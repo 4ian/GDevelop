@@ -65,10 +65,10 @@ export class PixiTileMapHelper {
     // So the atlas images can have unused pixels at the right and bottom.
     if (
       (atlasTexture.width !== 1 && atlasTexture.width < expectedAtlasWidth) ||
-      atlasTexture.width > expectedAtlasWidth + spacing + tilewidth ||
+      atlasTexture.width >= expectedAtlasWidth + spacing + tilewidth ||
       (atlasTexture.height !== 1 &&
         atlasTexture.height < expectedAtlasHeight) ||
-      atlasTexture.height > expectedAtlasHeight + spacing + tileheight
+      atlasTexture.height >= expectedAtlasHeight + spacing + tileheight
     ) {
       console.error(
         "It seems the atlas file was resized, which is not supported. " +
@@ -171,10 +171,11 @@ export class PixiTileMapHelper {
 
         const tileWidth = tileLayer.tileMap.getTileWidth();
         const tileHeight = tileLayer.tileMap.getTileHeight();
+        const dimensionX = tileLayer.tileMap.getDimensionX();
+        const dimensionY = tileLayer.tileMap.getDimensionY();
 
-        for (let y = 0; y < tileLayer.tileMap.getDimensionY(); y++) {
-          let first = true;
-          for (let x = 0; x < tileLayer.tileMap.getDimensionX(); x++) {
+        for (let y = 0; y < dimensionY; y++) {
+          for (let x = 0; x < dimensionX; x++) {
             const xPos = tileWidth * x;
             const yPos = tileHeight * y;
 

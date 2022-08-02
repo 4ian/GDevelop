@@ -444,6 +444,7 @@ type InstallAssetArgs = {|
   project: gdProject,
   events: gdEventsList,
   objectsContainer: gdObjectsContainer,
+  isStagingAsset: boolean,
 |};
 
 type InstallAssetOutput = {|
@@ -456,8 +457,9 @@ export const installAsset = async ({
   project,
   events,
   objectsContainer,
+  isStagingAsset,
 }: InstallAssetArgs): Promise<InstallAssetOutput> => {
-  const asset = await getAsset(assetShortHeader);
+  const asset = await getAsset(assetShortHeader, { isStagingAsset });
   const requiredBehaviors = getRequiredBehaviorsFromAsset(asset);
   const requiredExtensions = getRequiredExtensionsForEventsFromAsset(asset);
   const missingBehaviors = filterMissingBehaviors(gd, requiredBehaviors);

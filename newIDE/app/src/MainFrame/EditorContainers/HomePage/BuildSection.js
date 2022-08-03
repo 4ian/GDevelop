@@ -247,6 +247,14 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
             click: () => onRemoveFromRecentFiles(file),
           },
         ]);
+      } else {
+        actions = actions.concat([
+          { type: 'separator' },
+          {
+            label: i18n._(t`Remove from list`),
+            click: () => onRemoveFromRecentFiles(file),
+          },
+        ]);
       }
       return actions;
     };

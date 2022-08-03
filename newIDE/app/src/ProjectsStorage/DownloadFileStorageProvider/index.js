@@ -12,7 +12,7 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 export default ({
   internalName: 'DownloadFile',
   name: t`Download a copy`,
-  renderIcon: () => <SaveAlt />,
+  renderIcon: props => <SaveAlt fontSize={props.size} />,
   hiddenInOpenDialog: true,
   createOperations: ({ setDialog, closeDialog }) => ({
     onSaveProjectAs: (project: gdProject, fileMetadata: ?FileMetadata) => {

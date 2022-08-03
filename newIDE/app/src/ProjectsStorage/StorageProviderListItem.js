@@ -60,12 +60,15 @@ const StorageProviderListItem = ({
         >
           <ListItemIcon>
             {storageProvider.renderIcon
-              ? storageProvider.renderIcon()
+              ? storageProvider.renderIcon({})
               : undefined}
           </ListItemIcon>
           <ListItemText>
             <Line justifyContent="space-between" alignItems="center">
-              <Text noMargin>{i18n._(storageProvider.name)}</Text>
+              <Text noMargin>
+                {i18n._(storageProvider.name)}{' '}
+                {storageProvider.internalName === 'Cloud' && i18n._(t`(Beta)`)}
+              </Text>
               {shouldDisplayAuthenticationButtons && (
                 <Line noMargin>
                   <FlatButton

@@ -7,6 +7,7 @@ import {
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
+export const CLOUD_PROJECT_MAX_COUNT = 10;
 
 const projectResourcesClient = axios.create({
   baseURL: GDevelopProjectResourcesStorage.baseUrl,

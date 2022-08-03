@@ -276,7 +276,7 @@ const showFilePicker = ({
 export default ({
   internalName: 'GoogleDrive',
   name: t`Google Drive`,
-  renderIcon: () => <GoogleDrive />,
+  renderIcon: props => <GoogleDrive fontSize={props.size} />,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
     if (appArguments.state) {
       try {

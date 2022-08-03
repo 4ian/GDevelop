@@ -18,8 +18,8 @@ import Cloud from '../../UI/CustomSvgIcons/Cloud';
 
 export default ({
   internalName: 'Cloud',
-  name: t`GDevelop cloud storage`,
-  renderIcon: () => <Cloud />,
+  name: t`GDevelop Cloud`,
+  renderIcon: props => <Cloud fontSize={props.size} />,
   hiddenInOpenDialog: true,
   needUserAuthentication: true,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {

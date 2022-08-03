@@ -56,7 +56,7 @@ export default ({
   internalName: 'Dropbox',
   name: t`Dropbox (coming soon)`,
   disabled: true,
-  renderIcon: () => <Dropbox />,
+  renderIcon: props => <Dropbox fontSize={props.size} />,
   createOperations: ({ setDialog, closeDialog }) => {
     initializeApis().catch(() => {});
 

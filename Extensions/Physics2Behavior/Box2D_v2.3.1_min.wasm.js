@@ -626,6 +626,7 @@ Zv();a.b2Manifold.e_faceA=$v();a.b2Manifold.e_faceB=aw();a.b2_staticBody=bw();a.
 }
 );
 })();
-Box2D(window.Box2D).then(box2d => {
+
+gdjs.registerAsynchronouslyLibraryPromise(Box2D(window.Box2D).then(box2d => {
   window.Box2D = box2d;
-})
+}));

@@ -153,7 +153,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
         );
         hasTooManyCloudProjects =
           cloudProjects.filter(cloudProject => !cloudProject.deletedAt)
-            .length >= 10;
+            .length >= CLOUD_PROJECT_MAX_COUNT;
       }
     }
 

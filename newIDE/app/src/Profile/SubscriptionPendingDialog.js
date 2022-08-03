@@ -65,11 +65,10 @@ export default function SubscriptionPendingDialog({
               <Trans>
                 Thanks for getting a subscription and supporting GDevelop!
               </Trans>{' '}
-              {'❤️'}
+              {'❤️'}{' '}
               <b>
                 <Trans>
-                  Your browser will now open to enter your payment details
-                  (handled securely by Stripe.com).
+                  Your browser will now open to enter your payment details.
                 </Trans>
               </b>
             </Text>
@@ -105,7 +104,7 @@ export default function SubscriptionPendingDialog({
             <Spacer />
             <Text>
               <b>
-                <Trans>Your new plan is now activated</Trans>
+                <Trans>Your new plan is now activated.</Trans>
               </b>
             </Text>
           </Line>

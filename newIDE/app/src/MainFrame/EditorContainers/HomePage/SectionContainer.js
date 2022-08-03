@@ -20,6 +20,12 @@ const styles = {
     paddingLeft: SECTION_PADDING,
     paddingRight: SECTION_PADDING,
   },
+  mobileFooter: {
+    padding: 5,
+  },
+  desktopFooter: {
+    paddingLeft: SECTION_PADDING,
+  },
   rowContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -37,6 +43,7 @@ type Props = {|
   subtitle?: React.Node,
   backAction?: () => void,
   flexBody?: boolean,
+  renderFooter?: () => React.Node,
 |};
 
 const SectionContainer = ({
@@ -45,6 +52,7 @@ const SectionContainer = ({
   subtitle,
   backAction,
   flexBody,
+  renderFooter,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const GDevelopTheme = React.useContext(GDevelopThemeContext);
@@ -86,6 +94,19 @@ const SectionContainer = ({
           {children}
         </Column>
       </Paper>
+      {renderFooter && (
+        <Paper
+          style={{
+            borderLeft: `1px solid ${GDevelopTheme.home.separator.color}`,
+            ...(windowWidth === 'small'
+              ? styles.mobileFooter
+              : styles.desktopFooter),
+          }}
+          square
+        >
+          {renderFooter()}
+        </Paper>
+      )}
     </Column>
   );
 };

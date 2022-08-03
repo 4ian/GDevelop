@@ -59,6 +59,7 @@ const SectionContainer = ({
   return (
     <Column useFullHeight noMargin expand>
       <Paper
+        elevation={0}
         style={{
           ...styles.scrollContainer,
           display: flexBody ? 'flex' : 'block',
@@ -96,6 +97,7 @@ const SectionContainer = ({
       </Paper>
       {renderFooter && (
         <Paper
+          elevation={0}
           style={{
             borderLeft: `1px solid ${GDevelopTheme.home.separator.color}`,
             ...(windowWidth === 'small'

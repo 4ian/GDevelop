@@ -11,6 +11,7 @@ import AddIcon from '@material-ui/icons/Add';
 import Text from '../../../UI/Text';
 import TextButton from '../../../UI/TextButton';
 import RaisedButton from '../../../UI/RaisedButton';
+import AlertMessage from '../../../UI/AlertMessage';
 import { Line, Column, Spacer } from '../../../UI/Grid';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
@@ -25,7 +26,10 @@ import ContextMenu, {
 import CircularProgress from '../../../UI/CircularProgress';
 import { type MenuItemTemplate } from '../../../UI/Menu/Menu.flow';
 import useConfirmDialog from '../../../UI/Confirm/useConfirmDialog';
-import { deleteCloudProject } from '../../../Utils/GDevelopServices/Project';
+import {
+  CLOUD_PROJECT_MAX_COUNT,
+  deleteCloudProject,
+} from '../../../Utils/GDevelopServices/Project';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { getRelativeOrAbsoluteDisplayDate } from '../../../Utils/DateDisplay';
@@ -91,6 +95,8 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       file => file.fileMetadata
     );
 
+    let hasTooManyCloudProjects = false;
+
     // Show cloud projects on the web app only.
     if (isWebApp) {
       const { cloudProjects } = authenticatedUser;
@@ -112,6 +118,9 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
             })
             .filter(Boolean)
         );
+        hasTooManyCloudProjects =
+          cloudProjects.filter(cloudProject => !cloudProject.deletedAt)
+            .length >= 10;
       }
     }
 
@@ -213,7 +222,34 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       <I18n>
         {({ i18n }) => (
           <>
-            <SectionContainer title={<Trans>My projects</Trans>}>
+            <SectionContainer
+              title={<Trans>My projects</Trans>}
+              renderFooter={() =>
+                isWebApp &&
+                hasTooManyCloudProjects && (
+                  <Line>
+                    <Column expand>
+                      <AlertMessage kind="warning">
+                        <Text size="block-title">
+                          <Trans>
+                            You've reached your maximum storage of{' '}
+                            {CLOUD_PROJECT_MAX_COUNT}
+                            cloud-based projects
+                          </Trans>
+                        </Text>
+                        <Text>
+                          <Trans>
+                            You won't be able to save a new project using
+                            GDevelop Cloud. If you want to do so, first delete
+                            existing cloud-based projects of yours.
+                          </Trans>
+                        </Text>
+                      </AlertMessage>
+                    </Column>
+                  </Line>
+                )
+              }
+            >
               <SectionRow>
                 <Line noMargin>
                   <ResponsiveLineStackLayout

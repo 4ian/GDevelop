@@ -85,7 +85,7 @@ export type StorageProvider = {|
   hiddenInOpenDialog?: boolean,
   hiddenInSaveDialog?: boolean,
   disabled?: boolean,
-  renderIcon?: () => React.Node,
+  renderIcon?: ({| size?: 'small' | 'medium' |}) => React.Node,
   getFileMetadataFromAppArguments?: AppArguments => ?FileMetadata,
   createOperations: ({
     /** Open a dialog (a render function) */

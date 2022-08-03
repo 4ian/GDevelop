@@ -11,7 +11,7 @@ const FakeCloudStorageProvider = ({
   internalName: 'FakeCloud',
   name: t`GDevelop cloud storage (coming soon)`,
   disabled: true,
-  renderIcon: () => <Cloud />,
+  renderIcon: props => <Cloud fontSize={props.size} />,
   createOperations: () => {
     return {
       doesInitialOpenRequireUserInteraction: true,

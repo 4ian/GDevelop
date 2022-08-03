@@ -60,7 +60,7 @@ const StorageProviderListItem = ({
         >
           <ListItemIcon>
             {storageProvider.renderIcon
-              ? storageProvider.renderIcon()
+              ? storageProvider.renderIcon({})
               : undefined}
           </ListItemIcon>
           <ListItemText>

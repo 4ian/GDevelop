@@ -1468,11 +1468,14 @@ const MainFrame = (props: Props) => {
           projectItemName: null,
           renderEditorContainer: renderHomePageContainer,
           key: 'start page',
+          extraEditorProps: {
+            storageProviders: props.storageProviders,
+          },
           closable: false,
         }),
       }));
     },
-    [setState, i18n]
+    [setState, i18n, props.storageProviders]
   );
 
   const _openDebugger = React.useCallback(

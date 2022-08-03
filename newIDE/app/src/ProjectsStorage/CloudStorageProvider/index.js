@@ -18,7 +18,7 @@ import Cloud from '../../UI/CustomSvgIcons/Cloud';
 
 export default ({
   internalName: 'Cloud',
-  name: t`GDevelop cloud storage`,
+  name: t`GDevelop Cloud`,
   renderIcon: () => <Cloud />,
   hiddenInOpenDialog: true,
   needUserAuthentication: true,

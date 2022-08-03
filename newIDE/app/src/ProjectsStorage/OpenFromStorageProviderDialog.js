@@ -50,7 +50,7 @@ const OpenFromStorageProviderDialog = ({
                   primaryText={i18n._(storageProvider.name)}
                   leftIcon={
                     storageProvider.renderIcon
-                      ? storageProvider.renderIcon()
+                      ? storageProvider.renderIcon({})
                       : undefined
                   }
                   onClick={() => onChooseProvider(storageProvider)}

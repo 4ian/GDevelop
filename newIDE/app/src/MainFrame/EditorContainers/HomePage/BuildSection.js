@@ -3,19 +3,25 @@ import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 
 import AddIcon from '@material-ui/icons/Add';
 import Text from '../../../UI/Text';
 import TextButton from '../../../UI/TextButton';
 import RaisedButton from '../../../UI/RaisedButton';
+import AlertMessage from '../../../UI/AlertMessage';
 import { Line, Column, Spacer } from '../../../UI/Grid';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
 
-import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
+import {
+  type FileMetadataAndStorageProviderName,
+  type StorageProvider,
+} from '../../../ProjectsStorage';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import SectionContainer, { SectionRow } from './SectionContainer';
@@ -25,7 +31,10 @@ import ContextMenu, {
 import CircularProgress from '../../../UI/CircularProgress';
 import { type MenuItemTemplate } from '../../../UI/Menu/Menu.flow';
 import useConfirmDialog from '../../../UI/Confirm/useConfirmDialog';
-import { deleteCloudProject } from '../../../Utils/GDevelopServices/Project';
+import {
+  CLOUD_PROJECT_MAX_COUNT,
+  deleteCloudProject,
+} from '../../../Utils/GDevelopServices/Project';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { getRelativeOrAbsoluteDisplayDate } from '../../../Utils/DateDisplay';
@@ -51,6 +60,7 @@ type Props = {|
   onOpen: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   onCreateProject: () => void,
+  storageProviders: Array<StorageProvider>,
 |};
 
 export type BuildSectionInterface = {|
@@ -71,8 +81,33 @@ const PrettyBreakablePath = ({ path }: {| path: string |}) => {
   }, []);
 };
 
+const getStorageProviderByInternalName = (
+  storageProviders: Array<StorageProvider>,
+  internalName: string
+): ?StorageProvider => {
+  return storageProviders.find(
+    storageProvider => storageProvider.internalName === internalName
+  );
+};
+
+const useStylesForListItemIcon = makeStyles({
+  root: {
+    minWidth: 0,
+  },
+});
+
 const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
-  ({ project, canOpen, onOpen, onCreateProject, onOpenRecentFile }, ref) => {
+  (
+    {
+      project,
+      canOpen,
+      onOpen,
+      onCreateProject,
+      onOpenRecentFile,
+      storageProviders,
+    },
+    ref
+  ) => {
     const { getRecentProjectFiles, removeRecentProjectFile } = React.useContext(
       PreferencesContext
     );
@@ -83,6 +118,8 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     const windowWidth = useResponsiveWindowWidth();
     const forceUpdate = useForceUpdate();
 
+    const iconClasses = useStylesForListItemIcon();
+
     React.useImperativeHandle(ref, () => ({
       forceUpdate,
     }));
@@ -90,6 +127,8 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     let projectFiles: Array<FileMetadataAndStorageProviderName> = getRecentProjectFiles().filter(
       file => file.fileMetadata
     );
+
+    let hasTooManyCloudProjects = false;
 
     // Show cloud projects on the web app only.
     if (isWebApp) {
@@ -112,6 +151,9 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
             })
             .filter(Boolean)
         );
+        hasTooManyCloudProjects =
+          cloudProjects.filter(cloudProject => !cloudProject.deletedAt)
+            .length >= 10;
       }
     }
 
@@ -213,7 +255,33 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       <I18n>
         {({ i18n }) => (
           <>
-            <SectionContainer title={<Trans>My projects</Trans>}>
+            <SectionContainer
+              title={<Trans>My projects</Trans>}
+              renderFooter={() =>
+                isWebApp &&
+                hasTooManyCloudProjects && (
+                  <Line>
+                    <Column expand>
+                      <AlertMessage kind="warning">
+                        <Text size="block-title">
+                          <Trans>
+                            You've reached your maximum storage of{' '}
+                            {CLOUD_PROJECT_MAX_COUNT}
+                            cloud-based projects
+                          </Trans>
+                        </Text>
+                        <Text>
+                          <Trans>
+                            To keep using GDevelop cloud, consider deleting one
+                            of your projects.
+                          </Trans>
+                        </Text>
+                      </AlertMessage>
+                    </Column>
+                  </Line>
+                )
+              }
+            >
               <SectionRow>
                 <Line noMargin>
                   <ResponsiveLineStackLayout
@@ -274,99 +342,147 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                             </Column>
                             <Column expand>
                               <Text color="secondary">
+                                <Trans>Location</Trans>
+                              </Text>
+                            </Column>
+                            <Column expand>
+                              <Text color="secondary">
                                 <Trans>Last edited</Trans>
                               </Text>
                             </Column>
                           </LineStackLayout>
                         )}
                         <List>
-                          {projectFiles.map(file => (
-                            <ListItem
-                              button
-                              key={file.fileMetadata.fileIdentifier}
-                              onClick={() => {
-                                onOpenRecentFile(file);
-                              }}
-                              style={styles.listItem}
-                              onContextMenu={event =>
-                                openContextMenu(event, file)
-                              }
-                            >
-                              {isWindowWidthMediumOrLarger ? (
-                                <LineStackLayout
-                                  justifyContent="flex-start"
-                                  expand
-                                >
-                                  <Column expand>
-                                    <Line noMargin alignItems="center">
-                                      <Text noMargin>
-                                        {file.fileMetadata.name || (
-                                          <PrettyBreakablePath
-                                            path={
-                                              file.fileMetadata.fileIdentifier
-                                            }
-                                          />
-                                        )}
-                                      </Text>
-
-                                      {pendingProject ===
-                                        file.fileMetadata.fileIdentifier && (
-                                        <>
-                                          <Spacer />
-                                          <CircularProgress size={16} />
-                                        </>
-                                      )}
-                                    </Line>
-                                  </Column>
-                                  <Column expand>
-                                    {file.fileMetadata.lastModifiedDate && (
-                                      <Text noMargin>
-                                        {getRelativeOrAbsoluteDisplayDate(
-                                          i18n,
-                                          file.fileMetadata.lastModifiedDate
-                                        )}
-                                      </Text>
+                          {projectFiles.map(file => {
+                            const storageProvider = getStorageProviderByInternalName(
+                              storageProviders,
+                              file.storageProviderName
+                            );
+                            return (
+                              <ListItem
+                                button
+                                key={file.fileMetadata.fileIdentifier}
+                                onClick={() => {
+                                  onOpenRecentFile(file);
+                                }}
+                                style={styles.listItem}
+                                onContextMenu={event =>
+                                  openContextMenu(event, file)
+                                }
+                              >
+                                <>
+                                  {storageProvider &&
+                                    storageProvider.renderIcon &&
+                                    !isWindowWidthMediumOrLarger && (
+                                      <ListItemAvatar
+                                        classes={iconClasses}
+                                        style={{
+                                          marginTop: 8,
+                                          alignSelf: 'flex-start',
+                                        }}
+                                      >
+                                        {storageProvider.renderIcon({
+                                          size: 'small',
+                                        })}
+                                      </ListItemAvatar>
                                     )}
-                                  </Column>
-                                </LineStackLayout>
-                              ) : (
-                                <Column expand>
-                                  <Line
-                                    noMargin
-                                    alignItems="center"
-                                    justifyContent="space-between"
-                                  >
-                                    <ListItemText
-                                      primary={
-                                        file.fileMetadata.name || (
-                                          <PrettyBreakablePath
-                                            path={
-                                              file.fileMetadata.fileIdentifier
-                                            }
-                                          />
-                                        )
-                                      }
-                                      secondary={
-                                        file.fileMetadata.lastModifiedDate
-                                          ? getRelativeOrAbsoluteDisplayDate(
+                                  {isWindowWidthMediumOrLarger ? (
+                                    <LineStackLayout
+                                      justifyContent="flex-start"
+                                      expand
+                                    >
+                                      <Column expand>
+                                        <Line noMargin alignItems="center">
+                                          {storageProvider &&
+                                            storageProvider.renderIcon && (
+                                              <>
+                                                {storageProvider.renderIcon({
+                                                  size: 'small',
+                                                })}
+                                                <Spacer />
+                                              </>
+                                            )}
+                                          <Text noMargin>
+                                            {file.fileMetadata.name || (
+                                              <PrettyBreakablePath
+                                                path={
+                                                  file.fileMetadata
+                                                    .fileIdentifier
+                                                }
+                                              />
+                                            )}
+                                          </Text>
+
+                                          {pendingProject ===
+                                            file.fileMetadata
+                                              .fileIdentifier && (
+                                            <>
+                                              <Spacer />
+                                              <CircularProgress size={16} />
+                                            </>
+                                          )}
+                                        </Line>
+                                      </Column>
+                                      <Column expand>
+                                        <Text noMargin>
+                                          {storageProvider
+                                            ? i18n._(storageProvider.name)
+                                            : ''}
+                                        </Text>
+                                      </Column>
+                                      <Column expand>
+                                        {file.fileMetadata.lastModifiedDate && (
+                                          <Text noMargin>
+                                            {getRelativeOrAbsoluteDisplayDate(
                                               i18n,
                                               file.fileMetadata.lastModifiedDate
+                                            )}
+                                          </Text>
+                                        )}
+                                      </Column>
+                                    </LineStackLayout>
+                                  ) : (
+                                    <Column expand>
+                                      <Line
+                                        noMargin
+                                        alignItems="center"
+                                        justifyContent="space-between"
+                                      >
+                                        <ListItemText
+                                          primary={
+                                            file.fileMetadata.name || (
+                                              <PrettyBreakablePath
+                                                path={
+                                                  file.fileMetadata
+                                                    .fileIdentifier
+                                                }
+                                              />
                                             )
-                                          : undefined
-                                      }
-                                      onContextMenu={event =>
-                                        openContextMenu(event, file)
-                                      }
-                                    />
-                                    {pendingProject ===
-                                      file.fileMetadata.fileIdentifier && (
-                                      <CircularProgress size={24} />
-                                    )}
-                                  </Line>
-                                </Column>
-                              )}
-                            </ListItem>
-                          ))}
+                                          }
+                                          secondary={
+                                            file.fileMetadata.lastModifiedDate
+                                              ? getRelativeOrAbsoluteDisplayDate(
+                                                  i18n,
+                                                  file.fileMetadata
+                                                    .lastModifiedDate
+                                                )
+                                              : undefined
+                                          }
+                                          onContextMenu={event =>
+                                            openContextMenu(event, file)
+                                          }
+                                        />
+                                        {pendingProject ===
+                                          file.fileMetadata.fileIdentifier && (
+                                          <CircularProgress size={24} />
+                                        )}
+                                      </Line>
+                                    </Column>
+                                  )}
+                                </>
+                              </ListItem>
+                            );
+                          })}
                         </List>
                       </Column>
                     </Line>

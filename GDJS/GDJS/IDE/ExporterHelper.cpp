@@ -815,9 +815,6 @@ void ExporterHelper::ExportObjectAndBehaviorsRequiredFiles(
     const gd::Project &project, std::vector<gd::String> &requiredFiles) {
   auto addRequiredFiles = [&](const std::vector<gd::String> &newRequiredFiles) {
     for (const auto &requiredFile : newRequiredFiles) {
-      
-      std::cout << "include as resource: " << requiredFile
-                << std::endl;
       InsertUnique(requiredFiles, requiredFile);
     }
   };
@@ -826,6 +823,8 @@ void ExporterHelper::ExportObjectAndBehaviorsRequiredFiles(
     // Ensure needed files are included for the object type and its behaviors.
 
     // TODO Do the same for objects once we have a case to test it.
+    // No object use WebAssembly library so the requiredFiles attribute
+    // is not implemented yet.
 
     std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
     for (std::size_t j = 0; j < behaviors.size(); ++j) {

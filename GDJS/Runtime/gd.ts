@@ -559,24 +559,26 @@ namespace gdjs {
     }
   };
 
-  const asynchronouslyLibraryPromises: Array<Promise<any>> = [];
+  const asynchronouslyLoadingLibraryPromises: Array<Promise<any>> = [];
 
   /**
    * Register a promise that a library will be loaded.
    *
    * This method must be called by any library that loads asynchronously.
    */
-  export const registerAsynchronouslyLibraryPromise = (
+  export const registerAsynchronouslyLoadingLibraryPromise = (
     promise: Promise<any>
   ): void => {
-    asynchronouslyLibraryPromises.push(promise);
+    asynchronouslyLoadingLibraryPromises.push(promise);
   };
 
   /**
    * @returns a promise that all libraries will be loaded.
    */
-  export const getAllAsynchronouslyLibraryPromise = (): Promise<any[]> => {
-    return Promise.all(asynchronouslyLibraryPromises);
+  export const getAllAsynchronouslyLoadingLibraryPromise = (): Promise<
+    any[]
+  > => {
+    return Promise.all(asynchronouslyLoadingLibraryPromises);
   };
 }
 

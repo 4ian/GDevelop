@@ -7,7 +7,7 @@ describe('Physics2RuntimeBehavior', () => {
       await delay(5);
     }
     if (!window.Box2D) {
-      throw new Error('Timeout reading the tile map JSON file.');
+      throw new Error('Timeout loading Box2D.');
     }
   });
 

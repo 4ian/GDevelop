@@ -2124,6 +2124,7 @@ const MainFrame = (props: Props) => {
       enrichedFileMetadata = projectName
         ? { ...fileMetadata, name: projectName }
         : fileMetadata;
+      if (storageProvider) getStorageProviderOperations({ storageProvider });
       state = await openFromFileMetadata(enrichedFileMetadata);
     }
 

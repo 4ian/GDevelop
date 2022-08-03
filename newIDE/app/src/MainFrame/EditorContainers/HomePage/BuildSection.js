@@ -71,6 +71,8 @@ const PrettyBreakablePath = ({ path }: {| path: string |}) => {
   const separatorIndices = Array.from(path)
     .map((char, index) => (['/', '\\'].includes(char) ? index : null))
     .filter(Boolean);
+  if (separatorIndices.length === 0) return path;
+
   return separatorIndices.reduce((acc, separatorIndex, listIndex) => {
     const nextSeparatorIndex = separatorIndices[listIndex + 1];
     return [

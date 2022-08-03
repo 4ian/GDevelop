@@ -182,6 +182,52 @@ namespace gdjs {
         getTweensMap(runtimeScene).set(identifier, tween);
         getShiftyScene(runtimeScene).add(tween);
       };
+
+      export const tweenCameraZoom = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        toZoom: number,
+        layerName: string,
+        duration: number,
+        easing: shifty.easingFunction
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
+        const tween = shifty.tween({
+          from: { zoom: layer.getCameraZoom() },
+          to: { zoom: toZoom },
+          easing,
+          duration,
+          render: ({ zoom }) => {
+            layer.setCameraZoom(zoom);
+          },
+        });
+
+        getTweensMap(runtimeScene).set(identifier, tween);
+        getShiftyScene(runtimeScene).add(tween);
+      };
+
+      export const tweenCameraRotation = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        toRotation: number,
+        layerName: string,
+        duration: number,
+        easing: shifty.easingFunction
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
+        const tween = shifty.tween({
+          from: { rotation: layer.getCameraRotation() },
+          to: { rotation: toRotation },
+          easing,
+          duration,
+          render: ({ rotation }) => {
+            layer.setCameraRotation(rotation);
+          },
+        });
+
+        getTweensMap(runtimeScene).set(identifier, tween);
+        getShiftyScene(runtimeScene).add(tween);
+      };
     }
   }
 }

@@ -558,8 +558,30 @@ namespace gdjs {
       return diff / Math.min(absA + absB, Number.MAX_VALUE) < epsilon;
     }
   };
+
+  const asynchronouslyLoadingLibraryPromises: Array<Promise<any>> = [];
+
+  /**
+   * Register a promise that a library will be loaded.
+   *
+   * This method must be called by any library that loads asynchronously.
+   */
+  export const registerAsynchronouslyLoadingLibraryPromise = (
+    promise: Promise<any>
+  ): void => {
+    asynchronouslyLoadingLibraryPromises.push(promise);
+  };
+
+  /**
+   * @returns a promise that all libraries will be loaded.
+   */
+  export const getAllAsynchronouslyLoadingLibraryPromise = (): Promise<
+    any[]
+  > => {
+    return Promise.all(asynchronouslyLoadingLibraryPromises);
+  };
 }
 
-//Make sure console.warn and console.error are available.
+// Make sure console.warn and console.error are available.
 console.warn = console.warn || console.log;
 console.error = console.error || console.log;

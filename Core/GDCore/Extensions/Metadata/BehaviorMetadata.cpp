@@ -402,6 +402,16 @@ BehaviorMetadata& BehaviorMetadata::AddIncludeFile(
   return *this;
 }
 
+BehaviorMetadata& BehaviorMetadata::AddRequiredFile(
+    const gd::String& requiredFile) {
+#if defined(GD_IDE_ONLY)
+  if (std::find(requiredFiles.begin(), requiredFiles.end(), requiredFile) ==
+      requiredFiles.end())
+    requiredFiles.push_back(requiredFile);
+#endif
+  return *this;
+}
+
 const gd::String& BehaviorMetadata::GetName() const {
   return instance->GetTypeName();
 }

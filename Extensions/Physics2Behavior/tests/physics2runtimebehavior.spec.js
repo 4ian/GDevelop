@@ -1,4 +1,16 @@
 describe('Physics2RuntimeBehavior', () => {
+  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+  beforeEach(async function () {
+    // TODO find a clean way to wait for the Box2D library to load.
+    for (let index = 0; index < 200 && !window.Box2D; index++) {
+      await delay(5);
+    }
+    if (!window.Box2D) {
+      throw new Error('Timeout loading Box2D.');
+    }
+  });
+
   class FakeAutoRemoveBehavior extends gdjs.RuntimeBehavior {
     shouldDeleteInPreEvent = false;
 

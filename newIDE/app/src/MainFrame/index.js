@@ -182,11 +182,11 @@ const findStorageProviderFor = (
 
 /**
  * Compares a React reference to the current project (truth source)
- * and a project stored in a variable.
+ * and a project stored in a variable (coming probably from a React state).
  * It is useful to detect if the project stored in a variable is still
- * currently opened.
+ * valid (still currently opened). If it's not, it means the variable is "stale".
  */
-const isCurrentProjectUnchanged = (
+const isCurrentProjectStale = (
   currentProjectRef: {| current: ?gdProject |},
   currentProject: gdProject
 ) =>
@@ -364,9 +364,12 @@ const MainFrame = (props: Props) => {
     setFileMetadataOpeningMessage,
   ] = React.useState<?MessageDescriptor>(null);
 
-  // This reference is useful to get the current opened project.
-  // It might be different from the current project an effect or a callback
-  // manipulates when a promise resolves for instance.
+  /** This reference is useful to get the current opened project,
+   * even in the callback of a hook/promise - without risking to read "stale" data.
+   * This can be different from the `currentProject` (coming from the state)
+   * that an effect or a callback manipulates when a promise resolves for instance.
+   * See `isCurrentProjectStale`.
+   */
   const currentProjectRef = React.useRef<?gdProject>(null);
 
   // This is just for testing, to check if we're getting the right state
@@ -1859,11 +1862,9 @@ const MainFrame = (props: Props) => {
                   fileMetadata: enrichedFileMetadata,
                   storageProviderName: storageProviderInternalName,
                 });
-                if (
-                  isCurrentProjectUnchanged(currentProjectRef, currentProject)
-                ) {
+                if (isCurrentProjectStale(currentProjectRef, currentProject)) {
                   // We do not want to change the current file metadata if the
-                  // project has changed at the moment the promise resolved
+                  // project has changed before the promise resolves.
                   setState(state => ({
                     ...state,
                     currentFileMetadata: enrichedFileMetadata,
@@ -1979,9 +1980,9 @@ const MainFrame = (props: Props) => {
             fileMetadata: enrichedFileMetadata,
             storageProviderName: storageProviderInternalName,
           });
-          if (isCurrentProjectUnchanged(currentProjectRef, currentProject)) {
+          if (isCurrentProjectStale(currentProjectRef, currentProject)) {
             // We do not want to change the current file metadata if the
-            // project has changed at the moment the promise resolved
+            // project has changed before the promise resolves.
             setState(state => ({
               ...state,
               currentFileMetadata: enrichedFileMetadata,

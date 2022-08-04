@@ -149,6 +149,10 @@ class ResourceWorkerInEventsWorker : public ArbitraryEventsWorker {
             gd::String updatedParameterValue = parameterValue;
             worker.ExposeImage(updatedParameterValue);
             instruction.SetParameter(parameterIndex, updatedParameterValue);
+          } else if (parameterMetadata.GetType() == "jsonResource") {
+            gd::String updatedParameterValue = parameterValue;
+            worker.ExposeJson(updatedParameterValue);
+            instruction.SetParameter(parameterIndex, updatedParameterValue);
           }
         });
 

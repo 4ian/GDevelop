@@ -78,7 +78,7 @@ const StorageProviderListItem = ({
                   <Spacer />
                   <RaisedButton
                     primary
-                    label={i18n._(t`Log-in to GDevelop`)}
+                    label={i18n._(t`Login with GDevelop`)}
                     onClick={() => authenticatedUser.onLogin()}
                   />
                 </Line>

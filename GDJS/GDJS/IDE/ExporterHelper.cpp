@@ -822,9 +822,9 @@ void ExporterHelper::ExportObjectAndBehaviorsRequiredFiles(
   auto addObjectRequiredFiles = [&](const gd::Object &object) {
     // Ensure needed files are included for the object type and its behaviors.
 
-    // TODO Do the same for objects once we have a case to test it.
-    // No object use WebAssembly library so the requiredFiles attribute
-    // is not implemented yet.
+    // TODO: Handle required files declared by objects. For now, no objects has
+    // a need for additional required files, so the object metadata do not even
+    // have `requiredFiles`.
 
     std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
     for (std::size_t j = 0; j < behaviors.size(); ++j) {

@@ -562,7 +562,8 @@ namespace gdjs {
   const asynchronouslyLoadingLibraryPromises: Array<Promise<any>> = [];
 
   /**
-   * Register a promise that a library will be loaded.
+   * Register a promise which will be resolved when a third party library has
+   * finished loading (and is required to load before launching the game).
    *
    * This method must be called by any library that loads asynchronously.
    */
@@ -573,7 +574,9 @@ namespace gdjs {
   };
 
   /**
-   * @returns a promise that all libraries will be loaded.
+   * @returns a promise resolved when all all third party libraries, which need
+   * to be loaded before the game startup, are loaded. If a library fails
+   * loading, this will be rejected.
    */
   export const getAllAsynchronouslyLoadingLibraryPromise = (): Promise<
     any[]

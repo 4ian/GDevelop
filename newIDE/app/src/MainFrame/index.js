@@ -180,6 +180,19 @@ const findStorageProviderFor = (
   return storageProvider;
 };
 
+/**
+ * Compares a React reference to the current project (truth source)
+ * and a project stored in a variable.
+ * It is useful to detect if the project stored in a variable is still
+ * currently opened.
+ */
+const isCurrentProjectUnchanged = (
+  currentProjectRef: {| current: ?gdProject |},
+  currentProject: gdProject
+) =>
+  currentProjectRef.current &&
+  currentProject.ptr === currentProjectRef.current.ptr;
+
 export type State = {|
   createDialogOpen: boolean,
   currentProject: ?gdProject,
@@ -351,6 +364,11 @@ const MainFrame = (props: Props) => {
     setFileMetadataOpeningMessage,
   ] = React.useState<?MessageDescriptor>(null);
 
+  // This reference is useful to get the current opened project.
+  // It might different from the current project an effect or a callback
+  // manipulates when a promise resolves for instance.
+  const currentProjectRef = React.useRef<?gdProject>(null);
+
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
   // React.useEffect(() => {
@@ -390,6 +408,13 @@ const MainFrame = (props: Props) => {
     }, 3000); // Timeout to avoid showing the dialog while the app is still loading.
     return () => clearTimeout(timeoutId);
   }, []);
+
+  React.useEffect(
+    () => {
+      currentProjectRef.current = currentProject;
+    },
+    [currentProject]
+  );
 
   React.useEffect(
     () => {
@@ -1810,6 +1835,12 @@ const MainFrame = (props: Props) => {
       }
       setIsSavingProject(true);
 
+      // At the end of the promise below, currentProject and storageProvider
+      // may have changed (if the user opened another project). So we read and
+      // store their values in variables now.
+      const projectName = currentProject.getName();
+      const storageProviderInternalName = getStorageProvider().internalName;
+
       onSaveProjectAs(currentProject, currentFileMetadata, {
         context: options ? options.context : undefined,
         onStartSaving: () => _showSnackMessage(i18n._(t`Saving...`)),
@@ -1821,17 +1852,23 @@ const MainFrame = (props: Props) => {
               _showSnackMessage(i18n._(t`Project properly saved`));
 
               if (fileMetadata) {
+                const enrichedFileMetadata = fileMetadata.name
+                  ? fileMetadata
+                  : { ...fileMetadata, name: projectName };
                 preferences.insertRecentProjectFile({
-                  fileMetadata: fileMetadata.name
-                    ? fileMetadata
-                    : { ...fileMetadata, name: currentProject.getName() },
-                  storageProviderName: getStorageProvider().internalName,
+                  fileMetadata: enrichedFileMetadata,
+                  storageProviderName: storageProviderInternalName,
                 });
-
-                setState(state => ({
-                  ...state,
-                  currentFileMetadata: fileMetadata,
-                }));
+                if (
+                  isCurrentProjectUnchanged(currentProjectRef, currentProject)
+                ) {
+                  // We do not want to change the current file metadata if the
+                  // project has changed at the moment the promise resolved
+                  setState(state => ({
+                    ...state,
+                    currentFileMetadata: enrichedFileMetadata,
+                  }));
+                }
               }
             }
           },
@@ -1919,6 +1956,13 @@ const MainFrame = (props: Props) => {
 
       try {
         const saveStartTime = performance.now();
+
+        // At the end of the promise below, currentProject and storageProvider
+        // may have changed (if the user opened another project). So we read and
+        // store their values in variables now.
+        const projectName = currentProject.getName();
+        const storageProviderInternalName = getStorageProvider().internalName;
+
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
           currentFileMetadata
@@ -1928,17 +1972,22 @@ const MainFrame = (props: Props) => {
           console.info(
             `Project saved in ${performance.now() - saveStartTime}ms.`
           );
+          const enrichedFileMetadata = fileMetadata.name
+            ? fileMetadata
+            : { ...fileMetadata, name: projectName };
           preferences.insertRecentProjectFile({
-            fileMetadata: fileMetadata.name
-              ? fileMetadata
-              : { ...fileMetadata, name: currentProject.getName() },
-            storageProviderName: getStorageProvider().internalName,
+            fileMetadata: enrichedFileMetadata,
+            storageProviderName: storageProviderInternalName,
           });
+          if (isCurrentProjectUnchanged(currentProjectRef, currentProject)) {
+            // We do not want to change the current file metadata if the
+            // project has changed at the moment the promise resolved
+            setState(state => ({
+              ...state,
+              currentFileMetadata: enrichedFileMetadata,
+            }));
+          }
 
-          setState(state => ({
-            ...state,
-            currentFileMetadata: fileMetadata,
-          }));
           if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
           _showSnackMessage(i18n._(t`Project properly saved`));
         }

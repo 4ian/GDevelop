@@ -151,11 +151,12 @@ const createZeroesMetric = (date: Date): GameMetrics => {
  * @returns game metrics with a metric for each 364 past days (today first).
  */
 const fillMissingDays = (
-  gameMetrics: Array<GameMetrics>
+  gameMetrics: Array<GameMetrics>,
+  todayDate: Date
 ): Array<GameMetrics> => {
   const filledGameMetrics = [];
   // TODO In some timezones, it might start the wrong day.
-  let previousMetricDate = addDays(new Date(), 1);
+  let previousMetricDate = addDays(todayDate, 1);
   for (const metric of gameMetrics) {
     const metricDate = parseISO(metric.date);
     // Fill holes
@@ -617,7 +618,8 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
  * (today at last).
  */
 export const buildChartData = (
-  gameMetrics: ?Array<GameMetrics>
+  gameMetrics: ?Array<GameMetrics>,
+  todayDate: Date = new Date()
 ): { yearChartData: ChartData, monthChartData: ChartData } => {
   if (!gameMetrics) {
     return {
@@ -628,7 +630,8 @@ export const buildChartData = (
   const filledGameRollingMetrics = fillMissingDays(
     gameMetrics.sort(
       (a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime()
-    )
+    ),
+    todayDate
   );
   return {
     yearChartData: evaluateChartData(

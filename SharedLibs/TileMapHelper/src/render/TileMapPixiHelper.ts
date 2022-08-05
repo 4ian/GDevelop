@@ -266,16 +266,18 @@ export class PixiTileMapHelper {
               for (let index = 0; index < vertices.length; index++) {
                 let vertexX = vertices[index][0];
                 let vertexY = vertices[index][1];
+                // It's important to do the diagonal flipping first,
+                // because the other flipping "move" the origin.
+                if (isFlippedDiagonally) {
+                  const swap = vertexX;
+                  vertexX = vertexY;
+                  vertexY = swap;
+                }
                 if (isFlippedHorizontally) {
                   vertexX = tileWidth - vertexX;
                 }
                 if (isFlippedVertically) {
                   vertexY = tileHeight - vertexY;
-                }
-                if (isFlippedDiagonally) {
-                  const swap = vertexX;
-                  vertexX = vertexY;
-                  vertexY = swap;
                 }
                 if (index === 0) {
                   pixiGraphics.moveTo(xPos + vertexX, yPos + vertexY);

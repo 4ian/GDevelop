@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 #if defined(GD_IDE_ONLY)
-#ifndef GDCORE_EVENTSBASEDBEHAVIOR_H
-#define GDCORE_EVENTSBASEDBEHAVIOR_H
+#ifndef GDCORE_EventsBasedObject_H
+#define GDCORE_EventsBasedObject_H
 
 #include <vector>
 #include "GDCore/Project/AbstractEventsBasedEntity.h"
@@ -29,18 +29,19 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
+class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
  public:
-  EventsBasedBehavior();
-  virtual ~EventsBasedBehavior(){};
+  EventsBasedObject();
+  ~EventsBasedObject(){};
+  EventsBasedObject(const gd::EventsBasedObject &_layout);
 
   /**
-   * \brief Return a pointer to a new EventsBasedBehavior constructed from
+   * \brief Return a pointer to a new EventsBasedObject constructed from
    * this one.
    */
-  EventsBasedBehavior* Clone() const { return new EventsBasedBehavior(*this); };
+  EventsBasedObject* Clone() const { return new EventsBasedObject(*this); };
 
-  EventsBasedBehavior& SetDescription(const gd::String& description_) override {
+  EventsBasedObject& SetDescription(const gd::String& description_) override {
     AbstractEventsBasedEntity::SetDescription(description_);
     return *this;
   }
@@ -48,7 +49,7 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
   /**
    * \brief Set the internal name of the behavior.
    */
-  EventsBasedBehavior& SetName(const gd::String& name_) {
+  EventsBasedObject& SetName(const gd::String& name_) {
     AbstractEventsBasedEntity::SetDescription(name_);
     return *this;
   }
@@ -56,22 +57,23 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
   /**
    * \brief Set the name of the behavior, to be displayed in the editor.
    */
-  EventsBasedBehavior& SetFullName(const gd::String& fullName_) {
+  EventsBasedObject& SetFullName(const gd::String& fullName_) {
     AbstractEventsBasedEntity::SetDescription(fullName_);
     return *this;
   }
 
   /**
-   * \brief Get the object type the behavior should be used with.
+   * \brief Return a reference to the layout.
    */
-  const gd::String& GetObjectType() const { return objectType; };
+  Layout& GetLayout() {
+    return *layout;
+  }
 
   /**
-   * \brief Set the object type the behavior should be used with.
+   * \brief Return a reference to the layout.
    */
-  EventsBasedBehavior& SetObjectType(const gd::String& objectType_) {
-    AbstractEventsBasedEntity::SetDescription(objectType_);
-    return *this;
+  const Layout& GetLayout() const {
+    return *layout;
   }
 
   void SerializeTo(SerializerElement& element) const override;
@@ -80,10 +82,10 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
                        const SerializerElement& element) override;
 
  private:
-  gd::String objectType;
+ std::unique_ptr<gd::Layout> layout;
 };
 
 }  // namespace gd
 
-#endif  // GDCORE_EVENTSBASEDBEHAVIOR_H
+#endif  // GDCORE_EventsBasedObject_H
 #endif

@@ -1,0 +1,156 @@
+/*
+ * GDevelop Core
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
+ */
+#if defined(GD_IDE_ONLY)
+#ifndef GDCORE_ABSTRACTEVENTSBASEDENTITY_H
+#define GDCORE_ABSTRACTEVENTSBASEDENTITY_H
+
+
+
+#include <vector>
+#include "GDCore/Project/NamedPropertyDescriptor.h"
+#include "GDCore/Tools/SerializableWithNameList.h"
+#include "GDCore/Project/EventsFunctionsContainer.h"
+#include "GDCore/String.h"
+namespace gd {
+class SerializerElement;
+class Project;
+}  // namespace gd
+
+namespace gd {
+
+/**
+ * \brief Represents a behavior that is implemented with events.
+ *
+ * It's the responsibility of the IDE to run the logic to transform this into a
+ * real behavior, by declaring an extension and running code generation.
+ * See `EventsFunctionsExtensionsLoader`.
+ *
+ * \ingroup PlatformDefinition
+ */
+class GD_CORE_API AbstractEventsBasedEntity {
+ public:
+  AbstractEventsBasedEntity(const gd::String& _name);
+  virtual ~AbstractEventsBasedEntity(){};
+
+  /**
+   * \brief Return a pointer to a new AbstractEventsBasedEntity constructed from
+   * this one.
+   */
+  AbstractEventsBasedEntity* Clone() const { return new AbstractEventsBasedEntity(*this); };
+
+  /**
+   * \brief Get the description of the behavior, that is displayed in the
+   * editor.
+   */
+  const gd::String& GetDescription() const { return description; };
+
+  /**
+   * \brief Set the description of the behavior, to be displayed in the editor.
+   */
+  virtual AbstractEventsBasedEntity& SetDescription(const gd::String& description_) {
+    description = description_;
+    return *this;
+  }
+
+  /**
+   * \brief Get the internal name of the behavior.
+   */
+  const gd::String& GetName() const { return name; };
+
+  /**
+   * \brief Set the internal name of the behavior.
+   */
+  AbstractEventsBasedEntity& SetName(const gd::String& name_) {
+    name = name_;
+    return *this;
+  }
+
+  /**
+   * \brief Get the name of the behavior, that is displayed in the editor.
+   */
+  const gd::String& GetFullName() const { return fullName; };
+
+  /**
+   * \brief Set the name of the behavior, to be displayed in the editor.
+   */
+  AbstractEventsBasedEntity& SetFullName(const gd::String& fullName_) {
+    fullName = fullName_;
+    return *this;
+  }
+
+  /**
+   * \brief Return a reference to the functions of the events based behavior.
+   */
+  EventsFunctionsContainer& GetEventsFunctions() {
+    return eventsFunctionsContainer;
+  }
+
+  /**
+   * \brief Return a const reference to the functions of the events based
+   * behavior.
+   */
+  const EventsFunctionsContainer& GetEventsFunctions() const {
+    return eventsFunctionsContainer;
+  }
+
+  /**
+   * \brief Return a reference to the list of the properties.
+   */
+  SerializableWithNameList<NamedPropertyDescriptor>& GetPropertyDescriptors() {
+    return propertyDescriptors;
+  }
+
+  /**
+   * \brief Return a const reference to the list of the properties.
+   */
+  const SerializableWithNameList<NamedPropertyDescriptor>& GetPropertyDescriptors()
+      const {
+    return propertyDescriptors;
+  }
+
+  /**
+   * \brief Get the name of the action to change a property.
+   */
+  static gd::String GetPropertyActionName(const gd::String& propertyName) { return "SetProperty" + propertyName; };
+
+  /**
+   * \brief Get the name of the condition to compare a property.
+   */
+  static gd::String GetPropertyConditionName(const gd::String& propertyName) { return "Property" + propertyName; };
+
+  /**
+   * \brief Get the name of the expression to get a property.
+   */
+  static gd::String GetPropertyExpressionName(const gd::String& propertyName) { return "Property" + propertyName; };
+
+  /** \name Serialization
+   */
+  ///@{
+  /**
+   * \brief Serialize the EventsBasedBehavior to the specified element
+   */
+  virtual void SerializeTo(gd::SerializerElement& element) const;
+
+  /**
+   * \brief Load the EventsBasedBehavior from the specified element
+   */
+  virtual void UnserializeFrom(gd::Project& project,
+                       const gd::SerializerElement& element);
+  ///@}
+
+ private:
+  gd::String name;
+  gd::String fullName;
+  gd::String description;
+  gd::String objectType;
+  gd::EventsFunctionsContainer eventsFunctionsContainer;
+  SerializableWithNameList<NamedPropertyDescriptor> propertyDescriptors;
+};
+
+}  // namespace gd
+
+#endif  // GDCORE_ABSTRACTEVENTSBASEDENTITY_H
+#endif

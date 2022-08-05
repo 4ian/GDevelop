@@ -3,24 +3,28 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "EventsBasedBehavior.h"
+#include "EventsBasedObject.h"
 #include "EventsFunctionsContainer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/MakeUnique.h"
+#include "GDCore/Project/Layout.h"
 
 namespace gd {
 
-EventsBasedBehavior::EventsBasedBehavior()
-    : AbstractEventsBasedEntity("MyBehavior") {}
+EventsBasedObject::EventsBasedObject()
+    : AbstractEventsBasedEntity("MyObject"), layout() {}
+    
+EventsBasedObject::EventsBasedObject(const gd::EventsBasedObject &_eventBasedObject)
+        : AbstractEventsBasedEntity(_eventBasedObject),
+          layout(_eventBasedObject.GetLayout().Clone()) {
+}
 
-void EventsBasedBehavior::SerializeTo(SerializerElement& element) const {
-  element.SetAttribute("objectType", objectType);
+void EventsBasedObject::SerializeTo(SerializerElement& element) const {
   AbstractEventsBasedEntity::SerializeTo(element);
 }
 
-void EventsBasedBehavior::UnserializeFrom(gd::Project& project,
+void EventsBasedObject::UnserializeFrom(gd::Project& project,
                                           const SerializerElement& element) {
-  objectType = element.GetStringAttribute("objectType");
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
 }
 

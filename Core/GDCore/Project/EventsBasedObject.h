@@ -9,6 +9,7 @@
 
 #include <vector>
 #include "GDCore/Project/AbstractEventsBasedEntity.h"
+#include "GDCore/Project/Layout.h"
 #include "GDCore/Project/NamedPropertyDescriptor.h"
 #include "GDCore/Tools/SerializableWithNameList.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"

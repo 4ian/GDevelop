@@ -1307,6 +1307,7 @@ interface ParameterMetadataTools {
 interface EventsFunctionTools {
     void STATIC_FreeEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
     void STATIC_BehaviorEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
+    void STATIC_ObjectEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsBasedObject eventsBasedObject, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
 };
 
 interface ObjectMetadata {
@@ -2246,6 +2247,44 @@ interface EventsBasedBehaviorsList {
     [Ref] EventsBasedBehavior at(unsigned long index);
 };
 
+interface EventsBasedObject {
+    void EventsBasedObject();
+
+    [Ref] EventsBasedObject SetDescription([Const] DOMString description);
+    [Const, Ref] DOMString GetDescription();
+    [Ref] EventsBasedObject SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
+    [Ref] EventsBasedObject SetFullName([Const] DOMString fullName);
+    [Const, Ref] DOMString GetFullName();
+
+    [Const, Ref] Layout GetLayout();
+
+    [Ref] EventsFunctionsContainer GetEventsFunctions();
+    [Ref] NamedPropertyDescriptorsList GetPropertyDescriptors();
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+
+    [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetPropertyExpressionName([Const] DOMString propertyName);
+};
+
+interface EventsBasedObjectsList {
+    [Ref] EventsBasedObject InsertNew([Const] DOMString name, unsigned long pos);
+    [Ref] EventsBasedObject Insert([Const, Ref] EventsBasedObject item, unsigned long pos);
+    boolean Has([Const] DOMString name);
+    [Ref] EventsBasedObject Get([Const] DOMString name);
+    [Ref] EventsBasedObject GetAt(unsigned long pos);
+    void Remove([Const] DOMString name);
+    void Move(unsigned long oldIndex, unsigned long newIndex);
+    unsigned long GetCount();
+    unsigned long GetPosition([Const, Ref] EventsBasedObject item);
+
+    unsigned long size();
+    [Ref] EventsBasedObject at(unsigned long index);
+};
+
 interface NamedPropertyDescriptorsList {
     void NamedPropertyDescriptorsList();
 
@@ -2299,6 +2338,7 @@ interface EventsFunctionsExtension {
     [Ref] VectorDependencyMetadata GetAllDependencies();
 
     [Ref] EventsBasedBehaviorsList GetEventsBasedBehaviors();
+    [Ref] EventsBasedObjectsList GetEventsBasedObjects();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);

@@ -52,6 +52,7 @@
 #include <GDCore/Project/Behavior.h>
 #include <GDCore/Project/Effect.h>
 #include <GDCore/Project/EventsBasedBehavior.h>
+#include <GDCore/Project/EventsBasedObject.h>
 #include <GDCore/Project/EventsFunction.h>
 #include <GDCore/Project/EventsFunctionsExtension.h>
 #include <GDCore/Project/ExternalEvents.h>
@@ -415,6 +416,8 @@ typedef std::vector<gd::ExpressionParserDiagnostic *>
     VectorExpressionParserDiagnostic;
 typedef gd::SerializableWithNameList<gd::EventsBasedBehavior>
     EventsBasedBehaviorsList;
+typedef gd::SerializableWithNameList<gd::EventsBasedObject>
+    EventsBasedObjectsList;
 typedef gd::SerializableWithNameList<gd::NamedPropertyDescriptor>
     NamedPropertyDescriptorsList;
 typedef ExpressionCompletionDescription::CompletionKind
@@ -593,6 +596,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define STATIC_FreeEventsFunctionToObjectsContainer FreeEventsFunctionToObjectsContainer
 #define STATIC_BehaviorEventsFunctionToObjectsContainer BehaviorEventsFunctionToObjectsContainer
+#define STATIC_ObjectEventsFunctionToObjectsContainer ObjectEventsFunctionToObjectsContainer
 #define STATIC_ParametersToObjectsContainer ParametersToObjectsContainer
 #define STATIC_GetObjectParameterIndexFor GetObjectParameterIndexFor
 

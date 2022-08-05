@@ -8,6 +8,7 @@
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunction.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectsContainer.h"
@@ -70,6 +71,31 @@ void EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
       thisObject.AddNewBehavior(project, extraInfo.at(0), behaviorName);
     }
   }
+}
+
+void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
+    const gd::Project& project,
+    const gd::EventsBasedObject& eventsBasedObject,
+    const gd::EventsFunction& eventsFunction,
+    gd::ObjectsContainer& outputGlobalObjectsContainer,
+    gd::ObjectsContainer& outputObjectsContainer) {
+  // The context is build the same way as free function...
+  FreeEventsFunctionToObjectsContainer(project,
+                                       eventsFunction,
+                                       outputGlobalObjectsContainer,
+                                       outputObjectsContainer);
+
+  // ...and has an "Object" by convention...
+  if (!outputObjectsContainer.HasObjectNamed("Object")) {
+    gd::LogWarning("No \"Object\" in a function of an events based behavior: " +
+                   eventsFunction.GetName() +
+                   ". This means this function is likely misconfigured (check "
+                   "its parameters).");
+    return;
+  }
+
+  // TODO EBO Add child-objects.
+  // TODO EBO Add private behaviors of the parent.
 }
 
 }  // namespace gd

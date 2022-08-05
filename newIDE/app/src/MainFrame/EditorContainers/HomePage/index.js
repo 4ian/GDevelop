@@ -46,6 +46,7 @@ type Props = {|
   onOpenLanguageDialog: () => void,
   onOpenProfile: () => void,
   onOpenOnboardingDialog: () => void,
+  onChangeSubscription: () => void,
 
   // Project creation
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
@@ -77,6 +78,7 @@ export const HomePage = React.memo<Props>(
         onOpenProfile,
         setToolbar,
         onOpenOnboardingDialog,
+        onChangeSubscription,
         isActive,
         storageProviders,
       }: Props,
@@ -184,6 +186,7 @@ export const HomePage = React.memo<Props>(
                       onOpen={onOpen}
                       onCreateProject={onCreateProject}
                       onOpenRecentFile={onOpenRecentFile}
+                      onChangeSubscription={onChangeSubscription}
                       storageProviders={storageProviders}
                     />
                   )}
@@ -231,6 +234,7 @@ export const renderHomePageContainer = (
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
     onOpenOnboardingDialog={props.onOpenOnboardingDialog}
+    onChangeSubscription={props.onChangeSubscription}
     storageProviders={
       (props.extraEditorProps && props.extraEditorProps.storageProviders) || []
     }

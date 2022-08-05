@@ -23,14 +23,43 @@ export type Subscription = {|
   paypalPayerId?: string,
 |};
 
-export type Limit = {|
+/**
+ * The current usage values made by a user of something.
+ * Typically: the number of remaining builds for a user.
+ */
+export type CurrentUsage = {|
   limitReached: boolean,
   current: number,
   max: number,
 |};
 
+/**
+ * This describes what a user can do on our online services.
+ */
+export type Capabilities = {
+  analytics: {
+    sessions: boolean,
+    players: boolean,
+    retention: boolean,
+    sessionsTimeStats: boolean,
+    platforms: boolean,
+  },
+  cloudProjects: {
+    maximumCount: number,
+  },
+};
+
+export type CurrentUsages = {
+  [string]: CurrentUsage,
+};
+
+/**
+ * The limits communicated by the API for a user.
+ */
 export type Limits = {
-  [string]: Limit,
+  limits: CurrentUsages,
+  capabilities: Capabilities,
+  message: string | typeof undefined,
 };
 
 export type PlanDetails = {
@@ -127,7 +156,7 @@ export const getUserLimits = (
         },
       })
     )
-    .then(response => response.data.limits);
+    .then(response => response.data);
 };
 
 export const getUserSubscription = (

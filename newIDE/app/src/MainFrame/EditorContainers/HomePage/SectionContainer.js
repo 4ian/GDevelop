@@ -13,7 +13,9 @@ export const SECTION_PADDING = 30;
 
 const styles = {
   mobileScrollContainer: {
-    padding: 5,
+    paddingTop: 10,
+    paddingLeft: 5,
+    paddingRight: 5,
   },
   desktopScrollContainer: {
     paddingTop: SECTION_PADDING,

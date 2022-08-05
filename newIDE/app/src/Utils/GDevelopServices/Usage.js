@@ -46,6 +46,7 @@ export type Capabilities = {
   },
   cloudProjects: {
     maximumCount: number,
+    canMaximumCountBeIncreased: boolean,
   },
 };
 

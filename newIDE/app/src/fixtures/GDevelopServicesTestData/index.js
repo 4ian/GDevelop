@@ -111,12 +111,37 @@ export const limitsForIndieUser: Limits = {
     },
     cloudProjects: {
       maximumCount: 50,
+      canMaximumCountBeIncreased: true,
     },
   },
   limits: {
     'cordova-build': {
       current: 2,
       max: 10,
+      limitReached: false,
+    },
+  },
+  message: undefined,
+};
+
+export const limitsForProUser: Limits = {
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 100,
+      canMaximumCountBeIncreased: false,
+    },
+  },
+  limits: {
+    'cordova-build': {
+      current: 2,
+      max: 70,
       limitReached: false,
     },
   },
@@ -134,6 +159,7 @@ export const limitsReached: Limits = {
     },
     cloudProjects: {
       maximumCount: 10,
+      canMaximumCountBeIncreased: false,
     },
   },
   limits: {

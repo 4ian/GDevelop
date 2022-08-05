@@ -714,7 +714,8 @@ namespace gdjs {
           tileTransformation.flipY(height / 2);
         }
         if (this.layer.isFlippedDiagonally(this.x, this.y)) {
-          tileTransformation.flipDiagonally();
+          tileTransformation.flipX(width / 2);
+          tileTransformation.rotateAround(Math.PI / 2, width / 2, height / 2);
         }
         tileTransformation.preConcatenate(layerTransformation);
 

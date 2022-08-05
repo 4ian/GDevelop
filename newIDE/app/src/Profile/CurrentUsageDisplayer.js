@@ -4,22 +4,25 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import RaisedButton from '../UI/RaisedButton';
 import { Column, Line } from '../UI/Grid';
-import { type Limit, type Subscription } from '../Utils/GDevelopServices/Usage';
+import {
+  type CurrentUsage,
+  type Subscription,
+} from '../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Text from '../UI/Text';
 
 type Props = {|
   subscription: ?Subscription,
-  limit: ?Limit,
+  currentUsage: ?CurrentUsage,
   onChangeSubscription: Function,
 |};
 
-const LimitDisplayer = ({
+const CurrentUsageDisplayer = ({
   subscription,
-  limit,
+  currentUsage,
   onChangeSubscription,
 }: Props) => {
-  if (!limit) return <PlaceholderLoader />;
+  if (!currentUsage) return <PlaceholderLoader />;
   const hasSubscription = subscription && !!subscription.planId;
   const noSubscription = subscription && !subscription.planId;
 
@@ -27,11 +30,11 @@ const LimitDisplayer = ({
     <Column noMargin>
       <Text>
         <Trans>
-          You have {Math.max(limit.max - limit.current, 0)} remaining builds for
-          today (out of {limit.max}).
+          You have {Math.max(currentUsage.max - currentUsage.current, 0)}{' '}
+          remaining builds for today (out of {currentUsage.max}).
         </Trans>
       </Text>
-      {hasSubscription && limit.limitReached && (
+      {hasSubscription && currentUsage.limitReached && (
         <Text>
           <Trans>
             Need more power? You can upgrade to a new plan to increase the
@@ -39,7 +42,7 @@ const LimitDisplayer = ({
           </Trans>
         </Text>
       )}
-      {hasSubscription && limit.limitReached && (
+      {hasSubscription && currentUsage.limitReached && (
         <Line justifyContent="center" alignItems="center">
           <RaisedButton
             label={<Trans>Upgrade my account</Trans>}
@@ -68,4 +71,4 @@ const LimitDisplayer = ({
   );
 };
 
-export default LimitDisplayer;
+export default CurrentUsageDisplayer;

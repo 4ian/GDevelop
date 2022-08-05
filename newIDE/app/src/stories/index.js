@@ -64,7 +64,7 @@ import ParameterRenderingService from '../EventsSheet/ParameterRenderingService'
 import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
 import CreateProfile from '../Profile/CreateProfile';
 import AuthenticatedUserProfileDetails from '../Profile/AuthenticatedUserProfileDetails';
-import LimitDisplayer from '../Profile/LimitDisplayer';
+import CurrentUsageDisplayer from '../Profile/CurrentUsageDisplayer';
 import ResourcePreview from '../ResourcesList/ResourcePreview';
 import ResourcesList from '../ResourcesList';
 import {
@@ -3023,27 +3023,27 @@ storiesOf('Profile/CreateProfile', module)
     />
   ));
 
-storiesOf('LimitDisplayer', module)
+storiesOf('CurrentUsageDisplayer', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <LimitDisplayer
+    <CurrentUsageDisplayer
       subscription={subscriptionForIndieUser}
-      limit={limitsForIndieUser['cordova-build']}
+      currentUsage={limitsForIndieUser.limits['cordova-build']}
       onChangeSubscription={action('change subscription')}
     />
   ))
   .add('limit reached', () => (
-    <LimitDisplayer
+    <CurrentUsageDisplayer
       subscription={subscriptionForIndieUser}
-      limit={limitsReached['cordova-build']}
+      currentUsage={limitsReached.limits['cordova-build']}
       onChangeSubscription={action('change subscription')}
     />
   ))
   .add('limit reached without subscription', () => (
-    <LimitDisplayer
+    <CurrentUsageDisplayer
       subscription={noSubscription}
-      limit={limitsReached['cordova-build']}
+      currentUsage={limitsReached.limits['cordova-build']}
       onChangeSubscription={action('change subscription')}
     />
   ));

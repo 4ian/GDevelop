@@ -101,19 +101,49 @@ export const noSubscription: Subscription = {
 };
 
 export const limitsForIndieUser: Limits = {
-  'cordova-build': {
-    current: 2,
-    max: 10,
-    limitReached: false,
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 50,
+    },
   },
+  limits: {
+    'cordova-build': {
+      current: 2,
+      max: 10,
+      limitReached: false,
+    },
+  },
+  message: undefined,
 };
 
 export const limitsReached: Limits = {
-  'cordova-build': {
-    current: 10,
-    max: 10,
-    limitReached: true,
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 10,
+    },
   },
+  limits: {
+    'cordova-build': {
+      current: 10,
+      max: 10,
+      limitReached: true,
+    },
+  },
+  message: undefined,
 };
 
 export const fakeIndieAuthenticatedUser: AuthenticatedUser = {

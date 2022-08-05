@@ -929,7 +929,7 @@ const gd::String ExporterHelper::GenerateWebManifest(
       icons +=
           gd::String(R"({
         "src": "{FILE}",
-        "sizes": "{SIZE}x{SIZE}" 
+        "sizes": "{SIZE}x{SIZE}"
       },)")
               .FindAndReplace("{SIZE}", gd::String::From(sizeAndFile.first))
               .FindAndReplace("{FILE}", sizeAndFile.second);
@@ -938,11 +938,18 @@ const gd::String ExporterHelper::GenerateWebManifest(
 
   icons = icons.RightTrim(",") + "]";
 
+  gd::String jsonName =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetName()));
+  gd::String jsonPackageName =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetPackageName()));
+  gd::String jsonDescription =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetDescription()));
+
   return gd::String(R"webmanifest({
-  "name": "{NAME}",
-  "short_name": "{NAME}",
-  "id": "{PACKAGE_ID}",
-  "description": "{DESCRIPTION}",
+  "name": {NAME},
+  "short_name": {NAME},
+  "id": {PACKAGE_ID},
+  "description": {DESCRIPTION},
   "orientation": "{ORIENTATION}",
   "start_url": "./index.html",
   "display": "standalone",
@@ -950,9 +957,9 @@ const gd::String ExporterHelper::GenerateWebManifest(
   "categories": ["games", "entertainment"],
   "icons": {ICONS}
 })webmanifest")
-      .FindAndReplace("{NAME}", project.GetName())
-      .FindAndReplace("{PACKAGE_ID}", project.GetPackageName())
-      .FindAndReplace("{DESCRIPTION}", project.GetDescription())
+      .FindAndReplace("{NAME}", jsonName)
+      .FindAndReplace("{PACKAGE_ID}", jsonPackageName)
+      .FindAndReplace("{DESCRIPTION}", jsonDescription)
       .FindAndReplace("{ORIENTATION}",
                       orientation == "default" ? "any" : orientation)
       .FindAndReplace("{ICONS}", icons);

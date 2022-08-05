@@ -11,6 +11,7 @@ namespace gdjs {
     _debugDraw: PIXI.Graphics | null = null;
     _debugDrawContainer: PIXI.Container | null = null;
     _profilerText: PIXI.Text | null = null;
+    _showCursorAtNextRender: boolean = false;
     _debugDrawRenderedObjectsPoints: Record<
       number,
       {
@@ -59,6 +60,13 @@ namespace gdjs {
       // render the PIXI container of the scene
       this._pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
       this._pixiRenderer.render(this._pixiContainer);
+
+      // synchronize showing the cursor with rendering (useful to reduce
+      // blinking while switching from in-game cursor)
+      if (this._showCursorAtNextRender) {
+        this._pixiRenderer.view.style.cursor = '';
+        this._showCursorAtNextRender = false;
+      }
     }
 
     _renderProfileText() {
@@ -336,6 +344,7 @@ namespace gdjs {
     }
 
     hideCursor(): void {
+      this._showCursorAtNextRender = false;
       if (!this._pixiRenderer) {
         return;
       }
@@ -343,10 +352,7 @@ namespace gdjs {
     }
 
     showCursor(): void {
-      if (!this._pixiRenderer) {
-        return;
-      }
-      this._pixiRenderer.view.style.cursor = '';
+      this._showCursorAtNextRender = true;
     }
 
     getPIXIContainer() {

@@ -11,6 +11,7 @@ namespace gdjs {
     _debugDraw: PIXI.Graphics | null = null;
     _debugDrawContainer: PIXI.Container | null = null;
     _profilerText: PIXI.Text | null = null;
+    _showCursor: boolean = false;
     _debugDrawRenderedObjectsPoints: Record<
       number,
       {
@@ -59,6 +60,10 @@ namespace gdjs {
       // render the PIXI container of the scene
       this._pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
       this._pixiRenderer.render(this._pixiContainer);
+      if (this._showCursor) {
+        this._pixiRenderer.view.style.cursor = '';
+        this._showCursor = false;
+      }
     }
 
     _renderProfileText() {
@@ -336,6 +341,7 @@ namespace gdjs {
     }
 
     hideCursor(): void {
+      this._showCursor = false;
       if (!this._pixiRenderer) {
         return;
       }
@@ -343,10 +349,7 @@ namespace gdjs {
     }
 
     showCursor(): void {
-      if (!this._pixiRenderer) {
-        return;
-      }
-      this._pixiRenderer.view.style.cursor = '';
+      this._showCursor = true;
     }
 
     getPIXIContainer() {

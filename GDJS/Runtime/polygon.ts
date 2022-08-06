@@ -19,6 +19,64 @@ namespace gdjs {
     farSqDist: float;
   };
 
+  const makeNewCollisionTestResult = (): CollisionTestResult => {
+    return { collision: false, move_axis: [0, 0] };
+  };
+
+  const makeNewRaycastTestResult = (): RaycastTestResult => {
+    return {
+      collision: false,
+      closeX: 0,
+      closeY: 0,
+      closeSqDist: 0,
+      farX: 0,
+      farY: 0,
+      farSqDist: 0,
+    };
+  };
+
+  /**
+   * Arrays and data structure that are (re)used by Polygon.collisionTest to
+   * avoid any allocation.
+   */
+  const collisionTestStatics: {
+    minMaxA: FloatPoint;
+    minMaxB: FloatPoint;
+    edge: FloatPoint;
+    axis: FloatPoint;
+    move_axis: FloatPoint;
+    result: CollisionTestResult;
+  } = {
+    minMaxA: [0, 0],
+    minMaxB: [0, 0],
+    edge: [0, 0],
+    axis: [0, 0],
+    move_axis: [0, 0],
+    result: makeNewCollisionTestResult(),
+  };
+
+  /**
+   * Arrays and data structure that are (re)used by Polygon.raycastTest to
+   * avoid any allocation.
+   */
+  const raycastTestStatics: {
+    p: FloatPoint;
+    q: FloatPoint;
+    r: FloatPoint;
+    s: FloatPoint;
+    deltaQP: FloatPoint;
+    axis: FloatPoint;
+    result: RaycastTestResult;
+  } = {
+    p: [0, 0],
+    q: [0, 0],
+    r: [0, 0],
+    s: [0, 0],
+    deltaQP: [0, 0],
+    axis: [0, 0],
+    result: makeNewRaycastTestResult(),
+  };
+
   /**
    * Polygon represents a polygon which can be used to create collisions masks for RuntimeObject.
    */
@@ -129,11 +187,14 @@ namespace gdjs {
      * Do a collision test between two polygons.
      * Please note that polygons must *convexes*!
      *
+     * You can read the result but do not keep a reference to it as it's a static object
+     * reused between function calls. If you need to keep the results, use `copyCollisionTestResult`.
+     *
      * Uses <a href="http://en.wikipedia.org/wiki/Hyperplane_separation_theorem">Separating Axis Theorem </a>.<br>
      * Based on <a href="http://www.codeproject.com/Articles/15573/2D-Polygon-Collision-Detection">this</a>
      * and <a href="http://stackoverflow.com/questions/5742329/problem-with-collision-response-sat">this</a> article.
      *
-     * @return returnValue.collision is equal to true if polygons are overlapping
+     * @return A collision result. `collision` property is equal to true if polygons are overlapping. Do NOT keep a reference to this.
      * @param p1 The first polygon
      * @param p2 The second polygon
      * @param ignoreTouchingEdges If true, then edges that are touching each other, without the polygons actually overlapping, won't be considered in collision.
@@ -146,9 +207,9 @@ namespace gdjs {
       //Algorithm core :
       p1.computeEdges();
       p2.computeEdges();
-      let edge = Polygon.collisionTestStatics.edge;
-      const move_axis = Polygon.collisionTestStatics.move_axis;
-      const result = Polygon.collisionTestStatics.result;
+      let edge = collisionTestStatics.edge;
+      const move_axis = collisionTestStatics.move_axis;
+      const result = collisionTestStatics.result;
       let minDist = Number.MAX_VALUE;
       edge[0] = 0;
       edge[1] = 0;
@@ -170,14 +231,14 @@ namespace gdjs {
         } else {
           edge = p2.edges[i - len1];
         }
-        const axis = Polygon.collisionTestStatics.axis;
+        const axis = collisionTestStatics.axis;
 
         //Get the axis to which polygons will be projected
         axis[0] = -edge[1];
         axis[1] = edge[0];
         Polygon.normalise(axis);
-        const minMaxA = Polygon.collisionTestStatics.minMaxA;
-        const minMaxB = Polygon.collisionTestStatics.minMaxB;
+        const minMaxA = collisionTestStatics.minMaxA;
+        const minMaxB = collisionTestStatics.minMaxB;
         Polygon.project(
           axis,
           p1,
@@ -227,8 +288,11 @@ namespace gdjs {
     }
 
     /**
-     * Do a raycast test.<br>
-     * Please note that the polygon must be <b>convex</b>!
+     * Do a raycast test.
+     * Please note that the polygon must be **convex**!
+     *
+     * You can read the result but do not keep a reference to it as it's a static object
+     * reused between function calls. If you need to keep the results, use `copyRaycastTestResult`.
      *
      * For some theory, check <a href="https://www.codeproject.com/Tips/862988/Find-the-Intersection-Point-of-Two-Line-Segments">Find the Intersection Point of Two Line Segments</a>.
      *
@@ -237,7 +301,7 @@ namespace gdjs {
      * @param startY The raycast start point Y
      * @param endX The raycast end point X
      * @param endY The raycast end point Y
-     * @return A raycast result with the contact points and distances
+     * @return A raycast result with the contact points and distances. Do NOT keep a reference to this.
      */
     static raycastTest(
       poly: gdjs.Polygon,
@@ -246,16 +310,16 @@ namespace gdjs {
       endX: float,
       endY: float
     ): RaycastTestResult {
-      const result = Polygon.raycastTestStatics.result;
+      const result = raycastTestStatics.result;
       result.collision = false;
       if (poly.vertices.length < 2) {
         return result;
       }
       poly.computeEdges();
-      const p = Polygon.raycastTestStatics.p;
-      const q = Polygon.raycastTestStatics.q;
-      const r = Polygon.raycastTestStatics.r;
-      const s = Polygon.raycastTestStatics.s;
+      const p = raycastTestStatics.p;
+      const q = raycastTestStatics.q;
+      const r = raycastTestStatics.r;
+      const s = raycastTestStatics.s;
       let minSqDist = Number.MAX_VALUE;
 
       // Ray segment: p + t*r, with p = start and r = end - start
@@ -269,7 +333,7 @@ namespace gdjs {
         q[1] = poly.vertices[i][1];
         s[0] = poly.edges[i][0];
         s[1] = poly.edges[i][1];
-        const deltaQP = Polygon.raycastTestStatics.deltaQP;
+        const deltaQP = raycastTestStatics.deltaQP;
         deltaQP[0] = q[0] - p[0];
         deltaQP[1] = q[1] - p[1];
         const crossRS = Polygon.crossProduct(r, s);
@@ -283,7 +347,7 @@ namespace gdjs {
           Math.abs(Polygon.crossProduct(deltaQP, r)) <= 0.0001
         ) {
           // Project the ray and the edge to work on floats, keeping linearity through t
-          const axis = Polygon.raycastTestStatics.axis;
+          const axis = raycastTestStatics.axis;
           axis[0] = r[0];
           axis[1] = r[1];
           Polygon.normalise(axis);
@@ -431,50 +495,40 @@ namespace gdjs {
       return inside;
     }
 
-    // Arrays and data structure that are (re)used by Polygon.collisionTest to
-    // avoid any allocation.
-    private static collisionTestStatics: {
-      minMaxA: FloatPoint;
-      minMaxB: FloatPoint;
-      edge: FloatPoint;
-      axis: FloatPoint;
-      move_axis: FloatPoint;
-      result: CollisionTestResult;
-    } = {
-      minMaxA: [0, 0],
-      minMaxB: [0, 0],
-      edge: [0, 0],
-      axis: [0, 0],
-      move_axis: [0, 0],
-      result: { collision: false, move_axis: [0, 0] },
-    };
+    /**
+     * Copy a `CollisionTestResult` into another one.
+     * Use `gdjs.Polygon.makeNewCollisionTestResult()` to build a new
+     * destination before copying the existing source inside it.
+     */
+    static copyCollisionTestResult(
+      source: CollisionTestResult,
+      dest: CollisionTestResult
+    ) {
+      dest.collision = source.collision;
+      dest.move_axis[0] = source.move_axis[0];
+      dest.move_axis[1] = source.move_axis[1];
+    }
 
-    // Arrays and data structure that are (re)used by Polygon.raycastTest to
-    // avoid any allocation.
-    private static raycastTestStatics: {
-      p: FloatPoint;
-      q: FloatPoint;
-      r: FloatPoint;
-      s: FloatPoint;
-      deltaQP: FloatPoint;
-      axis: FloatPoint;
-      result: RaycastTestResult;
-    } = {
-      p: [0, 0],
-      q: [0, 0],
-      r: [0, 0],
-      s: [0, 0],
-      deltaQP: [0, 0],
-      axis: [0, 0],
-      result: {
-        collision: false,
-        closeX: 0,
-        closeY: 0,
-        closeSqDist: 0,
-        farX: 0,
-        farY: 0,
-        farSqDist: 0,
-      },
-    };
+    static makeNewCollisionTestResult = makeNewCollisionTestResult;
+
+    /**
+     * Copy a `RaycastTestResult` into another one.
+     * Use `gdjs.Polygon.makeNewRaycastTestResult()` to build a new
+     * destination before copying the existing source inside it.
+     */
+    static copyRaycastTestResult(
+      source: RaycastTestResult,
+      dest: RaycastTestResult
+    ) {
+      dest.collision = source.collision;
+      dest.closeX = source.closeX;
+      dest.closeY = source.closeY;
+      dest.closeSqDist = source.closeSqDist;
+      dest.farX = source.farX;
+      dest.farY = source.farY;
+      dest.farSqDist = source.farSqDist;
+    }
+
+    static makeNewRaycastTestResult = makeNewRaycastTestResult;
   }
 }

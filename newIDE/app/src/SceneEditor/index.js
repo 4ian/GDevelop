@@ -581,7 +581,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     instances: Array<gdInitialInstance>,
     multiSelect: boolean
   ) => {
-    this.instancesSelection.selectInstances(instances, multiSelect);
+    this.instancesSelection.selectInstances({
+      instances,
+      multiSelect,
+      layersVisibility: null,
+      ignoreSeal: true,
+    });
 
     if (this.editor) this.editor.centerViewOn(instances);
     this.forceUpdateInstancesList();
@@ -1047,7 +1052,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
     this._onInstancesAdded(newInstances);
     this.instancesSelection.clearSelection();
-    this.instancesSelection.selectInstances(newInstances, true);
+    this.instancesSelection.selectInstances({
+      instances: newInstances,
+      multiSelect: true,
+      layersVisibility: null,
+    });
   };
 
   paste = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
@@ -1079,7 +1088,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
     this._onInstancesAdded(newInstances);
     this.instancesSelection.clearSelection();
-    this.instancesSelection.selectInstances(newInstances, true);
+    this.instancesSelection.selectInstances({
+      instances: newInstances,
+      multiSelect: true,
+      layersVisibility: null,
+    });
   };
 
   updateBehaviorsSharedData = () => {

@@ -21,6 +21,8 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
+  // TODO TBO use it
+  eventsBasedObject: ?gdEventsBasedObject,
   onParametersOrGroupsUpdated: () => void,
   helpPagePath?: string,
   onConfigurationUpdated?: (whatChanged?: 'type') => void,

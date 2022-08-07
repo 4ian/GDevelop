@@ -203,7 +203,28 @@ export const declareBehaviorMetadata = (
  * Check if the name of the function is the name of a lifecycle function (for events-based behaviors),
  * that will be called automatically by the game engine.
  */
-export const isBehaviorLifecycleEventsFunction = (functionName: string) => {
+ export const isBehaviorLifecycleEventsFunction = (functionName: string) => {
+  return (
+    [
+      'onCreated',
+      'onActivate',
+      'onDeActivate',
+      'doStepPreEvents',
+      'doStepPostEvents',
+      'onDestroy',
+      // Compatibility with GD <= 5.0 beta 75
+      'onOwnerRemovedFromScene',
+      // end of compatibility code
+    ].indexOf(functionName) !== -1
+  );
+};
+
+/**
+ * Check if the name of the function is the name of a lifecycle function (for events-based behaviors),
+ * that will be called automatically by the game engine.
+ */
+export const isObjectLifecycleEventsFunction = (functionName: string) => {
+  // TODO EBO
   return (
     [
       'onCreated',

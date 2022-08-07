@@ -146,9 +146,7 @@ export default class InstancesList extends Component<Props, State> {
       <IconButton
         size="small"
         onClick={() => {
-          console.log("Click")
           if (instance.isSealed()) {
-            console.log("isSealed")
             instance.setSealed(false);
             instance.setLocked(false);
             return;

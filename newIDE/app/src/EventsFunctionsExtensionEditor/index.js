@@ -18,6 +18,7 @@ import Background from '../UI/Background';
 import OptionsEditorDialog from './OptionsEditorDialog';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import EventsBasedBehaviorEditorDialog from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog';
+import EventsBasedObjectEditorDialog from '../EventsBasedObjectEditor/EventsBasedObjectEditorDialog';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -94,8 +95,13 @@ const initialMosaicEditorNodes = {
   first: {
     direction: 'column',
     first: 'free-functions-list',
-    second: 'behaviors-list',
-    splitPercentage: 50,
+    second: {
+      direction: 'column',
+      first: 'objects-list',
+      second: 'behaviors-list',
+      splitPercentage: 50,
+    },
+    splitPercentage: 33,
   },
   second: {
     direction: 'column',
@@ -446,6 +452,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       {
         selectedEventsBasedBehavior,
         selectedEventsFunction: null,
+        selectedEventsBasedObject: null,
       },
       () => {
         this.updateToolbar();
@@ -471,6 +478,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       {
         selectedEventsBasedObject,
         selectedEventsFunction: null,
+        selectedEventsBasedBehavior: null,
       },
       () => {
         this.updateToolbar();
@@ -723,6 +731,22 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
+  _onObjectPropertyRenamed = (
+    eventsBasedObject: gdEventsBasedObject,
+    oldName: string,
+    newName: string
+  ) => {
+    const { project, eventsFunctionsExtension } = this.props;
+    // TODO EBO
+    // gd.WholeProjectRefactorer.renameEventsBasedObjectProperty(
+    //   project,
+    //   eventsFunctionsExtension,
+    //   eventsBasedObject,
+    //   oldName,
+    //   newName
+    // );
+  };
+
   _editOptions = (open: boolean = true) => {
     this.setState({
       editOptionsDialogOpen: open,
@@ -956,6 +980,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       objectMethodSelectorDialogOpen,
       extensionFunctionSelectorDialogOpen,
       editedEventsBasedBehavior,
+      editedEventsBasedObject,
     } = this.state;
 
     const editors = {
@@ -1124,7 +1149,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       },
       'behavior-functions-list': {
         type: 'primary',
-        title: t`Behavior functions`,
+        title: selectedEventsBasedObject ? t`Object functions` : t`Behavior functions`,
         renderEditor: () =>
         
         selectedEventsBasedObject ? (
@@ -1427,6 +1452,25 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             onRenameProperty={(oldName, newName) =>
               this._onBehaviorPropertyRenamed(
                 editedEventsBasedBehavior,
+                oldName,
+                newName
+              )
+            }
+          />
+        )}
+        {editedEventsBasedObject && (
+          <EventsBasedObjectEditorDialog
+            project={project}
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            eventsBasedObject={editedEventsBasedObject}
+            onApply={() => {
+              if (this.props.unsavedChanges)
+                this.props.unsavedChanges.triggerUnsavedChanges();
+              this._editObject(null);
+            }}
+            onRenameProperty={(oldName, newName) =>
+              this._onObjectPropertyRenamed(
+                editedEventsBasedObject,
                 oldName,
                 newName
               )

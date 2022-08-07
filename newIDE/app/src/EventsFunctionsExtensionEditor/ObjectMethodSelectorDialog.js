@@ -14,8 +14,6 @@ import Destroy from '../UI/CustomSvgIcons/Behaviors/Destroy';
 import Action from '../UI/CustomSvgIcons/Behaviors/Action';
 import Condition from '../UI/CustomSvgIcons/Behaviors/Condition';
 import Expression from '../UI/CustomSvgIcons/Behaviors/Expression';
-import Activate from '../UI/CustomSvgIcons/Behaviors/Activate';
-import Deactivate from '../UI/CustomSvgIcons/Behaviors/Deactivate';
 import { Line } from '../UI/Grid';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';

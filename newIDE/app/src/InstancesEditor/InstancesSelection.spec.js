@@ -22,9 +22,21 @@ describe('InstancesSelection', () => {
     expect(instancesSelection.getSelectedInstances()).toHaveLength(0);
 
     // Select instances, with multiselection activated.
-    instancesSelection.selectInstance(instance1OfObject1, true, null);
-    instancesSelection.selectInstance(instance2OfObject1, true, null);
-    instancesSelection.selectInstance(instance1OfObject2, true, null);
+    instancesSelection.selectInstance({
+      instance: instance1OfObject1,
+      multiSelect: true,
+      layersVisibility: null,
+    });
+    instancesSelection.selectInstance({
+      instance: instance2OfObject1,
+      multiSelect: true,
+      layersVisibility: null,
+    });
+    instancesSelection.selectInstance({
+      instance: instance1OfObject2,
+      multiSelect: true,
+      layersVisibility: null,
+    });
     expect(instancesSelection.hasSelectedInstances()).toBe(true);
     expect(instancesSelection.getSelectedInstances()).toHaveLength(3);
 
@@ -48,7 +60,11 @@ describe('InstancesSelection', () => {
     );
 
     // Unselect by selecting an instance again, with multiselection activated.
-    instancesSelection.selectInstance(instance1OfObject1, true, null);
+    instancesSelection.selectInstance({
+      instance: instance1OfObject1,
+      multiSelect: true,
+      layersVisibility: null,
+    });
     expect(instancesSelection.hasSelectedInstances()).toBe(true);
     expect(instancesSelection.getSelectedInstances()).toHaveLength(2);
     expect(instancesSelection.isInstanceSelected(instance1OfObject1)).toBe(
@@ -94,9 +110,21 @@ describe('InstancesSelection', () => {
     instance3OfObject2.setObjectName('Object2');
 
     // Select instances without multiselection
-    instancesSelection.selectInstance(instance1OfObject1, false, null);
-    instancesSelection.selectInstance(instance2OfObject1, false, null);
-    instancesSelection.selectInstance(instance1OfObject2, false, null);
+    instancesSelection.selectInstance({
+      instance: instance1OfObject1,
+      multiSelect: false,
+      layersVisibility: null,
+    });
+    instancesSelection.selectInstance({
+      instance: instance2OfObject1,
+      multiSelect: false,
+      layersVisibility: null,
+    });
+    instancesSelection.selectInstance({
+      instance: instance1OfObject2,
+      multiSelect: false,
+      layersVisibility: null,
+    });
     expect(instancesSelection.isInstanceSelected(instance1OfObject1)).toBe(
       false
     );
@@ -116,11 +144,11 @@ describe('InstancesSelection', () => {
       false
     );
 
-    instancesSelection.selectInstances(
-      [instance1OfObject1, instance2OfObject1, instance1OfObject2],
-      false,
-      null
-    );
+    instancesSelection.selectInstances({
+      instances: [instance1OfObject1, instance2OfObject1, instance1OfObject2],
+      multiSelect: false,
+      layersVisibility: null,
+    });
     expect(instancesSelection.isInstanceSelected(instance1OfObject1)).toBe(
       true
     );
@@ -163,16 +191,16 @@ describe('InstancesSelection', () => {
     const instance3OfObject2 = new gd.InitialInstance();
     instance3OfObject2.setObjectName('Object2');
 
-    instancesSelection.selectInstances(
-      [
+    instancesSelection.selectInstances({
+      instances: [
         instance1OfObject1,
         instance2OfObject1,
         instance1OfObject2,
         instance3OfObject2,
       ],
-      false,
-      null
-    );
+      multiSelect: false,
+      layersVisibility: null,
+    });
     expect(instancesSelection.isInstanceSelected(instance1OfObject2)).toBe(
       true
     );
@@ -251,16 +279,16 @@ describe('InstancesSelection', () => {
     const instance3OfObject2 = new gd.InitialInstance();
     instance3OfObject2.setObjectName('Object2');
 
-    instancesSelection.selectInstances(
-      [
+    instancesSelection.selectInstances({
+      instances: [
         instance1OfObject1,
         instance2OfObject1,
         instance1OfObject2,
         instance2OfObject2,
       ],
-      false,
-      null
-    );
+      multiSelect: false,
+      layersVisibility: null,
+    });
 
     instancesSelection.unselectInstancesOnLayer('Layer1');
     expect(instancesSelection.hasSelectedInstances()).toBe(true);

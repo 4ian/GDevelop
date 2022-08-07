@@ -51,7 +51,7 @@
   }
 
   getRendererObject() {
-    return {};
+    return null;
   }
 
   getWidth() {

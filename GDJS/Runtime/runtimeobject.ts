@@ -48,9 +48,9 @@ namespace gdjs {
    * {@link RuntimeObject.raycastTest} to avoid any allocation.
    */
   const raycastTestStatics: {
-    result: RaycastTestResult
+    result: RaycastTestResult;
   } = {
-    result: gdjs.Polygon.makeNewRaycastTestResult()
+    result: gdjs.Polygon.makeNewRaycastTestResult(),
   };
 
   /**
@@ -2332,24 +2332,32 @@ namespace gdjs {
       }
 
       // Do a real check if necessary.
-      let testSqDist = closest ? raySqBoundingRadius : 0;
-      const hitBoxes = this.getHitBoxesAround(x, y, endX, endY);
-      for (const hitBox of hitBoxes) {
-        const res = gdjs.Polygon.raycastTest(hitBox, x, y, endX, endY);
-        if (res.collision) {
-          if (closest && res.closeSqDist < testSqDist) {
-            testSqDist = res.closeSqDist;
+      if (closest) {
+        let sqDistMin = raySqBoundingRadius;
+        const hitBoxes = this.getHitBoxesAround(x, y, endX, endY);
+        for (const hitBox of hitBoxes) {
+          const res = gdjs.Polygon.raycastTest(hitBox, x, y, endX, endY);
+          if (res.collision && res.closeSqDist < sqDistMin) {
+            sqDistMin = res.closeSqDist;
             gdjs.Polygon.copyRaycastTestResult(res, result);
-          } else if (
-            !closest &&
-            res.farSqDist > testSqDist &&
+          }
+        }
+      } else {
+        let sqDistMax = 0;
+        const hitBoxes = this.getHitBoxesAround(x, y, endX, endY);
+        for (const hitBox of hitBoxes) {
+          const res = gdjs.Polygon.raycastTest(hitBox, x, y, endX, endY);
+          if (
+            res.collision &&
+            res.farSqDist > sqDistMax &&
             res.farSqDist <= raySqBoundingRadius
           ) {
-            testSqDist = res.farSqDist;
+            sqDistMax = res.farSqDist;
             gdjs.Polygon.copyRaycastTestResult(res, result);
           }
         }
       }
+
       return result;
     }
 

@@ -3,6 +3,35 @@ import InstancesSelection from './InstancesSelection';
 const gd: libGDevelop = global.gd;
 
 describe('InstancesSelection', () => {
+  it('does not select a sealed instance', () => {
+    const instancesSelection = new InstancesSelection();
+    const instance1OfObject1 = new gd.InitialInstance();
+    instance1OfObject1.setObjectName('Object1');
+    instance1OfObject1.setSealed(true);
+
+    expect(instancesSelection.hasSelectedInstances()).toBe(false);
+    expect(instancesSelection.getSelectedInstances()).toHaveLength(0);
+
+    instancesSelection.selectInstance({
+      instance: instance1OfObject1,
+      multiSelect: false,
+      layersVisibility: null,
+    });
+
+    expect(instancesSelection.hasSelectedInstances()).toBe(false);
+    expect(instancesSelection.getSelectedInstances()).toHaveLength(0);
+
+    instancesSelection.selectInstance({
+      instance: instance1OfObject1,
+      multiSelect: false,
+      layersVisibility: null,
+      ignoreSeal: true,
+    });
+
+    expect(instancesSelection.hasSelectedInstances()).toBe(true);
+    expect(instancesSelection.getSelectedInstances()).toHaveLength(1);
+  });
+
   it('handles multiselection of instances', () => {
     const instancesSelection = new InstancesSelection();
     const instance1OfObject1 = new gd.InitialInstance();

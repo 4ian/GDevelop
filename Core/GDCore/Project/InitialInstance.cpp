@@ -28,6 +28,7 @@ InitialInstance::InitialInstance()
       width(0),
       height(0),
       locked(false),
+      sealed(false),
       persistentUuid(UUID::MakeUuid4()) {}
 
 void InitialInstance::UnserializeFrom(const SerializerElement& element) {

@@ -51,7 +51,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
    * \brief Set the internal name of the behavior.
    */
   EventsBasedObject& SetName(const gd::String& name_) {
-    AbstractEventsBasedEntity::SetDescription(name_);
+    AbstractEventsBasedEntity::SetName(name_);
     return *this;
   }
 
@@ -59,7 +59,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
    * \brief Set the name of the behavior, to be displayed in the editor.
    */
   EventsBasedObject& SetFullName(const gd::String& fullName_) {
-    AbstractEventsBasedEntity::SetDescription(fullName_);
+    AbstractEventsBasedEntity::SetFullName(fullName_);
     return *this;
   }
 

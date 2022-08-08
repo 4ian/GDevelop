@@ -8,11 +8,12 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { Tabs, Tab } from '../UI/Tabs';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import EventsBasedObjectPropertiesEditor from './EventsBasedObjectPropertiesEditor';
+import EventBasedObjectChildrenEditor from './EventBasedObjectChildrenEditor';
 import { ColumnStackLayout } from '../UI/Layout';
 import { Line } from '../UI/Grid';
 const gd: libGDevelop = global.gd;
 
-type TabName = 'configuration' | 'properties';
+type TabName = 'configuration' | 'properties' | 'children';
 
 type Props = {|
   project: gdProject,
@@ -45,13 +46,14 @@ export default class EventsBasedObjectEditor extends React.Component<
 
   render() {
     const { currentTab } = this.state;
-    const { eventsBasedObject, project } = this.props;
+    const { eventsBasedObject, project, eventsFunctionsExtension } = this.props;
 
     return (
       <React.Fragment>
         <Tabs value={currentTab} onChange={this._changeTab}>
           <Tab label={<Trans>Configuration</Trans>} value="configuration" />
           <Tab label={<Trans>Properties</Trans>} value="properties" />
+          <Tab label={<Trans>Children</Trans>} value="children" />
         </Tabs>
         <Line>
           {currentTab === 'configuration' && (
@@ -119,6 +121,13 @@ export default class EventsBasedObjectEditor extends React.Component<
               eventsBasedObject={eventsBasedObject}
               onPropertiesUpdated={this.props.onPropertiesUpdated}
               onRenameProperty={this.props.onRenameProperty}
+            />
+          )}
+          {currentTab === 'children' && (
+            <EventBasedObjectChildrenEditor
+              project={project}
+              eventsFunctionsExtension={eventsFunctionsExtension}
+              eventsBasedObject={eventsBasedObject}
             />
           )}
         </Line>

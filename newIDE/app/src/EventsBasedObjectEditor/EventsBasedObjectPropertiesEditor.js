@@ -24,7 +24,6 @@ import Add from '@material-ui/icons/Add';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import StringArrayEditor from '../StringArrayEditor';
 import ColorField from '../UI/ColorField';
-import ObjectTypeSelector from '../ObjectTypeSelector';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 
 const gd: libGDevelop = global.gd;

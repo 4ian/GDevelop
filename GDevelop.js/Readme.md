@@ -8,7 +8,11 @@ This is the port of GDevelop core classes to WebAssembly+JavaScript. This allows
 
 > 👋 Usually, if you're working on the GDevelop editor or extensions in JavaScript, you don't need to rebuild GDevelop.js. If you want to make changes in C++ extensions or classes, read this section.
 
-- Make sure you have [CMake 3.17+](http://www.cmake.org/) (3.5+ should work on Linux/macOS) and [Node.js](https://nodejs.org/) installed.
+Prerequisite tools installed:
+
+- [CMake 3.17+](http://www.cmake.org/) (3.5+ should work on Linux/macOS). On MacOS, you can install it via HomeBrew (recommended for Apple M1 Architectures)
+- [Node.js](https://nodejs.org/) (We recommend using [nvm](https://github.com/nvm-sh/nvm) to be able to switch between node versions easily.
+- Python (via [pyenv](https://github.com/pyenv/pyenv) for versions management)
 
 - Install [Emscripten](https://github.com/kripken/emscripten), as explained on the [Emscripten installation instructions](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html):
 
@@ -16,10 +20,12 @@ This is the port of GDevelop core classes to WebAssembly+JavaScript. This allows
 | -------------------------------------------- | -------------------------------------------- |
 | `git clone https://github.com/juj/emsdk.git` | `git clone https://github.com/juj/emsdk.git` |
 | `cd emsdk`                                   | `cd emsdk`                                   |
-| `./emsdk update`                             | `emsdk update`                               |
+| `git pull`                                   | `git pull`                                   |
 | `./emsdk install 1.39.6`                     | `emsdk install 1.39.6`                       |
 | `./emsdk activate 1.39.6`                    | `emsdk activate 1.39.6`                      |
 | `source ./emsdk_env.sh`                      | `emsdk_env.bat`                              |
+
+> ⚠️ If you are on Apple M1, this version of emsdk may not be available for this architecture and you will get an error when installing it, indicating a missing binary. If this is the case, a workaround is to modify the `emsdk.py` line 132 with `machine = 'x86_64'` to ensure a correct binary is downloaded.
 
 - Launch the build from GDevelop.js folder:
 

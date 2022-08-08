@@ -6,7 +6,7 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import EventsSheet, { type EventsSheetInterface } from '../EventsSheet';
-import EditorMosaic from '../UI/EditorMosaic';
+import EditorMosaic, { mosaicContainsNode } from '../UI/EditorMosaic';
 import EmptyMessage from '../UI/EmptyMessage';
 import EventsFunctionConfigurationEditor from './EventsFunctionConfigurationEditor';
 import EventsFunctionsList, {
@@ -1393,9 +1393,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       )
                     }
                     initialNodes={
+                      mosaicContainsNode(initialMosaicEditorNodes, 'objects-list') ?
                       getDefaultEditorMosaicNode(
                         'events-functions-extension-editor'
-                      ) || initialMosaicEditorNodes
+                      ) || initialMosaicEditorNodes :
+                      initialMosaicEditorNodes
                     }
                   />
                 )}

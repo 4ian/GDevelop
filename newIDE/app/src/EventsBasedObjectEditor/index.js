@@ -55,7 +55,7 @@ export default class EventsBasedObjectEditor extends React.Component<
           <Tab label={<Trans>Properties</Trans>} value="properties" />
           <Tab label={<Trans>Children</Trans>} value="children" />
         </Tabs>
-        <Line>
+        <Line expand useFullHeight>
           {currentTab === 'configuration' && (
             <ColumnStackLayout expand>
               <DismissableAlertMessage

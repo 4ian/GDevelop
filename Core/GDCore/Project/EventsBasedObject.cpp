@@ -21,11 +21,16 @@ EventsBasedObject::EventsBasedObject(const gd::EventsBasedObject &_eventBasedObj
 
 void EventsBasedObject::SerializeTo(SerializerElement& element) const {
   AbstractEventsBasedEntity::SerializeTo(element);
+
+  layout->SerializeTo(element.AddChild("layout"));
 }
 
 void EventsBasedObject::UnserializeFrom(gd::Project& project,
                                           const SerializerElement& element) {
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
+
+  layout = make_unique<Layout>();
+  layout->UnserializeFrom(project, element.GetChild("layout"));
 }
 
 }  // namespace gd

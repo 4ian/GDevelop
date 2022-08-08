@@ -29,6 +29,7 @@ export default class EventsBasedObjectEditorDialog extends React.Component<
       <Dialog
         noMargin
         fullHeight
+        flexColumnBody
         secondaryActions={[
           <HelpButton
             key="help"

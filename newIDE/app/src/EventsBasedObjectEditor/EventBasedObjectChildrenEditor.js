@@ -4,7 +4,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
-import { Column } from '../UI/Grid';
+import { Line } from '../UI/Grid';
 import ObjectsList from '../ObjectsList';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import { showWarningBox } from '../UI/Messages/MessageBox';
@@ -60,7 +60,8 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
       layout,
       object.getName(),
       /* isObjectGroup=*/ false,
-      shouldRemoveReferences
+      // TODO EBO
+      false, //shouldRemoveReferences
     );
     done(true);
   };
@@ -142,7 +143,8 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
   updateBehaviorsSharedData = () => {
     const { project, eventsBasedObject } = this.props;
     const layout = eventsBasedObject.getLayout();
-    layout.updateBehaviorsSharedData(project);
+    // TODO EBO
+    //layout.updateBehaviorsSharedData(project);
   };
 
   forceUpdateObjectsList = () => {
@@ -156,16 +158,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
       <React.Fragment>
         <I18n>
           {({ i18n }) => (
-            <Column
-              noMargin
-              expand
-              useFullHeight={
-                true /* Ensure editors with large/scrolling children won't grow outside of the dialog. */
-              }
-              noOverflowParent={
-                true /* Ensure editors with large/scrolling children won't grow outside of the dialog. */
-              }
-            >
+            <Line expand useFullHeight>
               <ObjectsList
                 getThumbnail={ObjectsRenderingService.getThumbnail.bind(
                   ObjectsRenderingService
@@ -184,7 +177,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 onDeleteObject={this._onDeleteObject(i18n)}
                 canRenameObject={this._canObjectOrGroupUseNewName}
                 // Instances can't be created from this context. What does this do actually?
-                onObjectCreated={() => {}} // {this._onObjectCreated}
+                onObjectCreated={() => {console.log("New object !")}} // {this._onObjectCreated}
                 // Object selection has no impact.
                 onObjectSelected={() => {}}
                 onRenameObject={this._onRenameObject}
@@ -203,7 +196,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   launchProjectWithLoadingScreenPreview: () => {},
                 }}
               />
-            </Column>
+            </Line>
           )}
         </I18n>
         {this.state.editedObjectWithContext && (

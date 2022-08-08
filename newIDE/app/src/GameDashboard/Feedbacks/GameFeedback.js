@@ -258,7 +258,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                     onCheck={(_event, checked) => {
                       setShowProcessed(checked);
                     }}
-                    label={<Trans>Show unread feedbacks only</Trans>}
+                    label={<Trans>Show unread feedback only</Trans>}
                   />
                 </LineStackLayout>
               </Column>

@@ -542,11 +542,11 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
   InsertUnique(includesFiles, "timemanager.js");
+  InsertUnique(includesFiles, "polygon.js");
   InsertUnique(includesFiles, "runtimeobject.js");
   InsertUnique(includesFiles, "profiler.js");
   InsertUnique(includesFiles, "runtimescene.js");
   InsertUnique(includesFiles, "scenestack.js");
-  InsertUnique(includesFiles, "polygon.js");
   InsertUnique(includesFiles, "force.js");
   InsertUnique(includesFiles, "layer.js");
   InsertUnique(includesFiles, "timer.js");

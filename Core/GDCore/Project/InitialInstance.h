@@ -145,7 +145,7 @@ class GD_CORE_API InitialInstance {
   bool IsSealed() const { return sealed; };
 
   /**
-   * \brief (Un)lock the initial instance.
+   * \brief (Un)seal the initial instance.
    *
    * An instance which is sealed cannot be selected by clicking on it in a
    * layout editor canvas.

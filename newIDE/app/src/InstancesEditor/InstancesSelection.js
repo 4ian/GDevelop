@@ -32,12 +32,12 @@ export default class InstancesSelection {
     multiSelect,
     layersVisibility = null,
     ignoreSeal = false,
-  }: {
+  }: {|
     instance: gdInitialInstance,
     multiSelect: boolean,
     layersVisibility: ?{ [string]: boolean },
     ignoreSeal?: boolean,
-  }) {
+  |}) {
     if (!ignoreSeal && instance.isSealed()) return;
     if (this.isInstanceSelected(instance)) {
       if (multiSelect) this.unselectInstance(instance);
@@ -57,12 +57,12 @@ export default class InstancesSelection {
     multiSelect,
     layersVisibility = null,
     ignoreSeal = false,
-  }: {
+  }: {|
     instances: Array<gdInitialInstance>,
     multiSelect: boolean,
     layersVisibility: ?{ [string]: boolean },
     ignoreSeal?: boolean,
-  }) {
+  |}) {
     if (!multiSelect) this.clearSelection();
 
     instances.forEach(instance => {

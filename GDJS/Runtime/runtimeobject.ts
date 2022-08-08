@@ -2343,7 +2343,7 @@ namespace gdjs {
           }
         }
       } else {
-        let sqDistMax = 0;
+        let sqDistMax = -Number.MAX_VALUE;
         const hitBoxes = this.getHitBoxesAround(x, y, endX, endY);
         for (const hitBox of hitBoxes) {
           const res = gdjs.Polygon.raycastTest(hitBox, x, y, endX, endY);

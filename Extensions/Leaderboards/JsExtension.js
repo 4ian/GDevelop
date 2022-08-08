@@ -44,7 +44,7 @@ module.exports = {
         _('Save player score'),
         _("Save the player's score to the given leaderboard."),
         _(
-          'Send to leaderboard _PARAM1_ the score _PARAM2_ with player name: _PARAM3_.'
+          'Send to leaderboard _PARAM1_ the score _PARAM2_ with player name: _PARAM3_'
         ),
         _('Save score'),
         'JsPlatform/Extensions/leaderboard.svg',

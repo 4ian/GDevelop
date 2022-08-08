@@ -16,7 +16,7 @@ This is the port of GDevelop core classes to WebAssembly+JavaScript. This allows
 | -------------------------------------------- | -------------------------------------------- |
 | `git clone https://github.com/juj/emsdk.git` | `git clone https://github.com/juj/emsdk.git` |
 | `cd emsdk`                                   | `cd emsdk`                                   |
-| `./emsdk update`                             | `emsdk update`                               |
+| `git pull`                                   | `git pull`                                   |
 | `./emsdk install 1.39.6`                     | `emsdk install 1.39.6`                       |
 | `./emsdk activate 1.39.6`                    | `emsdk activate 1.39.6`                      |
 | `source ./emsdk_env.sh`                      | `emsdk_env.bat`                              |

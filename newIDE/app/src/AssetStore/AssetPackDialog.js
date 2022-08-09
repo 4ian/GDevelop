@@ -16,6 +16,7 @@ import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import LinearProgress from '../UI/LinearProgress';
+import { AssetStoreContext } from './AssetStoreContext';
 
 type Props = {|
   assetPack: AssetPack,
@@ -27,7 +28,6 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   events: gdEventsList,
   onObjectAddedFromAsset: (object: gdObject) => void,
-  showStagingAssets: boolean,
 |};
 
 export const AssetPackDialog = ({
@@ -40,7 +40,6 @@ export const AssetPackDialog = ({
   objectsContainer,
   events,
   onObjectAddedFromAsset,
-  showStagingAssets,
 }: Props) => {
   const missingAssetShortHeaders = assetShortHeaders.filter(
     assetShortHeader => !addedAssetIds.includes(assetShortHeader.id)
@@ -60,6 +59,8 @@ export const AssetPackDialog = ({
     EventsFunctionsExtensionsContext
   );
 
+  const { environment } = React.useContext(AssetStoreContext);
+
   const onInstallAssets = React.useCallback(
     async (assetShortHeaders: Array<AssetShortHeader>) => {
       if (!assetShortHeaders || !assetShortHeaders.length) return;
@@ -73,7 +74,7 @@ export const AssetPackDialog = ({
               project,
               objectsContainer,
               events,
-              isStagingAsset: showStagingAssets,
+              environment,
             })
           )
         );
@@ -106,7 +107,7 @@ export const AssetPackDialog = ({
       events,
       onObjectAddedFromAsset,
       onAssetsAdded,
-      showStagingAssets,
+      environment,
     ]
   );
 

@@ -18,8 +18,6 @@ export type NavigationState = {|
   previousPages: Array<AssetStorePageState>,
   getCurrentPage: () => AssetStorePageState,
   backToPreviousPage: () => void,
-  showStagingAssets: boolean,
-  toggleStagingAssets: () => void,
   openHome: () => void,
   clearHistory: () => void,
   openSearchIfNeeded: () => void,
@@ -61,7 +59,6 @@ export const useNavigation = (): NavigationState => {
   const [history, setHistory] = React.useState<AssetStorePageHistory>({
     previousPages: [assetStoreHomePageState],
   });
-  const [showStagingAssets, setShowStagingAssets] = React.useState(false);
   const previousPages = history.previousPages;
 
   return {
@@ -72,10 +69,6 @@ export const useNavigation = (): NavigationState => {
         previousPages.pop();
         setHistory({ previousPages });
       }
-    },
-    showStagingAssets,
-    toggleStagingAssets: () => {
-      setShowStagingAssets(!showStagingAssets);
     },
     openHome: () => {
       previousPages.length = 0;

@@ -66,7 +66,7 @@ const getExtensionIconUrl = (extension: gdPlatformExtension) => {
  * Declare the behavior for the given
  * events based behavior.
  */
-export const declareBehaviorMetadata = (
+ export const declareBehaviorMetadata = (
   extension: gdPlatformExtension,
   eventsBasedBehavior: gdEventsBasedBehavior
 ): gdBehaviorMetadata => {
@@ -200,6 +200,138 @@ export const declareBehaviorMetadata = (
 };
 
 /**
+ * Declare the object for the given
+ * events based object.
+ */
+ export const declareObjectMetadata = (
+  extension: gdPlatformExtension,
+  eventsBasedObject: gdEventsBasedObject
+): gdObjectMetadata => {
+  const generatedObject = new gd.ObjectJsImplementation();
+
+  // We enumerate the properties of the object from a list of gdNamedPropertyDescriptor
+  // to an array of JavaScript objects. This is important to ensure that the functions
+  // below are not keeping any reference to eventsBasedObject.
+  //
+  // We could in theory keep a reference to eventsBasedObject, and avoid using
+  // `enumerateNamedPropertyDescriptorsList` and `toGdPropertyDescriptor`.
+  // This should be safe as if eventsBasedObject is deleted (i.e: the object
+  // is removed from its extension), then the extension will be re-generated.
+  //
+  // In practice, we don't want to risk keeping this references, because if at some point
+  // we delete the eventsBasedObject and forget to remove the extension, then the
+  // extension will use a deleted object and crash the app. Instead, we convert the
+  // properties to an array of JavaScript objects, so that we're guaranteed that the
+  // lifetime of these properties is the same as the lifetime of these functions (i.e:
+  // we use the JS garbage collector).
+  const enumeratedProperties = enumerateNamedPropertyDescriptorsList(
+    eventsBasedObject.getPropertyDescriptors()
+  );
+
+  // $FlowExpectedError - we're creating an object
+  generatedObject.updateProperty = function(
+    objectContent: gdSerializerElement,
+    propertyName: string,
+    newValue: string
+  ) {
+    const enumeratedProperty = enumeratedProperties.find(
+      enumeratedProperty => enumeratedProperty.name === propertyName
+    );
+    if (!enumeratedProperty) return false;
+
+    const element = objectContent.addChild(propertyName);
+    const propertyType: string = enumeratedProperty.type;
+
+    if (
+      propertyType === 'String' ||
+      propertyType === 'Choice' ||
+      propertyType === 'Color'
+    ) {
+      element.setStringValue(newValue);
+    } else if (propertyType === 'Number') {
+      element.setDoubleValue(parseFloat(newValue));
+    } else if (propertyType === 'Boolean') {
+      element.setBoolValue(newValue === '1');
+    }
+
+    return true;
+  };
+
+  // $FlowExpectedError - we're creating an object
+  generatedObject.getProperties = function(objectContent) {
+    var objectProperties = new gd.MapStringPropertyDescriptor();
+
+    enumeratedProperties.forEach(enumeratedProperty => {
+      const propertyName = enumeratedProperty.name;
+      const propertyType = enumeratedProperty.type;
+      const newProperty = toGdPropertyDescriptor(
+        enumeratedProperty,
+        objectProperties.getOrCreate(propertyName)
+      );
+
+      if (objectContent.hasChild(propertyName)) {
+        if (
+          propertyType === 'String' ||
+          propertyType === 'Choice' ||
+          propertyType === 'Color'
+        ) {
+          newProperty.setValue(
+            objectContent.getChild(propertyName).getStringValue()
+          );
+        } else if (propertyType === 'Number') {
+          newProperty.setValue(
+            '' + objectContent.getChild(propertyName).getDoubleValue()
+          );
+        } else if (propertyType === 'Boolean') {
+          newProperty.setValue(
+            objectContent.getChild(propertyName).getBoolValue()
+              ? 'true'
+              : 'false'
+          );
+        }
+      } else {
+        // No value was serialized for this property. `newProperty`
+        // will have the default value coming from `enumeratedProperty`.
+      }
+    });
+
+    return objectProperties;
+  };
+
+  // $FlowExpectedError - we're creating an object
+  generatedObject.updateInitialInstanceProperty = function (
+    objectContent,
+    instance,
+    propertyName,
+    newValue,
+    project,
+    layout
+  ) {
+    return false;
+  };
+
+  // $FlowExpectedError - we're creating an object
+  generatedObject.getInitialInstanceProperties = function (
+    content,
+    instance,
+    project,
+    layout
+  ) {
+    var instanceProperties = new gd.MapStringPropertyDescriptor();
+    return instanceProperties;
+  };
+
+  return extension
+    .addObject(
+      eventsBasedObject.getName(),
+      eventsBasedObject.getFullName() || eventsBasedObject.getName(),
+      eventsBasedObject.getDescription(),
+      getExtensionIconUrl(extension),
+      generatedObject
+    );
+};
+
+/**
  * Check if the name of the function is the name of a lifecycle function (for events-based behaviors),
  * that will be called automatically by the game engine.
  */
@@ -303,7 +435,7 @@ export const declareInstructionOrExpressionMetadata = (
  * Declare the instruction (action/condition) or expression for the given
  * behavior events function.
  */
-export const declareBehaviorInstructionOrExpressionMetadata = (
+ export const declareBehaviorInstructionOrExpressionMetadata = (
   extension: gdPlatformExtension,
   behaviorMetadata: gdBehaviorMetadata,
   eventsBasedBehavior: gdEventsBasedBehavior,
@@ -362,6 +494,70 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
     );
   }
 };
+// TODO EBO Merge the 2 methods?
+/**
+ * Declare the instruction (action/condition) or expression for the given
+ * object events function.
+ */
+ export const declareObjectInstructionOrExpressionMetadata = (
+  extension: gdPlatformExtension,
+  objectMetadata: gdObjectMetadata,
+  eventsBasedObject: gdEventsBasedObject,
+  eventsFunction: gdEventsFunction
+): gdInstructionMetadata | gdExpressionMetadata => {
+  const functionType = eventsFunction.getFunctionType();
+  if (functionType === gd.EventsFunction.Expression) {
+    return objectMetadata.addExpression(
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      eventsFunction.getDescription() || eventsFunction.getFullName(),
+      eventsFunction.getGroup() ||
+        eventsBasedObject.getFullName() ||
+        eventsBasedObject.getName(),
+      getExtensionIconUrl(extension)
+    );
+  } else if (functionType === gd.EventsFunction.StringExpression) {
+    return objectMetadata.addStrExpression(
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      eventsFunction.getDescription() || eventsFunction.getFullName(),
+      eventsFunction.getGroup() ||
+        eventsBasedObject.getFullName() ||
+        eventsBasedObject.getName(),
+      getExtensionIconUrl(extension)
+    );
+  } else if (functionType === gd.EventsFunction.Condition) {
+    // Use the new "scoped" way to declare an instruction, because
+    // we want to prevent any conflict between free functions and
+    // objects (that can totally have functions with the same name).
+    return objectMetadata.addScopedCondition(
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      eventsFunction.getDescription() || eventsFunction.getFullName(),
+      eventsFunction.getSentence(),
+      eventsFunction.getGroup() ||
+        eventsBasedObject.getFullName() ||
+        eventsBasedObject.getName(),
+      getExtensionIconUrl(extension),
+      getExtensionIconUrl(extension)
+    );
+  } else {
+    // Use the new "scoped" way to declare an instruction, because
+    // we want to prevent any conflict between free functions and
+    // objects (that can totally have functions with the same name).
+    return objectMetadata.addScopedAction(
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      eventsFunction.getDescription() || eventsFunction.getFullName(),
+      eventsFunction.getSentence(),
+      eventsFunction.getGroup() ||
+        eventsBasedObject.getFullName() ||
+        eventsBasedObject.getName(),
+      getExtensionIconUrl(extension),
+      getExtensionIconUrl(extension)
+    );
+  }
+};
 
 type gdInstructionOrExpressionMetadata =
   | gdInstructionMetadata
@@ -373,7 +569,7 @@ type gdInstructionOrExpressionMetadata =
  * This is akin to what would happen by manually declaring a JS extension
  * (see `JsExtension.js` files of extensions).
  */
-export const declareBehaviorPropertiesInstructionAndExpressions = (
+ export const declareBehaviorPropertiesInstructionAndExpressions = (
   i18n: I18nType,
   extension: gdPlatformExtension,
   behaviorMetadata: gdBehaviorMetadata,
@@ -577,6 +773,212 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           propertyLabel,
           propertyLabel,
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+          getExtensionIconUrl(extension)
+        )
+      )
+        .getCodeExtraInformation()
+        .setFunctionName(getterName);
+    }
+  });
+};
+
+
+/**
+ * Declare the instructions (actions/conditions) and expressions for the
+ * properties of the given events based object.
+ * This is akin to what would happen by manually declaring a JS extension
+ * (see `JsExtension.js` files of extensions).
+ */
+ export const declareObjectPropertiesInstructionAndExpressions = (
+  i18n: I18nType,
+  extension: gdPlatformExtension,
+  objectMetadata: gdObjectMetadata,
+  eventsBasedObject: gdEventsBasedObject
+): void => {
+  const addObjectParameter = <T: gdInstructionOrExpressionMetadata>(
+    instructionOrExpression: T
+  ): T => {
+    // By convention, first parameter is always the object:
+    instructionOrExpression.addParameter(
+      'object',
+      'Object',
+      eventsBasedObject.getName(),
+      false
+    );
+
+    // All property actions/conditions/expressions are private, meaning
+    // they can only be used from the behavior events.
+    instructionOrExpression.setPrivate();
+
+    return instructionOrExpression;
+  };
+
+  mapVector(eventsBasedObject.getPropertyDescriptors(), property => {
+    const propertyType = property.getType();
+    const propertyName = property.getName();
+    // TODO EBO
+    const getterName = gd.BehaviorCodeGenerator.getBehaviorPropertyGetterName(
+      propertyName
+    );
+    const setterName = gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(
+      propertyName
+    );
+    const propertyLabel =
+      property.getLabel() || i18n._(t`${propertyName} property`);
+
+    if (propertyType === 'String' || propertyType === 'Choice') {
+      addObjectParameter(
+        objectMetadata.addStrExpression(
+          gd.EventsBasedObject.getPropertyExpressionName(propertyName),
+          propertyLabel,
+          propertyLabel,
+          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
+          getExtensionIconUrl(extension)
+        )
+      )
+        .getCodeExtraInformation()
+        .setFunctionName(getterName);
+
+        addObjectParameter(
+        objectMetadata.addScopedCondition(
+          gd.EventsBasedObject.getPropertyConditionName(propertyName),
+          propertyLabel,
+          i18n._(t`Compare the content of ${propertyLabel}`),
+          i18n._(t`the property ${propertyName}`),
+          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
+        )
+      )
+        .useStandardRelationalOperatorParameters('string')
+        .getCodeExtraInformation()
+        .setFunctionName(getterName);
+
+        addObjectParameter(
+        objectMetadata.addScopedAction(
+          gd.EventsBasedObject.getPropertyActionName(propertyName),
+          propertyLabel,
+          i18n._(t`Change the content of ${propertyLabel}`),
+          i18n._(t`the property ${propertyName}`),
+          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
+        )
+      )
+        .useStandardOperatorParameters('string')
+        .getCodeExtraInformation()
+        .setFunctionName(setterName)
+        .setManipulatedType('string')
+        .setGetter(getterName);
+    } else if (propertyType === 'Number') {
+      addObjectParameter(
+        objectMetadata.addExpression(
+          gd.EventsBasedObject.getPropertyExpressionName(propertyName),
+          propertyLabel,
+          propertyLabel,
+          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
+          getExtensionIconUrl(extension)
+        )
+      )
+        .getCodeExtraInformation()
+        .setFunctionName(getterName);
+
+        addObjectParameter(
+        objectMetadata.addScopedCondition(
+          gd.EventsBasedObject.getPropertyConditionName(propertyName),
+          propertyLabel,
+          i18n._(t`Compare the value of ${propertyLabel}`),
+          i18n._(t`the property ${propertyName}`),
+          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
+        )
+      )
+        .useStandardRelationalOperatorParameters('number')
+        .getCodeExtraInformation()
+        .setFunctionName(getterName);
+
+        addObjectParameter(
+        objectMetadata.addScopedAction(
+          gd.EventsBasedObject.getPropertyActionName(propertyName),
+          propertyLabel,
+          i18n._(t`Change the value of ${propertyLabel}`),
+          i18n._(t`the property ${propertyName}`),
+          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
+        )
+      )
+        .useStandardOperatorParameters('number')
+        .getCodeExtraInformation()
+        .setFunctionName(setterName)
+        .setGetter(getterName);
+    } else if (propertyType === 'Boolean') {
+      addObjectParameter(
+        objectMetadata.addScopedCondition(
+          gd.EventsBasedObject.getPropertyConditionName(propertyName),
+          propertyLabel,
+          i18n._(t`Check the value of ${propertyLabel}`),
+          i18n._(t`Property ${propertyName} of _PARAM0_ is true`),
+          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
+        )
+      )
+        .getCodeExtraInformation()
+        .setFunctionName(getterName);
+
+        addObjectParameter(
+        objectMetadata.addScopedAction(
+          gd.EventsBasedObject.getPropertyActionName(propertyName),
+          propertyLabel,
+          i18n._(t`Update the value of ${propertyLabel}`),
+          i18n._(t`Set property ${propertyName} of _PARAM0_ to _PARAM2_`),
+          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
+        )
+      )
+        .addParameter('yesorno', i18n._(t`New value to set`), '', false)
+        .getCodeExtraInformation()
+        .setFunctionName(setterName);
+    } else if (propertyType === 'Color') {
+      addObjectParameter(
+        objectMetadata.addScopedCondition(
+          gd.EventsBasedObject.getPropertyConditionName(propertyName),
+          propertyLabel,
+          i18n._(t`Check the color ${propertyLabel}`),
+          i18n._(t`Color ${propertyName}`),
+          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
+        )
+      )
+        .useStandardRelationalOperatorParameters('string')
+        .getCodeExtraInformation()
+        .setFunctionName(getterName);
+
+        addObjectParameter(
+        objectMetadata.addScopedAction(
+          gd.EventsBasedObject.getPropertyActionName(propertyName),
+          propertyLabel,
+          i18n._(t`Update the color of ${propertyLabel}`),
+          i18n._(t`Change color ${propertyName} of _PARAM0_ to _PARAM2_`),
+          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
+        )
+      )
+        .addParameter('color', i18n._(t`New color to set`), '', false)
+        .getCodeExtraInformation()
+        .setFunctionName(setterName);
+
+        addObjectParameter(
+        objectMetadata.addStrExpression(
+          gd.EventsBasedObject.getPropertyExpressionName(propertyName),
+          propertyLabel,
+          propertyLabel,
+          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
           getExtensionIconUrl(extension)
         )
       )

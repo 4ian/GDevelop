@@ -569,6 +569,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   GetAllObjectTypesUsingEventsBasedBehavior
 #define STATIC_EnsureBehaviorEventsFunctionsProperParameters \
   EnsureBehaviorEventsFunctionsProperParameters
+#define STATIC_EnsureObjectEventsFunctionsProperParameters \
+  EnsureObjectEventsFunctionsProperParameters
 #define STATIC_AddBehaviorAndRequiredBehaviors \
   AddBehaviorAndRequiredBehaviors
 #define STATIC_FindDependentBehaviorNames \
@@ -607,6 +609,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_MoveEventsFunctionParameter MoveEventsFunctionParameter
 #define STATIC_MoveBehaviorEventsFunctionParameter \
   MoveBehaviorEventsFunctionParameter
+#define STATIC_MoveObjectEventsFunctionParameter \
+  MoveObjectEventsFunctionParameter
 #define STATIC_RenameEventsBasedBehaviorProperty RenameEventsBasedBehaviorProperty
 #define STATIC_RenameEventsBasedBehavior RenameEventsBasedBehavior
 

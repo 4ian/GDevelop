@@ -550,14 +550,16 @@ export const getFreeEventsFunctionType = (
 };
 
 /**
- * Return the index of the first parameter to be shown to the user:
- * * 0 for a behavior "method",
- * * 1 for a free function (as the first parameter is by convention the runtimeScene).
+ * The index of the first parameter to be shown to the user.
  */
-export const getParametersIndexOffset = (
-  isEventsBasedBehaviorMethod: boolean
-) => {
-  return isEventsBasedBehaviorMethod
-    ? 0 /*In the case of a behavior events function, the first two parameters are by convention the "Object" and "Behavior" */
-    : 1; /*In the case of a free events function (i.e: not tied to a behavior), the first parameter is by convention the current scene and is not shown.*/
-};
+export const ParametersIndexOffsets = Object.freeze({
+  // In the case of a free events function (i.e: not tied to a behavior),
+  // the first parameter is by convention the current scene and is not shown.
+  FreeFunction: 1,
+  // In the case of a behavior events function, the first two parameters
+  // are by convention the "Object" and "Behavior".
+  BehaviorFunction: 0,
+  // In the case of an object events function, the first parameter
+  // is by convention the "Object".
+  ObjectFunction: 0,
+});

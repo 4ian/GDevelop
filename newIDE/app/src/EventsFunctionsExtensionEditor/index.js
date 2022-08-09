@@ -44,7 +44,7 @@ import Check from '@material-ui/icons/Check';
 import Tune from '@material-ui/icons/Tune';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import { getParametersIndexOffset } from '../EventsFunctionsExtensionsLoader';
+import { ParametersIndexOffsets } from '../EventsFunctionsExtensionsLoader';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 
 const gd: libGDevelop = global.gd;
@@ -402,8 +402,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       project,
       eventsFunctionsExtension,
       eventsFunction.getName(),
-      oldIndex + getParametersIndexOffset(false),
-      newIndex + getParametersIndexOffset(false)
+      oldIndex + ParametersIndexOffsets.FreeFunction,
+      newIndex + ParametersIndexOffsets.FreeFunction
     );
 
     done(true);
@@ -423,6 +423,28 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       project,
       eventsFunctionsExtension,
       eventsBasedBehavior,
+      eventsFunction.getName(),
+      oldIndex,
+      newIndex
+    );
+
+    done(true);
+  };
+
+  _makeMoveObjectEventsParameter = (i18n: I18nType) => (
+    eventsBasedObject: gdEventsBasedObject,
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: boolean => void
+  ) => {
+    // Don't ask for user confirmation as this change is easy to revert.
+
+    const { project, eventsFunctionsExtension } = this.props;
+    gd.WholeProjectRefactorer.moveObjectEventsFunctionParameter(
+      project,
+      eventsFunctionsExtension,
+      eventsBasedObject,
       eventsFunction.getName(),
       oldIndex,
       newIndex
@@ -709,11 +731,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     eventsFunction: gdEventsFunction
   ) => {
     // This will create the mandatory parameters for the newly added function.
-    // TODO EBO
-    // gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
-    //   this.props.eventsFunctionsExtension,
-    //   eventsBasedObject
-    // );
+    gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+      this.props.eventsFunctionsExtension,
+      eventsBasedObject
+    );
   };
 
   _onBehaviorPropertyRenamed = (
@@ -1038,6 +1059,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     onMoveBehaviorEventsParameter={this._makeMoveBehaviorEventsParameter(
                       i18n
                     )}
+                    onMoveObjectEventsParameter={this._makeMoveObjectEventsParameter(
+                      i18n
+                    )}
                     unsavedChanges={this.props.unsavedChanges}
                     getFunctionGroupNames={this._getFunctionGroupNames}
                   />
@@ -1067,7 +1091,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 ref={editor => (this.editor = editor)}
                 project={project}
                 scope={{
-                  layout: null,
+                  layout: selectedEventsBasedObject && selectedEventsBasedObject.getLayout(),
                   externalEvents: null,
                   eventsFunctionsExtension,
                   eventsBasedBehavior: selectedEventsBasedBehavior,

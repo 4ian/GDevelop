@@ -18,6 +18,7 @@ class EventsFunctionsExtension;
 class EventsFunction;
 class ObjectsContainer;
 class EventsBasedBehavior;
+class EventsBasedObject;
 class ArbitraryEventsWorker;
 class ArbitraryObjectsWorker;
 class ArbitraryEventsWorkerWithContext;
@@ -146,6 +147,22 @@ class GD_CORE_API WholeProjectRefactorer {
       gd::Project& project,
       const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& functionName,
+      std::size_t oldIndex,
+      std::size_t newIndex);
+
+  /**
+   * \brief Refactor the project **before** the parameter of an events function
+   * of an object is moved.
+   *
+   * \warning Do the move of the specified function parameters after calling
+   * this. This is because the function is expected to be in its old state for
+   * the refactoring.
+   */
+  static void MoveObjectEventsFunctionParameter(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::EventsBasedObject& eventsBasedObject,
       const gd::String& functionName,
       std::size_t oldIndex,
       std::size_t newIndex);
@@ -309,6 +326,15 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::EventsBasedBehavior& eventsBasedBehavior);
 
+  /**
+   * \brief Ensure (adding if necessary) that the functions of the given
+   * behavior have the proper mandatory parameters (the "Object" and
+   * "Behavior").
+   */
+  static void EnsureObjectEventsFunctionsProperParameters(
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::EventsBasedObject& eventsBasedObject);
+
   virtual ~WholeProjectRefactorer(){};
 
  private:
@@ -331,6 +357,7 @@ class GD_CORE_API WholeProjectRefactorer {
       std::unordered_set<gd::String>& dependentBehaviorNames);
 
   static const gd::String behaviorObjectParameterName;
+  static const gd::String parentObjectParameterName;
 
   WholeProjectRefactorer(){};
 };

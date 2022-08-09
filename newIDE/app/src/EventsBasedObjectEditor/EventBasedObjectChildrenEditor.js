@@ -176,8 +176,8 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 onEditObject={this.editObject}
                 onDeleteObject={this._onDeleteObject(i18n)}
                 canRenameObject={this._canObjectOrGroupUseNewName}
-                // Instances can't be created from this context. What does this do actually?
-                onObjectCreated={() => {console.log("New object !")}} // {this._onObjectCreated}
+                // Instances can't be created from this context.
+                onObjectCreated={() => {}}
                 // Object selection has no impact.
                 onObjectSelected={() => {}}
                 onRenameObject={this._onRenameObject}

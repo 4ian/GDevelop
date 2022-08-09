@@ -2000,6 +2000,13 @@ interface WholeProjectRefactorer {
       [Const] DOMString functionName,
       unsigned long oldIndex,
       unsigned long newIndex);
+    void STATIC_MoveObjectEventsFunctionParameter(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const, Ref] EventsBasedObject eventsBasedObject,
+      [Const] DOMString functionName,
+      unsigned long oldIndex,
+      unsigned long newIndex);
     void STATIC_RenameEventsBasedBehaviorProperty(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2019,6 +2026,7 @@ interface WholeProjectRefactorer {
     void STATIC_GlobalObjectOrGroupRemoved([Ref] Project project, [Const] DOMString objectName, boolean isObjectGroup, boolean removeEventsAndGroups);
     [Value] SetString STATIC_GetAllObjectTypesUsingEventsBasedBehavior([Const, Ref] Project project, [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
     void STATIC_EnsureBehaviorEventsFunctionsProperParameters([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
+    void STATIC_EnsureObjectEventsFunctionsProperParameters([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedObject eventsBasedObject);
     void STATIC_AddBehaviorAndRequiredBehaviors([Ref] Project project, [Ref] gdObject obj, [Const] DOMString behaviorType, [Const] DOMString behaviorName);
     [Value] VectorString STATIC_FindDependentBehaviorNames([Const, Ref] Project project, [Const, Ref] gdObject obj, [Const] DOMString behaviorName);
     [Value] VectorUnfilledRequiredBehaviorPropertyProblem STATIC_FindInvalidRequiredBehaviorProperties([Const, Ref] Project project);

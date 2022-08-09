@@ -87,14 +87,25 @@ void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
 
   // ...and has an "Object" by convention...
   if (!outputObjectsContainer.HasObjectNamed("Object")) {
-    gd::LogWarning("No \"Object\" in a function of an events based behavior: " +
+    gd::LogWarning("No \"Object\" in a function of an events based object: " +
                    eventsFunction.GetName() +
                    ". This means this function is likely misconfigured (check "
                    "its parameters).");
     return;
   }
+  if (eventsBasedObject.GetLayout().HasObjectNamed("Object")) {
+    gd::LogWarning("Child-objects can't be named Object because it's reserved"
+                  "for the parent. ");
+    return;
+  }
 
-  // TODO EBO Add child-objects.
+  // ...and its children.
+  auto &children = eventsBasedObject.GetLayout().GetObjects();
+  for (auto &childObject : children) {
+    auto child = childObject.get();
+    outputObjectsContainer.InsertObject(*child, children.size());
+  }
+
   // TODO EBO Add private behaviors of the parent.
 }
 

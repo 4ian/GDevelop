@@ -21,7 +21,6 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
-  // TODO TBO use it
   eventsBasedObject: ?gdEventsBasedObject,
   onParametersOrGroupsUpdated: () => void,
   helpPagePath?: string,
@@ -37,6 +36,13 @@ type Props = {|
   ) => void,
   onMoveBehaviorEventsParameter?: (
     eventsBasedBehavior: gdEventsBasedBehavior,
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: (boolean) => void
+  ) => void,
+  onMoveObjectEventsParameter?: (
+    eventsBasedObject: gdEventsBasedObject,
     eventsFunction: gdEventsFunction,
     oldIndex: number,
     newIndex: number,
@@ -156,6 +162,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       objectsContainer,
       eventsFunction,
       eventsBasedBehavior,
+      eventsBasedObject,
       freezeEventsFunctionType,
       onConfigurationUpdated,
       onParametersOrGroupsUpdated,
@@ -164,6 +171,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       renderConfigurationHeader,
       onMoveFreeEventsParameter,
       onMoveBehaviorEventsParameter,
+      onMoveObjectEventsParameter,
       getFunctionGroupNames,
     } = this.props;
 
@@ -189,6 +197,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
               <EventsFunctionPropertiesEditor
                 eventsFunction={eventsFunction}
                 eventsBasedBehavior={eventsBasedBehavior}
+                eventsBasedObject={eventsBasedObject}
                 helpPagePath={helpPagePath}
                 onConfigurationUpdated={onConfigurationUpdated}
                 renderConfigurationHeader={renderConfigurationHeader}
@@ -205,11 +214,13 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 project={project}
                 eventsFunction={eventsFunction}
                 eventsBasedBehavior={eventsBasedBehavior}
+                eventsBasedObject={eventsBasedObject}
                 onParametersUpdated={onParametersOrGroupsUpdated}
                 helpPagePath={helpPagePath}
                 freezeParameters={freezeParameters}
                 onMoveFreeEventsParameter={onMoveFreeEventsParameter}
                 onMoveBehaviorEventsParameter={onMoveBehaviorEventsParameter}
+                onMoveObjectEventsParameter={onMoveObjectEventsParameter}
                 key={eventsFunction ? eventsFunction.ptr : null}
               />
             </Line>

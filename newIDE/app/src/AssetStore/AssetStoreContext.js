@@ -6,6 +6,7 @@ import {
   type AssetPacks,
   type Author,
   type License,
+  type Environment,
   listAllAssets,
   listAllAuthors,
   listAllLicenses,
@@ -49,8 +50,10 @@ type AssetStoreState = {|
   assetPacks: ?AssetPacks,
   authors: ?Array<Author>,
   licenses: ?Array<License>,
+  environment: Environment,
+  setEnvironment: (Environment) => void,
   searchResults: ?Array<AssetShortHeader>,
-  fetchAssetsAndFilters: (showStagingAssets: boolean) => void,
+  fetchAssetsAndFilters: () => void,
   error: ?Error,
   searchText: string,
   setSearchText: string => void,
@@ -70,8 +73,10 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   assetPacks: null,
   authors: null,
   licenses: null,
+  environment: 'live',
+  setEnvironment: () => {},
   searchResults: null,
-  fetchAssetsAndFilters: showStagingAssets => {},
+  fetchAssetsAndFilters: () => {},
   error: null,
   searchText: '',
   setSearchText: () => {},
@@ -93,8 +98,6 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     previousPages: [assetStoreHomePageState],
     getCurrentPage: () => assetStoreHomePageState,
     backToPreviousPage: () => {},
-    showStagingAssets: false,
-    toggleStagingAssets: () => {},
     openHome: () => {},
     clearHistory: () => {},
     openSearchIfNeeded: () => {},
@@ -132,6 +135,7 @@ export const AssetStoreStateProvider = ({
   const [assetPacks, setAssetPacks] = React.useState<?AssetPacks>(null);
   const [authors, setAuthors] = React.useState<?Array<Author>>(null);
   const [licenses, setLicenses] = React.useState<?Array<License>>(null);
+  const [environment, setEnvironment] = React.useState<Environment>('live');
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
 
@@ -196,7 +200,7 @@ export const AssetStoreStateProvider = ({
   );
 
   const fetchAssetsAndFilters = React.useCallback(
-    (showStagingAssets: boolean) => {
+    () => {
       if (isLoading.current) return;
 
       (async () => {
@@ -208,9 +212,9 @@ export const AssetStoreStateProvider = ({
             assetShortHeaders,
             filters,
             assetPacks,
-          } = await listAllAssets(showStagingAssets);
-          const authors = await listAllAuthors();
-          const licenses = await listAllLicenses();
+          } = await listAllAssets({ environment });
+          const authors = await listAllAuthors({ environment });
+          const licenses = await listAllLicenses({ environment });
 
           const assetShortHeadersById = {};
           assetShortHeaders.forEach(assetShortHeader => {
@@ -236,9 +240,10 @@ export const AssetStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [isLoading]
+    [isLoading, environment]
   );
 
+  // Preload the assets and filters when the
   React.useEffect(
     () => {
       // Don't attempt to load again assets and filters if they
@@ -247,7 +252,7 @@ export const AssetStoreStateProvider = ({
 
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching assets from asset store...');
-        fetchAssetsAndFilters(false);
+        fetchAssetsAndFilters();
       }, 6000);
       return () => clearTimeout(timeoutId);
     },
@@ -273,6 +278,8 @@ export const AssetStoreStateProvider = ({
       assetPacks,
       authors,
       licenses,
+      environment,
+      setEnvironment,
       error,
       navigationState,
       currentPage,
@@ -314,6 +321,8 @@ export const AssetStoreStateProvider = ({
       assetPacks,
       authors,
       licenses,
+      environment,
+      setEnvironment,
       error,
       navigationState,
       currentPage,

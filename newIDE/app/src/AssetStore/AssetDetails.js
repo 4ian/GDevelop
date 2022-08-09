@@ -79,7 +79,6 @@ type Props = {|
   onTagSelection: (tag: string) => void,
   assetShortHeader: AssetShortHeader,
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
-  showStagingAssets: boolean,
 |};
 
 const getObjectAssetResourcesByName = (
@@ -99,10 +98,16 @@ export const AssetDetails = ({
   onTagSelection,
   assetShortHeader,
   onOpenDetails,
-  showStagingAssets,
 }: Props) => {
   const gdevelopTheme = React.useContext(ThemeContext);
-  const { authors, licenses } = React.useContext(AssetStoreContext);
+  const {
+    authors,
+    licenses,
+    environment,
+    error: filterError,
+    fetchAssetsAndFilters,
+    useSearchItem,
+  } = React.useContext(AssetStoreContext);
   const [asset, setAsset] = React.useState<?Asset>(null);
   const [
     selectedAnimationName,
@@ -116,7 +121,7 @@ export const AssetDetails = ({
           // Reinitialise asset to trigger a loader and recalculate all parameters. (for instance zoom)
           setAsset(null);
           const loadedAsset = await getAsset(assetShortHeader, {
-            isStagingAsset: showStagingAssets,
+            environment,
           });
           setAsset(loadedAsset);
           if (loadedAsset.objectType === 'sprite') {
@@ -131,7 +136,7 @@ export const AssetDetails = ({
         }
       })();
     },
-    [assetShortHeader, showStagingAssets]
+    [assetShortHeader, environment]
   );
 
   const isImageResourceSmooth = React.useMemo(
@@ -180,11 +185,6 @@ export const AssetDetails = ({
     () => [new SimilarAssetStoreSearchFilter(assetShortHeader)],
     [assetShortHeader]
   );
-  const {
-    error: filterError,
-    fetchAssetsAndFilters,
-    useSearchItem,
-  } = React.useContext(AssetStoreContext);
   const searchResults = useSearchItem('', null, null, similarAssetFilters);
   const truncatedSearchResults = searchResults && searchResults.slice(0, 60);
 
@@ -407,7 +407,7 @@ export const AssetDetails = ({
             <Line expand noMargin justifyContent="center">
               <BoxSearchResults
                 baseSize={128}
-                onRetry={() => fetchAssetsAndFilters(showStagingAssets)}
+                onRetry={fetchAssetsAndFilters}
                 error={filterError}
                 searchItems={truncatedSearchResults}
                 renderSearchItem={(assetShortHeader, size) => (

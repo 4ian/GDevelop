@@ -111,6 +111,8 @@ export type Author = {|
   website: string,
 |};
 
+export type Environment = 'staging' | 'live';
+
 /** Check if the IDE version, passed as argument, satisfy the version required by the asset. */
 export const isCompatibleWithAsset = (
   ideVersion: string,
@@ -122,16 +124,17 @@ export const isCompatibleWithAsset = (
       })
     : true;
 
-const stagingBucket = 'https://resources.gdevelop-app.com/staging';
-const devAssetShortHeadersUrl = `${stagingBucket}/assets-database/assetShortHeaders.json`;
-const devFiltersUrl = `${stagingBucket}/assets-database/assetFilters.json`;
-const devAssetPacksUrl = `${stagingBucket}/assets-database/assetPacks.json`;
-
-export const listAllAssets = (
-  showStagingAssets: boolean
-): Promise<AllAssets> => {
+export const listAllAssets = ({
+  environment,
+}: {
+  environment: Environment,
+}): Promise<AllAssets> => {
   return axios
-    .get(`${GDevelopAssetApi.baseUrl}/asset`)
+    .get(`${GDevelopAssetApi.baseUrl}/asset`, {
+      params: {
+        environment,
+      },
+    })
     .then(response => response.data)
     .then(({ assetShortHeadersUrl, filtersUrl, assetPacksUrl }) => {
       if (!assetShortHeadersUrl || !filtersUrl || !assetPacksUrl) {
@@ -139,17 +142,9 @@ export const listAllAssets = (
       }
 
       return Promise.all([
-        axios
-          .get(
-            showStagingAssets ? devAssetShortHeadersUrl : assetShortHeadersUrl
-          )
-          .then(response => response.data),
-        axios
-          .get(showStagingAssets ? devFiltersUrl : filtersUrl)
-          .then(response => response.data),
-        axios
-          .get(showStagingAssets ? devAssetPacksUrl : assetPacksUrl)
-          .then(response => response.data),
+        axios.get(assetShortHeadersUrl).then(response => response.data),
+        axios.get(filtersUrl).then(response => response.data),
+        axios.get(assetPacksUrl).then(response => response.data),
       ]).then(([assetShortHeaders, filters, assetPacks]) => ({
         assetShortHeaders,
         filters,
@@ -160,17 +155,14 @@ export const listAllAssets = (
 
 export const getAsset = (
   assetShortHeader: AssetShortHeader,
-  { isStagingAsset }: { isStagingAsset: boolean }
+  { environment }: { environment: Environment }
 ): Promise<Asset> => {
-  if (isStagingAsset) {
-    return axios
-      .get(
-        `${stagingBucket}/assets-database/assets/${assetShortHeader.id}.json`
-      )
-      .then(response => response.data);
-  }
   return axios
-    .get(`${GDevelopAssetApi.baseUrl}/asset/${assetShortHeader.id}`)
+    .get(`${GDevelopAssetApi.baseUrl}/asset/${assetShortHeader.id}`, {
+      params: {
+        environment,
+      },
+    })
     .then(response => response.data)
     .then(({ assetUrl }) => {
       if (!assetUrl) {
@@ -182,9 +174,17 @@ export const getAsset = (
     .then(response => response.data);
 };
 
-export const listAllResources = (): Promise<AllResources> => {
+export const listAllResources = ({
+  environment,
+}: {
+  environment: Environment,
+}): Promise<AllResources> => {
   return axios
-    .get(`${GDevelopAssetApi.baseUrl}/resource`)
+    .get(`${GDevelopAssetApi.baseUrl}/resource`, {
+      params: {
+        environment,
+      },
+    })
     .then(response => response.data)
     .then(({ resourcesUrl, filtersUrl }) => {
       if (!resourcesUrl || !filtersUrl) {
@@ -200,9 +200,17 @@ export const listAllResources = (): Promise<AllResources> => {
     });
 };
 
-export const listAllAuthors = (): Promise<Array<Author>> => {
+export const listAllAuthors = ({
+  environment,
+}: {
+  environment: Environment,
+}): Promise<Array<Author>> => {
   return axios
-    .get(`${GDevelopAssetApi.baseUrl}/author`)
+    .get(`${GDevelopAssetApi.baseUrl}/author`, {
+      params: {
+        environment,
+      },
+    })
     .then(response => response.data)
     .then(({ authorsUrl }) => {
       if (!authorsUrl)
@@ -212,9 +220,17 @@ export const listAllAuthors = (): Promise<Array<Author>> => {
     .then(response => response.data);
 };
 
-export const listAllLicenses = (): Promise<Array<License>> => {
+export const listAllLicenses = ({
+  environment,
+}: {
+  environment: Environment,
+}): Promise<Array<License>> => {
   return axios
-    .get(`${GDevelopAssetApi.baseUrl}/license`)
+    .get(`${GDevelopAssetApi.baseUrl}/license`, {
+      params: {
+        environment,
+      },
+    })
     .then(response => response.data)
     .then(({ licensesUrl }) => {
       if (!licensesUrl)

@@ -51,11 +51,11 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/fontfaceobserver-font-manager/fontfaceobserver-font-manager.js',
       './newIDE/app/resources/GDJS/Runtime/jsonmanager.js',
       './newIDE/app/resources/GDJS/Runtime/timemanager.js',
+      './newIDE/app/resources/GDJS/Runtime/polygon.js',
       './newIDE/app/resources/GDJS/Runtime/runtimeobject.js',
       './newIDE/app/resources/GDJS/Runtime/runtimescene.js',
       './newIDE/app/resources/GDJS/Runtime/scenestack.js',
       './newIDE/app/resources/GDJS/Runtime/profiler.js',
-      './newIDE/app/resources/GDJS/Runtime/polygon.js',
       './newIDE/app/resources/GDJS/Runtime/force.js',
       './newIDE/app/resources/GDJS/Runtime/layer.js',
       './newIDE/app/resources/GDJS/Runtime/timer.js',
@@ -120,7 +120,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/collision/TransformedTileMap.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/helper/TileMapHelper.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/pako/dist/pako.min.js',
-      
+
       // Test extensions:
       './GDJS/tests/tests/Extensions/**.js',
 

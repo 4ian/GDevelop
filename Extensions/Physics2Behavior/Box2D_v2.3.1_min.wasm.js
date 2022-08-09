@@ -18,7 +18,7 @@ function Fa(b){for(;0<b.length;){var c=b.shift();if("function"==typeof c)c(a);el
 function na(b){if(a.onAbort)a.onAbort(b);b+="";pa(b);qa(b);ua=!0;throw new WebAssembly.RuntimeError("abort("+b+"). Build with -s ASSERTIONS=1 for more info.");}function Pa(b){var c=Qa;return String.prototype.startsWith?c.startsWith(b):0===c.indexOf(b)}function Ra(){return Pa("data:application/octet-stream;base64,")}
 
 // The wasm file path is defined here.
-var Qa="Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.wasm";
+var Qa="Box2D_v2.3.1_min.wasm.wasm";
 
 if(!Ra()){var Sa=Qa;Qa=a.locateFile?a.locateFile(Sa,ia):ia+Sa}
 function Ta(){try{if(ra)return new Uint8Array(ra);if(ka)return ka(Qa);throw"both async and sync fetching of the wasm failed";}catch(b){na(b)}}function Ua(){return ra||!da&&!ea||"function"!==typeof fetch||Pa("file://")?new Promise(function(b){b(Ta())}):fetch(Qa,{credentials:"same-origin"}).then(function(b){if(!b.ok)throw"failed to load wasm binary file at '"+Qa+"'";return b.arrayBuffer()}).catch(function(){return Ta()})}

@@ -252,7 +252,9 @@ void WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
     parameters[0]
         .SetType("object")
         .SetName(parentObjectParameterName)
-        .SetDescription("Object");
+        .SetDescription("Object")
+        .SetExtraInfo(GetObjectFullType(eventsFunctionsExtension.GetName(),
+                                        eventsBasedObject.GetName()));
   }
 }
 

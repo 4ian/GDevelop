@@ -6,7 +6,6 @@
   "homepage": "https://gdevelop.io",
   "//": "We use esbuild for a near instant build (important for quick feedback loop when developing). Typechecking is a separate process as much longer.",
   "devDependencies": {
-    "@types/electron": "^1.6.10",
     "@types/expect.js": "^0.3.29",
     "@types/mocha": "^5.2.7",
     "@types/node": "^14.11.1",

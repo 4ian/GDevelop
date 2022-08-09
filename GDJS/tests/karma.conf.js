@@ -27,12 +27,6 @@ module.exports = function (config) {
     proxies: {
       '/base/tests-utils/':
       '/base/GDJS/tests/tests-utils/',
-      // In a built game, the wasm library is in the extension sub-folder and
-      // the current path is equivalent to Runtime.
-      // Whereas Karma seems to give the library folder as the current path and
-      // the library adds the sub-folder a second time.
-      '/base/newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.wasm':
-      '/base/newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.wasm',
     },
     files: [
       './GDJS/tests/node_modules/expect.js/index.js',

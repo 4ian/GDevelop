@@ -111,6 +111,8 @@ export type Author = {|
   website: string,
 |};
 
+export type Environment = 'staging' | 'live';
+
 /** Check if the IDE version, passed as argument, satisfy the version required by the asset. */
 export const isCompatibleWithAsset = (
   ideVersion: string,
@@ -122,14 +124,23 @@ export const isCompatibleWithAsset = (
       })
     : true;
 
-export const listAllAssets = (): Promise<AllAssets> => {
+export const listAllAssets = ({
+  environment,
+}: {|
+  environment: Environment,
+|}): Promise<AllAssets> => {
   return axios
-    .get(`${GDevelopAssetApi.baseUrl}/asset`)
+    .get(`${GDevelopAssetApi.baseUrl}/asset`, {
+      params: {
+        environment,
+      },
+    })
     .then(response => response.data)
     .then(({ assetShortHeadersUrl, filtersUrl, assetPacksUrl }) => {
       if (!assetShortHeadersUrl || !filtersUrl || !assetPacksUrl) {
         throw new Error('Unexpected response from the resource endpoint.');
       }
+
       return Promise.all([
         axios.get(assetShortHeadersUrl).then(response => response.data),
         axios.get(filtersUrl).then(response => response.data),
@@ -143,10 +154,15 @@ export const listAllAssets = (): Promise<AllAssets> => {
 };
 
 export const getAsset = (
-  assetShortHeader: AssetShortHeader
+  assetShortHeader: AssetShortHeader,
+  { environment }: {| environment: Environment |}
 ): Promise<Asset> => {
   return axios
-    .get(`${GDevelopAssetApi.baseUrl}/asset/${assetShortHeader.id}`)
+    .get(`${GDevelopAssetApi.baseUrl}/asset/${assetShortHeader.id}`, {
+      params: {
+        environment,
+      },
+    })
     .then(response => response.data)
     .then(({ assetUrl }) => {
       if (!assetUrl) {
@@ -158,9 +174,17 @@ export const getAsset = (
     .then(response => response.data);
 };
 
-export const listAllResources = (): Promise<AllResources> => {
+export const listAllResources = ({
+  environment,
+}: {|
+  environment: Environment,
+|}): Promise<AllResources> => {
   return axios
-    .get(`${GDevelopAssetApi.baseUrl}/resource`)
+    .get(`${GDevelopAssetApi.baseUrl}/resource`, {
+      params: {
+        environment,
+      },
+    })
     .then(response => response.data)
     .then(({ resourcesUrl, filtersUrl }) => {
       if (!resourcesUrl || !filtersUrl) {
@@ -176,9 +200,17 @@ export const listAllResources = (): Promise<AllResources> => {
     });
 };
 
-export const listAllAuthors = (): Promise<Array<Author>> => {
+export const listAllAuthors = ({
+  environment,
+}: {|
+  environment: Environment,
+|}): Promise<Array<Author>> => {
   return axios
-    .get(`${GDevelopAssetApi.baseUrl}/author`)
+    .get(`${GDevelopAssetApi.baseUrl}/author`, {
+      params: {
+        environment,
+      },
+    })
     .then(response => response.data)
     .then(({ authorsUrl }) => {
       if (!authorsUrl)
@@ -188,9 +220,17 @@ export const listAllAuthors = (): Promise<Array<Author>> => {
     .then(response => response.data);
 };
 
-export const listAllLicenses = (): Promise<Array<License>> => {
+export const listAllLicenses = ({
+  environment,
+}: {|
+  environment: Environment,
+|}): Promise<Array<License>> => {
   return axios
-    .get(`${GDevelopAssetApi.baseUrl}/license`)
+    .get(`${GDevelopAssetApi.baseUrl}/license`, {
+      params: {
+        environment,
+      },
+    })
     .then(response => response.data)
     .then(({ licensesUrl }) => {
       if (!licensesUrl)

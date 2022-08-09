@@ -116,7 +116,7 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
         // skip checking if the item has it.
         chosenCategory.node.isTagContainerOnly ||
         tags.some(tag => tag === chosenCategory.node.name);
-      if (!hasChosenCategoryTag) return false; // Asset is not in the selected category
+      if (!hasChosenCategoryTag) return false; // Item is not in the selected category
       for (const parentNode of chosenCategory.parentNodes) {
         if (parentNode.isTagContainerOnly) {
           // The parent is a container of tags, not a real tag. No need
@@ -125,7 +125,7 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
         }
 
         const hasParentCategoryTag = tags.some(tag => tag === parentNode.name);
-        if (!hasParentCategoryTag) return false; // Asset is not in the parent(s) of the selected category
+        if (!hasParentCategoryTag) return false; // Item is not in the parent(s) of the selected category
       }
 
       return true;
@@ -237,8 +237,8 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
         const allIds = Object.keys(searchItemsById);
 
         allIds.forEach(id => {
-          const assetShortHeader = searchItemsById[id];
-          newSearchApi.indexDocument(id, getItemDescription(assetShortHeader));
+          const searchItem = searchItemsById[id];
+          newSearchApi.indexDocument(id, getItemDescription(searchItem));
         });
 
         const totalTime = performance.now() - startTime;

@@ -44,6 +44,16 @@ namespace gdjs {
   };
 
   /**
+   * Data structure that are (re)used by
+   * {@link RuntimeObject.raycastTest} to avoid any allocation.
+   */
+  const raycastTestStatics: {
+    result: RaycastTestResult;
+  } = {
+    result: gdjs.Polygon.makeNewRaycastTestResult(),
+  };
+
+  /**
    * Move the object using the results from collisionTest call.
    * This moves the object according to the direction of the longest vector,
    * and projects the others on the orthogonal vector.
@@ -2308,8 +2318,7 @@ namespace gdjs {
       const diffX = this.getDrawableX() + objCenterX - rayCenterWorldX;
       const diffY = this.getDrawableY() + objCenterY - rayCenterWorldY;
 
-      // @ts-ignore
-      let result = gdjs.Polygon.raycastTestStatics.result;
+      let result = raycastTestStatics.result;
       result.collision = false;
       if (
         // As an optimization, avoid computing the square root of the two boundings radius
@@ -2323,26 +2332,32 @@ namespace gdjs {
       }
 
       // Do a real check if necessary.
-      let testSqDist = closest ? raySqBoundingRadius : 0;
-      const hitBoxes = this.getHitBoxesAround(x, y, endX, endY);
-      for (const hitBox of hitBoxes) {
-        const res = gdjs.Polygon.raycastTest(hitBox, x, y, endX, endY);
-        if (res.collision) {
-          if (closest && res.closeSqDist < testSqDist) {
-            testSqDist = res.closeSqDist;
-            result = res;
-          } else {
-            if (
-              !closest &&
-              res.farSqDist > testSqDist &&
-              res.farSqDist <= raySqBoundingRadius
-            ) {
-              testSqDist = res.farSqDist;
-              result = res;
-            }
+      if (closest) {
+        let sqDistMin = Number.MAX_VALUE;
+        const hitBoxes = this.getHitBoxesAround(x, y, endX, endY);
+        for (const hitBox of hitBoxes) {
+          const res = gdjs.Polygon.raycastTest(hitBox, x, y, endX, endY);
+          if (res.collision && res.closeSqDist < sqDistMin) {
+            sqDistMin = res.closeSqDist;
+            gdjs.Polygon.copyRaycastTestResult(res, result);
+          }
+        }
+      } else {
+        let sqDistMax = -Number.MAX_VALUE;
+        const hitBoxes = this.getHitBoxesAround(x, y, endX, endY);
+        for (const hitBox of hitBoxes) {
+          const res = gdjs.Polygon.raycastTest(hitBox, x, y, endX, endY);
+          if (
+            res.collision &&
+            res.farSqDist > sqDistMax &&
+            res.farSqDist <= raySqBoundingRadius
+          ) {
+            sqDistMax = res.farSqDist;
+            gdjs.Polygon.copyRaycastTestResult(res, result);
           }
         }
       }
+
       return result;
     }
 

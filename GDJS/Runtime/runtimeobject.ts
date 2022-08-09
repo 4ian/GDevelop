@@ -2333,7 +2333,7 @@ namespace gdjs {
 
       // Do a real check if necessary.
       if (closest) {
-        let sqDistMin = raySqBoundingRadius;
+        let sqDistMin = Number.MAX_VALUE;
         const hitBoxes = this.getHitBoxesAround(x, y, endX, endY);
         for (const hitBox of hitBoxes) {
           const res = gdjs.Polygon.raycastTest(hitBox, x, y, endX, endY);

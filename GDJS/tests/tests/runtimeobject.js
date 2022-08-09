@@ -232,7 +232,7 @@ describe('gdjs.RuntimeObject', () => {
       true
     );
     expect(object1.raycastTest(25, 500, 25, 300 + 20, true).collision).to.be(
-      false
+      true
     );
     expect(object1.raycastTest(25, 500, 25, 300 + 20.1, true).collision).to.be(
       false
@@ -254,7 +254,7 @@ describe('gdjs.RuntimeObject', () => {
       true
     );
     expect(object1.raycastTest(500, 35, 200 + 10, 35, true).collision).to.be(
-      false
+      true
     );
     expect(object1.raycastTest(500, 35, 200 + 10.1, 35, true).collision).to.be(
       false

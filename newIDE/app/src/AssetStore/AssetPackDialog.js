@@ -16,6 +16,7 @@ import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import LinearProgress from '../UI/LinearProgress';
+import { AssetStoreContext } from './AssetStoreContext';
 
 type Props = {|
   assetPack: AssetPack,
@@ -58,6 +59,8 @@ export const AssetPackDialog = ({
     EventsFunctionsExtensionsContext
   );
 
+  const { environment } = React.useContext(AssetStoreContext);
+
   const onInstallAssets = React.useCallback(
     async (assetShortHeaders: Array<AssetShortHeader>) => {
       if (!assetShortHeaders || !assetShortHeaders.length) return;
@@ -71,6 +74,7 @@ export const AssetPackDialog = ({
               project,
               objectsContainer,
               events,
+              environment,
             })
           )
         );
@@ -103,6 +107,7 @@ export const AssetPackDialog = ({
       events,
       onObjectAddedFromAsset,
       onAssetsAdded,
+      environment,
     ]
   );
 

@@ -16,6 +16,13 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { useDebounce } from '../Utils/UseDebounce';
 import axios from 'axios';
 import AlertMessage from '../UI/AlertMessage';
+import { uploadProjectResourceFiles } from '../Utils/GDevelopServices/Project';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import { showErrorBox } from '../UI/Messages/MessageBox';
+import {
+  type StorageProvider,
+  type FileMetadata,
+} from '../ProjectsStorage';
 
 type ResourceStoreChooserProps = {
   options: ChooseResourceOptions,
@@ -169,6 +176,96 @@ export const UrlChooser = ({
   );
 };
 
+type LocalFileToCloudProjectResourceUploaderProps = {
+  options: ChooseResourceOptions,
+  fileMetadata: FileMetadata,
+  getStorageProvider: () => StorageProvider,
+  onChooseResources: (resources: Array<gdResource>) => void,
+  createNewResource: () => gdResource,
+};
+
+export const LocalFileToCloudProjectResourceUploader = ({
+  options,
+  fileMetadata,
+  getStorageProvider,
+  onChooseResources,
+  createNewResource,
+}: LocalFileToCloudProjectResourceUploaderProps) => {
+  const inputRef = React.useRef<?HTMLInputElement>(null);
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const [isUploading, setIsUploading] = React.useState(false);
+  const storageProvider = React.useMemo(getStorageProvider, [getStorageProvider]);
+  const cloudProjectId = fileMetadata.fileIdentifier;
+  const onUpload = React.useCallback(
+    async () => {
+      const input = inputRef.current;
+      if (!input) return;
+
+      const files = [];
+      for (let i = 0; i < input.files.length; i++) {
+        files.push(input.files[i]);
+      }
+
+      try {
+        setIsUploading(true);
+        const { urls, errors } = await uploadProjectResourceFiles(
+          authenticatedUser,
+          cloudProjectId,
+          files
+        );
+        if (errors.length) {
+          // TODO: handle only some resources were sent.
+          showErrorBox({
+            message:
+              'There was an error while uploading some resources. Verify your internet connection or try again later.',
+            rawError: errors[0],
+            errorId: 'upload-cloud-project-resource-error',
+          });
+        }
+        if (urls.length) {
+          onChooseResources(
+            urls.map(url => {
+              const newResource = createNewResource();
+              newResource.setFile(url);
+              newResource.setName(path.basename(url));
+              newResource.setOrigin('cloud-project-resource', url);
+
+              return newResource;
+            })
+          );
+        }
+      } catch (error) {
+      } finally {
+        setIsUploading(false);
+      }
+    },
+    [authenticatedUser, onChooseResources, createNewResource, cloudProjectId]
+  );
+
+  const canUploadResources = !isUploading && !!authenticatedUser.profile && storageProvider.internalName === 'Cloud';
+  // TODO: Show a specific message when not authenticated
+  // TODO: Show a specific message storage provider is not cloud.
+
+  return (
+    <ColumnStackLayout>
+      <input
+        accept="image/*"
+        style={{}}
+        multiple={options.multiSelection}
+        type="file"
+        ref={inputRef}
+        disabled={!canUploadResources}
+      />
+      <RaisedButton
+        onClick={onUpload}
+        disabled={!canUploadResources}
+        primary
+        label={<Trans>Choose</Trans>}
+      />
+    </ColumnStackLayout>
+  );
+};
+
 const browserResourceSources: Array<ResourceSource> = [
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
     name: `resource-store-${kind}`,
@@ -185,8 +282,25 @@ const browserResourceSources: Array<ResourceSource> = [
     ),
   })),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
+    name: `upload-${kind}`,
+    displayName: t`File(s) from your device`,
+    displayTab: 'import',
+    kind,
+    // TODO: check the storage provider
+    renderComponent: (props: ResourceSourceComponentProps) => (
+      <LocalFileToCloudProjectResourceUploader
+        createNewResource={createNewResource}
+        onChooseResources={props.onChooseResources}
+        options={props.options}
+        fileMetadata={props.fileMetadata}
+        getStorageProvider={props.getStorageProvider}
+        key={`url-chooser-${kind}`}
+      />
+    ),
+  })),
+  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
     name: `url-chooser-${kind}`,
-    displayName: t`Use an URL`,
+    displayName: t`Use a public URL`,
     displayTab: 'import',
     kind,
     renderComponent: (props: ResourceSourceComponentProps) => (

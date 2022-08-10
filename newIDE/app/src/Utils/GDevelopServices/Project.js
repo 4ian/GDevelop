@@ -5,6 +5,7 @@ import {
   GDevelopProjectResourcesStorage,
 } from './ApiConfigs';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+import PromisePool from '@supercharge/promise-pool';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
 
@@ -21,6 +22,11 @@ const projectResourcesCredentialsApiClient = axios.create({
   baseURL: GDevelopProjectApi.baseUrl,
   withCredentials: true, // Necessary to save cookie returned by the server.
 });
+
+type ResourceFileWithUploadPresignedUrl = {|
+  resourceFile: File,
+  presignedUrl: string,
+|};
 
 type CloudProject = {|
   id: string,
@@ -152,6 +158,45 @@ export const commitVersion = async (
   return response.data;
 };
 
+export const uploadProjectResourceFiles = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string,
+  resourceFiles: File[]
+): Promise<{|
+  urls: Array<string>,
+  errors: Array<{ error: Error, resourceFile: File }>,
+|}> => {
+  // Get the pre-signed urls where to upload the files.
+  const resourceFileWithPresignedUrls = await getPresignedUrlForResourcesUpload(
+    authenticatedUser,
+    cloudProjectId,
+    resourceFiles
+  );
+
+  // Upload the files.
+  const urls = [];
+  const errors = [];
+  await PromisePool.withConcurrency(1)
+    .for(resourceFileWithPresignedUrls)
+    .process(async ({ resourceFile, presignedUrl }) => {
+      try {
+        await refetchCredentialsForProjectAndRetryIfUnauthorized(
+          authenticatedUser,
+          cloudProjectId,
+          () =>
+            projectResourcesClient.post(presignedUrl, resourceFile, {
+              headers: { 'content-type': resourceFile.type },
+            })
+        );
+        urls.push(`${GDevelopProjectResourcesStorage.baseUrl}${presignedUrl}`); // TODO: strip the url
+      } catch (error) {
+        errors.push({ error, resourceFile });
+      }
+    });
+
+  return { urls, errors };
+};
+
 export const listUserCloudProjects = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string
@@ -227,7 +272,7 @@ export const deleteCloudProject = async (
   return response.data;
 };
 
-export const getPresignedUrlForVersionUpload = async (
+const getPresignedUrlForVersionUpload = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
 ): Promise<?string> => {
@@ -248,6 +293,38 @@ export const getPresignedUrlForVersionUpload = async (
   );
   if (!response.data || !response.data[0]) return;
   return response.data[0];
+};
+
+const getPresignedUrlForResourcesUpload = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string,
+  resourceFiles: File[]
+): Promise<Array<ResourceFileWithUploadPresignedUrl>> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) throw new Error('User is not authenticated.');
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.post(
+    `/project/${cloudProjectId}/action/create-presigned-urls`,
+    { resources: resourceFiles.map(() => 'newProjectResource') },
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    }
+  );
+  if (!response.data || !Array.isArray(response.data))
+    throw new Error('Response does not contain pre-signed urls for upload.');
+
+  const resourceFileWithPresignedUrls = response.data.map(
+    (presignedUrl, index) => ({
+      resourceFile: resourceFiles[index],
+      presignedUrl,
+    })
+  );
+  return resourceFileWithPresignedUrls;
 };
 
 export const getProjectFileAsZipBlob = async (

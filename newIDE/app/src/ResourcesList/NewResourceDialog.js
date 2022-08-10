@@ -16,11 +16,17 @@ import Text from '../UI/Text';
 import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import Window from '../Utils/Window';
 import optionalRequire from '../Utils/OptionalRequire';
+import {
+  type StorageProvider,
+  type FileMetadata,
+} from '../ProjectsStorage';
 
 const electron = optionalRequire('electron');
 
 type Props = {|
   project: gdProject,
+  fileMetadata: FileMetadata,
+  getStorageProvider: () => StorageProvider,
   i18n: I18nType,
   options: ChooseResourceOptions,
   resourceSources: Array<ResourceSource>,
@@ -30,6 +36,8 @@ type Props = {|
 
 export const NewResourceDialog = ({
   project,
+  fileMetadata,
+  getStorageProvider,
   options,
   i18n,
   resourceSources,
@@ -75,6 +83,8 @@ export const NewResourceDialog = ({
             i18n,
             options,
             project,
+            fileMetadata,
+            getStorageProvider,
             getLastUsedPath: preferences.getLastUsedPath,
             setLastUsedPath: preferences.setLastUsedPath,
           });
@@ -142,6 +152,8 @@ export const NewResourceDialog = ({
             i18n,
             options,
             project,
+            fileMetadata,
+            getStorageProvider,
             getLastUsedPath: preferences.getLastUsedPath,
             setLastUsedPath: preferences.setLastUsedPath,
             onChooseResources,
@@ -157,6 +169,8 @@ export const NewResourceDialog = ({
                     i18n,
                     options,
                     project,
+                    fileMetadata,
+                    getStorageProvider,
                     getLastUsedPath: preferences.getLastUsedPath,
                     setLastUsedPath: preferences.setLastUsedPath,
                     onChooseResources,

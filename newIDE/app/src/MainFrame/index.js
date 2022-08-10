@@ -2630,9 +2630,11 @@ const MainFrame = (props: Props) => {
             _previewLauncher.current = previewLauncher;
           }
         )}
-      {!!currentProject && chooseResourceOptions && onResourceChosen && (
+      {chooseResourceOptions && onResourceChosen && !!currentProject && !! currentFileMetadata && (
         <NewResourceDialog
           project={currentProject}
+          fileMetadata={currentFileMetadata}
+          getStorageProvider={getStorageProvider}
           i18n={i18n}
           resourceSources={resourceSources}
           onChooseResources={resources => {

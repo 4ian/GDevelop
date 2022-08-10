@@ -25,6 +25,7 @@ import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
+const isDev = Window.isDev();
 
 const electron = optionalRequire('electron');
 
@@ -37,7 +38,9 @@ type Props = {|
 
 export const openExampleInWebApp = (example: Example) => {
   Window.openExternalURL(
-    `https://editor.gdevelop-app.com/?project=${example.projectFileUrl}`
+    `${
+      isDev ? 'http://localhost:3000' : 'https://editor.gdevelop.io'
+    }/?project=${example.projectFileUrl}`
   );
 };
 

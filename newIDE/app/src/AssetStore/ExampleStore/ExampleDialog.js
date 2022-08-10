@@ -36,9 +36,7 @@ type Props = {|
 |};
 
 export const openExampleInWebApp = (example: Example) => {
-  Window.openExternalURL(
-    `https://editor.gdevelop-app.com/?project=${example.projectFileUrl}`
-  );
+  Window.openExternalURL(`/?project=${example.projectFileUrl}`);
 };
 
 export function ExampleDialog({

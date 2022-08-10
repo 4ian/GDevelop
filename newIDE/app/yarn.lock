@@ -6980,19 +6980,6 @@
     "is-descriptor" "^1.0.2"
     "isobject" "^3.0.1"
 
-"del@^2.2.0":
-  "integrity" "sha1-wSyYHQZ4RshLyvhiz/kw2Qf/0ag="
-  "resolved" "https://registry.npmjs.org/del/-/del-2.2.2.tgz"
-  "version" "2.2.2"
-  dependencies:
-    "globby" "^5.0.0"
-    "is-path-cwd" "^1.0.0"
-    "is-path-in-cwd" "^1.0.0"
-    "object-assign" "^4.0.1"
-    "pify" "^2.0.0"
-    "pinkie-promise" "^2.0.0"
-    "rimraf" "^2.2.8"
-
 "del@^4.1.1":
   "integrity" "sha512-QwGuEUouP2kVwQenAsOof5Fv8K9t3D8Ca8NxcXKrIpEHjTXK5J2nXLdP+ALI1cgv8wj7KuwBhTwBkOZSJKM5XQ=="
   "resolved" "https://registry.npmjs.org/del/-/del-4.1.1.tgz"
@@ -7428,11 +7415,6 @@
     "inherits" "^2.0.1"
     "minimalistic-assert" "^1.0.0"
     "minimalistic-crypto-utils" "^1.0.0"
-
-"emitter-mixin@0.0.3":
-  "integrity" "sha1-WUjLKG8uSO3DslGnz8H3iDOW1lw="
-  "resolved" "https://registry.npmjs.org/emitter-mixin/-/emitter-mixin-0.0.3.tgz"
-  "version" "0.0.3"
 
 "emittery@^0.7.1":
   "integrity" "sha512-A8OG5SR/ij3SsJdWDJdkkSYUjQdCUx6APQXem0SaEePBSRg4eymGYwBkKo1Y6DU+af/Jn2dBQqDBvjnr9Vi8nQ=="
@@ -9141,18 +9123,6 @@
     "merge2" "^1.4.1"
     "slash" "^3.0.0"
 
-"globby@^5.0.0":
-  "integrity" "sha1-69hGZ8oNuzMLmbz8aOrCvFQ3Dg0="
-  "resolved" "https://registry.npmjs.org/globby/-/globby-5.0.0.tgz"
-  "version" "5.0.0"
-  dependencies:
-    "array-union" "^1.0.1"
-    "arrify" "^1.0.0"
-    "glob" "^7.0.3"
-    "object-assign" "^4.0.1"
-    "pify" "^2.0.0"
-    "pinkie-promise" "^2.0.0"
-
 "globby@^6.1.0":
   "integrity" "sha1-9abXDoOV4hyFj7BInWTfAkJNUGw="
   "resolved" "https://registry.npmjs.org/globby/-/globby-6.1.0.tgz"
@@ -10290,22 +10260,10 @@
   "resolved" "https://registry.npmjs.org/is-object/-/is-object-1.0.2.tgz"
   "version" "1.0.2"
 
-"is-path-cwd@^1.0.0":
-  "integrity" "sha1-0iXsIxMuie3Tj9p2dHLmLmXxEG0="
-  "resolved" "https://registry.npmjs.org/is-path-cwd/-/is-path-cwd-1.0.0.tgz"
-  "version" "1.0.0"
-
 "is-path-cwd@^2.0.0":
   "integrity" "sha512-w942bTcih8fdJPJmQHFzkS76NEP8Kzzvmw92cXsazb8intwLqPibPPdXf4ANdKV3rYMuuQYGIWtvz9JilB3NFQ=="
   "resolved" "https://registry.npmjs.org/is-path-cwd/-/is-path-cwd-2.2.0.tgz"
   "version" "2.2.0"
-
-"is-path-in-cwd@^1.0.0":
-  "integrity" "sha512-FjV1RTW48E7CWM7eE/J2NJvAEEVektecDBVBE5Hh3nM1Jd0kvhHtX68Pr3xsDf857xt3Y4AkwVULK1Vku62aaQ=="
-  "resolved" "https://registry.npmjs.org/is-path-in-cwd/-/is-path-in-cwd-1.0.1.tgz"
-  "version" "1.0.1"
-  dependencies:
-    "is-path-inside" "^1.0.0"
 
 "is-path-in-cwd@^2.0.0":
   "integrity" "sha512-rNocXHgipO+rvnP6dk3zI20RpOtrAM/kzbB258Uw5BWr3TpXi861yzjo16Dn4hUox07iw5AyeMLHWsujkjzvRQ=="
@@ -10313,13 +10271,6 @@
   "version" "2.1.0"
   dependencies:
     "is-path-inside" "^2.1.0"
-
-"is-path-inside@^1.0.0":
-  "integrity" "sha1-jvW33lBDej/cprToZe96pVy0gDY="
-  "resolved" "https://registry.npmjs.org/is-path-inside/-/is-path-inside-1.0.1.tgz"
-  "version" "1.0.1"
-  dependencies:
-    "path-is-inside" "^1.0.1"
 
 "is-path-inside@^2.1.0":
   "integrity" "sha512-wiyhTzfDWsvwAW53OBWF5zuvaOGlZ6PwYxAbPVDhpm+gM09xKQGjBq/8uYN12aDvMxnAnq3dxTyoSoRNmg5YFg=="
@@ -13102,7 +13053,7 @@
   "resolved" "https://registry.npmjs.org/path-is-absolute/-/path-is-absolute-1.0.1.tgz"
   "version" "1.0.1"
 
-"path-is-inside@^1.0.1", "path-is-inside@^1.0.2":
+"path-is-inside@^1.0.2":
   "integrity" "sha1-NlQX3t5EQw0cEa9hAn+s8HS9/FM="
   "resolved" "https://registry.npmjs.org/path-is-inside/-/path-is-inside-1.0.2.tgz"
   "version" "1.0.2"
@@ -13182,8 +13133,13 @@
   "resolved" "https://registry.npmjs.org/picomatch/-/picomatch-2.3.1.tgz"
   "version" "2.3.1"
 
-"pify@^2.0.0", "pify@^2.3.0":
+"pify@^2.0.0":
   "integrity" "sha1-7RQaasBDqEnqWISY59yosVMw6Qw="
+  "resolved" "https://registry.npmjs.org/pify/-/pify-2.3.0.tgz"
+  "version" "2.3.0"
+
+"pify@^2.3.0":
+  "integrity" "sha512-udgsAY+fTnvv7kI7aaxbqwWNb0AHiB0qBO89PZKPkoTmGOgdbrHDKD+0B2X4uTfJ/FT1R09r9gTsjUjNJotuog=="
   "resolved" "https://registry.npmjs.org/pify/-/pify-2.3.0.tgz"
   "version" "2.3.0"
 
@@ -15113,13 +15069,11 @@
   dependencies:
     "resolve" "^1.1.6"
 
-"recursive-copy@^2.0.10":
-  "integrity" "sha512-DqL2kO10mUne7XK5BPcwRtOJJZKhddD7IrW4UmHmKrwdV3HLPWcw6Jr4Jh12ooddfJOVz7ynFoFYYnPM7De0Og=="
-  "resolved" "https://registry.npmjs.org/recursive-copy/-/recursive-copy-2.0.11.tgz"
-  "version" "2.0.11"
+"recursive-copy@^2.0.14":
+  "integrity" "sha512-K8WNY8f8naTpfbA+RaXmkaQuD1IeW9EgNEfyGxSqqTQukpVtoOKros9jUqbpEsSw59YOmpd8nCBgtqJZy5nvog=="
+  "resolved" "https://registry.npmjs.org/recursive-copy/-/recursive-copy-2.0.14.tgz"
+  "version" "2.0.14"
   dependencies:
-    "del" "^2.2.0"
-    "emitter-mixin" "0.0.3"
     "errno" "^0.1.2"
     "graceful-fs" "^4.1.4"
     "junk" "^1.0.1"
@@ -15127,6 +15081,7 @@
     "mkdirp" "^0.5.1"
     "pify" "^2.3.0"
     "promise" "^7.0.1"
+    "rimraf" "^2.7.1"
     "slash" "^1.0.0"
 
 "recursive-readdir@^2.2.2", "recursive-readdir@2.2.2":

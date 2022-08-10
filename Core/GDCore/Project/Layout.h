@@ -383,9 +383,6 @@ class GD_CORE_API Layout : public ObjectsContainer {
   bool stopSoundsOnStartup;  ///< True to make the scene stop all sounds at
                              ///< startup.
   bool standardSortMethod;   ///< True to sort objects using standard sort.
-  float oglFOV;              ///< OpenGL Field Of View value
-  float oglZNear;            ///< OpenGL Near Z position
-  float oglZFar;             ///< OpenGL Far Z position
   bool disableInputWhenNotFocused;  /// If set to true, the input must be
                                     /// disabled when the window do not have the
                                     /// focus.

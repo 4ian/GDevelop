@@ -100,7 +100,14 @@ export const AssetDetails = ({
   onOpenDetails,
 }: Props) => {
   const gdevelopTheme = React.useContext(ThemeContext);
-  const { authors, licenses } = React.useContext(AssetStoreContext);
+  const {
+    authors,
+    licenses,
+    environment,
+    error: filterError,
+    fetchAssetsAndFilters,
+    useSearchItem,
+  } = React.useContext(AssetStoreContext);
   const [asset, setAsset] = React.useState<?Asset>(null);
   const [
     selectedAnimationName,
@@ -113,7 +120,9 @@ export const AssetDetails = ({
         try {
           // Reinitialise asset to trigger a loader and recalculate all parameters. (for instance zoom)
           setAsset(null);
-          const loadedAsset = await getAsset(assetShortHeader);
+          const loadedAsset = await getAsset(assetShortHeader, {
+            environment,
+          });
           setAsset(loadedAsset);
           if (loadedAsset.objectType === 'sprite') {
             // Only sprites have animations and we select the first one.
@@ -127,7 +136,7 @@ export const AssetDetails = ({
         }
       })();
     },
-    [assetShortHeader]
+    [assetShortHeader, environment]
   );
 
   const isImageResourceSmooth = React.useMemo(
@@ -176,11 +185,6 @@ export const AssetDetails = ({
     () => [new SimilarAssetStoreSearchFilter(assetShortHeader)],
     [assetShortHeader]
   );
-  const {
-    error: filterError,
-    fetchAssetsAndFilters,
-    useSearchItem,
-  } = React.useContext(AssetStoreContext);
   const searchResults = useSearchItem('', null, null, similarAssetFilters);
   const truncatedSearchResults = searchResults && searchResults.slice(0, 60);
 
@@ -269,8 +273,7 @@ export const AssetDetails = ({
                       fixedWidth={FIXED_WIDTH}
                     />
                   )}
-                {(asset.objectType === 'tiled' ||
-                  asset.objectType === '9patch') && (
+                {asset.objectType !== 'sprite' && (
                   <div style={styles.previewBackground}>
                     <CorsAwareImage
                       style={styles.previewImage}

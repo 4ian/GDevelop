@@ -54,14 +54,6 @@ export const AssetStore = ({ project }: Props) => {
     openedAssetShortHeader,
     filtersState,
   } = navigationState.getCurrentPage();
-
-  React.useEffect(
-    () => {
-      fetchAssetsAndFilters();
-    },
-    [fetchAssetsAndFilters]
-  );
-
   const searchBar = React.useRef<?SearchBarInterface>(null);
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);

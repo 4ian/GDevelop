@@ -3,11 +3,8 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#if defined(GD_IDE_ONLY)
 #ifndef GDCORE_ABSTRACTEVENTSBASEDENTITY_H
 #define GDCORE_ABSTRACTEVENTSBASEDENTITY_H
-
-
 
 #include <vector>
 #include "GDCore/Project/NamedPropertyDescriptor.h"
@@ -153,4 +150,3 @@ class GD_CORE_API AbstractEventsBasedEntity {
 }  // namespace gd
 
 #endif  // GDCORE_ABSTRACTEVENTSBASEDENTITY_H
-#endif

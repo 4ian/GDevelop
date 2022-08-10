@@ -1091,7 +1091,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 ref={editor => (this.editor = editor)}
                 project={project}
                 scope={{
-                  layout: selectedEventsBasedObject && selectedEventsBasedObject.getLayout(),
+                  layout: null,
                   externalEvents: null,
                   eventsFunctionsExtension,
                   eventsBasedBehavior: selectedEventsBasedBehavior,

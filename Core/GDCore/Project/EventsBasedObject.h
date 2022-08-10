@@ -3,16 +3,12 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#if defined(GD_IDE_ONLY)
-#ifndef GDCORE_EventsBasedObject_H
-#define GDCORE_EventsBasedObject_H
+#ifndef GDCORE_EVENTSBASEDOBJECT_H
+#define GDCORE_EVENTSBASEDOBJECT_H
 
 #include <vector>
 #include "GDCore/Project/AbstractEventsBasedEntity.h"
-#include "GDCore/Project/Layout.h"
-#include "GDCore/Project/NamedPropertyDescriptor.h"
-#include "GDCore/Tools/SerializableWithNameList.h"
-#include "GDCore/Project/EventsFunctionsContainer.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/String.h"
 namespace gd {
 class SerializerElement;
@@ -30,11 +26,11 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
+class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public ObjectsContainer {
  public:
   EventsBasedObject();
-  ~EventsBasedObject(){};
-  EventsBasedObject(const gd::EventsBasedObject &_layout);
+  virtual ~EventsBasedObject();
+  EventsBasedObject(const gd::EventsBasedObject &_eventBasedObject);
 
   /**
    * \brief Return a pointer to a new EventsBasedObject constructed from
@@ -63,30 +59,14 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity {
     return *this;
   }
 
-  /**
-   * \brief Return a reference to the layout.
-   */
-  Layout& GetLayout() {
-    return *layout;
-  }
-
-  /**
-   * \brief Return a reference to the layout.
-   */
-  const Layout& GetLayout() const {
-    return *layout;
-  }
-
   void SerializeTo(SerializerElement& element) const override;
 
   void UnserializeFrom(gd::Project& project,
                        const SerializerElement& element) override;
 
  private:
- std::unique_ptr<gd::Layout> layout;
 };
 
 }  // namespace gd
 
-#endif  // GDCORE_EventsBasedObject_H
-#endif
+#endif  // GDCORE_EVENTSBASEDOBJECT_H

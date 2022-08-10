@@ -4,33 +4,33 @@
  * reserved. This project is released under the MIT License.
  */
 #include "EventsBasedObject.h"
-#include "EventsFunctionsContainer.h"
+#include "GDCore/Project/Object.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#include "GDCore/Tools/MakeUnique.h"
-#include "GDCore/Project/Layout.h"
 
 namespace gd {
 
 EventsBasedObject::EventsBasedObject()
-    : AbstractEventsBasedEntity("MyObject"), layout() {}
+    : AbstractEventsBasedEntity("MyObject"), ObjectsContainer() {
+}
+
+EventsBasedObject::~EventsBasedObject() {}
     
 EventsBasedObject::EventsBasedObject(const gd::EventsBasedObject &_eventBasedObject)
-        : AbstractEventsBasedEntity(_eventBasedObject),
-          layout(_eventBasedObject.GetLayout().Clone()) {
+        : AbstractEventsBasedEntity(_eventBasedObject) {
+  // TODO Add a copy constructor in ObjectsContainer.
+  initialObjects = gd::Clone(_eventBasedObject.initialObjects);
+  objectGroups = _eventBasedObject.objectGroups;
 }
 
 void EventsBasedObject::SerializeTo(SerializerElement& element) const {
   AbstractEventsBasedEntity::SerializeTo(element);
-
-  layout->SerializeTo(element.AddChild("layout"));
+  SerializeObjectsTo(element.AddChild("objects"));
 }
 
 void EventsBasedObject::UnserializeFrom(gd::Project& project,
                                           const SerializerElement& element) {
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
-
-  layout = make_unique<Layout>();
-  layout->UnserializeFrom(project, element.GetChild("layout"));
+  UnserializeObjectsFrom(project, element.GetChild("objects"));
 }
 
 }  // namespace gd

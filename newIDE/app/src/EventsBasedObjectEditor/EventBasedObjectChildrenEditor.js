@@ -44,7 +44,6 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
   ) => {
     const { object } = objectWithContext;
     const { project, eventsBasedObject } = this.props;
-    const layout = eventsBasedObject.getLayout();
 
     const answer = Window.showYesNoCancelDialog(
       i18n._(
@@ -55,24 +54,24 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     if (answer === 'cancel') return;
     const shouldRemoveReferences = answer === 'yes';
 
-    gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
-      project,
-      layout,
-      object.getName(),
-      /* isObjectGroup=*/ false,
-      // TODO EBO
-      false, //shouldRemoveReferences
-    );
+    // TODO EBO Find object references in the parent-object events.
+
+    // gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
+    //   project,
+    //   eventsBasedObject,
+    //   object.getName(),
+    //   /* isObjectGroup=*/ false,
+    //   shouldRemoveReferences
+    // );
     done(true);
   };
 
   _canObjectOrGroupUseNewName = (newName: string) => {
     const { eventsBasedObject } = this.props;
-    const layout = eventsBasedObject.getLayout();
 
     if (
-      layout.hasObjectNamed(newName) ||
-      layout.getObjectGroups().has(newName)
+      eventsBasedObject.hasObjectNamed(newName) ||
+      eventsBasedObject.getObjectGroups().has(newName)
     ) {
       showWarningBox('Another object or group with this name already exists.', {
         delayToNextTick: true,
@@ -104,20 +103,21 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
   ) => {
     const { object } = objectWithContext;
     const { project, eventsBasedObject } = this.props;
-    const layout = eventsBasedObject.getLayout();
 
     // newName is supposed to have been already validated
 
-    // Avoid triggering renaming refactoring if name has not really changed
-    if (object.getName() !== newName) {
-      gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
-        project,
-        layout,
-        object.getName(),
-        newName,
-        /* isObjectGroup=*/ false
-      );
-    }
+    // TODO EBO Find object references in the parent-object events.
+
+    // // Avoid triggering renaming refactoring if name has not really changed
+    // if (object.getName() !== newName) {
+    //   gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
+    //     project,
+    //     eventsBasedObject,
+    //     object.getName(),
+    //     newName,
+    //     /* isObjectGroup=*/ false
+    //   );
+    // }
 
     object.setName(newName);
     done(true);
@@ -141,9 +141,9 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
   };
 
   updateBehaviorsSharedData = () => {
-    const { project, eventsBasedObject } = this.props;
-    const layout = eventsBasedObject.getLayout();
-    // TODO EBO
+    // TODO EBO Should there be one shared data per parent-objects
+    // const { project, eventsBasedObject } = this.props;
+    // const layout = eventsBasedObject.getLayout();
     //layout.updateBehaviorsSharedData(project);
   };
 
@@ -164,10 +164,8 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   ObjectsRenderingService
                 )}
                 project={project}
-                objectsContainer={eventsBasedObject.getLayout()}
-                layout={eventsBasedObject.getLayout()}
-                // TODO EBO An object doesn't have scene events.
-                events={eventsBasedObject.getLayout().getEvents()}
+                objectsContainer={eventsBasedObject}
+                layout={null}
                 // TODO EBO Allow to use project resources as place holders?
                 resourceSources={[]}
                 resourceExternalEditors={[]}
@@ -209,15 +207,17 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
             resourceExternalEditors={[]}
             onChooseResource={() => Promise.resolve([])}
             onComputeAllVariableNames={() => {
-              const { editedObjectWithContext } = this.state;
-              if (!editedObjectWithContext) return [];
+              return [];
+              // TODO EBO Find undeclared variables in the parent events.
 
-              return EventsRootVariablesFinder.findAllObjectVariables(
-                project.getCurrentPlatform(),
-                project,
-                eventsBasedObject.getLayout(),
-                editedObjectWithContext.object
-              );
+              // const { editedObjectWithContext } = this.state;
+              // if (!editedObjectWithContext) return [];
+              // return EventsRootVariablesFinder.findAllObjectVariables(
+              //   project.getCurrentPlatform(),
+              //   project,
+              //   eventsBasedObject,
+              //   editedObjectWithContext.object
+              // );
             }}
             onCancel={() => {
               this.editObject(null);

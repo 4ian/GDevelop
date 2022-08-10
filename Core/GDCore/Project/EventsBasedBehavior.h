@@ -3,7 +3,6 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#if defined(GD_IDE_ONLY)
 #ifndef GDCORE_EVENTSBASEDBEHAVIOR_H
 #define GDCORE_EVENTSBASEDBEHAVIOR_H
 
@@ -86,4 +85,3 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
 }  // namespace gd
 
 #endif  // GDCORE_EVENTSBASEDBEHAVIOR_H
-#endif

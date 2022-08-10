@@ -262,9 +262,7 @@ void Layout::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("disableInputWhenNotFocused",
                        disableInputWhenNotFocused);
 
-#if defined(GD_IDE_ONLY)
   editorSettings.SerializeTo(element.AddChild("uiSettings"));
-#endif
 
   GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
   GetVariables().SerializeTo(element.AddChild("variables"));

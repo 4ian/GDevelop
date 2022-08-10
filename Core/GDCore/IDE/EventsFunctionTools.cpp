@@ -9,9 +9,9 @@
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsBasedObject.h"
+//#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/EventsFunction.h"
 #include "GDCore/Project/Object.h"
-#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/Log.h"
@@ -85,6 +85,9 @@ void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
                                        outputGlobalObjectsContainer,
                                        outputObjectsContainer);
 
+  // TODO EBO these 2 checks are not necessary for the following code to work.
+  // Should they be removed?
+
   // ...and has an "Object" by convention...
   if (!outputObjectsContainer.HasObjectNamed("Object")) {
     gd::LogWarning("No \"Object\" in a function of an events based object: " +
@@ -93,14 +96,14 @@ void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
                    "its parameters).");
     return;
   }
-  if (eventsBasedObject.GetLayout().HasObjectNamed("Object")) {
+  if (eventsBasedObject.HasObjectNamed("Object")) {
     gd::LogWarning("Child-objects can't be named Object because it's reserved"
                   "for the parent. ");
     return;
   }
 
   // ...and its children.
-  auto &children = eventsBasedObject.GetLayout().GetObjects();
+  auto &children = eventsBasedObject.GetObjects();
   for (auto &childObject : children) {
     auto child = childObject.get();
     outputObjectsContainer.InsertObject(*child, children.size());

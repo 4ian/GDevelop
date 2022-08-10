@@ -34,7 +34,8 @@ import { installAsset } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { showErrorBox } from '../UI/Messages/MessageBox';
-const isDev = process.env.NODE_ENV === 'development';
+import Window from '../Utils/Window';
+const isDev = Window.isDev();
 
 const ObjectListItem = ({
   objectMetadata,
@@ -208,10 +209,11 @@ export default function NewObjectDialog({
     ]
   );
 
-  // Load assets and filters when the dialog is opened.
+  // Load assets and filters when the dialog is opened or when the environment changes.
   React.useEffect(
     () => {
-      // This check is to ensure we call fetchAssetsAndFilters every time environment changes.
+      // The variable environment is always defined, this check is a hack
+      // to ensure we call fetchAssetsAndFilters every time the value changes.
       if (environment) {
         fetchAssetsAndFilters();
       }

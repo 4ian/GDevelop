@@ -243,7 +243,7 @@ export const AssetStoreStateProvider = ({
     [isLoading, environment]
   );
 
-  // Preload the assets and filters when the
+  // Preload the assets and filters when the app loads.
   React.useEffect(
     () => {
       // Don't attempt to load again assets and filters if they

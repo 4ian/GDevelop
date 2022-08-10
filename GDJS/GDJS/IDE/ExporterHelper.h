@@ -183,9 +183,8 @@ class ExporterHelper {
    * \param progressDlg Optional wxProgressDialog which will be updated with the
    * progress.
    */
-  static void ExportResources(gd::AbstractFileSystem &fs,
-                              gd::Project &project,
-                              gd::String exportDir);
+  static const std::vector<gd::String> ExportResources(
+      gd::AbstractFileSystem &fs, gd::Project &project, gd::String exportDir);
 
   /**
    * \brief Add libraries files to the list of includes.
@@ -309,6 +308,14 @@ class ExporterHelper {
                          const std::vector<gd::String> &includesFiles,
                          unsigned int nonRuntimeScriptsCacheBurst,
                          gd::String additionalSpec);
+
+  /**
+   * \brief Generates a service worker, a JS file that allows to define caching
+   * behavior and make the game a working PWA.
+   */
+  const gd::String GenerateServiceWorker(
+      const std::vector<gd::String> includesFiles,
+      const std::vector<gd::String> resourcesNames);
 
   /**
    * \brief Generates a WebManifest, a metadata file that allow to make the

@@ -259,6 +259,35 @@ class GD_CORE_API WholeProjectRefactorer {
                                            bool removeEventsAndGroups = true);
 
   /**
+   * \brief Refactor the project after an object is removed in an events-based
+   * object.
+   *
+   * This will update the events of the function and groups.
+   */
+  static void ObjectOrGroupRemovedInEventsBasedObject(
+      gd::Project& project,
+      gd::EventsBasedObject& eventsBasedObject,
+      gd::ObjectsContainer& globalObjectsContainer,
+      gd::ObjectsContainer& objectsContainer,
+      const gd::String& objectName,
+      bool isObjectGroup,
+      bool removeEventsAndGroups);
+
+  /**
+   * \brief Refactor the events function after an object or group is renamed
+   *
+   * This will update the events of the function and groups.
+   */
+  static void ObjectOrGroupRenamedInEventsBasedObject(
+      gd::Project& project,
+      gd::EventsBasedObject& eventsBasedObject,
+      gd::ObjectsContainer& globalObjectsContainer,
+      gd::ObjectsContainer& objectsContainer,
+      const gd::String& oldName,
+      const gd::String& newName,
+      bool isObjectGroup);
+
+  /**
    * \brief Refactor the events function after an object or group is renamed
    *
    * This will update the events of the function and groups.

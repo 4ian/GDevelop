@@ -1197,6 +1197,28 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
     }
   }
 }
+
+void WholeProjectRefactorer::ObjectOrGroupRemovedInEventsBasedObject(
+    gd::Project& project,
+    gd::EventsBasedObject& eventsBasedObject,
+    gd::ObjectsContainer& globalObjectsContainer,
+    gd::ObjectsContainer& objectsContainer,
+    const gd::String& objectName,
+    bool isObjectGroup,
+    bool removeEventsAndGroups) {
+  for (auto &functionUniquePtr : eventsBasedObject.GetEventsFunctions().GetInternalVector()) {
+    auto function = functionUniquePtr.get();
+    WholeProjectRefactorer::ObjectOrGroupRemovedInEventsFunction(
+        project,
+        *function,
+        globalObjectsContainer,
+        objectsContainer,
+        objectName,
+        isObjectGroup,
+        isObjectGroup);
+  }
+}
+
 void WholeProjectRefactorer::ObjectOrGroupRemovedInEventsFunction(
     gd::Project& project,
     gd::EventsFunction& eventsFunction,
@@ -1221,6 +1243,27 @@ void WholeProjectRefactorer::ObjectOrGroupRemovedInEventsFunction(
           eventsFunction.GetObjectGroups()[g].RemoveObject(objectName);
       }
     }
+  }
+}
+
+void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsBasedObject(
+    gd::Project& project,
+    gd::EventsBasedObject& eventsBasedObject,
+    gd::ObjectsContainer& globalObjectsContainer,
+    gd::ObjectsContainer& objectsContainer,
+    const gd::String& oldName,
+    const gd::String& newName,
+    bool isObjectGroup) {
+  for (auto &functionUniquePtr : eventsBasedObject.GetEventsFunctions().GetInternalVector()) {
+    auto function = functionUniquePtr.get();
+    WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
+        project,
+        *function,
+        globalObjectsContainer,
+        objectsContainer,
+        oldName,
+        newName,
+        isObjectGroup);
   }
 }
 

@@ -1484,9 +1484,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             }
           />
         )}
-        {editedEventsBasedObject && (
+        {editedEventsBasedObject && this._globalObjectsContainer && (
           <EventsBasedObjectEditorDialog
             project={project}
+            globalObjectsContainer={this._globalObjectsContainer}
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedObject={editedEventsBasedObject}
             onApply={() => {

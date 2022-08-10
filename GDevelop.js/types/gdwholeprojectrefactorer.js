@@ -13,6 +13,8 @@ declare class gdWholeProjectRefactorer {
   static objectOrGroupRemovedInLayout(project: gdProject, layout: gdLayout, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
   static objectOrGroupRenamedInEventsFunction(project: gdProject, eventsFunction: gdEventsFunction, globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectOrGroupRemovedInEventsFunction(project: gdProject, eventsFunction: gdEventsFunction, globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
+  static objectOrGroupRenamedInEventsBasedObject(project: gdProject, eventsBasedObject: gdEventsBasedObject, globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, oldName: string, newName: string, isObjectGroup: boolean): void;
+  static objectOrGroupRemovedInEventsBasedObject(project: gdProject, eventsBasedObject: gdEventsBasedObject, globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
   static globalObjectOrGroupRenamed(project: gdProject, oldName: string, newName: string, isObjectGroup: boolean): void;
   static globalObjectOrGroupRemoved(project: gdProject, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
   static getAllObjectTypesUsingEventsBasedBehavior(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior): gdSetString;

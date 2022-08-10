@@ -8,6 +8,7 @@ import HelpButton from '../UI/HelpButton';
 type Props = {|
   onApply: () => void,
   project: gdProject,
+  globalObjectsContainer: gdObjectsContainer,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
   onRenameProperty: (oldName: string, newName: string) => void,
@@ -23,6 +24,7 @@ export default class EventsBasedObjectEditorDialog extends React.Component<
       eventsBasedObject,
       eventsFunctionsExtension,
       project,
+      globalObjectsContainer,
     } = this.props;
 
     return (
@@ -51,6 +53,7 @@ export default class EventsBasedObjectEditorDialog extends React.Component<
       >
         <EventsBasedObjectEditor
           project={project}
+          globalObjectsContainer={globalObjectsContainer}
           eventsFunctionsExtension={eventsFunctionsExtension}
           eventsBasedObject={eventsBasedObject}
           onTabChanged={

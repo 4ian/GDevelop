@@ -22,6 +22,7 @@ declare class gdEventsBasedObject extends gdObjectsContainer {
   moveObject(oldIndex: number, newIndex: number): void;
   moveObjectToAnotherContainer(name: string, newObjectsContainer: gdObjectsContainer, newPosition: number): void;
   getObjectsCount(): number;
+  getObjectGroups(): gdObjectGroupsContainer;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;

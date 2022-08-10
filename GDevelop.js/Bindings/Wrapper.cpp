@@ -563,6 +563,10 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   ObjectOrGroupRemovedInEventsFunction
 #define STATIC_ObjectOrGroupRenamedInEventsFunction \
   ObjectOrGroupRenamedInEventsFunction
+#define STATIC_ObjectOrGroupRemovedInEventsBasedObject \
+  ObjectOrGroupRemovedInEventsBasedObject
+#define STATIC_ObjectOrGroupRenamedInEventsBasedObject \
+  ObjectOrGroupRenamedInEventsBasedObject
 #define STATIC_GlobalObjectOrGroupRenamed GlobalObjectOrGroupRenamed
 #define STATIC_GlobalObjectOrGroupRemoved GlobalObjectOrGroupRemoved
 #define STATIC_GetAllObjectTypesUsingEventsBasedBehavior \

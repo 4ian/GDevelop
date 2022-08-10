@@ -18,6 +18,7 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
+  globalObjectsContainer: gdObjectsContainer,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
 |};
@@ -43,7 +44,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     done: boolean => void
   ) => {
     const { object } = objectWithContext;
-    const { project, eventsBasedObject } = this.props;
+    const { project, globalObjectsContainer, eventsBasedObject } = this.props;
 
     const answer = Window.showYesNoCancelDialog(
       i18n._(
@@ -54,15 +55,15 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     if (answer === 'cancel') return;
     const shouldRemoveReferences = answer === 'yes';
 
-    // TODO EBO Find object references in the parent-object events.
-
-    // gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
-    //   project,
-    //   eventsBasedObject,
-    //   object.getName(),
-    //   /* isObjectGroup=*/ false,
-    //   shouldRemoveReferences
-    // );
+    gd.WholeProjectRefactorer.objectOrGroupRemovedInEventsBasedObject(
+      project,
+      eventsBasedObject,
+      globalObjectsContainer,
+      eventsBasedObject,
+      object.getName(),
+      /* isObjectGroup=*/ false,
+      shouldRemoveReferences
+    );
     done(true);
   };
 
@@ -102,22 +103,22 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     done: boolean => void
   ) => {
     const { object } = objectWithContext;
-    const { project, eventsBasedObject } = this.props;
+    const { project, globalObjectsContainer, eventsBasedObject } = this.props;
 
     // newName is supposed to have been already validated
 
-    // TODO EBO Find object references in the parent-object events.
-
-    // // Avoid triggering renaming refactoring if name has not really changed
-    // if (object.getName() !== newName) {
-    //   gd.WholeProjectRefactorer.objectOrGroupRenamedInLayout(
-    //     project,
-    //     eventsBasedObject,
-    //     object.getName(),
-    //     newName,
-    //     /* isObjectGroup=*/ false
-    //   );
-    // }
+    // Avoid triggering renaming refactoring if name has not really changed
+    if (object.getName() !== newName) {
+      gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject(
+        project,
+        eventsBasedObject,
+        globalObjectsContainer,
+        eventsBasedObject,
+        object.getName(),
+        newName,
+        /* isObjectGroup=*/ false
+      );
+    }
 
     object.setName(newName);
     done(true);

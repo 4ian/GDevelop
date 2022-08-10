@@ -17,6 +17,7 @@ type TabName = 'configuration' | 'properties' | 'children';
 
 type Props = {|
   project: gdProject,
+  globalObjectsContainer: gdObjectsContainer,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
   onPropertiesUpdated: () => void,
@@ -46,7 +47,7 @@ export default class EventsBasedObjectEditor extends React.Component<
 
   render() {
     const { currentTab } = this.state;
-    const { eventsBasedObject, project, eventsFunctionsExtension } = this.props;
+    const { eventsBasedObject, project, globalObjectsContainer, eventsFunctionsExtension } = this.props;
 
     return (
       <React.Fragment>
@@ -126,6 +127,7 @@ export default class EventsBasedObjectEditor extends React.Component<
           {currentTab === 'children' && (
             <EventBasedObjectChildrenEditor
               project={project}
+              globalObjectsContainer={globalObjectsContainer}
               eventsFunctionsExtension={eventsFunctionsExtension}
               eventsBasedObject={eventsBasedObject}
             />

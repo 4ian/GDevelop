@@ -22,7 +22,7 @@
     "prettier": "1.15.3",
     "react-error-overlay": "^6.0.9",
     "react-scripts": "4.0.3",
-    "recursive-copy": "^2.0.10",
+    "recursive-copy": "^2.0.14",
     "recursive-readdir": "^2.2.2",
     "shelljs": "0.8.4",
     "storybook-addon-mock": "^1.7.0",

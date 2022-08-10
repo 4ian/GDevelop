@@ -18,6 +18,7 @@ import AuthenticatedUserContext, {
   initialAuthenticatedUser,
   type AuthenticatedUser,
 } from '../../Profile/AuthenticatedUserContext';
+import CloudStorageProvider from '../../ProjectsStorage/CloudStorageProvider';
 import {
   fakeIndieAuthenticatedUser,
   indieUserProfile,
@@ -83,6 +84,7 @@ const WrappedHomePage = ({
                 projectItemName={null}
                 setToolbar={() => {}}
                 canOpen={true}
+                storageProviders={[CloudStorageProvider]}
                 onOpen={() => action('onOpen')()}
                 onOpenRecentFile={() => action('onOpenRecentFile')()}
                 onCreateProject={() => action('onCreateProject')()}
@@ -100,6 +102,7 @@ const WrappedHomePage = ({
                 }
                 onOpenProfile={() => action('open profile')()}
                 onCreateBlank={() => action('create blank')()}
+                onChangeSubscription={() => action('change subscription')()}
               />
             </GamesShowcaseStateProvider>
           </TutorialStateProvider>

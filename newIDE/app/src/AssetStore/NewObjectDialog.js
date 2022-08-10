@@ -34,6 +34,8 @@ import { installAsset } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import Window from '../Utils/Window';
+const isDev = Window.isDev();
 
 const ObjectListItem = ({
   objectMetadata,
@@ -126,9 +128,13 @@ export default function NewObjectDialog({
     'intro-object-types'
   );
 
-  const { searchResults, navigationState } = React.useContext(
-    AssetStoreContext
-  );
+  const {
+    searchResults,
+    navigationState,
+    fetchAssetsAndFilters,
+    environment,
+    setEnvironment,
+  } = React.useContext(AssetStoreContext);
   const {
     openedAssetPack,
     openedAssetShortHeader,
@@ -164,6 +170,7 @@ export default function NewObjectDialog({
             project,
             objectsContainer,
             events,
+            environment,
           });
           sendAssetAddedToProject({
             id: openedAssetShortHeader.id,
@@ -198,7 +205,20 @@ export default function NewObjectDialog({
       events,
       onObjectAddedFromAsset,
       openedAssetShortHeader,
+      environment,
     ]
+  );
+
+  // Load assets and filters when the dialog is opened or when the environment changes.
+  React.useEffect(
+    () => {
+      // The variable environment is always defined, this check is a hack
+      // to ensure we call fetchAssetsAndFilters every time the value changes.
+      if (environment) {
+        fetchAssetsAndFilters();
+      }
+    },
+    [fetchAssetsAndFilters, environment]
   );
 
   const mainAction = openedAssetPack ? (
@@ -225,6 +245,20 @@ export default function NewObjectDialog({
       onClick={onInstallAsset}
       disabled={isAssetBeingInstalled}
       id="add-asset-button"
+    />
+  ) : isDev ? (
+    <RaisedButton
+      key="show-dev-assets"
+      label={
+        environment === 'staging' ? (
+          <Trans>Show live assets</Trans>
+        ) : (
+          <Trans>Show staging assets</Trans>
+        )
+      }
+      onClick={() => {
+        setEnvironment(environment === 'staging' ? 'live' : 'staging');
+      }}
     />
   ) : (
     undefined

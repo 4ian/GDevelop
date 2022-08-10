@@ -2,6 +2,7 @@
 import {
   type Asset,
   type AssetShortHeader,
+  type Environment,
   getAsset,
   isPixelArt,
 } from '../Utils/GDevelopServices/Asset';
@@ -444,6 +445,7 @@ type InstallAssetArgs = {|
   project: gdProject,
   events: gdEventsList,
   objectsContainer: gdObjectsContainer,
+  environment: Environment,
 |};
 
 type InstallAssetOutput = {|
@@ -456,8 +458,9 @@ export const installAsset = async ({
   project,
   events,
   objectsContainer,
+  environment,
 }: InstallAssetArgs): Promise<InstallAssetOutput> => {
-  const asset = await getAsset(assetShortHeader);
+  const asset = await getAsset(assetShortHeader, { environment });
   const requiredBehaviors = getRequiredBehaviorsFromAsset(asset);
   const requiredExtensions = getRequiredExtensionsForEventsFromAsset(asset);
   const missingBehaviors = filterMissingBehaviors(gd, requiredBehaviors);

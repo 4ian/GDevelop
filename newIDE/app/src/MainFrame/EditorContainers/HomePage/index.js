@@ -8,7 +8,10 @@ import {
   type OnCreateBlankFunction,
   type OnOpenProjectAfterCreationFunction,
 } from '../../../ProjectCreation/CreateProjectDialog';
-import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
+import {
+  type FileMetadataAndStorageProviderName,
+  type StorageProvider,
+} from '../../../ProjectsStorage';
 import GetStartedSection from './GetStartedSection';
 import BuildSection, { type BuildSectionInterface } from './BuildSection';
 import LearnSection from './LearnSection';
@@ -29,6 +32,7 @@ type Props = {|
   projectItemName: ?string,
   project: ?gdProject,
   setToolbar: (?React.Node) => void,
+  storageProviders: Array<StorageProvider>,
 
   // Project opening
   canOpen: boolean,
@@ -42,6 +46,7 @@ type Props = {|
   onOpenLanguageDialog: () => void,
   onOpenProfile: () => void,
   onOpenOnboardingDialog: () => void,
+  onChangeSubscription: () => void,
 
   // Project creation
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
@@ -73,7 +78,9 @@ export const HomePage = React.memo<Props>(
         onOpenProfile,
         setToolbar,
         onOpenOnboardingDialog,
+        onChangeSubscription,
         isActive,
+        storageProviders,
       }: Props,
       ref
     ) => {
@@ -179,6 +186,8 @@ export const HomePage = React.memo<Props>(
                       onOpen={onOpen}
                       onCreateProject={onCreateProject}
                       onOpenRecentFile={onOpenRecentFile}
+                      onChangeSubscription={onChangeSubscription}
+                      storageProviders={storageProviders}
                     />
                   )}
                   {activeTab === 'learn' && (
@@ -225,5 +234,9 @@ export const renderHomePageContainer = (
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
     onOpenOnboardingDialog={props.onOpenOnboardingDialog}
+    onChangeSubscription={props.onChangeSubscription}
+    storageProviders={
+      (props.extraEditorProps && props.extraEditorProps.storageProviders) || []
+    }
   />
 );

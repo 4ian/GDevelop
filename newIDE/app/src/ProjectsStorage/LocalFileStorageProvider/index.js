@@ -28,7 +28,7 @@ import Computer from '../../UI/CustomSvgIcons/Computer';
 export default ({
   internalName: 'LocalFile',
   name: t`Your computer`,
-  renderIcon: () => <Computer />,
+  renderIcon: props => <Computer fontSize={props.size} />,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY]) return null;
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY].length) return null;

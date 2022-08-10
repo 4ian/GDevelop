@@ -689,6 +689,7 @@ describe('InstallAsset', () => {
           project,
           objectsContainer: layout,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+          environment: 'live',
         })
       ).rejects.toMatchObject({
         message: 'Fake error - unable to download',
@@ -727,6 +728,7 @@ describe('InstallAsset', () => {
           project,
           objectsContainer: layout,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+          environment: 'live',
         })
       ).rejects.toMatchObject({
         message: 'Unable to find extension UnknownBehavior in the registry.',
@@ -765,6 +767,7 @@ describe('InstallAsset', () => {
           project,
           objectsContainer: layout,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+          environment: 'live',
         })
       ).rejects.toMatchObject({
         message: 'Unable to find extension UnknownExtension in the registry.',
@@ -808,6 +811,7 @@ describe('InstallAsset', () => {
           project,
           objectsContainer: layout,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+          environment: 'live',
         })
       ).rejects.toMatchObject({
         message: 'These behaviors could not be installed: Flash::Flash (Flash)',
@@ -851,6 +855,7 @@ describe('InstallAsset', () => {
           project,
           objectsContainer: layout,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+          environment: 'live',
         })
       ).rejects.toMatchObject({
         message: 'These extensions could not be installed: Flash',
@@ -879,6 +884,7 @@ describe('InstallAsset', () => {
         project,
         objectsContainer: layout,
         eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+        environment: 'live',
       });
 
       // No extensions fetched because the behavior is already installed.

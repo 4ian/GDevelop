@@ -241,6 +241,12 @@ class ExporterHelper {
    */
   void ExportObjectAndBehaviorsIncludes(const gd::Project &project,
                                         std::vector<gd::String> &includesFiles);
+  /**
+   * \brief Add the required files for all the objects of the project
+   * and their behaviors.
+   */
+  void ExportObjectAndBehaviorsRequiredFiles(const gd::Project &project,
+                                         std::vector<gd::String> &includesFiles);
 
   /**
    * \brief Copy the external source files used by the game into the export

@@ -43,7 +43,7 @@ export type ValueFieldCommonProperties = {|
   getLabel?: Instance => string,
   getDescription?: Instance => string,
   getExtraDescription?: Instance => string,
-  disabled?: boolean,
+  disabled?: boolean | ((instances: Array<gdInitialInstance>) => boolean),
   onEditButtonClick?: Instance => void,
 |};
 
@@ -169,6 +169,14 @@ const styles = {
   },
 };
 
+const getDisabled = (instances: Instances, field: ValueField): boolean => {
+  return typeof field.disabled === 'boolean'
+    ? field.disabled
+    : typeof field.disabled === 'function'
+    ? field.disabled(instances)
+    : false;
+};
+
 /**
  * Get the value for the given field across all instances.
  * If one of the instances doesn't share the same value, returns the default value.
@@ -290,7 +298,7 @@ const PropertiesEditor = ({
               instances.forEach(i => setValue(i, !!newValue));
               _onInstancesModified(instances);
             }}
-            disabled={field.disabled}
+            disabled={getDisabled(instances, field)}
           />
         );
       } else if (field.valueType === 'number') {
@@ -309,7 +317,7 @@ const PropertiesEditor = ({
             }}
             type="number"
             style={styles.field}
-            disabled={field.disabled}
+            disabled={getDisabled(instances, field)}
           />
         );
       } else if (field.valueType === 'color') {
@@ -366,7 +374,7 @@ const PropertiesEditor = ({
                   _onInstancesModified(instances);
                 }}
                 style={styles.field}
-                disabled={field.disabled}
+                disabled={getDisabled(instances, field)}
               />
             )}
             renderButton={style =>
@@ -434,7 +442,7 @@ const PropertiesEditor = ({
               _onInstancesModified(instances);
             }}
             style={styles.field}
-            disabled={field.disabled}
+            disabled={getDisabled(instances, field)}
           >
             {children}
           </SelectField>

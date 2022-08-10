@@ -109,12 +109,12 @@ module.exports = {
         'JsPlatform/Extensions/tween_behavior32.png'
       )
       .addCodeOnlyParameter('currentScene', '')
-      .addParameter('string', 'Tween identifier', '', false)
-      .addParameter('scenevar', 'The variable to tween', '', false)
-      .addParameter('expression', 'Initial value', '', false)
-      .addParameter('expression', 'Final value', '', false)
-      .addParameter('expression', 'Duration', '', false)
-      .addParameter('stringWithSelector', 'Easing', easingChoices, false)
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('scenevar', _('The variable to tween'), '', false)
+      .addParameter('expression', _('Initial value'), '', false)
+      .addParameter('expression', _('Final value'), '', false)
+      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
       .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
@@ -125,9 +125,7 @@ module.exports = {
       .addAction(
         'TweenCameraPosition',
         _('Tween the camera position'),
-        _(
-          'Tweens tweens the camera position from the current one to a new one.'
-        ),
+        _('Tweens the camera position from the current one to a new one.'),
         _(
           'Tween camera on layer _PARAM4_ to _PARAM2_;_PARAM3_ for _PARAM5_ms with easing _PARAM6_ as _PARAM1_'
         ),
@@ -136,17 +134,65 @@ module.exports = {
         'JsPlatform/Extensions/tween_behavior32.png'
       )
       .addCodeOnlyParameter('currentScene', '')
-      .addParameter('string', 'Tween identifier', '', false)
-      .addParameter('expression', 'Target X position', '', false)
-      .addParameter('expression', 'Target Y position', '', false)
-      .addParameter('layer', 'Layer', '', true)
-      .addParameter('expression', 'Duration', '', false)
-      .addParameter('stringWithSelector', 'Easing', easingChoices, false)
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('expression', _('Target X position'), '', false)
+      .addParameter('expression', _('Target Y position'), '', false)
+      .addParameter('layer', _('Layer'), '', true)
+      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
       .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenCamera');
+
+    extension
+      .addAction(
+        'TweenCameraZoom',
+        _('Tween the camera zoom'),
+        _('Tweens the camera zoom from the current zoom factor to a new one.'),
+        _(
+          'Tween the zoom of camera on layer _PARAM3_ to _PARAM2_ for _PARAM4_ms with easing _PARAM5_ as _PARAM1_'
+        ),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('expression', _('Target zoom'), '', false)
+      .addParameter('layer', _('Layer'), '', true)
+      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.tweenCameraZoom');
+
+    extension
+      .addAction(
+        'TweenCameraRotation',
+        _('Tween the camera rotation'),
+        _('Tweens the camera rotation from the current angle to a new one.'),
+        _(
+          'Tween the rotation of camera on layer _PARAM3_ to _PARAM2_ for _PARAM4_ms with easing _PARAM5_ as _PARAM1_'
+        ),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('expression', _('Target rotation'), '', false)
+      .addParameter('layer', _('Layer'), '', true)
+      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.tweenCameraRotation');
 
     extension
       .addCondition(

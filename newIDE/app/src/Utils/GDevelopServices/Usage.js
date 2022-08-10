@@ -19,16 +19,48 @@ export type Subscription = {|
   updatedAt: number,
   stripeSubscriptionId?: string,
   stripeCustomerId?: string,
+  paypalSubscriptionId?: string,
+  paypalPayerId?: string,
 |};
 
-export type Limit = {|
+/**
+ * The current usage values made by a user of something.
+ * Typically: the number of remaining builds for a user.
+ */
+export type CurrentUsage = {|
   limitReached: boolean,
   current: number,
   max: number,
 |};
 
+/**
+ * This describes what a user can do on our online services.
+ */
+export type Capabilities = {
+  analytics: {
+    sessions: boolean,
+    players: boolean,
+    retention: boolean,
+    sessionsTimeStats: boolean,
+    platforms: boolean,
+  },
+  cloudProjects: {
+    maximumCount: number,
+    canMaximumCountBeIncreased: boolean,
+  },
+};
+
+export type CurrentUsages = {
+  [string]: CurrentUsage,
+};
+
+/**
+ * The limits communicated by the API for a user.
+ */
 export type Limits = {
-  [string]: Limit,
+  limits: CurrentUsages,
+  capabilities: Capabilities,
+  message: string | typeof undefined,
 };
 
 export type PlanDetails = {
@@ -57,6 +89,9 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
         message: t`One-click packaging for Windows, macOS and Linux up to 70 times a day (every 24 hours).`,
       },
       {
+        message: t`No limits on your work: store up to 100 cloud projects.`,
+      },
+      {
         message: t`Immerse your players by removing GDevelop logo when the game loads.`,
       },
     ],
@@ -75,7 +110,7 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
         message: t`One-click packaging for Windows, macOS and Linux up to 10 times a day (every 24 hours).`,
       },
       {
-        message: t`Immerse your players by removing GDevelop logo when the game loads`,
+        message: t`Create more: store up to 50 cloud projects.`,
       },
     ],
     extraDescription: t`You'll also have access to online packaging for iOS or other services when they are released.`,
@@ -86,7 +121,7 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
     monthlyPriceInEuros: 0,
     descriptionBullets: [
       {
-        message: t`You can use GDevelop for free! Online packaging for Android, Windows, macOS and Linux is limited to twice a day (every 24 hours) to avoid overloading the services.`,
+        message: t`You can use GDevelop for free, forever! Online packaging for Android, Windows, macOS and Linux is limited to twice a day (every 24 hours) to avoid overloading the services. You can store up to 10 cloud projects.`,
       },
     ],
   },
@@ -125,7 +160,7 @@ export const getUserLimits = (
         },
       })
     )
-    .then(response => response.data.limits);
+    .then(response => response.data);
 };
 
 export const getUserSubscription = (
@@ -167,6 +202,12 @@ export const changeUserSubscription = (
       )
     )
     .then(response => response.data);
+};
+
+export const canSeamlesslyChangeSubscription = (subscription: Subscription) => {
+  // If the subscription is on Stripe, it can be upgraded/downgraded seamlessly.
+  // Otherwise (Paypal), it needs to be cancelled first.
+  return !!subscription.stripeSubscriptionId;
 };
 
 type UploadType = 'build' | 'preview';
@@ -213,14 +254,14 @@ export const getRedirectToSubscriptionPortalUrl = (
 
 export const getRedirectToCheckoutUrl = (
   planId: string,
-  uid: string,
-  email: string
+  userId: string,
+  userEmail: string
 ): string => {
   return `${
     GDevelopUsageApi.baseUrl
-  }/subscription-v2/redirect-to-checkout?planId=${encodeURIComponent(
+  }/subscription-v2/action/redirect-to-checkout?planId=${encodeURIComponent(
     planId
-  )}&clientReferenceId=${encodeURIComponent(
-    uid
-  )}&customerEmail=${encodeURIComponent(email)}`;
+  )}&userId=${encodeURIComponent(userId)}&customerEmail=${encodeURIComponent(
+    userEmail
+  )}`;
 };

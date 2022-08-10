@@ -127,18 +127,30 @@ class GD_CORE_API InitialInstance {
   void SetCustomHeight(double height_) { height = height_; }
 
   /**
-   * \brief Return true if the instance is locked and cannot be selected by
-   * clicking on it in the IDE.
+   * \brief Return true if the instance is locked and cannot be moved in the IDE.
    */
   bool IsLocked() const { return locked; };
 
   /**
    * \brief (Un)lock the initial instance.
    *
-   * An instance which is locked cannot be selected by clicking on it in a
-   * layout editor canvas.
+   * An instance which is locked cannot be moved with actions in the IDE.
    */
   void SetLocked(bool enable = true) { locked = enable; }
+
+  /**
+   * \brief Return true if the instance cannot be selected by clicking on it
+   * in the IDE (only applies if instance is also locked).
+   */
+  bool IsSealed() const { return sealed; };
+
+  /**
+   * \brief (Un)seal the initial instance.
+   *
+   * An instance which is sealed cannot be selected by clicking on it in a
+   * layout editor canvas.
+   */
+  void SetSealed(bool enable = true) { sealed = enable; }
 
   ///@}
 
@@ -270,6 +282,7 @@ class GD_CORE_API InitialInstance {
   double height;           ///< Object custom height
   gd::VariablesContainer initialVariables;  ///< Instance specific variables
   bool locked;                              ///< True if the instance is locked
+  bool sealed;                              ///< True if the instance is sealed
   mutable gd::String persistentUuid; ///< A persistent random version 4 UUID, useful for hot reloading.
 
   static gd::String*

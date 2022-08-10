@@ -79,6 +79,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   fs.MkDir(options.exportPath);
   fs.ClearDir(options.exportPath);
   std::vector<gd::String> includesFiles;
+  std::vector<gd::String> resourcesFiles;
 
   // TODO Try to remove side effects to avoid the copy
   // that destroys the AST in cache.
@@ -116,6 +117,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   // Export files for object and behaviors
   ExportObjectAndBehaviorsIncludes(immutableProject, includesFiles);
+  ExportObjectAndBehaviorsRequiredFiles(immutableProject, resourcesFiles);
 
   // Export effects (after engine libraries as they auto-register themselves to
   // the engine)
@@ -186,6 +188,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   // Copy all the dependencies and their source maps
   ExportIncludesAndLibs(includesFiles, options.exportPath, true);
+  ExportIncludesAndLibs(resourcesFiles, options.exportPath, true);
 
   // Create the index file
   if (!ExportPixiIndexFile(exportedProject,
@@ -541,11 +544,11 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
   InsertUnique(includesFiles, "timemanager.js");
+  InsertUnique(includesFiles, "polygon.js");
   InsertUnique(includesFiles, "runtimeobject.js");
   InsertUnique(includesFiles, "profiler.js");
   InsertUnique(includesFiles, "runtimescene.js");
   InsertUnique(includesFiles, "scenestack.js");
-  InsertUnique(includesFiles, "polygon.js");
   InsertUnique(includesFiles, "force.js");
   InsertUnique(includesFiles, "layer.js");
   InsertUnique(includesFiles, "timer.js");
@@ -810,9 +813,49 @@ void ExporterHelper::ExportObjectAndBehaviorsIncludes(
   }
 }
 
-const std::vector<gd::String> ExporterHelper::ExportResources(
-    gd::AbstractFileSystem &fs, gd::Project &project, gd::String exportDir) {
-  return gd::ProjectResourcesCopier::CopyAllResourcesTo(
+void ExporterHelper::ExportObjectAndBehaviorsRequiredFiles(
+    const gd::Project &project, std::vector<gd::String> &requiredFiles) {
+  auto addRequiredFiles = [&](const std::vector<gd::String> &newRequiredFiles) {
+    for (const auto &requiredFile : newRequiredFiles) {
+      InsertUnique(requiredFiles, requiredFile);
+    }
+  };
+
+  auto addObjectRequiredFiles = [&](const gd::Object &object) {
+    // Ensure needed files are included for the object type and its behaviors.
+
+    // TODO: Handle required files declared by objects. For now, no objects has
+    // a need for additional required files, so the object metadata do not even
+    // have `requiredFiles`.
+
+    std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
+    for (std::size_t j = 0; j < behaviors.size(); ++j) {
+      const gd::BehaviorMetadata &metadata =
+          gd::MetadataProvider::GetBehaviorMetadata(
+              JsPlatform::Get(),
+              object.GetBehavior(behaviors[j]).GetTypeName());
+      addRequiredFiles(metadata.requiredFiles);
+    }
+  };
+
+  auto addObjectsRequiredFiles =
+      [&](const gd::ObjectsContainer &objectsContainer) {
+        for (std::size_t i = 0; i < objectsContainer.GetObjectsCount(); ++i) {
+          addObjectRequiredFiles(objectsContainer.GetObject(i));
+        }
+      };
+
+  addObjectsRequiredFiles(project);
+  for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
+    const gd::Layout &layout = project.GetLayout(i);
+    addObjectsRequiredFiles(layout);
+  }
+}
+
+void ExporterHelper::ExportResources(gd::AbstractFileSystem &fs,
+                                     gd::Project &project,
+                                     gd::String exportDir) {
+  gd::ProjectResourcesCopier::CopyAllResourcesTo(
       project, fs, exportDir, true, false, false);
 }
 
@@ -1050,7 +1093,7 @@ const gd::String ExporterHelper::GenerateWebManifest(
       icons +=
           gd::String(R"({
         "src": "{FILE}",
-        "sizes": "{SIZE}x{SIZE}" 
+        "sizes": "{SIZE}x{SIZE}"
       },)")
               .FindAndReplace("{SIZE}", gd::String::From(sizeAndFile.first))
               .FindAndReplace("{FILE}", sizeAndFile.second);
@@ -1059,11 +1102,18 @@ const gd::String ExporterHelper::GenerateWebManifest(
 
   icons = icons.RightTrim(",") + "]";
 
+  gd::String jsonName =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetName()));
+  gd::String jsonPackageName =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetPackageName()));
+  gd::String jsonDescription =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetDescription()));
+
   return gd::String(R"webmanifest({
-  "name": "{NAME}",
-  "short_name": "{NAME}",
-  "id": "{PACKAGE_ID}",
-  "description": "{DESCRIPTION}",
+  "name": {NAME},
+  "short_name": {NAME},
+  "id": {PACKAGE_ID},
+  "description": {DESCRIPTION},
   "orientation": "{ORIENTATION}",
   "start_url": "./index.html",
   "display": "standalone",
@@ -1071,9 +1121,9 @@ const gd::String ExporterHelper::GenerateWebManifest(
   "categories": ["games", "entertainment"],
   "icons": {ICONS}
 })webmanifest")
-      .FindAndReplace("{NAME}", project.GetName())
-      .FindAndReplace("{PACKAGE_ID}", project.GetPackageName())
-      .FindAndReplace("{DESCRIPTION}", project.GetDescription())
+      .FindAndReplace("{NAME}", jsonName)
+      .FindAndReplace("{PACKAGE_ID}", jsonPackageName)
+      .FindAndReplace("{DESCRIPTION}", jsonDescription)
       .FindAndReplace("{ORIENTATION}",
                       orientation == "default" ? "any" : orientation)
       .FindAndReplace("{ICONS}", icons);

@@ -52,7 +52,7 @@ export const SetupExportHeader = ({
       >
         <FormControlLabel
           value={'androidApk'}
-          control={<Radio color="primary" />}
+          control={<Radio color="secondary" />}
           label={
             <Trans>
               APK (for testing on device or sharing outside Google Play)
@@ -61,7 +61,7 @@ export const SetupExportHeader = ({
         />
         <FormControlLabel
           value={'androidAppBundle'}
-          control={<Radio color="primary" />}
+          control={<Radio color="secondary" />}
           label={
             <Trans>Android App Bundle (for publishing on Google Play)</Trans>
           }

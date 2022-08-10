@@ -5,6 +5,7 @@ import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource';
+import type { StorageProvider } from '../../ProjectsStorage';
 import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
@@ -16,8 +17,12 @@ import {
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 
 export type EditorContainerExtraProps = {|
+  // Events function extension editor
   initiallyFocusedFunctionName?: ?string,
   initiallyFocusedBehaviorName?: ?string,
+
+  // Homepage
+  storageProviders?: Array<StorageProvider>,
 |};
 
 export type RenderEditorContainerProps = {|

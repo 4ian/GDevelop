@@ -2166,14 +2166,13 @@ const MainFrame = (props: Props) => {
       await setState(state => ({ ...state, createDialogOpen: false }));
 
     let state: ?State;
-    let enrichedFileMetadata: FileMetadata;
+    let enrichedFileMetadata = fileMetadata;
     if (project) {
       if (projectName) project.setName(projectName);
-      state = await loadFromProject(project, fileMetadata);
-    } else if (!!fileMetadata) {
-      enrichedFileMetadata = projectName
-        ? { ...fileMetadata, name: projectName }
-        : fileMetadata;
+      state = await loadFromProject(project, enrichedFileMetadata);
+    } else if (!!enrichedFileMetadata) {
+      if (projectName)
+        enrichedFileMetadata = { ...enrichedFileMetadata, name: projectName };
       if (storageProvider) getStorageProviderOperations({ storageProvider });
       state = await openFromFileMetadata(enrichedFileMetadata);
     }

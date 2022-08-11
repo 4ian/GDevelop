@@ -852,10 +852,10 @@ void ExporterHelper::ExportObjectAndBehaviorsRequiredFiles(
   }
 }
 
-void ExporterHelper::ExportResources(gd::AbstractFileSystem &fs,
-                                     gd::Project &project,
-                                     gd::String exportDir) {
-  gd::ProjectResourcesCopier::CopyAllResourcesTo(
+const std::vector<gd::String> ExporterHelper::ExportResources(gd::AbstractFileSystem &fs,
+                                                              gd::Project &project,
+                                                              gd::String exportDir) {
+  return gd::ProjectResourcesCopier::CopyAllResourcesTo(
       project, fs, exportDir, true, false, false);
 }
 

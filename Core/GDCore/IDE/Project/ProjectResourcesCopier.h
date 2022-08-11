@@ -39,14 +39,16 @@ class GD_CORE_API ProjectResourcesCopier {
    * of the resources will be preserved when copying. Otherwise, everything will
    * be send in the destinationDirectory.
    *
-   * \return true if no error happened
+   * \return The list of the exported names of all resources, useful for
+   * prefetching and caching.
    */
-  static bool CopyAllResourcesTo(gd::Project& project,
-                                 gd::AbstractFileSystem& fs,
-                                 gd::String destinationDirectory,
-                                 bool updateOriginalProject,
-                                 bool preserveAbsoluteFilenames = true,
-                                 bool preserveDirectoryStructure = true);
+  static const std::vector<gd::String> CopyAllResourcesTo(
+      gd::Project& project,
+      gd::AbstractFileSystem& fs,
+      gd::String destinationDirectory,
+      bool updateOriginalProject,
+      bool preserveAbsoluteFilenames = true,
+      bool preserveDirectoryStructure = true);
 };
 
 }  // namespace gd

@@ -17,6 +17,7 @@ const ObjectsEditorService = {
       console.warn(
         `Object with type ${objectType} has no editor configuration registered. Please use registerEditorConfiguration to register your editor.`
       );
+      return this.getDefaultObjectJsImplementationPropertiesEditor({helpPagePath: ""});
     }
 
     return this.editorConfigurations[objectType];

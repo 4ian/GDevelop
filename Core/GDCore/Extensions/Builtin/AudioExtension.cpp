@@ -73,9 +73,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
 
   extension
       .AddAction("RePlaySoundCanal",
-                 _("Play the sound of a channel"),
-                 _("Play the sound of the channel."),
-                 _("Play the sound of channel _PARAM1_"),
+                 _("Resume playing a sound on a channel"),
+                 _("Resume playing a sound on a channel that was paused."),
+                 _("Resume the sound of channel _PARAM1_"),
                  _("Sounds on channels"),
                  "res/actions/son24.png",
                  "res/actions/son.png")

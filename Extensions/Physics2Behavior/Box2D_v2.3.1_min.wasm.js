@@ -624,7 +624,7 @@ Zv();a.b2Manifold.e_faceA=$v();a.b2Manifold.e_faceB=aw();a.b2_staticBody=bw();a.
 
 gdjs.registerAsynchronouslyLoadingLibraryPromise(initializeBox2D({locateFile: function(path, prefix) {
   return location.protocol === 'file:' ?
-      // This is needed to run on preview.
+      // This is needed to run on Electron.
       prefix + "Extensions/Physics2Behavior/" + path :
       prefix + path;
 }}).then(box2d => {

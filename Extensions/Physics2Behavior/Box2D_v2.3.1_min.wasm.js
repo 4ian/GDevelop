@@ -1,10 +1,10 @@
-
-var Box2D = (function() {
+(function() {
+var initializeBox2D = (function() {
   var _scriptDir = typeof document !== 'undefined' && document.currentScript ? document.currentScript.src : undefined;
   if (typeof __filename !== 'undefined') _scriptDir = _scriptDir || __filename;
   return (
 function(Box2D) {
-  Box2D = Box2D || {};
+  Box2D = Box2D || { };
 
 
 var a;a||(a=typeof Box2D !== 'undefined' ? Box2D : {});var aa;a.ready=new Promise(function(b){aa=b});var ba={},ca;for(ca in a)a.hasOwnProperty(ca)&&(ba[ca]=a[ca]);var da=!1,ea=!1,fa=!1,ha=!1;da="object"===typeof window;ea="function"===typeof importScripts;fa="object"===typeof process&&"object"===typeof process.versions&&"string"===typeof process.versions.node;ha=!da&&!fa&&!ea;var ia="",ja,ka,la,ma;
@@ -15,12 +15,7 @@ a.noExitRuntime&&(noExitRuntime=a.noExitRuntime);"object"!==typeof WebAssembly&&
 function wa(b,c,d){var f=c+d;for(d=c;b[d]&&!(d>=f);)++d;if(16<d-c&&b.subarray&&va)return va.decode(b.subarray(c,d));for(f="";c<d;){var y=b[c++];if(y&128){var oa=b[c++]&63;if(192==(y&224))f+=String.fromCharCode((y&31)<<6|oa);else{var ya=b[c++]&63;y=224==(y&240)?(y&15)<<12|oa<<6|ya:(y&7)<<18|oa<<12|ya<<6|b[c++]&63;65536>y?f+=String.fromCharCode(y):(y-=65536,f+=String.fromCharCode(55296|y>>10,56320|y&1023))}}else f+=String.fromCharCode(y)}return f}function xa(b){return b?wa(za,b,void 0):""}
 var Aa,za,Ba,Ca;function Da(b){Aa=b;a.HEAP8=new Int8Array(b);a.HEAP16=new Int16Array(b);a.HEAP32=Ba=new Int32Array(b);a.HEAPU8=za=new Uint8Array(b);a.HEAPU16=new Uint16Array(b);a.HEAPU32=new Uint32Array(b);a.HEAPF32=new Float32Array(b);a.HEAPF64=Ca=new Float64Array(b)}var Ea=a.INITIAL_MEMORY||16777216;if(sa=a.wasmMemory?a.wasmMemory:new WebAssembly.Memory({initial:Ea/65536,maximum:32768}))Aa=sa.buffer;Ea=Aa.byteLength;Da(Aa);Ba[6512]=5269088;
 function Fa(b){for(;0<b.length;){var c=b.shift();if("function"==typeof c)c(a);else{var d=c.ev;"number"===typeof d?void 0===c.Au?a.dynCall_v(d):a.dynCall_vi(d,c.Au):d(void 0===c.Au?null:c.Au)}}}var Ga=[],Ha=[],Ia=[],Ja=[],Ka=!1;function La(){var b=a.preRun.shift();Ga.unshift(b)}var Ma=0,Na=null,Oa=null;a.preloadedImages={};a.preloadedAudios={};
-function na(b){if(a.onAbort)a.onAbort(b);b+="";pa(b);qa(b);ua=!0;throw new WebAssembly.RuntimeError("abort("+b+"). Build with -s ASSERTIONS=1 for more info.");}function Pa(b){var c=Qa;return String.prototype.startsWith?c.startsWith(b):0===c.indexOf(b)}function Ra(){return Pa("data:application/octet-stream;base64,")}
-
-// The wasm file path is defined here.
-var Qa="Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.wasm";
-
-if(!Ra()){var Sa=Qa;Qa=a.locateFile?a.locateFile(Sa,ia):ia+Sa}
+function na(b){if(a.onAbort)a.onAbort(b);b+="";pa(b);qa(b);ua=!0;throw new WebAssembly.RuntimeError("abort("+b+"). Build with -s ASSERTIONS=1 for more info.");}function Pa(b){var c=Qa;return String.prototype.startsWith?c.startsWith(b):0===c.indexOf(b)}function Ra(){return Pa("data:application/octet-stream;base64,")}var Qa="Box2D_v2.3.1_min.wasm.wasm";if(!Ra()){var Sa=Qa;Qa=a.locateFile?a.locateFile(Sa,ia):ia+Sa}
 function Ta(){try{if(ra)return new Uint8Array(ra);if(ka)return ka(Qa);throw"both async and sync fetching of the wasm failed";}catch(b){na(b)}}function Ua(){return ra||!da&&!ea||"function"!==typeof fetch||Pa("file://")?new Promise(function(b){b(Ta())}):fetch(Qa,{credentials:"same-origin"}).then(function(b){if(!b.ok)throw"failed to load wasm binary file at '"+Qa+"'";return b.arrayBuffer()}).catch(function(){return Ta()})}
 var Va={1156:function(b,c){b=a.getCache(a.JSDestructionListener)[b];if(!b.hasOwnProperty("SayGoodbyeJoint"))throw"a JSImplementation must implement all functions, you forgot JSDestructionListener::SayGoodbyeJoint.";b.SayGoodbyeJoint(c)},1414:function(b,c){b=a.getCache(a.JSDestructionListener)[b];if(!b.hasOwnProperty("SayGoodbyeFixture"))throw"a JSImplementation must implement all functions, you forgot JSDestructionListener::SayGoodbyeFixture.";b.SayGoodbyeFixture(c)},1840:function(b,c){b=a.getCache(a.JSQueryCallback)[b];
 if(!b.hasOwnProperty("ReportFixture"))throw"a JSImplementation must implement all functions, you forgot JSQueryCallback::ReportFixture.";return b.ReportFixture(c)},2104:function(b,c,d,f,y){b=a.getCache(a.JSRayCastCallback)[b];if(!b.hasOwnProperty("ReportFixture"))throw"a JSImplementation must implement all functions, you forgot JSRayCastCallback::ReportFixture.";return b.ReportFixture(c,d,f,y)},2400:function(b,c){b=a.getCache(a.JSContactListener)[b];if(!b.hasOwnProperty("BeginContact"))throw"a JSImplementation must implement all functions, you forgot JSContactListener::BeginContact.";
@@ -627,6 +622,12 @@ Zv();a.b2Manifold.e_faceA=$v();a.b2Manifold.e_faceB=aw();a.b2_staticBody=bw();a.
 );
 })();
 
-gdjs.registerAsynchronouslyLoadingLibraryPromise(Box2D(window.Box2D).then(box2d => {
+gdjs.registerAsynchronouslyLoadingLibraryPromise(initializeBox2D({locateFile: function(path, prefix) {
+  return location.protocol === 'file:' ?
+      // This is needed to run on preview.
+      prefix + "Extensions/Physics2Behavior/" + path :
+      prefix + path;
+}}).then(box2d => {
   window.Box2D = box2d;
 }));
+})();

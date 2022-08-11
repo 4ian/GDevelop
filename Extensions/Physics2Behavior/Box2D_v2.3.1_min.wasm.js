@@ -3,8 +3,8 @@ var initializeBox2D = (function() {
   var _scriptDir = typeof document !== 'undefined' && document.currentScript ? document.currentScript.src : undefined;
   if (typeof __filename !== 'undefined') _scriptDir = _scriptDir || __filename;
   return (
-function(Box2D, locateFile) {
-  Box2D = Box2D || {locateFile: locateFile};
+function(Box2D) {
+  Box2D = Box2D || { };
 
 
 var a;a||(a=typeof Box2D !== 'undefined' ? Box2D : {});var aa;a.ready=new Promise(function(b){aa=b});var ba={},ca;for(ca in a)a.hasOwnProperty(ca)&&(ba[ca]=a[ca]);var da=!1,ea=!1,fa=!1,ha=!1;da="object"===typeof window;ea="function"===typeof importScripts;fa="object"===typeof process&&"object"===typeof process.versions&&"string"===typeof process.versions.node;ha=!da&&!fa&&!ea;var ia="",ja,ka,la,ma;
@@ -622,12 +622,12 @@ Zv();a.b2Manifold.e_faceA=$v();a.b2Manifold.e_faceB=aw();a.b2_staticBody=bw();a.
 );
 })();
 
-gdjs.registerAsynchronouslyLoadingLibraryPromise(initializeBox2D(window.Box2D, function(path, prefix) {
+gdjs.registerAsynchronouslyLoadingLibraryPromise(initializeBox2D({locateFile: function(path, prefix) {
   return location.protocol === 'file:' ?
       // This is needed to run on preview.
       prefix + "Extensions/Physics2Behavior/" + path :
       prefix + path;
-}).then(box2d => {
+}}).then(box2d => {
   window.Box2D = box2d;
 }));
 })();

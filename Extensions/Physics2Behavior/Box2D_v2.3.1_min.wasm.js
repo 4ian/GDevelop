@@ -1,20 +1,13 @@
-
-var Box2D = (function() {
+(function() {
+var initializeBox2D = (function() {
   var _scriptDir = typeof document !== 'undefined' && document.currentScript ? document.currentScript.src : undefined;
   if (typeof __filename !== 'undefined') _scriptDir = _scriptDir || __filename;
   return (
-function(Box2D) {
-  Box2D = Box2D || {};
+function(Box2D, locateFile) {
+  Box2D = Box2D || {locateFile: locateFile};
 
 
-var a;a||(a=typeof Box2D !== 'undefined' ? Box2D : {
-  locateFile: function(path, prefix) {
-    return location.protocol === 'file' ?
-        // This is needed to run in preview.
-        prefix + "Extensions/Physics2Behavior/" + path :
-        prefix + path;
-  },
-});var aa;a.ready=new Promise(function(b){aa=b});var ba={},ca;for(ca in a)a.hasOwnProperty(ca)&&(ba[ca]=a[ca]);var da=!1,ea=!1,fa=!1,ha=!1;da="object"===typeof window;ea="function"===typeof importScripts;fa="object"===typeof process&&"object"===typeof process.versions&&"string"===typeof process.versions.node;ha=!da&&!fa&&!ea;var ia="",ja,ka,la,ma;
+var a;a||(a=typeof Box2D !== 'undefined' ? Box2D : {});var aa;a.ready=new Promise(function(b){aa=b});var ba={},ca;for(ca in a)a.hasOwnProperty(ca)&&(ba[ca]=a[ca]);var da=!1,ea=!1,fa=!1,ha=!1;da="object"===typeof window;ea="function"===typeof importScripts;fa="object"===typeof process&&"object"===typeof process.versions&&"string"===typeof process.versions.node;ha=!da&&!fa&&!ea;var ia="",ja,ka,la,ma;
 if(fa)ia=ea?require("path").dirname(ia)+"/":__dirname+"/",ja=function(b,c){la||(la=require("fs"));ma||(ma=require("path"));b=ma.normalize(b);return la.readFileSync(b,c?null:"utf8")},ka=function(b){b=ja(b,!0);b.buffer||(b=new Uint8Array(b));assert(b.buffer);return b},1<process.argv.length&&process.argv[1].replace(/\\/g,"/"),process.argv.slice(2),process.on("uncaughtException",function(b){throw b;}),process.on("unhandledRejection",na),a.inspect=function(){return"[Emscripten Module object]"};else if(ha)"undefined"!=
 typeof read&&(ja=function(b){return read(b)}),ka=function(b){if("function"===typeof readbuffer)return new Uint8Array(readbuffer(b));b=read(b,"binary");assert("object"===typeof b);return b},"undefined"!==typeof print&&("undefined"===typeof console&&(console={}),console.log=print,console.warn=console.error="undefined"!==typeof printErr?printErr:print);else if(da||ea)ea?ia=self.location.href:document.currentScript&&(ia=document.currentScript.src),_scriptDir&&(ia=_scriptDir),ia=0!==ia.indexOf("blob:")?
 ia.substr(0,ia.lastIndexOf("/")+1):"",ja=function(b){var c=new XMLHttpRequest;c.open("GET",b,!1);c.send(null);return c.responseText},ea&&(ka=function(b){var c=new XMLHttpRequest;c.open("GET",b,!1);c.responseType="arraybuffer";c.send(null);return new Uint8Array(c.response)});var pa=a.print||console.log.bind(console),qa=a.printErr||console.warn.bind(console);for(ca in ba)ba.hasOwnProperty(ca)&&(a[ca]=ba[ca]);ba=null;var ra;a.wasmBinary&&(ra=a.wasmBinary);var noExitRuntime;
@@ -629,6 +622,12 @@ Zv();a.b2Manifold.e_faceA=$v();a.b2Manifold.e_faceB=aw();a.b2_staticBody=bw();a.
 );
 })();
 
-gdjs.registerAsynchronouslyLoadingLibraryPromise(Box2D(window.Box2D).then(box2d => {
+gdjs.registerAsynchronouslyLoadingLibraryPromise(initializeBox2D(window.Box2D, function(path, prefix) {
+  return location.protocol === 'file:' ?
+      // This is needed to run on preview.
+      prefix + "Extensions/Physics2Behavior/" + path :
+      prefix + path;
+}).then(box2d => {
   window.Box2D = box2d;
 }));
+})();

@@ -121,6 +121,21 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newFunctionName);
 
   /**
+   * \brief Refactor the project **before** an events function of an object is
+   * renamed.
+   *
+   * \warning Do the renaming of the specified function after calling this.
+   * This is because the function is expected to have its old name for the
+   * refactoring.
+   */
+  static void RenameObjectEventsFunction(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::EventsBasedObject& eventsBasedObject,
+      const gd::String& oldFunctionName,
+      const gd::String& newFunctionName);
+
+  /**
    * \brief Refactor the project **before** an events function parameter
    * is moved.
    *
@@ -183,6 +198,21 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newPropertyName);
 
   /**
+   * \brief Refactor the project **before** a property of an object is
+   * renamed.
+   *
+   * \warning Do the renaming of the specified property after calling this.
+   * This is because the property is expected to have its old name for the
+   * refactoring.
+   */
+  static void RenameEventsBasedObjectProperty(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::EventsBasedObject& eventsBasedObject,
+      const gd::String& oldPropertyName,
+      const gd::String& newPropertyName);
+
+  /**
    * \brief Add a behavior to an object and add required behaviors if necessary
    * to fill every behavior properties of the added behaviors.
    */
@@ -233,6 +263,19 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::String& oldBehaviorName,
       const gd::String& newBehaviorName);
+
+  /**
+   * \brief Refactor the project **before** an object is renamed.
+   *
+   * \warning Do the renaming of the specified object after calling this.
+   * This is because the object is expected to have its old name for the
+   * refactoring.
+   */
+  static void RenameEventsBasedObject(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::String& oldObjectName,
+      const gd::String& newObjectName);
 
   /**
    * \brief Refactor the project after an object is renamed in a layout
@@ -378,6 +421,10 @@ class GD_CORE_API WholeProjectRefactorer {
   static void DoRenameBehavior(gd::Project& project,
                                const gd::String& oldBehaviorType,
                                const gd::String& newBehaviorType);
+
+  static void DoRenameObject(gd::Project& project,
+                             const gd::String& oldObjectType,
+                             const gd::String& newObjectType);
 
   static void FindDependentBehaviorNames(
       const gd::Project& project,

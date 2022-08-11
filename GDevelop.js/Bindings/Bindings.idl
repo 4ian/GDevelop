@@ -1987,6 +1987,12 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_RenameObjectEventsFunction(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const, Ref] EventsBasedObject eventsBasedObject,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
     void STATIC_MoveEventsFunctionParameter(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2013,7 +2019,18 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_RenameEventsBasedObjectProperty(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const, Ref] EventsBasedObject eventsBasedObject,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
     void STATIC_RenameEventsBasedBehavior(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameEventsBasedObject(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,

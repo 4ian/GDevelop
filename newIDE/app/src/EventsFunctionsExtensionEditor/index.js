@@ -377,14 +377,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
 
     const { project, eventsFunctionsExtension } = this.props;
-    // TODO EBO
-    // gd.WholeProjectRefactorer.renameObjectEventsFunction(
-    //   project,
-    //   eventsFunctionsExtension,
-    //   eventsBasedObject,
-    //   eventsFunction.getName(),
-    //   newName
-    // );
+    gd.WholeProjectRefactorer.renameObjectEventsFunction(
+      project,
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      eventsFunction.getName(),
+      newName
+    );
 
     done(true);
   };
@@ -561,13 +560,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
 
     const { project, eventsFunctionsExtension } = this.props;
-    // TODO EBO
-    // gd.WholeProjectRefactorer.renameEventsBasedObject(
-    //   project,
-    //   eventsFunctionsExtension,
-    //   eventsBasedObject.getName(),
-    //   newName
-    // );
+    gd.WholeProjectRefactorer.renameEventsBasedObject(
+      project,
+      eventsFunctionsExtension,
+      eventsBasedObject.getName(),
+      newName
+    );
 
     done(true);
   };
@@ -758,14 +756,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string
   ) => {
     const { project, eventsFunctionsExtension } = this.props;
-    // TODO EBO
-    // gd.WholeProjectRefactorer.renameEventsBasedObjectProperty(
-    //   project,
-    //   eventsFunctionsExtension,
-    //   eventsBasedObject,
-    //   oldName,
-    //   newName
-    // );
+    gd.WholeProjectRefactorer.renameEventsBasedObjectProperty(
+      project,
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      oldName,
+      newName
+    );
   };
 
   _editOptions = (open: boolean = true) => {

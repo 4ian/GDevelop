@@ -4,11 +4,14 @@ declare class gdWholeProjectRefactorer {
   static renameEventsFunctionsExtension(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, oldName: string, newName: string): void;
   static renameEventsFunction(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, oldName: string, newName: string): void;
   static renameBehaviorEventsFunction(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, oldName: string, newName: string): void;
+  static renameObjectEventsFunction(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject, oldName: string, newName: string): void;
   static moveEventsFunctionParameter(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, functionName: string, oldIndex: number, newIndex: number): void;
   static moveBehaviorEventsFunctionParameter(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, functionName: string, oldIndex: number, newIndex: number): void;
   static moveObjectEventsFunctionParameter(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject, functionName: string, oldIndex: number, newIndex: number): void;
   static renameEventsBasedBehaviorProperty(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, oldName: string, newName: string): void;
+  static renameEventsBasedObjectProperty(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject, oldName: string, newName: string): void;
   static renameEventsBasedBehavior(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, oldName: string, newName: string): void;
+  static renameEventsBasedObject(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, oldName: string, newName: string): void;
   static objectOrGroupRenamedInLayout(project: gdProject, layout: gdLayout, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectOrGroupRemovedInLayout(project: gdProject, layout: gdLayout, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
   static objectOrGroupRenamedInEventsFunction(project: gdProject, eventsFunction: gdEventsFunction, globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, oldName: string, newName: string, isObjectGroup: boolean): void;

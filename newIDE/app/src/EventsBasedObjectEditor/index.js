@@ -11,7 +11,6 @@ import EventsBasedObjectPropertiesEditor from './EventsBasedObjectPropertiesEdit
 import EventBasedObjectChildrenEditor from './EventBasedObjectChildrenEditor';
 import { ColumnStackLayout } from '../UI/Layout';
 import { Line } from '../UI/Grid';
-const gd: libGDevelop = global.gd;
 
 type TabName = 'configuration' | 'properties' | 'children';
 

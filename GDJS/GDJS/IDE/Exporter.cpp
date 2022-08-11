@@ -129,7 +129,7 @@ bool Exporter::ExportWholePixiProject(
       gd::LogError("Unable to export WebManifest.");
 
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
-    helper.ExportIncludesAndLibs(resourcesFiles, exportDir, true);
+    helper.ExportIncludesAndLibs(resourcesFiles, exportDir, false);
 
     gd::String source = gdjsRoot + "/Runtime/index.html";
     if (exportForCordova)

@@ -132,9 +132,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
 
   extension
       .AddAction("RePlayMusicCanal",
-                 _("Play the music of a channel"),
-                 _("Play the music of the channel."),
-                 _("Play the music of channel _PARAM1_"),
+                 _("Resume playing a music on a channel"),
+                 _("Resume playing a music on a channel that was paused."),
+                 _("Resume the music of channel _PARAM1_"),
                  _("Music on channels"),
                  "res/actions/music24.png",
                  "res/actions/music.png")

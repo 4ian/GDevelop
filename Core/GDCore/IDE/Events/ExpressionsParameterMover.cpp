@@ -78,13 +78,16 @@ class GD_CORE_API ExpressionParameterMover
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {}
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     auto moveParameter =
-        [this](std::vector<std::unique_ptr<gd::ExpressionNode>>& parameters) {
-          if (oldIndex >= parameters.size() || newIndex >= parameters.size())
+        [this](std::vector<std::unique_ptr<gd::ExpressionNode>>& parameters, int firstWrittenParameterIndex) {
+          size_t newExpressionIndex = newIndex - firstWrittenParameterIndex;
+          size_t oldExpressionIndex = oldIndex - firstWrittenParameterIndex;
+
+          if (oldExpressionIndex >= parameters.size() || newExpressionIndex >= parameters.size())
             return;
 
-          auto movedParameterNode = std::move(parameters[oldIndex]);
-          parameters.erase(parameters.begin() + oldIndex);
-          parameters.insert(parameters.begin() + newIndex,
+          auto movedParameterNode = std::move(parameters[oldExpressionIndex]);
+          parameters.erase(parameters.begin() + oldExpressionIndex);
+          parameters.insert(parameters.begin() + newExpressionIndex,
                             std::move(movedParameterNode));
         };
 
@@ -92,10 +95,13 @@ class GD_CORE_API ExpressionParameterMover
       if (behaviorType.empty() && !objectType.empty() &&
           !node.objectName.empty()) {
         // Move parameter of an object function
+        // This refactor only applies on events object functions
+        // and events object functions doesn't exist yet.
+        // This is a dead code.
         const gd::String& thisObjectType = gd::GetTypeOfObject(
             globalObjectsContainer, objectsContainer, node.objectName);
         if (thisObjectType == objectType) {
-          moveParameter(node.parameters);
+          moveParameter(node.parameters, 1);
           hasDoneMoving = true;
         }
       } else if (!behaviorType.empty() && !node.behaviorName.empty()) {
@@ -103,12 +109,12 @@ class GD_CORE_API ExpressionParameterMover
         const gd::String& thisBehaviorType = gd::GetTypeOfBehavior(
             globalObjectsContainer, objectsContainer, node.behaviorName);
         if (thisBehaviorType == behaviorType) {
-          moveParameter(node.parameters);
+          moveParameter(node.parameters, 2);
           hasDoneMoving = true;
         }
       } else if (behaviorType.empty() && objectType.empty()) {
         // Move parameter of a free function
-        moveParameter(node.parameters);
+        moveParameter(node.parameters, 1);
         hasDoneMoving = true;
       }
     }

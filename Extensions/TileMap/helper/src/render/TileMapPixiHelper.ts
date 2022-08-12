@@ -75,7 +75,7 @@ export class PixiTileMapHelper {
       atlasTexture.height >= expectedAtlasHeight + spacing + tileheight
     ) {
       console.error(
-        "It seems the atlas file was resized, which is not supported. " +
+        'It seems the atlas file was resized, which is not supported. ' +
           `It should be ${expectedAtlasWidth}x${expectedAtlasHeight} px, ` +
           `but it's ${atlasTexture.width}x${atlasTexture.height} px.`
       );
@@ -86,7 +86,7 @@ export class PixiTileMapHelper {
       (atlasTexture.height !== 1 && atlasTexture.height !== expectedAtlasHeight)
     ) {
       console.warn(
-        "It seems the atlas file has unused pixels. " +
+        'It seems the atlas file has unused pixels. ' +
           `It should be ${expectedAtlasWidth}x${expectedAtlasHeight} px, ` +
           `but it's ${atlasTexture.width}x${atlasTexture.height} px.`
       );

@@ -518,7 +518,7 @@ describe('TiledTileMapLoader', function () {
     });
   });
 
-  describe("with a collision mask", function () {
+  describe('with a collision mask', function () {
     // Built from an actual json file exported by Tiled.
     const tiledMap: TiledMap = {
       compressionlevel: -1,
@@ -538,9 +538,9 @@ describe('TiledTileMapLoader', function () {
           ],
           height: 2,
           id: 1,
-          name: "Tile Layer 1",
+          name: 'Tile Layer 1',
           opacity: 1,
-          type: "tilelayer",
+          type: 'tilelayer',
           visible: true,
           width: 4,
           x: 0,
@@ -549,36 +549,36 @@ describe('TiledTileMapLoader', function () {
       ],
       nextlayerid: 2,
       nextobjectid: 1,
-      orientation: "orthogonal",
-      renderorder: "right-down",
-      tiledversion: "1.9.0",
+      orientation: 'orthogonal',
+      renderorder: 'right-down',
+      tiledversion: '1.9.0',
       tileheight: 8,
       tilesets: [
         {
           columns: 1,
-          image: "MiniTiledSet.png",
+          image: 'MiniTiledSet.png',
           imageheight: 8,
           imagewidth: 8,
           margin: 0,
-          name: "new tileset",
+          name: 'new tileset',
           spacing: 0,
           tilecount: 1,
-          tiledversion: "1.9.0",
+          tiledversion: '1.9.0',
           tileheight: 8,
           tiles: [
             {
-              class: "obstacle",
+              class: 'obstacle',
               id: 2,
               objectgroup: {
-                draworder: "index",
+                draworder: 'index',
                 id: 2,
-                name: "",
+                name: '',
                 objects: [
                   {
-                    class: "",
+                    class: '',
                     height: 0,
                     id: 9,
-                    name: "",
+                    name: '',
                     polygon: [
                       {
                         x: 0,
@@ -605,7 +605,7 @@ describe('TiledTileMapLoader', function () {
                   },
                 ],
                 opacity: 1,
-                type: "objectgroup",
+                type: 'objectgroup',
                 visible: true,
                 x: 0,
                 y: 0,
@@ -613,19 +613,19 @@ describe('TiledTileMapLoader', function () {
             },
           ],
           tilewidth: 8,
-          type: "tileset",
-          version: "1.8",
+          type: 'tileset',
+          version: '1.8',
         },
       ],
       tilewidth: 8,
-      type: "map",
-      version: "1.9",
+      type: 'map',
+      version: '1.9',
       width: 4,
     };
 
     const tileMap: EditableTileMap = TiledTileMapLoader.load(null, tiledMap);
 
-    it("can load flipped tiles", function () {
+    it('can load flipped tiles', function () {
       const layers = new Array(...tileMap.getLayers());
       expect(layers.length).to.be(1);
       const layer = layers[0] as EditableTileMapLayer;

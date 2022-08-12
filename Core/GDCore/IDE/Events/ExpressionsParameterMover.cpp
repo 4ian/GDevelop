@@ -96,7 +96,7 @@ class GD_CORE_API ExpressionParameterMover
       if (behaviorType.empty() && !objectType.empty() &&
           !node.objectName.empty()) {
         // Move parameter of an object function
-        // This refactor only applies on events functions
+        // This refactor only applies on events object functions
         // and events object functions doesn't exist yet.
         // This is a dead code.
         const gd::String& thisObjectType = gd::GetTypeOfObject(

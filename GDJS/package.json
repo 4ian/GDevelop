@@ -16,6 +16,7 @@
     "@pixi/canvas-sprite": "6.1.2",
     "@pixi/canvas-sprite-tiling": "6.1.2",
     "@pixi/canvas-text": "6.1.2",
+    "@pixi/particle-emitter": "^5.0.7",
     "@pixi/tilemap": "^3.2.2",
     "@types/electron": "^1.6.10",
     "@types/expect.js": "^0.3.29",

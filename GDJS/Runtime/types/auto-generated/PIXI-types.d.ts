@@ -26,11 +26,19 @@ export * from '@pixi/canvas-graphics';
 export * from '@pixi/mesh';
 export * from '@pixi/canvas-mesh';
 export * from '@pixi/text-bitmap';
+import * as particles from '@pixi/particle-emitter';
+export { particles };
 export * as tilemap from '@pixi/tilemap';
 import MultiStyleText from 'pixi-multistyle-text';
 export { MultiStyleText };
 export * from '@pixi/loaders';
 import '@pixi/mixin-cache-as-bitmap';
+import { AlphaFilter } from '@pixi/filter-alpha';
+import { BlurFilter, BlurFilterPass } from '@pixi/filter-blur';
+import { ColorMatrixFilter } from '@pixi/filter-color-matrix';
+import { DisplacementFilter } from '@pixi/filter-displacement';
+import { FXAAFilter } from '@pixi/filter-fxaa';
+import { NoiseFilter } from '@pixi/filter-noise';
 export namespace filters {
   export {
     AlphaFilter,

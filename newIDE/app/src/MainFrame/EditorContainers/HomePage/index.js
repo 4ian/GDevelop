@@ -8,9 +8,12 @@ import {
   type OnCreateBlankFunction,
   type OnOpenProjectAfterCreationFunction,
 } from '../../../ProjectCreation/CreateProjectDialog';
-import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
+import {
+  type FileMetadataAndStorageProviderName,
+  type StorageProvider,
+} from '../../../ProjectsStorage';
 import GetStartedSection from './GetStartedSection';
-import BuildSection from './BuildSection';
+import BuildSection, { type BuildSectionInterface } from './BuildSection';
 import LearnSection from './LearnSection';
 import PlaySection from './PlaySection';
 import CommunitySection from './CommunitySection';
@@ -20,6 +23,7 @@ import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleSto
 import { HomePageHeader } from './HomePageHeader';
 import { HomePageMenu, type HomeTab } from './HomePageMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
+import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
 type Props = {|
   project: ?gdProject,
@@ -28,6 +32,7 @@ type Props = {|
   projectItemName: ?string,
   project: ?gdProject,
   setToolbar: (?React.Node) => void,
+  storageProviders: Array<StorageProvider>,
 
   // Project opening
   canOpen: boolean,
@@ -41,6 +46,7 @@ type Props = {|
   onOpenLanguageDialog: () => void,
   onOpenProfile: () => void,
   onOpenOnboardingDialog: () => void,
+  onChangeSubscription: () => void,
 
   // Project creation
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
@@ -72,9 +78,15 @@ export const HomePage = React.memo<Props>(
         onOpenProfile,
         setToolbar,
         onOpenOnboardingDialog,
+        onChangeSubscription,
+        isActive,
+        storageProviders,
       }: Props,
       ref
     ) => {
+      const { authenticated, onCloudProjectsChanged } = React.useContext(
+        AuthenticatedUserContext
+      );
       const { fetchTutorials } = React.useContext(TutorialContext);
       const { fetchShowcasedGamesAndFilters } = React.useContext(
         GamesShowcaseContext
@@ -84,6 +96,7 @@ export const HomePage = React.memo<Props>(
         values: { showGetStartedSection },
         setShowGetStartedSection,
       } = React.useContext(PreferencesContext);
+      const buildSectionRef = React.useRef<?BuildSectionInterface>(null);
 
       // Load everything when the user opens the home page, to avoid future loading times.
       React.useEffect(
@@ -93,6 +106,29 @@ export const HomePage = React.memo<Props>(
           fetchTutorials();
         },
         [fetchExamplesAndFilters, fetchShowcasedGamesAndFilters, fetchTutorials]
+      );
+
+      // Fetch user cloud projects when home page becomes active
+      React.useEffect(
+        () => {
+          if (isActive && authenticated) {
+            onCloudProjectsChanged();
+          }
+        },
+        [isActive, authenticated, onCloudProjectsChanged]
+      );
+
+      // Refresh build section when homepage becomes active
+      React.useEffect(
+        () => {
+          if (isActive && activeTab === 'build' && buildSectionRef.current) {
+            buildSectionRef.current.forceUpdate();
+          }
+        },
+        // Active tab is excluded from the dependencies because switching tab
+        // mounts and unmounts section, so the data is already up to date.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [isActive]
       );
 
       const getProject = () => {
@@ -144,11 +180,14 @@ export const HomePage = React.memo<Props>(
                   )}
                   {activeTab === 'build' && (
                     <BuildSection
+                      ref={buildSectionRef}
                       project={project}
                       canOpen={canOpen}
                       onOpen={onOpen}
                       onCreateProject={onCreateProject}
                       onOpenRecentFile={onOpenRecentFile}
+                      onChangeSubscription={onChangeSubscription}
+                      storageProviders={storageProviders}
                     />
                   )}
                   {activeTab === 'learn' && (
@@ -195,5 +234,9 @@ export const renderHomePageContainer = (
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
     onOpenOnboardingDialog={props.onOpenOnboardingDialog}
+    onChangeSubscription={props.onChangeSubscription}
+    storageProviders={
+      (props.extraEditorProps && props.extraEditorProps.storageProviders) || []
+    }
   />
 );

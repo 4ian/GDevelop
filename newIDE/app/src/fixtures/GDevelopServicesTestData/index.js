@@ -8,6 +8,7 @@ import { User as FirebaseUser } from 'firebase/auth';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 import { type Release } from '../../Utils/GDevelopServices/Release';
 import { type Build } from '../../Utils/GDevelopServices/Build';
+import { type CloudProjectWithUserAccessInfo } from '../../Utils/GDevelopServices/Project';
 import {
   type ExtensionShortHeader,
   type ExtensionHeader,
@@ -40,6 +41,21 @@ export const indieVerifiedFirebaseUser: FirebaseUser = {
   email: 'indie-user@example.com',
   emailVerified: true,
 };
+
+export const cloudProjectsForIndieUser: Array<CloudProjectWithUserAccessInfo> = [
+  {
+    id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372143',
+    name: 'Worms 2D',
+    createdAt: '2022-02-05T00:36:53.972Z',
+    lastModifiedAt: '2022-02-07T00:36:53.972Z',
+  },
+  {
+    id: 'fb4d878a-1935-4916-b681-f9235475d35c',
+    name: 'Crash Bandicoot',
+    createdAt: '2020-01-24T00:36:53.972Z',
+    lastModifiedAt: '2020-02-06T00:36:53.972Z',
+  },
+];
 
 export const indieUserProfile: Profile = {
   id: 'indie-user',
@@ -85,25 +101,83 @@ export const noSubscription: Subscription = {
 };
 
 export const limitsForIndieUser: Limits = {
-  'cordova-build': {
-    current: 2,
-    max: 10,
-    limitReached: false,
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 50,
+      canMaximumCountBeIncreased: true,
+    },
   },
+  limits: {
+    'cordova-build': {
+      current: 2,
+      max: 10,
+      limitReached: false,
+    },
+  },
+  message: undefined,
+};
+
+export const limitsForProUser: Limits = {
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 100,
+      canMaximumCountBeIncreased: false,
+    },
+  },
+  limits: {
+    'cordova-build': {
+      current: 2,
+      max: 70,
+      limitReached: false,
+    },
+  },
+  message: undefined,
 };
 
 export const limitsReached: Limits = {
-  'cordova-build': {
-    current: 10,
-    max: 10,
-    limitReached: true,
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 10,
+      canMaximumCountBeIncreased: false,
+    },
   },
+  limits: {
+    'cordova-build': {
+      current: 10,
+      max: 10,
+      limitReached: true,
+    },
+  },
+  message: undefined,
 };
 
 export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
+  loginState: 'done',
   badges: null,
+  cloudProjects: null,
   firebaseUser: indieFirebaseUser,
   subscription: subscriptionForIndieUser,
   usages: usagesForIndieUser,
@@ -114,6 +188,7 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   onChangeEmail: () => {},
   onCreateAccount: () => {},
   onBadgesChanged: async () => {},
+  onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -132,7 +207,9 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
 export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
+  loginState: 'done',
   badges: null,
+  cloudProjects: cloudProjectsForIndieUser,
   firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
@@ -143,6 +220,7 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   onChangeEmail: () => {},
   onCreateAccount: () => {},
   onBadgesChanged: async () => {},
+  onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -161,7 +239,9 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
 export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
+  loginState: 'done',
   badges: null,
+  cloudProjects: cloudProjectsForIndieUser,
   firebaseUser: indieVerifiedFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
@@ -172,6 +252,7 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   onChangeEmail: () => {},
   onCreateAccount: () => {},
   onBadgesChanged: async () => {},
+  onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -190,7 +271,9 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
 export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: null,
+  loginState: 'loggingIn',
   badges: null,
+  cloudProjects: null,
   firebaseUser: null,
   subscription: null,
   usages: null,
@@ -201,6 +284,7 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   onChangeEmail: () => {},
   onCreateAccount: () => {},
   onBadgesChanged: async () => {},
+  onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -219,7 +303,9 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
 export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   authenticated: false,
   profile: null,
+  loginState: 'done',
   badges: null,
+  cloudProjects: null,
   firebaseUser: null,
   subscription: null,
   usages: null,
@@ -230,6 +316,7 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   onChangeEmail: () => {},
   onCreateAccount: () => {},
   onBadgesChanged: async () => {},
+  onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -1180,11 +1267,11 @@ export const fakeAssetPacks: AssetPacks = {
   ],
 };
 
-export const commentUnsolved: Comment = {
-  id: 'comment-unsolved-id',
+export const commentUnprocessed: Comment = {
+  id: 'comment-unprocessed-id',
   type: 'FEEDBACK',
-  gameId: 'game-id',
-  buildId: 'build-id',
+  gameId: 'complete-game-id',
+  buildId: 'complete-build-id',
   text:
     "This is my honest feedback: I think the art is cute. Specially on the screen when it jumps over the chickens. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
   ratings: {
@@ -1199,11 +1286,11 @@ export const commentUnsolved: Comment = {
   updatedAt: 1515084393000,
 };
 
-export const commentSolved: Comment = {
-  id: 'comment-solved-id',
+export const commentProcessed: Comment = {
+  id: 'comment-processed-id',
   type: 'FEEDBACK',
-  gameId: 'game-id',
-  buildId: 'build-id',
+  gameId: 'complete-game-id',
+  buildId: 'complete-build-id',
   text:
     "This is my honest feedback: I think the art is cute. Specially on the screen when it jumps over the chickens. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
   ratings: {

@@ -261,7 +261,7 @@ export type TiledTileset = {
   columns: integer;
 
   /** GID corresponding to the first tile in the set */
-  firstgid: integer;
+  firstgid?: integer;
 
   /** (optional) */
   grid?: TiledGrid;

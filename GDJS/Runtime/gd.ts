@@ -558,8 +558,33 @@ namespace gdjs {
       return diff / Math.min(absA + absB, Number.MAX_VALUE) < epsilon;
     }
   };
+
+  const asynchronouslyLoadingLibraryPromises: Array<Promise<any>> = [];
+
+  /**
+   * Register a promise which will be resolved when a third party library has
+   * finished loading (and is required to load before launching the game).
+   *
+   * This method must be called by any library that loads asynchronously.
+   */
+  export const registerAsynchronouslyLoadingLibraryPromise = (
+    promise: Promise<any>
+  ): void => {
+    asynchronouslyLoadingLibraryPromises.push(promise);
+  };
+
+  /**
+   * @returns a promise resolved when all all third party libraries, which need
+   * to be loaded before the game startup, are loaded. If a library fails
+   * loading, this will be rejected.
+   */
+  export const getAllAsynchronouslyLoadingLibraryPromise = (): Promise<
+    any[]
+  > => {
+    return Promise.all(asynchronouslyLoadingLibraryPromises);
+  };
 }
 
-//Make sure console.warn and console.error are available.
+// Make sure console.warn and console.error are available.
 console.warn = console.warn || console.log;
 console.error = console.error || console.log;

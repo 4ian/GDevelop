@@ -56,7 +56,7 @@ export default ({
   internalName: 'OneDrive',
   name: t`OneDrive (coming soon)`,
   disabled: true,
-  renderIcon: () => <OneDrive />,
+  renderIcon: props => <OneDrive fontSize={props.size} />,
   createOperations: ({ setDialog, closeDialog }) => {
     initializeApis().catch(() => {});
 

@@ -196,6 +196,13 @@ class GD_CORE_API BehaviorMetadata {
   BehaviorMetadata& AddIncludeFile(const gd::String& includeFile);
 
   /**
+   * \brief Add a file to the already existing required files.
+   * \note These files are required for the behavior to work,
+   * but they are not executable.
+   */
+  BehaviorMetadata& AddRequiredFile(const gd::String& requiredFile);
+
+  /**
    * Get the help path of the behavior, relative to the GDevelop documentation
    * root.
    */
@@ -278,6 +285,7 @@ class GD_CORE_API BehaviorMetadata {
   std::map<gd::String, gd::ExpressionMetadata> strExpressionsInfos;
 
   std::vector<gd::String> includeFiles;
+  std::vector<gd::String> requiredFiles;
   gd::String className;
 #endif
  private:

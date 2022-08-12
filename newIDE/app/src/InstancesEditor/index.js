@@ -149,6 +149,7 @@ export default class InstancesEditor extends Component<Props> {
       // Disable anti-aliasing(default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
     );
     canvasArea.appendChild(this.pixiRenderer.view);
+    this.pixiRenderer.view.style.outline = 'none';
 
     this.longTouchHandler = new LongTouchHandler({
       canvas: this.pixiRenderer.view,
@@ -596,11 +597,11 @@ export default class InstancesEditor extends Component<Props> {
     if (this.selectionRectangle.hasStartedSelectionRectangle()) {
       let instancesSelected = this.selectionRectangle.endSelectionRectangle();
 
-      this.props.instancesSelection.selectInstances(
-        instancesSelected,
-        this.keyboardShortcuts.shouldMultiSelect(),
-        this._getLayersVisibility()
-      );
+      this.props.instancesSelection.selectInstances({
+        instances: instancesSelected,
+        multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
+        layersVisibility: this._getLayersVisibility(),
+      });
       instancesSelected = this.props.instancesSelection.getSelectedInstances();
       this.props.onInstancesSelected(instancesSelected);
     }
@@ -670,11 +671,11 @@ export default class InstancesEditor extends Component<Props> {
           .resetPersistentUuid();
       }
     } else {
-      this.props.instancesSelection.selectInstance(
+      this.props.instancesSelection.selectInstance({
         instance,
-        this.keyboardShortcuts.shouldMultiSelect(),
-        this._getLayersVisibility()
-      );
+        multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
+        layersVisibility: this._getLayersVisibility(),
+      });
 
       if (this.props.onInstancesSelected) {
         this.props.onInstancesSelected(

@@ -25,6 +25,7 @@ import Copy from '../../UI/CustomSvgIcons/Copy';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import LinearProgress from '../../UI/LinearProgress';
+import FlatButton from '../../UI/FlatButton';
 
 const buildTypesConfig = {
   'cordova-build': {
@@ -294,7 +295,8 @@ const BuildProgressAndActions = ({
                   .filter(button => !!build[button.key])
                   .map(button => (
                     <React.Fragment key={button.key}>
-                      <TextButton
+                      <RaisedButton
+                        primary
                         label={i18n._(button.displayName)}
                         onClick={() => onDownload(button.key)}
                         icon={button.icon}
@@ -303,8 +305,7 @@ const BuildProgressAndActions = ({
                     </React.Fragment>
                   ))}
               </ResponsiveLineStackLayout>
-              <RaisedButton
-                primary
+              <FlatButton
                 label={<Trans>Download log files</Trans>}
                 onClick={() => onDownload('logsKey')}
               />

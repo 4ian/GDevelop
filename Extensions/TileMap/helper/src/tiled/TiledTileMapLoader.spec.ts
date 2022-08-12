@@ -517,4 +517,160 @@ describe('TiledTileMapLoader', function () {
       expect(tileMap.pointIsInsideTile(12, 12, 'obstacle')).to.be(false);
     });
   });
+
+  describe("with a collision mask", function () {
+    // Built from an actual json file exported by Tiled.
+    const tiledMap: TiledMap = {
+      compressionlevel: -1,
+      height: 2,
+      infinite: false,
+      layers: [
+        {
+          data: [
+            3,
+            2684354563,
+            536870915,
+            2147483651,
+            1610612739,
+            3221225475,
+            1073741827,
+            3758096387,
+          ],
+          height: 2,
+          id: 1,
+          name: "Tile Layer 1",
+          opacity: 1,
+          type: "tilelayer",
+          visible: true,
+          width: 4,
+          x: 0,
+          y: 0,
+        },
+      ],
+      nextlayerid: 2,
+      nextobjectid: 1,
+      orientation: "orthogonal",
+      renderorder: "right-down",
+      tiledversion: "1.9.0",
+      tileheight: 8,
+      tilesets: [
+        {
+          columns: 1,
+          image: "MiniTiledSet.png",
+          imageheight: 8,
+          imagewidth: 8,
+          margin: 0,
+          name: "new tileset",
+          spacing: 0,
+          tilecount: 1,
+          tiledversion: "1.9.0",
+          tileheight: 8,
+          tiles: [
+            {
+              class: "obstacle",
+              id: 2,
+              objectgroup: {
+                draworder: "index",
+                id: 2,
+                name: "",
+                objects: [
+                  {
+                    class: "",
+                    height: 0,
+                    id: 9,
+                    name: "",
+                    polygon: [
+                      {
+                        x: 0,
+                        y: 0,
+                      },
+                      {
+                        x: 4,
+                        y: 0,
+                      },
+                      {
+                        x: 4,
+                        y: 4,
+                      },
+                      {
+                        x: 0,
+                        y: 4,
+                      },
+                    ],
+                    rotation: 0,
+                    visible: true,
+                    width: 0,
+                    x: 0,
+                    y: 0,
+                  },
+                ],
+                opacity: 1,
+                type: "objectgroup",
+                visible: true,
+                x: 0,
+                y: 0,
+              },
+            },
+          ],
+          tilewidth: 8,
+          type: "tileset",
+          version: "1.8",
+        },
+      ],
+      tilewidth: 8,
+      type: "map",
+      version: "1.9",
+      width: 4,
+    };
+
+    const tileMap: EditableTileMap = TiledTileMapLoader.load(null, tiledMap);
+
+    it("can load flipped tiles", function () {
+      const layers = new Array(...tileMap.getLayers());
+      expect(layers.length).to.be(1);
+      const layer = layers[0] as EditableTileMapLayer;
+      expect(layer.id).to.be(1);
+      expect(layer.isVisible()).to.be(true);
+
+      expect(layer.get(0, 0)).to.be(2);
+      expect(layer.isFlippedVertically(0, 0)).to.be(false);
+      expect(layer.isFlippedHorizontally(0, 0)).to.be(false);
+      expect(layer.isFlippedDiagonally(0, 0)).to.be(false);
+
+      expect(layer.get(1, 0)).to.be(2);
+      expect(layer.isFlippedVertically(1, 0)).to.be(false);
+      expect(layer.isFlippedHorizontally(1, 0)).to.be(true);
+      expect(layer.isFlippedDiagonally(1, 0)).to.be(true);
+
+      expect(layer.get(1, 1)).to.be(2);
+      expect(layer.isFlippedVertically(1, 1)).to.be(true);
+      expect(layer.isFlippedHorizontally(1, 1)).to.be(true);
+      expect(layer.isFlippedDiagonally(1, 1)).to.be(false);
+
+      expect(layer.get(0, 1)).to.be(2);
+      expect(layer.isFlippedVertically(0, 1)).to.be(true);
+      expect(layer.isFlippedHorizontally(0, 1)).to.be(false);
+      expect(layer.isFlippedDiagonally(0, 1)).to.be(true);
+
+      expect(layer.get(2, 0)).to.be(2);
+      expect(layer.isFlippedVertically(2, 0)).to.be(false);
+      expect(layer.isFlippedHorizontally(2, 0)).to.be(false);
+      expect(layer.isFlippedDiagonally(2, 0)).to.be(true);
+
+      expect(layer.get(3, 0)).to.be(2);
+      expect(layer.isFlippedVertically(3, 0)).to.be(false);
+      expect(layer.isFlippedHorizontally(3, 0)).to.be(true);
+      expect(layer.isFlippedDiagonally(3, 0)).to.be(false);
+
+      expect(layer.get(3, 1)).to.be(2);
+      expect(layer.isFlippedVertically(3, 1)).to.be(true);
+      expect(layer.isFlippedHorizontally(3, 1)).to.be(true);
+      expect(layer.isFlippedDiagonally(3, 1)).to.be(true);
+
+      expect(layer.get(2, 1)).to.be(2);
+      expect(layer.isFlippedVertically(2, 1)).to.be(true);
+      expect(layer.isFlippedHorizontally(2, 1)).to.be(false);
+      expect(layer.isFlippedDiagonally(2, 1)).to.be(false);
+    });
+  });
 });

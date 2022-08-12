@@ -56,9 +56,8 @@ namespace gdjs {
       this._fillOpacity = objectData.content.fillOpacity;
       this._outlineOpacity = objectData.content.outlineOpacity;
       this._outlineSize = objectData.content.outlineSize;
-      this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
-        runtimeScene
-      );
+      this._tileMapManager =
+        gdjs.TileMap.TileMapRuntimeManager.getManager(runtimeScene);
 
       // The actual size is set when the tile map file is loaded.
       this._width = 0;
@@ -85,6 +84,14 @@ namespace gdjs {
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
+    }
+
+    updatePreRender(runtimeScene: gdjs.RuntimeScene) {
+      super.updatePreRender(runtimeScene);
+
+      if (this._debugMode && this.hitBoxesDirty) {
+        this.updateHitBoxes();
+      }
     }
 
     getRendererObject(): PIXI.Graphics {

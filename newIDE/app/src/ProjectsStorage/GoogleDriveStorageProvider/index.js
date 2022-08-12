@@ -276,7 +276,7 @@ const showFilePicker = ({
 export default ({
   internalName: 'GoogleDrive',
   name: t`Google Drive`,
-  renderIcon: () => <GoogleDrive />,
+  renderIcon: props => <GoogleDrive fontSize={props.size} />,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
     if (appArguments.state) {
       try {
@@ -388,7 +388,14 @@ export default ({
             fileMetadata: newFileMetadata,
           }));
       },
-      onSaveProjectAs: (project: gdProject, fileMetadata: ?FileMetadata) => {
+      onSaveProjectAs: (
+        project: gdProject,
+        fileMetadata: ?FileMetadata,
+        options?: {
+          context?: 'duplicateCurrentProject',
+          onStartSaving: () => void,
+        }
+      ) => {
         return new Promise(resolve => {
           setDialog(() => (
             <GoogleDriveSaveAsDialog
@@ -399,6 +406,8 @@ export default ({
               }}
               onSave={({ selectedFileOrFolder, newFileName }) => {
                 const content = serializeToJSON(project);
+
+                if (options && options.onStartSaving) options.onStartSaving();
 
                 if (selectedFileOrFolder.type === 'FOLDER') {
                   return authenticate().then(googleUser =>
@@ -448,7 +457,7 @@ export default ({
           return t`Google Drive could not be loaded. Check that you are not offline and have a proper internet connection, then try again.`;
         }
 
-        return t`Check that you don't have any blocked popup (if so, allow them and retry) and that you have the authorizations for reading the file you're trying to access.`;
+        return t`Check that you don't have any blocked popup (if so, allow them and retry) and that you have the authorization for reading the file you're trying to access.`;
       },
     };
   },

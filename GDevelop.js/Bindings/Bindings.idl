@@ -915,6 +915,8 @@ interface InitialInstance {
     void SetAngle(float angle);
     boolean IsLocked();
     void SetLocked(boolean lock);
+    boolean IsSealed();
+    void SetSealed(boolean seal);
     long GetZOrder();
     void SetZOrder(long zOrder);
     [Const, Ref] DOMString GetLayer();
@@ -1487,6 +1489,7 @@ interface BehaviorMetadata {
 
     [Ref] BehaviorMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] BehaviorMetadata AddIncludeFile([Const] DOMString includeFile);
+    [Ref] BehaviorMetadata AddRequiredFile([Const] DOMString resourceFile);
 
     [Ref] BehaviorMetadata SetObjectType([Const] DOMString objectType);
     [Const, Ref] DOMString GetObjectType();

@@ -4,7 +4,6 @@ import * as React from 'react';
 import { Column, Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import Chip from '../UI/Chip';
-import RaisedButton from '../UI/RaisedButton';
 import {
   type AssetShortHeader,
   type Asset,
@@ -13,11 +12,8 @@ import {
   getAsset,
   isPixelArt,
 } from '../Utils/GDevelopServices/Asset';
-import LeftLoader from '../UI/LeftLoader';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
-import { type ResourceSource } from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { AssetStoreContext } from './AssetStoreContext';
@@ -80,16 +76,8 @@ const makeFirstLetterUppercase = (str: string) =>
 
 type Props = {|
   project: gdProject,
-  objectsContainer: gdObjectsContainer,
-  resourceSources: Array<ResourceSource>,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
   onTagSelection: (tag: string) => void,
-
   assetShortHeader: AssetShortHeader,
-  onAdd: () => void,
-  onClose: () => void,
-  isAddedToScene: boolean,
-  isBeingAddedToScene: boolean,
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
 |};
 
@@ -107,19 +95,19 @@ const getObjectAssetResourcesByName = (
 
 export const AssetDetails = ({
   project,
-  objectsContainer,
-  resourceSources,
-  resourceExternalEditors,
   onTagSelection,
   assetShortHeader,
-  onAdd,
-  onClose,
-  isAddedToScene,
-  isBeingAddedToScene,
   onOpenDetails,
 }: Props) => {
   const gdevelopTheme = React.useContext(ThemeContext);
-  const { authors, licenses } = React.useContext(AssetStoreContext);
+  const {
+    authors,
+    licenses,
+    environment,
+    error: filterError,
+    fetchAssetsAndFilters,
+    useSearchItem,
+  } = React.useContext(AssetStoreContext);
   const [asset, setAsset] = React.useState<?Asset>(null);
   const [
     selectedAnimationName,
@@ -132,7 +120,9 @@ export const AssetDetails = ({
         try {
           // Reinitialise asset to trigger a loader and recalculate all parameters. (for instance zoom)
           setAsset(null);
-          const loadedAsset = await getAsset(assetShortHeader);
+          const loadedAsset = await getAsset(assetShortHeader, {
+            environment,
+          });
           setAsset(loadedAsset);
           if (loadedAsset.objectType === 'sprite') {
             // Only sprites have animations and we select the first one.
@@ -146,7 +136,7 @@ export const AssetDetails = ({
         }
       })();
     },
-    [assetShortHeader]
+    [assetShortHeader, environment]
   );
 
   const isImageResourceSmooth = React.useMemo(
@@ -159,14 +149,6 @@ export const AssetDetails = ({
       loadAsset();
     },
     [loadAsset]
-  );
-
-  const canAddAsset = !isBeingAddedToScene && !!asset;
-  const onAddAsset = React.useCallback(
-    () => {
-      if (canAddAsset) onAdd();
-    },
-    [onAdd, canAddAsset]
   );
 
   const assetAuthors: ?Array<Author> =
@@ -203,11 +185,6 @@ export const AssetDetails = ({
     () => [new SimilarAssetStoreSearchFilter(assetShortHeader)],
     [assetShortHeader]
   );
-  const {
-    error: filterError,
-    fetchAssetsAndFilters,
-    useSearchItem,
-  } = React.useContext(AssetStoreContext);
   const searchResults = useSearchItem('', null, null, similarAssetFilters);
   const truncatedSearchResults = searchResults && searchResults.slice(0, 60);
 
@@ -271,28 +248,6 @@ export const AssetDetails = ({
               </div>
             </Line>
           </Column>
-          <Column alignItems="center" justifyContent="center">
-            <LeftLoader
-              isLoading={isBeingAddedToScene || (!asset && !error)}
-              key="install"
-            >
-              <RaisedButton
-                primary={!isAddedToScene}
-                label={
-                  isBeingAddedToScene ? (
-                    <Trans>Adding...</Trans>
-                  ) : isAddedToScene ? (
-                    <Trans>Add again</Trans>
-                  ) : (
-                    <Trans>Add to the scene</Trans>
-                  )
-                }
-                onClick={onAddAsset}
-                disabled={!canAddAsset}
-                id="add-asset-button"
-              />
-            </LeftLoader>
-          </Column>
         </Line>
         <ResponsiveLineStackLayout noMargin>
           <Column>
@@ -318,8 +273,7 @@ export const AssetDetails = ({
                       fixedWidth={FIXED_WIDTH}
                     />
                   )}
-                {(asset.objectType === 'tiled' ||
-                  asset.objectType === '9patch') && (
+                {asset.objectType !== 'sprite' && (
                   <div style={styles.previewBackground}>
                     <CorsAwareImage
                       style={styles.previewImage}

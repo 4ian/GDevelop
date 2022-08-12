@@ -541,6 +541,9 @@ namespace gdjs {
                           if (progressCallback) progressCallback(percent);
                         })
                         .then(() => loadingScreen.unload())
+                        .then(() =>
+                          gdjs.getAllAsynchronouslyLoadingLibraryPromise()
+                        )
                         .then(() => {
                           callback();
                         });

@@ -1786,7 +1786,7 @@ module.exports = {
         'FirestoreHasDocument',
         _("Check for a document's existence"),
         _(
-          'Checks for the existence of a document. Sets the result variable to 1 if it exists else to 2.'
+          'Checks for the existence of a document. Sets the result variable to true if it exists else to false.'
         ),
         _(
           'Check for existence of _PARAM1_ in collection _PARAM0_ and store result in _PARAM2_ (store result state in _PARAM3_)'

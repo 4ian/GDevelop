@@ -16,7 +16,8 @@ import SearchBar, {
 } from '../../UI/SearchBar';
 import Lock from '@material-ui/icons/Lock';
 import LockOpen from '@material-ui/icons/LockOpen';
-const gd /*TODO: add flow in this file */ = global.gd;
+import NotInterested from '@material-ui/icons/NotInterested';
+const gd = global.gd;
 
 type State = {|
   searchText: string,
@@ -136,15 +137,34 @@ export default class InstancesList extends Component<Props, State> {
     }
   };
 
-  _renderLockCell = ({ rowData }: { rowData: RenderedRowInfo }) => {
+  _renderLockCell = ({
+    rowData: { instance },
+  }: {
+    rowData: RenderedRowInfo,
+  }) => {
     return (
       <IconButton
         size="small"
         onClick={() => {
-          rowData.instance.setLocked(!rowData.instance.isLocked());
+          if (instance.isSealed()) {
+            instance.setSealed(false);
+            instance.setLocked(false);
+            return;
+          }
+          if (instance.isLocked()) {
+            instance.setSealed(true);
+            return;
+          }
+          instance.setLocked(true);
         }}
       >
-        {rowData.instance.isLocked() ? <Lock /> : <LockOpen />}
+        {instance.isLocked() && instance.isSealed() ? (
+          <NotInterested />
+        ) : instance.isLocked() ? (
+          <Lock />
+        ) : (
+          <LockOpen />
+        )}
       </IconButton>
     );
   };

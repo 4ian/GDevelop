@@ -11,6 +11,7 @@
 #include "GDCore/IDE/DependenciesAnalyzer.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/Events/EventsBehaviorRenamer.h"
+#include "GDCore/IDE/Events/CustomObjectTypeRenamer.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/IDE/Events/ExpressionsParameterMover.h"
 #include "GDCore/IDE/Events/ExpressionsRenamer.h"
@@ -182,6 +183,18 @@ void WholeProjectRefactorer::ExposeProjectObjects(
   worker.Launch(project);
   for (size_t i = 0; i < project.GetLayoutsCount(); i++)
     worker.Launch(project.GetLayout(i));
+
+    for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
+       e++) {
+    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
+
+    for (auto& eventsBasedObjectUniquePtr :
+         eventsFunctionsExtension.GetEventsBasedObjects()
+             .GetInternalVector()) {
+      auto eventsBasedObject = eventsBasedObjectUniquePtr.get();
+      worker.Launch(*eventsBasedObject);
+    }
+  }
 };
 
 std::set<gd::String>
@@ -1280,6 +1293,12 @@ void WholeProjectRefactorer::DoRenameObject(
     gd::Project& project,
     const gd::String& oldObjectType,
     const gd::String& newObjectType) {
+  auto customObjectTypeRenamer = gd::CustomObjectTypeRenamer(
+          project,
+          oldObjectType,
+          newObjectType);
+  ExposeProjectObjects(project, customObjectTypeRenamer);
+
   auto renameObjectTypeInParameters =
       [&oldObjectType, &newObjectType](gd::EventsFunction& eventsFunction) {
         for (auto& parameter : eventsFunction.GetParameters()) {

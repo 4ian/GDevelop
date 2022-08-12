@@ -24,6 +24,7 @@ class ExternalEvents;
 class ResourcesManager;
 class ExternalLayout;
 class EventsFunctionsExtension;
+class EventsBasedObject;
 class Object;
 class VariablesContainer;
 class ArbitraryResourceWorker;
@@ -827,6 +828,17 @@ class GD_CORE_API Project : public ObjectsContainer {
    * \brief Remove all the events functions extensions.
    */
   void ClearEventsFunctionsExtensions();
+
+  /**
+   * \brief  Check if events based object with a given type exists.
+   */
+  bool HasEventsBasedObject(const gd::String& type) const;
+
+  /**
+   * \brief Return the events based object with a given type.
+   */
+  gd::EventsBasedObject& GetEventsBasedObject(const gd::String& type);
+
   ///@}
 
   /** \name Resources management

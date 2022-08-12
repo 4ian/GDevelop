@@ -73,6 +73,7 @@ declare class libGDevelop {
   gdObject: Class<gdObject>;
   UniquePtrObject: Class<gdUniquePtrObject>;
   ObjectJsImplementation: Class<gdObjectJsImplementation>;
+  CustomObject: Class<gdCustomObject>;
   Layout: Class<gdLayout>;
   ExternalEvents: Class<gdExternalEvents>;
   ExternalLayout: Class<gdExternalLayout>;

@@ -207,127 +207,13 @@ const getExtensionIconUrl = (extension: gdPlatformExtension) => {
   extension: gdPlatformExtension,
   eventsBasedObject: gdEventsBasedObject
 ): gdObjectMetadata => {
-  const generatedObject = new gd.ObjectJsImplementation();
-
-  // We enumerate the properties of the object from a list of gdNamedPropertyDescriptor
-  // to an array of JavaScript objects. This is important to ensure that the functions
-  // below are not keeping any reference to eventsBasedObject.
-  //
-  // We could in theory keep a reference to eventsBasedObject, and avoid using
-  // `enumerateNamedPropertyDescriptorsList` and `toGdPropertyDescriptor`.
-  // This should be safe as if eventsBasedObject is deleted (i.e: the object
-  // is removed from its extension), then the extension will be re-generated.
-  //
-  // In practice, we don't want to risk keeping this references, because if at some point
-  // we delete the eventsBasedObject and forget to remove the extension, then the
-  // extension will use a deleted object and crash the app. Instead, we convert the
-  // properties to an array of JavaScript objects, so that we're guaranteed that the
-  // lifetime of these properties is the same as the lifetime of these functions (i.e:
-  // we use the JS garbage collector).
-  const enumeratedProperties = enumerateNamedPropertyDescriptorsList(
-    eventsBasedObject.getPropertyDescriptors()
-  );
-
-  // $FlowExpectedError - we're creating an object
-  generatedObject.updateProperty = function(
-    objectContent: gdSerializerElement,
-    propertyName: string,
-    newValue: string
-  ) {
-    const enumeratedProperty = enumeratedProperties.find(
-      enumeratedProperty => enumeratedProperty.name === propertyName
-    );
-    if (!enumeratedProperty) return false;
-
-    const element = objectContent.addChild(propertyName);
-    const propertyType: string = enumeratedProperty.type;
-
-    if (
-      propertyType === 'String' ||
-      propertyType === 'Choice' ||
-      propertyType === 'Color'
-    ) {
-      element.setStringValue(newValue);
-    } else if (propertyType === 'Number') {
-      element.setDoubleValue(parseFloat(newValue));
-    } else if (propertyType === 'Boolean') {
-      element.setBoolValue(newValue === '1');
-    }
-
-    return true;
-  };
-
-  // $FlowExpectedError - we're creating an object
-  generatedObject.getProperties = function(objectContent) {
-    var objectProperties = new gd.MapStringPropertyDescriptor();
-
-    enumeratedProperties.forEach(enumeratedProperty => {
-      const propertyName = enumeratedProperty.name;
-      const propertyType = enumeratedProperty.type;
-      const newProperty = toGdPropertyDescriptor(
-        enumeratedProperty,
-        objectProperties.getOrCreate(propertyName)
-      );
-
-      if (objectContent.hasChild(propertyName)) {
-        if (
-          propertyType === 'String' ||
-          propertyType === 'Choice' ||
-          propertyType === 'Color'
-        ) {
-          newProperty.setValue(
-            objectContent.getChild(propertyName).getStringValue()
-          );
-        } else if (propertyType === 'Number') {
-          newProperty.setValue(
-            '' + objectContent.getChild(propertyName).getDoubleValue()
-          );
-        } else if (propertyType === 'Boolean') {
-          newProperty.setValue(
-            objectContent.getChild(propertyName).getBoolValue()
-              ? 'true'
-              : 'false'
-          );
-        }
-      } else {
-        // No value was serialized for this property. `newProperty`
-        // will have the default value coming from `enumeratedProperty`.
-      }
-    });
-
-    return objectProperties;
-  };
-
-  // $FlowExpectedError - we're creating an object
-  generatedObject.updateInitialInstanceProperty = function (
-    objectContent,
-    instance,
-    propertyName,
-    newValue,
-    project,
-    layout
-  ) {
-    return false;
-  };
-
-  // $FlowExpectedError - we're creating an object
-  generatedObject.getInitialInstanceProperties = function (
-    content,
-    instance,
-    project,
-    layout
-  ) {
-    var instanceProperties = new gd.MapStringPropertyDescriptor();
-    return instanceProperties;
-  };
-
   return extension
     .addObject(
       eventsBasedObject.getName(),
       eventsBasedObject.getFullName() || eventsBasedObject.getName(),
       eventsBasedObject.getDescription(),
       getExtensionIconUrl(extension),
-      generatedObject
+      new gd.CustomObject(eventsBasedObject)
     );
 };
 

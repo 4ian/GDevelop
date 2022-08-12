@@ -21,6 +21,7 @@ type Props = {|
   onChange: string => void,
   floatingLabelText?: React.Node,
   hintText?: MessageDescriptor,
+  helperMarkdownText?: ?string,
 |};
 
 const styles = {
@@ -39,6 +40,7 @@ const ResourceSelectorWithThumbnail = ({
   onChange,
   floatingLabelText,
   hintText,
+  helperMarkdownText,
 }: Props) => {
   return (
     <div style={styles.container}>
@@ -55,6 +57,7 @@ const ResourceSelectorWithThumbnail = ({
           onChange={onChange}
           floatingLabelText={floatingLabelText}
           hintText={hintText}
+          helperMarkdownText={helperMarkdownText}
         />
       </div>
       <ResourceThumbnail

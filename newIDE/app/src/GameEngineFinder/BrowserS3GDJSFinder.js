@@ -49,7 +49,7 @@ export const findGDJS = (
   // If you want to test your local changes to the game engine on the local web-app,
   // run `npx serve -- --cors` (or another CORS enabled http server on port 5000)
   // in `newIDE/app/resources/GDJS` and uncomment this line:
-  gdjsRoot = `http://localhost:53593`;
+  // gdjsRoot = `http://localhost:53593`;
 
   return Promise.all(
     filesToDownload[fileSet].map(relativeFilePath => {

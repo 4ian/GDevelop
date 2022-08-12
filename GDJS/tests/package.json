@@ -28,9 +28,10 @@
     "mocha": "^1.21.4"
   },
   "devDependencies": {
+    "@chiragrupani/karma-chromium-edge-launcher": "2.1.1",
     "karma": "^1.7.1",
     "karma-chrome-launcher": "^2.2.0",
-    "@chiragrupani/karma-chromium-edge-launcher": "2.1.1",
+    "karma-esbuild": "^2.2.4",
     "karma-firefox-launcher": "^1.1.0",
     "karma-mocha": "^1.3.0"
   }

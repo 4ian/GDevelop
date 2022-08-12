@@ -1,5 +1,5 @@
 import RenderedInstance from './RenderedInstance';
-import * as PIXI from 'pixi.js-legacy';
+import * as PIXI from '../../PIXI';
 
 /**
  * Create a renderer for an type of object displayed as an icon

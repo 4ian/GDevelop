@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   /**
    * The PIXI.js renderer for the Bitmap Text runtime object.
    */
@@ -53,7 +51,7 @@ namespace gdjs {
       this.updateTint();
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.BitmapText {
       return this._pixiObject;
     }
 

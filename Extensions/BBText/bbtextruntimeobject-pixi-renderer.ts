@@ -1,5 +1,3 @@
-declare var MultiStyleText: any;
-
 namespace gdjs {
   /**
    * The PIXI.js renderer for the BBCode Text runtime object.
@@ -20,7 +18,7 @@ namespace gdjs {
 
       // Load (or reset) the text
       if (this._pixiObject === undefined) {
-        this._pixiObject = new MultiStyleText(runtimeObject._text, {
+        this._pixiObject = new PIXI.MultiStyleText(runtimeObject._text, {
           default: {
             fontFamily: runtimeScene
               .getGame()

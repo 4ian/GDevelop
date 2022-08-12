@@ -2364,8 +2364,6 @@ const MainFrame = (props: Props) => {
               askToCloseProject();
             }}
             onExportProject={() => openExportDialog(true)}
-            onOpenPreferences={() => openPreferencesDialog(true)}
-            onOpenProfile={() => openProfileDialogWithTab('profile')}
             onOpenGamesDashboard={() =>
               openProfileDialogWithTab('games-dashboard')
             }
@@ -2488,6 +2486,8 @@ const MainFrame = (props: Props) => {
                     onOpenProfile: () => openProfileDialogWithTab('profile'),
                     onOpenHelpFinder: () => openHelpFinderDialog(true),
                     onOpenLanguageDialog: () => openLanguageDialog(true),
+                    onOpenPreferences: () => openPreferencesDialog(true),
+                    onOpenAbout: () => openAboutDialog(true),
                     onOpenOnboardingDialog: () => openOnboardingDialog(true),
                     onLoadEventsFunctionsExtensions: () =>
                       eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(

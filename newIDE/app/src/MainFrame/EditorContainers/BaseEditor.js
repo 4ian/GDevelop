@@ -83,6 +83,8 @@ export type RenderEditorContainerProps = {|
   onOpenOnboardingDialog: () => void,
   onChangeSubscription: () => void,
   onOpenProfile: () => void,
+  onOpenPreferences: () => void,
+  onOpenAbout: () => void,
 
   // Resources handling
   onDeleteResource: (resource: gdResource, cb: (boolean) => void) => void,

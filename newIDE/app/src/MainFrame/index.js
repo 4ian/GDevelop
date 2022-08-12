@@ -69,9 +69,9 @@ import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEd
 import { type JsExtensionsLoader } from '../JsExtensionsLoader';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import {
-  getUpdateNotificationTitle,
-  getUpdateNotificationBody,
-  type UpdateStatus,
+  getElectronUpdateNotificationTitle,
+  getElectronUpdateNotificationBody,
+  type ElectronUpdateStatus,
 } from './UpdaterTools';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -200,7 +200,7 @@ export type State = {|
   editorTabs: EditorTabsState,
   snackMessage: string,
   snackMessageOpen: boolean,
-  updateStatus: UpdateStatus,
+  updateStatus: ElectronUpdateStatus,
   openFromStorageProviderDialogOpen: boolean,
   saveToStorageProviderDialogOpen: boolean,
   eventsFunctionsExtensionsError: ?Error,
@@ -2134,11 +2134,11 @@ const MainFrame = (props: Props) => {
     });
   };
 
-  const setUpdateStatus = (updateStatus: UpdateStatus) => {
+  const setElectronUpdateStatus = (updateStatus: ElectronUpdateStatus) => {
     setState(state => ({ ...state, updateStatus }));
 
-    const notificationTitle = getUpdateNotificationTitle(updateStatus);
-    const notificationBody = getUpdateNotificationBody(updateStatus);
+    const notificationTitle = getElectronUpdateNotificationTitle(updateStatus);
+    const notificationBody = getElectronUpdateNotificationBody(updateStatus);
     if (notificationTitle) {
       const notification = new window.Notification(notificationTitle, {
         body: notificationBody,
@@ -2223,7 +2223,7 @@ const MainFrame = (props: Props) => {
   };
 
   const simulateUpdateDownloaded = () =>
-    setUpdateStatus({
+    setElectronUpdateStatus({
       status: 'update-downloaded',
       message: 'update-downloaded',
       info: {
@@ -2232,7 +2232,7 @@ const MainFrame = (props: Props) => {
     });
 
   const simulateUpdateAvailable = () =>
-    setUpdateStatus({
+    setElectronUpdateStatus({
       status: 'update-available',
       message: 'Update available',
     });
@@ -2315,7 +2315,7 @@ const MainFrame = (props: Props) => {
           onOpenProfile: () => openProfileDialogWithTab('profile'),
           onOpenGamesDashboard: () =>
             openProfileDialogWithTab('games-dashboard'),
-          setUpdateStatus: setUpdateStatus,
+          setElectronUpdateStatus: setElectronUpdateStatus,
           recentProjectFiles: preferences.getRecentProjectFiles(),
         })}
       <ProjectTitlebar

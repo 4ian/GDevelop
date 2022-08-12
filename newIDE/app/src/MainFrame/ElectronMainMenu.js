@@ -357,7 +357,7 @@ const ElectronMainMenu = (props: MainMenuProps) => {
     'main-menu-open-games-dashboard',
     props.onOpenGamesDashboard
   );
-  useIPCEventListener('update-status', props.setUpdateStatus);
+  useIPCEventListener('update-status', props.setElectronUpdateStatus);
 
   React.useEffect(
     () => {

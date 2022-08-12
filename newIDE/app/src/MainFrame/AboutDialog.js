@@ -17,7 +17,12 @@ import {
   type UpdateStatus,
 } from './UpdaterTools';
 import Changelog from './Changelog';
-import { getIDEVersion, getGDCoreVersion } from '../Version';
+import {
+  getIDEVersion,
+  getGDCoreVersion,
+  getIDEVersionWithHash,
+} from '../Version';
+import { ColumnStackLayout } from '../UI/Layout';
 
 type Props = {
   open: boolean,
@@ -302,19 +307,24 @@ export default class AboutDialog extends PureComponent<Props, State> {
               </Tabs>
               {currentTab === 'about' && (
                 <React.Fragment>
-                  <Column>
-                    <Line>
+                  <Line>
+                    <ColumnStackLayout>
                       <Text>
                         <Trans>
-                          GDevelop {getIDEVersion()} based on GDevelop.js{' '}
-                          {getGDCoreVersion()}
+                          GDevelop is a full-featured, open-source game engine.
+                          Build and publish games for any mobile, desktop or web
+                          game store. It's super fast, easy to learn and powered
+                          by a community making it better every day.
                         </Trans>
                       </Text>
-                    </Line>
-                    <Line>
+                      <Text allowSelection>
+                        <Trans>
+                          You're using GDevelop {getIDEVersion()} (Editor full
+                          version: {getIDEVersionWithHash()}, core version:{' '}
+                          {getGDCoreVersion()}).
+                        </Trans>
+                      </Text>
                       <Text>{updateStatusString}</Text>
-                    </Line>
-                    <Line justifyContent="center">
                       {!!updateStatusString && (
                         <FlatButton
                           label={updateButtonLabel}
@@ -323,8 +333,8 @@ export default class AboutDialog extends PureComponent<Props, State> {
                           }
                         />
                       )}
-                    </Line>
-                  </Column>
+                    </ColumnStackLayout>
+                  </Line>
                 </React.Fragment>
               )}
               {currentTab === 'changelog' && (

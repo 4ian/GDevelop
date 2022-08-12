@@ -47,6 +47,8 @@ type Props = {|
   onOpenProfile: () => void,
   onOpenOnboardingDialog: () => void,
   onChangeSubscription: () => void,
+  onOpenPreferences: () => void,
+  onOpenAbout: () => void,
 
   // Project creation
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
@@ -79,6 +81,8 @@ export const HomePage = React.memo<Props>(
         setToolbar,
         onOpenOnboardingDialog,
         onChangeSubscription,
+        onOpenPreferences,
+        onOpenAbout,
         isActive,
         storageProviders,
       }: Props,
@@ -168,6 +172,8 @@ export const HomePage = React.memo<Props>(
                   <HomePageMenu
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
+                    onOpenPreferences={onOpenPreferences}
+                    onOpenAbout={onOpenAbout}
                   />
                   {activeTab === 'get-started' && (
                     <GetStartedSection
@@ -235,6 +241,8 @@ export const renderHomePageContainer = (
     onOpenProfile={props.onOpenProfile}
     onOpenOnboardingDialog={props.onOpenOnboardingDialog}
     onChangeSubscription={props.onChangeSubscription}
+    onOpenPreferences={props.onOpenPreferences}
+    onOpenAbout={props.onOpenAbout}
     storageProviders={
       (props.extraEditorProps && props.extraEditorProps.storageProviders) || []
     }

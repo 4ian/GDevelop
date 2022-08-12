@@ -65,8 +65,6 @@ namespace gdjs {
           endsWith(srcFilename, 'shifty.js') ||
           // Don't reload shopify-buy library.
           endsWith(srcFilename, 'shopify-buy.umd.polyfilled.min.js') ||
-          // Don't reload pixi-multistyle-text library.
-          endsWith(srcFilename, 'pixi-multistyle-text.umd.js') ||
           // Don't reload pixi-tilemap library.
           endsWith(srcFilename, 'pixi-tilemap.umd.js') ||
           // Don't reload bondage.js library.

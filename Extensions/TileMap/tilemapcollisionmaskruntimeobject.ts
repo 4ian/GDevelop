@@ -1,4 +1,3 @@
-/// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
   const logger = new gdjs.Logger('Tilemap object');
 
@@ -57,9 +56,8 @@ namespace gdjs {
       this._fillOpacity = objectData.content.fillOpacity;
       this._outlineOpacity = objectData.content.outlineOpacity;
       this._outlineSize = objectData.content.outlineSize;
-      this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
-        runtimeScene
-      );
+      this._tileMapManager =
+        gdjs.TileMap.TileMapRuntimeManager.getManager(runtimeScene);
 
       // The actual size is set when the tile map file is loaded.
       this._width = 0;
@@ -96,7 +94,7 @@ namespace gdjs {
       }
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.Graphics {
       return this._renderer.getRendererObject();
     }
 

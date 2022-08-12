@@ -1,4 +1,3 @@
-/// <reference path="../helper/TileMapHelper.d.ts" />
 namespace gdjs {
   export namespace TileMap {
     /**

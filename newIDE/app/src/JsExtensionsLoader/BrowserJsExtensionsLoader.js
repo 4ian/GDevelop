@@ -99,10 +99,7 @@ const jsExtensions = [
     name: 'BBText',
     // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/BBText/JsExtension.js'),
-    objectsRenderingServiceModules: {
-      // $FlowExpectedError - this path is ignored for Flow.
-      'pixi-multistyle-text/dist/pixi-multistyle-text.umd': require('GDJS-for-web-app-only/Runtime/Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd'),
-    },
+    objectsRenderingServiceModules: {},
   },
   {
     name: 'TileMap',
@@ -110,11 +107,7 @@ const jsExtensions = [
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/JsExtension.js'),
     objectsRenderingServiceModules: {
       // $FlowExpectedError - this path is ignored for Flow.
-      'pixi-tilemap/dist/pixi-tilemap.umd': require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd'),
-      // $FlowExpectedError - this path is ignored for Flow.
       'helper/TileMapHelper': require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/helper/TileMapHelper.js'),
-      // $FlowExpectedError - this path is ignored for Flow.
-      'pako/dist/pako.min': require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/pako/dist/pako.min'),
     },
   },
   {

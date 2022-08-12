@@ -165,9 +165,6 @@ module.exports = {
       )
       .setIncludeFile('Extensions/BBText/bbtextruntimeobject.js')
       .addIncludeFile('Extensions/BBText/bbtextruntimeobject-pixi-renderer.js')
-      .addIncludeFile(
-        'Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd.js'
-      )
       .setCategoryFullName(_('Texts'));
 
     /**
@@ -438,10 +435,7 @@ module.exports = {
   ) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
-    const MultiStyleText = objectsRenderingService.requireModule(
-      __dirname,
-      'pixi-multistyle-text/dist/pixi-multistyle-text.umd'
-    );
+    const { MultiStyleText } = PIXI;
 
     /**
      * Renderer for instances of BBText inside the IDE.

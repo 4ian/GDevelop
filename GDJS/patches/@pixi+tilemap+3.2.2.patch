@@ -1,0 +1,12 @@
+diff --git a/node_modules/@pixi/tilemap/index.d.ts b/node_modules/@pixi/tilemap/index.d.ts
+index 3bfbe47..3f4d888 100644
+--- a/node_modules/@pixi/tilemap/index.d.ts
++++ b/node_modules/@pixi/tilemap/index.d.ts
+@@ -51,7 +51,6 @@ declare class CompositeTilemap extends Container {
+         animDivisor?: number;
+         alpha?: number;
+     }): this;
+-    renderCanvas(renderer: any): void;
+     render(renderer: Renderer): void;
+     isModified(anim: boolean): boolean;
+     clearModify(): void;

@@ -1,5 +1,5 @@
 // @flow
-import * as PIXI from 'pixi.js-legacy';
+import * as PIXI from '../PIXI';
 import transformRect from '../Utils/TransformRect';
 import ViewPosition from './ViewPosition';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';

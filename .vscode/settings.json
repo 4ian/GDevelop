@@ -127,5 +127,6 @@
     "flow.useNPMPackagedFlow": true,
 
     // Clang format styling (duplicated in scripts/CMakeClangUtils.txt)
-    "C_Cpp.clang_format_style": "{BasedOnStyle: Google, BinPackParameters: false, BinPackArguments: false}"
+    "C_Cpp.clang_format_style": "{BasedOnStyle: Google, BinPackParameters: false, BinPackArguments: false}",
+    "task.allowAutomaticTasks": true
 }

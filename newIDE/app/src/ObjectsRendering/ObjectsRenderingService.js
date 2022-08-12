@@ -10,7 +10,7 @@ import RenderedParticleEmitterInstance from './Renderers/RenderedParticleEmitter
 import PixiResourcesLoader from './PixiResourcesLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import RenderedInstance from './Renderers/RenderedInstance';
-import * as PIXI from 'pixi.js-legacy';
+import * as PIXI from '../PIXI';
 import optionalRequire from '../Utils/OptionalRequire';
 import { rgbOrHexToHexNumber } from '../Utils/ColorTransformer';
 const path = optionalRequire('path');
@@ -21,9 +21,6 @@ const gd: libGDevelop = global.gd;
 // or still require a global PIXI object to be accessible, so we expose PIXI here.
 // This can be removed if no more extension PixiJS plugin requires this.
 global.PIXI = PIXI;
-// We also export it as GlobalPIXIModule, which is normally used in GDJS runtime and extensions
-// to allow TypeScript typings of PIXI to work.
-global.GlobalPIXIModule = { PIXI };
 
 const requirableModules = {};
 
@@ -144,7 +141,7 @@ const ObjectsRenderingService = {
 
       // Allow pixi.js to be required by extensions:
       const allowedModules = {
-        'pixi.js-legacy': PIXI,
+        '../PIXI': PIXI,
         'pixi.js': PIXI,
         '@pixi/core': PIXI,
         '@pixi/display': PIXI,

@@ -62,11 +62,22 @@ class GD_CORE_API WholeProjectRefactorer {
    * \brief Call the specified worker on all events of the events based behavior
    *
    * This should be the preferred way to traverse all the events of an events
-   * based behavior
+   * based behavior.
    */
   static void ExposeEventsBasedBehaviorEvents(
       gd::Project& project,
       const gd::EventsBasedBehavior& eventsBasedBehavior,
+      gd::ArbitraryEventsWorkerWithContext& worker);
+
+  /**
+   * \brief Call the specified worker on all events of the events based object
+   *
+   * This should be the preferred way to traverse all the events of an events
+   * based object.
+   */
+  static void ExposeEventsBasedObjectEvents(
+      gd::Project& project,
+      const gd::EventsBasedObject& eventsBasedObject,
       gd::ArbitraryEventsWorkerWithContext& worker);
 
   /**

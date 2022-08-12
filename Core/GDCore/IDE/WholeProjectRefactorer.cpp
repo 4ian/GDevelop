@@ -109,6 +109,17 @@ void WholeProjectRefactorer::ExposeProjectEvents(
         worker.Launch(eventsFunction->GetEvents());
       }
     }
+
+    // Add (object) events functions
+    for (auto&& eventsBasedObject :
+         eventsFunctionsExtension.GetEventsBasedObjects()
+             .GetInternalVector()) {
+      auto& objectEventsFunctions = eventsBasedObject->GetEventsFunctions();
+      for (auto&& eventsFunction :
+           objectEventsFunctions.GetInternalVector()) {
+        worker.Launch(eventsFunction->GetEvents());
+      }
+    }
   }
 }
 
@@ -155,6 +166,13 @@ void WholeProjectRefactorer::ExposeProjectEvents(
              .GetInternalVector()) {
       ExposeEventsBasedBehaviorEvents(project, *eventsBasedBehavior, worker);
     }
+
+    // Add (object) events functions
+    for (auto&& eventsBasedObject :
+         eventsFunctionsExtension.GetEventsBasedObjects()
+             .GetInternalVector()) {
+      ExposeEventsBasedObjectEvents(project, *eventsBasedObject, worker);
+    }
   }
 }
 
@@ -178,19 +196,40 @@ void WholeProjectRefactorer::ExposeEventsBasedBehaviorEvents(
   }
 }
 
+void WholeProjectRefactorer::ExposeEventsBasedObjectEvents(
+    gd::Project& project,
+    const gd::EventsBasedObject& eventsBasedObject,
+    gd::ArbitraryEventsWorkerWithContext& worker) {
+  auto& objectEventsFunctions = eventsBasedObject.GetEventsFunctions();
+  for (auto&& eventsFunction : objectEventsFunctions.GetInternalVector()) {
+    gd::ObjectsContainer globalObjectsAndGroups;
+    gd::ObjectsContainer objectsAndGroups;
+    gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
+        project,
+        eventsBasedObject,
+        *eventsFunction,
+        globalObjectsAndGroups,
+        objectsAndGroups);
+
+    worker.Launch(
+        eventsFunction->GetEvents(), globalObjectsAndGroups, objectsAndGroups);
+  }
+}
+
 void WholeProjectRefactorer::ExposeProjectObjects(
     gd::Project& project, gd::ArbitraryObjectsWorker& worker) {
   worker.Launch(project);
-  for (size_t i = 0; i < project.GetLayoutsCount(); i++)
+  for (size_t i = 0; i < project.GetLayoutsCount(); i++) {
     worker.Launch(project.GetLayout(i));
+  }
 
-    for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
-       e++) {
+  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
+      e++) {
     auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
 
-    for (auto& eventsBasedObjectUniquePtr :
-         eventsFunctionsExtension.GetEventsBasedObjects()
-             .GetInternalVector()) {
+    for (auto&& eventsBasedObjectUniquePtr :
+        eventsFunctionsExtension.GetEventsBasedObjects()
+            .GetInternalVector()) {
       auto eventsBasedObject = eventsBasedObjectUniquePtr.get();
       worker.Launch(*eventsBasedObject);
     }

@@ -33,13 +33,11 @@ import Flag from '@material-ui/icons/Flag';
 import Close from '@material-ui/icons/Close';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
 import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
-import Settings from '@material-ui/icons/Settings';
 import Save from '@material-ui/icons/Save';
 import VariableTree from '../UI/CustomSvgIcons/VariableTree';
 import ArtTrack from '@material-ui/icons/ArtTrack';
 import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
 import FileCopy from '@material-ui/icons/FileCopy';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import TimelineIcon from '@material-ui/icons/Timeline';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
@@ -101,8 +99,6 @@ type Props = {|
   onSaveProjectAs: () => void,
   onCloseProject: () => void,
   onExportProject: () => void,
-  onOpenPreferences: () => void,
-  onOpenProfile: () => void,
   onOpenGamesDashboard: () => void,
   onOpenResources: () => void,
   onOpenPlatformSpecificAssets: () => void,
@@ -607,18 +603,6 @@ export default class ProjectManager extends React.Component<Props, State> {
           primaryText={<Trans>Close</Trans>}
           leftIcon={<Close />}
           onClick={() => this.props.onCloseProject()}
-        />
-        <ListItem
-          key="preferences"
-          primaryText={<Trans>Preferences</Trans>}
-          leftIcon={<Settings />}
-          onClick={() => this.props.onOpenPreferences()}
-        />
-        <ListItem
-          key="profile"
-          primaryText={<Trans>My profile</Trans>}
-          leftIcon={<AccountCircle />}
-          onClick={() => this.props.onOpenProfile()}
         />
         <ListItem
           key="games-dashboard"

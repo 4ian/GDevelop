@@ -103,6 +103,8 @@ const WrappedHomePage = ({
                 onOpenProfile={() => action('open profile')()}
                 onCreateBlank={() => action('create blank')()}
                 onChangeSubscription={() => action('change subscription')()}
+                onOpenPreferences={() => action('open preferences')()}
+                onOpenAbout={() => action('open about')()}
               />
             </GamesShowcaseStateProvider>
           </TutorialStateProvider>

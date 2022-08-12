@@ -200,7 +200,6 @@ import {
   ExamplesAccordion,
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
-import CloudDownload from '@material-ui/icons/CloudDownload';
 
 configureActions({
   depth: 2,
@@ -3806,8 +3805,6 @@ storiesOf('ProjectManager', module)
       onSaveProjectAs={action('onSaveProjectAs')}
       onCloseProject={action('onCloseProject')}
       onExportProject={action('onExportProject')}
-      onOpenPreferences={action('onOpenPreferences')}
-      onOpenProfile={action('onOpenProfile')}
       onOpenGamesDashboard={action('onOpenGamesDashboard')}
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
@@ -3849,8 +3846,6 @@ storiesOf('ProjectManager', module)
       onSaveProjectAs={action('onSaveProjectAs')}
       onCloseProject={action('onCloseProject')}
       onExportProject={action('onExportProject')}
-      onOpenPreferences={action('onOpenPreferences')}
-      onOpenProfile={action('onOpenProfile')}
       onOpenGamesDashboard={action('onOpenGamesDashboard')}
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}

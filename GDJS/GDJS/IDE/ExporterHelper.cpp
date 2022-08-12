@@ -277,6 +277,18 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
                                   : "";
     }
 
+    // Splashscreen icon for Android 12+.
+    gd::String splashScreenIconFilename = getIconFilename("android", "windowSplashScreenAnimatedIcon");
+    if (!splashScreenIconFilename.empty())
+      output += "<preference name=\"AndroidWindowSplashScreenAnimatedIcon\" value=\""
+        + splashScreenIconFilename + "\" />\n";
+
+    // Splashscreen "branding" image for Android 12+.
+    gd::String splashScreenBrandingImageFilename = getIconFilename("android", "windowSplashScreenBrandingImage");
+    if (!splashScreenBrandingImageFilename.empty())
+      output += "<preference name=\"AndroidWindowSplashScreenBrandingImage\" value=\""
+        + splashScreenBrandingImageFilename + "\" />\n";
+
     return output;
   };
 

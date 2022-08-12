@@ -135,6 +135,18 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   _objectsContainer: ?gdObjectsContainer;
 
   componentDidMount() {
+    // Create an empty "context" of objects.
+    // Avoid recreating containers if they were already created, so that
+    // we keep the same objects in memory and avoid remounting components
+    // (like ObjectGroupsList) because objects "ptr" changed.
+    if (!this._globalObjectsContainer) {
+      this._globalObjectsContainer = new gd.ObjectsContainer();
+    }
+
+    if (!this._objectsContainer) {
+      this._objectsContainer = new gd.ObjectsContainer();
+    }
+
     if (this.props.initiallyFocusedFunctionName) {
       this.selectEventsFunctionByName(
         this.props.initiallyFocusedFunctionName,
@@ -154,18 +166,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject
   ) => {
-    // Create an empty "context" of objects.
-    // Avoid recreating containers if they were already created, so that
-    // we keep the same objects in memory and avoid remounting components
-    // (like ObjectGroupsList) because objects "ptr" changed.
-    if (!this._globalObjectsContainer) {
-      this._globalObjectsContainer = new gd.ObjectsContainer();
-    }
-
-    if (!this._objectsContainer) {
-      this._objectsContainer = new gd.ObjectsContainer();
-    }
-
     // Initialize this "context" of objects with the function
     // (as done during code generation).
     if (eventsBasedBehavior) {
@@ -831,11 +831,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         // are up-to-date in all event functions of the behavior (the object
         // type might have changed).
         if (state.editedEventsBasedObject && !editedEventsBasedObject) {
-          // TODO EBO
-          // gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
-          //   this.props.eventsFunctionsExtension,
-          //   state.editedEventsBasedObject
-          // );
+          gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+            this.props.eventsFunctionsExtension,
+            state.editedEventsBasedObject
+          );
         }
 
         return {

@@ -3,10 +3,7 @@ import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { t } from '@lingui/macro';
-import {
-  type StorageProvider,
-  type FileMetadata,
-} from '../ProjectsStorage';
+import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 
 const gd: libGDevelop = global.gd;
 

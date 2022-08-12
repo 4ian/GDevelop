@@ -19,10 +19,7 @@ import AlertMessage from '../UI/AlertMessage';
 import { uploadProjectResourceFiles } from '../Utils/GDevelopServices/Project';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { showErrorBox } from '../UI/Messages/MessageBox';
-import {
-  type StorageProvider,
-  type FileMetadata,
-} from '../ProjectsStorage';
+import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 
 type ResourceStoreChooserProps = {
   options: ChooseResourceOptions,
@@ -194,7 +191,9 @@ export const LocalFileToCloudProjectResourceUploader = ({
   const inputRef = React.useRef<?HTMLInputElement>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [isUploading, setIsUploading] = React.useState(false);
-  const storageProvider = React.useMemo(getStorageProvider, [getStorageProvider]);
+  const storageProvider = React.useMemo(getStorageProvider, [
+    getStorageProvider,
+  ]);
   const cloudProjectId = fileMetadata.fileIdentifier;
   const onUpload = React.useCallback(
     async () => {
@@ -242,7 +241,10 @@ export const LocalFileToCloudProjectResourceUploader = ({
     [authenticatedUser, onChooseResources, createNewResource, cloudProjectId]
   );
 
-  const canUploadResources = !isUploading && !!authenticatedUser.profile && storageProvider.internalName === 'Cloud';
+  const canUploadResources =
+    !isUploading &&
+    !!authenticatedUser.profile &&
+    storageProvider.internalName === 'Cloud';
   // TODO: Show a specific message when not authenticated
   // TODO: Show a specific message storage provider is not cloud.
 

@@ -16,10 +16,7 @@ import Text from '../UI/Text';
 import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import Window from '../Utils/Window';
 import optionalRequire from '../Utils/OptionalRequire';
-import {
-  type StorageProvider,
-  type FileMetadata,
-} from '../ProjectsStorage';
+import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 
 const electron = optionalRequire('electron');
 

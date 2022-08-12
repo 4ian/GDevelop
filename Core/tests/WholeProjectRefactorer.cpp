@@ -290,6 +290,174 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
     }
   }
 
+  // Add a events based object
+  {
+    auto &eventsBasedObject =
+        eventsExtension.GetEventsBasedObjects().InsertNew(
+            "MyEventsBasedObject", 0);
+    eventsBasedObject.SetFullName("My events based object");
+    eventsBasedObject.SetDescription("An events based object for test");
+
+    // Add functions, and parameters that should be there by convention.
+    auto &objectEventsFunctions = eventsBasedObject.GetEventsFunctions();
+    auto &objectAction = objectEventsFunctions.InsertNewEventsFunction(
+        "MyObjectEventsFunction", 0);
+    objectAction.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("Object")
+            .SetType("object")
+            .SetExtraInfo("MyExtension::MyEventsBasedObject"));
+
+    auto &objectExpression =
+        objectEventsFunctions
+            .InsertNewEventsFunction("MyObjectEventsFunctionExpression", 1)
+            .SetFunctionType(gd::EventsFunction::Expression);
+    objectExpression.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("Object")
+            .SetType("object")
+            .SetExtraInfo("MyExtension::MyEventsBasedObject"));
+
+    // Add property
+    eventsBasedObject.GetPropertyDescriptors()
+        .InsertNew("MyProperty", 0)
+        .SetType("Number");
+  }
+
+  // Add some usage in events
+  {
+    auto &layout = project.InsertNewLayout("LayoutWithObjectFunctions", 0);
+    auto &externalEvents = project.InsertNewExternalEvents(
+        "ExternalEventsWithObjectFunctions", 0);
+    externalEvents.SetAssociatedLayout("LayoutWithObjectFunctions");
+
+    auto &object = layout.InsertNewObject(
+        project, "MyExtension::MyEventsBasedObject", "MyCustomObject", 0);
+
+    auto &globalObject = project.InsertNewObject(
+        project, "MyExtension::MyEventsBasedObject", "GlobalMyCustomObject", 0);
+
+    // Create an event in the layout referring to
+    // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunction
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType(
+          "MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunction");
+      instruction.SetParametersCount(3);
+      instruction.SetParameter(0, gd::Expression("First parameter"));
+      instruction.SetParameter(1, gd::Expression("Second parameter"));
+      instruction.SetParameter(2, gd::Expression("Third parameter"));
+      event.GetActions().Insert(instruction);
+      layout.GetEvents().InsertEvent(event);
+    }
+
+    // Create an event in the layout using "MyProperty" action
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType(
+          "MyEventsExtension::MyEventsBasedObject::" +
+          gd::EventsBasedObject::GetPropertyActionName("MyProperty"));
+      event.GetActions().Insert(instruction);
+      layout.GetEvents().InsertEvent(event);
+    }
+
+    // Create an event in the layout using "MyProperty" condition
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType(
+          "MyEventsExtension::MyEventsBasedObject::" +
+          gd::EventsBasedObject::GetPropertyConditionName("MyProperty"));
+      event.GetConditions().Insert(instruction);
+      layout.GetEvents().InsertEvent(event);
+    }
+
+    // Create an event in the layout using "MyProperty" expression
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0,
+          gd::Expression(
+              "MyCustomObject." +
+              gd::EventsBasedObject::GetPropertyExpressionName("MyProperty") +
+              "()"));
+      event.GetActions().Insert(instruction);
+      layout.GetEvents().InsertEvent(event);
+    }
+
+    // Create an event in ExternalEvents1 referring to
+    // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunctionExpression
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0,
+          gd::Expression("1 + "
+                         "MyCustomObject."
+                         "MyObjectEventsFunctionExpression(123, 456, 789)"));
+      event.GetActions().Insert(instruction);
+      externalEvents.GetEvents().InsertEvent(event);
+    }
+
+    // Create an event in ExternalEvents1 **wrongly** referring to
+    // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunctionExpression
+    // (it's ill-named).
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0,
+          gd::Expression("2 + "
+                         "MyCustomObject::"
+                         "MyObjectEventsFunctionExpression(123, 456, 789)"));
+      event.GetActions().Insert(instruction);
+      externalEvents.GetEvents().InsertEvent(event);
+    }
+
+    // Create an event in ExternalEvents1 referring to
+    // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunctionExpression
+    // function name without calling the function.
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0,
+          gd::Expression("3 + "
+                         "MyCustomObject."
+                         "MyObjectEventsFunctionExpression"));
+      event.GetActions().Insert(instruction);
+      externalEvents.GetEvents().InsertEvent(event);
+    }
+
+    // Create an event in ExternalEvents1 **wrongly** referring to
+    // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunctionExpression
+    // function name without calling the function (it's ill-named).
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0,
+          gd::Expression("4 + "
+                         "MyCustomObject::"
+                         "MyObjectEventsFunctionExpression"));
+      event.GetActions().Insert(instruction);
+      externalEvents.GetEvents().InsertEvent(event);
+    }
+  }
+
   return eventsExtension;
 }
 }  // namespace

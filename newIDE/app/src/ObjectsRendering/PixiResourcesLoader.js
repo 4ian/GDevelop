@@ -11,6 +11,7 @@ const loadedFontFamilies = {};
 const loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
 
+// TODO: factor (find the right place for it and comment it)
 const determineCrossOrigin = (url: string) => {
   // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
   // i.e: its gdevelop.io cookie, to be passed.

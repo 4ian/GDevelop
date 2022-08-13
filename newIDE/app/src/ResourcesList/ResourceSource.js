@@ -84,7 +84,7 @@ export type ResourceSourceComponentProps = {|
 export type ResourceSource = {
   name: string,
   displayName: MessageDescriptor,
-  displayTab: 'standalone' | 'import',
+  displayTab: 'standalone' | 'import' | 'import-advanced',
   kind: ResourceKind,
   selectResourcesHeadless?: ?(
     ChooseResourceProps

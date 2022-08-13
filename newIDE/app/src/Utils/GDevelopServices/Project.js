@@ -6,8 +6,10 @@ import {
 } from './ApiConfigs';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import PromisePool from '@supercharge/promise-pool';
+import { getFileSha512TruncatedTo256 } from '../FileHasher';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
+export const PROJECT_RESOURCE_MAX_SIZE_IN_BYTES = 15 * 1024 * 1024;
 
 const projectResourcesClient = axios.create({
   baseURL: GDevelopProjectResourcesStorage.baseUrl,
@@ -26,7 +28,14 @@ const projectResourcesCredentialsApiClient = axios.create({
 type ResourceFileWithUploadPresignedUrl = {|
   resourceFile: File,
   presignedUrl: string,
+  index: number,
 |};
+
+export type UploadedProjectResourceFiles = Array<{|
+  error: ?Error,
+  resourceFile: File,
+  url: ?string,
+|}>;
 
 type CloudProject = {|
   id: string,
@@ -162,10 +171,7 @@ export const uploadProjectResourceFiles = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
   resourceFiles: File[]
-): Promise<{|
-  urls: Array<string>,
-  errors: Array<{ error: Error, resourceFile: File }>,
-|}> => {
+): Promise<UploadedProjectResourceFiles> => {
   // Get the pre-signed urls where to upload the files.
   const resourceFileWithPresignedUrls = await getPresignedUrlForResourcesUpload(
     authenticatedUser,
@@ -174,8 +180,7 @@ export const uploadProjectResourceFiles = async (
   );
 
   // Upload the files.
-  const urls = [];
-  const errors = [];
+  const results = [];
   await PromisePool.withConcurrency(1)
     .for(resourceFileWithPresignedUrls)
     .process(async ({ resourceFile, presignedUrl }) => {
@@ -188,13 +193,24 @@ export const uploadProjectResourceFiles = async (
               headers: { 'content-type': resourceFile.type },
             })
         );
-        urls.push(`${GDevelopProjectResourcesStorage.baseUrl}${presignedUrl}`); // TODO: strip the url
+
+        const fullUrl = `${GDevelopProjectResourcesStorage.baseUrl}${presignedUrl}`;
+        const urlWithoutSearchParams = fullUrl.substr(0, fullUrl.indexOf('?'))
+        results.push({
+          error: null,
+          resourceFile,
+          url: urlWithoutSearchParams,
+        });
       } catch (error) {
-        errors.push({ error, resourceFile });
+        results.push({
+          error,
+          resourceFile,
+          url: null,
+        });
       }
     });
 
-  return { urls, errors };
+  return results;
 };
 
 export const listUserCloudProjects = async (
@@ -305,9 +321,21 @@ const getPresignedUrlForResourcesUpload = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
+
+  const requestedResources = await Promise.all(
+    resourceFiles.map(async resourceFile => ({
+      type: 'project-resource',
+      filename: resourceFile.name,
+      size: resourceFile.size,
+      sha512TruncatedTo256: await getFileSha512TruncatedTo256(resourceFile),
+    }))
+  );
+
   const response = await apiClient.post(
     `/project/${cloudProjectId}/action/create-presigned-urls`,
-    { resources: resourceFiles.map(() => 'newProjectResource') },
+    {
+      requestedResources,
+    },
     {
       headers: {
         Authorization: authorizationHeader,
@@ -322,6 +350,7 @@ const getPresignedUrlForResourcesUpload = async (
     (presignedUrl, index) => ({
       resourceFile: resourceFiles[index],
       presignedUrl,
+      index,
     })
   );
   return resourceFileWithPresignedUrls;

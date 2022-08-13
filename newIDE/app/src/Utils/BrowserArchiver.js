@@ -57,6 +57,20 @@ function eachCallback<T>(
   callNextCallback();
 }
 
+// TODO: factor (find the right place for it and comment it)
+const determineCrossOrigin = (url: string) => {
+  // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
+  // i.e: its gdevelop.io cookie, to be passed.
+  if (
+    url.startsWith('https://project-resources.gdevelop.io/') ||
+    url.startsWith('https://project-resources-dev.gdevelop.io/')
+  )
+    return 'include';
+
+  // For other resources, use "same-origin" as done by default by fetch.
+  return 'same-origin';
+};
+
 export const downloadUrlsToBlobs = async ({
   urlFiles,
   onProgress,
@@ -67,7 +81,7 @@ export const downloadUrlsToBlobs = async ({
   let count = 0;
   return Promise.all(
     urlFiles
-      .filter(({ url }) => url.indexOf('.h') === -1) // TODO
+      .filter(({ url }) => url.indexOf('.h') === -1) // Should be useless now, still keep it by safety.
       .map(({ url, filePath }) => {
         // To avoid strange/hard to understand CORS issues, we add a dummy parameter.
         // By doing so, we force browser to consider this URL as different than the one traditionally
@@ -93,7 +107,11 @@ export const downloadUrlsToBlobs = async ({
           'export'
         );
 
-        return fetch(urlWithParameters)
+        return fetch(urlWithParameters, {
+          // Include credentials so that resources on GDevelop cloud are properly fetched
+          // with the cookie obtained for the project.
+          credentials: determineCrossOrigin(urlWithParameters),
+        })
           .then(
             response => {
               if (!response.ok) {

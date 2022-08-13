@@ -238,6 +238,7 @@ namespace gdjs {
           loader.add({
             name: file,
             url: file,
+            loadType: PIXI.LoaderResource.LOAD_TYPE.IMAGE,
             crossOrigin: determineCrossOrigin(file),
           });
         }
@@ -255,8 +256,6 @@ namespace gdjs {
             resourceFiles[file].forEach((resource) => {
               const loadedTexture = loadedPixiResources[file].texture;
               if (!loadedTexture) {
-                // TODO: this is erroring for things in the bucket, because the XHR is done as text?
-                // Instead of img?
                 const error = loadedPixiResources[file].error;
                 logFileLoadingError(file, error);
                 return;

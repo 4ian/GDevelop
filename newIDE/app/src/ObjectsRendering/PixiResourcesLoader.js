@@ -60,12 +60,15 @@ export default class PixiResourcesLoader {
       if (!resourcesManager.hasResource(resourceName)) return;
 
       const resource = resourcesManager.getResource(resourceName);
+      if (resource.getKind() !== 'image') return;
+
       const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
         isResourceForPixi: true,
       });
       loader.add({
         name: resourceName,
         url: url,
+        loadType: PIXI.LoaderResource.LOAD_TYPE.IMAGE,
         crossOrigin: determineCrossOrigin(url),
       });
       allResources[resourceName] = resource;
@@ -92,11 +95,14 @@ export default class PixiResourcesLoader {
           const resource = resourcesManager.getResource(resourceName);
           if (resource.getKind() !== 'image') continue;
 
-          loadedTextures[resourceName] = loadedResources[resourceName].texture;
-          PixiResourcesLoader._initializeTexture(
-            resource,
-            loadedTextures[resourceName]
-          );
+          const texture = loadedResources[resourceName].texture;
+          if (texture) {
+            loadedTextures[resourceName] = texture;
+            PixiResourcesLoader._initializeTexture(
+              resource,
+              loadedTextures[resourceName]
+            );
+          }
         }
       }
 

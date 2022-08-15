@@ -130,7 +130,7 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
         gd::ParameterMetadata()
             .SetName("Behavior")
             .SetType("behavior")
-            .SetExtraInfo("MyExtension::MyEventsBasedBehavior"));
+            .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
 
     auto &behaviorExpression =
         behaviorEventsFunctions
@@ -142,7 +142,7 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
         gd::ParameterMetadata()
             .SetName("Behavior")
             .SetType("behavior")
-            .SetExtraInfo("MyExtension::MyEventsBasedBehavior"));
+            .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
 
     // Add property
     eventsBasedBehavior.GetPropertyDescriptors()
@@ -306,7 +306,7 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
         gd::ParameterMetadata()
             .SetName("Object")
             .SetType("object")
-            .SetExtraInfo("MyExtension::MyEventsBasedObject"));
+            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
 
     auto &objectExpression =
         objectEventsFunctions
@@ -316,7 +316,7 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
         gd::ParameterMetadata()
             .SetName("Object")
             .SetType("object")
-            .SetExtraInfo("MyExtension::MyEventsBasedObject"));
+            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
 
     // Add property
     eventsBasedObject.GetPropertyDescriptors()
@@ -332,10 +332,10 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
     externalEvents.SetAssociatedLayout("LayoutWithObjectFunctions");
 
     auto &object = layout.InsertNewObject(
-        project, "MyExtension::MyEventsBasedObject", "MyCustomObject", 0);
+        project, "MyEventsExtension::MyEventsBasedObject", "MyCustomObject", 0);
 
     auto &globalObject = project.InsertNewObject(
-        project, "MyExtension::MyEventsBasedObject", "GlobalMyCustomObject", 0);
+        project, "MyEventsExtension::MyEventsBasedObject", "MyGlobalCustomObject", 0);
 
     // Create an event in the layout referring to
     // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunction
@@ -854,7 +854,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         GetEventFirstActionType(project.GetLayout("LayoutWithObjectFunctions")
                                     .GetEvents()
                                     .GetEvent(0)) ==
-        "MyRenamedExtension::MyObjectEventsFunction");
+        "MyRenamedExtension::MyEventsBasedObject::MyObjectEventsFunction");
 
     // Check if events-based object properties have been renamed in
     // instructions
@@ -862,7 +862,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         GetEventFirstActionType(project.GetLayout("LayoutWithObjectFunctions")
                                     .GetEvents()
                                     .GetEvent(1)) ==
-        "MyRenamedExtension::SetPropertyMyProperty");
+        "MyRenamedExtension::MyEventsBasedObject::SetPropertyMyProperty");
 
     // Check events-based object methods have *not* been renamed in
     // expressions
@@ -875,11 +875,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyObjectEventsFunctionExpression(123, 456, 789)");
 
     REQUIRE(GetEventFirstActionFirstParameterString(
-                project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
+                project.GetExternalEvents("ExternalEventsWithObjectFunctions")
                     .GetEvents()
                     .GetEvent(2)) ==
             "3 + "
-            "ObjectWithMyBehavior.MyBehaviorEventsFunctionExpression");
+            "MyCustomObject.MyObjectEventsFunctionExpression");
   }
   SECTION("(Free) events action renamed") {
     gd::Project project;

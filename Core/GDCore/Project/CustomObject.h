@@ -16,11 +16,13 @@ using namespace gd;
  */
 class CustomObject : public gd::Object {
  public:
-  CustomObject(const EventsBasedObject& _eventsBasedObject)
+  CustomObject(const EventsBasedObject& _eventsBasedObject, const gd::String &fullType)
       :  // Name is not important as this object is just a "blueprint"
          // that is copied (see calls to AddObject).
         Object("CustomObject"),
-        eventsBasedObject(_eventsBasedObject) {}
+        eventsBasedObject(_eventsBasedObject) {
+    SetType(fullType);
+  }
   std::unique_ptr<gd::Object> Clone() const override;
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;

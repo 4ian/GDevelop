@@ -82,10 +82,12 @@ void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 std::unique_ptr<gd::Object> Project::CreateObject(
     const gd::String& type,
     const gd::String& name,
-    const gd::String& platformName) {
+    const gd::String& platformName) const {
     if (Project::HasEventsBasedObject(type)) {
       auto &eventsBasedObject = Project::GetEventsBasedObject(type);
-      return gd::make_unique<CustomObject>(eventsBasedObject);
+      auto customObject = gd::make_unique<CustomObject>(eventsBasedObject, type);
+      customObject->SetName(name);
+      return customObject;
     }
     else {
       for (std::size_t i = 0; i < platforms.size(); ++i) {
@@ -114,7 +116,6 @@ bool Project::HasEventsBasedObject(const gd::String& type) const {
       return false;
     }
     auto &extension = Project::GetEventsFunctionsExtension(extensionName);
-
     gd::String objectTypeName = type.substr(separatorIndex + 2);
     return extension.GetEventsBasedObjects().Has(objectTypeName);
 }
@@ -125,6 +126,15 @@ gd::EventsBasedObject& Project::GetEventsBasedObject(const gd::String& type) {
     gd::String objectTypeName = type.substr(separatorIndex + 2);
 
     auto &extension = Project::GetEventsFunctionsExtension(extensionName);
+    return extension.GetEventsBasedObjects().Get(objectTypeName);
+}
+
+const gd::EventsBasedObject& Project::GetEventsBasedObject(const gd::String& type) const {
+    const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
+    gd::String extensionName = type.substr(0, separatorIndex);
+    gd::String objectTypeName = type.substr(separatorIndex + 2);
+
+    const auto &extension = Project::GetEventsFunctionsExtension(extensionName);
     return extension.GetEventsBasedObjects().Get(objectTypeName);
 }
 

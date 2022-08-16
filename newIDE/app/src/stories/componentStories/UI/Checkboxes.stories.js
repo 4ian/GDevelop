@@ -62,6 +62,13 @@ export const Default = () => {
           disabled
         />
         <LargeSpacer />
+        <InlineCheckbox
+          checked={true}
+          onCheck={(e, value) => {}}
+          label="With some helper text"
+          tooltipOrHelperText="This is some helper text"
+        />
+        <LargeSpacer />
         <Text>Without label</Text>
         <InlineCheckbox
           checked={inlineValue}

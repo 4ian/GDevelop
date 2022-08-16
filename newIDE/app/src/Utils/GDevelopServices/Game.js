@@ -38,6 +38,7 @@ export type Game = {
   discoverable?: boolean,
   acceptsBuildComments?: boolean,
   acceptsGameComments?: boolean,
+  displayAdsOnGamePage?: boolean,
 };
 
 export type GameSlug = {
@@ -229,6 +230,7 @@ export const updateGame = (
     discoverable,
     acceptsBuildComments,
     acceptsGameComments,
+    displayAdsOnGamePage,
   }: {|
     gameName?: string,
     categories?: string[],
@@ -243,6 +245,7 @@ export const updateGame = (
     discoverable?: boolean,
     acceptsBuildComments?: boolean,
     acceptsGameComments?: boolean,
+    displayAdsOnGamePage?: boolean,
   |}
 ): Promise<Game> => {
   return getAuthorizationHeader()
@@ -263,6 +266,7 @@ export const updateGame = (
           discoverable,
           acceptsBuildComments,
           acceptsGameComments,
+          displayAdsOnGamePage,
         },
         {
           params: {

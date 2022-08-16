@@ -919,6 +919,7 @@ export const game1: Game = {
   gameName: 'My Great Game',
   createdAt: 1606065498,
   publicWebBuildId: 'fake-publicwebbuild-id',
+  displayAdsOnGamePage: true,
 };
 
 export const game2: Game = {
@@ -926,6 +927,16 @@ export const game2: Game = {
   authorName: 'My company',
   gameName: 'My Other Game',
   createdAt: 1607065498,
+};
+
+export const gameWithDisplayAdsOnGamePageEnabled: Game = {
+  ...game1,
+  displayAdsOnGamePage: true,
+};
+
+export const gameWithDisplayAdsOnGamePageDisabled: Game = {
+  ...game1,
+  displayAdsOnGamePage: false,
 };
 
 /**

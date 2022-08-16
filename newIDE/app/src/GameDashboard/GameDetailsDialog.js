@@ -45,6 +45,7 @@ import LeaderboardAdmin from './LeaderboardAdmin';
 import { GameAnalyticsPanel } from './GameAnalyticsPanel';
 import GameFeedback from './Feedbacks/GameFeedback';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { GameMonetization } from './Monetization/GameMonetization';
 
 export type GamesDetailsTab =
   | 'details'
@@ -346,6 +347,7 @@ export const GameDetailsDialog = ({
             <Tab label={<Trans>Player Feedback</Trans>} value="feedback" />
             <Tab label={<Trans>Statistics</Trans>} value="analytics" />
             <Tab label={<Trans>Leaderboards</Trans>} value="leaderboards" />
+            <Tab label={<Trans>Monetization</Trans>} value="monetization" />
           </Tabs>
           <Line expand>
             {currentTab === 'leaderboards' ? (
@@ -562,6 +564,14 @@ export const GameDetailsDialog = ({
                 authenticatedUser={authenticatedUser}
                 game={game}
               />
+            ) : null}
+            {currentTab === 'monetization' ? (
+              <ColumnStackLayout>
+                <GameMonetization
+                  game={game}
+                  onGameUpdated={handleGameUpdated}
+                />
+              </ColumnStackLayout>
             ) : null}
           </Line>
           {publicGame && project && isPublicGamePropertiesDialogOpen && (

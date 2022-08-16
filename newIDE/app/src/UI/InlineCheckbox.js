@@ -22,7 +22,7 @@ const useFormGroupStyles = makeStyles({
 type Props = {|
   label?: ?React.Node,
   checked: boolean,
-  onCheck?: (e: {||}, checked: boolean) => void,
+  onCheck?: (e: {||}, checked: boolean) => void | Promise<void>,
   checkedIcon?: React.Node,
   uncheckedIcon?: React.Node,
   disabled?: boolean,

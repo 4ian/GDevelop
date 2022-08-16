@@ -1416,6 +1416,16 @@ void WholeProjectRefactorer::DoRenameBehavior(
         renameBehaviorTypeInParameters(*eventsFunction);
       }
     }
+
+    for (auto&& eventsBasedObject :
+         eventsFunctionsExtension.GetEventsBasedObjects()
+             .GetInternalVector()) {
+      auto& behaviorEventsFunctions = eventsBasedObject->GetEventsFunctions();
+      for (auto&& eventsFunction :
+           behaviorEventsFunctions.GetInternalVector()) {
+        renameBehaviorTypeInParameters(*eventsFunction);
+      }
+    }
   }
 }
 
@@ -1423,6 +1433,7 @@ void WholeProjectRefactorer::DoRenameObject(
     gd::Project& project,
     const gd::String& oldObjectType,
     const gd::String& newObjectType) {
+
   auto customObjectTypeRenamer = gd::CustomObjectTypeRenamer(
           project,
           oldObjectType,
@@ -1443,8 +1454,27 @@ void WholeProjectRefactorer::DoRenameObject(
   for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
        e++) {
     auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
+
+    // Behavior object types
+    for (auto&& eventsBasedBehavior :
+        eventsFunctionsExtension.GetEventsBasedBehaviors().GetInternalVector()) {
+      if (eventsBasedBehavior->GetObjectType() == oldObjectType) {
+        eventsBasedBehavior->SetObjectType(newObjectType);
+      }
+    }
+
     for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
       renameObjectTypeInParameters(*eventsFunction);
+    }
+
+    for (auto&& eventsBasedBehavior :
+         eventsFunctionsExtension.GetEventsBasedBehaviors()
+             .GetInternalVector()) {
+      auto& behaviorEventsFunctions = eventsBasedBehavior->GetEventsFunctions();
+      for (auto&& eventsFunction :
+           behaviorEventsFunctions.GetInternalVector()) {
+        renameObjectTypeInParameters(*eventsFunction);
+      }
     }
 
     for (auto&& eventsBasedObject :

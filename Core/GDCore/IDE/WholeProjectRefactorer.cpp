@@ -12,6 +12,7 @@
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/Events/EventsBehaviorRenamer.h"
 #include "GDCore/IDE/Events/CustomObjectTypeRenamer.h"
+#include "GDCore/IDE/Events/BehaviorTypeRenamer.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/IDE/Events/ExpressionsParameterMover.h"
 #include "GDCore/IDE/Events/ExpressionsRenamer.h"
@@ -218,11 +219,16 @@ void WholeProjectRefactorer::ExposeEventsBasedObjectEvents(
 
 void WholeProjectRefactorer::ExposeProjectObjects(
     gd::Project& project, gd::ArbitraryObjectsWorker& worker) {
+
+  // Global objects
   worker.Launch(project);
+
+  // Layers objects
   for (size_t i = 0; i < project.GetLayoutsCount(); i++) {
     worker.Launch(project.GetLayout(i));
   }
 
+  // Event based objects children
   for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
       e++) {
     auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
@@ -1342,15 +1348,6 @@ void WholeProjectRefactorer::DoRenameBehavior(
           behaviorContent.SetTypeName(newBehaviorType);
         }
       };
-  auto renameBehaviorTypeInObjects =
-      [&renameBehaviorTypeInBehaviorContent](
-          std::vector<std::unique_ptr<gd::Object> >& objectsList) {
-        for (auto& object : objectsList) {
-          for (auto& behaviorContent : object->GetAllBehaviorContents()) {
-            renameBehaviorTypeInBehaviorContent(*behaviorContent.second);
-          }
-        }
-      };
   auto renameBehaviorTypeInParameters =
       [&oldBehaviorType, &newBehaviorType](gd::EventsFunction& eventsFunction) {
         for (auto& parameter : eventsFunction.GetParameters()) {
@@ -1385,16 +1382,18 @@ void WholeProjectRefactorer::DoRenameBehavior(
       }
     }
   }
+  
+  // Rename behavior in objects lists.
+  auto behaviorTypeRenamer = gd::BehaviorTypeRenamer(
+          project,
+          oldBehaviorType,
+          newBehaviorType);
+  ExposeProjectObjects(project, behaviorTypeRenamer);
 
-  // TODO use object worker
-  // Rename behavior in global objects
-  renameBehaviorTypeInObjects(project.GetObjects());
-
-  // Rename behavior in layout objects and layout behavior shared data.
+  // Rename behavior in layout behavior shared data.
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
     gd::Layout& layout = project.GetLayout(i);
 
-    renameBehaviorTypeInObjects(layout.GetObjects());
     for (auto& behaviorSharedDataContent : layout.GetAllBehaviorSharedData()) {
       renameBehaviorTypeInBehaviorContent(*behaviorSharedDataContent.second);
     }

@@ -108,8 +108,6 @@ void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
     auto child = childObject.get();
     outputObjectsContainer.InsertObject(*child, children.size());
   }
-
-  // TODO EBO Add private behaviors of the parent.
 }
 
 }  // namespace gd

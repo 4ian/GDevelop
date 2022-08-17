@@ -849,26 +849,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         // TODO: Is this logic the same as in _onEventsBasedObjectRenamed?
 
         if (!editedEventsBasedObject) {
-          // If we're closing the properties of a behavior, notify parent
-          // that a behavior was edited (to trigger reload of extensions)
+          // If we're closing the properties of a object, notify parent
+          // that a object was edited (to trigger reload of extensions)
           if (this.props.onObjectEdited) {
             await this.props.onObjectEdited();
-
-            // Once extensions are reloaded, ensure the project stays valid by
-            // filling any invalid required behavior property in the objects
-            // of the project.
-            //
-            // We need to do that as "required behavior" properties may have been
-            // added (or the type of the required behavior changed) in the dialog.
-            // TODO EBO Do something like this but for children and their behaviors?
-            // gd.WholeProjectRefactorer.fixInvalidRequiredBehaviorProperties(
-            //   this.props.project
-            // );
           }
 
-          // Reload the selected events function, if any, as the behavior was
+          // Reload the selected events function, if any, as the object was
           // changed so objects containers need to be re-created. Notably, the
-          // type of the object that is handled by the behavior may have changed.
+          // type of the object that is handled by the object may have changed.
           if (this.state.selectedEventsFunction) {
             this._loadEventsFunctionFrom(
               this.props.project,

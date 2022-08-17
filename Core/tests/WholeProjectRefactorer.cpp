@@ -1349,7 +1349,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                 .GetObjectType() ==
             "MyEventsExtension::MyRenamedEventsBasedObject");
   }
-
+  // TODO: Check that this works when behaviors are attached to a child-object.
   SECTION("Events based behavior renamed (other behaviors properties update)") {
     gd::Project project;
     gd::Platform platform;
@@ -1663,7 +1663,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     }
   }
 }
-
+// TODO: Check that this works when behaviors are attached to a child-object.
 TEST_CASE("WholeProjectRefactorer (FindInvalidRequiredBehaviorProperties)",
           "[common]") {
   SECTION("Find nothing if there are no missing required behavior") {

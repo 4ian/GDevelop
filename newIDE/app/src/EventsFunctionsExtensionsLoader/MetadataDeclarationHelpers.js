@@ -251,12 +251,10 @@ export const isBehaviorLifecycleEventsFunction = (functionName: string) => {
  * that will be called automatically by the game engine.
  */
 export const isObjectLifecycleEventsFunction = (functionName: string) => {
-  // TODO EBO
+  // TODO EBO Rename doStepPreEvents and doStepPostEvents
   return (
     [
       'onCreated',
-      'onActivate',
-      'onDeActivate',
       'doStepPreEvents',
       'doStepPostEvents',
       'onDestroy',
@@ -389,7 +387,7 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
     );
   }
 };
-// TODO EBO Merge the 2 methods?
+
 /**
  * Declare the instruction (action/condition) or expression for the given
  * object events function.
@@ -710,7 +708,7 @@ export const declareObjectPropertiesInstructionAndExpressions = (
   mapVector(eventsBasedObject.getPropertyDescriptors(), property => {
     const propertyType = property.getType();
     const propertyName = property.getName();
-    // TODO EBO
+    // TODO EBO Use the proper methods for objects when the generator is implemented.
     const getterName = gd.BehaviorCodeGenerator.getBehaviorPropertyGetterName(
       propertyName
     );

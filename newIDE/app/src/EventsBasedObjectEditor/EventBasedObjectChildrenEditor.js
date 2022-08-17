@@ -142,10 +142,11 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
   };
 
   updateBehaviorsSharedData = () => {
-    // TODO EBO Should there be one shared data per parent-objects
+    // TODO EBO Find all layouts that are using this object and update them
+    // (something a bit like UsedExtensionsFinder, but the other way around).
     // const { project, eventsBasedObject } = this.props;
     // const layout = eventsBasedObject.getLayout();
-    //layout.updateBehaviorsSharedData(project);
+    // layout.updateBehaviorsSharedData(project);
   };
 
   forceUpdateObjectsList = () => {
@@ -167,7 +168,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 project={project}
                 objectsContainer={eventsBasedObject}
                 layout={null}
-                // TODO EBO Allow to use project resources as place holders?
+                // TODO EBO Allow to use project resources as place holders
                 resourceSources={[]}
                 resourceExternalEditors={[]}
                 onChooseResource={() => Promise.resolve([])}
@@ -183,7 +184,6 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 // Instances can't be created from this context.
                 onAddObjectInstance={() => {}}
                 onObjectPasted={() => this.updateBehaviorsSharedData()}
-                // TODO EBO Handle tag filtering
                 selectedObjectTags={[]}
                 onChangeSelectedObjectTags={selectedObjectTags => {}}
                 getAllObjectTags={() => []}

@@ -610,7 +610,7 @@ interface ObjectJsImplementation {
 };
 
 interface CustomObject {
-    void CustomObject([Const, Ref] EventsBasedObject eventsBasedObject);
+    void CustomObject([Const, Ref] EventsBasedObject eventsBasedObject, [Const] DOMString fullType);
     [Value] UniquePtrObject Clone();
 
     [Value] MapStringPropertyDescriptor GetProperties();

@@ -199,6 +199,13 @@ const getExtensionIconUrl = (extension: gdPlatformExtension) => {
     .setObjectType(eventsBasedBehavior.getObjectType());
 };
 
+// This is copied from gd::WholeProjectRefactorer (see GetObjectFullType)
+// Could be factored into a single C++ function in gd::PlatformExtension?
+const getObjectFullType = (extensionName: string, objectName: string) => {
+  const separator = gd.PlatformExtension.getNamespaceSeparator();
+  return extensionName + separator + objectName;
+};
+
 /**
  * Declare the object for the given
  * events based object.
@@ -213,7 +220,9 @@ const getExtensionIconUrl = (extension: gdPlatformExtension) => {
       eventsBasedObject.getFullName() || eventsBasedObject.getName(),
       eventsBasedObject.getDescription(),
       getExtensionIconUrl(extension),
-      new gd.CustomObject(eventsBasedObject)
+      new gd.CustomObject(
+          eventsBasedObject,
+          getObjectFullType(extension.getName(), eventsBasedObject.getName()))
     );
 };
 

@@ -11,7 +11,6 @@ import { showWarningBox } from '../UI/Messages/MessageBox';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Window from '../Utils/Window';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
-import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 
 const gd: libGDevelop = global.gd;

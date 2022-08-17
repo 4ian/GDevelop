@@ -643,43 +643,6 @@ describe('InstallAsset', () => {
       expect(getExtension).not.toHaveBeenCalled();
     });
 
-    it("throws if an extension can't be found in the registry", async () => {
-      makeTestExtensions(gd);
-      const { project } = makeTestProject(gd);
-      const layout = project.insertNewLayout('MyTestLayout', 0);
-
-      // Get an asset that uses an extension...
-      mockFn(Asset.getAsset).mockImplementationOnce(
-        () => fakeAssetWithEventCustomizationsAndUnknownExtension1
-      );
-
-      // ...but this extension does not exist in the registry
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        allTags: [''],
-        extensionShortHeaders: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
-      }));
-
-      // Check that the extension is stated as not found in the registry
-      await expect(
-        installAsset({
-          assetShortHeader: fakeAssetShortHeader1,
-          project,
-          objectsContainer: layout,
-          eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
-          environment: 'live',
-        })
-      ).rejects.toMatchObject({
-        message: 'Unable to find extension UnknownExtension in the registry.',
-      });
-
-      expect(getExtensionsRegistry).toHaveBeenCalledTimes(1);
-      expect(getExtension).not.toHaveBeenCalled();
-    });
-
     it("throws if a behavior can't be installed, even if its extension was properly found in the registry", async () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
@@ -716,48 +679,6 @@ describe('InstallAsset', () => {
         })
       ).rejects.toMatchObject({
         message: 'These behaviors could not be installed: Flash::Flash (Flash)',
-      });
-
-      expect(getExtensionsRegistry).toHaveBeenCalledTimes(1);
-      expect(getExtension).toHaveBeenCalledTimes(1);
-    });
-
-    it("throws if an extension can't be installed, even if it was properly found in the registry", async () => {
-      makeTestExtensions(gd);
-      const { project } = makeTestProject(gd);
-      const layout = project.insertNewLayout('MyTestLayout', 0);
-
-      // Get an asset that uses an extension...
-      mockFn(Asset.getAsset).mockImplementationOnce(
-        () => fakeAssetWithEventCustomizationsAndFlashExtension1
-      );
-
-      // ...and this extension is in the registry
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        allTags: [''],
-        extensionShortHeaders: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
-      }));
-
-      mockFn(getExtension).mockImplementationOnce(
-        () => flashExtensionShortHeader
-      );
-
-      // Verify that, because we use `mockEventsFunctionsExtensionsState`, the
-      // extension won't be loaded, so the extension won't be installed.
-      await expect(
-        installAsset({
-          assetShortHeader: fakeAssetShortHeader1,
-          project,
-          objectsContainer: layout,
-          eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
-          environment: 'live',
-        })
-      ).rejects.toMatchObject({
-        message: 'These extensions could not be installed: Flash',
       });
 
       expect(getExtensionsRegistry).toHaveBeenCalledTimes(1);

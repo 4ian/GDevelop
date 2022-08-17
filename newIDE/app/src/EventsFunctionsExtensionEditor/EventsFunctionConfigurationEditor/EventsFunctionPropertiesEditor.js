@@ -50,9 +50,11 @@ const getSentenceErrorText = (
       t`Enter the sentence that will be displayed in the events sheet`
     );
 
-    const parametersIndexOffset = eventsBasedBehavior ? ParametersIndexOffsets.BehaviorFunction :
-        eventsBasedObject ? ParametersIndexOffsets.ObjectFunction :
-        ParametersIndexOffsets.FreeFunction;
+  const parametersIndexOffset = eventsBasedBehavior
+    ? ParametersIndexOffsets.BehaviorFunction
+    : eventsBasedObject
+    ? ParametersIndexOffsets.ObjectFunction
+    : ParametersIndexOffsets.FreeFunction;
 
   const missingParameters = mapVector(
     eventsFunction.getParameters(),
@@ -120,7 +122,8 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
 
     const type = eventsFunction.getFunctionType();
     const isABehaviorLifecycleEventsFunction =
-      !!eventsBasedBehavior && !eventsBasedObject &&
+      !!eventsBasedBehavior &&
+      !eventsBasedObject &&
       isBehaviorLifecycleEventsFunction(eventsFunction.getName());
     if (isABehaviorLifecycleEventsFunction) {
       return (
@@ -135,7 +138,8 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
     }
 
     const isAnObjectLifecycleEventsFunction =
-      !!eventsBasedObject && !eventsBasedBehavior &&
+      !!eventsBasedObject &&
+      !eventsBasedBehavior &&
       isObjectLifecycleEventsFunction(eventsFunction.getName());
     if (isAnObjectLifecycleEventsFunction) {
       return (
@@ -149,7 +153,8 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
     }
 
     const isAnExtensionLifecycleEventsFunction =
-      !eventsBasedBehavior && !eventsBasedObject &&
+      !eventsBasedBehavior &&
+      !eventsBasedObject &&
       isExtensionLifecycleEventsFunction(eventsFunction.getName());
     if (isAnExtensionLifecycleEventsFunction) {
       return (

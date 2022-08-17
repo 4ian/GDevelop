@@ -36,17 +36,14 @@ type State = {|
   searchText: string,
 |};
 
-const getEventsBasedObjectName = (
-  eventsBasedObject: gdEventsBasedObject
-) => eventsBasedObject.getName();
+const getEventsBasedObjectName = (eventsBasedObject: gdEventsBasedObject) =>
+  eventsBasedObject.getName();
 
 type Props = {|
   project: gdProject,
   eventsBasedObjectsList: gdEventsBasedObjectsList,
   selectedEventsBasedObject: ?gdEventsBasedObject,
-  onSelectEventsBasedObject: (
-    eventsBasedObject: ?gdEventsBasedObject
-  ) => void,
+  onSelectEventsBasedObject: (eventsBasedObject: ?gdEventsBasedObject) => void,
   onDeleteEventsBasedObject: (
     eventsBasedObject: gdEventsBasedObject,
     cb: (boolean) => void
@@ -56,9 +53,7 @@ type Props = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
-  onEventsBasedObjectRenamed: (
-    eventsBasedObject: gdEventsBasedObject
-  ) => void,
+  onEventsBasedObjectRenamed: (eventsBasedObject: gdEventsBasedObject) => void,
   onEditProperties: (eventsBasedObject: gdEventsBasedObject) => void,
   unsavedChanges?: ?UnsavedChanges,
 |};
@@ -144,13 +139,8 @@ export default class EventsBasedObjectsList extends React.Component<
     );
   };
 
-  _moveSelectionTo = (
-    destinationEventsBasedObject: gdEventsBasedObject
-  ) => {
-    const {
-      eventsBasedObjectsList,
-      selectedEventsBasedObject,
-    } = this.props;
+  _moveSelectionTo = (destinationEventsBasedObject: gdEventsBasedObject) => {
+    const { eventsBasedObjectsList, selectedEventsBasedObject } = this.props;
     if (!selectedEventsBasedObject) return;
 
     eventsBasedObjectsList.move(
@@ -183,9 +173,7 @@ export default class EventsBasedObjectsList extends React.Component<
   _pasteEventsBasedObject = (index: number) => {
     if (!Clipboard.has(EVENTS_BASED_OBJECT_CLIPBOARD_KIND)) return;
 
-    const clipboardContent = Clipboard.get(
-      EVENTS_BASED_OBJECT_CLIPBOARD_KIND
-    );
+    const clipboardContent = Clipboard.get(EVENTS_BASED_OBJECT_CLIPBOARD_KIND);
     const copiedEventsBasedObject = SafeExtractor.extractObjectProperty(
       clipboardContent,
       'eventsBasedObject'

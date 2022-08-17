@@ -46,7 +46,12 @@ export default class EventsBasedObjectEditor extends React.Component<
 
   render() {
     const { currentTab } = this.state;
-    const { eventsBasedObject, project, globalObjectsContainer, eventsFunctionsExtension } = this.props;
+    const {
+      eventsBasedObject,
+      project,
+      globalObjectsContainer,
+      eventsFunctionsExtension,
+    } = this.props;
 
     return (
       <React.Fragment>
@@ -63,10 +68,10 @@ export default class EventsBasedObjectEditor extends React.Component<
                 kind="info"
               >
                 <Trans>
-                  This is the configuration of your object. Make sure to
-                  choose a proper internal name as it's hard to change it later.
-                  Enter a description explaining what the object is doing to
-                  the object.
+                  This is the configuration of your object. Make sure to choose
+                  a proper internal name as it's hard to change it later. Enter
+                  a description explaining what the object is doing to the
+                  object.
                 </Trans>
               </DismissableAlertMessage>
               <TextField
@@ -108,8 +113,8 @@ export default class EventsBasedObjectEditor extends React.Component<
                 >
                   <Trans>
                     Once you're done, close this dialog and start adding some
-                    functions to the object. Then, test the object by adding
-                    it to an object in a scene.
+                    functions to the object. Then, test the object by adding it
+                    to an object in a scene.
                   </Trans>
                 </DismissableAlertMessage>
               )}

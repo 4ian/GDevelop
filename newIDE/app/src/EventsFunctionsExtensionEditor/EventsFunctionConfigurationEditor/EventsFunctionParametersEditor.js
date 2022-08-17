@@ -172,7 +172,11 @@ export default class EventsFunctionParametersEditor extends React.Component<
   };
 
   _moveParameters = (oldIndex: number, newIndex: number) => {
-    const { eventsFunction, eventsBasedBehavior, eventsBasedObject } = this.props;
+    const {
+      eventsFunction,
+      eventsBasedBehavior,
+      eventsBasedObject,
+    } = this.props;
     const parameters = eventsFunction.getParameters();
 
     if (eventsBasedBehavior) {
@@ -281,16 +285,20 @@ export default class EventsFunctionParametersEditor extends React.Component<
     }
 
     const isParameterDisabled = index => {
-      return !!freezeParameters ||
-          (!!eventsBasedBehavior && index < 2) ||
-          (!!eventsBasedObject && index < 1);
+      return (
+        !!freezeParameters ||
+        (!!eventsBasedBehavior && index < 2) ||
+        (!!eventsBasedObject && index < 1)
+      );
     };
     const isParameterDescriptionAndTypeShown = index => {
       // The first two parameters of a behavior method should not be changed at all,
       // so we even hide their description and type to avoid cluttering the interface.
-      return (!eventsBasedBehavior && !eventsBasedObject) ||
-          (!!eventsBasedBehavior && index >= 2) ||
-          (!!eventsBasedObject && index >= 1);
+      return (
+        (!eventsBasedBehavior && !eventsBasedObject) ||
+        (!!eventsBasedBehavior && index >= 2) ||
+        (!!eventsBasedObject && index >= 1)
+      );
     };
     const isParameterLongDescriptionShown = (parameter, index): boolean => {
       if (!isParameterDescriptionAndTypeShown(index)) return false;
@@ -300,9 +308,11 @@ export default class EventsFunctionParametersEditor extends React.Component<
         !!this.state.longDescriptionShownIndexes[index]
       );
     };
-    const parametersIndexOffset = eventsBasedBehavior ? ParametersIndexOffsets.BehaviorFunction :
-        eventsBasedObject ? ParametersIndexOffsets.ObjectFunction :
-        ParametersIndexOffsets.FreeFunction;
+    const parametersIndexOffset = eventsBasedBehavior
+      ? ParametersIndexOffsets.BehaviorFunction
+      : eventsBasedObject
+      ? ParametersIndexOffsets.ObjectFunction
+      : ParametersIndexOffsets.FreeFunction;
 
     return (
       <I18n>

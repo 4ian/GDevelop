@@ -66,7 +66,7 @@ const getExtensionIconUrl = (extension: gdPlatformExtension) => {
  * Declare the behavior for the given
  * events based behavior.
  */
- export const declareBehaviorMetadata = (
+export const declareBehaviorMetadata = (
   extension: gdPlatformExtension,
   eventsBasedBehavior: gdEventsBasedBehavior
 ): gdBehaviorMetadata => {
@@ -210,27 +210,27 @@ const getObjectFullType = (extensionName: string, objectName: string) => {
  * Declare the object for the given
  * events based object.
  */
- export const declareObjectMetadata = (
+export const declareObjectMetadata = (
   extension: gdPlatformExtension,
   eventsBasedObject: gdEventsBasedObject
 ): gdObjectMetadata => {
-  return extension
-    .addObject(
-      eventsBasedObject.getName(),
-      eventsBasedObject.getFullName() || eventsBasedObject.getName(),
-      eventsBasedObject.getDescription(),
-      getExtensionIconUrl(extension),
-      new gd.CustomObject(
-          eventsBasedObject,
-          getObjectFullType(extension.getName(), eventsBasedObject.getName()))
-    );
+  return extension.addObject(
+    eventsBasedObject.getName(),
+    eventsBasedObject.getFullName() || eventsBasedObject.getName(),
+    eventsBasedObject.getDescription(),
+    getExtensionIconUrl(extension),
+    new gd.CustomObject(
+      eventsBasedObject,
+      getObjectFullType(extension.getName(), eventsBasedObject.getName())
+    )
+  );
 };
 
 /**
  * Check if the name of the function is the name of a lifecycle function (for events-based behaviors),
  * that will be called automatically by the game engine.
  */
- export const isBehaviorLifecycleEventsFunction = (functionName: string) => {
+export const isBehaviorLifecycleEventsFunction = (functionName: string) => {
   return (
     [
       'onCreated',
@@ -330,7 +330,7 @@ export const declareInstructionOrExpressionMetadata = (
  * Declare the instruction (action/condition) or expression for the given
  * behavior events function.
  */
- export const declareBehaviorInstructionOrExpressionMetadata = (
+export const declareBehaviorInstructionOrExpressionMetadata = (
   extension: gdPlatformExtension,
   behaviorMetadata: gdBehaviorMetadata,
   eventsBasedBehavior: gdEventsBasedBehavior,
@@ -394,7 +394,7 @@ export const declareInstructionOrExpressionMetadata = (
  * Declare the instruction (action/condition) or expression for the given
  * object events function.
  */
- export const declareObjectInstructionOrExpressionMetadata = (
+export const declareObjectInstructionOrExpressionMetadata = (
   extension: gdPlatformExtension,
   objectMetadata: gdObjectMetadata,
   eventsBasedObject: gdEventsBasedObject,
@@ -464,7 +464,7 @@ type gdInstructionOrExpressionMetadata =
  * This is akin to what would happen by manually declaring a JS extension
  * (see `JsExtension.js` files of extensions).
  */
- export const declareBehaviorPropertiesInstructionAndExpressions = (
+export const declareBehaviorPropertiesInstructionAndExpressions = (
   i18n: I18nType,
   extension: gdPlatformExtension,
   behaviorMetadata: gdBehaviorMetadata,
@@ -677,14 +677,13 @@ type gdInstructionOrExpressionMetadata =
   });
 };
 
-
 /**
  * Declare the instructions (actions/conditions) and expressions for the
  * properties of the given events based object.
  * This is akin to what would happen by manually declaring a JS extension
  * (see `JsExtension.js` files of extensions).
  */
- export const declareObjectPropertiesInstructionAndExpressions = (
+export const declareObjectPropertiesInstructionAndExpressions = (
   i18n: I18nType,
   extension: gdPlatformExtension,
   objectMetadata: gdObjectMetadata,
@@ -734,7 +733,7 @@ type gdInstructionOrExpressionMetadata =
         .getCodeExtraInformation()
         .setFunctionName(getterName);
 
-        addObjectParameter(
+      addObjectParameter(
         objectMetadata.addScopedCondition(
           gd.EventsBasedObject.getPropertyConditionName(propertyName),
           propertyLabel,
@@ -749,7 +748,7 @@ type gdInstructionOrExpressionMetadata =
         .getCodeExtraInformation()
         .setFunctionName(getterName);
 
-        addObjectParameter(
+      addObjectParameter(
         objectMetadata.addScopedAction(
           gd.EventsBasedObject.getPropertyActionName(propertyName),
           propertyLabel,
@@ -778,7 +777,7 @@ type gdInstructionOrExpressionMetadata =
         .getCodeExtraInformation()
         .setFunctionName(getterName);
 
-        addObjectParameter(
+      addObjectParameter(
         objectMetadata.addScopedCondition(
           gd.EventsBasedObject.getPropertyConditionName(propertyName),
           propertyLabel,
@@ -793,7 +792,7 @@ type gdInstructionOrExpressionMetadata =
         .getCodeExtraInformation()
         .setFunctionName(getterName);
 
-        addObjectParameter(
+      addObjectParameter(
         objectMetadata.addScopedAction(
           gd.EventsBasedObject.getPropertyActionName(propertyName),
           propertyLabel,
@@ -823,7 +822,7 @@ type gdInstructionOrExpressionMetadata =
         .getCodeExtraInformation()
         .setFunctionName(getterName);
 
-        addObjectParameter(
+      addObjectParameter(
         objectMetadata.addScopedAction(
           gd.EventsBasedObject.getPropertyActionName(propertyName),
           propertyLabel,
@@ -853,7 +852,7 @@ type gdInstructionOrExpressionMetadata =
         .getCodeExtraInformation()
         .setFunctionName(getterName);
 
-        addObjectParameter(
+      addObjectParameter(
         objectMetadata.addScopedAction(
           gd.EventsBasedObject.getPropertyActionName(propertyName),
           propertyLabel,
@@ -868,7 +867,7 @@ type gdInstructionOrExpressionMetadata =
         .getCodeExtraInformation()
         .setFunctionName(setterName);
 
-        addObjectParameter(
+      addObjectParameter(
         objectMetadata.addStrExpression(
           gd.EventsBasedObject.getPropertyExpressionName(propertyName),
           propertyLabel,

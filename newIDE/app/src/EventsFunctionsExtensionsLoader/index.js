@@ -516,10 +516,7 @@ function generateObject(
   options: Options,
   codeGenerationContext: CodeGenerationContext
 ): Promise<void> {
-  const objectMetadata = declareObjectMetadata(
-    extension,
-    eventsBasedObject
-  );
+  const objectMetadata = declareObjectMetadata(extension, eventsBasedObject);
 
   const eventsFunctionsContainer = eventsBasedObject.getEventsFunctions();
   const codeNamespace = getObjectFunctionCodeNamespace(

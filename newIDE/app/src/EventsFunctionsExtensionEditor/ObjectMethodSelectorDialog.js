@@ -96,9 +96,8 @@ export default function ObjectMethodSelectorDialog({
           primaryText={<Trans>Action</Trans>}
           secondaryText={
             <Trans>
-              An action that can be used on the object. You can
-              define the action parameters: objects, texts, numbers, layers,
-              etc...
+              An action that can be used on the object. You can define the
+              action parameters: objects, texts, numbers, layers, etc...
             </Trans>
           }
           onClick={() =>
@@ -113,9 +112,8 @@ export default function ObjectMethodSelectorDialog({
           primaryText={<Trans>Condition</Trans>}
           secondaryText={
             <Trans>
-              A condition that can be used on the object. You can
-              define the condition parameters: objects, texts, numbers, layers,
-              etc...
+              A condition that can be used on the object. You can define the
+              condition parameters: objects, texts, numbers, layers, etc...
             </Trans>
           }
           onClick={() =>
@@ -130,8 +128,8 @@ export default function ObjectMethodSelectorDialog({
           primaryText={<Trans>Expression</Trans>}
           secondaryText={
             <Trans>
-              An expression that can be used on the object. Can
-              either return a number or a string, and take some parameters.
+              An expression that can be used on the object. Can either return a
+              number or a string, and take some parameters.
             </Trans>
           }
           onClick={() =>
@@ -163,8 +161,8 @@ export default function ObjectMethodSelectorDialog({
           description={
             <Trans>
               Events that will be run at every frame (roughly 60 times per
-              second), for every object, before
-              the events from the events sheet are launched.
+              second), for every object, before the events from the events sheet
+              are launched.
             </Trans>
           }
         />
@@ -198,8 +196,8 @@ export default function ObjectMethodSelectorDialog({
               description={
                 <Trans>
                   Events that will be run at every frame (roughly 60 times per
-                  second), for every object,
-                  after the events from the events sheet.
+                  second), for every object, after the events from the events
+                  sheet.
                 </Trans>
               }
             />

@@ -71,10 +71,10 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     }
   };
 
-  // TDOD EBO factorize?
+  // TODO EBO factorize?
   _onObjectEdited = async () => {
     // Immediately trigger the reload/regeneration of extensions
-    // as a change in the properties of a behavior can create changes
+    // as a change in the properties of an object can create changes
     // in actions/conditions/expressions to manipulate these properties.
     try {
       await this.props.onLoadEventsFunctionsExtensions();

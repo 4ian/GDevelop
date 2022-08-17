@@ -247,7 +247,7 @@ export const isBehaviorLifecycleEventsFunction = (functionName: string) => {
 };
 
 /**
- * Check if the name of the function is the name of a lifecycle function (for events-based behaviors),
+ * Check if the name of the function is the name of a lifecycle function (for events-based objects),
  * that will be called automatically by the game engine.
  */
 export const isObjectLifecycleEventsFunction = (functionName: string) => {
@@ -699,7 +699,7 @@ export const declareObjectPropertiesInstructionAndExpressions = (
     );
 
     // All property actions/conditions/expressions are private, meaning
-    // they can only be used from the behavior events.
+    // they can only be used from the object events.
     instructionOrExpression.setPrivate();
 
     return instructionOrExpression;

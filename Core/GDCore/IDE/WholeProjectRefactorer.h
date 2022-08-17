@@ -411,7 +411,7 @@ class GD_CORE_API WholeProjectRefactorer {
 
   /**
    * \brief Ensure (adding if necessary) that the functions of the given
-   * behavior have the proper mandatory parameters (the "Object" and
+   * object have the proper mandatory parameters (the "Object" and
    * "Behavior").
    */
   static void EnsureObjectEventsFunctionsProperParameters(

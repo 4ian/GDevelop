@@ -195,9 +195,8 @@ const generateEventsFunctionExtension = (
     )
   )
     .then(() =>
-      // Generate all free functions
+      // Generate all objects and their functions
       Promise.all(
-        // Generate all behaviors and their functions
         mapVector(
           eventsFunctionsExtension.getEventsBasedObjects(),
           eventsBasedObject => {

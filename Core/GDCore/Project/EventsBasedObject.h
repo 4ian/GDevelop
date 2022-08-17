@@ -18,10 +18,10 @@ class Project;
 namespace gd {
 
 /**
- * \brief Represents a behavior that is implemented with events.
+ * \brief Represents an object that is implemented with events.
  *
  * It's the responsibility of the IDE to run the logic to transform this into a
- * real behavior, by declaring an extension and running code generation.
+ * real object, by declaring an extension and running code generation.
  * See `EventsFunctionsExtensionsLoader`.
  *
  * \ingroup PlatformDefinition
@@ -44,7 +44,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public Ob
   }
 
   /**
-   * \brief Set the internal name of the behavior.
+   * \brief Set the internal name of the object.
    */
   EventsBasedObject& SetName(const gd::String& name_) {
     AbstractEventsBasedEntity::SetName(name_);
@@ -52,7 +52,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public Ob
   }
 
   /**
-   * \brief Set the name of the behavior, to be displayed in the editor.
+   * \brief Set the name of the object, to be displayed in the editor.
    */
   EventsBasedObject& SetFullName(const gd::String& fullName_) {
     AbstractEventsBasedEntity::SetFullName(fullName_);

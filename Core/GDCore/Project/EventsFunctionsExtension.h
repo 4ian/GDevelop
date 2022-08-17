@@ -147,14 +147,14 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   }
 
   /**
-   * \brief Return a reference to the list of the events based behaviors.
+   * \brief Return a reference to the list of the events based objects.
    */
   gd::SerializableWithNameList<EventsBasedObject>& GetEventsBasedObjects() {
     return eventsBasedObjects;
   }
 
   /**
-   * \brief Return a const reference to the list of the events based behaviors.
+   * \brief Return a const reference to the list of the events based objects.
    */
   const gd::SerializableWithNameList<EventsBasedObject>&
   GetEventsBasedObjects() const {

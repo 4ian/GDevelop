@@ -86,7 +86,7 @@ export const allAlertMessages: Array<{
   },
   {
     key: 'events-based-object-explanation',
-    label: <Trans>Using events based behavior</Trans>,
+    label: <Trans>Using events based object</Trans>,
   },
   {
     key: 'empty-events-based-object-explanation',

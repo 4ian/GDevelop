@@ -19,10 +19,10 @@ class Project;
 namespace gd {
 
 /**
- * \brief Represents a behavior that is implemented with events.
+ * \brief Represents a behavior or an object that is implemented with events.
  *
  * It's the responsibility of the IDE to run the logic to transform this into a
- * real behavior, by declaring an extension and running code generation.
+ * real behavior or object, by declaring an extension and running code generation.
  * See `EventsFunctionsExtensionsLoader`.
  *
  * \ingroup PlatformDefinition
@@ -39,13 +39,13 @@ class GD_CORE_API AbstractEventsBasedEntity {
   AbstractEventsBasedEntity* Clone() const { return new AbstractEventsBasedEntity(*this); };
 
   /**
-   * \brief Get the description of the behavior, that is displayed in the
+   * \brief Get the description of the behavior or object, that is displayed in the
    * editor.
    */
   const gd::String& GetDescription() const { return description; };
 
   /**
-   * \brief Set the description of the behavior, to be displayed in the editor.
+   * \brief Set the description of the behavior or object, to be displayed in the editor.
    */
   virtual AbstractEventsBasedEntity& SetDescription(const gd::String& description_) {
     description = description_;
@@ -53,12 +53,12 @@ class GD_CORE_API AbstractEventsBasedEntity {
   }
 
   /**
-   * \brief Get the internal name of the behavior.
+   * \brief Get the internal name of the behavior or object.
    */
   const gd::String& GetName() const { return name; };
 
   /**
-   * \brief Set the internal name of the behavior.
+   * \brief Set the internal name of the behavior or object.
    */
   AbstractEventsBasedEntity& SetName(const gd::String& name_) {
     name = name_;
@@ -66,12 +66,12 @@ class GD_CORE_API AbstractEventsBasedEntity {
   }
 
   /**
-   * \brief Get the name of the behavior, that is displayed in the editor.
+   * \brief Get the name of the behavior or object, that is displayed in the editor.
    */
   const gd::String& GetFullName() const { return fullName; };
 
   /**
-   * \brief Set the name of the behavior, to be displayed in the editor.
+   * \brief Set the name of the behavior or object, to be displayed in the editor.
    */
   AbstractEventsBasedEntity& SetFullName(const gd::String& fullName_) {
     fullName = fullName_;
@@ -79,7 +79,7 @@ class GD_CORE_API AbstractEventsBasedEntity {
   }
 
   /**
-   * \brief Return a reference to the functions of the events based behavior.
+   * \brief Return a reference to the functions of the events based behavior or object.
    */
   EventsFunctionsContainer& GetEventsFunctions() {
     return eventsFunctionsContainer;
@@ -87,7 +87,7 @@ class GD_CORE_API AbstractEventsBasedEntity {
 
   /**
    * \brief Return a const reference to the functions of the events based
-   * behavior.
+   * behavior or object.
    */
   const EventsFunctionsContainer& GetEventsFunctions() const {
     return eventsFunctionsContainer;
@@ -127,12 +127,12 @@ class GD_CORE_API AbstractEventsBasedEntity {
    */
   ///@{
   /**
-   * \brief Serialize the EventsBasedBehavior to the specified element
+   * \brief Serialize the AbstractEventsBasedEntity to the specified element
    */
   virtual void SerializeTo(gd::SerializerElement& element) const;
 
   /**
-   * \brief Load the EventsBasedBehavior from the specified element
+   * \brief Load the AbstractEventsBasedEntity from the specified element
    */
   virtual void UnserializeFrom(gd::Project& project,
                        const gd::SerializerElement& element);

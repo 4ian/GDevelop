@@ -2776,7 +2776,6 @@ storiesOf('ObjectsList', module)
             project={testProject.project}
             objectsContainer={testProject.testLayout}
             layout={testProject.testLayout}
-            events={testProject.testLayout.getEvents()}
             resourceSources={[]}
             onChooseResource={() => Promise.reject('unimplemented')}
             resourceExternalEditors={fakeResourceExternalEditors}
@@ -2806,7 +2805,6 @@ storiesOf('ObjectsList', module)
             project={testProject.project}
             objectsContainer={testProject.testLayout}
             layout={testProject.testLayout}
-            events={testProject.testLayout.getEvents()}
             resourceSources={[]}
             onChooseResource={() => Promise.reject('unimplemented')}
             resourceExternalEditors={fakeResourceExternalEditors}
@@ -3614,6 +3612,7 @@ storiesOf('EventsFunctionConfigurationEditor', module)
         helpPagePath="/events/functions"
         eventsFunction={testProject.testEventsFunction}
         eventsBasedBehavior={null}
+        eventsBasedObject={null}
         onParametersOrGroupsUpdated={action(
           'Parameters or groups were updated'
         )}
@@ -3629,6 +3628,7 @@ storiesOf('EventsFunctionConfigurationEditor', module)
         helpPagePath="/events/functions"
         eventsFunction={testProject.testBehaviorEventsFunction}
         eventsBasedBehavior={testProject.testEventsBasedBehavior}
+        eventsBasedObject={null}
         onParametersOrGroupsUpdated={action(
           'Parameters or groups were updated'
         )}
@@ -3644,6 +3644,7 @@ storiesOf('EventsFunctionConfigurationEditor', module)
         helpPagePath="/events/functions"
         eventsFunction={testProject.testBehaviorLifecycleEventsFunction}
         eventsBasedBehavior={testProject.testEventsBasedBehavior}
+        eventsBasedObject={null}
         onParametersOrGroupsUpdated={action(
           'Parameters or groups were updated'
         )}

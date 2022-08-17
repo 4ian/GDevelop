@@ -46,8 +46,11 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { ParametersIndexOffsets } from '../EventsFunctionsExtensionsLoader';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
+import Window from '../Utils/Window';
 
 const gd: libGDevelop = global.gd;
+
+const isDev = Window.isDev();
 
 type Props = {|
   project: gdProject,
@@ -90,19 +93,28 @@ type State = {|
   ) => void,
 |};
 
+// The event based object editor is hidden in releases
+// because it's not handled by GDJS.
 const initialMosaicEditorNodes = {
   direction: 'row',
-  first: {
-    direction: 'column',
-    first: 'free-functions-list',
-    second: {
-      direction: 'column',
-      first: 'objects-list',
-      second: 'behaviors-list',
-      splitPercentage: 50,
-    },
-    splitPercentage: 33,
-  },
+  first: (isDev
+    ? {
+        direction: 'column',
+        first: 'free-functions-list',
+        second: {
+          direction: 'column',
+          first: 'objects-list',
+          second: 'behaviors-list',
+          splitPercentage: 50,
+        },
+        splitPercentage: 33,
+      }
+    : {
+        direction: 'column',
+        first: 'free-functions-list',
+        second: 'behaviors-list',
+        splitPercentage: 50,
+      }),
   second: {
     direction: 'column',
     first: 'parameters',
@@ -1405,11 +1417,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       )
                     }
                     initialNodes={
-                      mosaicContainsNode(initialMosaicEditorNodes, 'objects-list') ?
-                      getDefaultEditorMosaicNode(
-                        'events-functions-extension-editor'
-                      ) || initialMosaicEditorNodes :
-                      initialMosaicEditorNodes
+                      isDev !==
+                      mosaicContainsNode(
+                        initialMosaicEditorNodes,
+                        'objects-list'
+                      )
+                        ? getDefaultEditorMosaicNode(
+                            'events-functions-extension-editor'
+                          ) || initialMosaicEditorNodes
+                        : initialMosaicEditorNodes
                     }
                   />
                 )}

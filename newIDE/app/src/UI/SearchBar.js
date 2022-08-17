@@ -130,6 +130,8 @@ export type SearchBarInterface = {|
   blur: () => void,
 |};
 
+const filterTags = createFilterOptions({ limit: 200 });
+
 /**
  * Material design search bar,
  * inspired from https://github.com/TeamWertarbyte/material-ui-search-bar
@@ -244,8 +246,6 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
         onRequestSearch(value);
       }
     };
-
-    const filterTags = createFilterOptions({ limit: 200 });
 
     // --- Autocomplete-specific handlers ---
 

@@ -64,7 +64,7 @@ jobs:
       # Note: Code signing is done using CSC_LINK (see https://www.electron.build/code-signing).
       - run:
           name: Build GDevelop IDE
-          command: export CSC_FOR_PULL_REQUEST=true && export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && npm run build -- --mac --publish=never
+          command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && npm run build -- --mac --publish=never
 
       - run:
           name: Clean dist folder to keep only installers/binaries.

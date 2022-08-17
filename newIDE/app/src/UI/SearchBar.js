@@ -304,7 +304,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                       id={id}
                       options={tags}
                       filterOptions={(options, state) =>
-                        filterTags(options, state).slice(0, 30)
+                        filterTags(options, state).slice(0, 200)
                       }
                       groupBy={options => i18n._(t`Apply a filter`)}
                       classes={autocompleteStyles}

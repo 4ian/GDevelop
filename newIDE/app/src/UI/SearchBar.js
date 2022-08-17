@@ -245,7 +245,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       }
     };
 
-    const filterTags = createFilterOptions();
+    const filterTags = createFilterOptions({ limit: 200 });
 
     // --- Autocomplete-specific handlers ---
 
@@ -303,9 +303,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                     <Autocomplete
                       id={id}
                       options={tags}
-                      filterOptions={(options, state) =>
-                        filterTags(options, state).slice(0, 200)
-                      }
+                      filterOptions={filterTags}
                       groupBy={options => i18n._(t`Apply a filter`)}
                       classes={autocompleteStyles}
                       freeSolo

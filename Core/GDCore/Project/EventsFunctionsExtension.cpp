@@ -6,6 +6,7 @@
 #include "EventsFunctionsExtension.h"
 
 #include "EventsBasedBehavior.h"
+#include "EventsBasedObject.h"
 #include "EventsFunction.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/MakeUnique.h"
@@ -42,6 +43,7 @@ void EventsFunctionsExtension::Init(const gd::EventsFunctionsExtension& other) {
   helpPath = other.helpPath;
   EventsFunctionsContainer::Init(other);
   eventsBasedBehaviors = other.eventsBasedBehaviors;
+  eventsBasedObjects = other.eventsBasedObjects;
 }
 
 void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
@@ -79,6 +81,8 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   SerializeEventsFunctionsTo(element.AddChild("eventsFunctions"));
   eventsBasedBehaviors.SerializeElementsTo(
       "eventsBasedBehavior", element.AddChild("eventsBasedBehaviors"));
+  eventsBasedObjects.SerializeElementsTo(
+      "eventsBasedObject", element.AddChild("eventsBasedObjects"));
 }
 
 void EventsFunctionsExtension::UnserializeFrom(
@@ -137,6 +141,8 @@ void EventsFunctionsExtension::UnserializeFrom(
   UnserializeEventsFunctionsFrom(project, element.GetChild("eventsFunctions"));
   eventsBasedBehaviors.UnserializeElementsFrom(
       "eventsBasedBehavior", project, element.GetChild("eventsBasedBehaviors"));
+  eventsBasedObjects.UnserializeElementsFrom(
+      "eventsBasedObject", project, element.GetChild("eventsBasedObjects"));
 }
 
 bool EventsFunctionsExtension::IsExtensionLifecycleEventsFunction(

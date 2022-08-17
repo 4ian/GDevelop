@@ -698,36 +698,6 @@ export const fakeAssetWithEventCustomizationsAndFlashExtension1: Asset = {
               extensionVersion: '1.0.0',
             },
           ],
-          events: [
-            {
-              disabled: false,
-              folded: false,
-              type: 'BuiltinCommonInstructions::Standard',
-              conditions: [
-                {
-                  type: { inverted: false, value: 'VarScene' },
-                  parameters: [
-                    'Counter',
-                    '<',
-                    'TEXT_TO_REPLACE + PlayerSpaceship.Variable(test)',
-                  ],
-                  subInstructions: [],
-                },
-              ],
-              actions: [
-                {
-                  type: { inverted: false, value: 'ModVarScene' },
-                  parameters: [
-                    'Counter',
-                    '=',
-                    'TEXT_TO_REPLACE + PlayerSpaceship.Variable(test2)',
-                  ],
-                  subInstructions: [],
-                },
-              ],
-              events: [],
-            },
-          ],
           parameters: [
             {
               codeOnly: false,
@@ -775,16 +745,6 @@ export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
             {
               extensionName: 'UnknownExtension', // Not really used in events, just for tests.
               extensionVersion: '1.0.0',
-            },
-          ],
-          events: [
-            {
-              disabled: false,
-              folded: false,
-              type: 'BuiltinCommonInstructions::Standard',
-              conditions: [],
-              actions: [],
-              events: [],
             },
           ],
           parameters: [

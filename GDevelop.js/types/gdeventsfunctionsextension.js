@@ -32,6 +32,7 @@ declare class gdEventsFunctionsExtension extends gdEventsFunctionsContainer {
   removeDependencyAt(index: number): void;
   getAllDependencies(): gdVectorDependencyMetadata;
   getEventsBasedBehaviors(): gdEventsBasedBehaviorsList;
+  getEventsBasedObjects(): gdEventsBasedObjectsList;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   static isExtensionLifecycleEventsFunction(eventsFunctionName: string): boolean;

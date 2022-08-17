@@ -35,10 +35,38 @@
         "to": "preview_node_modules"
       }
     ],
+    "linux": {
+      "target": [{
+        "target": "AppImage",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      }, {
+        "target": "zip",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      }, {
+        "target": "deb",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      }]
+    },
     "mac": {
       "category": "public.app-category.developer-tools",
       "hardenedRuntime": true,
-      "entitlements": "./build/entitlements.mac.inherit.plist"
+      "entitlements": "./build/entitlements.mac.inherit.plist",
+      "target": {
+        "target": "default",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      }
     },
     "win": {
       "executableName": "GDevelop"

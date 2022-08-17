@@ -26,7 +26,6 @@ export type AssetCustomization =
     |}
   | {|
       required: boolean,
-      events: any /*(serialized gdEventsList)*/,
       parameters: Array<SerializedParameterMetadata>,
       extensions: Array<{|
         extensionName: string,

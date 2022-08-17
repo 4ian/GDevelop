@@ -373,7 +373,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     if (isObjectLifecycleEventsFunction(newName)) {
       showWarningBox(
         i18n._(
-          t`This name is reserved for a lifecycle method of the behavior. Choose another name for your custom function.`
+          t`This name is reserved for a lifecycle method of the object. Choose another name for your custom function.`
         ),
         { delayToNextTick: true }
       );
@@ -593,8 +593,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
 
   _onEventsBasedObjectRenamed = () => {
-    // Name of a object changed, so notify parent
-    // that a object was edited (to trigger reload of extensions)
+    // Name of an object changed, so notify parent
+    // that an object was edited (to trigger reload of extensions)
     if (this.props.onObjectEdited) this.props.onObjectEdited();
 
     // Reload the selected events function, if any, as the parent-object was
@@ -831,9 +831,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   _editObject = (editedEventsBasedObject: ?gdEventsBasedObject) => {
     this.setState(
       state => {
-        // If we're closing the properties of a behavior, ensure parameters
-        // are up-to-date in all event functions of the behavior (the object
-        // type might have changed).
+        // If we're closing the properties of an object, ensure parameters
+        // are up-to-date in all event functions of the object.
         if (state.editedEventsBasedObject && !editedEventsBasedObject) {
           gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
             this.props.eventsFunctionsExtension,
@@ -1287,8 +1286,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             <Background>
               <EmptyMessage>
                 <Trans>
-                  Select a behavior or an to display the functions inside this
-                  behavior.
+                  Select a behavior or an object to display its functions.
                 </Trans>
               </EmptyMessage>
             </Background>

@@ -392,8 +392,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                 {properties.getCount() === 0 ? (
                   <EmptyMessage>
                     <Trans>
-                      No properties for this behavior. Add one to store data
-                      inside this behavior (for example: health, ammo, speed,
+                      No properties for this object. Add one to store data
+                      inside this object (for example: health, ammo, speed,
                       etc...)
                     </Trans>
                   </EmptyMessage>

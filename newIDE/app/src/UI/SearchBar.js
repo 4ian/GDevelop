@@ -14,7 +14,9 @@ import {
 import Close from '@material-ui/icons/Close';
 import Search from '@material-ui/icons/Search';
 import FilterList from '@material-ui/icons/FilterList';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import Autocomplete, {
+  createFilterOptions,
+} from '@material-ui/lab/Autocomplete';
 import ElementWithMenu from './Menu/ElementWithMenu';
 import HelpIcon from './HelpIcon';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
@@ -243,6 +245,8 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       }
     };
 
+    const filterTags = createFilterOptions({ limit: 200 });
+
     // --- Autocomplete-specific handlers ---
 
     const handleAutocompleteInput = (
@@ -299,6 +303,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                     <Autocomplete
                       id={id}
                       options={tags}
+                      filterOptions={filterTags}
                       groupBy={options => i18n._(t`Apply a filter`)}
                       classes={autocompleteStyles}
                       freeSolo

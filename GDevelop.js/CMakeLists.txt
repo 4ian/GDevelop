@@ -14,7 +14,7 @@ endif()
 
 # Compilation flags (https://emscripten.org/docs/tools_reference/emcc.html):
 SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O2") # Optimizations during compilation
-# SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --profiling") # Profiling support
+SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --profiling") # Profiling support
 
 #Common directories:
 ###

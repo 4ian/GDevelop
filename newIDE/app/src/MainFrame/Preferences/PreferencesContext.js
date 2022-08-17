@@ -21,6 +21,8 @@ export type AlertMessageIdentifier =
   | 'function-extractor-explanation'
   | 'events-based-behavior-explanation'
   | 'empty-events-based-behavior-explanation'
+  | 'events-based-object-explanation'
+  | 'empty-events-based-object-explanation'
   | 'too-much-effects'
   | 'effects-usage'
   | 'lighting-layer-usage'
@@ -81,6 +83,14 @@ export const allAlertMessages: Array<{
   {
     key: 'empty-events-based-behavior-explanation',
     label: <Trans>Using empty events based behavior</Trans>,
+  },
+  {
+    key: 'events-based-object-explanation',
+    label: <Trans>Using events based behavior</Trans>,
+  },
+  {
+    key: 'empty-events-based-object-explanation',
+    label: <Trans>Using empty events based object</Trans>,
   },
   {
     key: 'too-much-effects',

@@ -74,7 +74,6 @@ type Props = {|
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
-  events: gdEventsList,
   onClose: () => void,
   onCreateNewObject: (type: string) => void,
   onObjectAddedFromAsset: gdObject => void,
@@ -87,7 +86,6 @@ export default function NewObjectDialog({
   resourceSources,
   onChooseResource,
   resourceExternalEditors,
-  events,
   onClose,
   onCreateNewObject,
   onObjectAddedFromAsset,
@@ -169,7 +167,6 @@ export default function NewObjectDialog({
             eventsFunctionsExtensionsState,
             project,
             objectsContainer,
-            events,
             environment,
           });
           sendAssetAddedToProject({
@@ -202,7 +199,6 @@ export default function NewObjectDialog({
       eventsFunctionsExtensionsState,
       project,
       objectsContainer,
-      events,
       onObjectAddedFromAsset,
       openedAssetShortHeader,
       environment,
@@ -344,7 +340,6 @@ export default function NewObjectDialog({
           }}
           project={project}
           objectsContainer={objectsContainer}
-          events={events}
           onObjectAddedFromAsset={onObjectAddedFromAsset}
         />
       )}

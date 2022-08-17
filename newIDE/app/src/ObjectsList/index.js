@@ -107,7 +107,6 @@ type Props = {|
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
-  events: gdEventsList,
   onDeleteObject: (
     objectWithContext: ObjectWithContext,
     cb: (boolean) => void
@@ -617,7 +616,6 @@ export default class ObjectsList extends React.Component<Props, State> {
       onChooseResource,
       resourceExternalEditors,
       selectedObjectTags,
-      events,
     } = this.props;
     const { searchText, tagEditedObject } = this.state;
 
@@ -711,7 +709,6 @@ export default class ObjectsList extends React.Component<Props, State> {
             project={project}
             layout={layout}
             objectsContainer={objectsContainer}
-            events={events}
             resourceSources={resourceSources}
             onChooseResource={onChooseResource}
             resourceExternalEditors={resourceExternalEditors}

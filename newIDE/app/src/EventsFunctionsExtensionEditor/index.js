@@ -131,22 +131,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   editor: ?EventsSheetInterface;
   _editorMosaic: ?EditorMosaic;
   _editorNavigator: ?EditorNavigatorInterface;
-  _globalObjectsContainer: ?gdObjectsContainer;
-  _objectsContainer: ?gdObjectsContainer;
+  // Create an empty "context" of objects.
+  // Avoid recreating containers if they were already created, so that
+  // we keep the same objects in memory and avoid remounting components
+  // (like ObjectGroupsList) because objects "ptr" changed.
+  _globalObjectsContainer: gdObjectsContainer = new gd.ObjectsContainer();
+  _objectsContainer: gdObjectsContainer = new gd.ObjectsContainer();
 
   componentDidMount() {
-    // Create an empty "context" of objects.
-    // Avoid recreating containers if they were already created, so that
-    // we keep the same objects in memory and avoid remounting components
-    // (like ObjectGroupsList) because objects "ptr" changed.
-    if (!this._globalObjectsContainer) {
-      this._globalObjectsContainer = new gd.ObjectsContainer();
-    }
-
-    if (!this._objectsContainer) {
-      this._objectsContainer = new gd.ObjectsContainer();
-    }
-
     if (this.props.initiallyFocusedFunctionName) {
       this.selectEventsFunctionByName(
         this.props.initiallyFocusedFunctionName,

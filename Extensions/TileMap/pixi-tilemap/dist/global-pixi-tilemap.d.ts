@@ -5,6 +5,7 @@ import {
   TilemapGeometry,
   TilemapShader,
   TileRenderer,
+  settings,
 } from './pixi-tilemap';
 
 declare global {
@@ -16,6 +17,7 @@ declare global {
       export { TilemapGeometry };
       export { TilemapShader };
       export { TileRenderer };
+      export { settings };
     }
   }
 }

@@ -956,6 +956,7 @@ module.exports = {
         pixiRenderer
       );
 
+      Tilemap.settings.use32bitIndex = true;
       pixiRenderer.plugins.tilemap =
         pixiRenderer.plugins.tilemap || new Tilemap.TileRenderer();
       this.tileMapPixiObject = new Tilemap.CompositeTilemap();

@@ -956,7 +956,8 @@ module.exports = {
         pixiRenderer
       );
 
-      pixiRenderer.plugins.tilemap = new Tilemap.TileRenderer();
+      pixiRenderer.plugins.tilemap =
+        pixiRenderer.plugins.tilemap || new Tilemap.TileRenderer();
       this.tileMapPixiObject = new Tilemap.CompositeTilemap();
       this._pixiObject = this.tileMapPixiObject;
 

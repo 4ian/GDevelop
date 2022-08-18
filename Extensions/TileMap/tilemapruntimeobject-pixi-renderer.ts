@@ -32,7 +32,8 @@ namespace gdjs {
         .getPIXIRenderer();
 
       // @ts-ignore - pixi-tilemap types to be added.
-      pixiRenderer.plugins.tilemap = new PIXI.tilemap.TileRenderer();
+      pixiRenderer.plugins.tilemap =
+        pixiRenderer.plugins.tilemap || new PIXI.tilemap.TileRenderer();
 
       // Load (or reset)
       this._pixiObject = new PIXI.tilemap.CompositeTilemap();

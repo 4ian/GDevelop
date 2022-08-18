@@ -13,7 +13,7 @@ namespace gdjs {
     private _runtimeScene: gdjs.RuntimeScene;
     private _tileMap: TileMapHelper.EditableTileMap | null = null;
 
-    private _pixiObject: PIXI.tilemap.CompositeRectTileLayer;
+    private _pixiObject: PIXI.tilemap.CompositeTilemap;
 
     /**
      * @param runtimeObject The object to render

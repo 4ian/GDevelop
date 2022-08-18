@@ -1,34 +1,58 @@
 import PIXI = GlobalPIXIModule.PIXI;
 
 export declare class CanvasTileRenderer {
-  renderer: PIXI.Renderer;
+  renderer: PIXI.AbstractRenderer;
   tileAnim: number[];
   dontUseTransform: boolean;
-  constructor(renderer: PIXI.Renderer);
+  constructor(renderer: PIXI.AbstractRenderer);
 }
 
-export declare class CompositeRectTileLayer extends PIXI.Container {
-  constructor(
-    zIndex?: number,
-    bitmaps?: Array<PIXI.Texture>,
-    texPerChild?: number
-  );
-  z: number;
-  // @ts-ignore Maybe it's a compatibility issue with the PIXI version we are using
-  zIndex: number;
-  modificationMarker: number;
-  shadowColor: Float32Array;
-  _globalMat: PIXI.Matrix;
-  _lastLayer: RectTileLayer;
-  texPerChild: number;
-  tileAnim: number[];
-  initialize(
-    zIndex?: number,
-    bitmaps?: Array<PIXI.Texture>,
-    texPerChild?: number
-  ): void;
-  setBitmaps(bitmaps: Array<PIXI.Texture>): void;
-  clear(): void;
+declare abstract class CanvasRenderer extends PIXI.AbstractRenderer {}
+
+declare class CompositeTilemap extends PIXI.Container {
+  readonly texturesPerTilemap: number;
+  tileAnim: [number, number];
+  protected lastModifiedTilemap: Tilemap;
+  private modificationMarker;
+  private shadowColor;
+  private _globalMat;
+  constructor(tileset?: Array<PIXI.BaseTexture>);
+  tileset(tileTextures: Array<PIXI.BaseTexture>): this;
+  clear(): this;
+  tileRotate(rotate: number): this;
+  tileAnimX(offset: number, count: number): this;
+  tileAnimY(offset: number, count: number): this;
+  tile(
+    tileTexture: PIXI.Texture | string | number,
+    x: number,
+    y: number,
+    options?: {
+      u?: number;
+      v?: number;
+      tileWidth?: number;
+      tileHeight?: number;
+      animX?: number;
+      animY?: number;
+      rotate?: number;
+      animCountX?: number;
+      animCountY?: number;
+      alpha?: number;
+    }
+  ): this;
+  renderCanvas(renderer: CanvasRenderer): void;
+  render(renderer: PIXI.Renderer): void;
+  isModified(anim: boolean): boolean;
+  clearModify(): void;
+  addFrame(
+    texture: PIXI.Texture | string | number,
+    x: number,
+    y: number,
+    animX?: number,
+    animY?: number,
+    animWidth?: number,
+    animHeight?: number,
+    alpha?: number
+  ): this;
   addRect(
     textureIndex: number,
     u: number,
@@ -43,32 +67,22 @@ export declare class CompositeRectTileLayer extends PIXI.Container {
     animWidth?: number,
     animHeight?: number
   ): this;
-  tileRotate(rotate: number): this;
-  tileAnimX(offset: number, count: number): this;
-  tileAnimY(offset: number, count: number): this;
-  addFrame(
-    texture_: PIXI.Texture | String | number,
-    x: number,
-    y: number,
-    animX?: number,
-    animY?: number,
-    animWidth?: number,
-    animHeight?: number
-  ): this;
-  renderCanvas(renderer: any): void;
-  render(renderer: PIXI.Renderer): void;
-  isModified(anim: boolean): boolean;
-  clearModify(): void;
+  setBitmaps: (tileTextures: Array<PIXI.BaseTexture>) => this;
+  get texPerChild(): number;
 }
+export { CompositeTilemap as CompositeRectTileLayer };
+export { CompositeTilemap };
 
 export declare const Constant: {
+  TEXTURES_PER_TILEMAP: number;
+  TEXTILE_DIMEN: number;
+  TEXTILE_UNITS: number;
+  TEXTILE_SCALE_MODE: PIXI.SCALE_MODES;
+  use32bitIndex: boolean;
+  DO_CLEAR: boolean;
   maxTextures: number;
-  bufferSize: number;
   boundSize: number;
   boundCountPerBuffer: number;
-  use32bitIndex: boolean;
-  SCALE_MODE: PIXI.SCALE_MODES;
-  DO_CLEAR: boolean;
 };
 
 export declare function fillSamplers(
@@ -81,32 +95,61 @@ export declare function generateFragmentSrc(
   fragmentSrc: string
 ): string;
 
-export declare function generateSampleSrc(maxTextures: number): string;
+export declare const pixi_tilemap: {
+  CanvasTileRenderer: typeof CanvasTileRenderer;
+  CompositeRectTileLayer: typeof CompositeTilemap;
+  CompositeTilemap: typeof CompositeTilemap;
+  Constant: {
+    TEXTURES_PER_TILEMAP: number;
+    TEXTILE_DIMEN: number;
+    TEXTILE_UNITS: number;
+    TEXTILE_SCALE_MODE: PIXI.SCALE_MODES;
+    use32bitIndex: boolean;
+    DO_CLEAR: boolean;
+    maxTextures: number;
+    boundSize: number;
+    boundCountPerBuffer: number;
+  };
+  TextileResource: typeof TextileResource;
+  MultiTextureResource: typeof TextileResource;
+  RectTileLayer: typeof Tilemap;
+  Tilemap: typeof Tilemap;
+  TilemapShader: typeof TilemapShader;
+  TilemapGeometry: typeof TilemapGeometry;
+  RectTileShader: typeof TilemapShader;
+  RectTileGeom: typeof TilemapGeometry;
+  TileRenderer: typeof TileRenderer;
+};
 
-export declare class GraphicsLayer extends PIXI.Graphics {
-  constructor(zIndex: number);
-  renderCanvas(renderer: any): void;
-  isModified(anim: boolean): boolean;
-  clearModify(): void;
-}
+export declare const POINT_STRUCT_SIZE: number;
 
-export declare interface IMultiTextureOptions {
-  boundCountPerBuffer: number;
+export declare const settings: {
+  TEXTURES_PER_TILEMAP: number;
+  TEXTILE_DIMEN: number;
+  TEXTILE_UNITS: number;
+  TEXTILE_SCALE_MODE: PIXI.SCALE_MODES;
+  use32bitIndex: boolean;
+  DO_CLEAR: boolean;
+  maxTextures: number;
   boundSize: number;
-  bufferSize: number;
+  boundCountPerBuffer: number;
+};
+
+export declare interface TextileOptions {
+  TEXTILE_DIMEN: number;
+  TEXTILE_UNITS: number;
   DO_CLEAR?: boolean;
 }
 
-export declare class MultiTextureResource extends PIXI.Resource {
-  constructor(options: IMultiTextureOptions);
-  DO_CLEAR: boolean;
-  boundSize: number;
-  _clearBuffer: Uint8Array;
+export declare class TextileResource extends PIXI.Resource {
+  baseTexture: PIXI.BaseTexture;
+  private readonly doClear;
+  private readonly tileDimen;
+  private readonly tiles;
+  private _clearBuffer;
+  constructor(options?: TextileOptions);
+  tile(index: number, texture: PIXI.BaseTexture): void;
   bind(baseTexture: PIXI.BaseTexture): void;
-  baseTex: PIXI.BaseTexture;
-  boundSprites: Array<PIXI.Sprite>;
-  dirties: Array<number>;
-  setTexture(ind: number, texture: PIXI.Texture): void;
   upload(
     renderer: PIXI.Renderer,
     texture: PIXI.BaseTexture,
@@ -114,60 +157,60 @@ export declare class MultiTextureResource extends PIXI.Resource {
   ): boolean;
 }
 
-export declare const pixi_tilemap: {
-  CanvasTileRenderer: typeof CanvasTileRenderer;
-  CompositeRectTileLayer: typeof CompositeRectTileLayer;
-  Constant: {
-    maxTextures: number;
-    bufferSize: number;
-    boundSize: number;
-    boundCountPerBuffer: number;
-    use32bitIndex: boolean;
-    SCALE_MODE: PIXI.SCALE_MODES;
-    DO_CLEAR: boolean;
-  };
-  GraphicsLayer: typeof GraphicsLayer;
-  MultiTextureResource: typeof MultiTextureResource;
-  RectTileLayer: typeof RectTileLayer;
-  TilemapShader: typeof TilemapShader;
-  RectTileShader: typeof RectTileShader;
-  RectTileGeom: typeof RectTileGeom;
-  TileRenderer: typeof TileRenderer;
-  ZLayer: typeof ZLayer;
-};
-
-export declare const POINT_STRUCT_SIZE = 12;
-
-export declare class RectTileGeom extends PIXI.Geometry {
-  vertSize: number;
-  vertPerQuad: number;
-  stride: number;
-  lastTimeAccess: number;
-  constructor();
-  buf: PIXI.Buffer;
-}
-
-export declare class RectTileLayer extends PIXI.Container {
-  constructor(zIndex: number, texture: PIXI.Texture | Array<PIXI.Texture>);
-  // @ts-ignore Maybe it's a compatibility issue with the PIXI version we are using
-  zIndex: number;
-  modificationMarker: number;
-  _$_localBounds: PIXI.Bounds;
+declare class Tilemap extends PIXI.Container {
   shadowColor: Float32Array;
   _globalMat: PIXI.Matrix;
-  pointsBuf: Array<number>;
-  hasAnim: boolean;
-  textures: Array<PIXI.Texture>;
+  tileAnim: [number, number];
+  modificationMarker: number;
   offsetX: number;
   offsetY: number;
   compositeParent: boolean;
-  initialize(
-    zIndex: number,
-    textures: PIXI.Texture | Array<PIXI.Texture>
-  ): void;
-  clear(): void;
+  protected tileset: Array<PIXI.BaseTexture>;
+  protected readonly tilemapBounds: PIXI.Bounds;
+  protected hasAnimatedTile: boolean;
+  private pointsBuf;
+  constructor(tileset: PIXI.BaseTexture | Array<PIXI.BaseTexture>);
+  getTileset(): Array<PIXI.BaseTexture>;
+  setTileset(tileset?: PIXI.BaseTexture | Array<PIXI.BaseTexture>): this;
+  clear(): this;
+  tile(
+    tileTexture: number | string | PIXI.Texture | PIXI.BaseTexture,
+    x: number,
+    y: number,
+    options?: {
+      u?: number;
+      v?: number;
+      tileWidth?: number;
+      tileHeight?: number;
+      animX?: number;
+      animY?: number;
+      rotate?: number;
+      animCountX?: number;
+      animCountY?: number;
+      alpha?: number;
+    }
+  ): this;
+  tileRotate(rotate: number): void;
+  tileAnimX(offset: number, count: number): void;
+  tileAnimY(offset: number, count: number): void;
+  tileAlpha(alpha: number): void;
+  renderCanvas(renderer: CanvasRenderer): void;
+  renderCanvasCore(renderer: CanvasRenderer): void;
+  private vbId;
+  private vb;
+  private vbBuffer;
+  private vbArray;
+  private vbInts;
+  private destroyVb;
+  render(renderer: PIXI.Renderer): void;
+  renderWebGLCore(renderer: PIXI.Renderer, plugin: TileRenderer): void;
+  isModified(anim: boolean): boolean;
+  clearModify(): void;
+  protected _calculateBounds(): void;
+  getLocalBounds(rect?: PIXI.Rectangle): PIXI.Rectangle;
+  destroy(options?: PIXI.IDestroyOptions): void;
   addFrame(
-    texture_: PIXI.Texture | String | number,
+    texture: PIXI.Texture | string | number,
     x: number,
     y: number,
     animX: number,
@@ -185,78 +228,43 @@ export declare class RectTileLayer extends PIXI.Container {
     animY?: number,
     rotate?: number,
     animCountX?: number,
-    animCountY?: number
+    animCountY?: number,
+    alpha?: number
   ): this;
-  tileRotate(rotate: number): void;
-  tileAnimX(offset: number, count: number): void;
-  tileAnimY(offset: number, count: number): void;
-  renderCanvas(renderer: any): void;
-  renderCanvasCore(renderer: any): void;
-  vbId: number;
-  vb: RectTileGeom;
-  vbBuffer: ArrayBuffer;
-  vbArray: Float32Array;
-  vbInts: Uint32Array;
-  destroyVb(): void;
-  render(renderer: PIXI.Renderer): void;
-  renderWebGLCore(renderer: PIXI.Renderer, plugin: TileRenderer): void;
-  isModified(anim: boolean): boolean;
-  clearModify(): void;
-  protected _calculateBounds(): void;
-  getLocalBounds(rect?: PIXI.Rectangle): PIXI.Rectangle;
-  destroy(options?: any): void;
+}
+export { Tilemap as RectTileLayer };
+export { Tilemap };
+
+export declare class TilemapGeometry extends PIXI.Geometry {
+  vertSize: number;
+  vertPerQuad: number;
+  stride: number;
+  lastTimeAccess: number;
+  constructor();
+  buf: any;
 }
 
-export declare class RectTileShader extends TilemapShader {
+export declare class TilemapShader extends PIXI.Shader {
+  maxTextures: number;
   constructor(maxTextures: number);
 }
 
-export declare abstract class TilemapShader extends PIXI.Shader {
-  maxTextures: number;
-  constructor(maxTextures: number, shaderVert: string, shaderFrag: string);
-}
-
 export declare class TileRenderer extends PIXI.ObjectRenderer {
-  renderer: PIXI.Renderer;
-  gl: WebGLRenderingContext;
-  sn: number;
-  indexBuffer: PIXI.Buffer;
-  ibLen: number;
+  readonly renderer: PIXI.Renderer;
   tileAnim: number[];
-  texLoc: Array<number>;
-  rectShader: RectTileShader;
-  texResources: Array<MultiTextureResource>;
+  private ibLen;
+  private indexBuffer;
+  private shader;
+  private textiles;
   constructor(renderer: PIXI.Renderer);
-  initBounds(): void;
-  bindTexturesWithoutRT(
+  bindTileTextures(
     renderer: PIXI.Renderer,
-    shader: TilemapShader,
-    textures: Array<PIXI.Texture>
-  ): void;
-  bindTextures(
-    renderer: PIXI.Renderer,
-    shader: TilemapShader,
-    textures: Array<PIXI.Texture>
+    textures: Array<PIXI.BaseTexture>
   ): void;
   start(): void;
-  createVb(): RectTileGeom;
-  checkIndexBuffer(size: number, vb?: RectTileGeom): void;
+  createVb(): TilemapGeometry;
   getShader(): TilemapShader;
   destroy(): void;
-}
-
-export declare class ZLayer extends PIXI.Container {
-  constructor(tilemap: PIXI.Container, zIndex: number);
-  tilemap: any;
-  z: number;
-  // @ts-ignore Maybe it's a compatibility issue with the PIXI version we are using
-  zIndex: number;
-  _previousLayers: number;
-  canvasBuffer: HTMLCanvasElement;
-  _tempRender: any;
-  _lastAnimationFrame: number;
-  layerTransform: PIXI.Matrix;
-  clear(): void;
-  cacheIfDirty(): void;
-  renderCanvas(renderer: any): void;
+  checkIndexBuffer(size: number, _vb?: TilemapGeometry): void;
+  private makeTextiles;
 }

@@ -942,7 +942,8 @@ module.exports = {
       instance,
       associatedObject,
       pixiContainer,
-      pixiResourcesLoader
+      pixiResourcesLoader,
+      pixiRenderer
     ) {
       RenderedInstance.call(
         this,
@@ -951,10 +952,14 @@ module.exports = {
         instance,
         associatedObject,
         pixiContainer,
-        pixiResourcesLoader
+        pixiResourcesLoader,
+        pixiRenderer
       );
 
-      this.tileMapPixiObject = new Tilemap.CompositeRectTileLayer(0);
+      Tilemap.settings.use32bitIndex = true;
+      pixiRenderer.plugins.tilemap =
+        pixiRenderer.plugins.tilemap || new Tilemap.TileRenderer();
+      this.tileMapPixiObject = new Tilemap.CompositeTilemap();
       this._pixiObject = this.tileMapPixiObject;
 
       // Implement `containsPoint` so that we can set `interactive` to true and

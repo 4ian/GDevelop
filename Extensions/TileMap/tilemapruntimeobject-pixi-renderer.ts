@@ -34,7 +34,7 @@ namespace gdjs {
       PIXI.tilemap.settings.use32bitIndex = true;
       if (pixiRenderer) {
         pixiRenderer.plugins.tilemap =
-        // @ts-ignore - pixi-tilemap types to be added.
+          // @ts-ignore - pixi-tilemap types to be added.
           pixiRenderer.plugins.tilemap || new PIXI.tilemap.TileRenderer();
       }
 

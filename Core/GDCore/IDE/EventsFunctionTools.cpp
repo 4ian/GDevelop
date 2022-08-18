@@ -85,9 +85,6 @@ void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
                                        outputGlobalObjectsContainer,
                                        outputObjectsContainer);
 
-  // TODO EBO these 2 checks are not necessary for the following code to work.
-  // Should they be removed?
-
   // ...and has an "Object" by convention...
   if (!outputObjectsContainer.HasObjectNamed("Object")) {
     gd::LogWarning("No \"Object\" in a function of an events based object: " +

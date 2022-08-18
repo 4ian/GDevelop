@@ -17,7 +17,6 @@ void AbstractEventsBasedEntity::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("description", description);
   element.SetAttribute("name", name);
   element.SetAttribute("fullName", fullName);
-  element.SetAttribute("objectType", objectType);
 
   gd::SerializerElement& eventsFunctionsElement =
       element.AddChild("eventsFunctions");
@@ -31,7 +30,6 @@ void AbstractEventsBasedEntity::UnserializeFrom(gd::Project& project,
   description = element.GetStringAttribute("description");
   name = element.GetStringAttribute("name");
   fullName = element.GetStringAttribute("fullName");
-  objectType = element.GetStringAttribute("objectType");
 
   const gd::SerializerElement& eventsFunctionsElement =
       element.GetChild("eventsFunctions");

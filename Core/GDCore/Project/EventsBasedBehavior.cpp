@@ -14,14 +14,14 @@ EventsBasedBehavior::EventsBasedBehavior()
     : AbstractEventsBasedEntity("MyBehavior") {}
 
 void EventsBasedBehavior::SerializeTo(SerializerElement& element) const {
-  element.SetAttribute("objectType", objectType);
   AbstractEventsBasedEntity::SerializeTo(element);
+  element.SetAttribute("objectType", objectType);
 }
 
 void EventsBasedBehavior::UnserializeFrom(gd::Project& project,
                                           const SerializerElement& element) {
-  objectType = element.GetStringAttribute("objectType");
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
+  objectType = element.GetStringAttribute("objectType");
 }
 
 }  // namespace gd

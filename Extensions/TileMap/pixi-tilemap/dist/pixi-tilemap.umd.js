@@ -1,5 +1,8 @@
 /* eslint-disable */
  
+// If you update this library, beware of the hack for createIndicesForQuads
+// inside of the library code.
+
 /*!
  * @pixi/tilemap - v3.2.2
  * Compiled Fri, 22 Oct 2021 12:27:49 UTC
@@ -1887,7 +1890,9 @@ void main(void)
     	    }
 
     	    this.ibLen = totalIndices;
-    	    this.indexBuffer.update(utils.createIndicesForQuads(size,
+            // This is needed because the IDE and the Runtime doesn't use the same namespace.
+            const createIndicesForQuads = utils.createIndicesForQuads || utils.utils.createIndicesForQuads;
+    	    this.indexBuffer.update(createIndicesForQuads(size,
     	        settings.use32bitIndex ? new Uint32Array(size * 6) : undefined));
 
     	    // 	TODO: create new index buffer instead?

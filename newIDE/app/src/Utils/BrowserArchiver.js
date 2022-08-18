@@ -1,6 +1,6 @@
 // @flow
-
 import { initializeZipJs } from './Zip.js';
+import { checkIfCredentialsRequired } from './CrossOrigin';
 import path from 'path';
 
 export type BlobFileDescriptor = {|
@@ -57,20 +57,6 @@ function eachCallback<T>(
   callNextCallback();
 }
 
-// TODO: factor (find the right place for it and comment it)
-const determineCrossOrigin = (url: string) => {
-  // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
-  // i.e: its gdevelop.io cookie, to be passed.
-  if (
-    url.startsWith('https://project-resources.gdevelop.io/') ||
-    url.startsWith('https://project-resources-dev.gdevelop.io/')
-  )
-    return 'include';
-
-  // For other resources, use "same-origin" as done by default by fetch.
-  return 'same-origin';
-};
-
 export const downloadUrlsToBlobs = async ({
   urlFiles,
   onProgress,
@@ -110,7 +96,12 @@ export const downloadUrlsToBlobs = async ({
         return fetch(urlWithParameters, {
           // Include credentials so that resources on GDevelop cloud are properly fetched
           // with the cookie obtained for the project.
-          credentials: determineCrossOrigin(urlWithParameters),
+          credentials: checkIfCredentialsRequired(urlWithParameters)
+            ? // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
+              // i.e: its gdevelop.io cookie, to be passed.
+              'include'
+            : // For other resources, use "same-origin" as done by default by fetch.
+              'same-origin',
         })
           .then(
             response => {

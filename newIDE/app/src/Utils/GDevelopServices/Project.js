@@ -194,8 +194,10 @@ export const uploadProjectResourceFiles = async (
             })
         );
 
-        const fullUrl = `${GDevelopProjectResourcesStorage.baseUrl}${presignedUrl}`;
-        const urlWithoutSearchParams = fullUrl.substr(0, fullUrl.indexOf('?'))
+        const fullUrl = `${
+          GDevelopProjectResourcesStorage.baseUrl
+        }${presignedUrl}`;
+        const urlWithoutSearchParams = fullUrl.substr(0, fullUrl.indexOf('?'));
         results.push({
           error: null,
           resourceFile,

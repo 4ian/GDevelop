@@ -1,6 +1,8 @@
 // @flow
 
-export const getFileSha512TruncatedTo256 = async (file: File): Promise<string> => {
+export const getFileSha512TruncatedTo256 = async (
+  file: File
+): Promise<string> => {
   // $FlowFixMe - Flow does not know about crypto API
   if (!crypto || !crypto.subtle) {
     console.error('crypto.subtle is not available in this environment.');

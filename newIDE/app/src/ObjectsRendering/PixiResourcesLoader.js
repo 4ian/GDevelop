@@ -4,6 +4,7 @@ import axios from 'axios';
 import * as PIXI from 'pixi.js-legacy';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
+import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
 const gd: libGDevelop = global.gd;
 
 const loadedBitmapFonts = {};
@@ -11,15 +12,10 @@ const loadedFontFamilies = {};
 const loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
 
-// TODO: factor (find the right place for it and comment it)
 const determineCrossOrigin = (url: string) => {
   // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
   // i.e: its gdevelop.io cookie, to be passed.
-  if (
-    url.startsWith('https://project-resources.gdevelop.io/') ||
-    url.startsWith('https://project-resources-dev.gdevelop.io/')
-  )
-    return 'use-credentials';
+  if (checkIfCredentialsRequired(url)) return 'use-credentials';
 
   // For other resources, use "anonymous" as done by default by PixiJS. Note that using `false`
   // to not having `crossorigin` at all would NOT work because the browser would taint the

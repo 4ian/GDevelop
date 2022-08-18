@@ -9,7 +9,10 @@ import muiDecorator from '../../ThemeDecorator';
 import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../../GDevelopJsInitializerDecorator';
-import { fakeIndieAuthenticatedUser, fakeNotAuthenticatedAuthenticatedUser } from '../../../fixtures/GDevelopServicesTestData';
+import {
+  fakeIndieAuthenticatedUser,
+  fakeNotAuthenticatedAuthenticatedUser,
+} from '../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
 const gd: libGDevelop = global.gd;
@@ -72,7 +75,9 @@ export const IncompatibleStorageProvider = () => (
 );
 
 export const NotAuthenticatedUser = () => (
-  <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider
+    value={fakeNotAuthenticatedAuthenticatedUser}
+  >
     <FileToCloudProjectResourceUploader
       project={testProject.project}
       createNewResource={() => new gd.ImageResource()}

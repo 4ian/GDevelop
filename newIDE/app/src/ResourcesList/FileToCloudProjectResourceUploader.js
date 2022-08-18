@@ -27,6 +27,15 @@ type FileToCloudProjectResourceUploaderProps = {
   createNewResource: () => gdResource,
 };
 
+const resourceKindToInputAcceptedFiles = {
+  audio: 'audio/*',
+  image: 'image/*',
+  font: 'font/*',
+  video: 'video/*',
+  json: 'application/json',
+  bitmapFont: '.fnt,.xml',
+};
+
 export const FileToCloudProjectResourceUploader = ({
   options,
   fileMetadata,
@@ -136,7 +145,7 @@ export const FileToCloudProjectResourceUploader = ({
         <Line expand>
           <Column expand>
             <input
-              accept="image/*"
+              accept={resourceKindToInputAcceptedFiles[options.resourceKind]}
               style={styles.fileInput}
               multiple={options.multiSelection}
               type="file"

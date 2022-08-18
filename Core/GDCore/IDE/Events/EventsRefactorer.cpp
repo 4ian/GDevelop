@@ -19,6 +19,7 @@
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/IDE/Events/InstructionSentenceFormatter.h"
 #include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 
 using namespace std;
@@ -411,8 +412,8 @@ void EventsRefactorer::RenameObjectInEvents(const gd::Platform& platform,
 }
 
 bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
-                                             gd::ObjectsContainer& project,
-                                             gd::ObjectsContainer& layout,
+                                             gd::ObjectsContainer& globalObjectsContainer,
+                                             gd::ObjectsContainer& objectsContainer,
                                              gd::InstructionsList& actions,
                                              gd::String name) {
   bool somethingModified = false;
@@ -434,7 +435,7 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
                    "number", instrInfos.parameters[pNb].type)) {
         auto node = actions[aId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectFinder::CheckIfHasObject(platform, project, layout, "number", *node, name)) {
+        if (ExpressionObjectFinder::CheckIfHasObject(platform, globalObjectsContainer, objectsContainer, "number", *node, name)) {
           deleteMe = true;
           break;
         }
@@ -444,7 +445,7 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
                    "string", instrInfos.parameters[pNb].type)) {
         auto node = actions[aId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectFinder::CheckIfHasObject(platform, project, layout, "string", *node, name)) {
+        if (ExpressionObjectFinder::CheckIfHasObject(platform, globalObjectsContainer, objectsContainer, "string", *node, name)) {
           deleteMe = true;
           break;
         }
@@ -458,8 +459,8 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
     } else if (!actions[aId].GetSubInstructions().empty())
       somethingModified =
           RemoveObjectInActions(platform,
-                                project,
-                                layout,
+                                globalObjectsContainer,
+                                objectsContainer,
                                 actions[aId].GetSubInstructions(),
                                 name) ||
           somethingModified;
@@ -470,8 +471,8 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
 
 bool EventsRefactorer::RemoveObjectInConditions(
     const gd::Platform& platform,
-    gd::ObjectsContainer& project,
-    gd::ObjectsContainer& layout,
+    gd::ObjectsContainer& globalObjectsContainer,
+    gd::ObjectsContainer& objectsContainer,
     gd::InstructionsList& conditions,
     gd::String name) {
   bool somethingModified = false;
@@ -494,7 +495,7 @@ bool EventsRefactorer::RemoveObjectInConditions(
                    "number", instrInfos.parameters[pNb].type)) {
         auto node = conditions[cId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectFinder::CheckIfHasObject(platform, project, layout, "number", *node, name)) {
+        if (ExpressionObjectFinder::CheckIfHasObject(platform, globalObjectsContainer, objectsContainer, "number", *node, name)) {
           deleteMe = true;
           break;
         }
@@ -504,7 +505,7 @@ bool EventsRefactorer::RemoveObjectInConditions(
                    "string", instrInfos.parameters[pNb].type)) {
         auto node = conditions[cId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectFinder::CheckIfHasObject(platform, project, layout, "string", *node, name)) {
+        if (ExpressionObjectFinder::CheckIfHasObject(platform, globalObjectsContainer, objectsContainer, "string", *node, name)) {
           deleteMe = true;
           break;
         }
@@ -518,8 +519,8 @@ bool EventsRefactorer::RemoveObjectInConditions(
     } else if (!conditions[cId].GetSubInstructions().empty())
       somethingModified =
           RemoveObjectInConditions(platform,
-                                   project,
-                                   layout,
+                                   globalObjectsContainer,
+                                   objectsContainer,
                                    conditions[cId].GetSubInstructions(),
                                    name) ||
           somethingModified;
@@ -529,8 +530,8 @@ bool EventsRefactorer::RemoveObjectInConditions(
 }
 
 void EventsRefactorer::RemoveObjectInEvents(const gd::Platform& platform,
-                                            gd::ObjectsContainer& project,
-                                            gd::ObjectsContainer& layout,
+                                            gd::ObjectsContainer& globalObjectsContainer,
+                                            gd::ObjectsContainer& objectsContainer,
                                             gd::EventsList& events,
                                             gd::String name) {
   for (std::size_t i = 0; i < events.size(); ++i) {
@@ -538,19 +539,19 @@ void EventsRefactorer::RemoveObjectInEvents(const gd::Platform& platform,
         events[i].GetAllConditionsVectors();
     for (std::size_t j = 0; j < conditionsVectors.size(); ++j) {
       bool conditionsModified = RemoveObjectInConditions(
-          platform, project, layout, *conditionsVectors[j], name);
+          platform, globalObjectsContainer, objectsContainer, *conditionsVectors[j], name);
     }
 
     vector<gd::InstructionsList*> actionsVectors =
         events[i].GetAllActionsVectors();
     for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
       bool actionsModified = RemoveObjectInActions(
-          platform, project, layout, *actionsVectors[j], name);
+          platform, globalObjectsContainer, objectsContainer, *actionsVectors[j], name);
     }
 
     if (events[i].CanHaveSubEvents())
       RemoveObjectInEvents(
-          platform, project, layout, events[i].GetSubEvents(), name);
+          platform, globalObjectsContainer, objectsContainer, events[i].GetSubEvents(), name);
   }
 }
 

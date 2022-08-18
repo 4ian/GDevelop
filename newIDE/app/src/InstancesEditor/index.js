@@ -86,7 +86,7 @@ export default class InstancesEditor extends Component<Props> {
   lastCursorY = 0;
   fpsLimiter = new FpsLimiter(28);
   canvasArea: ?HTMLDivElement;
-  pixiRenderer: any;
+  pixiRenderer: PIXI.Renderer;
   keyboardShortcuts: DeprecatedKeyboardShortcuts;
   pinchHandler: PinchHandler;
   canvasCursor: CanvasCursor;
@@ -337,6 +337,7 @@ export default class InstancesEditor extends Component<Props> {
       layout: props.layout,
       instances: props.initialInstances,
       viewPosition: this.viewPosition,
+      pixiRenderer: this.pixiRenderer,
       onOverInstance: this._onOverInstance,
       onMoveInstance: this._onMoveInstance,
       onMoveInstanceEnd: this._onMoveInstanceEnd,

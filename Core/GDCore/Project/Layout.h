@@ -17,9 +17,8 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
-#if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/EditorSettings.h"
-#endif
+
 namespace gd {
 class BaseEvent;
 class Object;
@@ -131,7 +130,6 @@ class GD_CORE_API Layout : public ObjectsContainer {
    */
   ///@{
 
-#if defined(GD_IDE_ONLY)
   /**
    * Get the events of the layout
    */
@@ -141,7 +139,7 @@ class GD_CORE_API Layout : public ObjectsContainer {
    * Get the events of the layout
    */
   gd::EventsList& GetEvents() { return events; }
-#endif
+
   ///@}
 
   /** \name Variable management
@@ -238,12 +236,10 @@ class GD_CORE_API Layout : public ObjectsContainer {
    */
   void MoveLayer(std::size_t oldIndex, std::size_t newIndex);
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Serialize the layers.
    */
   void SerializeLayersTo(SerializerElement& element) const;
-#endif
 
   /**
    * \brief Unserialize the layers.
@@ -288,7 +284,7 @@ class GD_CORE_API Layout : public ObjectsContainer {
   const std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>&
   GetAllBehaviorSharedData() const;
 
-#if defined(GD_IDE_ONLY)
+
   /**
    * Return the settings associated to the layout.
    * \see gd::EditorSettings
@@ -304,7 +300,6 @@ class GD_CORE_API Layout : public ObjectsContainer {
   gd::EditorSettings& GetAssociatedEditorSettings() {
     return editorSettings;
   }
-#endif
 
   /** \name Other properties
    */
@@ -345,48 +340,16 @@ class GD_CORE_API Layout : public ObjectsContainer {
    * launched
    */
   bool StopSoundsOnStartup() const { return stopSoundsOnStartup; }
-
-  /**
-   * Set OpenGL default field of view
-   */
-  void SetOpenGLFOV(float oglFOV_) { oglFOV = oglFOV_; }
-
-  /**
-   * Get OpenGL default field of view
-   */
-  float GetOpenGLFOV() const { return oglFOV; }
-
-  /**
-   * Set OpenGL near clipping plan
-   */
-  void SetOpenGLZNear(float oglZNear_) { oglZNear = oglZNear_; }
-
-  /**
-   * Get OpenGL near clipping plan
-   */
-  float GetOpenGLZNear() const { return oglZNear; }
-
-  /**
-   * Set OpenGL far clipping plan
-   */
-  void SetOpenGLZFar(float oglZFar_) { oglZFar = oglZFar_; }
-
-  /**
-   * Get OpenGL far clipping plan
-   */
-  float GetOpenGLZFar() const { return oglZFar; }
 ///@}
 
 /** \name Saving and loading
  * Members functions related to saving and loading the object.
  */
 ///@{
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Serialize the layout.
    */
   void SerializeTo(SerializerElement& element) const;
-#endif
 
   /**
    * \brief Unserialize the layout.
@@ -395,7 +358,6 @@ class GD_CORE_API Layout : public ObjectsContainer {
 ///@}
 
 // TODO: GD C++ Platform specific code below
-#if defined(GD_IDE_ONLY)
   /**
    * Get the profiler associated with the scene. Can be NULL.
    */
@@ -405,7 +367,6 @@ class GD_CORE_API Layout : public ObjectsContainer {
    * Set the profiler associated with the scene. Can be NULL.
    */
   void SetProfiler(BaseProfiler* profiler_) { profiler = profiler_; };
-#endif
 
  private:
   gd::String name;         ///< Scene name
@@ -422,9 +383,6 @@ class GD_CORE_API Layout : public ObjectsContainer {
   bool stopSoundsOnStartup;  ///< True to make the scene stop all sounds at
                              ///< startup.
   bool standardSortMethod;   ///< True to sort objects using standard sort.
-  float oglFOV;              ///< OpenGL Field Of View value
-  float oglZNear;            ///< OpenGL Near Z position
-  float oglZFar;             ///< OpenGL Far Z position
   bool disableInputWhenNotFocused;  /// If set to true, the input must be
                                     /// disabled when the window do not have the
                                     /// focus.
@@ -434,15 +392,13 @@ class GD_CORE_API Layout : public ObjectsContainer {
       badBehaviorContent;  ///< Null object, returned when
                            ///< GetBehaviorSharedData can not find the
                            ///< specified behavior shared data.
-#if defined(GD_IDE_ONLY)
+
   EventsList events;  ///< Scene events
   gd::EditorSettings editorSettings;
-#endif
 
 // TODO: GD C++ Platform specific code below
-#if defined(GD_IDE_ONLY)
+
   BaseProfiler* profiler;  ///< Pointer to the profiler. Can be NULL.
-#endif
 
   /**
    * Initialize from another layout. Used by copy-ctor and assign-op.

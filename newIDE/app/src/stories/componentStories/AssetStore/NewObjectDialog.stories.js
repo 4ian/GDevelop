@@ -23,7 +23,6 @@ export const Default = () => (
       onClose={action('onClose')}
       onCreateNewObject={action('onCreateNewObject')}
       onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
-      events={testProject.testLayout.getEvents()}
       objectsContainer={testProject.testLayout}
       resourceExternalEditors={fakeResourceExternalEditors}
       onChooseResource={() => {

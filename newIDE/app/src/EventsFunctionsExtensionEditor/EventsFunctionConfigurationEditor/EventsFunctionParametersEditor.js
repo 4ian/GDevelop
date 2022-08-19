@@ -294,6 +294,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
     const isParameterDescriptionAndTypeShown = index => {
       // The first two parameters of a behavior method should not be changed at all,
       // so we even hide their description and type to avoid cluttering the interface.
+      // Same thing for an object which has mandatory Object parameter.
       return (
         (!eventsBasedBehavior && !eventsBasedObject) ||
         (!!eventsBasedBehavior && index >= 2) ||

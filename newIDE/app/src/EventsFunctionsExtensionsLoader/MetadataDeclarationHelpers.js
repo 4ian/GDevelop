@@ -253,15 +253,9 @@ export const isBehaviorLifecycleEventsFunction = (functionName: string) => {
 export const isObjectLifecycleEventsFunction = (functionName: string) => {
   // TODO EBO Rename doStepPreEvents and doStepPostEvents
   return (
-    [
-      'onCreated',
-      'doStepPreEvents',
-      'doStepPostEvents',
-      'onDestroy',
-      // Compatibility with GD <= 5.0 beta 75
-      'onOwnerRemovedFromScene',
-      // end of compatibility code
-    ].indexOf(functionName) !== -1
+    ['onCreated', 'doStepPreEvents', 'doStepPostEvents', 'onDestroy'].indexOf(
+      functionName
+    ) !== -1
   );
 };
 

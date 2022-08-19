@@ -70,8 +70,7 @@ export default class EventsBasedObjectEditor extends React.Component<
                 <Trans>
                   This is the configuration of your object. Make sure to choose
                   a proper internal name as it's hard to change it later. Enter
-                  a description explaining what the object is doing to the
-                  object.
+                  a description explaining how the object works.
                 </Trans>
               </DismissableAlertMessage>
               <TextField

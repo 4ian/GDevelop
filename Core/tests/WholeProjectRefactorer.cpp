@@ -9,6 +9,7 @@
 #include "GDCore/IDE/WholeProjectRefactorer.h"
 
 #include <algorithm>
+#include <stdexcept>
 
 #include "DummyPlatform.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
@@ -108,289 +109,332 @@ const std::vector<const gd::EventsList *> GetEventsLists(gd::Project &project) {
 const void SetupEvents(gd::EventsList &eventList) {
 
   // Add some free functions usages in events
-  {// Create an event in the layout referring to
-   // MyEventsExtension::MyEventsFunction
-   // TestEvent: FreeFunctionAction
-   {gd::StandardEvent event;
-  gd::Instruction instruction;
-  instruction.SetType("MyEventsExtension::MyEventsFunction");
-  instruction.SetParametersCount(4);
-  instruction.SetParameter(0, gd::Expression("scene"));
-  instruction.SetParameter(1, gd::Expression("First parameter"));
-  instruction.SetParameter(2, gd::Expression("Second parameter"));
-  instruction.SetParameter(3, gd::Expression("Third parameter"));
-  event.GetActions().Insert(instruction);
-  eventList.InsertEvent(event);
-}
-
-// Create an event in the external events referring to
-// MyEventsExtension::MyEventsFunctionExpression
-// TestEvent: FreeFunctionExpression
-{
-  gd::StandardEvent event;
-  gd::Instruction action;
-  action.SetType("MyExtension::DoSomething");
-  action.SetParametersCount(1);
-  action.SetParameter(
-      0, gd::Expression(
-             "1 + MyEventsExtension::MyEventsFunctionExpression(123, 456)"));
-  event.GetActions().Insert(action);
-  eventList.InsertEvent(event);
-}
-} // namespace
-
-// Add some events based behavior usages in events
-{// Create an event in the layout referring to
- // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunction
- // TestEvent: BehaviorAction
- {gd::StandardEvent event;
-gd::Instruction instruction;
-instruction.SetType(
-    "MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunction");
-instruction.SetParametersCount(5);
-instruction.SetParameter(0, gd::Expression("ObjectWithMyBehavior"));
-instruction.SetParameter(1, gd::Expression("MyBehavior"));
-instruction.SetParameter(2, gd::Expression("First parameter"));
-instruction.SetParameter(3, gd::Expression("Second parameter"));
-instruction.SetParameter(4, gd::Expression("Third parameter"));
-event.GetActions().Insert(instruction);
-eventList.InsertEvent(event);
-}
-
-// Create an event in the layout using "MyProperty" action
-// TestEvent: BehaviorPropertyAction
-{
-  gd::StandardEvent event;
-  gd::Instruction instruction;
-  instruction.SetType(
-      "MyEventsExtension::MyEventsBasedBehavior::" +
-      gd::EventsBasedBehavior::GetPropertyActionName("MyProperty"));
-  event.GetActions().Insert(instruction);
-  eventList.InsertEvent(event);
-}
-
-// Create an event in the layout using "MyProperty" condition
-// TestEvent: BehaviorPropertyCondition
-{
-  gd::StandardEvent event;
-  gd::Instruction instruction;
-  instruction.SetType(
-      "MyEventsExtension::MyEventsBasedBehavior::" +
-      gd::EventsBasedBehavior::GetPropertyConditionName("MyProperty"));
-  event.GetConditions().Insert(instruction);
-  eventList.InsertEvent(event);
-}
-
-// Create an event in the layout using "MyProperty" expression
-// TestEvent: BehaviorPropertyExpression
-{
-  gd::StandardEvent event;
-  gd::Instruction instruction;
-  instruction.SetType("MyExtension::DoSomething");
-  instruction.SetParametersCount(1);
-  instruction.SetParameter(
-      0, gd::Expression(
-             "ObjectWithMyBehavior.MyBehavior::" +
-             gd::EventsBasedBehavior::GetPropertyExpressionName("MyProperty") +
-             "()"));
-  event.GetActions().Insert(instruction);
-  eventList.InsertEvent(event);
-}
-
-// Create an event referring to
-// MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionExpression
-// TestEvent: BehaviorExpression
-{
-  gd::StandardEvent event;
-  gd::Instruction instruction;
-  instruction.SetType("MyExtension::DoSomething");
-  instruction.SetParametersCount(1);
-  instruction.SetParameter(
-      0, gd::Expression("1 + "
-                        "ObjectWithMyBehavior.MyBehavior::"
-                        "MyBehaviorEventsFunctionExpression(123, 456, 789)"));
-  event.GetActions().Insert(instruction);
-  eventList.InsertEvent(event);
-}
-
-// Create an event **wrongly** referring to
-// MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionExpression
-// (it's ill-named).
-// TestEvent: IllNamedBehaviorExpression
-{
-  gd::StandardEvent event;
-  gd::Instruction instruction;
-  instruction.SetType("MyExtension::DoSomething");
-  instruction.SetParametersCount(1);
-  instruction.SetParameter(
-      0, gd::Expression("2 + "
-                        "ObjectWithMyBehavior::MyBehavior."
-                        "MyBehaviorEventsFunctionExpression(123, 456, 789)"));
-  event.GetActions().Insert(instruction);
-  eventList.InsertEvent(event);
-}
-
-// Create an event referring to
-// MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionExpression
-// function name without calling the function.
-// TestEvent: NoParameterBehaviorExpression
-{
-  gd::StandardEvent event;
-  gd::Instruction instruction;
-  instruction.SetType("MyExtension::DoSomething");
-  instruction.SetParametersCount(1);
-  instruction.SetParameter(
-      0, gd::Expression("3 + "
-                        "ObjectWithMyBehavior.MyBehavior::"
-                        "MyBehaviorEventsFunctionExpression"));
-  event.GetActions().Insert(instruction);
-  eventList.InsertEvent(event);
-}
-
-// Create an event **wrongly** referring to
-// MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionExpression
-// function name without calling the function (it's ill-named).
-// TestEvent: NoParameterIllNamedBehaviorExpression
-{
-  gd::StandardEvent event;
-  gd::Instruction instruction;
-  instruction.SetType("MyExtension::DoSomething");
-  instruction.SetParametersCount(1);
-  instruction.SetParameter(
-      0, gd::Expression("4 + "
-                        "ObjectWithMyBehavior::MyBehavior."
-                        "MyBehaviorEventsFunctionExpression"));
-  event.GetActions().Insert(instruction);
-  eventList.InsertEvent(event);
-}
-}
-
-// Add some events based object usages in events
-{
-  // Create an event in the layout referring to
-  // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunction
-  // TestEvent: ObjectAction
   {
-    gd::StandardEvent event;
-    gd::Instruction instruction;
-    instruction.SetType(
-        "MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunction");
-    instruction.SetParametersCount(4);
-    instruction.SetParameter(0, gd::Expression("MyCustomObject"));
-    instruction.SetParameter(1, gd::Expression("First parameter"));
-    instruction.SetParameter(2, gd::Expression("Second parameter"));
-    instruction.SetParameter(3, gd::Expression("Third parameter"));
-    event.GetActions().Insert(instruction);
-    eventList.InsertEvent(event);
+    if (eventList.GetEventsCount() != FreeFunctionAction) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event in the layout referring to
+    // MyEventsExtension::MyEventsFunction
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyEventsExtension::MyEventsFunction");
+      instruction.SetParametersCount(4);
+      instruction.SetParameter(0, gd::Expression("scene"));
+      instruction.SetParameter(1, gd::Expression("First parameter"));
+      instruction.SetParameter(2, gd::Expression("Second parameter"));
+      instruction.SetParameter(3, gd::Expression("Third parameter"));
+      event.GetActions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != FreeFunctionExpression) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event in the external events referring to
+    // MyEventsExtension::MyEventsFunctionExpression
+    {
+      gd::StandardEvent event;
+      gd::Instruction action;
+      action.SetType("MyExtension::DoSomething");
+      action.SetParametersCount(1);
+      action.SetParameter(
+          0,
+          gd::Expression(
+              "1 + MyEventsExtension::MyEventsFunctionExpression(123, 456)"));
+      event.GetActions().Insert(action);
+      eventList.InsertEvent(event);
+    }
   }
 
-  // Create an event in the layout using "MyProperty" action
-  // TestEvent: ObjectPropertyAction
+  // Add some events based behavior usages in events
   {
-    gd::StandardEvent event;
-    gd::Instruction instruction;
-    instruction.SetType(
-        "MyEventsExtension::MyEventsBasedObject::" +
-        gd::EventsBasedObject::GetPropertyActionName("MyProperty"));
-    event.GetActions().Insert(instruction);
-    eventList.InsertEvent(event);
+    if (eventList.GetEventsCount() != BehaviorAction) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event in the layout referring to
+    // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunction
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType(
+          "MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunction");
+      instruction.SetParametersCount(5);
+      instruction.SetParameter(0, gd::Expression("ObjectWithMyBehavior"));
+      instruction.SetParameter(1, gd::Expression("MyBehavior"));
+      instruction.SetParameter(2, gd::Expression("First parameter"));
+      instruction.SetParameter(3, gd::Expression("Second parameter"));
+      instruction.SetParameter(4, gd::Expression("Third parameter"));
+      event.GetActions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != BehaviorPropertyAction) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event in the layout using "MyProperty" action
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType(
+          "MyEventsExtension::MyEventsBasedBehavior::" +
+          gd::EventsBasedBehavior::GetPropertyActionName("MyProperty"));
+      event.GetActions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != BehaviorPropertyCondition) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event in the layout using "MyProperty" condition
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType(
+          "MyEventsExtension::MyEventsBasedBehavior::" +
+          gd::EventsBasedBehavior::GetPropertyConditionName("MyProperty"));
+      event.GetConditions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != BehaviorPropertyExpression) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event in the layout using "MyProperty" expression
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0, gd::Expression("ObjectWithMyBehavior.MyBehavior::" +
+                            gd::EventsBasedBehavior::GetPropertyExpressionName(
+                                "MyProperty") +
+                            "()"));
+      event.GetActions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != BehaviorExpression) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event referring to
+    // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionExpression
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0,
+          gd::Expression("1 + "
+                         "ObjectWithMyBehavior.MyBehavior::"
+                         "MyBehaviorEventsFunctionExpression(123, 456, 789)"));
+      event.GetActions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != IllNamedBehaviorExpression) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event **wrongly** referring to
+    // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionExpression
+    // (it's ill-named).
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0,
+          gd::Expression("2 + "
+                         "ObjectWithMyBehavior::MyBehavior."
+                         "MyBehaviorEventsFunctionExpression(123, 456, 789)"));
+      event.GetActions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != NoParameterBehaviorExpression) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event referring to
+    // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionExpression
+    // function name without calling the function.
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0, gd::Expression("3 + "
+                            "ObjectWithMyBehavior.MyBehavior::"
+                            "MyBehaviorEventsFunctionExpression"));
+      event.GetActions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != NoParameterIllNamedBehaviorExpression) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event **wrongly** referring to
+    // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionExpression
+    // function name without calling the function (it's ill-named).
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0, gd::Expression("4 + "
+                            "ObjectWithMyBehavior::MyBehavior."
+                            "MyBehaviorEventsFunctionExpression"));
+      event.GetActions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
   }
 
-  // Create an event in the layout using "MyProperty" condition
-  // TestEvent: ObjectPropertyCondition
+  // Add some events based object usages in events
   {
-    gd::StandardEvent event;
-    gd::Instruction instruction;
-    instruction.SetType(
-        "MyEventsExtension::MyEventsBasedObject::" +
-        gd::EventsBasedObject::GetPropertyConditionName("MyProperty"));
-    event.GetConditions().Insert(instruction);
-    eventList.InsertEvent(event);
-  }
+    if (eventList.GetEventsCount() != ObjectAction) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event in the layout referring to
+    // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunction
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType(
+          "MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunction");
+      instruction.SetParametersCount(4);
+      instruction.SetParameter(0, gd::Expression("MyCustomObject"));
+      instruction.SetParameter(1, gd::Expression("First parameter"));
+      instruction.SetParameter(2, gd::Expression("Second parameter"));
+      instruction.SetParameter(3, gd::Expression("Third parameter"));
+      event.GetActions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
 
-  // Create an event in the layout using "MyProperty" expression
-  // TestEvent: ObjectPropertyExpression
-  {
-    gd::StandardEvent event;
-    gd::Instruction instruction;
-    instruction.SetType("MyExtension::DoSomething");
-    instruction.SetParametersCount(1);
-    instruction.SetParameter(
-        0, gd::Expression(
-               "MyCustomObject." +
-               gd::EventsBasedObject::GetPropertyExpressionName("MyProperty") +
-               "()"));
-    event.GetActions().Insert(instruction);
-    eventList.InsertEvent(event);
-  }
+    if (eventList.GetEventsCount() != ObjectPropertyAction) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event in the layout using "MyProperty" action
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType(
+          "MyEventsExtension::MyEventsBasedObject::" +
+          gd::EventsBasedObject::GetPropertyActionName("MyProperty"));
+      event.GetActions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
 
-  // Create an event referring to
-  // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunctionExpression
-  // TestEvent: ObjectExpression
-  {
-    gd::StandardEvent event;
-    gd::Instruction instruction;
-    instruction.SetType("MyExtension::DoSomething");
-    instruction.SetParametersCount(1);
-    instruction.SetParameter(
-        0, gd::Expression("1 + "
-                          "MyCustomObject."
-                          "MyObjectEventsFunctionExpression(123, 456, 789)"));
-    event.GetActions().Insert(instruction);
-    eventList.InsertEvent(event);
-  }
+    if (eventList.GetEventsCount() != ObjectPropertyCondition) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event in the layout using "MyProperty" condition
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType(
+          "MyEventsExtension::MyEventsBasedObject::" +
+          gd::EventsBasedObject::GetPropertyConditionName("MyProperty"));
+      event.GetConditions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
 
-  // Create an event **wrongly** referring to
-  // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunctionExpression
-  // (it's ill-named).
-  // TestEvent: IllNamedObjectExpression
-  {
-    gd::StandardEvent event;
-    gd::Instruction instruction;
-    instruction.SetType("MyExtension::DoSomething");
-    instruction.SetParametersCount(1);
-    instruction.SetParameter(
-        0, gd::Expression("2 + "
-                          "MyCustomObject::"
-                          "MyObjectEventsFunctionExpression(123, 456, 789)"));
-    event.GetActions().Insert(instruction);
-    eventList.InsertEvent(event);
-  }
+    if (eventList.GetEventsCount() != ObjectPropertyExpression) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event in the layout using "MyProperty" expression
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0, gd::Expression("MyCustomObject." +
+                            gd::EventsBasedObject::GetPropertyExpressionName(
+                                "MyProperty") +
+                            "()"));
+      event.GetActions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
 
-  // Create an event referring to
-  // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunctionExpression
-  // function name without calling the function.
-  // TestEvent: NoParameterObjectExpression
-  {
-    gd::StandardEvent event;
-    gd::Instruction instruction;
-    instruction.SetType("MyExtension::DoSomething");
-    instruction.SetParametersCount(1);
-    instruction.SetParameter(
-        0, gd::Expression("3 + "
-                          "MyCustomObject."
-                          "MyObjectEventsFunctionExpression"));
-    event.GetActions().Insert(instruction);
-    eventList.InsertEvent(event);
-  }
+    if (eventList.GetEventsCount() != ObjectExpression) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event referring to
+    // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunctionExpression
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0, gd::Expression("1 + "
+                            "MyCustomObject."
+                            "MyObjectEventsFunctionExpression(123, 456, 789)"));
+      event.GetActions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
 
-  // Create an event **wrongly** referring to
-  // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunctionExpression
-  // function name without calling the function (it's ill-named).
-  // TestEvent: NoParameterIllNamedObjectExpression
-  {
-    gd::StandardEvent event;
-    gd::Instruction instruction;
-    instruction.SetType("MyExtension::DoSomething");
-    instruction.SetParametersCount(1);
-    instruction.SetParameter(
-        0, gd::Expression("4 + "
-                          "MyCustomObject::"
-                          "MyObjectEventsFunctionExpression"));
-    event.GetActions().Insert(instruction);
-    eventList.InsertEvent(event);
+    if (eventList.GetEventsCount() != IllNamedObjectExpression) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event **wrongly** referring to
+    // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunctionExpression
+    // (it's ill-named).
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0, gd::Expression("2 + "
+                            "MyCustomObject::"
+                            "MyObjectEventsFunctionExpression(123, 456, 789)"));
+      event.GetActions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != NoParameterObjectExpression) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event referring to
+    // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunctionExpression
+    // function name without calling the function.
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0, gd::Expression("3 + "
+                            "MyCustomObject."
+                            "MyObjectEventsFunctionExpression"));
+      event.GetActions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != NoParameterIllNamedObjectExpression) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event **wrongly** referring to
+    // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunctionExpression
+    // function name without calling the function (it's ill-named).
+    {
+      gd::StandardEvent event;
+      gd::Instruction instruction;
+      instruction.SetType("MyExtension::DoSomething");
+      instruction.SetParametersCount(1);
+      instruction.SetParameter(
+          0, gd::Expression("4 + "
+                            "MyCustomObject::"
+                            "MyObjectEventsFunctionExpression"));
+      event.GetActions().Insert(instruction);
+      eventList.InsertEvent(event);
+    }
   }
-}
 }
 
 gd::EventsFunctionsExtension &

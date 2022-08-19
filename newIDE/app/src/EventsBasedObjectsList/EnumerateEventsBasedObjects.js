@@ -2,9 +2,9 @@
 import { mapVector } from '../Utils/MapFor';
 
 export const enumerateEventsBasedObjects = (
-  eventsFunctionsContainer: gdEventsBasedObjectsList
+  eventsBasedObjectsList: gdEventsBasedObjectsList
 ): Array<gdEventsBasedObject> =>
-  mapVector(eventsFunctionsContainer, eventsBasedObject => eventsBasedObject);
+  mapVector(eventsBasedObjectsList, eventsBasedObject => eventsBasedObject);
 
 export const filterEventsBasedObjectsList = (
   list: Array<gdEventsBasedObject>,

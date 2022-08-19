@@ -459,6 +459,9 @@ interface Project {
     [Ref] EventsFunctionsExtension InsertEventsFunctionsExtension([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, unsigned long position);
     void RemoveEventsFunctionsExtension([Const] DOMString name);
 
+    boolean HasEventsBasedObject([Const] DOMString type);
+    [Ref] EventsBasedObject GetEventsBasedObject([Const] DOMString type);
+
     [Ref] VariablesContainer GetVariables();
     [Ref] ResourcesManager GetResourcesManager();
     void ExposeResources([Ref] ArbitraryResourceWorker worker);

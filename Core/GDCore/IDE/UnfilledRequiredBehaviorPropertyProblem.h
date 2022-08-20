@@ -11,7 +11,7 @@
 namespace gd {
 class Project;
 class Object;
-class BehaviorContent;
+class Behavior;
 }  // namespace gd
 
 namespace gd {
@@ -24,12 +24,12 @@ class GD_CORE_API UnfilledRequiredBehaviorPropertyProblem {
   UnfilledRequiredBehaviorPropertyProblem(
       const gd::Project& sourceProject_,
       gd::Object& sourceObject_,
-      gd::BehaviorContent& sourceBehaviorContent_,
+      gd::Behavior& sourceBehavior_,
       const gd::String& sourcePropertyName_,
       const gd::String& expectedBehaviorTypeName_)
       : sourceProject(sourceProject_),
       sourceObject(sourceObject_),
-      sourceBehaviorContent(sourceBehaviorContent_),
+      sourceBehavior(sourceBehavior_),
       sourcePropertyName(sourcePropertyName_),
       expectedBehaviorTypeName(expectedBehaviorTypeName_){};
   virtual ~UnfilledRequiredBehaviorPropertyProblem();
@@ -47,8 +47,8 @@ class GD_CORE_API UnfilledRequiredBehaviorPropertyProblem {
   /**
    * \brief Return the behavior where the problem appears.
    */
-  virtual gd::BehaviorContent& GetSourceBehaviorContent() const {
-    return sourceBehaviorContent;
+  virtual gd::Behavior& GetSourceBehaviorContent() const {
+    return sourceBehavior;
   }
 
   /**
@@ -69,7 +69,7 @@ class GD_CORE_API UnfilledRequiredBehaviorPropertyProblem {
  private:
   const gd::Project& sourceProject;
   gd::Object& sourceObject;
-  gd::BehaviorContent& sourceBehaviorContent;
+  gd::Behavior& sourceBehavior;
   const gd::String sourcePropertyName;
 
   const gd::String expectedBehaviorTypeName;

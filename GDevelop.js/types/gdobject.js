@@ -19,8 +19,8 @@ declare class gdObject {
   getEffects(): gdEffectsContainer;
   getAllBehaviorNames(): gdVectorString;
   hasBehaviorNamed(name: string): boolean;
-  addNewBehavior(project: gdProject, type: string, name: string): gdBehaviorContent;
-  getBehavior(name: string): gdBehaviorContent;
+  addNewBehavior(project: gdProject, type: string, name: string): gdBehavior;
+  getBehavior(name: string): gdBehavior;
   removeBehavior(name: string): void;
   renameBehavior(oldName: string, name: string): boolean;
   serializeTo(element: gdSerializerElement): void;

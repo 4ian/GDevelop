@@ -1413,65 +1413,67 @@ export default class SceneEditor extends React.Component<Props, State> {
             </PreferencesContext.Consumer>
           )}
         </ResponsiveWindowMeasurer>
-        {this.state.editedObjectWithContext && (
-          <I18n>
-            {({ i18n }) => (
-              <ObjectEditorDialog
-                open
-                object={this.state.editedObjectWithContext.object}
-                initialTab={this.state.editedObjectInitialTab}
-                project={project}
-                resourceSources={resourceSources}
-                resourceExternalEditors={resourceExternalEditors}
-                onChooseResource={onChooseResource}
-                onComputeAllVariableNames={() => {
-                  const { editedObjectWithContext } = this.state;
-                  if (!editedObjectWithContext) return [];
+        <I18n>
+          {({ i18n }) => (
+            <React.Fragment>
+              {this.state.editedObjectWithContext && (
+                <ObjectEditorDialog
+                  open
+                  object={this.state.editedObjectWithContext.object}
+                  initialTab={this.state.editedObjectInitialTab}
+                  project={project}
+                  resourceSources={resourceSources}
+                  resourceExternalEditors={resourceExternalEditors}
+                  onChooseResource={onChooseResource}
+                  onComputeAllVariableNames={() => {
+                    const { editedObjectWithContext } = this.state;
+                    if (!editedObjectWithContext) return [];
 
-                  return EventsRootVariablesFinder.findAllObjectVariables(
-                    project.getCurrentPlatform(),
-                    project,
-                    layout,
-                    editedObjectWithContext.object
-                  );
-                }}
-                onCancel={() => {
-                  if (this.state.editedObjectWithContext) {
-                    this.reloadResourcesFor(
-                      this.state.editedObjectWithContext.object
+                    return EventsRootVariablesFinder.findAllObjectVariables(
+                      project.getCurrentPlatform(),
+                      project,
+                      layout,
+                      editedObjectWithContext.object
                     );
+                  }}
+                  onCancel={() => {
+                    if (this.state.editedObjectWithContext) {
+                      this.reloadResourcesFor(
+                        this.state.editedObjectWithContext.object
+                      );
+                    }
+                    this.editObject(null);
+                  }}
+                  canRenameObject={newName =>
+                    this._canObjectOrGroupUseNewName(newName, i18n)
                   }
-                  this.editObject(null);
-                }}
-                canRenameObject={newName =>
-                  this._canObjectOrGroupUseNewName(newName, i18n)
-                }
-                onRename={newName => {
-                  this._onRenameEditedObject(newName);
-                }}
-                onApply={() => {
-                  if (this.state.editedObjectWithContext) {
-                    this.reloadResourcesFor(
-                      this.state.editedObjectWithContext.object
-                    );
-                  }
-                  this.editObject(null);
-                  this.updateBehaviorsSharedData();
-                  this.forceUpdateObjectsList();
+                  onRename={newName => {
+                    this._onRenameEditedObject(newName);
+                  }}
+                  onApply={() => {
+                    if (this.state.editedObjectWithContext) {
+                      this.reloadResourcesFor(
+                        this.state.editedObjectWithContext.object
+                      );
+                    }
+                    this.editObject(null);
+                    this.updateBehaviorsSharedData();
+                    this.forceUpdateObjectsList();
 
-                  if (this.props.unsavedChanges)
-                    this.props.unsavedChanges.triggerUnsavedChanges();
-                }}
-                hotReloadPreviewButtonProps={
-                  this.props.hotReloadPreviewButtonProps
-                }
-                onUpdateBehaviorsSharedData={() =>
-                  this.updateBehaviorsSharedData()
-                }
-              />
-            )}
-          </I18n>
-        )}
+                    if (this.props.unsavedChanges)
+                      this.props.unsavedChanges.triggerUnsavedChanges();
+                  }}
+                  hotReloadPreviewButtonProps={
+                    this.props.hotReloadPreviewButtonProps
+                  }
+                  onUpdateBehaviorsSharedData={() =>
+                    this.updateBehaviorsSharedData()
+                  }
+                />
+              )}
+            </React.Fragment>
+          )}
+        </I18n>
         {!!this.state.editedGroup && (
           <ObjectGroupEditorDialog
             project={project}

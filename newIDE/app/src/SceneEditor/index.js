@@ -719,7 +719,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.updateToolbar();
   };
 
-  _canObjectOrGroupUseNewName = (newName: string) => {
+  _canObjectOrGroupUseNewName = (newName: string, i18n: I18nType) => {
     const { project, layout } = this.props;
 
     if (
@@ -728,13 +728,18 @@ export default class SceneEditor extends React.Component<Props, State> {
       layout.getObjectGroups().has(newName) ||
       project.getObjectGroups().has(newName)
     ) {
-      showWarningBox('Another object or group with this name already exists.', {
-        delayToNextTick: true,
-      });
+      showWarningBox(
+        i18n._(t`Another object or group with this name already exists.`),
+        {
+          delayToNextTick: true,
+        }
+      );
       return false;
     } else if (!gd.Project.validateName(newName)) {
       showWarningBox(
-        'This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.',
+        i18n._(
+          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
+        ),
         { delayToNextTick: true }
       );
       return false;
@@ -1318,7 +1323,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 selectedObjectNames={this.state.selectedObjectNames}
                 onEditObject={this.props.onEditObject || this.editObject}
                 onDeleteObject={this._onDeleteObject(i18n)}
-                canRenameObject={this._canObjectOrGroupUseNewName}
+                canRenameObject={newName =>
+                  this._canObjectOrGroupUseNewName(newName, i18n)
+                }
                 onObjectCreated={this._onObjectCreated}
                 onObjectSelected={this._onObjectSelected}
                 onRenameObject={this._onRenameObject}
@@ -1345,15 +1352,21 @@ export default class SceneEditor extends React.Component<Props, State> {
         type: 'secondary',
         title: t`Object Groups`,
         renderEditor: () => (
-          <ObjectGroupsList
-            globalObjectGroups={project.getObjectGroups()}
-            objectGroups={layout.getObjectGroups()}
-            onEditGroup={this.editGroup}
-            onDeleteGroup={this._onDeleteGroup}
-            onRenameGroup={this._onRenameGroup}
-            canRenameGroup={this._canObjectOrGroupUseNewName}
-            unsavedChanges={this.props.unsavedChanges}
-          />
+          <I18n>
+            {({ i18n }) => (
+              <ObjectGroupsList
+                globalObjectGroups={project.getObjectGroups()}
+                objectGroups={layout.getObjectGroups()}
+                onEditGroup={this.editGroup}
+                onDeleteGroup={this._onDeleteGroup}
+                onRenameGroup={this._onRenameGroup}
+                canRenameGroup={newName =>
+                  this._canObjectOrGroupUseNewName(newName, i18n)
+                }
+                unsavedChanges={this.props.unsavedChanges}
+              />
+            )}
+          </I18n>
         ),
       },
     };
@@ -1401,53 +1414,63 @@ export default class SceneEditor extends React.Component<Props, State> {
           )}
         </ResponsiveWindowMeasurer>
         {this.state.editedObjectWithContext && (
-          <ObjectEditorDialog
-            open
-            object={this.state.editedObjectWithContext.object}
-            initialTab={this.state.editedObjectInitialTab}
-            project={project}
-            resourceSources={resourceSources}
-            resourceExternalEditors={resourceExternalEditors}
-            onChooseResource={onChooseResource}
-            onComputeAllVariableNames={() => {
-              const { editedObjectWithContext } = this.state;
-              if (!editedObjectWithContext) return [];
+          <I18n>
+            {({ i18n }) => (
+              <ObjectEditorDialog
+                open
+                object={this.state.editedObjectWithContext.object}
+                initialTab={this.state.editedObjectInitialTab}
+                project={project}
+                resourceSources={resourceSources}
+                resourceExternalEditors={resourceExternalEditors}
+                onChooseResource={onChooseResource}
+                onComputeAllVariableNames={() => {
+                  const { editedObjectWithContext } = this.state;
+                  if (!editedObjectWithContext) return [];
 
-              return EventsRootVariablesFinder.findAllObjectVariables(
-                project.getCurrentPlatform(),
-                project,
-                layout,
-                editedObjectWithContext.object
-              );
-            }}
-            onCancel={() => {
-              if (this.state.editedObjectWithContext) {
-                this.reloadResourcesFor(
-                  this.state.editedObjectWithContext.object
-                );
-              }
-              this.editObject(null);
-            }}
-            canRenameObject={this._canObjectOrGroupUseNewName}
-            onRename={newName => {
-              this._onRenameEditedObject(newName);
-            }}
-            onApply={() => {
-              if (this.state.editedObjectWithContext) {
-                this.reloadResourcesFor(
-                  this.state.editedObjectWithContext.object
-                );
-              }
-              this.editObject(null);
-              this.updateBehaviorsSharedData();
-              this.forceUpdateObjectsList();
+                  return EventsRootVariablesFinder.findAllObjectVariables(
+                    project.getCurrentPlatform(),
+                    project,
+                    layout,
+                    editedObjectWithContext.object
+                  );
+                }}
+                onCancel={() => {
+                  if (this.state.editedObjectWithContext) {
+                    this.reloadResourcesFor(
+                      this.state.editedObjectWithContext.object
+                    );
+                  }
+                  this.editObject(null);
+                }}
+                canRenameObject={newName =>
+                  this._canObjectOrGroupUseNewName(newName, i18n)
+                }
+                onRename={newName => {
+                  this._onRenameEditedObject(newName);
+                }}
+                onApply={() => {
+                  if (this.state.editedObjectWithContext) {
+                    this.reloadResourcesFor(
+                      this.state.editedObjectWithContext.object
+                    );
+                  }
+                  this.editObject(null);
+                  this.updateBehaviorsSharedData();
+                  this.forceUpdateObjectsList();
 
-              if (this.props.unsavedChanges)
-                this.props.unsavedChanges.triggerUnsavedChanges();
-            }}
-            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-            onUpdateBehaviorsSharedData={() => this.updateBehaviorsSharedData()}
-          />
+                  if (this.props.unsavedChanges)
+                    this.props.unsavedChanges.triggerUnsavedChanges();
+                }}
+                hotReloadPreviewButtonProps={
+                  this.props.hotReloadPreviewButtonProps
+                }
+                onUpdateBehaviorsSharedData={() =>
+                  this.updateBehaviorsSharedData()
+                }
+              />
+            )}
+          </I18n>
         )}
         {!!this.state.editedGroup && (
           <ObjectGroupEditorDialog

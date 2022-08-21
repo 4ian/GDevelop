@@ -282,7 +282,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleAlpha2",
-         _("Start opacity"),
+         _("End opacity"),
          _("Compare the end opacity of particles."),
          _("the end opacity"),
          _("Common"),

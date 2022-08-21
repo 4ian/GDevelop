@@ -26,7 +26,6 @@ type Props = {|
   onAssetsAdded: () => void,
   project: gdProject,
   objectsContainer: gdObjectsContainer,
-  events: gdEventsList,
   onObjectAddedFromAsset: (object: gdObject) => void,
 |};
 
@@ -38,7 +37,6 @@ export const AssetPackDialog = ({
   onAssetsAdded,
   project,
   objectsContainer,
-  events,
   onObjectAddedFromAsset,
 }: Props) => {
   const missingAssetShortHeaders = assetShortHeaders.filter(
@@ -73,7 +71,6 @@ export const AssetPackDialog = ({
               eventsFunctionsExtensionsState,
               project,
               objectsContainer,
-              events,
               environment,
             })
           )
@@ -104,7 +101,6 @@ export const AssetPackDialog = ({
       eventsFunctionsExtensionsState,
       project,
       objectsContainer,
-      events,
       onObjectAddedFromAsset,
       onAssetsAdded,
       environment,

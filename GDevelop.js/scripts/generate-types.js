@@ -236,6 +236,12 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
     );
     shell.sed(
       '-i',
+      'declare class gdEventsBasedObject {',
+      'declare class gdEventsBasedObject extends gdObjectsContainer {',
+      'types/gdeventsbasedobject.js'
+    );
+    shell.sed(
+      '-i',
       'declare class gdEventsFunctionsExtension {',
       'declare class gdEventsFunctionsExtension extends gdEventsFunctionsContainer {',
       'types/gdeventsfunctionsextension.js'
@@ -245,6 +251,12 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
       'declare class gdObjectJsImplementation {',
       'declare class gdObjectJsImplementation extends gdObject {',
       'types/gdobjectjsimplementation.js'
+    );
+    shell.sed(
+      '-i',
+      'declare class gdCustomObject {',
+      'declare class gdCustomObject extends gdObject {',
+      'types/gdcustomobject.js'
     );
     shell.sed(
       '-i',

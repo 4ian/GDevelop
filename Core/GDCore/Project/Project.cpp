@@ -683,6 +683,11 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   if (currentPlatform == NULL && !platforms.empty())
     currentPlatform = platforms.back();
 
+  // TODO EBO All events based behaviors and events based objects should be
+  // added to the project before the content of events based objects is
+  // unserialized because when unserializing child-objects InsertNewObject and
+  // AddNewBehavior need to get EventsBasedObject and EventsBasedBehavior
+  // instances from the Project.
   eventsFunctionsExtensions.clear();
   const SerializerElement& eventsFunctionsExtensionsElement =
       element.GetChild("eventsFunctionsExtensions");

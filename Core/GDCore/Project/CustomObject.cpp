@@ -16,6 +16,11 @@ std::unique_ptr<gd::Object> CustomObject::Clone() const {
   return std::unique_ptr<gd::Object>(clone);
 }
 
+// TODO EBO Extract a class from Object for the object configuration.
+// This will allow CustomObject to have a ObjectConfiguration composed of
+// ObjectConfiguration for their children in addition to its own properties.
+// This will be used by the GUI to display custom editors (for sprites for
+// instance)
 std::map<gd::String, gd::PropertyDescriptor> CustomObject::GetProperties() const {
     const auto &properties = eventsBasedObject.GetPropertyDescriptors();
     auto objectProperties = std::map<gd::String, gd::PropertyDescriptor>();

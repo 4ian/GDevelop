@@ -85,6 +85,7 @@ void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
                                        outputGlobalObjectsContainer,
                                        outputObjectsContainer);
 
+  // TODO EBO Use a constant instead a hard coded value "Object".
   // ...and has an "Object" by convention...
   if (!outputObjectsContainer.HasObjectNamed("Object")) {
     gd::LogWarning("No \"Object\" in a function of an events based object: " +

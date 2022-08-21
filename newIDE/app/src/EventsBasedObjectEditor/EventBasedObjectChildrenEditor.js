@@ -109,9 +109,14 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
   ) => {
     // TODO EBO Use a constant instead a hard coded value "Object".
     if (newName === 'Object') {
-      showWarningBox(i18n._(t`"Object" is a reserved name for the parent.`), {
-        delayToNextTick: true,
-      });
+      showWarningBox(
+        i18n._(
+          t`"Object" is a reserved name, used for the parent object in the events (actions, conditions, expressions...). Please choose another name.`
+        ),
+        {
+          delayToNextTick: true,
+        }
+      );
       return;
     }
 

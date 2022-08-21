@@ -80,17 +80,17 @@ Project::~Project() {}
 void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 
 std::unique_ptr<gd::Object> Project::CreateObject(
-    const gd::String& type,
-    const gd::String& name,
-    const gd::String& platformName) const {
-    if (Project::HasEventsBasedObject(type)) {
-      auto &eventsBasedObject = Project::GetEventsBasedObject(type);
-      auto customObject = gd::make_unique<CustomObject>(eventsBasedObject, type);
-      customObject->SetName(name);
-      return customObject;
-    }
-    else {
-      for (std::size_t i = 0; i < platforms.size(); ++i) {
+  const gd::String& type,
+  const gd::String& name,
+  const gd::String& platformName) const {
+  if (Project::HasEventsBasedObject(type)) {
+    auto &eventsBasedObject = Project::GetEventsBasedObject(type);
+    auto customObject = gd::make_unique<CustomObject>(eventsBasedObject, type);
+    customObject->SetName(name);
+    return customObject;
+  }
+  else {
+    for (std::size_t i = 0; i < platforms.size(); ++i) {
       if (!platformName.empty() && platforms[i]->GetName() != platformName)
         continue;
 
@@ -102,40 +102,39 @@ std::unique_ptr<gd::Object> Project::CreateObject(
                         // base object), return it
     }
   }
-
   return nullptr;
 }
 
 bool Project::HasEventsBasedObject(const gd::String& type) const {
-    const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
-    if (separatorIndex == std::string::npos) {
-      return false;
-    }
-    gd::String extensionName = type.substr(0, separatorIndex);
-    if (!Project::HasEventsFunctionsExtensionNamed(extensionName)) {
-      return false;
-    }
-    auto &extension = Project::GetEventsFunctionsExtension(extensionName);
-    gd::String objectTypeName = type.substr(separatorIndex + 2);
-    return extension.GetEventsBasedObjects().Has(objectTypeName);
+  const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
+  if (separatorIndex == std::string::npos) {
+    return false;
+  }
+  gd::String extensionName = type.substr(0, separatorIndex);
+  if (!Project::HasEventsFunctionsExtensionNamed(extensionName)) {
+    return false;
+  }
+  auto &extension = Project::GetEventsFunctionsExtension(extensionName);
+  gd::String objectTypeName = type.substr(separatorIndex + 2);
+  return extension.GetEventsBasedObjects().Has(objectTypeName);
 }
 
 gd::EventsBasedObject& Project::GetEventsBasedObject(const gd::String& type) {
-    const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
-    gd::String extensionName = type.substr(0, separatorIndex);
-    gd::String objectTypeName = type.substr(separatorIndex + 2);
+  const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
+  gd::String extensionName = type.substr(0, separatorIndex);
+  gd::String objectTypeName = type.substr(separatorIndex + 2);
 
-    auto &extension = Project::GetEventsFunctionsExtension(extensionName);
-    return extension.GetEventsBasedObjects().Get(objectTypeName);
+  auto &extension = Project::GetEventsFunctionsExtension(extensionName);
+  return extension.GetEventsBasedObjects().Get(objectTypeName);
 }
 
 const gd::EventsBasedObject& Project::GetEventsBasedObject(const gd::String& type) const {
-    const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
-    gd::String extensionName = type.substr(0, separatorIndex);
-    gd::String objectTypeName = type.substr(separatorIndex + 2);
+  const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
+  gd::String extensionName = type.substr(0, separatorIndex);
+  gd::String objectTypeName = type.substr(separatorIndex + 2);
 
-    const auto &extension = Project::GetEventsFunctionsExtension(extensionName);
-    return extension.GetEventsBasedObjects().Get(objectTypeName);
+  const auto &extension = Project::GetEventsFunctionsExtension(extensionName);
+  return extension.GetEventsBasedObjects().Get(objectTypeName);
 }
 
 std::shared_ptr<gd::BaseEvent> Project::CreateEvent(

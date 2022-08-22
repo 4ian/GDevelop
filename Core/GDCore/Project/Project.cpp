@@ -81,8 +81,7 @@ void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 
 std::unique_ptr<gd::Object> Project::CreateObject(
   const gd::String& type,
-  const gd::String& name,
-  const gd::String& platformName) const {
+  const gd::String& name) const {
   if (Project::HasEventsBasedObject(type)) {
     auto &eventsBasedObject = Project::GetEventsBasedObject(type);
     auto customObject = gd::make_unique<CustomObject>(eventsBasedObject, type);
@@ -90,20 +89,8 @@ std::unique_ptr<gd::Object> Project::CreateObject(
     return customObject;
   }
   else {
-    std::unique_ptr<gd::Object> object = nullptr;
-    for (std::size_t i = 0; i < platforms.size(); ++i) {
-      if (!platformName.empty() && platforms[i]->GetName() != platformName)
-        continue;
-
-      object = platforms[i]->CreateObject(
-          type, name);  // Create a base object if the type can't be found in the
-                        // platform
-      if (object && object->GetType() == type)
-        return object;  // If the object is valid and has the good type (not a
-                        // base object), return it
-    }
-    // Return an object with an empty type when the type is unknown.
-    return object;
+    // Create a base object if the type can't be found in the platform.
+    return currentPlatform->CreateObject(type, name);
   }
 }
 

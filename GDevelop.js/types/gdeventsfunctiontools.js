@@ -2,6 +2,7 @@
 declare class gdEventsFunctionTools {
   static freeEventsFunctionToObjectsContainer(project: gdProject, eventsFunction: gdEventsFunction, outputGlobalObjectsContainer: gdObjectsContainer, outputObjectsContainer: gdObjectsContainer): void;
   static behaviorEventsFunctionToObjectsContainer(project: gdProject, eventsBasedBehavior: gdEventsBasedBehavior, eventsFunction: gdEventsFunction, outputGlobalObjectsContainer: gdObjectsContainer, outputObjectsContainer: gdObjectsContainer): void;
+  static objectEventsFunctionToObjectsContainer(project: gdProject, eventsBasedObject: gdEventsBasedObject, eventsFunction: gdEventsFunction, outputGlobalObjectsContainer: gdObjectsContainer, outputObjectsContainer: gdObjectsContainer): void;
   delete(): void;
   ptr: number;
 };

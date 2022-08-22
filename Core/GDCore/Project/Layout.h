@@ -23,7 +23,6 @@ namespace gd {
 class BaseEvent;
 class Object;
 class Project;
-class BehaviorContent;
 class InitialInstancesContainer;
 }  // namespace gd
 class TiXmlElement;
@@ -270,18 +269,18 @@ class GD_CORE_API Layout : public ObjectsContainer {
   /**
    * \brief Get the shared data stored for a behavior
    */
-  const gd::BehaviorContent& GetBehaviorSharedData(
+  const gd::BehaviorsSharedData& GetBehaviorSharedData(
       const gd::String& behaviorName) const;
 
   /**
    * \brief Get the shared data stored for a behavior
    */
-  gd::BehaviorContent& GetBehaviorSharedData(const gd::String& behaviorName);
+  gd::BehaviorsSharedData& GetBehaviorSharedData(const gd::String& behaviorName);
 
   /**
    * \brief Get a map of all shared data stored for behaviors
    */
-  const std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>&
+  const std::map<gd::String, std::unique_ptr<gd::BehaviorsSharedData>>&
   GetAllBehaviorSharedData() const;
 
 
@@ -378,7 +377,7 @@ class GD_CORE_API Layout : public ObjectsContainer {
   gd::VariablesContainer variables;  ///< Variables list
   gd::InitialInstancesContainer initialInstances;  ///< Initial instances
   std::vector<gd::Layer> initialLayers;            ///< Initial layers
-  std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>
+  std::map<gd::String, std::unique_ptr<gd::BehaviorsSharedData>>
       behaviorsSharedData;   ///< Initial shared datas of behaviors
   bool stopSoundsOnStartup;  ///< True to make the scene stop all sounds at
                              ///< startup.
@@ -388,8 +387,8 @@ class GD_CORE_API Layout : public ObjectsContainer {
                                     /// focus.
   static gd::Layer badLayer;  ///< Null object, returned when GetLayer can not
                               ///< find an appropriate layer.
-  static gd::BehaviorContent
-      badBehaviorContent;  ///< Null object, returned when
+  static gd::BehaviorsSharedData
+      badBehaviorSharedData;  ///< Null object, returned when
                            ///< GetBehaviorSharedData can not find the
                            ///< specified behavior shared data.
 

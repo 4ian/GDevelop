@@ -16,7 +16,7 @@
 namespace gd {
 class Project;
 class Object;
-class BehaviorContent;
+class Behavior;
 }  // namespace gd
 
 namespace gd {
@@ -38,7 +38,7 @@ class GD_CORE_API UsedExtensionsFinder
   void DoVisitObject(gd::Object& object) override;
 
   // Behavior Visitor
-  void DoVisitBehavior(gd::BehaviorContent& behavior) override;
+  void DoVisitBehavior(gd::Behavior& behavior) override;
 
   // Instructions Visitor
   bool DoVisitInstruction(gd::Instruction& instruction,

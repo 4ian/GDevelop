@@ -43,6 +43,16 @@ class GD_CORE_API ObjectMetadata {
                  const gd::String& description_,
                  const gd::String& icon24x24_,
                  std::shared_ptr<gd::Object> blueprintObject_);
+  /**
+   * \brief Construct an object metadata, without "blueprint" object
+   * 
+   * \note This is used by events based objects.
+   */
+  ObjectMetadata(const gd::String& extensionNamespace_,
+                 const gd::String& name_,
+                 const gd::String& fullname_,
+                 const gd::String& description_,
+                 const gd::String& icon24x24_);
 
   /**
    * \brief Construct an object metadata, with a function that will be called
@@ -307,7 +317,8 @@ class GD_CORE_API ObjectMetadata {
   std::shared_ptr<gd::Object>
       blueprintObject;  ///< The "blueprint" object to be copied when a new
                         ///< object is asked. Can be null in case a creation
-                        ///< function is passed.
+                        ///< function is passed or for events based objects
+                        ///< as CustomObject are using EventBasedObject.
 };
 
 }  // namespace gd

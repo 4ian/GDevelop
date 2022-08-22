@@ -4,7 +4,6 @@ import { I18n } from '@lingui/react';
 import { Line, Column } from '../../../UI/Grid';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
-  type OnCreateFromExampleShortHeaderFunction,
   type OnCreateBlankFunction,
   type OnOpenProjectAfterCreationFunction,
 } from '../../../ProjectCreation/CreateProjectDialog';
@@ -36,7 +35,7 @@ type Props = {|
 
   // Project opening
   canOpen: boolean,
-  onOpen: () => void,
+  onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   onCreateProject: () => void,
   onOpenProjectManager: () => void,
@@ -51,7 +50,6 @@ type Props = {|
   onOpenAbout: () => void,
 
   // Project creation
-  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
   onCreateBlank: OnCreateBlankFunction,
   onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
 |};
@@ -68,9 +66,8 @@ export const HomePage = React.memo<Props>(
       {
         project,
         canOpen,
-        onOpen,
+        onChooseProject,
         onOpenRecentFile,
-        onCreateFromExampleShortHeader,
         onCreateBlank,
         onOpenProjectAfterCreation,
         onCreateProject,
@@ -189,8 +186,9 @@ export const HomePage = React.memo<Props>(
                       ref={buildSectionRef}
                       project={project}
                       canOpen={canOpen}
-                      onOpen={onOpen}
-                      onCreateProject={onCreateProject}
+                      onChooseProject={onChooseProject}
+                      onCreateBlank={onCreateBlank}
+                      onOpenProjectAfterCreation={onOpenProjectAfterCreation}
                       onOpenRecentFile={onOpenRecentFile}
                       onChangeSubscription={onChangeSubscription}
                       storageProviders={storageProviders}
@@ -229,12 +227,11 @@ export const renderHomePageContainer = (
     projectItemName={props.projectItemName}
     setToolbar={props.setToolbar}
     canOpen={props.canOpen}
-    onOpen={props.onOpen}
+    onChooseProject={props.onChooseProject}
+    onOpenProjectAfterCreation={props.onOpenProjectAfterCreation}
     onOpenRecentFile={props.onOpenRecentFile}
     onCreateProject={props.onCreateProject}
-    onCreateFromExampleShortHeader={props.onCreateFromExampleShortHeader}
     onCreateBlank={props.onCreateBlank}
-    onOpenProjectAfterCreation={props.onOpenProjectAfterCreation}
     onOpenProjectManager={props.onOpenProjectManager}
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}

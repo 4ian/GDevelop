@@ -39,6 +39,12 @@ import optionalRequire from '../../../../Utils/OptionalRequire';
 import { showErrorBox } from '../../../../UI/Messages/MessageBox';
 import { getRelativeOrAbsoluteDisplayDate } from '../../../../Utils/DateDisplay';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
+import ProjectPreCreationDialog from '../../../../ProjectCreation/ProjectPreCreationDialog';
+import {
+  type ProjectCreationSettings,
+  type OnCreateBlankFunction,
+  type OnOpenProjectAfterCreationFunction,
+} from '../../../../ProjectCreation/CreateProjectDialog';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -57,9 +63,10 @@ const styles = {
 type Props = {|
   project: ?gdProject,
   canOpen: boolean,
-  onOpen: () => void,
+  onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onCreateProject: () => void,
+  onCreateBlank: OnCreateBlankFunction,
+  onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
   onChangeSubscription: () => void,
   storageProviders: Array<StorageProvider>,
 |};
@@ -104,8 +111,9 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     {
       project,
       canOpen,
-      onOpen,
-      onCreateProject,
+      onChooseProject,
+      onCreateBlank,
+      onOpenProjectAfterCreation,
       onOpenRecentFile,
       onChangeSubscription,
       storageProviders,
@@ -120,6 +128,13 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     const contextMenu = React.useRef<?ContextMenuInterface>(null);
     const { showDeleteConfirmation } = useConfirmDialog();
     const [pendingProject, setPendingProject] = React.useState<?string>(null);
+    const [isOpeningProject, setIsOpeningProject] = React.useState<boolean>(
+      false
+    );
+    const [
+      preCreationDialogOpen,
+      setPreCreationDialogOpen,
+    ] = React.useState<boolean>(false);
     const windowWidth = useResponsiveWindowWidth();
     const forceUpdate = useForceUpdate();
 
@@ -136,29 +151,27 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     let hasTooManyCloudProjects = false;
 
     // Show cloud projects on the web app only.
-    if (isWebApp) {
-      if (cloudProjects) {
-        projectFiles = projectFiles.concat(
-          cloudProjects
-            .map(cloudProject => {
-              if (cloudProject.deletedAt) return null;
-              const file: FileMetadataAndStorageProviderName = {
-                storageProviderName: 'Cloud',
-                fileMetadata: {
-                  fileIdentifier: cloudProject.id,
-                  lastModifiedDate: Date.parse(cloudProject.lastModifiedAt),
-                  name: cloudProject.name,
-                },
-              };
-              return file;
-            })
-            .filter(Boolean)
-        );
-        hasTooManyCloudProjects = limits
-          ? cloudProjects.filter(cloudProject => !cloudProject.deletedAt)
-              .length >= limits.capabilities.cloudProjects.maximumCount
-          : false;
-      }
+    if (isWebApp && cloudProjects) {
+      projectFiles = projectFiles.concat(
+        cloudProjects
+          .map(cloudProject => {
+            if (cloudProject.deletedAt) return null;
+            const file: FileMetadataAndStorageProviderName = {
+              storageProviderName: 'Cloud',
+              fileMetadata: {
+                fileIdentifier: cloudProject.id,
+                lastModifiedDate: Date.parse(cloudProject.lastModifiedAt),
+                name: cloudProject.name,
+              },
+            };
+            return file;
+          })
+          .filter(Boolean)
+      );
+      hasTooManyCloudProjects = limits
+        ? cloudProjects.filter(cloudProject => !cloudProject.deletedAt)
+            .length >= limits.capabilities.cloudProjects.maximumCount
+        : false;
     }
 
     projectFiles.sort((a, b) => {
@@ -261,6 +274,29 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       return actions;
     };
 
+    const createProject = async (
+      i18n: I18nType,
+      settings: ProjectCreationSettings
+    ) => {
+      setIsOpeningProject(true);
+
+      try {
+        let projectMetadata;
+
+        projectMetadata = await onCreateBlank({
+          i18n,
+          settings,
+        });
+
+        if (!projectMetadata) return;
+
+        setPreCreationDialogOpen(false);
+        onOpenProjectAfterCreation({ ...projectMetadata });
+      } finally {
+        setIsOpeningProject(false);
+      }
+    };
+
     const isWindowWidthMediumOrLarger = windowWidth !== 'small';
 
     return (
@@ -292,7 +328,9 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                     <RaisedButton
                       primary
                       label={<Trans>Create a project</Trans>}
-                      onClick={onCreateProject}
+                      onClick={() => {
+                        setPreCreationDialogOpen(true);
+                      }}
                       icon={<AddIcon />}
                       id="home-create-project-button"
                     />
@@ -309,7 +347,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                         <TextButton
                           primary
                           label={<Trans>Open an existing project</Trans>}
-                          onClick={onOpen}
+                          onClick={onChooseProject}
                         />
                       </>
                     )}
@@ -496,6 +534,14 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                 buildContextMenu(_i18n, file)
               }
             />
+            {preCreationDialogOpen && (
+              <ProjectPreCreationDialog
+                open
+                isOpening={isOpeningProject}
+                onClose={() => setPreCreationDialogOpen(false)}
+                onCreate={projectName => createProject(i18n, projectName)}
+              />
+            )}
           </>
         )}
       </I18n>

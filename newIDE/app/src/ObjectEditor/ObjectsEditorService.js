@@ -12,14 +12,18 @@ const gd /* TODO: add flow in this file */ = global.gd;
  * A service returning editor components for each object type.
  */
 const ObjectsEditorService = {
-  getEditorConfiguration(objectType: string) {
-    if (!this.editorConfigurations[objectType]) {
+  getEditorConfiguration(project: gdProject, objectType: string) {
+    if (this.editorConfigurations[objectType]) {
+      return this.editorConfigurations[objectType];
+    }
+    if (!project.hasEventsBasedObject(objectType)) {
       console.warn(
         `Object with type ${objectType} has no editor configuration registered. Please use registerEditorConfiguration to register your editor.`
       );
     }
-
-    return this.editorConfigurations[objectType];
+    return this.getDefaultObjectJsImplementationPropertiesEditor({
+      helpPagePath: '',
+    });
   },
   registerEditorConfiguration: function(objectType, editorConfiguration) {
     if (!editorConfiguration.component) {

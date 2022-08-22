@@ -66,7 +66,7 @@ The npm _build_ task:
 - Updates the glue.cpp and glue.js from Bindings.idl using _Emscripten WebIDL Binder_,
 - Launches the compilation with `make` (or `ninja` on Windows with CMake 3.17+) (you can also compile using MinGW-32 using `npm run build-with-MinGW`).
 
-See the [CMakeLists.txt](./CMakeLists.txt) for the arguments passed to the Emscripten linker.
+See the [CMakeLists.txt](./CMakeLists.txt) for the arguments passed to the Emscripten linker. For instance, if you want to see the function names in stacks or for profiling, the compilation flags can be changed.
 
 ## Documentation
 

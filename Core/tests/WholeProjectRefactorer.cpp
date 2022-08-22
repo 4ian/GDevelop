@@ -562,8 +562,7 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     // to be able to use the same events list.
     auto &childObject = eventsBasedObject.InsertNewObject(
         project, "MyExtension::Sprite", "ObjectWithMyBehavior", 0);
-    childObject.AddBehavior(gd::BehaviorContent(
-        "MyBehavior", "MyEventsExtension::MyEventsBasedBehavior"));
+    childObject.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior", "MyBehavior");
 
     eventsBasedObject.InsertNewObject(
         project, "MyEventsExtension::MyEventsBasedObject", "MyCustomObject", 1);
@@ -605,13 +604,11 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     // Objects with event based behaviors
     auto &object = layout.InsertNewObject(project, "MyExtension::Sprite",
                                           "ObjectWithMyBehavior", 0);
-    object.AddBehavior(gd::BehaviorContent(
-        "MyBehavior", "MyEventsExtension::MyEventsBasedBehavior"));
+    object.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior", "MyBehavior");
 
     auto &globalObject = project.InsertNewObject(
         project, "MyExtension::Sprite", "GlobalObjectWithMyBehavior", 0);
-    globalObject.AddBehavior(gd::BehaviorContent(
-        "MyBehavior", "MyEventsExtension::MyEventsBasedBehavior"));
+    globalObject.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior", "MyBehavior");
 
     // Custom objects
     layout.InsertNewObject(project, "MyEventsExtension::MyEventsBasedObject",
@@ -1759,14 +1756,9 @@ TEST_CASE("WholeProjectRefactorer (FindInvalidRequiredBehaviorProperties)",
 
     // Fill the required behavior property on the object.
     gd::Behavior &behavior =
-        gd::MetadataProvider::GetBehaviorMetadata(
-            platform, "MyExtension::BehaviorWithRequiredBehaviorProperty")
-            .Get();
-    gd::BehaviorContent &behaviorContent =
         object.GetBehavior("MyBehaviorWithRequiredBehaviorProperty");
-    REQUIRE(behavior.UpdateProperty(behaviorContent.GetContent(),
-                                    "requiredBehaviorProperty",
-                                    "MyBehavior") == true);
+    REQUIRE(behavior.UpdateProperty("requiredBehaviorProperty", "MyBehavior") ==
+            true);
 
     std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
         gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
@@ -1790,13 +1782,8 @@ TEST_CASE("WholeProjectRefactorer (FindInvalidRequiredBehaviorProperties)",
     // Fill the required behavior property on the object with the wrong behavior
     // name
     gd::Behavior &behavior =
-        gd::MetadataProvider::GetBehaviorMetadata(
-            platform, "MyExtension::BehaviorWithRequiredBehaviorProperty")
-            .Get();
-    gd::BehaviorContent &behaviorContent =
         object.GetBehavior("MyBehaviorWithRequiredBehaviorProperty");
-    REQUIRE(behavior.UpdateProperty(behaviorContent.GetContent(),
-                                    "requiredBehaviorProperty",
+    REQUIRE(behavior.UpdateProperty("requiredBehaviorProperty",
                                     "MyOtherBehavior") == true);
 
     std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
@@ -1825,13 +1812,8 @@ TEST_CASE("WholeProjectRefactorer (FindInvalidRequiredBehaviorProperties)",
     // Fill the required behavior property on the object with the wrong behavior
     // name
     gd::Behavior &behavior =
-        gd::MetadataProvider::GetBehaviorMetadata(
-            platform, "MyExtension::BehaviorWithRequiredBehaviorProperty")
-            .Get();
-    gd::BehaviorContent &behaviorContent =
         object.GetBehavior("MyBehaviorWithRequiredBehaviorProperty");
-    REQUIRE(behavior.UpdateProperty(behaviorContent.GetContent(),
-                                    "requiredBehaviorProperty",
+    REQUIRE(behavior.UpdateProperty("requiredBehaviorProperty",
                                     "MyNotExistingBehavior") == true);
 
     std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
@@ -1914,13 +1896,8 @@ TEST_CASE("WholeProjectRefactorer (FixInvalidRequiredBehaviorProperties)",
 
     // Wrongly fill the required behavior property on the object.
     gd::Behavior &behavior =
-        gd::MetadataProvider::GetBehaviorMetadata(
-            platform, "MyExtension::BehaviorWithRequiredBehaviorProperty")
-            .Get();
-    gd::BehaviorContent &behaviorContent =
         object.GetBehavior("MyBehaviorWithRequiredBehaviorProperty");
-    REQUIRE(behavior.UpdateProperty(behaviorContent.GetContent(),
-                                    "requiredBehaviorProperty",
+    REQUIRE(behavior.UpdateProperty("requiredBehaviorProperty",
                                     "ThisIsInvalid") == true);
 
     // Check a fix is done
@@ -1930,9 +1907,9 @@ TEST_CASE("WholeProjectRefactorer (FixInvalidRequiredBehaviorProperties)",
     REQUIRE(object.HasBehaviorNamed("MyBehaviorWithRequiredBehaviorProperty"));
 
     // Check that the property was filled with the existing behavior.
-    REQUIRE(behavior.GetProperties(behaviorContent.GetContent())
-                .at("requiredBehaviorProperty")
-                .GetValue() == "MyBehavior");
+    REQUIRE(
+        behavior.GetProperties().at("requiredBehaviorProperty").GetValue() ==
+        "MyBehavior");
 
     // Check that the existing behavior is unchanged.
     REQUIRE(object.GetAllBehaviorNames().size() == 2);
@@ -2002,12 +1979,8 @@ TEST_CASE("WholeProjectRefactorer (AddBehaviorAndRequiredBehaviors)",
         platform, "MyExtension::"
                   "BehaviorWithRequiredBehaviorProperty");
     REQUIRE(!gd::MetadataProvider::IsBadBehaviorMetadata(metadata1));
-    const auto &behaviorWithRequiredBehaviorPropertyProperties =
-        metadata1.Get().GetProperties(
-            object.GetBehavior("BehaviorWithRequiredBehaviorProperty")
-                .GetContent());
-
-    REQUIRE(behaviorWithRequiredBehaviorPropertyProperties
+    REQUIRE(object.GetBehavior("BehaviorWithRequiredBehaviorProperty")
+                .GetProperties()
                 .at("requiredBehaviorProperty")
                 .GetValue() == "MyBehavior");
   }
@@ -2042,23 +2015,15 @@ TEST_CASE("WholeProjectRefactorer (AddBehaviorAndRequiredBehaviors)",
         platform, "MyExtension::BehaviorWithRequiredBehaviorProperty");
     REQUIRE(!gd::MetadataProvider::IsBadBehaviorMetadata(metadata1));
     REQUIRE(!gd::MetadataProvider::IsBadBehaviorMetadata(metadata2));
-    const auto &
-        behaviorWithRequiredBehaviorPropertyRequiringAnotherBehaviorProperties =
-            metadata1.Get().GetProperties(
-                object
-                    .GetBehavior("BehaviorWithRequiredBehaviorPropertyRequiring"
-                                 "AnotherBehavior")
-                    .GetContent());
-    const auto &behaviorWithRequiredBehaviorPropertyProperties =
-        metadata2.Get().GetProperties(
-            object.GetBehavior("BehaviorWithRequiredBehaviorProperty")
-                .GetContent());
-
     REQUIRE(
-        behaviorWithRequiredBehaviorPropertyRequiringAnotherBehaviorProperties
+        object
+            .GetBehavior(
+                "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior")
+            .GetProperties()
             .at("requiredBehaviorProperty")
             .GetValue() == "BehaviorWithRequiredBehaviorProperty");
-    REQUIRE(behaviorWithRequiredBehaviorPropertyProperties
+    REQUIRE(object.GetBehavior("BehaviorWithRequiredBehaviorProperty")
+                .GetProperties()
                 .at("requiredBehaviorProperty")
                 .GetValue() == "MyBehavior");
   }
@@ -2134,9 +2099,7 @@ TEST_CASE("WholeProjectRefactorer (FindDependentBehaviorNames failing cases)",
     REQUIRE(object.HasBehaviorNamed("MyBehavior"));
     REQUIRE(object.HasBehaviorNamed("BehaviorWithRequiredBehaviorProperty"));
 
-    gd::BehaviorContent unknownBehaviorContent(
-        "MyUnknownBehavior", "MyUnknownExtension::MyUnknownBehavior");
-    object.AddBehavior(unknownBehaviorContent);
+    object.AddNewBehavior(project, "MyUnknownExtension::MyUnknownBehavior", "MyUnknownBehavior");
 
     // Find dependent behaviors and ignore the unknown one.
     {

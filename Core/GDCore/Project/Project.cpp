@@ -126,6 +126,38 @@ const gd::EventsBasedObject& Project::GetEventsBasedObject(const gd::String& typ
   return extension.GetEventsBasedObjects().Get(objectTypeName);
 }
 
+bool Project::HasEventsBasedBehavior(const gd::String& type) const {
+    const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
+    if (separatorIndex == std::string::npos) {
+      return false;
+    }
+    gd::String extensionName = type.substr(0, separatorIndex);
+    if (!Project::HasEventsFunctionsExtensionNamed(extensionName)) {
+      return false;
+    }
+    auto &extension = Project::GetEventsFunctionsExtension(extensionName);
+    gd::String behaviorTypeName = type.substr(separatorIndex + 2);
+    return extension.GetEventsBasedBehaviors().Has(behaviorTypeName);
+}
+
+gd::EventsBasedBehavior& Project::GetEventsBasedBehavior(const gd::String& type) {
+    const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
+    gd::String extensionName = type.substr(0, separatorIndex);
+    gd::String behaviorTypeName = type.substr(separatorIndex + 2);
+
+    auto &extension = Project::GetEventsFunctionsExtension(extensionName);
+    return extension.GetEventsBasedBehaviors().Get(behaviorTypeName);
+}
+
+const gd::EventsBasedBehavior& Project::GetEventsBasedBehavior(const gd::String& type) const {
+    const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
+    gd::String extensionName = type.substr(0, separatorIndex);
+    gd::String behaviorTypeName = type.substr(separatorIndex + 2);
+
+    auto &extension = Project::GetEventsFunctionsExtension(extensionName);
+    return extension.GetEventsBasedBehaviors().Get(behaviorTypeName);
+}
+
 std::shared_ptr<gd::BaseEvent> Project::CreateEvent(
     const gd::String& type, const gd::String& platformName) {
   for (std::size_t i = 0; i < platforms.size(); ++i) {
@@ -671,16 +703,15 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   if (currentPlatform == NULL && !platforms.empty())
     currentPlatform = platforms.back();
 
-  // TODO EBO All events based behaviors and events based objects should be
-  // added to the project before the content of events based objects is
-  // unserialized because when unserializing child-objects InsertNewObject and
-  // AddNewBehavior need to get EventsBasedObject and EventsBasedBehavior
-  // instances from the Project.
   eventsFunctionsExtensions.clear();
   const SerializerElement& eventsFunctionsExtensionsElement =
       element.GetChild("eventsFunctionsExtensions");
   eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
       "eventsFunctionsExtension");
+  // First, only unserialize behaviors and objects names.
+  // As event based objects can contains CustomObject and Custom Object,
+  // this allows them to reference EventBasedBehavior and EventBasedObject
+  // respectively.
   for (std::size_t i = 0;
        i < eventsFunctionsExtensionsElement.GetChildrenCount();
        ++i) {
@@ -691,6 +722,16 @@ void Project::UnserializeFrom(const SerializerElement& element) {
         InsertNewEventsFunctionsExtension("",
                                           GetEventsFunctionsExtensionsCount());
     newEventsFunctionsExtension.UnserializeFrom(
+        *this, eventsFunctionsExtensionElement);
+  }
+  // Then unserialize functions, behaviors and objects content.
+  for (std::size_t i = 0;
+       i < eventsFunctionsExtensionsElement.GetChildrenCount();
+       ++i) {
+    const SerializerElement& eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(i);
+
+    eventsFunctionsExtensions.at(i)->UnserializeExtensionImplementationFrom(
         *this, eventsFunctionsExtensionElement);
   }
 

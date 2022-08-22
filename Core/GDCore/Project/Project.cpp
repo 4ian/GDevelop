@@ -84,9 +84,7 @@ std::unique_ptr<gd::Object> Project::CreateObject(
   const gd::String& name) const {
   if (Project::HasEventsBasedObject(type)) {
     auto &eventsBasedObject = Project::GetEventsBasedObject(type);
-    auto customObject = gd::make_unique<CustomObject>(eventsBasedObject, type);
-    customObject->SetName(name);
-    return customObject;
+    return gd::make_unique<CustomObject>(name, eventsBasedObject, type);
   }
   else {
     // Create a base object if the type can't be found in the platform.

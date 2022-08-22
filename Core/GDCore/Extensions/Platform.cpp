@@ -8,6 +8,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/Log.h"
 
 using namespace std;
 
@@ -94,11 +95,11 @@ std::shared_ptr<gd::PlatformExtension> Platform::GetExtension(
 std::unique_ptr<gd::Object> Platform::CreateObject(
     gd::String type, const gd::String& name) const {
   if (creationFunctionTable.find(type) == creationFunctionTable.end()) {
-    std::cout << "Tried to create an object with an unknown type: " << type
-              << " for platform " << GetName() << "!" << std::endl;
+    gd::LogWarning("Tried to create an object with an unknown type: " + type
+              + " for platform " + GetName() + "!");
     type = "";
     if (creationFunctionTable.find("") == creationFunctionTable.end()) {
-      std::cout << "Unable to create a Base object!" << std::endl;
+      gd::LogError("Unable to create a Base object!");
       return nullptr;
     }
   }

@@ -14,6 +14,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Project/PropertyDescriptor.h"
+#include "GDCore/Tools/Log.h"
 
 namespace gd {
 
@@ -81,7 +82,6 @@ gd::Behavior* Object::AddNewBehavior(const gd::Project& project,
                                             const gd::String& name) {
   auto initializeAndAdd =
       [this, &name](std::unique_ptr<gd::Behavior> behavior) {
-    behavior->SetName(name);
     behavior->InitializeContent();
     this->behaviors[name] = std::move(behavior);
     return this->behaviors[name].get();
@@ -90,18 +90,19 @@ gd::Behavior* Object::AddNewBehavior(const gd::Project& project,
   if (project.HasEventsBasedBehavior(type)) {
     auto &eventsBasedBehavior = project.GetEventsBasedBehavior(type);
     return initializeAndAdd(
-        gd::make_unique<CustomBehavior>(eventsBasedBehavior, type));
+        gd::make_unique<CustomBehavior>(name, eventsBasedBehavior, type));
   }
   else {
     const gd::BehaviorMetadata& behaviorMetadata =
         gd::MetadataProvider::GetBehaviorMetadata(project.GetCurrentPlatform(),
                                                   type);
     if (gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
-      std::cout << "Tried to create a behavior with an unknown type: " << type
-                << " on object " << GetName() << "!" << std::endl;
+      gd::LogWarning("Tried to create a behavior with an unknown type: " + type
+                     + " on object " + GetName() + "!");
       return nullptr;
     }
     std::unique_ptr<gd::Behavior> behavior(behaviorMetadata.Get().Clone());
+    behavior->SetName(name);
     return initializeAndAdd(std::move(behavior));
   }
 }

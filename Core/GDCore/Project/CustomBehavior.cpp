@@ -69,7 +69,7 @@ bool CustomBehavior::UpdateProperty(gd::SerializerElement &behaviorContent,
   }
   const auto &property = properties.Get(propertyName);
 
-  auto &element = objectContent.AddChild(propertyName);
+  auto &element = behaviorContent.AddChild(propertyName);
   const gd::String &propertyType = property.GetType();
 
   if (propertyType == "String" || propertyType == "Choice" ||

@@ -522,22 +522,6 @@ interface BehaviorJsImplementation {
     void InitializeContent([Ref] SerializerElement behaviorContent);
 };
 
-interface CustomBehavior {
-    void CustomBehavior([Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const] DOMString fullType);
-    CustomBehavior Clone();
-
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    [Const, Ref] DOMString GetTypeName();
-
-    [Value] MapStringPropertyDescriptor GetProperties();
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
-    void InitializeContent();
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
-};
-
 interface BehaviorsSharedData {
     void BehaviorsSharedData();
 
@@ -613,24 +597,6 @@ interface ObjectJsImplementation {
 
     [Const, Ref] DOMString GetRawJSONContent();
     [Ref] ObjectJsImplementation SetRawJSONContent([Const] DOMString newContent);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
-
-    // Not exposed as protected:
-    // void DoSerializeTo([Ref] SerializerElement element);
-    // void DoUnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
-};
-
-interface CustomObject {
-    void CustomObject([Const, Ref] EventsBasedObject eventsBasedObject, [Const] DOMString fullType);
-    [Value] UniquePtrObject Clone();
-
-    [Value] MapStringPropertyDescriptor GetProperties();
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
-
-    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
-    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);

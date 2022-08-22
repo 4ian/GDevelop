@@ -13,11 +13,10 @@ using namespace gd;
  */
 class CustomBehavior : public gd::Behavior {
 public:
-  CustomBehavior(const EventsBasedBehavior &eventsBasedBehavior_,
+  CustomBehavior(const gd::String &name,
+                 const EventsBasedBehavior &eventsBasedBehavior_,
                  const gd::String &fullType)
-      : // Name is not important as this object is just a "blueprint"
-        // that is copied (see calls to AddObject).
-        Behavior("CustomObject", fullType),
+      : Behavior(name, fullType),
         eventsBasedBehavior(eventsBasedBehavior_) {}
   CustomBehavior *Clone() const override;
 
@@ -36,5 +35,4 @@ protected:
 
 private:
   const EventsBasedBehavior &eventsBasedBehavior;
-  gd::SerializerElement objectContent;
 };

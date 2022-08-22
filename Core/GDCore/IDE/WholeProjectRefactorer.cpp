@@ -986,17 +986,6 @@ WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
                object->GetAllBehaviorContents()) {
             gd::Behavior& behavior = *behaviorKeyValuePair.second;
 
-            // TODO BC Be confident on the model and remove the metadata check?
-            const auto& behaviorMetadata =
-                gd::MetadataProvider::GetBehaviorMetadata(
-                    project.GetCurrentPlatform(),
-                    behavior.GetTypeName());
-            if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
-              std::cout << "Could not find metadata for behavior with type \""
-                        << behavior.GetTypeName() << "\"" << std::endl;
-              continue;
-            }
-
             for (auto const& keyValue : behavior.GetProperties()) {
               const gd::String& propertyName = keyValue.first;
               const gd::PropertyDescriptor& property = keyValue.second;

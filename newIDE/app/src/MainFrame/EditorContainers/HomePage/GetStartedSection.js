@@ -32,6 +32,7 @@ const getColumnsFromWidth = (width: WidthType) => {
 };
 const MAX_COLUMNS = getColumnsFromWidth('large');
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
+const ITEMS_SPACING = 5;
 const styles = {
   grid: {
     textAlign: 'center',
@@ -52,7 +53,8 @@ const styles = {
   },
   bannerContainer: {
     width: '100%',
-    maxWidth: MAX_SECTION_WIDTH,
+    maxWidth: MAX_SECTION_WIDTH - 2 * ITEMS_SPACING,
+    marginLeft: ITEMS_SPACING,
   },
   bannerImage: {
     width: '100%',
@@ -94,7 +96,7 @@ const GetStartedSection = ({
   }[] = [
     {
       key: 'tutorial',
-      title: <Trans>Follow a tutorial</Trans>,
+      title: <Trans>GDevelop tutorials</Trans>,
       subText: (
         <>
           <span style={styles.icon}>🕐</span>
@@ -103,7 +105,7 @@ const GetStartedSection = ({
       ),
       description: <Trans>A complete game step by step</Trans>,
       action: () => onTabChange('learn'),
-      imagePath: 'res/homepage/follow-tutorial.png',
+      imagePath: 'res/homepage/get-started.png',
     },
     {
       key: 'build',
@@ -180,7 +182,7 @@ const GetStartedSection = ({
             cols={getColumnsFromWidth(windowWidth)}
             style={styles.grid}
             cellHeight="auto"
-            spacing={10}
+            spacing={ITEMS_SPACING * 2}
           >
             {items.map((item, index) => (
               <GridListTile key={index} style={styles.gridListTile}>

@@ -90,19 +90,21 @@ std::unique_ptr<gd::Object> Project::CreateObject(
     return customObject;
   }
   else {
+    std::unique_ptr<gd::Object> object = nullptr;
     for (std::size_t i = 0; i < platforms.size(); ++i) {
       if (!platformName.empty() && platforms[i]->GetName() != platformName)
         continue;
 
-      std::unique_ptr<gd::Object> object = platforms[i]->CreateObject(
+      object = platforms[i]->CreateObject(
           type, name);  // Create a base object if the type can't be found in the
                         // platform
       if (object && object->GetType() == type)
         return object;  // If the object is valid and has the good type (not a
                         // base object), return it
     }
+    // Return an object with an empty type when the type is unknown.
+    return object;
   }
-  return nullptr;
 }
 
 bool Project::HasEventsBasedObject(const gd::String& type) const {

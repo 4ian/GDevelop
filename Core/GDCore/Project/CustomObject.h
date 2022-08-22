@@ -41,8 +41,8 @@ class CustomObject : public gd::Object {
   void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
 
  protected:
-  void DoSerializeTo(SerializerElement& arg0) const override;
-  void DoUnserializeFrom(Project& arg0, const SerializerElement& arg1) override;
+  void DoSerializeTo(SerializerElement& element) const override;
+  void DoUnserializeFrom(Project& project, const SerializerElement& element) override;
 
   private:
     const EventsBasedObject& eventsBasedObject;

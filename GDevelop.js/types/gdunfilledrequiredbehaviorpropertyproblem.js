@@ -2,7 +2,7 @@
 declare class gdUnfilledRequiredBehaviorPropertyProblem {
   getSourceProject(): gdProject;
   getSourceObject(): gdObject;
-  getSourceBehaviorContent(): gdBehaviorContent;
+  getSourceBehaviorContent(): gdBehavior;
   getSourcePropertyName(): string;
   getExpectedBehaviorTypeName(): string;
   delete(): void;

@@ -23,14 +23,12 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
                                const gd::String& description_,
                                const gd::String& icon24x24,
                                std::shared_ptr<gd::Object> blueprintObject_)
-    : extensionNamespace(extensionNamespace_),
-      blueprintObject(blueprintObject_) {
-  name = name_;
-#if defined(GD_IDE_ONLY)
-  SetFullName(gd::String(fullname_));
-  SetDescription(gd::String(description_));
-  iconFilename = icon24x24;
-#endif
+    : ObjectMetadata(extensionNamespace_,
+                     name_,
+                     fullname_,
+                     description_,
+                     icon24x24) {
+  blueprintObject = blueprintObject_;
   createFunPtr =
       [blueprintObject_](gd::String name) -> std::unique_ptr<gd::Object> {
     if (blueprintObject_ == std::shared_ptr<gd::Object>()) {
@@ -51,15 +49,25 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
                                const gd::String& name_,
                                const gd::String& fullname_,
                                const gd::String& description_,
-                               const gd::String& icon24x24,
-                               CreateFunPtr createFunPtrP)
+                               const gd::String& icon24x24)
     : extensionNamespace(extensionNamespace_) {
   name = name_;
-#if defined(GD_IDE_ONLY)
   SetFullName(gd::String(fullname_));
   SetDescription(gd::String(description_));
   iconFilename = icon24x24;
-#endif
+}
+
+ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
+                               const gd::String& name_,
+                               const gd::String& fullname_,
+                               const gd::String& description_,
+                               const gd::String& icon24x24,
+                               CreateFunPtr createFunPtrP)
+    : ObjectMetadata(extensionNamespace_,
+                     name_,
+                     fullname_,
+                     description_,
+                     icon24x24) {
   createFunPtr = createFunPtrP;
 }
 

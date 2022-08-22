@@ -44,7 +44,7 @@ export const SMALL_WIDGET_SIZE = 200;
 type Props = {|
   children: React.Node,
   onClick: () => void,
-  size: 'small' | 'large',
+  size: 'small' | 'large' | 'banner',
   disabled?: boolean,
 |};
 
@@ -53,7 +53,9 @@ export const CardWidget = ({ children, onClick, size, disabled }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
 
   const widgetMaxWidth =
-    windowWidth === 'small'
+    size === 'banner'
+      ? undefined
+      : windowWidth === 'small'
       ? undefined
       : size === 'small'
       ? SMALL_WIDGET_SIZE

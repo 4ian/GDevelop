@@ -23,6 +23,7 @@
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/Project/CustomObject.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
@@ -79,22 +80,50 @@ Project::~Project() {}
 void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 
 std::unique_ptr<gd::Object> Project::CreateObject(
-    const gd::String& type,
-    const gd::String& name,
-    const gd::String& platformName) {
-  for (std::size_t i = 0; i < platforms.size(); ++i) {
-    if (!platformName.empty() && platforms[i]->GetName() != platformName)
-      continue;
-
-    std::unique_ptr<gd::Object> object = platforms[i]->CreateObject(
-        type, name);  // Create a base object if the type can't be found in the
-                      // platform
-    if (object && object->GetType() == type)
-      return object;  // If the object is valid and has the good type (not a
-                      // base object), return it
+  const gd::String& type,
+  const gd::String& name) const {
+  if (Project::HasEventsBasedObject(type)) {
+    auto &eventsBasedObject = Project::GetEventsBasedObject(type);
+    auto customObject = gd::make_unique<CustomObject>(eventsBasedObject, type);
+    customObject->SetName(name);
+    return customObject;
   }
+  else {
+    // Create a base object if the type can't be found in the platform.
+    return currentPlatform->CreateObject(type, name);
+  }
+}
 
-  return nullptr;
+bool Project::HasEventsBasedObject(const gd::String& type) const {
+  const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
+  if (separatorIndex == std::string::npos) {
+    return false;
+  }
+  gd::String extensionName = type.substr(0, separatorIndex);
+  if (!Project::HasEventsFunctionsExtensionNamed(extensionName)) {
+    return false;
+  }
+  auto &extension = Project::GetEventsFunctionsExtension(extensionName);
+  gd::String objectTypeName = type.substr(separatorIndex + 2);
+  return extension.GetEventsBasedObjects().Has(objectTypeName);
+}
+
+gd::EventsBasedObject& Project::GetEventsBasedObject(const gd::String& type) {
+  const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
+  gd::String extensionName = type.substr(0, separatorIndex);
+  gd::String objectTypeName = type.substr(separatorIndex + 2);
+
+  auto &extension = Project::GetEventsFunctionsExtension(extensionName);
+  return extension.GetEventsBasedObjects().Get(objectTypeName);
+}
+
+const gd::EventsBasedObject& Project::GetEventsBasedObject(const gd::String& type) const {
+  const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
+  gd::String extensionName = type.substr(0, separatorIndex);
+  gd::String objectTypeName = type.substr(separatorIndex + 2);
+
+  const auto &extension = Project::GetEventsFunctionsExtension(extensionName);
+  return extension.GetEventsBasedObjects().Get(objectTypeName);
 }
 
 std::shared_ptr<gd::BaseEvent> Project::CreateEvent(
@@ -642,6 +671,29 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   if (currentPlatform == NULL && !platforms.empty())
     currentPlatform = platforms.back();
 
+  // TODO EBO All events based behaviors and events based objects should be
+  // added to the project before the content of events based objects is
+  // unserialized because when unserializing child-objects InsertNewObject and
+  // AddNewBehavior need to get EventsBasedObject and EventsBasedBehavior
+  // instances from the Project.
+  eventsFunctionsExtensions.clear();
+  const SerializerElement& eventsFunctionsExtensionsElement =
+      element.GetChild("eventsFunctionsExtensions");
+  eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
+      "eventsFunctionsExtension");
+  for (std::size_t i = 0;
+       i < eventsFunctionsExtensionsElement.GetChildrenCount();
+       ++i) {
+    const SerializerElement& eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(i);
+
+    gd::EventsFunctionsExtension& newEventsFunctionsExtension =
+        InsertNewEventsFunctionsExtension("",
+                                          GetEventsFunctionsExtensionsCount());
+    newEventsFunctionsExtension.UnserializeFrom(
+        *this, eventsFunctionsExtensionElement);
+  }
+
   GetObjectGroups().UnserializeFrom(
       element.GetChild("objectsGroups", 0, "ObjectGroups"));
   resourcesManager.UnserializeFrom(
@@ -674,24 +726,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
         externalEventElement.GetStringAttribute("name", "", "Name"),
         GetExternalEventsCount());
     externalEvents.UnserializeFrom(*this, externalEventElement);
-  }
-
-  eventsFunctionsExtensions.clear();
-  const SerializerElement& eventsFunctionsExtensionsElement =
-      element.GetChild("eventsFunctionsExtensions");
-  eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
-      "eventsFunctionsExtension");
-  for (std::size_t i = 0;
-       i < eventsFunctionsExtensionsElement.GetChildrenCount();
-       ++i) {
-    const SerializerElement& eventsFunctionsExtensionElement =
-        eventsFunctionsExtensionsElement.GetChild(i);
-
-    gd::EventsFunctionsExtension& newEventsFunctionsExtension =
-        InsertNewEventsFunctionsExtension("",
-                                          GetEventsFunctionsExtensionsCount());
-    newEventsFunctionsExtension.UnserializeFrom(
-        *this, eventsFunctionsExtensionElement);
   }
 
   externalLayouts.clear();

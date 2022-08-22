@@ -23,7 +23,7 @@ import {
   isBehaviorLifecycleEventsFunction,
   isExtensionLifecycleEventsFunction,
 } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
-import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
+import { ParametersIndexOffsets } from '../../EventsFunctionsExtensionsLoader';
 import Add from '@material-ui/icons/Add';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
@@ -37,6 +37,7 @@ type Props = {|
   project: gdProject,
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
+  eventsBasedObject: ?gdEventsBasedObject,
   onParametersUpdated: () => void,
   helpPagePath?: string,
   freezeParameters?: boolean,
@@ -48,6 +49,13 @@ type Props = {|
   ) => void,
   onMoveBehaviorEventsParameter?: (
     eventsBasedBehavior: gdEventsBasedBehavior,
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: (boolean) => void
+  ) => void,
+  onMoveObjectEventsParameter?: (
+    eventsBasedObject: gdEventsBasedObject,
     eventsFunction: gdEventsFunction,
     oldIndex: number,
     newIndex: number,
@@ -164,13 +172,31 @@ export default class EventsFunctionParametersEditor extends React.Component<
   };
 
   _moveParameters = (oldIndex: number, newIndex: number) => {
-    const { eventsFunction, eventsBasedBehavior } = this.props;
+    const {
+      eventsFunction,
+      eventsBasedBehavior,
+      eventsBasedObject,
+    } = this.props;
     const parameters = eventsFunction.getParameters();
 
     if (eventsBasedBehavior) {
       if (this.props.onMoveBehaviorEventsParameter)
         this.props.onMoveBehaviorEventsParameter(
           eventsBasedBehavior,
+          eventsFunction,
+          oldIndex,
+          newIndex,
+          isDone => {
+            if (!isDone) return;
+            gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
+            this.forceUpdate();
+            this.props.onParametersUpdated();
+          }
+        );
+    } else if (eventsBasedObject) {
+      if (this.props.onMoveObjectEventsParameter)
+        this.props.onMoveObjectEventsParameter(
+          eventsBasedObject,
           eventsFunction,
           oldIndex,
           newIndex,
@@ -209,6 +235,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
       project,
       eventsFunction,
       eventsBasedBehavior,
+      eventsBasedObject,
       freezeParameters,
       helpPagePath,
     } = this.props;
@@ -258,12 +285,21 @@ export default class EventsFunctionParametersEditor extends React.Component<
     }
 
     const isParameterDisabled = index => {
-      return !!freezeParameters || (!!eventsBasedBehavior && index < 2);
+      return (
+        !!freezeParameters ||
+        (!!eventsBasedBehavior && index < 2) ||
+        (!!eventsBasedObject && index < 1)
+      );
     };
     const isParameterDescriptionAndTypeShown = index => {
       // The first two parameters of a behavior method should not be changed at all,
       // so we even hide their description and type to avoid cluttering the interface.
-      return !eventsBasedBehavior || index >= 2;
+      // Same thing for an object which has mandatory Object parameter.
+      return (
+        (!eventsBasedBehavior && !eventsBasedObject) ||
+        (!!eventsBasedBehavior && index >= 2) ||
+        (!!eventsBasedObject && index >= 1)
+      );
     };
     const isParameterLongDescriptionShown = (parameter, index): boolean => {
       if (!isParameterDescriptionAndTypeShown(index)) return false;
@@ -273,9 +309,11 @@ export default class EventsFunctionParametersEditor extends React.Component<
         !!this.state.longDescriptionShownIndexes[index]
       );
     };
-    const parametersIndexOffset = getParametersIndexOffset(
-      !!eventsBasedBehavior
-    );
+    const parametersIndexOffset = eventsBasedBehavior
+      ? ParametersIndexOffsets.BehaviorFunction
+      : eventsBasedObject
+      ? ParametersIndexOffsets.ObjectFunction
+      : ParametersIndexOffsets.FreeFunction;
 
     return (
       <I18n>

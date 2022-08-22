@@ -51,9 +51,6 @@ Layout::Layout()
       backgroundColorB(209),
       stopSoundsOnStartup(true),
       standardSortMethod(true),
-      oglFOV(90.0f),
-      oglZNear(1.0f),
-      oglZFar(500.0f),
       disableInputWhenNotFocused(true),
       profiler(NULL)
 {
@@ -260,17 +257,12 @@ void Layout::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("v", (int)GetBackgroundColorGreen());
   element.SetAttribute("b", (int)GetBackgroundColorBlue());
   element.SetAttribute("title", GetWindowDefaultTitle());
-  element.SetAttribute("oglFOV", oglFOV);
-  element.SetAttribute("oglZNear", oglZNear);
-  element.SetAttribute("oglZFar", oglZFar);
   element.SetAttribute("standardSortMethod", standardSortMethod);
   element.SetAttribute("stopSoundsOnStartup", stopSoundsOnStartup);
   element.SetAttribute("disableInputWhenNotFocused",
                        disableInputWhenNotFocused);
 
-#if defined(GD_IDE_ONLY)
   editorSettings.SerializeTo(element.AddChild("uiSettings"));
-#endif
 
   GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
   GetVariables().SerializeTo(element.AddChild("variables"));
@@ -321,9 +313,6 @@ void Layout::UnserializeFrom(gd::Project& project,
                      element.GetIntAttribute("b"));
   SetWindowDefaultTitle(
       element.GetStringAttribute("title", "(No title)", "titre"));
-  oglFOV = element.GetDoubleAttribute("oglFOV");
-  oglZNear = element.GetDoubleAttribute("oglZNear");
-  oglZFar = element.GetDoubleAttribute("oglZFar");
   standardSortMethod = element.GetBoolAttribute("standardSortMethod");
   stopSoundsOnStartup = element.GetBoolAttribute("stopSoundsOnStartup");
   disableInputWhenNotFocused =
@@ -388,9 +377,6 @@ void Layout::Init(const Layout& other) {
   backgroundColorB = other.backgroundColorB;
   standardSortMethod = other.standardSortMethod;
   title = other.title;
-  oglFOV = other.oglFOV;
-  oglZNear = other.oglZNear;
-  oglZFar = other.oglZFar;
   stopSoundsOnStartup = other.stopSoundsOnStartup;
   disableInputWhenNotFocused = other.disableInputWhenNotFocused;
   initialInstances = other.initialInstances;

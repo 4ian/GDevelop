@@ -264,7 +264,6 @@ export const WithObjectsList = () => (
                   project={testProject.project}
                   objectsContainer={testProject.testLayout}
                   layout={testProject.testLayout}
-                  events={testProject.testLayout.getEvents()}
                   resourceSources={[]}
                   onChooseResource={() => Promise.reject('unimplemented')}
                   resourceExternalEditors={fakeResourceExternalEditors}

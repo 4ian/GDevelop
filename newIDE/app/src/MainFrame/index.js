@@ -2460,7 +2460,7 @@ const MainFrame = (props: Props) => {
                     canOpen: !!props.storageProviders.filter(
                       ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
                     ).length,
-                    onOpen: () => chooseProject(),
+                    onChooseProject: chooseProject,
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
                     onCreateFromExampleShortHeader: onCreateFromExampleShortHeader,
                     onCreateBlank: onCreateBlank,

@@ -67,7 +67,7 @@ declare class libGDevelop {
   ExtensionProperties: Class<gdExtensionProperties>;
   Behavior: Class<gdBehavior>;
   BehaviorJsImplementation: Class<gdBehaviorJsImplementation>;
-  BehaviorContent: Class<gdBehaviorContent>;
+  CustomBehavior: Class<gdCustomBehavior>;
   BehaviorsSharedData: Class<gdBehaviorsSharedData>;
   BehaviorSharedDataJsImplementation: Class<gdBehaviorSharedDataJsImplementation>;
   gdObject: Class<gdObject>;

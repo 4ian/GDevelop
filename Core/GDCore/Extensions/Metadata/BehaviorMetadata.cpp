@@ -14,6 +14,7 @@
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Tools/MakeUnique.h"
 
 namespace gd {
 
@@ -41,6 +42,27 @@ BehaviorMetadata::BehaviorMetadata(
   if (instance) instance->SetTypeName(name_);
   if (sharedDatasInstance) sharedDatasInstance->SetTypeName(name_);
 }
+
+BehaviorMetadata::BehaviorMetadata(
+    const gd::String& extensionNamespace,
+    const gd::String& name_,
+    const gd::String& fullname_,
+    const gd::String& description_,
+    const gd::String& group_,
+    const gd::String& icon24x24_): BehaviorMetadata(
+        extensionNamespace,
+        name_,
+        fullname_,
+        // Default name is the name
+        name_,
+        description_,
+        group_,
+        icon24x24_,
+        // Class name is the name, actually unused
+        name_,
+        // It is only used to get the name for GetName.
+        gd::make_unique<gd::Behavior>(),
+        nullptr){};
 
 gd::InstructionMetadata& BehaviorMetadata::AddCondition(
     const gd::String& name,

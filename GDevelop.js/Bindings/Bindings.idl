@@ -503,11 +503,14 @@ interface Behavior {
     void Behavior();
 
     Behavior Clone();
+
+    void SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
     [Const, Ref] DOMString GetTypeName();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorContent);
-    boolean UpdateProperty([Ref] SerializerElement behaviorContent, [Const] DOMString name, [Const] DOMString value);
-    void InitializeContent([Ref] SerializerElement behaviorContent);
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
+    void InitializeContent();
 };
 
 [JSImplementation=Behavior]
@@ -519,14 +522,17 @@ interface BehaviorJsImplementation {
     void InitializeContent([Ref] SerializerElement behaviorContent);
 };
 
-interface BehaviorContent {
-    void BehaviorContent([Const] DOMString name, [Const] DOMString type);
+interface CustomBehavior {
+    void CustomBehavior([Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const] DOMString fullType);
+    CustomBehavior Clone();
 
-    BehaviorContent Clone();
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
     [Const, Ref] DOMString GetTypeName();
-    [Ref] SerializerElement GetContent();
+
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
+    void InitializeContent();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -535,9 +541,13 @@ interface BehaviorContent {
 interface BehaviorsSharedData {
     void BehaviorsSharedData();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorSharedDataContent);
-    boolean UpdateProperty([Ref] SerializerElement behaviorSharedDataContent, [Const] DOMString name, [Const] DOMString value);
-    void InitializeContent([Ref] SerializerElement behaviorSharedDataContent);
+    void SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
+    [Const, Ref] DOMString GetTypeName();
+
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
+    void InitializeContent();
 };
 
 [JSImplementation=BehaviorsSharedData]
@@ -576,8 +586,8 @@ interface gdObject {
     [Ref] EffectsContainer GetEffects();
     [Value] VectorString GetAllBehaviorNames();
     boolean HasBehaviorNamed([Const] DOMString name);
-    BehaviorContent AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
-    [Ref] BehaviorContent GetBehavior([Const] DOMString name);
+    Behavior AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
+    [Ref] Behavior GetBehavior([Const] DOMString name);
     void RemoveBehavior([Const] DOMString name);
     boolean RenameBehavior([Const] DOMString oldName, [Const] DOMString name);
 
@@ -648,7 +658,7 @@ interface Layout {
     void UpdateBehaviorsSharedData([Ref] Project project);
     [Value] VectorString GetAllBehaviorSharedDataNames();
     boolean HasBehaviorSharedData([Const] DOMString behaviorName);
-    [Ref] BehaviorContent GetBehaviorSharedData([Const] DOMString behaviorName);
+    [Ref] BehaviorsSharedData GetBehaviorSharedData([Const] DOMString behaviorName);
 
     void InsertNewLayer([Const] DOMString name, unsigned long position);
     void InsertLayer([Const, Ref] Layer layer, unsigned long position);
@@ -1614,11 +1624,22 @@ interface PlatformExtension {
         Behavior instance,
         BehaviorsSharedData sharedDatasInstance);
 
+    [Ref] BehaviorMetadata AddEventsBasedBehavior([Const] DOMString name,
+        [Const] DOMString fullname,
+        [Const] DOMString description,
+        [Const] DOMString group,
+        [Const] DOMString icon24x24);
+
     [Ref] ObjectMetadata WRAPPED_AddObject([Const] DOMString name,
         [Const] DOMString fullname,
         [Const] DOMString description,
         [Const] DOMString icon24x24,
         gdObject instance);
+
+    [Ref] ObjectMetadata AddEventsBasedObject([Const] DOMString name,
+        [Const] DOMString fullname,
+        [Const] DOMString description,
+        [Const] DOMString icon24x24);
 
     [Ref] EffectMetadata AddEffect([Const] DOMString name);
 
@@ -1980,7 +2001,7 @@ interface EventsRefactorer {
 interface UnfilledRequiredBehaviorPropertyProblem {
   [Const, Ref] Project GetSourceProject();
   [Ref] gdObject GetSourceObject();
-  [Ref] BehaviorContent GetSourceBehaviorContent();
+  [Ref] Behavior GetSourceBehaviorContent();
   [Const, Ref] DOMString GetSourcePropertyName();
   [Const, Ref] DOMString GetExpectedBehaviorTypeName();
 };

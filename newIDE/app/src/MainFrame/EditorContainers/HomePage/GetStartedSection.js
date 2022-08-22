@@ -16,6 +16,7 @@ import {
 import { CardWidget, LARGE_WIDGET_SIZE } from './CardWidget';
 import Checkbox from '../../../UI/Checkbox';
 import { GridList, GridListTile } from '@material-ui/core';
+import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 const electron = optionalRequire('electron');
 
 const getColumnsFromWidth = (width: WidthType) => {
@@ -30,11 +31,13 @@ const getColumnsFromWidth = (width: WidthType) => {
   }
 };
 const MAX_COLUMNS = getColumnsFromWidth('large');
+const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
+const ITEMS_SPACING = 5;
 const styles = {
   grid: {
     textAlign: 'center',
     // Avoid tiles taking too much space on large screens.
-    maxWidth: (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS, // widget size + 5 padding per side
+    maxWidth: MAX_SECTION_WIDTH,
     overflow: 'hidden',
   },
   gridListTile: { display: 'flex', justifyContent: 'flex-start' },
@@ -42,11 +45,25 @@ const styles = {
     textAlign: 'left',
     padding: 10,
   },
-  image: {
+  cardImage: {
     width: '100%',
-    // Prevent cumulative layout shift by enforcing
-    // the 2 ratio.
+    // Prevent cumulative layout shift by enforcing the 2 ratio.
     aspectRatio: '2',
+    maxWidth: LARGE_WIDGET_SIZE,
+  },
+  bannerContainer: {
+    width: '100%',
+    maxWidth: MAX_SECTION_WIDTH - 2 * ITEMS_SPACING,
+    marginLeft: ITEMS_SPACING,
+  },
+  bannerImage: {
+    width: '100%',
+    // Prevent cumulative layout shift by enforcing ratio.
+    aspectRatio: '16 / 9',
+    maxWidth: LARGE_WIDGET_SIZE,
+  },
+  icon: {
+    marginRight: 8, // Without this, the icon is too close to the text and space is not enough.
   },
 };
 
@@ -66,7 +83,8 @@ const GetStartedSection = ({
   setShowGetStartedSection,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const shouldShowOnboardingButton = !electron && !isMobile();
+  const shouldShowOnboardingButton =
+    !electron && !isMobile() && windowWidth !== 'small';
   const items: {
     key: string,
     title: React.Node,
@@ -76,27 +94,18 @@ const GetStartedSection = ({
     imagePath: string,
     disabled?: boolean,
   }[] = [
-    shouldShowOnboardingButton
-      ? {
-          key: 'tour',
-          title: <Trans>Take the tour</Trans>,
-          subText: <Trans>🕐 5 minutes</Trans>,
-          description: <Trans>Learn the fundamentals of the editor</Trans>,
-          action: () => {
-            sendOnboardingManuallyOpened();
-            onOpenOnboardingDialog();
-          },
-          imagePath: 'res/homepage/take-the-tour.png',
-          disabled: isUserflowRunning,
-        }
-      : undefined,
     {
       key: 'tutorial',
-      title: <Trans>Follow a tutorial</Trans>,
-      subText: <Trans>🕐 30 min to 1h</Trans>,
+      title: <Trans>GDevelop tutorials</Trans>,
+      subText: (
+        <>
+          <span style={styles.icon}>🕐</span>
+          <Trans>30 min to 1h</Trans>
+        </>
+      ),
       description: <Trans>A complete game step by step</Trans>,
       action: () => onTabChange('learn'),
-      imagePath: 'res/homepage/follow-tutorial.png',
+      imagePath: 'res/homepage/get-started.png',
     },
     {
       key: 'build',
@@ -114,7 +123,7 @@ const GetStartedSection = ({
       action: () => onTabChange('play'),
       imagePath: 'res/homepage/explore-games.png',
     },
-  ].filter(Boolean);
+  ];
 
   return (
     <SectionContainer
@@ -129,14 +138,51 @@ const GetStartedSection = ({
             onCheck={(e, checked) => setShowGetStartedSection(!checked)}
           />
         </Line>
+        {shouldShowOnboardingButton && (
+          <Line>
+            <div style={styles.bannerContainer}>
+              <CardWidget
+                onClick={() => {
+                  sendOnboardingManuallyOpened();
+                  onOpenOnboardingDialog();
+                }}
+                size="banner"
+                disabled={isUserflowRunning}
+              >
+                <ResponsiveLineStackLayout noMargin expand>
+                  <img
+                    alt="tour"
+                    src="res/homepage/step-by-step.gif"
+                    style={styles.bannerImage}
+                  />
+                  <div style={styles.cardTextContainer}>
+                    <Text size="block-title">
+                      <Trans>Take the tour</Trans>
+                    </Text>
+                    <Text size="body" color="secondary">
+                      <span style={styles.icon}>🕐</span>
+                      <Trans>5 minutes</Trans>
+                    </Text>
+                    <Text size="body">
+                      <Trans>Learn the fundamentals of the editor</Trans>
+                    </Text>
+                  </div>
+                </ResponsiveLineStackLayout>
+              </CardWidget>
+            </div>
+          </Line>
+        )}
       </SectionRow>
       <SectionRow>
+        <Text size="title">
+          <Trans>New to GDevelop?</Trans>
+        </Text>
         <Line noMargin>
           <GridList
             cols={getColumnsFromWidth(windowWidth)}
             style={styles.grid}
             cellHeight="auto"
-            spacing={10}
+            spacing={ITEMS_SPACING * 2}
           >
             {items.map((item, index) => (
               <GridListTile key={index} style={styles.gridListTile}>
@@ -150,7 +196,7 @@ const GetStartedSection = ({
                     <img
                       alt={item.key}
                       src={item.imagePath}
-                      style={styles.image}
+                      style={styles.cardImage}
                     />
                     <div style={styles.cardTextContainer}>
                       <Text size="block-title">{item.title}</Text>

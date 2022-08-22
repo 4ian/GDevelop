@@ -67,28 +67,14 @@ export const declareBehaviorMetadata = (
   eventsBasedBehavior: gdEventsBasedBehavior
 ): gdBehaviorMetadata => {
   return extension
-    .addBehavior(
+    .addEventsBasedBehavior(
       eventsBasedBehavior.getName(),
       eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-      eventsBasedBehavior.getName(), // Default name is the name
       eventsBasedBehavior.getDescription(),
       '',
-      getExtensionIconUrl(extension),
-      eventsBasedBehavior.getName(), // Class name is the name, actually unused
-      new gd.CustomBehavior(
-        eventsBasedBehavior,
-        getObjectFullType(extension.getName(), eventsBasedBehavior.getName())
-      ),
-      new gd.BehaviorsSharedData()
+      getExtensionIconUrl(extension)
     )
     .setObjectType(eventsBasedBehavior.getObjectType());
-};
-
-// This is copied from gd::WholeProjectRefactorer (see GetObjectFullType)
-// Could be factored into a single C++ function in gd::PlatformExtension?
-const getObjectFullType = (extensionName: string, objectName: string) => {
-  const separator = gd.PlatformExtension.getNamespaceSeparator();
-  return extensionName + separator + objectName;
 };
 
 /**
@@ -99,15 +85,11 @@ export const declareObjectMetadata = (
   extension: gdPlatformExtension,
   eventsBasedObject: gdEventsBasedObject
 ): gdObjectMetadata => {
-  return extension.addObject(
+  return extension.AddEventsBasedObject(
     eventsBasedObject.getName(),
     eventsBasedObject.getFullName() || eventsBasedObject.getName(),
     eventsBasedObject.getDescription(),
-    getExtensionIconUrl(extension),
-    new gd.CustomObject(
-      eventsBasedObject,
-      getObjectFullType(extension.getName(), eventsBasedObject.getName())
-    )
+    getExtensionIconUrl(extension)
   );
 };
 

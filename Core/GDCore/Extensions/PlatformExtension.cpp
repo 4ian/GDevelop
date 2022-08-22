@@ -244,6 +244,21 @@ gd::ObjectMetadata& PlatformExtension::AddObject(
   return objectsInfos[nameWithNamespace];
 }
 
+gd::ObjectMetadata& PlatformExtension::AddEventsBasedObject(
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& icon24x24) {
+  gd::String nameWithNamespace = GetNameSpace() + name;
+  objectsInfos[nameWithNamespace] = ObjectMetadata(GetNameSpace(),
+                                                   nameWithNamespace,
+                                                   fullname,
+                                                   description,
+                                                   icon24x24)
+                                        .SetHelpPath(GetHelpPath());
+  return objectsInfos[nameWithNamespace];
+}
+
 gd::BehaviorMetadata& PlatformExtension::AddBehavior(
     const gd::String& name,
     const gd::String& fullname,
@@ -265,6 +280,23 @@ gd::BehaviorMetadata& PlatformExtension::AddBehavior(
                                                       className,
                                                       instance,
                                                       sharedDatasInstance)
+                                         .SetHelpPath(GetHelpPath());
+  return behaviorsInfo[nameWithNamespace];
+}
+
+gd::BehaviorMetadata& PlatformExtension::AddEventsBasedBehavior(
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& group,
+    const gd::String& icon24x24) {
+  gd::String nameWithNamespace = GetNameSpace() + name;
+  behaviorsInfo[nameWithNamespace] = BehaviorMetadata(GetNameSpace(),
+                                                      nameWithNamespace,
+                                                      fullname,
+                                                      description,
+                                                      group,
+                                                      icon24x24)
                                          .SetHelpPath(GetHelpPath());
   return behaviorsInfo[nameWithNamespace];
 }

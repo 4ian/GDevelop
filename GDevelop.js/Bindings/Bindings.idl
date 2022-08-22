@@ -1624,11 +1624,22 @@ interface PlatformExtension {
         Behavior instance,
         BehaviorsSharedData sharedDatasInstance);
 
+    [Ref] BehaviorMetadata AddEventsBasedBehavior([Const] DOMString name,
+        [Const] DOMString fullname,
+        [Const] DOMString description,
+        [Const] DOMString group,
+        [Const] DOMString icon24x24);
+
     [Ref] ObjectMetadata WRAPPED_AddObject([Const] DOMString name,
         [Const] DOMString fullname,
         [Const] DOMString description,
         [Const] DOMString icon24x24,
         gdObject instance);
+
+    [Ref] ObjectMetadata AddEventsBasedObject([Const] DOMString name,
+        [Const] DOMString fullname,
+        [Const] DOMString description,
+        [Const] DOMString icon24x24);
 
     [Ref] EffectMetadata AddEffect([Const] DOMString name);
 

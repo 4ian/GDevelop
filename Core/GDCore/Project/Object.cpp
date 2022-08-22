@@ -88,9 +88,8 @@ gd::Behavior* Object::AddNewBehavior(const gd::Project& project,
   };
 
   if (project.HasEventsBasedBehavior(type)) {
-    auto &eventsBasedBehavior = project.GetEventsBasedBehavior(type);
     return initializeAndAdd(
-        gd::make_unique<CustomBehavior>(name, eventsBasedBehavior, type));
+        gd::make_unique<CustomBehavior>(name, project, type));
   }
   else {
     const gd::BehaviorMetadata& behaviorMetadata =

@@ -87,6 +87,12 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
 
 void EventsFunctionsExtension::UnserializeFrom(
     gd::Project& project, const SerializerElement& element) {
+      UnserializeExtensionDeclarationFrom(project, element);
+      UnserializeExtensionImplementationFrom(project, element);
+}
+
+void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
+    gd::Project& project, const SerializerElement& element) {
   version = element.GetStringAttribute("version");
   extensionNamespace = element.GetStringAttribute("extensionNamespace");
   shortDescription = element.GetStringAttribute("shortDescription");

@@ -83,8 +83,7 @@ std::unique_ptr<gd::Object> Project::CreateObject(
   const gd::String& type,
   const gd::String& name) const {
   if (Project::HasEventsBasedObject(type)) {
-    auto &eventsBasedObject = Project::GetEventsBasedObject(type);
-    return gd::make_unique<CustomObject>(name, eventsBasedObject, type);
+    return gd::make_unique<CustomObject>(name, *this, type);
   }
   else {
     // Create a base object if the type can't be found in the platform.
@@ -719,7 +718,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     gd::EventsFunctionsExtension& newEventsFunctionsExtension =
         InsertNewEventsFunctionsExtension("",
                                           GetEventsFunctionsExtensionsCount());
-    newEventsFunctionsExtension.UnserializeFrom(
+    newEventsFunctionsExtension.UnserializeExtensionDeclarationFrom(
         *this, eventsFunctionsExtensionElement);
   }
   // Then unserialize functions, behaviors and objects content.

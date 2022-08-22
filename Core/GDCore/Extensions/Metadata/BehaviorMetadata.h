@@ -262,7 +262,7 @@ class GD_CORE_API BehaviorMetadata {
    * \brief Return the associated gd::Behavior, handling behavior contents.
    * 
    * \note Returns a dub Behavior for events based behaviors as CustomBehavior
-   * are created using EventBasedBehavior.
+   * are using EventBasedBehavior.
    */
   gd::Behavior& Get() const;
 

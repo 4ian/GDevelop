@@ -317,9 +317,8 @@ class GD_CORE_API ObjectMetadata {
   std::shared_ptr<gd::Object>
       blueprintObject;  ///< The "blueprint" object to be copied when a new
                         ///< object is asked. Can be null in case a creation
-                        ///< function is passed or for events based behaviors
-                        ///< as CustomBehavior are created using
-                        ///< EventBasedBehavior.
+                        ///< function is passed or for events based objects
+                        ///< as CustomObject are using EventBasedObject.
 };
 
 }  // namespace gd

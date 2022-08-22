@@ -18,15 +18,19 @@ CustomBehavior *CustomBehavior::Clone() const {
 
 std::map<gd::String, gd::PropertyDescriptor> CustomBehavior::GetProperties(
     const gd::SerializerElement &behaviorContent) const {
+  auto behaviorProperties = std::map<gd::String, gd::PropertyDescriptor>();
+  if (!project.HasEventsBasedBehavior(GetTypeName())) {
+    return behaviorProperties;
+  }
+  const auto &eventsBasedBehavior = project.GetEventsBasedBehavior(GetTypeName());
   const auto &properties = eventsBasedBehavior.GetPropertyDescriptors();
-  auto objectProperties = std::map<gd::String, gd::PropertyDescriptor>();
 
   for (auto &property : properties.GetInternalVector()) {
     const auto &propertyName = property->GetName();
     const auto &propertyType = property->GetType();
 
     // TODO Move this into a PropertyDescriptor copy method.
-    auto &newProperty = objectProperties[propertyName]
+    auto &newProperty = behaviorProperties[propertyName]
                             .SetType(property->GetType())
                             .SetDescription(property->GetDescription())
                             .SetGroup(property->GetGroup())
@@ -57,12 +61,16 @@ std::map<gd::String, gd::PropertyDescriptor> CustomBehavior::GetProperties(
     }
   }
 
-  return objectProperties;
+  return behaviorProperties;
 }
 
 bool CustomBehavior::UpdateProperty(gd::SerializerElement &behaviorContent,
                                     const gd::String &propertyName,
                                     const gd::String &newValue) {
+  if (!project.HasEventsBasedBehavior(GetTypeName())) {
+    return false;
+  }
+  const auto &eventsBasedBehavior = project.GetEventsBasedBehavior(GetTypeName());
   const auto &properties = eventsBasedBehavior.GetPropertyDescriptors();
   if (!properties.Has(propertyName)) {
     return false;
@@ -85,6 +93,10 @@ bool CustomBehavior::UpdateProperty(gd::SerializerElement &behaviorContent,
 }
 
 void CustomBehavior::InitializeContent(gd::SerializerElement &behaviorContent) {
+  if (!project.HasEventsBasedBehavior(GetTypeName())) {
+    return;
+  }
+  const auto &eventsBasedBehavior = project.GetEventsBasedBehavior(GetTypeName());
   const auto &properties = eventsBasedBehavior.GetPropertyDescriptors();
   for (auto &&property : properties.GetInternalVector()) {
     auto element = behaviorContent.AddChild(property->GetName());

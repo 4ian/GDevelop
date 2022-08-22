@@ -16,9 +16,9 @@ using namespace gd;
  */
 class CustomObject : public gd::Object {
  public:
-  CustomObject(const gd::String &name, const EventsBasedObject& eventsBasedObject_, const gd::String &fullType)
+  CustomObject(const gd::String &name, const Project& project_, const gd::String &fullType)
       : Object(name),
-        eventsBasedObject(eventsBasedObject_) {
+        project(project_) {
     SetType(fullType);
   }
   std::unique_ptr<gd::Object> Clone() const override;
@@ -43,6 +43,6 @@ class CustomObject : public gd::Object {
   void DoUnserializeFrom(Project& project, const SerializerElement& element) override;
 
   private:
-    const EventsBasedObject& eventsBasedObject;
+    const Project& project;
     gd::SerializerElement objectContent;
 };

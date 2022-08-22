@@ -14,10 +14,10 @@ using namespace gd;
 class CustomBehavior : public gd::Behavior {
 public:
   CustomBehavior(const gd::String &name,
-                 const EventsBasedBehavior &eventsBasedBehavior_,
+                 const Project &project_,
                  const gd::String &fullType)
       : Behavior(name, fullType),
-        eventsBasedBehavior(eventsBasedBehavior_) {}
+        project(project_) {}
   CustomBehavior *Clone() const override;
 
   using Behavior::GetProperties;
@@ -34,5 +34,5 @@ protected:
   InitializeContent(gd::SerializerElement &behaviorContent) override;
 
 private:
-  const EventsBasedBehavior &eventsBasedBehavior;
+  const Project &project;
 };

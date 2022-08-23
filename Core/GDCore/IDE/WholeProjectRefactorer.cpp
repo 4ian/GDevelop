@@ -1038,13 +1038,6 @@ bool WholeProjectRefactorer::FixInvalidRequiredBehaviorProperties(
     auto suggestedBehaviorNames =
         GetBehaviorsWithType(object, problem.GetExpectedBehaviorTypeName());
     auto& behavior = problem.GetSourceBehaviorContent();
-    
-    // TODO BC Be confident on the model and remove the metadata check?
-    auto& behaviorMetadata = MetadataProvider::GetBehaviorMetadata(
-        project.GetCurrentPlatform(), behavior.GetTypeName());
-    if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
-      continue;
-    }
 
     if (suggestedBehaviorNames.empty()) {
       // No matching behavior on the object.
@@ -1052,7 +1045,7 @@ bool WholeProjectRefactorer::FixInvalidRequiredBehaviorProperties(
 
       auto& expectedBehaviorMetadata = MetadataProvider::GetBehaviorMetadata(
           project.GetCurrentPlatform(), problem.GetExpectedBehaviorTypeName());
-      if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
+      if (MetadataProvider::IsBadBehaviorMetadata(expectedBehaviorMetadata)) {
         continue;
       }
 

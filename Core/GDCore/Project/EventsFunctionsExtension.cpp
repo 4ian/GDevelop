@@ -87,6 +87,12 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
 
 void EventsFunctionsExtension::UnserializeFrom(
     gd::Project& project, const SerializerElement& element) {
+      UnserializeExtensionDeclarationFrom(project, element);
+      UnserializeExtensionImplementationFrom(project, element);
+}
+
+void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
+    gd::Project& project, const SerializerElement& element) {
   version = element.GetStringAttribute("version");
   extensionNamespace = element.GetStringAttribute("extensionNamespace");
   shortDescription = element.GetStringAttribute("shortDescription");
@@ -138,11 +144,48 @@ void EventsFunctionsExtension::UnserializeFrom(
     dependencies.push_back(
         UnserializeDependencyFrom(dependenciesElement.GetChild(i)));
 
+  // Only unserialize behaviors and objects names.
+  // As event based objects can contains objects using CustomBehavior and/or
+  // CustomObject, this allows them to reference EventBasedBehavior and
+  // EventBasedObject respectively.
+  auto &behaviorsElement = element.GetChild("eventsBasedBehaviors");
+  behaviorsElement.ConsiderAsArrayOf("eventsBasedBehavior");
+  for (std::size_t i = 0; i < behaviorsElement.GetChildrenCount(); ++i) {
+    const gd::String &behaviorName =
+        behaviorsElement.GetChild(i).GetStringAttribute("name");
+    eventsBasedBehaviors.InsertNew(behaviorName, eventsBasedBehaviors.GetCount());
+  }
+  auto &objectsElement = element.GetChild("eventsBasedObjects");
+  objectsElement.ConsiderAsArrayOf("eventsBasedObject");
+  for (std::size_t i = 0; i < objectsElement.GetChildrenCount(); ++i) {
+    const gd::String &objectName =
+        objectsElement.GetChild(i).GetStringAttribute("name");
+    eventsBasedObjects.InsertNew(objectName, eventsBasedObjects.GetCount());
+  }
+}
+
+void EventsFunctionsExtension::UnserializeExtensionImplementationFrom(
+    gd::Project& project,
+    const SerializerElement& element) {
   UnserializeEventsFunctionsFrom(project, element.GetChild("eventsFunctions"));
-  eventsBasedBehaviors.UnserializeElementsFrom(
-      "eventsBasedBehavior", project, element.GetChild("eventsBasedBehaviors"));
-  eventsBasedObjects.UnserializeElementsFrom(
-      "eventsBasedObject", project, element.GetChild("eventsBasedObjects"));
+  auto &behaviorsElement = element.GetChild("eventsBasedBehaviors");
+  behaviorsElement.ConsiderAsArrayOf("eventsBasedBehavior");
+  for (std::size_t i = 0; i < behaviorsElement.GetChildrenCount(); ++i) {
+    const gd::String &behaviorName =
+        behaviorsElement.GetChild(i).GetStringAttribute("name");
+    if (eventsBasedBehaviors.Has(behaviorName)) {
+      eventsBasedBehaviors.Get(behaviorName).UnserializeFrom(project, behaviorsElement.GetChild(i));
+    }
+  }
+  auto &objectsElement = element.GetChild("eventsBasedObjects");
+  objectsElement.ConsiderAsArrayOf("eventsBasedObject");
+  for (std::size_t i = 0; i < objectsElement.GetChildrenCount(); ++i) {
+    const gd::String &objectName =
+        objectsElement.GetChild(i).GetStringAttribute("name");
+    if (eventsBasedBehaviors.Has(objectName)) {
+      eventsBasedObjects.Get(objectName).UnserializeFrom(project, objectsElement.GetChild(i));
+    }
+  }
 }
 
 bool EventsFunctionsExtension::IsExtensionLifecycleEventsFunction(

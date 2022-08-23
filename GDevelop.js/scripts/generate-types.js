@@ -266,6 +266,12 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
     );
     shell.sed(
       '-i',
+      'declare class gdCustomBehavior {',
+      'declare class gdCustomBehavior extends gdBehavior {',
+      'types/gdcustombehavior.js'
+    );
+    shell.sed(
+      '-i',
       'declare class gdBehaviorSharedDataJsImplementation {',
       'declare class gdBehaviorSharedDataJsImplementation extends gdBehaviorsSharedData {',
       'types/gdbehaviorshareddatajsimplementation.js'

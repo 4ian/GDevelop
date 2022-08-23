@@ -1941,19 +1941,20 @@ TEST_CASE("WholeProjectRefactorer (AddBehaviorAndRequiredBehaviors)",
     REQUIRE(object.GetAllBehaviorNames().size() == 1);
   }
 
-  SECTION("Does not add anything else if the newly added behavior is unknown") {
+  SECTION("Does not crash if the newly added behavior is unknown") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
     auto &object =
         project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
 
-    // Add a simple behavior.
+    // Add an unknown behavior.
     gd::WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
         project, object, "MyExtension::MyNotExistingBehavior",
         "MyNotExistingBehavior");
 
-    REQUIRE(object.GetAllBehaviorNames().size() == 0);
+    // Still add the behavior because it's safer.
+    REQUIRE(object.GetAllBehaviorNames().size() == 1);
   }
 
   SECTION("Add a behavior and its required behaviors on an object") {

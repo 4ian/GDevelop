@@ -98,7 +98,10 @@ gd::Behavior* Object::AddNewBehavior(const gd::Project& project,
     if (gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
       gd::LogWarning("Tried to create a behavior with an unknown type: " + type
                      + " on object " + GetName() + "!");
-      return nullptr;
+    // It's probably an Event based that was removed.
+    // Create a custom behavior to preserve the properties values.
+    return initializeAndAdd(
+        gd::make_unique<CustomBehavior>(name, project, type));
     }
     std::unique_ptr<gd::Behavior> behavior(behaviorMetadata.Get().Clone());
     behavior->SetName(name);

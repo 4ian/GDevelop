@@ -23,7 +23,6 @@ class ArbitraryEventsWorker;
 class ArbitraryObjectsWorker;
 class ArbitraryEventsWorkerWithContext;
 class Behavior;
-class BehaviorContent;
 class BehaviorMetadata;
 class UnfilledRequiredBehaviorPropertyProblem;
 }  // namespace gd

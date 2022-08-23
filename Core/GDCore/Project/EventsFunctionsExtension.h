@@ -216,10 +216,26 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   void SerializeTo(gd::SerializerElement& element) const;
 
   /**
-   * \brief Load the EventsFunctionsExtension from the specified element
+   * \brief Load the EventsFunctionsExtension from the specified element.
    */
   void UnserializeFrom(gd::Project& project,
                        const gd::SerializerElement& element);
+
+  /**
+   * \brief Load the extension without free functions, behaviors and objects
+   * implementation.
+   */
+  void UnserializeExtensionDeclarationFrom(
+      gd::Project& project,
+      const gd::SerializerElement& element);
+
+  /**
+   * \brief Load free functions, behaviors and objects implementation.
+   * (in opposition to load just their "declaration" by reading their name).
+   */
+  void UnserializeExtensionImplementationFrom(
+      gd::Project& project,
+      const gd::SerializerElement& element);
   ///@}
 
   /** \name Lifecycle event functions

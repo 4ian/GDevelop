@@ -182,7 +182,7 @@ void EventsFunctionsExtension::UnserializeExtensionImplementationFrom(
   for (std::size_t i = 0; i < objectsElement.GetChildrenCount(); ++i) {
     const gd::String &objectName =
         objectsElement.GetChild(i).GetStringAttribute("name");
-    if (eventsBasedBehaviors.Has(objectName)) {
+    if (eventsBasedObjects.Has(objectName)) {
       eventsBasedObjects.Get(objectName).UnserializeFrom(project, objectsElement.GetChild(i));
     }
   }

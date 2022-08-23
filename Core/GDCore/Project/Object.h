@@ -10,7 +10,7 @@
 #include <memory>
 #include <vector>
 
-#include "GDCore/Project/BehaviorContent.h"
+#include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EffectsContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
@@ -208,12 +208,12 @@ class GD_CORE_API Object {
   /**
    * \brief Return a reference to the content of the behavior called \a name.
    */
-  BehaviorContent& GetBehavior(const gd::String& name);
+  Behavior& GetBehavior(const gd::String& name);
 
   /**
    * \brief Return a reference to the content of the behavior called \a name.
    */
-  const BehaviorContent& GetBehavior(const gd::String& name) const;
+  const Behavior& GetBehavior(const gd::String& name) const;
 
   /**
    * \brief Return true if object has a behavior called \a name.
@@ -232,13 +232,6 @@ class GD_CORE_API Object {
   bool RenameBehavior(const gd::String& name, const gd::String& newName);
 
   /**
-   * \brief Add the specified behavior content to the object
-   *
-   * \return A reference to the newly added behavior content.
-   */
-  gd::BehaviorContent& AddBehavior(const gd::BehaviorContent& behavior);
-
-  /**
    * \brief Add the behavior of the specified \a type with the specified \a
    * name.
    *
@@ -247,15 +240,15 @@ class GD_CORE_API Object {
    * \return A pointer to the newly added behavior content. NULL if the creation
    * failed.
    */
-  gd::BehaviorContent* AddNewBehavior(const gd::Project& project,
-                                      const gd::String& type,
-                                      const gd::String& name);
+  gd::Behavior* AddNewBehavior(const gd::Project& project,
+                               const gd::String& type,
+                               const gd::String& name);
 
   /**
    * \brief Get a read-only access to the map containing the behaviors with
    * their properties.
    */
-  const std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>&
+  const std::map<gd::String, std::unique_ptr<gd::Behavior>>&
   GetAllBehaviorContents() const {
     return behaviors;
   };
@@ -318,7 +311,7 @@ class GD_CORE_API Object {
   gd::String assetStoreId;  ///< The ID of the asset if the object comes from the store.
   gd::String type;  ///< Which type is the object. ( To test if we can do
                     ///< something reserved to some objects with it )
-  std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>
+  std::map<gd::String, std::unique_ptr<gd::Behavior>>
       behaviors;  ///< Contains all behaviors and their properties for the
                   ///< object. Behavior contents are the ownership of the
                   ///< object.

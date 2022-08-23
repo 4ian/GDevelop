@@ -16,7 +16,7 @@
 namespace gd {
 class Project;
 class Object;
-class BehaviorContent;
+class Behavior;
 }  // namespace gd
 
 namespace gd {
@@ -31,7 +31,7 @@ class GD_CORE_API CustomObjectTypeRenamer : public ArbitraryObjectsWorker {
 
  private:
   void DoVisitObject(gd::Object& object) override;
-  void DoVisitBehavior(gd::BehaviorContent& behavior) override;
+  void DoVisitBehavior(gd::Behavior& behavior) override;
 
   const gd::Project& project;
   gd::String oldType;

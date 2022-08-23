@@ -73,7 +73,8 @@ void SetupProject(gd::Project &project, gd::Platform &platform) {
   behavior->UpdateProperty("MyProperty", "481516");
 };
 
-void CheckBehaviorPropertyInObjectContainerElement(SerializerElement &objectContainerElement) {
+void CheckBehaviorPropertyInObjectContainerElement(
+    SerializerElement &objectContainerElement) {
   REQUIRE(objectContainerElement.HasChild("objects"));
 
   auto &objectsElement = objectContainerElement.GetChild("objects");
@@ -172,20 +173,25 @@ TEST_CASE("ProjectSerialization", "[common]") {
 
     SerializerElement projectElement;
     writtenProject.SerializeTo(projectElement);
-    
-  auto &extensionsElement = projectElement.GetChild("eventsFunctionsExtensions");
-  extensionsElement.ConsiderAsArrayOf("eventsFunctionsExtension");
-  REQUIRE(extensionsElement.GetChildrenCount() == 2);
 
-  auto &firstExtensionElement = extensionsElement.GetChild(0);
-  REQUIRE(firstExtensionElement.GetStringAttribute("name") == "MyOtherEventsExtension");
-  auto &eventsBasedObjectsElement = firstExtensionElement.GetChild("eventsBasedObjects");
-  eventsBasedObjectsElement.ConsiderAsArrayOf("eventsBasedObject");
-  auto &eventsBasedObjectElement = eventsBasedObjectsElement.GetChild("MyEventsBasedObject");
-  CheckBehaviorPropertyInObjectContainerElement(eventsBasedObjectElement);
+    auto &extensionsElement =
+        projectElement.GetChild("eventsFunctionsExtensions");
+    extensionsElement.ConsiderAsArrayOf("eventsFunctionsExtension");
+    REQUIRE(extensionsElement.GetChildrenCount() == 2);
 
-  auto &secondExtensionElement = extensionsElement.GetChild(1);
-  REQUIRE(secondExtensionElement.GetStringAttribute("name") == "MyEventsExtension");
+    auto &firstExtensionElement = extensionsElement.GetChild(0);
+    REQUIRE(firstExtensionElement.GetStringAttribute("name") ==
+            "MyOtherEventsExtension");
+    auto &eventsBasedObjectsElement =
+        firstExtensionElement.GetChild("eventsBasedObjects");
+    eventsBasedObjectsElement.ConsiderAsArrayOf("eventsBasedObject");
+    auto &eventsBasedObjectElement =
+        eventsBasedObjectsElement.GetChild("MyEventsBasedObject");
+    CheckBehaviorPropertyInObjectContainerElement(eventsBasedObjectElement);
+
+    auto &secondExtensionElement = extensionsElement.GetChild(1);
+    REQUIRE(secondExtensionElement.GetStringAttribute("name") ==
+            "MyEventsExtension");
 
     gd::Project readProject;
     readProject.AddPlatform(platform);
@@ -193,7 +199,8 @@ TEST_CASE("ProjectSerialization", "[common]") {
 
     // The custom behavior is unserialized even though it depends on the other
     // extension.
-    REQUIRE(readProject.HasEventsBasedObject("MyOtherEventsExtension::MyEventsBasedObject"));
+    REQUIRE(readProject.HasEventsBasedObject(
+        "MyOtherEventsExtension::MyEventsBasedObject"));
     CheckBehaviorProperty(readProject.GetEventsBasedObject(
         "MyOtherEventsExtension::MyEventsBasedObject"));
   }

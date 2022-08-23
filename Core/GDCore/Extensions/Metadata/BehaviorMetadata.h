@@ -38,6 +38,20 @@ class GD_CORE_API BehaviorMetadata {
       const gd::String& className_,
       std::shared_ptr<gd::Behavior> instance,
       std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance);
+      
+  /**
+   * \brief Construct a behavior metadata, without "blueprint" behavior.
+   * 
+   * \note This is used by events based behaviors.
+   */
+  BehaviorMetadata(
+      const gd::String& extensionNamespace,
+      const gd::String& name_,
+      const gd::String& fullname_,
+      const gd::String& description_,
+      const gd::String& group_,
+      const gd::String& icon24x24_);
+
   BehaviorMetadata(){};
   virtual ~BehaviorMetadata(){};
 
@@ -246,12 +260,18 @@ class GD_CORE_API BehaviorMetadata {
 
   /**
    * \brief Return the associated gd::Behavior, handling behavior contents.
+   * 
+   * \note Returns a dub Behavior for events based behaviors as CustomBehavior
+   * are using EventBasedBehavior.
    */
   gd::Behavior& Get() const;
 
   /**
    * \brief Return the associated gd::BehaviorsSharedData, handling behavior
    * shared data, if any (nullptr if none).
+   * 
+   * \note Returns nullptr for events based behaviors as they don't declare
+   * shared data yet.
    */
   gd::BehaviorsSharedData* GetSharedDataInstance() const {
     return sharedDatasInstance.get();
@@ -278,7 +298,6 @@ class GD_CORE_API BehaviorMetadata {
    */
   std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressions() { return strExpressionsInfos; };
 
-#if defined(GD_IDE_ONLY)
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
@@ -287,18 +306,16 @@ class GD_CORE_API BehaviorMetadata {
   std::vector<gd::String> includeFiles;
   std::vector<gd::String> requiredFiles;
   gd::String className;
-#endif
+
  private:
   gd::String extensionNamespace;
   gd::String helpPath;
-#if defined(GD_IDE_ONLY)
   gd::String fullname;
   gd::String defaultName;
   gd::String description;
   gd::String group;
   gd::String iconFilename;
   gd::String objectType;
-#endif
 
   // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.
   std::shared_ptr<gd::Behavior> instance;

@@ -1678,11 +1678,7 @@ describe('libGD.js', function () {
 
     it('can be un/serialized (with behavior content)', function () {
       const behaviorContent = object.getBehavior('Draggable');
-      behaviorContent.getContent().addChild('Child1');
-      behaviorContent
-        .getContent()
-        .addChild('Child2')
-        .setStringValue('Child2Value');
+      behaviorContent.updateProperty('checkCollisionMask', "true");
 
       let serializerElement = new gd.SerializerElement();
       object.serializeTo(serializerElement);
@@ -1697,11 +1693,9 @@ describe('libGD.js', function () {
       expect(behaviors.at(0)).toBe('Draggable');
 
       const behaviorContent2 = object2.getBehavior('Draggable');
-      expect(behaviorContent2.getContent().hasChild('Child1')).toBe(true);
-      expect(behaviorContent2.getContent().hasChild('Child2')).toBe(true);
-      expect(
-        behaviorContent2.getContent().getChild('Child2').getStringValue()
-      ).toBe('Child2Value');
+      expect(behaviorContent2.getProperties()
+                             .get('checkCollisionMask')
+                             .getValue()).toBe("true");
     });
 
     afterAll(function () {

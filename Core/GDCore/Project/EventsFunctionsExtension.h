@@ -230,7 +230,7 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
       const gd::SerializerElement& element);
 
   /**
-   * \brief Load free functions, behaviors and objects implementation.
+   * \brief Load free functions, behaviors and objects implementation
    * (in opposition to load just their "declaration" by reading their name).
    */
   void UnserializeExtensionImplementationFrom(

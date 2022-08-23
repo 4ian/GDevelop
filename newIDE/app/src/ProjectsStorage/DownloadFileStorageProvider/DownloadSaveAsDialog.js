@@ -30,6 +30,9 @@ export default class DownloadSaveAsDialog extends React.Component<Props> {
     }
     var uri = encodeURI('data:application/json;charset=utf-8,' + content);
 
+    // TODO: Adapt to use "ResourceFetcher" to "upload resources to blobs"
+    // and download an archive.
+
     var downloadLink = document.createElement('a');
     downloadLink.href = uri;
     downloadLink.download = 'game.json';

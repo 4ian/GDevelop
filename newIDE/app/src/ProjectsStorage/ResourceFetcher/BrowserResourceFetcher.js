@@ -91,6 +91,7 @@ const fetchResources = async ({
   };
 };
 
+// TODO: This is the ResourceFetcher of UrlStorageProvider.
 export const BrowserResourceFetcher: ResourceFetcher = {
   getResourcesToFetch,
   fetchResources,

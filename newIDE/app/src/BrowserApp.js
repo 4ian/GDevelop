@@ -33,6 +33,7 @@ import {
   onCreateFromExampleShortHeader,
   onCreateBlank,
 } from './ProjectCreation/services/BrowserCreation';
+import BrowserResourceMover from './ProjectsStorage/ResourceMover/BrowserResourceMover';
 
 export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
@@ -97,6 +98,7 @@ export const create = (authentication: Authentication) => {
                 />
               )}
               storageProviders={storageProviders}
+              resourceMover={BrowserResourceMover}
               onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
               onCreateBlank={onCreateBlank}
               getStorageProviderOperations={getStorageProviderOperations}

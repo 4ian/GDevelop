@@ -180,10 +180,10 @@ export const uploadProjectResourceFiles = async (
   );
 
   // Upload the files.
-  const results = [];
-  await PromisePool.withConcurrency(1)
+  const results = Array(resourceFileWithPresignedUrls.length);
+  await PromisePool.withConcurrency(10)
     .for(resourceFileWithPresignedUrls)
-    .process(async ({ resourceFile, presignedUrl }) => {
+    .process(async ({ resourceFile, presignedUrl, index }) => {
       try {
         await refetchCredentialsForProjectAndRetryIfUnauthorized(
           authenticatedUser,
@@ -198,17 +198,17 @@ export const uploadProjectResourceFiles = async (
           GDevelopProjectResourcesStorage.baseUrl
         }${presignedUrl}`;
         const urlWithoutSearchParams = fullUrl.substr(0, fullUrl.indexOf('?'));
-        results.push({
+        results[index] = {
           error: null,
           resourceFile,
           url: urlWithoutSearchParams,
-        });
+        };
       } catch (error) {
-        results.push({
+        results[index] = {
           error,
           resourceFile,
           url: null,
-        });
+        };
       }
     });
 

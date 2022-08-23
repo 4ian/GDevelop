@@ -89,6 +89,7 @@ const fetchResources = async ({
     }));
 };
 
+// TODO: This is the ResourceFetcher of LocalFileStorageProvider.
 export const LocalResourceFetcher: ResourceFetcher = {
   getResourcesToFetch,
   fetchResources,

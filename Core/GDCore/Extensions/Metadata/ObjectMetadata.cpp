@@ -14,6 +14,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Tools/Log.h"
 
 namespace gd {
 
@@ -23,29 +24,42 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
                                const gd::String& description_,
                                const gd::String& icon24x24,
                                std::shared_ptr<gd::Object> blueprintObject_)
-    : extensionNamespace(extensionNamespace_),
-      blueprintObject(blueprintObject_) {
-  name = name_;
-#if defined(GD_IDE_ONLY)
-  SetFullName(gd::String(fullname_));
-  SetDescription(gd::String(description_));
-  iconFilename = icon24x24;
-#endif
-  createFunPtr =
-      [blueprintObject_](gd::String name) -> std::unique_ptr<gd::Object> {
+    : ObjectMetadata(extensionNamespace_,
+                     name_,
+                     fullname_,
+                     description_,
+                     icon24x24,
+                     [blueprintObject_](gd::String name) -> std::unique_ptr<gd::Object> {
     if (blueprintObject_ == std::shared_ptr<gd::Object>()) {
-      std::cout
-          << "Error: Unable to create object. Have you declared an extension "
-             "(or ObjectMetadata) without specifying an object as blueprint?"
-          << std::endl;
+      gd::LogFatalError(
+          "Error: Unable to create object. Have you declared an extension "
+          "(or ObjectMetadata) without specifying an object as blueprint?");
       return nullptr;
     }
 
     std::unique_ptr<gd::Object> newObject = blueprintObject_->Clone();
     newObject->SetName(name);
     return newObject;
-  };
+  }) {
+  blueprintObject = blueprintObject_;
 }
+
+ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
+                               const gd::String& name_,
+                               const gd::String& fullname_,
+                               const gd::String& description_,
+                               const gd::String& icon24x24)
+    : ObjectMetadata(extensionNamespace_,
+                     name_,
+                     fullname_,
+                     description_,
+                     icon24x24,
+                     [](gd::String name) -> std::unique_ptr<gd::Object> {
+      gd::LogFatalError(
+          "Error: Event-based objects don't have blueprint. "
+          "This method should not never be called.");
+      return nullptr;
+    }) {}
 
 ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
                                const gd::String& name_,
@@ -53,14 +67,12 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
                                const gd::String& description_,
                                const gd::String& icon24x24,
                                CreateFunPtr createFunPtrP)
-    : extensionNamespace(extensionNamespace_) {
-  name = name_;
-#if defined(GD_IDE_ONLY)
+    : name(name_),
+      iconFilename(icon24x24),
+      createFunPtr(createFunPtrP),
+      extensionNamespace(extensionNamespace_) {
   SetFullName(gd::String(fullname_));
   SetDescription(gd::String(description_));
-  iconFilename = icon24x24;
-#endif
-  createFunPtr = createFunPtrP;
 }
 
 gd::InstructionMetadata& ObjectMetadata::AddCondition(

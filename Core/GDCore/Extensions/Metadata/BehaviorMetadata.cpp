@@ -15,6 +15,7 @@
 #include "GDCore/Project/BehaviorsSharedData.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/MakeUnique.h"
+#include "GDCore/Tools/Log.h"
 
 namespace gd {
 
@@ -30,14 +31,22 @@ BehaviorMetadata::BehaviorMetadata(
     std::shared_ptr<gd::Behavior> instance_,
     std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance_)
     : extensionNamespace(extensionNamespace_),
+      className(className_),
+      iconFilename(icon24x24),
       instance(instance_),
-      sharedDatasInstance(sharedDatasInstance_) {
+      sharedDatasInstance(sharedDatasInstance_),
+      isEventBased(false) {
   SetFullName(gd::String(fullname_));
   SetDescription(gd::String(description_));
   SetDefaultName(gd::String(defaultName_));
   SetGroup(group_);
-  className = className_;
-  iconFilename = icon24x24;
+
+  if (!instance) {
+    gd::LogFatalError(
+        "Trying to create a BehaviorMetadata that has no "
+        "behavior. This will crash - please double check that the "
+        "BehaviorMetadata is valid for: " + name_);
+  }
 
   if (instance) instance->SetTypeName(name_);
   if (sharedDatasInstance) sharedDatasInstance->SetTypeName(name_);
@@ -62,7 +71,9 @@ BehaviorMetadata::BehaviorMetadata(
         name_,
         // It is only used to get the name for GetName.
         gd::make_unique<gd::Behavior>(),
-        nullptr){};
+        nullptr){
+  isEventBased = true;
+};
 
 gd::InstructionMetadata& BehaviorMetadata::AddCondition(
     const gd::String& name,
@@ -409,13 +420,25 @@ const gd::String& BehaviorMetadata::GetName() const {
 }
 
 gd::Behavior& BehaviorMetadata::Get() const {
-  if (!instance)
+  if (isEventBased) {
+    gd::LogFatalError("Error: Event-based behaviors don't have blueprint. "
+                      "This method should not never be called.");
+  }
+  if (!instance) {
     gd::LogFatalError(
         "Trying to get a behavior from a BehaviorMetadata that has no "
         "behavior. This will crash - please double check that the "
-        "BehaviorMetadata is valid.");
-
+        "BehaviorMetadata is valid for: " + className);
+  }
   return *instance;
+}
+
+gd::BehaviorsSharedData* BehaviorMetadata::GetSharedDataInstance() const { 
+  if (isEventBased) {
+    gd::LogFatalError("Error: Event-based behaviors don't have blueprint. "
+                      "This method should not never be called.");
+  }
+  return sharedDatasInstance.get();
 }
 
 }  // namespace gd

@@ -273,9 +273,7 @@ class GD_CORE_API BehaviorMetadata {
    * \note Returns nullptr for events based behaviors as they don't declare
    * shared data yet.
    */
-  gd::BehaviorsSharedData* GetSharedDataInstance() const {
-    return sharedDatasInstance.get();
-  }
+  gd::BehaviorsSharedData* GetSharedDataInstance() const;
 
   /**
    * \brief Return a reference to a map containing the names of the actions
@@ -320,6 +318,7 @@ class GD_CORE_API BehaviorMetadata {
   // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.
   std::shared_ptr<gd::Behavior> instance;
   std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance;
+  bool isEventBased;
 };
 
 }  // namespace gd

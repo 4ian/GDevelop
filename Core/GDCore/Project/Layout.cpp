@@ -218,20 +218,34 @@ void Layout::UpdateBehaviorsSharedData(gd::Project& project) {
 
     if (behaviorsSharedData.find(name) != behaviorsSharedData.end()) continue;
 
-    const gd::BehaviorMetadata& behaviorMetadata =
-        gd::MetadataProvider::GetBehaviorMetadata(project.GetCurrentPlatform(),
-                                                  allBehaviorsTypes[i]);
-    if (gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) continue;
+    if (project.HasEventsBasedBehavior(allBehaviorsTypes[i])) {
+      // Events based behaviors don't have shared data yet.
+      auto sharedData =
+          gd::make_unique<gd::BehaviorsSharedData>(name, allBehaviorsTypes[i]);
+      sharedData->InitializeContent();
+      behaviorsSharedData[name] = std::move(sharedData);
+    }
+    else {
+      const gd::BehaviorMetadata& behaviorMetadata =
+          gd::MetadataProvider::GetBehaviorMetadata(
+              project.GetCurrentPlatform(),
+              allBehaviorsTypes[i]);
+      if (gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
+        continue;
+      }
 
-    gd::BehaviorsSharedData* behaviorsSharedDataBluePrint =
-        behaviorMetadata.GetSharedDataInstance();
-    if (!behaviorsSharedDataBluePrint) continue;
+      gd::BehaviorsSharedData* behaviorsSharedDataBluePrint =
+          behaviorMetadata.GetSharedDataInstance();
+      if (!behaviorsSharedDataBluePrint) continue;
 
-    auto sharedData = gd::make_unique<gd::BehaviorsSharedData>(*behaviorsSharedDataBluePrint);
-    sharedData->SetName(name);
-    sharedData->SetTypeName(allBehaviorsTypes[i]);
-    sharedData->InitializeContent();
-    behaviorsSharedData[name] = std::move(sharedData);
+      auto sharedData =
+          gd::make_unique<gd::BehaviorsSharedData>(
+              *behaviorsSharedDataBluePrint);
+      sharedData->SetName(name);
+      sharedData->SetTypeName(allBehaviorsTypes[i]);
+      sharedData->InitializeContent();
+      behaviorsSharedData[name] = std::move(sharedData);
+    }
   }
 
   // Remove useless shared data:

@@ -43,6 +43,7 @@ class CustomObject : public gd::Object {
   void DoUnserializeFrom(Project& project, const SerializerElement& element) override;
 
   private:
-    const Project& project;
+    const Project& project; ///< The project is used to get the
+                            ///< EventBasedObject from the fullType.
     gd::SerializerElement objectContent;
 };

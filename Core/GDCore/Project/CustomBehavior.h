@@ -34,5 +34,6 @@ protected:
   InitializeContent(gd::SerializerElement &behaviorContent) override;
 
 private:
-  const Project &project;
+  const Project &project; ///< The project is used to get the
+                          ///< EventBasedBehavior from the fullType.
 };

@@ -318,7 +318,8 @@ class GD_CORE_API ObjectMetadata {
       blueprintObject;  ///< The "blueprint" object to be copied when a new
                         ///< object is asked. Can be null in case a creation
                         ///< function is passed or for events based objects
-                        ///< as CustomObject are using EventBasedObject.
+                        ///< (CustomObject are using EventBasedObject, they
+                        ///< don't need blueprints).
 };
 
 }  // namespace gd

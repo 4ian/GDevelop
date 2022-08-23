@@ -231,6 +231,7 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
 
   /**
    * \brief Load free functions, behaviors and objects implementation.
+   * (in opposition to load just their "declaration" by reading their name).
    */
   void UnserializeExtensionImplementationFrom(
       gd::Project& project,

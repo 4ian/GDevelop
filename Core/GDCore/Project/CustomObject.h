@@ -16,11 +16,9 @@ using namespace gd;
  */
 class CustomObject : public gd::Object {
  public:
-  CustomObject(const EventsBasedObject& _eventsBasedObject, const gd::String &fullType)
-      :  // Name is not important as this object is just a "blueprint"
-         // that is copied (see calls to AddObject).
-        Object("CustomObject"),
-        eventsBasedObject(_eventsBasedObject) {
+  CustomObject(const gd::String &name, const Project& project_, const gd::String &fullType)
+      : Object(name),
+        project(project_) {
     SetType(fullType);
   }
   std::unique_ptr<gd::Object> Clone() const override;
@@ -45,6 +43,7 @@ class CustomObject : public gd::Object {
   void DoUnserializeFrom(Project& project, const SerializerElement& element) override;
 
   private:
-    const EventsBasedObject& eventsBasedObject;
+    const Project& project; ///< The project is used to get the
+                            ///< EventBasedObject from the fullType.
     gd::SerializerElement objectContent;
 };

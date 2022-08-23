@@ -85,7 +85,7 @@ export const declareObjectMetadata = (
   extension: gdPlatformExtension,
   eventsBasedObject: gdEventsBasedObject
 ): gdObjectMetadata => {
-  return extension.AddEventsBasedObject(
+  return extension.addEventsBasedObject(
     eventsBasedObject.getName(),
     eventsBasedObject.getFullName() || eventsBasedObject.getName(),
     eventsBasedObject.getDescription(),

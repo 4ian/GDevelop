@@ -70,7 +70,7 @@ BehaviorMetadata::BehaviorMetadata(
         // Class name is the name, actually unused
         name_,
         // It is only used to get the name for GetName.
-        gd::make_unique<gd::Behavior>(),
+        gd::make_unique<gd::Behavior>("", name_),
         nullptr){
   isEventBased = true;
 };

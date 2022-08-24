@@ -20,6 +20,7 @@ export const Default = () => (
       onOpen={action('On open project after it is created')}
       onCreateBlank={() => action('create blank project')}
       onCreateFromExampleShortHeader={() => action('create from example')}
+      initialExampleShortHeader={null}
     />
   </ExampleStoreStateProvider>
 );

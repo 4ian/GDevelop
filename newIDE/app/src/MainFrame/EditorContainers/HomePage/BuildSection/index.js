@@ -9,7 +9,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 
-import AddIcon from '@material-ui/icons/Add';
 import Text from '../../../../UI/Text';
 import TextButton from '../../../../UI/TextButton';
 import RaisedButton from '../../../../UI/RaisedButton';
@@ -45,6 +44,11 @@ import {
   type OnCreateBlankFunction,
   type OnOpenProjectAfterCreationFunction,
 } from '../../../../ProjectCreation/CreateProjectDialog';
+import { ExampleStoreContext } from '../../../../AssetStore/ExampleStore/ExampleStoreContext';
+import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
+import ExamplesLine from './ExamplesLine';
+import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
+import Add from '../../../../UI/CustomSvgIcons/Add';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -66,6 +70,8 @@ type Props = {|
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   onCreateBlank: OnCreateBlankFunction,
+  onShowAllExamples: () => void,
+  onSelectExample: (exampleShortHeader: ExampleShortHeader) => void,
   onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
   onChangeSubscription: () => void,
   storageProviders: Array<StorageProvider>,
@@ -113,6 +119,8 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       canOpen,
       onChooseProject,
       onCreateBlank,
+      onShowAllExamples,
+      onSelectExample,
       onOpenProjectAfterCreation,
       onOpenRecentFile,
       onChangeSubscription,
@@ -123,6 +131,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     const { getRecentProjectFiles, removeRecentProjectFile } = React.useContext(
       PreferencesContext
     );
+    const { allExamples } = React.useContext(ExampleStoreContext);
     const authenticatedUser = React.useContext(AuthenticatedUserContext);
     const { cloudProjects, limits } = authenticatedUser;
     const contextMenu = React.useRef<?ContextMenuInterface>(null);
@@ -319,40 +328,60 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
               }
             >
               <SectionRow>
-                <Line noMargin>
-                  <ResponsiveLineStackLayout
-                    noColumnMargin
-                    justifyContent="start"
-                    alignItems="center"
-                  >
-                    <RaisedButton
-                      primary
-                      label={<Trans>Create a project</Trans>}
-                      onClick={() => {
-                        setPreCreationDialogOpen(true);
-                      }}
-                      icon={<AddIcon />}
-                      id="home-create-project-button"
-                    />
-                    {canOpen && (
-                      <>
-                        {isWindowWidthMediumOrLarger && (
-                          <>
-                            <Text>
-                              <Trans>or</Trans>
-                            </Text>
-                            <Spacer />
-                          </>
-                        )}
-                        <TextButton
-                          primary
-                          label={<Trans>Open an existing project</Trans>}
-                          onClick={onChooseProject}
-                        />
-                      </>
-                    )}
-                  </ResponsiveLineStackLayout>
-                </Line>
+                {!allExamples ? (
+                  <PlaceholderLoader />
+                ) : (
+                  <ExamplesLine
+                    exampleShortHeaders={allExamples}
+                    onExpand={onShowAllExamples}
+                    onOpen={onSelectExample}
+                  />
+                )}
+              </SectionRow>
+              <SectionRow>
+                <LineStackLayout
+                  justifyContent="space-between"
+                  alignItems="center"
+                  noMargin
+                  expand
+                >
+                  <Column noMargin>
+                    <Text size="section-title">
+                      <Trans>Existing projects</Trans>
+                    </Text>
+                  </Column>
+                  <Column noMargin>
+                    <ResponsiveLineStackLayout noMargin>
+                      <RaisedButton
+                        primary
+                        label={<Trans>Create a project</Trans>}
+                        onClick={() => {
+                          setPreCreationDialogOpen(true);
+                        }}
+                        icon={<Add fontSize="small" />}
+                        id="home-create-project-button"
+                      />
+                      {canOpen && (
+                        <>
+                          {isWindowWidthMediumOrLarger && (
+                            <>
+                              <Spacer />
+                              <Text>
+                                <Trans>or</Trans>
+                              </Text>
+                              <Spacer />
+                            </>
+                          )}
+                          <TextButton
+                            primary
+                            label={<Trans>Open an existing project</Trans>}
+                            onClick={onChooseProject}
+                          />
+                        </>
+                      )}
+                    </ResponsiveLineStackLayout>
+                  </Column>
+                </LineStackLayout>
                 {authenticatedUser.loginState === 'loggingIn' ? (
                   <Column
                     useFullHeight

@@ -8,6 +8,7 @@ import { isUserflowRunning } from '../../Onboarding/OnboardingDialog';
 import { isMobile } from '../../../Utils/Platform';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import { sendOnboardingManuallyOpened } from '../../../Utils/Analytics/EventSender';
+import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
 import SectionContainer, { SectionRow } from './SectionContainer';
 import {
   useResponsiveWindowWidth,
@@ -68,7 +69,7 @@ const styles = {
 };
 
 type Props = {|
-  onCreateProject: () => void,
+  onCreateProject: (?ExampleShortHeader) => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenOnboardingDialog: () => void,
   showGetStartedSection: boolean,

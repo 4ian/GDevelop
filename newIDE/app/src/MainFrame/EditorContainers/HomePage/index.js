@@ -23,6 +23,7 @@ import { HomePageHeader } from './HomePageHeader';
 import { HomePageMenu, type HomeTab } from './HomePageMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
 
 type Props = {|
   project: ?gdProject,
@@ -37,7 +38,7 @@ type Props = {|
   canOpen: boolean,
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onCreateProject: () => void,
+  onCreateProject: (ExampleShortHeader | null) => void,
   onOpenProjectManager: () => void,
 
   // Other dialogs opening:
@@ -175,7 +176,7 @@ export const HomePage = React.memo<Props>(
                   {activeTab === 'get-started' && (
                     <GetStartedSection
                       onTabChange={setActiveTab}
-                      onCreateProject={onCreateProject}
+                      onCreateProject={() => onCreateProject(null)}
                       onOpenOnboardingDialog={onOpenOnboardingDialog}
                       showGetStartedSection={showGetStartedSection}
                       setShowGetStartedSection={setShowGetStartedSection}
@@ -188,6 +189,10 @@ export const HomePage = React.memo<Props>(
                       canOpen={canOpen}
                       onChooseProject={onChooseProject}
                       onCreateBlank={onCreateBlank}
+                      onShowAllExamples={() => onCreateProject(null)}
+                      onSelectExample={exampleShortHeader =>
+                        onCreateProject(exampleShortHeader)
+                      }
                       onOpenProjectAfterCreation={onOpenProjectAfterCreation}
                       onOpenRecentFile={onOpenRecentFile}
                       onChangeSubscription={onChangeSubscription}
@@ -197,7 +202,7 @@ export const HomePage = React.memo<Props>(
                   {activeTab === 'learn' && (
                     <LearnSection
                       onOpenOnboardingDialog={onOpenOnboardingDialog}
-                      onCreateProject={onCreateProject}
+                      onCreateProject={() => onCreateProject(null)}
                       onTabChange={setActiveTab}
                       onOpenHelpFinder={onOpenHelpFinder}
                     />

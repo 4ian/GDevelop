@@ -46,9 +46,11 @@ import {
 } from '../../../../ProjectCreation/CreateProjectDialog';
 import { ExampleStoreContext } from '../../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
-import ExamplesLine from './ExamplesLine';
+import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import Add from '../../../../UI/CustomSvgIcons/Add';
+import WidgetsRow from '../../../../UI/WidgetsRow';
+import { prepareExamples } from '../../../../AssetStore/ExampleStore';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -62,6 +64,18 @@ const styles = {
     borderRadius: 8,
     overflowWrap: 'anywhere', // Ensure everything is wrapped on small devices.
   },
+};
+
+const getTemplatesGridSizeFromWidth = (width: WidthType) => {
+  switch (width) {
+    case 'small':
+      return 2;
+    case 'medium':
+      return 4;
+    case 'large':
+    default:
+      return 6;
+  }
 };
 
 type Props = {|
@@ -331,10 +345,16 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                 {!allExamples ? (
                   <PlaceholderLoader />
                 ) : (
-                  <ExamplesLine
-                    exampleShortHeaders={allExamples}
-                    onExpand={onShowAllExamples}
-                    onOpen={onSelectExample}
+                  <WidgetsRow
+                    items={prepareExamples(allExamples).map(example => ({
+                      onClick: () => onSelectExample(example),
+                      imageUrl: example.previewImageUrls[0],
+                    }))}
+                    title={<Trans>Recommended templates</Trans>}
+                    onShowAll={onShowAllExamples}
+                    showAllIcon={<Add fontSize="small" />}
+                    getColumnsFromWidth={getTemplatesGridSizeFromWidth}
+                    getLimitFromWidth={getTemplatesGridSizeFromWidth}
                   />
                 )}
               </SectionRow>

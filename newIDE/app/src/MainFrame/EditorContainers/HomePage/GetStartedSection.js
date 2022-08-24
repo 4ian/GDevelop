@@ -104,7 +104,7 @@ const GetStartedSection = ({
           <Trans>30 min to 1h</Trans>
         </>
       ),
-      description: <Trans>A complete game step by step</Trans>,
+      description: <Trans>Learn the basics of game development</Trans>,
       action: () => onTabChange('learn'),
       imagePath: 'res/homepage/get-started.png',
     },

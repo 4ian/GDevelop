@@ -92,6 +92,7 @@ export const create = (authentication: Authentication) => {
                   onCreateFromExampleShortHeader={
                     onCreateFromExampleShortHeader
                   }
+                  initialExampleShortHeader={props.initialExampleShortHeader}
                 />
               )}
               renderGDJSDevelopmentWatcher={

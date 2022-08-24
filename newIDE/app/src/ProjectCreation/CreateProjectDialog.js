@@ -24,6 +24,7 @@ export type CreateProjectDialogWithComponentsProps = {|
   open: boolean,
   onClose: () => void,
   onOpen: OnOpenProjectAfterCreationFunction,
+  initialExampleShortHeader: ?ExampleShortHeader,
 |};
 
 export type ProjectCreationSettings = {|
@@ -63,12 +64,13 @@ const CreateProjectDialog = ({
   onOpen,
   onCreateFromExampleShortHeader,
   onCreateBlank,
+  initialExampleShortHeader,
 }: Props) => {
   const [isOpening, setIsOpening] = React.useState<boolean>(false);
   const [
     selectedExampleShortHeader,
     setSelectedExampleShortHeader,
-  ] = React.useState<?ExampleShortHeader>(null);
+  ] = React.useState<?ExampleShortHeader>(initialExampleShortHeader);
   const [
     preCreationDialogOpen,
     setPreCreationDialogOpen,
@@ -153,6 +155,7 @@ const CreateProjectDialog = ({
                     setSelectedExampleShortHeader(example);
                     setPreCreationDialogOpen(true);
                   }}
+                  initialExampleShortHeader={selectedExampleShortHeader}
                 />
               </Column>
             </Column>

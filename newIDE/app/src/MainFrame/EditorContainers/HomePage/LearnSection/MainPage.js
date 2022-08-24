@@ -11,6 +11,7 @@ import {
   type TutorialCategory,
   type Tutorial,
 } from '../../../../Utils/GDevelopServices/Tutorial';
+import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { isUserflowRunning } from '../../../Onboarding/OnboardingDialog';
 import { isMobile } from '../../../../Utils/Platform';
 import optionalRequire from '../../../../Utils/OptionalRequire';
@@ -63,7 +64,7 @@ const styles = {
 
 type Props = {|
   onOpenOnboardingDialog: () => void,
-  onCreateProject: () => void,
+  onCreateProject: (?ExampleShortHeader) => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenHelpFinder: () => void,
   onSelectCategory: (?TutorialCategory) => void,

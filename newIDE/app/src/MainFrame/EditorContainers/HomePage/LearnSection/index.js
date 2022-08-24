@@ -9,6 +9,7 @@ import { TutorialContext } from '../../../../Tutorial/TutorialContext';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import { Paper } from '@material-ui/core';
+import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -48,7 +49,7 @@ const styles = {
 
 type Props = {|
   onOpenOnboardingDialog: () => void,
-  onCreateProject: () => void,
+  onCreateProject: (?ExampleShortHeader) => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenHelpFinder: () => void,
 |};

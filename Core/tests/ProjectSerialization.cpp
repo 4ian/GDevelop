@@ -186,7 +186,7 @@ TEST_CASE("ProjectSerialization", "[common]") {
         firstExtensionElement.GetChild("eventsBasedObjects");
     eventsBasedObjectsElement.ConsiderAsArrayOf("eventsBasedObject");
     auto &eventsBasedObjectElement =
-        eventsBasedObjectsElement.GetChild("MyEventsBasedObject");
+        eventsBasedObjectsElement.GetChild(0);
     CheckBehaviorPropertyInObjectContainerElement(eventsBasedObjectElement);
 
     auto &secondExtensionElement = extensionsElement.GetChild(1);

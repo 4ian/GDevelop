@@ -37,9 +37,10 @@ class ArbitraryResourceWorker;
 class BehaviorsSharedData;
 class Behavior;
 class Object;
+class ObjectConfiguration;
 }  // namespace gd
 
-typedef std::function<std::unique_ptr<gd::Object>(gd::String name)>
+typedef std::function<std::unique_ptr<gd::ObjectConfiguration>()>
     CreateFunPtr;
 
 namespace gd {
@@ -242,7 +243,7 @@ class GD_CORE_API PlatformExtension {
                                 const gd::String& fullname_,
                                 const gd::String& description_,
                                 const gd::String& icon_,
-                                std::shared_ptr<gd::Object> instance);
+                                std::shared_ptr<gd::ObjectConfiguration> instance);
 
   /**
    * \brief Declare a new events based object as being part of the extension.

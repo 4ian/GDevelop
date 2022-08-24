@@ -7,6 +7,7 @@
 
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/Log.h"
 
@@ -105,10 +106,10 @@ std::unique_ptr<gd::Object> Platform::CreateObject(
   }
 
   // Create a new object with the type we want.
+  std::unique_ptr<gd::ObjectConfiguration> objectConfiguration =
+      (creationFunctionTable.find(type)->second)();
   std::unique_ptr<gd::Object> object =
-      (creationFunctionTable.find(type)->second)(name);
-  object->SetType(type);
-
+      gd::make_unique<gd::Object>(name, type, std::move(objectConfiguration));
   return std::unique_ptr<gd::Object>(std::move(object));
 }
 

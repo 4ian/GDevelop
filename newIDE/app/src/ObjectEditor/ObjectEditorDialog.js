@@ -206,7 +206,7 @@ const InnerDialog = (props: InnerDialogProps) => {
             </Column>
           </Line>
           <EditorComponent
-            object={props.object}
+            object={props.object.getConfiguration()}
             project={props.project}
             resourceSources={props.resourceSources}
             onChooseResource={props.onChooseResource}

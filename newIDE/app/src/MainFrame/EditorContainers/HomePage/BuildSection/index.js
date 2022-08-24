@@ -9,7 +9,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 
-import AddIcon from '@material-ui/icons/Add';
 import Text from '../../../../UI/Text';
 import TextButton from '../../../../UI/TextButton';
 import RaisedButton from '../../../../UI/RaisedButton';
@@ -39,6 +38,19 @@ import optionalRequire from '../../../../Utils/OptionalRequire';
 import { showErrorBox } from '../../../../UI/Messages/MessageBox';
 import { getRelativeOrAbsoluteDisplayDate } from '../../../../Utils/DateDisplay';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
+import ProjectPreCreationDialog from '../../../../ProjectCreation/ProjectPreCreationDialog';
+import {
+  type ProjectCreationSettings,
+  type OnCreateBlankFunction,
+  type OnOpenProjectAfterCreationFunction,
+} from '../../../../ProjectCreation/CreateProjectDialog';
+import { ExampleStoreContext } from '../../../../AssetStore/ExampleStore/ExampleStoreContext';
+import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
+import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
+import Add from '../../../../UI/CustomSvgIcons/Add';
+import WidgetsRow from '../../../../UI/WidgetsRow';
+import { prepareExamples } from '../../../../AssetStore/ExampleStore';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -54,12 +66,27 @@ const styles = {
   },
 };
 
+const getTemplatesGridSizeFromWidth = (width: WidthType) => {
+  switch (width) {
+    case 'small':
+      return 2;
+    case 'medium':
+      return 4;
+    case 'large':
+    default:
+      return 6;
+  }
+};
+
 type Props = {|
   project: ?gdProject,
   canOpen: boolean,
-  onOpen: () => void,
+  onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onCreateProject: () => void,
+  onCreateBlank: OnCreateBlankFunction,
+  onShowAllExamples: () => void,
+  onSelectExample: (exampleShortHeader: ExampleShortHeader) => void,
+  onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
   onChangeSubscription: () => void,
   storageProviders: Array<StorageProvider>,
 |};
@@ -104,8 +131,11 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     {
       project,
       canOpen,
-      onOpen,
-      onCreateProject,
+      onChooseProject,
+      onCreateBlank,
+      onShowAllExamples,
+      onSelectExample,
+      onOpenProjectAfterCreation,
       onOpenRecentFile,
       onChangeSubscription,
       storageProviders,
@@ -115,11 +145,19 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     const { getRecentProjectFiles, removeRecentProjectFile } = React.useContext(
       PreferencesContext
     );
+    const { allExamples } = React.useContext(ExampleStoreContext);
     const authenticatedUser = React.useContext(AuthenticatedUserContext);
     const { cloudProjects, limits } = authenticatedUser;
     const contextMenu = React.useRef<?ContextMenuInterface>(null);
     const { showDeleteConfirmation } = useConfirmDialog();
     const [pendingProject, setPendingProject] = React.useState<?string>(null);
+    const [isOpeningProject, setIsOpeningProject] = React.useState<boolean>(
+      false
+    );
+    const [
+      preCreationDialogOpen,
+      setPreCreationDialogOpen,
+    ] = React.useState<boolean>(false);
     const windowWidth = useResponsiveWindowWidth();
     const forceUpdate = useForceUpdate();
 
@@ -136,29 +174,27 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     let hasTooManyCloudProjects = false;
 
     // Show cloud projects on the web app only.
-    if (isWebApp) {
-      if (cloudProjects) {
-        projectFiles = projectFiles.concat(
-          cloudProjects
-            .map(cloudProject => {
-              if (cloudProject.deletedAt) return null;
-              const file: FileMetadataAndStorageProviderName = {
-                storageProviderName: 'Cloud',
-                fileMetadata: {
-                  fileIdentifier: cloudProject.id,
-                  lastModifiedDate: Date.parse(cloudProject.lastModifiedAt),
-                  name: cloudProject.name,
-                },
-              };
-              return file;
-            })
-            .filter(Boolean)
-        );
-        hasTooManyCloudProjects = limits
-          ? cloudProjects.filter(cloudProject => !cloudProject.deletedAt)
-              .length >= limits.capabilities.cloudProjects.maximumCount
-          : false;
-      }
+    if (isWebApp && cloudProjects) {
+      projectFiles = projectFiles.concat(
+        cloudProjects
+          .map(cloudProject => {
+            if (cloudProject.deletedAt) return null;
+            const file: FileMetadataAndStorageProviderName = {
+              storageProviderName: 'Cloud',
+              fileMetadata: {
+                fileIdentifier: cloudProject.id,
+                lastModifiedDate: Date.parse(cloudProject.lastModifiedAt),
+                name: cloudProject.name,
+              },
+            };
+            return file;
+          })
+          .filter(Boolean)
+      );
+      hasTooManyCloudProjects = limits
+        ? cloudProjects.filter(cloudProject => !cloudProject.deletedAt)
+            .length >= limits.capabilities.cloudProjects.maximumCount
+        : false;
     }
 
     projectFiles.sort((a, b) => {
@@ -261,6 +297,29 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       return actions;
     };
 
+    const createProject = async (
+      i18n: I18nType,
+      settings: ProjectCreationSettings
+    ) => {
+      setIsOpeningProject(true);
+
+      try {
+        let projectMetadata;
+
+        projectMetadata = await onCreateBlank({
+          i18n,
+          settings,
+        });
+
+        if (!projectMetadata) return;
+
+        setPreCreationDialogOpen(false);
+        onOpenProjectAfterCreation({ ...projectMetadata });
+      } finally {
+        setIsOpeningProject(false);
+      }
+    };
+
     const isWindowWidthMediumOrLarger = windowWidth !== 'small';
 
     return (
@@ -283,38 +342,66 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
               }
             >
               <SectionRow>
-                <Line noMargin>
-                  <ResponsiveLineStackLayout
-                    noColumnMargin
-                    justifyContent="start"
-                    alignItems="center"
-                  >
-                    <RaisedButton
-                      primary
-                      label={<Trans>Create a project</Trans>}
-                      onClick={onCreateProject}
-                      icon={<AddIcon />}
-                      id="home-create-project-button"
-                    />
-                    {canOpen && (
-                      <>
-                        {isWindowWidthMediumOrLarger && (
-                          <>
-                            <Text>
-                              <Trans>or</Trans>
-                            </Text>
-                            <Spacer />
-                          </>
-                        )}
-                        <TextButton
-                          primary
-                          label={<Trans>Open an existing project</Trans>}
-                          onClick={onOpen}
-                        />
-                      </>
-                    )}
-                  </ResponsiveLineStackLayout>
-                </Line>
+                {!allExamples ? (
+                  <PlaceholderLoader />
+                ) : (
+                  <WidgetsRow
+                    items={prepareExamples(allExamples).map(example => ({
+                      onClick: () => onSelectExample(example),
+                      imageUrl: example.previewImageUrls[0],
+                    }))}
+                    title={<Trans>Recommended templates</Trans>}
+                    onShowAll={onShowAllExamples}
+                    showAllIcon={<Add fontSize="small" />}
+                    getColumnsFromWidth={getTemplatesGridSizeFromWidth}
+                    getLimitFromWidth={getTemplatesGridSizeFromWidth}
+                  />
+                )}
+              </SectionRow>
+              <SectionRow>
+                <LineStackLayout
+                  justifyContent="space-between"
+                  alignItems="center"
+                  noMargin
+                  expand
+                >
+                  <Column noMargin>
+                    <Text size="section-title">
+                      <Trans>Existing projects</Trans>
+                    </Text>
+                  </Column>
+                  <Column noMargin>
+                    <ResponsiveLineStackLayout noMargin>
+                      <RaisedButton
+                        primary
+                        label={<Trans>Create a project</Trans>}
+                        onClick={() => {
+                          setPreCreationDialogOpen(true);
+                        }}
+                        icon={<Add fontSize="small" />}
+                        id="home-create-project-button"
+                      />
+                      {canOpen && (
+                        <>
+                          {isWindowWidthMediumOrLarger && (
+                            <>
+                              <Spacer />
+                              <Text>
+                                <Trans>or</Trans>
+                              </Text>
+                              <Spacer />
+                            </>
+                          )}
+                          <TextButton
+                            primary
+                            label={<Trans>Open an existing project</Trans>}
+                            onClick={onChooseProject}
+                          />
+                        </>
+                      )}
+                    </ResponsiveLineStackLayout>
+                  </Column>
+                </LineStackLayout>
                 {authenticatedUser.loginState === 'loggingIn' ? (
                   <Column
                     useFullHeight
@@ -496,6 +583,14 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                 buildContextMenu(_i18n, file)
               }
             />
+            {preCreationDialogOpen && (
+              <ProjectPreCreationDialog
+                open
+                isOpening={isOpeningProject}
+                onClose={() => setPreCreationDialogOpen(false)}
+                onCreate={projectName => createProject(i18n, projectName)}
+              />
+            )}
           </>
         )}
       </I18n>

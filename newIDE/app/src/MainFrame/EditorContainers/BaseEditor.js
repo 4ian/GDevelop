@@ -15,6 +15,7 @@ import {
   type OnOpenProjectAfterCreationFunction,
 } from '../../ProjectCreation/CreateProjectDialog';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
+import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -71,13 +72,13 @@ export type RenderEditorContainerProps = {|
 
   // Project opening
   canOpen: boolean,
-  onOpen: () => void,
+  onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   onOpenProjectManager: () => void,
   onCloseProject: () => Promise<void>,
 
   // Other dialogs opening:
-  onCreateProject: () => void,
+  onCreateProject: (?ExampleShortHeader) => void,
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   onOpenOnboardingDialog: () => void,

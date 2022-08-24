@@ -7,6 +7,7 @@
 
 using namespace gd;
 
+namespace gd {
 /**
  * \brief A gd::Behavior that stores its content in JSON and forward the
  * properties related functions to Javascript with Emscripten.
@@ -37,3 +38,4 @@ private:
   const Project &project; ///< The project is used to get the
                           ///< EventBasedBehavior from the fullType.
 };
+}  // namespace gd

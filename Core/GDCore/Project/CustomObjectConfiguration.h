@@ -7,6 +7,7 @@
 
 using namespace gd;
 
+namespace gd {
 /**
  * \brief A gd::Object that stores its content in JSON and forward the
  * properties related functions to Javascript with Emscripten.
@@ -14,14 +15,11 @@ using namespace gd;
  * It also implements "ExposeResources" to expose the properties of type
  * "resource".
  */
-class CustomObject : public gd::Object {
+class CustomObjectConfiguration : public gd::ObjectConfiguration {
  public:
-  CustomObject(const gd::String &name, const Project& project_, const gd::String &fullType)
-      : Object(name),
-        project(project_) {
-    SetType(fullType);
-  }
-  std::unique_ptr<gd::Object> Clone() const override;
+  CustomObjectConfiguration(const Project& project_)
+      : project(project_) {}
+  std::unique_ptr<gd::ObjectConfiguration> Clone() const override;
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name, const gd::String& value) override;
@@ -47,3 +45,4 @@ class CustomObject : public gd::Object {
                             ///< EventBasedObject from the fullType.
     gd::SerializerElement objectContent;
 };
+}  // namespace gd

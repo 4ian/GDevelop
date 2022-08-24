@@ -16,6 +16,7 @@ namespace gd {
 class InstructionsMetadataHolder;
 class Project;
 class Object;
+class ObjectConfiguration;
 class Behavior;
 class BehaviorMetadata;
 class ObjectMetadata;
@@ -26,7 +27,7 @@ class LayoutEditorCanvas;
 class ProjectExporter;
 }  // namespace gd
 
-typedef std::function<std::unique_ptr<gd::Object>(gd::String name)>
+typedef std::function<std::unique_ptr<gd::ObjectConfiguration>()>
     CreateFunPtr;
 
 #undef CreateEvent

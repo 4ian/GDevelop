@@ -311,7 +311,7 @@ const getAutocompletionsForText = function(
     }
 
     if (object.getType() === 'Sprite') {
-      const spriteObject = gd.asSpriteObject(object);
+      const spriteObject = gd.asSpriteObject(object.getConfiguration());
 
       autocompletionTexts = getAllPointNames(spriteObject)
         .map(spriteObjectName =>
@@ -333,7 +333,7 @@ const getAutocompletionsForText = function(
     }
 
     if (object.getType() === 'Sprite') {
-      const spriteObject = gd.asSpriteObject(object);
+      const spriteObject = gd.asSpriteObject(object.getConfiguration());
 
       autocompletionTexts = mapFor(
         0,

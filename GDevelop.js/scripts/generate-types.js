@@ -177,15 +177,15 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
         `  asJsCodeEvent(gdBaseEvent): gdJsCodeEvent;`,
         `  asPlatform(gdPlatform): gdPlatform;`,
         '',
-        `  asSpriteObject(gdObject): gdSpriteObject;`,
-        `  asTiledSpriteObject(gdObject): gdTiledSpriteObject;`,
-        `  asPanelSpriteObject(gdObject): gdPanelSpriteObject;`,
-        `  asTextObject(gdObject): gdTextObject;`,
-        `  asShapePainterObject(gdObject): gdShapePainterObject;`,
-        `  asAdMobObject(gdObject): gdAdMobObject;`,
-        `  asTextEntryObject(gdObject): gdTextEntryObject;`,
-        `  asParticleEmitterObject(gdObject): gdParticleEmitterObject;`,
-        `  asObjectJsImplementation(gdObject): gdObjectJsImplementation;`,
+        `  asSpriteObject(gdObjectConfiguration): gdSpriteObject;`,
+        `  asTiledSpriteObject(gdObjectConfiguration): gdTiledSpriteObject;`,
+        `  asPanelSpriteObject(gdObjectConfiguration): gdPanelSpriteObject;`,
+        `  asTextObject(gdObjectConfiguration): gdTextObject;`,
+        `  asShapePainterObject(gdObjectConfiguration): gdShapePainterObject;`,
+        `  asAdMobObject(gdObjectConfiguration): gdAdMobObject;`,
+        `  asTextEntryObject(gdObjectConfiguration): gdTextEntryObject;`,
+        `  asParticleEmitterObject(gdObjectConfiguration): gdParticleEmitterObject;`,
+        `  asObjectJsImplementation(gdObjectConfiguration): gdObjectJsImplementation;`,
         '',
         `  asImageResource(gdResource): gdImageResource;`,
         '',
@@ -249,26 +249,14 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
     shell.sed(
       '-i',
       'declare class gdObjectJsImplementation {',
-      'declare class gdObjectJsImplementation extends gdObject {',
+      'declare class gdObjectJsImplementation extends gdObjectConfiguration {',
       'types/gdobjectjsimplementation.js'
-    );
-    shell.sed(
-      '-i',
-      'declare class gdCustomObject {',
-      'declare class gdCustomObject extends gdObject {',
-      'types/gdcustomobject.js'
     );
     shell.sed(
       '-i',
       'declare class gdBehaviorJsImplementation {',
       'declare class gdBehaviorJsImplementation extends gdBehavior {',
       'types/gdbehaviorjsimplementation.js'
-    );
-    shell.sed(
-      '-i',
-      'declare class gdCustomBehavior {',
-      'declare class gdCustomBehavior extends gdBehavior {',
-      'types/gdcustombehavior.js'
     );
     shell.sed(
       '-i',

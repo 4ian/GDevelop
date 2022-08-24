@@ -374,20 +374,14 @@ describe('libGD.js', function () {
 
   describe('gd.ObjectsContainer', function () {
     it('can move objects between containers, without moving them in memory', function () {
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+
       // Prepare two containers, one with 3 objects and one empty
       const objectsContainer1 = new gd.ObjectsContainer();
       const objectsContainer2 = new gd.ObjectsContainer();
-      const mySpriteObject = new gd.SpriteObject('MySprite');
-      const mySprite2Object = new gd.SpriteObject('MySprite2');
-      const mySprite3Object = new gd.SpriteObject('MySprite3');
-      objectsContainer1.insertObject(mySpriteObject, 0);
-      objectsContainer1.insertObject(mySprite2Object, 1);
-      objectsContainer1.insertObject(mySprite3Object, 2);
-
-      // Objects are copied when inserted in the container, so we delete them:
-      mySpriteObject.delete();
-      mySprite2Object.delete();
-      mySprite3Object.delete();
+      const mySpriteObject = objectsContainer1.insertNewObject(project, 'Sprite', 'MySprite', 0);
+      const mySprite2Object = objectsContainer1.insertNewObject(project, 'Sprite', 'MySprite2', 1);
+      const mySprite3Object = objectsContainer1.insertNewObject(project, 'Sprite', 'MySprite3', 2);
 
       // Find the pointer to the objects in memory
       expect(objectsContainer1.getObjectsCount()).toBe(3);
@@ -455,6 +449,7 @@ describe('libGD.js', function () {
       expect(gd.getPointer(objectsContainer2.getObjectAt(0))).toBe(
         mySprite3ObjectPtr
       );
+      project.delete();
     });
   });
 
@@ -1200,7 +1195,7 @@ describe('libGD.js', function () {
       anim1.setDirectionsCount(1);
       anim1.getDirection(0).addSprite(sprite1);
 
-      gd.castObject(obj, gd.SpriteObject).addAnimation(anim1);
+      gd.castObject(obj.getConfiguration(), gd.SpriteObject).addAnimation(anim1);
 
       {
         let allResources = project.getResourcesManager().getAllResourceNames();
@@ -1257,13 +1252,13 @@ describe('libGD.js', function () {
     it('should be called with resources of the project', function (done) {
       let project = gd.ProjectHelper.createNewGDJSProject();
       let obj = project.insertNewObject(project, 'Sprite', 'MyObject', 0);
-      const spriteObject = gd.asSpriteObject(obj);
+      const spriteConfiguration = gd.asSpriteObject(obj.getConfiguration());
       let sprite1 = new gd.Sprite();
       sprite1.setImageName('Used');
       const animation = new gd.Animation();
       animation.setDirectionsCount(1);
       animation.getDirection(0).addSprite(sprite1);
-      spriteObject.addAnimation(animation);
+      spriteConfiguration.addAnimation(animation);
 
       let worker = extend(new gd.ArbitraryResourceWorkerJS(), {
         exposeImage: function (image) {
@@ -1288,7 +1283,7 @@ describe('libGD.js', function () {
       let sprite3 = new gd.Sprite();
       sprite3.setImageName('Image3');
 
-      const spriteObject = new gd.SpriteObject('My sprite object');
+      const spriteObject = new gd.SpriteObject();
       const animation = new gd.Animation();
       animation.setDirectionsCount(1);
       animation.getDirection(0).addSprite(sprite1);
@@ -1296,7 +1291,7 @@ describe('libGD.js', function () {
       animation.getDirection(0).addSprite(sprite1);
       spriteObject.addAnimation(animation);
 
-      const spriteObject2 = new gd.SpriteObject('My sprite object');
+      const spriteObject2 = new gd.SpriteObject();
       const animation2 = new gd.Animation();
       animation2.setDirectionsCount(1);
       animation2.getDirection(0).addSprite(sprite1);
@@ -1779,7 +1774,7 @@ describe('libGD.js', function () {
       // see ObjectJsImplementation C++ implementation). If called directly here from JS,
       // the arguments will be mismatched. To workaround this, always case the object to
       // a base gdObject to ensure C++ methods are called.
-      return gd.castObject(myObject, gd.Object);
+      return gd.castObject(myObject, gd.ObjectConfiguration);
     };
 
     it('can create a gd.ObjectJsImplementation and pass sanity checks', function () {
@@ -1824,7 +1819,6 @@ describe('libGD.js', function () {
     });
 
     it('can clone a gd.ObjectJsImplementation', function () {
-      const project = gd.ProjectHelper.createNewGDJSProject();
       const object1 = createSampleObjectJsImplementation();
       expect(
         object1.getProperties().get('My first property').getValue() ==
@@ -1883,8 +1877,6 @@ describe('libGD.js', function () {
           propertiesObject3.get('My first property').getValue() == 'test1'
         );
       }
-
-      project.delete();
     });
   });
 
@@ -2640,17 +2632,19 @@ describe('libGD.js', function () {
 
   describe('gd.SpriteObject', function () {
     it('is a gd.Object and can have tags', function () {
-      let object = new gd.SpriteObject('MySpriteObject');
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      let object = project.insertNewObject(project, 'Sprite', 'MySpriteObject');
 
       expect(object instanceof gd.Object).toBe(true);
       object.setTags('tag1, tag2, tag3');
       expect(object.getTags()).toBe('tag1, tag2, tag3');
       expect(object.getVariables()).toBeTruthy();
       object.delete();
+      project.delete();
     });
 
     it('can have animations', function () {
-      let obj = new gd.SpriteObject('MySpriteObject');
+      let obj = new gd.SpriteObject();
       obj.addAnimation(new gd.Animation());
       obj.addAnimation(new gd.Animation());
       expect(obj.getAnimationsCount()).toBe(2);
@@ -2659,7 +2653,7 @@ describe('libGD.js', function () {
     });
 
     it('can swap animations', function () {
-      let obj = new gd.SpriteObject('MySpriteObject');
+      let obj = new gd.SpriteObject();
       obj.removeAllAnimations();
       let anim1 = new gd.Animation();
       let anim2 = new gd.Animation();

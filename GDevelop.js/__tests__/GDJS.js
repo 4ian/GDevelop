@@ -618,17 +618,9 @@ describe('libGD.js - GDJS related tests', function () {
     });
   });
 
-  const testObjectFeatures = (object) => {
-    expect(object instanceof gd.Object).toBe(true);
-    object.setTags('tag1, tag2, tag3');
-    expect(object.getTags()).toBe('tag1, tag2, tag3');
-    expect(object.getVariables()).toBeTruthy();
-  };
-
   describe('TextObject', function () {
     it('should expose TextObject specific methods', function () {
       var object = new gd.TextObject('MyTextObject');
-      testObjectFeatures(object);
       object.setString('Hello');
       object.setFontName('Hello.ttf');
       object.setCharacterSize(10);
@@ -647,7 +639,6 @@ describe('libGD.js - GDJS related tests', function () {
   describe('TiledSpriteObject', function () {
     it('should expose TiledSpriteObject specific methods', function () {
       var object = new gd.TiledSpriteObject('MyTiledSpriteObject');
-      testObjectFeatures(object);
       object.setTexture('MyImageName');
       expect(object.getTexture()).toBe('MyImageName');
     });
@@ -655,7 +646,6 @@ describe('libGD.js - GDJS related tests', function () {
   describe('PanelSpriteObject', function () {
     it('should expose PanelSpriteObject specific methods', function () {
       var object = new gd.PanelSpriteObject('MyPanelSpriteObject');
-      testObjectFeatures(object);
       object.setTexture('MyImageName');
       expect(object.getTexture()).toBe('MyImageName');
     });
@@ -663,7 +653,6 @@ describe('libGD.js - GDJS related tests', function () {
   describe('ShapePainterObject', function () {
     it('should expose ShapePainterObject specific methods', function () {
       var object = new gd.ShapePainterObject('MyShapePainterObject');
-      testObjectFeatures(object);
       object.setCoordinatesAbsolute();
       expect(object.areCoordinatesAbsolute()).toBe(true);
       object.setCoordinatesRelative();
@@ -673,7 +662,6 @@ describe('libGD.js - GDJS related tests', function () {
   describe('ShapePainterObject', function () {
     it('should expose ShapePainterObject specific methods', function () {
       var object = new gd.ShapePainterObject('MyShapePainterObject');
-      testObjectFeatures(object);
       object.setClearBetweenFrames(true);
       expect(object.isClearedBetweenFrames()).toBe(true);
       object.setClearBetweenFrames(false);
@@ -683,13 +671,11 @@ describe('libGD.js - GDJS related tests', function () {
   describe('TextEntryObject', function () {
     it('should expose TextEntryObject', function () {
       var object = new gd.TextEntryObject('MyTextEntryObject');
-      testObjectFeatures(object);
     });
   });
   describe('ParticleEmitterObject', function () {
     it('should expose ParticleEmitterObject', function () {
       var object = new gd.ParticleEmitterObject('MyParticleEmitterObject');
-      testObjectFeatures(object);
     });
   });
   describe('JsCodeEvent', function () {

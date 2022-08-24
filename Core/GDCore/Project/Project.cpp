@@ -23,7 +23,7 @@
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
-#include "GDCore/Project/CustomObject.h"
+#include "GDCore/Project/CustomObjectConfiguration.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
@@ -83,7 +83,7 @@ std::unique_ptr<gd::Object> Project::CreateObject(
   const gd::String& type,
   const gd::String& name) const {
   if (Project::HasEventsBasedObject(type)) {
-    return gd::make_unique<CustomObject>(name, *this, type);
+    return gd::make_unique<Object>(name, type, gd::make_unique<CustomObjectConfiguration>(*this));
   }
   else {
     // Create a base object if the type can't be found in the platform.
@@ -940,8 +940,9 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   // Add layouts resources
   for (std::size_t s = 0; s < GetLayoutsCount(); s++) {
     for (std::size_t j = 0; j < GetLayout(s).GetObjectsCount();
-         ++j)  // Add objects resources
-      GetLayout(s).GetObject(j).ExposeResources(worker);
+         ++j) { // Add objects resources
+      GetLayout(s).GetObject(j).GetConfiguration().ExposeResources(worker);
+    }
 
     LaunchResourceWorkerOnEvents(*this, GetLayout(s).GetEvents(), worker);
   }
@@ -960,7 +961,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
 
   // Add global objects resources
   for (std::size_t j = 0; j < GetObjectsCount(); ++j) {
-    GetObject(j).ExposeResources(worker);
+    GetObject(j).GetConfiguration().ExposeResources(worker);
   }
 
   // Add loading screen background image if present

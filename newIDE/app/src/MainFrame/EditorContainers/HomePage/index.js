@@ -3,11 +3,7 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { Line, Column } from '../../../UI/Grid';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
-import {
-  type OnCreateFromExampleShortHeaderFunction,
-  type OnCreateBlankFunction,
-  type OnOpenProjectAfterCreationFunction,
-} from '../../../ProjectCreation/CreateProjectDialog';
+import { type OnOpenProjectAfterCreationFunction } from '../../../ProjectCreation/CreateProjectDialog';
 import {
   type FileMetadataAndStorageProviderName,
   type StorageProvider,
@@ -24,6 +20,7 @@ import { HomePageHeader } from './HomePageHeader';
 import { HomePageMenu, type HomeTab } from './HomePageMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
 
 type Props = {|
   project: ?gdProject,
@@ -36,9 +33,9 @@ type Props = {|
 
   // Project opening
   canOpen: boolean,
-  onOpen: () => void,
+  onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onCreateProject: () => void,
+  onCreateProject: (ExampleShortHeader | null) => void,
   onOpenProjectManager: () => void,
 
   // Other dialogs opening:
@@ -51,8 +48,7 @@ type Props = {|
   onOpenAbout: () => void,
 
   // Project creation
-  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
-  onCreateBlank: OnCreateBlankFunction,
+  onOpenProjectPreCreationDialog: (?ExampleShortHeader) => void,
   onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
 |};
 
@@ -68,10 +64,9 @@ export const HomePage = React.memo<Props>(
       {
         project,
         canOpen,
-        onOpen,
+        onChooseProject,
         onOpenRecentFile,
-        onCreateFromExampleShortHeader,
-        onCreateBlank,
+        onOpenProjectPreCreationDialog,
         onOpenProjectAfterCreation,
         onCreateProject,
         onOpenProjectManager,
@@ -178,7 +173,9 @@ export const HomePage = React.memo<Props>(
                   {activeTab === 'get-started' && (
                     <GetStartedSection
                       onTabChange={setActiveTab}
-                      onCreateProject={onCreateProject}
+                      onCreateProject={() =>
+                        onCreateProject(/*exampleShortHeader=*/ null)
+                      }
                       onOpenOnboardingDialog={onOpenOnboardingDialog}
                       showGetStartedSection={showGetStartedSection}
                       setShowGetStartedSection={setShowGetStartedSection}
@@ -189,8 +186,17 @@ export const HomePage = React.memo<Props>(
                       ref={buildSectionRef}
                       project={project}
                       canOpen={canOpen}
-                      onOpen={onOpen}
-                      onCreateProject={onCreateProject}
+                      onChooseProject={onChooseProject}
+                      onOpenProjectPreCreationDialog={
+                        onOpenProjectPreCreationDialog
+                      }
+                      onShowAllExamples={() =>
+                        onCreateProject(/*exampleShortHeader=*/ null)
+                      }
+                      onSelectExample={exampleShortHeader =>
+                        onCreateProject(exampleShortHeader)
+                      }
+                      onOpenProjectAfterCreation={onOpenProjectAfterCreation}
                       onOpenRecentFile={onOpenRecentFile}
                       onChangeSubscription={onChangeSubscription}
                       storageProviders={storageProviders}
@@ -199,7 +205,9 @@ export const HomePage = React.memo<Props>(
                   {activeTab === 'learn' && (
                     <LearnSection
                       onOpenOnboardingDialog={onOpenOnboardingDialog}
-                      onCreateProject={onCreateProject}
+                      onCreateProject={() =>
+                        onCreateProject(/*exampleShortHeader=*/ null)
+                      }
                       onTabChange={setActiveTab}
                       onOpenHelpFinder={onOpenHelpFinder}
                     />
@@ -229,12 +237,11 @@ export const renderHomePageContainer = (
     projectItemName={props.projectItemName}
     setToolbar={props.setToolbar}
     canOpen={props.canOpen}
-    onOpen={props.onOpen}
+    onChooseProject={props.onChooseProject}
+    onOpenProjectAfterCreation={props.onOpenProjectAfterCreation}
     onOpenRecentFile={props.onOpenRecentFile}
     onCreateProject={props.onCreateProject}
-    onCreateFromExampleShortHeader={props.onCreateFromExampleShortHeader}
-    onCreateBlank={props.onCreateBlank}
-    onOpenProjectAfterCreation={props.onOpenProjectAfterCreation}
+    onOpenProjectPreCreationDialog={props.onOpenProjectPreCreationDialog}
     onOpenProjectManager={props.onOpenProjectManager}
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}

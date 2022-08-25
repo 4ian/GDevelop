@@ -85,7 +85,7 @@ const WrappedHomePage = ({
                 setToolbar={() => {}}
                 canOpen={true}
                 storageProviders={[CloudStorageProvider]}
-                onOpen={() => action('onOpen')()}
+                onChooseProject={() => action('onChooseProject')()}
                 onOpenRecentFile={() => action('onOpenRecentFile')()}
                 onCreateProject={() => action('onCreateProject')()}
                 onOpenProjectManager={() => action('onOpenProjectManager')()}
@@ -93,9 +93,6 @@ const WrappedHomePage = ({
                 onOpenLanguageDialog={() => action('open language dialog')()}
                 onOpenOnboardingDialog={() =>
                   action('open onboarding dialog')()
-                }
-                onCreateFromExampleShortHeader={() =>
-                  action('create from example')()
                 }
                 onOpenProjectAfterCreation={() =>
                   action('call callback after project creation')()

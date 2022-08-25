@@ -47,7 +47,7 @@ export default class ObjectAnimationNameField extends Component<
     }
 
     if (object.getType() === 'Sprite') {
-      const spriteObject = gd.asSpriteObject(object);
+      const spriteObject = gd.asSpriteObject(object.getConfiguration());
 
       return mapFor(0, spriteObject.getAnimationsCount(), index => {
         const animationName = spriteObject.getAnimation(index).getName();

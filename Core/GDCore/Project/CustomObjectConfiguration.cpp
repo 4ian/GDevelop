@@ -1,4 +1,4 @@
-#include "CustomObject.h"
+#include "CustomObjectConfiguration.h"
 
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Project/Object.h"
@@ -11,9 +11,9 @@
 
 using namespace gd;
 
-std::unique_ptr<gd::Object> CustomObject::Clone() const {
-  CustomObject* clone = new CustomObject(*this);
-  return std::unique_ptr<gd::Object>(clone);
+std::unique_ptr<gd::ObjectConfiguration> CustomObjectConfiguration::Clone() const {
+  CustomObjectConfiguration* clone = new CustomObjectConfiguration(*this);
+  return std::unique_ptr<gd::ObjectConfiguration>(clone);
 }
 
 // TODO EBO Extract a class from Object for the object configuration.
@@ -21,9 +21,13 @@ std::unique_ptr<gd::Object> CustomObject::Clone() const {
 // ObjectConfiguration for their children in addition to its own properties.
 // This will be used by the GUI to display custom editors (for sprites for
 // instance)
-std::map<gd::String, gd::PropertyDescriptor> CustomObject::GetProperties() const {
-    const auto &properties = eventsBasedObject.GetPropertyDescriptors();
+std::map<gd::String, gd::PropertyDescriptor> CustomObjectConfiguration::GetProperties() const {
     auto objectProperties = std::map<gd::String, gd::PropertyDescriptor>();
+    if (!project.HasEventsBasedObject(GetType())) {
+      return objectProperties;
+    }
+    const auto &eventsBasedObject = project.GetEventsBasedObject(GetType());
+    const auto &properties = eventsBasedObject.GetPropertyDescriptors();
 
     for (auto &property : properties.GetInternalVector()) {
       const auto &propertyName = property->GetName();
@@ -71,8 +75,12 @@ std::map<gd::String, gd::PropertyDescriptor> CustomObject::GetProperties() const
     return objectProperties;
 }
 
-bool CustomObject::UpdateProperty(const gd::String& propertyName,
+bool CustomObjectConfiguration::UpdateProperty(const gd::String& propertyName,
                                   const gd::String& newValue) {
+    if (!project.HasEventsBasedObject(GetType())) {
+      return false;
+    }
+    const auto &eventsBasedObject = project.GetEventsBasedObject(GetType());
     const auto &properties = eventsBasedObject.GetPropertyDescriptors();
     if (!properties.Has(propertyName)) {
       return false;
@@ -98,14 +106,14 @@ bool CustomObject::UpdateProperty(const gd::String& propertyName,
 }
 
 std::map<gd::String, gd::PropertyDescriptor>
-CustomObject::GetInitialInstanceProperties(
+CustomObjectConfiguration::GetInitialInstanceProperties(
     const gd::InitialInstance& instance,
     gd::Project& project,
     gd::Layout& scene) {
   return std::map<gd::String, gd::PropertyDescriptor>();
 }
 
-bool CustomObject::UpdateInitialInstanceProperty(
+bool CustomObjectConfiguration::UpdateInitialInstanceProperty(
     gd::InitialInstance& instance,
     const gd::String& name,
     const gd::String& value,
@@ -114,15 +122,15 @@ bool CustomObject::UpdateInitialInstanceProperty(
   return false;
 }
 
-void CustomObject::DoSerializeTo(SerializerElement& arg0) const {
-  arg0.AddChild("content") = objectContent;
+void CustomObjectConfiguration::DoSerializeTo(SerializerElement& element) const {
+  element.AddChild("content") = objectContent;
 }
-void CustomObject::DoUnserializeFrom(Project& arg0,
-                                               const SerializerElement& arg1) {
-  objectContent = arg1.GetChild("content");
+void CustomObjectConfiguration::DoUnserializeFrom(Project& project,
+                                               const SerializerElement& element) {
+  objectContent = element.GetChild("content");
 }
 
-void CustomObject::ExposeResources(
+void CustomObjectConfiguration::ExposeResources(
     gd::ArbitraryResourceWorker& worker) {
   std::map<gd::String, gd::PropertyDescriptor> properties = GetProperties();
 

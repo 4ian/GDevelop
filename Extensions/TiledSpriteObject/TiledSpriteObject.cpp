@@ -20,8 +20,8 @@ This project is released under the MIT License.
 
 using namespace std;
 
-TiledSpriteObject::TiledSpriteObject(gd::String name_)
-    : Object(name_), textureName(""), width(32), height(32) {}
+TiledSpriteObject::TiledSpriteObject()
+    : textureName(""), width(32), height(32) {}
 
 void TiledSpriteObject::DoUnserializeFrom(
     gd::Project& project, const gd::SerializerElement& element) {

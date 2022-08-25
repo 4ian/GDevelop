@@ -89,10 +89,10 @@ export const create = (authentication: Authentication) => {
                 <CreateProjectDialog
                   open={props.open}
                   onClose={props.onClose}
-                  onOpen={props.onOpen}
-                  onCreateBlank={onCreateBlank}
-                  onCreateFromExampleShortHeader={
-                    onCreateFromExampleShortHeader
+                  initialExampleShortHeader={props.initialExampleShortHeader}
+                  isProjectOpening={props.isProjectOpening}
+                  onOpenProjectPreCreationDialog={
+                    props.onOpenProjectPreCreationDialog
                   }
                 />
               )}

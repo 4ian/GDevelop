@@ -1,7 +1,10 @@
 // @flow
 import * as React from 'react';
 import { type HomeTab } from '../HomePageMenu';
-import { type TutorialCategory } from '../../../../Utils/GDevelopServices/Tutorial';
+import {
+  type TutorialCategory,
+  type Tutorial,
+} from '../../../../Utils/GDevelopServices/Tutorial';
 import MainPage from './MainPage';
 import TutorialsCategoryPage from './TutorialsCategoryPage';
 import { Trans } from '@lingui/macro';
@@ -9,6 +12,10 @@ import { TutorialContext } from '../../../../Tutorial/TutorialContext';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import { Paper } from '@material-ui/core';
+import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
+import { sendTutorialOpened } from '../../../../Utils/Analytics/EventSender';
+import Window from '../../../../Utils/Window';
+import { secondsToMinutesAndSeconds } from '../../../../Utils/DateDisplay';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -39,6 +46,21 @@ export const TUTORIAL_CATEGORY_TEXTS = {
   },
 };
 
+export const formatTutorialToWidgetItem = (tutorial: Tutorial) => ({
+  title: tutorial.title,
+  description: tutorial.description,
+  onClick: (tutorial: Tutorial) => {
+    sendTutorialOpened(tutorial.id);
+    Window.openExternalURL(tutorial.link);
+  },
+  imageUrl: tutorial.thumbnailUrl,
+  overlayText: tutorial.duration ? (
+    secondsToMinutesAndSeconds(tutorial.duration)
+  ) : (
+    <Trans>Text</Trans>
+  ),
+});
+
 const styles = {
   paper: {
     flex: 1,
@@ -48,7 +70,7 @@ const styles = {
 
 type Props = {|
   onOpenOnboardingDialog: () => void,
-  onCreateProject: () => void,
+  onCreateProject: (?ExampleShortHeader) => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenHelpFinder: () => void,
 |};

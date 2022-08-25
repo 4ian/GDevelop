@@ -27,7 +27,7 @@ import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import { makeStyles } from '@material-ui/core/styles';
 import ImageTileRow from '../../../../UI/ImageTileRow';
-import { formatTutorialToWidgetItem, TUTORIAL_CATEGORY_TEXTS } from '.';
+import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
 import ArrowRight from '@material-ui/icons/ArrowRight';
 const electron = optionalRequire('electron');
 
@@ -135,6 +135,20 @@ const MainPage = ({
     },
   ].filter(Boolean);
 
+  const renderTutorialsRow = (category: TutorialCategory) => (
+    <ImageTileRow
+      title={TUTORIAL_CATEGORY_TEXTS[category].title}
+      description={TUTORIAL_CATEGORY_TEXTS[category].description}
+      items={tutorials
+        .filter(tutorial => tutorial.category === category)
+        .map(formatTutorialToImageTileComponent)}
+      onShowAll={() => onSelectCategory(category)}
+      showAllIcon={<ArrowRight fontSize="small" />}
+      getColumnsFromWidth={getTutorialsColumnsFromWidth}
+      getLimitFromWidth={getTutorialsColumnsFromWidth}
+    />
+  );
+
   return (
     <SectionContainer title={<Trans>Help and guides</Trans>}>
       <SectionRow>
@@ -209,32 +223,8 @@ const MainPage = ({
             </Text>
           </Line>
         </SectionRow>
-        <SectionRow>
-          <ImageTileRow
-            title={TUTORIAL_CATEGORY_TEXTS['full-game'].title}
-            description={TUTORIAL_CATEGORY_TEXTS['full-game'].description}
-            items={tutorials
-              .filter(tutorial => tutorial.category === 'full-game')
-              .map(formatTutorialToWidgetItem)}
-            onShowAll={() => onSelectCategory('full-game')}
-            showAllIcon={<ArrowRight fontSize="small" />}
-            getColumnsFromWidth={getTutorialsColumnsFromWidth}
-            getLimitFromWidth={getTutorialsColumnsFromWidth}
-          />
-        </SectionRow>
-        <SectionRow>
-          <ImageTileRow
-            title={TUTORIAL_CATEGORY_TEXTS['game-mechanic'].title}
-            description={TUTORIAL_CATEGORY_TEXTS['game-mechanic'].description}
-            items={tutorials
-              .filter(tutorial => tutorial.category === 'game-mechanic')
-              .map(formatTutorialToWidgetItem)}
-            onShowAll={() => onSelectCategory('game-mechanic')}
-            showAllIcon={<ArrowRight fontSize="small" />}
-            getColumnsFromWidth={getTutorialsColumnsFromWidth}
-            getLimitFromWidth={getTutorialsColumnsFromWidth}
-          />
-        </SectionRow>
+        <SectionRow>{renderTutorialsRow('full-game')}</SectionRow>
+        <SectionRow>{renderTutorialsRow('game-mechanic')}</SectionRow>
         <SectionRow>
           <Line noMargin>
             <Text size="title">
@@ -247,51 +237,9 @@ const MainPage = ({
             </Text>
           </Line>
         </SectionRow>
-        <SectionRow>
-          <ImageTileRow
-            title={TUTORIAL_CATEGORY_TEXTS['official-beginner'].title}
-            description={
-              TUTORIAL_CATEGORY_TEXTS['official-beginner'].description
-            }
-            items={tutorials
-              .filter(tutorial => tutorial.category === 'official-beginner')
-              .map(formatTutorialToWidgetItem)}
-            onShowAll={() => onSelectCategory('official-beginner')}
-            showAllIcon={<ArrowRight fontSize="small" />}
-            getColumnsFromWidth={getTutorialsColumnsFromWidth}
-            getLimitFromWidth={getTutorialsColumnsFromWidth}
-          />
-        </SectionRow>
-        <SectionRow>
-          <ImageTileRow
-            title={TUTORIAL_CATEGORY_TEXTS['official-intermediate'].title}
-            description={
-              TUTORIAL_CATEGORY_TEXTS['official-intermediate'].description
-            }
-            items={tutorials
-              .filter(tutorial => tutorial.category === 'official-intermediate')
-              .map(formatTutorialToWidgetItem)}
-            onShowAll={() => onSelectCategory('official-intermediate')}
-            showAllIcon={<ArrowRight fontSize="small" />}
-            getColumnsFromWidth={getTutorialsColumnsFromWidth}
-            getLimitFromWidth={getTutorialsColumnsFromWidth}
-          />
-        </SectionRow>
-        <SectionRow>
-          <ImageTileRow
-            title={TUTORIAL_CATEGORY_TEXTS['official-advanced'].title}
-            description={
-              TUTORIAL_CATEGORY_TEXTS['official-advanced'].description
-            }
-            items={tutorials
-              .filter(tutorial => tutorial.category === 'official-advanced')
-              .map(formatTutorialToWidgetItem)}
-            onShowAll={() => onSelectCategory('official-advanced')}
-            showAllIcon={<ArrowRight fontSize="small" />}
-            getColumnsFromWidth={getTutorialsColumnsFromWidth}
-            getLimitFromWidth={getTutorialsColumnsFromWidth}
-          />
-        </SectionRow>
+        <SectionRow>{renderTutorialsRow('official-beginner')}</SectionRow>
+        <SectionRow>{renderTutorialsRow('official-intermediate')}</SectionRow>
+        <SectionRow>{renderTutorialsRow('official-advanced')}</SectionRow>
       </>
     </SectionContainer>
   );

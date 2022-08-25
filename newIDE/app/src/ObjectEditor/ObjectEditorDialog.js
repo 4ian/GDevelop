@@ -110,8 +110,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     },
     [currentTab]
   );
-
-  return (
+    return (
     <Dialog
       key={props.object && props.object.ptr}
       actions={[
@@ -336,7 +335,7 @@ export default class ObjectEditorDialog extends Component<Props, State> {
         editorComponent={editorComponent}
         key={this.props.object && this.props.object.ptr}
         helpPagePath={helpPagePath}
-        object={castToObjectType(object)}
+        object={object}
         objectName={this.state.objectName}
         initialTab={initialTab}
       />

@@ -84,10 +84,14 @@ import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
-import { type CreateProjectDialogWithComponentsProps } from '../ProjectCreation/CreateProjectDialog';
+import {
+  type CreateProjectDialogWithComponentsProps,
+  type ProjectCreationSettings,
+} from '../ProjectCreation/CreateProjectDialog';
 import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnCreateBlankFunction,
+  type OnOpenProjectAfterCreationFunction,
 } from '../ProjectCreation/CreateProjectDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
@@ -121,6 +125,7 @@ import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { delay } from '../Utils/Delay';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
+import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
 import { NewResourceDialog } from '../ResourcesList/NewResourceDialog';
@@ -135,6 +140,7 @@ import LeaderboardProvider from '../Leaderboard/LeaderboardProvider';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 import { useLeaderboardReplacer } from '../Leaderboard/useLeaderboardReplacer';
 import useConfirmDialog from '../UI/Confirm/useConfirmDialog';
+import ProjectPreCreationDialog from '../ProjectCreation/ProjectPreCreationDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -200,6 +206,7 @@ export type State = {|
   saveToStorageProviderDialogOpen: boolean,
   eventsFunctionsExtensionsError: ?Error,
   gdjsDevelopmentWatcherEnabled: boolean,
+  initialExampleShortHeader: ?ExampleShortHeader,
 |};
 
 const initialPreviewState: PreviewState = {
@@ -264,6 +271,7 @@ const MainFrame = (props: Props) => {
       saveToStorageProviderDialogOpen: false,
       eventsFunctionsExtensionsError: null,
       gdjsDevelopmentWatcherEnabled: false,
+      initialExampleShortHeader: null,
     }: State)
   );
   const [customWindowTitle, setCustomWindowTitle] = React.useState<?string>(
@@ -315,6 +323,17 @@ const MainFrame = (props: Props) => {
     subscriptionDialogOpen,
     openSubscriptionDialog,
   ] = React.useState<boolean>(false);
+  const [
+    projectPreCreationDialogOpen,
+    setProjectPreCreationDialogOpen,
+  ] = React.useState<boolean>(false);
+  const [
+    selectedExampleShortHeader,
+    setSelectedExampleShortHeader,
+  ] = React.useState<?ExampleShortHeader>(null);
+  const [isProjectOpening, setIsProjectOpening] = React.useState<boolean>(
+    false
+  );
   const [exportDialogOpen, openExportDialog] = React.useState<boolean>(false);
   const { showConfirmation } = useConfirmDialog();
   const preferences = React.useContext(PreferencesContext);
@@ -1608,8 +1627,12 @@ const MainFrame = (props: Props) => {
   };
 
   const openCreateProjectDialog = React.useCallback(
-    (open: boolean = true) => {
-      setState(state => ({ ...state, createDialogOpen: open }));
+    (open: boolean, exampleShortHeader: ?ExampleShortHeader) => {
+      setState(state => ({
+        ...state,
+        initialExampleShortHeader: exampleShortHeader,
+        createDialogOpen: open,
+      }));
     },
     [setState]
   );
@@ -2132,7 +2155,7 @@ const MainFrame = (props: Props) => {
     }
   };
 
-  const onOpenProjectAfterCreation = async ({
+  const onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction = async ({
     project,
     storageProvider,
     fileMetadata,
@@ -2207,6 +2230,34 @@ const MainFrame = (props: Props) => {
     }
   };
 
+  const createProject = async (
+    i18n: I18n,
+    settings: ProjectCreationSettings
+  ) => {
+    setIsProjectOpening(true);
+
+    try {
+      const projectMetadata = selectedExampleShortHeader
+        ? await onCreateFromExampleShortHeader({
+            i18n,
+            exampleShortHeader: selectedExampleShortHeader,
+            settings,
+          })
+        : await onCreateBlank({
+            i18n,
+            settings,
+          });
+
+      if (!projectMetadata) return;
+
+      setProjectPreCreationDialogOpen(false);
+      setSelectedExampleShortHeader(null);
+      onOpenProjectAfterCreation({ ...projectMetadata });
+    } finally {
+      setIsProjectOpening(false);
+    }
+  };
+
   const simulateUpdateDownloaded = () =>
     setElectronUpdateStatus({
       status: 'update-downloaded',
@@ -2251,7 +2302,7 @@ const MainFrame = (props: Props) => {
     onLaunchDebugPreview: launchDebuggerAndPreview,
     onLaunchNetworkPreview: launchNetworkPreview,
     onOpenHomePage: openHomePage,
-    onCreateProject: openCreateProjectDialog,
+    onCreateBlank: () => setProjectPreCreationDialogOpen(true),
     onOpenProject: chooseProject,
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
@@ -2290,7 +2341,8 @@ const MainFrame = (props: Props) => {
           onCloseProject: askToCloseProject,
           onCloseApp: closeApp,
           onExportProject: () => openExportDialog(true),
-          onCreateProject: openCreateProjectDialog,
+          onCreateProject: () => openCreateProjectDialog(true, null),
+          onCreateBlank: () => setProjectPreCreationDialogOpen(true),
           onOpenProjectManager: () => openProjectManager(true),
           onOpenHomePage: openHomePage,
           onOpenDebugger: openDebugger,
@@ -2460,14 +2512,17 @@ const MainFrame = (props: Props) => {
                     canOpen: !!props.storageProviders.filter(
                       ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
                     ).length,
-                    onOpen: () => chooseProject(),
+                    onChooseProject: chooseProject,
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
-                    onCreateFromExampleShortHeader: onCreateFromExampleShortHeader,
-                    onCreateBlank: onCreateBlank,
+                    onOpenProjectPreCreationDialog: exampleShortHeader => {
+                      setSelectedExampleShortHeader(exampleShortHeader);
+                      setProjectPreCreationDialogOpen(true);
+                    },
                     onOpenProjectAfterCreation: onOpenProjectAfterCreation,
                     onOpenProjectManager: () => openProjectManager(true),
                     onCloseProject: () => askToCloseProject(),
-                    onCreateProject: () => openCreateProjectDialog(true),
+                    onCreateProject: exampleShortHeader =>
+                      openCreateProjectDialog(true, exampleShortHeader),
                     onOpenProfile: () => openProfileDialogWithTab('profile'),
                     onOpenHelpFinder: () => openHelpFinderDialog(true),
                     onOpenLanguageDialog: () => openLanguageDialog(true),
@@ -2539,7 +2594,12 @@ const MainFrame = (props: Props) => {
         renderCreateDialog({
           open: state.createDialogOpen,
           onClose: closeCreateDialog,
-          onOpen: onOpenProjectAfterCreation,
+          initialExampleShortHeader: state.initialExampleShortHeader,
+          onOpenProjectPreCreationDialog: exampleShortHeader => {
+            setSelectedExampleShortHeader(exampleShortHeader);
+            setProjectPreCreationDialogOpen(true);
+          },
+          isProjectOpening: isProjectOpening,
         })}
       {!!introDialog &&
         introDialogOpen &&
@@ -2603,6 +2663,19 @@ const MainFrame = (props: Props) => {
             openSubscriptionDialog(false);
           }}
           open
+        />
+      )}
+      {projectPreCreationDialogOpen && (
+        <ProjectPreCreationDialog
+          open
+          isOpening={isProjectOpening}
+          onClose={() => setProjectPreCreationDialogOpen(false)}
+          onCreate={projectName => createProject(i18n, projectName)}
+          sourceExampleName={
+            selectedExampleShortHeader
+              ? selectedExampleShortHeader.name
+              : undefined
+          }
         />
       )}
       {preferencesDialogOpen && (

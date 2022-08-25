@@ -9,7 +9,6 @@ import FlatButton from '../UI/FlatButton';
 import { Column } from '../UI/Grid';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
-import ProjectPreCreationDialog from './ProjectPreCreationDialog';
 
 export type OnOpenProjectAfterCreationFunction = ({|
   project?: gdProject,
@@ -23,7 +22,11 @@ export type OnOpenProjectAfterCreationFunction = ({|
 export type CreateProjectDialogWithComponentsProps = {|
   open: boolean,
   onClose: () => void,
-  onOpen: OnOpenProjectAfterCreationFunction,
+  initialExampleShortHeader: ?ExampleShortHeader,
+  onOpenProjectPreCreationDialog: (
+    assetShortHeader: ?ExampleShortHeader
+  ) => void,
+  isProjectOpening: boolean,
 |};
 
 export type ProjectCreationSettings = {|
@@ -53,27 +56,15 @@ export type OnCreateFromExampleShortHeaderFunction = ({|
 
 type Props = {|
   ...CreateProjectDialogWithComponentsProps,
-  onCreateBlank: OnCreateBlankFunction,
-  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
 |};
 
 const CreateProjectDialog = ({
   open,
   onClose,
-  onOpen,
-  onCreateFromExampleShortHeader,
-  onCreateBlank,
+  initialExampleShortHeader,
+  onOpenProjectPreCreationDialog,
+  isProjectOpening,
 }: Props) => {
-  const [isOpening, setIsOpening] = React.useState<boolean>(false);
-  const [
-    selectedExampleShortHeader,
-    setSelectedExampleShortHeader,
-  ] = React.useState<?ExampleShortHeader>(null);
-  const [
-    preCreationDialogOpen,
-    setPreCreationDialogOpen,
-  ] = React.useState<boolean>(false);
-
   const actions = React.useMemo(
     () => [
       <FlatButton
@@ -87,48 +78,15 @@ const CreateProjectDialog = ({
         id="create-blank-project-button"
         label={<Trans>Create a blank project</Trans>}
         primary
-        onClick={() => {
-          setSelectedExampleShortHeader(null);
-          setPreCreationDialogOpen(true);
-        }}
+        onClick={() =>
+          onOpenProjectPreCreationDialog(/*exampleShortHeader*/ null)
+        }
       />,
     ],
-    [onClose, setPreCreationDialogOpen]
+    [onClose, onOpenProjectPreCreationDialog]
   );
 
   if (!open) return null;
-
-  const createProject = async (
-    i18n: I18nType,
-    settings: ProjectCreationSettings
-  ) => {
-    setIsOpening(true);
-
-    try {
-      let projectMetadata;
-
-      if (selectedExampleShortHeader) {
-        projectMetadata = await onCreateFromExampleShortHeader({
-          i18n,
-          exampleShortHeader: selectedExampleShortHeader,
-          settings,
-        });
-      } else {
-        projectMetadata = await onCreateBlank({
-          i18n,
-          settings,
-        });
-      }
-
-      if (!projectMetadata) return;
-
-      setPreCreationDialogOpen(false);
-      setSelectedExampleShortHeader(null);
-      onOpen({ ...projectMetadata });
-    } finally {
-      setIsOpening(false);
-    }
-  };
 
   return (
     <I18n>
@@ -138,7 +96,9 @@ const CreateProjectDialog = ({
             title={<Trans>Create a new project</Trans>}
             actions={actions}
             onRequestClose={onClose}
-            onApply={() => setPreCreationDialogOpen(true)}
+            onApply={() => {
+              onOpenProjectPreCreationDialog(/*exampleShortHeader*/ null);
+            }}
             open={open}
             noMargin
             fullHeight
@@ -148,28 +108,15 @@ const CreateProjectDialog = ({
               <Column noMargin expand useFullHeight>
                 <ExampleStore
                   focusOnMount
-                  isOpening={isOpening}
-                  onOpen={async (example: ?ExampleShortHeader) => {
-                    setSelectedExampleShortHeader(example);
-                    setPreCreationDialogOpen(true);
+                  isOpening={isProjectOpening}
+                  onOpen={async (exampleShortHeader: ExampleShortHeader) => {
+                    onOpenProjectPreCreationDialog(exampleShortHeader);
                   }}
+                  initialExampleShortHeader={initialExampleShortHeader}
                 />
               </Column>
             </Column>
           </Dialog>
-          {preCreationDialogOpen && (
-            <ProjectPreCreationDialog
-              open
-              isOpening={isOpening}
-              onClose={() => setPreCreationDialogOpen(false)}
-              onCreate={projectName => createProject(i18n, projectName)}
-              sourceExampleName={
-                selectedExampleShortHeader
-                  ? selectedExampleShortHeader.name
-                  : undefined
-              }
-            />
-          )}
         </>
       )}
     </I18n>

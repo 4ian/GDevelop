@@ -22,7 +22,7 @@ type Props = {|
   open: boolean,
   isOpening?: boolean,
   onClose: () => void,
-  onCreate: ProjectCreationSettings => void | Promise<void>,
+  onCreate: ProjectCreationSettings => Promise<void>,
   sourceExampleName?: string,
 |};
 
@@ -49,7 +49,7 @@ const ProjectPreCreationDialog = ({
   );
 
   const onValidate = React.useCallback(
-    () => {
+    async () => {
       if (isOpening) return;
 
       setProjectNameError(null);
@@ -59,7 +59,7 @@ const ProjectPreCreationDialog = ({
         );
         return;
       }
-      onCreate({ projectName, outputPath: app ? outputPath : undefined });
+      await onCreate({ projectName, outputPath: app ? outputPath : undefined });
     },
     [onCreate, projectName, outputPath, isOpening]
   );

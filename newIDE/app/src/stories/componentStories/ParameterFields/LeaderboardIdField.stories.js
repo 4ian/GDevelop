@@ -10,12 +10,7 @@ import LeaderboardIdField from '../../../EventsSheet/ParameterFields/Leaderboard
 import ValueStateHolder from '../../ValueStateHolder';
 
 import LeaderboardContext from '../../../Leaderboard/LeaderboardContext';
-import {
-  type Leaderboard,
-  type LeaderboardSortOption,
-} from '../../../Utils/GDevelopServices/Play';
-
-const gd: libGDevelop = global.gd;
+import { type Leaderboard } from '../../../Utils/GDevelopServices/Play';
 
 export default {
   title: 'ParameterFields/LeaderboardIdField',
@@ -55,7 +50,6 @@ const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
     currentLeaderboard,
     setCurrentLeaderboard,
   ] = React.useState<Leaderboard>(mockedLeaderboards[3]);
-  const [sort, setSort] = React.useState<LeaderboardSortOption>('ASC');
   return (
     <LeaderboardContext.Provider
       value={{

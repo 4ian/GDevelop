@@ -97,8 +97,10 @@ const WrappedHomePage = ({
                 onOpenProjectAfterCreation={() =>
                   action('call callback after project creation')()
                 }
+                onOpenProjectPreCreationDialog={() =>
+                  action('open precreation dialog')()
+                }
                 onOpenProfile={() => action('open profile')()}
-                onCreateBlank={() => action('create blank')()}
                 onChangeSubscription={() => action('change subscription')()}
                 onOpenPreferences={() => action('open preferences')()}
                 onOpenAbout={() => action('open about')()}

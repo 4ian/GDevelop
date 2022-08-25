@@ -38,12 +38,7 @@ import optionalRequire from '../../../../Utils/OptionalRequire';
 import { showErrorBox } from '../../../../UI/Messages/MessageBox';
 import { getRelativeOrAbsoluteDisplayDate } from '../../../../Utils/DateDisplay';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
-import ProjectPreCreationDialog from '../../../../ProjectCreation/ProjectPreCreationDialog';
-import {
-  type ProjectCreationSettings,
-  type OnCreateBlankFunction,
-  type OnOpenProjectAfterCreationFunction,
-} from '../../../../ProjectCreation/CreateProjectDialog';
+import { type OnOpenProjectAfterCreationFunction } from '../../../../ProjectCreation/CreateProjectDialog';
 import { ExampleStoreContext } from '../../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
@@ -83,7 +78,7 @@ type Props = {|
   canOpen: boolean,
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onCreateBlank: OnCreateBlankFunction,
+  onOpenProjectPreCreationDialog: (?ExampleShortHeader) => void,
   onShowAllExamples: () => void,
   onSelectExample: (exampleShortHeader: ExampleShortHeader) => void,
   onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
@@ -132,7 +127,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       project,
       canOpen,
       onChooseProject,
-      onCreateBlank,
+      onOpenProjectPreCreationDialog,
       onShowAllExamples,
       onSelectExample,
       onOpenProjectAfterCreation,
@@ -151,13 +146,6 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     const contextMenu = React.useRef<?ContextMenuInterface>(null);
     const { showDeleteConfirmation } = useConfirmDialog();
     const [pendingProject, setPendingProject] = React.useState<?string>(null);
-    const [isOpeningProject, setIsOpeningProject] = React.useState<boolean>(
-      false
-    );
-    const [
-      preCreationDialogOpen,
-      setPreCreationDialogOpen,
-    ] = React.useState<boolean>(false);
     const windowWidth = useResponsiveWindowWidth();
     const forceUpdate = useForceUpdate();
 
@@ -297,27 +285,6 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       return actions;
     };
 
-    const createProject = async (
-      i18n: I18nType,
-      settings: ProjectCreationSettings
-    ) => {
-      setIsOpeningProject(true);
-
-      try {
-        const projectMetadata = await onCreateBlank({
-          i18n,
-          settings,
-        });
-
-        if (!projectMetadata) return;
-
-        setPreCreationDialogOpen(false);
-        await onOpenProjectAfterCreation({ ...projectMetadata });
-      } finally {
-        setIsOpeningProject(false);
-      }
-    };
-
     const isWindowWidthMediumOrLarger = windowWidth !== 'small';
 
     return (
@@ -373,9 +340,11 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                       <RaisedButton
                         primary
                         label={<Trans>Create a project</Trans>}
-                        onClick={() => {
-                          setPreCreationDialogOpen(true);
-                        }}
+                        onClick={() =>
+                          onOpenProjectPreCreationDialog(
+                            /*exampleShortHeader=*/ null
+                          )
+                        }
                         icon={<Add fontSize="small" />}
                         id="home-create-project-button"
                       />
@@ -581,14 +550,6 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                 buildContextMenu(_i18n, file)
               }
             />
-            {preCreationDialogOpen && (
-              <ProjectPreCreationDialog
-                open
-                isOpening={isOpeningProject}
-                onClose={() => setPreCreationDialogOpen(false)}
-                onCreate={projectName => createProject(i18n, projectName)}
-              />
-            )}
           </>
         )}
       </I18n>

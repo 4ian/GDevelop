@@ -84,7 +84,10 @@ import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
-import { type CreateProjectDialogWithComponentsProps } from '../ProjectCreation/CreateProjectDialog';
+import {
+  type CreateProjectDialogWithComponentsProps,
+  type ProjectCreationSettings,
+} from '../ProjectCreation/CreateProjectDialog';
 import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnCreateBlankFunction,
@@ -137,6 +140,7 @@ import LeaderboardProvider from '../Leaderboard/LeaderboardProvider';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 import { useLeaderboardReplacer } from '../Leaderboard/useLeaderboardReplacer';
 import useConfirmDialog from '../UI/Confirm/useConfirmDialog';
+import ProjectPreCreationDialog from '../ProjectCreation/ProjectPreCreationDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -319,6 +323,17 @@ const MainFrame = (props: Props) => {
     subscriptionDialogOpen,
     openSubscriptionDialog,
   ] = React.useState<boolean>(false);
+  const [
+    projectPreCreationDialogOpen,
+    setProjectPreCreationDialogOpen,
+  ] = React.useState<boolean>(false);
+  const [
+    selectedExampleShortHeader,
+    setSelectedExampleShortHeader,
+  ] = React.useState<?ExampleShortHeader>(null);
+  const [isProjectOpening, setIsProjectOpening] = React.useState<boolean>(
+    false
+  );
   const [exportDialogOpen, openExportDialog] = React.useState<boolean>(false);
   const { showConfirmation } = useConfirmDialog();
   const preferences = React.useContext(PreferencesContext);
@@ -2215,6 +2230,34 @@ const MainFrame = (props: Props) => {
     }
   };
 
+  const createProject = async (
+    i18n: I18n,
+    settings: ProjectCreationSettings
+  ) => {
+    setIsProjectOpening(true);
+
+    try {
+      const projectMetadata = selectedExampleShortHeader
+        ? await onCreateFromExampleShortHeader({
+            i18n,
+            exampleShortHeader: selectedExampleShortHeader,
+            settings,
+          })
+        : await onCreateBlank({
+            i18n,
+            settings,
+          });
+
+      if (!projectMetadata) return;
+
+      setProjectPreCreationDialogOpen(false);
+      setSelectedExampleShortHeader(null);
+      onOpenProjectAfterCreation({ ...projectMetadata });
+    } finally {
+      setIsProjectOpening(false);
+    }
+  };
+
   const simulateUpdateDownloaded = () =>
     setElectronUpdateStatus({
       status: 'update-downloaded',
@@ -2259,7 +2302,7 @@ const MainFrame = (props: Props) => {
     onLaunchDebugPreview: launchDebuggerAndPreview,
     onLaunchNetworkPreview: launchNetworkPreview,
     onOpenHomePage: openHomePage,
-    onCreateProject: () => openCreateProjectDialog(true, null),
+    onCreateBlank: () => setProjectPreCreationDialogOpen(true),
     onOpenProject: chooseProject,
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
@@ -2299,6 +2342,7 @@ const MainFrame = (props: Props) => {
           onCloseApp: closeApp,
           onExportProject: () => openExportDialog(true),
           onCreateProject: () => openCreateProjectDialog(true, null),
+          onCreateBlank: () => setProjectPreCreationDialogOpen(true),
           onOpenProjectManager: () => openProjectManager(true),
           onOpenHomePage: openHomePage,
           onOpenDebugger: openDebugger,
@@ -2470,8 +2514,10 @@ const MainFrame = (props: Props) => {
                     ).length,
                     onChooseProject: chooseProject,
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
-                    onCreateFromExampleShortHeader: onCreateFromExampleShortHeader,
-                    onCreateBlank: onCreateBlank,
+                    onOpenProjectPreCreationDialog: exampleShortHeader => {
+                      setSelectedExampleShortHeader(exampleShortHeader);
+                      setProjectPreCreationDialogOpen(true);
+                    },
                     onOpenProjectAfterCreation: onOpenProjectAfterCreation,
                     onOpenProjectManager: () => openProjectManager(true),
                     onCloseProject: () => askToCloseProject(),
@@ -2548,8 +2594,12 @@ const MainFrame = (props: Props) => {
         renderCreateDialog({
           open: state.createDialogOpen,
           onClose: closeCreateDialog,
-          onOpen: onOpenProjectAfterCreation,
           initialExampleShortHeader: state.initialExampleShortHeader,
+          onOpenProjectPreCreationDialog: exampleShortHeader => {
+            setSelectedExampleShortHeader(exampleShortHeader);
+            setProjectPreCreationDialogOpen(true);
+          },
+          isProjectOpening: isProjectOpening,
         })}
       {!!introDialog &&
         introDialogOpen &&
@@ -2613,6 +2663,19 @@ const MainFrame = (props: Props) => {
             openSubscriptionDialog(false);
           }}
           open
+        />
+      )}
+      {projectPreCreationDialogOpen && (
+        <ProjectPreCreationDialog
+          open
+          isOpening={isProjectOpening}
+          onClose={() => setProjectPreCreationDialogOpen(false)}
+          onCreate={projectName => createProject(i18n, projectName)}
+          sourceExampleName={
+            selectedExampleShortHeader
+              ? selectedExampleShortHeader.name
+              : undefined
+          }
         />
       )}
       {preferencesDialogOpen && (

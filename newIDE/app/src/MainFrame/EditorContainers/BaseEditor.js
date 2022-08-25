@@ -9,11 +9,7 @@ import type { StorageProvider } from '../../ProjectsStorage';
 import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
-import {
-  type OnCreateFromExampleShortHeaderFunction,
-  type OnCreateBlankFunction,
-  type OnOpenProjectAfterCreationFunction,
-} from '../../ProjectCreation/CreateProjectDialog';
+import { type OnOpenProjectAfterCreationFunction } from '../../ProjectCreation/CreateProjectDialog';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 
@@ -96,8 +92,7 @@ export type RenderEditorContainerProps = {|
   ) => void,
 
   // Project creation
-  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
-  onCreateBlank: OnCreateBlankFunction,
+  onOpenProjectPreCreationDialog: (?ExampleShortHeader) => void,
   onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
 |};
 

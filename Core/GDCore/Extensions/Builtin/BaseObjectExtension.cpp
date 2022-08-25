@@ -1098,7 +1098,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Target Y position"));
 
   obj.AddExpression("Variable",
-                    _("Object variable"),
+                    _("Value of an object variable"),
                     _("Value of an object variable"),
                     _("Variables"),
                     "res/actions/var.png")
@@ -1114,7 +1114,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"));
 
   obj.AddStrExpression("VariableString",
-                       _("Object variable"),
+                       _("Text of an object variable"),
                        _("Text of an object variable"),
                        _("Variables"),
                        "res/actions/var.png")

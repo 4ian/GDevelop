@@ -1,51 +1,25 @@
 // @flow
 import * as React from 'react';
-import { type Tutorial } from '../../../../Utils/GDevelopServices/Tutorial';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
-import { Column, Line } from '../../../../UI/Grid';
+import { Column, Line } from './Grid';
 import {
   useResponsiveWindowWidth,
   type WidthType,
-} from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import { CorsAwareImage } from '../../../../UI/CorsAwareImage';
-import Text from '../../../../UI/Text';
-import { shortenString } from '../../../../Utils/StringHelpers';
-import { sendTutorialOpened } from '../../../../Utils/Analytics/EventSender';
-import Window from '../../../../Utils/Window';
-import { Trans } from '@lingui/macro';
+} from './Reponsive/ResponsiveWindowMeasurer';
+import { CorsAwareImage } from './CorsAwareImage';
+import Text from './Text';
 import { Typography } from '@material-ui/core';
+import { shortenString } from '../Utils/StringHelpers';
 
-const secondsToMinutesAndSeconds = (seconds: number) => {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  const formattedRemainingSeconds =
-    remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds;
-  return `${minutes}:${formattedRemainingSeconds}`;
-};
-
-const getColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
-    case 'small':
-      return 1;
-    case 'medium':
-      return 3;
-    case 'large':
-    default:
-      return 5;
-  }
-};
-const MAX_COLUMNS = getColumnsFromWidth('large');
 const MAX_TILE_SIZE = 300;
+const SPACING = 8;
 
 const styles = {
-  tutorialsContainer: {
+  container: {
     marginTop: 25,
-  },
-  grid: {
-    maxWidth: (MAX_TILE_SIZE + 2 * 8) * MAX_COLUMNS, // Avoid tiles taking too much space on large screens.
   },
   buttonStyle: {
     textAlign: 'left',
@@ -92,6 +66,7 @@ const useStylesForTile = makeStyles(theme =>
     tile: {
       borderRadius: 8,
       padding: 4,
+      height: 'auto',
       '&:focus': {
         backgroundColor: theme.palette.action.hover,
       },
@@ -102,57 +77,79 @@ const useStylesForTile = makeStyles(theme =>
   })
 );
 
-const ImageOverlay = ({ text }) => (
+const ImageOverlay = ({ content }: {| content: React.Node |}) => (
   <div style={styles.overlay}>
     <Typography variant="body1" style={styles.overlayText}>
-      {text ? secondsToMinutesAndSeconds(text) : <Trans>Text</Trans>}
+      {content}
     </Typography>
   </div>
 );
 
-type TutorialsGridProps = {|
-  tutorials: Array<Tutorial>,
-  limit?: number,
+export type ImageTileComponent = {|
+  onClick: (item: any) => void,
+  imageUrl: string,
+  title?: string,
+  description?: string,
+  overlayText?: string | React.Node,
 |};
 
-const TutorialsGrid = ({ tutorials, limit }: TutorialsGridProps) => {
+type ImageTileGridProps = {|
+  items: Array<ImageTileComponent>,
+  getColumnsFromWidth: (width: WidthType) => number,
+  getLimitFromWidth?: (width: WidthType) => number,
+|};
+
+const ImageTileGrid = ({
+  items,
+  getColumnsFromWidth,
+  getLimitFromWidth,
+}: ImageTileGridProps) => {
   const windowWidth = useResponsiveWindowWidth();
   const tileClasses = useStylesForTile();
-  const tutorialsToDisplay = limit ? tutorials.slice(0, limit) : tutorials;
+  const MAX_COLUMNS = getColumnsFromWidth('large');
+  const limit = getLimitFromWidth ? getLimitFromWidth(windowWidth) : undefined;
+  const itemsToDisplay = limit ? items.slice(0, limit) : items;
 
   return (
-    <div style={styles.tutorialsContainer}>
+    <div style={styles.container}>
       <Line noMargin>
         <GridList
           cols={getColumnsFromWidth(windowWidth)}
-          style={styles.grid}
+          style={{
+            maxWidth: (MAX_TILE_SIZE + 2 * SPACING) * MAX_COLUMNS, // Avoid tiles taking too much space on large screens.
+          }}
           cellHeight="auto"
-          spacing={16}
+          spacing={SPACING * 2}
         >
-          {tutorialsToDisplay.map((tutorial, index) => (
+          {itemsToDisplay.map((item, index) => (
             <GridListTile key={index} classes={tileClasses}>
               <ButtonBase
                 style={styles.buttonStyle}
-                onClick={() => {
-                  sendTutorialOpened(tutorial.id);
-                  Window.openExternalURL(tutorial.link);
-                }}
+                onClick={item.onClick}
+                tabIndex={0}
+                focusRipple
               >
                 <Column noMargin>
                   <div style={styles.imageContainer}>
                     <CorsAwareImage
                       style={styles.thumbnailImageWithDescription}
-                      src={tutorial.thumbnailUrl}
-                      alt={tutorial.title}
+                      src={item.imageUrl}
+                      alt={`thumbnail ${index}`}
                     />
-                    <ImageOverlay text={tutorial.duration} />
+                    {item.overlayText && (
+                      <ImageOverlay content={item.overlayText} />
+                    )}
                   </div>
-                  <div style={styles.titleContainer}>
-                    <Text size="sub-title">{tutorial.title}</Text>
-                  </div>
-                  <Text size="body" color="secondary">
-                    {shortenString(tutorial.description, 120)}
-                  </Text>
+                  {item.title && (
+                    <div style={styles.titleContainer}>
+                      <Text size="sub-title">{item.title}</Text>
+                    </div>
+                  )}
+                  {item.description && (
+                    <Text size="body" color="secondary">
+                      {shortenString(item.description, 120)}
+                    </Text>
+                  )}
                 </Column>
               </ButtonBase>
             </GridListTile>
@@ -163,4 +160,4 @@ const TutorialsGrid = ({ tutorials, limit }: TutorialsGridProps) => {
   );
 };
 
-export default TutorialsGrid;
+export default ImageTileGrid;

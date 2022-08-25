@@ -16,6 +16,7 @@ import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Exam
 import { sendTutorialOpened } from '../../../../Utils/Analytics/EventSender';
 import Window from '../../../../Utils/Window';
 import { secondsToMinutesAndSeconds } from '../../../../Utils/DateDisplay';
+import { type ImageTileComponent } from '../../../../UI/ImageTileGrid';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -46,10 +47,12 @@ export const TUTORIAL_CATEGORY_TEXTS = {
   },
 };
 
-export const formatTutorialToWidgetItem = (tutorial: Tutorial) => ({
+export const formatTutorialToImageTileComponent = (
+  tutorial: Tutorial
+): ImageTileComponent => ({
   title: tutorial.title,
   description: tutorial.description,
-  onClick: (tutorial: Tutorial) => {
+  onClick: () => {
     sendTutorialOpened(tutorial.id);
     Window.openExternalURL(tutorial.link);
   },

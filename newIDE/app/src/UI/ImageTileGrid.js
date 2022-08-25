@@ -86,7 +86,7 @@ const ImageOverlay = ({ content }: {| content: React.Node |}) => (
 );
 
 export type ImageTileComponent = {|
-  onClick: (item: any) => void,
+  onClick: () => void,
   imageUrl: string,
   title?: string,
   description?: string,

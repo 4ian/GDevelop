@@ -94,6 +94,7 @@ export const create = (authentication: Authentication) => {
                   onCreateFromExampleShortHeader={
                     onCreateFromExampleShortHeader
                   }
+                  initialExampleShortHeader={props.initialExampleShortHeader}
                 />
               )}
               storageProviders={storageProviders}

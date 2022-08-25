@@ -16,6 +16,7 @@ export type MainMenuProps = {|
   onCloseApp: () => void,
   onExportProject: (open?: boolean) => void,
   onCreateProject: (open?: boolean) => void,
+  onCreateBlank: () => void,
   onOpenProjectManager: (open?: boolean) => void,
   onOpenHomePage: () => void,
   onOpenDebugger: () => void,

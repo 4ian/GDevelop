@@ -3,10 +3,7 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { Line, Column } from '../../../UI/Grid';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
-import {
-  type OnCreateBlankFunction,
-  type OnOpenProjectAfterCreationFunction,
-} from '../../../ProjectCreation/CreateProjectDialog';
+import { type OnOpenProjectAfterCreationFunction } from '../../../ProjectCreation/CreateProjectDialog';
 import {
   type FileMetadataAndStorageProviderName,
   type StorageProvider,
@@ -51,7 +48,7 @@ type Props = {|
   onOpenAbout: () => void,
 
   // Project creation
-  onCreateBlank: OnCreateBlankFunction,
+  onOpenProjectPreCreationDialog: (?ExampleShortHeader) => void,
   onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
 |};
 
@@ -69,7 +66,7 @@ export const HomePage = React.memo<Props>(
         canOpen,
         onChooseProject,
         onOpenRecentFile,
-        onCreateBlank,
+        onOpenProjectPreCreationDialog,
         onOpenProjectAfterCreation,
         onCreateProject,
         onOpenProjectManager,
@@ -190,7 +187,9 @@ export const HomePage = React.memo<Props>(
                       project={project}
                       canOpen={canOpen}
                       onChooseProject={onChooseProject}
-                      onCreateBlank={onCreateBlank}
+                      onOpenProjectPreCreationDialog={
+                        onOpenProjectPreCreationDialog
+                      }
                       onShowAllExamples={() =>
                         onCreateProject(/*exampleShortHeader=*/ null)
                       }
@@ -242,7 +241,7 @@ export const renderHomePageContainer = (
     onOpenProjectAfterCreation={props.onOpenProjectAfterCreation}
     onOpenRecentFile={props.onOpenRecentFile}
     onCreateProject={props.onCreateProject}
-    onCreateBlank={props.onCreateBlank}
+    onOpenProjectPreCreationDialog={props.onOpenProjectPreCreationDialog}
     onOpenProjectManager={props.onOpenProjectManager}
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}

@@ -16,15 +16,17 @@ const styles = {
     position: 'absolute',
     transform: 'translate(-6px, -5px)',
     cursor: 'move',
+    width: 11,
+    height: 11,
   },
   highlightedPoint: {
     outline: '1px solid black',
-    background: 'rgba(255, 255, 255, 0.5)',
+    backdropFilter: 'brightness(200%)',
     zIndex: highlightedPointZIndex,
   },
   selectedPoint: {
     outline: '1px solid blue',
-    background: 'rgba(255, 255, 255, 0.5)',
+    backdropFilter: 'brightness(130%)',
     zIndex: selectedPointZIndex,
   },
 };
@@ -147,23 +149,22 @@ const PointsPreview = (props: Props) => {
   ) => {
     const pointName = getPointName(kind, point);
     return (
-      <img
-        src={getImageSrc(kind)}
+      <div
         title={pointName}
         style={{
+          backgroundImage: `url(${getImageSrc(kind)})`,
           left: x,
           top: y,
           ...styles.point,
-          ...(pointName === selectedPointName
-            ? styles.selectedPoint
-            : pointName === highlightedPointName
+          ...(pointName === highlightedPointName
             ? styles.highlightedPoint
+            : pointName === selectedPointName
+            ? styles.selectedPoint
             : null),
         }}
         alt=""
         key={name}
         onPointerDown={e => {
-          e.preventDefault(); // Disable dragging ghost image on Firefox
           onStartDragPoint(point, kind);
         }}
       />

@@ -72,7 +72,7 @@ const BitGroupEditor = (props: {|
 const Physics2Editor = (props: Props) => {
   const { current: resourcesLoader } = React.useRef(ResourcesLoader);
   const [image, setImage] = React.useState('');
-  const { behavior, behaviorContent } = props;
+  const { behavior } = props;
   const forceUpdate = useForceUpdate();
 
   const isBitEnabled = (bitsValue: number, pos: number) => {
@@ -85,7 +85,7 @@ const Physics2Editor = (props: Props) => {
     return bitsValue;
   };
 
-  const properties = behavior.getProperties(behaviorContent.getContent());
+  const properties = behavior.getProperties();
   const bits = Array(16).fill(null);
   const shape = properties.get('shape').getValue();
   const layersValues = parseInt(properties.get('layers').getValue(), 10);
@@ -104,11 +104,7 @@ const Physics2Editor = (props: Props) => {
           floatingLabelText={properties.get('bodyType').getLabel()}
           value={properties.get('bodyType').getValue()}
           onChange={(e, i, newValue: string) => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'bodyType',
-              newValue
-            );
+            behavior.updateProperty('bodyType', newValue);
             forceUpdate();
           }}
         >
@@ -136,11 +132,7 @@ const Physics2Editor = (props: Props) => {
           label={properties.get('bullet').getLabel()}
           checked={properties.get('bullet').getValue() === 'true'}
           onCheck={(e, checked) => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'bullet',
-              checked ? '1' : '0'
-            );
+            behavior.updateProperty('bullet', checked ? '1' : '0');
             forceUpdate();
           }}
         />
@@ -148,11 +140,7 @@ const Physics2Editor = (props: Props) => {
           label={properties.get('fixedRotation').getLabel()}
           checked={properties.get('fixedRotation').getValue() === 'true'}
           onCheck={(e, checked) => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'fixedRotation',
-              checked ? '1' : '0'
-            );
+            behavior.updateProperty('fixedRotation', checked ? '1' : '0');
             forceUpdate();
           }}
         />
@@ -160,11 +148,7 @@ const Physics2Editor = (props: Props) => {
           label={properties.get('canSleep').getLabel()}
           checked={properties.get('canSleep').getValue() === 'true'}
           onCheck={(e, checked) => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'canSleep',
-              checked ? '1' : '0'
-            );
+            behavior.updateProperty('canSleep', checked ? '1' : '0');
             forceUpdate();
           }}
         />
@@ -189,11 +173,7 @@ const Physics2Editor = (props: Props) => {
           floatingLabelText={properties.get('shape').getLabel()}
           value={properties.get('shape').getValue()}
           onChange={(e, i, newValue: string) => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'shape',
-              newValue
-            );
+            behavior.updateProperty('shape', newValue);
             forceUpdate();
           }}
         >
@@ -229,7 +209,6 @@ const Physics2Editor = (props: Props) => {
             min={0}
             onChange={newValue => {
               behavior.updateProperty(
-                behaviorContent.getContent(),
                 shape === 'Polygon' ? 'PolygonOriginX' : 'shapeDimensionA',
                 newValue
               );
@@ -249,7 +228,6 @@ const Physics2Editor = (props: Props) => {
             min={shape === 'Edge' ? undefined : 0}
             onChange={newValue => {
               behavior.updateProperty(
-                behaviorContent.getContent(),
                 shape === 'Polygon' ? 'PolygonOriginY' : 'shapeDimensionB',
                 newValue
               );
@@ -264,11 +242,7 @@ const Physics2Editor = (props: Props) => {
             floatingLabelText={properties.get('polygonOrigin').getLabel()}
             value={properties.get('polygonOrigin').getValue()}
             onChange={(e, i, newValue: string) => {
-              behavior.updateProperty(
-                behaviorContent.getContent(),
-                'polygonOrigin',
-                newValue
-              );
+              behavior.updateProperty('polygonOrigin', newValue);
               forceUpdate();
             }}
           >
@@ -296,11 +270,7 @@ const Physics2Editor = (props: Props) => {
           propertyName={'shapeOffsetX'}
           step={1}
           onUpdate={newValue => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'shapeOffsetX',
-              newValue
-            );
+            behavior.updateProperty('shapeOffsetX', newValue);
             forceUpdate();
           }}
         />
@@ -309,11 +279,7 @@ const Physics2Editor = (props: Props) => {
           propertyName={'shapeOffsetY'}
           step={1}
           onUpdate={newValue => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'shapeOffsetY',
-              newValue
-            );
+            behavior.updateProperty('shapeOffsetY', newValue);
             forceUpdate();
           }}
         />
@@ -373,9 +339,7 @@ const Physics2Editor = (props: Props) => {
               renderOverlay={overlayProps => {
                 // The result from `getProperties` is temporary, and because this renderOverlay
                 // function can be called outside of the render, we must get the properties again.
-                const properties = behavior.getProperties(
-                  behaviorContent.getContent()
-                );
+                const properties = behavior.getProperties();
 
                 return (
                   <ShapePreview
@@ -406,7 +370,6 @@ const Physics2Editor = (props: Props) => {
                       vertices[index].x = newX;
                       vertices[index].y = newY;
                       behavior.updateProperty(
-                        behaviorContent.getContent(),
                         'vertices',
                         JSON.stringify(vertices)
                       );
@@ -426,42 +389,26 @@ const Physics2Editor = (props: Props) => {
             onChangeVertexX={(newValue, index) => {
               let vertices = JSON.parse(properties.get('vertices').getValue());
               vertices[index].x = newValue;
-              behavior.updateProperty(
-                behaviorContent.getContent(),
-                'vertices',
-                JSON.stringify(vertices)
-              );
+              behavior.updateProperty('vertices', JSON.stringify(vertices));
               forceUpdate();
             }}
             onChangeVertexY={(newValue, index) => {
               let vertices = JSON.parse(properties.get('vertices').getValue());
               vertices[index].y = newValue;
-              behavior.updateProperty(
-                behaviorContent.getContent(),
-                'vertices',
-                JSON.stringify(vertices)
-              );
+              behavior.updateProperty('vertices', JSON.stringify(vertices));
               forceUpdate();
             }}
             onAdd={() => {
               let vertices = JSON.parse(properties.get('vertices').getValue());
               if (vertices.length >= 8) return;
               vertices.push({ x: 0, y: 0 });
-              behavior.updateProperty(
-                behaviorContent.getContent(),
-                'vertices',
-                JSON.stringify(vertices)
-              );
+              behavior.updateProperty('vertices', JSON.stringify(vertices));
               forceUpdate();
             }}
             onRemove={index => {
               let vertices = JSON.parse(properties.get('vertices').getValue());
               vertices.splice(index, 1);
-              behavior.updateProperty(
-                behaviorContent.getContent(),
-                'vertices',
-                JSON.stringify(vertices)
-              );
+              behavior.updateProperty('vertices', JSON.stringify(vertices));
               forceUpdate();
             }}
           />
@@ -474,7 +421,6 @@ const Physics2Editor = (props: Props) => {
           step={0.1}
           onUpdate={newValue => {
             behavior.updateProperty(
-              behaviorContent.getContent(),
               'density',
               parseFloat(newValue) > 0 ? newValue : '0'
             );
@@ -486,11 +432,7 @@ const Physics2Editor = (props: Props) => {
           propertyName={'gravityScale'}
           step={0.1}
           onUpdate={newValue => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'gravityScale',
-              newValue
-            );
+            behavior.updateProperty('gravityScale', newValue);
             forceUpdate();
           }}
         />
@@ -502,7 +444,6 @@ const Physics2Editor = (props: Props) => {
           step={0.1}
           onUpdate={newValue => {
             behavior.updateProperty(
-              behaviorContent.getContent(),
               'friction',
               parseFloat(newValue) > 0 ? newValue : '0'
             );
@@ -515,7 +456,6 @@ const Physics2Editor = (props: Props) => {
           step={0.1}
           onUpdate={newValue => {
             behavior.updateProperty(
-              behaviorContent.getContent(),
               'restitution',
               parseFloat(newValue) > 0 ? newValue : '0'
             );
@@ -529,11 +469,7 @@ const Physics2Editor = (props: Props) => {
           propertyName={'linearDamping'}
           step={0.05}
           onUpdate={newValue => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'linearDamping',
-              newValue
-            );
+            behavior.updateProperty('linearDamping', newValue);
             forceUpdate();
           }}
         />
@@ -542,11 +478,7 @@ const Physics2Editor = (props: Props) => {
           propertyName={'angularDamping'}
           step={0.05}
           onUpdate={newValue => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'angularDamping',
-              newValue
-            );
+            behavior.updateProperty('angularDamping', newValue);
             forceUpdate();
           }}
         />
@@ -559,11 +491,7 @@ const Physics2Editor = (props: Props) => {
           bits={bits.map((_, idx) => isBitEnabled(layersValues, idx))}
           onChange={(index, value) => {
             const newValue = enableBit(layersValues, index, value);
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'layers',
-              newValue.toString(10)
-            );
+            behavior.updateProperty('layers', newValue.toString(10));
             forceUpdate();
           }}
         />
@@ -576,11 +504,7 @@ const Physics2Editor = (props: Props) => {
           bits={bits.map((_, idx) => isBitEnabled(masksValues, idx))}
           onChange={(index, value) => {
             const newValue = enableBit(masksValues, index, value);
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'masks',
-              newValue.toString(10)
-            );
+            behavior.updateProperty('masks', newValue.toString(10));
             forceUpdate();
           }}
         />

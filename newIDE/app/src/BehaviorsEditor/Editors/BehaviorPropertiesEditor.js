@@ -12,14 +12,13 @@ type Props = BehaviorEditorProps;
 
 export default class BehaviorPropertiesEditor extends React.Component<Props> {
   render() {
-    const { behavior, behaviorContent, object } = this.props;
-    const properties = behavior.getProperties(behaviorContent.getContent());
+    const { behavior, object } = this.props;
 
     const propertiesSchema = propertiesMapToSchema(
-      properties,
-      behaviorContent => behavior.getProperties(behaviorContent.getContent()),
-      (behaviorContent, name, value) => {
-        behavior.updateProperty(behaviorContent.getContent(), name, value);
+      behavior.getProperties(),
+      behavior => behavior.getProperties(),
+      (behavior, name, value) => {
+        behavior.updateProperty(name, value);
       },
       object
     );
@@ -27,10 +26,7 @@ export default class BehaviorPropertiesEditor extends React.Component<Props> {
     return (
       <Column expand>
         {propertiesSchema.length ? (
-          <PropertiesEditor
-            schema={propertiesSchema}
-            instances={[behaviorContent]}
-          />
+          <PropertiesEditor schema={propertiesSchema} instances={[behavior]} />
         ) : (
           <EmptyMessage>
             <Trans>

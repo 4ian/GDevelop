@@ -179,6 +179,8 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
   render() {
     const { eventsBasedObject, project } = this.props;
 
+    // TODO EBO When adding an object, filter the object types to excludes
+    // object that depend (transitively) on this object to avoid cycles.
     return (
       <I18n>
         {({ i18n }) => (

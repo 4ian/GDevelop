@@ -5,7 +5,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/WholeProjectRefactorer.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
-#include "GDCore/Project/BehaviorContent.h"
+#include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
 
@@ -17,7 +17,7 @@ void CustomObjectTypeRenamer::DoVisitObject(gd::Object& object) {
   }
 };
 
-void CustomObjectTypeRenamer::DoVisitBehavior(gd::BehaviorContent& behavior) {};
+void CustomObjectTypeRenamer::DoVisitBehavior(gd::Behavior& behavior) {};
 
 CustomObjectTypeRenamer::~CustomObjectTypeRenamer() {}
 

@@ -183,7 +183,7 @@ export const addAssetToProject = async ({
     const renamedResourcesMap = toNewGdMapStringString(resourceNewNames);
     const resourcesRenamer = new gd.ResourcesRenamer(renamedResourcesMap);
     renamedResourcesMap.delete();
-    object.exposeResources(resourcesRenamer);
+    object.getConfiguration().exposeResources(resourcesRenamer);
     resourcesRenamer.delete();
 
     objectAsset.customization.forEach(customization => {
@@ -200,21 +200,16 @@ export const addAssetToProject = async ({
           );
         }
 
-        const behavior = behaviorMetadata.get();
         // TODO: When this feature is exposed to users, we might want to use
         // gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors instead.
         // And add analytics for this.
-        const behaviorContent = object.addNewBehavior(
+        const behavior = object.addNewBehavior(
           project,
           behaviorType,
           behaviorName
         );
         customization.properties.forEach(property => {
-          behavior.updateProperty(
-            behaviorContent.getContent(),
-            property.name,
-            property.defaultValue
-          );
+          behavior.updateProperty(property.name, property.defaultValue);
         });
       }
     });

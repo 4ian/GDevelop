@@ -33,7 +33,7 @@ ShapePainterObjectBase::ShapePainterObjectBase()
       clearBetweenFrames(true),
       absoluteCoordinates(false) {}
 
-ShapePainterObject::ShapePainterObject(gd::String name_) : gd::Object(name_) {}
+ShapePainterObject::ShapePainterObject() {}
 
 void ShapePainterObjectBase::DoUnserializeFrom(
     gd::Project& project, const gd::SerializerElement& element) {

@@ -110,8 +110,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     },
     [currentTab]
   );
-
-  return (
+    return (
     <Dialog
       key={props.object && props.object.ptr}
       actions={[
@@ -206,7 +205,7 @@ const InnerDialog = (props: InnerDialogProps) => {
             </Column>
           </Line>
           <EditorComponent
-            object={props.object}
+            object={props.object.getConfiguration()}
             project={props.project}
             resourceSources={props.resourceSources}
             onChooseResource={props.onChooseResource}
@@ -336,7 +335,7 @@ export default class ObjectEditorDialog extends Component<Props, State> {
         editorComponent={editorComponent}
         key={this.props.object && this.props.object.ptr}
         helpPagePath={helpPagePath}
-        object={castToObjectType(object)}
+        object={object}
         objectName={this.state.objectName}
         initialTab={initialTab}
       />

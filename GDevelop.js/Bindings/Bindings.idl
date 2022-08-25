@@ -121,8 +121,8 @@ interface ProjectHelper {
     void STATIC_InitializePlatforms();
     [Const, Value] DOMString STATIC_SanityCheckBehaviorProperty(Behavior behavior, [Const] DOMString propertyName, [Const] DOMString newValue);
     [Const, Value] DOMString STATIC_SanityCheckBehaviorsSharedDataProperty(BehaviorsSharedData behavior, [Const] DOMString propertyName, [Const] DOMString newValue);
-    [Const, Value] DOMString STATIC_SanityCheckObjectProperty(gdObject obj, [Const] DOMString propertyName, [Const] DOMString newValue);
-    [Const, Value] DOMString STATIC_SanityCheckObjectInitialInstanceProperty(gdObject obj, [Const] DOMString propertyName, [Const] DOMString newValue);
+    [Const, Value] DOMString STATIC_SanityCheckObjectProperty(ObjectConfiguration configuration, [Const] DOMString propertyName, [Const] DOMString newValue);
+    [Const, Value] DOMString STATIC_SanityCheckObjectInitialInstanceProperty(ObjectConfiguration configuration, [Const] DOMString propertyName, [Const] DOMString newValue);
 };
 
 interface EventsVariablesFinder {
@@ -503,11 +503,14 @@ interface Behavior {
     void Behavior();
 
     Behavior Clone();
+
+    void SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
     [Const, Ref] DOMString GetTypeName();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorContent);
-    boolean UpdateProperty([Ref] SerializerElement behaviorContent, [Const] DOMString name, [Const] DOMString value);
-    void InitializeContent([Ref] SerializerElement behaviorContent);
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
+    void InitializeContent();
 };
 
 [JSImplementation=Behavior]
@@ -519,25 +522,16 @@ interface BehaviorJsImplementation {
     void InitializeContent([Ref] SerializerElement behaviorContent);
 };
 
-interface BehaviorContent {
-    void BehaviorContent([Const] DOMString name, [Const] DOMString type);
-
-    BehaviorContent Clone();
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    [Const, Ref] DOMString GetTypeName();
-    [Ref] SerializerElement GetContent();
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
-};
-
 interface BehaviorsSharedData {
     void BehaviorsSharedData();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorSharedDataContent);
-    boolean UpdateProperty([Ref] SerializerElement behaviorSharedDataContent, [Const] DOMString name, [Const] DOMString value);
-    void InitializeContent([Ref] SerializerElement behaviorSharedDataContent);
+    void SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
+    [Const, Ref] DOMString GetTypeName();
+
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
+    void InitializeContent();
 };
 
 [JSImplementation=BehaviorsSharedData]
@@ -549,10 +543,33 @@ interface BehaviorSharedDataJsImplementation {
     void InitializeContent([Ref] SerializerElement behaviorSharedDataContent);
 };
 
+interface ObjectConfiguration {
+    void ObjectConfiguration();
+    [Value] UniquePtrObjectConfiguration Clone();
+
+    [Const, Ref] DOMString GetType();
+
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
+
+    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
+    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
+
+    void ExposeResources([Ref] ArbitraryResourceWorker worker);
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+};
+
+interface UniquePtrObjectConfiguration {
+    ObjectConfiguration get();
+    ObjectConfiguration release();
+};
+
 interface gdObject {
     // /!\ We need to call it gdObject to avoid messing up with javascript Object
     //     global in glue.js!
-    void gdObject([Const] DOMString name);
+    //void gdObject([Const] DOMString name, [Value] UniquePtrObjectConfiguration configuration);
     [Value] UniquePtrObject Clone();
 
     void SetName([Const] DOMString name);
@@ -564,20 +581,14 @@ interface gdObject {
     void SetTags([Const] DOMString tags);
     [Const, Ref] DOMString GetTags();
 
-    [Value] MapStringPropertyDescriptor GetProperties();
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
-
-    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
-    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
-
-    void ExposeResources([Ref] ArbitraryResourceWorker worker);
+    [Ref] ObjectConfiguration GetConfiguration();
 
     [Ref] VariablesContainer GetVariables();
     [Ref] EffectsContainer GetEffects();
     [Value] VectorString GetAllBehaviorNames();
     boolean HasBehaviorNamed([Const] DOMString name);
-    BehaviorContent AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
-    [Ref] BehaviorContent GetBehavior([Const] DOMString name);
+    Behavior AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
+    [Ref] Behavior GetBehavior([Const] DOMString name);
     void RemoveBehavior([Const] DOMString name);
     boolean RenameBehavior([Const] DOMString oldName, [Const] DOMString name);
 
@@ -590,10 +601,10 @@ interface UniquePtrObject {
     gdObject release();
 };
 
-[JSImplementation=gdObject]
+[JSImplementation=ObjectConfiguration]
 interface ObjectJsImplementation {
     void ObjectJsImplementation();
-    [Value] UniquePtrObject Clone();
+    [Value] UniquePtrObjectConfiguration Clone();
 
     [Value] MapStringPropertyDescriptor GetProperties();
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
@@ -603,24 +614,6 @@ interface ObjectJsImplementation {
 
     [Const, Ref] DOMString GetRawJSONContent();
     [Ref] ObjectJsImplementation SetRawJSONContent([Const] DOMString newContent);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
-
-    // Not exposed as protected:
-    // void DoSerializeTo([Ref] SerializerElement element);
-    // void DoUnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
-};
-
-interface CustomObject {
-    void CustomObject([Const, Ref] EventsBasedObject eventsBasedObject, [Const] DOMString fullType);
-    [Value] UniquePtrObject Clone();
-
-    [Value] MapStringPropertyDescriptor GetProperties();
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
-
-    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
-    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
@@ -648,7 +641,7 @@ interface Layout {
     void UpdateBehaviorsSharedData([Ref] Project project);
     [Value] VectorString GetAllBehaviorSharedDataNames();
     boolean HasBehaviorSharedData([Const] DOMString behaviorName);
-    [Ref] BehaviorContent GetBehaviorSharedData([Const] DOMString behaviorName);
+    [Ref] BehaviorsSharedData GetBehaviorSharedData([Const] DOMString behaviorName);
 
     void InsertNewLayer([Const] DOMString name, unsigned long position);
     void InsertLayer([Const, Ref] Layer layer, unsigned long position);
@@ -1614,11 +1607,22 @@ interface PlatformExtension {
         Behavior instance,
         BehaviorsSharedData sharedDatasInstance);
 
+    [Ref] BehaviorMetadata AddEventsBasedBehavior([Const] DOMString name,
+        [Const] DOMString fullname,
+        [Const] DOMString description,
+        [Const] DOMString group,
+        [Const] DOMString icon24x24);
+
     [Ref] ObjectMetadata WRAPPED_AddObject([Const] DOMString name,
         [Const] DOMString fullname,
         [Const] DOMString description,
         [Const] DOMString icon24x24,
-        gdObject instance);
+        ObjectConfiguration instance);
+
+    [Ref] ObjectMetadata AddEventsBasedObject([Const] DOMString name,
+        [Const] DOMString fullname,
+        [Const] DOMString description,
+        [Const] DOMString icon24x24);
 
     [Ref] EffectMetadata AddEffect([Const] DOMString name);
 
@@ -1980,7 +1984,7 @@ interface EventsRefactorer {
 interface UnfilledRequiredBehaviorPropertyProblem {
   [Const, Ref] Project GetSourceProject();
   [Ref] gdObject GetSourceObject();
-  [Ref] BehaviorContent GetSourceBehaviorContent();
+  [Ref] Behavior GetSourceBehaviorContent();
   [Const, Ref] DOMString GetSourcePropertyName();
   [Const, Ref] DOMString GetExpectedBehaviorTypeName();
 };
@@ -2672,7 +2676,7 @@ interface Animation {
 };
 
 interface SpriteObject {
-    void SpriteObject([Const] DOMString name);
+    void SpriteObject();
 
     void AddAnimation([Const, Ref] Animation animation);
     [Ref] Animation GetAnimation(unsigned long index);
@@ -2686,7 +2690,7 @@ interface SpriteObject {
     void SetUpdateIfNotVisible(boolean updateIfNotVisible);
     boolean GetUpdateIfNotVisible();
 };
-SpriteObject implements gdObject;
+SpriteObject implements ObjectConfiguration;
 
 interface Vector2f {
     void Vector2f();
@@ -2710,7 +2714,7 @@ interface VectorVector2f {
 //Extensions bindings:
 
 interface TextObject {
-    void TextObject([Const] DOMString name);
+    void TextObject();
 
     void SetString([Const] DOMString string);
     [Const, Ref] DOMString GetString();
@@ -2729,10 +2733,10 @@ interface TextObject {
     unsigned long GetColorG();
     unsigned long GetColorB();
 };
-TextObject implements gdObject;
+TextObject implements ObjectConfiguration;
 
 interface TiledSpriteObject {
-    void TiledSpriteObject([Const] DOMString name);
+    void TiledSpriteObject();
 
     void SetTexture([Const] DOMString texture);
     [Const, Ref] DOMString GetTexture();
@@ -2741,10 +2745,10 @@ interface TiledSpriteObject {
     void SetHeight(float height);
     float GetHeight();
 };
-TiledSpriteObject implements gdObject;
+TiledSpriteObject implements ObjectConfiguration;
 
 interface PanelSpriteObject {
-    void PanelSpriteObject([Const] DOMString name);
+    void PanelSpriteObject();
 
     float GetLeftMargin();
     void SetLeftMargin(float newMargin);
@@ -2769,10 +2773,10 @@ interface PanelSpriteObject {
     void SetHeight(float height);
     float GetHeight();
 };
-PanelSpriteObject implements gdObject;
+PanelSpriteObject implements ObjectConfiguration;
 
 interface ShapePainterObject {
-    void ShapePainterObject([Const] DOMString name);
+    void ShapePainterObject();
 
     void SetCoordinatesAbsolute();
     void SetCoordinatesRelative();
@@ -2800,12 +2804,12 @@ interface ShapePainterObject {
     unsigned long GetFillColorG();
     unsigned long GetFillColorB();
 };
-ShapePainterObject implements gdObject;
+ShapePainterObject implements ObjectConfiguration;
 
 interface TextEntryObject {
-    void TextEntryObject([Const] DOMString name);
+    void TextEntryObject();
 };
-TextEntryObject implements gdObject;
+TextEntryObject implements ObjectConfiguration;
 
 enum ParticleEmitterObject_RendererType {
   "ParticleEmitterObject::Point",
@@ -2814,7 +2818,7 @@ enum ParticleEmitterObject_RendererType {
 };
 
 interface ParticleEmitterObject {
-    void ParticleEmitterObject([Const] DOMString name);
+    void ParticleEmitterObject();
 
     void SetRendererType(ParticleEmitterObject_RendererType type);
     ParticleEmitterObject_RendererType GetRendererType();
@@ -2902,7 +2906,7 @@ interface ParticleEmitterObject {
     float GetParticleAngleRandomness2();
 
 };
-ParticleEmitterObject implements gdObject;
+ParticleEmitterObject implements ObjectConfiguration;
 
 //GDJS bindings:
 [Prefix="gdjs::"]

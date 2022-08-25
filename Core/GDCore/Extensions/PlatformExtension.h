@@ -37,9 +37,10 @@ class ArbitraryResourceWorker;
 class BehaviorsSharedData;
 class Behavior;
 class Object;
+class ObjectConfiguration;
 }  // namespace gd
 
-typedef std::function<std::unique_ptr<gd::Object>(gd::String name)>
+typedef std::function<std::unique_ptr<gd::ObjectConfiguration>()>
     CreateFunPtr;
 
 namespace gd {
@@ -242,7 +243,21 @@ class GD_CORE_API PlatformExtension {
                                 const gd::String& fullname_,
                                 const gd::String& description_,
                                 const gd::String& icon_,
-                                std::shared_ptr<gd::Object> instance);
+                                std::shared_ptr<gd::ObjectConfiguration> instance);
+
+  /**
+   * \brief Declare a new events based object as being part of the extension.
+   *
+   * \param name The name of the object
+   * \param fullname The user friendly name of the object
+   * \param description The user friendly description of the object
+   * \param icon The icon of the object.
+   */
+  gd::ObjectMetadata& AddEventsBasedObject(
+      const gd::String& name_,
+      const gd::String& fullname_,
+      const gd::String& description_,
+      const gd::String& icon_);
 
   /**
    * \brief Declare a new behavior as being part of the extension.
@@ -266,6 +281,21 @@ class GD_CORE_API PlatformExtension {
       const gd::String& className_,
       std::shared_ptr<gd::Behavior> instance,
       std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance);
+
+  /**
+   * \brief Declare a new events based behavior as being part of the extension.
+   *
+   * \param name The name of the behavior
+   * \param fullname The user friendly name of the behavior
+   * \param description The user friendly description of the behavior
+   * \param icon The icon of the behavior.
+   */
+  gd::BehaviorMetadata& AddEventsBasedBehavior(
+      const gd::String& name_,
+      const gd::String& fullname_,
+      const gd::String& description_,
+      const gd::String& group_,
+      const gd::String& icon_);
 
   /**
    * \brief Declare a new effect as being part of the extension.

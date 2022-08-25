@@ -22,15 +22,15 @@ declare class libGDevelop {
   asJsCodeEvent(gdBaseEvent): gdJsCodeEvent;
   asPlatform(gdPlatform): gdPlatform;
 
-  asSpriteObject(gdObject): gdSpriteObject;
-  asTiledSpriteObject(gdObject): gdTiledSpriteObject;
-  asPanelSpriteObject(gdObject): gdPanelSpriteObject;
-  asTextObject(gdObject): gdTextObject;
-  asShapePainterObject(gdObject): gdShapePainterObject;
-  asAdMobObject(gdObject): gdAdMobObject;
-  asTextEntryObject(gdObject): gdTextEntryObject;
-  asParticleEmitterObject(gdObject): gdParticleEmitterObject;
-  asObjectJsImplementation(gdObject): gdObjectJsImplementation;
+  asSpriteObject(gdObjectConfiguration): gdSpriteObject;
+  asTiledSpriteObject(gdObjectConfiguration): gdTiledSpriteObject;
+  asPanelSpriteObject(gdObjectConfiguration): gdPanelSpriteObject;
+  asTextObject(gdObjectConfiguration): gdTextObject;
+  asShapePainterObject(gdObjectConfiguration): gdShapePainterObject;
+  asAdMobObject(gdObjectConfiguration): gdAdMobObject;
+  asTextEntryObject(gdObjectConfiguration): gdTextEntryObject;
+  asParticleEmitterObject(gdObjectConfiguration): gdParticleEmitterObject;
+  asObjectJsImplementation(gdObjectConfiguration): gdObjectJsImplementation;
 
   asImageResource(gdResource): gdImageResource;
 
@@ -67,13 +67,13 @@ declare class libGDevelop {
   ExtensionProperties: Class<gdExtensionProperties>;
   Behavior: Class<gdBehavior>;
   BehaviorJsImplementation: Class<gdBehaviorJsImplementation>;
-  BehaviorContent: Class<gdBehaviorContent>;
   BehaviorsSharedData: Class<gdBehaviorsSharedData>;
   BehaviorSharedDataJsImplementation: Class<gdBehaviorSharedDataJsImplementation>;
+  ObjectConfiguration: Class<gdObjectConfiguration>;
+  UniquePtrObjectConfiguration: Class<gdUniquePtrObjectConfiguration>;
   gdObject: Class<gdObject>;
   UniquePtrObject: Class<gdUniquePtrObject>;
   ObjectJsImplementation: Class<gdObjectJsImplementation>;
-  CustomObject: Class<gdCustomObject>;
   Layout: Class<gdLayout>;
   ExternalEvents: Class<gdExternalEvents>;
   ExternalLayout: Class<gdExternalLayout>;

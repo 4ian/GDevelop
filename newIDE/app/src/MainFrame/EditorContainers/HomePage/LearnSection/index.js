@@ -15,6 +15,7 @@ import { Paper } from '@material-ui/core';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { sendTutorialOpened } from '../../../../Utils/Analytics/EventSender';
 import Window from '../../../../Utils/Window';
+import { secondsToMinutesAndSeconds } from '../../../../Utils/DateDisplay';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -43,14 +44,6 @@ export const TUTORIAL_CATEGORY_TEXTS = {
     title: <Trans>Advanced course</Trans>,
     description: <Trans>The icing on the cake</Trans>,
   },
-};
-
-export const secondsToMinutesAndSeconds = (seconds: number) => {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  const formattedRemainingSeconds =
-    remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds;
-  return `${minutes}:${formattedRemainingSeconds}`;
 };
 
 export const formatTutorialToWidgetItem = (tutorial: Tutorial) => ({

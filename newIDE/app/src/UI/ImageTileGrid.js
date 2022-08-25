@@ -77,15 +77,15 @@ const useStylesForTile = makeStyles(theme =>
   })
 );
 
-const ImageOverlay = ({ text }) => (
+const ImageOverlay = ({ content }: {| content: React.Node |}) => (
   <div style={styles.overlay}>
     <Typography variant="body1" style={styles.overlayText}>
-      {text}
+      {content}
     </Typography>
   </div>
 );
 
-export type Widget = {|
+export type ImageTileComponent = {|
   onClick: (item: any) => void,
   imageUrl: string,
   title?: string,
@@ -94,7 +94,7 @@ export type Widget = {|
 |};
 
 type ImageTileGridProps = {|
-  items: Array<Widget>,
+  items: Array<ImageTileComponent>,
   getColumnsFromWidth: (width: WidthType) => number,
   getLimitFromWidth?: (width: WidthType) => number,
 |};
@@ -137,7 +137,7 @@ const ImageTileGrid = ({
                       alt={`thumbnail ${index}`}
                     />
                     {item.overlayText && (
-                      <ImageOverlay text={item.overlayText} />
+                      <ImageOverlay content={item.overlayText} />
                     )}
                   </div>
                   {item.title && (

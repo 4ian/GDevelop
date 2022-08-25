@@ -1,18 +1,17 @@
 // @flow
 import * as React from 'react';
-import { Column } from './Grid';
+import { Column, Line } from './Grid';
 import Text from './Text';
 import { LineStackLayout } from './Layout';
 import FlatButton from './FlatButton';
 import { Trans } from '@lingui/macro';
-import ImageTileGrid, { type Widget } from './ImageTileGrid';
+import ImageTileGrid, { type ImageTileComponent } from './ImageTileGrid';
 import { type WidthType } from './Reponsive/ResponsiveWindowMeasurer';
-import { Line } from 'recharts';
 
 type ImageTileRowProps = {|
   title: React.Node,
   description?: React.Node,
-  items: Array<Widget>,
+  items: Array<ImageTileComponent>,
   onShowAll: () => void,
   showAllIcon: React.Node,
   getLimitFromWidth: (width: WidthType) => number,

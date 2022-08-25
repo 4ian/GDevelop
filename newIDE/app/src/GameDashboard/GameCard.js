@@ -49,32 +49,34 @@ type TogglableProperties =
 const confirmationMessage = {
   discoverable: {
     true: t`
-        You are about to make this game discoverable on categories pages on
-        Liluo.io. Continue?
+        You are about to make this game discoverable on Liluo.io categories pages. 
+        Do you want to continue?
       `,
     false: t`
-        You are about to hide this game from categories pages on Liluo.io.
-        Continue?
+        You are about to hide this game from Liluo.io categories pages.
+        Do you want to continue?
       `,
   },
   acceptsBuildComments: {
     true: t`
-        You are about to activate a feedback banner on all your build pages on
-        Liluo.io, asking for feedback on your game. Continue?
+        You are about to activate a feedback banner on all builds of this game.
+        By doing this you're allowing feedback from any player who has access to your Liluo.io build URLs.
+        Do you want to continue?
       `,
     false: t`
-        You are about to de-activate the feedback banner on all your build pages
-        on Liluo.io. Continue ?
+        You are about to de-activate the feedback banner on all your Liluo.io build pages.
+        Do you want to continue ?
       `,
   },
   acceptsGameComments: {
     true: t`
-        You are about to activate a feedback banner on your game page on
-        Liluo.io, to let any user give you feedback. Continue?
+        You are about to activate a feedback banner on your Liluo.io game page.
+        By doing this you will receive feedback from any Liluo.io visitor.
+        Do you want to continue?
       `,
     false: t`
-        You are about to de-activate the feedback banner on your game page on
-        Liluo.io. Continue ?
+        You are about to de-activate the feedback banner on your Liluo.io game page.
+        Do you want to continue ?
       `,
   },
 };

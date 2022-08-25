@@ -6,7 +6,7 @@ import {
   type TutorialCategory,
 } from '../../../../Utils/GDevelopServices/Tutorial';
 import { formatTutorialToWidgetItem, TUTORIAL_CATEGORY_TEXTS } from '.';
-import WidgetsGrid from '../../../../UI/WidgetsGrid';
+import ImageTileGrid from '../../../../UI/ImageTileGrid';
 import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const getColumnsFromWidth = (width: WidthType) => {
@@ -39,7 +39,7 @@ const TutorialsCategoryPage = ({ category, tutorials, onBack }: Props) => {
       backAction={onBack}
     >
       <SectionRow>
-        <WidgetsGrid
+        <ImageTileGrid
           items={filteredTutorials.map(formatTutorialToWidgetItem)}
           getColumnsFromWidth={getColumnsFromWidth}
         />

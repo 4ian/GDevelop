@@ -5,11 +5,11 @@ import Text from './Text';
 import { LineStackLayout } from './Layout';
 import FlatButton from './FlatButton';
 import { Trans } from '@lingui/macro';
-import WidgetsGrid, { type Widget } from './WidgetsGrid';
+import ImageTileGrid, { type Widget } from './ImageTileGrid';
 import { type WidthType } from './Reponsive/ResponsiveWindowMeasurer';
 import { Line } from 'recharts';
 
-type WidgetsRowProps = {|
+type ImageTileRowProps = {|
   title: React.Node,
   description?: React.Node,
   items: Array<Widget>,
@@ -19,7 +19,7 @@ type WidgetsRowProps = {|
   getColumnsFromWidth: (width: WidthType) => number,
 |};
 
-const WidgetsRow = ({
+const ImageTileRow = ({
   title,
   description,
   items,
@@ -27,7 +27,7 @@ const WidgetsRow = ({
   showAllIcon,
   getLimitFromWidth,
   getColumnsFromWidth,
-}: WidgetsRowProps) => {
+}: ImageTileRowProps) => {
   return (
     <>
       <LineStackLayout
@@ -52,7 +52,7 @@ const WidgetsRow = ({
           <Text noMargin>{description}</Text>
         </Line>
       )}
-      <WidgetsGrid
+      <ImageTileGrid
         items={items}
         getLimitFromWidth={getLimitFromWidth}
         getColumnsFromWidth={getColumnsFromWidth}
@@ -61,4 +61,4 @@ const WidgetsRow = ({
   );
 };
 
-export default WidgetsRow;
+export default ImageTileRow;

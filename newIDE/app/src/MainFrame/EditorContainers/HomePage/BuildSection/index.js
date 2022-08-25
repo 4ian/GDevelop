@@ -49,7 +49,7 @@ import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Exam
 import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import Add from '../../../../UI/CustomSvgIcons/Add';
-import WidgetsRow from '../../../../UI/WidgetsRow';
+import ImageTileRow from '../../../../UI/ImageTileRow';
 import { prepareExamples } from '../../../../AssetStore/ExampleStore';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -304,9 +304,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       setIsOpeningProject(true);
 
       try {
-        let projectMetadata;
-
-        projectMetadata = await onCreateBlank({
+        const projectMetadata = await onCreateBlank({
           i18n,
           settings,
         });
@@ -314,7 +312,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
         if (!projectMetadata) return;
 
         setPreCreationDialogOpen(false);
-        onOpenProjectAfterCreation({ ...projectMetadata });
+        await onOpenProjectAfterCreation({ ...projectMetadata });
       } finally {
         setIsOpeningProject(false);
       }
@@ -345,7 +343,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                 {!allExamples ? (
                   <PlaceholderLoader />
                 ) : (
-                  <WidgetsRow
+                  <ImageTileRow
                     items={prepareExamples(allExamples).map(example => ({
                       onClick: () => onSelectExample(example),
                       imageUrl: example.previewImageUrls[0],

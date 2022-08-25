@@ -93,17 +93,17 @@ export type Widget = {|
   overlayText?: string | React.Node,
 |};
 
-type WidgetsGridProps = {|
+type ImageTileGridProps = {|
   items: Array<Widget>,
   getColumnsFromWidth: (width: WidthType) => number,
   getLimitFromWidth?: (width: WidthType) => number,
 |};
 
-const WidgetsGrid = ({
+const ImageTileGrid = ({
   items,
   getColumnsFromWidth,
   getLimitFromWidth,
-}: WidgetsGridProps) => {
+}: ImageTileGridProps) => {
   const windowWidth = useResponsiveWindowWidth();
   const tileClasses = useStylesForTile();
   const MAX_COLUMNS = getColumnsFromWidth('large');
@@ -123,7 +123,12 @@ const WidgetsGrid = ({
         >
           {itemsToDisplay.map((item, index) => (
             <GridListTile key={index} classes={tileClasses}>
-              <ButtonBase style={styles.buttonStyle} onClick={item.onClick}>
+              <ButtonBase
+                style={styles.buttonStyle}
+                onClick={item.onClick}
+                tabIndex={0}
+                focusRipple
+              >
                 <Column noMargin>
                   <div style={styles.imageContainer}>
                     <CorsAwareImage
@@ -155,4 +160,4 @@ const WidgetsGrid = ({
   );
 };
 
-export default WidgetsGrid;
+export default ImageTileGrid;

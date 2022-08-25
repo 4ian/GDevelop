@@ -88,6 +88,7 @@ import { type CreateProjectDialogWithComponentsProps } from '../ProjectCreation/
 import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnCreateBlankFunction,
+  type OnOpenProjectAfterCreationFunction,
 } from '../ProjectCreation/CreateProjectDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
@@ -2139,7 +2140,7 @@ const MainFrame = (props: Props) => {
     }
   };
 
-  const onOpenProjectAfterCreation = async ({
+  const onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction = async ({
     project,
     storageProvider,
     fileMetadata,

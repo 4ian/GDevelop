@@ -107,20 +107,16 @@ const CreateProjectDialog = ({
     setIsOpening(true);
 
     try {
-      let projectMetadata;
-
-      if (selectedExampleShortHeader) {
-        projectMetadata = await onCreateFromExampleShortHeader({
-          i18n,
-          exampleShortHeader: selectedExampleShortHeader,
-          settings,
-        });
-      } else {
-        projectMetadata = await onCreateBlank({
-          i18n,
-          settings,
-        });
-      }
+      const projectMetadata = selectedExampleShortHeader
+        ? await onCreateFromExampleShortHeader({
+            i18n,
+            exampleShortHeader: selectedExampleShortHeader,
+            settings,
+          })
+        : await onCreateBlank({
+            i18n,
+            settings,
+          });
 
       if (!projectMetadata) return;
 

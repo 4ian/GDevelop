@@ -50,11 +50,11 @@ const confirmationMessage = {
   discoverable: {
     true: t`
         You are about to make this game discoverable on Liluo.io categories pages. 
-        Do you want to Continue?
+        Do you want to continue?
       `,
     false: t`
         You are about to hide this game from Liluo.io categories pages.
-        Do you want to Continue?
+        Do you want to continue?
       `,
   },
   acceptsBuildComments: {
@@ -65,7 +65,7 @@ const confirmationMessage = {
       `,
     false: t`
         You are about to de-activate the feedback banner on all your Liluo.io build pages.
-        Do you want to Continue ?
+        Do you want to continue ?
       `,
   },
   acceptsGameComments: {
@@ -76,7 +76,7 @@ const confirmationMessage = {
       `,
     false: t`
         You are about to de-activate the feedback banner on your Liluo.io game page.
-        Do you want to Continue ?
+        Do you want to continue ?
       `,
   },
 };

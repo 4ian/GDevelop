@@ -26,7 +26,7 @@ import { CardWidget, SMALL_WIDGET_SIZE } from '../CardWidget';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import { makeStyles } from '@material-ui/core/styles';
-import WidgetsRow from '../../../../UI/WidgetsRow';
+import ImageTileRow from '../../../../UI/ImageTileRow';
 import { formatTutorialToWidgetItem, TUTORIAL_CATEGORY_TEXTS } from '.';
 import ArrowRight from '@material-ui/icons/ArrowRight';
 const electron = optionalRequire('electron');
@@ -210,7 +210,7 @@ const MainPage = ({
           </Line>
         </SectionRow>
         <SectionRow>
-          <WidgetsRow
+          <ImageTileRow
             title={TUTORIAL_CATEGORY_TEXTS['full-game'].title}
             description={TUTORIAL_CATEGORY_TEXTS['full-game'].description}
             items={tutorials
@@ -223,7 +223,7 @@ const MainPage = ({
           />
         </SectionRow>
         <SectionRow>
-          <WidgetsRow
+          <ImageTileRow
             title={TUTORIAL_CATEGORY_TEXTS['game-mechanic'].title}
             description={TUTORIAL_CATEGORY_TEXTS['game-mechanic'].description}
             items={tutorials
@@ -248,7 +248,7 @@ const MainPage = ({
           </Line>
         </SectionRow>
         <SectionRow>
-          <WidgetsRow
+          <ImageTileRow
             title={TUTORIAL_CATEGORY_TEXTS['official-beginner'].title}
             description={
               TUTORIAL_CATEGORY_TEXTS['official-beginner'].description
@@ -263,7 +263,7 @@ const MainPage = ({
           />
         </SectionRow>
         <SectionRow>
-          <WidgetsRow
+          <ImageTileRow
             title={TUTORIAL_CATEGORY_TEXTS['official-intermediate'].title}
             description={
               TUTORIAL_CATEGORY_TEXTS['official-intermediate'].description
@@ -278,7 +278,7 @@ const MainPage = ({
           />
         </SectionRow>
         <SectionRow>
-          <WidgetsRow
+          <ImageTileRow
             title={TUTORIAL_CATEGORY_TEXTS['official-advanced'].title}
             description={
               TUTORIAL_CATEGORY_TEXTS['official-advanced'].description

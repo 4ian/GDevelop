@@ -176,7 +176,9 @@ export const HomePage = React.memo<Props>(
                   {activeTab === 'get-started' && (
                     <GetStartedSection
                       onTabChange={setActiveTab}
-                      onCreateProject={() => onCreateProject(null)}
+                      onCreateProject={() =>
+                        onCreateProject(/*exampleShortHeader=*/ null)
+                      }
                       onOpenOnboardingDialog={onOpenOnboardingDialog}
                       showGetStartedSection={showGetStartedSection}
                       setShowGetStartedSection={setShowGetStartedSection}
@@ -189,7 +191,9 @@ export const HomePage = React.memo<Props>(
                       canOpen={canOpen}
                       onChooseProject={onChooseProject}
                       onCreateBlank={onCreateBlank}
-                      onShowAllExamples={() => onCreateProject(null)}
+                      onShowAllExamples={() =>
+                        onCreateProject(/*exampleShortHeader=*/ null)
+                      }
                       onSelectExample={exampleShortHeader =>
                         onCreateProject(exampleShortHeader)
                       }
@@ -202,7 +206,9 @@ export const HomePage = React.memo<Props>(
                   {activeTab === 'learn' && (
                     <LearnSection
                       onOpenOnboardingDialog={onOpenOnboardingDialog}
-                      onCreateProject={() => onCreateProject(null)}
+                      onCreateProject={() =>
+                        onCreateProject(/*exampleShortHeader=*/ null)
+                      }
                       onTabChange={setActiveTab}
                       onOpenHelpFinder={onOpenHelpFinder}
                     />

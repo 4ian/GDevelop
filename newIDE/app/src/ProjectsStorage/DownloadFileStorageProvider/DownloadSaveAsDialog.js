@@ -4,7 +4,8 @@ import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import RaisedButton from '../../UI/RaisedButton';
-import { Column, Line } from '../../UI/Grid';
+import { Column } from '../../UI/Grid';
+import { ColumnStackLayout } from '../../UI/Layout';
 import Window from '../../Utils/Window';
 import { serializeToJSObject } from '../../Utils/Serializer';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -65,26 +66,22 @@ export default class DownloadSaveAsDialog extends React.Component<Props> {
 
     return (
       <Dialog actions={actions} onRequestClose={onDone} open maxWidth="sm">
-        <Column noMargin>
-          <Line>
-            <Text>
-              <Trans>
-                You can download the file of your game to continue working on it
-                using the full GDevelop version:
-              </Trans>
-            </Text>
-          </Line>
-          <Line>
-            <Column expand>
-              <RaisedButton
-                label={<Trans>Download game file</Trans>}
-                fullWidth
-                primary
-                onClick={this._download}
-              />
-            </Column>
-          </Line>
-        </Column>
+        <ColumnStackLayout>
+          <Text>
+            <Trans>
+              You can download the file of your game to continue working on it
+              using the full GDevelop version:
+            </Trans>
+          </Text>
+          <Column noMargin expand>
+            <RaisedButton
+              label={<Trans>Download game file</Trans>}
+              fullWidth
+              primary
+              onClick={this._download}
+            />
+          </Column>
+        </ColumnStackLayout>
       </Dialog>
     );
   }

@@ -46,7 +46,6 @@ const fetchResources = async ({
   const baseAssetsPath = path.join(projectPath, 'assets');
   const downloadedFilePaths = new Set<string>();
   const erroredResources = [];
-  const fetchedResources = [];
 
   let fetchedResourcesCount = 0;
   const resourcesToFetch = getResourcesToFetch(project);
@@ -75,7 +74,6 @@ const fetchResources = async ({
           resource.setFile(
             path.relative(projectPath, newPath).replace(/\\/g, '/')
           );
-          fetchedResources.push({ resourceName });
         });
       } catch (error) {
         erroredResources.push({ resourceName, error });
@@ -84,7 +82,6 @@ const fetchResources = async ({
       onProgress(fetchedResourcesCount++, resourcesToFetch.length);
     })
     .then(() => ({
-      fetchedResources,
       erroredResources,
     }));
 };

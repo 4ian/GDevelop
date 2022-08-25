@@ -5,7 +5,7 @@ import Paper from '@material-ui/core/Paper';
 import { type ChooseResourceOptions } from './ResourceSource';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import AlertMessage from '../UI/AlertMessage';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
 import {
   type UploadedProjectResourceFiles,
@@ -15,7 +15,7 @@ import {
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { Line, Column } from '../UI/Grid';
-import LeftLoader from '../UI/LeftLoader';
+import LinearProgress from '../UI/LinearProgress';
 
 const styles = { fileInput: {} };
 
@@ -52,6 +52,7 @@ export const FileToCloudProjectResourceUploader = ({
     getStorageProvider,
   ]);
   const cloudProjectId = fileMetadata.fileIdentifier;
+  const [uploadProgress, setUploadProgress] = React.useState(0);
   const onUpload = React.useCallback(
     async () => {
       const input = inputRef.current;
@@ -59,10 +60,14 @@ export const FileToCloudProjectResourceUploader = ({
 
       try {
         setIsUploading(true);
+        setUploadProgress(0);
         const results: UploadedProjectResourceFiles = await uploadProjectResourceFiles(
           authenticatedUser,
           cloudProjectId,
-          selectedFiles
+          selectedFiles,
+          (current: number, total: number) => {
+            setUploadProgress((current / total) * 100);
+          }
         );
         const erroredResults = results.filter(({ error }) => !!error);
         const okResults = results.filter(({ url }) => !!url);
@@ -179,22 +184,23 @@ export const FileToCloudProjectResourceUploader = ({
           </AlertMessage>
         );
       })}
-      <Line expand justifyContent="flex-end">
-        <LeftLoader isLoading={isUploading}>
-          <RaisedButton
-            onClick={onUpload}
-            disabled={!canUploadFiles}
-            primary
-            label={
-              options.multiSelection ? (
-                <Trans>Add selected file(s)</Trans>
-              ) : (
-                <Trans>Add selected file</Trans>
-              )
-            }
-          />
-        </LeftLoader>
-      </Line>
+      <LineStackLayout alignItems="center" justifyContent="flex-end" expand>
+        {isUploading ? (
+          <LinearProgress expand value={uploadProgress} variant="determinate" />
+        ) : null}
+        <RaisedButton
+          onClick={onUpload}
+          disabled={!canUploadFiles}
+          primary
+          label={
+            options.multiSelection ? (
+              <Trans>Add selected file(s)</Trans>
+            ) : (
+              <Trans>Add selected file</Trans>
+            )
+          }
+        />
+      </LineStackLayout>
     </ColumnStackLayout>
   );
 };

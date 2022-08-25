@@ -12,6 +12,8 @@ import {
   getCredentialsForCloudProject,
   type UploadedProjectResourceFiles,
   uploadProjectResourceFiles,
+  extractFilenameFromProjectResourceUrl,
+  extractProjectUuidFromProjetResourceUrl,
 } from '../../Utils/GDevelopServices/Project';
 
 import { checkIfIsGDevelopCloudBucketUrl } from '../../Utils/CrossOrigin';
@@ -48,7 +50,10 @@ const moveAllCloudProjectResourcesToCloudProject = async ({
   type ResourceToFetchAndUpload = {|
     resource: gdResource,
     url: string,
+    filename: string,
   |};
+
+  const newCloudProjectId = newFileMetadata.fileIdentifier;
 
   /**
    * Find the resources stored on GDevelop Cloud that must be downloaded and
@@ -60,32 +65,45 @@ const moveAllCloudProjectResourcesToCloudProject = async ({
     const resourcesManager = project.getResourcesManager();
     const allResourceNames = resourcesManager.getAllResourceNames().toJSArray();
     return allResourceNames
-      .map(resourceName => {
-        const resource = resourcesManager.getResource(resourceName);
-        const resourceFile = resource.getFile();
+      .map(
+        (resourceName: string): ?ResourceToFetchAndUpload => {
+          const resource = resourcesManager.getResource(resourceName);
+          const resourceFile = resource.getFile();
 
-        if (isURL(resourceFile)) {
-          if (checkIfIsGDevelopCloudBucketUrl(resourceFile)) {
-            return {
-              resource,
-              url: resourceFile,
-            };
-          } else if (isBlobURL(resourceFile)) {
-            throw new Error('Unsupported blob files for cloud projects.');
+          if (isURL(resourceFile)) {
+            if (checkIfIsGDevelopCloudBucketUrl(resourceFile)) {
+              if (
+                extractProjectUuidFromProjetResourceUrl(resourceFile) ===
+                newCloudProjectId
+              ) {
+                // Somehow the resource is *already* stored in the new project - surely because
+                // the project resources were partially moved (like when you click "Retry" after some failures
+                // when saving a project as a new cloud project).
+                // Just ignore this resource which is already moved then.
+                return null;
+              }
+
+              return {
+                resource,
+                url: resourceFile,
+                filename: extractFilenameFromProjectResourceUrl(resourceFile),
+              };
+            } else if (isBlobURL(resourceFile)) {
+              throw new Error('Unsupported blob files for cloud projects.');
+            } else {
+              // Public URL resource: nothing to do.
+              return null;
+            }
           } else {
-            // Public URL resource: nothing to do.
-            return null;
+            // Local resource: unsupported.
+            throw new Error('Unsupported local files for cloud projects.');
           }
-        } else {
-          // Local resource: unsupported.
-          throw new Error('Unsupported local files for cloud projects.');
         }
-      })
+      )
       .filter(Boolean);
   };
 
   const resourcesToFetchAndUpload = getResourcesToFetchAndUpload(project);
-  console.log({ resourcesToFetchAndUpload });
 
   // If an error happens here, it will be thrown out of the function.
   if (oldStorageProviderOperations.onEnsureCanAccessResources)
@@ -99,7 +117,9 @@ const moveAllCloudProjectResourcesToCloudProject = async ({
     ItemResult<ResourceToFetchAndUpload>
   > = await downloadUrlsToBlobs({
     urlContainers: resourcesToFetchAndUpload,
-    onProgress,
+    onProgress: (count, total) => {
+      onProgress(count, total * 2);
+    },
   });
 
   // Transform Blobs into Files.
@@ -110,7 +130,7 @@ const moveAllCloudProjectResourcesToCloudProject = async ({
     .map(({ item, blob, error }) => {
       if (error || !blob) {
         result.erroredResources.push({
-          resource: item.resource,
+          resourceName: item.resource.getName(),
           error: error || new Error('Unknown error during download.'),
         });
         return null;
@@ -118,26 +138,33 @@ const moveAllCloudProjectResourcesToCloudProject = async ({
 
       return {
         resource: item.resource,
-        file: new File([blob], 'TODO', { type: 'todo' }),
+        file: new File([blob], item.filename, { type: blob.type }),
       };
     })
     .filter(Boolean);
 
   // Upload the files just downloaded, for the new project.
-  const cloudProjectId = newFileMetadata.fileIdentifier;
-  await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
+  await getCredentialsForCloudProject(authenticatedUser, newCloudProjectId);
   const uploadedProjectResourceFiles: UploadedProjectResourceFiles = await uploadProjectResourceFiles(
     authenticatedUser,
-    cloudProjectId,
-    downloadedFilesAndResourcesToUpload.map(({ file }) => file)
+    newCloudProjectId,
+    downloadedFilesAndResourcesToUpload.map(({ file }) => file),
+    (count, total) => {
+      onProgress(total + count, total * 2);
+    }
   );
 
   // Update resources with the newly created URLs.
   uploadedProjectResourceFiles.forEach(({ url, error }, index) => {
     const resource = downloadedFilesAndResourcesToUpload[index].resource;
+    console.log({
+      url,
+      error,
+      resourceName: resource.getName(),
+    });
     if (error || !url) {
       result.erroredResources.push({
-        resource,
+        resourceName: resource.getName(),
         error: error || new Error('Unknown error during upload.'),
       });
       return;
@@ -149,39 +176,37 @@ const moveAllCloudProjectResourcesToCloudProject = async ({
   return result;
 };
 
+const moveNothing = () => {
+  return {
+    erroredResources: [],
+  };
+};
+
 const movers: {
   [string]: MoveAllProjectResourcesFunction,
 } = {
   [`${CloudStorageProvider.internalName}=>${
     CloudStorageProvider.internalName
   }`]: moveAllCloudProjectResourcesToCloudProject,
-  [`${CloudStorageProvider.internalName}=>${
-    DownloadFileStorageProvider.internalName
-  }`]: (options: MoveAllProjectResourcesOptions) => {
-    // Download everything as a blob.
-    console.log('TODO: Download everything as a blob.');
-    return {
-      erroredResources: [],
-    };
-  },
   [`${UrlStorageProvider.internalName}=>${
     CloudStorageProvider.internalName
   }`]: (options: MoveAllProjectResourcesOptions) => {
     // Ensure urls are accessible, and do nothing else.
-    console.log('TODO: Ensure urls are accessible, and do nothing else.');
+    console.log(
+      'TODO - once save as it used for project creation: ensure urls are accessible, and do nothing else.'
+    );
     return {
       erroredResources: [],
     };
   },
+  // Saving to "DownloadFile" will *not* change any resources, as it's a
+  // "temporary save" that is made and given to the user.
+  [`${CloudStorageProvider.internalName}=>${
+    DownloadFileStorageProvider.internalName
+  }`]: moveNothing,
   [`${UrlStorageProvider.internalName}=>${
     DownloadFileStorageProvider.internalName
-  }`]: (options: MoveAllProjectResourcesOptions) => {
-    // Ensure urls are accessible, and do nothing else.
-    console.log('TODO: Ensure urls are accessible, and do nothing else.');
-    return {
-      erroredResources: [],
-    };
-  },
+  }`]: moveNothing,
 };
 
 const BrowserResourceMover: ResourceMover = {

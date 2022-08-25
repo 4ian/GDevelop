@@ -42,7 +42,6 @@ import {
   notifyPreviewWillStart,
   moveTabToTheRightOfHoveredTab,
 } from './EditorTabs/EditorTabsHandler';
-import { timePromise } from '../Utils/TimeFunction';
 import HelpFinder from '../HelpFinder';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -141,7 +140,10 @@ import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 import { useLeaderboardReplacer } from '../Leaderboard/useLeaderboardReplacer';
 import useConfirmDialog from '../UI/Confirm/useConfirmDialog';
 import ProjectPreCreationDialog from '../ProjectCreation/ProjectPreCreationDialog';
-import { type ResourceMover } from '../ProjectsStorage/ResourceMover';
+import {
+  useResourceMover,
+  type ResourceMover,
+} from '../ProjectsStorage/ResourceMover';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -418,6 +420,11 @@ const MainFrame = (props: Props) => {
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
   } = props;
+
+  const {
+    ensureResourcesAreMoved,
+    renderResourceMoverDialog,
+  } = useResourceMover({ resourceMover });
 
   React.useEffect(
     () => {
@@ -749,15 +756,14 @@ const MainFrame = (props: Props) => {
       serializedProject: gdSerializerElement,
       fileMetadata: ?FileMetadata
     ): Promise<State> => {
-      return timePromise(
-        () => {
-          const newProject = gd.ProjectHelper.createNewGDJSProject();
-          newProject.unserializeFrom(serializedProject);
+      const startTime = Date.now();
+      const newProject = gd.ProjectHelper.createNewGDJSProject();
+      newProject.unserializeFrom(serializedProject);
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+      console.info(`Unserialization took ${duration.toFixed(2)} ms`);
 
-          return loadFromProject(newProject, fileMetadata);
-        },
-        time => console.info(`Unserialization took ${time} ms`)
-      );
+      return loadFromProject(newProject, fileMetadata);
     },
     [loadFromProject]
   );
@@ -1870,8 +1876,7 @@ const MainFrame = (props: Props) => {
             context: options ? options.context : undefined,
             onStartSaving: () => _showSnackMessage(i18n._(t`Saving...`)),
             onMoveResources: async ({ newFileMetadata }) => {
-              // TODO: open a modal
-              console.log('Moving project resources', {
+              await ensureResourcesAreMoved({
                 project: currentProject,
                 newFileMetadata,
                 newStorageProvider,
@@ -1881,21 +1886,6 @@ const MainFrame = (props: Props) => {
                 oldStorageProviderOperations,
                 authenticatedUser,
               });
-              await resourceMover.moveAllProjectResources({
-                project: currentProject,
-                newFileMetadata,
-                newStorageProvider,
-                newStorageProviderOperations,
-                oldFileMetadata: currentFileMetadata,
-                oldStorageProvider,
-                oldStorageProviderOperations,
-                authenticatedUser,
-                onProgress: () => {
-                  /* TODO: Update the progress  */
-                },
-              });
-              // TODO: Allow to retry if it fails.
-              // TODO: close the modal
             },
           }
         );
@@ -1953,7 +1943,7 @@ const MainFrame = (props: Props) => {
       getStorageProvider,
       preferences,
       updateWindowTitle,
-      resourceMover,
+      ensureResourcesAreMoved,
       authenticatedUser,
     ]
   );
@@ -2788,6 +2778,7 @@ const MainFrame = (props: Props) => {
       {renderOpenConfirmDialog()}
       {renderLeaderboardReplacerDialog()}
       {renderResourceFetcherDialog()}
+      {renderResourceMoverDialog()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}

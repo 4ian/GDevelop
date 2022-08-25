@@ -20,6 +20,8 @@ export default ({
       fileMetadata: ?FileMetadata,
       options
     ) => {
+      if (options && options.onStartSaving) options.onStartSaving();
+
       const newFileMetadata = fileMetadata
         ? {
             ...fileMetadata,

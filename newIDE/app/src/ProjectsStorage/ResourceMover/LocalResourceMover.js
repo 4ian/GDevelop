@@ -40,6 +40,9 @@ const movers: {
   }`]: (options: MoveAllProjectResourcesOptions) => {
     // TODO: Currently unused.
     // Download resources. Check if this ResourceFetcher can be moved here.
+    console.log(
+      'TODO - once save as it used for project creation: download resources, check ResourceFetcher implementation.'
+    );
     return {
       erroredResources: [],
     };

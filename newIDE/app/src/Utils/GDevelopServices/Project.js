@@ -170,7 +170,8 @@ export const commitVersion = async (
 export const uploadProjectResourceFiles = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
-  resourceFiles: File[]
+  resourceFiles: File[],
+  onProgress: (number, number) => void
 ): Promise<UploadedProjectResourceFiles> => {
   // Get the pre-signed urls where to upload the files.
   const resourceFileWithPresignedUrls = await getPresignedUrlForResourcesUpload(
@@ -181,6 +182,7 @@ export const uploadProjectResourceFiles = async (
 
   // Upload the files.
   const results = Array(resourceFileWithPresignedUrls.length);
+  let doneCount = 0;
   await PromisePool.withConcurrency(10)
     .for(resourceFileWithPresignedUrls)
     .process(async ({ resourceFile, presignedUrl, index }) => {
@@ -210,6 +212,7 @@ export const uploadProjectResourceFiles = async (
           url: null,
         };
       }
+      onProgress(++doneCount, resourceFileWithPresignedUrls.length);
     });
 
   return results;
@@ -369,4 +372,40 @@ export const getProjectFileAsZipBlob = async (
     { responseType: 'blob' }
   );
   return response.data;
+};
+
+function escapeStringForRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+const resourceFilenameRegex = new RegExp(
+  `${escapeStringForRegExp(
+    GDevelopProjectResourcesStorage.baseUrl
+  )}\\/(.*)\\/resources\\/(.*\\/)*([a-zA-Z0-9]+)-([^\\?\\n\\r]+)`
+);
+
+export const extractFilenameFromProjectResourceUrl = (url: string): string => {
+  if (url.startsWith(GDevelopProjectResourcesStorage.baseUrl)) {
+    const matches = resourceFilenameRegex.exec(url);
+    if (matches) {
+      return matches[4];
+    }
+  }
+
+  if (url.lastIndexOf('/') !== -1) {
+    return url.substring(url.lastIndexOf('/') + 1);
+  }
+  return url;
+};
+
+export const extractProjectUuidFromProjetResourceUrl = (
+  url: string
+): string | null => {
+  if (url.startsWith(GDevelopProjectResourcesStorage.baseUrl)) {
+    const matches = resourceFilenameRegex.exec(url);
+    if (matches) {
+      return matches[1];
+    }
+  }
+
+  return null;
 };

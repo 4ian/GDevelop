@@ -25,8 +25,8 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
     bool preserveAbsoluteFilenames,
     bool preserveDirectoryStructure) {
   // Check if there are some resources with absolute filenames
-  // gd::ResourcesAbsolutePathChecker absolutePathChecker(fs);
-  // originalProject.ExposeResources(absolutePathChecker);
+  gd::ResourcesAbsolutePathChecker absolutePathChecker(fs);
+  originalProject.ExposeResources(absolutePathChecker);
 
   auto projectDirectory = fs.DirNameFrom(originalProject.GetProjectFile());
   std::cout << "Copying all ressources from " << projectDirectory << " to "

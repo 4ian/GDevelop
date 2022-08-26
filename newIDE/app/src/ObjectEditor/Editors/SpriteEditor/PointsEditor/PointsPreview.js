@@ -149,6 +149,9 @@ const PointsPreview = (props: Props) => {
   ) => {
     const pointName = getPointName(kind, point);
     return (
+      /* Use div instead of img to prevent dragging issues happening
+      with Safari and Firefox that display ghost image of the dragged
+      element under the cursor. */
       <div
         title={pointName}
         style={{

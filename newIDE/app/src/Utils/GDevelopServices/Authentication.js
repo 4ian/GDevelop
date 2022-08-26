@@ -22,6 +22,8 @@ export type Profile = {|
   username: ?string,
   description: ?string,
   getGameStatsEmail: boolean,
+  isCreator: boolean,
+  isPlayer: boolean,
 |};
 
 export type LoginForm = {|
@@ -131,6 +133,7 @@ export default class Authentication {
             email: form.email,
             username: form.username,
             appLanguage: appLanguage,
+            isCreator: true,
           },
           {
             params: {
@@ -267,8 +270,19 @@ export default class Authentication {
 
   editUserProfile = async (
     getAuthorizationHeader: () => Promise<string>,
-    form: EditForm,
-    appLanguage: string
+    {
+      username,
+      description,
+      getGameStatsEmail,
+      appLanguage,
+      isCreator,
+    }: {
+      username?: string,
+      description?: string,
+      getGameStatsEmail?: boolean,
+      appLanguage?: string,
+      isCreator?: boolean,
+    }
   ) => {
     const { currentUser } = this.auth;
     if (!currentUser)
@@ -276,7 +290,6 @@ export default class Authentication {
 
     return getAuthorizationHeader()
       .then(authorizationHeader => {
-        const { username, description, getGameStatsEmail } = form;
         return axios.patch(
           `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
           {
@@ -284,6 +297,7 @@ export default class Authentication {
             description,
             getGameStatsEmail,
             appLanguage,
+            isCreator,
           },
           {
             params: {

@@ -285,6 +285,19 @@ export default class AuthenticatedUserProvider extends React.Component<
       authentication.getAuthorizationHeader
     );
 
+    if (!userProfile.isCreator) {
+      // If the user is not a creator, then update the profile to say they now are.
+      try {
+        await authentication.editUserProfile(
+          authentication.getAuthorizationHeader,
+          { isCreator: true }
+        );
+      } catch (error) {
+        // Catch the error so that the user profile is still fetched.
+        console.error('Error while updating the user profile:', error);
+      }
+    }
+
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...authenticatedUser,
@@ -370,8 +383,12 @@ export default class AuthenticatedUserProvider extends React.Component<
     try {
       await authentication.editUserProfile(
         authentication.getAuthorizationHeader,
-        form,
-        preferences.language
+        {
+          username: form.username,
+          description: form.description,
+          getGameStatsEmail: form.getGameStatsEmail,
+          appLanguage: preferences.language,
+        }
       );
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openEditProfileDialog(false);

@@ -157,11 +157,6 @@ const moveAllCloudProjectResourcesToCloudProject = async ({
   // Update resources with the newly created URLs.
   uploadedProjectResourceFiles.forEach(({ url, error }, index) => {
     const resource = downloadedFilesAndResourcesToUpload[index].resource;
-    console.log({
-      url,
-      error,
-      resourceName: resource.getName(),
-    });
     if (error || !url) {
       result.erroredResources.push({
         resourceName: resource.getName(),
@@ -188,17 +183,12 @@ const movers: {
   [`${CloudStorageProvider.internalName}=>${
     CloudStorageProvider.internalName
   }`]: moveAllCloudProjectResourcesToCloudProject,
+  // Nothing to move around when going from a project on a public URL
+  // to a cloud project (we could offer an option one day though to download
+  // and upload the URL resources on GDevelop Cloud).
   [`${UrlStorageProvider.internalName}=>${
     CloudStorageProvider.internalName
-  }`]: (options: MoveAllProjectResourcesOptions) => {
-    // Ensure urls are accessible, and do nothing else.
-    console.log(
-      'TODO - once save as it used for project creation: ensure urls are accessible, and do nothing else.'
-    );
-    return {
-      erroredResources: [],
-    };
-  },
+  }`]: moveNothing,
   // Saving to "DownloadFile" will *not* change any resources, as it's a
   // "temporary save" that is made and given to the user.
   [`${CloudStorageProvider.internalName}=>${

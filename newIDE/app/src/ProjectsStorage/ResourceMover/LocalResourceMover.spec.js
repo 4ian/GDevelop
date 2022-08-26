@@ -1,7 +1,9 @@
 // @flow
 import optionalRequire from '../../Utils/OptionalRequire';
-import { LocalResourceFetcher } from './LocalResourceFetcher';
+import { moveResourcesToLocalFiles } from './LocalResourceMover';
 import { makeTestProject } from '../../fixtures/TestProject';
+import { emptyStorageProvider } from '../ProjectStorageProviders';
+import { fakeNoSubscriptionAuthenticatedUser } from '../../fixtures/GDevelopServicesTestData';
 import path from 'path';
 const gd: libGDevelop = global.gd;
 
@@ -13,7 +15,7 @@ const makeTestProjectWithResourcesToDownload = () => {
   const { project } = makeTestProject(gd);
 
   // Add a resource that uses a URL, which will be download
-  // by the LocalResourceFetcher (whatever the origin).
+  // by the LocalResourceMover (whatever the origin).
   {
     const newResource = new gd.ImageResource();
     newResource.setName('MyResourceToDownload');
@@ -35,7 +37,27 @@ const makeTestProjectWithResourcesToDownload = () => {
   return project;
 };
 
-describe('LocalResourceFetcher', () => {
+const makeMoveAllProjectResourcesOptions = (project: gdProject) => ({
+  project,
+  authenticatedUser: fakeNoSubscriptionAuthenticatedUser,
+  onProgress: jest.fn(),
+  oldFileMetadata: { fileIdentifier: 'http://fake.url.com' },
+  oldStorageProvider: emptyStorageProvider,
+  oldStorageProviderOperations: emptyStorageProvider.createOperations({
+    setDialog: () => {},
+    closeDialog: () => {},
+    authenticatedUser: fakeNoSubscriptionAuthenticatedUser,
+  }),
+  newStorageProvider: emptyStorageProvider,
+  newStorageProviderOperations: emptyStorageProvider.createOperations({
+    setDialog: () => {},
+    closeDialog: () => {},
+    authenticatedUser: fakeNoSubscriptionAuthenticatedUser,
+  }),
+  newFileMetadata: { fileIdentifier: 'fake-file' },
+})
+
+describe('LocalResourceMover', () => {
   beforeEach(() => {
     mockFn(optionalRequire.mockFsExtra.ensureDir).mockReset();
     mockFn(optionalRequire.mockFsExtra.existsSync).mockReset();
@@ -45,12 +67,7 @@ describe('LocalResourceFetcher', () => {
   it('fetches resources and can download them', async () => {
     const project = makeTestProjectWithResourcesToDownload();
 
-    // Ensure just the files to be downloaded are listed
-    const resourceNames = LocalResourceFetcher.getResourcesToFetch(project);
-    expect(resourceNames).toEqual(['MyResourceToDownload']);
-
     // Mock a proper download
-    const onProgress = jest.fn();
     mockFn(optionalRequire.mockFsExtra.ensureDir).mockImplementation(
       async () => {}
     );
@@ -61,11 +78,8 @@ describe('LocalResourceFetcher', () => {
       () => Promise.resolve()
     );
 
-    const fetchedResources = await LocalResourceFetcher.fetchResources({
-      project,
-      resourceNames,
-      onProgress,
-    });
+    const options = makeMoveAllProjectResourcesOptions(project);
+    const fetchedResources = await moveResourcesToLocalFiles(options);
 
     // Verify that download was done
     expect(
@@ -81,10 +95,6 @@ describe('LocalResourceFetcher', () => {
   it('reports errors in case of download failure', async () => {
     const project = makeTestProjectWithResourcesToDownload();
 
-    // Ensure just the files to be downloaded are listed
-    const resourceNames = LocalResourceFetcher.getResourcesToFetch(project);
-    expect(resourceNames).toEqual(['MyResourceToDownload']);
-
     // Mock a failed download
     const onProgress = jest.fn();
     mockFn(optionalRequire.mockFsExtra.ensureDir).mockImplementation(
@@ -97,11 +107,8 @@ describe('LocalResourceFetcher', () => {
       () => Promise.reject(new Error('Fake download failure'))
     );
 
-    const fetchedResources = await LocalResourceFetcher.fetchResources({
-      project,
-      resourceNames,
-      onProgress,
-    });
+    const options = makeMoveAllProjectResourcesOptions(project);
+    const fetchedResources = await moveResourcesToLocalFiles(options);
 
     // Verify that download was done and reported as failed, even after 2 tries.
     expect(
@@ -122,10 +129,6 @@ describe('LocalResourceFetcher', () => {
   it('automatically retries if a resource failed', async () => {
     const project = makeTestProjectWithResourcesToDownload();
 
-    // Ensure just the files to be downloaded are listed
-    const resourceNames = LocalResourceFetcher.getResourcesToFetch(project);
-    expect(resourceNames).toEqual(['MyResourceToDownload']);
-
     // Mock a failed download once, then successful
     const onProgress = jest.fn();
     mockFn(optionalRequire.mockFsExtra.ensureDir).mockImplementation(
@@ -140,11 +143,9 @@ describe('LocalResourceFetcher', () => {
       )
       .mockImplementationOnce(() => Promise.resolve());
 
-    const fetchedResources = await LocalResourceFetcher.fetchResources({
-      project,
-      resourceNames,
-      onProgress,
-    });
+
+    const options = makeMoveAllProjectResourcesOptions(project);
+    const fetchedResources = await moveResourcesToLocalFiles(options);
 
     // Verify that download was done.
     expect(

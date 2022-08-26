@@ -139,19 +139,11 @@ export const onSaveProject = (
   });
 };
 
-export const onSaveProjectAs = async (
+export const onChooseSaveProjectAsLocation = async (
   project: gdProject,
-  fileMetadata: ?FileMetadata,
-  options: {|
-    context?: 'duplicateCurrentProject',
-    onStartSaving: () => void,
-    onMoveResources: (options: {|
-      newFileMetadata: FileMetadata,
-    |}) => Promise<void>,
-  |}
+  fileMetadata: ?FileMetadata // This is the current location.
 ): Promise<{|
-  wasSaved: boolean,
-  fileMetadata: ?FileMetadata,
+  fileMetadata: ?FileMetadata, // This is the newly chosen location (or null if cancelled).
 |}> => {
   const defaultPath = fileMetadata ? fileMetadata.fileIdentifier : '';
   const browserWindow = remote.getCurrentWindow();
@@ -165,31 +157,39 @@ export const onSaveProjectAs = async (
   }
   const filePath = dialog.showSaveDialogSync(browserWindow, saveDialogOptions);
   if (!filePath) {
-    return { wasSaved: false, fileMetadata };
+    return { fileMetadata: null };
   }
-  const projectPath = path.dirname(filePath);
+
+  return {
+    fileMetadata: {
+      fileIdentifier: filePath,
+    },
+  };
+};
+
+export const onSaveProjectAs = async (
+  project: gdProject,
+  fileMetadata: ?FileMetadata,
+  options: {|
+    onStartSaving: () => void,
+    onMoveResources: () => Promise<void>,
+  |}
+): Promise<{|
+  wasSaved: boolean,
+|}> => {
+  if (!fileMetadata) throw new Error("A location was not chosen before saving as.");
 
   if (options && options.onStartSaving) options.onStartSaving();
+  await options.onMoveResources();
 
-  const newFileMetadata = {
-    ...fileMetadata,
-    fileIdentifier: filePath,
-  };
-
-  await options.onMoveResources({ newFileMetadata });
-
-  // Update the project with the new file path (resources have already been updated)
+  const filePath = fileMetadata.fileIdentifier;
+  const projectPath = path.dirname(filePath);
   project.setProjectFile(filePath);
 
-  return writeProjectFiles(project, filePath, projectPath).then(() => {
-    return {
-      wasSaved: true,
-      fileMetadata: {
-        ...newFileMetadata,
-        lastModifiedDate: Date.now(),
-      },
-    }; // Save was properly done
-  });
+  await writeProjectFiles(project, filePath, projectPath);
+  return {
+    wasSaved: true,
+  };
 };
 
 export const onAutoSaveProject = (

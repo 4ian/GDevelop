@@ -21,23 +21,14 @@ export default ({
       options
     ) => {
       if (options && options.onStartSaving) options.onStartSaving();
-
-      const newFileMetadata = fileMetadata
-        ? {
-            ...fileMetadata,
-            lastModifiedDate: Date.now(),
-          }
-        : fileMetadata;
-
-      // TODO: can this even be null??
-      await options.onMoveResources({ newFileMetadata });
+      await options.onMoveResources();
 
       return new Promise(resolve => {
         setDialog(() => (
           <DownloadSaveAsDialog
             onDone={() => {
               closeDialog();
-              resolve({ wasSaved: false, fileMetadata: newFileMetadata });
+              resolve({ wasSaved: false });
             }}
             project={project}
           />

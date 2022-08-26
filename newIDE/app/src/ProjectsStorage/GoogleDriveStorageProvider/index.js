@@ -388,10 +388,9 @@ export default ({
             fileMetadata: newFileMetadata,
           }));
       },
-      onSaveProjectAs: (
+      onChooseSaveProjectAsLocation: (
         project: gdProject,
         fileMetadata: ?FileMetadata,
-        options
       ) => {
         return new Promise(resolve => {
           setDialog(() => (
@@ -399,51 +398,25 @@ export default ({
               onShowFilePicker={showFilePicker}
               onCancel={() => {
                 closeDialog();
-                resolve({ wasSaved: false, fileMetadata });
+                resolve({ fileMetadata: null });
               }}
               onSave={async ({ selectedFileOrFolder, newFileName }) => {
-                const content = serializeToJSON(project);
 
-                if (options && options.onStartSaving) options.onStartSaving();
-
-                const googleUser = await authenticate();
+                await authenticate();
                 if (selectedFileOrFolder.type === 'FOLDER') {
                   const newFileId = await createNewJsonFile(
                     selectedFileOrFolder.id,
                     newFileName
                   );
-                  const newFileMetadata = {
-                    fileIdentifier: newFileId,
-                  };
-                  await options.onMoveResources({ newFileMetadata });
-
-                  await patchJsonFile(newFileId, googleUser, content);
-
-                  closeDialog();
                   resolve({
-                    wasSaved: true,
                     fileMetadata: {
-                      ...newFileMetadata,
-                      lastModifiedDate: Date.now(),
+                      fileIdentifier: newFileId,
                     },
                   });
                 } else {
-                  const newFileMetadata = {
-                    fileIdentifier: selectedFileOrFolder.id,
-                  };
-                  await options.onMoveResources({ newFileMetadata });
-                  await patchJsonFile(
-                    selectedFileOrFolder.id,
-                    googleUser,
-                    content
-                  );
-
-                  closeDialog();
                   resolve({
-                    wasSaved: true,
                     fileMetadata: {
-                      ...newFileMetadata,
-                      lastModifiedDate: Date.now(),
+                      fileIdentifier: selectedFileOrFolder.id,
                     },
                   });
                 }
@@ -451,6 +424,25 @@ export default ({
             />
           ));
         });
+      },
+      onSaveProjectAs: async (
+        project: gdProject,
+        fileMetadata: ?FileMetadata,
+        options
+      ) => {
+        if (!fileMetadata) throw new Error("A location was not chosen before saving as.");
+
+        const content = serializeToJSON(project);
+        if (options && options.onStartSaving) options.onStartSaving();
+
+        const googleUser = await authenticate();
+        await options.onMoveResources();
+        await patchJsonFile(fileMetadata.fileIdentifier, googleUser, content);
+
+        closeDialog();
+        return {
+          wasSaved: true,
+        };
       },
       getOpenErrorMessage: (error: Error): MessageDescriptor => {
         if (!apisLoaded) {

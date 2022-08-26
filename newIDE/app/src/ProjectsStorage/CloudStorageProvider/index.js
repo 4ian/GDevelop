@@ -5,6 +5,7 @@ import { type StorageProvider } from '../index';
 import {
   generateOnChangeProjectProperty,
   generateOnSaveProject,
+  generateOnChooseSaveProjectAsLocation,
   generateOnSaveProjectAs,
   getWriteErrorMessage,
 } from './CloudProjectWriter';
@@ -39,6 +40,11 @@ export default ({
       authenticatedUser
     ),
     onSaveProject: generateOnSaveProject(authenticatedUser),
+    onChooseSaveProjectAsLocation: generateOnChooseSaveProjectAsLocation(
+      authenticatedUser,
+      setDialog,
+      closeDialog
+    ),
     onSaveProjectAs: generateOnSaveProjectAs(
       authenticatedUser,
       setDialog,

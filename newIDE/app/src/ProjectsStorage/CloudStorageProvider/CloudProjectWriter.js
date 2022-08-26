@@ -118,6 +118,51 @@ export const getWriteErrorMessage = (
   return t`An error occurred when saving the project, please verify your internet connection or try again later.`;
 };
 
+export const generateOnChooseSaveProjectAsLocation = (
+  authenticatedUser: AuthenticatedUser,
+  setDialog: (() => React.Node) => void,
+  closeDialog: () => void
+) => async (
+  project: gdProject,
+  fileMetadata: ?FileMetadata
+): Promise<{|
+  fileMetadata: ?FileMetadata,
+|}> => {
+  if (!authenticatedUser.authenticated) {
+    return { fileMetadata: null };
+  }
+
+  const name = await new Promise(resolve => {
+    setDialog(() => (
+      <CloudSaveAsDialog
+        onCancel={() => {
+          closeDialog();
+          resolve(null);
+        }}
+        nameSuggestion={project.getName()}
+        onSave={(newName: string) => {
+          closeDialog();
+          resolve(newName);
+        }}
+      />
+    ));
+  });
+
+  if (!name) return { fileMetadata: null }; // Save was cancelled.
+
+  const cloudProject = await createCloudProject(authenticatedUser, {
+    name,
+  });
+  if (!cloudProject)
+    throw new Error('No cloud project was returned from creation api call.');
+
+  return {
+    fileMetadata: {
+      fileIdentifier: cloudProject.id,
+    },
+  };
+};
+
 export const generateOnSaveProjectAs = (
   authenticatedUser: AuthenticatedUser,
   setDialog: (() => React.Node) => void,
@@ -126,70 +171,34 @@ export const generateOnSaveProjectAs = (
   project: gdProject,
   fileMetadata: ?FileMetadata,
   options: {|
-    context?: 'duplicateCurrentProject',
     onStartSaving: () => void,
-    onMoveResources: (options: {|
-      newFileMetadata: FileMetadata,
-    |}) => Promise<void>,
+    onMoveResources: () => Promise<void>,
   |}
 ) => {
+  if (!fileMetadata)
+    throw new Error('A location was not chosen before saving as.');
   if (!authenticatedUser.authenticated) {
-    return { wasSaved: false, fileMetadata };
+    return { wasSaved: false };
   }
-  let name;
-
-  const isBlankProject = !fileMetadata;
-  const shouldDuplicateCurrentCloudProject =
-    fileMetadata && options && options.context === 'duplicateCurrentProject';
-  if (!isBlankProject && shouldDuplicateCurrentCloudProject) {
-    name = await new Promise(resolve => {
-      setDialog(() => (
-        <CloudSaveAsDialog
-          onCancel={() => {
-            closeDialog();
-            resolve(null);
-          }}
-          nameSuggestion={project.getName()}
-          onSave={(newName: string) => {
-            resolve(newName);
-          }}
-        />
-      ));
-    });
-    if (!name) return { wasSaved: false, fileMetadata };
-    project.setName(name);
-  } else {
-    name = project.getName();
-  }
-
   if (options && options.onStartSaving) options.onStartSaving();
-  closeDialog();
 
   // From now, save was confirmed so we create a new project. Any failure should
   // be reported as an error.
   try {
-    const cloudProject = await createCloudProject(authenticatedUser, {
-      name,
-    });
-    if (!cloudProject)
-      throw new Error('No cloud project was returned from creation api call.');
+    await options.onMoveResources();
 
-    const newFileMetadata = { fileIdentifier: cloudProject.id };
-
-    await options.onMoveResources({ newFileMetadata });
-
-    await getCredentialsForCloudProject(authenticatedUser, cloudProject.id);
+    const cloudProjectId = fileMetadata.fileIdentifier;
+    await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
     const newVersion = await zipProjectAndCommitVersion({
       authenticatedUser,
       project,
-      cloudProjectId: cloudProject.id,
+      cloudProjectId,
     });
     if (!newVersion)
       throw new Error('No version id was returned from committing api call.');
 
     return {
       wasSaved: true,
-      fileMetadata: newFileMetadata,
     };
   } catch (error) {
     console.error('An error occurred while creating a cloud project', error);

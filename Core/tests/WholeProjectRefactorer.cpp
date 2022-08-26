@@ -1831,6 +1831,13 @@ TEST_CASE("WholeProjectRefactorer (FindInvalidRequiredBehaviorProperties)",
 
 TEST_CASE("WholeProjectRefactorer (FixInvalidRequiredBehaviorProperties)",
           "[common]") {
+  // TODO: Add a cases for required behaviors that were removed.
+  // - add a required behavior "B" property to an event-based behavior "A"
+  // - remove the event-based behavior "B"
+  // - add the behavior "A" to an object
+  // Check that no behavior is added on the object for it and that there is no
+  // crash.
+  
   SECTION("Fix nothing if there are no missing required behavior") {
     gd::Project project;
     gd::Platform platform;

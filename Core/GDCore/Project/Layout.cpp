@@ -401,9 +401,8 @@ void Layout::Init(const Layout& other) {
 
   behaviorsSharedData.clear();
   for (const auto& it : other.behaviorsSharedData) {
-    auto *sharedData = it.second.get();
     behaviorsSharedData[it.first] =
-        gd::make_unique<gd::BehaviorsSharedData>(*sharedData);
+        gd::make_unique<gd::BehaviorsSharedData>(*(it.second->Clone()));
   }
 
   events = other.events;

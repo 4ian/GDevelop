@@ -27,13 +27,13 @@ import LocalEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoad
 import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import LocalFileStorageProvider from './ProjectsStorage/LocalFileStorageProvider';
 import { LocalGDJSDevelopmentWatcher } from './GameEngineFinder/LocalGDJSDevelopmentWatcher';
-import { LocalResourceFetcher } from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
 import {
   onCreateFromExampleShortHeader,
   onCreateBlank,
 } from './ProjectCreation/services/LocalCreation';
 import FakeCloudStorageProvider from './ProjectsStorage/FakeCloudStorageProvider';
 import LocalResourceMover from './ProjectsStorage/ResourceMover/LocalResourceMover';
+import LocalResourceFetcher from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
 
 const gd: libGDevelop = global.gd;
 
@@ -50,7 +50,6 @@ export const create = (authentication: Authentication) => {
       makeEventsFunctionCodeWriter={makeLocalEventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={LocalEventsFunctionsExtensionWriter}
       eventsFunctionsExtensionOpener={LocalEventsFunctionsExtensionOpener}
-      resourceFetcher={LocalResourceFetcher}
     >
       {({ i18n }) => (
         <ProjectStorageProviders
@@ -100,6 +99,7 @@ export const create = (authentication: Authentication) => {
               onCreateBlank={onCreateBlank}
               storageProviders={storageProviders}
               resourceMover={LocalResourceMover}
+              resourceFetcher={LocalResourceFetcher}
               getStorageProviderOperations={getStorageProviderOperations}
               getStorageProvider={getStorageProvider}
               resourceSources={localResourceSources}

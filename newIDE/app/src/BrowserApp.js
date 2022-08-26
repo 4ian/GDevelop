@@ -28,12 +28,12 @@ import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStoragePr
 import DropboxStorageProvider from './ProjectsStorage/DropboxStorageProvider';
 import OneDriveStorageProvider from './ProjectsStorage/OneDriveStorageProvider';
 import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
-import { BrowserResourceFetcher } from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
 import {
   onCreateFromExampleShortHeader,
   onCreateBlank,
 } from './ProjectCreation/services/BrowserCreation';
 import BrowserResourceMover from './ProjectsStorage/ResourceMover/BrowserResourceMover';
+import BrowserResourceFetcher from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
 
 export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
@@ -48,7 +48,6 @@ export const create = (authentication: Authentication) => {
       makeEventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={null}
       eventsFunctionsExtensionOpener={null}
-      resourceFetcher={BrowserResourceFetcher}
     >
       {({ i18n }) => (
         <ProjectStorageProviders
@@ -99,6 +98,7 @@ export const create = (authentication: Authentication) => {
               )}
               storageProviders={storageProviders}
               resourceMover={BrowserResourceMover}
+              resourceFetcher={BrowserResourceFetcher}
               onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
               onCreateBlank={onCreateBlank}
               getStorageProviderOperations={getStorageProviderOperations}

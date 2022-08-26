@@ -5,6 +5,7 @@ import { type StorageProvider } from '../index';
 import {
   generateOnChangeProjectProperty,
   generateOnSaveProject,
+  generateOnChooseSaveProjectAsLocation,
   generateOnSaveProjectAs,
   getWriteErrorMessage,
 } from './CloudProjectWriter';
@@ -19,6 +20,16 @@ import {
 } from './CloudProjectOpener';
 import Cloud from '../../UI/CustomSvgIcons/Cloud';
 
+const isURL = (filename: string) => {
+  return (
+    filename.startsWith('http://') ||
+    filename.startsWith('https://') ||
+    filename.startsWith('ftp://') ||
+    filename.startsWith('blob:') ||
+    filename.startsWith('data:')
+  );
+};
+
 export default ({
   internalName: 'Cloud',
   name: t`GDevelop Cloud`,
@@ -29,8 +40,11 @@ export default ({
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY]) return null;
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY].length) return null;
 
+    const fileIdentifier = appArguments[POSITIONAL_ARGUMENTS_KEY][0];
+    if (isURL(fileIdentifier)) return null;
+
     return {
-      fileIdentifier: appArguments[POSITIONAL_ARGUMENTS_KEY][0],
+      fileIdentifier,
     };
   },
   createOperations: ({ setDialog, closeDialog, authenticatedUser }) => ({
@@ -39,6 +53,11 @@ export default ({
       authenticatedUser
     ),
     onSaveProject: generateOnSaveProject(authenticatedUser),
+    onChooseSaveProjectAsLocation: generateOnChooseSaveProjectAsLocation(
+      authenticatedUser,
+      setDialog,
+      closeDialog
+    ),
     onSaveProjectAs: generateOnSaveProjectAs(
       authenticatedUser,
       setDialog,

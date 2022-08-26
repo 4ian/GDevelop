@@ -12,11 +12,13 @@ import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Window from '../Utils/Window';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
+import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 
 const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
+  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
   globalObjectsContainer: gdObjectsContainer,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
@@ -224,6 +226,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   launchProjectDataOnlyPreview: () => {},
                   launchProjectWithLoadingScreenPreview: () => {},
                 }}
+                onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
               />
             </Line>
             {this.state.editedObjectWithContext && (

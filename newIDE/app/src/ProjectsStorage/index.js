@@ -52,19 +52,21 @@ export type StorageProviderOperations = {|
     wasSaved: boolean,
     fileMetadata: FileMetadata,
   |}>,
+  onChooseSaveProjectAsLocation?: (
+    project: gdProject,
+    fileMetadata: ?FileMetadata, // This is the current location.
+  ) => Promise<{|
+    fileMetadata: ?FileMetadata, // This is the newly chosen location (or null if cancelled).
+  |}>,
   onSaveProjectAs?: (
     project: gdProject,
     fileMetadata: ?FileMetadata,
     options: {|
-      context?: 'duplicateCurrentProject',
       onStartSaving: () => void,
-      onMoveResources: (options: {|
-        newFileMetadata: FileMetadata,
-      |}) => Promise<void>,
+      onMoveResources: () => Promise<void>,
     |}
   ) => Promise<{|
     wasSaved: boolean,
-    fileMetadata: ?FileMetadata,
   |}>,
 
   // Project properties saving:

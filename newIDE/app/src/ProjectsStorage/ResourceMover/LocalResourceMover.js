@@ -5,6 +5,7 @@ import {
   type MoveAllProjectResourcesFunction,
 } from './index';
 import LocalFileStorageProvider from '../LocalFileStorageProvider';
+import {moveUrlResourcesToLocalFiles} from '../LocalFileStorageProvider/LocalFileResourceMover';
 import UrlStorageProvider from '../UrlStorageProvider';
 import localFileSystem from '../../Export/LocalExporters/LocalFileSystem';
 import assignIn from 'lodash/assignIn';
@@ -18,7 +19,7 @@ const movers: {
 } = {
   [`${LocalFileStorageProvider.internalName}=>${
     LocalFileStorageProvider.internalName
-  }`]: ({ project, newFileMetadata }: MoveAllProjectResourcesOptions) => {
+  }`]: async ({ project, newFileMetadata }: MoveAllProjectResourcesOptions) => {
     // TODO: Ideally, errors while copying resources should be reported.
     // TODO: Report progress.
     const projectPath = path.dirname(newFileMetadata.fileIdentifier);
@@ -35,18 +36,13 @@ const movers: {
       erroredResources: [],
     };
   },
+  // On the desktop app, try to download all URLs into local files, put
+  // next to the project file (in a "assets" directory). This is helpful
+  // to continue working on a game started on the web-app (using public URLs
+  // for resources).
   [`${UrlStorageProvider.internalName}=>${
     LocalFileStorageProvider.internalName
-  }`]: (options: MoveAllProjectResourcesOptions) => {
-    // TODO: Currently unused.
-    // Download resources. Check if this ResourceFetcher can be moved here.
-    console.log(
-      'TODO - once save as it used for project creation: download resources, check ResourceFetcher implementation.'
-    );
-    return {
-      erroredResources: [],
-    };
-  },
+  }`]: ({project, newFileMetadata, onProgress}) => moveUrlResourcesToLocalFiles({ project, fileMetadata: newFileMetadata, onProgress}),
 };
 
 const LocalResourceMover = {

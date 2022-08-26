@@ -14,7 +14,7 @@ const styles = {
   },
   point: {
     position: 'absolute',
-    transform: 'translate(-6px, -5px)',
+    transform: 'translate(-5px, -5px)',
     cursor: 'move',
     width: 11,
     height: 11,

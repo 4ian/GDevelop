@@ -2,7 +2,7 @@
 const styles = {
   nameColumn: { width: '40%' },
   coordinateColumn: {
-    width: 60,
+    width: 80,
   },
   toolColumn: {
     width: 36,

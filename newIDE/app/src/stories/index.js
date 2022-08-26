@@ -134,11 +134,9 @@ import EmailVerificationPendingDialog from '../Profile/EmailVerificationPendingD
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import { Column, Line } from '../UI/Grid';
-import { LineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import DragAndDropTestBed from './DragAndDropTestBed';
 import EditorMosaic from '../UI/EditorMosaic';
 import FlatButton from '../UI/FlatButton';
-import TextButton from '../UI/TextButton';
 import EditorMosaicPlayground from './EditorMosaicPlayground';
 import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
 import ChooseEventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor/ChooseEventsFunctionsExtensionEditor';
@@ -148,14 +146,9 @@ import CreateAccountDialog from '../Profile/CreateAccountDialog';
 import BrowserPreviewErrorDialog from '../Export/BrowserExporters/BrowserS3PreviewLauncher/BrowserPreviewErrorDialog';
 import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
-import ToolbarIcon from '../UI/ToolbarIcon';
-import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import IconButton from '../UI/IconButton';
-import FilterList from '@material-ui/icons/FilterList';
 import Brush from '@material-ui/icons/Brush';
 import Delete from '@material-ui/icons/Delete';
-import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
-import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import fakeResourceExternalEditors from './FakeResourceExternalEditors';
 import {
   TextFieldWithButtonLayout,
@@ -3235,6 +3228,8 @@ storiesOf('Profile/EditProfileDialog', module)
         username: 'username',
         description: 'I am just another video game enthusiast!',
         getGameStatsEmail: false,
+        isCreator: true,
+        isPlayer: false,
       }}
       onClose={action('on close')}
       editInProgress={false}
@@ -3250,6 +3245,8 @@ storiesOf('Profile/EditProfileDialog', module)
         username: 'username',
         description: 'I am just another video game enthusiast!',
         getGameStatsEmail: false,
+        isCreator: true,
+        isPlayer: false,
       }}
       onClose={action('on close')}
       editInProgress={false}
@@ -3265,6 +3262,8 @@ storiesOf('Profile/EditProfileDialog', module)
         username: 'username',
         description: 'I am just another video game enthusiast!',
         getGameStatsEmail: false,
+        isCreator: true,
+        isPlayer: false,
       }}
       onClose={action('on close')}
       editInProgress

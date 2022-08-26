@@ -183,11 +183,11 @@ const PointsList = (props: PointsListProps) => {
             <TableHeaderColumn style={styles.nameColumn}>
               <Trans>Point name</Trans>
             </TableHeaderColumn>
-            <TableHeaderColumn style={styles.coordinateColumn}>
-              X
+            <TableHeaderColumn style={styles.coordinateColumn} padding="none">
+              <Column>X</Column>
             </TableHeaderColumn>
-            <TableHeaderColumn style={styles.coordinateColumn}>
-              Y
+            <TableHeaderColumn style={styles.coordinateColumn} padding="none">
+              <Column>Y</Column>
             </TableHeaderColumn>
             <TableHeaderColumn style={styles.toolColumn} />
           </TableRow>

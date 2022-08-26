@@ -60,5 +60,6 @@ export default ({
         content: response.data,
       };
     },
+    // TODO: Move the thing to fetch resources here.
   }),
 }: StorageProvider);

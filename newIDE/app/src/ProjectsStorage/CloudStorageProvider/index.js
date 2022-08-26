@@ -5,6 +5,7 @@ import { type StorageProvider } from '../index';
 import {
   generateOnChangeProjectProperty,
   generateOnSaveProject,
+  generateOnChooseSaveProjectAsLocation,
   generateOnSaveProjectAs,
   getWriteErrorMessage,
 } from './CloudProjectWriter';
@@ -13,7 +14,10 @@ import {
   POSITIONAL_ARGUMENTS_KEY,
 } from '../../Utils/Window';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
-import { generateOnOpen } from './CloudProjectOpener';
+import {
+  generateOnOpen,
+  generateOnEnsureCanAccessResources,
+} from './CloudProjectOpener';
 import Cloud from '../../UI/CustomSvgIcons/Cloud';
 
 export default ({
@@ -32,7 +36,15 @@ export default ({
   },
   createOperations: ({ setDialog, closeDialog, authenticatedUser }) => ({
     onOpen: generateOnOpen(authenticatedUser),
+    onEnsureCanAccessResources: generateOnEnsureCanAccessResources(
+      authenticatedUser
+    ),
     onSaveProject: generateOnSaveProject(authenticatedUser),
+    onChooseSaveProjectAsLocation: generateOnChooseSaveProjectAsLocation(
+      authenticatedUser,
+      setDialog,
+      closeDialog
+    ),
     onSaveProjectAs: generateOnSaveProjectAs(
       authenticatedUser,
       setDialog,

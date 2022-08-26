@@ -94,9 +94,6 @@ const WrappedHomePage = ({
                 onOpenOnboardingDialog={() =>
                   action('open onboarding dialog')()
                 }
-                onOpenProjectAfterCreation={() =>
-                  action('call callback after project creation')()
-                }
                 onOpenProjectPreCreationDialog={() =>
                   action('open precreation dialog')()
                 }

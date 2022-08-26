@@ -176,7 +176,6 @@ import ScrollView from '../UI/ScrollView';
 import '../UI/Theme/Global/Scrollbar.css';
 import '../UI/Theme/Global/Animation.css';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
-import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
 import { GamesShowcase } from '../GamesShowcase';
 import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
 import { ShowcasedGameListItem } from '../GamesShowcase/ShowcasedGameListItem';
@@ -4079,37 +4078,6 @@ storiesOf('HotReloadLogsDialog', module)
       ]}
       onClose={() => {}}
       onLaunchNewPreview={() => {}}
-    />
-  ));
-
-storiesOf('ResourceFetcher/ResourceFetcherDialog', module)
-  .addDecorator(muiDecorator)
-  .add('in progress', () => (
-    <ResourceFetcherDialog
-      progress={40}
-      fetchedResources={null}
-      onAbandon={null}
-      onRetry={null}
-    />
-  ))
-  .add('with errors', () => (
-    <ResourceFetcherDialog
-      progress={100}
-      fetchedResources={{
-        fetchedResources: [],
-        erroredResources: [
-          {
-            resourceName: 'Player.png',
-            error: new Error('Fake download error'),
-          },
-          {
-            resourceName: 'Spaceship.png',
-            error: new Error('Another fake error'),
-          },
-        ],
-      }}
-      onAbandon={action('abandon')}
-      onRetry={action('retry')}
     />
   ));
 

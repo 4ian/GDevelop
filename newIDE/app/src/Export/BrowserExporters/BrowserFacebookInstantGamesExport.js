@@ -8,7 +8,7 @@ import {
   type UrlFileDescriptor,
   type TextFileDescriptor,
   type BlobFileDescriptor,
-  downloadUrlsToBlobs,
+  downloadUrlFilesToBlobFiles,
   archiveFiles,
 } from '../../Utils/BrowserArchiver';
 import {
@@ -112,7 +112,7 @@ export const browserFacebookInstantGamesExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     { textFiles, urlFiles }: ExportOutput
   ): Promise<ResourcesDownloadOutput> => {
-    return downloadUrlsToBlobs({
+    return downloadUrlFilesToBlobFiles({
       urlFiles,
       onProgress: context.updateStepProgress,
     }).then(blobFiles => ({

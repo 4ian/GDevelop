@@ -45,7 +45,6 @@ const fetchResources = async ({
 }: FetchResourcesArgs) => {
   const resourcesManager = project.getResourcesManager();
   const erroredResources = [];
-  const fetchedResources = [];
 
   const projectFileUrl = project.getProjectFile();
   const projectBaseUrl = projectFileUrl.substr(
@@ -56,7 +55,6 @@ const fetchResources = async ({
     // Can't fetch anything relative to this project, because
     // this project does not have a public URL.
     return {
-      fetchedResources: [],
       erroredResources: [],
     };
   }
@@ -77,7 +75,6 @@ const fetchResources = async ({
         });
 
         resource.setFile(resourceFullUrl);
-        fetchedResources.push({ resourceName });
       } catch (error) {
         erroredResources.push({ resourceName, error });
       }
@@ -86,11 +83,11 @@ const fetchResources = async ({
     });
 
   return {
-    fetchedResources,
     erroredResources,
   };
 };
 
+// TODO: This is the ResourceFetcher of UrlStorageProvider.
 export const BrowserResourceFetcher: ResourceFetcher = {
   getResourcesToFetch,
   fetchResources,

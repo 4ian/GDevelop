@@ -11,6 +11,7 @@ import styles from './styles';
 import ThemeConsumer from '../../../../UI/Theme/ThemeConsumer';
 import Text from '../../../../UI/Text';
 import { roundTo } from '../../../../Utils/Mathematics';
+import { Column } from '../../../../UI/Grid';
 
 const POINT_COORDINATE_PRECISION = 4;
 
@@ -62,7 +63,8 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => (
             onBlur={props.onBlur}
           />
         </TableRowColumn>
-        <TableRowColumn style={styles.coordinateColumn}>
+        <TableRowColumn style={styles.coordinateColumn} padding="none">
+          <Column>
           {!props.isAutomatic ? (
             <SemiControlledTextField
               margin="none"
@@ -89,8 +91,10 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => (
               <Trans>(auto)</Trans>
             </Text>
           )}
+          </Column>
         </TableRowColumn>
-        <TableRowColumn style={styles.coordinateColumn}>
+        <TableRowColumn style={styles.coordinateColumn} padding="none">
+          <Column>
           {!props.isAutomatic ? (
             <SemiControlledTextField
               margin="none"
@@ -117,6 +121,7 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => (
               <Trans>(auto)</Trans>
             </Text>
           )}
+          </Column>
         </TableRowColumn>
         <TableRowColumn style={styles.toolColumn}>
           {!!props.onRemove && (

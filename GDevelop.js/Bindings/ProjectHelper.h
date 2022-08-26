@@ -54,15 +54,14 @@ class ProjectHelper {
     gd::Project project;
     project.AddPlatform(JsPlatform::Get());
 
-    gd::SerializerElement behaviorContent;
-    behavior->InitializeContent(behaviorContent);
+    behavior->InitializeContent();
 
     // Call GetProperties as a sanity check
-    behavior->GetProperties(behaviorContent)[propertyName].GetValue();
+    behavior->GetProperties()[propertyName].GetValue();
 
-    behavior->UpdateProperty(behaviorContent, propertyName, newValue);
+    behavior->UpdateProperty(propertyName, newValue);
     gd::String updatedValue =
-        behavior->GetProperties(behaviorContent)[propertyName].GetValue();
+        behavior->GetProperties()[propertyName].GetValue();
     if (updatedValue != newValue) {
       return "FAIL: expected the newValue to be set for the property, but "
              "received:" +
@@ -83,15 +82,14 @@ class ProjectHelper {
     gd::Project project;
     project.AddPlatform(JsPlatform::Get());
 
-    gd::SerializerElement sharedDataContent;
-    sharedData->InitializeContent(sharedDataContent);
+    sharedData->InitializeContent();
 
     // Call GetProperties as a sanity check
-    sharedData->GetProperties(sharedDataContent)[propertyName].GetValue();
+    sharedData->GetProperties()[propertyName].GetValue();
 
-    sharedData->UpdateProperty(sharedDataContent, propertyName, newValue);
+    sharedData->UpdateProperty(propertyName, newValue);
     gd::String updatedValue =
-        sharedData->GetProperties(sharedDataContent)[propertyName].GetValue();
+        sharedData->GetProperties()[propertyName].GetValue();
     if (updatedValue != newValue) {
       return "FAIL: expected the newValue to be set for the property, but "
              "received:" +

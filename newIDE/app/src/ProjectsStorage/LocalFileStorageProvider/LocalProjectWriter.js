@@ -8,11 +8,7 @@ import {
   getSlugifiedUniqueNameFromProperty,
 } from '../../Utils/ObjectSplitter';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
-import localFileSystem from '../../Export/LocalExporters/LocalFileSystem';
-import assignIn from 'lodash/assignIn';
 import { t } from '@lingui/macro';
-
-const gd: libGDevelop = global.gd;
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -143,16 +139,21 @@ export const onSaveProject = (
   });
 };
 
-export const onSaveProjectAs = (
+export const onSaveProjectAs = async (
   project: gdProject,
   fileMetadata: ?FileMetadata,
-  options?: { context?: 'duplicateCurrentProject', onStartSaving: () => void }
+  options: {|
+    context?: 'duplicateCurrentProject',
+    onStartSaving: () => void,
+    onMoveResources: (options: {|
+      newFileMetadata: FileMetadata,
+    |}) => Promise<void>,
+  |}
 ): Promise<{|
   wasSaved: boolean,
   fileMetadata: ?FileMetadata,
 |}> => {
   const defaultPath = fileMetadata ? fileMetadata.fileIdentifier : '';
-  const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
   const browserWindow = remote.getCurrentWindow();
   const saveDialogOptions = {
     defaultPath,
@@ -160,25 +161,22 @@ export const onSaveProjectAs = (
   };
 
   if (!dialog) {
-    return Promise.reject('Unsupported');
+    throw new Error('Unsupported');
   }
   const filePath = dialog.showSaveDialogSync(browserWindow, saveDialogOptions);
   if (!filePath) {
-    return Promise.resolve({ wasSaved: false, fileMetadata });
+    return { wasSaved: false, fileMetadata };
   }
   const projectPath = path.dirname(filePath);
 
   if (options && options.onStartSaving) options.onStartSaving();
 
-  // TODO: Ideally, errors while copying resources should be reported.
-  gd.ProjectResourcesCopier.copyAllResourcesTo(
-    project,
-    fileSystem,
-    projectPath,
-    true, // Update the project with the new resource paths
-    false, // Don't move absolute files
-    true // Keep relative files folders structure.
-  );
+  const newFileMetadata = {
+    ...fileMetadata,
+    fileIdentifier: filePath,
+  };
+
+  await options.onMoveResources({ newFileMetadata });
 
   // Update the project with the new file path (resources have already been updated)
   project.setProjectFile(filePath);
@@ -187,8 +185,7 @@ export const onSaveProjectAs = (
     return {
       wasSaved: true,
       fileMetadata: {
-        ...fileMetadata,
-        fileIdentifier: filePath,
+        ...newFileMetadata,
         lastModifiedDate: Date.now(),
       },
     }; // Save was properly done

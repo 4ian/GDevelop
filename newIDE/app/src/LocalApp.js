@@ -33,6 +33,7 @@ import {
   onCreateBlank,
 } from './ProjectCreation/services/LocalCreation';
 import FakeCloudStorageProvider from './ProjectsStorage/FakeCloudStorageProvider';
+import LocalResourceMover from './ProjectsStorage/ResourceMover/LocalResourceMover';
 
 const gd: libGDevelop = global.gd;
 
@@ -98,6 +99,7 @@ export const create = (authentication: Authentication) => {
               onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
               onCreateBlank={onCreateBlank}
               storageProviders={storageProviders}
+              resourceMover={LocalResourceMover}
               getStorageProviderOperations={getStorageProviderOperations}
               getStorageProvider={getStorageProvider}
               resourceSources={localResourceSources}

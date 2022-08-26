@@ -105,32 +105,6 @@ export const generateOnChangeProjectProperty = (
   }
 };
 
-const createCloudProjectAndInitCommit = async (
-  project: gdProject,
-  authenticatedUser: AuthenticatedUser,
-  name: string
-): Promise<?string> => {
-  try {
-    const cloudProject = await createCloudProject(authenticatedUser, {
-      name,
-    });
-    if (!cloudProject)
-      throw new Error('No cloud project was returned from creation api call.');
-    await getCredentialsForCloudProject(authenticatedUser, cloudProject.id);
-    const newVersion = await zipProjectAndCommitVersion({
-      authenticatedUser,
-      project,
-      cloudProjectId: cloudProject.id,
-    });
-    if (!newVersion)
-      throw new Error('No version id was returned from committing api call.');
-    return cloudProject.id;
-  } catch (error) {
-    console.error('An error occurred while creating a cloud project', error);
-    throw error;
-  }
-};
-
 export const getWriteErrorMessage = (
   error: Error | $AxiosError<any>
 ): MessageDescriptor => {
@@ -151,7 +125,13 @@ export const generateOnSaveProjectAs = (
 ) => async (
   project: gdProject,
   fileMetadata: ?FileMetadata,
-  options?: { context?: 'duplicateCurrentProject', onStartSaving: () => void }
+  options: {|
+    context?: 'duplicateCurrentProject',
+    onStartSaving: () => void,
+    onMoveResources: (options: {|
+      newFileMetadata: FileMetadata,
+    |}) => Promise<void>,
+  |}
 ) => {
   if (!authenticatedUser.authenticated) {
     return { wasSaved: false, fileMetadata };
@@ -185,16 +165,34 @@ export const generateOnSaveProjectAs = (
   if (options && options.onStartSaving) options.onStartSaving();
   closeDialog();
 
-  const cloudProjectId = await createCloudProjectAndInitCommit(
-    project,
-    authenticatedUser,
-    name
-  );
+  // From now, save was confirmed so we create a new project. Any failure should
+  // be reported as an error.
+  try {
+    const cloudProject = await createCloudProject(authenticatedUser, {
+      name,
+    });
+    if (!cloudProject)
+      throw new Error('No cloud project was returned from creation api call.');
 
-  if (!cloudProjectId) return { wasSaved: false, fileMetadata };
+    const newFileMetadata = { fileIdentifier: cloudProject.id };
 
-  return {
-    wasSaved: true,
-    fileMetadata: { fileIdentifier: cloudProjectId },
-  };
+    await options.onMoveResources({ newFileMetadata });
+
+    await getCredentialsForCloudProject(authenticatedUser, cloudProject.id);
+    const newVersion = await zipProjectAndCommitVersion({
+      authenticatedUser,
+      project,
+      cloudProjectId: cloudProject.id,
+    });
+    if (!newVersion)
+      throw new Error('No version id was returned from committing api call.');
+
+    return {
+      wasSaved: true,
+      fileMetadata: newFileMetadata,
+    };
+  } catch (error) {
+    console.error('An error occurred while creating a cloud project', error);
+    throw error;
+  }
 };

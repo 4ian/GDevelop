@@ -15,13 +15,23 @@ export default ({
   renderIcon: props => <SaveAlt fontSize={props.size} />,
   hiddenInOpenDialog: true,
   createOperations: ({ setDialog, closeDialog }) => ({
-    onSaveProjectAs: (project: gdProject, fileMetadata: ?FileMetadata) => {
+    onSaveProjectAs: async (
+      project: gdProject,
+      fileMetadata: ?FileMetadata,
+      options
+    ) => {
+      if (options && options.onStartSaving) options.onStartSaving();
+
       const newFileMetadata = fileMetadata
         ? {
             ...fileMetadata,
             lastModifiedDate: Date.now(),
           }
         : fileMetadata;
+
+      // TODO: can this even be null??
+      await options.onMoveResources({ newFileMetadata });
+
       return new Promise(resolve => {
         setDialog(() => (
           <DownloadSaveAsDialog

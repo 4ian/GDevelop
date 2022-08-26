@@ -391,10 +391,7 @@ export default ({
       onSaveProjectAs: (
         project: gdProject,
         fileMetadata: ?FileMetadata,
-        options?: {
-          context?: 'duplicateCurrentProject',
-          onStartSaving: () => void,
-        }
+        options
       ) => {
         return new Promise(resolve => {
           setDialog(() => (
@@ -404,48 +401,51 @@ export default ({
                 closeDialog();
                 resolve({ wasSaved: false, fileMetadata });
               }}
-              onSave={({ selectedFileOrFolder, newFileName }) => {
+              onSave={async ({ selectedFileOrFolder, newFileName }) => {
                 const content = serializeToJSON(project);
 
                 if (options && options.onStartSaving) options.onStartSaving();
 
+                const googleUser = await authenticate();
                 if (selectedFileOrFolder.type === 'FOLDER') {
-                  return authenticate().then(googleUser =>
-                    createNewJsonFile(
-                      selectedFileOrFolder.id,
-                      newFileName
-                    ).then(newFileId =>
-                      patchJsonFile(newFileId, googleUser, content).then(() => {
-                        closeDialog();
-                        resolve({
-                          wasSaved: true,
-                          fileMetadata: {
-                            fileIdentifier: newFileId,
-                            lastModifiedDate: Date.now(),
-                          },
-                        });
-                      })
-                    )
+                  const newFileId = await createNewJsonFile(
+                    selectedFileOrFolder.id,
+                    newFileName
                   );
+                  const newFileMetadata = {
+                    fileIdentifier: newFileId,
+                  };
+                  await options.onMoveResources({ newFileMetadata });
+
+                  await patchJsonFile(newFileId, googleUser, content);
+
+                  closeDialog();
+                  resolve({
+                    wasSaved: true,
+                    fileMetadata: {
+                      ...newFileMetadata,
+                      lastModifiedDate: Date.now(),
+                    },
+                  });
                 } else {
-                  return authenticate()
-                    .then(googleUser =>
-                      patchJsonFile(
-                        selectedFileOrFolder.id,
-                        googleUser,
-                        content
-                      )
-                    )
-                    .then(() => {
-                      closeDialog();
-                      resolve({
-                        wasSaved: true,
-                        fileMetadata: {
-                          fileIdentifier: selectedFileOrFolder.id,
-                          lastModifiedDate: Date.now(),
-                        },
-                      });
-                    });
+                  const newFileMetadata = {
+                    fileIdentifier: selectedFileOrFolder.id,
+                  };
+                  await options.onMoveResources({ newFileMetadata });
+                  await patchJsonFile(
+                    selectedFileOrFolder.id,
+                    googleUser,
+                    content
+                  );
+
+                  closeDialog();
+                  resolve({
+                    wasSaved: true,
+                    fileMetadata: {
+                      ...newFileMetadata,
+                      lastModifiedDate: Date.now(),
+                    },
+                  });
                 }
               }}
             />

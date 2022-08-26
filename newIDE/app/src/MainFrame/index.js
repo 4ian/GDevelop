@@ -42,7 +42,6 @@ import {
   notifyPreviewWillStart,
   moveTabToTheRightOfHoveredTab,
 } from './EditorTabs/EditorTabsHandler';
-import { timePromise } from '../Utils/TimeFunction';
 import HelpFinder from '../HelpFinder';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -141,6 +140,10 @@ import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 import { useLeaderboardReplacer } from '../Leaderboard/useLeaderboardReplacer';
 import useConfirmDialog from '../UI/Confirm/useConfirmDialog';
 import ProjectPreCreationDialog from '../ProjectCreation/ProjectPreCreationDialog';
+import {
+  useResourceMover,
+  type ResourceMover,
+} from '../ProjectsStorage/ResourceMover';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -234,6 +237,7 @@ export type Props = {
   ) => React.Element<PreviewLauncherComponent>,
   onEditObject?: gdObject => void,
   storageProviders: Array<StorageProvider>,
+  resourceMover: ResourceMover,
   getStorageProviderOperations: (
     ?{
       storageProvider: StorageProvider,
@@ -406,6 +410,7 @@ const MainFrame = (props: Props) => {
     resourceSources,
     renderPreviewLauncher,
     resourceExternalEditors,
+    resourceMover,
     getStorageProviderOperations,
     getStorageProvider,
     integratedEditor,
@@ -415,6 +420,11 @@ const MainFrame = (props: Props) => {
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
   } = props;
+
+  const {
+    ensureResourcesAreMoved,
+    renderResourceMoverDialog,
+  } = useResourceMover({ resourceMover });
 
   React.useEffect(
     () => {
@@ -719,6 +729,7 @@ const MainFrame = (props: Props) => {
 
       // Fetch the resources if needed, for example if opening on the desktop app
       // a project made on the web-app.
+      // TODO: use ResourcesMover?
       const { someResourcesWereFetched } = await ensureResourcesAreFetched(
         project
       );
@@ -745,15 +756,14 @@ const MainFrame = (props: Props) => {
       serializedProject: gdSerializerElement,
       fileMetadata: ?FileMetadata
     ): Promise<State> => {
-      return timePromise(
-        () => {
-          const newProject = gd.ProjectHelper.createNewGDJSProject();
-          newProject.unserializeFrom(serializedProject);
+      const startTime = Date.now();
+      const newProject = gd.ProjectHelper.createNewGDJSProject();
+      newProject.unserializeFrom(serializedProject);
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+      console.info(`Unserialization took ${duration.toFixed(2)} ms`);
 
-          return loadFromProject(newProject, fileMetadata);
-        },
-        time => console.info(`Unserialization took ${time} ms`)
-      );
+      return loadFromProject(newProject, fileMetadata);
     },
     [loadFromProject]
   );
@@ -1813,7 +1823,7 @@ const MainFrame = (props: Props) => {
   );
 
   const saveProjectAsWithStorageProvider = React.useCallback(
-    (
+    async (
       options: ?{
         context?: 'duplicateCurrentProject',
         storageProviderOperationsGetOptions?: {
@@ -1826,14 +1836,20 @@ const MainFrame = (props: Props) => {
 
       saveUiSettings(state.editorTabs);
 
-      const storageProviderOperations = getStorageProviderOperations(
+      // Remember the old storage provider, as we may need to use it to get access
+      // to resources.
+      const oldStorageProvider = getStorageProvider();
+      const oldStorageProviderOperations = getStorageProviderOperations();
+
+      // Get the methods to save the project using the *new* storage provider.
+      const newStorageProvider = getStorageProvider();
+      const newStorageProviderOperations = getStorageProviderOperations(
         options ? options.storageProviderOperationsGetOptions : null
       );
-
       const {
         onSaveProjectAs,
         getWriteErrorMessage,
-      } = storageProviderOperations;
+      } = newStorageProviderOperations;
       if (!onSaveProjectAs) {
         return;
       }
@@ -1850,53 +1866,69 @@ const MainFrame = (props: Props) => {
       // may have changed (if the user opened another project). So we read and
       // store their values in variables now.
       const projectName = currentProject.getName();
-      const storageProviderInternalName = getStorageProvider().internalName;
+      const storageProviderInternalName = newStorageProvider.internalName;
 
-      onSaveProjectAs(currentProject, currentFileMetadata, {
-        context: options ? options.context : undefined,
-        onStartSaving: () => _showSnackMessage(i18n._(t`Saving...`)),
-      })
-        .then(
-          ({ wasSaved, fileMetadata }) => {
-            if (wasSaved) {
-              if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
-              _showSnackMessage(i18n._(t`Project properly saved`));
-
-              if (fileMetadata) {
-                const enrichedFileMetadata = fileMetadata.name
-                  ? fileMetadata
-                  : { ...fileMetadata, name: projectName };
-                preferences.insertRecentProjectFile({
-                  fileMetadata: enrichedFileMetadata,
-                  storageProviderName: storageProviderInternalName,
-                });
-                if (isCurrentProjectStale(currentProjectRef, currentProject)) {
-                  // We do not want to change the current file metadata if the
-                  // project has changed before the promise resolves.
-                  setState(state => ({
-                    ...state,
-                    currentFileMetadata: enrichedFileMetadata,
-                  }));
-                }
-              }
-            }
-          },
-          rawError => {
-            const errorMessage = getWriteErrorMessage
-              ? getWriteErrorMessage(rawError)
-              : t`An error occurred when saving the project. Please try again later.`;
-            showErrorBox({
-              message: i18n._(errorMessage),
-              rawError,
-              errorId: 'project-save-as-error',
-            });
+      try {
+        const { wasSaved, fileMetadata } = await onSaveProjectAs(
+          currentProject,
+          currentFileMetadata,
+          {
+            context: options ? options.context : undefined,
+            onStartSaving: () => _showSnackMessage(i18n._(t`Saving...`)),
+            onMoveResources: async ({ newFileMetadata }) => {
+              await ensureResourcesAreMoved({
+                project: currentProject,
+                newFileMetadata,
+                newStorageProvider,
+                newStorageProviderOperations,
+                oldFileMetadata: currentFileMetadata,
+                oldStorageProvider,
+                oldStorageProviderOperations,
+                authenticatedUser,
+              });
+            },
           }
-        )
-        .catch(() => {})
-        .then(() => {
-          setIsSavingProject(false);
-          updateWindowTitle();
+        );
+
+        if (!wasSaved) return; // Save was cancelled, don't do anything.
+
+        if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
+        _showSnackMessage(i18n._(t`Project properly saved`));
+
+        if (fileMetadata) {
+          // Save was done on a new file/location, so save it in the
+          // recent projects and in the state.
+          const enrichedFileMetadata = fileMetadata.name
+            ? fileMetadata
+            : { ...fileMetadata, name: projectName };
+          preferences.insertRecentProjectFile({
+            fileMetadata: enrichedFileMetadata,
+            storageProviderName: storageProviderInternalName,
+          });
+          if (isCurrentProjectStale(currentProjectRef, currentProject)) {
+            // We do not want to change the current file metadata if the
+            // project has changed before the promise resolves.
+            setState(state => ({
+              ...state,
+              currentFileMetadata: enrichedFileMetadata,
+            }));
+          }
+        } else {
+          // TODO: Comment what this case represents.
+        }
+      } catch (rawError) {
+        const errorMessage = getWriteErrorMessage
+          ? getWriteErrorMessage(rawError)
+          : t`An error occurred when saving the project. Please try again later.`;
+        showErrorBox({
+          message: i18n._(errorMessage),
+          rawError,
+          errorId: 'project-save-as-error',
         });
+      } finally {
+        setIsSavingProject(false);
+        updateWindowTitle();
+      }
     },
     [
       i18n,
@@ -1911,6 +1943,8 @@ const MainFrame = (props: Props) => {
       getStorageProvider,
       preferences,
       updateWindowTitle,
+      ensureResourcesAreMoved,
+      authenticatedUser,
     ]
   );
 
@@ -2630,24 +2664,29 @@ const MainFrame = (props: Props) => {
             _previewLauncher.current = previewLauncher;
           }
         )}
-      {!!currentProject && chooseResourceOptions && onResourceChosen && (
-        <NewResourceDialog
-          project={currentProject}
-          i18n={i18n}
-          resourceSources={resourceSources}
-          onChooseResources={resources => {
-            setOnResourceChosen(null);
-            setChooseResourceOptions(null);
-            onResourceChosen(resources);
-          }}
-          onClose={() => {
-            setOnResourceChosen(null);
-            setChooseResourceOptions(null);
-            onResourceChosen([]);
-          }}
-          options={chooseResourceOptions}
-        />
-      )}
+      {chooseResourceOptions &&
+        onResourceChosen &&
+        !!currentProject &&
+        !!currentFileMetadata && (
+          <NewResourceDialog
+            project={currentProject}
+            fileMetadata={currentFileMetadata}
+            getStorageProvider={getStorageProvider}
+            i18n={i18n}
+            resourceSources={resourceSources}
+            onChooseResources={resources => {
+              setOnResourceChosen(null);
+              setChooseResourceOptions(null);
+              onResourceChosen(resources);
+            }}
+            onClose={() => {
+              setOnResourceChosen(null);
+              setChooseResourceOptions(null);
+              onResourceChosen([]);
+            }}
+            options={chooseResourceOptions}
+          />
+        )}
       {profileDialogOpen && (
         <ProfileDialog
           currentProject={currentProject}
@@ -2739,6 +2778,7 @@ const MainFrame = (props: Props) => {
       {renderOpenConfirmDialog()}
       {renderLeaderboardReplacerDialog()}
       {renderResourceFetcherDialog()}
+      {renderResourceMoverDialog()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}

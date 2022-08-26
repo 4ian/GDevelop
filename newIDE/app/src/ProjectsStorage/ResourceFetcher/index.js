@@ -1,30 +1,9 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
-import FlatButton from '../../UI/FlatButton';
-import { Line } from '../../UI/Grid';
-import Text from '../../UI/Text';
 import {
-  Table,
-  TableBody,
-  TableHeader,
-  TableHeaderColumn,
-  TableRow,
-  TableRowColumn,
-} from '../../UI/Table';
-import { ColumnStackLayout } from '../../UI/Layout';
-import LinearProgress from '../../UI/LinearProgress';
-
-export type FetchedResources = {|
-  erroredResources: Array<{|
-    resourceName: string,
-    error: Error,
-  |}>,
-  fetchedResources: Array<{|
-    resourceName: string,
-  |}>,
-|};
+  ResourceMoverDialog,
+  type MoveAllProjectResourcesResult,
+} from '../ResourceMover';
 
 export type FetchResourcesArgs = {|
   project: gdProject,
@@ -39,95 +18,12 @@ export type FetchResourcesArgs = {|
  */
 export type ResourceFetcher = {|
   getResourcesToFetch: (project: gdProject) => Array<string>,
-  fetchResources: FetchResourcesArgs => Promise<FetchedResources>,
+  fetchResources: FetchResourcesArgs => Promise<MoveAllProjectResourcesResult>,
 |};
 
 export const ResourceFetcherContext = React.createContext<?ResourceFetcher>(
   null
 );
-
-type ResourceFetcherDialogProps = {|
-  progress: number,
-  fetchedResources: ?FetchedResources,
-  onAbandon: ?() => void,
-  onRetry: ?() => void,
-|};
-
-export const ResourceFetcherDialog = ({
-  progress,
-  fetchedResources,
-  onAbandon,
-  onRetry,
-}: ResourceFetcherDialogProps) => {
-  const hasErrors =
-    fetchedResources && fetchedResources.erroredResources.length > 0;
-
-  return (
-    <Dialog
-      actions={[
-        onRetry ? (
-          <DialogPrimaryButton
-            label={<Trans>Retry</Trans>}
-            primary
-            onClick={onRetry}
-            key="retry"
-          />
-        ) : null,
-        <FlatButton
-          label={
-            onAbandon ? <Trans>Abandon</Trans> : <Trans>Please wait...</Trans>
-          }
-          disabled={!onAbandon}
-          onClick={onAbandon}
-          key="close"
-        />,
-      ]}
-      cannotBeDismissed={!hasErrors}
-      noMargin
-      open
-      maxWidth="sm"
-    >
-      <Line>
-        <ColumnStackLayout expand>
-          <Text>
-            {hasErrors ? (
-              <Trans>
-                There were errors when fetching resources for the project. You
-                can retry (recommended) or continue despite the errors. In this
-                case, the project will be missing some resources.
-              </Trans>
-            ) : (
-              <Trans>Resources needed for the project are fetched...</Trans>
-            )}
-          </Text>
-          <Line noMargin expand>
-            <LinearProgress variant="determinate" value={progress} />
-          </Line>
-          {hasErrors && fetchedResources ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHeaderColumn>Resource name</TableHeaderColumn>
-                  <TableHeaderColumn>Error</TableHeaderColumn>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {fetchedResources.erroredResources.map(
-                  ({ resourceName, error }) => (
-                    <TableRow key={resourceName}>
-                      <TableRowColumn>{resourceName}</TableRowColumn>
-                      <TableRowColumn>{error.toString()}</TableRowColumn>
-                    </TableRow>
-                  )
-                )}
-              </TableBody>
-            </Table>
-          ) : null}
-        </ColumnStackLayout>
-      </Line>
-    </Dialog>
-  );
-};
 
 type RetryOrAbandonCallback = () => void;
 
@@ -147,6 +43,7 @@ type UseResourceFetcherOutput = {
   renderResourceFetcherDialog: () => React.Node,
 };
 
+// TODO: replace by ResourceMover?
 /**
  * Hook allowing to launch the fetching of resources, useful after opening a project
  * or adding assets from the asset store (as they must be downloaded on the desktop app).
@@ -155,10 +52,9 @@ export const useResourceFetcher = (): UseResourceFetcherOutput => {
   const resourceFetcher = React.useContext(ResourceFetcherContext);
   const [progress, setProgress] = React.useState(0);
   const [isFetching, setIsFetching] = React.useState(false);
-  const [
-    fetchedResources,
-    setFetchedResources,
-  ] = React.useState<?FetchedResources>(null);
+  const [result, setResult] = React.useState<?MoveAllProjectResourcesResult>(
+    null
+  );
   const [onRetry, setOnRetry] = React.useState<?RetryOrAbandonCallback>(null);
   const [onAbandon, setOnAbandon] = React.useState<?RetryOrAbandonCallback>(
     null
@@ -175,11 +71,11 @@ export const useResourceFetcher = (): UseResourceFetcherOutput => {
       setProgress(0);
       setOnRetry(null);
       setOnAbandon(null);
-      setFetchedResources(null);
+      setResult(null);
       setIsFetching(true);
 
       // TODO: handle error?
-      const fetchedResources = await resourceFetcher.fetchResources({
+      const result = await resourceFetcher.fetchResources({
         project,
         resourceNames,
         onProgress: (count, total) => {
@@ -188,10 +84,10 @@ export const useResourceFetcher = (): UseResourceFetcherOutput => {
       });
 
       setProgress(100);
-      if (fetchedResources.erroredResources.length === 0) {
+      if (result.erroredResources.length === 0) {
         // No error happened: finish normally, closing the dialog.
         setIsFetching(false);
-        setFetchedResources(null);
+        setResult(null);
         return { someResourcesWereFetched: true };
       }
 
@@ -209,13 +105,13 @@ export const useResourceFetcher = (): UseResourceFetcherOutput => {
           (): RetryOrAbandonCallback => () => {
             // Abandon: resolve immediately, closing the dialog
             setIsFetching(false);
-            setFetchedResources(null);
+            setResult(null);
             resolve({ someResourcesWereFetched: true });
           }
         );
 
         // Display the errors to the user:
-        setFetchedResources(fetchedResources);
+        setResult(result);
         setIsFetching(false);
       });
     },
@@ -223,16 +119,16 @@ export const useResourceFetcher = (): UseResourceFetcherOutput => {
   );
 
   const renderResourceFetcherDialog = () => {
-    const hasErrors =
-      fetchedResources && fetchedResources.erroredResources.length >= 0;
+    const hasErrors = result && result.erroredResources.length >= 0;
     if (!isFetching && !hasErrors) return null;
 
     return (
-      <ResourceFetcherDialog
+      <ResourceMoverDialog
         progress={progress}
-        fetchedResources={fetchedResources}
+        result={result}
         onAbandon={onAbandon}
         onRetry={onRetry}
+        genericError={null}
       />
     );
   };

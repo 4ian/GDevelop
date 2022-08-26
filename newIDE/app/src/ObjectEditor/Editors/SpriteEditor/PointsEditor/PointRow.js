@@ -65,62 +65,64 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => (
         </TableRowColumn>
         <TableRowColumn style={styles.coordinateColumn} padding="none">
           <Column>
-          {!props.isAutomatic ? (
-            <SemiControlledTextField
-              margin="none"
-              inputStyle={
-                props.selected
-                  ? { color: muiTheme.listItem.selectedTextColor }
-                  : undefined
-              }
-              value={roundTo(pointX, POINT_COORDINATE_PRECISION).toString()}
-              type="number"
-              id="point-x"
-              onChange={value => {
-                const valueAsNumber = parseFloat(value);
-                if (!isNaN(valueAsNumber)) props.onChangePointX(valueAsNumber);
-              }}
-              onBlur={event => {
-                props.onChangePointX(
-                  parseFloat(event.currentTarget.value) || 0
-                );
-              }}
-            />
-          ) : (
-            <Text noMargin>
-              <Trans>(auto)</Trans>
-            </Text>
-          )}
+            {!props.isAutomatic ? (
+              <SemiControlledTextField
+                margin="none"
+                inputStyle={
+                  props.selected
+                    ? { color: muiTheme.listItem.selectedTextColor }
+                    : undefined
+                }
+                value={roundTo(pointX, POINT_COORDINATE_PRECISION).toString()}
+                type="number"
+                id="point-x"
+                onChange={value => {
+                  const valueAsNumber = parseFloat(value);
+                  if (!isNaN(valueAsNumber))
+                    props.onChangePointX(valueAsNumber);
+                }}
+                onBlur={event => {
+                  props.onChangePointX(
+                    parseFloat(event.currentTarget.value) || 0
+                  );
+                }}
+              />
+            ) : (
+              <Text noMargin>
+                <Trans>(auto)</Trans>
+              </Text>
+            )}
           </Column>
         </TableRowColumn>
         <TableRowColumn style={styles.coordinateColumn} padding="none">
           <Column>
-          {!props.isAutomatic ? (
-            <SemiControlledTextField
-              margin="none"
-              inputStyle={
-                props.selected
-                  ? { color: muiTheme.listItem.selectedTextColor }
-                  : undefined
-              }
-              value={roundTo(pointY, POINT_COORDINATE_PRECISION).toString()}
-              type="number"
-              id="point-y"
-              onChange={value => {
-                const valueAsNumber = parseFloat(value);
-                if (!isNaN(valueAsNumber)) props.onChangePointY(valueAsNumber);
-              }}
-              onBlur={event => {
-                props.onChangePointY(
-                  parseFloat(event.currentTarget.value) || 0
-                );
-              }}
-            />
-          ) : (
-            <Text noMargin>
-              <Trans>(auto)</Trans>
-            </Text>
-          )}
+            {!props.isAutomatic ? (
+              <SemiControlledTextField
+                margin="none"
+                inputStyle={
+                  props.selected
+                    ? { color: muiTheme.listItem.selectedTextColor }
+                    : undefined
+                }
+                value={roundTo(pointY, POINT_COORDINATE_PRECISION).toString()}
+                type="number"
+                id="point-y"
+                onChange={value => {
+                  const valueAsNumber = parseFloat(value);
+                  if (!isNaN(valueAsNumber))
+                    props.onChangePointY(valueAsNumber);
+                }}
+                onBlur={event => {
+                  props.onChangePointY(
+                    parseFloat(event.currentTarget.value) || 0
+                  );
+                }}
+              />
+            ) : (
+              <Text noMargin>
+                <Trans>(auto)</Trans>
+              </Text>
+            )}
           </Column>
         </TableRowColumn>
         <TableRowColumn style={styles.toolColumn}>

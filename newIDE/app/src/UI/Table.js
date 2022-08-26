@@ -48,6 +48,7 @@ export class TableHeader extends React.Component<TableHeaderProps, {||}> {
 
 type TableHeaderColumnProps = {|
   children?: React.Node, // Text of the column
+  padding?: 'none',
   style?: {|
     height?: number,
     width?: number | string,
@@ -89,6 +90,7 @@ export class TableRow extends React.Component<TableRowProps, {||}> {
 
 type TableRowColumnProps = {|
   children?: React.Node, // Content for the cell
+  padding?: 'none',
   style?: {|
     height?: number,
     width?: number | string,

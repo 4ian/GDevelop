@@ -28,6 +28,7 @@
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Project/SourceFile.h"
@@ -82,12 +83,17 @@ void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 std::unique_ptr<gd::Object> Project::CreateObject(
   const gd::String& type,
   const gd::String& name) const {
+    return gd::make_unique<Object>(name, type, CreateObjectConfiguration(type));
+}
+
+std::unique_ptr<gd::ObjectConfiguration> Project::CreateObjectConfiguration(
+  const gd::String& type) const {
   if (Project::HasEventsBasedObject(type)) {
-    return gd::make_unique<Object>(name, type, gd::make_unique<CustomObjectConfiguration>(*this));
+    return gd::make_unique<CustomObjectConfiguration>(*this);
   }
   else {
     // Create a base object if the type can't be found in the platform.
-    return currentPlatform->CreateObject(type, name);
+    return currentPlatform->CreateObjectConfiguration(type);
   }
 }
 

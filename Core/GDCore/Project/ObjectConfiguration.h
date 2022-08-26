@@ -182,11 +182,6 @@ class GD_CORE_API ObjectConfiguration {
 }  // namespace gd
 
 /**
- * An object list is a vector containing (smart) pointers to objects.
- */
-using ObjConfList = std::vector<std::unique_ptr<gd::ObjectConfiguration>>;
-
-/**
  * Objects are usually managed thanks to (smart) pointers.
  */
 using ObjConfSPtr = std::unique_ptr<gd::ObjectConfiguration>;

@@ -1,3 +1,11 @@
+/*
+ * GDevelop Core
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
+ */
+#ifndef GDCORE_CUSTOMBEHAVIOR_H
+#define GDCORE_CUSTOMBEHAVIOR_H
+
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/Project.h"
@@ -39,3 +47,5 @@ private:
                           ///< EventBasedBehavior from the fullType.
 };
 }  // namespace gd
+
+#endif  // GDCORE_CUSTOMBEHAVIOR_H

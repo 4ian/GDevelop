@@ -93,8 +93,8 @@ std::shared_ptr<gd::PlatformExtension> Platform::GetExtension(
   return std::shared_ptr<gd::PlatformExtension>();
 }
 
-std::unique_ptr<gd::Object> Platform::CreateObject(
-    gd::String type, const gd::String& name) const {
+std::unique_ptr<gd::ObjectConfiguration> Platform::CreateObjectConfiguration(
+    gd::String type) const {
   if (creationFunctionTable.find(type) == creationFunctionTable.end()) {
     gd::LogWarning("Tried to create an object with an unknown type: " + type
               + " for platform " + GetName() + "!");
@@ -106,11 +106,7 @@ std::unique_ptr<gd::Object> Platform::CreateObject(
   }
 
   // Create a new object with the type we want.
-  std::unique_ptr<gd::ObjectConfiguration> objectConfiguration =
-      (creationFunctionTable.find(type)->second)();
-  std::unique_ptr<gd::Object> object =
-      gd::make_unique<gd::Object>(name, type, std::move(objectConfiguration));
-  return std::unique_ptr<gd::Object>(std::move(object));
+  return (creationFunctionTable.find(type)->second)();
 }
 
 #if defined(GD_IDE_ONLY)

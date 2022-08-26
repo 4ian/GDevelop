@@ -63,6 +63,7 @@
 #include <GDCore/Project/NamedPropertyDescriptor.h>
 #include <GDCore/Project/Object.h>
 #include <GDCore/Project/ObjectConfiguration.h>
+#include <GDCore/Project/CustomObjectConfiguration.h>
 #include <GDCore/Project/Project.h>
 #include <GDCore/Project/PropertyDescriptor.h>
 #include <GDCore/Project/Variable.h>

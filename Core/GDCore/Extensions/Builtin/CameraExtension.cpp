@@ -221,7 +221,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                  "res/actions/camera24.png",
                  "res/actions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .AddParameter("layer", _("Layer"))
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Width"), "", true)
       .AddParameter("expression", _("Height"), "", true)
@@ -256,7 +256,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                  "res/actions/camera24.png",
                  "res/actions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .AddParameter("layer", _("Layer"))
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"))
       .MarkAsComplex();
@@ -272,7 +272,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                  "res/actions/camera24.png",
                  "res/actions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .AddParameter("layer", _("Layer"))
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"))
       .AddParameter("expression", _("Width"))
@@ -290,7 +290,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                  "res/actions/camera24.png",
                  "res/actions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .AddParameter("layer", _("Layer"))
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"))
       .AddParameter(
@@ -413,7 +413,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                  "res/actions/layer24.png",
                  "res/actions/layer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .AddParameter("layer", _("Layer"))
       .SetDefaultValue("\"\"")
       .MarkAsAdvanced();
 
@@ -426,7 +426,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                  "res/actions/layer24.png",
                  "res/actions/layer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .AddParameter("layer", _("Layer"))
       .SetDefaultValue("\"\"")
       .MarkAsAdvanced();
 
@@ -439,7 +439,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                     "res/conditions/layer24.png",
                     "res/conditions/layer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .AddParameter("layer", _("Layer"))
       .SetDefaultValue("\"\"")
       .MarkAsAdvanced();
 

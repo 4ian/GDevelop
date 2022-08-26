@@ -393,7 +393,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/layer.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("layer", _("Move it to this layer (base layer if empty)"))
+      .AddParameter("layer", _("Move it to this layer"))
       .SetDefaultValue("\"\"")
       .MarkAsAdvanced();
 

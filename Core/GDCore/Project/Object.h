@@ -72,7 +72,10 @@ class GD_CORE_API Object {
     return gd::make_unique<gd::Object>(*this);
   }
 
+  // TODO write a documentation
   gd::ObjectConfiguration& GetConfiguration();
+
+  gd::ObjectConfiguration& GetConfiguration() const;
 
   /** \name Common properties
    * Members functions related to common properties
@@ -245,6 +248,9 @@ class GD_CORE_API Object {
   /**
    * Initialize object using another object. Used by copy-ctor and assign-op.
    * Don't forget to update me if members were changed!
+   * 
+   * It's needed because there is no default copy for a map of unique_ptr like
+   * behaviors and it must be a deep copy.
    */
   void Init(const gd::Object& object);
 };

@@ -43,7 +43,6 @@ export const moveUrlResourcesToLocalFiles = async ({
   const baseAssetsPath = path.join(projectPath, 'assets');
   const downloadedFilePaths = new Set<string>();
   const erroredResources = [];
-  console.log({ resourceToFetchNames });
 
   let fetchedResourcesCount = 0;
 

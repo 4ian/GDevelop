@@ -2,7 +2,7 @@
 import { t } from '@lingui/macro';
 import * as React from 'react';
 import { type StorageProvider, type FileMetadata } from '../index';
-import DownloadSaveAsDialog from './DownloadSaveAsDialog';
+import DownloadFileSaveAsDialog from './DownloadFileSaveAsDialog';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 
 /**
@@ -15,19 +15,20 @@ export default ({
   renderIcon: props => <SaveAlt fontSize={props.size} />,
   hiddenInOpenDialog: true,
   createOperations: ({ setDialog, closeDialog }) => ({
-    onSaveProjectAs: (project: gdProject, fileMetadata: ?FileMetadata) => {
-      const newFileMetadata = fileMetadata
-        ? {
-            ...fileMetadata,
-            lastModifiedDate: Date.now(),
-          }
-        : fileMetadata;
+    onSaveProjectAs: async (
+      project: gdProject,
+      fileMetadata: ?FileMetadata,
+      options
+    ) => {
+      if (options && options.onStartSaving) options.onStartSaving();
+      await options.onMoveResources();
+
       return new Promise(resolve => {
         setDialog(() => (
-          <DownloadSaveAsDialog
+          <DownloadFileSaveAsDialog
             onDone={() => {
               closeDialog();
-              resolve({ wasSaved: false, fileMetadata: newFileMetadata });
+              resolve({ wasSaved: false });
             }}
             project={project}
           />

@@ -3,7 +3,6 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { Line, Column } from '../../../UI/Grid';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
-import { type OnOpenProjectAfterCreationFunction } from '../../../ProjectCreation/CreateProjectDialog';
 import {
   type FileMetadataAndStorageProviderName,
   type StorageProvider,
@@ -49,7 +48,6 @@ type Props = {|
 
   // Project creation
   onOpenProjectPreCreationDialog: (?ExampleShortHeader) => void,
-  onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
 |};
 
 type HomePageEditorInterface = {|
@@ -67,7 +65,6 @@ export const HomePage = React.memo<Props>(
         onChooseProject,
         onOpenRecentFile,
         onOpenProjectPreCreationDialog,
-        onOpenProjectAfterCreation,
         onCreateProject,
         onOpenProjectManager,
         onOpenHelpFinder,
@@ -196,7 +193,6 @@ export const HomePage = React.memo<Props>(
                       onSelectExample={exampleShortHeader =>
                         onCreateProject(exampleShortHeader)
                       }
-                      onOpenProjectAfterCreation={onOpenProjectAfterCreation}
                       onOpenRecentFile={onOpenRecentFile}
                       onChangeSubscription={onChangeSubscription}
                       storageProviders={storageProviders}
@@ -238,7 +234,6 @@ export const renderHomePageContainer = (
     setToolbar={props.setToolbar}
     canOpen={props.canOpen}
     onChooseProject={props.onChooseProject}
-    onOpenProjectAfterCreation={props.onOpenProjectAfterCreation}
     onOpenRecentFile={props.onOpenRecentFile}
     onCreateProject={props.onCreateProject}
     onOpenProjectPreCreationDialog={props.onOpenProjectPreCreationDialog}

@@ -1344,7 +1344,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 hotReloadPreviewButtonProps={
                   this.props.hotReloadPreviewButtonProps
                 }
-                onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
+                onFetchNewlyAddedResources={
+                  this.props.onFetchNewlyAddedResources
+                }
               />
             )}
           </I18n>

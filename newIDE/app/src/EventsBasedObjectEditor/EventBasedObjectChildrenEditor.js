@@ -226,7 +226,9 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   launchProjectDataOnlyPreview: () => {},
                   launchProjectWithLoadingScreenPreview: () => {},
                 }}
-                onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
+                onFetchNewlyAddedResources={
+                  this.props.onFetchNewlyAddedResources
+                }
               />
             </Line>
             {this.state.editedObjectWithContext && (

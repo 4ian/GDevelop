@@ -7,7 +7,7 @@ import {
 } from './index';
 import CloudStorageProvider from '../CloudStorageProvider';
 import UrlStorageProvider from '../UrlStorageProvider';
-import {fetchRelativeResourcesToFullUrls} from '../UrlStorageProvider/UrlResourceFetcher';
+import { fetchRelativeResourcesToFullUrls } from '../UrlStorageProvider/UrlResourceFetcher';
 
 const fetchNothing: FetchAllProjectResourcesFunction = async () => {
   return {
@@ -34,7 +34,9 @@ const BrowserResourceFetcher: ResourceFetcher = {
     const fetcher = fetchers[storageProvider.internalName];
     if (!fetcher)
       throw new Error(
-        `Can't find a ResourceFetcher for ${storageProvider.internalName} - have you registered the storage provider here?`
+        `Can't find a ResourceFetcher for ${
+          storageProvider.internalName
+        } - have you registered the storage provider here?`
       );
 
     return fetcher(options);

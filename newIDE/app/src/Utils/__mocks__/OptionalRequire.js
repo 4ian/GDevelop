@@ -15,7 +15,7 @@ const mockFs = {
 };
 const mockProcess = {};
 const mockOs = {
-  tmpdir: () => '/some/fake-tmp-dir'
+  tmpdir: () => '/some/fake-tmp-dir',
 };
 
 const mockOptionalRequire = jest.fn(

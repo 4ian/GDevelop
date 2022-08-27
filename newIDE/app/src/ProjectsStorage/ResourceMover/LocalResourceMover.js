@@ -5,7 +5,7 @@ import {
   type MoveAllProjectResourcesFunction,
 } from './index';
 import LocalFileStorageProvider from '../LocalFileStorageProvider';
-import {moveUrlResourcesToLocalFiles} from '../LocalFileStorageProvider/LocalFileResourceMover';
+import { moveUrlResourcesToLocalFiles } from '../LocalFileStorageProvider/LocalFileResourceMover';
 import UrlStorageProvider from '../UrlStorageProvider';
 import localFileSystem from '../../Export/LocalExporters/LocalFileSystem';
 import assignIn from 'lodash/assignIn';
@@ -42,7 +42,12 @@ const movers: {
   // for resources).
   [`${UrlStorageProvider.internalName}=>${
     LocalFileStorageProvider.internalName
-  }`]: ({project, newFileMetadata, onProgress}) => moveUrlResourcesToLocalFiles({ project, fileMetadata: newFileMetadata, onProgress}),
+  }`]: ({ project, newFileMetadata, onProgress }) =>
+    moveUrlResourcesToLocalFiles({
+      project,
+      fileMetadata: newFileMetadata,
+      onProgress,
+    }),
 };
 
 const LocalResourceMover = {

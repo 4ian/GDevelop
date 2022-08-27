@@ -2790,6 +2790,7 @@ storiesOf('ObjectsList', module)
             onRenameObject={(objectWithContext, newName, cb) => cb(true)}
             onObjectSelected={() => {}}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+            onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
           />
         </div>
       </SerializedObjectDisplay>
@@ -2826,6 +2827,7 @@ storiesOf('ObjectsList', module)
             onRenameObject={(objectWithContext, newName, cb) => cb(true)}
             onObjectSelected={() => {}}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+            onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
           />
         </div>
       </SerializedObjectDisplay>
@@ -3689,6 +3691,7 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           initiallyFocusedFunctionName={null}
           initiallyFocusedBehaviorName={null}
           onCreateEventsFunction={action('on create events function')}
+          onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>

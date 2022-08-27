@@ -2354,13 +2354,11 @@ const MainFrame = (props: Props) => {
         fileMetadata: currentFileMetadata,
         storageProvider,
         storageProviderOperations,
-        authenticatedUser,
       });
     },
     [
       currentProject,
       currentFileMetadata,
-      authenticatedUser,
       ensureResourcesAreFetched,
       getStorageProvider,
       getStorageProviderOperations,

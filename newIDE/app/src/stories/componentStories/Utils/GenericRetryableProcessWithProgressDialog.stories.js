@@ -2,19 +2,19 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../../ThemeDecorator';
-import paperDecorator from '../../../PaperDecorator';
+import muiDecorator from '../../ThemeDecorator';
+import paperDecorator from '../../PaperDecorator';
 
-import { ResourceMoverDialog } from '../../../../ProjectsStorage/ResourceMover';
+import { GenericRetryableProcessWithProgressDialog } from '../../../Utils/UseGenericRetryableProcessWithProgress';
 
 export default {
-  title: 'ResourceMoverDialog',
-  component: ResourceMoverDialog,
+  title: 'GenericRetryableProcessWithProgressDialog',
+  component: GenericRetryableProcessWithProgressDialog,
   decorators: [paperDecorator, muiDecorator],
 };
 
 export const Default = () => (
-  <ResourceMoverDialog
+  <GenericRetryableProcessWithProgressDialog
     progress={40}
     result={null}
     onAbandon={null}
@@ -24,7 +24,7 @@ export const Default = () => (
 );
 
 export const WithErrors = () => (
-  <ResourceMoverDialog
+  <GenericRetryableProcessWithProgressDialog
     progress={100}
     result={{
       erroredResources: [
@@ -45,7 +45,7 @@ export const WithErrors = () => (
 );
 
 export const WithGenericError = () => (
-  <ResourceMoverDialog
+  <GenericRetryableProcessWithProgressDialog
     progress={100}
     result={{
       erroredResources: [

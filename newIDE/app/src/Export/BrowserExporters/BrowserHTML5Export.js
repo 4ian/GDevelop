@@ -16,9 +16,11 @@ import {
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
 import RaisedButton from '../../UI/RaisedButton';
-import { BlobDownloadUrlHolder } from '../../Utils/BlobDownloadUrlHolder';
+import {
+  BlobDownloadUrlHolder,
+  openBlobDownloadUrl,
+} from '../../Utils/BlobDownloadUrlHolder';
 import { ExplanationHeader, DoneFooter } from '../GenericExporters/HTML5Export';
-import { openBlobDownloadUrl } from '.';
 const gd: libGDevelop = global.gd;
 
 type ExportState = null;

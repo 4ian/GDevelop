@@ -47,6 +47,10 @@ const moveAllCloudProjectResourcesToCloudProject = async ({
   newStorageProviderOperations,
   onProgress,
 }: MoveAllProjectResourcesOptions): Promise<MoveAllProjectResourcesResult> => {
+  const result: MoveAllProjectResourcesResult = {
+    erroredResources: [],
+  };
+
   type ResourceToFetchAndUpload = {|
     resource: gdResource,
     url: string,
@@ -89,14 +93,22 @@ const moveAllCloudProjectResourcesToCloudProject = async ({
                 filename: extractFilenameFromProjectResourceUrl(resourceFile),
               };
             } else if (isBlobURL(resourceFile)) {
-              throw new Error('Unsupported blob files for cloud projects.');
+              result.erroredResources.push({
+                resourceName: resource.getName(),
+                error: new Error('Unsupported blob URL.'),
+              });
+              return null;
             } else {
               // Public URL resource: nothing to do.
               return null;
             }
           } else {
             // Local resource: unsupported.
-            throw new Error('Unsupported local files for cloud projects.');
+            result.erroredResources.push({
+              resourceName: resource.getName(),
+              error: new Error('Unsupported relative file.'),
+            });
+            return null;
           }
         }
       )
@@ -123,9 +135,6 @@ const moveAllCloudProjectResourcesToCloudProject = async ({
   });
 
   // Transform Blobs into Files.
-  const result: MoveAllProjectResourcesResult = {
-    erroredResources: [],
-  };
   const downloadedFilesAndResourcesToUpload = downloadedBlobsAndResourcesToUpload
     .map(({ item, blob, error }) => {
       if (error || !blob) {

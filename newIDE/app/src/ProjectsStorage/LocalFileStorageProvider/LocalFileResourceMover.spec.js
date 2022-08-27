@@ -39,7 +39,7 @@ const makeMoveAllProjectResourcesOptions = (project: gdProject) => ({
   project,
   onProgress: jest.fn(),
   fileMetadata: { fileIdentifier: 'fake-file' },
-})
+});
 
 describe('LocalResourceMover', () => {
   beforeEach(() => {
@@ -124,7 +124,6 @@ describe('LocalResourceMover', () => {
         Promise.reject(new Error('Fake download failure'))
       )
       .mockImplementationOnce(() => Promise.resolve());
-
 
     const options = makeMoveAllProjectResourcesOptions(project);
     const fetchedResources = await moveUrlResourcesToLocalFiles(options);

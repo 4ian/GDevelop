@@ -177,7 +177,8 @@ export const onSaveProjectAs = async (
 ): Promise<{|
   wasSaved: boolean,
 |}> => {
-  if (!fileMetadata) throw new Error("A location was not chosen before saving as.");
+  if (!fileMetadata)
+    throw new Error('A location was not chosen before saving as.');
 
   if (options && options.onStartSaving) options.onStartSaving();
   await options.onMoveResources();

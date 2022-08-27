@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { useGenericRetryableProcessWithProgress } from '../../Utils/UseGenericRetryableProcessWithProgress';
 import { type StorageProviderOperations, type StorageProvider } from '../index';
-import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { type FileMetadata } from '..';
 
 export type FetchAllProjectResourcesOptionsWithoutProgress = {|
@@ -10,7 +9,6 @@ export type FetchAllProjectResourcesOptionsWithoutProgress = {|
   fileMetadata: FileMetadata,
   storageProvider: StorageProvider,
   storageProviderOperations: StorageProviderOperations,
-  authenticatedUser: AuthenticatedUser,
 |};
 
 export type FetchAllProjectResourcesOptions = {|
@@ -36,7 +34,7 @@ export type ResourceFetcher = {|
 type UseResourceFetcherOutput = {|
   /**
    * Launch the fetching of the resources, when new resources were added from a source
-   * and must optionnally be fetched by the storage provider (e.g: a URL to be downloaded).
+   * and must optionally be fetched by the storage provider (e.g: a URL to be downloaded).
    */
   ensureResourcesAreFetched: (
     options: FetchAllProjectResourcesOptionsWithoutProgress
@@ -61,11 +59,14 @@ export const useResourceFetcher = ({
     renderProcessDialog,
   } = useGenericRetryableProcessWithProgress<FetchAllProjectResourcesOptionsWithoutProgress>(
     {
-      onDoProcess: (options, onProgress) =>
-        resourceFetcher.fetchAllProjectResources({
-          ...options,
-          onProgress,
-        }),
+      onDoProcess: React.useCallback(
+        (options, onProgress) =>
+          resourceFetcher.fetchAllProjectResources({
+            ...options,
+            onProgress,
+          }),
+        [resourceFetcher]
+      ),
     }
   );
 
@@ -83,4 +84,3 @@ export const useResourceFetcher = ({
  * after new resources were added.
  */
 export type OnFetchNewlyAddedResourcesFunction = () => Promise<void>;
-

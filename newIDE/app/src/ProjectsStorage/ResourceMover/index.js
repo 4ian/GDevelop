@@ -63,11 +63,14 @@ export const useResourceMover = ({
     renderProcessDialog,
   } = useGenericRetryableProcessWithProgress<MoveAllProjectResourcesOptionsWithoutProgress>(
     {
-      onDoProcess: (options, onProgress) =>
-        resourceMover.moveAllProjectResources({
-          ...options,
-          onProgress,
-        }),
+      onDoProcess: React.useCallback(
+        (options, onProgress) =>
+          resourceMover.moveAllProjectResources({
+            ...options,
+            onProgress,
+          }),
+        [resourceMover]
+      ),
     }
   );
 

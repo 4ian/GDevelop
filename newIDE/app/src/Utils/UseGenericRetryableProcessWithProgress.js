@@ -38,7 +38,7 @@ const styles = {
   },
 };
 
-export const GenericRetryableProcessWithProgress = ({
+export const GenericRetryableProcessWithProgressDialog = ({
   progress,
   result,
   onAbandon,
@@ -226,7 +226,7 @@ export const useGenericRetryableProcessWithProgress = <DoProcessOptions>({
       if (!isFetching && !hasErrors) return null;
 
       return (
-        <GenericRetryableProcessWithProgress
+        <GenericRetryableProcessWithProgressDialog
           progress={progress}
           result={result}
           genericError={genericError}

@@ -2,7 +2,7 @@
 import { t } from '@lingui/macro';
 import * as React from 'react';
 import { type StorageProvider, type FileMetadata } from '../index';
-import DownloadSaveAsDialog from './DownloadSaveAsDialog';
+import DownloadFileSaveAsDialog from './DownloadFileSaveAsDialog';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 
 /**
@@ -25,7 +25,7 @@ export default ({
 
       return new Promise(resolve => {
         setDialog(() => (
-          <DownloadSaveAsDialog
+          <DownloadFileSaveAsDialog
             onDone={() => {
               closeDialog();
               resolve({ wasSaved: false });

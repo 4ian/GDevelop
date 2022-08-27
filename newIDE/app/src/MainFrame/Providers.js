@@ -63,7 +63,6 @@ export default class Providers extends React.Component<Props, {||}> {
       makeEventsFunctionCodeWriter,
       eventsFunctionsExtensionWriter,
       eventsFunctionsExtensionOpener,
-      resourceFetcher,
     } = this.props;
     return (
       <DragAndDropContextProvider>

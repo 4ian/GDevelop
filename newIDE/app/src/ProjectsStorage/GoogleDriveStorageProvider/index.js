@@ -390,7 +390,7 @@ export default ({
       },
       onChooseSaveProjectAsLocation: (
         project: gdProject,
-        fileMetadata: ?FileMetadata,
+        fileMetadata: ?FileMetadata
       ) => {
         return new Promise(resolve => {
           setDialog(() => (
@@ -401,7 +401,6 @@ export default ({
                 resolve({ fileMetadata: null });
               }}
               onSave={async ({ selectedFileOrFolder, newFileName }) => {
-
                 await authenticate();
                 if (selectedFileOrFolder.type === 'FOLDER') {
                   const newFileId = await createNewJsonFile(
@@ -430,7 +429,8 @@ export default ({
         fileMetadata: ?FileMetadata,
         options
       ) => {
-        if (!fileMetadata) throw new Error("A location was not chosen before saving as.");
+        if (!fileMetadata)
+          throw new Error('A location was not chosen before saving as.');
 
         const content = serializeToJSON(project);
         if (options && options.onStartSaving) options.onStartSaving();

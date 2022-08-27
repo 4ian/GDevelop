@@ -54,7 +54,7 @@ export type StorageProviderOperations = {|
   |}>,
   onChooseSaveProjectAsLocation?: (
     project: gdProject,
-    fileMetadata: ?FileMetadata, // This is the current location.
+    fileMetadata: ?FileMetadata // This is the current location.
   ) => Promise<{|
     fileMetadata: ?FileMetadata, // This is the newly chosen location (or null if cancelled).
   |}>,

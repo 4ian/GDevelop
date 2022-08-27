@@ -623,6 +623,19 @@ interface ObjectJsImplementation {
     // void DoUnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
+interface CustomObjectConfiguration {
+    [Value] UniquePtrObjectConfiguration Clone();
+
+    [Ref] ObjectConfiguration GetChildObjectConfiguration([Const] DOMString objectName);
+
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
+
+    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
+    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
+};
+CustomObjectConfiguration implements ObjectConfiguration;
+
 interface Layout {
     void Layout();
 

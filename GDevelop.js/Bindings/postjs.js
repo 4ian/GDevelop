@@ -144,6 +144,9 @@ var adaptNamingConventions = function (gd) {
   gd.asObjectJsImplementation = function (evt) {
     return gd.castObject(evt, gd.ObjectJsImplementation);
   };
+  gd.asCustomObjectConfiguration = function (evt) {
+    return gd.castObject(evt, gd.CustomObjectConfiguration);
+  };
 
   gd.asImageResource = function (evt) {
     return gd.castObject(evt, gd.ImageResource);

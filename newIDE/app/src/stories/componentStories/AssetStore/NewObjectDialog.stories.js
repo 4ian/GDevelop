@@ -30,6 +30,7 @@ export const Default = () => (
         return Promise.reject();
       }}
       resourceSources={[]}
+      onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
     />
   </AssetStoreStateProvider>
 );

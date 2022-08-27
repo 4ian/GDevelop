@@ -47,7 +47,7 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { ParametersIndexOffsets } from '../EventsFunctionsExtensionsLoader';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 import Window from '../Utils/Window';
-
+import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 const gd: libGDevelop = global.gd;
 
 const isDev = Window.isDev();
@@ -59,6 +59,7 @@ type Props = {|
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
+  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
   openInstructionOrExpression: (
     extension: gdPlatformExtension,
     type: string
@@ -1481,6 +1482,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         {editedEventsBasedObject && this._globalObjectsContainer && (
           <EventsBasedObjectEditorDialog
             project={project}
+            onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
             globalObjectsContainer={this._globalObjectsContainer}
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedObject={editedEventsBasedObject}

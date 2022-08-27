@@ -39,6 +39,11 @@ export type StorageProviderOperations = {|
   // will trigger a confirmation modal (so that a user interaction happen).
   doesInitialOpenRequireUserInteraction?: boolean,
 
+  onEnsureCanAccessResources?: (
+    project: gdProject,
+    fileMetadata: FileMetadata
+  ) => Promise<void>,
+
   // Project saving:
   onSaveProject?: (
     project: gdProject,
@@ -47,13 +52,21 @@ export type StorageProviderOperations = {|
     wasSaved: boolean,
     fileMetadata: FileMetadata,
   |}>,
+  onChooseSaveProjectAsLocation?: (
+    project: gdProject,
+    fileMetadata: ?FileMetadata // This is the current location.
+  ) => Promise<{|
+    fileMetadata: ?FileMetadata, // This is the newly chosen location (or null if cancelled).
+  |}>,
   onSaveProjectAs?: (
     project: gdProject,
     fileMetadata: ?FileMetadata,
-    options?: { context?: 'duplicateCurrentProject', onStartSaving: () => void }
+    options: {|
+      onStartSaving: () => void,
+      onMoveResources: () => Promise<void>,
+    |}
   ) => Promise<{|
     wasSaved: boolean,
-    fileMetadata: ?FileMetadata,
   |}>,
 
   // Project properties saving:

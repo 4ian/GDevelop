@@ -37,3 +37,21 @@ export const BlobDownloadUrlHolder = ({ blob, children }: Props) => {
 
   return children(blobDownloadUrl);
 };
+
+/**
+ * Open an URL generated from a blob, to download it with the specified filename.
+ */
+export const openBlobDownloadUrl = (url: string, filename: string) => {
+  const { body } = document;
+  if (!body) return;
+
+  // Not using Window.openExternalURL because blob urls are blocked
+  // by Adblock Plus (and maybe other ad blockers).
+  const a = document.createElement('a');
+  body.appendChild(a);
+  a.style.display = 'none';
+  a.href = url;
+  a.download = filename;
+  a.click();
+  body.removeChild(a);
+};

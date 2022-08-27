@@ -97,6 +97,7 @@ type TableRowColumnProps = {|
     paddingLeft?: number,
     paddingRight?: number,
     textAlign?: string,
+    wordBreak?: 'break-word',
   |},
 |};
 

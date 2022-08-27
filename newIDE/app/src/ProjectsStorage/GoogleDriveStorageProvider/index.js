@@ -388,13 +388,9 @@ export default ({
             fileMetadata: newFileMetadata,
           }));
       },
-      onSaveProjectAs: (
+      onChooseSaveProjectAsLocation: (
         project: gdProject,
-        fileMetadata: ?FileMetadata,
-        options?: {
-          context?: 'duplicateCurrentProject',
-          onStartSaving: () => void,
-        }
+        fileMetadata: ?FileMetadata
       ) => {
         return new Promise(resolve => {
           setDialog(() => (
@@ -402,55 +398,51 @@ export default ({
               onShowFilePicker={showFilePicker}
               onCancel={() => {
                 closeDialog();
-                resolve({ wasSaved: false, fileMetadata });
+                resolve({ fileMetadata: null });
               }}
-              onSave={({ selectedFileOrFolder, newFileName }) => {
-                const content = serializeToJSON(project);
-
-                if (options && options.onStartSaving) options.onStartSaving();
-
+              onSave={async ({ selectedFileOrFolder, newFileName }) => {
+                await authenticate();
                 if (selectedFileOrFolder.type === 'FOLDER') {
-                  return authenticate().then(googleUser =>
-                    createNewJsonFile(
-                      selectedFileOrFolder.id,
-                      newFileName
-                    ).then(newFileId =>
-                      patchJsonFile(newFileId, googleUser, content).then(() => {
-                        closeDialog();
-                        resolve({
-                          wasSaved: true,
-                          fileMetadata: {
-                            fileIdentifier: newFileId,
-                            lastModifiedDate: Date.now(),
-                          },
-                        });
-                      })
-                    )
+                  const newFileId = await createNewJsonFile(
+                    selectedFileOrFolder.id,
+                    newFileName
                   );
+                  resolve({
+                    fileMetadata: {
+                      fileIdentifier: newFileId,
+                    },
+                  });
                 } else {
-                  return authenticate()
-                    .then(googleUser =>
-                      patchJsonFile(
-                        selectedFileOrFolder.id,
-                        googleUser,
-                        content
-                      )
-                    )
-                    .then(() => {
-                      closeDialog();
-                      resolve({
-                        wasSaved: true,
-                        fileMetadata: {
-                          fileIdentifier: selectedFileOrFolder.id,
-                          lastModifiedDate: Date.now(),
-                        },
-                      });
-                    });
+                  resolve({
+                    fileMetadata: {
+                      fileIdentifier: selectedFileOrFolder.id,
+                    },
+                  });
                 }
               }}
             />
           ));
         });
+      },
+      onSaveProjectAs: async (
+        project: gdProject,
+        fileMetadata: ?FileMetadata,
+        options
+      ) => {
+        if (!fileMetadata)
+          throw new Error('A location was not chosen before saving as.');
+
+        const content = serializeToJSON(project);
+        if (options && options.onStartSaving) options.onStartSaving();
+
+        const googleUser = await authenticate();
+        await options.onMoveResources();
+        await patchJsonFile(fileMetadata.fileIdentifier, googleUser, content);
+
+        closeDialog();
+        return {
+          wasSaved: true,
+        };
       },
       getOpenErrorMessage: (error: Error): MessageDescriptor => {
         if (!apisLoaded) {

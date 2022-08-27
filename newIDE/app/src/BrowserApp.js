@@ -25,8 +25,6 @@ import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import UrlStorageProvider from './ProjectsStorage/UrlStorageProvider';
 import GoogleDriveStorageProvider from './ProjectsStorage/GoogleDriveStorageProvider';
 import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStorageProvider';
-import DropboxStorageProvider from './ProjectsStorage/DropboxStorageProvider';
-import OneDriveStorageProvider from './ProjectsStorage/OneDriveStorageProvider';
 import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
 import {
   onCreateFromExampleShortHeader,
@@ -56,8 +54,6 @@ export const create = (authentication: Authentication) => {
             UrlStorageProvider,
             CloudStorageProvider,
             GoogleDriveStorageProvider,
-            DropboxStorageProvider,
-            OneDriveStorageProvider,
             DownloadFileStorageProvider,
           ]}
           defaultStorageProvider={UrlStorageProvider}

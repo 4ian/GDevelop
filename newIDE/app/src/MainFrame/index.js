@@ -1747,25 +1747,6 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const chooseProject = React.useCallback(
-    () => {
-      if (
-        props.storageProviders.filter(
-          ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
-        ).length > 1
-      ) {
-        openOpenFromStorageProviderDialog();
-      } else {
-        chooseProjectWithStorageProviderPicker();
-      }
-    },
-    [
-      props.storageProviders,
-      openOpenFromStorageProviderDialog,
-      chooseProjectWithStorageProviderPicker,
-    ]
-  );
-
   const openFromFileMetadataWithStorageProvider = React.useCallback(
     (
       fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
@@ -2410,7 +2391,7 @@ const MainFrame = (props: Props) => {
     onLaunchNetworkPreview: launchNetworkPreview,
     onOpenHomePage: openHomePage,
     onCreateBlank: () => setProjectPreCreationDialogOpen(true),
-    onOpenProject: chooseProject,
+    onOpenProject: () => openOpenFromStorageProviderDialog(),
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
     onCloseApp: closeApp,
@@ -2441,7 +2422,7 @@ const MainFrame = (props: Props) => {
         renderMainMenu({
           i18n: i18n,
           project: state.currentProject,
-          onChooseProject: chooseProject,
+          onChooseProject: () => openOpenFromStorageProviderDialog(),
           onOpenRecentFile: openFromFileMetadataWithStorageProvider,
           onSaveProject: saveProject,
           onSaveProjectAs: saveProjectAs,
@@ -2620,7 +2601,7 @@ const MainFrame = (props: Props) => {
                     canOpen: !!props.storageProviders.filter(
                       ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
                     ).length,
-                    onChooseProject: chooseProject,
+                    onChooseProject: () => openOpenFromStorageProviderDialog(),
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
                     onOpenProjectPreCreationDialog: exampleShortHeader => {
                       setSelectedExampleShortHeader(exampleShortHeader);

@@ -30,8 +30,11 @@ namespace gd {
  */
 class CustomObjectConfiguration : public gd::ObjectConfiguration {
  public:
-  CustomObjectConfiguration(const Project& project_)
-      : project(&project_) {}
+  CustomObjectConfiguration(const Project& project_, const String& type_)
+      : project(&project_) {
+    // TODO EBO Should it be done by the base class?
+    SetType(type_);
+  }
   std::unique_ptr<gd::ObjectConfiguration> Clone() const override;
 
   /**

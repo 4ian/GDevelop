@@ -110,7 +110,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     },
     [currentTab]
   );
-    return (
+  return (
     <Dialog
       key={props.object && props.object.ptr}
       actions={[

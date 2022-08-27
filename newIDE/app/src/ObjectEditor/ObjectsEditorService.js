@@ -7,6 +7,7 @@ import EmptyEditor from './Editors/EmptyEditor';
 import ShapePainterEditor from './Editors/ShapePainterEditor';
 import ParticleEmitterEditor from './Editors/ParticleEmitterEditor';
 import ObjectPropertiesEditor from './Editors/ObjectPropertiesEditor';
+import CustomObjectPropertiesEditor from './Editors/CustomObjectPropertiesEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -24,6 +25,18 @@ type ObjectsEditorServiceType = {|
     castToObjectType: (
       object: gdObjectConfiguration
     ) => gdObjectJsImplementation,
+    helpPagePath: string,
+  |},
+  getCustomObjectPropertiesEditor: (options: {
+    helpPagePath: string,
+  }) => {|
+    component: any,
+    createNewObject: (
+      object: gdObjectConfiguration
+    ) => gdCustomObjectConfiguration,
+    castToObjectType: (
+      object: gdObjectConfiguration
+    ) => gdCustomObjectConfiguration,
     helpPagePath: string,
   |},
   editorConfigurations: {
@@ -82,11 +95,15 @@ const ObjectsEditorService: ObjectsEditorServiceType = {
     if (this.editorConfigurations[objectType]) {
       return this.editorConfigurations[objectType];
     }
-    if (!project.hasEventsBasedObject(objectType)) {
-      console.warn(
-        `Object with type ${objectType} has no editor configuration registered. Please use registerEditorConfiguration to register your editor.`
-      );
+    if (project.hasEventsBasedObject(objectType)) {
+      return this.getCustomObjectPropertiesEditor({
+        // TODO EBO Add the help page
+        helpPagePath: '',
+      });
     }
+    console.warn(
+      `Object with type ${objectType} has no editor configuration registered. Please use registerEditorConfiguration to register your editor.`
+    );
     return this.getDefaultObjectJsImplementationPropertiesEditor({
       helpPagePath: '',
     });
@@ -129,6 +146,20 @@ const ObjectsEditorService: ObjectsEditorServiceType = {
           .clone()
           .release(),
       castToObjectType: object => gd.asObjectJsImplementation(object),
+      helpPagePath: options.helpPagePath,
+    };
+  },
+  getCustomObjectPropertiesEditor(options) {
+    return {
+      component: CustomObjectPropertiesEditor,
+      createNewObject: object =>
+        gd.asCustomObjectConfiguration(
+          gd
+            .asCustomObjectConfiguration(object)
+            .clone()
+            .release()
+        ),
+      castToObjectType: object => gd.asCustomObjectConfiguration(object),
       helpPagePath: options.helpPagePath,
     };
   },

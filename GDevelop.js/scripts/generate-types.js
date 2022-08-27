@@ -186,6 +186,7 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
         `  asTextEntryObject(gdObjectConfiguration): gdTextEntryObject;`,
         `  asParticleEmitterObject(gdObjectConfiguration): gdParticleEmitterObject;`,
         `  asObjectJsImplementation(gdObjectConfiguration): gdObjectJsImplementation;`,
+        `  asCustomObjectConfiguration(gdObjectConfiguration): gdCustomObjectConfiguration;`,
         '',
         `  asImageResource(gdResource): gdImageResource;`,
         '',
@@ -251,6 +252,12 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
       'declare class gdObjectJsImplementation {',
       'declare class gdObjectJsImplementation extends gdObjectConfiguration {',
       'types/gdobjectjsimplementation.js'
+    );
+    shell.sed(
+      '-i',
+      'declare class gdCustomObjectConfiguration {',
+      'declare class gdCustomObjectConfiguration extends gdObjectConfiguration {',
+      'types/gdcustomobjectconfiguration.js'
     );
     shell.sed(
       '-i',

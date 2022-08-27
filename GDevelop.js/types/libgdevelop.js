@@ -31,6 +31,7 @@ declare class libGDevelop {
   asTextEntryObject(gdObjectConfiguration): gdTextEntryObject;
   asParticleEmitterObject(gdObjectConfiguration): gdParticleEmitterObject;
   asObjectJsImplementation(gdObjectConfiguration): gdObjectJsImplementation;
+  asCustomObjectConfiguration(gdObjectConfiguration): gdCustomObjectConfiguration;
 
   asImageResource(gdResource): gdImageResource;
 
@@ -74,6 +75,7 @@ declare class libGDevelop {
   gdObject: Class<gdObject>;
   UniquePtrObject: Class<gdUniquePtrObject>;
   ObjectJsImplementation: Class<gdObjectJsImplementation>;
+  CustomObjectConfiguration: Class<gdCustomObjectConfiguration>;
   Layout: Class<gdLayout>;
   ExternalEvents: Class<gdExternalEvents>;
   ExternalLayout: Class<gdExternalLayout>;

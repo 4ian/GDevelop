@@ -30,10 +30,6 @@ import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
-import {
-  type ResourceFetcher,
-  ResourceFetcherContext,
-} from '../ProjectsStorage/ResourceFetcher';
 import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
 import { TutorialStateProvider } from '../Tutorial/TutorialContext';
 import ConfirmProvider from '../UI/Confirm/ConfirmProvider';
@@ -49,7 +45,6 @@ type Props = {|
   makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
-  resourceFetcher: ResourceFetcher,
   children: ({|
     i18n: I18nType,
   |}) => React.Node,
@@ -111,11 +106,7 @@ export default class Providers extends React.Component<Props, {||}> {
                                               <ExtensionStoreStateProvider>
                                                 <GamesShowcaseStateProvider>
                                                   <TutorialStateProvider>
-                                                    <ResourceFetcherContext.Provider
-                                                      value={resourceFetcher}
-                                                    >
-                                                      {children({ i18n })}
-                                                    </ResourceFetcherContext.Provider>
+                                                    {children({ i18n })}
                                                   </TutorialStateProvider>
                                                 </GamesShowcaseStateProvider>
                                               </ExtensionStoreStateProvider>

@@ -10,6 +10,7 @@ import {
 } from './LocalProjectOpener';
 import {
   onSaveProject,
+  onChooseSaveProjectAsLocation,
   onSaveProjectAs,
   onAutoSaveProject,
   getWriteErrorMessage,
@@ -42,6 +43,7 @@ export default ({
     onOpen,
     hasAutoSave,
     onSaveProject,
+    onChooseSaveProjectAsLocation,
     onSaveProjectAs,
     onAutoSaveProject,
     onGetAutoSave,

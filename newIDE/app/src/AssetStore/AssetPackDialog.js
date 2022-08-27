@@ -13,10 +13,10 @@ import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import { Column, Line } from '../UI/Grid';
 import { installAsset } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import LinearProgress from '../UI/LinearProgress';
 import { AssetStoreContext } from './AssetStoreContext';
+import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 
 type Props = {|
   assetPack: AssetPack,
@@ -27,6 +27,7 @@ type Props = {|
   project: gdProject,
   objectsContainer: gdObjectsContainer,
   onObjectAddedFromAsset: (object: gdObject) => void,
+  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
 |};
 
 export const AssetPackDialog = ({
@@ -38,6 +39,7 @@ export const AssetPackDialog = ({
   project,
   objectsContainer,
   onObjectAddedFromAsset,
+  onFetchNewlyAddedResources,
 }: Props) => {
   const missingAssetShortHeaders = assetShortHeaders.filter(
     assetShortHeader => !addedAssetIds.includes(assetShortHeader.id)
@@ -47,7 +49,6 @@ export const AssetPackDialog = ({
     !allAssetsInstalled &&
     missingAssetShortHeaders.length === assetShortHeaders.length;
 
-  const resourcesFetcher = useResourceFetcher();
   const [
     areAssetsBeingInstalled,
     setAreAssetsBeingInstalled,
@@ -81,7 +82,7 @@ export const AssetPackDialog = ({
           });
         });
 
-        await resourcesFetcher.ensureResourcesAreFetched(project);
+        await onFetchNewlyAddedResources();
 
         setAreAssetsBeingInstalled(false);
         onAssetsAdded();
@@ -97,13 +98,13 @@ export const AssetPackDialog = ({
       }
     },
     [
-      resourcesFetcher,
       eventsFunctionsExtensionsState,
       project,
       objectsContainer,
       onObjectAddedFromAsset,
       onAssetsAdded,
       environment,
+      onFetchNewlyAddedResources,
     ]
   );
 

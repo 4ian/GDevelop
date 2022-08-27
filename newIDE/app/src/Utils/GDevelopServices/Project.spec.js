@@ -50,13 +50,16 @@ describe('Project service', () => {
         )
       ).toBe('Pea-Happy.png');
     });
-    it('extracts filename from a classic URL', () => {
+    it('just extracts the filename from an URL which is not from GDevelop Cloud (or not valid)', () => {
       expect(
         extractFilenameFromProjectResourceUrl('example.com/test.png')
       ).toBe('test.png');
       expect(extractFilenameFromProjectResourceUrl('example.com/test')).toBe(
         'test'
       );
+
+      // In case the resources buckets are used, but the URL is not valid,
+      // we can't extract the filename without the hash. So we take everything.
       expect(
         extractFilenameFromProjectResourceUrl(
           'https://project-resources.gdevelop.io/whatever/some/other-folder/1/2/_/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png'
@@ -72,7 +75,7 @@ describe('Project service', () => {
         '6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png?some=parameter'
       );
     });
-    it('extracts filename from a classic URL', () => {
+    it('returns the name given if its not a URL', () => {
       expect(extractFilenameFromProjectResourceUrl('test.png')).toBe(
         'test.png'
       );

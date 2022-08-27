@@ -120,7 +120,7 @@ export const FileToCloudProjectResourceUploader = ({
 
   const canUploadWithThisStorageProvider =
     storageProvider.internalName === 'Cloud';
-  const isConnected = !!authenticatedUser.profile;
+  const isConnected = !!authenticatedUser.authenticated;
   const canChooseFiles =
     !isUploading && isConnected && canUploadWithThisStorageProvider;
   const canUploadFiles =

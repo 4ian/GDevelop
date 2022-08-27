@@ -89,7 +89,7 @@ std::unique_ptr<gd::Object> Project::CreateObject(
 std::unique_ptr<gd::ObjectConfiguration> Project::CreateObjectConfiguration(
   const gd::String& type) const {
   if (Project::HasEventsBasedObject(type)) {
-    return gd::make_unique<CustomObjectConfiguration>(*this);
+    return gd::make_unique<CustomObjectConfiguration>(*this, type);
   }
   else {
     // Create a base object if the type can't be found in the platform.

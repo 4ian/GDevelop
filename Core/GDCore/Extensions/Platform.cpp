@@ -106,7 +106,9 @@ std::unique_ptr<gd::ObjectConfiguration> Platform::CreateObjectConfiguration(
   }
 
   // Create a new object with the type we want.
-  return (creationFunctionTable.find(type)->second)();
+  auto objectConfiguration = (creationFunctionTable.find(type)->second)();
+  objectConfiguration->SetType(type);
+  return objectConfiguration;
 }
 
 #if defined(GD_IDE_ONLY)

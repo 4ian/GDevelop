@@ -11,11 +11,13 @@ import EventsBasedObjectPropertiesEditor from './EventsBasedObjectPropertiesEdit
 import EventBasedObjectChildrenEditor from './EventBasedObjectChildrenEditor';
 import { ColumnStackLayout } from '../UI/Layout';
 import { Line } from '../UI/Grid';
+import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 
 type TabName = 'configuration' | 'properties' | 'children';
 
 type Props = {|
   project: gdProject,
+  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
   globalObjectsContainer: gdObjectsContainer,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
@@ -130,6 +132,7 @@ export default class EventsBasedObjectEditor extends React.Component<
           {currentTab === 'children' && (
             <EventBasedObjectChildrenEditor
               project={project}
+              onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
               globalObjectsContainer={globalObjectsContainer}
               eventsFunctionsExtension={eventsFunctionsExtension}
               eventsBasedObject={eventsBasedObject}

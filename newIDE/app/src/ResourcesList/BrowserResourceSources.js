@@ -16,6 +16,7 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { useDebounce } from '../Utils/UseDebounce';
 import axios from 'axios';
 import AlertMessage from '../UI/AlertMessage';
+import { FileToCloudProjectResourceUploader } from './FileToCloudProjectResourceUploader';
 
 type ResourceStoreChooserProps = {
   options: ChooseResourceOptions,
@@ -185,9 +186,25 @@ const browserResourceSources: Array<ResourceSource> = [
     ),
   })),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
-    name: `url-chooser-${kind}`,
-    displayName: t`Use an URL`,
+    name: `upload-${kind}`,
+    displayName: t`File(s) from your device`,
     displayTab: 'import',
+    kind,
+    renderComponent: (props: ResourceSourceComponentProps) => (
+      <FileToCloudProjectResourceUploader
+        createNewResource={createNewResource}
+        onChooseResources={props.onChooseResources}
+        options={props.options}
+        fileMetadata={props.fileMetadata}
+        getStorageProvider={props.getStorageProvider}
+        key={`url-chooser-${kind}`}
+      />
+    ),
+  })),
+  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
+    name: `url-chooser-${kind}`,
+    displayName: t`Use a public URL`,
+    displayTab: 'import-advanced',
     kind,
     renderComponent: (props: ResourceSourceComponentProps) => (
       <UrlChooser

@@ -174,7 +174,8 @@ export const FileToCloudProjectResourceUploader = ({
             <AlertMessage kind="error">
               <Trans>
                 The file {erroredFile.filename} is too large. Use files that are
-                smaller for your game.
+                smaller for your game: each must be less than{' '}
+                {PROJECT_RESOURCE_MAX_SIZE_IN_BYTES / 1000 / 1000} MB.
               </Trans>
             </AlertMessage>
           );

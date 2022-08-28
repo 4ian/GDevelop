@@ -9,7 +9,7 @@ import PromisePool from '@supercharge/promise-pool';
 import { getFileSha512TruncatedTo256 } from '../FileHasher';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
-export const PROJECT_RESOURCE_MAX_SIZE_IN_BYTES = 15 * 1024 * 1024;
+export const PROJECT_RESOURCE_MAX_SIZE_IN_BYTES = 15 * 1000 * 1000;
 
 const projectResourcesClient = axios.create({
   baseURL: GDevelopProjectResourcesStorage.baseUrl,

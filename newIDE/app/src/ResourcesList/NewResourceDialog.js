@@ -50,7 +50,6 @@ export const NewResourceDialog = ({
   const importTabAdvancedResourceSources = possibleResourceSources.filter(
     ({ displayTab }) => displayTab === 'import-advanced'
   );
-  // TODO: get this from preferences instead of from the parent.
   const initialSource = possibleResourceSources.find(
     ({ name }) => name === options.initialSourceName
   );

@@ -42,7 +42,6 @@ import {
   notifyPreviewWillStart,
   moveTabToTheRightOfHoveredTab,
 } from './EditorTabs/EditorTabsHandler';
-import { timePromise } from '../Utils/TimeFunction';
 import HelpFinder from '../HelpFinder';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -85,13 +84,12 @@ import PreferencesContext from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
 import {
-  type CreateProjectDialogWithComponentsProps,
+  type CreateProjectDialogProps,
   type ProjectCreationSettings,
 } from '../ProjectCreation/CreateProjectDialog';
 import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnCreateBlankFunction,
-  type OnOpenProjectAfterCreationFunction,
 } from '../ProjectCreation/CreateProjectDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
@@ -122,7 +120,6 @@ import {
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
-import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { delay } from '../Utils/Delay';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
@@ -141,6 +138,14 @@ import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 import { useLeaderboardReplacer } from '../Leaderboard/useLeaderboardReplacer';
 import useConfirmDialog from '../UI/Confirm/useConfirmDialog';
 import ProjectPreCreationDialog from '../ProjectCreation/ProjectPreCreationDialog';
+import {
+  useResourceMover,
+  type ResourceMover,
+} from '../ProjectsStorage/ResourceMover';
+import {
+  useResourceFetcher,
+  type ResourceFetcher,
+} from '../ProjectsStorage/ResourceFetcher';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -234,18 +239,17 @@ export type Props = {
   ) => React.Element<PreviewLauncherComponent>,
   onEditObject?: gdObject => void,
   storageProviders: Array<StorageProvider>,
+  resourceMover: ResourceMover,
+  resourceFetcher: ResourceFetcher,
   getStorageProviderOperations: (
-    ?{
-      storageProvider: StorageProvider,
-      doNotKeepForNextOperations?: boolean,
-    }
+    storageProvider?: ?StorageProvider
   ) => StorageProviderOperations,
   getStorageProvider: () => StorageProvider,
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   requestUpdate?: () => void,
   renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
-  renderCreateDialog?: CreateProjectDialogWithComponentsProps => React.Node,
+  renderCreateDialog?: CreateProjectDialogProps => React.Node,
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
   onCreateBlank: OnCreateBlankFunction,
   renderGDJSDevelopmentWatcher?: ?() => React.Node,
@@ -358,10 +362,6 @@ const MainFrame = (props: Props) => {
     renderOpenConfirmDialog,
   } = useOpenConfirmDialog();
   const {
-    ensureResourcesAreFetched,
-    renderResourceFetcherDialog,
-  } = useResourceFetcher();
-  const {
     findLeaderboardsToReplace,
     renderLeaderboardReplacerDialog,
   } = useLeaderboardReplacer();
@@ -406,6 +406,8 @@ const MainFrame = (props: Props) => {
     resourceSources,
     renderPreviewLauncher,
     resourceExternalEditors,
+    resourceMover,
+    resourceFetcher,
     getStorageProviderOperations,
     getStorageProvider,
     integratedEditor,
@@ -415,6 +417,15 @@ const MainFrame = (props: Props) => {
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
   } = props;
+
+  const {
+    ensureResourcesAreMoved,
+    renderResourceMoverDialog,
+  } = useResourceMover({ resourceMover });
+  const {
+    ensureResourcesAreFetched,
+    renderResourceFetcherDialog,
+  } = useResourceFetcher({ resourceFetcher });
 
   React.useEffect(
     () => {
@@ -475,9 +486,9 @@ const MainFrame = (props: Props) => {
             );
             if (!storageProvider) return;
 
-            const storageProviderOperations = getStorageProviderOperations({
-              storageProvider,
-            });
+            const storageProviderOperations = getStorageProviderOperations(
+              storageProvider
+            );
             const proceed = await ensureInteractionHappened(
               storageProviderOperations
             );
@@ -673,9 +684,9 @@ const MainFrame = (props: Props) => {
     async (project: gdProject, fileMetadata: ?FileMetadata): Promise<State> => {
       if (fileMetadata) {
         const storageProvider = getStorageProvider();
-        const storageProviderOperations = getStorageProviderOperations({
-          storageProvider,
-        });
+        const storageProviderOperations = getStorageProviderOperations(
+          storageProvider
+        );
         const { onSaveProject } = storageProviderOperations;
 
         // Only save the project in the recent files if the storage provider
@@ -715,21 +726,31 @@ const MainFrame = (props: Props) => {
 
       if (fileMetadata) {
         project.setProjectFile(fileMetadata.fileIdentifier);
-      }
 
-      // Fetch the resources if needed, for example if opening on the desktop app
-      // a project made on the web-app.
-      const { someResourcesWereFetched } = await ensureResourcesAreFetched(
-        project
-      );
-      if (someResourcesWereFetched) {
-        if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+        const storageProvider = getStorageProvider();
+        const storageProviderOperations = getStorageProviderOperations(
+          storageProvider
+        );
+
+        // Fetch the resources if needed, for example:
+        // - if opening a local file, with resources stored as URL
+        //   (which can happen after downloading it from the web-app),
+        //   in which case URLs will be downloaded.
+        // - if opening from a URL, with resources that are relative
+        //   to this base URL and which will be converted to full URLs.
+        // ...
+        // See `ResourceFetcher` for all the cases.
+        await ensureResourcesAreFetched({
+          project,
+          fileMetadata,
+          storageProvider,
+          storageProviderOperations,
+        });
       }
 
       return state;
     },
     [
-      unsavedChanges,
       setState,
       closeProject,
       preferences,
@@ -745,15 +766,13 @@ const MainFrame = (props: Props) => {
       serializedProject: gdSerializerElement,
       fileMetadata: ?FileMetadata
     ): Promise<State> => {
-      return timePromise(
-        () => {
-          const newProject = gd.ProjectHelper.createNewGDJSProject();
-          newProject.unserializeFrom(serializedProject);
+      const startTime = Date.now();
+      const newProject = gd.ProjectHelper.createNewGDJSProject();
+      newProject.unserializeFrom(serializedProject);
+      const duration = Date.now() - startTime;
+      console.info(`Unserialization took ${duration.toFixed(2)} ms`);
 
-          return loadFromProject(newProject, fileMetadata);
-        },
-        time => console.info(`Unserialization took ${time} ms`)
-      );
+      return loadFromProject(newProject, fileMetadata);
     },
     [loadFromProject]
   );
@@ -1728,25 +1747,6 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const chooseProject = React.useCallback(
-    () => {
-      if (
-        props.storageProviders.filter(
-          ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
-        ).length > 1
-      ) {
-        openOpenFromStorageProviderDialog();
-      } else {
-        chooseProjectWithStorageProviderPicker();
-      }
-    },
-    [
-      props.storageProviders,
-      openOpenFromStorageProviderDialog,
-      chooseProjectWithStorageProviderPicker,
-    ]
-  );
-
   const openFromFileMetadataWithStorageProvider = React.useCallback(
     (
       fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
@@ -1770,7 +1770,7 @@ const MainFrame = (props: Props) => {
 
       if (!storageProvider) return;
 
-      getStorageProviderOperations({ storageProvider });
+      getStorageProviderOperations(storageProvider);
       openFromFileMetadata(fileMetadata)
         .then(state => {
           if (state) {
@@ -1813,30 +1813,10 @@ const MainFrame = (props: Props) => {
   );
 
   const saveProjectAsWithStorageProvider = React.useCallback(
-    (
-      options: ?{
-        context?: 'duplicateCurrentProject',
-        storageProviderOperationsGetOptions?: {
-          storageProvider: StorageProvider,
-          doNotKeepForNextOperations?: boolean,
-        },
-      }
-    ) => {
+    async (requestedStorageProvider?: StorageProvider) => {
       if (!currentProject) return;
 
       saveUiSettings(state.editorTabs);
-
-      const storageProviderOperations = getStorageProviderOperations(
-        options ? options.storageProviderOperationsGetOptions : null
-      );
-
-      const {
-        onSaveProjectAs,
-        getWriteErrorMessage,
-      } = storageProviderOperations;
-      if (!onSaveProjectAs) {
-        return;
-      }
 
       // Protect against concurrent saves, which can trigger issues with the
       // file system.
@@ -1844,59 +1824,114 @@ const MainFrame = (props: Props) => {
         console.info('Project is already being saved, not triggering save.');
         return;
       }
+
+      // Remember the old storage provider, as we may need to use it to get access
+      // to resources.
+      const oldStorageProvider = getStorageProvider();
+      const oldStorageProviderOperations = getStorageProviderOperations();
+
+      // Get the methods to save the project using the *new* storage provider.
+      const newStorageProviderOperations = getStorageProviderOperations(
+        requestedStorageProvider
+      );
+      const newStorageProvider = getStorageProvider();
+
+      const {
+        onSaveProjectAs,
+        onChooseSaveProjectAsLocation,
+        getWriteErrorMessage,
+      } = newStorageProviderOperations;
+      if (!onSaveProjectAs) {
+        // The new storage provider can't even save as. It's strange that it was even
+        // selected here.
+        return;
+      }
+
       setIsSavingProject(true);
 
       // At the end of the promise below, currentProject and storageProvider
       // may have changed (if the user opened another project). So we read and
       // store their values in variables now.
       const projectName = currentProject.getName();
-      const storageProviderInternalName = getStorageProvider().internalName;
+      const storageProviderInternalName = newStorageProvider.internalName;
 
-      onSaveProjectAs(currentProject, currentFileMetadata, {
-        context: options ? options.context : undefined,
-        onStartSaving: () => _showSnackMessage(i18n._(t`Saving...`)),
-      })
-        .then(
-          ({ wasSaved, fileMetadata }) => {
-            if (wasSaved) {
-              if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
-              _showSnackMessage(i18n._(t`Project properly saved`));
-
-              if (fileMetadata) {
-                const enrichedFileMetadata = fileMetadata.name
-                  ? fileMetadata
-                  : { ...fileMetadata, name: projectName };
-                preferences.insertRecentProjectFile({
-                  fileMetadata: enrichedFileMetadata,
-                  storageProviderName: storageProviderInternalName,
-                });
-                if (isCurrentProjectStale(currentProjectRef, currentProject)) {
-                  // We do not want to change the current file metadata if the
-                  // project has changed before the promise resolves.
-                  setState(state => ({
-                    ...state,
-                    currentFileMetadata: enrichedFileMetadata,
-                  }));
-                }
-              }
-            }
-          },
-          rawError => {
-            const errorMessage = getWriteErrorMessage
-              ? getWriteErrorMessage(rawError)
-              : t`An error occurred when saving the project. Please try again later.`;
-            showErrorBox({
-              message: i18n._(errorMessage),
-              rawError,
-              errorId: 'project-save-as-error',
-            });
+      try {
+        let newFileMetadata: ?FileMetadata = null;
+        if (onChooseSaveProjectAsLocation) {
+          const { fileMetadata } = await onChooseSaveProjectAsLocation(
+            currentProject,
+            currentFileMetadata
+          );
+          if (!fileMetadata) {
+            return; // Save as was cancelled.
           }
-        )
-        .catch(() => {})
-        .then(() => {
-          setIsSavingProject(false);
-          updateWindowTitle();
+          newFileMetadata = fileMetadata;
+        }
+
+        const { wasSaved } = await onSaveProjectAs(
+          currentProject,
+          newFileMetadata,
+          {
+            onStartSaving: () => _showSnackMessage(i18n._(t`Saving...`)),
+            onMoveResources: async () => {
+              if (newFileMetadata && currentFileMetadata)
+                await ensureResourcesAreMoved({
+                  project: currentProject,
+                  newFileMetadata,
+                  newStorageProvider,
+                  newStorageProviderOperations,
+                  oldFileMetadata: currentFileMetadata,
+                  oldStorageProvider,
+                  oldStorageProviderOperations,
+                  authenticatedUser,
+                });
+            },
+          }
+        );
+
+        if (!wasSaved) return; // Save was cancelled, don't do anything.
+
+        if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
+        _showSnackMessage(i18n._(t`Project properly saved`));
+
+        if (!newFileMetadata) {
+          // Some storage provider like "DownloadFile" don't have file metadata, because
+          // it's more like an "export".
+          return;
+        }
+
+        // Save was done on a new file/location, so save it in the
+        // recent projects and in the state.
+        const enrichedFileMetadata = newFileMetadata.name
+          ? newFileMetadata
+          : { ...newFileMetadata, name: projectName };
+        preferences.insertRecentProjectFile({
+          fileMetadata: enrichedFileMetadata,
+          storageProviderName: storageProviderInternalName,
         });
+
+        if (isCurrentProjectStale(currentProjectRef, currentProject)) {
+          // We do not want to change the current file metadata if the
+          // project has changed since the beginning of the save, which
+          // can happen if another project was loaded in the meantime.
+          setState(state => ({
+            ...state,
+            currentFileMetadata: enrichedFileMetadata,
+          }));
+        }
+      } catch (rawError) {
+        const errorMessage = getWriteErrorMessage
+          ? getWriteErrorMessage(rawError)
+          : t`An error occurred when saving the project. Please try again later.`;
+        showErrorBox({
+          message: i18n._(errorMessage),
+          rawError,
+          errorId: 'project-save-as-error',
+        });
+      } finally {
+        setIsSavingProject(false);
+        updateWindowTitle();
+      }
     },
     [
       i18n,
@@ -1911,6 +1946,8 @@ const MainFrame = (props: Props) => {
       getStorageProvider,
       preferences,
       updateWindowTitle,
+      ensureResourcesAreMoved,
+      authenticatedUser,
     ]
   );
 
@@ -1990,7 +2027,8 @@ const MainFrame = (props: Props) => {
           });
           if (isCurrentProjectStale(currentProjectRef, currentProject)) {
             // We do not want to change the current file metadata if the
-            // project has changed before the promise resolves.
+            // project has changed since the beginning of the save, which
+            // can happen if another project was loaded in the meantime.
             setState(state => ({
               ...state,
               currentFileMetadata: enrichedFileMetadata,
@@ -2008,9 +2046,9 @@ const MainFrame = (props: Props) => {
           rawError,
           errorId: 'project-save-error',
         });
+      } finally {
+        setIsSavingProject(false);
       }
-
-      setIsSavingProject(false);
     },
     [
       isSavingProject,
@@ -2155,81 +2193,6 @@ const MainFrame = (props: Props) => {
     }
   };
 
-  const onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction = async ({
-    project,
-    storageProvider,
-    fileMetadata,
-    projectName,
-    templateSlug,
-    shouldCloseDialog,
-  }: {|
-    project?: gdProject,
-    storageProvider: ?StorageProvider,
-    fileMetadata: ?FileMetadata,
-    projectName?: string,
-    templateSlug?: string,
-    shouldCloseDialog?: boolean,
-  |}) => {
-    if (shouldCloseDialog)
-      await setState(state => ({ ...state, createDialogOpen: false }));
-
-    let state: ?State;
-    let enrichedFileMetadata = fileMetadata;
-    if (project) {
-      if (projectName) project.setName(projectName);
-      state = await loadFromProject(project, enrichedFileMetadata);
-    } else if (!!enrichedFileMetadata) {
-      if (projectName)
-        enrichedFileMetadata = { ...enrichedFileMetadata, name: projectName };
-      if (storageProvider) getStorageProviderOperations({ storageProvider });
-      state = await openFromFileMetadata(enrichedFileMetadata);
-    }
-
-    if (!state) return;
-    const { currentProject, editorTabs } = state;
-    if (!currentProject) return;
-    const oldProjectId = currentProject.getProjectUuid();
-    currentProject.resetProjectUuid();
-
-    currentProject.setVersion('1.0.0');
-    currentProject.getAuthorIds().clear();
-    currentProject.setAuthor('');
-    if (templateSlug) currentProject.setTemplateSlug(templateSlug);
-    if (projectName) currentProject.setName(projectName);
-
-    findLeaderboardsToReplace(currentProject, oldProjectId);
-    openSceneOrProjectManager({
-      currentProject: currentProject,
-      editorTabs: editorTabs,
-    });
-
-    const storageProviderOperations = getStorageProviderOperations(
-      storageProvider ? { storageProvider } : null
-    );
-
-    const { onSaveProject } = storageProviderOperations;
-
-    if (onSaveProject && enrichedFileMetadata) {
-      try {
-        const { wasSaved } = await onSaveProject(
-          currentProject,
-          enrichedFileMetadata
-        );
-
-        if (wasSaved) {
-          if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
-          const currentStorageProvider = getStorageProvider();
-          if (currentStorageProvider.internalName === 'LocalFile') {
-            preferences.setHasProjectOpened(true);
-          }
-        }
-      } catch (rawError) {
-        // Do not prevent creating the project.
-        console.error("Couldn't save the project after creation.", rawError);
-      }
-    }
-  };
-
   const createProject = async (
     i18n: I18n,
     settings: ProjectCreationSettings
@@ -2237,7 +2200,7 @@ const MainFrame = (props: Props) => {
     setIsProjectOpening(true);
 
     try {
-      const projectMetadata = selectedExampleShortHeader
+      const createProjectSetup = selectedExampleShortHeader
         ? await onCreateFromExampleShortHeader({
             i18n,
             exampleShortHeader: selectedExampleShortHeader,
@@ -2248,15 +2211,140 @@ const MainFrame = (props: Props) => {
             settings,
           });
 
-      if (!projectMetadata) return;
+      if (!createProjectSetup) return; // New project creation aborted.
+
+      const { source, destination } = createProjectSetup;
 
       setProjectPreCreationDialogOpen(false);
       setSelectedExampleShortHeader(null);
-      onOpenProjectAfterCreation({ ...projectMetadata });
+      await setState(state => ({ ...state, createDialogOpen: false }));
+
+      let state: ?State;
+      const sourceStorageProvider = source.storageProvider;
+      const sourceStorageProviderOperations = sourceStorageProvider
+        ? getStorageProviderOperations(source.storageProvider)
+        : null;
+      if (source.project) {
+        state = await loadFromProject(source.project, null);
+      } else if (source.fileMetadata && sourceStorageProvider) {
+        state = await openFromFileMetadata(source.fileMetadata);
+      }
+
+      if (!state) {
+        throw new Error(
+          'Neither a project nor a file metadata to load was provided for the new project'
+        );
+      }
+
+      const { currentProject, editorTabs } = state;
+      if (!currentProject) {
+        throw new Error('The new project could not be opened.');
+      }
+
+      const oldProjectId = currentProject.getProjectUuid();
+      currentProject.resetProjectUuid();
+
+      currentProject.setVersion('1.0.0');
+      currentProject.getAuthorIds().clear();
+      currentProject.setAuthor('');
+      if (selectedExampleShortHeader)
+        currentProject.setTemplateSlug(selectedExampleShortHeader.slug);
+      if (source.projectName) currentProject.setName(source.projectName);
+
+      // If there is a destination, save the project where asked to.
+      if (destination) {
+        const destinationStorageProviderOperations = getStorageProviderOperations(
+          destination.storageProvider
+        );
+
+        const { onSaveProjectAs } = destinationStorageProviderOperations;
+
+        if (onSaveProjectAs) {
+          try {
+            const { wasSaved } = await onSaveProjectAs(
+              currentProject,
+              destination.fileMetadata,
+              {
+                onStartSaving: () => {
+                  console.log('Start saving as the new project...');
+                },
+                onMoveResources: async () => {
+                  if (
+                    !sourceStorageProvider ||
+                    !sourceStorageProviderOperations ||
+                    !source.fileMetadata
+                  ) {
+                    console.log(
+                      'No storage provider set or no previous FileMetadata (probably creating a blank project) - skipping resources copy.'
+                    );
+                    return;
+                  }
+
+                  await ensureResourcesAreMoved({
+                    project: currentProject,
+                    newFileMetadata: destination.fileMetadata,
+                    newStorageProvider: destination.storageProvider,
+                    newStorageProviderOperations: destinationStorageProviderOperations,
+                    oldFileMetadata: source.fileMetadata,
+                    oldStorageProvider: sourceStorageProvider,
+                    oldStorageProviderOperations: sourceStorageProviderOperations,
+                    authenticatedUser,
+                  });
+                },
+              }
+            );
+
+            if (wasSaved) {
+              setState(state => ({
+                ...state,
+                currentFileMetadata: destination.fileMetadata,
+              }));
+              if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
+              if (destination.storageProvider.internalName === 'LocalFile') {
+                preferences.setHasProjectOpened(true);
+              }
+            }
+          } catch (rawError) {
+            // Do not prevent creating the project.
+            console.error(
+              "Couldn't save the project after creation.",
+              rawError
+            );
+          }
+        }
+      }
+
+      findLeaderboardsToReplace(currentProject, oldProjectId);
+      openSceneOrProjectManager({
+        currentProject: currentProject,
+        editorTabs: editorTabs,
+      });
     } finally {
       setIsProjectOpening(false);
     }
   };
+
+  const onFetchNewlyAddedResources = React.useCallback(
+    async (): Promise<void> => {
+      if (!currentProject || !currentFileMetadata) return;
+
+      const storageProvider = getStorageProvider();
+      const storageProviderOperations = getStorageProviderOperations();
+      await ensureResourcesAreFetched({
+        project: currentProject,
+        fileMetadata: currentFileMetadata,
+        storageProvider,
+        storageProviderOperations,
+      });
+    },
+    [
+      currentProject,
+      currentFileMetadata,
+      ensureResourcesAreFetched,
+      getStorageProvider,
+      getStorageProviderOperations,
+    ]
+  );
 
   const simulateUpdateDownloaded = () =>
     setElectronUpdateStatus({
@@ -2303,7 +2391,7 @@ const MainFrame = (props: Props) => {
     onLaunchNetworkPreview: launchNetworkPreview,
     onOpenHomePage: openHomePage,
     onCreateBlank: () => setProjectPreCreationDialogOpen(true),
-    onOpenProject: chooseProject,
+    onOpenProject: () => openOpenFromStorageProviderDialog(),
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
     onCloseApp: closeApp,
@@ -2334,7 +2422,7 @@ const MainFrame = (props: Props) => {
         renderMainMenu({
           i18n: i18n,
           project: state.currentProject,
-          onChooseProject: chooseProject,
+          onChooseProject: () => openOpenFromStorageProviderDialog(),
           onOpenRecentFile: openFromFileMetadataWithStorageProvider,
           onSaveProject: saveProject,
           onSaveProjectAs: saveProjectAs,
@@ -2506,19 +2594,19 @@ const MainFrame = (props: Props) => {
                     resourceSources: props.resourceSources,
                     onChooseResource,
                     resourceExternalEditors,
+                    onFetchNewlyAddedResources,
                     onCreateEventsFunction,
                     openInstructionOrExpression,
                     unsavedChanges: unsavedChanges,
                     canOpen: !!props.storageProviders.filter(
                       ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
                     ).length,
-                    onChooseProject: chooseProject,
+                    onChooseProject: () => openOpenFromStorageProviderDialog(),
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
                     onOpenProjectPreCreationDialog: exampleShortHeader => {
                       setSelectedExampleShortHeader(exampleShortHeader);
                       setProjectPreCreationDialogOpen(true);
                     },
-                    onOpenProjectAfterCreation: onOpenProjectAfterCreation,
                     onOpenProjectManager: () => openProjectManager(true),
                     onCloseProject: () => askToCloseProject(),
                     onCreateProject: exampleShortHeader =>
@@ -2630,24 +2718,28 @@ const MainFrame = (props: Props) => {
             _previewLauncher.current = previewLauncher;
           }
         )}
-      {!!currentProject && chooseResourceOptions && onResourceChosen && (
-        <NewResourceDialog
-          project={currentProject}
-          i18n={i18n}
-          resourceSources={resourceSources}
-          onChooseResources={resources => {
-            setOnResourceChosen(null);
-            setChooseResourceOptions(null);
-            onResourceChosen(resources);
-          }}
-          onClose={() => {
-            setOnResourceChosen(null);
-            setChooseResourceOptions(null);
-            onResourceChosen([]);
-          }}
-          options={chooseResourceOptions}
-        />
-      )}
+      {chooseResourceOptions &&
+        onResourceChosen &&
+        !!currentProject && (
+          <NewResourceDialog
+            project={currentProject}
+            fileMetadata={currentFileMetadata}
+            getStorageProvider={getStorageProvider}
+            i18n={i18n}
+            resourceSources={resourceSources}
+            onChooseResources={resources => {
+              setOnResourceChosen(null);
+              setChooseResourceOptions(null);
+              onResourceChosen(resources);
+            }}
+            onClose={() => {
+              setOnResourceChosen(null);
+              setChooseResourceOptions(null);
+              onResourceChosen([]);
+            }}
+            options={chooseResourceOptions}
+          />
+        )}
       {profileDialogOpen && (
         <ProfileDialog
           currentProject={currentProject}
@@ -2709,7 +2801,7 @@ const MainFrame = (props: Props) => {
           storageProviders={props.storageProviders}
           onChooseProvider={storageProvider => {
             openOpenFromStorageProviderDialog(false);
-            getStorageProviderOperations({ storageProvider });
+            getStorageProviderOperations(storageProvider);
             chooseProjectWithStorageProviderPicker();
           }}
         />
@@ -2719,25 +2811,14 @@ const MainFrame = (props: Props) => {
           onClose={() => openSaveToStorageProviderDialog(false)}
           storageProviders={props.storageProviders}
           onChooseProvider={storageProvider => {
-            const currentStorageProvider = getStorageProvider();
             openSaveToStorageProviderDialog(false);
-            saveProjectAsWithStorageProvider({
-              context:
-                storageProvider.internalName ===
-                currentStorageProvider.internalName
-                  ? 'duplicateCurrentProject'
-                  : undefined,
-              storageProviderOperationsGetOptions: {
-                storageProvider,
-                doNotKeepForNextOperations:
-                  storageProvider.internalName === 'DownloadFile',
-              },
-            });
+            saveProjectAsWithStorageProvider(storageProvider);
           }}
         />
       )}
       {renderOpenConfirmDialog()}
       {renderLeaderboardReplacerDialog()}
+      {renderResourceMoverDialog()}
       {renderResourceFetcherDialog()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}

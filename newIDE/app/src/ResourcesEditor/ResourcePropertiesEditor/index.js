@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import Background from '../../UI/Background';
@@ -52,7 +53,13 @@ export default class ResourcePropertiesEditor extends React.Component<
       getValue: (resource: gdResource) => resource.getFile(),
       setValue: (resource: gdResource, newValue: string) =>
         resource.setFile(newValue),
-      onEditButtonClick: () => this._chooseResourcePath(),
+      onEditButtonBuildMenuTemplate: (i18n: I18nType) =>
+        this.props.resourceSources
+          .filter(source => source.kind === this.props.resources[0].getKind())
+          .map(source => ({
+            label: i18n._(source.displayName),
+            click: () => this._chooseResourcePath(source),
+          })),
     },
   ];
 
@@ -68,23 +75,13 @@ export default class ResourcePropertiesEditor extends React.Component<
     );
   }
 
-  _chooseResourcePath = () => {
-    const {
-      resources,
-      onResourcePathUpdated,
-      onChooseResource,
-      resourceSources,
-    } = this.props;
+  _chooseResourcePath = (resourceSource: ResourceSource) => {
+    const { resources, onResourcePathUpdated, onChooseResource } = this.props;
     const resource = resources[0];
-    const sources = resourceSources.filter(
-      source => source.kind === resource.getKind()
-    );
-    if (!sources.length) return;
+
     onChooseResource({
-      // Should be updated once new sources are introduced in the desktop app.
-      // Search for "sources[0]" in the codebase for other places like this.
-      initialSourceName: sources[0].name,
-      multiSelection: true,
+      initialSourceName: resourceSource.name,
+      multiSelection: false,
       resourceKind: resource.getKind(),
     }).then(resources => {
       if (!resources.length) return; // No path was chosen by the user.
@@ -96,6 +93,8 @@ export default class ResourcePropertiesEditor extends React.Component<
 
       onResourcePathUpdated();
       this.forceUpdate();
+
+      // TODO: await onFetchNewlyAddedResources();
     });
   };
 

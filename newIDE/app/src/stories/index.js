@@ -1433,7 +1433,22 @@ storiesOf('PropertiesEditor', module)
           disabled: true,
           getValue: instance => 'Disabled field',
           setValue: (instance, newValue) => {},
-          onEditButtonClick: instance => action('edit button clicked'),
+        },
+        {
+          name: 'Some field with edit buttons',
+          valueType: 'string',
+          getValue: instance => 'Click to test',
+          setValue: (instance, newValue) => {},
+          onEditButtonBuildMenuTemplate: () => [
+            {
+              label: 'Option 1',
+              click: action('Option 1'),
+            },
+            {
+              label: 'Option 2',
+              click: action('Option 2'),
+            },
+          ],
         },
         {
           name: 'Position',
@@ -1484,9 +1499,24 @@ storiesOf('PropertiesEditor', module)
           disabled: true,
           getValue: instance => 'Disabled field',
           setValue: (instance, newValue) => {},
-          onEditButtonClick: instance => action('edit button clicked'),
           getDescription: () =>
             'This is a description. It can be fairly long and even have some *Markdown*, including [links](http://example.com).',
+        },
+        {
+          name: 'Some field with edit buttons',
+          valueType: 'string',
+          getValue: instance => 'Click to test',
+          setValue: (instance, newValue) => {},
+          onEditButtonBuildMenuTemplate: () => [
+            {
+              label: 'Option 1',
+              click: action('Option 1'),
+            },
+            {
+              label: 'Option 2',
+              click: action('Option 2'),
+            },
+          ],
         },
         {
           name: 'Position',

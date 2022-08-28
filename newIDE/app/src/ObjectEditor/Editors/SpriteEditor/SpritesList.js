@@ -1,6 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
-
+import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../../../Utils/MapFor';
@@ -24,6 +24,9 @@ import {
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
 import RaisedButton from '../../../UI/RaisedButton';
+import FlatButton from '../../../UI/FlatButton';
+import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
+import ElementWithMenu from '../../../UI/Menu/ElementWithMenu';
 const gd: libGDevelop = global.gd;
 const path = require('path');
 
@@ -44,18 +47,39 @@ const styles = {
   },
 };
 
-const AddSpriteButton = SortableElement(({ displayHint, onAdd }) => {
-  return (
-    <div style={thumbnailContainerStyle}>
-      <RaisedButton
-        onClick={onAdd}
-        label={<Trans>Add a sprite</Trans>}
-        icon={<Add />}
-        primary
-      />
-    </div>
-  );
-});
+type AddSpriteButtonProps = {|
+  onAdd: (resourceSource: ResourceSource) => void,
+  resourceSources: Array<ResourceSource>,
+|};
+
+const AddSpriteButton = SortableElement(
+  ({ displayHint, onAdd, resourceSources }: AddSpriteButtonProps) => {
+    return (
+      <div style={thumbnailContainerStyle}>
+        <ElementWithMenu
+          element={
+            <RaisedButton
+              onClick={() => {
+                /* Will be replaced by ElementWithMenu. */
+              }}
+              label={<Trans>Add a sprite</Trans>}
+              icon={<Add />}
+              primary
+            />
+          }
+          buildMenuTemplate={(i18n: I18nType) =>
+            resourceSources
+              .filter(source => source.kind === 'image')
+              .map(source => ({
+                label: i18n._(source.displayName),
+                click: () => onAdd(source),
+              }))
+          }
+        />
+      </div>
+    );
+  }
+);
 
 const SortableSpriteThumbnail = SortableElement(
   ({ sprite, project, resourcesLoader, selected, onSelect, onContextMenu }) => {
@@ -80,6 +104,7 @@ const SortableList = SortableContainer(
     project,
     resourcesLoader,
     onAddSprite,
+    resourceSources,
     selectedSprites,
     onSelectSprite,
     onSpriteContextMenu,
@@ -109,6 +134,7 @@ const SortableList = SortableContainer(
             disabled
             index={spritesCount}
             onAdd={onAddSprite}
+            resourceSources={resourceSources}
           />,
         ]}
       </div>
@@ -169,16 +195,8 @@ export default class SpritesList extends Component<Props, void> {
     this.forceUpdate();
   };
 
-  onAddSprite = () => {
-    const {
-      resourceSources,
-      onChooseResource,
-      project,
-      direction,
-    } = this.props;
-    if (!resourceSources) return;
-    const sources = resourceSources.filter(source => source.kind === 'image');
-    if (!sources.length) return;
+  onAddSprite = (resourceSource: ResourceSource) => {
+    const { onChooseResource, project, direction } = this.props;
 
     const {
       allDirectionSpritesHaveSameCollisionMasks,
@@ -186,9 +204,7 @@ export default class SpritesList extends Component<Props, void> {
     } = checkDirectionPointsAndCollisionsMasks(direction);
 
     onChooseResource({
-      // Should be updated once new sources are introduced in the desktop app.
-      // Search for "sources[0]" in the codebase for other places like this.
-      initialSourceName: sources[0].name,
+      initialSourceName: resourceSource.name,
       multiSelection: true,
       resourceKind: 'image',
     }).then(resources => {
@@ -213,6 +229,8 @@ export default class SpritesList extends Component<Props, void> {
       resources.forEach(resource => resource.delete());
 
       this.forceUpdate();
+
+      // TODO: await onFetchNewlyAddedResources();
     });
   };
 
@@ -326,6 +344,7 @@ export default class SpritesList extends Component<Props, void> {
           project={this.props.project}
           onSortEnd={this.onSortEnd}
           onAddSprite={this.onAddSprite}
+          resourceSources={this.props.resourceSources}
           selectedSprites={this.props.selectedSprites}
           onSelectSprite={this.props.onSelectSprite}
           onSpriteContextMenu={this.props.onSpriteContextMenu}

@@ -47,7 +47,7 @@ export default class ObjectPointNameField extends Component<
     }
 
     if (object.getType() === 'Sprite') {
-      const spriteObject = gd.asSpriteObject(object);
+      const spriteObject = gd.asSpriteObject(object.getConfiguration());
 
       return getAllPointNames(spriteObject)
         .map(spriteObjectName =>

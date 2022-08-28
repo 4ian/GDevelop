@@ -25,7 +25,9 @@ class ResourcesManager;
 class ExternalLayout;
 class EventsFunctionsExtension;
 class EventsBasedObject;
+class EventsBasedBehavior;
 class Object;
+class ObjectConfiguration;
 class VariablesContainer;
 class ArbitraryResourceWorker;
 class SourceFile;
@@ -464,6 +466,13 @@ class GD_CORE_API Project : public ObjectsContainer {
                                            const gd::String& name) const;
 
   /**
+   * Create an object configuration of the given type with the specified name.
+   * 
+   * \param type The type of the object
+   */
+  std::unique_ptr<gd::ObjectConfiguration> CreateObjectConfiguration(const gd::String& type) const;
+
+  /**
    * Create an event of the given type.
    *
    * \note A project can use more than one platform. In this case, the first
@@ -835,6 +844,21 @@ class GD_CORE_API Project : public ObjectsContainer {
    * \brief Return the events based object with a given type.
    */
   const gd::EventsBasedObject& GetEventsBasedObject(const gd::String& type) const;
+
+  /**
+   * \brief  Check if events based behavior with a given type exists.
+   */
+  bool HasEventsBasedBehavior(const gd::String& type) const;
+
+  /**
+   * \brief Return the events based behavior with a given type.
+   */
+  gd::EventsBasedBehavior& GetEventsBasedBehavior(const gd::String& type);
+
+  /**
+   * \brief Return the events based behavior with a given type.
+   */
+  const gd::EventsBasedBehavior& GetEventsBasedBehavior(const gd::String& type) const;
 
   ///@}
 

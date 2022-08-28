@@ -103,75 +103,73 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                     childObjectConfiguration.getType()
                   );
                   const EditorComponent = editorConfiguration.component;
-                  
+
                   const objectMetadata = gd.MetadataProvider.getObjectMetadata(
                     gd.JsPlatform.get(),
                     childObjectConfiguration.getType()
                   );
                   const iconUrl = objectMetadata.getIconFilename();
-                  const tutorialIds = getObjectTutorialIds(childObjectConfiguration.getType());
+                  const tutorialIds = getObjectTutorialIds(
+                    childObjectConfiguration.getType()
+                  );
                   const enabledTutorialIds = tutorialIds.filter(
                     tutorialId => !values.hiddenTutorialHints[tutorialId]
                   );
 
                   return (
                     <Accordion key={childObject.getName()} defaultExpanded>
-                    <AccordionHeader
-                      actions={[
-                        <HelpIcon
-                          key="help"
-                          size="small"
-                          helpPagePath={objectMetadata.getHelpPath()}
-                        />,
-                      ]}
-                    >
-                      {iconUrl ? (
-                        <IconContainer
-                          src={iconUrl}
-                          alt={childObject.getName()}
-                          size={20}
-                        />
-                      ) : null}
-                      <Column expand>
-                        <Text size="block-title">
-                          {childObject.getName()}
-                        </Text>
-                      </Column>
-                    </AccordionHeader>
-                    <AccordionBody>
-                      <Column
-                        expand
-                        noMargin
-                        noOverflowParent
+                      <AccordionHeader
+                        actions={[
+                          <HelpIcon
+                            key="help"
+                            size="small"
+                            helpPagePath={objectMetadata.getHelpPath()}
+                          />,
+                        ]}
                       >
-                        {enabledTutorialIds.length ? (
-                          <Line>
-                            <ColumnStackLayout expand>
-                              {tutorialIds.map(tutorialId => (
-                                <DismissableTutorialMessage
-                                  key={tutorialId}
-                                  tutorialId={tutorialId}
-                                />
-                              ))}
-                            </ColumnStackLayout>
-                          </Line>
-                        ) : null}
-                        <Line>
-                          <EditorComponent
-                            object={childObjectConfiguration}
-                            project={project}
-                            resourceSources={resourceSources}
-                            onChooseResource={onChooseResource}
-                            resourceExternalEditors={resourceExternalEditors}
-                            onSizeUpdated={
-                              forceUpdate /*Force update to ensure dialog is properly positionned*/
-                            }
-                            objectName={childObject.getName()}
+                        {iconUrl ? (
+                          <IconContainer
+                            src={iconUrl}
+                            alt={childObject.getName()}
+                            size={20}
                           />
-                        </Line>
-                      </Column>
-                    </AccordionBody>
-                  </Accordion>
+                        ) : null}
+                        <Column expand>
+                          <Text size="block-title">
+                            {childObject.getName()}
+                          </Text>
+                        </Column>
+                      </AccordionHeader>
+                      <AccordionBody>
+                        <Column expand noMargin noOverflowParent>
+                          {enabledTutorialIds.length ? (
+                            <Line>
+                              <ColumnStackLayout expand>
+                                {tutorialIds.map(tutorialId => (
+                                  <DismissableTutorialMessage
+                                    key={tutorialId}
+                                    tutorialId={tutorialId}
+                                  />
+                                ))}
+                              </ColumnStackLayout>
+                            </Line>
+                          ) : null}
+                          <Line>
+                            <EditorComponent
+                              object={childObjectConfiguration}
+                              project={project}
+                              resourceSources={resourceSources}
+                              onChooseResource={onChooseResource}
+                              resourceExternalEditors={resourceExternalEditors}
+                              onSizeUpdated={
+                                forceUpdate /*Force update to ensure dialog is properly positionned*/
+                              }
+                              objectName={childObject.getName()}
+                            />
+                          </Line>
+                        </Column>
+                      </AccordionBody>
+                    </Accordion>
                   );
                 })}
             </React.Fragment>

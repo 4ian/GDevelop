@@ -25,14 +25,13 @@ import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import UrlStorageProvider from './ProjectsStorage/UrlStorageProvider';
 import GoogleDriveStorageProvider from './ProjectsStorage/GoogleDriveStorageProvider';
 import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStorageProvider';
-import DropboxStorageProvider from './ProjectsStorage/DropboxStorageProvider';
-import OneDriveStorageProvider from './ProjectsStorage/OneDriveStorageProvider';
 import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
-import { BrowserResourceFetcher } from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
 import {
   onCreateFromExampleShortHeader,
   onCreateBlank,
 } from './ProjectCreation/services/BrowserCreation';
+import BrowserResourceMover from './ProjectsStorage/ResourceMover/BrowserResourceMover';
+import BrowserResourceFetcher from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
 
 export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
@@ -47,7 +46,6 @@ export const create = (authentication: Authentication) => {
       makeEventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={null}
       eventsFunctionsExtensionOpener={null}
-      resourceFetcher={BrowserResourceFetcher}
     >
       {({ i18n }) => (
         <ProjectStorageProviders
@@ -56,8 +54,6 @@ export const create = (authentication: Authentication) => {
             UrlStorageProvider,
             CloudStorageProvider,
             GoogleDriveStorageProvider,
-            DropboxStorageProvider,
-            OneDriveStorageProvider,
             DownloadFileStorageProvider,
           ]}
           defaultStorageProvider={UrlStorageProvider}
@@ -97,6 +93,8 @@ export const create = (authentication: Authentication) => {
                 />
               )}
               storageProviders={storageProviders}
+              resourceMover={BrowserResourceMover}
+              resourceFetcher={BrowserResourceFetcher}
               onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
               onCreateBlank={onCreateBlank}
               getStorageProviderOperations={getStorageProviderOperations}

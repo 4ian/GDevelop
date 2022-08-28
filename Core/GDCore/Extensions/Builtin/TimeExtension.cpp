@@ -136,7 +136,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
 
   extension
       .AddAction("ChangeTimeScale",
-                 _("Change time scale"),
+                 _("Time scale"),
                  _("Change the time scale of the scene."),
                  _("Set the time scale of the scene to _PARAM1_"),
                  "",

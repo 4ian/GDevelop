@@ -33,7 +33,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
           .SetCategoryFullName(_("General"));
 
   obj.AddAction("Opacity",
-                _("Change sprite opacity"),
+                _("Sprite opacity"),
                 _("Change the opacity of a Sprite. 0 is fully transparent, 255 "
                   "is opaque (default)."),
                 _("the opacity"),

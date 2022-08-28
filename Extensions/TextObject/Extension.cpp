@@ -180,7 +180,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Thickness"));
 
   obj.AddAction("SetShadow",
-                _("Change Shadow"),
+                _("Text shadow"),
                 _("Change the shadow of the text."),
                 _("Change the shadow of _PARAM0_ to color _PARAM1_ distance "
                   "_PARAM2_ blur _PARAM3_ angle _PARAM4_"),
@@ -206,7 +206,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("yesorno", _("Show the shadow"));
 
   obj.AddAction("Opacity",
-                _("Change text opacity"),
+                _("Text opacity"),
                 _("Change the opacity of a Text. 0 is fully transparent, 255 "
                   "is opaque (default)."),
                 _("the opacity"),

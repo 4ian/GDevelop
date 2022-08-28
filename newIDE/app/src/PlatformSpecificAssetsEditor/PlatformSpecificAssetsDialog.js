@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
@@ -21,6 +22,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 import Text from '../UI/Text';
 import { ColumnStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 const path = optionalRequire('path');
 const gd: libGDevelop = global.gd;
 
@@ -112,16 +114,12 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
     }
   }
 
-  _generateFromFile = () => {
-    const { project, resourceSources, onChooseResource } = this.props;
+  _generateFromFile = (resourceSource: ResourceSource) => {
+    const { project, onChooseResource } = this.props;
 
-    const sources = resourceSources.filter(source => source.kind === 'image');
-    if (!sources.length) return;
-
+    // TODO: Only local files are supported
     onChooseResource({
-      // Should be updated once new sources are introduced in the desktop app.
-      // Search for "sources[0]" in the codebase for other places like this.
-      initialSourceName: sources[0].name,
+      initialSourceName: resourceSource.name,
       multiSelection: false,
       resourceKind: 'image',
     }).then(resources => {
@@ -314,6 +312,36 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         onApply={this.onApply}
       >
         <ColumnStackLayout noMargin>
+          <Line justifyContent="center" noMargin>
+            {isResizeSupported() ? (
+              <ElementWithMenu
+                element={
+                  <RaisedButton
+                    primary
+                    label={<Trans>Generate icons from a file</Trans>}
+                    onClick={() => {
+                      /* Will be replaced by ElementWithMenu */
+                    }}
+                  />
+                }
+                buildMenuTemplate={(i18n: I18nType) =>
+                  resourceSources
+                    .filter(source => source.kind === 'image')
+                    .map(source => ({
+                      label: i18n._(source.displayName),
+                      click: () => this._generateFromFile(source),
+                    }))
+                }
+              />
+            ) : (
+              <Text>
+                <Trans>
+                  Download GDevelop desktop version to generate the Android and
+                  iOS icons of your game.
+                </Trans>
+              </Text>
+            )}
+          </Line>
           <Text size="sub-title">
             <Trans>Liluo.io thumbnail</Trans>
           </Text>

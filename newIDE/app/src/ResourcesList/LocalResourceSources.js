@@ -1,9 +1,13 @@
 // @flow
 import { t } from '@lingui/macro';
+import * as React from 'react';
 import {
+  type ChooseResourceOptions,
+  type ResourceSourceComponentProps,
   type ResourceSource,
   allResourceKindsAndMetadata,
 } from './ResourceSource';
+import { ResourceStore } from '../AssetStore/ResourceStore';
 import { isPathInProjectFolder, copyAllToProjectFolder } from './ResourceUtils';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
@@ -11,7 +15,48 @@ const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
 const path = optionalRequire('path');
 
+type ResourceStoreChooserProps = {
+  options: ChooseResourceOptions,
+  onChooseResources: (resources: Array<gdResource>) => void,
+  createNewResource: () => gdResource,
+};
+
+const ResourceStoreChooser = ({
+  options,
+  onChooseResources,
+  createNewResource,
+}: ResourceStoreChooserProps) => {
+  return (
+    <ResourceStore
+      onChoose={resource => {
+        const chosenResourceUrl = resource.url;
+        const newResource = createNewResource();
+        newResource.setFile(chosenResourceUrl);
+        newResource.setName(path.basename(chosenResourceUrl));
+        newResource.setOrigin('gdevelop-asset-store', chosenResourceUrl);
+
+        onChooseResources([newResource]);
+      }}
+      resourceKind={options.resourceKind}
+    />
+  );
+};
+
 const localResourceSources: Array<ResourceSource> = [
+  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
+    name: `resource-store-${kind}`,
+    displayName: t`Choose from asset store`,
+    displayTab: 'standalone',
+    kind,
+    renderComponent: (props: ResourceSourceComponentProps) => (
+      <ResourceStoreChooser
+        createNewResource={createNewResource}
+        onChooseResources={props.onChooseResources}
+        options={props.options}
+        key={`resource-store-${kind}`}
+      />
+    ),
+  })),
   ...allResourceKindsAndMetadata.map(
     ({ kind, displayName, fileExtensions, createNewResource }) => ({
       name: 'local-file-opener-' + kind,

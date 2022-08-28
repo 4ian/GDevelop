@@ -48,8 +48,6 @@ import { prepareExamples } from '../../../../AssetStore/ExampleStore';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
-const isWebApp = !electron;
-
 const styles = {
   listItem: {
     padding: 0,
@@ -159,7 +157,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     let hasTooManyCloudProjects = false;
 
     // Show cloud projects on the web app only.
-    if (isWebApp && cloudProjects) {
+    if (cloudProjects) {
       projectFiles = projectFiles.concat(
         cloudProjects
           .map(cloudProject => {
@@ -262,7 +260,6 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
           {
             label: i18n._(t`Show in local folder`),
             click: () => locateProjectFile(file),
-            enabled: !isWebApp,
           },
           { type: 'separator' },
           {
@@ -291,7 +288,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
             <SectionContainer
               title={<Trans>My projects</Trans>}
               renderFooter={() =>
-                isWebApp && limits && hasTooManyCloudProjects ? (
+                limits && hasTooManyCloudProjects ? (
                   <Line>
                     <Column expand>
                       <MaxProjectCountAlertMessage

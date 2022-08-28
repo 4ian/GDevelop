@@ -5,7 +5,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/WholeProjectRefactorer.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
-#include "GDCore/Project/BehaviorContent.h"
+#include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
 
@@ -29,7 +29,7 @@ void UsedExtensionsFinder::DoVisitObject(gd::Object& object) {
 
 // Behaviors scanner
 
-void UsedExtensionsFinder::DoVisitBehavior(gd::BehaviorContent& behavior) {
+void UsedExtensionsFinder::DoVisitBehavior(gd::Behavior& behavior) {
   usedExtensions.insert(
       gd::MetadataProvider::GetExtensionAndBehaviorMetadata(
           project.GetCurrentPlatform(), behavior.GetTypeName())

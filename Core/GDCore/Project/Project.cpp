@@ -23,11 +23,12 @@
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
-#include "GDCore/Project/CustomObject.h"
+#include "GDCore/Project/CustomObjectConfiguration.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Project/SourceFile.h"
@@ -82,15 +83,17 @@ void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 std::unique_ptr<gd::Object> Project::CreateObject(
   const gd::String& type,
   const gd::String& name) const {
+    return gd::make_unique<Object>(name, type, CreateObjectConfiguration(type));
+}
+
+std::unique_ptr<gd::ObjectConfiguration> Project::CreateObjectConfiguration(
+  const gd::String& type) const {
   if (Project::HasEventsBasedObject(type)) {
-    auto &eventsBasedObject = Project::GetEventsBasedObject(type);
-    auto customObject = gd::make_unique<CustomObject>(eventsBasedObject, type);
-    customObject->SetName(name);
-    return customObject;
+    return gd::make_unique<CustomObjectConfiguration>(*this, type);
   }
   else {
     // Create a base object if the type can't be found in the platform.
-    return currentPlatform->CreateObject(type, name);
+    return currentPlatform->CreateObjectConfiguration(type);
   }
 }
 
@@ -124,6 +127,38 @@ const gd::EventsBasedObject& Project::GetEventsBasedObject(const gd::String& typ
 
   const auto &extension = Project::GetEventsFunctionsExtension(extensionName);
   return extension.GetEventsBasedObjects().Get(objectTypeName);
+}
+
+bool Project::HasEventsBasedBehavior(const gd::String& type) const {
+    const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
+    if (separatorIndex == std::string::npos) {
+      return false;
+    }
+    gd::String extensionName = type.substr(0, separatorIndex);
+    if (!Project::HasEventsFunctionsExtensionNamed(extensionName)) {
+      return false;
+    }
+    auto &extension = Project::GetEventsFunctionsExtension(extensionName);
+    gd::String behaviorTypeName = type.substr(separatorIndex + 2);
+    return extension.GetEventsBasedBehaviors().Has(behaviorTypeName);
+}
+
+gd::EventsBasedBehavior& Project::GetEventsBasedBehavior(const gd::String& type) {
+    const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
+    gd::String extensionName = type.substr(0, separatorIndex);
+    gd::String behaviorTypeName = type.substr(separatorIndex + 2);
+
+    auto &extension = Project::GetEventsFunctionsExtension(extensionName);
+    return extension.GetEventsBasedBehaviors().Get(behaviorTypeName);
+}
+
+const gd::EventsBasedBehavior& Project::GetEventsBasedBehavior(const gd::String& type) const {
+    const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
+    gd::String extensionName = type.substr(0, separatorIndex);
+    gd::String behaviorTypeName = type.substr(separatorIndex + 2);
+
+    auto &extension = Project::GetEventsFunctionsExtension(extensionName);
+    return extension.GetEventsBasedBehaviors().Get(behaviorTypeName);
 }
 
 std::shared_ptr<gd::BaseEvent> Project::CreateEvent(
@@ -671,16 +706,15 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   if (currentPlatform == NULL && !platforms.empty())
     currentPlatform = platforms.back();
 
-  // TODO EBO All events based behaviors and events based objects should be
-  // added to the project before the content of events based objects is
-  // unserialized because when unserializing child-objects InsertNewObject and
-  // AddNewBehavior need to get EventsBasedObject and EventsBasedBehavior
-  // instances from the Project.
   eventsFunctionsExtensions.clear();
   const SerializerElement& eventsFunctionsExtensionsElement =
       element.GetChild("eventsFunctionsExtensions");
   eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
       "eventsFunctionsExtension");
+  // First, only unserialize behaviors and objects names.
+  // As event based objects can contains CustomObject and Custom Object,
+  // this allows them to reference EventBasedBehavior and EventBasedObject
+  // respectively.
   for (std::size_t i = 0;
        i < eventsFunctionsExtensionsElement.GetChildrenCount();
        ++i) {
@@ -690,7 +724,17 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     gd::EventsFunctionsExtension& newEventsFunctionsExtension =
         InsertNewEventsFunctionsExtension("",
                                           GetEventsFunctionsExtensionsCount());
-    newEventsFunctionsExtension.UnserializeFrom(
+    newEventsFunctionsExtension.UnserializeExtensionDeclarationFrom(
+        *this, eventsFunctionsExtensionElement);
+  }
+  // Then unserialize functions, behaviors and objects content.
+  for (std::size_t i = 0;
+       i < eventsFunctionsExtensionsElement.GetChildrenCount();
+       ++i) {
+    const SerializerElement& eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(i);
+
+    eventsFunctionsExtensions.at(i)->UnserializeExtensionImplementationFrom(
         *this, eventsFunctionsExtensionElement);
   }
 
@@ -902,8 +946,9 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   // Add layouts resources
   for (std::size_t s = 0; s < GetLayoutsCount(); s++) {
     for (std::size_t j = 0; j < GetLayout(s).GetObjectsCount();
-         ++j)  // Add objects resources
-      GetLayout(s).GetObject(j).ExposeResources(worker);
+         ++j) { // Add objects resources
+      GetLayout(s).GetObject(j).GetConfiguration().ExposeResources(worker);
+    }
 
     LaunchResourceWorkerOnEvents(*this, GetLayout(s).GetEvents(), worker);
   }
@@ -922,7 +967,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
 
   // Add global objects resources
   for (std::size_t j = 0; j < GetObjectsCount(); ++j) {
-    GetObject(j).ExposeResources(worker);
+    GetObject(j).GetConfiguration().ExposeResources(worker);
   }
 
   // Add loading screen background image if present

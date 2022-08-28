@@ -19,9 +19,8 @@ This project is released under the MIT License.
 
 using namespace std;
 
-TextObject::TextObject(gd::String name_)
-    : Object(name_),
-      text("Text"),
+TextObject::TextObject()
+    : text("Text"),
       characterSize(20),
       fontName(""),
       smoothed(true),

@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import InlineCheckbox from '../UI/InlineCheckbox';
@@ -13,7 +14,7 @@ import ColorField from '../UI/ColorField';
 import { MarkdownText } from '../UI/MarkdownText';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 import FormHelperText from '@material-ui/core/FormHelperText';
-
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import {
   type ResourceKind,
   type ResourceSource,
@@ -32,6 +33,7 @@ import UnsavedChangesContext, {
 import { Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -44,7 +46,7 @@ export type ValueFieldCommonProperties = {|
   getDescription?: Instance => string,
   getExtraDescription?: Instance => string,
   disabled?: boolean | ((instances: Array<gdInitialInstance>) => boolean),
-  onEditButtonClick?: Instance => void,
+  onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
 |};
 
 // "Primitive" value fields are "simple" fields.
@@ -355,7 +357,7 @@ const PropertiesEditor = ({
           />
         );
       } else {
-        const { onEditButtonClick, setValue } = field;
+        const { onEditButtonBuildMenuTemplate, setValue } = field;
         return (
           <TextFieldWithButtonLayout
             key={field.name}
@@ -375,14 +377,21 @@ const PropertiesEditor = ({
               />
             )}
             renderButton={style =>
-              onEditButtonClick ? (
-                <RaisedButton
-                  style={style}
-                  primary
-                  disabled={instances.length !== 1}
-                  icon={<Edit />}
-                  label={<Trans>Edit</Trans>}
-                  onClick={() => onEditButtonClick(instances[0])}
+              onEditButtonBuildMenuTemplate ? (
+                <ElementWithMenu
+                  element={
+                    <RaisedButton
+                      style={style}
+                      primary
+                      disabled={instances.length !== 1}
+                      icon={<Edit />}
+                      label={<Trans>Edit</Trans>}
+                      onClick={() => {
+                        /* Will be replaced by ElementWithMenu */
+                      }}
+                    />
+                  }
+                  buildMenuTemplate={onEditButtonBuildMenuTemplate}
                 />
               ) : null
             }

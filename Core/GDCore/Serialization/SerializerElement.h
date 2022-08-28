@@ -22,7 +22,7 @@ namespace gd {
  * properties).
  *
  * It is used for serialization (to JSON or XML), or as a generic
- * container for properties of objects (see for example gd::BehaviorContent).
+ * container for properties of objects (see for example gd::Behavior).
  *
  * It also has specialized methods in GDevelop.js (see postjs.js) to be
  * converted to a JavaScript object.

@@ -1,4 +1,9 @@
-#include "CustomObject.h"
+/*
+ * GDevelop Core
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
+ */
+#include "CustomObjectConfiguration.h"
 
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Project/Object.h"
@@ -6,24 +11,63 @@
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
-
-#include <map>
+#include "GDCore/Tools/Log.h"
 
 using namespace gd;
 
-std::unique_ptr<gd::Object> CustomObject::Clone() const {
-  CustomObject* clone = new CustomObject(*this);
-  return std::unique_ptr<gd::Object>(clone);
+void CustomObjectConfiguration::Init(const gd::CustomObjectConfiguration& objectConfiguration) {
+  project = objectConfiguration.project;
+  objectContent = objectConfiguration.objectContent;
+
+  // There is no default copy for a map of unique_ptr like childObjectConfigurations.
+  childObjectConfigurations.clear();
+  for (auto& it : objectConfiguration.childObjectConfigurations) {
+    childObjectConfigurations[it.first] =
+        gd::make_unique<gd::ObjectConfiguration>(*it.second);
+  }
 }
 
-// TODO EBO Extract a class from Object for the object configuration.
-// This will allow CustomObject to have a ObjectConfiguration composed of
-// ObjectConfiguration for their children in addition to its own properties.
-// This will be used by the GUI to display custom editors (for sprites for
-// instance)
-std::map<gd::String, gd::PropertyDescriptor> CustomObject::GetProperties() const {
-    const auto &properties = eventsBasedObject.GetPropertyDescriptors();
+gd::ObjectConfiguration CustomObjectConfiguration::badObjectConfiguration;
+
+std::unique_ptr<gd::ObjectConfiguration> CustomObjectConfiguration::Clone() const {
+  CustomObjectConfiguration* clone = new CustomObjectConfiguration(*this);
+  return std::unique_ptr<gd::ObjectConfiguration>(clone);
+}
+
+gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(const gd::String &objectName) {
+  if (!project->HasEventsBasedObject(GetType())) {
+    return badObjectConfiguration;
+  }
+  const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
+  
+  if (!eventsBasedObject.HasObjectNamed(objectName)) {
+    gd::LogError("Tried to get the configuration of a child-object:" + objectName
+                + " that doesn't exist in the event-based object: " + GetType());
+    return badObjectConfiguration;
+  }
+
+  auto &childObject = eventsBasedObject.GetObject(objectName);
+  auto configurationPosition = childObjectConfigurations.find(objectName);
+  if (configurationPosition == childObjectConfigurations.end()) {
+    childObjectConfigurations.insert(std::make_pair(
+        objectName,
+        project->CreateObjectConfiguration(childObject.GetType())));
+    return *(childObjectConfigurations[objectName]);
+  }
+  else {
+    auto &pair = *configurationPosition;
+    auto &configuration = pair.second;
+    return *configuration;
+  }
+ }
+
+std::map<gd::String, gd::PropertyDescriptor> CustomObjectConfiguration::GetProperties() const {
     auto objectProperties = std::map<gd::String, gd::PropertyDescriptor>();
+    if (!project->HasEventsBasedObject(GetType())) {
+      return objectProperties;
+    }
+    const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
+    const auto &properties = eventsBasedObject.GetPropertyDescriptors();
 
     for (auto &property : properties.GetInternalVector()) {
       const auto &propertyName = property->GetName();
@@ -71,8 +115,12 @@ std::map<gd::String, gd::PropertyDescriptor> CustomObject::GetProperties() const
     return objectProperties;
 }
 
-bool CustomObject::UpdateProperty(const gd::String& propertyName,
+bool CustomObjectConfiguration::UpdateProperty(const gd::String& propertyName,
                                   const gd::String& newValue) {
+    if (!project->HasEventsBasedObject(GetType())) {
+      return false;
+    }
+    const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
     const auto &properties = eventsBasedObject.GetPropertyDescriptors();
     if (!properties.Has(propertyName)) {
       return false;
@@ -98,14 +146,14 @@ bool CustomObject::UpdateProperty(const gd::String& propertyName,
 }
 
 std::map<gd::String, gd::PropertyDescriptor>
-CustomObject::GetInitialInstanceProperties(
+CustomObjectConfiguration::GetInitialInstanceProperties(
     const gd::InitialInstance& instance,
     gd::Project& project,
     gd::Layout& scene) {
   return std::map<gd::String, gd::PropertyDescriptor>();
 }
 
-bool CustomObject::UpdateInitialInstanceProperty(
+bool CustomObjectConfiguration::UpdateInitialInstanceProperty(
     gd::InitialInstance& instance,
     const gd::String& name,
     const gd::String& value,
@@ -114,15 +162,29 @@ bool CustomObject::UpdateInitialInstanceProperty(
   return false;
 }
 
-void CustomObject::DoSerializeTo(SerializerElement& arg0) const {
-  arg0.AddChild("content") = objectContent;
+void CustomObjectConfiguration::DoSerializeTo(SerializerElement& element) const {
+  element.AddChild("content") = objectContent;
+  auto &childrenContentElement = element.AddChild("childrenContent");
+  for (auto &pair : childObjectConfigurations) {
+    auto &childName = pair.first;
+    auto &childConfiguration = pair.second;
+    auto &childElement = childrenContentElement.AddChild(childName);
+    childConfiguration->SerializeTo(childElement);
+  }
 }
-void CustomObject::DoUnserializeFrom(Project& arg0,
-                                               const SerializerElement& arg1) {
-  objectContent = arg1.GetChild("content");
+void CustomObjectConfiguration::DoUnserializeFrom(Project& project,
+                                               const SerializerElement& element) {
+  objectContent = element.GetChild("content");
+  auto &childrenContentElement = element.GetChild("childrenContent");
+  for (auto &pair : childrenContentElement.GetAllChildren()) {
+    auto &childName = pair.first;
+    auto &childElement = pair.second;
+    auto &childConfiguration = GetChildObjectConfiguration(childName);
+    childConfiguration.UnserializeFrom(project, *childElement);
+  }
 }
 
-void CustomObject::ExposeResources(
+void CustomObjectConfiguration::ExposeResources(
     gd::ArbitraryResourceWorker& worker) {
   std::map<gd::String, gd::PropertyDescriptor> properties = GetProperties();
 

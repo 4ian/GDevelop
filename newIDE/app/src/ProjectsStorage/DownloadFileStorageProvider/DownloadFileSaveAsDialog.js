@@ -27,7 +27,11 @@ import {
   type BlobFileDescriptor,
   type TextFileDescriptor,
 } from '../../Utils/BrowserArchiver';
+import path from 'path';
+import newNameGenerator from '../../Utils/NewNameGenerator';
 const gd: libGDevelop = global.gd;
+
+const PROJECT_JSON_FILENAME = 'game.json';
 
 const isURL = (filename: string) => {
   return (
@@ -111,10 +115,10 @@ export const downloadResourcesAsBlobs = async ({
     },
   });
 
+  const alreadyUsedFilenames = new Set([PROJECT_JSON_FILENAME]);
+
   downloadedBlobsAndResources.forEach(({ item, error, blob }) => {
     const { resource, filename } = item;
-    // TODO: handle conflicts of filenames (and do a test file for this).
-    // TODO: organise by resource type in a "assets folder".
     if (error || !blob) {
       result.erroredResources.push({
         resourceName: resource.getName(),
@@ -123,8 +127,20 @@ export const downloadResourcesAsBlobs = async ({
       return;
     }
 
-    resource.setFile(filename);
-    onAddBlobFile({ blob, filePath: filename });
+    // Ensure each filename is unique, and sort resources in folder by types.
+    const extension = path.extname(filename);
+    const basename = path.basename(filename, extension);
+    const pathPrefix = 'assets/' + resource.getKind();
+    const newBasename = newNameGenerator(basename, tentativeBasename =>
+      alreadyUsedFilenames.has(
+        path.join(pathPrefix, tentativeBasename + extension)
+      )
+    );
+    const newResourcePath = path.join(pathPrefix, newBasename + extension);
+    alreadyUsedFilenames.add(newResourcePath);
+
+    resource.setFile(newResourcePath);
+    onAddBlobFile({ blob, filePath: newResourcePath });
   });
 
   return result;
@@ -173,7 +189,7 @@ export default function DownloadFileSaveAsDialog({ project, onDone }: Props) {
           // Serialize the project.
           textFiles.push({
             text: JSON.stringify(serializeToJSObject(newProject)),
-            filePath: 'game.json',
+            filePath: PROJECT_JSON_FILENAME,
           });
 
           // Archive the whole project.

@@ -96,9 +96,12 @@ const ObjectsEditorService: ObjectsEditorServiceType = {
       return this.editorConfigurations[objectType];
     }
     if (project.hasEventsBasedObject(objectType)) {
-      const eventsBasedObject = project.getEventsBasedObject(objectType);
+      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+        gd.JsPlatform.get(),
+        objectType
+      );
       return this.getCustomObjectPropertiesEditor({
-        helpPagePath: eventsBasedObject.getHelpPath(),
+        helpPagePath: objectMetadata.getHelpPath(),
       });
     }
     console.warn(

@@ -1,6 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
-
+import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../../../Utils/MapFor';
@@ -25,6 +25,7 @@ import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExte
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
 import FlatButton from '../../../UI/FlatButton';
 import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
+import ElementWithMenu from '../../../UI/Menu/ElementWithMenu';
 const gd: libGDevelop = global.gd;
 const path = require('path');
 
@@ -45,26 +46,47 @@ const styles = {
   },
 };
 
-const AddSpriteButton = SortableElement(({ displayHint, onAdd }) => {
-  return (
-    <ThemeConsumer>
-      {muiTheme => (
-        <div
-          style={{
-            ...thumbnailContainerStyle,
-            backgroundColor: muiTheme.list.itemsBackgroundColor,
-          }}
-        >
-          <FlatButton
-            onClick={onAdd}
-            label={<Trans>Add</Trans>}
-            leftIcon={<Add />}
-          />
-        </div>
-      )}
-    </ThemeConsumer>
-  );
-});
+type AddSpriteButtonProps = {|
+  onAdd: (resourceSource: ResourceSource) => void,
+  resourceSources: Array<ResourceSource>,
+|};
+
+const AddSpriteButton = SortableElement(
+  ({ onAdd, resourceSources }: AddSpriteButtonProps) => {
+    return (
+      <ThemeConsumer>
+        {muiTheme => (
+          <div
+            style={{
+              ...thumbnailContainerStyle,
+              backgroundColor: muiTheme.list.itemsBackgroundColor,
+            }}
+          >
+            <ElementWithMenu
+              element={
+                <FlatButton
+                  onClick={() => {
+                    /* Will be replaced by ElementWithMenu. */
+                  }}
+                  label={<Trans>Add</Trans>}
+                  leftIcon={<Add />}
+                />
+              }
+              buildMenuTemplate={(i18n: I18nType) =>
+                resourceSources
+                  .filter(source => source.kind === 'image')
+                  .map(source => ({
+                    label: i18n._(source.displayName),
+                    click: () => onAdd(source),
+                  }))
+              }
+            />
+          </div>
+        )}
+      </ThemeConsumer>
+    );
+  }
+);
 
 const SortableSpriteThumbnail = SortableElement(
   ({ sprite, project, resourcesLoader, selected, onSelect, onContextMenu }) => {
@@ -89,6 +111,7 @@ const SortableList = SortableContainer(
     project,
     resourcesLoader,
     onAddSprite,
+    resourceSources,
     selectedSprites,
     onSelectSprite,
     onSpriteContextMenu,
@@ -118,6 +141,7 @@ const SortableList = SortableContainer(
             disabled
             index={spritesCount}
             onAdd={onAddSprite}
+            resourceSources={resourceSources}
           />,
         ]}
       </div>
@@ -178,16 +202,8 @@ export default class SpritesList extends Component<Props, void> {
     this.forceUpdate();
   };
 
-  onAddSprite = () => {
-    const {
-      resourceSources,
-      onChooseResource,
-      project,
-      direction,
-    } = this.props;
-    if (!resourceSources) return;
-    const sources = resourceSources.filter(source => source.kind === 'image');
-    if (!sources.length) return;
+  onAddSprite = (resourceSource: ResourceSource) => {
+    const { onChooseResource, project, direction } = this.props;
 
     const {
       allDirectionSpritesHaveSameCollisionMasks,
@@ -195,9 +211,7 @@ export default class SpritesList extends Component<Props, void> {
     } = checkDirectionPointsAndCollisionsMasks(direction);
 
     onChooseResource({
-      // Should be updated once new sources are introduced in the desktop app.
-      // Search for "sources[0]" in the codebase for other places like this.
-      initialSourceName: sources[0].name,
+      initialSourceName: resourceSource.name,
       multiSelection: true,
       resourceKind: 'image',
     }).then(resources => {
@@ -222,6 +236,8 @@ export default class SpritesList extends Component<Props, void> {
       resources.forEach(resource => resource.delete());
 
       this.forceUpdate();
+
+      // TODO: await onFetchNewlyAddedResources();
     });
   };
 
@@ -335,6 +351,7 @@ export default class SpritesList extends Component<Props, void> {
           project={this.props.project}
           onSortEnd={this.onSortEnd}
           onAddSprite={this.onAddSprite}
+          resourceSources={this.props.resourceSources}
           selectedSprites={this.props.selectedSprites}
           onSelectSprite={this.props.onSelectSprite}
           onSpriteContextMenu={this.props.onSpriteContextMenu}

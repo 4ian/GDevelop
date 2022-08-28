@@ -55,7 +55,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
 
   extension
       .AddAction("SetWindowMargins",
-                 _("Change the window's margins"),
+                 _("Window's margins"),
                  _("This action changes the margins, in pixels, between the "
                    "game frame and the window borders."),
                  _("Set margins of game window to "
@@ -71,7 +71,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
 
   extension
       .AddAction("SetGameResolutionSize",
-                 _("Change the resolution of the game"),
+                 _("Game resolution"),
                  _("Changes the resolution of the game, effectively changing "
                    "the game area size. This won't change the size of the "
                    "window in which the game is running."),
@@ -117,7 +117,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
 
   extension
       .AddAction("SetGameResolutionResizeMode",
-                 _("Change the game resolution resize mode"),
+                 _("Game resolution resize mode"),
                  _("Set if the width or the height of the game resolution "
                    "should be changed to fit the game window - or if the game "
                    "resolution should not be updated automatically."),
@@ -153,7 +153,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
 
   extension
       .AddAction("SetWindowIcon",
-                 _("Change the window's icon"),
+                 _("Window's icon"),
                  _("This action changes the icon of the game's window."),
                  _("Use _PARAM1_ as the icon for the game's window."),
                  "",
@@ -164,7 +164,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
 
   extension
       .AddAction("SetWindowTitle",
-                 _("Change the window's title"),
+                 _("Window's title"),
                  _("This action changes the title of the game's window."),
                  _("Change window title to _PARAM1_"),
                  "",

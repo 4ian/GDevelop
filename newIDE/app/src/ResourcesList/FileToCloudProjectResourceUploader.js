@@ -21,7 +21,7 @@ const styles = { fileInput: {} };
 
 type FileToCloudProjectResourceUploaderProps = {
   options: ChooseResourceOptions,
-  fileMetadata: FileMetadata,
+  fileMetadata: ?FileMetadata,
   getStorageProvider: () => StorageProvider,
   onChooseResources: (resources: Array<gdResource>) => void,
   createNewResource: () => gdResource,
@@ -51,12 +51,13 @@ export const FileToCloudProjectResourceUploader = ({
   const storageProvider = React.useMemo(getStorageProvider, [
     getStorageProvider,
   ]);
-  const cloudProjectId = fileMetadata.fileIdentifier;
+  const cloudProjectId = fileMetadata ? fileMetadata.fileIdentifier : null;
   const [uploadProgress, setUploadProgress] = React.useState(0);
   const onUpload = React.useCallback(
     async () => {
       const input = inputRef.current;
       if (!input) return;
+      if (!cloudProjectId) return;
 
       try {
         setIsUploading(true);
@@ -119,7 +120,7 @@ export const FileToCloudProjectResourceUploader = ({
     .filter(Boolean);
 
   const canUploadWithThisStorageProvider =
-    storageProvider.internalName === 'Cloud';
+    storageProvider.internalName === 'Cloud' && !!fileMetadata;
   const isConnected = !!authenticatedUser.authenticated;
   const canChooseFiles =
     !isUploading && isConnected && canUploadWithThisStorageProvider;

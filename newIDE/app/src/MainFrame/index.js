@@ -2720,8 +2720,7 @@ const MainFrame = (props: Props) => {
         )}
       {chooseResourceOptions &&
         onResourceChosen &&
-        !!currentProject &&
-        !!currentFileMetadata && (
+        !!currentProject && (
           <NewResourceDialog
             project={currentProject}
             fileMetadata={currentFileMetadata}

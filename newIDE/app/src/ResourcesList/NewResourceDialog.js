@@ -18,7 +18,7 @@ import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 
 type Props = {|
   project: gdProject,
-  fileMetadata: FileMetadata,
+  fileMetadata: ?FileMetadata,
   getStorageProvider: () => StorageProvider,
   i18n: I18nType,
   options: ChooseResourceOptions,

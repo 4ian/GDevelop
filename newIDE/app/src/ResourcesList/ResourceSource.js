@@ -65,7 +65,7 @@ export type ChooseResourceOptions = {|
 export type ChooseResourceProps = {|
   i18n: I18nType,
   project: gdProject,
-  fileMetadata: FileMetadata,
+  fileMetadata: ?FileMetadata,
   getStorageProvider: () => StorageProvider,
   getLastUsedPath: (project: gdProject, kind: ResourceKind) => string,
   setLastUsedPath: (

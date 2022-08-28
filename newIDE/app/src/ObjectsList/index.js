@@ -46,6 +46,7 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -107,6 +108,7 @@ type Props = {|
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
+  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
   onDeleteObject: (
     objectWithContext: ObjectWithContext,
     cb: (boolean) => void
@@ -616,6 +618,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       onChooseResource,
       resourceExternalEditors,
       selectedObjectTags,
+      onFetchNewlyAddedResources,
     } = this.props;
     const { searchText, tagEditedObject } = this.state;
 
@@ -712,6 +715,7 @@ export default class ObjectsList extends React.Component<Props, State> {
             resourceSources={resourceSources}
             onChooseResource={onChooseResource}
             resourceExternalEditors={resourceExternalEditors}
+            onFetchNewlyAddedResources={onFetchNewlyAddedResources}
           />
         )}
         {tagEditedObject && (

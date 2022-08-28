@@ -9,8 +9,6 @@ import GoogleDriveStorageProvider from '../../../ProjectsStorage/GoogleDriveStor
 import CloudStorageProvider from '../../../ProjectsStorage/CloudStorageProvider';
 import muiDecorator from '../../ThemeDecorator';
 import UrlStorageProvider from '../../../ProjectsStorage/UrlStorageProvider';
-import DropboxStorageProvider from '../../../ProjectsStorage/DropboxStorageProvider';
-import OneDriveStorageProvider from '../../../ProjectsStorage/OneDriveStorageProvider';
 import DownloadFileStorageProvider from '../../../ProjectsStorage/DownloadFileStorageProvider';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import {
@@ -33,8 +31,6 @@ export const UserNotAuthenticated = () => (
         UrlStorageProvider,
         CloudStorageProvider,
         GoogleDriveStorageProvider,
-        DropboxStorageProvider,
-        OneDriveStorageProvider,
         DownloadFileStorageProvider,
       ]}
       onChooseProvider={action('onChooseProvider')}
@@ -52,8 +48,6 @@ export const UserAuthenticated = () => (
         UrlStorageProvider,
         CloudStorageProvider,
         GoogleDriveStorageProvider,
-        DropboxStorageProvider,
-        OneDriveStorageProvider,
         DownloadFileStorageProvider,
       ]}
       onChooseProvider={action('onChooseProvider')}

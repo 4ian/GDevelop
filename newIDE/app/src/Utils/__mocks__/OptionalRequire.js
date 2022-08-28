@@ -9,6 +9,14 @@ const mockFsExtra = {
   ensureDir: jest.fn(),
   existsSync: jest.fn(),
 };
+const mockFs = {
+  ensureDir: jest.fn(),
+  existsSync: jest.fn(),
+};
+const mockProcess = {};
+const mockOs = {
+  tmpdir: () => '/some/fake-tmp-dir',
+};
 
 const mockOptionalRequire = jest.fn(
   (
@@ -23,8 +31,20 @@ const mockOptionalRequire = jest.fn(
     if (moduleName === 'fs-extra') {
       return mockFsExtra;
     }
+    if (moduleName === 'fs') {
+      return mockFs;
+    }
+    if (moduleName === 'process') {
+      return mockProcess;
+    }
     if (moduleName === 'path') {
       return path;
+    }
+    if (moduleName === 'os') {
+      return mockOs;
+    }
+    if (moduleName === '@electron/remote') {
+      return null;
     }
 
     throw new Error(

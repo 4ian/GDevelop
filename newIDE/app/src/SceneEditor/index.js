@@ -75,6 +75,7 @@ import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts/DeprecatedKeyboardShortcuts';
+import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 
 const gd: libGDevelop = global.gd;
 
@@ -120,6 +121,7 @@ type Props = {|
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
+  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
   isActive: boolean,
   unsavedChanges?: ?UnsavedChanges,
 
@@ -1341,6 +1343,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 unsavedChanges={this.props.unsavedChanges}
                 hotReloadPreviewButtonProps={
                   this.props.hotReloadPreviewButtonProps
+                }
+                onFetchNewlyAddedResources={
+                  this.props.onFetchNewlyAddedResources
                 }
               />
             )}

@@ -10,16 +10,7 @@ import { Column } from '../UI/Grid';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 
-export type OnOpenProjectAfterCreationFunction = ({|
-  project?: gdProject,
-  storageProvider: ?StorageProvider,
-  fileMetadata: ?FileMetadata,
-  projectName?: string,
-  templateSlug?: string,
-  shouldCloseDialog?: boolean,
-|}) => Promise<void>;
-
-export type CreateProjectDialogWithComponentsProps = {|
+export type CreateProjectDialogProps = {|
   open: boolean,
   onClose: () => void,
   initialExampleShortHeader: ?ExampleShortHeader,
@@ -34,29 +25,29 @@ export type ProjectCreationSettings = {|
   outputPath?: string,
 |};
 
+export type CreateProjectSetup = {|
+  source: {|
+    project: ?gdProject,
+    projectName: string,
+    storageProvider: ?StorageProvider,
+    fileMetadata: ?FileMetadata,
+  |},
+  destination: ?{|
+    storageProvider: StorageProvider,
+    fileMetadata: FileMetadata,
+  |},
+|};
+
 export type OnCreateBlankFunction = ({|
   i18n: I18nType,
   settings: ProjectCreationSettings,
-|}) => Promise<?{|
-  project: gdProject,
-  storageProvider: ?StorageProvider,
-  projectName?: string,
-  fileMetadata: ?FileMetadata,
-|}>;
+|}) => Promise<?CreateProjectSetup>;
 
 export type OnCreateFromExampleShortHeaderFunction = ({|
   i18n: I18nType,
   exampleShortHeader: ExampleShortHeader,
   settings: ProjectCreationSettings,
-|}) => Promise<?{|
-  storageProvider: StorageProvider,
-  projectName: string,
-  fileMetadata: FileMetadata,
-|}>;
-
-type Props = {|
-  ...CreateProjectDialogWithComponentsProps,
-|};
+|}) => Promise<?CreateProjectSetup>;
 
 const CreateProjectDialog = ({
   open,
@@ -64,7 +55,7 @@ const CreateProjectDialog = ({
   initialExampleShortHeader,
   onOpenProjectPreCreationDialog,
   isProjectOpening,
-}: Props) => {
+}: CreateProjectDialogProps) => {
   const actions = React.useMemo(
     () => [
       <FlatButton

@@ -31,7 +31,8 @@ import {
   onCreateFromExampleShortHeader,
   onCreateBlank,
 } from './ProjectCreation/services/LocalCreation';
-import FakeCloudStorageProvider from './ProjectsStorage/FakeCloudStorageProvider';
+import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
+import UrlStorageProvider from './ProjectsStorage/UrlStorageProvider';
 import LocalResourceMover from './ProjectsStorage/ResourceMover/LocalResourceMover';
 import LocalResourceFetcher from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
 
@@ -55,8 +56,7 @@ export const create = (authentication: Authentication) => {
         <ProjectStorageProviders
           appArguments={appArguments}
           storageProviders={
-            // Add Url provider
-            [LocalFileStorageProvider, FakeCloudStorageProvider]
+            [LocalFileStorageProvider, UrlStorageProvider, CloudStorageProvider]
           }
           defaultStorageProvider={LocalFileStorageProvider}
         >

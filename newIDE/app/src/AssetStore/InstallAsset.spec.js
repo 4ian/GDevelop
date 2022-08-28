@@ -21,7 +21,6 @@ import {
   fakeAssetWithEventCustomizationsAndFlashExtension1,
   flashExtensionShortHeader,
   fireBulletExtensionShortHeader,
-  fakeAssetWithEventCustomizationsAndUnknownExtension1,
 } from '../fixtures/GDevelopServicesTestData';
 import { makeTestExtensions } from '../fixtures/TestExtensions';
 import {

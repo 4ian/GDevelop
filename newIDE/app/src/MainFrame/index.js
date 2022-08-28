@@ -2718,28 +2718,26 @@ const MainFrame = (props: Props) => {
             _previewLauncher.current = previewLauncher;
           }
         )}
-      {chooseResourceOptions &&
-        onResourceChosen &&
-        !!currentProject && (
-          <NewResourceDialog
-            project={currentProject}
-            fileMetadata={currentFileMetadata}
-            getStorageProvider={getStorageProvider}
-            i18n={i18n}
-            resourceSources={resourceSources}
-            onChooseResources={resources => {
-              setOnResourceChosen(null);
-              setChooseResourceOptions(null);
-              onResourceChosen(resources);
-            }}
-            onClose={() => {
-              setOnResourceChosen(null);
-              setChooseResourceOptions(null);
-              onResourceChosen([]);
-            }}
-            options={chooseResourceOptions}
-          />
-        )}
+      {chooseResourceOptions && onResourceChosen && !!currentProject && (
+        <NewResourceDialog
+          project={currentProject}
+          fileMetadata={currentFileMetadata}
+          getStorageProvider={getStorageProvider}
+          i18n={i18n}
+          resourceSources={resourceSources}
+          onChooseResources={resources => {
+            setOnResourceChosen(null);
+            setChooseResourceOptions(null);
+            onResourceChosen(resources);
+          }}
+          onClose={() => {
+            setOnResourceChosen(null);
+            setChooseResourceOptions(null);
+            onResourceChosen([]);
+          }}
+          options={chooseResourceOptions}
+        />
+      )}
       {profileDialogOpen && (
         <ProfileDialog
           currentProject={currentProject}

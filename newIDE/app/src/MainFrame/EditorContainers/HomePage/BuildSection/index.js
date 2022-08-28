@@ -38,7 +38,6 @@ import optionalRequire from '../../../../Utils/OptionalRequire';
 import { showErrorBox } from '../../../../UI/Messages/MessageBox';
 import { getRelativeOrAbsoluteDisplayDate } from '../../../../Utils/DateDisplay';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
-import { type OnOpenProjectAfterCreationFunction } from '../../../../ProjectCreation/CreateProjectDialog';
 import { ExampleStoreContext } from '../../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
@@ -81,7 +80,6 @@ type Props = {|
   onOpenProjectPreCreationDialog: (?ExampleShortHeader) => void,
   onShowAllExamples: () => void,
   onSelectExample: (exampleShortHeader: ExampleShortHeader) => void,
-  onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
   onChangeSubscription: () => void,
   storageProviders: Array<StorageProvider>,
 |};
@@ -130,7 +128,6 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       onOpenProjectPreCreationDialog,
       onShowAllExamples,
       onSelectExample,
-      onOpenProjectAfterCreation,
       onOpenRecentFile,
       onChangeSubscription,
       storageProviders,

@@ -59,3 +59,14 @@ export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
     content: JSON.parse(serializedProject),
   };
 };
+
+export const generateOnEnsureCanAccessResources = (
+  authenticatedUser: AuthenticatedUser
+) => async (
+  project: gdProject,
+  fileMetadata: FileMetadata,
+  onProgress?: (progress: number, message: MessageDescriptor) => void
+): Promise<void> => {
+  const cloudProjectId = fileMetadata.fileIdentifier;
+  await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
+};

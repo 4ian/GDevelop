@@ -7,7 +7,7 @@ import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { type EditorProps } from './EditorProps.flow';
-import { Line } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import { getExtraObjectsInformation } from '../../Hints';
 import { getObjectTutorialIds } from '../../Utils/GDevelopServices/Tutorial';
 import AlertMessage from '../../UI/AlertMessage';
@@ -17,6 +17,10 @@ import { mapFor } from '../../Utils/MapFor';
 import ObjectsEditorService from '../ObjectsEditorService';
 import Text from '../../UI/Text';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import { Accordion, AccordionHeader, AccordionBody } from '../../UI/Accordion';
+import { IconContainer } from '../../UI/IconContainer';
+import HelpIcon from '../../UI/HelpIcon';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -47,6 +51,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     customObjectConfiguration.getType()
   ];
 
+  const { values } = React.useContext(PreferencesContext);
   const tutorialIds = getObjectTutorialIds(customObjectConfiguration.getType());
 
   const eventBasedObject = project.hasEventsBasedObject(
@@ -65,7 +70,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
               tutorialId={tutorialId}
             />
           ))}
-          {propertiesSchema.length ? (
+          {propertiesSchema.length || eventBasedObject.getObjectsCount() ? (
             <React.Fragment>
               {extraInformation ? (
                 <Line>
@@ -98,23 +103,75 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                     childObjectConfiguration.getType()
                   );
                   const EditorComponent = editorConfiguration.component;
+                  
+                  const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+                    gd.JsPlatform.get(),
+                    childObjectConfiguration.getType()
+                  );
+                  const iconUrl = objectMetadata.getIconFilename();
+                  const tutorialIds = getObjectTutorialIds(childObjectConfiguration.getType());
+                  const enabledTutorialIds = tutorialIds.filter(
+                    tutorialId => !values.hiddenTutorialHints[tutorialId]
+                  );
+
                   return (
-                    <React.Fragment>
-                      <Line>
-                        <Text displayInlineAsSpan>{childObject.getName()}</Text>
-                      </Line>
-                      <EditorComponent
-                        object={childObjectConfiguration}
-                        project={project}
-                        resourceSources={resourceSources}
-                        onChooseResource={onChooseResource}
-                        resourceExternalEditors={resourceExternalEditors}
-                        onSizeUpdated={
-                          forceUpdate /*Force update to ensure dialog is properly positionned*/
-                        }
-                        objectName={childObject.getName()}
-                      />
-                    </React.Fragment>
+                    <Accordion key={childObject.getName()} defaultExpanded>
+                    <AccordionHeader
+                      actions={[
+                        <HelpIcon
+                          key="help"
+                          size="small"
+                          helpPagePath={objectMetadata.getHelpPath()}
+                        />,
+                      ]}
+                    >
+                      {iconUrl ? (
+                        <IconContainer
+                          src={iconUrl}
+                          alt={childObject.getName()}
+                          size={20}
+                        />
+                      ) : null}
+                      <Column expand>
+                        <Text size="block-title">
+                          {childObject.getName()}
+                        </Text>
+                      </Column>
+                    </AccordionHeader>
+                    <AccordionBody>
+                      <Column
+                        expand
+                        noMargin
+                        noOverflowParent
+                      >
+                        {enabledTutorialIds.length ? (
+                          <Line>
+                            <ColumnStackLayout expand>
+                              {tutorialIds.map(tutorialId => (
+                                <DismissableTutorialMessage
+                                  key={tutorialId}
+                                  tutorialId={tutorialId}
+                                />
+                              ))}
+                            </ColumnStackLayout>
+                          </Line>
+                        ) : null}
+                        <Line>
+                          <EditorComponent
+                            object={childObjectConfiguration}
+                            project={project}
+                            resourceSources={resourceSources}
+                            onChooseResource={onChooseResource}
+                            resourceExternalEditors={resourceExternalEditors}
+                            onSizeUpdated={
+                              forceUpdate /*Force update to ensure dialog is properly positionned*/
+                            }
+                            objectName={childObject.getName()}
+                          />
+                        </Line>
+                      </Column>
+                    </AccordionBody>
+                  </Accordion>
                   );
                 })}
             </React.Fragment>

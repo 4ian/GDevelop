@@ -96,9 +96,9 @@ const ObjectsEditorService: ObjectsEditorServiceType = {
       return this.editorConfigurations[objectType];
     }
     if (project.hasEventsBasedObject(objectType)) {
+      const eventsBasedObject = project.getEventsBasedObject(objectType);
       return this.getCustomObjectPropertiesEditor({
-        // TODO EBO Add the help page
-        helpPagePath: '',
+        helpPagePath: eventsBasedObject.getHelpPath(),
       });
     }
     console.warn(

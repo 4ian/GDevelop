@@ -146,6 +146,8 @@ export default class ResourceSelector extends React.Component<Props, State> {
         // Important, we are responsible for deleting the resources that were given to us.
         // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
         resources.forEach(resource => resource.delete());
+
+        // TODO: await onFetchNewlyAddedResources();
       })
       .catch(err => {
         // Should never happen, errors should be shown in the interface.

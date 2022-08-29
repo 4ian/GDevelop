@@ -197,6 +197,9 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
 
     // TODO EBO When adding an object, filter the object types to excludes
     // object that depend (transitively) on this object to avoid cycles.
+
+    // TODO EBO Add a button icon to mark some objects solid or not.
+
     return (
       <I18n>
         {({ i18n }) => (

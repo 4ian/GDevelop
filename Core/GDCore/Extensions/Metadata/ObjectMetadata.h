@@ -13,6 +13,7 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/String.h"
 namespace gd {
 class InstructionMetadata;
@@ -20,7 +21,7 @@ class MultipleInstructionMetadata;
 class ExpressionMetadata;
 }  // namespace gd
 
-typedef std::function<std::unique_ptr<gd::Object>(gd::String name)>
+typedef std::function<std::unique_ptr<gd::ObjectConfiguration>()>
     CreateFunPtr;
 
 namespace gd {
@@ -42,7 +43,7 @@ class GD_CORE_API ObjectMetadata {
                  const gd::String& fullname_,
                  const gd::String& description_,
                  const gd::String& icon24x24_,
-                 std::shared_ptr<gd::Object> blueprintObject_);
+                 std::shared_ptr<gd::ObjectConfiguration> blueprintObject_);
   /**
    * \brief Construct an object metadata, without "blueprint" object
    * 
@@ -314,7 +315,7 @@ class GD_CORE_API ObjectMetadata {
   gd::String categoryFullName;
   std::set<gd::String> unsupportedBaseObjectCapabilities;
 
-  std::shared_ptr<gd::Object>
+  std::shared_ptr<gd::ObjectConfiguration>
       blueprintObject;  ///< The "blueprint" object to be copied when a new
                         ///< object is asked. Can be null in case a creation
                         ///< function is passed or for events based objects

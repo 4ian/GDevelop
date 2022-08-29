@@ -956,6 +956,7 @@ module.exports = {
         pixiRenderer
       );
 
+      // This setting allows tile maps with more than 16K tiles.
       Tilemap.settings.use32bitIndex = true;
       pixiRenderer.plugins.tilemap =
         pixiRenderer.plugins.tilemap || new Tilemap.TileRenderer();

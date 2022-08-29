@@ -2695,7 +2695,7 @@ storiesOf('SpriteEditor and related editors', module)
       <DragAndDropContextProvider>
         <FixedHeightFlexContainer height={500}>
           <PointsEditor
-            object={testProject.spriteObjectConfiguration}
+            objectConfiguration={testProject.spriteObjectConfiguration}
             project={testProject.project}
             resourcesLoader={ResourcesLoader}
           />
@@ -2708,7 +2708,7 @@ storiesOf('SpriteEditor and related editors', module)
       <DragAndDropContextProvider>
         <FixedHeightFlexContainer height={500}>
           <CollisionMasksEditor
-            object={testProject.spriteObjectConfiguration}
+            objectConfiguration={testProject.spriteObjectConfiguration}
             project={testProject.project}
             resourcesLoader={ResourcesLoader}
           />

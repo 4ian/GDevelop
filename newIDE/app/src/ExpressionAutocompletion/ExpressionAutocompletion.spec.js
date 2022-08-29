@@ -18,7 +18,9 @@ const makeTestContext = () => {
     'MySpriteObject',
     0
   );
-  const spriteObject = gd.asSpriteObject(object.getConfiguration());
+  const spriteConfiguration = gd.asSpriteConfiguration(
+    object.getConfiguration()
+  );
   const point = new gd.Point('Head');
   const sprite = new gd.Sprite();
   sprite.addPoint(point);
@@ -28,7 +30,7 @@ const makeTestContext = () => {
   animation.setName('Jump');
   animation.setDirectionsCount(1);
   animation.setDirection(direction, 0);
-  spriteObject.addAnimation(animation);
+  spriteConfiguration.addAnimation(animation);
 
   const spriteObjectWithBehaviors = testLayout.insertNewObject(
     project,

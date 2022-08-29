@@ -22,8 +22,8 @@ using namespace gd;
 
 namespace gd {
 /**
- * \brief A gd::Object that stores its content in JSON and forward the
- * properties related functions to Javascript with Emscripten.
+ * \brief A gd::ObjectConfiguration that stores its content in JSON and is
+ * composed of other configuration according to it's object children.
  *
  * It also implements "ExposeResources" to expose the properties of type
  * "resource".
@@ -32,7 +32,6 @@ class CustomObjectConfiguration : public gd::ObjectConfiguration {
  public:
   CustomObjectConfiguration(const Project& project_, const String& type_)
       : project(&project_) {
-    // TODO EBO Should it be done by the base class?
     SetType(type_);
   }
   std::unique_ptr<gd::ObjectConfiguration> Clone() const override;
@@ -86,7 +85,9 @@ class CustomObjectConfiguration : public gd::ObjectConfiguration {
   static gd::ObjectConfiguration badObjectConfiguration;
 
   /**
-   * Initialize object using another object. Used by copy-ctor and assign-op.
+   * Initialize configuration using another configuration. Used by copy-ctor
+   * and assign-op.
+   * 
    * Don't forget to update me if members were changed!
    * 
    * It's needed because there is no default copy for childObjectConfigurations

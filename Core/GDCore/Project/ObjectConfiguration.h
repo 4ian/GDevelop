@@ -28,14 +28,14 @@ class EffectsContainer;
 namespace gd {
 
 /**
- * \brief Base class used to represent an object of a platform
+ * \brief Base class used to represent an object configuration
  *
  * \ingroup PlatformDefinition
  */
 class GD_CORE_API ObjectConfiguration {
  public:
   /**
-   * Create a new object with the name passed as argument.
+   * Create a new object configuration.
    */
   ObjectConfiguration();
 
@@ -49,7 +49,7 @@ class GD_CORE_API ObjectConfiguration {
    * do polymorphic copies. Just redefine this method in your derived object
    * class like this:
    * \code
-   * return gd::make_unique<MyObject>(*this);
+   * return gd::make_unique<MyObjectConfiguration>(*this);
    * \endcode
    */
   virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const {

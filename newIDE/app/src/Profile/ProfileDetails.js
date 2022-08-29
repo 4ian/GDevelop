@@ -58,6 +58,7 @@ const ProfileDetails = ({
               <Spacer />
               <Text
                 size="block-title"
+                allowBrowserAutoTranslate={!profile.username}
                 style={{
                   opacity: profile.username ? 1.0 : 0.5,
                 }}

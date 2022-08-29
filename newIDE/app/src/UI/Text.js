@@ -28,7 +28,7 @@ type Props = {|
   noMargin?: boolean,
   /** Allow user to select content */
   allowSelection?: boolean,
-  /** When false, prevents browser auto translate features to translate the content (useful fore username) */
+  /** When false, prevents browser auto translate features to translate the content (useful for user input, like a username) */
   allowBrowserAutoTranslate?: boolean,
   /** By default the text is a paragraph (`p`). It can be shown inline  */
   displayInlineAsSpan?: boolean,

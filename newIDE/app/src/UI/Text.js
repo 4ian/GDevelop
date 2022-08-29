@@ -28,6 +28,8 @@ type Props = {|
   noMargin?: boolean,
   /** Allow user to select content */
   allowSelection?: boolean,
+  /** When false, prevents browser auto translate features to translate the content (useful fore username) */
+  allowBrowserAutoTranslate?: boolean,
   /** By default the text is a paragraph (`p`). It can be shown inline  */
   displayInlineAsSpan?: boolean,
   /** A limited set of styling is supported. */
@@ -101,6 +103,7 @@ const Text = React.forwardRef<Props, Interface>(
       noShrink,
       noMargin,
       allowSelection,
+      allowBrowserAutoTranslate = true,
       displayInlineAsSpan,
       ...otherProps // Used by possible parent element (such as Tooltip) to pass down props.
     },
@@ -109,6 +112,7 @@ const Text = React.forwardRef<Props, Interface>(
     <Typography
       variant={getVariantFromSize(size)}
       ref={ref}
+      translate={allowBrowserAutoTranslate ? 'yes' : 'no'}
       color={getTextColorFromColor(color)}
       component={displayInlineAsSpan ? 'span' : undefined}
       style={{

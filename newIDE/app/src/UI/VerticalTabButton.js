@@ -69,7 +69,7 @@ const VerticalTabButton = ({
       {!hideLabel && (
         <>
           <Spacer />
-          {label}
+          <span>{label}</span>
         </>
       )}
     </Button>

@@ -69,7 +69,8 @@ const VerticalTabButton = ({
       {!hideLabel && (
         <>
           <Spacer />
-          {label}
+          {/* span element is required to prevent browser auto translators to crash the app - See https://github.com/4ian/GDevelop/issues/3453 */}
+          <span>{label}</span>
         </>
       )}
     </Button>

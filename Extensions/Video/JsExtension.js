@@ -528,7 +528,7 @@ module.exports = {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -537,7 +537,7 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );
@@ -568,8 +568,7 @@ module.exports = {
 
     RenderedVideoObjectInstance.prototype._getVideoTexture = function () {
       // Get the video resource to use
-      const videoResource = this._associatedObject
-        .getConfiguration()
+      const videoResource = this._associatedObjectConfiguration
         .getProperties()
         .get('videoResource')
         .getValue();
@@ -586,8 +585,7 @@ module.exports = {
      */
     RenderedVideoObjectInstance.prototype.update = function () {
       // Check if the video resource has changed
-      const videoResource = this._associatedObject
-        .getConfiguration()
+      const videoResource = this._associatedObjectConfiguration
         .getProperties()
         .get('videoResource')
         .getValue();
@@ -608,8 +606,7 @@ module.exports = {
       }
 
       // Update opacity
-      const opacity = this._associatedObject
-        .getConfiguration()
+      const opacity = this._associatedObjectConfiguration
         .getProperties()
         .get('Opacity')
         .getValue();

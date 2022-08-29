@@ -506,7 +506,7 @@ module.exports = {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -515,7 +515,7 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );
@@ -549,8 +549,7 @@ module.exports = {
      */
     RenderedDummyObjectInstance.prototype.update = function () {
       // Read a property from the object
-      const property1Value = this._associatedObject
-        .getConfiguration()
+      const property1Value = this._associatedObjectConfiguration
         .getProperties()
         .get('My first property')
         .getValue();

@@ -14,7 +14,7 @@ function RenderedParticleEmitterInstance(
   project,
   layout,
   instance,
-  associatedObject,
+  associatedObjectConfiguration,
   pixiContainer,
   pixiResourcesLoader
 ) {
@@ -23,7 +23,7 @@ function RenderedParticleEmitterInstance(
     project,
     layout,
     instance,
-    associatedObject,
+    associatedObjectConfiguration,
     pixiContainer,
     pixiResourcesLoader
   );
@@ -58,7 +58,7 @@ RenderedParticleEmitterInstance.prototype.update = function() {
  */
 RenderedParticleEmitterInstance.prototype.updateGraphics = function() {
   const particleEmitterConfiguration = gd.asParticleEmitterConfiguration(
-    this._associatedObject
+    this._associatedObjectConfiguration
   );
 
   this._pixiObject.clear();

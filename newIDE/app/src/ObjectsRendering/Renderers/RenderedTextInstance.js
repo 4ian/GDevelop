@@ -13,7 +13,7 @@ function RenderedTextInstance(
   project,
   layout,
   instance,
-  associatedObject,
+  associatedObjectConfiguration,
   pixiContainer,
   pixiResourcesLoader
 ) {
@@ -22,7 +22,7 @@ function RenderedTextInstance(
     project,
     layout,
     instance,
-    associatedObject,
+    associatedObjectConfiguration,
     pixiContainer,
     pixiResourcesLoader
   );
@@ -53,7 +53,7 @@ RenderedTextInstance.getThumbnail = function(project, resourcesLoader, object) {
 
 RenderedTextInstance.prototype.update = function() {
   const textObjectConfiguration = gd.asTextObjectConfiguration(
-    this._associatedObject.getConfiguration()
+    this._associatedObjectConfiguration
   );
   this._pixiObject.text = textObjectConfiguration.getString();
 

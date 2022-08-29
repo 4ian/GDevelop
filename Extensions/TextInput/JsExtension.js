@@ -582,7 +582,7 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       ) {
@@ -590,7 +590,7 @@ module.exports = {
           project,
           layout,
           instance,
-          associatedObject,
+          associatedObjectConfiguration,
           pixiContainer,
           pixiResourcesLoader
         );
@@ -618,8 +618,7 @@ module.exports = {
 
       update() {
         const instance = this._instance;
-        const properties = this._associatedObject
-          .getConfiguration()
+        const properties = this._associatedObjectConfiguration
           .getProperties();
 
         const placeholder =

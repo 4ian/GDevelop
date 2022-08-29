@@ -44,6 +44,7 @@ const UserChip = ({ profile, onClick, displayNotificationBadge }: Props) => {
         <TextButton
           label={shortenString(profile.username || profile.email, 20)}
           onClick={onClick}
+          allowBrowserAutoTranslate={false}
           icon={
             <Avatar
               src={getGravatarUrl(profile.email || '', { size: 50 })}

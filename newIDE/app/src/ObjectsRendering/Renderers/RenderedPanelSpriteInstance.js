@@ -407,7 +407,7 @@ RenderedPanelSpriteInstance.getThumbnail = function(
   resourcesLoader,
   object
 ) {
-  const panelSprite = gd.asPanelSpriteConfiguration(object);
+  const panelSprite = gd.asPanelSpriteConfiguration(object.getConfiguration());
 
   return resourcesLoader.getResourceFullUrl(
     project,

@@ -53,7 +53,7 @@ RenderedTiledSpriteInstance.getThumbnail = function(
   resourcesLoader,
   object
 ) {
-  let tiledSprite = gd.asTiledSpriteConfiguration(object);
+  let tiledSprite = gd.asTiledSpriteConfiguration(object.getConfiguration());
 
   return resourcesLoader.getResourceFullUrl(
     project,

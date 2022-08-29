@@ -4,8 +4,8 @@ declare class gdProjectHelper {
   static initializePlatforms(): void;
   static sanityCheckBehaviorProperty(behavior: gdBehavior, propertyName: string, newValue: string): string;
   static sanityCheckBehaviorsSharedDataProperty(behavior: gdBehaviorsSharedData, propertyName: string, newValue: string): string;
-  static sanityCheckObjectProperty(obj: gdObject, propertyName: string, newValue: string): string;
-  static sanityCheckObjectInitialInstanceProperty(obj: gdObject, propertyName: string, newValue: string): string;
+  static sanityCheckObjectProperty(configuration: gdObjectConfiguration, propertyName: string, newValue: string): string;
+  static sanityCheckObjectInitialInstanceProperty(configuration: gdObjectConfiguration, propertyName: string, newValue: string): string;
   delete(): void;
   ptr: number;
 };

@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 #ifndef TEXTOBJECT_H
 #define TEXTOBJECT_H
-#include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 namespace gd {
 class Project;
 class Object;
@@ -17,11 +17,11 @@ class InitialInstance;
 /**
  * Text Object
  */
-class GD_EXTENSION_API TextObject : public gd::Object {
+class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
  public:
-  TextObject(gd::String name_);
+  TextObject();
   virtual ~TextObject();
-  virtual std::unique_ptr<gd::Object> Clone() const {
+  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const {
     return gd::make_unique<TextObject>(*this);
   }
 

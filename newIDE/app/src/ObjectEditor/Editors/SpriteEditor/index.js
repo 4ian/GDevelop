@@ -382,7 +382,7 @@ class AnimationsListContainer extends React.Component<
 }
 
 export default function SpriteEditor({
-  object,
+  objectConfiguration,
   project,
   resourceSources,
   onChooseResource,
@@ -397,7 +397,7 @@ export default function SpriteEditor({
     setCollisionMasksEditorOpen,
   ] = React.useState(false);
   const forceUpdate = useForceUpdate();
-  const spriteObject = gd.asSpriteObject(object);
+  const spriteObject = gd.asSpriteObject(objectConfiguration);
 
   return (
     <>

@@ -2615,7 +2615,7 @@ storiesOf('TextEditor', module)
   .add('default', () => (
     <SerializedObjectDisplay object={testProject.textObjectConfiguration}>
       <TextEditor
-        object={testProject.textObjectConfiguration}
+        objectConfiguration={testProject.textObjectConfiguration}
         project={testProject.project}
         resourceSources={[]}
         onChooseResource={source =>
@@ -2636,7 +2636,7 @@ storiesOf('TiledSpriteEditor', module)
       object={testProject.tiledSpriteObjectConfiguration}
     >
       <TiledSpriteEditor
-        object={testProject.tiledSpriteObjectConfiguration}
+        objectConfiguration={testProject.tiledSpriteObjectConfiguration}
         project={testProject.project}
         resourceSources={[]}
         onChooseResource={source =>
@@ -2657,7 +2657,7 @@ storiesOf('PanelSpriteEditor', module)
       object={testProject.panelSpriteObjectConfiguration}
     >
       <PanelSpriteEditor
-        object={testProject.panelSpriteObjectConfiguration}
+        objectConfiguration={testProject.panelSpriteObjectConfiguration}
         project={testProject.project}
         resourceSources={[]}
         onChooseResource={source =>
@@ -2677,7 +2677,7 @@ storiesOf('SpriteEditor and related editors', module)
     <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
       <DragAndDropContextProvider>
         <SpriteEditor
-          object={testProject.spriteObjectConfiguration}
+          objectConfiguration={testProject.spriteObjectConfiguration}
           project={testProject.project}
           resourceSources={[]}
           onChooseResource={source =>
@@ -2725,7 +2725,7 @@ storiesOf('ShapePainterEditor', module)
       object={testProject.shapePainterObjectConfiguration}
     >
       <ShapePainterEditor
-        object={testProject.shapePainterObjectConfiguration}
+        objectConfiguration={testProject.shapePainterObjectConfiguration}
         project={testProject.project}
         resourceSources={[]}
         onChooseResource={source =>

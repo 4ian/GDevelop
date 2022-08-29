@@ -61,9 +61,7 @@ type Props = {|
 
 type InnerDialogProps = {|
   ...Props,
-  editorComponent: //React.AbstractComponent<EditorProps, any>,
-  ?ComponentType<EditorProps>,
-  //?Class<React.Component<EditorProps, any>> | (props: EditorProps) => ?React$Element<any>,
+  editorComponent: ?ComponentType<EditorProps>,
   objectName: string,
   helpPagePath: ?string,
   object: gdObject,
@@ -276,9 +274,7 @@ const InnerDialog = (props: InnerDialogProps) => {
 };
 
 type State = {|
-  editorComponent: //React.AbstractComponent<EditorProps, any>,
-  ?ComponentType<EditorProps>,
-  //?Class<React.Component<EditorProps, any>> | (props: EditorProps) => ?React$Element<any>,
+  editorComponent: ?ComponentType<EditorProps>,
   castToObjectType: ?(
     objectConfiguration: gdObjectConfiguration
   ) => gdObjectConfiguration,

@@ -117,10 +117,10 @@ std::map<gd::String, gd::PropertyDescriptor>
 InitialInstance::GetCustomProperties(gd::Project& project, gd::Layout& layout) {
   // Find an object
   if (layout.HasObjectNamed(GetObjectName()))
-    return layout.GetObject(GetObjectName())
+    return layout.GetObject(GetObjectName()).GetConfiguration()
         .GetInitialInstanceProperties(*this, project, layout);
   else if (project.HasObjectNamed(GetObjectName()))
-    return project.GetObject(GetObjectName())
+    return project.GetObject(GetObjectName()).GetConfiguration()
         .GetInitialInstanceProperties(*this, project, layout);
 
   std::map<gd::String, gd::PropertyDescriptor> nothing;
@@ -132,10 +132,10 @@ bool InitialInstance::UpdateCustomProperty(const gd::String& name,
                                            gd::Project& project,
                                            gd::Layout& layout) {
   if (layout.HasObjectNamed(GetObjectName()))
-    return layout.GetObject(GetObjectName())
+    return layout.GetObject(GetObjectName()).GetConfiguration()
         .UpdateInitialInstanceProperty(*this, name, value, project, layout);
   else if (project.HasObjectNamed(GetObjectName()))
-    return project.GetObject(GetObjectName())
+    return project.GetObject(GetObjectName()).GetConfiguration()
         .UpdateInitialInstanceProperty(*this, name, value, project, layout);
 
   return false;

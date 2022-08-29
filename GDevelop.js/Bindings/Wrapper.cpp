@@ -62,8 +62,8 @@
 #include <GDCore/Project/Layout.h>
 #include <GDCore/Project/NamedPropertyDescriptor.h>
 #include <GDCore/Project/Object.h>
-#include <GDCore/Project/CustomObject.h>
-#include <GDCore/Project/CustomBehavior.h>
+#include <GDCore/Project/ObjectConfiguration.h>
+#include <GDCore/Project/CustomObjectConfiguration.h>
 #include <GDCore/Project/Project.h>
 #include <GDCore/Project/PropertyDescriptor.h>
 #include <GDCore/Project/Variable.h>
@@ -413,6 +413,7 @@ typedef gd::Object gdObject;  // To avoid clashing javascript Object in glue.js
 typedef ParticleEmitterObject::RendererType ParticleEmitterObject_RendererType;
 typedef EventsFunction::FunctionType EventsFunction_FunctionType;
 typedef std::unique_ptr<gd::Object> UniquePtrObject;
+typedef std::unique_ptr<gd::ObjectConfiguration> UniquePtrObjectConfiguration;
 typedef std::unique_ptr<ExpressionNode> UniquePtrExpressionNode;
 typedef std::vector<gd::ExpressionParserDiagnostic *>
     VectorExpressionParserDiagnostic;
@@ -491,7 +492,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
             fullname,                                                       \
             description,                                                    \
             icon24x24,                                                      \
-            std::shared_ptr<gd::Object>(instance))
+            std::shared_ptr<gd::ObjectConfiguration>(instance))
 
 #define WRAPPED_at(a) at(a).get()
 

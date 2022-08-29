@@ -30,7 +30,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
   const forceUpdate = useForceUpdate();
 
   const {
-    object,
+    objectConfiguration,
     project,
     resourceSources,
     onChooseResource,
@@ -38,7 +38,9 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     unsavedChanges,
   } = props;
 
-  const customObjectConfiguration = gd.asCustomObjectConfiguration(object);
+  const customObjectConfiguration = gd.asCustomObjectConfiguration(
+    objectConfiguration
+  );
   const properties = customObjectConfiguration.getProperties();
 
   const propertiesSchema = propertiesMapToSchema(
@@ -158,7 +160,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                           <Line>
                             <Column expand>
                               <EditorComponent
-                                object={childObjectConfiguration}
+                                objectConfiguration={childObjectConfiguration}
                                 project={project}
                                 resourceSources={resourceSources}
                                 onChooseResource={onChooseResource}

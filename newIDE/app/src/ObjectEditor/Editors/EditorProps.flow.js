@@ -10,7 +10,7 @@ import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
  * The props given to any object editor
  */
 export type EditorProps = {|
-  object: gdObjectConfiguration,
+  objectConfiguration: gdObjectConfiguration,
   project: gdProject,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,

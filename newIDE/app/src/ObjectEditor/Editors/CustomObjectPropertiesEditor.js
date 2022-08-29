@@ -70,7 +70,8 @@ const CustomObjectPropertiesEditor = (props: Props) => {
               tutorialId={tutorialId}
             />
           ))}
-          {propertiesSchema.length || eventBasedObject.getObjectsCount() ? (
+          {propertiesSchema.length ||
+          (eventBasedObject && eventBasedObject.getObjectsCount()) ? (
             <React.Fragment>
               {extraInformation ? (
                 <Line>

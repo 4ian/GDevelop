@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-import React, { Component, useEffect } from 'react';
+import React, { useEffect, Component, type ComponentType } from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -61,7 +61,9 @@ type Props = {|
 
 type InnerDialogProps = {|
   ...Props,
-  editorComponent: ?Class<React.Component<EditorProps, any>>,
+  editorComponent: //React.AbstractComponent<EditorProps, any>,
+  ?ComponentType<EditorProps>,
+  //?Class<React.Component<EditorProps, any>> | (props: EditorProps) => ?React$Element<any>,
   objectName: string,
   helpPagePath: ?string,
   object: gdObject,
@@ -88,7 +90,8 @@ const InnerDialog = (props: InnerDialogProps) => {
     [props.project, props.object]
   );
 
-  const EditorComponent = props.editorComponent;
+  // TODO: Type this variable.
+  const EditorComponent: any = props.editorComponent;
 
   const onApply = () => {
     props.onApply();
@@ -110,6 +113,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     },
     [currentTab]
   );
+
   return (
     <Dialog
       key={props.object && props.object.ptr}
@@ -272,8 +276,12 @@ const InnerDialog = (props: InnerDialogProps) => {
 };
 
 type State = {|
-  editorComponent: ?Class<React.Component<EditorProps, any>>,
-  castToObjectType: ?(object: gdObject) => gdObject,
+  editorComponent: //React.AbstractComponent<EditorProps, any>,
+  ?ComponentType<EditorProps>,
+  //?Class<React.Component<EditorProps, any>> | (props: EditorProps) => ?React$Element<any>,
+  castToObjectType: ?(
+    objectConfiguration: gdObjectConfiguration
+  ) => gdObjectConfiguration,
   helpPagePath: ?string,
   objectName: string,
 |};

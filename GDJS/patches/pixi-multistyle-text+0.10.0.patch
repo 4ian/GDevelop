@@ -1,0 +1,22 @@
+diff --git a/node_modules/pixi-multistyle-text/dist/pixi-multistyle-text.d.ts b/node_modules/pixi-multistyle-text/dist/pixi-multistyle-text.d.ts
+index e95368e..085a6d6 100644
+--- a/node_modules/pixi-multistyle-text/dist/pixi-multistyle-text.d.ts
++++ b/node_modules/pixi-multistyle-text/dist/pixi-multistyle-text.d.ts
+@@ -59,9 +59,6 @@ export interface TagData {
+         [key: string]: string;
+     };
+ }
+-export interface MstInteractionEvent extends PIXI.interaction.InteractionEvent {
+-    targetTag: TagData;
+-}
+ export default class MultiStyleText extends PIXI.Text {
+     private static DEFAULT_TAG_STYLE;
+     static debugOptions: MstDebugOptions;
+@@ -82,7 +79,6 @@ export default class MultiStyleText extends PIXI.Text {
+     private withPrivateMembers;
+     updateText(): void;
+     protected wordWrap(text: string): string;
+-    protected updateTexture(): void;
+     private assign;
+ }
+ export {};

@@ -109,12 +109,6 @@ var filters = {
 };
 export { filters };
 /** WITH
-import { AlphaFilter } from '@pixi/filter-alpha';
-import { BlurFilter, BlurFilterPass } from '@pixi/filter-blur';
-import { ColorMatrixFilter } from '@pixi/filter-color-matrix';
-import { DisplacementFilter } from '@pixi/filter-displacement';
-import { FXAAFilter } from '@pixi/filter-fxaa';
-import { NoiseFilter } from '@pixi/filter-noise';
 export namespace filters {
   export {
     AlphaFilter,

@@ -527,14 +527,8 @@ describe('TiledTileMapLoader', function () {
       layers: [
         {
           data: [
-            3,
-            2684354563,
-            536870915,
-            2147483651,
-            1610612739,
-            3221225475,
-            1073741827,
-            3758096387,
+            3, 2684354563, 536870915, 2147483651, 1610612739, 3221225475,
+            1073741827, 3758096387,
           ],
           height: 2,
           id: 1,
@@ -623,6 +617,8 @@ describe('TiledTileMapLoader', function () {
       width: 4,
     };
 
+    //TODO: Fix this error
+    //@ts-ignore
     const tileMap: EditableTileMap = TiledTileMapLoader.load(null, tiledMap);
 
     it('can load flipped tiles', function () {

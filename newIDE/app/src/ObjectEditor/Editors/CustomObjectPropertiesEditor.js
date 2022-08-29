@@ -155,17 +155,21 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                             </Line>
                           ) : null}
                           <Line>
-                            <EditorComponent
-                              object={childObjectConfiguration}
-                              project={project}
-                              resourceSources={resourceSources}
-                              onChooseResource={onChooseResource}
-                              resourceExternalEditors={resourceExternalEditors}
-                              onSizeUpdated={
-                                forceUpdate /*Force update to ensure dialog is properly positionned*/
-                              }
-                              objectName={childObject.getName()}
-                            />
+                            <Column expand>
+                              <EditorComponent
+                                object={childObjectConfiguration}
+                                project={project}
+                                resourceSources={resourceSources}
+                                onChooseResource={onChooseResource}
+                                resourceExternalEditors={
+                                  resourceExternalEditors
+                                }
+                                onSizeUpdated={
+                                  forceUpdate /*Force update to ensure dialog is properly positionned*/
+                                }
+                                objectName={childObject.getName()}
+                              />
+                            </Column>
                           </Line>
                         </Column>
                       </AccordionBody>

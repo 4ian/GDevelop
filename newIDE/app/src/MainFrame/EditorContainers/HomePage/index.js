@@ -4,11 +4,6 @@ import { I18n } from '@lingui/react';
 import { Line, Column } from '../../../UI/Grid';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
-  type OnCreateFromExampleShortHeaderFunction,
-  type OnCreateBlankFunction,
-  type OnOpenProjectAfterCreationFunction,
-} from '../../../ProjectCreation/CreateProjectDialog';
-import {
   type FileMetadataAndStorageProviderName,
   type StorageProvider,
 } from '../../../ProjectsStorage';
@@ -24,6 +19,7 @@ import { HomePageHeader } from './HomePageHeader';
 import { HomePageMenu, type HomeTab } from './HomePageMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
 
 type Props = {|
   project: ?gdProject,
@@ -36,9 +32,9 @@ type Props = {|
 
   // Project opening
   canOpen: boolean,
-  onOpen: () => void,
+  onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onCreateProject: () => void,
+  onCreateProject: (ExampleShortHeader | null) => void,
   onOpenProjectManager: () => void,
 
   // Other dialogs opening:
@@ -47,11 +43,11 @@ type Props = {|
   onOpenProfile: () => void,
   onOpenOnboardingDialog: () => void,
   onChangeSubscription: () => void,
+  onOpenPreferences: () => void,
+  onOpenAbout: () => void,
 
   // Project creation
-  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
-  onCreateBlank: OnCreateBlankFunction,
-  onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
+  onOpenProjectPreCreationDialog: (?ExampleShortHeader) => void,
 |};
 
 type HomePageEditorInterface = {|
@@ -66,11 +62,9 @@ export const HomePage = React.memo<Props>(
       {
         project,
         canOpen,
-        onOpen,
+        onChooseProject,
         onOpenRecentFile,
-        onCreateFromExampleShortHeader,
-        onCreateBlank,
-        onOpenProjectAfterCreation,
+        onOpenProjectPreCreationDialog,
         onCreateProject,
         onOpenProjectManager,
         onOpenHelpFinder,
@@ -79,6 +73,8 @@ export const HomePage = React.memo<Props>(
         setToolbar,
         onOpenOnboardingDialog,
         onChangeSubscription,
+        onOpenPreferences,
+        onOpenAbout,
         isActive,
         storageProviders,
       }: Props,
@@ -168,11 +164,15 @@ export const HomePage = React.memo<Props>(
                   <HomePageMenu
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
+                    onOpenPreferences={onOpenPreferences}
+                    onOpenAbout={onOpenAbout}
                   />
                   {activeTab === 'get-started' && (
                     <GetStartedSection
                       onTabChange={setActiveTab}
-                      onCreateProject={onCreateProject}
+                      onCreateProject={() =>
+                        onCreateProject(/*exampleShortHeader=*/ null)
+                      }
                       onOpenOnboardingDialog={onOpenOnboardingDialog}
                       showGetStartedSection={showGetStartedSection}
                       setShowGetStartedSection={setShowGetStartedSection}
@@ -183,8 +183,16 @@ export const HomePage = React.memo<Props>(
                       ref={buildSectionRef}
                       project={project}
                       canOpen={canOpen}
-                      onOpen={onOpen}
-                      onCreateProject={onCreateProject}
+                      onChooseProject={onChooseProject}
+                      onOpenProjectPreCreationDialog={
+                        onOpenProjectPreCreationDialog
+                      }
+                      onShowAllExamples={() =>
+                        onCreateProject(/*exampleShortHeader=*/ null)
+                      }
+                      onSelectExample={exampleShortHeader =>
+                        onCreateProject(exampleShortHeader)
+                      }
                       onOpenRecentFile={onOpenRecentFile}
                       onChangeSubscription={onChangeSubscription}
                       storageProviders={storageProviders}
@@ -193,7 +201,9 @@ export const HomePage = React.memo<Props>(
                   {activeTab === 'learn' && (
                     <LearnSection
                       onOpenOnboardingDialog={onOpenOnboardingDialog}
-                      onCreateProject={onCreateProject}
+                      onCreateProject={() =>
+                        onCreateProject(/*exampleShortHeader=*/ null)
+                      }
                       onTabChange={setActiveTab}
                       onOpenHelpFinder={onOpenHelpFinder}
                     />
@@ -223,18 +233,18 @@ export const renderHomePageContainer = (
     projectItemName={props.projectItemName}
     setToolbar={props.setToolbar}
     canOpen={props.canOpen}
-    onOpen={props.onOpen}
+    onChooseProject={props.onChooseProject}
     onOpenRecentFile={props.onOpenRecentFile}
     onCreateProject={props.onCreateProject}
-    onCreateFromExampleShortHeader={props.onCreateFromExampleShortHeader}
-    onCreateBlank={props.onCreateBlank}
-    onOpenProjectAfterCreation={props.onOpenProjectAfterCreation}
+    onOpenProjectPreCreationDialog={props.onOpenProjectPreCreationDialog}
     onOpenProjectManager={props.onOpenProjectManager}
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
     onOpenOnboardingDialog={props.onOpenOnboardingDialog}
     onChangeSubscription={props.onChangeSubscription}
+    onOpenPreferences={props.onOpenPreferences}
+    onOpenAbout={props.onOpenAbout}
     storageProviders={
       (props.extraEditorProps && props.extraEditorProps.storageProviders) || []
     }

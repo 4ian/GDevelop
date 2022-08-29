@@ -52,6 +52,7 @@
 #include <GDCore/Project/Behavior.h>
 #include <GDCore/Project/Effect.h>
 #include <GDCore/Project/EventsBasedBehavior.h>
+#include <GDCore/Project/EventsBasedObject.h>
 #include <GDCore/Project/EventsFunction.h>
 #include <GDCore/Project/EventsFunctionsExtension.h>
 #include <GDCore/Project/ExternalEvents.h>
@@ -61,6 +62,8 @@
 #include <GDCore/Project/Layout.h>
 #include <GDCore/Project/NamedPropertyDescriptor.h>
 #include <GDCore/Project/Object.h>
+#include <GDCore/Project/CustomObject.h>
+#include <GDCore/Project/CustomBehavior.h>
 #include <GDCore/Project/Project.h>
 #include <GDCore/Project/PropertyDescriptor.h>
 #include <GDCore/Project/Variable.h>
@@ -415,6 +418,8 @@ typedef std::vector<gd::ExpressionParserDiagnostic *>
     VectorExpressionParserDiagnostic;
 typedef gd::SerializableWithNameList<gd::EventsBasedBehavior>
     EventsBasedBehaviorsList;
+typedef gd::SerializableWithNameList<gd::EventsBasedObject>
+    EventsBasedObjectsList;
 typedef gd::SerializableWithNameList<gd::NamedPropertyDescriptor>
     NamedPropertyDescriptorsList;
 typedef ExpressionCompletionDescription::CompletionKind
@@ -560,12 +565,18 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   ObjectOrGroupRemovedInEventsFunction
 #define STATIC_ObjectOrGroupRenamedInEventsFunction \
   ObjectOrGroupRenamedInEventsFunction
+#define STATIC_ObjectOrGroupRemovedInEventsBasedObject \
+  ObjectOrGroupRemovedInEventsBasedObject
+#define STATIC_ObjectOrGroupRenamedInEventsBasedObject \
+  ObjectOrGroupRenamedInEventsBasedObject
 #define STATIC_GlobalObjectOrGroupRenamed GlobalObjectOrGroupRenamed
 #define STATIC_GlobalObjectOrGroupRemoved GlobalObjectOrGroupRemoved
 #define STATIC_GetAllObjectTypesUsingEventsBasedBehavior \
   GetAllObjectTypesUsingEventsBasedBehavior
 #define STATIC_EnsureBehaviorEventsFunctionsProperParameters \
   EnsureBehaviorEventsFunctionsProperParameters
+#define STATIC_EnsureObjectEventsFunctionsProperParameters \
+  EnsureObjectEventsFunctionsProperParameters
 #define STATIC_AddBehaviorAndRequiredBehaviors \
   AddBehaviorAndRequiredBehaviors
 #define STATIC_FindDependentBehaviorNames \
@@ -593,6 +604,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define STATIC_FreeEventsFunctionToObjectsContainer FreeEventsFunctionToObjectsContainer
 #define STATIC_BehaviorEventsFunctionToObjectsContainer BehaviorEventsFunctionToObjectsContainer
+#define STATIC_ObjectEventsFunctionToObjectsContainer ObjectEventsFunctionToObjectsContainer
 #define STATIC_ParametersToObjectsContainer ParametersToObjectsContainer
 #define STATIC_GetObjectParameterIndexFor GetObjectParameterIndexFor
 
@@ -600,11 +612,16 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
 #define STATIC_RenameEventsFunction RenameEventsFunction
 #define STATIC_RenameBehaviorEventsFunction RenameBehaviorEventsFunction
+#define STATIC_RenameObjectEventsFunction RenameObjectEventsFunction
 #define STATIC_MoveEventsFunctionParameter MoveEventsFunctionParameter
 #define STATIC_MoveBehaviorEventsFunctionParameter \
   MoveBehaviorEventsFunctionParameter
+#define STATIC_MoveObjectEventsFunctionParameter \
+  MoveObjectEventsFunctionParameter
 #define STATIC_RenameEventsBasedBehaviorProperty RenameEventsBasedBehaviorProperty
+#define STATIC_RenameEventsBasedObjectProperty RenameEventsBasedObjectProperty
 #define STATIC_RenameEventsBasedBehavior RenameEventsBasedBehavior
+#define STATIC_RenameEventsBasedObject RenameEventsBasedObject
 
 #define STATIC_GetBehaviorPropertyGetterName GetBehaviorPropertyGetterName
 #define STATIC_GetBehaviorPropertySetterName GetBehaviorPropertySetterName

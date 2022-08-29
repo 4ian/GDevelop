@@ -63,6 +63,8 @@ export const indieUserProfile: Profile = {
   username: 'im-the-indie-user',
   description: 'Just here to develop indie games',
   getGameStatsEmail: false,
+  isCreator: true,
+  isPlayer: false,
 };
 
 export const usagesForIndieUser: Usages = [
@@ -698,36 +700,6 @@ export const fakeAssetWithEventCustomizationsAndFlashExtension1: Asset = {
               extensionVersion: '1.0.0',
             },
           ],
-          events: [
-            {
-              disabled: false,
-              folded: false,
-              type: 'BuiltinCommonInstructions::Standard',
-              conditions: [
-                {
-                  type: { inverted: false, value: 'VarScene' },
-                  parameters: [
-                    'Counter',
-                    '<',
-                    'TEXT_TO_REPLACE + PlayerSpaceship.Variable(test)',
-                  ],
-                  subInstructions: [],
-                },
-              ],
-              actions: [
-                {
-                  type: { inverted: false, value: 'ModVarScene' },
-                  parameters: [
-                    'Counter',
-                    '=',
-                    'TEXT_TO_REPLACE + PlayerSpaceship.Variable(test2)',
-                  ],
-                  subInstructions: [],
-                },
-              ],
-              events: [],
-            },
-          ],
           parameters: [
             {
               codeOnly: false,
@@ -775,16 +747,6 @@ export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
             {
               extensionName: 'UnknownExtension', // Not really used in events, just for tests.
               extensionVersion: '1.0.0',
-            },
-          ],
-          events: [
-            {
-              disabled: false,
-              folded: false,
-              type: 'BuiltinCommonInstructions::Standard',
-              conditions: [],
-              actions: [],
-              events: [],
             },
           ],
           parameters: [
@@ -919,6 +881,7 @@ export const game1: Game = {
   gameName: 'My Great Game',
   createdAt: 1606065498,
   publicWebBuildId: 'fake-publicwebbuild-id',
+  displayAdsOnGamePage: true,
 };
 
 export const game2: Game = {
@@ -926,6 +889,16 @@ export const game2: Game = {
   authorName: 'My company',
   gameName: 'My Other Game',
   createdAt: 1607065498,
+};
+
+export const gameWithDisplayAdsOnGamePageEnabled: Game = {
+  ...game1,
+  displayAdsOnGamePage: true,
+};
+
+export const gameWithDisplayAdsOnGamePageDisabled: Game = {
+  ...game1,
+  displayAdsOnGamePage: false,
 };
 
 /**

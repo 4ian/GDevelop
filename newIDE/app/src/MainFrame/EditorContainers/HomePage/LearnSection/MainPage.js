@@ -11,6 +11,7 @@ import {
   type TutorialCategory,
   type Tutorial,
 } from '../../../../Utils/GDevelopServices/Tutorial';
+import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { isUserflowRunning } from '../../../Onboarding/OnboardingDialog';
 import { isMobile } from '../../../../Utils/Platform';
 import optionalRequire from '../../../../Utils/OptionalRequire';
@@ -25,7 +26,9 @@ import { CardWidget, SMALL_WIDGET_SIZE } from '../CardWidget';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import { makeStyles } from '@material-ui/core/styles';
-import TutorialsLine from './TutorialsLine';
+import ImageTileRow from '../../../../UI/ImageTileRow';
+import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
+import ArrowRight from '@material-ui/icons/ArrowRight';
 const electron = optionalRequire('electron');
 
 const useStyles = makeStyles({
@@ -34,7 +37,10 @@ const useStyles = makeStyles({
   },
 });
 
-const getColumnsFromWidth = (width: WidthType, showTourHelpItem: boolean) => {
+const getHelpItemsColumnsFromWidth = (
+  width: WidthType,
+  showTourHelpItem: boolean
+) => {
   switch (width) {
     case 'small':
       return 1;
@@ -46,11 +52,23 @@ const getColumnsFromWidth = (width: WidthType, showTourHelpItem: boolean) => {
   }
 };
 
-const MAX_COLUMNS = getColumnsFromWidth('large', true);
+const getTutorialsColumnsFromWidth = (width: WidthType) => {
+  switch (width) {
+    case 'small':
+      return 2;
+    case 'medium':
+      return 3;
+    case 'large':
+    default:
+      return 5;
+  }
+};
+
+const HELP_ITEMS_MAX_COLUMNS = getHelpItemsColumnsFromWidth('large', true);
 const styles = {
   grid: {
     textAlign: 'center',
-    maxWidth: (SMALL_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS, // Avoid tiles taking too much space on large screens.
+    maxWidth: (SMALL_WIDGET_SIZE + 2 * 5) * HELP_ITEMS_MAX_COLUMNS, // Avoid tiles taking too much space on large screens.
   },
   gridListTile: {
     display: 'flex',
@@ -63,7 +81,7 @@ const styles = {
 
 type Props = {|
   onOpenOnboardingDialog: () => void,
-  onCreateProject: () => void,
+  onCreateProject: (?ExampleShortHeader) => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenHelpFinder: () => void,
   onSelectCategory: (?TutorialCategory) => void,
@@ -117,12 +135,29 @@ const MainPage = ({
     },
   ].filter(Boolean);
 
+  const renderTutorialsRow = (category: TutorialCategory) => (
+    <ImageTileRow
+      title={TUTORIAL_CATEGORY_TEXTS[category].title}
+      description={TUTORIAL_CATEGORY_TEXTS[category].description}
+      items={tutorials
+        .filter(tutorial => tutorial.category === category)
+        .map(formatTutorialToImageTileComponent)}
+      onShowAll={() => onSelectCategory(category)}
+      showAllIcon={<ArrowRight fontSize="small" />}
+      getColumnsFromWidth={getTutorialsColumnsFromWidth}
+      getLimitFromWidth={getTutorialsColumnsFromWidth}
+    />
+  );
+
   return (
     <SectionContainer title={<Trans>Help and guides</Trans>}>
       <SectionRow>
         <Line noMargin>
           <GridList
-            cols={getColumnsFromWidth(windowWidth, shouldShowOnboardingButton)}
+            cols={getHelpItemsColumnsFromWidth(
+              windowWidth,
+              shouldShowOnboardingButton
+            )}
             style={styles.grid}
             cellHeight="auto"
             spacing={10}
@@ -188,20 +223,8 @@ const MainPage = ({
             </Text>
           </Line>
         </SectionRow>
-        <SectionRow>
-          <TutorialsLine
-            category="full-game"
-            tutorials={tutorials}
-            onSelectCategory={onSelectCategory}
-          />
-        </SectionRow>
-        <SectionRow>
-          <TutorialsLine
-            category="game-mechanic"
-            tutorials={tutorials}
-            onSelectCategory={onSelectCategory}
-          />
-        </SectionRow>
+        <SectionRow>{renderTutorialsRow('full-game')}</SectionRow>
+        <SectionRow>{renderTutorialsRow('game-mechanic')}</SectionRow>
         <SectionRow>
           <Line noMargin>
             <Text size="title">
@@ -214,27 +237,9 @@ const MainPage = ({
             </Text>
           </Line>
         </SectionRow>
-        <SectionRow>
-          <TutorialsLine
-            category="official-beginner"
-            tutorials={tutorials}
-            onSelectCategory={onSelectCategory}
-          />
-        </SectionRow>
-        <SectionRow>
-          <TutorialsLine
-            category="official-intermediate"
-            tutorials={tutorials}
-            onSelectCategory={onSelectCategory}
-          />
-        </SectionRow>
-        <SectionRow>
-          <TutorialsLine
-            category="official-advanced"
-            tutorials={tutorials}
-            onSelectCategory={onSelectCategory}
-          />
-        </SectionRow>
+        <SectionRow>{renderTutorialsRow('official-beginner')}</SectionRow>
+        <SectionRow>{renderTutorialsRow('official-intermediate')}</SectionRow>
+        <SectionRow>{renderTutorialsRow('official-advanced')}</SectionRow>
       </>
     </SectionContainer>
   );

@@ -119,7 +119,7 @@ module.exports = {
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
       .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
-      .setFunctionName('gdjs.evtTools.tween.tweenNumber');
+      .setFunctionName('gdjs.evtTools.tween.tweenVariableNumber');
 
     extension
       .addAction(

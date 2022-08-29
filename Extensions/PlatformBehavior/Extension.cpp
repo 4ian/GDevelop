@@ -786,7 +786,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         std::make_shared<gd::BehaviorsSharedData>());
 
     aut.AddAction("ChangePlatformType",
-                  _("Change platform type"),
+                  _("Platform type"),
                   _("Change the platform type of the object: Platform, "
                     "Jump-Through, or Ladder."),
                   _("Set platform type of _PARAM0_ to _PARAM2_"),

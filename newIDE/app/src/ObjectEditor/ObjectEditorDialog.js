@@ -306,6 +306,7 @@ export default class ObjectEditorDialog extends Component<Props, State> {
     if (!object) return;
 
     const editorConfiguration = ObjectsEditorService.getEditorConfiguration(
+      this.props.project,
       object.getType()
     );
     if (!editorConfiguration) {

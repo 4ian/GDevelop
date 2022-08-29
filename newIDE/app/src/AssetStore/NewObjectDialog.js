@@ -19,6 +19,7 @@ import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource';
+import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import {
   sendAssetAddedToProject,
@@ -32,7 +33,6 @@ import { AssetStoreContext } from './AssetStoreContext';
 import { AssetPackDialog } from './AssetPackDialog';
 import { installAsset } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import Window from '../Utils/Window';
 const isDev = Window.isDev();
@@ -73,8 +73,8 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
+  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
-  events: gdEventsList,
   onClose: () => void,
   onCreateNewObject: (type: string) => void,
   onObjectAddedFromAsset: gdObject => void,
@@ -86,8 +86,8 @@ export default function NewObjectDialog({
   objectsContainer,
   resourceSources,
   onChooseResource,
+  onFetchNewlyAddedResources,
   resourceExternalEditors,
-  events,
   onClose,
   onCreateNewObject,
   onObjectAddedFromAsset,
@@ -151,7 +151,6 @@ export default function NewObjectDialog({
     isAssetBeingInstalled,
     setIsAssetBeingInstalled,
   ] = React.useState<boolean>(false);
-  const resourcesFetcher = useResourceFetcher();
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -169,7 +168,6 @@ export default function NewObjectDialog({
             eventsFunctionsExtensionsState,
             project,
             objectsContainer,
-            events,
             environment,
           });
           sendAssetAddedToProject({
@@ -182,7 +180,7 @@ export default function NewObjectDialog({
             onObjectAddedFromAsset(object);
           });
 
-          await resourcesFetcher.ensureResourcesAreFetched(project);
+          await onFetchNewlyAddedResources();
         } catch (error) {
           console.error('Error while installing the asset:', error);
           showErrorBox({
@@ -198,14 +196,13 @@ export default function NewObjectDialog({
       })();
     },
     [
-      resourcesFetcher,
       eventsFunctionsExtensionsState,
       project,
       objectsContainer,
-      events,
       onObjectAddedFromAsset,
       openedAssetShortHeader,
       environment,
+      onFetchNewlyAddedResources,
     ]
   );
 
@@ -344,11 +341,10 @@ export default function NewObjectDialog({
           }}
           project={project}
           objectsContainer={objectsContainer}
-          events={events}
           onObjectAddedFromAsset={onObjectAddedFromAsset}
+          onFetchNewlyAddedResources={onFetchNewlyAddedResources}
         />
       )}
-      {resourcesFetcher.renderResourceFetcherDialog()}
     </>
   );
 }

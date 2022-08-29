@@ -39,6 +39,22 @@ namespace gdjs {
     return null;
   };
 
+  const determineCrossOrigin = (url: string) => {
+    // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
+    // i.e: its gdevelop.io cookie, to be passed.
+    // Note that this is only useful during previews.
+    if (
+      url.startsWith('https://project-resources.gdevelop.io/') ||
+      url.startsWith('https://project-resources-dev.gdevelop.io/')
+    )
+      return 'use-credentials';
+
+    // For other resources, use "anonymous" as done by default by PixiJS. Note that using `false`
+    // to not having `crossorigin` at all would NOT work because the browser would taint the
+    // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
+    return 'anonymous';
+  };
+
   /**
    * PixiImageManager loads and stores textures that can be used by the Pixi.js renderers.
    */
@@ -115,7 +131,11 @@ namespace gdjs {
 
       logger.log('Loading texture for resource "' + resourceName + '"...');
       const file = resource.file;
-      const texture = PIXI.Texture.from(file).on('error', (error) => {
+      const texture = PIXI.Texture.from(file, {
+        resourceOptions: {
+          crossorigin: determineCrossOrigin(file),
+        },
+      }).on('error', (error) => {
         logFileLoadingError(file, error);
       });
       applyTextureSettings(texture, resource);
@@ -155,7 +175,11 @@ namespace gdjs {
       logger.log(
         'Loading video texture for resource "' + resourceName + '"...'
       );
-      const texture = PIXI.Texture.from(file).on('error', (error) => {
+      const texture = PIXI.Texture.from(file, {
+        resourceOptions: {
+          crossorigin: determineCrossOrigin(file),
+        },
+      }).on('error', (error) => {
         logFileLoadingError(file, error);
       });
 
@@ -210,7 +234,12 @@ namespace gdjs {
       });
       for (const file in resourceFiles) {
         if (resourceFiles.hasOwnProperty(file)) {
-          loader.add(file, file);
+          loader.add({
+            name: file,
+            url: file,
+            loadType: PIXI.LoaderResource.LOAD_TYPE.IMAGE,
+            crossOrigin: determineCrossOrigin(file),
+          });
         }
       }
       loader.load((loader, loadedPixiResources) => {

@@ -87,7 +87,11 @@ export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => {
     backgroundColor: gdevelopTheme.closableTabs.containerBackgroundColor,
   };
 
-  return <div style={tabItemContainerStyle}>{children}</div>;
+  return (
+    <div className="almost-invisible-scrollbar" style={tabItemContainerStyle}>
+      {children}
+    </div>
+  );
 };
 
 export type ClosableTabProps = {|

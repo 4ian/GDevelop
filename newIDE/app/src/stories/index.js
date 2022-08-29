@@ -134,11 +134,9 @@ import EmailVerificationPendingDialog from '../Profile/EmailVerificationPendingD
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import { Column, Line } from '../UI/Grid';
-import { LineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import DragAndDropTestBed from './DragAndDropTestBed';
 import EditorMosaic from '../UI/EditorMosaic';
 import FlatButton from '../UI/FlatButton';
-import TextButton from '../UI/TextButton';
 import EditorMosaicPlayground from './EditorMosaicPlayground';
 import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
 import ChooseEventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor/ChooseEventsFunctionsExtensionEditor';
@@ -148,14 +146,9 @@ import CreateAccountDialog from '../Profile/CreateAccountDialog';
 import BrowserPreviewErrorDialog from '../Export/BrowserExporters/BrowserS3PreviewLauncher/BrowserPreviewErrorDialog';
 import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
-import ToolbarIcon from '../UI/ToolbarIcon';
-import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import IconButton from '../UI/IconButton';
-import FilterList from '@material-ui/icons/FilterList';
 import Brush from '@material-ui/icons/Brush';
 import Delete from '@material-ui/icons/Delete';
-import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
-import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import fakeResourceExternalEditors from './FakeResourceExternalEditors';
 import {
   TextFieldWithButtonLayout,
@@ -183,7 +176,6 @@ import ScrollView from '../UI/ScrollView';
 import '../UI/Theme/Global/Scrollbar.css';
 import '../UI/Theme/Global/Animation.css';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
-import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
 import { GamesShowcase } from '../GamesShowcase';
 import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
 import { ShowcasedGameListItem } from '../GamesShowcase/ShowcasedGameListItem';
@@ -200,7 +192,6 @@ import {
   ExamplesAccordion,
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
-import CloudDownload from '@material-ui/icons/CloudDownload';
 
 configureActions({
   depth: 2,
@@ -2777,7 +2768,6 @@ storiesOf('ObjectsList', module)
             project={testProject.project}
             objectsContainer={testProject.testLayout}
             layout={testProject.testLayout}
-            events={testProject.testLayout.getEvents()}
             resourceSources={[]}
             onChooseResource={() => Promise.reject('unimplemented')}
             resourceExternalEditors={fakeResourceExternalEditors}
@@ -2793,6 +2783,7 @@ storiesOf('ObjectsList', module)
             onRenameObject={(objectWithContext, newName, cb) => cb(true)}
             onObjectSelected={() => {}}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+            onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
           />
         </div>
       </SerializedObjectDisplay>
@@ -2807,7 +2798,6 @@ storiesOf('ObjectsList', module)
             project={testProject.project}
             objectsContainer={testProject.testLayout}
             layout={testProject.testLayout}
-            events={testProject.testLayout.getEvents()}
             resourceSources={[]}
             onChooseResource={() => Promise.reject('unimplemented')}
             resourceExternalEditors={fakeResourceExternalEditors}
@@ -2830,6 +2820,7 @@ storiesOf('ObjectsList', module)
             onRenameObject={(objectWithContext, newName, cb) => cb(true)}
             onObjectSelected={() => {}}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+            onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
           />
         </div>
       </SerializedObjectDisplay>
@@ -3238,6 +3229,8 @@ storiesOf('Profile/EditProfileDialog', module)
         username: 'username',
         description: 'I am just another video game enthusiast!',
         getGameStatsEmail: false,
+        isCreator: true,
+        isPlayer: false,
       }}
       onClose={action('on close')}
       editInProgress={false}
@@ -3253,6 +3246,8 @@ storiesOf('Profile/EditProfileDialog', module)
         username: 'username',
         description: 'I am just another video game enthusiast!',
         getGameStatsEmail: false,
+        isCreator: true,
+        isPlayer: false,
       }}
       onClose={action('on close')}
       editInProgress={false}
@@ -3268,6 +3263,8 @@ storiesOf('Profile/EditProfileDialog', module)
         username: 'username',
         description: 'I am just another video game enthusiast!',
         getGameStatsEmail: false,
+        isCreator: true,
+        isPlayer: false,
       }}
       onClose={action('on close')}
       editInProgress
@@ -3615,6 +3612,7 @@ storiesOf('EventsFunctionConfigurationEditor', module)
         helpPagePath="/events/functions"
         eventsFunction={testProject.testEventsFunction}
         eventsBasedBehavior={null}
+        eventsBasedObject={null}
         onParametersOrGroupsUpdated={action(
           'Parameters or groups were updated'
         )}
@@ -3630,6 +3628,7 @@ storiesOf('EventsFunctionConfigurationEditor', module)
         helpPagePath="/events/functions"
         eventsFunction={testProject.testBehaviorEventsFunction}
         eventsBasedBehavior={testProject.testEventsBasedBehavior}
+        eventsBasedObject={null}
         onParametersOrGroupsUpdated={action(
           'Parameters or groups were updated'
         )}
@@ -3645,6 +3644,7 @@ storiesOf('EventsFunctionConfigurationEditor', module)
         helpPagePath="/events/functions"
         eventsFunction={testProject.testBehaviorLifecycleEventsFunction}
         eventsBasedBehavior={testProject.testEventsBasedBehavior}
+        eventsBasedObject={null}
         onParametersOrGroupsUpdated={action(
           'Parameters or groups were updated'
         )}
@@ -3690,6 +3690,7 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           initiallyFocusedFunctionName={null}
           initiallyFocusedBehaviorName={null}
           onCreateEventsFunction={action('on create events function')}
+          onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -3806,8 +3807,6 @@ storiesOf('ProjectManager', module)
       onSaveProjectAs={action('onSaveProjectAs')}
       onCloseProject={action('onCloseProject')}
       onExportProject={action('onExportProject')}
-      onOpenPreferences={action('onOpenPreferences')}
-      onOpenProfile={action('onOpenProfile')}
       onOpenGamesDashboard={action('onOpenGamesDashboard')}
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
@@ -3849,8 +3848,6 @@ storiesOf('ProjectManager', module)
       onSaveProjectAs={action('onSaveProjectAs')}
       onCloseProject={action('onCloseProject')}
       onExportProject={action('onExportProject')}
-      onOpenPreferences={action('onOpenPreferences')}
-      onOpenProfile={action('onOpenProfile')}
       onOpenGamesDashboard={action('onOpenGamesDashboard')}
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
@@ -4084,37 +4081,6 @@ storiesOf('HotReloadLogsDialog', module)
       ]}
       onClose={() => {}}
       onLaunchNewPreview={() => {}}
-    />
-  ));
-
-storiesOf('ResourceFetcher/ResourceFetcherDialog', module)
-  .addDecorator(muiDecorator)
-  .add('in progress', () => (
-    <ResourceFetcherDialog
-      progress={40}
-      fetchedResources={null}
-      onAbandon={null}
-      onRetry={null}
-    />
-  ))
-  .add('with errors', () => (
-    <ResourceFetcherDialog
-      progress={100}
-      fetchedResources={{
-        fetchedResources: [],
-        erroredResources: [
-          {
-            resourceName: 'Player.png',
-            error: new Error('Fake download error'),
-          },
-          {
-            resourceName: 'Spaceship.png',
-            error: new Error('Another fake error'),
-          },
-        ],
-      }}
-      onAbandon={action('abandon')}
-      onRetry={action('retry')}
     />
   ));
 

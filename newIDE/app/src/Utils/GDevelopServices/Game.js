@@ -38,6 +38,7 @@ export type Game = {
   discoverable?: boolean,
   acceptsBuildComments?: boolean,
   acceptsGameComments?: boolean,
+  displayAdsOnGamePage?: boolean,
 };
 
 export type GameSlug = {
@@ -100,6 +101,7 @@ export const allGameCategories = [
   'sport',
   'multiplayer',
   'leaderboard',
+  'educational',
 ];
 
 export const getCategoryName = (category: string, i18n: I18nType) => {
@@ -136,6 +138,8 @@ export const getCategoryName = (category: string, i18n: I18nType) => {
       return i18n._(t`Multiplayer`);
     case 'leaderboard':
       return i18n._(t`Leaderboard`);
+    case 'educational':
+      return i18n._(t`Educational`);
     default:
       return category;
   }
@@ -229,6 +233,7 @@ export const updateGame = (
     discoverable,
     acceptsBuildComments,
     acceptsGameComments,
+    displayAdsOnGamePage,
   }: {|
     gameName?: string,
     categories?: string[],
@@ -243,6 +248,7 @@ export const updateGame = (
     discoverable?: boolean,
     acceptsBuildComments?: boolean,
     acceptsGameComments?: boolean,
+    displayAdsOnGamePage?: boolean,
   |}
 ): Promise<Game> => {
   return getAuthorizationHeader()
@@ -263,6 +269,7 @@ export const updateGame = (
           discoverable,
           acceptsBuildComments,
           acceptsGameComments,
+          displayAdsOnGamePage,
         },
         {
           params: {

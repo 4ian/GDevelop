@@ -67,7 +67,6 @@ declare class libGDevelop {
   ExtensionProperties: Class<gdExtensionProperties>;
   Behavior: Class<gdBehavior>;
   BehaviorJsImplementation: Class<gdBehaviorJsImplementation>;
-  BehaviorContent: Class<gdBehaviorContent>;
   BehaviorsSharedData: Class<gdBehaviorsSharedData>;
   BehaviorSharedDataJsImplementation: Class<gdBehaviorSharedDataJsImplementation>;
   gdObject: Class<gdObject>;
@@ -166,6 +165,8 @@ declare class libGDevelop {
   EventsFunctionsContainer: Class<gdEventsFunctionsContainer>;
   EventsBasedBehavior: Class<gdEventsBasedBehavior>;
   EventsBasedBehaviorsList: Class<gdEventsBasedBehaviorsList>;
+  EventsBasedObject: Class<gdEventsBasedObject>;
+  EventsBasedObjectsList: Class<gdEventsBasedObjectsList>;
   NamedPropertyDescriptorsList: Class<gdNamedPropertyDescriptorsList>;
   EventsFunctionsExtension: Class<gdEventsFunctionsExtension>;
   AbstractFileSystem: Class<gdAbstractFileSystem>;

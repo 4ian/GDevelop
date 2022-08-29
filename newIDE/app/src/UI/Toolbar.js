@@ -17,6 +17,7 @@ export const Toolbar = React.memo<ToolbarProps>(
     <ThemeConsumer>
       {muiTheme => (
         <div
+          className="almost-invisible-scrollbar"
           style={{
             backgroundColor: muiTheme.toolbar.backgroundColor,
             padding: 3,

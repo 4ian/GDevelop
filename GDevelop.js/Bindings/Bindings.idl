@@ -459,6 +459,9 @@ interface Project {
     [Ref] EventsFunctionsExtension InsertEventsFunctionsExtension([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, unsigned long position);
     void RemoveEventsFunctionsExtension([Const] DOMString name);
 
+    boolean HasEventsBasedObject([Const] DOMString type);
+    [Ref] EventsBasedObject GetEventsBasedObject([Const] DOMString type);
+
     [Ref] VariablesContainer GetVariables();
     [Ref] ResourcesManager GetResourcesManager();
     void ExposeResources([Ref] ArbitraryResourceWorker worker);
@@ -500,11 +503,14 @@ interface Behavior {
     void Behavior();
 
     Behavior Clone();
+
+    void SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
     [Const, Ref] DOMString GetTypeName();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorContent);
-    boolean UpdateProperty([Ref] SerializerElement behaviorContent, [Const] DOMString name, [Const] DOMString value);
-    void InitializeContent([Ref] SerializerElement behaviorContent);
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
+    void InitializeContent();
 };
 
 [JSImplementation=Behavior]
@@ -516,25 +522,16 @@ interface BehaviorJsImplementation {
     void InitializeContent([Ref] SerializerElement behaviorContent);
 };
 
-interface BehaviorContent {
-    void BehaviorContent([Const] DOMString name, [Const] DOMString type);
-
-    BehaviorContent Clone();
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    [Const, Ref] DOMString GetTypeName();
-    [Ref] SerializerElement GetContent();
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Const, Ref] SerializerElement element);
-};
-
 interface BehaviorsSharedData {
     void BehaviorsSharedData();
 
-    [Value] MapStringPropertyDescriptor GetProperties([Const, Ref] SerializerElement behaviorSharedDataContent);
-    boolean UpdateProperty([Ref] SerializerElement behaviorSharedDataContent, [Const] DOMString name, [Const] DOMString value);
-    void InitializeContent([Ref] SerializerElement behaviorSharedDataContent);
+    void SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
+    [Const, Ref] DOMString GetTypeName();
+
+    [Value] MapStringPropertyDescriptor GetProperties();
+    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
+    void InitializeContent();
 };
 
 [JSImplementation=BehaviorsSharedData]
@@ -573,8 +570,8 @@ interface gdObject {
     [Ref] EffectsContainer GetEffects();
     [Value] VectorString GetAllBehaviorNames();
     boolean HasBehaviorNamed([Const] DOMString name);
-    BehaviorContent AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
-    [Ref] BehaviorContent GetBehavior([Const] DOMString name);
+    Behavior AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
+    [Ref] Behavior GetBehavior([Const] DOMString name);
     void RemoveBehavior([Const] DOMString name);
     boolean RenameBehavior([Const] DOMString oldName, [Const] DOMString name);
 
@@ -627,7 +624,7 @@ interface Layout {
     void UpdateBehaviorsSharedData([Ref] Project project);
     [Value] VectorString GetAllBehaviorSharedDataNames();
     boolean HasBehaviorSharedData([Const] DOMString behaviorName);
-    [Ref] BehaviorContent GetBehaviorSharedData([Const] DOMString behaviorName);
+    [Ref] BehaviorsSharedData GetBehaviorSharedData([Const] DOMString behaviorName);
 
     void InsertNewLayer([Const] DOMString name, unsigned long position);
     void InsertLayer([Const, Ref] Layer layer, unsigned long position);
@@ -1307,6 +1304,7 @@ interface ParameterMetadataTools {
 interface EventsFunctionTools {
     void STATIC_FreeEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
     void STATIC_BehaviorEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
+    void STATIC_ObjectEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsBasedObject eventsBasedObject, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
 };
 
 interface ObjectMetadata {
@@ -1592,11 +1590,22 @@ interface PlatformExtension {
         Behavior instance,
         BehaviorsSharedData sharedDatasInstance);
 
+    [Ref] BehaviorMetadata AddEventsBasedBehavior([Const] DOMString name,
+        [Const] DOMString fullname,
+        [Const] DOMString description,
+        [Const] DOMString group,
+        [Const] DOMString icon24x24);
+
     [Ref] ObjectMetadata WRAPPED_AddObject([Const] DOMString name,
         [Const] DOMString fullname,
         [Const] DOMString description,
         [Const] DOMString icon24x24,
         gdObject instance);
+
+    [Ref] ObjectMetadata AddEventsBasedObject([Const] DOMString name,
+        [Const] DOMString fullname,
+        [Const] DOMString description,
+        [Const] DOMString icon24x24);
 
     [Ref] EffectMetadata AddEffect([Const] DOMString name);
 
@@ -1958,7 +1967,7 @@ interface EventsRefactorer {
 interface UnfilledRequiredBehaviorPropertyProblem {
   [Const, Ref] Project GetSourceProject();
   [Ref] gdObject GetSourceObject();
-  [Ref] BehaviorContent GetSourceBehaviorContent();
+  [Ref] Behavior GetSourceBehaviorContent();
   [Const, Ref] DOMString GetSourcePropertyName();
   [Const, Ref] DOMString GetExpectedBehaviorTypeName();
 };
@@ -1986,6 +1995,12 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_RenameObjectEventsFunction(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const, Ref] EventsBasedObject eventsBasedObject,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
     void STATIC_MoveEventsFunctionParameter(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -1999,13 +2014,31 @@ interface WholeProjectRefactorer {
       [Const] DOMString functionName,
       unsigned long oldIndex,
       unsigned long newIndex);
+    void STATIC_MoveObjectEventsFunctionParameter(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const, Ref] EventsBasedObject eventsBasedObject,
+      [Const] DOMString functionName,
+      unsigned long oldIndex,
+      unsigned long newIndex);
     void STATIC_RenameEventsBasedBehaviorProperty(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_RenameEventsBasedObjectProperty(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const, Ref] EventsBasedObject eventsBasedObject,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
     void STATIC_RenameEventsBasedBehavior(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameEventsBasedObject(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
@@ -2014,10 +2047,13 @@ interface WholeProjectRefactorer {
     void STATIC_ObjectOrGroupRemovedInLayout([Ref] Project project, [Ref] Layout layout, [Const] DOMString objectName, boolean isObjectGroup, boolean removeEventsAndGroups);
     void STATIC_ObjectOrGroupRenamedInEventsFunction([Ref] Project project, [Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer globalObjectsContainer, [Ref] ObjectsContainer objectsContainer, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
     void STATIC_ObjectOrGroupRemovedInEventsFunction([Ref] Project project, [Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer globalObjectsContainer, [Ref] ObjectsContainer objectsContainer, [Const] DOMString objectName, boolean isObjectGroup, boolean removeEventsAndGroups);
+    void STATIC_ObjectOrGroupRenamedInEventsBasedObject([Ref] Project project, [Ref] EventsBasedObject eventsBasedObject, [Ref] ObjectsContainer globalObjectsContainer, [Ref] ObjectsContainer objectsContainer, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
+    void STATIC_ObjectOrGroupRemovedInEventsBasedObject([Ref] Project project, [Ref] EventsBasedObject eventsBasedObject, [Ref] ObjectsContainer globalObjectsContainer, [Ref] ObjectsContainer objectsContainer, [Const] DOMString objectName, boolean isObjectGroup, boolean removeEventsAndGroups);
     void STATIC_GlobalObjectOrGroupRenamed([Ref] Project project, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
     void STATIC_GlobalObjectOrGroupRemoved([Ref] Project project, [Const] DOMString objectName, boolean isObjectGroup, boolean removeEventsAndGroups);
     [Value] SetString STATIC_GetAllObjectTypesUsingEventsBasedBehavior([Const, Ref] Project project, [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
     void STATIC_EnsureBehaviorEventsFunctionsProperParameters([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
+    void STATIC_EnsureObjectEventsFunctionsProperParameters([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedObject eventsBasedObject);
     void STATIC_AddBehaviorAndRequiredBehaviors([Ref] Project project, [Ref] gdObject obj, [Const] DOMString behaviorType, [Const] DOMString behaviorName);
     [Value] VectorString STATIC_FindDependentBehaviorNames([Const, Ref] Project project, [Const, Ref] gdObject obj, [Const] DOMString behaviorName);
     [Value] VectorUnfilledRequiredBehaviorPropertyProblem STATIC_FindInvalidRequiredBehaviorProperties([Const, Ref] Project project);
@@ -2246,6 +2282,56 @@ interface EventsBasedBehaviorsList {
     [Ref] EventsBasedBehavior at(unsigned long index);
 };
 
+interface EventsBasedObject {
+    void EventsBasedObject();
+
+    [Ref] EventsBasedObject SetDescription([Const] DOMString description);
+    [Const, Ref] DOMString GetDescription();
+    [Ref] EventsBasedObject SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
+    [Ref] EventsBasedObject SetFullName([Const] DOMString fullName);
+    [Const, Ref] DOMString GetFullName();
+
+    [Ref] EventsFunctionsContainer GetEventsFunctions();
+    [Ref] NamedPropertyDescriptorsList GetPropertyDescriptors();
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+
+    //Inherited from gd::ObjectsContainer
+    [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
+    [Ref] gdObject InsertObject([Const, Ref] gdObject obj, unsigned long pos);
+    boolean HasObjectNamed([Const] DOMString name);
+    [Ref] gdObject GetObject([Const] DOMString name);
+    [Ref] gdObject GetObjectAt(unsigned long pos);
+    unsigned long GetObjectPosition([Const] DOMString name);
+    void RemoveObject([Const] DOMString name);
+    void SwapObjects(unsigned long first, unsigned long second);
+    void MoveObject(unsigned long oldIndex, unsigned long newIndex);
+    void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
+    unsigned long GetObjectsCount();
+    [Ref] ObjectGroupsContainer GetObjectGroups();
+
+    [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetPropertyExpressionName([Const] DOMString propertyName);
+};
+
+interface EventsBasedObjectsList {
+    [Ref] EventsBasedObject InsertNew([Const] DOMString name, unsigned long pos);
+    [Ref] EventsBasedObject Insert([Const, Ref] EventsBasedObject item, unsigned long pos);
+    boolean Has([Const] DOMString name);
+    [Ref] EventsBasedObject Get([Const] DOMString name);
+    [Ref] EventsBasedObject GetAt(unsigned long pos);
+    void Remove([Const] DOMString name);
+    void Move(unsigned long oldIndex, unsigned long newIndex);
+    unsigned long GetCount();
+    unsigned long GetPosition([Const, Ref] EventsBasedObject item);
+
+    unsigned long size();
+    [Ref] EventsBasedObject at(unsigned long index);
+};
+
 interface NamedPropertyDescriptorsList {
     void NamedPropertyDescriptorsList();
 
@@ -2299,6 +2385,7 @@ interface EventsFunctionsExtension {
     [Ref] VectorDependencyMetadata GetAllDependencies();
 
     [Ref] EventsBasedBehaviorsList GetEventsBasedBehaviors();
+    [Ref] EventsBasedObjectsList GetEventsBasedObjects();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);

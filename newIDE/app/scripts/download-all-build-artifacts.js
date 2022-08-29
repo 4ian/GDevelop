@@ -30,6 +30,7 @@ shell.echo(
 );
 
 const artifactsToDownload = {
+  // Windows:
   'Windows exe': {
     url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5 Setup ${version}.exe`,
     outputFilename: `GDevelop-5-Setup-${version}.exe`,
@@ -46,6 +47,7 @@ const artifactsToDownload = {
     url: 'https://gdevelop-releases.s3.amazonaws.com/master/latest/latest.yml',
     outputFilename: 'latest.yml',
   },
+  // macOS (Intel):
   'macOS zip': {
     url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}-mac.zip`,
     outputFilename: `GDevelop-5-${version}-mac.zip`,
@@ -63,14 +65,37 @@ const artifactsToDownload = {
       'https://gdevelop-releases.s3.amazonaws.com/master/latest/latest-mac.yml',
     outputFilename: 'latest-mac.yml',
   },
-  'Linux AppImage': {
+  // macOS (Apple Silicon):
+  'macOS zip (Apple Silicon)': {
+    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}-arm64-mac.zip`,
+    outputFilename: `GDevelop-5-${version}-arm64-mac.zip`,
+  },
+  'macOS dmg (Apple Silicon)': {
+    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}-arm64.dmg`,
+    outputFilename: `GDevelop-5-${version}-arm64.dmg`,
+  },
+  'macOS dmg blockmap (Apple Silicon)': {
+    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}-arm64.dmg.blockmap`,
+    outputFilename: `GDevelop-5-${version}-arm64.dmg.blockmap`,
+  },
+  // Linux (amd64 and arm64):
+  'Linux AppImage (amd64)': {
     url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}.AppImage`,
     outputFilename: `GDevelop-5-${version}.AppImage`,
   },
-  'Linux auto-update file': {
+  'Linux AppImage (arm64)': {
+    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}-arm64.AppImage`,
+    outputFilename: `GDevelop-5-${version}-arm64.AppImage`,
+  },
+  'Linux auto-update file (amd64)': {
     url:
       'https://gdevelop-releases.s3.amazonaws.com/master/latest/latest-linux.yml',
     outputFilename: 'latest-linux.yml',
+  },
+  'Linux auto-update file (arm64)': {
+    url:
+      'https://gdevelop-releases.s3.amazonaws.com/master/latest/latest-linux-arm64.yml',
+    outputFilename: 'latest-linux-arm64.yml',
   },
 };
 

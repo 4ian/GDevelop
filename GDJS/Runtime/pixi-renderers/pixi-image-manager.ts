@@ -5,7 +5,6 @@
  */
 namespace gdjs {
   const logger = new gdjs.Logger('PIXI Image manager');
-  import PIXI = GlobalPIXIModule.PIXI;
 
   const logFileLoadingError = (file: string, error: Error | undefined) => {
     logger.error(

@@ -1,0 +1,13 @@
+diff --git a/node_modules/@pixi/particle-emitter/lib/LinkedListContainer.d.ts b/node_modules/@pixi/particle-emitter/lib/LinkedListContainer.d.ts
+index 53e156a..b069d76 100644
+--- a/node_modules/@pixi/particle-emitter/lib/LinkedListContainer.d.ts
++++ b/node_modules/@pixi/particle-emitter/lib/LinkedListContainer.d.ts
+@@ -67,8 +67,4 @@ export declare class LinkedListContainer extends Container {
+      * Render the object using the WebGL renderer and advanced features. Copied from and overrides PixiJS v5 method
+      */
+     protected renderAdvanced(renderer: Renderer): void;
+-    /**
+-     * Renders the object using the Canvas renderer. Copied from and overrides PixiJS Canvas mixin in V5 and V6.
+-     */
+-    renderCanvas(renderer: any): void;
+ }

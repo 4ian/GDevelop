@@ -5,7 +5,7 @@ import RenderedInstance from '../../ObjectsRendering/Renderers/RenderedInstance'
 import getObjectByName from '../../Utils/GetObjectByName';
 import ViewPosition from '../ViewPosition';
 
-import * as PIXI from 'pixi.js-legacy';
+import * as PIXI from '../../PIXI';
 import { shouldBeHandledByPinch } from '../PinchHandler';
 import { makeDoubleClickable } from './PixiDoubleClickEvent';
 import Rectangle from '../../Utils/Rectangle';

@@ -1,7 +1,7 @@
 // @flow
 import slugs from 'slugs';
 import axios from 'axios';
-import * as PIXI from 'pixi.js-legacy';
+import * as PIXI from '../PIXI';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';

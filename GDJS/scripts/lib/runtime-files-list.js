@@ -1,3 +1,4 @@
+//@ts-check
 const path = require('path');
 const recursive = require('recursive-readdir');
 const fs = require('fs').promises;
@@ -22,7 +23,6 @@ const transformExcludedExtensions = ['.min.js', '.d.ts'];
 // be built with esbuild, but simply copied.
 const untransformedPaths = [
   // GDJS prebuilt files:
-  'GDJS/Runtime/pixi-renderers/pixi.js',
   'GDJS/Runtime/fontfaceobserver-font-manager/fontfaceobserver.js',
   'GDJS/Runtime/Cordova',
   'GDJS/Runtime/Electron',
@@ -33,7 +33,6 @@ const untransformedPaths = [
   // Extensions pre-built files:
   'Extensions/Leaderboards/sha256.js',
   'Extensions/Firebase/A_firebasejs',
-  'Extensions/BBText/pixi-multistyle-text/dist',
   'Extensions/DialogueTree/bondage.js/dist',
   'Extensions/Effects/pixi-filters',
   'Extensions/P2P/A_peer.js',
@@ -45,10 +44,52 @@ const untransformedPaths = [
   'Extensions/JsExtensionTypes.flow.js',
 ].map((untransformedPath) => path.resolve(gdevelopRootPath, untransformedPath));
 
+// Files under these paths (relative to the GDevelop root path) will be completely
+// ignored. This is useful for example for ESM source files, where only the
+// entrypoint should be compiled.
+const ignoredPaths = [
+  // TileMapHelper source files:
+  'Extensions/TileMap/TileMapHelper/src',
+].map((untransformedPath) => path.resolve(gdevelopRootPath, untransformedPath));
+
+/**
+ * The list of modules that are not namespaced typescript but ES Modules to be bundled as a namespace.
+ * The key is the path to the module relative to the GDevelop root path, and the value is the name of
+ * the namespace where to put all exports of the ES Module.
+ * @type {Array<{filePath:string, namespace: string}>}
+ */
+const esModulesAndNamespaces = [
+  {
+    filePath: 'GDJS/Runtime/pixi-renderers/pixi.ts',
+    namespace: 'PIXI',
+  },
+  {
+    filePath: 'Extensions/TileMap/helper/TileMapHelper.ts',
+    namespace: 'TileMapHelper',
+  },
+];
+
+const esModulesPathsWithNamespaces = new Map(
+  esModulesAndNamespaces.map(({ filePath, namespace }) => [
+    path.resolve(gdevelopRootPath, filePath),
+    namespace,
+  ])
+);
+
+/*
+const esModulesAndNamespaces = Object.entries({
+  'GDJS/Runtime/pixi-renderers/pixi.ts': 'PIXI',
+  'Extensions/TileMap/helper/TileMapHelper.ts': 'TileMapHelper',
+}).map(([untransformedPath, namespace]) => ({
+  path: path.resolve(gdevelopRootPath, untransformedPath),
+  namespace,
+}));
+*/
+
 /**
  * Check if a file is not a source file (should not be included in the built Runtime).
  * @param {string} fileOrDirectoryPath
- * @param {fs.Stats} stats
+ * @param {import("fs").Stats} stats
  */
 const isNotAllowedExtension = (fileOrDirectoryPath, stats) => {
   return (
@@ -60,7 +101,7 @@ const isNotAllowedExtension = (fileOrDirectoryPath, stats) => {
 /**
  * Check if a folder is a test folder (should not be included in the built Runtime).
  * @param {string} fileOrDirectoryPath
- * @param {fs.Stats} stats
+ * @param {import("fs").Stats} stats
  */
 const isTestDirectory = (fileOrDirectoryPath, stats) => {
   if (!stats.isDirectory()) return false;
@@ -74,6 +115,16 @@ const isTestDirectory = (fileOrDirectoryPath, stats) => {
 };
 
 /**
+ * Check if a folder or directory should be ignored.
+ * @param {string} fileOrDirectoryPath
+ * @param {import("fs").Stats} stats
+ */
+const isIgnoredFileOrDirectory = (fileOrDirectoryPath, stats) => {
+  const resolvedPath = path.resolve(fileOrDirectoryPath);
+  return ignoredPaths.includes(resolvedPath);
+};
+
+/**
  * Check if a file is declaration of an extension (should not be transformed).
  * @param {string} filePath
  */
@@ -82,6 +133,7 @@ const isJsExtensionDeclaration = (filePath) => {
 };
 
 /** @typedef {{inPath: string; outPath: string;}} InOutPath */
+/** @typedef {{inPath: string; outPath: string; namespace: string;}} ESMInOutPath */
 
 /** Returns a function to generate the file paths in the bundled runtime. */
 const getInOutPaths = (basePath, bundledOutPath) => (inPath) => {
@@ -91,6 +143,13 @@ const getInOutPaths = (basePath, bundledOutPath) => (inPath) => {
     outPath: path.join(bundledOutPath, relativePath),
   };
 };
+
+/**
+ * Returns true if a path should be treated as an ES Module.
+ * @param {string} inPath
+ * @returns {boolean}
+ */
+const isESM = (inPath) => esModulesPathsWithNamespaces.has(inPath);
 
 module.exports = {
   /**
@@ -117,15 +176,17 @@ module.exports = {
   /**
    * Get the list of all files part of the runtime, and their destination file when the runtime is bundled.
    * @param {{bundledOutPath: string}} options
-   * @returns {Promise<{allGDJSInOutFilePaths: InOutPath[]; allExtensionsInOutFilePaths: InOutPath[];}>}
+   * @returns {Promise<{allNamespacedInOutFilePaths: InOutPath[]; allESMInOutFilePaths: ESMInOutPath[];}>}
    */
   getAllInOutFilePaths: async (options) => {
     // List all the files of the runtime
     const allGDJSInFilePaths = await recursive(gdjsRuntimePath, [
       isNotAllowedExtension,
+      isIgnoredFileOrDirectory,
     ]);
     const allExtensionsInFilePaths = await recursive(extensionsRuntimePath, [
       isNotAllowedExtension,
+      isIgnoredFileOrDirectory,
       isTestDirectory,
     ]);
 
@@ -137,6 +198,25 @@ module.exports = {
       getInOutPaths(gdevelopRootPath, options.bundledOutPath)
     );
 
-    return { allGDJSInOutFilePaths, allExtensionsInOutFilePaths };
+    const allInOutFilePaths = [
+      ...allGDJSInOutFilePaths,
+      ...allExtensionsInOutFilePaths,
+    ];
+
+    /** @type {Array<InOutPath>} */
+    const allNamespacedInOutFilePaths = [];
+    /** @type {Array<ESMInOutPath>} */
+    const allESMInOutFilePaths = [];
+
+    for (const inOutFilePath of allInOutFilePaths) {
+      if (isESM(inOutFilePath.inPath)) {
+        allESMInOutFilePaths.push({
+          ...inOutFilePath,
+          namespace: esModulesPathsWithNamespaces.get(inOutFilePath.inPath),
+        });
+      } else allNamespacedInOutFilePaths.push(inOutFilePath);
+    }
+
+    return { allNamespacedInOutFilePaths, allESMInOutFilePaths };
   },
 };

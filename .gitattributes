@@ -4,7 +4,6 @@ Extensions/ParticleSystem/SPARK/* linguist-vendored
 Extensions/PhysicsBehavior/Box2D/* linguist-vendored
 Extensions/PhysicsBehavior/box2djs/* linguist-vendored
 Extensions/Physics2Behavior/box2d.js linguist-vendored
-Extensions/BBText/pixi-multistyle-text/* linguist-vendored
 Extensions/P2P/A_peer.js linguist-vendored
 Extensions/Shopify/shopify-buy.umd.polyfilled.min.js linguist-vendored
 Extensions/TileMap/pako/* linguist-vendored

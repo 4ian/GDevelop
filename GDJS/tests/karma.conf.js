@@ -1,5 +1,9 @@
 module.exports = function (config) {
-  const testFiles = ['./Extensions/**/tests/**.spec.js', './GDJS/tests/tests/**/*.js'];
+  const testFiles = [
+    './Extensions/**/tests/**.spec.js',
+    './Extensions/**/*.spec.ts',
+    './GDJS/tests/**/*.js',
+  ];
 
   const benchmarkFiles = [
     './GDJS/tests/benchmarks/init.js',
@@ -16,6 +20,7 @@ module.exports = function (config) {
       require('@chiragrupani/karma-chromium-edge-launcher'),
       require('karma-firefox-launcher'),
       require('karma-mocha'),
+      require('karma-esbuild'),
     ],
     client: {
       mocha: {
@@ -28,6 +33,7 @@ module.exports = function (config) {
       '/base/tests-utils/':
       '/base/GDJS/tests/tests-utils/',
     },
+    preprocessors: { '../../Extensions/**/*.ts': 'esbuild' },
     files: [
       './GDJS/tests/node_modules/expect.js/index.js',
 
@@ -113,7 +119,6 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/collision/TileMapCollisionMaskRenderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/collision/TransformedTileMap.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/helper/TileMapHelper.js',
-      './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/pako/dist/pako.min.js',
 
       // Test extensions:
       './GDJS/tests/tests/Extensions/**.js',

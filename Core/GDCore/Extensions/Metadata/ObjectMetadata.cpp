@@ -23,23 +23,20 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
                                const gd::String& fullname_,
                                const gd::String& description_,
                                const gd::String& icon24x24,
-                               std::shared_ptr<gd::Object> blueprintObject_)
+                               std::shared_ptr<gd::ObjectConfiguration> blueprintObject_)
     : ObjectMetadata(extensionNamespace_,
                      name_,
                      fullname_,
                      description_,
                      icon24x24,
-                     [blueprintObject_](gd::String name) -> std::unique_ptr<gd::Object> {
-    if (blueprintObject_ == std::shared_ptr<gd::Object>()) {
+                     [blueprintObject_]() -> std::unique_ptr<gd::ObjectConfiguration> {
+    if (blueprintObject_ == std::shared_ptr<gd::ObjectConfiguration>()) {
       gd::LogFatalError(
           "Error: Unable to create object. Have you declared an extension "
           "(or ObjectMetadata) without specifying an object as blueprint?");
       return nullptr;
     }
-
-    std::unique_ptr<gd::Object> newObject = blueprintObject_->Clone();
-    newObject->SetName(name);
-    return newObject;
+    return blueprintObject_->Clone();
   }) {
   blueprintObject = blueprintObject_;
 }
@@ -54,7 +51,7 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
                      fullname_,
                      description_,
                      icon24x24,
-                     [](gd::String name) -> std::unique_ptr<gd::Object> {
+                     []() -> std::unique_ptr<gd::ObjectConfiguration> {
       gd::LogFatalError(
           "Error: Event-based objects don't have blueprint. "
           "This method should not never be called.");

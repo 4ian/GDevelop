@@ -3,13 +3,14 @@
 /*::
 export type TestProject = {|
   project: gdProject,
-  shapePainterObject: any,
-  textObject: any,
-  tiledSpriteObject: any,
-  panelSpriteObject: any,
-  spriteObject: gdSpriteObject,
-  spriteObjectWithBehaviors: gdSpriteObject,
-  spriteObjectWithoutBehaviors: gdSpriteObject,
+  shapePainterObjectConfiguration: gdObjectConfiguration,
+  textObjectConfiguration: gdObjectConfiguration,
+  tiledSpriteObjectConfiguration: gdObjectConfiguration,
+  panelSpriteObjectConfiguration: gdObjectConfiguration,
+  spriteObjectConfiguration: gdSpriteObject,
+  spriteObject: gdObject,
+  spriteObjectWithBehaviors: gdObject,
+  spriteObjectWithoutBehaviors: gdObject,
   testSpriteObjectInstance: gdInitialInstance,
   testLayout: gdLayout,
   group1: gdObjectGroup,
@@ -32,8 +33,8 @@ export type TestProject = {|
   layerWithEffects: gdLayer,
   layerWithEffectWithoutEffectType: gdLayer,
   layerWithoutEffects: gdLayer,
-  spriteObjectWithEffects: gdSpriteObject,
-  spriteObjectWithoutEffects: gdSpriteObject,
+  spriteObjectWithEffects: gdObject,
+  spriteObjectWithoutEffects: gdObject,
   stringRelationalOperatorParameterMetadata: gdParameterMetadata,
   numberRelationalOperatorParameterMetadata: gdParameterMetadata,
   colorRelationalOperatorParameterMetadata: gdParameterMetadata,
@@ -106,16 +107,76 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   project.getResourcesManager().addResource(jsonResource3);
 
   // Create and expose some objects
-  const shapePainterObject = new gd.ShapePainterObject('MyShapePainterObject');
-  shapePainterObject.setType('PrimitiveDrawing::Drawer');
-  const textObject = new gd.TextObject('MyTextObject');
-  textObject.setType('TextObject::Text');
-  const tiledSpriteObject = new gd.TiledSpriteObject('MyTiledSpriteObject');
-  tiledSpriteObject.setType('TiledSpriteObject::TiledSprite');
-  const panelSpriteObject = new gd.PanelSpriteObject('MyPanelSpriteObject');
-  panelSpriteObject.setType('PanelSpriteObject::PanelSprite');
-  const spriteObject = new gd.SpriteObject('MySpriteObject');
-  spriteObject.setType('Sprite');
+  const testLayout = project.insertNewLayout('TestLayout', 0);
+  const shapePainterObject = testLayout.insertNewObject(
+    project,
+    'PrimitiveDrawing::Drawer',
+    'MyShapePainterObject',
+    0
+  );
+  const textObject = testLayout.insertNewObject(
+    project,
+    'TextObject::Text',
+    'MyTextObject',
+    0
+  );
+  const tiledSpriteObject = testLayout.insertNewObject(
+    project,
+    'TiledSpriteObject::TiledSprite',
+    'MyTiledSpriteObject',
+    0
+  );
+  const panelSpriteObject = testLayout.insertNewObject(
+    project,
+    'PanelSpriteObject::PanelSprite',
+    'MyPanelSpriteObject',
+    0
+  );
+  const spriteObject = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObject',
+    0
+  );
+  const spriteObjectWithBehaviors = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObjectWithBehaviors',
+    0
+  );
+  const spriteObjectWithoutBehaviors = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObjectWithoutBehaviors',
+    0
+  );
+  const spriteObjectWithoutEffects = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObjectWithoutEffect',
+    0
+  );
+  const spriteObjectWithEffects = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObjectWithEffects',
+    0
+  );
+  testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name',
+    14
+  );
+  testLayout.insertNewObject(
+    project,
+    'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
+    'MyFakeObjectWithUnsupportedCapability',
+    15
+  );
+  const spriteObjectConfiguration = gd.asSpriteObject(
+    spriteObject.getConfiguration()
+  );
   {
     const variablesContainer = spriteObject.getVariables();
     variablesContainer
@@ -136,19 +197,6 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     arrayVariable.setFolded(true);
     arrayVariable.pushNew().setValue(856.5);
   }
-  const spriteObjectWithBehaviors = new gd.SpriteObject(
-    'MySpriteObjectWithBehaviors'
-  );
-  spriteObjectWithBehaviors.setType('Sprite');
-  const spriteObjectWithoutBehaviors = new gd.SpriteObject(
-    'MySpriteObjectWithoutBehaviors'
-  );
-  spriteObjectWithoutBehaviors.setType('Sprite');
-  const spriteObjectWithLongName = new gd.SpriteObject(
-    'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name'
-  );
-  spriteObjectWithLongName.setType('Sprite');
-
   {
     const animation = new gd.Animation();
     animation.setDirectionsCount(1);
@@ -172,7 +220,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     animation.getDirection(0).addSprite(sprite1);
     animation.getDirection(0).addSprite(sprite2);
     animation.getDirection(0).addSprite(sprite3);
-    spriteObject.addAnimation(animation);
+    spriteObjectConfiguration.addAnimation(animation);
   }
   {
     const animation = new gd.Animation();
@@ -189,7 +237,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     animation.getDirection(0).addSprite(sprite2);
     animation.getDirection(0).addSprite(sprite3);
     animation.getDirection(0).addSprite(sprite4);
-    spriteObject.addAnimation(animation);
+    spriteObjectConfiguration.addAnimation(animation);
   }
   {
     const animation = new gd.Animation();
@@ -197,7 +245,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     const sprite1 = new gd.Sprite();
     sprite1.setImageName('pixi');
     animation.getDirection(0).addSprite(sprite1);
-    spriteObject.addAnimation(animation);
+    spriteObjectConfiguration.addAnimation(animation);
   }
 
   spriteObjectWithBehaviors.addNewBehavior(
@@ -214,23 +262,6 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   // Add some tags
   tiledSpriteObject.setTags('Tag1');
   spriteObject.setTags('Tag1, Tag2');
-
-  // Layout
-  const testLayout = project.insertNewLayout('TestLayout', 0);
-  testLayout.insertObject(shapePainterObject, 0);
-  testLayout.insertObject(textObject, 0);
-  testLayout.insertObject(tiledSpriteObject, 0);
-  testLayout.insertObject(panelSpriteObject, 0);
-  testLayout.insertObject(spriteObject, 0);
-  testLayout.insertObject(spriteObjectWithBehaviors, 0);
-  testLayout.insertObject(spriteObjectWithoutBehaviors, 0);
-  testLayout.insertObject(spriteObjectWithLongName, 14);
-  testLayout.insertNewObject(
-    project,
-    'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
-    'MyFakeObjectWithUnsupportedCapability',
-    15
-  );
 
   const group1 = new gd.ObjectGroup();
   group1.setName('GroupOfSprites');
@@ -456,12 +487,13 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   const testInstruction = makeKeyPressedCondition('Space');
 
   // Global objects
-  const globalTextObject = new gd.TextObject('GlobalTextObject');
-  const globalTiledSpriteObject = new gd.TiledSpriteObject(
-    'GlobalTiledSpriteObject'
+  project.insertNewObject(project, 'TextObject::Text', 'GlobalTextObject', 0);
+  project.insertNewObject(
+    project,
+    'TiledSpriteObject::TiledSprite',
+    'GlobalTiledSpriteObject',
+    0
   );
-  project.insertObject(globalTextObject, 0);
-  project.insertObject(globalTiledSpriteObject, 0);
 
   // External events
   const testExternalEvents1 = project.insertNewExternalEvents(
@@ -650,12 +682,6 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   const layerWithoutEffects = new gd.Layer();
 
-  const spriteObjectWithoutEffects = new gd.SpriteObject(
-    'MySpriteObjectWithoutEffects'
-  );
-  const spriteObjectWithEffects = new gd.SpriteObject(
-    'MySpriteObjectWithEffects'
-  );
   {
     const effect1 = spriteObjectWithEffects
       .getEffects()
@@ -710,11 +736,12 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   return {
     project,
-    shapePainterObject,
-    textObject,
-    tiledSpriteObject,
-    panelSpriteObject,
+    shapePainterObjectConfiguration: shapePainterObject.getConfiguration(),
+    textObjectConfiguration: textObject.getConfiguration(),
+    tiledSpriteObjectConfiguration: tiledSpriteObject.getConfiguration(),
+    panelSpriteObjectConfiguration: panelSpriteObject.getConfiguration(),
     spriteObject,
+    spriteObjectConfiguration,
     testSpriteObjectInstance,
     spriteObjectWithBehaviors,
     spriteObjectWithoutBehaviors,

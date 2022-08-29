@@ -2613,9 +2613,9 @@ storiesOf('TextEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <SerializedObjectDisplay object={testProject.textObject}>
+    <SerializedObjectDisplay object={testProject.textObjectConfiguration}>
       <TextEditor
-        object={testProject.textObject}
+        object={testProject.textObjectConfiguration}
         project={testProject.project}
         resourceSources={[]}
         onChooseResource={source =>
@@ -2632,9 +2632,11 @@ storiesOf('TiledSpriteEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <SerializedObjectDisplay object={testProject.tiledSpriteObject}>
+    <SerializedObjectDisplay
+      object={testProject.tiledSpriteObjectConfiguration}
+    >
       <TiledSpriteEditor
-        object={testProject.tiledSpriteObject}
+        object={testProject.tiledSpriteObjectConfiguration}
         project={testProject.project}
         resourceSources={[]}
         onChooseResource={source =>
@@ -2651,9 +2653,11 @@ storiesOf('PanelSpriteEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <SerializedObjectDisplay object={testProject.panelSpriteObject}>
+    <SerializedObjectDisplay
+      object={testProject.panelSpriteObjectConfiguration}
+    >
       <PanelSpriteEditor
-        object={testProject.panelSpriteObject}
+        object={testProject.panelSpriteObjectConfiguration}
         project={testProject.project}
         resourceSources={[]}
         onChooseResource={source =>
@@ -2670,10 +2674,10 @@ storiesOf('SpriteEditor and related editors', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('SpriteEditor', () => (
-    <SerializedObjectDisplay object={testProject.spriteObject}>
+    <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
       <DragAndDropContextProvider>
         <SpriteEditor
-          object={testProject.spriteObject}
+          object={testProject.spriteObjectConfiguration}
           project={testProject.project}
           resourceSources={[]}
           onChooseResource={source =>
@@ -2687,11 +2691,11 @@ storiesOf('SpriteEditor and related editors', module)
     </SerializedObjectDisplay>
   ))
   .add('PointsEditor', () => (
-    <SerializedObjectDisplay object={testProject.spriteObject}>
+    <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
       <DragAndDropContextProvider>
         <FixedHeightFlexContainer height={500}>
           <PointsEditor
-            object={testProject.spriteObject}
+            object={testProject.spriteObjectConfiguration}
             project={testProject.project}
             resourcesLoader={ResourcesLoader}
           />
@@ -2700,11 +2704,11 @@ storiesOf('SpriteEditor and related editors', module)
     </SerializedObjectDisplay>
   ))
   .add('CollisionMasksEditor', () => (
-    <SerializedObjectDisplay object={testProject.spriteObject}>
+    <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
       <DragAndDropContextProvider>
         <FixedHeightFlexContainer height={500}>
           <CollisionMasksEditor
-            object={testProject.spriteObject}
+            object={testProject.spriteObjectConfiguration}
             project={testProject.project}
             resourcesLoader={ResourcesLoader}
           />
@@ -2717,9 +2721,11 @@ storiesOf('ShapePainterEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <SerializedObjectDisplay object={testProject.shapePainterObject}>
+    <SerializedObjectDisplay
+      object={testProject.shapePainterObjectConfiguration}
+    >
       <ShapePainterEditor
-        object={testProject.shapePainterObject}
+        object={testProject.shapePainterObjectConfiguration}
         project={testProject.project}
         resourceSources={[]}
         onChooseResource={source =>

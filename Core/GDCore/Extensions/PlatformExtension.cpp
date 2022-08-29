@@ -18,6 +18,7 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
 #include "GDCore/Tools/Localization.h"
 
@@ -231,7 +232,7 @@ gd::ObjectMetadata& PlatformExtension::AddObject(
     const gd::String& fullname,
     const gd::String& description,
     const gd::String& icon24x24,
-    std::shared_ptr<gd::Object> instance) {
+    std::shared_ptr<gd::ObjectConfiguration> instance) {
   gd::String nameWithNamespace = GetNameSpace() + name;
   objectsInfos[nameWithNamespace] = ObjectMetadata(GetNameSpace(),
                                                    nameWithNamespace,

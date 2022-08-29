@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #include <memory>
 #include "GDCore/Project/Object.h"
 namespace gd {
-class Object;
+class ObjectConfiguration;
 class InitialInstance;
 class Project;
 }
@@ -18,12 +18,12 @@ class Project;
 /**
  * PanelSprite Object
  */
-class GD_EXTENSION_API PanelSpriteObject : public gd::Object {
+class GD_EXTENSION_API PanelSpriteObject : public gd::ObjectConfiguration {
  public:
-  PanelSpriteObject(gd::String name_);
+  PanelSpriteObject();
   virtual ~PanelSpriteObject();
-  virtual std::unique_ptr<gd::Object> Clone() const {
-    return std::unique_ptr<gd::Object>(new PanelSpriteObject(*this));
+  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const {
+    return std::unique_ptr<gd::ObjectConfiguration>(new PanelSpriteObject(*this));
   }
 
 #if defined(GD_IDE_ONLY)

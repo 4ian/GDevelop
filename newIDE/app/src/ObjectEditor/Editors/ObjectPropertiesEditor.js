@@ -20,7 +20,7 @@ type Props = EditorProps;
 
 const ObjectPropertiesEditor = (props: Props) => {
   const {
-    object,
+    objectConfiguration,
     project,
     resourceSources,
     onChooseResource,
@@ -33,7 +33,10 @@ const ObjectPropertiesEditor = (props: Props) => {
   // see ObjectJsImplementation C++ implementation). If called directly here from JS,
   // the arguments will be mismatched. To workaround this, always case the object to
   // a base gdObject to ensure C++ methods are called.
-  const objectAsGdObject = gd.castObject(object, gd.gdObject);
+  const objectAsGdObject = gd.castObject(
+    objectConfiguration,
+    gd.ObjectConfiguration
+  );
   const properties = objectAsGdObject.getProperties();
 
   const propertiesSchema = propertiesMapToSchema(

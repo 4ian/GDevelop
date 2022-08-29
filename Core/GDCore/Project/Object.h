@@ -11,10 +11,12 @@
 #include <vector>
 
 #include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/EffectsContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/MakeUnique.h"
+
 namespace gd {
 class PropertyDescriptor;
 class Project;
@@ -38,7 +40,7 @@ class GD_CORE_API Object {
    * Create a new object with the name passed as argument.
    * \param name Object's name
    */
-  Object(const gd::String& name);
+  Object(const gd::String& name, const gd::String& type, std::unique_ptr<gd::ObjectConfiguration> configuration);
 
   /**
    * Copy constructor. Calls Init().
@@ -70,6 +72,11 @@ class GD_CORE_API Object {
     return gd::make_unique<gd::Object>(*this);
   }
 
+  // TODO write a documentation
+  gd::ObjectConfiguration& GetConfiguration();
+
+  gd::ObjectConfiguration& GetConfiguration() const;
+
   /** \name Common properties
    * Members functions related to common properties
    */
@@ -93,11 +100,15 @@ class GD_CORE_API Object {
 
   /** \brief Change the type of the object.
    */
-  void SetType(const gd::String& type_) { type = type_; }
+  void SetType(const gd::String& type_) {
+    configuration->SetType(type_);
+  }
 
   /** \brief Return the type of the object.
    */
-  const gd::String& GetType() const { return type; }
+  const gd::String& GetType() const {
+    return configuration->GetType();
+  }
 
   /** \brief Change the tags of the object.
    */
@@ -107,92 +118,6 @@ class GD_CORE_API Object {
    */
   const gd::String& GetTags() const { return tags; }
   ///@}
-
-  /** \name Resources management
-   * Members functions related to managing resources used by the object
-   */
-  ///@{
-  /**
-   * \brief Called ( e.g. during compilation ) so as to inventory internal
-   * resources and sometimes update their filename. Implementation example:
-   * \code
-   * worker.ExposeImage(myImage);
-   * worker.ExposeFile(myResourceFile);
-   * \endcode
-   *
-   * \see ArbitraryResourceWorker
-   */
-  virtual void ExposeResources(gd::ArbitraryResourceWorker& worker) { return; };
-
-  /**
-   * Redefine this function to return true if your object can use shaders.
-   */
-  virtual bool SupportShaders() { return false; }
-  ///@}
-
-  /** \name Object properties
-   * Reading and updating object properties
-   */
-  ///@{
-  /**
-   * \brief Called when the IDE wants to know about the custom properties of the
-   object.
-   *
-   * Usage example:
-   \code
-      std::map<gd::String, gd::PropertyDescriptor> properties;
-      properties[ToString(_("Text"))].SetValue("Hello world!");
-
-      return properties;
-   \endcode
-   *
-   * \return a std::map with properties names as key.
-   * \see gd::PropertyDescriptor
-   */
-  virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties() const;
-
-  /**
-   * \brief Called when the IDE wants to update a custom property of the object
-   *
-   * \return false if the new value cannot be set
-   */
-  virtual bool UpdateProperty(const gd::String& name, const gd::String& value) {
-    return false;
-  };
-  ///@}
-
-  /** \name Drawing and editing initial instances
-   * Members functions related to drawing and editing initial instances of this
-   * object
-   */
-  ///@{
-  /**
-   * \brief Called when the IDE wants to know about the custom properties of an
-   * initial instance of this object.
-   *
-   * \return a std::map with properties names as key and values.
-   * \see gd::InitialInstance
-   */
-  virtual std::map<gd::String, gd::PropertyDescriptor>
-  GetInitialInstanceProperties(const gd::InitialInstance& instance,
-                               gd::Project& project,
-                               gd::Layout& layout);
-
-  /**
-   * \brief Called when the IDE wants to update a custom property of an initial
-   * instance of this object.
-   *
-   * \return false if the new value cannot be set
-   * \see gd::InitialInstance
-   */
-  virtual bool UpdateInitialInstanceProperty(gd::InitialInstance& instance,
-                                             const gd::String& name,
-                                             const gd::String& value,
-                                             gd::Project& project,
-                                             gd::Layout& layout) {
-    return false;
-  };
-    ///@}
 
   /** \name Behaviors management
    * Members functions related to behaviors management.
@@ -309,8 +234,7 @@ class GD_CORE_API Object {
  protected:
   gd::String name;  ///< The full name of the object
   gd::String assetStoreId;  ///< The ID of the asset if the object comes from the store.
-  gd::String type;  ///< Which type is the object. ( To test if we can do
-                    ///< something reserved to some objects with it )
+  std::unique_ptr<gd::ObjectConfiguration> configuration;
   std::map<gd::String, std::unique_ptr<gd::Behavior>>
       behaviors;  ///< Contains all behaviors and their properties for the
                   ///< object. Behavior contents are the ownership of the
@@ -322,19 +246,11 @@ class GD_CORE_API Object {
       effectsContainer;  ///< The effects container for the object.
 
   /**
-   * \brief Derived objects can redefine this method to load custom attributes.
-   */
-  virtual void DoUnserializeFrom(gd::Project& project,
-                                 const SerializerElement& element){};
-
-  /**
-   * \brief Derived objects can redefine this method to save custom attributes.
-   */
-  virtual void DoSerializeTo(SerializerElement& element) const {};
-
-  /**
    * Initialize object using another object. Used by copy-ctor and assign-op.
    * Don't forget to update me if members were changed!
+   * 
+   * It's needed because there is no default copy for a map of unique_ptr like
+   * behaviors and it must be a deep copy.
    */
   void Init(const gd::Object& object);
 };

@@ -28,7 +28,7 @@ function RenderedTiledSpriteInstance(
   );
 
   //Setup the PIXI object:
-  var tiledSprite = gd.asTiledSpriteObject(associatedObject);
+  var tiledSprite = gd.asTiledSpriteObject(associatedObject.getConfiguration());
   this._texture = tiledSprite.getTexture();
   this._pixiObject = new PIXI.TilingSprite(
     this._pixiResourcesLoader.getPIXITexture(project, tiledSprite.getTexture()),

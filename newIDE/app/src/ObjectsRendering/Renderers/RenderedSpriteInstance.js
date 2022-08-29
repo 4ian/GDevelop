@@ -51,7 +51,7 @@ RenderedSpriteInstance.getThumbnail = function(
   resourcesLoader,
   object
 ) {
-  const spriteObject = gd.asSpriteObject(object);
+  const spriteObject = gd.asSpriteObject(object.getConfiguration());
 
   if (
     spriteObject.getAnimationsCount() > 0 &&
@@ -101,7 +101,9 @@ RenderedSpriteInstance.prototype.updateSprite = function() {
   this._sprite = null;
   this._shouldNotRotate = false;
 
-  const spriteObject = gd.asSpriteObject(this._associatedObject);
+  const spriteObject = gd.asSpriteObject(
+    this._associatedObject.getConfiguration()
+  );
   if (spriteObject.hasNoAnimations()) return false;
 
   this._renderedAnimation = this._instance.getRawDoubleProperty('animation');

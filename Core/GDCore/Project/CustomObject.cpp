@@ -22,8 +22,12 @@ std::unique_ptr<gd::Object> CustomObject::Clone() const {
 // This will be used by the GUI to display custom editors (for sprites for
 // instance)
 std::map<gd::String, gd::PropertyDescriptor> CustomObject::GetProperties() const {
-    const auto &properties = eventsBasedObject.GetPropertyDescriptors();
     auto objectProperties = std::map<gd::String, gd::PropertyDescriptor>();
+    if (!project.HasEventsBasedObject(GetType())) {
+      return objectProperties;
+    }
+    const auto &eventsBasedObject = project.GetEventsBasedObject(GetType());
+    const auto &properties = eventsBasedObject.GetPropertyDescriptors();
 
     for (auto &property : properties.GetInternalVector()) {
       const auto &propertyName = property->GetName();
@@ -73,6 +77,10 @@ std::map<gd::String, gd::PropertyDescriptor> CustomObject::GetProperties() const
 
 bool CustomObject::UpdateProperty(const gd::String& propertyName,
                                   const gd::String& newValue) {
+    if (!project.HasEventsBasedObject(GetType())) {
+      return false;
+    }
+    const auto &eventsBasedObject = project.GetEventsBasedObject(GetType());
     const auto &properties = eventsBasedObject.GetPropertyDescriptors();
     if (!properties.Has(propertyName)) {
       return false;

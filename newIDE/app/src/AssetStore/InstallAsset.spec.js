@@ -365,13 +365,21 @@ describe('InstallAsset', () => {
 
       // Check that the properties from customization were set.
       expect(
-        gd.Serializer.toJSON(
-          layout
-            .getObject('PlayerSpaceship')
-            .getBehavior('MyBehavior')
-            .getContent()
-        )
-      ).toBe('{"property1":"Overriden value","property2":true}');
+        layout
+          .getObject('PlayerSpaceship')
+          .getBehavior('MyBehavior')
+          .getProperties()
+          .get('property1')
+          .getValue()
+      ).toBe('Overriden value');
+      expect(
+        layout
+          .getObject('PlayerSpaceship')
+          .getBehavior('MyBehavior')
+          .getProperties()
+          .get('property2')
+          .getValue()
+      ).toBe('true');
     });
   });
 

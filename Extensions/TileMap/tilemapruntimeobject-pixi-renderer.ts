@@ -31,6 +31,7 @@ namespace gdjs {
         .getRenderer()
         .getPIXIRenderer();
 
+      // This setting allows tile maps with more than 16K tiles.
       PIXI.tilemap.settings.use32bitIndex = true;
       if (pixiRenderer) {
         pixiRenderer.plugins.tilemap =

@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef TILEDSPRITEOBJECT_H
 #define TILEDSPRITEOBJECT_H
 #include <memory>
-#include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 namespace gd {
 class InitialInstance;
 class Project;
@@ -17,11 +17,11 @@ class Project;
 /**
  * TiledSprite Object
  */
-class GD_EXTENSION_API TiledSpriteObject : public gd::Object {
+class GD_EXTENSION_API TiledSpriteObject : public gd::ObjectConfiguration {
  public:
-  TiledSpriteObject(gd::String name_);
+  TiledSpriteObject();
   virtual ~TiledSpriteObject(){};
-  virtual std::unique_ptr<gd::Object> Clone() const {
+  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const {
     return gd::make_unique<TiledSpriteObject>(*this);
   }
 

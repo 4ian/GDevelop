@@ -27,6 +27,7 @@ type Props = {|
 type State = {|
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
+  selectedObjectNames: string[],
 |};
 
 export default class EventBasedObjectChildrenEditor extends React.Component<
@@ -38,6 +39,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
   state = {
     editedObjectWithContext: null,
     editedObjectInitialTab: 'properties',
+    selectedObjectNames: [],
   };
 
   _onDeleteObject = (i18n: I18nType) => (
@@ -161,6 +163,18 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     }
   };
 
+  _onObjectSelected = (selectedObjectName: string) => {
+    if (!selectedObjectName) {
+      this.setState({
+        selectedObjectNames: [],
+      });
+    } else {
+      this.setState({
+        selectedObjectNames: [selectedObjectName],
+      });
+    }
+  };
+
   updateBehaviorsSharedData = () => {
     // TODO EBO Decide how BehaviorsSharedData of child-objects should work.
     // - Use a shared data per object instance
@@ -181,6 +195,11 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
   render() {
     const { eventsBasedObject, project } = this.props;
 
+    // TODO EBO When adding an object, filter the object types to excludes
+    // object that depend (transitively) on this object to avoid cycles.
+
+    // TODO EBO Add a button icon to mark some objects solid or not.
+
     return (
       <I18n>
         {({ i18n }) => (
@@ -197,7 +216,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 resourceSources={[]}
                 resourceExternalEditors={[]}
                 onChooseResource={() => Promise.resolve([])}
-                selectedObjectNames={[]}
+                selectedObjectNames={this.state.selectedObjectNames}
                 onEditObject={this.editObject}
                 onDeleteObject={this._onDeleteObject(i18n)}
                 canRenameObject={newName =>
@@ -205,8 +224,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 }
                 // Nothing special to do.
                 onObjectCreated={() => {}}
-                // Object selection has no impact.
-                onObjectSelected={() => {}}
+                onObjectSelected={this._onObjectSelected}
                 onRenameObject={(objectWithContext, newName, done) =>
                   this._onRenameObject(objectWithContext, newName, done, i18n)
                 }

@@ -131,7 +131,7 @@ type Props = {|
   canRenameObject: (newName: string) => boolean,
   onAddObjectInstance: (objectName: string) => void,
 
-  getThumbnail: (project: gdProject, object: Object) => string,
+  getThumbnail: (project: gdProject, object: gdObject) => string,
   unsavedChanges?: ?UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};

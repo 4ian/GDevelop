@@ -18,7 +18,7 @@ const makeTestContext = () => {
     'MySpriteObject',
     0
   );
-  const spriteObject = gd.asSpriteObject(object);
+  const spriteObject = gd.asSpriteObject(object.getConfiguration());
   const point = new gd.Point('Head');
   const sprite = new gd.Sprite();
   sprite.addPoint(point);

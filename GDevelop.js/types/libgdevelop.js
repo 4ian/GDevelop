@@ -22,15 +22,16 @@ declare class libGDevelop {
   asJsCodeEvent(gdBaseEvent): gdJsCodeEvent;
   asPlatform(gdPlatform): gdPlatform;
 
-  asSpriteObject(gdObject): gdSpriteObject;
-  asTiledSpriteObject(gdObject): gdTiledSpriteObject;
-  asPanelSpriteObject(gdObject): gdPanelSpriteObject;
-  asTextObject(gdObject): gdTextObject;
-  asShapePainterObject(gdObject): gdShapePainterObject;
-  asAdMobObject(gdObject): gdAdMobObject;
-  asTextEntryObject(gdObject): gdTextEntryObject;
-  asParticleEmitterObject(gdObject): gdParticleEmitterObject;
-  asObjectJsImplementation(gdObject): gdObjectJsImplementation;
+  asSpriteObject(gdObjectConfiguration): gdSpriteObject;
+  asTiledSpriteObject(gdObjectConfiguration): gdTiledSpriteObject;
+  asPanelSpriteObject(gdObjectConfiguration): gdPanelSpriteObject;
+  asTextObject(gdObjectConfiguration): gdTextObject;
+  asShapePainterObject(gdObjectConfiguration): gdShapePainterObject;
+  asAdMobObject(gdObjectConfiguration): gdAdMobObject;
+  asTextEntryObject(gdObjectConfiguration): gdTextEntryObject;
+  asParticleEmitterObject(gdObjectConfiguration): gdParticleEmitterObject;
+  asObjectJsImplementation(gdObjectConfiguration): gdObjectJsImplementation;
+  asCustomObjectConfiguration(gdObjectConfiguration): gdCustomObjectConfiguration;
 
   asImageResource(gdResource): gdImageResource;
 
@@ -69,9 +70,12 @@ declare class libGDevelop {
   BehaviorJsImplementation: Class<gdBehaviorJsImplementation>;
   BehaviorsSharedData: Class<gdBehaviorsSharedData>;
   BehaviorSharedDataJsImplementation: Class<gdBehaviorSharedDataJsImplementation>;
+  ObjectConfiguration: Class<gdObjectConfiguration>;
+  UniquePtrObjectConfiguration: Class<gdUniquePtrObjectConfiguration>;
   gdObject: Class<gdObject>;
   UniquePtrObject: Class<gdUniquePtrObject>;
   ObjectJsImplementation: Class<gdObjectJsImplementation>;
+  CustomObjectConfiguration: Class<gdCustomObjectConfiguration>;
   Layout: Class<gdLayout>;
   ExternalEvents: Class<gdExternalEvents>;
   ExternalLayout: Class<gdExternalLayout>;

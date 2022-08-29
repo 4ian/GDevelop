@@ -550,6 +550,7 @@ module.exports = {
     RenderedDummyObjectInstance.prototype.update = function () {
       // Read a property from the object
       const property1Value = this._associatedObject
+        .getConfiguration()
         .getProperties()
         .get('My first property')
         .getValue();

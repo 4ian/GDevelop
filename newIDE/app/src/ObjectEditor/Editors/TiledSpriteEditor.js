@@ -20,7 +20,7 @@ export default class TiledSpriteEditor extends React.Component<
       onChooseResource,
       resourceExternalEditors,
     } = this.props;
-    const tiledSpriteConfiguration = gd.asTiledSpriteObject(
+    const tiledSpriteConfiguration = gd.asTiledSpriteConfiguration(
       objectConfiguration
     );
 

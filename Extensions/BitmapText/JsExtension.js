@@ -634,7 +634,9 @@ module.exports = {
 
     // This is called to update the PIXI object on the scene editor
     RenderedBitmapTextInstance.prototype.update = function () {
-      const properties = this._associatedObject.getProperties();
+      const properties = this._associatedObject
+        .getConfiguration()
+        .getProperties();
 
       // Update the rendered text properties (note: Pixi is only
       // applying changes if there were changed).

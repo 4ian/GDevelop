@@ -36,7 +36,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
       onChooseResource,
       resourceExternalEditors,
     } = this.props;
-    const textObjectConfiguration = gd.asTextObject(objectConfiguration);
+    const textObjectConfiguration = gd.asTextConfiguration(objectConfiguration);
 
     return (
       <Column noMargin>

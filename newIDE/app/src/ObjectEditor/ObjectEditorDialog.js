@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-import React, { Component, useEffect } from 'react';
+import React, { useEffect, Component, type ComponentType } from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -61,7 +61,7 @@ type Props = {|
 
 type InnerDialogProps = {|
   ...Props,
-  editorComponent: ?Class<React.Component<EditorProps, any>>,
+  editorComponent: ?ComponentType<EditorProps>,
   objectName: string,
   helpPagePath: ?string,
   object: gdObject,
@@ -88,7 +88,8 @@ const InnerDialog = (props: InnerDialogProps) => {
     [props.project, props.object]
   );
 
-  const EditorComponent = props.editorComponent;
+  // TODO: Type this variable.
+  const EditorComponent: any = props.editorComponent;
 
   const onApply = () => {
     props.onApply();
@@ -206,7 +207,7 @@ const InnerDialog = (props: InnerDialogProps) => {
             </Column>
           </Line>
           <EditorComponent
-            object={props.object}
+            objectConfiguration={props.object.getConfiguration()}
             project={props.project}
             resourceSources={props.resourceSources}
             onChooseResource={props.onChooseResource}
@@ -273,8 +274,10 @@ const InnerDialog = (props: InnerDialogProps) => {
 };
 
 type State = {|
-  editorComponent: ?Class<React.Component<EditorProps, any>>,
-  castToObjectType: ?(object: gdObject) => gdObject,
+  editorComponent: ?ComponentType<EditorProps>,
+  castToObjectType: ?(
+    objectConfiguration: gdObjectConfiguration
+  ) => gdObjectConfiguration,
   helpPagePath: ?string,
   objectName: string,
 |};
@@ -336,7 +339,7 @@ export default class ObjectEditorDialog extends Component<Props, State> {
         editorComponent={editorComponent}
         key={this.props.object && this.props.object.ptr}
         helpPagePath={helpPagePath}
-        object={castToObjectType(object)}
+        object={object}
         objectName={this.state.objectName}
         initialTab={initialTab}
       />

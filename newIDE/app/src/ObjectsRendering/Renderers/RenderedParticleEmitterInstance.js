@@ -14,7 +14,7 @@ function RenderedParticleEmitterInstance(
   project,
   layout,
   instance,
-  associatedObject,
+  associatedObjectConfiguration,
   pixiContainer,
   pixiResourcesLoader
 ) {
@@ -23,7 +23,7 @@ function RenderedParticleEmitterInstance(
     project,
     layout,
     instance,
-    associatedObject,
+    associatedObjectConfiguration,
     pixiContainer,
     pixiResourcesLoader
   );
@@ -57,14 +57,14 @@ RenderedParticleEmitterInstance.prototype.update = function() {
  * Render the preview of the particle emitter according to the setup of the object
  */
 RenderedParticleEmitterInstance.prototype.updateGraphics = function() {
-  const particleEmitterObject = gd.asParticleEmitterObject(
-    this._associatedObject
+  const particleEmitterConfiguration = gd.asParticleEmitterConfiguration(
+    this._associatedObjectConfiguration
   );
 
   this._pixiObject.clear();
 
   const emitterAngle = (this._instance.getAngle() / 180) * 3.14159;
-  const sprayConeAngle = particleEmitterObject.getConeSprayAngle();
+  const sprayConeAngle = particleEmitterConfiguration.getConeSprayAngle();
   const line1Angle = emitterAngle - (sprayConeAngle / 2.0 / 180.0) * 3.14159;
   const line2Angle = emitterAngle + (sprayConeAngle / 2.0 / 180.0) * 3.14159;
   const length = 64;
@@ -73,9 +73,9 @@ RenderedParticleEmitterInstance.prototype.updateGraphics = function() {
   this._pixiObject.lineStyle(
     3,
     rgbToHexNumber(
-      particleEmitterObject.getParticleRed2(),
-      particleEmitterObject.getParticleGreen2(),
-      particleEmitterObject.getParticleBlue2()
+      particleEmitterConfiguration.getParticleRed2(),
+      particleEmitterConfiguration.getParticleGreen2(),
+      particleEmitterConfiguration.getParticleBlue2()
     ),
     1
   );
@@ -94,9 +94,9 @@ RenderedParticleEmitterInstance.prototype.updateGraphics = function() {
   this._pixiObject.lineStyle(0, 0x000000, 1);
   this._pixiObject.beginFill(
     rgbToHexNumber(
-      particleEmitterObject.getParticleRed1(),
-      particleEmitterObject.getParticleGreen1(),
-      particleEmitterObject.getParticleBlue1()
+      particleEmitterConfiguration.getParticleRed1(),
+      particleEmitterConfiguration.getParticleGreen1(),
+      particleEmitterConfiguration.getParticleBlue1()
     )
   );
   this._pixiObject.drawCircle(0, 0, 8);

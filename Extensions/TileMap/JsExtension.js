@@ -940,7 +940,7 @@ module.exports = {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -949,7 +949,7 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );
@@ -1014,26 +1014,26 @@ module.exports = {
      */
     RenderedTileMapInstance.prototype.updateTileMap = function () {
       // Get the tileset resource to use
-      const tilemapAtlasImage = this._associatedObject
+      const tilemapAtlasImage = this._associatedObjectConfiguration
         .getProperties(this.project)
         .get('tilemapAtlasImage')
         .getValue();
-      const tilemapJsonFile = this._associatedObject
+      const tilemapJsonFile = this._associatedObjectConfiguration
         .getProperties(this.project)
         .get('tilemapJsonFile')
         .getValue();
-      const tilesetJsonFile = this._associatedObject
+      const tilesetJsonFile = this._associatedObjectConfiguration
         .getProperties(this.project)
         .get('tilesetJsonFile')
         .getValue();
       const layerIndex = parseInt(
-        this._associatedObject
+        this._associatedObjectConfiguration
           .getProperties(this.project)
           .get('layerIndex')
           .getValue(),
         10
       );
-      const displayMode = this._associatedObject
+      const displayMode = this._associatedObjectConfiguration
         .getProperties(this.project)
         .get('displayMode')
         .getValue();
@@ -1181,7 +1181,7 @@ module.exports = {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -1190,7 +1190,7 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );
@@ -1256,39 +1256,39 @@ module.exports = {
      */
      RenderedCollisionMaskInstance.prototype.updateTileMap = function () {
       // Get the tileset resource to use
-      const tilemapAtlasImage = this._associatedObject
+      const tilemapAtlasImage = this._associatedObjectConfiguration
       .getProperties(this.project)
       .get('tilemapAtlasImage')
       .getValue();
-    const tilemapJsonFile = this._associatedObject
+    const tilemapJsonFile = this._associatedObjectConfiguration
       .getProperties(this.project)
       .get('tilemapJsonFile')
       .getValue();
-    const tilesetJsonFile = this._associatedObject
+    const tilesetJsonFile = this._associatedObjectConfiguration
       .getProperties(this.project)
       .get('tilesetJsonFile')
       .getValue();
-    const collisionMaskTag = this._associatedObject
+    const collisionMaskTag = this._associatedObjectConfiguration
       .getProperties(this.project)
       .get('collisionMaskTag')
       .getValue();
     const outlineColor = objectsRenderingService.rgbOrHexToHexNumber(
-      this._associatedObject
+      this._associatedObjectConfiguration
         .getProperties(this.project)
         .get('outlineColor')
         .getValue()
     );
     const fillColor = objectsRenderingService.rgbOrHexToHexNumber(
-      this._associatedObject
+      this._associatedObjectConfiguration
         .getProperties(this.project)
         .get('fillColor')
         .getValue()
     );
-    const outlineOpacity = this._associatedObject
+    const outlineOpacity = this._associatedObjectConfiguration
       .getProperties(this.project)
       .get('outlineOpacity')
       .getValue() / 255;
-    const fillOpacity = this._associatedObject
+    const fillOpacity = this._associatedObjectConfiguration
       .getProperties(this.project)
       .get('fillOpacity')
       .getValue() / 255;

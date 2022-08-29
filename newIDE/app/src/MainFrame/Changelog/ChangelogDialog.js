@@ -7,6 +7,8 @@ import FlatButton from '../../UI/FlatButton';
 import Changelog from '.';
 import Text from '../../UI/Text';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import { Line } from '../../UI/Grid';
+import Window from '../../Utils/Window';
 
 type Props = {|
   open: boolean,
@@ -19,6 +21,9 @@ const ChangelogDialog = ({ open, onClose }: Props) => {
     // Don't render anything, to avoid in particular sending useless requests.
     return null;
   }
+
+  const openReleaseNote = () =>
+    Window.openExternalURL('https://github.com/4ian/GDevelop/releases');
 
   const actions = [
     <FlatButton
@@ -35,12 +40,19 @@ const ChangelogDialog = ({ open, onClose }: Props) => {
       actions={actions}
       open={open}
       onRequestClose={onClose}
+      flexColumnBody
     >
-      <Text>
-        <Trans>
-          GDevelop was upgraded to a new version! Check out the changes.
-        </Trans>
-      </Text>
+      <Line noMargin justifyContent="space-between">
+        <Text>
+          <Trans>
+            GDevelop was upgraded to a new version! Check out the changes.
+          </Trans>
+        </Text>
+        <FlatButton
+          label={<Trans>See all the release notes</Trans>}
+          onClick={openReleaseNote}
+        />
+      </Line>
       <Changelog
         onUpdated={forceUpdate} // Force update to ensure dialog is properly positionned
       />

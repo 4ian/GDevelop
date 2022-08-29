@@ -507,7 +507,9 @@ module.exports = {
      * This is called to update the PIXI object on the scene editor
      */
     RenderedBBTextInstance.prototype.update = function () {
-      const properties = this._associatedObject.getProperties();
+      const properties = this._associatedObject
+        .getConfiguration()
+        .getProperties();
 
       const rawText = properties.get('text').getValue();
       if (rawText !== this._pixiObject.text) {

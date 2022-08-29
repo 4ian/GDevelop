@@ -12,7 +12,7 @@ import { getCurrentElements } from './SpriteObjectHelper';
 import { ResponsiveLineStackLayout } from '../../../../UI/Layout';
 
 type Props = {|
-  spriteObject: gdSpriteObject,
+  spriteConfiguration: gdSpriteObject,
 
   animationIndex: number,
   directionIndex: number,
@@ -41,7 +41,7 @@ type Props = {|
 export default class SpriteSelector extends React.Component<Props, void> {
   render() {
     const {
-      spriteObject,
+      spriteConfiguration,
       animationIndex,
       directionIndex,
       spriteIndex,
@@ -56,13 +56,8 @@ export default class SpriteSelector extends React.Component<Props, void> {
       setSameForAllSpritesLabel,
     } = this.props;
 
-    const {
-      hasValidAnimation,
-      animation,
-      hasValidDirection,
-      direction,
-    } = getCurrentElements(
-      spriteObject,
+    const { animation, direction } = getCurrentElements(
+      spriteConfiguration,
       animationIndex,
       directionIndex,
       spriteIndex
@@ -79,8 +74,8 @@ export default class SpriteSelector extends React.Component<Props, void> {
               chooseAnimation(parseInt(value, 10) || 0)
             }
           >
-            {mapFor(0, spriteObject.getAnimationsCount(), i => {
-              const animation = spriteObject.getAnimation(i);
+            {mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+              const animation = spriteConfiguration.getAnimation(i);
               return (
                 <SelectOption
                   key={i}
@@ -90,7 +85,7 @@ export default class SpriteSelector extends React.Component<Props, void> {
               );
             })}
           </SelectField>
-          {hasValidAnimation && animation.getDirectionsCount() > 1 && (
+          {animation && animation.getDirectionsCount() > 1 && (
             <SelectField
               fullWidth
               floatingLabelText={<Trans>Direction</Trans>}
@@ -110,7 +105,7 @@ export default class SpriteSelector extends React.Component<Props, void> {
               })}
             </SelectField>
           )}
-          {hasValidDirection && (
+          {direction && (
             <SelectField
               fullWidth
               floatingLabelText={<Trans>Frame</Trans>}

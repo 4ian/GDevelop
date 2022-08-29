@@ -618,7 +618,9 @@ module.exports = {
 
       update() {
         const instance = this._instance;
-        const properties = this._associatedObject.getProperties();
+        const properties = this._associatedObject
+          .getConfiguration()
+          .getProperties();
 
         const placeholder =
           instance.getRawStringProperty('placeholder') ||

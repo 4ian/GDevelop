@@ -569,6 +569,7 @@ module.exports = {
     RenderedVideoObjectInstance.prototype._getVideoTexture = function () {
       // Get the video resource to use
       const videoResource = this._associatedObject
+        .getConfiguration()
         .getProperties()
         .get('videoResource')
         .getValue();
@@ -586,6 +587,7 @@ module.exports = {
     RenderedVideoObjectInstance.prototype.update = function () {
       // Check if the video resource has changed
       const videoResource = this._associatedObject
+        .getConfiguration()
         .getProperties()
         .get('videoResource')
         .getValue();
@@ -607,6 +609,7 @@ module.exports = {
 
       // Update opacity
       const opacity = this._associatedObject
+        .getConfiguration()
         .getProperties()
         .get('Opacity')
         .getValue();

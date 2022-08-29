@@ -31,7 +31,7 @@ export default class ParticleEmitterEditor extends React.Component<
       onChooseResource,
       resourceExternalEditors,
     } = this.props;
-    const particleEmitterConfiguration = gd.asParticleEmitterObject(
+    const particleEmitterConfiguration = gd.asParticleEmitterConfiguration(
       objectConfiguration
     );
     const tutorialIds = getObjectTutorialIds(objectConfiguration.getType());

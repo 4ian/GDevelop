@@ -1252,7 +1252,7 @@ describe('libGD.js', function () {
     it('should be called with resources of the project', function (done) {
       let project = gd.ProjectHelper.createNewGDJSProject();
       let obj = project.insertNewObject(project, 'Sprite', 'MyObject', 0);
-      const spriteConfiguration = gd.asSpriteObject(obj.getConfiguration());
+      const spriteConfiguration = gd.asSpriteConfiguration(obj.getConfiguration());
       let sprite1 = new gd.Sprite();
       sprite1.setImageName('Used');
       const animation = new gd.Animation();

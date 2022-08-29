@@ -21,7 +21,7 @@ export default class PanelSpriteEditor extends React.Component<
       onChooseResource,
       resourceExternalEditors,
     } = this.props;
-    const panelSpriteConfiguration = gd.asPanelSpriteObject(
+    const panelSpriteConfiguration = gd.asPanelSpriteConfiguration(
       objectConfiguration
     );
 

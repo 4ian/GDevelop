@@ -284,6 +284,7 @@ module.exports = {
       );
       this._radius = parseFloat(
         this._associatedObject
+          .getConfiguration()
           .getProperties(this.project)
           .get('radius')
           .getValue()
@@ -291,6 +292,7 @@ module.exports = {
       if (this._radius <= 0) this._radius = 1;
       const colorHex = objectsRenderingService.rgbOrHexToHexNumber(
         this._associatedObject
+          .getConfiguration()
           .getProperties(this.project)
           .get('color')
           .getValue()

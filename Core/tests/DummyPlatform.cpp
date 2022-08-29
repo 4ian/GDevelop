@@ -7,6 +7,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
@@ -98,7 +99,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
   // Create the base object. All objects "inherits" from it.
   baseObjectExtension->SetExtensionInformation(
       "BuiltinObject", "Base Object dummy extension", "", "", "");
-  auto& baseObject = baseObjectExtension->AddObject<gd::Object>(
+  auto& baseObject = baseObjectExtension->AddObject<gd::ObjectConfiguration>(
       "", "Dummy Base Object", "Dummy Base Object", "");
 
   // Add this expression for all objects. But it requires a "capability".
@@ -214,7 +215,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("objectvar", _("Variable for object 2"))
       .SetFunctionName("getStringWith1ObjectParamAnd2ObjectVarParam");
 
-  auto& object = extension->AddObject<gd::Object>(
+  auto& object = extension->AddObject<gd::ObjectConfiguration>(
       "Sprite", "Dummy Sprite", "Dummy sprite object", "");
   object
       .AddExpression("GetObjectVariableAsNumber",
@@ -351,7 +352,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
 
   {
     auto& object = extension
-                       ->AddObject<gd::Object>(
+                       ->AddObject<gd::ObjectConfiguration>(
                            "FakeObjectWithUnsupportedCapability",
                            "FakeObjectWithUnsupportedCapability",
                            "This is FakeObjectWithUnsupportedCapability",

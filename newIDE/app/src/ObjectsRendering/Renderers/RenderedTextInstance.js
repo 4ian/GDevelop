@@ -52,30 +52,32 @@ RenderedTextInstance.getThumbnail = function(project, resourcesLoader, object) {
 };
 
 RenderedTextInstance.prototype.update = function() {
-  const textObject = gd.asTextObject(this._associatedObject);
-  this._pixiObject.text = textObject.getString();
+  const textObjectConfiguration = gd.asTextObjectConfiguration(
+    this._associatedObject.getConfiguration()
+  );
+  this._pixiObject.text = textObjectConfiguration.getString();
 
   //Update style, only if needed to avoid destroying text rendering performances
   if (
-    textObject.isItalic() !== this._isItalic ||
-    textObject.isBold() !== this._isBold ||
-    textObject.getCharacterSize() !== this._characterSize ||
+    textObjectConfiguration.isItalic() !== this._isItalic ||
+    textObjectConfiguration.isBold() !== this._isBold ||
+    textObjectConfiguration.getCharacterSize() !== this._characterSize ||
     this._instance.hasCustomSize() !== this._wrapping ||
     (this._instance.getCustomWidth() !== this._wrappingWidth && this._wrapping)
   ) {
-    this._isItalic = textObject.isItalic();
-    this._isBold = textObject.isBold();
-    this._characterSize = textObject.getCharacterSize();
+    this._isItalic = textObjectConfiguration.isItalic();
+    this._isBold = textObjectConfiguration.isBold();
+    this._characterSize = textObjectConfiguration.getCharacterSize();
     this._wrapping = this._instance.hasCustomSize();
     this._wrappingWidth = this._instance.getCustomWidth();
     this._styleFontDirty = true;
   }
 
-  if (this._fontName !== textObject.getFontName()) {
+  if (this._fontName !== textObjectConfiguration.getFontName()) {
     //Avoid calling loadFontFamily if the font didn't changed.
-    this._fontName = textObject.getFontName();
+    this._fontName = textObjectConfiguration.getFontName();
     this._pixiResourcesLoader
-      .loadFontFamily(this._project, textObject.getFontName())
+      .loadFontFamily(this._project, textObjectConfiguration.getFontName())
       .then(fontFamily => {
         // Once the font is loaded, we can use the given fontFamily.
         this._fontFamily = fontFamily;
@@ -107,13 +109,13 @@ RenderedTextInstance.prototype.update = function() {
   }
 
   if (
-    textObject.getColorR() !== this._colorR ||
-    textObject.getColorG() !== this._colorG ||
-    textObject.getColorB() !== this._colorB
+    textObjectConfiguration.getColorR() !== this._colorR ||
+    textObjectConfiguration.getColorG() !== this._colorG ||
+    textObjectConfiguration.getColorB() !== this._colorB
   ) {
-    this._colorR = textObject.getColorR();
-    this._colorG = textObject.getColorG();
-    this._colorB = textObject.getColorB();
+    this._colorR = textObjectConfiguration.getColorR();
+    this._colorG = textObjectConfiguration.getColorG();
+    this._colorB = textObjectConfiguration.getColorB();
     this._pixiObject.style.fill =
       'rgb(' + this._colorR + ',' + this._colorG + ',' + this._colorB + ')';
 

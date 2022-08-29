@@ -1015,25 +1015,30 @@ module.exports = {
     RenderedTileMapInstance.prototype.updateTileMap = function () {
       // Get the tileset resource to use
       const tilemapAtlasImage = this._associatedObject
+        .getConfiguration()
         .getProperties(this.project)
         .get('tilemapAtlasImage')
         .getValue();
       const tilemapJsonFile = this._associatedObject
+        .getConfiguration()
         .getProperties(this.project)
         .get('tilemapJsonFile')
         .getValue();
       const tilesetJsonFile = this._associatedObject
+        .getConfiguration()
         .getProperties(this.project)
         .get('tilesetJsonFile')
         .getValue();
       const layerIndex = parseInt(
         this._associatedObject
+          .getConfiguration()
           .getProperties(this.project)
           .get('layerIndex')
           .getValue(),
         10
       );
       const displayMode = this._associatedObject
+        .getConfiguration()
         .getProperties(this.project)
         .get('displayMode')
         .getValue();
@@ -1257,38 +1262,46 @@ module.exports = {
      RenderedCollisionMaskInstance.prototype.updateTileMap = function () {
       // Get the tileset resource to use
       const tilemapAtlasImage = this._associatedObject
+      .getConfiguration()
       .getProperties(this.project)
       .get('tilemapAtlasImage')
       .getValue();
     const tilemapJsonFile = this._associatedObject
+      .getConfiguration()
       .getProperties(this.project)
       .get('tilemapJsonFile')
       .getValue();
     const tilesetJsonFile = this._associatedObject
+      .getConfiguration()
       .getProperties(this.project)
       .get('tilesetJsonFile')
       .getValue();
     const collisionMaskTag = this._associatedObject
+      .getConfiguration()
       .getProperties(this.project)
       .get('collisionMaskTag')
       .getValue();
     const outlineColor = objectsRenderingService.rgbOrHexToHexNumber(
       this._associatedObject
+        .getConfiguration()
         .getProperties(this.project)
         .get('outlineColor')
         .getValue()
     );
     const fillColor = objectsRenderingService.rgbOrHexToHexNumber(
       this._associatedObject
+        .getConfiguration()
         .getProperties(this.project)
         .get('fillColor')
         .getValue()
     );
     const outlineOpacity = this._associatedObject
+      .getConfiguration()
       .getProperties(this.project)
       .get('outlineOpacity')
       .getValue() / 255;
     const fillOpacity = this._associatedObject
+      .getConfiguration()
       .getProperties(this.project)
       .get('fillOpacity')
       .getValue() / 255;

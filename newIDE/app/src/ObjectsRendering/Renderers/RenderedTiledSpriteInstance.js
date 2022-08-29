@@ -13,7 +13,7 @@ function RenderedTiledSpriteInstance(
   project,
   layout,
   instance,
-  associatedObject,
+  associatedObjectConfiguration,
   pixiContainer,
   pixiResourcesLoader
 ) {
@@ -22,14 +22,14 @@ function RenderedTiledSpriteInstance(
     project,
     layout,
     instance,
-    associatedObject,
+    associatedObjectConfiguration,
     pixiContainer,
     pixiResourcesLoader
   );
 
   //Setup the PIXI object:
   let tiledSprite = gd.asTiledSpriteConfiguration(
-    associatedObject.getConfiguration()
+    associatedObjectConfiguration
   );
   this._texture = tiledSprite.getTexture();
   this._pixiObject = new PIXI.TilingSprite(
@@ -64,7 +64,7 @@ RenderedTiledSpriteInstance.getThumbnail = function(
 
 RenderedTiledSpriteInstance.prototype.update = function() {
   let tiledSprite = gd.asTiledSpriteConfiguration(
-    this._associatedObject.getConfiguration()
+    this._associatedObjectConfiguration
   );
   if (this._instance.hasCustomSize()) {
     this._pixiObject.width = this._instance.getCustomWidth();
@@ -89,14 +89,14 @@ RenderedTiledSpriteInstance.prototype.update = function() {
 
 RenderedTiledSpriteInstance.prototype.getDefaultWidth = function() {
   let tiledSprite = gd.asTiledSpriteConfiguration(
-    this._associatedObject.getConfiguration()
+    this._associatedObjectConfiguration
   );
   return tiledSprite.getWidth();
 };
 
 RenderedTiledSpriteInstance.prototype.getDefaultHeight = function() {
   let tiledSprite = gd.asTiledSpriteConfiguration(
-    this._associatedObject.getConfiguration()
+    this._associatedObjectConfiguration
   );
   return tiledSprite.getHeight();
 };

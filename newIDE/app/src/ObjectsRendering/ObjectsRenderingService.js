@@ -61,16 +61,16 @@ const ObjectsRenderingService = {
     project: gdProject,
     layout: gdLayout,
     instance: gdInitialInstance,
-    associatedObject: gdObject,
+    associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: any
-  ) {
-    var objectType = associatedObject.getType();
+  ): RenderedInstance {
+    var objectType = associatedObjectConfiguration.getType();
     if (this.renderers.hasOwnProperty(objectType))
       return new this.renderers[objectType](
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         PixiResourcesLoader
       );
@@ -82,7 +82,7 @@ const ObjectsRenderingService = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         PixiResourcesLoader
       );

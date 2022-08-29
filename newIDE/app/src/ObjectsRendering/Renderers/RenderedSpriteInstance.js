@@ -13,7 +13,7 @@ function RenderedSpriteInstance(
   project,
   layout,
   instance,
-  associatedObject,
+  associatedObjectConfiguration,
   pixiContainer,
   pixiResourcesLoader
 ) {
@@ -22,7 +22,7 @@ function RenderedSpriteInstance(
     project,
     layout,
     instance,
-    associatedObject,
+    associatedObjectConfiguration,
     pixiContainer,
     pixiResourcesLoader
   );
@@ -104,7 +104,7 @@ RenderedSpriteInstance.prototype.updateSprite = function() {
   this._shouldNotRotate = false;
 
   const spriteConfiguration = gd.asSpriteConfiguration(
-    this._associatedObject.getConfiguration()
+    this._associatedObjectConfiguration
   );
   if (spriteConfiguration.hasNoAnimations()) return false;
 

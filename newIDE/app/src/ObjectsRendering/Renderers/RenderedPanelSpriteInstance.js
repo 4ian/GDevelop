@@ -16,7 +16,7 @@ function RenderedPanelSpriteInstance(
   project,
   layout,
   instance,
-  associatedObject,
+  associatedObjectConfiguration,
   pixiContainer,
   pixiResourcesLoader
 ) {
@@ -25,7 +25,7 @@ function RenderedPanelSpriteInstance(
     project,
     layout,
     instance,
-    associatedObject,
+    associatedObjectConfiguration,
     pixiContainer,
     pixiResourcesLoader
   );
@@ -45,7 +45,7 @@ RenderedPanelSpriteInstance.prototype.update = function() {
   // this._wasRendered = true;
 
   const panelSprite = gd.asPanelSpriteConfiguration(
-    this._associatedObject.getConfiguration()
+    this._associatedObjectConfiguration
   );
   if (panelSprite.isTiled() !== this._tiled) {
     this.makeObjects();
@@ -64,7 +64,7 @@ RenderedPanelSpriteInstance.prototype.update = function() {
     this._height = this._instance.getCustomHeight();
   } else {
     var tiledSprite = gd.asPanelSpriteConfiguration(
-      this._associatedObject.getConfiguration()
+      this._associatedObjectConfiguration
     );
     this._width = tiledSprite.getWidth();
     this._height = tiledSprite.getHeight();
@@ -77,7 +77,7 @@ RenderedPanelSpriteInstance.prototype.update = function() {
 
 RenderedPanelSpriteInstance.prototype.makeObjects = function() {
   const panelSprite = gd.asPanelSpriteConfiguration(
-    this._associatedObject.getConfiguration()
+    this._associatedObjectConfiguration
   );
   this._textureName = panelSprite.getTexture();
   const texture = this._pixiResourcesLoader.getPIXITexture(
@@ -122,7 +122,7 @@ RenderedPanelSpriteInstance.prototype.updatePosition = function() {
 
 RenderedPanelSpriteInstance.prototype._updateLocalPositions = function() {
   const panelSprite = gd.asPanelSpriteConfiguration(
-    this._associatedObject.getConfiguration()
+    this._associatedObjectConfiguration
   );
 
   this._centerSprite.position.x = panelSprite.getLeftMargin();
@@ -169,7 +169,7 @@ RenderedPanelSpriteInstance.prototype._updateLocalPositions = function() {
 
 RenderedPanelSpriteInstance.prototype._updateSpritesAndTexturesSize = function() {
   const panelSprite = gd.asPanelSpriteConfiguration(
-    this._associatedObject.getConfiguration()
+    this._associatedObjectConfiguration
   );
   this._centerSprite.width = Math.max(
     this._width - panelSprite.getRightMargin() - panelSprite.getLeftMargin(),
@@ -214,7 +214,7 @@ RenderedPanelSpriteInstance.prototype._updateSpritesAndTexturesSize = function()
 
 RenderedPanelSpriteInstance.prototype.updateTexture = function() {
   const panelSprite = gd.asPanelSpriteConfiguration(
-    this._associatedObject.getConfiguration()
+    this._associatedObjectConfiguration
   );
   this._textureName = panelSprite.getTexture();
   const texture = this._pixiResourcesLoader.getPIXITexture(
@@ -387,14 +387,14 @@ RenderedPanelSpriteInstance.prototype.updateWidthHeight = function() {
 
 RenderedPanelSpriteInstance.prototype.getDefaultWidth = function() {
   const panelSprite = gd.asPanelSpriteConfiguration(
-    this._associatedObject.getConfiguration()
+    this._associatedObjectConfiguration
   );
   return panelSprite.getWidth();
 };
 
 RenderedPanelSpriteInstance.prototype.getDefaultHeight = function() {
   const panelSprite = gd.asPanelSpriteConfiguration(
-    this._associatedObject.getConfiguration()
+    this._associatedObjectConfiguration
   );
   return panelSprite.getHeight();
 };

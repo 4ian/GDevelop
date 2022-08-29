@@ -43,7 +43,7 @@ const verticalMosaicNodes: EditorMosaicNode = {
 };
 
 type Props = {|
-  object: gdSpriteObject,
+  objectConfiguration: gdSpriteObject,
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
 |};
@@ -70,9 +70,11 @@ const PointsEditor = (props: Props) => {
   const [samePointsForSprites, setSamePointsForSprites] = React.useState(false);
   const forceUpdate = useForceUpdate();
 
-  const spriteObject = gd.asSpriteObject(props.object);
-  const { animation, sprite, hasValidSprite } = getCurrentElements(
-    spriteObject,
+  const spriteConfiguration = gd.asSpriteConfiguration(
+    props.objectConfiguration
+  );
+  const { animation, sprite } = getCurrentElements(
+    spriteConfiguration,
     animationIndex,
     directionIndex,
     spriteIndex
@@ -82,8 +84,8 @@ const PointsEditor = (props: Props) => {
     () => {
       if (animation && sprite) {
         if (samePointsForAnimations) {
-          mapFor(0, spriteObject.getAnimationsCount(), i => {
-            const otherAnimation = spriteObject.getAnimation(i);
+          mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+            const otherAnimation = spriteConfiguration.getAnimation(i);
             copyAnimationsSpritePoints(sprite, otherAnimation);
           });
         } else if (samePointsForSprites) {
@@ -96,7 +98,7 @@ const PointsEditor = (props: Props) => {
     [
       animation,
       sprite,
-      spriteObject,
+      spriteConfiguration,
       samePointsForAnimations,
       samePointsForSprites,
       forceUpdate,
@@ -123,8 +125,8 @@ const PointsEditor = (props: Props) => {
 
     setSamePointsForAnimations(
       every(
-        mapFor(0, spriteObject.getAnimationsCount(), i => {
-          const otherAnimation = spriteObject.getAnimation(i);
+        mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+          const otherAnimation = spriteConfiguration.getAnimation(i);
           return allSpritesHaveSamePointsAs(sprite, otherAnimation);
         })
       )
@@ -172,8 +174,8 @@ const PointsEditor = (props: Props) => {
   const editorNodes =
     screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
 
-  if (!props.object.getAnimationsCount()) return null;
-  const resourceName = hasValidSprite ? sprite.getImageName() : '';
+  if (!props.objectConfiguration.getAnimationsCount()) return null;
+  const resourceName = sprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor } = {
     preview: {
@@ -194,7 +196,7 @@ const PointsEditor = (props: Props) => {
             )}
             project={props.project}
             renderOverlay={overlayProps =>
-              hasValidSprite && (
+              sprite && (
                 <PointsPreview
                   {...overlayProps}
                   pointsContainer={sprite}
@@ -218,7 +220,7 @@ const PointsEditor = (props: Props) => {
             <Line>
               <Column expand>
                 <SpriteSelector
-                  spriteObject={spriteObject}
+                  spriteConfiguration={spriteConfiguration}
                   animationIndex={animationIndex}
                   directionIndex={directionIndex}
                   spriteIndex={spriteIndex}

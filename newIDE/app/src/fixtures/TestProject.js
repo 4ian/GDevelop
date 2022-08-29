@@ -174,7 +174,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'MyFakeObjectWithUnsupportedCapability',
     15
   );
-  const spriteObjectConfiguration = gd.asSpriteObject(
+  const spriteObjectConfiguration = gd.asSpriteConfiguration(
     spriteObject.getConfiguration()
   );
   {

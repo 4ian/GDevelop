@@ -111,7 +111,7 @@ const ObjectsEditorService = {
       createNewObject: (): gdSpriteObject => new gd.SpriteObject(),
       castToObjectType: (
         objectConfiguration: gdObjectConfiguration
-      ): gdSpriteObject => gd.asSpriteObject(objectConfiguration),
+      ): gdSpriteObject => gd.asSpriteConfiguration(objectConfiguration),
       helpPagePath: '/objects/sprite',
     },
     'TiledSpriteObject::TiledSprite': {
@@ -119,7 +119,8 @@ const ObjectsEditorService = {
       createNewObject: (): gdTiledSpriteObject => new gd.TiledSpriteObject(),
       castToObjectType: (
         objectConfiguration: gdObjectConfiguration
-      ): gdTiledSpriteObject => gd.asTiledSpriteObject(objectConfiguration),
+      ): gdTiledSpriteObject =>
+        gd.asTiledSpriteConfiguration(objectConfiguration),
       helpPagePath: '/objects/tiled_sprite',
     },
     'PanelSpriteObject::PanelSprite': {
@@ -127,7 +128,8 @@ const ObjectsEditorService = {
       createNewObject: (): gdPanelSpriteObject => new gd.PanelSpriteObject(),
       castToObjectType: (
         objectConfiguration: gdObjectConfiguration
-      ): gdPanelSpriteObject => gd.asPanelSpriteObject(objectConfiguration),
+      ): gdPanelSpriteObject =>
+        gd.asPanelSpriteConfiguration(objectConfiguration),
       helpPagePath: '/objects/panel_sprite',
     },
     'TextObject::Text': {
@@ -135,7 +137,7 @@ const ObjectsEditorService = {
       createNewObject: (): gdTextObject => new gd.TextObject(),
       castToObjectType: (
         objectConfiguration: gdObjectConfiguration
-      ): gdTextObject => gd.asTextObject(objectConfiguration),
+      ): gdTextObject => gd.asTextObjectConfiguration(objectConfiguration),
       helpPagePath: '/objects/text',
     },
     'PrimitiveDrawing::Drawer': {
@@ -143,7 +145,8 @@ const ObjectsEditorService = {
       createNewObject: (): gdShapePainterObject => new gd.ShapePainterObject(),
       castToObjectType: (
         objectConfiguration: gdObjectConfiguration
-      ): gdShapePainterObject => gd.asShapePainterObject(objectConfiguration),
+      ): gdShapePainterObject =>
+        gd.asShapePainterConfiguration(objectConfiguration),
       helpPagePath: '/objects/shape_painter',
     },
     'TextEntryObject::TextEntry': {
@@ -151,7 +154,7 @@ const ObjectsEditorService = {
       createNewObject: (): gdTextEntryObject => new gd.TextEntryObject(),
       castToObjectType: (
         objectConfiguration: gdObjectConfiguration
-      ): gdTextEntryObject => gd.asTextEntryObject(objectConfiguration),
+      ): gdTextEntryObject => gd.asTextEntryConfiguration(objectConfiguration),
       helpPagePath: '/objects/text_entry',
     },
     'ParticleSystem::ParticleEmitter': {
@@ -161,7 +164,7 @@ const ObjectsEditorService = {
       castToObjectType: (
         objectConfiguration: gdObjectConfiguration
       ): gdParticleEmitterObject =>
-        gd.asParticleEmitterObject(objectConfiguration),
+        gd.asParticleEmitterConfiguration(objectConfiguration),
       helpPagePath: '/objects/particles_emitter',
     },
   },

@@ -30,7 +30,7 @@ class EffectsContainer;
 namespace gd {
 
 /**
- * \brief Base class used to represent an object of a platform
+ * \brief Represent an object of a platform
  *
  * \ingroup PlatformDefinition
  */
@@ -72,7 +72,9 @@ class GD_CORE_API Object {
     return gd::make_unique<gd::Object>(*this);
   }
 
-  // TODO write a documentation
+  /**
+   * \brief Return the object configuration.
+   */
   gd::ObjectConfiguration& GetConfiguration();
 
   gd::ObjectConfiguration& GetConfiguration() const;

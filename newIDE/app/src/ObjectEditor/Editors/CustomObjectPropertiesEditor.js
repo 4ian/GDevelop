@@ -118,7 +118,8 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                   const enabledTutorialIds = tutorialIds.filter(
                     tutorialId => !values.hiddenTutorialHints[tutorialId]
                   );
-
+                  // TODO EBO: Add a protection against infinite loop in case
+                  // of object cycles (thought it should be forbidden).
                   return (
                     <Accordion key={childObject.getName()} defaultExpanded>
                       <AccordionHeader

@@ -43,7 +43,7 @@ const verticalMosaicNodes: EditorMosaicNode = {
 };
 
 type Props = {|
-  object: gdSpriteObject,
+  objectConfiguration: gdSpriteObject,
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
 |};
@@ -75,9 +75,11 @@ const CollisionMasksEditor = (props: Props) => {
   const [spriteHeight, setSpriteHeight] = React.useState(0);
   const forceUpdate = useForceUpdate();
 
-  const spriteObject = gd.asSpriteObject(props.object);
-  const { animation, sprite, hasValidSprite } = getCurrentElements(
-    spriteObject,
+  const spriteConfiguration = gd.asSpriteConfiguration(
+    props.objectConfiguration
+  );
+  const { animation, sprite } = getCurrentElements(
+    spriteConfiguration,
     animationIndex,
     directionIndex,
     spriteIndex
@@ -87,8 +89,8 @@ const CollisionMasksEditor = (props: Props) => {
     () => {
       if (animation && sprite) {
         if (sameCollisionMasksForAnimations) {
-          mapFor(0, spriteObject.getAnimationsCount(), i => {
-            const otherAnimation = spriteObject.getAnimation(i);
+          mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+            const otherAnimation = spriteConfiguration.getAnimation(i);
             copyAnimationsSpriteCollisionMasks(sprite, otherAnimation);
           });
         } else if (sameCollisionMasksForSprites) {
@@ -101,7 +103,7 @@ const CollisionMasksEditor = (props: Props) => {
     [
       animation,
       sprite,
-      spriteObject,
+      spriteConfiguration,
       sameCollisionMasksForAnimations,
       sameCollisionMasksForSprites,
       forceUpdate,
@@ -128,8 +130,8 @@ const CollisionMasksEditor = (props: Props) => {
 
     setSameCollisionMasksForAnimations(
       every(
-        mapFor(0, spriteObject.getAnimationsCount(), i => {
-          const otherAnimation = spriteObject.getAnimation(i);
+        mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+          const otherAnimation = spriteConfiguration.getAnimation(i);
           return allSpritesHaveSameCollisionMasksAs(sprite, otherAnimation);
         })
       )
@@ -195,8 +197,8 @@ const CollisionMasksEditor = (props: Props) => {
   const editorNodes =
     screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
 
-  if (!props.object.getAnimationsCount()) return null;
-  const resourceName = hasValidSprite ? sprite.getImageName() : '';
+  if (!props.objectConfiguration.getAnimationsCount()) return null;
+  const resourceName = sprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor } = {
     preview: {
@@ -218,7 +220,7 @@ const CollisionMasksEditor = (props: Props) => {
             project={props.project}
             onSize={setCurrentSpriteSize}
             renderOverlay={overlayProps =>
-              hasValidSprite && (
+              sprite && (
                 <CollisionMasksPreview
                   {...overlayProps}
                   isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
@@ -242,7 +244,7 @@ const CollisionMasksEditor = (props: Props) => {
           <Line>
             <Column expand>
               <SpriteSelector
-                spriteObject={spriteObject}
+                spriteConfiguration={spriteConfiguration}
                 animationIndex={animationIndex}
                 directionIndex={directionIndex}
                 spriteIndex={spriteIndex}

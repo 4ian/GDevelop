@@ -9,7 +9,7 @@ This project is released under the MIT License.
 #define SHAPEPAINTEROBJECT_H
 #include <vector>
 
-#include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 namespace gd {
 class Object;
 class InitialInstance;
@@ -88,12 +88,12 @@ class GD_EXTENSION_API ShapePainterObjectBase {
 /**
  * \brief The Shape Painter object used for storage and by the IDE.
  */
-class GD_EXTENSION_API ShapePainterObject : public gd::Object,
+class GD_EXTENSION_API ShapePainterObject : public gd::ObjectConfiguration,
                                             public ShapePainterObjectBase {
  public:
-  ShapePainterObject(gd::String name_);
+  ShapePainterObject();
   virtual ~ShapePainterObject(){};
-  virtual std::unique_ptr<gd::Object> Clone() const {
+  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const {
     return gd::make_unique<ShapePainterObject>(*this);
   }
 

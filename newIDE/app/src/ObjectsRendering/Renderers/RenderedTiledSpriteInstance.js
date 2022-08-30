@@ -13,7 +13,7 @@ function RenderedTiledSpriteInstance(
   project,
   layout,
   instance,
-  associatedObject,
+  associatedObjectConfiguration,
   pixiContainer,
   pixiResourcesLoader
 ) {
@@ -22,13 +22,15 @@ function RenderedTiledSpriteInstance(
     project,
     layout,
     instance,
-    associatedObject,
+    associatedObjectConfiguration,
     pixiContainer,
     pixiResourcesLoader
   );
 
   //Setup the PIXI object:
-  var tiledSprite = gd.asTiledSpriteObject(associatedObject);
+  let tiledSprite = gd.asTiledSpriteConfiguration(
+    associatedObjectConfiguration
+  );
   this._texture = tiledSprite.getTexture();
   this._pixiObject = new PIXI.TilingSprite(
     this._pixiResourcesLoader.getPIXITexture(project, tiledSprite.getTexture()),
@@ -51,7 +53,7 @@ RenderedTiledSpriteInstance.getThumbnail = function(
   resourcesLoader,
   object
 ) {
-  var tiledSprite = gd.asTiledSpriteObject(object);
+  let tiledSprite = gd.asTiledSpriteConfiguration(object.getConfiguration());
 
   return resourcesLoader.getResourceFullUrl(
     project,
@@ -61,7 +63,9 @@ RenderedTiledSpriteInstance.getThumbnail = function(
 };
 
 RenderedTiledSpriteInstance.prototype.update = function() {
-  var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
+  let tiledSprite = gd.asTiledSpriteConfiguration(
+    this._associatedObjectConfiguration
+  );
   if (this._instance.hasCustomSize()) {
     this._pixiObject.width = this._instance.getCustomWidth();
     this._pixiObject.height = this._instance.getCustomHeight();
@@ -84,12 +88,16 @@ RenderedTiledSpriteInstance.prototype.update = function() {
 };
 
 RenderedTiledSpriteInstance.prototype.getDefaultWidth = function() {
-  var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
+  let tiledSprite = gd.asTiledSpriteConfiguration(
+    this._associatedObjectConfiguration
+  );
   return tiledSprite.getWidth();
 };
 
 RenderedTiledSpriteInstance.prototype.getDefaultHeight = function() {
-  var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
+  let tiledSprite = gd.asTiledSpriteConfiguration(
+    this._associatedObjectConfiguration
+  );
   return tiledSprite.getHeight();
 };
 

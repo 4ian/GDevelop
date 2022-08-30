@@ -7,8 +7,8 @@ import FlatButton from '../../UI/FlatButton';
 import Changelog from '.';
 import Text from '../../UI/Text';
 import useForceUpdate from '../../Utils/UseForceUpdate';
-import { Line } from '../../UI/Grid';
 import Window from '../../Utils/Window';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
 
 type Props = {|
   open: boolean,
@@ -42,7 +42,7 @@ const ChangelogDialog = ({ open, onClose }: Props) => {
       onRequestClose={onClose}
       flexColumnBody
     >
-      <Line noMargin justifyContent="space-between">
+      <ResponsiveLineStackLayout noMargin justifyContent="space-between">
         <Text>
           <Trans>
             GDevelop was upgraded to a new version! Check out the changes.
@@ -52,7 +52,7 @@ const ChangelogDialog = ({ open, onClose }: Props) => {
           label={<Trans>See all the release notes</Trans>}
           onClick={openReleaseNote}
         />
-      </Line>
+      </ResponsiveLineStackLayout>
       <Changelog
         onUpdated={forceUpdate} // Force update to ensure dialog is properly positionned
       />

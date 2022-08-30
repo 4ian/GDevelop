@@ -10,18 +10,13 @@ export type UserPublicProfile = {|
   description: ?string,
 |};
 
-export type UserPublicProfileSearch = {|
-  id: string,
-  username: ?string,
-|};
-
 export type UserPublicProfileByIds = {|
   [key: string]: UserPublicProfile,
 |};
 
 export const searchUserPublicProfilesByUsername = (
   searchString: string
-): Promise<Array<UserPublicProfileSearch>> => {
+): Promise<Array<UserPublicProfile>> => {
   return axios
     .get(`${GDevelopUserApi.baseUrl}/user-public-profile/search`, {
       params: {

@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 
-import React, { Component } from 'react';
+import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import TextField from '../UI/TextField';
@@ -10,6 +10,7 @@ import {
   type RegisterForm,
   type AuthError,
 } from '../Utils/GDevelopServices/Authentication';
+import { type UsernameAvailability } from '../Utils/GDevelopServices/User';
 import LeftLoader from '../UI/LeftLoader';
 import BackgroundText from '../UI/BackgroundText';
 import { ColumnStackLayout } from '../UI/Layout';
@@ -22,10 +23,6 @@ type Props = {|
   onCreateAccount: (form: RegisterForm) => Promise<void>,
   createAccountInProgress: boolean,
   error: ?AuthError,
-|};
-
-type State = {|
-  form: RegisterForm,
 |};
 
 export const getEmailErrorText = (error: ?AuthError) => {
@@ -76,119 +73,137 @@ export const getPasswordErrorText = (error: ?AuthError) => {
   return undefined;
 };
 
-export default class CreateAccountDialog extends Component<Props, State> {
-  state = {
-    form: {
-      email: '',
-      password: '',
-      username: '',
+const CreateAccountDialog = ({
+  onClose,
+  onGoToLogin,
+  onCreateAccount,
+  createAccountInProgress,
+  error,
+}: Props) => {
+  const [email, setEmail] = React.useState<string>('');
+  const [password, setPassword] = React.useState<string>('');
+  const [username, setUsername] = React.useState<string>('');
+  const [
+    usernameAvailability,
+    setUsernameAvailability,
+  ] = React.useState<?UsernameAvailability>(null);
+  const [
+    isValidatingUsername,
+    setIsValidatingUsername,
+  ] = React.useState<boolean>(false);
+
+  const canCreateAccount = React.useMemo(
+    () =>
+      !createAccountInProgress &&
+      isUsernameValid(username, { allowEmpty: true }) &&
+      !isValidatingUsername &&
+      (!usernameAvailability || usernameAvailability.isAvailable),
+    [
+      username,
+      createAccountInProgress,
+      isValidatingUsername,
+      usernameAvailability,
+    ]
+  );
+  const createAccount = React.useCallback(
+    () => {
+      if (!canCreateAccount) return;
+      onCreateAccount({
+        email,
+        password,
+        username,
+      });
     },
-  };
+    [canCreateAccount, onCreateAccount, email, password, username]
+  );
 
-  _canCreateAccount = () => {
-    return (
-      !this.props.createAccountInProgress &&
-      isUsernameValid(this.state.form.username, true)
-    );
-  };
-
-  _onCreateAccount = () => {
-    if (!this._canCreateAccount()) return;
-
-    const { form } = this.state;
-    this.props.onCreateAccount(form);
-  };
-
-  render() {
-    const { onClose, createAccountInProgress, onGoToLogin, error } = this.props;
-
-    return (
-      <Dialog
-        title={<Trans>Create a new GDevelop account</Trans>}
-        actions={[
-          <FlatButton
-            label={<Trans>Back</Trans>}
-            disabled={createAccountInProgress}
-            key="close"
-            primary={false}
-            onClick={onClose}
-          />,
-          <LeftLoader isLoading={createAccountInProgress} key="create-account">
-            <DialogPrimaryButton
-              label={<Trans>Create my account</Trans>}
-              primary
-              disabled={!this._canCreateAccount()}
-              onClick={this._onCreateAccount}
-            />
-          </LeftLoader>,
-        ]}
-        secondaryActions={[
-          <FlatButton
-            label={<Trans>Already have an account?</Trans>}
-            primary={false}
-            key="already-have-account"
-            onClick={onGoToLogin}
-          />,
-        ]}
-        cannotBeDismissed={createAccountInProgress}
-        onApply={this._onCreateAccount}
-        onRequestClose={() => {
-          if (!createAccountInProgress) onClose();
-        }}
-        maxWidth="sm"
-        open
-      >
-        <ColumnStackLayout noMargin>
-          <BackgroundText>
-            <MarkdownText
-              translatableSource={t`By creating an account and using GDevelop, you agree to the [Terms and Conditions](https://gdevelop.io/page/terms-and-conditions). Having an account allows you to export your game on Android or as a Desktop app and it unlocks other services for your project!`}
-            />
-          </BackgroundText>
-          <UsernameField
-            value={this.state.form.username}
-            onChange={(e, value) => {
-              this.setState({
-                form: {
-                  ...this.state.form,
-                  username: value,
-                },
-              });
-            }}
-            allowEmpty
+  return (
+    <Dialog
+      title={<Trans>Create a new GDevelop account</Trans>}
+      actions={[
+        <FlatButton
+          label={<Trans>Back</Trans>}
+          disabled={createAccountInProgress}
+          key="close"
+          primary={false}
+          onClick={onClose}
+        />,
+        <LeftLoader
+          isLoading={createAccountInProgress || isValidatingUsername}
+          key="create-account"
+        >
+          <DialogPrimaryButton
+            label={<Trans>Create my account</Trans>}
+            primary
+            disabled={!canCreateAccount}
+            onClick={createAccount}
           />
-          <TextField
-            value={this.state.form.email}
-            floatingLabelText={<Trans>Email</Trans>}
-            errorText={getEmailErrorText(error)}
-            fullWidth
-            required
-            onChange={(e, value) => {
-              this.setState({
-                form: {
-                  ...this.state.form,
-                  email: value,
-                },
-              });
-            }}
+        </LeftLoader>,
+      ]}
+      secondaryActions={[
+        <FlatButton
+          label={<Trans>Already have an account?</Trans>}
+          primary={false}
+          key="already-have-account"
+          onClick={onGoToLogin}
+          disabled={createAccountInProgress}
+        />,
+      ]}
+      cannotBeDismissed={createAccountInProgress}
+      onApply={createAccount}
+      onRequestClose={() => {
+        if (!createAccountInProgress) onClose();
+      }}
+      maxWidth="sm"
+      open
+    >
+      <ColumnStackLayout noMargin>
+        <BackgroundText>
+          <MarkdownText
+            translatableSource={t`By creating an account and using GDevelop, you agree to the [Terms and Conditions](https://gdevelop.io/page/terms-and-conditions). Having an account allows you to export your game on Android or as a Desktop app and it unlocks other services for your project!`}
           />
-          <TextField
-            value={this.state.form.password}
-            floatingLabelText={<Trans>Password</Trans>}
-            errorText={getPasswordErrorText(error)}
-            type="password"
-            fullWidth
-            required
-            onChange={(e, value) => {
-              this.setState({
-                form: {
-                  ...this.state.form,
-                  password: value,
-                },
-              });
-            }}
-          />
-        </ColumnStackLayout>
-      </Dialog>
-    );
-  }
-}
+        </BackgroundText>
+        <UsernameField
+          value={username}
+          onChange={(e, value) => {
+            setUsername(value);
+            if (!value) {
+              // User can create an account without a username.
+              setUsernameAvailability(null);
+            }
+          }}
+          allowEmpty
+          onAvailabilityChecked={(
+            usernameAvailability: ?UsernameAvailability
+          ) => {
+            setUsernameAvailability(usernameAvailability);
+          }}
+          onAvailabilityCheckLoading={setIsValidatingUsername}
+        />
+        <TextField
+          value={email}
+          floatingLabelText={<Trans>Email</Trans>}
+          errorText={getEmailErrorText(error)}
+          fullWidth
+          required
+          onChange={(e, value) => {
+            setEmail(value);
+          }}
+        />
+        <TextField
+          value={password}
+          floatingLabelText={<Trans>Password</Trans>}
+          errorText={getPasswordErrorText(error)}
+          type="password"
+          fullWidth
+          required
+          onChange={(e, value) => {
+            setPassword(value);
+          }}
+        />
+      </ColumnStackLayout>
+    </Dialog>
+  );
+};
+
+export default CreateAccountDialog;

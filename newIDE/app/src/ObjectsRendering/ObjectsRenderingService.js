@@ -45,6 +45,7 @@ const ObjectsRenderingService = {
   },
   getThumbnail: function(project: gdProject, object: gdObject) {
     var objectType = object.getType();
+    console.log(objectType);
     if (this.renderers.hasOwnProperty(objectType))
       return this.renderers[objectType].getThumbnail(
         project,

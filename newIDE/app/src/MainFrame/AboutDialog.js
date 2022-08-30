@@ -29,6 +29,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 
 type Props = {|
+  open?: boolean,
   onClose: () => void,
   updateStatus: ElectronUpdateStatus,
 |};

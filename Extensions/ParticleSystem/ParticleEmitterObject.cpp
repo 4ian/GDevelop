@@ -55,8 +55,7 @@ ParticleEmitterBase::ParticleEmitterBase()
       maxParticleNb(300),
       destroyWhenNoParticles(true) {}
 
-ParticleEmitterObject::ParticleEmitterObject(gd::String name_)
-    : Object(name_) {}
+ParticleEmitterObject::ParticleEmitterObject() {}
 
 void ParticleEmitterObject::DoUnserializeFrom(
     gd::Project& project, const gd::SerializerElement& element) {

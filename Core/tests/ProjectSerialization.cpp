@@ -120,6 +120,7 @@ void CheckBehaviorProperty(ObjectsContainer &container) {
 };
 } // namespace
 
+// TODO EBO Add similar test cases for events-based objects.
 TEST_CASE("ProjectSerialization", "[common]") {
 
   SECTION("Save and load a project with a custom behavior property value") {

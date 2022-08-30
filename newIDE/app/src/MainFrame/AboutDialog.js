@@ -28,10 +28,12 @@ import { ColumnStackLayout } from '../UI/Layout';
 import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 
-type Props = {
+type Props = {|
   onClose: () => void,
   updateStatus: ElectronUpdateStatus,
-};
+|};
+
+type TabName = 'about' | 'changelog' | 'contributors';
 
 const styles = {
   logo: {
@@ -250,13 +252,16 @@ export default function AboutDialog({ onClose, updateStatus }: Props) {
     Window.openExternalURL('https://gdevelop.io/page/contribute/');
   }, []);
 
+  const openReleaseNote = () =>
+    Window.openExternalURL('https://github.com/4ian/GDevelop/releases');
+
   const openLink = React.useCallback((link: string) => {
     if (!link) return;
 
     Window.openExternalURL(link);
   }, []);
 
-  const [currentTab, setCurrentTab] = React.useState('about');
+  const [currentTab, setCurrentTab] = React.useState<TabName>('about');
 
   const { checkUpdates } = React.useContext(PreferencesContext);
 
@@ -287,6 +292,18 @@ export default function AboutDialog({ onClose, updateStatus }: Props) {
           onClick={onClose}
         />,
       ]}
+      secondaryActions={
+        currentTab === 'changelog'
+          ? [
+              <FlatButton
+                key="see-all"
+                label={<Trans>See all release notes</Trans>}
+                primary={false}
+                onClick={openReleaseNote}
+              />,
+            ]
+          : undefined
+      }
       onRequestClose={onClose}
       open
       maxWidth="sm"

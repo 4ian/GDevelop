@@ -146,7 +146,7 @@ export class PixiTileMapHelper {
         (displayMode === "index" && layerIndex !== layer.id) ||
         (displayMode === "visible" && !layer.isVisible())
       ) {
-        return;
+        continue;
       }
 
       if (layer instanceof EditableObjectLayer) {

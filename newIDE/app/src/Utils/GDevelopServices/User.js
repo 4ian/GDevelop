@@ -14,6 +14,11 @@ export type UserPublicProfileByIds = {|
   [key: string]: UserPublicProfile,
 |};
 
+export type UsernameAvailability = {|
+  username: string,
+  isAvailable: boolean,
+|};
+
 export const searchCreatorPublicProfilesByUsername = (
   searchString: string
 ): Promise<Array<UserPublicProfile>> => {
@@ -50,5 +55,13 @@ export const getUserPublicProfile = (
 ): Promise<UserPublicProfile> => {
   return axios
     .get(`${GDevelopUserApi.baseUrl}/user-public-profile/${id}`)
+    .then(response => response.data);
+};
+
+export const getUsernameAvailability = (
+  username: string
+): Promise<UsernameAvailability> => {
+  return axios
+    .get(`${GDevelopUserApi.baseUrl}/username-availability/${username}`)
     .then(response => response.data);
 };

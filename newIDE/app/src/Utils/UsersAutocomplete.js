@@ -5,7 +5,7 @@ import { t } from '@lingui/macro';
 import { useDebounce } from './UseDebounce';
 import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
 import {
-  searchUserPublicProfilesByUsername,
+  searchCreatorPublicProfilesByUsername,
   type UserPublicProfile,
   getUserPublicProfilesByIds,
 } from './GDevelopServices/User';
@@ -51,7 +51,7 @@ export const UsersAutocomplete = ({
     }
     try {
       setLoading(true);
-      const userPublicProfiles = await searchUserPublicProfilesByUsername(
+      const userPublicProfiles = await searchCreatorPublicProfilesByUsername(
         userInput
       );
       setCompletionUserPublicProfiles(userPublicProfiles);

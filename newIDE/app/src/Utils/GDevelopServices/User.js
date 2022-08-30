@@ -14,13 +14,14 @@ export type UserPublicProfileByIds = {|
   [key: string]: UserPublicProfile,
 |};
 
-export const searchUserPublicProfilesByUsername = (
+export const searchCreatorPublicProfilesByUsername = (
   searchString: string
 ): Promise<Array<UserPublicProfile>> => {
   return axios
     .get(`${GDevelopUserApi.baseUrl}/user-public-profile/search`, {
       params: {
         username: searchString,
+        type: 'creator',
       },
     })
     .then(response => response.data);

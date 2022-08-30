@@ -33,6 +33,13 @@ const gd: libGDevelop = global.gd;
 
 const PROJECT_JSON_FILENAME = 'game.json';
 
+// For some reason, `path.posix` is undefined when packaged
+// with webpack, so we're using `path` directly. As it's for the web-app,
+// it should always be the posix version. In tests on Windows,
+// it's necessary to use path.posix.
+// Search for "pathPosix" in the codebase for other places where this is used.
+const pathPosix = path.posix || path;
+
 const isURL = (filename: string) => {
   return (
     filename.startsWith('http://') ||
@@ -128,15 +135,15 @@ export const downloadResourcesAsBlobs = async ({
     }
 
     // Ensure each filename is unique, and sort resources in folder by types.
-    const extension = path.extname(filename);
-    const basename = path.basename(filename, extension);
+    const extension = pathPosix.extname(filename);
+    const basename = pathPosix.basename(filename, extension);
     const pathPrefix = 'assets/' + resource.getKind();
     const newBasename = newNameGenerator(basename, tentativeBasename =>
       alreadyUsedFilenames.has(
-        path.join(pathPrefix, tentativeBasename + extension)
+        pathPosix.join(pathPrefix, tentativeBasename + extension)
       )
     );
-    const newResourcePath = path.join(pathPrefix, newBasename + extension);
+    const newResourcePath = pathPosix.join(pathPrefix, newBasename + extension);
     alreadyUsedFilenames.add(newResourcePath);
 
     resource.setFile(newResourcePath);

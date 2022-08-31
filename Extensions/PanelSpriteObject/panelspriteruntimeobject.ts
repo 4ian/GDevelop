@@ -100,7 +100,7 @@ namespace gdjs {
         updateTexture = true;
       }
       if (updateTexture) {
-        this.setTexture(newObjectData.texture, this._runtimeScene);
+        this.setTexture(newObjectData.texture, this.getRuntimeScene());
       }
       if (oldObjectData.tiled !== newObjectData.tiled) {
         return false;

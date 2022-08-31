@@ -23,7 +23,7 @@ namespace gdjs {
     _cachedGameResolutionWidth: integer;
     _cachedGameResolutionHeight: integer;
 
-    _runtimeScene: gdjs.RuntimeScene;
+    _runtimeInstancesContainer: gdjs.RuntimeInstancesContainer;
     _effectsManager: gdjs.EffectsManager;
 
     // Lighting layer properties.
@@ -36,22 +36,29 @@ namespace gdjs {
 
     /**
      * @param layerData The data used to initialize the layer
-     * @param runtimeScene The scene in which the layer is used
+     * @param runtimeInstancesContainer The scene in which the layer is used
      */
-    constructor(layerData: LayerData, runtimeScene: gdjs.RuntimeScene) {
+    constructor(
+      layerData: LayerData,
+      runtimeInstancesContainer: gdjs.RuntimeInstancesContainer
+    ) {
       this._name = layerData.name;
       this._hidden = !layerData.visibility;
       this._initialEffectsData = layerData.effects || [];
-      this._cameraX = runtimeScene.getGame().getGameResolutionWidth() / 2;
-      this._cameraY = runtimeScene.getGame().getGameResolutionHeight() / 2;
-      this._cachedGameResolutionWidth = runtimeScene
+      this._cameraX =
+        runtimeInstancesContainer.getGame().getGameResolutionWidth() / 2;
+      this._cameraY =
+        runtimeInstancesContainer.getGame().getGameResolutionHeight() / 2;
+      this._cachedGameResolutionWidth = runtimeInstancesContainer
         .getGame()
         .getGameResolutionWidth();
-      this._cachedGameResolutionHeight = runtimeScene
+      this._cachedGameResolutionHeight = runtimeInstancesContainer
         .getGame()
         .getGameResolutionHeight();
-      this._runtimeScene = runtimeScene;
-      this._effectsManager = runtimeScene.getGame().getEffectsManager();
+      this._runtimeInstancesContainer = runtimeInstancesContainer;
+      this._effectsManager = runtimeInstancesContainer
+        .getGame()
+        .getEffectsManager();
       this._isLightingLayer = layerData.isLightingLayer;
       this._followBaseLayerCamera = layerData.followBaseLayerCamera;
       this._clearColor = [
@@ -60,7 +67,10 @@ namespace gdjs {
         layerData.ambientLightColorB / 255,
         1.0,
       ];
-      this._renderer = new gdjs.LayerRenderer(this, runtimeScene.getRenderer());
+      this._renderer = new gdjs.LayerRenderer(
+        this,
+        runtimeInstancesContainer.getRenderer()
+      );
       this.show(!this._hidden);
       for (let i = 0; i < layerData.effects.length; ++i) {
         this.addEffect(layerData.effects[i]);
@@ -105,10 +115,10 @@ namespace gdjs {
     onGameResolutionResized(): void {
       const oldGameResolutionWidth = this._cachedGameResolutionWidth;
       const oldGameResolutionHeight = this._cachedGameResolutionHeight;
-      this._cachedGameResolutionWidth = this._runtimeScene
+      this._cachedGameResolutionWidth = this._runtimeInstancesContainer
         .getGame()
         .getGameResolutionWidth();
-      this._cachedGameResolutionHeight = this._runtimeScene
+      this._cachedGameResolutionHeight = this._runtimeInstancesContainer
         .getGame()
         .getGameResolutionHeight();
 
@@ -131,13 +141,13 @@ namespace gdjs {
      * @returns the scene the layer belongs to
      */
     getRuntimeScene(): gdjs.RuntimeScene {
-      return this._runtimeScene;
+      return this._runtimeInstancesContainer.getScene();
     }
 
     /**
      * Called at each frame, after events are run and before rendering.
      */
-    updatePreRender(runtimeScene?: gdjs.RuntimeScene): void {
+    updatePreRender(runtimeScene?: gdjs.RuntimeInstancesContainer): void {
       if (this._followBaseLayerCamera) {
         this.followBaseLayer();
       }
@@ -478,15 +488,15 @@ namespace gdjs {
      * in milliseconds, for objects on the layer.
      */
     getElapsedTime(runtimeScene?: RuntimeScene): float {
-      runtimeScene = runtimeScene || this._runtimeScene;
-      return runtimeScene.getTimeManager().getElapsedTime() * this._timeScale;
+      const instanceContainer = runtimeScene || this._runtimeInstancesContainer;
+      return instanceContainer.getElapsedTime() * this._timeScale;
     }
 
     /**
      * Change the position, rotation and scale (zoom) of the layer camera to be the same as the base layer camera.
      */
     followBaseLayer(): void {
-      const baseLayer = this._runtimeScene.getLayer('');
+      const baseLayer = this._runtimeInstancesContainer.getLayer('');
       this.setCameraX(baseLayer.getCameraX());
       this.setCameraY(baseLayer.getCameraY());
       this.setCameraRotation(baseLayer.getCameraRotation());

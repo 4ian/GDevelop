@@ -54,7 +54,7 @@ namespace gdjs {
 
     updateFromObjectData(oldObjectData, newObjectData): boolean {
       if (oldObjectData.texture !== newObjectData.texture) {
-        this.setTexture(newObjectData.texture, this._runtimeScene);
+        this.setTexture(newObjectData.texture, this.getRuntimeScene());
       }
       if (oldObjectData.width !== newObjectData.width) {
         this.setWidth(newObjectData.width);

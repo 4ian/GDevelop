@@ -357,6 +357,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       loginInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -378,6 +379,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       editInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -410,6 +412,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       createAccountInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -445,6 +448,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       forgotPasswordInProgress: true,
+      authError: null,
     });
     try {
       await authentication.forgotPassword(form);
@@ -474,6 +478,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       editInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -496,6 +501,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       changeEmailInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -586,7 +592,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                   profile={this.state.authenticatedUser.profile}
                   onClose={() => this.openEditProfileDialog(false)}
                   onEdit={form => this._doEdit(form, preferences)}
-                  editInProgress={this.state.editInProgress}
+                  updateProfileInProgress={this.state.editInProgress}
                   error={this.state.authError}
                 />
               )}

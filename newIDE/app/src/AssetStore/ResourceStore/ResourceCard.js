@@ -59,6 +59,7 @@ type ImageCardProps = {|
   size: number,
   resource: Resource,
   onChoose: () => void,
+  removeThemeFilterAppliedOnBackground?: boolean,
   imageStyle?: {|
     width: number,
     height: number,
@@ -70,12 +71,21 @@ const ImageCard = ({
   onChoose,
   size,
   imageStyle,
+  removeThemeFilterAppliedOnBackground,
 }: ImageCardProps) => {
   return (
     <ButtonBase onClick={onChoose} focusRipple>
       <div style={{ ...styles.cardContainer, width: size, height: size }}>
         <div style={{ ...styles.previewContainer, width: size, height: size }}>
-          <CheckeredBackground />
+          <CheckeredBackground
+            style={
+              removeThemeFilterAppliedOnBackground
+                ? {
+                    filter: 'unset',
+                  }
+                : undefined
+            }
+          />
           <CorsAwareImage
             key={resource.url}
             style={{
@@ -148,6 +158,7 @@ export const ResourceCard = ({ resource, onChoose, size }: Props) => {
           onChoose={onChoose}
           size={size}
           imageStyle={styles.previewIcon}
+          removeThemeFilterAppliedOnBackground // All svg are black and hard to see on background darken by the theme filter so we prefer using the raw checkered background that is quite light #nofilter
         />
       );
     case 'audio':

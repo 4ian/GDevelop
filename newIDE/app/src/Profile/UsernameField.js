@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
+import CircularProgress from '../UI/CircularProgress';
 import TextField from '../UI/TextField';
 import {
   getUsernameAvailability,
@@ -8,15 +9,12 @@ import {
 } from '../Utils/GDevelopServices/User';
 import { useDebounce } from '../Utils/UseDebounce';
 
-type Props = {|
-  initialUsername?: ?string,
-  value: string,
-  onChange: (event: {| target: {| value: string |} |}, value: string) => void,
-  onAvailabilityCheckLoading: boolean => void,
-  onAvailabilityChecked: (?UsernameAvailability) => void,
-  errorText?: ?string,
-  allowEmpty?: boolean,
-|};
+const styles = {
+  circularProgress: {
+    height: 20,
+    width: 20,
+  },
+};
 
 export const isUsernameValid = (
   username: string,
@@ -26,11 +24,27 @@ export const isUsernameValid = (
   return !!username && /^[\w|-]+$/.test(username) && username.length < 31;
 };
 
-export const usernameFormatErrorMessage =
-  'Please pick a short username with only alphanumeric characters as well as _ and -';
+export const usernameFormatErrorMessage = (
+  <Trans>
+    Please pick a short username with only alphanumeric characters as well as _
+    and -
+  </Trans>
+);
 
-const usernameAvailabilityErrorMessage =
-  'This username is already used, please pick another one.';
+export const usernameAvailabilityErrorMessage = (
+  <Trans>This username is already used, please pick another one.</Trans>
+);
+
+type Props = {|
+  initialUsername?: ?string,
+  value: string,
+  onChange: (event: {| target: {| value: string |} |}, value: string) => void,
+  isValidatingUsername: boolean,
+  onAvailabilityCheckLoading: boolean => void,
+  onAvailabilityChecked: (?UsernameAvailability) => void,
+  errorText?: ?React.Node,
+  allowEmpty?: boolean,
+|};
 
 export const UsernameField = ({
   initialUsername,
@@ -40,26 +54,25 @@ export const UsernameField = ({
   allowEmpty,
   onAvailabilityChecked,
   onAvailabilityCheckLoading,
+  isValidatingUsername,
 }: Props) => {
-  const usernameFormattingError = React.useMemo(
-    () =>
-      isUsernameValid(value, { allowEmpty: !!allowEmpty })
-        ? undefined
-        : usernameFormatErrorMessage,
-    [value, allowEmpty]
-  );
+  const usernameFormattingError = isUsernameValid(value, {
+    allowEmpty: !!allowEmpty,
+  })
+    ? undefined
+    : usernameFormatErrorMessage;
 
   const [
     usernameAvailabilityError,
     setUsernameAvailabilityError,
-  ] = React.useState<?string>(null);
+  ] = React.useState<?React.Node>(null);
 
   const updateUsernameAvailability = ({
     usernameAvailability,
     error,
   }: {
-    usernameAvailability: UsernameAvailability | null,
-    error: string | null,
+    usernameAvailability: ?UsernameAvailability,
+    error: ?React.Node,
   }) => {
     onAvailabilityChecked(usernameAvailability);
     setUsernameAvailabilityError(error);
@@ -91,12 +104,7 @@ export const UsernameField = ({
       const usernameAvailability = await getUsernameAvailability(username);
 
       if (!usernameAvailability) {
-        console.error('Unable to check username availability.');
-        // Do not block user creation.
-        updateUsernameAvailability({
-          usernameAvailability: null,
-          error: null,
-        });
+        throw new Error('Could not get username availability.');
       } else {
         updateUsernameAvailability({
           usernameAvailability,
@@ -106,7 +114,7 @@ export const UsernameField = ({
         });
       }
     } catch (error) {
-      console.error('Unable to check username availability.');
+      console.error('Unable to check username availability.', error);
       // Do not block user creation.
       updateUsernameAvailability({
         usernameAvailability: null,
@@ -136,6 +144,11 @@ export const UsernameField = ({
       }}
       errorText={
         usernameFormattingError || usernameAvailabilityError || errorText
+      }
+      endAdornment={
+        isValidatingUsername && (
+          <CircularProgress style={styles.circularProgress} />
+        )
       }
     />
   );

@@ -592,7 +592,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                   profile={this.state.authenticatedUser.profile}
                   onClose={() => this.openEditProfileDialog(false)}
                   onEdit={form => this._doEdit(form, preferences)}
-                  editInProgress={this.state.editInProgress}
+                  updateProfileInProgress={this.state.editInProgress}
                   error={this.state.authError}
                 />
               )}

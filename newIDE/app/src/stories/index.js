@@ -3233,7 +3233,7 @@ storiesOf('Profile/EditProfileDialog', module)
         isPlayer: false,
       }}
       onClose={action('on close')}
-      editInProgress={false}
+      updateProfileInProgress={false}
       onEdit={action('on edit')}
       error={null}
     />
@@ -3250,7 +3250,7 @@ storiesOf('Profile/EditProfileDialog', module)
         isPlayer: false,
       }}
       onClose={action('on close')}
-      editInProgress={false}
+      updateProfileInProgress={false}
       onEdit={action('on edit')}
       error={{ code: 'auth/username-used' }}
     />
@@ -3267,7 +3267,7 @@ storiesOf('Profile/EditProfileDialog', module)
         isPlayer: false,
       }}
       onClose={action('on close')}
-      editInProgress
+      updateProfileInProgress
       onEdit={action('on edit')}
       error={null}
     />

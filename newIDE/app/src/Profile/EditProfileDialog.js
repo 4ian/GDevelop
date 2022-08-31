@@ -16,6 +16,7 @@ import {
   isUsernameValid,
   UsernameField,
   usernameFormatErrorMessage,
+  usernameAvailabilityErrorMessage,
 } from './UsernameField';
 import TextField from '../UI/TextField';
 import Checkbox from '../UI/Checkbox';
@@ -24,7 +25,7 @@ type Props = {|
   profile: Profile,
   onClose: () => void,
   onEdit: (form: EditForm) => Promise<void>,
-  editInProgress: boolean,
+  updateProfileInProgress: boolean,
   error: ?AuthError,
 |};
 
@@ -32,17 +33,17 @@ export const getUsernameErrorText = (error: ?AuthError) => {
   if (!error) return undefined;
 
   if (error.code === 'auth/username-used')
-    return 'This username is already used, please pick another one.';
+    return usernameAvailabilityErrorMessage;
   if (error.code === 'auth/malformed-username')
     return usernameFormatErrorMessage;
   return undefined;
 };
 
-const EditDialog = ({
+const EditProfileDialog = ({
   profile,
   onClose,
   onEdit,
-  editInProgress,
+  updateProfileInProgress,
   error,
 }: Props) => {
   const [username, setUsername] = React.useState(profile.username || '');
@@ -61,14 +62,11 @@ const EditDialog = ({
     setIsValidatingUsername,
   ] = React.useState<boolean>(false);
 
-  const canEdit = React.useMemo(
-    () =>
-      !editInProgress &&
-      isUsernameValid(username, { allowEmpty: false }) &&
-      !isValidatingUsername &&
-      (!usernameAvailability || usernameAvailability.isAvailable),
-    [editInProgress, username, isValidatingUsername, usernameAvailability]
-  );
+  const canEdit =
+    !updateProfileInProgress &&
+    isUsernameValid(username, { allowEmpty: false }) &&
+    !isValidatingUsername &&
+    (!usernameAvailability || usernameAvailability.isAvailable);
 
   const edit = () => {
     if (!canEdit) return;
@@ -82,12 +80,12 @@ const EditDialog = ({
   const actions = [
     <FlatButton
       label={<Trans>Back</Trans>}
-      disabled={editInProgress}
+      disabled={updateProfileInProgress}
       key="back"
       primary={false}
       onClick={onClose}
     />,
-    <LeftLoader isLoading={editInProgress || isValidatingUsername} key="edit">
+    <LeftLoader isLoading={updateProfileInProgress} key="edit">
       <DialogPrimaryButton
         label={<Trans>Save</Trans>}
         primary
@@ -102,7 +100,7 @@ const EditDialog = ({
       title={<Trans>Edit your GDevelop profile</Trans>}
       actions={actions}
       maxWidth="sm"
-      cannotBeDismissed={editInProgress}
+      cannotBeDismissed={updateProfileInProgress}
       onRequestClose={onClose}
       onApply={edit}
       open
@@ -115,12 +113,9 @@ const EditDialog = ({
             setUsername(value);
           }}
           errorText={getUsernameErrorText(error)}
-          onAvailabilityChecked={(
-            usernameAvailability: ?UsernameAvailability
-          ) => {
-            setUsernameAvailability(usernameAvailability);
-          }}
+          onAvailabilityChecked={setUsernameAvailability}
           onAvailabilityCheckLoading={setIsValidatingUsername}
+          isValidatingUsername={isValidatingUsername}
         />
         <TextField
           value={description}
@@ -146,4 +141,4 @@ const EditDialog = ({
   );
 };
 
-export default EditDialog;
+export default EditProfileDialog;

@@ -92,30 +92,20 @@ const CreateAccountDialog = ({
     setIsValidatingUsername,
   ] = React.useState<boolean>(false);
 
-  const canCreateAccount = React.useMemo(
-    () =>
-      !createAccountInProgress &&
-      isUsernameValid(username, { allowEmpty: true }) &&
-      !isValidatingUsername &&
-      (!usernameAvailability || usernameAvailability.isAvailable),
-    [
+  const canCreateAccount =
+    !createAccountInProgress &&
+    isUsernameValid(username, { allowEmpty: true }) &&
+    !isValidatingUsername &&
+    (!usernameAvailability || usernameAvailability.isAvailable);
+
+  const createAccount = () => {
+    if (!canCreateAccount) return;
+    onCreateAccount({
+      email,
+      password,
       username,
-      createAccountInProgress,
-      isValidatingUsername,
-      usernameAvailability,
-    ]
-  );
-  const createAccount = React.useCallback(
-    () => {
-      if (!canCreateAccount) return;
-      onCreateAccount({
-        email,
-        password,
-        username,
-      });
-    },
-    [canCreateAccount, onCreateAccount, email, password, username]
-  );
+    });
+  };
 
   return (
     <Dialog
@@ -128,10 +118,7 @@ const CreateAccountDialog = ({
           primary={false}
           onClick={onClose}
         />,
-        <LeftLoader
-          isLoading={createAccountInProgress || isValidatingUsername}
-          key="create-account"
-        >
+        <LeftLoader isLoading={createAccountInProgress} key="create-account">
           <DialogPrimaryButton
             label={<Trans>Create my account</Trans>}
             primary
@@ -167,18 +154,11 @@ const CreateAccountDialog = ({
           value={username}
           onChange={(e, value) => {
             setUsername(value);
-            if (!value) {
-              // User can create an account without a username.
-              setUsernameAvailability(null);
-            }
           }}
           allowEmpty
-          onAvailabilityChecked={(
-            usernameAvailability: ?UsernameAvailability
-          ) => {
-            setUsernameAvailability(usernameAvailability);
-          }}
+          onAvailabilityChecked={setUsernameAvailability}
           onAvailabilityCheckLoading={setIsValidatingUsername}
+          isValidatingUsername={isValidatingUsername}
         />
         <TextField
           value={email}

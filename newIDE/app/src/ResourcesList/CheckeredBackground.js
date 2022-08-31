@@ -3,7 +3,7 @@ import * as React from 'react';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
 type Props = {|
-  style?: Object,
+  style?: {| filter?: 'unset' |},
 |};
 
 /**

@@ -231,7 +231,10 @@ namespace gdjs {
       if (
         oldObjectData.textureParticleName !== newObjectData.textureParticleName
       ) {
-        this.setTexture(newObjectData.textureParticleName, this._runtimeScene);
+        this.setTexture(
+          newObjectData.textureParticleName,
+          this.getRuntimeScene()
+        );
       }
       if (oldObjectData.flow !== newObjectData.flow) {
         this.setFlow(newObjectData.flow);
@@ -267,7 +270,7 @@ namespace gdjs {
 
         // and recreate the renderer, which will add itself to the layer.
         this._renderer = new gdjs.ParticleEmitterObjectRenderer(
-          this._runtimeScene,
+          this.getInstancesContainer(),
           this,
           newObjectData
         );

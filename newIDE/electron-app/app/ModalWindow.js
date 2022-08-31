@@ -36,6 +36,10 @@ const loadModalWindow = ({
     backgroundColor,
     modal: true,
     center: true,
+    // Hide top bar to hide close button (needed on Linux) so that
+    // one cannot close the modal window without using Save or Cancel
+    // buttons (and lose work on Piskel for instance) (Workaround for #4245).
+    frame: false,
     webPreferences: {
       webSecurity: false,
       // Allow Node.js API access in renderer process, as long

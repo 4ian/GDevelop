@@ -12,7 +12,7 @@ namespace gdjs {
     started: boolean = false;
 
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instancesContainer: gdjs.RuntimeInstancesContainer,
       runtimeObject: gdjs.RuntimeObject,
       objectData: any
     ) {
@@ -40,7 +40,7 @@ namespace gdjs {
         );
       } else if (objectData.textureParticleName) {
         const sprite = new PIXI.Sprite(
-          (runtimeScene
+          (instancesContainer
             .getGame()
             .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
             objectData.textureParticleName
@@ -62,7 +62,7 @@ namespace gdjs {
       // Render the texture from graphics using the PIXI Renderer.
       // TODO: could be optimized by generating the texture only once per object type,
       // instead of at each object creation.
-      const pixiRenderer = runtimeScene
+      const pixiRenderer = instancesContainer
         .getGame()
         .getRenderer()
         .getPIXIRenderer();
@@ -167,7 +167,7 @@ namespace gdjs {
       // @ts-ignore
       this.emitter = new PIXI.particles.Emitter(this.renderer, texture, config);
       this.start();
-      const layer = runtimeScene.getLayer(runtimeObject.getLayer());
+      const layer = instancesContainer.getLayer(runtimeObject.getLayer());
       if (layer) {
         layer
           .getRenderer()

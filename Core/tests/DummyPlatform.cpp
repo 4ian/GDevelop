@@ -8,6 +8,7 @@
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/ObjectConfiguration.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
@@ -215,7 +216,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("objectvar", _("Variable for object 2"))
       .SetFunctionName("getStringWith1ObjectParamAnd2ObjectVarParam");
 
-  auto& object = extension->AddObject<gd::ObjectConfiguration>(
+  auto& object = extension->AddObject<gd::SpriteObject>(
       "Sprite", "Dummy Sprite", "Dummy sprite object", "");
   object
       .AddExpression("GetObjectVariableAsNumber",

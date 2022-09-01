@@ -28,7 +28,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   extension.AddInstructionOrExpressionGroupMetadata(_("Movement using forces"))
       .SetIcon("res/actions/force24.png");
 
-  gd::ObjectMetadata& obj = extension.AddObject<gd::Object>(
+  gd::ObjectMetadata& obj = extension.AddObject<gd::ObjectConfiguration>(
       "", _("Base object"), _("Base object"), "res/objeticon24.png");
 
   obj.AddCondition("PosX",

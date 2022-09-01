@@ -14,13 +14,15 @@ export default class TiledSpriteEditor extends React.Component<
 > {
   render() {
     const {
-      object,
+      objectConfiguration,
       project,
       resourceSources,
       onChooseResource,
       resourceExternalEditors,
     } = this.props;
-    const tiledSpriteObject = gd.asTiledSpriteObject(object);
+    const tiledSpriteConfiguration = gd.asTiledSpriteConfiguration(
+      objectConfiguration
+    );
 
     return (
       <ColumnStackLayout>
@@ -29,10 +31,10 @@ export default class TiledSpriteEditor extends React.Component<
           resourceSources={resourceSources}
           onChooseResource={onChooseResource}
           resourceKind="image"
-          resourceName={tiledSpriteObject.getTexture()}
+          resourceName={tiledSpriteConfiguration.getTexture()}
           resourceExternalEditors={resourceExternalEditors}
           onChange={resourceName => {
-            tiledSpriteObject.setTexture(resourceName);
+            tiledSpriteConfiguration.setTexture(resourceName);
             this.forceUpdate();
           }}
           floatingLabelText={<Trans>Select an image</Trans>}
@@ -43,9 +45,9 @@ export default class TiledSpriteEditor extends React.Component<
             floatingLabelText={<Trans>Default width (in pixels)</Trans>}
             fullWidth
             type="number"
-            value={tiledSpriteObject.getWidth()}
+            value={tiledSpriteConfiguration.getWidth()}
             onChange={value => {
-              tiledSpriteObject.setWidth(parseInt(value, 10) || 0);
+              tiledSpriteConfiguration.setWidth(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />
@@ -54,9 +56,9 @@ export default class TiledSpriteEditor extends React.Component<
             floatingLabelText={<Trans>Default height (in pixels)</Trans>}
             fullWidth
             type="number"
-            value={tiledSpriteObject.getHeight()}
+            value={tiledSpriteConfiguration.getHeight()}
             onChange={value => {
-              tiledSpriteObject.setHeight(parseInt(value, 10) || 0);
+              tiledSpriteConfiguration.setHeight(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
           />

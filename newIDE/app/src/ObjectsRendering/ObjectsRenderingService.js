@@ -7,6 +7,7 @@ import RenderedTextInstance from './Renderers/RenderedTextInstance';
 import RenderedShapePainterInstance from './Renderers/RenderedShapePainterInstance';
 import RenderedTextEntryInstance from './Renderers/RenderedTextEntryInstance';
 import RenderedParticleEmitterInstance from './Renderers/RenderedParticleEmitterInstance';
+import RenderedCustomObjectInstance from './Renderers/RenderedCustomObjectInstance';
 import PixiResourcesLoader from './PixiResourcesLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import RenderedInstance from './Renderers/RenderedInstance';
@@ -44,6 +45,7 @@ const ObjectsRenderingService = {
   },
   getThumbnail: function(project: gdProject, object: gdObject) {
     var objectType = object.getType();
+    console.log(objectType);
     if (this.renderers.hasOwnProperty(objectType))
       return this.renderers[objectType].getThumbnail(
         project,
@@ -61,22 +63,33 @@ const ObjectsRenderingService = {
     project: gdProject,
     layout: gdLayout,
     instance: gdInitialInstance,
-    associatedObject: gdObject,
+    associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: any,
     pixiRenderer: PIXI.Renderer
-  ) {
-    var objectType = associatedObject.getType();
+  ): RenderedInstance {
+    var objectType = associatedObjectConfiguration.getType();
     if (this.renderers.hasOwnProperty(objectType))
       return new this.renderers[objectType](
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         PixiResourcesLoader,
         pixiRenderer
       );
     else {
+      if (project.hasEventsBasedObject(objectType)) {
+        return new RenderedCustomObjectInstance(
+          project,
+          layout,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          PixiResourcesLoader
+        );
+      }
+
       console.warn(
         `Object with type ${objectType} has no instance renderer registered. Please use registerInstanceRenderer to register your renderer.`
       );
@@ -84,7 +97,7 @@ const ObjectsRenderingService = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         PixiResourcesLoader,
         pixiRenderer

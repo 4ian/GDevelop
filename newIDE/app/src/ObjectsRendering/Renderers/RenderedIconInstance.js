@@ -14,7 +14,7 @@ export default function makeRenderer(iconPath) {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -22,7 +22,7 @@ export default function makeRenderer(iconPath) {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );

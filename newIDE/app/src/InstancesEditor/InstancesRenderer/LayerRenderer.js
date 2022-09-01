@@ -264,7 +264,7 @@ export default class LayerRenderer {
         this.project,
         this.layout,
         instance,
-        associatedObject,
+        associatedObject.getConfiguration(),
         this.pixiContainer,
         this.pixiRenderer
       );

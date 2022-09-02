@@ -570,6 +570,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "runtimebehavior.js");
   InsertUnique(includesFiles, "spriteruntimeobject.js");
   InsertUnique(includesFiles, "affinetransformation.js");
+  InsertUnique(includesFiles, "CustomRuntimeObjectInstancesContainer.js");
+  InsertUnique(includesFiles, "CustomRuntimeObject.js");
 
   // Common includes for events only.
   InsertUnique(includesFiles, "events-tools/commontools.js");
@@ -616,6 +618,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "pixi-renderers/pixi-bitmapfont-manager.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/spriteruntimeobject-pixi-renderer.js");
+    InsertUnique(includesFiles,
+                 "pixi-renderers/CustomObjectPixiRenderer.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/loadingscreen-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-effects-manager.js");

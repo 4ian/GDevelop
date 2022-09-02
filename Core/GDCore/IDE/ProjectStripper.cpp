@@ -21,7 +21,7 @@ void GD_CORE_API ProjectStripper::StripProjectForExport(gd::Project& project) {
     project.GetLayout(i).GetObjectGroups().Clear();
     project.GetLayout(i).GetEvents().Clear();
   }
-
+  // TODO EBO Keep the EventsBasedObject object list or save the object type in the configurations.
   project.ClearEventsFunctionsExtensions();
 }
 

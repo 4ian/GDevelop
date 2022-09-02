@@ -56,11 +56,7 @@ describe('libGD.js object serialization', function() {
   describe('gd.Serializer', function() {
     it('should serialize a Text Object', function() {
       var obj = new gd.TextObject('testObject');
-      obj.setType('TextObject::Text');
-      obj.setName('testObject');
       obj.setString('Text of the object, with 官话 characters');
-      obj.setTags('inventory, player');
-      obj.setAssetStoreId('1234');
 
       var serializedObject = new gd.SerializerElement();
       obj.serializeTo(serializedObject);
@@ -69,7 +65,7 @@ describe('libGD.js object serialization', function() {
       obj.delete();
 
       expect(jsonObject).toBe(
-        '{"assetStoreId":"1234","bold":false,"italic":false,"name":"testObject","smoothed":true,"tags":"inventory, player","type":"TextObject::Text","underlined":false,"variables":[],"effects":[],"behaviors":[],"string":"Text of the object, with 官话 characters","font":"","characterSize":20.0,"color":{"b":0,"g":0,"r":0}}'
+        '{"bold":false,"italic":false,"smoothed":true,"underlined":false,"string":"Text of the object, with 官话 characters","font":"","characterSize":20.0,"color":{"b":0,"g":0,"r":0}}'
       );
     });
   });

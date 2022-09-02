@@ -7,7 +7,7 @@ const addNewAnimationWithImageToSpriteObject = (
   object: gdObject,
   imageName: string
 ) => {
-  const spriteObject = gd.asSpriteObject(object);
+  const spriteObject = gd.asSpriteConfiguration(object.getConfiguration());
 
   const animation = new gd.Animation();
   animation.setDirectionsCount(1);
@@ -99,7 +99,7 @@ describe('ResourceUtils', () => {
     // Verify renaming was done in objects and in events.
     expect(
       gd
-        .asSpriteObject(globalObject)
+        .asSpriteConfiguration(globalObject.getConfiguration())
         .getAnimation(0)
         .getDirection(0)
         .getSprite(0)
@@ -107,7 +107,7 @@ describe('ResourceUtils', () => {
     ).toBe('Image1');
     expect(
       gd
-        .asSpriteObject(object)
+        .asSpriteConfiguration(object.getConfiguration())
         .getAnimation(0)
         .getDirection(0)
         .getSprite(0)

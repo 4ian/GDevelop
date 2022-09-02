@@ -21,6 +21,7 @@ const defaultProps = {
     username: 'username',
     description: 'I am just another video game enthusiast!',
     getGameStatsEmail: false,
+    getNewsletterEmail: true,
     isCreator: true,
     isPlayer: false,
   },

@@ -21,6 +21,7 @@ import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 const indieUserProfileWithGameStatsEmail: Profile = {
   ...indieUserProfile,
   getGameStatsEmail: true,
+  getNewsletterEmail: true,
 };
 
 export default {

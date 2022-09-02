@@ -53,6 +53,9 @@ const EditProfileDialog = ({
   const [getGameStatsEmail, setGetGameStatsEmail] = React.useState(
     !!profile.getGameStatsEmail
   );
+  const [getNewsletterEmail, setGetNewsletterEmail] = React.useState(
+    !!profile.getNewsletterEmail
+  );
   const [
     usernameAvailability,
     setUsernameAvailability,
@@ -74,6 +77,7 @@ const EditProfileDialog = ({
       username,
       description,
       getGameStatsEmail,
+      getNewsletterEmail,
     });
   };
 
@@ -134,6 +138,13 @@ const EditProfileDialog = ({
           checked={getGameStatsEmail}
           onCheck={(e, value) => {
             setGetGameStatsEmail(value);
+          }}
+        />
+        <Checkbox
+          label={<Trans>I want to receive the GDevelop Newsletter</Trans>}
+          checked={getNewsletterEmail}
+          onCheck={(e, value) => {
+            setGetNewsletterEmail(value);
           }}
         />
       </ColumnStackLayout>

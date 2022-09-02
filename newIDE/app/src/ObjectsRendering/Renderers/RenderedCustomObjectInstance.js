@@ -8,7 +8,7 @@ import * as PIXI from 'pixi.js-legacy';
 
 const gd: libGDevelop = global.gd;
 
-// TODO Make an event-based object instance editor (like the one for the scene)
+// TODO EBO Make an event-based object instance editor (like the one for the scene)
 // and use real instances instead of this.
 class ChildInstance {
   x: number;

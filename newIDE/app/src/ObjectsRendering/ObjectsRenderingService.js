@@ -44,8 +44,7 @@ const ObjectsRenderingService = {
     'ParticleSystem::ParticleEmitter': RenderedParticleEmitterInstance,
   },
   getThumbnail: function(project: gdProject, object: gdObject) {
-    var objectType = object.getType();
-    console.log(objectType);
+    const objectType = object.getType();
     if (this.renderers.hasOwnProperty(objectType))
       return this.renderers[objectType].getThumbnail(
         project,
@@ -67,7 +66,7 @@ const ObjectsRenderingService = {
     pixiContainer: any,
     pixiRenderer: PIXI.Renderer
   ): RenderedInstance {
-    var objectType = associatedObjectConfiguration.getType();
+    const objectType = associatedObjectConfiguration.getType();
     if (this.renderers.hasOwnProperty(objectType))
       return new this.renderers[objectType](
         project,

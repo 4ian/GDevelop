@@ -389,6 +389,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           username: form.username,
           description: form.description,
           getGameStatsEmail: form.getGameStatsEmail,
+          getNewsletterEmail: form.getNewsletterEmail,
           appLanguage: preferences.language,
         }
       );
@@ -483,6 +484,29 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = false;
     try {
       await authentication.acceptGameStatsEmail(
+        authentication.getAuthorizationHeader
+      );
+      await this._fetchUserProfileWithoutThrowingErrors();
+    } catch (authError) {
+      this.setState({ authError });
+    }
+    this.setState({
+      editInProgress: false,
+    });
+    this._automaticallyUpdateUserProfile = true;
+  };
+
+  _doAcceptNewsletterEmail = async () => {
+    const { authentication } = this.props;
+    if (!authentication) return;
+
+    this.setState({
+      editInProgress: true,
+      authError: null,
+    });
+    this._automaticallyUpdateUserProfile = false;
+    try {
+      await authentication.acceptNewsletterEmail(
         authentication.getAuthorizationHeader
       );
       await this._fetchUserProfileWithoutThrowingErrors();

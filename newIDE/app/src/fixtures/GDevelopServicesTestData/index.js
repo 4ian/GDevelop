@@ -63,6 +63,7 @@ export const indieUserProfile: Profile = {
   username: 'im-the-indie-user',
   description: 'Just here to develop indie games',
   getGameStatsEmail: false,
+  getNewsletterEmail: true,
   isCreator: true,
   isPlayer: false,
 };
@@ -330,6 +331,9 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   },
   onAcceptGameStatsEmail: async () => {
     console.info('This should accept receiving game stats email');
+  },
+  onAcceptNewsletterEmail: async () => {
+    console.info('This should accept receiving newsletter email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };

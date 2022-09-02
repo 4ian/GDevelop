@@ -21,6 +21,7 @@ import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 const indieUserProfileWithGameStatsEmail: Profile = {
   ...indieUserProfile,
   getGameStatsEmail: true,
+  getNewsletterEmail: true,
 };
 
 export default {
@@ -43,7 +44,9 @@ const defaultProps: GameRegistrationWidgetProps = {
   hideIfRegistered: false,
   unavailableReason: null,
   acceptGameStatsEmailInProgress: false,
+  acceptNewsletterEmailInProgress: true,
   onAcceptGameStatsEmail: action('onAcceptGameStatsEmail'),
+  onAcceptNewsletterEmail: action('onAcceptNewsletterEmail'),
   detailsInitialTab: 'details',
   setDetailsInitialTab: action('setDetailsInitialTab'),
   detailsOpened: false,

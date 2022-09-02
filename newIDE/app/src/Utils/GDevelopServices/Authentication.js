@@ -22,6 +22,7 @@ export type Profile = {|
   username: ?string,
   description: ?string,
   getGameStatsEmail: boolean,
+  getNewsletterEmail: boolean,
   isCreator: boolean,
   isPlayer: boolean,
 |};
@@ -41,6 +42,7 @@ export type EditForm = {|
   username: string,
   description: string,
   getGameStatsEmail: boolean,
+  getNewsletterEmail: boolean,
 |};
 
 export type ChangeEmailForm = {|
@@ -274,12 +276,14 @@ export default class Authentication {
       username,
       description,
       getGameStatsEmail,
+      getNewsletterEmail,
       appLanguage,
       isCreator,
     }: {
       username?: string,
       description?: string,
       getGameStatsEmail?: boolean,
+      getNewsletterEmail?: boolean,
       appLanguage?: string,
       isCreator?: boolean,
     }
@@ -296,6 +300,7 @@ export default class Authentication {
             username,
             description,
             getGameStatsEmail,
+            getNewsletterEmail,
             appLanguage,
             isCreator,
           },
@@ -339,6 +344,33 @@ export default class Authentication {
       .then(response => response.data)
       .catch(error => {
         console.error('Error while accepting game stats email:', error);
+        throw error;
+      });
+  };
+
+  acceptNewsletterEmail = async (
+    getAuthorizationHeader: () => Promise<string>
+  ) => {
+    const { currentUser } = this.auth;
+    if (!currentUser)
+      throw new Error(
+        'Tried to accept newsletter email while not authenticated.'
+      );
+
+    return getAuthorizationHeader()
+      .then(authorizationHeader => {
+        return axios.patch(
+          `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
+          { getNewsletterEmail: true },
+          {
+            params: { userId: currentUser.uid },
+            headers: { Authorization: authorizationHeader },
+          }
+        );
+      })
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error while accepting newsletter email:', error);
         throw error;
       });
   };

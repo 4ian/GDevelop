@@ -20,12 +20,14 @@ namespace gd {
 
 Object::~Object() {}
 
-Object::Object(const gd::String& name_) : name(name_) {}
+Object::Object(const gd::String& name_, const gd::String& type_, std::unique_ptr<gd::ObjectConfiguration> configuration_)
+    : name(name_), configuration(std::move(configuration_)) {
+      SetType(type_);
+    }
 
 void Object::Init(const gd::Object& object) {
   name = object.name;
   assetStoreId = object.assetStoreId;
-  type = object.type;
   objectVariables = object.objectVariables;
   tags = object.tags;
   effectsContainer = object.effectsContainer;
@@ -34,6 +36,16 @@ void Object::Init(const gd::Object& object) {
   for (auto& it : object.behaviors) {
     behaviors[it.first] = gd::make_unique<gd::Behavior>(*it.second);
   }
+
+  configuration = object.configuration->Clone();
+}
+
+gd::ObjectConfiguration& Object::GetConfiguration() {
+  return *configuration;
+}
+
+const gd::ObjectConfiguration& Object::GetConfiguration() const {
+  return *configuration;
 }
 
 std::vector<gd::String> Object::GetAllBehaviorNames() const {
@@ -72,11 +84,6 @@ bool Object::HasBehaviorNamed(const gd::String& name) const {
   return behaviors.find(name) != behaviors.end();
 }
 
-std::map<gd::String, gd::PropertyDescriptor> Object::GetProperties() const {
-  std::map<gd::String, gd::PropertyDescriptor> nothing;
-  return nothing;
-}
-
 gd::Behavior* Object::AddNewBehavior(const gd::Project& project,
                                             const gd::String& type,
                                             const gd::String& name) {
@@ -109,17 +116,9 @@ gd::Behavior* Object::AddNewBehavior(const gd::Project& project,
   }
 }
 
-std::map<gd::String, gd::PropertyDescriptor>
-Object::GetInitialInstanceProperties(const gd::InitialInstance& instance,
-                                     gd::Project& project,
-                                     gd::Layout& layout) {
-  std::map<gd::String, gd::PropertyDescriptor> nothing;
-  return nothing;
-}
-
 void Object::UnserializeFrom(gd::Project& project,
                              const SerializerElement& element) {
-  type = element.GetStringAttribute("type");
+  SetType(element.GetStringAttribute("type"));
   assetStoreId = element.GetStringAttribute("assetStoreId");
   name = element.GetStringAttribute("name", name, "nom");
   tags = element.GetStringAttribute("tags");
@@ -186,7 +185,7 @@ void Object::UnserializeFrom(gd::Project& project,
     }
   }
 
-  DoUnserializeFrom(project, element);
+  configuration->UnserializeFrom(project, element);
 }
 
 void Object::SerializeTo(SerializerElement& element) const {
@@ -212,7 +211,7 @@ void Object::SerializeTo(SerializerElement& element) const {
     behaviorElement.SetAttribute("name", behavior.GetName());
   }
 
-  DoSerializeTo(element);
+  configuration->SerializeTo(element);
 }
 
 }  // namespace gd

@@ -120,12 +120,14 @@ void CheckBehaviorProperty(ObjectsContainer &container) {
 };
 } // namespace
 
-TEST_CASE("ProjectSerialization", "[common]") {
+// TODO EBO Add similar test cases for events-based objects.
+TEST_CASE("BehaviorSerialization", "[common]") {
 
   SECTION("Save and load a project with a custom behavior property value") {
     gd::Platform platform;
     gd::Project writtenProject;
     SetupProject(writtenProject, platform);
+    CheckBehaviorProperty(writtenProject.GetLayout("Scene"));
 
     SerializerElement projectElement;
     writtenProject.SerializeTo(projectElement);

@@ -27,6 +27,7 @@ class EventsFunctionsExtension;
 class EventsBasedObject;
 class EventsBasedBehavior;
 class Object;
+class ObjectConfiguration;
 class VariablesContainer;
 class ArbitraryResourceWorker;
 class SourceFile;
@@ -463,6 +464,14 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   std::unique_ptr<gd::Object> CreateObject(const gd::String& type,
                                            const gd::String& name) const;
+
+  /**
+   * Create an object configuration of the given type.
+   * 
+   * \param type The type of the object
+   */
+  std::unique_ptr<gd::ObjectConfiguration> CreateObjectConfiguration(
+      const gd::String& type) const;
 
   /**
    * Create an event of the given type.

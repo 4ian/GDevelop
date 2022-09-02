@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef PARTICLEEMITTEROBJECT_H
 #define PARTICLEEMITTEROBJECT_H
 
-#include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 namespace gd {
 class InitialInstance;
 class Project;
@@ -211,12 +211,12 @@ class GD_EXTENSION_API ParticleEmitterBase {
 /**
  * \brief Particle Emitter object used for storage and for the IDE.
  */
-class GD_EXTENSION_API ParticleEmitterObject : public gd::Object,
+class GD_EXTENSION_API ParticleEmitterObject : public gd::ObjectConfiguration,
                                                public ParticleEmitterBase {
  public:
-  ParticleEmitterObject(gd::String name_);
+  ParticleEmitterObject();
   virtual ~ParticleEmitterObject(){};
-  virtual std::unique_ptr<gd::Object> Clone() const {
+  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const {
     return gd::make_unique<ParticleEmitterObject>(*this);
   }
 

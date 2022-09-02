@@ -30,13 +30,15 @@ const styles = {
 export default class TextEditor extends React.Component<EditorProps, void> {
   render() {
     const {
-      object,
+      objectConfiguration,
       project,
       resourceSources,
       onChooseResource,
       resourceExternalEditors,
     } = this.props;
-    const textObject = gd.asTextObject(object);
+    const textObjectConfiguration = gd.asTextObjectConfiguration(
+      objectConfiguration
+    );
 
     return (
       <Column noMargin>
@@ -49,9 +51,11 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             type="number"
             margin="none"
             style={styles.sizeTextField}
-            value={textObject.getCharacterSize()}
+            value={textObjectConfiguration.getCharacterSize()}
             onChange={value => {
-              textObject.setCharacterSize(parseInt(value, 10) || 0);
+              textObjectConfiguration.setCharacterSize(
+                parseInt(value, 10) || 0
+              );
               this.forceUpdate();
             }}
           />
@@ -62,30 +66,34 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             style={styles.toolbarItem}
             disableAlpha
             color={{
-              r: textObject.getColorR(),
-              g: textObject.getColorG(),
-              b: textObject.getColorB(),
+              r: textObjectConfiguration.getColorR(),
+              g: textObjectConfiguration.getColorG(),
+              b: textObjectConfiguration.getColorB(),
               a: 255,
             }}
             onChangeComplete={color => {
-              textObject.setColor(color.rgb.r, color.rgb.g, color.rgb.b);
+              textObjectConfiguration.setColor(
+                color.rgb.r,
+                color.rgb.g,
+                color.rgb.b
+              );
               this.forceUpdate();
             }}
           />
           <Checkbox
             label={<Trans>Bold</Trans>}
-            checked={textObject.isBold()}
+            checked={textObjectConfiguration.isBold()}
             onCheck={(e, checked) => {
-              textObject.setBold(checked);
+              textObjectConfiguration.setBold(checked);
               this.forceUpdate();
             }}
             style={styles.checkbox}
           />
           <Checkbox
             label={<Trans>Italic</Trans>}
-            checked={textObject.isItalic()}
+            checked={textObjectConfiguration.isItalic()}
             onCheck={(e, checked) => {
-              textObject.setItalic(checked);
+              textObjectConfiguration.setItalic(checked);
               this.forceUpdate();
             }}
             style={styles.checkbox}
@@ -103,9 +111,9 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             resourceKind="font"
             fullWidth
             canBeReset
-            initialResourceName={textObject.getFontName()}
+            initialResourceName={textObjectConfiguration.getFontName()}
             onChange={resourceName => {
-              textObject.setFontName(resourceName);
+              textObjectConfiguration.setFontName(resourceName);
               this.forceUpdate();
             }}
             hintText={<Trans>Choose a font</Trans>}
@@ -124,9 +132,9 @@ export default class TextEditor extends React.Component<EditorProps, void> {
                 multiline
                 rows={8}
                 rowsMax={8}
-                value={textObject.getString()}
+                value={textObjectConfiguration.getString()}
                 onChange={value => {
-                  textObject.setString(value);
+                  textObjectConfiguration.setString(value);
                   this.forceUpdate();
                   this.props.onSizeUpdated();
                 }}

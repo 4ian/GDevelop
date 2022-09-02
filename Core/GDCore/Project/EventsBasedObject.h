@@ -16,7 +16,7 @@ class Project;
 }  // namespace gd
 
 namespace gd {
-
+// TODO EBO Add a way to mark some parts of children configuration as readonly.
 /**
  * \brief Represents an object that is implemented with events.
  *

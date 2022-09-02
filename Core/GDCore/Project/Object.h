@@ -77,7 +77,7 @@ class GD_CORE_API Object {
    */
   gd::ObjectConfiguration& GetConfiguration();
 
-  gd::ObjectConfiguration& GetConfiguration() const;
+  const gd::ObjectConfiguration& GetConfiguration() const;
 
   /** \name Common properties
    * Members functions related to common properties

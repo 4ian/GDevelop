@@ -466,11 +466,12 @@ class GD_CORE_API Project : public ObjectsContainer {
                                            const gd::String& name) const;
 
   /**
-   * Create an object configuration of the given type with the specified name.
+   * Create an object configuration of the given type.
    * 
    * \param type The type of the object
    */
-  std::unique_ptr<gd::ObjectConfiguration> CreateObjectConfiguration(const gd::String& type) const;
+  std::unique_ptr<gd::ObjectConfiguration> CreateObjectConfiguration(
+      const gd::String& type) const;
 
   /**
    * Create an event of the given type.

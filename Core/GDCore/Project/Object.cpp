@@ -44,7 +44,7 @@ gd::ObjectConfiguration& Object::GetConfiguration() {
   return *configuration;
 }
 
-gd::ObjectConfiguration& Object::GetConfiguration() const {
+const gd::ObjectConfiguration& Object::GetConfiguration() const {
   return *configuration;
 }
 

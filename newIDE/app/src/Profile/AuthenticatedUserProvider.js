@@ -389,6 +389,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           username: form.username,
           description: form.description,
           getGameStatsEmail: form.getGameStatsEmail,
+          getNewsletterEmail: form.getNewsletterEmail,
           appLanguage: preferences.language,
         }
       );

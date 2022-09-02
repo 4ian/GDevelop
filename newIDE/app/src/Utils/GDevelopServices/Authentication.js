@@ -22,6 +22,7 @@ export type Profile = {|
   username: ?string,
   description: ?string,
   getGameStatsEmail: boolean,
+  getNewsletterEmail: boolean,
   isCreator: boolean,
   isPlayer: boolean,
 |};
@@ -35,12 +36,14 @@ export type RegisterForm = {|
   email: string,
   password: string,
   username: string,
+  getNewsletterEmail: boolean,
 |};
 
 export type EditForm = {|
   username: string,
   description: string,
   getGameStatsEmail: boolean,
+  getNewsletterEmail: boolean,
 |};
 
 export type ChangeEmailForm = {|
@@ -133,6 +136,7 @@ export default class Authentication {
             email: form.email,
             username: form.username,
             appLanguage: appLanguage,
+            getNewsletterEmail: form.getNewsletterEmail,
             isCreator: true,
           },
           {
@@ -274,12 +278,14 @@ export default class Authentication {
       username,
       description,
       getGameStatsEmail,
+      getNewsletterEmail,
       appLanguage,
       isCreator,
     }: {
       username?: string,
       description?: string,
       getGameStatsEmail?: boolean,
+      getNewsletterEmail?: boolean,
       appLanguage?: string,
       isCreator?: boolean,
     }
@@ -296,6 +302,7 @@ export default class Authentication {
             username,
             description,
             getGameStatsEmail,
+            getNewsletterEmail,
             appLanguage,
             isCreator,
           },

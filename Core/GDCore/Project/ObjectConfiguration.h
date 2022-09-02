@@ -28,7 +28,7 @@ class EffectsContainer;
 namespace gd {
 
 /**
- * \brief Base class used to represent an object configuration
+ * \brief Base class used to represent an object configuration.
  * For example, this can be the animations in a sprite, the text, its font,
  * its color in a Text object, etc...
  *

@@ -48,6 +48,30 @@ export type BuildArtifactKeyName =
   | 's3Key'
   | 'logsKey';
 
+export const getBuildExtensionlessFilename = ({
+  gameName,
+  gameVersion,
+}: {
+  gameName: string,
+  gameVersion: string,
+}): string => {
+  try {
+    const specialCharactersRemovalRegex = /[./\\]/g;
+    return `${gameName
+      .slice(0, 50)
+      .replace(specialCharactersRemovalRegex, '_')}-${gameVersion
+      .slice(0, 15)
+      .replace(specialCharactersRemovalRegex, '_')}`;
+  } catch (error) {
+    // If an error occurs, we don't want to prevent the build.
+    console.warn(
+      'An error happened when computing game extensionless filename:',
+      error
+    );
+    return 'game';
+  }
+};
+
 export const getBuildArtifactUrl = (
   build: ?Build,
   keyName: BuildArtifactKeyName
@@ -119,7 +143,11 @@ export const buildElectron = (
   userId: string,
   key: string,
   targets: Array<TargetName>,
-  gameId: string
+  gameId: string,
+  options: {
+    gameName: string,
+    gameVersion: string,
+  }
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
@@ -130,6 +158,7 @@ export const buildElectron = (
           type: 'electron-build',
           targets: targets.join(','),
           gameId,
+          filename: getBuildExtensionlessFilename(options),
         },
         headers: {
           Authorization: authorizationHeader,
@@ -143,7 +172,11 @@ export const buildWeb = (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   key: string,
-  gameId: string
+  gameId: string,
+  options: {
+    gameName: string,
+    gameVersion: string,
+  }
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
@@ -154,6 +187,7 @@ export const buildWeb = (
           type: 'web-build',
           targets: 's3',
           gameId,
+          filename: getBuildExtensionlessFilename(options),
         },
         headers: {
           Authorization: authorizationHeader,
@@ -169,7 +203,11 @@ export const buildCordovaAndroid = (
   key: string,
   targets: Array<TargetName>,
   keystore: 'old' | 'new',
-  gameId: string
+  gameId: string,
+  options: {
+    gameName: string,
+    gameVersion: string,
+  }
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
@@ -187,6 +225,7 @@ export const buildCordovaAndroid = (
             type: 'cordova-build',
             targets: targets.join(','),
             gameId,
+            filename: getBuildExtensionlessFilename(options),
           },
           headers: {
             Authorization: authorizationHeader,

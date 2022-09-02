@@ -294,7 +294,11 @@ export default class ExportLauncher extends Component<Props, State> {
           this.state.exportState,
           authenticatedUser,
           uploadBucketKey,
-          this.props.project.getProjectUuid()
+          project.getProjectUuid(),
+          {
+            gameName: project.getName(),
+            gameVersion: project.getVersion(),
+          }
         );
         setStep('build');
         this.setState({ build }, () => {

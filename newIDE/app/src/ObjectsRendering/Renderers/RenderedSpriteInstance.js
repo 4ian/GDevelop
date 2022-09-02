@@ -13,7 +13,7 @@ function RenderedSpriteInstance(
   project,
   layout,
   instance,
-  associatedObject,
+  associatedObjectConfiguration,
   pixiContainer,
   pixiResourcesLoader
 ) {
@@ -22,7 +22,7 @@ function RenderedSpriteInstance(
     project,
     layout,
     instance,
-    associatedObject,
+    associatedObjectConfiguration,
     pixiContainer,
     pixiResourcesLoader
   );
@@ -51,17 +51,19 @@ RenderedSpriteInstance.getThumbnail = function(
   resourcesLoader,
   object
 ) {
-  const spriteObject = gd.asSpriteObject(object);
+  const spriteConfiguration = gd.asSpriteConfiguration(
+    object.getConfiguration()
+  );
 
   if (
-    spriteObject.getAnimationsCount() > 0 &&
-    spriteObject.getAnimation(0).getDirectionsCount() > 0 &&
-    spriteObject
+    spriteConfiguration.getAnimationsCount() > 0 &&
+    spriteConfiguration.getAnimation(0).getDirectionsCount() > 0 &&
+    spriteConfiguration
       .getAnimation(0)
       .getDirection(0)
       .getSpritesCount() > 0
   ) {
-    const imageName = spriteObject
+    const imageName = spriteConfiguration
       .getAnimation(0)
       .getDirection(0)
       .getSprite(0)
@@ -101,14 +103,16 @@ RenderedSpriteInstance.prototype.updateSprite = function() {
   this._sprite = null;
   this._shouldNotRotate = false;
 
-  const spriteObject = gd.asSpriteObject(this._associatedObject);
-  if (spriteObject.hasNoAnimations()) return false;
+  const spriteConfiguration = gd.asSpriteConfiguration(
+    this._associatedObjectConfiguration
+  );
+  if (spriteConfiguration.hasNoAnimations()) return false;
 
   this._renderedAnimation = this._instance.getRawDoubleProperty('animation');
-  if (this._renderedAnimation >= spriteObject.getAnimationsCount())
+  if (this._renderedAnimation >= spriteConfiguration.getAnimationsCount())
     this._renderedAnimation = 0;
 
-  const animation = spriteObject.getAnimation(this._renderedAnimation);
+  const animation = spriteConfiguration.getAnimation(this._renderedAnimation);
   if (animation.hasNoDirections()) return false;
 
   this._renderedDirection = 0;

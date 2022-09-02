@@ -589,7 +589,7 @@ module.exports = {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -598,7 +598,7 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );
@@ -634,7 +634,8 @@ module.exports = {
 
     // This is called to update the PIXI object on the scene editor
     RenderedBitmapTextInstance.prototype.update = function () {
-      const properties = this._associatedObject.getProperties();
+      const properties = this._associatedObjectConfiguration
+        .getProperties();
 
       // Update the rendered text properties (note: Pixi is only
       // applying changes if there were changed).

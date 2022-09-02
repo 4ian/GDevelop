@@ -1,22 +1,21 @@
+// @flow
 import RenderedInstance from './RenderedInstance';
+import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
+import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
 
 /**
  * Create a renderer for an type of object displayed as an icon
- *
- * @extends RenderedInstance
- * @class RenderedIconInstance
- * @constructor
  */
-export default function makeRenderer(iconPath) {
+export default function makeRenderer(iconPath: string) {
   class RenderedIconInstance extends RenderedInstance {
     constructor(
-      project,
-      layout,
-      instance,
-      associatedObjectConfiguration,
-      pixiContainer,
-      pixiResourcesLoader
+      project: gdProject,
+      layout: gdLayout,
+      instance: gdInitialInstance,
+      associatedObjectConfiguration: gdObjectConfiguration,
+      pixiContainer: PIXI.Container,
+      pixiResourcesLoader: Class<PixiResourcesLoader>
     ) {
       super(
         project,
@@ -37,7 +36,11 @@ export default function makeRenderer(iconPath) {
       this._pixiObject.rotation = (this._instance.getAngle() * Math.PI) / 180.0;
     }
 
-    static getThumbnail(project, resourcesLoader, object) {
+    static getThumbnail(
+      project: gdProject,
+      resourcesLoader: Class<ResourcesLoader>,
+      object: gdObject
+    ) {
       return iconPath;
     }
   }

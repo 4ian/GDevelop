@@ -75,6 +75,7 @@ const ObjectsRenderingService = {
         associatedObjectConfiguration,
         pixiContainer,
         PixiResourcesLoader,
+        // This parameter is only used by RenderedTileMapInstance.
         pixiRenderer
       );
     else {
@@ -98,8 +99,7 @@ const ObjectsRenderingService = {
         instance,
         associatedObjectConfiguration,
         pixiContainer,
-        PixiResourcesLoader,
-        pixiRenderer
+        PixiResourcesLoader
       );
     }
   },

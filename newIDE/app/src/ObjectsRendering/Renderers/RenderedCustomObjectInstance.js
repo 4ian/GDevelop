@@ -122,7 +122,7 @@ class ChildInstance {
 }
 
 /**
- * Renderer for gd.SpriteObject
+ * Renderer for gd.CustomObject (the class is not exposed to newIDE)
  */
 export default class RenderedCustomObjectInstance extends RenderedInstance {
   childrenInstances: ChildInstance[];

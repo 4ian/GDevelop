@@ -62,8 +62,7 @@ const ObjectsRenderingService = {
     layout: gdLayout,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
-    pixiContainer: any,
-    pixiRenderer: PIXI.Renderer
+    pixiContainer: any
   ): RenderedInstance {
     var objectType = associatedObjectConfiguration.getType();
     if (this.renderers.hasOwnProperty(objectType))
@@ -73,8 +72,7 @@ const ObjectsRenderingService = {
         instance,
         associatedObjectConfiguration,
         pixiContainer,
-        PixiResourcesLoader,
-        pixiRenderer
+        PixiResourcesLoader
       );
     else {
       console.warn(
@@ -86,8 +84,7 @@ const ObjectsRenderingService = {
         instance,
         associatedObjectConfiguration,
         pixiContainer,
-        PixiResourcesLoader,
-        pixiRenderer
+        PixiResourcesLoader
       );
     }
   },

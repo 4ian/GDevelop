@@ -41,16 +41,26 @@ namespace gdjs {
      * @param customObjectData An object containing the scene data.
      * @see gdjs.RuntimeGame#getSceneData
      */
-    loadFrom(
-      customObjectData: EventsBasedObjectData & CustomObjectConfiguration
-    ) {
+    loadFrom(customObjectData: ObjectData & CustomObjectConfiguration) {
       if (this._isLoaded) {
         this.onDestroyFromScene(this._parent);
       }
 
+      const eventsBasedObjectData = this._runtimeScene
+        .getGame()
+        .getEventsBasedObjectData(customObjectData.type);
+      if (!eventsBasedObjectData) {
+        logger.error('loadFrom was called without an events-based object');
+        return;
+      }
+
       // Registering objects
-      for (let i = 0, len = customObjectData.objects.length; i < len; ++i) {
-        const childObjectData = customObjectData.objects[i];
+      for (
+        let i = 0, len = eventsBasedObjectData.objects.length;
+        i < len;
+        ++i
+      ) {
+        const childObjectData = eventsBasedObjectData.objects[i];
         this.registerObject({
           ...childObjectData,
           ...customObjectData.childrenContent[childObjectData.name],

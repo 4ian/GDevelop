@@ -22,16 +22,14 @@ void CustomObjectConfiguration::Init(const gd::CustomObjectConfiguration& object
   // There is no default copy for a map of unique_ptr like childObjectConfigurations.
   childObjectConfigurations.clear();
   for (auto& it : objectConfiguration.childObjectConfigurations) {
-    childObjectConfigurations[it.first] =
-        gd::make_unique<gd::ObjectConfiguration>(*it.second);
+    childObjectConfigurations[it.first] = it.second->Clone();
   }
 }
 
 gd::ObjectConfiguration CustomObjectConfiguration::badObjectConfiguration;
 
 std::unique_ptr<gd::ObjectConfiguration> CustomObjectConfiguration::Clone() const {
-  CustomObjectConfiguration* clone = new CustomObjectConfiguration(*this);
-  return std::unique_ptr<gd::ObjectConfiguration>(clone);
+  return gd::make_unique<gd::CustomObjectConfiguration>(*this);
 }
 
 gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(const gd::String &objectName) {

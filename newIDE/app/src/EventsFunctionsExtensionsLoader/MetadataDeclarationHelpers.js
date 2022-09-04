@@ -569,11 +569,10 @@ export const declareObjectPropertiesInstructionAndExpressions = (
   mapVector(eventsBasedObject.getPropertyDescriptors(), property => {
     const propertyType = property.getType();
     const propertyName = property.getName();
-    // TODO EBO Use the proper methods for objects when the generator is implemented.
-    const getterName = gd.BehaviorCodeGenerator.getBehaviorPropertyGetterName(
+    const getterName = gd.ObjectCodeGenerator.getObjectPropertyGetterName(
       propertyName
     );
-    const setterName = gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(
+    const setterName = gd.ObjectCodeGenerator.getObjectPropertySetterName(
       propertyName
     );
     const propertyLabel =

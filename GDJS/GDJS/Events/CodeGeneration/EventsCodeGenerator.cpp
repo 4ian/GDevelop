@@ -201,6 +201,63 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
   return output;
 }
 
+gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
+    gd::Project& project,
+    const gd::EventsBasedObject& eventsBasedObject,
+    const gd::EventsFunction& eventsFunction,
+    const gd::String& codeNamespace,
+    const gd::String& fullyQualifiedFunctionName,
+    const gd::String& onceTriggersVariable,
+    const gd::String& preludeCode,
+    std::set<gd::String>& includeFiles,
+    bool compilationForRuntime) {
+  gd::ObjectsContainer globalObjectsAndGroups;
+  gd::ObjectsContainer objectsAndGroups;
+  gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
+      project,
+      eventsBasedObject,
+      eventsFunction,
+      globalObjectsAndGroups,
+      objectsAndGroups);
+
+  EventsCodeGenerator codeGenerator(globalObjectsAndGroups, objectsAndGroups);
+  codeGenerator.SetCodeNamespace(codeNamespace);
+  codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+
+  // Generate the code setting up the context of the function.
+  gd::String fullPreludeCode =
+      preludeCode + "\n" + "var that = this;\n" +
+      // runtimeScene is supposed to be always accessible, read
+      // it from the object
+      "var runtimeScene = this._runtimeScene;\n" +
+      // By convention of Object Events Function, the object is accessible
+      // as a parameter called "Object", and thisObjectList is an array
+      // containing it (for faster access, without having to go through the
+      // hashmap).
+      "var thisObjectList = [this];\n" +
+      "var Object = Hashtable.newFrom({Object: thisObjectList});\n" +
+      codeGenerator.GenerateObjectEventsFunctionContext(
+          eventsBasedObject,
+          eventsFunction.GetParameters(),
+          onceTriggersVariable,
+          // Pass the names of the parameters considered as the current
+          // object and behavior parameters:
+          "Object");
+
+  gd::String output = GenerateEventsListCompleteFunctionCode(
+      codeGenerator,
+      fullyQualifiedFunctionName,
+      codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
+          eventsFunction.GetParameters(), true),
+      fullPreludeCode,
+      eventsFunction.GetEvents(),
+      codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
+
+  includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
+                      codeGenerator.GetIncludeFiles().end());
+  return output;
+}
+
 gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
     const vector<gd::ParameterMetadata>& parameters,
     bool isBehaviorEventsFunction) {
@@ -292,6 +349,36 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionContext(
                                        behaviorNamesMap,
                                        thisObjectName,
                                        thisBehaviorName);
+}
+
+gd::String EventsCodeGenerator::GenerateObjectEventsFunctionContext(
+    const gd::EventsBasedObject& eventsBasedObject,
+    const vector<gd::ParameterMetadata>& parameters,
+    const gd::String& onceTriggersVariable,
+    const gd::String& thisObjectName) {
+  // See the comment at the start of the GenerateEventsFunctionContext function
+
+  gd::String objectsGettersMap;
+  gd::String objectArraysMap;
+  gd::String behaviorNamesMap;
+
+  // If we have an object considered as the current object ("this") (usually
+  // called Object in behavior events function), generate a slightly more
+  // optimized getter for it (bypassing "Object" hashmap, and directly return
+  // the array containing it).
+  if (!thisObjectName.empty()) {
+    objectsGettersMap +=
+        ConvertToStringExplicit(thisObjectName) + ": " + thisObjectName + "\n";
+    objectArraysMap +=
+        ConvertToStringExplicit(thisObjectName) + ": thisObjectList\n";
+  }
+
+  return GenerateEventsFunctionContext(parameters,
+                                       onceTriggersVariable,
+                                       objectsGettersMap,
+                                       objectArraysMap,
+                                       behaviorNamesMap,
+                                       thisObjectName);
 }
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionContext(

@@ -40,7 +40,9 @@ namespace gdjs {
 
       const layer = parent.getLayer('');
       if (layer) {
-        layer.getRenderer().addRendererObject(object, object.getZOrder());
+        layer
+          .getRenderer()
+          .addRendererObject(this._pixiContainer, object.getZOrder());
       }
     }
 

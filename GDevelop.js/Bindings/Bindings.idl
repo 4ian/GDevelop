@@ -569,7 +569,7 @@ interface UniquePtrObjectConfiguration {
 interface gdObject {
     // /!\ We need to call it gdObject to avoid messing up with javascript Object
     //     global in glue.js!
-    //void gdObject([Const] DOMString name, [Value] UniquePtrObjectConfiguration configuration);
+    void gdObject([Const] DOMString name, [Const] DOMString type, [Ref] ObjectConfiguration configuration);
     [Value] UniquePtrObject Clone();
 
     void SetName([Const] DOMString name);

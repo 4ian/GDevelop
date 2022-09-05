@@ -343,6 +343,7 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.begin('objects (post-events)');
       }
+      // TODO EBO Add a method in RuntimeObject for this.
       this._updateObjectsPostEvents();
       if (this._profiler) {
         this._profiler.end('objects (post-events)');
@@ -731,9 +732,6 @@ namespace gdjs {
       if (sceneName) this._requestedScene = sceneName;
     }
 
-    /**
-     * Get the profiler associated with the scene, or null if none.
-     */
     getProfiler() {
       return this._profiler;
     }

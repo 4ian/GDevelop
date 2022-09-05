@@ -5,7 +5,6 @@ namespace gdjs {
    * The renderer for a gdjs.RuntimeScene using Pixi.js.
    */
   export class CustomObjectPixiRenderer {
-    _pixiRenderer: PIXI.Renderer | null;
     _object: gdjs.CustomRuntimeObject;
     _instancesContainer: gdjs.CustomRuntimeObjectInstancesContainer;
     _pixiContainer: PIXI.Container;
@@ -23,15 +22,12 @@ namespace gdjs {
     constructor(
       object: gdjs.CustomRuntimeObject,
       instancesContainer: gdjs.CustomRuntimeObjectInstancesContainer,
-      parent: gdjs.RuntimeInstancesContainer,
-      runtimeGameRenderer: gdjs.RuntimeGamePixiRenderer | null
+      parent: gdjs.RuntimeInstancesContainer
     ) {
-      this._pixiRenderer = runtimeGameRenderer
-        ? runtimeGameRenderer.getPIXIRenderer()
-        : null;
       this._object = object;
       this._instancesContainer = instancesContainer;
       this._pixiContainer = new PIXI.Container();
+      this._pixiContainer.name = "Custom " + object.getName();
       this._debugDrawRenderedObjectsPoints = {};
 
       // Contains the layers of the scene (and, optionally, debug PIXI objects).
@@ -40,6 +36,7 @@ namespace gdjs {
 
       const layer = parent.getLayer('');
       if (layer) {
+        console.log("Add custom object to the layer");
         layer
           .getRenderer()
           .addRendererObject(this._pixiContainer, object.getZOrder());
@@ -54,7 +51,8 @@ namespace gdjs {
       this._isContainerDirty = true;
       const layer = parent.getLayer('');
       if (layer) {
-        layer.getRenderer().addRendererObject(object, object.getZOrder());
+        console.log("Add custom object to the layer (reinitialize");
+        layer.getRenderer().addRendererObject(this._pixiContainer, object.getZOrder());
       }
     }
 
@@ -62,28 +60,19 @@ namespace gdjs {
       return this._pixiContainer;
     }
 
-    render() {
-      if (!this._pixiRenderer) {
-        return;
-      }
-
-      // render the PIXI container of the scene
-      this._pixiRenderer.render(this._pixiContainer);
-    }
-
     /**
      * Update the internal PIXI.Sprite position, angle...
      */
     _updatePIXIContainer() {
-      this._pixiContainer.pivot.x = this._object.getCenterX();
-      this._pixiContainer.pivot.y = this._object.getCenterY();
-      this._pixiContainer.position.x = this._object.x;
-      this._pixiContainer.position.y = this._object.y;
-      this._pixiContainer.rotation = gdjs.toRad(this._object.angle);
+      // this._pixiContainer.pivot.x = this._object.getCenterX();
+      // this._pixiContainer.pivot.y = this._object.getCenterY();
+      // this._pixiContainer.position.x = this._object.x;
+      // this._pixiContainer.position.y = this._object.y;
+      // this._pixiContainer.rotation = gdjs.toRad(this._object.angle);
+      // this._pixiContainer.scale.x = this._object._scaleX;
+      // this._pixiContainer.scale.y = this._object._scaleY;
       this._pixiContainer.visible = !this._object.hidden;
       this._pixiContainer.alpha = this._object.opacity / 255;
-      this._pixiContainer.scale.x = this._object._scaleX;
-      this._pixiContainer.scale.y = this._object._scaleY;
 
       this._isContainerDirty = false;
     }
@@ -379,7 +368,7 @@ namespace gdjs {
     }
 
     getPIXIRenderer() {
-      return this._pixiRenderer;
+      return null;
     }
 
     setLayerIndex(layer: gdjs.Layer, index: float): void {

@@ -942,8 +942,7 @@ module.exports = {
       instance,
       associatedObjectConfiguration,
       pixiContainer,
-      pixiResourcesLoader,
-      pixiRenderer
+      pixiResourcesLoader
     ) {
       RenderedInstance.call(
         this,
@@ -952,14 +951,12 @@ module.exports = {
         instance,
         associatedObjectConfiguration,
         pixiContainer,
-        pixiResourcesLoader,
-        pixiRenderer
+        pixiResourcesLoader
       );
 
       // This setting allows tile maps with more than 16K tiles.
       Tilemap.settings.use32bitIndex = true;
-      pixiRenderer.plugins.tilemap =
-        pixiRenderer.plugins.tilemap || new Tilemap.TileRenderer();
+
       this.tileMapPixiObject = new Tilemap.CompositeTilemap();
       this._pixiObject = this.tileMapPixiObject;
 

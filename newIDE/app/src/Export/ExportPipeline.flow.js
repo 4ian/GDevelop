@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type Build } from '../Utils/GDevelopServices/Build';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import { type BuildStep } from './Builds/BuildStepsProgress';
@@ -92,7 +91,11 @@ export type ExportPipeline<
     exportState: ExportState,
     authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string,
-    gameId: string
+    gameId: string,
+    options: {
+      gameName: string,
+      gameVersion: string,
+    }
   ) => Promise<Build>,
 
   /**

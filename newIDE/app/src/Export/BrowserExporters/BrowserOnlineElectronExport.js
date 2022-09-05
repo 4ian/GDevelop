@@ -161,7 +161,11 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
     exportState: ExportState,
     authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string,
-    gameId: string
+    gameId: string,
+    options: {
+      gameName: string,
+      gameVersion: string,
+    }
   ): Promise<Build> => {
     const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
     if (!firebaseUser)
@@ -172,7 +176,8 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
       firebaseUser.uid,
       uploadBucketKey,
       exportState.targets,
-      gameId
+      gameId,
+      options
     );
   },
 };

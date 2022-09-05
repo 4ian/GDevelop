@@ -356,6 +356,13 @@ namespace gdjs {
     /**
      * The gdjs.RuntimeScene the object belongs to.
      */
+    getParent(): gdjs.RuntimeInstancesContainer {
+      return this._runtimeScene;
+    }
+
+    /**
+     * The gdjs.RuntimeScene the object belongs to.
+     */
     getRuntimeScene(): gdjs.RuntimeScene {
       return this._runtimeScene.getScene();
     }

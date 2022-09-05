@@ -36,6 +36,8 @@ namespace gdjs {
       objectData: ObjectData & CustomObjectConfiguration & EventsBasedObjectData
     ) {
       super(parent, objectData);
+      console.log("Custom: " + objectData.name + " : " + objectData.type);
+      console.log(objectData);
       this._instanceContainer = new gdjs.CustomRuntimeObjectInstancesContainer(
         parent,
         this
@@ -43,7 +45,7 @@ namespace gdjs {
       this._objectData = objectData;
 
       this._instanceContainer.loadFrom(objectData);
-      this.getRenderer().reinitialize(this, this._instanceContainer);
+      this.getRenderer().reinitialize(this, parent);
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -55,7 +57,7 @@ namespace gdjs {
       super.reinitialize(objectData);
 
       this._instanceContainer.loadFrom(objectData);
-      this.getRenderer().reinitialize(this, this._instanceContainer);
+      this.getRenderer().reinitialize(this, this.getParent());
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object reinitialize method.
       this.onCreated();
@@ -88,13 +90,16 @@ namespace gdjs {
     /**
      * Update the current frame of the object according to the elapsed time on the scene.
      */
-    update(runtimeScene: gdjs.RuntimeScene): void {}
+    update(runtimeScene: gdjs.RuntimeScene): void {
+      this._instanceContainer._updateObjectsPreEvents();
+    }
 
     /**
      * Ensure the sprite is ready to be displayed: the proper animation frame
      * is set and the renderer is up to date (position, angle, alpha, flip, blend mode...).
      */
     updatePreRender(runtimeScene: gdjs.RuntimeScene): void {
+      this._instanceContainer._updateObjectsPreRender();
       this.getRenderer().ensureUpToDate();
     }
 
@@ -104,6 +109,11 @@ namespace gdjs {
 
     getRenderer() {
       return this._instanceContainer.getRenderer();
+    }
+
+    onChildrenLocationChange() {
+      console.log("onChildrenLocationChange");
+      this._isUntransformedHitBoxesDirty = true;
     }
 
     /**
@@ -118,7 +128,6 @@ namespace gdjs {
 
       //Update the current hitboxes with the frame custom hit boxes
       //and apply transformations.
-      this.hitBoxes.length = this._untransformedHitBoxes.length;
       for (let i = 0; i < this._untransformedHitBoxes.length; ++i) {
         if (i >= this.hitBoxes.length) {
           this.hitBoxes.push(new gdjs.Polygon());
@@ -151,8 +160,8 @@ namespace gdjs {
       this._isUntransformedHitBoxesDirty = false;
       let minX = Number.MAX_VALUE;
       let minY = Number.MAX_VALUE;
-      let maxX = Number.MIN_VALUE;
-      let maxY = Number.MIN_VALUE;
+      let maxX = -Number.MAX_VALUE;
+      let maxY = -Number.MAX_VALUE;
       for (const childInstance of this._instanceContainer.getAllInstances()) {
         Array.prototype.push.apply(
           this._untransformedHitBoxes,
@@ -160,14 +169,19 @@ namespace gdjs {
         );
         const childAABB = childInstance.getAABB();
         minX = Math.min(minX, childAABB.min[0]);
-        minY = Math.min(minX, childAABB.min[1]);
+        minY = Math.min(minY, childAABB.min[1]);
         maxX = Math.max(maxX, childAABB.max[0]);
-        maxY = Math.max(maxX, childAABB.max[1]);
+        maxY = Math.max(maxY, childAABB.max[1]);
       }
       this._unrotatedAABB.min[0] = minX;
       this._unrotatedAABB.min[1] = minY;
       this._unrotatedAABB.max[0] = maxX;
       this._unrotatedAABB.max[1] = maxY;
+
+      while (this.hitBoxes.length < this._untransformedHitBoxes.length) {
+        this.hitBoxes.push(new gdjs.Polygon());
+      }
+      this.hitBoxes.length = this._untransformedHitBoxes.length;
     }
 
     //Position :

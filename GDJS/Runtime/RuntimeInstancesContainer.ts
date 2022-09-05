@@ -50,11 +50,6 @@ namespace gdjs {
     abstract getElapsedTime(): float;
 
     /**
-     * Render the PIXI container associated to the runtimeScene.
-     */
-    abstract render(): void;
-
-    /**
      * Get the renderer associated to the RuntimeScene.
      */
     abstract getRenderer();
@@ -68,6 +63,11 @@ namespace gdjs {
      * Get the runtimeScene associated to this.
      */
     abstract getScene(): gdjs.RuntimeScene;
+
+    /**
+     * Get the profiler associated with the scene, or null if none.
+     */
+    abstract getProfiler(): gdjs.Profiler | null;
 
     /**
      * Activate or deactivate the debug visualization for collisions and points.

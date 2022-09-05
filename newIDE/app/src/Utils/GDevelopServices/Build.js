@@ -56,7 +56,7 @@ export const getBuildExtensionlessFilename = ({
   gameVersion: string,
 |}): string => {
   try {
-    const specialCharactersRemovalRegex = /[./\\[\]<>&$@=;:+,?^{}%#~|'"]/g;
+    const specialCharactersRemovalRegex = /[./\\[\]<>&$@=;:+,?^{}%#~|'"*]/g;
     return `${gameName
       .slice(0, 50)
       .replace(specialCharactersRemovalRegex, '_')}-${gameVersion

@@ -38,7 +38,6 @@ class GD_CORE_API Object {
  public:
   /**
    * Create a new object with the name passed as argument.
-   * \param name Object's name
    */
   Object(const gd::String& name,
          const gd::String& type,
@@ -46,11 +45,12 @@ class GD_CORE_API Object {
 
   /**
    * Create a new object with the name passed as argument.
-   * \param name Object's name
+   * 
+   * Object takes the ownership of the configuration.
    */
   Object(const gd::String& name,
          const gd::String& type,
-         gd::ObjectConfiguration& configuration);
+         gd::ObjectConfiguration* configuration);
 
   /**
    * Copy constructor. Calls Init().

@@ -29,8 +29,8 @@ Object::Object(const gd::String& name_,
 
 Object::Object(const gd::String& name_,
                const gd::String& type_,
-               gd::ObjectConfiguration& configuration_)
-    : name(name_), configuration(&configuration_) {
+               gd::ObjectConfiguration* configuration_)
+    : name(name_), configuration(configuration_) {
       SetType(type_);
     }
 

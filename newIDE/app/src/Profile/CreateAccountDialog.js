@@ -16,6 +16,7 @@ import BackgroundText from '../UI/BackgroundText';
 import { ColumnStackLayout } from '../UI/Layout';
 import { MarkdownText } from '../UI/MarkdownText';
 import { UsernameField, isUsernameValid } from './UsernameField';
+import Checkbox from '../UI/Checkbox';
 
 type Props = {|
   onClose: () => void,
@@ -83,6 +84,9 @@ const CreateAccountDialog = ({
   const [email, setEmail] = React.useState<string>('');
   const [password, setPassword] = React.useState<string>('');
   const [username, setUsername] = React.useState<string>('');
+  const [getNewsletterEmail, setGetNewsletterEmail] = React.useState<boolean>(
+    false
+  );
   const [
     usernameAvailability,
     setUsernameAvailability,
@@ -104,6 +108,7 @@ const CreateAccountDialog = ({
       email,
       password,
       username,
+      getNewsletterEmail,
     });
   };
 
@@ -179,6 +184,13 @@ const CreateAccountDialog = ({
           required
           onChange={(e, value) => {
             setPassword(value);
+          }}
+        />
+        <Checkbox
+          label={<Trans>I want to receive weekly stats about my games</Trans>}
+          checked={getNewsletterEmail}
+          onCheck={(e, value) => {
+            setGetNewsletterEmail(value);
           }}
         />
       </ColumnStackLayout>

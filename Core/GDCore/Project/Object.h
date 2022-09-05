@@ -40,7 +40,17 @@ class GD_CORE_API Object {
    * Create a new object with the name passed as argument.
    * \param name Object's name
    */
-  Object(const gd::String& name, const gd::String& type, std::unique_ptr<gd::ObjectConfiguration> configuration);
+  Object(const gd::String& name,
+         const gd::String& type,
+         std::unique_ptr<gd::ObjectConfiguration> configuration);
+
+  /**
+   * Create a new object with the name passed as argument.
+   * \param name Object's name
+   */
+  Object(const gd::String& name,
+         const gd::String& type,
+         gd::ObjectConfiguration& configuration);
 
   /**
    * Copy constructor. Calls Init().

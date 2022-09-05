@@ -187,7 +187,6 @@ export const buildWeb = (
           type: 'web-build',
           targets: 's3',
           gameId,
-          filename: getBuildExtensionlessFilename(options),
         },
         headers: {
           Authorization: authorizationHeader,

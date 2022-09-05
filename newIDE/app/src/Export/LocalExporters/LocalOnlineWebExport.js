@@ -159,7 +159,11 @@ export const localOnlineWebExportPipeline: ExportPipeline<
     exportState: ExportState,
     authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string,
-    gameId: string
+    gameId: string,
+    options: {
+      gameName: string,
+      gameVersion: string,
+    }
   ): Promise<Build> => {
     const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
     if (!firebaseUser)
@@ -169,7 +173,8 @@ export const localOnlineWebExportPipeline: ExportPipeline<
       getAuthorizationHeader,
       firebaseUser.uid,
       uploadBucketKey,
-      gameId
+      gameId,
+      options
     );
   },
 };

@@ -92,10 +92,10 @@ export type ExportPipeline<
     authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string,
     gameId: string,
-    options: {
+    options: {|
       gameName: string,
       gameVersion: string,
-    }
+    |}
   ) => Promise<Build>,
 
   /**

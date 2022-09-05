@@ -51,10 +51,10 @@ export type BuildArtifactKeyName =
 export const getBuildExtensionlessFilename = ({
   gameName,
   gameVersion,
-}: {
+}: {|
   gameName: string,
   gameVersion: string,
-}): string => {
+|}): string => {
   try {
     const specialCharactersRemovalRegex = /[./\\[\]<>&$@=;:+,?^{}%#~|'"]/g;
     return `${gameName
@@ -144,10 +144,10 @@ export const buildElectron = (
   key: string,
   targets: Array<TargetName>,
   gameId: string,
-  options: {
+  options: {|
     gameName: string,
     gameVersion: string,
-  }
+  |}
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
@@ -173,10 +173,10 @@ export const buildWeb = (
   userId: string,
   key: string,
   gameId: string,
-  options: {
+  options: {|
     gameName: string,
     gameVersion: string,
-  }
+  |}
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
@@ -203,10 +203,10 @@ export const buildCordovaAndroid = (
   targets: Array<TargetName>,
   keystore: 'old' | 'new',
   gameId: string,
-  options: {
+  options: {|
     gameName: string,
     gameVersion: string,
-  }
+  |}
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>

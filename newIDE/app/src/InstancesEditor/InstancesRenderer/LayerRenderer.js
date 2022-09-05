@@ -41,7 +41,6 @@ export default class LayerRenderer {
 
   renderedInstances: { [number]: RenderedInstance } = {};
   pixiContainer: PIXI.Container;
-  pixiRenderer: PIXI.Renderer;
 
   /** Functor used to render an instance */
   instancesRenderer: gdInitialInstanceJSFunctor;
@@ -65,7 +64,6 @@ export default class LayerRenderer {
     onMoveInstance,
     onMoveInstanceEnd,
     onDownInstance,
-    pixiRenderer,
   }: {
     project: gdProject,
     instances: gdInitialInstancesContainer,
@@ -85,9 +83,7 @@ export default class LayerRenderer {
     onMoveInstance: (gdInitialInstance, number, number) => void,
     onMoveInstanceEnd: void => void,
     onDownInstance: (gdInitialInstance, number, number) => void,
-    pixiRenderer: PIXI.Renderer,
   }) {
-    this.pixiRenderer = pixiRenderer;
     this.project = project;
     this.instances = instances;
     this.layout = layout;
@@ -265,8 +261,7 @@ export default class LayerRenderer {
         this.layout,
         instance,
         associatedObject.getConfiguration(),
-        this.pixiContainer,
-        this.pixiRenderer
+        this.pixiContainer
       );
 
       renderedInstance._pixiObject.interactive = true;

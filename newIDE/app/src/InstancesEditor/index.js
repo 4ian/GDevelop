@@ -337,7 +337,6 @@ export default class InstancesEditor extends Component<Props> {
       layout: props.layout,
       instances: props.initialInstances,
       viewPosition: this.viewPosition,
-      pixiRenderer: this.pixiRenderer,
       onOverInstance: this._onOverInstance,
       onMoveInstance: this._onMoveInstance,
       onMoveInstanceEnd: this._onMoveInstanceEnd,

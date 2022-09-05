@@ -19,6 +19,7 @@
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunction.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Layout.h"
@@ -229,14 +230,23 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
       preludeCode + "\n" + "var that = this;\n" +
       // runtimeScene is supposed to be always accessible, read
       // it from the object
-      "var runtimeScene = this._runtimeScene;\n" +
+      "var runtimeScene = this._instanceContainer;\n" +
       // By convention of Object Events Function, the object is accessible
       // as a parameter called "Object", and thisObjectList is an array
       // containing it (for faster access, without having to go through the
       // hashmap).
       "var thisObjectList = [this];\n" +
-      "var Object = Hashtable.newFrom({Object: thisObjectList});\n" +
-      codeGenerator.GenerateObjectEventsFunctionContext(
+      "var Object = Hashtable.newFrom({Object: thisObjectList});\n";
+      
+      // Add child-objects
+      for (auto &childObject : eventsBasedObject.GetObjects()) {
+        // child-object are never picked because they are not parameters.
+        fullPreludeCode += "var this" + childObject->GetName() + "List = [];\n" +
+                           "var " + childObject->GetName() + " = Hashtable.newFrom({" +
+                           childObject->GetName() + ": this" + childObject->GetName() + "List});\n";
+      }
+
+      fullPreludeCode += codeGenerator.GenerateObjectEventsFunctionContext(
           eventsBasedObject,
           eventsFunction.GetParameters(),
           onceTriggersVariable,
@@ -371,6 +381,13 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionContext(
         ConvertToStringExplicit(thisObjectName) + ": " + thisObjectName + "\n";
     objectArraysMap +=
         ConvertToStringExplicit(thisObjectName) + ": thisObjectList\n";
+    
+    // Add child-objects
+    for (auto &childObject : eventsBasedObject.GetObjects()) {
+      // child-object are never picked because they are not parameters.
+      objectsGettersMap += ", " + ConvertToStringExplicit(childObject->GetName()) + ": " + childObject->GetName() + "\n";
+      objectArraysMap += ", " + ConvertToStringExplicit(childObject->GetName()) + ": this" + childObject->GetName() + "List\n";
+    }
   }
 
   return GenerateEventsFunctionContext(parameters,

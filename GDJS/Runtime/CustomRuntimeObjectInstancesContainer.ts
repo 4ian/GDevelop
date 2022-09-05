@@ -14,6 +14,7 @@ namespace gdjs {
     _renderer: gdjs.CustomObjectRenderer;
     _runtimeScene: gdjs.RuntimeScene;
     _parent: gdjs.RuntimeInstancesContainer;
+    _customObject: gdjs.CustomRuntimeObject;
     _isLoaded: boolean = false;
 
     /**
@@ -25,15 +26,20 @@ namespace gdjs {
     ) {
       super();
       this._parent = parent;
-      const scene = parent.getScene();
-      const runtimeGame = scene.getGame();
+      this._customObject = customObject;
+      this._runtimeScene = parent.getScene();
       this._renderer = new gdjs.CustomObjectRenderer(
         customObject,
         this,
-        parent,
-        runtimeGame && runtimeGame.getRenderer()
+        parent
       );
-      this._runtimeScene = scene;
+    }
+
+    createObject(objectName: string): gdjs.RuntimeObject | null {
+      console.log("CustomObject createObject");
+      const result = super.createObject(objectName);
+      this._customObject.onChildrenLocationChange();
+      return result;
     }
 
     /**
@@ -67,6 +73,27 @@ namespace gdjs {
         });
       }
 
+      // TODO EBO Remove it when the instance editor is done.
+      // Add a default layer
+      this.addLayer({
+        name: '',
+        visibility: true,
+        cameras: [{
+          defaultSize: true,
+          defaultViewport: true,
+          height: 0,
+          viewportBottom: 0,
+          viewportLeft: 0,
+          viewportRight: 0,
+          viewportTop: 0,
+          width: 0}],
+        effects: [],
+        ambientLightColorR: 0,
+        ambientLightColorG: 0,
+        ambientLightColorB: 0,
+        isLightingLayer: false,
+        followBaseLayerCamera: false});
+
       // Set up the default z order (for objects created from events)
       this._setLayerDefaultZOrders();
 
@@ -98,13 +125,6 @@ namespace gdjs {
       //@ts-ignore We are deleting the object
       this._onceTriggers = null;
       this._isLoaded = false;
-    }
-
-    /**
-     * Render the PIXI container associated to the runtimeScene.
-     */
-    render() {
-      this._renderer.render();
     }
 
     _updateLayersCameraCoordinates(scale: float) {
@@ -252,6 +272,10 @@ namespace gdjs {
 
     getScene() {
       return this._runtimeScene;
+    }
+    
+    getProfiler(): gdjs.Profiler | null {
+      return this._runtimeScene.getProfiler();
     }
 
     /**

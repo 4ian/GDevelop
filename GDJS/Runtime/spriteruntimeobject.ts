@@ -201,7 +201,7 @@ namespace gdjs {
     loop: boolean;
     frames: SpriteAnimationFrame[] = [];
 
-    constructor(imageManager, directionData) {
+    constructor(imageManager: gdjs.PixiImageManager, directionData: SpriteDirectionData) {
       this.timeBetweenFrames = directionData
         ? directionData.timeBetweenFrames
         : 1.0;
@@ -247,9 +247,10 @@ namespace gdjs {
     name: string;
     directions: gdjs.SpriteAnimationDirection[] = [];
 
-    constructor(imageManager, animData) {
+    constructor(imageManager: gdjs.PixiImageManager, animData: SpriteAnimationData) {
       this.hasMultipleDirections = !!animData.useMultipleDirections;
       this.name = animData.name || '';
+      console.log(this.name);
       this.reinitialize(imageManager, animData);
     }
 
@@ -316,8 +317,9 @@ namespace gdjs {
     hitBoxesDirty: any;
     _animationFrameDirty: any;
 
-    constructor(runtimeScene, spriteObjectData) {
+    constructor(runtimeScene: gdjs.RuntimeInstancesContainer, spriteObjectData: ObjectData & SpriteObjectDataType) {
       super(runtimeScene, spriteObjectData);
+      console.log("Sprite: " + spriteObjectData.name);
       this._updateIfNotVisible = !!spriteObjectData.updateIfNotVisible;
       for (let i = 0, len = spriteObjectData.animations.length; i < len; ++i) {
         this._animations.push(

@@ -27,6 +27,7 @@ namespace gdjs {
       this._object = object;
       this._instancesContainer = instancesContainer;
       this._pixiContainer = new PIXI.Container();
+      // TODO Remove all these name
       this._pixiContainer.name = "Custom " + object.getName();
       this._debugDrawRenderedObjectsPoints = {};
 
@@ -62,13 +63,13 @@ namespace gdjs {
      * Update the internal PIXI.Sprite position, angle...
      */
     _updatePIXIContainer() {
-      // this._pixiContainer.pivot.x = this._object.getCenterX();
-      // this._pixiContainer.pivot.y = this._object.getCenterY();
-      // this._pixiContainer.position.x = this._object.x;
-      // this._pixiContainer.position.y = this._object.y;
-      // this._pixiContainer.rotation = gdjs.toRad(this._object.angle);
-      // this._pixiContainer.scale.x = this._object._scaleX;
-      // this._pixiContainer.scale.y = this._object._scaleY;
+      this._pixiContainer.pivot.x = this._object.getCenterX();
+      this._pixiContainer.pivot.y = this._object.getCenterY();
+      this._pixiContainer.position.x = this._object.x + this._pixiContainer.pivot.x * Math.abs(this._object._scaleX);
+      this._pixiContainer.position.y = this._object.y + this._pixiContainer.pivot.y * Math.abs(this._object._scaleY);
+      this._pixiContainer.rotation = gdjs.toRad(this._object.angle);
+      this._pixiContainer.scale.x = this._object._scaleX;
+      this._pixiContainer.scale.y = this._object._scaleY;
       this._pixiContainer.visible = !this._object.hidden;
       this._pixiContainer.alpha = this._object.opacity / 255;
 

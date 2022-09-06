@@ -34,7 +34,11 @@ namespace gdjs {
       runtimeSceneRenderer: gdjs.RuntimeScenePixiRenderer
     ) {
       this._pixiContainer = new PIXI.Container();
-      this._pixiContainer.name = "Layer of " + (layer._runtimeInstancesContainer._name ? layer._runtimeInstancesContainer._name : "Custom");
+      this._pixiContainer.name =
+        'Layer of ' +
+        (layer._runtimeInstancesContainer._name
+          ? layer._runtimeInstancesContainer._name
+          : 'Custom');
       this._layer = layer;
       this._runtimeSceneRenderer = runtimeSceneRenderer;
       this._pixiRenderer = runtimeSceneRenderer.getPIXIRenderer();

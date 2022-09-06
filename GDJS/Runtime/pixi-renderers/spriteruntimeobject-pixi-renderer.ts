@@ -24,7 +24,7 @@ namespace gdjs {
       this._sprite = new PIXI.Sprite(
         runtimeScene.getGame().getImageManager().getInvalidPIXITexture()
       );
-      this._sprite.name = "Sprite " + runtimeObject.getName();
+      this._sprite.name = 'Sprite ' + runtimeObject.getName();
       const layer = runtimeScene.getLayer('');
       if (layer) {
         layer
@@ -33,7 +33,10 @@ namespace gdjs {
       }
     }
 
-    reinitialize(runtimeObject: gdjs.SpriteRuntimeObject, runtimeScene: gdjs.RuntimeInstancesContainer) {
+    reinitialize(
+      runtimeObject: gdjs.SpriteRuntimeObject,
+      runtimeScene: gdjs.RuntimeInstancesContainer
+    ) {
       this._object = runtimeObject;
       this._spriteDirty = true;
       this._textureDirty = true;

@@ -23,11 +23,13 @@ namespace gdjs {
         if (colors.length < 3) {
           return;
         }
-        runtimeScene.getScene().setBackgroundColor(
-          parseInt(colors[0]),
-          parseInt(colors[1]),
-          parseInt(colors[2])
-        );
+        runtimeScene
+          .getScene()
+          .setBackgroundColor(
+            parseInt(colors[0]),
+            parseInt(colors[1]),
+            parseInt(colors[2])
+          );
       };
 
       export const getElapsedTimeInSeconds = function (runtimeScene) {
@@ -115,7 +117,8 @@ namespace gdjs {
         }
 
         update(runtimeScene: RuntimeScene): boolean {
-          this.timeElapsedOnScene += runtimeScene.getScene()
+          this.timeElapsedOnScene += runtimeScene
+            .getScene()
             .getTimeManager()
             .getElapsedTime();
           return this.timeElapsedOnScene >= this.duration;
@@ -168,7 +171,9 @@ namespace gdjs {
       export const getTimeFromStartInSeconds = function (
         runtimeScene: gdjs.RuntimeScene
       ) {
-        return runtimeScene.getScene().getTimeManager().getTimeFromStart() / 1000;
+        return (
+          runtimeScene.getScene().getTimeManager().getTimeFromStart() / 1000
+        );
       };
 
       export const getTime = function (
@@ -211,30 +216,35 @@ namespace gdjs {
         if (!runtimeScene.getGame().getSceneData(newSceneName)) {
           return;
         }
-        runtimeScene.getScene().requestChange(
-          clearOthers
-            ? gdjs.SceneChangeRequest.CLEAR_SCENES
-            : gdjs.SceneChangeRequest.REPLACE_SCENE,
-          newSceneName
-        );
+        runtimeScene
+          .getScene()
+          .requestChange(
+            clearOthers
+              ? gdjs.SceneChangeRequest.CLEAR_SCENES
+              : gdjs.SceneChangeRequest.REPLACE_SCENE,
+            newSceneName
+          );
       };
 
       export const pushScene = function (runtimeScene, newSceneName) {
         if (!runtimeScene.getGame().getSceneData(newSceneName)) {
           return;
         }
-        runtimeScene.getScene().requestChange(
-          gdjs.SceneChangeRequest.PUSH_SCENE,
-          newSceneName
-        );
+        runtimeScene
+          .getScene()
+          .requestChange(gdjs.SceneChangeRequest.PUSH_SCENE, newSceneName);
       };
 
       export const popScene = function (runtimeScene) {
-        runtimeScene.getScene().requestChange(gdjs.SceneChangeRequest.POP_SCENE);
+        runtimeScene
+          .getScene()
+          .requestChange(gdjs.SceneChangeRequest.POP_SCENE);
       };
 
       export const stopGame = function (runtimeScene) {
-        runtimeScene.getScene().requestChange(gdjs.SceneChangeRequest.STOP_GAME);
+        runtimeScene
+          .getScene()
+          .requestChange(gdjs.SceneChangeRequest.STOP_GAME);
       };
 
       export const createObjectsFromExternalLayout = function (

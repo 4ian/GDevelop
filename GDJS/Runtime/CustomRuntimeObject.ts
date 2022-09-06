@@ -93,8 +93,8 @@ namespace gdjs {
       // TODO EBO choose another name
       this.doStepPreEvents(instanceContainer);
     }
-    
-    doStepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {};
+
+    doStepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {}
 
     updatePreRender(instanceContainer: gdjs.RuntimeScene): void {
       this._instanceContainer._updateObjectsPreRender();
@@ -102,8 +102,8 @@ namespace gdjs {
       // TODO EBO choose another name
       this.doStepPostEvents(instanceContainer);
     }
-    
-    doStepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {};
+
+    doStepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {}
 
     getRendererObject() {
       return this.getRenderer().getRendererObject();

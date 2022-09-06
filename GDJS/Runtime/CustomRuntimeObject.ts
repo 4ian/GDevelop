@@ -36,8 +36,6 @@ namespace gdjs {
       objectData: ObjectData & CustomObjectConfiguration & EventsBasedObjectData
     ) {
       super(parent, objectData);
-      console.log("Custom: " + objectData.name + " : " + objectData.type);
-      console.log(objectData);
       this._instanceContainer = new gdjs.CustomRuntimeObjectInstancesContainer(
         parent,
         this
@@ -112,7 +110,6 @@ namespace gdjs {
     }
 
     onChildrenLocationChange() {
-      console.log("onChildrenLocationChange");
       this._isUntransformedHitBoxesDirty = true;
     }
 

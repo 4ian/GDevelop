@@ -143,12 +143,10 @@ namespace gdjs {
         if (this._pixiContainer.children[i].zOrder >= zOrder) {
           //TODO : Dichotomic search
           this._pixiContainer.addChildAt(child, i);
-          console.log(this._pixiContainer.name + " <--- " + child.name);
           return;
         }
       }
       this._pixiContainer.addChild(child);
-      console.log(this._pixiContainer.name + " <--- " + child.name);
     }
 
     /**

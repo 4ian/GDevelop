@@ -36,7 +36,6 @@ namespace gdjs {
     }
 
     createObject(objectName: string): gdjs.RuntimeObject | null {
-      console.log("CustomObject createObject");
       const result = super.createObject(objectName);
       this._customObject.onChildrenLocationChange();
       return result;

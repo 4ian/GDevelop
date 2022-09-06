@@ -250,7 +250,6 @@ namespace gdjs {
     constructor(imageManager: gdjs.PixiImageManager, animData: SpriteAnimationData) {
       this.hasMultipleDirections = !!animData.useMultipleDirections;
       this.name = animData.name || '';
-      console.log(this.name);
       this.reinitialize(imageManager, animData);
     }
 
@@ -319,7 +318,6 @@ namespace gdjs {
 
     constructor(runtimeScene: gdjs.RuntimeInstancesContainer, spriteObjectData: ObjectData & SpriteObjectDataType) {
       super(runtimeScene, spriteObjectData);
-      console.log("Sprite: " + spriteObjectData.name);
       this._updateIfNotVisible = !!spriteObjectData.updateIfNotVisible;
       for (let i = 0, len = spriteObjectData.animations.length; i < len; ++i) {
         this._animations.push(

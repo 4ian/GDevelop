@@ -77,21 +77,25 @@ namespace gdjs {
       this.addLayer({
         name: '',
         visibility: true,
-        cameras: [{
-          defaultSize: true,
-          defaultViewport: true,
-          height: 0,
-          viewportBottom: 0,
-          viewportLeft: 0,
-          viewportRight: 0,
-          viewportTop: 0,
-          width: 0}],
+        cameras: [
+          {
+            defaultSize: true,
+            defaultViewport: true,
+            height: 0,
+            viewportBottom: 0,
+            viewportLeft: 0,
+            viewportRight: 0,
+            viewportTop: 0,
+            width: 0,
+          },
+        ],
         effects: [],
         ambientLightColorR: 0,
         ambientLightColorG: 0,
         ambientLightColorB: 0,
         isLightingLayer: false,
-        followBaseLayerCamera: false});
+        followBaseLayerCamera: false,
+      });
 
       // Set up the default z order (for objects created from events)
       this._setLayerDefaultZOrders();
@@ -272,7 +276,7 @@ namespace gdjs {
     getScene() {
       return this._runtimeScene;
     }
-    
+
     getProfiler(): gdjs.Profiler | null {
       return this._runtimeScene.getProfiler();
     }

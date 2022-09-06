@@ -36,7 +36,6 @@ namespace gdjs {
 
       const layer = parent.getLayer('');
       if (layer) {
-        console.log("Add custom object to the layer");
         layer
           .getRenderer()
           .addRendererObject(this._pixiContainer, object.getZOrder());
@@ -51,7 +50,6 @@ namespace gdjs {
       this._isContainerDirty = true;
       const layer = parent.getLayer('');
       if (layer) {
-        console.log("Add custom object to the layer (reinitialize");
         layer.getRenderer().addRendererObject(this._pixiContainer, object.getZOrder());
       }
     }

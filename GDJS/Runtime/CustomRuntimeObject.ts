@@ -18,7 +18,7 @@ namespace gdjs {
    * @param runtimeScene The scene the object belongs to
    * @param spriteObjectData The object data used to initialize the object
    */
-  export class CustomRuntimeObject extends gdjs.RuntimeObject {
+  export abstract class CustomRuntimeObject extends gdjs.RuntimeObject {
     _instanceContainer: gdjs.CustomRuntimeObjectInstancesContainer;
     _isUntransformedHitBoxesDirty: boolean = true;
     _untransformedHitBoxes: gdjs.Polygon[] = [];
@@ -47,6 +47,7 @@ namespace gdjs {
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
+      this._instanceContainer._constructListOfAllInstances();
     }
 
     reinitialize(
@@ -85,21 +86,24 @@ namespace gdjs {
       this._instanceContainer.onDestroyFromScene(runtimeScene);
     }
 
-    /**
-     * Update the current frame of the object according to the elapsed time on the scene.
-     */
-    update(runtimeScene: gdjs.RuntimeScene): void {
+    update(instanceContainer: gdjs.RuntimeInstancesContainer): void {
       this._instanceContainer._updateObjectsPreEvents();
-    }
 
-    /**
-     * Ensure the sprite is ready to be displayed: the proper animation frame
-     * is set and the renderer is up to date (position, angle, alpha, flip, blend mode...).
-     */
-    updatePreRender(runtimeScene: gdjs.RuntimeScene): void {
+      //this._instanceContainer._allInstancesList[0].setY(8 * Math.random());
+      // TODO EBO choose another name
+      this.doStepPreEvents(instanceContainer);
+    }
+    
+    doStepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {};
+
+    updatePreRender(instanceContainer: gdjs.RuntimeScene): void {
       this._instanceContainer._updateObjectsPreRender();
       this.getRenderer().ensureUpToDate();
+      // TODO EBO choose another name
+      this.doStepPostEvents(instanceContainer);
     }
+    
+    doStepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {};
 
     getRendererObject() {
       return this.getRenderer().getRendererObject();
@@ -261,11 +265,11 @@ namespace gdjs {
     }
 
     getCenterX(): float {
-      return this.getDrawableX() + this.getWidth() / 2;
+      return this.getDrawableX() + this.getUnscaledWidth() / 2;
     }
 
     getCenterY(): float {
-      return this.getDrawableY() + this.getHeight() / 2;
+      return this.getDrawableY() + this.getUnscaledHeight() / 2;
     }
 
     getWidth(): float {

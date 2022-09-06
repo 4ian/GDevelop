@@ -241,9 +241,13 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
       // Add child-objects
       for (auto &childObject : eventsBasedObject.GetObjects()) {
         // child-object are never picked because they are not parameters.
-        fullPreludeCode += "var this" + childObject->GetName() + "List = [];\n" +
-                           "var " + childObject->GetName() + " = Hashtable.newFrom({" +
-                           childObject->GetName() + ": this" + childObject->GetName() + "List});\n";
+        fullPreludeCode +=
+            "var this" + childObject->GetName() +
+            "List = runtimeScene.getObjects(" +
+            ConvertToStringExplicit(childObject->GetName()) + ");\n" +
+            "var " + childObject->GetName() + " = Hashtable.newFrom({" +
+            childObject->GetName() + ": this" + childObject->GetName() +
+            "List});\n";
       }
 
       fullPreludeCode += codeGenerator.GenerateObjectEventsFunctionContext(

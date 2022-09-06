@@ -7,15 +7,15 @@ namespace gdjs {
   export namespace evtTools {
     export namespace runtimeScene {
       export const sceneJustBegins = function (runtimeScene) {
-        return runtimeScene.getTimeManager().isFirstFrame();
+        return runtimeScene.getScene().getTimeManager().isFirstFrame();
       };
 
       export const sceneJustResumed = function (runtimeScene) {
-        return runtimeScene.sceneJustResumed();
+        return runtimeScene.getScene().sceneJustResumed();
       };
 
       export const getSceneName = function (runtimeScene) {
-        return runtimeScene.getName();
+        return runtimeScene.getScene().getName();
       };
 
       export const setBackgroundColor = function (runtimeScene, rgbColor) {
@@ -23,7 +23,7 @@ namespace gdjs {
         if (colors.length < 3) {
           return;
         }
-        runtimeScene.setBackgroundColor(
+        runtimeScene.getScene().setBackgroundColor(
           parseInt(colors[0]),
           parseInt(colors[1]),
           parseInt(colors[2])
@@ -31,15 +31,15 @@ namespace gdjs {
       };
 
       export const getElapsedTimeInSeconds = function (runtimeScene) {
-        return runtimeScene.getTimeManager().getElapsedTime() / 1000;
+        return runtimeScene.getScene().getTimeManager().getElapsedTime() / 1000;
       };
 
       export const setTimeScale = function (runtimeScene, timeScale) {
-        return runtimeScene.getTimeManager().setTimeScale(timeScale);
+        return runtimeScene.getScene().getTimeManager().setTimeScale(timeScale);
       };
 
       export const getTimeScale = function (runtimeScene) {
-        return runtimeScene.getTimeManager().getTimeScale();
+        return runtimeScene.getScene().getTimeManager().getTimeScale();
       };
 
       /**
@@ -57,7 +57,7 @@ namespace gdjs {
         timeInSeconds: float,
         timerName: string
       ) {
-        const timeManager = runtimeScene.getTimeManager();
+        const timeManager = runtimeScene.getScene().getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
           timeManager.addTimer(timerName);
           return false;
@@ -68,7 +68,7 @@ namespace gdjs {
       };
 
       export const timerPaused = function (runtimeScene, timerName) {
-        const timeManager = runtimeScene.getTimeManager();
+        const timeManager = runtimeScene.getScene().getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
           return false;
         }
@@ -76,7 +76,7 @@ namespace gdjs {
       };
 
       export const resetTimer = function (runtimeScene, timerName) {
-        const timeManager = runtimeScene.getTimeManager();
+        const timeManager = runtimeScene.getScene().getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
           timeManager.addTimer(timerName);
         } else {
@@ -85,7 +85,7 @@ namespace gdjs {
       };
 
       export const pauseTimer = function (runtimeScene, timerName) {
-        const timeManager = runtimeScene.getTimeManager();
+        const timeManager = runtimeScene.getScene().getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
           timeManager.addTimer(timerName);
         }
@@ -93,7 +93,7 @@ namespace gdjs {
       };
 
       export const unpauseTimer = function (runtimeScene, timerName) {
-        const timeManager = runtimeScene.getTimeManager();
+        const timeManager = runtimeScene.getScene().getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
           timeManager.addTimer(timerName);
         }
@@ -101,7 +101,7 @@ namespace gdjs {
       };
 
       export const removeTimer = function (runtimeScene, timerName) {
-        const timeManager = runtimeScene.getTimeManager();
+        const timeManager = runtimeScene.getScene().getTimeManager();
         timeManager.removeTimer(timerName);
       };
 
@@ -115,7 +115,7 @@ namespace gdjs {
         }
 
         update(runtimeScene: RuntimeScene): boolean {
-          this.timeElapsedOnScene += runtimeScene
+          this.timeElapsedOnScene += runtimeScene.getScene()
             .getTimeManager()
             .getElapsedTime();
           return this.timeElapsedOnScene >= this.duration;
@@ -139,7 +139,7 @@ namespace gdjs {
         runtimeScene: gdjs.RuntimeScene,
         timerName: string
       ) {
-        const timeManager = runtimeScene.getTimeManager();
+        const timeManager = runtimeScene.getScene().getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
           return 0;
         }
@@ -158,7 +158,7 @@ namespace gdjs {
         runtimeScene: gdjs.RuntimeScene,
         timerName: string
       ) {
-        const timeManager = runtimeScene.getTimeManager();
+        const timeManager = runtimeScene.getScene().getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
           return Number.NaN;
         }
@@ -168,7 +168,7 @@ namespace gdjs {
       export const getTimeFromStartInSeconds = function (
         runtimeScene: gdjs.RuntimeScene
       ) {
-        return runtimeScene.getTimeManager().getTimeFromStart() / 1000;
+        return runtimeScene.getScene().getTimeManager().getTimeFromStart() / 1000;
       };
 
       export const getTime = function (
@@ -211,7 +211,7 @@ namespace gdjs {
         if (!runtimeScene.getGame().getSceneData(newSceneName)) {
           return;
         }
-        runtimeScene.requestChange(
+        runtimeScene.getScene().requestChange(
           clearOthers
             ? gdjs.SceneChangeRequest.CLEAR_SCENES
             : gdjs.SceneChangeRequest.REPLACE_SCENE,
@@ -223,18 +223,18 @@ namespace gdjs {
         if (!runtimeScene.getGame().getSceneData(newSceneName)) {
           return;
         }
-        runtimeScene.requestChange(
+        runtimeScene.getScene().requestChange(
           gdjs.SceneChangeRequest.PUSH_SCENE,
           newSceneName
         );
       };
 
       export const popScene = function (runtimeScene) {
-        runtimeScene.requestChange(gdjs.SceneChangeRequest.POP_SCENE);
+        runtimeScene.getScene().requestChange(gdjs.SceneChangeRequest.POP_SCENE);
       };
 
       export const stopGame = function (runtimeScene) {
-        runtimeScene.requestChange(gdjs.SceneChangeRequest.STOP_GAME);
+        runtimeScene.getScene().requestChange(gdjs.SceneChangeRequest.STOP_GAME);
       };
 
       export const createObjectsFromExternalLayout = function (
@@ -252,7 +252,7 @@ namespace gdjs {
 
         // trackByPersistentUuid is set to false as we don't want external layouts
         // instantiated at runtime to be hot-reloaded.
-        scene.createObjectsFrom(
+        scene.getScene().createObjectsFrom(
           externalLayoutData.instances,
           xPos,
           yPos,

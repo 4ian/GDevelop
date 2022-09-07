@@ -18,7 +18,7 @@ gdjs.TestRuntimeObject = class TestRuntimeObject extends gdjs.RuntimeObject {
 
   /**
    * @param {gdjs.RuntimeScene} runtimeScene
-   * @param {ObjectData} objectData
+   * @param {ObjectData & any} objectData
    */
   constructor(runtimeScene, objectData) {
     // *ALWAYS* call the base gdjs.RuntimeObject constructor.

@@ -351,7 +351,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   gd::String GenerateEventsFunctionParameterDeclarationsList(
       const std::vector<gd::ParameterMetadata>& parameters,
-      bool isBehaviorEventsFunction);
+      int firstParameterIndex,
+      bool addsSceneParameter);
 
   /**
    * \brief Generate the "eventsFunctionContext" object that allow a free

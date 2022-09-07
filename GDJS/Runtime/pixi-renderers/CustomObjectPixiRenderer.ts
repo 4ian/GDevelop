@@ -65,8 +65,8 @@ namespace gdjs {
      * Update the internal PIXI.Sprite position, angle...
      */
     _updatePIXIContainer() {
-      this._pixiContainer.pivot.x = this._object.getCenterX();
-      this._pixiContainer.pivot.y = this._object.getCenterY();
+      this._pixiContainer.pivot.x = this._object.getUnscaledCenterX();
+      this._pixiContainer.pivot.y = this._object.getUnscaledCenterY();
       this._pixiContainer.position.x =
         this._object.x +
         this._pixiContainer.pivot.x * Math.abs(this._object._scaleX);

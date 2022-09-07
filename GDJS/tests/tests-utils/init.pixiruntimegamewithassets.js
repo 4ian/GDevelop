@@ -13,6 +13,7 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
 
   var runtimeGame = new gdjs.RuntimeGame({
     variables: [],
+    eventsFunctionsExtensions: [],
     properties: {
       adaptGameResolutionAtRuntime: true,
       folderProject: false,

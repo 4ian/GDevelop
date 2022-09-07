@@ -28,7 +28,7 @@ declare type ObjectData = {
   /** The list of default variables. */
   variables: Array<RootVariableData>;
   /** The list of default behaviors. */
-  behaviors: Array<BehaviorData>;
+  behaviors: Array<BehaviorData & any>;
   /** The list of effects. */
   effects: Array<EffectData>;
 };

@@ -141,7 +141,7 @@ namespace gdjs {
           if (j >= this.hitBoxes[i].vertices.length) {
             this.hitBoxes[i].vertices.push([0, 0]);
           }
-          this._transformToGlobal(
+          this.applyObjectTransformation(
             this._untransformedHitBoxes[i].vertices[j][0],
             this._untransformedHitBoxes[i].vertices[j][1],
             this.hitBoxes[i].vertices[j]
@@ -190,8 +190,6 @@ namespace gdjs {
      * Return an array containing the coordinates of the point passed as parameter
      * in world coordinates (as opposed to the object local coordinates).
      *
-     * Beware: this._animationFrame and this._sprite must *not* be null!
-     *
      * All transformations (flipping, scale, rotation) are supported.
      *
      * @param x The X position of the point, in object coordinates.
@@ -199,7 +197,7 @@ namespace gdjs {
      * @param result Array that will be updated with the result
      * (x and y position of the point in global coordinates).
      */
-    private _transformToGlobal(x: float, y: float, result: number[]) {
+    applyObjectTransformation(x: float, y: float, result: number[]) {
       let cx = this.getCenterX();
       let cy = this.getCenterY();
 
@@ -222,10 +220,7 @@ namespace gdjs {
       //Rotation
       const oldX = x;
       const angleInRadians = (this.angle / 180) * Math.PI;
-      const cosValue = Math.cos(
-        // Only compute cos and sin once (10% faster than doing it twice)
-        angleInRadians
-      );
+      const cosValue = Math.cos(angleInRadians);
       const sinValue = Math.sin(angleInRadians);
       const xToCenterXDelta = x - cx;
       const yToCenterYDelta = y - cy;
@@ -236,18 +231,54 @@ namespace gdjs {
       result[1] = y + this.y;
     }
 
+    // TODO EBO Documentation
+    applyObjectInverseTransformation(x: float, y: float, result: number[]) {
+      x -= this.getCenterXInScene();
+      y -= this.getCenterYInScene();
+
+      const absScaleX = Math.abs(this._scaleX);
+      const absScaleY = Math.abs(this._scaleY);
+
+      //Rotation
+      const angleInRadians = (this.angle / 180) * Math.PI;
+      const cosValue = Math.cos(-angleInRadians);
+      const sinValue = Math.sin(-angleInRadians);
+      const oldX = x;
+      x = cosValue * x - sinValue * y;
+      y = sinValue * oldX + cosValue * y;
+
+      //Scale
+      x /= absScaleX;
+      y /= absScaleY;
+
+      //Flipping
+      if (this._flippedX) {
+        x = -x;
+      }
+      if (this._flippedY) {
+        y = -y;
+      }
+
+      const positionToCenterX =
+        this.getUnscaledWidth() / 2 - this._unrotatedAABB.min[0];
+      const positionToCenterY =
+        this.getUnscaledHeight() / 2 - this._unrotatedAABB.min[1];
+      result[0] = x + positionToCenterX;
+      result[1] = y + positionToCenterY;
+    }
+
     getDrawableX(): float {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
-      return this._unrotatedAABB.min[0];
+      return this.x + this._unrotatedAABB.min[0] * this._scaleX;
     }
 
     getDrawableY(): float {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
-      return this._unrotatedAABB.min[1];
+      return this.y + this._unrotatedAABB.min[1] * this._scaleY;
     }
 
     getUnscaledWidth(): float {
@@ -264,12 +295,26 @@ namespace gdjs {
       return this._unrotatedAABB.max[1] - this._unrotatedAABB.min[1];
     }
 
+    getUnscaledCenterX(): float {
+      if (this._isUntransformedHitBoxesDirty) {
+        this._updateUntransformedHitBoxes();
+      }
+      return this.getUnscaledWidth() / 2 - this._unrotatedAABB.min[0];
+    }
+
+    getUnscaledCenterY(): float {
+      if (this._isUntransformedHitBoxesDirty) {
+        this._updateUntransformedHitBoxes();
+      }
+      return this.getUnscaledHeight() / 2 - this._unrotatedAABB.min[1];
+    }
+
     getCenterX(): float {
-      return this.getDrawableX() + this.getUnscaledWidth() / 2;
+      return this.getUnscaledCenterX() * this._scaleX;
     }
 
     getCenterY(): float {
-      return this.getDrawableY() + this.getUnscaledHeight() / 2;
+      return this.getUnscaledCenterY() * this._scaleY;
     }
 
     getWidth(): float {

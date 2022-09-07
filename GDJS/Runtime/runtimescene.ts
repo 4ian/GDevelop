@@ -404,38 +404,6 @@ namespace gdjs {
       this._renderer.render();
     }
 
-    _updateLayersCameraCoordinates(scale: float) {
-      this._layersCameraCoordinates = this._layersCameraCoordinates || {};
-      for (const name in this._layers.items) {
-        if (this._layers.items.hasOwnProperty(name)) {
-          const theLayer = this._layers.items[name];
-          this._layersCameraCoordinates[name] = this._layersCameraCoordinates[
-            name
-          ] || [0, 0, 0, 0];
-          this._layersCameraCoordinates[name][0] =
-            theLayer.getCameraX() - (theLayer.getCameraWidth() / 2) * scale;
-          this._layersCameraCoordinates[name][1] =
-            theLayer.getCameraY() - (theLayer.getCameraHeight() / 2) * scale;
-          this._layersCameraCoordinates[name][2] =
-            theLayer.getCameraX() + (theLayer.getCameraWidth() / 2) * scale;
-          this._layersCameraCoordinates[name][3] =
-            theLayer.getCameraY() + (theLayer.getCameraHeight() / 2) * scale;
-        }
-      }
-    }
-
-    /**
-     * Called to update effects of layers before rendering.
-     */
-    _updateLayersPreRender() {
-      for (const name in this._layers.items) {
-        if (this._layers.items.hasOwnProperty(name)) {
-          const layer = this._layers.items[name];
-          layer.updatePreRender(this);
-        }
-      }
-    }
-
     /**
      * Called to update visibility of the renderers of objects
      * rendered on the scene ("culling"), update effects (of visible objects)
@@ -446,24 +414,7 @@ namespace gdjs {
      */
     _updateObjectsPreRender() {
       if (this._timeManager.isFirstFrame()) {
-        this._constructListOfAllInstances();
-        for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-          const object = this._allInstancesList[i];
-          const rendererObject = object.getRendererObject();
-          if (rendererObject) {
-            rendererObject.visible = !object.isHidden();
-
-            // Update effects, only for visible objects.
-            if (rendererObject.visible) {
-              this._runtimeGame
-                .getEffectsManager()
-                .updatePreRender(object.getRendererEffects(), object);
-            }
-          }
-
-          // Perform pre-render update.
-          object.updatePreRender(this);
-        }
+        super._updateObjectsPreRender();
         return;
       } else {
         // After first frame, optimise rendering by setting only objects
@@ -522,51 +473,6 @@ namespace gdjs {
           }
         }
       }
-    }
-
-    /**
-     * Update the objects before launching the events.
-     */
-    _updateObjectsPreEvents() {
-      //It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
-      //may delete the objects.
-      this._constructListOfAllInstances();
-      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-        const obj = this._allInstancesList[i];
-        const elapsedTime = obj.getElapsedTime(this);
-        if (!obj.hasNoForces()) {
-          const averageForce = obj.getAverageForce();
-          const elapsedTimeInSeconds = elapsedTime / 1000;
-          obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
-          obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
-          obj.update(this);
-          obj.updateForces(elapsedTimeInSeconds);
-        } else {
-          obj.update(this);
-        }
-        obj.updateTimers(elapsedTime);
-        this._allInstancesList[i].stepBehaviorsPreEvents(this);
-      }
-
-      //Some behaviors may have request objects to be deleted.
-      this._cacheOrClearRemovedInstances();
-    }
-
-    /**
-     * Update the objects (update positions, time management...)
-     */
-    _updateObjectsPostEvents() {
-      this._cacheOrClearRemovedInstances();
-
-      //It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
-      //may delete the objects.
-      this._constructListOfAllInstances();
-      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-        this._allInstancesList[i].stepBehaviorsPostEvents(this);
-      }
-
-      //Some behaviors may have request objects to be deleted.
-      this._cacheOrClearRemovedInstances();
     }
 
     /**

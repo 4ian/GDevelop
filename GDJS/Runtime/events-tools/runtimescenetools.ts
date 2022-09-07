@@ -6,19 +6,26 @@
 namespace gdjs {
   export namespace evtTools {
     export namespace runtimeScene {
-      export const sceneJustBegins = function (runtimeScene) {
+      export const sceneJustBegins = function (
+        runtimeScene: gdjs.RuntimeScene
+      ) {
         return runtimeScene.getScene().getTimeManager().isFirstFrame();
       };
 
-      export const sceneJustResumed = function (runtimeScene) {
+      export const sceneJustResumed = function (
+        runtimeScene: gdjs.RuntimeScene
+      ) {
         return runtimeScene.getScene().sceneJustResumed();
       };
 
-      export const getSceneName = function (runtimeScene) {
+      export const getSceneName = function (runtimeScene: gdjs.RuntimeScene) {
         return runtimeScene.getScene().getName();
       };
 
-      export const setBackgroundColor = function (runtimeScene, rgbColor) {
+      export const setBackgroundColor = function (
+        runtimeScene: gdjs.RuntimeScene,
+        rgbColor: string
+      ) {
         const colors = rgbColor.split(';');
         if (colors.length < 3) {
           return;
@@ -32,15 +39,20 @@ namespace gdjs {
           );
       };
 
-      export const getElapsedTimeInSeconds = function (runtimeScene) {
+      export const getElapsedTimeInSeconds = function (
+        runtimeScene: gdjs.RuntimeScene
+      ) {
         return runtimeScene.getScene().getTimeManager().getElapsedTime() / 1000;
       };
 
-      export const setTimeScale = function (runtimeScene, timeScale) {
+      export const setTimeScale = function (
+        runtimeScene: gdjs.RuntimeScene,
+        timeScale: float
+      ) {
         return runtimeScene.getScene().getTimeManager().setTimeScale(timeScale);
       };
 
-      export const getTimeScale = function (runtimeScene) {
+      export const getTimeScale = function (runtimeScene: gdjs.RuntimeScene) {
         return runtimeScene.getScene().getTimeManager().getTimeScale();
       };
 
@@ -69,7 +81,10 @@ namespace gdjs {
         );
       };
 
-      export const timerPaused = function (runtimeScene, timerName) {
+      export const timerPaused = function (
+        runtimeScene: gdjs.RuntimeScene,
+        timerName: string
+      ) {
         const timeManager = runtimeScene.getScene().getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
           return false;
@@ -77,7 +92,10 @@ namespace gdjs {
         return timeManager.getTimer(timerName).isPaused();
       };
 
-      export const resetTimer = function (runtimeScene, timerName) {
+      export const resetTimer = function (
+        runtimeScene: gdjs.RuntimeScene,
+        timerName: string
+      ) {
         const timeManager = runtimeScene.getScene().getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
           timeManager.addTimer(timerName);
@@ -86,7 +104,10 @@ namespace gdjs {
         }
       };
 
-      export const pauseTimer = function (runtimeScene, timerName) {
+      export const pauseTimer = function (
+        runtimeScene: gdjs.RuntimeScene,
+        timerName: string
+      ) {
         const timeManager = runtimeScene.getScene().getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
           timeManager.addTimer(timerName);
@@ -94,7 +115,10 @@ namespace gdjs {
         timeManager.getTimer(timerName).setPaused(true);
       };
 
-      export const unpauseTimer = function (runtimeScene, timerName) {
+      export const unpauseTimer = function (
+        runtimeScene: gdjs.RuntimeScene,
+        timerName: string
+      ) {
         const timeManager = runtimeScene.getScene().getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
           timeManager.addTimer(timerName);
@@ -102,7 +126,10 @@ namespace gdjs {
         return timeManager.getTimer(timerName).setPaused(false);
       };
 
-      export const removeTimer = function (runtimeScene, timerName) {
+      export const removeTimer = function (
+        runtimeScene: gdjs.RuntimeScene,
+        timerName: string
+      ) {
         const timeManager = runtimeScene.getScene().getTimeManager();
         timeManager.removeTimer(timerName);
       };
@@ -226,7 +253,10 @@ namespace gdjs {
           );
       };
 
-      export const pushScene = function (runtimeScene, newSceneName) {
+      export const pushScene = function (
+        runtimeScene: gdjs.RuntimeScene,
+        newSceneName: string
+      ) {
         if (!runtimeScene.getGame().getSceneData(newSceneName)) {
           return;
         }
@@ -235,20 +265,20 @@ namespace gdjs {
           .requestChange(gdjs.SceneChangeRequest.PUSH_SCENE, newSceneName);
       };
 
-      export const popScene = function (runtimeScene) {
+      export const popScene = function (runtimeScene: gdjs.RuntimeScene) {
         runtimeScene
           .getScene()
           .requestChange(gdjs.SceneChangeRequest.POP_SCENE);
       };
 
-      export const stopGame = function (runtimeScene) {
+      export const stopGame = function (runtimeScene: gdjs.RuntimeScene) {
         runtimeScene
           .getScene()
           .requestChange(gdjs.SceneChangeRequest.STOP_GAME);
       };
 
       export const createObjectsFromExternalLayout = function (
-        scene: gdjs.RuntimeScene,
+        scene: gdjs.RuntimeInstancesContainer,
         externalLayout: string,
         xPos: float,
         yPos: float

@@ -640,6 +640,15 @@ namespace gdjs {
       return this;
     }
 
+    convertCoords(x: float, y: float): FloatPoint {
+      // TODO EBO Use an attribute instead of instantiating a point.
+      return [x, y];
+    }
+
+    convertInverseCoords(sceneX: float, sceneY: float): FloatPoint {
+      return [sceneX, sceneY];
+    }
+
     /**
      * Get the variables of the runtimeScene.
      * @return The container holding the variables of the scene.

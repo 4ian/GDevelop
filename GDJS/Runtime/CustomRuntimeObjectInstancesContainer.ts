@@ -277,6 +277,22 @@ namespace gdjs {
       return this._runtimeScene;
     }
 
+    convertCoords(x: float, y: float): FloatPoint {
+      const position = this._parent.convertCoords(x, y);
+      this._customObject.applyObjectInverseTransformation(
+        position[0],
+        position[1],
+        position
+      );
+      return position;
+    }
+
+    convertInverseCoords(sceneX: float, sceneY: float): FloatPoint {
+      const position = [0, 0];
+      this._customObject.applyObjectTransformation(sceneX, sceneY, position);
+      return this._parent.convertInverseCoords(position[0], position[1]);
+    }
+
     getProfiler(): gdjs.Profiler | null {
       return this._runtimeScene.getProfiler();
     }

@@ -309,7 +309,11 @@ namespace gdjs {
       const sinValue = Math.sin(angleInRadians);
       x = cosValue * x - sinValue * y;
       y = sinValue * tmp + cosValue * y;
-      return [x + this.getCameraX(cameraId), y + this.getCameraY(cameraId)];
+      // TODO EBO use an AffineTransformation to avoid chained calls.
+      return this._runtimeInstancesContainer.convertCoords(
+        x + this.getCameraX(cameraId),
+        y + this.getCameraY(cameraId)
+      );
     }
 
     /**
@@ -320,7 +324,17 @@ namespace gdjs {
      * @param y The y position, in scene coordinates.
      * @param cameraId The camera number. Currently ignored.
      */
-    convertInverseCoords(x: float, y: float, cameraId?: integer): FloatPoint {
+    convertInverseCoords(
+      sceneX: float,
+      sceneY: float,
+      cameraId?: integer
+    ): FloatPoint {
+      const position = this._runtimeInstancesContainer.convertInverseCoords(
+        sceneX,
+        sceneY
+      );
+      let x = position[0];
+      let y = position[1];
       x -= this.getCameraX(cameraId);
       y -= this.getCameraY(cameraId);
 
@@ -333,10 +347,9 @@ namespace gdjs {
       y = sinValue * tmp + cosValue * y;
       x *= Math.abs(this._zoomFactor);
       y *= Math.abs(this._zoomFactor);
-      return [
-        x + this._cachedGameResolutionWidth / 2,
-        y + this._cachedGameResolutionHeight / 2,
-      ];
+      position[0] = x + this._cachedGameResolutionWidth / 2;
+      position[1] = y + this._cachedGameResolutionHeight / 2;
+      return position;
     }
 
     getWidth(): float {

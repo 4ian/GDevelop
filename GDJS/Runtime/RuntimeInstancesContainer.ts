@@ -70,6 +70,24 @@ namespace gdjs {
     abstract getProfiler(): gdjs.Profiler | null;
 
     /**
+     * Convert a point from the canvas coordinates (for example,
+     * the mouse position) to the container coordinates.
+     *
+     * @param x The x position, in container coordinates.
+     * @param y The y position, in container coordinates.
+     */
+    abstract convertCoords(x: float, y: float): FloatPoint;
+
+    /**
+     * Convert a point from the container coordinates (for example,
+     * an object position) to the canvas coordinates.
+     *
+     * @param x The x position, in container coordinates.
+     * @param y The y position, in container coordinates.
+     */
+    abstract convertInverseCoords(sceneX: float, sceneY: float): FloatPoint;
+
+    /**
      * Activate or deactivate the debug visualization for collisions and points.
      */
     enableDebugDraw(

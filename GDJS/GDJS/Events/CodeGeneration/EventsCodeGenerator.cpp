@@ -130,7 +130,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       codeGenerator,
       codeGenerator.GetCodeNamespaceAccessor() + "func",
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParameters(), false),
+          eventsFunction.GetParameters(), 0, true),
       codeGenerator.GenerateFreeEventsFunctionContext(
           eventsFunction.GetParameters(), "runtimeScene.getOnceTriggers()"),
       eventsFunction.GetEvents(),
@@ -192,7 +192,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       codeGenerator,
       fullyQualifiedFunctionName,
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParameters(), true),
+          eventsFunction.GetParameters(), 2, false),
       fullPreludeCode,
       eventsFunction.GetEvents(),
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
@@ -262,7 +262,8 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
       codeGenerator,
       fullyQualifiedFunctionName,
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParameters(), true),
+        // TODO EBO use constants for firstParameterIndex
+          eventsFunction.GetParameters(), 1, false),
       fullPreludeCode,
       eventsFunction.GetEvents(),
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
@@ -274,11 +275,12 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
     const vector<gd::ParameterMetadata>& parameters,
-    bool isBehaviorEventsFunction) {
-  gd::String declaration = isBehaviorEventsFunction ? "" : "runtimeScene";
+    int firstParameterIndex,
+    bool addsSceneParameter) {
+  gd::String declaration = addsSceneParameter ? "runtimeScene" : "";
   for (size_t i = 0; i < parameters.size(); ++i) {
     const auto& parameter = parameters[i];
-    if (isBehaviorEventsFunction && (i == 0 || i == 1)) {
+    if (i < firstParameterIndex) {
       // By convention, the first two arguments of a behavior events function
       // are the object and the behavior, which are not passed to the called
       // function in the generated JS code.

@@ -211,7 +211,7 @@ namespace gdjs {
      */
     constructor(
       instancesContainer: gdjs.RuntimeInstancesContainer,
-      objectData: ObjectData
+      objectData: ObjectData & any
     ) {
       this.name = objectData.name || '';
       this.type = objectData.type || '';
@@ -2420,9 +2420,9 @@ namespace gdjs {
      *
      * @return true if the cursor, or any touch, is on the object.
      */
-    cursorOnObject(runtimeScene: RuntimeScene): boolean {
-      const inputManager = runtimeScene.getGame().getInputManager();
-      const layer = runtimeScene.getLayer(this.layer);
+    cursorOnObject(instanceContainer: gdjs.RuntimeInstancesContainer): boolean {
+      const inputManager = instanceContainer.getGame().getInputManager();
+      const layer = instanceContainer.getLayer(this.layer);
       const mousePos = layer.convertCoords(
         inputManager.getMouseX(),
         inputManager.getMouseY()

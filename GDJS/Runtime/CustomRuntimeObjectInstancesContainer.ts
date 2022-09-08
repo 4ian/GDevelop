@@ -12,6 +12,7 @@ namespace gdjs {
    */
   export class CustomRuntimeObjectInstancesContainer extends gdjs.RuntimeInstancesContainer {
     _renderer: gdjs.CustomObjectRenderer;
+    _debuggerRenderer: gdjs.DebuggerRenderer;
     _runtimeScene: gdjs.RuntimeScene;
     _parent: gdjs.RuntimeInstancesContainer;
     _customObject: gdjs.CustomRuntimeObject;
@@ -33,11 +34,12 @@ namespace gdjs {
         this,
         parent
       );
+      this._debuggerRenderer = new gdjs.DebuggerRenderer(this);
     }
 
     createObject(objectName: string): gdjs.RuntimeObject | null {
       const result = super.createObject(objectName);
-      this._customObject.onChildrenLocationChange();
+      this._customObject.onChildrenLocationChanged();
       return result;
     }
 
@@ -186,6 +188,17 @@ namespace gdjs {
           }
         }
 
+        // Set to true to enable debug rendering (look for the implementation in the renderer
+        // to see what is rendered).
+        if (this._debugDrawEnabled) {
+          this._debuggerRenderer.renderDebugDraw(
+            this._allInstancesList,
+            this._debugDrawShowHiddenInstances,
+            this._debugDrawShowPointsNames,
+            this._debugDrawShowCustomPoints
+          );
+        }
+
         // Perform pre-render update.
         object.updatePreRender(this);
       }
@@ -248,6 +261,10 @@ namespace gdjs {
       return this._renderer;
     }
 
+    getDebuggerRenderer() {
+      return this._debuggerRenderer;
+    }
+
     getGame() {
       return this._runtimeScene.getGame();
     }
@@ -262,6 +279,10 @@ namespace gdjs {
 
     getViewportHeight(): float {
       return this._customObject.getUnscaledHeight();
+    }
+
+    onChildrenLocationChanged(): void {
+      this._customObject.onChildrenLocationChanged();
     }
 
     onObjectUnscaledDimensionChange(oldWidth: float, oldHeight: float): void {

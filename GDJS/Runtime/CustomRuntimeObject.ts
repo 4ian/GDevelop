@@ -94,16 +94,16 @@ namespace gdjs {
       this.doStepPreEvents(instanceContainer);
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {}
+    doStepPreEvents(instanceContainer: gdjs.RuntimeInstancesContainer) {}
 
-    updatePreRender(instanceContainer: gdjs.RuntimeScene): void {
+    updatePreRender(instanceContainer: gdjs.RuntimeInstancesContainer): void {
       this._instanceContainer._updateObjectsPreRender();
       this.getRenderer().ensureUpToDate();
       // TODO EBO choose another name
       this.doStepPostEvents(instanceContainer);
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {}
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstancesContainer) {}
 
     getRendererObject() {
       return this.getRenderer().getRendererObject();
@@ -113,7 +113,7 @@ namespace gdjs {
       return this._instanceContainer.getRenderer();
     }
 
-    onChildrenLocationChange() {
+    onChildrenLocationChanged() {
       this._isUntransformedHitBoxesDirty = true;
     }
 
@@ -172,6 +172,7 @@ namespace gdjs {
       let minY = Number.MAX_VALUE;
       let maxX = -Number.MAX_VALUE;
       let maxY = -Number.MAX_VALUE;
+      this._untransformedHitBoxes.length = 0;
       for (const childInstance of this._instanceContainer.getAllInstances()) {
         Array.prototype.push.apply(
           this._untransformedHitBoxes,

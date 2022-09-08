@@ -14,9 +14,10 @@ namespace gdjs {
     _eventsFunction: null | ((runtimeScene: RuntimeScene) => void) = null;
 
     // TODO EBO move behavior shared data up to the instances container.
-    //Contains the objects data stored in the project
+    /** Contains the objects data stored in the project */
     _initialBehaviorSharedData: Hashtable<BehaviorSharedData | null>;
     _renderer: RuntimeSceneRenderer;
+    _debuggerRenderer: gdjs.DebuggerRenderer;
     _variables: gdjs.VariablesContainer;
     _runtimeGame: gdjs.RuntimeGame;
     _lastId: integer = 0;
@@ -49,24 +50,22 @@ namespace gdjs {
     constructor(runtimeGame: gdjs.RuntimeGame) {
       super();
       this._initialBehaviorSharedData = new Hashtable();
+      this._runtimeGame = runtimeGame;
+      this._variables = new gdjs.VariablesContainer();
+      this._timeManager = new gdjs.TimeManager();
+      this._onceTriggers = new gdjs.OnceTriggers();
+      this._requestedChange = SceneChangeRequest.CONTINUE;
+      this._cachedGameResolutionWidth = runtimeGame.getGameResolutionWidth();
+      this._cachedGameResolutionHeight = runtimeGame.getGameResolutionHeight();
+
       this._renderer = new gdjs.RuntimeSceneRenderer(
         this,
         // @ts-ignore
         runtimeGame ? runtimeGame.getRenderer() : null
       );
-      this._variables = new gdjs.VariablesContainer();
-      this._runtimeGame = runtimeGame;
-      this._timeManager = new gdjs.TimeManager();
-      this._requestedChange = SceneChangeRequest.CONTINUE;
-      this._cachedGameResolutionWidth = runtimeGame.getGameResolutionWidth();
-      this._cachedGameResolutionHeight = runtimeGame.getGameResolutionHeight();
+      this._debuggerRenderer = new gdjs.DebuggerRenderer(this);
 
       // What to do after the frame is rendered.
-
-      //An array used to create a list of all instance when necessary ( see _constructListOfAllInstances )
-      this._onceTriggers = new gdjs.OnceTriggers();
-
-      //The instances removed from the scene and waiting to be sent to the cache.
 
       // The callback function to call when the profiler is stopped.
       this.onGameResolutionResized();
@@ -389,7 +388,7 @@ namespace gdjs {
       // Set to true to enable debug rendering (look for the implementation in the renderer
       // to see what is rendered).
       if (this._debugDrawEnabled) {
-        this.getRenderer().renderDebugDraw(
+        this._debuggerRenderer.renderDebugDraw(
           this._allInstancesList,
           this._debugDrawShowHiddenInstances,
           this._debugDrawShowPointsNames,
@@ -521,11 +520,12 @@ namespace gdjs {
       return this._lastId;
     }
 
-    /**
-     * Get the renderer associated to the RuntimeScene.
-     */
-    getRenderer() {
+    getRenderer(): gdjs.RuntimeScenePixiRenderer {
       return this._renderer;
+    }
+
+    getDebuggerRenderer() {
+      return this._debuggerRenderer;
     }
 
     getGame() {
@@ -551,6 +551,10 @@ namespace gdjs {
 
     convertInverseCoords(sceneX: float, sceneY: float): FloatPoint {
       return [sceneX, sceneY];
+    }
+
+    onChildrenLocationChanged(): void {
+      // Scenes don't maintain bounds.
     }
 
     /**

@@ -20,6 +20,8 @@ import { HomePageMenu, type HomeTab } from './HomePageMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
+import { AnnouncementsFeed } from '../../../AnnouncementsFeed/AnnouncementsFeed';
+import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 
 type Props = {|
   project: ?gdProject,
@@ -84,6 +86,7 @@ export const HomePage = React.memo<Props>(
         AuthenticatedUserContext
       );
       const { fetchTutorials } = React.useContext(TutorialContext);
+      const { announcements } = React.useContext(AnnouncementsFeedContext);
       const { fetchShowcasedGamesAndFilters } = React.useContext(
         GamesShowcaseContext
       );
@@ -167,49 +170,57 @@ export const HomePage = React.memo<Props>(
                     onOpenPreferences={onOpenPreferences}
                     onOpenAbout={onOpenAbout}
                   />
-                  {activeTab === 'get-started' && (
-                    <GetStartedSection
-                      onTabChange={setActiveTab}
-                      onCreateProject={() =>
-                        onCreateProject(/*exampleShortHeader=*/ null)
-                      }
-                      onOpenOnboardingDialog={onOpenOnboardingDialog}
-                      showGetStartedSection={showGetStartedSection}
-                      setShowGetStartedSection={setShowGetStartedSection}
-                    />
-                  )}
-                  {activeTab === 'build' && (
-                    <BuildSection
-                      ref={buildSectionRef}
-                      project={project}
-                      canOpen={canOpen}
-                      onChooseProject={onChooseProject}
-                      onOpenProjectPreCreationDialog={
-                        onOpenProjectPreCreationDialog
-                      }
-                      onShowAllExamples={() =>
-                        onCreateProject(/*exampleShortHeader=*/ null)
-                      }
-                      onSelectExample={exampleShortHeader =>
-                        onCreateProject(exampleShortHeader)
-                      }
-                      onOpenRecentFile={onOpenRecentFile}
-                      onChangeSubscription={onChangeSubscription}
-                      storageProviders={storageProviders}
-                    />
-                  )}
-                  {activeTab === 'learn' && (
-                    <LearnSection
-                      onOpenOnboardingDialog={onOpenOnboardingDialog}
-                      onCreateProject={() =>
-                        onCreateProject(/*exampleShortHeader=*/ null)
-                      }
-                      onTabChange={setActiveTab}
-                      onOpenHelpFinder={onOpenHelpFinder}
-                    />
-                  )}
-                  {activeTab === 'play' && <PlaySection />}
-                  {activeTab === 'community' && <CommunitySection />}
+                  <Column
+                    noMargin
+                    expand //TODO: check fullHeight and co on Safari.
+                  >
+                    {!!announcements && (
+                      <AnnouncementsFeed level="urgent" canClose addMargins />
+                    )}
+                    {activeTab === 'get-started' && (
+                      <GetStartedSection
+                        onTabChange={setActiveTab}
+                        onCreateProject={() =>
+                          onCreateProject(/*exampleShortHeader=*/ null)
+                        }
+                        onOpenOnboardingDialog={onOpenOnboardingDialog}
+                        showGetStartedSection={showGetStartedSection}
+                        setShowGetStartedSection={setShowGetStartedSection}
+                      />
+                    )}
+                    {activeTab === 'build' && (
+                      <BuildSection
+                        ref={buildSectionRef}
+                        project={project}
+                        canOpen={canOpen}
+                        onChooseProject={onChooseProject}
+                        onOpenProjectPreCreationDialog={
+                          onOpenProjectPreCreationDialog
+                        }
+                        onShowAllExamples={() =>
+                          onCreateProject(/*exampleShortHeader=*/ null)
+                        }
+                        onSelectExample={exampleShortHeader =>
+                          onCreateProject(exampleShortHeader)
+                        }
+                        onOpenRecentFile={onOpenRecentFile}
+                        onChangeSubscription={onChangeSubscription}
+                        storageProviders={storageProviders}
+                      />
+                    )}
+                    {activeTab === 'learn' && (
+                      <LearnSection
+                        onOpenOnboardingDialog={onOpenOnboardingDialog}
+                        onCreateProject={() =>
+                          onCreateProject(/*exampleShortHeader=*/ null)
+                        }
+                        onTabChange={setActiveTab}
+                        onOpenHelpFinder={onOpenHelpFinder}
+                      />
+                    )}
+                    {activeTab === 'play' && <PlaySection />}
+                    {activeTab === 'community' && <CommunitySection />}
+                  </Column>
                 </Line>
               </Column>
             </>

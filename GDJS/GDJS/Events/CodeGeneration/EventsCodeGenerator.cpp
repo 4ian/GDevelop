@@ -243,8 +243,8 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
         // child-object are never picked because they are not parameters.
         fullPreludeCode +=
             "var this" + childObject->GetName() +
-            "List = runtimeScene.getObjects(" +
-            ConvertToStringExplicit(childObject->GetName()) + ");\n" +
+            "List = [...runtimeScene.getObjects(" +
+            ConvertToStringExplicit(childObject->GetName()) + ")];\n" +
             "var " + childObject->GetName() + " = Hashtable.newFrom({" +
             childObject->GetName() + ": this" + childObject->GetName() +
             "List});\n";

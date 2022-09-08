@@ -256,8 +256,28 @@ namespace gdjs {
       return this._runtimeScene;
     }
 
+    getViewportWidth(): float {
+      return this._customObject.getUnscaledWidth();
+    }
+
+    getViewportHeight(): float {
+      return this._customObject.getUnscaledHeight();
+    }
+
+    onObjectUnscaledDimensionChange(oldWidth: float, oldHeight: float): void {
+      for (const name in this._layers.items) {
+        if (this._layers.items.hasOwnProperty(name)) {
+          /** @type gdjs.Layer */
+          const theLayer: gdjs.Layer = this._layers.items[name];
+          theLayer.onGameResolutionResized(oldWidth, oldHeight);
+        }
+      }
+    }
+
     convertCoords(x: float, y: float): FloatPoint {
-      const position = this._parent.convertCoords(x, y);
+      const position = this._parent
+        .getLayer(this._customObject.getLayer())
+        .convertCoords(x, y);
       this._customObject.applyObjectInverseTransformation(
         position[0],
         position[1],

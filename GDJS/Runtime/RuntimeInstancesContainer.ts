@@ -87,6 +87,12 @@ namespace gdjs {
      */
     abstract convertInverseCoords(sceneX: float, sceneY: float): FloatPoint;
 
+    // TODO EBO Documentation
+    abstract getViewportWidth(): float;
+
+    // TODO EBO Documentation
+    abstract getViewportHeight(): float;
+
     /**
      * Activate or deactivate the debug visualization for collisions and points.
      */
@@ -597,11 +603,11 @@ namespace gdjs {
 
       return 0;
     }
-    
+
     /**
      * Update the objects positions according to their forces
      */
-     updateObjectsForces(): void {
+    updateObjectsForces(): void {
       for (const name in this._instances.items) {
         if (this._instances.items.hasOwnProperty(name)) {
           const list = this._instances.items[name];

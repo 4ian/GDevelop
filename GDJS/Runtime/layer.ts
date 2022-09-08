@@ -20,8 +20,6 @@ namespace gdjs {
     _initialEffectsData: Array<EffectData>;
     _cameraX: float;
     _cameraY: float;
-    _cachedGameResolutionWidth: integer;
-    _cachedGameResolutionHeight: integer;
 
     _runtimeInstancesContainer: gdjs.RuntimeInstancesContainer;
     _effectsManager: gdjs.EffectsManager;
@@ -32,7 +30,7 @@ namespace gdjs {
     _clearColor: Array<integer>;
 
     _rendererEffects: Record<string, PixiFiltersTools.Filter> = {};
-    _renderer: LayerRenderer;
+    _renderer: gdjs.LayerRenderer;
 
     /**
      * @param layerData The data used to initialize the layer
@@ -45,17 +43,9 @@ namespace gdjs {
       this._name = layerData.name;
       this._hidden = !layerData.visibility;
       this._initialEffectsData = layerData.effects || [];
-      this._cameraX =
-        runtimeInstancesContainer.getGame().getGameResolutionWidth() / 2;
-      this._cameraY =
-        runtimeInstancesContainer.getGame().getGameResolutionHeight() / 2;
-      this._cachedGameResolutionWidth = runtimeInstancesContainer
-        .getGame()
-        .getGameResolutionWidth();
-      this._cachedGameResolutionHeight = runtimeInstancesContainer
-        .getGame()
-        .getGameResolutionHeight();
       this._runtimeInstancesContainer = runtimeInstancesContainer;
+      this._cameraX = this.getWidth() / 2;
+      this._cameraY = this.getHeight() / 2;
       this._effectsManager = runtimeInstancesContainer
         .getGame()
         .getEffectsManager();
@@ -112,16 +102,10 @@ namespace gdjs {
      * Called by the RuntimeScene whenever the game resolution size is changed.
      * Updates the layer width/height and position.
      */
-    onGameResolutionResized(): void {
-      const oldGameResolutionWidth = this._cachedGameResolutionWidth;
-      const oldGameResolutionHeight = this._cachedGameResolutionHeight;
-      this._cachedGameResolutionWidth = this._runtimeInstancesContainer
-        .getGame()
-        .getGameResolutionWidth();
-      this._cachedGameResolutionHeight = this._runtimeInstancesContainer
-        .getGame()
-        .getGameResolutionHeight();
-
+    onGameResolutionResized(
+      oldGameResolutionWidth: float,
+      oldGameResolutionHeight: float
+    ): void {
       // Adapt position of the camera center as:
       // * Most cameras following a player/object on the scene will be updating this
       // in events anyway.
@@ -129,10 +113,8 @@ namespace gdjs {
       // expected not to "move". Not adapting the center position would make the camera
       // move from its initial position (which is centered in the screen) - and anchor
       // behavior would behave counterintuitively.
-      this._cameraX +=
-        (this._cachedGameResolutionWidth - oldGameResolutionWidth) / 2;
-      this._cameraY +=
-        (this._cachedGameResolutionHeight - oldGameResolutionHeight) / 2;
+      this._cameraX += (this.getWidth() - oldGameResolutionWidth) / 2;
+      this._cameraY += (this.getHeight() - oldGameResolutionHeight) / 2;
       this._renderer.updatePosition();
     }
 
@@ -170,6 +152,7 @@ namespace gdjs {
      * @return The x position of the camera
      */
     getCameraX(cameraId?: integer): float {
+      this._forceDimensionUpdate();
       return this._cameraX;
     }
 
@@ -180,6 +163,7 @@ namespace gdjs {
      * @return The y position of the camera
      */
     getCameraY(cameraId?: integer): float {
+      this._forceDimensionUpdate();
       return this._cameraY;
     }
 
@@ -190,6 +174,7 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      */
     setCameraX(x: float, cameraId?: integer): void {
+      this._forceDimensionUpdate();
       this._cameraX = x;
       this._renderer.updatePosition();
     }
@@ -201,6 +186,7 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      */
     setCameraY(y: float, cameraId?: integer): void {
+      this._forceDimensionUpdate();
       this._cameraY = y;
       this._renderer.updatePosition();
     }
@@ -213,7 +199,7 @@ namespace gdjs {
      * @return The width of the camera
      */
     getCameraWidth(cameraId?: integer): float {
-      return (+this._cachedGameResolutionWidth * 1) / this._zoomFactor;
+      return this.getWidth() / this._zoomFactor;
     }
 
     /**
@@ -224,7 +210,7 @@ namespace gdjs {
      * @return The height of the camera
      */
     getCameraHeight(cameraId?: integer): float {
-      return (+this._cachedGameResolutionHeight * 1) / this._zoomFactor;
+      return this.getHeight() / this._zoomFactor;
     }
 
     /**
@@ -290,15 +276,19 @@ namespace gdjs {
 
     /**
      * Convert a point from the canvas coordinates (for example,
-     * the mouse position) to the scene coordinates.
+     * the mouse position) to the container coordinates.
      *
      * @param x The x position, in canvas coordinates.
      * @param y The y position, in canvas coordinates.
      * @param cameraId The camera number. Currently ignored.
      */
     convertCoords(x: float, y: float, cameraId?: integer): FloatPoint {
-      x -= this._cachedGameResolutionWidth / 2;
-      y -= this._cachedGameResolutionHeight / 2;
+      const position = this._runtimeInstancesContainer.convertCoords(x, y);
+      x = position[0];
+      y = position[1];
+
+      x -= this.getWidth() / 2;
+      y -= this.getHeight() / 2;
       x /= Math.abs(this._zoomFactor);
       y /= Math.abs(this._zoomFactor);
 
@@ -310,31 +300,20 @@ namespace gdjs {
       x = cosValue * x - sinValue * y;
       y = sinValue * tmp + cosValue * y;
       // TODO EBO use an AffineTransformation to avoid chained calls.
-      return this._runtimeInstancesContainer.convertCoords(
-        x + this.getCameraX(cameraId),
-        y + this.getCameraY(cameraId)
-      );
+      position[0] = x + this.getCameraX(cameraId);
+      position[1] = y + this.getCameraY(cameraId);
+      return position;
     }
 
     /**
-     * Convert a point from the scene coordinates (for example,
+     * Convert a point from the container coordinates (for example,
      * an object position) to the canvas coordinates.
      *
-     * @param x The x position, in scene coordinates.
-     * @param y The y position, in scene coordinates.
+     * @param x The x position, in container coordinates.
+     * @param y The y position, in container coordinates.
      * @param cameraId The camera number. Currently ignored.
      */
-    convertInverseCoords(
-      sceneX: float,
-      sceneY: float,
-      cameraId?: integer
-    ): FloatPoint {
-      const position = this._runtimeInstancesContainer.convertInverseCoords(
-        sceneX,
-        sceneY
-      );
-      let x = position[0];
-      let y = position[1];
+    convertInverseCoords(x: float, y: float, cameraId?: integer): FloatPoint {
       x -= this.getCameraX(cameraId);
       y -= this.getCameraY(cameraId);
 
@@ -347,17 +326,24 @@ namespace gdjs {
       y = sinValue * tmp + cosValue * y;
       x *= Math.abs(this._zoomFactor);
       y *= Math.abs(this._zoomFactor);
-      position[0] = x + this._cachedGameResolutionWidth / 2;
-      position[1] = y + this._cachedGameResolutionHeight / 2;
-      return position;
+      x += this.getWidth() / 2;
+      y += this.getHeight() / 2;
+      return this._runtimeInstancesContainer.convertInverseCoords(x, y);
     }
 
     getWidth(): float {
-      return this._cachedGameResolutionWidth;
+      return this._runtimeInstancesContainer.getViewportWidth();
     }
 
     getHeight(): float {
-      return this._cachedGameResolutionHeight;
+      return this._runtimeInstancesContainer.getViewportHeight();
+    }
+
+    // TODO EBO Documentation
+    private _forceDimensionUpdate(): void {
+      // Custom object dimension is only updated on demand.
+      this.getWidth();
+      this.getHeight();
     }
 
     /**

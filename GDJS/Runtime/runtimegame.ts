@@ -138,12 +138,14 @@ namespace gdjs {
       this._playerId = null;
 
       this._eventsBasedObjectDatas = new Map<String, EventsBasedObjectData>();
-      for (const extension of this._data.eventsFunctionsExtensions) {
-        for (const eventsBasedObject of extension.eventsBasedObjects) {
-          this._eventsBasedObjectDatas.set(
-            extension.name + '::' + eventsBasedObject.name,
-            eventsBasedObject
-          );
+      if (this._data.eventsFunctionsExtensions) {
+        for (const extension of this._data.eventsFunctionsExtensions) {
+          for (const eventsBasedObject of extension.eventsBasedObjects) {
+            this._eventsBasedObjectDatas.set(
+              extension.name + '::' + eventsBasedObject.name,
+              eventsBasedObject
+            );
+          }
         }
       }
     }

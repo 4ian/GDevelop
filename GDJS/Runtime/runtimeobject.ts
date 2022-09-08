@@ -532,7 +532,13 @@ namespace gdjs {
         return;
       }
       this.x = x;
+      this.invalidateHitboxes();
+    }
+
+    // TODO EBO
+    invalidateHitboxes(): void {
       this.hitBoxesDirty = true;
+      this._runtimeScene.onChildrenLocationChanged();
     }
 
     /**
@@ -554,7 +560,7 @@ namespace gdjs {
         return;
       }
       this.y = y;
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**

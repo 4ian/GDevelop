@@ -16,7 +16,7 @@ namespace gdjs {
     _layer: gdjs.Layer;
     _renderTexture: PIXI.RenderTexture | null = null;
     _lightingSprite: PIXI.Sprite | null = null;
-    _runtimeSceneRenderer: any;
+    _runtimeSceneRenderer: gdjs.RuntimeInstancesContainerRenderer;
     _pixiRenderer: PIXI.Renderer | null;
 
     // Width and height are tracked when a render texture is used.
@@ -31,7 +31,8 @@ namespace gdjs {
      */
     constructor(
       layer: gdjs.Layer,
-      runtimeSceneRenderer: gdjs.RuntimeScenePixiRenderer
+      runtimeSceneRenderer: gdjs.RuntimeInstancesContainerRenderer,
+      pixiRenderer: PIXI.Renderer | null
     ) {
       this._pixiContainer = new PIXI.Container();
       this._pixiContainer.name =
@@ -41,10 +42,10 @@ namespace gdjs {
           : 'Custom');
       this._layer = layer;
       this._runtimeSceneRenderer = runtimeSceneRenderer;
-      this._pixiRenderer = runtimeSceneRenderer.getPIXIRenderer();
+      this._pixiRenderer = pixiRenderer;
       this._isLightingLayer = layer.isLightingLayer();
       this._clearColor = layer.getClearColor();
-      runtimeSceneRenderer.getPIXIContainer().addChild(this._pixiContainer);
+      runtimeSceneRenderer.getRendererObject().addChild(this._pixiContainer);
       this._pixiContainer.filters = [];
       if (this._isLightingLayer) {
         this._replaceContainerWithSprite();
@@ -249,7 +250,7 @@ namespace gdjs {
       }
       this._lightingSprite = new PIXI.Sprite(this._renderTexture);
       this._lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
-      const sceneContainer = this._runtimeSceneRenderer.getPIXIContainer();
+      const sceneContainer = this._runtimeSceneRenderer.getRendererObject();
       const index = sceneContainer.getChildIndex(this._pixiContainer);
       sceneContainer.addChildAt(this._lightingSprite, index);
       sceneContainer.removeChild(this._pixiContainer);

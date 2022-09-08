@@ -58,7 +58,8 @@ namespace gdjs {
       ];
       this._renderer = new gdjs.LayerRenderer(
         this,
-        runtimeInstancesContainer.getRenderer()
+        runtimeInstancesContainer.getRenderer(),
+        runtimeInstancesContainer.getGame().getRenderer().getPIXIRenderer()
       );
       this.show(!this._hidden);
       for (let i = 0; i < layerData.effects.length; ++i) {
@@ -270,11 +271,23 @@ namespace gdjs {
      * @param y The y position, in canvas coordinates.
      * @param cameraId The camera number. Currently ignored.
      */
-    convertCoords(x: float, y: float, cameraId?: integer): FloatPoint {
+    convertCoords(x: float, y: float, cameraId: integer = 0): FloatPoint {
       const position = this._runtimeInstancesContainer.convertCoords(x, y);
-      x = position[0];
-      y = position[1];
+      return this.applyLayerInverseTransformation(
+        position[0],
+        position[1],
+        cameraId,
+        position
+      );
+    }
 
+    // TODO EBO Documentation
+    applyLayerInverseTransformation(
+      x: float,
+      y: float,
+      cameraId: integer,
+      result: FloatPoint
+    ): FloatPoint {
       x -= this.getWidth() / 2;
       y -= this.getHeight() / 2;
       x /= Math.abs(this._zoomFactor);
@@ -288,9 +301,9 @@ namespace gdjs {
       x = cosValue * x - sinValue * y;
       y = sinValue * tmp + cosValue * y;
       // TODO EBO use an AffineTransformation to avoid chained calls.
-      position[0] = x + this.getCameraX(cameraId);
-      position[1] = y + this.getCameraY(cameraId);
-      return position;
+      result[0] = x + this.getCameraX(cameraId);
+      result[1] = y + this.getCameraY(cameraId);
+      return result;
     }
 
     /**
@@ -301,7 +314,26 @@ namespace gdjs {
      * @param y The y position, in container coordinates.
      * @param cameraId The camera number. Currently ignored.
      */
-    convertInverseCoords(x: float, y: float, cameraId?: integer): FloatPoint {
+    convertInverseCoords(
+      x: float,
+      y: float,
+      cameraId: integer = 0
+    ): FloatPoint {
+      const position: FloatPoint = [0, 0];
+      this.applyLayerTransformation(x, y, cameraId, position);
+      return this._runtimeInstancesContainer.convertInverseCoords(
+        position[0],
+        position[1]
+      );
+    }
+
+    // TODO EBO Documentation
+    applyLayerTransformation(
+      x: float,
+      y: float,
+      cameraId: integer,
+      result: FloatPoint
+    ): FloatPoint {
       x -= this.getCameraX(cameraId);
       y -= this.getCameraY(cameraId);
 
@@ -316,7 +348,10 @@ namespace gdjs {
       y *= Math.abs(this._zoomFactor);
       x += this.getWidth() / 2;
       y += this.getHeight() / 2;
-      return this._runtimeInstancesContainer.convertInverseCoords(x, y);
+
+      result[0] = x;
+      result[1] = y;
+      return result;
     }
 
     getWidth(): float {

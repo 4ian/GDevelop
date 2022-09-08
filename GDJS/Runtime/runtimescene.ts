@@ -27,17 +27,21 @@ namespace gdjs {
     _isLoaded: boolean = false;
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
 
-    // True if loadFromScene was called and the scene is being played.
+    /** True if loadFromScene was called and the scene is being played. */
     _isJustResumed: boolean = false;
 
-    // True in the first frame after resuming the paused scene
+    /** True in the first frame after resuming the paused scene */
     _requestedChange: SceneChangeRequest;
+    /** Black background by default. */
     _backgroundColor: integer = 0;
     _onceTriggers: OnceTriggers;
     _profiler: gdjs.Profiler | null = null;
 
     // Set to `new gdjs.Profiler()` to have profiling done on the scene.
     _onProfilerStopped: null | ((oldProfiler: gdjs.Profiler) => void) = null;
+
+    _cachedGameResolutionWidth: integer;
+    _cachedGameResolutionHeight: integer;
 
     /**
      * @param runtimeGame The game associated to this scene.
@@ -54,10 +58,10 @@ namespace gdjs {
       this._runtimeGame = runtimeGame;
       this._timeManager = new gdjs.TimeManager();
       this._requestedChange = SceneChangeRequest.CONTINUE;
+      this._cachedGameResolutionWidth = runtimeGame.getGameResolutionWidth();
+      this._cachedGameResolutionHeight = runtimeGame.getGameResolutionHeight();
 
       // What to do after the frame is rendered.
-
-      // Black background by default.
 
       //An array used to create a list of all instance when necessary ( see _constructListOfAllInstances )
       this._onceTriggers = new gdjs.OnceTriggers();
@@ -73,11 +77,18 @@ namespace gdjs {
      * See gdjs.RuntimeGame.startGameLoop in particular.
      */
     onGameResolutionResized() {
+      const oldGameResolutionWidth = this._cachedGameResolutionWidth;
+      const oldGameResolutionHeight = this._cachedGameResolutionHeight;
+      this._cachedGameResolutionWidth = this._runtimeGame.getGameResolutionWidth();
+      this._cachedGameResolutionHeight = this._runtimeGame.getGameResolutionHeight();
       for (const name in this._layers.items) {
         if (this._layers.items.hasOwnProperty(name)) {
           /** @type gdjs.Layer */
           const theLayer: gdjs.Layer = this._layers.items[name];
-          theLayer.onGameResolutionResized();
+          theLayer.onGameResolutionResized(
+            oldGameResolutionWidth,
+            oldGameResolutionHeight
+          );
         }
       }
       this._renderer.onGameResolutionResized();
@@ -523,6 +534,14 @@ namespace gdjs {
 
     getScene() {
       return this;
+    }
+
+    getViewportWidth(): float {
+      return this._cachedGameResolutionWidth;
+    }
+
+    getViewportHeight(): float {
+      return this._cachedGameResolutionHeight;
     }
 
     convertCoords(x: float, y: float): FloatPoint {

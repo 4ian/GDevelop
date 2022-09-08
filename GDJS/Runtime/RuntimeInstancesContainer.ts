@@ -15,18 +15,21 @@ namespace gdjs {
   export abstract class RuntimeInstancesContainer {
     _instances: Hashtable<RuntimeObject[]>;
 
-    //Contains the instances living on the scene
+    /** Contains the instances living on the scene */
     _instancesCache: Hashtable<RuntimeObject[]>;
 
-    //Used to recycle destroyed instance instead of creating new ones.
+    /** Used to recycle destroyed instance instead of creating new ones. */
     _objects: Hashtable<ObjectData>;
 
-    //Contains the objects data stored in the project
+    /** Contains the objects data stored in the project */
     _objectsCtor: Hashtable<typeof RuntimeObject>;
     _layers: Hashtable<Layer>;
 
+    /** An array used to create a list of all instance when necessary ( see _constructListOfAllInstances ) */
     _allInstancesList: gdjs.RuntimeObject[] = [];
     _layersCameraCoordinates: Record<string, [float, float, float, float]> = {};
+
+    /** The instances removed from the scene and waiting to be sent to the cache. */
     _instancesRemoved: gdjs.RuntimeObject[] = [];
 
     // Options for the debug draw:
@@ -50,9 +53,14 @@ namespace gdjs {
     abstract getElapsedTime(): float;
 
     /**
-     * Get the renderer associated to the RuntimeScene.
+     * Get the renderer associated to the container.
      */
-    abstract getRenderer();
+    abstract getRenderer(): gdjs.RuntimeInstancesContainerRenderer;
+
+    /**
+     * Get the renderer for visual debugging associated to the container.
+     */
+    abstract getDebuggerRenderer(): gdjs.DebuggerRenderer;
 
     /**
      * Get the runtimeGame associated to this.
@@ -93,6 +101,9 @@ namespace gdjs {
     // TODO EBO Documentation
     abstract getViewportHeight(): float;
 
+    // TODO EBO
+    abstract onChildrenLocationChanged(): void;
+
     /**
      * Activate or deactivate the debug visualization for collisions and points.
      */
@@ -103,7 +114,7 @@ namespace gdjs {
       showCustomPoints: boolean
     ): void {
       if (this._debugDrawEnabled && !enableDebugDraw) {
-        this.getRenderer().clearDebugDraw();
+        this.getDebuggerRenderer().clearDebugDraw();
       }
 
       this._debugDrawEnabled = enableDebugDraw;

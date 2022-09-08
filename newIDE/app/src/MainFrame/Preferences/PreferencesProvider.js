@@ -99,6 +99,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     showAllAlertMessages: this._showAllAlertMessages.bind(this),
     showTutorialHint: this._showTutorialHint.bind(this),
     showAllTutorialHints: this._showAllTutorialHints.bind(this),
+    showAnnouncement: this._showAnnouncement.bind(this),
+    showAllAnnouncements: this._showAllAnnouncements.bind(this),
     verifyIfIsNewVersion: this._verifyIfIsNewVersion.bind(this),
     setEventsSheetShowObjectThumbnails: this._setEventsSheetShowObjectThumbnails.bind(
       this
@@ -441,6 +443,33 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           hiddenTutorialHints: {},
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _showAnnouncement(identifier: string, show: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hiddenAnnouncements: {
+            ...state.values.hiddenAnnouncements,
+            [identifier]: !show,
+          },
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _showAllAnnouncements() {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hiddenAnnouncements: {},
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

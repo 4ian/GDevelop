@@ -33,6 +33,7 @@ import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/Extens
 import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
 import { TutorialStateProvider } from '../Tutorial/TutorialContext';
 import ConfirmProvider from '../UI/Confirm/ConfirmProvider';
+import { AnnouncementsFeedStateProvider } from '../AnnouncementsFeed/AnnouncementsFeedContext';
 
 // Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
 const jss = create({
@@ -105,7 +106,9 @@ export default class Providers extends React.Component<Props, {||}> {
                                               <ExtensionStoreStateProvider>
                                                 <GamesShowcaseStateProvider>
                                                   <TutorialStateProvider>
-                                                    {children({ i18n })}
+                                                    <AnnouncementsFeedStateProvider>
+                                                      {children({ i18n })}
+                                                    </AnnouncementsFeedStateProvider>
                                                   </TutorialStateProvider>
                                                 </GamesShowcaseStateProvider>
                                               </ExtensionStoreStateProvider>

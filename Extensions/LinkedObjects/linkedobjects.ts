@@ -273,7 +273,7 @@ namespace gdjs {
             // avoid running an intersection with the picked objects later.
             let objectCount = 0;
             for (const objectName of parentEventPickedObjectNames) {
-              objectCount += runtimeScene.getObjects(objectName).length;
+              objectCount += runtimeScene.getObjects(objectName)!.length;
             }
 
             if (parentEventPickedObjects.length === objectCount) {

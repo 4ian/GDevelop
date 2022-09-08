@@ -158,6 +158,15 @@ namespace gdjs {
      * Merge the hitboxes of the children.
      */
     _updateUntransformedHitBoxes() {
+      const oldUnscaledWidth = Math.max(
+        0,
+        this._unrotatedAABB.max[0] - this._unrotatedAABB.min[0]
+      );
+      const oldUnscaledHeight = Math.max(
+        0,
+        this._unrotatedAABB.max[1] - this._unrotatedAABB.min[1]
+      );
+
       this._isUntransformedHitBoxesDirty = false;
       let minX = Number.MAX_VALUE;
       let minY = Number.MAX_VALUE;
@@ -183,6 +192,16 @@ namespace gdjs {
         this.hitBoxes.push(new gdjs.Polygon());
       }
       this.hitBoxes.length = this._untransformedHitBoxes.length;
+
+      if (
+        this.getUnscaledWidth() !== oldUnscaledWidth ||
+        this.getUnscaledHeight() !== oldUnscaledHeight
+      ) {
+        this._instanceContainer.onObjectUnscaledDimensionChange(
+          oldUnscaledWidth,
+          oldUnscaledHeight
+        );
+      }
     }
 
     //Position :
@@ -285,14 +304,20 @@ namespace gdjs {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
-      return this._unrotatedAABB.max[0] - this._unrotatedAABB.min[0];
+      return Math.max(
+        0,
+        this._unrotatedAABB.max[0] - this._unrotatedAABB.min[0]
+      );
     }
 
     getUnscaledHeight(): float {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
-      return this._unrotatedAABB.max[1] - this._unrotatedAABB.min[1];
+      return Math.max(
+        0,
+        this._unrotatedAABB.max[1] - this._unrotatedAABB.min[1]
+      );
     }
 
     getUnscaledCenterX(): float {

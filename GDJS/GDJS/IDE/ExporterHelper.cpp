@@ -621,6 +621,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles,
                  "pixi-renderers/CustomObjectPixiRenderer.js");
     InsertUnique(includesFiles,
+                 "pixi-renderers/DebuggerPixiRenderer.js");
+    InsertUnique(includesFiles,
                  "pixi-renderers/loadingscreen-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-effects-manager.js");
     InsertUnique(includesFiles, "howler-sound-manager/howler.min.js");

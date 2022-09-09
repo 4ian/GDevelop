@@ -353,7 +353,6 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.begin('objects (post-events)');
       }
-      // TODO EBO Add a method in RuntimeObject for this.
       this._updateObjectsPostEvents();
       if (this._profiler) {
         this._profiler.end('objects (post-events)');

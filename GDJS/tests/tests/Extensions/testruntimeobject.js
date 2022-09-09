@@ -31,13 +31,13 @@ gdjs.TestRuntimeObject = class TestRuntimeObject extends gdjs.RuntimeObject {
   setCustomWidthAndHeight(customWidth, customHeight) {
     this._customWidth = customWidth;
     this._customHeight = customHeight;
-    this.hitBoxesDirty = true;
+    this.invalidateHitboxes();
   }
 
   setCustomCenter(customCenterX, customCenterY) {
     this._customCenterX = customCenterX;
     this._customCenterY = customCenterY;
-    this.hitBoxesDirty = true;
+    this.invalidateHitboxes();
   }
 
   getRendererObject() {
@@ -51,7 +51,7 @@ gdjs.TestRuntimeObject = class TestRuntimeObject extends gdjs.RuntimeObject {
   setWidth(width) {
     if (width !== this._customWidth) {
       this._customWidth = width;
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
     return this._customWidth;
   }
@@ -63,7 +63,7 @@ gdjs.TestRuntimeObject = class TestRuntimeObject extends gdjs.RuntimeObject {
   setHeight(height) {
     if (height !== this._customHeight) {
       this._customHeight = height;
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
     return this._customHeight;
   }

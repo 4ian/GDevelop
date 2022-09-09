@@ -319,7 +319,6 @@ namespace gdjs {
      */
     _animationFrame: gdjs.SpriteAnimationFrame | null = null;
     _renderer: gdjs.SpriteRuntimeObjectRenderer;
-    hitBoxesDirty: any;
     _animationFrameDirty: any;
 
     constructor(
@@ -416,7 +415,7 @@ namespace gdjs {
       if (!this._animationFrame) {
         this.setAnimation(0);
       }
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
       return true;
     }
 
@@ -502,7 +501,7 @@ namespace gdjs {
         this._updateAnimationFrame();
       }
       if (oldFrame !== this._currentFrame) {
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
       }
       this._renderer.ensureUpToDate();
     }
@@ -622,7 +621,7 @@ namespace gdjs {
         //TODO: This may be unnecessary.
         this._renderer.update();
         this._animationFrameDirty = true;
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
       }
     }
 
@@ -678,7 +677,7 @@ namespace gdjs {
           return;
         }
         this.angle = newValue;
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
         this._renderer.updateAngle();
       } else {
         newValue = newValue | 0;
@@ -697,7 +696,7 @@ namespace gdjs {
         //TODO: This may be unnecessary.
         this._renderer.update();
         this._animationFrameDirty = true;
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
       }
     }
 
@@ -734,7 +733,7 @@ namespace gdjs {
       ) {
         this._currentFrame = newFrame;
         this._animationFrameDirty = true;
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
       }
     }
 
@@ -988,7 +987,7 @@ namespace gdjs {
       }
       this.x = x;
       if (this._animationFrame !== null) {
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
         this._renderer.updateX();
       }
     }
@@ -1003,7 +1002,7 @@ namespace gdjs {
       }
       this.y = y;
       if (this._animationFrame !== null) {
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
         this._renderer.updateY();
       }
     }
@@ -1022,7 +1021,7 @@ namespace gdjs {
         }
         this.angle = angle;
         this._renderer.updateAngle();
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
       } else {
         angle = angle % 360;
         if (angle < 0) {
@@ -1113,20 +1112,20 @@ namespace gdjs {
       return this._renderer.getColor();
     }
 
-    flipX(enable) {
+    flipX(enable: boolean) {
       if (enable !== this._flippedX) {
         this._scaleX *= -1;
         this._flippedX = enable;
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
         this._renderer.update();
       }
     }
 
-    flipY(enable) {
+    flipY(enable: boolean) {
       if (enable !== this._flippedY) {
         this._scaleY *= -1;
         this._flippedY = enable;
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
         this._renderer.update();
       }
     }
@@ -1223,7 +1222,7 @@ namespace gdjs {
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this._renderer.update();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -1240,7 +1239,7 @@ namespace gdjs {
       }
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this._renderer.update();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -1257,7 +1256,7 @@ namespace gdjs {
       }
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this._renderer.update();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**

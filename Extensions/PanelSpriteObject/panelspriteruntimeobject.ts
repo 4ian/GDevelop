@@ -196,7 +196,7 @@ namespace gdjs {
 
       this._width = width;
       this._renderer.updateWidth();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -208,7 +208,7 @@ namespace gdjs {
 
       this._height = height;
       this._renderer.updateHeight();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**

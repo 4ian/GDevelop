@@ -338,6 +338,8 @@ namespace gdjs {
       this._timers.clear();
 
       this.destroyCallbacks.clear();
+
+      this.invalidateHitboxes();
     }
 
     static supportsReinitialization = false;
@@ -535,7 +537,9 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    // TODO EBO
+    // TODO EBO Check that no community extension set hitBoxesDirty to true
+    // directly.
+    // TODO EBO Documentation
     invalidateHitboxes(): void {
       this.hitBoxesDirty = true;
       this._runtimeScene.onChildrenLocationChanged();
@@ -678,7 +682,7 @@ namespace gdjs {
         return;
       }
       this.angle = angle;
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -1885,7 +1889,7 @@ namespace gdjs {
      * @return true if the object was moved
      */
     separateFromObjects(
-      objects: RuntimeObject[],
+      objects: gdjs.RuntimeObject[],
       ignoreTouchingEdges: boolean
     ): boolean {
       let moveXArray: Array<float> = separateFromObjectsStatics.moveXArray;

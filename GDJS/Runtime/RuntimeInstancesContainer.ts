@@ -421,7 +421,7 @@ namespace gdjs {
      * Add an object to the instances living on the scene.
      * @param obj The object to be added.
      */
-    addObject(obj: RuntimeObject) {
+    addObject(obj: gdjs.RuntimeObject) {
       if (!this._instances.containsKey(obj.name)) {
         this._instances.put(obj.name, []);
       }

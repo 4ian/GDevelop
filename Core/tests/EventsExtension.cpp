@@ -58,7 +58,6 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
 
 TEST_CASE("Events-based extension", "[common]") {
   SECTION("Default behavior property value") {
-    std::cout << "TEST" << std::endl;
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);

@@ -4,7 +4,6 @@ import { Column, Line } from '../../../UI/Grid';
 import Paper from '@material-ui/core/Paper';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Text from '../../../UI/Text';
-import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
 import ArrowLeft from '../../../UI/CustomSvgIcons/ArrowLeft';
 import TextButton from '../../../UI/TextButton';
 import { Trans } from '@lingui/macro';
@@ -57,7 +56,7 @@ const SectionContainer = ({
   renderFooter,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const GDevelopTheme = React.useContext(GDevelopThemeContext);
+
   return (
     <Column useFullHeight noMargin expand>
       <Paper
@@ -65,7 +64,6 @@ const SectionContainer = ({
         style={{
           ...styles.scrollContainer,
           display: flexBody ? 'flex' : 'block',
-          borderLeft: `1px solid ${GDevelopTheme.home.separator.color}`,
           ...(windowWidth === 'small'
             ? styles.mobileScrollContainer
             : styles.desktopScrollContainer),
@@ -100,12 +98,9 @@ const SectionContainer = ({
       {renderFooter && (
         <Paper
           elevation={0}
-          style={{
-            borderLeft: `1px solid ${GDevelopTheme.home.separator.color}`,
-            ...(windowWidth === 'small'
-              ? styles.mobileFooter
-              : styles.desktopFooter),
-          }}
+          style={
+            windowWidth === 'small' ? styles.mobileFooter : styles.desktopFooter
+          }
           square
         >
           {renderFooter()}

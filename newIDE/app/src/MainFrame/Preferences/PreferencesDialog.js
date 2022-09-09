@@ -40,6 +40,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setAutoDownloadUpdates,
     showAllAlertMessages,
     showAllTutorialHints,
+    showAllAnnouncements,
     setAutoDisplayChangelog,
     setEventsSheetShowObjectThumbnails,
     setAutosaveOnPreview,
@@ -288,6 +289,13 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                 label={<Trans>Reset hidden embedded tutorials</Trans>}
                 onClick={() => showAllTutorialHints()}
                 disabled={!Object.keys(values.hiddenTutorialHints).length}
+              />
+            </Line>
+            <Line>
+              <RaisedButton
+                label={<Trans>Reset hidden announcements</Trans>}
+                onClick={() => showAllAnnouncements()}
+                disabled={!Object.keys(values.hiddenAnnouncements).length}
               />
             </Line>
           </Column>

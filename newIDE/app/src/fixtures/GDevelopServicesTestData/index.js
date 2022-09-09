@@ -27,6 +27,7 @@ import {
 } from '../../Utils/GDevelopServices/Asset';
 import { formatISO, subDays } from 'date-fns';
 import { type Comment } from '../../Utils/GDevelopServices/Play';
+import { type Announcement } from '../../Utils/GDevelopServices/Announcement';
 
 export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
@@ -1279,3 +1280,58 @@ export const commentProcessed: Comment = {
   updatedAt: 1515084393000,
   processedAt: 1515084393000,
 };
+
+export const fakeAnnouncements: Announcement[] = [
+  {
+    id: '123',
+    type: 'info',
+    level: 'normal',
+    titleByLocale: {
+      en: 'Some title',
+    },
+    messageByLocale: {
+      en: 'Something to announce which is really really cool',
+    },
+    buttonLabelByLocale: { en: 'View' },
+    buttonUrl: 'https://gdevelop.io',
+  },
+  {
+    id: '124',
+    type: 'info',
+    level: 'urgent',
+    titleByLocale: {
+      en: 'Some title',
+    },
+    messageByLocale: {
+      en: 'Something nothing important but urgent to announce.',
+    },
+    buttonLabelByLocale: { en: 'View' },
+    buttonUrl: 'https://gdevelop.io',
+  },
+  {
+    id: '125',
+    type: 'warning',
+    level: 'urgent',
+    titleByLocale: {
+      en: 'Some title',
+    },
+    messageByLocale: {
+      en: 'Something important and urgent to announce.',
+    },
+    buttonLabelByLocale: { en: 'View' },
+    buttonUrl: 'https://gdevelop.io',
+  },
+  {
+    id: '126',
+    type: 'warning',
+    level: 'normal',
+    titleByLocale: {
+      en: 'Some title',
+    },
+    messageByLocale: {
+      en: 'Something important but not urgent to announce.',
+    },
+    buttonLabelByLocale: { en: 'View' },
+    buttonUrl: 'https://gdevelop.io',
+  },
+];

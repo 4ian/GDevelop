@@ -123,7 +123,10 @@ export const HomePageMenu = ({
   return (
     <>
       <Paper
-        style={windowWidth === 'large' ? styles.desktopMenu : styles.mobileMenu}
+        style={{
+          ...(windowWidth === 'large' ? styles.desktopMenu : styles.mobileMenu),
+          borderRight: `1px solid ${GDevelopTheme.home.separator.color}`,
+        }}
         square
       >
         <Column expand>

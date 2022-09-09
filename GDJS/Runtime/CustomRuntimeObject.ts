@@ -117,6 +117,7 @@ namespace gdjs {
 
     onChildrenLocationChanged() {
       this._isUntransformedHitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**

@@ -239,7 +239,7 @@ namespace gdjs {
 
       this._wrappingWidth = width;
       this._renderer.updateWrappingWidth();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -254,7 +254,7 @@ namespace gdjs {
 
       this._wordWrap = wordWrap;
       this._renderer.updateWordWrap();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     getWordWrap() {

@@ -489,7 +489,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // can be different between the parameter name vs the actual behavior
          // name passed as argument).
          "  getBehaviorName: function(behaviorName) {\n" +
-         "    return eventsFunctionContext._behaviorNamesMap[behaviorName];\n"
+         // TODO EBO Handle behavior name collision between parameters and children
+         "    return eventsFunctionContext._behaviorNamesMap[behaviorName] || behaviorName;\n"
          "  },\n" +
          // Creator function that will be used to create new objects. We
          // need to check if the function was given the context of the calling

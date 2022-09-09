@@ -91,12 +91,15 @@ namespace gdjs {
 
       this._instanceContainer._updateObjectsPreEvents();
 
+      // TODO EBO This is only to handle trigger once.
+      this.doStepPreEvents(instanceContainer);
       // This is a bit like the "scene" events for custom objects.
       this.doStepPostEvents(instanceContainer);
 
       this._instanceContainer._updateObjectsPostEvents();
     }
 
+    doStepPreEvents(instanceContainer: gdjs.RuntimeInstancesContainer) {}
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstancesContainer) {}
 
     updatePreRender(instanceContainer: gdjs.RuntimeInstancesContainer): void {

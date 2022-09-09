@@ -147,7 +147,7 @@ namespace gdjs {
 
       this._width = width;
       this._renderer.setWidth(width);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -159,7 +159,7 @@ namespace gdjs {
 
       this._height = height;
       this._renderer.setHeight(height);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**

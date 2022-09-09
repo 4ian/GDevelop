@@ -472,8 +472,8 @@ namespace gdjs {
       }
       this._scaleX = width / this._collisionTileMap.getWidth();
       this._width = width;
-      this.hitBoxesDirty = true;
       this._transformationIsUpToDate = false;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -487,8 +487,8 @@ namespace gdjs {
       }
       this._scaleY = height / this._collisionTileMap.getHeight();
       this._height = height;
-      this.hitBoxesDirty = true;
       this._transformationIsUpToDate = false;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -515,8 +515,8 @@ namespace gdjs {
       }
       this._scaleX = scaleX;
       this._width = scaleX * this._collisionTileMap.getWidth();
-      this.hitBoxesDirty = true;
       this._transformationIsUpToDate = false;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -533,8 +533,8 @@ namespace gdjs {
       }
       this._scaleY = scaleY;
       this._height = scaleY * this._collisionTileMap.getHeight();
-      this.hitBoxesDirty = true;
       this._transformationIsUpToDate = false;
+      this.invalidateHitboxes();
     }
 
     getWidth(): float {

@@ -381,7 +381,7 @@ namespace gdjs {
         return;
       }
       this.x = x;
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
       this.getRenderer().updateX();
     }
 
@@ -390,7 +390,7 @@ namespace gdjs {
         return;
       }
       this.y = y;
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
       this.getRenderer().updateY();
     }
 
@@ -399,7 +399,7 @@ namespace gdjs {
         return;
       }
       this.angle = angle;
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
       this.getRenderer().updateAngle();
     }
 
@@ -421,7 +421,7 @@ namespace gdjs {
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this.getRenderer().update();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -438,7 +438,7 @@ namespace gdjs {
       }
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this.getRenderer().update();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -455,7 +455,7 @@ namespace gdjs {
       }
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this.getRenderer().update();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -521,20 +521,20 @@ namespace gdjs {
       this.getRenderer().updateVisibility();
     }
 
-    flipX(enable) {
+    flipX(enable: boolean) {
       if (enable !== this._flippedX) {
         this._scaleX *= -1;
         this._flippedX = enable;
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
         this.getRenderer().update();
       }
     }
 
-    flipY(enable) {
+    flipY(enable: boolean) {
       if (enable !== this._flippedY) {
         this._scaleY *= -1;
         this._flippedY = enable;
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
         this.getRenderer().update();
       }
     }

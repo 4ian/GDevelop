@@ -957,7 +957,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 }
               />
               <ProjectStructureItem
-                primaryText={<Trans>Functions/Behaviors</Trans>}
+                primaryText={<Trans>Extensions</Trans>}
                 error={eventsFunctionsExtensionsError}
                 onRefresh={onReloadEventsFunctionsExtensions}
                 leftIcon={

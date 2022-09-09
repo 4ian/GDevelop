@@ -97,11 +97,15 @@ namespace gdjs {
     }
 
     updateX(): void {
-      this._pixiContainer.position.x = this._object.x;
+      this._pixiContainer.position.x =
+        this._object.x +
+        this._pixiContainer.pivot.x * Math.abs(this._object._scaleX);
     }
 
     updateY(): void {
-      this._pixiContainer.position.y = this._object.y;
+      this._pixiContainer.position.y =
+        this._object.y +
+        this._pixiContainer.pivot.y * Math.abs(this._object._scaleY);
     }
 
     updateAngle(): void {

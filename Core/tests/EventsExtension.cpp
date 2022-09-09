@@ -37,7 +37,7 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
   auto &eventsExtension =
       project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
 
-  // Add a events based behavior
+  // Add an events-based behavior
   {
     auto &eventsBasedBehavior =
         eventsExtension.GetEventsBasedBehaviors().InsertNew(
@@ -45,7 +45,7 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     eventsBasedBehavior.SetFullName("My events based behavior");
     eventsBasedBehavior.SetDescription("An events based behavior for test");
 
-    // Add property
+    // Add a property
     eventsBasedBehavior.GetPropertyDescriptors()
         .InsertNew("MyProperty", 0)
         .SetValue("123")
@@ -62,12 +62,14 @@ TEST_CASE("Events-based extension", "[common]") {
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
-
     auto &layout1 = project.InsertNewLayout("Layout1", 0);
-
     auto &object = layout1.InsertNewObject(project, "MyExtension::Sprite", "Object1", 0);
+
+    // Attach a behavior to an object.
     auto *behavior = object.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior", "MyEventsBasedBehavior");
     behavior->InitializeContent();
+
+    // The behavior has the default value.
     REQUIRE(behavior->GetProperties().size() == 1);
     REQUIRE(behavior->GetProperties().at("MyProperty").GetValue() == "123");
   }

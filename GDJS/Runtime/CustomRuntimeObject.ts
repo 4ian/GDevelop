@@ -87,23 +87,22 @@ namespace gdjs {
     }
 
     update(instanceContainer: gdjs.RuntimeInstancesContainer): void {
+      // TODO EBO Use the profiler.
+
       this._instanceContainer._updateObjectsPreEvents();
 
-      //this._instanceContainer._allInstancesList[0].setY(8 * Math.random());
-      // TODO EBO choose another name
-      this.doStepPreEvents(instanceContainer);
+      // This is a bit like the "scene" events for custom objects.
+      this.doStepPostEvents(instanceContainer);
+
+      this._instanceContainer._updateObjectsPostEvents();
     }
 
-    doStepPreEvents(instanceContainer: gdjs.RuntimeInstancesContainer) {}
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstancesContainer) {}
 
     updatePreRender(instanceContainer: gdjs.RuntimeInstancesContainer): void {
       this._instanceContainer._updateObjectsPreRender();
       this.getRenderer().ensureUpToDate();
-      // TODO EBO choose another name
-      this.doStepPostEvents(instanceContainer);
     }
-
-    doStepPostEvents(instanceContainer: gdjs.RuntimeInstancesContainer) {}
 
     getRendererObject() {
       return this.getRenderer().getRendererObject();

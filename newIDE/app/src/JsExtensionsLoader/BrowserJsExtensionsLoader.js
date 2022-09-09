@@ -90,6 +90,12 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
+    name: 'GDevelopAuthentication',
+    // $FlowExpectedError - this path is ignored for Flow.
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/GDevelopAuthentication/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'DialogueTree',
     // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DialogueTree/JsExtension.js'),

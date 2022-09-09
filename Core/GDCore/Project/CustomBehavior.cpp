@@ -104,7 +104,7 @@ void CustomBehavior::InitializeContent(gd::SerializerElement &behaviorContent) {
   const auto &eventsBasedBehavior = project.GetEventsBasedBehavior(GetTypeName());
   const auto &properties = eventsBasedBehavior.GetPropertyDescriptors();
   for (auto &&property : properties.GetInternalVector()) {
-    auto element = behaviorContent.AddChild(property->GetName());
+    auto &element = behaviorContent.AddChild(property->GetName());
     auto propertyType = property->GetType();
 
     if (propertyType == "String" || propertyType == "Choice" ||

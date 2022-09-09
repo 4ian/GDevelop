@@ -5,7 +5,7 @@ import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
-import { AnnouncementsFeed } from '../../../AnnouncementsFeed/AnnouncementsFeed';
+import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 import { fakeAnnouncements } from '../../../fixtures/GDevelopServicesTestData';
 

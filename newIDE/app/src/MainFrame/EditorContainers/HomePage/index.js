@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import Paper from '@material-ui/core/Paper';
 import { Line, Column } from '../../../UI/Grid';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
@@ -170,12 +171,11 @@ export const HomePage = React.memo<Props>(
                     onOpenPreferences={onOpenPreferences}
                     onOpenAbout={onOpenAbout}
                   />
-                  <Column
-                    noMargin
-                    expand
-                  >
+                  <Column noMargin expand>
                     {activeTab !== 'community' && !!announcements && (
-                      <AnnouncementsFeed level="urgent" canClose addMargins />
+                      <Paper elevation={0} style={{}} square>
+                        <AnnouncementsFeed level="urgent" canClose addMargins />
+                      </Paper>
                     )}
                     {activeTab === 'get-started' && (
                       <GetStartedSection

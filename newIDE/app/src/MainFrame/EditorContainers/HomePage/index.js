@@ -20,7 +20,7 @@ import { HomePageMenu, type HomeTab } from './HomePageMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
-import { AnnouncementsFeed } from '../../../AnnouncementsFeed/AnnouncementsFeed';
+import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 
 type Props = {|
@@ -172,9 +172,9 @@ export const HomePage = React.memo<Props>(
                   />
                   <Column
                     noMargin
-                    expand //TODO: check fullHeight and co on Safari.
+                    expand
                   >
-                    {!!announcements && (
+                    {activeTab !== 'community' && !!announcements && (
                       <AnnouncementsFeed level="urgent" canClose addMargins />
                     )}
                     {activeTab === 'get-started' && (

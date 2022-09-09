@@ -57,7 +57,7 @@ const SectionContainer = ({
   renderFooter,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const GDevelopTheme = React.useContext(GDevelopThemeContext);
+
   return (
     <Column useFullHeight noMargin expand>
       <Paper
@@ -65,7 +65,6 @@ const SectionContainer = ({
         style={{
           ...styles.scrollContainer,
           display: flexBody ? 'flex' : 'block',
-          borderLeft: `1px solid ${GDevelopTheme.home.separator.color}`,
           ...(windowWidth === 'small'
             ? styles.mobileScrollContainer
             : styles.desktopScrollContainer),
@@ -100,12 +99,9 @@ const SectionContainer = ({
       {renderFooter && (
         <Paper
           elevation={0}
-          style={{
-            borderLeft: `1px solid ${GDevelopTheme.home.separator.color}`,
-            ...(windowWidth === 'small'
+          style={windowWidth === 'small'
               ? styles.mobileFooter
-              : styles.desktopFooter),
-          }}
+              : styles.desktopFooter}
           square
         >
           {renderFooter()}

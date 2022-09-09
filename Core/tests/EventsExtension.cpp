@@ -57,7 +57,7 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
 } // namespace
 
 TEST_CASE("Events-based extension", "[common]") {
-  SECTION("Default behavior property value") {
+  SECTION("Behavior property default value") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);

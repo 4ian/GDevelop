@@ -4,7 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 /**
- * @file Tests covering events-based extension
+ * @file Tests covering events-based extensions
  */
 #include "GDCore/IDE/WholeProjectRefactorer.h"
 

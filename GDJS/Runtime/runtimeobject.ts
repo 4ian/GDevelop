@@ -1647,7 +1647,7 @@ namespace gdjs {
     /**
      * Call each behavior stepPreEvents method.
      */
-    stepBehaviorsPreEvents(runtimeScene): void {
+    stepBehaviorsPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer): void {
       for (let i = 0, len = this._behaviors.length; i < len; ++i) {
         this._behaviors[i].stepPreEvents(runtimeScene);
       }
@@ -1656,7 +1656,9 @@ namespace gdjs {
     /**
      * Call each behavior stepPostEvents method.
      */
-    stepBehaviorsPostEvents(runtimeScene): void {
+    stepBehaviorsPostEvents(
+      runtimeScene: gdjs.RuntimeInstancesContainer
+    ): void {
       for (let i = 0, len = this._behaviors.length; i < len; ++i) {
         this._behaviors[i].stepPostEvents(runtimeScene);
       }

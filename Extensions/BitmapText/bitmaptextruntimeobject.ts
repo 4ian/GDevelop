@@ -148,7 +148,7 @@ namespace gdjs {
     setText(text: string): void {
       this._text = text;
       this._renderer.updateTextContent();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -170,7 +170,7 @@ namespace gdjs {
     setScale(scale: float): void {
       this._scale = scale;
       this._renderer.updateScale();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     getScale(): float {
@@ -276,7 +276,7 @@ namespace gdjs {
     setWrappingWidth(width: float): void {
       this._wrappingWidth = width;
       this._renderer.updateWrappingWidth();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -289,7 +289,7 @@ namespace gdjs {
     setWordWrap(wordWrap: boolean): void {
       this._wordWrap = wordWrap;
       this._renderer.updateWrappingWidth();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     getWordWrap(): boolean {

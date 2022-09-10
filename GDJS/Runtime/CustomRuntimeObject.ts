@@ -339,19 +339,19 @@ namespace gdjs {
     }
 
     getCenterX(): float {
-      return this.getUnscaledCenterX() * this._scaleX;
+      return this.getUnscaledCenterX() * this.getScaleX();
     }
 
     getCenterY(): float {
-      return this.getUnscaledCenterY() * this._scaleY;
+      return this.getUnscaledCenterY() * this.getScaleY();
     }
 
     getWidth(): float {
-      return this.getUnscaledWidth() * this._scaleX;
+      return this.getUnscaledWidth() * this.getScaleX();
     }
 
     getHeight(): float {
-      return this.getUnscaledHeight() * this._scaleY;
+      return this.getUnscaledHeight() * this.getScaleY();
     }
 
     setWidth(newWidth: float): void {
@@ -528,8 +528,8 @@ namespace gdjs {
       if (enable !== this._flippedX) {
         this._scaleX *= -1;
         this._flippedX = enable;
-        this.invalidateHitboxes();
         this.getRenderer().update();
+        this.invalidateHitboxes();
       }
     }
 
@@ -537,8 +537,8 @@ namespace gdjs {
       if (enable !== this._flippedY) {
         this._scaleY *= -1;
         this._flippedY = enable;
-        this.invalidateHitboxes();
         this.getRenderer().update();
+        this.invalidateHitboxes();
       }
     }
 

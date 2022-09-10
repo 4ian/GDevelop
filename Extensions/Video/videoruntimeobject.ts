@@ -41,7 +41,7 @@ namespace gdjs {
      * @param videoObjectData The data defining the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       videoObjectData: VideoObjectData
     ) {
       super(runtimeScene, videoObjectData);
@@ -97,7 +97,7 @@ namespace gdjs {
       this._renderer.onDestroy();
     }
 
-    update(runtimeScene): void {
+    update(runtimeScene: gdjs.RuntimeInstancesContainer): void {
       this._renderer.ensureUpToDate();
     }
 

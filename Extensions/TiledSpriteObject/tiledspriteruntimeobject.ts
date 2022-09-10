@@ -34,7 +34,7 @@ namespace gdjs {
      * @param tiledSpriteObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       tiledSpriteObjectData: TiledSpriteObjectData
     ) {
       super(runtimeScene, tiledSpriteObjectData);
@@ -109,7 +109,10 @@ namespace gdjs {
      * @param textureName The name of the image texture ressource.
      * @param runtimeScene The scene in which the texture is used.
      */
-    setTexture(textureName: string, runtimeScene: gdjs.RuntimeScene): void {
+    setTexture(
+      textureName: string,
+      runtimeScene: gdjs.RuntimeInstancesContainer
+    ): void {
       this._renderer.setTexture(textureName, runtimeScene);
     }
 

@@ -267,7 +267,7 @@ namespace gdjs {
 
     isTextureNameValid(
       texture: string,
-      runtimeScene: gdjs.RuntimeScene
+      runtimeScene: gdjs.RuntimeInstancesContainer
     ): boolean {
       const invalidPixiTexture = runtimeScene
         .getGame()
@@ -280,7 +280,10 @@ namespace gdjs {
       return pixiTexture.valid && pixiTexture !== invalidPixiTexture;
     }
 
-    setTextureName(texture: string, runtimeScene: gdjs.RuntimeScene): void {
+    setTextureName(
+      texture: string,
+      runtimeScene: gdjs.RuntimeInstancesContainer
+    ): void {
       const invalidPixiTexture = runtimeScene
         .getGame()
         .getImageManager()

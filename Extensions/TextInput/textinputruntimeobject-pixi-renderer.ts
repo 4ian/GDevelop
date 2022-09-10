@@ -29,12 +29,15 @@ namespace gdjs {
   class TextInputRuntimeObjectPixiRenderer {
     private _object: gdjs.TextInputRuntimeObject;
     private _input: HTMLInputElement | HTMLTextAreaElement | null = null;
-    private _runtimeScene: gdjs.RuntimeScene;
+    private _runtimeScene: gdjs.RuntimeInstancesContainer;
     private _runtimeGame: gdjs.RuntimeGame;
 
-    constructor(runtimeObject: gdjs.TextInputRuntimeObject) {
+    constructor(
+      runtimeObject: gdjs.TextInputRuntimeObject,
+      runtimeScene: gdjs.RuntimeInstancesContainer
+    ) {
       this._object = runtimeObject;
-      this._runtimeScene = runtimeObject.getRuntimeScene();
+      this._runtimeScene = runtimeScene;
       this._runtimeGame = this._runtimeScene.getGame();
 
       this._createElement();

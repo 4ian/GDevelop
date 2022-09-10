@@ -133,6 +133,18 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .SetFunctionName("doSomething");
 
   extension
+      ->AddAction("DoSomethingWithObjects",
+                  "Do something",
+                  "This does something",
+                  "Do something please",
+                  "",
+                  "",
+                  "")
+      .AddParameter("object", _("Object 1 parameter"))
+      .AddParameter("object", _("Object 2 parameter"))
+      .SetFunctionName("doSomethingWithObjects");
+
+  extension
       ->AddAction("DoSomethingWithResources",
                   "Do something with resources",
                   "This does something with resources",

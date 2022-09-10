@@ -35,7 +35,7 @@ namespace gdjs {
      */
     _registeredBehaviors: Set<Physics2RuntimeBehavior>;
 
-    constructor(runtimeScene: gdjs.RuntimeScene, sharedData) {
+    constructor(runtimeScene: gdjs.RuntimeInstancesContainer, sharedData) {
       this._registeredBehaviors = new Set();
       this.gravityX = sharedData.gravityX;
       this.gravityY = sharedData.gravityY;
@@ -349,7 +349,7 @@ namespace gdjs {
     _verticesBuffer: integer = 0;
 
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       behaviorData,
       owner: gdjs.RuntimeObject
     ) {
@@ -382,7 +382,7 @@ namespace gdjs {
       this.currentContacts.length = 0;
       this.destroyedDuringFrameLogic = false;
       this._sharedData = Physics2SharedData.getSharedData(
-        runtimeScene,
+        runtimeScene.getScene(),
         behaviorData.name
       );
       this._tempb2Vec2 = new Box2D.b2Vec2();
@@ -824,14 +824,14 @@ namespace gdjs {
       return true;
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
       // Step the world if not done this frame yet
       if (!this._sharedData.stepped) {
         // Reset started and ended contacts array for all physics instances.
         this._sharedData.resetStartedAndEndedCollisions();
         this._sharedData.updateBodiesFromObjects();
         this._sharedData.step(
-          runtimeScene.getTimeManager().getElapsedTime() / 1000.0
+          runtimeScene.getScene().getTimeManager().getElapsedTime() / 1000.0
         );
       }
 
@@ -862,7 +862,7 @@ namespace gdjs {
       this._objectOldAngle = this.owner.getAngle();
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {
+    doStepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
       // Reset world step to update next frame
       this._sharedData.stepped = false;
     }

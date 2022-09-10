@@ -20,7 +20,7 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.PanelSpriteRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       textureName: string,
       tiled: boolean
     ) {
@@ -188,12 +188,19 @@ namespace gdjs {
       this._spritesContainer.cacheAsBitmap = false;
     }
 
-    setTexture(textureName, runtimeScene): void {
+    setTexture(
+      textureName: string,
+      runtimeScene: gdjs.RuntimeInstancesContainer
+    ): void {
       const obj = this._object;
+      // @ts-ignore
       const texture = runtimeScene
         .getGame()
         .getImageManager()
-        .getPIXITexture(textureName);
+        .getPIXITexture(textureName) as PIXI.BaseTexture<
+        PIXI.Resource,
+        PIXI.IAutoDetectOptions
+      >;
       this._textureWidth = texture.width;
       this._textureHeight = texture.height;
 

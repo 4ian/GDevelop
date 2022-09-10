@@ -7,7 +7,7 @@ namespace gdjs {
    * The PIXI.js renderer for the VideoRuntimeObject.
    */
   export class VideoRuntimeObjectPixiRenderer {
-    _object: any;
+    _object: gdjs.VideoRuntimeObject;
 
     // Load (or reset) the video
     _pixiObject: any;
@@ -19,7 +19,7 @@ namespace gdjs {
      */
     constructor(
       runtimeObject: gdjs.VideoRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      runtimeScene: gdjs.RuntimeInstancesContainer
     ) {
       this._object = runtimeObject;
       this._pixiObject = new PIXI.Sprite(

@@ -14,7 +14,7 @@ namespace gdjs {
      */
     constructor(
       runtimeObject: gdjs.BBTextRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      runtimeScene: gdjs.RuntimeInstancesContainer
     ) {
       this._object = runtimeObject;
 

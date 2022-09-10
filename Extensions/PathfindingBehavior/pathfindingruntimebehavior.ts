@@ -38,7 +38,7 @@ namespace gdjs {
     _movementAngle: float = 0;
 
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       behaviorData,
       owner: gdjs.RuntimeObject
     ) {
@@ -313,7 +313,7 @@ namespace gdjs {
     /**
      * Compute and move on the path to the specified destination.
      */
-    moveTo(runtimeScene: gdjs.RuntimeScene, x: float, y: float) {
+    moveTo(runtimeScene: gdjs.RuntimeInstancesContainer, x: float, y: float) {
       const owner = this.owner;
 
       //First be sure that there is a path to compute.
@@ -403,7 +403,7 @@ namespace gdjs {
       }
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
       if (this._path.length === 0 || this._reachedEnd) {
         return;
       }
@@ -463,7 +463,7 @@ namespace gdjs {
       this.owner.setY(newPos[1]);
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
+    doStepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {}
 
     /**
      * Compute the euclidean distance between two positions.

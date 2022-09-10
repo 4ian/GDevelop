@@ -8,7 +8,7 @@ namespace gdjs {
      * @param savePath The path where to save the screenshot
      */
     export const takeScreenshot = function (
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       savePath: string
     ) {
       const fs = typeof require !== 'undefined' ? require('fs') : null;

@@ -11,7 +11,11 @@ namespace gdjs {
   export class DestroyOutsideRuntimeBehavior extends gdjs.RuntimeBehavior {
     _extraBorder: any;
 
-    constructor(runtimeScene, behaviorData, owner) {
+    constructor(
+      runtimeScene: gdjs.RuntimeInstancesContainer,
+      behaviorData,
+      owner
+    ) {
       super(runtimeScene, behaviorData, owner);
       this._extraBorder = behaviorData.extraBorder || 0;
     }
@@ -23,7 +27,7 @@ namespace gdjs {
       return true;
     }
 
-    doStepPostEvents(runtimeScene) {
+    doStepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
       // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
       // is not necessarily in the middle of the object (for sprites for example).
       const ow = this.owner.getWidth();

@@ -101,7 +101,7 @@ namespace gdjs {
     // TODO EBO Documentation
     abstract getViewportHeight(): float;
 
-    // TODO EBO
+    // TODO EBO Documentation
     abstract onChildrenLocationChanged(): void;
 
     /**

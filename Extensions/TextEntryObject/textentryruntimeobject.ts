@@ -16,7 +16,7 @@ namespace gdjs {
      * @param textEntryObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       textEntryObjectData: ObjectData
     ) {
       super(runtimeScene, textEntryObjectData);
@@ -38,7 +38,7 @@ namespace gdjs {
       }
     }
 
-    update(runtimeScene: gdjs.RuntimeScene): void {
+    update(runtimeScene: gdjs.RuntimeInstancesContainer): void {
       if ((this._renderer as any).getString) {
         this._str = (this._renderer as any).getString();
       }

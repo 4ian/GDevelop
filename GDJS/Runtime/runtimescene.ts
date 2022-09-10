@@ -55,12 +55,16 @@ namespace gdjs {
       this._timeManager = new gdjs.TimeManager();
       this._onceTriggers = new gdjs.OnceTriggers();
       this._requestedChange = SceneChangeRequest.CONTINUE;
-      this._cachedGameResolutionWidth = runtimeGame.getGameResolutionWidth();
-      this._cachedGameResolutionHeight = runtimeGame.getGameResolutionHeight();
+      this._cachedGameResolutionWidth = runtimeGame
+        ? runtimeGame.getGameResolutionWidth()
+        : 0;
+      this._cachedGameResolutionHeight = runtimeGame
+        ? runtimeGame.getGameResolutionHeight()
+        : 0;
 
       this._renderer = new gdjs.RuntimeSceneRenderer(
         this,
-        // @ts-ignore
+        // @ts-ignore This is needed because of test. They should mock RuntimeGame instead.
         runtimeGame ? runtimeGame.getRenderer() : null
       );
       this._debuggerRenderer = new gdjs.DebuggerRenderer(this);
@@ -78,8 +82,12 @@ namespace gdjs {
     onGameResolutionResized() {
       const oldGameResolutionWidth = this._cachedGameResolutionWidth;
       const oldGameResolutionHeight = this._cachedGameResolutionHeight;
-      this._cachedGameResolutionWidth = this._runtimeGame.getGameResolutionWidth();
-      this._cachedGameResolutionHeight = this._runtimeGame.getGameResolutionHeight();
+      this._cachedGameResolutionWidth = this._runtimeGame
+        ? this._runtimeGame.getGameResolutionWidth()
+        : 0;
+      this._cachedGameResolutionHeight = this._runtimeGame
+        ? this._runtimeGame.getGameResolutionHeight()
+        : 0;
       for (const name in this._layers.items) {
         if (this._layers.items.hasOwnProperty(name)) {
           /** @type gdjs.Layer */

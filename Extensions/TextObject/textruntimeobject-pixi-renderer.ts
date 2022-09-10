@@ -9,7 +9,7 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.TextRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      runtimeScene: gdjs.RuntimeInstancesContainer
     ) {
       this._object = runtimeObject;
       this._fontManager = runtimeScene.getGame().getFontManager();

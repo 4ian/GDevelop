@@ -47,7 +47,7 @@ namespace gdjs {
      * @param panelSpriteObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       panelSpriteObjectData: PanelSpriteObjectData
     ) {
       super(runtimeScene, panelSpriteObjectData);
@@ -112,7 +112,7 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    onDestroyFromScene(runtimeScene): void {
+    onDestroyFromScene(runtimeScene: gdjs.RuntimeInstancesContainer): void {
       super.onDestroyFromScene(runtimeScene);
       // @ts-ignore
       if (this._renderer.onDestroy) {
@@ -121,7 +121,7 @@ namespace gdjs {
       }
     }
 
-    update(runtimeScene: gdjs.RuntimeScene): void {
+    update(runtimeScene: gdjs.RuntimeInstancesContainer): void {
       this._renderer.ensureUpToDate();
     }
 
@@ -158,7 +158,10 @@ namespace gdjs {
      * @param textureName The name of the texture.
      * @param runtimeScene The scene the object lives in.
      */
-    setTexture(textureName: string, runtimeScene: gdjs.RuntimeScene): void {
+    setTexture(
+      textureName: string,
+      runtimeScene: gdjs.RuntimeInstancesContainer
+    ): void {
       this._renderer.setTexture(textureName, runtimeScene);
     }
 

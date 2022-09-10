@@ -67,7 +67,7 @@ namespace gdjs {
      * @param textObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       textObjectData: TextObjectData
     ) {
       super(runtimeScene, textObjectData);
@@ -131,7 +131,7 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    update(runtimeScene: gdjs.RuntimeScene): void {
+    update(runtimeScene: gdjs.RuntimeInstancesContainer): void {
       this._renderer.ensureUpToDate();
     }
 

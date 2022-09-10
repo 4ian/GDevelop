@@ -48,7 +48,7 @@ namespace gdjs {
     private _temporaryPointForTransformations: FloatPoint = [0, 0];
 
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       behaviorData,
       owner: gdjs.RuntimeObject
     ) {
@@ -227,7 +227,7 @@ namespace gdjs {
       return this._movementAngleOffset;
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;

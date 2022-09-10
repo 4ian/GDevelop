@@ -422,7 +422,7 @@ namespace gdjs {
      * Do not change/redefine this method. Instead, redefine the onDestroyFromScene method.
      * @param runtimeScene The RuntimeScene owning the object.
      */
-    deleteFromScene(runtimeScene: gdjs.RuntimeScene): void {
+    deleteFromScene(runtimeScene: gdjs.RuntimeInstancesContainer): void {
       if (this._livingOnScene) {
         runtimeScene.markObjectForDeletion(this);
         this._livingOnScene = false;
@@ -623,7 +623,7 @@ namespace gdjs {
     rotateTowardAngle(
       angle: float,
       speed: float,
-      runtimeScene: gdjs.RuntimeScene
+      runtimeScene: gdjs.RuntimeInstancesContainer
     ): void {
       if (speed === 0) {
         this.setAngle(angle);

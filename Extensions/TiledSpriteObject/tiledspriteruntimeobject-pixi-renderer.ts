@@ -7,7 +7,7 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.TiledSpriteRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       textureName: string
     ) {
       this._object = runtimeObject;
@@ -42,7 +42,7 @@ namespace gdjs {
         this._object.y + this._tiledSprite.height / 2;
     }
 
-    setTexture(textureName, runtimeScene): void {
+    setTexture(textureName, runtimeScene: RuntimeInstancesContainer): void {
       const texture = runtimeScene
         .getGame()
         .getImageManager()

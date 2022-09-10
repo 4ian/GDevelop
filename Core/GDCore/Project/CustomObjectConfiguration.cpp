@@ -49,7 +49,7 @@ gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(
   if (configurationPosition == childObjectConfigurations.end()) {
     childObjectConfigurations.insert(std::make_pair(
         objectName,
-        project->CreateObjectConfiguration(childObject.GetType())));
+        childObject.GetConfiguration().Clone()));
     return *(childObjectConfigurations[objectName]);
   }
   else {

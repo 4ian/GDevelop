@@ -18,14 +18,14 @@ namespace gdjs {
     /**
      * @param object The object
      */
-    constructor(runtimeScene: gdjs.RuntimeScene) {
+    constructor(runtimeScene: gdjs.RuntimeInstancesContainer) {
       this._platformRBush = new rbush();
     }
 
     /**
      * Get the platforms manager of a scene.
      */
-    static getManager(runtimeScene: gdjs.RuntimeScene) {
+    static getManager(runtimeScene: gdjs.RuntimeInstancesContainer) {
       // @ts-ignore
       if (!runtimeScene.platformsObjectsManager) {
         //Create the shared manager if necessary.
@@ -132,7 +132,7 @@ namespace gdjs {
     _registeredInManager: boolean = false;
 
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       behaviorData,
       owner: gdjs.RuntimeObject
     ) {
@@ -169,7 +169,7 @@ namespace gdjs {
       }
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
       //Scene change is not supported
       /*if ( parentScene != &scene ) //Parent scene has changed
             {
@@ -211,7 +211,7 @@ namespace gdjs {
       }
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
+    doStepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {}
 
     onActivate() {
       if (this._registeredInManager) {

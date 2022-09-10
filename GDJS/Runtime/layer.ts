@@ -521,7 +521,7 @@ namespace gdjs {
      * Return the time elapsed since the last frame,
      * in milliseconds, for objects on the layer.
      */
-    getElapsedTime(runtimeScene?: RuntimeScene): float {
+    getElapsedTime(runtimeScene?: gdjs.RuntimeInstancesContainer): float {
       const instanceContainer = runtimeScene || this._runtimeInstancesContainer;
       return instanceContainer.getElapsedTime() * this._timeScale;
     }

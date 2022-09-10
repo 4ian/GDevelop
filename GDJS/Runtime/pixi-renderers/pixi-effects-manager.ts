@@ -9,8 +9,8 @@ namespace gdjs {
   type RendererEffects = Record<string, PixiFiltersTools.Filter>;
 
   export interface EffectsTarget {
-    getRuntimeScene: () => RuntimeScene;
-    getElapsedTime: (runtimeScene?: RuntimeScene) => number;
+    getRuntimeScene: () => gdjs.RuntimeInstancesContainer;
+    getElapsedTime: (runtimeScene?: gdjs.RuntimeInstancesContainer) => number;
     getHeight: () => number;
     getWidth: () => number;
     isLightingLayer?: () => boolean;

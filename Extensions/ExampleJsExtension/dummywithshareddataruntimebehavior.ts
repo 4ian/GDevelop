@@ -4,7 +4,7 @@ namespace gdjs {
     _textToSet: string;
 
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       behaviorData: any,
       owner: gdjs.RuntimeObject
     ) {
@@ -15,9 +15,9 @@ namespace gdjs {
       this._textToSet = behaviorData.property1;
 
       // You can also access to the shared data:
-      const sharedData = runtimeScene.getInitialSharedDataForBehavior(
-        behaviorData.name
-      );
+      const sharedData = runtimeScene
+        .getScene()
+        .getInitialSharedDataForBehavior(behaviorData.name);
       this._textToSet = (sharedData as any).sharedProperty1;
 
       // You can also run arbitrary code at the creation of the behavior:
@@ -40,7 +40,7 @@ namespace gdjs {
 
     onDeActivate() {}
 
-    doStepPreEvents(runtimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
       // This is run at every frame, before events are launched.
       this.owner
         .getVariables()
@@ -48,7 +48,7 @@ namespace gdjs {
         .setString(this._textToSet);
     }
 
-    doStepPostEvents(runtimeScene) {
+    doStepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
       // This is run at every frame, after events are launched.
     }
   }

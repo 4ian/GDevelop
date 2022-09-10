@@ -14,7 +14,7 @@ namespace gdjs {
     // @ts-expect-error ts-migrate(2564) FIXME: Property 'opacity' has no initializer and is not d... Remove this comment to see the full error message
     opacity: float;
 
-    constructor(runtimeScene, objectData) {
+    constructor(runtimeScene: gdjs.RuntimeInstancesContainer, objectData) {
       // *ALWAYS* call the base gdjs.RuntimeObject constructor.
       super(runtimeScene, objectData);
       this._property1 = objectData.content.property1;
@@ -42,7 +42,7 @@ namespace gdjs {
      * Called once during the game loop, before events and rendering.
      * @param runtimeScene The gdjs.RuntimeScene the object belongs to.
      */
-    update(runtimeScene: gdjs.RuntimeScene): void {
+    update(runtimeScene: gdjs.RuntimeInstancesContainer): void {
       // This is an example: typically you want to make sure the renderer
       // is up to date with the object.
       this._renderer.ensureUpToDate();

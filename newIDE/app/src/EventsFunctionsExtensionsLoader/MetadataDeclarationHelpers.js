@@ -118,11 +118,8 @@ export const isBehaviorLifecycleEventsFunction = (functionName: string) => {
  * that will be called automatically by the game engine.
  */
 export const isObjectLifecycleEventsFunction = (functionName: string) => {
-  // TODO EBO Rename doStepPreEvents and doStepPostEvents
   return (
-    ['onCreated', 'doStepPreEvents', 'doStepPostEvents', 'onDestroy'].indexOf(
-      functionName
-    ) !== -1
+    ['onCreated', 'doStepPostEvents', 'onDestroy'].indexOf(functionName) !== -1
   );
 };
 

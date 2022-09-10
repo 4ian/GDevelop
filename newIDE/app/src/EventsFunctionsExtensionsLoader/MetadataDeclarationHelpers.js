@@ -82,15 +82,165 @@ export const declareBehaviorMetadata = (
  * events based object.
  */
 export const declareObjectMetadata = (
+  i18n: I18nType,
   extension: gdPlatformExtension,
   eventsBasedObject: gdEventsBasedObject
 ): gdObjectMetadata => {
-  return extension.addEventsBasedObject(
+  const objectMetadata = extension.addEventsBasedObject(
     eventsBasedObject.getName(),
     eventsBasedObject.getFullName() || eventsBasedObject.getName(),
     eventsBasedObject.getDescription(),
     getExtensionIconUrl(extension)
   );
+
+  // TODO EBO Use full type to identify object to avoid collision.
+  // Objects are identified by their name alone.
+  const objectType = eventsBasedObject.getName();
+
+  objectMetadata
+    .addAction(
+      'Width',
+      i18n._('Width'),
+      i18n._('Change the width of an object.'),
+      i18n._('the width'),
+      i18n._('Size'),
+      'res/actions/scaleWidth24.png',
+      'res/actions/scale.png'
+    )
+    .addParameter('object', i18n._('Object'), objectType)
+    .useStandardOperatorParameters('number')
+    .markAsAdvanced()
+    .getCodeExtraInformation()
+    .setFunctionName('setWidth')
+    .setGetter('getWidth');
+
+  objectMetadata
+    .addAction(
+      'Height',
+      i18n._('Height'),
+      i18n._('Change the height of an object.'),
+      i18n._('the height'),
+      i18n._('Size'),
+      'res/actions/scaleHeight24.png',
+      'res/actions/scale.png'
+    )
+    .addParameter('object', i18n._('Object'), objectType)
+    .useStandardOperatorParameters('number')
+    .markAsAdvanced()
+    .getCodeExtraInformation()
+    .setFunctionName('setHeight')
+    .setGetter('getHeight');
+
+  objectMetadata
+    .addAction(
+      'Scale',
+      i18n._('Scale'),
+      i18n._('Modify the scale of the specified object.'),
+      i18n._('the scale'),
+      i18n._('Size'),
+      'res/actions/scale24.png',
+      'res/actions/scale.png'
+    )
+    .addParameter('object', i18n._('Object'), objectType)
+    .useStandardOperatorParameters('number')
+    .markAsAdvanced()
+    .getCodeExtraInformation()
+    .setFunctionName('setScale')
+    .setGetter('getScale');
+
+  objectMetadata
+    .addExpressionAndConditionAndAction(
+      'number',
+      'ScaleX',
+      i18n._('Scale on X axis'),
+      i18n._("the width's scale of an object"),
+      i18n._("the width's scale"),
+      i18n._('Size'),
+      'res/actions/scaleWidth24.png'
+    )
+    .addParameter('object', i18n._('Object'), objectType)
+    .useStandardParameters('number')
+    .markAsAdvanced()
+    .setFunctionName('setScaleX')
+    .setGetter('getScaleY');
+
+  objectMetadata
+    .addExpressionAndConditionAndAction(
+      'number',
+      'ScaleY',
+      i18n._('Scale on Y axis'),
+      i18n._("the height's scale of an object"),
+      i18n._("the height's scale"),
+      i18n._('Size'),
+      'res/actions/scaleHeight24.png'
+    )
+    .addParameter('object', i18n._('Object'), objectType)
+    .useStandardParameters('number')
+    .markAsAdvanced()
+    .setFunctionName('setScaleY')
+    .setGetter('getScaleY');
+
+  objectMetadata
+    .addAction(
+      'FlipX',
+      i18n._('Flip the object horizontally'),
+      i18n._('Flip the object horizontally'),
+      i18n._('Flip horizontally _PARAM0_: _PARAM1_'),
+      i18n._('Effects'),
+      'res/actions/flipX24.png',
+      'res/actions/flipX.png'
+    )
+    .addParameter('object', i18n._('Object'), objectType)
+    .addParameter('yesorno', i18n._('Activate flipping'))
+    .markAsSimple()
+    .getCodeExtraInformation()
+    .setFunctionName('flipX');
+
+  objectMetadata
+    .addAction(
+      'FlipY',
+      i18n._('Flip the object vertically'),
+      i18n._('Flip the object vertically'),
+      i18n._('Flip vertically _PARAM0_: _PARAM1_'),
+      i18n._('Effects'),
+      'res/actions/flipY24.png',
+      'res/actions/flipY.png'
+    )
+    .addParameter('object', i18n._('Object'), objectType)
+    .addParameter('yesorno', i18n._('Activate flipping'))
+    .markAsSimple()
+    .getCodeExtraInformation()
+    .setFunctionName('flipY');
+
+  objectMetadata
+    .addCondition(
+      'FlippedX',
+      i18n._('Horizontally flipped'),
+      i18n._('Check if the object is horizontally flipped'),
+      i18n._('_PARAM0_ is horizontally flipped'),
+      i18n._('Effects'),
+      'res/actions/flipX24.png',
+      'res/actions/flipX.png'
+    )
+    .addParameter('object', i18n._('Object'), objectType)
+    .getCodeExtraInformation()
+    .setFunctionName('isFlippedX');
+
+  objectMetadata
+    .addCondition(
+      'FlippedY',
+      i18n._('Vertically flipped'),
+      i18n._('Check if the object is vertically flipped'),
+      i18n._('_PARAM0_ is vertically flipped'),
+      i18n._('Effects'),
+      'res/actions/flipY24.png',
+      'res/actions/flipY.png'
+    )
+    .addParameter('object', i18n._('Object'), objectType)
+    .getCodeExtraInformation()
+    .setFunctionName('isFlippedY');
+
+  return objectMetadata;
 };
 
 /**

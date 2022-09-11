@@ -39,10 +39,13 @@ export const mosaicContainsNode = (
   return (
     !!mosaic &&
     (mosaic === node ||
-      (!!mosaic.first &&
-        mosaicContainsNode(((mosaic.first: ?any): ?EditorMosaicNode), node) &&
-        !!mosaic.second &&
-        mosaicContainsNode(((mosaic.second: ?any): ?EditorMosaicNode), node)))
+      ((!!mosaic.first &&
+        mosaicContainsNode(((mosaic.first: ?any): ?EditorMosaicNode), node)) ||
+        (!!mosaic.second &&
+          mosaicContainsNode(
+            ((mosaic.second: ?any): ?EditorMosaicNode),
+            node
+          ))))
   );
 };
 

@@ -1628,19 +1628,18 @@ void WholeProjectRefactorer::ObjectOrGroupRemovedInEventsFunction(
 
 void WholeProjectRefactorer::ObjectOrGroupRenamedInEventsBasedObject(
     gd::Project& project,
-    gd::EventsBasedObject& eventsBasedObject,
     gd::ObjectsContainer& globalObjectsContainer,
-    gd::ObjectsContainer& objectsContainer,
+    gd::EventsBasedObject& eventsBasedObject,
     const gd::String& oldName,
     const gd::String& newName,
     bool isObjectGroup) {
   for (auto &functionUniquePtr : eventsBasedObject.GetEventsFunctions().GetInternalVector()) {
-    auto function = functionUniquePtr.get();
+    auto *function = functionUniquePtr.get();
     WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
         project,
         *function,
         globalObjectsContainer,
-        objectsContainer,
+        eventsBasedObject,
         oldName,
         newName,
         isObjectGroup);

@@ -333,9 +333,8 @@ class GD_CORE_API WholeProjectRefactorer {
    */
   static void ObjectOrGroupRenamedInEventsBasedObject(
       gd::Project& project,
-      gd::EventsBasedObject& eventsBasedObject,
       gd::ObjectsContainer& globalObjectsContainer,
-      gd::ObjectsContainer& objectsContainer,
+      gd::EventsBasedObject& eventsBasedObject,
       const gd::String& oldName,
       const gd::String& newName,
       bool isObjectGroup);

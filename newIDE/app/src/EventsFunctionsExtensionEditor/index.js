@@ -1410,9 +1410,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       )
                     }
                     initialNodes={
-                      isDev !==
+                      isDev ===
                       mosaicContainsNode(
-                        initialMosaicEditorNodes,
+                        getDefaultEditorMosaicNode(
+                          'events-functions-extension-editor'
+                        ) || initialMosaicEditorNodes,
                         'objects-list'
                       )
                         ? getDefaultEditorMosaicNode(

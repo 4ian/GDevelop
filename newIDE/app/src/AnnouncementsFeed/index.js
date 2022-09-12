@@ -13,6 +13,7 @@ import { AnnouncementsFeedContext } from './AnnouncementsFeedContext';
 import Text from '../UI/Text';
 import { Line } from '../UI/Grid';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import { MarkdownText } from '../UI/MarkdownText';
 
 type AnnouncementsFeedProps = {|
   level?: 'urgent' | 'normal',
@@ -60,38 +61,48 @@ export const AnnouncementsFeed = ({
       {({ i18n }) => (
         <Line noMargin={!addMargins}>
           <ColumnStackLayout noMargin={!addMargins} expand>
-            {displayedAnnouncements.map(announcement => (
-              <AlertMessage
-                kind={announcement.type === 'warning' ? 'warning' : 'info'}
-                renderRightButton={() => (
-                  <RaisedButton
-                    label={selectMessageByLocale(
+            {displayedAnnouncements.map(announcement => {
+              const { buttonLabelByLocale, buttonUrl } = announcement;
+
+              return (
+                <AlertMessage
+                  kind={announcement.type === 'warning' ? 'warning' : 'info'}
+                  renderRightButton={
+                    buttonLabelByLocale && buttonUrl
+                      ? () => (
+                          <RaisedButton
+                            label={selectMessageByLocale(
+                              i18n,
+                              buttonLabelByLocale
+                            )}
+                            onClick={() => Window.openExternalURL(buttonUrl)}
+                          />
+                        )
+                      : null
+                  }
+                  onHide={
+                    canClose
+                      ? () => {
+                          showAnnouncement(announcement.id, false);
+                        }
+                      : null
+                  }
+                >
+                  <Text size="block-title">
+                    <Trans>
+                      {selectMessageByLocale(i18n, announcement.titleByLocale)}
+                    </Trans>
+                  </Text>
+                  <MarkdownText
+                    source={selectMessageByLocale(
                       i18n,
-                      announcement.buttonLabelByLocale
+                      announcement.markdownMessageByLocale
                     )}
-                    onClick={() =>
-                      Window.openExternalURL(announcement.buttonUrl)
-                    }
+                    allowParagraphs={false}
                   />
-                )}
-                onHide={
-                  canClose
-                    ? () => {
-                        showAnnouncement(announcement.id, false);
-                      }
-                    : undefined
-                }
-              >
-                <Text size="block-title">
-                  <Trans>
-                    {selectMessageByLocale(i18n, announcement.titleByLocale)}
-                  </Trans>
-                </Text>
-                <Text>
-                  {selectMessageByLocale(i18n, announcement.messageByLocale)}
-                </Text>
-              </AlertMessage>
-            ))}
+                </AlertMessage>
+              );
+            })}
           </ColumnStackLayout>
         </Line>
       )}

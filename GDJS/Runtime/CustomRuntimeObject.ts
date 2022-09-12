@@ -18,7 +18,7 @@ namespace gdjs {
    * @param runtimeScene The scene the object belongs to
    * @param spriteObjectData The object data used to initialize the object
    */
-  export abstract class CustomRuntimeObject extends gdjs.RuntimeObject {
+  export class CustomRuntimeObject extends gdjs.RuntimeObject {
     _instanceContainer: gdjs.CustomRuntimeObjectInstancesContainer;
     _isUntransformedHitBoxesDirty: boolean = true;
     _untransformedHitBoxes: gdjs.Polygon[] = [];
@@ -29,11 +29,11 @@ namespace gdjs {
     _flippedX: boolean = false;
     _flippedY: boolean = false;
     opacity: float = 255;
-    _objectData: ObjectData & CustomObjectConfiguration & EventsBasedObjectData;
+    _objectData: ObjectData & CustomObjectConfiguration;
 
     constructor(
       parent: gdjs.RuntimeInstancesContainer,
-      objectData: ObjectData & CustomObjectConfiguration & EventsBasedObjectData
+      objectData: ObjectData & CustomObjectConfiguration
     ) {
       super(parent, objectData);
       this._instanceContainer = new gdjs.CustomRuntimeObjectInstancesContainer(
@@ -50,9 +50,7 @@ namespace gdjs {
       this._instanceContainer._constructListOfAllInstances();
     }
 
-    reinitialize(
-      objectData: ObjectData & CustomObjectConfiguration & EventsBasedObjectData
-    ) {
+    reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
       super.reinitialize(objectData);
 
       this._instanceContainer.loadFrom(objectData);
@@ -324,6 +322,9 @@ namespace gdjs {
       );
     }
 
+    /**
+     * @returns the center X from the local origin (0;0).
+     */
     getUnscaledCenterX(): float {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
@@ -331,19 +332,14 @@ namespace gdjs {
       return this.getUnscaledWidth() / 2 - this._unrotatedAABB.min[0];
     }
 
+    /**
+     * @returns the center Y from the local origin (0;0).
+     */
     getUnscaledCenterY(): float {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
       return this.getUnscaledHeight() / 2 - this._unrotatedAABB.min[1];
-    }
-
-    getCenterX(): float {
-      return this.getUnscaledCenterX() * this.getScaleX();
-    }
-
-    getCenterY(): float {
-      return this.getUnscaledCenterY() * this.getScaleY();
     }
 
     getWidth(): float {

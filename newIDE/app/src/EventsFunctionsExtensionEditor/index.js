@@ -1410,6 +1410,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       )
                     }
                     initialNodes={
+                      // "objects-list" must only appear in dev mode.
                       isDev ===
                       mosaicContainsNode(
                         getDefaultEditorMosaicNode(
@@ -1420,7 +1421,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                         ? getDefaultEditorMosaicNode(
                             'events-functions-extension-editor'
                           ) || initialMosaicEditorNodes
-                        : initialMosaicEditorNodes
+                        : // Force the mosaic to reset to default.
+                          // It contains "objects-list" only
+                          // in dev mode.
+                          initialMosaicEditorNodes
                     }
                   />
                 )}

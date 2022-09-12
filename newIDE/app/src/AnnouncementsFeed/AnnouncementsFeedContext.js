@@ -58,10 +58,10 @@ export const AnnouncementsFeedStateProvider = ({
     [isLoading]
   );
 
-  // Preload the assets and filters when the app loads.
+  // Preload the announcements when the app loads.
   React.useEffect(
     () => {
-      // Don't attempt to load again assets and filters if they
+      // Don't attempt to load again announcements if they
       // were loaded already.
       if (announcements || isLoading.current) return;
 

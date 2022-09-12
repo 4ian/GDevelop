@@ -1289,11 +1289,10 @@ export const fakeAnnouncements: Announcement[] = [
     titleByLocale: {
       en: 'Some title',
     },
-    messageByLocale: {
-      en: 'Something to announce which is really really cool',
+    markdownMessageByLocale: {
+      en:
+        'Something to announce which is really really cool [with a link](https://gdevelop.io) and *other* **markdown** ~~formatting~~!',
     },
-    buttonLabelByLocale: { en: 'View' },
-    buttonUrl: 'https://gdevelop.io',
   },
   {
     id: '124',
@@ -1302,8 +1301,9 @@ export const fakeAnnouncements: Announcement[] = [
     titleByLocale: {
       en: 'Some title',
     },
-    messageByLocale: {
-      en: 'Something nothing important but urgent to announce.',
+    markdownMessageByLocale: {
+      en:
+        'Something nothing important but urgent to announce, with a button and [with a link](https://gdevelop.io) too.',
     },
     buttonLabelByLocale: { en: 'View' },
     buttonUrl: 'https://gdevelop.io',
@@ -1315,8 +1315,8 @@ export const fakeAnnouncements: Announcement[] = [
     titleByLocale: {
       en: 'Some title',
     },
-    messageByLocale: {
-      en: 'Something important and urgent to announce.',
+    markdownMessageByLocale: {
+      en: 'Something important and urgent to announce.\n\n- With\n- a list',
     },
     buttonLabelByLocale: { en: 'View' },
     buttonUrl: 'https://gdevelop.io',
@@ -1328,8 +1328,9 @@ export const fakeAnnouncements: Announcement[] = [
     titleByLocale: {
       en: 'Some title',
     },
-    messageByLocale: {
-      en: 'Something important but not urgent to announce.',
+    markdownMessageByLocale: {
+      en:
+        'Something important but not urgent to announce, with a big image.\n\n![some image](https://raw.githubusercontent.com/4ian/GDevelop/master/newIDE/GDevelop%20banner.png)',
     },
     buttonLabelByLocale: { en: 'View' },
     buttonUrl: 'https://gdevelop.io',

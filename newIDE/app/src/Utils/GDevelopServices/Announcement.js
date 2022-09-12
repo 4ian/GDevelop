@@ -6,11 +6,11 @@ import { type MessageByLocale } from '../i18n/MessageByLocale';
 export type Announcement = {
   id: string,
   titleByLocale: MessageByLocale,
-  messageByLocale: MessageByLocale,
+  markdownMessageByLocale: MessageByLocale,
   type: 'info' | 'warning',
   level: 'normal' | 'urgent',
-  buttonUrl: string,
-  buttonLabelByLocale: MessageByLocale,
+  buttonUrl?: string,
+  buttonLabelByLocale?: MessageByLocale,
 };
 
 export const listAllAnnouncements = async (): Promise<Array<Announcement>> => {

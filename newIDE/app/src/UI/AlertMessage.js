@@ -24,7 +24,7 @@ type Props = {|
   children: React.Node,
   onHide?: ?() => void,
   renderLeftIcon?: () => React.Node,
-  renderRightButton?: () => React.Node,
+  renderRightButton?: ?() => React.Node,
 |};
 
 /**

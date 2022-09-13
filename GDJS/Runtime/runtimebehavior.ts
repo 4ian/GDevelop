@@ -96,7 +96,7 @@ namespace gdjs {
      */
     stepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer): void {
       if (this._activated) {
-        const profiler = runtimeScene.getProfiler();
+        const profiler = runtimeScene.getScene().getProfiler();
         if (profiler) {
           profiler.begin(this.name);
         }
@@ -114,7 +114,7 @@ namespace gdjs {
      */
     stepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer): void {
       if (this._activated) {
-        const profiler = runtimeScene.getProfiler();
+        const profiler = runtimeScene.getScene().getProfiler();
         if (profiler) {
           profiler.begin(this.name);
         }

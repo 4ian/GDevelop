@@ -6,6 +6,20 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Font manager');
 
+  const checkIfCredentialsRequired = (url: string) => {
+    // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
+    // i.e: its gdevelop.io cookie, to be passed.
+    // Note that this is only useful during previews.
+    if (
+      url.startsWith('https://project-resources.gdevelop.io/') ||
+      url.startsWith('https://project-resources-dev.gdevelop.io/')
+    )
+      return true;
+
+    // For other resources, use the default way of loading resources ("anonymous" or "same-site").
+    return false;
+  };
+
   /**
    * FontFaceObserverFontManager loads fonts (using `FontFace` or `fontfaceobserver` library)
    * from the game resources (see `loadFonts`), and allow to access to
@@ -118,16 +132,41 @@ namespace gdjs {
       const descriptors = {};
       const srcWithUrl = 'url(' + encodeURI(src) + ')';
 
-      // @ts-ignore
       if (typeof FontFace !== 'undefined') {
         // Load the given font using CSS Font Loading API.
-        // @ts-ignore
-        const fontFace = new FontFace(fontFamily, srcWithUrl, descriptors);
+        return fetch(src, {
+          credentials: checkIfCredentialsRequired(src)
+            ? // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
+              // i.e: its gdevelop.io cookie, to be passed.
+              'include'
+            : // For other resources, use "same-origin" as done by default by fetch.
+              'same-origin',
+        })
+          .then((response) => {
+            if (!response.ok) {
+              const errorMessage =
+                'Unable to fetch ' +
+                src +
+                ' to be loaded as a font. HTTP status is: ' +
+                response.status +
+                '.';
+              logger.error(errorMessage);
+              throw new Error(errorMessage);
+            }
 
-        // @ts-ignore
-        document.fonts.add(fontFace);
-        return fontFace.load();
+            return response.arrayBuffer();
+          })
+          .then((arrayBuffer) => {
+            const fontFace = new FontFace(fontFamily, arrayBuffer, descriptors);
+
+            // @ts-ignore
+            document.fonts.add(fontFace);
+          });
       } else {
+        // TODO: this method of loading font should be removed as old and not allowing
+        // to handle loading with credentials. All moderns and not-so-modern browsers
+        // that we support also support FontFace API.
+
         // Add @font-face and use FontFaceObserver to be notified when the
         // font is ready.
         const newStyle = document.createElement('style');

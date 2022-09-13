@@ -40,7 +40,7 @@ namespace gdjs {
     return null;
   };
 
-  const determineCrossOrigin = (url: string) => {
+  const checkIfCredentialsRequired = (url: string) => {
     // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
     // i.e: its gdevelop.io cookie, to be passed.
     // Note that this is only useful during previews.
@@ -48,12 +48,10 @@ namespace gdjs {
       url.startsWith('https://project-resources.gdevelop.io/') ||
       url.startsWith('https://project-resources-dev.gdevelop.io/')
     )
-      return 'use-credentials';
+      return true;
 
-    // For other resources, use "anonymous" as done by default by PixiJS. Note that using `false`
-    // to not having `crossorigin` at all would NOT work because the browser would taint the
-    // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
-    return 'anonymous';
+    // For other resources, use the default way of loading resources ("anonymous" or "same-site").
+    return false;
   };
 
   /**
@@ -134,7 +132,12 @@ namespace gdjs {
       const file = resource.file;
       const texture = PIXI.Texture.from(file, {
         resourceOptions: {
-          crossorigin: determineCrossOrigin(file),
+          // Note that using `false`
+          // to not having `crossorigin` at all would NOT work because the browser would taint the
+          // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
+          crossorigin: checkIfCredentialsRequired(file)
+            ? 'use-credentials'
+            : 'anonymous',
         },
       }).on('error', (error) => {
         logFileLoadingError(file, error);
@@ -178,7 +181,12 @@ namespace gdjs {
       );
       const texture = PIXI.Texture.from(file, {
         resourceOptions: {
-          crossorigin: determineCrossOrigin(file),
+          // Note that using `false`
+          // to not having `crossorigin` at all would NOT work because the browser would taint the
+          // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
+          crossorigin: checkIfCredentialsRequired(file)
+            ? 'use-credentials'
+            : 'anonymous',
         },
       }).on('error', (error) => {
         logFileLoadingError(file, error);
@@ -239,7 +247,9 @@ namespace gdjs {
             name: file,
             url: file,
             loadType: PIXI.LoaderResource.LOAD_TYPE.IMAGE,
-            crossOrigin: determineCrossOrigin(file),
+            crossOrigin: checkIfCredentialsRequired(file)
+              ? 'use-credentials'
+              : 'anonymous',
           });
         }
       }

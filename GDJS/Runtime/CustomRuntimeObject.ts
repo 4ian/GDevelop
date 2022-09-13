@@ -46,8 +46,9 @@ namespace gdjs {
       this.getRenderer().reinitialize(this, parent);
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
+      // TODO EBO Make generated code call super implementation for life-cycle methods.
+      super.onCreated();
       this.onCreated();
-      this._instanceContainer._constructListOfAllInstances();
     }
 
     reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
@@ -57,6 +58,8 @@ namespace gdjs {
       this.getRenderer().reinitialize(this, this.getParent());
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object reinitialize method.
+      // TODO EBO Make generated code call super implementation for life-cycle methods.
+      super.onCreated();
       this.onCreated();
     }
 
@@ -79,9 +82,12 @@ namespace gdjs {
       }
     }
 
-    onDestroyFromScene(runtimeScene: gdjs.RuntimeInstancesContainer): void {
-      super.onDestroyFromScene(runtimeScene);
-      this._instanceContainer.onDestroyFromScene(runtimeScene);
+    onDestroyFromScene(
+      instanceContainer: gdjs.RuntimeInstancesContainer
+    ): void {
+      this.onDestroy(instanceContainer);
+      super.onDestroyFromScene(instanceContainer);
+      this._instanceContainer.onDestroyFromScene(instanceContainer);
     }
 
     update(instanceContainer: gdjs.RuntimeInstancesContainer): void {
@@ -97,8 +103,10 @@ namespace gdjs {
       this._instanceContainer._updateObjectsPostEvents();
     }
 
+    // Life-cycle methods implemented by generated subclasses.
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstancesContainer) {}
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstancesContainer) {}
+    onDestroy(instanceContainer: gdjs.RuntimeInstancesContainer) {}
 
     updatePreRender(instanceContainer: gdjs.RuntimeInstancesContainer): void {
       this._instanceContainer._updateObjectsPreRender();
@@ -174,7 +182,7 @@ namespace gdjs {
       let maxX = -Number.MAX_VALUE;
       let maxY = -Number.MAX_VALUE;
       this._untransformedHitBoxes.length = 0;
-      for (const childInstance of this._instanceContainer.getAllInstances()) {
+      for (const childInstance of this._instanceContainer.getAdhocListOfAllInstances()) {
         Array.prototype.push.apply(
           this._untransformedHitBoxes,
           childInstance.getHitBoxes()

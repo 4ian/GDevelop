@@ -91,14 +91,20 @@ namespace gdjs {
     }
 
     update(instanceContainer: gdjs.RuntimeInstancesContainer): void {
-      // TODO EBO Use the profiler.
-
       this._instanceContainer._updateObjectsPreEvents();
 
       // TODO EBO This is only to handle trigger once.
       this.doStepPreEvents(instanceContainer);
+
+      const profiler = this.getRuntimeScene().getProfiler();
+      if (profiler) {
+        profiler.begin(this._objectData.type);
+      }
       // This is a bit like the "scene" events for custom objects.
       this.doStepPostEvents(instanceContainer);
+      if (profiler) {
+        profiler.end(this._objectData.type);
+      }
 
       this._instanceContainer._updateObjectsPostEvents();
     }

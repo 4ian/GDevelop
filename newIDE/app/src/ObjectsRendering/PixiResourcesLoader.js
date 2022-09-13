@@ -225,13 +225,11 @@ export default class PixiResourcesLoader {
       return Promise.resolve('Arial');
     }
 
-    return loadFontFace(fontFamily, `url("${fullFilename}")`, {}).then(
-      loadedFace => {
-        loadedFontFamilies[resourceName] = fontFamily;
+    return loadFontFace(fontFamily, fullFilename).then(loadedFace => {
+      loadedFontFamilies[resourceName] = fontFamily;
 
-        return fontFamily;
-      }
-    );
+      return fontFamily;
+    });
   }
 
   /**
@@ -318,8 +316,10 @@ export default class PixiResourcesLoader {
     const fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName, {
       isResourceForPixi: true,
     });
-    return axios.get(fullUrl, {
-      withCredentials: checkIfCredentialsRequired(fullUrl),
-    }).then(response => response.data);
+    return axios
+      .get(fullUrl, {
+        withCredentials: checkIfCredentialsRequired(fullUrl),
+      })
+      .then(response => response.data);
   }
 }

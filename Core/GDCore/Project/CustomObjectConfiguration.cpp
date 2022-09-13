@@ -216,4 +216,15 @@ void CustomObjectConfiguration::ExposeResources(
       }
     }
   }
+
+  auto objectProperties = std::map<gd::String, gd::PropertyDescriptor>();
+  if (!project->HasEventsBasedObject(GetType())) {
+    return;
+  }
+  const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
+
+  for (auto& childObject : eventsBasedObject.GetObjects()) {
+    auto &configuration = GetChildObjectConfiguration(childObject->GetName());
+    configuration.ExposeResources(worker);
+  }
 }

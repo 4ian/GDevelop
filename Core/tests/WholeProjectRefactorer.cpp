@@ -108,18 +108,6 @@ const std::vector<const gd::EventsList *> GetEventsLists(gd::Project &project) {
   return eventLists;
 }
 
-const std::vector<const gd::ObjectsContainer *> GetObjectContainers(gd::Project &project) {
-  std::vector<const gd::ObjectsContainer *> objectContainers;
-  auto &scene = project.GetLayout("Scene");
-  auto &eventsBasedObject =
-      project.GetEventsFunctionsExtension("MyEventsExtension")
-          .GetEventsBasedObjects()
-          .Get("MyOtherEventsBasedObject");
-  objectContainers.push_back(&scene);
-  objectContainers.push_back(&eventsBasedObject);
-  return objectContainers;
-}
-
 const void SetupEvents(gd::EventsList &eventList) {
 
   // Add some free functions usages in events

@@ -76,7 +76,7 @@ namespace gdjs {
         runtimeScene: gdjs.RuntimeScene,
         variableName: string
       ): boolean {
-        return runtimeScene.getVariables().has(variableName);
+        return runtimeScene.getScene().getVariables().has(variableName);
       };
 
       /**

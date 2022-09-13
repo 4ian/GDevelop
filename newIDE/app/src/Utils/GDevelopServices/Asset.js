@@ -34,7 +34,7 @@ export type AssetCustomization =
     |};
 
 export type ObjectAsset = {|
-  object: any /*(serialized gdObject)*/,
+  object: any /*(serialized gdObjectConfiguration)*/,
   resources: Array<any /*(serialized gdResource)*/>,
   customization: Array<AssetCustomization>,
 |};

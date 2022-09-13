@@ -117,7 +117,7 @@ namespace gdjs {
     private _manager: gdjs.PlatformObjectsManager;
 
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       behaviorData,
       owner: gdjs.RuntimeObject
     ) {
@@ -210,7 +210,7 @@ namespace gdjs {
       return true;
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;
@@ -329,7 +329,7 @@ namespace gdjs {
       this._lastDeltaY = object.getY() - oldY;
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
+    doStepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {}
 
     private _updateSpeed(timeDelta: float): float {
       const previousSpeed = this._currentSpeed;

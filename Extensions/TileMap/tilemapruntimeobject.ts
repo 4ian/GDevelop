@@ -19,7 +19,7 @@ namespace gdjs {
     _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
     _renderer: gdjs.TileMapRuntimeObjectPixiRenderer;
 
-    constructor(runtimeScene: gdjs.RuntimeScene, objectData) {
+    constructor(runtimeScene: gdjs.RuntimeInstancesContainer, objectData) {
       super(runtimeScene, objectData);
       this._opacity = objectData.content.opacity;
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
@@ -46,7 +46,7 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    update(runtimeScene: gdjs.RuntimeScene): void {
+    update(runtimeScene: gdjs.RuntimeInstancesContainer): void {
       if (this._animationSpeedScale <= 0 || this._animationFps === 0) {
         return;
       }
@@ -221,7 +221,7 @@ namespace gdjs {
       if (this.getWidth() === width) return;
 
       this._renderer.setWidth(width);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -233,7 +233,7 @@ namespace gdjs {
       if (this.getHeight() === height) return;
 
       this._renderer.setHeight(height);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -258,7 +258,7 @@ namespace gdjs {
       if (this.getScaleX() === scaleX) return;
 
       this._renderer.setScaleX(scaleX);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -273,7 +273,7 @@ namespace gdjs {
       if (this.getScaleY() === scaleY) return;
 
       this._renderer.setScaleY(scaleY);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     setX(x: float): void {

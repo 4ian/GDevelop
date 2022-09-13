@@ -51,7 +51,10 @@ namespace gdjs {
      * @param runtimeScene The scene the object belongs to.
      * @param objectData The object data used to initialize the object
      */
-    constructor(runtimeScene: gdjs.RuntimeScene, objectData: BBTextObjectData) {
+    constructor(
+      runtimeScene: gdjs.RuntimeInstancesContainer,
+      objectData: BBTextObjectData
+    ) {
       super(runtimeScene, objectData);
       // @ts-ignore - parseFloat should not be required, but GDevelop 5.0 beta 92 and below were storing it as a string.
       this._opacity = parseFloat(objectData.content.opacity);
@@ -239,7 +242,7 @@ namespace gdjs {
 
       this._wrappingWidth = width;
       this._renderer.updateWrappingWidth();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -254,7 +257,7 @@ namespace gdjs {
 
       this._wordWrap = wordWrap;
       this._renderer.updateWordWrap();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     getWordWrap() {

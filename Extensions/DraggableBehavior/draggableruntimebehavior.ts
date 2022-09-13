@@ -16,7 +16,11 @@ namespace gdjs {
     _draggedByDraggableManager: DraggableManager | null = null;
     _checkCollisionMask: boolean;
 
-    constructor(runtimeScene, behaviorData, owner) {
+    constructor(
+      runtimeScene: gdjs.RuntimeInstancesContainer,
+      behaviorData,
+      owner
+    ) {
       super(runtimeScene, behaviorData, owner);
       this._checkCollisionMask = behaviorData.checkCollisionMask ? true : false;
     }
@@ -45,7 +49,7 @@ namespace gdjs {
       this._draggedByDraggableManager = null;
     }
 
-    _tryBeginDrag(runtimeScene) {
+    _tryBeginDrag(runtimeScene: gdjs.RuntimeInstancesContainer) {
       if (this._draggedByDraggableManager) {
         return false;
       }
@@ -83,14 +87,14 @@ namespace gdjs {
       return false;
     }
 
-    _shouldEndDrag(runtimeScene) {
+    _shouldEndDrag(runtimeScene: gdjs.RuntimeInstancesContainer) {
       if (!this._draggedByDraggableManager) {
         return false;
       }
       return this._draggedByDraggableManager.shouldEndDrag(runtimeScene, this);
     }
 
-    _updateObjectPosition(runtimeScene) {
+    _updateObjectPosition(runtimeScene: gdjs.RuntimeInstancesContainer) {
       if (!this._draggedByDraggableManager) {
         return false;
       }
@@ -98,7 +102,7 @@ namespace gdjs {
       return true;
     }
 
-    doStepPreEvents(runtimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
       this._tryBeginDrag(runtimeScene);
       if (this._shouldEndDrag(runtimeScene)) {
         this._endDrag();
@@ -106,7 +110,7 @@ namespace gdjs {
       this._updateObjectPosition(runtimeScene);
     }
 
-    doStepPostEvents(runtimeScene) {
+    doStepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
       const mouseDraggableManager = DraggableManager.getMouseManager(
         runtimeScene
       );
@@ -116,7 +120,7 @@ namespace gdjs {
         .isMouseButtonPressed(0);
     }
 
-    isDragged(runtimeScene): boolean {
+    isDragged(runtimeScene: gdjs.RuntimeInstancesContainer): boolean {
       return !!this._draggedByDraggableManager;
     }
   }
@@ -137,13 +141,13 @@ namespace gdjs {
     protected _xOffset: number = 0;
     protected _yOffset: number = 0;
 
-    constructor(runtimeScene: gdjs.RuntimeScene) {}
+    constructor(runtimeScene: gdjs.RuntimeInstancesContainer) {}
 
     /**
      * Get the platforms manager of a scene.
      */
     static getMouseManager(
-      runtimeScene: gdjs.RuntimeScene
+      runtimeScene: gdjs.RuntimeInstancesContainer
     ): MouseDraggableManager {
       // @ts-ignore
       if (!runtimeScene.mouseDraggableManager) {
@@ -161,7 +165,7 @@ namespace gdjs {
      * Get the platforms manager of a scene.
      */
     static getTouchManager(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       touchId: integer
     ): DraggableManager {
       // @ts-ignore
@@ -183,7 +187,7 @@ namespace gdjs {
     }
 
     tryAndTakeDragging(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       draggableRuntimeBehavior: DraggableRuntimeBehavior
     ) {
       if (
@@ -218,7 +222,7 @@ namespace gdjs {
     }
 
     updateObjectPosition(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       draggableRuntimeBehavior: DraggableRuntimeBehavior
     ) {
       const position = this.getPosition(runtimeScene, draggableRuntimeBehavior);
@@ -241,11 +245,11 @@ namespace gdjs {
       draggableRuntimeBehavior: DraggableRuntimeBehavior
     ): boolean;
     abstract shouldEndDrag(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       draggableRuntimeBehavior: DraggableRuntimeBehavior
     ): boolean;
     abstract getPosition(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       draggableRuntimeBehavior: DraggableRuntimeBehavior
     ): FloatPoint;
   }
@@ -257,7 +261,7 @@ namespace gdjs {
     /** Used to only start dragging when clicking. */
     leftPressedLastFrame = false;
 
-    constructor(runtimeScene: gdjs.RuntimeScene) {
+    constructor(runtimeScene: gdjs.RuntimeInstancesContainer) {
       super(runtimeScene);
     }
 
@@ -266,7 +270,7 @@ namespace gdjs {
     }
 
     getPosition(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       draggableRuntimeBehavior: DraggableRuntimeBehavior
     ): FloatPoint {
       const inputManager = runtimeScene.getGame().getInputManager();
@@ -276,7 +280,7 @@ namespace gdjs {
     }
 
     shouldEndDrag(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       draggableRuntimeBehavior: DraggableRuntimeBehavior
     ): boolean {
       const inputManager = runtimeScene.getGame().getInputManager();
@@ -290,7 +294,10 @@ namespace gdjs {
   class TouchDraggableManager extends DraggableManager {
     private _touchId: integer;
 
-    constructor(runtimeScene: gdjs.RuntimeScene, touchId: integer) {
+    constructor(
+      runtimeScene: gdjs.RuntimeInstancesContainer,
+      touchId: integer
+    ) {
       super(runtimeScene);
       this._touchId = touchId;
     }
@@ -300,7 +307,7 @@ namespace gdjs {
     }
 
     getPosition(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       draggableRuntimeBehavior: DraggableRuntimeBehavior
     ): FloatPoint {
       const inputManager = runtimeScene.getGame().getInputManager();
@@ -313,7 +320,7 @@ namespace gdjs {
     }
 
     shouldEndDrag(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       draggableRuntimeBehavior: DraggableRuntimeBehavior
     ): boolean {
       const inputManager = runtimeScene.getGame().getInputManager();

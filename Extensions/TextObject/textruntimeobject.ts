@@ -67,7 +67,7 @@ namespace gdjs {
      * @param textObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       textObjectData: TextObjectData
     ) {
       super(runtimeScene, textObjectData);
@@ -131,7 +131,7 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    update(runtimeScene: gdjs.RuntimeScene): void {
+    update(runtimeScene: gdjs.RuntimeInstancesContainer): void {
       this._renderer.ensureUpToDate();
     }
 
@@ -151,7 +151,7 @@ namespace gdjs {
      * Update the rendered object position.
      */
     private _updateTextPosition() {
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
       this._renderer.updatePosition();
     }
 
@@ -326,7 +326,7 @@ namespace gdjs {
       this._scaleX = newScale;
       this._scaleY = newScale;
       this._renderer.setScale(newScale);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -338,7 +338,7 @@ namespace gdjs {
 
       this._scaleX = newScale;
       this._renderer.setScaleX(newScale);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -350,7 +350,7 @@ namespace gdjs {
 
       this._scaleY = newScale;
       this._renderer.setScaleY(newScale);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -410,7 +410,7 @@ namespace gdjs {
 
       this._wrapping = enable;
       this._renderer.updateStyle();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -432,7 +432,7 @@ namespace gdjs {
 
       this._wrappingWidth = width;
       this._renderer.updateStyle();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**

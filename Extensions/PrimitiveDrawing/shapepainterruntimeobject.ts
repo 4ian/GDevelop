@@ -61,7 +61,7 @@ namespace gdjs {
      * @param shapePainterObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       shapePainterObjectData: ShapePainterObjectData
     ) {
       super(runtimeScene, shapePainterObjectData);
@@ -158,7 +158,7 @@ namespace gdjs {
       return true;
     }
 
-    stepBehaviorsPreEvents(runtimeScene: gdjs.RuntimeScene) {
+    stepBehaviorsPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
       //We redefine stepBehaviorsPreEvents just to clear the graphics before running events.
       if (this._clearBetweenFrames) {
         this.clear();
@@ -468,7 +468,7 @@ namespace gdjs {
       }
       super.setAngle(angle);
       this._renderer.updateAngle();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -584,7 +584,7 @@ namespace gdjs {
       }
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this._renderer.updateScaleX();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -601,7 +601,7 @@ namespace gdjs {
       }
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this._renderer.updateScaleY();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     flipX(enable: boolean): void {
@@ -609,7 +609,7 @@ namespace gdjs {
         this._scaleX *= -1;
         this._flippedX = enable;
         this._renderer.updateScaleX();
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
       }
     }
 
@@ -618,7 +618,7 @@ namespace gdjs {
         this._scaleY *= -1;
         this._flippedY = enable;
         this._renderer.updateScaleY();
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
       }
     }
 
@@ -660,7 +660,7 @@ namespace gdjs {
     }
 
     invalidateBounds() {
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     getDrawableX(): float {
@@ -741,7 +741,7 @@ namespace gdjs {
       rectangle[3][0] = left;
       rectangle[3][1] = bottom;
 
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     updateHitBoxes(): void {

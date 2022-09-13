@@ -34,7 +34,7 @@ namespace gdjs {
      * @param tiledSpriteObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      runtimeScene: gdjs.RuntimeInstancesContainer,
       tiledSpriteObjectData: TiledSpriteObjectData
     ) {
       super(runtimeScene, tiledSpriteObjectData);
@@ -54,7 +54,7 @@ namespace gdjs {
 
     updateFromObjectData(oldObjectData, newObjectData): boolean {
       if (oldObjectData.texture !== newObjectData.texture) {
-        this.setTexture(newObjectData.texture, this._runtimeScene);
+        this.setTexture(newObjectData.texture, this.getRuntimeScene());
       }
       if (oldObjectData.width !== newObjectData.width) {
         this.setWidth(newObjectData.width);
@@ -109,7 +109,10 @@ namespace gdjs {
      * @param textureName The name of the image texture ressource.
      * @param runtimeScene The scene in which the texture is used.
      */
-    setTexture(textureName: string, runtimeScene: gdjs.RuntimeScene): void {
+    setTexture(
+      textureName: string,
+      runtimeScene: gdjs.RuntimeInstancesContainer
+    ): void {
       this._renderer.setTexture(textureName, runtimeScene);
     }
 
@@ -147,7 +150,7 @@ namespace gdjs {
 
       this._width = width;
       this._renderer.setWidth(width);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -159,7 +162,7 @@ namespace gdjs {
 
       this._height = height;
       this._renderer.setHeight(height);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**

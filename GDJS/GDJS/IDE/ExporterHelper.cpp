@@ -31,6 +31,8 @@
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/EventsBasedObject.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Project/SourceFile.h"
 #include "GDCore/Serialization/Serializer.h"
@@ -557,6 +559,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "polygon.js");
   InsertUnique(includesFiles, "runtimeobject.js");
   InsertUnique(includesFiles, "profiler.js");
+  InsertUnique(includesFiles, "RuntimeInstancesContainer.js");
   InsertUnique(includesFiles, "runtimescene.js");
   InsertUnique(includesFiles, "scenestack.js");
   InsertUnique(includesFiles, "force.js");
@@ -569,6 +572,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "runtimebehavior.js");
   InsertUnique(includesFiles, "spriteruntimeobject.js");
   InsertUnique(includesFiles, "affinetransformation.js");
+  InsertUnique(includesFiles, "CustomRuntimeObjectInstancesContainer.js");
+  InsertUnique(includesFiles, "CustomRuntimeObject.js");
 
   // Common includes for events only.
   InsertUnique(includesFiles, "events-tools/commontools.js");
@@ -615,6 +620,10 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "pixi-renderers/pixi-bitmapfont-manager.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/spriteruntimeobject-pixi-renderer.js");
+    InsertUnique(includesFiles,
+                 "pixi-renderers/CustomObjectPixiRenderer.js");
+    InsertUnique(includesFiles,
+                 "pixi-renderers/DebuggerPixiRenderer.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/loadingscreen-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-effects-manager.js");
@@ -816,10 +825,24 @@ void ExporterHelper::ExportObjectAndBehaviorsIncludes(
         }
       };
 
+  // TODO UsedExtensionsFinder should be used instead.
+  // The Exporter class already use it.
   addObjectsIncludeFiles(project);
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
     const gd::Layout &layout = project.GetLayout(i);
     addObjectsIncludeFiles(layout);
+  }
+  
+  // Event based objects children
+  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount(); e++) {
+    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
+    for (auto&& eventsBasedObjectUniquePtr :
+        eventsFunctionsExtension.GetEventsBasedObjects()
+            .GetInternalVector()) {
+      auto eventsBasedObject = eventsBasedObjectUniquePtr.get();
+
+      addObjectsIncludeFiles(*eventsBasedObject);
+    }
   }
 }
 

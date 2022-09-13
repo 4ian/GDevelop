@@ -313,10 +313,6 @@ namespace gdjs {
       return this._parent.convertInverseCoords(position[0], position[1]);
     }
 
-    getProfiler(): gdjs.Profiler | null {
-      return this._runtimeScene.getProfiler();
-    }
-
     /**
      * Return the time elapsed since the last frame,
      * in milliseconds, for objects on the layer.

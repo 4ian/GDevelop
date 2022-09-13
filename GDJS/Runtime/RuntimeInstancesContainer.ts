@@ -74,11 +74,6 @@ namespace gdjs {
     abstract getScene(): gdjs.RuntimeScene;
 
     /**
-     * Get the profiler associated with the scene, or null if none.
-     */
-    abstract getProfiler(): gdjs.Profiler | null;
-
-    /**
      * Convert a point from the canvas coordinates (for example,
      * the mouse position) to the container coordinates.
      *

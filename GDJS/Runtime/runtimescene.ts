@@ -194,9 +194,9 @@ namespace gdjs {
     onPause() {
       // Notify the objects that the scene is being paused. Objects should not
       // do anything special, but some object renderers might want to know about this.
-      this._constructListOfAllInstances();
-      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-        const object = this._allInstancesList[i];
+      const allInstancesList = this.getAdhocListOfAllInstances();
+      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+        const object = allInstancesList[i];
         object.onScenePaused(this);
       }
 
@@ -214,9 +214,9 @@ namespace gdjs {
 
       // Notify the objects that the scene is being resumed. Objects should not
       // do anything special, but some object renderers might want to know about this.
-      this._constructListOfAllInstances();
-      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-        const object = this._allInstancesList[i];
+      const allInstancesList = this.getAdhocListOfAllInstances();
+      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+        const object = allInstancesList[i];
         object.onSceneResumed(this);
       }
 
@@ -244,9 +244,9 @@ namespace gdjs {
       }
 
       // Notify the objects they are being destroyed
-      this._constructListOfAllInstances();
-      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-        const object = this._allInstancesList[i];
+      const allInstancesList = this.getAdhocListOfAllInstances();
+      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+        const object = allInstancesList[i];
         object.onDestroyFromScene(this);
       }
 
@@ -262,24 +262,22 @@ namespace gdjs {
         gdjs.callbacksRuntimeSceneUnloaded[i](this);
       }
 
-      // It should not be necessary to reset these variables, but this help
-      // ensuring that all memory related to the RuntimeScene is released immediately.
-      this._layers = new Hashtable();
-      this._variables = new gdjs.VariablesContainer();
-      this._initialBehaviorSharedData = new Hashtable();
-      this._objects = new Hashtable();
-      this._instances = new Hashtable();
-      this._instancesCache = new Hashtable();
-      this._eventsFunction = null;
-      this._objectsCtor = new Hashtable();
-      this._allInstancesList = [];
-      this._instancesRemoved = [];
-      this._lastId = 0;
+      this._destroy();
 
-      //@ts-ignore We are deleting the object
-      this._onceTriggers = null;
       this._isLoaded = false;
       this.onGameResolutionResized();
+    }
+
+    _destroy() {
+      // It should not be necessary to reset these variables, but this help
+      // ensuring that all memory related to the RuntimeScene is released immediately.
+      super._destroy();
+      this._variables = new gdjs.VariablesContainer();
+      this._initialBehaviorSharedData = new Hashtable();
+      this._eventsFunction = null;
+      this._lastId = 0;
+      // @ts-ignore We are deleting the object
+      this._onceTriggers = null;
     }
 
     /**
@@ -396,7 +394,7 @@ namespace gdjs {
       // to see what is rendered).
       if (this._debugDrawEnabled) {
         this._debuggerRenderer.renderDebugDraw(
-          this._allInstancesList,
+          this.getAdhocListOfAllInstances(),
           this._debugDrawShowHiddenInstances,
           this._debugDrawShowPointsNames,
           this._debugDrawShowCustomPoints
@@ -445,9 +443,9 @@ namespace gdjs {
         // instead.
         // - objects having effects rendering outside of their visibility AABB.
         this._updateLayersCameraCoordinates(2);
-        this._constructListOfAllInstances();
-        for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-          const object = this._allInstancesList[i];
+        const allInstancesList = this.getAdhocListOfAllInstances();
+        for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+          const object = allInstancesList[i];
           const rendererObject = object.getRendererObject();
           if (rendererObject) {
             if (object.isHidden()) {

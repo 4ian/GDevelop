@@ -3,7 +3,7 @@
 /**
  * Basic tests for gdjs.SpriteRuntimeObject
  */
-describe.only('gdjs.CustomRuntimeObject', function () {
+describe('gdjs.CustomRuntimeObject', function () {
   const extensions = {
     eventsFunctionsExtensions: [
       {

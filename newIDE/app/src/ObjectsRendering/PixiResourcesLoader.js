@@ -283,10 +283,14 @@ export default class PixiResourcesLoader {
       );
     }
 
-    return axios.get(fullUrl).then(response => {
-      loadedBitmapFonts[resourceName] = response;
-      return response.data;
-    });
+    return axios
+      .get(fullUrl, {
+        withCredentials: checkIfCredentialsRequired(fullUrl),
+      })
+      .then(response => {
+        loadedBitmapFonts[resourceName] = response;
+        return response.data;
+      });
   }
 
   static getInvalidPIXITexture() {
@@ -314,6 +318,8 @@ export default class PixiResourcesLoader {
     const fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName, {
       isResourceForPixi: true,
     });
-    return axios.get(fullUrl).then(response => response.data);
+    return axios.get(fullUrl, {
+      withCredentials: checkIfCredentialsRequired(fullUrl),
+    }).then(response => response.data);
   }
 }

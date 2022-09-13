@@ -28,10 +28,10 @@ type FileToCloudProjectResourceUploaderProps = {
 };
 
 const resourceKindToInputAcceptedFiles = {
-  audio: 'audio/*',
-  image: 'image/*',
-  font: 'font/*',
-  video: 'video/*',
+  audio: 'audio/aac,audio/x-wav,audio/mpeg,audio/mp3,audio/ogg',
+  image: 'image/jpeg,image/png,image/webp',
+  font: 'font/ttf,font/otf',
+  video: 'video/mp4,video/webm',
   json: 'application/json',
   bitmapFont: '.fnt,.xml',
 };

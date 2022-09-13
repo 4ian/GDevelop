@@ -13,24 +13,25 @@ namespace gdjs {
    * A scene being played, containing instances of objects rendered on screen.
    */
   export abstract class RuntimeInstancesContainer {
+    /** Contains the instances living on the scene */
     _instances: Hashtable<RuntimeObject[]>;
 
-    /** Contains the instances living on the scene */
-    _instancesCache: Hashtable<RuntimeObject[]>;
+    /** An array used to create a list of all instance when necessary ( see _constructListOfAllInstances ) */
+    private _allInstancesList: gdjs.RuntimeObject[] = [];
+    _allInstancesListIsUpToDate = true;
 
     /** Used to recycle destroyed instance instead of creating new ones. */
-    _objects: Hashtable<ObjectData>;
-
-    /** Contains the objects data stored in the project */
-    _objectsCtor: Hashtable<typeof RuntimeObject>;
-    _layers: Hashtable<Layer>;
-
-    /** An array used to create a list of all instance when necessary ( see _constructListOfAllInstances ) */
-    _allInstancesList: gdjs.RuntimeObject[] = [];
-    _layersCameraCoordinates: Record<string, [float, float, float, float]> = {};
+    _instancesCache: Hashtable<RuntimeObject[]>;
 
     /** The instances removed from the scene and waiting to be sent to the cache. */
     _instancesRemoved: gdjs.RuntimeObject[] = [];
+
+    /** Contains the objects data stored in the project */
+    _objects: Hashtable<ObjectData>;
+    _objectsCtor: Hashtable<typeof RuntimeObject>;
+
+    _layers: Hashtable<Layer>;
+    _layersCameraCoordinates: Record<string, [float, float, float, float]> = {};
 
     // Options for the debug draw:
     _debugDrawEnabled: boolean = false;
@@ -353,7 +354,7 @@ namespace gdjs {
     /**
      * Tool function filling _allInstancesList member with all the living object instances.
      */
-    _constructListOfAllInstances() {
+    private _constructListOfAllInstances() {
       let currentListSize = 0;
       for (const name in this._instances.items) {
         if (this._instances.items.hasOwnProperty(name)) {
@@ -370,6 +371,22 @@ namespace gdjs {
         }
       }
       this._allInstancesList.length = currentListSize;
+      this._allInstancesListIsUpToDate = true;
+    }
+
+    /**
+     * Get a list of all gdjs.RuntimeObject living on the scene.
+     * You should not, normally, need this method at all. It's only to be used
+     * in exceptional use cases where you need to loop through all objects,
+     * and it won't be performant.
+     *
+     * @returns The list of all runtime objects on the scnee
+     */
+    getAdhocListOfAllInstances(): gdjs.RuntimeObject[] {
+      if (!this._allInstancesListIsUpToDate) {
+        this._constructListOfAllInstances();
+      }
+      return this._allInstancesList;
     }
 
     /**
@@ -426,6 +443,7 @@ namespace gdjs {
         this._instances.put(obj.name, []);
       }
       this._instances.get(obj.name).push(obj);
+      this._allInstancesListIsUpToDate = false;
     }
 
     /**
@@ -496,6 +514,7 @@ namespace gdjs {
         for (let i = 0, len = allInstances.length; i < len; ++i) {
           if (allInstances[i].id == objId) {
             allInstances.splice(i, 1);
+            this._allInstancesListIsUpToDate = false;
             break;
           }
         }
@@ -580,19 +599,6 @@ namespace gdjs {
     }
 
     /**
-     * Get a list of all gdjs.RuntimeObject living on the scene.
-     * You should not, normally, need this method at all. It's only to be used
-     * in exceptional use cases where you need to loop through all objects,
-     * and it won't be performant.
-     *
-     * @returns The list of all runtime objects on the scnee
-     */
-    getAdhocListOfAllInstances(): gdjs.RuntimeObject[] {
-      this._constructListOfAllInstances();
-      return this._allInstancesList;
-    }
-
-    /**
      * Return the number of instances of the specified object living on the scene.
      * @param objectName The object name for which instances must be counted.
      */
@@ -624,6 +630,18 @@ namespace gdjs {
           }
         }
       }
+    }
+    // TODO EBO Documentation
+    _destroy() {
+      // It should not be necessary to reset these variables, but this help
+      // ensuring that all memory related to the RuntimeScene is released immediately.
+      this._layers = new Hashtable();
+      this._objects = new Hashtable();
+      this._instances = new Hashtable();
+      this._instancesCache = new Hashtable();
+      this._objectsCtor = new Hashtable();
+      this._allInstancesList = [];
+      this._instancesRemoved = [];
     }
   }
 }

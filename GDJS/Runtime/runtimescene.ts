@@ -654,7 +654,10 @@ namespace gdjs {
       if (sceneName) this._requestedScene = sceneName;
     }
 
-    getProfiler() {
+    /**
+     * Get the profiler associated with the scene, or null if none.
+     */
+    getProfiler(): gdjs.Profiler | null {
       return this._profiler;
     }
 

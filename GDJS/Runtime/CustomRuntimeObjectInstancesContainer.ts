@@ -105,31 +105,31 @@ namespace gdjs {
       this._isLoaded = true;
     }
 
-    onDestroyFromScene(runtimeScene: gdjs.RuntimeInstancesContainer): void {
+    onDestroyFromScene(
+      instanceContainer: gdjs.RuntimeInstancesContainer
+    ): void {
       if (!this._isLoaded) {
         return;
       }
 
       // Notify the objects they are being destroyed
-      this._constructListOfAllInstances();
-      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-        const object = this._allInstancesList[i];
+      const allInstancesList = this.getAdhocListOfAllInstances();
+      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+        const object = allInstancesList[i];
         object.onDestroyFromScene(this);
       }
 
+      this._destroy();
+
+      this._isLoaded = false;
+    }
+
+    _destroy() {
       // It should not be necessary to reset these variables, but this help
       // ensuring that all memory related to the RuntimeScene is released immediately.
-      this._layers = new Hashtable();
-      this._objects = new Hashtable();
-      this._instances = new Hashtable();
-      this._instancesCache = new Hashtable();
-      this._objectsCtor = new Hashtable();
-      this._allInstancesList = [];
-      this._instancesRemoved = [];
-
-      //@ts-ignore We are deleting the object
+      super._destroy();
+      // @ts-ignore We are deleting the object
       this._onceTriggers = null;
-      this._isLoaded = false;
     }
 
     _updateLayersCameraCoordinates(scale: float) {
@@ -173,9 +173,13 @@ namespace gdjs {
      * object is too far from the camera of its layer ("culling").
      */
     _updateObjectsPreRender() {
-      this._constructListOfAllInstances();
-      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-        const object = this._allInstancesList[i];
+      const allInstancesList = this.getAdhocListOfAllInstances();
+      for (
+        let i = 0, len = this.getAdhocListOfAllInstances().length;
+        i < len;
+        ++i
+      ) {
+        const object = this.getAdhocListOfAllInstances()[i];
         const rendererObject = object.getRendererObject();
         if (rendererObject) {
           rendererObject.visible = !object.isHidden();
@@ -192,7 +196,7 @@ namespace gdjs {
         // to see what is rendered).
         if (this._debugDrawEnabled) {
           this._debuggerRenderer.renderDebugDraw(
-            this._allInstancesList,
+            this.getAdhocListOfAllInstances(),
             this._debugDrawShowHiddenInstances,
             this._debugDrawShowPointsNames,
             this._debugDrawShowCustomPoints
@@ -211,9 +215,9 @@ namespace gdjs {
     _updateObjectsPreEvents() {
       //It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
       //may delete the objects.
-      this._constructListOfAllInstances();
-      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-        const obj = this._allInstancesList[i];
+      const allInstancesList = this.getAdhocListOfAllInstances();
+      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+        const obj = allInstancesList[i];
         const elapsedTime = obj.getElapsedTime(this);
         if (!obj.hasNoForces()) {
           const averageForce = obj.getAverageForce();
@@ -226,7 +230,7 @@ namespace gdjs {
           obj.update(this);
         }
         obj.updateTimers(elapsedTime);
-        this._allInstancesList[i].stepBehaviorsPreEvents(this);
+        obj.stepBehaviorsPreEvents(this);
       }
 
       //Some behaviors may have request objects to be deleted.
@@ -241,17 +245,13 @@ namespace gdjs {
 
       //It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
       //may delete the objects.
-      this._constructListOfAllInstances();
-      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-        this._allInstancesList[i].stepBehaviorsPostEvents(this);
+      const allInstancesList = this.getAdhocListOfAllInstances();
+      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+        allInstancesList[i].stepBehaviorsPostEvents(this);
       }
 
       //Some behaviors may have request objects to be deleted.
       this._cacheOrClearRemovedInstances();
-    }
-
-    getAllInstances(): gdjs.RuntimeObject[] {
-      return this._allInstancesList;
     }
 
     /**

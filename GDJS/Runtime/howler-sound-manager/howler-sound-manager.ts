@@ -812,7 +812,7 @@ namespace gdjs {
             onloaderror: onLoadCallback,
             html5: isMusic,
             xhr: {
-              withCredentials: checkIfCredentialsRequired(file)
+              withCredentials: checkIfCredentialsRequired(file),
             },
             // Cache the sound with no volume. This avoids a bug where it plays at full volume
             // for a split second before setting its correct volume.

@@ -11,18 +11,6 @@ declare class gdEventsBasedObject extends gdObjectsContainer {
   getPropertyDescriptors(): gdNamedPropertyDescriptorsList;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
-  insertNewObject(project: gdProject, type: string, name: string, pos: number): gdObject;
-  insertObject(obj: gdObject, pos: number): gdObject;
-  hasObjectNamed(name: string): boolean;
-  getObject(name: string): gdObject;
-  getObjectAt(pos: number): gdObject;
-  getObjectPosition(name: string): number;
-  removeObject(name: string): void;
-  swapObjects(first: number, second: number): void;
-  moveObject(oldIndex: number, newIndex: number): void;
-  moveObjectToAnotherContainer(name: string, newObjectsContainer: gdObjectsContainer, newPosition: number): void;
-  getObjectsCount(): number;
-  getObjectGroups(): gdObjectGroupsContainer;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;

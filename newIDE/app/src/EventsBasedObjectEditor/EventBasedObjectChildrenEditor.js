@@ -133,7 +133,6 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     if (object.getName() !== newName) {
       gd.WholeProjectRefactorer.objectOrGroupRenamedInEventsBasedObject(
         project,
-        eventsBasedObject,
         globalObjectsContainer,
         eventsBasedObject,
         object.getName(),

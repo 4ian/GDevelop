@@ -67,7 +67,9 @@ const gd::String &GetEventFirstActionType(const gd::BaseEvent &event) {
 
 enum TestEvent {
   FreeFunctionAction,
-  FreeFunctionExpression,
+  FreeFunctionWithExpression,
+  FreeFunctionWithObjects,
+  FreeFunctionWithObjectExpression,
 
   BehaviorAction,
   BehaviorPropertyAction,
@@ -113,7 +115,7 @@ const void SetupEvents(gd::EventsList &eventList) {
     if (eventList.GetEventsCount() != FreeFunctionAction) {
       throw std::logic_error("Invalid events setup");
     }
-    // Create an event in the layout referring to
+    // Create an event referring to
     // MyEventsExtension::MyEventsFunction
     {
       gd::StandardEvent event;
@@ -128,10 +130,10 @@ const void SetupEvents(gd::EventsList &eventList) {
       eventList.InsertEvent(event);
     }
 
-    if (eventList.GetEventsCount() != FreeFunctionExpression) {
+    if (eventList.GetEventsCount() != FreeFunctionWithExpression) {
       throw std::logic_error("Invalid events setup");
     }
-    // Create an event in the external events referring to
+    // Create an event referring to
     // MyEventsExtension::MyEventsFunctionExpression
     {
       gd::StandardEvent event;
@@ -142,6 +144,38 @@ const void SetupEvents(gd::EventsList &eventList) {
           0,
           gd::Expression(
               "1 + MyEventsExtension::MyEventsFunctionExpression(123, 456)"));
+      event.GetActions().Insert(action);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != FreeFunctionWithObjects) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event referring to objects
+    {
+      gd::StandardEvent event;
+      gd::Instruction action;
+      action.SetType("MyExtension::DoSomethingWithObjects");
+      action.SetParametersCount(2);
+      action.SetParameter(0, gd::Expression("ObjectWithMyBehavior"));
+      action.SetParameter(1, gd::Expression("MyCustomObject"));
+      event.GetActions().Insert(action);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != FreeFunctionWithObjectExpression) {
+      throw std::logic_error("Invalid events setup");
+    }
+    // Create an event referring to objects in an expression
+    {
+      gd::StandardEvent event;
+      gd::Instruction action;
+      action.SetType("MyExtension::DoSomething");
+      action.SetParametersCount(1);
+      action.SetParameter(
+          0,
+          gd::Expression(
+              "ObjectWithMyBehavior.GetObjectNumber()"));
       event.GetActions().Insert(action);
       eventList.InsertEvent(event);
     }
@@ -854,6 +888,30 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(externalLayout2.GetInitialInstances().HasInstancesOfObject(
                   "GlobalObject3") == true);
     }
+    
+    SECTION("Events") {
+      gd::Project project;
+      gd::Platform platform;
+      SetupProjectWithDummyPlatform(project, platform);
+      auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+      auto &layout = project.GetLayout("Scene");
+
+      // Trigger the refactoring after the renaming of an object
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+          project, layout, "ObjectWithMyBehavior", "RenamedObjectWithMyBehavior",
+          /* isObjectGroup=*/false);
+
+      // Check object name has been renamed in action parameters.
+      REQUIRE(GetEventFirstActionFirstParameterString(
+                  layout.GetEvents().GetEvent(FreeFunctionWithObjects)) ==
+              "RenamedObjectWithMyBehavior");
+
+      // Check object name has been renamed in expressions.
+      REQUIRE(GetEventFirstActionFirstParameterString(
+                  layout.GetEvents().GetEvent(FreeFunctionWithObjectExpression)) ==
+                "RenamedObjectWithMyBehavior.GetObjectNumber()");
+    }
   }
 
   SECTION("Object renamed (in events function)") {
@@ -892,6 +950,43 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     REQUIRE(objectGroup.Find("Object2") == true);
 
     // Events are not tested
+  }
+
+  SECTION("Object renamed (in events-based object)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    auto &eventsBasedObject =
+        project.GetEventsFunctionsExtension("MyEventsExtension")
+               .GetEventsBasedObjects()
+               .Get("MyOtherEventsBasedObject");
+
+    // Create the objects container for the events function
+    gd::ObjectsContainer globalObjectsContainer;
+
+    // Trigger the refactoring after the renaming of an object
+    gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsBasedObject(
+        project, globalObjectsContainer, eventsBasedObject,
+        "ObjectWithMyBehavior", "RenamedObjectWithMyBehavior",
+        /* isObjectGroup=*/false);
+
+    auto &objectFunctionEvents =
+        eventsBasedObject
+            .GetEventsFunctions()
+            .GetEventsFunction("MyObjectEventsFunction")
+            .GetEvents();
+
+    // Check object name has been renamed in action parameters.
+    REQUIRE(GetEventFirstActionFirstParameterString(
+                objectFunctionEvents.GetEvent(FreeFunctionWithObjects)) ==
+            "RenamedObjectWithMyBehavior");
+
+    // Check object name has been renamed in expressions.
+    REQUIRE(GetEventFirstActionFirstParameterString(
+                objectFunctionEvents.GetEvent(FreeFunctionWithObjectExpression)) ==
+              "RenamedObjectWithMyBehavior.GetObjectNumber()");
   }
 
   SECTION("Object deleted (in events function)") {
@@ -948,7 +1043,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
       // Check that events function calls in expressions have been renamed
       REQUIRE(GetEventFirstActionFirstParameterString(
-                  eventsList->GetEvent(FreeFunctionExpression)) ==
+                  eventsList->GetEvent(FreeFunctionWithExpression)) ==
               "1 + MyRenamedExtension::MyEventsFunctionExpression(123, 456)");
 
       // Check that the type of the behavior was changed in the behaviors of
@@ -1137,7 +1232,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     for (auto *eventsList : GetEventsLists(project)) {
       // Check that events function calls in expressions have been renamed
       REQUIRE(GetEventFirstActionFirstParameterString(
-                  eventsList->GetEvent(FreeFunctionExpression)) ==
+                  eventsList->GetEvent(FreeFunctionWithExpression)) ==
               "1 + MyEventsExtension::MyRenamedFunctionExpression(123, 456)");
     }
   }
@@ -1177,7 +1272,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     for (auto *eventsList : GetEventsLists(project)) {
       // Check that events function calls in expressions have been updated
       REQUIRE(GetEventFirstActionFirstParameterString(
-                  eventsList->GetEvent(FreeFunctionExpression)) ==
+                  eventsList->GetEvent(FreeFunctionWithExpression)) ==
               "1 + MyEventsExtension::MyEventsFunctionExpression(456, 123)");
     }
   }

@@ -216,7 +216,7 @@ namespace gdjs {
       const allInstancesList = this.getAdhocListOfAllInstances();
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const obj = allInstancesList[i];
-        const elapsedTime = obj.getElapsedTime(this);
+        const elapsedTime = obj.getElapsedTime();
         if (!obj.hasNoForces()) {
           const averageForce = obj.getAverageForce();
           const elapsedTimeInSeconds = elapsedTime / 1000;

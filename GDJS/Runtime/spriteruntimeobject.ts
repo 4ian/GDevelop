@@ -474,7 +474,7 @@ namespace gdjs {
       //and compute nothing more.
       if (!direction.loop && this._currentFrame >= direction.frames.length) {
       } else {
-        const elapsedTime = this.getElapsedTime(instanceContainer) / 1000;
+        const elapsedTime = this.getElapsedTime() / 1000;
         this._frameElapsedTime += this._animationPaused
           ? 0
           : elapsedTime * this._animationSpeedScale;

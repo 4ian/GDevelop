@@ -617,10 +617,15 @@ namespace gdjs {
       );
     }
 
+    /**
+     * @param angle The targeted direction angle.
+     * @param speed The rotation speed.
+     * @param instanceContainer The container the object belongs to (deprecated - can be omitted).
+     */
     rotateTowardAngle(
       angle: float,
       speed: float,
-      runtimeScene: gdjs.RuntimeInstanceContainer
+      instanceContainer?: gdjs.RuntimeInstanceContainer
     ): void {
       if (speed === 0) {
         this.setAngle(angle);
@@ -633,10 +638,7 @@ namespace gdjs {
       const diffWasPositive = angularDiff >= 0;
       let newAngle =
         this.getAngle() +
-        ((diffWasPositive ? -1.0 : 1.0) *
-          speed *
-          this.getElapsedTime(runtimeScene)) /
-          1000;
+        ((diffWasPositive ? -1.0 : 1.0) * speed * this.getElapsedTime()) / 1000;
 
       if (
         // @ts-ignore
@@ -661,12 +663,13 @@ namespace gdjs {
      * Rotate the object at the given speed
      *
      * @param speed The speed, in degrees per second.
-     * @param runtimeScene The scene where the object is displayed.
+     * @param instanceContainer The container the object belongs to (deprecated - can be omitted).
      */
-    rotate(speed: float, runtimeScene: gdjs.RuntimeScene): void {
-      this.setAngle(
-        this.getAngle() + (speed * this.getElapsedTime(runtimeScene)) / 1000
-      );
+    rotate(
+      speed: float,
+      instanceContainer?: gdjs.RuntimeInstanceContainer
+    ): void {
+      this.setAngle(this.getAngle() + (speed * this.getElapsedTime()) / 1000);
     }
 
     /**
@@ -1647,18 +1650,22 @@ namespace gdjs {
     /**
      * Call each behavior stepPreEvents method.
      */
-    stepBehaviorsPreEvents(runtimeScene: gdjs.RuntimeInstanceContainer): void {
+    stepBehaviorsPreEvents(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
       for (let i = 0, len = this._behaviors.length; i < len; ++i) {
-        this._behaviors[i].stepPreEvents(runtimeScene);
+        this._behaviors[i].stepPreEvents(instanceContainer);
       }
     }
 
     /**
      * Call each behavior stepPostEvents method.
      */
-    stepBehaviorsPostEvents(runtimeScene: gdjs.RuntimeInstanceContainer): void {
+    stepBehaviorsPostEvents(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
       for (let i = 0, len = this._behaviors.length; i < len; ++i) {
-        this._behaviors[i].stepPostEvents(runtimeScene);
+        this._behaviors[i].stepPostEvents(instanceContainer);
       }
     }
 

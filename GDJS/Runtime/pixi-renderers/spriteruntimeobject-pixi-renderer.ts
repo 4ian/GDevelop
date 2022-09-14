@@ -24,7 +24,6 @@ namespace gdjs {
       this._sprite = new PIXI.Sprite(
         instanceContainer.getGame().getImageManager().getInvalidPIXITexture()
       );
-      this._sprite.name = 'Sprite ' + runtimeObject.getName();
       const layer = instanceContainer.getLayer('');
       if (layer) {
         layer

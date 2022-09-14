@@ -92,7 +92,7 @@ declare interface EventsFunctionsExtensionData {
 
 declare interface EventsBasedObjectData {
   name: string;
-  objects: ObjectData[];
+  objects: Array<ObjectData & any>;
 }
 
 declare interface BehaviorSharedData {

@@ -1,6 +1,6 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
-  export interface RuntimeScene {
+  export interface RuntimeInstanceContainer {
     tileMapCollisionMaskManager: gdjs.TileMap.TileMapRuntimeManager;
   }
   export namespace TileMap {
@@ -26,7 +26,7 @@ namespace gdjs {
      * @see {@link TileMapManager}
      */
     export class TileMapRuntimeManager {
-      private _runtimeScene: gdjs.RuntimeScene;
+      private _instanceContainer: gdjs.RuntimeInstanceContainer;
       /**
        * Delegate that actually manage the caches without anything specific to
        * GDJS.
@@ -34,27 +34,27 @@ namespace gdjs {
        */
       private _manager: TileMapHelper.TileMapManager;
       /**
-       * @param runtimeScene The scene.
+       * @param instanceContainer The scene.
        */
-      private constructor(runtimeScene: gdjs.RuntimeScene) {
-        this._runtimeScene = runtimeScene;
+      private constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {
+        this._instanceContainer = instanceContainer;
         this._manager = new TileMapHelper.TileMapManager();
       }
 
       /**
-       * @param runtimeScene Where to set the manager instance.
+       * @param instanceContainer Where to set the manager instance.
        * @returns The shared manager.
        */
       static getManager(
-        runtimeScene: gdjs.RuntimeScene
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ): TileMapRuntimeManager {
-        if (!runtimeScene.tileMapCollisionMaskManager) {
+        if (!instanceContainer.tileMapCollisionMaskManager) {
           // Create the shared manager if necessary.
-          runtimeScene.tileMapCollisionMaskManager = new TileMapRuntimeManager(
-            runtimeScene
+          instanceContainer.tileMapCollisionMaskManager = new TileMapRuntimeManager(
+            instanceContainer
           );
         }
-        return runtimeScene.tileMapCollisionMaskManager;
+        return instanceContainer.tileMapCollisionMaskManager;
       }
 
       /**
@@ -109,7 +109,7 @@ namespace gdjs {
         tileSetJsonResourceName: string,
         callback: (tiledMap: TileMapHelper.TiledMap | null) => void
       ): void {
-        this._runtimeScene
+        this._instanceContainer
           .getGame()
           .getJsonManager()
           .loadJson(tileMapJsonResourceName, (error, tileMapJsonData) => {
@@ -123,7 +123,7 @@ namespace gdjs {
             }
             const tiledMap = tileMapJsonData as TileMapHelper.TiledMap;
             if (tileSetJsonResourceName) {
-              this._runtimeScene
+              this._instanceContainer
                 .getGame()
                 .getJsonManager()
                 .loadJson(tileSetJsonResourceName, (error, tileSetJsonData) => {

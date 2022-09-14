@@ -32,7 +32,7 @@ namespace gdjs {
     _objectData: ObjectData & CustomObjectConfiguration;
 
     constructor(
-      parent: gdjs.RuntimeInstancesContainer,
+      parent: gdjs.RuntimeInstanceContainer,
       objectData: ObjectData & CustomObjectConfiguration
     ) {
       super(parent, objectData);
@@ -83,14 +83,14 @@ namespace gdjs {
     }
 
     onDestroyFromScene(
-      instanceContainer: gdjs.RuntimeInstancesContainer
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
       this.onDestroy(instanceContainer);
       super.onDestroyFromScene(instanceContainer);
       this._instanceContainer.onDestroyFromScene(instanceContainer);
     }
 
-    update(instanceContainer: gdjs.RuntimeInstancesContainer): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._instanceContainer._updateObjectsPreEvents();
 
       // TODO EBO This is only to handle trigger once.
@@ -110,11 +110,11 @@ namespace gdjs {
     }
 
     // Life-cycle methods implemented by generated subclasses.
-    doStepPreEvents(instanceContainer: gdjs.RuntimeInstancesContainer) {}
-    doStepPostEvents(instanceContainer: gdjs.RuntimeInstancesContainer) {}
-    onDestroy(instanceContainer: gdjs.RuntimeInstancesContainer) {}
+    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+    onDestroy(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
-    updatePreRender(instanceContainer: gdjs.RuntimeInstancesContainer): void {
+    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._instanceContainer._updateObjectsPreRender();
       this.getRenderer().ensureUpToDate();
     }

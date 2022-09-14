@@ -71,7 +71,7 @@ namespace gdjs {
     _renderer: TextInputRuntimeObjectRenderer;
 
     constructor(
-      runtimeScene: gdjs.RuntimeInstancesContainer,
+      runtimeScene: gdjs.RuntimeInstanceContainer,
       objectData: TextInputObjectData
     ) {
       super(runtimeScene, objectData);
@@ -170,7 +170,7 @@ namespace gdjs {
       return true;
     }
 
-    updatePreRender(runtimeScene: RuntimeInstancesContainer): void {
+    updatePreRender(runtimeScene: RuntimeInstanceContainer): void {
       this._renderer.updatePreRender();
     }
 

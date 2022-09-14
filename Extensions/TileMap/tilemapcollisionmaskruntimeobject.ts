@@ -42,7 +42,7 @@ namespace gdjs {
      */
     private _transformationIsUpToDate: boolean = false;
 
-    constructor(runtimeScene: gdjs.RuntimeInstancesContainer, objectData) {
+    constructor(runtimeScene: gdjs.RuntimeInstanceContainer, objectData) {
       super(runtimeScene, objectData);
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
@@ -88,7 +88,7 @@ namespace gdjs {
       this.onCreated();
     }
 
-    updatePreRender(runtimeScene: gdjs.RuntimeInstancesContainer) {
+    updatePreRender(runtimeScene: gdjs.RuntimeInstanceContainer) {
       super.updatePreRender(runtimeScene);
 
       if (this._debugMode && this.hitBoxesDirty) {

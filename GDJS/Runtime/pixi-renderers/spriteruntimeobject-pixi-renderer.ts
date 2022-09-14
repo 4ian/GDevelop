@@ -18,7 +18,7 @@ namespace gdjs {
      */
     constructor(
       runtimeObject: gdjs.SpriteRuntimeObject,
-      runtimeScene: gdjs.RuntimeInstancesContainer
+      runtimeScene: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
       this._sprite = new PIXI.Sprite(
@@ -35,7 +35,7 @@ namespace gdjs {
 
     reinitialize(
       runtimeObject: gdjs.SpriteRuntimeObject,
-      runtimeScene: gdjs.RuntimeInstancesContainer
+      runtimeScene: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
       this._spriteDirty = true;

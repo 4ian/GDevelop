@@ -3,34 +3,7 @@
 /**
  * Basic tests for gdjs.SpriteRuntimeObject
  */
-describe.only('gdjs.CustomRuntimeObject', function () {
-  const extensions = {
-    eventsFunctionsExtensions: [
-      {
-        name: 'MyExtension',
-        eventsBasedObjects: [
-          {
-            name: 'MyEventsBasedObject',
-            description: '',
-            fullName: '',
-            eventsFunctions: [],
-            propertyDescriptors: [],
-            objects: [
-              {
-                name: 'MySprite',
-                type: 'Sprite',
-                updateIfNotVisible: false,
-                variables: [],
-                behaviors: [],
-                animations: [],
-                effects: [],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  };
+describe('gdjs.CustomRuntimeObject', function () {
 
   /**
    * Create a CustomRuntimeObject with a SpriteRuntimeObject using a 64x64
@@ -38,6 +11,8 @@ describe.only('gdjs.CustomRuntimeObject', function () {
    * @param {gdjs.RuntimeInstanceContainer} instanceContainer
    */
   const createCustomObject = (instanceContainer) => {
+    // The corresponding event-based object declaration is done by
+    // getPixiRuntimeGameWithAssets.
     const customObject = new gdjs.CustomRuntimeObject(instanceContainer, {
       name: 'MyCustomObject',
       type: 'MyExtension::MyEventsBasedObject',
@@ -123,7 +98,7 @@ describe.only('gdjs.CustomRuntimeObject', function () {
 
     it('can return hit-boxes according to its children', function () {
       return gdjs
-        .getPixiRuntimeGameWithAssets(extensions)
+        .getPixiRuntimeGameWithAssets()
         .then((runtimeGame) => {
           const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
           makeCustomObjectWith2Children(runtimeScene);
@@ -169,7 +144,7 @@ describe.only('gdjs.CustomRuntimeObject', function () {
 
     it('can translate its hit-boxes', function () {
       return gdjs
-        .getPixiRuntimeGameWithAssets(extensions)
+        .getPixiRuntimeGameWithAssets()
         .then((runtimeGame) => {
           const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
           makeCustomObjectWith2Children(runtimeScene);
@@ -198,7 +173,7 @@ describe.only('gdjs.CustomRuntimeObject', function () {
 
     it('can rotate its hit-boxes', function () {
       return gdjs
-        .getPixiRuntimeGameWithAssets(extensions)
+        .getPixiRuntimeGameWithAssets()
         .then((runtimeGame) => {
           const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
           makeCustomObjectWith2Children(runtimeScene);
@@ -229,7 +204,7 @@ describe.only('gdjs.CustomRuntimeObject', function () {
 
     it('can scale its hit-boxes', function () {
       return gdjs
-        .getPixiRuntimeGameWithAssets(extensions)
+        .getPixiRuntimeGameWithAssets()
         .then((runtimeGame) => {
           const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
           makeCustomObjectWith2Children(runtimeScene);
@@ -259,7 +234,7 @@ describe.only('gdjs.CustomRuntimeObject', function () {
 
     it('can translate, scale and rotate its hit-boxes', function () {
       return gdjs
-        .getPixiRuntimeGameWithAssets(extensions)
+        .getPixiRuntimeGameWithAssets()
         .then((runtimeGame) => {
           const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
           makeCustomObjectWith2Children(runtimeScene);
@@ -291,7 +266,7 @@ describe.only('gdjs.CustomRuntimeObject', function () {
 
     it('keeps hit-boxes up to date when its children move and push the bottom-right corner', function () {
       return gdjs
-        .getPixiRuntimeGameWithAssets(extensions)
+        .getPixiRuntimeGameWithAssets()
         .then((runtimeGame) => {
           const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
           makeCustomObjectWith2Children(runtimeScene);
@@ -323,7 +298,7 @@ describe.only('gdjs.CustomRuntimeObject', function () {
 
     it('keeps hit-boxes up to date when its children move and push the top-left corner', function () {
       return gdjs
-        .getPixiRuntimeGameWithAssets(extensions)
+        .getPixiRuntimeGameWithAssets()
         .then((runtimeGame) => {
           const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
           makeCustomObjectWith2Children(runtimeScene);
@@ -358,7 +333,7 @@ describe.only('gdjs.CustomRuntimeObject', function () {
 
     it('keeps hit-boxes up to date when its children move and shrink the top-left corner', function () {
       return gdjs
-        .getPixiRuntimeGameWithAssets(extensions)
+        .getPixiRuntimeGameWithAssets()
         .then((runtimeGame) => {
           const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
           makeCustomObjectWith2Children(runtimeScene);
@@ -394,7 +369,7 @@ describe.only('gdjs.CustomRuntimeObject', function () {
 
     it('keeps hit-boxes up to date when new children is added', function () {
       return gdjs
-        .getPixiRuntimeGameWithAssets(extensions)
+        .getPixiRuntimeGameWithAssets()
         .then((runtimeGame) => {
           const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
           makeCustomObjectWith2Children(runtimeScene);
@@ -467,7 +442,7 @@ describe.only('gdjs.CustomRuntimeObject', function () {
 
     it('can return hit-boxes according to its children', function () {
       return gdjs
-        .getPixiRuntimeGameWithAssets(extensions)
+        .getPixiRuntimeGameWithAssets()
         .then((runtimeGame) => {
           const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
           makeCustomObjectWith2ChildrenAt2Levels(runtimeScene);
@@ -509,7 +484,7 @@ describe.only('gdjs.CustomRuntimeObject', function () {
 
     it('keeps hit-boxes up to date when its children move and push the bottom-right corner', function () {
       return gdjs
-        .getPixiRuntimeGameWithAssets(extensions)
+        .getPixiRuntimeGameWithAssets()
         .then((runtimeGame) => {
           const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
           makeCustomObjectWith2ChildrenAt2Levels(runtimeScene);
@@ -551,7 +526,7 @@ describe.only('gdjs.CustomRuntimeObject', function () {
     
     it('keeps hit-boxes up to date when new children is added', function () {
       return gdjs
-        .getPixiRuntimeGameWithAssets(extensions)
+        .getPixiRuntimeGameWithAssets()
         .then((runtimeGame) => {
           const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
           makeCustomObjectWith2ChildrenAt2Levels(runtimeScene);

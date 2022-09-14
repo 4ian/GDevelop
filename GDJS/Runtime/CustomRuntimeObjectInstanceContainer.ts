@@ -105,9 +105,7 @@ namespace gdjs {
       this._isLoaded = true;
     }
 
-    onDestroyFromScene(
-      instanceContainer: gdjs.RuntimeInstanceContainer
-    ): void {
+    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (!this._isLoaded) {
         return;
       }

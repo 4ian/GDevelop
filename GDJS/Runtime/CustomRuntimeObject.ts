@@ -9,7 +9,7 @@ namespace gdjs {
   };
 
   export type CustomObjectConfiguration = ObjectConfiguration & {
-    childrenContent: { [objectName: string]: ObjectConfiguration };
+    childrenContent: { [objectName: string]: ObjectConfiguration & any };
   };
 
   /**

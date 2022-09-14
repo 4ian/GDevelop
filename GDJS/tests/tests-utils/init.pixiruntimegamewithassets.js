@@ -6,13 +6,14 @@
  * @internal
  * @returns {Promise<gdjs.RuntimeGame>} A promise resolving with the game with loaded assets.
  */
-gdjs.getPixiRuntimeGameWithAssets = () => {
+gdjs.getPixiRuntimeGameWithAssets = (customOptions = {}) => {
   if (gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise) {
     return gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise;
   }
 
   var runtimeGame = new gdjs.RuntimeGame({
     variables: [],
+    eventsFunctionsExtensions: [],
     properties: {
       adaptGameResolutionAtRuntime: true,
       folderProject: false,
@@ -71,6 +72,32 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
         },
       ],
     },
+    // Used in CustomRuntimeObjects.js
+    eventsFunctionsExtensions: [
+      {
+        name: 'MyExtension',
+        eventsBasedObjects: [
+          {
+            name: 'MyEventsBasedObject',
+            description: '',
+            fullName: '',
+            eventsFunctions: [],
+            propertyDescriptors: [],
+            objects: [
+              {
+                name: 'MySprite',
+                type: 'Sprite',
+                updateIfNotVisible: false,
+                variables: [],
+                behaviors: [],
+                animations: [],
+                effects: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
   });
 
   gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise = new Promise(

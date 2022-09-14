@@ -16,6 +16,7 @@ declare interface ProjectData {
   variables: RootVariableData[];
   layouts: LayoutData[];
   externalLayouts: ExternalLayoutData[];
+  eventsFunctionsExtensions: EventsFunctionsExtensionData[];
 }
 
 /** Object containing initial properties for all objects extending {@link gdjs.RuntimeObject}. */
@@ -27,7 +28,7 @@ declare type ObjectData = {
   /** The list of default variables. */
   variables: Array<RootVariableData>;
   /** The list of default behaviors. */
-  behaviors: Array<BehaviorData>;
+  behaviors: Array<BehaviorData & any>;
   /** The list of effects. */
   effects: Array<EffectData>;
 };
@@ -82,6 +83,16 @@ declare interface LayoutData {
   objects: ObjectData[];
   layers: LayerData[];
   behaviorsSharedData: BehaviorSharedData[];
+}
+
+declare interface EventsFunctionsExtensionData {
+  name: string;
+  eventsBasedObjects: EventsBasedObjectData[];
+}
+
+declare interface EventsBasedObjectData {
+  name: string;
+  objects: ObjectData[];
 }
 
 declare interface BehaviorSharedData {

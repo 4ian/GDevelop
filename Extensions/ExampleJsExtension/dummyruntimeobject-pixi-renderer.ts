@@ -15,7 +15,7 @@ namespace gdjs {
      */
     constructor(
       runtimeObject: gdjs.DummyRuntimeObject,
-      runtimeScene: gdjs.RuntimeInstancesContainer
+      runtimeScene: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
 

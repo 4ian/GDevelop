@@ -20,7 +20,7 @@ namespace gdjs {
      */
     constructor(
       runtimeObject: gdjs.TileMapRuntimeObject,
-      runtimeScene: gdjs.RuntimeInstancesContainer
+      runtimeScene: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
 
@@ -44,7 +44,7 @@ namespace gdjs {
       return this._pixiObject;
     }
 
-    incrementAnimationFrameX(runtimeScene: gdjs.RuntimeInstancesContainer) {
+    incrementAnimationFrameX(runtimeScene: gdjs.RuntimeInstanceContainer) {
       this._pixiObject.tileAnim[0] += 1;
     }
 

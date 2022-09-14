@@ -322,20 +322,23 @@ namespace gdjs {
     _animationFrameDirty: any;
 
     constructor(
-      runtimeScene: gdjs.RuntimeInstanceContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       spriteObjectData: ObjectData & SpriteObjectDataType
     ) {
-      super(runtimeScene, spriteObjectData);
+      super(instanceContainer, spriteObjectData);
       this._updateIfNotVisible = !!spriteObjectData.updateIfNotVisible;
       for (let i = 0, len = spriteObjectData.animations.length; i < len; ++i) {
         this._animations.push(
           new gdjs.SpriteAnimation(
-            runtimeScene.getGame().getImageManager(),
+            instanceContainer.getGame().getImageManager(),
             spriteObjectData.animations[i]
           )
         );
       }
-      this._renderer = new gdjs.SpriteRuntimeObjectRenderer(this, runtimeScene);
+      this._renderer = new gdjs.SpriteRuntimeObjectRenderer(
+        this,
+        instanceContainer
+      );
       this._updateAnimationFrame();
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -445,7 +448,7 @@ namespace gdjs {
     /**
      * Update the current frame of the object according to the elapsed time on the scene.
      */
-    update(runtimeScene: gdjs.RuntimeInstanceContainer): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       //Playing the animation of all objects including the ones outside the screen can be
       //costly when the scene is big with a lot of animated objects. By default, we skip
       //updating the object if it is not visible.
@@ -471,7 +474,7 @@ namespace gdjs {
       //and compute nothing more.
       if (!direction.loop && this._currentFrame >= direction.frames.length) {
       } else {
-        const elapsedTime = this.getElapsedTime(runtimeScene) / 1000;
+        const elapsedTime = this.getElapsedTime(instanceContainer) / 1000;
         this._frameElapsedTime += this._animationPaused
           ? 0
           : elapsedTime * this._animationSpeedScale;
@@ -510,7 +513,7 @@ namespace gdjs {
      * Ensure the sprite is ready to be displayed: the proper animation frame
      * is set and the renderer is up to date (position, angle, alpha, flip, blend mode...).
      */
-    updatePreRender(runtimeScene: gdjs.RuntimeInstanceContainer): void {
+    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
       }

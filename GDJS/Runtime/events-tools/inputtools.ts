@@ -145,7 +145,7 @@ namespace gdjs {
        *
        */
       export const isKeyPressed = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         key: string
       ) {
         if (gdjs.evtTools.input.keysNameToCode.hasOwnProperty(key)) {
@@ -162,7 +162,7 @@ namespace gdjs {
        *
        */
       export const wasKeyReleased = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         key: string
       ) {
         if (gdjs.evtTools.input.keysNameToCode.hasOwnProperty(key)) {
@@ -178,7 +178,7 @@ namespace gdjs {
        * Return the name of the last key pressed in the game
        */
       export const lastPressedKey = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ) {
         const keyCode = instanceContainer
           .getGame()
@@ -191,19 +191,19 @@ namespace gdjs {
       };
 
       export const anyKeyPressed = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ) {
         return instanceContainer.getGame().getInputManager().anyKeyPressed();
       };
 
       export const anyKeyReleased = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ) {
         return instanceContainer.getGame().getInputManager().anyKeyReleased();
       };
 
       export const isMouseButtonPressed = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         button: string
       ) {
         if (button === 'Left') {
@@ -228,7 +228,7 @@ namespace gdjs {
       };
 
       export const isMouseButtonReleased = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         button: string
       ) {
         if (button === 'Left') {
@@ -265,7 +265,7 @@ namespace gdjs {
       };
 
       export const getMouseWheelDelta = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ) {
         return instanceContainer
           .getGame()
@@ -274,19 +274,19 @@ namespace gdjs {
       };
 
       export const isScrollingUp = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ) {
         return instanceContainer.getGame().getInputManager().isScrollingUp();
       };
 
       export const isScrollingDown = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ) {
         return instanceContainer.getGame().getInputManager().isScrollingDown();
       };
 
       export const getMouseX = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         camera: integer
       ) {
@@ -299,7 +299,7 @@ namespace gdjs {
       };
 
       export const getMouseY = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         camera: integer
       ) {
@@ -312,7 +312,7 @@ namespace gdjs {
       };
 
       export const isMouseInsideCanvas = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ) {
         return instanceContainer
           .getGame()
@@ -322,14 +322,14 @@ namespace gdjs {
 
       export const _cursorIsOnObject = function (
         obj: gdjs.RuntimeObject,
-        instanceContainer: gdjs.RuntimeInstancesContainer
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ) {
         return obj.cursorOnObject(instanceContainer);
       };
 
       export const cursorOnObject = function (
         objectsLists: Hashtable<gdjs.RuntimeObject[]>,
-        instanceContainer: gdjs.RuntimeInstancesContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         accurate: boolean,
         inverted: boolean
       ) {
@@ -342,7 +342,7 @@ namespace gdjs {
       };
 
       export const getTouchX = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         identifier: integer,
         layer: string,
         camera: integer
@@ -356,7 +356,7 @@ namespace gdjs {
       };
 
       export const getTouchY = (
-        instanceContainer: gdjs.RuntimeInstancesContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         identifier: integer,
         layer: string,
         camera: integer
@@ -370,7 +370,7 @@ namespace gdjs {
       };
 
       export const hasAnyTouchStarted = (
-        instanceContainer: gdjs.RuntimeInstancesContainer
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ): boolean => {
         return (
           instanceContainer
@@ -381,7 +381,7 @@ namespace gdjs {
       };
 
       export const getStartedTouchCount = (
-        instanceContainer: gdjs.RuntimeInstancesContainer
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ): integer => {
         return instanceContainer
           .getGame()
@@ -390,7 +390,7 @@ namespace gdjs {
       };
 
       export const getStartedTouchIdentifier = (
-        instanceContainer: gdjs.RuntimeInstancesContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         index: integer
       ): integer => {
         return instanceContainer
@@ -400,7 +400,7 @@ namespace gdjs {
       };
 
       export const hasTouchEnded = (
-        instanceContainer: gdjs.RuntimeInstancesContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         identifier: integer
       ): boolean => {
         return instanceContainer
@@ -427,7 +427,7 @@ namespace gdjs {
        * @deprecated
        */
       export const popStartedTouch = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ) {
         const startedTouchId = instanceContainer
           .getGame()
@@ -444,7 +444,7 @@ namespace gdjs {
        * @deprecated
        */
       export const popEndedTouch = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ) {
         const endedTouchId = instanceContainer
           .getGame()
@@ -458,7 +458,7 @@ namespace gdjs {
       };
 
       export const touchSimulateMouse = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         enable: boolean
       ) {
         instanceContainer

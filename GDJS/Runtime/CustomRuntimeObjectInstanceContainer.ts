@@ -10,11 +10,11 @@ namespace gdjs {
   /**
    * A scene being played, containing instances of objects rendered on screen.
    */
-  export class CustomRuntimeObjectInstanceContainer extends gdjs.RuntimeInstancesContainer {
+  export class CustomRuntimeObjectInstanceContainer extends gdjs.RuntimeInstanceContainer {
     _renderer: gdjs.CustomObjectRenderer;
     _debuggerRenderer: gdjs.DebuggerRenderer;
     _runtimeScene: gdjs.RuntimeScene;
-    _parent: gdjs.RuntimeInstancesContainer;
+    _parent: gdjs.RuntimeInstanceContainer;
     _customObject: gdjs.CustomRuntimeObject;
     _isLoaded: boolean = false;
 
@@ -22,7 +22,7 @@ namespace gdjs {
      * @param runtimeGame The game associated to this scene.
      */
     constructor(
-      parent: gdjs.RuntimeInstancesContainer,
+      parent: gdjs.RuntimeInstanceContainer,
       customObject: gdjs.CustomRuntimeObject
     ) {
       super();
@@ -106,7 +106,7 @@ namespace gdjs {
     }
 
     onDestroyFromScene(
-      instanceContainer: gdjs.RuntimeInstancesContainer
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
       if (!this._isLoaded) {
         return;

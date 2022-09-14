@@ -35,7 +35,7 @@ describe.only('gdjs.CustomRuntimeObject', function () {
   /**
    * Create a CustomRuntimeObject with a SpriteRuntimeObject using a 64x64
    * image with a custom collision mask.
-   * @param {gdjs.RuntimeInstancesContainer} instanceContainer
+   * @param {gdjs.RuntimeInstanceContainer} instanceContainer
    */
   const createCustomObject = (instanceContainer) => {
     const customObject = new gdjs.CustomRuntimeObject(instanceContainer, {
@@ -92,7 +92,7 @@ describe.only('gdjs.CustomRuntimeObject', function () {
   };
 
   /**
-   * @param {gdjs.RuntimeInstancesContainer} parent
+   * @param {gdjs.RuntimeInstanceContainer} parent
    */
   const createSpriteObject = (parent) => {
     const sprite = parent.createObject('MySprite');

@@ -16,7 +16,7 @@ namespace gdjs {
     _layer: gdjs.Layer;
     _renderTexture: PIXI.RenderTexture | null = null;
     _lightingSprite: PIXI.Sprite | null = null;
-    _runtimeSceneRenderer: gdjs.RuntimeInstancesContainerRenderer;
+    _runtimeSceneRenderer: gdjs.RuntimeInstanceContainerRenderer;
     _pixiRenderer: PIXI.Renderer | null;
 
     // Width and height are tracked when a render texture is used.
@@ -31,14 +31,14 @@ namespace gdjs {
      */
     constructor(
       layer: gdjs.Layer,
-      runtimeSceneRenderer: gdjs.RuntimeInstancesContainerRenderer,
+      runtimeSceneRenderer: gdjs.RuntimeInstanceContainerRenderer,
       pixiRenderer: PIXI.Renderer | null
     ) {
       this._pixiContainer = new PIXI.Container();
       this._pixiContainer.name =
         'Layer of ' +
-        (layer._runtimeInstancesContainer._name
-          ? layer._runtimeInstancesContainer._name
+        (layer._runtimeInstanceContainer._name
+          ? layer._runtimeInstanceContainer._name
           : 'Custom');
       this._layer = layer;
       this._runtimeSceneRenderer = runtimeSceneRenderer;

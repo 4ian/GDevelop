@@ -29,20 +29,20 @@ namespace gdjs {
 
       /**
        * Enable or disable the debug draw.
-       * @param instancesContainer - The current scene.
+       * @param instanceContainer - The current scene.
        * @param enableDebugDraw - true to enable the debug draw, false to disable it.
        * @param showHiddenInstances - true to apply the debug draw to hidden objects.
        * @param showPointsNames - true to show point names.
        * @param showCustomPoints - true to show custom points of Sprite objects.
        */
       export const enableDebugDraw = function (
-        instancesContainer: gdjs.RuntimeInstancesContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         enableDebugDraw: boolean,
         showHiddenInstances: boolean,
         showPointsNames: boolean,
         showCustomPoints: boolean
       ) {
-        instancesContainer.enableDebugDraw(
+        instanceContainer.enableDebugDraw(
           enableDebugDraw,
           showHiddenInstances,
           showPointsNames,

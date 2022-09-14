@@ -559,7 +559,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "polygon.js");
   InsertUnique(includesFiles, "runtimeobject.js");
   InsertUnique(includesFiles, "profiler.js");
-  InsertUnique(includesFiles, "RuntimeInstancesContainer.js");
+  InsertUnique(includesFiles, "RuntimeInstanceContainer.js");
   InsertUnique(includesFiles, "runtimescene.js");
   InsertUnique(includesFiles, "scenestack.js");
   InsertUnique(includesFiles, "force.js");
@@ -572,7 +572,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "runtimebehavior.js");
   InsertUnique(includesFiles, "spriteruntimeobject.js");
   InsertUnique(includesFiles, "affinetransformation.js");
-  InsertUnique(includesFiles, "CustomRuntimeObjectInstancesContainer.js");
+  InsertUnique(includesFiles, "CustomRuntimeObjectInstanceContainer.js");
   InsertUnique(includesFiles, "CustomRuntimeObject.js");
 
   // Common includes for events only.

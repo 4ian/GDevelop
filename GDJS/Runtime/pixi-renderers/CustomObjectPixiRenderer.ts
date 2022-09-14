@@ -5,9 +5,9 @@ namespace gdjs {
    * The renderer for a gdjs.RuntimeScene using Pixi.js.
    */
   export class CustomObjectPixiRenderer
-    implements gdjs.RuntimeInstancesContainerRenderer {
+    implements gdjs.RuntimeInstanceContainerRenderer {
     _object: gdjs.CustomRuntimeObject;
-    _instancesContainer: gdjs.CustomRuntimeObjectInstanceContainer;
+    _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _pixiContainer: PIXI.Container;
     _isContainerDirty: boolean = true;
     _debugDraw: PIXI.Graphics | null = null;
@@ -22,11 +22,11 @@ namespace gdjs {
 
     constructor(
       object: gdjs.CustomRuntimeObject,
-      instancesContainer: gdjs.CustomRuntimeObjectInstanceContainer,
-      parent: gdjs.RuntimeInstancesContainer
+      instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer,
+      parent: gdjs.RuntimeInstanceContainer
     ) {
       this._object = object;
-      this._instancesContainer = instancesContainer;
+      this._instanceContainer = instanceContainer;
       this._pixiContainer = new PIXI.Container();
       // TODO Remove all these name
       this._pixiContainer.name = 'Custom ' + object.getName();
@@ -46,7 +46,7 @@ namespace gdjs {
 
     reinitialize(
       object: gdjs.CustomRuntimeObject,
-      parent: gdjs.RuntimeInstancesContainer
+      parent: gdjs.RuntimeInstanceContainer
     ) {
       this._object = object;
       this._isContainerDirty = true;

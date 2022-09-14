@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  export interface RuntimeInstancesContainerRenderer {
+  export interface RuntimeInstanceContainerPixiRenderer {
     setLayerIndex(layer: gdjs.Layer, index: float): void;
     getRendererObject();
   }

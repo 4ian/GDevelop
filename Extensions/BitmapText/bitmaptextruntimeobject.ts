@@ -54,7 +54,7 @@ namespace gdjs {
      * @param objectData The object data used to initialize the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeInstancesContainer,
+      runtimeScene: gdjs.RuntimeInstanceContainer,
       objectData: BitmapTextObjectData
     ) {
       super(runtimeScene, objectData);

@@ -13,7 +13,7 @@ namespace gdjs {
      * Get the links manager of a scene.
      */
     static getManager(
-      runtimeScene: gdjs.RuntimeInstancesContainer
+      runtimeScene: gdjs.RuntimeInstanceContainer
     ): gdjs.LinksManager {
       // @ts-ignore
       if (!runtimeScene.linkedObjectsManager) {
@@ -191,7 +191,7 @@ namespace gdjs {
       });
 
       export const linkObjects = function (
-        runtimeScene: gdjs.RuntimeInstancesContainer,
+        runtimeScene: gdjs.RuntimeInstanceContainer,
         objA: gdjs.RuntimeObject,
         objB: gdjs.RuntimeObject
       ) {
@@ -202,7 +202,7 @@ namespace gdjs {
       };
 
       export const removeLinkBetween = function (
-        runtimeScene: gdjs.RuntimeInstancesContainer,
+        runtimeScene: gdjs.RuntimeInstanceContainer,
         objA: gdjs.RuntimeObject,
         objB: gdjs.RuntimeObject
       ) {
@@ -213,7 +213,7 @@ namespace gdjs {
       };
 
       export const removeAllLinksOf = function (
-        runtimeScene: gdjs.RuntimeInstancesContainer,
+        runtimeScene: gdjs.RuntimeInstanceContainer,
         objA: gdjs.RuntimeObject
       ) {
         if (objA === null) {
@@ -223,7 +223,7 @@ namespace gdjs {
       };
 
       export const pickObjectsLinkedTo = function (
-        runtimeScene: gdjs.RuntimeInstancesContainer,
+        runtimeScene: gdjs.RuntimeInstanceContainer,
         objectsLists: Hashtable<gdjs.RuntimeObject[]>,
         obj: gdjs.RuntimeObject,
         eventsFunctionContext: EventsFunctionContext | undefined

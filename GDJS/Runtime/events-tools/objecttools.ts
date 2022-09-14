@@ -222,7 +222,7 @@ namespace gdjs {
         objectsLists1: ObjectsLists,
         objectsLists2: ObjectsLists,
         inverted: boolean,
-        instanceContainer: gdjs.RuntimeInstancesContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         ignoreTouchingEdges: boolean
       ) {
         return gdjs.evtTools.object.twoListsTest(
@@ -338,7 +338,7 @@ namespace gdjs {
       };
 
       export const pickRandomObject = function (
-        instanceContainer: gdjs.RuntimeInstancesContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         objectsLists: ObjectsLists
       ) {
         // Compute one many objects we have

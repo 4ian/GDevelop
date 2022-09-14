@@ -35,7 +35,7 @@ namespace gdjs {
      */
     _registeredBehaviors: Set<Physics2RuntimeBehavior>;
 
-    constructor(runtimeScene: gdjs.RuntimeInstancesContainer, sharedData) {
+    constructor(runtimeScene: gdjs.RuntimeInstanceContainer, sharedData) {
       this._registeredBehaviors = new Set();
       this.gravityX = sharedData.gravityX;
       this.gravityY = sharedData.gravityY;
@@ -349,7 +349,7 @@ namespace gdjs {
     _verticesBuffer: integer = 0;
 
     constructor(
-      runtimeScene: gdjs.RuntimeInstancesContainer,
+      runtimeScene: gdjs.RuntimeInstanceContainer,
       behaviorData,
       owner: gdjs.RuntimeObject
     ) {
@@ -824,7 +824,7 @@ namespace gdjs {
       return true;
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeInstanceContainer) {
       // Step the world if not done this frame yet
       if (!this._sharedData.stepped) {
         // Reset started and ended contacts array for all physics instances.
@@ -862,7 +862,7 @@ namespace gdjs {
       this._objectOldAngle = this.owner.getAngle();
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
+    doStepPostEvents(runtimeScene: gdjs.RuntimeInstanceContainer) {
       // Reset world step to update next frame
       this._sharedData.stepped = false;
     }

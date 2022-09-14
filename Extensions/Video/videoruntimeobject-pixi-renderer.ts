@@ -19,7 +19,7 @@ namespace gdjs {
      */
     constructor(
       runtimeObject: gdjs.VideoRuntimeObject,
-      runtimeScene: gdjs.RuntimeInstancesContainer
+      runtimeScene: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
       this._pixiObject = new PIXI.Sprite(

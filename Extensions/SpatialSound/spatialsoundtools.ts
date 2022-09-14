@@ -3,7 +3,7 @@ namespace gdjs {
     export namespace spatialSound {
       const logger = new gdjs.Logger('Spatial Sound');
       export const setSoundPosition = (
-        runtimeScene: gdjs.RuntimeInstancesContainer,
+        runtimeScene: gdjs.RuntimeInstanceContainer,
         channel: integer,
         x: float,
         y: float,

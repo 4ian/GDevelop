@@ -83,20 +83,20 @@ namespace gdjs {
        * @returns true if WebGL is supported
        */
       export const isWebGLSupported = (
-        runtimeScene: gdjs.RuntimeInstanceContainer
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ): boolean => {
-        return runtimeScene.getGame().getRenderer().isWebGLSupported();
+        return instanceContainer.getGame().getRenderer().isWebGLSupported();
       };
 
       /**
        * Check if the game is running as a preview, launched from an editor.
-       * @param runtimeScene The current scene.
+       * @param instanceContainer The current scene.
        * @returns true if the game is running as a preview.
        */
       export const isPreview = (
-        runtimeScene: gdjs.RuntimeInstanceContainer
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ): boolean => {
-        return runtimeScene.getGame().isPreview();
+        return instanceContainer.getGame().isPreview();
       };
     }
   }

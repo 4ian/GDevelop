@@ -251,7 +251,7 @@ namespace gdjs {
         !this._ignoreDefaultControls &&
         instanceContainer.getGame().getInputManager().isKeyPressed(UPKEY);
 
-      const elapsedTime = this.owner.getElapsedTime(instanceContainer);
+      const elapsedTime = this.owner.getElapsedTime();
 
       if (!this._leftKey) {
         this._leftKeyPressedDuration = 0;
@@ -330,7 +330,7 @@ namespace gdjs {
       }
 
       const object = this.owner;
-      const timeDelta = this.owner.getElapsedTime(instanceContainer) / 1000;
+      const timeDelta = this.owner.getElapsedTime() / 1000;
       const previousVelocityX = this._xVelocity;
       const previousVelocityY = this._yVelocity;
       this._wasStickUsed = false;

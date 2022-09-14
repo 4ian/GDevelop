@@ -59,7 +59,7 @@ const setupWindowClosedPolling = () => {
   }, 1000);
 };
 
-const PREVIEWS_ORIGIN = 'https://game-previews.gdevelop-app.com';
+const PREVIEWS_ORIGIN = 'https://game-previews.gdevelop.io';
 
 /**
  * A debugger server implemented using the ability to send/receive messages

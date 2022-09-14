@@ -7,7 +7,7 @@ namespace gdjs {
    */
   export class LightRuntimeObjectPixiRenderer {
     _object: gdjs.LightRuntimeObject;
-    _runtimeScene: gdjs.RuntimeInstancesContainer;
+    _runtimeScene: gdjs.RuntimeInstanceContainer;
     _manager: gdjs.LightObstaclesManager;
     _radius: number;
     _color: [number, number, number];
@@ -30,7 +30,7 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.LightRuntimeObject,
-      runtimeScene: gdjs.RuntimeInstancesContainer
+      runtimeScene: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
       this._runtimeScene = runtimeScene;

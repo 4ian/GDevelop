@@ -97,7 +97,7 @@ namespace gdjs {
      * @param particleObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeInstancesContainer,
+      runtimeScene: gdjs.RuntimeInstanceContainer,
       particleObjectData: ParticleEmitterObjectData
     ) {
       super(runtimeScene, particleObjectData);
@@ -270,7 +270,7 @@ namespace gdjs {
 
         // and recreate the renderer, which will add itself to the layer.
         this._renderer = new gdjs.ParticleEmitterObjectRenderer(
-          this.getInstancesContainer(),
+          this.getInstanceContainer(),
           this,
           newObjectData
         );
@@ -284,7 +284,7 @@ namespace gdjs {
       return true;
     }
 
-    update(runtimeScene: gdjs.RuntimeInstancesContainer): void {
+    update(runtimeScene: gdjs.RuntimeInstanceContainer): void {
       if (this._posDirty) {
         this._renderer.setPosition(this.getX(), this.getY());
       }
@@ -342,7 +342,7 @@ namespace gdjs {
       }
     }
 
-    onDestroyFromScene(runtimeScene: gdjs.RuntimeInstancesContainer): void {
+    onDestroyFromScene(runtimeScene: gdjs.RuntimeInstanceContainer): void {
       this._renderer.destroy();
       super.onDestroyFromScene(runtimeScene);
     }

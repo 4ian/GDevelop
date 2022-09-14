@@ -14,7 +14,7 @@ namespace gdjs {
      */
     constructor(
       runtimeObject: gdjs.BitmapTextRuntimeObject,
-      runtimeScene: gdjs.RuntimeInstancesContainer
+      runtimeScene: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
 

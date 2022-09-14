@@ -11,7 +11,7 @@ gdjs.getPixiRuntimeGameWithAssets = (customOptions = {}) => {
     return gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise;
   }
 
-  var runtimeGame = new gdjs.RuntimeGame({...{
+  var runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     eventsFunctionsExtensions: [],
     properties: {
@@ -72,7 +72,33 @@ gdjs.getPixiRuntimeGameWithAssets = (customOptions = {}) => {
         },
       ],
     },
-  }, ...customOptions});
+    // Used in CustomRuntimeObjects.js
+    eventsFunctionsExtensions: [
+      {
+        name: 'MyExtension',
+        eventsBasedObjects: [
+          {
+            name: 'MyEventsBasedObject',
+            description: '',
+            fullName: '',
+            eventsFunctions: [],
+            propertyDescriptors: [],
+            objects: [
+              {
+                name: 'MySprite',
+                type: 'Sprite',
+                updateIfNotVisible: false,
+                variables: [],
+                behaviors: [],
+                animations: [],
+                effects: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
 
   gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise = new Promise(
     (resolve) => {

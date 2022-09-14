@@ -9,14 +9,14 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.TextRuntimeObject,
-      runtimeScene: gdjs.RuntimeInstanceContainer
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
-      this._fontManager = runtimeScene.getGame().getFontManager();
+      this._fontManager = instanceContainer.getGame().getFontManager();
       this._text = new PIXI.Text(' ', { align: 'left' });
       this._text.anchor.x = 0.5;
       this._text.anchor.y = 0.5;
-      runtimeScene
+      instanceContainer
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._text, runtimeObject.getZOrder());

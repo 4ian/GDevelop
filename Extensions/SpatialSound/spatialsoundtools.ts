@@ -3,14 +3,14 @@ namespace gdjs {
     export namespace spatialSound {
       const logger = new gdjs.Logger('Spatial Sound');
       export const setSoundPosition = (
-        runtimeScene: gdjs.RuntimeInstanceContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         channel: integer,
         x: float,
         y: float,
         z: float
       ) => {
         // TODO EBO The position must be transform to the scene position when it comes from a custom object.
-        const sound = runtimeScene
+        const sound = instanceContainer
           .getScene()
           .getSoundManager()
           .getSoundOnChannel(channel);

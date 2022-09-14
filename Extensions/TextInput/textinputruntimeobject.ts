@@ -71,10 +71,10 @@ namespace gdjs {
     _renderer: TextInputRuntimeObjectRenderer;
 
     constructor(
-      runtimeScene: gdjs.RuntimeInstanceContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       objectData: TextInputObjectData
     ) {
-      super(runtimeScene, objectData);
+      super(instanceContainer, objectData);
 
       this._string = objectData.content.initialValue;
       this._placeholder = objectData.content.placeholder;
@@ -94,7 +94,7 @@ namespace gdjs {
 
       this._renderer = new gdjs.TextInputRuntimeObjectRenderer(
         this,
-        runtimeScene
+        instanceContainer
       );
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -170,7 +170,7 @@ namespace gdjs {
       return true;
     }
 
-    updatePreRender(runtimeScene: RuntimeInstanceContainer): void {
+    updatePreRender(instanceContainer: RuntimeInstanceContainer): void {
       this._renderer.updatePreRender();
     }
 

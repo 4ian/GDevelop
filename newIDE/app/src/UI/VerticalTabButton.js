@@ -56,6 +56,7 @@ const VerticalTabButton = ({
       onClick={onClick}
       color={isActive ? 'primary' : 'default'}
       id={id}
+      disableElevation
     >
       <div
         style={

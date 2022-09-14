@@ -30,7 +30,7 @@ import SubscriptionPendingDialog from './SubscriptionPendingDialog';
 import Window from '../Utils/Window';
 import Text from '../UI/Text';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import useConfirmDialog from '../UI/Confirm/useConfirmDialog';
 
 const styles = {
@@ -46,14 +46,6 @@ const styles = {
     flexShrink: 0,
     objectFit: 'contain',
   },
-};
-
-const renderPrice = (plan: PlanDetails) => {
-  return !plan.monthlyPriceInEuros ? (
-    <Trans>Free</Trans>
-  ) : (
-    <Trans>{plan.monthlyPriceInEuros}€/month</Trans>
-  );
 };
 
 const cancelConfirmationTexts = {
@@ -221,12 +213,12 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
               onClick={onClose}
             />,
           ]}
-          title={<Trans>GDevelop Subscription</Trans>}
+          title={<Trans>GDevelop Premium</Trans>}
           onRequestClose={onClose}
           open={open}
         >
           <ColumnStackLayout noMargin expand>
-            <Line noMargin alignItems="center">
+            <LineStackLayout noMargin alignItems="center">
               <img src="res/diamond.svg" style={styles.diamondIcon} alt="" />
               <Text>
                 <Trans>
@@ -236,7 +228,14 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
                   GDevelop, which is an open-source software.
                 </Trans>
               </Text>
-            </Line>
+              <FlatButton
+                style={{ flexShrink: 0 }}
+                label={<Trans>Read more</Trans>}
+                onClick={() =>
+                  Window.openExternalURL('https://gdevelop.io/pricing')
+                }
+              />
+            </LineStackLayout>
             {getSubscriptionPlans().map(plan => {
               const isCurrentPlan =
                 !!authenticatedUser.subscription &&
@@ -245,7 +244,12 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
                 <Card key={plan.planId || ''} isHighlighted={isCurrentPlan}>
                   <Text size="block-title">
                     <span>
-                      <b>{plan.name}</b> - {renderPrice(plan)}
+                      <b>{plan.name}</b>{' '}
+                      {!plan.monthlyPriceInEuros ? null : (
+                        <>
+                          - <Trans>{plan.monthlyPriceInEuros}€/month</Trans>
+                        </>
+                      )}
                     </span>
                   </Text>
                   <Text size="sub-title">
@@ -268,21 +272,13 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
                             <CheckCircle style={styles.bulletIcon} />
                           )}
                           <Text style={styles.bulletText}>
-                            {i18n._(descriptionBullet.message)}{' '}
-                            {descriptionBullet.isLocalAppOnly && (
-                              <Trans>(on the desktop app only)</Trans>
-                            )}
+                            {i18n._(descriptionBullet.message)}
                           </Text>
                         </Line>
                       </Column>
                     ))}
-                    <Text style={styles.descriptionText}>
-                      {plan.extraDescription
-                        ? i18n._(plan.extraDescription)
-                        : ''}
-                    </Text>
                   </Column>
-                  <Line expand justifyContent="flex-end">
+                  <LineStackLayout expand justifyContent="flex-end">
                     {authenticatedUser.subscription &&
                     authenticatedUser.subscription.planId === plan.planId ? (
                       <FlatButton
@@ -308,7 +304,7 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
                         />
                       </LeftLoader>
                     )}
-                  </Line>
+                  </LineStackLayout>
                 </Card>
               );
             })}
@@ -332,15 +328,17 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
                     be able to access to online services like one-click builds:
                   </Trans>
                 </Text>
-                <RaisedButton
-                  label={<Trans>Create my account</Trans>}
-                  primary
-                  onClick={authenticatedUser.onLogin}
-                />
-                <FlatButton
-                  label={<Trans>Not now, thanks</Trans>}
-                  onClick={onClose}
-                />
+                <LineStackLayout justifyContent="center">
+                  <RaisedButton
+                    label={<Trans>Create my account</Trans>}
+                    primary
+                    onClick={authenticatedUser.onCreateAccount}
+                  />
+                  <FlatButton
+                    label={<Trans>Not now, thanks</Trans>}
+                    onClick={onClose}
+                  />
+                </LineStackLayout>
               </PlaceholderMessage>
             )}
             {subscriptionPendingDialogOpen && (

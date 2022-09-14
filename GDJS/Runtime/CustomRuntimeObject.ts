@@ -19,7 +19,7 @@ namespace gdjs {
    * @param spriteObjectData The object data used to initialize the object
    */
   export class CustomRuntimeObject extends gdjs.RuntimeObject {
-    _instanceContainer: gdjs.CustomRuntimeObjectInstancesContainer;
+    _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _isUntransformedHitBoxesDirty: boolean = true;
     _untransformedHitBoxes: gdjs.Polygon[] = [];
     _unrotatedAABB: AABB = { min: [0, 0], max: [0, 0] };
@@ -36,7 +36,7 @@ namespace gdjs {
       objectData: ObjectData & CustomObjectConfiguration
     ) {
       super(parent, objectData);
-      this._instanceContainer = new gdjs.CustomRuntimeObjectInstancesContainer(
+      this._instanceContainer = new gdjs.CustomRuntimeObjectInstanceContainer(
         parent,
         this
       );

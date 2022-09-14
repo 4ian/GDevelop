@@ -7,7 +7,7 @@ namespace gdjs {
   export class CustomObjectPixiRenderer
     implements gdjs.RuntimeInstancesContainerRenderer {
     _object: gdjs.CustomRuntimeObject;
-    _instancesContainer: gdjs.CustomRuntimeObjectInstancesContainer;
+    _instancesContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _pixiContainer: PIXI.Container;
     _isContainerDirty: boolean = true;
     _debugDraw: PIXI.Graphics | null = null;
@@ -22,7 +22,7 @@ namespace gdjs {
 
     constructor(
       object: gdjs.CustomRuntimeObject,
-      instancesContainer: gdjs.CustomRuntimeObjectInstancesContainer,
+      instancesContainer: gdjs.CustomRuntimeObjectInstanceContainer,
       parent: gdjs.RuntimeInstancesContainer
     ) {
       this._object = object;

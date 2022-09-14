@@ -29,13 +29,16 @@ namespace gdjs {
   class TextInputRuntimeObjectPixiRenderer {
     private _object: gdjs.TextInputRuntimeObject;
     private _input: HTMLInputElement | HTMLTextAreaElement | null = null;
-    private _runtimeScene: gdjs.RuntimeScene;
+    private _instanceContainer: gdjs.RuntimeInstanceContainer;
     private _runtimeGame: gdjs.RuntimeGame;
 
-    constructor(runtimeObject: gdjs.TextInputRuntimeObject) {
+    constructor(
+      runtimeObject: gdjs.TextInputRuntimeObject,
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
       this._object = runtimeObject;
-      this._runtimeScene = runtimeObject.getRuntimeScene();
-      this._runtimeGame = this._runtimeScene.getGame();
+      this._instanceContainer = instanceContainer;
+      this._runtimeGame = this._instanceContainer.getGame();
 
       this._createElement();
     }
@@ -123,13 +126,13 @@ namespace gdjs {
       // Hide the input entirely if the layer is not visible.
       // Because this object is rendered as a DOM element (and not part of the PixiJS
       // scene graph), we have to do this manually.
-      const layer = this._runtimeScene.getLayer(this._object.getLayer());
+      const layer = this._instanceContainer.getLayer(this._object.getLayer());
       if (!layer.isVisible()) {
         this._input.style.display = 'none';
         return;
       }
 
-      const runtimeGame = this._runtimeScene.getGame();
+      const runtimeGame = this._instanceContainer.getGame();
       const runtimeGameRenderer = runtimeGame.getRenderer();
       const topLeftCanvasCoordinates = layer.convertInverseCoords(
         this._object.x,
@@ -195,7 +198,7 @@ namespace gdjs {
 
     updateFont() {
       if (!this._input) return;
-      this._input.style.fontFamily = this._runtimeScene
+      this._input.style.fontFamily = this._instanceContainer
         .getGame()
         .getFontManager()
         .getFontFamily(this._object.getFontResourceName());

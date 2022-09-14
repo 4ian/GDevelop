@@ -393,7 +393,7 @@ namespace gdjs {
       this._constructListOfAllInstances();
       for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
         const obj = this._allInstancesList[i];
-        const elapsedTime = obj.getElapsedTime(this);
+        const elapsedTime = obj.getElapsedTime();
         if (!obj.hasNoForces()) {
           const averageForce = obj.getAverageForce();
           const elapsedTimeInSeconds = elapsedTime / 1000;
@@ -617,7 +617,7 @@ namespace gdjs {
             const obj = list[j];
             if (!obj.hasNoForces()) {
               const averageForce = obj.getAverageForce();
-              const elapsedTimeInSeconds = obj.getElapsedTime(this) / 1000;
+              const elapsedTimeInSeconds = obj.getElapsedTime() / 1000;
               obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
               obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
               obj.updateForces(elapsedTimeInSeconds);

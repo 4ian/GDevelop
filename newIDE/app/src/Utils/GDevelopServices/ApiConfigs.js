@@ -4,7 +4,7 @@ import Window from '../Window';
 const isDev = Window.isDev();
 
 export const GDevelopGamePreviews = {
-  baseUrl: `https://game-previews.gdevelop-app.com/`,
+  baseUrl: `https://game-previews.gdevelop.io/`,
 };
 
 export const GDevelopGamesPlatform = {

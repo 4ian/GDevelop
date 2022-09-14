@@ -41,12 +41,12 @@ namespace gdjs {
     _activated: boolean = true;
 
     /**
-     * @param runtimeScene The scene owning the object of the behavior
+     * @param instanceContainer The container owning the object of the behavior
      * @param behaviorData The properties used to setup the behavior
      * @param owner The object owning the behavior
      */
     constructor(
-      runtimeScene: gdjs.RuntimeInstanceContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData: BehaviorData,
       public owner: gdjs.RuntimeObject
     ) {
@@ -92,15 +92,15 @@ namespace gdjs {
     /**
      * Called at each frame before events. Call doStepPreEvents.<br>
      * Behaviors writers: Please do not redefine this method. Redefine doStepPreEvents instead.
-     * @param runtimeScene The runtimeScene owning the object
+     * @param instanceContainer The instanceContainer owning the object
      */
-    stepPreEvents(runtimeScene: gdjs.RuntimeInstanceContainer): void {
+    stepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (this._activated) {
-        const profiler = runtimeScene.getScene().getProfiler();
+        const profiler = instanceContainer.getScene().getProfiler();
         if (profiler) {
           profiler.begin(this.name);
         }
-        this.doStepPreEvents(runtimeScene);
+        this.doStepPreEvents(instanceContainer);
         if (profiler) {
           profiler.end(this.name);
         }
@@ -110,15 +110,15 @@ namespace gdjs {
     /**
      * Called at each frame after events. Call doStepPostEvents.<br>
      * Behaviors writers: Please do not redefine this method. Redefine doStepPreEvents instead.
-     * @param runtimeScene The runtimeScene owning the object
+     * @param instanceContainer The instanceContainer owning the object
      */
-    stepPostEvents(runtimeScene: gdjs.RuntimeInstanceContainer): void {
+    stepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (this._activated) {
-        const profiler = runtimeScene.getScene().getProfiler();
+        const profiler = instanceContainer.getScene().getProfiler();
         if (profiler) {
           profiler.begin(this.name);
         }
-        this.doStepPostEvents(runtimeScene);
+        this.doStepPostEvents(instanceContainer);
         if (profiler) {
           profiler.end(this.name);
         }
@@ -171,15 +171,15 @@ namespace gdjs {
 
     /**
      * This method is called each tick before events are done.
-     * @param runtimeScene The runtimeScene owning the object
+     * @param instanceContainer The instanceContainer owning the object
      */
-    doStepPreEvents(runtimeScene: gdjs.RuntimeInstanceContainer): void {}
+    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer): void {}
 
     /**
      * This method is called each tick after events are done.
-     * @param runtimeScene The runtimeScene owning the object
+     * @param instanceContainer The instanceContainer owning the object
      */
-    doStepPostEvents(runtimeScene: gdjs.RuntimeInstanceContainer): void {}
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer): void {}
 
     /**
      * This method is called when the owner of the behavior

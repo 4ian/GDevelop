@@ -63,14 +63,14 @@ namespace gdjs {
     _scaleY: number = 1;
 
     /**
-     * @param runtimeScene The scene the object belongs to.
+     * @param instanceContainer The scene the object belongs to.
      * @param textObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeInstanceContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       textObjectData: TextObjectData
     ) {
-      super(runtimeScene, textObjectData);
+      super(instanceContainer, textObjectData);
       this._characterSize = Math.max(1, textObjectData.characterSize);
       this._fontName = textObjectData.font;
       this._bold = textObjectData.bold;
@@ -82,7 +82,10 @@ namespace gdjs {
         textObjectData.color.b,
       ];
       this._str = textObjectData.string;
-      this._renderer = new gdjs.TextRuntimeObjectRenderer(this, runtimeScene);
+      this._renderer = new gdjs.TextRuntimeObjectRenderer(
+        this,
+        instanceContainer
+      );
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -131,7 +134,7 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    update(runtimeScene: gdjs.RuntimeInstanceContainer): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._renderer.ensureUpToDate();
     }
 

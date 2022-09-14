@@ -347,9 +347,9 @@ namespace gdjs {
      *
      * Objects can have different elapsed time if they are on layers with different time scales.
      *
-     * @param runtimeScene The RuntimeScene the object belongs to (deprecated - can be omitted).
+     * @param instanceContainer The instance container the object belongs to (deprecated - can be omitted).
      */
-    getElapsedTime(runtimeScene?: gdjs.RuntimeInstanceContainer): float {
+    getElapsedTime(instanceContainer?: gdjs.RuntimeInstanceContainer): float {
       const theLayer = this._runtimeScene.getLayer(this.layer);
       return theLayer.getElapsedTime();
     }
@@ -369,7 +369,7 @@ namespace gdjs {
     }
 
     /**
-     * The gdjs.RuntimeInstanceContainer the object belongs to.
+     * The container the object belongs to.
      */
     getInstanceContainer(): gdjs.RuntimeInstanceContainer {
       return this._runtimeScene;
@@ -377,15 +377,15 @@ namespace gdjs {
 
     /**
      * Called once during the game loop, before events and rendering.
-     * @param runtimeScene The gdjs.RuntimeScene the object belongs to.
+     * @param instanceContainer The container the object belongs to.
      */
-    update(runtimeScene: gdjs.RuntimeInstanceContainer): void {}
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {}
 
     /**
      * Called once during the game loop, after events and before rendering.
-     * @param runtimeScene The gdjs.RuntimeScene the object belongs to.
+     * @param instanceContainer The container the object belongs to.
      */
-    updatePreRender(runtimeScene: gdjs.RuntimeInstanceContainer): void {}
+    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {}
 
     /**
      * Called when the object is created from an initial instance at the startup of the scene.<br>
@@ -417,11 +417,11 @@ namespace gdjs {
      * Remove an object from a scene.
      *
      * Do not change/redefine this method. Instead, redefine the onDestroyFromScene method.
-     * @param runtimeScene The RuntimeScene owning the object.
+     * @param instanceContainer The container owning the object.
      */
-    deleteFromScene(runtimeScene: gdjs.RuntimeInstanceContainer): void {
+    deleteFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (this._livingOnScene) {
-        runtimeScene.markObjectForDeletion(this);
+        instanceContainer.markObjectForDeletion(this);
         this._livingOnScene = false;
       }
     }
@@ -439,10 +439,10 @@ namespace gdjs {
      * is being unloaded). If you redefine this function, **make sure to call the original method**
      * (`RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);`).
      *
-     * @param runtimeScene The scene owning the object.
+     * @param instanceContainer The container owning the object.
      */
-    onDestroyFromScene(runtimeScene: gdjs.RuntimeInstanceContainer): void {
-      const theLayer = runtimeScene.getLayer(this.layer);
+    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+      const theLayer = instanceContainer.getLayer(this.layer);
       const rendererObject = this.getRendererObject();
       if (rendererObject) {
         theLayer.getRenderer().removeRendererObject(rendererObject);
@@ -1656,9 +1656,7 @@ namespace gdjs {
     /**
      * Call each behavior stepPostEvents method.
      */
-    stepBehaviorsPostEvents(
-      runtimeScene: gdjs.RuntimeInstanceContainer
-    ): void {
+    stepBehaviorsPostEvents(runtimeScene: gdjs.RuntimeInstanceContainer): void {
       for (let i = 0, len = this._behaviors.length; i < len; ++i) {
         this._behaviors[i].stepPostEvents(runtimeScene);
       }

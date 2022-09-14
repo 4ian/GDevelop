@@ -43,14 +43,14 @@ namespace gdjs {
     _renderer: gdjs.PanelSpriteRuntimeObjectRenderer;
 
     /**
-     * @param runtimeScene The scene the object belongs to.
+     * @param instanceContainer The scene the object belongs to.
      * @param panelSpriteObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeInstanceContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       panelSpriteObjectData: PanelSpriteObjectData
     ) {
-      super(runtimeScene, panelSpriteObjectData);
+      super(instanceContainer, panelSpriteObjectData);
       this._rBorder = panelSpriteObjectData.rightMargin;
       this._lBorder = panelSpriteObjectData.leftMargin;
       this._tBorder = panelSpriteObjectData.topMargin;
@@ -60,7 +60,7 @@ namespace gdjs {
       this._height = panelSpriteObjectData.height;
       this._renderer = new gdjs.PanelSpriteRuntimeObjectRenderer(
         this,
-        runtimeScene,
+        instanceContainer,
         panelSpriteObjectData.texture,
         panelSpriteObjectData.tiled
       );
@@ -112,8 +112,8 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    onDestroyFromScene(runtimeScene: gdjs.RuntimeInstanceContainer): void {
-      super.onDestroyFromScene(runtimeScene);
+    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+      super.onDestroyFromScene(instanceContainer);
       // @ts-ignore
       if (this._renderer.onDestroy) {
         // @ts-ignore
@@ -121,7 +121,7 @@ namespace gdjs {
       }
     }
 
-    update(runtimeScene: gdjs.RuntimeInstanceContainer): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._renderer.ensureUpToDate();
     }
 
@@ -156,13 +156,13 @@ namespace gdjs {
     /**
      * Set the texture of the panel sprite.
      * @param textureName The name of the texture.
-     * @param runtimeScene The scene the object lives in.
+     * @param instanceContainer The scene the object lives in.
      */
     setTexture(
       textureName: string,
-      runtimeScene: gdjs.RuntimeInstanceContainer
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
-      this._renderer.setTexture(textureName, runtimeScene);
+      this._renderer.setTexture(textureName, instanceContainer);
     }
 
     /**

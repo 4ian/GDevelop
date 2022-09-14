@@ -57,14 +57,14 @@ namespace gdjs {
     private static readonly _pointForTransformation: FloatPoint = [0, 0];
 
     /**
-     * @param runtimeScene The scene the object belongs to.
+     * @param instanceContainer The scene the object belongs to.
      * @param shapePainterObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeInstanceContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       shapePainterObjectData: ShapePainterObjectData
     ) {
-      super(runtimeScene, shapePainterObjectData);
+      super(instanceContainer, shapePainterObjectData);
       this._fillColor = parseInt(
         gdjs.rgbToHex(
           shapePainterObjectData.fillColor.r,
@@ -88,7 +88,7 @@ namespace gdjs {
       this._clearBetweenFrames = shapePainterObjectData.clearBetweenFrames;
       this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(
         this,
-        runtimeScene
+        instanceContainer
       );
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -158,12 +158,12 @@ namespace gdjs {
       return true;
     }
 
-    stepBehaviorsPreEvents(runtimeScene: gdjs.RuntimeInstanceContainer) {
+    stepBehaviorsPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       //We redefine stepBehaviorsPreEvents just to clear the graphics before running events.
       if (this._clearBetweenFrames) {
         this.clear();
       }
-      super.stepBehaviorsPreEvents(runtimeScene);
+      super.stepBehaviorsPreEvents(instanceContainer);
     }
 
     /**

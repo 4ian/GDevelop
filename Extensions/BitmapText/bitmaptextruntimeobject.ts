@@ -50,14 +50,14 @@ namespace gdjs {
     _renderer: gdjs.BitmapTextRuntimeObjectPixiRenderer;
 
     /**
-     * @param runtimeScene The scene the object belongs to.
+     * @param instanceContainer The scene the object belongs to.
      * @param objectData The object data used to initialize the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeInstanceContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       objectData: BitmapTextObjectData
     ) {
-      super(runtimeScene, objectData);
+      super(instanceContainer, objectData);
 
       this._opacity = objectData.content.opacity;
       this._text = objectData.content.text;
@@ -73,7 +73,7 @@ namespace gdjs {
 
       this._renderer = new gdjs.BitmapTextRuntimeObjectRenderer(
         this,
-        runtimeScene
+        instanceContainer
       );
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.

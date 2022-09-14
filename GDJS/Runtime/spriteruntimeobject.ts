@@ -322,7 +322,7 @@ namespace gdjs {
     _animationFrameDirty: any;
 
     constructor(
-      runtimeScene: gdjs.RuntimeInstancesContainer,
+      runtimeScene: gdjs.RuntimeInstanceContainer,
       spriteObjectData: ObjectData & SpriteObjectDataType
     ) {
       super(runtimeScene, spriteObjectData);
@@ -445,7 +445,7 @@ namespace gdjs {
     /**
      * Update the current frame of the object according to the elapsed time on the scene.
      */
-    update(runtimeScene: gdjs.RuntimeInstancesContainer): void {
+    update(runtimeScene: gdjs.RuntimeInstanceContainer): void {
       //Playing the animation of all objects including the ones outside the screen can be
       //costly when the scene is big with a lot of animated objects. By default, we skip
       //updating the object if it is not visible.
@@ -510,7 +510,7 @@ namespace gdjs {
      * Ensure the sprite is ready to be displayed: the proper animation frame
      * is set and the renderer is up to date (position, angle, alpha, flip, blend mode...).
      */
-    updatePreRender(runtimeScene: gdjs.RuntimeInstancesContainer): void {
+    updatePreRender(runtimeScene: gdjs.RuntimeInstanceContainer): void {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
       }

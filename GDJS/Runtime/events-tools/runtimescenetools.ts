@@ -278,7 +278,7 @@ namespace gdjs {
       };
 
       export const createObjectsFromExternalLayout = function (
-        scene: gdjs.RuntimeInstancesContainer,
+        scene: gdjs.RuntimeInstanceContainer,
         externalLayout: string,
         xPos: float,
         yPos: float

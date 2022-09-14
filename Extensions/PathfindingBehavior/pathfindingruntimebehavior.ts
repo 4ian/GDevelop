@@ -458,8 +458,7 @@ namespace gdjs {
         ) {
           this.owner.rotateTowardAngle(
             this._movementAngle + this._angleOffset,
-            this._angularSpeed,
-            instanceContainer
+            this._angularSpeed
           );
         }
       } else {

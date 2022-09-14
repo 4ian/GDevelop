@@ -10,7 +10,9 @@ namespace gdjs {
 
   export interface EffectsTarget {
     getRuntimeScene: () => gdjs.RuntimeInstanceContainer;
-    getElapsedTime: (runtimeScene?: gdjs.RuntimeInstanceContainer) => number;
+    getElapsedTime: (
+      instanceContainer?: gdjs.RuntimeInstanceContainer
+    ) => number;
     getHeight: () => number;
     getWidth: () => number;
     isLightingLayer?: () => boolean;

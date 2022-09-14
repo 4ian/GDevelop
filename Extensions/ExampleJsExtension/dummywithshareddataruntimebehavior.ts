@@ -4,18 +4,18 @@ namespace gdjs {
     _textToSet: string;
 
     constructor(
-      runtimeScene: gdjs.RuntimeInstanceContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData: any,
       owner: gdjs.RuntimeObject
     ) {
-      super(runtimeScene, behaviorData, owner);
+      super(instanceContainer, behaviorData, owner);
 
       // Here you can access to the behavior data (JSON declared in JsExtension.js)
       // using behaviorData:
       this._textToSet = behaviorData.property1;
 
       // You can also access to the shared data:
-      const sharedData = runtimeScene
+      const sharedData = instanceContainer
         .getScene()
         .getInitialSharedDataForBehavior(behaviorData.name);
       this._textToSet = (sharedData as any).sharedProperty1;
@@ -40,7 +40,7 @@ namespace gdjs {
 
     onDeActivate() {}
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeInstanceContainer) {
+    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       // This is run at every frame, before events are launched.
       this.owner
         .getVariables()
@@ -48,7 +48,7 @@ namespace gdjs {
         .setString(this._textToSet);
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeInstanceContainer) {
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       // This is run at every frame, after events are launched.
     }
   }

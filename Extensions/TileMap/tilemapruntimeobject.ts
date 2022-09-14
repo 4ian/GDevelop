@@ -19,8 +19,8 @@ namespace gdjs {
     _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
     _renderer: gdjs.TileMapRuntimeObjectPixiRenderer;
 
-    constructor(runtimeScene: gdjs.RuntimeInstanceContainer, objectData) {
-      super(runtimeScene, objectData);
+    constructor(instanceContainer: gdjs.RuntimeInstanceContainer, objectData) {
+      super(instanceContainer, objectData);
       this._opacity = objectData.content.opacity;
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
@@ -30,11 +30,11 @@ namespace gdjs {
       this._animationSpeedScale = objectData.content.animationSpeedScale;
       this._animationFps = objectData.content.animationFps;
       this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
-        runtimeScene
+        instanceContainer
       );
       this._renderer = new gdjs.TileMapRuntimeObjectRenderer(
         this,
-        runtimeScene
+        instanceContainer
       );
       this._updateTileMap();
 
@@ -46,14 +46,14 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    update(runtimeScene: gdjs.RuntimeInstanceContainer): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (this._animationSpeedScale <= 0 || this._animationFps === 0) {
         return;
       }
-      const elapsedTime = this.getElapsedTime(runtimeScene) / 1000;
+      const elapsedTime = this.getElapsedTime(instanceContainer) / 1000;
       this._frameElapsedTime += elapsedTime * this._animationSpeedScale;
       while (this._frameElapsedTime > 1 / this._animationFps) {
-        this._renderer.incrementAnimationFrameX(runtimeScene);
+        this._renderer.incrementAnimationFrameX(instanceContainer);
         this._frameElapsedTime -= 1 / this._animationFps;
       }
     }

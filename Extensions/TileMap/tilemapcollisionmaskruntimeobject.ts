@@ -42,8 +42,8 @@ namespace gdjs {
      */
     private _transformationIsUpToDate: boolean = false;
 
-    constructor(runtimeScene: gdjs.RuntimeInstanceContainer, objectData) {
-      super(runtimeScene, objectData);
+    constructor(instanceContainer: gdjs.RuntimeInstanceContainer, objectData) {
+      super(instanceContainer, objectData);
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
       this._collisionMaskTag = objectData.content.collisionMaskTag;
@@ -58,7 +58,7 @@ namespace gdjs {
       this._outlineOpacity = objectData.content.outlineOpacity;
       this._outlineSize = objectData.content.outlineSize;
       this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
-        runtimeScene
+        instanceContainer
       );
 
       // The actual size is set when the tile map file is loaded.
@@ -80,7 +80,7 @@ namespace gdjs {
 
       this._renderer = new gdjs.TileMap.TileMapCollisionMaskRenderer(
         this,
-        runtimeScene
+        instanceContainer
       );
       this._updateTileMap();
 
@@ -88,8 +88,8 @@ namespace gdjs {
       this.onCreated();
     }
 
-    updatePreRender(runtimeScene: gdjs.RuntimeInstanceContainer) {
-      super.updatePreRender(runtimeScene);
+    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      super.updatePreRender(instanceContainer);
 
       if (this._debugMode && this.hitBoxesDirty) {
         this.updateHitBoxes();

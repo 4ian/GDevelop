@@ -37,19 +37,22 @@ namespace gdjs {
     _playbackSpeed: any;
 
     /**
-     * @param runtimeScene The scene the object belongs to.
+     * @param instanceContainer The scene the object belongs to.
      * @param videoObjectData The data defining the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeInstanceContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       videoObjectData: VideoObjectData
     ) {
-      super(runtimeScene, videoObjectData);
+      super(instanceContainer, videoObjectData);
       this._opacity = videoObjectData.content.opacity;
       this._loop = videoObjectData.content.loop;
       this._volume = videoObjectData.content.volume;
       this._videoResource = videoObjectData.content.videoResource;
-      this._renderer = new gdjs.VideoRuntimeObjectRenderer(this, runtimeScene);
+      this._renderer = new gdjs.VideoRuntimeObjectRenderer(
+        this,
+        instanceContainer
+      );
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -97,7 +100,7 @@ namespace gdjs {
       this._renderer.onDestroy();
     }
 
-    update(runtimeScene: gdjs.RuntimeInstanceContainer): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._renderer.ensureUpToDate();
     }
 

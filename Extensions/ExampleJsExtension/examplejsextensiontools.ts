@@ -45,12 +45,12 @@ namespace gdjs {
        * In **very rare cases** you may want to run code whenever an object is deleted.
        */
       gdjs.registerObjectDeletedFromSceneCallback(function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         runtimeObject
       ) {
         logger.log(
           'A gdjs.RuntimeObject was deleted from a gdjs.RuntimeScene:',
-          runtimeScene,
+          instanceContainer,
           runtimeObject
         );
       });

@@ -240,6 +240,22 @@ export const declareObjectMetadata = (
     .getCodeExtraInformation()
     .setFunctionName('isFlippedY');
 
+  objectMetadata
+    .addExpressionAndConditionAndAction(
+      'number',
+      'Opacity',
+      i18n._('Opacity'),
+      i18n._(
+        'the opacity of an object, between 0 (fully transparent) to 255 (opaque)'
+      ),
+      i18n._('the opacity'),
+      i18n._('Visibility'),
+      'res/conditions/opacity24.png'
+    )
+    .addParameter('object', i18n._('Object'), objectType)
+    .useStandardParameters('number')
+    .setFunctionName('getOpacity');
+
   return objectMetadata;
 };
 

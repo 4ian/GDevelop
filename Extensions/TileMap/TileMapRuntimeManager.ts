@@ -1,6 +1,6 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
-  export interface RuntimeInstancesContainer {
+  export interface RuntimeInstanceContainer {
     tileMapCollisionMaskManager: gdjs.TileMap.TileMapRuntimeManager;
   }
   export namespace TileMap {
@@ -26,7 +26,7 @@ namespace gdjs {
      * @see {@link TileMapManager}
      */
     export class TileMapRuntimeManager {
-      private _runtimeScene: gdjs.RuntimeInstancesContainer;
+      private _runtimeScene: gdjs.RuntimeInstanceContainer;
       /**
        * Delegate that actually manage the caches without anything specific to
        * GDJS.
@@ -36,7 +36,7 @@ namespace gdjs {
       /**
        * @param runtimeScene The scene.
        */
-      private constructor(runtimeScene: gdjs.RuntimeInstancesContainer) {
+      private constructor(runtimeScene: gdjs.RuntimeInstanceContainer) {
         this._runtimeScene = runtimeScene;
         this._manager = new TileMapHelper.TileMapManager();
       }
@@ -46,7 +46,7 @@ namespace gdjs {
        * @returns The shared manager.
        */
       static getManager(
-        runtimeScene: gdjs.RuntimeInstancesContainer
+        runtimeScene: gdjs.RuntimeInstanceContainer
       ): TileMapRuntimeManager {
         if (!runtimeScene.tileMapCollisionMaskManager) {
           // Create the shared manager if necessary.

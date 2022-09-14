@@ -443,8 +443,7 @@ namespace gdjs {
         if (this._rotateObject) {
           object.rotateTowardAngle(
             directionInDeg + this._angleOffset,
-            this._angularSpeed,
-            runtimeScene
+            this._angularSpeed
           );
         }
       }

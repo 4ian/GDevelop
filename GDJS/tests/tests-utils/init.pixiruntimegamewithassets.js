@@ -13,7 +13,6 @@ gdjs.getPixiRuntimeGameWithAssets = (customOptions = {}) => {
 
   var runtimeGame = new gdjs.RuntimeGame({
     variables: [],
-    eventsFunctionsExtensions: [],
     properties: {
       adaptGameResolutionAtRuntime: true,
       folderProject: false,
@@ -79,10 +78,6 @@ gdjs.getPixiRuntimeGameWithAssets = (customOptions = {}) => {
         eventsBasedObjects: [
           {
             name: 'MyEventsBasedObject',
-            description: '',
-            fullName: '',
-            eventsFunctions: [],
-            propertyDescriptors: [],
             objects: [
               {
                 name: 'MySprite',

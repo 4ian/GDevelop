@@ -35,9 +35,6 @@ namespace gdjs {
       pixiRenderer: PIXI.Renderer | null
     ) {
       this._pixiContainer = new PIXI.Container();
-      this._pixiContainer.name =
-        'Layer of ' +
-        (layer._runtimeScene._name ? layer._runtimeScene._name : 'Custom');
       this._layer = layer;
       this._runtimeSceneRenderer = runtimeSceneRenderer;
       this._pixiRenderer = pixiRenderer;

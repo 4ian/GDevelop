@@ -28,8 +28,6 @@ namespace gdjs {
       this._object = object;
       this._instanceContainer = instanceContainer;
       this._pixiContainer = new PIXI.Container();
-      // TODO Remove all these name
-      this._pixiContainer.name = 'Custom ' + object.getName();
       this._debugDrawRenderedObjectsPoints = {};
 
       // Contains the layers of the scene (and, optionally, debug PIXI objects).

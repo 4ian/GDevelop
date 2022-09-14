@@ -4,7 +4,7 @@ namespace gdjs {
   export class LightObstaclesManager {
     _obstacleRBush: any;
 
-    constructor(runtimeScene: gdjs.RuntimeInstancesContainer) {
+    constructor(runtimeScene: gdjs.RuntimeInstanceContainer) {
       this._obstacleRBush = new rbush();
     }
 
@@ -12,7 +12,7 @@ namespace gdjs {
      * Get the light obstacles manager of a scene.
      */
     static getManager(
-      runtimeScene: gdjs.RuntimeInstancesContainer
+      runtimeScene: gdjs.RuntimeInstanceContainer
     ): gdjs.LightObstaclesManager {
       // @ts-ignore
       if (!runtimeScene._lightObstaclesManager) {
@@ -92,7 +92,7 @@ namespace gdjs {
     _registeredInManager: boolean = false;
 
     constructor(
-      runtimeScene: gdjs.RuntimeInstancesContainer,
+      runtimeScene: gdjs.RuntimeInstanceContainer,
       behaviorData,
       owner: gdjs.RuntimeObject
     ) {
@@ -100,7 +100,7 @@ namespace gdjs {
       this._manager = LightObstaclesManager.getManager(runtimeScene);
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeInstanceContainer) {
       // Make sure the obstacle is or is not in the obstacles manager.
       if (!this.activated() && this._registeredInManager) {
         this._manager.removeObstacle(this);

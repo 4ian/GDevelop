@@ -5,7 +5,7 @@ namespace gdjs {
    * The renderer for a gdjs.RuntimeScene using Pixi.js.
    */
   export class RuntimeScenePixiRenderer
-    implements gdjs.RuntimeInstancesContainerRenderer {
+    implements gdjs.RuntimeInstanceContainerRenderer {
     _pixiRenderer: PIXI.Renderer | null;
     _runtimeScene: gdjs.RuntimeScene;
     _pixiContainer: PIXI.Container;

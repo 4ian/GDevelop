@@ -4,15 +4,15 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  const logger = new gdjs.Logger('RuntimeInstancesContainer');
+  const logger = new gdjs.Logger('RuntimeInstanceContainer');
   const setupWarningLogger = new gdjs.Logger(
-    'RuntimeInstancesContainer (setup warnings)'
+    'RuntimeInstanceContainer (setup warnings)'
   );
 
   /**
    * A scene being played, containing instances of objects rendered on screen.
    */
-  export abstract class RuntimeInstancesContainer {
+  export abstract class RuntimeInstanceContainer {
     /** Contains the instances living on the scene */
     _instances: Hashtable<RuntimeObject[]>;
 
@@ -56,7 +56,7 @@ namespace gdjs {
     /**
      * Get the renderer associated to the container.
      */
-    abstract getRenderer(): gdjs.RuntimeInstancesContainerRenderer;
+    abstract getRenderer(): gdjs.RuntimeInstanceContainerRenderer;
 
     /**
      * Get the renderer for visual debugging associated to the container.

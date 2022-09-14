@@ -5,7 +5,7 @@ namespace gdjs {
    * The renderer for a gdjs.RuntimeScene using Pixi.js.
    */
   export class DebuggerPixiRenderer {
-    _instancesContainer: gdjs.RuntimeInstancesContainer;
+    _instanceContainer: gdjs.RuntimeInstanceContainer;
     _debugDraw: PIXI.Graphics | null = null;
     _debugDrawContainer: PIXI.Container | null = null;
     _debugDrawRenderedObjectsPoints: Record<
@@ -16,8 +16,8 @@ namespace gdjs {
       }
     >;
 
-    constructor(instancesContainer: gdjs.RuntimeInstancesContainer) {
-      this._instancesContainer = instancesContainer;
+    constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      this._instanceContainer = instanceContainer;
       this._debugDrawRenderedObjectsPoints = {};
       this._debugDraw = null;
     }
@@ -36,7 +36,7 @@ namespace gdjs {
       showPointsNames: boolean,
       showCustomPoints: boolean
     ) {
-      const pixiContainer: PIXI.Container = this._instancesContainer
+      const pixiContainer: PIXI.Container = this._instanceContainer
         .getRenderer()
         .getRendererObject();
       if (!this._debugDraw || !this._debugDrawContainer) {
@@ -88,7 +88,7 @@ namespace gdjs {
       const workingPoint: FloatPoint = [0, 0];
       for (let i = 0; i < instances.length; i++) {
         const object = instances[i];
-        const layer = this._instancesContainer.getLayer(object.getLayer());
+        const layer = this._instanceContainer.getLayer(object.getLayer());
 
         if (
           (!object.isVisible() || !layer.isVisible()) &&
@@ -150,7 +150,7 @@ namespace gdjs {
       // Draw hitboxes and points
       for (let i = 0; i < instances.length; i++) {
         const object = instances[i];
-        const layer = this._instancesContainer.getLayer(object.getLayer());
+        const layer = this._instanceContainer.getLayer(object.getLayer());
 
         if (
           (!object.isVisible() || !layer.isVisible()) &&
@@ -309,7 +309,7 @@ namespace gdjs {
         this._debugDrawContainer.destroy({
           children: true,
         });
-        const pixiContainer: PIXI.Container = this._instancesContainer
+        const pixiContainer: PIXI.Container = this._instanceContainer
           .getRenderer()
           .getRendererObject();
         pixiContainer.removeChild(this._debugDrawContainer);

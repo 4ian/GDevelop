@@ -11,7 +11,7 @@ namespace gdjs {
     _textToSet: string;
 
     constructor(
-      runtimeScene: gdjs.RuntimeInstancesContainer,
+      runtimeScene: gdjs.RuntimeInstanceContainer,
       behaviorData: any,
       owner: gdjs.RuntimeObject
     ) {
@@ -37,7 +37,7 @@ namespace gdjs {
 
     onDeActivate() {}
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeInstanceContainer) {
       // This is run at every frame, before events are launched.
       this.owner
         .getVariables()
@@ -45,7 +45,7 @@ namespace gdjs {
         .setString(this._textToSet);
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
+    doStepPostEvents(runtimeScene: gdjs.RuntimeInstanceContainer) {
       // This is run at every frame, after events are launched.
     }
   }

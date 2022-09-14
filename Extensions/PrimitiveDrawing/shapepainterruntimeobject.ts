@@ -61,7 +61,7 @@ namespace gdjs {
      * @param shapePainterObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeInstancesContainer,
+      runtimeScene: gdjs.RuntimeInstanceContainer,
       shapePainterObjectData: ShapePainterObjectData
     ) {
       super(runtimeScene, shapePainterObjectData);
@@ -158,7 +158,7 @@ namespace gdjs {
       return true;
     }
 
-    stepBehaviorsPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
+    stepBehaviorsPreEvents(runtimeScene: gdjs.RuntimeInstanceContainer) {
       //We redefine stepBehaviorsPreEvents just to clear the graphics before running events.
       if (this._clearBetweenFrames) {
         this.clear();

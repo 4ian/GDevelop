@@ -70,14 +70,14 @@ export class EditableTileMap {
    * @returns The tile width in pixels.
    */
   getTileHeight(): integer {
-    return this.tileWidth;
+    return this.tileHeight;
   }
 
   /**
    * @returns The tile height in pixels.
    */
   getTileWidth(): integer {
-    return this.tileHeight;
+    return this.tileWidth;
   }
 
   /**

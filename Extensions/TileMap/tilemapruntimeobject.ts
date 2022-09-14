@@ -50,7 +50,7 @@ namespace gdjs {
       if (this._animationSpeedScale <= 0 || this._animationFps === 0) {
         return;
       }
-      const elapsedTime = this.getElapsedTime(instanceContainer) / 1000;
+      const elapsedTime = this.getElapsedTime() / 1000;
       this._frameElapsedTime += elapsedTime * this._animationSpeedScale;
       while (this._frameElapsedTime > 1 / this._animationFps) {
         this._renderer.incrementAnimationFrameX(instanceContainer);

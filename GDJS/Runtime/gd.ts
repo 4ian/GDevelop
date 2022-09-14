@@ -26,7 +26,7 @@ namespace gdjs {
 
   type RuntimeSceneCallback = (runtimeScene: gdjs.RuntimeScene) => void;
   type RuntimeSceneRuntimeObjectCallback = (
-    runtimeScene: gdjs.RuntimeScene,
+    instanceContainer: gdjs.RuntimeInstanceContainer,
     runtimeObject: gdjs.RuntimeObject
   ) => void;
 
@@ -329,7 +329,7 @@ namespace gdjs {
     gdjs.callbacksRuntimeSceneUnloaded.push(callback);
   };
 
-  // TODO EBO Generalize it for InstanceContainer.
+  // TODO EBO Check that it doesn't break community extensions.
   /**
    * Register a function to be called when an object is deleted from a scene.
    * @param callback The function to be called.

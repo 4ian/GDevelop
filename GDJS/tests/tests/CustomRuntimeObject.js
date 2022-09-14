@@ -44,6 +44,7 @@ describe('gdjs.CustomRuntimeObject', function () {
       variables: [],
       behaviors: [],
       effects: [],
+      content: {},
       childrenContent: {
         MySprite: {
           updateIfNotVisible: false,
@@ -94,16 +95,25 @@ describe('gdjs.CustomRuntimeObject', function () {
   /** @type {gdjs.RuntimeObject} */
   let rightSprite;
 
+/**
+ * @param {gdjs.RuntimeInstancesContainer} parent 
+ */
+  const createSpriteObject = (parent) => {
+    const sprite = parent.createObject('MySprite');
+    if (!sprite) {
+      throw new Error("Object couldn't be created");
+    }
+    return sprite;
+  }
+
   const makeCustomObjectWith2Children = (runtimeScene) => {
     customObject = makeCustomObject(runtimeScene);
 
     // Child-object creation should be done in the onCreate method of custom object.
     // TODO EBO Rewrite this test when an events-based object has initialInstances.
-    leftSprite = customObject._instanceContainer.createObject('MySprite');
-    rightSprite = customObject._instanceContainer.createObject('MySprite');
-    if (!leftSprite || !rightSprite) {
-      throw new Error("Object couldn't be created");
-    }
+    leftSprite = createSpriteObject(customObject._instanceContainer);
+    rightSprite = createSpriteObject(customObject._instanceContainer);
+
     rightSprite.setX(64);
     // The onCreate method would have rebuilt the instance list.
     customObject.update(runtimeScene);
@@ -359,9 +369,7 @@ describe('gdjs.CustomRuntimeObject', function () {
       makeCustomObjectWith2Children(runtimeScene);
 
       // doStepPostEvents create a child
-      const middleSprite = customObject._instanceContainer.createObject(
-        'MySprite'
-      );
+      const middleSprite = createSpriteObject(customObject._instanceContainer);
       middleSprite.setX(32);
 
       // It refreshes the instance list
@@ -392,9 +400,7 @@ describe('gdjs.CustomRuntimeObject', function () {
       makeCustomObjectWith2Children(runtimeScene);
 
       // An action of the object create a child.
-      const middleSprite = customObject._instanceContainer.createObject(
-        'MySprite'
-      );
+      const middleSprite = createSpriteObject(customObject._instanceContainer);
       middleSprite.setX(32);
 
       // A collision test need the hit-boxes of the parent

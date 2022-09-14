@@ -230,7 +230,7 @@ type LaunchPreviewOptions = {
 };
 
 export type Props = {
-  integratedEditor?: boolean,
+  initialDialog?: string,
   introDialog?: React.Element<*>,
   renderMainMenu?: MainMenuProps => React.Node,
   renderPreviewLauncher?: (
@@ -410,7 +410,7 @@ const MainFrame = (props: Props) => {
     resourceFetcher,
     getStorageProviderOperations,
     getStorageProvider,
-    integratedEditor,
+    initialDialog,
     initialFileMetadataToOpen,
     introDialog,
     i18n,
@@ -436,7 +436,7 @@ const MainFrame = (props: Props) => {
 
   React.useEffect(
     () => {
-      if (!integratedEditor) openHomePage();
+      openHomePage();
       GD_STARTUP_TIMES.push(['MainFrameComponentDidMount', performance.now()]);
       _loadExtensions()
         .then(() =>
@@ -508,6 +508,15 @@ const MainFrame = (props: Props) => {
     // We want to run this effect only when the component did mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
+  );
+
+  React.useEffect(
+    () => {
+      if (initialDialog === 'subscription') {
+        openSubscriptionDialog(true);
+      }
+    },
+    [initialDialog]
   );
 
   const openProfileDialogWithTab = (
@@ -2523,7 +2532,7 @@ const MainFrame = (props: Props) => {
       </Drawer>
       <Toolbar
         ref={toolbar}
-        showProjectIcons={!props.integratedEditor}
+        showProjectIcons
         hasProject={!!currentProject}
         toggleProjectManager={toggleProjectManager}
         exportProject={() => openExportDialog(true)}
@@ -2546,7 +2555,7 @@ const MainFrame = (props: Props) => {
         previewState={previewState}
       />
       <DraggableClosableTabs
-        hideLabels={!!props.integratedEditor}
+        hideLabels={false}
         editorTabs={state.editorTabs}
         onClickTab={(id: number) => _onChangeEditorTab(id)}
         onCloseTab={(editorTab: EditorTab) => _onCloseEditorTab(editorTab)}

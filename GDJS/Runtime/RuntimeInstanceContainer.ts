@@ -532,7 +532,7 @@ namespace gdjs {
       for (let j = 0; j < gdjs.callbacksObjectDeletedFromScene.length; ++j) {
         // TODO EBO Check if the instances container should be pass instead of
         // the scene.
-        gdjs.callbacksObjectDeletedFromScene[j](this.getScene(), obj);
+        gdjs.callbacksObjectDeletedFromScene[j](this, obj);
       }
       return;
     }

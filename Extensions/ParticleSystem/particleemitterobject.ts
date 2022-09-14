@@ -97,12 +97,12 @@ namespace gdjs {
      * @param particleObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeInstanceContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       particleObjectData: ParticleEmitterObjectData
     ) {
-      super(runtimeScene, particleObjectData);
+      super(instanceContainer, particleObjectData);
       this._renderer = new gdjs.ParticleEmitterObjectRenderer(
-        runtimeScene,
+        instanceContainer,
         this,
         particleObjectData
       );
@@ -284,7 +284,7 @@ namespace gdjs {
       return true;
     }
 
-    update(runtimeScene: gdjs.RuntimeInstanceContainer): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (this._posDirty) {
         this._renderer.setPosition(this.getX(), this.getY());
       }
@@ -327,24 +327,24 @@ namespace gdjs {
         this._renderer.resetEmission(this.flow, this.tank);
       }
       if (this._textureDirty) {
-        this._renderer.setTextureName(this.texture, runtimeScene);
+        this._renderer.setTextureName(this.texture, instanceContainer);
       }
       this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = false;
       this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = false;
       this._alphaDirty = this._flowDirty = this._textureDirty = this._tankDirty = false;
-      this._renderer.update(this.getElapsedTime(runtimeScene) / 1000.0);
+      this._renderer.update(this.getElapsedTime(instanceContainer) / 1000.0);
       if (
         this._renderer.hasStarted() &&
         this.getParticleCount() === 0 &&
         this.destroyWhenNoParticles
       ) {
-        this.deleteFromScene(runtimeScene);
+        this.deleteFromScene(instanceContainer);
       }
     }
 
-    onDestroyFromScene(runtimeScene: gdjs.RuntimeInstanceContainer): void {
+    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._renderer.destroy();
-      super.onDestroyFromScene(runtimeScene);
+      super.onDestroyFromScene(instanceContainer);
     }
 
     getEmitterForceMin(): number {

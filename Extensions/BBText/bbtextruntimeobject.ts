@@ -48,14 +48,14 @@ namespace gdjs {
     hidden: boolean;
 
     /**
-     * @param runtimeScene The scene the object belongs to.
+     * @param instanceContainer The scene the object belongs to.
      * @param objectData The object data used to initialize the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeInstanceContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       objectData: BBTextObjectData
     ) {
-      super(runtimeScene, objectData);
+      super(instanceContainer, objectData);
       // @ts-ignore - parseFloat should not be required, but GDevelop 5.0 beta 92 and below were storing it as a string.
       this._opacity = parseFloat(objectData.content.opacity);
       this._text = objectData.content.text;
@@ -65,7 +65,10 @@ namespace gdjs {
       this._fontSize = parseFloat(objectData.content.fontSize);
       this._wordWrap = objectData.content.wordWrap;
       this._align = objectData.content.align;
-      this._renderer = new gdjs.BBTextRuntimeObjectRenderer(this, runtimeScene);
+      this._renderer = new gdjs.BBTextRuntimeObjectRenderer(
+        this,
+        instanceContainer
+      );
       this.hidden = !objectData.content.visible;
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.

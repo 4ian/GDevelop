@@ -82,9 +82,7 @@ namespace gdjs {
       }
     }
 
-    onDestroyFromScene(
-      instanceContainer: gdjs.RuntimeInstanceContainer
-    ): void {
+    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this.onDestroy(instanceContainer);
       super.onDestroyFromScene(instanceContainer);
       this._instanceContainer.onDestroyFromScene(instanceContainer);

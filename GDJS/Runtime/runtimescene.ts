@@ -10,7 +10,7 @@ namespace gdjs {
   /**
    * A scene being played, containing instances of objects rendered on screen.
    */
-  export class RuntimeScene extends gdjs.RuntimeInstancesContainer {
+  export class RuntimeScene extends gdjs.RuntimeInstanceContainer {
     _eventsFunction: null | ((runtimeScene: RuntimeScene) => void) = null;
 
     // TODO EBO move behavior shared data up to the instances container.

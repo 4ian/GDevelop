@@ -10,7 +10,7 @@ namespace gdjs {
   /**
    * A scene being played, containing instances of objects rendered on screen.
    */
-  export class CustomRuntimeObjectInstancesContainer extends gdjs.RuntimeInstancesContainer {
+  export class CustomRuntimeObjectInstanceContainer extends gdjs.RuntimeInstancesContainer {
     _renderer: gdjs.CustomObjectRenderer;
     _debuggerRenderer: gdjs.DebuggerRenderer;
     _runtimeScene: gdjs.RuntimeScene;

@@ -46,7 +46,7 @@ namespace gdjs {
      * @param owner The object owning the behavior
      */
     constructor(
-      runtimeScene: gdjs.RuntimeInstancesContainer,
+      runtimeScene: gdjs.RuntimeInstanceContainer,
       behaviorData: BehaviorData,
       public owner: gdjs.RuntimeObject
     ) {
@@ -94,7 +94,7 @@ namespace gdjs {
      * Behaviors writers: Please do not redefine this method. Redefine doStepPreEvents instead.
      * @param runtimeScene The runtimeScene owning the object
      */
-    stepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer): void {
+    stepPreEvents(runtimeScene: gdjs.RuntimeInstanceContainer): void {
       if (this._activated) {
         const profiler = runtimeScene.getScene().getProfiler();
         if (profiler) {
@@ -112,7 +112,7 @@ namespace gdjs {
      * Behaviors writers: Please do not redefine this method. Redefine doStepPreEvents instead.
      * @param runtimeScene The runtimeScene owning the object
      */
-    stepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer): void {
+    stepPostEvents(runtimeScene: gdjs.RuntimeInstanceContainer): void {
       if (this._activated) {
         const profiler = runtimeScene.getScene().getProfiler();
         if (profiler) {
@@ -173,13 +173,13 @@ namespace gdjs {
      * This method is called each tick before events are done.
      * @param runtimeScene The runtimeScene owning the object
      */
-    doStepPreEvents(runtimeScene: gdjs.RuntimeInstancesContainer): void {}
+    doStepPreEvents(runtimeScene: gdjs.RuntimeInstanceContainer): void {}
 
     /**
      * This method is called each tick after events are done.
      * @param runtimeScene The runtimeScene owning the object
      */
-    doStepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer): void {}
+    doStepPostEvents(runtimeScene: gdjs.RuntimeInstanceContainer): void {}
 
     /**
      * This method is called when the owner of the behavior

@@ -21,7 +21,7 @@ namespace gdjs {
     _cameraX: float;
     _cameraY: float;
 
-    _runtimeInstancesContainer: gdjs.RuntimeInstancesContainer;
+    _runtimeInstanceContainer: gdjs.RuntimeInstanceContainer;
     _effectsManager: gdjs.EffectsManager;
 
     // Lighting layer properties.
@@ -38,12 +38,12 @@ namespace gdjs {
      */
     constructor(
       layerData: LayerData,
-      runtimeInstancesContainer: gdjs.RuntimeInstancesContainer
+      runtimeInstancesContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._name = layerData.name;
       this._hidden = !layerData.visibility;
       this._initialEffectsData = layerData.effects || [];
-      this._runtimeInstancesContainer = runtimeInstancesContainer;
+      this._runtimeInstanceContainer = runtimeInstancesContainer;
       this._cameraX = this.getWidth() / 2;
       this._cameraY = this.getHeight() / 2;
       this._effectsManager = runtimeInstancesContainer
@@ -124,13 +124,13 @@ namespace gdjs {
      * @returns the scene the layer belongs to
      */
     getRuntimeScene(): gdjs.RuntimeScene {
-      return this._runtimeInstancesContainer.getScene();
+      return this._runtimeInstanceContainer.getScene();
     }
 
     /**
      * Called at each frame, after events are run and before rendering.
      */
-    updatePreRender(runtimeScene?: gdjs.RuntimeInstancesContainer): void {
+    updatePreRender(runtimeScene?: gdjs.RuntimeInstanceContainer): void {
       if (this._followBaseLayerCamera) {
         this.followBaseLayer();
       }
@@ -284,7 +284,7 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      */
     convertCoords(x: float, y: float, cameraId: integer = 0): FloatPoint {
-      const position = this._runtimeInstancesContainer.convertCoords(x, y);
+      const position = this._runtimeInstanceContainer.convertCoords(x, y);
       return this.applyLayerInverseTransformation(
         position[0],
         position[1],
@@ -333,7 +333,7 @@ namespace gdjs {
     ): FloatPoint {
       const position: FloatPoint = [0, 0];
       this.applyLayerTransformation(x, y, cameraId, position);
-      return this._runtimeInstancesContainer.convertInverseCoords(
+      return this._runtimeInstanceContainer.convertInverseCoords(
         position[0],
         position[1]
       );
@@ -367,11 +367,11 @@ namespace gdjs {
     }
 
     getWidth(): float {
-      return this._runtimeInstancesContainer.getViewportWidth();
+      return this._runtimeInstanceContainer.getViewportWidth();
     }
 
     getHeight(): float {
-      return this._runtimeInstancesContainer.getViewportHeight();
+      return this._runtimeInstanceContainer.getViewportHeight();
     }
 
     // TODO EBO Documentation
@@ -521,8 +521,8 @@ namespace gdjs {
      * Return the time elapsed since the last frame,
      * in milliseconds, for objects on the layer.
      */
-    getElapsedTime(runtimeScene?: gdjs.RuntimeInstancesContainer): float {
-      const instanceContainer = runtimeScene || this._runtimeInstancesContainer;
+    getElapsedTime(runtimeScene?: gdjs.RuntimeInstanceContainer): float {
+      const instanceContainer = runtimeScene || this._runtimeInstanceContainer;
       return instanceContainer.getElapsedTime() * this._timeScale;
     }
 
@@ -530,7 +530,7 @@ namespace gdjs {
      * Change the position, rotation and scale (zoom) of the layer camera to be the same as the base layer camera.
      */
     followBaseLayer(): void {
-      const baseLayer = this._runtimeInstancesContainer.getLayer('');
+      const baseLayer = this._runtimeInstanceContainer.getLayer('');
       this.setCameraX(baseLayer.getCameraX());
       this.setCameraY(baseLayer.getCameraY());
       this.setCameraRotation(baseLayer.getCameraRotation());

@@ -20,7 +20,7 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.PanelSpriteRuntimeObject,
-      runtimeScene: gdjs.RuntimeInstancesContainer,
+      runtimeScene: gdjs.RuntimeInstanceContainer,
       textureName: string,
       tiled: boolean
     ) {
@@ -190,7 +190,7 @@ namespace gdjs {
 
     setTexture(
       textureName: string,
-      runtimeScene: gdjs.RuntimeInstancesContainer
+      runtimeScene: gdjs.RuntimeInstanceContainer
     ): void {
       const obj = this._object;
       // @ts-ignore

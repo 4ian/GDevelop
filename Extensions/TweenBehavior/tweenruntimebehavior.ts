@@ -89,7 +89,7 @@ namespace gdjs {
      * @param owner The runtime object the behavior belongs to.
      */
     constructor(
-      instanceContainer: gdjs.RuntimeInstancesContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData: BehaviorData,
       owner: gdjs.RuntimeObject
     ) {

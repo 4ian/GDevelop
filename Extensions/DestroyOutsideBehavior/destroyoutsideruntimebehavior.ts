@@ -12,7 +12,7 @@ namespace gdjs {
     _extraBorder: any;
 
     constructor(
-      runtimeScene: gdjs.RuntimeInstancesContainer,
+      runtimeScene: gdjs.RuntimeInstanceContainer,
       behaviorData,
       owner
     ) {
@@ -27,7 +27,7 @@ namespace gdjs {
       return true;
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeInstancesContainer) {
+    doStepPostEvents(runtimeScene: gdjs.RuntimeInstanceContainer) {
       // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
       // is not necessarily in the middle of the object (for sprites for example).
       const ow = this.owner.getWidth();

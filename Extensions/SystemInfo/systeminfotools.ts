@@ -83,7 +83,7 @@ namespace gdjs {
        * @returns true if WebGL is supported
        */
       export const isWebGLSupported = (
-        runtimeScene: gdjs.RuntimeInstancesContainer
+        runtimeScene: gdjs.RuntimeInstanceContainer
       ): boolean => {
         return runtimeScene.getGame().getRenderer().isWebGLSupported();
       };
@@ -94,7 +94,7 @@ namespace gdjs {
        * @returns true if the game is running as a preview.
        */
       export const isPreview = (
-        runtimeScene: gdjs.RuntimeInstancesContainer
+        runtimeScene: gdjs.RuntimeInstanceContainer
       ): boolean => {
         return runtimeScene.getGame().isPreview();
       };

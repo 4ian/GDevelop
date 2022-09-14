@@ -12,7 +12,7 @@ namespace gdjs {
 
       constructor(
         runtimeObject: gdjs.TileMapCollisionMaskRuntimeObject,
-        runtimeScene: gdjs.RuntimeInstancesContainer
+        runtimeScene: gdjs.RuntimeInstanceContainer
       ) {
         this._object = runtimeObject;
         this._graphics = new PIXI.Graphics();

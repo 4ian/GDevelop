@@ -20,7 +20,7 @@ namespace gdjs {
     _cameraX: float;
     _cameraY: float;
 
-    _runtimeInstanceContainer: gdjs.RuntimeInstanceContainer;
+    _runtimeScene: gdjs.RuntimeInstanceContainer;
     _effectsManager: gdjs.EffectsManager;
 
     // Lighting layer properties.
@@ -33,19 +33,19 @@ namespace gdjs {
 
     /**
      * @param layerData The data used to initialize the layer
-     * @param runtimeInstancesContainer The scene in which the layer is used
+     * @param runtimeInstanceContainer The scene in which the layer is used
      */
     constructor(
       layerData: LayerData,
-      runtimeInstancesContainer: gdjs.RuntimeInstanceContainer
+      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._name = layerData.name;
       this._hidden = !layerData.visibility;
       this._initialEffectsData = layerData.effects || [];
-      this._runtimeInstanceContainer = runtimeInstancesContainer;
+      this._runtimeScene = runtimeInstanceContainer;
       this._cameraX = this.getWidth() / 2;
       this._cameraY = this.getHeight() / 2;
-      this._effectsManager = runtimeInstancesContainer
+      this._effectsManager = runtimeInstanceContainer
         .getGame()
         .getEffectsManager();
       this._isLightingLayer = layerData.isLightingLayer;
@@ -58,8 +58,8 @@ namespace gdjs {
       ];
       this._renderer = new gdjs.LayerRenderer(
         this,
-        runtimeInstancesContainer.getRenderer(),
-        runtimeInstancesContainer.getGame().getRenderer().getPIXIRenderer()
+        runtimeInstanceContainer.getRenderer(),
+        runtimeInstanceContainer.getGame().getRenderer().getPIXIRenderer()
       );
       this.show(!this._hidden);
       for (let i = 0; i < layerData.effects.length; ++i) {
@@ -112,13 +112,13 @@ namespace gdjs {
      * @returns the scene the layer belongs to
      */
     getRuntimeScene(): gdjs.RuntimeScene {
-      return this._runtimeInstanceContainer.getScene();
+      return this._runtimeScene.getScene();
     }
 
     /**
      * Called at each frame, after events are run and before rendering.
      */
-    updatePreRender(runtimeScene?: gdjs.RuntimeInstanceContainer): void {
+    updatePreRender(instanceContainer?: gdjs.RuntimeInstanceContainer): void {
       if (this._followBaseLayerCamera) {
         this.followBaseLayer();
       }
@@ -272,7 +272,7 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      */
     convertCoords(x: float, y: float, cameraId: integer = 0): FloatPoint {
-      const position = this._runtimeInstanceContainer.convertCoords(x, y);
+      const position = this._runtimeScene.convertCoords(x, y);
       return this.applyLayerInverseTransformation(
         position[0],
         position[1],
@@ -321,10 +321,7 @@ namespace gdjs {
     ): FloatPoint {
       const position: FloatPoint = [0, 0];
       this.applyLayerTransformation(x, y, cameraId, position);
-      return this._runtimeInstanceContainer.convertInverseCoords(
-        position[0],
-        position[1]
-      );
+      return this._runtimeScene.convertInverseCoords(position[0], position[1]);
     }
 
     // TODO EBO Documentation
@@ -355,11 +352,11 @@ namespace gdjs {
     }
 
     getWidth(): float {
-      return this._runtimeInstanceContainer.getViewportWidth();
+      return this._runtimeScene.getViewportWidth();
     }
 
     getHeight(): float {
-      return this._runtimeInstanceContainer.getViewportHeight();
+      return this._runtimeScene.getViewportHeight();
     }
 
     // TODO EBO Documentation
@@ -508,17 +505,19 @@ namespace gdjs {
     /**
      * Return the time elapsed since the last frame,
      * in milliseconds, for objects on the layer.
+     *
+     * @param instanceContainer The instance container the layer belongs to (deprecated - can be omitted).
      */
-    getElapsedTime(runtimeScene?: gdjs.RuntimeInstanceContainer): float {
-      const instanceContainer = runtimeScene || this._runtimeInstanceContainer;
-      return instanceContainer.getElapsedTime() * this._timeScale;
+    getElapsedTime(instanceContainer?: gdjs.RuntimeInstanceContainer): float {
+      const container = instanceContainer || this._runtimeScene;
+      return container.getElapsedTime() * this._timeScale;
     }
 
     /**
      * Change the position, rotation and scale (zoom) of the layer camera to be the same as the base layer camera.
      */
     followBaseLayer(): void {
-      const baseLayer = this._runtimeInstanceContainer.getLayer('');
+      const baseLayer = this._runtimeScene.getLayer('');
       this.setCameraX(baseLayer.getCameraX());
       this.setCameraY(baseLayer.getCameraY());
       this.setCameraRotation(baseLayer.getCameraRotation());

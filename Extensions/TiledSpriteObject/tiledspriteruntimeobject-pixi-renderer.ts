@@ -7,17 +7,17 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.TiledSpriteRuntimeObject,
-      runtimeScene: gdjs.RuntimeInstanceContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       textureName: string
     ) {
       this._object = runtimeObject;
-      const texture = runtimeScene
+      const texture = instanceContainer
         .getGame()
         .getImageManager()
         .getPIXITexture(textureName);
       this._tiledSprite = new PIXI.TilingSprite(texture, 1024, 1024);
 
-      runtimeScene
+      instanceContainer
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._tiledSprite, runtimeObject.getZOrder());
@@ -42,8 +42,11 @@ namespace gdjs {
         this._object.y + this._tiledSprite.height / 2;
     }
 
-    setTexture(textureName, runtimeScene: RuntimeInstanceContainer): void {
-      const texture = runtimeScene
+    setTexture(
+      textureName: string,
+      instanceContainer: RuntimeInstanceContainer
+    ): void {
+      const texture = instanceContainer
         .getGame()
         .getImageManager()
         .getPIXITexture(textureName);

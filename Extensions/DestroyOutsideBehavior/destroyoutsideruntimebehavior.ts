@@ -12,11 +12,11 @@ namespace gdjs {
     _extraBorder: any;
 
     constructor(
-      runtimeScene: gdjs.RuntimeInstanceContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
       owner
     ) {
-      super(runtimeScene, behaviorData, owner);
+      super(instanceContainer, behaviorData, owner);
       this._extraBorder = behaviorData.extraBorder || 0;
     }
 
@@ -27,14 +27,14 @@ namespace gdjs {
       return true;
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeInstanceContainer) {
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
       // is not necessarily in the middle of the object (for sprites for example).
       const ow = this.owner.getWidth();
       const oh = this.owner.getHeight();
       const ocx = this.owner.getDrawableX() + this.owner.getCenterX();
       const ocy = this.owner.getDrawableY() + this.owner.getCenterY();
-      const layer = runtimeScene.getLayer(this.owner.getLayer());
+      const layer = instanceContainer.getLayer(this.owner.getLayer());
       const boundingCircleRadius = Math.sqrt(ow * ow + oh * oh) / 2.0;
       if (
         ocx + boundingCircleRadius + this._extraBorder <
@@ -47,7 +47,7 @@ namespace gdjs {
           layer.getCameraY() + layer.getCameraHeight() / 2
       ) {
         //We are outside the camera area.
-        this.owner.deleteFromScene(runtimeScene);
+        this.owner.deleteFromScene(instanceContainer);
       }
     }
 

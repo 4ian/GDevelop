@@ -13,16 +13,16 @@ namespace gdjs {
      * Get the links manager of a scene.
      */
     static getManager(
-      runtimeScene: gdjs.RuntimeInstanceContainer
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ): gdjs.LinksManager {
       // @ts-ignore
-      if (!runtimeScene.linkedObjectsManager) {
+      if (!instanceContainer.linkedObjectsManager) {
         //Create the shared manager if necessary.
         // @ts-ignore
-        runtimeScene.linkedObjectsManager = new gdjs.LinksManager();
+        instanceContainer.linkedObjectsManager = new gdjs.LinksManager();
       }
       // @ts-ignore
-      return runtimeScene.linkedObjectsManager;
+      return instanceContainer.linkedObjectsManager;
     }
 
     /**
@@ -186,44 +186,48 @@ namespace gdjs {
 
   export namespace evtTools {
     export namespace linkedObjects {
+      // TODO EBO Handle links inside custom objects.
       gdjs.registerObjectDeletedFromSceneCallback(function (runtimeScene, obj) {
         LinksManager.getManager(runtimeScene).removeAllLinksOf(obj);
       });
 
       export const linkObjects = function (
-        runtimeScene: gdjs.RuntimeInstanceContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         objA: gdjs.RuntimeObject,
         objB: gdjs.RuntimeObject
       ) {
         if (objA === null || objB === null) {
           return;
         }
-        LinksManager.getManager(runtimeScene).linkObjects(objA, objB);
+        LinksManager.getManager(instanceContainer).linkObjects(objA, objB);
       };
 
       export const removeLinkBetween = function (
-        runtimeScene: gdjs.RuntimeInstanceContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         objA: gdjs.RuntimeObject,
         objB: gdjs.RuntimeObject
       ) {
         if (objA === null || objB === null) {
           return;
         }
-        LinksManager.getManager(runtimeScene).removeLinkBetween(objA, objB);
+        LinksManager.getManager(instanceContainer).removeLinkBetween(
+          objA,
+          objB
+        );
       };
 
       export const removeAllLinksOf = function (
-        runtimeScene: gdjs.RuntimeInstanceContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         objA: gdjs.RuntimeObject
       ) {
         if (objA === null) {
           return;
         }
-        LinksManager.getManager(runtimeScene).removeAllLinksOf(objA);
+        LinksManager.getManager(instanceContainer).removeAllLinksOf(objA);
       };
 
       export const pickObjectsLinkedTo = function (
-        runtimeScene: gdjs.RuntimeInstanceContainer,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         objectsLists: Hashtable<gdjs.RuntimeObject[]>,
         obj: gdjs.RuntimeObject,
         eventsFunctionContext: EventsFunctionContext | undefined
@@ -232,7 +236,7 @@ namespace gdjs {
           return false;
         }
         const linkedObjectMap = LinksManager.getManager(
-          runtimeScene
+          instanceContainer
         )._getMapOfObjectsLinkedWith(obj);
 
         let pickedSomething = false;
@@ -275,7 +279,7 @@ namespace gdjs {
             // avoid running an intersection with the picked objects later.
             let objectCount = 0;
             for (const objectName of parentEventPickedObjectNames) {
-              objectCount += runtimeScene.getObjects(objectName)!.length;
+              objectCount += instanceContainer.getObjects(objectName)!.length;
             }
 
             if (parentEventPickedObjects.length === objectCount) {

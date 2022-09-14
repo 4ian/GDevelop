@@ -12,14 +12,14 @@ namespace gdjs {
     _renderer: gdjs.TextEntryRuntimeObjectRenderer;
 
     /**
-     * @param runtimeScene The scene the object belongs to.
+     * @param instanceContainer The scene the object belongs to.
      * @param textEntryObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeInstanceContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       textEntryObjectData: ObjectData
     ) {
-      super(runtimeScene, textEntryObjectData);
+      super(instanceContainer, textEntryObjectData);
       this._renderer = new gdjs.TextEntryRuntimeObjectRenderer(this);
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -31,14 +31,14 @@ namespace gdjs {
       return true;
     }
 
-    onDestroyFromScene(runtimeScene): void {
-      super.onDestroyFromScene(runtimeScene);
+    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+      super.onDestroyFromScene(instanceContainer);
       if (this._renderer.onDestroy) {
         this._renderer.onDestroy();
       }
     }
 
-    update(runtimeScene: gdjs.RuntimeInstanceContainer): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if ((this._renderer as any).getString) {
         this._str = (this._renderer as any).getString();
       }

@@ -48,11 +48,11 @@ namespace gdjs {
     private _temporaryPointForTransformations: FloatPoint = [0, 0];
 
     constructor(
-      runtimeScene: gdjs.RuntimeInstanceContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
       owner: gdjs.RuntimeObject
     ) {
-      super(runtimeScene, behaviorData, owner);
+      super(instanceContainer, behaviorData, owner);
       this._allowDiagonals = behaviorData.allowDiagonals;
       this._acceleration = behaviorData.acceleration;
       this._deceleration = behaviorData.deceleration;
@@ -227,7 +227,7 @@ namespace gdjs {
       return this._movementAngleOffset;
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeInstanceContainer) {
+    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;
@@ -237,21 +237,21 @@ namespace gdjs {
       // @ts-ignore
       this._leftKey |=
         !this._ignoreDefaultControls &&
-        runtimeScene.getGame().getInputManager().isKeyPressed(LEFTKEY);
+        instanceContainer.getGame().getInputManager().isKeyPressed(LEFTKEY);
       // @ts-ignore
       this._rightKey |=
         !this._ignoreDefaultControls &&
-        runtimeScene.getGame().getInputManager().isKeyPressed(RIGHTKEY);
+        instanceContainer.getGame().getInputManager().isKeyPressed(RIGHTKEY);
       // @ts-ignore
       this._downKey |=
         !this._ignoreDefaultControls &&
-        runtimeScene.getGame().getInputManager().isKeyPressed(DOWNKEY);
+        instanceContainer.getGame().getInputManager().isKeyPressed(DOWNKEY);
       // @ts-ignore
       this._upKey |=
         !this._ignoreDefaultControls &&
-        runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
+        instanceContainer.getGame().getInputManager().isKeyPressed(UPKEY);
 
-      const elapsedTime = this.owner.getElapsedTime(runtimeScene);
+      const elapsedTime = this.owner.getElapsedTime(instanceContainer);
 
       if (!this._leftKey) {
         this._leftKeyPressedDuration = 0;
@@ -330,7 +330,7 @@ namespace gdjs {
       }
 
       const object = this.owner;
-      const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
+      const timeDelta = this.owner.getElapsedTime(instanceContainer) / 1000;
       const previousVelocityX = this._xVelocity;
       const previousVelocityY = this._yVelocity;
       this._wasStickUsed = false;

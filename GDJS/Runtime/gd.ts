@@ -329,6 +329,7 @@ namespace gdjs {
     gdjs.callbacksRuntimeSceneUnloaded.push(callback);
   };
 
+  // TODO EBO Generalize it for InstanceContainer.
   /**
    * Register a function to be called when an object is deleted from a scene.
    * @param callback The function to be called.

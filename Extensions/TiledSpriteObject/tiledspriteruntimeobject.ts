@@ -30,17 +30,17 @@ namespace gdjs {
     _renderer: gdjs.TiledSpriteRuntimeObjectRenderer;
 
     /**
-     * @param runtimeScene The scene the object belongs to.
+     * @param instanceContainer The scene the object belongs to.
      * @param tiledSpriteObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeInstanceContainer,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       tiledSpriteObjectData: TiledSpriteObjectData
     ) {
-      super(runtimeScene, tiledSpriteObjectData);
+      super(instanceContainer, tiledSpriteObjectData);
       this._renderer = new gdjs.TiledSpriteRuntimeObjectRenderer(
         this,
-        runtimeScene,
+        instanceContainer,
         tiledSpriteObjectData.texture
       );
       this._width = 0;
@@ -107,13 +107,13 @@ namespace gdjs {
     /**
      * Assign a new texture to the Tiled Sprite object.
      * @param textureName The name of the image texture ressource.
-     * @param runtimeScene The scene in which the texture is used.
+     * @param instanceContainer The scene in which the texture is used.
      */
     setTexture(
       textureName: string,
-      runtimeScene: gdjs.RuntimeInstanceContainer
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ): void {
-      this._renderer.setTexture(textureName, runtimeScene);
+      this._renderer.setTexture(textureName, instanceContainer);
     }
 
     /**

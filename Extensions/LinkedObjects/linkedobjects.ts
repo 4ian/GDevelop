@@ -186,9 +186,11 @@ namespace gdjs {
 
   export namespace evtTools {
     export namespace linkedObjects {
-      // TODO EBO Handle links inside custom objects.
-      gdjs.registerObjectDeletedFromSceneCallback(function (runtimeScene, obj) {
-        LinksManager.getManager(runtimeScene).removeAllLinksOf(obj);
+      gdjs.registerObjectDeletedFromSceneCallback(function (
+        instanceContainer,
+        obj
+      ) {
+        LinksManager.getManager(instanceContainer).removeAllLinksOf(obj);
       });
 
       export const linkObjects = function (

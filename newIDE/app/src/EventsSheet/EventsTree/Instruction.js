@@ -298,14 +298,15 @@ const Instruction = (props: Props) => {
               instruction.getType()
             );
 
+        const smallIconFilename = metadata.getSmallIconFilename();
         // The instruction itself can be dragged and is a target for
         // another instruction to be dropped. It's IMPORTANT NOT to have
         // the subinstructions list inside the connectDropTarget/connectDragSource
         // as otherwise this can confuse react-dnd ("Expected to find a valid target")
         // (surely due to components re-mounting/rerendering ?).
-        const isBlackSvgIcon = metadata
-          .getSmallIconFilename()
-          .startsWith('data:image/svg+xml');
+        const isBlackSvgIcon =
+          smallIconFilename.startsWith('data:image/svg+xml') ||
+          smallIconFilename.endsWith('.svg');
 
         const instructionDragSourceElement = connectDragSource(
           <div
@@ -377,7 +378,7 @@ const Instruction = (props: Props) => {
               className={classNames({
                 [icon]: true,
               })}
-              src={metadata.getSmallIconFilename()}
+              src={smallIconFilename}
               alt=""
               style={{
                 filter:

@@ -18,8 +18,8 @@ type Props = {|
   tooltip?: string,
   disabled?: boolean,
   /**
-   * Set true if icon is either a GDevelop-made icon (with blue tone)
-   * loaded from app or a base64 encoded SVG in a data url.
+   * Set true if icon is either an icon loaded from the
+   * app or a base64 encoded SVG in a data url.
    */
   isGDevelopIcon?: boolean,
   cssAnimation?: string,
@@ -54,16 +54,15 @@ function ListIcon(props: Props) {
   // the text. Add it back if necessary
   const paddingRight = iconWidth > 40 ? 16 : 0;
 
-  const isBlackSvgIcon =
+  const isBlackIcon =
     src.startsWith('data:image/svg+xml') || src.includes('_black');
-  const shouldInvertGrayScale = paletteType === 'dark' && isBlackSvgIcon;
+  const shouldInvertGrayScale = paletteType === 'dark' && isBlackIcon;
 
   let filter = undefined;
-  if (isBlackSvgIcon && shouldInvertGrayScale)
-    filter = 'grayscale(1) invert(1)';
-  else if (isGDevelopIcon && disabled && !isBlackSvgIcon)
+  if (shouldInvertGrayScale) filter = 'grayscale(1) invert(1)';
+  else if (isGDevelopIcon && disabled && !isBlackIcon)
     filter = 'grayscale(100%)';
-  else if (isGDevelopIcon && !isBlackSvgIcon)
+  else if (isGDevelopIcon && !isBlackIcon)
     filter = gdevelopTheme.gdevelopIconsCSSFilter;
 
   const style = {

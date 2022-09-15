@@ -304,7 +304,7 @@ const Instruction = (props: Props) => {
         // the subinstructions list inside the connectDropTarget/connectDragSource
         // as otherwise this can confuse react-dnd ("Expected to find a valid target")
         // (surely due to components re-mounting/rerendering ?).
-        const isBlackSvgIcon =
+        const isBlackIcon =
           smallIconFilename.startsWith('data:image/svg+xml') ||
           smallIconFilename.includes('_black');
 
@@ -382,7 +382,7 @@ const Instruction = (props: Props) => {
               alt=""
               style={{
                 filter:
-                  type === 'dark' && isBlackSvgIcon
+                  type === 'dark' && isBlackIcon
                     ? 'grayscale(1) invert(1)'
                     : undefined,
               }}

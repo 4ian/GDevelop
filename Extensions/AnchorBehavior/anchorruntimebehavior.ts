@@ -17,8 +17,12 @@ namespace gdjs {
     _bottomEdgeDistance: number = 0;
     _useLegacyBottomAndRightAnchors: boolean = false;
 
-    constructor(runtimeScene, behaviorData, owner) {
-      super(runtimeScene, behaviorData, owner);
+    constructor(
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      behaviorData,
+      owner: gdjs.RuntimeObject
+    ) {
+      super(instanceContainer, behaviorData, owner);
       this._relativeToOriginalWindowSize = !!behaviorData.relativeToOriginalWindowSize;
       this._leftEdgeAnchor = behaviorData.leftEdgeAnchor;
       this._rightEdgeAnchor = behaviorData.rightEdgeAnchor;
@@ -65,11 +69,12 @@ namespace gdjs {
       this._invalidDistances = true;
     }
 
-    doStepPreEvents(runtimeScene) {
-      const game = runtimeScene.getGame();
+    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      // TODO EBO Make it work with event based objects or hide this behavior for them.
+      const game = instanceContainer.getGame();
       let rendererWidth = game.getGameResolutionWidth();
       let rendererHeight = game.getGameResolutionHeight();
-      const layer = runtimeScene.getLayer(this.owner.getLayer());
+      const layer = instanceContainer.getLayer(this.owner.getLayer());
       if (this._invalidDistances) {
         if (this._relativeToOriginalWindowSize) {
           rendererWidth = game.getOriginalWidth();
@@ -366,7 +371,7 @@ namespace gdjs {
       }
     }
 
-    doStepPostEvents(runtimeScene) {}
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     static HorizontalAnchor = {
       NONE: 0,

@@ -11,11 +11,11 @@ namespace gdjs {
 
     /**
      * @param runtimeObject The object to render
-     * @param runtimeScene The gdjs.RuntimeScene in which the object is
+     * @param instanceContainer The gdjs.RuntimeScene in which the object is
      */
     constructor(
       runtimeObject: gdjs.DummyRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
 
@@ -32,7 +32,7 @@ namespace gdjs {
       //     this._sprite = new PIXI.Sprite(this._imageManager.getInvalidPIXITexture());
       this._text.anchor.x = 0.5;
       this._text.anchor.y = 0.5;
-      runtimeScene
+      instanceContainer
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._text, runtimeObject.getZOrder());

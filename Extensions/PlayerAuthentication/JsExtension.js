@@ -27,7 +27,7 @@ module.exports = {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
-        'GDevelop Authentication',
+        'PlayerAuthentication',
         _('Player Authentication (experimental)'),
         _('Allow your game to authenticate players.'),
         'Florian Rival',
@@ -51,8 +51,10 @@ module.exports = {
       .addAction(
         'DisplayAuthenticationBanner',
         _('Display authentication banner'),
-        _('Display the authentication banner for the player.'),
-        _('Display the authentication banner for the player'),
+        _(
+          'Display an authentication banner at the top of the game screen, for the player to log in.'
+        ),
+        _('Display an authentication banner'),
         '',
         'JsPlatform/Extensions/authentication.svg',
         'JsPlatform/Extensions/authentication.svg'
@@ -61,34 +63,48 @@ module.exports = {
       .setHelpPath('/all-features/authentication')
       .getCodeExtraInformation()
       .setIncludeFile(
-        'Extensions/GDevelopAuthentication/gdevelopauthenticationtools.js'
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
-      .setFunctionName(
-        'gdjs.gdevelopAuthentication.displayAuthenticationBanner'
-      );
-
-      extension
-      .addAction(
-        'DisplayAuthenticationWindow',
-        _('Display authentication window'),
-        _('Display the authentication window for the player.'),
-        _('Display the authentication window for the player'),
-        '',
-        'JsPlatform/Extensions/authentication.svg',
-        'JsPlatform/Extensions/authentication.svg'
-      )
-      .addCodeOnlyParameter('currentScene', '')
-      .setHelpPath('/all-features/authentication')
-      .getCodeExtraInformation()
-      .setIncludeFile(
-        'Extensions/GDevelopAuthentication/gdevelopauthenticationtools.js'
-      )
-      .setFunctionName(
-        'gdjs.gdevelopAuthentication.displayAuthenticationWindow'
-      );
+      .setFunctionName('gdjs.playerAuthentication.displayAuthenticationBanner');
 
     extension
-      .addExpression(
+      .addAction(
+        'OpenAuthenticationWindow',
+        _('Open authentication window'),
+        _('Open an authentication window for the player to log in.'),
+        _('Open an authentication window'),
+        '',
+        'JsPlatform/Extensions/authentication.svg',
+        'JsPlatform/Extensions/authentication.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .setHelpPath('/all-features/authentication')
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .setFunctionName('gdjs.playerAuthentication.openAuthenticationWindow');
+
+    extension
+      .addAction(
+        'LogOut',
+        _('Log out the player'),
+        _('Log out the player.'),
+        _('Log out the player'),
+        '',
+        'JsPlatform/Extensions/authentication.svg',
+        'JsPlatform/Extensions/authentication.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .setHelpPath('/all-features/authentication')
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .setFunctionName('gdjs.playerAuthentication.logout');
+
+    extension
+      .addStrExpression(
         'Username',
         _('Username'),
         _('Get the username of the authenticated player.'),
@@ -97,9 +113,9 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile(
-        'Extensions/GDevelopAuthentication/gdevelopauthenticationtools.js'
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
-      .setFunctionName('gdjs.gdevelopAuthentication.getUsername');
+      .setFunctionName('gdjs.playerAuthentication.getUsername');
 
     extension
       .addCondition(
@@ -113,9 +129,9 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile(
-        'Extensions/GDevelopAuthentication/gdevelopauthenticationtools.js'
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
-      .setFunctionName('gdjs.gdevelopAuthentication.isAuthenticated');
+      .setFunctionName('gdjs.playerAuthentication.isAuthenticated');
 
     extension
       .addCondition(
@@ -129,9 +145,9 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile(
-        'Extensions/GDevelopAuthentication/gdevelopauthenticationtools.js'
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
-      .setFunctionName('gdjs.gdevelopAuthentication.hasLoggedIn');
+      .setFunctionName('gdjs.playerAuthentication.hasLoggedIn');
 
     return extension;
   },

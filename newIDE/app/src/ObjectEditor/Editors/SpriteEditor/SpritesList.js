@@ -19,7 +19,7 @@ import {
 import ResourcesLoader from '../../../ResourcesLoader';
 import {
   type ResourceSource,
-  type ChooseResourceFunction,
+  type ResourceManagementProps,
 } from '../../../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
@@ -176,9 +176,7 @@ type Props = {|
   direction: gdDirection,
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
-  resourceSources: Array<ResourceSource>,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
-  onChooseResource: ChooseResourceFunction,
+  resourceManagementProps: ResourceManagementProps,
   onSpriteContextMenu: (x: number, y: number, sprite: gdSprite) => void,
   selectedSprites: {
     [number]: boolean,
@@ -202,42 +200,42 @@ export default class SpritesList extends Component<Props, void> {
     this.forceUpdate();
   };
 
-  onAddSprite = (resourceSource: ResourceSource) => {
-    const { onChooseResource, project, direction } = this.props;
+  onAddSprite = async (resourceSource: ResourceSource) => {
+    const { resourceManagementProps, project, direction } = this.props;
 
     const {
       allDirectionSpritesHaveSameCollisionMasks,
       allDirectionSpritesHaveSamePoints,
     } = checkDirectionPointsAndCollisionsMasks(direction);
 
-    onChooseResource({
+    const resources = await resourceManagementProps.onChooseResource({
       initialSourceName: resourceSource.name,
       multiSelection: true,
       resourceKind: 'image',
-    }).then(resources => {
-      resources.forEach(resource => {
-        applyResourceDefaults(project, resource);
-        project.getResourcesManager().addResource(resource);
-
-        const sprite = new gd.Sprite();
-        sprite.setImageName(resource.getName());
-        if (allDirectionSpritesHaveSamePoints) {
-          copySpritePoints(direction.getSprite(0), sprite);
-        }
-        if (allDirectionSpritesHaveSameCollisionMasks) {
-          copySpritePolygons(direction.getSprite(0), sprite);
-        }
-        direction.addSprite(sprite);
-      });
-
-      // Important, we are responsible for deleting the resources that were given to us.
-      // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-      resources.forEach(resource => resource.delete());
-
-      this.forceUpdate();
-
-      // TODO: await onFetchNewlyAddedResources();
     });
+
+    resources.forEach(resource => {
+      applyResourceDefaults(project, resource);
+      project.getResourcesManager().addResource(resource);
+
+      const sprite = new gd.Sprite();
+      sprite.setImageName(resource.getName());
+      if (allDirectionSpritesHaveSamePoints) {
+        copySpritePoints(direction.getSprite(0), sprite);
+      }
+      if (allDirectionSpritesHaveSameCollisionMasks) {
+        copySpritePolygons(direction.getSprite(0), sprite);
+      }
+      direction.addSprite(sprite);
+    });
+
+    // Important, we are responsible for deleting the resources that were given to us.
+    // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+    resources.forEach(resource => resource.delete());
+
+    this.forceUpdate();
+
+    await resourceManagementProps.onFetchNewlyAddedResources();
   };
 
   editWith = (externalEditor: ResourceExternalEditor) => {
@@ -339,7 +337,9 @@ export default class SpritesList extends Component<Props, void> {
             direction={this.props.direction}
             resourcesLoader={this.props.resourcesLoader}
             project={this.props.project}
-            resourceExternalEditors={this.props.resourceExternalEditors}
+            resourceExternalEditors={
+              this.props.resourceManagementProps.resourceExternalEditors
+            }
             onEditWith={this.editWith}
           />
         </MiniToolbar>
@@ -349,7 +349,7 @@ export default class SpritesList extends Component<Props, void> {
           project={this.props.project}
           onSortEnd={this.onSortEnd}
           onAddSprite={this.onAddSprite}
-          resourceSources={this.props.resourceSources}
+          resourceSources={this.props.resourceManagementProps.resourceSources}
           selectedSprites={this.props.selectedSprites}
           onSelectSprite={this.props.onSelectSprite}
           onSpriteContextMenu={this.props.onSpriteContextMenu}

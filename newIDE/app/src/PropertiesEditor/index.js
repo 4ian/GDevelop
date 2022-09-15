@@ -17,10 +17,8 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import {
   type ResourceKind,
-  type ResourceSource,
-  type ChooseResourceFunction,
+  type ResourceManagementProps,
 } from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import {
   TextFieldWithButtonLayout,
   ResponsiveLineStackLayout,
@@ -143,9 +141,7 @@ type Props = {|
 
   // Optional context:
   project?: ?gdProject,
-  resourceSources?: ?Array<ResourceSource>,
-  onChooseResource?: ?ChooseResourceFunction,
-  resourceExternalEditors?: ?Array<ResourceExternalEditor>,
+  resourceManagementProps?: ?ResourceManagementProps,
 |};
 
 const styles = {
@@ -232,9 +228,7 @@ const PropertiesEditor = ({
   renderExtraDescriptionText,
   unsavedChanges,
   project,
-  resourceSources,
-  onChooseResource,
-  resourceExternalEditors,
+  resourceManagementProps,
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
@@ -488,14 +482,9 @@ const PropertiesEditor = ({
   );
 
   const renderResourceField = (field: ResourceField) => {
-    if (
-      !project ||
-      !resourceSources ||
-      !onChooseResource ||
-      !resourceExternalEditors
-    ) {
+    if (!project || !resourceManagementProps) {
       console.error(
-        'You tried to display a resource field in a PropertiesEditor that does not support display resources. If you need to display resources, pass additional props (project, resourceSources, onChooseResource, resourceExternalEditors).'
+        'You tried to display a resource field in a PropertiesEditor that does not support display resources. If you need to display resources, pass additional props (project, resourceManagementProps).'
       );
       return null;
     }
@@ -505,9 +494,7 @@ const PropertiesEditor = ({
       <ResourceSelector
         key={field.name}
         project={project}
-        resourceSources={resourceSources}
-        onChooseResource={onChooseResource}
-        resourceExternalEditors={resourceExternalEditors}
+        resourceManagementProps={resourceManagementProps}
         resourcesLoader={ResourcesLoader}
         resourceKind={field.resourceKind}
         fullWidth
@@ -591,9 +578,7 @@ const PropertiesEditor = ({
               {unsavedChanges => (
                 <PropertiesEditor
                   project={project}
-                  resourceSources={resourceSources}
-                  onChooseResource={onChooseResource}
-                  resourceExternalEditors={resourceExternalEditors}
+                  resourceManagementProps={resourceManagementProps}
                   schema={field.children}
                   instances={instances}
                   mode="row"
@@ -622,9 +607,7 @@ const PropertiesEditor = ({
                 {unsavedChanges => (
                   <PropertiesEditor
                     project={project}
-                    resourceSources={resourceSources}
-                    onChooseResource={onChooseResource}
-                    resourceExternalEditors={resourceExternalEditors}
+                    resourceManagementProps={resourceManagementProps}
                     schema={field.children}
                     instances={instances}
                     mode="column"

@@ -5,11 +5,7 @@ import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import InstructionEditor from '.';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 
 type Props = {|
@@ -19,9 +15,7 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   instruction: gdInstruction,
   isCondition: boolean,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   style?: Object,
   isNewInstruction: boolean,
   onCancel: () => void,

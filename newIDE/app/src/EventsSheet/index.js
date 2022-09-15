@@ -57,11 +57,7 @@ import EventsContextAnalyzerDialog, {
   toEventsContextResult,
 } from './EventsContextAnalyzerDialog';
 import SearchPanel, { type SearchPanelInterface } from './SearchPanel';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import EventsSearcher, {
   type ReplaceInEventsInputs,
   type SearchInEventsInputs,
@@ -121,9 +117,7 @@ type Props = {|
   onOpenSettings?: ?() => void,
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   openInstructionOrExpression: (
     extension: gdPlatformExtension,
     type: string
@@ -1578,9 +1572,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           ensureSingleOnceInstructions(instrsList);
           if (this._eventsTree) this._eventsTree.forceEventsUpdate();
         }}
-        resourceSources={this.props.resourceSources}
-        onChooseResource={this.props.onChooseResource}
-        resourceExternalEditors={this.props.resourceExternalEditors}
+        resourceManagementProps={this.props.resourceManagementProps}
         openInstructionOrExpression={(extension, type) => {
           this.closeInstructionEditor();
           this.props.openInstructionOrExpression(extension, type);
@@ -1648,9 +1640,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       globalObjectsContainer,
       objectsContainer,
       preferences,
-      resourceSources,
-      onChooseResource,
-      resourceExternalEditors,
+      resourceManagementProps,
       onCreateEventsFunction,
       tutorials,
     } = this.props;
@@ -1807,9 +1797,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     if (this._searchPanel)
                       this._searchPanel.markSearchResultsDirty();
                   }}
-                  resourceSources={resourceSources}
-                  onChooseResource={onChooseResource}
-                  resourceExternalEditors={resourceExternalEditors}
+                  resourceManagementProps={resourceManagementProps}
                 />
                 <ContextMenu
                   ref={eventContextMenu =>

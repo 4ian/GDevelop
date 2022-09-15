@@ -264,9 +264,12 @@ export const WithObjectsList = () => (
                   project={testProject.project}
                   objectsContainer={testProject.testLayout}
                   layout={testProject.testLayout}
-                  resourceSources={[]}
-                  onChooseResource={() => Promise.reject('unimplemented')}
-                  resourceExternalEditors={fakeResourceExternalEditors}
+                  resourceManagementProps={{
+                    onFetchNewlyAddedResources: async () => {},
+                    resourceSources: [],
+                    onChooseResource: () => Promise.reject('Unimplemented'),
+                    resourceExternalEditors: fakeResourceExternalEditors,
+                  }}
                   onEditObject={action('On edit object')}
                   onAddObjectInstance={action('On add instance to the scene')}
                   selectedObjectNames={[]}

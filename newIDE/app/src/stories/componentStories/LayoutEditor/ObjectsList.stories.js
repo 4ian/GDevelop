@@ -29,9 +29,12 @@ export const Default = () => (
           project={testProject.project}
           objectsContainer={testProject.testLayout}
           layout={testProject.testLayout}
-          resourceSources={[]}
-          onChooseResource={() => Promise.reject('unimplemented')}
-          resourceExternalEditors={fakeResourceExternalEditors}
+          resourceManagementProps={{
+            onFetchNewlyAddedResources: async () => {},
+            resourceSources: [],
+            onChooseResource: () => Promise.reject('Unimplemented'),
+            resourceExternalEditors: fakeResourceExternalEditors,
+          }}
           onEditObject={action('On edit object')}
           onAddObjectInstance={action('On add instance to the scene')}
           onObjectCreated={action('On object created')}
@@ -44,7 +47,6 @@ export const Default = () => (
           onRenameObject={(objectWithContext, newName, cb) => cb(true)}
           onObjectSelected={() => {}}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-          onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
           canInstallPrivateAsset={() => false}
         />
       </div>
@@ -61,9 +63,12 @@ export const WithTags = () => (
           project={testProject.project}
           objectsContainer={testProject.testLayout}
           layout={testProject.testLayout}
-          resourceSources={[]}
-          onChooseResource={() => Promise.reject('unimplemented')}
-          resourceExternalEditors={fakeResourceExternalEditors}
+          resourceManagementProps={{
+            onFetchNewlyAddedResources: async () => {},
+            resourceSources: [],
+            onChooseResource: () => Promise.reject('Unimplemented'),
+            resourceExternalEditors: fakeResourceExternalEditors,
+          }}
           onEditObject={action('On edit object')}
           onAddObjectInstance={action('On add instance to the scene')}
           onObjectCreated={action('On object created')}
@@ -81,7 +86,6 @@ export const WithTags = () => (
           onRenameObject={(objectWithContext, newName, cb) => cb(true)}
           onObjectSelected={() => {}}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-          onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
           canInstallPrivateAsset={() => false}
         />
       </div>

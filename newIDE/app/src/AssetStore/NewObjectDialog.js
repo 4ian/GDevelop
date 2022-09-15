@@ -15,12 +15,7 @@ import HelpButton from '../UI/HelpButton';
 import { Column, Line } from '../UI/Grid';
 import { Tabs, Tab } from '../UI/Tabs';
 import { AssetStore } from '.';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import {
   sendAssetAddedToProject,
   sendNewObjectCreated,
@@ -74,10 +69,7 @@ type Props = {|
   project: gdProject,
   layout: ?gdLayout,
   objectsContainer: gdObjectsContainer,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   onClose: () => void,
   onCreateNewObject: (type: string) => void,
   onObjectAddedFromAsset: gdObject => void,
@@ -88,10 +80,7 @@ export default function NewObjectDialog({
   project,
   layout,
   objectsContainer,
-  resourceSources,
-  onChooseResource,
-  onFetchNewlyAddedResources,
-  resourceExternalEditors,
+  resourceManagementProps,
   onClose,
   onCreateNewObject,
   onObjectAddedFromAsset,
@@ -211,7 +200,7 @@ export default function NewObjectDialog({
             onObjectAddedFromAsset(object);
           });
 
-          await onFetchNewlyAddedResources();
+          await resourceManagementProps.onFetchNewlyAddedResources();
         } catch (error) {
           console.error('Error while installing the asset:', error);
           showErrorBox({
@@ -233,10 +222,10 @@ export default function NewObjectDialog({
       onObjectAddedFromAsset,
       openedAssetShortHeader,
       environment,
-      onFetchNewlyAddedResources,
       installPrivateAsset,
       canInstallPrivateAsset,
       showAlert,
+      resourceManagementProps,
     ]
   );
 
@@ -381,7 +370,7 @@ export default function NewObjectDialog({
           project={project}
           objectsContainer={objectsContainer}
           onObjectAddedFromAsset={onObjectAddedFromAsset}
-          onFetchNewlyAddedResources={onFetchNewlyAddedResources}
+          resourceManagementProps={resourceManagementProps}
         />
       )}
     </>

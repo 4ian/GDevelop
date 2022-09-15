@@ -21,7 +21,7 @@ namespace gd {
 
 BehaviorMetadata::BehaviorMetadata(
     const gd::String& extensionNamespace_,
-    const gd::String& name_,
+    const gd::String& nameWithNamespace,
     const gd::String& fullname_,
     const gd::String& defaultName_,
     const gd::String& description_,
@@ -45,32 +45,32 @@ BehaviorMetadata::BehaviorMetadata(
     gd::LogFatalError(
         "Trying to create a BehaviorMetadata that has no "
         "behavior. This will crash - please double check that the "
-        "BehaviorMetadata is valid for: " + name_);
+        "BehaviorMetadata is valid for: " + nameWithNamespace);
   }
 
-  if (instance) instance->SetTypeName(name_);
-  if (sharedDatasInstance) sharedDatasInstance->SetTypeName(name_);
+  if (instance) instance->SetTypeName(nameWithNamespace);
+  if (sharedDatasInstance) sharedDatasInstance->SetTypeName(nameWithNamespace);
 }
 
 BehaviorMetadata::BehaviorMetadata(
     const gd::String& extensionNamespace,
-    const gd::String& name_,
+    const gd::String& nameWithNamespace,
     const gd::String& fullname_,
+    const gd::String& defaultName_,
     const gd::String& description_,
     const gd::String& group_,
     const gd::String& icon24x24_): BehaviorMetadata(
         extensionNamespace,
-        name_,
+        nameWithNamespace,
         fullname_,
-        // Default name is the name
-        name_,
+        defaultName_,
         description_,
         group_,
         icon24x24_,
         // Class name is the name, actually unused
-        name_,
+        defaultName_,
         // It is only used to get the name for GetName.
-        gd::make_unique<gd::Behavior>("", name_),
+        gd::make_unique<gd::Behavior>("", nameWithNamespace),
         nullptr){
   isEventBased = true;
 };

@@ -2233,17 +2233,18 @@ const MainFrame = (props: Props) => {
     [getStorageProvider]
   );
 
-  const onChooseResource: ChooseResourceFunction = (
-    options: ChooseResourceOptions
-  ) => {
-    return new Promise(resolve => {
-      setChooseResourceOptions(options);
-      const onResourceChosenSetter: () => (
-        Promise<Array<gdResource>> | Array<gdResource>
-      ) => void = () => resolve;
-      setOnResourceChosen(onResourceChosenSetter);
-    });
-  };
+  const onChooseResource: ChooseResourceFunction = React.useCallback(
+    (options: ChooseResourceOptions) => {
+      return new Promise(resolve => {
+        setChooseResourceOptions(options);
+        const onResourceChosenSetter: () => (
+          Promise<Array<gdResource>> | Array<gdResource>
+        ) => void = () => resolve;
+        setOnResourceChosen(onResourceChosenSetter);
+      });
+    },
+    [setOnResourceChosen, setChooseResourceOptions]
+  );
 
   const setElectronUpdateStatus = (updateStatus: ElectronUpdateStatus) => {
     setState(state => ({ ...state, updateStatus }));
@@ -2487,6 +2488,21 @@ const MainFrame = (props: Props) => {
     [state.editorTabs, setCurrentEditor]
   );
 
+  const resourceManagementProps = React.useMemo(
+    () => ({
+      resourceSources,
+      onChooseResource,
+      resourceExternalEditors,
+      onFetchNewlyAddedResources,
+    }),
+    [
+      resourceSources,
+      onChooseResource,
+      resourceExternalEditors,
+      onFetchNewlyAddedResources,
+    ]
+  );
+
   const showLoader = isLoadingProject || previewLoading;
 
   return (
@@ -2582,9 +2598,7 @@ const MainFrame = (props: Props) => {
             freezeUpdate={!projectManagerOpen}
             unsavedChanges={unsavedChanges}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-            resourceSources={resourceSources}
-            onChooseResource={onChooseResource}
-            resourceExternalEditors={resourceExternalEditors}
+            resourceManagementProps={resourceManagementProps}
           />
         )}
         {!state.currentProject && (
@@ -2664,10 +2678,7 @@ const MainFrame = (props: Props) => {
                         openEventsEditor: true,
                         openSceneEditor: false,
                       }),
-                    resourceSources: props.resourceSources,
-                    onChooseResource,
-                    resourceExternalEditors,
-                    onFetchNewlyAddedResources,
+                    resourceManagementProps,
                     onCreateEventsFunction,
                     openInstructionOrExpression,
                     unsavedChanges: unsavedChanges,
@@ -2774,9 +2785,7 @@ const MainFrame = (props: Props) => {
           open
           onApply={() => openPlatformSpecificAssetsDialog(false)}
           onClose={() => openPlatformSpecificAssetsDialog(false)}
-          resourceSources={resourceSources}
-          onChooseResource={onChooseResource}
-          resourceExternalEditors={resourceExternalEditors}
+          resourceManagementProps={resourceManagementProps}
         />
       )}
       {!!renderPreviewLauncher &&

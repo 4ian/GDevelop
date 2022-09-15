@@ -534,10 +534,16 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    // TODO EBO Check that no community extension set hitBoxesDirty to true
-    // directly.
-    // TODO EBO Documentation
+    /**
+     * Send a signal that the object hitboxes are no longer up to date.
+     *
+     * The signal is propagated to parents so
+     * {@link gdjs.RuntimeObject.hitBoxesDirty} should never be modified
+     * directly.
+     */
     invalidateHitboxes(): void {
+      // TODO EBO Check that no community extension set hitBoxesDirty to true
+      // directly.
       this.hitBoxesDirty = true;
       this._runtimeScene.onChildrenLocationChanged();
     }

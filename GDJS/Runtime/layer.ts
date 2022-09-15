@@ -5,7 +5,7 @@
  */
 namespace gdjs {
   /**
-   * Represents a layer of a scene, used to display objects.
+   * Represents a layer of a container, used to display objects.
    *
    * Viewports and multiple cameras are not supported.
    */
@@ -33,21 +33,19 @@ namespace gdjs {
 
     /**
      * @param layerData The data used to initialize the layer
-     * @param runtimeInstanceContainer The scene in which the layer is used
+     * @param instanceContainer The container in which the layer is used
      */
     constructor(
       layerData: LayerData,
-      runtimeInstanceContainer: gdjs.RuntimeInstanceContainer
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._name = layerData.name;
       this._hidden = !layerData.visibility;
       this._initialEffectsData = layerData.effects || [];
-      this._runtimeScene = runtimeInstanceContainer;
+      this._runtimeScene = instanceContainer;
       this._cameraX = this.getWidth() / 2;
       this._cameraY = this.getHeight() / 2;
-      this._effectsManager = runtimeInstanceContainer
-        .getGame()
-        .getEffectsManager();
+      this._effectsManager = instanceContainer.getGame().getEffectsManager();
       this._isLightingLayer = layerData.isLightingLayer;
       this._followBaseLayerCamera = layerData.followBaseLayerCamera;
       this._clearColor = [
@@ -58,8 +56,8 @@ namespace gdjs {
       ];
       this._renderer = new gdjs.LayerRenderer(
         this,
-        runtimeInstanceContainer.getRenderer(),
-        runtimeInstanceContainer.getGame().getRenderer().getPIXIRenderer()
+        instanceContainer.getRenderer(),
+        instanceContainer.getGame().getRenderer().getPIXIRenderer()
       );
       this.show(!this._hidden);
       for (let i = 0; i < layerData.effects.length; ++i) {
@@ -108,8 +106,8 @@ namespace gdjs {
     }
 
     /**
-     * Returns the scene the layer belongs to
-     * @returns the scene the layer belongs to
+     * Returns the scene the layer belongs to directly or indirectly
+     * @returns the scene the layer belongs to directly or indirectly
      */
     getRuntimeScene(): gdjs.RuntimeScene {
       return this._runtimeScene.getScene();
@@ -281,7 +279,17 @@ namespace gdjs {
       );
     }
 
-    // TODO EBO Documentation
+    /**
+     * Return an array containing the coordinates of the point passed as parameter
+     * in layer local coordinates (as opposed to the parent coordinate coordinates).
+     *
+     * All transformations (scale, rotation) are supported.
+     *
+     * @param x The X position of the point, in parent coordinates.
+     * @param y The Y position of the point, in parent coordinates.
+     * @param result Array that will be updated with the result
+     * (x and y position of the point in layer coordinates).
+     */
     applyLayerInverseTransformation(
       x: float,
       y: float,
@@ -324,7 +332,17 @@ namespace gdjs {
       return this._runtimeScene.convertInverseCoords(position[0], position[1]);
     }
 
-    // TODO EBO Documentation
+    /**
+     * Return an array containing the coordinates of the point passed as parameter
+     * in parent coordinate coordinates (as opposed to the layer local coordinates).
+     *
+     * All transformations (scale, rotation) are supported.
+     *
+     * @param x The X position of the point, in layer coordinates.
+     * @param y The Y position of the point, in layer coordinates.
+     * @param result Array that will be updated with the result
+     * (x and y position of the point in parent coordinates).
+     */
     applyLayerTransformation(
       x: float,
       y: float,
@@ -359,9 +377,13 @@ namespace gdjs {
       return this._runtimeScene.getViewportHeight();
     }
 
-    // TODO EBO Documentation
+    /**
+     * This ensure that the viewport dimensions are up to date.
+     *
+     * It's needed because custom objects dimensions are only updated on
+     * demand for efficiency reasons.
+     */
     private _forceDimensionUpdate(): void {
-      // Custom object dimension is only updated on demand.
       this.getWidth();
       this.getHeight();
     }

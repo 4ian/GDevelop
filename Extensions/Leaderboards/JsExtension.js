@@ -34,7 +34,7 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/all-features/leaderboards')
-      .setCategory('Leaderboards')
+      .setCategory('Players')
       .addInstructionOrExpressionGroupMetadata(_('Leaderboards (experimental)'))
       .setIcon('JsPlatform/Extensions/leaderboard.svg');
 

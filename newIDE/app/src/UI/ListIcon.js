@@ -54,7 +54,8 @@ function ListIcon(props: Props) {
   // the text. Add it back if necessary
   const paddingRight = iconWidth > 40 ? 16 : 0;
 
-  const isBlackSvgIcon = src.startsWith('data:image/svg+xml');
+  const isBlackSvgIcon =
+    src.startsWith('data:image/svg+xml') || src.endsWith('.svg');
   const shouldInvertGrayScale = paletteType === 'dark' && isBlackSvgIcon;
 
   let filter = undefined;

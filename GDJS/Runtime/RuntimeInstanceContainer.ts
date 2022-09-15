@@ -10,20 +10,23 @@ namespace gdjs {
   );
 
   /**
-   * A scene being played, containing instances of objects rendered on screen.
+   * A container of object instances rendered on screen.
    */
   export abstract class RuntimeInstanceContainer {
-    /** Contains the instances living on the scene */
+    /** Contains the instances living on the container */
     _instances: Hashtable<RuntimeObject[]>;
 
-    /** An array used to create a list of all instance when necessary ( see _constructListOfAllInstances ) */
+    /**
+     * An array used to create a list of all instance when necessary.
+     * @see gdjs.RuntimeInstanceContainer#_constructListOfAllInstances}
+     */
     private _allInstancesList: gdjs.RuntimeObject[] = [];
     _allInstancesListIsUpToDate = true;
 
     /** Used to recycle destroyed instance instead of creating new ones. */
     _instancesCache: Hashtable<RuntimeObject[]>;
 
-    /** The instances removed from the scene and waiting to be sent to the cache. */
+    /** The instances removed from the container and waiting to be sent to the cache. */
     _instancesRemoved: gdjs.RuntimeObject[] = [];
 
     /** Contains the objects data stored in the project */
@@ -64,12 +67,12 @@ namespace gdjs {
     abstract getDebuggerRenderer(): gdjs.DebuggerRenderer;
 
     /**
-     * Get the runtimeGame associated to this.
+     * Get the {@link gdjs.RuntimeGame} associated to this.
      */
     abstract getGame(): gdjs.RuntimeGame;
 
     /**
-     * Get the runtimeScene associated to this.
+     * Get the {@link gdjs.RuntimeScene} associated to this.
      */
     abstract getScene(): gdjs.RuntimeScene;
 
@@ -86,18 +89,26 @@ namespace gdjs {
      * Convert a point from the container coordinates (for example,
      * an object position) to the canvas coordinates.
      *
-     * @param x The x position, in container coordinates.
-     * @param y The y position, in container coordinates.
+     * @param sceneX The x position, in container coordinates.
+     * @param sceneY The y position, in container coordinates.
      */
     abstract convertInverseCoords(sceneX: float, sceneY: float): FloatPoint;
 
-    // TODO EBO Documentation
+    /**
+     * @return the width of the game resolution for a {@link gdjs.RuntimeScene} or the
+     * internal size for a {@link gdjs.CustomRuntimeObject}.
+     */
     abstract getViewportWidth(): float;
 
-    // TODO EBO Documentation
+    /**
+     * @return the height of the game resolution for a {@link gdjs.RuntimeScene} or the
+     * internal size for a {@link gdjs.CustomRuntimeObject}.
+     */
     abstract getViewportHeight(): float;
 
-    // TODO EBO Documentation
+    /**
+     * Triggered when the AABB of a child of the container could have changed.
+     */
     abstract onChildrenLocationChanged(): void;
 
     /**
@@ -120,8 +131,9 @@ namespace gdjs {
     }
 
     /**
-     * Check if an object is registered, meaning that instances of it can be created and lives in the scene.
-     * @see gdjs.RuntimeScene#registerObject
+     * Check if an object is registered, meaning that instances of it can be
+     * created and lives in the container.
+     * @see gdjs.RuntimeInstanceContainer#registerObject
      */
     isObjectRegistered(objectName: string): boolean {
       return (
@@ -132,7 +144,8 @@ namespace gdjs {
     }
 
     /**
-     * Register a {@link gdjs.RuntimeObject} so that instances of it can be used in the scene.
+     * Register a {@link gdjs.RuntimeObject} so that instances of it can be
+     * used in the container.
      * @param objectData The data for the object to register.
      */
     registerObject(objectData: ObjectData) {
@@ -150,7 +163,8 @@ namespace gdjs {
     }
 
     /**
-     * Update the data of a {@link gdjs.RuntimeObject} so that instances use this when constructed.
+     * Update the data of a {@link gdjs.RuntimeObject} so that instances use
+     * this when constructed.
      * @param objectData The data for the object to register.
      */
     updateObject(objectData: ObjectData): void {
@@ -300,9 +314,9 @@ namespace gdjs {
      * object is too far from the camera of its layer ("culling").
      */
     _updateObjectsPreRender() {
-      this._constructListOfAllInstances();
-      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-        const object = this._allInstancesList[i];
+      const allInstancesList = this.getAdhocListOfAllInstances();
+      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+        const object = allInstancesList[i];
         const rendererObject = object.getRendererObject();
         if (rendererObject) {
           rendererObject.visible = !object.isHidden();
@@ -322,11 +336,14 @@ namespace gdjs {
     }
 
     /**
-     * Empty the list of the removed objects:<br>
-     * When an object is removed from the scene, it is still kept in the _instancesRemoved member
-     * of the RuntimeScene.<br>
+     * Empty the list of the removed objects:
+     *
+     * When an object is removed from the container, it is still kept in
+     * {@link gdjs.RuntimeInstanceContainer#_instancesRemoved}.
+     *
      * This method should be called regularly (after events or behaviors steps) so as to clear this list
-     * and allows the removed objects to be cached (or destroyed if the cache is full).<br>
+     * and allows the removed objects to be cached (or destroyed if the cache is full).
+     *
      * The removed objects could not be sent directly to the cache, as events may still be using them after
      * removing them from the scene for example.
      */
@@ -380,12 +397,12 @@ namespace gdjs {
     }
 
     /**
-     * Get a list of all gdjs.RuntimeObject living on the scene.
+     * Get a list of all {@link gdjs.RuntimeObject} living in the container.
      * You should not, normally, need this method at all. It's only to be used
      * in exceptional use cases where you need to loop through all objects,
      * and it won't be performant.
      *
-     * @returns The list of all runtime objects on the scnee
+     * @returns The list of all runtime objects in the container
      */
     getAdhocListOfAllInstances(): gdjs.RuntimeObject[] {
       if (!this._allInstancesListIsUpToDate) {
@@ -398,11 +415,11 @@ namespace gdjs {
      * Update the objects before launching the events.
      */
     _updateObjectsPreEvents() {
-      //It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
-      //may delete the objects.
-      this._constructListOfAllInstances();
-      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-        const obj = this._allInstancesList[i];
+      // It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
+      // may delete the objects.
+      const allInstancesList = this.getAdhocListOfAllInstances();
+      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+        const obj = allInstancesList[i];
         const elapsedTime = obj.getElapsedTime();
         if (!obj.hasNoForces()) {
           const averageForce = obj.getAverageForce();
@@ -415,10 +432,10 @@ namespace gdjs {
           obj.update(this);
         }
         obj.updateTimers(elapsedTime);
-        this._allInstancesList[i].stepBehaviorsPreEvents(this);
+        allInstancesList[i].stepBehaviorsPreEvents(this);
       }
 
-      //Some behaviors may have request objects to be deleted.
+      // Some behaviors may have request objects to be deleted.
       this._cacheOrClearRemovedInstances();
     }
 
@@ -428,19 +445,19 @@ namespace gdjs {
     _updateObjectsPostEvents() {
       this._cacheOrClearRemovedInstances();
 
-      //It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
-      //may delete the objects.
-      this._constructListOfAllInstances();
-      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-        this._allInstancesList[i].stepBehaviorsPostEvents(this);
+      // It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
+      // may delete the objects.
+      const allInstancesList = this.getAdhocListOfAllInstances();
+      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+        allInstancesList[i].stepBehaviorsPostEvents(this);
       }
 
-      //Some behaviors may have request objects to be deleted.
+      // Some behaviors may have request objects to be deleted.
       this._cacheOrClearRemovedInstances();
     }
 
     /**
-     * Add an object to the instances living on the scene.
+     * Add an object to the instances living in the container.
      * @param obj The object to be added.
      */
     addObject(obj: gdjs.RuntimeObject) {
@@ -470,7 +487,7 @@ namespace gdjs {
 
     /**
      * Create a new object from its name. The object is also added to the instances
-     * living on the scene ( No need to call RuntimeScene.addObject )
+     * living in the container (No need to call {@link gdjs.RuntimeScene.addObject})
      * @param objectName The name of the object to be created
      * @return The created object
      */
@@ -479,10 +496,9 @@ namespace gdjs {
         !this._objectsCtor.containsKey(objectName) ||
         !this._objects.containsKey(objectName)
       ) {
+        // There is no such object in this container.
         return null;
       }
-
-      //There is no such object in this scene.
 
       // Create a new object using the object constructor (cached during loading)
       // and the stored object's data:
@@ -502,17 +518,17 @@ namespace gdjs {
     }
 
     /**
-     * Must be called whenever an object must be removed from the scene.
+     * Must be called whenever an object must be removed from the container.
      * @param obj The object to be removed.
      */
     markObjectForDeletion(obj: gdjs.RuntimeObject) {
-      //Add to the objects removed list.
-      //The objects will be sent to the instances cache or really deleted from memory later.
+      // Add to the objects removed list.
+      // The objects will be sent to the instances cache or really deleted from memory later.
       if (this._instancesRemoved.indexOf(obj) === -1) {
         this._instancesRemoved.push(obj);
       }
 
-      //Delete from the living instances.
+      // Delete from the living instances.
       if (this._instances.containsKey(obj.getName())) {
         const objId = obj.id;
         const allInstances = this._instances.get(obj.getName());
@@ -525,13 +541,11 @@ namespace gdjs {
         }
       }
 
-      //Notify the object it was removed from the scene
+      // Notify the object it was removed from the container
       obj.onDestroyFromScene(this);
 
       // Notify the global callbacks
       for (let j = 0; j < gdjs.callbacksObjectDeletedFromScene.length; ++j) {
-        // TODO EBO Check if the instances container should be pass instead of
-        // the scene.
         gdjs.callbacksObjectDeletedFromScene[j](this, obj);
       }
       return;
@@ -604,7 +618,7 @@ namespace gdjs {
     }
 
     /**
-     * Return the number of instances of the specified object living on the scene.
+     * Return the number of instances of the specified object living in the container.
      * @param objectName The object name for which instances must be counted.
      */
     getInstancesCountOnScene(objectName: string): integer {
@@ -636,10 +650,14 @@ namespace gdjs {
         }
       }
     }
-    // TODO EBO Documentation
+
+    /**
+     * Clear any data structures to make sure memory is freed as soon as
+     * possible.
+     */
     _destroy() {
       // It should not be necessary to reset these variables, but this help
-      // ensuring that all memory related to the RuntimeScene is released immediately.
+      // ensuring that all memory related to the container is released immediately.
       this._layers = new Hashtable();
       this._objects = new Hashtable();
       this._instances = new Hashtable();

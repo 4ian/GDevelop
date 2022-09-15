@@ -1,6 +1,6 @@
 /*
  * GDevelop JS Platform
- * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2013-2022 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
 namespace gdjs {
@@ -8,18 +8,25 @@ namespace gdjs {
   const setupWarningLogger = new gdjs.Logger('RuntimeScene (setup warnings)');
 
   /**
-   * A scene being played, containing instances of objects rendered on screen.
+   * The instance container of a custom object, containing instances of objects rendered on screen.
+   *
+   * @see gdjs.CustomRuntimeObject
    */
   export class CustomRuntimeObjectInstanceContainer extends gdjs.RuntimeInstanceContainer {
     _renderer: gdjs.CustomObjectRenderer;
     _debuggerRenderer: gdjs.DebuggerRenderer;
     _runtimeScene: gdjs.RuntimeScene;
+    /** The parent container that contains the object associated with this container. */
     _parent: gdjs.RuntimeInstanceContainer;
+    /** The object that is built with the instances of this container. */
     _customObject: gdjs.CustomRuntimeObject;
     _isLoaded: boolean = false;
 
     /**
-     * @param runtimeGame The game associated to this scene.
+     * @param parent the parent container that contains the object associated
+     * with this container.
+     * @param customObject the object that is built with the instances of this
+     * container.
      */
     constructor(
       parent: gdjs.RuntimeInstanceContainer,
@@ -44,8 +51,8 @@ namespace gdjs {
     }
 
     /**
-     * Load the runtime scene from the given scene.
-     * @param customObjectData An object containing the scene data.
+     * Load the container from the given scene.
+     * @param customObjectData An object containing the container data.
      * @see gdjs.RuntimeGame#getSceneData
      */
     loadFrom(customObjectData: ObjectData & CustomObjectConfiguration) {
@@ -105,6 +112,12 @@ namespace gdjs {
       this._isLoaded = true;
     }
 
+    /**
+     * Called when the associated object is destroyed (because it is removed
+     * from its parent container or the scene is being unloaded).
+     *
+     * @param instanceContainer The container owning the object.
+     */
     onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (!this._isLoaded) {
         return;
@@ -211,8 +224,6 @@ namespace gdjs {
      * Update the objects before launching the events.
      */
     _updateObjectsPreEvents() {
-      //It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
-      //may delete the objects.
       const allInstancesList = this.getAdhocListOfAllInstances();
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const obj = allInstancesList[i];
@@ -231,7 +242,7 @@ namespace gdjs {
         obj.stepBehaviorsPreEvents(this);
       }
 
-      //Some behaviors may have request objects to be deleted.
+      // Some behaviors may have request objects to be deleted.
       this._cacheOrClearRemovedInstances();
     }
 
@@ -241,14 +252,12 @@ namespace gdjs {
     _updateObjectsPostEvents() {
       this._cacheOrClearRemovedInstances();
 
-      //It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
-      //may delete the objects.
       const allInstancesList = this.getAdhocListOfAllInstances();
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         allInstancesList[i].stepBehaviorsPostEvents(this);
       }
 
-      //Some behaviors may have request objects to be deleted.
+      // Some behaviors may have request objects to be deleted.
       this._cacheOrClearRemovedInstances();
     }
 
@@ -283,6 +292,11 @@ namespace gdjs {
       this._customObject.onChildrenLocationChanged();
     }
 
+    /**
+     * Triggered when the object dimensions are changed.
+     *
+     * It adapts the layers camera positions.
+     */
     onObjectUnscaledDimensionChange(oldWidth: float, oldHeight: float): void {
       for (const name in this._layers.items) {
         if (this._layers.items.hasOwnProperty(name)) {

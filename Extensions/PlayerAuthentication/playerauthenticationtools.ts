@@ -9,7 +9,6 @@ namespace gdjs {
     let _userToken: string | null = null;
     let _justLoggedIn = false;
 
-    let _error: any = null;
     let _checkedLocalStorage: boolean = false;
 
     // Authentication display
@@ -21,12 +20,18 @@ namespace gdjs {
     let _authenticationLoader: HTMLDivElement | null = null;
     let _authenticationBanner: HTMLDivElement | null = null;
     let _authenticationTimeoutId: NodeJS.Timeout | null = null;
-    let _authenticationMessageCallback:
-      | ((event: MessageEvent) => void)
-      | null = null;
+    let _authenticationMessageCallback: ((event: MessageEvent) => void) | null =
+      null;
     let _cordovaAuthenticationMessageCallback:
       | ((event: MessageEvent) => void)
       | null = null;
+
+    // Ensure that the condition "just logged in" is valid only for one frame.
+    gdjs.registerRuntimeScenePostEventsCallback(() => {
+      if (_justLoggedIn) {
+        _justLoggedIn = false;
+      }
+    });
 
     /**
      * Returns true if a user token is present in the local storage.
@@ -42,13 +47,7 @@ namespace gdjs {
      * Returns true if the user just logged in.
      * Useful to update username or trigger messages in the game.
      */
-    export const hasLoggedIn = () => {
-      if (_justLoggedIn) {
-        _justLoggedIn = false;
-        return true;
-      }
-      return false;
-    };
+    export const hasLoggedIn = () => _justLoggedIn;
 
     /**
      * Returns the username from the local storage.
@@ -96,10 +95,8 @@ namespace gdjs {
     /**
      * Retrieves the user information from the local storage, and store
      * them in the extension variables.
-     * Returns if the fetched user is different than the current one used
-     * in the variables. (useful when the user changes)
      */
-    const readAuthenticatedUserFromLocalStorage = (): boolean => {
+    const readAuthenticatedUserFromLocalStorage = () => {
       const _gameId = gdjs.projectData.properties.projectUuid;
 
       const authenticatedUserStorageItem = window.localStorage.getItem(
@@ -107,17 +104,14 @@ namespace gdjs {
       );
       if (!authenticatedUserStorageItem) {
         _checkedLocalStorage = true;
-        return _userId === null;
+        return;
       }
       const authenticatedUser = JSON.parse(authenticatedUserStorageItem);
-      const hasUserChanged = authenticatedUser.userId !== _userId;
 
       _username = authenticatedUser.username;
       _userId = authenticatedUser.userId;
       _userToken = authenticatedUser.userToken;
       _checkedLocalStorage = true;
-
-      return hasUserChanged;
     };
 
     /**
@@ -201,7 +195,6 @@ namespace gdjs {
       message: string
     ) {
       logger.error(message);
-      _error = message;
       clearAuthenticationWindowTimeout();
       removeAuthenticationContainer(runtimeScene);
       removeAuthenticationBanner(runtimeScene);
@@ -440,7 +433,7 @@ namespace gdjs {
         'authenticated-notification',
         `<img style="margin-right:4px" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOSIgaGVpZ2h0PSI5IiB2aWV3Qm94PSIwIDAgOSA5IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNNC4xNjY2NyAwQzEuODY2NjcgMCAwIDEuODY2NjcgMCA0LjE2NjY3QzAgNi40NjY2NyAxLjg2NjY3IDguMzMzMzMgNC4xNjY2NyA4LjMzMzMzQzYuNDY2NjcgOC4zMzMzMyA4LjMzMzMzIDYuNDY2NjcgOC4zMzMzMyA0LjE2NjY3QzguMzMzMzMgMS44NjY2NyA2LjQ2NjY3IDAgNC4xNjY2NyAwWk0zLjMzMzMzIDYuMjVMMS4yNSA0LjE2NjY3TDEuODM3NSAzLjU3OTE3TDMuMzMzMzMgNS4wNzA4M0w2LjQ5NTgzIDEuOTA4MzNMNy4wODMzMyAyLjVMMy4zMzMzMyA2LjI1WiIgZmlsbD0iIzAwQ0M4MyIvPgo8L3N2Zz4K" />
           Logged as ${username}`,
-        'error'
+        'success'
       );
     };
 
@@ -602,9 +595,8 @@ namespace gdjs {
         );
         return;
       }
-      const authenticationContainer = computeAuthenticationContainer(
-        runtimeScene
-      );
+      const authenticationContainer =
+        computeAuthenticationContainer(runtimeScene);
       domElementContainer.appendChild(authenticationContainer);
 
       // Based on which platform the game is running, we open the authentication window
@@ -653,6 +645,13 @@ namespace gdjs {
           windowFeatures
         );
       }
+    };
+
+    /**
+     * Condition to check if the window is open, so that the game can be paused in the background.
+     */
+    export const isAuthenticationWindowOpen = function (): boolean {
+      return !!_authenticationRootContainer;
     };
 
     /**

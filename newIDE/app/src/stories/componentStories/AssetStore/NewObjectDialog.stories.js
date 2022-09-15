@@ -24,13 +24,11 @@ export const Default = () => (
       onCreateNewObject={action('onCreateNewObject')}
       onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
       objectsContainer={testProject.testLayout}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
+      resourceManagementProps={{
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
       }}
-      resourceSources={[]}
-      onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
     />
   </AssetStoreStateProvider>
 );

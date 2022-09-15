@@ -4,6 +4,8 @@ import { type I18n as I18nType } from '@lingui/core';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { t } from '@lingui/macro';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
+import { type ResourceExternalEditor } from './ResourceExternalEditor.flow';
+import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 
 const gd: libGDevelop = global.gd;
 
@@ -95,3 +97,10 @@ export type ResourceSource = {
 export type ChooseResourceFunction = (
   options: ChooseResourceOptions
 ) => Promise<Array<gdResource>>;
+
+export type ResourceManagementProps = {|
+  resourceSources: Array<ResourceSource>,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
+  onChooseResource: ChooseResourceFunction,
+  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
+|};

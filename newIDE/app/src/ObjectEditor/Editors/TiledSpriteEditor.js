@@ -16,9 +16,7 @@ export default class TiledSpriteEditor extends React.Component<
     const {
       objectConfiguration,
       project,
-      resourceSources,
-      onChooseResource,
-      resourceExternalEditors,
+      resourceManagementProps,
     } = this.props;
     const tiledSpriteConfiguration = gd.asTiledSpriteConfiguration(
       objectConfiguration
@@ -28,11 +26,9 @@ export default class TiledSpriteEditor extends React.Component<
       <ColumnStackLayout>
         <ResourceSelectorWithThumbnail
           project={project}
-          resourceSources={resourceSources}
-          onChooseResource={onChooseResource}
+          resourceManagementProps={resourceManagementProps}
           resourceKind="image"
           resourceName={tiledSpriteConfiguration.getTexture()}
-          resourceExternalEditors={resourceExternalEditors}
           onChange={resourceName => {
             tiledSpriteConfiguration.setTexture(resourceName);
             this.forceUpdate();

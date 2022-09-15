@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import Background from '../../UI/Background';
@@ -12,7 +13,7 @@ import { type Schema } from '../../PropertiesEditor';
 
 import {
   type ResourceSource,
-  type ChooseResourceFunction,
+  type ResourceManagementProps,
 } from '../../ResourcesList/ResourceSource';
 
 const styles = {
@@ -29,8 +30,7 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   resources: Array<gdResource>,
   onResourcePathUpdated: () => void,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
+  resourceManagementProps: ResourceManagementProps,
 |};
 
 export default class ResourcePropertiesEditor extends React.Component<
@@ -52,7 +52,13 @@ export default class ResourcePropertiesEditor extends React.Component<
       getValue: (resource: gdResource) => resource.getFile(),
       setValue: (resource: gdResource, newValue: string) =>
         resource.setFile(newValue),
-      onEditButtonClick: () => this._chooseResourcePath(),
+      onEditButtonBuildMenuTemplate: (i18n: I18nType) =>
+        this.props.resourceSources
+          .filter(source => source.kind === this.props.resources[0].getKind())
+          .map(source => ({
+            label: i18n._(source.displayName),
+            click: () => this._chooseResourcePath(source),
+          })),
     },
   ];
 
@@ -68,35 +74,30 @@ export default class ResourcePropertiesEditor extends React.Component<
     );
   }
 
-  _chooseResourcePath = () => {
+  _chooseResourcePath = async (resourceSource: ResourceSource) => {
     const {
       resources,
       onResourcePathUpdated,
-      onChooseResource,
-      resourceSources,
+      resourceManagementProps,
     } = this.props;
     const resource = resources[0];
-    const sources = resourceSources.filter(
-      source => source.kind === resource.getKind()
-    );
-    if (!sources.length) return;
-    onChooseResource({
-      // Should be updated once new sources are introduced in the desktop app.
-      // Search for "sources[0]" in the codebase for other places like this.
-      initialSourceName: sources[0].name,
-      multiSelection: true,
+
+    const newResources = await resourceManagementProps.onChooseResource({
+      initialSourceName: resourceSource.name,
+      multiSelection: false,
       resourceKind: resource.getKind(),
-    }).then(resources => {
-      if (!resources.length) return; // No path was chosen by the user.
-      resource.setFile(resources[0].getFile());
-
-      // Important, we are responsible for deleting the resources that were given to us.
-      // Otherwise we have a memory leak.
-      resources.forEach(resource => resource.delete());
-
-      onResourcePathUpdated();
-      this.forceUpdate();
     });
+    if (!newResources.length) return; // No path was chosen by the user.
+    resource.setFile(newResources[0].getFile());
+
+    // Important, we are responsible for deleting the resources that were given to us.
+    // Otherwise we have a memory leak.
+    newResources.forEach(resource => resource.delete());
+
+    onResourcePathUpdated();
+    this.forceUpdate();
+
+    await resourceManagementProps.onFetchNewlyAddedResources();
   };
 
   _renderResourcesProperties() {

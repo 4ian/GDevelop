@@ -11,7 +11,7 @@ import Add from '@material-ui/icons/Add';
 import Brush from '@material-ui/icons/Brush';
 import {
   type ResourceSource,
-  type ChooseResourceFunction,
+  type ResourceManagementProps,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
@@ -24,9 +24,7 @@ import IconButton from '../UI/IconButton';
 
 type Props = {|
   project: gdProject,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   resourcesLoader: typeof ResourcesLoader,
   resourceKind: ResourceKind,
   fullWidth?: boolean,
@@ -80,7 +78,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
   }
 
   _getResourceSourceItems(): DataSource {
-    const sources = this.props.resourceSources || [];
+    const sources = this.props.resourceManagementProps.resourceSources || [];
     return [
       ...sources
         .filter(source => source.kind === this.props.resourceKind)
@@ -115,42 +113,44 @@ export default class ResourceSelector extends React.Component<Props, State> {
     this.autoCompleteData = [...resourceSourceItems, ...resourceItems];
   }
 
-  _addFrom = (source: ResourceSource) => {
-    if (!source) return;
+  _addFrom = async (source: ResourceSource) => {
+    try {
+      if (!source) return;
 
-    const { project, onChooseResource } = this.props;
-    onChooseResource({
-      initialSourceName: source.name,
-      multiSelection: false,
-      resourceKind: this.props.resourceKind,
-    })
-      .then(resources => {
-        if (!resources.length) return;
-        const resource = resources[0];
-        applyResourceDefaults(project, resource);
-
-        // addResource will check if a resource with the same name exists, and if it is
-        // the case, no new resource will be added.
-        project.getResourcesManager().addResource(resource);
-
-        this._loadFrom(project.getResourcesManager());
-        const resourceName: string = resource.getName();
-        this._onChangeResourceName(resourceName);
-
-        // Imperatively set the value of the autocomplete, as it can be (on Windows for example),
-        // still focused. This means that when it's then getting blurred, the value we
-        // set for the resource name would get erased by the one that was getting entered.
-        if (this._autoComplete)
-          this._autoComplete.forceInputValueTo(resourceName);
-
-        // Important, we are responsible for deleting the resources that were given to us.
-        // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-        resources.forEach(resource => resource.delete());
-      })
-      .catch(err => {
-        // Should never happen, errors should be shown in the interface.
-        console.error('Unable to choose a resource', err);
+      const { project, resourceManagementProps } = this.props;
+      const resources = await resourceManagementProps.onChooseResource({
+        initialSourceName: source.name,
+        multiSelection: false,
+        resourceKind: this.props.resourceKind,
       });
+
+      if (!resources.length) return;
+      const resource = resources[0];
+      applyResourceDefaults(project, resource);
+
+      // addResource will check if a resource with the same name exists, and if it is
+      // the case, no new resource will be added.
+      project.getResourcesManager().addResource(resource);
+
+      this._loadFrom(project.getResourcesManager());
+      const resourceName: string = resource.getName();
+      this._onChangeResourceName(resourceName);
+
+      // Imperatively set the value of the autocomplete, as it can be (on Windows for example),
+      // still focused. This means that when it's then getting blurred, the value we
+      // set for the resource name would get erased by the one that was getting entered.
+      if (this._autoComplete)
+        this._autoComplete.forceInputValueTo(resourceName);
+
+      // Important, we are responsible for deleting the resources that were given to us.
+      // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+      resources.forEach(resource => resource.delete());
+
+      await resourceManagementProps.onFetchNewlyAddedResources();
+    } catch (err) {
+      // Should never happen, errors should be shown in the interface.
+      console.error('Unable to choose a resource', err);
+    }
   };
 
   _onResetResourceName = () => {
@@ -263,7 +263,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
       ? 'This resource does not exist in the game'
       : null;
 
-    const externalEditors = this.props.resourceExternalEditors.filter(
+    const externalEditors = this.props.resourceManagementProps.resourceExternalEditors.filter(
       externalEditor => externalEditor.kind === this.props.resourceKind
     );
     return (

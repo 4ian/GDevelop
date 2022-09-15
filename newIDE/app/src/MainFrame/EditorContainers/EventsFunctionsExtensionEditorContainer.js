@@ -133,9 +133,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           project={project}
           eventsFunctionsExtension={eventsFunctionsExtension}
           setToolbar={this.props.setToolbar}
-          resourceSources={this.props.resourceSources}
-          onChooseResource={this.props.onChooseResource}
-          resourceExternalEditors={this.props.resourceExternalEditors}
+          resourceManagementProps={this.props.resourceManagementProps}
           onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
           openInstructionOrExpression={this.props.openInstructionOrExpression}
           onCreateEventsFunction={this.props.onCreateEventsFunction}

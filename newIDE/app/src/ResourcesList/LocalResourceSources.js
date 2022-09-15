@@ -1,8 +1,9 @@
 // @flow
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import {
   type ChooseResourceOptions,
+  type ChooseResourceProps,
   type ResourceSourceComponentProps,
   type ResourceSource,
   allResourceKindsAndMetadata,
@@ -11,6 +12,8 @@ import { ResourceStore } from '../AssetStore/ResourceStore';
 import { isPathInProjectFolder, copyAllToProjectFolder } from './ResourceUtils';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
+import { Line } from '../UI/Grid';
+import RaisedButton from '../UI/RaisedButton';
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
 const path = optionalRequire('path');
@@ -58,18 +61,14 @@ const localResourceSources: Array<ResourceSource> = [
     ),
   })),
   ...allResourceKindsAndMetadata.map(
-    ({ kind, displayName, fileExtensions, createNewResource }) => ({
-      name: 'local-file-opener-' + kind,
-      displayName: t`Choose a file`,
-      displayTab: 'import',
-      kind,
-      selectResourcesHeadless: async ({
+    ({ kind, displayName, fileExtensions, createNewResource }) => {
+      const selectLocalFileResources = async ({
         i18n,
         getLastUsedPath,
         setLastUsedPath,
         project,
         options,
-      }) => {
+      }: ChooseResourceProps) => {
         if (!dialog)
           throw new Error('Electron dialog not supported in this environment.');
 
@@ -117,9 +116,43 @@ const localResourceSources: Array<ResourceSource> = [
 
           return newResource;
         });
-      },
-      renderComponent: () => null,
-    })
+      };
+
+      return {
+        name: 'local-file-opener-' + kind,
+        displayName: t`Choose a file`,
+        displayTab: 'import',
+        kind,
+        selectResourcesHeadless: selectLocalFileResources,
+        renderComponent: (props: ResourceSourceComponentProps) => (
+          <Line justifyContent="center">
+            <RaisedButton
+              primary
+              label={
+                props.options.multiSelection ? (
+                  <Trans>Choose one or more files</Trans>
+                ) : (
+                  <Trans>Choose a file</Trans>
+                )
+              }
+              onClick={async () => {
+                const resources = await selectLocalFileResources({
+                  i18n: props.i18n,
+                  project: props.project,
+                  fileMetadata: props.fileMetadata,
+                  getStorageProvider: props.getStorageProvider,
+                  getLastUsedPath: props.getLastUsedPath,
+                  setLastUsedPath: props.setLastUsedPath,
+                  options: props.options,
+                });
+
+                props.onChooseResources(resources);
+              }}
+            />
+          </Line>
+        ),
+      };
+    }
   ),
 ];
 

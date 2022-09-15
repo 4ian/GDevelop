@@ -17,14 +17,9 @@ export default class BitmapFontResourceField extends Component<
   }
 
   render() {
-    if (
-      !this.props.resourceSources ||
-      !this.props.onChooseResource ||
-      !this.props.resourceExternalEditors ||
-      !this.props.project
-    ) {
+    if (!this.props.resourceManagementProps || !this.props.project) {
       console.error(
-        'Missing project, resourceSources, onChooseResource or resourceExternalEditors for FontResourceField'
+        'Missing project or resourceManagementProps for FontResourceField'
       );
       return null;
     }
@@ -33,9 +28,7 @@ export default class BitmapFontResourceField extends Component<
       <ResourceSelector
         margin={this.props.isInline ? 'none' : 'dense'}
         project={this.props.project}
-        resourceSources={this.props.resourceSources}
-        onChooseResource={this.props.onChooseResource}
-        resourceExternalEditors={this.props.resourceExternalEditors}
+        resourceManagementProps={this.props.resourceManagementProps}
         resourcesLoader={ResourcesLoader}
         resourceKind="font"
         fullWidth

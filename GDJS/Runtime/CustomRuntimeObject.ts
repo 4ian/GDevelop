@@ -1,6 +1,6 @@
 /*
  * GDevelop JS Platform
- * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2013-2022 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
 namespace gdjs {
@@ -13,24 +13,31 @@ namespace gdjs {
   };
 
   /**
-   * The SpriteRuntimeObject represents an object that can display images.
+   * An object that contains other object.
    *
-   * @param runtimeScene The scene the object belongs to
-   * @param spriteObjectData The object data used to initialize the object
+   * This is the base class for objects generated from EventsBasedObject.
+   * 
+   * @see gdjs.CustomRuntimeObjectInstanceContainer
    */
   export class CustomRuntimeObject extends gdjs.RuntimeObject {
+    /** It contains the children of this object. */
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _isUntransformedHitBoxesDirty: boolean = true;
+    /** It contains shallow copies of the children hitboxes */
     _untransformedHitBoxes: gdjs.Polygon[] = [];
+    /** The dimension of this object is calculated from it's children AABB. */
     _unrotatedAABB: AABB = { min: [0, 0], max: [0, 0] };
     _scaleX: number = 1;
     _scaleY: number = 1;
-    _blendMode: number = 0;
     _flippedX: boolean = false;
     _flippedY: boolean = false;
     opacity: float = 255;
     _objectData: ObjectData & CustomObjectConfiguration;
 
+    /**
+     * @param parent The container the object belongs to
+     * @param objectData The object data used to initialize the object
+     */
     constructor(
       parent: gdjs.RuntimeInstanceContainer,
       objectData: ObjectData & CustomObjectConfiguration
@@ -71,10 +78,6 @@ namespace gdjs {
       return false;
     }
 
-    /**
-     * Initialize the extra parameters that could be set for an instance.
-     * @param initialInstanceData The extra parameters
-     */
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
       if (initialInstanceData.customSize) {
         this.setWidth(initialInstanceData.width);
@@ -91,7 +94,6 @@ namespace gdjs {
     update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._instanceContainer._updateObjectsPreEvents();
 
-      // TODO EBO This is only to handle trigger once.
       this.doStepPreEvents(instanceContainer);
 
       const profiler = this.getRuntimeScene().getProfiler();
@@ -107,9 +109,19 @@ namespace gdjs {
       this._instanceContainer._updateObjectsPostEvents();
     }
 
-    // Life-cycle methods implemented by generated subclasses.
+    // TODO EBO This is only to handle trigger once.
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+
+    /**
+     * This method is called each tick after events are done.
+     * @param instanceContainer The instanceContainer owning the object
+     */
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+    
+    /**
+     * This method is called when the object is being removed from its parent
+     * container and is about to be destroyed/reused later.
+     */
     onDestroy(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
@@ -130,11 +142,6 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    /**
-     * Update the hit boxes for the object.
-     * Fallback to the default implementation (rotated bounding box) if there is no custom
-     * hitboxes defined for the current animation frame.
-     */
     updateHitBoxes(): void {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
@@ -165,7 +172,6 @@ namespace gdjs {
         ].vertices.length;
       }
     }
-    //Rotate and scale and flipping have already been applied to the point by _transformToGlobal.
 
     /**
      * Merge the hitboxes of the children.
@@ -211,6 +217,7 @@ namespace gdjs {
         this.getUnscaledWidth() !== oldUnscaledWidth ||
         this.getUnscaledHeight() !== oldUnscaledHeight
       ) {
+        // TODO EBO Should this be called for any change of the AABB?
         this._instanceContainer.onObjectUnscaledDimensionChange(
           oldUnscaledWidth,
           oldUnscaledHeight
@@ -218,23 +225,23 @@ namespace gdjs {
       }
     }
 
-    //Position :
+    // Position:
     /**
      * Return an array containing the coordinates of the point passed as parameter
-     * in world coordinates (as opposed to the object local coordinates).
+     * in parent coordinate coordinates (as opposed to the object local coordinates).
      *
      * All transformations (flipping, scale, rotation) are supported.
      *
      * @param x The X position of the point, in object coordinates.
      * @param y The Y position of the point, in object coordinates.
      * @param result Array that will be updated with the result
-     * (x and y position of the point in global coordinates).
+     * (x and y position of the point in parent coordinates).
      */
     applyObjectTransformation(x: float, y: float, result: number[]) {
       let cx = this.getCenterX();
       let cy = this.getCenterY();
 
-      //Flipping
+      // Flipping
       if (this._flippedX) {
         x = x + (cx - x) * 2;
       }
@@ -242,7 +249,7 @@ namespace gdjs {
         y = y + (cy - y) * 2;
       }
 
-      //Scale
+      // Scale
       const absScaleX = Math.abs(this._scaleX);
       const absScaleY = Math.abs(this._scaleY);
       x *= absScaleX;
@@ -250,7 +257,7 @@ namespace gdjs {
       cx *= absScaleX;
       cy *= absScaleY;
 
-      //Rotation
+      // Rotation
       const oldX = x;
       const angleInRadians = (this.angle / 180) * Math.PI;
       const cosValue = Math.cos(angleInRadians);
@@ -264,7 +271,17 @@ namespace gdjs {
       result[1] = y + this.y;
     }
 
-    // TODO EBO Documentation
+    /**
+     * Return an array containing the coordinates of the point passed as parameter
+     * in object local coordinates (as opposed to the parent coordinate coordinates).
+     *
+     * All transformations (flipping, scale, rotation) are supported.
+     *
+     * @param x The X position of the point, in parent coordinates.
+     * @param y The Y position of the point, in parent coordinates.
+     * @param result Array that will be updated with the result
+     * (x and y position of the point in object coordinates).
+     */
     applyObjectInverseTransformation(x: float, y: float, result: number[]) {
       x -= this.getCenterXInScene();
       y -= this.getCenterYInScene();
@@ -272,7 +289,7 @@ namespace gdjs {
       const absScaleX = Math.abs(this._scaleX);
       const absScaleY = Math.abs(this._scaleY);
 
-      //Rotation
+      // Rotation
       const angleInRadians = (this.angle / 180) * Math.PI;
       const cosValue = Math.cos(-angleInRadians);
       const sinValue = Math.sin(-angleInRadians);
@@ -280,11 +297,11 @@ namespace gdjs {
       x = cosValue * x - sinValue * y;
       y = sinValue * oldX + cosValue * y;
 
-      //Scale
+      // Scale
       x /= absScaleX;
       y /= absScaleY;
 
-      //Flipping
+      // Flipping
       if (this._flippedX) {
         x = -x;
       }
@@ -314,6 +331,9 @@ namespace gdjs {
       return this.y + this._unrotatedAABB.min[1] * this._scaleY;
     }
 
+    /**
+     * @return the internal width of the object according to its children.
+     */
     getUnscaledWidth(): float {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
@@ -324,6 +344,9 @@ namespace gdjs {
       );
     }
 
+    /**
+     * @return the internal height of the object according to its children.
+     */
     getUnscaledHeight(): float {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
@@ -453,7 +476,7 @@ namespace gdjs {
     }
 
     /**
-     * Change the scale on Y axis of the object (changing its width).
+     * Change the scale on Y axis of the object (changing its height).
      *
      * @param newScale The new scale (must be greater than 0).
      */
@@ -470,9 +493,11 @@ namespace gdjs {
     }
 
     /**
-     * Get the scale of the object (or the average of the X and Y scale in case they are different).
+     * Get the scale of the object (or the average of the X and Y scale in case
+     * they are different).
      *
-     * @return the scale of the object (or the average of the X and Y scale in case they are different).
+     * @return the scale of the object (or the average of the X and Y scale in
+     * case they are different).
      */
     getScale(): number {
       return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
@@ -496,7 +521,7 @@ namespace gdjs {
       return Math.abs(this._scaleX);
     }
 
-    //Visibility and display :
+    // Visibility and display :
     /**
      * Change the transparency of the object.
      * @param opacity The new opacity, between 0 (transparent) and 255 (opaque).
@@ -558,7 +583,7 @@ namespace gdjs {
       return this._flippedY;
     }
 
-    //Other :
+    // Other :
     /**
      * @param obj The target object
      * @param scene The scene containing the object
@@ -577,6 +602,6 @@ namespace gdjs {
     }
   }
 
-  //Others initialization and internal state management :
+  // Others initialization and internal state management :
   CustomRuntimeObject.supportsReinitialization = true;
 }

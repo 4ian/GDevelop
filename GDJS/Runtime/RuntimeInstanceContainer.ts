@@ -91,13 +91,21 @@ namespace gdjs {
      */
     abstract convertInverseCoords(sceneX: float, sceneY: float): FloatPoint;
 
-    // TODO EBO Documentation
+    /**
+     * @return the width of the game resolution for a RuntimeScene or the
+     * internal size for a CustomRuntimeObject.
+     */
     abstract getViewportWidth(): float;
 
-    // TODO EBO Documentation
+    /**
+     * @return the height of the game resolution for a RuntimeScene or the
+     * internal size for a CustomRuntimeObject.
+     */
     abstract getViewportHeight(): float;
 
-    // TODO EBO Documentation
+    /**
+     * Triggered when the AABB of a child of the container could have changed.
+     */
     abstract onChildrenLocationChanged(): void;
 
     /**
@@ -300,9 +308,9 @@ namespace gdjs {
      * object is too far from the camera of its layer ("culling").
      */
     _updateObjectsPreRender() {
-      this._constructListOfAllInstances();
-      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-        const object = this._allInstancesList[i];
+      const allInstancesList = this.getAdhocListOfAllInstances();
+      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+        const object = allInstancesList[i];
         const rendererObject = object.getRendererObject();
         if (rendererObject) {
           rendererObject.visible = !object.isHidden();
@@ -375,7 +383,7 @@ namespace gdjs {
      * in exceptional use cases where you need to loop through all objects,
      * and it won't be performant.
      *
-     * @returns The list of all runtime objects on the scnee
+     * @returns The list of all runtime objects in the container
      */
     getAdhocListOfAllInstances(): gdjs.RuntimeObject[] {
       if (!this._allInstancesListIsUpToDate) {
@@ -390,9 +398,9 @@ namespace gdjs {
     _updateObjectsPreEvents() {
       //It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
       //may delete the objects.
-      this._constructListOfAllInstances();
-      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-        const obj = this._allInstancesList[i];
+      const allInstancesList = this.getAdhocListOfAllInstances();
+      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+        const obj = allInstancesList[i];
         const elapsedTime = obj.getElapsedTime();
         if (!obj.hasNoForces()) {
           const averageForce = obj.getAverageForce();
@@ -405,7 +413,7 @@ namespace gdjs {
           obj.update(this);
         }
         obj.updateTimers(elapsedTime);
-        this._allInstancesList[i].stepBehaviorsPreEvents(this);
+        allInstancesList[i].stepBehaviorsPreEvents(this);
       }
 
       //Some behaviors may have request objects to be deleted.
@@ -420,9 +428,9 @@ namespace gdjs {
 
       //It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
       //may delete the objects.
-      this._constructListOfAllInstances();
-      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
-        this._allInstancesList[i].stepBehaviorsPostEvents(this);
+      const allInstancesList = this.getAdhocListOfAllInstances();
+      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+        allInstancesList[i].stepBehaviorsPostEvents(this);
       }
 
       //Some behaviors may have request objects to be deleted.
@@ -469,10 +477,9 @@ namespace gdjs {
         !this._objectsCtor.containsKey(objectName) ||
         !this._objects.containsKey(objectName)
       ) {
+        // There is no such object in this container.
         return null;
       }
-
-      //There is no such object in this scene.
 
       // Create a new object using the object constructor (cached during loading)
       // and the stored object's data:
@@ -492,7 +499,7 @@ namespace gdjs {
     }
 
     /**
-     * Must be called whenever an object must be removed from the scene.
+     * Must be called whenever an object must be removed from the container.
      * @param obj The object to be removed.
      */
     markObjectForDeletion(obj: gdjs.RuntimeObject) {
@@ -626,7 +633,11 @@ namespace gdjs {
         }
       }
     }
-    // TODO EBO Documentation
+
+    /**
+     * Clear any data structures to make sure memory is freed as soon as
+     * possible.
+     */
     _destroy() {
       // It should not be necessary to reset these variables, but this help
       // ensuring that all memory related to the RuntimeScene is released immediately.

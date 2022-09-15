@@ -90,9 +90,9 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
-    name: 'GDevelopAuthentication',
+    name: 'PlayerAuthentication',
     // $FlowExpectedError - this path is ignored for Flow.
-    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/GDevelopAuthentication/JsExtension.js'),
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/PlayerAuthentication/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
   {

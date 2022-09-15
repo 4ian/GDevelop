@@ -191,6 +191,7 @@ namespace gdjs {
         leaderboardId,
         playerName,
         playerId,
+        playerToken,
         score,
         scoreSavingState,
         runtimeScene,
@@ -198,11 +199,12 @@ namespace gdjs {
         leaderboardId: string;
         playerName?: string;
         playerId?: string;
+        playerToken?: string;
         score: number;
         scoreSavingState: ScoreSavingState;
         runtimeScene: gdjs.RuntimeScene;
       }) {
-        const baseUrl = 'https://api.gdevelop-app.com/play';
+        const baseUrl = 'https://api.gdevelop.io/play';
         const game = runtimeScene.getGame();
         const payloadObject = {
           score: score,
@@ -216,6 +218,12 @@ namespace gdjs {
         if (playerName)
           payloadObject['playerName'] = formatPlayerName(playerName);
         const payload = JSON.stringify(payloadObject);
+        const headers = {
+          'Content-Type': 'application/json',
+          Digest: computeDigest(payload),
+        };
+        if (playerToken)
+          headers['Authorization'] = `player-game-token ${playerToken}`;
         let leaderboardEntryCreationUrl = `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`;
         if (playerId) {
           leaderboardEntryCreationUrl += `?playerId=${playerId}`;
@@ -223,10 +231,7 @@ namespace gdjs {
         fetch(leaderboardEntryCreationUrl, {
           body: payload,
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Digest: computeDigest(payload),
-          },
+          headers: headers,
         }).then(
           (response) => {
             if (!response.ok) {
@@ -317,7 +322,14 @@ namespace gdjs {
         score: float
       ) {
         let scoreSavingState: ScoreSavingState;
-        const playerId = 'toto';
+        const playerId = gdjs.playerAuthentication.getUserId();
+        const playerToken = gdjs.playerAuthentication.getUserToken();
+        if (!playerId || !playerToken) {
+          logger.warn(
+            'Cannot save a score for a connected player if the player is not connected.'
+          );
+          return;
+        }
         if (_scoreSavingStateByLeaderboard[leaderboardId]) {
           scoreSavingState = _scoreSavingStateByLeaderboard[leaderboardId];
           if (scoreSavingState.isAlreadySavingThisScore({ playerId, score })) {
@@ -354,6 +366,7 @@ namespace gdjs {
         saveScore({
           leaderboardId,
           playerId,
+          playerToken,
           score,
           scoreSavingState,
           runtimeScene,
@@ -662,9 +675,8 @@ namespace gdjs {
 
               resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-              _leaderboardViewIframe = computeLeaderboardDisplayingIframe(
-                targetUrl
-              );
+              _leaderboardViewIframe =
+                computeLeaderboardDisplayingIframe(targetUrl);
               if (typeof window !== 'undefined') {
                 _leaderboardViewClosingCallback = (event: MessageEvent) => {
                   receiveMessageFromLeaderboardView(

@@ -1,8 +1,8 @@
 namespace gdjs {
   declare var cordova: any;
 
-  const logger = new gdjs.Logger('Authentication');
-  export namespace gdevelopAuthentication {
+  const logger = new gdjs.Logger('Player Authentication');
+  export namespace playerAuthentication {
     // Authentication information.
     let _username: string | null = null;
     let _userId: string | null = null;
@@ -33,7 +33,7 @@ namespace gdjs {
      */
     export const isAuthenticated = () => {
       if (!_checkedLocalStorage) {
-        fetchAuthenticatedUserFromLocalStorage();
+        readAuthenticatedUserFromLocalStorage();
       }
       return _userToken !== null;
     };
@@ -55,23 +55,41 @@ namespace gdjs {
      */
     export const getUsername = () => {
       if (!_checkedLocalStorage) {
-        fetchAuthenticatedUserFromLocalStorage();
+        readAuthenticatedUserFromLocalStorage();
       }
       return _username || '';
+    };
+
+    /**
+     * Returns the user token from the local storage.
+     */
+    export const getUserToken = () => {
+      if (!_checkedLocalStorage) {
+        readAuthenticatedUserFromLocalStorage();
+      }
+      return _userToken || null;
+    };
+
+    /**
+     * Returns the username from the local storage.
+     */
+    export const getUserId = () => {
+      if (!_checkedLocalStorage) {
+        readAuthenticatedUserFromLocalStorage();
+      }
+      return _userId || null;
     };
 
     /**
      * Remove the user information from the local storage.
      */
     export const logout = (runtimeScene: RuntimeScene) => {
-      if (!_checkedLocalStorage) {
-        fetchAuthenticatedUserFromLocalStorage();
-      }
       _username = null;
       _userToken = null;
+      _userId = null;
 
       const _gameId = gdjs.projectData.properties.projectUuid;
-      (window as any).localStorage.removeItem(`${_gameId}_authenticatedUser`);
+      window.localStorage.removeItem(`${_gameId}_authenticatedUser`);
       _authenticationBanner = computeNotAuthenticatedBanner(runtimeScene);
     };
 
@@ -81,7 +99,7 @@ namespace gdjs {
      * Returns if the fetched user is different than the current one used
      * in the variables. (useful when the user changes)
      */
-    const fetchAuthenticatedUserFromLocalStorage = (): boolean => {
+    const readAuthenticatedUserFromLocalStorage = (): boolean => {
       const _gameId = gdjs.projectData.properties.projectUuid;
 
       const authenticatedUserStorageItem = window.localStorage.getItem(
@@ -144,6 +162,9 @@ namespace gdjs {
           if (!username) {
             logger.warn('The authenticated player does not have a username');
           }
+          _username = username;
+          _userId = event.data.body.userId;
+          _userToken = event.data.body.token;
           window.localStorage.setItem(
             `${_gameId}_authenticatedUser`,
             JSON.stringify({
@@ -152,9 +173,6 @@ namespace gdjs {
               userToken: _userToken,
             })
           );
-          _username = username;
-          _userId = event.data.body.userId;
-          _userToken = event.data.body.token;
 
           _justLoggedIn = true;
           clearAuthenticationWindowTimeout();
@@ -206,7 +224,7 @@ namespace gdjs {
         removeAuthenticationContainer(runtimeScene);
         displayAuthenticationBanner(runtimeScene);
         focusOnGame(runtimeScene);
-      }, 60000);
+      }, 180000); // Give a few minutes for the user to enter their credentials.
     };
 
     /**
@@ -281,9 +299,8 @@ namespace gdjs {
       _closeContainer.style.justifyContent = 'right';
       _closeContainer.style.alignItems = 'center';
       _closeContainer.style.zIndex = '3';
-      _closeContainer.addEventListener('click', closeAuthenticationContainer);
-      _closeContainer.addEventListener(
-        'touchstart',
+      addTouchAndClickEventListeners(
+        _closeContainer,
         closeAuthenticationContainer
       );
 
@@ -367,7 +384,7 @@ namespace gdjs {
         removeAuthenticationBanner(runtimeScene);
       };
 
-      divContainer.id = 'authenticated-notification';
+      divContainer.id = 'authenticated-banner';
       divContainer.style.position = 'absolute';
       divContainer.style.pointerEvents = 'all';
       divContainer.style.backgroundColor = '#0E062D';
@@ -396,8 +413,7 @@ namespace gdjs {
       _closeContainer.style.zIndex = '3';
       _closeContainer.style.marginRight = '32px';
       _closeContainer.style.height = '100%';
-      _closeContainer.addEventListener('click', dismissBanner);
-      _closeContainer.addEventListener('touchstart', dismissBanner);
+      addTouchAndClickEventListeners(_closeContainer, dismissBanner);
 
       const _close = document.createElement('img');
       _close.setAttribute('width', '30px');
@@ -419,159 +435,25 @@ namespace gdjs {
       runtimeScene: RuntimeScene,
       username: string
     ) {
-      const divContainer = document.createElement('div');
-
-      divContainer.id = 'authenticated-notification';
-      divContainer.style.position = 'absolute';
-      divContainer.style.pointerEvents = 'all';
-      divContainer.style.backgroundColor = '#0E062D';
-      divContainer.style.top = '12px';
-      divContainer.style.right = '16px';
-      divContainer.style.padding = '6px 32px 6px 6px';
-      // Use zIndex 1 to make sure it is below the authentication iframe or webview.
-      divContainer.style.zIndex = '1';
-      divContainer.style.display = 'flex';
-      divContainer.style.flexDirection = 'row-reverse';
-      divContainer.style.justifyContent = 'space-between';
-      divContainer.style.alignItems = 'center';
-      divContainer.style.boxShadow = '0px 4px 4px rgba(0, 0, 0, 0.25)';
-      divContainer.style.borderRadius = '4px';
-      divContainer.style.fontSize = '11pt';
-      divContainer.style.color = '#FFFFFF';
-      divContainer.style.fontFamily =
-        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
-      try {
-        divContainer.animate(
-          [
-            { transform: 'translateY(-30px)', opacity: 0 },
-            { transform: 'translateY(0px)', opacity: 1 },
-          ],
-          {
-            duration: 700,
-            easing: 'ease-out',
-          }
-        );
-      } catch {
-        logger.warn('Animation not supported, div will be fixed.');
-      }
-      const loggedText = document.createElement('p');
-      loggedText.id = 'loggedText';
-      loggedText.innerHTML = `<img style="margin-right:4px" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOSIgaGVpZ2h0PSI5IiB2aWV3Qm94PSIwIDAgOSA5IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNNC4xNjY2NyAwQzEuODY2NjcgMCAwIDEuODY2NjcgMCA0LjE2NjY3QzAgNi40NjY2NyAxLjg2NjY3IDguMzMzMzMgNC4xNjY2NyA4LjMzMzMzQzYuNDY2NjcgOC4zMzMzMyA4LjMzMzMzIDYuNDY2NjcgOC4zMzMzMyA0LjE2NjY3QzguMzMzMzMgMS44NjY2NyA2LjQ2NjY3IDAgNC4xNjY2NyAwWk0zLjMzMzMzIDYuMjVMMS4yNSA0LjE2NjY3TDEuODM3NSAzLjU3OTE3TDMuMzMzMzMgNS4wNzA4M0w2LjQ5NTgzIDEuOTA4MzNMNy4wODMzMyAyLjVMMy4zMzMzMyA2LjI1WiIgZmlsbD0iIzAwQ0M4MyIvPgo8L3N2Zz4K" />
-                                  Logged as ${username}`;
-      loggedText.style.margin = '0px';
-
-      divContainer.appendChild(loggedText);
-
-      const domElementContainer = runtimeScene
-        .getGame()
-        .getRenderer()
-        .getDomElementContainer();
-      if (domElementContainer) {
-        domElementContainer.appendChild(divContainer);
-        setTimeout(() => {
-          try {
-            divContainer.animate(
-              [
-                { transform: 'translateY(0px)', opacity: 1 },
-                { transform: 'translateY(-30px)', opacity: 0 },
-              ],
-              {
-                duration: 700,
-                easing: 'ease-in',
-              }
-            );
-          } catch {
-            logger.warn('Animation not supported, div will be fixed.');
-          }
-        }, 2000);
-        // Use timeout because onanimationend listener does not work.
-        setTimeout(
-          () => {
-            divContainer.remove();
-          },
-          // Wait 2000 ms + 700 ms for the animation to finish.
-          2700
-        );
-      }
+      showNotification(
+        runtimeScene,
+        'authenticated-notification',
+        `<img style="margin-right:4px" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOSIgaGVpZ2h0PSI5IiB2aWV3Qm94PSIwIDAgOSA5IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNNC4xNjY2NyAwQzEuODY2NjcgMCAwIDEuODY2NjcgMCA0LjE2NjY3QzAgNi40NjY2NyAxLjg2NjY3IDguMzMzMzMgNC4xNjY2NyA4LjMzMzMzQzYuNDY2NjcgOC4zMzMzMyA4LjMzMzMzIDYuNDY2NjcgOC4zMzMzMyA0LjE2NjY3QzguMzMzMzMgMS44NjY2NyA2LjQ2NjY3IDAgNC4xNjY2NyAwWk0zLjMzMzMzIDYuMjVMMS4yNSA0LjE2NjY3TDEuODM3NSAzLjU3OTE3TDMuMzMzMzMgNS4wNzA4M0w2LjQ5NTgzIDEuOTA4MzNMNy4wODMzMyAyLjVMMy4zMzMzMyA2LjI1WiIgZmlsbD0iIzAwQ0M4MyIvPgo8L3N2Zz4K" />
+          Logged as ${username}`,
+        'error'
+      );
     };
 
     /**
      * Create, display, and hide an error notification.
      */
     const displayErrorNotification = function (runtimeScene: RuntimeScene) {
-      const divContainer = document.createElement('div');
-
-      divContainer.id = 'authenticated-notification';
-      divContainer.style.position = 'absolute';
-      divContainer.style.pointerEvents = 'all';
-      divContainer.style.backgroundColor = 'red';
-      divContainer.style.top = '12px';
-      divContainer.style.right = '16px';
-      divContainer.style.padding = '6px 32px 6px 6px';
-      // Use zIndex 1 to make sure it is below the authentication iframe or webview.
-      divContainer.style.zIndex = '1';
-      divContainer.style.display = 'flex';
-      divContainer.style.flexDirection = 'row-reverse';
-      divContainer.style.justifyContent = 'space-between';
-      divContainer.style.alignItems = 'center';
-      divContainer.style.boxShadow = '0px 4px 4px rgba(0, 0, 0, 0.25)';
-      divContainer.style.borderRadius = '4px';
-      divContainer.style.fontSize = '11pt';
-      divContainer.style.color = '#FFFFFF';
-      divContainer.style.fontFamily =
-        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
-      try {
-        divContainer.animate(
-          [
-            { transform: 'translateY(-30px)', opacity: 0 },
-            { transform: 'translateY(0px)', opacity: 1 },
-          ],
-          {
-            duration: 700,
-            easing: 'ease-out',
-          }
-        );
-      } catch {
-        logger.warn('Animation not supported, div will be fixed.');
-      }
-      const loggedText = document.createElement('p');
-      loggedText.id = 'loggedText';
-      loggedText.innerHTML = 'An error occured...';
-      loggedText.style.margin = '0px';
-
-      divContainer.appendChild(loggedText);
-
-      const domElementContainer = runtimeScene
-        .getGame()
-        .getRenderer()
-        .getDomElementContainer();
-      if (domElementContainer) {
-        domElementContainer.appendChild(divContainer);
-        setTimeout(() => {
-          try {
-            divContainer.animate(
-              [
-                { transform: 'translateY(0px)', opacity: 1 },
-                { transform: 'translateY(-30px)', opacity: 0 },
-              ],
-              {
-                duration: 700,
-                easing: 'ease-in',
-              }
-            );
-          } catch {
-            logger.warn('Animation not supported, div will be fixed.');
-          }
-        }, 2000);
-        // Use timeout because onanimationend listener does not work.
-        setTimeout(
-          () => {
-            divContainer.remove();
-          },
-          // Wait 2000 ms + 700 ms for the animation to finish.
-          2700
-        );
-      }
+      showNotification(
+        runtimeScene,
+        'error-notification',
+        'An error occurred while authenticating, please try again.',
+        'error'
+      );
     };
 
     /**
@@ -579,15 +461,14 @@ namespace gdjs {
      * they're using and also to allow switching to another account.
      */
     const computeAuthenticatedBanner = function (
-      runtimeScene: gdjs.RuntimeScene,
-      username: string
+      runtimeScene: gdjs.RuntimeScene
     ): HTMLDivElement {
       const divContainer = computeDismissableBanner(runtimeScene);
 
-      const onClickDisplayAuthenticationWindow = () => {
-        displayAuthenticationWindow(runtimeScene);
-        removeAuthenticationBanner(runtimeScene);
+      const onClickOpenAuthenticationWindow = () => {
+        openAuthenticationWindow(runtimeScene);
       };
+      const username = _username || 'Anonymous';
 
       const _textContainer: HTMLDivElement = document.createElement('div');
       const loggedText = document.createElement('p');
@@ -603,13 +484,9 @@ namespace gdjs {
       changeAccountText.style.marginTop = '4px';
       changeAccountText.style.textDecoration = 'underline';
       changeAccountText.style.cursor = 'pointer';
-      changeAccountText.addEventListener(
-        'click',
-        onClickDisplayAuthenticationWindow
-      );
-      changeAccountText.addEventListener(
-        'touchstart',
-        onClickDisplayAuthenticationWindow
+      addTouchAndClickEventListeners(
+        changeAccountText,
+        onClickOpenAuthenticationWindow
       );
 
       _textContainer.appendChild(loggedText);
@@ -628,9 +505,8 @@ namespace gdjs {
     ): HTMLDivElement {
       const divContainer = computeDismissableBanner(runtimeScene);
 
-      const onClickDisplayAuthenticationWindow = () => {
-        displayAuthenticationWindow(runtimeScene);
-        if (_authenticationBanner) _authenticationBanner.style.opacity = '0';
+      const onClickOpenAuthenticationWindow = () => {
+        openAuthenticationWindow(runtimeScene);
       };
 
       const _textContainer: HTMLDivElement = document.createElement('div');
@@ -646,13 +522,9 @@ namespace gdjs {
       changeAccountText.style.marginTop = '4px';
       changeAccountText.style.textDecoration = 'underline';
       changeAccountText.style.cursor = 'pointer';
-      changeAccountText.addEventListener(
-        'click',
-        onClickDisplayAuthenticationWindow
-      );
-      changeAccountText.addEventListener(
-        'touchstart',
-        onClickDisplayAuthenticationWindow
+      addTouchAndClickEventListeners(
+        changeAccountText,
+        onClickOpenAuthenticationWindow
       );
 
       _textContainer.appendChild(loggedText);
@@ -674,7 +546,7 @@ namespace gdjs {
         return;
       }
       if (!_checkedLocalStorage) {
-        fetchAuthenticatedUserFromLocalStorage();
+        readAuthenticatedUserFromLocalStorage();
       }
 
       const domElementContainer = runtimeScene
@@ -688,29 +560,24 @@ namespace gdjs {
         );
         return;
       }
-      if (_userToken && _username !== null) {
-        // If the user is already authenticated, we display the corresponding banner.
-        _authenticationBanner = computeAuthenticatedBanner(
-          runtimeScene,
-          _username
-        );
-        domElementContainer.appendChild(_authenticationBanner);
-        return;
-      } else {
-        // If the user is not authenticated, we display the corresponding banner.
-        _authenticationBanner = computeNotAuthenticatedBanner(runtimeScene);
-        domElementContainer.appendChild(_authenticationBanner);
-      }
+      // We display the corresponding banner depending on the authentication status.
+      _authenticationBanner = _userToken
+        ? computeAuthenticatedBanner(runtimeScene)
+        : computeNotAuthenticatedBanner(runtimeScene);
+      domElementContainer.appendChild(_authenticationBanner);
     };
 
     /**
      * Action to display the authentication window to the user.
      */
-    export const displayAuthenticationWindow = function (
+    export const openAuthenticationWindow = function (
       runtimeScene: gdjs.RuntimeScene
     ) {
+      // If the banner is displayed, hide it, so that it can be shown again if the user closes the window.
+      if (_authenticationBanner) _authenticationBanner.style.opacity = '0';
+
       const _gameId = gdjs.projectData.properties.projectUuid;
-      const targetUrl = `https://liluo.io/oauth?gameId=${_gameId}&dev=true`;
+      const targetUrl = `https://liluo.io/auth?gameId=${_gameId}`;
 
       startAuthenticationWindowTimeout(runtimeScene);
 
@@ -745,7 +612,6 @@ namespace gdjs {
       const electron = runtimeScene.getGame().getRenderer().getElectron();
       if (electron) {
         // If we're on Electron, use an iframe.
-        logger.info("We're on Electron");
         _authenticationIframe = computeAuthenticationIframe(targetUrl);
         if (!_authenticationSubContainer) {
           handleAuthenticationError(
@@ -757,7 +623,6 @@ namespace gdjs {
         _authenticationSubContainer.appendChild(_authenticationIframe);
       } else if (typeof cordova !== 'undefined') {
         // If we're on Cordova, use the InAppBrowser.
-        logger.info("We're on Cordova");
         insertExternalWindowLoaderText();
         _authenticationInAppWindow = cordova.InAppBrowser.open(
           targetUrl,
@@ -778,7 +643,6 @@ namespace gdjs {
         }
       } else {
         // We're on a browser.
-        logger.info("We're on a browser");
         insertExternalWindowLoaderText();
         const left = screen.width / 2 - 500 / 2;
         const top = screen.height / 2 - 600 / 2;
@@ -816,6 +680,7 @@ namespace gdjs {
           true
         );
         _authenticationMessageCallback = null;
+        // No need to detach the callback from the InAppBrowser, as it's destroyed when the window is closed.
         _cordovaAuthenticationMessageCallback = null;
       }
 
@@ -860,6 +725,109 @@ namespace gdjs {
     const focusOnGame = function (runtimeScene: gdjs.RuntimeScene) {
       const gameCanvas = runtimeScene.getGame().getRenderer().getCanvas();
       if (gameCanvas) gameCanvas.focus();
+    };
+
+    /**
+     * Helper to add event listeners on a pressable/clickable element
+     * to work on both desktop and mobile.
+     */
+    const addTouchAndClickEventListeners = function (
+      element: HTMLElement,
+      action: () => void
+    ) {
+      // Touch start event listener for mobile.
+      element.addEventListener('touchstart', (event) => {
+        action();
+      });
+      // Click event listener for desktop.
+      element.addEventListener('click', (event) => {
+        action();
+      });
+    };
+
+    /**
+     * Helper to show a notification to the user, that disappears automatically.
+     */
+    const showNotification = function (
+      runtimeScene: gdjs.RuntimeScene,
+      id: string,
+      content: string,
+      type: 'success' | 'error'
+    ) {
+      const divContainer = document.createElement('div');
+
+      divContainer.id = id;
+      divContainer.style.position = 'absolute';
+      divContainer.style.pointerEvents = 'all';
+      divContainer.style.backgroundColor =
+        type === 'success' ? '#0E062D' : 'red';
+      divContainer.style.top = '12px';
+      divContainer.style.right = '16px';
+      divContainer.style.padding = '6px 32px 6px 6px';
+      // Use zIndex 1 to make sure it is below the authentication iframe or webview.
+      divContainer.style.zIndex = '1';
+      divContainer.style.display = 'flex';
+      divContainer.style.flexDirection = 'row-reverse';
+      divContainer.style.justifyContent = 'space-between';
+      divContainer.style.alignItems = 'center';
+      divContainer.style.boxShadow = '0px 4px 4px rgba(0, 0, 0, 0.25)';
+      divContainer.style.borderRadius = '4px';
+      divContainer.style.fontSize = '11pt';
+      divContainer.style.color = '#FFFFFF';
+      divContainer.style.fontFamily =
+        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
+      try {
+        divContainer.animate(
+          [
+            { transform: 'translateY(-30px)', opacity: 0 },
+            { transform: 'translateY(0px)', opacity: 1 },
+          ],
+          {
+            duration: 700,
+            easing: 'ease-out',
+          }
+        );
+      } catch {
+        logger.warn('Animation not supported, div will be fixed.');
+      }
+      const loggedText = document.createElement('p');
+      loggedText.id = 'loggedText';
+      loggedText.innerHTML = content;
+      loggedText.style.margin = '0px';
+
+      divContainer.appendChild(loggedText);
+
+      const domElementContainer = runtimeScene
+        .getGame()
+        .getRenderer()
+        .getDomElementContainer();
+      if (domElementContainer) {
+        domElementContainer.appendChild(divContainer);
+        setTimeout(() => {
+          try {
+            divContainer.animate(
+              [
+                { transform: 'translateY(0px)', opacity: 1 },
+                { transform: 'translateY(-30px)', opacity: 0 },
+              ],
+              {
+                duration: 700,
+                easing: 'ease-in',
+              }
+            );
+          } catch {
+            logger.warn('Animation not supported, div will be fixed.');
+          }
+        }, 2000);
+        // Use timeout because onanimationend listener does not work.
+        setTimeout(
+          () => {
+            divContainer.remove();
+          },
+          // Wait 2000 ms + 700 ms for the animation to finish.
+          2700
+        );
+      }
     };
   }
 }

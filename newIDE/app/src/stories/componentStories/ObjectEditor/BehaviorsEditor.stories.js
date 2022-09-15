@@ -22,9 +22,12 @@ export const Default = () => (
     <BehaviorsEditor
       project={testProject.project}
       object={testProject.spriteObjectWithBehaviors}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       onUpdateBehaviorsSharedData={() => {}}
     />
   </SerializedObjectDisplay>
@@ -35,9 +38,12 @@ export const WithoutAnyBehaviors = () => (
     <BehaviorsEditor
       project={testProject.project}
       object={testProject.spriteObjectWithoutBehaviors}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       onUpdateBehaviorsSharedData={() => {}}
     />
   </SerializedObjectDisplay>

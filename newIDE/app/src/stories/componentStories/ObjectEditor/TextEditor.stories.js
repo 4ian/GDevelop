@@ -23,9 +23,12 @@ export const Default = () => (
     <TextEditor
       objectConfiguration={testProject.textObjectConfiguration}
       project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={source => action('Choose resource from source', source)}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       onSizeUpdated={() => {}}
       objectName="FakeObjectName"
     />

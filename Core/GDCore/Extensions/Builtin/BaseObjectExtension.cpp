@@ -234,7 +234,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                   "counterclockwise otherwise."),
                 _("Rotate _PARAM0_ at speed _PARAM1_ deg/second"),
                 _("Angle"),
-                "res/actions/direction24.png",
+                "res/actions/rotate24_black.png",
                 "res/actions/direction.png")
 
       .AddParameter("object", _("Object"))
@@ -248,7 +248,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Rotate an object towards an angle with the specified speed."),
          _("Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_ deg/second"),
          _("Angle"),
-         "res/actions/direction24.png",
+         "res/actions/rotate24_black.png",
          "res/actions/direction.png")
 
       .AddParameter("object", _("Object"))
@@ -264,7 +264,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed "
            "_PARAM3_ deg/second"),
          _("Angle"),
-         "res/actions/direction24.png",
+         "res/actions/rotate24_black.png",
          "res/actions/direction.png")
 
       .AddParameter("object", _("Object"))

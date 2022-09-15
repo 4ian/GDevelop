@@ -140,7 +140,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 "Rotate an object towards a position.",
                 "Rotate _PARAM0_ towards _PARAM1_;_PARAM2_",
                 _("Direction"),
-                "res/actions/direction24.png",
+                "res/actions/rotate24_black.png",
                 "res/actions/direction.png")
 
       .AddParameter("object", _("Object to be rotated"), "Sprite")
@@ -168,8 +168,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 _("Modify the scale of the width of an object."),
                 _("the width's scale"),
                 _("Size"),
-                "res/actions/scale24.png",
-                "res/actions/scale.png")
+                "res/actions/scaleWidth24_black.png",
+                "res/actions/scaleWidth.png")
 
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardOperatorParameters("number")
@@ -180,7 +180,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 _("Modify the scale of the height of an object."),
                 _("the height's scale"),
                 _("Size"),
-                "res/actions/scale24.png",
+                "res/actions/scaleHeight24_black.png",
                 "res/actions/scale.png")
 
       .AddParameter("object", _("Object"), "Sprite")
@@ -192,7 +192,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 _("Change the width of a Sprite object."),
                 _("the width"),
                 _("Size"),
-                "res/actions/scale24.png",
+                "res/actions/scaleWidth24_black.png",
                 "res/actions/scale.png")
 
       .AddParameter("object", _("Object"), "Sprite")
@@ -216,7 +216,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 _("Change the height of a Sprite object."),
                 _("the height"),
                 _("Size"),
-                "res/actions/scale24.png",
+                "res/actions/scaleHeight24_black.png",
                 "res/actions/scale.png")
 
       .AddParameter("object", _("Object"), "Sprite")
@@ -449,7 +449,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 "Rotate an object towards another.",
                 "Rotate _PARAM0_ towards _PARAM1_",
                 _("Direction"),
-                "res/actions/direction24.png",
+                "res/actions/rotate24_black.png",
                 "res/actions/direction.png")
 
       .AddParameter("object", _("Object"), "Sprite")

@@ -33,8 +33,8 @@ module.exports = {
         'Florian Rival',
         'Open source (MIT License)'
       )
-      .setExtensionHelpPath('/all-features/authentication')
-      .setCategory('Authentication');
+      .setExtensionHelpPath('/all-features/player-authentication')
+      .setCategory('Players');
     extension
       .addInstructionOrExpressionGroupMetadata(
         _('Player Authentication (experimental)')
@@ -60,7 +60,7 @@ module.exports = {
         'JsPlatform/Extensions/authentication.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
-      .setHelpPath('/all-features/authentication')
+      .setHelpPath('/all-features/player-authentication')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
@@ -78,7 +78,7 @@ module.exports = {
         'JsPlatform/Extensions/authentication.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
-      .setHelpPath('/all-features/authentication')
+      .setHelpPath('/all-features/player-authentication')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
@@ -96,7 +96,7 @@ module.exports = {
         'JsPlatform/Extensions/authentication.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
-      .setHelpPath('/all-features/authentication')
+      .setHelpPath('/all-features/player-authentication')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
@@ -136,7 +136,7 @@ module.exports = {
     extension
       .addCondition(
         'HasPlayerLoggedIn',
-        _('Player has just logged in'),
+        _('Player has logged in'),
         _('Check if the player has just logged in.'),
         _('Player has logged in'),
         '',

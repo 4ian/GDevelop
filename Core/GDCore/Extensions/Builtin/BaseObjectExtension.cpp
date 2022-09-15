@@ -36,7 +36,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Compare the X position of the object."),
                    _("the X position"),
                    _("Position"),
-                   "res/conditions/position24.png",
+                   "res/conditions/position24_black.png",
                    "res/conditions/position.png")
 
       .AddParameter("object", _("Object"))
@@ -48,7 +48,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Change the X position of an object."),
                 _("the X position"),
                 _("Position"),
-                "res/actions/position24.png",
+                "res/actions/position24_black.png",
                 "res/actions/position.png")
 
       .AddParameter("object", _("Object"))
@@ -60,7 +60,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Compare the Y position of an object."),
                    _("the Y position"),
                    _("Position"),
-                   "res/conditions/position24.png",
+                   "res/conditions/position24_black.png",
                    "res/conditions/position.png")
 
       .AddParameter("object", _("Object"))
@@ -72,7 +72,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Change the Y position of an object."),
                 _("the Y position"),
                 _("Position"),
-                "res/actions/position24.png",
+                "res/actions/position24_black.png",
                 "res/actions/position.png")
 
       .AddParameter("object", _("Object"))
@@ -85,7 +85,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Change the position of _PARAM0_: _PARAM1_ _PARAM2_ (x "
                   "axis), _PARAM3_ _PARAM4_ (y axis)"),
                 _("Position"),
-                "res/actions/position24.png",
+                "res/actions/position24_black.png",
                 "res/actions/position.png")
 
       .AddParameter("object", _("Object"))
@@ -102,7 +102,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                   "_PARAM2_ (x "
                   "axis), _PARAM3_ _PARAM4_ (y axis)"),
                 _("Position/Center"),
-                "res/actions/position24.png",
+                "res/actions/position24_black.png",
                 "res/actions/position.png")
       .AddParameter("object", _("Object"))
       .AddParameter("operator", _("Modification's sign"), "number")
@@ -118,7 +118,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("the X position of the center of rotation"),
          _("the X position of the center"),
          _("Position/Center"),
-         "res/actions/position24.png")
+         "res/actions/position24_black.png")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -129,7 +129,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("the Y position of the center of rotation"),
          _("the Y position of the center"),
          _("Position/Center"),
-         "res/actions/position24.png")
+         "res/actions/position24_black.png")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -140,7 +140,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                   "the object) left position"),
                                 _("the bounding box left position"),
                                 _("Position/Bounding Box"),
-                                "res/conditions/bounding-box-left.svg")
+                                "res/conditions/bounding-box-left_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -151,7 +151,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("the bounding box (the area encapsulating the object) top position"),
          _("the bounding box top position"),
          _("Position/Bounding Box"),
-         "res/conditions/bounding-box-top.svg")
+         "res/conditions/bounding-box-top_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -162,7 +162,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                   "the object) right position"),
                                 _("the bounding box right position"),
                                 _("Position/Bounding Box"),
-                                "res/conditions/bounding-box-right.svg")
+                                "res/conditions/bounding-box-right_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -173,7 +173,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                   "the object) bottom position"),
                                 _("the bounding box bottom position"),
                                 _("Position/Bounding Box"),
-                                "res/conditions/bounding-box-bottom.svg")
+                                "res/conditions/bounding-box-bottom_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -184,7 +184,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                   "the object) center X position"),
                                 _("the bounding box center X position"),
                                 _("Position/Bounding Box"),
-                                "res/conditions/bounding-box-center.svg")
+                                "res/conditions/bounding-box-center_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -195,7 +195,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                   "the object) center Y position"),
                                 _("the bounding box center Y position"),
                                 _("Position/Bounding Box"),
-                                "res/conditions/bounding-box-center.svg")
+                                "res/conditions/bounding-box-center_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -222,7 +222,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Change the angle of rotation of an object (in degrees)."),
                 _("the angle"),
                 _("Angle"),
-                "res/actions/direction24.png",
+                "res/actions/direction24_black.png",
                 "res/actions/direction.png")
 
       .AddParameter("object", _("Object"))
@@ -512,7 +512,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Compare the angle of the specified object."),
                    _("the angle (in degrees)"),
                    _("Angle"),
-                   "res/conditions/direction24.png",
+                   "res/conditions/direction24_black.png",
                    "res/conditions/direction.png")
 
       .AddParameter("object", _("Object"))

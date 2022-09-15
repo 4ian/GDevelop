@@ -168,24 +168,10 @@ void EventsFunctionsExtension::UnserializeExtensionImplementationFrom(
     gd::Project& project,
     const SerializerElement& element) {
   UnserializeEventsFunctionsFrom(project, element.GetChild("eventsFunctions"));
-  auto &behaviorsElement = element.GetChild("eventsBasedBehaviors");
-  behaviorsElement.ConsiderAsArrayOf("eventsBasedBehavior");
-  for (std::size_t i = 0; i < behaviorsElement.GetChildrenCount(); ++i) {
-    const gd::String &behaviorName =
-        behaviorsElement.GetChild(i).GetStringAttribute("name");
-    if (eventsBasedBehaviors.Has(behaviorName)) {
-      eventsBasedBehaviors.Get(behaviorName).UnserializeFrom(project, behaviorsElement.GetChild(i));
-    }
-  }
-  auto &objectsElement = element.GetChild("eventsBasedObjects");
-  objectsElement.ConsiderAsArrayOf("eventsBasedObject");
-  for (std::size_t i = 0; i < objectsElement.GetChildrenCount(); ++i) {
-    const gd::String &objectName =
-        objectsElement.GetChild(i).GetStringAttribute("name");
-    if (eventsBasedObjects.Has(objectName)) {
-      eventsBasedObjects.Get(objectName).UnserializeFrom(project, objectsElement.GetChild(i));
-    }
-  }
+  eventsBasedBehaviors.UnserializeElementsFrom(
+      "eventsBasedBehavior", project, element.GetChild("eventsBasedBehaviors"));
+  eventsBasedObjects.UnserializeElementsFrom(
+      "eventsBasedObject", project, element.GetChild("eventsBasedObjects"));
 }
 
 bool EventsFunctionsExtension::IsExtensionLifecycleEventsFunction(

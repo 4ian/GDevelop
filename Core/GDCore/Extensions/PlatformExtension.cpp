@@ -295,6 +295,8 @@ gd::BehaviorMetadata& PlatformExtension::AddEventsBasedBehavior(
   behaviorsInfo[nameWithNamespace] = BehaviorMetadata(GetNameSpace(),
                                                       nameWithNamespace,
                                                       fullname,
+                                                      // Default name is the name
+                                                      name,
                                                       description,
                                                       group,
                                                       icon24x24)

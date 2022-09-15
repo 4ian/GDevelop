@@ -86,6 +86,22 @@ module.exports = {
       .setFunctionName('gdjs.playerAuthentication.openAuthenticationWindow');
 
     extension
+      .addCondition(
+        'IsAuthenticationWindowOpen',
+        _('Authentication window is open'),
+        _('Check if the authentication window is open.'),
+        _('Authentication window is open'),
+        '',
+        'JsPlatform/Extensions/authentication.svg',
+        'JsPlatform/Extensions/authentication.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .setFunctionName('gdjs.playerAuthentication.isAuthenticationWindowOpen');
+
+    extension
       .addAction(
         'LogOut',
         _('Log out the player'),

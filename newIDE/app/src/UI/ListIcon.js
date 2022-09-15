@@ -55,7 +55,7 @@ function ListIcon(props: Props) {
   const paddingRight = iconWidth > 40 ? 16 : 0;
 
   const isBlackSvgIcon =
-    src.startsWith('data:image/svg+xml') || src.endsWith('.svg');
+    src.startsWith('data:image/svg+xml') || src.includes('_black');
   const shouldInvertGrayScale = paletteType === 'dark' && isBlackSvgIcon;
 
   let filter = undefined;

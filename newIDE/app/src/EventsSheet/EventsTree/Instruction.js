@@ -306,7 +306,7 @@ const Instruction = (props: Props) => {
         // (surely due to components re-mounting/rerendering ?).
         const isBlackSvgIcon =
           smallIconFilename.startsWith('data:image/svg+xml') ||
-          smallIconFilename.endsWith('.svg');
+          smallIconFilename.includes('_black');
 
         const instructionDragSourceElement = connectDragSource(
           <div

@@ -79,7 +79,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
            "is in 8 directions mode, the valid directions are 0..7"),
          _("the direction"),
          _("Direction"),
-         "res/actions/direction24.png",
+         "res/actions/direction24_black.png",
          "res/actions/direction.png")
       .SetHidden()  // Hide as 8 direction is not supported officially in the
                     // interface.
@@ -156,7 +156,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 _("Modify the scale of the specified object."),
                 _("the scale"),
                 _("Size"),
-                "res/actions/scale24.png",
+                "res/actions/scale24_black.png",
                 "res/actions/scale.png")
 
       .AddParameter("object", _("Object"), "Sprite")
@@ -204,7 +204,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    _("Compare the width of a Sprite object."),
                    _("the width"),
                    _("Size"),
-                   "res/conditions/scaleWidth24.png",
+                   "res/conditions/scaleWidth24_black.png",
                    "res/conditions/scaleWidth.png")
 
       .AddParameter("object", _("Object"), "Sprite")
@@ -228,7 +228,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    _("Compare the height of a Sprite object."),
                    _("the height"),
                    _("Size"),
-                   "res/conditions/scaleHeight24.png",
+                   "res/conditions/scaleHeight24_black.png",
                    "res/conditions/scaleHeight.png")
 
       .AddParameter("object", _("Object"), "Sprite")
@@ -240,7 +240,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 _("Change the size of an object."),
                 _("Change the size of _PARAM0_: set to _PARAM1_x_PARAM2_"),
                 _("Size"),
-                "res/actions/scale24.png",
+                "res/actions/scale24_black.png",
                 "res/actions/scale.png")
 
       .AddParameter("object", _("Object"))
@@ -281,7 +281,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
            "from 0 to 7. Otherwise, the direction is in degrees."),
          _("the direction"),
          _("Direction"),
-         "res/conditions/direction24.png",
+         "res/conditions/direction24_black.png",
          "res/conditions/direction.png")
       .SetHidden()  // Hide as 8 direction is not supported officially in the
                     // interface.
@@ -330,7 +330,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    _("Compare the scale of the width of an object."),
                    _("the width's scale"),
                    _("Size"),
-                   "res/conditions/scaleWidth24.png",
+                   "res/conditions/scaleWidth24_black.png",
                    "res/conditions/scaleWidth.png")
 
       .AddParameter("object", _("Object"), "Sprite")
@@ -342,7 +342,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    _("Compare the scale of the height of an object."),
                    _("the height's scale"),
                    _("Size"),
-                   "res/conditions/scaleHeight24.png",
+                   "res/conditions/scaleHeight24_black.png",
                    "res/conditions/scaleHeight.png")
 
       .AddParameter("object", _("Object"), "Sprite")

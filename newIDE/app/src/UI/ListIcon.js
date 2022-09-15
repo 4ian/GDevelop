@@ -17,6 +17,10 @@ type Props = {|
   src: string,
   tooltip?: string,
   disabled?: boolean,
+  /**
+   * Set true if icon is either a GDevelop-made icon (with blue tone)
+   * loaded from app or a base64 encoded SVG in a data url.
+   */
   isGDevelopIcon?: boolean,
   cssAnimation?: string,
   useExactIconSize?: boolean,
@@ -29,6 +33,8 @@ type Props = {|
  */
 function ListIcon(props: Props) {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const paletteType = gdevelopTheme.palette.type;
+
   const {
     src,
     tooltip,
@@ -48,6 +54,17 @@ function ListIcon(props: Props) {
   // the text. Add it back if necessary
   const paddingRight = iconWidth > 40 ? 16 : 0;
 
+  const isBlackSvgIcon = src.startsWith('data:image/svg+xml');
+  const shouldInvertGrayScale = paletteType === 'dark' && isBlackSvgIcon;
+
+  let filter = undefined;
+  if (isBlackSvgIcon && shouldInvertGrayScale)
+    filter = 'grayscale(1) invert(1)';
+  else if (isGDevelopIcon && disabled && !isBlackSvgIcon)
+    filter = 'grayscale(100%)';
+  else if (isGDevelopIcon && !isBlackSvgIcon)
+    filter = gdevelopTheme.gdevelopIconsCSSFilter;
+
   const style = {
     maxWidth: useExactIconSize ? undefined : iconWidth,
     maxHeight: useExactIconSize ? undefined : iconHeight,
@@ -55,11 +72,7 @@ function ListIcon(props: Props) {
     height: useExactIconSize ? iconHeight : undefined,
     verticalAlign: 'middle', // Vertical centering
     animation: cssAnimation,
-    filter: !isGDevelopIcon
-      ? undefined
-      : disabled
-      ? 'grayscale(100%)'
-      : gdevelopTheme.gdevelopIconsCSSFilter,
+    filter,
   };
 
   return (

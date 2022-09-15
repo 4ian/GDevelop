@@ -29,7 +29,7 @@ class GD_CORE_API BehaviorMetadata {
  public:
   BehaviorMetadata(
       const gd::String& extensionNamespace,
-      const gd::String& name_,
+      const gd::String& nameWithNamespace,
       const gd::String& fullname_,
       const gd::String& defaultName_,
       const gd::String& description_,
@@ -46,8 +46,9 @@ class GD_CORE_API BehaviorMetadata {
    */
   BehaviorMetadata(
       const gd::String& extensionNamespace,
-      const gd::String& name_,
+      const gd::String& nameWithNamespace,
       const gd::String& fullname_,
+      const gd::String& defaultName_,
       const gd::String& description_,
       const gd::String& group_,
       const gd::String& icon24x24_);

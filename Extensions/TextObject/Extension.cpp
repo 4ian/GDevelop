@@ -38,7 +38,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                 _("Modify the text of a Text object."),
                 _("the text"),
                 "",
-                "res/actions/text24.png",
+                "res/actions/text24_black.png",
                 "res/actions/text.png")
 
       .AddParameter("object", _("Object"), "Text")
@@ -51,7 +51,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    _("Compare the text of a Text object."),
                    _("the text"),
                    "",
-                   "res/conditions/text24.png",
+                   "res/conditions/text24_black.png",
                    "res/conditions/text.png")
 
       .AddParameter("object", _("Object"), "Text")
@@ -75,7 +75,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    _("Compare the scale of the text on the X axis"),
                    _("the scale on the X axis"),
                    "Scale",
-                   "res/conditions/scaleWidth24.png",
+                   "res/conditions/scaleWidth24_black.png",
                    "res/conditions/scaleWidth.png")
 
       .AddParameter("object", _("Object"), "Text")
@@ -88,7 +88,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
          _("Modify the scale of the text on the X axis (default scale is 1)"),
          _("the scale on the X axis"),
          _("Scale"),
-         "res/actions/scaleWidth24.png",
+         "res/actions/scaleWidth24_black.png",
          "res/actions/scaleWidth.png")
 
       .AddParameter("object", _("Object"), "Text")
@@ -100,7 +100,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    _("Compare the scale of the text on the Y axis"),
                    _("the scale on the Y axis"),
                    "Scale",
-                   "res/conditions/scaleHeight24.png",
+                   "res/conditions/scaleHeight24_black.png",
                    "res/conditions/scaleHeight.png")
 
       .AddParameter("object", _("Object"), "Text")
@@ -113,7 +113,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
          _("Modify the scale of the text on the Y axis (default scale is 1)"),
          _("the scale on the Y axis"),
          _("Scale"),
-         "res/actions/scaleHeight24.png",
+         "res/actions/scaleHeight24_black.png",
          "res/actions/scaleHeight.png")
 
       .AddParameter("object", _("Object"), "Text")
@@ -126,7 +126,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
          _("Modify the scale of the specified object (default scale is 1)"),
          _("the scale"),
          _("Scale"),
-         "res/actions/scale24.png",
+         "res/actions/scale24_black.png",
          "res/actions/scale.png")
 
       .AddParameter("object", _("Object"), "Text")
@@ -329,7 +329,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                 _("Modify the angle of a Text object."),
                 _("the angle"),
                 _("Rotation"),
-                "res/actions/rotate24.png",
+                "res/actions/rotate24_black.png",
                 "res/actions/rotate.png")
 
       .AddParameter("object", _("Object"), "Text")
@@ -342,7 +342,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    _("Compare the value of the angle of a Text object."),
                    _("the angle"),
                    _("Rotation"),
-                   "res/conditions/rotate24.png",
+                   "res/conditions/rotate24_black.png",
                    "res/conditions/rotate.png")
 
       .AddParameter("object", _("Object"), "Text")
@@ -356,7 +356,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                      "cropped, raise this value."),
                    _("the padding"),
                    _("Style"),
-                   "res/conditions/textPadding24.png",
+                   "res/conditions/textPadding24_black.png",
                    "res/conditions/textPadding.png")
 
       .AddParameter("object", _("Object"), "Text")
@@ -369,7 +369,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                   "raise this value."),
                 _("the padding"),
                 _("Style"),
-                "res/actions/textPadding24.png",
+                "res/actions/textPadding24_black.png",
                 "res/actions/textPadding.png")
 
       .AddParameter("object", _("Object"), "Text")
@@ -409,7 +409,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
            "option,\nyou can't get the number of lines displayed"),
          _("Activate wrapping style of _PARAM0_: _PARAM1_"),
          _("Style"),
-         "res/actions/wordWrap24.png",
+         "res/actions/wordWrap24_black.png",
          "res/actions/wordWrap.png")
 
       .AddParameter("object", _("Object"), "Text")
@@ -420,7 +420,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    _("Test if the word wrapping style of an object is set."),
                    _("_PARAM0_ word wrapping style is activated"),
                    _("Style"),
-                   "res/conditions/wordWrap24.png",
+                   "res/conditions/wordWrap24_black.png",
                    "res/conditions/wordWrap.png")
 
       .AddParameter("object", _("Object"), "Text");
@@ -430,7 +430,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                 _("Modify the word wrapping width of a Text object."),
                 _("the wrapping width"),
                 _("Style"),
-                "res/actions/wordWrap24.png",
+                "res/actions/wordWrap24_black.png",
                 "res/actions/wordWrap.png")
 
       .AddParameter("object", _("Object"), "Text")
@@ -441,7 +441,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    _("Test the word wrapping width of a Text object."),
                    _("the wrapping width"),
                    _("Style"),
-                   "res/conditions/wordWrap24.png",
+                   "res/conditions/wordWrap24_black.png",
                    "res/conditions/wordWrap.png")
 
       .AddParameter("object", _("Object"), "Text")

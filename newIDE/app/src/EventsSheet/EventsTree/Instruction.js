@@ -35,6 +35,7 @@ import {
 } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import AsyncIcon from '../../UI/CustomSvgIcons/Async';
 import Tooltip from '@material-ui/core/Tooltip';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -126,6 +127,10 @@ const Instruction = (props: Props) => {
     []
   );
   const preferences = React.useContext(PreferencesContext);
+  const {
+    palette: { type },
+  } = React.useContext(GDevelopThemeContext);
+
   const useAssignmentOperators =
     preferences.values.eventsSheetUseAssignmentOperators;
 
@@ -298,6 +303,10 @@ const Instruction = (props: Props) => {
         // the subinstructions list inside the connectDropTarget/connectDragSource
         // as otherwise this can confuse react-dnd ("Expected to find a valid target")
         // (surely due to components re-mounting/rerendering ?).
+        const isBlackSvgIcon = metadata
+          .getSmallIconFilename()
+          .startsWith('data:image/svg+xml');
+
         const instructionDragSourceElement = connectDragSource(
           <div
             style={styles.container}
@@ -370,6 +379,12 @@ const Instruction = (props: Props) => {
               })}
               src={metadata.getSmallIconFilename()}
               alt=""
+              style={{
+                filter:
+                  type === 'dark' && isBlackSvgIcon
+                    ? 'grayscale(1) invert(1)'
+                    : undefined,
+              }}
             />
             {renderInstructionText(metadata)}
           </div>

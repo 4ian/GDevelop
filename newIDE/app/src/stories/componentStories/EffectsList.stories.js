@@ -18,12 +18,11 @@ export const withSomeEffectsForALayer = () => (
       <EffectsList
         target="layer"
         project={testProject.project}
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onChooseResource={() => {
-          action('onChooseResource');
-          return Promise.reject();
+        resourceManagementProps={{
+          resourceSources: [],
+          onChooseResource: () => Promise.reject('Unimplemented'),
+          resourceExternalEditors: fakeResourceExternalEditors,
         }}
-        resourceSources={[]}
         effectsContainer={testProject.layerWithEffects.getEffects()}
         onEffectsUpdated={action('effects updated')}
       />
@@ -37,12 +36,11 @@ export const withSomeEffectsForAnObject = () => (
       <EffectsList
         target="object"
         project={testProject.project}
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onChooseResource={() => {
-          action('onChooseResource');
-          return Promise.reject();
+        resourceManagementProps={{
+          resourceSources: [],
+          onChooseResource: () => Promise.reject('Unimplemented'),
+          resourceExternalEditors: fakeResourceExternalEditors,
         }}
-        resourceSources={[]}
         effectsContainer={testProject.spriteObjectWithEffects.getEffects()}
         onEffectsUpdated={action('effects updated')}
       />
@@ -56,12 +54,11 @@ export const withAnEffectWithoutEffectTypeForALayer = () => (
       <EffectsList
         target="layer"
         project={testProject.project}
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onChooseResource={() => {
-          action('onChooseResource');
-          return Promise.reject();
+        resourceManagementProps={{
+          resourceSources: [],
+          onChooseResource: () => Promise.reject('Unimplemented'),
+          resourceExternalEditors: fakeResourceExternalEditors,
         }}
-        resourceSources={[]}
         effectsContainer={testProject.layerWithEffectWithoutEffectType.getEffects()}
         onEffectsUpdated={action('effects updated')}
       />
@@ -75,12 +72,11 @@ export const withoutEffectsForALayer = () => (
       <EffectsList
         target="layer"
         project={testProject.project}
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onChooseResource={() => {
-          action('onChooseResource');
-          return Promise.reject();
+        resourceManagementProps={{
+          resourceSources: [],
+          onChooseResource: () => Promise.reject('Unimplemented'),
+          resourceExternalEditors: fakeResourceExternalEditors,
         }}
-        resourceSources={[]}
         effectsContainer={testProject.layerWithoutEffects.getEffects()}
         onEffectsUpdated={action('effects updated')}
       />
@@ -94,12 +90,11 @@ export const withoutEffectsForAnObject = () => (
       <EffectsList
         target="object"
         project={testProject.project}
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onChooseResource={() => {
-          action('onChooseResource');
-          return Promise.reject();
+        resourceManagementProps={{
+          resourceSources: [],
+          onChooseResource: () => Promise.reject('Unimplemented'),
+          resourceExternalEditors: fakeResourceExternalEditors,
         }}
-        resourceSources={[]}
         effectsContainer={testProject.spriteObjectWithoutEffects.getEffects()}
         onEffectsUpdated={action('effects updated')}
       />

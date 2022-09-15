@@ -34,9 +34,11 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />
@@ -53,9 +55,11 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />
@@ -72,9 +76,11 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />
@@ -91,9 +97,11 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />
@@ -110,9 +118,11 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />
@@ -129,9 +139,11 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />

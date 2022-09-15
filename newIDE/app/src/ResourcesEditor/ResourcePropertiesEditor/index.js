@@ -13,7 +13,7 @@ import { type Schema } from '../../PropertiesEditor';
 
 import {
   type ResourceSource,
-  type ChooseResourceFunction,
+  type ResourceManagementProps,
 } from '../../ResourcesList/ResourceSource';
 
 const styles = {
@@ -30,8 +30,7 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   resources: Array<gdResource>,
   onResourcePathUpdated: () => void,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
+  resourceManagementProps: ResourceManagementProps,
 |};
 
 export default class ResourcePropertiesEditor extends React.Component<
@@ -75,27 +74,30 @@ export default class ResourcePropertiesEditor extends React.Component<
     );
   }
 
-  _chooseResourcePath = (resourceSource: ResourceSource) => {
-    const { resources, onResourcePathUpdated, onChooseResource } = this.props;
+  _chooseResourcePath = async (resourceSource: ResourceSource) => {
+    const {
+      resources,
+      onResourcePathUpdated,
+      resourceManagementProps,
+    } = this.props;
     const resource = resources[0];
 
-    onChooseResource({
+    const newResources = await resourceManagementProps.onChooseResource({
       initialSourceName: resourceSource.name,
       multiSelection: false,
       resourceKind: resource.getKind(),
-    }).then(resources => {
-      if (!resources.length) return; // No path was chosen by the user.
-      resource.setFile(resources[0].getFile());
-
-      // Important, we are responsible for deleting the resources that were given to us.
-      // Otherwise we have a memory leak.
-      resources.forEach(resource => resource.delete());
-
-      onResourcePathUpdated();
-      this.forceUpdate();
-
-      // TODO: await onFetchNewlyAddedResources();
     });
+    if (!newResources.length) return; // No path was chosen by the user.
+    resource.setFile(newResources[0].getFile());
+
+    // Important, we are responsible for deleting the resources that were given to us.
+    // Otherwise we have a memory leak.
+    newResources.forEach(resource => resource.delete());
+
+    onResourcePathUpdated();
+    this.forceUpdate();
+
+    await resourceManagementProps.onFetchNewlyAddedResources();
   };
 
   _renderResourcesProperties() {

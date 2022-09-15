@@ -4,11 +4,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import InstructionParametersEditor from './InstructionParametersEditor';
 import InstructionOrObjectSelector, {
   type TabName,
@@ -55,9 +51,7 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   instruction: gdInstruction,
   isCondition: boolean,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   style?: Object,
   isNewInstruction: boolean,
   onCancel: () => void,
@@ -100,9 +94,7 @@ export default function NewInstructionEditorDialog({
   isNewInstruction,
   scope,
   onSubmit,
-  resourceSources,
-  onChooseResource,
-  resourceExternalEditors,
+  resourceManagementProps,
   openInstructionOrExpression,
 }: Props) {
   const forceUpdate = useForceUpdate();
@@ -260,9 +252,7 @@ export default function NewInstructionEditorDialog({
       objectName={chosenObjectName}
       isCondition={isCondition}
       instruction={instruction}
-      resourceSources={resourceSources}
-      onChooseResource={onChooseResource}
-      resourceExternalEditors={resourceExternalEditors}
+      resourceManagementProps={resourceManagementProps}
       openInstructionOrExpression={openInstructionOrExpression}
       ref={instructionParametersEditor}
       focusOnMount={!!instructionType}

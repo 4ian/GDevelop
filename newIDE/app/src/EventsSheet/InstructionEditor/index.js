@@ -3,11 +3,7 @@ import * as React from 'react';
 import Paper from '@material-ui/core/Paper';
 import InstructionSelector from './InstructionOrExpressionSelector/InstructionSelector';
 import InstructionParametersEditor from './InstructionParametersEditor';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 
 const styles = {
@@ -29,9 +25,7 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   instruction: gdInstruction,
   isCondition: boolean,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   style?: Object,
   openInstructionOrExpression: (
     extension: gdPlatformExtension,
@@ -81,9 +75,7 @@ export default class InstructionEditor extends React.Component<Props, State> {
             objectsContainer={objectsContainer}
             isCondition={isCondition}
             instruction={instruction}
-            resourceSources={this.props.resourceSources}
-            onChooseResource={this.props.onChooseResource}
-            resourceExternalEditors={this.props.resourceExternalEditors}
+            resourceManagementProps={this.props.resourceManagementProps}
             openInstructionOrExpression={this.props.openInstructionOrExpression}
             ref={instructionParametersEditor =>
               (this._instructionParametersEditor = instructionParametersEditor)

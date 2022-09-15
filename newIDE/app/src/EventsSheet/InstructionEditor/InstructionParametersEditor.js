@@ -10,11 +10,7 @@ import { mapFor } from '../../Utils/MapFor';
 import EmptyMessage from '../../UI/EmptyMessage';
 import ParameterRenderingService from '../ParameterRenderingService';
 import HelpButton from '../../UI/HelpButton';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
@@ -68,9 +64,7 @@ type Props = {|
   instruction: gdInstruction,
   isCondition: boolean,
   focusOnMount?: boolean,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   style?: Object,
   openInstructionOrExpression: (
     extension: gdPlatformExtension,
@@ -341,10 +335,8 @@ export default class InstructionParametersEditor extends React.Component<
                         objectsContainer={objectsContainer}
                         key={i}
                         parameterRenderingService={ParameterRenderingService}
-                        resourceSources={this.props.resourceSources}
-                        onChooseResource={this.props.onChooseResource}
-                        resourceExternalEditors={
-                          this.props.resourceExternalEditors
+                        resourceManagementProps={
+                          this.props.resourceManagementProps
                         }
                         ref={field => {
                           if (isFirstVisibleParameterField) {

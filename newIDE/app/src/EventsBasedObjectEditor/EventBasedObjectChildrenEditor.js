@@ -212,9 +212,12 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 objectsContainer={eventsBasedObject}
                 layout={null}
                 // TODO EBO Allow to use project resources as place holders
-                resourceSources={[]}
-                resourceExternalEditors={[]}
-                onChooseResource={() => Promise.resolve([])}
+                resourceManagementProps={{
+                  resourceSources: [],
+                  resourceExternalEditors: [],
+                  onChooseResource: async () => [],
+                  onFetchNewlyAddedResources: async () => {},
+                }}
                 selectedObjectNames={this.state.selectedObjectNames}
                 onEditObject={this.editObject}
                 onDeleteObject={this._onDeleteObject(i18n)}
@@ -254,9 +257,12 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 object={this.state.editedObjectWithContext.object}
                 initialTab={this.state.editedObjectInitialTab}
                 project={project}
-                resourceSources={[]}
-                resourceExternalEditors={[]}
-                onChooseResource={() => Promise.resolve([])}
+                resourceManagementProps={{
+                  resourceSources: [],
+                  resourceExternalEditors: [],
+                  onChooseResource: async () => [],
+                  onFetchNewlyAddedResources: async () => {},
+                }}
                 onComputeAllVariableNames={() => {
                   return [];
                   // TODO EBO Find undeclared variables in the parent events.

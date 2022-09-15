@@ -13,9 +13,8 @@ import ResourcesLoader from '../ResourcesLoader';
 import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
 import {
   type ResourceSource,
-  type ChooseResourceFunction,
+  type ResourceManagementProps,
 } from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { resizeImage, isResizeSupported } from './ImageResizer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import optionalRequire from '../Utils/OptionalRequire';
@@ -30,9 +29,7 @@ type Props = {|
   open: boolean,
   onClose: Function,
   onApply: Function,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
 |};
 
 type State = {|
@@ -208,6 +205,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         });
 
         // Make sure the resources are (re)loaded.
+        // TODO: Call resourceManagementProps.onFetchNewlyAddedResources here?
         ResourcesLoader.burstUrlsCacheForResources(project, allResourcesNames);
         setTimeout(() => {
           this.setState({
@@ -285,12 +283,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         onClick={this.onApply}
       />,
     ];
-    const {
-      project,
-      resourceSources,
-      onChooseResource,
-      resourceExternalEditors,
-    } = this.props;
+    const { project, resourceManagementProps } = this.props;
     const {
       thumbnailResourceName,
       desktopIconResourceNames,
@@ -321,7 +314,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
                   />
                 }
                 buildMenuTemplate={(i18n: I18nType) =>
-                  resourceSources
+                  resourceManagementProps.resourceSources
                     .filter(source => source.kind === 'image')
                     .map(source => ({
                       label: i18n._(source.displayName),
@@ -344,9 +337,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
           <ResourceSelectorWithThumbnail
             floatingLabelText={`Liluo.io thumbnail (1920x1080 px)`}
             project={project}
-            resourceSources={resourceSources}
-            onChooseResource={onChooseResource}
-            resourceExternalEditors={resourceExternalEditors}
+            resourceManagementProps={resourceManagementProps}
             resourceKind="image"
             resourceName={thumbnailResourceName}
             onChange={resourceName => {
@@ -363,9 +354,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
               key={size}
               floatingLabelText={`Desktop icon (${size}x${size} px)`}
               project={project}
-              resourceSources={resourceSources}
-              onChooseResource={onChooseResource}
-              resourceExternalEditors={resourceExternalEditors}
+              resourceManagementProps={resourceManagementProps}
               resourceKind="image"
               resourceName={desktopIconResourceNames[index]}
               onChange={resourceName => {
@@ -385,9 +374,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
               <ResourceSelectorWithThumbnail
                 floatingLabelText={`Android 12+ splashscreen icon (576x576 px)`}
                 project={project}
-                resourceSources={resourceSources}
-                onChooseResource={onChooseResource}
-                resourceExternalEditors={resourceExternalEditors}
+                resourceManagementProps={resourceManagementProps}
                 resourceKind="image"
                 resourceName={androidWindowSplashScreenAnimatedIconResourceName}
                 onChange={resourceName => {
@@ -406,9 +393,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
               key={size}
               floatingLabelText={`Android icon (${size}x${size} px)`}
               project={project}
-              resourceSources={resourceSources}
-              onChooseResource={onChooseResource}
-              resourceExternalEditors={resourceExternalEditors}
+              resourceManagementProps={resourceManagementProps}
               resourceKind="image"
               resourceName={androidIconResourceNames[index]}
               onChange={resourceName => {
@@ -428,11 +413,9 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
               key={size}
               floatingLabelText={`iOS icon (${size}x${size} px)`}
               project={project}
-              resourceSources={resourceSources}
-              onChooseResource={onChooseResource}
+              resourceManagementProps={resourceManagementProps}
               resourceKind="image"
               resourceName={iosIconResourceNames[index]}
-              resourceExternalEditors={resourceExternalEditors}
               onChange={resourceName => {
                 const newIcons = [...iosIconResourceNames];
                 newIcons[index] = resourceName;

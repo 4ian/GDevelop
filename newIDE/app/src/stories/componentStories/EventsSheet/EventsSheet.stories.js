@@ -26,11 +26,11 @@ export const DefaultNoScope = () => (
         objectsContainer={testProject.testLayout}
         events={testProject.testLayout.getEvents()}
         onOpenExternalEvents={action('Open external events')}
-        resourceSources={[]}
-        onChooseResource={source =>
-          action('Choose resource from source', source)
-        }
-        resourceExternalEditors={fakeResourceExternalEditors}
+        resourceManagementProps={{
+          resourceSources: [],
+          onChooseResource: () => Promise.reject('Unimplemented'),
+          resourceExternalEditors: fakeResourceExternalEditors,
+        }}
         onOpenLayout={action('open layout')}
         onOpenSettings={action('open settings')}
         setToolbar={() => {}}
@@ -53,11 +53,11 @@ export const EmptyNoScope = () => (
         objectsContainer={testProject.emptyLayout}
         events={testProject.emptyLayout.getEvents()}
         onOpenExternalEvents={action('Open external events')}
-        resourceSources={[]}
-        onChooseResource={source =>
-          action('Choose resource from source', source)
-        }
-        resourceExternalEditors={fakeResourceExternalEditors}
+        resourceManagementProps={{
+          resourceSources: [],
+          onChooseResource: () => Promise.reject('Unimplemented'),
+          resourceExternalEditors: fakeResourceExternalEditors,
+        }}
         onOpenLayout={action('open layout')}
         onOpenSettings={action('open settings')}
         setToolbar={() => {}}

@@ -1247,7 +1247,7 @@ namespace gdjs {
     }
 
     /**
-     * Change the scale on Y axis of the object (changing its width).
+     * Change the scale on Y axis of the object (changing its height).
      *
      * @param newScale The new scale (must be greater than 0).
      */

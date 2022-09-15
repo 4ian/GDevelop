@@ -2,10 +2,10 @@ namespace gdjs {
   import PIXI = GlobalPIXIModule.PIXI;
 
   /**
-   * The renderer for a gdjs.RuntimeScene using Pixi.js.
+   * The renderer for a {@link gdjs.CustomRuntimeObject} using Pixi.js.
    */
   export class CustomObjectPixiRenderer
-    implements gdjs.RuntimeInstanceContainerRenderer {
+    implements gdjs.RuntimeInstanceContainerPixiRenderer {
     _object: gdjs.CustomRuntimeObject;
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _pixiContainer: PIXI.Container;
@@ -61,7 +61,7 @@ namespace gdjs {
     }
 
     /**
-     * Update the internal PIXI.Sprite position, angle...
+     * Update the internal PIXI.Container position, angle...
      */
     _updatePIXIContainer() {
       this._pixiContainer.pivot.x = this._object.getUnscaledCenterX();
@@ -146,7 +146,7 @@ namespace gdjs {
     }
   }
 
-  //Register the class to let the engine use it.
+  // Register the class to let the engine use it.
   export type CustomObjectRenderer = gdjs.CustomObjectPixiRenderer;
   export const CustomObjectRenderer = gdjs.CustomObjectPixiRenderer;
 }

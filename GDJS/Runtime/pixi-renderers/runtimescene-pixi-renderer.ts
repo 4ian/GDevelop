@@ -5,7 +5,7 @@ namespace gdjs {
    * The renderer for a gdjs.RuntimeScene using Pixi.js.
    */
   export class RuntimeScenePixiRenderer
-    implements gdjs.RuntimeInstanceContainerRenderer {
+    implements gdjs.RuntimeInstanceContainerPixiRenderer {
     _pixiRenderer: PIXI.Renderer | null;
     _runtimeScene: gdjs.RuntimeScene;
     _pixiContainer: PIXI.Container;
@@ -124,7 +124,7 @@ namespace gdjs {
     }
   }
 
-  //Register the class to let the engine use it.
+  // Register the class to let the engine use it.
   export type RuntimeSceneRenderer = gdjs.RuntimeScenePixiRenderer;
   export const RuntimeSceneRenderer = gdjs.RuntimeScenePixiRenderer;
 }

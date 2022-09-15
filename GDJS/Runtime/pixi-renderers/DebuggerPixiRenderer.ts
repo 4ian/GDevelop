@@ -2,7 +2,9 @@ namespace gdjs {
   import PIXI = GlobalPIXIModule.PIXI;
 
   /**
-   * The renderer for a gdjs.RuntimeScene using Pixi.js.
+   * A renderer for debug instances location of a container using Pixi.js.
+   *
+   * @see gdjs.CustomObjectPixiRenderer
    */
   export class DebuggerPixiRenderer {
     _instanceContainer: gdjs.RuntimeInstanceContainer;
@@ -29,6 +31,7 @@ namespace gdjs {
     /**
      * Render graphics for debugging purpose. Activate this in `gdjs.RuntimeScene`,
      * in the `renderAndStep` method.
+     * @see gdjs.RuntimeInstanceContainer#enableDebugDraw
      */
     renderDebugDraw(
       instances: gdjs.RuntimeObject[],
@@ -36,7 +39,7 @@ namespace gdjs {
       showPointsNames: boolean,
       showCustomPoints: boolean
     ) {
-      const pixiContainer: PIXI.Container = this._instanceContainer
+      const pixiContainer = this._instanceContainer
         .getRenderer()
         .getRendererObject();
       if (!this._debugDraw || !this._debugDrawContainer) {
@@ -320,7 +323,7 @@ namespace gdjs {
     }
   }
 
-  //Register the class to let the engine use it.
+  // Register the class to let the engine use it.
   export type DebuggerRenderer = gdjs.DebuggerPixiRenderer;
   export const DebuggerRenderer = gdjs.DebuggerPixiRenderer;
 }

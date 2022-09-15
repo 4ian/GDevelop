@@ -33,7 +33,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       .SetExtensionHelpPath("/all-features/advanced-conditions");
   extension
       .AddInstructionOrExpressionGroupMetadata(_("Events and control flow"))
-      .SetIcon("res/conditions/toujours24.png");
+      .SetIcon("res/conditions/toujours24_black.png");
 
   extension
       .AddCondition("Always",
@@ -42,7 +42,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                       "the condition is inverted)."),
                     _("Always"),
                     "",
-                    "res/conditions/toujours24.png",
+                    "res/conditions/toujours24_black.png",
                     "res/conditions/toujours.png")
       .SetHelpPath("/all-features/advanced-conditions")
       .AddCodeOnlyParameter("conditionInverted", "")
@@ -61,7 +61,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                     _("Check if one of the sub conditions is true"),
                     _("If one of these conditions is true:"),
                     "",
-                    "res/conditions/or24.png",
+                    "res/conditions/or24_black.png",
                     "res/conditions/or.png")
       .SetCanHaveSubInstructions()
       .MarkAsAdvanced();
@@ -72,7 +72,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                     _("Check if all sub conditions are true"),
                     _("If all of these conditions are true:"),
                     "",
-                    "res/conditions/and24.png",
+                    "res/conditions/and24_black.png",
                     "res/conditions/and.png")
       .SetCanHaveSubInstructions()
       .MarkAsAdvanced();
@@ -84,7 +84,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
           _("Return the contrary of the result of the sub conditions"),
           _("Invert the logical result of these conditions:"),
           "",
-          "res/conditions/not24.png",
+          "res/conditions/not24_black.png",
           "res/conditions/not.png")
       .SetCanHaveSubInstructions()
       .MarkAsAdvanced();
@@ -104,7 +104,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                     _("Compare the two numbers."),
                     _("_PARAM0_ _PARAM1_ _PARAM2_"),
                     "",
-                    "res/conditions/egal24.png",
+                    "res/conditions/egal24_black.png",
                     "res/conditions/egal.png")
       .SetHelpPath("/all-features/advanced-conditions")
       .AddParameter("expression", _("First expression"))
@@ -125,7 +125,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                     _("Compare the two strings."),
                     _("_PARAM0_ _PARAM1_ _PARAM2_"),
                     "",
-                    "res/conditions/egal24.png",
+                    "res/conditions/egal24_black.png",
                     "res/conditions/egal.png")
       .SetHelpPath("/all-features/advanced-conditions")
       .AddParameter("string", _("First string expression"))

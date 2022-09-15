@@ -14,11 +14,7 @@ import BehaviorsEditorService from './BehaviorsEditorService';
 import Window from '../Utils/Window';
 import { Column, Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
@@ -42,9 +38,7 @@ type Props = {|
   object: gdObject,
   onUpdateBehaviorsSharedData: () => void,
   onSizeUpdated?: ?() => void,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   onBehaviorsUpdated?: () => void,
 |};
 
@@ -269,10 +263,8 @@ const BehaviorsEditor = (props: Props) => {
                           behavior={behavior}
                           project={project}
                           object={object}
-                          resourceSources={props.resourceSources}
-                          onChooseResource={props.onChooseResource}
-                          resourceExternalEditors={
-                            props.resourceExternalEditors
+                          resourceManagementProps={
+                            props.resourceManagementProps
                           }
                         />
                       </Line>

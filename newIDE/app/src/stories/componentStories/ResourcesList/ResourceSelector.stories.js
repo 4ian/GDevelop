@@ -19,9 +19,12 @@ export const ImageNotSelected = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={() => Promise.reject('Unimplemented')}
-    resourceExternalEditors={fakeResourceExternalEditors}
+    resourceManagementProps={{
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
     initialResourceName=""
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}
@@ -32,9 +35,12 @@ export const ImageSelected = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={() => Promise.reject('Unimplemented')}
-    resourceExternalEditors={fakeResourceExternalEditors}
+    resourceManagementProps={{
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
     initialResourceName="icon128.png"
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}
@@ -83,9 +89,12 @@ export const ImageNoMargin = () => (
     margin="none"
     resourceKind="image"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={() => Promise.reject('Unimplemented')}
-    resourceExternalEditors={fakeResourceExternalEditors}
+    resourceManagementProps={{
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
     initialResourceName="icon128.png"
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}
@@ -96,9 +105,12 @@ export const ImageWithThumbnail = () => (
   <ResourceSelectorWithThumbnail
     resourceKind="image"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={() => Promise.reject('Unimplemented')}
-    resourceExternalEditors={fakeResourceExternalEditors}
+    resourceManagementProps={{
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
     resourceName="icon128.png"
     onChange={action('on change')}
   />
@@ -108,9 +120,12 @@ export const Audio = () => (
   <ResourceSelector
     resourceKind="audio"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={() => Promise.reject('Unimplemented')}
-    resourceExternalEditors={fakeResourceExternalEditors}
+    resourceManagementProps={{
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
     initialResourceName="fake-audio1.mp3"
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}
@@ -122,9 +137,12 @@ export const FontWithResetButton = () => (
     canBeReset
     resourceKind="font"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={() => Promise.reject('Unimplemented')}
-    resourceExternalEditors={fakeResourceExternalEditors}
+    resourceManagementProps={{
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
     initialResourceName="font.otf"
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}
@@ -137,9 +155,12 @@ export const FontNoMarginWithResetButton = () => (
     margin="none"
     resourceKind="font"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={() => Promise.reject('Unimplemented')}
-    resourceExternalEditors={fakeResourceExternalEditors}
+    resourceManagementProps={{
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
     initialResourceName="font.otf"
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}

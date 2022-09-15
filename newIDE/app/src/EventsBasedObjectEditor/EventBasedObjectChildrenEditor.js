@@ -12,13 +12,11 @@ import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Window from '../Utils/Window';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
-import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 
 const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
-  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
   globalObjectsContainer: gdObjectsContainer,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
@@ -212,9 +210,12 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 objectsContainer={eventsBasedObject}
                 layout={null}
                 // TODO EBO Allow to use project resources as place holders
-                resourceSources={[]}
-                resourceExternalEditors={[]}
-                onChooseResource={() => Promise.resolve([])}
+                resourceManagementProps={{
+                  resourceSources: [],
+                  resourceExternalEditors: [],
+                  onChooseResource: async () => [],
+                  onFetchNewlyAddedResources: async () => {},
+                }}
                 selectedObjectNames={this.state.selectedObjectNames}
                 onEditObject={this.editObject}
                 // Don't allow export as there is no assets.
@@ -248,9 +249,6 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   launchProjectDataOnlyPreview: () => {},
                   launchProjectWithLoadingScreenPreview: () => {},
                 }}
-                onFetchNewlyAddedResources={
-                  this.props.onFetchNewlyAddedResources
-                }
                 canInstallPrivateAsset={() => false}
               />
             </Line>
@@ -261,9 +259,12 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 initialTab={this.state.editedObjectInitialTab}
                 project={project}
                 eventsFunctionsExtension={eventsFunctionsExtension}
-                resourceSources={[]}
-                resourceExternalEditors={[]}
-                onChooseResource={() => Promise.resolve([])}
+                resourceManagementProps={{
+                  resourceSources: [],
+                  resourceExternalEditors: [],
+                  onChooseResource: async () => [],
+                  onFetchNewlyAddedResources: async () => {},
+                }}
                 onComputeAllVariableNames={() => {
                   return [];
                   // TODO EBO Find undeclared variables in the parent events.

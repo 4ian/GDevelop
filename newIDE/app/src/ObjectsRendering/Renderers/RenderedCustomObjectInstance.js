@@ -3,7 +3,7 @@ import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import ObjectsRenderingService from '../ObjectsRenderingService';
-import { mapFor } from '../../Utils/MapFor';
+import { mapReverseFor } from '../../Utils/MapFor';
 import * as PIXI from 'pixi.js-legacy';
 
 const gd: libGDevelop = global.gd;
@@ -161,7 +161,7 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
 
     this.childrenInstances = [];
     this.childrenRenderedInstances = eventBasedObject
-      ? mapFor(0, eventBasedObject.getObjectsCount(), i => {
+      ? mapReverseFor(0, eventBasedObject.getObjectsCount(), i => {
           const childObject = eventBasedObject.getObjectAt(i);
           const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
             childObject.getName()

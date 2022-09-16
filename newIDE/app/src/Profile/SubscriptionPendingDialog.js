@@ -65,7 +65,7 @@ export default function SubscriptionPendingDialog({
               <Trans>
                 Thanks for getting a subscription and supporting GDevelop!
               </Trans>{' '}
-              {'❤️'}{' '}
+              {'💜'}{' '}
               <b>
                 <Trans>
                   Your browser will now open to enter your payment details.
@@ -96,7 +96,7 @@ export default function SubscriptionPendingDialog({
               <Trans>
                 Thanks for getting a subscription and supporting GDevelop!
               </Trans>{' '}
-              {'❤️'}
+              {'💜'}
             </Text>
           </Line>
           <Line justifyContent="center" alignItems="center">

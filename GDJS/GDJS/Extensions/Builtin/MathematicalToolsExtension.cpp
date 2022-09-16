@@ -70,6 +70,7 @@ MathematicalToolsExtension::MathematicalToolsExtension() {
   GetAllExpressions()["lerp"].SetFunctionName("gdjs.evtTools.common.lerp");
   GetAllExpressions()["XFromAngleAndDistance"].SetFunctionName("gdjs.evtTools.common.getXFromAngleAndDistance");
   GetAllExpressions()["YFromAngleAndDistance"].SetFunctionName("gdjs.evtTools.common.getYFromAngleAndDistance");
+  GetAllExpressions()["Pi"].SetFunctionName("gdjs.evtTools.common.pi");
 
   StripUnimplementedInstructionsAndExpressions();
 }

@@ -808,6 +808,7 @@ export default class InstancesEditor extends Component<Props> {
     const x = this.props.project.getGameResolutionWidth() / 2;
     const y = this.props.project.getGameResolutionHeight() / 2;
     this.viewPosition.scrollTo(x, y);
+    this.setZoomFactor(1);
   }
 
   centerViewOnLastInstance(instances: Array<gdInitialInstance>) {

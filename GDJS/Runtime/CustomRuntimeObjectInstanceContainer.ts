@@ -307,10 +307,11 @@ namespace gdjs {
       }
     }
 
-    convertCoords(x: float, y: float): FloatPoint {
-      const position = this._parent
+    convertCoords(x: float, y: float, result?: FloatPoint): FloatPoint {
+      let position = result || [0, 0];
+      position = this._parent
         .getLayer(this._customObject.getLayer())
-        .convertCoords(x, y);
+        .convertCoords(x, y, 0, position);
       this._customObject.applyObjectInverseTransformation(
         position[0],
         position[1],
@@ -319,10 +320,18 @@ namespace gdjs {
       return position;
     }
 
-    convertInverseCoords(sceneX: float, sceneY: float): FloatPoint {
-      const position = [0, 0];
+    convertInverseCoords(
+      sceneX: float,
+      sceneY: float,
+      result?: FloatPoint
+    ): FloatPoint {
+      const position = result || [0, 0];
       this._customObject.applyObjectTransformation(sceneX, sceneY, position);
-      return this._parent.convertInverseCoords(position[0], position[1]);
+      return this._parent.convertInverseCoords(
+        position[0],
+        position[1],
+        position
+      );
     }
 
     /**

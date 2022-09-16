@@ -549,13 +549,22 @@ namespace gdjs {
       return this._cachedGameResolutionHeight;
     }
 
-    convertCoords(x: float, y: float): FloatPoint {
-      // TODO EBO Use an attribute instead of instantiating a point.
-      return [x, y];
+    convertCoords(x: float, y: float, result?: FloatPoint): FloatPoint {
+      const point = result || [0, 0];
+      point[0] = x;
+      point[1] = y;
+      return point;
     }
 
-    convertInverseCoords(sceneX: float, sceneY: float): FloatPoint {
-      return [sceneX, sceneY];
+    convertInverseCoords(
+      sceneX: float,
+      sceneY: float,
+      result?: FloatPoint
+    ): FloatPoint {
+      const point = result || [0, 0];
+      point[0] = sceneX;
+      point[1] = sceneY;
+      return point;
     }
 
     onChildrenLocationChanged(): void {

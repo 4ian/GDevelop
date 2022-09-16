@@ -7,7 +7,7 @@ namespace gdjs {
    * The PIXI.js renderer for the VideoRuntimeObject.
    */
   export class VideoRuntimeObjectPixiRenderer {
-    _object: any;
+    _object: gdjs.VideoRuntimeObject;
 
     // Load (or reset) the video
     _pixiObject: any;
@@ -15,15 +15,15 @@ namespace gdjs {
 
     /**
      * @param runtimeObject The object to render
-     * @param runtimeScene The gdjs.RuntimeScene in which the object is
+     * @param instanceContainer The gdjs.RuntimeScene in which the object is
      */
     constructor(
       runtimeObject: gdjs.VideoRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
       this._pixiObject = new PIXI.Sprite(
-        runtimeScene
+        instanceContainer
           .getGame()
           .getImageManager()
           .getPIXIVideoTexture(this._object._videoResource)
@@ -36,7 +36,7 @@ namespace gdjs {
       this._pixiObject._texture.baseTexture.resource.source.autoload = true;
 
       // Will be set to true when video texture is loaded.
-      runtimeScene
+      instanceContainer
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._pixiObject, runtimeObject.getZOrder());

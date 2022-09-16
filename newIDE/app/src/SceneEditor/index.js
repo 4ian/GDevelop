@@ -928,6 +928,11 @@ export default class SceneEditor extends React.Component<Props, State> {
           label: i18n._(t`Insert new...`),
           click: () => this._createNewObjectAndInstanceUnderCursor(),
         },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Center view`),
+          click: () => this.centerView(),
+        },
       ];
     } else {
       contextMenuItems = [

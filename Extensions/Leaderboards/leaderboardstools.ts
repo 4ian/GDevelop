@@ -675,8 +675,9 @@ namespace gdjs {
 
               resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-              _leaderboardViewIframe =
-                computeLeaderboardDisplayingIframe(targetUrl);
+              _leaderboardViewIframe = computeLeaderboardDisplayingIframe(
+                targetUrl
+              );
               if (typeof window !== 'undefined') {
                 _leaderboardViewClosingCallback = (event: MessageEvent) => {
                   receiveMessageFromLeaderboardView(

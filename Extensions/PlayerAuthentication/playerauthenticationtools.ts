@@ -21,8 +21,9 @@ namespace gdjs {
     let _authenticationLoader: HTMLDivElement | null = null;
     let _authenticationBanner: HTMLDivElement | null = null;
     let _authenticationTimeoutId: NodeJS.Timeout | null = null;
-    let _authenticationMessageCallback: ((event: MessageEvent) => void) | null =
-      null;
+    let _authenticationMessageCallback:
+      | ((event: MessageEvent) => void)
+      | null = null;
     let _cordovaAuthenticationMessageCallback:
       | ((event: MessageEvent) => void)
       | null = null;
@@ -352,10 +353,13 @@ namespace gdjs {
         removeAuthenticationContainer(runtimeScene);
         displayAuthenticationBanner(runtimeScene);
       };
-      const { rootContainer, subContainer, loaderContainer } =
-        authComponents.computeAuthenticationContainer(
-          onAuthenticationContainerDismissed
-        );
+      const {
+        rootContainer,
+        subContainer,
+        loaderContainer,
+      } = authComponents.computeAuthenticationContainer(
+        onAuthenticationContainerDismissed
+      );
       _authenticationRootContainer = rootContainer;
       _authenticationSubContainer = subContainer;
       _authenticationLoader = loaderContainer;
@@ -366,8 +370,9 @@ namespace gdjs {
       const electron = runtimeScene.getGame().getRenderer().getElectron();
       if (electron) {
         // If we're on Electron, use an iframe.
-        _authenticationIframe =
-          authComponents.computeAuthenticationIframe(targetUrl);
+        _authenticationIframe = authComponents.computeAuthenticationIframe(
+          targetUrl
+        );
         if (!_authenticationSubContainer) {
           handleAuthenticationError(
             runtimeScene,

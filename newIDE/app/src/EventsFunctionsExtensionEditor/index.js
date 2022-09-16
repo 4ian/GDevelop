@@ -46,11 +46,11 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { ParametersIndexOffsets } from '../EventsFunctionsExtensionsLoader';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
-import Window from '../Utils/Window';
+//import Window from '../Utils/Window';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 const gd: libGDevelop = global.gd;
 
-const isDev = Window.isDev();
+const isDev = true; //Window.isDev();
 
 type Props = {|
   project: gdProject,

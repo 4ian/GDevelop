@@ -84,7 +84,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                 _("the width"),
                 _("Size"),
                 "res/actions/scaleWidth24_black.png",
-                "res/actions/scaleWidth.png")
+                "res/actions/scaleWidth_black.png")
 
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardOperatorParameters("number")
@@ -97,7 +97,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                    _("the width"),
                    _("Size"),
                    "res/conditions/scaleWidth24_black.png",
-                   "res/conditions/scaleWidth.png")
+                   "res/conditions/scaleWidth_black.png")
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
@@ -109,7 +109,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                 _("the height"),
                 _("Size"),
                 "res/actions/scaleHeight24_black.png",
-                "res/actions/scaleHeight.png")
+                "res/actions/scaleHeight_black.png")
 
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardOperatorParameters("number")
@@ -122,7 +122,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                    _("the height"),
                    _("Size"),
                    "res/conditions/scaleHeight24_black.png",
-                   "res/conditions/scaleHeight.png")
+                   "res/conditions/scaleHeight_black.png")
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
@@ -134,7 +134,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                 _("Change the size of _PARAM0_: set to _PARAM1_x_PARAM2_"),
                 _("Size"),
                 "res/actions/scale24_black.png",
-                "res/actions/scale.png")
+                "res/actions/scale_black.png")
 
       .AddParameter("object", _("Object"), "TiledSprite")
       .AddParameter("expression", _("Width"))
@@ -148,7 +148,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                 _("the angle"),
                 _("Size"),
                 "res/actions/rotate24_black.png",
-                "res/actions/rotate.png")
+                "res/actions/rotate_black.png")
 
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardOperatorParameters("number")
@@ -161,7 +161,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                    "the angle",
                    _("Size"),
                    "res/conditions/rotate24_black.png",
-                   "res/conditions/rotate.png")
+                   "res/conditions/rotate_black.png")
 
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardRelationalOperatorParameters("number")
@@ -174,7 +174,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
          _("the X offset"),
          _("Image offset"),
          "res/conditions/scaleWidth24_black.png",
-         "res/conditions/scaleWidth.png")
+         "res/conditions/scaleWidth_black.png")
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced()
@@ -188,7 +188,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
          _("the X offset"),
          _("Image offset"),
          "res/conditions/scaleWidth24_black.png",
-         "res/conditions/scaleWidth.png")
+         "res/conditions/scaleWidth_black.png")
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
@@ -201,7 +201,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
          _("the Y offset"),
          _("Image offset"),
          "res/conditions/scaleHeight24_black.png",
-         "res/conditions/scaleHeight.png")
+         "res/conditions/scaleHeight_black.png")
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced()
@@ -215,7 +215,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
          _("the Y offset"),
          _("Image offset"),
          "res/conditions/scaleHeight24_black.png",
-         "res/conditions/scaleHeight.png")
+         "res/conditions/scaleHeight_black.png")
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()

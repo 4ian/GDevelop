@@ -436,7 +436,7 @@ const defineTileMap = function (
     _("the scale"),
     _("Size"),
     "res/actions/scale24_black.png",
-    "res/actions/scale.png"
+    "res/actions/scale_black.png"
   )
   .addParameter('object', _('Tile map'), 'TileMap', false)
   .useStandardOperatorParameters("number")
@@ -484,7 +484,7 @@ object
       _("the width"),
       _("Size"),
       "res/actions/scaleWidth24_black.png",
-      "res/actions/scale.png"
+      "res/actions/scaleWidth_black.png"
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
     .useStandardOperatorParameters("number")
@@ -500,7 +500,7 @@ object
       _("the height"),
       _("Size"),
       "res/actions/scaleHeight24_black.png",
-      "res/actions/scale.png"
+      "res/actions/scaleHeight_black.png"
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
     .useStandardOperatorParameters("number")
@@ -769,7 +769,7 @@ const defineCollisionMask = function (
       _("the scale"),
       _("Size"),
       "res/actions/scale24_black.png",
-      "res/actions/scale.png"
+      "res/actions/scale_black.png"
     )
     .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
     .useStandardOperatorParameters("number")
@@ -817,7 +817,7 @@ const defineCollisionMask = function (
         _("the width"),
         _("Size"),
         "res/actions/scaleWidth24_black.png",
-        "res/actions/scale.png"
+        "res/actions/scaleWidth_black.png"
       )
       .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
       .useStandardOperatorParameters("number")
@@ -833,7 +833,7 @@ const defineCollisionMask = function (
         _("the height"),
         _("Size"),
         "res/actions/scaleHeight24_black.png",
-        "res/actions/scale.png"
+        "res/actions/scaleHeight_black.png"
       )
       .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
       .useStandardOperatorParameters("number")

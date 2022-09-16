@@ -332,7 +332,7 @@ module.exports = {
         _('_PARAM0_ word wrap is enabled'),
         '',
         'res/conditions/wordWrap24_black.png',
-        'res/conditions/wordWrap.png'
+        'res/conditions/wordWrap_black.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .getCodeExtraInformation()
@@ -346,7 +346,7 @@ module.exports = {
         _('Activate word wrap of _PARAM0_: _PARAM1_'),
         '',
         'res/actions/wordWrap24_black.png',
-        'res/actions/wordWrap.png'
+        'res/actions/wordWrap_black.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .addParameter('yesorno', _('Activate word wrap'), '', false)

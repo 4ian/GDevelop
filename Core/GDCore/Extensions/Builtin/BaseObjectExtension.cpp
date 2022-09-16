@@ -37,7 +37,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("the X position"),
                    _("Position"),
                    "res/conditions/position24_black.png",
-                   "res/conditions/position.png")
+                   "res/conditions/position_black.png")
 
       .AddParameter("object", _("Object"))
       .UseStandardRelationalOperatorParameters("number")
@@ -49,7 +49,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("the X position"),
                 _("Position"),
                 "res/actions/position24_black.png",
-                "res/actions/position.png")
+                "res/actions/position_black.png")
 
       .AddParameter("object", _("Object"))
       .UseStandardOperatorParameters("number")
@@ -61,7 +61,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("the Y position"),
                    _("Position"),
                    "res/conditions/position24_black.png",
-                   "res/conditions/position.png")
+                   "res/conditions/position_black.png")
 
       .AddParameter("object", _("Object"))
       .UseStandardRelationalOperatorParameters("number")
@@ -73,7 +73,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("the Y position"),
                 _("Position"),
                 "res/actions/position24_black.png",
-                "res/actions/position.png")
+                "res/actions/position_black.png")
 
       .AddParameter("object", _("Object"))
       .UseStandardOperatorParameters("number")
@@ -86,7 +86,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                   "axis), _PARAM3_ _PARAM4_ (y axis)"),
                 _("Position"),
                 "res/actions/position24_black.png",
-                "res/actions/position.png")
+                "res/actions/position_black.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("operator", _("Modification's sign"), "number")
@@ -103,7 +103,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                   "axis), _PARAM3_ _PARAM4_ (y axis)"),
                 _("Position/Center"),
                 "res/actions/position24_black.png",
-                "res/actions/position.png")
+                "res/actions/position_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("X position"))
@@ -223,7 +223,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("the angle"),
                 _("Angle"),
                 "res/actions/direction24_black.png",
-                "res/actions/direction.png")
+                "res/actions/direction_black.png")
 
       .AddParameter("object", _("Object"))
       .UseStandardOperatorParameters("number");
@@ -235,7 +235,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Rotate _PARAM0_ at speed _PARAM1_ deg/second"),
                 _("Angle"),
                 "res/actions/rotate24_black.png",
-                "res/actions/direction.png")
+                "res/actions/rotate_black.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angular speed (in degrees per second)"))
@@ -249,7 +249,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_ deg/second"),
          _("Angle"),
          "res/actions/rotate24_black.png",
-         "res/actions/direction.png")
+         "res/actions/rotate_black.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angle to rotate towards (in degrees)"))
@@ -265,7 +265,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
            "_PARAM3_ deg/second"),
          _("Angle"),
          "res/actions/rotate24_black.png",
-         "res/actions/direction.png")
+         "res/actions/rotate_black.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("X position"))
@@ -513,7 +513,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("the angle (in degrees)"),
                    _("Angle"),
                    "res/conditions/direction24_black.png",
-                   "res/conditions/direction.png")
+                   "res/conditions/direction_black.png")
 
       .AddParameter("object", _("Object"))
       .UseStandardRelationalOperatorParameters("number")
@@ -965,21 +965,21 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("X position"),
                     _("X position of the object"),
                     _("Position"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("Y",
                     _("Y position"),
                     _("Y position of the object"),
                     _("Position"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("Angle",
                     _("Angle"),
                     _("Current angle, in degrees, of the object"),
                     _("Angle"),
-                    "res/actions/direction.png")
+                    "res/actions/direction_black.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("ForceX",
@@ -1022,14 +1022,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Width"),
                     _("Width of the object"),
                     _("Size"),
-                    "res/actions/scaleWidth.png")
+                    "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("Largeur",
                     _("Width"),
                     _("Width of the object"),
                     _("Size"),
-                    "res/actions/scaleWidth.png")
+                    "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"))
       .SetHidden();
 
@@ -1037,14 +1037,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Height"),
                     _("Height of the object"),
                     _("Size"),
-                    "res/actions/scaleHeight.png")
+                    "res/actions/scaleHeight_black.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("Hauteur",
                     _("Height"),
                     _("Height of the object"),
                     _("Size"),
-                    "res/actions/scaleHeight.png")
+                    "res/actions/scaleHeight_black.png")
       .AddParameter("object", _("Object"))
       .SetHidden();
 
@@ -1135,7 +1135,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                       "If you need the angle to an arbitrary position, "
                       "use AngleToPosition."),
                     _("Angle"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Object"));
 
@@ -1146,7 +1146,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                       "getting the cartesian coordinates of a 2D vector, using "
                       "its polar coordinates."),
                     _("Position"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angle, in degrees"))
       .AddParameter("expression", _("Distance"));
@@ -1158,7 +1158,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                       "getting the cartesian coordinates of a 2D vector, using "
                       "its polar coordinates."),
                     _("Position"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angle, in degrees"))
       .AddParameter("expression", _("Distance"));
@@ -1169,7 +1169,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                       "\"target\" position (in degrees). If you need the angle "
                       "between two objects, use AngleToObject."),
                     _("Angle"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Target X position"))
       .AddParameter("expression", _("Target Y position"));
@@ -1565,7 +1565,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                        _("Object name"),
                        _("Return the name of the object"),
                        "",
-                       "res/conditions/text.png")
+                       "res/conditions/text_black.png")
       .AddParameter("object", _("Object"));
 
   obj.AddStrExpression("Layer",

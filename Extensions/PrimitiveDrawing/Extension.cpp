@@ -257,7 +257,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                   "with _PARAM0_"),
                 _("Advanced"),
                 "res/actions/position24_black.png",
-                "res/actions/position.png")
+                "res/actions/position_black.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("X position of start point"))
@@ -475,7 +475,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("the size of the outline"),
                 _("Setup"),
                 "res/actions/outlineSize24_black.png",
-                "res/actions/outlineSize.png")
+                "res/actions/outlineSize_black.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .UseStandardOperatorParameters("number")
@@ -488,7 +488,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                    _("the size of the outline"),
                    _("Setup"),
                    "res/conditions/outlineSize24_black.png",
-                   "res/conditions/outlineSize.png")
+                   "res/conditions/outlineSize_black.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .UseStandardRelationalOperatorParameters("number")
@@ -498,7 +498,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     _("Outline size"),
                     _("Outline size"),
                     "",
-                    "res/conditions/outlineSize.png")
+                    "res/conditions/outlineSize_black.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .SetFunctionName("GetOutlineSize");
 
@@ -577,7 +577,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
          _("Use relative coordinates for _PARAM0_: _PARAM1_"),
          _("Setup"),
          "res/actions/position24_black.png",
-         "res/actions/position.png")
+         "res/actions/position_black.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("yesorno", _("Use relative coordinates?"), "", false)
       .SetDefaultValue("true")
@@ -590,7 +590,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
          _("_PARAM0_ is using relative coordinates"),
          _("Setup"),
          "res/conditions/position24_black.png",
-         "res/conditions/position.png")
+         "res/conditions/position_black.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .SetFunctionName("AreCoordinatesRelative");
@@ -601,7 +601,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("the scale"),
                 _("Size"),
                 "res/actions/scale24_black.png",
-                "res/actions/scale.png")
+                "res/actions/scale_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced();
@@ -674,7 +674,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("the width"),
                 _("Size"),
                 "res/actions/scaleWidth24_black.png",
-                "res/actions/scale.png")
+                "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced();
@@ -685,7 +685,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("the height"),
                 _("Size"),
                 "res/actions/scaleHeight24_black.png",
-                "res/actions/scale.png")
+                "res/actions/scaleHeight_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced();
@@ -698,7 +698,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
          _("Change the center of rotation of _PARAM0_: _PARAM1_; _PARAM2_"),
          _("Angle"),
          "res/actions/position24_black.png",
-         "res/actions/position.png")
+         "res/actions/position_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
@@ -712,7 +712,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                   "_PARAM1_; _PARAM2_ to _PARAM3_; _PARAM4_"),
                 _("Position"),
                 "res/actions/position24_black.png",
-                "res/actions/position.png")
+                "res/actions/position_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("Left X position"))
       .AddParameter("expression", _("Top Y position"))
@@ -724,7 +724,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     _("X drawing coordinate of a point from the scene"),
                     _("X drawing coordinate of a point from the scene"),
                     _("Position"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("X scene position"))
       .AddParameter("expression", _("Y scene position"));
@@ -733,7 +733,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     _("Y drawing coordinate of a point from the scene"),
                     _("Y drawing coordinate of a point from the scene"),
                     _("Position"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("X scene position"))
       .AddParameter("expression", _("Y scene position"));
@@ -742,7 +742,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     _("X scene coordinate of a point from the drawing"),
                     _("X scene coordinate of a point from the drawing"),
                     _("Position"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("X drawing position"))
       .AddParameter("expression", _("Y drawing position"));
@@ -751,7 +751,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     _("Y scene coordinate of a point from the drawing"),
                     _("Y scene coordinate of a point from the drawing"),
                     _("Position"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("X drawing position"))
       .AddParameter("expression", _("Y drawing position"));

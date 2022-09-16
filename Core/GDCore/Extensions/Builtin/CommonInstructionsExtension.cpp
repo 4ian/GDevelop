@@ -43,7 +43,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                     _("Always"),
                     "",
                     "res/conditions/toujours24_black.png",
-                    "res/conditions/toujours.png")
+                    "res/conditions/toujours_black.png")
       .SetHelpPath("/all-features/advanced-conditions")
       .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsAdvanced();
@@ -62,7 +62,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                     _("If one of these conditions is true:"),
                     "",
                     "res/conditions/or24_black.png",
-                    "res/conditions/or.png")
+                    "res/conditions/or_black.png")
       .SetCanHaveSubInstructions()
       .MarkAsAdvanced();
 
@@ -73,7 +73,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                     _("If all of these conditions are true:"),
                     "",
                     "res/conditions/and24_black.png",
-                    "res/conditions/and.png")
+                    "res/conditions/and_black.png")
       .SetCanHaveSubInstructions()
       .MarkAsAdvanced();
 
@@ -85,7 +85,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
           _("Invert the logical result of these conditions:"),
           "",
           "res/conditions/not24_black.png",
-          "res/conditions/not.png")
+          "res/conditions/not_black.png")
       .SetCanHaveSubInstructions()
       .MarkAsAdvanced();
 
@@ -105,7 +105,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                     _("_PARAM0_ _PARAM1_ _PARAM2_"),
                     "",
                     "res/conditions/egal24_black.png",
-                    "res/conditions/egal.png")
+                    "res/conditions/egal_black.png")
       .SetHelpPath("/all-features/advanced-conditions")
       .AddParameter("expression", _("First expression"))
       .AddParameter("relationalOperator", _("Sign of the test"), "number")
@@ -126,7 +126,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                     _("_PARAM0_ _PARAM1_ _PARAM2_"),
                     "",
                     "res/conditions/egal24_black.png",
-                    "res/conditions/egal.png")
+                    "res/conditions/egal_black.png")
       .SetHelpPath("/all-features/advanced-conditions")
       .AddParameter("string", _("First string expression"))
       .AddParameter("relationalOperator", _("Sign of the test"), "string")

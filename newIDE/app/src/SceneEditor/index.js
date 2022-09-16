@@ -112,7 +112,7 @@ type Props = {|
   onOpenEvents: (sceneName: string) => void,
   project: gdProject,
   setToolbar: (?React.Node) => void,
-  ...ResourceManagementProps,
+  resourceManagementProps: ResourceManagementProps,
   isActive: boolean,
   unsavedChanges?: ?UnsavedChanges,
 

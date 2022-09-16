@@ -110,9 +110,7 @@ const InstructionParametersEditor = React.forwardRef<
       focusOnMount,
       style,
       openInstructionOrExpression,
-      resourceSources,
-      onChooseResource,
-      resourceExternalEditors,
+      resourceManagementProps,
     },
     ref
   ) => {
@@ -364,9 +362,7 @@ const InstructionParametersEditor = React.forwardRef<
                         objectsContainer={objectsContainer}
                         key={i}
                         parameterRenderingService={ParameterRenderingService}
-                        resourceManagementProps={
-                          this.props.resourceManagementProps
-                        }
+                        resourceManagementProps={resourceManagementProps}
                         ref={field => {
                           if (isFirstVisibleParameterField) {
                             firstVisibleField.current = field;

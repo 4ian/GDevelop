@@ -97,12 +97,12 @@ namespace gdjs {
      * @param particleObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       particleObjectData: ParticleEmitterObjectData
     ) {
-      super(runtimeScene, particleObjectData);
+      super(instanceContainer, particleObjectData);
       this._renderer = new gdjs.ParticleEmitterObjectRenderer(
-        runtimeScene,
+        instanceContainer,
         this,
         particleObjectData
       );
@@ -231,7 +231,10 @@ namespace gdjs {
       if (
         oldObjectData.textureParticleName !== newObjectData.textureParticleName
       ) {
-        this.setTexture(newObjectData.textureParticleName, this._runtimeScene);
+        this.setTexture(
+          newObjectData.textureParticleName,
+          this.getRuntimeScene()
+        );
       }
       if (oldObjectData.flow !== newObjectData.flow) {
         this.setFlow(newObjectData.flow);
@@ -267,7 +270,7 @@ namespace gdjs {
 
         // and recreate the renderer, which will add itself to the layer.
         this._renderer = new gdjs.ParticleEmitterObjectRenderer(
-          this._runtimeScene,
+          this.getInstanceContainer(),
           this,
           newObjectData
         );
@@ -281,7 +284,7 @@ namespace gdjs {
       return true;
     }
 
-    update(runtimeScene): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (this._posDirty) {
         this._renderer.setPosition(this.getX(), this.getY());
       }
@@ -324,24 +327,24 @@ namespace gdjs {
         this._renderer.resetEmission(this.flow, this.tank);
       }
       if (this._textureDirty) {
-        this._renderer.setTextureName(this.texture, runtimeScene);
+        this._renderer.setTextureName(this.texture, instanceContainer);
       }
       this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = false;
       this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = false;
       this._alphaDirty = this._flowDirty = this._textureDirty = this._tankDirty = false;
-      this._renderer.update(this.getElapsedTime(runtimeScene) / 1000.0);
+      this._renderer.update(this.getElapsedTime() / 1000.0);
       if (
         this._renderer.hasStarted() &&
         this.getParticleCount() === 0 &&
         this.destroyWhenNoParticles
       ) {
-        this.deleteFromScene(runtimeScene);
+        this.deleteFromScene(instanceContainer);
       }
     }
 
-    onDestroyFromScene(runtimeScene: gdjs.RuntimeScene): void {
+    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._renderer.destroy();
-      super.onDestroyFromScene(runtimeScene);
+      super.onDestroyFromScene(instanceContainer);
     }
 
     getEmitterForceMin(): number {

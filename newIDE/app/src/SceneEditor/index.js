@@ -886,6 +886,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editor) this.editor.zoomToInitialPosition();
   };
 
+  zoomToFitSelection = () => {
+    const selectedInstances = this.instancesSelection.getSelectedInstances();
+    if (this.editor) this.editor.zoomToFitSelection(selectedInstances);
+  };
+
   setZoomFactor = (zoomFactor: number) => {
     if (this.editor) this.editor.setZoomFactor(zoomFactor);
   };
@@ -932,6 +937,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         {
           label: i18n._(t`Zoom to initial position`),
           click: () => this.zoomToInitialPosition(),
+        },
+        {
+          label: i18n._(t`Zoom to fit selection`),
+          click: () => this.zoomToFitSelection(),
         },
       ];
     } else {

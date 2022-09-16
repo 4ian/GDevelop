@@ -31,6 +31,7 @@ import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
 import LongTouchHandler from './LongTouchHandler';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
+import Rectangle from '../Utils/Rectangle';
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
@@ -809,6 +810,25 @@ export default class InstancesEditor extends Component<Props> {
     const y = this.props.project.getGameResolutionHeight() / 2;
     this.viewPosition.scrollTo(x, y);
     this.setZoomFactor(1);
+  }
+
+  zoomToFitSelection(instances: Array<gdInitialInstance>) {
+    if (instances.length === 0) return;
+    const [firstInstance, ...otherInstances] = instances;
+    const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
+    let selectedInstancesRectangle = instanceMeasurer.getInstanceAABB(
+      firstInstance,
+      new Rectangle()
+    );
+    otherInstances.forEach(instance => {
+      selectedInstancesRectangle.union(
+        instanceMeasurer.getInstanceAABB(instance, new Rectangle())
+      );
+    });
+    const idealZoom = this.viewPosition.fitToRectangle(
+      selectedInstancesRectangle
+    );
+    this.setZoomFactor(idealZoom);
   }
 
   centerViewOnLastInstance(instances: Array<gdInitialInstance>) {

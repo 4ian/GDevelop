@@ -50,7 +50,7 @@ import Window from '../Utils/Window';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 const gd: libGDevelop = global.gd;
 
-const isDev = Window.isDev();
+const isDev = true;//Window.isDev();
 
 type Props = {|
   project: gdProject,

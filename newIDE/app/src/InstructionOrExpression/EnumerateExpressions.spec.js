@@ -242,7 +242,7 @@ describe('EnumerateExpressions', () => {
         Angle: {
           displayedName: 'Angle',
           fullGroupName: 'General/Objects/Angle',
-          iconFilename: 'res/actions/direction.png',
+          iconFilename: 'res/actions/direction_black.png',
           isPrivate: false,
           name: 'Angle',
           scope: {

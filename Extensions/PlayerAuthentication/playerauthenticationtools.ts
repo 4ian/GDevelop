@@ -30,9 +30,7 @@ namespace gdjs {
 
     // Ensure that the condition "just logged in" is valid only for one frame.
     gdjs.registerRuntimeScenePostEventsCallback(() => {
-      if (_justLoggedIn) {
-        _justLoggedIn = false;
-      }
+      _justLoggedIn = false;
     });
 
     /**

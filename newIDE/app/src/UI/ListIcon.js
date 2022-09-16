@@ -60,10 +60,10 @@ function ListIcon(props: Props) {
 
   let filter = undefined;
   if (shouldInvertGrayScale) filter = 'grayscale(1) invert(1)';
-  else if (isGDevelopIcon && disabled && !isBlackIcon)
-    filter = 'grayscale(100%)';
   else if (isGDevelopIcon && !isBlackIcon)
-    filter = gdevelopTheme.gdevelopIconsCSSFilter;
+    filter = disabled
+      ? 'grayscale(100%)'
+      : gdevelopTheme.gdevelopIconsCSSFilter;
 
   const style = {
     maxWidth: useExactIconSize ? undefined : iconWidth,

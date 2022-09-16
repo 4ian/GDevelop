@@ -485,6 +485,13 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("Angle, in degrees"))
       .AddParameter("expression", _("Distance"));
 
+  extension
+      .AddExpression("Pi",
+                     _("Number Pi (3.1415...)"),
+                     _("The Number Pi (3.1415...)"),
+                     "",
+                     "res/mathfunction.png")
+      .SetHelpPath("/all-features/expressions");
 }
 
 }  // namespace gd

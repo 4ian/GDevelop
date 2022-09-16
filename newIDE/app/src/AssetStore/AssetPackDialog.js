@@ -16,7 +16,7 @@ import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import LinearProgress from '../UI/LinearProgress';
 import { AssetStoreContext } from './AssetStoreContext';
-import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 
 type Props = {|
   assetPack: AssetPack,
@@ -27,7 +27,7 @@ type Props = {|
   project: gdProject,
   objectsContainer: gdObjectsContainer,
   onObjectAddedFromAsset: (object: gdObject) => void,
-  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
+  resourceManagementProps: ResourceManagementProps,
 |};
 
 export const AssetPackDialog = ({
@@ -39,7 +39,7 @@ export const AssetPackDialog = ({
   project,
   objectsContainer,
   onObjectAddedFromAsset,
-  onFetchNewlyAddedResources,
+  resourceManagementProps,
 }: Props) => {
   const missingAssetShortHeaders = assetShortHeaders.filter(
     assetShortHeader => !addedAssetIds.includes(assetShortHeader.id)
@@ -82,7 +82,7 @@ export const AssetPackDialog = ({
           });
         });
 
-        await onFetchNewlyAddedResources();
+        await resourceManagementProps.onFetchNewlyAddedResources();
 
         setAreAssetsBeingInstalled(false);
         onAssetsAdded();
@@ -104,7 +104,7 @@ export const AssetPackDialog = ({
       onObjectAddedFromAsset,
       onAssetsAdded,
       environment,
-      onFetchNewlyAddedResources,
+      resourceManagementProps,
     ]
   );
 

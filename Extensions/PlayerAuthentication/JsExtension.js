@@ -63,6 +63,9 @@ module.exports = {
       .setHelpPath('/all-features/player-authentication')
       .getCodeExtraInformation()
       .setIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .setFunctionName('gdjs.playerAuthentication.displayAuthenticationBanner');
@@ -81,6 +84,9 @@ module.exports = {
       .setHelpPath('/all-features/player-authentication')
       .getCodeExtraInformation()
       .setIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .setFunctionName('gdjs.playerAuthentication.openAuthenticationWindow');
@@ -97,6 +103,9 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .setFunctionName('gdjs.playerAuthentication.isAuthenticationWindowOpen');
@@ -115,6 +124,9 @@ module.exports = {
       .setHelpPath('/all-features/player-authentication')
       .getCodeExtraInformation()
       .setIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .setFunctionName('gdjs.playerAuthentication.logout');
@@ -129,6 +141,9 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .setFunctionName('gdjs.playerAuthentication.getUsername');
@@ -145,6 +160,9 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .setFunctionName('gdjs.playerAuthentication.isAuthenticated');
@@ -161,6 +179,9 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .setFunctionName('gdjs.playerAuthentication.hasLoggedIn');

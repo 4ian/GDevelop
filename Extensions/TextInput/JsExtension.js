@@ -293,7 +293,7 @@ module.exports = {
         _('the text'),
         _('the text'),
         '',
-        'res/conditions/text24.png'
+        'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
       .useStandardParameters('string')
@@ -308,7 +308,7 @@ module.exports = {
         _('the placeholder'),
         _('the placeholder'),
         '',
-        'res/conditions/text24.png'
+        'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
       .useStandardParameters('string')
@@ -368,7 +368,7 @@ module.exports = {
         _('the input type'),
         _('the input type'),
         _('Type'),
-        'res/conditions/text24.png'
+        'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
       .useStandardParameters('string') // TODO: stringWithSelector?
@@ -458,7 +458,7 @@ module.exports = {
         _('the border width'),
         _('the border width'),
         _('Field appearance'),
-        'res/conditions/outlineSize24.png'
+        'res/conditions/outlineSize24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
       .useStandardParameters('number')
@@ -475,7 +475,7 @@ module.exports = {
         _('the text input is read-only'),
         _('read-only'),
         '',
-        'res/conditions/text24.png'
+        'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
       .useStandardParameters('boolean')
@@ -490,7 +490,7 @@ module.exports = {
         _('the text input is disabled'),
         _('disabled'),
         '',
-        'res/conditions/text24.png'
+        'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
       .useStandardParameters('boolean')

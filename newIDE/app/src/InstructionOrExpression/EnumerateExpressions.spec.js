@@ -261,7 +261,7 @@ describe('EnumerateExpressions', () => {
         'X position of a point': {
           displayedName: 'X position of a point',
           fullGroupName: 'General/Sprite/Position',
-          iconFilename: 'res/actions/position.png',
+          iconFilename: 'res/actions/position_black.png',
           isPrivate: false,
           name: 'PointX',
           scope: {

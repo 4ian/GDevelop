@@ -125,7 +125,7 @@ export default class SelectedInstances {
       () => {
         this.onRotateEnd();
       },
-      'url("res/actions/rotate24.png"),auto'
+      'url("res/actions/rotate24_black.png"),auto'
     );
   }
 

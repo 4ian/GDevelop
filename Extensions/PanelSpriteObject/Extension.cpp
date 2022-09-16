@@ -85,8 +85,8 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                 _("Modify the width of a Panel Sprite."),
                 _("the width"),
                 _("Size and angle"),
-                "res/actions/scaleWidth24.png",
-                "res/actions/scaleWidth.png")
+                "res/actions/scaleWidth24_black.png",
+                "res/actions/scaleWidth_black.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
       .UseStandardOperatorParameters("number")
@@ -98,8 +98,8 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                    _("Check the width of a Panel Sprite."),
                    _("the width"),
                    _("Size and angle"),
-                   "res/conditions/scaleWidth24.png",
-                   "res/conditions/scaleWidth.png")
+                   "res/conditions/scaleWidth24_black.png",
+                   "res/conditions/scaleWidth_black.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
       .UseStandardRelationalOperatorParameters("number")
@@ -110,8 +110,8 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                 _("Modify the height of a Panel Sprite."),
                 _("the height"),
                 _("Size and angle"),
-                "res/actions/scaleHeight24.png",
-                "res/actions/scaleHeight.png")
+                "res/actions/scaleHeight24_black.png",
+                "res/actions/scaleHeight_black.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
       .UseStandardOperatorParameters("number")
@@ -123,8 +123,8 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                    _("Check the height of a Panel Sprite."),
                    _("the height"),
                    _("Size and angle"),
-                   "res/conditions/scaleHeight24.png",
-                   "res/conditions/scaleHeight.png")
+                   "res/conditions/scaleHeight24_black.png",
+                   "res/conditions/scaleHeight_black.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
       .UseStandardRelationalOperatorParameters("number")
@@ -136,8 +136,8 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                 "Modify the angle of a Panel Sprite.",
                 "the angle",
                 _("Size and angle"),
-                "res/actions/rotate24.png",
-                "res/actions/rotate.png")
+                "res/actions/rotate24_black.png",
+                "res/actions/rotate_black.png")
 
       .SetHidden()  // Deprecated
       .AddParameter("object", _("Object"), "PanelSprite")
@@ -150,8 +150,8 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                    "Check the angle of a Panel Sprite.",
                    "the angle",
                    _("Size and angle"),
-                   "res/conditions/rotate24.png",
-                   "res/conditions/rotate.png")
+                   "res/conditions/rotate24_black.png",
+                   "res/conditions/rotate_black.png")
 
       .SetHidden()  // Deprecated
       .AddParameter("object", _("Object"), "PanelSprite")

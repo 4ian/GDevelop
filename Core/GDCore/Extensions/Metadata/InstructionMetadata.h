@@ -361,7 +361,7 @@ class GD_CORE_API InstructionMetadata {
      *                 _("the string"),
      *                 _("Text"),
      *                 "CppPlatform/Extensions/text24.png",
-     *                 "CppPlatform/Extensions/text.png");
+     *                 "CppPlatform/Extensions/text_black.png");
      *
      *      .AddParameter("object", _("Object"), "Text", false)
      *      .AddParameter("operator", _("Modification operator"), "string")

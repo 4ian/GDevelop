@@ -282,9 +282,6 @@ export const WithObjectsList = () => (
                   onObjectCreated={() => {}}
                   onObjectSelected={() => {}}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-                  onFetchNewlyAddedResources={action(
-                    'onFetchNewlyAddedResources'
-                  )}
                   canInstallPrivateAsset={() => false}
                 />
               </TabContentContainer>

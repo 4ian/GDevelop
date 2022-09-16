@@ -488,7 +488,7 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
   extension
       .AddExpression("Pi",
                      _("Number Pi (3.1415...)"),
-                     _("The Number Pi (3.1415...)"),
+                     _("The number Pi (3.1415...)"),
                      "",
                      "res/mathfunction.png")
       .SetHelpPath("/all-features/expressions");

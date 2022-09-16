@@ -1,5 +1,6 @@
 // @flow
 import * as PIXI from 'pixi.js-legacy';
+import Rectangle from '../Utils/Rectangle';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
 
 type Props = {|
@@ -101,6 +102,19 @@ export default class ViewPosition {
   scrollTo(x: number, y: number) {
     this.viewX = x;
     this.viewY = y;
+  }
+
+  /**
+   * Moves view to the rectangle center and returns the ideal zoom
+   * factor to fit to the rectangle.
+   */
+  fitToRectangle(rectangle: Rectangle) {
+    this.viewX = rectangle.centerX();
+    this.viewY = rectangle.centerY();
+    const idealZoomOnX = this._width / rectangle.width();
+    const idealZoomOnY = this._height / rectangle.height();
+
+    return Math.min(idealZoomOnX, idealZoomOnY);
   }
 
   scrollToInstance(instance: gdInitialInstance) {

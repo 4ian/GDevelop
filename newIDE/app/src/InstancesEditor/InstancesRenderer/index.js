@@ -28,7 +28,16 @@ export default class InstancesRenderer {
   pixiContainer: PIXI.Container;
 
   temporaryRectangle: Rectangle;
-  instanceMeasurer: any;
+  instanceMeasurer: {|
+    getInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
+    getUnrotatedInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
+    getInstanceRect: gdInitialInstance => {|
+      x: number,
+      y: number,
+      width: number,
+      height: number,
+    |},
+  |};
 
   constructor({
     project,

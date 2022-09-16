@@ -26,7 +26,7 @@ const defineTileMap = function (
   extension,
   _ /*: (string) => string */,
   gd /*: libGDevelop */) {
-  
+
   var objectTileMap = new gd.ObjectJsImplementation();
   // $FlowExpectedError - ignore Flow warning as we're creating an object
   objectTileMap.updateProperty = function (
@@ -435,8 +435,8 @@ const defineTileMap = function (
     _("Modify the scale of the specified object."),
     _("the scale"),
     _("Size"),
-    "res/actions/scale24.png",
-    "res/actions/scale.png"
+    "res/actions/scale24_black.png",
+    "res/actions/scale_black.png"
   )
   .addParameter('object', _('Tile map'), 'TileMap', false)
   .useStandardOperatorParameters("number")
@@ -452,7 +452,7 @@ object
     _("the width's scale of an object"),
     _("the width's scale"),
     _("Size"),
-    "res/actions/scaleWidth24.png"
+    "res/actions/scaleWidth24_black.png"
   )
   .addParameter('object', _('Tile map'), 'TileMap', false)
   .useStandardParameters("number")
@@ -468,7 +468,7 @@ object
     _("the height's scale of an object"),
     _("the height's scale"),
     _("Size"),
-    "res/actions/scaleHeight24.png"
+    "res/actions/scaleHeight24_black.png"
   )
   .addParameter('object', _('Tile map'), 'TileMap', false)
   .useStandardParameters("number")
@@ -483,8 +483,8 @@ object
       _("Change the width of an object."),
       _("the width"),
       _("Size"),
-      "res/actions/scaleWidth24.png",
-      "res/actions/scale.png"
+      "res/actions/scaleWidth24_black.png",
+      "res/actions/scaleWidth_black.png"
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
     .useStandardOperatorParameters("number")
@@ -499,8 +499,8 @@ object
       _("Change the height of an object."),
       _("the height"),
       _("Size"),
-      "res/actions/scaleHeight24.png",
-      "res/actions/scale.png"
+      "res/actions/scaleHeight24_black.png",
+      "res/actions/scaleHeight_black.png"
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
     .useStandardOperatorParameters("number")
@@ -514,7 +514,7 @@ const defineCollisionMask = function (
   extension,
   _ /*: (string) => string */,
   gd /*: libGDevelop */) {
-  
+
   var collisionMaskObject = new gd.ObjectJsImplementation();
   // $FlowExpectedError - ignore Flow warning as we're creating an object
   collisionMaskObject.updateProperty = function (
@@ -768,15 +768,15 @@ const defineCollisionMask = function (
       _("Modify the scale of the specified object."),
       _("the scale"),
       _("Size"),
-      "res/actions/scale24.png",
-      "res/actions/scale.png"
+      "res/actions/scale24_black.png",
+      "res/actions/scale_black.png"
     )
     .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
     .useStandardOperatorParameters("number")
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('setScale');
-  
+
   object
     .addExpressionAndConditionAndAction(
       "number",
@@ -785,7 +785,7 @@ const defineCollisionMask = function (
       _("the width's scale of an object"),
       _("the width's scale"),
       _("Size"),
-      "res/actions/scaleWidth24.png"
+      "res/actions/scaleWidth24_black.png"
     )
     .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
     .useStandardParameters("number")
@@ -801,7 +801,7 @@ const defineCollisionMask = function (
       _("the height's scale of an object"),
       _("the height's scale"),
       _("Size"),
-      "res/actions/scaleHeight24.png"
+      "res/actions/scaleHeight24_black.png"
     )
     .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
     .useStandardParameters("number")
@@ -816,15 +816,15 @@ const defineCollisionMask = function (
         _("Change the width of an object."),
         _("the width"),
         _("Size"),
-        "res/actions/scaleWidth24.png",
-        "res/actions/scale.png"
+        "res/actions/scaleWidth24_black.png",
+        "res/actions/scaleWidth_black.png"
       )
       .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
       .useStandardOperatorParameters("number")
       .markAsAdvanced()
       .getCodeExtraInformation()
       .setFunctionName('setWidth');
-  
+
     object
       .addAction(
         "Height",
@@ -832,15 +832,15 @@ const defineCollisionMask = function (
         _("Change the height of an object."),
         _("the height"),
         _("Size"),
-        "res/actions/scaleHeight24.png",
-        "res/actions/scale.png"
+        "res/actions/scaleHeight24_black.png",
+        "res/actions/scaleHeight_black.png"
       )
       .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
       .useStandardOperatorParameters("number")
       .markAsAdvanced()
       .getCodeExtraInformation()
       .setFunctionName('setHeight');
-  
+
 };
 
 module.exports = {
@@ -859,7 +859,7 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/objects/tilemap');
-    
+
       defineTileMap(extension, _, gd);
       defineCollisionMask(extension, _, gd);
 

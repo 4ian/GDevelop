@@ -9,7 +9,9 @@ import {
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
-import InstructionParametersEditor from './InstructionParametersEditor';
+import InstructionParametersEditor, {
+  type InstructionParametersEditorInterface,
+} from './InstructionParametersEditor';
 import InstructionOrObjectSelector, {
   type TabName,
 } from './InstructionOrObjectSelector';
@@ -199,8 +201,8 @@ export default function NewInstructionEditorDialog({
   };
 
   // Focus the parameters when showing them
-  const instructionParametersEditor = React.useRef(
-    (null: ?InstructionParametersEditor)
+  const instructionParametersEditor = React.useRef<?InstructionParametersEditorInterface>(
+    null
   );
   React.useEffect(
     () => {

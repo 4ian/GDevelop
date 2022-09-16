@@ -2639,7 +2639,6 @@ describe('libGD.js', function () {
       object.setTags('tag1, tag2, tag3');
       expect(object.getTags()).toBe('tag1, tag2, tag3');
       expect(object.getVariables()).toBeTruthy();
-      object.delete();
       project.delete();
     });
 

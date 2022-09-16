@@ -280,9 +280,16 @@ namespace gdjs {
      * @param x The x position, in canvas coordinates.
      * @param y The y position, in canvas coordinates.
      * @param cameraId The camera number. Currently ignored.
+     * @param result The point instance that is used to return the result.
      */
-    convertCoords(x: float, y: float, cameraId: integer = 0): FloatPoint {
-      const position = this._runtimeScene.convertCoords(x, y);
+    convertCoords(
+      x: float,
+      y: float,
+      cameraId: integer = 0,
+      result?: FloatPoint
+    ): FloatPoint {
+      let position = result || [0, 0];
+      position = this._runtimeScene.convertCoords(x, y, position);
       return this.applyLayerInverseTransformation(
         position[0],
         position[1],
@@ -300,6 +307,7 @@ namespace gdjs {
      * @param x The X position of the point, in parent coordinates.
      * @param y The Y position of the point, in parent coordinates.
      * @param result Array that will be updated with the result
+     * @param result The point instance that is used to return the result.
      * (x and y position of the point in layer coordinates).
      */
     applyLayerInverseTransformation(
@@ -333,15 +341,21 @@ namespace gdjs {
      * @param x The x position, in container coordinates.
      * @param y The y position, in container coordinates.
      * @param cameraId The camera number. Currently ignored.
+     * @param result The point instance that is used to return the result.
      */
     convertInverseCoords(
       x: float,
       y: float,
-      cameraId: integer = 0
+      cameraId: integer = 0,
+      result?: FloatPoint
     ): FloatPoint {
-      const position: FloatPoint = [0, 0];
+      let position = result || [0, 0];
       this.applyLayerTransformation(x, y, cameraId, position);
-      return this._runtimeScene.convertInverseCoords(position[0], position[1]);
+      return this._runtimeScene.convertInverseCoords(
+        position[0],
+        position[1],
+        position
+      );
     }
 
     /**

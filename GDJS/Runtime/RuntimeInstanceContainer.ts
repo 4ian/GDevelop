@@ -82,8 +82,9 @@ namespace gdjs {
      *
      * @param x The x position, in container coordinates.
      * @param y The y position, in container coordinates.
+     * @param result The point instance that is used to return the result.
      */
-    abstract convertCoords(x: float, y: float): FloatPoint;
+    abstract convertCoords(x: float, y: float, result?: FloatPoint): FloatPoint;
 
     /**
      * Convert a point from the container coordinates (for example,
@@ -91,8 +92,13 @@ namespace gdjs {
      *
      * @param sceneX The x position, in container coordinates.
      * @param sceneY The y position, in container coordinates.
+     * @param result The point instance that is used to return the result.
      */
-    abstract convertInverseCoords(sceneX: float, sceneY: float): FloatPoint;
+    abstract convertInverseCoords(
+      sceneX: float,
+      sceneY: float,
+      result?: FloatPoint
+    ): FloatPoint;
 
     /**
      * @return the width of the game resolution for a {@link gdjs.RuntimeScene} or the

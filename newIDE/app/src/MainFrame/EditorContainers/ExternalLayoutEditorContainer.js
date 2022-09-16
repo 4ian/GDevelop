@@ -165,10 +165,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
         {layout && (
           <SceneEditor
             setToolbar={this.props.setToolbar}
-            resourceSources={this.props.resourceSources}
-            onChooseResource={this.props.onChooseResource}
-            resourceExternalEditors={this.props.resourceExternalEditors}
-            onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
+            resourceManagementProps={this.props.resourceManagementProps}
             unsavedChanges={this.props.unsavedChanges}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             ref={editor => (this.editor = editor)}

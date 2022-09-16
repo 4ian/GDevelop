@@ -247,7 +247,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         }
         openSetupGrid={this.openSetupGrid}
         setZoomFactor={this.setZoomFactor}
-        centerView={this.centerView}
+        zoomToInitialPosition={this.zoomToInitialPosition}
         canUndo={canUndo(this.state.history)}
         canRedo={canRedo(this.state.history)}
         undo={this.undo}
@@ -590,7 +590,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       ignoreSeal: true,
     });
 
-    if (this.editor) this.editor.centerViewOn(instances);
+    if (this.editor) this.editor.centerViewOnLastInstance(instances);
     this.forceUpdateInstancesList();
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
@@ -882,8 +882,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
-  centerView = () => {
-    if (this.editor) this.editor.centerView();
+  zoomToInitialPosition = () => {
+    if (this.editor) this.editor.zoomToInitialPosition();
   };
 
   setZoomFactor = (zoomFactor: number) => {
@@ -930,8 +930,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         },
         { type: 'separator' },
         {
-          label: i18n._(t`Center view`),
-          click: () => this.centerView(),
+          label: i18n._(t`Zoom to initial position`),
+          click: () => this.zoomToInitialPosition(),
         },
       ];
     } else {

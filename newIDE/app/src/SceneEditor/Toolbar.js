@@ -28,7 +28,7 @@ type Props = {|
   openSetupGrid: () => void,
   zoomIn: () => void,
   zoomOut: () => void,
-  centerView: () => void,
+  zoomToInitialPosition: () => void,
   setZoomFactor: number => void,
   onOpenSettings?: ?() => void,
 |};
@@ -150,8 +150,8 @@ export class Toolbar extends PureComponent<Props> {
                 accelerator: 'CmdOrCtrl+numsub',
               },
               {
-                label: i18n._(t`Center View`),
-                click: () => this.props.centerView(),
+                label: i18n._(t`Zoom to initial position`),
+                click: () => this.props.zoomToInitialPosition(),
               },
               { type: 'separator' },
               { label: '5%', click: () => this.props.setZoomFactor(0.05) },

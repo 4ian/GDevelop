@@ -804,13 +804,13 @@ export default class InstancesEditor extends Component<Props> {
     this.viewPosition.scrollTo(x, y);
   }
 
-  centerView() {
+  zoomToInitialPosition() {
     const x = this.props.project.getGameResolutionWidth() / 2;
     const y = this.props.project.getGameResolutionHeight() / 2;
     this.viewPosition.scrollTo(x, y);
   }
 
-  centerViewOn(instances: Array<gdInitialInstance>) {
+  centerViewOnLastInstance(instances: Array<gdInitialInstance>) {
     if (!instances.length) return;
 
     this.viewPosition.scrollToInstance(instances[instances.length - 1]);

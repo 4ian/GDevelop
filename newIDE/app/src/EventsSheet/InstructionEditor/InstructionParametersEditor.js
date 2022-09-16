@@ -33,6 +33,7 @@ import { setupInstructionParameters } from '../../InstructionOrExpression/SetupI
 import ScrollView from '../../UI/ScrollView';
 import { getInstructionTutorialIds } from '../../Utils/GDevelopServices/Tutorial';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -112,6 +113,10 @@ const InstructionParametersEditor = ({
 }: Props) => {
   const firstVisibleField = React.useRef<?{ +focus?: () => void }>(null);
   const [isDirty, setIsDirty] = React.useState<boolean>(false);
+  const {
+    palette: { type: paletteType },
+  } = React.useContext(GDevelopThemeContext);
+
   const forceUpdate = useForceUpdate();
 
   const focus = () => {
@@ -233,6 +238,12 @@ const InstructionParametersEditor = ({
     objectName
   );
 
+  const iconFilename = instructionMetadata.getIconFilename();
+  const shouldInvertGrayScale =
+    paletteType === 'dark' &&
+    (iconFilename.startsWith('data:image/svg+xml') ||
+      iconFilename.includes('_black'));
+
   let parameterFieldIndex = 0;
   return (
     <I18n>
@@ -243,7 +254,12 @@ const InstructionParametersEditor = ({
               <img
                 src={instructionMetadata.getIconFilename()}
                 alt=""
-                style={styles.icon}
+                style={{
+                  ...styles.icon,
+                  filter: shouldInvertGrayScale
+                    ? 'grayscale(1) invert(1)'
+                    : undefined,
+                }}
               />
               <Text style={styles.description}>
                 {instructionMetadata.getDescription()}

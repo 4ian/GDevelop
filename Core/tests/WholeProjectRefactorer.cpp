@@ -30,6 +30,8 @@
 #include "GDCore/Project/Variable.h"
 #include "catch.hpp"
 
+// TODO EBO Add a test where a child is removed form the EventsBasedObject
+// and check the configuration still gives access to other child configuration.
 namespace {
 
 const gd::StandardEvent &EnsureStandardEvent(const gd::BaseEvent &baseEvent) {

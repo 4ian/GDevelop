@@ -43,14 +43,14 @@ namespace gdjs {
     _renderer: gdjs.PanelSpriteRuntimeObjectRenderer;
 
     /**
-     * @param runtimeScene The scene the object belongs to.
+     * @param instanceContainer The scene the object belongs to.
      * @param panelSpriteObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       panelSpriteObjectData: PanelSpriteObjectData
     ) {
-      super(runtimeScene, panelSpriteObjectData);
+      super(instanceContainer, panelSpriteObjectData);
       this._rBorder = panelSpriteObjectData.rightMargin;
       this._lBorder = panelSpriteObjectData.leftMargin;
       this._tBorder = panelSpriteObjectData.topMargin;
@@ -60,7 +60,7 @@ namespace gdjs {
       this._height = panelSpriteObjectData.height;
       this._renderer = new gdjs.PanelSpriteRuntimeObjectRenderer(
         this,
-        runtimeScene,
+        instanceContainer,
         panelSpriteObjectData.texture,
         panelSpriteObjectData.tiled
       );
@@ -100,7 +100,7 @@ namespace gdjs {
         updateTexture = true;
       }
       if (updateTexture) {
-        this.setTexture(newObjectData.texture, this._runtimeScene);
+        this.setTexture(newObjectData.texture, this.getRuntimeScene());
       }
       if (oldObjectData.tiled !== newObjectData.tiled) {
         return false;
@@ -112,8 +112,8 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    onDestroyFromScene(runtimeScene): void {
-      super.onDestroyFromScene(runtimeScene);
+    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+      super.onDestroyFromScene(instanceContainer);
       // @ts-ignore
       if (this._renderer.onDestroy) {
         // @ts-ignore
@@ -121,7 +121,7 @@ namespace gdjs {
       }
     }
 
-    update(runtimeScene: gdjs.RuntimeScene): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._renderer.ensureUpToDate();
     }
 
@@ -156,10 +156,13 @@ namespace gdjs {
     /**
      * Set the texture of the panel sprite.
      * @param textureName The name of the texture.
-     * @param runtimeScene The scene the object lives in.
+     * @param instanceContainer The scene the object lives in.
      */
-    setTexture(textureName: string, runtimeScene: gdjs.RuntimeScene): void {
-      this._renderer.setTexture(textureName, runtimeScene);
+    setTexture(
+      textureName: string,
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
+      this._renderer.setTexture(textureName, instanceContainer);
     }
 
     /**
@@ -196,7 +199,7 @@ namespace gdjs {
 
       this._width = width;
       this._renderer.updateWidth();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -208,7 +211,7 @@ namespace gdjs {
 
       this._height = height;
       this._renderer.updateHeight();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**

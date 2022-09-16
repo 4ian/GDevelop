@@ -38,11 +38,11 @@ namespace gdjs {
     _movementAngle: float = 0;
 
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
       owner: gdjs.RuntimeObject
     ) {
-      super(runtimeScene, behaviorData, owner);
+      super(instanceContainer, behaviorData, owner);
 
       //The path computed and followed by the object (Array of arrays containing x and y position)
       if (this._path === undefined) {
@@ -60,7 +60,9 @@ namespace gdjs {
       this._gridOffsetX = behaviorData.gridOffsetX || 0;
       this._gridOffsetY = behaviorData.gridOffsetY || 0;
       this._extraBorder = behaviorData.extraBorder;
-      this._manager = gdjs.PathfindingObstaclesManager.getManager(runtimeScene);
+      this._manager = gdjs.PathfindingObstaclesManager.getManager(
+        instanceContainer
+      );
       this._searchContext = new gdjs.PathfindingRuntimeBehavior.SearchContext(
         this._manager
       );
@@ -313,7 +315,11 @@ namespace gdjs {
     /**
      * Compute and move on the path to the specified destination.
      */
-    moveTo(runtimeScene: gdjs.RuntimeScene, x: float, y: float) {
+    moveTo(
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      x: float,
+      y: float
+    ) {
       const owner = this.owner;
 
       //First be sure that there is a path to compute.
@@ -403,13 +409,13 @@ namespace gdjs {
       }
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
+    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       if (this._path.length === 0 || this._reachedEnd) {
         return;
       }
 
       // Update the speed of the object
-      const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
+      const timeDelta = this.owner.getElapsedTime() / 1000;
       const previousSpeed = this._speed;
       if (this._speed !== this._maxSpeed) {
         this._speed += this._acceleration * timeDelta;
@@ -452,8 +458,7 @@ namespace gdjs {
         ) {
           this.owner.rotateTowardAngle(
             this._movementAngle + this._angleOffset,
-            this._angularSpeed,
-            runtimeScene
+            this._angularSpeed
           );
         }
       } else {
@@ -463,7 +468,7 @@ namespace gdjs {
       this.owner.setY(newPos[1]);
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     /**
      * Compute the euclidean distance between two positions.

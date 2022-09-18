@@ -26,7 +26,6 @@ export default class BehaviorPropertiesEditor extends React.Component<Props> {
     return (
       <Column expand>
         {propertiesSchema.length ? (
-          // TODO: add resourceManagementProps?
           <PropertiesEditor schema={propertiesSchema} instances={[behavior]} />
         ) : (
           <EmptyMessage>

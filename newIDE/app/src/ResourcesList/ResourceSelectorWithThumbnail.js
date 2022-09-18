@@ -3,19 +3,15 @@ import * as React from 'react';
 import ResourcesLoader from '../ResourcesLoader';
 import ResourceSelector from './ResourceSelector';
 import {
-  type ResourceSource,
-  type ChooseResourceFunction,
+  type ResourceManagementProps,
   type ResourceKind,
 } from './ResourceSource';
 import ResourceThumbnail from './ResourceThumbnail';
-import { type ResourceExternalEditor } from './ResourceExternalEditor.flow';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 type Props = {|
   project: gdProject,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   resourceKind: ResourceKind,
   resourceName: string,
   onChange: string => void,
@@ -32,9 +28,7 @@ const styles = {
 
 const ResourceSelectorWithThumbnail = ({
   project,
-  resourceSources,
-  onChooseResource,
-  resourceExternalEditors,
+  resourceManagementProps,
   resourceKind,
   resourceName,
   onChange,
@@ -47,9 +41,7 @@ const ResourceSelectorWithThumbnail = ({
       <div style={styles.selectorContainer}>
         <ResourceSelector
           project={project}
-          resourceSources={resourceSources}
-          onChooseResource={onChooseResource}
-          resourceExternalEditors={resourceExternalEditors}
+          resourceManagementProps={resourceManagementProps}
           resourcesLoader={ResourcesLoader}
           resourceKind={resourceKind}
           fullWidth

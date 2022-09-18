@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import InlineCheckbox from '../UI/InlineCheckbox';
@@ -13,13 +14,11 @@ import ColorField from '../UI/ColorField';
 import { MarkdownText } from '../UI/MarkdownText';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 import FormHelperText from '@material-ui/core/FormHelperText';
-
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import {
   type ResourceKind,
-  type ResourceSource,
-  type ChooseResourceFunction,
+  type ResourceManagementProps,
 } from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import {
   TextFieldWithButtonLayout,
   ResponsiveLineStackLayout,
@@ -32,6 +31,7 @@ import UnsavedChangesContext, {
 import { Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -44,7 +44,7 @@ export type ValueFieldCommonProperties = {|
   getDescription?: Instance => string,
   getExtraDescription?: Instance => string,
   disabled?: boolean | ((instances: Array<gdInitialInstance>) => boolean),
-  onEditButtonClick?: Instance => void,
+  onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
 |};
 
 // "Primitive" value fields are "simple" fields.
@@ -141,9 +141,7 @@ type Props = {|
 
   // Optional context:
   project?: ?gdProject,
-  resourceSources?: ?Array<ResourceSource>,
-  onChooseResource?: ?ChooseResourceFunction,
-  resourceExternalEditors?: ?Array<ResourceExternalEditor>,
+  resourceManagementProps?: ?ResourceManagementProps,
 |};
 
 const styles = {
@@ -230,9 +228,7 @@ const PropertiesEditor = ({
   renderExtraDescriptionText,
   unsavedChanges,
   project,
-  resourceSources,
-  onChooseResource,
-  resourceExternalEditors,
+  resourceManagementProps,
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
@@ -358,7 +354,7 @@ const PropertiesEditor = ({
           />
         );
       } else {
-        const { onEditButtonClick, setValue } = field;
+        const { onEditButtonBuildMenuTemplate, setValue } = field;
         return (
           <TextFieldWithButtonLayout
             key={field.name}
@@ -378,14 +374,21 @@ const PropertiesEditor = ({
               />
             )}
             renderButton={style =>
-              onEditButtonClick ? (
-                <RaisedButton
-                  style={style}
-                  primary
-                  disabled={instances.length !== 1}
-                  icon={<Edit />}
-                  label={<Trans>Edit</Trans>}
-                  onClick={() => onEditButtonClick(instances[0])}
+              onEditButtonBuildMenuTemplate ? (
+                <ElementWithMenu
+                  element={
+                    <RaisedButton
+                      style={style}
+                      primary
+                      disabled={instances.length !== 1}
+                      icon={<Edit />}
+                      label={<Trans>Edit</Trans>}
+                      onClick={() => {
+                        /* Will be replaced by ElementWithMenu */
+                      }}
+                    />
+                  }
+                  buildMenuTemplate={onEditButtonBuildMenuTemplate}
                 />
               ) : null
             }
@@ -479,14 +482,9 @@ const PropertiesEditor = ({
   );
 
   const renderResourceField = (field: ResourceField) => {
-    if (
-      !project ||
-      !resourceSources ||
-      !onChooseResource ||
-      !resourceExternalEditors
-    ) {
+    if (!project || !resourceManagementProps) {
       console.error(
-        'You tried to display a resource field in a PropertiesEditor that does not support display resources. If you need to display resources, pass additional props (project, resourceSources, onChooseResource, resourceExternalEditors).'
+        'You tried to display a resource field in a PropertiesEditor that does not support display resources. If you need to display resources, pass additional props (project, resourceManagementProps).'
       );
       return null;
     }
@@ -496,9 +494,7 @@ const PropertiesEditor = ({
       <ResourceSelector
         key={field.name}
         project={project}
-        resourceSources={resourceSources}
-        onChooseResource={onChooseResource}
-        resourceExternalEditors={resourceExternalEditors}
+        resourceManagementProps={resourceManagementProps}
         resourcesLoader={ResourcesLoader}
         resourceKind={field.resourceKind}
         fullWidth
@@ -582,9 +578,7 @@ const PropertiesEditor = ({
               {unsavedChanges => (
                 <PropertiesEditor
                   project={project}
-                  resourceSources={resourceSources}
-                  onChooseResource={onChooseResource}
-                  resourceExternalEditors={resourceExternalEditors}
+                  resourceManagementProps={resourceManagementProps}
                   schema={field.children}
                   instances={instances}
                   mode="row"
@@ -613,9 +607,7 @@ const PropertiesEditor = ({
                 {unsavedChanges => (
                   <PropertiesEditor
                     project={project}
-                    resourceSources={resourceSources}
-                    onChooseResource={onChooseResource}
-                    resourceExternalEditors={resourceExternalEditors}
+                    resourceManagementProps={resourceManagementProps}
                     schema={field.children}
                     instances={instances}
                     mode="column"

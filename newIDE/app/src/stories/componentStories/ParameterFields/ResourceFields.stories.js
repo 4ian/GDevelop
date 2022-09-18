@@ -34,9 +34,12 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              onFetchNewlyAddedResources: async () => {},
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />
@@ -53,9 +56,12 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              onFetchNewlyAddedResources: async () => {},
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />
@@ -72,9 +78,12 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              onFetchNewlyAddedResources: async () => {},
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />
@@ -91,9 +100,12 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              onFetchNewlyAddedResources: async () => {},
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />
@@ -110,9 +122,12 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              onFetchNewlyAddedResources: async () => {},
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />
@@ -129,9 +144,12 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              onFetchNewlyAddedResources: async () => {},
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />

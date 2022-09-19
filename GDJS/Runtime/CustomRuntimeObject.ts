@@ -310,9 +310,9 @@ namespace gdjs {
       }
 
       const positionToCenterX =
-        this.getUnscaledWidth() / 2 - this._unrotatedAABB.min[0];
+        this.getUnscaledWidth() / 2 + this._unrotatedAABB.min[0];
       const positionToCenterY =
-        this.getUnscaledHeight() / 2 - this._unrotatedAABB.min[1];
+        this.getUnscaledHeight() / 2 + this._unrotatedAABB.min[1];
       result[0] = x + positionToCenterX;
       result[1] = y + positionToCenterY;
     }

@@ -97,7 +97,7 @@ namespace gdjs {
     abstract convertInverseCoords(
       sceneX: float,
       sceneY: float,
-      result?: FloatPoint
+      result: FloatPoint
     ): FloatPoint;
 
     /**

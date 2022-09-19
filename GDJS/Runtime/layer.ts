@@ -286,8 +286,9 @@ namespace gdjs {
       x: float,
       y: float,
       cameraId: integer = 0,
-      result?: FloatPoint
+      result: FloatPoint
     ): FloatPoint {
+      // The result parameter used to be optional.
       let position = result || [0, 0];
       position = this._runtimeScene.convertCoords(x, y, position);
       return this.applyLayerInverseTransformation(
@@ -347,7 +348,7 @@ namespace gdjs {
       x: float,
       y: float,
       cameraId: integer = 0,
-      result?: FloatPoint
+      result: FloatPoint
     ): FloatPoint {
       let position = result || [0, 0];
       this.applyLayerTransformation(x, y, cameraId, position);

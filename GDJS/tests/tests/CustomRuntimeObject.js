@@ -395,7 +395,11 @@ describe('gdjs.CustomRuntimeObject', function () {
       });
     });
 
+    /** @type {FloatPoint} */
+    const workingPoint = [0, 0];
+
     describe('convertCoords', function () {
+
       it('can transform a point from the scene', function () {
         return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
           const runtimeScene = createSceneWithLayer(runtimeGame);
@@ -403,7 +407,7 @@ describe('gdjs.CustomRuntimeObject', function () {
           const instanceContainer = customObject._instanceContainer;
 
           customObject.setPosition(16, 8);
-          expect(instanceContainer.convertCoords(16, 8)).to.eql([0, 0]);
+          expect(instanceContainer.convertCoords(16, 8, workingPoint)).to.eql([0, 0]);
         });
       });
 
@@ -415,7 +419,7 @@ describe('gdjs.CustomRuntimeObject', function () {
 
           leftSprite.setPosition(-16, -8);
           customObject.setPosition(0, 0);
-          expect(instanceContainer.convertCoords(0, 0)).to.eql([0, 0]);
+          expect(instanceContainer.convertCoords(0, 0, workingPoint)).to.eql([0, 0]);
         });
       });
 
@@ -427,7 +431,7 @@ describe('gdjs.CustomRuntimeObject', function () {
 
           leftSprite.setPosition(16, 8);
           customObject.setPosition(0, 0);
-          expect(instanceContainer.convertCoords(0, 0)).to.eql([0, 0]);
+          expect(instanceContainer.convertCoords(0, 0, workingPoint)).to.eql([0, 0]);
         });
       });
     });
@@ -439,7 +443,7 @@ describe('gdjs.CustomRuntimeObject', function () {
           const instanceContainer = customObject._instanceContainer;
 
           customObject.setPosition(16, 8);
-          expect(instanceContainer.convertInverseCoords(0, 0)).to.eql([16, 8]);
+          expect(instanceContainer.convertInverseCoords(0, 0, workingPoint)).to.eql([16, 8]);
         });
       });
 
@@ -451,7 +455,7 @@ describe('gdjs.CustomRuntimeObject', function () {
 
           leftSprite.setPosition(-16, -8);
           customObject.setPosition(0, 0);
-          expect(instanceContainer.convertInverseCoords(0, 0)).to.eql([0, 0]);
+          expect(instanceContainer.convertInverseCoords(0, 0, workingPoint)).to.eql([0, 0]);
         });
       });
 
@@ -463,7 +467,7 @@ describe('gdjs.CustomRuntimeObject', function () {
 
           leftSprite.setPosition(16, 8);
           customObject.setPosition(0, 0);
-          expect(instanceContainer.convertInverseCoords(0, 0)).to.eql([0, 0]);
+          expect(instanceContainer.convertInverseCoords(0, 0, workingPoint)).to.eql([0, 0]);
         });
       });
     });

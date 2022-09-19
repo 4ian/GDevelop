@@ -4,7 +4,6 @@
  * Basic tests for gdjs.SpriteRuntimeObject
  */
 describe('gdjs.CustomRuntimeObject', function () {
-
   /**
    * Create a CustomRuntimeObject with a SpriteRuntimeObject using a 64x64
    * image with a custom collision mask.
@@ -77,6 +76,22 @@ describe('gdjs.CustomRuntimeObject', function () {
     return sprite;
   };
 
+  const createSceneWithLayer = (runtimeGame) => {
+    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+    runtimeScene.addLayer({
+      name: '',
+      visibility: true,
+      cameras: [],
+      effects: [],
+      ambientLightColorR: 0,
+      ambientLightColorG: 0,
+      ambientLightColorB: 0,
+      isLightingLayer: false,
+      followBaseLayerCamera: false
+    });
+    return runtimeScene;
+  }
+
   describe('with 2 sprites', function () {
     /** @type {gdjs.CustomRuntimeObject} */
     let customObject;
@@ -97,305 +112,360 @@ describe('gdjs.CustomRuntimeObject', function () {
     };
 
     it('can return hit-boxes according to its children', function () {
-      return gdjs
-        .getPixiRuntimeGameWithAssets()
-        .then((runtimeGame) => {
-          const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-          makeCustomObjectWith2Children(runtimeScene);
+      return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+        const runtimeScene = createSceneWithLayer(runtimeGame);
+        makeCustomObjectWith2Children(runtimeScene);
 
-          expect(leftSprite.getHitBoxes().length).to.be(1);
-          expect(leftSprite.getHitBoxes()[0].vertices).to.eql([
-            [64, 64],
-            [0, 64],
-            [64, 0],
-          ]);
+        expect(leftSprite.getHitBoxes().length).to.be(1);
+        expect(leftSprite.getHitBoxes()[0].vertices).to.eql([
+          [64, 64],
+          [0, 64],
+          [64, 0],
+        ]);
 
-          expect(rightSprite.getHitBoxes().length).to.be(1);
-          expect(rightSprite.getHitBoxes()[0].vertices).to.eql([
-            [128, 64],
-            [64, 64],
-            [128, 0],
-          ]);
+        expect(rightSprite.getHitBoxes().length).to.be(1);
+        expect(rightSprite.getHitBoxes()[0].vertices).to.eql([
+          [128, 64],
+          [64, 64],
+          [128, 0],
+        ]);
 
-          expect(customObject.getWidth()).to.be(128);
-          expect(customObject.getHeight()).to.be(64);
+        expect(customObject.getWidth()).to.be(128);
+        expect(customObject.getHeight()).to.be(64);
 
-          expect(customObject.getAABB()).to.eql({
-            min: [0, 0],
-            max: [128, 64],
-          });
-
-          expect(customObject.getCenterXInScene()).to.be(64);
-          expect(customObject.getCenterYInScene()).to.be(32);
-
-          expect(customObject.getHitBoxes().length).to.be(2);
-          expect(customObject.getHitBoxes()[0].vertices).to.eql([
-            [64, 64],
-            [0, 64],
-            [64, 0],
-          ]);
-          expect(customObject.getHitBoxes()[1].vertices).to.eql([
-            [128, 64],
-            [64, 64],
-            [128, 0],
-          ]);
+        expect(customObject.getAABB()).to.eql({
+          min: [0, 0],
+          max: [128, 64],
         });
+
+        expect(customObject.getCenterXInScene()).to.be(64);
+        expect(customObject.getCenterYInScene()).to.be(32);
+
+        expect(customObject.getHitBoxes().length).to.be(2);
+        expect(customObject.getHitBoxes()[0].vertices).to.eql([
+          [64, 64],
+          [0, 64],
+          [64, 0],
+        ]);
+        expect(customObject.getHitBoxes()[1].vertices).to.eql([
+          [128, 64],
+          [64, 64],
+          [128, 0],
+        ]);
+      });
     });
 
     it('can translate its hit-boxes', function () {
-      return gdjs
-        .getPixiRuntimeGameWithAssets()
-        .then((runtimeGame) => {
-          const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-          makeCustomObjectWith2Children(runtimeScene);
+      return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+        const runtimeScene = createSceneWithLayer(runtimeGame);
+        makeCustomObjectWith2Children(runtimeScene);
 
-          customObject.setPosition(8, 16);
+        customObject.setPosition(8, 16);
 
-          expect(customObject.getWidth()).to.be(128);
-          expect(customObject.getHeight()).to.be(64);
+        expect(customObject.getWidth()).to.be(128);
+        expect(customObject.getHeight()).to.be(64);
 
-          expect(customObject.getCenterXInScene()).to.be(64 + 8);
-          expect(customObject.getCenterYInScene()).to.be(32 + 16);
+        expect(customObject.getCenterXInScene()).to.be(64 + 8);
+        expect(customObject.getCenterYInScene()).to.be(32 + 16);
 
-          expect(customObject.getHitBoxes().length).to.be(2);
-          expect(customObject.getHitBoxes()[0].vertices).to.eql([
-            [72, 80],
-            [8, 80],
-            [72, 16],
-          ]);
-          expect(customObject.getHitBoxes()[1].vertices).to.eql([
-            [136, 80],
-            [72, 80],
-            [136, 16],
-          ]);
-        });
+        expect(customObject.getHitBoxes().length).to.be(2);
+        expect(customObject.getHitBoxes()[0].vertices).to.eql([
+          [72, 80],
+          [8, 80],
+          [72, 16],
+        ]);
+        expect(customObject.getHitBoxes()[1].vertices).to.eql([
+          [136, 80],
+          [72, 80],
+          [136, 16],
+        ]);
+      });
     });
 
     it('can rotate its hit-boxes', function () {
-      return gdjs
-        .getPixiRuntimeGameWithAssets()
-        .then((runtimeGame) => {
-          const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-          makeCustomObjectWith2Children(runtimeScene);
+      return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+        const runtimeScene = createSceneWithLayer(runtimeGame);
+        makeCustomObjectWith2Children(runtimeScene);
 
-          customObject.setAngle(90);
+        customObject.setAngle(90);
 
-          expect(customObject.getWidth()).to.be(128);
-          expect(customObject.getHeight()).to.be(64);
+        expect(customObject.getWidth()).to.be(128);
+        expect(customObject.getHeight()).to.be(64);
 
-          expect(customObject.getCenterXInScene()).to.be(64);
-          expect(customObject.getCenterYInScene()).to.be(32);
+        expect(customObject.getCenterXInScene()).to.be(64);
+        expect(customObject.getCenterYInScene()).to.be(32);
 
-          // sin(pi/2) can't be exactly 0
-          // but cos(pi/2) is rounded to 1 because of the mantissa length.
-          expect(customObject.getHitBoxes().length).to.be(2);
-          expect(customObject.getHitBoxes()[0].vertices).to.eql([
-            [32, 32],
-            [31.999999999999993, -31.999999999999996],
-            [96, 31.999999999999996],
-          ]);
-          expect(customObject.getHitBoxes()[1].vertices).to.eql([
-            [32, 96],
-            [32, 32],
-            [96, 96],
-          ]);
-        });
+        // sin(pi/2) can't be exactly 0
+        // but cos(pi/2) is rounded to 1 because of the mantissa length.
+        expect(customObject.getHitBoxes().length).to.be(2);
+        expect(customObject.getHitBoxes()[0].vertices).to.eql([
+          [32, 32],
+          [31.999999999999993, -31.999999999999996],
+          [96, 31.999999999999996],
+        ]);
+        expect(customObject.getHitBoxes()[1].vertices).to.eql([
+          [32, 96],
+          [32, 32],
+          [96, 96],
+        ]);
+      });
     });
 
     it('can scale its hit-boxes', function () {
-      return gdjs
-        .getPixiRuntimeGameWithAssets()
-        .then((runtimeGame) => {
-          const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-          makeCustomObjectWith2Children(runtimeScene);
+      return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+        const runtimeScene = createSceneWithLayer(runtimeGame);
+        makeCustomObjectWith2Children(runtimeScene);
 
-          customObject.setWidth(32);
-          customObject.setHeight(96);
+        customObject.setWidth(32);
+        customObject.setHeight(96);
 
-          expect(customObject.getWidth()).to.be(32);
-          expect(customObject.getHeight()).to.be(96);
+        expect(customObject.getWidth()).to.be(32);
+        expect(customObject.getHeight()).to.be(96);
 
-          expect(customObject.getCenterXInScene()).to.be(16);
-          expect(customObject.getCenterYInScene()).to.be(48);
+        expect(customObject.getCenterXInScene()).to.be(16);
+        expect(customObject.getCenterYInScene()).to.be(48);
 
-          expect(customObject.getHitBoxes().length).to.be(2);
-          expect(customObject.getHitBoxes()[0].vertices).to.eql([
-            [16, 96],
-            [0, 96],
-            [16, 0],
-          ]);
-          expect(customObject.getHitBoxes()[1].vertices).to.eql([
-            [32, 96],
-            [16, 96],
-            [32, 0],
-          ]);
-        });
+        expect(customObject.getHitBoxes().length).to.be(2);
+        expect(customObject.getHitBoxes()[0].vertices).to.eql([
+          [16, 96],
+          [0, 96],
+          [16, 0],
+        ]);
+        expect(customObject.getHitBoxes()[1].vertices).to.eql([
+          [32, 96],
+          [16, 96],
+          [32, 0],
+        ]);
+      });
     });
 
     it('can translate, scale and rotate its hit-boxes', function () {
-      return gdjs
-        .getPixiRuntimeGameWithAssets()
-        .then((runtimeGame) => {
-          const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-          makeCustomObjectWith2Children(runtimeScene);
+      return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+        const runtimeScene = createSceneWithLayer(runtimeGame);
+        makeCustomObjectWith2Children(runtimeScene);
 
-          customObject.setPosition(8, 16);
-          customObject.setAngle(90);
-          customObject.setWidth(32);
-          customObject.setHeight(96);
+        customObject.setPosition(8, 16);
+        customObject.setAngle(90);
+        customObject.setWidth(32);
+        customObject.setHeight(96);
 
-          expect(customObject.getWidth()).to.be(32);
-          expect(customObject.getHeight()).to.be(96);
+        expect(customObject.getWidth()).to.be(32);
+        expect(customObject.getHeight()).to.be(96);
 
-          expect(customObject.getCenterXInScene()).to.be(32 / 2 + 8);
-          expect(customObject.getCenterYInScene()).to.be(96 / 2 + 16);
+        expect(customObject.getCenterXInScene()).to.be(32 / 2 + 8);
+        expect(customObject.getCenterYInScene()).to.be(96 / 2 + 16);
 
-          expect(customObject.getHitBoxes().length).to.be(2);
-          expect(customObject.getHitBoxes()[0].vertices).to.eql([
-            [-12, 100],
-            [-12, 84],
-            [84, 100],
-          ]);
-          expect(customObject.getHitBoxes()[1].vertices).to.eql([
-            [-12, 116],
-            [-12, 100],
-            [84, 116],
-          ]);
-        });
+        expect(customObject.getHitBoxes().length).to.be(2);
+        expect(customObject.getHitBoxes()[0].vertices).to.eql([
+          [-12, 100],
+          [-12, 84],
+          [84, 100],
+        ]);
+        expect(customObject.getHitBoxes()[1].vertices).to.eql([
+          [-12, 116],
+          [-12, 100],
+          [84, 116],
+        ]);
+      });
     });
 
     it('keeps hit-boxes up to date when its children move and push the bottom-right corner', function () {
-      return gdjs
-        .getPixiRuntimeGameWithAssets()
-        .then((runtimeGame) => {
-          const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-          makeCustomObjectWith2Children(runtimeScene);
+      return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+        const runtimeScene = createSceneWithLayer(runtimeGame);
+        makeCustomObjectWith2Children(runtimeScene);
 
-          rightSprite.setPosition(64 + 32, 0 + 8);
+        rightSprite.setPosition(64 + 32, 0 + 8);
 
-          expect(customObject.getWidth()).to.be(128 + 32);
-          expect(customObject.getHeight()).to.be(64 + 8);
+        expect(customObject.getWidth()).to.be(128 + 32);
+        expect(customObject.getHeight()).to.be(64 + 8);
 
-          expect(customObject.getX()).to.be(0);
-          expect(customObject.getY()).to.be(0);
+        expect(customObject.getX()).to.be(0);
+        expect(customObject.getY()).to.be(0);
 
-          expect(customObject.getCenterXInScene()).to.be(64 + 16);
-          expect(customObject.getCenterYInScene()).to.be(32 + 4);
+        expect(customObject.getCenterXInScene()).to.be(64 + 16);
+        expect(customObject.getCenterYInScene()).to.be(32 + 4);
 
-          expect(customObject.getHitBoxes().length).to.be(2);
-          expect(customObject.getHitBoxes()[0].vertices).to.eql([
-            [64, 64],
-            [0, 64],
-            [64, 0],
-          ]);
-          expect(customObject.getHitBoxes()[1].vertices).to.eql([
-            [160, 72],
-            [96, 72],
-            [160, 8],
-          ]);
-        });
+        expect(customObject.getHitBoxes().length).to.be(2);
+        expect(customObject.getHitBoxes()[0].vertices).to.eql([
+          [64, 64],
+          [0, 64],
+          [64, 0],
+        ]);
+        expect(customObject.getHitBoxes()[1].vertices).to.eql([
+          [160, 72],
+          [96, 72],
+          [160, 8],
+        ]);
+      });
     });
 
     it('keeps hit-boxes up to date when its children move and push the top-left corner', function () {
-      return gdjs
-        .getPixiRuntimeGameWithAssets()
-        .then((runtimeGame) => {
-          const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-          makeCustomObjectWith2Children(runtimeScene);
+      return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+        const runtimeScene = createSceneWithLayer(runtimeGame);
+        makeCustomObjectWith2Children(runtimeScene);
 
-          leftSprite.setPosition(0 - 32, 0 - 8);
+        leftSprite.setPosition(0 - 32, 0 - 8);
 
-          expect(customObject.getWidth()).to.be(128 + 32);
-          expect(customObject.getHeight()).to.be(64 + 8);
+        expect(customObject.getWidth()).to.be(128 + 32);
+        expect(customObject.getHeight()).to.be(64 + 8);
 
-          expect(customObject.getX()).to.be(0);
-          expect(customObject.getY()).to.be(0);
+        expect(customObject.getX()).to.be(0);
+        expect(customObject.getY()).to.be(0);
 
-          expect(customObject.getDrawableX()).to.be(-32);
-          expect(customObject.getDrawableY()).to.be(-8);
+        expect(customObject.getDrawableX()).to.be(-32);
+        expect(customObject.getDrawableY()).to.be(-8);
 
-          expect(customObject.getCenterXInScene()).to.be(64 - 16);
-          expect(customObject.getCenterYInScene()).to.be(32 - 4);
+        expect(customObject.getCenterXInScene()).to.be(64 - 16);
+        expect(customObject.getCenterYInScene()).to.be(32 - 4);
 
-          expect(customObject.getHitBoxes().length).to.be(2);
-          expect(customObject.getHitBoxes()[0].vertices).to.eql([
-            [32, 56],
-            [-32, 56],
-            [32, -8],
-          ]);
-          expect(customObject.getHitBoxes()[1].vertices).to.eql([
-            [128, 64],
-            [64, 64],
-            [128, 0],
-          ]);
-        });
+        expect(customObject.getHitBoxes().length).to.be(2);
+        expect(customObject.getHitBoxes()[0].vertices).to.eql([
+          [32, 56],
+          [-32, 56],
+          [32, -8],
+        ]);
+        expect(customObject.getHitBoxes()[1].vertices).to.eql([
+          [128, 64],
+          [64, 64],
+          [128, 0],
+        ]);
+      });
     });
 
     it('keeps hit-boxes up to date when its children move and shrink the top-left corner', function () {
-      return gdjs
-        .getPixiRuntimeGameWithAssets()
-        .then((runtimeGame) => {
-          const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-          makeCustomObjectWith2Children(runtimeScene);
+      return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+        const runtimeScene = createSceneWithLayer(runtimeGame);
+        makeCustomObjectWith2Children(runtimeScene);
 
-          leftSprite.setPosition(0 + 32, 0 + 8);
-          rightSprite.setPosition(64, 0 + 8);
+        leftSprite.setPosition(0 + 32, 0 + 8);
+        rightSprite.setPosition(64, 0 + 8);
 
-          expect(customObject.getWidth()).to.be(128 - 32);
-          expect(customObject.getHeight()).to.be(64);
+        expect(customObject.getWidth()).to.be(128 - 32);
+        expect(customObject.getHeight()).to.be(64);
 
-          expect(customObject.getX()).to.be(0);
-          expect(customObject.getY()).to.be(0);
+        expect(customObject.getX()).to.be(0);
+        expect(customObject.getY()).to.be(0);
 
-          expect(customObject.getDrawableX()).to.be(32);
-          expect(customObject.getDrawableY()).to.be(8);
+        expect(customObject.getDrawableX()).to.be(32);
+        expect(customObject.getDrawableY()).to.be(8);
 
-          expect(customObject.getCenterXInScene()).to.be(64 + 16);
-          expect(customObject.getCenterYInScene()).to.be(32 + 8);
+        expect(customObject.getCenterXInScene()).to.be(64 + 16);
+        expect(customObject.getCenterYInScene()).to.be(32 + 8);
 
-          expect(customObject.getHitBoxes().length).to.be(2);
-          expect(customObject.getHitBoxes()[0].vertices).to.eql([
-            [96, 72],
-            [32, 72],
-            [96, 8],
-          ]);
-          expect(customObject.getHitBoxes()[1].vertices).to.eql([
-            [128, 72],
-            [64, 72],
-            [128, 8],
-          ]);
-        });
+        expect(customObject.getHitBoxes().length).to.be(2);
+        expect(customObject.getHitBoxes()[0].vertices).to.eql([
+          [96, 72],
+          [32, 72],
+          [96, 8],
+        ]);
+        expect(customObject.getHitBoxes()[1].vertices).to.eql([
+          [128, 72],
+          [64, 72],
+          [128, 8],
+        ]);
+      });
     });
 
     it('keeps hit-boxes up to date when new children is added', function () {
-      return gdjs
-        .getPixiRuntimeGameWithAssets()
-        .then((runtimeGame) => {
-          const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+      return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+        const runtimeScene = createSceneWithLayer(runtimeGame);
+        makeCustomObjectWith2Children(runtimeScene);
+
+        const middleSprite = createSpriteObject(
+          customObject._instanceContainer
+        );
+        middleSprite.setX(32);
+
+        expect(customObject.getHitBoxes().length).to.be(3);
+        expect(customObject.getHitBoxes()[0].vertices).to.eql([
+          [64, 64],
+          [0, 64],
+          [64, 0],
+        ]);
+        expect(customObject.getHitBoxes()[1].vertices).to.eql([
+          [128, 64],
+          [64, 64],
+          [128, 0],
+        ]);
+        expect(customObject.getHitBoxes()[2].vertices).to.eql([
+          [96, 64],
+          [32, 64],
+          [96, 0],
+        ]);
+      });
+    });
+
+    describe('convertCoords', function () {
+      it('can transform a point from the scene', function () {
+        return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+          const runtimeScene = createSceneWithLayer(runtimeGame);
           makeCustomObjectWith2Children(runtimeScene);
+          const instanceContainer = customObject._instanceContainer;
 
-          const middleSprite = createSpriteObject(
-            customObject._instanceContainer
-          );
-          middleSprite.setX(32);
-
-          expect(customObject.getHitBoxes().length).to.be(3);
-          expect(customObject.getHitBoxes()[0].vertices).to.eql([
-            [64, 64],
-            [0, 64],
-            [64, 0],
-          ]);
-          expect(customObject.getHitBoxes()[1].vertices).to.eql([
-            [128, 64],
-            [64, 64],
-            [128, 0],
-          ]);
-          expect(customObject.getHitBoxes()[2].vertices).to.eql([
-            [96, 64],
-            [32, 64],
-            [96, 0],
-          ]);
+          customObject.setPosition(16, 8);
+          expect(instanceContainer.convertCoords(16, 8)).to.eql([0, 0]);
         });
+      });
+
+      it('can transform a point from the scene with a negative AABB min position', function () {
+        return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+          const runtimeScene = createSceneWithLayer(runtimeGame);
+          makeCustomObjectWith2Children(runtimeScene);
+          const instanceContainer = customObject._instanceContainer;
+
+          leftSprite.setPosition(-16, -8);
+          customObject.setPosition(0, 0);
+          expect(instanceContainer.convertCoords(0, 0)).to.eql([0, 0]);
+        });
+      });
+
+      it('can transform a point from the scene with a positive AABB min position', function () {
+        return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+          const runtimeScene = createSceneWithLayer(runtimeGame);
+          makeCustomObjectWith2Children(runtimeScene);
+          const instanceContainer = customObject._instanceContainer;
+
+          leftSprite.setPosition(16, 8);
+          customObject.setPosition(0, 0);
+          expect(instanceContainer.convertCoords(0, 0)).to.eql([0, 0]);
+        });
+      });
+    });
+    describe('convertInverseCoords', function () {
+      it('can transform a point from the scene', function () {
+        return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+          const runtimeScene = createSceneWithLayer(runtimeGame);
+          makeCustomObjectWith2Children(runtimeScene);
+          const instanceContainer = customObject._instanceContainer;
+
+          customObject.setPosition(16, 8);
+          expect(instanceContainer.convertInverseCoords(0, 0)).to.eql([16, 8]);
+        });
+      });
+
+      it('can transform a point to scene with a negative AABB min position', function () {
+        return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+          const runtimeScene = createSceneWithLayer(runtimeGame);
+          makeCustomObjectWith2Children(runtimeScene);
+          const instanceContainer = customObject._instanceContainer;
+
+          leftSprite.setPosition(-16, -8);
+          customObject.setPosition(0, 0);
+          expect(instanceContainer.convertInverseCoords(0, 0)).to.eql([0, 0]);
+        });
+      });
+
+      it('can transform a point to the scene with a positive AABB min position', function () {
+        return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+          const runtimeScene = createSceneWithLayer(runtimeGame);
+          makeCustomObjectWith2Children(runtimeScene);
+          const instanceContainer = customObject._instanceContainer;
+
+          leftSprite.setPosition(16, 8);
+          customObject.setPosition(0, 0);
+          expect(instanceContainer.convertInverseCoords(0, 0)).to.eql([0, 0]);
+        });
+      });
     });
   });
 
@@ -441,129 +511,123 @@ describe('gdjs.CustomRuntimeObject', function () {
     };
 
     it('can return hit-boxes according to its children', function () {
-      return gdjs
-        .getPixiRuntimeGameWithAssets()
-        .then((runtimeGame) => {
-          const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-          makeCustomObjectWith2ChildrenAt2Levels(runtimeScene);
+      return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+        const runtimeScene = createSceneWithLayer(runtimeGame);
+        makeCustomObjectWith2ChildrenAt2Levels(runtimeScene);
 
-          expect(rootCustomObject.getWidth()).to.be(128);
-          expect(rootCustomObject.getHeight()).to.be(128);
+        expect(rootCustomObject.getWidth()).to.be(128);
+        expect(rootCustomObject.getHeight()).to.be(128);
 
-          expect(rootCustomObject.getAABB()).to.eql({
-            min: [0, 0],
-            max: [128, 128],
-          });
-
-          expect(rootCustomObject.getCenterXInScene()).to.be(64);
-          expect(rootCustomObject.getCenterYInScene()).to.be(64);
-
-          expect(rootCustomObject.getHitBoxes().length).to.be(4);
-          expect(rootCustomObject.getHitBoxes()[0].vertices).to.eql([
-            [64, 64],
-            [0, 64],
-            [64, 0],
-          ]);
-          expect(rootCustomObject.getHitBoxes()[1].vertices).to.eql([
-            [128, 64],
-            [64, 64],
-            [128, 0],
-          ]);
-          expect(rootCustomObject.getHitBoxes()[2].vertices).to.eql([
-            [64, 128],
-            [0, 128],
-            [64, 64],
-          ]);
-          expect(rootCustomObject.getHitBoxes()[3].vertices).to.eql([
-            [128, 128],
-            [64, 128],
-            [128, 64],
-          ]);
+        expect(rootCustomObject.getAABB()).to.eql({
+          min: [0, 0],
+          max: [128, 128],
         });
+
+        expect(rootCustomObject.getCenterXInScene()).to.be(64);
+        expect(rootCustomObject.getCenterYInScene()).to.be(64);
+
+        expect(rootCustomObject.getHitBoxes().length).to.be(4);
+        expect(rootCustomObject.getHitBoxes()[0].vertices).to.eql([
+          [64, 64],
+          [0, 64],
+          [64, 0],
+        ]);
+        expect(rootCustomObject.getHitBoxes()[1].vertices).to.eql([
+          [128, 64],
+          [64, 64],
+          [128, 0],
+        ]);
+        expect(rootCustomObject.getHitBoxes()[2].vertices).to.eql([
+          [64, 128],
+          [0, 128],
+          [64, 64],
+        ]);
+        expect(rootCustomObject.getHitBoxes()[3].vertices).to.eql([
+          [128, 128],
+          [64, 128],
+          [128, 64],
+        ]);
+      });
     });
 
     it('keeps hit-boxes up to date when its children move and push the bottom-right corner', function () {
-      return gdjs
-        .getPixiRuntimeGameWithAssets()
-        .then((runtimeGame) => {
-          const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-          makeCustomObjectWith2ChildrenAt2Levels(runtimeScene);
+      return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+        const runtimeScene = createSceneWithLayer(runtimeGame);
+        makeCustomObjectWith2ChildrenAt2Levels(runtimeScene);
 
-          bottomRightSprite.setPosition(64 + 32, 0 + 8);
+        bottomRightSprite.setPosition(64 + 32, 0 + 8);
 
-          expect(rootCustomObject.getWidth()).to.be(128 + 32);
-          expect(rootCustomObject.getHeight()).to.be(128 + 8);
+        expect(rootCustomObject.getWidth()).to.be(128 + 32);
+        expect(rootCustomObject.getHeight()).to.be(128 + 8);
 
-          expect(rootCustomObject.getX()).to.be(0);
-          expect(rootCustomObject.getY()).to.be(0);
+        expect(rootCustomObject.getX()).to.be(0);
+        expect(rootCustomObject.getY()).to.be(0);
 
-          expect(rootCustomObject.getCenterXInScene()).to.be(64 + 16);
-          expect(rootCustomObject.getCenterYInScene()).to.be(64 + 4);
+        expect(rootCustomObject.getCenterXInScene()).to.be(64 + 16);
+        expect(rootCustomObject.getCenterYInScene()).to.be(64 + 4);
 
-          expect(rootCustomObject.getHitBoxes().length).to.be(4);
-          expect(rootCustomObject.getHitBoxes()[0].vertices).to.eql([
-            [64, 64],
-            [0, 64],
-            [64, 0],
-          ]);
-          expect(rootCustomObject.getHitBoxes()[1].vertices).to.eql([
-            [128, 64],
-            [64, 64],
-            [128, 0],
-          ]);
-          expect(rootCustomObject.getHitBoxes()[2].vertices).to.eql([
-            [64, 128],
-            [0, 128],
-            [64, 64],
-          ]);
-          expect(rootCustomObject.getHitBoxes()[3].vertices).to.eql([
-            [160, 136],
-            [96, 136],
-            [160, 72],
-          ]);
-        });
+        expect(rootCustomObject.getHitBoxes().length).to.be(4);
+        expect(rootCustomObject.getHitBoxes()[0].vertices).to.eql([
+          [64, 64],
+          [0, 64],
+          [64, 0],
+        ]);
+        expect(rootCustomObject.getHitBoxes()[1].vertices).to.eql([
+          [128, 64],
+          [64, 64],
+          [128, 0],
+        ]);
+        expect(rootCustomObject.getHitBoxes()[2].vertices).to.eql([
+          [64, 128],
+          [0, 128],
+          [64, 64],
+        ]);
+        expect(rootCustomObject.getHitBoxes()[3].vertices).to.eql([
+          [160, 136],
+          [96, 136],
+          [160, 72],
+        ]);
+      });
     });
-    
+
     it('keeps hit-boxes up to date when new children is added', function () {
-      return gdjs
-        .getPixiRuntimeGameWithAssets()
-        .then((runtimeGame) => {
-          const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-          makeCustomObjectWith2ChildrenAt2Levels(runtimeScene);
+      return gdjs.getPixiRuntimeGameWithAssets().then((runtimeGame) => {
+        const runtimeScene = createSceneWithLayer(runtimeGame);
+        makeCustomObjectWith2ChildrenAt2Levels(runtimeScene);
 
-          const topMiddleSprite = createSpriteObject(
-            topCustomObject._instanceContainer
-          );
-          topMiddleSprite.setX(32);
+        const topMiddleSprite = createSpriteObject(
+          topCustomObject._instanceContainer
+        );
+        topMiddleSprite.setX(32);
 
-          expect(rootCustomObject.getHitBoxes().length).to.be(5);
-          expect(rootCustomObject.getHitBoxes()[0].vertices).to.eql([
-            [64, 64],
-            [0, 64],
-            [64, 0],
-          ]);
-          expect(rootCustomObject.getHitBoxes()[1].vertices).to.eql([
-            [128, 64],
-            [64, 64],
-            [128, 0],
-          ]);
-          // This is the new child.
-          expect(rootCustomObject.getHitBoxes()[2].vertices).to.eql([
-            [96, 64],
-            [32, 64],
-            [96, 0],
-          ]);
-          expect(rootCustomObject.getHitBoxes()[3].vertices).to.eql([
-            [64, 128],
-            [0, 128],
-            [64, 64],
-          ]);
-          expect(rootCustomObject.getHitBoxes()[4].vertices).to.eql([
-            [128, 128],
-            [64, 128],
-            [128, 64],
-          ]);
-        });
+        expect(rootCustomObject.getHitBoxes().length).to.be(5);
+        expect(rootCustomObject.getHitBoxes()[0].vertices).to.eql([
+          [64, 64],
+          [0, 64],
+          [64, 0],
+        ]);
+        expect(rootCustomObject.getHitBoxes()[1].vertices).to.eql([
+          [128, 64],
+          [64, 64],
+          [128, 0],
+        ]);
+        // This is the new child.
+        expect(rootCustomObject.getHitBoxes()[2].vertices).to.eql([
+          [96, 64],
+          [32, 64],
+          [96, 0],
+        ]);
+        expect(rootCustomObject.getHitBoxes()[3].vertices).to.eql([
+          [64, 128],
+          [0, 128],
+          [64, 64],
+        ]);
+        expect(rootCustomObject.getHitBoxes()[4].vertices).to.eql([
+          [128, 128],
+          [64, 128],
+          [128, 64],
+        ]);
+      });
     });
   });
 });

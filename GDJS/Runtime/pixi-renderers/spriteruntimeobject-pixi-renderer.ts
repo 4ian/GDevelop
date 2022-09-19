@@ -14,19 +14,17 @@ namespace gdjs {
 
     /**
      * @param runtimeObject The object
-     * @param runtimeScene The scene
+     * @param instanceContainer The scene
      */
     constructor(
       runtimeObject: gdjs.SpriteRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
-      if (this._sprite === undefined) {
-        this._sprite = new PIXI.Sprite(
-          runtimeScene.getGame().getImageManager().getInvalidPIXITexture()
-        );
-      }
-      const layer = runtimeScene.getLayer('');
+      this._sprite = new PIXI.Sprite(
+        instanceContainer.getGame().getImageManager().getInvalidPIXITexture()
+      );
+      const layer = instanceContainer.getLayer('');
       if (layer) {
         layer
           .getRenderer()
@@ -34,11 +32,14 @@ namespace gdjs {
       }
     }
 
-    reinitialize(runtimeObject, runtimeScene) {
+    reinitialize(
+      runtimeObject: gdjs.SpriteRuntimeObject,
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
       this._object = runtimeObject;
       this._spriteDirty = true;
       this._textureDirty = true;
-      const layer = runtimeScene.getLayer('');
+      const layer = instanceContainer.getLayer('');
       if (layer) {
         layer
           .getRenderer()

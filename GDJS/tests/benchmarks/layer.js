@@ -10,6 +10,7 @@ describe('gdjs.Layer', function() {
   var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
   it('benchmark convertCoords and convertInverseCoords', function() {
+    // TODO EBO Understand why the timeout need to be 35s instead of 20s to pass on CI.
     this.timeout(20000);
     var layer = new gdjs.Layer(
       { name: 'My layer', 
@@ -29,12 +30,14 @@ describe('gdjs.Layer', function() {
     layer.setCameraRotation(90, 0);
 
     const benchmarkSuite = makeBenchmarkSuite();
+    /** @type {FloatPoint} */
+    const workingPoint = [0, 0];
     benchmarkSuite
       .add('convertCoords', () => {
-        layer.convertCoords(350, 450, 0);
+        layer.convertCoords(350, 450, 0, workingPoint);
       })
       .add('convertInverseCoords', () => {
-        layer.convertInverseCoords(350, 450, 0);
+        layer.convertInverseCoords(350, 450, 0, workingPoint);
       });
 
     console.log(benchmarkSuite.run());

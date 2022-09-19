@@ -27,11 +27,7 @@ namespace gdjs {
      */
     export const computeAuthenticationContainer = function (
       onCloseAuthenticationContainer: () => void
-    ): {
-      rootContainer: HTMLDivElement;
-      subContainer: HTMLDivElement;
-      loaderContainer: HTMLDivElement;
-    } {
+    ): HTMLDivElement {
       const rootContainer = document.createElement('div');
       rootContainer.id = 'authentication-root-container';
       rootContainer.style.position = 'relative';
@@ -103,39 +99,25 @@ namespace gdjs {
       } catch {
         logger.warn('Animation not supported, loader will be fixed.');
       }
+      const title = document.createElement('h1');
+      title.innerText = 'Logging in...';
+      title.style.fontSize = '20pt';
+      title.style.fontWeight = 'bold';
+      const text1 = document.createElement('p');
+      text1.innerText = "We're opening another page for you to log in. ";
+      const text2 = document.createElement('p');
+      text2.innerText = "It's alright, we'll wait until you're done.";
+      text2.style.marginBottom = '50px';
+      loaderContainer.appendChild(title);
+      loaderContainer.appendChild(text1);
+      loaderContainer.appendChild(text2);
       loaderContainer.appendChild(_loader);
 
       subContainer.appendChild(_closeContainer);
       subContainer.appendChild(loaderContainer);
       rootContainer.appendChild(subContainer);
 
-      return {
-        rootContainer,
-        subContainer,
-        loaderContainer,
-      };
-    };
-
-    /**
-     * When a popup is opened, add this text for the user to understand we're waiting.
-     */
-    export const insertExternalWindowLoaderText = (
-      loaderContainer: HTMLDivElement
-    ) => {
-      if (loaderContainer) {
-        const title = document.createElement('h1');
-        title.innerText = 'Logging in...';
-        title.style.fontSize = '20pt';
-        title.style.fontWeight = 'bold';
-        const text1 = document.createElement('p');
-        text1.innerText = "We're opening another page for you to log in. ";
-        const text2 = document.createElement('p');
-        text2.innerText = "It's alright, we'll wait until you're done.";
-        text2.style.marginBottom = '50px';
-        loaderContainer.prepend(text2);
-        loaderContainer.prepend(text1);
-        loaderContainer.prepend(title);
-      }
+      return rootContainer;
     };
 
     /**

@@ -132,45 +132,65 @@ namespace gdjs {
         return;
       }
 
+      const workingPoint: FloatPoint = gdjs.staticArray(
+        TextInputRuntimeObjectPixiRenderer.prototype.updatePreRender
+      ) as FloatPoint;
+
       const runtimeGame = this._instanceContainer.getGame();
       const runtimeGameRenderer = runtimeGame.getRenderer();
       const topLeftCanvasCoordinates = layer.convertInverseCoords(
         this._object.x,
         this._object.y,
-        0
+        0,
+        workingPoint
       );
+      const canvasLeft = topLeftCanvasCoordinates[0];
+      const canvasTop = topLeftCanvasCoordinates[1];
+
       const bottomRightCanvasCoordinates = layer.convertInverseCoords(
         this._object.x + this._object.getWidth(),
         this._object.y + this._object.getHeight(),
-        0
+        0,
+        workingPoint
       );
+      const canvasRight = bottomRightCanvasCoordinates[0];
+      const canvasBottom = bottomRightCanvasCoordinates[1];
 
       // Hide the input entirely if not visible at all.
       const isOutsideCanvas =
-        bottomRightCanvasCoordinates[0] < 0 ||
-        bottomRightCanvasCoordinates[1] < 0 ||
-        topLeftCanvasCoordinates[0] > runtimeGame.getGameResolutionWidth() ||
-        topLeftCanvasCoordinates[1] > runtimeGame.getGameResolutionHeight();
+        canvasRight < 0 ||
+        canvasBottom < 0 ||
+        canvasLeft > runtimeGame.getGameResolutionWidth() ||
+        canvasTop > runtimeGame.getGameResolutionHeight();
       if (isOutsideCanvas) {
         this._input.style.display = 'none';
         return;
       }
 
       // Position the input on the container on top of the canvas.
+      workingPoint[0] = canvasLeft;
+      workingPoint[1] = canvasRight;
       const topLeftPageCoordinates = runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
-        topLeftCanvasCoordinates
+        workingPoint,
+        workingPoint
       );
+      const pageLeft = workingPoint[0];
+      const pageTop = workingPoint[1];
+
+      workingPoint[0] = canvasRight;
+      workingPoint[1] = canvasBottom;
       const bottomRightPageCoordinates = runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
-        bottomRightCanvasCoordinates
+        workingPoint,
+        workingPoint
       );
+      const pageRight = workingPoint[0];
+      const pageBottom = workingPoint[1];
 
-      const widthInContainer =
-        bottomRightPageCoordinates[0] - topLeftPageCoordinates[0];
-      const heightInContainer =
-        bottomRightPageCoordinates[1] - topLeftPageCoordinates[1];
+      const widthInContainer = pageRight - pageLeft;
+      const heightInContainer = pageBottom - pageTop;
 
-      this._input.style.left = topLeftPageCoordinates[0] + 'px';
-      this._input.style.top = topLeftPageCoordinates[1] + 'px';
+      this._input.style.left = pageLeft + 'px';
+      this._input.style.top = pageTop + 'px';
       this._input.style.width = widthInContainer + 'px';
       this._input.style.height = heightInContainer + 'px';
       this._input.style.transform =

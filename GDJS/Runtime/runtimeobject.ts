@@ -2443,11 +2443,17 @@ namespace gdjs {
      * @return true if the cursor, or any touch, is on the object.
      */
     cursorOnObject(instanceContainer: gdjs.RuntimeInstanceContainer): boolean {
+      const workingPoint: FloatPoint = gdjs.staticArray(
+        RuntimeObject.prototype.cursorOnObject
+      ) as FloatPoint;
+      workingPoint.length = 2;
       const inputManager = instanceContainer.getGame().getInputManager();
       const layer = instanceContainer.getLayer(this.layer);
       const mousePos = layer.convertCoords(
         inputManager.getMouseX(),
-        inputManager.getMouseY()
+        inputManager.getMouseY(),
+        0,
+        workingPoint
       );
       if (this.insideObject(mousePos[0], mousePos[1])) {
         return true;
@@ -2456,7 +2462,9 @@ namespace gdjs {
       for (let i = 0; i < touchIds.length; ++i) {
         const touchPos = layer.convertCoords(
           inputManager.getTouchX(touchIds[i]),
-          inputManager.getTouchY(touchIds[i])
+          inputManager.getTouchY(touchIds[i]),
+          0,
+          workingPoint
         );
         if (this.insideObject(touchPos[0], touchPos[1])) {
           return true;

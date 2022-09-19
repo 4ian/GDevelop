@@ -549,7 +549,8 @@ namespace gdjs {
       return this._cachedGameResolutionHeight;
     }
 
-    convertCoords(x: float, y: float, result?: FloatPoint): FloatPoint {
+    convertCoords(x: float, y: float, result: FloatPoint): FloatPoint {
+      // The result parameter used to be optional.
       const point = result || [0, 0];
       point[0] = x;
       point[1] = y;
@@ -559,7 +560,7 @@ namespace gdjs {
     convertInverseCoords(
       sceneX: float,
       sceneY: float,
-      result?: FloatPoint
+      result: FloatPoint
     ): FloatPoint {
       const point = result || [0, 0];
       point[0] = sceneX;

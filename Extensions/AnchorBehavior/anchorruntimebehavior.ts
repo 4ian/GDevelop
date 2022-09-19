@@ -70,6 +70,9 @@ namespace gdjs {
     }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      const workingPoint: FloatPoint = gdjs.staticArray(
+        gdjs.AnchorRuntimeBehavior.prototype.doStepPreEvents
+      ) as FloatPoint;
       // TODO EBO Make it work with event based objects or hide this behavior for them.
       const game = instanceContainer.getGame();
       let rendererWidth = game.getGameResolutionWidth();
@@ -84,7 +87,9 @@ namespace gdjs {
         //Calculate the distances from the window's bounds.
         const topLeftPixel = layer.convertCoords(
           this.owner.getDrawableX(),
-          this.owner.getDrawableY()
+          this.owner.getDrawableY(),
+          0,
+          workingPoint
         );
 
         //Left edge
@@ -130,9 +135,12 @@ namespace gdjs {
             }
           }
         }
+        // It's fine to reuse workingPoint as topLeftPixel is no longer used.
         const bottomRightPixel = layer.convertCoords(
           this.owner.getDrawableX() + this.owner.getWidth(),
-          this.owner.getDrawableY() + this.owner.getHeight()
+          this.owner.getDrawableY() + this.owner.getHeight(),
+          0,
+          workingPoint
         );
 
         //Right edge
@@ -273,11 +281,24 @@ namespace gdjs {
             }
           }
         }
-        const topLeftCoord = layer.convertInverseCoords(leftPixel, topPixel);
+        // It's fine to reuse workingPoint as topLeftPixel is no longer used.
+        const topLeftCoord = layer.convertInverseCoords(
+          leftPixel,
+          topPixel,
+          0,
+          workingPoint
+        );
+        const left = topLeftCoord[0];
+        const top = topLeftCoord[1];
+
         const bottomRightCoord = layer.convertInverseCoords(
           rightPixel,
-          bottomPixel
+          bottomPixel,
+          0,
+          workingPoint
         );
+        const right = bottomRightCoord[0];
+        const bottom = bottomRightCoord[1];
 
         // Compatibility with GD <= 5.0.133
         if (this._useLegacyBottomAndRightAnchors) {
@@ -286,25 +307,25 @@ namespace gdjs {
             this._rightEdgeAnchor !==
             AnchorRuntimeBehavior.HorizontalAnchor.NONE
           ) {
-            this.owner.setWidth(bottomRightCoord[0] - topLeftCoord[0]);
+            this.owner.setWidth(right - left);
           }
           if (
             this._bottomEdgeAnchor !== AnchorRuntimeBehavior.VerticalAnchor.NONE
           ) {
-            this.owner.setHeight(bottomRightCoord[1] - topLeftCoord[1]);
+            this.owner.setHeight(bottom - top);
           }
           if (
             this._leftEdgeAnchor !== AnchorRuntimeBehavior.HorizontalAnchor.NONE
           ) {
             this.owner.setX(
-              topLeftCoord[0] + this.owner.getX() - this.owner.getDrawableX()
+              left + this.owner.getX() - this.owner.getDrawableX()
             );
           }
           if (
             this._topEdgeAnchor !== AnchorRuntimeBehavior.VerticalAnchor.NONE
           ) {
             this.owner.setY(
-              topLeftCoord[1] + this.owner.getY() - this.owner.getDrawableY()
+              top + this.owner.getY() - this.owner.getDrawableY()
             );
           }
         }
@@ -316,15 +337,15 @@ namespace gdjs {
               AnchorRuntimeBehavior.HorizontalAnchor.NONE &&
             this._leftEdgeAnchor !== AnchorRuntimeBehavior.HorizontalAnchor.NONE
           ) {
-            this.owner.setWidth(bottomRightCoord[0] - topLeftCoord[0]);
-            this.owner.setX(topLeftCoord[0]);
+            this.owner.setWidth(right - left);
+            this.owner.setX(left);
           } else {
             if (
               this._leftEdgeAnchor !==
               AnchorRuntimeBehavior.HorizontalAnchor.NONE
             ) {
               this.owner.setX(
-                topLeftCoord[0] + this.owner.getX() - this.owner.getDrawableX()
+                left + this.owner.getX() - this.owner.getDrawableX()
               );
             }
             if (
@@ -332,7 +353,7 @@ namespace gdjs {
               AnchorRuntimeBehavior.HorizontalAnchor.NONE
             ) {
               this.owner.setX(
-                bottomRightCoord[0] +
+                right +
                   this.owner.getX() -
                   this.owner.getDrawableX() -
                   this.owner.getWidth()
@@ -345,14 +366,14 @@ namespace gdjs {
               AnchorRuntimeBehavior.VerticalAnchor.NONE &&
             this._topEdgeAnchor !== AnchorRuntimeBehavior.VerticalAnchor.NONE
           ) {
-            this.owner.setHeight(bottomRightCoord[1] - topLeftCoord[1]);
-            this.owner.setY(topLeftCoord[1]);
+            this.owner.setHeight(bottom - top);
+            this.owner.setY(top);
           } else {
             if (
               this._topEdgeAnchor !== AnchorRuntimeBehavior.VerticalAnchor.NONE
             ) {
               this.owner.setY(
-                topLeftCoord[1] + this.owner.getY() - this.owner.getDrawableY()
+                top + this.owner.getY() - this.owner.getDrawableY()
               );
             }
             if (
@@ -360,7 +381,7 @@ namespace gdjs {
               AnchorRuntimeBehavior.VerticalAnchor.NONE
             ) {
               this.owner.setY(
-                bottomRightCoord[1] +
+                bottom +
                   this.owner.getY() -
                   this.owner.getDrawableY() -
                   this.owner.getHeight()

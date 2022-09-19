@@ -287,10 +287,18 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer,
       draggableRuntimeBehavior: DraggableRuntimeBehavior
     ): FloatPoint {
+      const workingPoint: FloatPoint = gdjs.staticArray(
+        MouseDraggableManager.prototype.getPosition
+      ) as FloatPoint;
       const inputManager = instanceContainer.getGame().getInputManager();
       return instanceContainer
         .getLayer(draggableRuntimeBehavior.owner.getLayer())
-        .convertCoords(inputManager.getMouseX(), inputManager.getMouseY());
+        .convertCoords(
+          inputManager.getMouseX(),
+          inputManager.getMouseY(),
+          0,
+          workingPoint
+        );
     }
 
     shouldEndDrag(
@@ -324,12 +332,17 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer,
       draggableRuntimeBehavior: DraggableRuntimeBehavior
     ): FloatPoint {
+      const workingPoint: FloatPoint = gdjs.staticArray(
+        TouchDraggableManager.prototype.getPosition
+      ) as FloatPoint;
       const inputManager = instanceContainer.getGame().getInputManager();
       return instanceContainer
         .getLayer(draggableRuntimeBehavior.owner.getLayer())
         .convertCoords(
           inputManager.getTouchX(this._touchId),
-          inputManager.getTouchY(this._touchId)
+          inputManager.getTouchY(this._touchId),
+          0,
+          workingPoint
         );
     }
 

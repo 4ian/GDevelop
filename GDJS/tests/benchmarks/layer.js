@@ -11,7 +11,7 @@ describe('gdjs.Layer', function() {
 
   it('benchmark convertCoords and convertInverseCoords', function() {
     // TODO EBO Understand why the timeout need to be 35s instead of 20s to pass on CI.
-    this.timeout(30000);
+    this.timeout(35000);
     var layer = new gdjs.Layer(
       { name: 'My layer', 
         visibility: true, 

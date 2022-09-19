@@ -290,11 +290,16 @@ namespace gdjs {
         layer: string,
         camera: integer
       ) {
+        const workingPoint: FloatPoint = gdjs.staticArray(
+          gdjs.evtTools.input.getMouseX
+        ) as FloatPoint;
         return instanceContainer
           .getLayer(layer)
           .convertCoords(
             instanceContainer.getGame().getInputManager().getMouseX(),
-            instanceContainer.getGame().getInputManager().getMouseY()
+            instanceContainer.getGame().getInputManager().getMouseY(),
+            0,
+            workingPoint
           )[0];
       };
 
@@ -303,11 +308,16 @@ namespace gdjs {
         layer: string,
         camera: integer
       ) {
+        const workingPoint: FloatPoint = gdjs.staticArray(
+          gdjs.evtTools.input.getMouseY
+        ) as FloatPoint;
         return instanceContainer
           .getLayer(layer)
           .convertCoords(
             instanceContainer.getGame().getInputManager().getMouseX(),
-            instanceContainer.getGame().getInputManager().getMouseY()
+            instanceContainer.getGame().getInputManager().getMouseY(),
+            0,
+            workingPoint
           )[1];
       };
 
@@ -347,11 +357,16 @@ namespace gdjs {
         layer: string,
         camera: integer
       ) {
+        const workingPoint: FloatPoint = gdjs.staticArray(
+          gdjs.evtTools.input.getTouchX
+        ) as FloatPoint;
         return instanceContainer
           .getLayer(layer)
           .convertCoords(
             instanceContainer.getGame().getInputManager().getTouchX(identifier),
-            instanceContainer.getGame().getInputManager().getTouchY(identifier)
+            instanceContainer.getGame().getInputManager().getTouchY(identifier),
+            0,
+            workingPoint
           )[0];
       };
 
@@ -361,11 +376,16 @@ namespace gdjs {
         layer: string,
         camera: integer
       ) => {
+        const workingPoint: FloatPoint = gdjs.staticArray(
+          gdjs.evtTools.input.getTouchY
+        ) as FloatPoint;
         return instanceContainer
           .getLayer(layer)
           .convertCoords(
             instanceContainer.getGame().getInputManager().getTouchX(identifier),
-            instanceContainer.getGame().getInputManager().getTouchY(identifier)
+            instanceContainer.getGame().getInputManager().getTouchY(identifier),
+            0,
+            workingPoint
           )[1];
       };
 

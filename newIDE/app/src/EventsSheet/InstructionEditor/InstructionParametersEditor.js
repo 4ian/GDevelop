@@ -362,6 +362,7 @@ const InstructionParametersEditor = React.forwardRef<
                           ) {
                             instruction.setParameter(i, value);
                             setIsDirty(true);
+                            forceUpdate();
                           }
                         }}
                         project={project}

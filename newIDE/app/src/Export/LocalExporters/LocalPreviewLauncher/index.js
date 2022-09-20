@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import localFileSystem from '../LocalFileSystem';
+import LocalFileSystem from '../LocalFileSystem';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import { timeFunction } from '../../../Utils/TimeFunction';
 import { findGDJS } from '../../../GameEngineFinder/LocalGDJSFinder';
@@ -151,6 +151,9 @@ export default class LocalPreviewLauncher extends React.Component<
     return findGDJS().then(({ gdjsRoot }) => {
       console.info('GDJS found in ', gdjsRoot);
 
+      const localFileSystem = new LocalFileSystem({
+        downloadUrlsToLocalFiles: false,
+      });
       const fileSystem = assignIn(
         new gd.AbstractFileSystemJS(),
         localFileSystem

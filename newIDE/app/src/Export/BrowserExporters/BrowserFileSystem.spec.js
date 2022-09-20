@@ -76,6 +76,7 @@ describe('BrowserFileSystem', () => {
       expect(browserFileSystem.readFile('/copied-file1')).toBe('content1');
     });
 
+    // TODO: copy this test to LocalFileSystem
     test('it can mark files to be copied from an URL as to be downloaded', () => {
       const browserFileSystem = new BrowserFileSystem({ textFiles: [] });
 

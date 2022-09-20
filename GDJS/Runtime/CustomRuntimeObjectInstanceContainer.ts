@@ -51,7 +51,7 @@ namespace gdjs {
     }
 
     /**
-     * Load the container from the given scene.
+     * Load the container from the given initial configuration.
      * @param customObjectData An object containing the container data.
      * @see gdjs.RuntimeGame#getSceneData
      */
@@ -110,6 +110,51 @@ namespace gdjs {
       this._setLayerDefaultZOrders();
 
       this._isLoaded = true;
+    }
+
+    /**
+     * Called when the container must be updated using the specified
+     * objectData. This is the case during hot-reload, and is only called if
+     * the object was modified.
+     *
+     * @param oldCustomObjectData The previous data for the object.
+     * @param newCustomObjectData The new data for the object.
+     * @returns true if the object was updated, false if it could not
+     * (i.e: hot-reload is not supported).
+     */
+    updateFrom(
+      oldCustomObjectData: ObjectData & CustomObjectConfiguration,
+      newCustomObjectData: ObjectData & CustomObjectConfiguration
+    ): boolean {
+      const eventsBasedObjectData = this._runtimeScene
+        .getGame()
+        .getEventsBasedObjectData(newCustomObjectData.type);
+      if (!eventsBasedObjectData) {
+        logger.error('updateFrom was called without an events-based object');
+        return false;
+      }
+
+      for (
+        let i = 0, len = eventsBasedObjectData.objects.length;
+        i < len;
+        ++i
+      ) {
+        const childName = eventsBasedObjectData.objects[i].name;
+        const oldChildData = {
+          ...eventsBasedObjectData.objects[i],
+          ...oldCustomObjectData.childrenContent[childName],
+        };
+        const newChildData = {
+          ...eventsBasedObjectData.objects[i],
+          ...newCustomObjectData.childrenContent[childName],
+        };
+        this.updateObject(newChildData);
+
+        for (const child of this.getInstancesOf(childName)) {
+          child.updateFromObjectData(oldChildData, newChildData);
+        }
+      }
+      return true;
     }
 
     /**

@@ -78,10 +78,18 @@ export default class ResourceSelector extends React.Component<Props, State> {
   }
 
   _getResourceSourceItems(): DataSource {
-    const sources = this.props.resourceManagementProps.resourceSources || [];
+    const { resourceManagementProps } = this.props;
+    const sources = resourceManagementProps.resourceSources || [];
+    const storageProvider = resourceManagementProps.getStorageProvider();
+
     return [
       ...sources
         .filter(source => source.kind === this.props.resourceKind)
+        .filter(
+          ({ onlyForStorageProvider }) =>
+            !onlyForStorageProvider ||
+            onlyForStorageProvider === storageProvider.internalName
+        )
         .map(source => ({
           text: '',
           value: '',

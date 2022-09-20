@@ -63,6 +63,7 @@ import {
   type ResourceSource,
   type ChooseResourceFunction,
   type ChooseResourceOptions,
+  type ResourceManagementProps,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type JsExtensionsLoader } from '../JsExtensionsLoader';
@@ -2442,17 +2443,19 @@ const MainFrame = (props: Props) => {
     ),
   });
 
-  const resourceManagementProps = React.useMemo(
+  const resourceManagementProps: ResourceManagementProps = React.useMemo(
     () => ({
       resourceSources,
       onChooseResource,
       resourceExternalEditors,
+      getStorageProvider,
       onFetchNewlyAddedResources,
     }),
     [
       resourceSources,
       onChooseResource,
       resourceExternalEditors,
+      getStorageProvider,
       onFetchNewlyAddedResources,
     ]
   );

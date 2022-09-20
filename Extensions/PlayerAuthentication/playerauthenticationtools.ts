@@ -289,13 +289,14 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ) => {
       clearAuthenticationWindowTimeout();
+      const time = 12 * 60 * 1000; // 12 minutes, in case the user needs time to authenticate.
       _authenticationTimeoutId = setTimeout(() => {
         logger.info(
           'Authentication window did not send message in time. Closing it.'
         );
         cleanUpAuthWindowAndCallbacks(runtimeScene);
         focusOnGame(runtimeScene);
-      }, 300000); // Give a few minutes for the user to enter their credentials.
+      }, time);
     };
 
     /**
@@ -359,12 +360,18 @@ namespace gdjs {
      * We open a new window, and create a websocket to know when the user is logged in.
      */
     const openAuthenticationWindowForElectron = (runtimeScene, gameId) => {
-      _websocket = new WebSocket(`wss://api.gdevelop.io/play:3001`); // TODO: check correct URL once deployed.
+      _websocket = new WebSocket('wss://api-ws.gdevelop.io/play');
       _websocket.onopen = () => {
         // When socket is open, ask for the connectionId, so that we can open the authentication window.
         if (_websocket) {
           _websocket.send(JSON.stringify({ action: 'getConnectionId' }));
         }
+      };
+      _websocket.onerror = () => {
+        handleAuthenticationError(
+          runtimeScene,
+          'Error while connecting to the authentication server.'
+        );
       };
       _websocket.onmessage = (event) => {
         if (event.data) {

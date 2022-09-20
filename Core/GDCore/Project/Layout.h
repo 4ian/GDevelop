@@ -404,6 +404,11 @@ class GD_CORE_API Layout : public ObjectsContainer {
    * Don't forget to update me if members were changed!
    */
   void Init(const gd::Layout& other);
+
+  std::unique_ptr<gd::BehaviorsSharedData> CreateBehaviorsSharedData(
+      gd::Project& project,
+      const gd::String& name,
+      const gd::String& behaviorsType);
 };
 
 /**

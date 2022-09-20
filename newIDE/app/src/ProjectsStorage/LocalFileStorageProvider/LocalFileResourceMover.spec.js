@@ -24,8 +24,10 @@ const makeTestProjectWithResourcesToDownload = () => {
   // Resource with an authorized URL
   {
     const newResource = new gd.ImageResource();
-    newResource.setName('MyResourceToDownload');
-    newResource.setFile('http://example/file-to-download.png?token=123');
+    newResource.setName('MyPrivateResourceToDownload');
+    newResource.setFile(
+      'https://private-assets.gdevelop.io/private-file-to-download.png?token=123'
+    );
     project.getResourcesManager().addResource(newResource);
     newResource.delete();
   }
@@ -79,7 +81,14 @@ describe('LocalResourceMover', () => {
     ).toHaveBeenCalledWith(
       'local-file-download',
       'http://example/file-to-download.png',
-      path.join('assets', 'file-to-download.png')
+      path.join('assets', 'image', 'file-to-download.png')
+    );
+    expect(
+      optionalRequire.mockElectron.ipcRenderer.invoke
+    ).toHaveBeenCalledWith(
+      'local-file-download',
+      'https://private-assets.gdevelop.io/private-file-to-download.png?token=123',
+      path.join('assets', 'image', 'private-file-to-download.png')
     );
     expect(fetchedResources.erroredResources).toEqual([]);
   });
@@ -104,16 +113,24 @@ describe('LocalResourceMover', () => {
     // Verify that download was done and reported as failed, even after 2 tries.
     expect(
       optionalRequire.mockElectron.ipcRenderer.invoke
-    ).toHaveBeenCalledTimes(2);
+    ).toHaveBeenCalledTimes(4);
     expect(
       optionalRequire.mockElectron.ipcRenderer.invoke
     ).toHaveBeenCalledWith(
       'local-file-download',
       'http://example/file-to-download.png',
-      path.join('assets', 'file-to-download.png')
+      path.join('assets', 'image', 'file-to-download.png')
+    );
+    expect(
+      optionalRequire.mockElectron.ipcRenderer.invoke
+    ).toHaveBeenCalledWith(
+      'local-file-download',
+      'https://private-assets.gdevelop.io/private-file-to-download.png?token=123',
+      path.join('assets', 'image', 'private-file-to-download.png')
     );
     expect(fetchedResources.erroredResources).toEqual([
       { resourceName: 'MyResourceToDownload', error: expect.any(Error) },
+      { resourceName: 'MyPrivateResourceToDownload', error: expect.any(Error) },
     ]);
   });
 
@@ -131,30 +148,39 @@ describe('LocalResourceMover', () => {
       .mockImplementationOnce(() =>
         Promise.reject(new Error('Fake download failure'))
       )
+      .mockImplementationOnce(() => Promise.resolve())
       .mockImplementationOnce(() => Promise.resolve());
 
     const options = makeMoveAllProjectResourcesOptions(project);
     const fetchedResources = await moveUrlResourcesToLocalFiles(options);
 
-    // Verify that download was done.
+    // Verify that download was done (including a failure that was retried).
     expect(
       optionalRequire.mockElectron.ipcRenderer.invoke
-    ).toHaveBeenCalledTimes(2);
+    ).toHaveBeenCalledTimes(3);
     expect(
       optionalRequire.mockElectron.ipcRenderer.invoke
     ).toHaveBeenNthCalledWith(
       1,
       'local-file-download',
       'http://example/file-to-download.png',
-      path.join('assets', 'file-to-download.png')
+      path.join('assets', 'image', 'file-to-download.png')
     );
     expect(
       optionalRequire.mockElectron.ipcRenderer.invoke
     ).toHaveBeenNthCalledWith(
       2,
       'local-file-download',
+      'https://private-assets.gdevelop.io/private-file-to-download.png?token=123',
+      path.join('assets', 'image', 'private-file-to-download.png')
+    );
+    expect(
+      optionalRequire.mockElectron.ipcRenderer.invoke
+    ).toHaveBeenNthCalledWith(
+      3,
+      'local-file-download',
       'http://example/file-to-download.png',
-      path.join('assets', 'file-to-download.png')
+      path.join('assets', 'image', 'file-to-download.png')
     );
     expect(fetchedResources.erroredResources).toEqual([]);
   });

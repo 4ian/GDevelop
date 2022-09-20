@@ -156,14 +156,13 @@ export default function ObjectMethodSelectorDialog({
         />
         <MethodListItem
           icon={<Step style={styles.icon} />}
-          name={'doStepPreEvents'}
-          disabled={eventsFunctions.hasEventsFunctionNamed('doStepPreEvents')}
+          name={'doStepPostEvents'}
+          disabled={eventsFunctions.hasEventsFunctionNamed('doStepPostEvents')}
           onChoose={onChoose}
           description={
             <Trans>
               Events that will be run at every frame (roughly 60 times per
-              second), for every object, before the events from the events sheet
-              are launched.
+              second), for every object, after the events from the events sheet.
             </Trans>
           }
         />
@@ -187,21 +186,6 @@ export default function ObjectMethodSelectorDialog({
             <Subheader>
               <Trans>Other lifecycle methods</Trans>
             </Subheader>
-            <MethodListItem
-              icon={<Step style={styles.icon} />}
-              name={'doStepPostEvents'}
-              disabled={eventsFunctions.hasEventsFunctionNamed(
-                'doStepPostEvents'
-              )}
-              onChoose={onChoose}
-              description={
-                <Trans>
-                  Events that will be run at every frame (roughly 60 times per
-                  second), for every object, after the events from the events
-                  sheet.
-                </Trans>
-              }
-            />
           </>
         )}
       </List>

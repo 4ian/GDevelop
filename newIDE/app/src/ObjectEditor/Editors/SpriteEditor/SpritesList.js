@@ -48,11 +48,11 @@ const styles = {
 
 type AddSpriteButtonProps = {|
   onAdd: (resourceSource: ResourceSource) => void,
-  resourceSources: Array<ResourceSource>,
+  resourceManagementProps: ResourceManagementProps,
 |};
 
 const AddSpriteButton = SortableElement(
-  ({ onAdd, resourceSources }: AddSpriteButtonProps) => {
+  ({ onAdd, resourceManagementProps }: AddSpriteButtonProps) => {
     return (
       <ThemeConsumer>
         {muiTheme => (
@@ -72,14 +72,20 @@ const AddSpriteButton = SortableElement(
                   leftIcon={<Add />}
                 />
               }
-              buildMenuTemplate={(i18n: I18nType) =>
-                resourceSources
+              buildMenuTemplate={(i18n: I18nType) => {
+                const storageProvider = resourceManagementProps.getStorageProvider();
+                return resourceManagementProps.resourceSources
                   .filter(source => source.kind === 'image')
+                  .filter(
+                    ({ onlyForStorageProvider }) =>
+                      !onlyForStorageProvider ||
+                      onlyForStorageProvider === storageProvider.internalName
+                  )
                   .map(source => ({
                     label: i18n._(source.displayName),
                     click: () => onAdd(source),
-                  }))
-              }
+                  }));
+              }}
             />
           </div>
         )}
@@ -111,7 +117,7 @@ const SortableList = SortableContainer(
     project,
     resourcesLoader,
     onAddSprite,
-    resourceSources,
+    resourceManagementProps,
     selectedSprites,
     onSelectSprite,
     onSpriteContextMenu,
@@ -141,7 +147,7 @@ const SortableList = SortableContainer(
             disabled
             index={spritesCount}
             onAdd={onAddSprite}
-            resourceSources={resourceSources}
+            resourceManagementProps={resourceManagementProps}
           />,
         ]}
       </div>
@@ -351,7 +357,7 @@ export default class SpritesList extends Component<Props, void> {
           project={this.props.project}
           onSortEnd={this.onSortEnd}
           onAddSprite={this.onAddSprite}
-          resourceSources={this.props.resourceManagementProps.resourceSources}
+          resourceManagementProps={this.props.resourceManagementProps}
           selectedSprites={this.props.selectedSprites}
           onSelectSprite={this.props.onSelectSprite}
           onSpriteContextMenu={this.props.onSpriteContextMenu}

@@ -52,13 +52,21 @@ export default class ResourcePropertiesEditor extends React.Component<
       getValue: (resource: gdResource) => resource.getFile(),
       setValue: (resource: gdResource, newValue: string) =>
         resource.setFile(newValue),
-      onEditButtonBuildMenuTemplate: (i18n: I18nType) =>
-        this.props.resourceManagementProps.resourceSources
+      onEditButtonBuildMenuTemplate: (i18n: I18nType) => {
+        const { resourceManagementProps } = this.props;
+        const storageProvider = resourceManagementProps.getStorageProvider();
+        return resourceManagementProps.resourceSources
           .filter(source => source.kind === this.props.resources[0].getKind())
+          .filter(
+            ({ onlyForStorageProvider }) =>
+              !onlyForStorageProvider ||
+              onlyForStorageProvider === storageProvider.internalName
+          )
           .map(source => ({
             label: i18n._(source.displayName),
             click: () => this._chooseResourcePath(source),
-          })),
+          }));
+      },
     },
   ];
 

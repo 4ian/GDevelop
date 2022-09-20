@@ -1,0 +1,376 @@
+namespace gdjs {
+  const logger = new gdjs.Logger('Player Authentication');
+  export namespace playerAuthenticationComponents {
+    /**
+     * Create the Iframe that will contain the authentication form. (electron)
+     */
+    export const computeAuthenticationIframe = function (
+      url: string
+    ): HTMLIFrameElement {
+      const iframe = document.createElement('iframe');
+
+      iframe.id = 'authentication-iframe';
+      iframe.src = url;
+      // We create the iframe with opacity 0 to let it load and send us messages.
+      iframe.style.opacity = '0';
+      iframe.style.pointerEvents = 'all';
+      iframe.style.backgroundColor = '#FFFFFF';
+      iframe.style.height = '100%';
+      iframe.style.width = '100%';
+      iframe.style.border = 'none';
+
+      return iframe;
+    };
+
+    /**
+     * Creates a DOM element that will contain the loader or the authentication iframe.
+     */
+    export const computeAuthenticationContainer = function (
+      onCloseAuthenticationContainer: () => void
+    ): HTMLDivElement {
+      const rootContainer = document.createElement('div');
+      rootContainer.id = 'authentication-root-container';
+      rootContainer.style.position = 'relative';
+      rootContainer.style.backgroundColor = 'rgba(14, 6, 45, 0.5)';
+      rootContainer.style.opacity = '1';
+      rootContainer.style.width = '100%';
+      rootContainer.style.height = '100%';
+      rootContainer.style.zIndex = '2';
+      rootContainer.style.pointerEvents = 'all';
+
+      const subContainer = document.createElement('div');
+      subContainer.id = 'authentication-sub-container';
+      subContainer.style.backgroundColor = '#FFFFFF';
+      subContainer.style.position = 'absolute';
+      subContainer.style.top = '16px';
+      subContainer.style.bottom = '16px';
+      subContainer.style.left = '16px';
+      subContainer.style.right = '16px';
+      subContainer.style.borderRadius = '8px';
+      subContainer.style.boxShadow = '0px 4px 4px rgba(0, 0, 0, 0.25)';
+      subContainer.style.padding = '16px';
+
+      const _closeContainer: HTMLDivElement = document.createElement('div');
+      _closeContainer.style.cursor = 'pointer';
+      _closeContainer.style.display = 'flex';
+      _closeContainer.style.justifyContent = 'right';
+      _closeContainer.style.alignItems = 'center';
+      _closeContainer.style.zIndex = '3';
+      addTouchAndClickEventListeners(
+        _closeContainer,
+        onCloseAuthenticationContainer
+      );
+
+      const _close = document.createElement('img');
+      _close.setAttribute('width', '15px');
+      _close.setAttribute(
+        'src',
+        'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOCIgaGVpZ2h0PSI4IiB2aWV3Qm94PSIwIDAgOCA4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTcuODUzNTUgMC4xNDY0NDdDOC4wNDg4MiAwLjM0MTcwOSA4LjA0ODgyIDAuNjU4MjkxIDcuODUzNTUgMC44NTM1NTNMMC44NTM1NTMgNy44NTM1NUMwLjY1ODI5MSA4LjA0ODgyIDAuMzQxNzA5IDguMDQ4ODIgMC4xNDY0NDcgNy44NTM1NUMtMC4wNDg4MTU1IDcuNjU4MjkgLTAuMDQ4ODE1NSA3LjM0MTcxIDAuMTQ2NDQ3IDcuMTQ2NDVMNy4xNDY0NSAwLjE0NjQ0N0M3LjM0MTcxIC0wLjA0ODgxNTUgNy42NTgyOSAtMC4wNDg4MTU1IDcuODUzNTUgMC4xNDY0NDdaIiBmaWxsPSIjMUQxRDI2Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMC4xNDY0NDcgMC4xNDY0NDdDMC4zNDE3MDkgLTAuMDQ4ODE1NSAwLjY1ODI5MSAtMC4wNDg4MTU1IDAuODUzNTUzIDAuMTQ2NDQ3TDcuODUzNTUgNy4xNDY0NUM4LjA0ODgyIDcuMzQxNzEgOC4wNDg4MiA3LjY1ODI5IDcuODUzNTUgNy44NTM1NUM3LjY1ODI5IDguMDQ4ODIgNy4zNDE3MSA4LjA0ODgyIDcuMTQ2NDUgNy44NTM1NUwwLjE0NjQ0NyAwLjg1MzU1M0MtMC4wNDg4MTU1IDAuNjU4MjkxIC0wLjA0ODgxNTUgMC4zNDE3MDkgMC4xNDY0NDcgMC4xNDY0NDdaIiBmaWxsPSIjMUQxRDI2Ii8+Cjwvc3ZnPgo='
+      );
+      _closeContainer.appendChild(_close);
+
+      const loaderContainer: HTMLDivElement = document.createElement('div');
+      loaderContainer.id = 'authentication-container-loader';
+      loaderContainer.style.display = 'flex';
+      loaderContainer.style.flexDirection = 'column';
+      loaderContainer.style.height = '100%';
+      loaderContainer.style.width = '100%';
+      loaderContainer.style.justifyContent = 'center';
+      loaderContainer.style.alignItems = 'center';
+      loaderContainer.style.position = 'relative';
+      loaderContainer.style.zIndex = '3';
+      loaderContainer.style.fontSize = '11pt';
+      loaderContainer.style.fontFamily =
+        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
+      const _loader = document.createElement('img');
+      _loader.setAttribute('width', '28px');
+      _loader.setAttribute(
+        'src',
+        'data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iYW5pbWF0ZS1zcGluIC1tbC0xIG1yLTMgaC01IHctNSB0ZXh0LXdoaXRlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyNCAyNCI+CjxjaXJjbGUgb3BhY2l0eT0nMC4yNScgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSI0Ij48L2NpcmNsZT4KPHBhdGggb3BhY2l0eT0nMC43NScgZmlsbD0iY3VycmVudENvbG9yIiBkPSJNNCAxMmE4IDggMCAwMTgtOFYwQzUuMzczIDAgMCA1LjM3MyAwIDEyaDR6bTIgNS4yOTFBNy45NjIgNy45NjIgMCAwMTQgMTJIMGMwIDMuMDQyIDEuMTM1IDUuODI0IDMgNy45MzhsMy0yLjY0N3oiPjwvcGF0aD4KPC9zdmc+'
+      );
+      try {
+        _loader.animate(
+          [{ transform: 'rotate(0deg)' }, { transform: 'rotate(359deg)' }],
+          {
+            duration: 3000,
+            iterations: Infinity,
+          }
+        );
+      } catch {
+        logger.warn('Animation not supported, loader will be fixed.');
+      }
+      const title = document.createElement('h1');
+      title.innerText = 'Logging in...';
+      title.style.fontSize = '20pt';
+      title.style.fontWeight = 'bold';
+      const text1 = document.createElement('p');
+      text1.innerText = "We're opening another page for you to log in. ";
+      const text2 = document.createElement('p');
+      text2.innerText = "It's alright, we'll wait until you're done.";
+      text2.style.marginBottom = '50px';
+      loaderContainer.appendChild(title);
+      loaderContainer.appendChild(text1);
+      loaderContainer.appendChild(text2);
+      loaderContainer.appendChild(_loader);
+
+      subContainer.appendChild(_closeContainer);
+      subContainer.appendChild(loaderContainer);
+      rootContainer.appendChild(subContainer);
+
+      return rootContainer;
+    };
+
+    /**
+     * Creates a DOM element to display a dismissable banner.
+     */
+    export const computeDismissableBanner = function (
+      onDismissBanner: () => void
+    ): HTMLDivElement {
+      const divContainer = document.createElement('div');
+
+      divContainer.id = 'authenticated-banner';
+      divContainer.style.position = 'absolute';
+      divContainer.style.pointerEvents = 'all';
+      divContainer.style.backgroundColor = '#0E062D';
+      divContainer.style.top = '0px';
+      divContainer.style.height = '48px';
+      divContainer.style.left = '0px';
+      divContainer.style.width = '100%';
+      divContainer.style.padding = '6px 16px';
+      // Use zIndex 1 to make sure it is below the authentication iframe or webview.
+      divContainer.style.zIndex = '1';
+      divContainer.style.display = 'flex';
+      divContainer.style.flexDirection = 'row-reverse';
+      divContainer.style.justifyContent = 'space-between';
+      divContainer.style.alignItems = 'center';
+      divContainer.style.boxShadow = '0px 4px 4px rgba(0, 0, 0, 0.25)';
+      divContainer.style.fontSize = '11pt';
+      divContainer.style.color = '#FFFFFF';
+      divContainer.style.fontFamily =
+        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
+
+      const _closeContainer: HTMLDivElement = document.createElement('div');
+      _closeContainer.style.cursor = 'pointer';
+      _closeContainer.style.display = 'flex';
+      _closeContainer.style.justifyContent = 'center';
+      _closeContainer.style.alignItems = 'center';
+      _closeContainer.style.zIndex = '3';
+      _closeContainer.style.marginRight = '32px';
+      _closeContainer.style.height = '100%';
+      addTouchAndClickEventListeners(_closeContainer, onDismissBanner);
+
+      const _close = document.createElement('img');
+      _close.setAttribute('width', '30px');
+      _close.setAttribute(
+        'src',
+        'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAzMCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIzLjc1IDguMDEyNUwyMS45ODc1IDYuMjVMMTUgMTMuMjM3NUw4LjAxMjUgNi4yNUw2LjI1IDguMDEyNUwxMy4yMzc1IDE1TDYuMjUgMjEuOTg3NUw4LjAxMjUgMjMuNzVMMTUgMTYuNzYyNUwyMS45ODc1IDIzLjc1TDIzLjc1IDIxLjk4NzVMMTYuNzYyNSAxNUwyMy43NSA4LjAxMjVaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K'
+      );
+
+      _closeContainer.appendChild(_close);
+      divContainer.appendChild(_closeContainer);
+
+      return divContainer;
+    };
+
+    /**
+     * Creates a DOM element reprensenting a banner for the user to know which account
+     * they're using and also to allow switching to another account.
+     */
+    export const computeAuthenticatedBanner = function (
+      onOpenAuthenticationWindow: () => void,
+      onDismissBanner: () => void,
+      username: string | null
+    ): HTMLDivElement {
+      const divContainer = computeDismissableBanner(onDismissBanner);
+
+      const playerUsername = username || 'Anonymous';
+
+      const _textContainer: HTMLDivElement = document.createElement('div');
+      const loggedText = document.createElement('p');
+      loggedText.id = 'loggedText';
+      loggedText.innerHTML = `<img style="margin-right:4px" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOSIgaGVpZ2h0PSI5IiB2aWV3Qm94PSIwIDAgOSA5IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNNC4xNjY2NyAwQzEuODY2NjcgMCAwIDEuODY2NjcgMCA0LjE2NjY3QzAgNi40NjY2NyAxLjg2NjY3IDguMzMzMzMgNC4xNjY2NyA4LjMzMzMzQzYuNDY2NjcgOC4zMzMzMyA4LjMzMzMzIDYuNDY2NjcgOC4zMzMzMyA0LjE2NjY3QzguMzMzMzMgMS44NjY2NyA2LjQ2NjY3IDAgNC4xNjY2NyAwWk0zLjMzMzMzIDYuMjVMMS4yNSA0LjE2NjY3TDEuODM3NSAzLjU3OTE3TDMuMzMzMzMgNS4wNzA4M0w2LjQ5NTgzIDEuOTA4MzNMNy4wODMzMyAyLjVMMy4zMzMzMyA2LjI1WiIgZmlsbD0iIzAwQ0M4MyIvPgo8L3N2Zz4K" />
+                                Logged as ${playerUsername}`;
+      loggedText.style.margin = '0px';
+
+      const changeAccountText = document.createElement('p');
+      changeAccountText.id = 'changeAccountText';
+      changeAccountText.innerText = `Click here to switch to another account.`;
+      changeAccountText.style.margin = '0px';
+      changeAccountText.style.marginTop = '4px';
+      changeAccountText.style.textDecoration = 'underline';
+      changeAccountText.style.cursor = 'pointer';
+      addTouchAndClickEventListeners(
+        changeAccountText,
+        onOpenAuthenticationWindow
+      );
+
+      _textContainer.appendChild(loggedText);
+      _textContainer.appendChild(changeAccountText);
+      divContainer.appendChild(_textContainer);
+
+      return divContainer;
+    };
+
+    /**
+     * Creates a DOM element reprensenting a banner for the user to know
+     * they are not connected and to allow logging in.
+     */
+    export const computeNotAuthenticatedBanner = function (
+      onOpenAuthenticationWindow: () => void,
+      onDismissBanner: () => void
+    ): HTMLDivElement {
+      const divContainer = computeDismissableBanner(onDismissBanner);
+
+      const _textContainer: HTMLDivElement = document.createElement('div');
+      const loggedText = document.createElement('p');
+      loggedText.id = 'loggedText';
+      loggedText.innerHTML = `You are not authenticated.`;
+      loggedText.style.margin = '0px';
+
+      const changeAccountText = document.createElement('p');
+      changeAccountText.id = 'changeAccountText';
+      changeAccountText.innerText = `Click here to log in.`;
+      changeAccountText.style.margin = '0px';
+      changeAccountText.style.marginTop = '4px';
+      changeAccountText.style.textDecoration = 'underline';
+      changeAccountText.style.cursor = 'pointer';
+      addTouchAndClickEventListeners(
+        changeAccountText,
+        onOpenAuthenticationWindow
+      );
+
+      _textContainer.appendChild(loggedText);
+      _textContainer.appendChild(changeAccountText);
+      divContainer.appendChild(_textContainer);
+
+      return divContainer;
+    };
+
+    /**
+     * Create, display, and hide the logged in confirmation.
+     */
+    export const displayLoggedInNotification = function (
+      domContainer: HTMLDivElement,
+      username: string
+    ) {
+      showNotification(
+        domContainer,
+        'authenticated-notification',
+        `<img style="margin-right:4px" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOSIgaGVpZ2h0PSI5IiB2aWV3Qm94PSIwIDAgOSA5IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNNC4xNjY2NyAwQzEuODY2NjcgMCAwIDEuODY2NjcgMCA0LjE2NjY3QzAgNi40NjY2NyAxLjg2NjY3IDguMzMzMzMgNC4xNjY2NyA4LjMzMzMzQzYuNDY2NjcgOC4zMzMzMyA4LjMzMzMzIDYuNDY2NjcgOC4zMzMzMyA0LjE2NjY3QzguMzMzMzMgMS44NjY2NyA2LjQ2NjY3IDAgNC4xNjY2NyAwWk0zLjMzMzMzIDYuMjVMMS4yNSA0LjE2NjY3TDEuODM3NSAzLjU3OTE3TDMuMzMzMzMgNS4wNzA4M0w2LjQ5NTgzIDEuOTA4MzNMNy4wODMzMyAyLjVMMy4zMzMzMyA2LjI1WiIgZmlsbD0iIzAwQ0M4MyIvPgo8L3N2Zz4K" />
+              Logged as ${username}`,
+        'success'
+      );
+    };
+
+    /**
+     * Create, display, and hide an error notification.
+     */
+    export const displayErrorNotification = function (
+      domContainer: HTMLDivElement
+    ) {
+      showNotification(
+        domContainer,
+        'error-notification',
+        'An error occurred while authenticating, please try again.',
+        'error'
+      );
+    };
+
+    /**
+     * Helper to show a notification to the user, that disappears automatically.
+     */
+    export const showNotification = function (
+      domContainer: HTMLDivElement,
+      id: string,
+      content: string,
+      type: 'success' | 'error'
+    ) {
+      const divContainer = document.createElement('div');
+
+      divContainer.id = id;
+      divContainer.style.position = 'absolute';
+      divContainer.style.pointerEvents = 'all';
+      divContainer.style.backgroundColor =
+        type === 'success' ? '#0E062D' : 'red';
+      divContainer.style.top = '12px';
+      divContainer.style.right = '16px';
+      divContainer.style.padding = '6px 32px 6px 6px';
+      // Use zIndex 1 to make sure it is below the authentication iframe or webview.
+      divContainer.style.zIndex = '1';
+      divContainer.style.display = 'flex';
+      divContainer.style.flexDirection = 'row-reverse';
+      divContainer.style.justifyContent = 'space-between';
+      divContainer.style.alignItems = 'center';
+      divContainer.style.boxShadow = '0px 4px 4px rgba(0, 0, 0, 0.25)';
+      divContainer.style.borderRadius = '4px';
+      divContainer.style.fontSize = '11pt';
+      divContainer.style.color = '#FFFFFF';
+      divContainer.style.fontFamily =
+        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
+      try {
+        divContainer.animate(
+          [
+            { transform: 'translateY(-30px)', opacity: 0 },
+            { transform: 'translateY(0px)', opacity: 1 },
+          ],
+          {
+            duration: 700,
+            easing: 'ease-out',
+          }
+        );
+      } catch {
+        logger.warn('Animation not supported, div will be fixed.');
+      }
+      const loggedText = document.createElement('p');
+      loggedText.id = 'loggedText';
+      loggedText.innerHTML = content;
+      loggedText.style.margin = '0px';
+
+      divContainer.appendChild(loggedText);
+
+      domContainer.appendChild(divContainer);
+      setTimeout(() => {
+        try {
+          divContainer.animate(
+            [
+              { transform: 'translateY(0px)', opacity: 1 },
+              { transform: 'translateY(-30px)', opacity: 0 },
+            ],
+            {
+              duration: 700,
+              easing: 'ease-in',
+            }
+          );
+        } catch {
+          logger.warn('Animation not supported, div will be fixed.');
+        }
+      }, 2000);
+      // Use timeout because onanimationend listener does not work.
+      setTimeout(
+        () => {
+          divContainer.remove();
+        },
+        // Wait 2000 ms + 700 ms for the animation to finish.
+        2700
+      );
+    };
+
+    /**
+     * Helper to add event listeners on a pressable/clickable element
+     * to work on both desktop and mobile.
+     */
+    export const addTouchAndClickEventListeners = function (
+      element: HTMLElement,
+      action: () => void
+    ) {
+      // Touch start event listener for mobile.
+      element.addEventListener('touchstart', (event) => {
+        action();
+      });
+      // Click event listener for desktop.
+      element.addEventListener('click', (event) => {
+        action();
+      });
+    };
+  }
+}

@@ -2,27 +2,6 @@ namespace gdjs {
   const logger = new gdjs.Logger('Player Authentication');
   export namespace playerAuthenticationComponents {
     /**
-     * Create the Iframe that will contain the authentication form. (electron)
-     */
-    export const computeAuthenticationIframe = function (
-      url: string
-    ): HTMLIFrameElement {
-      const iframe = document.createElement('iframe');
-
-      iframe.id = 'authentication-iframe';
-      iframe.src = url;
-      // We create the iframe with opacity 0 to let it load and send us messages.
-      iframe.style.opacity = '0';
-      iframe.style.pointerEvents = 'all';
-      iframe.style.backgroundColor = '#FFFFFF';
-      iframe.style.height = '100%';
-      iframe.style.width = '100%';
-      iframe.style.border = 'none';
-
-      return iframe;
-    };
-
-    /**
      * Creates a DOM element that will contain the loader or the authentication iframe.
      */
     export const computeAuthenticationContainer = function (
@@ -173,7 +152,7 @@ namespace gdjs {
     };
 
     /**
-     * Creates a DOM element reprensenting a banner for the user to know which account
+     * Creates a DOM element representing a banner for the user to know which account
      * they're using and also to allow switching to another account.
      */
     export const computeAuthenticatedBanner = function (
@@ -212,7 +191,7 @@ namespace gdjs {
     };
 
     /**
-     * Creates a DOM element reprensenting a banner for the user to know
+     * Creates a DOM element representing a banner for the user to know
      * they are not connected and to allow logging in.
      */
     export const computeNotAuthenticatedBanner = function (

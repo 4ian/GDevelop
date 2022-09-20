@@ -363,7 +363,7 @@ namespace gdjs {
       _websocket.onopen = () => {
         // When socket is open, ask for the connectionId, so that we can open the authentication window.
         if (_websocket) {
-          _websocket.send(JSON.stringify({ action: 'connectionId' }));
+          _websocket.send(JSON.stringify({ action: 'getConnectionId' }));
         }
       };
       _websocket.onmessage = (event) => {

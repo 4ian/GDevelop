@@ -71,7 +71,7 @@ module.exports = {
         _('Save connected player score'),
         _("Save the connected player's score to the given leaderboard."),
         _(
-          'Send to leaderboard _PARAM1_ the score _PARAM2_ for connected player'
+          'Send to leaderboard _PARAM1_ the score _PARAM2_ for the connected player'
         ),
         _('Save score'),
         'JsPlatform/Extensions/leaderboard.svg',

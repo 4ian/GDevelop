@@ -50,7 +50,7 @@ import Window from '../Utils/Window';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 const gd: libGDevelop = global.gd;
 
-const isDev = Window.isDev();
+const isDev = true;//Window.isDev();
 
 type Props = {|
   project: gdProject,
@@ -465,7 +465,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this.state.selectedEventsFunction &&
       gd.compare(eventsFunction, this.state.selectedEventsFunction)
     ) {
-      this._selectEventsFunction(null, this.state.selectedEventsBasedBehavior);
+      this._selectEventsFunction(
+        null,
+        this.state.selectedEventsBasedBehavior,
+        this.state.selectedEventsBasedObject
+      );
     }
 
     cb(true);

@@ -10,16 +10,16 @@ namespace gdjs {
 
     /**
      * @param runtimeObject The object to render
-     * @param runtimeScene The gdjs.RuntimeScene in which the object is
+     * @param instanceContainer The gdjs.RuntimeScene in which the object is
      */
     constructor(
       runtimeObject: gdjs.BitmapTextRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
 
       // Obtain the bitmap font to use in the object.
-      const bitmapFont = runtimeScene
+      const bitmapFont = instanceContainer
         .getGame()
         .getBitmapFontManager()
         .obtainBitmapFont(
@@ -32,7 +32,7 @@ namespace gdjs {
       });
 
       // Set the object on the scene
-      runtimeScene
+      instanceContainer
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._pixiObject, runtimeObject.getZOrder());

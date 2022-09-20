@@ -1,5 +1,8 @@
 module.exports = function (config) {
-  const testFiles = ['./Extensions/**/tests/**.spec.js', './GDJS/tests/tests/**/*.js'];
+  const testFiles = [
+    './Extensions/**/tests/**.spec.js',
+    './GDJS/tests/tests/**/*.js',
+  ];
 
   const benchmarkFiles = [
     './GDJS/tests/benchmarks/init.js',
@@ -25,8 +28,7 @@ module.exports = function (config) {
     },
     basePath: '../..',
     proxies: {
-      '/base/tests-utils/':
-      '/base/GDJS/tests/tests-utils/',
+      '/base/tests-utils/': '/base/GDJS/tests/tests-utils/',
     },
     files: [
       './GDJS/tests/node_modules/expect.js/index.js',
@@ -82,7 +84,8 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/Inventory/inventory.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Inventory/inventorytools.js',
       {
-        pattern: './newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.wasm',
+        pattern:
+          './newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.wasm',
         watched: true,
         included: false,
         served: true,
@@ -92,6 +95,8 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/physics2runtimebehavior.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/physics2tools.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Leaderboards/leaderboardstools.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/PlayerAuthentication/playerauthenticationtools.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/PlayerAuthentication/playerauthenticationcomponents.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Lighting/lightruntimeobject.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Lighting/lightruntimeobject-pixi-renderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Lighting/lightobstacleruntimebehavior.js',

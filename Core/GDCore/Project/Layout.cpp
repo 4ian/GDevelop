@@ -218,32 +218,8 @@ void Layout::UpdateBehaviorsSharedData(gd::Project& project) {
 
     if (behaviorsSharedData.find(name) != behaviorsSharedData.end()) continue;
 
-    if (project.HasEventsBasedBehavior(allBehaviorsTypes[i])) {
-      // Events based behaviors don't have shared data yet.
-      auto sharedData =
-          gd::make_unique<gd::BehaviorsSharedData>(name, allBehaviorsTypes[i]);
-      sharedData->InitializeContent();
-      behaviorsSharedData[name] = std::move(sharedData);
-    }
-    else {
-      const gd::BehaviorMetadata& behaviorMetadata =
-          gd::MetadataProvider::GetBehaviorMetadata(
-              project.GetCurrentPlatform(),
-              allBehaviorsTypes[i]);
-      if (gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
-        continue;
-      }
-
-      gd::BehaviorsSharedData* behaviorsSharedDataBluePrint =
-          behaviorMetadata.GetSharedDataInstance();
-      if (!behaviorsSharedDataBluePrint) continue;
-
-      auto sharedData =
-          gd::make_unique<gd::BehaviorsSharedData>(
-              *behaviorsSharedDataBluePrint);
-      sharedData->SetName(name);
-      sharedData->SetTypeName(allBehaviorsTypes[i]);
-      sharedData->InitializeContent();
+    auto sharedData = CreateBehaviorsSharedData(project, name, allBehaviorsTypes[i]);
+    if (sharedData) {
       behaviorsSharedData[name] = std::move(sharedData);
     }
   }
@@ -262,6 +238,33 @@ void Layout::UpdateBehaviorsSharedData(gd::Project& project) {
                   allSharedData[i]) == allBehaviorsNames.end())
       behaviorsSharedData.erase(allSharedData[i]);
   }
+}
+
+std::unique_ptr<gd::BehaviorsSharedData> Layout::CreateBehaviorsSharedData(gd::Project& project, const gd::String& name, const gd::String& behaviorsType) {
+    if (project.HasEventsBasedBehavior(behaviorsType)) {
+      // Events based behaviors don't have shared data yet.
+      auto sharedData =
+          gd::make_unique<gd::BehaviorsSharedData>(name, behaviorsType);
+      sharedData->InitializeContent();
+      return std::move(sharedData);
+    }
+    const gd::BehaviorMetadata& behaviorMetadata =
+        gd::MetadataProvider::GetBehaviorMetadata(
+            project.GetCurrentPlatform(),
+            behaviorsType);
+    if (gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
+      return nullptr;
+    }
+
+    gd::BehaviorsSharedData* behaviorsSharedDataBluePrint =
+        behaviorMetadata.GetSharedDataInstance();
+    if (!behaviorsSharedDataBluePrint) return nullptr;
+
+    auto sharedData = behaviorsSharedDataBluePrint->Clone();
+    sharedData->SetName(name);
+    sharedData->SetTypeName(behaviorsType);
+    sharedData->InitializeContent();
+    return std::unique_ptr<gd::BehaviorsSharedData>(sharedData);
 }
 
 void Layout::SerializeTo(SerializerElement& element) const {
@@ -367,20 +370,23 @@ void Layout::UnserializeFrom(gd::Project& project,
                             "Behavior");  // Compatibility with GD <= 4
     gd::String name = sharedDataElement.GetStringAttribute("name", "", "Name");
 
-    auto behavior = gd::make_unique<gd::BehaviorsSharedData>(name, type);
-    // Compatibility with GD <= 4.0.98
-    // If there is only one child called "content" (in addition to "type" and
-    // "name"), it's the content of a JavaScript behavior. Move the content
-    // out of the "content" object (to put it directly at the root of the
-    // behavior shared data element).
-    if (sharedDataElement.HasChild("content")) {
-      behavior->UnserializeFrom(sharedDataElement.GetChild("content"));
+
+    auto sharedData = CreateBehaviorsSharedData(project, name, type);
+    if (sharedData) {
+      // Compatibility with GD <= 4.0.98
+      // If there is only one child called "content" (in addition to "type" and
+      // "name"), it's the content of a JavaScript behavior. Move the content
+      // out of the "content" object (to put it directly at the root of the
+      // behavior shared data element).
+      if (sharedDataElement.HasChild("content")) {
+        sharedData->UnserializeFrom(sharedDataElement.GetChild("content"));
+      }
+      // end of compatibility code
+      else {
+        sharedData->UnserializeFrom(sharedDataElement);
+      }
+      behaviorsSharedData[name] = std::move(sharedData);
     }
-    // end of compatibility code
-    else {
-      behavior->UnserializeFrom(sharedDataElement);
-    }
-    behaviorsSharedData[name] = std::move(behavior);
   }
 }
 
@@ -402,7 +408,7 @@ void Layout::Init(const Layout& other) {
   behaviorsSharedData.clear();
   for (const auto& it : other.behaviorsSharedData) {
     behaviorsSharedData[it.first] =
-        gd::make_unique<gd::BehaviorsSharedData>(*(it.second->Clone()));
+        std::unique_ptr<gd::BehaviorsSharedData>(it.second->Clone());
   }
 
   events = other.events;

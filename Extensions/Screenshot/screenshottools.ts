@@ -4,16 +4,16 @@ namespace gdjs {
 
     /**
      * Save a screenshot of the game.
-     * @param runtimeScene The scene
+     * @param instanceContainer The scene
      * @param savePath The path where to save the screenshot
      */
     export const takeScreenshot = function (
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       savePath: string
     ) {
       const fs = typeof require !== 'undefined' ? require('fs') : null;
       if (fs) {
-        const canvas = runtimeScene.getGame().getRenderer().getCanvas();
+        const canvas = instanceContainer.getGame().getRenderer().getCanvas();
         if (canvas) {
           const content = canvas
             .toDataURL('image/png')

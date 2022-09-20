@@ -87,6 +87,7 @@ export type ResourceSource = {
   name: string,
   displayName: MessageDescriptor,
   displayTab: 'standalone' | 'import' | 'import-advanced',
+  onlyForStorageProvider?: ?string,
   kind: ResourceKind,
   selectResourcesHeadless?: ?(
     ChooseResourceProps
@@ -102,5 +103,6 @@ export type ResourceManagementProps = {|
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   onChooseResource: ChooseResourceFunction,
+  getStorageProvider: () => StorageProvider,
   onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
 |};

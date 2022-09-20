@@ -13,6 +13,7 @@ import {
   isPublicAssetResourceUrl,
 } from '../../Utils/GDevelopServices/Asset';
 import { isFetchableUrl } from '../../ResourcesList/ResourceUtils';
+import { extractFilenameFromProjectResourceUrl } from '../../Utils/GDevelopServices/Project';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const fs = optionalRequire('fs-extra');
@@ -65,8 +66,8 @@ export const moveUrlResourcesToLocalFiles = async ({
           url
         );
       } else {
-        // Resource is a generic url.
-        filenameWithExtension = path.basename(url);
+        // Resource is a project resource or a generic url.
+        filenameWithExtension = extractFilenameFromProjectResourceUrl(url);
       }
       const extension = path.extname(filenameWithExtension);
       const filenameWithoutExtension = path.basename(

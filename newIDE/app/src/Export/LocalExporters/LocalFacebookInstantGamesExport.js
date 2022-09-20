@@ -5,7 +5,7 @@ import React from 'react';
 import RaisedButton from '../../UI/RaisedButton';
 import { Column, Line } from '../../UI/Grid';
 import { findGDJS } from '../../GameEngineFinder/LocalGDJSFinder';
-import localFileSystem from './LocalFileSystem';
+import LocalFileSystem, { type UrlFileDescriptor } from './LocalFileSystem';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
 import {
@@ -18,6 +18,7 @@ import {
   ExplanationHeader,
   DoneFooter,
 } from '../GenericExporters/FacebookInstantGamesExport';
+import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -32,11 +33,13 @@ type ExportState = {
 
 type PreparedExporter = {|
   exporter: gdjsExporter,
+  localFileSystem: LocalFileSystem,
   temporaryOutputDir: string,
 |};
 
 type ExportOutput = {|
   temporaryOutputDir: string,
+  urlFiles: Array<UrlFileDescriptor>,
 |};
 
 type ResourcesDownloadOutput = {|
@@ -101,6 +104,9 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
       console.info('GDJS found in ', gdjsRoot);
 
       // TODO: Memory leak? Check for other exporters too.
+      const localFileSystem = new LocalFileSystem({
+        downloadUrlsToLocalFiles: true,
+      });
       const fileSystem = assignIn(
         new gd.AbstractFileSystemJS(),
         localFileSystem
@@ -115,14 +121,15 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
 
       return {
         exporter,
+        localFileSystem,
         temporaryOutputDir,
       };
     });
   },
 
-  launchExport: (
+  launchExport: async (
     context: ExportPipelineContext<ExportState>,
-    { exporter, temporaryOutputDir }: PreparedExporter
+    { exporter, localFileSystem, temporaryOutputDir }: PreparedExporter
   ): Promise<ExportOutput> => {
     const exportOptions = new gd.MapStringBoolean();
     exportOptions.set('exportForFacebookInstantGames', true);
@@ -134,14 +141,23 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
     exportOptions.delete();
     exporter.delete();
 
-    return Promise.resolve({ temporaryOutputDir });
+    return {
+      temporaryOutputDir,
+      urlFiles: localFileSystem.getAllUrlFilesIn(temporaryOutputDir),
+    };
   },
 
-  launchResourcesDownload: (
+  launchResourcesDownload: async (
     context: ExportPipelineContext<ExportState>,
-    { temporaryOutputDir }: ExportOutput
+    { temporaryOutputDir, urlFiles }: ExportOutput
   ): Promise<ResourcesDownloadOutput> => {
-    return Promise.resolve({ temporaryOutputDir });
+    await downloadUrlsToLocalFiles({
+      urlContainers: urlFiles,
+      onProgress: context.updateStepProgress,
+      throwIfAnyError: true,
+    });
+
+    return { temporaryOutputDir };
   },
 
   launchCompression: (

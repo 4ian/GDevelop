@@ -14,6 +14,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
 import { Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
+import { FileToCloudProjectResourceUploader } from './FileToCloudProjectResourceUploader';
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
 const path = optionalRequire('path');
@@ -57,6 +58,23 @@ const localResourceSources: Array<ResourceSource> = [
         onChooseResources={props.onChooseResources}
         options={props.options}
         key={`resource-store-${kind}`}
+      />
+    ),
+  })),
+  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
+    name: `upload-${kind}`,
+    displayName: t`File(s) from your device`,
+    displayTab: 'import',
+    onlyForStorageProvider: 'Cloud',
+    kind,
+    renderComponent: (props: ResourceSourceComponentProps) => (
+      <FileToCloudProjectResourceUploader
+        createNewResource={createNewResource}
+        onChooseResources={props.onChooseResources}
+        options={props.options}
+        fileMetadata={props.fileMetadata}
+        getStorageProvider={props.getStorageProvider}
+        key={`url-chooser-${kind}`}
       />
     ),
   })),
@@ -122,6 +140,7 @@ const localResourceSources: Array<ResourceSource> = [
         name: 'local-file-opener-' + kind,
         displayName: t`Choose a file`,
         displayTab: 'import',
+        onlyForStorageProvider: 'LocalFile',
         kind,
         selectResourcesHeadless: selectLocalFileResources,
         renderComponent: (props: ResourceSourceComponentProps) => (

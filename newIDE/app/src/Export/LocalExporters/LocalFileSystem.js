@@ -1,9 +1,33 @@
+// @flow
 import optionalRequire from '../../Utils/OptionalRequire';
 import { getUID } from '../../Utils/LocalUserInfo';
-var fs = optionalRequire('fs-extra');
-var path = optionalRequire('path');
-var os = optionalRequire('os');
-const gd /* TODO: add flow in this file */ = global.gd;
+const fs = optionalRequire('fs-extra');
+const path = optionalRequire('path');
+const os = optionalRequire('os');
+
+const gd: libGDevelop = global.gd;
+
+export type UrlFileDescriptor = {|
+  filePath: string,
+  url: string,
+|};
+
+const isURL = (filename: string) => {
+  return (
+    filename.startsWith('http://') ||
+    filename.startsWith('https://') ||
+    filename.startsWith('ftp://') ||
+    filename.startsWith('blob:') ||
+    filename.startsWith('data:')
+  );
+};
+
+// For some reason, `path.posix` is undefined when packaged
+// with webpack, so we're using `path` directly. As it's for the web-app,
+// it should always be the posix version. In tests on Windows,
+// it's necessary to use path.posix.
+// Search for "pathPosix" in the codebase for other places where this is used.
+const pathPosix = path.posix || path;
 
 /**
  * Gives access to the local filesystem, but returns paths
@@ -11,8 +35,40 @@ const gd /* TODO: add flow in this file */ = global.gd;
  * (so that in exported games, paths are slashs, which is
  * supported everywhere).
  */
-const LocalFileSystem = {
-  mkDir: function(path) {
+class LocalFileSystem {
+  /**
+   * True if URLs should be downloaded (useful for an export, but not for a preview).
+   */
+  _downloadUrlsToLocalFiles: boolean;
+
+  /**
+   * Store all the files that should be downloaded (filepath => url)
+   * @private
+   */
+  _filesToDownload: { [string]: string } = {};
+
+  constructor(
+    options: ?{|
+      downloadUrlsToLocalFiles: boolean,
+    |}
+  ) {
+    this._downloadUrlsToLocalFiles =
+      !!options && options.downloadUrlsToLocalFiles;
+  }
+
+  /**
+   * Returns all the files that should be downloaded from a URL, with the specified destination path prefix.
+   */
+  getAllUrlFilesIn = (pathPrefix: string): Array<UrlFileDescriptor> => {
+    return Object.keys(this._filesToDownload)
+      .filter(filePath => filePath.indexOf(pathPrefix) === 0)
+      .map(filePath => ({
+        filePath,
+        url: this._filesToDownload[filePath],
+      }));
+  };
+
+  mkDir = (path: string) => {
     try {
       fs.mkdirsSync(path);
     } catch (e) {
@@ -20,66 +76,71 @@ const LocalFileSystem = {
       return false;
     }
     return true;
-  },
-  dirExists: function(path) {
+  };
+  dirExists = (path: string) => {
     return fs.existsSync(path);
-  },
-  clearDir: function(path) {
+  };
+  clearDir = (path: string) => {
     try {
       fs.emptyDirSync(path);
     } catch (e) {
       console.error('clearDir(' + path + ') failed: ' + e);
     }
-  },
-  getTempDir: function() {
+  };
+  getTempDir = () => {
     return path.join(os.tmpdir(), `GDTMP-${getUID()}`);
-  },
-  fileNameFrom: function(fullPath) {
-    if (this._isExternalUrl(fullPath)) return fullPath;
+  };
+  fileNameFrom = (fullPath: string) => {
+    // If URLs are not downloaded, then filenames are not changed.
+    if (!this._downloadUrlsToLocalFiles && isURL(fullPath)) return fullPath;
 
-    fullPath = this._translateUrl(fullPath);
     return path.basename(fullPath);
-  },
-  dirNameFrom: function(fullPath) {
-    if (this._isExternalUrl(fullPath)) return '';
-
-    fullPath = this._translateUrl(fullPath);
+  };
+  dirNameFrom = (fullPath: string) => {
     return path.dirname(fullPath).replace(/\\/g, '/');
-  },
-  makeAbsolute: function(filename, baseDirectory) {
-    if (this._isExternalUrl(filename)) return filename;
+  };
+  makeAbsolute = (filename: string, baseDirectory: string) => {
+    if (isURL(filename)) return filename;
 
-    filename = this._translateUrl(filename);
     if (!this.isAbsolute(baseDirectory))
       baseDirectory = path.resolve(baseDirectory);
 
     return path
       .resolve(baseDirectory, path.normalize(filename))
       .replace(/\\/g, '/');
-  },
-  makeRelative: function(filename, baseDirectory) {
-    if (this._isExternalUrl(filename)) return filename;
+  };
+  makeRelative = (filename: string, baseDirectory: string) => {
+    if (isURL(filename)) return filename;
 
-    filename = this._translateUrl(filename);
     return path
       .relative(baseDirectory, path.normalize(filename))
       .replace(/\\/g, '/');
-  },
-  isAbsolute: function(fullPath) {
-    if (this._isExternalUrl(fullPath)) return true;
+  };
+  isAbsolute = (fullPath: string) => {
+    if (isURL(fullPath)) return true;
 
     if (fullPath.length === 0) return true;
-    fullPath = this._translateUrl(fullPath);
     return (
       (fullPath.length > 0 && fullPath.charAt(0) === '/') ||
       (fullPath.length > 1 && fullPath.charAt(1) === ':')
     );
-  },
-  copyFile: function(source, dest) {
-    //URL are not copied.
-    if (this._isExternalUrl(source)) return true;
+  };
+  copyFile = (source: string, dest: string) => {
+    if (isURL(source)) {
+      // If URLs are not downloaded, then there is nothing to copy.
+      if (!this._downloadUrlsToLocalFiles) return true;
 
-    source = this._translateUrl(source);
+      if (isURL(dest)) {
+        console.error(
+          `Destination can't be a URL in copyFile (from ${source} to ${dest}).`
+        );
+        return false;
+      }
+
+      this._filesToDownload[pathPosix.normalize(dest)] = source;
+      return true;
+    }
+
     try {
       if (source !== dest) fs.copySync(source, dest);
     } catch (e) {
@@ -87,8 +148,8 @@ const LocalFileSystem = {
       return false;
     }
     return true;
-  },
-  writeToFile: function(file, contents) {
+  };
+  writeToFile = (file: string, contents: string) => {
     try {
       fs.outputFileSync(file, contents);
     } catch (e) {
@@ -96,8 +157,8 @@ const LocalFileSystem = {
       return false;
     }
     return true;
-  },
-  readFile: function(file) {
+  };
+  readFile = (file: string) => {
     try {
       var contents = fs.readFileSync(file);
       return contents.toString();
@@ -105,8 +166,8 @@ const LocalFileSystem = {
       console.error('readFile(' + file + ') failed: ' + e);
       return '';
     }
-  },
-  readDir: function(path, ext) {
+  };
+  readDir = (path: string, ext: string) => {
     ext = ext.toUpperCase();
     var output = new gd.VectorString();
     try {
@@ -127,36 +188,25 @@ const LocalFileSystem = {
     }
 
     return output;
-  },
-  fileExists: function(filename) {
-    filename = this._translateUrl(filename);
+  };
+  fileExists = (filePath: string) => {
+    // Check if a file WILL exists once downloaded.
+    const normalizedFilePath = pathPosix.normalize(filePath);
+    const shouldTheFileBeDownloaded = !!this._filesToDownload[
+      normalizedFilePath
+    ];
+    if (shouldTheFileBeDownloaded) {
+      return true;
+    }
+
+    // Check if a local file exists.
     try {
-      const stat = fs.statSync(filename);
+      const stat = fs.statSync(filePath);
       return stat.isFile();
     } catch (e) {
       return false;
     }
-  },
-  _isExternalUrl: function(filename) {
-    return (
-      filename.startsWith('http://') ||
-      filename.startsWith('https://') ||
-      filename.startsWith('ftp://') ||
-      filename.startsWith('blob:') ||
-      filename.startsWith('data:')
-    );
-  },
-  /**
-   * Return the filename associated to the URL on the server, relative to the games directory.
-   * (i.e: Transform g/mydirectory/myfile.png to mydirectory/myfile.png).
-   */
-  _translateUrl: function(filename) {
-    // TODO: remove
-    if (filename.substr(0, 2) === 'g/' || filename.substr(0, 2) === 'g\\')
-      filename = filename.substr(2);
-
-    return filename;
-  },
-};
+  };
+}
 
 export default LocalFileSystem;

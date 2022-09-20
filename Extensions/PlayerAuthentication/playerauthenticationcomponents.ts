@@ -329,6 +329,8 @@ namespace gdjs {
       divContainer.appendChild(loggedText);
 
       domContainer.appendChild(divContainer);
+      const animationTime = 700;
+      const notificationTime = 5000;
       setTimeout(() => {
         try {
           divContainer.animate(
@@ -337,22 +339,18 @@ namespace gdjs {
               { transform: 'translateY(-30px)', opacity: 0 },
             ],
             {
-              duration: 700,
+              duration: animationTime,
               easing: 'ease-in',
             }
           );
         } catch {
           logger.warn('Animation not supported, div will be fixed.');
         }
-      }, 2000);
+      }, notificationTime);
       // Use timeout because onanimationend listener does not work.
-      setTimeout(
-        () => {
-          divContainer.remove();
-        },
-        // Wait 2000 ms + 700 ms for the animation to finish.
-        2700
-      );
+      setTimeout(() => {
+        divContainer.remove();
+      }, notificationTime + animationTime);
     };
 
     /**

@@ -33,7 +33,18 @@ namespace gdjs {
       _justLoggedIn = false;
     });
 
-    const LOCAL_STORAGE_KEY = `${gdjs.projectData.properties.projectUuid}_authenticatedUser`;
+    const getLocalStorageKey = (gameId: string) =>
+      `${gameId}_authenticatedUser`;
+    const getAuthWindowUrl = ({
+      gameId,
+      connectionId,
+    }: {
+      gameId: string;
+      connectionId?: string;
+    }) =>
+      `https://liluo.io/auth?gameId=${gameId}${
+        connectionId ? `&connectionId=${connectionId}` : ''
+      }`;
 
     /**
      * Returns true if a user token is present in the local storage.
@@ -89,7 +100,12 @@ namespace gdjs {
       _userToken = null;
       _userId = null;
 
-      window.localStorage.removeItem(LOCAL_STORAGE_KEY);
+      const gameId = gdjs.projectData.properties.projectUuid;
+      if (!gameId) {
+        logger.error('Missing game id in project properties.');
+        return;
+      }
+      window.localStorage.removeItem(getLocalStorageKey(gameId));
       const onDismissBanner = () => {
         removeAuthenticationBanner(runtimeScene);
       };
@@ -107,8 +123,13 @@ namespace gdjs {
      * them in the extension variables.
      */
     const readAuthenticatedUserFromLocalStorage = () => {
+      const gameId = gdjs.projectData.properties.projectUuid;
+      if (!gameId) {
+        logger.error('Missing game id in project properties.');
+        return;
+      }
       const authenticatedUserStorageItem = window.localStorage.getItem(
-        LOCAL_STORAGE_KEY
+        getLocalStorageKey(gameId)
       );
       if (!authenticatedUserStorageItem) {
         _checkedLocalStorage = true;
@@ -120,6 +141,29 @@ namespace gdjs {
       _userId = authenticatedUser.userId;
       _userToken = authenticatedUser.userToken;
       _checkedLocalStorage = true;
+    };
+
+    /**
+     * Helper to be called on login or error.
+     * Removes all the UI and callbacks.
+     */
+    const cleanUpAuthWindowAndCallbacks = (runtimeScene: RuntimeScene) => {
+      removeAuthenticationContainer(runtimeScene);
+      clearAuthenticationWindowTimeout();
+      if (_websocket) {
+        _websocket.close();
+        _websocket = null;
+      }
+      // If a new window was opened (web), close it.
+      if (_authenticationWindow) {
+        _authenticationWindow.close();
+        _authenticationWindow = null;
+      }
+      // If an in-app browser was used (cordova), close it.
+      if (_authenticationInAppWindow) {
+        _authenticationInAppWindow.close();
+        _authenticationInAppWindow = null;
+      }
     };
 
     /**
@@ -139,31 +183,22 @@ namespace gdjs {
       _userId = userId;
       _userToken = userToken;
       _justLoggedIn = true;
+
+      const gameId = gdjs.projectData.properties.projectUuid;
+      if (!gameId) {
+        logger.error('Missing game id in project properties.');
+        return;
+      }
       window.localStorage.setItem(
-        LOCAL_STORAGE_KEY,
+        getLocalStorageKey(gameId),
         JSON.stringify({
           username: _username,
           userId: _userId,
           userToken: _userToken,
         })
       );
+      cleanUpAuthWindowAndCallbacks(runtimeScene);
       removeAuthenticationBanner(runtimeScene);
-      removeAuthenticationContainer(runtimeScene);
-      clearAuthenticationWindowTimeout();
-      if (_websocket) {
-        _websocket.close();
-        _websocket = null;
-      }
-      // If a new window was opened (web), close it.
-      if (_authenticationWindow) {
-        _authenticationWindow.close();
-        _authenticationWindow = null;
-      }
-      // If an in-app browser was used (cordova), close it.
-      if (_authenticationInAppWindow) {
-        _authenticationInAppWindow.close();
-        _authenticationInAppWindow = null;
-      }
 
       const domElementContainer = runtimeScene
         .getGame()
@@ -229,7 +264,7 @@ namespace gdjs {
       message: string
     ) {
       logger.error(message);
-      clearAuthenticationWindowTimeout();
+      cleanUpAuthWindowAndCallbacks(runtimeScene);
 
       const domElementContainer = runtimeScene
         .getGame()
@@ -242,14 +277,12 @@ namespace gdjs {
         );
         return;
       }
-      removeAuthenticationContainer(runtimeScene);
-      removeAuthenticationBanner(runtimeScene);
       authComponents.displayErrorNotification(domElementContainer);
       focusOnGame(runtimeScene);
     };
 
     /**
-     * If after 60s, no message has been received from the authentication window,
+     * If after 5min, no message has been received from the authentication window,
      * show a notification and remove the authentication container.
      */
     const startAuthenticationWindowTimeout = (
@@ -260,10 +293,9 @@ namespace gdjs {
         logger.info(
           'Authentication window did not send message in time. Closing it.'
         );
-        removeAuthenticationContainer(runtimeScene);
-        displayAuthenticationBanner(runtimeScene);
+        cleanUpAuthWindowAndCallbacks(runtimeScene);
         focusOnGame(runtimeScene);
-      }, 180000); // Give a few minutes for the user to enter their credentials.
+      }, 300000); // Give a few minutes for the user to enter their credentials.
     };
 
     /**
@@ -327,7 +359,7 @@ namespace gdjs {
      * We open a new window, and create a websocket to know when the user is logged in.
      */
     const openAuthenticationWindowForElectron = (runtimeScene, gameId) => {
-      _websocket = new WebSocket(`wss://api.gdevelop.io/play:3001`); // To check correct URL once deployed.
+      _websocket = new WebSocket(`wss://api.gdevelop.io/play:3001`); // TODO: check correct URL once deployed.
       _websocket.onopen = () => {
         // When socket is open, ask for the connectionId, so that we can open the authentication window.
         if (_websocket) {
@@ -357,7 +389,7 @@ namespace gdjs {
                 return;
               }
 
-              const targetUrl = `https://liluo.io/auth?gameId=${gameId}&connectionId=${connectionId}`;
+              const targetUrl = getAuthWindowUrl({ gameId, connectionId });
 
               const electron = runtimeScene
                 .getGame()
@@ -375,7 +407,7 @@ namespace gdjs {
      * We open an InAppBrowser window, and listen to messages posted on this window.
      */
     const openAuthenticationWindowForCordova = (runtimeScene, gameId) => {
-      const targetUrl = `https://liluo.io/auth?gameId=${gameId}`;
+      const targetUrl = getAuthWindowUrl({ gameId });
 
       _authenticationInAppWindow = cordova.InAppBrowser.open(
         targetUrl,
@@ -404,7 +436,7 @@ namespace gdjs {
      */
     const openAuthenticationWindowForWeb = (runtimeScene, gameId) => {
       // If we're on a browser, open a new window.
-      const targetUrl = `https://liluo.io/auth?gameId=${gameId}`;
+      const targetUrl = getAuthWindowUrl({ gameId });
 
       // Listen to messages posted by the authentication window, so that we can
       // know when the user is authenticated.
@@ -450,7 +482,7 @@ namespace gdjs {
         return;
       }
       const onAuthenticationContainerDismissed = () => {
-        removeAuthenticationContainer(runtimeScene);
+        cleanUpAuthWindowAndCallbacks(runtimeScene);
         displayAuthenticationBanner(runtimeScene);
       };
       const rootContainer = authComponents.computeAuthenticationContainer(

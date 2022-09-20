@@ -102,6 +102,7 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectCompleteCode(
       },
       [&]() {
         gd::String updateFromObjectCode;
+        updateFromObjectCode += "super.updateFromObjectData(oldObjectData, newObjectData);";
         for (auto& property :
              eventsBasedObject.GetPropertyDescriptors().GetInternalVector()) {
           updateFromObjectCode +=

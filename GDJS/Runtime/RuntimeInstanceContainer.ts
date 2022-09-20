@@ -393,6 +393,14 @@ namespace gdjs {
     }
 
     /**
+     * @param objectName The name of the object
+     * @returns the instances of a given object in the container.
+     */
+    getInstancesOf(objectName: string): gdjs.RuntimeObject[] {
+      return this._instances.items[objectName];
+    }
+
+    /**
      * Get a list of all {@link gdjs.RuntimeObject} living in the container.
      * You should not, normally, need this method at all. It's only to be used
      * in exceptional use cases where you need to loop through all objects,

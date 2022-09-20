@@ -74,8 +74,7 @@ namespace gdjs {
       oldObjectData: ObjectData & CustomObjectConfiguration,
       newObjectData: ObjectData & CustomObjectConfiguration
     ): boolean {
-      // TODO EBO Handle hot reload.
-      return false;
+      return this._instanceContainer.updateFrom(oldObjectData, newObjectData);
     }
 
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {

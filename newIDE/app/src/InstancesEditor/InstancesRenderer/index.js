@@ -4,6 +4,17 @@ import ViewPosition from '../ViewPosition';
 import * as PIXI from 'pixi.js-legacy';
 import Rectangle from '../../Utils/Rectangle';
 
+export type InstanceMeasurer = {|
+  getInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
+  getUnrotatedInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
+  getInstanceRect: gdInitialInstance => {|
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  |},
+|};
+
 export default class InstancesRenderer {
   project: gdProject;
   instances: gdInitialInstancesContainer;
@@ -28,16 +39,7 @@ export default class InstancesRenderer {
   pixiContainer: PIXI.Container;
 
   temporaryRectangle: Rectangle;
-  instanceMeasurer: {|
-    getInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
-    getUnrotatedInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
-    getInstanceRect: gdInitialInstance => {|
-      x: number,
-      y: number,
-      width: number,
-      height: number,
-    |},
-  |};
+  instanceMeasurer: InstanceMeasurer;
 
   constructor({
     project,

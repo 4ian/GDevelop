@@ -370,7 +370,7 @@ module.exports = {
     RenderedLightObjectInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'CppPlatform/Extensions/lightIcon32.png';
     };

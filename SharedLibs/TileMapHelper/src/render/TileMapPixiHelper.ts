@@ -137,7 +137,7 @@ export class PixiTileMapHelper {
     layerIndex: number
   ): void {
     // The extension doesn't handle the Pixi sub-namespace very well.
-    const pixiTileMap = untypedPixiTileMap as PIXI.tilemap.CompositeRectTileLayer;
+    const pixiTileMap = untypedPixiTileMap as PIXI.tilemap.CompositeTilemap;
     if (!pixiTileMap) return;
     pixiTileMap.clear();
 
@@ -152,17 +152,18 @@ export class PixiTileMapHelper {
       if (layer instanceof EditableObjectLayer) {
         const objectLayer = layer as EditableObjectLayer;
         for (const object of objectLayer.objects) {
-          const texture = textureCache.findTileTexture(
-            object.getTileId(),
-            object.isFlippedHorizontally(),
-            object.isFlippedVertically(),
-            object.isFlippedDiagonally()
-          );
+          const texture = textureCache.findTileTexture(object.getTileId());
           if (texture) {
-            pixiTileMap.addFrame(
+            const rotate = textureCache.getPixiRotate(
+              object.isFlippedHorizontally(),
+              object.isFlippedVertically(),
+              object.isFlippedDiagonally()
+            );
+            pixiTileMap.tile(
               texture,
               object.x,
-              object.y - objectLayer.tileMap.getTileHeight()
+              object.y - objectLayer.tileMap.getTileHeight(),
+              { rotate }
             );
           }
         }
@@ -183,21 +184,19 @@ export class PixiTileMapHelper {
             if (tileId === undefined) {
               continue;
             }
-            const tileTexture = textureCache.findTileTexture(
-              tileId,
-              tileLayer.isFlippedHorizontally(x, y),
-              tileLayer.isFlippedVertically(x, y),
-              tileLayer.isFlippedDiagonally(x, y)
-            );
+            const tileTexture = textureCache.findTileTexture(tileId);
             if (!tileTexture) {
               console.warn(`Unknown tile id: ${tileId} at (${x}, ${y})`);
               continue;
             }
-            const pixiTilemapFrame = pixiTileMap.addFrame(
-              tileTexture,
-              xPos,
-              yPos
+            const rotate = textureCache.getPixiRotate(
+              tileLayer.isFlippedHorizontally(x, y),
+              tileLayer.isFlippedVertically(x, y),
+              tileLayer.isFlippedDiagonally(x, y)
             );
+            const pixiTilemapFrame = pixiTileMap.tile(tileTexture, xPos, yPos, {
+              rotate,
+            });
 
             const tileDefinition = tileLayer.tileMap.getTileDefinition(tileId);
 

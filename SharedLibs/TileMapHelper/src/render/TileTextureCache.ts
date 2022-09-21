@@ -36,51 +36,31 @@ export class TileTextureCache {
   }
 
   /**
+   * Return the texture to use for the tile with the specified id.
+   *
+   * @param tileId The tile identifier
+   * @returns The texture for the given tile identifier.
+   */
+  findTileTexture(tileId: integer): PIXI.Texture | undefined {
+    return this._textures.get(tileId);
+  }
+
+  /**
    * Return the texture to use for the tile with the specified uid, which can contains
    * information about rotation in bits 32, 31 and 30
    * (see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/).
    *
-   * @param tileId The tile identifier
    * @param flippedHorizontally true if the tile is flipped horizontally.
    * @param flippedVertically true if the tile is flipped vertically.
    * @param flippedDiagonally true if the tile is flipped diagonally.
-   * @returns The texture for the given tile identifier and orientation.
+   * @returns the rotation "D8" number used by Pixi.
+   * @see https://pixijs.io/examples/#/textures/texture-rotate.js
    */
-  findTileTexture(
-    tileId: integer,
+  getPixiRotate(
     flippedHorizontally: boolean,
     flippedVertically: boolean,
     flippedDiagonally: boolean
-  ): PIXI.Texture | undefined {
-    let globalTileUid = this._getGlobalId(
-      tileId,
-      flippedHorizontally,
-      flippedVertically,
-      flippedDiagonally
-    );
-
-    if (this._textures.has(globalTileUid)) {
-      return this._textures.get(globalTileUid);
-    }
-    // If the texture is not in the cache, it's potentially because its ID
-    // is a flipped/rotated version of another ID.
-    const unflippedTexture = this._textures.get(tileId);
-    // If the tile still can't be found in the cache, it means the ID we got
-    // is invalid.
-    if (!unflippedTexture) return undefined;
-
-    // Clone the unflipped texture and save it in the cache
-    const frame = unflippedTexture.frame.clone();
-    const orig = unflippedTexture.orig.clone();
-    if (flippedDiagonally) {
-      const width = orig.width;
-      orig.width = orig.height;
-      orig.height = width;
-    }
-    const trim = orig.clone();
-
-    // Get the rotation "D8" number.
-    // See https://pixijs.io/examples/#/textures/texture-rotate.js
+  ): number {
     let rotate = 0;
     if (flippedDiagonally) {
       rotate = 10;
@@ -101,16 +81,7 @@ export class TileTextureCache {
         rotate = 4;
       }
     }
-
-    const flippedTexture = new PIXI.Texture(
-      unflippedTexture.baseTexture,
-      frame,
-      orig,
-      trim,
-      rotate
-    );
-    this._textures.set(globalTileUid, flippedTexture);
-    return flippedTexture;
+    return rotate;
   }
 
   /**

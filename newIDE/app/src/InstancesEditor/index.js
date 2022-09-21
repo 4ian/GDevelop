@@ -32,6 +32,7 @@ import InstancesSelection from './InstancesSelection';
 import LongTouchHandler from './LongTouchHandler';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
 import Rectangle from '../Utils/Rectangle';
+const gd: libGDevelop = global.gd;
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
@@ -803,6 +804,34 @@ export default class InstancesEditor extends Component<Props> {
 
   scrollTo(x: number, y: number) {
     this.viewPosition.scrollTo(x, y);
+  }
+
+  zoomToFitContent() {
+    const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
+    let rectangle: ?Rectangle;
+    const getInstanceRectangle = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe - invoke is not writable
+    getInstanceRectangle.invoke = instancePtr => {
+      // $FlowFixMe - wrapPointer is not exposed
+      const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
+      if (!rectangle) {
+        rectangle = instanceMeasurer.getInstanceAABB(instance, new Rectangle());
+      } else {
+        rectangle.union(
+          instanceMeasurer.getInstanceAABB(instance, new Rectangle())
+        );
+      }
+    };
+    const { initialInstances } = this.props;
+    if (initialInstances.getInstancesCount() > 0) {
+      // $FlowFixMe - JSFunctor is incompatible with Functor
+      initialInstances.iterateOverInstances(getInstanceRectangle);
+
+      if (rectangle) {
+        const idealZoom = this.viewPosition.fitToRectangle(rectangle);
+        this.setZoomFactor(idealZoom);
+      }
+    }
   }
 
   zoomToInitialPosition() {

@@ -108,13 +108,13 @@ export default class ViewPosition {
    * Moves view to the rectangle center and returns the ideal zoom
    * factor to fit to the rectangle.
    */
-  fitToRectangle(rectangle: Rectangle) {
+  fitToRectangle(rectangle: Rectangle): number {
     this.viewX = rectangle.centerX();
     this.viewY = rectangle.centerY();
     const idealZoomOnX = this._width / rectangle.width();
     const idealZoomOnY = this._height / rectangle.height();
 
-    return Math.min(idealZoomOnX, idealZoomOnY) - 0.05; //Add margin so that the object don't feel cut
+    return Math.min(idealZoomOnX, idealZoomOnY) - 0.05; // Add margin so that the object doesn't feel cut
   }
 
   getViewX() {

@@ -186,8 +186,38 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
   static getThumbnail(
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
-    object: gdObject
+    objectConfiguration: gdObjectConfiguration
   ) {
+    const customObjectConfiguration = gd.asCustomObjectConfiguration(
+      objectConfiguration
+    );
+
+    const eventBasedObject = project.hasEventsBasedObject(
+      customObjectConfiguration.getType()
+    )
+      ? project.getEventsBasedObject(customObjectConfiguration.getType())
+      : null;
+    if (!eventBasedObject) {
+      return 'res/unknown32.png';
+    }
+
+    for (let i = 0; i < eventBasedObject.getObjectsCount(); i++) {
+      const childObject = eventBasedObject.getObjectAt(i);
+      const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
+        childObject.getName()
+      );
+      const childType = childObjectConfiguration.getType();
+      if (
+        childType === 'Sprite' ||
+        childType === 'TiledSpriteObject::TiledSprite' ||
+        childType === 'PanelSpriteObject::PanelSprite'
+      ) {
+        return ObjectsRenderingService.getThumbnail(
+          project,
+          childObjectConfiguration
+        );
+      }
+    }
     return 'res/unknown32.png';
   }
 

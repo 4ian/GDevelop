@@ -1,8 +1,9 @@
 // @flow
 import Rectangle from '../Utils/Rectangle';
+import { type InstanceMeasurer } from './InstancesRenderer';
 
 export default class InstancesRotator {
-  _instanceMeasurer: any;
+  _instanceMeasurer: InstanceMeasurer;
 
   // Initial state of the instances
   // from which the rotation is calculated.
@@ -24,7 +25,7 @@ export default class InstancesRotator {
    */
   _fixedPoint: [number, number] = [0, 0];
 
-  constructor(instanceMeasurer: any) {
+  constructor(instanceMeasurer: InstanceMeasurer) {
     this._instanceMeasurer = instanceMeasurer;
   }
 

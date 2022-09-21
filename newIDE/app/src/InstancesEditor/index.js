@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import gesture from 'pixi-simple-gesture';
-import DeprecatedKeyboardShortcuts from '../UI/KeyboardShortcuts/DeprecatedKeyboardShortcuts';
+import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import InstancesRenderer from './InstancesRenderer';
 import ViewPosition from './ViewPosition';
 import SelectedInstances from './SelectedInstances';
@@ -31,6 +31,8 @@ import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
 import LongTouchHandler from './LongTouchHandler';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
+import Rectangle from '../Utils/Rectangle';
+const gd: libGDevelop = global.gd;
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
@@ -38,6 +40,20 @@ const styles = {
 };
 
 const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
+
+export type InstancesEditorShortcutsCallbacks = {|
+  onDelete: () => void,
+  onCopy: () => void,
+  onCut: () => void,
+  onPaste: () => void,
+  onUndo: () => void,
+  onRedo: () => void,
+  onZoomOut: () => void,
+  onZoomIn: () => void,
+  onShift1: () => void,
+  onShift2: () => void,
+  onShift3: () => void,
+|};
 
 export type InstancesEditorPropsWithoutSizeAndScroll = {|
   project: gdProject,
@@ -48,7 +64,6 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
     instancesEditorSettings: InstancesEditorSettings
   ) => void,
   instancesSelection: InstancesSelection,
-  onDeleteSelection: () => void,
   onInstancesAdded: (instances: Array<gdInitialInstance>) => void,
   onInstancesSelected: (instances: Array<gdInitialInstance>) => void,
   onInstanceDoubleClicked: (instance: gdInitialInstance) => void,
@@ -61,14 +76,8 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
     y: number,
     ignoreSelectedObjectNamesForContextMenu?: boolean
   ) => void,
-  onCopy: () => void,
-  onCut: () => void,
-  onPaste: () => void,
-  onUndo: () => void,
-  onRedo: () => void,
-  onZoomOut: () => void,
-  onZoomIn: () => void,
   pauseRendering: boolean,
+  instancesEditorShortcutsCallbacks: InstancesEditorShortcutsCallbacks,
 |};
 
 type Props = {|
@@ -87,7 +96,7 @@ export default class InstancesEditor extends Component<Props> {
   fpsLimiter = new FpsLimiter(28);
   canvasArea: ?HTMLDivElement;
   pixiRenderer: PIXI.Renderer;
-  keyboardShortcuts: DeprecatedKeyboardShortcuts;
+  keyboardShortcuts: KeyboardShortcuts;
   pinchHandler: PinchHandler;
   canvasCursor: CanvasCursor;
   _instancesAdder: InstancesAdder;
@@ -137,6 +146,13 @@ export default class InstancesEditor extends Component<Props> {
     // if the project changes).
     const { project } = this.props;
 
+    this.keyboardShortcuts = new KeyboardShortcuts({
+      shortcutCallbacks: {
+        onMove: this.moveSelection,
+        ...this.props.instancesEditorShortcutsCallbacks,
+      },
+    });
+
     //Create the renderer and setup the rendering area for scene editor.
     //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
     this.pixiRenderer = PIXI.autoDetectRenderer(
@@ -176,18 +192,22 @@ export default class InstancesEditor extends Component<Props> {
       event.preventDefault();
     };
     this.pixiRenderer.view.setAttribute('tabIndex', -1);
-    this.pixiRenderer.view.addEventListener('focus', e => {
-      this.keyboardShortcuts.focus();
-    });
-    this.pixiRenderer.view.addEventListener('blur', e => {
-      this.keyboardShortcuts.blur();
-    });
-    this.pixiRenderer.view.addEventListener('mouseover', e => {
-      this.keyboardShortcuts.focus();
-    });
-    this.pixiRenderer.view.addEventListener('mouseout', e => {
-      this.keyboardShortcuts.blur();
-    });
+    this.pixiRenderer.view.addEventListener(
+      'keydown',
+      this.keyboardShortcuts.onKeyDown
+    );
+    this.pixiRenderer.view.addEventListener(
+      'keyup',
+      this.keyboardShortcuts.onKeyUp
+    );
+    this.pixiRenderer.view.addEventListener(
+      'mousedown',
+      this.keyboardShortcuts.onMouseDown
+    );
+    this.pixiRenderer.view.addEventListener(
+      'mouseup',
+      this.keyboardShortcuts.onMouseUp
+    );
 
     this.pixiContainer = new PIXI.Container();
 
@@ -256,18 +276,6 @@ export default class InstancesEditor extends Component<Props> {
       instancesEditorSettings: this.props.instancesEditorSettings,
     });
     this.pixiContainer.addChild(this.grid.getPixiObject());
-
-    this.keyboardShortcuts = new DeprecatedKeyboardShortcuts({
-      onDelete: this.props.onDeleteSelection,
-      onMove: this.moveSelection,
-      onCopy: this.props.onCopy,
-      onCut: this.props.onCut,
-      onPaste: this.props.onPaste,
-      onUndo: this.props.onUndo,
-      onRedo: this.props.onRedo,
-      onZoomOut: this.props.onZoomOut,
-      onZoomIn: this.props.onZoomIn,
-    });
 
     this.pinchHandler = new PinchHandler({
       canvas: this.pixiRenderer.view,
@@ -408,7 +416,6 @@ export default class InstancesEditor extends Component<Props> {
     // to protect against renders after the component is unmounted.
     this._unmounted = true;
 
-    this.keyboardShortcuts.unmount();
     this.selectionRectangle.delete();
     this.instancesRenderer.delete();
     this._instancesAdder.unmount();
@@ -804,16 +811,69 @@ export default class InstancesEditor extends Component<Props> {
     this.viewPosition.scrollTo(x, y);
   }
 
-  centerView() {
+  zoomToFitContent() {
+    const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
+    let rectangle: ?Rectangle;
+    const getInstanceRectangle = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe - invoke is not writable
+    getInstanceRectangle.invoke = instancePtr => {
+      // $FlowFixMe - wrapPointer is not exposed
+      const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
+      if (!rectangle) {
+        rectangle = instanceMeasurer.getInstanceAABB(instance, new Rectangle());
+      } else {
+        rectangle.union(
+          instanceMeasurer.getInstanceAABB(instance, new Rectangle())
+        );
+      }
+    };
+    const { initialInstances } = this.props;
+    if (initialInstances.getInstancesCount() > 0) {
+      // $FlowFixMe - JSFunctor is incompatible with Functor
+      initialInstances.iterateOverInstances(getInstanceRectangle);
+
+      if (rectangle) {
+        const idealZoom = this.viewPosition.fitToRectangle(rectangle);
+        this.setZoomFactor(idealZoom);
+      }
+    }
+  }
+
+  zoomToInitialPosition() {
     const x = this.props.project.getGameResolutionWidth() / 2;
     const y = this.props.project.getGameResolutionHeight() / 2;
     this.viewPosition.scrollTo(x, y);
+    this.setZoomFactor(1);
   }
 
-  centerViewOn(instances: Array<gdInitialInstance>) {
-    if (!instances.length) return;
+  zoomToFitSelection(instances: Array<gdInitialInstance>) {
+    if (instances.length === 0) return;
+    const [firstInstance, ...otherInstances] = instances;
+    const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
+    let selectedInstancesRectangle = instanceMeasurer.getInstanceAABB(
+      firstInstance,
+      new Rectangle()
+    );
+    otherInstances.forEach(instance => {
+      selectedInstancesRectangle.union(
+        instanceMeasurer.getInstanceAABB(instance, new Rectangle())
+      );
+    });
+    const idealZoom = this.viewPosition.fitToRectangle(
+      selectedInstancesRectangle
+    );
+    this.setZoomFactor(idealZoom);
+  }
 
-    this.viewPosition.scrollToInstance(instances[instances.length - 1]);
+  centerViewOnLastInstance(instances: Array<gdInitialInstance>) {
+    if (instances.length === 0) return;
+
+    const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
+    let lastInstanceRectangle = instanceMeasurer.getInstanceAABB(
+      instances[instances.length - 1],
+      new Rectangle()
+    );
+    this.viewPosition.fitToRectangle(lastInstanceRectangle);
     if (this.props.onViewPositionChanged) {
       this.props.onViewPositionChanged(this.viewPosition);
     }

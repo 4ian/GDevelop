@@ -1,4 +1,8 @@
 // @flow
+import { isMacLike } from '../../Utils/Platform';
+
+export const MOVEMENT_BIG_DELTA = 5;
+
 const LEFT_KEY = 37;
 const UP_KEY = 38;
 const RIGHT_KEY = 39;
@@ -7,6 +11,7 @@ const BACKSPACE_KEY = 8;
 const DELETE_KEY = 46;
 const EQUAL_KEY = 187;
 const MINUS_KEY = 189;
+const SPACE_KEY = 32;
 const NUMPAD_ADD = 107;
 const NUMPAD_SUBTRACT = 109;
 const C_KEY = 67;
@@ -15,7 +20,15 @@ const V_KEY = 86;
 const X_KEY = 88;
 const Y_KEY = 89;
 const Z_KEY = 90;
+const KEY_1 = 49;
+const KEY_2 = 50;
+const KEY_3 = 51;
+const KEY_1_NUMPAD = 97;
+const KEY_2_NUMPAD = 98;
+const KEY_3_NUMPAD = 99;
 const ESC_KEY = 27;
+
+const MID_MOUSE_BUTTON = 1;
 
 type ShortcutCallbacks = {|
   onDelete?: () => void,
@@ -29,6 +42,9 @@ type ShortcutCallbacks = {|
   onZoomOut?: KeyboardEvent => void,
   onZoomIn?: KeyboardEvent => void,
   onEscape?: () => void,
+  onShift1?: () => void,
+  onShift2?: () => void,
+  onShift3?: () => void,
 |};
 
 type ConstructorArgs = {|
@@ -54,6 +70,8 @@ export default class KeyboardShortcuts {
   _ctrlPressed = false;
   _altPressed = false;
   _metaPressed = false;
+  _mouseMidButtonPressed = false;
+  _spacePressed = false;
 
   constructor({ isActive, shortcutCallbacks }: ConstructorArgs) {
     this._shortcutCallbacks = shortcutCallbacks;
@@ -68,6 +86,42 @@ export default class KeyboardShortcuts {
     return this._shiftPressed;
   }
 
+  shouldFollowAxis() {
+    return this._shiftPressed;
+  }
+
+  shouldNotSnapToGrid() {
+    return this._altPressed;
+  }
+
+  shouldResizeProportionally() {
+    return this._shiftPressed;
+  }
+
+  shouldScrollHorizontally() {
+    return this._altPressed;
+  }
+
+  shouldMoveView() {
+    return this._spacePressed || this._mouseMidButtonPressed;
+  }
+
+  shouldZoom() {
+    if (isMacLike()) {
+      return this._isControlOrCmdPressed();
+    } else {
+      if (
+        !this._isControlOrCmdPressed() &&
+        !this._altPressed &&
+        !this._shiftPressed
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
   _updateModifiersFromEvent = (evt: KeyboardEvent | DragEvent) => {
     this._metaPressed = evt.metaKey;
     this._altPressed = evt.altKey;
@@ -75,9 +129,29 @@ export default class KeyboardShortcuts {
     this._shiftPressed = evt.shiftKey;
   };
 
+  _updateSpecialKeysStatus = (evt: KeyboardEvent, isDown: boolean) => {
+    if (evt.which === SPACE_KEY) {
+      this._spacePressed = isDown;
+    }
+  };
+
   _isControlOrCmdPressed = () => {
     // On macOS, meta key (Apple/Command key) acts as Control key on Windows/Linux.
     return this._metaPressed || this._ctrlPressed;
+  };
+
+  onMouseDown = (evt: MouseEvent) => {
+    if (evt.button === MID_MOUSE_BUTTON) {
+      this._mouseMidButtonPressed = true;
+    } else {
+      this._mouseMidButtonPressed = false;
+    }
+  };
+
+  onMouseUp = (evt: MouseEvent) => {
+    if (evt.button === MID_MOUSE_BUTTON) {
+      this._mouseMidButtonPressed = false;
+    }
   };
 
   onDragOver = (evt: DragEvent) => {
@@ -86,6 +160,7 @@ export default class KeyboardShortcuts {
 
   onKeyUp = (evt: KeyboardEvent) => {
     this._updateModifiersFromEvent(evt);
+    this._updateSpecialKeysStatus(evt, false);
   };
 
   onKeyDown = (evt: KeyboardEvent) => {
@@ -99,6 +174,8 @@ export default class KeyboardShortcuts {
       return; // Something else is currently being edited.
     }
 
+    this._updateSpecialKeysStatus(evt, true);
+
     const {
       onDelete,
       onMove,
@@ -111,6 +188,9 @@ export default class KeyboardShortcuts {
       onZoomOut,
       onZoomIn,
       onEscape,
+      onShift1,
+      onShift2,
+      onShift3,
     } = this._shortcutCallbacks;
 
     if (onMove) {
@@ -186,6 +266,30 @@ export default class KeyboardShortcuts {
     if (onZoomIn && evt.which === NUMPAD_ADD) {
       evt.preventDefault();
       onZoomIn(evt);
+    }
+    if (
+      onShift1 &&
+      this._shiftPressed &&
+      (evt.which === KEY_1 || evt.which === KEY_1_NUMPAD)
+    ) {
+      evt.preventDefault();
+      onShift1();
+    }
+    if (
+      onShift2 &&
+      this._shiftPressed &&
+      (evt.which === KEY_2 || evt.which === KEY_2_NUMPAD)
+    ) {
+      evt.preventDefault();
+      onShift2();
+    }
+    if (
+      onShift3 &&
+      this._shiftPressed &&
+      (evt.which === KEY_3 || evt.which === KEY_3_NUMPAD)
+    ) {
+      evt.preventDefault();
+      onShift3();
     }
   };
 }

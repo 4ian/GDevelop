@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import gesture from 'pixi-simple-gesture';
-import DeprecatedKeyboardShortcuts from '../UI/KeyboardShortcuts/DeprecatedKeyboardShortcuts';
+import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import InstancesRenderer from './InstancesRenderer';
 import ViewPosition from './ViewPosition';
 import SelectedInstances from './SelectedInstances';
@@ -89,7 +89,7 @@ export default class InstancesEditor extends Component<Props> {
   fpsLimiter = new FpsLimiter(28);
   canvasArea: ?HTMLDivElement;
   pixiRenderer: PIXI.Renderer;
-  keyboardShortcuts: DeprecatedKeyboardShortcuts;
+  keyboardShortcuts: KeyboardShortcuts;
   pinchHandler: PinchHandler;
   canvasCursor: CanvasCursor;
   _instancesAdder: InstancesAdder;
@@ -139,6 +139,20 @@ export default class InstancesEditor extends Component<Props> {
     // if the project changes).
     const { project } = this.props;
 
+    this.keyboardShortcuts = new KeyboardShortcuts({
+      shortcutCallbacks: {
+        onDelete: this.props.onDeleteSelection,
+        onMove: this.moveSelection,
+        onCopy: this.props.onCopy,
+        onCut: this.props.onCut,
+        onPaste: this.props.onPaste,
+        onUndo: this.props.onUndo,
+        onRedo: this.props.onRedo,
+        onZoomOut: this.props.onZoomOut,
+        onZoomIn: this.props.onZoomIn,
+      },
+    });
+
     //Create the renderer and setup the rendering area for scene editor.
     //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
     this.pixiRenderer = PIXI.autoDetectRenderer(
@@ -178,18 +192,22 @@ export default class InstancesEditor extends Component<Props> {
       event.preventDefault();
     };
     this.pixiRenderer.view.setAttribute('tabIndex', -1);
-    this.pixiRenderer.view.addEventListener('focus', e => {
-      this.keyboardShortcuts.focus();
-    });
-    this.pixiRenderer.view.addEventListener('blur', e => {
-      this.keyboardShortcuts.blur();
-    });
-    this.pixiRenderer.view.addEventListener('mouseover', e => {
-      this.keyboardShortcuts.focus();
-    });
-    this.pixiRenderer.view.addEventListener('mouseout', e => {
-      this.keyboardShortcuts.blur();
-    });
+    this.pixiRenderer.view.addEventListener(
+      'keydown',
+      this.keyboardShortcuts.onKeyDown
+    );
+    this.pixiRenderer.view.addEventListener(
+      'keyup',
+      this.keyboardShortcuts.onKeyUp
+    );
+    this.pixiRenderer.view.addEventListener(
+      'mousedown',
+      this.keyboardShortcuts.onMouseDown
+    );
+    this.pixiRenderer.view.addEventListener(
+      'mouseup',
+      this.keyboardShortcuts.onMouseUp
+    );
 
     this.pixiContainer = new PIXI.Container();
 
@@ -258,18 +276,6 @@ export default class InstancesEditor extends Component<Props> {
       instancesEditorSettings: this.props.instancesEditorSettings,
     });
     this.pixiContainer.addChild(this.grid.getPixiObject());
-
-    this.keyboardShortcuts = new DeprecatedKeyboardShortcuts({
-      onDelete: this.props.onDeleteSelection,
-      onMove: this.moveSelection,
-      onCopy: this.props.onCopy,
-      onCut: this.props.onCut,
-      onPaste: this.props.onPaste,
-      onUndo: this.props.onUndo,
-      onRedo: this.props.onRedo,
-      onZoomOut: this.props.onZoomOut,
-      onZoomIn: this.props.onZoomIn,
-    });
 
     this.pinchHandler = new PinchHandler({
       canvas: this.pixiRenderer.view,
@@ -410,7 +416,6 @@ export default class InstancesEditor extends Component<Props> {
     // to protect against renders after the component is unmounted.
     this._unmounted = true;
 
-    this.keyboardShortcuts.unmount();
     this.selectionRectangle.delete();
     this.instancesRenderer.delete();
     this._instancesAdder.unmount();

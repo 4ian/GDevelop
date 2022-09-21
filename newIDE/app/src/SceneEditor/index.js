@@ -74,7 +74,7 @@ import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
 import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
-import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts/DeprecatedKeyboardShortcuts';
+import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 
 const gd: libGDevelop = global.gd;

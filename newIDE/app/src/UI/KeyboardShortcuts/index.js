@@ -20,6 +20,12 @@ const V_KEY = 86;
 const X_KEY = 88;
 const Y_KEY = 89;
 const Z_KEY = 90;
+const KEY_1 = 49;
+const KEY_2 = 50;
+const KEY_3 = 51;
+const KEY_1_NUMPAD = 97;
+const KEY_2_NUMPAD = 98;
+const KEY_3_NUMPAD = 99;
 const ESC_KEY = 27;
 
 const MID_MOUSE_BUTTON = 1;
@@ -36,6 +42,9 @@ type ShortcutCallbacks = {|
   onZoomOut?: KeyboardEvent => void,
   onZoomIn?: KeyboardEvent => void,
   onEscape?: () => void,
+  onShift1?: () => void,
+  onShift2?: () => void,
+  onShift3?: () => void,
 |};
 
 type ConstructorArgs = {|
@@ -180,6 +189,9 @@ export default class KeyboardShortcuts {
       onZoomOut,
       onZoomIn,
       onEscape,
+      onShift1,
+      onShift2,
+      onShift3,
     } = this._shortcutCallbacks;
 
     if (onMove) {
@@ -255,6 +267,30 @@ export default class KeyboardShortcuts {
     if (onZoomIn && evt.which === NUMPAD_ADD) {
       evt.preventDefault();
       onZoomIn(evt);
+    }
+    if (
+      onShift1 &&
+      this._shiftPressed &&
+      (evt.which === KEY_1 || evt.which === KEY_1_NUMPAD)
+    ) {
+      evt.preventDefault();
+      onShift1();
+    }
+    if (
+      onShift2 &&
+      this._shiftPressed &&
+      (evt.which === KEY_2 || evt.which === KEY_2_NUMPAD)
+    ) {
+      evt.preventDefault();
+      onShift2();
+    }
+    if (
+      onShift3 &&
+      this._shiftPressed &&
+      (evt.which === KEY_3 || evt.which === KEY_3_NUMPAD)
+    ) {
+      evt.preventDefault();
+      onShift3();
     }
   };
 }

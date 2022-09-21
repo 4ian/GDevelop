@@ -104,8 +104,8 @@ export const declareObjectMetadata = (
       i18n._('Change the width of an object.'),
       i18n._('the width'),
       i18n._('Size'),
-      'res/actions/scaleWidth24.png',
-      'res/actions/scale.png'
+      'res/actions/scaleWidth24_black.png',
+      'res/actions/scale_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
     .useStandardOperatorParameters('number')
@@ -121,8 +121,8 @@ export const declareObjectMetadata = (
       i18n._('Change the height of an object.'),
       i18n._('the height'),
       i18n._('Size'),
-      'res/actions/scaleHeight24.png',
-      'res/actions/scale.png'
+      'res/actions/scaleHeight24_black.png',
+      'res/actions/scale_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
     .useStandardOperatorParameters('number')
@@ -138,8 +138,8 @@ export const declareObjectMetadata = (
       i18n._('Modify the scale of the specified object.'),
       i18n._('the scale'),
       i18n._('Size'),
-      'res/actions/scale24.png',
-      'res/actions/scale.png'
+      'res/actions/scale24_black.png',
+      'res/actions/scale_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
     .useStandardOperatorParameters('number')
@@ -156,7 +156,7 @@ export const declareObjectMetadata = (
       i18n._("the width's scale of an object"),
       i18n._("the width's scale"),
       i18n._('Size'),
-      'res/actions/scaleWidth24.png'
+      'res/actions/scaleWidth24_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
     .useStandardParameters('number')
@@ -172,7 +172,7 @@ export const declareObjectMetadata = (
       i18n._("the height's scale of an object"),
       i18n._("the height's scale"),
       i18n._('Size'),
-      'res/actions/scaleHeight24.png'
+      'res/actions/scaleHeight24_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
     .useStandardParameters('number')
@@ -187,8 +187,8 @@ export const declareObjectMetadata = (
       i18n._('Flip the object horizontally'),
       i18n._('Flip horizontally _PARAM0_: _PARAM1_'),
       i18n._('Effects'),
-      'res/actions/flipX24.png',
-      'res/actions/flipX.png'
+      'res/actions/flipX24_black.png',
+      'res/actions/flipX_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
     .addParameter('yesorno', i18n._('Activate flipping'))
@@ -203,8 +203,8 @@ export const declareObjectMetadata = (
       i18n._('Flip the object vertically'),
       i18n._('Flip vertically _PARAM0_: _PARAM1_'),
       i18n._('Effects'),
-      'res/actions/flipY24.png',
-      'res/actions/flipY.png'
+      'res/actions/flipY24_black.png',
+      'res/actions/flipY_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
     .addParameter('yesorno', i18n._('Activate flipping'))
@@ -219,8 +219,8 @@ export const declareObjectMetadata = (
       i18n._('Check if the object is horizontally flipped'),
       i18n._('_PARAM0_ is horizontally flipped'),
       i18n._('Effects'),
-      'res/actions/flipX24.png',
-      'res/actions/flipX.png'
+      'res/actions/flipX24_black.png',
+      'res/actions/flipX_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
     .getCodeExtraInformation()
@@ -233,8 +233,8 @@ export const declareObjectMetadata = (
       i18n._('Check if the object is vertically flipped'),
       i18n._('_PARAM0_ is vertically flipped'),
       i18n._('Effects'),
-      'res/actions/flipY24.png',
-      'res/actions/flipY.png'
+      'res/actions/flipY24_black.png',
+      'res/actions/flipY_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
     .getCodeExtraInformation()

@@ -8,6 +8,7 @@ import ToolbarIcon from '../UI/ToolbarIcon';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import ToolbarCommands from './ToolbarCommands';
 import InstancesSelection from '../InstancesEditor/InstancesSelection';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 
 type Props = {|
   openObjectsList: () => void,
@@ -26,9 +27,7 @@ type Props = {|
   isGridShown: () => boolean,
   toggleGrid: () => void,
   openSetupGrid: () => void,
-  zoomIn: () => void,
-  zoomOut: () => void,
-  zoomToInitialPosition: () => void,
+  getContextMenuZoomItems: I18nType => Array<MenuItemTemplate>,
   setZoomFactor: number => void,
   onOpenSettings?: ?() => void,
 |};
@@ -139,20 +138,7 @@ export class Toolbar extends PureComponent<Props> {
               />
             }
             buildMenuTemplate={(i18n: I18nType) => [
-              {
-                label: i18n._(t`Zoom in`),
-                click: this.props.zoomIn,
-                accelerator: 'CmdOrCtrl+numadd',
-              },
-              {
-                label: i18n._(t`Zoom out`),
-                click: this.props.zoomOut,
-                accelerator: 'CmdOrCtrl+numsub',
-              },
-              {
-                label: i18n._(t`Zoom to initial position`),
-                click: () => this.props.zoomToInitialPosition(),
-              },
+              ...this.props.getContextMenuZoomItems(i18n),
               { type: 'separator' },
               { label: '5%', click: () => this.props.setZoomFactor(0.05) },
               { label: '10%', click: () => this.props.setZoomFactor(0.1) },

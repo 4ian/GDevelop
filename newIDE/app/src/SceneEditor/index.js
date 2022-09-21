@@ -247,13 +247,11 @@ export default class SceneEditor extends React.Component<Props, State> {
         }
         openSetupGrid={this.openSetupGrid}
         setZoomFactor={this.setZoomFactor}
-        zoomToInitialPosition={this.zoomToInitialPosition}
+        getContextMenuZoomItems={this.getContextMenuZoomItems}
         canUndo={canUndo(this.state.history)}
         canRedo={canRedo(this.state.history)}
         undo={this.undo}
         redo={this.redo}
-        zoomIn={this.zoomIn}
-        zoomOut={this.zoomOut}
         onOpenSettings={this.openSceneProperties}
       />
     );
@@ -895,6 +893,33 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editor) this.editor.zoomToFitSelection(selectedInstances);
   };
 
+  getContextMenuZoomItems = (i18n: I18nType) => {
+    return [
+      {
+        label: i18n._(t`Zoom in`),
+        click: this.zoomIn,
+        accelerator: 'CmdOrCtrl+numadd',
+      },
+      {
+        label: i18n._(t`Zoom out`),
+        click: this.zoomOut,
+        accelerator: 'CmdOrCtrl+numsub',
+      },
+      {
+        label: i18n._(t`Zoom to fit selection`),
+        click: () => this.zoomToFitSelection(),
+      },
+      {
+        label: i18n._(t`Zoom to initial position`),
+        click: () => this.zoomToInitialPosition(),
+      },
+      {
+        label: i18n._(t`Zoom to fit content`),
+        click: () => this.zoomToFitContent(),
+      },
+    ];
+  };
+
   setZoomFactor = (zoomFactor: number) => {
     if (this.editor) this.editor.setZoomFactor(zoomFactor);
   };
@@ -938,18 +963,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           click: () => this._createNewObjectAndInstanceUnderCursor(),
         },
         { type: 'separator' },
-        {
-          label: i18n._(t`Zoom to initial position`),
-          click: () => this.zoomToInitialPosition(),
-        },
-        {
-          label: i18n._(t`Zoom to fit selection`),
-          click: () => this.zoomToFitSelection(),
-        },
-        {
-          label: i18n._(t`Zoom to fit content`),
-          click: () => this.zoomToFitContent(),
-        },
+        ...this.getContextMenuZoomItems(i18n),
       ];
     } else {
       contextMenuItems = [

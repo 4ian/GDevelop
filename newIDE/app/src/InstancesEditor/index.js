@@ -50,6 +50,9 @@ export type InstancesEditorShortcutsCallbacks = {|
   onRedo: () => void,
   onZoomOut: () => void,
   onZoomIn: () => void,
+  onShift1: () => void,
+  onShift2: () => void,
+  onShift3: () => void,
 |};
 
 export type InstancesEditorPropsWithoutSizeAndScroll = {|

@@ -909,14 +909,17 @@ export default class SceneEditor extends React.Component<Props, State> {
         label: i18n._(t`Zoom to fit selection`),
         click: () => this.zoomToFitSelection(),
         enabled: this.instancesSelection.hasSelectedInstances(),
+        accelerator: 'Shift+num1',
       },
       {
         label: i18n._(t`Zoom to initial position`),
         click: () => this.zoomToInitialPosition(),
+        accelerator: 'Shift+num2',
       },
       {
         label: i18n._(t`Zoom to fit content`),
         click: () => this.zoomToFitContent(),
+        accelerator: 'Shift+num3',
       },
     ];
   };
@@ -1324,6 +1327,9 @@ export default class SceneEditor extends React.Component<Props, State> {
               onRedo: this.redo,
               onZoomOut: this.zoomOut,
               onZoomIn: this.zoomIn,
+              onShift1: this.zoomToFitSelection,
+              onShift2: this.zoomToInitialPosition,
+              onShift3: this.zoomToFitContent,
             }}
             wrappedEditorRef={editor => {
               this.editor = editor;

@@ -38,7 +38,7 @@ export default class RenderedParticleEmitterInstance extends RenderedInstance {
   static getThumbnail(
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
-    object: gdObject
+    objectConfiguration: gdObjectConfiguration
   ) {
     return 'CppPlatform/Extensions/particleSystemicon.png';
   }

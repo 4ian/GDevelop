@@ -413,11 +413,9 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
   static getThumbnail(
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
-    object: gdObject
+    objectConfiguration: gdObjectConfiguration
   ) {
-    const panelSprite = gd.asPanelSpriteConfiguration(
-      object.getConfiguration()
-    );
+    const panelSprite = gd.asPanelSpriteConfiguration(objectConfiguration);
 
     return ResourcesLoader.getResourceFullUrl(
       project,

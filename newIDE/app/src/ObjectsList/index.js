@@ -131,7 +131,10 @@ type Props = {|
   canRenameObject: (newName: string) => boolean,
   onAddObjectInstance: (objectName: string) => void,
 
-  getThumbnail: (project: gdProject, object: gdObject) => string,
+  getThumbnail: (
+    project: gdProject,
+    objectConfiguration: gdObjectConfiguration
+  ) => string,
   unsavedChanges?: ?UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
@@ -514,7 +517,10 @@ export default class ObjectsList extends React.Component<Props, State> {
   };
 
   _getObjectThumbnail = (objectWithContext: ObjectWithContext) =>
-    this.props.getThumbnail(this.props.project, objectWithContext.object);
+    this.props.getThumbnail(
+      this.props.project,
+      objectWithContext.object.getConfiguration()
+    );
 
   _renderObjectMenuTemplate = (i18n: I18nType) => (
     objectWithContext: ObjectWithContext,

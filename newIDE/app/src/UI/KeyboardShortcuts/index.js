@@ -141,7 +141,6 @@ export default class KeyboardShortcuts {
   };
 
   onMouseDown = (evt: MouseEvent) => {
-    console.log(evt);
     if (evt.button === MID_MOUSE_BUTTON) {
       this._mouseMidButtonPressed = true;
     } else {

@@ -9,7 +9,7 @@ module.exports = {
   makeTestExtensions: (gd) => {
     const platform = gd.JsPlatform.get();
 
-    {
+    const declareFakeAdmod = () => {
       const extension = new gd.PlatformExtension();
       extension
         .setExtensionInformation(
@@ -69,8 +69,10 @@ module.exports = {
 
       platform.addNewExtension(extension);
       extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
-    }
-    {
+    };
+    declareFakeAdmod();
+
+    const declareFakeObjectWithUnsupportedCapability = () => {
       const extension = new gd.PlatformExtension();
       extension.setExtensionInformation(
         'FakeObjectWithUnsupportedCapability',
@@ -139,8 +141,10 @@ module.exports = {
 
       platform.addNewExtension(extension);
       extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
-    }
-    {
+    };
+    declareFakeObjectWithUnsupportedCapability();
+
+    const declareFakeObjectWithAsyncAction = () => {
       const extension = new gd.PlatformExtension();
       extension.setExtensionInformation(
         'FakeObjectWithAsyncAction',
@@ -225,8 +229,10 @@ module.exports = {
 
       platform.addNewExtension(extension);
       extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
-    }
-    {
+    };
+    declareFakeObjectWithAsyncAction();
+
+    const declareFakeOptionallyAsyncAction = () => {
       const extension = new gd.PlatformExtension();
       extension.setExtensionInformation(
         'FakeOptionallyAsyncAction',
@@ -253,6 +259,111 @@ module.exports = {
 
       platform.addNewExtension(extension);
       extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
-    }
+    };
+    declareFakeOptionallyAsyncAction();
+
+    const declareFakeBehaviorWithSharedData = () => {
+      const extension = new gd.PlatformExtension();
+      extension.setExtensionInformation(
+        'FakeBehaviorWithSharedData',
+        'Fake behavior with shared data',
+        'Fake behavior with shared data',
+        '',
+        'MIT'
+      );
+      // Declare z behavior with shared data between the behaviors
+      // In addition to the usual behavior:
+      // Create a new gd.BehaviorSharedDataJsImplementation object and implement the methods
+      // that are called to get and set the properties of the shared data.
+      const dummyBehaviorWithSharedData = new gd.BehaviorJsImplementation();
+      // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+      dummyBehaviorWithSharedData.updateProperty = function (
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
+        if (propertyName === 'MyBehaviorProperty') {
+          behaviorContent.setStringAttribute('MyBehaviorProperty', newValue);
+          return true;
+        }
+
+        return false;
+      };
+
+      dummyBehaviorWithSharedData.getProperties = function (behaviorContent) {
+        const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+        behaviorProperties
+          .getOrCreate('MyBehaviorProperty')
+          .setValue(behaviorContent.getStringAttribute('MyBehaviorProperty'));
+
+        return behaviorProperties;
+      };
+
+      dummyBehaviorWithSharedData.initializeContent = function (
+        behaviorContent
+      ) {
+        behaviorContent.setStringAttribute(
+          'MyBehaviorProperty',
+          'Initial value 1'
+        );
+      };
+
+      const sharedData = new gd.BehaviorSharedDataJsImplementation();
+
+      sharedData.updateProperty = function (
+        sharedContent,
+        propertyName,
+        newValue
+      ) {
+        if (propertyName === 'MySharedProperty') {
+          sharedContent.setStringAttribute('MySharedProperty', newValue);
+          return true;
+        }
+
+        return false;
+      };
+
+      sharedData.getProperties = function (sharedContent) {
+        const sharedProperties = new gd.MapStringPropertyDescriptor();
+
+        sharedProperties
+          .getOrCreate('MySharedProperty')
+          .setValue(sharedContent.getStringAttribute('MySharedProperty'));
+
+        return sharedProperties;
+      };
+
+      sharedData.initializeContent = function (behaviorContent) {
+        behaviorContent.setStringAttribute(
+          'MySharedProperty',
+          'Initial shared value 1'
+        );
+      };
+
+      extension
+        .addBehavior(
+          'DummyBehaviorWithSharedData',
+          'Dummy behavior with shared data for testing',
+          'DummyBehaviorWithSharedData',
+          'Do nothing but use shared data.',
+          '',
+          'CppPlatform/Extensions/topdownmovementicon.png',
+          'DummyBehaviorWithSharedData',
+          dummyBehaviorWithSharedData,
+          sharedData
+        )
+        .setIncludeFile(
+          'Extensions/ExampleJsExtension/dummywithshareddataruntimebehavior.js'
+        )
+        // You can optionally include more than one file when the behavior is used:
+        .addIncludeFile(
+          'Extensions/ExampleJsExtension/examplejsextensiontools.js'
+        );
+
+      platform.addNewExtension(extension);
+      extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+    };
+    declareFakeBehaviorWithSharedData();
   },
 };

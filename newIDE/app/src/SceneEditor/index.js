@@ -1307,7 +1307,6 @@ export default class SceneEditor extends React.Component<Props, State> {
             instancesEditorSettings={this.state.instancesEditorSettings}
             onChangeInstancesEditorSettings={this.setInstancesEditorSettings}
             instancesSelection={this.instancesSelection}
-            onDeleteSelection={this.deleteSelection}
             onInstancesAdded={this._onInstancesAdded}
             onInstancesSelected={this._onInstancesSelected}
             onInstanceDoubleClicked={this._onInstanceDoubleClicked}
@@ -1316,13 +1315,16 @@ export default class SceneEditor extends React.Component<Props, State> {
             onInstancesRotated={this._onInstancesRotated}
             selectedObjectNames={this.state.selectedObjectNames}
             onContextMenu={this._onContextMenu}
-            onCopy={() => this.copySelection({ useLastCursorPosition: true })}
-            onCut={() => this.cutSelection({ useLastCursorPosition: true })}
-            onPaste={() => this.paste({ useLastCursorPosition: true })}
-            onUndo={this.undo}
-            onRedo={this.redo}
-            onZoomOut={this.zoomOut}
-            onZoomIn={this.zoomIn}
+            instancesEditorShortcutsCallbacks={{
+              onCopy: () => this.copySelection({ useLastCursorPosition: true }),
+              onCut: () => this.cutSelection({ useLastCursorPosition: true }),
+              onPaste: () => this.paste({ useLastCursorPosition: true }),
+              onDelete: this.deleteSelection,
+              onUndo: this.undo,
+              onRedo: this.redo,
+              onZoomOut: this.zoomOut,
+              onZoomIn: this.zoomIn,
+            }}
             wrappedEditorRef={editor => {
               this.editor = editor;
             }}

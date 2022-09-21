@@ -41,6 +41,17 @@ const styles = {
 
 const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
 
+export type InstancesEditorShortcutsCallbacks = {|
+  onDelete: () => void,
+  onCopy: () => void,
+  onCut: () => void,
+  onPaste: () => void,
+  onUndo: () => void,
+  onRedo: () => void,
+  onZoomOut: () => void,
+  onZoomIn: () => void,
+|};
+
 export type InstancesEditorPropsWithoutSizeAndScroll = {|
   project: gdProject,
   layout: gdLayout,
@@ -50,7 +61,6 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
     instancesEditorSettings: InstancesEditorSettings
   ) => void,
   instancesSelection: InstancesSelection,
-  onDeleteSelection: () => void,
   onInstancesAdded: (instances: Array<gdInitialInstance>) => void,
   onInstancesSelected: (instances: Array<gdInitialInstance>) => void,
   onInstanceDoubleClicked: (instance: gdInitialInstance) => void,
@@ -63,14 +73,8 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
     y: number,
     ignoreSelectedObjectNamesForContextMenu?: boolean
   ) => void,
-  onCopy: () => void,
-  onCut: () => void,
-  onPaste: () => void,
-  onUndo: () => void,
-  onRedo: () => void,
-  onZoomOut: () => void,
-  onZoomIn: () => void,
   pauseRendering: boolean,
+  instancesEditorShortcutsCallbacks: InstancesEditorShortcutsCallbacks,
 |};
 
 type Props = {|
@@ -141,15 +145,8 @@ export default class InstancesEditor extends Component<Props> {
 
     this.keyboardShortcuts = new KeyboardShortcuts({
       shortcutCallbacks: {
-        onDelete: this.props.onDeleteSelection,
         onMove: this.moveSelection,
-        onCopy: this.props.onCopy,
-        onCut: this.props.onCut,
-        onPaste: this.props.onPaste,
-        onUndo: this.props.onUndo,
-        onRedo: this.props.onRedo,
-        onZoomOut: this.props.onZoomOut,
-        onZoomIn: this.props.onZoomIn,
+        ...this.props.instancesEditorShortcutsCallbacks,
       },
     });
 

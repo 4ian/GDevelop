@@ -117,11 +117,6 @@ export default class ViewPosition {
     return Math.min(idealZoomOnX, idealZoomOnY) - 0.05; //Add margin so that the object don't feel cut
   }
 
-  scrollToInstance(instance: gdInitialInstance) {
-    this.viewX = instance.getX();
-    this.viewY = instance.getY();
-  }
-
   getViewX() {
     return this.viewX;
   }

@@ -832,9 +832,14 @@ export default class InstancesEditor extends Component<Props> {
   }
 
   centerViewOnLastInstance(instances: Array<gdInitialInstance>) {
-    if (!instances.length) return;
+    if (instances.length === 0) return;
 
-    this.viewPosition.scrollToInstance(instances[instances.length - 1]);
+    const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
+    let lastInstanceRectangle = instanceMeasurer.getInstanceAABB(
+      instances[instances.length - 1],
+      new Rectangle()
+    );
+    this.viewPosition.fitToRectangle(lastInstanceRectangle);
     if (this.props.onViewPositionChanged) {
       this.props.onViewPositionChanged(this.viewPosition);
     }

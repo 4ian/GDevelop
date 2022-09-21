@@ -7,12 +7,6 @@ import Rectangle from '../../Utils/Rectangle';
 export type InstanceMeasurer = {|
   getInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
   getUnrotatedInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
-  getInstanceRect: gdInitialInstance => {|
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-  |},
 |};
 
 export default class InstancesRenderer {
@@ -118,19 +112,6 @@ export default class InstancesRenderer {
         }
 
         return layerRenderer.getUnrotatedInstanceAABB(instance, bounds);
-      },
-      //TODO Replace by getInstanceAABB (make TransformRect uses Rectangle)
-      getInstanceRect: instance => {
-        const aabb = this.instanceMeasurer.getInstanceAABB(
-          instance,
-          this.temporaryRectangle
-        );
-        return {
-          x: aabb.left,
-          y: aabb.top,
-          width: aabb.width(),
-          height: aabb.height(),
-        };
       },
     };
   }

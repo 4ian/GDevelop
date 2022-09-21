@@ -908,6 +908,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       {
         label: i18n._(t`Zoom to fit selection`),
         click: () => this.zoomToFitSelection(),
+        enabled: this.instancesSelection.hasSelectedInstances(),
       },
       {
         label: i18n._(t`Zoom to initial position`),

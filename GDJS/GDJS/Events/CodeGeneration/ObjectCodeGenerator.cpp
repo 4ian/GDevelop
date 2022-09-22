@@ -142,6 +142,7 @@ CODE_NAMESPACE.RUNTIME_OBJECT_CLASSNAME = class RUNTIME_OBJECT_CLASSNAME extends
   updateFromObjectData(oldObjectData, newObjectData) {
     UPDATE_FROM_OBJECT_DATA_CODE
 
+    this.onHotReloading(this.getInstanceContainer());
     return true;
   }
 

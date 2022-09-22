@@ -9,6 +9,7 @@ import { List, ListItem } from '../UI/List';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import Create from '../UI/CustomSvgIcons/Behaviors/Create';
+import Reload from '../UI/CustomSvgIcons/Behaviors/Reload';
 import Step from '../UI/CustomSvgIcons/Behaviors/Step';
 import Destroy from '../UI/CustomSvgIcons/Behaviors/Destroy';
 import Action from '../UI/CustomSvgIcons/Behaviors/Action';
@@ -186,6 +187,20 @@ export default function ObjectMethodSelectorDialog({
             <Subheader>
               <Trans>Other lifecycle methods</Trans>
             </Subheader>
+            <MethodListItem
+              icon={<Reload style={styles.icon} />}
+              name={'onHotReloading'}
+              disabled={eventsFunctions.hasEventsFunctionNamed(
+                'onHotReloading'
+              )}
+              onChoose={onChoose}
+              description={
+                <Trans>
+                  Events that will be run when the preview is being
+                  hot-reloaded.
+                </Trans>
+              }
+            />
           </>
         )}
       </List>

@@ -285,7 +285,9 @@ export const isBehaviorLifecycleEventsFunction = (functionName: string) => {
  */
 export const isObjectLifecycleEventsFunction = (functionName: string) => {
   return (
-    ['onCreated', 'doStepPostEvents', 'onDestroy'].indexOf(functionName) !== -1
+    ['onCreated', 'doStepPostEvents', 'onDestroy', 'onHotReloading'].indexOf(
+      functionName
+    ) !== -1
   );
 };
 

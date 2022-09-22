@@ -9,6 +9,8 @@ import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
 import Dialog from '../UI/Dialog';
 import TextButton from '../UI/TextButton';
+import AlertMessage from '../UI/AlertMessage';
+import PlaceholderLoader from '../UI/PlaceholderLoader';
 
 type Props = {|
   privateAssetPack: PrivateAssetPackListingData,
@@ -26,14 +28,25 @@ const PrivateAssetPackDialog = ({
   const [isFetchingDetails, setIsFetchingDetails] = React.useState<boolean>(
     false
   );
+  const [errorText, setErrorText] = React.useState<?string>(null);
   React.useEffect(
     () => {
       (async () => {
         setIsFetchingDetails(true);
-        // TODO: handle 404 or any other error
-        const details = await getPrivateAssetPackDetails(id);
-        setAssetPackDetails(details);
-        setIsFetchingDetails(false);
+        try {
+          const details = await getPrivateAssetPackDetails(id);
+          setAssetPackDetails(details);
+        } catch (error) {
+          if (error.status === 404) {
+            setErrorText(
+              'Asset pack not found - An error occurred, please try again later.'
+            );
+          } else {
+            setErrorText('Unknown error');
+          }
+        } finally {
+          setIsFetchingDetails(false);
+        }
       })();
     },
     [id]
@@ -53,9 +66,20 @@ const PrivateAssetPackDialog = ({
       ]}
       onApply={() => {}}
       flexColumnBody
+      fullHeight
     >
-      <Text>{description}</Text>
-      {assetPackDetails && <Text>{assetPackDetails.longDescription}</Text>}
+      {errorText ? (
+        <AlertMessage kind="error">
+          <Text>${errorText}</Text>
+        </AlertMessage>
+      ) : isFetchingDetails ? (
+        <PlaceholderLoader />
+      ) : (
+        <>
+          <Text>{description}</Text>
+          {assetPackDetails && <Text>{assetPackDetails.longDescription}</Text>}
+        </>
+      )}
     </Dialog>
   );
 };

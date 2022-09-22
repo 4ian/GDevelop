@@ -21,6 +21,6 @@ export type PrivateAssetPackListingData = {|
 export const listListedPrivateAssetPacks = async (): Promise<
   Array<PrivateAssetPackListingData>
 > => {
-  const response = await client.get('/asset-pack', {});
+  const response = await client.get('/asset-pack');
   return response.data;
 };

@@ -133,7 +133,7 @@ export type Author = {|
 
 export type Environment = 'staging' | 'live';
 
-const client = axios.create({
+export const client = axios.create({
   baseURL: GDevelopAssetApi.baseUrl,
 });
 
@@ -267,9 +267,7 @@ export const listAllLicenses = ({
 export const getPrivateAssetPackDetails = async (
   assetPackId: string
 ): Promise<?PrivateAssetPackDetails> => {
-  const response = await client.get(`/asset-pack/${assetPackId}`, {
-    validateStatus: status => true,
-  });
+  const response = await client.get(`/asset-pack/${assetPackId}`);
   return response.data;
 };
 

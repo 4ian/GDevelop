@@ -37,7 +37,7 @@ const PrivateAssetPackDialog = ({
           const details = await getPrivateAssetPackDetails(id);
           setAssetPackDetails(details);
         } catch (error) {
-          if (error.status === 404) {
+          if (error.response && error.response.status === 404) {
             setErrorText(
               'Asset pack not found - An error occurred, please try again later.'
             );
@@ -70,7 +70,7 @@ const PrivateAssetPackDialog = ({
     >
       {errorText ? (
         <AlertMessage kind="error">
-          <Text>${errorText}</Text>
+          <Text>{errorText}</Text>
         </AlertMessage>
       ) : isFetchingDetails ? (
         <PlaceholderLoader />

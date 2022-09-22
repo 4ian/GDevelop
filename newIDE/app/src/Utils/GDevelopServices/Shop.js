@@ -6,7 +6,7 @@ const client = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
 });
 
-export type PrivateAssetPack = {|
+export type PrivateAssetPackListingData = {|
   id: string,
   sellerId: string,
   productType: 'ASSET_PACK',
@@ -19,7 +19,7 @@ export type PrivateAssetPack = {|
 |};
 
 export const listListedPrivateAssetPacks = async (): Promise<
-  Array<PrivateAssetPack>
+  Array<PrivateAssetPackListingData>
 > => {
   const response = await client.get('/asset-pack', {});
   return response.data;

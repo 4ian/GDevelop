@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import Text from '../UI/Text';
 import { type AssetPacks } from '../Utils/GDevelopServices/Asset';
-import { type PrivateAssetPack } from '../Utils/GDevelopServices/Shop';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import {
   GridListTile,
   GridList,
@@ -60,7 +60,7 @@ const useStylesForGridListItem = makeStyles(theme =>
 
 type Props = {|
   assetPacks: AssetPacks,
-  privateAssetPacks: Array<PrivateAssetPack>,
+  privateAssetPacks: Array<PrivateAssetPackListingData>,
   onPackSelection: string => void,
 |};
 

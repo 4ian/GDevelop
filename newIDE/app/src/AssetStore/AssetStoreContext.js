@@ -13,7 +13,7 @@ import {
 } from '../Utils/GDevelopServices/Asset';
 import {
   listListedPrivateAssetPacks,
-  type PrivateAssetPack,
+  type PrivateAssetPackListingData,
 } from '../Utils/GDevelopServices/Shop';
 import { useSearchItem, SearchFilter } from '../UI/Search/UseSearchItem';
 import {
@@ -52,7 +52,7 @@ export type AssetFiltersState = {|
 type AssetStoreState = {|
   filters: ?Filters,
   assetPacks: ?AssetPacks,
-  privateAssetPacks: ?Array<PrivateAssetPack>,
+  privateAssetPacks: ?Array<PrivateAssetPackListingData>,
   authors: ?Array<Author>,
   licenses: ?Array<License>,
   environment: Environment,
@@ -142,7 +142,7 @@ export const AssetStoreStateProvider = ({
   const [
     privateAssetPacks,
     setPrivateAssetPacks,
-  ] = React.useState<?Array<PrivateAssetPack>>(null);
+  ] = React.useState<?Array<PrivateAssetPackListingData>>(null);
   const [authors, setAuthors] = React.useState<?Array<Author>>(null);
   const [licenses, setLicenses] = React.useState<?Array<License>>(null);
   const [environment, setEnvironment] = React.useState<Environment>('live');

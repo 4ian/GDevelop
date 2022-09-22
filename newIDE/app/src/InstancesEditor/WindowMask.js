@@ -3,6 +3,7 @@ import * as PIXI from 'pixi.js-legacy';
 import transformRect from '../Utils/TransformRect';
 import ViewPosition from './ViewPosition';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
+import Rectangle from '../Utils/Rectangle';
 
 type Props = {|
   project: gdProject,
@@ -15,12 +16,7 @@ export default class WindowMask {
   instancesEditorSettings: InstancesEditorSettings;
   viewPosition: ViewPosition;
   pixiRectangle = new PIXI.Graphics();
-  windowRectangle = {
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0,
-  };
+  windowRectangle: Rectangle = new Rectangle();
 
   constructor({ project, viewPosition, instancesEditorSettings }: Props) {
     this.project = project;
@@ -46,10 +42,12 @@ export default class WindowMask {
 
     const width = this.project.getGameResolutionWidth();
     const height = this.project.getGameResolutionHeight();
-    this.windowRectangle.x = this.viewPosition.getViewX() - width / 2;
-    this.windowRectangle.y = this.viewPosition.getViewY() - height / 2;
-    this.windowRectangle.width = width;
-    this.windowRectangle.height = height;
+    this.windowRectangle.setThroughCenter({
+      centerX: this.viewPosition.getViewX(),
+      centerY: this.viewPosition.getViewY(),
+      width,
+      height,
+    });
 
     const displayedRectangle = transformRect(
       this.viewPosition.toCanvasCoordinates,
@@ -63,10 +61,10 @@ export default class WindowMask {
     this.pixiRectangle.alpha = 1;
     this.pixiRectangle.fill.alpha = 0;
     this.pixiRectangle.drawRect(
-      displayedRectangle.x,
-      displayedRectangle.y,
-      displayedRectangle.width,
-      displayedRectangle.height
+      displayedRectangle.left,
+      displayedRectangle.top,
+      displayedRectangle.width(),
+      displayedRectangle.height()
     );
     this.pixiRectangle.endFill();
   }

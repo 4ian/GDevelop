@@ -59,11 +59,6 @@ const privateAssetPackDetails = {
 };
 
 export const Default = () => {
-  console.log(
-    `${GDevelopUserApi.baseUrl}/user-public-profile/${
-      privateAssetPackListingData.sellerId
-    }`
-  );
   const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
   axiosMock
     .onGet(
@@ -71,7 +66,15 @@ export const Default = () => {
         privateAssetPackListingData.sellerId
       }`
     )
-    .reply(200, sellerPublicProfile);
+    .reply(200, sellerPublicProfile)
+    .onGet(
+      `${GDevelopUserApi.baseUrl}/user/${
+        privateAssetPackListingData.sellerId
+      }/badge`
+    )
+    .reply(200, [])
+    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
+    .reply(200, []);
   const assetServiceMock = new MockAdapter(assetApiAxiosClient, {
     delayResponse: 2000,
   });
@@ -102,7 +105,15 @@ export const With404 = () => {
         privateAssetPackListingData.sellerId
       }`
     )
-    .reply(200, sellerPublicProfile);
+    .reply(200, sellerPublicProfile)
+    .onGet(
+      `${GDevelopUserApi.baseUrl}/user/${
+        privateAssetPackListingData.sellerId
+      }/badge`
+    )
+    .reply(200, [])
+    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
+    .reply(200, []);
   const assetServiceMock = new MockAdapter(assetApiAxiosClient, {
     delayResponse: 2000,
   });
@@ -133,7 +144,15 @@ export const WithUnknownError = () => {
         privateAssetPackListingData.sellerId
       }`
     )
-    .reply(200, sellerPublicProfile);
+    .reply(200, sellerPublicProfile)
+    .onGet(
+      `${GDevelopUserApi.baseUrl}/user/${
+        privateAssetPackListingData.sellerId
+      }/badge`
+    )
+    .reply(200, [])
+    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
+    .reply(200, []);
   const assetServiceMock = new MockAdapter(assetApiAxiosClient, {
     delayResponse: 2000,
   });

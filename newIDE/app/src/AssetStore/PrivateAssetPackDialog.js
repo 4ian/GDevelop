@@ -17,6 +17,8 @@ import {
   getUserPublicProfile,
   type UserPublicProfile,
 } from '../Utils/GDevelopServices/User';
+import PublicProfileDialog from '../Profile/PublicProfileDialog';
+import Link from '../UI/Link';
 
 type Props = {|
   privateAssetPack: PrivateAssetPackListingData,
@@ -34,6 +36,10 @@ const PrivateAssetPackDialog = ({
   const [isFetchingDetails, setIsFetchingDetails] = React.useState<boolean>(
     false
   );
+  const [
+    openSellerPublicProfileDialog,
+    setOpenSellerPublicProfileDialog,
+  ] = React.useState<boolean>(false);
   const [
     sellerPublicProfile,
     setSellerPublicProfile,
@@ -65,48 +71,62 @@ const PrivateAssetPackDialog = ({
   );
 
   return (
-    <Dialog
-      maxWidth="md"
-      open
-      onRequestClose={onClose}
-      actions={[
-        <TextButton
-          key="cancel"
-          label={<Trans>Cancel</Trans>}
-          onClick={onClose}
-        />,
-      ]}
-      onApply={() => {}}
-      flexColumnBody
-      fullHeight
-    >
-      {errorText ? (
-        <AlertMessage kind="error">
-          <Text>{errorText}</Text>
-        </AlertMessage>
-      ) : isFetchingDetails ? (
-        <PlaceholderLoader />
-      ) : assetPackDetails && sellerPublicProfile ? (
-        <>
-          <Column noMargin>
-            <Text size="title">{name}</Text>
-            <Text size="body2">
-              <Trans>by</Trans> {sellerPublicProfile.username}
-            </Text>
-          </Column>
-          <ResponsiveLineStackLayout noColumnMargin noMargin>
-            <Column useFullHeight expand>
-              Salut
+    <>
+      <Dialog
+        maxWidth="md"
+        open
+        onRequestClose={onClose}
+        actions={[
+          <TextButton
+            key="cancel"
+            label={<Trans>Cancel</Trans>}
+            onClick={onClose}
+          />,
+        ]}
+        onApply={() => {}}
+        flexColumnBody
+        fullHeight
+      >
+        {errorText ? (
+          <AlertMessage kind="error">
+            <Text>{errorText}</Text>
+          </AlertMessage>
+        ) : isFetchingDetails ? (
+          <PlaceholderLoader />
+        ) : assetPackDetails && sellerPublicProfile ? (
+          <>
+            <Column noMargin>
+              <Text size="title">{name}</Text>
+              <Text size="body2">
+                <Trans>by</Trans>{' '}
+                <Link
+                  onClick={() => setOpenSellerPublicProfileDialog(true)}
+                  href=""
+                >
+                  {sellerPublicProfile.username || ''}
+                </Link>
+              </Text>
             </Column>
-            <Column useFullHeight expand>
-              {assetPackDetails && (
-                <Text>{assetPackDetails.longDescription}</Text>
-              )}
-            </Column>
-          </ResponsiveLineStackLayout>
-        </>
-      ) : null}
-    </Dialog>
+            <ResponsiveLineStackLayout noColumnMargin noMargin>
+              <Column useFullHeight expand>
+                Salut
+              </Column>
+              <Column useFullHeight expand>
+                {assetPackDetails && (
+                  <Text>{assetPackDetails.longDescription}</Text>
+                )}
+              </Column>
+            </ResponsiveLineStackLayout>
+          </>
+        ) : null}
+      </Dialog>
+      {openSellerPublicProfileDialog && (
+        <PublicProfileDialog
+          userId={sellerId}
+          onClose={() => setOpenSellerPublicProfileDialog(false)}
+        />
+      )}
+    </>
   );
 };
 

@@ -13,6 +13,10 @@ import AlertMessage from '../UI/AlertMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import { Column } from '../UI/Grid';
+import {
+  getUserPublicProfile,
+  type UserPublicProfile,
+} from '../Utils/GDevelopServices/User';
 
 type Props = {|
   privateAssetPack: PrivateAssetPackListingData,
@@ -30,6 +34,10 @@ const PrivateAssetPackDialog = ({
   const [isFetchingDetails, setIsFetchingDetails] = React.useState<boolean>(
     false
   );
+  const [
+    sellerPublicProfile,
+    setSellerPublicProfile,
+  ] = React.useState<?UserPublicProfile>(null);
   const [errorText, setErrorText] = React.useState<?string>(null);
   React.useEffect(
     () => {
@@ -37,7 +45,9 @@ const PrivateAssetPackDialog = ({
         setIsFetchingDetails(true);
         try {
           const details = await getPrivateAssetPackDetails(id);
+          const profile = await getUserPublicProfile(sellerId);
           setAssetPackDetails(details);
+          setSellerPublicProfile(profile);
         } catch (error) {
           if (error.response && error.response.status === 404) {
             setErrorText(
@@ -51,8 +61,9 @@ const PrivateAssetPackDialog = ({
         }
       })();
     },
-    [id]
+    [id, sellerId]
   );
+
   return (
     <Dialog
       maxWidth="md"
@@ -75,13 +86,12 @@ const PrivateAssetPackDialog = ({
         </AlertMessage>
       ) : isFetchingDetails ? (
         <PlaceholderLoader />
-      ) : assetPackDetails ? (
+      ) : assetPackDetails && sellerPublicProfile ? (
         <>
           <Column noMargin>
             <Text size="title">{name}</Text>
             <Text size="body2">
-              <Trans>by</Trans>{' '}
-              {sellerId}
+              <Trans>by</Trans> {sellerPublicProfile.username}
             </Text>
           </Column>
           <ResponsiveLineStackLayout noColumnMargin noMargin>

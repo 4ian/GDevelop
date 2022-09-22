@@ -2,11 +2,15 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import MockAdapter from 'axios-mock-adapter';
+import axios from 'axios';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import PrivateAssetPackDialog from '../../../../AssetStore/PrivateAssetPackDialog';
-import { GDevelopAssetApi } from '../../../../Utils/GDevelopServices/ApiConfigs';
+import {
+  GDevelopAssetApi,
+  GDevelopUserApi,
+} from '../../../../Utils/GDevelopServices/ApiConfigs';
 import { client as assetApiAxiosClient } from '../../../../Utils/GDevelopServices/Asset';
 
 export default {
@@ -29,6 +33,12 @@ const privateAssetPackListingData = {
   name: 'French Food',
 };
 
+const sellerPublicProfile = {
+  id: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+  username: 'CreatorUserName',
+  description: 'I create asset packs for GDevelop for country-specific food.',
+};
+
 const privateAssetPackDetails = {
   id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
   content: {
@@ -49,8 +59,23 @@ const privateAssetPackDetails = {
 };
 
 export const Default = () => {
-  const mock = new MockAdapter(assetApiAxiosClient, { delayResponse: 2000 });
-  mock
+  console.log(
+    `${GDevelopUserApi.baseUrl}/user-public-profile/${
+      privateAssetPackListingData.sellerId
+    }`
+  );
+  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
+  axiosMock
+    .onGet(
+      `${GDevelopUserApi.baseUrl}/user-public-profile/${
+        privateAssetPackListingData.sellerId
+      }`
+    )
+    .reply(200, sellerPublicProfile);
+  const assetServiceMock = new MockAdapter(assetApiAxiosClient, {
+    delayResponse: 2000,
+  });
+  assetServiceMock
     .onGet(
       `${GDevelopAssetApi.baseUrl}/asset-pack/${privateAssetPackListingData.id}`
     )
@@ -70,8 +95,18 @@ export const Default = () => {
 };
 
 export const With404 = () => {
-  const mock = new MockAdapter(assetApiAxiosClient, { delayResponse: 500 });
-  mock
+  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
+  axiosMock
+    .onGet(
+      `${GDevelopUserApi.baseUrl}/user-public-profile/${
+        privateAssetPackListingData.sellerId
+      }`
+    )
+    .reply(200, sellerPublicProfile);
+  const assetServiceMock = new MockAdapter(assetApiAxiosClient, {
+    delayResponse: 2000,
+  });
+  assetServiceMock
     .onGet(
       `${GDevelopAssetApi.baseUrl}/asset-pack/${privateAssetPackListingData.id}`
     )
@@ -91,8 +126,18 @@ export const With404 = () => {
 };
 
 export const WithUnknownError = () => {
-  const mock = new MockAdapter(assetApiAxiosClient, { delayResponse: 500 });
-  mock
+  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
+  axiosMock
+    .onGet(
+      `${GDevelopUserApi.baseUrl}/user-public-profile/${
+        privateAssetPackListingData.sellerId
+      }`
+    )
+    .reply(200, sellerPublicProfile);
+  const assetServiceMock = new MockAdapter(assetApiAxiosClient, {
+    delayResponse: 2000,
+  });
+  assetServiceMock
     .onGet(
       `${GDevelopAssetApi.baseUrl}/asset-pack/${privateAssetPackListingData.id}`
     )

@@ -112,6 +112,10 @@ export type Author = {|
 
 export type Environment = 'staging' | 'live';
 
+const client = axios.create({
+  baseURL: GDevelopAssetApi.baseUrl,
+});
+
 /** Check if the IDE version, passed as argument, satisfy the version required by the asset. */
 export const isCompatibleWithAsset = (
   ideVersion: string,
@@ -128,8 +132,8 @@ export const listAllAssets = ({
 }: {|
   environment: Environment,
 |}): Promise<AllAssets> => {
-  return axios
-    .get(`${GDevelopAssetApi.baseUrl}/asset`, {
+  return client
+    .get(`/asset`, {
       params: {
         environment,
       },
@@ -141,9 +145,9 @@ export const listAllAssets = ({
       }
 
       return Promise.all([
-        axios.get(assetShortHeadersUrl).then(response => response.data),
-        axios.get(filtersUrl).then(response => response.data),
-        axios.get(assetPacksUrl).then(response => response.data),
+        client.get(assetShortHeadersUrl).then(response => response.data),
+        client.get(filtersUrl).then(response => response.data),
+        client.get(assetPacksUrl).then(response => response.data),
       ]).then(([assetShortHeaders, filters, assetPacks]) => ({
         assetShortHeaders,
         filters,
@@ -156,8 +160,8 @@ export const getAsset = (
   assetShortHeader: AssetShortHeader,
   { environment }: {| environment: Environment |}
 ): Promise<Asset> => {
-  return axios
-    .get(`${GDevelopAssetApi.baseUrl}/asset/${assetShortHeader.id}`, {
+  return client
+    .get(`/asset/${assetShortHeader.id}`, {
       params: {
         environment,
       },
@@ -168,7 +172,7 @@ export const getAsset = (
         throw new Error('Unexpected response from the asset endpoint.');
       }
 
-      return axios.get(assetUrl);
+      return client.get(assetUrl);
     })
     .then(response => response.data);
 };
@@ -178,8 +182,8 @@ export const listAllResources = ({
 }: {|
   environment: Environment,
 |}): Promise<AllResources> => {
-  return axios
-    .get(`${GDevelopAssetApi.baseUrl}/resource`, {
+  return client
+    .get(`/resource`, {
       params: {
         environment,
       },
@@ -190,8 +194,8 @@ export const listAllResources = ({
         throw new Error('Unexpected response from the resource endpoint.');
       }
       return Promise.all([
-        axios.get(resourcesUrl).then(response => response.data),
-        axios.get(filtersUrl).then(response => response.data),
+        client.get(resourcesUrl).then(response => response.data),
+        client.get(filtersUrl).then(response => response.data),
       ]).then(([resources, filters]) => ({
         resources,
         filters,
@@ -204,8 +208,8 @@ export const listAllAuthors = ({
 }: {|
   environment: Environment,
 |}): Promise<Array<Author>> => {
-  return axios
-    .get(`${GDevelopAssetApi.baseUrl}/author`, {
+  return client
+    .get(`/author`, {
       params: {
         environment,
       },
@@ -214,7 +218,7 @@ export const listAllAuthors = ({
     .then(({ authorsUrl }) => {
       if (!authorsUrl)
         throw new Error('Unexpected response from author endpoint.');
-      return axios.get(authorsUrl);
+      return client.get(authorsUrl);
     })
     .then(response => response.data);
 };
@@ -224,8 +228,8 @@ export const listAllLicenses = ({
 }: {|
   environment: Environment,
 |}): Promise<Array<License>> => {
-  return axios
-    .get(`${GDevelopAssetApi.baseUrl}/license`, {
+  return client
+    .get(`/license`, {
       params: {
         environment,
       },
@@ -234,7 +238,7 @@ export const listAllLicenses = ({
     .then(({ licensesUrl }) => {
       if (!licensesUrl)
         throw new Error('Unexpected response from license endpoint.');
-      return axios.get(licensesUrl);
+      return client.get(licensesUrl);
     })
     .then(response => response.data);
 };

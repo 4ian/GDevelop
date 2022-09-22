@@ -40,6 +40,7 @@ type Props = {|
 export const AssetStore = ({ project }: Props) => {
   const {
     assetPacks,
+    privateAssetPacks,
     searchResults,
     error,
     fetchAssetsAndFilters,
@@ -257,10 +258,11 @@ export const AssetStore = ({ project }: Props) => {
                     )}
                   </Background>
                 )}
-                {isOnHomePage && !assetPacks && <PlaceholderLoader />}
-                {isOnHomePage && assetPacks && (
+                {isOnHomePage && !(assetPacks && privateAssetPacks) && <PlaceholderLoader />}
+                {isOnHomePage && assetPacks && privateAssetPacks && (
                   <AssetsHome
                     assetPacks={assetPacks}
+                    privateAssetPacks={privateAssetPacks}
                     onPackSelection={selectPack}
                   />
                 )}

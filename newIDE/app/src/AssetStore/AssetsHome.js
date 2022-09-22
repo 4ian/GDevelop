@@ -4,6 +4,7 @@ import { Trans } from '@lingui/macro';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import Text from '../UI/Text';
 import { type AssetPacks } from '../Utils/GDevelopServices/Asset';
+import { type PrivateAssetPack } from '../Utils/GDevelopServices/Shop';
 import {
   GridListTile,
   GridList,
@@ -59,16 +60,99 @@ const useStylesForGridListItem = makeStyles(theme =>
 
 type Props = {|
   assetPacks: AssetPacks,
+  privateAssetPacks: Array<PrivateAssetPack>,
   onPackSelection: string => void,
 |};
 
 export const AssetsHome = ({
   assetPacks: { starterPacks },
+  privateAssetPacks,
   onPackSelection,
 }: Props) => {
   const classesForGridListItem = useStylesForGridListItem();
   const windowWidth = useResponsiveWindowWidth();
   const gdevelopTheme = React.useContext(ThemeContext);
+
+  const starterPacksTiles = starterPacks.map((pack, index) => (
+    <GridListTile
+      classes={classesForGridListItem}
+      key={pack.tag}
+      tabIndex={0}
+      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
+        if (shouldValidate(event)) {
+          onPackSelection(pack.tag);
+        }
+      }}
+      onClick={() => onPackSelection(pack.tag)}
+    >
+      <Paper
+        elevation={2}
+        style={{
+          ...styles.paper,
+          backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+        }}
+      >
+        <CorsAwareImage
+          key={pack.name}
+          style={styles.previewImage}
+          src={pack.thumbnailUrl}
+          alt={`Preview image of asset pack ${pack.name}`}
+        />
+        <Column>
+          <Line justifyContent="space-between" noMargin>
+            <Text style={styles.packTitle} size="body2">
+              {pack.name}
+            </Text>
+            <Text style={styles.packTitle} color="primary" size="body2">
+              <Trans>{pack.assetsCount} Assets</Trans>
+              {pack.userFriendlyPrice ? ' - ' + pack.userFriendlyPrice : null}
+            </Text>
+          </Line>
+        </Column>
+      </Paper>
+    </GridListTile>
+  ));
+
+  const privateAssetPacksTiles = privateAssetPacks.map(pack => (
+    <GridListTile
+      classes={classesForGridListItem}
+      key={pack.id}
+      tabIndex={0}
+      // onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
+      //   if (shouldValidate(event)) {
+      //     onPackSelection(pack.tag);
+      //   }
+      // }}
+      // onClick={() => onPackSelection(pack.tag)}
+    >
+      <Paper
+        elevation={2}
+        style={{
+          ...styles.paper,
+          backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+        }}
+      >
+        <CorsAwareImage
+          key={pack.name}
+          style={styles.previewImage}
+          src={pack.thumbnailUrls[0]}
+          alt={`Preview image of asset pack ${pack.name}`}
+        />
+        <Column>
+          <Line justifyContent="space-between" noMargin>
+            <Text style={styles.packTitle} size="body2">
+              {pack.name}
+            </Text>
+            <Text style={styles.packTitle} color="primary" size="body2">
+              <Trans>{pack.description}</Trans>
+            </Text>
+          </Line>
+        </Column>
+      </Paper>
+    </GridListTile>
+  ));
+
+  const allTiles = starterPacksTiles.concat(privateAssetPacksTiles)
 
   return (
     <ScrollView>
@@ -78,49 +162,7 @@ export const AssetsHome = ({
         cellHeight="auto"
         spacing={cellSpacing}
       >
-        {starterPacks.map((pack, index) => (
-          <GridListTile
-            classes={classesForGridListItem}
-            key={pack.tag}
-            tabIndex={0}
-            onKeyPress={(
-              event: SyntheticKeyboardEvent<HTMLLIElement>
-            ): void => {
-              if (shouldValidate(event)) {
-                onPackSelection(pack.tag);
-              }
-            }}
-            onClick={() => onPackSelection(pack.tag)}
-          >
-            <Paper
-              elevation={2}
-              style={{
-                ...styles.paper,
-                backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
-              }}
-            >
-              <CorsAwareImage
-                key={pack.name}
-                style={styles.previewImage}
-                src={pack.thumbnailUrl}
-                alt={pack.name}
-              />
-              <Column>
-                <Line justifyContent="space-between" noMargin>
-                  <Text style={styles.packTitle} size="body2">
-                    {pack.name}
-                  </Text>
-                  <Text style={styles.packTitle} color="primary" size="body2">
-                    <Trans>{pack.assetsCount} Assets</Trans>
-                    {pack.userFriendlyPrice
-                      ? ' - ' + pack.userFriendlyPrice
-                      : null}
-                  </Text>
-                </Line>
-              </Column>
-            </Paper>
-          </GridListTile>
-        ))}
+        {allTiles}
       </GridList>
     </ScrollView>
   );

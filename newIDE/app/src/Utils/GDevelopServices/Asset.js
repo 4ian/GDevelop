@@ -81,6 +81,27 @@ export type AssetPacks = {|
   starterPacks: Array<AssetPack>,
 |};
 
+type PrivateAssetPackAssetType =
+  | 'font'
+  | 'audio'
+  | 'sprite'
+  | '9patch'
+  | 'tiled'
+  | 'partial'
+  | 'particleEmitter';
+
+export type PrivateAssetPackContent = { [PrivateAssetPackAssetType]: number };
+
+export type PrivateAssetPackDetails = {|
+  id: string,
+  previewImageUrls: Array<string>,
+  updatedAt: string,
+  createdAt: string,
+  tag: string,
+  longDescription: string,
+  content: PrivateAssetPackContent,
+|};
+
 export type AllAssets = {|
   assetShortHeaders: Array<AssetShortHeader>,
   filters: Filters,
@@ -241,6 +262,15 @@ export const listAllLicenses = ({
       return client.get(licensesUrl);
     })
     .then(response => response.data);
+};
+
+export const getPrivateAssetPackDetails = async (
+  assetPackId: string
+): Promise<?PrivateAssetPackDetails> => {
+  const response = await client.get(`/asset-pack/${assetPackId}`, {
+    validateStatus: status => true,
+  });
+  return response.data;
 };
 
 export const isPixelArt = (

@@ -56,11 +56,9 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   static getThumbnail(
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
-    object: gdObject
+    objectConfiguration: gdObjectConfiguration
   ): string {
-    const spriteConfiguration = gd.asSpriteConfiguration(
-      object.getConfiguration()
-    );
+    const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
 
     if (
       spriteConfiguration.getAnimationsCount() > 0 &&

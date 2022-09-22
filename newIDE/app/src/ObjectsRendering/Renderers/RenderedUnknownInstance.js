@@ -44,7 +44,7 @@ export default class RenderedUnknownInstance extends RenderedInstance {
   static getThumbnail(
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
-    object: gdObject
+    objectConfiguration: gdObjectConfiguration
   ) {
     return 'res/unknown32.png';
   }

@@ -11,6 +11,8 @@ import Dialog from '../UI/Dialog';
 import TextButton from '../UI/TextButton';
 import AlertMessage from '../UI/AlertMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
+import { ResponsiveLineStackLayout } from '../UI/Layout';
+import { Column } from '../UI/Grid';
 
 type Props = {|
   privateAssetPack: PrivateAssetPackListingData,
@@ -18,7 +20,7 @@ type Props = {|
 |};
 
 const PrivateAssetPackDialog = ({
-  privateAssetPack: { id, name, description },
+  privateAssetPack: { id, name, description, sellerId },
   onClose,
 }: Props) => {
   const [
@@ -54,7 +56,6 @@ const PrivateAssetPackDialog = ({
   return (
     <Dialog
       maxWidth="md"
-      title={name}
       open
       onRequestClose={onClose}
       actions={[
@@ -74,12 +75,27 @@ const PrivateAssetPackDialog = ({
         </AlertMessage>
       ) : isFetchingDetails ? (
         <PlaceholderLoader />
-      ) : (
+      ) : assetPackDetails ? (
         <>
-          <Text>{description}</Text>
-          {assetPackDetails && <Text>{assetPackDetails.longDescription}</Text>}
+          <Column noMargin>
+            <Text size="title">{name}</Text>
+            <Text size="body2">
+              <Trans>by</Trans>{' '}
+              {sellerId}
+            </Text>
+          </Column>
+          <ResponsiveLineStackLayout noColumnMargin noMargin>
+            <Column useFullHeight expand>
+              Salut
+            </Column>
+            <Column useFullHeight expand>
+              {assetPackDetails && (
+                <Text>{assetPackDetails.longDescription}</Text>
+              )}
+            </Column>
+          </ResponsiveLineStackLayout>
         </>
-      )}
+      ) : null}
     </Dialog>
   );
 };

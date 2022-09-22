@@ -1,8 +1,24 @@
+// @flow
 import transformRect from '../Utils/TransformRect';
 import * as PIXI from 'pixi.js-legacy';
+import { type InstanceMeasurer } from './InstancesRenderer';
+import Rectangle from '../Utils/Rectangle';
 
 export default class InstancesSelection {
-  constructor({ instanceMeasurer, toCanvasCoordinates }) {
+  instanceMeasurer: InstanceMeasurer;
+  toCanvasCoordinates: (x: number, y: number) => [number, number];
+  highlightedInstance: gdInitialInstance | null;
+  highlightRectangle: PIXI.Container;
+  tooltipBackground: PIXI.Container;
+  tooltipText: PIXI.Container;
+
+  constructor({
+    instanceMeasurer,
+    toCanvasCoordinates,
+  }: {
+    instanceMeasurer: InstanceMeasurer,
+    toCanvasCoordinates: (x: number, y: number) => [number, number],
+  }) {
     this.instanceMeasurer = instanceMeasurer;
     this.toCanvasCoordinates = toCanvasCoordinates;
 
@@ -20,27 +36,31 @@ export default class InstancesSelection {
     this.highlightRectangle.addChild(this.tooltipText);
   }
 
-  setInstance(instance) {
+  setInstance(instance: gdInitialInstance | null) {
     this.highlightedInstance = instance;
   }
 
-  getInstance() {
+  getInstance(): ?gdInitialInstance {
     return this.highlightedInstance;
   }
 
-  getPixiObject(instance) {
+  getPixiObject(): PIXI.Container {
     return this.highlightRectangle;
   }
 
   render() {
-    if (this.highlightedInstance === null) {
+    const { highlightedInstance } = this;
+    if (highlightedInstance === null) {
       this.highlightRectangle.visible = false;
       return;
     }
 
     const highlightRectangle = transformRect(
       this.toCanvasCoordinates,
-      this.instanceMeasurer.getInstanceRect(this.highlightedInstance)
+      this.instanceMeasurer.getInstanceAABB(
+        highlightedInstance,
+        new Rectangle()
+      )
     );
 
     this.highlightRectangle.visible = true;
@@ -50,35 +70,35 @@ export default class InstancesSelection {
     this.highlightRectangle.alpha = 0.8;
     this.highlightRectangle.lineStyle(1, 0x000000, 1);
     this.highlightRectangle.drawRect(
-      highlightRectangle.x,
-      highlightRectangle.y,
-      highlightRectangle.width,
-      highlightRectangle.height
+      highlightRectangle.left,
+      highlightRectangle.top,
+      highlightRectangle.width(),
+      highlightRectangle.height()
     );
     this.highlightRectangle.endFill();
 
     const tooltipInfo =
-      this.highlightedInstance.getObjectName() +
+      highlightedInstance.getObjectName() +
       '\n' +
       'X: ' +
-      parseInt(this.highlightedInstance.getX()) +
+      parseInt(highlightedInstance.getX()) +
       '  Y: ' +
-      parseInt(this.highlightedInstance.getY()) +
+      parseInt(highlightedInstance.getY()) +
       '\n' +
       'Layer: ' +
-      this.highlightedInstance.getLayer() +
+      highlightedInstance.getLayer() +
       '  Z: ' +
-      this.highlightedInstance.getZOrder() +
+      highlightedInstance.getZOrder() +
       '\n';
     this.tooltipText.text = tooltipInfo;
 
     this.tooltipText.x = Math.round(
-      highlightRectangle.x -
+      highlightRectangle.left -
         this.tooltipText.width / 2 +
-        highlightRectangle.width / 2
+        highlightRectangle.width() / 2
     );
     this.tooltipText.y = Math.round(
-      highlightRectangle.y - this.tooltipText.height
+      highlightRectangle.top - this.tooltipText.height
     );
 
     const padding = 5;

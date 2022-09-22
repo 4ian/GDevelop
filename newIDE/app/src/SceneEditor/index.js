@@ -74,7 +74,7 @@ import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
 import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
-import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts/DeprecatedKeyboardShortcuts';
+import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 
 const gd: libGDevelop = global.gd;
@@ -247,13 +247,11 @@ export default class SceneEditor extends React.Component<Props, State> {
         }
         openSetupGrid={this.openSetupGrid}
         setZoomFactor={this.setZoomFactor}
-        centerView={this.centerView}
+        getContextMenuZoomItems={this.getContextMenuZoomItems}
         canUndo={canUndo(this.state.history)}
         canRedo={canRedo(this.state.history)}
         undo={this.undo}
         redo={this.redo}
-        zoomIn={this.zoomIn}
-        zoomOut={this.zoomOut}
         onOpenSettings={this.openSceneProperties}
       />
     );
@@ -590,7 +588,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       ignoreSeal: true,
     });
 
-    if (this.editor) this.editor.centerViewOn(instances);
+    if (this.editor) this.editor.centerViewOnLastInstance(instances);
     this.forceUpdateInstancesList();
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
@@ -882,8 +880,48 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
-  centerView = () => {
-    if (this.editor) this.editor.centerView();
+  zoomToInitialPosition = () => {
+    if (this.editor) this.editor.zoomToInitialPosition();
+  };
+
+  zoomToFitContent = () => {
+    if (this.editor) this.editor.zoomToFitContent();
+  };
+
+  zoomToFitSelection = () => {
+    const selectedInstances = this.instancesSelection.getSelectedInstances();
+    if (this.editor) this.editor.zoomToFitSelection(selectedInstances);
+  };
+
+  getContextMenuZoomItems = (i18n: I18nType) => {
+    return [
+      {
+        label: i18n._(t`Zoom in`),
+        click: this.zoomIn,
+        accelerator: 'CmdOrCtrl+numadd',
+      },
+      {
+        label: i18n._(t`Zoom out`),
+        click: this.zoomOut,
+        accelerator: 'CmdOrCtrl+numsub',
+      },
+      {
+        label: i18n._(t`Zoom to fit selection`),
+        click: () => this.zoomToFitSelection(),
+        enabled: this.instancesSelection.hasSelectedInstances(),
+        accelerator: 'Shift+num1',
+      },
+      {
+        label: i18n._(t`Zoom to initial position`),
+        click: () => this.zoomToInitialPosition(),
+        accelerator: 'Shift+num2',
+      },
+      {
+        label: i18n._(t`Zoom to fit content`),
+        click: () => this.zoomToFitContent(),
+        accelerator: 'Shift+num3',
+      },
+    ];
   };
 
   setZoomFactor = (zoomFactor: number) => {
@@ -928,6 +966,8 @@ export default class SceneEditor extends React.Component<Props, State> {
           label: i18n._(t`Insert new...`),
           click: () => this._createNewObjectAndInstanceUnderCursor(),
         },
+        { type: 'separator' },
+        ...this.getContextMenuZoomItems(i18n),
       ];
     } else {
       contextMenuItems = [
@@ -1270,7 +1310,6 @@ export default class SceneEditor extends React.Component<Props, State> {
             instancesEditorSettings={this.state.instancesEditorSettings}
             onChangeInstancesEditorSettings={this.setInstancesEditorSettings}
             instancesSelection={this.instancesSelection}
-            onDeleteSelection={this.deleteSelection}
             onInstancesAdded={this._onInstancesAdded}
             onInstancesSelected={this._onInstancesSelected}
             onInstanceDoubleClicked={this._onInstanceDoubleClicked}
@@ -1279,13 +1318,19 @@ export default class SceneEditor extends React.Component<Props, State> {
             onInstancesRotated={this._onInstancesRotated}
             selectedObjectNames={this.state.selectedObjectNames}
             onContextMenu={this._onContextMenu}
-            onCopy={() => this.copySelection({ useLastCursorPosition: true })}
-            onCut={() => this.cutSelection({ useLastCursorPosition: true })}
-            onPaste={() => this.paste({ useLastCursorPosition: true })}
-            onUndo={this.undo}
-            onRedo={this.redo}
-            onZoomOut={this.zoomOut}
-            onZoomIn={this.zoomIn}
+            instancesEditorShortcutsCallbacks={{
+              onCopy: () => this.copySelection({ useLastCursorPosition: true }),
+              onCut: () => this.cutSelection({ useLastCursorPosition: true }),
+              onPaste: () => this.paste({ useLastCursorPosition: true }),
+              onDelete: this.deleteSelection,
+              onUndo: this.undo,
+              onRedo: this.redo,
+              onZoomOut: this.zoomOut,
+              onZoomIn: this.zoomIn,
+              onShift1: this.zoomToFitSelection,
+              onShift2: this.zoomToInitialPosition,
+              onShift3: this.zoomToFitContent,
+            }}
             wrappedEditorRef={editor => {
               this.editor = editor;
             }}

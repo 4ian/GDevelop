@@ -24,6 +24,20 @@ export default class Rectangle {
     this.bottom = bottom;
   }
 
+  setThroughCenter(
+    centerX: number,
+    centerY: number,
+    width: number,
+    height: number
+  ) {
+    this.set(
+      centerX - width / 2,
+      centerY - height / 2,
+      centerX + width / 2,
+      centerY + height / 2
+    );
+  }
+
   setRectangle(rectangle: Rectangle) {
     this.left = rectangle.left;
     this.top = rectangle.top;

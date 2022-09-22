@@ -498,7 +498,7 @@ module.exports = {
     RenderedBBTextInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'JsPlatform/Extensions/bbcode24.png';
     };

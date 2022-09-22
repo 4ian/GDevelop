@@ -612,7 +612,7 @@ module.exports = {
         this.update();
       }
 
-      static getThumbnail(project, resourcesLoader, object) {
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
         return 'JsPlatform/Extensions/text_input.svg';
       }
 

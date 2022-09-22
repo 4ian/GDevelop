@@ -62,12 +62,14 @@ type Props = {|
   assetPacks: AssetPacks,
   privateAssetPacks: Array<PrivateAssetPackListingData>,
   onPackSelection: string => void,
+  onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
 |};
 
 export const AssetsHome = ({
   assetPacks: { starterPacks },
   privateAssetPacks,
   onPackSelection,
+  onPrivateAssetPackSelection,
 }: Props) => {
   const classesForGridListItem = useStylesForGridListItem();
   const windowWidth = useResponsiveWindowWidth();
@@ -118,12 +120,12 @@ export const AssetsHome = ({
       classes={classesForGridListItem}
       key={pack.id}
       tabIndex={0}
-      // onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-      //   if (shouldValidate(event)) {
-      //     onPackSelection(pack.tag);
-      //   }
-      // }}
-      // onClick={() => onPackSelection(pack.tag)}
+      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
+        if (shouldValidate(event)) {
+          onPrivateAssetPackSelection(pack);
+        }
+      }}
+      onClick={() => onPrivateAssetPackSelection(pack)}
     >
       <Paper
         elevation={2}
@@ -152,7 +154,7 @@ export const AssetsHome = ({
     </GridListTile>
   ));
 
-  const allTiles = starterPacksTiles.concat(privateAssetPacksTiles)
+  const allTiles = starterPacksTiles.concat(privateAssetPacksTiles);
 
   return (
     <ScrollView>

@@ -108,6 +108,11 @@ namespace gdjs {
       this._instanceContainer._updateObjectsPostEvents();
     }
 
+    /**
+     * This method is called when the preview is being hot-reloaded.
+     */
+    onHotReloading(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+
     // TODO EBO This is only to handle trigger once.
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 

@@ -181,7 +181,7 @@ export default class LayerRenderer {
     const top = this.getUnrotatedInstanceTop(instance);
     const right = left + this.getUnrotatedInstanceWidth(instance);
     const bottom = top + this.getUnrotatedInstanceHeight(instance);
-    bounds.set(left, top, right, bottom);
+    bounds.set({ left, top, right, bottom });
     return bounds;
   }
 
@@ -230,7 +230,7 @@ export default class LayerRenderer {
       top = Math.min(top, rotatedRectangle[i][1]);
       bottom = Math.max(bottom, rotatedRectangle[i][1]);
     }
-    bounds.set(left, top, right, bottom);
+    bounds.set({ left, top, right, bottom });
     return bounds;
   }
 

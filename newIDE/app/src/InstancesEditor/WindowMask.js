@@ -42,12 +42,12 @@ export default class WindowMask {
 
     const width = this.project.getGameResolutionWidth();
     const height = this.project.getGameResolutionHeight();
-    this.windowRectangle.setThroughCenter(
-      this.viewPosition.getViewX(),
-      this.viewPosition.getViewY(),
+    this.windowRectangle.setThroughCenter({
+      centerX: this.viewPosition.getViewX(),
+      centerY: this.viewPosition.getViewY(),
       width,
-      height
-    );
+      height,
+    });
 
     const displayedRectangle = transformRect(
       this.viewPosition.toCanvasCoordinates,

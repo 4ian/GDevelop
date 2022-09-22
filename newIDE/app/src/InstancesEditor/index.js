@@ -813,16 +813,19 @@ export default class InstancesEditor extends Component<Props> {
 
   zoomToFitContent() {
     const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
-    let rectangle: ?Rectangle;
+    let contentAABB: ?Rectangle;
     const getInstanceRectangle = new gd.InitialInstanceJSFunctor();
     // $FlowFixMe - invoke is not writable
     getInstanceRectangle.invoke = instancePtr => {
       // $FlowFixMe - wrapPointer is not exposed
       const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
-      if (!rectangle) {
-        rectangle = instanceMeasurer.getInstanceAABB(instance, new Rectangle());
+      if (!contentAABB) {
+        contentAABB = instanceMeasurer.getInstanceAABB(
+          instance,
+          new Rectangle()
+        );
       } else {
-        rectangle.union(
+        contentAABB.union(
           instanceMeasurer.getInstanceAABB(instance, new Rectangle())
         );
       }
@@ -832,8 +835,8 @@ export default class InstancesEditor extends Component<Props> {
       // $FlowFixMe - JSFunctor is incompatible with Functor
       initialInstances.iterateOverInstances(getInstanceRectangle);
 
-      if (rectangle) {
-        const idealZoom = this.viewPosition.fitToRectangle(rectangle);
+      if (contentAABB) {
+        const idealZoom = this.viewPosition.fitToRectangle(contentAABB);
         this.setZoomFactor(idealZoom);
       }
     }

@@ -114,7 +114,7 @@ export default class ViewPosition {
     const idealZoomOnX = this._width / rectangle.width();
     const idealZoomOnY = this._height / rectangle.height();
 
-    return Math.min(idealZoomOnX, idealZoomOnY) - 0.05; // Add margin so that the object doesn't feel cut
+    return Math.min(idealZoomOnX, idealZoomOnY) * 0.95; // Add margin so that the object doesn't feel cut
   }
 
   getViewX() {

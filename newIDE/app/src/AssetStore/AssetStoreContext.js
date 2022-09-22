@@ -11,6 +11,10 @@ import {
   listAllAuthors,
   listAllLicenses,
 } from '../Utils/GDevelopServices/Asset';
+import {
+  listListedPrivateAssetPacks,
+  type PrivateAssetPack,
+} from '../Utils/GDevelopServices/Shop';
 import { useSearchItem, SearchFilter } from '../UI/Search/UseSearchItem';
 import {
   TagAssetStoreSearchFilter,
@@ -48,6 +52,7 @@ export type AssetFiltersState = {|
 type AssetStoreState = {|
   filters: ?Filters,
   assetPacks: ?AssetPacks,
+  privateAssetPacks: ?Array<PrivateAssetPack>,
   authors: ?Array<Author>,
   licenses: ?Array<License>,
   environment: Environment,
@@ -71,6 +76,7 @@ type AssetStoreState = {|
 export const AssetStoreContext = React.createContext<AssetStoreState>({
   filters: null,
   assetPacks: null,
+  privateAssetPacks: null,
   authors: null,
   licenses: null,
   environment: 'live',
@@ -133,6 +139,10 @@ export const AssetStoreStateProvider = ({
   }>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [assetPacks, setAssetPacks] = React.useState<?AssetPacks>(null);
+  const [
+    privateAssetPacks,
+    setPrivateAssetPacks,
+  ] = React.useState<?Array<PrivateAssetPack>>(null);
   const [authors, setAuthors] = React.useState<?Array<Author>>(null);
   const [licenses, setLicenses] = React.useState<?Array<License>>(null);
   const [environment, setEnvironment] = React.useState<Environment>('live');
@@ -215,6 +225,7 @@ export const AssetStoreStateProvider = ({
           } = await listAllAssets({ environment });
           const authors = await listAllAuthors({ environment });
           const licenses = await listAllLicenses({ environment });
+          const privateAssetPacks = await listListedPrivateAssetPacks();
 
           const assetShortHeadersById = {};
           assetShortHeaders.forEach(assetShortHeader => {
@@ -229,6 +240,7 @@ export const AssetStoreStateProvider = ({
           setAssetPacks(assetPacks);
           setAuthors(authors);
           setLicenses(licenses);
+          setPrivateAssetPacks(privateAssetPacks);
         } catch (error) {
           console.error(
             `Unable to load the assets from the asset store:`,
@@ -276,6 +288,7 @@ export const AssetStoreStateProvider = ({
       fetchAssetsAndFilters,
       filters,
       assetPacks,
+      privateAssetPacks,
       authors,
       licenses,
       environment,
@@ -319,6 +332,7 @@ export const AssetStoreStateProvider = ({
       fetchAssetsAndFilters,
       filters,
       assetPacks,
+      privateAssetPacks,
       authors,
       licenses,
       environment,

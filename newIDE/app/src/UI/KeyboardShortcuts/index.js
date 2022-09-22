@@ -110,15 +110,11 @@ export default class KeyboardShortcuts {
     if (isMacLike()) {
       return this._isControlOrCmdPressed();
     } else {
-      if (
+      return (
         !this._isControlOrCmdPressed() &&
         !this._altPressed &&
         !this._shiftPressed
-      ) {
-        return true;
-      } else {
-        return false;
-      }
+      );
     }
   }
 

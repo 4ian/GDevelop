@@ -95,8 +95,20 @@ export const GDevelopProjectApi = {
     : 'https://api.gdevelop.io/project',
 };
 
+export const GDevelopShopApi = {
+  baseUrl: isDev
+    ? 'https://api-dev.gdevelop.io/shop'
+    : 'https://api.gdevelop.io/shop',
+};
+
 export const GDevelopProjectResourcesStorage = {
   baseUrl: isDev
     ? 'https://project-resources-dev.gdevelop.io'
     : 'https://project-resources.gdevelop.io',
+};
+
+export const GDevelopPrivateAssetsStorage = {
+  baseUrl: isDev
+    ? 'https://private-assets-dev.gdevelop.io'
+    : 'https://private-assets.gdevelop.io',
 };

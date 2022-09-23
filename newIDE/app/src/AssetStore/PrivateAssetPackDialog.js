@@ -115,7 +115,12 @@ const PrivateAssetPackDialog = ({
                 <Text>{errorText}</Text>
               </AlertMessage>
             ) : isFetchingDetails ? (
-              <PlaceholderLoader />
+              <>
+                <Text size="title">{name}</Text>
+                <Column expand>
+                  <PlaceholderLoader />
+                </Column>
+              </>
             ) : assetPackDetails && sellerPublicProfile ? (
               <>
                 <Column noMargin>

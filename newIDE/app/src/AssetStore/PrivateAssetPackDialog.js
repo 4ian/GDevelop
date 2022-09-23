@@ -20,6 +20,8 @@ import {
 } from '../Utils/GDevelopServices/User';
 import PublicProfileDialog from '../Profile/PublicProfileDialog';
 import Link from '../UI/Link';
+import Mark from '../UI/CustomSvgIcons/Mark';
+import Cross from '../UI/CustomSvgIcons/Cross';
 
 type Props = {|
   privateAssetPack: PrivateAssetPackListingData,
@@ -139,29 +141,58 @@ const PrivateAssetPackDialog = ({
                   <Column useFullHeight expand>
                     Salut
                   </Column>
-                  <Column useFullHeight expand>
+                  <Column useFullHeight expand noMargin>
                     <Text>{assetPackDetails.longDescription}</Text>
                     <Line noMargin>
-                      <Column noMargin>
-                        <Text>
+                      <Column noMargin expand>
+                        <Text size="sub-title">
                           <Trans>Content</Trans>
                         </Text>
-                        <Text>
-                          {sortedContentType.map(type => {
-                            if (assetPackDetails.content[type]) {
-                              return (
-                                <li>
+                        {sortedContentType.map(type => {
+                          if (assetPackDetails.content[type]) {
+                            return (
+                              <li>
+                                <Text displayInlineAsSpan noMargin>
                                   {assetPackDetails.content[type]}{' '}
                                   {i18n._(contentTypeToMessageDescriptor[type])}
                                   {assetPackDetails.content[type] > 1
                                     ? 's' // TODO: find a better way to pluralize
                                     : ''}
-                                </li>
-                              );
-                            }
-                            return null;
-                          })}
+                                </Text>
+                              </li>
+                            );
+                          }
+                          return null;
+                        })}
+                      </Column>
+                      <Column noMargin expand>
+                        <Text size="sub-title">
+                          <Trans>Licensing</Trans>
                         </Text>
+                        <Line noMargin alignItems="center">
+                          <Mark fontSize="small" />
+                          <Text displayInlineAsSpan noMargin>
+                            <Trans>Personal projects</Trans>
+                          </Text>
+                        </Line>
+                        <Line noMargin alignItems="center">
+                          <Mark fontSize="small" />
+                          <Text displayInlineAsSpan noMargin>
+                            <Trans>Professional projects</Trans>
+                          </Text>
+                        </Line>
+                        <Line noMargin alignItems="center">
+                          <Mark fontSize="small" />
+                          <Text displayInlineAsSpan noMargin>
+                            <Trans>Asset modification</Trans>
+                          </Text>
+                        </Line>
+                        <Line noMargin alignItems="center">
+                          <Cross fontSize="small" />
+                          <Text displayInlineAsSpan noMargin>
+                            <Trans>Redistribution &amp; reselling</Trans>
+                          </Text>
+                        </Line>
                       </Column>
                     </Line>
                   </Column>

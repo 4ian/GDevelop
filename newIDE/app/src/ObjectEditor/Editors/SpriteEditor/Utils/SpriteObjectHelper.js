@@ -331,6 +331,7 @@ export const duplicateSpritesInAnimation = (
 
         direction.addSprite(newSprite);
         direction.moveSprite(direction.getSpritesCount() - 1, spriteIndex);
+        newSprite.delete();
       }
     }
   });

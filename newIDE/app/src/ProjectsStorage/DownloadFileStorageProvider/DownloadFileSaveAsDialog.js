@@ -182,6 +182,7 @@ export default function DownloadFileSaveAsDialog({ project, onDone }: Props) {
           const serializedProject = new gd.SerializerElement();
           project.serializeTo(serializedProject);
           newProject.unserializeFrom(serializedProject);
+          serializedProject.delete();
 
           // Download resources to blobs, and update the project resources.
           const blobFiles: Array<BlobFileDescriptor> = [];

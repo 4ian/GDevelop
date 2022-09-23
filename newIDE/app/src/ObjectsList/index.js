@@ -47,7 +47,7 @@ import {
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
-import InstancesSelection from '../InstancesEditor/InstancesSelection';
+import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -72,38 +72,6 @@ const objectTypeToDefaultName = {
   'Lighting::LightObject': 'NewLight',
   'TextInput::TextInputObject': 'NewTextInput',
   'Video::VideoObject': 'NewVideo',
-};
-
-const getInstancesInLayoutForObject = (
-  layout: gdLayout,
-  objectName: string
-): Array<gdInitialInstance> => {
-  const instances = layout.getInitialInstances();
-  if (instances.getInstancesCount() === 0) return [];
-  const objectInstances = [];
-  const instanceGetter = new gd.InitialInstanceJSFunctor();
-  // $FlowFixMe - invoke is not writable
-  instanceGetter.invoke = instancePtr => {
-    // $FlowFixMe - wrapPointer is not exposed
-    const instance: gdInitialInstance = gd.wrapPointer(
-      instancePtr,
-      gd.InitialInstance
-    );
-    if (instance.getObjectName() === objectName) {
-      objectInstances.push(instance);
-    }
-  };
-  // $FlowFixMe - JSFunctor is incompatible with Functor
-  instances.iterateOverInstances(instanceGetter);
-
-  return objectInstances;
-};
-
-const getInstanceCountInLayoutForObject = (
-  layout: gdLayout,
-  objectName: string
-): number => {
-  return getInstancesInLayoutForObject(layout, objectName).length;
 };
 
 export const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
@@ -142,7 +110,7 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
-  instancesSelection?: InstancesSelection,
+  onSelectAllInstancesOfObjectInLayout?: string => void,
   onDeleteObject: (
     objectWithContext: ObjectWithContext,
     cb: (boolean) => void
@@ -555,7 +523,10 @@ export default class ObjectsList extends React.Component<Props, State> {
     index: number
   ) => {
     const { object } = objectWithContext;
-    const { layout, instancesSelection } = this.props;
+    const { layout, onSelectAllInstancesOfObjectInLayout } = this.props;
+    const instanceCountOnScene = layout
+      ? getInstanceCountInLayoutForObject(layout, object.getName())
+      : undefined;
 
     const objectMetadata = gd.MetadataProvider.getObjectMetadata(
       this.props.project.getCurrentPlatform(),
@@ -579,24 +550,13 @@ export default class ObjectsList extends React.Component<Props, State> {
         label: i18n._(t`Duplicate`),
         click: () => this._duplicateObject(objectWithContext),
       },
-      layout && instancesSelection
+      instanceCountOnScene !== undefined && onSelectAllInstancesOfObjectInLayout
         ? {
             label: i18n._(
-              t`Select instances on scene (${getInstanceCountInLayoutForObject(
-                layout,
-                object.getName()
-              )})`
+              t`Select instances on scene (${instanceCountOnScene})`
             ),
-            click: () =>
-              instancesSelection.selectInstances({
-                instances: getInstancesInLayoutForObject(
-                  layout,
-                  object.getName()
-                ),
-                ignoreSeal: true,
-                multiSelect: false,
-                layersVisibility: null,
-              }),
+            click: () => onSelectAllInstancesOfObjectInLayout(object.getName()),
+            enabled: instanceCountOnScene > 0,
           }
         : undefined,
       { type: 'separator' },

@@ -76,6 +76,7 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
+import { getInstancesInLayoutForObject } from '../Utils/Layout';
 
 const gd: libGDevelop = global.gd;
 
@@ -1142,6 +1143,19 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
+  onSelectAllInstancesOfObjectInLayout = (objectName: string) => {
+    const { layout } = this.props;
+    const instancesToSelect = getInstancesInLayoutForObject(layout, objectName);
+    this.instancesSelection.selectInstances({
+      instances: instancesToSelect,
+      ignoreSeal: true,
+      multiSelect: false,
+      layersVisibility: null,
+    });
+    this.forceUpdateInstancesList();
+    this._onInstancesSelected(instancesToSelect);
+  };
+
   updateBehaviorsSharedData = () => {
     const { layout, project } = this.props;
     layout.updateBehaviorsSharedData(project);
@@ -1364,7 +1378,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 objectsContainer={layout}
                 layout={layout}
                 resourceSources={resourceSources}
-                instancesSelection={this.instancesSelection}
+                onSelectAllInstancesOfObjectInLayout={
+                  this.onSelectAllInstancesOfObjectInLayout
+                }
                 resourceExternalEditors={resourceExternalEditors}
                 onChooseResource={onChooseResource}
                 selectedObjectNames={this.state.selectedObjectNames}

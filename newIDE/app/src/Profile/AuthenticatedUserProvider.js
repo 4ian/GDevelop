@@ -30,6 +30,7 @@ import PreferencesContext, {
   type PreferencesValues,
 } from '../MainFrame/Preferences/PreferencesContext';
 import { listUserCloudProjects } from '../Utils/GDevelopServices/Project';
+import { listUserPurchases } from '../Utils/GDevelopServices/Shop';
 import { clearCloudProjectCookies } from '../ProjectsStorage/CloudStorageProvider/CloudProjectCookies';
 
 type Props = {|
@@ -271,6 +272,22 @@ export default class AuthenticatedUserProvider extends React.Component<
           authenticatedUser: {
             ...authenticatedUser,
             cloudProjects,
+          },
+        })),
+      error => {
+        console.error('Error while loading user cloud projects:', error);
+      }
+    );
+    listUserPurchases(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+      role: 'receiver',
+      productType: 'asset-pack',
+    }).then(
+      purchases =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            ownedAssetPackIds: purchases.map(purchase => purchase.productId),
           },
         })),
       error => {

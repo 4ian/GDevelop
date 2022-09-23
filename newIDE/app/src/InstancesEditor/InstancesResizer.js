@@ -2,6 +2,7 @@
 import Rectangle from '../Utils/Rectangle';
 import { roundPositionForResizing } from '../Utils/GridHelpers';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
+import { type InstanceMeasurer } from './InstancesRenderer';
 
 export type ResizeGrabbingLocation =
   | 'TopLeft'
@@ -49,7 +50,7 @@ const areAnyInstancesNotStraight = (instances: gdInitialInstance[]) => {
 };
 
 export default class InstancesResizer {
-  instanceMeasurer: any;
+  instanceMeasurer: InstanceMeasurer;
   instancesEditorSettings: InstancesEditorSettings;
 
   // The initial state of instances before a resize:
@@ -71,7 +72,7 @@ export default class InstancesResizer {
     instanceMeasurer,
     instancesEditorSettings,
   }: {
-    instanceMeasurer: any,
+    instanceMeasurer: InstanceMeasurer,
     instancesEditorSettings: InstancesEditorSettings,
   }) {
     this.instanceMeasurer = instanceMeasurer;

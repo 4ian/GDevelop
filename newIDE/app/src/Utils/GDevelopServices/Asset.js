@@ -266,7 +266,7 @@ export const listAllLicenses = ({
 
 export const getPrivateAssetPackDetails = async (
   assetPackId: string
-): Promise<?PrivateAssetPackDetails> => {
+): Promise<PrivateAssetPackDetails> => {
   const response = await client.get(`/asset-pack/${assetPackId}`);
   return response.data;
 };

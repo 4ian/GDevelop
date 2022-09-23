@@ -1364,6 +1364,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 objectsContainer={layout}
                 layout={layout}
                 resourceSources={resourceSources}
+                instancesSelection={this.instancesSelection}
                 resourceExternalEditors={resourceExternalEditors}
                 onChooseResource={onChooseResource}
                 selectedObjectNames={this.state.selectedObjectNames}

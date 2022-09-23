@@ -224,6 +224,7 @@ class AnimationsListContainer extends React.Component<
     const emptyAnimation = new gd.Animation();
     emptyAnimation.setDirectionsCount(1);
     this.props.spriteConfiguration.addAnimation(emptyAnimation);
+    emptyAnimation.delete();
     this.forceUpdate();
     this.props.onSizeUpdated();
   };

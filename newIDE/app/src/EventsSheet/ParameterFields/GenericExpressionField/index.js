@@ -309,6 +309,8 @@ export default class ExpressionField extends React.Component<Props, State> {
       shouldConvertToString,
     });
 
+    parser.delete();
+
     // Generate the expression with the function call
     const newValue =
       value.substr(0, cursorPosition) +

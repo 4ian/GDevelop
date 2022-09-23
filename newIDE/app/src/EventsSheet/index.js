@@ -1012,6 +1012,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     const positions = this._getChangedEventRows(eventsWithDeletion);
     eventsRemover.launch(events);
+    eventsRemover.delete();
 
     // /!\ Events were changed, so any reference to an existing event can now
     // be invalid. Make sure to immediately trigger a forced update before

@@ -214,6 +214,7 @@ export default class SpritesList extends Component<Props, void> {
           copySpritePolygons(direction.getSprite(0), sprite);
         }
         direction.addSprite(sprite);
+        sprite.delete();
       });
 
       // Important, we are responsible for deleting the resources that were given to us.

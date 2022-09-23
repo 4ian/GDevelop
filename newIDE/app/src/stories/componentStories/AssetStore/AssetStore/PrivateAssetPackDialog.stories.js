@@ -42,11 +42,13 @@ const sellerPublicProfile = {
 const privateAssetPackDetails = {
   id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
   content: {
-    sprite: 1,
-    audio: 1,
-    '9patch': 1,
-    particleEmitter: 1,
+    sprite: 14,
+    audio: 2,
+    tiled: 1,
+    '9patch': 7,
+    particleEmitter: 2,
     font: 1,
+    partial: 2
   },
   previewImageUrls: [
     'https://resources.gdevelop-app.com/staging/private-assets/French Food/preview1.png',

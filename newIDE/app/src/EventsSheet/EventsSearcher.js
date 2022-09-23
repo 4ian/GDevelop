@@ -72,6 +72,7 @@ const getSearchInitialOffset = (
     selectedEventPosition,
     ...searchResultsPositions
   ] = positionFinder.getPositions().toJSArray();
+  positionFinder.delete();
 
   // Search results are considered to be sorted by position
   // (top to bottom in the flatten event tree)

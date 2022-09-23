@@ -310,6 +310,7 @@ const generateFreeFunction = (
       });
 
     includeFiles.delete();
+    eventsFunctionsExtensionCodeGenerator.delete();
 
     return options.eventsFunctionCodeWriter
       .writeFunctionCode(functionName, code)

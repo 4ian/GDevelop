@@ -13,7 +13,7 @@ import TextButton from '../UI/TextButton';
 import AlertMessage from '../UI/AlertMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
-import { Column, Line } from '../UI/Grid';
+import { Column, LargeSpacer, Line, Spacer } from '../UI/Grid';
 import {
   getUserPublicProfile,
   type UserPublicProfile,
@@ -22,6 +22,7 @@ import PublicProfileDialog from '../Profile/PublicProfileDialog';
 import Link from '../UI/Link';
 import Mark from '../UI/CustomSvgIcons/Mark';
 import Cross from '../UI/CustomSvgIcons/Cross';
+import { Paper } from '@material-ui/core';
 
 type Props = {|
   privateAssetPack: PrivateAssetPackListingData,
@@ -142,59 +143,75 @@ const PrivateAssetPackDialog = ({
                     Salut
                   </Column>
                   <Column useFullHeight expand noMargin>
-                    <Text>{assetPackDetails.longDescription}</Text>
-                    <Line noMargin>
-                      <Column noMargin expand>
-                        <Text size="sub-title">
-                          <Trans>Content</Trans>
-                        </Text>
-                        {sortedContentType.map(type => {
-                          if (assetPackDetails.content[type]) {
-                            return (
-                              <li>
+                    <Paper variant="outlined">
+                      <Line useFullHeight>
+                        <Column expand>
+                          <LargeSpacer />
+                          <Text noMargin>
+                            {assetPackDetails.longDescription}
+                          </Text>
+                          <LargeSpacer />
+                          <Line noMargin>
+                            <Column noMargin expand>
+                              <Text size="sub-title">
+                                <Trans>Content</Trans>
+                              </Text>
+                              {sortedContentType.map(type => {
+                                if (assetPackDetails.content[type]) {
+                                  return (
+                                    <li key={type}>
+                                      <Text displayInlineAsSpan noMargin>
+                                        {assetPackDetails.content[type]}{' '}
+                                        {i18n._(
+                                          contentTypeToMessageDescriptor[type]
+                                        )}
+                                        {assetPackDetails.content[type] > 1
+                                          ? 's' // TODO: find a better way to pluralize
+                                          : ''}
+                                      </Text>
+                                    </li>
+                                  );
+                                }
+                                return null;
+                              })}
+                            </Column>
+                            <Column noMargin expand>
+                              <Text size="sub-title">
+                                <Trans>Licensing</Trans>
+                              </Text>
+                              <Line noMargin alignItems="center">
+                                <Mark fontSize="small" />
+                                <Spacer />
                                 <Text displayInlineAsSpan noMargin>
-                                  {assetPackDetails.content[type]}{' '}
-                                  {i18n._(contentTypeToMessageDescriptor[type])}
-                                  {assetPackDetails.content[type] > 1
-                                    ? 's' // TODO: find a better way to pluralize
-                                    : ''}
+                                  <Trans>Personal projects</Trans>
                                 </Text>
-                              </li>
-                            );
-                          }
-                          return null;
-                        })}
-                      </Column>
-                      <Column noMargin expand>
-                        <Text size="sub-title">
-                          <Trans>Licensing</Trans>
-                        </Text>
-                        <Line noMargin alignItems="center">
-                          <Mark fontSize="small" />
-                          <Text displayInlineAsSpan noMargin>
-                            <Trans>Personal projects</Trans>
-                          </Text>
-                        </Line>
-                        <Line noMargin alignItems="center">
-                          <Mark fontSize="small" />
-                          <Text displayInlineAsSpan noMargin>
-                            <Trans>Professional projects</Trans>
-                          </Text>
-                        </Line>
-                        <Line noMargin alignItems="center">
-                          <Mark fontSize="small" />
-                          <Text displayInlineAsSpan noMargin>
-                            <Trans>Asset modification</Trans>
-                          </Text>
-                        </Line>
-                        <Line noMargin alignItems="center">
-                          <Cross fontSize="small" />
-                          <Text displayInlineAsSpan noMargin>
-                            <Trans>Redistribution &amp; reselling</Trans>
-                          </Text>
-                        </Line>
-                      </Column>
-                    </Line>
+                              </Line>
+                              <Line noMargin alignItems="center">
+                                <Mark fontSize="small" />
+                                <Spacer />
+                                <Text displayInlineAsSpan noMargin>
+                                  <Trans>Professional projects</Trans>
+                                </Text>
+                              </Line>
+                              <Line noMargin alignItems="center">
+                                <Mark fontSize="small" />
+                                <Spacer />
+                                <Text displayInlineAsSpan noMargin>
+                                  <Trans>Asset modification</Trans>
+                                </Text>
+                              </Line>
+                              <Line noMargin alignItems="center">
+                                <Cross fontSize="small" />
+                                <Spacer />
+                                <Text displayInlineAsSpan noMargin>
+                                  <Trans>Redistribution &amp; reselling</Trans>
+                                </Text>
+                              </Line>
+                            </Column>
+                          </Line>
+                        </Column>
+                      </Line>
+                    </Paper>
                   </Column>
                 </ResponsiveLineStackLayout>
               </>

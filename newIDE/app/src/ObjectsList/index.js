@@ -550,15 +550,6 @@ export default class ObjectsList extends React.Component<Props, State> {
         label: i18n._(t`Duplicate`),
         click: () => this._duplicateObject(objectWithContext),
       },
-      instanceCountOnScene !== undefined && onSelectAllInstancesOfObjectInLayout
-        ? {
-            label: i18n._(
-              t`Select instances on scene (${instanceCountOnScene})`
-            ),
-            click: () => onSelectAllInstancesOfObjectInLayout(object.getName()),
-            enabled: instanceCountOnScene > 0,
-          }
-        : undefined,
       { type: 'separator' },
       {
         label: i18n._(t`Edit object`),
@@ -609,6 +600,15 @@ export default class ObjectsList extends React.Component<Props, State> {
         label: i18n._(t`Add instance to the scene`),
         click: () => this.props.onAddObjectInstance(object.getName()),
       },
+      instanceCountOnScene !== undefined && onSelectAllInstancesOfObjectInLayout
+        ? {
+            label: i18n._(
+              t`Select instances on scene (${instanceCountOnScene})`
+            ),
+            click: () => onSelectAllInstancesOfObjectInLayout(object.getName()),
+            enabled: instanceCountOnScene > 0,
+          }
+        : undefined,
       { type: 'separator' },
       {
         label: i18n._(t`Add a new object...`),

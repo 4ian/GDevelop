@@ -821,7 +821,10 @@ export default class InstancesEditor extends Component<Props> {
     // $FlowFixMe - invoke is not writable
     getInstanceRectangle.invoke = instancePtr => {
       // $FlowFixMe - wrapPointer is not exposed
-      const instance: gdInitialInstance = gd.wrapPointer(instancePtr, gd.InitialInstance);
+      const instance: gdInitialInstance = gd.wrapPointer(
+        instancePtr,
+        gd.InitialInstance
+      );
       if (!contentAABB) {
         contentAABB = instanceMeasurer.getInstanceAABB(
           instance,

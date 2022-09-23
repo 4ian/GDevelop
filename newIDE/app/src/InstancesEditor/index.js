@@ -812,6 +812,9 @@ export default class InstancesEditor extends Component<Props> {
   }
 
   zoomToFitContent() {
+    const { initialInstances } = this.props;
+    if (initialInstances.getInstancesCount() === 0) return;
+
     const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
     let contentAABB: ?Rectangle;
     const getInstanceRectangle = new gd.InitialInstanceJSFunctor();
@@ -830,15 +833,12 @@ export default class InstancesEditor extends Component<Props> {
         );
       }
     };
-    const { initialInstances } = this.props;
-    if (initialInstances.getInstancesCount() > 0) {
-      // $FlowFixMe - JSFunctor is incompatible with Functor
-      initialInstances.iterateOverInstances(getInstanceRectangle);
+    // $FlowFixMe - JSFunctor is incompatible with Functor
+    initialInstances.iterateOverInstances(getInstanceRectangle);
 
-      if (contentAABB) {
-        const idealZoom = this.viewPosition.fitToRectangle(contentAABB);
-        this.setZoomFactor(idealZoom);
-      }
+    if (contentAABB) {
+      const idealZoom = this.viewPosition.fitToRectangle(contentAABB);
+      this.setZoomFactor(idealZoom);
     }
   }
 

@@ -23,6 +23,7 @@ import Link from '../UI/Link';
 import Mark from '../UI/CustomSvgIcons/Mark';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import { Paper } from '@material-ui/core';
+import { CorsAwareImage } from '../UI/CorsAwareImage';
 
 type Props = {|
   privateAssetPack: PrivateAssetPackListingData,
@@ -51,6 +52,17 @@ const contentTypeToMessageDescriptor = {
 
 const styles = {
   descriptionContainer: { padding: 30 },
+  previewImage: {
+    width: '100%',
+    // Prevent cumulative layout shift by enforcing
+    // the 16:9 ratio.
+    aspectRatio: '16 / 9',
+    objectFit: 'cover',
+  },
+  previewImageCarouselItem: {
+    height: 50,
+    aspectRatio: '16 / 9',
+  },
 };
 
 const PrivateAssetPackDialog = ({
@@ -73,6 +85,11 @@ const PrivateAssetPackDialog = ({
     setSellerPublicProfile,
   ] = React.useState<?UserPublicProfile>(null);
   const [errorText, setErrorText] = React.useState<?string>(null);
+  const [
+    selectedPreviewImageUrl,
+    setSelectedPreviewImageUrl,
+  ] = React.useState<?string>(null);
+
   React.useEffect(
     () => {
       (async () => {
@@ -82,6 +99,7 @@ const PrivateAssetPackDialog = ({
           const profile = await getUserPublicProfile(sellerId);
           setAssetPackDetails(details);
           setSellerPublicProfile(profile);
+          setSelectedPreviewImageUrl(details.previewImageUrls[0]);
         } catch (error) {
           if (error.response && error.response.status === 404) {
             setErrorText(
@@ -128,7 +146,9 @@ const PrivateAssetPackDialog = ({
                   <PlaceholderLoader />
                 </Column>
               </>
-            ) : assetPackDetails && sellerPublicProfile ? (
+            ) : assetPackDetails &&
+              sellerPublicProfile &&
+              selectedPreviewImageUrl ? (
               <>
                 <Column noMargin>
                   <Text size="title">{name}</Text>
@@ -144,7 +164,20 @@ const PrivateAssetPackDialog = ({
                 </Column>
                 <ResponsiveLineStackLayout noColumnMargin noMargin>
                   <Column useFullHeight expand>
-                    Salut
+                    <CorsAwareImage
+                      style={styles.previewImage}
+                      src={selectedPreviewImageUrl}
+                      alt={`Preview image of asset pack ${name}`}
+                    />
+                    <Line>
+                      {assetPackDetails.previewImageUrls.map(url => (
+                        <CorsAwareImage
+                          src={url}
+                          style={styles.previewImageCarouselItem}
+                          alt={`Preview image of asset pack ${name}`}
+                        />
+                      ))}
+                    </Line>
                   </Column>
                   <Column useFullHeight expand noMargin>
                     <Paper

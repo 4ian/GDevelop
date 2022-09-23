@@ -22,7 +22,7 @@ export const getInstancesInLayoutForObject = (
   };
   // $FlowFixMe - JSFunctor is incompatible with Functor
   instances.iterateOverInstances(instanceGetter);
-
+  instanceGetter.delete();
   return objectInstances;
 };
 

@@ -75,8 +75,44 @@ export const Default = () => {
     .reply(200, [])
     .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
     .reply(200, []);
+  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
+  assetServiceMock
+    .onGet(
+      `${GDevelopAssetApi.baseUrl}/asset-pack/${privateAssetPackListingData.id}`
+    )
+    .reply(200, privateAssetPackDetails)
+    .onAny()
+    .reply(config => {
+      console.error(`Unexpected call to ${config.url} (${config.method})`);
+      return [504, null];
+    });
+
+  return (
+    <PrivateAssetPackDialog
+      privateAssetPack={privateAssetPackListingData}
+      onClose={() => action('close')()}
+    />
+  );
+};
+export const Loading = () => {
+  const axiosMock = new MockAdapter(axios, { delayResponse: 10000 });
+  axiosMock
+    .onGet(
+      `${GDevelopUserApi.baseUrl}/user-public-profile/${
+        privateAssetPackListingData.sellerId
+      }`
+    )
+    .reply(200, sellerPublicProfile)
+    .onGet(
+      `${GDevelopUserApi.baseUrl}/user/${
+        privateAssetPackListingData.sellerId
+      }/badge`
+    )
+    .reply(200, [])
+    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
+    .reply(200, []);
   const assetServiceMock = new MockAdapter(assetApiAxiosClient, {
-    delayResponse: 2000,
+    delayResponse: 10000,
   });
   assetServiceMock
     .onGet(
@@ -114,9 +150,7 @@ export const With404 = () => {
     .reply(200, [])
     .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
     .reply(200, []);
-  const assetServiceMock = new MockAdapter(assetApiAxiosClient, {
-    delayResponse: 2000,
-  });
+  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
   assetServiceMock
     .onGet(
       `${GDevelopAssetApi.baseUrl}/asset-pack/${privateAssetPackListingData.id}`
@@ -153,9 +187,7 @@ export const WithUnknownError = () => {
     .reply(200, [])
     .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
     .reply(200, []);
-  const assetServiceMock = new MockAdapter(assetApiAxiosClient, {
-    delayResponse: 2000,
-  });
+  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
   assetServiceMock
     .onGet(
       `${GDevelopAssetApi.baseUrl}/asset-pack/${privateAssetPackListingData.id}`

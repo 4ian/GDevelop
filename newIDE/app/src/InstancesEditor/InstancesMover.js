@@ -2,9 +2,10 @@
 import { roundPosition } from '../Utils/GridHelpers';
 import Rectangle from '../Utils/Rectangle';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
+import { type InstanceMeasurer } from './InstancesRenderer';
 
 export default class InstancesMover {
-  instanceMeasurer: any;
+  instanceMeasurer: InstanceMeasurer;
   instancesEditorSettings: InstancesEditorSettings;
   instancePositions: { [number]: { x: number, y: number } };
   totalDeltaX: number;
@@ -18,7 +19,7 @@ export default class InstancesMover {
     instanceMeasurer,
     instancesEditorSettings,
   }: {
-    instanceMeasurer: any,
+    instanceMeasurer: InstanceMeasurer,
     instancesEditorSettings: InstancesEditorSettings,
   }) {
     this.instanceMeasurer = instanceMeasurer;

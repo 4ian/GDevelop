@@ -47,6 +47,7 @@ import {
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
+import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -109,6 +110,7 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
+  onSelectAllInstancesOfObjectInLayout?: string => void,
   onDeleteObject: (
     objectWithContext: ObjectWithContext,
     cb: (boolean) => void
@@ -521,6 +523,11 @@ export default class ObjectsList extends React.Component<Props, State> {
     index: number
   ) => {
     const { object } = objectWithContext;
+    const { layout, onSelectAllInstancesOfObjectInLayout } = this.props;
+    const instanceCountOnScene = layout
+      ? getInstanceCountInLayoutForObject(layout, object.getName())
+      : undefined;
+
     const objectMetadata = gd.MetadataProvider.getObjectMetadata(
       this.props.project.getCurrentPlatform(),
       object.getType()
@@ -543,6 +550,15 @@ export default class ObjectsList extends React.Component<Props, State> {
         label: i18n._(t`Duplicate`),
         click: () => this._duplicateObject(objectWithContext),
       },
+      instanceCountOnScene !== undefined && onSelectAllInstancesOfObjectInLayout
+        ? {
+            label: i18n._(
+              t`Select instances on scene (${instanceCountOnScene})`
+            ),
+            click: () => onSelectAllInstancesOfObjectInLayout(object.getName()),
+            enabled: instanceCountOnScene > 0,
+          }
+        : undefined,
       { type: 'separator' },
       {
         label: i18n._(t`Edit object`),
@@ -598,7 +614,7 @@ export default class ObjectsList extends React.Component<Props, State> {
         label: i18n._(t`Add a new object...`),
         click: () => this.onAddNewObject(),
       },
-    ];
+    ].filter(Boolean);
   };
 
   _onObjectModified = (shouldForceUpdateList: boolean) => {

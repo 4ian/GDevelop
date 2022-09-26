@@ -122,6 +122,7 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
         '\n' +
         convertMarkdownToDokuWikiMarkdown(extension.description) +
         '\n' +
+        (helpPageUrl ? `\n[[${helpPageUrl}|Read more...]]\n` : ``) +
         generateExtensionFooterText(extension.fullName);
 
       const extensionReferenceFilePath = path.join(

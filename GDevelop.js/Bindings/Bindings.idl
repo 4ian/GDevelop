@@ -2321,6 +2321,8 @@ interface EventsBasedObject {
     [Const, Ref] DOMString GetName();
     [Ref] EventsBasedObject SetFullName([Const] DOMString fullName);
     [Const, Ref] DOMString GetFullName();
+    [Ref] EventsBasedObject SetDefaultName([Const] DOMString defaultName);
+    [Const, Ref] DOMString GetDefaultName();
 
     [Ref] EventsFunctionsContainer GetEventsFunctions();
     [Ref] NamedPropertyDescriptorsList GetPropertyDescriptors();

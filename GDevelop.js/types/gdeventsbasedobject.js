@@ -7,6 +7,8 @@ declare class gdEventsBasedObject extends gdObjectsContainer {
   getName(): string;
   setFullName(fullName: string): gdEventsBasedObject;
   getFullName(): string;
+  setDefaultName(defaultName: string): gdEventsBasedObject;
+  getDefaultName(): string;
   getEventsFunctions(): gdEventsFunctionsContainer;
   getPropertyDescriptors(): gdNamedPropertyDescriptorsList;
   serializeTo(element: gdSerializerElement): void;

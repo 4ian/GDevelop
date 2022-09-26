@@ -39,7 +39,7 @@ export default function makeRenderer(iconPath: string) {
     static getThumbnail(
       project: gdProject,
       resourcesLoader: Class<ResourcesLoader>,
-      object: gdObject
+      objectConfiguration: gdObjectConfiguration
     ) {
       return iconPath;
     }

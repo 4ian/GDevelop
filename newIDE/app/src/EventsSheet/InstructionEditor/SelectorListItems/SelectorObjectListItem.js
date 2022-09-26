@@ -48,7 +48,7 @@ export const renderObjectListItem = ({
           iconSize={iconSize}
           src={ObjectsRenderingService.getThumbnail(
             project,
-            objectWithContext.object
+            objectWithContext.object.getConfiguration()
           )}
         />
       }

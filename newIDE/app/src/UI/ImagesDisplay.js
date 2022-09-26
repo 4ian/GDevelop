@@ -1,8 +1,12 @@
 // @flow
-import { CardMedia, Grid, makeStyles } from '@material-ui/core';
+import CardMedia from '@material-ui/core/CardMedia';
+import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@material-ui/core/styles';
 import * as React from 'react';
 import { CorsAwareImage } from './CorsAwareImage';
 import { Line, Column } from './Grid';
+import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
+import Text from './Text';
 
 const styles = {
   mainImage: {
@@ -26,7 +30,7 @@ const styles = {
   },
 };
 
-const useStyles = makeStyles({
+const useStylesForGridContainer = makeStyles({
   'spacing-xs-1': {
     marginLeft: 0,
     marginRight: 0,
@@ -45,8 +49,9 @@ type Props = {|
 
 const ImagesDisplay = ({ imagesUrls }: Props) => {
   const [selectedImageIndex, setSelectedImageIndex] = React.useState<number>(0);
+  const windowWidth = useResponsiveWindowWidth();
 
-  const classes = useStyles();
+  const classesForGridContainer = useStylesForGridContainer();
 
   return (
     <Column noMargin>
@@ -55,35 +60,41 @@ const ImagesDisplay = ({ imagesUrls }: Props) => {
         src={imagesUrls[selectedImageIndex]}
         alt={``}
       />
-      <Line>
-        <Grid
-          classes={classes}
-          container
-          spacing={1}
-          wrap="nowrap"
-          style={styles.grid}
-        >
-          {imagesUrls.map((url, index) => (
-            <Grid item key={url}>
-              <CardMedia
-                onClick={() => setSelectedImageIndex(index)}
-                style={{
-                  ...styles.carouselItem,
-                  outline:
-                    index === selectedImageIndex
-                      ? 'solid 1px white'
-                      : undefined,
-                }}
-              >
-                <CorsAwareImage
-                  src={url}
-                  style={styles.imageCarouselItem}
-                  alt={``}
-                />
-              </CardMedia>
-            </Grid>
-          ))}
-        </Grid>
+      <Line justifyContent="center">
+        {windowWidth === 'small' ? (
+          <Text noMargin size="body2">
+            {selectedImageIndex + 1}/{imagesUrls.length}
+          </Text>
+        ) : (
+          <Grid
+            classes={classesForGridContainer}
+            container
+            spacing={1}
+            wrap="nowrap"
+            style={styles.grid}
+          >
+            {imagesUrls.map((url, index) => (
+              <Grid item key={url}>
+                <CardMedia
+                  onClick={() => setSelectedImageIndex(index)}
+                  style={{
+                    ...styles.carouselItem,
+                    outline:
+                      index === selectedImageIndex
+                        ? 'solid 1px white'
+                        : undefined,
+                  }}
+                >
+                  <CorsAwareImage
+                    src={url}
+                    style={styles.imageCarouselItem}
+                    alt={``}
+                  />
+                </CardMedia>
+              </Grid>
+            ))}
+          </Grid>
+        )}
       </Line>
     </Column>
   );

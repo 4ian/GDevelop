@@ -24,6 +24,7 @@ import Mark from '../UI/CustomSvgIcons/Mark';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import { Paper } from '@material-ui/core';
 import ImagesDisplay from '../UI/ImagesDisplay';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 type Props = {|
   privateAssetPack: PrivateAssetPackListingData,
@@ -74,6 +75,7 @@ const PrivateAssetPackDialog = ({
     setSellerPublicProfile,
   ] = React.useState<?UserPublicProfile>(null);
   const [errorText, setErrorText] = React.useState<?string>(null);
+  const windowWidth = useResponsiveWindowWidth();
 
   React.useEffect(
     () => {
@@ -145,8 +147,15 @@ const PrivateAssetPackDialog = ({
                   </Text>
                 </Column>
                 <ResponsiveLineStackLayout noColumnMargin noMargin>
-                  <Column useFullHeight expand noMargin noOverflowParent>
-                    <ImagesDisplay imagesUrls={assetPackDetails.previewImageUrls} />
+                  <Column
+                    useFullHeight
+                    expand={windowWidth !== 'small'}
+                    noMargin
+                    noOverflowParent
+                  >
+                    <ImagesDisplay
+                      imagesUrls={assetPackDetails.previewImageUrls}
+                    />
                   </Column>
                   <Column useFullHeight expand noMargin>
                     <Paper

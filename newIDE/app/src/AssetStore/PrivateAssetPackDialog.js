@@ -51,10 +51,6 @@ const contentTypeToMessageDescriptor = {
   partial: t`Other`,
 };
 
-const styles = {
-  descriptionContainer: { padding: 30 },
-};
-
 const PrivateAssetPackDialog = ({
   privateAssetPack: { id, name, description, sellerId },
   onClose,
@@ -160,69 +156,71 @@ const PrivateAssetPackDialog = ({
                   <Column useFullHeight expand noMargin>
                     <Paper
                       variant="outlined"
-                      style={styles.descriptionContainer}
+                      style={{ padding: windowWidth === 'small' ? 20 : 30 }}
                     >
-                      <LargeSpacer />
-                      <Text noMargin>{assetPackDetails.longDescription}</Text>
-                      <LargeSpacer />
-                      <ResponsiveLineStackLayout noMargin noColumnMargin>
-                        <Column noMargin expand>
-                          <Text size="sub-title">
-                            <Trans>Content</Trans>
-                          </Text>
-                          {sortedContentType.map(type => {
-                            if (assetPackDetails.content[type]) {
-                              return (
-                                <li key={type}>
-                                  <Text displayInlineAsSpan noMargin>
-                                    {assetPackDetails.content[type]}{' '}
-                                    {i18n._(
-                                      contentTypeToMessageDescriptor[type]
-                                    )}
-                                    {assetPackDetails.content[type] > 1
-                                      ? 's' // TODO: find a better way to pluralize
-                                      : ''}
-                                  </Text>
-                                </li>
-                              );
-                            }
-                            return null;
-                          })}
-                        </Column>
-                        <Column noMargin expand>
-                          <Text size="sub-title">
-                            <Trans>Licensing</Trans>
-                          </Text>
-                          <Line noMargin alignItems="center">
-                            <Mark fontSize="small" />
-                            <Spacer />
-                            <Text displayInlineAsSpan noMargin>
-                              <Trans>Personal projects</Trans>
+                      <Column noMargin>
+                        <LargeSpacer /> {/* To be replaced by prices */}
+                        <Text noMargin>{assetPackDetails.longDescription}</Text>
+                        <LargeSpacer />
+                        <ResponsiveLineStackLayout noMargin noColumnMargin>
+                          <Column noMargin expand>
+                            <Text size="sub-title">
+                              <Trans>Content</Trans>
                             </Text>
-                          </Line>
-                          <Line noMargin alignItems="center">
-                            <Mark fontSize="small" />
-                            <Spacer />
-                            <Text displayInlineAsSpan noMargin>
-                              <Trans>Professional projects</Trans>
+                            {sortedContentType.map(type => {
+                              if (assetPackDetails.content[type]) {
+                                return (
+                                  <li key={type}>
+                                    <Text displayInlineAsSpan noMargin>
+                                      {assetPackDetails.content[type]}{' '}
+                                      {i18n._(
+                                        contentTypeToMessageDescriptor[type]
+                                      )}
+                                      {assetPackDetails.content[type] > 1
+                                        ? 's' // TODO: find a better way to pluralize
+                                        : ''}
+                                    </Text>
+                                  </li>
+                                );
+                              }
+                              return null;
+                            })}
+                          </Column>
+                          <Column noMargin expand>
+                            <Text size="sub-title">
+                              <Trans>Licensing</Trans>
                             </Text>
-                          </Line>
-                          <Line noMargin alignItems="center">
-                            <Mark fontSize="small" />
-                            <Spacer />
-                            <Text displayInlineAsSpan noMargin>
-                              <Trans>Asset modification</Trans>
-                            </Text>
-                          </Line>
-                          <Line noMargin alignItems="center">
-                            <Cross fontSize="small" />
-                            <Spacer />
-                            <Text displayInlineAsSpan noMargin>
-                              <Trans>Redistribution &amp; reselling</Trans>
-                            </Text>
-                          </Line>
-                        </Column>
-                      </ResponsiveLineStackLayout>
+                            <Line noMargin alignItems="center">
+                              <Mark fontSize="small" />
+                              <Spacer />
+                              <Text displayInlineAsSpan noMargin>
+                                <Trans>Personal projects</Trans>
+                              </Text>
+                            </Line>
+                            <Line noMargin alignItems="center">
+                              <Mark fontSize="small" />
+                              <Spacer />
+                              <Text displayInlineAsSpan noMargin>
+                                <Trans>Professional projects</Trans>
+                              </Text>
+                            </Line>
+                            <Line noMargin alignItems="center">
+                              <Mark fontSize="small" />
+                              <Spacer />
+                              <Text displayInlineAsSpan noMargin>
+                                <Trans>Asset modification</Trans>
+                              </Text>
+                            </Line>
+                            <Line noMargin alignItems="center">
+                              <Cross fontSize="small" />
+                              <Spacer />
+                              <Text displayInlineAsSpan noMargin>
+                                <Trans>Redistribution &amp; reselling</Trans>
+                              </Text>
+                            </Line>
+                          </Column>
+                        </ResponsiveLineStackLayout>
+                      </Column>
                     </Paper>
                   </Column>
                 </ResponsiveLineStackLayout>

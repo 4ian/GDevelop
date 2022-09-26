@@ -2321,6 +2321,8 @@ interface EventsBasedObject {
     [Const, Ref] DOMString GetName();
     [Ref] EventsBasedObject SetFullName([Const] DOMString fullName);
     [Const, Ref] DOMString GetFullName();
+    [Ref] EventsBasedObject SetDefaultName([Const] DOMString defaultName);
+    [Const, Ref] DOMString GetDefaultName();
 
     [Ref] EventsFunctionsContainer GetEventsFunctions();
     [Ref] NamedPropertyDescriptorsList GetPropertyDescriptors();
@@ -2921,7 +2923,14 @@ interface BehaviorCodeGenerator {
     [Const, Value] DOMString GenerateRuntimeBehaviorCompleteCode([Const] DOMString extensionName, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const] DOMString codeNamespace, [Const, Ref] MapStringString behaviorMethodMangledNames, [Ref] SetString includes, boolean compilationForRuntime);
     [Const, Value] DOMString STATIC_GetBehaviorPropertyGetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetBehaviorPropertySetterName([Const] DOMString propertyName);
+};
 
+[Prefix="gdjs::"]
+interface ObjectCodeGenerator {
+    void ObjectCodeGenerator([Ref] Project project);
+    [Const, Value] DOMString GenerateRuntimeObjectCompleteCode([Const] DOMString extensionName, [Const, Ref] EventsBasedObject eventsBasedObject, [Const] DOMString codeNamespace, [Const, Ref] MapStringString objectMethodMangledNames, [Ref] SetString includes, boolean compilationForRuntime);
+    [Const, Value] DOMString STATIC_GetObjectPropertyGetterName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetObjectPropertySetterName([Const] DOMString propertyName);
 };
 
 [Prefix="gdjs::"]

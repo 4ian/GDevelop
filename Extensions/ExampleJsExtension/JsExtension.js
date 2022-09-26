@@ -539,7 +539,7 @@ module.exports = {
     RenderedDummyObjectInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'CppPlatform/Extensions/texticon24.png';
     };

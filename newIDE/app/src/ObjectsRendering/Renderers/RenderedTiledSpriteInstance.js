@@ -49,11 +49,9 @@ export default class RenderedTiledSpriteInstance extends RenderedInstance {
   static getThumbnail(
     project: gdProject,
     resourcesLoader: Class<ResourcesLoader>,
-    object: gdObject
+    objectConfiguration: gdObjectConfiguration
   ) {
-    const tiledSprite = gd.asTiledSpriteConfiguration(
-      object.getConfiguration()
-    );
+    const tiledSprite = gd.asTiledSpriteConfiguration(objectConfiguration);
 
     return ResourcesLoader.getResourceFullUrl(
       project,

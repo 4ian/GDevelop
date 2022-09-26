@@ -627,7 +627,7 @@ module.exports = {
     RenderedBitmapTextInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'JsPlatform/Extensions/bitmapfont24.png';
     };

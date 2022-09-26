@@ -561,7 +561,7 @@ module.exports = {
     RenderedVideoObjectInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'JsPlatform/Extensions/videoicon24.png';
     };

@@ -16,6 +16,8 @@ namespace gdjs {
     let _authenticationWindow: Window | null = null; // For Web.
     let _authenticationInAppWindow: Window | null = null; // For Cordova.
     let _authenticationRootContainer: HTMLDivElement | null = null;
+    let _authenticationLoaderContainer: HTMLDivElement | null = null;
+    let _authenticationTextContainer: HTMLDivElement | null = null;
     let _authenticationBanner: HTMLDivElement | null = null;
     let _authenticationTimeoutId: NodeJS.Timeout | null = null;
 
@@ -35,6 +37,7 @@ namespace gdjs {
 
     const getLocalStorageKey = (gameId: string) =>
       `${gameId}_authenticatedUser`;
+
     const getAuthWindowUrl = ({
       gameId,
       connectionId,
@@ -45,6 +48,18 @@ namespace gdjs {
       `https://liluo.io/auth?gameId=${gameId}${
         connectionId ? `&connectionId=${connectionId}` : ''
       }`;
+
+    /**
+     * Helper returning 'electron', 'cordova' or 'web' depending on the platform.
+     */
+    const getPlatform = (runtimeScene: RuntimeScene) => {
+      const electron = runtimeScene.getGame().getRenderer().getElectron();
+      if (electron) {
+        return 'electron';
+      }
+      if (typeof cordova !== 'undefined') return 'cordova';
+      return 'web';
+    };
 
     /**
      * Returns true if a user token is present in the local storage.
@@ -93,6 +108,38 @@ namespace gdjs {
     };
 
     /**
+     * Returns true if the game is registered, false otherwise.
+     * Useful to display a message to the user to register the game before logging in.
+     */
+    const isGameRegistered = (
+      gameId: string,
+      tries: number = 0
+    ): Promise<boolean> => {
+      const url = `https://api.gdevelop.io/game/public-game/${gameId}`;
+      return fetch(url, { method: 'HEAD' }).then(
+        (response) => {
+          if (response.status !== 200) {
+            logger.warn(
+              `Error while fetching the game: ${response.status} ${response.statusText}`
+            );
+
+            // If the response is not 404, it may be a timeout, so retry a few times.
+            if (response.status === 404 || tries > 2) {
+              return false;
+            }
+
+            return isGameRegistered(gameId, tries + 1);
+          }
+          return true;
+        },
+        (err) => {
+          logger.error('Error while fetching game:', err);
+          return false;
+        }
+      );
+    };
+
+    /**
      * Remove the user information from the local storage.
      */
     export const logout = (runtimeScene: RuntimeScene) => {
@@ -106,16 +153,20 @@ namespace gdjs {
         return;
       }
       window.localStorage.removeItem(getLocalStorageKey(gameId));
-      const onDismissBanner = () => {
-        removeAuthenticationBanner(runtimeScene);
-      };
-      const onOpenAuthenticationWindow = () => {
-        openAuthenticationWindow(runtimeScene);
-      };
-      _authenticationBanner = authComponents.computeNotAuthenticatedBanner(
-        onOpenAuthenticationWindow,
-        onDismissBanner
-      );
+      cleanUpAuthWindowAndCallbacks(runtimeScene);
+      removeAuthenticationBanner(runtimeScene);
+      const domElementContainer = runtimeScene
+        .getGame()
+        .getRenderer()
+        .getDomElementContainer();
+      if (!domElementContainer) {
+        handleAuthenticationError(
+          runtimeScene,
+          "The div element covering the game couldn't be found, the authentication banner cannot be displayed."
+        );
+        return;
+      }
+      authComponents.displayLoggedOutNotification(domElementContainer);
     };
 
     /**
@@ -378,7 +429,6 @@ namespace gdjs {
           const messageContent = JSON.parse(event.data);
           switch (messageContent.type) {
             case 'authenticationResult': {
-              console.log('Received player token');
               const messageData = messageContent.data;
               handleLoggedInEvent(
                 runtimeScene,
@@ -402,7 +452,19 @@ namespace gdjs {
                 .getGame()
                 .getRenderer()
                 .getElectron();
-              electron.shell.openExternal(targetUrl);
+              const openWindow = () => electron.shell.openExternal(targetUrl);
+
+              openWindow();
+
+              // Add the link to the window in case a popup blocker is preventing the window from opening.
+              if (_authenticationTextContainer) {
+                authComponents.addAuthenticationUrlToTextsContainer(
+                  openWindow,
+                  _authenticationTextContainer
+                );
+              }
+
+              break;
             }
           }
         }
@@ -457,11 +519,17 @@ namespace gdjs {
       const left = screen.width / 2 - 500 / 2;
       const top = screen.height / 2 - 600 / 2;
       const windowFeatures = `left=${left},top=${top},width=500,height=600`;
-      _authenticationWindow = window.open(
-        targetUrl,
-        'authentication',
-        windowFeatures
-      );
+      const openWindow = () =>
+        window.open(targetUrl, 'authentication', windowFeatures);
+      _authenticationWindow = openWindow();
+
+      // Add the link to the window in case a popup blocker is preventing the window from opening.
+      if (_authenticationTextContainer) {
+        authComponents.addAuthenticationUrlToTextsContainer(
+          openWindow,
+          _authenticationTextContainer
+        );
+      }
     };
 
     /**
@@ -470,12 +538,6 @@ namespace gdjs {
     export const openAuthenticationWindow = function (
       runtimeScene: gdjs.RuntimeScene
     ) {
-      // If the banner is displayed, hide it, so that it can be shown again if the user closes the window.
-      if (_authenticationBanner) _authenticationBanner.style.opacity = '0';
-      const _gameId = gdjs.projectData.properties.projectUuid;
-
-      startAuthenticationWindowTimeout(runtimeScene);
-
       // Create the authentication container for the player to wait.
       const domElementContainer = runtimeScene
         .getGame()
@@ -488,26 +550,73 @@ namespace gdjs {
         );
         return;
       }
+
       const onAuthenticationContainerDismissed = () => {
         cleanUpAuthWindowAndCallbacks(runtimeScene);
         displayAuthenticationBanner(runtimeScene);
       };
-      const rootContainer = authComponents.computeAuthenticationContainer(
+
+      const _gameId = gdjs.projectData.properties.projectUuid;
+      if (!_gameId) {
+        handleAuthenticationError(
+          runtimeScene,
+          'The game ID is missing, the authentication window cannot be opened.'
+        );
+        return;
+      }
+
+      // If the banner is displayed, hide it, so that it can be shown again if the user closes the window.
+      if (_authenticationBanner) _authenticationBanner.style.opacity = '0';
+
+      const platform = getPlatform(runtimeScene);
+      const {
+        rootContainer,
+        loaderContainer,
+      } = authComponents.computeAuthenticationContainer(
         onAuthenticationContainerDismissed
       );
       _authenticationRootContainer = rootContainer;
+      _authenticationLoaderContainer = loaderContainer;
+
+      // Display the authentication window right away, to show a loader
+      // while the call for game registration is happening.
       domElementContainer.appendChild(_authenticationRootContainer);
 
-      // Based on which platform the game is running, we open the authentication window
-      // with a different window, with or without a websocket.
-      const electron = runtimeScene.getGame().getRenderer().getElectron();
-      if (electron) {
-        openAuthenticationWindowForElectron(runtimeScene, _gameId);
-      } else if (typeof cordova !== 'undefined') {
-        openAuthenticationWindowForCordova(runtimeScene, _gameId);
-      } else {
-        openAuthenticationWindowForWeb(runtimeScene, _gameId);
-      }
+      // If the game is registered, open the authentication window.
+      // Otherwise, open the window indicating that the game is not registered.
+      isGameRegistered(_gameId)
+        .then((isRegistered) => {
+          if (_authenticationLoaderContainer) {
+            _authenticationTextContainer = authComponents.addAuthenticationTextsToLoadingContainer(
+              _authenticationLoaderContainer,
+              platform,
+              isRegistered
+            );
+          }
+          if (isRegistered) {
+            // Based on which platform the game is running, we open the authentication window
+            // with a different window, with or without a websocket.
+            switch (platform) {
+              case 'electron':
+                openAuthenticationWindowForElectron(runtimeScene, _gameId);
+                break;
+              case 'cordova':
+                openAuthenticationWindowForCordova(runtimeScene, _gameId);
+                break;
+              case 'web':
+              default:
+                openAuthenticationWindowForWeb(runtimeScene, _gameId);
+                break;
+            }
+          }
+        })
+        .catch((error) => {
+          handleAuthenticationError(
+            runtimeScene,
+            'Error while checking if the game is registered.'
+          );
+          console.error(error);
+        });
     };
 
     /**
@@ -552,6 +661,8 @@ namespace gdjs {
       }
 
       _authenticationRootContainer = null;
+      _authenticationLoaderContainer = null;
+      _authenticationTextContainer = null;
     };
 
     /**

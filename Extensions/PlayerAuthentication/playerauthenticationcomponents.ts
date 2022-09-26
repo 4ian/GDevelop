@@ -1,12 +1,39 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Player Authentication');
   export namespace playerAuthenticationComponents {
+    const getMessages = ({
+      platform,
+      registered,
+    }: {
+      platform: 'cordova' | 'electron' | 'web';
+      registered: boolean;
+    }) =>
+      registered
+        ? {
+            title: 'Logging in...',
+            text1:
+              platform === 'cordova'
+                ? "One moment, we're opening a window for you to log in."
+                : "One moment, we're opening a new page with your web browser for you to log in.",
+            text2:
+              'If the window did not open, please check your pop-up blocker and click the button below to try again.',
+          }
+        : {
+            title: 'Your game is not registered!',
+            text1:
+              'In order to use player authentication, this game must be registered with GDevelop Services first.',
+            text2: 'Head to your Game Dashboard, then try again.',
+          };
+
     /**
-     * Creates a DOM element that will contain the loader or the authentication iframe.
+     * Creates a DOM element that will contain the loader or a message if the game is not registered.
      */
     export const computeAuthenticationContainer = function (
       onCloseAuthenticationContainer: () => void
-    ): HTMLDivElement {
+    ): {
+      rootContainer: HTMLDivElement;
+      loaderContainer: HTMLDivElement;
+    } {
       const rootContainer = document.createElement('div');
       rootContainer.id = 'authentication-root-container';
       rootContainer.style.position = 'relative';
@@ -56,17 +83,14 @@ namespace gdjs {
       loaderContainer.style.width = '100%';
       loaderContainer.style.justifyContent = 'center';
       loaderContainer.style.alignItems = 'center';
-      loaderContainer.style.position = 'relative';
-      loaderContainer.style.zIndex = '3';
-      loaderContainer.style.fontSize = '11pt';
-      loaderContainer.style.fontFamily =
-        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
+
       const _loader = document.createElement('img');
       _loader.setAttribute('width', '28px');
       _loader.setAttribute(
         'src',
         'data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iYW5pbWF0ZS1zcGluIC1tbC0xIG1yLTMgaC01IHctNSB0ZXh0LXdoaXRlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyNCAyNCI+CjxjaXJjbGUgb3BhY2l0eT0nMC4yNScgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSI0Ij48L2NpcmNsZT4KPHBhdGggb3BhY2l0eT0nMC43NScgZmlsbD0iY3VycmVudENvbG9yIiBkPSJNNCAxMmE4IDggMCAwMTgtOFYwQzUuMzczIDAgMCA1LjM3MyAwIDEyaDR6bTIgNS4yOTFBNy45NjIgNy45NjIgMCAwMTQgMTJIMGMwIDMuMDQyIDEuMTM1IDUuODI0IDMgNy45MzhsMy0yLjY0N3oiPjwvcGF0aD4KPC9zdmc+'
       );
+      _loader.style.marginTop = '50px';
       try {
         _loader.animate(
           [{ transform: 'rotate(0deg)' }, { transform: 'rotate(359deg)' }],
@@ -78,25 +102,81 @@ namespace gdjs {
       } catch {
         logger.warn('Animation not supported, loader will be fixed.');
       }
-      const title = document.createElement('h1');
-      title.innerText = 'Logging in...';
-      title.style.fontSize = '20pt';
-      title.style.fontWeight = 'bold';
-      const text1 = document.createElement('p');
-      text1.innerText = "We're opening another page for you to log in. ";
-      const text2 = document.createElement('p');
-      text2.innerText = "It's alright, we'll wait until you're done.";
-      text2.style.marginBottom = '50px';
-      loaderContainer.appendChild(title);
-      loaderContainer.appendChild(text1);
-      loaderContainer.appendChild(text2);
+
       loaderContainer.appendChild(_loader);
 
       subContainer.appendChild(_closeContainer);
       subContainer.appendChild(loaderContainer);
       rootContainer.appendChild(subContainer);
 
-      return rootContainer;
+      return { rootContainer, loaderContainer };
+    };
+
+    /**
+     * Helper to add the texts to the authentication container
+     * based on the platform or if the game is registered.
+     */
+    export const addAuthenticationTextsToLoadingContainer = (
+      loaderContainer: HTMLDivElement,
+      platform,
+      isRegistered
+    ) => {
+      const textContainer: HTMLDivElement = document.createElement('div');
+      textContainer.id = 'authentication-container-texts';
+      textContainer.style.display = 'flex';
+      textContainer.style.flexDirection = 'column';
+      textContainer.style.width = '100%';
+      textContainer.style.justifyContent = 'center';
+      textContainer.style.alignItems = 'center';
+      textContainer.style.position = 'relative';
+      textContainer.style.zIndex = '3';
+      textContainer.style.fontSize = '11pt';
+      textContainer.style.fontFamily =
+        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
+
+      const messages = getMessages({
+        platform,
+        registered: isRegistered,
+      });
+      const title = document.createElement('h1');
+      title.innerText = messages.title;
+      title.style.fontSize = '20pt';
+      title.style.fontWeight = 'bold';
+      const text1 = document.createElement('p');
+      text1.innerText = messages.text1;
+      const text2 = document.createElement('p');
+      text2.innerText = messages.text2;
+      textContainer.appendChild(title);
+      textContainer.appendChild(text1);
+      textContainer.appendChild(text2);
+
+      if (!isRegistered) {
+        // Remove the loader.
+        loaderContainer.innerHTML = '';
+      }
+
+      loaderContainer.prepend(textContainer);
+
+      return textContainer;
+    };
+
+    /**
+     * Helper to add the authentication link in case the window hasn't opened properly.
+     * Useful for Electron & Web platforms.
+     */
+    export const addAuthenticationUrlToTextsContainer = (
+      onClick: () => void,
+      textContainer: HTMLDivElement
+    ) => {
+      const link = document.createElement('a');
+      addTouchAndClickEventListeners(link, onClick);
+      link.innerText = 'Click here to authenticate';
+      link.style.color = '#0078d4';
+      link.style.textDecoration = 'none';
+      link.style.textDecoration = 'underline';
+      link.style.cursor = 'pointer';
+
+      textContainer.appendChild(link);
     };
 
     /**
@@ -237,6 +317,21 @@ namespace gdjs {
         'authenticated-notification',
         `<img style="margin-right:4px" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOSIgaGVpZ2h0PSI5IiB2aWV3Qm94PSIwIDAgOSA5IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNNC4xNjY2NyAwQzEuODY2NjcgMCAwIDEuODY2NjcgMCA0LjE2NjY3QzAgNi40NjY2NyAxLjg2NjY3IDguMzMzMzMgNC4xNjY2NyA4LjMzMzMzQzYuNDY2NjcgOC4zMzMzMyA4LjMzMzMzIDYuNDY2NjcgOC4zMzMzMyA0LjE2NjY3QzguMzMzMzMgMS44NjY2NyA2LjQ2NjY3IDAgNC4xNjY2NyAwWk0zLjMzMzMzIDYuMjVMMS4yNSA0LjE2NjY3TDEuODM3NSAzLjU3OTE3TDMuMzMzMzMgNS4wNzA4M0w2LjQ5NTgzIDEuOTA4MzNMNy4wODMzMyAyLjVMMy4zMzMzMyA2LjI1WiIgZmlsbD0iIzAwQ0M4MyIvPgo8L3N2Zz4K" />
               Logged as ${username}`,
+        'success'
+      );
+    };
+
+    /**
+     * Create, display, and hide the logged in confirmation.
+     */
+    export const displayLoggedOutNotification = function (
+      domContainer: HTMLDivElement
+    ) {
+      showNotification(
+        domContainer,
+        'authenticated-notification',
+        `<img style="margin-right:4px" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOSIgaGVpZ2h0PSI5IiB2aWV3Qm94PSIwIDAgOSA5IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNNC4xNjY2NyAwQzEuODY2NjcgMCAwIDEuODY2NjcgMCA0LjE2NjY3QzAgNi40NjY2NyAxLjg2NjY3IDguMzMzMzMgNC4xNjY2NyA4LjMzMzMzQzYuNDY2NjcgOC4zMzMzMyA4LjMzMzMzIDYuNDY2NjcgOC4zMzMzMyA0LjE2NjY3QzguMzMzMzMgMS44NjY2NyA2LjQ2NjY3IDAgNC4xNjY2NyAwWk0zLjMzMzMzIDYuMjVMMS4yNSA0LjE2NjY3TDEuODM3NSAzLjU3OTE3TDMuMzMzMzMgNS4wNzA4M0w2LjQ5NTgzIDEuOTA4MzNMNy4wODMzMyAyLjVMMy4zMzMzMyA2LjI1WiIgZmlsbD0iIzAwQ0M4MyIvPgo8L3N2Zz4K" />
+              Logged out`,
         'success'
       );
     };

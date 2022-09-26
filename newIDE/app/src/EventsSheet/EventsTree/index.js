@@ -631,7 +631,7 @@ export default class ThemableEventsTree extends Component<
           [icon]: true,
         })}
         alt=""
-        src={getThumbnail(project, object)}
+        src={getThumbnail(project, object.getConfiguration())}
       />
     );
   };

@@ -19,6 +19,7 @@
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunction.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Layout.h"
@@ -129,7 +130,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       codeGenerator,
       codeGenerator.GetCodeNamespaceAccessor() + "func",
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParameters(), false),
+          eventsFunction.GetParameters(), 0, true),
       codeGenerator.GenerateFreeEventsFunctionContext(
           eventsFunction.GetParameters(), "runtimeScene.getOnceTriggers()"),
       eventsFunction.GetEvents(),
@@ -191,7 +192,78 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       codeGenerator,
       fullyQualifiedFunctionName,
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParameters(), true),
+          eventsFunction.GetParameters(), 2, false),
+      fullPreludeCode,
+      eventsFunction.GetEvents(),
+      codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
+
+  includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
+                      codeGenerator.GetIncludeFiles().end());
+  return output;
+}
+
+gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
+    gd::Project& project,
+    const gd::EventsBasedObject& eventsBasedObject,
+    const gd::EventsFunction& eventsFunction,
+    const gd::String& codeNamespace,
+    const gd::String& fullyQualifiedFunctionName,
+    const gd::String& onceTriggersVariable,
+    const gd::String& preludeCode,
+    std::set<gd::String>& includeFiles,
+    bool compilationForRuntime) {
+  gd::ObjectsContainer globalObjectsAndGroups;
+  gd::ObjectsContainer objectsAndGroups;
+  gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
+      project,
+      eventsBasedObject,
+      eventsFunction,
+      globalObjectsAndGroups,
+      objectsAndGroups);
+
+  EventsCodeGenerator codeGenerator(globalObjectsAndGroups, objectsAndGroups);
+  codeGenerator.SetCodeNamespace(codeNamespace);
+  codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+
+  // Generate the code setting up the context of the function.
+  gd::String fullPreludeCode =
+      preludeCode + "\n" + "var that = this;\n" +
+      // runtimeScene is supposed to be always accessible, read
+      // it from the object
+      "var runtimeScene = this._instanceContainer;\n" +
+      // By convention of Object Events Function, the object is accessible
+      // as a parameter called "Object", and thisObjectList is an array
+      // containing it (for faster access, without having to go through the
+      // hashmap).
+      "var thisObjectList = [this];\n" +
+      "var Object = Hashtable.newFrom({Object: thisObjectList});\n";
+      
+      // Add child-objects
+      for (auto &childObject : eventsBasedObject.GetObjects()) {
+        // child-object are never picked because they are not parameters.
+        fullPreludeCode +=
+            "var this" + childObject->GetName() +
+            "List = [...runtimeScene.getObjects(" +
+            ConvertToStringExplicit(childObject->GetName()) + ")];\n" +
+            "var " + childObject->GetName() + " = Hashtable.newFrom({" +
+            childObject->GetName() + ": this" + childObject->GetName() +
+            "List});\n";
+      }
+
+      fullPreludeCode += codeGenerator.GenerateObjectEventsFunctionContext(
+          eventsBasedObject,
+          eventsFunction.GetParameters(),
+          onceTriggersVariable,
+          // Pass the names of the parameters considered as the current
+          // object and behavior parameters:
+          "Object");
+
+  gd::String output = GenerateEventsListCompleteFunctionCode(
+      codeGenerator,
+      fullyQualifiedFunctionName,
+      codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
+        // TODO EBO use constants for firstParameterIndex
+          eventsFunction.GetParameters(), 1, false),
       fullPreludeCode,
       eventsFunction.GetEvents(),
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
@@ -203,11 +275,12 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
     const vector<gd::ParameterMetadata>& parameters,
-    bool isBehaviorEventsFunction) {
-  gd::String declaration = isBehaviorEventsFunction ? "" : "runtimeScene";
+    int firstParameterIndex,
+    bool addsSceneParameter) {
+  gd::String declaration = addsSceneParameter ? "runtimeScene" : "";
   for (size_t i = 0; i < parameters.size(); ++i) {
     const auto& parameter = parameters[i];
-    if (isBehaviorEventsFunction && (i == 0 || i == 1)) {
+    if (i < firstParameterIndex) {
       // By convention, the first two arguments of a behavior events function
       // are the object and the behavior, which are not passed to the called
       // function in the generated JS code.
@@ -292,6 +365,43 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionContext(
                                        behaviorNamesMap,
                                        thisObjectName,
                                        thisBehaviorName);
+}
+
+gd::String EventsCodeGenerator::GenerateObjectEventsFunctionContext(
+    const gd::EventsBasedObject& eventsBasedObject,
+    const vector<gd::ParameterMetadata>& parameters,
+    const gd::String& onceTriggersVariable,
+    const gd::String& thisObjectName) {
+  // See the comment at the start of the GenerateEventsFunctionContext function
+
+  gd::String objectsGettersMap;
+  gd::String objectArraysMap;
+  gd::String behaviorNamesMap;
+
+  // If we have an object considered as the current object ("this") (usually
+  // called Object in behavior events function), generate a slightly more
+  // optimized getter for it (bypassing "Object" hashmap, and directly return
+  // the array containing it).
+  if (!thisObjectName.empty()) {
+    objectsGettersMap +=
+        ConvertToStringExplicit(thisObjectName) + ": " + thisObjectName + "\n";
+    objectArraysMap +=
+        ConvertToStringExplicit(thisObjectName) + ": thisObjectList\n";
+    
+    // Add child-objects
+    for (auto &childObject : eventsBasedObject.GetObjects()) {
+      // child-object are never picked because they are not parameters.
+      objectsGettersMap += ", " + ConvertToStringExplicit(childObject->GetName()) + ": " + childObject->GetName() + "\n";
+      objectArraysMap += ", " + ConvertToStringExplicit(childObject->GetName()) + ": this" + childObject->GetName() + "List\n";
+    }
+  }
+
+  return GenerateEventsFunctionContext(parameters,
+                                       onceTriggersVariable,
+                                       objectsGettersMap,
+                                       objectArraysMap,
+                                       behaviorNamesMap,
+                                       thisObjectName);
 }
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
@@ -379,7 +489,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // can be different between the parameter name vs the actual behavior
          // name passed as argument).
          "  getBehaviorName: function(behaviorName) {\n" +
-         "    return eventsFunctionContext._behaviorNamesMap[behaviorName];\n"
+         // TODO EBO Handle behavior name collision between parameters and children
+         "    return eventsFunctionContext._behaviorNamesMap[behaviorName] || behaviorName;\n"
          "  },\n" +
          // Creator function that will be used to create new objects. We
          // need to check if the function was given the context of the calling

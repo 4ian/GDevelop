@@ -76,23 +76,25 @@ namespace gdjs {
     ];
   }
 
+  // TODO EBO Rewrite this behavior to use standard method to step.
+  // This could also fix layer time scale that seems to be ignored.
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
     private _tweens: Record<string, TweenRuntimeBehavior.TweenInstance> = {};
     private _runtimeScene: gdjs.RuntimeScene;
     private _isActive: boolean = true;
 
     /**
-     * @param runtimeScene The runtime scene the behavior belongs to.
+     * @param instanceContainer The instance container the behavior belongs to.
      * @param behaviorData The data to initialize the behavior
      * @param owner The runtime object the behavior belongs to.
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData: BehaviorData,
       owner: gdjs.RuntimeObject
     ) {
-      super(runtimeScene, behaviorData, owner);
-      this._runtimeScene = runtimeScene;
+      super(instanceContainer, behaviorData, owner);
+      this._runtimeScene = instanceContainer.getScene();
     }
 
     updateFromBehaviorData(

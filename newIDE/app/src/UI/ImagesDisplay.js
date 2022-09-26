@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import * as React from 'react';
 import { CorsAwareImage } from './CorsAwareImage';
 import { Line, Column } from './Grid';
+import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 import Text from './Text';
 
@@ -74,7 +75,18 @@ const ImagesDisplay = ({ imagesUrls }: Props) => {
             style={styles.grid}
           >
             {imagesUrls.map((url, index) => (
-              <Grid item key={url}>
+              <Grid
+                item
+                key={url}
+                tabIndex={0}
+                onKeyPress={(
+                  event: SyntheticKeyboardEvent<HTMLLIElement>
+                ): void => {
+                  if (shouldValidate(event)) {
+                    setSelectedImageIndex(index);
+                  }
+                }}
+              >
                 <CardMedia
                   onClick={() => setSelectedImageIndex(index)}
                   style={{

@@ -3,12 +3,12 @@ namespace gdjs {
   export namespace playerAuthenticationComponents {
     const getPlayerLoginMessages = ({
       platform,
-      registered,
+      isGameRegistered,
     }: {
       platform: 'cordova' | 'electron' | 'web';
-      registered: boolean;
+      isGameRegistered: boolean;
     }) =>
-      registered
+      isGameRegistered
         ? {
             title: 'Logging in...',
             text1:
@@ -136,7 +136,7 @@ namespace gdjs {
 
       const messages = getPlayerLoginMessages({
         platform,
-        registered: isGameRegistered,
+        isGameRegistered,
       });
       const title = document.createElement('h1');
       title.innerText = messages.title;

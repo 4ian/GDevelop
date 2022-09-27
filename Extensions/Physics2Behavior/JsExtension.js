@@ -3816,6 +3816,23 @@ module.exports = {
     gd /*: libGDevelop */,
     extension /*: gdPlatformExtension*/
   ) {
-    return [];
+    const dummyBehavior = extension
+      .getBehaviorMetadata('Physics2::Physics2Behavior')
+      .get();
+    const sharedData = extension
+      .getBehaviorMetadata('Physics2::Physics2Behavior')
+      .getSharedDataInstance();
+    return [
+      gd.ProjectHelper.sanityCheckBehaviorProperty(
+        dummyBehavior,
+        'density',
+        '123'
+      ),
+      gd.ProjectHelper.sanityCheckBehaviorsSharedDataProperty(
+        sharedData,
+        'gravityY',
+        '456'
+      ),
+    ];
   },
 };

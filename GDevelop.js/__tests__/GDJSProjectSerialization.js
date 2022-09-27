@@ -49,6 +49,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
     }
+    serializerElement.delete();
   });
 
   it('should keep TiledSpriteObject configuration after a save and reload', function () {
@@ -84,6 +85,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
     }
+    serializerElement.delete();
   });
 
   it('should keep PanelSpriteObject configuration after a save and reload', function () {
@@ -119,6 +121,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
     }
+    serializerElement.delete();
   });
 
   it('should keep ShapePainterObject configuration after a save and reload', function () {
@@ -155,6 +158,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
     }
+    serializerElement.delete();
   });
 
   it('should keep ParticleEmitterObject configuration after a save and reload', function () {
@@ -190,5 +194,112 @@ describe('libGD.js - GDJS project serialization tests', function () {
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
     }
+    serializerElement.delete();
+  });
+
+  it('should set behavior properties default values', function () {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+    const behavior = object.addNewBehavior(
+      project,
+      'FakeBehaviorWithSharedData::DummyBehaviorWithSharedData',
+      'DummyBehaviorWithSharedData'
+    );
+
+    expect(behavior.getProperties().get('MyBehaviorProperty').getValue()).toBe(
+      'Initial value 1'
+    );
+  });
+
+  it('should keep behavior properties values after a save and reload', function () {
+    const checkConfiguration = (project) => {
+      const layout = project.getLayout('Scene');
+      const object = layout.getObject('MyObject');
+      const behavior = object.getBehavior('DummyBehaviorWithSharedData');
+      expect(
+        behavior.getProperties().get('MyBehaviorProperty').getValue()
+      ).toBe('123');
+    };
+
+    const serializerElement = new gd.SerializerElement();
+    {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const layout = project.insertNewLayout('Scene', 0);
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      const behavior = object.addNewBehavior(
+        project,
+        'FakeBehaviorWithSharedData::DummyBehaviorWithSharedData',
+        'DummyBehaviorWithSharedData'
+      );
+      behavior.updateProperty('MyBehaviorProperty', '123');
+
+      checkConfiguration(project);
+      project.serializeTo(serializerElement);
+    }
+    {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      project.unserializeFrom(serializerElement);
+      checkConfiguration(project);
+    }
+    serializerElement.delete();
+  });
+
+  it('should set behavior shared properties default values', function () {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+    const behavior = object.addNewBehavior(
+      project,
+      'FakeBehaviorWithSharedData::DummyBehaviorWithSharedData',
+      'DummyBehaviorWithSharedData'
+    );
+    layout.updateBehaviorsSharedData(project);
+    const sharedData = layout.getBehaviorSharedData(
+      'DummyBehaviorWithSharedData'
+    );
+
+    expect(sharedData.getProperties().get('MySharedProperty').getValue()).toBe(
+      'Initial shared value 1'
+    );
+  });
+
+  it('should keep behavior shared properties values after a save and reload', function () {
+    const checkConfiguration = (project) => {
+      const layout = project.getLayout('Scene');
+      const object = layout.getObject('MyObject');
+      const sharedData = layout.getBehaviorSharedData(
+        'DummyBehaviorWithSharedData'
+      );
+      expect(
+        sharedData.getProperties().get('MySharedProperty').getValue()
+      ).toBe('123');
+    };
+
+    const serializerElement = new gd.SerializerElement();
+    {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const layout = project.insertNewLayout('Scene', 0);
+      const object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      const behavior = object.addNewBehavior(
+        project,
+        'FakeBehaviorWithSharedData::DummyBehaviorWithSharedData',
+        'DummyBehaviorWithSharedData'
+      );
+      layout.updateBehaviorsSharedData(project);
+      const sharedData = layout.getBehaviorSharedData(
+        'DummyBehaviorWithSharedData'
+      );
+      sharedData.updateProperty('MySharedProperty', '123');
+
+      checkConfiguration(project);
+      project.serializeTo(serializerElement);
+    }
+    {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      project.unserializeFrom(serializerElement);
+      checkConfiguration(project);
+    }
+    serializerElement.delete();
   });
 });

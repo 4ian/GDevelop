@@ -7,10 +7,12 @@ namespace gdjs {
     export namespace debuggerTools {
       /**
        * Stop the game execution.
-       * @param runtimeScene - The current scene.
+       * @param instanceContainer - The current scene.
        */
-      export const pause = function (runtimeScene: gdjs.RuntimeScene) {
-        runtimeScene.getGame().pause(true);
+      export const pause = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ) {
+        instanceContainer.getGame().pause(true);
       };
 
       /**

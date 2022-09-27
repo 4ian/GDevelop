@@ -86,7 +86,7 @@ const getAllExtensionAndExtensionShortHeaders = async () => {
 };
 
 
-const getExtensionSectionAndCreatePage = async (extension, extensionShortHeader) => {
+const createExtensionReferencePage = async (extension, extensionShortHeader, isCommunity) => {
   const folderName = getExtensionFolderName(extension.name);
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
   const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;
@@ -103,20 +103,19 @@ const getExtensionSectionAndCreatePage = async (extension, extensionShortHeader)
     '\n' +
     `**Authors and contributors** to this community extension: ${authorNamesWithLinks}.\n` +
     '\n' +
-    `<note warning>
+    (isCommunity ? `<note important>
 This is an extension made by a community member — but not reviewed
 by the GDevelop extension team. As such, we can't guarantee it
 meets all the quality standards of official extensions. It could
 also not be compatible with older GDevelop versions. In case of
 doubt, contact the author to know more about what the extension
 does or inspect its content before using it.
-</note>\n` +
-    '\n' +
+</note>\n\n` : '') +
     '---\n' +
     '\n' +
     convertMarkdownToDokuWikiMarkdown(extension.description) +
     '\n' +
-    (helpPageUrl ? `\n[[${helpPageUrl}|Read more...]]\n` : ``) +
+    (extension.helpPath ? `\n[[${helpPageUrl}|Read more...]]\n` : ``) +
     generateExtensionFooterText(extension.fullName);
 
   const extensionReferenceFilePath = path.join(
@@ -129,6 +128,12 @@ does or inspect its content before using it.
   });
   await fs.writeFile(extensionReferenceFilePath, referencePageContent);
   console.info(`ℹ️ File generated: ${extensionReferenceFilePath}`);
+};
+
+const getExtensionSection = (extension, extensionShortHeader) => {
+  const folderName = getExtensionFolderName(extension.name);
+  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
+  const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;
 
   return (
     '### ' +
@@ -161,17 +166,22 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
 
 `;
 
-    const reviewedExtensionsAndExtensionShortHeaders = extensionsAndExtensionShortHeaders.filter(extensionShortHeader => extensionShortHeader.tier !== 'community');
-    const communityExtensionsAndExtensionShortHeaders = extensionsAndExtensionShortHeaders.filter(extensionShortHeader => extensionShortHeader.tier === 'community');
+    const reviewedExtensionsAndExtensionShortHeaders =
+        extensionsAndExtensionShortHeaders.filter(
+          pair => pair.extensionShortHeader.tier !== 'community');
+    const communityExtensionsAndExtensionShortHeaders =
+        extensionsAndExtensionShortHeaders.filter(
+          pair => pair.extensionShortHeader.tier === 'community');
 
-    indexPageContent += '### Reviewed extensions\n';
+    indexPageContent += '## Reviewed extensions\n';
     for (const {
       extension,
       extensionShortHeader,
     } of reviewedExtensionsAndExtensionShortHeaders) {
-      indexPageContent += await getExtensionSectionAndCreatePage(extension, extensionShortHeader);
+      indexPageContent += getExtensionSection(extension, extensionShortHeader);
+      await createExtensionReferencePage(extension, extensionShortHeader, false);
     }
-    indexPageContent += `### Community extensions
+    indexPageContent += `## Community extensions
 
 The following extensions are made by community members — but not reviewed
 by the GDevelop extension team. As such, we can't guarantee it
@@ -184,7 +194,8 @@ does or inspect its content before using it.
       extension,
       extensionShortHeader,
     } of communityExtensionsAndExtensionShortHeaders) {
-      indexPageContent += await getExtensionSectionAndCreatePage(extension, extensionShortHeader);
+      indexPageContent += getExtensionSection(extension, extensionShortHeader);
+      await createExtensionReferencePage(extension, extensionShortHeader, true);
     }
 
     indexPageContent += `

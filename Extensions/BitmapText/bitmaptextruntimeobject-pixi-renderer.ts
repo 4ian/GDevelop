@@ -10,7 +10,7 @@ namespace gdjs {
 
     /**
      * @param runtimeObject The object to render
-     * @param instanceContainer The gdjs.RuntimeScene in which the object is
+     * @param instanceContainer The container in which the object is
      */
     constructor(
       runtimeObject: gdjs.BitmapTextRuntimeObject,
@@ -59,7 +59,8 @@ namespace gdjs {
 
     onDestroy() {
       // Mark the font from the object as not used anymore.
-      this._object._runtimeScene
+      this._object
+        .getInstanceContainer()
         .getGame()
         .getBitmapFontManager()
         .releaseBitmapFont(this._pixiObject.fontName);
@@ -73,7 +74,8 @@ namespace gdjs {
 
     updateFont(): void {
       // Get the new bitmap font to use
-      const bitmapFont = this._object._runtimeScene
+      const bitmapFont = this._object
+        .getInstanceContainer()
         .getGame()
         .getBitmapFontManager()
         .obtainBitmapFont(
@@ -82,7 +84,8 @@ namespace gdjs {
         );
 
       // Mark the old font as not used anymore
-      this._object._runtimeScene
+      this._object
+        .getInstanceContainer()
         .getGame()
         .getBitmapFontManager()
         .releaseBitmapFont(this._pixiObject.fontName);

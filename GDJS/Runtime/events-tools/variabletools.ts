@@ -85,10 +85,10 @@ namespace gdjs {
        * @private
        */
       export const globalVariableExists = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         variableName: string
       ): boolean {
-        return runtimeScene.getGame().getVariables().has(variableName);
+        return instanceContainer.getGame().getVariables().has(variableName);
       };
 
       /**

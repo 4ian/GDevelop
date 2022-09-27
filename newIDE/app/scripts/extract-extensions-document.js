@@ -106,8 +106,7 @@ const createExtensionReferencePage = async (extension, extensionShortHeader, isC
     (isCommunity ? `<note important>
 This is an extension made by a community member — but not reviewed
 by the GDevelop extension team. As such, we can't guarantee it
-meets all the quality standards of official extensions. It could
-also not be compatible with older GDevelop versions. In case of
+meets all the quality standards of official extensions. In case of
 doubt, contact the author to know more about what the extension
 does or inspect its content before using it.
 </note>\n\n` : '') +

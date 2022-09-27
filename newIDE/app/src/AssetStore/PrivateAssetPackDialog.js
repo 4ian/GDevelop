@@ -70,7 +70,7 @@ const PrivateAssetPackDialog = ({
     sellerPublicProfile,
     setSellerPublicProfile,
   ] = React.useState<?UserPublicProfile>(null);
-  const [errorText, setErrorText] = React.useState<?string>(null);
+  const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const windowWidth = useResponsiveWindowWidth();
 
   React.useEffect(
@@ -85,10 +85,13 @@ const PrivateAssetPackDialog = ({
         } catch (error) {
           if (error.response && error.response.status === 404) {
             setErrorText(
-              'Asset pack not found - An error occurred, please try again later.'
+              <Trans>
+                Asset pack not found - An error occurred, please try again
+                later.
+              </Trans>
             );
           } else {
-            setErrorText('Unknown error');
+            setErrorText(<Trans>Unknown error</Trans>);
           }
         } finally {
           setIsFetchingDetails(false);

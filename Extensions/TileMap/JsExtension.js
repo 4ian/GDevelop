@@ -1007,7 +1007,7 @@ module.exports = {
     RenderedTileMapInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'JsPlatform/Extensions/tile_map.svg';
     };
@@ -1249,7 +1249,7 @@ module.exports = {
      RenderedCollisionMaskInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'JsPlatform/Extensions/tile_map_collision_mask24.svg';
     };

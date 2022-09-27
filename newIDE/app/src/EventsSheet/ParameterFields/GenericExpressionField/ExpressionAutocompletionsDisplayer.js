@@ -157,7 +157,7 @@ const DisplayedObjectAutocompletion = React.forwardRef(
       project && expressionAutocompletion.object
         ? ObjectsRenderingService.getThumbnail(
             project,
-            expressionAutocompletion.object
+            expressionAutocompletion.object.getConfiguration()
           )
         : 'res/types/object.png';
 

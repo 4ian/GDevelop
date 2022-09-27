@@ -59,9 +59,15 @@ const GRID_SPACING = 1;
 
 type Props = {|
   imagesUrls: Array<string>,
+  /**
+   * Alt text inserted for each image tag.
+   * The string `{imageIndex}` will be replaced with image actual index.
+   * For instance: "Asset pack preview image {imageIndex}"
+   */
+  altTextTemplate: string,
 |};
 
-const ImagesDisplay = ({ imagesUrls }: Props) => {
+const ImagesDisplay = ({ imagesUrls, altTextTemplate }: Props) => {
   const [selectedImageIndex, setSelectedImageIndex] = React.useState<number>(0);
   const windowWidth = useResponsiveWindowWidth();
 
@@ -166,7 +172,10 @@ const ImagesDisplay = ({ imagesUrls }: Props) => {
                             (mobileGridClientWidth - 30) / // Width kept for user to see that there's an image afterwards
                             (16 / 9),
                         }}
-                        alt={``}
+                        alt={altTextTemplate.replace(
+                          /{imageIndex}/g,
+                          String(selectedImageIndex + 1)
+                        )}
                       />
                     </CardMedia>
                   </Grid>
@@ -188,7 +197,10 @@ const ImagesDisplay = ({ imagesUrls }: Props) => {
       <CorsAwareImage
         style={styles.mainImage}
         src={imagesUrls[selectedImageIndex]}
-        alt={``}
+        alt={altTextTemplate.replace(
+          /{imageIndex}/g,
+          String(selectedImageIndex + 1)
+        )}
       />
       <Line>
         <Grid

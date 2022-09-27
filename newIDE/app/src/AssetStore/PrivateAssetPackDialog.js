@@ -151,6 +151,7 @@ const PrivateAssetPackDialog = ({
                   >
                     <ImagesDisplay
                       imagesUrls={assetPackDetails.previewImageUrls}
+                      altTextTemplate={`Asset pack ${name} preview image {imageIndex}`}
                     />
                   </Column>
                   <Column useFullHeight expand noMargin>

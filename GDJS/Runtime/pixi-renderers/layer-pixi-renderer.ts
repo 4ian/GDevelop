@@ -27,20 +27,22 @@ namespace gdjs {
 
     /**
      * @param layer The layer
-     * @param runtimeSceneRenderer The scene renderer
+     * @param runtimeInstanceContainerRenderer The scene renderer
      */
     constructor(
       layer: gdjs.Layer,
-      runtimeSceneRenderer: gdjs.RuntimeInstanceContainerRenderer,
+      runtimeInstanceContainerRenderer: gdjs.RuntimeInstanceContainerRenderer,
       pixiRenderer: PIXI.Renderer | null
     ) {
       this._pixiContainer = new PIXI.Container();
       this._layer = layer;
-      this._runtimeSceneRenderer = runtimeSceneRenderer;
+      this._runtimeSceneRenderer = runtimeInstanceContainerRenderer;
       this._pixiRenderer = pixiRenderer;
       this._isLightingLayer = layer.isLightingLayer();
       this._clearColor = layer.getClearColor();
-      runtimeSceneRenderer.getRendererObject().addChild(this._pixiContainer);
+      runtimeInstanceContainerRenderer
+        .getRendererObject()
+        .addChild(this._pixiContainer);
       this._pixiContainer.filters = [];
       if (this._isLightingLayer) {
         this._replaceContainerWithSprite();

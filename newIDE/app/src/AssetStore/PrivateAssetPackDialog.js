@@ -42,13 +42,13 @@ const sortedContentType = [
 ];
 
 const contentTypeToMessageDescriptor = {
-  sprite: { one: t`Sprite`, other: t`Sprites` },
-  '9patch': { one: t`Panel sprite`, other: t`Panel sprites` },
-  tiled: { one: t`Tiled sprite`, other: t`Tiled sprites` },
-  particleEmitter: { one: t`Particle emitter`, other: t`Particle emitters` },
-  font: { one: t`Font`, other: t`Fonts` },
-  audio: { one: t`Audio`, other: t`Audios` },
-  partial: { one: t`Other`, other: t`Other` },
+  sprite: t`Sprites`,
+  '9patch': t`Panel sprites`,
+  tiled: t`Tiled sprites`,
+  particleEmitter: t`Particle emitters`,
+  font: t`Fonts`,
+  audio: t`Audios`,
+  partial: t`Other`,
 };
 
 const PrivateAssetPackDialog = ({
@@ -178,17 +178,9 @@ const PrivateAssetPackDialog = ({
                                   <li key={type}>
                                     <Text displayInlineAsSpan noMargin>
                                       {assetPackDetails.content[type]}{' '}
-                                      {i18n.plural({
-                                        value: assetPackDetails.content[type],
-                                        one: i18n._(
-                                          contentTypeToMessageDescriptor[type]
-                                            .one
-                                        ),
-                                        other: i18n._(
-                                          contentTypeToMessageDescriptor[type]
-                                            .other
-                                        ),
-                                      })}
+                                      {i18n._(
+                                        contentTypeToMessageDescriptor[type]
+                                      )}
                                     </Text>
                                   </li>
                                 );

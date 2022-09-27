@@ -48,7 +48,7 @@ const privateAssetPackDetails = {
     '9patch': 7,
     particleEmitter: 2,
     font: 1,
-    partial: 2
+    partial: 2,
   },
   previewImageUrls: [
     'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',

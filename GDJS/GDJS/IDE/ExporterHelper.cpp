@@ -825,7 +825,7 @@ void ExporterHelper::ExportObjectAndBehaviorsIncludes(
         }
       };
 
-  // TODO UsedExtensionsFinder should be used instead.
+  // TODO UsedExtensionsFinder should be used instead to find the file to include.
   // The Exporter class already use it.
   addObjectsIncludeFiles(project);
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {

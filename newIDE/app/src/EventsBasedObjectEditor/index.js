@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 
 import * as React from 'react';
 import TextField from '../UI/TextField';
@@ -12,6 +13,9 @@ import EventBasedObjectChildrenEditor from './EventBasedObjectChildrenEditor';
 import { ColumnStackLayout } from '../UI/Layout';
 import { Line } from '../UI/Grid';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
+import { showWarningBox } from '../UI/Messages/MessageBox';
+
+const gd: libGDevelop = global.gd;
 
 type TabName = 'configuration' | 'properties' | 'children';
 
@@ -105,6 +109,34 @@ export default class EventsBasedObjectEditor extends React.Component<
                 fullWidth
                 rows={3}
               />
+              <I18n>
+                {({ i18n }) => (
+                  <SemiControlledTextField
+                    commitOnBlur
+                    floatingLabelText={
+                      <Trans>Default name for created objects</Trans>
+                    }
+                    value={
+                      eventsBasedObject.getDefaultName() ||
+                      eventsBasedObject.getName()
+                    }
+                    onChange={text => {
+                      if (!gd.Project.validateName(text)) {
+                        showWarningBox(
+                          i18n._(
+                            t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
+                          ),
+                          { delayToNextTick: true }
+                        );
+                        return false;
+                      }
+                      eventsBasedObject.setDefaultName(text);
+                      this.forceUpdate();
+                    }}
+                    fullWidth
+                  />
+                )}
+              </I18n>
               {eventsBasedObject
                 .getEventsFunctions()
                 .getEventsFunctionsCount() === 0 && (

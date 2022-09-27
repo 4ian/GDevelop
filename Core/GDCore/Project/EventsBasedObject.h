@@ -38,6 +38,19 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public Ob
    */
   EventsBasedObject* Clone() const { return new EventsBasedObject(*this); };
 
+  /**
+   * \brief Get the default name for created objects.
+   */
+  const gd::String& GetDefaultName() const { return defaultName; };
+
+  /**
+   * \brief Set the default name for created objects.
+   */
+  EventsBasedObject& SetDefaultName(const gd::String& defaultName_) {
+    defaultName = defaultName_;
+    return *this;
+  }
+
   EventsBasedObject& SetDescription(const gd::String& description_) override {
     AbstractEventsBasedEntity::SetDescription(description_);
     return *this;
@@ -65,6 +78,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public Ob
                        const SerializerElement& element) override;
 
  private:
+  gd::String defaultName;
 };
 
 }  // namespace gd

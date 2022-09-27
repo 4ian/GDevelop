@@ -189,8 +189,11 @@ export default class ObjectsList extends React.Component<Props, State> {
       onObjectSelected,
     } = this.props;
 
+    const defaultName = project.hasEventsBasedObject(objectType)
+      ? 'New' + project.getEventsBasedObject(objectType).getDefaultName()
+      : objectTypeToDefaultName[objectType] || 'NewObject';
     const name = newNameGenerator(
-      objectTypeToDefaultName[objectType] || 'NewObject',
+      defaultName,
       name =>
         objectsContainer.hasObjectNamed(name) || project.hasObjectNamed(name)
     );

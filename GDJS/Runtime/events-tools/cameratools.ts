@@ -4,218 +4,221 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  // TODO EBO Replace instanceContainer by instanceContainer.
   export namespace evtTools {
     export namespace camera {
       export const setCameraX = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         x: float,
         layer: string,
         cameraId: integer
       ) {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return;
         }
-        runtimeScene.getLayer(layer).setCameraX(x, cameraId);
+        instanceContainer.getLayer(layer).setCameraX(x, cameraId);
       };
 
       export const setCameraY = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         y: float,
         layer: string,
         cameraId: integer
       ) {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return;
         }
-        runtimeScene.getLayer(layer).setCameraY(y, cameraId);
+        instanceContainer.getLayer(layer).setCameraY(y, cameraId);
       };
 
       export const getCameraX = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         cameraId: integer
       ): number {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return 0;
         }
-        return runtimeScene.getLayer(layer).getCameraX();
+        return instanceContainer.getLayer(layer).getCameraX();
       };
 
       export const getCameraY = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         cameraId: integer
       ): number {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return 0;
         }
-        return runtimeScene.getLayer(layer).getCameraY();
+        return instanceContainer.getLayer(layer).getCameraY();
       };
 
       export const getCameraWidth = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         cameraId: integer
       ): number {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return 0;
         }
-        return runtimeScene.getLayer(layer).getCameraWidth();
+        return instanceContainer.getLayer(layer).getCameraWidth();
       };
 
       export const getCameraHeight = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         cameraId: integer
       ): number {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return 0;
         }
-        return runtimeScene.getLayer(layer).getCameraHeight();
+        return instanceContainer.getLayer(layer).getCameraHeight();
       };
 
       export const getCameraBorderLeft = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         cameraId: integer
       ): number {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return 0;
         }
         return (
-          getCameraX(runtimeScene, layer, cameraId) -
-          getCameraWidth(runtimeScene, layer, cameraId) / 2
+          getCameraX(instanceContainer, layer, cameraId) -
+          getCameraWidth(instanceContainer, layer, cameraId) / 2
         );
       };
 
       export const getCameraBorderRight = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         cameraId: integer
       ): number {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return 0;
         }
         return (
-          getCameraX(runtimeScene, layer, cameraId) +
-          getCameraWidth(runtimeScene, layer, cameraId) / 2
+          getCameraX(instanceContainer, layer, cameraId) +
+          getCameraWidth(instanceContainer, layer, cameraId) / 2
         );
       };
 
       export const getCameraBorderTop = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         cameraId: integer
       ): number {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return 0;
         }
         return (
-          getCameraY(runtimeScene, layer, cameraId) -
-          getCameraHeight(runtimeScene, layer, cameraId) / 2
+          getCameraY(instanceContainer, layer, cameraId) -
+          getCameraHeight(instanceContainer, layer, cameraId) / 2
         );
       };
 
       export const getCameraBorderBottom = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         cameraId: integer
       ): number {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return 0;
         }
         return (
-          getCameraY(runtimeScene, layer, cameraId) +
-          getCameraHeight(runtimeScene, layer, cameraId) / 2
+          getCameraY(instanceContainer, layer, cameraId) +
+          getCameraHeight(instanceContainer, layer, cameraId) / 2
         );
       };
 
       export const showLayer = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string
       ) {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return;
         }
-        return runtimeScene.getLayer(layer).show(true);
+        return instanceContainer.getLayer(layer).show(true);
       };
 
       export const hideLayer = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string
       ) {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return;
         }
-        return runtimeScene.getLayer(layer).show(false);
+        return instanceContainer.getLayer(layer).show(false);
       };
 
       export const layerIsVisible = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string
       ): boolean {
         return (
-          runtimeScene.hasLayer(layer) &&
-          runtimeScene.getLayer(layer).isVisible()
+          instanceContainer.hasLayer(layer) &&
+          instanceContainer.getLayer(layer).isVisible()
         );
       };
 
       export const setCameraRotation = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         rotation: float,
         layer: string,
         cameraId: integer
       ) {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return;
         }
-        return runtimeScene
+        return instanceContainer
           .getLayer(layer)
           .setCameraRotation(rotation, cameraId);
       };
 
       export const getCameraRotation = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         cameraId: integer
       ): number {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return 0;
         }
-        return runtimeScene.getLayer(layer).getCameraRotation(cameraId);
+        return instanceContainer.getLayer(layer).getCameraRotation(cameraId);
       };
 
       export const getCameraZoom = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         cameraId: integer
       ): number {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return 0;
         }
-        return runtimeScene.getLayer(layer).getCameraZoom(cameraId);
+        return instanceContainer.getLayer(layer).getCameraZoom(cameraId);
       };
 
       export const setCameraZoom = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         newZoom: float,
         layer: string,
         cameraId: integer
       ) {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return;
         }
-        return runtimeScene.getLayer(layer).setCameraZoom(newZoom, cameraId);
+        return instanceContainer
+          .getLayer(layer)
+          .setCameraZoom(newZoom, cameraId);
       };
 
       export const centerCamera = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         object: gdjs.RuntimeObject | null,
         anticipateMove: boolean,
         layerName: string,
         cameraId: integer
       ) {
-        if (!runtimeScene.hasLayer(layerName) || object == null) {
+        if (!instanceContainer.hasLayer(layerName) || object == null) {
           return;
         }
         let xOffset = 0;
@@ -223,11 +226,11 @@ namespace gdjs {
         if (anticipateMove && !object.hasNoForces()) {
           const objectAverageForce = object.getAverageForce();
           const elapsedTimeInSeconds =
-            object.getElapsedTime(runtimeScene) / 1000;
+            object.getElapsedTime(instanceContainer) / 1000;
           xOffset = objectAverageForce.getX() * elapsedTimeInSeconds;
           yOffset = objectAverageForce.getY() * elapsedTimeInSeconds;
         }
-        const layer = runtimeScene.getLayer(layerName);
+        const layer = instanceContainer.getLayer(layerName);
         layer.setCameraX(object.getCenterXInScene() + xOffset, cameraId);
         layer.setCameraY(object.getCenterYInScene() + yOffset, cameraId);
       };
@@ -236,7 +239,7 @@ namespace gdjs {
        * @deprecated prefer using centerCamera and clampCamera.
        */
       export const centerCameraWithinLimits = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         object: gdjs.RuntimeObject | null,
         left: number,
         top: number,
@@ -246,9 +249,15 @@ namespace gdjs {
         layerName: string,
         cameraId: integer
       ) {
-        centerCamera(runtimeScene, object, anticipateMove, layerName, cameraId);
+        centerCamera(
+          instanceContainer,
+          object,
+          anticipateMove,
+          layerName,
+          cameraId
+        );
         clampCamera(
-          runtimeScene,
+          instanceContainer,
           left,
           top,
           right,
@@ -259,7 +268,7 @@ namespace gdjs {
       };
 
       export const clampCamera = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         left: float,
         top: float,
         right: float,
@@ -267,10 +276,10 @@ namespace gdjs {
         layerName: string,
         cameraId: integer
       ) {
-        if (!runtimeScene.hasLayer(layerName)) {
+        if (!instanceContainer.hasLayer(layerName)) {
           return;
         }
-        const layer = runtimeScene.getLayer(layerName);
+        const layer = instanceContainer.getLayer(layerName);
         const cameraHalfWidth = layer.getCameraWidth(cameraId) / 2;
         const cameraHalfHeight = layer.getCameraHeight(cameraId) / 2;
 
@@ -304,150 +313,152 @@ namespace gdjs {
 
       /**
        * Update a layer effect parameter (with a number).
-       * @param runtimeScene The scene
+       * @param instanceContainer The scene
        * @param layer The name of the layer
        * @param effect The name of the effect
        * @param parameter The parameter to update
        * @param value The new value
        */
       export const setLayerEffectDoubleParameter = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         effect: string,
         parameter: string,
         value: float
       ) {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return;
         }
-        return runtimeScene
+        return instanceContainer
           .getLayer(layer)
           .setEffectDoubleParameter(effect, parameter, value);
       };
 
       /**
        * Update a layer effect parameter (with a string).
-       * @param runtimeScene The scene
+       * @param instanceContainer The scene
        * @param layer The name of the layer
        * @param effect The name of the effect
        * @param parameter The parameter to update
        * @param value The new value
        */
       export const setLayerEffectStringParameter = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         effect: string,
         parameter: string,
         value: string
       ) {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return;
         }
-        return runtimeScene
+        return instanceContainer
           .getLayer(layer)
           .setEffectStringParameter(effect, parameter, value);
       };
 
       /**
        * Enable or disable a layer effect parameter (boolean).
-       * @param runtimeScene The scene
+       * @param instanceContainer The scene
        * @param layer The name of the layer
        * @param effect The name of the effect
        * @param parameter The parameter to update
        * @param value The new value
        */
       export const setLayerEffectBooleanParameter = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         effect: string,
         parameter: string,
         value: boolean
       ) {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return;
         }
-        return runtimeScene
+        return instanceContainer
           .getLayer(layer)
           .setEffectBooleanParameter(effect, parameter, value);
       };
 
       /**
        * Enable, or disable, an effect of a layer.
-       * @param runtimeScene The scene
+       * @param instanceContainer The scene
        * @param layer The name of the layer
        * @param effect The name of the effect
        * @param enabled true to enable, false to disable.
        */
       export const enableLayerEffect = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         effect: string,
         enabled: boolean
       ) {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return;
         }
-        runtimeScene.getLayer(layer).enableEffect(effect, enabled);
+        instanceContainer.getLayer(layer).enableEffect(effect, enabled);
       };
 
       /**
        * Check if an effect is enabled.
-       * @param runtimeScene The scene
+       * @param instanceContainer The scene
        * @param layer The name of the layer
        * @param effect The name of the effect
        * @return true if the effect is enabled, false otherwise.
        */
       export const layerEffectEnabled = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         effect: string
       ): boolean {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return true;
         }
-        return runtimeScene.getLayer(layer).isEffectEnabled(effect);
+        return instanceContainer.getLayer(layer).isEffectEnabled(effect);
       };
 
       export const setLayerTimeScale = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         timeScale: float
       ) {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return;
         }
-        return runtimeScene.getLayer(layer).setTimeScale(timeScale);
+        return instanceContainer.getLayer(layer).setTimeScale(timeScale);
       };
 
       export const getLayerTimeScale = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string
       ): number {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return 1;
         }
-        return runtimeScene.getLayer(layer).getTimeScale();
+        return instanceContainer.getLayer(layer).getTimeScale();
       };
 
       export const setLayerDefaultZOrder = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         defaultZOrder: integer
       ) {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return;
         }
-        return runtimeScene.getLayer(layer).setDefaultZOrder(defaultZOrder);
+        return instanceContainer
+          .getLayer(layer)
+          .setDefaultZOrder(defaultZOrder);
       };
 
       export const getLayerDefaultZOrder = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string
       ): number {
-        if (!runtimeScene.hasLayer(layer)) {
+        if (!instanceContainer.hasLayer(layer)) {
           return 0;
         }
-        return runtimeScene.getLayer(layer).getDefaultZOrder();
+        return instanceContainer.getLayer(layer).getDefaultZOrder();
       };
 
       /**
@@ -456,13 +467,13 @@ namespace gdjs {
        * @param rgbColor The color, in RGB format ("128;200;255").
        */
       export const setLayerAmbientLightColor = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         layerName: string,
         rgbColor: string
       ) {
         if (
-          !runtimeScene.hasLayer(layerName) ||
-          !runtimeScene.getLayer(layerName).isLightingLayer()
+          !instanceContainer.hasLayer(layerName) ||
+          !instanceContainer.getLayer(layerName).isLightingLayer()
         ) {
           return;
         }
@@ -470,7 +481,7 @@ namespace gdjs {
         if (colors.length < 3) {
           return;
         }
-        return runtimeScene
+        return instanceContainer
           .getLayer(layerName)
           .setClearColor(
             parseInt(colors[0], 10),

@@ -50,7 +50,7 @@ namespace gdjs {
     _renderer: gdjs.BitmapTextRuntimeObjectPixiRenderer;
 
     /**
-     * @param instanceContainer The scene the object belongs to.
+     * @param instanceContainer The container the object belongs to.
      * @param objectData The object data used to initialize the object
      */
     constructor(
@@ -137,8 +137,8 @@ namespace gdjs {
       }
     }
 
-    onDestroyFromScene(runtimeScene: gdjs.RuntimeScene): void {
-      super.onDestroyFromScene(runtimeScene);
+    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+      super.onDestroyFromScene(instanceContainer);
       this._renderer.onDestroy();
     }
 

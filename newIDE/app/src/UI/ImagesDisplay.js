@@ -176,7 +176,7 @@ const ImagesDisplay = ({
           }}
         >
           {({ contentRect, measureRef }) => (
-            <div ref={measureRef}>
+            <div style={{ display: 'flex' }} ref={measureRef}>
               <Grid
                 classes={classesForGridContainer}
                 container

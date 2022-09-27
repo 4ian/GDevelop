@@ -4,8 +4,10 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  const logger = new gdjs.Logger('RuntimeScene');
-  const setupWarningLogger = new gdjs.Logger('RuntimeScene (setup warnings)');
+  const logger = new gdjs.Logger('CustomRuntimeObject');
+  const setupWarningLogger = new gdjs.Logger(
+    'CustomRuntimeObject (setup warnings)'
+  );
 
   /**
    * The instance container of a custom object, containing instances of objects rendered on screen.
@@ -182,7 +184,7 @@ namespace gdjs {
 
     _destroy() {
       // It should not be necessary to reset these variables, but this help
-      // ensuring that all memory related to the RuntimeScene is released immediately.
+      // ensuring that all memory related to the container is released immediately.
       super._destroy();
       // @ts-ignore We are deleting the object
       this._onceTriggers = null;

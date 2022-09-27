@@ -156,7 +156,7 @@ namespace gdjs {
     /**
      * Set the texture of the panel sprite.
      * @param textureName The name of the texture.
-     * @param instanceContainer The scene the object lives in.
+     * @param instanceContainer The container the object lives in.
      */
     setTexture(
       textureName: string,

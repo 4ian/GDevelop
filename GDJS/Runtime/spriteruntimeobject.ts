@@ -288,9 +288,6 @@ namespace gdjs {
 
   /**
    * The SpriteRuntimeObject represents an object that can display images.
-   *
-   * @param runtimeScene The scene the object belongs to
-   * @param spriteObjectData The object data used to initialize the object
    */
   export class SpriteRuntimeObject extends gdjs.RuntimeObject {
     _currentAnimation: number = 0;
@@ -321,6 +318,10 @@ namespace gdjs {
     _renderer: gdjs.SpriteRuntimeObjectRenderer;
     _animationFrameDirty: any;
 
+    /**
+     * @param instanceContainer The container the object belongs to
+     * @param spriteObjectData The object data used to initialize the object
+     */
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       spriteObjectData: ObjectData & SpriteObjectDataType
@@ -347,7 +348,7 @@ namespace gdjs {
 
     reinitialize(spriteObjectData: SpriteObjectData) {
       super.reinitialize(spriteObjectData);
-      const runtimeScene = this._runtimeScene;
+      const instanceContainer = this._instanceContainer;
       this._currentAnimation = 0;
       this._currentDirection = 0;
       this._currentFrame = 0;
@@ -366,13 +367,13 @@ namespace gdjs {
         const animData = spriteObjectData.animations[i];
         if (i < this._animations.length) {
           this._animations[i].reinitialize(
-            runtimeScene.getGame().getImageManager(),
+            instanceContainer.getGame().getImageManager(),
             animData
           );
         } else {
           this._animations.push(
             new gdjs.SpriteAnimation(
-              runtimeScene.getGame().getImageManager(),
+              instanceContainer.getGame().getImageManager(),
               animData
             )
           );
@@ -382,7 +383,7 @@ namespace gdjs {
 
       //Make sure to delete already existing animations which are not used anymore.
       this._animationFrame = null;
-      this._renderer.reinitialize(this, runtimeScene);
+      this._renderer.reinitialize(this, instanceContainer);
       this._updateAnimationFrame();
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object reinitialize method.
@@ -393,19 +394,19 @@ namespace gdjs {
       oldObjectData: SpriteObjectData,
       newObjectData: SpriteObjectData
     ): boolean {
-      const runtimeScene = this._runtimeScene;
+      const instanceContainer = this._instanceContainer;
       let i = 0;
       for (const len = newObjectData.animations.length; i < len; ++i) {
         const animData = newObjectData.animations[i];
         if (i < this._animations.length) {
           this._animations[i].reinitialize(
-            runtimeScene.getGame().getImageManager(),
+            instanceContainer.getGame().getImageManager(),
             animData
           );
         } else {
           this._animations.push(
             new gdjs.SpriteAnimation(
-              runtimeScene.getGame().getImageManager(),
+              instanceContainer.getGame().getImageManager(),
               animData
             )
           );

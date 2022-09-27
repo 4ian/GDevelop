@@ -3,6 +3,7 @@ namespace gdjs {
 
   const logger = new gdjs.Logger('Player Authentication');
   const authComponents = gdjs.playerAuthenticationComponents;
+  // TODO EBO Replace runtimeScene to instanceContainer.
   export namespace playerAuthentication {
     // Authentication information.
     let _username: string | null = null;

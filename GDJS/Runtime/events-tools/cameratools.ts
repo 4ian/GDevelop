@@ -4,6 +4,7 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  // TODO EBO Replace runtimeScene by instanceContainer.
   export namespace evtTools {
     export namespace camera {
       export const setCameraX = function (

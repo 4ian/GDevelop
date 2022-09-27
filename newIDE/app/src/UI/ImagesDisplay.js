@@ -1,8 +1,9 @@
 // @flow
+import * as React from 'react';
+import Measure from 'react-measure';
+import { makeStyles } from '@material-ui/core/styles';
 import CardMedia from '@material-ui/core/CardMedia';
 import Grid from '@material-ui/core/Grid';
-import { makeStyles } from '@material-ui/core/styles';
-import * as React from 'react';
 import { CorsAwareImage } from './CorsAwareImage';
 import { Line, Column } from './Grid';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
@@ -26,7 +27,6 @@ const styles = {
     display: 'block',
   },
   mobileImageCarouselItem: {
-    height: 200,
     aspectRatio: '16 / 9',
     display: 'block',
   },
@@ -70,6 +70,10 @@ const ImagesDisplay = ({ imagesUrls }: Props) => {
   const mobileGrid = React.useRef<?HTMLDivElement>(null);
   const isTouching = React.useRef<boolean>(false);
 
+  const [
+    mobileGridClientWidth,
+    setMobileGridClientWidth,
+  ] = React.useState<number>(0);
   const [startDragX, setStartDragX] = React.useState(null);
   const [
     mobileGridScrollXWhenTouching,
@@ -132,29 +136,45 @@ const ImagesDisplay = ({ imagesUrls }: Props) => {
   if (windowWidth === 'small') {
     return (
       <Column noMargin>
-        <Grid
-          classes={classesForGridContainer}
-          container
-          spacing={GRID_SPACING}
-          wrap="nowrap"
-          style={styles.mobileGrid}
-          onTouchMove={handleTouchMove}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-          ref={mobileGrid}
+        <Measure
+          bounds
+          onResize={contentRect => {
+            setMobileGridClientWidth(contentRect.bounds.width);
+          }}
         >
-          {imagesUrls.map((url, index) => (
-            <Grid item key={url}>
-              <CardMedia>
-                <CorsAwareImage
-                  src={url}
-                  style={styles.mobileImageCarouselItem}
-                  alt={``}
-                />
-              </CardMedia>
-            </Grid>
-          ))}
-        </Grid>
+          {({ contentRect, measureRef }) => (
+            <div ref={measureRef}>
+              <Grid
+                classes={classesForGridContainer}
+                container
+                spacing={GRID_SPACING}
+                wrap="nowrap"
+                style={styles.mobileGrid}
+                onTouchMove={handleTouchMove}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+                ref={mobileGrid}
+              >
+                {imagesUrls.map((url, index) => (
+                  <Grid item key={url}>
+                    <CardMedia>
+                      <CorsAwareImage
+                        src={url}
+                        style={{
+                          ...styles.mobileImageCarouselItem,
+                          height:
+                            (mobileGridClientWidth - 30) / // Width kept for user to see that there's an image afterwards
+                            (16 / 9),
+                        }}
+                        alt={``}
+                      />
+                    </CardMedia>
+                  </Grid>
+                ))}
+              </Grid>
+            </div>
+          )}
+        </Measure>
         <Line justifyContent="center">
           <Text noMargin size="body2">
             {selectedImageIndex + 1}/{imagesUrls.length}
@@ -163,7 +183,6 @@ const ImagesDisplay = ({ imagesUrls }: Props) => {
       </Column>
     );
   }
-
   return (
     <Column noMargin>
       <CorsAwareImage

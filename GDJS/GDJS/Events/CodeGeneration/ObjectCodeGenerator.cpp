@@ -79,14 +79,6 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectCompleteCode(
                       : "",
                   includeFiles,
                   compilationForRuntime);
-
-          // Compatibility with GD <= 5.0 beta 75
-          if (functionName == "onOwnerRemovedFromScene") {
-            runtimeObjectMethodsCode +=
-                GenerateObjectOnDestroyToDeprecatedOnOwnerRemovedFromScene(
-                    eventsBasedObject, codeNamespace);
-          }
-          // end of compatibility code
         }
 
         bool hasDoStepPreEventsFunction =
@@ -229,21 +221,6 @@ gd::String ObjectCodeGenerator::GeneratePropertyValueCode(
   }
 
   return "0 /* Error: property was of an unrecognized type */";
-}
-
-gd::String ObjectCodeGenerator::
-    GenerateObjectOnDestroyToDeprecatedOnOwnerRemovedFromScene(
-        const gd::EventsBasedObject& eventsBasedObject,
-        const gd::String& codeNamespace) {
-  return gd::String(R"jscode_template(
-CODE_NAMESPACE.RUNTIME_OBJECT_CLASSNAME.prototype.onDestroy = function() {
-  // Redirect call to onOwnerRemovedFromScene (the old name of onDestroy)
-  if (this.onOwnerRemovedFromScene) this.onOwnerRemovedFromScene();
-};
-)jscode_template")
-      .FindAndReplace("RUNTIME_OBJECT_CLASSNAME",
-                      eventsBasedObject.GetName())
-      .FindAndReplace("CODE_NAMESPACE", codeNamespace);
 }
 
 gd::String ObjectCodeGenerator::GenerateDefaultDoStepPreEventsFunctionCode(

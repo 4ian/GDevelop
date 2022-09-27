@@ -290,6 +290,7 @@ namespace gdjs {
     ): FloatPoint {
       // The result parameter used to be optional.
       let position = result || [0, 0];
+      // TODO EBO use an AffineTransformation to avoid chained calls.
       position = this._runtimeScene.convertCoords(x, y, position);
       return this.applyLayerInverseTransformation(
         position[0],
@@ -329,7 +330,6 @@ namespace gdjs {
       const sinValue = Math.sin(angleInRadians);
       x = cosValue * x - sinValue * y;
       y = sinValue * tmp + cosValue * y;
-      // TODO EBO use an AffineTransformation to avoid chained calls.
       result[0] = x + this.getCameraX(cameraId);
       result[1] = y + this.getCameraY(cameraId);
       return result;
@@ -351,6 +351,7 @@ namespace gdjs {
       result: FloatPoint
     ): FloatPoint {
       let position = result || [0, 0];
+      // TODO EBO use an AffineTransformation to avoid chained calls.
       this.applyLayerTransformation(x, y, cameraId, position);
       return this._runtimeScene.convertInverseCoords(
         position[0],

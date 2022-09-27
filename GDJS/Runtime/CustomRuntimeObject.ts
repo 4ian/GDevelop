@@ -52,10 +52,10 @@ namespace gdjs {
       this._instanceContainer.loadFrom(objectData);
       this.getRenderer().reinitialize(this, parent);
 
+      this.onCreated();
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       // TODO EBO Make generated code call super implementation for life-cycle methods.
       super.onCreated();
-      this.onCreated();
     }
 
     reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
@@ -585,24 +585,6 @@ namespace gdjs {
 
     isFlippedY(): boolean {
       return this._flippedY;
-    }
-
-    // Other :
-    /**
-     * @param obj The target object
-     * @param scene The scene containing the object
-     * @deprecated
-     */
-    turnTowardObject(obj: gdjs.RuntimeObject, scene: gdjs.RuntimeScene) {
-      if (obj === null) {
-        return;
-      }
-      this.rotateTowardPosition(
-        obj.getDrawableX() + obj.getCenterX(),
-        obj.getDrawableY() + obj.getCenterY(),
-        0,
-        scene
-      );
     }
   }
 

@@ -28,6 +28,7 @@ const styles = {
   mobileImageCarouselItem: {
     height: 200,
     aspectRatio: '16 / 9',
+    display: 'block',
   },
   grid: {
     overflowX: 'scroll',
@@ -43,6 +44,7 @@ const useStylesForGridContainer = makeStyles({
   'spacing-xs-1': {
     marginLeft: 0,
     marginRight: 0,
+    // Remove padding for first and last element to keep images aligned on component max width
     '& > .MuiGrid-item:first-child': {
       paddingLeft: 0,
     },
@@ -51,6 +53,9 @@ const useStylesForGridContainer = makeStyles({
     },
   },
 });
+
+const SWIPE_PIXEL_DELTA_TRIGGER = 50;
+const GRID_SPACING = 1;
 
 type Props = {|
   imagesUrls: Array<string>,
@@ -66,7 +71,10 @@ const ImagesDisplay = ({ imagesUrls }: Props) => {
   const isTouching = React.useRef<boolean>(false);
 
   const [startDragX, setStartDragX] = React.useState(null);
-  const [positionX, setPositionX] = React.useState(0);
+  const [
+    mobileGridScrollXWhenTouching,
+    setMobileGridScrollXWhenTouching,
+  ] = React.useState(0);
   const [
     mobileGridScrollXBeforeTouch,
     setMobileGridScrollXBeforeTouch,
@@ -83,35 +91,42 @@ const ImagesDisplay = ({ imagesUrls }: Props) => {
     if (!startDragX) return;
     const endDragX = event.changedTouches[0].clientX;
     const newIndex =
-      startDragX - endDragX > 50
+      startDragX - endDragX > SWIPE_PIXEL_DELTA_TRIGGER
         ? Math.min(selectedImageIndex + 1, imagesUrls.length - 1)
-        : startDragX - endDragX < -50
+        : startDragX - endDragX < -SWIPE_PIXEL_DELTA_TRIGGER
         ? Math.max(selectedImageIndex - 1, 0)
         : selectedImageIndex;
 
     setSelectedImageIndex(newIndex);
     const { current } = mobileGrid;
     if (!current) return;
-    const step = current.scrollWidth / imagesUrls.length;
+    // Compute item width based on container width and spacing between items
+    const itemWidth =
+      (current.scrollWidth - GRID_SPACING * 8 * (imagesUrls.length - 1)) /
+      imagesUrls.length;
+    const newScrollPosition = (itemWidth + GRID_SPACING * 8) * newIndex;
     current.scrollTo({
-      left: newIndex * step,
+      left: newScrollPosition,
       behavior: 'smooth',
     });
-    setMobileGridScrollXBeforeTouch(newIndex * step);
+    setMobileGridScrollXBeforeTouch(newScrollPosition);
   };
 
   const handleTouchMove = (event: TouchEvent) => {
     if (!startDragX) return;
-    const positionX = event.changedTouches[0].clientX;
-    setPositionX(positionX - startDragX - mobileGridScrollXBeforeTouch);
+    const touchXPosition = event.changedTouches[0].clientX;
+    setMobileGridScrollXWhenTouching(
+      touchXPosition - startDragX - mobileGridScrollXBeforeTouch
+    );
   };
 
+  // Scroll element based on touch position only when touching
   React.useEffect(
     () => {
       if (!mobileGrid.current || !isTouching.current) return;
-      mobileGrid.current.scrollTo(-positionX, 0);
+      mobileGrid.current.scrollTo(-mobileGridScrollXWhenTouching, 0);
     },
-    [positionX]
+    [mobileGridScrollXWhenTouching]
   );
 
   if (windowWidth === 'small') {
@@ -120,7 +135,7 @@ const ImagesDisplay = ({ imagesUrls }: Props) => {
         <Grid
           classes={classesForGridContainer}
           container
-          spacing={1}
+          spacing={GRID_SPACING}
           wrap="nowrap"
           style={styles.mobileGrid}
           onTouchMove={handleTouchMove}
@@ -160,7 +175,7 @@ const ImagesDisplay = ({ imagesUrls }: Props) => {
         <Grid
           classes={classesForGridContainer}
           container
-          spacing={1}
+          spacing={GRID_SPACING}
           wrap="nowrap"
           style={styles.grid}
         >

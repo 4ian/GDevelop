@@ -128,7 +128,9 @@ const ImagesDisplay = ({
         GRID_SPACING * 8 * (imagesUrls.length - 1) -
         2 * mobileExtremeItemsPadding) /
       imagesUrls.length;
-    const newScrollPosition = (itemWidth + GRID_SPACING * 8) * newIndex;
+    const newScrollPosition =
+      (itemWidth + GRID_SPACING * 8) * newIndex -
+      (horizontalOuterMarginToEatOnMobile || 0) / 2;
     current.scrollTo({
       left: newScrollPosition,
       behavior: 'smooth',

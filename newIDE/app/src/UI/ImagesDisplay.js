@@ -265,7 +265,10 @@ const ImagesDisplay = ({
                 <CorsAwareImage
                   src={url}
                   style={styles.imageCarouselItem}
-                  alt={``}
+                  alt={altTextTemplate.replace(
+                    /{imageIndex}/g,
+                    String(index + 1)
+                  )}
                 />
               </CardMedia>
             </Grid>

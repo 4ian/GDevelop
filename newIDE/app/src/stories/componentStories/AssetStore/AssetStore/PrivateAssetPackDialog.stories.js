@@ -51,8 +51,12 @@ const privateAssetPackDetails = {
     partial: 2
   },
   previewImageUrls: [
-    'https://resources.gdevelop-app.com/staging/private-assets/French Food/preview1.png',
-    'https://resources.gdevelop-app.com/staging/private-assets/French Food/preview2.png',
+    'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
+    'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
+    'https://resources.gdevelop-app.com/assets/Packs/particles emitter.png',
+    'https://resources.gdevelop-app.com/assets/Packs/lucid icons pack.png',
+    'https://resources.gdevelop-app.com/assets/Packs/wesxdz skullcup.png',
+    'https://resources.gdevelop-app.com/assets/Packs/casual buttons pack.png',
   ],
   updatedAt: '2022-09-15T08:17:59.977Z',
   createdAt: '2022-09-14T12:27:27.173Z',

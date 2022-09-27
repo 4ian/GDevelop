@@ -38,6 +38,13 @@ const styles = {
     overflowX: 'hidden',
     overflowY: 'hidden',
   },
+  flex: {
+    display: 'flex',
+  },
+  flexColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
 };
 
 const SWIPE_PIXEL_DELTA_TRIGGER = 50;
@@ -159,8 +166,7 @@ const ImagesDisplay = ({
     return (
       <div
         style={{
-          display: 'flex',
-          flexDirection: 'column',
+          ...styles.flexColumn,
           marginLeft: horizontalOuterMarginToEatOnMobile
             ? -horizontalOuterMarginToEatOnMobile
             : 0,
@@ -176,7 +182,7 @@ const ImagesDisplay = ({
           }}
         >
           {({ contentRect, measureRef }) => (
-            <div style={{ display: 'flex' }} ref={measureRef}>
+            <div style={styles.flex} ref={measureRef}>
               <Grid
                 classes={classesForGridContainer}
                 container

@@ -10,7 +10,7 @@ namespace gdjs {
 
     /**
      * @param runtimeObject The object to render
-     * @param instanceContainer The gdjs.RuntimeScene in which the object is
+     * @param instanceContainer The gdjs.RuntimeInstanceContainer in which the object is
      */
     constructor(
       runtimeObject: gdjs.BBTextRuntimeObject,
@@ -95,7 +95,7 @@ namespace gdjs {
     }
 
     updateFontFamily(): void {
-      this._pixiObject.textStyles.default.fontFamily = this._object._runtimeScene
+      this._pixiObject.textStyles.default.fontFamily = this._object._instanceContainer
         .getGame()
         .getFontManager()
         .getFontFamily(this._object._fontFamily);

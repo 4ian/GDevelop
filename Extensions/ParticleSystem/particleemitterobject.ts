@@ -262,7 +262,7 @@ namespace gdjs {
         oldObjectData.rendererParam2 !== newObjectData.rendererParam2
       ) {
         // Destroy the renderer, ensure it's removed from the layer.
-        const layer = this._runtimeScene.getLayer(this.layer);
+        const layer = this._instanceContainer.getLayer(this.layer);
         layer
           .getRenderer()
           .removeRendererObject(this._renderer.getRendererObject());
@@ -737,9 +737,12 @@ namespace gdjs {
       return this.texture;
     }
 
-    setTexture(texture: string, runtimeScene: gdjs.RuntimeScene): void {
+    setTexture(
+      texture: string,
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
       if (this.texture !== texture) {
-        if (this._renderer.isTextureNameValid(texture, runtimeScene)) {
+        if (this._renderer.isTextureNameValid(texture, instanceContainer)) {
           this.texture = texture;
           this._textureDirty = true;
         }

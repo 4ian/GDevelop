@@ -271,7 +271,7 @@ module.exports = {
         '',
         'MIT'
       );
-      // Declare z behavior with shared data between the behaviors
+      // Declare a behavior with shared data between the behaviors
       // In addition to the usual behavior:
       // Create a new gd.BehaviorSharedDataJsImplementation object and implement the methods
       // that are called to get and set the properties of the shared data.

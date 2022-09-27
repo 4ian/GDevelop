@@ -49,6 +49,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
     }
+    serializerElement.delete();
   });
 
   it('should keep TiledSpriteObject configuration after a save and reload', function () {
@@ -84,6 +85,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
     }
+    serializerElement.delete();
   });
 
   it('should keep PanelSpriteObject configuration after a save and reload', function () {
@@ -119,6 +121,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
     }
+    serializerElement.delete();
   });
 
   it('should keep ShapePainterObject configuration after a save and reload', function () {
@@ -155,6 +158,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
     }
+    serializerElement.delete();
   });
 
   it('should keep ParticleEmitterObject configuration after a save and reload', function () {
@@ -190,6 +194,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
     }
+    serializerElement.destroy();
   });
 
   it('should set behavior properties default values', function () {
@@ -237,6 +242,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
     }
+    serializerElement.delete();
   });
 
   it('should set behavior shared properties default values', function () {
@@ -294,5 +300,6 @@ describe('libGD.js - GDJS project serialization tests', function () {
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
     }
+    serializerElement.delete();
   });
 });

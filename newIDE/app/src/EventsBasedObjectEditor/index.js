@@ -121,17 +121,17 @@ export default class EventsBasedObjectEditor extends React.Component<
                       eventsBasedObject.getName()
                     }
                     onChange={text => {
-                      if (!gd.Project.validateName(text)) {
+                      if (gd.Project.validateName(text)) {
+                        eventsBasedObject.setDefaultName(text);
+                        this.forceUpdate();
+                      } else {
                         showWarningBox(
                           i18n._(
                             t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
                           ),
                           { delayToNextTick: true }
                         );
-                        return false;
                       }
-                      eventsBasedObject.setDefaultName(text);
-                      this.forceUpdate();
                     }}
                     fullWidth
                   />

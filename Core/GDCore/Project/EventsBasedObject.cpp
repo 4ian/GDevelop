@@ -23,12 +23,16 @@ EventsBasedObject::EventsBasedObject(const gd::EventsBasedObject &_eventBasedObj
 }
 
 void EventsBasedObject::SerializeTo(SerializerElement& element) const {
+  element.SetAttribute("defaultName", defaultName);
+
   AbstractEventsBasedEntity::SerializeTo(element);
   SerializeObjectsTo(element.AddChild("objects"));
 }
 
 void EventsBasedObject::UnserializeFrom(gd::Project& project,
                                           const SerializerElement& element) {
+  defaultName = element.GetStringAttribute("defaultName");
+
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
   UnserializeObjectsFrom(project, element.GetChild("objects"));
 }

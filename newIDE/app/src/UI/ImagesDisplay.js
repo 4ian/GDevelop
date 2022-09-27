@@ -40,20 +40,6 @@ const styles = {
   },
 };
 
-const useStylesForGridContainer = makeStyles({
-  'spacing-xs-1': {
-    marginLeft: 0,
-    marginRight: 0,
-    // Remove padding for first and last element to keep images aligned on component max width
-    '& > .MuiGrid-item:first-child': {
-      paddingLeft: 0,
-    },
-    '& > .MuiGrid-item:last-child': {
-      paddingRight: 0,
-    },
-  },
-});
-
 const SWIPE_PIXEL_DELTA_TRIGGER = 50;
 const GRID_SPACING = 1;
 
@@ -65,13 +51,39 @@ type Props = {|
    * For instance: "Asset pack preview image {imageIndex}"
    */
   altTextTemplate: string,
+  horizontalOuterMarginToEatOnMobile?: number,
 |};
 
-const ImagesDisplay = ({ imagesUrls, altTextTemplate }: Props) => {
+const ImagesDisplay = ({
+  imagesUrls,
+  altTextTemplate,
+  horizontalOuterMarginToEatOnMobile,
+}: Props) => {
   const [selectedImageIndex, setSelectedImageIndex] = React.useState<number>(0);
   const windowWidth = useResponsiveWindowWidth();
 
-  const classesForGridContainer = useStylesForGridContainer();
+  const mobileExtremeItemsPadding =
+    windowWidth === 'small' && horizontalOuterMarginToEatOnMobile
+      ? 2 * horizontalOuterMarginToEatOnMobile
+      : 0;
+
+  const classesForGridContainer = React.useMemo(
+    () =>
+      makeStyles({
+        'spacing-xs-1': {
+          marginLeft: 0,
+          marginRight: 0,
+          // Remove padding for first and last element to keep images aligned on component max width
+          '& > .MuiGrid-item:first-child': {
+            paddingLeft: mobileExtremeItemsPadding,
+          },
+          '& > .MuiGrid-item:last-child': {
+            paddingRight: mobileExtremeItemsPadding,
+          },
+        },
+      }),
+    [mobileExtremeItemsPadding]
+  )();
 
   const mobileGrid = React.useRef<?HTMLDivElement>(null);
   const isTouching = React.useRef<boolean>(false);
@@ -112,7 +124,9 @@ const ImagesDisplay = ({ imagesUrls, altTextTemplate }: Props) => {
     if (!current) return;
     // Compute item width based on container width and spacing between items
     const itemWidth =
-      (current.scrollWidth - GRID_SPACING * 8 * (imagesUrls.length - 1)) /
+      (current.scrollWidth -
+        GRID_SPACING * 8 * (imagesUrls.length - 1) -
+        2 * mobileExtremeItemsPadding) /
       imagesUrls.length;
     const newScrollPosition = (itemWidth + GRID_SPACING * 8) * newIndex;
     current.scrollTo({
@@ -141,7 +155,18 @@ const ImagesDisplay = ({ imagesUrls, altTextTemplate }: Props) => {
 
   if (windowWidth === 'small') {
     return (
-      <Column noMargin>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          marginLeft: horizontalOuterMarginToEatOnMobile
+            ? -horizontalOuterMarginToEatOnMobile
+            : 0,
+          marginRight: horizontalOuterMarginToEatOnMobile
+            ? -horizontalOuterMarginToEatOnMobile
+            : 0,
+        }}
+      >
         <Measure
           bounds
           onResize={contentRect => {
@@ -169,7 +194,9 @@ const ImagesDisplay = ({ imagesUrls, altTextTemplate }: Props) => {
                         style={{
                           ...styles.mobileImageCarouselItem,
                           height:
-                            (mobileGridClientWidth - 30) / // Width kept for user to see that there's an image afterwards
+                            (mobileGridClientWidth -
+                            30 - // Width kept for user to see that there's an image after or before
+                              (horizontalOuterMarginToEatOnMobile || 0)) /
                             (16 / 9),
                         }}
                         alt={altTextTemplate.replace(
@@ -189,7 +216,7 @@ const ImagesDisplay = ({ imagesUrls, altTextTemplate }: Props) => {
             {selectedImageIndex + 1}/{imagesUrls.length}
           </Text>
         </Line>
-      </Column>
+      </div>
     );
   }
   return (

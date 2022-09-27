@@ -85,6 +85,69 @@ const getAllExtensionAndExtensionShortHeaders = async () => {
   return extensions;
 };
 
+
+const getExtensionSectionAndCreatePage = async (extension, extensionShortHeader) => {
+  const folderName = getExtensionFolderName(extension.name);
+  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
+  const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;
+  const authorNamesWithLinks = generateAuthorNamesWithLinks(
+    extensionShortHeader.authors || []
+  );
+
+  const referencePageContent =
+    `# ${extension.fullName}` +
+    '\n\n' +
+    generateSvgImageIcon(extension.previewIconUrl) +
+    '\n' +
+    `${extension.shortDescription}\n` +
+    '\n' +
+    `**Authors and contributors** to this community extension: ${authorNamesWithLinks}.\n` +
+    '\n' +
+    `<note warning>
+This is an extension made by a community member — but not reviewed
+by the GDevelop extension team. As such, we can't guarantee it
+meets all the quality standards of official extensions. It could
+also not be compatible with older GDevelop versions. In case of
+doubt, contact the author to know more about what the extension
+does or inspect its content before using it.
+</note>\n` +
+    '\n' +
+    '---\n' +
+    '\n' +
+    convertMarkdownToDokuWikiMarkdown(extension.description) +
+    '\n' +
+    (helpPageUrl ? `\n[[${helpPageUrl}|Read more...]]\n` : ``) +
+    generateExtensionFooterText(extension.fullName);
+
+  const extensionReferenceFilePath = path.join(
+    extensionsRootPath,
+    folderName,
+    'reference.txt'
+  );
+  await fs.mkdir(path.dirname(extensionReferenceFilePath), {
+    recursive: true,
+  });
+  await fs.writeFile(extensionReferenceFilePath, referencePageContent);
+  console.info(`ℹ️ File generated: ${extensionReferenceFilePath}`);
+
+  return (
+    '### ' +
+    extension.fullName +
+    '\n' +
+    // Use the `&.png?` syntax to force Dokuwiki to display the image.
+    // See https://www.dokuwiki.org/images.
+    generateSvgImageIcon(extension.previewIconUrl) +
+    '\n' +
+    extension.shortDescription +
+    '\n\n' +
+    // Link to help page or to reference if none.
+    `[[${helpPageUrl}|Read more...]]` +
+    (helpPageUrl !== referencePageUrl
+      ? ` ([[${referencePageUrl}|reference]])`
+      : '') +
+    '\n\n');
+};
+
 (async () => {
   try {
     console.info(`ℹ️ Loading all community extensions...`);
@@ -98,60 +161,30 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
 
 `;
 
+    const reviewedExtensionsAndExtensionShortHeaders = extensionsAndExtensionShortHeaders.filter(extensionShortHeader => extensionShortHeader.tier !== 'community');
+    const communityExtensionsAndExtensionShortHeaders = extensionsAndExtensionShortHeaders.filter(extensionShortHeader => extensionShortHeader.tier === 'community');
+
+    indexPageContent += '### Reviewed extensions\n';
     for (const {
       extension,
       extensionShortHeader,
-    } of extensionsAndExtensionShortHeaders) {
-      const folderName = getExtensionFolderName(extension.name);
-      const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
-      const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;
-      const authorNamesWithLinks = generateAuthorNamesWithLinks(
-        extensionShortHeader.authors || []
-      );
+    } of reviewedExtensionsAndExtensionShortHeaders) {
+      indexPageContent += await getExtensionSectionAndCreatePage(extension, extensionShortHeader);
+    }
+    indexPageContent += `### Community extensions
 
-      const referencePageContent =
-        `# ${extension.fullName}` +
-        '\n\n' +
-        generateSvgImageIcon(extension.previewIconUrl) +
-        '\n' +
-        `${extension.shortDescription}\n` +
-        '\n' +
-        `**Authors and contributors** to this community extension: ${authorNamesWithLinks}.\n` +
-        '\n' +
-        '---\n' +
-        '\n' +
-        convertMarkdownToDokuWikiMarkdown(extension.description) +
-        '\n' +
-        (helpPageUrl ? `\n[[${helpPageUrl}|Read more...]]\n` : ``) +
-        generateExtensionFooterText(extension.fullName);
+The following extensions are made by community members — but not reviewed
+by the GDevelop extension team. As such, we can't guarantee it
+meets all the quality standards of official extensions. In case of
+doubt, contact the author to know more about what the extension
+does or inspect its content before using it.
 
-      const extensionReferenceFilePath = path.join(
-        extensionsRootPath,
-        folderName,
-        'reference.txt'
-      );
-      await fs.mkdir(path.dirname(extensionReferenceFilePath), {
-        recursive: true,
-      });
-      await fs.writeFile(extensionReferenceFilePath, referencePageContent);
-      console.info(`ℹ️ File generated: ${extensionReferenceFilePath}`);
-
-      indexPageContent +=
-        '## ' +
-        extension.fullName +
-        '\n' +
-        // Use the `&.png?` syntax to force Dokuwiki to display the image.
-        // See https://www.dokuwiki.org/images.
-        generateSvgImageIcon(extension.previewIconUrl) +
-        '\n' +
-        extension.shortDescription +
-        '\n\n' +
-        // Link to help page or to reference if none.
-        `[[${helpPageUrl}|Read more...]]` +
-        (helpPageUrl !== referencePageUrl
-          ? ` ([[${referencePageUrl}|reference]])`
-          : '') +
-        '\n\n';
+`;
+    for (const {
+      extension,
+      extensionShortHeader,
+    } of communityExtensionsAndExtensionShortHeaders) {
+      indexPageContent += await getExtensionSectionAndCreatePage(extension, extensionShortHeader);
     }
 
     indexPageContent += `

@@ -4,6 +4,9 @@ namespace gdjs {
   const logger = new gdjs.Logger('Player Authentication');
   const authComponents = gdjs.playerAuthenticationComponents;
   export namespace playerAuthentication {
+    // In order to test in development mode, change this to true.
+    const dev = false;
+
     // Authentication information.
     let _username: string | null = null;
     let _userId: string | null = null;
@@ -47,7 +50,7 @@ namespace gdjs {
     }) =>
       `https://liluo.io/auth?gameId=${gameId}${
         connectionId ? `&connectionId=${connectionId}` : ''
-      }`;
+      }${dev ? '&dev=true' : ''}`;
 
     /**
      * Helper returning the platform.
@@ -117,7 +120,10 @@ namespace gdjs {
       gameId: string,
       tries: number = 0
     ): Promise<boolean> => {
-      const url = `https://api.gdevelop.io/game/public-game/${gameId}`;
+      const rootApi = dev
+        ? 'https://api-dev.gdevelop.io'
+        : 'https://api.gdevelop.io';
+      const url = `${rootApi}/game/public-game/${gameId}`;
       return fetch(url, { method: 'HEAD' }).then(
         (response) => {
           if (response.status !== 200) {
@@ -596,6 +602,8 @@ namespace gdjs {
             );
           }
           if (isGameRegistered) {
+            startAuthenticationWindowTimeout(runtimeScene);
+
             // Based on which platform the game is running, we open the authentication window
             // with a different window, with or without a websocket.
             switch (platform) {

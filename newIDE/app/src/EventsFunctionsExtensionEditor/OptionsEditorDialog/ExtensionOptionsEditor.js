@@ -209,12 +209,20 @@ export const ExtensionOptionsEditor = ({
                 value: 'Ads',
               },
               {
+                text: 'Animations and effects',
+                value: 'Animations and effects',
+              },
+              {
                 text: 'Audio',
                 value: 'Audio',
               },
               {
                 text: 'Advanced',
                 value: 'Advanced',
+              },
+              {
+                text: 'Camera',
+                value: 'Camera',
               },
               {
                 text: 'Device',
@@ -225,12 +233,24 @@ export const ExtensionOptionsEditor = ({
                 value: 'Input',
               },
               {
+                text: 'Game mechanics',
+                value: 'Game mechanics',
+              },
+              {
+                text: 'Movement and positioning',
+                value: 'Movement and positioning',
+              },
+              {
                 text: 'Network',
                 value: 'Network',
               },
               {
                 text: 'Third-party',
                 value: 'Third-party',
+              },
+              {
+                text: 'User interface',
+                value: 'User interface',
               },
             ]}
           />

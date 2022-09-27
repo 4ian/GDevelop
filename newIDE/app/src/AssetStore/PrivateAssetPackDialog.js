@@ -42,13 +42,13 @@ const sortedContentType = [
 ];
 
 const contentTypeToMessageDescriptor = {
-  sprite: t`Sprite`,
-  '9patch': t`Panel sprite`,
-  tiled: t`Tiled sprite`,
-  particleEmitter: t`Particle emitter`,
-  font: t`Font`,
-  audio: t`Audio`,
-  partial: t`Other`,
+  sprite: { one: t`Sprite`, other: t`Sprites` },
+  '9patch': { one: t`Panel sprite`, other: t`Panel sprites` },
+  tiled: { one: t`Tiled sprite`, other: t`Tiled sprites` },
+  particleEmitter: { one: t`Particle emitter`, other: t`Particle emitters` },
+  font: { one: t`Font`, other: t`Fonts` },
+  audio: { one: t`Audio`, other: t`Audios` },
+  partial: { one: t`Other`, other: t`Other` },
 };
 
 const PrivateAssetPackDialog = ({
@@ -178,12 +178,17 @@ const PrivateAssetPackDialog = ({
                                   <li key={type}>
                                     <Text displayInlineAsSpan noMargin>
                                       {assetPackDetails.content[type]}{' '}
-                                      {i18n._(
-                                        contentTypeToMessageDescriptor[type]
-                                      )}
-                                      {assetPackDetails.content[type] > 1
-                                        ? 's' // TODO: find a better way to pluralize
-                                        : ''}
+                                      {i18n.plural({
+                                        value: assetPackDetails.content[type],
+                                        one: i18n._(
+                                          contentTypeToMessageDescriptor[type]
+                                            .one
+                                        ),
+                                        other: i18n._(
+                                          contentTypeToMessageDescriptor[type]
+                                            .other
+                                        ),
+                                      })}
                                     </Text>
                                   </li>
                                 );

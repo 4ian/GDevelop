@@ -124,7 +124,7 @@ namespace gdjs {
           }
           this._tileMapManager.getOrLoadTextureCache(
             (textureName) =>
-              (this._runtimeScene
+              (this._instanceContainer
                 .getGame()
                 .getImageManager()
                 .getPIXITexture(textureName) as unknown) as PIXI.BaseTexture<

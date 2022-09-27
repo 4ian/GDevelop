@@ -679,7 +679,7 @@ namespace gdjs {
       return this._renderer.getHeight();
     }
 
-    updatePreRender(runtimeScene: gdjs.RuntimeScene): void {
+    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._renderer.updatePreRender();
     }
 

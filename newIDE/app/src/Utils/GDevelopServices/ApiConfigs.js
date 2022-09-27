@@ -83,6 +83,12 @@ export const GDevelopPlayApi = {
     : 'https://api.gdevelop.io/play',
 };
 
+export const GDevelopShopApi = {
+  baseUrl: isDev
+    ? 'https://api-dev.gdevelop.io/shop'
+    : 'https://api.gdevelop.io/shop',
+};
+
 export const GDevelopProjectApi = {
   baseUrl: isDev
     ? 'https://api-dev.gdevelop.io/project'

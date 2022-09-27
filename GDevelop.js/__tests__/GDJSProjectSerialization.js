@@ -194,7 +194,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       project.unserializeFrom(serializerElement);
       checkConfiguration(project);
     }
-    serializerElement.destroy();
+    serializerElement.delete();
   });
 
   it('should set behavior properties default values', function () {

@@ -105,6 +105,21 @@ export default class EventsBasedObjectEditor extends React.Component<
                 fullWidth
                 rows={3}
               />
+              <SemiControlledTextField
+                commitOnBlur
+                floatingLabelText={
+                  <Trans>Default name for created objects</Trans>
+                }
+                value={
+                  eventsBasedObject.getDefaultName() ||
+                  eventsBasedObject.getName()
+                }
+                onChange={text => {
+                  eventsBasedObject.setDefaultName(text);
+                  this.forceUpdate();
+                }}
+                fullWidth
+              />
               {eventsBasedObject
                 .getEventsFunctions()
                 .getEventsFunctionsCount() === 0 && (

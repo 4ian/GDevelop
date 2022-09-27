@@ -43,20 +43,30 @@ const ObjectsRenderingService = {
     'TextEntryObject::TextEntry': RenderedTextEntryInstance,
     'ParticleSystem::ParticleEmitter': RenderedParticleEmitterInstance,
   },
-  getThumbnail: function(project: gdProject, object: gdObject) {
-    const objectType = object.getType();
+  getThumbnail: function(
+    project: gdProject,
+    objectConfiguration: gdObjectConfiguration
+  ) {
+    const objectType = objectConfiguration.getType();
     if (this.renderers.hasOwnProperty(objectType))
       return this.renderers[objectType].getThumbnail(
         project,
         ResourcesLoader,
-        object
+        objectConfiguration
       );
-    else
+    else if (project.hasEventsBasedObject(objectType)) {
+      return RenderedCustomObjectInstance.getThumbnail(
+        project,
+        ResourcesLoader,
+        objectConfiguration
+      );
+    } else {
       return this.renderers['unknownObjectType'].getThumbnail(
         project,
         ResourcesLoader,
-        object
+        objectConfiguration
       );
+    }
   },
   createNewInstanceRenderer: function(
     project: gdProject,

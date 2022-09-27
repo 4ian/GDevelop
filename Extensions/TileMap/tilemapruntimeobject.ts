@@ -19,8 +19,8 @@ namespace gdjs {
     _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
     _renderer: gdjs.TileMapRuntimeObjectPixiRenderer;
 
-    constructor(runtimeScene: gdjs.RuntimeScene, objectData) {
-      super(runtimeScene, objectData);
+    constructor(instanceContainer: gdjs.RuntimeInstanceContainer, objectData) {
+      super(instanceContainer, objectData);
       this._opacity = objectData.content.opacity;
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
@@ -30,11 +30,11 @@ namespace gdjs {
       this._animationSpeedScale = objectData.content.animationSpeedScale;
       this._animationFps = objectData.content.animationFps;
       this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
-        runtimeScene
+        instanceContainer
       );
       this._renderer = new gdjs.TileMapRuntimeObjectRenderer(
         this,
-        runtimeScene
+        instanceContainer
       );
       this._updateTileMap();
 
@@ -46,14 +46,14 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    update(runtimeScene: gdjs.RuntimeScene): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (this._animationSpeedScale <= 0 || this._animationFps === 0) {
         return;
       }
-      const elapsedTime = this.getElapsedTime(runtimeScene) / 1000;
+      const elapsedTime = this.getElapsedTime() / 1000;
       this._frameElapsedTime += elapsedTime * this._animationSpeedScale;
       while (this._frameElapsedTime > 1 / this._animationFps) {
-        this._renderer.incrementAnimationFrameX(runtimeScene);
+        this._renderer.incrementAnimationFrameX(instanceContainer);
         this._frameElapsedTime -= 1 / this._animationFps;
       }
     }
@@ -124,7 +124,7 @@ namespace gdjs {
           }
           this._tileMapManager.getOrLoadTextureCache(
             (textureName) =>
-              (this._runtimeScene
+              (this._instanceContainer
                 .getGame()
                 .getImageManager()
                 .getPIXITexture(textureName) as unknown) as PIXI.BaseTexture<
@@ -221,7 +221,7 @@ namespace gdjs {
       if (this.getWidth() === width) return;
 
       this._renderer.setWidth(width);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -233,7 +233,7 @@ namespace gdjs {
       if (this.getHeight() === height) return;
 
       this._renderer.setHeight(height);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -258,7 +258,7 @@ namespace gdjs {
       if (this.getScaleX() === scaleX) return;
 
       this._renderer.setScaleX(scaleX);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -273,7 +273,7 @@ namespace gdjs {
       if (this.getScaleY() === scaleY) return;
 
       this._renderer.setScaleY(scaleY);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     setX(x: float): void {

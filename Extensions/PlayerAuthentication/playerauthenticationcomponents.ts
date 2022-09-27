@@ -1,7 +1,7 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Player Authentication');
   export namespace playerAuthenticationComponents {
-    const getMessages = ({
+    const getPlayerLoginMessages = ({
       platform,
       registered,
     }: {
@@ -119,7 +119,7 @@ namespace gdjs {
     export const addAuthenticationTextsToLoadingContainer = (
       loaderContainer: HTMLDivElement,
       platform,
-      isRegistered
+      isGameRegistered
     ) => {
       const textContainer: HTMLDivElement = document.createElement('div');
       textContainer.id = 'authentication-container-texts';
@@ -134,9 +134,9 @@ namespace gdjs {
       textContainer.style.fontFamily =
         '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
 
-      const messages = getMessages({
+      const messages = getPlayerLoginMessages({
         platform,
-        registered: isRegistered,
+        registered: isGameRegistered,
       });
       const title = document.createElement('h1');
       title.innerText = messages.title;
@@ -150,7 +150,7 @@ namespace gdjs {
       textContainer.appendChild(text1);
       textContainer.appendChild(text2);
 
-      if (!isRegistered) {
+      if (!isGameRegistered) {
         // Remove the loader.
         loaderContainer.innerHTML = '';
       }

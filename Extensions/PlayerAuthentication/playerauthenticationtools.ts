@@ -50,9 +50,11 @@ namespace gdjs {
       }`;
 
     /**
-     * Helper returning 'electron', 'cordova' or 'web' depending on the platform.
+     * Helper returning the platform.
      */
-    const getPlatform = (runtimeScene: RuntimeScene) => {
+    const getPlatform = (
+      runtimeScene: RuntimeScene
+    ): 'electron' | 'cordova' | 'web' => {
       const electron = runtimeScene.getGame().getRenderer().getElectron();
       if (electron) {
         return 'electron';
@@ -111,7 +113,7 @@ namespace gdjs {
      * Returns true if the game is registered, false otherwise.
      * Useful to display a message to the user to register the game before logging in.
      */
-    const isGameRegistered = (
+    const checkIfGameIsRegistered = (
       gameId: string,
       tries: number = 0
     ): Promise<boolean> => {
@@ -128,7 +130,7 @@ namespace gdjs {
               return false;
             }
 
-            return isGameRegistered(gameId, tries + 1);
+            return checkIfGameIsRegistered(gameId, tries + 1);
           }
           return true;
         },
@@ -584,16 +586,16 @@ namespace gdjs {
 
       // If the game is registered, open the authentication window.
       // Otherwise, open the window indicating that the game is not registered.
-      isGameRegistered(_gameId)
-        .then((isRegistered) => {
+      checkIfGameIsRegistered(_gameId)
+        .then((isGameRegistered) => {
           if (_authenticationLoaderContainer) {
             _authenticationTextContainer = authComponents.addAuthenticationTextsToLoadingContainer(
               _authenticationLoaderContainer,
               platform,
-              isRegistered
+              isGameRegistered
             );
           }
-          if (isRegistered) {
+          if (isGameRegistered) {
             // Based on which platform the game is running, we open the authentication window
             // with a different window, with or without a websocket.
             switch (platform) {

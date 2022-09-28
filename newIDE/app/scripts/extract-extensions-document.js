@@ -107,8 +107,6 @@ const sortKeys = (table) => {
   return sortedTable;
 }
 
-const getExtensionCategory = pair => pair.extension.category || 'General';
-
 const createExtensionReferencePage = async (extension, extensionShortHeader, isCommunity) => {
   const folderName = getExtensionFolderName(extension.name);
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
@@ -175,7 +173,9 @@ const getExtensionSection = (extension, extensionShortHeader) => {
 
 const getAllExtensionsSections = (extensionsAndExtensionShortHeaders) => {
   let extensionSectionsContent = "";
-  const extensionsByCategory = sortKeys(group(extensionsAndExtensionShortHeaders, getExtensionCategory));
+  const extensionsByCategory = sortKeys(group(
+      extensionsAndExtensionShortHeaders,
+      pair => pair.extension.category || 'General'));
   for (const category in extensionsByCategory) {
       const extensions = extensionsByCategory[category];
 

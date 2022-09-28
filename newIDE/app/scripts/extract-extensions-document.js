@@ -14,7 +14,6 @@ const {
   improperlyFormattedHelpPaths,
 } = require('./lib/WikiHelpLink');
 const { convertMarkdownToDokuWikiMarkdown } = require('./lib/DokuwikiHelpers');
-const { table } = require('console');
 
 const extensionShortHeadersUrl =
   'https://api.gdevelop-app.com/asset/extension-short-header';
@@ -178,14 +177,12 @@ const getAllExtensionsSections = (extensionsAndExtensionShortHeaders) => {
   let extensionSectionsContent = "";
   const extensionsByCategory = sortKeys(group(extensionsAndExtensionShortHeaders, getExtensionCategory));
   for (const category in extensionsByCategory) {
-    if (Object.hasOwnProperty.call(extensionsByCategory, category)) {
       const extensions = extensionsByCategory[category];
 
       extensionSectionsContent += `### ${category}\n\n`;
       for (const { extension, extensionShortHeader } of extensions) {
         extensionSectionsContent += getExtensionSection(extension, extensionShortHeader);
       }
-    }
   }
   return extensionSectionsContent;
 }

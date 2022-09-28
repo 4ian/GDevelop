@@ -199,8 +199,9 @@ namespace gdjs {
             // A variable can have empty items in its children array if one inserts
             // a variable at an index greater than highest index. All the array elements
             // in the gap will be empty elements.
-            if (item === undefined) arr.push(undefined);
-            else arr.push(item.toJSObject());
+            item === undefined
+              ? arr.push(undefined)
+              : arr.push(item.toJSObject());
           }
           return arr;
       }

@@ -14,6 +14,7 @@ import {
   sendAssetPackOpened,
 } from '../Utils/Analytics/EventSender';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
 import {
@@ -32,6 +33,7 @@ import IconButton from '../UI/IconButton';
 import { AssetDetails } from './AssetDetails';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Home from '@material-ui/icons/Home';
+import PrivateAssetPackDialog from './PrivateAssetPackDialog';
 
 type Props = {|
   project: gdProject,
@@ -40,6 +42,7 @@ type Props = {|
 export const AssetStore = ({ project }: Props) => {
   const {
     assetPacks,
+    privateAssetPacks,
     searchResults,
     error,
     fetchAssetsAndFilters,
@@ -47,6 +50,7 @@ export const AssetStore = ({ project }: Props) => {
     searchText,
     setSearchText,
     assetFiltersState,
+    assetPackRandomOrdering,
   } = React.useContext(AssetStoreContext);
   const {
     isOnHomePage,
@@ -57,6 +61,10 @@ export const AssetStore = ({ project }: Props) => {
   const searchBar = React.useRef<?SearchBarInterface>(null);
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
+  const [
+    selectedPrivateAssetPack,
+    setSelectedPrivateAssetPack,
+  ] = React.useState<?PrivateAssetPackListingData>(null);
 
   const onOpenDetails = (assetShortHeader: AssetShortHeader) => {
     sendAssetOpened({
@@ -257,11 +265,16 @@ export const AssetStore = ({ project }: Props) => {
                     )}
                   </Background>
                 )}
-                {isOnHomePage && !assetPacks && <PlaceholderLoader />}
-                {isOnHomePage && assetPacks && (
+                {isOnHomePage && !(assetPacks && privateAssetPacks) && (
+                  <PlaceholderLoader />
+                )}
+                {isOnHomePage && assetPacks && privateAssetPacks && assetPackRandomOrdering && (
                   <AssetsHome
                     assetPacks={assetPacks}
+                    privateAssetPacks={privateAssetPacks}
+                    assetPackRandomOrdering={assetPackRandomOrdering}
                     onPackSelection={selectPack}
+                    onPrivateAssetPackSelection={setSelectedPrivateAssetPack}
                   />
                 )}
                 {!isOnHomePage && !openedAssetShortHeader && (
@@ -290,6 +303,12 @@ export const AssetStore = ({ project }: Props) => {
                     onTagSelection={selectTag}
                     assetShortHeader={openedAssetShortHeader}
                     onOpenDetails={onOpenDetails}
+                  />
+                )}
+                {selectedPrivateAssetPack && (
+                  <PrivateAssetPackDialog
+                    privateAssetPack={selectedPrivateAssetPack}
+                    onClose={() => setSelectedPrivateAssetPack(null)}
                   />
                 )}
               </Line>

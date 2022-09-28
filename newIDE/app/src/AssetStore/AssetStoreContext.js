@@ -11,6 +11,10 @@ import {
   listAllAuthors,
   listAllLicenses,
 } from '../Utils/GDevelopServices/Asset';
+import {
+  listListedPrivateAssetPacks,
+  type PrivateAssetPackListingData,
+} from '../Utils/GDevelopServices/Shop';
 import { useSearchItem, SearchFilter } from '../UI/Search/UseSearchItem';
 import {
   TagAssetStoreSearchFilter,
@@ -27,8 +31,11 @@ import {
   assetStoreHomePageState,
 } from './AssetStoreNavigator';
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
+import shuffle from 'lodash/shuffle';
 
 const defaultSearchText = '';
+// TODO: Remove once the marketplace is up and running.
+const ACTIVATE_ASSET_PACK_MARKETPLACE = false;
 
 export type AssetFiltersState = {|
   animatedFilter: AnimatedAssetStoreSearchFilter,
@@ -48,6 +55,8 @@ export type AssetFiltersState = {|
 type AssetStoreState = {|
   filters: ?Filters,
   assetPacks: ?AssetPacks,
+  privateAssetPacks: ?Array<PrivateAssetPackListingData>,
+  assetPackRandomOrdering: ?Array<number>,
   authors: ?Array<Author>,
   licenses: ?Array<License>,
   environment: Environment,
@@ -71,6 +80,8 @@ type AssetStoreState = {|
 export const AssetStoreContext = React.createContext<AssetStoreState>({
   filters: null,
   assetPacks: null,
+  privateAssetPacks: null,
+  assetPackRandomOrdering: null,
   authors: null,
   licenses: null,
   environment: 'live',
@@ -125,6 +136,12 @@ const getAssetShortHeaderSearchTerms = (assetShortHeader: AssetShortHeader) => {
   );
 };
 
+const getAssetPackRandomOrdering = (length: number): Array<number> => {
+  const array = new Array(length).fill(0).map((_, index) => index);
+
+  return ACTIVATE_ASSET_PACK_MARKETPLACE ? shuffle(array) : array;
+};
+
 export const AssetStoreStateProvider = ({
   children,
 }: AssetStoreStateProviderProps) => {
@@ -133,6 +150,14 @@ export const AssetStoreStateProvider = ({
   }>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [assetPacks, setAssetPacks] = React.useState<?AssetPacks>(null);
+  const [
+    assetPackRandomOrdering,
+    setAssetPackRandomOrdering,
+  ] = React.useState<?Array<number>>(null);
+  const [
+    privateAssetPacks,
+    setPrivateAssetPacks,
+  ] = React.useState<?Array<PrivateAssetPackListingData>>(null);
   const [authors, setAuthors] = React.useState<?Array<Author>>(null);
   const [licenses, setLicenses] = React.useState<?Array<License>>(null);
   const [environment, setEnvironment] = React.useState<Environment>('live');
@@ -215,6 +240,9 @@ export const AssetStoreStateProvider = ({
           } = await listAllAssets({ environment });
           const authors = await listAllAuthors({ environment });
           const licenses = await listAllLicenses({ environment });
+          const privateAssetPacks = ACTIVATE_ASSET_PACK_MARKETPLACE
+            ? await listListedPrivateAssetPacks()
+            : [];
 
           const assetShortHeadersById = {};
           assetShortHeaders.forEach(assetShortHeader => {
@@ -229,6 +257,7 @@ export const AssetStoreStateProvider = ({
           setAssetPacks(assetPacks);
           setAuthors(authors);
           setLicenses(licenses);
+          setPrivateAssetPacks(privateAssetPacks);
         } catch (error) {
           console.error(
             `Unable to load the assets from the asset store:`,
@@ -259,6 +288,25 @@ export const AssetStoreStateProvider = ({
     [fetchAssetsAndFilters, assetShortHeadersById, isLoading]
   );
 
+  // Randomize asset packs when number of asset packs and private asset packs change
+  const assetPackCount = assetPacks
+    ? assetPacks.starterPacks.length
+    : undefined;
+  const privateAssetPackCount = privateAssetPacks
+    ? privateAssetPacks.length
+    : undefined;
+  React.useEffect(
+    () => {
+      if (assetPackCount === undefined || privateAssetPackCount === undefined) {
+        return;
+      }
+      setAssetPackRandomOrdering(
+        getAssetPackRandomOrdering(assetPackCount + privateAssetPackCount)
+      );
+    },
+    [assetPackCount, privateAssetPackCount]
+  );
+
   const currentPage = navigationState.getCurrentPage();
   const { chosenCategory, chosenFilters } = currentPage.filtersState;
   const searchResults: ?Array<AssetShortHeader> = useSearchItem(
@@ -276,6 +324,8 @@ export const AssetStoreStateProvider = ({
       fetchAssetsAndFilters,
       filters,
       assetPacks,
+      privateAssetPacks,
+      assetPackRandomOrdering,
       authors,
       licenses,
       environment,
@@ -319,6 +369,8 @@ export const AssetStoreStateProvider = ({
       fetchAssetsAndFilters,
       filters,
       assetPacks,
+      privateAssetPacks,
+      assetPackRandomOrdering,
       authors,
       licenses,
       environment,

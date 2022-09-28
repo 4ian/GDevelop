@@ -9,6 +9,7 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../UI/Text';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import CheckeredBackground from '../ResourcesList/CheckeredBackground';
+import AuthorizedAssetImage from './PrivateAssets/AuthorizedAssetImage';
 
 const paddingSize = 10;
 const styles = {
@@ -61,24 +62,37 @@ type Props = {|
 |};
 
 export const AssetCard = ({ assetShortHeader, onOpenDetails, size }: Props) => {
+  const previewImageUrl = assetShortHeader.previewImageUrls[0];
+  console.log(assetShortHeader);
+  const isPrivateAsset = previewImageUrl.startsWith('https://private-assets'); // TODO: improve that?
+  const style = {
+    maxWidth: 128 - 2 * paddingSize,
+    maxHeight: 128 - 2 * paddingSize,
+    ...styles.previewImage,
+    ...(isPixelArt(assetShortHeader)
+      ? styles.previewImagePixelated
+      : undefined),
+  };
   return (
     <ButtonBase onClick={onOpenDetails} focusRipple>
       <div style={{ ...styles.cardContainer, width: size, height: size }}>
         <div style={{ ...styles.previewContainer, width: size, height: size }}>
           <CheckeredBackground />
-          <CorsAwareImage
-            key={assetShortHeader.previewImageUrls[0]}
-            style={{
-              maxWidth: 128 - 2 * paddingSize,
-              maxHeight: 128 - 2 * paddingSize,
-              ...styles.previewImage,
-              ...(isPixelArt(assetShortHeader)
-                ? styles.previewImagePixelated
-                : undefined),
-            }}
-            src={assetShortHeader.previewImageUrls[0]}
-            alt={assetShortHeader.name}
-          />
+          {isPrivateAsset ? (
+            <AuthorizedAssetImage
+              key={previewImageUrl}
+              style={style}
+              url={previewImageUrl}
+              alt={assetShortHeader.name}
+            />
+          ) : (
+            <CorsAwareImage
+              key={previewImageUrl}
+              style={style}
+              src={previewImageUrl}
+              alt={assetShortHeader.name}
+            />
+          )}
         </div>
         <div style={styles.titleContainer}>
           <Text noMargin style={styles.title} color="inherit">

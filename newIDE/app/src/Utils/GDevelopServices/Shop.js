@@ -1,7 +1,7 @@
 // @flow
 import axios from 'axios';
 import { GDevelopShopApi } from './ApiConfigs';
-import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+// import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
 const client = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
@@ -42,41 +42,24 @@ type Purchase = {|
   cancelledAt?: string,
 |};
 
-const refetchCredentialsForAssetsAndRetryIfUnauthorized = async <T>(
-  authenticatedUser: AuthenticatedUser,
-  apiCall: () => Promise<T>
-): Promise<T> => {
-  try {
-    const response = await apiCall();
-    return response;
-  } catch (error) {
-    if (error.response && error.response.status === 403) {
-      await getCredentialsForPrivateAssets(authenticatedUser);
-      const response = await apiCall();
-      return response;
-    }
-    throw error;
-  }
-};
+// export const getCredentialsForPrivateAssets = async (
+//   authenticatedUser: AuthenticatedUser
+// ): Promise<?string> => {
+//   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+//   if (!firebaseUser) return null;
 
-export const getCredentialsForPrivateAssets = async (
-  authenticatedUser: AuthenticatedUser
-): Promise<?string> => {
-  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
-  if (!firebaseUser) return null;
-
-  const { uid: userId } = firebaseUser;
-  const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${GDevelopShopApi.baseUrl}/asset-pack/action/authorize`,
-    {},
-    {
-      headers: { Authorization: authorizationHeader },
-      params: { userId },
-    }
-  );
-  return response.data;
-};
+//   const { uid: userId } = firebaseUser;
+//   const authorizationHeader = await getAuthorizationHeader();
+//   const response = await axios.post(
+//     `${GDevelopShopApi.baseUrl}/asset-pack/action/authorize`,
+//     {},
+//     {
+//       headers: { Authorization: authorizationHeader },
+//       params: { userId },
+//     }
+//   );
+//   return response.data;
+// };
 
 export const listUserPurchases = async (
   getAuthorizationHeader: () => Promise<string>,
@@ -95,5 +78,25 @@ export const listUserPurchases = async (
     headers: { Authorization: authorizationHeader },
     params: { userId, productType, role },
   });
+  return response.data;
+};
+
+export const getAuthorizationTokenForPrivateAssets = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+  }: {|
+    userId: string,
+  |}
+): Promise<string> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${GDevelopShopApi.baseUrl}/asset-pack/action/authorize`,
+    {},
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
   return response.data;
 };

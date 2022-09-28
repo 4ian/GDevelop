@@ -32,6 +32,7 @@ import {
 } from './AssetStoreNavigator';
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
 import shuffle from 'lodash/shuffle';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 const defaultSearchText = '';
 // TODO: Remove once the marketplace is up and running.
@@ -148,6 +149,7 @@ export const AssetStoreStateProvider = ({
   const [assetShortHeadersById, setAssetShortHeadersById] = React.useState<?{
     [string]: AssetShortHeader,
   }>(null);
+  const { ownedAssetShortHeaders } = React.useContext(AuthenticatedUserContext);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [assetPacks, setAssetPacks] = React.useState<?AssetPacks>(null);
   const [
@@ -248,6 +250,11 @@ export const AssetStoreStateProvider = ({
           assetShortHeaders.forEach(assetShortHeader => {
             assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
           });
+          if (ownedAssetShortHeaders) {
+            ownedAssetShortHeaders.forEach(assetShortHeader => {
+              assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
+            });
+          }
 
           console.info(
             `Loaded ${assetShortHeaders.length} assets from the asset store.`
@@ -269,7 +276,32 @@ export const AssetStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [isLoading, environment]
+    [isLoading, environment, ownedAssetShortHeaders]
+  );
+
+  // Effect to add the private assets as soon as they're loaded (when the user connects)
+  React.useEffect(
+    // CRASH ????
+    () => {
+      if (ownedAssetShortHeaders) {
+        if (!assetShortHeadersById) {
+          // If the assetShortHeadersById is not yet initialized, we can just
+          // fetch everything.
+          fetchAssetsAndFilters();
+        } else {
+          // Otherwise, we add the private assets to the existing list.
+          const ownedAssetShortHeadersById = {};
+          ownedAssetShortHeaders.forEach(assetShortHeader => {
+            ownedAssetShortHeadersById[assetShortHeader.id] = assetShortHeader;
+          });
+          setAssetShortHeadersById({
+            ...assetShortHeadersById,
+            ...ownedAssetShortHeadersById,
+          });
+        }
+      }
+    },
+    [ownedAssetShortHeaders, assetShortHeadersById, fetchAssetsAndFilters]
   );
 
   // Preload the assets and filters when the app loads.

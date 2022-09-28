@@ -278,3 +278,22 @@ export const isPixelArt = (
     return tag.toLowerCase() === 'pixel art';
   });
 };
+
+export const listReceivedAssetShortHeaders = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+  }: {|
+    userId: string,
+  |}
+): Promise<Array<AssetShortHeader>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.get(
+    `${GDevelopAssetApi.baseUrl}/asset-short-header`,
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+  return response.data;
+};

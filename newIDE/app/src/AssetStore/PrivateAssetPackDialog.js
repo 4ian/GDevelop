@@ -91,7 +91,9 @@ const PrivateAssetPackDialog = ({
               </Trans>
             );
           } else {
-            setErrorText(<Trans>An error occurred, please try again later.</Trans>);
+            setErrorText(
+              <Trans>An error occurred, please try again later.</Trans>
+            );
           }
         } finally {
           setIsFetchingDetails(false);

@@ -23,7 +23,7 @@ import Link from '../UI/Link';
 import Mark from '../UI/CustomSvgIcons/Mark';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import { Paper } from '@material-ui/core';
-import ImagesDisplay from '../UI/ImagesDisplay';
+import ResponsiveImagesGallery from '../UI/ResponsiveImagesGallery';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 type Props = {|
@@ -91,7 +91,7 @@ const PrivateAssetPackDialog = ({
               </Trans>
             );
           } else {
-            setErrorText(<Trans>Unknown error</Trans>);
+            setErrorText(<Trans>An error occurred, please try again later.</Trans>);
           }
         } finally {
           setIsFetchingDetails(false);
@@ -139,7 +139,7 @@ const PrivateAssetPackDialog = ({
                     <Trans>by</Trans>{' '}
                     <Link
                       onClick={() => setOpenSellerPublicProfileDialog(true)}
-                      href=""
+                      href="#"
                     >
                       {sellerPublicProfile.username || ''}
                     </Link>
@@ -152,7 +152,7 @@ const PrivateAssetPackDialog = ({
                     noMargin
                     noOverflowParent
                   >
-                    <ImagesDisplay
+                    <ResponsiveImagesGallery
                       imagesUrls={assetPackDetails.previewImageUrls}
                       altTextTemplate={`Asset pack ${name} preview image {imageIndex}`}
                       horizontalOuterMarginToEatOnMobile={8}

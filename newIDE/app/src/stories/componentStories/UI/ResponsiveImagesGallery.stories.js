@@ -3,15 +3,15 @@ import * as React from 'react';
 
 import muiDecorator from '../../ThemeDecorator';
 
-import ImagesDisplay from '../../../UI/ImagesDisplay';
+import ResponsiveImagesGallery from '../../../UI/ResponsiveImagesGallery';
 import Text from '../../../UI/Text';
 import { Column } from '../../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import { Paper } from '@material-ui/core';
 
 export default {
-  title: 'ImagesDisplay',
-  component: ImagesDisplay,
+  title: 'UI Building Blocks/ResponsiveImagesGallery',
+  component: ResponsiveImagesGallery,
   decorators: [muiDecorator],
 };
 
@@ -23,7 +23,7 @@ export const Default = () => (
           <Text>Default</Text>
         </Column>
         <Column expand noOverflowParent noMargin>
-          <ImagesDisplay
+          <ResponsiveImagesGallery
             imagesUrls={[
               'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
               'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
@@ -41,7 +41,7 @@ export const Default = () => (
           <Text>Eating outer margins on the side on small devices</Text>
         </Column>
         <Column expand noOverflowParent noMargin>
-          <ImagesDisplay
+          <ResponsiveImagesGallery
             imagesUrls={[
               'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
               'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',

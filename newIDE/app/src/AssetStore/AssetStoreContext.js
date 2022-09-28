@@ -31,9 +31,10 @@ import {
   assetStoreHomePageState,
 } from './AssetStoreNavigator';
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
-import _ from 'lodash';
+import shuffle from 'lodash/shuffle';
 
 const defaultSearchText = '';
+// TODO: Remove once the marketplace is up and running.
 const ACTIVATE_ASSET_PACK_MARKETPLACE = false;
 
 export type AssetFiltersState = {|
@@ -138,7 +139,7 @@ const getAssetShortHeaderSearchTerms = (assetShortHeader: AssetShortHeader) => {
 const getAssetPackRandomOrdering = (length: number): Array<number> => {
   const array = new Array(length).fill(0).map((_, index) => index);
 
-  return ACTIVATE_ASSET_PACK_MARKETPLACE ? _.shuffle(array) : array;
+  return ACTIVATE_ASSET_PACK_MARKETPLACE ? shuffle(array) : array;
 };
 
 export const AssetStoreStateProvider = ({

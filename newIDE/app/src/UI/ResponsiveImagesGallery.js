@@ -5,10 +5,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import CardMedia from '@material-ui/core/CardMedia';
 import Grid from '@material-ui/core/Grid';
 import { CorsAwareImage } from './CorsAwareImage';
-import { Line, Column } from './Grid';
+import { Line } from './Grid';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 import Text from './Text';
+import { ColumnStackLayout } from './Layout';
 
 const styles = {
   mainImage: {
@@ -61,7 +62,7 @@ type Props = {|
   horizontalOuterMarginToEatOnMobile?: number,
 |};
 
-const ImagesDisplay = ({
+const ResponsiveImagesGallery = ({
   imagesUrls,
   altTextTemplate,
   horizontalOuterMarginToEatOnMobile,
@@ -195,7 +196,7 @@ const ImagesDisplay = ({
     );
   }
   return (
-    <Column noMargin>
+    <ColumnStackLayout noMargin>
       <CorsAwareImage
         style={styles.mainImage}
         src={imagesUrls[selectedImageIndex]}
@@ -204,52 +205,48 @@ const ImagesDisplay = ({
           String(selectedImageIndex + 1)
         )}
       />
-      <Line>
-        <Grid
-          classes={classesForGridContainer}
-          container
-          spacing={GRID_SPACING}
-          wrap="nowrap"
-          style={styles.grid}
-        >
-          {imagesUrls.map((url, index) => (
-            <Grid
-              item
-              key={url}
-              tabIndex={0}
-              onKeyPress={(
-                event: SyntheticKeyboardEvent<HTMLLIElement>
-              ): void => {
-                if (shouldValidate(event)) {
-                  setSelectedImageIndex(index);
-                }
+      <Grid
+        classes={classesForGridContainer}
+        container
+        spacing={GRID_SPACING}
+        wrap="nowrap"
+        style={styles.grid}
+      >
+        {imagesUrls.map((url, index) => (
+          <Grid
+            item
+            key={url}
+            tabIndex={0}
+            onKeyPress={(
+              event: SyntheticKeyboardEvent<HTMLLIElement>
+            ): void => {
+              if (shouldValidate(event)) {
+                setSelectedImageIndex(index);
+              }
+            }}
+          >
+            <CardMedia
+              onClick={() => setSelectedImageIndex(index)}
+              style={{
+                ...styles.carouselItem,
+                outline:
+                  index === selectedImageIndex ? 'solid 1px white' : undefined,
               }}
             >
-              <CardMedia
-                onClick={() => setSelectedImageIndex(index)}
-                style={{
-                  ...styles.carouselItem,
-                  outline:
-                    index === selectedImageIndex
-                      ? 'solid 1px white'
-                      : undefined,
-                }}
-              >
-                <CorsAwareImage
-                  src={url}
-                  style={styles.imageCarouselItem}
-                  alt={altTextTemplate.replace(
-                    /{imageIndex}/g,
-                    String(index + 1)
-                  )}
-                />
-              </CardMedia>
-            </Grid>
-          ))}
-        </Grid>
-      </Line>
-    </Column>
+              <CorsAwareImage
+                src={url}
+                style={styles.imageCarouselItem}
+                alt={altTextTemplate.replace(
+                  /{imageIndex}/g,
+                  (index + 1).toString()
+                )}
+              />
+            </CardMedia>
+          </Grid>
+        ))}
+      </Grid>
+    </ColumnStackLayout>
   );
 };
 
-export default ImagesDisplay;
+export default ResponsiveImagesGallery;

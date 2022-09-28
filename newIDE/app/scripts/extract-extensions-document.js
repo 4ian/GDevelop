@@ -14,6 +14,7 @@ const {
   improperlyFormattedHelpPaths,
 } = require('./lib/WikiHelpLink');
 const { convertMarkdownToDokuWikiMarkdown } = require('./lib/DokuwikiHelpers');
+const { table } = require('console');
 
 const extensionShortHeadersUrl =
   'https://api.gdevelop-app.com/asset/extension-short-header';
@@ -85,6 +86,29 @@ const getAllExtensionAndExtensionShortHeaders = async () => {
   return extensions;
 };
 
+const group = (array, getKey) => {
+  const table = {};
+  for (const element of array) {
+    const key = getKey(element);
+    let group = table[key];
+    if (!group) {
+      group = [];
+      table[key] = group;
+    }
+    group.push(element);
+  }
+  return table;
+}
+
+const sortKeys = (table) => {
+  const sortedTable = {};
+  for (const key of Object.keys(table).sort()) {
+    sortedTable[key] = table[key];
+  }
+  return sortedTable;
+}
+
+const getExtensionCategory = pair => pair.extension.category || 'General';
 
 const createExtensionReferencePage = async (extension, extensionShortHeader, isCommunity) => {
   const folderName = getExtensionFolderName(extension.name);
@@ -135,9 +159,7 @@ const getExtensionSection = (extension, extensionShortHeader) => {
   const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;
 
   return (
-    '### ' +
-    extension.fullName +
-    '\n' +
+    `#### ${extension.fullName}\n` +
     // Use the `&.png?` syntax to force Dokuwiki to display the image.
     // See https://www.dokuwiki.org/images.
     generateSvgImageIcon(extension.previewIconUrl) +
@@ -151,6 +173,22 @@ const getExtensionSection = (extension, extensionShortHeader) => {
       : '') +
     '\n\n');
 };
+
+const getAllExtensionsSections = (extensionsAndExtensionShortHeaders) => {
+  let extensionSectionsContent = "";
+  const extensionsByCategory = sortKeys(group(extensionsAndExtensionShortHeaders, getExtensionCategory));
+  for (const category in extensionsByCategory) {
+    if (Object.hasOwnProperty.call(extensionsByCategory, category)) {
+      const extensions = extensionsByCategory[category];
+
+      extensionSectionsContent += `### ${category}\n\n`;
+      for (const { extension, extensionShortHeader } of extensions) {
+        extensionSectionsContent += getExtensionSection(extension, extensionShortHeader);
+      }
+    }
+  }
+  return extensionSectionsContent;
+}
 
 (async () => {
   try {
@@ -172,14 +210,15 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
         extensionsAndExtensionShortHeaders.filter(
           pair => pair.extensionShortHeader.tier === 'community');
 
-    indexPageContent += '## Reviewed extensions\n';
+    indexPageContent += '## Reviewed extensions\n\n';
     for (const {
       extension,
       extensionShortHeader,
     } of reviewedExtensionsAndExtensionShortHeaders) {
-      indexPageContent += getExtensionSection(extension, extensionShortHeader);
       await createExtensionReferencePage(extension, extensionShortHeader, false);
     }
+    indexPageContent += getAllExtensionsSections(reviewedExtensionsAndExtensionShortHeaders);
+
     indexPageContent += `## Community extensions
 
 The following extensions are made by community members — but not reviewed
@@ -193,9 +232,9 @@ does or inspect its content before using it.
       extension,
       extensionShortHeader,
     } of communityExtensionsAndExtensionShortHeaders) {
-      indexPageContent += getExtensionSection(extension, extensionShortHeader);
       await createExtensionReferencePage(extension, extensionShortHeader, true);
     }
+    indexPageContent += getAllExtensionsSections(communityExtensionsAndExtensionShortHeaders);
 
     indexPageContent += `
 ## Make your own extension

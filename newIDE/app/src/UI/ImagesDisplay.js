@@ -35,8 +35,9 @@ const styles = {
     overflowY: 'hidden',
   },
   mobileGrid: {
-    overflowX: 'hidden',
+    overflowX: 'scroll',
     overflowY: 'hidden',
+    scrollSnapType: 'x mandatory',
   },
   flex: {
     display: 'flex',
@@ -47,7 +48,6 @@ const styles = {
   },
 };
 
-const SWIPE_PIXEL_DELTA_TRIGGER = 50;
 const GRID_SPACING = 1;
 
 type Props = {|
@@ -68,9 +68,10 @@ const ImagesDisplay = ({
 }: Props) => {
   const [selectedImageIndex, setSelectedImageIndex] = React.useState<number>(0);
   const windowWidth = useResponsiveWindowWidth();
+  const isMobile = windowWidth === 'small';
 
   const mobileExtremeItemsPadding =
-    windowWidth === 'small' && horizontalOuterMarginToEatOnMobile
+    isMobile && horizontalOuterMarginToEatOnMobile
       ? 2 * horizontalOuterMarginToEatOnMobile
       : 0;
 
@@ -88,81 +89,44 @@ const ImagesDisplay = ({
             paddingRight: mobileExtremeItemsPadding,
           },
         },
+        root: isMobile
+          ? {
+              scrollbarHeight: 'none' /* For Firefox */,
+              '-ms-overflow-style': 'none' /* For Internet Explorer and Edge */,
+              '&::-webkit-scrollbar': {
+                height: 0 /* For Chrome, Safari, and Opera */,
+              },
+            }
+          : undefined,
       }),
-    [mobileExtremeItemsPadding]
+    [mobileExtremeItemsPadding, isMobile]
   )();
-
-  const mobileGrid = React.useRef<?HTMLDivElement>(null);
-  const isTouching = React.useRef<boolean>(false);
 
   const [
     mobileGridClientWidth,
     setMobileGridClientWidth,
   ] = React.useState<number>(0);
-  const [startDragX, setStartDragX] = React.useState(null);
+  const [mobileGridScrollX, setMobileGridScrollX] = React.useState(0);
   const [
-    mobileGridScrollXWhenTouching,
-    setMobileGridScrollXWhenTouching,
-  ] = React.useState(0);
-  const [
-    mobileGridScrollXBeforeTouch,
-    setMobileGridScrollXBeforeTouch,
+    currentlyViewedImageIndex,
+    setCurrentlyViewedImageIndex,
   ] = React.useState<number>(0);
 
-  const handleTouchStart = (event: TouchEvent) => {
-    isTouching.current = true;
-    setStartDragX(event.changedTouches[0].clientX);
-  };
+  const mobileImageWidth =
+    mobileGridClientWidth -
+    30 - // Width kept for user to see that there's an image after or before
+    (horizontalOuterMarginToEatOnMobile || 0);
 
-  const handleTouchEnd = (event: TouchEvent) => {
-    isTouching.current = false;
-
-    if (!startDragX) return;
-    const endDragX = event.changedTouches[0].clientX;
-    const newIndex =
-      startDragX - endDragX > SWIPE_PIXEL_DELTA_TRIGGER
-        ? Math.min(selectedImageIndex + 1, imagesUrls.length - 1)
-        : startDragX - endDragX < -SWIPE_PIXEL_DELTA_TRIGGER
-        ? Math.max(selectedImageIndex - 1, 0)
-        : selectedImageIndex;
-
-    setSelectedImageIndex(newIndex);
-    const { current } = mobileGrid;
-    if (!current) return;
-    // Compute item width based on container width and spacing between items
-    const itemWidth =
-      (current.scrollWidth -
-        GRID_SPACING * 8 * (imagesUrls.length - 1) -
-        2 * mobileExtremeItemsPadding) /
-      imagesUrls.length;
-    const newScrollPosition =
-      (itemWidth + GRID_SPACING * 8) * newIndex -
-      (horizontalOuterMarginToEatOnMobile || 0) / 2;
-    current.scrollTo({
-      left: newScrollPosition,
-      behavior: 'smooth',
-    });
-    setMobileGridScrollXBeforeTouch(newScrollPosition);
-  };
-
-  const handleTouchMove = (event: TouchEvent) => {
-    if (!startDragX) return;
-    const touchXPosition = event.changedTouches[0].clientX;
-    setMobileGridScrollXWhenTouching(
-      touchXPosition - startDragX - mobileGridScrollXBeforeTouch
-    );
-  };
-
-  // Scroll element based on touch position only when touching
   React.useEffect(
     () => {
-      if (!mobileGrid.current || !isTouching.current) return;
-      mobileGrid.current.scrollTo(-mobileGridScrollXWhenTouching, 0);
+      setCurrentlyViewedImageIndex(
+        Math.round(mobileGridScrollX / (mobileImageWidth + GRID_SPACING))
+      );
     },
-    [mobileGridScrollXWhenTouching]
+    [mobileImageWidth, mobileGridScrollX]
   );
 
-  if (windowWidth === 'small') {
+  if (isMobile) {
     return (
       <div
         style={{
@@ -189,23 +153,26 @@ const ImagesDisplay = ({
                 spacing={GRID_SPACING}
                 wrap="nowrap"
                 style={styles.mobileGrid}
-                onTouchMove={handleTouchMove}
-                onTouchStart={handleTouchStart}
-                onTouchEnd={handleTouchEnd}
-                ref={mobileGrid}
+                onScroll={(event: SyntheticEvent<HTMLDivElement>) =>
+                  setMobileGridScrollX(event.currentTarget.scrollLeft)
+                }
               >
                 {imagesUrls.map((url, index) => (
-                  <Grid item key={url}>
+                  <Grid
+                    item
+                    key={url}
+                    style={{
+                      scrollSnapAlign: horizontalOuterMarginToEatOnMobile
+                        ? 'center'
+                        : 'start',
+                    }}
+                  >
                     <CardMedia>
                       <CorsAwareImage
                         src={url}
                         style={{
                           ...styles.mobileImageCarouselItem,
-                          height:
-                            (mobileGridClientWidth -
-                            30 - // Width kept for user to see that there's an image after or before
-                              (horizontalOuterMarginToEatOnMobile || 0)) /
-                            (16 / 9),
+                          height: mobileImageWidth / (16 / 9),
                         }}
                         alt={altTextTemplate.replace(
                           /{imageIndex}/g,
@@ -221,7 +188,7 @@ const ImagesDisplay = ({
         </Measure>
         <Line justifyContent="center">
           <Text noMargin size="body2">
-            {selectedImageIndex + 1}/{imagesUrls.length}
+            {currentlyViewedImageIndex + 1}/{imagesUrls.length}
           </Text>
         </Line>
       </div>

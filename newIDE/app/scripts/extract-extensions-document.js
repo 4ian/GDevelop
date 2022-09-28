@@ -85,7 +85,7 @@ const getAllExtensionAndExtensionShortHeaders = async () => {
   return extensions;
 };
 
-const group = (array, getKey) => {
+const groupBy = (array, getKey) => {
   const table = {};
   for (const element of array) {
     const key = getKey(element);
@@ -150,7 +150,7 @@ does or inspect its content before using it.
   console.info(`ℹ️ File generated: ${extensionReferenceFilePath}`);
 };
 
-const getExtensionSection = (extension, extensionShortHeader) => {
+const generateExtensionSection = (extension, extensionShortHeader) => {
   const folderName = getExtensionFolderName(extension.name);
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
   const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;
@@ -171,9 +171,9 @@ const getExtensionSection = (extension, extensionShortHeader) => {
     '\n\n');
 };
 
-const getAllExtensionsSections = (extensionsAndExtensionShortHeaders) => {
+const generateAllExtensionsSections = (extensionsAndExtensionShortHeaders) => {
   let extensionSectionsContent = "";
-  const extensionsByCategory = sortKeys(group(
+  const extensionsByCategory = sortKeys(groupBy(
       extensionsAndExtensionShortHeaders,
       pair => pair.extension.category || 'General'));
   for (const category in extensionsByCategory) {
@@ -181,7 +181,7 @@ const getAllExtensionsSections = (extensionsAndExtensionShortHeaders) => {
 
       extensionSectionsContent += `### ${category}\n\n`;
       for (const { extension, extensionShortHeader } of extensions) {
-        extensionSectionsContent += getExtensionSection(extension, extensionShortHeader);
+        extensionSectionsContent += generateExtensionSection(extension, extensionShortHeader);
       }
   }
   return extensionSectionsContent;
@@ -214,7 +214,7 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
     } of reviewedExtensionsAndExtensionShortHeaders) {
       await createExtensionReferencePage(extension, extensionShortHeader, false);
     }
-    indexPageContent += getAllExtensionsSections(reviewedExtensionsAndExtensionShortHeaders);
+    indexPageContent += generateAllExtensionsSections(reviewedExtensionsAndExtensionShortHeaders);
 
     indexPageContent += `## Community extensions
 
@@ -231,7 +231,7 @@ does or inspect its content before using it.
     } of communityExtensionsAndExtensionShortHeaders) {
       await createExtensionReferencePage(extension, extensionShortHeader, true);
     }
-    indexPageContent += getAllExtensionsSections(communityExtensionsAndExtensionShortHeaders);
+    indexPageContent += generateAllExtensionsSections(communityExtensionsAndExtensionShortHeaders);
 
     indexPageContent += `
 ## Make your own extension

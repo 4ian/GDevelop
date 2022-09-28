@@ -268,15 +268,18 @@ export const AssetStore = ({ project }: Props) => {
                 {isOnHomePage && !(assetPacks && privateAssetPacks) && (
                   <PlaceholderLoader />
                 )}
-                {isOnHomePage && assetPacks && privateAssetPacks && assetPackRandomOrdering && (
-                  <AssetsHome
-                    assetPacks={assetPacks}
-                    privateAssetPacks={privateAssetPacks}
-                    assetPackRandomOrdering={assetPackRandomOrdering}
-                    onPackSelection={selectPack}
-                    onPrivateAssetPackSelection={setSelectedPrivateAssetPack}
-                  />
-                )}
+                {isOnHomePage &&
+                  assetPacks &&
+                  privateAssetPacks &&
+                  assetPackRandomOrdering && (
+                    <AssetsHome
+                      assetPacks={assetPacks}
+                      privateAssetPacks={privateAssetPacks}
+                      assetPackRandomOrdering={assetPackRandomOrdering}
+                      onPackSelection={selectPack}
+                      onPrivateAssetPackSelection={setSelectedPrivateAssetPack}
+                    />
+                  )}
                 {!isOnHomePage && !openedAssetShortHeader && (
                   <BoxSearchResults
                     baseSize={128}

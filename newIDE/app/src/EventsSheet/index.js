@@ -320,8 +320,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         onAddSubEvent={this.addSubEvents}
         canAddSubEvent={hasEventSelected(this.state.selection)}
         canToggleEventDisabled={hasEventSelected(this.state.selection)}
+        canToggleInstructionInverted={hasInstructionSelected(
+          this.state.selection
+        )}
         onAddCommentEvent={this._addCommentEvent}
         onAddEvent={this.addNewEvent}
+        onToggleInvertedCondition={this._invertSelectedConditions}
         onToggleDisabledEvent={this.toggleDisabled}
         canRemove={hasSomethingSelected(this.state.selection)}
         onRemove={this.deleteSelection}
@@ -544,6 +548,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       label: i18n._(t`Invert Condition`),
       click: () => this._invertSelectedConditions(),
       visible: hasSelectedAtLeastOneCondition(this.state.selection),
+      accelerator: getShortcutDisplayName(
+        this.props.preferences.values.userShortcutMap[
+          'TOGGLE_CONDITION_INVERTED'
+        ] || 'KeyJ'
+      ),
     },
     {
       label: i18n._(t`Toggle Wait the Action to End`),

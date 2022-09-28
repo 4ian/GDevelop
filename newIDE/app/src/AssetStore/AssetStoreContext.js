@@ -34,6 +34,7 @@ import { type ChosenCategory } from '../UI/Search/FiltersChooser';
 import _ from 'lodash';
 
 const defaultSearchText = '';
+const ACTIVATE_ASSET_PACK_MARKETPLACE = false;
 
 export type AssetFiltersState = {|
   animatedFilter: AnimatedAssetStoreSearchFilter,
@@ -136,7 +137,8 @@ const getAssetShortHeaderSearchTerms = (assetShortHeader: AssetShortHeader) => {
 
 const getAssetPackRandomOrdering = (length: number): Array<number> => {
   const array = new Array(length).fill(0).map((_, index) => index);
-  return _.shuffle(array);
+
+  return ACTIVATE_ASSET_PACK_MARKETPLACE ? _.shuffle(array) : array;
 };
 
 export const AssetStoreStateProvider = ({
@@ -237,7 +239,9 @@ export const AssetStoreStateProvider = ({
           } = await listAllAssets({ environment });
           const authors = await listAllAuthors({ environment });
           const licenses = await listAllLicenses({ environment });
-          const privateAssetPacks = await listListedPrivateAssetPacks();
+          const privateAssetPacks = ACTIVATE_ASSET_PACK_MARKETPLACE
+            ? await listListedPrivateAssetPacks()
+            : [];
 
           const assetShortHeadersById = {};
           assetShortHeaders.forEach(assetShortHeader => {
@@ -292,7 +296,9 @@ export const AssetStoreStateProvider = ({
     : undefined;
   React.useEffect(
     () => {
-      if (!assetPackCount || !privateAssetPackCount) return;
+      if (assetPackCount === undefined || privateAssetPackCount === undefined) {
+        return;
+      }
       setAssetPackRandomOrdering(
         getAssetPackRandomOrdering(assetPackCount + privateAssetPackCount)
       );

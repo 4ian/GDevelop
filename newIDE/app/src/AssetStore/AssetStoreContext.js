@@ -31,6 +31,7 @@ import {
   assetStoreHomePageState,
 } from './AssetStoreNavigator';
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
+import _ from 'lodash';
 
 const defaultSearchText = '';
 
@@ -53,6 +54,7 @@ type AssetStoreState = {|
   filters: ?Filters,
   assetPacks: ?AssetPacks,
   privateAssetPacks: ?Array<PrivateAssetPackListingData>,
+  assetPackRandomOrdering: ?Array<number>,
   authors: ?Array<Author>,
   licenses: ?Array<License>,
   environment: Environment,
@@ -77,6 +79,7 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   filters: null,
   assetPacks: null,
   privateAssetPacks: null,
+  assetPackRandomOrdering: null,
   authors: null,
   licenses: null,
   environment: 'live',
@@ -131,6 +134,11 @@ const getAssetShortHeaderSearchTerms = (assetShortHeader: AssetShortHeader) => {
   );
 };
 
+const getAssetPackRandomOrdering = (length: number): Array<number> => {
+  const array = new Array(length).fill(0).map((_, index) => index);
+  return _.shuffle(array);
+};
+
 export const AssetStoreStateProvider = ({
   children,
 }: AssetStoreStateProviderProps) => {
@@ -139,6 +147,10 @@ export const AssetStoreStateProvider = ({
   }>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [assetPacks, setAssetPacks] = React.useState<?AssetPacks>(null);
+  const [
+    assetPackRandomOrdering,
+    setAssetPackRandomOrdering,
+  ] = React.useState<?Array<number>>(null);
   const [
     privateAssetPacks,
     setPrivateAssetPacks,
@@ -271,6 +283,23 @@ export const AssetStoreStateProvider = ({
     [fetchAssetsAndFilters, assetShortHeadersById, isLoading]
   );
 
+  // Randomize asset packs when number of asset packs and private asset packs change
+  const assetPackCount = assetPacks
+    ? assetPacks.starterPacks.length
+    : undefined;
+  const privateAssetPackCount = privateAssetPacks
+    ? privateAssetPacks.length
+    : undefined;
+  React.useEffect(
+    () => {
+      if (!assetPackCount || !privateAssetPackCount) return;
+      setAssetPackRandomOrdering(
+        getAssetPackRandomOrdering(assetPackCount + privateAssetPackCount)
+      );
+    },
+    [assetPackCount, privateAssetPackCount]
+  );
+
   const currentPage = navigationState.getCurrentPage();
   const { chosenCategory, chosenFilters } = currentPage.filtersState;
   const searchResults: ?Array<AssetShortHeader> = useSearchItem(
@@ -289,6 +318,7 @@ export const AssetStoreStateProvider = ({
       filters,
       assetPacks,
       privateAssetPacks,
+      assetPackRandomOrdering,
       authors,
       licenses,
       environment,
@@ -333,6 +363,7 @@ export const AssetStoreStateProvider = ({
       filters,
       assetPacks,
       privateAssetPacks,
+      assetPackRandomOrdering,
       authors,
       licenses,
       environment,

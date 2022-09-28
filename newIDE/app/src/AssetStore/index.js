@@ -50,6 +50,7 @@ export const AssetStore = ({ project }: Props) => {
     searchText,
     setSearchText,
     assetFiltersState,
+    assetPackRandomOrdering,
   } = React.useContext(AssetStoreContext);
   const {
     isOnHomePage,
@@ -267,10 +268,11 @@ export const AssetStore = ({ project }: Props) => {
                 {isOnHomePage && !(assetPacks && privateAssetPacks) && (
                   <PlaceholderLoader />
                 )}
-                {isOnHomePage && assetPacks && privateAssetPacks && (
+                {isOnHomePage && assetPacks && privateAssetPacks && assetPackRandomOrdering && (
                   <AssetsHome
                     assetPacks={assetPacks}
                     privateAssetPacks={privateAssetPacks}
+                    assetPackRandomOrdering={assetPackRandomOrdering}
                     onPackSelection={selectPack}
                     onPrivateAssetPackSelection={setSelectedPrivateAssetPack}
                   />

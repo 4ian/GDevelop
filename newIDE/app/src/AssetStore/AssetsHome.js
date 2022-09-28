@@ -61,6 +61,7 @@ const useStylesForGridListItem = makeStyles(theme =>
 type Props = {|
   assetPacks: AssetPacks,
   privateAssetPacks: Array<PrivateAssetPackListingData>,
+  assetPackRandomOrdering: Array<number>,
   onPackSelection: string => void,
   onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
 |};
@@ -68,6 +69,7 @@ type Props = {|
 export const AssetsHome = ({
   assetPacks: { starterPacks },
   privateAssetPacks,
+  assetPackRandomOrdering,
   onPackSelection,
   onPrivateAssetPackSelection,
 }: Props) => {
@@ -154,7 +156,11 @@ export const AssetsHome = ({
     </GridListTile>
   ));
 
-  const allTiles = starterPacksTiles.concat(privateAssetPacksTiles);
+  const allTiles = starterPacksTiles
+    .concat(privateAssetPacksTiles)
+    .map((tile, index) => ({ pos: assetPackRandomOrdering[index], tile }))
+    .sort((a, b) => a.pos - b.pos)
+    .map(sortObject => sortObject.tile);
 
   return (
     <ScrollView>

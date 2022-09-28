@@ -319,7 +319,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         onAddStandardEvent={this._addStandardEvent}
         onAddSubEvent={this.addSubEvents}
         canAddSubEvent={hasEventSelected(this.state.selection)}
-        canToggleEventDisabled={hasEventSelected(this.state.selection)}
+        canToggleEventDisabled={
+          hasEventSelected(this.state.selection) &&
+          this._selectionCanToggleDisabled()
+        }
         canToggleInstructionInverted={hasInstructionSelected(
           this.state.selection
         )}

@@ -194,7 +194,14 @@ namespace gdjs {
           return obj;
         case 'array':
           const arr: any[] = [];
-          for (const item of this._childrenArray) arr.push(item.toJSObject());
+          for (const item of this._childrenArray) {
+            // item can be undefined if there are empty elements in the array.
+            // A variable can have empty items in its children array if one inserts
+            // a variable at an index greater than highest index. All the array elements
+            // in the gap will be empty elements.
+            if (item === undefined) arr.push(undefined);
+            else arr.push(item.toJSObject());
+          }
           return arr;
       }
     }

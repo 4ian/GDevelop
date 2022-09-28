@@ -206,6 +206,11 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                           }}
                           checkedIcon={<Visibility />}
                           uncheckedIcon={<VisibilityOff />}
+                          disabled={
+                            property.getType() === 'Behavior' &&
+                            // Allow to make it visible just in case.
+                            !property.isHidden()
+                          }
                         />
                         <ElementWithMenu
                           element={
@@ -241,6 +246,9 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                               value={property.getType()}
                               onChange={(e, i, value: string) => {
                                 property.setType(value);
+                                if (value === 'Behavior') {
+                                  property.setHidden(false);
+                                }
                                 this.forceUpdate();
                                 this.props.onPropertiesUpdated();
                               }}

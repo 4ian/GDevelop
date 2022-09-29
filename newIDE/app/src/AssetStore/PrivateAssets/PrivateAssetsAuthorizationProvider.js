@@ -16,11 +16,11 @@ function PrivateAssetsAuthorizationProvider({ children }: Props) {
   const isLoading = React.useRef<boolean>(false);
 
   const fetchAuthorizationToken = async () => {
-    // If a request is already in progress, don't do anything.
-    if (isLoading.current) return;
-
     if (!profile) return;
     const userId = profile.id;
+
+    // If a request is already in progress, don't do anything.
+    if (isLoading.current) return;
 
     try {
       isLoading.current = true;

@@ -140,6 +140,8 @@ export default class AuthenticatedUserProvider extends React.Component<
         onAcceptGameStatsEmail: this._doAcceptGameStatsEmail,
         getAuthorizationHeader: () =>
           this.props.authentication.getAuthorizationHeader(),
+        ownedAssetPackIds: [], // Not using null in order to trigger an update of the assets context.
+        ownedAssetShortHeaders: [], // Not using null in order to trigger an update of the assets context.
       },
     }));
   }

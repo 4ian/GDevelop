@@ -279,32 +279,20 @@ export const AssetStoreStateProvider = ({
     [isLoading, environment, ownedAssetShortHeaders]
   );
 
-  // Effect to add the private assets as soon as they're loaded (when the user connects)
+  // We're listening to the owned assets changing to update the list of assets.
+  // This can happen when the user logs in or logs out.
   React.useEffect(
-    // CRASH ????
     () => {
-      if (ownedAssetShortHeaders) {
-        if (!assetShortHeadersById) {
-          // If the assetShortHeadersById is not yet initialized, we can just
-          // fetch everything.
-          fetchAssetsAndFilters();
-        } else {
-          // Otherwise, we add the private assets to the existing list.
-          const ownedAssetShortHeadersById = {};
-          ownedAssetShortHeaders.forEach(assetShortHeader => {
-            ownedAssetShortHeadersById[assetShortHeader.id] = assetShortHeader;
-          });
-          setAssetShortHeadersById({
-            ...assetShortHeadersById,
-            ...ownedAssetShortHeadersById,
-          });
-        }
+      if (!ownedAssetShortHeaders) {
+        return;
       }
+      fetchAssetsAndFilters();
     },
-    [ownedAssetShortHeaders, assetShortHeadersById, fetchAssetsAndFilters]
+    [ownedAssetShortHeaders, fetchAssetsAndFilters]
   );
 
-  // Preload the assets and filters when the app loads.
+  // Preload the assets and filters when the app loads, in case the user
+  // is not logged in. (A log in will trigger a reload of the assets.)
   React.useEffect(
     () => {
       // Don't attempt to load again assets and filters if they

@@ -276,9 +276,11 @@ const InstructionParametersEditor = React.forwardRef<
                       : undefined,
                   }}
                 />
-                <Text style={styles.description}>
-                  {instructionMetadata.getDescription()}
-                </Text>
+                <Column expand>
+                  <Text style={styles.description}>
+                    {instructionMetadata.getDescription()}
+                  </Text>
+                </Column>
                 {isAnEventFunctionMetadata(instructionMetadata) && (
                   <IconButton
                     onClick={() => {

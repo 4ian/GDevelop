@@ -1218,6 +1218,7 @@ interface ExpressionMetadata {
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetGroup();
     [Const, Ref] DOMString GetSmallIconFilename();
+    [Const, Ref] DOMString GetHelpPath();
     boolean IsShown();
     boolean IsPrivate();
     [Ref] ParameterMetadata GetParameter(unsigned long id);

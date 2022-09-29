@@ -192,6 +192,7 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
             this._pixiObject
           );
           if (renderer instanceof RenderedTextInstance) {
+            // TODO EBO Remove this line when an alignment property is added to the text object.
             renderer._pixiObject.style.align = 'center';
           }
           return renderer;
@@ -269,13 +270,16 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
       childInstance.setCustomHeight(height);
       renderedInstance.update();
 
-      // Center text objects.
       if (renderedInstance instanceof RenderedTextInstance) {
+        // TODO EBO Remove this line when an alignment property is added to the text object.
         renderedInstance._pixiObject.style.align = 'center';
-        childInstance.x = (width - renderedInstance._pixiObject.width) / 2;
-        childInstance.y = (height - renderedInstance._pixiObject.height) / 2;
-        renderedInstance.update();
       }
+      // This ensure objects are centered if their dimensions changed from the
+      // custom ones (preferred ones).
+      // For instance, text object dimensions change according to how the text is wrapped.
+      childInstance.x = (width - renderedInstance._pixiObject.width) / 2;
+      childInstance.y = (height - renderedInstance._pixiObject.height) / 2;
+      renderedInstance.update();
     }
 
     this._pixiObject.pivot.x = centerX;

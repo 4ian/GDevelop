@@ -49,6 +49,7 @@ namespace gdjs {
   export class RuntimeGame {
     _variables: VariablesContainer;
     _data: ProjectData;
+    _eventsBasedObjectDatas: Map<String, EventsBasedObjectData>;
     _imageManager: ImageManager;
     _soundManager: SoundManager;
     _fontManager: FontManager;
@@ -135,6 +136,18 @@ namespace gdjs {
       this._isPreview = this._options.isPreview || false;
       this._sessionId = null;
       this._playerId = null;
+
+      this._eventsBasedObjectDatas = new Map<String, EventsBasedObjectData>();
+      if (this._data.eventsFunctionsExtensions) {
+        for (const extension of this._data.eventsFunctionsExtensions) {
+          for (const eventsBasedObject of extension.eventsBasedObjects) {
+            this._eventsBasedObjectDatas.set(
+              extension.name + '::' + eventsBasedObject.name,
+              eventsBasedObject
+            );
+          }
+        }
+      }
     }
 
     /**
@@ -237,6 +250,17 @@ namespace gdjs {
      */
     getGameData(): ProjectData {
       return this._data;
+    }
+
+    getEventsBasedObjectData(type: string): EventsBasedObjectData | null {
+      const eventsBasedObjectData = this._eventsBasedObjectDatas.get(type);
+      if (!eventsBasedObjectData) {
+        logger.error(
+          'The game has no events-based object of the type "' + type + '"'
+        );
+        return null;
+      }
+      return eventsBasedObjectData;
     }
 
     /**

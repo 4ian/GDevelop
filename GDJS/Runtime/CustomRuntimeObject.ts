@@ -52,10 +52,8 @@ namespace gdjs {
       this._instanceContainer.loadFrom(objectData);
       this.getRenderer().reinitialize(this, parent);
 
+      // The generated code calls the onCreated super implementation at the end.
       this.onCreated();
-      // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
-      // TODO EBO Make generated code call super implementation for life-cycle methods.
-      super.onCreated();
     }
 
     reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
@@ -64,9 +62,7 @@ namespace gdjs {
       this._instanceContainer.loadFrom(objectData);
       this.getRenderer().reinitialize(this, this.getParent());
 
-      // *ALWAYS* call `this.onCreated()` at the very end of your object reinitialize method.
-      // TODO EBO Make generated code call super implementation for life-cycle methods.
-      super.onCreated();
+      // The generated code calls the onCreated super implementation at the end.
       this.onCreated();
     }
 

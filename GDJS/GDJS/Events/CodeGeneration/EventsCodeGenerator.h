@@ -110,7 +110,9 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \param fullyQualifiedFunctionName The function name with its namespace.
    * \param onceTriggersVariable The code to access the variable holding
    * OnceTriggers.
-   * \param preludeCode The code to run just before the events
+   * \param preludeCode The code to run right before the events
+   * generated code.
+   * \param endingCode The code to run right after the events
    * generated code.
    * \param includeFiles Will be filled with the necessary include files.
    * \param compilationForRuntime Set this to true if the code
@@ -126,6 +128,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& fullyQualifiedFunctionName,
       const gd::String& onceTriggersVariable,
       const gd::String& preludeCode,
+      const gd::String& endingCode,
       std::set<gd::String>& includeFiles,
       bool compilationForRuntime = false);
 
@@ -330,6 +333,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       gd::String functionArgumentsCode,
       gd::String functionPreEventsCode,
       const gd::EventsList& events,
+      gd::String functionPostEventsCode,
       gd::String functionReturnCode);
 
   /**

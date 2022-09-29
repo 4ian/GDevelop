@@ -39,6 +39,7 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
     gd::String functionArgumentsCode,
     gd::String functionPreEventsCode,
     const gd::EventsList& events,
+    gd::String functionPostEventsCode,
     gd::String functionReturnCode) {
   // Prepare the global context
   unsigned int maxDepthLevelReached = 0;
@@ -81,6 +82,7 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
         functionPreEventsCode + "\n" +
         globalObjectListsReset + "\n" +
         wholeEventsCode + "\n" +
+        functionPostEventsCode + "\n" +
         functionReturnCode + "\n" +
       "}\n";
   // clang-format on
@@ -104,6 +106,7 @@ gd::String EventsCodeGenerator::GenerateLayoutCode(
       "runtimeScene",
       "runtimeScene.getOnceTriggers().startNewFrame();\n",
       scene.GetEvents(),
+      "",
       "return;\n");
 
   includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
@@ -134,6 +137,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       codeGenerator.GenerateFreeEventsFunctionContext(
           eventsFunction.GetParameters(), "runtimeScene.getOnceTriggers()"),
       eventsFunction.GetEvents(),
+      "",
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
 
   includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
@@ -195,6 +199,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
           eventsFunction.GetParameters(), 2, false),
       fullPreludeCode,
       eventsFunction.GetEvents(),
+      "",
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
 
   includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
@@ -210,6 +215,7 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
     const gd::String& fullyQualifiedFunctionName,
     const gd::String& onceTriggersVariable,
     const gd::String& preludeCode,
+    const gd::String& endingCode,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
   gd::ObjectsContainer globalObjectsAndGroups;
@@ -266,6 +272,7 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
           eventsFunction.GetParameters(), 1, false),
       fullPreludeCode,
       eventsFunction.GetEvents(),
+      endingCode,
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
 
   includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),

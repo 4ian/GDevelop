@@ -87,6 +87,7 @@ class ObjectCodeGenerator {
 
   gd::Project& project;
 
+  static gd::String onCreatedFunctionName;
   static gd::String doStepPreEventsFunctionName;
 };
 

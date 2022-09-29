@@ -201,7 +201,10 @@ namespace gdjs {
     loop: boolean;
     frames: SpriteAnimationFrame[] = [];
 
-    constructor(imageManager, directionData) {
+    constructor(
+      imageManager: gdjs.PixiImageManager,
+      directionData: SpriteDirectionData
+    ) {
       this.timeBetweenFrames = directionData
         ? directionData.timeBetweenFrames
         : 1.0;
@@ -247,7 +250,10 @@ namespace gdjs {
     name: string;
     directions: gdjs.SpriteAnimationDirection[] = [];
 
-    constructor(imageManager, animData) {
+    constructor(
+      imageManager: gdjs.PixiImageManager,
+      animData: SpriteAnimationData
+    ) {
       this.hasMultipleDirections = !!animData.useMultipleDirections;
       this.name = animData.name || '';
       this.reinitialize(imageManager, animData);
@@ -282,9 +288,6 @@ namespace gdjs {
 
   /**
    * The SpriteRuntimeObject represents an object that can display images.
-   *
-   * @param runtimeScene The scene the object belongs to
-   * @param spriteObjectData The object data used to initialize the object
    */
   export class SpriteRuntimeObject extends gdjs.RuntimeObject {
     _currentAnimation: number = 0;
@@ -313,21 +316,30 @@ namespace gdjs {
      */
     _animationFrame: gdjs.SpriteAnimationFrame | null = null;
     _renderer: gdjs.SpriteRuntimeObjectRenderer;
-    hitBoxesDirty: any;
     _animationFrameDirty: any;
 
-    constructor(runtimeScene, spriteObjectData) {
-      super(runtimeScene, spriteObjectData);
+    /**
+     * @param instanceContainer The container the object belongs to
+     * @param spriteObjectData The object data used to initialize the object
+     */
+    constructor(
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      spriteObjectData: ObjectData & SpriteObjectDataType
+    ) {
+      super(instanceContainer, spriteObjectData);
       this._updateIfNotVisible = !!spriteObjectData.updateIfNotVisible;
       for (let i = 0, len = spriteObjectData.animations.length; i < len; ++i) {
         this._animations.push(
           new gdjs.SpriteAnimation(
-            runtimeScene.getGame().getImageManager(),
+            instanceContainer.getGame().getImageManager(),
             spriteObjectData.animations[i]
           )
         );
       }
-      this._renderer = new gdjs.SpriteRuntimeObjectRenderer(this, runtimeScene);
+      this._renderer = new gdjs.SpriteRuntimeObjectRenderer(
+        this,
+        instanceContainer
+      );
       this._updateAnimationFrame();
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -336,7 +348,7 @@ namespace gdjs {
 
     reinitialize(spriteObjectData: SpriteObjectData) {
       super.reinitialize(spriteObjectData);
-      const runtimeScene = this._runtimeScene;
+      const instanceContainer = this.getInstanceContainer();
       this._currentAnimation = 0;
       this._currentDirection = 0;
       this._currentFrame = 0;
@@ -355,13 +367,13 @@ namespace gdjs {
         const animData = spriteObjectData.animations[i];
         if (i < this._animations.length) {
           this._animations[i].reinitialize(
-            runtimeScene.getGame().getImageManager(),
+            instanceContainer.getGame().getImageManager(),
             animData
           );
         } else {
           this._animations.push(
             new gdjs.SpriteAnimation(
-              runtimeScene.getGame().getImageManager(),
+              instanceContainer.getGame().getImageManager(),
               animData
             )
           );
@@ -371,7 +383,7 @@ namespace gdjs {
 
       //Make sure to delete already existing animations which are not used anymore.
       this._animationFrame = null;
-      this._renderer.reinitialize(this, runtimeScene);
+      this._renderer.reinitialize(this, instanceContainer);
       this._updateAnimationFrame();
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object reinitialize method.
@@ -382,19 +394,19 @@ namespace gdjs {
       oldObjectData: SpriteObjectData,
       newObjectData: SpriteObjectData
     ): boolean {
-      const runtimeScene = this._runtimeScene;
+      const instanceContainer = this.getInstanceContainer();
       let i = 0;
       for (const len = newObjectData.animations.length; i < len; ++i) {
         const animData = newObjectData.animations[i];
         if (i < this._animations.length) {
           this._animations[i].reinitialize(
-            runtimeScene.getGame().getImageManager(),
+            instanceContainer.getGame().getImageManager(),
             animData
           );
         } else {
           this._animations.push(
             new gdjs.SpriteAnimation(
-              runtimeScene.getGame().getImageManager(),
+              instanceContainer.getGame().getImageManager(),
               animData
             )
           );
@@ -407,7 +419,7 @@ namespace gdjs {
       if (!this._animationFrame) {
         this.setAnimation(0);
       }
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
       return true;
     }
 
@@ -437,7 +449,7 @@ namespace gdjs {
     /**
      * Update the current frame of the object according to the elapsed time on the scene.
      */
-    update(runtimeScene: gdjs.RuntimeScene): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       //Playing the animation of all objects including the ones outside the screen can be
       //costly when the scene is big with a lot of animated objects. By default, we skip
       //updating the object if it is not visible.
@@ -463,7 +475,7 @@ namespace gdjs {
       //and compute nothing more.
       if (!direction.loop && this._currentFrame >= direction.frames.length) {
       } else {
-        const elapsedTime = this.getElapsedTime(runtimeScene) / 1000;
+        const elapsedTime = this.getElapsedTime() / 1000;
         this._frameElapsedTime += this._animationPaused
           ? 0
           : elapsedTime * this._animationSpeedScale;
@@ -493,7 +505,7 @@ namespace gdjs {
         this._updateAnimationFrame();
       }
       if (oldFrame !== this._currentFrame) {
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
       }
       this._renderer.ensureUpToDate();
     }
@@ -502,7 +514,7 @@ namespace gdjs {
      * Ensure the sprite is ready to be displayed: the proper animation frame
      * is set and the renderer is up to date (position, angle, alpha, flip, blend mode...).
      */
-    updatePreRender(runtimeScene: gdjs.RuntimeScene): void {
+    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
       }
@@ -613,7 +625,7 @@ namespace gdjs {
         //TODO: This may be unnecessary.
         this._renderer.update();
         this._animationFrameDirty = true;
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
       }
     }
 
@@ -669,7 +681,7 @@ namespace gdjs {
           return;
         }
         this.angle = newValue;
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
         this._renderer.updateAngle();
       } else {
         newValue = newValue | 0;
@@ -688,7 +700,7 @@ namespace gdjs {
         //TODO: This may be unnecessary.
         this._renderer.update();
         this._animationFrameDirty = true;
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
       }
     }
 
@@ -725,7 +737,7 @@ namespace gdjs {
       ) {
         this._currentFrame = newFrame;
         this._animationFrameDirty = true;
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
       }
     }
 
@@ -980,7 +992,7 @@ namespace gdjs {
       }
       this.x = x;
       if (this._animationFrame !== null) {
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
         this._renderer.updateX();
       }
     }
@@ -995,7 +1007,7 @@ namespace gdjs {
       }
       this.y = y;
       if (this._animationFrame !== null) {
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
         this._renderer.updateY();
       }
     }
@@ -1014,7 +1026,7 @@ namespace gdjs {
         }
         this.angle = angle;
         this._renderer.updateAngle();
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
       } else {
         angle = angle % 360;
         if (angle < 0) {
@@ -1105,20 +1117,20 @@ namespace gdjs {
       return this._renderer.getColor();
     }
 
-    flipX(enable) {
+    flipX(enable: boolean) {
       if (enable !== this._flippedX) {
         this._scaleX *= -1;
         this._flippedX = enable;
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
         this._renderer.update();
       }
     }
 
-    flipY(enable) {
+    flipY(enable: boolean) {
       if (enable !== this._flippedY) {
         this._scaleY *= -1;
         this._flippedY = enable;
-        this.hitBoxesDirty = true;
+        this.invalidateHitboxes();
         this._renderer.update();
       }
     }
@@ -1215,7 +1227,7 @@ namespace gdjs {
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this._renderer.update();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -1232,11 +1244,11 @@ namespace gdjs {
       }
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this._renderer.update();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
-     * Change the scale on Y axis of the object (changing its width).
+     * Change the scale on Y axis of the object (changing its height).
      *
      * @param newScale The new scale (must be greater than 0).
      */
@@ -1249,7 +1261,7 @@ namespace gdjs {
       }
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this._renderer.update();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -1285,7 +1297,7 @@ namespace gdjs {
      * @param scene The scene containing the object
      * @deprecated
      */
-    turnTowardObject(obj, scene) {
+    turnTowardObject(obj: gdjs.RuntimeObject, scene: gdjs.RuntimeScene) {
       if (obj === null) {
         return;
       }

@@ -224,7 +224,7 @@ namespace gdjs {
       export const readNumberFromJSONFile = (
         name: string,
         elementPath: string,
-        runtimeScene: gdjs.RuntimeScene | null,
+        instanceContainer: gdjs.RuntimeInstanceContainer | null,
         variable: gdjs.Variable
       ) => {
         return loadObject(name, (jsObject) => {
@@ -250,7 +250,7 @@ namespace gdjs {
       export const readStringFromJSONFile = (
         name: string,
         elementPath: string,
-        runtimeScene: gdjs.RuntimeScene | null,
+        instanceContainer: gdjs.RuntimeInstanceContainer | null,
         variable: gdjs.Variable
       ) => {
         return loadObject(name, (jsObject) => {

@@ -7,7 +7,7 @@ namespace gdjs {
     export namespace debuggerTools {
       /**
        * Stop the game execution.
-       * @param instanceContainer - The current scene.
+       * @param instanceContainer - The current container.
        */
       export const pause = function (
         instanceContainer: gdjs.RuntimeInstanceContainer
@@ -31,7 +31,7 @@ namespace gdjs {
 
       /**
        * Enable or disable the debug draw.
-       * @param instanceContainer - The current scene.
+       * @param instanceContainer - The current container.
        * @param enableDebugDraw - true to enable the debug draw, false to disable it.
        * @param showHiddenInstances - true to apply the debug draw to hidden objects.
        * @param showPointsNames - true to show point names.

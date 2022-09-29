@@ -34,7 +34,7 @@ namespace gdjs {
        */
       private _manager: TileMapHelper.TileMapManager;
       /**
-       * @param instanceContainer The scene.
+       * @param instanceContainer The instance container.
        */
       private constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {
         this._instanceContainer = instanceContainer;

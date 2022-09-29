@@ -30,7 +30,7 @@ namespace gdjs {
     _renderer: gdjs.TiledSpriteRuntimeObjectRenderer;
 
     /**
-     * @param instanceContainer The scene the object belongs to.
+     * @param instanceContainer The container the object belongs to.
      * @param tiledSpriteObjectData The initial properties of the object
      */
     constructor(
@@ -106,8 +106,8 @@ namespace gdjs {
 
     /**
      * Assign a new texture to the Tiled Sprite object.
-     * @param textureName The name of the image texture ressource.
-     * @param instanceContainer The scene in which the texture is used.
+     * @param textureName The name of the image texture resource.
+     * @param instanceContainer The container in which the texture is used.
      */
     setTexture(
       textureName: string,

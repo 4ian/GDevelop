@@ -5,7 +5,7 @@ import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.f
 import ExpressionParametersEditor from './ExpressionParametersEditor';
 import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import Text from '../../../UI/Text';
-import { Column, Line } from '../../../UI/Grid';
+import { Column } from '../../../UI/Grid';
 import HelpButton from '../../../UI/HelpButton';
 
 export type ParameterValues = Array<string>;

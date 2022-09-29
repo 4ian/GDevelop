@@ -113,6 +113,18 @@ namespace gdjs {
     abstract getViewportHeight(): float;
 
     /**
+     * @return the center X of the game resolution for a {@link gdjs.RuntimeScene} or the
+     * internal size for a {@link gdjs.CustomRuntimeObject}.
+     */
+    abstract getViewportOriginX(): float;
+
+    /**
+     * @return the center Y of the game resolution for a {@link gdjs.RuntimeScene} or the
+     * internal size for a {@link gdjs.CustomRuntimeObject}.
+     */
+    abstract getViewportOriginY(): float;
+
+    /**
      * Triggered when the AABB of a child of the container could have changed.
      */
     abstract onChildrenLocationChanged(): void;

@@ -3,6 +3,7 @@ namespace gdjs {
 
   const logger = new gdjs.Logger('Player Authentication');
   const authComponents = gdjs.playerAuthenticationComponents;
+  // TODO EBO Replace runtimeScene to instanceContainer.
   export namespace playerAuthentication {
     // In order to test in development mode, change this to true.
     const dev = false;

@@ -3,7 +3,8 @@ import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import ObjectsRenderingService from '../ObjectsRenderingService';
-import { mapFor } from '../../Utils/MapFor';
+import RenderedTextInstance from './RenderedTextInstance';
+import { mapReverseFor } from '../../Utils/MapFor';
 import * as PIXI from 'pixi.js-legacy';
 
 const gd: libGDevelop = global.gd;
@@ -13,10 +14,16 @@ const gd: libGDevelop = global.gd;
 class ChildInstance {
   x: number;
   y: number;
+  _hasCustomSize: boolean;
+  _customWidth: number;
+  _customHeight: number;
 
   constructor() {
     this.x = 0;
     this.y = 0;
+    this._customWidth = 0;
+    this._customHeight = 0;
+    this._hasCustomSize = false;
   }
 
   getX() {
@@ -67,22 +74,30 @@ class ChildInstance {
 
   setLayer(layer: string) {}
 
-  setHasCustomSize(enable: boolean) {}
+  setHasCustomSize(enable: boolean) {
+    this._hasCustomSize = enable;
+  }
 
   hasCustomSize() {
-    return false;
+    return this._hasCustomSize;
   }
 
-  setCustomWidth(width: number) {}
+  setCustomWidth(width: number) {
+    this._customWidth = width;
+    this._hasCustomSize = true;
+  }
 
   getCustomWidth() {
-    return 0;
+    return this._customWidth;
   }
 
-  setCustomHeight(height: number) {}
+  setCustomHeight(height: number) {
+    this._customHeight = height;
+    this._hasCustomSize = true;
+  }
 
   getCustomHeight() {
-    return 0;
+    return this._customHeight;
   }
 
   resetPersistentUuid() {
@@ -161,14 +176,14 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
 
     this.childrenInstances = [];
     this.childrenRenderedInstances = eventBasedObject
-      ? mapFor(0, eventBasedObject.getObjectsCount(), i => {
+      ? mapReverseFor(0, eventBasedObject.getObjectsCount(), i => {
           const childObject = eventBasedObject.getObjectAt(i);
           const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
             childObject.getName()
           );
           const childInstance = new ChildInstance();
           this.childrenInstances.push(childInstance);
-          return ObjectsRenderingService.createNewInstanceRenderer(
+          const renderer = ObjectsRenderingService.createNewInstanceRenderer(
             project,
             layout,
             // $FlowFixMe Use real object instances.
@@ -176,6 +191,11 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
             childObjectConfiguration,
             this._pixiObject
           );
+          if (renderer instanceof RenderedTextInstance) {
+            // TODO EBO Remove this line when an alignment property is added to the text object.
+            renderer._pixiObject.style.align = 'center';
+          }
+          return renderer;
         })
       : [];
   }
@@ -229,6 +249,13 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
     const centerX = defaultWidth / 2;
     const centerY = defaultHeight / 2;
 
+    const width = this._instance.hasCustomSize()
+      ? this._instance.getCustomWidth()
+      : this.getDefaultWidth();
+    const height = this._instance.hasCustomSize()
+      ? this._instance.getCustomHeight()
+      : this.getDefaultHeight();
+
     for (
       let index = 0;
       index < this.childrenRenderedInstances.length;
@@ -236,9 +263,22 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
     ) {
       const renderedInstance = this.childrenRenderedInstances[index];
       const childInstance = this.childrenInstances[index];
-      childInstance.x = (defaultWidth - renderedInstance.getDefaultWidth()) / 2;
-      childInstance.y =
-        (defaultHeight - renderedInstance.getDefaultHeight()) / 2;
+
+      childInstance.x = 0;
+      childInstance.y = 0;
+      childInstance.setCustomWidth(width);
+      childInstance.setCustomHeight(height);
+      renderedInstance.update();
+
+      if (renderedInstance instanceof RenderedTextInstance) {
+        // TODO EBO Remove this line when an alignment property is added to the text object.
+        renderedInstance._pixiObject.style.align = 'center';
+      }
+      // This ensure objects are centered if their dimensions changed from the
+      // custom ones (preferred ones).
+      // For instance, text object dimensions change according to how the text is wrapped.
+      childInstance.x = (width - renderedInstance._pixiObject.width) / 2;
+      childInstance.y = (height - renderedInstance._pixiObject.height) / 2;
       renderedInstance.update();
     }
 
@@ -247,14 +287,8 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
     this._pixiObject.rotation = RenderedInstance.toRad(
       this._instance.getAngle()
     );
-    if (this._instance.hasCustomSize()) {
-      this._pixiObject.scale.x = this._instance.getCustomWidth() / defaultWidth;
-      this._pixiObject.scale.y =
-        this._instance.getCustomHeight() / defaultHeight;
-    } else {
-      this._pixiObject.scale.x = 1;
-      this._pixiObject.scale.y = 1;
-    }
+    this._pixiObject.scale.x = 1;
+    this._pixiObject.scale.y = 1;
     this._pixiObject.position.x =
       this._instance.getX() +
       (centerX - originX) * Math.abs(this._pixiObject.scale.x);

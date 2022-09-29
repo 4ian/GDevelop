@@ -9,7 +9,7 @@ namespace gdjs {
     }
 
     /**
-     * Get the light obstacles manager of a scene.
+     * Get the light obstacles manager of an instance container.
      */
     static getManager(
       instanceContainer: gdjs.RuntimeInstanceContainer

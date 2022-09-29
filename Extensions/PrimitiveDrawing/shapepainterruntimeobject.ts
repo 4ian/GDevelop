@@ -57,7 +57,7 @@ namespace gdjs {
     private static readonly _pointForTransformation: FloatPoint = [0, 0];
 
     /**
-     * @param instanceContainer The scene the object belongs to.
+     * @param instanceContainer The container the object belongs to.
      * @param shapePainterObjectData The initial properties of the object
      */
     constructor(

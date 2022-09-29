@@ -8,9 +8,9 @@ namespace gdjs {
 
   /**
    * Manages the common objects shared by objects having a
-   * platform behavior: in particular, the platforms behaviors are required to declare
-   * themselves (see PlatformObjectsManager.addPlatform) to the manager of their associated scene
-   * (see PlatformRuntimeBehavior.getManager).
+   * platform behavior: in particular, the platforms behaviors are required to
+   * declare themselves (see PlatformObjectsManager.addPlatform) to the manager
+   * of their associated container (see PlatformRuntimeBehavior.getManager).
    */
   export class PlatformObjectsManager {
     private _platformRBush: any;
@@ -20,7 +20,7 @@ namespace gdjs {
     }
 
     /**
-     * Get the platforms manager of a scene.
+     * Get the platforms manager of an instance container.
      */
     static getManager(instanceContainer: gdjs.RuntimeInstanceContainer) {
       // @ts-ignore

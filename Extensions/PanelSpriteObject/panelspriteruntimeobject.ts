@@ -43,7 +43,7 @@ namespace gdjs {
     _renderer: gdjs.PanelSpriteRuntimeObjectRenderer;
 
     /**
-     * @param instanceContainer The scene the object belongs to.
+     * @param instanceContainer The container the object belongs to.
      * @param panelSpriteObjectData The initial properties of the object
      */
     constructor(

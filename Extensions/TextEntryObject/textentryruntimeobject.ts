@@ -12,7 +12,7 @@ namespace gdjs {
     _renderer: gdjs.TextEntryRuntimeObjectRenderer;
 
     /**
-     * @param instanceContainer The scene the object belongs to.
+     * @param instanceContainer The container the object belongs to.
      * @param textEntryObjectData The initial properties of the object
      */
     constructor(

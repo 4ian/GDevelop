@@ -10,10 +10,12 @@ namespace gdjs {
   declare var rbush: any;
 
   /**
-   * PathfindingObstaclesManager manages the common objects shared by objects having a
-   * pathfinding behavior: In particular, the obstacles behaviors are required to declare
-   * themselves (see `PathfindingObstaclesManager.addObstacle`) to the manager of their associated scene
-   * (see `gdjs.PathfindingRuntimeBehavior.obstaclesManagers`).
+   * PathfindingObstaclesManager manages the common objects shared by objects
+   * having a pathfinding behavior: In particular, the obstacles behaviors are
+   * required to declare themselves (see
+   * `PathfindingObstaclesManager.addObstacle`) to the manager of their
+   * associated container (see
+   * `gdjs.PathfindingRuntimeBehavior.obstaclesManagers`).
    */
   export class PathfindingObstaclesManager {
     _obstaclesRBush: any;
@@ -23,7 +25,7 @@ namespace gdjs {
     }
 
     /**
-     * Get the obstacles manager of a scene.
+     * Get the obstacles manager of an instance container.
      */
     static getManager(instanceContainer: gdjs.RuntimeInstanceContainer) {
       if (!instanceContainer.pathfindingObstaclesManager) {

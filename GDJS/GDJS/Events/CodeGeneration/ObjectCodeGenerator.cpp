@@ -9,6 +9,9 @@
 
 namespace gdjs {
 
+gd::String ObjectCodeGenerator::onCreatedFunctionName =
+    "onCreated";
+
 gd::String ObjectCodeGenerator::doStepPreEventsFunctionName =
     "doStepPreEvents";
 
@@ -76,6 +79,9 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectCompleteCode(
                   "that._onceTriggers",
                   functionName == doStepPreEventsFunctionName
                       ? GenerateDoStepPreEventsPreludeCode()
+                      : "",
+                  functionName == onCreatedFunctionName
+                      ? "gdjs.CustomRuntimeObject.prototype.onCreated.call(this);\n"
                       : "",
                   includeFiles,
                   compilationForRuntime);

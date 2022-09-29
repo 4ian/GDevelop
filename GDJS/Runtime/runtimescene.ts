@@ -80,8 +80,8 @@ namespace gdjs {
      * See gdjs.RuntimeGame.startGameLoop in particular.
      */
     onGameResolutionResized() {
-      const oldGameResolutionWidth = this._cachedGameResolutionWidth;
-      const oldGameResolutionHeight = this._cachedGameResolutionHeight;
+      const oldGameResolutionOriginX = this.getViewportOriginX();
+      const oldGameResolutionOriginY = this.getViewportOriginY();
       this._cachedGameResolutionWidth = this._runtimeGame
         ? this._runtimeGame.getGameResolutionWidth()
         : 0;
@@ -93,8 +93,8 @@ namespace gdjs {
           /** @type gdjs.Layer */
           const theLayer: gdjs.Layer = this._layers.items[name];
           theLayer.onGameResolutionResized(
-            oldGameResolutionWidth,
-            oldGameResolutionHeight
+            oldGameResolutionOriginX,
+            oldGameResolutionOriginY
           );
         }
       }
@@ -547,6 +547,14 @@ namespace gdjs {
 
     getViewportHeight(): float {
       return this._cachedGameResolutionHeight;
+    }
+
+    getViewportOriginX(): float {
+      return this._cachedGameResolutionWidth / 2;
+    }
+
+    getViewportOriginY(): float {
+      return this._cachedGameResolutionHeight / 2;
     }
 
     convertCoords(x: float, y: float, result: FloatPoint): FloatPoint {

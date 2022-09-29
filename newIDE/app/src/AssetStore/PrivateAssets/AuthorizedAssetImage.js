@@ -27,7 +27,9 @@ const AuthorizedAssetImage = (props: Props) => {
       if (!authorizationToken) {
         fetchAuthorizationToken();
       } else {
-        setAuthorizedUrl(props.url + '?token=' + authorizationToken);
+        setAuthorizedUrl(
+          props.url + '?token=' + encodeURIComponent(authorizationToken)
+        );
       }
     },
     [authorizationToken, fetchAuthorizationToken, props.url, isImageLoaded]
@@ -50,6 +52,8 @@ const AuthorizedAssetImage = (props: Props) => {
         src={authorizedUrl}
         style={{
           ...props.style,
+          // Use display none to load the image in the background, but not
+          // display it. Once loaded, display it and hide loader.
           display: isImageLoaded ? 'block' : 'none',
         }}
         onError={onFetchingError}

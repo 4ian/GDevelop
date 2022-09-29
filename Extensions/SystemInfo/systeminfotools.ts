@@ -90,7 +90,7 @@ namespace gdjs {
 
       /**
        * Check if the game is running as a preview, launched from an editor.
-       * @param instanceContainer The current scene.
+       * @param instanceContainer The current container.
        * @returns true if the game is running as a preview.
        */
       export const isPreview = (

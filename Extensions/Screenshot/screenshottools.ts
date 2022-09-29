@@ -4,7 +4,7 @@ namespace gdjs {
 
     /**
      * Save a screenshot of the game.
-     * @param instanceContainer The scene
+     * @param instanceContainer The container
      * @param savePath The path where to save the screenshot
      */
     export const takeScreenshot = function (

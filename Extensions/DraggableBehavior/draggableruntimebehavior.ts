@@ -152,7 +152,7 @@ namespace gdjs {
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     /**
-     * Get the platforms manager of a scene.
+     * Get the platforms manager of an instance container.
      */
     static getMouseManager(
       instanceContainer: gdjs.RuntimeInstanceContainer
@@ -170,7 +170,7 @@ namespace gdjs {
     }
 
     /**
-     * Get the platforms manager of a scene.
+     * Get the platforms manager of an instance container.
      */
     static getTouchManager(
       instanceContainer: gdjs.RuntimeInstanceContainer,

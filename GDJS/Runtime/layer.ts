@@ -90,8 +90,8 @@ namespace gdjs {
      * Updates the layer width/height and position.
      */
     onGameResolutionResized(
-      oldGameResolutionWidth: float,
-      oldGameResolutionHeight: float
+      oldGameResolutionOriginX: float,
+      oldGameResolutionOriginY: float
     ): void {
       // Adapt position of the camera center as:
       // * Most cameras following a player/object on the scene will be updating this
@@ -100,8 +100,10 @@ namespace gdjs {
       // expected not to "move". Not adapting the center position would make the camera
       // move from its initial position (which is centered in the screen) - and anchor
       // behavior would behave counterintuitively.
-      this._cameraX += (this.getWidth() - oldGameResolutionWidth) / 2;
-      this._cameraY += (this.getHeight() - oldGameResolutionHeight) / 2;
+      this._cameraX +=
+        this._runtimeScene.getViewportOriginX() - oldGameResolutionOriginX;
+      this._cameraY +=
+        this._runtimeScene.getViewportOriginY() - oldGameResolutionOriginY;
       this._renderer.updatePosition();
     }
 
@@ -306,8 +308,8 @@ namespace gdjs {
       cameraId: integer,
       result: FloatPoint
     ): FloatPoint {
-      x -= this.getWidth() / 2;
-      y -= this.getHeight() / 2;
+      x -= this._runtimeScene.getViewportOriginX();
+      y -= this._runtimeScene.getViewportOriginY();
       x /= Math.abs(this._zoomFactor);
       y /= Math.abs(this._zoomFactor);
 
@@ -320,6 +322,7 @@ namespace gdjs {
       y = sinValue * tmp + cosValue * y;
       result[0] = x + this.getCameraX(cameraId);
       result[1] = y + this.getCameraY(cameraId);
+
       return result;
     }
 
@@ -377,8 +380,8 @@ namespace gdjs {
       y = sinValue * tmp + cosValue * y;
       x *= Math.abs(this._zoomFactor);
       y *= Math.abs(this._zoomFactor);
-      x += this.getWidth() / 2;
-      y += this.getHeight() / 2;
+      x += this._runtimeScene.getViewportOriginX();
+      y += this._runtimeScene.getViewportOriginY();
 
       result[0] = x;
       result[1] = y;

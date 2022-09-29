@@ -335,6 +335,14 @@ namespace gdjs {
       return this._customObject.getUnscaledHeight();
     }
 
+    getViewportOriginX(): float {
+      return this._customObject.getUnscaledCenterX();
+    }
+
+    getViewportOriginY(): float {
+      return this._customObject.getUnscaledCenterY();
+    }
+
     onChildrenLocationChanged(): void {
       this._customObject.onChildrenLocationChanged();
     }
@@ -344,12 +352,12 @@ namespace gdjs {
      *
      * It adapts the layers camera positions.
      */
-    onObjectUnscaledDimensionChange(oldWidth: float, oldHeight: float): void {
+    onObjectUnscaledCenterChanged(oldOriginX: float, oldOriginY: float): void {
       for (const name in this._layers.items) {
         if (this._layers.items.hasOwnProperty(name)) {
           /** @type gdjs.Layer */
           const theLayer: gdjs.Layer = this._layers.items[name];
-          theLayer.onGameResolutionResized(oldWidth, oldHeight);
+          theLayer.onGameResolutionResized(oldOriginX, oldOriginY);
         }
       }
     }

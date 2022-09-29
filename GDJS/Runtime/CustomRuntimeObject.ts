@@ -109,7 +109,7 @@ namespace gdjs {
      */
     onHotReloading(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
-    // TODO EBO This is only to handle trigger once.
+    // This is only to handle trigger once.
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     /**
@@ -140,6 +140,7 @@ namespace gdjs {
     onChildrenLocationChanged() {
       this._isUntransformedHitBoxesDirty = true;
       this.invalidateHitboxes();
+      this.getRenderer().update();
     }
 
     updateHitBoxes(): void {
@@ -177,50 +178,53 @@ namespace gdjs {
      * Merge the hitboxes of the children.
      */
     _updateUntransformedHitBoxes() {
-      const oldUnscaledWidth = Math.max(
-        0,
-        this._unrotatedAABB.max[0] - this._unrotatedAABB.min[0]
-      );
-      const oldUnscaledHeight = Math.max(
-        0,
-        this._unrotatedAABB.max[1] - this._unrotatedAABB.min[1]
-      );
-
       this._isUntransformedHitBoxesDirty = false;
-      let minX = Number.MAX_VALUE;
-      let minY = Number.MAX_VALUE;
-      let maxX = -Number.MAX_VALUE;
-      let maxY = -Number.MAX_VALUE;
-      this._untransformedHitBoxes.length = 0;
-      for (const childInstance of this._instanceContainer.getAdhocListOfAllInstances()) {
-        Array.prototype.push.apply(
-          this._untransformedHitBoxes,
-          childInstance.getHitBoxes()
-        );
-        const childAABB = childInstance.getAABB();
-        minX = Math.min(minX, childAABB.min[0]);
-        minY = Math.min(minY, childAABB.min[1]);
-        maxX = Math.max(maxX, childAABB.max[0]);
-        maxY = Math.max(maxY, childAABB.max[1]);
-      }
-      this._unrotatedAABB.min[0] = minX;
-      this._unrotatedAABB.min[1] = minY;
-      this._unrotatedAABB.max[0] = maxX;
-      this._unrotatedAABB.max[1] = maxY;
 
-      while (this.hitBoxes.length < this._untransformedHitBoxes.length) {
-        this.hitBoxes.push(new gdjs.Polygon());
+      const oldUnscaledCenterX =
+        (this._unrotatedAABB.max[0] + this._unrotatedAABB.min[0]) / 2;
+      const oldUnscaledCenterY =
+        (this._unrotatedAABB.max[1] + this._unrotatedAABB.min[1]) / 2;
+
+      this._untransformedHitBoxes.length = 0;
+      if (this._instanceContainer.getAdhocListOfAllInstances().length === 0) {
+        this._unrotatedAABB.min[0] = 0;
+        this._unrotatedAABB.min[1] = 0;
+        this._unrotatedAABB.max[0] = 0;
+        this._unrotatedAABB.max[1] = 0;
+      } else {
+        let minX = Number.MAX_VALUE;
+        let minY = Number.MAX_VALUE;
+        let maxX = -Number.MAX_VALUE;
+        let maxY = -Number.MAX_VALUE;
+        for (const childInstance of this._instanceContainer.getAdhocListOfAllInstances()) {
+          Array.prototype.push.apply(
+            this._untransformedHitBoxes,
+            childInstance.getHitBoxes()
+          );
+          const childAABB = childInstance.getAABB();
+          minX = Math.min(minX, childAABB.min[0]);
+          minY = Math.min(minY, childAABB.min[1]);
+          maxX = Math.max(maxX, childAABB.max[0]);
+          maxY = Math.max(maxY, childAABB.max[1]);
+        }
+        this._unrotatedAABB.min[0] = minX;
+        this._unrotatedAABB.min[1] = minY;
+        this._unrotatedAABB.max[0] = maxX;
+        this._unrotatedAABB.max[1] = maxY;
+
+        while (this.hitBoxes.length < this._untransformedHitBoxes.length) {
+          this.hitBoxes.push(new gdjs.Polygon());
+        }
+        this.hitBoxes.length = this._untransformedHitBoxes.length;
       }
-      this.hitBoxes.length = this._untransformedHitBoxes.length;
 
       if (
-        this.getUnscaledWidth() !== oldUnscaledWidth ||
-        this.getUnscaledHeight() !== oldUnscaledHeight
+        this.getUnscaledCenterX() !== oldUnscaledCenterX ||
+        this.getUnscaledCenterY() !== oldUnscaledCenterY
       ) {
-        // TODO EBO Should this be called for any change of the AABB?
-        this._instanceContainer.onObjectUnscaledDimensionChange(
-          oldUnscaledWidth,
-          oldUnscaledHeight
+        this._instanceContainer.onObjectUnscaledCenterChanged(
+          oldUnscaledCenterX,
+          oldUnscaledCenterY
         );
       }
     }
@@ -338,10 +342,7 @@ namespace gdjs {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
-      return Math.max(
-        0,
-        this._unrotatedAABB.max[0] - this._unrotatedAABB.min[0]
-      );
+      return this._unrotatedAABB.max[0] - this._unrotatedAABB.min[0];
     }
 
     /**
@@ -351,10 +352,7 @@ namespace gdjs {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
-      return Math.max(
-        0,
-        this._unrotatedAABB.max[1] - this._unrotatedAABB.min[1]
-      );
+      return this._unrotatedAABB.max[1] - this._unrotatedAABB.min[1];
     }
 
     /**
@@ -364,7 +362,7 @@ namespace gdjs {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
-      return this.getUnscaledWidth() / 2 - this._unrotatedAABB.min[0];
+      return (this._unrotatedAABB.min[0] + this._unrotatedAABB.max[0]) / 2;
     }
 
     /**
@@ -374,7 +372,7 @@ namespace gdjs {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
-      return this.getUnscaledHeight() / 2 - this._unrotatedAABB.min[1];
+      return (this._unrotatedAABB.min[1] + this._unrotatedAABB.max[1]) / 2;
     }
 
     getWidth(): float {
@@ -454,8 +452,8 @@ namespace gdjs {
       }
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
-      this.getRenderer().update();
       this.invalidateHitboxes();
+      this.getRenderer().update();
     }
 
     /**
@@ -471,8 +469,8 @@ namespace gdjs {
         return;
       }
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
-      this.getRenderer().update();
       this.invalidateHitboxes();
+      this.getRenderer().update();
     }
 
     /**
@@ -488,8 +486,8 @@ namespace gdjs {
         return;
       }
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
-      this.getRenderer().update();
       this.invalidateHitboxes();
+      this.getRenderer().update();
     }
 
     /**
@@ -561,8 +559,8 @@ namespace gdjs {
       if (enable !== this._flippedX) {
         this._scaleX *= -1;
         this._flippedX = enable;
-        this.getRenderer().update();
         this.invalidateHitboxes();
+        this.getRenderer().update();
       }
     }
 
@@ -570,8 +568,8 @@ namespace gdjs {
       if (enable !== this._flippedY) {
         this._scaleY *= -1;
         this._flippedY = enable;
-        this.getRenderer().update();
         this.invalidateHitboxes();
+        this.getRenderer().update();
       }
     }
 

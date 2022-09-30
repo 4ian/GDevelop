@@ -1,6 +1,11 @@
+// @flow
 import { type ExtensionsRegistry } from '../../Utils/GDevelopServices/Extension';
+import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
 
-export const fakeExtensionsRegistry: ExtensionsRegistry = {
+export const fakeExtensionsRegistry: ExtensionsRegistry & {
+  // The service gives CSV but it's converted on the fly to an array.
+  extensionShortHeaders: Array<ExtensionShortHeader & { tags: any }>,
+} = {
   version: '0.0.1',
   allTags: [
     'ledge tolerance',
@@ -424,6 +429,21 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
     'sdk',
     'ads',
   ],
+  allCategories: [
+    'Movement',
+    'Network',
+    'User interface',
+    'General',
+    'Input',
+    'Advanced',
+    'Camera',
+    'Game mechanic',
+    'Visual effect',
+    'Third-party',
+    'Ads',
+    'Audio',
+    'Device',
+  ],
   views: {
     default: {
       firstExtensionIds: [
@@ -448,13 +468,18 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/SomeAlreadyInstalledExtension-header.json',
       tags: 'ledge tolerance,jump,platform',
+      category: 'Movement',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Sports and Fitness/Sports and Fitness_training_running_run.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
       authors: [
-        { id: 'this-is-a-fake-id', username: 'Fake author' },
-        { id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2', username: 'D8H' },
+        { id: 'this-is-a-fake-id', username: 'Fake author', description: '' },
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+        },
       ],
     },
     {
@@ -470,13 +495,18 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/AdvancedJump-header.json',
       tags: 'ledge tolerance,jump,platform',
+      category: 'Movement',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Sports and Fitness/Sports and Fitness_training_running_run.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
       authors: [
-        { id: 'this-is-a-fake-id', username: 'Fake author' },
-        { id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2', username: 'D8H' },
+        { id: 'this-is-a-fake-id', username: 'Fake author', description: '' },
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+        },
       ],
     },
     {
@@ -493,11 +523,18 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/AdvancedP2PEventHandling-header.json',
       tags: 'p2p,performance,advanced',
+      category: 'Network',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Applications and Programming/Applications and Programming_sitemap_map_ux_application.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 1,
-      authors: [{ id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1', username: 'arthuro555' }],
+      authors: [
+        {
+          id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
+          username: 'arthuro555',
+          description: '',
+        },
+      ],
     },
     {
       tier: 'community',
@@ -512,12 +549,17 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/AlignObject-header.json',
       tags: 'align,alignment,center',
+      category: 'User interface',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/format-vertical-align-center.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 14,
       authors: [
-        { id: 'I0kdjvsICFML0APq45CZjZ6PyEQ2', username: 'Fake user #EQ2' },
+        {
+          id: 'I0kdjvsICFML0APq45CZjZ6PyEQ2',
+          username: 'Fake user #EQ2',
+          description: '',
+        },
       ],
     },
     {
@@ -534,11 +576,18 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/AnimatedBackAndForthMovement-header.json',
       tags: 'back,forth,movement',
+      category: 'Movement',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
-      authors: [{ id: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2', username: '4ian' }],
+      authors: [
+        {
+          id: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
+          username: '4ian',
+          description: '',
+        },
+      ],
     },
     {
       tier: 'reviewed',
@@ -554,11 +603,18 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
         'https://resources.gdevelop-app.com/extensions/ArrayTools-header.json',
       tags:
         'array,variable,index,tool,math,string,sort,find,slice,cut,random,copy,combine,concat,append,insert',
+      category: 'General',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/code-array.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 31,
-      authors: [{ id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1', username: 'arthuro555' }],
+      authors: [
+        {
+          id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
+          username: 'arthuro555',
+          description: '',
+        },
+      ],
     },
     {
       tier: 'reviewed',
@@ -573,11 +629,18 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/AutoTyping-header.json',
       tags: 'text,bbtext,dialogue,visual novel,autotyping,bitmap',
+      category: 'User interface',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/typewriter.svg',
       eventsBasedBehaviorsCount: 3,
       eventsFunctionsCount: 0,
-      authors: [{ id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92', username: 'Bouh' }],
+      authors: [
+        {
+          id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
+          username: 'Bouh',
+          description: '',
+        },
+      ],
     },
     {
       tier: 'reviewed',
@@ -591,11 +654,18 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/BackButton-header.json',
       tags: 'back,mobile,button,input',
+      category: 'Input',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/keyboard-backspace.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 4,
-      authors: [{ id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1', username: 'arthuro555' }],
+      authors: [
+        {
+          id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
+          username: 'arthuro555',
+          description: '',
+        },
+      ],
     },
     {
       tier: 'reviewed',
@@ -610,12 +680,17 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/BaseConversion-header.json',
       tags: 'binary,numbers,number,base,hex,decimal',
+      category: 'Advance',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/hexadecimal.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 2,
       authors: [
-        { id: 'onPsboRtDkUHNOsx7OPr8R8G1oj2', username: 'Fake user #oj2' },
+        {
+          id: 'onPsboRtDkUHNOsx7OPr8R8G1oj2',
+          username: 'Fake user #oj2',
+          description: '',
+        },
       ],
     },
     {
@@ -631,12 +706,17 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/BehaviorRemapper-header.json',
       tags: 'remapper,key,bindings,presets,platformer,top-down',
+      category: 'Input',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/alpha-w-box-outline.svg',
       eventsBasedBehaviorsCount: 2,
       eventsFunctionsCount: 0,
       authors: [
-        { id: 'AlZ3D1xkH0QDao7T37VZZUeYNpn1', username: 'Fake user #pn1' },
+        {
+          id: 'AlZ3D1xkH0QDao7T37VZZUeYNpn1',
+          username: 'Fake user #pn1',
+          description: '',
+        },
       ],
     },
     {
@@ -654,13 +734,22 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/BoidsMovement-header.json',
       tags: 'flock,swarm,boids,crowd,horde',
+      category: 'Movement',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Restaurant/Restaurant_restaurant_seafood_animal_fish.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 1,
       authors: [
-        { id: 'rotBq28wITdtfsrE7McHQri4k2w2', username: 'Fake user #2w2' },
-        { id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2', username: 'D8H' },
+        {
+          id: 'rotBq28wITdtfsrE7McHQri4k2w2',
+          username: 'Fake user #2w2',
+          description: '',
+        },
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+        },
       ],
     },
     {
@@ -676,13 +765,18 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/Boomerang-header.json',
       tags: 'boomerang,throw,attack,projectile,ricochet,rebound,launch',
+      category: 'Movement',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/boomerang.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
       authors: [
-        { id: 'this-is-a-fake-id', username: 'Fake author' },
-        { id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1', username: 'Fake user #Cg1' },
+        { id: 'this-is-a-fake-id', username: 'Fake author', description: '' },
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+        },
       ],
     },
     {
@@ -698,11 +792,18 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/Bounce-header.json',
       tags: 'bounce,bullet',
+      category: 'Movement',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/volleyball.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
-      authors: [{ id: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2', username: '4ian' }],
+      authors: [
+        {
+          id: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
+          username: '4ian',
+          description: '',
+        },
+      ],
     },
     {
       tier: 'reviewed',
@@ -720,13 +821,22 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CameraShake-header.json',
       tags: 'shaking,camera,effect,screen,shake,zoom,position,rotate',
+      category: 'Camera',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/vector-difference-ab.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 4,
       authors: [
-        { id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1', username: 'Fake user #Cg1' },
-        { id: 'm4hBMBTUilft4s1V4FQQPakVDGx1', username: 'Fake user #Gx1' },
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+        },
+        {
+          id: 'm4hBMBTUilft4s1V4FQQPakVDGx1',
+          username: 'Fake user #Gx1',
+          description: '',
+        },
       ],
     },
     {
@@ -745,13 +855,22 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CameraZoom-header.json',
       tags: 'Camera,Layer,Zoom',
+      category: 'Camera',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/UI Essentials/UI Essentials_zoom_in_plus.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 3,
       authors: [
-        { id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2', username: 'D8H' },
-        { id: '30b1QQoYi1gQQHzIjMlNY8aLyYV2', username: 'Fake user #YV2' },
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+        },
+        {
+          id: '30b1QQoYi1gQQHzIjMlNY8aLyYV2',
+          username: 'Fake user #YV2',
+          description: '',
+        },
       ],
     },
     {
@@ -768,11 +887,18 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CancellableDraggable-header.json',
       tags: 'drag,drop',
+      category: 'User interface',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/step-backward.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
-      authors: [{ id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2', username: 'D8H' }],
+      authors: [
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+        },
+      ],
     },
     {
       tier: 'reviewed',
@@ -787,12 +913,17 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/Checkbox-header.json',
       tags: 'checkbox,ui,widget,shape painter,toggle,checkmark',
+      category: 'User interface',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/checkbox-marked.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
       authors: [
-        { id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1', username: 'Fake user #Cg1' },
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+        },
       ],
     },
     {
@@ -810,13 +941,22 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/Checkpoints-header.json',
       tags: 'position,checkpoint',
+      category: 'Game mechanic',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/flag-variant.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 3,
       authors: [
-        { id: '30b1QQoYi1gQQHzIjMlNY8aLyYV2', username: 'Fake user #YV2' },
-        { id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92', username: 'Bouh' },
+        {
+          id: '30b1QQoYi1gQQHzIjMlNY8aLyYV2',
+          username: 'Fake user #YV2',
+          description: '',
+        },
+        {
+          id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
+          username: 'Bouh',
+          description: '',
+        },
       ],
     },
     {
@@ -832,12 +972,17 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/Choose-header.json',
       tags: 'choose,random',
+      category: 'General',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/dice-multiple.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 2,
       authors: [
-        { id: 'ZShmW1xkW7WWl9AkB78VITJMiTw1', username: 'Fake user #Tw1' },
+        {
+          id: 'ZShmW1xkW7WWl9AkB78VITJMiTw1',
+          username: 'Fake user #Tw1',
+          description: '',
+        },
       ],
     },
     {
@@ -855,13 +1000,22 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/Clipboard-header.json',
       tags: 'clipboard,pasteboard,paste,copy,write',
+      category: 'User interface',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/clipboard-text-multiple-outline.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 3,
       authors: [
-        { id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92', username: 'Bouh' },
-        { id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1', username: 'arthuro555' },
+        {
+          id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
+          username: 'Bouh',
+          description: '',
+        },
+        {
+          id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
+          username: 'arthuro555',
+          description: '',
+        },
       ],
     },
     {
@@ -881,14 +1035,27 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/ColorConversion-header.json',
       tags: 'color,conversion,hexadecimal,rgb,hsl,hsv,hsb',
+      category: 'Advance',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/invert-colors.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 9,
       authors: [
-        { id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1', username: 'Fake user #Cg1' },
-        { id: 'AlZ3D1xkH0QDao7T37VZZUeYNpn1', username: 'Fake user #pn1' },
-        { id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2', username: 'D8H' },
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+        },
+        {
+          id: 'AlZ3D1xkH0QDao7T37VZZUeYNpn1',
+          username: 'Fake user #pn1',
+          description: '',
+        },
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+        },
       ],
     },
     {
@@ -903,11 +1070,18 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/Compressor-header.json',
       tags: 'string,compression,zip',
+      category: 'Advance',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/folder-zip-outline.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 3,
-      authors: [{ id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1', username: 'arthuro555' }],
+      authors: [
+        {
+          id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
+          username: 'arthuro555',
+          description: '',
+        },
+      ],
     },
     {
       tier: 'reviewed',
@@ -923,12 +1097,17 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CopyCameraSettings-header.json',
       tags: 'camera,clone,zoom,position,layer,angle,copy',
+      category: 'Camera',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/layers-triple-outline.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 1,
       authors: [
-        { id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1', username: 'Fake user #Cg1' },
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+        },
       ],
     },
     {
@@ -945,12 +1124,17 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CreateMultipleCopiesOfObject-header.json',
       tags: 'create,multiple,object,grid,row,column',
+      category: 'Visual effect',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/grid.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 1,
       authors: [
-        { id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1', username: 'Fake user #Cg1' },
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+        },
       ],
     },
     {
@@ -967,12 +1151,17 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CurrentGameVersion-header.json',
       tags: 'version',
+      category: 'Advance',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/numeric.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 1,
       authors: [
-        { id: 'ZShmW1xkW7WWl9AkB78VITJMiTw1', username: 'Fake user #Tw1' },
+        {
+          id: 'ZShmW1xkW7WWl9AkB78VITJMiTw1',
+          username: 'Fake user #Tw1',
+          description: '',
+        },
       ],
     },
     {
@@ -988,11 +1177,18 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CursorMovement-header.json',
       tags: 'mouse,pointer,cursor',
+      category: 'Input',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Computers and Hardware/Computers and Hardware_mouse_pc.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 3,
-      authors: [{ id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2', username: 'D8H' }],
+      authors: [
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+        },
+      ],
     },
     {
       tier: 'community',
@@ -1010,13 +1206,22 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CursorType-header.json',
       tags: 'cursor,javascript,desktop',
+      category: 'User interface',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/cursor-default-outline.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 2,
       authors: [
-        { id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1', username: 'arthuro555' },
-        { id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92', username: 'Bouh' },
+        {
+          id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
+          username: 'arthuro555',
+          description: '',
+        },
+        {
+          id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
+          username: 'Bouh',
+          description: '',
+        },
       ],
     },
     {
@@ -1032,12 +1237,17 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DepthEffect-header.json',
       tags: 'depth,effect,scale,y,text,sprite',
+      category: 'Visual effect',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Virtual Reality/Virtual Reality_vr_computer_3d_cube_screen_tv.svg',
       eventsBasedBehaviorsCount: 2,
       eventsFunctionsCount: 0,
       authors: [
-        { id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1', username: 'Fake user #Cg1' },
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+        },
       ],
     },
     {
@@ -1053,11 +1263,18 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DiscordRichPresence-header.json',
       tags: 'discord,rich,presence,integration,status',
+      category: 'Third-party',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/discord.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 3,
-      authors: [{ id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1', username: 'arthuro555' }],
+      authors: [
+        {
+          id: 'ZgrsWuRTAkXgeuPV9bo0zuEcA2w1',
+          username: 'arthuro555',
+          description: '',
+        },
+      ],
     },
     {
       tier: 'reviewed',
@@ -1072,12 +1289,17 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DoubleClick-header.json',
       tags: 'double-click,double-tap',
+      category: 'Input',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Computers and Hardware/Computers and Hardware_mouse_wireless_pc.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 3,
       authors: [
-        { id: '8Ih1aa8f5gWUp4UB2BdhQ2iXWxJ3', username: 'Fake user #xJ3' },
+        {
+          id: '8Ih1aa8f5gWUp4UB2BdhQ2iXWxJ3',
+          username: 'Fake user #xJ3',
+          description: '',
+        },
       ],
     },
     {
@@ -1096,13 +1318,22 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DragCameraWithPointer-header.json',
       tags: 'pointer,drag,camera,scroll,gestures',
+      category: 'Camera',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/drag-variant.svg',
       eventsBasedBehaviorsCount: 0,
       eventsFunctionsCount: 1,
       authors: [
-        { id: 'GfzRsieyUFVnsRR8OZThsPR29oq2', username: 'Fake user #oq2' },
-        { id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1', username: 'Fake user #Cg1' },
+        {
+          id: 'GfzRsieyUFVnsRR8OZThsPR29oq2',
+          username: 'Fake user #oq2',
+          description: '',
+        },
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+        },
       ],
     },
     {
@@ -1118,12 +1349,17 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DraggablePhysics-header.json',
       tags: 'draggable,mouse,touch,physics,object,joint,fling',
+      category: 'Movement',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/Glyphster Pack/Master/SVG/Virtual Reality/Virtual Reality_hand_vr_ar_360.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
       authors: [
-        { id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1', username: 'Fake user #Cg1' },
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+        },
       ],
     },
     {
@@ -1143,13 +1379,22 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DraggableSliderControl-header.json',
       tags: 'draggable,slider,shape painter,ui,widget',
+      category: 'User interface',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/UI Essentials/UI Essentials_sliders_options.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
       authors: [
-        { id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2', username: 'D8H' },
-        { id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1', username: 'Fake user #Cg1' },
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+        },
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+        },
       ],
     },
     {
@@ -1165,11 +1410,14 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DrawPathfinding-header.json',
       tags: 'pathfinding,debug,shape painter,draw',
+      category: 'Movement',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/resistor-nodes.svg',
       eventsBasedBehaviorsCount: 1,
       eventsFunctionsCount: 0,
-      authors: [{ id: 'this-is-a-fake-id', username: 'Fake author' }],
+      authors: [
+        { id: 'this-is-a-fake-id', username: 'Fake author', description: '' },
+      ],
     },
   ],
 };

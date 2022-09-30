@@ -9,6 +9,7 @@ type ExtensionTier = 'community' | 'reviewed';
 export type ExtensionShortHeader = {|
   tier: ExtensionTier,
   shortDescription: string,
+  authorIds: Array<string>,
   authors?: Array<UserPublicProfile>,
   extensionNamespace: string,
   fullName: string,
@@ -18,6 +19,7 @@ export type ExtensionShortHeader = {|
   url: string,
   headerUrl: string,
   tags: Array<string>,
+  category: string,
   previewIconUrl: string,
   eventsBasedBehaviorsCount: number,
   eventsFunctionsCount: number,
@@ -47,6 +49,7 @@ export type SerializedExtension = {
 export type ExtensionsRegistry = {
   version: string,
   allTags: Array<string>,
+  allCategories: Array<string>,
   extensionShortHeaders: Array<ExtensionShortHeader>,
   views?: {
     default: {

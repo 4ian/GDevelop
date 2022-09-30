@@ -462,6 +462,7 @@ describe('InstallAsset', () => {
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
         allTags: [''],
+        allCategories: [''],
         extensionShortHeaders: [
           flashExtensionShortHeader,
           fireBulletExtensionShortHeader,
@@ -481,6 +482,7 @@ describe('InstallAsset', () => {
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
         allTags: [''],
+        allCategories: [''],
         extensionShortHeaders: [
           flashExtensionShortHeader,
           fireBulletExtensionShortHeader,
@@ -627,6 +629,7 @@ describe('InstallAsset', () => {
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
         allTags: [''],
+        allCategories: [''],
         extensionShortHeaders: [
           flashExtensionShortHeader,
           fireBulletExtensionShortHeader,
@@ -664,6 +667,7 @@ describe('InstallAsset', () => {
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
         allTags: [''],
+        allCategories: [''],
         extensionShortHeaders: [
           flashExtensionShortHeader,
           fireBulletExtensionShortHeader,

@@ -79,16 +79,19 @@ const SearchBarSelectField = React.forwardRef<
   SearchBarSelectFieldInterface
 >((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
-
-  const focus = () => {
-    if (inputRef.current) inputRef.current.focus();
-  };
-
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-
+  const focus = React.useCallback(
+    () => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    },
+    [inputRef]
+  );
   React.useImperativeHandle(ref, () => ({
     focus,
   }));
+
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const selectStyles = useSelectStyles(props.textAlign);
 
   const onChange = props.onChange || undefined;

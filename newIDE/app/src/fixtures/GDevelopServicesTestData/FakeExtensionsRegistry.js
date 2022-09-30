@@ -680,7 +680,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/BaseConversion-header.json',
       tags: 'binary,numbers,number,base,hex,decimal',
-      category: 'Advance',
+      category: 'Advanced',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/hexadecimal.svg',
       eventsBasedBehaviorsCount: 0,
@@ -1035,7 +1035,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/ColorConversion-header.json',
       tags: 'color,conversion,hexadecimal,rgb,hsl,hsv,hsb',
-      category: 'Advance',
+      category: 'Advanced',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/invert-colors.svg',
       eventsBasedBehaviorsCount: 0,
@@ -1070,7 +1070,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/Compressor-header.json',
       tags: 'string,compression,zip',
-      category: 'Advance',
+      category: 'Advanced',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/folder-zip-outline.svg',
       eventsBasedBehaviorsCount: 0,
@@ -1151,7 +1151,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CurrentGameVersion-header.json',
       tags: 'version',
-      category: 'Advance',
+      category: 'Advanced',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/numeric.svg',
       eventsBasedBehaviorsCount: 0,

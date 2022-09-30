@@ -14,13 +14,15 @@ namespace gdjs {
     _eventsFunction: null | ((runtimeScene: RuntimeScene) => void) = null;
     _instances: Hashtable<RuntimeObject[]>;
 
-    //Contains the instances living on the scene
+    // Contains the instances living on the scene
     _instancesCache: Hashtable<RuntimeObject[]>;
 
-    //Used to recycle destroyed instance instead of creating new ones.
+    _layerHighestZOrders: Hashtable<number>;
+
+    // Used to recycle destroyed instance instead of creating new ones.
     _objects: Hashtable<ObjectData>;
 
-    //Contains the objects data stored in the project
+    // Contains the objects data stored in the project
     _objectsCtor: Hashtable<typeof RuntimeObject>;
     _layers: Hashtable<Layer>;
     _initialBehaviorSharedData: Hashtable<BehaviorSharedData | null>;
@@ -62,6 +64,7 @@ namespace gdjs {
     constructor(runtimeGame: gdjs.RuntimeGame) {
       this._instances = new Hashtable();
       this._instancesCache = new Hashtable();
+      this._layerHighestZOrders = new Hashtable();
       this._objects = new Hashtable();
       this._objectsCtor = new Hashtable();
       this._layers = new Hashtable();
@@ -732,6 +735,8 @@ namespace gdjs {
      * Tool function filling _allInstancesList member with all the living object instances.
      */
     _constructListOfAllInstances() {
+      this._layerHighestZOrders.clear();
+
       let currentListSize = 0;
       for (const name in this._instances.items) {
         if (this._instances.items.hasOwnProperty(name)) {
@@ -743,6 +748,14 @@ namespace gdjs {
               this._allInstancesList[oldSize + j] = list[j];
             } else {
               this._allInstancesList.push(list[j]);
+            }
+            const layerName = list[j].getLayer();
+            const zOrder = list[j].getZOrder();
+            if (
+              !this._layerHighestZOrders.containsKey(layerName) ||
+              this._layerHighestZOrders.get(layerName) < zOrder
+            ) {
+              this._layerHighestZOrders.put(layerName, zOrder);
             }
           }
         }
@@ -1158,7 +1171,7 @@ namespace gdjs {
      * in exceptional use cases where you need to loop through all objects,
      * and it won't be performant.
      *
-     * @returns The list of all runtime objects on the scnee
+     * @returns The list of all runtime objects on the scene
      */
     getAdhocListOfAllInstances(): gdjs.RuntimeObject[] {
       this._constructListOfAllInstances();

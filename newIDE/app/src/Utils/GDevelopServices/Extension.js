@@ -18,6 +18,7 @@ export type ExtensionShortHeader = {|
   url: string,
   headerUrl: string,
   tags: Array<string>,
+  category: string,
   previewIconUrl: string,
   eventsBasedBehaviorsCount: number,
   eventsFunctionsCount: number,
@@ -47,6 +48,7 @@ export type SerializedExtension = {
 export type ExtensionsRegistry = {
   version: string,
   allTags: Array<string>,
+  allCategories: Array<string>,
   extensionShortHeaders: Array<ExtensionShortHeader>,
   views?: {
     default: {

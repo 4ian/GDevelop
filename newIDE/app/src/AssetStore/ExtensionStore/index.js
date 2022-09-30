@@ -46,13 +46,13 @@ export const ExtensionStore = ({
   ] = React.useState<?ExtensionShortHeader>(null);
   const {
     filters,
-    allCategories,
     searchResults,
     error,
     fetchExtensionsAndFilters,
     filtersState,
     searchText,
     setSearchText,
+    allCategories,
     chosenCategory,
     setChosenCategory,
   } = React.useContext(ExtensionStoreContext);

@@ -43,6 +43,7 @@ export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
   searchText: '',
   setSearchText: () => {},
   allCategories: [],
+  // '' means all categories.
   chosenCategory: '',
   setChosenCategory: () => {},
   extensionShortHeadersByName: {},

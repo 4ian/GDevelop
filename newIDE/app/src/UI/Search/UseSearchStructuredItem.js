@@ -16,6 +16,7 @@ export type SearchResult<T> = {|
 
 type SearchOptions = {|
   searchText: string,
+  itemCategory?: string,
   chosenCategory: ?ChosenCategory,
   chosenFilters: Set<string>,
   excludedTiers: Set<string>,
@@ -75,9 +76,11 @@ export const filterSearchResults = <
     tags: Array<string>,
     // Some search items can have tiers:
     +tier?: string,
+    +category?: string,
   }
 >(
   searchResults: ?Array<SearchResult<SearchItem>>,
+  itemCategory: ?string,
   chosenCategory: ?ChosenCategory,
   chosenFilters: Set<string>,
   excludedTiers: Set<string>
@@ -86,6 +89,12 @@ export const filterSearchResults = <
 
   const startTime = performance.now();
   const filteredSearchResults = searchResults
+    .filter(
+      ({ item }) =>
+        !itemCategory ||
+        item.category === itemCategory ||
+        (itemCategory === 'General' && !item.category)
+    )
     .filter(({ item: { tags } }) => {
       if (!chosenCategory) return true;
 
@@ -136,11 +145,13 @@ export const useSearchStructuredItem = <
     tags: Array<string>,
     // Some search items can have tiers:
     +tier?: string,
+    +category?: string,
   }
 >(
   searchItemsById: ?{ [string]: SearchItem },
   {
     searchText,
+    itemCategory,
     chosenCategory,
     chosenFilters,
     excludedTiers,
@@ -228,6 +239,7 @@ export const useSearchStructuredItem = <
         setSearchResults(
           filterSearchResults(
             orderedSearchResults,
+            itemCategory,
             chosenCategory,
             chosenFilters,
             excludedTiers
@@ -259,6 +271,7 @@ export const useSearchStructuredItem = <
               item: result.item,
               matches: tuneMatches(result, searchText),
             })),
+            itemCategory,
             chosenCategory,
             chosenFilters,
             excludedTiers
@@ -276,6 +289,7 @@ export const useSearchStructuredItem = <
       orderedSearchResults,
       searchItemsById,
       searchText,
+      itemCategory,
       chosenCategory,
       chosenFilters,
       searchApi,

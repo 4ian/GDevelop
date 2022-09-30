@@ -31,7 +31,8 @@ module.exports = {
       _('A text field the player can type text into.'),
       'Florian Rival',
       'MIT'
-    );
+    )
+    .setCategory('User interface');
 
     const textInputObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating an object
@@ -277,7 +278,7 @@ module.exports = {
         'JsPlatform/Extensions/text_input.svg',
         textInputObject
       )
-      .setCategoryFullName(_('Form control'))
+      .setCategoryFullName(_('User interface'))
       .addUnsupportedBaseObjectCapability('effect')
       .setIncludeFile('Extensions/TextInput/textinputruntimeobject.js')
       .addIncludeFile(

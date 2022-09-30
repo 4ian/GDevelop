@@ -20,6 +20,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
             "keyboard or using events."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetCategory("Movement")
       .SetExtensionHelpPath("/behaviors/topdown");
 
   gd::BehaviorMetadata& aut = extension.AddBehavior(

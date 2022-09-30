@@ -225,10 +225,6 @@ export const ExtensionOptionsEditor = ({
                 value: 'Camera',
               },
               {
-                text: 'Device',
-                value: 'Device',
-              },
-              {
                 text: 'Input',
                 value: 'Input',
               },

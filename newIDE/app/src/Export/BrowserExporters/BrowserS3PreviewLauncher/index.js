@@ -13,6 +13,7 @@ import {
   getExistingTargetIdForDebuggerId,
   registerPreviewWindow,
 } from './BrowserPreviewDebuggerServer';
+import Window from '../../../Utils/Window';
 const gd: libGDevelop = global.gd;
 
 type State = {|
@@ -124,6 +125,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
           outputDir
         );
         previewExportOptions.setLayoutName(layout.getName());
+        previewExportOptions.setIsDevelopmentEnvironment(Window.isDev());
         if (externalLayout) {
           previewExportOptions.setExternalLayoutName(externalLayout.getName());
         }

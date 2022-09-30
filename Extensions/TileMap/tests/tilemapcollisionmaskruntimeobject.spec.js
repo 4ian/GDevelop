@@ -121,7 +121,7 @@ describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
       // TODO find a clean way to wait for the json to be read.
       for (
         let index = 0;
-        index < 200 && tileMap._collisionTileMap.getDimensionX() === 0;
+        index < 400 && tileMap._collisionTileMap.getDimensionX() === 0;
         index++
       ) {
         await delay(5);

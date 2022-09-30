@@ -90,10 +90,7 @@ export const filterSearchResults = <
   const startTime = performance.now();
   const filteredSearchResults = searchResults
     .filter(
-      ({ item }) =>
-        !chosenItemCategory ||
-        item.category === chosenItemCategory ||
-        (chosenItemCategory === 'General' && !item.category)
+      ({ item }) => !chosenItemCategory || item.category === chosenItemCategory
     )
     .filter(({ item: { tags } }) => {
       if (!chosenCategory) return true;

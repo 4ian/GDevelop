@@ -1081,6 +1081,21 @@ namespace gdjs {
     }
 
     /**
+     * Get the highest z order across the layer's object instances
+     * @param layerName The name of the layer
+     * @returns The highest z order across the layer's object instances
+     */
+    getLayerHighestZOrder(layerName: string): number {
+      if (!this._layerHighestZOrders.containsKey(layerName)) return 0;
+      return this._layerHighestZOrders.get(layerName);
+    }
+
+    _setLayerHighestZOrder(layerName: string, zOrder: number) {
+      if (!this._layerHighestZOrders.containsKey(layerName)) return;
+      this._layerHighestZOrders.put(layerName, zOrder);
+    }
+
+    /**
      * Shortcut to get the SoundManager of the game.
      * @return The gdjs.SoundManager of the game.
      */

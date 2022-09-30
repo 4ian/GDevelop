@@ -204,7 +204,12 @@ namespace gdjs {
         scoreSavingState: ScoreSavingState;
         runtimeScene: gdjs.RuntimeScene;
       }) {
-        const baseUrl = 'https://api.gdevelop.io/play';
+        const rootApi = runtimeScene
+          .getGame()
+          .isUsingGDevelopDevelopmentEnvironment()
+          ? 'https://api-dev.gdevelop.io'
+          : 'https://api.gdevelop.io';
+        const baseUrl = `${rootApi}/play`;
         const game = runtimeScene.getGame();
         const payloadObject = {
           score: score,
@@ -635,7 +640,12 @@ namespace gdjs {
         }
 
         const gameId = gdjs.projectData.properties.projectUuid;
-        const targetUrl = `https://liluo.io/games/${gameId}/leaderboard/${leaderboardId}?inGameEmbedded=true`;
+        const isDev = runtimeScene
+          .getGame()
+          .isUsingGDevelopDevelopmentEnvironment();
+        const targetUrl = `https://liluo.io/games/${gameId}/leaderboard/${leaderboardId}?inGameEmbedded=true${
+          isDev ? '&dev=true' : ''
+        }`;
         checkLeaderboardAvailability(targetUrl).then(
           (isAvailable) => {
             if (leaderboardId !== _requestedLeaderboardId) {

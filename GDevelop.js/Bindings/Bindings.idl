@@ -2943,6 +2943,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetIncludeFileHash([Const] DOMString includeFile, long hash);
     [Ref] PreviewExportOptions SetProjectDataOnlyExport(boolean enable);
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
+    [Ref] PreviewExportOptions SetIsDevelopmentEnvironment(boolean enable);
     [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
     [Ref] PreviewExportOptions SetElectronRemoteRequirePath([Const] DOMString electronRemoteRequirePath);
 };

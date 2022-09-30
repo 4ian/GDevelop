@@ -9,6 +9,7 @@ type ExtensionTier = 'community' | 'reviewed';
 export type ExtensionShortHeader = {|
   tier: ExtensionTier,
   shortDescription: string,
+  authorIds: Array<string>,
   authors?: Array<UserPublicProfile>,
   extensionNamespace: string,
   fullName: string,

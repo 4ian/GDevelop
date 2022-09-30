@@ -796,6 +796,7 @@ export const fakeAssetShortHeader1: AssetShortHeader = {
 
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
   tier: 'reviewed',
+  authorIds: [],
   shortDescription:
     'Allow the object to fire bullets, with customizable speed, angle and fire rate.',
   extensionNamespace: '',
@@ -838,6 +839,7 @@ export const alreadyInstalledCommunityExtensionShortHeader: ExtensionShortHeader
 
 export const flashExtensionShortHeader: ExtensionShortHeader = {
   tier: 'reviewed',
+  authorIds: [],
   shortDescription:
     'Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nTrigger the effect by using the Flash action.',
   extensionNamespace: '',
@@ -855,6 +857,7 @@ export const flashExtensionShortHeader: ExtensionShortHeader = {
 
 export const communityTierExtensionShortHeader: ExtensionShortHeader = {
   tier: 'community',
+  authorIds: [],
   shortDescription:
     'This is an example of an extension that is a community extension (not reviewed).',
   extensionNamespace: '',

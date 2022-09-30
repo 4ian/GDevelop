@@ -14,6 +14,7 @@ import {
   getDebuggerServerAddress,
   localPreviewDebuggerServer,
 } from './LocalPreviewDebuggerServer';
+import Window from '../../../Utils/Window';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -189,6 +190,7 @@ export default class LocalPreviewLauncher extends React.Component<
               project,
               outputDir
             );
+            previewExportOptions.setIsDevelopmentEnvironment(Window.isDev());
             previewExportOptions.setLayoutName(layout.getName());
             if (externalLayout) {
               previewExportOptions.setExternalLayoutName(

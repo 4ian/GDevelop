@@ -4,9 +4,6 @@ namespace gdjs {
   const logger = new gdjs.Logger('Player Authentication');
   const authComponents = gdjs.playerAuthenticationComponents;
   export namespace playerAuthentication {
-    // In order to test in development mode, change this to true.
-    const dev = false;
-
     // Authentication information.
     let _username: string | null = null;
     let _userId: string | null = null;
@@ -42,15 +39,19 @@ namespace gdjs {
       `${gameId}_authenticatedUser`;
 
     const getAuthWindowUrl = ({
+      runtimeGame,
       gameId,
       connectionId,
     }: {
+      runtimeGame: gdjs.RuntimeGame;
       gameId: string;
       connectionId?: string;
     }) =>
       `https://liluo.io/auth?gameId=${gameId}${
         connectionId ? `&connectionId=${connectionId}` : ''
-      }${dev ? '&dev=true' : ''}`;
+      }${
+        runtimeGame.isUsingGDevelopDevelopmentEnvironment() ? '&dev=true' : ''
+      }`;
 
     /**
      * Helper returning the platform.
@@ -117,10 +118,11 @@ namespace gdjs {
      * Useful to display a message to the user to register the game before logging in.
      */
     const checkIfGameIsRegistered = (
+      runtimeGame: gdjs.RuntimeGame,
       gameId: string,
       tries: number = 0
     ): Promise<boolean> => {
-      const rootApi = dev
+      const rootApi = runtimeGame.isUsingGDevelopDevelopmentEnvironment()
         ? 'https://api-dev.gdevelop.io'
         : 'https://api.gdevelop.io';
       const url = `${rootApi}/game/public-game/${gameId}`;
@@ -136,7 +138,7 @@ namespace gdjs {
               return false;
             }
 
-            return checkIfGameIsRegistered(gameId, tries + 1);
+            return checkIfGameIsRegistered(runtimeGame, gameId, tries + 1);
           }
           return true;
         },
@@ -418,8 +420,13 @@ namespace gdjs {
      * Helper to handle authentication window on Electron.
      * We open a new window, and create a websocket to know when the user is logged in.
      */
-    const openAuthenticationWindowForElectron = (runtimeScene, gameId) => {
-      const wsPlayApi = dev
+    const openAuthenticationWindowForElectron = (
+      runtimeScene: gdjs.RuntimeScene,
+      gameId: string
+    ) => {
+      const wsPlayApi = runtimeScene
+        .getGame()
+        .isUsingGDevelopDevelopmentEnvironment()
         ? 'wss://api-ws-dev.gdevelop.io/play'
         : 'wss://api-ws.gdevelop.io/play';
       _websocket = new WebSocket(wsPlayApi);
@@ -457,7 +464,11 @@ namespace gdjs {
                 return;
               }
 
-              const targetUrl = getAuthWindowUrl({ gameId, connectionId });
+              const targetUrl = getAuthWindowUrl({
+                runtimeGame: runtimeScene.getGame(),
+                gameId,
+                connectionId,
+              });
 
               const electron = runtimeScene
                 .getGame()
@@ -486,8 +497,14 @@ namespace gdjs {
      * Helper to handle authentication window on Cordova.
      * We open an InAppBrowser window, and listen to messages posted on this window.
      */
-    const openAuthenticationWindowForCordova = (runtimeScene, gameId) => {
-      const targetUrl = getAuthWindowUrl({ gameId });
+    const openAuthenticationWindowForCordova = (
+      runtimeScene: gdjs.RuntimeScene,
+      gameId: string
+    ) => {
+      const targetUrl = getAuthWindowUrl({
+        runtimeGame: runtimeScene.getGame(),
+        gameId,
+      });
 
       _authenticationInAppWindow = cordova.InAppBrowser.open(
         targetUrl,
@@ -514,9 +531,15 @@ namespace gdjs {
      * Helper to handle authentication window on web.
      * We open a new window, and listen to messages posted back to the game window.
      */
-    const openAuthenticationWindowForWeb = (runtimeScene, gameId) => {
+    const openAuthenticationWindowForWeb = (
+      runtimeScene: gdjs.RuntimeScene,
+      gameId: string
+    ) => {
       // If we're on a browser, open a new window.
-      const targetUrl = getAuthWindowUrl({ gameId });
+      const targetUrl = getAuthWindowUrl({
+        runtimeGame: runtimeScene.getGame(),
+        gameId,
+      });
 
       // Listen to messages posted by the authentication window, so that we can
       // know when the user is authenticated.
@@ -595,7 +618,7 @@ namespace gdjs {
 
       // If the game is registered, open the authentication window.
       // Otherwise, open the window indicating that the game is not registered.
-      checkIfGameIsRegistered(_gameId)
+      checkIfGameIsRegistered(runtimeScene.getGame(), _gameId)
         .then((isGameRegistered) => {
           if (_authenticationLoaderContainer) {
             _authenticationTextContainer = authComponents.addAuthenticationTextsToLoadingContainer(

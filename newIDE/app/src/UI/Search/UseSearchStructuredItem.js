@@ -16,7 +16,7 @@ export type SearchResult<T> = {|
 
 type SearchOptions = {|
   searchText: string,
-  itemCategory?: string,
+  chosenItemCategory?: string,
   chosenCategory: ?ChosenCategory,
   chosenFilters: Set<string>,
   excludedTiers: Set<string>,
@@ -80,7 +80,7 @@ export const filterSearchResults = <
   }
 >(
   searchResults: ?Array<SearchResult<SearchItem>>,
-  itemCategory: ?string,
+  chosenItemCategory: ?string,
   chosenCategory: ?ChosenCategory,
   chosenFilters: Set<string>,
   excludedTiers: Set<string>
@@ -91,9 +91,9 @@ export const filterSearchResults = <
   const filteredSearchResults = searchResults
     .filter(
       ({ item }) =>
-        !itemCategory ||
-        item.category === itemCategory ||
-        (itemCategory === 'General' && !item.category)
+        !chosenItemCategory ||
+        item.category === chosenItemCategory ||
+        (chosenItemCategory === 'General' && !item.category)
     )
     .filter(({ item: { tags } }) => {
       if (!chosenCategory) return true;
@@ -151,7 +151,7 @@ export const useSearchStructuredItem = <
   searchItemsById: ?{ [string]: SearchItem },
   {
     searchText,
-    itemCategory,
+    chosenItemCategory,
     chosenCategory,
     chosenFilters,
     excludedTiers,
@@ -239,7 +239,7 @@ export const useSearchStructuredItem = <
         setSearchResults(
           filterSearchResults(
             orderedSearchResults,
-            itemCategory,
+            chosenItemCategory,
             chosenCategory,
             chosenFilters,
             excludedTiers
@@ -271,7 +271,7 @@ export const useSearchStructuredItem = <
               item: result.item,
               matches: tuneMatches(result, searchText),
             })),
-            itemCategory,
+            chosenItemCategory,
             chosenCategory,
             chosenFilters,
             excludedTiers
@@ -289,7 +289,7 @@ export const useSearchStructuredItem = <
       orderedSearchResults,
       searchItemsById,
       searchText,
-      itemCategory,
+      chosenItemCategory,
       chosenCategory,
       chosenFilters,
       searchApi,

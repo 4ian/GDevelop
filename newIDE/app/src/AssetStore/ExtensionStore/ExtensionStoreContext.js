@@ -173,7 +173,7 @@ export const ExtensionStoreStateProvider = ({
     matches: SearchMatch[],
   |}> = useSearchStructuredItem(extensionShortHeadersByName, {
     searchText,
-    itemCategory: chosenCategory,
+    chosenItemCategory: chosenCategory,
     chosenCategory: filtersState.chosenCategory,
     chosenFilters: filtersState.chosenFilters,
     excludedTiers: showCommunityExtensions

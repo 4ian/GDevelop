@@ -111,10 +111,14 @@ export const ExtensionStore = ({
                 >
                   <SelectOption value="" primaryText={t`All categories`} />
                   {allCategories.map(category => (
-                    <SelectOption value={category} primaryText={category} />
+                    <SelectOption
+                      key={category}
+                      value={category}
+                      primaryText={category}
+                    />
                   ))}
                 </SelectField>
-                <Column expand>
+                <Column expand noMargin>
                   <SearchBar
                     value={searchText}
                     onChange={setSearchText}

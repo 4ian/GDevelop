@@ -73,7 +73,10 @@ module.exports = {
         'Matthias Meike, Florian Rival',
         'Open source (MIT License)'
       )
+      .setCategory('Visual effect')
       .setExtensionHelpPath('/behaviors/tween');
+    extension.addInstructionOrExpressionGroupMetadata(_("Tweening"))
+        .setIcon("JsPlatform/Extensions/tween_behavior32.png");
 
     extension
       .addExpression(

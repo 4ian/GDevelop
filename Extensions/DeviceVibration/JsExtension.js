@@ -35,7 +35,7 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/all-features/device-vibration')
-      .setCategory('Device');
+      .setCategory('User interface');
       extension.addInstructionOrExpressionGroupMetadata(_("Device vibration"))
           .setIcon("JsPlatform/Extensions/vibration_start32.png");
 

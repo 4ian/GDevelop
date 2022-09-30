@@ -22,6 +22,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "object or a position.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetCategory("Camera")
       .SetExtensionHelpPath("/interface/scene-editor/layers-and-cameras");
   extension.AddInstructionOrExpressionGroupMetadata(_("Layers and cameras"))
       .SetIcon("res/conditions/camera24.png");

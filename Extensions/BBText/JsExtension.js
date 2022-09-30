@@ -33,7 +33,8 @@ module.exports = {
         'Todor Imreorov',
         'Open source (MIT License)'
       )
-      .setExtensionHelpPath('/objects/bbtext');
+      .setExtensionHelpPath('/objects/bbtext')
+      .setCategory('User interface');
 
     var objectBBText = new gd.ObjectJsImplementation();
     // $FlowExpectedError
@@ -168,7 +169,7 @@ module.exports = {
       .addIncludeFile(
         'Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd.js'
       )
-      .setCategoryFullName(_('Texts'));
+      .setCategoryFullName(_('User interface'));
 
     /**
      * Utility function to add both a setter and a getter to a property from a list.

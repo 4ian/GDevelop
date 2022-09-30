@@ -796,6 +796,7 @@ export const fakeAssetShortHeader1: AssetShortHeader = {
 
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
   tier: 'reviewed',
+  authorIds: [],
   shortDescription:
     'Allow the object to fire bullets, with customizable speed, angle and fire rate.',
   extensionNamespace: '',
@@ -806,6 +807,7 @@ export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
   headerUrl:
     'https://resources.gdevelop-app.com/extensions/FireBullet-header.json',
   tags: ['fire', 'bullets', 'spawn', 'firerate'],
+  category: 'Movement',
   previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
@@ -837,6 +839,7 @@ export const alreadyInstalledCommunityExtensionShortHeader: ExtensionShortHeader
 
 export const flashExtensionShortHeader: ExtensionShortHeader = {
   tier: 'reviewed',
+  authorIds: [],
   shortDescription:
     'Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nTrigger the effect by using the Flash action.',
   extensionNamespace: '',
@@ -846,6 +849,7 @@ export const flashExtensionShortHeader: ExtensionShortHeader = {
   url: 'Extensions/Flash.json',
   headerUrl: 'Extensions/Flash-header.json',
   tags: ['flash', 'blink', 'visible', 'invisible', 'hit', 'damage'],
+  category: 'Visual effect',
   previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
@@ -853,6 +857,7 @@ export const flashExtensionShortHeader: ExtensionShortHeader = {
 
 export const communityTierExtensionShortHeader: ExtensionShortHeader = {
   tier: 'community',
+  authorIds: [],
   shortDescription:
     'This is an example of an extension that is a community extension (not reviewed).',
   extensionNamespace: '',
@@ -864,6 +869,7 @@ export const communityTierExtensionShortHeader: ExtensionShortHeader = {
   headerUrl:
     'https://resources.gdevelop-app.com/extensions/FakeCommunityExtension-header.json',
   tags: ['fire', 'bullets', 'spawn', 'firerate'],
+  category: '',
   previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,

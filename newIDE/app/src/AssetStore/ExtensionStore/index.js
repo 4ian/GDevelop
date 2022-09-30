@@ -20,7 +20,7 @@ import { ColumnStackLayout } from '../../UI/Layout';
 import { Column } from '../../UI/Grid';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
-import SelectField from '../../UI/SelectField';
+import SearchBarSelectField from '../../UI/SearchBarSelectField';
 import SelectOption from '../../UI/SelectOption';
 
 type Props = {|
@@ -102,12 +102,11 @@ export const ExtensionStore = ({
           <ColumnStackLayout expand noMargin useFullHeight>
             <ColumnStackLayout>
               <ResponsiveLineStackLayout noMargin>
-                <SelectField
+                <SearchBarSelectField
                   value={chosenCategory}
                   onChange={(e, i, value: string) => {
                     setChosenCategory(value);
                   }}
-                  disableUnderline
                 >
                   <SelectOption value="" primaryText={t`All categories`} />
                   {allCategories.map(category => (
@@ -117,7 +116,7 @@ export const ExtensionStore = ({
                       primaryText={category}
                     />
                   ))}
-                </SelectField>
+                </SearchBarSelectField>
                 <Column expand noMargin>
                   <SearchBar
                     value={searchText}

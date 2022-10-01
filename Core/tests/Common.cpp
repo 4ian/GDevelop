@@ -19,6 +19,8 @@
 #include "GDCore/Tools/VersionWrapper.h"
 #include "catch.hpp"
 
+// TODO: Add some tests on layouts and behavior shared data.
+
 TEST_CASE("Project", "[common]") {
   SECTION("Basics") {
     gd::Project project;

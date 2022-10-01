@@ -15,27 +15,40 @@ import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import { sendExampleDetailsOpened } from '../../Utils/Analytics/EventSender';
 import { t } from '@lingui/macro';
 
-const styles = {
-  searchBar: {
-    // TODO: Can we put this in the search bar by default?
-    flexShrink: 0,
-  },
-};
+// When showing examples, always put the starters first.
+export const prepareExamples = (
+  examples: Array<ExampleShortHeader>
+): Array<ExampleShortHeader> =>
+  examples.sort((example1, example2) => {
+    const isExample1Starter = example1.tags.includes('Starter');
+    const isExample2Starter = example2.tags.includes('Starter');
+    return isExample1Starter && !isExample2Starter
+      ? -1
+      : !isExample1Starter && isExample2Starter
+      ? 1
+      : 0;
+  });
+
+const getExampleName = (exampleShortHeader: ExampleShortHeader) =>
+  exampleShortHeader.name;
 
 type Props = {|
   isOpening: boolean,
   onOpen: ExampleShortHeader => Promise<void>,
   focusOnMount?: boolean,
+  initialExampleShortHeader: ?ExampleShortHeader,
 |};
 
-const getExampleName = (exampleShortHeader: ExampleShortHeader) =>
-  exampleShortHeader.name;
-
-export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
+export const ExampleStore = ({
+  isOpening,
+  onOpen,
+  focusOnMount,
+  initialExampleShortHeader,
+}: Props) => {
   const [
     selectedExampleShortHeader,
     setSelectedExampleShortHeader,
-  ] = React.useState<?ExampleShortHeader>(null);
+  ] = React.useState<?ExampleShortHeader>(initialExampleShortHeader);
   const {
     filters,
     searchResults,
@@ -88,28 +101,33 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
       <ResponsiveWindowMeasurer>
         {windowWidth => (
           <Column expand noMargin useFullHeight>
-            <SearchBar
-              value={searchText}
-              onChange={setSearchText}
-              onRequestSearch={() => {}}
-              style={styles.searchBar}
-              tagsHandler={tagsHandler}
-              tags={filters && filters.defaultTags}
-              ref={searchBarRef}
-              placeholder={t`Search examples`}
-            />
+            <Line>
+              <Column expand>
+                <SearchBar
+                  value={searchText}
+                  onChange={setSearchText}
+                  onRequestSearch={() => {}}
+                  tagsHandler={tagsHandler}
+                  tags={filters && filters.defaultTags}
+                  ref={searchBarRef}
+                  placeholder={t`Search examples`}
+                />
+              </Column>
+            </Line>
             <Line
               expand
               overflow={
                 'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
               }
+              noMargin
             >
               <ListSearchResults
                 disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
                 onRetry={fetchExamplesAndFilters}
                 error={error}
                 searchItems={
-                  searchResults && searchResults.map(({ item }) => item)
+                  searchResults &&
+                  prepareExamples(searchResults.map(({ item }) => item))
                 }
                 getSearchItemUniqueId={getExampleName}
                 renderSearchItem={(exampleShortHeader, onHeightComputed) => (

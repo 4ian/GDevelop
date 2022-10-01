@@ -269,7 +269,7 @@ module.exports = {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -278,19 +278,19 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );
       this._radius = parseFloat(
-        this._associatedObject
+        this._associatedObjectConfiguration
           .getProperties(this.project)
           .get('radius')
           .getValue()
       );
       if (this._radius <= 0) this._radius = 1;
       const colorHex = objectsRenderingService.rgbOrHexToHexNumber(
-        this._associatedObject
+        this._associatedObjectConfiguration
           .getProperties(this.project)
           .get('color')
           .getValue()
@@ -370,7 +370,7 @@ module.exports = {
     RenderedLightObjectInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'CppPlatform/Extensions/lightIcon32.png';
     };

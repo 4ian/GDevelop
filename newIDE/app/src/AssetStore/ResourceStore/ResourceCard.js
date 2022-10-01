@@ -29,6 +29,7 @@ const styles = {
   previewIcon: {
     width: 40,
     height: 40,
+    filter: 'grayscale(1) invert(1)',
   },
   cardContainer: {
     overflow: 'hidden',
@@ -62,6 +63,7 @@ type ImageCardProps = {|
   imageStyle?: {|
     width: number,
     height: number,
+    filter: string,
   |},
 |};
 

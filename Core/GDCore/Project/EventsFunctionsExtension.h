@@ -10,6 +10,7 @@
 
 #include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/SerializableWithNameList.h"
@@ -146,6 +147,21 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   }
 
   /**
+   * \brief Return a reference to the list of the events based objects.
+   */
+  gd::SerializableWithNameList<EventsBasedObject>& GetEventsBasedObjects() {
+    return eventsBasedObjects;
+  }
+
+  /**
+   * \brief Return a const reference to the list of the events based objects.
+   */
+  const gd::SerializableWithNameList<EventsBasedObject>&
+  GetEventsBasedObjects() const {
+    return eventsBasedObjects;
+  }
+
+  /**
    * \brief Sets an extension origin. This method is not present since the
    * beginning so the projects created before that will have extensions
    * installed from the store without an origin. Keep that in mind when creating
@@ -200,10 +216,26 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   void SerializeTo(gd::SerializerElement& element) const;
 
   /**
-   * \brief Load the EventsFunctionsExtension from the specified element
+   * \brief Load the EventsFunctionsExtension from the specified element.
    */
   void UnserializeFrom(gd::Project& project,
                        const gd::SerializerElement& element);
+
+  /**
+   * \brief Load the extension without free functions, behaviors and objects
+   * implementation.
+   */
+  void UnserializeExtensionDeclarationFrom(
+      gd::Project& project,
+      const gd::SerializerElement& element);
+
+  /**
+   * \brief Load free functions, behaviors and objects implementation
+   * (in opposition to load just their "declaration" by reading their name).
+   */
+  void UnserializeExtensionImplementationFrom(
+      gd::Project& project,
+      const gd::SerializerElement& element);
   ///@}
 
   /** \name Lifecycle event functions
@@ -255,6 +287,7 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   gd::String helpPath;  ///< The relative path to the help for this extension in
                         ///< the documentation (or an absolute URL).
   gd::SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
+  gd::SerializableWithNameList<EventsBasedObject> eventsBasedObjects;
   std::vector<gd::DependencyMetadata> dependencies;
 };
 

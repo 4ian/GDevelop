@@ -63,12 +63,6 @@ import {
 
 const gd: libGDevelop = global.gd;
 
-const styles = {
-  searchBar: {
-    flexShrink: 0,
-  },
-};
-
 const DISPLAYED_INSTRUCTIONS_MAX_LENGTH = 20;
 
 export type TabName = 'objects' | 'free-instructions';
@@ -389,7 +383,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                   buildMenuTemplate={() =>
                     this._buildObjectTagsMenuTemplate(i18n)
                   }
-                  style={styles.searchBar}
+                  aspect="integrated-search-bar"
                   ref={this._searchBar}
                   placeholder={
                     isCondition

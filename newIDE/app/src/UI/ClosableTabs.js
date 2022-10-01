@@ -4,10 +4,10 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Close from '@material-ui/icons/Close';
 import ButtonBase from '@material-ui/core/ButtonBase';
-import ThemeConsumer from './Theme/ThemeConsumer';
 import ContextMenu, { type ContextMenuInterface } from './Menu/ContextMenu';
 import { useLongTouch } from '../Utils/UseLongTouch';
 import { Spacer } from './Grid';
+import GDevelopThemeContext from './Theme/ThemeContext';
 
 const styles = {
   tabContentContainer: {
@@ -76,22 +76,23 @@ type ClosableTabsProps = {|
   children: React.Node,
 |};
 
-export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => (
-  <ThemeConsumer>
-    {muiTheme => {
-      const tabItemContainerStyle = {
-        maxWidth: '100%', // Tabs should take all width
-        flexShrink: 0, // Tabs height should never be reduced
-        display: hideLabels ? 'none' : 'flex',
-        flexWrap: 'nowrap', // Single line of tab...
-        overflowX: 'auto', // ...scroll horizontally if needed
-        backgroundColor: muiTheme.closableTabs.containerBackgroundColor,
-      };
+export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const tabItemContainerStyle = {
+    maxWidth: '100%', // Tabs should take all width
+    flexShrink: 0, // Tabs height should never be reduced
+    display: hideLabels ? 'none' : 'flex',
+    flexWrap: 'nowrap', // Single line of tab...
+    overflowX: 'auto', // ...scroll horizontally if needed
+    backgroundColor: gdevelopTheme.closableTabs.containerBackgroundColor,
+  };
 
-      return <div style={tabItemContainerStyle}>{children}</div>;
-    }}
-  </ThemeConsumer>
-);
+  return (
+    <div className="almost-invisible-scrollbar" style={tabItemContainerStyle}>
+      {children}
+    </div>
+  );
+};
 
 export type ClosableTabProps = {|
   id?: string,
@@ -156,90 +157,85 @@ export function ClosableTab({
     )
   );
 
-  return (
-    <ThemeConsumer>
-      {muiTheme => {
-        const textColor = !active
-          ? muiTheme.closableTabs.textColor
-          : muiTheme.closableTabs.selectedTextColor;
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const textColor = !active
+    ? gdevelopTheme.closableTabs.textColor
+    : gdevelopTheme.closableTabs.selectedTextColor;
 
-        return (
-          <React.Fragment>
-            <span
+  return (
+    <React.Fragment>
+      <span
+        style={{
+          flexShrink: 0, // Tabs are never resized to fit in flex container
+          position: 'relative',
+          display: 'inline-block',
+          marginRight: 1,
+          backgroundColor: !active
+            ? gdevelopTheme.closableTabs.backgroundColor
+            : gdevelopTheme.closableTabs.selectedBackgroundColor,
+        }}
+      >
+        <ButtonBase
+          onClick={onClick}
+          onAuxClick={closable ? closeOnMiddleClick : undefined}
+          onContextMenu={openContextMenu}
+          id={id ? `${id}-button` : undefined}
+          {...longTouchForContextMenuProps}
+          focusRipple
+          // If the touch ripple is not disabled, the dragged preview will
+          // use the size of the ripple and it will be too big.
+          disableTouchRipple
+        >
+          <span
+            style={{
+              ...styles.tabLabelAndIcon,
+              height: gdevelopTheme.closableTabs.height,
+              color: textColor,
+              fontFamily: gdevelopTheme.closableTabs.fontFamily,
+            }}
+          >
+            {icon}
+            {icon && label ? <Spacer /> : null}
+            {label && <span style={styles.tabLabel}>{label}</span>}
+          </span>
+        </ButtonBase>
+        {closable && (
+          <ButtonBase
+            onClick={onClose}
+            onAuxClick={closeOnMiddleClick}
+            onContextMenu={openContextMenu}
+            {...longTouchForContextMenuProps}
+            focusRipple
+          >
+            <Close
               style={{
-                flexShrink: 0, // Tabs are never resized to fit in flex container
-                position: 'relative',
-                display: 'inline-block',
-                marginRight: 1,
-                backgroundColor: !active
-                  ? muiTheme.closableTabs.backgroundColor
-                  : muiTheme.closableTabs.selectedBackgroundColor,
+                ...styles.closeButton,
+                width: gdevelopTheme.closableTabs.height / 2,
+                height: gdevelopTheme.closableTabs.height,
               }}
-            >
-              <ButtonBase
-                onClick={onClick}
-                onAuxClick={closable ? closeOnMiddleClick : undefined}
-                onContextMenu={openContextMenu}
-                id={id ? `${id}-button` : undefined}
-                {...longTouchForContextMenuProps}
-                focusRipple
-                // If the touch ripple is not disabled, the dragged preview will
-                // use the size of the ripple and it will be too big.
-                disableTouchRipple
-              >
-                <span
-                  style={{
-                    ...styles.tabLabelAndIcon,
-                    height: muiTheme.closableTabs.height,
-                    color: textColor,
-                    fontFamily: muiTheme.closableTabs.fontFamily,
-                  }}
-                >
-                  {icon}
-                  {icon && label ? <Spacer /> : null}
-                  {label && <span style={styles.tabLabel}>{label}</span>}
-                </span>
-              </ButtonBase>
-              {closable && (
-                <ButtonBase
-                  onClick={onClose}
-                  onAuxClick={closeOnMiddleClick}
-                  onContextMenu={openContextMenu}
-                  {...longTouchForContextMenuProps}
-                  focusRipple
-                >
-                  <Close
-                    style={{
-                      ...styles.closeButton,
-                      width: muiTheme.closableTabs.height / 2,
-                      height: muiTheme.closableTabs.height,
-                    }}
-                    htmlColor={textColor}
-                  />
-                </ButtonBase>
-              )}
-            </span>
-            <ContextMenu
-              ref={contextMenu}
-              buildMenuTemplate={(i18n: I18nType) => [
-                {
-                  label: i18n._(t`Close`),
-                  click: onClose,
-                  enabled: closable,
-                },
-                {
-                  label: i18n._(t`Close others`),
-                  click: onCloseOthers,
-                },
-                {
-                  label: i18n._(t`Close all`),
-                  click: onCloseAll,
-                },
-              ]}
+              htmlColor={textColor}
             />
-          </React.Fragment>
-        );
-      }}
-    </ThemeConsumer>
+          </ButtonBase>
+        )}
+      </span>
+      <ContextMenu
+        ref={contextMenu}
+        buildMenuTemplate={(i18n: I18nType) => [
+          {
+            label: i18n._(t`Close`),
+            click: onClose,
+            enabled: closable,
+          },
+          {
+            label: i18n._(t`Close others`),
+            click: onCloseOthers,
+          },
+          {
+            label: i18n._(t`Close all`),
+            click: onCloseAll,
+          },
+        ]}
+      />
+    </React.Fragment>
   );
 }

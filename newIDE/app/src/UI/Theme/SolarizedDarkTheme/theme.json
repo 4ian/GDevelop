@@ -10,10 +10,10 @@
     },
     "secondary": {
       "color": {
-        "value": "#EEE"
+        "value": "#2799b9"
       },
       "text-contrast-color": {
-        "value": "#000"
+        "value": "#fff"
       }
     },
     "surface": {
@@ -169,7 +169,7 @@
     "drop-indicator": {
       "can-drop": {
         "color": {
-          "value": "#047AA6"
+          "value": "#DCDCDC"
         }
       },
       "cannot-drop": {
@@ -180,6 +180,18 @@
       "border": {
         "color": {
           "value": "{theme.surface.canvas.background-color.value}"
+        }
+      }
+    },
+    "home": {
+      "header": {
+        "background-color": {
+          "value": "{theme.surface.canvas.background-color.value}"
+        }
+      },
+      "separator": {
+        "color": {
+          "value": "#32323B"
         }
       }
     }
@@ -193,7 +205,7 @@
   },
   "tabs": {
     "background-color": {
-      "value": "#047AA6"
+      "value": "#586e75"
     }
   },
   "event-sheet": {

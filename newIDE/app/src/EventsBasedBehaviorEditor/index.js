@@ -98,7 +98,7 @@ export default class EventsBasedBehaviorEditor extends React.Component<
                 commitOnBlur
                 floatingLabelText={<Trans>Description</Trans>}
                 floatingLabelFixed
-                hintText={t`The description of the behavior should explain what the behavior is doing to the object, and, briefly, how to use it.`}
+                translatableHintText={t`The description of the behavior should explain what the behavior is doing to the object, and, briefly, how to use it.`}
                 value={eventsBasedBehavior.getDescription()}
                 onChange={text => {
                   eventsBasedBehavior.setDescription(text);

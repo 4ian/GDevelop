@@ -9,7 +9,7 @@ module.exports = {
   makeTestExtensions: (gd) => {
     const platform = gd.JsPlatform.get();
 
-    {
+    const declareFakeAdmod = () => {
       const extension = new gd.PlatformExtension();
       extension
         .setExtensionInformation(
@@ -69,8 +69,10 @@ module.exports = {
 
       platform.addNewExtension(extension);
       extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
-    }
-    {
+    };
+    declareFakeAdmod();
+
+    const declareFakeObjectWithUnsupportedCapability = () => {
       const extension = new gd.PlatformExtension();
       extension.setExtensionInformation(
         'FakeObjectWithUnsupportedCapability',
@@ -81,8 +83,7 @@ module.exports = {
       );
       const fakeObject = new gd.ObjectJsImplementation();
 
-
-      fakeObject.updateProperty = function(
+      fakeObject.updateProperty = function (
         objectContent,
         propertyName,
         newValue
@@ -90,7 +91,7 @@ module.exports = {
         return false;
       };
 
-      fakeObject.getProperties = function(objectContent) {
+      fakeObject.getProperties = function (objectContent) {
         const objectProperties = new gd.MapStringPropertyDescriptor();
 
         objectProperties
@@ -107,8 +108,7 @@ module.exports = {
         })
       );
 
-
-      fakeObject.updateInitialInstanceProperty = function(
+      fakeObject.updateInitialInstanceProperty = function (
         objectContent,
         instance,
         propertyName,
@@ -119,7 +119,7 @@ module.exports = {
         return false;
       };
 
-      fakeObject.getInitialInstanceProperties = function(
+      fakeObject.getInitialInstanceProperties = function (
         content,
         instance,
         project,
@@ -141,8 +141,10 @@ module.exports = {
 
       platform.addNewExtension(extension);
       extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
-    }
-    {
+    };
+    declareFakeObjectWithUnsupportedCapability();
+
+    const declareFakeObjectWithAsyncAction = () => {
       const extension = new gd.PlatformExtension();
       extension.setExtensionInformation(
         'FakeObjectWithAsyncAction',
@@ -153,8 +155,7 @@ module.exports = {
       );
       const fakeObject = new gd.ObjectJsImplementation();
 
-
-      fakeObject.updateProperty = function(
+      fakeObject.updateProperty = function (
         objectContent,
         propertyName,
         newValue
@@ -162,15 +163,13 @@ module.exports = {
         return false;
       };
 
-      fakeObject.getProperties = function(objectContent) {
+      fakeObject.getProperties = function (objectContent) {
         const objectProperties = new gd.MapStringPropertyDescriptor();
         return objectProperties;
       };
-      fakeObject.setRawJSONContent(
-        JSON.stringify({})
-      );
+      fakeObject.setRawJSONContent(JSON.stringify({}));
 
-      fakeObject.updateInitialInstanceProperty = function(
+      fakeObject.updateInitialInstanceProperty = function (
         objectContent,
         instance,
         propertyName,
@@ -181,7 +180,7 @@ module.exports = {
         return false;
       };
 
-      fakeObject.getInitialInstanceProperties = function(
+      fakeObject.getInitialInstanceProperties = function (
         content,
         instance,
         project,
@@ -191,16 +190,16 @@ module.exports = {
         return instanceProperties;
       };
 
-      const object = extension
-        .addObject(
-          'FakeObjectWithAsyncAction',
-          'FakeObjectWithAsyncAction',
-          'This is FakeObjectWithAsyncAction',
-          '',
-          fakeObject
-        );
+      const object = extension.addObject(
+        'FakeObjectWithAsyncAction',
+        'FakeObjectWithAsyncAction',
+        'This is FakeObjectWithAsyncAction',
+        '',
+        fakeObject
+      );
 
-      object.addScopedAction(
+      object
+        .addScopedAction(
           'DoAsyncAction',
           'Some async action',
           'Some async action.',
@@ -210,12 +209,161 @@ module.exports = {
           'res/icon.png'
         )
         .addParameter('object', 'Object', 'FakeObjectWithAsyncAction', false)
-        .setAsync()
         .getCodeExtraInformation()
-        .setFunctionName('doFakeAsyncAction')
+        .setAsyncFunctionName('doFakeAsyncAction');
+
+      object
+        .addScopedAction(
+          'DoOptionallyAsyncAction',
+          'Some optionally async action',
+          'Some optionally async action.',
+          'Do some optionally async action with _PARAM0_',
+          '',
+          'res/icon.png',
+          'res/icon.png'
+        )
+        .addParameter('object', 'Object', 'FakeObjectWithAsyncAction', false)
+        .getCodeExtraInformation()
+        .setFunctionName('noop')
+        .setAsyncFunctionName('doFakeAsyncAction');
 
       platform.addNewExtension(extension);
       extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
-    }
+    };
+    declareFakeObjectWithAsyncAction();
+
+    const declareFakeOptionallyAsyncAction = () => {
+      const extension = new gd.PlatformExtension();
+      extension.setExtensionInformation(
+        'FakeOptionallyAsyncAction',
+        'Fake optionally async action',
+        'Fake optionally async action',
+        '',
+        'MIT'
+      );
+
+      extension
+        .addAction(
+          'DoOptionallyAsyncAction',
+          'Some optionally async action',
+          'Some optionally async action.',
+          'Optionally async action with _PARAM0_',
+          '',
+          'res/icon.png',
+          'res/icon.png'
+        )
+        .addParameter('expression', 'Wait time', '', false)
+        .getCodeExtraInformation()
+        .setFunctionName('gdjs.evtTools.runtimeScene.noop')
+        .setAsyncFunctionName('gdjs.evtTools.runtimeScene.wait');
+
+      platform.addNewExtension(extension);
+      extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+    };
+    declareFakeOptionallyAsyncAction();
+
+    const declareFakeBehaviorWithSharedData = () => {
+      const extension = new gd.PlatformExtension();
+      extension.setExtensionInformation(
+        'FakeBehaviorWithSharedData',
+        'Fake behavior with shared data',
+        'Fake behavior with shared data',
+        '',
+        'MIT'
+      );
+      // Declare a behavior with shared data between the behaviors
+      // In addition to the usual behavior:
+      // Create a new gd.BehaviorSharedDataJsImplementation object and implement the methods
+      // that are called to get and set the properties of the shared data.
+      const dummyBehaviorWithSharedData = new gd.BehaviorJsImplementation();
+      // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+      dummyBehaviorWithSharedData.updateProperty = function (
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
+        if (propertyName === 'MyBehaviorProperty') {
+          behaviorContent.setStringAttribute('MyBehaviorProperty', newValue);
+          return true;
+        }
+
+        return false;
+      };
+
+      dummyBehaviorWithSharedData.getProperties = function (behaviorContent) {
+        const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+        behaviorProperties
+          .getOrCreate('MyBehaviorProperty')
+          .setValue(behaviorContent.getStringAttribute('MyBehaviorProperty'));
+
+        return behaviorProperties;
+      };
+
+      dummyBehaviorWithSharedData.initializeContent = function (
+        behaviorContent
+      ) {
+        behaviorContent.setStringAttribute(
+          'MyBehaviorProperty',
+          'Initial value 1'
+        );
+      };
+
+      const sharedData = new gd.BehaviorSharedDataJsImplementation();
+
+      sharedData.updateProperty = function (
+        sharedContent,
+        propertyName,
+        newValue
+      ) {
+        if (propertyName === 'MySharedProperty') {
+          sharedContent.setStringAttribute('MySharedProperty', newValue);
+          return true;
+        }
+
+        return false;
+      };
+
+      sharedData.getProperties = function (sharedContent) {
+        const sharedProperties = new gd.MapStringPropertyDescriptor();
+
+        sharedProperties
+          .getOrCreate('MySharedProperty')
+          .setValue(sharedContent.getStringAttribute('MySharedProperty'));
+
+        return sharedProperties;
+      };
+
+      sharedData.initializeContent = function (behaviorContent) {
+        behaviorContent.setStringAttribute(
+          'MySharedProperty',
+          'Initial shared value 1'
+        );
+      };
+
+      extension
+        .addBehavior(
+          'DummyBehaviorWithSharedData',
+          'Dummy behavior with shared data for testing',
+          'DummyBehaviorWithSharedData',
+          'Do nothing but use shared data.',
+          '',
+          'CppPlatform/Extensions/topdownmovementicon.png',
+          'DummyBehaviorWithSharedData',
+          dummyBehaviorWithSharedData,
+          sharedData
+        )
+        .setIncludeFile(
+          'Extensions/ExampleJsExtension/dummywithshareddataruntimebehavior.js'
+        )
+        // You can optionally include more than one file when the behavior is used:
+        .addIncludeFile(
+          'Extensions/ExampleJsExtension/examplejsextensiontools.js'
+        );
+
+      platform.addNewExtension(extension);
+      extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+    };
+    declareFakeBehaviorWithSharedData();
   },
 };

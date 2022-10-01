@@ -360,6 +360,14 @@ namespace gdjs {
           Math.pow(10, decimalPlace)
         );
       };
+
+      /**
+       * Pi 3.1415...
+       * @returns the Pi number
+       */
+      export const pi = function (): number {
+        return Math.PI;
+      };
     }
   }
 }

@@ -21,9 +21,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/timers-and-time");
-  extension.AddInstructionOrExpressionGroupMetadata(
-      _("Timers and time")
-  )
+  extension.AddInstructionOrExpressionGroupMetadata(_("Timers and time"))
       .SetIcon("res/conditions/timer24.png");
 
   // Deprecated and replaced by CompareTimer
@@ -138,7 +136,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
 
   extension
       .AddAction("ChangeTimeScale",
-                 _("Change time scale"),
+                 _("Time scale"),
                  _("Change the time scale of the scene."),
                  _("Set the time scale of the scene to _PARAM1_"),
                  "",
@@ -155,11 +153,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                    "the next actions (and sub-events)."),
                  _("Wait _PARAM0_ seconds"),
                  "",
-                 "res/timer.svg",
-                 "res/timer.svg")
+                 "res/timer_black.svg",
+                 "res/timer_black.svg")
       .AddParameter("expression", "Time to wait in seconds")
-      .SetHelpPath("/all-features/timers-and-time/wait-action")
-      .SetAsync();
+      .SetHelpPath("/all-features/timers-and-time/wait-action");
 
   extension
       .AddExpression("TimeDelta",

@@ -4,12 +4,24 @@ import axios from 'axios';
 import * as PIXI from 'pixi.js-legacy';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
+import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
 const gd: libGDevelop = global.gd;
 
 const loadedBitmapFonts = {};
 const loadedFontFamilies = {};
 const loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
+
+const determineCrossOrigin = (url: string) => {
+  // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
+  // i.e: its gdevelop.io cookie, to be passed.
+  if (checkIfCredentialsRequired(url)) return 'use-credentials';
+
+  // For other resources, use "anonymous" as done by default by PixiJS. Note that using `false`
+  // to not having `crossorigin` at all would NOT work because the browser would taint the
+  // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
+  return 'anonymous';
+};
 
 /**
  * Expose functions to load PIXI textures or fonts, given the names of
@@ -45,14 +57,17 @@ export default class PixiResourcesLoader {
       if (!resourcesManager.hasResource(resourceName)) return;
 
       const resource = resourcesManager.getResource(resourceName);
-      const filename = ResourcesLoader.getResourceFullUrl(
-        project,
-        resourceName,
-        {
-          isResourceForPixi: true,
-        }
-      );
-      loader.add(resourceName, filename);
+      if (resource.getKind() !== 'image') return;
+
+      const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
+        isResourceForPixi: true,
+      });
+      loader.add({
+        name: resourceName,
+        url: url,
+        loadType: PIXI.LoaderResource.LOAD_TYPE.IMAGE,
+        crossOrigin: determineCrossOrigin(url),
+      });
       allResources[resourceName] = resource;
     });
 
@@ -77,11 +92,14 @@ export default class PixiResourcesLoader {
           const resource = resourcesManager.getResource(resourceName);
           if (resource.getKind() !== 'image') continue;
 
-          loadedTextures[resourceName] = loadedResources[resourceName].texture;
-          PixiResourcesLoader._initializeTexture(
-            resource,
-            loadedTextures[resourceName]
-          );
+          const texture = loadedResources[resourceName].texture;
+          if (texture) {
+            loadedTextures[resourceName] = texture;
+            PixiResourcesLoader._initializeTexture(
+              resource,
+              loadedTextures[resourceName]
+            );
+          }
         }
       }
 
@@ -111,11 +129,14 @@ export default class PixiResourcesLoader {
     const resource = project.getResourcesManager().getResource(resourceName);
     if (resource.getKind() !== 'image') return invalidTexture;
 
-    loadedTextures[resourceName] = PIXI.Texture.from(
-      ResourcesLoader.getResourceFullUrl(project, resourceName, {
-        isResourceForPixi: true,
-      })
-    );
+    const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
+      isResourceForPixi: true,
+    });
+    loadedTextures[resourceName] = PIXI.Texture.from(url, {
+      resourceOptions: {
+        crossorigin: determineCrossOrigin(url),
+      },
+    });
 
     PixiResourcesLoader._initializeTexture(
       resource,
@@ -146,18 +167,18 @@ export default class PixiResourcesLoader {
     const resource = project.getResourcesManager().getResource(resourceName);
     if (resource.getKind() !== 'video') return invalidTexture;
 
-    loadedTextures[resourceName] = PIXI.Texture.from(
-      ResourcesLoader.getResourceFullUrl(project, resourceName, {
-        disableCacheBurst: true, // Disable cache bursting for video because it prevent the video to be recognized as such (for a local file)
-        isResourceForPixi: true,
-      }),
-      {
-        scaleMode: PIXI.SCALE_MODES.LINEAR,
-        resourceOptions: {
-          autoPlay: false,
-        },
-      }
-    );
+    const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
+      disableCacheBurst: true, // Disable cache bursting for video because it prevents the video to be recognized as such (for a local file)
+      isResourceForPixi: true,
+    });
+
+    loadedTextures[resourceName] = PIXI.Texture.from(url, {
+      scaleMode: PIXI.SCALE_MODES.LINEAR,
+      resourceOptions: {
+        autoPlay: false,
+        crossorigin: determineCrossOrigin(url),
+      },
+    });
 
     return loadedTextures[resourceName];
   }
@@ -204,13 +225,11 @@ export default class PixiResourcesLoader {
       return Promise.resolve('Arial');
     }
 
-    return loadFontFace(fontFamily, `url("${fullFilename}")`, {}).then(
-      loadedFace => {
-        loadedFontFamilies[resourceName] = fontFamily;
+    return loadFontFace(fontFamily, fullFilename).then(loadedFace => {
+      loadedFontFamilies[resourceName] = fontFamily;
 
-        return fontFamily;
-      }
-    );
+      return fontFamily;
+    });
   }
 
   /**
@@ -262,10 +281,14 @@ export default class PixiResourcesLoader {
       );
     }
 
-    return axios.get(fullUrl).then(response => {
-      loadedBitmapFonts[resourceName] = response;
-      return response.data;
-    });
+    return axios
+      .get(fullUrl, {
+        withCredentials: checkIfCredentialsRequired(fullUrl),
+      })
+      .then(response => {
+        loadedBitmapFonts[resourceName] = response;
+        return response.data;
+      });
   }
 
   static getInvalidPIXITexture() {
@@ -293,6 +316,10 @@ export default class PixiResourcesLoader {
     const fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName, {
       isResourceForPixi: true,
     });
-    return axios.get(fullUrl).then(response => response.data);
+    return axios
+      .get(fullUrl, {
+        withCredentials: checkIfCredentialsRequired(fullUrl),
+      })
+      .then(response => response.data);
   }
 }

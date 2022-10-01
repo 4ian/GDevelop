@@ -19,6 +19,8 @@ declare class gdProject extends gdObjectsContainer {
   setPlayableWithMobile(playable: boolean): void;
   setPackageName(packageName: string): void;
   getPackageName(): string;
+  setTemplateSlug(templateSlug: string): void;
+  getTemplateSlug(): string;
   setOrientation(orientation: string): void;
   getOrientation(): string;
   setProjectUuid(projectUuid: string): void;
@@ -83,6 +85,8 @@ declare class gdProject extends gdObjectsContainer {
   insertNewEventsFunctionsExtension(name: string, position: number): gdEventsFunctionsExtension;
   insertEventsFunctionsExtension(eventsFunctionsExtension: gdEventsFunctionsExtension, position: number): gdEventsFunctionsExtension;
   removeEventsFunctionsExtension(name: string): void;
+  hasEventsBasedObject(type: string): boolean;
+  getEventsBasedObject(type: string): gdEventsBasedObject;
   getVariables(): gdVariablesContainer;
   getResourcesManager(): gdResourcesManager;
   exposeResources(worker: gdArbitraryResourceWorker): void;

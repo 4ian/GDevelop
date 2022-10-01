@@ -25,10 +25,13 @@ import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import UrlStorageProvider from './ProjectsStorage/UrlStorageProvider';
 import GoogleDriveStorageProvider from './ProjectsStorage/GoogleDriveStorageProvider';
 import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStorageProvider';
-import DropboxStorageProvider from './ProjectsStorage/DropboxStorageProvider';
-import OneDriveStorageProvider from './ProjectsStorage/OneDriveStorageProvider';
-import { BrowserResourceFetcher } from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
-import { onCreateFromExampleShortHeader, onCreateBlank } from './ProjectCreation/services/BrowserCreation';
+import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
+import {
+  onCreateFromExampleShortHeader,
+  onCreateBlank,
+} from './ProjectCreation/services/BrowserCreation';
+import BrowserResourceMover from './ProjectsStorage/ResourceMover/BrowserResourceMover';
+import BrowserResourceFetcher from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
 
 export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
@@ -43,16 +46,14 @@ export const create = (authentication: Authentication) => {
       makeEventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={null}
       eventsFunctionsExtensionOpener={null}
-      resourceFetcher={BrowserResourceFetcher}
     >
       {({ i18n }) => (
         <ProjectStorageProviders
           appArguments={appArguments}
           storageProviders={[
             UrlStorageProvider,
+            CloudStorageProvider,
             GoogleDriveStorageProvider,
-            DropboxStorageProvider,
-            OneDriveStorageProvider,
             DownloadFileStorageProvider,
           ]}
           defaultStorageProvider={UrlStorageProvider}
@@ -68,6 +69,7 @@ export const create = (authentication: Authentication) => {
               renderPreviewLauncher={(props, ref) => (
                 <BrowserS3PreviewLauncher {...props} ref={ref} />
               )}
+              initialDialog={appArguments['initial-dialog']}
               renderExportDialog={props => (
                 <ExportDialog
                   project={props.project}
@@ -84,13 +86,16 @@ export const create = (authentication: Authentication) => {
                 <CreateProjectDialog
                   open={props.open}
                   onClose={props.onClose}
-                  onOpen={props.onOpen}
-                  initialTab={props.initialTab}
-                  onCreateBlank={onCreateBlank}
-                  onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
+                  initialExampleShortHeader={props.initialExampleShortHeader}
+                  isProjectOpening={props.isProjectOpening}
+                  onOpenProjectPreCreationDialog={
+                    props.onOpenProjectPreCreationDialog
+                  }
                 />
               )}
               storageProviders={storageProviders}
+              resourceMover={BrowserResourceMover}
+              resourceFetcher={BrowserResourceFetcher}
               onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
               onCreateBlank={onCreateBlank}
               getStorageProviderOperations={getStorageProviderOperations}

@@ -30,12 +30,10 @@ import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
-import {
-  type ResourceFetcher,
-  ResourceFetcherContext,
-} from '../ProjectsStorage/ResourceFetcher';
 import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
 import { TutorialStateProvider } from '../Tutorial/TutorialContext';
+import ConfirmProvider from '../UI/Confirm/ConfirmProvider';
+import { AnnouncementsFeedStateProvider } from '../AnnouncementsFeed/AnnouncementsFeedContext';
 
 // Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
 const jss = create({
@@ -48,7 +46,6 @@ type Props = {|
   makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
-  resourceFetcher: ResourceFetcher,
   children: ({|
     i18n: I18nType,
   |}) => React.Node,
@@ -67,7 +64,6 @@ export default class Providers extends React.Component<Props, {||}> {
       makeEventsFunctionCodeWriter,
       eventsFunctionsExtensionWriter,
       eventsFunctionsExtensionOpener,
-      resourceFetcher,
     } = this.props;
     return (
       <DragAndDropContextProvider>
@@ -102,25 +98,25 @@ export default class Providers extends React.Component<Props, {||}> {
                                       eventsFunctionsExtensionOpener
                                     }
                                   >
-                                    <CommandsContextProvider>
-                                      <AssetStoreStateProvider>
-                                        <ResourceStoreStateProvider>
-                                          <ExampleStoreStateProvider>
-                                            <ExtensionStoreStateProvider>
-                                              <GamesShowcaseStateProvider>
-                                                <TutorialStateProvider>
-                                                  <ResourceFetcherContext.Provider
-                                                    value={resourceFetcher}
-                                                  >
-                                                    {children({ i18n })}
-                                                  </ResourceFetcherContext.Provider>
-                                                </TutorialStateProvider>
-                                              </GamesShowcaseStateProvider>
-                                            </ExtensionStoreStateProvider>
-                                          </ExampleStoreStateProvider>
-                                        </ResourceStoreStateProvider>
-                                      </AssetStoreStateProvider>
-                                    </CommandsContextProvider>
+                                    <ConfirmProvider>
+                                      <CommandsContextProvider>
+                                        <AssetStoreStateProvider>
+                                          <ResourceStoreStateProvider>
+                                            <ExampleStoreStateProvider>
+                                              <ExtensionStoreStateProvider>
+                                                <GamesShowcaseStateProvider>
+                                                  <TutorialStateProvider>
+                                                    <AnnouncementsFeedStateProvider>
+                                                      {children({ i18n })}
+                                                    </AnnouncementsFeedStateProvider>
+                                                  </TutorialStateProvider>
+                                                </GamesShowcaseStateProvider>
+                                              </ExtensionStoreStateProvider>
+                                            </ExampleStoreStateProvider>
+                                          </ResourceStoreStateProvider>
+                                        </AssetStoreStateProvider>
+                                      </CommandsContextProvider>
+                                    </ConfirmProvider>
                                   </EventsFunctionsExtensionsProvider>
                                 )}
                               </I18n>

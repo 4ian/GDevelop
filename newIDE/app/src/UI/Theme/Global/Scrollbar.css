@@ -1,4 +1,4 @@
-/* Width */
+/* The default scrollbar for the app */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -11,17 +11,44 @@
     border-radius: 4px;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
     background-color: rgba(0, 0, 0, 0.07);
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
     background-color: #8d8d8dcc;
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
+    background-color: #8d8d8d;
+}
+
+/** The scrollbar for tabs or toolbars: either invisible or very thing */
+.almost-invisible-scrollbar {
+    /** For browsers not supporting -webkit-scrollbar, hide it because even the `thin` option is too large. */
+    scrollbar-width: none;
+}
+
+.almost-invisible-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+.almost-invisible-scrollbar::-webkit-scrollbar-track,
+.almost-invisible-scrollbar::-webkit-scrollbar-thumb {
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    border-radius: 4px;
+}
+
+.almost-invisible-scrollbar::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.07);
+}
+
+.almost-invisible-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #8d8d8dcc;
+}
+
+.almost-invisible-scrollbar::-webkit-scrollbar-thumb:hover {
     background-color: #8d8d8d;
 }

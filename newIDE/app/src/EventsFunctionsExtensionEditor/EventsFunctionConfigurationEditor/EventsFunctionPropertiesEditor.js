@@ -13,10 +13,11 @@ import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import {
   isBehaviorLifecycleEventsFunction,
+  isObjectLifecycleEventsFunction,
   isExtensionLifecycleEventsFunction,
 } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import EmptyMessage from '../../UI/EmptyMessage';
-import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
+import { ParametersIndexOffsets } from '../../EventsFunctionsExtensionsLoader';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
@@ -27,6 +28,7 @@ const gd: libGDevelop = global.gd;
 type Props = {|
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
+  eventsBasedObject: ?gdEventsBasedObject,
   helpPagePath?: string,
   onConfigurationUpdated?: (whatChanged?: 'type') => void,
   renderConfigurationHeader?: () => React.Node,
@@ -39,6 +41,7 @@ type State = {||};
 const getSentenceErrorText = (
   i18n: I18nType,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
+  eventsBasedObject: ?gdEventsBasedObject,
   eventsFunction: gdEventsFunction
 ) => {
   const sentence = eventsFunction.getSentence();
@@ -47,7 +50,11 @@ const getSentenceErrorText = (
       t`Enter the sentence that will be displayed in the events sheet`
     );
 
-  const parametersIndexOffset = getParametersIndexOffset(!!eventsBasedBehavior);
+  const parametersIndexOffset = eventsBasedBehavior
+    ? ParametersIndexOffsets.BehaviorFunction
+    : eventsBasedObject
+    ? ParametersIndexOffsets.ObjectFunction
+    : ParametersIndexOffsets.FreeFunction;
 
   const missingParameters = mapVector(
     eventsFunction.getParameters(),
@@ -109,12 +116,14 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
       helpPagePath,
       renderConfigurationHeader,
       eventsBasedBehavior,
+      eventsBasedObject,
       getFunctionGroupNames,
     } = this.props;
 
     const type = eventsFunction.getFunctionType();
     const isABehaviorLifecycleEventsFunction =
       !!eventsBasedBehavior &&
+      !eventsBasedObject &&
       isBehaviorLifecycleEventsFunction(eventsFunction.getName());
     if (isABehaviorLifecycleEventsFunction) {
       return (
@@ -128,8 +137,24 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
       );
     }
 
+    const isAnObjectLifecycleEventsFunction =
+      !!eventsBasedObject &&
+      !eventsBasedBehavior &&
+      isObjectLifecycleEventsFunction(eventsFunction.getName());
+    if (isAnObjectLifecycleEventsFunction) {
+      return (
+        <EmptyMessage>
+          <Trans>
+            This is a "lifecycle method". It will be called automatically by the
+            game engine for each instance living on the scene.
+          </Trans>
+        </EmptyMessage>
+      );
+    }
+
     const isAnExtensionLifecycleEventsFunction =
       !eventsBasedBehavior &&
+      !eventsBasedObject &&
       isExtensionLifecycleEventsFunction(eventsFunction.getName());
     if (isAnExtensionLifecycleEventsFunction) {
       return (
@@ -197,7 +222,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
               <SemiControlledTextField
                 commitOnBlur
                 floatingLabelText={<Trans>Full name displayed in editor</Trans>}
-                hintText={getFullNameHintText(type)}
+                translatableHintText={getFullNameHintText(type)}
                 value={eventsFunction.getFullName()}
                 onChange={text => {
                   eventsFunction.setFullName(text);
@@ -235,7 +260,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                 floatingLabelText={
                   <Trans>Description, displayed in editor</Trans>
                 }
-                hintText={getDescriptionHintText(type)}
+                translatableHintText={getDescriptionHintText(type)}
                 fullWidth
                 multiline
                 value={eventsFunction.getDescription()}
@@ -252,7 +277,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                 <SemiControlledTextField
                   commitOnBlur
                   floatingLabelText={<Trans>Sentence in Events Sheet</Trans>}
-                  hintText={t`Note: write _PARAMx_ for parameters, e.g: Flash _PARAM1_ for 5 seconds`}
+                  translatableHintText={t`Note: write _PARAMx_ for parameters, e.g: Flash _PARAM1_ for 5 seconds`}
                   fullWidth
                   value={eventsFunction.getSentence()}
                   onChange={text => {
@@ -263,6 +288,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                   errorText={getSentenceErrorText(
                     i18n,
                     eventsBasedBehavior,
+                    eventsBasedObject,
                     eventsFunction
                   )}
                 />

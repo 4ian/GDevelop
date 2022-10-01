@@ -1,5 +1,4 @@
 // @flow
-import { t } from '@lingui/macro';
 import * as React from 'react';
 import TextField from '../UI/TextField';
 import ColorPicker, { type ColorResult } from '../UI/ColorField/ColorPicker';
@@ -100,7 +99,7 @@ export const HexColorField = ({
         floatingLabelFixed
         helperMarkdownText={helperMarkdownText}
         type="text"
-        hintText={t`#ff8844`}
+        hintText={'#ff8844'}
         value={colorString}
         onChange={event => handleTextChange(event.target.value)}
       />

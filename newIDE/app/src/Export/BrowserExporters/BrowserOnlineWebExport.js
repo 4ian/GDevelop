@@ -15,7 +15,7 @@ import {
   type UrlFileDescriptor,
   type TextFileDescriptor,
   type BlobFileDescriptor,
-  downloadUrlsToBlobs,
+  downloadUrlFilesToBlobFiles,
   archiveFiles,
 } from '../../Utils/BrowserArchiver';
 import {
@@ -133,7 +133,7 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     { textFiles, urlFiles }: ExportOutput
   ): Promise<ResourcesDownloadOutput> => {
-    return downloadUrlsToBlobs({
+    return downloadUrlFilesToBlobFiles({
       urlFiles,
       onProgress: context.updateStepProgress,
     }).then(blobFiles => ({
@@ -172,7 +172,11 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
     exportState: ExportState,
     authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string,
-    gameId: string
+    gameId: string,
+    options: {|
+      gameName: string,
+      gameVersion: string,
+    |}
   ): Promise<Build> => {
     const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
     if (!firebaseUser)
@@ -182,7 +186,8 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
       getAuthorizationHeader,
       firebaseUser.uid,
       uploadBucketKey,
-      gameId
+      gameId,
+      options
     );
   },
 };

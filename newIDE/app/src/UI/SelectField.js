@@ -11,11 +11,13 @@ import { makeStyles } from '@material-ui/core';
 const INVALID_VALUE = '';
 const stopPropagation = event => event.stopPropagation();
 
-const useSelectCenterStyles = makeStyles({
-  root: {
-    textAlign: 'center',
-  },
-});
+const useSelectStyles = textAlign =>
+  makeStyles({
+    root: {
+      textAlign: textAlign || 'left',
+      cursor: 'default',
+    },
+  })();
 
 export type SelectFieldInterface = {| focus: () => void |};
 
@@ -52,7 +54,7 @@ type Props = {|
 
   // If a hint text is specified, will be shown as an option for the empty
   // value (""), disabled.
-  hintText?: MessageDescriptor,
+  translatableHintText?: MessageDescriptor,
 |};
 
 /**
@@ -70,7 +72,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
     React.useImperativeHandle(ref, () => ({
       focus,
     }));
-    const selectCenterStyles = useSelectCenterStyles();
+    const selectStyles = useSelectStyles(props.textAlign);
 
     const onChange = props.onChange || undefined;
 
@@ -101,6 +103,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
         {({ i18n }) => (
           <TextField
             select
+            color="secondary"
             {...computeTextFieldStyleProps(props)}
             disabled={props.disabled}
             fullWidth={props.fullWidth}
@@ -124,15 +127,15 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
             }}
             SelectProps={{
               native: true,
-              classes: props.textAlign === 'center' ? selectCenterStyles : {},
+              classes: selectStyles,
             }}
             style={props.style}
             inputRef={inputRef}
           >
             {!hasValidValue ? (
               <option value={INVALID_VALUE} disabled>
-                {props.hintText
-                  ? i18n._(props.hintText)
+                {props.translatableHintText
+                  ? i18n._(props.translatableHintText)
                   : i18n._(t`Choose an option`)}
               </option>
             ) : null}

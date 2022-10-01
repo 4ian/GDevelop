@@ -14,7 +14,7 @@ const styles = {
     cursor: 'pointer',
   },
   dropIndicator: {
-    border: '4px solid black',
+    border: '2px solid black',
     outline: '1px solid white',
   },
 };
@@ -80,7 +80,6 @@ export default function BottomButtons({
                       onClick={() =>
                         onAddEvent('BuiltinCommonInstructions::Standard')
                       }
-                      id="add-event-button"
                     >
                       <Trans>Add a new event</Trans>
                     </button>

@@ -9,7 +9,7 @@ import Window from '../../Utils/Window';
 import PreferencesContext from './PreferencesContext';
 import LocalesMetadata from '../../locales/LocalesMetadata';
 import Text from '../../UI/Text';
-import Link from '@material-ui/core/Link';
+import Link from '../../UI/Link';
 
 type Props = {|
   onLanguageChanged: (language: string) => void,
@@ -76,10 +76,9 @@ const LanguageSelector = ({ onLanguageChanged }: Props) => {
           You can{' '}
           <Link
             href={'https://crowdin.com/project/gdevelop'}
-            onClick={event => {
-              Window.openExternalURL('https://crowdin.com/project/gdevelop');
-              event.preventDefault();
-            }}
+            onClick={() =>
+              Window.openExternalURL('https://crowdin.com/project/gdevelop')
+            }
           >
             help to translate GDevelop in your language
           </Link>

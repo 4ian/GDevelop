@@ -116,7 +116,8 @@ export const extractExtremeScoreDisplayData = ({
   score,
 });
 
-export const breakUuid = (uuid: string): string => `${uuid.split('-')[0]}-...`;
+export const shortenUuidForDisplay = (uuid: string): string =>
+  `${uuid.split('-')[0]}-...`;
 
 export const listGameActiveLeaderboards = async (
   authenticatedUser: AuthenticatedUser,
@@ -199,6 +200,32 @@ export const createLeaderboard = async (
       name,
       sort,
     },
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+  return response.data;
+};
+
+type LeaderboardDuplicationPayload = {|
+  sourceLeaderboardId: string,
+  sourceGameId: string,
+|};
+
+export const duplicateLeaderboard = async (
+  authenticatedUser: AuthenticatedUser,
+  gameId: string,
+  payload: LeaderboardDuplicationPayload
+): Promise<Leaderboard> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) throw new Error('User is not authenticated.');
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard/action/copy`,
+    payload,
     {
       headers: { Authorization: authorizationHeader },
       params: { userId },
@@ -293,4 +320,85 @@ export const deleteLeaderboardEntry = async (
     }
   );
   return response.data;
+};
+
+// 2 types of comments. Feedback is private, Review is public.
+export type CommentType = 'FEEDBACK' | 'REVIEW';
+
+export type GameRatings = {
+  version: number,
+  visuals: number,
+  sound: number,
+  fun: number,
+  easeOfUse: number,
+};
+
+export type Comment = {
+  id: string,
+  type: CommentType,
+  gameId: string,
+  buildId?: string,
+  text: string,
+  ratings?: GameRatings,
+  playerId?: string,
+  playerName?: string,
+  contact?: string,
+  createdAt: number,
+  processedAt?: number,
+  updatedAt: number,
+};
+
+export const listComments = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  {
+    gameId,
+    type,
+  }: {|
+    gameId: string,
+    type: 'FEEDBACK' | 'REVIEW',
+  |}
+): Promise<Array<Comment>> => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.get(`${GDevelopPlayApi.baseUrl}/game/${gameId}/comment`, {
+        params: {
+          userId,
+          type,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      })
+    )
+    .then(response => response.data);
+};
+
+export const updateComment = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  {
+    gameId,
+    commentId,
+    processed,
+  }: {|
+    gameId: string,
+    commentId: string,
+    processed: boolean,
+  |}
+) => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.patch(
+        `${GDevelopPlayApi.baseUrl}/game/${gameId}/comment/${commentId}`,
+        { processed },
+        {
+          params: { userId },
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        }
+      )
+    )
+    .then(response => response.data);
 };

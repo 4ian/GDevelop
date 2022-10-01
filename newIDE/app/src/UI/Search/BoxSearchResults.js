@@ -63,8 +63,6 @@ export const BoxSearchResults = <SearchItem>({
       <div style={styles.container}>
         <AutoSizer>
           {({ width, height }) => {
-            if (!width || !height) return null;
-
             const columnCount = Math.max(Math.floor((width - 5) / baseSize), 1);
             const columnWidth = Math.max(Math.floor(width / columnCount), 30);
             const rowCount = Math.max(

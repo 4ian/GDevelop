@@ -4,7 +4,7 @@ exports[`HelpIcon renders nothing if the helpPagePath is empty 1`] = `null`;
 
 exports[`HelpIcon renders the icon linking to a help page 1`] = `
 <button
-  className="MuiButtonBase-root MuiIconButton-root"
+  className="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorSecondary"
   disabled={false}
   onBlur={[Function]}
   onClick={[Function]}

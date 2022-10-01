@@ -3,8 +3,7 @@ import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import { Column, Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
-import Chip from '@material-ui/core/Chip';
-import RaisedButton from '../UI/RaisedButton';
+import Chip from '../UI/Chip';
 import {
   type AssetShortHeader,
   type Asset,
@@ -13,15 +12,11 @@ import {
   getAsset,
   isPixelArt,
 } from '../Utils/GDevelopServices/Asset';
-import LeftLoader from '../UI/LeftLoader';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
-import { type ResourceSource } from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { AssetStoreContext } from './AssetStoreContext';
-import Link from '@material-ui/core/Link';
 import Window from '../Utils/Window';
 import Paper from '@material-ui/core/Paper';
 import SelectField from '../UI/SelectField';
@@ -36,8 +31,10 @@ import { AssetCard } from './AssetCard';
 import { SimilarAssetStoreSearchFilter } from './AssetStoreSearchFilter';
 import EmptyMessage from '../UI/EmptyMessage';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
+import Link from '../UI/Link';
 
 const FIXED_HEIGHT = 250;
+const FIXED_WIDTH = 300;
 
 const styles = {
   previewBackground: {
@@ -46,7 +43,7 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     padding: 10,
-    width: 300,
+    width: FIXED_WIDTH,
     height: FIXED_HEIGHT,
   },
   chip: {
@@ -79,16 +76,8 @@ const makeFirstLetterUppercase = (str: string) =>
 
 type Props = {|
   project: gdProject,
-  objectsContainer: gdObjectsContainer,
-  resourceSources: Array<ResourceSource>,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
   onTagSelection: (tag: string) => void,
-
   assetShortHeader: AssetShortHeader,
-  onAdd: () => void,
-  onClose: () => void,
-  isAddedToScene: boolean,
-  isBeingAddedToScene: boolean,
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
 |};
 
@@ -106,19 +95,19 @@ const getObjectAssetResourcesByName = (
 
 export const AssetDetails = ({
   project,
-  objectsContainer,
-  resourceSources,
-  resourceExternalEditors,
   onTagSelection,
   assetShortHeader,
-  onAdd,
-  onClose,
-  isAddedToScene,
-  isBeingAddedToScene,
   onOpenDetails,
 }: Props) => {
   const gdevelopTheme = React.useContext(ThemeContext);
-  const { authors, licenses } = React.useContext(AssetStoreContext);
+  const {
+    authors,
+    licenses,
+    environment,
+    error: filterError,
+    fetchAssetsAndFilters,
+    useSearchItem,
+  } = React.useContext(AssetStoreContext);
   const [asset, setAsset] = React.useState<?Asset>(null);
   const [
     selectedAnimationName,
@@ -129,7 +118,11 @@ export const AssetDetails = ({
     () => {
       (async () => {
         try {
-          const loadedAsset = await getAsset(assetShortHeader);
+          // Reinitialise asset to trigger a loader and recalculate all parameters. (for instance zoom)
+          setAsset(null);
+          const loadedAsset = await getAsset(assetShortHeader, {
+            environment,
+          });
           setAsset(loadedAsset);
           if (loadedAsset.objectType === 'sprite') {
             // Only sprites have animations and we select the first one.
@@ -143,7 +136,7 @@ export const AssetDetails = ({
         }
       })();
     },
-    [assetShortHeader]
+    [assetShortHeader, environment]
   );
 
   const isImageResourceSmooth = React.useMemo(
@@ -156,14 +149,6 @@ export const AssetDetails = ({
       loadAsset();
     },
     [loadAsset]
-  );
-
-  const canAddAsset = !isBeingAddedToScene && !!asset;
-  const onAddAsset = React.useCallback(
-    () => {
-      if (canAddAsset) onAdd();
-    },
-    [onAdd, canAddAsset]
   );
 
   const assetAuthors: ?Array<Author> =
@@ -200,11 +185,6 @@ export const AssetDetails = ({
     () => [new SimilarAssetStoreSearchFilter(assetShortHeader)],
     [assetShortHeader]
   );
-  const {
-    error: filterError,
-    fetchAssetsAndFilters,
-    useSearchItem,
-  } = React.useContext(AssetStoreContext);
   const searchResults = useSearchItem('', null, null, similarAssetFilters);
   const truncatedSearchResults = searchResults && searchResults.slice(0, 60);
 
@@ -214,7 +194,7 @@ export const AssetDetails = ({
         <Line justifyContent="space-between" noMargin>
           <Column>
             <Line alignItems="baseline" noMargin>
-              <Text size="title" displayInlineAsSpan>
+              <Text size="block-title" displayInlineAsSpan>
                 {assetShortHeader.name}
               </Text>
               <Spacer />
@@ -227,10 +207,7 @@ export const AssetDetails = ({
                         <Link
                           key={author.name}
                           href={author.website}
-                          onClick={event => {
-                            Window.openExternalURL(author.website);
-                            event.preventDefault();
-                          }}
+                          onClick={() => Window.openExternalURL(author.website)}
                         >
                           {author.name}
                         </Link>
@@ -271,68 +248,46 @@ export const AssetDetails = ({
               </div>
             </Line>
           </Column>
-          <Column alignItems="center" justifyContent="center">
-            <LeftLoader
-              isLoading={isBeingAddedToScene || (!asset && !error)}
-              key="install"
-            >
-              <RaisedButton
-                primary={!isAddedToScene}
-                label={
-                  isBeingAddedToScene ? (
-                    <Trans>Adding...</Trans>
-                  ) : isAddedToScene ? (
-                    <Trans>Add again</Trans>
-                  ) : (
-                    <Trans>Add to the scene</Trans>
-                  )
-                }
-                onClick={onAddAsset}
-                disabled={!canAddAsset}
-                id="add-asset-button"
-              />
-            </LeftLoader>
-          </Column>
         </Line>
         <ResponsiveLineStackLayout noMargin>
           <Column>
-            <div style={styles.previewBackground}>
-              {asset ? (
-                <>
-                  {asset.objectType === 'sprite' &&
-                    animationResources &&
-                    direction && (
-                      <AnimationPreview
-                        resourceNames={animationResources.map(
-                          ({ name }) => name
-                        )}
-                        getImageResourceSource={(resourceName: string) => {
-                          const resource = assetResources[resourceName];
-                          return resource ? resource.file : '';
-                        }}
-                        isImageResourceSmooth={() => isImageResourceSmooth}
-                        project={project}
-                        timeBetweenFrames={direction.timeBetweenFrames}
-                        isLooping // Always loop in the asset store.
-                        hideCheckeredBackground
-                        hideControls
-                        initialZoom={140 / Math.max(asset.width, asset.height)}
-                        fixedHeight={FIXED_HEIGHT}
-                      />
-                    )}
-                  {(asset.objectType === 'tiled' ||
-                    asset.objectType === '9patch') && (
+            {asset ? (
+              <>
+                {asset.objectType === 'sprite' &&
+                  animationResources &&
+                  direction && (
+                    <AnimationPreview
+                      resourceNames={animationResources.map(({ name }) => name)}
+                      getImageResourceSource={(resourceName: string) => {
+                        const resource = assetResources[resourceName];
+                        return resource ? resource.file : '';
+                      }}
+                      isImageResourceSmooth={() => isImageResourceSmooth}
+                      project={project}
+                      timeBetweenFrames={direction.timeBetweenFrames}
+                      isLooping // Always loop in the asset store.
+                      hideCheckeredBackground
+                      hideControls
+                      initialZoom={140 / Math.max(asset.width, asset.height)}
+                      fixedHeight={FIXED_HEIGHT}
+                      fixedWidth={FIXED_WIDTH}
+                    />
+                  )}
+                {asset.objectType !== 'sprite' && (
+                  <div style={styles.previewBackground}>
                     <CorsAwareImage
                       style={styles.previewImage}
                       src={asset.previewImageUrls[0]}
                       alt={asset.name}
                     />
-                  )}
-                </>
-              ) : (
+                  </div>
+                )}
+              </>
+            ) : (
+              <div style={styles.previewBackground}>
                 <PlaceholderLoader />
-              )}
-            </div>
+              </div>
+            )}
             {assetAnimations &&
               assetAnimations.length > 1 &&
               typeof selectedAnimationName === 'string' && (
@@ -418,10 +373,9 @@ export const AssetDetails = ({
                       {
                         <Link
                           href={assetLicense.website}
-                          onClick={event => {
-                            Window.openExternalURL(assetLicense.website);
-                            event.preventDefault();
-                          }}
+                          onClick={() =>
+                            Window.openExternalURL(assetLicense.website)
+                          }
                         >
                           {assetLicense.name}
                         </Link>
@@ -446,7 +400,7 @@ export const AssetDetails = ({
         {asset && (
           <Column expand>
             <Line noMargin>
-              <Text size="title" displayInlineAsSpan>
+              <Text size="block-title" displayInlineAsSpan>
                 <Trans>You might like</Trans>
               </Text>
             </Line>

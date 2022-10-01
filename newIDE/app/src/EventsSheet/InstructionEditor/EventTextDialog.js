@@ -195,7 +195,7 @@ const EventTextDialog = (props: Props) => {
             <Line>
               <SemiControlledTextField
                 commitOnBlur
-                hintText={t`Enter the text to be displayed`}
+                translatableHintText={t`Enter the text to be displayed`}
                 fullWidth
                 multiline
                 rows={8}

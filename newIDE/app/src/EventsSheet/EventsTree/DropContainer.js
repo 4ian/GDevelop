@@ -5,19 +5,19 @@ import {
   moveNodeAbove,
   moveNodeBelow,
   moveNodeAsSubEvent,
-  isSameDepthAndJustBelow,
+  isJustBelow,
+  isSibling,
 } from './helpers';
 import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import './style.css';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import { type DropTargetComponent } from '../../UI/DragAndDrop/DropTarget';
-
 const sharedStyles = {
   dropArea: { zIndex: 1, position: 'absolute' },
   dropIndicator: {
     position: 'absolute',
     zIndex: 2,
-    border: '4px solid black',
+    border: '2px solid black',
     outline: '1px solid white',
   },
   autoScroll: {
@@ -42,7 +42,7 @@ type TargetPositionStyles = { [position: string]: DropTargetContainerStyle };
 const getTargetPositionStyles = (
   indentWidth: number,
   draggedNodeHeight: number,
-  isDraggedNodeChild: boolean
+  isDraggedNodeSibling: boolean
 ): TargetPositionStyles => ({
   'bottom-left': { left: '0px', bottom: '0px', top: '50%', width: indentWidth },
   'bottom-right': {
@@ -54,13 +54,13 @@ const getTargetPositionStyles = (
   top: { left: '0px', right: '0px', top: '0px', bottom: '50%' },
   bottom: { left: '0px', right: '0px', top: '50%', bottom: '0px' },
   'below-left': {
-    left: isDraggedNodeChild ? '0px' : '10px',
+    left: isDraggedNodeSibling ? '10px' : '0px',
     top: '100%',
     height: draggedNodeHeight,
     width: indentWidth,
   },
   'below-right': {
-    left: isDraggedNodeChild ? `${indentWidth + 10}px` : `${indentWidth}px`,
+    left: isDraggedNodeSibling ? `${indentWidth}px` : `${indentWidth + 10}px`,
     right: '0px',
     top: '100%',
     height: draggedNodeHeight,
@@ -70,9 +70,9 @@ const getTargetPositionStyles = (
 const getIndicatorPositionStyles = (
   indentWidth: number
 ): TargetPositionStyles => ({
-  bottom: { left: '0px', right: '0px', bottom: '-4px' },
-  'bottom-right': { left: `${indentWidth}px`, right: '0px', bottom: '-4px' },
-  top: { left: '0px', right: '0px', top: '-4px' },
+  bottom: { left: '0px', right: '0px', bottom: '-2px' },
+  'bottom-right': { left: `${indentWidth}px`, right: '0px', bottom: '-2px' },
+  top: { left: '0px', right: '0px', top: '-2px' },
 });
 
 function DropTargetContainer({
@@ -132,7 +132,7 @@ type DropContainerProps = {|
     moveFunction: ({
       targetNode: SortableTreeNode,
       node: SortableTreeNode,
-    }) => number,
+    }) => void,
     node: SortableTreeNode
   ) => void,
   activateTargets: boolean,
@@ -142,7 +142,75 @@ type DropContainerProps = {|
   // Used only for the node just above dragged node if it is an only child,
   // so that drop area covers the whole dragged node's row in height.
   draggedNodeHeight: number,
+  getNodeAtPath: (path: Array<number>) => SortableTreeNode,
 |};
+
+type HorizontalDraggedNodeDropContainerProps = {|
+  node: SortableTreeNode,
+  draggedNode: SortableTreeNode,
+  DnDComponent: DropTargetComponent<SortableTreeNode>,
+  onDrop: (
+    moveFunction: ({
+      targetNode: SortableTreeNode,
+      node: SortableTreeNode,
+    }) => void,
+    node: SortableTreeNode
+  ) => void,
+  activateTargets: boolean,
+
+  getNodeAtPath: (path: Array<number>) => SortableTreeNode,
+  draggedNodeHeight: number,
+  indentWidth: number,
+|};
+
+function HorizontalDraggedNodeDropContainer({
+  DnDComponent,
+  onDrop,
+  activateTargets,
+  getNodeAtPath,
+  node,
+  draggedNode,
+  indentWidth,
+  draggedNodeHeight,
+}: HorizontalDraggedNodeDropContainerProps) {
+  const { depth } = node;
+  return (
+    <>
+      {new Array(depth).fill(0).map((_, depthStep) => {
+        // Skip so that it does not hinder dragging and so that we don't have to
+        // worry about delaying the drop target activation.
+        if (depthStep === draggedNode.depth) return null;
+        return (
+          <DropTargetContainer
+            key={depthStep}
+            DnDComponent={DnDComponent}
+            onDrop={() =>
+              onDrop(
+                moveNodeBelow,
+                getNodeAtPath(node.nodePath.slice(0, depthStep + 1))
+              )
+            }
+            canDrop={() => true}
+            style={{
+              dropArea: {
+                top: '100%',
+                bottom: `-${draggedNodeHeight}px`,
+                left: `-${indentWidth * (depth - depthStep)}px`,
+                width: indentWidth,
+              },
+              dropIndicator: {
+                left: `-${indentWidth * (depth - depthStep)}px`,
+                right: '0px',
+                // The bottom is set so that the indicator is centered between the events.
+                bottom: '-2px',
+              },
+            }}
+          />
+        );
+      })}
+    </>
+  );
+}
 
 /**
  * DropContainer is composed of sub-containers of drop targets that allows us to identify
@@ -158,24 +226,19 @@ export function DropContainer({
   activateTargets,
   windowWidth,
   draggedNodeHeight,
+  getNodeAtPath,
 }: DropContainerProps) {
-  const isDraggedNodesOnlyChild =
-    node.children.length === 1 && node.children[0].key === draggedNode.key;
-  const isDraggedNodeSameDepthAndBelow = isSameDepthAndJustBelow(
-    node,
-    draggedNode
-  );
+  const isDraggedNodeSibling = isSibling(node, draggedNode);
+  const isDraggedNodeJustBelow = isJustBelow(node, draggedNode);
   // We want to allow dropping below if the event has no children OR if the only
   // child of the event is the dragged one.
-  const canDropBelow =
-    !!node.event && (node.children.length === 0 || isDraggedNodesOnlyChild);
   const canHaveSubEvents = !!node.event && node.event.canHaveSubEvents();
 
   const indentWidth = getIndentWidth(windowWidth);
   const dropAreaStyles = getTargetPositionStyles(
     indentWidth,
     draggedNodeHeight,
-    isDraggedNodesOnlyChild
+    isDraggedNodeSibling
   );
   const indicatorStyles = getIndicatorPositionStyles(indentWidth);
   const commonProps = {
@@ -196,7 +259,7 @@ export function DropContainer({
         onDrop={() => onDrop(moveNodeAbove, node)}
         {...commonProps}
       />
-      {canHaveSubEvents && canDropBelow && (
+      {canHaveSubEvents ? (
         <>
           <DropTargetContainer
             style={{
@@ -214,8 +277,8 @@ export function DropContainer({
             onDrop={() => onDrop(moveNodeBelow, node)}
             {...commonProps}
           />
-          {/* Allow dragging left/right to move below or as subevent */}
-          {(isDraggedNodesOnlyChild || isDraggedNodeSameDepthAndBelow) && (
+          {/* Allow dragging left/right just below the current node. */}
+          {isDraggedNodeJustBelow && (
             <>
               <DropTargetContainer
                 style={{
@@ -236,8 +299,7 @@ export function DropContainer({
             </>
           )}
         </>
-      )}
-      {!canHaveSubEvents && canDropBelow && (
+      ) : (
         <DropTargetContainer
           style={{
             dropIndicator: indicatorStyles['bottom'],
@@ -247,14 +309,19 @@ export function DropContainer({
           {...commonProps}
         />
       )}
-      {canHaveSubEvents && !canDropBelow && (
-        <DropTargetContainer
-          style={{
-            dropIndicator: indicatorStyles['bottom-right'],
-            dropArea: dropAreaStyles['bottom'],
-          }}
-          onDrop={() => onDrop(moveNodeAsSubEvent, node)}
-          {...commonProps}
+      {/* This DropContainer allows dragging horizontally, on any depth between
+      0 and the depth of the node just above the dragged one (which has information on
+      its parents). */}
+      {isDraggedNodeJustBelow && (
+        <HorizontalDraggedNodeDropContainer
+          node={node}
+          draggedNode={draggedNode}
+          DnDComponent={DnDComponent}
+          activateTargets={activateTargets}
+          onDrop={onDrop}
+          indentWidth={indentWidth}
+          draggedNodeHeight={draggedNodeHeight}
+          getNodeAtPath={getNodeAtPath}
         />
       )}
     </div>

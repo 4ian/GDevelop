@@ -18,7 +18,8 @@ type MainMenuEvent =
   | 'main-menu-close'
   | 'main-menu-close-app'
   | 'main-menu-export'
-  | 'main-menu-create'
+  | 'main-menu-create-blank'
+  | 'main-menu-create-template'
   | 'main-menu-open-project-manager'
   | 'main-menu-open-home-page'
   | 'main-menu-open-debugger'
@@ -91,9 +92,20 @@ const buildAndSendMenuTemplate = (
     label: i18n._(t`File`),
     submenu: [
       {
-        label: i18n._(t`Create a New Project...`),
-        accelerator: getElectronAccelerator(shortcutMap['CREATE_NEW_PROJECT']),
-        onClickSendEvent: 'main-menu-create',
+        label: i18n._(t`Create`),
+        submenu: [
+          {
+            label: i18n._(t`New empty project...`),
+            accelerator: getElectronAccelerator(
+              shortcutMap['CREATE_NEW_PROJECT']
+            ),
+            onClickSendEvent: 'main-menu-create-blank',
+          },
+          {
+            label: i18n._(t`New project from template...`),
+            onClickSendEvent: 'main-menu-create-template',
+          },
+        ],
       },
       { type: 'separator' },
       {
@@ -342,7 +354,8 @@ const ElectronMainMenu = (props: MainMenuProps) => {
   useIPCEventListener('main-menu-close', props.onCloseProject);
   useIPCEventListener('main-menu-close-app', props.onCloseApp);
   useIPCEventListener('main-menu-export', props.onExportProject);
-  useIPCEventListener('main-menu-create', props.onCreateProject);
+  useIPCEventListener('main-menu-create-template', props.onCreateProject);
+  useIPCEventListener('main-menu-create-blank', props.onCreateBlank);
   useIPCEventListener(
     'main-menu-open-project-manager',
     props.onOpenProjectManager
@@ -357,7 +370,7 @@ const ElectronMainMenu = (props: MainMenuProps) => {
     'main-menu-open-games-dashboard',
     props.onOpenGamesDashboard
   );
-  useIPCEventListener('update-status', props.setUpdateStatus);
+  useIPCEventListener('update-status', props.setElectronUpdateStatus);
 
   React.useEffect(
     () => {

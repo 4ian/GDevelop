@@ -310,6 +310,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
               } = getDefaultStylingProps(params, props);
               return (
                 <TextField
+                  color="secondary"
                   InputProps={{
                     ...InputProps,
                     placeholder:

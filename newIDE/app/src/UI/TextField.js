@@ -25,7 +25,7 @@ type ValueProps =
   // Support an "uncontrolled" field:
   | {| defaultValue: string |}
   // Support an empty field with just a hint text:
-  | {| hintText?: React.Node |};
+  | {| translatableHintText?: MessageDescriptor, hintText?: string |};
 
 // We support a subset of the props supported by Material-UI v0.x TextField
 // They should be self descriptive - refer to Material UI docs otherwise.
@@ -64,7 +64,8 @@ type Props = {|
   floatingLabelFixed?: boolean,
   floatingLabelText?: React.Node,
   name?: string,
-  hintText?: MessageDescriptor,
+  translatableHintText?: MessageDescriptor,
+  hintText?: string,
   helperMarkdownText?: ?string,
   id?: string,
 
@@ -203,6 +204,7 @@ export default class TextField extends React.Component<Props, {||}> {
       <I18n>
         {({ i18n }) => (
           <MUITextField
+            color="secondary"
             // Value and change handling:
             type={props.type !== undefined ? props.type : undefined}
             value={props.value !== undefined ? props.value : undefined}
@@ -224,7 +226,13 @@ export default class TextField extends React.Component<Props, {||}> {
             }}
             label={props.floatingLabelText}
             name={props.name}
-            placeholder={props.hintText ? i18n._(props.hintText) : undefined}
+            placeholder={
+              props.hintText
+                ? props.hintText
+                : props.translatableHintText
+                ? i18n._(props.translatableHintText)
+                : undefined
+            }
             id={props.id}
             // Keyboard focus:
             autoFocus={props.autoFocus}

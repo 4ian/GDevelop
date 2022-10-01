@@ -57,7 +57,8 @@ const ProfileDetails = ({
               <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
               <Spacer />
               <Text
-                size="title"
+                size="block-title"
+                allowBrowserAutoTranslate={!profile.username}
                 style={{
                   opacity: profile.username ? 1.0 : 0.5,
                 }}
@@ -102,7 +103,7 @@ const ProfileDetails = ({
               multiline
               floatingLabelText={<Trans>Bio</Trans>}
               floatingLabelFixed={true}
-              hintText={
+              translatableHintText={
                 isAuthenticatedUserProfile
                   ? t`No bio defined. Edit your profile to tell us what you are using GDevelop for!`
                   : t`No bio defined.`

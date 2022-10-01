@@ -126,7 +126,7 @@ const VerticesTable = (props: VerticesTableProps) => {
       )}
       <Line justifyContent="center">
         <FlatButton
-          icon={<AddIcon size="small" />}
+          leftIcon={<AddIcon size="small" />}
           label={<Trans>Add a vertex</Trans>}
           onClick={() => {
             const newVertice = new gd.Vector2f();

@@ -74,7 +74,7 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
                       if (transition.previousEditor)
                         setCurrentEditorName(transition.previousEditor);
                     }}
-                    icon={<ArrowBack />}
+                    leftIcon={<ArrowBack />}
                   />
                 )}
                 {transition.nextLabel && transition.nextEditor && (
@@ -84,7 +84,7 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
                       if (transition.nextEditor)
                         setCurrentEditorName(transition.nextEditor);
                     }}
-                    icon={transition.nextIcon}
+                    leftIcon={transition.nextIcon}
                   />
                 )}
               </Line>

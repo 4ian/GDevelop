@@ -154,6 +154,10 @@ const SearchPanel = (
     [currentTab]
   );
 
+  const shouldDisableSearch = !searchText;
+  const shouldDisableReplace =
+    !searchText || (!hasEventSelected && searchInSelection);
+
   return (
     <Background noFullHeight noExpand>
       <Tabs value={currentTab} onChange={setCurrentTab}>
@@ -173,7 +177,7 @@ const SearchPanel = (
               ref={searchTextField}
               type="search"
               margin="dense"
-              hintText={
+              translatableHintText={
                 isSearchAndReplaceTab()
                   ? t`Text to search in parameters`
                   : t`Text to search in event sentences`
@@ -188,7 +192,7 @@ const SearchPanel = (
                   if (!searchResultsDirty) {
                     onGoToNextSearchResult();
                   } else {
-                    launchSearchIfResultsDirty();
+                    if (!shouldDisableSearch) launchSearchIfResultsDirty();
                   }
                 }
               }}
@@ -202,7 +206,7 @@ const SearchPanel = (
             />
             <Spacer />
             <RaisedButton
-              disabled={!searchText}
+              disabled={shouldDisableSearch}
               primary
               label={<Trans>Search</Trans>}
               onClick={() => {
@@ -219,13 +223,13 @@ const SearchPanel = (
               <TextField
                 type="search"
                 margin="dense"
-                hintText={t`Text to replace in parameters`}
+                translatableHintText={t`Text to replace in parameters`}
                 onChange={(e, replaceText) => {
                   setReplaceText(replaceText);
                 }}
                 onKeyPress={event => {
                   if (shouldValidate(event)) {
-                    launchReplace();
+                    if (!shouldDisableReplace) launchReplace();
                   }
                 }}
                 onKeyUp={event => {
@@ -238,11 +242,7 @@ const SearchPanel = (
               />
               <Spacer />
               <RaisedButton
-                disabled={
-                  !replaceText ||
-                  !searchText ||
-                  (!hasEventSelected && searchInSelection)
-                }
+                disabled={shouldDisableReplace}
                 label={<Trans>Replace</Trans>}
                 onClick={launchReplace}
               />

@@ -9,7 +9,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import Chip from '@material-ui/core/Chip';
+import Chip from '../../UI/Chip';
 import TextField from '@material-ui/core/TextField';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -19,13 +19,16 @@ import commandsList, { commandAreas } from '../CommandsList';
 import { getShortcutDisplayName } from '../../KeyboardShortcuts';
 
 const useStyles = makeStyles({
-  shortcutChip: {
-    borderRadius: 3,
-  },
   listItemContainer: {
     width: '100%',
   },
 });
+
+const styles = {
+  chip: {
+    borderRadius: 3,
+  },
+};
 
 type Item = NamedCommand | CommandOption;
 
@@ -61,7 +64,7 @@ const AutocompletePicker = (
       const shortcutDisplayName = getShortcutDisplayName(shortcutString);
       return (
         <ListItemSecondaryAction>
-          <Chip className={classes.shortcutChip} label={shortcutDisplayName} />
+          <Chip label={shortcutDisplayName} style={styles.chip} />
         </ListItemSecondaryAction>
       );
     }

@@ -29,7 +29,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension
       .AddExpressionAndConditionAndAction(
           "number",
-          "CameraX",
+          "CameraCenterX",
           _("Camera center X position"),
           _("the X position of the center of a camera"),
           _("the X position of camera _PARAM4_ (layer: _PARAM3_)"),
@@ -43,15 +43,25 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .SetDefaultValue("0")
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.0.135
+  extension.AddDuplicatedCondition("CameraX", "CameraCenterX")
+      .SetHidden();  // Deprecated
+  extension.AddDuplicatedExpression("CameraX", "CameraCenterX")
+      .SetHidden();  // Deprecated
+  extension.AddDuplicatedAction("SetCameraX", "SetCameraCenterX")
+      .SetHidden();  // Deprecated
+
   extension.AddDuplicatedAction("CameraX", "SetCameraX")
       .SetHidden();  // Deprecated
+
   extension.AddDuplicatedExpression("VueX", "CameraX")
       .SetHidden();  // Deprecated
+  // end of compatibility code
 
   extension
       .AddExpressionAndConditionAndAction(
           "number",
-          "CameraY",
+          "CameraCenterY",
           _("Camera center Y position"),
           _("the Y position of the center of a camera"),
           _("the Y position of camera _PARAM4_ (layer: _PARAM3_)"),
@@ -65,10 +75,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .SetDefaultValue("0")
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.0.135
+  extension.AddDuplicatedCondition("CameraY", "CameraCenterY")
+      .SetHidden();  // Deprecated
+  extension.AddDuplicatedExpression("CameraY", "CameraCenterY")
+      .SetHidden();  // Deprecated
+  extension.AddDuplicatedAction("SetCameraY", "SetCameraCenterY")
+      .SetHidden();  // Deprecated
+
   extension.AddDuplicatedAction("CameraY", "SetCameraY")
       .SetHidden();  // Deprecated
+
   extension.AddDuplicatedExpression("VueY", "CameraY")
       .SetHidden();  // Deprecated
+  // end of compatibility code
 
   extension
       .AddExpressionAndCondition(
@@ -80,9 +100,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "",
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
-      .AddParameter("expression", _("Camera number"))
+      .AddParameter("expression", _("Camera number"), "", true)
       .UseStandardParameters("number")
       .MarkAsAdvanced();
 
@@ -96,9 +116,77 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "",
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
-      .AddParameter("expression", _("Camera number"))
+      .AddParameter("expression", _("Camera number"), "", true)
+      .UseStandardParameters("number")
+      .MarkAsAdvanced();
+
+  extension
+      .AddExpressionAndCondition(
+          "number",
+          "CameraBorderLeft",
+          _("Camera left border position"),
+          _("the position of the left border of a camera"),
+          _("the position of the left border of camera _PARAM2_ of layer "
+            "_PARAM1_"),
+          "",
+          "res/conditions/camera24.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("expression", _("Camera number"), "", true)
+      .UseStandardParameters("number")
+      .MarkAsAdvanced();
+
+  extension
+      .AddExpressionAndCondition(
+          "number",
+          "CameraBorderRight",
+          _("Camera right border position"),
+          _("the position of the right border of a camera"),
+          _("the position of the right border of camera _PARAM2_ of layer "
+            "_PARAM1_"),
+          "",
+          "res/conditions/camera24.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("expression", _("Camera number"), "", true)
+      .UseStandardParameters("number")
+      .MarkAsAdvanced();
+
+  extension
+      .AddExpressionAndCondition(
+          "number",
+          "CameraBorderTop",
+          _("Camera top border position"),
+          _("the position of the top border of a camera"),
+          _("the position of the top border of camera _PARAM2_ of layer "
+            "_PARAM1_"),
+          "",
+          "res/conditions/camera24.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("expression", _("Camera number"), "", true)
+      .UseStandardParameters("number")
+      .MarkAsAdvanced();
+
+  extension
+      .AddExpressionAndCondition(
+          "number",
+          "CameraBorderBottom",
+          _("Camera bottom border position"),
+          _("the position of the bottom border of a camera"),
+          _("the position of the bottom border of camera _PARAM2_ of layer "
+            "_PARAM1_"),
+          "",
+          "res/conditions/camera24.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("expression", _("Camera number"), "", true)
       .UseStandardParameters("number")
       .MarkAsAdvanced();
 
@@ -107,7 +195,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "number",
           "CameraAngle",
           _("Angle of a camera of a layer"),
-          _("the angle of rotation of a camera"),
+          _("the angle of rotation of a camera (in degrees)"),
           _("the angle of camera (layer: _PARAM3_, camera: _PARAM4_)"),
           "",
           "res/conditions/camera24.png")
@@ -133,7 +221,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                  "res/actions/camera24.png",
                  "res/actions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .AddParameter("layer", _("Layer"))
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Width"), "", true)
       .AddParameter("expression", _("Height"), "", true)
@@ -168,7 +256,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                  "res/actions/camera24.png",
                  "res/actions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .AddParameter("layer", _("Layer"))
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"))
       .MarkAsComplex();
@@ -184,7 +272,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                  "res/actions/camera24.png",
                  "res/actions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .AddParameter("layer", _("Layer"))
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"))
       .AddParameter("expression", _("Width"))
@@ -202,7 +290,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                  "res/actions/camera24.png",
                  "res/actions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .AddParameter("layer", _("Layer"))
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"))
       .AddParameter(
@@ -221,7 +309,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
 
   extension
       .AddAction("ZoomCamera",
-                 _("Change camera zoom"),
+                 _("Camera zoom"),
                  _("Change camera zoom."),
                  _("Change camera zoom to _PARAM1_ (layer: _PARAM2_, camera: "
                    "_PARAM3_)"),
@@ -325,7 +413,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                  "res/actions/layer24.png",
                  "res/actions/layer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .AddParameter("layer", _("Layer"))
       .SetDefaultValue("\"\"")
       .MarkAsAdvanced();
 
@@ -338,7 +426,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                  "res/actions/layer24.png",
                  "res/actions/layer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .AddParameter("layer", _("Layer"))
       .SetDefaultValue("\"\"")
       .MarkAsAdvanced();
 
@@ -351,7 +439,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                     "res/conditions/layer24.png",
                     "res/conditions/layer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"))
+      .AddParameter("layer", _("Layer"))
       .SetDefaultValue("\"\"")
       .MarkAsAdvanced();
 
@@ -488,7 +576,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
 
   extension
       .AddAction("SetLayerDefaultZOrder",
-                 _("Change layer default Z order"),
+                 _("Layer default Z order"),
                  _("Change the default Z order set to objects when they are "
                    "created on a layer."),
                  _("Set the default Z order of objects created on _PARAM1_ to "

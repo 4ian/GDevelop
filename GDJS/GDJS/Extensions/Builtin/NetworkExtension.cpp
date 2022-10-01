@@ -18,8 +18,9 @@ NetworkExtension::NetworkExtension() {
 
   GetAllActions()["SendRequest"].SetFunctionName(
       "gdjs.evtTools.network.sendDeprecatedSynchronousRequest");
-  GetAllActions()["SendAsyncRequest"].SetFunctionName(
-      "gdjs.evtTools.network.sendAsyncRequest");
+  GetAllActions()["SendAsyncRequest"]
+      .SetFunctionName("gdjs.evtTools.network.sendAsyncRequest")
+      .SetAsyncFunctionName("gdjs.evtTools.network.sendAwaitableAsyncRequest");
   GetAllActions()["EnableMetrics"].SetFunctionName(
       "gdjs.evtTools.network.enableMetrics");
   GetAllActions()["LaunchFile"].SetFunctionName("gdjs.evtTools.window.openURL");

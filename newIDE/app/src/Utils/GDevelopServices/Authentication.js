@@ -22,6 +22,9 @@ export type Profile = {|
   username: ?string,
   description: ?string,
   getGameStatsEmail: boolean,
+  getNewsletterEmail: boolean,
+  isCreator: boolean,
+  isPlayer: boolean,
 |};
 
 export type LoginForm = {|
@@ -33,12 +36,14 @@ export type RegisterForm = {|
   email: string,
   password: string,
   username: string,
+  getNewsletterEmail: boolean,
 |};
 
 export type EditForm = {|
   username: string,
   description: string,
   getGameStatsEmail: boolean,
+  getNewsletterEmail: boolean,
 |};
 
 export type ChangeEmailForm = {|
@@ -131,6 +136,8 @@ export default class Authentication {
             email: form.email,
             username: form.username,
             appLanguage: appLanguage,
+            getNewsletterEmail: form.getNewsletterEmail,
+            isCreator: true,
           },
           {
             params: {
@@ -267,8 +274,21 @@ export default class Authentication {
 
   editUserProfile = async (
     getAuthorizationHeader: () => Promise<string>,
-    form: EditForm,
-    appLanguage: string
+    {
+      username,
+      description,
+      getGameStatsEmail,
+      getNewsletterEmail,
+      appLanguage,
+      isCreator,
+    }: {
+      username?: string,
+      description?: string,
+      getGameStatsEmail?: boolean,
+      getNewsletterEmail?: boolean,
+      appLanguage?: string,
+      isCreator?: boolean,
+    }
   ) => {
     const { currentUser } = this.auth;
     if (!currentUser)
@@ -276,14 +296,15 @@ export default class Authentication {
 
     return getAuthorizationHeader()
       .then(authorizationHeader => {
-        const { username, description, getGameStatsEmail } = form;
         return axios.patch(
           `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
           {
             username,
             description,
             getGameStatsEmail,
+            getNewsletterEmail,
             appLanguage,
+            isCreator,
           },
           {
             params: {

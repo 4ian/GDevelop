@@ -96,7 +96,7 @@ class Animation extends React.Component<AnimationProps, void> {
               commitOnBlur
               margin="none"
               value={animation.getName()}
-              hintText={t`Optional animation name`}
+              translatableHintText={t`Optional animation name`}
               onChange={text => onChangeName(text)}
               fullWidth
             />
@@ -137,7 +137,7 @@ const SortableAnimation = SortableElement(Animation);
 
 const SortableAnimationsList = SortableContainer(
   ({
-    spriteObject,
+    spriteConfiguration,
     objectName,
     onAddAnimation,
     onRemoveAnimation,
@@ -158,8 +158,8 @@ const SortableAnimationsList = SortableContainer(
     // SortableContainer would not find a root div to use).
     return (
       <ScrollView>
-        {mapFor(0, spriteObject.getAnimationsCount(), i => {
-          const animation = spriteObject.getAnimation(i);
+        {mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+          const animation = spriteConfiguration.getAnimation(i);
           return (
             <SortableAnimation
               key={i}
@@ -189,7 +189,7 @@ const SortableAnimationsList = SortableContainer(
 );
 
 type AnimationsListContainerProps = {|
-  spriteObject: gdSpriteObject,
+  spriteConfiguration: gdSpriteObject,
   project: gdProject,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
@@ -216,14 +216,15 @@ class AnimationsListContainer extends React.Component<
   spriteContextMenu: ?ContextMenuInterface;
 
   onSortEnd = ({ oldIndex, newIndex }) => {
-    this.props.spriteObject.moveAnimation(oldIndex, newIndex);
+    this.props.spriteConfiguration.moveAnimation(oldIndex, newIndex);
     this.forceUpdate();
   };
 
   addAnimation = () => {
     const emptyAnimation = new gd.Animation();
     emptyAnimation.setDirectionsCount(1);
-    this.props.spriteObject.addAnimation(emptyAnimation);
+    this.props.spriteConfiguration.addAnimation(emptyAnimation);
+    emptyAnimation.delete();
     this.forceUpdate();
     this.props.onSizeUpdated();
   };
@@ -234,20 +235,24 @@ class AnimationsListContainer extends React.Component<
     );
 
     if (answer) {
-      this.props.spriteObject.removeAnimation(i);
+      this.props.spriteConfiguration.removeAnimation(i);
       this.forceUpdate();
       this.props.onSizeUpdated();
     }
   };
 
   changeAnimationName = (i, newName) => {
-    const { spriteObject } = this.props;
+    const { spriteConfiguration } = this.props;
 
-    const otherNames = mapFor(0, spriteObject.getAnimationsCount(), index => {
-      return index === i
-        ? undefined // Don't check the current animation name as we're changing it.
-        : spriteObject.getAnimation(index).getName();
-    });
+    const otherNames = mapFor(
+      0,
+      spriteConfiguration.getAnimationsCount(),
+      index => {
+        return index === i
+          ? undefined // Don't check the current animation name as we're changing it.
+          : spriteConfiguration.getAnimation(index).getName();
+      }
+    );
 
     if (newName !== '' && otherNames.filter(name => name === newName).length) {
       showWarningBox(
@@ -257,15 +262,15 @@ class AnimationsListContainer extends React.Component<
       return;
     }
 
-    spriteObject.getAnimation(i).setName(newName);
+    spriteConfiguration.getAnimation(i).setName(newName);
     this.forceUpdate();
   };
 
   deleteSelection = () => {
-    const { spriteObject } = this.props;
+    const { spriteConfiguration } = this.props;
 
-    mapFor(0, spriteObject.getAnimationsCount(), index => {
-      const animation = spriteObject.getAnimation(index);
+    mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
+      const animation = spriteConfiguration.getAnimation(index);
       deleteSpritesFromAnimation(animation, this.state.selectedSprites);
     });
 
@@ -275,10 +280,10 @@ class AnimationsListContainer extends React.Component<
   };
 
   duplicateSelection = () => {
-    const { spriteObject } = this.props;
+    const { spriteConfiguration } = this.props;
 
-    mapFor(0, spriteObject.getAnimationsCount(), index => {
-      const animation = spriteObject.getAnimation(index);
+    mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
+      const animation = spriteConfiguration.getAnimation(index);
       duplicateSpritesInAnimation(animation, this.state.selectedSprites);
     });
 
@@ -302,7 +307,7 @@ class AnimationsListContainer extends React.Component<
   };
 
   replaceDirection = (animationId, directionId, newDirection) => {
-    this.props.spriteObject
+    this.props.spriteConfiguration
       .getAnimation(animationId)
       .setDirection(newDirection, directionId);
     this.forceUpdate();
@@ -311,7 +316,7 @@ class AnimationsListContainer extends React.Component<
   render() {
     return (
       <Column noMargin expand useFullHeight>
-        {this.props.spriteObject.getAnimationsCount() === 0 ? (
+        {this.props.spriteConfiguration.getAnimationsCount() === 0 ? (
           <Column noMargin expand justifyContent="center">
             <EmptyPlaceholder
               title={<Trans>Add your first animation</Trans>}
@@ -326,7 +331,7 @@ class AnimationsListContainer extends React.Component<
           <React.Fragment>
             <SpacedDismissableTutorialMessage />
             <SortableAnimationsList
-              spriteObject={this.props.spriteObject}
+              spriteConfiguration={this.props.spriteConfiguration}
               objectName={this.props.objectName}
               helperClass="sortable-helper"
               project={this.props.project}
@@ -382,7 +387,7 @@ class AnimationsListContainer extends React.Component<
 }
 
 export default function SpriteEditor({
-  object,
+  objectConfiguration,
   project,
   resourceSources,
   onChooseResource,
@@ -397,12 +402,12 @@ export default function SpriteEditor({
     setCollisionMasksEditorOpen,
   ] = React.useState(false);
   const forceUpdate = useForceUpdate();
-  const spriteObject = gd.asSpriteObject(object);
+  const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
 
   return (
     <>
       <AnimationsListContainer
-        spriteObject={spriteObject}
+        spriteConfiguration={spriteConfiguration}
         resourcesLoader={ResourcesLoader}
         resourceSources={resourceSources}
         onChooseResource={onChooseResource}
@@ -416,19 +421,19 @@ export default function SpriteEditor({
               label={<Trans>Edit collision masks</Trans>}
               primary={false}
               onClick={() => setCollisionMasksEditorOpen(true)}
-              disabled={spriteObject.getAnimationsCount() === 0}
+              disabled={spriteConfiguration.getAnimationsCount() === 0}
             />
             <RaisedButton
               label={<Trans>Edit points</Trans>}
               primary={false}
               onClick={() => setPointsEditorOpen(true)}
-              disabled={spriteObject.getAnimationsCount() === 0}
+              disabled={spriteConfiguration.getAnimationsCount() === 0}
             />
             <FlatButton
               label={<Trans>Advanced options</Trans>}
               primary={false}
               onClick={() => setAdvancedOptionsOpen(true)}
-              disabled={spriteObject.getAnimationsCount() === 0}
+              disabled={spriteConfiguration.getAnimationsCount() === 0}
             />
           </ResponsiveLineStackLayout>
         }
@@ -456,9 +461,9 @@ export default function SpriteEditor({
                   camera or hidden (recommended for performance)
                 </Trans>
               }
-              checked={!spriteObject.getUpdateIfNotVisible()}
+              checked={!spriteConfiguration.getUpdateIfNotVisible()}
               onCheck={(_, value) => {
-                spriteObject.setUpdateIfNotVisible(!value);
+                spriteConfiguration.setUpdateIfNotVisible(!value);
 
                 forceUpdate();
               }}
@@ -490,7 +495,7 @@ export default function SpriteEditor({
           open={pointsEditorOpen}
         >
           <PointsEditor
-            object={spriteObject}
+            objectConfiguration={spriteConfiguration}
             resourcesLoader={ResourcesLoader}
             project={project}
           />
@@ -520,7 +525,7 @@ export default function SpriteEditor({
           open={collisionMasksEditorOpen}
         >
           <CollisionMasksEditor
-            object={spriteObject}
+            objectConfiguration={spriteConfiguration}
             resourcesLoader={ResourcesLoader}
             project={project}
           />

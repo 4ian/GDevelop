@@ -18,6 +18,7 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
 #include "GDCore/Tools/Localization.h"
 
@@ -231,7 +232,7 @@ gd::ObjectMetadata& PlatformExtension::AddObject(
     const gd::String& fullname,
     const gd::String& description,
     const gd::String& icon24x24,
-    std::shared_ptr<gd::Object> instance) {
+    std::shared_ptr<gd::ObjectConfiguration> instance) {
   gd::String nameWithNamespace = GetNameSpace() + name;
   objectsInfos[nameWithNamespace] = ObjectMetadata(GetNameSpace(),
                                                    nameWithNamespace,
@@ -241,6 +242,21 @@ gd::ObjectMetadata& PlatformExtension::AddObject(
                                                    instance)
                                         .SetHelpPath(GetHelpPath());
 
+  return objectsInfos[nameWithNamespace];
+}
+
+gd::ObjectMetadata& PlatformExtension::AddEventsBasedObject(
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& icon24x24) {
+  gd::String nameWithNamespace = GetNameSpace() + name;
+  objectsInfos[nameWithNamespace] = ObjectMetadata(GetNameSpace(),
+                                                   nameWithNamespace,
+                                                   fullname,
+                                                   description,
+                                                   icon24x24)
+                                        .SetHelpPath(GetHelpPath());
   return objectsInfos[nameWithNamespace];
 }
 
@@ -265,6 +281,25 @@ gd::BehaviorMetadata& PlatformExtension::AddBehavior(
                                                       className,
                                                       instance,
                                                       sharedDatasInstance)
+                                         .SetHelpPath(GetHelpPath());
+  return behaviorsInfo[nameWithNamespace];
+}
+
+gd::BehaviorMetadata& PlatformExtension::AddEventsBasedBehavior(
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& group,
+    const gd::String& icon24x24) {
+  gd::String nameWithNamespace = GetNameSpace() + name;
+  behaviorsInfo[nameWithNamespace] = BehaviorMetadata(GetNameSpace(),
+                                                      nameWithNamespace,
+                                                      fullname,
+                                                      // Default name is the name
+                                                      name,
+                                                      description,
+                                                      group,
+                                                      icon24x24)
                                          .SetHelpPath(GetHelpPath());
   return behaviorsInfo[nameWithNamespace];
 }
@@ -380,7 +415,7 @@ gd::InstructionMetadata& PlatformExtension::AddDuplicatedAction(
 
   auto copiedAction = actionsInfos.find(copiedNameWithNamespace);
   if (copiedAction == actionsInfos.end()) {
-    gd::LogWarning("Could not find an action with name " +
+    gd::LogError("Could not find an action with name " +
                    copiedNameWithNamespace + " to copy.");
   } else {
     actionsInfos[newNameWithNamespace] = copiedAction->second;
@@ -400,7 +435,7 @@ gd::InstructionMetadata& PlatformExtension::AddDuplicatedCondition(
 
   auto copiedCondition = conditionsInfos.find(copiedNameWithNamespace);
   if (copiedCondition == conditionsInfos.end()) {
-    gd::LogWarning("Could not find a condition with name " +
+    gd::LogError("Could not find a condition with name " +
                    copiedNameWithNamespace + " to copy.");
   } else {
     conditionsInfos[newNameWithNamespace] = copiedCondition->second;
@@ -417,7 +452,7 @@ gd::ExpressionMetadata& PlatformExtension::AddDuplicatedExpression(
 
   auto copiedExpression = expressionsInfos.find(copiedNameWithNamespace);
   if (copiedExpression == expressionsInfos.end()) {
-    gd::LogWarning("Could not find an expression with name " +
+    gd::LogError("Could not find an expression with name " +
                    copiedNameWithNamespace + " to copy.");
   } else {
     expressionsInfos[newNameWithNamespace] = copiedExpression->second;
@@ -434,7 +469,7 @@ gd::ExpressionMetadata& PlatformExtension::AddDuplicatedStrExpression(
 
   auto copiedExpression = strExpressionsInfos.find(copiedNameWithNamespace);
   if (copiedExpression == strExpressionsInfos.end()) {
-    gd::LogWarning("Could not find a string expression with name " +
+    gd::LogError("Could not find a string expression with name " +
                    copiedNameWithNamespace + " to copy.");
   } else {
     strExpressionsInfos[newNameWithNamespace] = copiedExpression->second;

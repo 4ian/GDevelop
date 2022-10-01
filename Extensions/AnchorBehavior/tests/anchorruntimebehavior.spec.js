@@ -1,5 +1,5 @@
 // @ts-check
-describe.only('gdjs.AnchorRuntimeBehavior', function () {
+describe('gdjs.AnchorRuntimeBehavior', function () {
   const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     resources: { resources: [] },

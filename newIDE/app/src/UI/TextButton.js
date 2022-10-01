@@ -10,6 +10,7 @@ type Props = {|
   label: React.Node,
   onClick: ?(ev: any) => void | Promise<void>,
   primary?: boolean,
+  allowBrowserAutoTranslate?: boolean,
   disabled?: boolean,
   keyboardFocused?: boolean,
   fullWidth?: boolean,
@@ -42,6 +43,7 @@ const TextButton = React.forwardRef<Props, ButtonInterface>(
       exceptionalTooltipForToolbar,
       disabled,
       id,
+      allowBrowserAutoTranslate = true,
       ...otherProps
     },
     ref
@@ -56,7 +58,8 @@ const TextButton = React.forwardRef<Props, ButtonInterface>(
       <Button
         variant="text"
         size="small"
-        color={primary ? 'primary' : 'default'}
+        translate={allowBrowserAutoTranslate ? 'yes' : 'no'}
+        color={primary ? 'secondary' : 'default'}
         autoFocus={keyboardFocused}
         focusRipple={focusRipple}
         disabled={disabled}

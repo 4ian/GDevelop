@@ -165,10 +165,16 @@ export function PublicGameProperties({
                     setCategories(
                       values ? values.map(category => category.value) : []
                     );
+                    setCategoryInput('');
                   }}
                   inputValue={categoryInput}
-                  onInputChange={(event, value) => {
-                    setCategoryInput(value);
+                  onInputChange={(event, value, reason) => {
+                    // It seems that the input is triggered with a "reset" reason,
+                    // after each input change. (https://github.com/mui/material-ui/issues/20939)
+                    // We handle this manually to avoid the input to be reseted.
+                    if (reason === 'input') {
+                      setCategoryInput(value);
+                    }
                   }}
                   dataSource={allGameCategories.map(category => ({
                     value: category,

@@ -213,6 +213,8 @@ export default class EventsBasedBehaviorsList extends React.Component<
     newEventsBasedBehavior.setName(newName);
 
     this._onEventsBasedBehaviorModified();
+    this.props.onSelectEventsBasedBehavior(newEventsBasedBehavior);
+    this._editName(newEventsBasedBehavior);
   };
 
   _renderEventsBasedBehaviorMenuTemplate = (i18n: I18nType) => (
@@ -252,7 +254,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
       {
         label: i18n._(t`Paste`),
         enabled: Clipboard.has(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND),
-        click: () => this._pasteEventsBasedBehavior(index),
+        click: () => this._pasteEventsBasedBehavior(index + 1),
       },
     ];
   };
@@ -263,11 +265,14 @@ export default class EventsBasedBehaviorsList extends React.Component<
     const name = newNameGenerator('MyBehavior', name =>
       eventsBasedBehaviorsList.has(name)
     );
-    eventsBasedBehaviorsList.insertNew(
+    const newEventsBasedBehavior = eventsBasedBehaviorsList.insertNew(
       name,
       eventsBasedBehaviorsList.getCount()
     );
     this._onEventsBasedBehaviorModified();
+
+    this.props.onSelectEventsBasedBehavior(newEventsBasedBehavior);
+    this._editName(newEventsBasedBehavior);
   };
 
   _onEventsBasedBehaviorModified() {
@@ -338,6 +343,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
               searchText: text,
             })
           }
+          aspect="integrated-search-bar"
           placeholder={t`Search behaviors`}
         />
       </Background>

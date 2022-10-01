@@ -13,6 +13,7 @@ import generateName from '../Utils/ProjectNameGenerator';
 import optionalRequire from '../Utils/OptionalRequire';
 import { findEmptyPathInDefaultFolder } from './LocalPathFinder';
 import { type ProjectCreationSettings } from './CreateProjectDialog';
+import IconButton from '../UI/IconButton';
 
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
@@ -21,27 +22,34 @@ type Props = {|
   open: boolean,
   isOpening?: boolean,
   onClose: () => void,
-  onCreate: ProjectCreationSettings => void | Promise<void>,
+  onCreate: ProjectCreationSettings => Promise<void>,
+  sourceExampleName?: string,
 |};
+
+const generateProjectName = (sourceExampleName: ?string) =>
+  sourceExampleName
+    ? `${generateName()} (${sourceExampleName})`
+    : generateName();
 
 const ProjectPreCreationDialog = ({
   open,
   isOpening,
   onClose,
   onCreate,
+  sourceExampleName,
 }: Props): React.Node => {
   const [projectNameError, setProjectNameError] = React.useState<?React.Node>(
     null
   );
   const [projectName, setProjectName] = React.useState<string>(() =>
-    generateName()
+    generateProjectName(sourceExampleName)
   );
   const [outputPath, setOutputPath] = React.useState<string>(() =>
     app ? findEmptyPathInDefaultFolder(app) : ''
   );
 
   const onValidate = React.useCallback(
-    () => {
+    async () => {
       if (isOpening) return;
 
       setProjectNameError(null);
@@ -51,7 +59,7 @@ const ProjectPreCreationDialog = ({
         );
         return;
       }
-      onCreate({ projectName, outputPath: app ? outputPath : undefined });
+      await onCreate({ projectName, outputPath: app ? outputPath : undefined });
     },
     [onCreate, projectName, outputPath, isOpening]
   );
@@ -99,7 +107,14 @@ const ProjectPreCreationDialog = ({
           onChange={_onChangeProjectName}
           floatingLabelText={<Trans>Project name</Trans>}
           endAdornment={
-            <Refresh onClick={() => setProjectName(generateName())} />
+            <IconButton
+              size="small"
+              onClick={() =>
+                setProjectName(generateProjectName(sourceExampleName))
+              }
+            >
+              <Refresh />
+            </IconButton>
           }
         />
         {app && (

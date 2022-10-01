@@ -11,28 +11,23 @@ import TextButton from '../UI/TextButton';
 import RaisedButton from '../UI/RaisedButton';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import { Column, Line } from '../UI/Grid';
-import { LinearProgress } from '@material-ui/core';
 import { installAsset } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { showErrorBox } from '../UI/Messages/MessageBox';
-
-const styles = {
-  linearProgress: {
-    flex: 1,
-  },
-};
+import LinearProgress from '../UI/LinearProgress';
+import { AssetStoreContext } from './AssetStoreContext';
+import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 
 type Props = {|
   assetPack: AssetPack,
   assetShortHeaders: Array<AssetShortHeader>,
   addedAssetIds: Array<string>,
   onClose: () => void,
-  onAssetPackAdded: () => void,
+  onAssetsAdded: () => void,
   project: gdProject,
   objectsContainer: gdObjectsContainer,
-  events: gdEventsList,
   onObjectAddedFromAsset: (object: gdObject) => void,
+  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
 |};
 
 export const AssetPackDialog = ({
@@ -40,11 +35,11 @@ export const AssetPackDialog = ({
   assetShortHeaders,
   addedAssetIds,
   onClose,
-  onAssetPackAdded,
+  onAssetsAdded,
   project,
   objectsContainer,
-  events,
   onObjectAddedFromAsset,
+  onFetchNewlyAddedResources,
 }: Props) => {
   const missingAssetShortHeaders = assetShortHeaders.filter(
     assetShortHeader => !addedAssetIds.includes(assetShortHeader.id)
@@ -54,20 +49,21 @@ export const AssetPackDialog = ({
     !allAssetsInstalled &&
     missingAssetShortHeaders.length === assetShortHeaders.length;
 
-  const resourcesFetcher = useResourceFetcher();
   const [
-    isAssetPackBeingInstalled,
-    setIsAssetPackBeingInstalled,
+    areAssetsBeingInstalled,
+    setAreAssetsBeingInstalled,
   ] = React.useState<boolean>(false);
 
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
 
-  const onInstallAssetPack = React.useCallback(
+  const { environment } = React.useContext(AssetStoreContext);
+
+  const onInstallAssets = React.useCallback(
     async (assetShortHeaders: Array<AssetShortHeader>) => {
       if (!assetShortHeaders || !assetShortHeaders.length) return;
-      setIsAssetPackBeingInstalled(true);
+      setAreAssetsBeingInstalled(true);
       try {
         const installOutputs = await Promise.all(
           assetShortHeaders.map(assetShortHeader =>
@@ -76,7 +72,7 @@ export const AssetPackDialog = ({
               eventsFunctionsExtensionsState,
               project,
               objectsContainer,
-              events,
+              environment,
             })
           )
         );
@@ -86,33 +82,33 @@ export const AssetPackDialog = ({
           });
         });
 
-        await resourcesFetcher.ensureResourcesAreFetched(project);
+        await onFetchNewlyAddedResources();
 
-        setIsAssetPackBeingInstalled(false);
-        onAssetPackAdded();
+        setAreAssetsBeingInstalled(false);
+        onAssetsAdded();
       } catch (error) {
-        setIsAssetPackBeingInstalled(false);
-        console.error('Error while installing the asset pack', error);
+        setAreAssetsBeingInstalled(false);
+        console.error('Error while installing the assets', error);
         showErrorBox({
           message:
-            'There was an error while installing the asset pack. Verify your internet connection or try again later.',
+            'There was an error while installing the assets. Verify your internet connection or try again later.',
           rawError: error,
           errorId: 'install-asset-pack-error',
         });
       }
     },
     [
-      resourcesFetcher,
       eventsFunctionsExtensionsState,
       project,
       objectsContainer,
-      events,
       onObjectAddedFromAsset,
-      onAssetPackAdded,
+      onAssetsAdded,
+      environment,
+      onFetchNewlyAddedResources,
     ]
   );
 
-  const dialogContent = isAssetPackBeingInstalled
+  const dialogContent = areAssetsBeingInstalled
     ? {
         actionButton: (
           <TextButton
@@ -129,7 +125,7 @@ export const AssetPackDialog = ({
               <Trans>Installing assets...</Trans>
             </Text>
             <Line expand>
-              <LinearProgress style={styles.linearProgress} />
+              <LinearProgress />
             </Line>
           </>
         ),
@@ -141,15 +137,15 @@ export const AssetPackDialog = ({
             key="install-again"
             label={<Trans>Install again</Trans>}
             primary={false}
-            onClick={() => onInstallAssetPack(assetShortHeaders)}
+            onClick={() => onInstallAssets(assetShortHeaders)}
           />
         ),
-        onApply: () => onInstallAssetPack(assetShortHeaders),
+        onApply: () => onInstallAssets(assetShortHeaders),
         content: (
           <Text>
             <Trans>
-              You already have this asset pack installed, do you want to add the{' '}
-              {assetShortHeaders.length} assets again?
+              You already have these {assetShortHeaders.length} assets
+              installed, do you want to add them again?
             </Trans>
           </Text>
         ),
@@ -161,15 +157,14 @@ export const AssetPackDialog = ({
             key="continue"
             label={<Trans>Continue</Trans>}
             primary
-            onClick={() => onInstallAssetPack(assetShortHeaders)}
+            onClick={() => onInstallAssets(assetShortHeaders)}
           />
         ),
-        onApply: () => onInstallAssetPack(assetShortHeaders),
+        onApply: () => onInstallAssets(assetShortHeaders),
         content: (
           <Text>
             <Trans>
-              You're about to add {assetShortHeaders.length} assets from the
-              asset pack. Continue?
+              You're about to add {assetShortHeaders.length} assets. Continue?
             </Trans>
           </Text>
         ),
@@ -181,24 +176,24 @@ export const AssetPackDialog = ({
             key="install-missing"
             primary
             onClick={() => {
-              onInstallAssetPack(missingAssetShortHeaders);
+              onInstallAssets(missingAssetShortHeaders);
             }}
             buildMenuTemplate={i18n => [
               {
                 label: i18n._(t`Install all the assets`),
-                click: () => onInstallAssetPack(assetShortHeaders),
+                click: () => onInstallAssets(assetShortHeaders),
               },
             ]}
           />
         ),
-        onApply: () => onInstallAssetPack(missingAssetShortHeaders),
+        onApply: () => onInstallAssets(missingAssetShortHeaders),
         content: (
           <Text>
             <Trans>
               You already have{' '}
               {assetShortHeaders.length - missingAssetShortHeaders.length}{' '}
-              asset(s) from this pack in your scene. Do you want to add the
-              remaining {missingAssetShortHeaders.length} asset(s)?
+              asset(s) in your scene. Do you want to add the remaining{' '}
+              {missingAssetShortHeaders.length} one(s)?
             </Trans>
           </Text>
         ),
@@ -210,16 +205,18 @@ export const AssetPackDialog = ({
       title={assetPack.name}
       open
       onRequestClose={() => {
-        if (!isAssetPackBeingInstalled) onClose();
+        if (!areAssetsBeingInstalled) onClose();
       }}
       cannotBeDismissed
       actions={[
-        <TextButton
-          key="cancel"
-          label={<Trans>Cancel</Trans>}
-          disabled={isAssetPackBeingInstalled}
-          onClick={onClose}
-        />,
+        // Installing a list of assets is not cancelable, so we hide the button while installing.
+        !areAssetsBeingInstalled ? (
+          <TextButton
+            key="cancel"
+            label={<Trans>Cancel</Trans>}
+            onClick={onClose}
+          />
+        ) : null,
         dialogContent.actionButton,
       ]}
       onApply={dialogContent.onApply}

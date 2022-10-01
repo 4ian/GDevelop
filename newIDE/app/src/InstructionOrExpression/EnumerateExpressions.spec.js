@@ -12,7 +12,7 @@ import { type EnumeratedExpressionMetadata } from './EnumeratedInstructionOrExpr
 const gd: libGDevelop = global.gd;
 
 describe('EnumerateExpressions', () => {
-  it('can enumerate and filter free expressions', () => {
+  it('can enumerate and filter free expressions (number only)', () => {
     const freeExpressions = enumerateFreeExpressions('number');
 
     // Should find atan, atan2, atanh math function
@@ -24,8 +24,9 @@ describe('EnumerateExpressions', () => {
     expect(filterExpressions(freeExpressions, 'MouseX')).toHaveLength(1);
     expect(filterExpressions(freeExpressions, 'MouseY')).toHaveLength(1);
   });
-  it('can enumerate and filter free expressions (type "number|string")', () => {
-    const freeExpressions = enumerateFreeExpressions('number|string');
+
+  it('can enumerate and filter free expressions', () => {
+    const freeExpressions = enumerateFreeExpressions('string');
 
     // Should find ToString and LargeNumberToString:
     expect(filterExpressions(freeExpressions, 'ToString')).toHaveLength(2);
@@ -40,7 +41,7 @@ describe('EnumerateExpressions', () => {
     expect(filterExpressions(freeExpressions, 'MouseY')).toHaveLength(1);
   });
 
-  it('can enumerate and filter object expressions', () => {
+  it('can enumerate and filter object expressions (number only)', () => {
     const spriteObjectExpressions = enumerateObjectExpressions(
       'number',
       'Sprite'
@@ -58,9 +59,9 @@ describe('EnumerateExpressions', () => {
     );
   });
 
-  it('can enumerate and filter object expressions (type "number|string")', () => {
+  it('can enumerate object expressions', () => {
     const spriteObjectExpressions = enumerateObjectExpressions(
-      'number|string',
+      'string',
       'Sprite'
     );
     expect(filterExpressions(spriteObjectExpressions, 'PointX')).toHaveLength(
@@ -70,7 +71,7 @@ describe('EnumerateExpressions', () => {
       filterExpressions(spriteObjectExpressions, 'AnimationName')
     ).toHaveLength(1);
 
-    const objectExpressions = enumerateObjectExpressions('number|string', '');
+    const objectExpressions = enumerateObjectExpressions('string', '');
     expect(filterExpressions(objectExpressions, 'PointX')).toHaveLength(0);
     expect(filterExpressions(objectExpressions, 'Layer')).toHaveLength(1);
     expect(filterExpressions(objectExpressions, 'X')).toContainEqual(
@@ -80,7 +81,7 @@ describe('EnumerateExpressions', () => {
     );
   });
 
-  it('can enumerate and filter behavior expressions', () => {
+  it('can enumerate and filter behavior expressions (number only)', () => {
     const platformerObjectBehaviorExpressions = enumerateBehaviorExpressions(
       'number',
       'PlatformBehavior::PlatformerObjectBehavior'
@@ -103,10 +104,11 @@ describe('EnumerateExpressions', () => {
       })
     );
   });
-  it('can enumerate and filter behavior expressions (type "number|string")', () => {
+
+  it('can enumerate behavior expressions', () => {
     makeTestExtensions(gd);
     const fakeBehaviorExpressions = enumerateBehaviorExpressions(
-      'number|string',
+      'string',
       'FakeBehavior::FakeBehavior'
     );
 
@@ -145,7 +147,7 @@ describe('EnumerateExpressions', () => {
     });
   });
 
-  it('can enumerate all expressions (type "number")', () => {
+  it('can enumerate all expressions (number only)', () => {
     makeTestExtensions(gd);
     const allNumberExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
       'number'
@@ -173,38 +175,10 @@ describe('EnumerateExpressions', () => {
     ).toHaveLength(0);
   });
 
-  it('can enumerate all expressions (type "string")', () => {
-    makeTestExtensions(gd);
-    const allStringExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'string'
-    );
-    // Check a free expression:
-    expect(allStringExpressions).toContainEqual(
-      expect.objectContaining({
-        type: 'ToString',
-      })
-    );
-    // Check a behavior expression:
-    expect(allStringExpressions).toContainEqual(
-      expect.objectContaining({
-        type: 'SomethingReturningStringWith1NumberParam',
-      })
-    );
-
-    // Sanity check number expressions are not there:
-    expect(filterExpressions(allStringExpressions, 'ToNumber')).toHaveLength(0);
-    expect(
-      filterExpressions(
-        allStringExpressions,
-        'SomethingReturningNumberWith1NumberParam'
-      )
-    ).toHaveLength(0);
-  });
-
-  it('can enumerate all expressions (type "number|string")', () => {
+  it('can enumerate all expressions', () => {
     makeTestExtensions(gd);
     const allExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'number|string'
+      'string'
     );
     // Check a free expression:
     expect(allExpressions).toContainEqual(
@@ -268,7 +242,7 @@ describe('EnumerateExpressions', () => {
         Angle: {
           displayedName: 'Angle',
           fullGroupName: 'General/Objects/Angle',
-          iconFilename: 'res/actions/direction.png',
+          iconFilename: 'res/actions/direction_black.png',
           isPrivate: false,
           name: 'Angle',
           scope: {
@@ -287,7 +261,7 @@ describe('EnumerateExpressions', () => {
         'X position of a point': {
           displayedName: 'X position of a point',
           fullGroupName: 'General/Sprite/Position',
-          iconFilename: 'res/actions/position.png',
+          iconFilename: 'res/actions/position_black.png',
           isPrivate: false,
           name: 'PointX',
           scope: {

@@ -135,7 +135,7 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
       .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("Texture",
-                _("Change image (using an expression)"),
+                _("Particle image (using an expression)"),
                 _("Change the image of particles (if displayed)."),
                 _("Change the image of particles of _PARAM0_ to _PARAM1_"),
                 _("Advanced"),
@@ -146,7 +146,7 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
       .SetParameterLongDescription("Indicate the name of the resource");
 
   obj.AddAction("SetTextureFromResource",
-                _("Change image"),
+                _("Particle image"),
                 _("Change the image of particles (if displayed)."),
                 _("Change the image of particles of _PARAM0_ to _PARAM1_"),
                 _("Common"),

@@ -33,13 +33,11 @@ import Flag from '@material-ui/icons/Flag';
 import Close from '@material-ui/icons/Close';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
 import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
-import Settings from '@material-ui/icons/Settings';
 import Save from '@material-ui/icons/Save';
 import VariableTree from '../UI/CustomSvgIcons/VariableTree';
 import ArtTrack from '@material-ui/icons/ArtTrack';
 import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
 import FileCopy from '@material-ui/icons/FileCopy';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import TimelineIcon from '@material-ui/icons/Timeline';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
@@ -83,6 +81,8 @@ const styles = {
 
 type Props = {|
   project: gdProject,
+  onChangeProjectName: string => Promise<void>,
+  onSaveProjectProperties: (options: { newName?: string }) => Promise<boolean>,
   onDeleteLayout: gdLayout => void,
   onDeleteExternalEvents: gdExternalEvents => void,
   onDeleteExternalLayout: gdExternalLayout => void,
@@ -99,8 +99,6 @@ type Props = {|
   onSaveProjectAs: () => void,
   onCloseProject: () => void,
   onExportProject: () => void,
-  onOpenPreferences: () => void,
-  onOpenProfile: () => void,
   onOpenGamesDashboard: () => void,
   onOpenResources: () => void,
   onOpenPlatformSpecificAssets: () => void,
@@ -563,6 +561,18 @@ export default class ProjectManager extends React.Component<Props, State> {
     });
   };
 
+  _onProjectPropertiesApplied = (options: { newName?: string }) => {
+    if (this.props.unsavedChanges) {
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    }
+
+    if (options.newName) {
+      this.props.onChangeProjectName(options.newName);
+    }
+
+    this.setState({ projectPropertiesDialogOpen: false });
+  };
+
   _renderMenu() {
     // If there is already a main menu (as the native one made with
     // Electron), don't show it in the Project Manager.
@@ -593,18 +603,6 @@ export default class ProjectManager extends React.Component<Props, State> {
           primaryText={<Trans>Close</Trans>}
           leftIcon={<Close />}
           onClick={() => this.props.onCloseProject()}
-        />
-        <ListItem
-          key="preferences"
-          primaryText={<Trans>Preferences</Trans>}
-          leftIcon={<Settings />}
-          onClick={() => this.props.onOpenPreferences()}
-        />
-        <ListItem
-          key="profile"
-          primaryText={<Trans>My profile</Trans>}
-          leftIcon={<AccountCircle />}
-          onClick={() => this.props.onOpenProfile()}
         />
         <ListItem
           key="games-dashboard"
@@ -959,7 +957,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 }
               />
               <ProjectStructureItem
-                primaryText={<Trans>Functions/Behaviors</Trans>}
+                primaryText={<Trans>Extensions</Trans>}
                 error={eventsFunctionsExtensionsError}
                 onRefresh={onReloadEventsFunctionsExtensions}
                 leftIcon={
@@ -1068,6 +1066,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               onRequestSearch={this._onRequestSearch}
               onChange={this._onSearchChange}
               placeholder={t`Search in project`}
+              aspect="integrated-search-bar"
             />
             {this.state.projectVariablesEditorOpen && (
               <VariablesEditorDialog
@@ -1110,11 +1109,8 @@ export default class ProjectManager extends React.Component<Props, State> {
                 onClose={() =>
                   this.setState({ projectPropertiesDialogOpen: false })
                 }
-                onApply={() => {
-                  if (this.props.unsavedChanges)
-                    this.props.unsavedChanges.triggerUnsavedChanges();
-                  this.setState({ projectPropertiesDialogOpen: false });
-                }}
+                onApply={this.props.onSaveProjectProperties}
+                onPropertiesApplied={this._onProjectPropertiesApplied}
                 onChangeSubscription={this.props.onChangeSubscription}
                 resourceSources={this.props.resourceSources}
                 onChooseResource={this.props.onChooseResource}

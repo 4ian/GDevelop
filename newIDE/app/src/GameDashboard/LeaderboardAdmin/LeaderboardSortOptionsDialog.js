@@ -130,7 +130,7 @@ function LeaderboardSortOptionsDialog({
             onSaveSettings(i18n);
           }}
         >
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Sort order</Trans>
           </Text>
           <ColumnStackLayout noMargin>

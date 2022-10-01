@@ -16,8 +16,10 @@ namespace gdjs {
         lastScoreSavingSucceededAt: number | null;
         currentlySavingScore: number | null;
         currentlySavingPlayerName: string | null;
+        currentlySavingPlayerId: string | null;
         lastSavedScore: number | null;
         lastSavedPlayerName: string | null;
+        lastSavedPlayerId: string | null;
         lastSaveError: string | null;
         isScoreSaving: boolean;
         hasScoreBeenSaved: boolean;
@@ -28,25 +30,45 @@ namespace gdjs {
           this.lastScoreSavingSucceededAt = null;
           this.currentlySavingScore = null;
           this.currentlySavingPlayerName = null;
+          this.currentlySavingPlayerId = null;
           this.lastSavedScore = null;
           this.lastSavedPlayerName = null;
+          this.lastSavedPlayerId = null;
           this.lastSaveError = null;
           this.isScoreSaving = false;
           this.hasScoreBeenSaved = false;
           this.hasScoreSavingErrored = false;
         }
 
-        isSameAsLastScore(playerName: string, score: number): boolean {
+        isSameAsLastScore({
+          playerName,
+          playerId,
+          score,
+        }: {
+          playerName?: string;
+          playerId?: string;
+          score: number;
+        }): boolean {
           return (
-            this.lastSavedPlayerName === playerName &&
+            ((!!playerName && this.lastSavedPlayerName === playerName) ||
+              (!!playerId && this.lastSavedPlayerId === playerId)) &&
             this.lastSavedScore === score
           );
         }
 
-        isAlreadySavingThisScore(playerName: string, score: number): boolean {
+        isAlreadySavingThisScore({
+          playerName,
+          playerId,
+          score,
+        }: {
+          playerName?: string;
+          playerId?: string;
+          score: number;
+        }): boolean {
           return (
+            ((!!playerName && this.currentlySavingPlayerName === playerName) ||
+              (!!playerId && this.currentlySavingPlayerId === playerId)) &&
             this.isScoreSaving &&
-            this.currentlySavingPlayerName === playerName &&
             this.currentlySavingScore === score
           );
         }
@@ -58,19 +80,29 @@ namespace gdjs {
           );
         }
 
-        startSaving(playerName: string, score: number): void {
+        startSaving({
+          playerName,
+          playerId,
+          score,
+        }: {
+          playerName?: string;
+          playerId?: string;
+          score: number;
+        }): void {
           this.lastScoreSavingStartedAt = Date.now();
           this.isScoreSaving = true;
           this.hasScoreBeenSaved = false;
           this.hasScoreSavingErrored = false;
           this.currentlySavingScore = score;
-          this.currentlySavingPlayerName = playerName;
+          if (playerName) this.currentlySavingPlayerName = playerName;
+          if (playerId) this.currentlySavingPlayerId = playerId;
         }
 
         closeSaving(): void {
           this.lastScoreSavingSucceededAt = Date.now();
           this.lastSavedScore = this.currentlySavingScore;
           this.lastSavedPlayerName = this.currentlySavingPlayerName;
+          this.lastSavedPlayerId = this.currentlySavingPlayerId;
           this.isScoreSaving = false;
           this.hasScoreBeenSaved = true;
         }
@@ -155,50 +187,31 @@ namespace gdjs {
         return lastScoreSavingState;
       };
 
-      export const savePlayerScore = function (
-        runtimeScene: gdjs.RuntimeScene,
-        leaderboardId: string,
-        score: float,
-        playerName: string
-      ) {
-        let scoreSavingState: ScoreSavingState;
-        if (_scoreSavingStateByLeaderboard[leaderboardId]) {
-          scoreSavingState = _scoreSavingStateByLeaderboard[leaderboardId];
-          if (scoreSavingState.isAlreadySavingThisScore(playerName, score)) {
-            logger.warn(
-              'There is already a request to save with this player name and this score. Ignoring this one.'
-            );
-            return;
-          }
-
-          if (scoreSavingState.isSameAsLastScore(playerName, score)) {
-            logger.warn(
-              'The player and score to be sent are the same as previous one. Ignoring this one.'
-            );
-            const errorCode = 'SAME_AS_PREVIOUS';
-            scoreSavingState.setError(errorCode);
-            return;
-          }
-
-          if (scoreSavingState.isTooSoonToSaveAnotherScore()) {
-            logger.warn(
-              'Last entry was sent too little time ago. Ignoring this one.'
-            );
-            const errorCode = 'TOO_FAST';
-            scoreSavingState.setError(errorCode);
-            return;
-          }
-        } else {
-          scoreSavingState = new ScoreSavingState();
-          _scoreSavingStateByLeaderboard[leaderboardId] = scoreSavingState;
-        }
-
-        scoreSavingState.startSaving(playerName, score);
-
-        const baseUrl = 'https://api.gdevelop-app.com/play';
+      const saveScore = function ({
+        leaderboardId,
+        playerName,
+        playerId,
+        playerToken,
+        score,
+        scoreSavingState,
+        runtimeScene,
+      }: {
+        leaderboardId: string;
+        playerName?: string;
+        playerId?: string;
+        playerToken?: string;
+        score: number;
+        scoreSavingState: ScoreSavingState;
+        runtimeScene: gdjs.RuntimeScene;
+      }) {
+        const rootApi = runtimeScene
+          .getGame()
+          .isUsingGDevelopDevelopmentEnvironment()
+          ? 'https://api-dev.gdevelop.io'
+          : 'https://api.gdevelop.io';
+        const baseUrl = `${rootApi}/play`;
         const game = runtimeScene.getGame();
-        const payload = JSON.stringify({
-          playerName: formatPlayerName(playerName),
+        const payloadObject = {
           score: score,
           sessionId: game.getSessionId(),
           clientPlayerId: game.getPlayerId(),
@@ -206,18 +219,25 @@ namespace gdjs {
             typeof window !== 'undefined' && (window as any).location
               ? (window as any).location.href
               : '',
-        });
-        fetch(
-          `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`,
-          {
-            body: payload,
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Digest: computeDigest(payload),
-            },
-          }
-        ).then(
+        };
+        if (playerName)
+          payloadObject['playerName'] = formatPlayerName(playerName);
+        const payload = JSON.stringify(payloadObject);
+        const headers = {
+          'Content-Type': 'application/json',
+          Digest: computeDigest(payload),
+        };
+        if (playerToken)
+          headers['Authorization'] = `player-game-token ${playerToken}`;
+        let leaderboardEntryCreationUrl = `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`;
+        if (playerId) {
+          leaderboardEntryCreationUrl += `?playerId=${playerId}`;
+        }
+        fetch(leaderboardEntryCreationUrl, {
+          body: payload,
+          method: 'POST',
+          headers: headers,
+        }).then(
           (response) => {
             if (!response.ok) {
               const errorCode = response.status.toString();
@@ -248,6 +268,114 @@ namespace gdjs {
             scoreSavingState.setError(errorCode);
           }
         );
+      };
+
+      export const savePlayerScore = function (
+        runtimeScene: gdjs.RuntimeScene,
+        leaderboardId: string,
+        score: float,
+        playerName: string
+      ) {
+        let scoreSavingState: ScoreSavingState;
+        if (_scoreSavingStateByLeaderboard[leaderboardId]) {
+          scoreSavingState = _scoreSavingStateByLeaderboard[leaderboardId];
+          if (
+            scoreSavingState.isAlreadySavingThisScore({ playerName, score })
+          ) {
+            logger.warn(
+              'There is already a request to save with this player name and this score. Ignoring this one.'
+            );
+            return;
+          }
+
+          if (scoreSavingState.isSameAsLastScore({ playerName, score })) {
+            logger.warn(
+              'The player and score to be sent are the same as previous one. Ignoring this one.'
+            );
+            const errorCode = 'SAME_AS_PREVIOUS';
+            scoreSavingState.setError(errorCode);
+            return;
+          }
+
+          if (scoreSavingState.isTooSoonToSaveAnotherScore()) {
+            logger.warn(
+              'Last entry was sent too little time ago. Ignoring this one.'
+            );
+            const errorCode = 'TOO_FAST';
+            scoreSavingState.setError(errorCode);
+            return;
+          }
+        } else {
+          scoreSavingState = new ScoreSavingState();
+          _scoreSavingStateByLeaderboard[leaderboardId] = scoreSavingState;
+        }
+
+        scoreSavingState.startSaving({ playerName, score });
+
+        saveScore({
+          leaderboardId,
+          playerName,
+          score,
+          scoreSavingState,
+          runtimeScene,
+        });
+      };
+
+      export const saveConnectedPlayerScore = function (
+        runtimeScene: gdjs.RuntimeScene,
+        leaderboardId: string,
+        score: float
+      ) {
+        let scoreSavingState: ScoreSavingState;
+        const playerId = gdjs.playerAuthentication.getUserId();
+        const playerToken = gdjs.playerAuthentication.getUserToken();
+        if (!playerId || !playerToken) {
+          logger.warn(
+            'Cannot save a score for a connected player if the player is not connected.'
+          );
+          return;
+        }
+        if (_scoreSavingStateByLeaderboard[leaderboardId]) {
+          scoreSavingState = _scoreSavingStateByLeaderboard[leaderboardId];
+          if (scoreSavingState.isAlreadySavingThisScore({ playerId, score })) {
+            logger.warn(
+              'There is already a request to save with this player ID and this score. Ignoring this one.'
+            );
+            return;
+          }
+
+          if (scoreSavingState.isSameAsLastScore({ playerId, score })) {
+            logger.warn(
+              'The player and score to be sent are the same as previous one. Ignoring this one.'
+            );
+            const errorCode = 'SAME_AS_PREVIOUS';
+            scoreSavingState.setError(errorCode);
+            return;
+          }
+
+          if (scoreSavingState.isTooSoonToSaveAnotherScore()) {
+            logger.warn(
+              'Last entry was sent too little time ago. Ignoring this one.'
+            );
+            const errorCode = 'TOO_FAST';
+            scoreSavingState.setError(errorCode);
+            return;
+          }
+        } else {
+          scoreSavingState = new ScoreSavingState();
+          _scoreSavingStateByLeaderboard[leaderboardId] = scoreSavingState;
+        }
+
+        scoreSavingState.startSaving({ playerId, score });
+
+        saveScore({
+          leaderboardId,
+          playerId,
+          playerToken,
+          score,
+          scoreSavingState,
+          runtimeScene,
+        });
       };
 
       export const isSaving = function (leaderboardId?: string): boolean {
@@ -512,7 +640,12 @@ namespace gdjs {
         }
 
         const gameId = gdjs.projectData.properties.projectUuid;
-        const targetUrl = `https://liluo.io/games/${gameId}/leaderboard/${leaderboardId}?inGameEmbedded=true`;
+        const isDev = runtimeScene
+          .getGame()
+          .isUsingGDevelopDevelopmentEnvironment();
+        const targetUrl = `https://liluo.io/games/${gameId}/leaderboard/${leaderboardId}?inGameEmbedded=true${
+          isDev ? '&dev=true' : ''
+        }`;
         checkLeaderboardAvailability(targetUrl).then(
           (isAvailable) => {
             if (leaderboardId !== _requestedLeaderboardId) {

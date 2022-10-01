@@ -37,6 +37,7 @@ struct PreviewExportOptions {
         useWindowMessageDebuggerClient(false),
         projectDataOnlyExport(false),
         fullLoadingScreen(false),
+        isDevelopmentEnvironment(false),
         nonRuntimeScriptsCacheBurst(0){};
 
   /**
@@ -106,6 +107,15 @@ struct PreviewExportOptions {
   }
 
   /**
+   * \brief Set if the export should consider to be in a development environment
+   * of GDevelop (the game should use GDevelop development APIs).
+   */
+  PreviewExportOptions &SetIsDevelopmentEnvironment(bool enable) {
+    isDevelopmentEnvironment = enable;
+    return *this;
+  }
+
+  /**
    * \brief If set to a non zero value, the exported script URLs will have an
    * extra search parameter added (with the given value) to ensure browser cache
    * is bypassed when they are loaded.
@@ -117,11 +127,12 @@ struct PreviewExportOptions {
 
   /**
    * Set the path to use for the game engine to require "@electron/remote".
-   * This is because the preview is run in a folder without any node_module, but this
-   * is still required for now for some features.
-   * This should be removed once the dependency to "@electron/remote" is removed.
+   * This is because the preview is run in a folder without any node_module, but
+   * this is still required for now for some features. This should be removed
+   * once the dependency to "@electron/remote" is removed.
    */
-  PreviewExportOptions &SetElectronRemoteRequirePath(const gd::String& electronRemoteRequirePath_) {
+  PreviewExportOptions &SetElectronRemoteRequirePath(
+      const gd::String &electronRemoteRequirePath_) {
     electronRemoteRequirePath = electronRemoteRequirePath_;
     return *this;
   }
@@ -136,6 +147,7 @@ struct PreviewExportOptions {
   std::map<gd::String, int> includeFileHashes;
   bool projectDataOnlyExport;
   bool fullLoadingScreen;
+  bool isDevelopmentEnvironment;
   unsigned int nonRuntimeScriptsCacheBurst;
   gd::String electronRemoteRequirePath;
 };
@@ -241,6 +253,12 @@ class ExporterHelper {
    */
   void ExportObjectAndBehaviorsIncludes(const gd::Project &project,
                                         std::vector<gd::String> &includesFiles);
+  /**
+   * \brief Add the required files for all the objects of the project
+   * and their behaviors.
+   */
+  void ExportObjectAndBehaviorsRequiredFiles(const gd::Project &project,
+                                         std::vector<gd::String> &includesFiles);
 
   /**
    * \brief Copy the external source files used by the game into the export
@@ -302,6 +320,15 @@ class ExporterHelper {
                          const std::vector<gd::String> &includesFiles,
                          unsigned int nonRuntimeScriptsCacheBurst,
                          gd::String additionalSpec);
+
+  /**
+   * \brief Generates a WebManifest, a metadata file that allow to make the
+   * exported game a working PWA.
+   *
+   * \param project The project containing the game properties to generate the
+   * manifest from.
+   */
+  const gd::String GenerateWebManifest(const gd::Project &project);
 
   /**
    * \brief Generate the Cordova configuration file and save it to the export

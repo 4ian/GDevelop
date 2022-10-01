@@ -111,7 +111,7 @@ class ResourceWorkerInEventsWorker : public ArbitraryEventsWorker {
   ResourceWorkerInEventsWorker(const gd::Project& project_,
                                gd::ArbitraryResourceWorker& worker_)
       : project(project_), worker(worker_){};
-  virtual ~ResourceWorkerInEventsWorker() {};
+  virtual ~ResourceWorkerInEventsWorker(){};
 
  private:
   bool DoVisitInstruction(gd::Instruction& instruction, bool isCondition) {
@@ -131,7 +131,8 @@ class ResourceWorkerInEventsWorker : public ArbitraryEventsWorker {
                              const gd::String& lastObjectName) {
           const String& parameterValue = parameterExpression.GetPlainString();
           if (parameterMetadata.GetType() ==
-              "police") {  // Should be renamed fontResource
+                  "police" ||  // Should be renamed fontResource
+              parameterMetadata.GetType() == "fontResource") {
             gd::String updatedParameterValue = parameterValue;
             worker.ExposeFont(updatedParameterValue);
             instruction.SetParameter(parameterIndex, updatedParameterValue);
@@ -148,6 +149,10 @@ class ResourceWorkerInEventsWorker : public ArbitraryEventsWorker {
           } else if (parameterMetadata.GetType() == "imageResource") {
             gd::String updatedParameterValue = parameterValue;
             worker.ExposeImage(updatedParameterValue);
+            instruction.SetParameter(parameterIndex, updatedParameterValue);
+          } else if (parameterMetadata.GetType() == "jsonResource") {
+            gd::String updatedParameterValue = parameterValue;
+            worker.ExposeJson(updatedParameterValue);
             instruction.SetParameter(parameterIndex, updatedParameterValue);
           }
         });

@@ -71,6 +71,21 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     }
   };
 
+  // TODO EBO factorize?
+  _onObjectEdited = async () => {
+    // Immediately trigger the reload/regeneration of extensions
+    // as a change in the properties of an object can create changes
+    // in actions/conditions/expressions to manipulate these properties.
+    try {
+      await this.props.onLoadEventsFunctionsExtensions();
+    } catch (error) {
+      console.warn(
+        'Error while loading events functions extensions - ignoring this in the context of the EventsFunctionsExtensionEditorContainer.',
+        error
+      );
+    }
+  };
+
   previewWillStart = () => {
     // Immediately trigger the reload/regeneration of extensions
     // if a preview is about to start, as changes chan have been made
@@ -121,11 +136,13 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           resourceSources={this.props.resourceSources}
           onChooseResource={this.props.onChooseResource}
           resourceExternalEditors={this.props.resourceExternalEditors}
+          onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
           openInstructionOrExpression={this.props.openInstructionOrExpression}
           onCreateEventsFunction={this.props.onCreateEventsFunction}
           initiallyFocusedFunctionName={initiallyFocusedFunctionName}
           initiallyFocusedBehaviorName={initiallyFocusedBehaviorName}
           onBehaviorEdited={this._onBehaviorEdited}
+          onObjectEdited={this._onObjectEdited}
           ref={editor => (this.editor = editor)}
           unsavedChanges={this.props.unsavedChanges}
         />

@@ -89,6 +89,16 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
         instance.setLocked(newValue),
     },
     {
+      name: this.props.i18n._(t`Prevent selection in the canvas`),
+      valueType: 'boolean',
+      disabled: (instances: gdInitialInstance[]) => {
+        return instances.some(instance => !instance.isLocked());
+      },
+      getValue: (instance: gdInitialInstance) => instance.isSealed(),
+      setValue: (instance: gdInitialInstance, newValue: boolean) =>
+        instance.setSealed(newValue),
+    },
+    {
       name: this.props.i18n._(t`Z Order`),
       valueType: 'number',
       getValue: (instance: gdInitialInstance) => instance.getZOrder(),
@@ -177,6 +187,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
                 <Trans>Instance Variables</Trans>
               </Text>
               <IconButton
+                size="small"
                 onClick={() => {
                   this.props.editInstanceVariables(instance);
                 }}

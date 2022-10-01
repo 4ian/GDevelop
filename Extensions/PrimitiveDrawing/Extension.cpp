@@ -31,8 +31,6 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
           .SetCategoryFullName(_("General"));
 
 #if defined(GD_IDE_ONLY)
-  obj.SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
-
   obj.AddAction(
          "Rectangle",
          _("Rectangle"),
@@ -48,8 +46,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Top Y position"))
       .AddParameter("expression", _("Right X position"))
       .AddParameter("expression", _("Bottom Y position"))
-      .SetFunctionName("DrawRectangle")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("DrawRectangle");
 
   obj.AddAction("Circle",
                 _("Circle"),
@@ -64,8 +61,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("X position of center"))
       .AddParameter("expression", _("Y position of center"))
       .AddParameter("expression", _("Radius (in pixels)"))
-      .SetFunctionName("DrawCircle")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("DrawCircle");
 
   obj.AddAction("Line",
                 _("Line"),
@@ -84,8 +80,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("X position of end point"))
       .AddParameter("expression", _("Y position of end point"))
       .AddParameter("expression", _("Thickness (in pixels)"))
-      .SetFunctionName("DrawLine")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("DrawLine");
 
   obj.AddAction("LineV2",
                 _("Line"),
@@ -103,8 +98,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("X position of end point"))
       .AddParameter("expression", _("Y position of end point"))
       .AddParameter("expression", _("Thickness (in pixels)"))
-      .SetFunctionName("drawLineV2")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("drawLineV2");
 
   obj.AddAction("Ellipse",
                 _("Ellipse"),
@@ -121,8 +115,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Y position of center"))
       .AddParameter("expression", _("The width of the ellipse"))
       .AddParameter("expression", _("The height of the ellipse"))
-      .SetFunctionName("DrawEllipse")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("DrawEllipse");
 
   obj.AddAction("RoundedRectangle",
                 _("Rounded rectangle"),
@@ -140,8 +133,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Right X position"))
       .AddParameter("expression", _("Bottom Y position"))
       .AddParameter("expression", _("Radius (in pixels)"))
-      .SetFunctionName("DrawRoundedRectangle")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("DrawRoundedRectangle");
 
   obj.AddAction(
          "Star",
@@ -163,8 +155,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression",
                     _("Inner radius (in pixels, half radius by default)"))
       .AddParameter("expression", _("Rotation (in degrees)"))
-      .SetFunctionName("DrawStar")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("DrawStar");
 
   obj.AddAction("Arc",
                 _("Arc"),
@@ -187,8 +178,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("End angle of the arc (in degrees)"))
       .AddParameter("yesorno", _("Anticlockwise"))
       .AddParameter("yesorno", _("Close path"))
-      .SetFunctionName("DrawArc")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("DrawArc");
 
   obj.AddAction("BezierCurve",
                 _("Bezier curve"),
@@ -210,8 +200,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Second Control point y"))
       .AddParameter("expression", _("Destination point x"))
       .AddParameter("expression", _("Destination point y"))
-      .SetFunctionName("drawBezierCurve")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("drawBezierCurve");
 
   obj.AddAction("QuadraticCurve",
                 _("Quadratic curve"),
@@ -230,8 +219,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Control point y"))
       .AddParameter("expression", _("Destination point x"))
       .AddParameter("expression", _("Destination point y"))
-      .SetFunctionName("drawQuadraticCurve")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("drawQuadraticCurve");
 
   obj.AddAction("BeginFillPath",
                 _("Begin fill path"),
@@ -248,8 +236,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("Start drawing x"))
       .AddParameter("expression", _("Start drawing y"))
-      .SetFunctionName("beginFillPath")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("beginFillPath");
 
   obj.AddAction("EndFillPath",
                 _("End fill path"),
@@ -261,8 +248,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/endFillPath.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .SetFunctionName("endFillPath")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("endFillPath");
 
   obj.AddAction("MovePathTo",
                 _("Move path drawing position"),
@@ -270,14 +256,13 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Move the drawing position of the path to _PARAM1_;_PARAM2_ "
                   "with _PARAM0_"),
                 _("Advanced"),
-                "res/actions/position24.png",
-                "res/actions/position.png")
+                "res/actions/position24_black.png",
+                "res/actions/position_black.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("X position of start point"))
       .AddParameter("expression", _("Y position of start point"))
-      .SetFunctionName("drawPathMoveTo")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("drawPathMoveTo");
 
   obj.AddAction("PathLineTo",
                 _("Path line"),
@@ -294,8 +279,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("X position of start point"))
       .AddParameter("expression", _("Y position of start point"))
-      .SetFunctionName("drawPathLineTo")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("drawPathLineTo");
 
   obj.AddAction("PathBezierCurveTo",
                 _("Path bezier curve"),
@@ -318,8 +302,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Second Control point y"))
       .AddParameter("expression", _("Destination point x"))
       .AddParameter("expression", _("Destination point y"))
-      .SetFunctionName("drawPathBezierCurveTo")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("drawPathBezierCurveTo");
 
   obj.AddAction("PathArc",
                 _("Path arc"),
@@ -342,8 +325,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Start angle"))
       .AddParameter("expression", _("End angle"))
       .AddParameter("yesorno", _("Anticlockwise"))
-      .SetFunctionName("drawPathArc")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("drawPathArc");
 
   obj.AddAction("PathQuadraticCurveTo",
                 _("Path quadratic curve"),
@@ -363,8 +345,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Control point y"))
       .AddParameter("expression", _("Destination point x"))
       .AddParameter("expression", _("Destination point y"))
-      .SetFunctionName("drawPathQuadraticCurveTo")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("drawPathQuadraticCurveTo");
 
   obj.AddAction("closePath",
                 _("Close Path"),
@@ -377,8 +358,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/closePath.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .SetFunctionName("closePath")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("closePath");
 
   obj.AddScopedAction("ClearShapes",
                       _("Clear shapes"),
@@ -403,8 +383,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("yesorno", _("Clear between each frame"), "", true)
       .SetDefaultValue("yes")
-      .SetFunctionName("SetClearBetweenFrames")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("SetClearBetweenFrames");
 
   obj.AddCondition(
          "ClearBetweenFrames",
@@ -416,8 +395,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
          "res/conditions/visibilite.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .SetFunctionName("IsClearedBetweenFrames")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("IsClearedBetweenFrames");
 
   obj.AddAction("FillColor",
                 _("Fill color"),
@@ -429,8 +407,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("color", _("Fill color"))
-      .SetFunctionName("SetFillColor")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("SetFillColor");
 
   obj.AddExpression("FillColorRed",
                     _("Filing color red component"),
@@ -438,8 +415,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     "",
                     "res/actions/color.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .SetFunctionName("GetFillColorR")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("GetFillColorR");
 
   obj.AddExpression("FillColorGreen",
                     _("Filing color green component"),
@@ -447,8 +423,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     "",
                     "res/actions/color.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .SetFunctionName("GetFillColorG")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("GetFillColorG");
 
   obj.AddExpression("FillColorBlue",
                     _("Filing color blue component"),
@@ -456,8 +431,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     "",
                     "res/actions/color.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .SetFunctionName("GetFillColorB")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("GetFillColorB");
 
   obj.AddAction("OutlineColor",
                 _("Outline color"),
@@ -469,8 +443,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("color", _("Color"))
-      .SetFunctionName("SetOutlineColor")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("SetOutlineColor");
 
   obj.AddExpression("OutlineColorRed",
                     _("Outline color red component"),
@@ -478,8 +451,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     "",
                     "res/actions/color.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .SetFunctionName("GetOutlineColorR")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("GetOutlineColorR");
 
   obj.AddExpression("OutlineColorGreen",
                     _("Outline color green component"),
@@ -487,8 +459,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     "",
                     "res/actions/color.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .SetFunctionName("GetOutlineColorG")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("GetOutlineColorG");
 
   obj.AddExpression("OutlineColorBlue",
                     _("Outline color blue component"),
@@ -496,44 +467,40 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     "",
                     "res/actions/color.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .SetFunctionName("GetOutlineColorB")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("GetOutlineColorB");
 
   obj.AddAction("OutlineSize",
                 _("Outline size"),
                 _("Modify the size of the outline of future drawings."),
                 _("the size of the outline"),
                 _("Setup"),
-                "res/actions/outlineSize24.png",
-                "res/actions/outlineSize.png")
+                "res/actions/outlineSize24_black.png",
+                "res/actions/outlineSize_black.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .UseStandardOperatorParameters("number")
       .SetFunctionName("SetOutlineSize")
-      .SetGetter("GetOutlineSize")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetGetter("GetOutlineSize");
 
   obj.AddCondition("OutlineSize",
                    _("Outline size"),
                    _("Test the size of the outline."),
                    _("the size of the outline"),
                    _("Setup"),
-                   "res/conditions/outlineSize24.png",
-                   "res/conditions/outlineSize.png")
+                   "res/conditions/outlineSize24_black.png",
+                   "res/conditions/outlineSize_black.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .UseStandardRelationalOperatorParameters("number")
-      .SetFunctionName("GetOutlineSize")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("GetOutlineSize");
 
   obj.AddExpression("OutlineSize",
                     _("Outline size"),
                     _("Outline size"),
                     "",
-                    "res/conditions/outlineSize.png")
+                    "res/conditions/outlineSize_black.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .SetFunctionName("GetOutlineSize")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("GetOutlineSize");
 
   obj.AddAction(
          "FillOpacity",
@@ -547,8 +514,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .UseStandardOperatorParameters("number")
       .SetFunctionName("SetFillOpacity")
-      .SetGetter("GetFillOpacity")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetGetter("GetFillOpacity");
 
   obj.AddCondition("FillOpacity",
                    _("Fill opacity"),
@@ -560,8 +526,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .UseStandardRelationalOperatorParameters("number")
-      .SetFunctionName("GetFillOpacity")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("GetFillOpacity");
 
   obj.AddExpression("FillOpacity",
                     _("Filling opacity"),
@@ -569,8 +534,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     "",
                     "res/conditions/opacity.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .SetFunctionName("GetFillOpacity")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("GetFillOpacity");
 
   obj.AddAction("OutlineOpacity",
                 _("Outline opacity"),
@@ -583,8 +547,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .UseStandardOperatorParameters("number")
       .SetFunctionName("SetOutlineOpacity")
-      .SetGetter("GetOutlineOpacity")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetGetter("GetOutlineOpacity");
 
   obj.AddCondition("OutlineOpacity",
                    _("Outline opacity"),
@@ -596,8 +559,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .UseStandardRelationalOperatorParameters("number")
-      .SetFunctionName("GetOutlineOpacity")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("GetOutlineOpacity");
 
   obj.AddExpression("OutlineOpacity",
                     _("Outline opacity"),
@@ -605,8 +567,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     "",
                     "res/conditions/opacity.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .SetFunctionName("GetOutlineOpacity")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("GetOutlineOpacity");
 
   obj.AddAction(
          "UseRelativeCoordinates",
@@ -615,13 +576,12 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
            "not. It's recommended to use relative coordinates."),
          _("Use relative coordinates for _PARAM0_: _PARAM1_"),
          _("Setup"),
-         "res/actions/position24.png",
-         "res/actions/position.png")
+         "res/actions/position24_black.png",
+         "res/actions/position_black.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("yesorno", _("Use relative coordinates?"), "", false)
       .SetDefaultValue("true")
-      .SetFunctionName("setCoordinatesRelative")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("setCoordinatesRelative");
 
   obj.AddCondition(
          "AreCoordinatesRelative",
@@ -629,20 +589,19 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
          _("Check if the coordinates of the shape painter is relative."),
          _("_PARAM0_ is using relative coordinates"),
          _("Setup"),
-         "res/conditions/position24.png",
-         "res/conditions/position.png")
+         "res/conditions/position24_black.png",
+         "res/conditions/position_black.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .SetFunctionName("AreCoordinatesRelative")
-      .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+      .SetFunctionName("AreCoordinatesRelative");
 
   obj.AddAction("Scale",
                 _("Scale"),
                 _("Modify the scale of the specified object."),
                 _("the scale"),
                 _("Size"),
-                "res/actions/scale24.png",
-                "res/actions/scale.png")
+                "res/actions/scale24_black.png",
+                "res/actions/scale_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced();
@@ -653,7 +612,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                                          _("the width's scale of an object"),
                                          _("the width's scale"),
                                          _("Size"),
-                                         "res/actions/scaleWidth24.png")
+                                         "res/actions/scaleWidth24_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .UseStandardParameters("number")
       .MarkAsAdvanced();
@@ -664,7 +623,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                                          _("the height's scale of an object"),
                                          _("the height's scale"),
                                          _("Size"),
-                                         "res/actions/scaleHeight24.png")
+                                         "res/actions/scaleHeight24_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .UseStandardParameters("number")
       .MarkAsAdvanced();
@@ -714,8 +673,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Change the width of an object."),
                 _("the width"),
                 _("Size"),
-                "res/actions/scaleWidth24.png",
-                "res/actions/scale.png")
+                "res/actions/scaleWidth24_black.png",
+                "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced();
@@ -725,8 +684,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Change the height of an object."),
                 _("the height"),
                 _("Size"),
-                "res/actions/scaleHeight24.png",
-                "res/actions/scale.png")
+                "res/actions/scaleHeight24_black.png",
+                "res/actions/scaleHeight_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced();
@@ -738,8 +697,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
            "object origin."),
          _("Change the center of rotation of _PARAM0_: _PARAM1_; _PARAM2_"),
          _("Angle"),
-         "res/actions/position24.png",
-         "res/actions/position.png")
+         "res/actions/position24_black.png",
+         "res/actions/position_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
@@ -752,8 +711,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Change the collision mask of _PARAM0_ to a rectangle from "
                   "_PARAM1_; _PARAM2_ to _PARAM3_; _PARAM4_"),
                 _("Position"),
-                "res/actions/position24.png",
-                "res/actions/position.png")
+                "res/actions/position24_black.png",
+                "res/actions/position_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("Left X position"))
       .AddParameter("expression", _("Top Y position"))
@@ -765,7 +724,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     _("X drawing coordinate of a point from the scene"),
                     _("X drawing coordinate of a point from the scene"),
                     _("Position"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("X scene position"))
       .AddParameter("expression", _("Y scene position"));
@@ -774,7 +733,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     _("Y drawing coordinate of a point from the scene"),
                     _("Y drawing coordinate of a point from the scene"),
                     _("Position"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("X scene position"))
       .AddParameter("expression", _("Y scene position"));
@@ -783,7 +742,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     _("X scene coordinate of a point from the drawing"),
                     _("X scene coordinate of a point from the drawing"),
                     _("Position"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("X drawing position"))
       .AddParameter("expression", _("Y drawing position"));
@@ -792,7 +751,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     _("Y scene coordinate of a point from the drawing"),
                     _("Y scene coordinate of a point from the drawing"),
                     _("Position"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("X drawing position"))
       .AddParameter("expression", _("Y drawing position"));

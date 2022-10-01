@@ -13,13 +13,6 @@ import Subheader from '../../UI/Subheader';
 import { CategoryChooser } from '../../UI/Search/CategoryChooser';
 import { t, Trans } from '@lingui/macro';
 
-const styles = {
-  searchBar: {
-    // TODO: Can we put this in the search bar by default?
-    flexShrink: 0,
-  },
-};
-
 type Props = {
   onChoose: Resource => void,
   resourceKind: string,
@@ -49,18 +42,22 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
 
   return (
     <Column expand noMargin useFullHeight>
-      <SearchBar
-        value={searchText}
-        onChange={setSearchText}
-        onRequestSearch={() => {}}
-        style={styles.searchBar}
-        placeholder={t`Search resources`}
-      />
+      <Line>
+        <Column expand>
+          <SearchBar
+            value={searchText}
+            onChange={setSearchText}
+            onRequestSearch={() => {}}
+            placeholder={t`Search resources`}
+          />
+        </Column>
+      </Line>
       <Line
         expand
         overflow={
           'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
         }
+        noMargin
       >
         <Background noFullHeight noExpand width={250}>
           <ScrollView>

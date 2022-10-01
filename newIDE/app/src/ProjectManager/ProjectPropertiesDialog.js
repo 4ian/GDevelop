@@ -42,8 +42,9 @@ type Props = {|
   project: gdProject,
   open: boolean,
   initialTab: 'properties' | 'loading-screen',
-  onClose: Function,
-  onApply: Function,
+  onClose: () => void,
+  onApply: (options: { newName?: string }) => Promise<boolean>,
+  onPropertiesApplied: (options: { newName?: string }) => void,
   onChangeSubscription: () => void,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
 
@@ -204,29 +205,36 @@ function ProjectPropertiesDialog(props: Props) {
     onCancel: onCancelLoadingScreenChanges,
   });
 
-  const onApply = () => {
-    if (
-      applyPropertiesToProject(project, {
-        gameResolutionWidth,
-        gameResolutionHeight,
-        adaptGameResolutionAtRuntime,
-        name,
-        description,
-        author,
-        authorIds,
-        version,
-        packageName,
-        orientation,
-        scaleMode,
-        pixelsRounding,
-        sizeOnStartupMode,
-        minFPS,
-        maxFPS,
-        isFolderProject,
-        useDeprecatedZeroAsDefaultZOrder,
-      })
-    )
-      props.onApply();
+  const onApply = async () => {
+    const specialPropertiesChanged =
+      name !== initialProperties.name ? { newName: name } : {};
+
+    const proceed = await props.onApply(specialPropertiesChanged);
+    if (!proceed) return;
+
+    const wasProjectPropertiesApplied = applyPropertiesToProject(project, {
+      gameResolutionWidth,
+      gameResolutionHeight,
+      adaptGameResolutionAtRuntime,
+      name,
+      description,
+      author,
+      authorIds,
+      version,
+      packageName,
+      orientation,
+      scaleMode,
+      pixelsRounding,
+      sizeOnStartupMode,
+      minFPS,
+      maxFPS,
+      isFolderProject,
+      useDeprecatedZeroAsDefaultZOrder,
+    });
+
+    if (wasProjectPropertiesApplied) {
+      props.onPropertiesApplied(specialPropertiesChanged);
+    }
   };
 
   return (
@@ -256,7 +264,7 @@ function ProjectPropertiesDialog(props: Props) {
               hotReloadPreviewButtonProps ? (
                 <FlatButton
                   key="hot-reload-preview-button"
-                  icon={<NewPreviewIcon />}
+                  leftIcon={<NewPreviewIcon />}
                   label={<Trans>Run a preview (with loading screen)</Trans>}
                   onClick={
                     hotReloadPreviewButtonProps.launchProjectWithLoadingScreenPreview
@@ -289,21 +297,23 @@ function ProjectPropertiesDialog(props: Props) {
           >
             {currentTab === 'properties' && (
               <ColumnStackLayout expand noMargin>
-                <Text size="title">
+                <Text size="block-title">
                   <Trans>Game Info</Trans>
                 </Text>
                 <PublicGameProperties
                   name={name}
-                  setName={setName}
+                  setName={newName => setName(newName.trim())}
                   description={description}
-                  setDescription={setDescription}
+                  setDescription={newDescription =>
+                    setDescription(newDescription.trim())
+                  }
                   project={project}
                   authorIds={authorIds}
                   setAuthorIds={setAuthorIds}
                   orientation={orientation}
                   setOrientation={setOrientation}
                 />
-                <Text size="title">
+                <Text size="block-title">
                   <Trans>Packaging</Trans>
                 </Text>
                 <SemiControlledTextField
@@ -338,7 +348,7 @@ function ProjectPropertiesDialog(props: Props) {
                 <SemiControlledTextField
                   floatingLabelText={<Trans>Publisher name</Trans>}
                   fullWidth
-                  hintText={t`Your name`}
+                  translatableHintText={t`Your name`}
                   helperMarkdownText={i18n._(
                     t`This will be used when packaging and submitting your application to the stores.`
                   )}
@@ -348,7 +358,7 @@ function ProjectPropertiesDialog(props: Props) {
                 />
                 {useDeprecatedZeroAsDefaultZOrder ? (
                   <React.Fragment>
-                    <Text size="title">
+                    <Text size="block-title">
                       <Trans>Z Order of objects created from events</Trans>
                     </Text>
                     <AlertMessage kind="info">
@@ -384,11 +394,11 @@ function ProjectPropertiesDialog(props: Props) {
                     />
                   </React.Fragment>
                 ) : null}
-                <Text size="title">
+                <Text size="block-title">
                   <Trans>Analytics</Trans>
                 </Text>
                 <GameRegistration project={project} />
-                <Text size="title">
+                <Text size="block-title">
                   <Trans>Resolution and rendering</Trans>
                 </Text>
                 <ResponsiveLineStackLayout noMargin>
@@ -553,7 +563,7 @@ function ProjectPropertiesDialog(props: Props) {
                   </DismissableAlertMessage>
                 )}
 
-                <Text size="title">
+                <Text size="block-title">
                   <Trans>Project files</Trans>
                 </Text>
                 <SelectField
@@ -563,6 +573,9 @@ function ProjectPropertiesDialog(props: Props) {
                   onChange={(e, i, value: string) =>
                     setIsFolderProject(value === 'folder-project')
                   }
+                  helperMarkdownText={i18n._(
+                    t`Note that this option will only have an effect when saving your project on your computer's filesystem from the desktop app.`
+                  )}
                 >
                   <SelectOption
                     value={'single-file'}

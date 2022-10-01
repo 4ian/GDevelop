@@ -10,7 +10,7 @@ import {
 } from 'react-virtualized';
 import useForceUpdate from '../Utils/UseForceUpdate';
 
-import Chip from '@material-ui/core/Chip';
+import Chip from '../UI/Chip';
 
 import { Line, Column, Spacer } from '../UI/Grid';
 import Dialog from '../UI/Dialog';

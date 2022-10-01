@@ -1,23 +1,55 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import * as React from 'react';
+import { I18n } from '@lingui/react';
+import { t, Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import { differenceInCalendarDays, format } from 'date-fns';
-import { Line } from '../../UI/Grid';
-import { type Build } from '../../Utils/GDevelopServices/Build';
-import { type Game } from '../../Utils/GDevelopServices/Game';
-import { Card, CardActions, CardHeader } from '@material-ui/core';
-import BuildProgressAndActions from './BuildProgressAndActions';
-import EmptyMessage from '../../UI/EmptyMessage';
-import Chrome from '../../UI/CustomSvgIcons/Chrome';
+
 import PhoneIphone from '@material-ui/icons/PhoneIphone';
 import LaptopMac from '@material-ui/icons/LaptopMac';
+import MoreVert from '@material-ui/icons/MoreVert';
+
+import { Line, LargeSpacer, Spacer, Column } from '../../UI/Grid';
+import EmptyMessage from '../../UI/EmptyMessage';
+import Chrome from '../../UI/CustomSvgIcons/Chrome';
+import Text from '../../UI/Text';
+import InfoBar from '../../UI/Messages/InfoBar';
+import IconButton from '../../UI/IconButton';
+import Copy from '../../UI/CustomSvgIcons/Copy';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
+import TextField from '../../UI/TextField';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
+import BackgroundText from '../../UI/BackgroundText';
+import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
+import { LineStackLayout } from '../../UI/Layout';
+import Card from '../../UI/Card';
+
+import BuildProgressAndActions from './BuildProgressAndActions';
+
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import {
+  deleteBuild,
+  updateBuild,
+  type Build,
+} from '../../Utils/GDevelopServices/Build';
+import { type Game } from '../../Utils/GDevelopServices/Game';
+import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+import Window from '../../Utils/Window';
+import CircularProgress from '../../UI/CircularProgress';
 
 const styles = {
   icon: {
-    height: 30,
-    width: 30,
-    marginRight: 5,
+    height: 16,
+    width: 16,
+    marginRight: 4,
   },
+  buildButtonIcon: { height: 16, width: 16, opacity: 0.6 },
+  openForFeedbackIndicator: { height: 4, width: 4, borderRadius: 4 },
+  cardContent: { flex: 1 },
+  textField: { width: '60%' },
+  circularProgress: { height: 20, width: 20 },
 };
 
 const formatBuildText = (
@@ -50,12 +82,30 @@ const getIcon = (
   }
 };
 
+const BuildAndCreatedAt = ({ build }: { build: Build }) => (
+  <Line alignItems="end">
+    <Line noMargin alignItems="center">
+      {getIcon(build.type)}
+      <Text noMargin>
+        <Trans>{formatBuildText(build.type)}</Trans>
+      </Text>
+    </Line>
+    <Spacer />
+    <BackgroundText>
+      <Trans>{format(build.updatedAt, 'yyyy-MM-dd HH:mm:ss')}</Trans>
+    </BackgroundText>
+  </Line>
+);
+
 type Props = {|
   build: Build,
   game: Game,
   onGameUpdated?: Game => void,
   gameUpdating: boolean,
   setGameUpdating: boolean => void,
+  onBuildUpdated: Build => void,
+  onBuildDeleted: Build => void,
+  authenticatedUser: AuthenticatedUser,
 |};
 
 export const BuildCard = ({
@@ -64,46 +114,228 @@ export const BuildCard = ({
   onGameUpdated,
   gameUpdating,
   setGameUpdating,
+  onBuildUpdated,
+  onBuildDeleted,
+  authenticatedUser,
 }: Props) => {
+  const { getAuthorizationHeader, profile } = authenticatedUser;
+  const buildName = build.name ? build.name : shortenUuidForDisplay(build.id);
+  const isOnlineBuild = game.publicWebBuildId === build.id;
   const isOld =
     build &&
     build.type !== 'web-build' &&
     differenceInCalendarDays(Date.now(), build.updatedAt) > 6;
+
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const nameInput = React.useRef<?TextField>(null);
+  const windowWidth = useResponsiveWindowWidth();
+
+  const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState(false);
+
+  const [isEditingName, setIsEditingName] = React.useState(false);
+  const [name, setName] = React.useState(build.name || '');
+
+  const onCopyUuid = () => {
+    navigator.clipboard.writeText(build.id);
+    setShowCopiedInfoBar(true);
+  };
+
+  const onEditName = () => {
+    setIsEditingName(true);
+    nameInput.current && nameInput.current.focus();
+  };
+  const onBlurEditName = async (i18n: I18nType) => {
+    if (!profile) return;
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      setName(build.name || '');
+    } else if (trimmedName === buildName) {
+      setName(name.trim());
+    } else {
+      try {
+        setGameUpdating(true);
+        const updatedBuild = await updateBuild(
+          getAuthorizationHeader,
+          profile.id,
+          build.id,
+          {
+            name: name,
+          }
+        );
+        onBuildUpdated({
+          ...build,
+          name: updatedBuild.name,
+        });
+      } catch (error) {
+        setName(build.name || '');
+        showErrorBox({
+          message: i18n._(
+            t`Could not update the build name. Verify your internet connection or try again later.`
+          ),
+          rawError: error,
+          errorId: 'build-name-update-error',
+        });
+      } finally {
+        setGameUpdating(false);
+      }
+    }
+    setIsEditingName(false);
+  };
+
+  const onDeleteBuild = async (i18n: I18nType) => {
+    if (!profile) return;
+    const answer = Window.showConfirmDialog(
+      'You are about to delete this build. Continue?'
+    );
+    if (!answer) return;
+    try {
+      setGameUpdating(true);
+      await deleteBuild(getAuthorizationHeader, profile.id, build.id);
+      setGameUpdating(false);
+      onBuildDeleted(build);
+    } catch (error) {
+      showErrorBox({
+        message: i18n._(
+          t`Could not delete the build. Verify your internet connection or try again later.`
+        ),
+        rawError: error,
+        errorId: 'build-delete-error',
+      });
+      setGameUpdating(false);
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader
-        title={build.id}
-        subheader={
-          <Line alignItems="center" noMargin>
-            {getIcon(build.type)}
-            <Trans>
-              {formatBuildText(build.type)} -{' '}
-              {format(build.updatedAt, 'yyyy-MM-dd HH:mm:ss')}
-            </Trans>
-          </Line>
-        }
-      />
-      <CardActions>
-        <Line expand noMargin justifyContent="flex-end">
-          {!isOld && (
-            <BuildProgressAndActions
-              build={build}
-              game={game}
-              onGameUpdated={onGameUpdated}
-              gameUpdating={gameUpdating}
-              setGameUpdating={setGameUpdating}
-            />
-          )}
-          {isOld && (
-            <EmptyMessage>
-              <Trans>
-                This build is old and the generated games can't be downloaded
-                anymore.
-              </Trans>
-            </EmptyMessage>
-          )}
-        </Line>
-      </CardActions>
-    </Card>
+    <I18n>
+      {({ i18n }) => (
+        <>
+          <Card
+            isHighlighted={isOnlineBuild}
+            cardCornerAction={
+              <ElementWithMenu
+                element={
+                  <IconButton size="small" disabled={gameUpdating}>
+                    <MoreVert />
+                  </IconButton>
+                }
+                buildMenuTemplate={(i18n: I18nType) => [
+                  {
+                    label: i18n._(t`Edit build name`),
+                    click: onEditName,
+                  },
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Delete build`),
+                    click: () => onDeleteBuild(i18n),
+                  },
+                ]}
+              />
+            }
+            header={
+              <Line noMargin alignItems="start" justifyContent="space-between">
+                {windowWidth !== 'small' && <BuildAndCreatedAt build={build} />}
+                <Column expand noMargin justifyContent="center">
+                  <Line noMargin justifyContent="end">
+                    {isOnlineBuild ? (
+                      <Text size="body2">
+                        <Trans>Current build online</Trans>
+                      </Text>
+                    ) : (
+                      game.acceptsBuildComments &&
+                      build.type === 'web-build' && (
+                        <LineStackLayout alignItems="center" noMargin>
+                          <div
+                            style={{
+                              ...styles.openForFeedbackIndicator,
+                              backgroundColor: gdevelopTheme.message.valid,
+                            }}
+                          />
+                          <Text size="body2">
+                            <Trans>Build open for feedbacks</Trans>
+                          </Text>
+                        </LineStackLayout>
+                      )
+                    )}
+                  </Line>
+                </Column>
+              </Line>
+            }
+          >
+            <Column expand noMargin>
+              {windowWidth === 'small' && <BuildAndCreatedAt build={build} />}
+              <Spacer />
+              <Line noMargin>
+                {isEditingName ? (
+                  <Line noMargin expand>
+                    <TextField
+                      ref={nameInput}
+                      style={styles.textField}
+                      value={name}
+                      margin="none"
+                      onChange={(_, value) => setName(value)}
+                      onBlur={() => {
+                        onBlurEditName(i18n);
+                      }}
+                      hintText={buildName}
+                      disabled={gameUpdating}
+                      onKeyPress={event => {
+                        if (shouldValidate(event) && nameInput.current)
+                          nameInput.current.blur();
+                      }}
+                      maxLength={50}
+                    />
+                    {gameUpdating && (
+                      <>
+                        <Spacer />
+                        <CircularProgress style={styles.circularProgress} />
+                      </>
+                    )}
+                  </Line>
+                ) : (
+                  <Line noMargin alignItems="baseline">
+                    <Text noMargin>{buildName}</Text>
+                  </Line>
+                )}
+              </Line>
+              <Line noMargin alignItems="center">
+                <BackgroundText style={{ textAlign: 'left' }}>
+                  {build.id}
+                </BackgroundText>
+                <Spacer />
+                <IconButton size="small" onClick={onCopyUuid}>
+                  <Copy style={styles.buildButtonIcon} />
+                </IconButton>
+              </Line>
+              <LargeSpacer />
+              <Line expand noMargin justifyContent="space-between">
+                {!isOld && (
+                  <BuildProgressAndActions
+                    build={build}
+                    game={game}
+                    onGameUpdated={onGameUpdated}
+                    gameUpdating={gameUpdating}
+                    setGameUpdating={setGameUpdating}
+                    onCopyToClipboard={() => setShowCopiedInfoBar(true)}
+                  />
+                )}
+                {isOld && (
+                  <EmptyMessage>
+                    <Trans>
+                      This build is old and the generated games can't be
+                      downloaded anymore.
+                    </Trans>
+                  </EmptyMessage>
+                )}
+              </Line>
+            </Column>
+          </Card>
+          <InfoBar
+            visible={showCopiedInfoBar}
+            hide={() => setShowCopiedInfoBar(false)}
+            message={<Trans>Copied to clipboard!</Trans>}
+          />
+        </>
+      )}
+    </I18n>
   );
 };

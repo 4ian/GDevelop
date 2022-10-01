@@ -96,6 +96,15 @@ namespace gdjs {
   };
 
   /**
+   * Convert a RGB string ("rrr;ggg;bbb") or a Hex string ("#rrggbb") to a RGB color number.
+   * @param rgbOrHexString The color as a RGB string or Hex string
+   */
+  export const rgbOrHexStringToNumber = (rgbOrHexString: string): integer => {
+    const components = gdjs.rgbOrHexToRGBColor(rgbOrHexString);
+    return gdjs.rgbToHexNumber(components[0], components[1], components[2]);
+  };
+
+  /**
    * Convert a RGB object to a Hex number.
    * @param r Red
    * @param g Green
@@ -524,8 +533,58 @@ namespace gdjs {
       hex[r[15]]
     );
   };
+
+  /**
+   * See https://floating-point-gui.de/errors/comparison/
+   * @param a
+   * @param b
+   * @param epsilon the relative margin error
+   * @returns true when a and b are within a relative margin error.
+   */
+  export const nearlyEqual = (a: float, b: float, epsilon: float): boolean => {
+    const absA = Math.abs(a);
+    const absB = Math.abs(b);
+    const diff = Math.abs(a - b);
+
+    if (a === b) {
+      // shortcut, handles infinities
+      return true;
+    } else if (a == 0 || b == 0 || absA + absB < Number.EPSILON) {
+      // a or b is zero or both are extremely close to it
+      // relative error is less meaningful here
+      return diff < epsilon * Number.EPSILON;
+    } else {
+      // use relative error
+      return diff / Math.min(absA + absB, Number.MAX_VALUE) < epsilon;
+    }
+  };
+
+  const asynchronouslyLoadingLibraryPromises: Array<Promise<any>> = [];
+
+  /**
+   * Register a promise which will be resolved when a third party library has
+   * finished loading (and is required to load before launching the game).
+   *
+   * This method must be called by any library that loads asynchronously.
+   */
+  export const registerAsynchronouslyLoadingLibraryPromise = (
+    promise: Promise<any>
+  ): void => {
+    asynchronouslyLoadingLibraryPromises.push(promise);
+  };
+
+  /**
+   * @returns a promise resolved when all all third party libraries, which need
+   * to be loaded before the game startup, are loaded. If a library fails
+   * loading, this will be rejected.
+   */
+  export const getAllAsynchronouslyLoadingLibraryPromise = (): Promise<
+    any[]
+  > => {
+    return Promise.all(asynchronouslyLoadingLibraryPromises);
+  };
 }
 
-//Make sure console.warn and console.error are available.
+// Make sure console.warn and console.error are available.
 console.warn = console.warn || console.log;
 console.error = console.error || console.log;

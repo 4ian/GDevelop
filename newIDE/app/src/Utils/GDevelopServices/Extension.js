@@ -2,11 +2,15 @@
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
-import { type UserPublicProfileSearch } from './User';
+import { type UserPublicProfile } from './User';
+
+type ExtensionTier = 'community' | 'reviewed';
 
 export type ExtensionShortHeader = {|
+  tier: ExtensionTier,
   shortDescription: string,
-  authors?: Array<UserPublicProfileSearch>,
+  authorIds: Array<string>,
+  authors?: Array<UserPublicProfile>,
   extensionNamespace: string,
   fullName: string,
   name: string,
@@ -15,6 +19,7 @@ export type ExtensionShortHeader = {|
   url: string,
   headerUrl: string,
   tags: Array<string>,
+  category: string,
   previewIconUrl: string,
   eventsBasedBehaviorsCount: number,
   eventsFunctionsCount: number,
@@ -44,7 +49,13 @@ export type SerializedExtension = {
 export type ExtensionsRegistry = {
   version: string,
   allTags: Array<string>,
+  allCategories: Array<string>,
   extensionShortHeaders: Array<ExtensionShortHeader>,
+  views?: {
+    default: {
+      firstExtensionIds: Array<string>,
+    },
+  },
 };
 
 /**

@@ -22,10 +22,13 @@ export const onCreateBlank: OnCreateBlankFunction = async ({
 
   const project = gd.ProjectHelper.createNewGDJSProject();
   return {
-    project,
-    projectName,
-    storageProvider: null,
-    fileMetadata: null,
+    source: {
+      project,
+      projectName,
+      storageProvider: null,
+      fileMetadata: null,
+    },
+    destination: null,
   };
 };
 
@@ -43,11 +46,15 @@ export const onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunct
       exampleSlug: exampleShortHeader.slug,
     });
     return {
-      storageProvider: UrlStorageProvider,
-      projectName,
-      fileMetadata: {
-        fileIdentifier: example.projectFileUrl,
+      source: {
+        project: null,
+        projectName,
+        storageProvider: UrlStorageProvider,
+        fileMetadata: {
+          fileIdentifier: example.projectFileUrl,
+        },
       },
+      destination: null,
     };
   } catch (error) {
     showErrorBox({

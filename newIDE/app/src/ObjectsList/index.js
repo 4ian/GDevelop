@@ -46,6 +46,8 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
+import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -65,6 +67,7 @@ const objectTypeToDefaultName = {
   'BitmapText::BitmapTextObject': 'NewBitmapText',
   'TextEntryObject::TextEntry': 'NewTextEntry',
   'TileMap::TileMap': 'NewTileMap',
+  'TileMap::CollisionMask': 'NewTileMapMask',
   'MyDummyExtension::DummyObject': 'NewDummyObject',
   'Lighting::LightObject': 'NewLight',
   'TextInput::TextInputObject': 'NewTextInput',
@@ -106,7 +109,8 @@ type Props = {|
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
-  events: gdEventsList,
+  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
+  onSelectAllInstancesOfObjectInLayout?: string => void,
   onDeleteObject: (
     objectWithContext: ObjectWithContext,
     cb: (boolean) => void
@@ -129,7 +133,10 @@ type Props = {|
   canRenameObject: (newName: string) => boolean,
   onAddObjectInstance: (objectName: string) => void,
 
-  getThumbnail: (project: gdProject, object: Object) => string,
+  getThumbnail: (
+    project: gdProject,
+    objectConfiguration: gdObjectConfiguration
+  ) => string,
   unsavedChanges?: ?UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
@@ -185,8 +192,11 @@ export default class ObjectsList extends React.Component<Props, State> {
       onObjectSelected,
     } = this.props;
 
+    const defaultName = project.hasEventsBasedObject(objectType)
+      ? 'New' + project.getEventsBasedObject(objectType).getDefaultName()
+      : objectTypeToDefaultName[objectType] || 'NewObject';
     const name = newNameGenerator(
-      objectTypeToDefaultName[objectType] || 'NewObject',
+      defaultName,
       name =>
         objectsContainer.hasObjectNamed(name) || project.hasObjectNamed(name)
     );
@@ -512,13 +522,21 @@ export default class ObjectsList extends React.Component<Props, State> {
   };
 
   _getObjectThumbnail = (objectWithContext: ObjectWithContext) =>
-    this.props.getThumbnail(this.props.project, objectWithContext.object);
+    this.props.getThumbnail(
+      this.props.project,
+      objectWithContext.object.getConfiguration()
+    );
 
   _renderObjectMenuTemplate = (i18n: I18nType) => (
     objectWithContext: ObjectWithContext,
     index: number
   ) => {
     const { object } = objectWithContext;
+    const { layout, onSelectAllInstancesOfObjectInLayout } = this.props;
+    const instanceCountOnScene = layout
+      ? getInstanceCountInLayoutForObject(layout, object.getName())
+      : undefined;
+
     const objectMetadata = gd.MetadataProvider.getObjectMetadata(
       this.props.project.getCurrentPlatform(),
       object.getType()
@@ -591,12 +609,21 @@ export default class ObjectsList extends React.Component<Props, State> {
         label: i18n._(t`Add instance to the scene`),
         click: () => this.props.onAddObjectInstance(object.getName()),
       },
+      instanceCountOnScene !== undefined && onSelectAllInstancesOfObjectInLayout
+        ? {
+            label: i18n._(
+              t`Select instances on scene (${instanceCountOnScene})`
+            ),
+            click: () => onSelectAllInstancesOfObjectInLayout(object.getName()),
+            enabled: instanceCountOnScene > 0,
+          }
+        : undefined,
       { type: 'separator' },
       {
         label: i18n._(t`Add a new object...`),
         click: () => this.onAddNewObject(),
       },
-    ];
+    ].filter(Boolean);
   };
 
   _onObjectModified = (shouldForceUpdateList: boolean) => {
@@ -616,7 +643,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       onChooseResource,
       resourceExternalEditors,
       selectedObjectTags,
-      events,
+      onFetchNewlyAddedResources,
     } = this.props;
     const { searchText, tagEditedObject } = this.state;
 
@@ -695,6 +722,7 @@ export default class ObjectsList extends React.Component<Props, State> {
               searchText: text,
             })
           }
+          aspect="integrated-search-bar"
           placeholder={t`Search objects`}
         />
         {this.state.newObjectDialogOpen && (
@@ -709,10 +737,10 @@ export default class ObjectsList extends React.Component<Props, State> {
             project={project}
             layout={layout}
             objectsContainer={objectsContainer}
-            events={events}
             resourceSources={resourceSources}
             onChooseResource={onChooseResource}
             resourceExternalEditors={resourceExternalEditors}
+            onFetchNewlyAddedResources={onFetchNewlyAddedResources}
           />
         )}
         {tagEditedObject && (

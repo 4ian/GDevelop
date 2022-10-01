@@ -292,12 +292,25 @@ export default class ResourcesList extends React.Component<Props, State> {
       { type: 'separator' },
       {
         label: i18n._(t`Remove unused...`),
-        submenu: allResourceKindsAndMetadata.map(({ displayName, kind }) => ({
-          label: i18n._(displayName),
-          click: () => {
-            this.props.onRemoveUnusedResources(kind);
-          },
-        })),
+        submenu: allResourceKindsAndMetadata
+          .map(({ displayName, kind }) => ({
+            label: i18n._(displayName),
+            click: () => {
+              this.props.onRemoveUnusedResources(kind);
+            },
+          }))
+          .concat([
+            {
+              label: i18n._(t`Resources (any kind)`),
+              click: () => {
+                allResourceKindsAndMetadata.forEach(resourceKindAndMetadata => {
+                  this.props.onRemoveUnusedResources(
+                    resourceKindAndMetadata.kind
+                  );
+                });
+              },
+            },
+          ]),
       },
       {
         label: i18n._(t`Remove Resources with Invalid Path`),
@@ -382,6 +395,7 @@ export default class ResourcesList extends React.Component<Props, State> {
             })
           }
           placeholder={t`Search resources`}
+          aspect="integrated-search-bar"
         />
       </Background>
     );

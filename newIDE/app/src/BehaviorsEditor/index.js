@@ -78,10 +78,7 @@ const BehaviorsEditor = (props: Props) => {
     props.onUpdateBehaviorsSharedData();
   };
 
-  const onChangeBehaviorName = (
-    behaviorContent: gdBehaviorContent,
-    newName: string
-  ) => {
+  const onChangeBehaviorName = (behavior: gdBehavior, newName: string) => {
     // TODO: This is disabled for now as there is no proper refactoring
     // of events after a behavior renaming. Once refactoring is available,
     // the text field can be enabled again and refactoring calls added here
@@ -89,7 +86,7 @@ const BehaviorsEditor = (props: Props) => {
     // Renaming a behavior is something that is really rare anyway! :)
 
     if (object.hasBehaviorNamed(newName)) return;
-    object.renameBehavior(behaviorContent.getName(), newName);
+    object.renameBehavior(behavior.getName(), newName);
     forceUpdate();
   };
 
@@ -137,8 +134,8 @@ const BehaviorsEditor = (props: Props) => {
         <React.Fragment>
           <ScrollView>
             {allBehaviorNames.map((behaviorName, index) => {
-              const behaviorContent = object.getBehavior(behaviorName);
-              const behaviorTypeName = behaviorContent.getTypeName();
+              const behavior = object.getBehavior(behaviorName);
+              const behaviorTypeName = behavior.getTypeName();
 
               const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
                 gd.JsPlatform.get(),
@@ -184,7 +181,6 @@ const BehaviorsEditor = (props: Props) => {
                 );
               }
 
-              const behavior = behaviorMetadata.get();
               const BehaviorComponent = BehaviorsEditorService.getEditor(
                 behaviorTypeName
               );
@@ -225,12 +221,12 @@ const BehaviorsEditor = (props: Props) => {
                     <Column expand>
                       <TextField
                         value={behaviorName}
-                        hintText={t`Behavior name`}
+                        translatableHintText={t`Behavior name`}
                         margin="none"
                         fullWidth
                         disabled
                         onChange={(e, text) =>
-                          onChangeBehaviorName(behaviorContent, text)
+                          onChangeBehaviorName(behavior, text)
                         }
                         id={`behavior-${behaviorName}-name-text-field`}
                       />
@@ -258,7 +254,6 @@ const BehaviorsEditor = (props: Props) => {
                       <Line>
                         <BehaviorComponent
                           behavior={behavior}
-                          behaviorContent={behaviorContent}
                           project={project}
                           object={object}
                           resourceSources={props.resourceSources}

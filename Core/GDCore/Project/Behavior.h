@@ -5,86 +5,28 @@
  */
 #ifndef GDCORE_BEHAVIOR_H
 #define GDCORE_BEHAVIOR_H
-#include <map>
+
 #include "GDCore/String.h"
-#if defined(GD_IDE_ONLY)
-namespace gd {
-class PropertyDescriptor;
-}
-#endif
-namespace gd {
-class SerializerElement;
-class Project;
-class Layout;
-}  // namespace gd
+#include "GDCore/Project/BehaviorConfigurationContainer.h"
 
 namespace gd {
 
 /**
  * \brief Base class used to represents a behavior that can be applied to an
- * object
+ * object. It stores the content (i.e: the properties) of a behavior of an object.
  *
- * \see gd::BehaviorContent
  * \see gd::BehaviorsSharedData
+ * \see gd::Object
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API Behavior {
+class GD_CORE_API Behavior: public BehaviorConfigurationContainer {
  public:
-  Behavior(){};
+
+  Behavior(): BehaviorConfigurationContainer() {};
+  Behavior(const gd::String& name_, const gd::String& type_)
+      : BehaviorConfigurationContainer(name_, type_) {};
   virtual ~Behavior();
-  virtual Behavior* Clone() const { return new Behavior(*this); }
-
-  /**
-   * \brief Return the type of the behavior
-   */
-  const gd::String& GetTypeName() const { return type; }
-
-  /**
-   * \brief Set the type of the behavior.
-   */
-  void SetTypeName(const gd::String& type_) { type = type_; };
-
-#if defined(GD_IDE_ONLY)
-  /**
-   * \brief Called when the IDE wants to know about the custom properties of the
-   * behavior.
-   *
-   * Implementation example:
-   \code
-      std::map<gd::String, gd::PropertyDescriptor> properties;
-      properties[_("Initial speed")].SetValue(gd::String::From(initialSpeed));
-
-      return properties;
-   \endcode
-   *
-   * \return a std::map with properties names as key.
-   * \see gd::PropertyDescriptor
-   */
-  virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
-      const gd::SerializerElement& behaviorContent) const;
-
-  /**
-   * \brief Called when the IDE wants to update a custom property of the
-   * behavior
-   *
-   * \return false if the new value cannot be set
-   * \see gd::InitialInstance
-   */
-  virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
-                              const gd::String& name,
-                              const gd::String& value) {
-    return false;
-  };
-#endif
-
-  /**
-   * \brief Called to initialize the content with the default properties
-   * for the behavior.
-   */
-  virtual void InitializeContent(gd::SerializerElement& behaviorContent){};
-
- private:
-  gd::String type;
+  virtual Behavior* Clone() const override { return new Behavior(*this); }
 };
 
 }  // namespace gd

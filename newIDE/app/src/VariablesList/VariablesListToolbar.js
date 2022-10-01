@@ -103,7 +103,7 @@ const VariablesListToolbar = (props: Props) => {
                 ) : (
                   <FlatButton
                     key={key}
-                    icon={<Icon />}
+                    leftIcon={<Icon />}
                     disabled={disabled}
                     label={label}
                     onClick={onClick}
@@ -138,7 +138,7 @@ const VariablesListToolbar = (props: Props) => {
             key="add-variable"
             onClick={props.onAdd}
             label={<Trans>Add variable</Trans>}
-            icon={<Add />}
+            leftIcon={<Add />}
           />
         )}
       </Column>

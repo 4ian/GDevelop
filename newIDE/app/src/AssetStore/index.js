@@ -4,23 +4,17 @@ import { t, Trans } from '@lingui/macro';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import Tune from '@material-ui/icons/Tune';
 import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
-import DoubleChevronArrow from '../UI/CustomSvgIcons/DoubleChevronArrow';
+import DoubleChevronArrowLeft from '../UI/CustomSvgIcons/DoubleChevronArrowLeft';
 import { Column, Line, Spacer } from '../UI/Grid';
 import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
 import Window from '../Utils/Window';
 import {
-  sendAssetAddedToProject,
   sendAssetOpened,
   sendAssetPackOpened,
 } from '../Utils/Analytics/EventSender';
-import RaisedButton from '../UI/RaisedButton';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
 import {
@@ -37,47 +31,18 @@ import TextButton from '../UI/TextButton';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
 import { AssetDetails } from './AssetDetails';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import { installAsset } from './InstallAsset';
-import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
-import { showErrorBox } from '../UI/Messages/MessageBox';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import { enumerateObjects } from '../ObjectsList/EnumerateObjects';
-import { AssetPackDialog } from './AssetPackDialog';
 import Home from '@material-ui/icons/Home';
+import PrivateAssetPackDialog from './PrivateAssetPackDialog';
 
-const styles = {
-  searchBar: {
-    // TODO: Can we put this in the search bar by default?
-    flexShrink: 0,
-  },
-};
-
-type Props = {
+type Props = {|
   project: gdProject,
-  objectsContainer: gdObjectsContainer,
-  events: gdEventsList,
-  focusOnMount?: boolean,
-  onObjectAddedFromAsset: (object: gdObject) => void,
-  layout: ?gdLayout,
-  resourceSources: Array<ResourceSource>,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
-  onChooseResource: ChooseResourceFunction,
-};
+|};
 
-export const AssetStore = ({
-  project,
-  objectsContainer,
-  events,
-  focusOnMount,
-  onObjectAddedFromAsset,
-  layout,
-  resourceSources,
-  resourceExternalEditors,
-  onChooseResource,
-}: Props) => {
+export const AssetStore = ({ project }: Props) => {
   const {
     assetPacks,
+    privateAssetPacks,
     searchResults,
     error,
     fetchAssetsAndFilters,
@@ -85,6 +50,7 @@ export const AssetStore = ({
     searchText,
     setSearchText,
     assetFiltersState,
+    assetPackRandomOrdering,
   } = React.useContext(AssetStoreContext);
   const {
     isOnHomePage,
@@ -92,37 +58,13 @@ export const AssetStore = ({
     openedAssetShortHeader,
     filtersState,
   } = navigationState.getCurrentPage();
-
-  React.useEffect(
-    () => {
-      fetchAssetsAndFilters();
-    },
-    [fetchAssetsAndFilters]
-  );
-
   const searchBar = React.useRef<?SearchBarInterface>(null);
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
   const [
-    isAssetPackDialogInstallOpen,
-    setIsAssetPackDialogInstallOpen,
-  ] = React.useState(false);
-  const [isAssetPackAdded, setIsAssetPackAdded] = React.useState(false);
-  const [
-    isAssetBeingInstalled,
-    setIsAssetBeingInstalled,
-  ] = React.useState<boolean>(false);
-
-  const { containerObjectsList } = enumerateObjects(project, objectsContainer);
-  const addedAssetIds = containerObjectsList
-    .map(({ object }) => object.getAssetStoreId())
-    .filter(Boolean);
-
-  const eventsFunctionsExtensionsState = React.useContext(
-    EventsFunctionsExtensionsContext
-  );
-
-  const resourcesFetcher = useResourceFetcher();
+    selectedPrivateAssetPack,
+    setSelectedPrivateAssetPack,
+  ] = React.useState<?PrivateAssetPackListingData>(null);
 
   const onOpenDetails = (assetShortHeader: AssetShortHeader) => {
     sendAssetOpened({
@@ -131,53 +73,6 @@ export const AssetStore = ({
     });
     navigationState.openDetailPage(assetShortHeader);
   };
-
-  const onInstallAsset = React.useCallback(
-    (assetShortHeader: AssetShortHeader) => {
-      setIsAssetBeingInstalled(true);
-      (async () => {
-        try {
-          const installOutput = await installAsset({
-            assetShortHeader,
-            eventsFunctionsExtensionsState,
-            project,
-            objectsContainer,
-            events,
-          });
-          sendAssetAddedToProject({
-            id: assetShortHeader.id,
-            name: assetShortHeader.name,
-          });
-          console.log('Asset successfully installed.');
-
-          installOutput.createdObjects.forEach(object => {
-            onObjectAddedFromAsset(object);
-          });
-
-          await resourcesFetcher.ensureResourcesAreFetched(project);
-        } catch (error) {
-          console.error('Error while installing the asset:', error);
-          showErrorBox({
-            message: `There was an error while installing the asset "${
-              assetShortHeader.name
-            }". Verify your internet connection or try again later.`,
-            rawError: error,
-            errorId: 'install-asset-error',
-          });
-        }
-
-        setIsAssetBeingInstalled(false);
-      })();
-    },
-    [
-      resourcesFetcher,
-      eventsFunctionsExtensionsState,
-      project,
-      objectsContainer,
-      events,
-      onObjectAddedFromAsset,
-    ]
-  );
 
   // When a pack is selected from the home page,
   // we set it as the chosen category and open the filters panel.
@@ -220,11 +115,11 @@ export const AssetStore = ({
 
   React.useEffect(
     () => {
-      if (focusOnMount && shouldAutofocusSearchbar && searchBar.current) {
+      if (shouldAutofocusSearchbar && searchBar.current) {
         searchBar.current.focus();
       }
     },
-    [shouldAutofocusSearchbar, focusOnMount]
+    [shouldAutofocusSearchbar]
   );
 
   return (
@@ -240,8 +135,8 @@ export const AssetStore = ({
                   tooltip={t`Back to discover`}
                   onClick={() => {
                     navigationState.openHome();
-                    setIsFiltersPanelOpen(false);
                     clearAllFilters(assetFiltersState);
+                    setIsFiltersPanelOpen(false);
                   }}
                   size="small"
                 >
@@ -258,7 +153,6 @@ export const AssetStore = ({
                       navigationState.clearHistory();
                       setIsFiltersPanelOpen(true);
                     }}
-                    style={styles.searchBar}
                     ref={searchBar}
                     id="asset-store-search-bar"
                   />
@@ -272,7 +166,7 @@ export const AssetStore = ({
                   alignItems="center"
                 >
                   {isOnHomePage ? (
-                    <Text size="title">
+                    <Text size="block-title">
                       <Trans>Discover</Trans>
                     </Text>
                   ) : (
@@ -291,42 +185,21 @@ export const AssetStore = ({
                           }}
                         />
                       </Column>
-                      {!openedAssetPack && filtersState.chosenCategory && (
+                      {(openedAssetPack || filtersState.chosenCategory) && (
                         <>
                           <Column expand alignItems="center">
-                            <Text size="title" noMargin>
-                              {capitalize(
-                                filtersState.chosenCategory.node.name
-                              )}
+                            <Text size="block-title" noMargin>
+                              {filtersState.chosenCategory
+                                ? capitalize(
+                                    filtersState.chosenCategory.node.name
+                                  )
+                                : openedAssetPack
+                                ? openedAssetPack.name
+                                : ''}
                             </Text>
                           </Column>
                           {/* to center the title */}
                           <Column expand alignItems="flex-end" noMargin />
-                        </>
-                      )}
-                      {openedAssetPack && (
-                        <>
-                          <Column expand alignItems="center">
-                            <Text size="title" noMargin>
-                              {openedAssetPack.name}
-                            </Text>
-                          </Column>
-                          <Column expand alignItems="flex-end" noMargin>
-                            <RaisedButton
-                              primary
-                              label={
-                                isAssetPackAdded ? (
-                                  <Trans>Asset pack added</Trans>
-                                ) : (
-                                  <Trans>Add pack to my scene</Trans>
-                                )
-                              }
-                              onClick={() =>
-                                setIsAssetPackDialogInstallOpen(true)
-                              }
-                              disabled={isAssetPackAdded}
-                            />
-                          </Column>
                         </>
                       )}
                     </>
@@ -374,7 +247,7 @@ export const AssetStore = ({
                           <IconButton
                             onClick={() => setIsFiltersPanelOpen(false)}
                           >
-                            <DoubleChevronArrow />
+                            <DoubleChevronArrowLeft />
                           </IconButton>
                         </Line>
                         <Line
@@ -383,22 +256,30 @@ export const AssetStore = ({
                         >
                           <AssetStoreFilterPanel
                             assetFiltersState={assetFiltersState}
-                            onChoiceChange={() =>
-                              navigationState.openSearchIfNeeded()
-                            }
+                            onChoiceChange={() => {
+                              navigationState.openSearchIfNeeded();
+                            }}
                           />
                         </Line>
                       </ScrollView>
                     )}
                   </Background>
                 )}
-                {isOnHomePage && !assetPacks && <PlaceholderLoader />}
-                {isOnHomePage && assetPacks && (
-                  <AssetsHome
-                    assetPacks={assetPacks}
-                    onPackSelection={selectPack}
-                  />
+                {isOnHomePage && !(assetPacks && privateAssetPacks) && (
+                  <PlaceholderLoader />
                 )}
+                {isOnHomePage &&
+                  assetPacks &&
+                  privateAssetPacks &&
+                  assetPackRandomOrdering && (
+                    <AssetsHome
+                      assetPacks={assetPacks}
+                      privateAssetPacks={privateAssetPacks}
+                      assetPackRandomOrdering={assetPackRandomOrdering}
+                      onPackSelection={selectPack}
+                      onPrivateAssetPackSelection={setSelectedPrivateAssetPack}
+                    />
+                  )}
                 {!isOnHomePage && !openedAssetShortHeader && (
                   <BoxSearchResults
                     baseSize={128}
@@ -422,39 +303,19 @@ export const AssetStore = ({
                 {openedAssetShortHeader && (
                   <AssetDetails
                     project={project}
-                    objectsContainer={objectsContainer}
-                    resourceSources={resourceSources}
-                    resourceExternalEditors={resourceExternalEditors}
                     onTagSelection={selectTag}
                     assetShortHeader={openedAssetShortHeader}
-                    onAdd={() => onInstallAsset(openedAssetShortHeader)}
-                    onClose={() => navigationState.backToPreviousPage()}
-                    isAddedToScene={addedAssetIds.includes(
-                      openedAssetShortHeader.id
-                    )}
-                    isBeingAddedToScene={isAssetBeingInstalled}
                     onOpenDetails={onOpenDetails}
+                  />
+                )}
+                {selectedPrivateAssetPack && (
+                  <PrivateAssetPackDialog
+                    privateAssetPack={selectedPrivateAssetPack}
+                    onClose={() => setSelectedPrivateAssetPack(null)}
                   />
                 )}
               </Line>
             </Column>
-            {resourcesFetcher.renderResourceFetcherDialog()}
-            {isAssetPackDialogInstallOpen && searchResults && openedAssetPack && (
-              <AssetPackDialog
-                assetPack={openedAssetPack}
-                assetShortHeaders={searchResults}
-                addedAssetIds={addedAssetIds}
-                onClose={() => setIsAssetPackDialogInstallOpen(false)}
-                onAssetPackAdded={() => {
-                  setIsAssetPackAdded(true);
-                  setIsAssetPackDialogInstallOpen(false);
-                }}
-                project={project}
-                objectsContainer={objectsContainer}
-                events={events}
-                onObjectAddedFromAsset={onObjectAddedFromAsset}
-              />
-            )}
           </>
         )}
       </ResponsiveWindowMeasurer>

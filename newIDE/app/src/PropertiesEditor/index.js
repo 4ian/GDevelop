@@ -43,7 +43,7 @@ export type ValueFieldCommonProperties = {|
   getLabel?: Instance => string,
   getDescription?: Instance => string,
   getExtraDescription?: Instance => string,
-  disabled?: boolean,
+  disabled?: boolean | ((instances: Array<gdInitialInstance>) => boolean),
   onEditButtonClick?: Instance => void,
 |};
 
@@ -59,7 +59,11 @@ export type PrimitiveValueField =
       valueType: 'string',
       getValue: Instance => string,
       setValue: (instance: Instance, newValue: string) => void,
-      getChoices?: ?() => Array<{| value: string, label: string |}>,
+      getChoices?: ?() => Array<{|
+        value: string,
+        label: string,
+        labelIsUserDefined?: boolean,
+      |}>,
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -163,6 +167,14 @@ const styles = {
   subHeader: {
     paddingLeft: 0,
   },
+};
+
+const getDisabled = (instances: Instances, field: ValueField): boolean => {
+  return typeof field.disabled === 'boolean'
+    ? field.disabled
+    : typeof field.disabled === 'function'
+    ? field.disabled(instances)
+    : false;
 };
 
 /**
@@ -286,7 +298,7 @@ const PropertiesEditor = ({
               instances.forEach(i => setValue(i, !!newValue));
               _onInstancesModified(instances);
             }}
-            disabled={field.disabled}
+            disabled={getDisabled(instances, field)}
           />
         );
       } else if (field.valueType === 'number') {
@@ -305,7 +317,7 @@ const PropertiesEditor = ({
             }}
             type="number"
             style={styles.field}
-            disabled={field.disabled}
+            disabled={getDisabled(instances, field)}
           />
         );
       } else if (field.valueType === 'color') {
@@ -362,7 +374,7 @@ const PropertiesEditor = ({
                   _onInstancesModified(instances);
                 }}
                 style={styles.field}
-                disabled={field.disabled}
+                disabled={getDisabled(instances, field)}
               />
             )}
             renderButton={style =>
@@ -390,8 +402,13 @@ const PropertiesEditor = ({
 
       const children = field
         .getChoices()
-        .map(({ value, label }) => (
-          <SelectOption key={value} value={value} primaryText={label} />
+        .map(({ value, label, labelIsUserDefined }) => (
+          <SelectOption
+            key={value}
+            value={value}
+            primaryText={label}
+            primaryTextIsUserDefined={labelIsUserDefined}
+          />
         ));
 
       if (field.valueType === 'number') {
@@ -425,7 +442,7 @@ const PropertiesEditor = ({
               _onInstancesModified(instances);
             }}
             style={styles.field}
-            disabled={field.disabled}
+            disabled={getDisabled(instances, field)}
           >
             {children}
           </SelectField>
@@ -579,7 +596,7 @@ const PropertiesEditor = ({
           );
           if (field.title) {
             return [
-              <Text key={field.name + '-title'} size="title">
+              <Text key={field.name + '-title'} size="block-title">
                 {field.title}
               </Text>,
               contentView,

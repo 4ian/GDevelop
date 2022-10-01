@@ -31,14 +31,6 @@ import {
 } from '../../../UI/Search/UseSearchStructuredItem';
 const gd: libGDevelop = global.gd;
 
-const styles = {
-  searchBar: {
-    backgroundColor: 'transparent',
-    flexShrink: 0,
-    zIndex: 1, // Put the SearchBar in front of the list, to display the shadow
-  },
-};
-
 const getGroupIconSrc = (key: string) => {
   return gd.JsPlatform.get()
     .getInstructionOrExpressionGroupMetadata(key)
@@ -159,7 +151,7 @@ export default class InstructionOrExpressionSelector<
                 })
               }
               onRequestSearch={onSubmitSearch}
-              style={styles.searchBar}
+              aspect="integrated-search-bar"
               placeholder={
                 searchPlaceholderObjectName
                   ? searchPlaceholderIsCondition

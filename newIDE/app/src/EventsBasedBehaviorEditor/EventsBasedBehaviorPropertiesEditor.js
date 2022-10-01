@@ -169,7 +169,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                           <SemiControlledTextField
                             margin="none"
                             commitOnBlur
-                            hintText={t`Enter the property name`}
+                            translatableHintText={t`Enter the property name`}
                             value={property.getName()}
                             onChange={newName => {
                               if (newName === property.getName()) return;
@@ -206,6 +206,11 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                           }}
                           checkedIcon={<Visibility />}
                           uncheckedIcon={<VisibilityOff />}
+                          disabled={
+                            property.getType() === 'Behavior' &&
+                            // Allow to make it visible just in case.
+                            !property.isHidden()
+                          }
                         />
                         <ElementWithMenu
                           element={
@@ -241,6 +246,9 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                               value={property.getType()}
                               onChange={(e, i, value: string) => {
                                 property.setType(value);
+                                if (value === 'Behavior') {
+                                  property.setHidden(false);
+                                }
                                 this.forceUpdate();
                                 this.props.onPropertiesUpdated();
                               }}
@@ -403,7 +411,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             floatingLabelText={
                               <Trans>Label, shown in the editor</Trans>
                             }
-                            hintText={t`This should make the purpose of the property easy to understand`}
+                            translatableHintText={t`This should make the purpose of the property easy to understand`}
                             floatingLabelFixed
                             value={property.getLabel()}
                             onChange={text => {

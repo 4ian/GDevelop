@@ -6,6 +6,12 @@ const client = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
 });
 
+type StripePrice = {|
+  value: number,
+  name: 'default',
+  stripePriceId: string,
+|};
+
 export type PrivateAssetPackListingData = {|
   id: string,
   sellerId: string,
@@ -16,6 +22,7 @@ export type PrivateAssetPackListingData = {|
   updatedAt: string,
   createdAt: string,
   thumbnailUrls: string[],
+  prices: StripePrice[],
 |};
 
 export const listListedPrivateAssetPacks = async (): Promise<

@@ -9,11 +9,16 @@ import {
 import Text from '../UI/Text';
 import { t, Trans } from '@lingui/macro';
 import Dialog from '../UI/Dialog';
+import PriceTag from '../UI/PriceTag';
 import TextButton from '../UI/TextButton';
 import AlertMessage from '../UI/AlertMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
-import { Column, LargeSpacer, Line, Spacer } from '../UI/Grid';
+import {
+  ColumnStackLayout,
+  ResponsiveLineStackLayout,
+  LineStackLayout,
+} from '../UI/Layout';
+import { Column, Line } from '../UI/Grid';
 import {
   getUserPublicProfile,
   type UserPublicProfile,
@@ -22,7 +27,7 @@ import PublicProfileDialog from '../Profile/PublicProfileDialog';
 import Link from '../UI/Link';
 import Mark from '../UI/CustomSvgIcons/Mark';
 import Cross from '../UI/CustomSvgIcons/Cross';
-import { Paper } from '@material-ui/core';
+import Paper from '@material-ui/core/Paper';
 import ResponsiveImagesGallery from '../UI/ResponsiveImagesGallery';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
@@ -51,8 +56,12 @@ const contentTypeToMessageDescriptor = {
   partial: t`Other`,
 };
 
+const styles = {
+  disabledText: { opacity: 0.6 },
+};
+
 const PrivateAssetPackDialog = ({
-  privateAssetPack: { id, name, description, sellerId },
+  privateAssetPack: { id, name, description, sellerId, prices },
   onClose,
 }: Props) => {
   const [
@@ -165,10 +174,11 @@ const PrivateAssetPackDialog = ({
                       variant="outlined"
                       style={{ padding: windowWidth === 'small' ? 20 : 30 }}
                     >
-                      <Column noMargin>
-                        <LargeSpacer /> {/* To be replaced by prices */}
+                      <ColumnStackLayout noMargin useLargeSpacer>
+                        <Line noMargin>
+                          <PriceTag value={prices[0].value} />
+                        </Line>
                         <Text noMargin>{assetPackDetails.longDescription}</Text>
-                        <LargeSpacer />
                         <ResponsiveLineStackLayout noMargin noColumnMargin>
                           <Column noMargin expand>
                             <Text size="sub-title">
@@ -194,37 +204,40 @@ const PrivateAssetPackDialog = ({
                             <Text size="sub-title">
                               <Trans>Licensing</Trans>
                             </Text>
-                            <Line noMargin alignItems="center">
+                            <LineStackLayout noMargin alignItems="center">
                               <Mark fontSize="small" />
-                              <Spacer />
                               <Text displayInlineAsSpan noMargin>
                                 <Trans>Personal projects</Trans>
                               </Text>
-                            </Line>
-                            <Line noMargin alignItems="center">
+                            </LineStackLayout>
+                            <LineStackLayout noMargin alignItems="center">
                               <Mark fontSize="small" />
-                              <Spacer />
                               <Text displayInlineAsSpan noMargin>
                                 <Trans>Professional projects</Trans>
                               </Text>
-                            </Line>
-                            <Line noMargin alignItems="center">
+                            </LineStackLayout>
+                            <LineStackLayout noMargin alignItems="center">
                               <Mark fontSize="small" />
-                              <Spacer />
                               <Text displayInlineAsSpan noMargin>
                                 <Trans>Asset modification</Trans>
                               </Text>
-                            </Line>
-                            <Line noMargin alignItems="center">
-                              <Cross fontSize="small" />
-                              <Spacer />
-                              <Text displayInlineAsSpan noMargin>
+                            </LineStackLayout>
+                            <LineStackLayout noMargin alignItems="center">
+                              <Cross
+                                fontSize="small"
+                                style={styles.disabledText}
+                              />
+                              <Text
+                                displayInlineAsSpan
+                                noMargin
+                                style={styles.disabledText}
+                              >
                                 <Trans>Redistribution &amp; reselling</Trans>
                               </Text>
-                            </Line>
+                            </LineStackLayout>
                           </Column>
                         </ResponsiveLineStackLayout>
-                      </Column>
+                      </ColumnStackLayout>
                     </Paper>
                   </Column>
                 </ResponsiveLineStackLayout>

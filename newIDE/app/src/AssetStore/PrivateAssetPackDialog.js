@@ -9,11 +9,12 @@ import {
 import Text from '../UI/Text';
 import { t, Trans } from '@lingui/macro';
 import Dialog from '../UI/Dialog';
+import PriceTag from '../UI/PriceTag';
 import TextButton from '../UI/TextButton';
 import AlertMessage from '../UI/AlertMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
-import { Column, LargeSpacer, Line, Spacer } from '../UI/Grid';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
+import { Column, Line, Spacer } from '../UI/Grid';
 import {
   getUserPublicProfile,
   type UserPublicProfile,
@@ -52,7 +53,7 @@ const contentTypeToMessageDescriptor = {
 };
 
 const PrivateAssetPackDialog = ({
-  privateAssetPack: { id, name, description, sellerId },
+  privateAssetPack: { id, name, description, sellerId, prices },
   onClose,
 }: Props) => {
   const [
@@ -165,10 +166,11 @@ const PrivateAssetPackDialog = ({
                       variant="outlined"
                       style={{ padding: windowWidth === 'small' ? 20 : 30 }}
                     >
-                      <Column noMargin>
-                        <LargeSpacer /> {/* To be replaced by prices */}
+                      <ColumnStackLayout noMargin useLargeSpacer>
+                        <Line noMargin>
+                          <PriceTag value={prices[0].value} />
+                        </Line>
                         <Text noMargin>{assetPackDetails.longDescription}</Text>
-                        <LargeSpacer />
                         <ResponsiveLineStackLayout noMargin noColumnMargin>
                           <Column noMargin expand>
                             <Text size="sub-title">
@@ -224,7 +226,7 @@ const PrivateAssetPackDialog = ({
                             </Line>
                           </Column>
                         </ResponsiveLineStackLayout>
-                      </Column>
+                      </ColumnStackLayout>
                     </Paper>
                   </Column>
                 </ResponsiveLineStackLayout>

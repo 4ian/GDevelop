@@ -13,8 +13,12 @@ import PriceTag from '../UI/PriceTag';
 import TextButton from '../UI/TextButton';
 import AlertMessage from '../UI/AlertMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
-import { Column, Line, Spacer } from '../UI/Grid';
+import {
+  ColumnStackLayout,
+  ResponsiveLineStackLayout,
+  LineStackLayout,
+} from '../UI/Layout';
+import { Column, Line } from '../UI/Grid';
 import {
   getUserPublicProfile,
   type UserPublicProfile,
@@ -196,34 +200,30 @@ const PrivateAssetPackDialog = ({
                             <Text size="sub-title">
                               <Trans>Licensing</Trans>
                             </Text>
-                            <Line noMargin alignItems="center">
+                            <LineStackLayout noMargin alignItems="center">
                               <Mark fontSize="small" />
-                              <Spacer />
                               <Text displayInlineAsSpan noMargin>
                                 <Trans>Personal projects</Trans>
                               </Text>
-                            </Line>
-                            <Line noMargin alignItems="center">
+                            </LineStackLayout>
+                            <LineStackLayout noMargin alignItems="center">
                               <Mark fontSize="small" />
-                              <Spacer />
                               <Text displayInlineAsSpan noMargin>
                                 <Trans>Professional projects</Trans>
                               </Text>
-                            </Line>
-                            <Line noMargin alignItems="center">
+                            </LineStackLayout>
+                            <LineStackLayout noMargin alignItems="center">
                               <Mark fontSize="small" />
-                              <Spacer />
                               <Text displayInlineAsSpan noMargin>
                                 <Trans>Asset modification</Trans>
                               </Text>
-                            </Line>
-                            <Line noMargin alignItems="center">
+                            </LineStackLayout>
+                            <LineStackLayout noMargin alignItems="center">
                               <Cross fontSize="small" />
-                              <Spacer />
                               <Text displayInlineAsSpan noMargin>
                                 <Trans>Redistribution &amp; reselling</Trans>
                               </Text>
-                            </Line>
+                            </LineStackLayout>
                           </Column>
                         </ResponsiveLineStackLayout>
                       </ColumnStackLayout>

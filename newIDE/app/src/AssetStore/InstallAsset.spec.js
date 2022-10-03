@@ -574,7 +574,7 @@ describe('InstallAsset', () => {
 
   describe('installAsset', () => {
     beforeEach(() => {
-      mockFn(Asset.getAsset).mockReset();
+      mockFn(Asset.getPublicAsset).mockReset();
       mockFn(getExtensionsRegistry).mockReset();
       mockFn(getExtension).mockReset();
     });
@@ -595,7 +595,7 @@ describe('InstallAsset', () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
       const layout = project.insertNewLayout('MyTestLayout', 0);
-      mockFn(Asset.getAsset).mockImplementationOnce(() => {
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(() => {
         throw new Error('Fake error - unable to download');
       });
 
@@ -621,7 +621,7 @@ describe('InstallAsset', () => {
       const layout = project.insertNewLayout('MyTestLayout', 0);
 
       // Get an asset that uses a behavior...
-      mockFn(Asset.getAsset).mockImplementationOnce(
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(
         () => fakeAssetWithUnknownBehaviorCustomizations1
       );
 
@@ -659,7 +659,7 @@ describe('InstallAsset', () => {
       const layout = project.insertNewLayout('MyTestLayout', 0);
 
       // Get an asset that uses a behavior...
-      mockFn(Asset.getAsset).mockImplementationOnce(
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(
         () => fakeAssetWithFlashBehaviorCustomizations1
       );
 
@@ -703,7 +703,7 @@ describe('InstallAsset', () => {
 
       // Fake an asset with a behavior of type "FakeBehavior::FakeBehavior",
       // that is installed already.
-      mockFn(Asset.getAsset).mockImplementationOnce(
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(
         () => fakeAssetWithBehaviorCustomizations1
       );
 

@@ -3,6 +3,7 @@ import * as React from 'react';
 import {
   type AssetShortHeader,
   isPixelArt,
+  isPrivateAsset,
 } from '../Utils/GDevelopServices/Asset';
 import { getPixelatedImageRendering } from '../Utils/CssHelpers';
 import ButtonBase from '@material-ui/core/ButtonBase';
@@ -63,8 +64,7 @@ type Props = {|
 
 export const AssetCard = ({ assetShortHeader, onOpenDetails, size }: Props) => {
   const previewImageUrl = assetShortHeader.previewImageUrls[0];
-  console.log(assetShortHeader);
-  const isPrivateAsset = previewImageUrl.startsWith('https://private-assets'); // TODO: improve that?
+  const isPrivate = isPrivateAsset(assetShortHeader);
   const style = {
     maxWidth: 128 - 2 * paddingSize,
     maxHeight: 128 - 2 * paddingSize,
@@ -78,7 +78,7 @@ export const AssetCard = ({ assetShortHeader, onOpenDetails, size }: Props) => {
       <div style={{ ...styles.cardContainer, width: size, height: size }}>
         <div style={{ ...styles.previewContainer, width: size, height: size }}>
           <CheckeredBackground />
-          {isPrivateAsset ? (
+          {isPrivate ? (
             <AuthorizedAssetImage
               key={previewImageUrl}
               style={style}

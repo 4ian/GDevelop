@@ -9,8 +9,9 @@ import {
   type Asset,
   type Author,
   type ObjectAsset,
-  getAsset,
+  getPublicAsset,
   isPixelArt,
+  isPrivateAsset,
 } from '../Utils/GDevelopServices/Asset';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
@@ -32,6 +33,8 @@ import { SimilarAssetStoreSearchFilter } from './AssetStoreSearchFilter';
 import EmptyMessage from '../UI/EmptyMessage';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import Link from '../UI/Link';
+import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
+import AuthorizedAssetImage from './PrivateAssets/AuthorizedAssetImage';
 
 const FIXED_HEIGHT = 250;
 const FIXED_WIDTH = 300;
@@ -114,16 +117,29 @@ export const AssetDetails = ({
     setSelectedAnimationName,
   ] = React.useState<?string>(null);
   const [error, setError] = React.useState<?Error>(null);
+  const isPrivate = isPrivateAsset(assetShortHeader);
+  const { fetchPrivateAsset } = React.useContext(
+    PrivateAssetsAuthorizationContext
+  );
   const loadAsset = React.useCallback(
     () => {
       (async () => {
         try {
           // Reinitialise asset to trigger a loader and recalculate all parameters. (for instance zoom)
           setAsset(null);
-          const loadedAsset = await getAsset(assetShortHeader, {
-            environment,
-          });
+          const loadedAsset = isPrivate
+            ? await fetchPrivateAsset(assetShortHeader, {
+                environment,
+              })
+            : await getPublicAsset(assetShortHeader, {
+                environment,
+              });
+          if (!loadedAsset) {
+            console.error('Cannot load private asset');
+            throw new Error('Cannot load private asset');
+          }
           setAsset(loadedAsset);
+
           if (loadedAsset.objectType === 'sprite') {
             // Only sprites have animations and we select the first one.
             const firstAnimationName =
@@ -136,7 +152,7 @@ export const AssetDetails = ({
         }
       })();
     },
-    [assetShortHeader, environment]
+    [assetShortHeader, environment, isPrivate, fetchPrivateAsset]
   );
 
   const isImageResourceSmooth = React.useMemo(
@@ -254,9 +270,11 @@ export const AssetDetails = ({
             {asset ? (
               <>
                 {asset.objectType === 'sprite' &&
-                  animationResources &&
+                animationResources &&
+                typeof selectedAnimationName === 'string' && // Animation name can be empty string.
                   direction && (
                     <AnimationPreview
+                      animationName={selectedAnimationName}
                       resourceNames={animationResources.map(({ name }) => name)}
                       getImageResourceSource={(resourceName: string) => {
                         const resource = assetResources[resourceName];
@@ -271,15 +289,24 @@ export const AssetDetails = ({
                       initialZoom={140 / Math.max(asset.width, asset.height)}
                       fixedHeight={FIXED_HEIGHT}
                       fixedWidth={FIXED_WIDTH}
+                      isPrivate={isPrivate}
                     />
                   )}
                 {asset.objectType !== 'sprite' && (
                   <div style={styles.previewBackground}>
-                    <CorsAwareImage
-                      style={styles.previewImage}
-                      src={asset.previewImageUrls[0]}
-                      alt={asset.name}
-                    />
+                    {isPrivate ? (
+                      <AuthorizedAssetImage
+                        style={styles.previewImage}
+                        url={asset.previewImageUrls[0]}
+                        alt={asset.name}
+                      />
+                    ) : (
+                      <CorsAwareImage
+                        style={styles.previewImage}
+                        src={asset.previewImageUrls[0]}
+                        alt={asset.name}
+                      />
+                    )}
                   </div>
                 )}
               </>

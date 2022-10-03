@@ -1,14 +1,24 @@
 // @flow
 import React from 'react';
+import {
+  type AssetShortHeader,
+  type Asset,
+  type Environment,
+} from '../../Utils/GDevelopServices/Asset';
 
 export type PrivateAssetsState = {|
   authorizationToken: ?string,
-  fetchAuthorizationToken: () => Promise<void>,
+  updateAuthorizationToken: () => Promise<void>,
+  fetchPrivateAsset: (
+    assetShortHeader: AssetShortHeader,
+    options: {| environment: Environment |}
+  ) => Promise<?Asset>,
 |};
 
 const initialPrivateAssetsState = {
   authorizationToken: null,
-  fetchAuthorizationToken: async () => {},
+  updateAuthorizationToken: async () => {},
+  fetchPrivateAsset: async (assetShortHeader, options) => null,
 };
 
 const PrivateAssetsAuthorizationContext = React.createContext<PrivateAssetsState>(

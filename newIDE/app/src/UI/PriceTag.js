@@ -23,12 +23,19 @@ const useStyles = makeStyles(theme => {
       borderRadius: 4,
       padding: '2px 4px',
       backdropFilter: props =>
-        props.withOverlay ? 'brightness(40%)' : undefined,
+        props.withOverlay && theme.palette.type === 'light'
+          ? 'brightness(40%)'
+          : undefined,
       backgroundColor: props =>
-        props.withOverlay
+        props.withOverlay && theme.palette.type === 'light'
           ? undefined
+          : theme.palette.background.alternate.startsWith('#')
+          ? theme.palette.background.alternate + 'BB' // manually add opacity to the background hex color
           : theme.palette.background.alternate,
-      color: props => (props.withOverlay ? '#FAFAFA' : undefined),
+      color: props =>
+        props.withOverlay && theme.palette.type === 'light'
+          ? '#FAFAFA'
+          : undefined,
     },
   };
 });

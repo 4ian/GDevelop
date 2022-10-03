@@ -450,6 +450,16 @@ namespace gdjs {
         return runtimeScene.getLayer(layer).getDefaultZOrder();
       };
 
+      export const getLayerHighestZOrder = function (
+        runtimeScene: gdjs.RuntimeScene,
+        layer: string
+      ): number {
+        if (!runtimeScene.hasLayer(layer)) {
+          return 0;
+        }
+        return runtimeScene.getLayerHighestZOrder(layer);
+      };
+
       /**
        * @param layerName The lighting layer with the ambient color.
        * @param rgbColor The color, in RGB format ("128;200;255").

@@ -27,7 +27,7 @@ import PublicProfileDialog from '../Profile/PublicProfileDialog';
 import Link from '../UI/Link';
 import Mark from '../UI/CustomSvgIcons/Mark';
 import Cross from '../UI/CustomSvgIcons/Cross';
-import { Paper } from '@material-ui/core';
+import Paper from '@material-ui/core/Paper';
 import ResponsiveImagesGallery from '../UI/ResponsiveImagesGallery';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
@@ -54,6 +54,10 @@ const contentTypeToMessageDescriptor = {
   font: t`Fonts`,
   audio: t`Audios`,
   partial: t`Other`,
+};
+
+const styles = {
+  disabledText: { opacity: 0.6 },
 };
 
 const PrivateAssetPackDialog = ({
@@ -219,8 +223,15 @@ const PrivateAssetPackDialog = ({
                               </Text>
                             </LineStackLayout>
                             <LineStackLayout noMargin alignItems="center">
-                              <Cross fontSize="small" />
-                              <Text displayInlineAsSpan noMargin>
+                              <Cross
+                                fontSize="small"
+                                style={styles.disabledText}
+                              />
+                              <Text
+                                displayInlineAsSpan
+                                noMargin
+                                style={styles.disabledText}
+                              >
                                 <Trans>Redistribution &amp; reselling</Trans>
                               </Text>
                             </LineStackLayout>

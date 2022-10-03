@@ -593,8 +593,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddExpressionAndCondition("number",
                                  "LayerHighestZOrder",
                                  _("Highest Z order of a layer"),
-                                 _("the highest z order of a layer"),
-                                 _("the highest z order of layer _PARAM1_"),
+                                 _("the highest Z order of a layer"),
+                                 _("the highest Z order of layer _PARAM1_"),
                                  "",
                                  "res/conditions/layer.png")
       .AddCodeOnlyParameter("currentScene", "")

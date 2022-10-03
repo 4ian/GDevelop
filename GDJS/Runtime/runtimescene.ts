@@ -17,6 +17,8 @@ namespace gdjs {
     // Contains the instances living on the scene
     _instancesCache: Hashtable<RuntimeObject[]>;
 
+    // Contains the highest Z orders for each layer.
+    // If the layer contains no object, the layer does not appear in the hashtable.
     _layerHighestZOrders: Hashtable<number>;
 
     // Used to recycle destroyed instance instead of creating new ones.
@@ -1091,7 +1093,6 @@ namespace gdjs {
     }
 
     _setLayerHighestZOrder(layerName: string, zOrder: number) {
-      if (!this._layerHighestZOrders.containsKey(layerName)) return;
       this._layerHighestZOrders.put(layerName, zOrder);
     }
 

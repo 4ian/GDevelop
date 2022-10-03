@@ -5,7 +5,7 @@
  * * GDJS/tests/games/rotate-flip-around-center-point/ship-rotate-flip.json
  * * GDJS/tests/games/rotated-objects-hitboxes/game.json
  */
-describe.only('gdjs.SpriteRuntimeObject (using a PixiJS RuntimeGame with assets)', function() {
+describe('gdjs.SpriteRuntimeObject (using a PixiJS RuntimeGame with assets)', function() {
   const textureWidth = 64;
   const textureHeight = 64;
   const centerPointX = 64;

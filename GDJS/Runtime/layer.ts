@@ -403,8 +403,8 @@ namespace gdjs {
      * demand for efficiency reasons.
      */
     private _forceDimensionUpdate(): void {
-      this.getWidth();
-      this.getHeight();
+      // This will update dimensions.
+      this._runtimeScene.getViewportWidth();
     }
 
     /**

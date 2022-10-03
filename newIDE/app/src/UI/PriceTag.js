@@ -11,13 +11,18 @@ type Props = {|
   /**
    * To be used when the component is over an element for which
    * we don't control the background (e.g. an image).
-   * This component should logically be invariant to selected theme
-   * when this option is activated
    */
   withOverlay?: boolean,
 |};
 
 const useStyles = makeStyles(theme => {
+  /**
+   * Customize component with overlay:
+   * - for dark themes (light font color on dark background), theme values are used.
+   * - for light themes, we want to keep the same principle (a light font color on
+   *   a dark background) so we override Material UI behavior that would use a dark
+   *   font on a light background.
+   */
   return {
     container: {
       borderRadius: 4,

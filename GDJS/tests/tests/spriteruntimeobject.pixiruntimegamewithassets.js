@@ -388,4 +388,53 @@ describe('gdjs.SpriteRuntimeObject (using a PixiJS RuntimeGame with assets)', fu
       expect(object.getPointY("Origin")).to.be(0);
     });
   });
+
+  it('properly computes hitboxes and point positions after the layer camera has moved', function() {
+    return gdjs.getPixiRuntimeGameWithAssets().then(runtimeGame => {
+      const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+      runtimeScene.addLayer({
+        name: '',
+        visibility: true,
+        cameras: [],
+        effects: [],
+        ambientLightColorR: 0,
+        ambientLightColorG: 0,
+        ambientLightColorB: 0,
+        isLightingLayer: false,
+        followBaseLayerCamera: false,
+      });
+      const defaultLayer = runtimeScene.getLayer('');
+
+      // Create an object with a custom hitbox
+      const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
+
+      // Check the hitboxes and positions with default camera position
+      expect(object.getHitBoxes()[0].vertices[0]).to.eql([12.5 - originPointX, 1 - originPointY]);
+      expect(object.getHitBoxes()[0].vertices[1]).to.eql([41.5 - originPointX, 2 - originPointY]);
+      expect(object.getHitBoxes()[0].vertices[2]).to.eql([55.5 - originPointX, 31 - originPointY]);
+      expect(object.getHitBoxes()[0].vertices[3]).to.eql([24.5 - originPointX, 30 - originPointY]);
+
+      expect(object.getPointX("Center")).to.be(32);
+      expect(object.getPointY("Center")).to.be(15);
+
+      expect(object.getPointX("Origin")).to.be(0);
+      expect(object.getPointY("Origin")).to.be(0);
+
+      // Move the layer camera.
+      defaultLayer.setCameraX(2000);
+      defaultLayer.setCameraY(4000);
+      
+      // The object hitboxes and positions stay the same.
+      expect(object.getHitBoxes()[0].vertices[0]).to.eql([12.5 - originPointX, 1 - originPointY]);
+      expect(object.getHitBoxes()[0].vertices[1]).to.eql([41.5 - originPointX, 2 - originPointY]);
+      expect(object.getHitBoxes()[0].vertices[2]).to.eql([55.5 - originPointX, 31 - originPointY]);
+      expect(object.getHitBoxes()[0].vertices[3]).to.eql([24.5 - originPointX, 30 - originPointY]);
+
+      expect(object.getPointX("Center")).to.be(32);
+      expect(object.getPointY("Center")).to.be(15);
+
+      expect(object.getPointX("Origin")).to.be(0);
+      expect(object.getPointY("Origin")).to.be(0);
+    });
+  });
 });

@@ -83,14 +83,19 @@ describe('gdjs.RuntimeScene integration tests', function () {
   });
 
   describe('Layers (using a Sprite object)', function () {
-    it('should handle objects on layers', () => {
-      const runtimeGame = new gdjs.RuntimeGame({
+    /** @type {gdjs.RuntimeGame} */
+    let runtimeGame;
+    /** @type {gdjs.RuntimeScene} */
+    let runtimeScene;
+
+    beforeEach(() => {
+      runtimeGame = new gdjs.RuntimeGame({
         variables: [],
         // @ts-expect-error ts-migrate(2740) FIXME: Type '{ windowWidth: number; windowHeight: number;... Remove this comment to see the full error message
         properties: { windowWidth: 800, windowHeight: 600 },
         resources: { resources: [] },
       });
-      const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+      runtimeScene = new gdjs.RuntimeScene(runtimeGame);
       runtimeScene.loadFromScene({
         layers: [
           {
@@ -138,7 +143,9 @@ describe('gdjs.RuntimeScene integration tests', function () {
         ],
         instances: [],
       });
+    });
 
+    it('should handle objects on layers', () => {
       expect(runtimeScene.hasLayer('')).to.be(true);
       expect(runtimeScene.hasLayer('MyLayer')).to.be(true);
       expect(runtimeScene.hasLayer('MyOtherLayer')).to.be(false);
@@ -179,6 +186,52 @@ describe('gdjs.RuntimeScene integration tests', function () {
       expect(runtimeScene.hasLayer('')).to.be(true);
       expect(runtimeScene.hasLayer('MyLayer')).to.be(false);
       expect(runtimeScene.hasLayer('MyOtherLayer')).to.be(true);
+    });
+
+    it('should compute layers highest z orders correctly', () => {
+      expect(runtimeScene.hasLayer('')).to.be(true);
+      expect(runtimeScene.hasLayer('MyLayer')).to.be(true);
+
+      const object1 = runtimeScene.createObject('MyObject');
+      const object2 = runtimeScene.createObject('MyObject');
+      const object3 = runtimeScene.createObject('MyObject');
+      if (!object1 || !object2 || !object3) {
+        throw new Error('object should have been created');
+      }
+      expect(object2.getZOrder()).to.be(0);
+      object2.setLayer('MyLayer');
+
+      // Layers highest Z orders should stay at 0 if objects did not change Z their order
+      runtimeScene._updateObjectsPreRender();
+      expect(runtimeScene.getLayerHighestZOrder('MyLayer')).to.be(0);
+      expect(runtimeScene.getLayerHighestZOrder('')).to.be(0);
+
+      object2.setZOrder(8);
+
+      // Check highest Z order has been correctly updated for layers and they are stable
+      runtimeScene._updateObjectsPreRender();
+      expect(runtimeScene.getLayerHighestZOrder('MyLayer')).to.be(8);
+      expect(runtimeScene.getLayerHighestZOrder('')).to.be(0);
+      runtimeScene._updateObjectsPreRender();
+      expect(runtimeScene.getLayerHighestZOrder('MyLayer')).to.be(8);
+      expect(runtimeScene.getLayerHighestZOrder('')).to.be(0);
+
+      // Change Z orders for default layer
+      object1.setZOrder(13);
+      object3.setZOrder(25);
+
+      runtimeScene._updateObjectsPreRender();
+      expect(runtimeScene.getLayerHighestZOrder('MyLayer')).to.be(8);
+      expect(runtimeScene.getLayerHighestZOrder('')).to.be(25);
+
+      // Check highest z orders come back to 0 after objects deletion
+      runtimeScene.markObjectForDeletion(object1);
+      runtimeScene.markObjectForDeletion(object2);
+      runtimeScene.markObjectForDeletion(object3);
+
+      runtimeScene._updateObjectsPreRender();
+      expect(runtimeScene.getLayerHighestZOrder('MyLayer')).to.be(0);
+      expect(runtimeScene.getLayerHighestZOrder('')).to.be(0);
     });
   });
 });

@@ -35,7 +35,7 @@ export const Default = () => (
           alignItems: 'flex-start',
         }}
       >
-        <PriceTag value={1200} transparentBackground />
+        <PriceTag value={1200} withOverlay />
       </div>
     </LineStackLayout>
   </ColumnStackLayout>

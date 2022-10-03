@@ -590,6 +590,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("expression", _("New default Z order"));
 
   extension
+      .AddExpressionAndCondition("number",
+                                 "LayerHighestZOrder",
+                                 _("Highest Z order of a layer"),
+                                 _("the highest z order of a layer"),
+                                 _("the highest z order of layer _PARAM1_"),
+                                 "",
+                                 "res/conditions/layer.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .UseStandardParameters("number");
+
+  extension
       .AddAction(
           "SetLayerAmbientLightColor",
           _("Set the ambient light color"),

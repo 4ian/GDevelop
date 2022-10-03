@@ -7,7 +7,10 @@ import paperDecorator from '../../../PaperDecorator';
 import { testProject } from '../../../GDevelopJsInitializerDecorator';
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
 import { AssetStore } from '../../../../AssetStore';
-import { fakeAssetPacks, fakeIndieAuthenticatedUser } from '../../../../fixtures/GDevelopServicesTestData';
+import {
+  fakeAssetPacks,
+  fakeIndieAuthenticatedUser,
+} from '../../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 
 export default {

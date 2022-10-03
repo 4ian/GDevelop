@@ -132,9 +132,7 @@ const PrivateAssetPackDialog = ({
             fullHeight
           >
             {errorText ? (
-              <AlertMessage kind="error">
-                <Text>{errorText}</Text>
-              </AlertMessage>
+              <AlertMessage kind="error">{errorText}</AlertMessage>
             ) : isFetchingDetails ? (
               <>
                 <Text size="title">{name}</Text>

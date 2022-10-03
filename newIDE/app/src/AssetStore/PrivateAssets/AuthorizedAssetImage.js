@@ -2,17 +2,28 @@
 import * as React from 'react';
 import PrivateAssetsAuthorizationContext from './PrivateAssetsAuthorizationContext';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
+import { createAuthorizedUrl } from '../../Utils/GDevelopServices/Shop';
 
 type Props = {|
   url: string,
   style?: Object,
   alt: string,
+  onError?: () => void,
+  onLoad?: (e: any) => void,
+  hideLoader?: boolean,
 |};
 
-const AuthorizedAssetImage = (props: Props) => {
+const AuthorizedAssetImage = ({
+  url,
+  style,
+  alt,
+  onError,
+  onLoad,
+  hideLoader,
+}: Props) => {
   const [authorizedUrl, setAuthorizedUrl] = React.useState(null);
   const [isImageLoaded, setIsImageLoaded] = React.useState(false);
-  const { authorizationToken, fetchAuthorizationToken } = React.useContext(
+  const { authorizationToken, updateAuthorizationToken } = React.useContext(
     PrivateAssetsAuthorizationContext
   );
   const [tries, setTries] = React.useState(0);
@@ -25,41 +36,68 @@ const AuthorizedAssetImage = (props: Props) => {
       if (isImageLoaded) return;
 
       if (!authorizationToken) {
-        fetchAuthorizationToken();
+        updateAuthorizationToken();
       } else {
-        setAuthorizedUrl(
-          props.url + '?token=' + encodeURIComponent(authorizationToken)
-        );
+        setAuthorizedUrl(createAuthorizedUrl(url, authorizationToken));
       }
     },
-    [authorizationToken, fetchAuthorizationToken, props.url, isImageLoaded]
+    [authorizationToken, updateAuthorizationToken, url, isImageLoaded]
   );
 
+  // React.useEffect(
+  //   () => {
+  //     // Ensure we reset the loaded status when the URL changes.
+  //     // Useful when used in the AnimationPreview.
+  //     if (url) {
+  //       setIsImageLoaded(false);
+  //     }
+  //   },
+  //   [url]
+  // );
+
   const onFetchingError = () => {
-    setIsImageLoaded(false);
-    // If the image is not authorized, fetch a new authorization token.
-    if (tries < 3) {
-      console.info('Error while fetching image, fetching a new token...');
-      fetchAuthorizationToken();
-      setTries(tries + 1);
+    console.warn('Error while fetching authorized image');
+    if (tries >= 3) {
+      if (onError) onError();
+      return;
     }
+    if (!hideLoader) {
+      setIsImageLoaded(false);
+    }
+    // If the image is not authorized, fetch a new authorization token.
+    console.info('Error while fetching image, fetching a new token...');
+    updateAuthorizationToken();
+    setTries(tries + 1);
+  };
+
+  const onImageLoaded = (e: any) => {
+    if (!hideLoader) {
+      setIsImageLoaded(true);
+    }
+    if (onLoad) onLoad(e);
   };
 
   return (
     <>
       <img
-        alt={props.alt}
+        alt={alt}
         src={authorizedUrl}
         style={{
-          ...props.style,
+          ...style,
           // Use display none to load the image in the background, but not
           // display it. Once loaded, display it and hide loader.
-          display: isImageLoaded ? 'block' : 'none',
+          // When used inside an animation preview, the image keep changing,
+          // and the browser will sometimes reload the image even if it's already been loaded.
+          // There is hidden magic in the browser to display the previously loaded image, while
+          // the next call is being made, to avoid a flickering.
+          // This is why, it's important to not display a loader or hide the image,
+          // when used in an animation.
+          display: !hideLoader && !isImageLoaded ? 'none' : 'block',
         }}
         onError={onFetchingError}
-        onLoad={() => setIsImageLoaded(true)}
+        onLoad={onImageLoaded}
       />
-      {!isImageLoaded && <PlaceholderLoader />}
+      {!hideLoader && !isImageLoaded && <PlaceholderLoader />}
     </>
   );
 };

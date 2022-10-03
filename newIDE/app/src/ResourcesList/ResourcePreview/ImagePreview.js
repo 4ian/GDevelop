@@ -17,6 +17,7 @@ import CheckeredBackground from '../CheckeredBackground';
 import { getPixelatedImageRendering } from '../../Utils/CssHelpers';
 import { shouldZoom } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import Slider from '../../UI/Slider';
+import AuthorizedAssetImage from '../../AssetStore/PrivateAssets/AuthorizedAssetImage';
 const gd: libGDevelop = global.gd;
 
 const MARGIN = 50;
@@ -36,6 +37,7 @@ const styles = {
     overflow: 'hidden',
   },
   imagePreviewContainer: {
+    display: 'flex',
     position: 'relative',
     width: '100%',
     height: '100%',
@@ -77,6 +79,9 @@ type Props = {|
   onSize?: (number, number) => void,
   hideCheckeredBackground?: boolean,
   hideControls?: boolean,
+  isPrivate?: boolean,
+  onImageLoaded?: () => void,
+  hideLoader?: boolean,
 |};
 
 export const isProjectImageResourceSmooth = (
@@ -105,6 +110,9 @@ const ImagePreview = ({
   hideCheckeredBackground,
   hideControls,
   initialZoom,
+  isPrivate,
+  onImageLoaded,
+  hideLoader,
 }: Props) => {
   const [errored, setErrored] = React.useState(false);
   const [imageWidth, setImageWidth] = React.useState(null);
@@ -148,6 +156,7 @@ const ImagePreview = ({
     setImageHeight(newImageHeight);
     setImageWidth(newImageWidth);
     if (onSize) onSize(newImageWidth, newImageHeight);
+    if (onImageLoaded) onImageLoaded();
   };
 
   const zoomBy = (imageZoomFactorDelta: number) => {
@@ -304,15 +313,25 @@ const ImagePreview = ({
                     </Text>
                   </PlaceholderMessage>
                 )}
-                {!errored && (
-                  <CorsAwareImage
-                    style={imageStyle}
-                    alt={resourceName}
-                    src={imageResourceSource}
-                    onError={handleImageError}
-                    onLoad={handleImageLoaded}
-                  />
-                )}
+                {!errored &&
+                  (isPrivate ? (
+                    <AuthorizedAssetImage
+                      style={imageStyle}
+                      alt={resourceName}
+                      url={imageResourceSource}
+                      onError={handleImageError}
+                      onLoad={handleImageLoaded}
+                      hideLoader={hideLoader}
+                    />
+                  ) : (
+                    <CorsAwareImage
+                      style={imageStyle}
+                      alt={resourceName}
+                      src={imageResourceSource}
+                      onError={handleImageError}
+                      onLoad={handleImageLoaded}
+                    />
+                  ))}
                 {imageLoaded && renderOverlay && <div style={frameStyle} />}
                 {imageLoaded && renderOverlay && (
                   <div style={overlayStyle}>

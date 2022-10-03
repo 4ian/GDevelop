@@ -174,7 +174,6 @@ export default function NewObjectDialog({
             id: openedAssetShortHeader.id,
             name: openedAssetShortHeader.name,
           });
-          console.log('Asset successfully installed.');
 
           installOutput.createdObjects.forEach(object => {
             onObjectAddedFromAsset(object);

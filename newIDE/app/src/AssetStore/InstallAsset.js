@@ -3,7 +3,7 @@ import {
   type Asset,
   type AssetShortHeader,
   type Environment,
-  getAsset,
+  getPublicAsset,
   isPixelArt,
 } from '../Utils/GDevelopServices/Asset';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -372,7 +372,7 @@ export const installAsset = async ({
   objectsContainer,
   environment,
 }: InstallAssetArgs): Promise<InstallAssetOutput> => {
-  const asset = await getAsset(assetShortHeader, { environment });
+  const asset = await getPublicAsset(assetShortHeader, { environment });
   const requiredBehaviors = getRequiredBehaviorsFromAsset(asset);
   const missingBehaviors = filterMissingBehaviors(gd, requiredBehaviors);
   const serializedExtensions = await downloadExtensions([

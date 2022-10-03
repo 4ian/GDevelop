@@ -80,3 +80,7 @@ export const getAuthorizationTokenForPrivateAssets = async (
   );
   return response.data;
 };
+
+export const createAuthorizedUrl = (url: string, token: string): string => {
+  return url + '?token=' + encodeURIComponent(token);
+};

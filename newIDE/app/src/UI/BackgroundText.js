@@ -16,6 +16,7 @@ const BackgroundText = (props: Props) => (
       <Typography
         variant="body2"
         align="center"
+        component="div"
         style={{
           opacity: 0.6,
           textShadow: `1px 1px 0px ${muiTheme.emptyMessage.shadowColor}`,

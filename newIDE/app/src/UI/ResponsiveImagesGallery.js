@@ -47,6 +47,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
+  disabledText: { opacity: 0.6 },
 };
 
 const GRID_SPACING = 1;
@@ -188,7 +189,7 @@ const ResponsiveImagesGallery = ({
           )}
         </Measure>
         <Line justifyContent="center">
-          <Text noMargin size="body2">
+          <Text noMargin size="body2" style={styles.disabledText}>
             {currentlyViewedImageIndex + 1}/{imagesUrls.length}
           </Text>
         </Line>

@@ -7,6 +7,7 @@ import GridList from '@material-ui/core/GridList';
 import Paper from '@material-ui/core/Paper';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import Text from '../UI/Text';
+import PriceTag from '../UI/PriceTag';
 import type { AssetPacks, AssetPack } from '../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
@@ -21,12 +22,19 @@ const cellSpacing = 2;
 
 const styles = {
   grid: { margin: '0 10px' },
+  priceTagContainer: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    cursor: 'default',
+  },
   previewImage: {
     width: '100%',
     // Prevent cumulative layout shift by enforcing
     // the 16:9 ratio.
     aspectRatio: '16 / 9',
     objectFit: 'cover',
+    position: 'relative',
   },
   cardContainer: {
     overflow: 'hidden',
@@ -150,6 +158,9 @@ const PrivateAssetPackTile = ({
           src={assetPack.thumbnailUrls[0]}
           alt={`Preview image of asset pack ${assetPack.name}`}
         />
+        <div style={styles.priceTagContainer}>
+          <PriceTag value={assetPack.prices[0].value} withOverlay />
+        </div>
         <Column>
           <Line justifyContent="space-between" noMargin>
             <Text style={styles.packTitle} size="body2">

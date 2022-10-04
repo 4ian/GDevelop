@@ -7,7 +7,11 @@ import paperDecorator from '../../../PaperDecorator';
 import { testProject } from '../../../GDevelopJsInitializerDecorator';
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
 import { AssetStore } from '../../../../AssetStore';
-import { fakeAssetPacks } from '../../../../fixtures/GDevelopServicesTestData';
+import {
+  fakeAssetPacks,
+  fakeIndieAuthenticatedUser,
+} from '../../../../fixtures/GDevelopServicesTestData';
+import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 
 export default {
   title: 'AssetStore/AssetStore',
@@ -38,17 +42,21 @@ const apiDataFakePacks = {
 };
 
 export const Default = () => (
-  <AssetStoreStateProvider>
-    <AssetStore project={testProject.project} />
-  </AssetStoreStateProvider>
+  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AssetStoreStateProvider>
+      <AssetStore project={testProject.project} />
+    </AssetStoreStateProvider>
+  </AuthenticatedUserContext.Provider>
 );
 Default.decorators = [withMock];
 Default.parameters = apiDataFakePacks;
 
 export const LoadingError = () => (
-  <AssetStoreStateProvider>
-    <AssetStore project={testProject.project} />
-  </AssetStoreStateProvider>
+  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AssetStoreStateProvider>
+      <AssetStore project={testProject.project} />
+    </AssetStoreStateProvider>
+  </AuthenticatedUserContext.Provider>
 );
 LoadingError.decorators = [withMock];
 LoadingError.parameters = apiDataServerSideError;

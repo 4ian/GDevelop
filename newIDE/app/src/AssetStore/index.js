@@ -34,6 +34,8 @@ import { AssetDetails } from './AssetDetails';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Home from '@material-ui/icons/Home';
 import PrivateAssetPackDialog from './PrivateAssetPackDialog';
+import PlaceholderError from '../UI/PlaceholderError';
+import AlertMessage from '../UI/AlertMessage';
 
 type Props = {|
   project: gdProject,
@@ -265,9 +267,9 @@ export const AssetStore = ({ project }: Props) => {
                     )}
                   </Background>
                 )}
-                {isOnHomePage && !(assetPacks && privateAssetPacks) && (
-                  <PlaceholderLoader />
-                )}
+                {isOnHomePage &&
+                  !(assetPacks && privateAssetPacks) &&
+                  !error && <PlaceholderLoader />}
                 {isOnHomePage &&
                   assetPacks &&
                   privateAssetPacks &&
@@ -299,6 +301,16 @@ export const AssetStore = ({ project }: Props) => {
                       />
                     }
                   />
+                )}
+                {isOnHomePage && error && (
+                  <PlaceholderError onRetry={fetchAssetsAndFilters}>
+                    <AlertMessage kind="error">
+                      <Trans>
+                        An error occurred when fetching the asset store content.
+                        Please try again later.
+                      </Trans>
+                    </AlertMessage>
+                  </PlaceholderError>
                 )}
                 {openedAssetShortHeader && (
                   <AssetDetails

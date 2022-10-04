@@ -34,7 +34,7 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/all-features/filesystem')
-      .setCategory('Device');
+      .setCategory('Advanced');
     extension
       .addInstructionOrExpressionGroupMetadata(_('File system'))
       .setIcon('JsPlatform/Extensions/filesystem_create_folder32.png');

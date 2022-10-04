@@ -35,7 +35,8 @@ module.exports = {
         'Aurélien Vivet',
         'Open source (MIT License)'
       )
-      .setExtensionHelpPath('/objects/bitmap_text');
+      .setExtensionHelpPath('/objects/bitmap_text')
+      .setCategory('User interface');
 
     const bitmapTextObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError
@@ -171,7 +172,7 @@ module.exports = {
       .addIncludeFile(
         'Extensions/BitmapText/bitmaptextruntimeobject-pixi-renderer.js'
       )
-      .setCategoryFullName(_('Texts'));
+      .setCategoryFullName(_('User interface'));
 
     object
       .addExpressionAndConditionAndAction(

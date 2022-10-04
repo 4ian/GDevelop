@@ -34,7 +34,7 @@ module.exports = {
         'MIT'
       )
       .setExtensionHelpPath('/behaviors/physics2')
-      .setCategory('Advanced');
+      .setCategory('Movement');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Physics Engine 2.0'))
       .setIcon('res/physics32.png');

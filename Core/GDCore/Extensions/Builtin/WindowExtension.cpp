@@ -20,6 +20,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
           "these features can be applied.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetCategory("User interface")
       .SetExtensionHelpPath("/all-features/window");
   extension
       .AddInstructionOrExpressionGroupMetadata(

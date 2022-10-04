@@ -32,7 +32,8 @@ module.exports = {
       'This provides a light object, and a behavior to mark other objects as being obstacles for the lights. This is a great way to create a special atmosphere to your game, along with effects, make it more realistic or to create gameplays based on lights.',
       'Harsimran Virk',
       'MIT'
-    );
+    )
+    .setCategory('Visual effect');
 
     const lightObstacleBehavior = new gd.BehaviorJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
@@ -195,7 +196,7 @@ module.exports = {
       .setIncludeFile('Extensions/Lighting/lightruntimeobject.js')
       .addIncludeFile('Extensions/Lighting/lightruntimeobject-pixi-renderer.js')
       .addIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js')
-      .setCategoryFullName(_('Lights'));
+      .setCategoryFullName(_('Visual effect'));
 
     object
       .addAction(

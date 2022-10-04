@@ -858,6 +858,7 @@ module.exports = {
         'Todor Imreorov',
         'Open source (MIT License)'
       )
+      .setCategory('Advanced')
       .setExtensionHelpPath('/objects/tilemap');
 
       defineTileMap(extension, _, gd);

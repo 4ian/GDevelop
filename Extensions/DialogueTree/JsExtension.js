@@ -34,7 +34,7 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/all-features/dialogue-tree')
-      .setCategory('Advanced');
+      .setCategory('Game mechanic');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Dialogue Tree (experimental)'))
       .setIcon('JsPlatform/Extensions/yarn32.png');

@@ -33,6 +33,7 @@ module.exports = {
         'Aurélien Vivet',
         'Open source (MIT License)'
       )
+      .setCategory('User interface')
       .setExtensionHelpPath('/objects/video');
 
     var videoObject = new gd.ObjectJsImplementation();
@@ -133,7 +134,7 @@ module.exports = {
       )
       .setIncludeFile('Extensions/Video/videoruntimeobject.js')
       .addIncludeFile('Extensions/Video/videoruntimeobject-pixi-renderer.js')
-      .setCategoryFullName(_('Multimedia'));
+      .setCategoryFullName(_('User interface'));
 
     object
       .addAction(

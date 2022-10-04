@@ -338,6 +338,7 @@ namespace gdjs {
      * @param stringVar Variable where to store the content
      * @param loadPath Path to the file
      * @param resultVar The variable where to store the result of the operation
+     * @param removeCRCharacters If true, will remove \r characters usually added by Windows when editing files
      */
     export const loadStringFromFile = function (
       stringVar: gdjs.Variable,
@@ -371,6 +372,7 @@ namespace gdjs {
      * @param variable Variable to store the variable
      * @param loadPath Path to the file
      * @param resultVar The variable where to store the result of the operation
+     * @param removeCRCharacters If true, will remove \r characters usually added by Windows when editing files
      */
     export const loadVariableFromJSONFile = function (
       variable: gdjs.Variable,
@@ -406,6 +408,7 @@ namespace gdjs {
      * @param variable Variable to store the variable
      * @param loadPath Path to the file
      * @param resultVar The variable where to store the result of the operation
+     * @param removeCRCharacters If true, will remove \r characters usually added by Windows when editing files
      */
     export const loadVariableFromJSONFileAsync = function (
       variable: gdjs.Variable,
@@ -440,6 +443,7 @@ namespace gdjs {
      * @param stringVar Variable where to store the content
      * @param loadPath Path to the file
      * @param resultVar The variable where to store the result of the operation
+     * @param removeCRCharacters If true, will remove \r characters usually added by Windows when editing files
      */
     export const loadStringFromFileAsync = function (
       stringVar: gdjs.Variable,

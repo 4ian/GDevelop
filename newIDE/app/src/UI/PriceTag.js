@@ -52,13 +52,13 @@ function PriceTag({ value, withOverlay }: Props) {
       {({ i18n }) => (
         <div className={classes.container}>
           <Text noMargin size="sub-title" color="inherit">
+            €
             {i18n
               .number(value / 100, {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })
               .replace(/\D00$/, '')}
-            EUR
           </Text>
         </div>
       )}

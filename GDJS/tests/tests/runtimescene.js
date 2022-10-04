@@ -198,10 +198,9 @@ describe('gdjs.RuntimeScene integration tests', function () {
       if (!object1 || !object2 || !object3) {
         throw new Error('object should have been created');
       }
-      expect(object2.getZOrder()).to.be(0);
       object2.setLayer('MyLayer');
 
-      // Layers highest Z orders should stay at 0 if objects did not change Z their order
+      // Layers highest Z orders should stay at 0 if objects did not change their Z order
       runtimeScene._updateObjectsPreRender();
       expect(runtimeScene.getLayer('MyLayer').getHighestZOrder()).to.be(0);
       expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(0);
@@ -216,7 +215,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
       expect(runtimeScene.getLayer('MyLayer').getHighestZOrder()).to.be(8);
       expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(0);
 
-      // Change Z orders for default layer
+      // Change default layer objects Z orders
       object1.setZOrder(13);
       object3.setZOrder(25);
 
@@ -224,8 +223,19 @@ describe('gdjs.RuntimeScene integration tests', function () {
       expect(runtimeScene.getLayer('MyLayer').getHighestZOrder()).to.be(8);
       expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(25);
 
-      // Check highest z orders come back to 0 after objects deletion
+      // Move object in front of the highest
+      object1.setZOrder(30)
+
+      runtimeScene._updateObjectsPreRender();
+      expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(30);
+
+      // Delete highest Z order object
       runtimeScene.markObjectForDeletion(object1);
+
+      runtimeScene._updateObjectsPreRender();
+      expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(25);
+
+      // Check highest z orders come back to 0 after objects deletion
       runtimeScene.markObjectForDeletion(object2);
       runtimeScene.markObjectForDeletion(object3);
 

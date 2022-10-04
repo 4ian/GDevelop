@@ -714,9 +714,12 @@ namespace gdjs {
       }
       this.zOrder = z;
       const rendererObject = this.getRendererObject();
+      const theLayer = this._runtimeScene.getLayer(this.layer);
       if (rendererObject) {
-        const theLayer = this._runtimeScene.getLayer(this.layer);
         theLayer.getRenderer().changeRendererObjectZOrder(rendererObject, z);
+      }
+      if (z > theLayer.getHighestZOrder()) {
+        theLayer._setHighestZOrder(z);
       }
     }
 

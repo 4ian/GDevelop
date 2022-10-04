@@ -204,7 +204,7 @@ export default function NewObjectDialog({
                 environment,
               });
           if (!installOutput) {
-            throw new Error('Unable to install private Asset Pack.');
+            throw new Error('Unable to install private Asset.');
           }
           sendAssetAddedToProject({
             id: openedAssetShortHeader.id,

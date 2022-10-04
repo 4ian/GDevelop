@@ -5,9 +5,9 @@ import {
   getRequiredBehaviorsFromAsset,
   filterMissingBehaviors,
   downloadExtensions,
-  installAsset,
   filterMissingExtensions,
   sanitizeObjectName,
+  installPublicAsset,
 } from './InstallAsset';
 import { makeTestProject } from '../fixtures/TestProject';
 import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
@@ -574,7 +574,7 @@ describe('InstallAsset', () => {
 
   describe('installAsset', () => {
     beforeEach(() => {
-      mockFn(Asset.getAsset).mockReset();
+      mockFn(Asset.getPublicAsset).mockReset();
       mockFn(getExtensionsRegistry).mockReset();
       mockFn(getExtension).mockReset();
     });
@@ -595,12 +595,12 @@ describe('InstallAsset', () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
       const layout = project.insertNewLayout('MyTestLayout', 0);
-      mockFn(Asset.getAsset).mockImplementationOnce(() => {
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(() => {
         throw new Error('Fake error - unable to download');
       });
 
       await expect(
-        installAsset({
+        installPublicAsset({
           assetShortHeader: fakeAssetShortHeader1,
           project,
           objectsContainer: layout,
@@ -621,7 +621,7 @@ describe('InstallAsset', () => {
       const layout = project.insertNewLayout('MyTestLayout', 0);
 
       // Get an asset that uses a behavior...
-      mockFn(Asset.getAsset).mockImplementationOnce(
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(
         () => fakeAssetWithUnknownBehaviorCustomizations1
       );
 
@@ -638,7 +638,7 @@ describe('InstallAsset', () => {
 
       // Check that the extension is stated as not found in the registry
       await expect(
-        installAsset({
+        installPublicAsset({
           assetShortHeader: fakeAssetShortHeader1,
           project,
           objectsContainer: layout,
@@ -659,7 +659,7 @@ describe('InstallAsset', () => {
       const layout = project.insertNewLayout('MyTestLayout', 0);
 
       // Get an asset that uses a behavior...
-      mockFn(Asset.getAsset).mockImplementationOnce(
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(
         () => fakeAssetWithFlashBehaviorCustomizations1
       );
 
@@ -681,7 +681,7 @@ describe('InstallAsset', () => {
       // Verify that, because we use `mockEventsFunctionsExtensionsState`, the
       // extension won't be loaded, so the behavior won't be installed.
       await expect(
-        installAsset({
+        installPublicAsset({
           assetShortHeader: fakeAssetShortHeader1,
           project,
           objectsContainer: layout,
@@ -703,12 +703,12 @@ describe('InstallAsset', () => {
 
       // Fake an asset with a behavior of type "FakeBehavior::FakeBehavior",
       // that is installed already.
-      mockFn(Asset.getAsset).mockImplementationOnce(
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(
         () => fakeAssetWithBehaviorCustomizations1
       );
 
       // Install the asset
-      await installAsset({
+      await installPublicAsset({
         assetShortHeader: fakeAssetShortHeader1,
         project,
         objectsContainer: layout,

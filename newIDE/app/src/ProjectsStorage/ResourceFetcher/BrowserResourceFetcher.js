@@ -6,6 +6,7 @@ import {
   type FetchAllProjectResourcesFunction,
 } from './index';
 import CloudStorageProvider from '../CloudStorageProvider';
+import { moveUrlResourcesToCloudFilesIfPrivate } from '../CloudStorageProvider/CloudResourceMover';
 import GoogleDriveStorageProvider from '../GoogleDriveStorageProvider';
 import UrlStorageProvider from '../UrlStorageProvider';
 import { fetchRelativeResourcesToFullUrls } from '../UrlStorageProvider/UrlResourceFetcher';
@@ -19,9 +20,9 @@ const fetchNothing: FetchAllProjectResourcesFunction = async () => {
 const fetchers: {
   [string]: FetchAllProjectResourcesFunction,
 } = {
-  // The cloud storage has nothing to fetch, all resources are supposed
-  // to be public URLs or URLs on GDevelop Cloud, accessed with a cookie.
-  [CloudStorageProvider.internalName]: fetchNothing,
+  // The Cloud file storage provider fetches the resources that are
+  // private URLs by downloading them and reuploading them to the cloud.
+  [CloudStorageProvider.internalName]: moveUrlResourcesToCloudFilesIfPrivate,
   // The cloud storage has nothing to fetch, all resources are supposed
   // to be public URLs.
   [GoogleDriveStorageProvider.internalName]: fetchNothing,

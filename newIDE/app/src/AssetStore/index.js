@@ -303,7 +303,7 @@ export const AssetStore = ({ project }: Props) => {
                   />
                 )}
                 {isOnHomePage && error && (
-                  <PlaceholderError>
+                  <PlaceholderError onRetry={fetchAssetsAndFilters}>
                     <AlertMessage kind="error">
                       <Trans>
                         An error occurred when fetching the asset store content.

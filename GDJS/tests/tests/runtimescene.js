@@ -203,26 +203,26 @@ describe('gdjs.RuntimeScene integration tests', function () {
 
       // Layers highest Z orders should stay at 0 if objects did not change Z their order
       runtimeScene._updateObjectsPreRender();
-      expect(runtimeScene.getLayerHighestZOrder('MyLayer')).to.be(0);
-      expect(runtimeScene.getLayerHighestZOrder('')).to.be(0);
+      expect(runtimeScene.getLayer('MyLayer').getHighestZOrder()).to.be(0);
+      expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(0);
 
       object2.setZOrder(8);
 
       // Check highest Z order has been correctly updated for layers and they are stable
       runtimeScene._updateObjectsPreRender();
-      expect(runtimeScene.getLayerHighestZOrder('MyLayer')).to.be(8);
-      expect(runtimeScene.getLayerHighestZOrder('')).to.be(0);
+      expect(runtimeScene.getLayer('MyLayer').getHighestZOrder()).to.be(8);
+      expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(0);
       runtimeScene._updateObjectsPreRender();
-      expect(runtimeScene.getLayerHighestZOrder('MyLayer')).to.be(8);
-      expect(runtimeScene.getLayerHighestZOrder('')).to.be(0);
+      expect(runtimeScene.getLayer('MyLayer').getHighestZOrder()).to.be(8);
+      expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(0);
 
       // Change Z orders for default layer
       object1.setZOrder(13);
       object3.setZOrder(25);
 
       runtimeScene._updateObjectsPreRender();
-      expect(runtimeScene.getLayerHighestZOrder('MyLayer')).to.be(8);
-      expect(runtimeScene.getLayerHighestZOrder('')).to.be(25);
+      expect(runtimeScene.getLayer('MyLayer').getHighestZOrder()).to.be(8);
+      expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(25);
 
       // Check highest z orders come back to 0 after objects deletion
       runtimeScene.markObjectForDeletion(object1);
@@ -230,8 +230,8 @@ describe('gdjs.RuntimeScene integration tests', function () {
       runtimeScene.markObjectForDeletion(object3);
 
       runtimeScene._updateObjectsPreRender();
-      expect(runtimeScene.getLayerHighestZOrder('MyLayer')).to.be(0);
-      expect(runtimeScene.getLayerHighestZOrder('')).to.be(0);
+      expect(runtimeScene.getLayer('MyLayer').getHighestZOrder()).to.be(0);
+      expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(0);
     });
   });
 });

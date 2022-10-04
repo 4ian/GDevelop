@@ -4,12 +4,10 @@ import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import EventsBasedObjectEditor from './index';
 import HelpButton from '../UI/HelpButton';
-import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 
 type Props = {|
   onApply: () => void,
   project: gdProject,
-  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
   globalObjectsContainer: gdObjectsContainer,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
@@ -55,7 +53,6 @@ export default class EventsBasedObjectEditorDialog extends React.Component<
       >
         <EventsBasedObjectEditor
           project={project}
-          onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
           globalObjectsContainer={globalObjectsContainer}
           eventsFunctionsExtension={eventsFunctionsExtension}
           eventsBasedObject={eventsBasedObject}

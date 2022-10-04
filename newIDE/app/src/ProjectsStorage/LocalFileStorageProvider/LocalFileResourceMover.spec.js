@@ -71,7 +71,7 @@ describe('LocalResourceMover', () => {
     ).toHaveBeenCalledWith(
       'local-file-download',
       'http://example/file-to-download.png',
-      path.join('assets', 'file-to-download.png')
+      path.join('assets', 'image', 'file-to-download.png')
     );
     expect(fetchedResources.erroredResources).toEqual([]);
   });
@@ -102,7 +102,7 @@ describe('LocalResourceMover', () => {
     ).toHaveBeenCalledWith(
       'local-file-download',
       'http://example/file-to-download.png',
-      path.join('assets', 'file-to-download.png')
+      path.join('assets', 'image', 'file-to-download.png')
     );
     expect(fetchedResources.erroredResources).toEqual([
       { resourceName: 'MyResourceToDownload', error: expect.any(Error) },
@@ -138,7 +138,7 @@ describe('LocalResourceMover', () => {
       1,
       'local-file-download',
       'http://example/file-to-download.png',
-      path.join('assets', 'file-to-download.png')
+      path.join('assets', 'image', 'file-to-download.png')
     );
     expect(
       optionalRequire.mockElectron.ipcRenderer.invoke
@@ -146,7 +146,7 @@ describe('LocalResourceMover', () => {
       2,
       'local-file-download',
       'http://example/file-to-download.png',
-      path.join('assets', 'file-to-download.png')
+      path.join('assets', 'image', 'file-to-download.png')
     );
     expect(fetchedResources.erroredResources).toEqual([]);
   });

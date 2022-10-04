@@ -12,7 +12,7 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { findGDJS } from '../../GameEngineFinder/LocalGDJSFinder';
 import { archiveLocalFolder } from '../../Utils/LocalArchiver';
 import optionalRequire from '../../Utils/OptionalRequire';
-import localFileSystem from './LocalFileSystem';
+import LocalFileSystem, { type UrlFileDescriptor } from './LocalFileSystem';
 import {
   type ExportPipeline,
   type ExportPipelineContext,
@@ -21,17 +21,20 @@ import {
   type ExportState,
   SetupExportHeader,
 } from '../GenericExporters/OnlineCordovaExport';
+import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const gd: libGDevelop = global.gd;
 
 type PreparedExporter = {|
   exporter: gdjsExporter,
+  localFileSystem: LocalFileSystem,
   temporaryOutputDir: string,
 |};
 
 type ExportOutput = {|
   temporaryOutputDir: string,
+  urlFiles: Array<UrlFileDescriptor>,
 |};
 
 type ResourcesDownloadOutput = {|
@@ -79,6 +82,9 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
     return findGDJS().then(({ gdjsRoot }) => {
       console.info('GDJS found in ', gdjsRoot);
 
+      const localFileSystem = new LocalFileSystem({
+        downloadUrlsToLocalFiles: true,
+      });
       const fileSystem = assignIn(
         new gd.AbstractFileSystemJS(),
         localFileSystem
@@ -93,14 +99,15 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
 
       return {
         exporter,
+        localFileSystem,
         temporaryOutputDir,
       };
     });
   },
 
-  launchExport: (
+  launchExport: async (
     context: ExportPipelineContext<ExportState>,
-    { exporter, temporaryOutputDir }: PreparedExporter
+    { exporter, localFileSystem, temporaryOutputDir }: PreparedExporter
   ): Promise<ExportOutput> => {
     const exportOptions = new gd.MapStringBoolean();
     exportOptions.set('exportForCordova', true);
@@ -112,14 +119,22 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
     exportOptions.delete();
     exporter.delete();
 
-    return Promise.resolve({ temporaryOutputDir });
+    return { temporaryOutputDir,
+      urlFiles: localFileSystem.getAllUrlFilesIn(temporaryOutputDir),
+     };
   },
 
-  launchResourcesDownload: (
+  launchResourcesDownload: async (
     context: ExportPipelineContext<ExportState>,
-    { temporaryOutputDir }: ExportOutput
+    { temporaryOutputDir, urlFiles }: ExportOutput
   ): Promise<ResourcesDownloadOutput> => {
-    return Promise.resolve({ temporaryOutputDir });
+    await downloadUrlsToLocalFiles({
+      urlContainers: urlFiles,
+      onProgress: context.updateStepProgress,
+      throwIfAnyError: true,
+    });
+
+    return { temporaryOutputDir };
   },
 
   launchCompression: (

@@ -1,9 +1,5 @@
 // @flow
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 
@@ -27,9 +23,7 @@ type CommonProps = {|
   isInline?: boolean,
   onRequestClose?: () => void,
   onApply?: () => void,
-  resourceSources?: Array<ResourceSource>,
-  onChooseResource?: ChooseResourceFunction,
-  resourceExternalEditors?: Array<ResourceExternalEditor>,
+  resourceManagementProps?: ResourceManagementProps,
 
   // Pass the ParameterRenderingService to allow to render nested parameters
   parameterRenderingService?: ParameterRenderingServiceType,

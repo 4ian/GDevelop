@@ -13,7 +13,7 @@ namespace gdjs {
         if (!runtimeScene.hasLayer(layer)) {
           return 0;
         }
-        return runtimeScene.getLayerHighestZOrder(layer);
+        return runtimeScene.getLayer(layer).getHighestZOrder();
       };
     }
   }

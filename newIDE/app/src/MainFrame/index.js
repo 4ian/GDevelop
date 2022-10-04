@@ -515,6 +515,9 @@ const MainFrame = (props: Props) => {
       if (initialDialog === 'subscription') {
         openSubscriptionDialog(true);
       }
+      if (initialDialog === 'onboarding') {
+        openOnboardingDialog(true);
+      }
     },
     [initialDialog]
   );

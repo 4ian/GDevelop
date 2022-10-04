@@ -273,13 +273,16 @@ describe('EnumerateExpressions', () => {
     });
 
     // Check that some behavior expressions are there
-    expect(generalTreeNode).toHaveProperty('Platform behavior');
+    const movementTreeNode: TreeNode<EnumeratedExpressionMetadata> =
     // $FlowFixMe
-    expect(generalTreeNode['Platform behavior']).toMatchObject({
+    allExpressionsTree['Movement'];
+    expect(movementTreeNode).toHaveProperty('Platform behavior');
+    // $FlowFixMe
+    expect(movementTreeNode['Platform behavior']).toMatchObject({
       Options: {
         'Maximum horizontal speed': {
           displayedName: 'Maximum horizontal speed',
-          fullGroupName: 'General/Platform behavior/Options',
+          fullGroupName: 'Movement/Platform behavior/Options',
           iconFilename: 'CppPlatform/Extensions/platformerobjecticon.png',
           isPrivate: false,
           name: 'MaxSpeed',

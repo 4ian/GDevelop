@@ -342,7 +342,8 @@ namespace gdjs {
     export const loadStringFromFile = function (
       stringVar: gdjs.Variable,
       loadPath: string,
-      resultVar: gdjs.Variable
+      resultVar: gdjs.Variable,
+      removeCRCharacters: boolean
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
       let result = 'error';
@@ -350,7 +351,9 @@ namespace gdjs {
         try {
           const data = fileSystem.readFileSync(loadPath, 'utf8');
           if (data) {
-            stringVar.setString(data);
+            stringVar.setString(
+              removeCRCharacters ? data.replace(/\r/g, '') : data
+            );
             result = 'ok';
           }
         } catch (err) {
@@ -372,7 +375,8 @@ namespace gdjs {
     export const loadVariableFromJSONFile = function (
       variable: gdjs.Variable,
       loadPath: string,
-      resultVar: gdjs.Variable
+      resultVar: gdjs.Variable,
+      removeCRCharacters: boolean
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
       let result = 'error';
@@ -380,7 +384,9 @@ namespace gdjs {
         try {
           const data = fileSystem.readFileSync(loadPath, 'utf8');
           if (data) {
-            variable.fromJSON(data);
+            variable.fromJSON(
+              removeCRCharacters ? data.replace(/\r/g, '') : data
+            );
             result = 'ok';
           }
         } catch (err) {
@@ -404,13 +410,16 @@ namespace gdjs {
     export const loadVariableFromJSONFileAsync = function (
       variable: gdjs.Variable,
       loadPath: string,
-      resultVar: gdjs.Variable
+      resultVar: gdjs.Variable,
+      removeCRCharacters: boolean
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
       if (fileSystem) {
         fileSystem.readFile(loadPath, 'utf8', (err, data) => {
           if (data) {
-            variable.fromJSON(data);
+            variable.fromJSON(
+              removeCRCharacters ? data.replace(/\r/g, '') : data
+            );
             resultVar.setString('ok');
           }
           if (err) {
@@ -435,13 +444,16 @@ namespace gdjs {
     export const loadStringFromFileAsync = function (
       stringVar: gdjs.Variable,
       loadPath: string,
-      resultVar: gdjs.Variable
+      resultVar: gdjs.Variable,
+      removeCRCharacters: boolean
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
       if (fileSystem) {
         fileSystem.readFile(loadPath, 'utf8', (err, data) => {
           if (data) {
-            stringVar.setString(data);
+            stringVar.setString(
+              removeCRCharacters ? data.replace(/\r/g, '') : data
+            );
             resultVar.setString('ok');
           }
           if (err) {

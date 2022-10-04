@@ -9,7 +9,7 @@ describe('gdjs.Layer', function() {
 	var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
 	it('can convert coordinates', function(){
-		var layer = new gdjs.Layer({name: 'My layer', visibility: true, effects:[]}, runtimeScene)
+		var layer = new gdjs.SceneLayer({name: 'My layer', visibility: true, effects:[]}, runtimeScene)
 		layer.setCameraX(100, 0);
 		layer.setCameraY(200, 0);
 		layer.setCameraRotation(90, 0);
@@ -18,7 +18,7 @@ describe('gdjs.Layer', function() {
 		expect(layer.convertCoords(350, 450, 0)[1]).to.be.within(149.9999, 150.001);
 	});
 	it('can convert inverse coordinates', function(){
-		var layer = new gdjs.Layer({name: 'My layer', visibility: true, effects:[]}, runtimeScene)
+		var layer = new gdjs.SceneLayer({name: 'My layer', visibility: true, effects:[]}, runtimeScene)
 		layer.setCameraX(100, 0);
 		layer.setCameraY(200, 0);
 		layer.setCameraRotation(90, 0);

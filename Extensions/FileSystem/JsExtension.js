@@ -203,6 +203,15 @@ module.exports = {
         '',
         true
       )
+      .addParameter(
+        'yesorno',
+        _(
+          '(Advanced) Should clean file from superfluous character (\\r) present in files created on Windows.'
+        ),
+        '',
+        true
+      )
+      .setDefaultValue('yes')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
       .setFunctionName('gdjs.fileSystem.loadStringFromFileAsync');
@@ -229,6 +238,15 @@ module.exports = {
         '',
         true
       )
+      .addParameter(
+        'yesorno',
+        _(
+          '(Advanced) Should clean file from superfluous character (\\r) present in files created on Windows.'
+        ),
+        '',
+        true
+      )
+      .setDefaultValue('yes')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
       .setFunctionName('gdjs.fileSystem.loadStringFromFile');
@@ -255,6 +273,15 @@ module.exports = {
         '',
         true
       )
+      .addParameter(
+        'yesorno',
+        _(
+          '(Advanced) Should clean file from superfluous character (\\r) present in files created on Windows.'
+        ),
+        '',
+        true
+      )
+      .setDefaultValue('yes')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
       .setFunctionName('gdjs.fileSystem.loadVariableFromJSONFile');
@@ -281,6 +308,15 @@ module.exports = {
         '',
         true
       )
+      .addParameter(
+        'yesorno',
+        _(
+          '(Advanced) Should clean file from superfluous character (\\r) present in files created on Windows.'
+        ),
+        '',
+        true
+      )
+      .setDefaultValue('yes')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
       .setFunctionName('gdjs.fileSystem.loadVariableFromJSONFileAsync');

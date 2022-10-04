@@ -21,6 +21,7 @@ import {
   fakeAssetWithEventCustomizationsAndFlashExtension1,
   flashExtensionShortHeader,
   fireBulletExtensionShortHeader,
+  fakeAssetWithCustomObject,
 } from '../fixtures/GDevelopServicesTestData';
 import { makeTestExtensions } from '../fixtures/TestExtensions';
 import {
@@ -729,6 +730,44 @@ describe('InstallAsset', () => {
           .getAllBehaviorNames()
           .toJSArray()
       ).toEqual(['MyBehavior']);
+    });
+
+    // TODO EBO Add a test for a custom object that contains another custom objet.
+    // There is 2 cases:
+    // - an event-based object from the same extension (this should already work).
+    // - an event-based object from another extension (this won't work because
+    //   it needs extension dependencies).
+
+    it('install an asset, with an event-based object that is already installed', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      const layout = project.insertNewLayout('MyTestLayout', 0);
+
+      // Fake an asset with a custom object of type "Button::PanelSpriteButton",
+      // that is installed already.
+      mockFn(Asset.getAsset).mockImplementationOnce(
+        () => fakeAssetWithCustomObject
+      );
+
+      // Install the asset
+      await installAsset({
+        assetShortHeader: fakeAssetShortHeader1,
+        project,
+        objectsContainer: layout,
+        eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+        environment: 'live',
+      });
+
+      // No extensions fetched because the behavior is already installed.
+      expect(getExtension).not.toHaveBeenCalled();
+      expect(getExtensionsRegistry).not.toHaveBeenCalled();
+
+      // Check that the object was created, with the proper behavior:
+      expect(layout.getObjectsCount()).toBe(1);
+      expect(layout.getObjectAt(0).getName()).toBe('YellowButton');
+      expect(layout.getObjectAt(0).getType()).toEqual(
+        'Button::PanelSpriteButton'
+      );
     });
   });
 });

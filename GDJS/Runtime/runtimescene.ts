@@ -187,6 +187,10 @@ namespace gdjs {
       this._timeManager.reset();
     }
 
+    addLayer(layerData: LayerData) {
+      this._layers.put(layerData.name, new gdjs.SceneLayer(layerData, this));
+    }
+
     /**
      * Called when a scene is "paused", i.e it will be not be rendered again
      * for some time, until it's resumed or unloaded.

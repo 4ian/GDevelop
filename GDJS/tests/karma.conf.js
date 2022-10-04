@@ -55,6 +55,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/profiler.js',
       './newIDE/app/resources/GDJS/Runtime/force.js',
       './newIDE/app/resources/GDJS/Runtime/layer.js',
+      './newIDE/app/resources/GDJS/Runtime/SceneLayer.js',
       './newIDE/app/resources/GDJS/Runtime/timer.js',
       './newIDE/app/resources/GDJS/Runtime/inputmanager.js',
       './newIDE/app/resources/GDJS/Runtime/runtimegame.js',

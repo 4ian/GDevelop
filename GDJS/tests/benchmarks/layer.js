@@ -10,9 +10,8 @@ describe('gdjs.Layer', function() {
   var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
   it('benchmark convertCoords and convertInverseCoords', function() {
-    // TODO EBO Understand why the timeout need to be 35s instead of 20s to pass on CI.
-    this.timeout(35000);
-    var layer = new gdjs.Layer(
+    this.timeout(20000);
+    var layer = new gdjs.SceneLayer(
       { name: 'My layer', 
         visibility: true, 
         effects: [], 

@@ -25,6 +25,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                                "Open source (MIT License)")
       .SetCategory("User interface")
       .SetExtensionHelpPath("/objects/text");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Text object"))
+      .SetIcon("CppPlatform/Extensions/texticon.png");
 
   gd::ObjectMetadata& obj =
       extension

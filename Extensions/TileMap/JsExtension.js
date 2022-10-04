@@ -860,6 +860,8 @@ module.exports = {
       )
       .setCategory('Advanced')
       .setExtensionHelpPath('/objects/tilemap');
+      extension.addInstructionOrExpressionGroupMetadata(_("Tilemap"))
+          .setIcon("JsPlatform/Extensions/tile_map.svg");
 
       defineTileMap(extension, _, gd);
       defineCollisionMask(extension, _, gd);

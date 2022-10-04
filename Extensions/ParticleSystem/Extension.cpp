@@ -27,6 +27,8 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
           "Open source (MIT License)")
       .SetCategory("Visual effect")
       .SetExtensionHelpPath("/objects/particles_emitter");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Particle system"))
+      .SetIcon("CppPlatform/Extensions/particleSystemicon.png");
 
   // Declaration of all objects available
   {

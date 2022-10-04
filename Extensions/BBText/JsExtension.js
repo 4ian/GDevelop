@@ -35,6 +35,8 @@ module.exports = {
       )
       .setExtensionHelpPath('/objects/bbtext')
       .setCategory('User interface');
+    extension.addInstructionOrExpressionGroupMetadata(_("BBCode Text Object"))
+        .setIcon("JsPlatform/Extensions/bbcode32.png");
 
     var objectBBText = new gd.ObjectJsImplementation();
     // $FlowExpectedError

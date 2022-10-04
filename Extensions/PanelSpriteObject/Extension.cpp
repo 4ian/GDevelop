@@ -24,6 +24,8 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
           "Victor Levasseur and Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/panel_sprite");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Panel Sprite (9-patch) Object"))
+      .SetIcon("CppPlatform/Extensions/PanelSpriteIcon.png");
 
   gd::ObjectMetadata& obj =
       extension

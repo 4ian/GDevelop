@@ -23,6 +23,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                                "Open source (MIT License)")
       .SetCategory("Movement")
       .SetExtensionHelpPath("/behaviors/physics");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Physics Engine (deprecated)"))
+      .SetIcon("res/physics16.png");
 
   {
     gd::BehaviorMetadata& aut = extension.AddBehavior(

@@ -14,17 +14,17 @@ namespace gdjs {
     _eventsFunction: null | ((runtimeScene: RuntimeScene) => void) = null;
     _instances: Hashtable<RuntimeObject[]>;
 
-    // Contains the instances living on the scene
+    //Contains the instances living on the scene
     _instancesCache: Hashtable<RuntimeObject[]>;
 
-    // Contains the highest Z orders for each layer.
-    // If the layer contains no object, the layer does not appear in the hashtable.
+    //Contains the highest Z orders for each layer.
+    //If the layer contains no object, the layer does not appear in the hashtable.
     _layerHighestZOrders: Hashtable<number>;
 
-    // Used to recycle destroyed instance instead of creating new ones.
+    //Used to recycle destroyed instance instead of creating new ones.
     _objects: Hashtable<ObjectData>;
 
-    // Contains the objects data stored in the project
+    //Contains the objects data stored in the project
     _objectsCtor: Hashtable<typeof RuntimeObject>;
     _layers: Hashtable<Layer>;
     _initialBehaviorSharedData: Hashtable<BehaviorSharedData | null>;
@@ -1187,7 +1187,7 @@ namespace gdjs {
      * in exceptional use cases where you need to loop through all objects,
      * and it won't be performant.
      *
-     * @returns The list of all runtime objects on the scene
+     * @returns The list of all runtime objects on the scnee
      */
     getAdhocListOfAllInstances(): gdjs.RuntimeObject[] {
       this._constructListOfAllInstances();

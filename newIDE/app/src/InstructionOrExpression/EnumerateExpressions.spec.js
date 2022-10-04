@@ -274,8 +274,8 @@ describe('EnumerateExpressions', () => {
 
     // Check that some behavior expressions are there
     const movementTreeNode: TreeNode<EnumeratedExpressionMetadata> =
-    // $FlowFixMe
-    allExpressionsTree['Movement'];
+      // $FlowFixMe
+      allExpressionsTree['Movement'];
     expect(movementTreeNode).toHaveProperty('Platform behavior');
     // $FlowFixMe
     expect(movementTreeNode['Platform behavior']).toMatchObject({

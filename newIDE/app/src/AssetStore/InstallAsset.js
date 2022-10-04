@@ -354,6 +354,14 @@ export const addSerializedExtensionsToProject = (
 };
 
 type InstallAssetArgs = {|
+  asset: Asset,
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
+  project: gdProject,
+  objectsContainer: gdObjectsContainer,
+  environment: Environment,
+|};
+
+export type InstallAssetShortHeaderArgs = {|
   assetShortHeader: AssetShortHeader,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   project: gdProject,
@@ -361,18 +369,17 @@ type InstallAssetArgs = {|
   environment: Environment,
 |};
 
-type InstallAssetOutput = {|
+export type InstallAssetOutput = {|
   createdObjects: Array<gdObject>,
 |};
 
 export const installAsset = async ({
-  assetShortHeader,
+  asset,
   eventsFunctionsExtensionsState,
   project,
   objectsContainer,
   environment,
 }: InstallAssetArgs): Promise<InstallAssetOutput> => {
-  const asset = await getPublicAsset(assetShortHeader, { environment });
   const requiredBehaviors = getRequiredBehaviorsFromAsset(asset);
   const missingBehaviors = filterMissingBehaviors(gd, requiredBehaviors);
   const serializedExtensions = await downloadExtensions([
@@ -403,4 +410,21 @@ export const installAsset = async ({
     objectsContainer,
   });
   return output;
+};
+
+export const installPublicAsset = async ({
+  assetShortHeader,
+  eventsFunctionsExtensionsState,
+  project,
+  objectsContainer,
+  environment,
+}: InstallAssetShortHeaderArgs): Promise<InstallAssetOutput> => {
+  const asset = await getPublicAsset(assetShortHeader, { environment });
+  return installAsset({
+    asset,
+    eventsFunctionsExtensionsState,
+    project,
+    objectsContainer,
+    environment,
+  });
 };

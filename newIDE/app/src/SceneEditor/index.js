@@ -125,6 +125,7 @@ type Props = {|
   onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
   isActive: boolean,
   unsavedChanges?: ?UnsavedChanges,
+  canInstallPrivateAsset: () => Promise<boolean>,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -1384,6 +1385,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 resourceExternalEditors={resourceExternalEditors}
                 onChooseResource={onChooseResource}
                 selectedObjectNames={this.state.selectedObjectNames}
+                canInstallPrivateAsset={this.props.canInstallPrivateAsset}
                 onEditObject={this.props.onEditObject || this.editObject}
                 onDeleteObject={this._onDeleteObject(i18n)}
                 canRenameObject={newName =>

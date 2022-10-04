@@ -11,7 +11,7 @@ import TextButton from '../UI/TextButton';
 import RaisedButton from '../UI/RaisedButton';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import { Column, Line } from '../UI/Grid';
-import { installAsset } from './InstallAsset';
+import { installPublicAsset } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import LinearProgress from '../UI/LinearProgress';
@@ -67,7 +67,7 @@ export const AssetPackDialog = ({
       try {
         const installOutputs = await Promise.all(
           assetShortHeaders.map(assetShortHeader =>
-            installAsset({
+            installPublicAsset({
               assetShortHeader,
               eventsFunctionsExtensionsState,
               project,

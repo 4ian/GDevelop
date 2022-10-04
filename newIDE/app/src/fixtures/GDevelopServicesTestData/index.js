@@ -552,6 +552,129 @@ export const fakePixelArtAsset1: Asset = {
   tags: ['space shooter', 'tag2', 'pixel art'],
 };
 
+export const fakeAssetWithCustomObject: Asset = {
+  id: '3c14012bd915b5d2e6ac2ec53c5f075f52532b11f8241352bf1d7cd14beeb447',
+  name: 'YellowButton',
+  authors: ['Kenney'],
+  license: 'CC0 (public domain)',
+  shortDescription: 'button',
+  description: 'A button that can be clicked.',
+  tags: ['custom objects', 'button'],
+  objectAssets: [
+    {
+      object: {
+        name: 'YellowButton',
+        type: 'Button::PanelSpriteButton',
+        content: {
+          LeftPadding: 16,
+          RightPadding: 16,
+          PressedLabelOffsetY: 10,
+          IdleLabelOffsetY: -8,
+          BottomPadding: 32,
+          TopPadding: 16,
+          MinimalWidth: 300,
+        },
+        childrenContent: {
+          Label: {
+            bold: false,
+            italic: false,
+            smoothed: true,
+            underlined: false,
+            string: 'Start',
+            font: '',
+            characterSize: 60,
+            color: { b: 42, g: 87, r: 139 },
+          },
+          Idle: {
+            bottomMargin: 32,
+            height: 106,
+            leftMargin: 16,
+            rightMargin: 16,
+            texture: 'object_YellowButton_Idle.png',
+            tiled: true,
+            topMargin: 16,
+            width: 256,
+          },
+          Hovered: {
+            bottomMargin: 32,
+            height: 106,
+            leftMargin: 16,
+            rightMargin: 16,
+            texture: 'object_YellowButton_Hovered.png',
+            tiled: true,
+            topMargin: 16,
+            width: 256,
+          },
+          Pressed: {
+            bottomMargin: 16,
+            height: 106,
+            leftMargin: 16,
+            rightMargin: 16,
+            texture: 'object_YellowButton_Pressed.png',
+            tiled: true,
+            topMargin: 32,
+            width: 256,
+          },
+        },
+      },
+      resources: [
+        {
+          alwaysLoaded: false,
+          file:
+            'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Hovered.png',
+          kind: 'image',
+          metadata: '',
+          name: 'object_YellowButton_Hovered.png',
+          userAdded: false,
+          origin: {
+            name: 'gdevelop-asset-store',
+            identifier:
+              'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Hovered.png',
+          },
+        },
+        {
+          alwaysLoaded: false,
+          file:
+            'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Idle.png',
+          kind: 'image',
+          metadata: '',
+          name: 'object_YellowButton_Idle.png',
+          userAdded: false,
+          origin: {
+            name: 'gdevelop-asset-store',
+            identifier:
+              'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Idle.png',
+          },
+        },
+        {
+          alwaysLoaded: false,
+          file:
+            'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Pressed.png',
+          kind: 'image',
+          metadata: '',
+          name: 'object_YellowButton_Pressed.png',
+          userAdded: false,
+          origin: {
+            name: 'gdevelop-asset-store',
+            identifier:
+              'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Pressed.png',
+          },
+        },
+      ],
+      customization: [],
+    },
+  ],
+  gdevelopVersion: '5.0.0-beta100',
+  version: '1.0.0',
+  objectType: 'object',
+  animationsCount: 1,
+  maxFramesCount: 1,
+  previewImageUrls: ['res/GD-logo.png'],
+  width: 256,
+  height: 106,
+  dominantColors: [16304136],
+};
+
 export const fakeAssetWithBehaviorCustomizations1: Asset = {
   id: '123',
   name: 'My spaceship',

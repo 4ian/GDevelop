@@ -595,7 +595,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                                  "LayerHighestZOrder",
                                  _("Highest Z order of a layer"),
                                  _("the highest Z order of a layer"),
-                                 _("the highest Z order of layer _PARAM1_"),
+                                 _("the highest Z order of objects in the layer _PARAM1_"),
                                  "",
                                  "res/conditions/layer.png")
       .AddCodeOnlyParameter("currentScene", "")

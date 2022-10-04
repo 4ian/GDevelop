@@ -20,6 +20,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
           "Florian Rival and Aurélien Vivet",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/shape_painter");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Shape painter"))
+      .SetIcon("CppPlatform/Extensions/primitivedrawingicon.png");
 
   gd::ObjectMetadata& obj =
       extension

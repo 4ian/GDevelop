@@ -28,13 +28,15 @@ module.exports = {
     extension
       .setExtensionInformation(
         'Video',
-        'Video',
-        'Provides an object to display a video on the scene. The recommended file format is MPEG4, with H264 video codec and AAC audio codec, to maximize the support of the video on different platform and browsers.',
+        _('Video'),
+        _('Provides an object to display a video on the scene. The recommended file format is MPEG4, with H264 video codec and AAC audio codec, to maximize the support of the video on different platform and browsers.'),
         'Aurélien Vivet',
         'Open source (MIT License)'
       )
       .setCategory('User interface')
       .setExtensionHelpPath('/objects/video');
+    extension.addInstructionOrExpressionGroupMetadata(_("Video"))
+        .setIcon("JsPlatform/Extensions/videoicon16.png");
 
     var videoObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating an object

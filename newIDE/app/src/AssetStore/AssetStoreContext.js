@@ -32,6 +32,7 @@ import {
 } from './AssetStoreNavigator';
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
 import shuffle from 'lodash/shuffle';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 const defaultSearchText = '';
 // TODO: Remove once the marketplace is up and running.
@@ -148,6 +149,7 @@ export const AssetStoreStateProvider = ({
   const [assetShortHeadersById, setAssetShortHeadersById] = React.useState<?{
     [string]: AssetShortHeader,
   }>(null);
+  const { ownedAssetShortHeaders } = React.useContext(AuthenticatedUserContext);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [assetPacks, setAssetPacks] = React.useState<?AssetPacks>(null);
   const [
@@ -248,6 +250,11 @@ export const AssetStoreStateProvider = ({
           assetShortHeaders.forEach(assetShortHeader => {
             assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
           });
+          if (ownedAssetShortHeaders) {
+            ownedAssetShortHeaders.forEach(assetShortHeader => {
+              assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
+            });
+          }
 
           console.info(
             `Loaded ${assetShortHeaders.length} assets from the asset store.`
@@ -269,10 +276,23 @@ export const AssetStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [isLoading, environment]
+    [isLoading, environment, ownedAssetShortHeaders]
   );
 
-  // Preload the assets and filters when the app loads.
+  // We're listening to the owned assets changing to update the list of assets.
+  // This can happen when the user logs in or logs out.
+  React.useEffect(
+    () => {
+      if (!ownedAssetShortHeaders) {
+        return;
+      }
+      fetchAssetsAndFilters();
+    },
+    [ownedAssetShortHeaders, fetchAssetsAndFilters]
+  );
+
+  // Preload the assets and filters when the app loads, in case the user
+  // is not logged in. (A log in will trigger a reload of the assets.)
   React.useEffect(
     () => {
       // Don't attempt to load again assets and filters if they

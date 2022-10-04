@@ -5,9 +5,9 @@ import {
   getRequiredBehaviorsFromAsset,
   filterMissingBehaviors,
   downloadExtensions,
-  installAsset,
   filterMissingExtensions,
   sanitizeObjectName,
+  installPublicAsset,
 } from './InstallAsset';
 import { makeTestProject } from '../fixtures/TestProject';
 import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
@@ -600,7 +600,7 @@ describe('InstallAsset', () => {
       });
 
       await expect(
-        installAsset({
+        installPublicAsset({
           assetShortHeader: fakeAssetShortHeader1,
           project,
           objectsContainer: layout,
@@ -638,7 +638,7 @@ describe('InstallAsset', () => {
 
       // Check that the extension is stated as not found in the registry
       await expect(
-        installAsset({
+        installPublicAsset({
           assetShortHeader: fakeAssetShortHeader1,
           project,
           objectsContainer: layout,
@@ -681,7 +681,7 @@ describe('InstallAsset', () => {
       // Verify that, because we use `mockEventsFunctionsExtensionsState`, the
       // extension won't be loaded, so the behavior won't be installed.
       await expect(
-        installAsset({
+        installPublicAsset({
           assetShortHeader: fakeAssetShortHeader1,
           project,
           objectsContainer: layout,
@@ -708,7 +708,7 @@ describe('InstallAsset', () => {
       );
 
       // Install the asset
-      await installAsset({
+      await installPublicAsset({
         assetShortHeader: fakeAssetShortHeader1,
         project,
         objectsContainer: layout,

@@ -3,12 +3,14 @@ import * as React from 'react';
 import { useGenericRetryableProcessWithProgress } from '../../Utils/UseGenericRetryableProcessWithProgress';
 import { type StorageProviderOperations, type StorageProvider } from '../index';
 import { type FileMetadata } from '..';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
 export type FetchAllProjectResourcesOptionsWithoutProgress = {|
   project: gdProject,
   fileMetadata: FileMetadata,
   storageProvider: StorageProvider,
   storageProviderOperations: StorageProviderOperations,
+  authenticatedUser?: AuthenticatedUser,
 |};
 
 export type FetchAllProjectResourcesOptions = {|

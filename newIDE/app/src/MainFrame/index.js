@@ -146,6 +146,7 @@ import {
   useResourceFetcher,
   type ResourceFetcher,
 } from '../ProjectsStorage/ResourceFetcher';
+import { getCloudProject } from '../Utils/GDevelopServices/Project';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -757,6 +758,7 @@ const MainFrame = (props: Props) => {
           fileMetadata,
           storageProvider,
           storageProviderOperations,
+          authenticatedUser,
         });
       }
 
@@ -770,6 +772,7 @@ const MainFrame = (props: Props) => {
       getStorageProvider,
       getStorageProviderOperations,
       ensureResourcesAreFetched,
+      authenticatedUser,
     ]
   );
 
@@ -2180,6 +2183,28 @@ const MainFrame = (props: Props) => {
     return true;
   };
 
+  const canInstallPrivateAsset = async (): Promise<boolean> => {
+    const storageProvider = getStorageProvider();
+    // A private asset can always be installed locally, as it will be downloaded.
+    if (storageProvider.internalName === 'LocalFile') {
+      return true;
+    }
+    // A private asset can be installed on the cloud if the user has saved their project as a cloud project.
+    if (storageProvider.internalName === 'Cloud') {
+      if (!currentFileMetadata) {
+        return false;
+      }
+      const cloudProjectId = currentFileMetadata.fileIdentifier;
+
+      const cloudProject = await getCloudProject(
+        authenticatedUser,
+        cloudProjectId
+      );
+      return !!cloudProject;
+    }
+    return false;
+  };
+
   const onChooseResource: ChooseResourceFunction = (
     options: ChooseResourceOptions
   ) => {
@@ -2347,6 +2372,7 @@ const MainFrame = (props: Props) => {
         fileMetadata: currentFileMetadata,
         storageProvider,
         storageProviderOperations,
+        authenticatedUser,
       });
     },
     [
@@ -2355,6 +2381,7 @@ const MainFrame = (props: Props) => {
       ensureResourcesAreFetched,
       getStorageProvider,
       getStorageProviderOperations,
+      authenticatedUser,
     ]
   );
 
@@ -2613,6 +2640,7 @@ const MainFrame = (props: Props) => {
                     canOpen: !!props.storageProviders.filter(
                       ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
                     ).length,
+                    canInstallPrivateAsset,
                     onChooseProject: () => openOpenFromStorageProviderDialog(),
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
                     onOpenProjectPreCreationDialog: exampleShortHeader => {

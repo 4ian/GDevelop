@@ -87,6 +87,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         onChooseResource={this.props.onChooseResource}
         resourceExternalEditors={this.props.resourceExternalEditors}
         onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
+        canInstallPrivateAsset={this.props.canInstallPrivateAsset}
         unsavedChanges={this.props.unsavedChanges}
         ref={editor => (this.editor = editor)}
         project={project}

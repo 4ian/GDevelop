@@ -7,15 +7,22 @@ import {
   type Asset,
   type Environment,
 } from '../../Utils/GDevelopServices/Asset';
-import { getAuthorizationTokenForPrivateAssets } from '../../Utils/GDevelopServices/Shop';
+import {
+  installAsset,
+  type InstallAssetOutput,
+  type InstallAssetShortHeaderArgs,
+} from '../InstallAsset';
+import {
+  createAuthorizedUrl,
+  getAuthorizationTokenForPrivateAssets,
+} from '../../Utils/GDevelopServices/Shop';
 import PrivateAssetsAuthorizationContext from './PrivateAssetsAuthorizationContext';
 
 type Props = {| children: React.Node |};
 
 const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
-  const { getAuthorizationHeader, profile } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const profile = authenticatedUser.profile;
   const [authorizationToken, setAuthorizationToken] = React.useState<?string>(
     null
   );
@@ -24,7 +31,7 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
   const fetchAuthorizationToken = React.useCallback(
     async (userId: string) => {
       const token = await getAuthorizationTokenForPrivateAssets(
-        getAuthorizationHeader,
+        authenticatedUser.getAuthorizationHeader,
         {
           userId,
         }
@@ -33,7 +40,7 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
       setAuthorizationToken(token);
       return token;
     },
-    [getAuthorizationHeader]
+    [authenticatedUser.getAuthorizationHeader]
   );
 
   const updateAuthorizationToken = async () => {
@@ -60,10 +67,8 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
     if (!profile) return;
     const userId = profile.id;
 
-    let token = authorizationToken;
-    if (!token) {
-      token = await fetchAuthorizationToken(userId);
-    }
+    let token =
+      authorizationToken || (await fetchAuthorizationToken(profile.id));
 
     try {
       const asset = await getPrivateAsset(assetShortHeader, token, {
@@ -81,12 +86,61 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
     }
   };
 
+  const installPrivateAsset = async ({
+    assetShortHeader,
+    eventsFunctionsExtensionsState,
+    project,
+    objectsContainer,
+    environment,
+  }: InstallAssetShortHeaderArgs): Promise<?InstallAssetOutput> => {
+    if (!profile) {
+      throw new Error(
+        'Unable to install the asset because no profile was found.'
+      );
+    }
+
+    const asset: ?Asset = await fetchPrivateAsset(assetShortHeader, {
+      environment,
+    });
+
+    if (!asset) {
+      throw new Error(
+        'Unable to install the asset because it could not be fetched.'
+      );
+    }
+
+    const token =
+      authorizationToken || (await fetchAuthorizationToken(profile.id));
+
+    const assetWithAuthorizedResourceUrls = {
+      ...asset,
+      objectAssets: [
+        {
+          ...asset.objectAssets[0],
+          resources: asset.objectAssets[0].resources.map(resource => ({
+            ...resource,
+            file: createAuthorizedUrl(resource.file, token),
+          })),
+        },
+      ],
+    };
+
+    return installAsset({
+      asset: assetWithAuthorizedResourceUrls,
+      eventsFunctionsExtensionsState,
+      project,
+      objectsContainer,
+      environment,
+    });
+  };
+
   return (
     <PrivateAssetsAuthorizationContext.Provider
       value={{
         authorizationToken,
         updateAuthorizationToken,
         fetchPrivateAsset,
+        installPrivateAsset,
       }}
     >
       {children}

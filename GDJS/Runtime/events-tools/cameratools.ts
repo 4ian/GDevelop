@@ -451,6 +451,7 @@ namespace gdjs {
       };
 
       /**
+       * @param runtimeScene The scene
        * @param layerName The lighting layer with the ambient color.
        * @param rgbColor The color, in RGB format ("128;200;255").
        */
@@ -476,6 +477,21 @@ namespace gdjs {
             parseInt(colors[1], 10),
             parseInt(colors[2], 10)
           );
+      };
+
+      /**
+       * @param runtimeScene The scene
+       * @param layer The name of the layer
+       * @return the highest Z order of objects in the layer
+       */
+      export const getLayerHighestZOrder = function (
+        runtimeScene: gdjs.RuntimeScene,
+        layer: string
+      ): number {
+        if (!runtimeScene.hasLayer(layer)) {
+          return 0;
+        }
+        return runtimeScene.getLayer(layer).getHighestZOrder();
       };
     }
   }

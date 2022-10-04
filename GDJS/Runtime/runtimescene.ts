@@ -733,9 +733,7 @@ namespace gdjs {
      */
     _constructListOfAllInstances() {
       for (const name in this._layers.items) {
-        if (this._layers.containsKey(name)) {
-          this._layers.get(name)._setHighestZOrder(0);
-        }
+        this._layers.get(name)._setHighestZOrder(0);
       }
 
       let currentListSize = 0;

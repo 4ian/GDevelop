@@ -593,8 +593,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension
       .AddExpressionAndCondition("number",
                                  "LayerHighestZOrder",
-                                 _("Highest Z order of a layer"),
-                                 _("the highest Z order of a layer"),
+                                 _("Layer highest Z order"),
+                                 _("the highest Z order of objects in a layer"),
                                  _("the highest Z order of objects in the layer _PARAM1_"),
                                  "",
                                  "res/conditions/layer.png")

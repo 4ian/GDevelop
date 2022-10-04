@@ -732,9 +732,11 @@ namespace gdjs {
      * Tool function filling _allInstancesList member with all the living object instances.
      */
     _constructListOfAllInstances() {
-      const layers = gdjs.staticArray(gdjs.RuntimeScene);
-      this._layers.values(layers);
-      layers.forEach((layer) => layer._setHighestZOrder(0));
+      for (const name in this._layers.items) {
+        if (this._layers.containsKey(name)) {
+          this._layers.get(name)._setHighestZOrder(0);
+        }
+      }
 
       let currentListSize = 0;
       for (const name in this._instances.items) {

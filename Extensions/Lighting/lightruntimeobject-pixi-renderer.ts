@@ -7,7 +7,7 @@ namespace gdjs {
    */
   export class LightRuntimeObjectPixiRenderer {
     _object: gdjs.LightRuntimeObject;
-    _runtimeScene: gdjs.RuntimeScene;
+    _instanceContainer: gdjs.RuntimeInstanceContainer;
     _manager: gdjs.LightObstaclesManager;
     _radius: number;
     _color: [number, number, number];
@@ -30,10 +30,10 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.LightRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
-      this._runtimeScene = runtimeScene;
+      this._instanceContainer = instanceContainer;
       this._manager = runtimeObject.getObstaclesManager();
       this._radius = runtimeObject.getRadius();
       const objectColor = runtimeObject._color;
@@ -57,14 +57,14 @@ namespace gdjs {
       ]);
       this._indexBuffer = new Uint16Array([0, 1, 2, 0, 2, 3]);
       this.updateMesh();
-      this._isPreview = runtimeScene.getGame().isPreview();
+      this._isPreview = instanceContainer.getGame().isPreview();
       this._lightBoundingPoly = gdjs.Polygon.createRectangle(0, 0);
 
       this.updateDebugMode();
 
       // Objects will be added in lighting layer, this is just to maintain consistency.
       if (this._light) {
-        runtimeScene
+        instanceContainer
           .getLayer('')
           .getRenderer()
           .addRendererObject(
@@ -198,7 +198,7 @@ namespace gdjs {
       const texture = this._object.getTexture();
       this._texture =
         texture !== ''
-          ? (this._runtimeScene
+          ? (this._instanceContainer
               .getGame()
               .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
               texture

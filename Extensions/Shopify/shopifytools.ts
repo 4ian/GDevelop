@@ -1,17 +1,24 @@
 namespace gdjs {
+  export interface RuntimeGame {
+    shopifyClients: { [name: string]: any };
+  }
   declare var ShopifyBuy: any;
 
   export class ShopifyClientsManager {
-    static set(runtimeScene, name, shopifyClient) {
-      const game = runtimeScene.getGame();
+    static set(
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      name: string,
+      shopifyClient
+    ) {
+      const game = instanceContainer.getGame();
       if (!game.shopifyClients) {
         game.shopifyClients = {};
       }
       game.shopifyClients[name] = shopifyClient;
     }
 
-    static get(runtimeScene, name) {
-      const game = runtimeScene.getGame();
+    static get(instanceContainer: gdjs.RuntimeInstanceContainer, name: string) {
+      const game = instanceContainer.getGame();
       if (!game.shopifyClients) {
         game.shopifyClients = {};
       }
@@ -22,11 +29,11 @@ namespace gdjs {
   export namespace evtTools {
     export namespace shopify {
       export const buildClient = function (
-        runtimeScene,
-        name,
-        domain,
-        appId,
-        accessToken
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        name: string,
+        domain: string,
+        appId: string,
+        accessToken: string
       ) {
         if (typeof ShopifyBuy === 'undefined') {
           return;
@@ -37,21 +44,24 @@ namespace gdjs {
           appId: appId,
         });
         const shopifyClient = ShopifyBuy.buildClient(config);
-        ShopifyClientsManager.set(runtimeScene, name, shopifyClient);
+        ShopifyClientsManager.set(instanceContainer, name, shopifyClient);
       };
 
       export const getCheckoutUrlForProduct = function (
-        runtimeScene,
-        name,
-        productId,
-        quantity,
-        variantIndex,
-        successVariable,
-        errorVariable
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        name: string,
+        productId: string,
+        quantity: number,
+        variantIndex: number,
+        successVariable: gdjs.Variable,
+        errorVariable: gdjs.Variable
       ) {
         errorVariable.setString('');
         successVariable.setString('');
-        const shopifyClient = ShopifyClientsManager.get(runtimeScene, name);
+        const shopifyClient = ShopifyClientsManager.get(
+          instanceContainer,
+          name
+        );
         shopifyClient.fetchProduct(productId).then(
           function (product) {
             if (variantIndex < 0 || variantIndex >= product.variants.length) {

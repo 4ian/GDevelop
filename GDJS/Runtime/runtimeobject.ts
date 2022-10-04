@@ -167,7 +167,7 @@ namespace gdjs {
 
     readonly id: integer;
     private destroyCallbacks = new Set<() => void>();
-    _runtimeScene: gdjs.RuntimeScene;
+    _runtimeScene: gdjs.RuntimeInstanceContainer;
 
     /**
      * An optional UUID associated to the object to be used
@@ -209,12 +209,15 @@ namespace gdjs {
      * @param runtimeScene The scene the object belongs to..
      * @param objectData The initial properties of the object.
      */
-    constructor(runtimeScene: gdjs.RuntimeScene, objectData: ObjectData) {
+    constructor(
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      objectData: ObjectData & any
+    ) {
       this.name = objectData.name || '';
       this.type = objectData.type || '';
       this._nameId = RuntimeObject.getNameIdentifier(this.name);
-      this.id = runtimeScene.createNewUniqueId();
-      this._runtimeScene = runtimeScene;
+      this.id = instanceContainer.getScene().createNewUniqueId();
+      this._runtimeScene = instanceContainer;
       this._defaultHitBoxes.push(gdjs.Polygon.createRectangle(0, 0));
       this.hitBoxes = this._defaultHitBoxes;
       this._variables = new gdjs.VariablesContainer(
@@ -234,7 +237,7 @@ namespace gdjs {
       for (let i = 0, len = objectData.behaviors.length; i < len; ++i) {
         const autoData = objectData.behaviors[i];
         const Ctor = gdjs.getBehaviorConstructor(autoData.type);
-        this._behaviors.push(new Ctor(runtimeScene, autoData, this));
+        this._behaviors.push(new Ctor(instanceContainer, autoData, this));
         this._behaviorsTable.put(autoData.name, this._behaviors[i]);
       }
       this._timers = new Hashtable();
@@ -296,7 +299,6 @@ namespace gdjs {
       this.id = runtimeScene.createNewUniqueId();
       this.persistentUuid = null;
       this.pick = false;
-      this.hitBoxesDirty = true;
       this.aabb.min[0] = 0;
       this.aabb.min[1] = 0;
       this.aabb.max[0] = 0;
@@ -333,6 +335,8 @@ namespace gdjs {
       this._timers.clear();
 
       this.destroyCallbacks.clear();
+
+      this.invalidateHitboxes();
     }
 
     static supportsReinitialization = false;
@@ -343,9 +347,9 @@ namespace gdjs {
      *
      * Objects can have different elapsed time if they are on layers with different time scales.
      *
-     * @param runtimeScene The RuntimeScene the object belongs to (deprecated - can be omitted).
+     * @param instanceContainer The instance container the object belongs to (deprecated - can be omitted).
      */
-    getElapsedTime(runtimeScene?: gdjs.RuntimeScene): float {
+    getElapsedTime(instanceContainer?: gdjs.RuntimeInstanceContainer): float {
       const theLayer = this._runtimeScene.getLayer(this.layer);
       return theLayer.getElapsedTime();
     }
@@ -353,21 +357,35 @@ namespace gdjs {
     /**
      * The gdjs.RuntimeScene the object belongs to.
      */
-    getRuntimeScene(): RuntimeScene {
+    getParent(): gdjs.RuntimeInstanceContainer {
+      return this._runtimeScene;
+    }
+
+    /**
+     * The gdjs.RuntimeScene the object belongs to.
+     */
+    getRuntimeScene(): gdjs.RuntimeScene {
+      return this._runtimeScene.getScene();
+    }
+
+    /**
+     * The container the object belongs to.
+     */
+    getInstanceContainer(): gdjs.RuntimeInstanceContainer {
       return this._runtimeScene;
     }
 
     /**
      * Called once during the game loop, before events and rendering.
-     * @param runtimeScene The gdjs.RuntimeScene the object belongs to.
+     * @param instanceContainer The container the object belongs to.
      */
-    update(runtimeScene: gdjs.RuntimeScene): void {}
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {}
 
     /**
      * Called once during the game loop, after events and before rendering.
-     * @param runtimeScene The gdjs.RuntimeScene the object belongs to.
+     * @param instanceContainer The container the object belongs to.
      */
-    updatePreRender(runtimeScene: gdjs.RuntimeScene): void {}
+    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {}
 
     /**
      * Called when the object is created from an initial instance at the startup of the scene.<br>
@@ -399,11 +417,11 @@ namespace gdjs {
      * Remove an object from a scene.
      *
      * Do not change/redefine this method. Instead, redefine the onDestroyFromScene method.
-     * @param runtimeScene The RuntimeScene owning the object.
+     * @param instanceContainer The container owning the object.
      */
-    deleteFromScene(runtimeScene: gdjs.RuntimeScene): void {
+    deleteFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (this._livingOnScene) {
-        runtimeScene.markObjectForDeletion(this);
+        instanceContainer.markObjectForDeletion(this);
         this._livingOnScene = false;
       }
     }
@@ -421,10 +439,10 @@ namespace gdjs {
      * is being unloaded). If you redefine this function, **make sure to call the original method**
      * (`RuntimeObject.prototype.onDestroyFromScene.call(this, runtimeScene);`).
      *
-     * @param runtimeScene The scene owning the object.
+     * @param instanceContainer The container owning the object.
      */
-    onDestroyFromScene(runtimeScene: gdjs.RuntimeScene): void {
-      const theLayer = runtimeScene.getLayer(this.layer);
+    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+      const theLayer = instanceContainer.getLayer(this.layer);
       const rendererObject = this.getRendererObject();
       if (rendererObject) {
         theLayer.getRenderer().removeRendererObject(rendererObject);
@@ -513,7 +531,21 @@ namespace gdjs {
         return;
       }
       this.x = x;
+      this.invalidateHitboxes();
+    }
+
+    /**
+     * Send a signal that the object hitboxes are no longer up to date.
+     *
+     * The signal is propagated to parents so
+     * {@link gdjs.RuntimeObject.hitBoxesDirty} should never be modified
+     * directly.
+     */
+    invalidateHitboxes(): void {
+      // TODO EBO Check that no community extension set hitBoxesDirty to true
+      // directly.
       this.hitBoxesDirty = true;
+      this._runtimeScene.onChildrenLocationChanged();
     }
 
     /**
@@ -535,7 +567,7 @@ namespace gdjs {
         return;
       }
       this.y = y;
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -591,10 +623,15 @@ namespace gdjs {
       );
     }
 
+    /**
+     * @param angle The targeted direction angle.
+     * @param speed The rotation speed.
+     * @param instanceContainer The container the object belongs to (deprecated - can be omitted).
+     */
     rotateTowardAngle(
       angle: float,
       speed: float,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer?: gdjs.RuntimeInstanceContainer
     ): void {
       if (speed === 0) {
         this.setAngle(angle);
@@ -607,10 +644,7 @@ namespace gdjs {
       const diffWasPositive = angularDiff >= 0;
       let newAngle =
         this.getAngle() +
-        ((diffWasPositive ? -1.0 : 1.0) *
-          speed *
-          this.getElapsedTime(runtimeScene)) /
-          1000;
+        ((diffWasPositive ? -1.0 : 1.0) * speed * this.getElapsedTime()) / 1000;
 
       if (
         // @ts-ignore
@@ -635,12 +669,13 @@ namespace gdjs {
      * Rotate the object at the given speed
      *
      * @param speed The speed, in degrees per second.
-     * @param runtimeScene The scene where the object is displayed.
+     * @param instanceContainer The container the object belongs to (deprecated - can be omitted).
      */
-    rotate(speed: float, runtimeScene: gdjs.RuntimeScene): void {
-      this.setAngle(
-        this.getAngle() + (speed * this.getElapsedTime(runtimeScene)) / 1000
-      );
+    rotate(
+      speed: float,
+      instanceContainer?: gdjs.RuntimeInstanceContainer
+    ): void {
+      this.setAngle(this.getAngle() + (speed * this.getElapsedTime()) / 1000);
     }
 
     /**
@@ -653,7 +688,7 @@ namespace gdjs {
         return;
       }
       this.angle = angle;
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -1621,18 +1656,22 @@ namespace gdjs {
     /**
      * Call each behavior stepPreEvents method.
      */
-    stepBehaviorsPreEvents(runtimeScene): void {
+    stepBehaviorsPreEvents(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
       for (let i = 0, len = this._behaviors.length; i < len; ++i) {
-        this._behaviors[i].stepPreEvents(runtimeScene);
+        this._behaviors[i].stepPreEvents(instanceContainer);
       }
     }
 
     /**
      * Call each behavior stepPostEvents method.
      */
-    stepBehaviorsPostEvents(runtimeScene): void {
+    stepBehaviorsPostEvents(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
       for (let i = 0, len = this._behaviors.length; i < len; ++i) {
-        this._behaviors[i].stepPostEvents(runtimeScene);
+        this._behaviors[i].stepPostEvents(instanceContainer);
       }
     }
 
@@ -1863,7 +1902,7 @@ namespace gdjs {
      * @return true if the object was moved
      */
     separateFromObjects(
-      objects: RuntimeObject[],
+      objects: gdjs.RuntimeObject[],
       ignoreTouchingEdges: boolean
     ): boolean {
       let moveXArray: Array<float> = separateFromObjectsStatics.moveXArray;
@@ -2403,12 +2442,18 @@ namespace gdjs {
      *
      * @return true if the cursor, or any touch, is on the object.
      */
-    cursorOnObject(runtimeScene: RuntimeScene): boolean {
-      const inputManager = runtimeScene.getGame().getInputManager();
-      const layer = runtimeScene.getLayer(this.layer);
+    cursorOnObject(instanceContainer: gdjs.RuntimeInstanceContainer): boolean {
+      const workingPoint: FloatPoint = gdjs.staticArray(
+        RuntimeObject.prototype.cursorOnObject
+      ) as FloatPoint;
+      workingPoint.length = 2;
+      const inputManager = instanceContainer.getGame().getInputManager();
+      const layer = instanceContainer.getLayer(this.layer);
       const mousePos = layer.convertCoords(
         inputManager.getMouseX(),
-        inputManager.getMouseY()
+        inputManager.getMouseY(),
+        0,
+        workingPoint
       );
       if (this.insideObject(mousePos[0], mousePos[1])) {
         return true;
@@ -2417,7 +2462,9 @@ namespace gdjs {
       for (let i = 0; i < touchIds.length; ++i) {
         const touchPos = layer.convertCoords(
           inputManager.getTouchX(touchIds[i]),
-          inputManager.getTouchY(touchIds[i])
+          inputManager.getTouchY(touchIds[i]),
+          0,
+          workingPoint
         );
         if (this.insideObject(touchPos[0], touchPos[1])) {
           return true;

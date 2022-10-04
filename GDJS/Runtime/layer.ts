@@ -15,6 +15,7 @@ namespace gdjs {
     _zoomFactor: float = 1;
     _timeScale: float = 1;
     _defaultZOrder: integer = 0;
+    _highestZOrder: integer = 0;
     _hidden: boolean;
     _initialEffectsData: Array<EffectData>;
     _cameraX: float;
@@ -74,7 +75,7 @@ namespace gdjs {
      * Get the default Z order to be attributed to objects created on this layer
      * (usually from events generated code).
      */
-    getDefaultZOrder(): float {
+    getDefaultZOrder(): integer {
       return this._defaultZOrder;
     }
 
@@ -84,6 +85,17 @@ namespace gdjs {
      */
     setDefaultZOrder(defaultZOrder: integer): void {
       this._defaultZOrder = defaultZOrder;
+    }
+
+    /**
+     * Get the highest Z order occupied by the runtime objects on the layer
+     */
+    getHighestZOrder(): integer {
+      return this._highestZOrder;
+    }
+
+    _setHighestZOrder(z: integer): void {
+      this._highestZOrder = z;
     }
 
     /**

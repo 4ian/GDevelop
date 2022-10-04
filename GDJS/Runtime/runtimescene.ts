@@ -732,6 +732,10 @@ namespace gdjs {
      * Tool function filling _allInstancesList member with all the living object instances.
      */
     _constructListOfAllInstances() {
+      for (const name in this._layers.items) {
+        this._layers.get(name)._setHighestZOrder(0);
+      }
+
       let currentListSize = 0;
       for (const name in this._instances.items) {
         if (this._instances.items.hasOwnProperty(name)) {
@@ -739,10 +743,16 @@ namespace gdjs {
           const oldSize = currentListSize;
           currentListSize += list.length;
           for (let j = 0, lenj = list.length; j < lenj; ++j) {
+            const instance = list[j];
             if (oldSize + j < this._allInstancesList.length) {
-              this._allInstancesList[oldSize + j] = list[j];
+              this._allInstancesList[oldSize + j] = instance;
             } else {
-              this._allInstancesList.push(list[j]);
+              this._allInstancesList.push(instance);
+            }
+            const layerName = instance.getLayer();
+            const zOrder = instance.getZOrder();
+            if (this.getLayer(layerName).getHighestZOrder() < zOrder) {
+              this.getLayer(layerName)._setHighestZOrder(zOrder);
             }
           }
         }

@@ -128,6 +128,10 @@ CameraExtension::CameraExtension() {
   GetAllExpressions()["LayerTimeScale"].SetFunctionName(
       "gdjs.evtTools.camera.getLayerTimeScale");
 
+  GetAllConditions()["LayerHighestZOrder"].SetFunctionName(
+      "gdjs.evtTools.layer.getLayerHighestZOrder");
+  GetAllExpressions()["LayerHighestZOrder"].SetFunctionName(
+      "gdjs.evtTools.layer.getLayerHighestZOrder");
   GetAllConditions()["LayerDefaultZOrder"].SetFunctionName(
       "gdjs.evtTools.camera.getLayerDefaultZOrder");
   GetAllActions()["SetLayerDefaultZOrder"].SetFunctionName(

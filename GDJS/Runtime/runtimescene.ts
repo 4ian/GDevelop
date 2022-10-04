@@ -17,6 +17,10 @@ namespace gdjs {
     //Contains the instances living on the scene
     _instancesCache: Hashtable<RuntimeObject[]>;
 
+    //Contains the highest Z orders for each layer.
+    //If the layer contains no object, the layer does not appear in the hashtable.
+    _layerHighestZOrders: Hashtable<number>;
+
     //Used to recycle destroyed instance instead of creating new ones.
     _objects: Hashtable<ObjectData>;
 
@@ -62,6 +66,7 @@ namespace gdjs {
     constructor(runtimeGame: gdjs.RuntimeGame) {
       this._instances = new Hashtable();
       this._instancesCache = new Hashtable();
+      this._layerHighestZOrders = new Hashtable();
       this._objects = new Hashtable();
       this._objectsCtor = new Hashtable();
       this._layers = new Hashtable();
@@ -732,6 +737,8 @@ namespace gdjs {
      * Tool function filling _allInstancesList member with all the living object instances.
      */
     _constructListOfAllInstances() {
+      this._layerHighestZOrders.clear();
+
       let currentListSize = 0;
       for (const name in this._instances.items) {
         if (this._instances.items.hasOwnProperty(name)) {
@@ -743,6 +750,14 @@ namespace gdjs {
               this._allInstancesList[oldSize + j] = list[j];
             } else {
               this._allInstancesList.push(list[j]);
+            }
+            const layerName = list[j].getLayer();
+            const zOrder = list[j].getZOrder();
+            if (
+              !this._layerHighestZOrders.containsKey(layerName) ||
+              this._layerHighestZOrders.get(layerName) < zOrder
+            ) {
+              this._layerHighestZOrders.put(layerName, zOrder);
             }
           }
         }
@@ -1065,6 +1080,20 @@ namespace gdjs {
      */
     getTimeManager(): gdjs.TimeManager {
       return this._timeManager;
+    }
+
+    /**
+     * Get the highest z order across the layer's object instances
+     * @param layerName The name of the layer
+     * @returns The highest z order across the layer's object instances
+     */
+    getLayerHighestZOrder(layerName: string): number {
+      if (!this._layerHighestZOrders.containsKey(layerName)) return 0;
+      return this._layerHighestZOrders.get(layerName);
+    }
+
+    _setLayerHighestZOrder(layerName: string, zOrder: number) {
+      this._layerHighestZOrders.put(layerName, zOrder);
     }
 
     /**

@@ -4,7 +4,6 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  // TODO EBO Replace instanceContainer by instanceContainer.
   export namespace evtTools {
     export namespace camera {
       export const setCameraX = function (
@@ -313,7 +312,7 @@ namespace gdjs {
 
       /**
        * Update a layer effect parameter (with a number).
-       * @param instanceContainer The scene
+       * @param instanceContainer the container owning the layer
        * @param layer The name of the layer
        * @param effect The name of the effect
        * @param parameter The parameter to update
@@ -336,7 +335,7 @@ namespace gdjs {
 
       /**
        * Update a layer effect parameter (with a string).
-       * @param instanceContainer The scene
+       * @param instanceContainer the container owning the layer
        * @param layer The name of the layer
        * @param effect The name of the effect
        * @param parameter The parameter to update
@@ -359,7 +358,7 @@ namespace gdjs {
 
       /**
        * Enable or disable a layer effect parameter (boolean).
-       * @param instanceContainer The scene
+       * @param instanceContainer the container owning the layer
        * @param layer The name of the layer
        * @param effect The name of the effect
        * @param parameter The parameter to update
@@ -382,7 +381,7 @@ namespace gdjs {
 
       /**
        * Enable, or disable, an effect of a layer.
-       * @param instanceContainer The scene
+       * @param instanceContainer the container owning the layer
        * @param layer The name of the layer
        * @param effect The name of the effect
        * @param enabled true to enable, false to disable.
@@ -401,7 +400,7 @@ namespace gdjs {
 
       /**
        * Check if an effect is enabled.
-       * @param instanceContainer The scene
+       * @param instanceContainer the container owning the layer
        * @param layer The name of the layer
        * @param effect The name of the effect
        * @return true if the effect is enabled, false otherwise.
@@ -462,6 +461,7 @@ namespace gdjs {
       };
 
       /**
+       * @param instanceContainer the container owning the layer
        * @param layerName The lighting layer with the ambient color.
        * @param rgbColor The color, in RGB format ("128;200;255").
        */

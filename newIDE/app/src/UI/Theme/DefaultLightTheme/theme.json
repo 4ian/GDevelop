@@ -139,13 +139,13 @@
       "default": {
         "color": {
           "value": "#1D1D26",
-          "comment": "Text/Primary"
+          "comment": "Palette/Grey/100 - Text/Primary"
         }
       },
       "secondary": {
         "color": {
           "value": "#494952",
-          "comment": "Text/Secondary"
+          "comment": "Palette/Grey/70 - Text/ Secondary"
         }
       },
       "disabled": {

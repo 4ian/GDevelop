@@ -37,6 +37,8 @@ module.exports = {
       )
       .setExtensionHelpPath('/objects/bitmap_text')
       .setCategory('User interface');
+    extension.addInstructionOrExpressionGroupMetadata(_("Bitmap Text"))
+        .setIcon("JsPlatform/Extensions/bitmapfont32.png");
 
     const bitmapTextObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError

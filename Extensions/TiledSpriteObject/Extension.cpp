@@ -24,6 +24,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
           "Victor Levasseur and Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/tiled_sprite");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Tiled Sprite Object"))
+      .SetIcon("CppPlatform/Extensions/TiledSpriteIcon.png");
 
   gd::ObjectMetadata& obj =
       extension

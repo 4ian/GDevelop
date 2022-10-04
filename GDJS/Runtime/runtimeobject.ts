@@ -718,8 +718,7 @@ namespace gdjs {
       if (rendererObject) {
         theLayer.getRenderer().changeRendererObjectZOrder(rendererObject, z);
       }
-      const layerHighestZOrder = theLayer.getHighestZOrder();
-      if (z > layerHighestZOrder) {
+      if (z > theLayer.getHighestZOrder()) {
         theLayer._setHighestZOrder(z);
       }
     }

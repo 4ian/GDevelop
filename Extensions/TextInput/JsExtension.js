@@ -33,6 +33,8 @@ module.exports = {
       'MIT'
     )
     .setCategory('User interface');
+    extension.addInstructionOrExpressionGroupMetadata(_("Text Input"))
+        .setIcon("JsPlatform/Extensions/text_input.svg");
 
     const textInputObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating an object

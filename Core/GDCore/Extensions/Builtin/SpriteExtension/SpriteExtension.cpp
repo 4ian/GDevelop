@@ -22,6 +22,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/sprite");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Sprite"))
+      .SetIcon("CppPlatform/Extensions/spriteicon.png");
 
   gd::ObjectMetadata& obj =
       extension

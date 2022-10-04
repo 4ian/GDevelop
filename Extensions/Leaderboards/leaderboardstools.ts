@@ -1,5 +1,6 @@
 /// <reference path="sha256.d.ts" />
 
+// TODO EBO Replace runtimeScene to instanceContainer.
 namespace gdjs {
   const logger = new gdjs.Logger('Leaderboards');
   export namespace evtTools {

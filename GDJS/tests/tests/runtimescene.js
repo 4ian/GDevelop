@@ -188,7 +188,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
       expect(runtimeScene.hasLayer('MyOtherLayer')).to.be(true);
     });
 
-    it('should compute layers highest z orders correctly', () => {
+    it('should compute layers highest z orders correctly when changing objects z orders', () => {
       expect(runtimeScene.hasLayer('')).to.be(true);
       expect(runtimeScene.hasLayer('MyLayer')).to.be(true);
 
@@ -224,7 +224,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
       expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(25);
 
       // Move object in front of the highest
-      object1.setZOrder(30)
+      object1.setZOrder(30);
 
       runtimeScene._updateObjectsPreRender();
       expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(30);
@@ -242,6 +242,39 @@ describe('gdjs.RuntimeScene integration tests', function () {
       runtimeScene._updateObjectsPreRender();
       expect(runtimeScene.getLayer('MyLayer').getHighestZOrder()).to.be(0);
       expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(0);
+    });
+
+    it('should compute layers highest z orders correctly when moving objects from a layer to another', () => {
+      expect(runtimeScene.hasLayer('')).to.be(true);
+      expect(runtimeScene.hasLayer('MyLayer')).to.be(true);
+
+      const object1 = runtimeScene.createObject('MyObject');
+      const object2 = runtimeScene.createObject('MyObject');
+      if (!object1 || !object2) {
+        throw new Error('object should have been created');
+      }
+
+      // Layers highest Z orders should stay at 0 if objects did not change their Z order
+      runtimeScene._updateObjectsPreRender();
+      expect(runtimeScene.getLayer('MyLayer').getHighestZOrder()).to.be(0);
+      expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(0);
+
+      object2.setZOrder(8);
+
+      // Check highest Z order has been correctly updated for layers
+      runtimeScene._updateObjectsPreRender();
+      expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(8);
+      expect(runtimeScene.getLayer('MyLayer').getHighestZOrder()).to.be(0);
+
+      // Move object to another layer and check the highest z order is instantly changed for the new layer
+      object2.setLayer('MyLayer');
+      expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(8);
+      expect(runtimeScene.getLayer('MyLayer').getHighestZOrder()).to.be(8);
+
+      // Check that the highest Z order for base layer is updated
+      runtimeScene._updateObjectsPreRender();
+      expect(runtimeScene.getLayer('').getHighestZOrder()).to.be(0);
+      expect(runtimeScene.getLayer('MyLayer').getHighestZOrder()).to.be(8);
     });
   });
 });

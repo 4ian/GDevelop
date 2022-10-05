@@ -682,6 +682,9 @@ namespace gdjs {
         oldLayer.getRenderer().removeRendererObject(rendererObject);
         newLayer.getRenderer().addRendererObject(rendererObject, this.zOrder);
       }
+      if (this.zOrder > newLayer.getHighestZOrder()) {
+        newLayer._setHighestZOrder(this.zOrder);
+      }
     }
 
     /**

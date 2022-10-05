@@ -205,11 +205,14 @@ module.exports = {
       )
       .addParameter(
         'yesorno',
-        _(
-          '(Advanced) Should clean file from superfluous character (\\r) present in files created on Windows (recommended).'
-        ),
+        _('Normalize the file content (recommended)'),
         '',
         true
+      )
+      .setParameterLongDescription(
+        _(
+          'This replaces Windows new lines characters ("CRLF") by a single new line character.'
+        )
       )
       .setDefaultValue('yes')
       .getCodeExtraInformation()
@@ -240,11 +243,14 @@ module.exports = {
       )
       .addParameter(
         'yesorno',
-        _(
-          '(Advanced) Should clean file from superfluous character (\\r) present in files created on Windows (recommended).'
-        ),
+        _('Normalize the file content (recommended)'),
         '',
         true
+      )
+      .setParameterLongDescription(
+        _(
+          'This replaces Windows new lines characters ("CRLF") by a single new line character.'
+        )
       )
       .setDefaultValue('yes')
       .getCodeExtraInformation()
@@ -275,11 +281,14 @@ module.exports = {
       )
       .addParameter(
         'yesorno',
-        _(
-          '(Advanced) Should clean file from superfluous character (\\r) present in files created on Windows (recommended).'
-        ),
+        _('Normalize the file content (recommended)'),
         '',
         true
+      )
+      .setParameterLongDescription(
+        _(
+          'This replaces Windows new lines characters ("CRLF") by a single new line character.'
+        )
       )
       .setDefaultValue('yes')
       .getCodeExtraInformation()
@@ -310,11 +319,14 @@ module.exports = {
       )
       .addParameter(
         'yesorno',
-        _(
-          '(Advanced) Should clean file from superfluous character (\\r) present in files created on Windows (recommended).'
-        ),
+        _('Normalize the file content (recommended)'),
         '',
         true
+      )
+      .setParameterLongDescription(
+        _(
+          'This replaces Windows new lines characters ("CRLF") by a single new line character.'
+        )
       )
       .setDefaultValue('yes')
       .getCodeExtraInformation()

@@ -26,12 +26,8 @@ export type AssetCustomization =
       properties: Array<SerializedParameterMetadata>,
     |}
   | {|
-      required: boolean,
-      parameters: Array<SerializedParameterMetadata>,
-      extensions: Array<{|
-        extensionName: string,
-        extensionVersion: string,
-      |}>,
+      extensionName: string,
+      extensionVersion: string,
     |};
 
 export type ObjectAsset = {|

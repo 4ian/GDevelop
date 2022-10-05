@@ -563,7 +563,7 @@ export const fakePixelArtAsset1: Asset = {
 };
 
 export const fakeAssetWithCustomObject: Asset = {
-  id: '3c14012bd915b5d2e6ac2ec53c5f075f52532b11f8241352bf1d7cd14beeb447',
+  id: '123',
   name: 'YellowButton',
   authors: ['Kenney'],
   license: 'CC0 (public domain)',
@@ -671,7 +671,12 @@ export const fakeAssetWithCustomObject: Asset = {
           },
         },
       ],
-      customization: [],
+      customization: [
+        {
+          extensionName: 'Button',
+          extensionVersion: '1.0.0',
+        },
+      ],
     },
   ],
   gdevelopVersion: '5.0.0-beta100',
@@ -723,7 +728,7 @@ export const fakeAssetWithBehaviorCustomizations1: Asset = {
               optional: false,
               type: 'string',
               name: 'property1',
-              defaultValue: 'Overriden value',
+              defaultValue: 'Overridden value',
             },
           ],
         },
@@ -804,55 +809,6 @@ export const fakeAssetWithFlashBehaviorCustomizations1: Asset = {
   ],
 };
 
-export const fakeAssetWithEventCustomizationsAndFlashExtension1: Asset = {
-  id: '123',
-  name: 'My spaceship',
-  shortDescription:
-    'A spaceship that can be moved with the keyboard or by touching the screen',
-  description: "A very nice way to start a shoot'em up.",
-  previewImageUrls: ['res/GD-logo.png'],
-  animationsCount: 6,
-  maxFramesCount: 6,
-  height: 36,
-  width: 36,
-  objectType: 'sprite',
-  gdevelopVersion: '5.0.0-beta100',
-  authors: ['test author'],
-  license: 'MIT',
-  version: '1.0.0',
-  tags: ['space shooter', 'tag2'],
-  dominantColors: [255],
-  objectAssets: [
-    {
-      object: spaceshipSerializedObject,
-      resources: spaceshipSerializedResources,
-      customization: [
-        {
-          required: true,
-          extensions: [
-            {
-              extensionName: 'Flash', // Not really used in events, just for tests.
-              extensionVersion: '1.0.0',
-            },
-          ],
-          parameters: [
-            {
-              codeOnly: false,
-              description: 'Example of a parameter',
-              longDescription: '',
-              supplementaryInformation: '',
-              optional: false,
-              type: 'string',
-              name: 'TEXT_TO_REPLACE',
-              defaultValue: '3',
-            },
-          ],
-        },
-      ],
-    },
-  ],
-};
-
 export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
   id: '123',
   name: 'My spaceship',
@@ -877,25 +833,8 @@ export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
       resources: spaceshipSerializedResources,
       customization: [
         {
-          required: true,
-          extensions: [
-            {
-              extensionName: 'UnknownExtension', // Not really used in events, just for tests.
-              extensionVersion: '1.0.0',
-            },
-          ],
-          parameters: [
-            {
-              codeOnly: false,
-              description: 'Example of a parameter',
-              longDescription: '',
-              supplementaryInformation: '',
-              optional: false,
-              type: 'string',
-              name: 'EXAMPLE_PARAMETER',
-              defaultValue: 'Hello World',
-            },
-          ],
+          extensionName: 'UnknownExtension', // Not really used in events, just for tests.
+          extensionVersion: '1.0.0',
         },
       ],
     },

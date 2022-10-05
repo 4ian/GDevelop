@@ -32,7 +32,7 @@ import ScrollView from '../UI/ScrollView';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import RaisedButton from '../UI/RaisedButton';
 import { AssetStoreContext } from './AssetStoreContext';
-import { AssetPackDialog } from './AssetPackDialog';
+import AssetPackDialog from './AssetPackInstallDialog';
 import { installPublicAsset } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { showErrorBox, showWarningBox } from '../UI/Messages/MessageBox';

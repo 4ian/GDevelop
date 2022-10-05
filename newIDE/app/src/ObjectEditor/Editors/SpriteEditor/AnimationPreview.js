@@ -39,7 +39,7 @@ type Props = {|
   initialZoom?: number,
   fixedHeight?: number,
   fixedWidth?: number,
-  isPrivate?: boolean,
+  isAssetPrivate?: boolean,
 |};
 
 const AnimationPreview = ({
@@ -56,7 +56,7 @@ const AnimationPreview = ({
   initialZoom,
   fixedHeight,
   fixedWidth,
-  isPrivate,
+  isAssetPrivate,
 }: Props) => {
   const forceUdpate = useForceUpdate();
 
@@ -159,7 +159,9 @@ const AnimationPreview = ({
           imagesLoadedArray.current[currentFrameIndexRef.current] = false;
           // When the array of loaders changes, wait a bit to display the loader to avoid flickering.
           loaderTimeout.current = setTimeout(() => {
-            console.warn('image took too long to load, displaying loader');
+            console.warn(
+              'The image took too long to load, displaying a loader.'
+            );
             setIsStillLoadingResources(true);
           }, 500);
           forceUdpate();
@@ -215,7 +217,7 @@ const AnimationPreview = ({
             if (loaderTimeout.current) clearTimeout(loaderTimeout.current);
             forceUdpate();
           }}
-          isPrivate={isPrivate}
+          isImagePrivate={isAssetPrivate}
           hideLoader // Handled by the animation preview, important to let the browser cache the image.
         />
         {isStillLoadingResources && (

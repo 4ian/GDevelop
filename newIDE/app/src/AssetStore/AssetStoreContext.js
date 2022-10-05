@@ -3,11 +3,11 @@ import * as React from 'react';
 import { type Filters } from '../Utils/GDevelopServices/Filters';
 import {
   type AssetShortHeader,
-  type AssetPacks,
+  type PublicAssetPacks,
   type Author,
   type License,
   type Environment,
-  listAllAssets,
+  listAllPublicAssets,
   listAllAuthors,
   listAllLicenses,
 } from '../Utils/GDevelopServices/Asset';
@@ -55,7 +55,7 @@ export type AssetFiltersState = {|
 
 type AssetStoreState = {|
   filters: ?Filters,
-  assetPacks: ?AssetPacks,
+  publicAssetPacks: ?PublicAssetPacks,
   privateAssetPacks: ?Array<PrivateAssetPackListingData>,
   assetPackRandomOrdering: ?Array<number>,
   authors: ?Array<Author>,
@@ -80,7 +80,7 @@ type AssetStoreState = {|
 
 export const AssetStoreContext = React.createContext<AssetStoreState>({
   filters: null,
-  assetPacks: null,
+  publicAssetPacks: null,
   privateAssetPacks: null,
   assetPackRandomOrdering: null,
   authors: null,
@@ -149,9 +149,14 @@ export const AssetStoreStateProvider = ({
   const [assetShortHeadersById, setAssetShortHeadersById] = React.useState<?{
     [string]: AssetShortHeader,
   }>(null);
-  const { ownedAssetShortHeaders } = React.useContext(AuthenticatedUserContext);
+  const { receivedAssetShortHeaders } = React.useContext(
+    AuthenticatedUserContext
+  );
   const [filters, setFilters] = React.useState<?Filters>(null);
-  const [assetPacks, setAssetPacks] = React.useState<?AssetPacks>(null);
+  const [
+    publicAssetPacks,
+    setPublicAssetPacks,
+  ] = React.useState<?PublicAssetPacks>(null);
   const [
     assetPackRandomOrdering,
     setAssetPackRandomOrdering,
@@ -236,10 +241,10 @@ export const AssetStoreStateProvider = ({
 
         try {
           const {
-            assetShortHeaders,
-            filters,
-            assetPacks,
-          } = await listAllAssets({ environment });
+            publicAssetShortHeaders,
+            publicFilters,
+            publicAssetPacks,
+          } = await listAllPublicAssets({ environment });
           const authors = await listAllAuthors({ environment });
           const licenses = await listAllLicenses({ environment });
           const privateAssetPacks = ACTIVATE_ASSET_PACK_MARKETPLACE
@@ -247,21 +252,23 @@ export const AssetStoreStateProvider = ({
             : [];
 
           const assetShortHeadersById = {};
-          assetShortHeaders.forEach(assetShortHeader => {
+          publicAssetShortHeaders.forEach(assetShortHeader => {
             assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
           });
-          if (ownedAssetShortHeaders) {
-            ownedAssetShortHeaders.forEach(assetShortHeader => {
+          if (receivedAssetShortHeaders) {
+            receivedAssetShortHeaders.forEach(assetShortHeader => {
               assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
             });
           }
 
           console.info(
-            `Loaded ${assetShortHeaders.length} assets from the asset store.`
+            `Loaded ${
+              publicAssetShortHeaders.length
+            } assets from the asset store.`
           );
           setAssetShortHeadersById(assetShortHeadersById);
-          setFilters(filters);
-          setAssetPacks(assetPacks);
+          setFilters(publicFilters);
+          setPublicAssetPacks(publicAssetPacks);
           setAuthors(authors);
           setLicenses(licenses);
           setPrivateAssetPacks(privateAssetPacks);
@@ -276,19 +283,19 @@ export const AssetStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [isLoading, environment, ownedAssetShortHeaders]
+    [isLoading, environment, receivedAssetShortHeaders]
   );
 
-  // We're listening to the owned assets changing to update the list of assets.
+  // We're listening to the received assets changing to update the list of assets.
   // This can happen when the user logs in or logs out.
   React.useEffect(
     () => {
-      if (!ownedAssetShortHeaders) {
+      if (!receivedAssetShortHeaders) {
         return;
       }
       fetchAssetsAndFilters();
     },
-    [ownedAssetShortHeaders, fetchAssetsAndFilters]
+    [receivedAssetShortHeaders, fetchAssetsAndFilters]
   );
 
   // Preload the assets and filters when the app loads, in case the user
@@ -309,8 +316,8 @@ export const AssetStoreStateProvider = ({
   );
 
   // Randomize asset packs when number of asset packs and private asset packs change
-  const assetPackCount = assetPacks
-    ? assetPacks.starterPacks.length
+  const assetPackCount = publicAssetPacks
+    ? publicAssetPacks.starterPacks.length
     : undefined;
   const privateAssetPackCount = privateAssetPacks
     ? privateAssetPacks.length
@@ -343,7 +350,7 @@ export const AssetStoreStateProvider = ({
       searchResults,
       fetchAssetsAndFilters,
       filters,
-      assetPacks,
+      publicAssetPacks,
       privateAssetPacks,
       assetPackRandomOrdering,
       authors,
@@ -388,7 +395,7 @@ export const AssetStoreStateProvider = ({
       searchResults,
       fetchAssetsAndFilters,
       filters,
-      assetPacks,
+      publicAssetPacks,
       privateAssetPacks,
       assetPackRandomOrdering,
       authors,

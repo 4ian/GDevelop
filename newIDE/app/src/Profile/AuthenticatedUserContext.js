@@ -9,7 +9,10 @@ import {
   type Usages,
   type Subscription,
 } from '../Utils/GDevelopServices/Usage';
-import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import {
+  type AssetShortHeader,
+  type PrivateAssetPack,
+} from '../Utils/GDevelopServices/Asset';
 
 export type AuthenticatedUser = {|
   authenticated: boolean,
@@ -18,8 +21,8 @@ export type AuthenticatedUser = {|
   loginState: null | 'loggingIn' | 'done',
   badges: ?Array<Badge>,
   cloudProjects: ?Array<CloudProjectWithUserAccessInfo>,
-  ownedAssetPackIds: ?Array<string>,
-  ownedAssetShortHeaders: ?Array<AssetShortHeader>,
+  receivedAssetPacks: ?Array<PrivateAssetPack>,
+  receivedAssetShortHeaders: ?Array<AssetShortHeader>,
   limits: ?Limits,
   usages: ?Usages,
   subscription: ?Subscription,
@@ -44,8 +47,8 @@ export const initialAuthenticatedUser = {
   loginState: null,
   badges: null,
   cloudProjects: null,
-  ownedAssetPackIds: null,
-  ownedAssetShortHeaders: null,
+  receivedAssetPacks: null,
+  receivedAssetShortHeaders: null,
   subscription: null,
   usages: null,
   limits: null,

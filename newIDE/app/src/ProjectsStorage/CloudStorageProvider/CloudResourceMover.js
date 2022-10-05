@@ -257,7 +257,7 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
 
   await uploadResourcesToCloud({
     resourcesToFetchAndUpload,
-    // // Remove the token used to download the file when re-uploading it.
+    // Remove the token used to download the file when re-uploading it.
     transformFilename: filename => filename.split('?')[0],
     authenticatedUser,
     cloudProjectId,

@@ -44,17 +44,6 @@ const AuthorizedAssetImage = ({
     [authorizationToken, updateAuthorizationToken, url, isImageLoaded]
   );
 
-  // React.useEffect(
-  //   () => {
-  //     // Ensure we reset the loaded status when the URL changes.
-  //     // Useful when used in the AnimationPreview.
-  //     if (url) {
-  //       setIsImageLoaded(false);
-  //     }
-  //   },
-  //   [url]
-  // );
-
   const onFetchingError = () => {
     console.warn('Error while fetching authorized image');
     if (tries >= 3) {

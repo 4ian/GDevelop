@@ -117,7 +117,7 @@ export const AssetDetails = ({
     setSelectedAnimationName,
   ] = React.useState<?string>(null);
   const [error, setError] = React.useState<?Error>(null);
-  const isPrivate = isPrivateAsset(assetShortHeader);
+  const isAssetPrivate = isPrivateAsset(assetShortHeader);
   const { fetchPrivateAsset } = React.useContext(
     PrivateAssetsAuthorizationContext
   );
@@ -127,7 +127,7 @@ export const AssetDetails = ({
         try {
           // Reinitialise asset to trigger a loader and recalculate all parameters. (for instance zoom)
           setAsset(null);
-          const loadedAsset = isPrivate
+          const loadedAsset = isAssetPrivate
             ? await fetchPrivateAsset(assetShortHeader, {
                 environment,
               })
@@ -152,7 +152,7 @@ export const AssetDetails = ({
         }
       })();
     },
-    [assetShortHeader, environment, isPrivate, fetchPrivateAsset]
+    [assetShortHeader, environment, isAssetPrivate, fetchPrivateAsset]
   );
 
   const isImageResourceSmooth = React.useMemo(
@@ -289,12 +289,12 @@ export const AssetDetails = ({
                       initialZoom={140 / Math.max(asset.width, asset.height)}
                       fixedHeight={FIXED_HEIGHT}
                       fixedWidth={FIXED_WIDTH}
-                      isPrivate={isPrivate}
+                      isAssetPrivate={isAssetPrivate}
                     />
                   )}
                 {asset.objectType !== 'sprite' && (
                   <div style={styles.previewBackground}>
-                    {isPrivate ? (
+                    {isAssetPrivate ? (
                       <AuthorizedAssetImage
                         style={styles.previewImage}
                         url={asset.previewImageUrls[0]}

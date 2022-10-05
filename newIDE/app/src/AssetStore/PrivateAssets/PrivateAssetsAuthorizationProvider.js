@@ -20,6 +20,23 @@ import PrivateAssetsAuthorizationContext from './PrivateAssetsAuthorizationConte
 
 type Props = {| children: React.Node |};
 
+const enrichAssetWithAuthorizedResourceUrls = (
+  asset: Asset,
+  authorizationToken: string
+): Asset => {
+  const objectAssets = asset.objectAssets;
+  return {
+    ...asset,
+    objectAssets: objectAssets.map(objectAsset => ({
+      ...objectAsset,
+      resources: objectAsset.resources.map(resource => ({
+        ...resource,
+        file: createAuthorizedUrl(resource.file, authorizationToken),
+      })),
+    })),
+  };
+};
+
 const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const profile = authenticatedUser.profile;
@@ -54,7 +71,7 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
       isLoading.current = true;
       await fetchAuthorizationToken(userId);
     } catch (error) {
-      console.error(error);
+      console.error('Could not fetch the authorization token', error);
     } finally {
       isLoading.current = false;
     }
@@ -79,7 +96,9 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
       if (error.response && error.response.status === 404) {
         // If the token is expired, fetch a new one and try again.
         token = await fetchAuthorizationToken(userId);
-        const asset = getPrivateAsset(assetShortHeader, token, { environment });
+        const asset = await getPrivateAsset(assetShortHeader, token, {
+          environment,
+        });
         return asset;
       }
       throw error;
@@ -112,18 +131,10 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
     const token =
       authorizationToken || (await fetchAuthorizationToken(profile.id));
 
-    const assetWithAuthorizedResourceUrls = {
-      ...asset,
-      objectAssets: [
-        {
-          ...asset.objectAssets[0],
-          resources: asset.objectAssets[0].resources.map(resource => ({
-            ...resource,
-            file: createAuthorizedUrl(resource.file, token),
-          })),
-        },
-      ],
-    };
+    const assetWithAuthorizedResourceUrls = enrichAssetWithAuthorizedResourceUrls(
+      asset,
+      token
+    );
 
     return installAsset({
       asset: assetWithAuthorizedResourceUrls,

@@ -70,7 +70,7 @@ export type Asset = {|
   objectAssets: Array<ObjectAsset>,
 |};
 
-export type AssetPack = {|
+export type PublicAssetPack = {|
   name: string,
   tag: string,
   thumbnailUrl: string,
@@ -79,8 +79,8 @@ export type AssetPack = {|
   userFriendlyPrice?: ?string,
 |};
 
-export type AssetPacks = {|
-  starterPacks: Array<AssetPack>,
+export type PublicAssetPacks = {|
+  starterPacks: Array<PublicAssetPack>,
 |};
 
 type PrivateAssetPackAssetType =
@@ -94,8 +94,9 @@ type PrivateAssetPackAssetType =
 
 export type PrivateAssetPackContent = { [PrivateAssetPackAssetType]: number };
 
-export type PrivateAssetPackDetails = {|
+export type PrivateAssetPack = {|
   id: string,
+  name: string,
   previewImageUrls: Array<string>,
   updatedAt: string,
   createdAt: string,
@@ -104,10 +105,10 @@ export type PrivateAssetPackDetails = {|
   content: PrivateAssetPackContent,
 |};
 
-export type AllAssets = {|
-  assetShortHeaders: Array<AssetShortHeader>,
-  filters: Filters,
-  assetPacks: AssetPacks,
+export type AllPublicAssets = {|
+  publicAssetShortHeaders: Array<AssetShortHeader>,
+  publicFilters: Filters,
+  publicAssetPacks: PublicAssetPacks,
 |};
 
 export type Resource = {|
@@ -150,11 +151,11 @@ export const isCompatibleWithAsset = (
       })
     : true;
 
-export const listAllAssets = ({
+export const listAllPublicAssets = ({
   environment,
 }: {|
   environment: Environment,
-|}): Promise<AllAssets> => {
+|}): Promise<AllPublicAssets> => {
   return client
     .get(`/asset`, {
       params: {
@@ -171,10 +172,10 @@ export const listAllAssets = ({
         client.get(assetShortHeadersUrl).then(response => response.data),
         client.get(filtersUrl).then(response => response.data),
         client.get(assetPacksUrl).then(response => response.data),
-      ]).then(([assetShortHeaders, filters, assetPacks]) => ({
-        assetShortHeaders,
-        filters,
-        assetPacks,
+      ]).then(([publicAssetShortHeaders, publicFilters, publicAssetPacks]) => ({
+        publicAssetShortHeaders,
+        publicFilters,
+        publicAssetPacks,
       }));
     });
 };
@@ -201,13 +202,13 @@ export const getPrivateAsset = async (
   authorizationToken: string,
   { environment }: {| environment: Environment |}
 ): Promise<Asset> => {
-  const assetPackId = assetShortHeader.assetPackId;
-  if (!assetPackId) {
-    throw new Error('Asset is not part of a private asset pack.');
+  const privateAssetPackId = assetShortHeader.assetPackId;
+  if (!privateAssetPackId) {
+    throw new Error('The asset does not have a private asset pack id.');
   }
-  const assetUrl = `${GDevelopPrivateAssetsStorage.baseUrl}/${assetPackId}/${
-    assetShortHeader.id
-  }.json`;
+  const assetUrl = `${
+    GDevelopPrivateAssetsStorage.baseUrl
+  }/${privateAssetPackId}/${assetShortHeader.id}.json`;
   const authorizedUrl = createAuthorizedUrl(assetUrl, authorizationToken);
   const assetResponse = await client.get(authorizedUrl);
   return assetResponse.data;
@@ -279,9 +280,9 @@ export const listAllLicenses = ({
     .then(response => response.data);
 };
 
-export const getPrivateAssetPackDetails = async (
+export const getPrivateAssetPack = async (
   assetPackId: string
-): Promise<PrivateAssetPackDetails> => {
+): Promise<PrivateAssetPack> => {
   const response = await client.get(`/asset-pack/${assetPackId}`);
   return response.data;
 };
@@ -297,8 +298,13 @@ export const isPixelArt = (
 export const isPrivateAsset = (
   assetOrAssetShortHeader: AssetShortHeader | Asset
 ): boolean => {
-  return assetOrAssetShortHeader.previewImageUrls[0].startsWith(
-    'https://private-assets'
+  return (
+    assetOrAssetShortHeader.previewImageUrls[0].startsWith(
+      'https://private-assets.gdevelop.io'
+    ) ||
+    assetOrAssetShortHeader.previewImageUrls[0].startsWith(
+      'https://private-assets-dev.gdevelop.io'
+    )
   );
 };
 
@@ -311,12 +317,25 @@ export const listReceivedAssetShortHeaders = async (
   |}
 ): Promise<Array<AssetShortHeader>> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.get(
-    `${GDevelopAssetApi.baseUrl}/asset-short-header`,
-    {
-      headers: { Authorization: authorizationHeader },
-      params: { userId },
-    }
-  );
+  const response = await client.get('/asset-short-header', {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+  return response.data;
+};
+
+export const listReceivedAssetPacks = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+  }: {|
+    userId: string,
+  |}
+): Promise<Array<PrivateAssetPack>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.get('/asset-pack', {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
   return response.data;
 };

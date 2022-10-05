@@ -79,7 +79,7 @@ type Props = {|
   onSize?: (number, number) => void,
   hideCheckeredBackground?: boolean,
   hideControls?: boolean,
-  isPrivate?: boolean,
+  isImagePrivate?: boolean,
   onImageLoaded?: () => void,
   hideLoader?: boolean,
 |};
@@ -110,7 +110,7 @@ const ImagePreview = ({
   hideCheckeredBackground,
   hideControls,
   initialZoom,
-  isPrivate,
+  isImagePrivate,
   onImageLoaded,
   hideLoader,
 }: Props) => {
@@ -314,7 +314,7 @@ const ImagePreview = ({
                   </PlaceholderMessage>
                 )}
                 {!errored &&
-                  (isPrivate ? (
+                  (isImagePrivate ? (
                     <AuthorizedAssetImage
                       style={imageStyle}
                       alt={resourceName}

@@ -2,7 +2,8 @@
 import * as React from 'react';
 import {
   type AssetShortHeader,
-  type AssetPack,
+  type PublicAssetPack,
+  type PrivateAssetPack,
   isPrivateAsset,
 } from '../Utils/GDevelopServices/Asset';
 import Text from '../UI/Text';
@@ -21,7 +22,7 @@ import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/Reso
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 
 type Props = {|
-  assetPack: AssetPack,
+  assetPack: PublicAssetPack | PrivateAssetPack,
   assetShortHeaders: Array<AssetShortHeader>,
   addedAssetIds: Array<string>,
   onClose: () => void,
@@ -32,7 +33,7 @@ type Props = {|
   onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
 |};
 
-export const AssetPackDialog = ({
+const AssetPackInstallDialog = ({
   assetPack,
   assetShortHeaders,
   addedAssetIds,
@@ -89,7 +90,7 @@ export const AssetPackDialog = ({
                 });
 
             if (!installOutput) {
-              throw new Error('Unable to install private Asset.');
+              throw new Error('Unable to install the asset.');
             }
 
             return installOutput;
@@ -246,3 +247,5 @@ export const AssetPackDialog = ({
     </Dialog>
   );
 };
+
+export default AssetPackInstallDialog;

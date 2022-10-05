@@ -552,6 +552,134 @@ export const fakePixelArtAsset1: Asset = {
   tags: ['space shooter', 'tag2', 'pixel art'],
 };
 
+export const fakeAssetWithCustomObject: Asset = {
+  id: '123',
+  name: 'YellowButton',
+  authors: ['Kenney'],
+  license: 'CC0 (public domain)',
+  shortDescription: 'button',
+  description: 'A button that can be clicked.',
+  tags: ['custom objects', 'button'],
+  objectAssets: [
+    {
+      object: {
+        name: 'YellowButton',
+        type: 'Button::PanelSpriteButton',
+        content: {
+          LeftPadding: 16,
+          RightPadding: 16,
+          PressedLabelOffsetY: 10,
+          IdleLabelOffsetY: -8,
+          BottomPadding: 32,
+          TopPadding: 16,
+          MinimalWidth: 300,
+        },
+        childrenContent: {
+          Label: {
+            bold: false,
+            italic: false,
+            smoothed: true,
+            underlined: false,
+            string: 'Start',
+            font: '',
+            characterSize: 60,
+            color: { b: 42, g: 87, r: 139 },
+          },
+          Idle: {
+            bottomMargin: 32,
+            height: 106,
+            leftMargin: 16,
+            rightMargin: 16,
+            texture: 'object_YellowButton_Idle.png',
+            tiled: true,
+            topMargin: 16,
+            width: 256,
+          },
+          Hovered: {
+            bottomMargin: 32,
+            height: 106,
+            leftMargin: 16,
+            rightMargin: 16,
+            texture: 'object_YellowButton_Hovered.png',
+            tiled: true,
+            topMargin: 16,
+            width: 256,
+          },
+          Pressed: {
+            bottomMargin: 16,
+            height: 106,
+            leftMargin: 16,
+            rightMargin: 16,
+            texture: 'object_YellowButton_Pressed.png',
+            tiled: true,
+            topMargin: 32,
+            width: 256,
+          },
+        },
+      },
+      resources: [
+        {
+          alwaysLoaded: false,
+          file:
+            'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Hovered.png',
+          kind: 'image',
+          metadata: '',
+          name: 'object_YellowButton_Hovered.png',
+          userAdded: false,
+          origin: {
+            name: 'gdevelop-asset-store',
+            identifier:
+              'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Hovered.png',
+          },
+        },
+        {
+          alwaysLoaded: false,
+          file:
+            'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Idle.png',
+          kind: 'image',
+          metadata: '',
+          name: 'object_YellowButton_Idle.png',
+          userAdded: false,
+          origin: {
+            name: 'gdevelop-asset-store',
+            identifier:
+              'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Idle.png',
+          },
+        },
+        {
+          alwaysLoaded: false,
+          file:
+            'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Pressed.png',
+          kind: 'image',
+          metadata: '',
+          name: 'object_YellowButton_Pressed.png',
+          userAdded: false,
+          origin: {
+            name: 'gdevelop-asset-store',
+            identifier:
+              'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Pressed.png',
+          },
+        },
+      ],
+      customization: [
+        {
+          extensionName: 'Button',
+          extensionVersion: '1.0.0',
+        },
+      ],
+    },
+  ],
+  gdevelopVersion: '5.0.0-beta100',
+  version: '1.0.0',
+  objectType: 'object',
+  animationsCount: 1,
+  maxFramesCount: 1,
+  previewImageUrls: ['res/GD-logo.png'],
+  width: 256,
+  height: 106,
+  dominantColors: [16304136],
+};
+
 export const fakeAssetWithBehaviorCustomizations1: Asset = {
   id: '123',
   name: 'My spaceship',
@@ -590,7 +718,7 @@ export const fakeAssetWithBehaviorCustomizations1: Asset = {
               optional: false,
               type: 'string',
               name: 'property1',
-              defaultValue: 'Overriden value',
+              defaultValue: 'Overridden value',
             },
           ],
         },
@@ -671,55 +799,6 @@ export const fakeAssetWithFlashBehaviorCustomizations1: Asset = {
   ],
 };
 
-export const fakeAssetWithEventCustomizationsAndFlashExtension1: Asset = {
-  id: '123',
-  name: 'My spaceship',
-  shortDescription:
-    'A spaceship that can be moved with the keyboard or by touching the screen',
-  description: "A very nice way to start a shoot'em up.",
-  previewImageUrls: ['res/GD-logo.png'],
-  animationsCount: 6,
-  maxFramesCount: 6,
-  height: 36,
-  width: 36,
-  objectType: 'sprite',
-  gdevelopVersion: '5.0.0-beta100',
-  authors: ['test author'],
-  license: 'MIT',
-  version: '1.0.0',
-  tags: ['space shooter', 'tag2'],
-  dominantColors: [255],
-  objectAssets: [
-    {
-      object: spaceshipSerializedObject,
-      resources: spaceshipSerializedResources,
-      customization: [
-        {
-          required: true,
-          extensions: [
-            {
-              extensionName: 'Flash', // Not really used in events, just for tests.
-              extensionVersion: '1.0.0',
-            },
-          ],
-          parameters: [
-            {
-              codeOnly: false,
-              description: 'Example of a parameter',
-              longDescription: '',
-              supplementaryInformation: '',
-              optional: false,
-              type: 'string',
-              name: 'TEXT_TO_REPLACE',
-              defaultValue: '3',
-            },
-          ],
-        },
-      ],
-    },
-  ],
-};
-
 export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
   id: '123',
   name: 'My spaceship',
@@ -744,25 +823,8 @@ export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
       resources: spaceshipSerializedResources,
       customization: [
         {
-          required: true,
-          extensions: [
-            {
-              extensionName: 'UnknownExtension', // Not really used in events, just for tests.
-              extensionVersion: '1.0.0',
-            },
-          ],
-          parameters: [
-            {
-              codeOnly: false,
-              description: 'Example of a parameter',
-              longDescription: '',
-              supplementaryInformation: '',
-              optional: false,
-              type: 'string',
-              name: 'EXAMPLE_PARAMETER',
-              defaultValue: 'Hello World',
-            },
-          ],
+          extensionName: 'UnknownExtension', // Not really used in events, just for tests.
+          extensionVersion: '1.0.0',
         },
       ],
     },

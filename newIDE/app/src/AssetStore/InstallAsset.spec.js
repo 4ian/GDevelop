@@ -2,8 +2,7 @@
 import {
   addAssetToProject,
   addSerializedExtensionsToProject,
-  getRequiredBehaviorsFromAsset,
-  filterMissingBehaviors,
+  getRequiredExtensionsFromAsset,
   downloadExtensions,
   installAsset,
   filterMissingExtensions,
@@ -18,9 +17,9 @@ import {
   fakeAssetWithBehaviorCustomizations1,
   fakeAssetWithUnknownBehaviorCustomizations1,
   fakeAssetWithFlashBehaviorCustomizations1,
-  fakeAssetWithEventCustomizationsAndFlashExtension1,
   flashExtensionShortHeader,
   fireBulletExtensionShortHeader,
+  fakeAssetWithCustomObject,
 } from '../fixtures/GDevelopServicesTestData';
 import { makeTestExtensions } from '../fixtures/TestExtensions';
 import {
@@ -371,7 +370,7 @@ describe('InstallAsset', () => {
           .getProperties()
           .get('property1')
           .getValue()
-      ).toBe('Overriden value');
+      ).toBe('Overridden value');
       expect(
         layout
           .getObject('PlayerSpaceship')
@@ -384,50 +383,26 @@ describe('InstallAsset', () => {
   });
 
   describe('getRequiredBehaviorsFromAsset', () => {
-    it('get the behaviors required for an asset', () => {
+    it('get the required extension for behaviors in an asset', () => {
       expect(
-        getRequiredBehaviorsFromAsset(
-          fakeAssetWithEventCustomizationsAndFlashExtension1
-        )
-      ).toEqual([]);
-      expect(
-        getRequiredBehaviorsFromAsset(fakeAssetWithBehaviorCustomizations1)
+        getRequiredExtensionsFromAsset(fakeAssetWithBehaviorCustomizations1)
       ).toEqual([
         {
-          behaviorType: 'FakeBehavior::FakeBehavior',
           extensionName: 'FakeBehavior',
           extensionVersion: '1.0.0',
         },
       ]);
     });
-  });
 
-  describe('filterMissingBehaviors', () => {
-    it('filters behaviors that are not loaded ', () => {
-      makeTestExtensions(gd);
-
-      expect(
-        filterMissingBehaviors(gd, [
-          // An unknown behavior not loaded:
+    it('get the required extensions for custom objects in an asset', () => {
+      expect(getRequiredExtensionsFromAsset(fakeAssetWithCustomObject)).toEqual(
+        [
           {
-            extensionName: 'NotExistingExtension',
-            extensionVersion: '1.0.0',
-            behaviorType: 'NotExistingExtension::MissingBehavior',
-          },
-          // A fake behavior loaded in makeTestExtensions:
-          {
-            behaviorType: 'FakeBehavior::FakeBehavior',
-            extensionName: 'FakeBehavior',
+            extensionName: 'Button',
             extensionVersion: '1.0.0',
           },
-        ])
-      ).toEqual([
-        {
-          extensionName: 'NotExistingExtension',
-          extensionVersion: '1.0.0',
-          behaviorType: 'NotExistingExtension::MissingBehavior',
-        },
-      ]);
+        ]
+      );
     });
   });
 
@@ -689,7 +664,7 @@ describe('InstallAsset', () => {
           environment: 'live',
         })
       ).rejects.toMatchObject({
-        message: 'These behaviors could not be installed: Flash::Flash (Flash)',
+        message: 'These extensions could not be installed: Flash',
       });
 
       expect(getExtensionsRegistry).toHaveBeenCalledTimes(1);
@@ -729,6 +704,44 @@ describe('InstallAsset', () => {
           .getAllBehaviorNames()
           .toJSArray()
       ).toEqual(['MyBehavior']);
+    });
+
+    // TODO EBO Add a test for a custom object that contains another custom objet.
+    // There is 2 cases:
+    // - an event-based object from the same extension (this should already work).
+    // - an event-based object from another extension (this won't work because
+    //   it needs extension dependencies).
+
+    it('install an asset, with an event-based object that is already installed', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      const layout = project.insertNewLayout('MyTestLayout', 0);
+
+      // Fake an asset with a custom object of type "Button::PanelSpriteButton",
+      // that is installed already.
+      mockFn(Asset.getAsset).mockImplementationOnce(
+        () => fakeAssetWithCustomObject
+      );
+
+      // Install the asset
+      await installAsset({
+        assetShortHeader: fakeAssetShortHeader1,
+        project,
+        objectsContainer: layout,
+        eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+        environment: 'live',
+      });
+
+      // No extensions fetched because the behavior is already installed.
+      expect(getExtension).not.toHaveBeenCalled();
+      expect(getExtensionsRegistry).not.toHaveBeenCalled();
+
+      // Check that the object was created, with the proper behavior:
+      expect(layout.getObjectsCount()).toBe(1);
+      expect(layout.getObjectAt(0).getName()).toBe('YellowButton');
+      expect(layout.getObjectAt(0).getType()).toEqual(
+        'Button::PanelSpriteButton'
+      );
     });
   });
 });

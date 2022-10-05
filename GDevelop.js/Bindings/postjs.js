@@ -181,10 +181,17 @@ var adaptNamingConventions = function (gd) {
     } else if (typeof object === 'boolean') {
       element.setBoolValue(object);
     } else if (Array.isArray(object)) {
-      element.considerAsArray();
-      for (var i = 0; i < object.length; ++i) {
-        var item = element.addChild('');
-        elementFromJSObject(object[i], item);
+      if (object[0] === '__MULTILINESTRING__') {
+        // Restore the new lines to recreate the multiline text
+        // while skipping the first element (the magic key that 
+        // tells the serializer to treat the array as a string)
+        element.setStringValue(object.slice(1).join('\n'));
+      } else {
+        element.considerAsArray();
+        for (var i = 0; i < object.length; ++i) {
+          var item = element.addChild('');
+          elementFromJSObject(object[i], item);
+        }
       }
     } else if (typeof object === 'object') {
       for (var childName in object) {
@@ -225,9 +232,8 @@ var adaptNamingConventions = function (gd) {
       const childrenCount = children.size();
       for (let i = 0; i < childrenCount; ++i) {
         // TODO: double check usage of shared_ptr
-        const sharedPtrSerializerElement = children.getSharedPtrSerializerElement(
-          i
-        );
+        const sharedPtrSerializerElement =
+          children.getSharedPtrSerializerElement(i);
         const serializerElement = sharedPtrSerializerElement.get();
         array.push(gd.Serializer.toJSObject(serializerElement));
         sharedPtrSerializerElement.reset();
@@ -251,9 +257,8 @@ var adaptNamingConventions = function (gd) {
       for (let i = 0; i < childrenCount; ++i) {
         // TODO: double check usage of shared_ptr
         const name = children.getString(i);
-        const sharedPtrSerializerElement = children.getSharedPtrSerializerElement(
-          i
-        );
+        const sharedPtrSerializerElement =
+          children.getSharedPtrSerializerElement(i);
         const serializerElement = sharedPtrSerializerElement.get();
         object[name] = gd.Serializer.toJSObject(serializerElement);
         sharedPtrSerializerElement.reset();

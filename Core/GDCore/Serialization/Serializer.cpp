@@ -111,8 +111,12 @@ gd::String Serializer::ToEscapedXMLString(const gd::String& str) {
 }
 
 namespace {
+
+const char* MultilineStringMagicKey = "__MULTILINESTRING__";
+
 void RapidJsonValueToElement(const Value& value,
                              gd::SerializerElement& element) {
+  
   if (value.IsBool()) {
     element.SetBoolValue(value.GetBool());
   } else if (value.IsNumber()) {
@@ -135,9 +139,19 @@ void RapidJsonValueToElement(const Value& value,
       RapidJsonValueToElement(m.value, element.AddChild(m.name.GetString()));
     }
   } else if (value.IsArray()) {
-    element.ConsiderAsArray();
-    for (auto& m : value.GetArray()) {
-      RapidJsonValueToElement(m, element.AddChild(""));
+    auto array = value.GetArray();
+    if (array[0].IsString()) {
+      // This is a multiline string
+      auto it = std::next(array.begin());
+      gd::String fullStr = (it++)->GetString();
+      while (it != array.end()) fullStr += (it++)->GetString();
+      element.SetStringValue(array[0].GetString());
+    } else {
+      // This is an array
+      element.ConsiderAsArray();
+      for (auto& m : array) {
+        RapidJsonValueToElement(m, element.AddChild(""));
+      }
     }
   }
 }
@@ -156,7 +170,27 @@ void ElementToRapidJson(const gd::SerializerElement& element,
       value.SetInt(serializerValue.GetInt());
     else if (serializerValue.IsString()) {
       // This does a copy of the string, and measure the string length.
-      value.SetString(serializerValue.GetRawString().c_str(), allocator);
+      const auto& str = serializerValue.GetRawString();
+      const auto& rawStr = str.c_str();
+      if (str.find_first_of("\n") == gd::String::npos)
+        value.SetString(serializerValue.GetRawString().c_str(), allocator);
+      else {
+        // Multiline strings are stored in an array for readability.
+        value.SetArray();
+
+        // We first store a magic number so that we can still differentiate
+        // strings from arrays
+        Value magicKey;
+        magicKey.SetString(MultilineStringMagicKey, allocator);
+        value.PushBack(magicKey, allocator);
+
+        auto ss = std::stringstream{rawStr};
+        for (std::string line; std::getline(ss, line, '\n');) {
+          Value subString;
+          subString.SetString(line.c_str(), allocator);
+          value.PushBack(subString, allocator);
+        }
+      }
     }
   } else if (element.ConsideredAsArray()) {
     value.SetArray();

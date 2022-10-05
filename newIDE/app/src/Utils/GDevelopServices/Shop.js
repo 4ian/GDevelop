@@ -31,3 +31,27 @@ export const listListedPrivateAssetPacks = async (): Promise<
   const response = await client.get('/asset-pack');
   return response.data;
 };
+
+export const getAuthorizationTokenForPrivateAssets = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+  }: {|
+    userId: string,
+  |}
+): Promise<string> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.post(
+    '/asset-pack/action/authorize',
+    {},
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+  return response.data;
+};
+
+export const createAuthorizedUrl = (url: string, token: string): string => {
+  return url + '?token=' + encodeURIComponent(token);
+};

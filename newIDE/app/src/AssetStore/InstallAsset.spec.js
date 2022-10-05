@@ -707,7 +707,7 @@ describe('InstallAsset', () => {
     });
 
     // TODO EBO Add a test for a custom object that contains another custom objet.
-    // There is 2 cases:
+    // There are 2 cases:
     // - an event-based object from the same extension (this should already work).
     // - an event-based object from another extension (this won't work because
     //   it needs extension dependencies).

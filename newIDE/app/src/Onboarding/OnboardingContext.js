@@ -2,7 +2,7 @@
 import * as React from 'react';
 
 export type OnboardingFlowStep = {|
-  tagToHighlightId: string,
+  elementToHighlightId: string,
 |};
 
 export type OnboardingState = {|

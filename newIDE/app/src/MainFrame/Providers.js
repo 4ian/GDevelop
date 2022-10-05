@@ -35,6 +35,7 @@ import { TutorialStateProvider } from '../Tutorial/TutorialContext';
 import ConfirmProvider from '../UI/Alert/AlertProvider';
 import { AnnouncementsFeedStateProvider } from '../AnnouncementsFeed/AnnouncementsFeedContext';
 import PrivateAssetsAuthorizationProvider from '../AssetStore/PrivateAssets/PrivateAssetsAuthorizationProvider';
+import OnboardingProvider from '../Onboarding/OnboardingProvider';
 
 // Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
 const jss = create({
@@ -101,23 +102,25 @@ export default class Providers extends React.Component<Props, {||}> {
                                   >
                                     <ConfirmProvider>
                                       <CommandsContextProvider>
-                                        <AssetStoreStateProvider>
-                                          <ResourceStoreStateProvider>
-                                            <ExampleStoreStateProvider>
-                                              <ExtensionStoreStateProvider>
-                                                <GamesShowcaseStateProvider>
-                                                  <TutorialStateProvider>
-                                                    <AnnouncementsFeedStateProvider>
-                                                      <PrivateAssetsAuthorizationProvider>
-                                                        {children({ i18n })}
-                                                      </PrivateAssetsAuthorizationProvider>
-                                                    </AnnouncementsFeedStateProvider>
-                                                  </TutorialStateProvider>
-                                                </GamesShowcaseStateProvider>
-                                              </ExtensionStoreStateProvider>
-                                            </ExampleStoreStateProvider>
-                                          </ResourceStoreStateProvider>
-                                        </AssetStoreStateProvider>
+                                        <OnboardingProvider>
+                                          <AssetStoreStateProvider>
+                                            <ResourceStoreStateProvider>
+                                              <ExampleStoreStateProvider>
+                                                <ExtensionStoreStateProvider>
+                                                  <GamesShowcaseStateProvider>
+                                                    <TutorialStateProvider>
+                                                      <AnnouncementsFeedStateProvider>
+                                                        <PrivateAssetsAuthorizationProvider>
+                                                          {children({ i18n })}
+                                                        </PrivateAssetsAuthorizationProvider>
+                                                      </AnnouncementsFeedStateProvider>
+                                                    </TutorialStateProvider>
+                                                  </GamesShowcaseStateProvider>
+                                                </ExtensionStoreStateProvider>
+                                              </ExampleStoreStateProvider>
+                                            </ResourceStoreStateProvider>
+                                          </AssetStoreStateProvider>
+                                        </OnboardingProvider>
                                       </CommandsContextProvider>
                                     </ConfirmProvider>
                                   </EventsFunctionsExtensionsProvider>

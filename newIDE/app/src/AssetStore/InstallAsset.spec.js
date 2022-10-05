@@ -2,8 +2,7 @@
 import {
   addAssetToProject,
   addSerializedExtensionsToProject,
-  getRequiredBehaviorsFromAsset,
-  filterMissingBehaviors,
+  getRequiredExtensionsFromAsset,
   downloadExtensions,
   installAsset,
   filterMissingExtensions,
@@ -18,7 +17,6 @@ import {
   fakeAssetWithBehaviorCustomizations1,
   fakeAssetWithUnknownBehaviorCustomizations1,
   fakeAssetWithFlashBehaviorCustomizations1,
-  fakeAssetWithEventCustomizationsAndFlashExtension1,
   flashExtensionShortHeader,
   fireBulletExtensionShortHeader,
   fakeAssetWithCustomObject,
@@ -372,7 +370,7 @@ describe('InstallAsset', () => {
           .getProperties()
           .get('property1')
           .getValue()
-      ).toBe('Overriden value');
+      ).toBe('Overridden value');
       expect(
         layout
           .getObject('PlayerSpaceship')
@@ -385,50 +383,26 @@ describe('InstallAsset', () => {
   });
 
   describe('getRequiredBehaviorsFromAsset', () => {
-    it('get the behaviors required for an asset', () => {
+    it('get the required extension for behaviors in an asset', () => {
       expect(
-        getRequiredBehaviorsFromAsset(
-          fakeAssetWithEventCustomizationsAndFlashExtension1
-        )
-      ).toEqual([]);
-      expect(
-        getRequiredBehaviorsFromAsset(fakeAssetWithBehaviorCustomizations1)
+        getRequiredExtensionsFromAsset(fakeAssetWithBehaviorCustomizations1)
       ).toEqual([
         {
-          behaviorType: 'FakeBehavior::FakeBehavior',
           extensionName: 'FakeBehavior',
           extensionVersion: '1.0.0',
         },
       ]);
     });
-  });
 
-  describe('filterMissingBehaviors', () => {
-    it('filters behaviors that are not loaded ', () => {
-      makeTestExtensions(gd);
-
-      expect(
-        filterMissingBehaviors(gd, [
-          // An unknown behavior not loaded:
+    it('get the required extensions for custom objects in an asset', () => {
+      expect(getRequiredExtensionsFromAsset(fakeAssetWithCustomObject)).toEqual(
+        [
           {
-            extensionName: 'NotExistingExtension',
-            extensionVersion: '1.0.0',
-            behaviorType: 'NotExistingExtension::MissingBehavior',
-          },
-          // A fake behavior loaded in makeTestExtensions:
-          {
-            behaviorType: 'FakeBehavior::FakeBehavior',
-            extensionName: 'FakeBehavior',
+            extensionName: 'Button',
             extensionVersion: '1.0.0',
           },
-        ])
-      ).toEqual([
-        {
-          extensionName: 'NotExistingExtension',
-          extensionVersion: '1.0.0',
-          behaviorType: 'NotExistingExtension::MissingBehavior',
-        },
-      ]);
+        ]
+      );
     });
   });
 
@@ -690,7 +664,7 @@ describe('InstallAsset', () => {
           environment: 'live',
         })
       ).rejects.toMatchObject({
-        message: 'These behaviors could not be installed: Flash::Flash (Flash)',
+        message: 'These extensions could not be installed: Flash',
       });
 
       expect(getExtensionsRegistry).toHaveBeenCalledTimes(1);

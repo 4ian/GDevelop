@@ -8,7 +8,7 @@ const OnboardingProvider = (props: Props) => {
     <OnboardingContext.Provider
       value={{
         flow: null,
-        currentStep: null,
+        currentStep: { elementToHighlightId: '#add-new-object-button' },
       }}
     >
       {props.children}

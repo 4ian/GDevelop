@@ -147,6 +147,8 @@ import {
   useResourceFetcher,
   type ResourceFetcher,
 } from '../ProjectsStorage/ResourceFetcher';
+import OnboardingContext from '../Onboarding/OnboardingContext';
+import OnboardingStepDisplayer from '../Onboarding/OnboardingStepDisplayer';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -370,6 +372,7 @@ const MainFrame = (props: Props) => {
     EventsFunctionsExtensionsContext
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
+  const onboardingState = React.useContext(OnboardingContext);
   const [
     fileMetadataOpeningProgress,
     setFileMetadataOpeningProgress,
@@ -2873,6 +2876,11 @@ const MainFrame = (props: Props) => {
             clearHotReloadLogs();
             launchNewPreview();
           }}
+        />
+      )}
+      {onboardingState.currentStep && (
+        <OnboardingStepDisplayer
+          step={onboardingState.currentStep}
         />
       )}
     </div>

@@ -2786,7 +2786,7 @@ storiesOf('ObjectsList', module)
             onObjectSelected={() => {}}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
-            canInstallPrivateAsset={() => Promise.resolve(false)}
+            canInstallPrivateAsset={() => false}
           />
         </div>
       </SerializedObjectDisplay>
@@ -2824,7 +2824,7 @@ storiesOf('ObjectsList', module)
             onObjectSelected={() => {}}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
-            canInstallPrivateAsset={() => Promise.resolve(false)}
+            canInstallPrivateAsset={() => false}
           />
         </div>
       </SerializedObjectDisplay>

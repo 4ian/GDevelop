@@ -125,7 +125,7 @@ type Props = {|
   onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
   isActive: boolean,
   unsavedChanges?: ?UnsavedChanges,
-  canInstallPrivateAsset: () => Promise<boolean>,
+  canInstallPrivateAsset: () => boolean,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,

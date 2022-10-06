@@ -82,7 +82,7 @@ type Props = {|
   onClose: () => void,
   onCreateNewObject: (type: string) => void,
   onObjectAddedFromAsset: gdObject => void,
-  canInstallPrivateAsset: () => Promise<boolean>,
+  canInstallPrivateAsset: () => boolean,
 |};
 
 export default function NewObjectDialog({

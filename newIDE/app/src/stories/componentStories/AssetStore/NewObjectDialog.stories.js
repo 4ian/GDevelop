@@ -31,7 +31,7 @@ export const Default = () => (
       }}
       resourceSources={[]}
       onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
-      canInstallPrivateAsset={() => Promise.resolve(false)}
+      canInstallPrivateAsset={() => false}
     />
   </AssetStoreStateProvider>
 );

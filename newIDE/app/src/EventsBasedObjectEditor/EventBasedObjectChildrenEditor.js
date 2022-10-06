@@ -246,7 +246,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 onFetchNewlyAddedResources={
                   this.props.onFetchNewlyAddedResources
                 }
-                canInstallPrivateAsset={async () => false}
+                canInstallPrivateAsset={() => false}
               />
             </Line>
             {this.state.editedObjectWithContext && (

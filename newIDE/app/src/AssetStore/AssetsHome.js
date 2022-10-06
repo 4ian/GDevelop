@@ -18,6 +18,7 @@ import { Line, Column } from '../UI/Grid';
 import ScrollView from '../UI/ScrollView';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import ThemeContext from '../UI/Theme/ThemeContext';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 const columns = 3;
 const columnsForSmallWindow = 2;
@@ -127,11 +128,13 @@ const PrivateAssetPackTile = ({
   assetPackListingData,
   onSelect,
   style,
+  owned,
 }: {|
   assetPackListingData: PrivateAssetPackListingData,
   onSelect: () => void,
   /** Props needed so that GidList component can adjust tile size */
   style?: any,
+  owned: boolean,
 |}) => {
   const classesForGridListItem = useStylesForGridListItem();
   const gdevelopTheme = React.useContext(ThemeContext);
@@ -161,9 +164,14 @@ const PrivateAssetPackTile = ({
           src={assetPackListingData.thumbnailUrls[0]}
           alt={`Preview image of asset pack ${assetPackListingData.name}`}
         />
-        <div style={styles.priceTagContainer}>
-          <PriceTag value={assetPackListingData.prices[0].value} withOverlay />
-        </div>
+        {!owned && (
+          <div style={styles.priceTagContainer}>
+            <PriceTag
+              value={assetPackListingData.prices[0].value}
+              withOverlay
+            />
+          </div>
+        )}
         <Column>
           <Line justifyContent="space-between" noMargin>
             <Text style={styles.packTitle} size="body2">
@@ -195,6 +203,7 @@ export const AssetsHome = ({
   onPrivateAssetPackSelection,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
+  const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
 
   const starterPacksTiles = starterPacks.map(assetPack => (
     <PublicAssetPackTile
@@ -207,7 +216,13 @@ export const AssetsHome = ({
     assetPackListingData => (
       <PrivateAssetPackTile
         assetPackListingData={assetPackListingData}
-        onSelect={() => onPrivateAssetPackSelection(assetPackListingData)}
+        onSelect={() => {
+          onPrivateAssetPackSelection(assetPackListingData);
+        }}
+        owned={
+          !!receivedAssetPacks &&
+          !!receivedAssetPacks.find(pack => pack.id === assetPackListingData.id)
+        }
       />
     )
   );

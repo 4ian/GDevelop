@@ -150,9 +150,6 @@ export const AssetStore = ({ project }: Props) => {
     [shouldAutofocusSearchbar]
   );
 
-  console.log('openedAssetPack', openedAssetPack);
-  console.log('filtersState', filtersState);
-
   return (
     <>
       <ResponsiveWindowMeasurer>

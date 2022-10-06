@@ -13,7 +13,10 @@ import {
   sendAssetOpened,
   sendAssetPackOpened,
 } from '../Utils/Analytics/EventSender';
-import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import {
+  type AssetShortHeader,
+  type PublicAssetPack,
+} from '../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
@@ -33,9 +36,10 @@ import IconButton from '../UI/IconButton';
 import { AssetDetails } from './AssetDetails';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Home from '@material-ui/icons/Home';
-import PrivateAssetPackDialog from './PrivateAssetPackDialog';
+import PrivateAssetPackDialog from './PrivateAssets/PrivateAssetPackDialog';
 import PlaceholderError from '../UI/PlaceholderError';
 import AlertMessage from '../UI/AlertMessage';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 type Props = {|
   project: gdProject,
@@ -43,7 +47,7 @@ type Props = {|
 
 export const AssetStore = ({ project }: Props) => {
   const {
-    assetPacks,
+    publicAssetPacks,
     privateAssetPacks,
     searchResults,
     error,
@@ -64,9 +68,10 @@ export const AssetStore = ({ project }: Props) => {
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
   const [
-    selectedPrivateAssetPack,
-    setSelectedPrivateAssetPack,
+    selectedPrivateAssetPackListingData,
+    setSelectedPrivateAssetPackListingData,
   ] = React.useState<?PrivateAssetPackListingData>(null);
+  const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
 
   const onOpenDetails = (assetShortHeader: AssetShortHeader) => {
     sendAssetOpened({
@@ -78,16 +83,8 @@ export const AssetStore = ({ project }: Props) => {
 
   // When a pack is selected from the home page,
   // we set it as the chosen category and open the filters panel.
-  const selectPack = (tag: string) => {
-    if (!assetPacks) return;
-
-    sendAssetPackOpened(tag);
-
-    const assetPack = assetPacks.starterPacks.find(pack => pack.tag === tag);
-    if (!assetPack) {
-      // This can't actually happen.
-      return;
-    }
+  const selectPublicAssetPack = (assetPack: PublicAssetPack) => {
+    sendAssetPackOpened(assetPack.tag);
 
     if (assetPack.externalWebLink) {
       Window.openExternalURL(assetPack.externalWebLink);
@@ -97,13 +94,42 @@ export const AssetStore = ({ project }: Props) => {
     }
   };
 
+  // When a private pack is selected from the home page,
+  // if the user owns it, we set it as the chosen category,
+  // otherwise we open the dialog to buy it.
+  const selectPrivateAssetPack = (
+    assetPackListingData: PrivateAssetPackListingData
+  ) => {
+    sendAssetPackOpened(assetPackListingData.name);
+
+    const receivedAssetPack = receivedAssetPacks
+      ? receivedAssetPacks.find(pack => pack.id === assetPackListingData.id)
+      : null;
+
+    if (!receivedAssetPack) {
+      // The user has not received the pack, open the dialog to buy it.
+      setSelectedPrivateAssetPackListingData(assetPackListingData);
+      return;
+    }
+
+    // The user has received the pack, open it.
+    navigationState.openPackPage(receivedAssetPack);
+    setIsFiltersPanelOpen(true);
+  };
+
   // When a tag is selected from the asset details page,
-  // we set it as the chosen category, clear old filters and open the filters panel.
+  // first determine if it's a public or private pack,
+  // then set it as the chosen category, clear old filters and open the filters panel.
   const selectTag = (tag: string) => {
-    const assetPack =
-      assetPacks && assetPacks.starterPacks.find(pack => pack.tag === tag);
-    if (assetPack) {
-      navigationState.openPackPage(assetPack);
+    const privateAssetPack =
+      receivedAssetPacks && receivedAssetPacks.find(pack => pack.tag === tag);
+    const publicAssetPack =
+      publicAssetPacks &&
+      publicAssetPacks.starterPacks.find(pack => pack.tag === tag);
+    if (privateAssetPack) {
+      navigationState.openPackPage(privateAssetPack);
+    } else if (publicAssetPack) {
+      navigationState.openPackPage(publicAssetPack);
     } else {
       navigationState.openTagPage(tag);
     }
@@ -191,12 +217,12 @@ export const AssetStore = ({ project }: Props) => {
                         <>
                           <Column expand alignItems="center">
                             <Text size="block-title" noMargin>
-                              {filtersState.chosenCategory
+                              {openedAssetPack
+                                ? openedAssetPack.name
+                                : filtersState.chosenCategory
                                 ? capitalize(
                                     filtersState.chosenCategory.node.name
                                   )
-                                : openedAssetPack
-                                ? openedAssetPack.name
                                 : ''}
                             </Text>
                           </Column>
@@ -268,18 +294,18 @@ export const AssetStore = ({ project }: Props) => {
                   </Background>
                 )}
                 {isOnHomePage &&
-                  !(assetPacks && privateAssetPacks) &&
+                  !(publicAssetPacks && privateAssetPacks) &&
                   !error && <PlaceholderLoader />}
                 {isOnHomePage &&
-                  assetPacks &&
+                  publicAssetPacks &&
                   privateAssetPacks &&
                   assetPackRandomOrdering && (
                     <AssetsHome
-                      assetPacks={assetPacks}
-                      privateAssetPacks={privateAssetPacks}
+                      publicAssetPacks={publicAssetPacks}
+                      privateAssetPacksListingData={privateAssetPacks}
                       assetPackRandomOrdering={assetPackRandomOrdering}
-                      onPackSelection={selectPack}
-                      onPrivateAssetPackSelection={setSelectedPrivateAssetPack}
+                      onPublicAssetPackSelection={selectPublicAssetPack}
+                      onPrivateAssetPackSelection={selectPrivateAssetPack}
                     />
                   )}
                 {!isOnHomePage && !openedAssetShortHeader && (
@@ -320,10 +346,12 @@ export const AssetStore = ({ project }: Props) => {
                     onOpenDetails={onOpenDetails}
                   />
                 )}
-                {selectedPrivateAssetPack && (
+                {selectedPrivateAssetPackListingData && (
                   <PrivateAssetPackDialog
-                    privateAssetPack={selectedPrivateAssetPack}
-                    onClose={() => setSelectedPrivateAssetPack(null)}
+                    privateAssetPackListingData={
+                      selectedPrivateAssetPackListingData
+                    }
+                    onClose={() => setSelectedPrivateAssetPackListingData(null)}
                   />
                 )}
               </Line>

@@ -297,6 +297,8 @@ namespace gdjs {
       this.persistentUuid = null;
       this.pick = false;
       this.hitBoxesDirty = true;
+      this._defaultHitBoxes.length = 0;
+      this._defaultHitBoxes.push(gdjs.Polygon.createRectangle(0, 0));
       this.aabb.min[0] = 0;
       this.aabb.min[1] = 0;
       this.aabb.max[0] = 0;

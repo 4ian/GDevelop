@@ -282,7 +282,7 @@ export const WithObjectsList = () => (
                   onFetchNewlyAddedResources={action(
                     'onFetchNewlyAddedResources'
                   )}
-                  canInstallPrivateAsset={() => Promise.resolve(false)}
+                  canInstallPrivateAsset={() => false}
                 />
               </TabContentContainer>
             }

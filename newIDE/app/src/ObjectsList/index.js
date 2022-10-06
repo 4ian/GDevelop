@@ -122,7 +122,7 @@ type Props = {|
     cb: (boolean) => void
   ) => void,
   selectedObjectNames: Array<string>,
-  canInstallPrivateAsset: () => Promise<boolean>,
+  canInstallPrivateAsset: () => boolean,
 
   selectedObjectTags: SelectedTags,
   getAllObjectTags: () => Tags,

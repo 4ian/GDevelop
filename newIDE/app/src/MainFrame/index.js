@@ -146,7 +146,6 @@ import {
   useResourceFetcher,
   type ResourceFetcher,
 } from '../ProjectsStorage/ResourceFetcher';
-import { getCloudProject } from '../Utils/GDevelopServices/Project';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -246,6 +245,7 @@ export type Props = {
     storageProvider?: ?StorageProvider
   ) => StorageProviderOperations,
   getStorageProvider: () => StorageProvider,
+  resetStorageProvider: () => void,
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   requestUpdate?: () => void,
@@ -411,6 +411,7 @@ const MainFrame = (props: Props) => {
     resourceFetcher,
     getStorageProviderOperations,
     getStorageProvider,
+    resetStorageProvider,
     initialDialog,
     initialFileMetadataToOpen,
     introDialog,
@@ -675,6 +676,7 @@ const MainFrame = (props: Props) => {
             currentProject
           );
           currentProject.delete();
+          resetStorageProvider();
         }
 
         return {
@@ -690,6 +692,7 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
       setState,
+      resetStorageProvider,
     ]
   );
 
@@ -2183,27 +2186,18 @@ const MainFrame = (props: Props) => {
     return true;
   };
 
-  const canInstallPrivateAsset = async (): Promise<boolean> => {
-    const storageProvider = getStorageProvider();
-    // A private asset can always be installed locally, as it will be downloaded.
-    if (storageProvider.internalName === 'LocalFile') {
-      return true;
-    }
-    // A private asset can be installed on the cloud if the user has saved their project as a cloud project.
-    if (storageProvider.internalName === 'Cloud') {
-      if (!currentFileMetadata) {
-        return false;
-      }
-      const cloudProjectId = currentFileMetadata.fileIdentifier;
-
-      const cloudProject = await getCloudProject(
-        authenticatedUser,
-        cloudProjectId
+  const canInstallPrivateAsset = React.useCallback(
+    () => {
+      const storageProvider = getStorageProvider();
+      // A private asset can always be installed locally, as it will be downloaded.
+      // Or on the cloud if the user has saved their project as a cloud project.
+      return (
+        storageProvider.internalName === 'LocalFile' ||
+        storageProvider.internalName === 'Cloud'
       );
-      return !!cloudProject;
-    }
-    return false;
-  };
+    },
+    [getStorageProvider]
+  );
 
   const onChooseResource: ChooseResourceFunction = (
     options: ChooseResourceOptions
@@ -2288,8 +2282,11 @@ const MainFrame = (props: Props) => {
         currentProject.setTemplateSlug(selectedExampleShortHeader.slug);
       if (source.projectName) currentProject.setName(source.projectName);
 
-      // If there is a destination, save the project where asked to.
-      if (destination) {
+      if (!destination) {
+        // If there is no destination, ensure the storageProvider is reset.
+        resetStorageProvider();
+      } else {
+        // If there is a destination, save the project where asked to.
         const destinationStorageProviderOperations = getStorageProviderOperations(
           destination.storageProvider
         );

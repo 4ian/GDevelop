@@ -17,7 +17,7 @@ const POINT_COORDINATE_PRECISION = 4;
 type Props = {|
   pointName: string,
   nameError?: boolean,
-  onBlur?: (ev: any) => void,
+  onChangePointName?: (newName: string) => void,
   onRemove?: ?(ev: any) => void,
   onEdit?: ?(ev: any) => void,
   onClick: (pointName: string) => void,
@@ -56,9 +56,9 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => {
           id={props.pointName}
           fullWidth
           errorText={props.nameError ? 'This name is already taken' : undefined}
-          disabled={!props.onBlur}
-          onBlur={props.onBlur}
-          onChange={value => {}}
+          disabled={!props.onChangePointName}
+          commitOnBlur
+          onChange={props.onChangePointName || (newName => {})}
         />
       </TableRowColumn>
       <TableRowColumn style={styles.coordinateColumn} padding="none">

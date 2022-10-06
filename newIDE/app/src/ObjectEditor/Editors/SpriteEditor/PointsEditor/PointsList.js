@@ -81,8 +81,7 @@ const PointsListBody = (props: PointsListBodyProps) => {
         pointName={pointName}
         selected={pointName === props.selectedPointName}
         nameError={nameErrors[pointName]}
-        onBlur={event => {
-          const newName = event.target.value;
+        onChangePointName={(newName: string) => {
           if (pointName === newName) return;
           if (!newName) return;
 

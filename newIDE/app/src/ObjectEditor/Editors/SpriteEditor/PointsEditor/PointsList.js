@@ -73,7 +73,7 @@ const PointsListBody = (props: PointsListBodyProps) => {
 
     return (
       <PointRow
-        key={'point-' + point.ptr}
+        key={`point-${point.ptr}`}
         pointX={point.getX()}
         pointY={point.getY()}
         onChangePointX={newValue => updatePointX(point, newValue)}
@@ -81,9 +81,9 @@ const PointsListBody = (props: PointsListBodyProps) => {
         pointName={pointName}
         selected={pointName === props.selectedPointName}
         nameError={nameErrors[pointName]}
-        onBlur={event => {
-          const newName = event.target.value;
+        onChangePointName={(newName: string) => {
           if (pointName === newName) return;
+          if (!newName) return;
 
           let success = true;
           if (pointsContainer.hasPoint(newName)) {

@@ -79,7 +79,7 @@ const VerticeRow = ({
                   isOver
                     ? {
                         borderTop: `2px solid ${
-                          gdevelopTheme.listItem.selectedBackgroundColor
+                          gdevelopTheme.dropIndicator.canDrop
                         }`,
                       }
                     : undefined

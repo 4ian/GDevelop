@@ -8,7 +8,10 @@ import Paper from '@material-ui/core/Paper';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import Text from '../UI/Text';
 import PriceTag from '../UI/PriceTag';
-import type { AssetPacks, AssetPack } from '../Utils/GDevelopServices/Asset';
+import type {
+  PublicAssetPacks,
+  PublicAssetPack,
+} from '../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { Line, Column } from '../UI/Grid';
@@ -63,16 +66,16 @@ const useStylesForGridListItem = makeStyles(theme =>
   })
 );
 
-const AssetPackTile = ({
+const PublicAssetPackTile = ({
   assetPack,
   onSelect,
   style,
-}: {
-  assetPack: AssetPack,
-  onSelect: (tag: string) => void,
+}: {|
+  assetPack: PublicAssetPack,
+  onSelect: () => void,
   /** Props needed so that GidList component can adjust tile size */
   style?: any,
-}) => {
+|}) => {
   const classesForGridListItem = useStylesForGridListItem();
   const gdevelopTheme = React.useContext(ThemeContext);
 
@@ -83,11 +86,11 @@ const AssetPackTile = ({
       tabIndex={0}
       onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
         if (shouldValidate(event)) {
-          onSelect(assetPack.tag);
+          onSelect();
         }
       }}
       style={style}
-      onClick={() => onSelect(assetPack.tag)}
+      onClick={onSelect}
     >
       <Paper
         elevation={2}
@@ -121,29 +124,29 @@ const AssetPackTile = ({
 };
 
 const PrivateAssetPackTile = ({
-  assetPack,
+  assetPackListingData,
   onSelect,
   style,
-}: {
-  assetPack: PrivateAssetPackListingData,
-  onSelect: (assetPack: PrivateAssetPackListingData) => void,
+}: {|
+  assetPackListingData: PrivateAssetPackListingData,
+  onSelect: () => void,
   /** Props needed so that GidList component can adjust tile size */
   style?: any,
-}) => {
+|}) => {
   const classesForGridListItem = useStylesForGridListItem();
   const gdevelopTheme = React.useContext(ThemeContext);
   return (
     <GridListTile
       classes={classesForGridListItem}
-      key={assetPack.id}
+      key={assetPackListingData.id}
       tabIndex={0}
       onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
         if (shouldValidate(event)) {
-          onSelect(assetPack);
+          onSelect();
         }
       }}
       style={style}
-      onClick={() => onSelect(assetPack)}
+      onClick={onSelect}
     >
       <Paper
         elevation={2}
@@ -153,21 +156,21 @@ const PrivateAssetPackTile = ({
         }}
       >
         <CorsAwareImage
-          key={assetPack.name}
+          key={assetPackListingData.name}
           style={styles.previewImage}
-          src={assetPack.thumbnailUrls[0]}
-          alt={`Preview image of asset pack ${assetPack.name}`}
+          src={assetPackListingData.thumbnailUrls[0]}
+          alt={`Preview image of asset pack ${assetPackListingData.name}`}
         />
         <div style={styles.priceTagContainer}>
-          <PriceTag value={assetPack.prices[0].value} withOverlay />
+          <PriceTag value={assetPackListingData.prices[0].value} withOverlay />
         </div>
         <Column>
           <Line justifyContent="space-between" noMargin>
             <Text style={styles.packTitle} size="body2">
-              {assetPack.name}
+              {assetPackListingData.name}
             </Text>
             <Text style={styles.packTitle} color="primary" size="body2">
-              <Trans>{assetPack.description}</Trans>
+              <Trans>{assetPackListingData.description}</Trans>
             </Text>
           </Line>
         </Column>
@@ -177,32 +180,37 @@ const PrivateAssetPackTile = ({
 };
 
 type Props = {|
-  assetPacks: AssetPacks,
-  privateAssetPacks: Array<PrivateAssetPackListingData>,
+  publicAssetPacks: PublicAssetPacks,
+  privateAssetPacksListingData: Array<PrivateAssetPackListingData>,
   assetPackRandomOrdering: Array<number>,
-  onPackSelection: string => void,
+  onPublicAssetPackSelection: PublicAssetPack => void,
   onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
 |};
 
 export const AssetsHome = ({
-  assetPacks: { starterPacks },
-  privateAssetPacks,
+  publicAssetPacks: { starterPacks },
+  privateAssetPacksListingData,
   assetPackRandomOrdering,
-  onPackSelection,
+  onPublicAssetPackSelection,
   onPrivateAssetPackSelection,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
 
-  const starterPacksTiles = starterPacks.map(pack => (
-    <AssetPackTile assetPack={pack} onSelect={onPackSelection} />
-  ));
-
-  const privateAssetPacksTiles = privateAssetPacks.map(pack => (
-    <PrivateAssetPackTile
-      assetPack={pack}
-      onSelect={onPrivateAssetPackSelection}
+  const starterPacksTiles = starterPacks.map(assetPack => (
+    <PublicAssetPackTile
+      assetPack={assetPack}
+      onSelect={() => onPublicAssetPackSelection(assetPack)}
     />
   ));
+
+  const privateAssetPacksTiles = privateAssetPacksListingData.map(
+    assetPackListingData => (
+      <PrivateAssetPackTile
+        assetPackListingData={assetPackListingData}
+        onSelect={() => onPrivateAssetPackSelection(assetPackListingData)}
+      />
+    )
+  );
 
   const allTiles = starterPacksTiles
     .concat(privateAssetPacksTiles)

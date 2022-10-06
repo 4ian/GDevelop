@@ -3,12 +3,13 @@ import * as React from 'react';
 import { type FiltersState } from '../UI/Search/FiltersChooser';
 import {
   type AssetShortHeader,
-  type AssetPack,
+  type PublicAssetPack,
+  type PrivateAssetPack,
 } from '../Utils/GDevelopServices/Asset';
 
 export type AssetStorePageState = {|
   isOnHomePage: boolean,
-  openedAssetPack: ?AssetPack,
+  openedAssetPack: PublicAssetPack | PrivateAssetPack | null,
   openedAssetShortHeader: ?AssetShortHeader,
   filtersState: FiltersState,
   ignoreTextualSearch: boolean,
@@ -23,7 +24,7 @@ export type NavigationState = {|
   openSearchIfNeeded: () => void,
   activateTextualSearch: () => void,
   openTagPage: string => void,
-  openPackPage: AssetPack => void,
+  openPackPage: (PublicAssetPack | PrivateAssetPack) => void,
   openDetailPage: AssetShortHeader => void,
 |};
 
@@ -118,7 +119,7 @@ export const useNavigation = (): NavigationState => {
       });
       setHistory({ previousPages });
     },
-    openPackPage: (assetPack: AssetPack) => {
+    openPackPage: (assetPack: PublicAssetPack | PrivateAssetPack) => {
       previousPages.push({
         isOnHomePage: false,
         openedAssetShortHeader: null,

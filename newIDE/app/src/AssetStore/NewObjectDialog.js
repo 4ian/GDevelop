@@ -1,6 +1,8 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
+import { I18n } from '@lingui/react';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import ListIcon from '../UI/ListIcon';
@@ -30,11 +32,13 @@ import ScrollView from '../UI/ScrollView';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import RaisedButton from '../UI/RaisedButton';
 import { AssetStoreContext } from './AssetStoreContext';
-import { AssetPackDialog } from './AssetPackDialog';
-import { installAsset } from './InstallAsset';
+import AssetPackDialog from './AssetPackInstallDialog';
+import { installPublicAsset } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import { showErrorBox } from '../UI/Messages/MessageBox';
+import { showErrorBox, showWarningBox } from '../UI/Messages/MessageBox';
 import Window from '../Utils/Window';
+import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
+import { isPrivateAsset } from '../Utils/GDevelopServices/Asset';
 const isDev = Window.isDev();
 
 const ObjectListItem = ({
@@ -78,6 +82,7 @@ type Props = {|
   onClose: () => void,
   onCreateNewObject: (type: string) => void,
   onObjectAddedFromAsset: gdObject => void,
+  canInstallPrivateAsset: () => boolean,
 |};
 
 export default function NewObjectDialog({
@@ -91,6 +96,7 @@ export default function NewObjectDialog({
   onClose,
   onCreateNewObject,
   onObjectAddedFromAsset,
+  canInstallPrivateAsset,
 }: Props) {
   const {
     setNewObjectDialogDefaultTab,
@@ -156,25 +162,54 @@ export default function NewObjectDialog({
   );
   const isAssetAddedToScene =
     openedAssetShortHeader && addedAssetIds.includes(openedAssetShortHeader.id);
+  const { installPrivateAsset } = React.useContext(
+    PrivateAssetsAuthorizationContext
+  );
 
   const onInstallAsset = React.useCallback(
-    () => {
+    (i18n: I18nType) => {
       setIsAssetBeingInstalled(true);
       (async () => {
         if (!openedAssetShortHeader) return;
         try {
-          const installOutput = await installAsset({
-            assetShortHeader: openedAssetShortHeader,
-            eventsFunctionsExtensionsState,
-            project,
-            objectsContainer,
-            environment,
-          });
+          const isPrivate = isPrivateAsset(openedAssetShortHeader);
+          if (isPrivate) {
+            const canUserInstallPrivateAsset = await canInstallPrivateAsset();
+            if (!canUserInstallPrivateAsset) {
+              showWarningBox(
+                i18n._(
+                  t`In order to use this asset online, your project must be saved using GDevelop Cloud. Save your project then try again!`
+                ),
+                {
+                  delayToNextTick: true,
+                }
+              );
+              setIsAssetBeingInstalled(false);
+              return;
+            }
+          }
+          const installOutput = isPrivate
+            ? await installPrivateAsset({
+                assetShortHeader: openedAssetShortHeader,
+                eventsFunctionsExtensionsState,
+                project,
+                objectsContainer,
+                environment,
+              })
+            : await installPublicAsset({
+                assetShortHeader: openedAssetShortHeader,
+                eventsFunctionsExtensionsState,
+                project,
+                objectsContainer,
+                environment,
+              });
+          if (!installOutput) {
+            throw new Error('Unable to install private Asset.');
+          }
           sendAssetAddedToProject({
             id: openedAssetShortHeader.id,
             name: openedAssetShortHeader.name,
           });
-          console.log('Asset successfully installed.');
 
           installOutput.createdObjects.forEach(object => {
             onObjectAddedFromAsset(object);
@@ -203,6 +238,8 @@ export default function NewObjectDialog({
       openedAssetShortHeader,
       environment,
       onFetchNewlyAddedResources,
+      installPrivateAsset,
+      canInstallPrivateAsset,
     ]
   );
 
@@ -218,133 +255,141 @@ export default function NewObjectDialog({
     [fetchAssetsAndFilters, environment]
   );
 
-  const mainAction = openedAssetPack ? (
-    <RaisedButton
-      key="add-all-assets"
-      primary
-      label={<Trans>Add all assets to my scene</Trans>}
-      onClick={() => setIsAssetPackDialogInstallOpen(true)}
-      disabled={!searchResults || searchResults.length === 0}
-    />
-  ) : openedAssetShortHeader ? (
-    <RaisedButton
-      key="add-asset"
-      primary={!isAssetAddedToScene}
-      label={
-        isAssetBeingInstalled ? (
-          <Trans>Adding...</Trans>
-        ) : isAssetAddedToScene ? (
-          <Trans>Add again</Trans>
-        ) : (
-          <Trans>Add to the scene</Trans>
-        )
-      }
-      onClick={onInstallAsset}
-      disabled={isAssetBeingInstalled}
-      id="add-asset-button"
-    />
-  ) : isDev ? (
-    <RaisedButton
-      key="show-dev-assets"
-      label={
-        environment === 'staging' ? (
-          <Trans>Show live assets</Trans>
-        ) : (
-          <Trans>Show staging assets</Trans>
-        )
-      }
-      onClick={() => {
-        setEnvironment(environment === 'staging' ? 'live' : 'staging');
-      }}
-    />
-  ) : (
-    undefined
-  );
+  const getMainAction = i18n =>
+    openedAssetPack ? (
+      <RaisedButton
+        key="add-all-assets"
+        primary
+        label={<Trans>Add all assets to my scene</Trans>}
+        onClick={() => setIsAssetPackDialogInstallOpen(true)}
+        disabled={!searchResults || searchResults.length === 0}
+      />
+    ) : openedAssetShortHeader ? (
+      <RaisedButton
+        key="add-asset"
+        primary={!isAssetAddedToScene}
+        label={
+          isAssetBeingInstalled ? (
+            <Trans>Adding...</Trans>
+          ) : isAssetAddedToScene ? (
+            <Trans>Add again</Trans>
+          ) : (
+            <Trans>Add to the scene</Trans>
+          )
+        }
+        onClick={() => onInstallAsset(i18n)}
+        disabled={isAssetBeingInstalled}
+        id="add-asset-button"
+      />
+    ) : isDev ? (
+      <RaisedButton
+        key="show-dev-assets"
+        label={
+          environment === 'staging' ? (
+            <Trans>Show live assets</Trans>
+          ) : (
+            <Trans>Show staging assets</Trans>
+          )
+        }
+        onClick={() => {
+          setEnvironment(environment === 'staging' ? 'live' : 'staging');
+        }}
+      />
+    ) : (
+      undefined
+    );
 
   return (
-    <>
-      <Dialog
-        title={<Trans>Add a new object</Trans>}
-        secondaryActions={[<HelpButton helpPagePath="/objects" key="help" />]}
-        actions={[
-          <FlatButton
-            key="close"
-            label={<Trans>Close</Trans>}
-            primary={false}
-            onClick={onClose}
-            id="close-button"
-          />,
-          mainAction,
-        ]}
-        onRequestClose={onClose}
-        onApply={
-          openedAssetPack
-            ? () => setIsAssetPackDialogInstallOpen(true)
-            : openedAssetShortHeader
-            ? onInstallAsset
-            : undefined
-        }
-        open
-        flexBody
-        noMargin
-        fullHeight
-        id="new-object-dialog"
-      >
-        <Column noMargin expand>
-          <Tabs value={currentTab} onChange={setCurrentTab}>
-            <Tab label={<Trans>Asset Store</Trans>} value="asset-store" />
-            <Tab
-              label={<Trans>New object from scratch</Trans>}
-              value="new-object"
-            />
-          </Tabs>
-          {currentTab === 'asset-store' && <AssetStore project={project} />}
-          {currentTab === 'new-object' && (
-            <ScrollView>
-              {DismissableTutorialMessage && (
-                <Line>
-                  <Column expand>{DismissableTutorialMessage}</Column>
-                </Line>
+    <I18n>
+      {({ i18n }) => (
+        <>
+          <Dialog
+            title={<Trans>Add a new object</Trans>}
+            secondaryActions={[
+              <HelpButton helpPagePath="/objects" key="help" />,
+            ]}
+            actions={[
+              <FlatButton
+                key="close"
+                label={<Trans>Close</Trans>}
+                primary={false}
+                onClick={onClose}
+                id="close-button"
+              />,
+              getMainAction(i18n),
+            ]}
+            onRequestClose={onClose}
+            onApply={
+              openedAssetPack
+                ? () => setIsAssetPackDialogInstallOpen(true)
+                : openedAssetShortHeader
+                ? () => onInstallAsset(i18n)
+                : undefined
+            }
+            open
+            flexBody
+            noMargin
+            fullHeight
+            id="new-object-dialog"
+          >
+            <Column noMargin expand>
+              <Tabs value={currentTab} onChange={setCurrentTab}>
+                <Tab label={<Trans>Asset Store</Trans>} value="asset-store" />
+                <Tab
+                  label={<Trans>New object from scratch</Trans>}
+                  value="new-object"
+                />
+              </Tabs>
+              {currentTab === 'asset-store' && <AssetStore project={project} />}
+              {currentTab === 'new-object' && (
+                <ScrollView>
+                  {DismissableTutorialMessage && (
+                    <Line>
+                      <Column expand>{DismissableTutorialMessage}</Column>
+                    </Line>
+                  )}
+                  <List>
+                    {Object.keys(objectsByCategory).map(category => {
+                      const categoryObjectMetadata =
+                        objectsByCategory[category];
+                      return (
+                        <React.Fragment key={category}>
+                          <Subheader>{category}</Subheader>
+                          {categoryObjectMetadata.map(objectMetadata => (
+                            <ObjectListItem
+                              key={objectMetadata.name}
+                              objectMetadata={objectMetadata}
+                              onClick={() => {
+                                sendNewObjectCreated(objectMetadata.name);
+                                onCreateNewObject(objectMetadata.name);
+                              }}
+                            />
+                          ))}
+                        </React.Fragment>
+                      );
+                    })}
+                  </List>
+                </ScrollView>
               )}
-              <List>
-                {Object.keys(objectsByCategory).map(category => {
-                  const categoryObjectMetadata = objectsByCategory[category];
-                  return (
-                    <React.Fragment key={category}>
-                      <Subheader>{category}</Subheader>
-                      {categoryObjectMetadata.map(objectMetadata => (
-                        <ObjectListItem
-                          key={objectMetadata.name}
-                          objectMetadata={objectMetadata}
-                          onClick={() => {
-                            sendNewObjectCreated(objectMetadata.name);
-                            onCreateNewObject(objectMetadata.name);
-                          }}
-                        />
-                      ))}
-                    </React.Fragment>
-                  );
-                })}
-              </List>
-            </ScrollView>
+            </Column>
+          </Dialog>
+          {isAssetPackDialogInstallOpen && searchResults && openedAssetPack && (
+            <AssetPackDialog
+              assetPack={openedAssetPack}
+              assetShortHeaders={searchResults}
+              addedAssetIds={addedAssetIds}
+              onClose={() => setIsAssetPackDialogInstallOpen(false)}
+              onAssetsAdded={() => {
+                setIsAssetPackDialogInstallOpen(false);
+              }}
+              project={project}
+              objectsContainer={objectsContainer}
+              onObjectAddedFromAsset={onObjectAddedFromAsset}
+              onFetchNewlyAddedResources={onFetchNewlyAddedResources}
+            />
           )}
-        </Column>
-      </Dialog>
-      {isAssetPackDialogInstallOpen && searchResults && openedAssetPack && (
-        <AssetPackDialog
-          assetPack={openedAssetPack}
-          assetShortHeaders={searchResults}
-          addedAssetIds={addedAssetIds}
-          onClose={() => setIsAssetPackDialogInstallOpen(false)}
-          onAssetsAdded={() => {
-            setIsAssetPackDialogInstallOpen(false);
-          }}
-          project={project}
-          objectsContainer={objectsContainer}
-          onObjectAddedFromAsset={onObjectAddedFromAsset}
-          onFetchNewlyAddedResources={onFetchNewlyAddedResources}
-        />
+        </>
       )}
-    </>
+    </I18n>
   );
 }

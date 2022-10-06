@@ -21,6 +21,14 @@ const makeTestProjectWithResourcesToDownload = () => {
     project.getResourcesManager().addResource(newResource);
     newResource.delete();
   }
+  // Resource with an authorized URL
+  {
+    const newResource = new gd.ImageResource();
+    newResource.setName('MyResourceToDownload');
+    newResource.setFile('http://example/file-to-download.png?token=123');
+    project.getResourcesManager().addResource(newResource);
+    newResource.delete();
+  }
 
   // Add a resource that won't need to be downloaded (like other
   // resources in the test project).

@@ -62,6 +62,17 @@ const AuthorizedAssetImage = ({
     if (onLoad) onLoad(e);
   };
 
+  // Ensure the loading status is reset when the URL changes,
+  // this can happen when used inside an animation preview.
+  React.useEffect(
+    () => {
+      if (url) {
+        setIsImageLoaded(false);
+      }
+    },
+    [url]
+  );
+
   return (
     <>
       <img

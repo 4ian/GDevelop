@@ -52,8 +52,12 @@ export const moveUrlResourcesToLocalFiles = async ({
       const resource = resourcesManager.getResource(resourceName);
 
       const url = resource.getFile();
-      const extension = path.extname(url);
-      const filenameWithoutExtension = path.basename(url, extension);
+      const urlWithoutQueryParams = url.split('?')[0];
+      const extension = path.extname(urlWithoutQueryParams);
+      const filenameWithoutExtension = path.basename(
+        urlWithoutQueryParams,
+        extension
+      );
       const name = newNameGenerator(filenameWithoutExtension, name => {
         const tentativePath = path.join(baseAssetsPath, name) + extension;
         return (

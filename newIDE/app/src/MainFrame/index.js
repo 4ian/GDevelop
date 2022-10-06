@@ -245,6 +245,7 @@ export type Props = {
     storageProvider?: ?StorageProvider
   ) => StorageProviderOperations,
   getStorageProvider: () => StorageProvider,
+  resetStorageProvider: () => void,
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   requestUpdate?: () => void,
@@ -410,6 +411,7 @@ const MainFrame = (props: Props) => {
     resourceFetcher,
     getStorageProviderOperations,
     getStorageProvider,
+    resetStorageProvider,
     initialDialog,
     initialFileMetadataToOpen,
     introDialog,
@@ -674,6 +676,7 @@ const MainFrame = (props: Props) => {
             currentProject
           );
           currentProject.delete();
+          resetStorageProvider();
         }
 
         return {
@@ -689,6 +692,7 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
       setState,
+      resetStorageProvider,
     ]
   );
 
@@ -757,6 +761,7 @@ const MainFrame = (props: Props) => {
           fileMetadata,
           storageProvider,
           storageProviderOperations,
+          authenticatedUser,
         });
       }
 
@@ -770,6 +775,7 @@ const MainFrame = (props: Props) => {
       getStorageProvider,
       getStorageProviderOperations,
       ensureResourcesAreFetched,
+      authenticatedUser,
     ]
   );
 
@@ -2180,6 +2186,19 @@ const MainFrame = (props: Props) => {
     return true;
   };
 
+  const canInstallPrivateAsset = React.useCallback(
+    () => {
+      const storageProvider = getStorageProvider();
+      // A private asset can always be installed locally, as it will be downloaded.
+      // Or on the cloud if the user has saved their project as a cloud project.
+      return (
+        storageProvider.internalName === 'LocalFile' ||
+        storageProvider.internalName === 'Cloud'
+      );
+    },
+    [getStorageProvider]
+  );
+
   const onChooseResource: ChooseResourceFunction = (
     options: ChooseResourceOptions
   ) => {
@@ -2263,8 +2282,11 @@ const MainFrame = (props: Props) => {
         currentProject.setTemplateSlug(selectedExampleShortHeader.slug);
       if (source.projectName) currentProject.setName(source.projectName);
 
-      // If there is a destination, save the project where asked to.
-      if (destination) {
+      if (!destination) {
+        // If there is no destination, ensure the storageProvider is reset.
+        resetStorageProvider();
+      } else {
+        // If there is a destination, save the project where asked to.
         const destinationStorageProviderOperations = getStorageProviderOperations(
           destination.storageProvider
         );
@@ -2347,6 +2369,7 @@ const MainFrame = (props: Props) => {
         fileMetadata: currentFileMetadata,
         storageProvider,
         storageProviderOperations,
+        authenticatedUser,
       });
     },
     [
@@ -2355,6 +2378,7 @@ const MainFrame = (props: Props) => {
       ensureResourcesAreFetched,
       getStorageProvider,
       getStorageProviderOperations,
+      authenticatedUser,
     ]
   );
 
@@ -2613,6 +2637,7 @@ const MainFrame = (props: Props) => {
                     canOpen: !!props.storageProviders.filter(
                       ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
                     ).length,
+                    canInstallPrivateAsset,
                     onChooseProject: () => openOpenFromStorageProviderDialog(),
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
                     onOpenProjectPreCreationDialog: exampleShortHeader => {

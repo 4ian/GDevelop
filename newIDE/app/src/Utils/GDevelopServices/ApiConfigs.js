@@ -100,3 +100,9 @@ export const GDevelopProjectResourcesStorage = {
     ? 'https://project-resources-dev.gdevelop.io'
     : 'https://project-resources.gdevelop.io',
 };
+
+export const GDevelopPrivateAssetsStorage = {
+  baseUrl: isDev
+    ? 'https://private-assets-dev.gdevelop.io'
+    : 'https://private-assets.gdevelop.io',
+};

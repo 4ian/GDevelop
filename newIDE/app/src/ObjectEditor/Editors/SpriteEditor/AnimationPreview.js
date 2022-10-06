@@ -214,7 +214,10 @@ const AnimationPreview = ({
               setIsStillLoadingResources(false);
             }
             // Image has loaded, so cancel the timeout if it was set.
-            if (loaderTimeout.current) clearTimeout(loaderTimeout.current);
+            if (loaderTimeout.current) {
+              clearTimeout(loaderTimeout.current);
+              loaderTimeout.current = null;
+            }
             forceUdpate();
           }}
           isImagePrivate={isAssetPrivate}

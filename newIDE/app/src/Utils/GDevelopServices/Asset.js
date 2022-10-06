@@ -3,7 +3,7 @@ import axios from 'axios';
 import { GDevelopAssetApi, GDevelopPrivateAssetsStorage } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
 import { type Filters } from './Filters';
-import { createAuthorizedUrl } from './Shop';
+import { createProductAuthorizedUrl } from './Shop';
 
 export type SerializedParameterMetadata = {|
   codeOnly: boolean,
@@ -209,7 +209,10 @@ export const getPrivateAsset = async (
   const assetUrl = `${
     GDevelopPrivateAssetsStorage.baseUrl
   }/${privateAssetPackId}/${assetShortHeader.id}.json`;
-  const authorizedUrl = createAuthorizedUrl(assetUrl, authorizationToken);
+  const authorizedUrl = createProductAuthorizedUrl(
+    assetUrl,
+    authorizationToken
+  );
   const assetResponse = await client.get(authorizedUrl);
   return assetResponse.data;
 };

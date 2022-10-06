@@ -2,7 +2,7 @@
 import * as React from 'react';
 import PrivateAssetsAuthorizationContext from './PrivateAssetsAuthorizationContext';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
-import { createAuthorizedUrl } from '../../Utils/GDevelopServices/Shop';
+import { createProductAuthorizedUrl } from '../../Utils/GDevelopServices/Shop';
 
 type Props = {|
   url: string,
@@ -26,7 +26,7 @@ const AuthorizedAssetImage = ({
   const { authorizationToken, updateAuthorizationToken } = React.useContext(
     PrivateAssetsAuthorizationContext
   );
-  const [tries, setTries] = React.useState(0);
+  const tries = React.useRef(0);
 
   React.useEffect(
     () => {
@@ -38,7 +38,7 @@ const AuthorizedAssetImage = ({
       if (!authorizationToken) {
         updateAuthorizationToken();
       } else {
-        setAuthorizedUrl(createAuthorizedUrl(url, authorizationToken));
+        setAuthorizedUrl(createProductAuthorizedUrl(url, authorizationToken));
       }
     },
     [authorizationToken, updateAuthorizationToken, url, isImageLoaded]
@@ -46,23 +46,19 @@ const AuthorizedAssetImage = ({
 
   const onFetchingError = () => {
     console.warn('Error while fetching authorized image');
-    if (tries >= 3) {
+    if (tries.current >= 3) {
       if (onError) onError();
       return;
     }
-    if (!hideLoader) {
-      setIsImageLoaded(false);
-    }
+    setIsImageLoaded(false);
     // If the image is not authorized, fetch a new authorization token.
     console.info('Error while fetching image, fetching a new token...');
     updateAuthorizationToken();
-    setTries(tries + 1);
+    tries.current += 1;
   };
 
   const onImageLoaded = (e: any) => {
-    if (!hideLoader) {
-      setIsImageLoaded(true);
-    }
+    setIsImageLoaded(true);
     if (onLoad) onLoad(e);
   };
 

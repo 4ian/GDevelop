@@ -13,7 +13,7 @@ import {
   type InstallAssetShortHeaderArgs,
 } from '../InstallAsset';
 import {
-  createAuthorizedUrl,
+  createProductAuthorizedUrl,
   getAuthorizationTokenForPrivateAssets,
 } from '../../Utils/GDevelopServices/Shop';
 import PrivateAssetsAuthorizationContext from './PrivateAssetsAuthorizationContext';
@@ -31,7 +31,7 @@ const enrichAssetWithAuthorizedResourceUrls = (
       ...objectAsset,
       resources: objectAsset.resources.map(resource => ({
         ...resource,
-        file: createAuthorizedUrl(resource.file, authorizationToken),
+        file: createProductAuthorizedUrl(resource.file, authorizationToken),
       })),
     })),
   };

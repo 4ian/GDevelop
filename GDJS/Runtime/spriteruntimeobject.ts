@@ -866,7 +866,6 @@ namespace gdjs {
       cy *= absScaleY;
 
       //Rotation
-      const oldX = x;
       const angleInRadians = (this.angle / 180) * Math.PI;
       const cosValue = Math.cos(
         // Only compute cos and sin once (10% faster than doing it twice)

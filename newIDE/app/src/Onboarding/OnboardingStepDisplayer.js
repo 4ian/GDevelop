@@ -8,10 +8,12 @@ type Props = {|
 |};
 
 function OnboardingStepDisplayer({ step }: Props) {
+  const elementToHighlight = document.querySelector(step.elementToHighlightId);
+
   return (
     <>
-      {step.elementToHighlightId && (
-        <OnboardingElementHighlighter elementId={step.elementToHighlightId} />
+      {elementToHighlight && (
+        <OnboardingElementHighlighter element={elementToHighlight} />
       )}
     </>
   );

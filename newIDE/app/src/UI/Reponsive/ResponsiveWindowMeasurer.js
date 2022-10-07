@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import useForceUpdate from '../../Utils/UseForceUpdate';
-import { useOnResize } from '../../Utils/UseOnResize';
+import useOnResize from '../../Utils/UseOnResize';
 
 export type WidthType = 'small' | 'medium' | 'large';
 

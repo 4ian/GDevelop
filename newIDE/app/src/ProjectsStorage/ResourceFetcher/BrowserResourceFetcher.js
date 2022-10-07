@@ -6,7 +6,7 @@ import {
   type FetchAllProjectResourcesFunction,
 } from './index';
 import CloudStorageProvider from '../CloudStorageProvider';
-import { moveUrlResourcesToCloudFilesIfPrivate } from '../CloudStorageProvider/CloudResourceMover';
+import { moveUrlResourcesToCloudFilesIfPrivate } from '../CloudStorageProvider/CloudResourceFetcher';
 import GoogleDriveStorageProvider from '../GoogleDriveStorageProvider';
 import UrlStorageProvider from '../UrlStorageProvider';
 import { fetchRelativeResourcesToFullUrls } from '../UrlStorageProvider/UrlResourceFetcher';

@@ -136,7 +136,7 @@ import OnboardingDialog from './Onboarding/OnboardingDialog';
 import LeaderboardProvider from '../Leaderboard/LeaderboardProvider';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 import { useLeaderboardReplacer } from '../Leaderboard/useLeaderboardReplacer';
-import useConfirmDialog from '../UI/Confirm/useConfirmDialog';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 import ProjectPreCreationDialog from '../ProjectCreation/ProjectPreCreationDialog';
 import {
   useResourceMover,
@@ -340,7 +340,7 @@ const MainFrame = (props: Props) => {
     false
   );
   const [exportDialogOpen, openExportDialog] = React.useState<boolean>(false);
-  const { showConfirmation } = useConfirmDialog();
+  const { showConfirmation } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
   const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);

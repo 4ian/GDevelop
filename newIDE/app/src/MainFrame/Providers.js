@@ -32,7 +32,7 @@ import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleSto
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
 import { TutorialStateProvider } from '../Tutorial/TutorialContext';
-import ConfirmProvider from '../UI/Confirm/ConfirmProvider';
+import ConfirmProvider from '../UI/Alert/AlertProvider';
 import { AnnouncementsFeedStateProvider } from '../AnnouncementsFeed/AnnouncementsFeedContext';
 import PrivateAssetsAuthorizationProvider from '../AssetStore/PrivateAssets/PrivateAssetsAuthorizationProvider';
 

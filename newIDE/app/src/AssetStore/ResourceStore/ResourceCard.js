@@ -11,6 +11,7 @@ import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../UI/Grid';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import CheckeredBackground from '../../ResourcesList/CheckeredBackground';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 
 const paddingSize = 10;
 const styles = {
@@ -26,10 +27,14 @@ const styles = {
     verticalAlign: 'middle',
     pointerEvents: 'none',
   },
-  previewIcon: {
+  previewIconDarkTheme: {
     width: 40,
     height: 40,
     filter: 'grayscale(1) invert(1)',
+  },
+  previewIconLightTheme: {
+    width: 40,
+    height: 40,
   },
   cardContainer: {
     overflow: 'hidden',
@@ -139,6 +144,7 @@ type Props = {|
 
 export const ResourceCard = ({ resource, onChoose, size }: Props) => {
   const resourceKind = resource.type;
+  const theme = React.useContext(GDevelopThemeContext);
 
   switch (resourceKind) {
     case 'image':
@@ -149,7 +155,11 @@ export const ResourceCard = ({ resource, onChoose, size }: Props) => {
           resource={resource}
           onChoose={onChoose}
           size={size}
-          imageStyle={styles.previewIcon}
+          imageStyle={
+            theme.palette.type === 'light'
+              ? styles.previewIconLightTheme
+              : styles.previewIconDarkTheme
+          }
         />
       );
     case 'audio':

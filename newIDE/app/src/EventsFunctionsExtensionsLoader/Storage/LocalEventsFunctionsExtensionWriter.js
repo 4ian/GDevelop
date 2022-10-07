@@ -88,12 +88,11 @@ export default class LocalEventsFunctionsExtensionWriter {
     customObject: gdObject,
     filepath: string
   ): Promise<void> => {
-    const exportedObject = customObject.clone();
+    const exportedObject = customObject.clone().get();
     exportedObject.setTags('');
     exportedObject.getVariables().clear();
     exportedObject.getEffects().clear();
     exportedObject
-      .get()
       .getAllBehaviorNames()
       .toJSArray()
       .forEach(name => exportedObject.removeBehavior(name));

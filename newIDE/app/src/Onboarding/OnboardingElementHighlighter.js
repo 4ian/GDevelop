@@ -3,9 +3,10 @@ import React from 'react';
 import Rectangle from '../Utils/Rectangle';
 import useOnResize from '../Utils/UseOnResize';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import { getScrollParent } from './HTMLUtils';
 
 type Props = {|
-  elementId: string,
+  element: HTMLElement,
 |};
 
 const highlighterPrimaryColor = '#E0E026';
@@ -21,10 +22,42 @@ const styles = {
   },
 };
 
-function OnboardingElementHighlighter({ elementId }: Props) {
-  useOnResize(useForceUpdate());
-  const element = document.querySelector(elementId);
-  if (!element) return null;
+function OnboardingElementHighlighter({ element }: Props) {
+  const forceUpdate = useForceUpdate();
+  useOnResize(forceUpdate);
+  const observerRef = React.useRef<?IntersectionObserver>(null);
+
+  const parent = getScrollParent(element);
+
+  React.useEffect(
+    () => {
+      observerRef.current = new IntersectionObserver(forceUpdate, {
+        root: null,
+        threshold: 1,
+      });
+      observerRef.current.observe(element);
+      return () => {
+        if (observerRef.current) observerRef.current.disconnect();
+      };
+    },
+    [element, forceUpdate]
+  );
+
+
+  React.useEffect(
+    () => {
+      if (parent) {
+        // $FlowFixMe - Flow declaration does not seem to support scroll event
+        parent.addEventListener('scroll', forceUpdate, { passive: true });
+        return () => {
+          // $FlowFixMe - Flow declaration does not seem to support scroll event
+          parent.removeEventListener('scroll', forceUpdate);
+        };
+      }
+    },
+    [parent, forceUpdate]
+  );
+
   const borderRadius = getComputedStyle(element).getPropertyValue(
     'border-radius'
   );
@@ -32,6 +65,7 @@ function OnboardingElementHighlighter({ elementId }: Props) {
   const elementRectangle = Rectangle.fromDOMRect(
     element.getBoundingClientRect()
   );
+
   return (
     <div
       id="element-highlighter"

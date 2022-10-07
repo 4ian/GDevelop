@@ -1,37 +1,51 @@
 // @flow
 import * as React from 'react';
-import ConfirmContext from './ConfirmContext';
+import AlertContext from './AlertContext';
+import AlertDialog from './AlertDialog';
 import ConfirmDialog from './ConfirmDialog';
 import ConfirmDeleteDialog from './ConfirmDeleteDialog';
 import {
+  type ShowAlertDialogOptions,
   type ShowConfirmDeleteDialogOptionsWithCallback,
   type ShowConfirmDialogOptionsWithCallback,
-} from './ConfirmContext';
+} from './AlertContext';
 
 type Props = {| children: React.Node |};
 
 function ConfirmProvider({ children }: Props) {
+  // Alert
+  const [alertDialogOpen, setAlertDialogOpen] = React.useState<boolean>(false);
+  const [
+    alertDialogConfig,
+    setAlertDialogConfig,
+  ] = React.useState<?ShowAlertDialogOptions>(null);
+  const openAlertDialog = (options: ShowAlertDialogOptions) => {
+    setAlertDialogOpen(true);
+    setAlertDialogConfig(options);
+  };
+
+  // Confirm
   const [confirmDialogOpen, setConfirmDialogOpen] = React.useState<boolean>(
     false
   );
   const [
-    confirmDeleteDialogOpen,
-    setConfirmDeleteDialogOpen,
-  ] = React.useState<boolean>(false);
-  const [
     confirmDialogConfig,
     setConfirmDialogConfig,
   ] = React.useState<?ShowConfirmDialogOptionsWithCallback>(null);
-  const [
-    confirmDeleteDialogConfig,
-    setConfirmDeleteDialogConfig,
-  ] = React.useState<?ShowConfirmDeleteDialogOptionsWithCallback>(null);
-
   const openConfirmDialog = (options: ShowConfirmDialogOptionsWithCallback) => {
     setConfirmDialogOpen(true);
     setConfirmDialogConfig(options);
   };
 
+  // Confirm Delete
+  const [
+    confirmDeleteDialogOpen,
+    setConfirmDeleteDialogOpen,
+  ] = React.useState<boolean>(false);
+  const [
+    confirmDeleteDialogConfig,
+    setConfirmDeleteDialogConfig,
+  ] = React.useState<?ShowConfirmDeleteDialogOptionsWithCallback>(null);
   const openConfirmDeleteDialog = (
     options: ShowConfirmDeleteDialogOptionsWithCallback
   ) => {
@@ -40,13 +54,24 @@ function ConfirmProvider({ children }: Props) {
   };
 
   return (
-    <ConfirmContext.Provider
+    <AlertContext.Provider
       value={{
+        showAlertDialog: openAlertDialog,
         showConfirmDialog: openConfirmDialog,
         showConfirmDeleteDialog: openConfirmDeleteDialog,
       }}
     >
       {children}
+      {alertDialogConfig && (
+        <AlertDialog
+          open={alertDialogOpen}
+          onDismiss={() => {
+            setAlertDialogOpen(false);
+          }}
+          title={alertDialogConfig.title}
+          message={alertDialogConfig.message}
+        />
+      )}
       {confirmDialogConfig && (
         <ConfirmDialog
           open={confirmDialogOpen}
@@ -79,7 +104,7 @@ function ConfirmProvider({ children }: Props) {
           confirmText={confirmDeleteDialogConfig.confirmText}
         />
       )}
-    </ConfirmContext.Provider>
+    </AlertContext.Provider>
   );
 }
 

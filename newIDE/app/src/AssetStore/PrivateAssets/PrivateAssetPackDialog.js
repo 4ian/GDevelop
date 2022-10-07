@@ -1,40 +1,35 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
+import { type PrivateAssetPackListingData } from '../../Utils/GDevelopServices/Shop';
 import {
-  getPrivateAssetPackDetails,
-  type PrivateAssetPackDetails,
-} from '../Utils/GDevelopServices/Asset';
-import Text from '../UI/Text';
+  getPrivateAssetPack,
+  type PrivateAssetPack,
+} from '../../Utils/GDevelopServices/Asset';
+import Text from '../../UI/Text';
 import { t, Trans } from '@lingui/macro';
-import Dialog from '../UI/Dialog';
-import PriceTag from '../UI/PriceTag';
-import TextButton from '../UI/TextButton';
-import AlertMessage from '../UI/AlertMessage';
-import PlaceholderLoader from '../UI/PlaceholderLoader';
+import Dialog from '../../UI/Dialog';
+import PriceTag from '../../UI/PriceTag';
+import TextButton from '../../UI/TextButton';
+import AlertMessage from '../../UI/AlertMessage';
+import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import {
   ColumnStackLayout,
   ResponsiveLineStackLayout,
   LineStackLayout,
-} from '../UI/Layout';
-import { Column, Line } from '../UI/Grid';
+} from '../../UI/Layout';
+import { Column, Line } from '../../UI/Grid';
 import {
   getUserPublicProfile,
   type UserPublicProfile,
-} from '../Utils/GDevelopServices/User';
-import PublicProfileDialog from '../Profile/PublicProfileDialog';
-import Link from '../UI/Link';
-import Mark from '../UI/CustomSvgIcons/Mark';
-import Cross from '../UI/CustomSvgIcons/Cross';
+} from '../../Utils/GDevelopServices/User';
+import PublicProfileDialog from '../../Profile/PublicProfileDialog';
+import Link from '../../UI/Link';
+import Mark from '../../UI/CustomSvgIcons/Mark';
+import Cross from '../../UI/CustomSvgIcons/Cross';
 import Paper from '@material-ui/core/Paper';
-import ResponsiveImagesGallery from '../UI/ResponsiveImagesGallery';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-
-type Props = {|
-  privateAssetPack: PrivateAssetPackListingData,
-  onClose: () => void,
-|};
+import ResponsiveImagesGallery from '../../UI/ResponsiveImagesGallery';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const sortedContentType = [
   'sprite',
@@ -60,17 +55,17 @@ const styles = {
   disabledText: { opacity: 0.6 },
 };
 
+type Props = {|
+  privateAssetPackListingData: PrivateAssetPackListingData,
+  onClose: () => void,
+|};
+
 const PrivateAssetPackDialog = ({
-  privateAssetPack: { id, name, description, sellerId, prices },
+  privateAssetPackListingData: { id, name, description, sellerId, prices },
   onClose,
 }: Props) => {
-  const [
-    assetPackDetails,
-    setAssetPackDetails,
-  ] = React.useState<?PrivateAssetPackDetails>(null);
-  const [isFetchingDetails, setIsFetchingDetails] = React.useState<boolean>(
-    false
-  );
+  const [assetPack, setAssetPack] = React.useState<?PrivateAssetPack>(null);
+  const [isFetching, setIsFetching] = React.useState<boolean>(false);
   const [
     openSellerPublicProfileDialog,
     setOpenSellerPublicProfileDialog,
@@ -85,11 +80,11 @@ const PrivateAssetPackDialog = ({
   React.useEffect(
     () => {
       (async () => {
-        setIsFetchingDetails(true);
+        setIsFetching(true);
         try {
-          const details = await getPrivateAssetPackDetails(id);
+          const assetPack = await getPrivateAssetPack(id);
           const profile = await getUserPublicProfile(sellerId);
-          setAssetPackDetails(details);
+          setAssetPack(assetPack);
           setSellerPublicProfile(profile);
         } catch (error) {
           if (error.response && error.response.status === 404) {
@@ -105,7 +100,7 @@ const PrivateAssetPackDialog = ({
             );
           }
         } finally {
-          setIsFetchingDetails(false);
+          setIsFetching(false);
         }
       })();
     },
@@ -133,14 +128,14 @@ const PrivateAssetPackDialog = ({
           >
             {errorText ? (
               <AlertMessage kind="error">{errorText}</AlertMessage>
-            ) : isFetchingDetails ? (
+            ) : isFetching ? (
               <>
                 <Text size="title">{name}</Text>
                 <Column expand>
                   <PlaceholderLoader />
                 </Column>
               </>
-            ) : assetPackDetails && sellerPublicProfile ? (
+            ) : assetPack && sellerPublicProfile ? (
               <>
                 <Column noMargin>
                   <Text size="title">{name}</Text>
@@ -162,7 +157,7 @@ const PrivateAssetPackDialog = ({
                     noOverflowParent
                   >
                     <ResponsiveImagesGallery
-                      imagesUrls={assetPackDetails.previewImageUrls}
+                      imagesUrls={assetPack.previewImageUrls}
                       altTextTemplate={`Asset pack ${name} preview image {imageIndex}`}
                       horizontalOuterMarginToEatOnMobile={8}
                     />
@@ -176,18 +171,18 @@ const PrivateAssetPackDialog = ({
                         <Line noMargin>
                           <PriceTag value={prices[0].value} />
                         </Line>
-                        <Text noMargin>{assetPackDetails.longDescription}</Text>
+                        <Text noMargin>{assetPack.longDescription}</Text>
                         <ResponsiveLineStackLayout noMargin noColumnMargin>
                           <Column noMargin expand>
                             <Text size="sub-title">
                               <Trans>Content</Trans>
                             </Text>
                             {sortedContentType.map(type => {
-                              if (assetPackDetails.content[type]) {
+                              if (assetPack.content[type]) {
                                 return (
                                   <li key={type}>
                                     <Text displayInlineAsSpan noMargin>
-                                      {assetPackDetails.content[type]}{' '}
+                                      {assetPack.content[type]}{' '}
                                       {i18n._(
                                         contentTypeToMessageDescriptor[type]
                                       )}

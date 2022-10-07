@@ -31,7 +31,7 @@ import Window from '../Utils/Window';
 import Text from '../UI/Text';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
-import useConfirmDialog from '../UI/Confirm/useConfirmDialog';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 const styles = {
   descriptionText: {
@@ -76,7 +76,7 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
   ] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const { showConfirmation } = useConfirmDialog();
+  const { showConfirmation } = useAlertDialog();
 
   React.useEffect(
     () => {

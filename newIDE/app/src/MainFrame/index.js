@@ -71,6 +71,8 @@ import {
   getElectronUpdateNotificationTitle,
   getElectronUpdateNotificationBody,
   type ElectronUpdateStatus,
+  useServiceWorkerUpdateStatus,
+  updateServiceWorkerToLatestVersion,
 } from './UpdaterTools';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -146,6 +148,7 @@ import {
   useResourceFetcher,
   type ResourceFetcher,
 } from '../ProjectsStorage/ResourceFetcher';
+import { useTimeout } from '../Utils/UseTimeout';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -659,6 +662,29 @@ const MainFrame = (props: Props) => {
   };
 
   useDiscordRichPresence(currentProject);
+
+  const serviceWorkerUpdateStatus = useServiceWorkerUpdateStatus();
+
+  useTimeout(
+    React.useCallback(
+      async () => {
+        if (serviceWorkerUpdateStatus === 'update-ready') {
+          const answer = await showConfirmation({
+            title: t`New update available!`,
+            message: t`A new version of GDevelop is available. Would you like to update now?`,
+          });
+          if (answer) {
+            await updateServiceWorkerToLatestVersion();
+            const cacheKeys = await caches.keys();
+            await Promise.all(cacheKeys.map(key => caches.delete(key)));
+            window.location.reload();
+          }
+        }
+      },
+      [showConfirmation, serviceWorkerUpdateStatus]
+    ),
+    3000
+  );
 
   const closeProject = React.useCallback(
     (): Promise<void> => {

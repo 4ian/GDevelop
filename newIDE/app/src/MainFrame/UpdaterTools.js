@@ -95,6 +95,14 @@ export const useServiceWorkerUpdateStatus = () => {
   return serviceWorkerUpdateStatus;
 };
 
+export const updateServiceWorkerToLatestVersion = async () => {
+  const { serviceWorker } = navigator;
+  if (!serviceWorker) return;
+  const registration = await serviceWorker.getRegistration();
+  if (!registration) return;
+  await registration.unregister();
+};
+
 export const getServiceWorkerStatusLabel = (
   status: ServiceWorkerUpdateStatus
 ) => {

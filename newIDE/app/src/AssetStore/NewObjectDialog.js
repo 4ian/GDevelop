@@ -292,10 +292,15 @@ export default function NewObjectDialog({
       >
         <Column noMargin expand>
           <Tabs value={currentTab} onChange={setCurrentTab}>
-            <Tab label={<Trans>Asset Store</Trans>} value="asset-store" />
+            <Tab
+              label={<Trans>Asset Store</Trans>}
+              value="asset-store"
+              id="asset-store-tab"
+            />
             <Tab
               label={<Trans>New object from scratch</Trans>}
               value="new-object"
+              id="new-object-from-scratch-tab"
             />
           </Tabs>
           {currentTab === 'asset-store' && <AssetStore project={project} />}

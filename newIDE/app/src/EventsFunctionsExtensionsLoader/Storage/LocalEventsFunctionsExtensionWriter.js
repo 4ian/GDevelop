@@ -93,6 +93,7 @@ export default class LocalEventsFunctionsExtensionWriter {
     exportedObject.getVariables().clear();
     exportedObject.getEffects().clear();
     exportedObject
+      .get()
       .getAllBehaviorNames()
       .toJSArray()
       .forEach(name => exportedObject.removeBehavior(name));

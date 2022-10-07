@@ -82,7 +82,7 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/googlePlayGameServices/tools.js')
-      .setFunctionName('gdjs.googlePlayGameServices.android.gameServicesReady');
+      .setFunctionName('gdjs.evtTools.googlePlayGameServices.gameServicesReady');
 
     extension
       .addAction(
@@ -104,7 +104,7 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/googlePlayGameServices/tools.js')
-      .setFunctionName('gdjs.googlePlayGameServices.android.gameServicesReady');
+      .setFunctionName('gdjs.evtTools.googlePlayGameServices.gameServicesReady');
 
     extension
       .addAction(
@@ -130,7 +130,7 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/googlePlayGameServices/tools.js')
-      .setFunctionName('gdjs.googlePlayGameServices.android.gameServicesReady');
+      .setFunctionName('gdjs.evtTools.googlePlayGameServices.gameServicesReady');
     return extension;
   },
   runExtensionSanityTests: function (

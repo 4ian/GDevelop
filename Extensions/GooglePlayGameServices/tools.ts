@@ -1,16 +1,16 @@
 namespace gdjs {
   declare var cordova: any;
 
+  interface extensionDataInterface {
+    AndroidReady: boolean;
+    runtimeSceneContainer: gdjs.RuntimeScene;
+  }
+
   const logger = new gdjs.Logger('Google Play Services extension');
 
-  export namespace googlePlayGameServices {
+  export namespace evtTools {
 
-    export namespace android {
-
-      interface extensionDataInterface {
-        AndroidReady: boolean;
-        runtimeSceneContainer: gdjs.RuntimeScene;
-      }
+    export namespace googlePlayGameServices {
 
       /** Initial Extension data */
       let extensionData = {
@@ -18,7 +18,7 @@ namespace gdjs {
       } as extensionDataInterface;
 
       /** Initialize API */
-      gdjs.registerRuntimeSceneLoadedCallback(function (runtimeScene: gdjs.RuntimeScene) {
+      gdjs.registerRuntimeSceneLoadedCallback(function (runtimeScene) {
         document.addEventListener('deviceready', ()=>{
             extensionData.AndroidReady = true;
             extensionData.runtimeSceneContainer = runtimeScene;

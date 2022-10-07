@@ -10,8 +10,9 @@ import SelectOption from '../UI/SelectOption';
 import { t } from '@lingui/macro';
 import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
 import {
-  allGameCategories,
   getCategoryName,
+  getGameCategories,
+  type GameCategory,
 } from '../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { I18n } from '@lingui/react';
@@ -117,6 +118,22 @@ export function PublicGameProperties({
   const hasValidGameSlug =
     hasGameSlug && (profile && userSlug !== profile.username);
 
+  const [allGameCategories, setAllGameCategories] = React.useState<
+    GameCategory[]
+  >([]);
+
+  const fetchGameCategories = React.useCallback(async () => {
+    const categories = await getGameCategories();
+    setAllGameCategories(categories);
+  }, []);
+
+  React.useEffect(
+    () => {
+      fetchGameCategories();
+    },
+    [fetchGameCategories]
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -177,12 +194,14 @@ export function PublicGameProperties({
                     }
                   }}
                   dataSource={allGameCategories.map(category => ({
-                    value: category,
-                    text: getCategoryName(category, i18n),
+                    value: category.name,
+                    text: getCategoryName(category.name, i18n),
+                    disabled: category.type === 'admin-only',
                   }))}
                   fullWidth
                   optionsLimit={4}
-                  loading={disabled}
+                  disabled={disabled}
+                  loading={allGameCategories.length === 0}
                 />
               )}
               {setDiscoverable && (

@@ -9,6 +9,7 @@ import { makeStyles } from '@material-ui/core';
 export type AutocompleteOption = {|
   text: string, // The text displayed
   value: string, // The internal value selected
+  disabled?: boolean, // If the option is disabled by default
 |};
 
 export type DataSource = Array<?AutocompleteOption>;
@@ -35,6 +36,7 @@ type Props = {|
   fullWidth?: boolean,
   error?: ?string,
   loading?: boolean,
+  disabled?: boolean,
   optionsLimit?: number, // Allow limiting the number of options by disabling the autocomplete.
 |};
 
@@ -52,6 +54,7 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
           options={props.dataSource}
           getOptionLabel={(option: AutocompleteOption) => option.text}
           getOptionDisabled={(option: AutocompleteOption) =>
+            option.disabled ||
             !!props.value.find(
               element => element && element.value === option.value
             ) ||
@@ -75,7 +78,7 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
             />
           )}
           fullWidth={props.fullWidth}
-          disabled={props.loading}
+          disabled={props.disabled || props.loading}
           ChipProps={{
             classes: chipStyles,
           }}

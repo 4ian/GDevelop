@@ -4,6 +4,8 @@ import Rectangle from '../Utils/Rectangle';
 import useOnResize from '../Utils/UseOnResize';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { getScrollParent } from './HTMLUtils';
+import ArrowTop from '../UI/CustomSvgIcons/ArrowTop';
+import ArrowBottom from '../UI/CustomSvgIcons/ArrowBottom';
 
 type Props = {|
   element: HTMLElement,
@@ -20,6 +22,13 @@ const styles = {
     boxSizing: 'border-box',
     pointerEvents: 'none',
   },
+  scrollIndicator: {
+    position: 'fixed',
+    zIndex: 1501, // highest z-index used by MaterialUI is 1500
+  },
+  scrollDirectionArrow: {
+    color: highlighterPrimaryColor,
+  },
 };
 
 function OnboardingElementHighlighter({ element }: Props) {
@@ -28,15 +37,42 @@ function OnboardingElementHighlighter({ element }: Props) {
   const observerRef = React.useRef<?IntersectionObserver>(null);
   const [showHighlighter, setShowHighlighter] = React.useState<boolean>(true);
 
-  const parent = getScrollParent(element);
+  const scrollParent = getScrollParent(element);
+  const scrollParentRectangle = scrollParent
+    ? Rectangle.fromDOMRect(scrollParent.getBoundingClientRect())
+    : undefined;
+  const elementRectangle = Rectangle.fromDOMRect(
+    element.getBoundingClientRect()
+  );
+
+  const [scrollDirection, setScrollDirection] = React.useState<
+    'top' | 'bottom'
+  >(() => {
+    if (!scrollParentRectangle) return 'bottom';
+    if (elementRectangle.bottom <= scrollParentRectangle.centerY()) {
+      return 'top';
+    } else if (elementRectangle.top >= scrollParentRectangle.centerY()) {
+      return 'bottom';
+    }
+    return 'bottom';
+  });
 
   const updateHighlighterVisibility = React.useCallback(
-    (entries) => {
-      setShowHighlighter(entries[0].isIntersecting)
+    entries => {
+      const { isIntersecting } = entries[0];
+      setShowHighlighter(isIntersecting);
+      if (!isIntersecting && scrollParentRectangle) {
+        if (elementRectangle.bottom <= scrollParentRectangle.centerY()) {
+          setScrollDirection('top');
+        } else if (elementRectangle.top >= scrollParentRectangle.centerY()) {
+          setScrollDirection('bottom');
+        }
+      }
       forceUpdate();
     },
-    [forceUpdate]
+    [forceUpdate, scrollParentRectangle, elementRectangle]
   );
+
   React.useEffect(
     () => {
       observerRef.current = new IntersectionObserver(
@@ -56,26 +92,23 @@ function OnboardingElementHighlighter({ element }: Props) {
 
   React.useEffect(
     () => {
-      if (parent) {
+      if (scrollParent) {
         // $FlowFixMe - Flow declaration does not seem to support scroll event
-        parent.addEventListener('scroll', forceUpdate, { passive: true });
+        scrollParent.addEventListener('scroll', forceUpdate, { passive: true });
         return () => {
           // $FlowFixMe - Flow declaration does not seem to support scroll event
-          parent.removeEventListener('scroll', forceUpdate);
+          scrollParent.removeEventListener('scroll', forceUpdate);
         };
       }
     },
-    [parent, forceUpdate]
+    [scrollParent, forceUpdate]
   );
 
   const borderRadius = getComputedStyle(element).getPropertyValue(
     'border-radius'
   );
 
-  const elementRectangle = Rectangle.fromDOMRect(
-    element.getBoundingClientRect()
-  );
-
+  const Icon = scrollDirection === 'top' ? ArrowTop : ArrowBottom;
   return (
     <>
       {showHighlighter && (
@@ -87,6 +120,23 @@ function OnboardingElementHighlighter({ element }: Props) {
             borderRadius: borderRadius,
           }}
         />
+      )}
+      {!showHighlighter && scrollParentRectangle && (
+        <div
+          id="scroll-indicator"
+          style={{
+            ...styles.scrollIndicator,
+            top:
+              scrollDirection === 'top'
+                ? scrollParentRectangle.top
+                : scrollParentRectangle.bottom - 50,
+            left: scrollParentRectangle.right - 80,
+          }}
+        >
+          <div style={styles.scrollDirectionArrow}>
+            <Icon fontSize="large" />
+          </div>
+        </div>
       )}
     </>
   );

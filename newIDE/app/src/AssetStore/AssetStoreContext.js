@@ -232,8 +232,12 @@ export const AssetStoreStateProvider = ({
   );
 
   const fetchAssetsAndFilters = React.useCallback(
-    () => {
-      if (isLoading.current) return;
+    (options: ?{ force: boolean }) => {
+      // Allowing forcing the fetch of the assets, even if it is currently loading.
+      // This is helpful to avoid race conditions:
+      // - the user opens the asset page -> assets load
+      // - the user gets logged in at the same time -> private assets loaded
+      if (isLoading.current && (!options || !options.force)) return;
 
       (async () => {
         setError(null);
@@ -293,7 +297,10 @@ export const AssetStoreStateProvider = ({
       if (!receivedAssetShortHeaders) {
         return;
       }
-      fetchAssetsAndFilters();
+      // We're forcing the fetch of the assets, even if it is currently loading,
+      // in case the pre-fetching of the assets is happening at the same time,
+      // or the user opens the asset store at the same time.
+      fetchAssetsAndFilters({ force: true });
     },
     [receivedAssetShortHeaders, fetchAssetsAndFilters]
   );

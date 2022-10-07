@@ -209,6 +209,7 @@ export const AssetsHome = ({
     <PublicAssetPackTile
       assetPack={assetPack}
       onSelect={() => onPublicAssetPackSelection(assetPack)}
+      key={assetPack.tag}
     />
   ));
 
@@ -223,6 +224,7 @@ export const AssetsHome = ({
           !!receivedAssetPacks &&
           !!receivedAssetPacks.find(pack => pack.id === assetPackListingData.id)
         }
+        key={assetPackListingData.id}
       />
     )
   );

@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
@@ -30,11 +30,14 @@ import ScrollView from '../UI/ScrollView';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import RaisedButton from '../UI/RaisedButton';
 import { AssetStoreContext } from './AssetStoreContext';
-import { AssetPackDialog } from './AssetPackDialog';
-import { installAsset } from './InstallAsset';
+import AssetPackDialog from './AssetPackInstallDialog';
+import { installPublicAsset } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import Window from '../Utils/Window';
+import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
+import { isPrivateAsset } from '../Utils/GDevelopServices/Asset';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 const isDev = Window.isDev();
 
 const ObjectListItem = ({
@@ -78,6 +81,7 @@ type Props = {|
   onClose: () => void,
   onCreateNewObject: (type: string) => void,
   onObjectAddedFromAsset: gdObject => void,
+  canInstallPrivateAsset: () => boolean,
 |};
 
 export default function NewObjectDialog({
@@ -91,6 +95,7 @@ export default function NewObjectDialog({
   onClose,
   onCreateNewObject,
   onObjectAddedFromAsset,
+  canInstallPrivateAsset,
 }: Props) {
   const {
     setNewObjectDialogDefaultTab,
@@ -156,6 +161,10 @@ export default function NewObjectDialog({
   );
   const isAssetAddedToScene =
     openedAssetShortHeader && addedAssetIds.includes(openedAssetShortHeader.id);
+  const { installPrivateAsset } = React.useContext(
+    PrivateAssetsAuthorizationContext
+  );
+  const { showAlert } = useAlertDialog();
 
   const onInstallAsset = React.useCallback(
     () => {
@@ -163,18 +172,40 @@ export default function NewObjectDialog({
       (async () => {
         if (!openedAssetShortHeader) return;
         try {
-          const installOutput = await installAsset({
-            assetShortHeader: openedAssetShortHeader,
-            eventsFunctionsExtensionsState,
-            project,
-            objectsContainer,
-            environment,
-          });
+          const isPrivate = isPrivateAsset(openedAssetShortHeader);
+          if (isPrivate) {
+            const canUserInstallPrivateAsset = await canInstallPrivateAsset();
+            if (!canUserInstallPrivateAsset) {
+              await showAlert({
+                title: t`No cloud project`,
+                message: t`You need to save this project as a cloud project to install this asset. Save your project and try again!`,
+              });
+              setIsAssetBeingInstalled(false);
+              return;
+            }
+          }
+          const installOutput = isPrivate
+            ? await installPrivateAsset({
+                assetShortHeader: openedAssetShortHeader,
+                eventsFunctionsExtensionsState,
+                project,
+                objectsContainer,
+                environment,
+              })
+            : await installPublicAsset({
+                assetShortHeader: openedAssetShortHeader,
+                eventsFunctionsExtensionsState,
+                project,
+                objectsContainer,
+                environment,
+              });
+          if (!installOutput) {
+            throw new Error('Unable to install private Asset.');
+          }
           sendAssetAddedToProject({
             id: openedAssetShortHeader.id,
             name: openedAssetShortHeader.name,
           });
-          console.log('Asset successfully installed.');
 
           installOutput.createdObjects.forEach(object => {
             onObjectAddedFromAsset(object);
@@ -203,6 +234,9 @@ export default function NewObjectDialog({
       openedAssetShortHeader,
       environment,
       onFetchNewlyAddedResources,
+      installPrivateAsset,
+      canInstallPrivateAsset,
+      showAlert,
     ]
   );
 
@@ -281,7 +315,7 @@ export default function NewObjectDialog({
           openedAssetPack
             ? () => setIsAssetPackDialogInstallOpen(true)
             : openedAssetShortHeader
-            ? onInstallAsset
+            ? () => onInstallAsset()
             : undefined
         }
         open

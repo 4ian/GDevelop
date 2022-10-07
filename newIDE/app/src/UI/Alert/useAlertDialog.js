@@ -1,15 +1,24 @@
 // @flow
 import * as React from 'react';
-import ConfirmContext from './ConfirmContext';
+import AlertContext from './AlertContext';
 import {
+  type ShowAlertDialogOptions,
   type ShowConfirmDeleteDialogOptions,
   type ShowConfirmDialogOptions,
-} from './ConfirmContext';
+} from './AlertContext';
 
-const useConfirmDialog = () => {
-  const { showConfirmDialog, showConfirmDeleteDialog } = React.useContext(
-    ConfirmContext
-  );
+const useAlertDialog = () => {
+  const {
+    showAlertDialog,
+    showConfirmDialog,
+    showConfirmDeleteDialog,
+  } = React.useContext(AlertContext);
+
+  const showAlert = async (options: ShowAlertDialogOptions): Promise<void> => {
+    await showAlertDialog({
+      ...options,
+    });
+  };
 
   const showConfirmation = (
     options: ShowConfirmDialogOptions
@@ -25,7 +34,7 @@ const useConfirmDialog = () => {
       showConfirmDeleteDialog({ callback: resolve, ...options });
     });
 
-  return { showConfirmation, showDeleteConfirmation };
+  return { showAlert, showConfirmation, showDeleteConfirmation };
 };
 
-export default useConfirmDialog;
+export default useAlertDialog;

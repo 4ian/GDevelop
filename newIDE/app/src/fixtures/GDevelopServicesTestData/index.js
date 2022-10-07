@@ -23,7 +23,7 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import {
   type AssetShortHeader,
   type Asset,
-  type AssetPacks,
+  type PublicAssetPacks,
 } from '../../Utils/GDevelopServices/Asset';
 import { formatISO, subDays } from 'date-fns';
 import { type Comment } from '../../Utils/GDevelopServices/Play';
@@ -186,6 +186,8 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   subscription: subscriptionForIndieUser,
   usages: usagesForIndieUser,
   limits: limitsForIndieUser,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
   onLogout: () => {},
   onLogin: () => {},
   onEdit: () => {},
@@ -218,6 +220,8 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   subscription: noSubscription,
   usages: usagesForIndieUser,
   limits: limitsForIndieUser,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
   onLogout: () => {},
   onLogin: () => {},
   onEdit: () => {},
@@ -250,6 +254,8 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   subscription: noSubscription,
   usages: usagesForIndieUser,
   limits: limitsForIndieUser,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
   onLogout: () => {},
   onLogin: () => {},
   onEdit: () => {},
@@ -282,6 +288,8 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   subscription: null,
   usages: null,
   limits: null,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
   onLogout: () => {},
   onLogin: () => {},
   onEdit: () => {},
@@ -314,6 +322,8 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   subscription: null,
   usages: null,
   limits: null,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
   onLogout: () => {},
   onLogin: () => {},
   onEdit: () => {},
@@ -1150,7 +1160,7 @@ export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
   gdevelopVersion: '',
 };
 
-export const fakeAssetPacks: AssetPacks = {
+export const fakeAssetPacks: PublicAssetPacks = {
   starterPacks: [
     {
       name: 'GDevelop Platformer',

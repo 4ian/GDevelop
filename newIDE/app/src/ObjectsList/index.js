@@ -48,6 +48,7 @@ import {
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
+
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -121,6 +122,7 @@ type Props = {|
     cb: (boolean) => void
   ) => void,
   selectedObjectNames: Array<string>,
+  canInstallPrivateAsset: () => boolean,
 
   selectedObjectTags: SelectedTags,
   getAllObjectTags: () => Tags,
@@ -644,6 +646,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       resourceExternalEditors,
       selectedObjectTags,
       onFetchNewlyAddedResources,
+      canInstallPrivateAsset,
     } = this.props;
     const { searchText, tagEditedObject } = this.state;
 
@@ -741,6 +744,7 @@ export default class ObjectsList extends React.Component<Props, State> {
             onChooseResource={onChooseResource}
             resourceExternalEditors={resourceExternalEditors}
             onFetchNewlyAddedResources={onFetchNewlyAddedResources}
+            canInstallPrivateAsset={canInstallPrivateAsset}
           />
         )}
         {tagEditedObject && (

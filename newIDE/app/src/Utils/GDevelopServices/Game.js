@@ -41,6 +41,11 @@ export type Game = {
   displayAdsOnGamePage?: boolean,
 };
 
+export type GameCategory = {
+  name: string,
+  type: 'user-defined' | 'admin-only',
+};
+
 export type GameSlug = {
   username: string,
   gameSlug: string,
@@ -84,25 +89,9 @@ export type GameApiError = {|
   code: 'game-deletion/leaderboards-exist',
 |};
 
-export const allGameCategories = [
-  'action',
-  'adventure',
-  'shooter',
-  'platformer',
-  'rpg',
-  'horror',
-  'strategy',
-  'puzzle',
-  'story-rich',
-  'survival',
-  'racing',
-  'building',
-  'simulation',
-  'sport',
-  'multiplayer',
-  'leaderboard',
-  'educational',
-];
+const capitalize = (str: string) => {
+  return str ? str[0].toUpperCase() + str.substr(1) : '';
+};
 
 export const getCategoryName = (category: string, i18n: I18nType) => {
   switch (category) {
@@ -141,7 +130,7 @@ export const getCategoryName = (category: string, i18n: I18nType) => {
     case 'educational':
       return i18n._(t`Educational`);
     default:
-      return category;
+      return capitalize(category);
   }
 };
 
@@ -422,5 +411,11 @@ export const getGameSlugs = (
         },
       })
     )
+    .then(response => response.data);
+};
+
+export const getGameCategories = (): Promise<GameCategory[]> => {
+  return axios
+    .get(`${GDevelopGameApi.baseUrl}/game-category`)
     .then(response => response.data);
 };

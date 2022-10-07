@@ -152,8 +152,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
   obj.AddAction("SetGradient",
                 _("Gradient"),
                 _("Change the gradient of the text."),
-                _("Change gradient of _PARAM0_ to colors _PARAM1_ _PARAM2_ "
-                  "_PARAM3_ _PARAM4_ type _PARAM5_"),
+                _("Change gradient of _PARAM0_ to colors _PARAM2_ "
+                  "_PARAM3_ _PARAM4_ _PARAM5_, type _PARAM1_"),
                 _("Effects"),
                 "res/actions/textGradient24.png",
                 "res/actions/textGradient.png")

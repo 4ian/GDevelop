@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 import Rectangle from '../Utils/Rectangle';
 import useOnResize from '../Utils/UseOnResize';
 import useForceUpdate from '../Utils/UseForceUpdate';
@@ -26,23 +26,33 @@ function OnboardingElementHighlighter({ element }: Props) {
   const forceUpdate = useForceUpdate();
   useOnResize(forceUpdate);
   const observerRef = React.useRef<?IntersectionObserver>(null);
+  const [showHighlighter, setShowHighlighter] = React.useState<boolean>(true);
 
   const parent = getScrollParent(element);
 
+  const updateHighlighterVisibility = React.useCallback(
+    (entries) => {
+      setShowHighlighter(entries[0].isIntersecting)
+      forceUpdate();
+    },
+    [forceUpdate]
+  );
   React.useEffect(
     () => {
-      observerRef.current = new IntersectionObserver(forceUpdate, {
-        root: null,
-        threshold: 1,
-      });
+      observerRef.current = new IntersectionObserver(
+        updateHighlighterVisibility,
+        {
+          root: null,
+          threshold: 0.8,
+        }
+      );
       observerRef.current.observe(element);
       return () => {
         if (observerRef.current) observerRef.current.disconnect();
       };
     },
-    [element, forceUpdate]
+    [element, updateHighlighterVisibility]
   );
-
 
   React.useEffect(
     () => {
@@ -67,14 +77,18 @@ function OnboardingElementHighlighter({ element }: Props) {
   );
 
   return (
-    <div
-      id="element-highlighter"
-      style={{
-        ...styles.rectangleHighlight,
-        ...elementRectangle.toCSSPosition(),
-        borderRadius: borderRadius,
-      }}
-    />
+    <>
+      {showHighlighter && (
+        <div
+          id="element-highlighter"
+          style={{
+            ...styles.rectangleHighlight,
+            ...elementRectangle.toCSSPosition(),
+            borderRadius: borderRadius,
+          }}
+        />
+      )}
+    </>
   );
 }
 

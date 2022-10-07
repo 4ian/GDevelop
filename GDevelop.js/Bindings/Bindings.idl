@@ -760,6 +760,7 @@ interface EffectsContainer {
   void RemoveEffect([Const] DOMString name);
   void SwapEffects(unsigned long firstEffectIndex, unsigned long secondEffectIndex);
   void MoveEffect(unsigned long oldIndex, unsigned long newIndex);
+  void Clear();
 
   void SerializeTo([Ref] SerializerElement element);
   void UnserializeFrom([Const, Ref] SerializerElement element);

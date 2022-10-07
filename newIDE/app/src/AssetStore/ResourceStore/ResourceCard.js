@@ -68,7 +68,7 @@ type ImageCardProps = {|
   imageStyle?: {|
     width: number,
     height: number,
-    filter: string,
+    filter?: string,
   |},
 |};
 

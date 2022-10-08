@@ -127,6 +127,7 @@ export const moveAllLocalResourcesToCloudResources = async ({
 
   const projectPath = path.dirname(oldFileMetadata.fileIdentifier);
 
+  let alreadyDoneCount = 0;
   // Read all files as Files.
   await processByChunk(allResourcesToUpload, {
     transformItem: async (resource): Promise<ResourceAndFile | null> => {
@@ -180,9 +181,10 @@ export const moveAllLocalResourcesToCloudResources = async ({
         newCloudProjectId,
         resourceAndFilesToUpload.map(({ file }) => file),
         (count, total) => {
-          onProgress(total + count, total * 2);
+          onProgress(alreadyDoneCount + count, allResourcesToUpload.length);
         }
       );
+      alreadyDoneCount += resourceAndFilesChunk.length;
 
       // Update resources with the newly created URLs.
       uploadedProjectResourceFiles.forEach(({ url, error }, index) => {

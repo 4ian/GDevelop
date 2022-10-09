@@ -4,6 +4,7 @@ import PromisePool from '@supercharge/promise-pool';
 import { retryIfFailed } from '../../Utils/RetryIfFailed';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 import { type FileMetadata } from '../index';
+import { extractFilenameFromProjectResourceUrl } from '../../Utils/GDevelopServices/Project';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const fs = optionalRequire('fs-extra');
@@ -52,20 +53,22 @@ export const moveUrlResourcesToLocalFiles = async ({
       const resource = resourcesManager.getResource(resourceName);
 
       const url = resource.getFile();
-      const extension = path.extname(url);
-      const filenameWithoutExtension = path.basename(url, extension);
-      const name = newNameGenerator(filenameWithoutExtension, name => {
-        const tentativePath = path.join(baseAssetsPath, name) + extension;
+      const filename = extractFilenameFromProjectResourceUrl(url);
+      const extension = path.extname(filename);
+      const basename = path.basename(filename, extension);
+      const pathPrefix = path.join(baseAssetsPath, resource.getKind());
+      const newBasename = newNameGenerator(basename, tentativeBasename => {
+        const tentativePath = path.join(pathPrefix, tentativeBasename) + extension;
         return (
           fs.existsSync(tentativePath) || downloadedFilePaths.has(tentativePath)
         );
       });
-      const newPath = path.join(baseAssetsPath, name) + extension;
+      const newPath = path.join(pathPrefix, newBasename) + extension;
       downloadedFilePaths.add(newPath);
 
       try {
         await retryIfFailed({ times: 2 }, async () => {
-          await fs.ensureDir(baseAssetsPath);
+          await fs.ensureDir(pathPrefix);
           await ipcRenderer.invoke('local-file-download', url, newPath);
           resource.setFile(
             path.relative(projectPath, newPath).replace(/\\/g, '/')

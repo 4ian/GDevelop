@@ -49,7 +49,7 @@ const OnboardingProvider = (props: Props) => {
 
   React.useEffect(
     () => {
-      const appContainer = document.querySelector('#root');
+      const appContainer = document.querySelector('body');
       if (!appContainer) return;
       const observer = new MutationObserver(handleDomMutation);
       observer.observe(appContainer, {

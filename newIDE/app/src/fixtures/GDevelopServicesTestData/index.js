@@ -542,7 +542,7 @@ export const fakeAsset1: Asset = {
     {
       object: spaceshipSerializedObject,
       resources: spaceshipSerializedResources,
-      customization: [],
+      extensions: [],
     },
   ],
 };
@@ -661,7 +661,7 @@ export const fakeAssetWithCustomObject: Asset = {
           },
         },
       ],
-      customization: [
+      extensions: [
         {
           extensionName: 'Button',
           extensionVersion: '1.0.0',
@@ -680,7 +680,7 @@ export const fakeAssetWithCustomObject: Asset = {
   dominantColors: [16304136],
 };
 
-export const fakeAssetWithBehaviorCustomizations1: Asset = {
+export const fakeAssetWithUnknownExtension1: Asset = {
   id: '123',
   name: 'My spaceship',
   shortDescription:
@@ -702,32 +702,17 @@ export const fakeAssetWithBehaviorCustomizations1: Asset = {
     {
       object: spaceshipSerializedObject,
       resources: spaceshipSerializedResources,
-      customization: [
+      extensions: [
         {
-          behaviorName: 'MyBehavior',
-          behaviorType: 'FakeBehavior::FakeBehavior',
-          required: true,
-          extensionName: 'FakeBehavior',
+          extensionName: 'UnknownExtension',
           extensionVersion: '1.0.0',
-          properties: [
-            {
-              codeOnly: false,
-              description: 'Example of a parameter',
-              longDescription: '',
-              supplementaryInformation: '',
-              optional: false,
-              type: 'string',
-              name: 'property1',
-              defaultValue: 'Overridden value',
-            },
-          ],
         },
       ],
     },
   ],
 };
 
-export const fakeAssetWithUnknownBehaviorCustomizations1: Asset = {
+export const fakeAssetWithFlashExtensionDependency1: Asset = {
   id: '123',
   name: 'My spaceship',
   shortDescription:
@@ -749,81 +734,9 @@ export const fakeAssetWithUnknownBehaviorCustomizations1: Asset = {
     {
       object: spaceshipSerializedObject,
       resources: spaceshipSerializedResources,
-      customization: [
+      extensions: [
         {
-          behaviorName: 'MyUnknownBehavior',
-          behaviorType: 'UnknownBehavior::UnknownBehavior',
-          required: true,
-          extensionName: 'UnknownBehavior',
-          extensionVersion: '1.0.0',
-          properties: [],
-        },
-      ],
-    },
-  ],
-};
-
-export const fakeAssetWithFlashBehaviorCustomizations1: Asset = {
-  id: '123',
-  name: 'My spaceship',
-  shortDescription:
-    'A spaceship that can be moved with the keyboard or by touching the screen',
-  description: "A very nice way to start a shoot'em up.",
-  previewImageUrls: ['res/GD-logo.png'],
-  animationsCount: 6,
-  maxFramesCount: 6,
-  height: 36,
-  width: 36,
-  objectType: 'sprite',
-  gdevelopVersion: '5.0.0-beta100',
-  version: '1.0.0',
-  authors: ['test author'],
-  license: 'MIT',
-  tags: ['space shooter', 'tag2'],
-  dominantColors: [255],
-  objectAssets: [
-    {
-      object: spaceshipSerializedObject,
-      resources: spaceshipSerializedResources,
-      customization: [
-        {
-          behaviorName: 'MyFlashBehavior',
-          behaviorType: 'Flash::Flash',
-          required: true,
           extensionName: 'Flash',
-          extensionVersion: '1.0.0',
-          properties: [],
-        },
-      ],
-    },
-  ],
-};
-
-export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
-  id: '123',
-  name: 'My spaceship',
-  shortDescription:
-    'A spaceship that can be moved with the keyboard or by touching the screen',
-  description: "A very nice way to start a shoot'em up.",
-  previewImageUrls: ['res/GD-logo.png'],
-  animationsCount: 6,
-  maxFramesCount: 6,
-  height: 36,
-  width: 36,
-  objectType: 'sprite',
-  gdevelopVersion: '5.0.0-beta100',
-  authors: ['test author'],
-  license: 'MIT',
-  version: '1.0.0',
-  tags: ['space shooter', 'tag2'],
-  dominantColors: [255],
-  objectAssets: [
-    {
-      object: spaceshipSerializedObject,
-      resources: spaceshipSerializedResources,
-      customization: [
-        {
-          extensionName: 'UnknownExtension', // Not really used in events, just for tests.
           extensionVersion: '1.0.0',
         },
       ],

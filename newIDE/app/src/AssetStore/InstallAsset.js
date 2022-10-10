@@ -186,34 +186,6 @@ export const addAssetToProject = async ({
     object.getConfiguration().exposeResources(resourcesRenamer);
     resourcesRenamer.delete();
 
-    objectAsset.customization.forEach(customization => {
-      if (customization.behaviorName) {
-        const { behaviorName, behaviorType } = customization;
-
-        const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-          gd.JsPlatform.get(),
-          behaviorType
-        );
-        if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
-          throw new Error(
-            'Behavior with type ' + behaviorType + ' could not be found.'
-          );
-        }
-
-        // TODO: When this feature is exposed to users, we might want to use
-        // gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors instead.
-        // And add analytics for this.
-        const behavior = object.addNewBehavior(
-          project,
-          behaviorType,
-          behaviorName
-        );
-        customization.properties.forEach(property => {
-          behavior.updateProperty(property.name, property.defaultValue);
-        });
-      }
-    });
-
     createdObjects.push(object);
   });
 
@@ -232,12 +204,7 @@ export const getRequiredExtensionsFromAsset = (
 ): Array<RequiredExtension> => {
   return uniqBy(
     flatten(
-      asset.objectAssets.map(objectAsset => {
-        return objectAsset.customization.map(customization => {
-          const { extensionName, extensionVersion } = customization;
-          return { extensionName, extensionVersion };
-        });
-      })
+      asset.objectAssets.map(objectAsset => objectAsset.extensions || [])
     ),
     ({ extensionName }) => extensionName
   );

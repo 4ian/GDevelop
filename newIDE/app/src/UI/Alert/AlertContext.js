@@ -7,6 +7,10 @@ export type ShowAlertDialogOptions = {|
   title: MessageDescriptor,
   message: MessageDescriptor,
 |};
+export type ShowAlertDialogOptionsWithCallback = {|
+  ...ShowAlertDialogOptions,
+  callback: Function,
+|};
 
 // Confirm
 export type ShowConfirmDialogOptions = {|
@@ -14,7 +18,7 @@ export type ShowConfirmDialogOptions = {|
   message: MessageDescriptor,
 |};
 export type ShowConfirmDialogOptionsWithCallback = {|
-  ...ShowAlertDialogOptions,
+  ...ShowConfirmDialogOptions,
   callback: Function,
 |};
 
@@ -31,13 +35,13 @@ export type ShowConfirmDeleteDialogOptionsWithCallback = {|
 |};
 
 export type ConfirmState = {|
-  showAlertDialog: ShowAlertDialogOptions => void,
+  showAlertDialog: ShowAlertDialogOptionsWithCallback => void,
   showConfirmDialog: ShowConfirmDialogOptionsWithCallback => void,
   showConfirmDeleteDialog: ShowConfirmDeleteDialogOptionsWithCallback => void,
 |};
 
 const initialConfirmState = {
-  showAlertDialog: ShowAlertDialogOptions => {},
+  showAlertDialog: ShowAlertDialogOptionsWithCallback => {},
   showConfirmDialog: ShowConfirmDialogOptionsWithCallback => {},
   showConfirmDeleteDialog: ShowConfirmDeleteDialogOptionsWithCallback => {},
 };

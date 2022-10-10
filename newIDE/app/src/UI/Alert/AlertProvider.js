@@ -5,7 +5,7 @@ import AlertDialog from './AlertDialog';
 import ConfirmDialog from './ConfirmDialog';
 import ConfirmDeleteDialog from './ConfirmDeleteDialog';
 import {
-  type ShowAlertDialogOptions,
+  type ShowAlertDialogOptionsWithCallback,
   type ShowConfirmDeleteDialogOptionsWithCallback,
   type ShowConfirmDialogOptionsWithCallback,
 } from './AlertContext';
@@ -18,8 +18,8 @@ function ConfirmProvider({ children }: Props) {
   const [
     alertDialogConfig,
     setAlertDialogConfig,
-  ] = React.useState<?ShowAlertDialogOptions>(null);
-  const openAlertDialog = (options: ShowAlertDialogOptions) => {
+  ] = React.useState<?ShowAlertDialogOptionsWithCallback>(null);
+  const openAlertDialog = (options: ShowAlertDialogOptionsWithCallback) => {
     setAlertDialogOpen(true);
     setAlertDialogConfig(options);
   };
@@ -67,6 +67,7 @@ function ConfirmProvider({ children }: Props) {
           open={alertDialogOpen}
           onDismiss={() => {
             setAlertDialogOpen(false);
+            alertDialogConfig.callback();
           }}
           title={alertDialogConfig.title}
           message={alertDialogConfig.message}

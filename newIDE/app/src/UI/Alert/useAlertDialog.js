@@ -14,11 +14,10 @@ const useAlertDialog = () => {
     showConfirmDeleteDialog,
   } = React.useContext(AlertContext);
 
-  const showAlert = async (options: ShowAlertDialogOptions): Promise<void> => {
-    await showAlertDialog({
-      ...options,
+  const showAlert = async (options: ShowAlertDialogOptions): Promise<void> =>
+    new Promise(resolve => {
+      showAlertDialog({ callback: resolve, ...options });
     });
-  };
 
   const showConfirmation = (
     options: ShowConfirmDialogOptions

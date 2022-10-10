@@ -2,9 +2,11 @@
 import * as React from 'react';
 
 export type OnboardingFlowStep = {|
-  elementToHighlightId: string,
+  elementToHighlightId?: string,
   id?: string,
-  nextStepTrigger?: {| presenceOfElement: string |},
+  nextStepTrigger?:
+    | {| presenceOfElement: string |}
+    | {| elementIsFilled: true |},
 |};
 
 export type OnboardingState = {|

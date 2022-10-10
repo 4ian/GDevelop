@@ -15,6 +15,15 @@ const flow: Array<OnboardingFlowStep> = [
   {
     id: 'ClickOnSearchBar',
     elementToHighlightId: '#asset-store-search-bar',
+    nextStepTrigger: { elementIsFilled: true },
+  },
+  {
+    id: 'WaitForUserToSelectAsset',
+    nextStepTrigger: { presenceOfElement: '#add-asset-button' },
+  },
+  {
+    id: 'AddAsset',
+    elementToHighlightId: '#add-asset-button',
   },
 ];
 
@@ -25,7 +34,10 @@ const OnboardingProvider = (props: Props) => {
       () => {
         const { nextStepTrigger } = flow[currentStepIndex];
         if (!nextStepTrigger) return;
-        if (document.querySelector(nextStepTrigger.presenceOfElement)) {
+        if (
+          nextStepTrigger.presenceOfElement &&
+          document.querySelector(nextStepTrigger.presenceOfElement)
+        ) {
           setCurrentStepIndex(currentStepIndex + 1);
         }
       },
@@ -55,6 +67,40 @@ const OnboardingProvider = (props: Props) => {
       };
     },
     [handleDomMutation]
+  );
+
+  // This handler should be used when listening for input events but
+  // it doesn't seem to work with React.
+  const handleInput = React.useCallback(
+    (event: KeyboardEvent | TouchEvent) => {
+      const { target } = event;
+      if (!(target instanceof window.HTMLInputElement)) {
+        return;
+      }
+      if (target.value) {
+        setCurrentStepIndex(currentStepIndex + 1);
+      }
+      return target.value;
+    },
+    [currentStepIndex]
+  );
+
+  React.useEffect(
+    () => {
+      const { nextStepTrigger, elementToHighlightId } = flow[currentStepIndex];
+      if (!elementToHighlightId) return;
+      const elementToWatch = document.querySelector(elementToHighlightId);
+      if (!elementToWatch) return;
+      if (nextStepTrigger && nextStepTrigger.elementIsFilled) {
+        elementToWatch.addEventListener('keyup', handleInput);
+        elementToWatch.addEventListener('touchend', handleInput);
+        return () => {
+          elementToWatch.removeEventListener('keyup', handleInput);
+          elementToWatch.removeEventListener('touchend', handleInput);
+        };
+      }
+    },
+    [currentStepIndex, handleInput]
   );
 
   return (

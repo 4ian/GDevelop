@@ -24,8 +24,10 @@ function OnboardingStepDisplayer({ step }: Props) {
     },
     [elementQueryCounter]
   );
-
-  const elementToHighlight = document.querySelector(step.elementToHighlightId);
+  let elementToHighlight;
+  if (step.elementToHighlightId) {
+    elementToHighlight = document.querySelector(step.elementToHighlightId);
+  }
 
   return (
     <>

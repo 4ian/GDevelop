@@ -5,6 +5,7 @@ export type TestProject = {|
   project: gdProject,
   shapePainterObjectConfiguration: gdObjectConfiguration,
   textObjectConfiguration: gdObjectConfiguration,
+  particleEmitterConfiguration: gdObjectConfiguration,
   tiledSpriteObjectConfiguration: gdObjectConfiguration,
   panelSpriteObject: gdObject,
   spriteObjectConfiguration: gdSpriteObject,
@@ -182,6 +183,12 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     project,
     'TextObject::Text',
     'MyTextObject',
+    0
+  );
+  const particleEmitter = testLayout.insertNewObject(
+    project,
+    'ParticleSystem::ParticleEmitter',
+    'MyParticleEmitter',
     0
   );
   const tiledSpriteObject = testLayout.insertNewObject(
@@ -802,6 +809,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     project,
     shapePainterObjectConfiguration: shapePainterObject.getConfiguration(),
     textObjectConfiguration: textObject.getConfiguration(),
+    particleEmitterConfiguration: particleEmitter.getConfiguration(),
     tiledSpriteObjectConfiguration: tiledSpriteObject.getConfiguration(),
     panelSpriteObject,
     customObject,

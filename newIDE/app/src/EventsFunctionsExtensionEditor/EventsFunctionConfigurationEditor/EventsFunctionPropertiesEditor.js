@@ -82,9 +82,9 @@ const getSentenceErrorText = (
 
 const getFullNameHintText = (type: any): MessageDescriptor => {
   if (type === gd.EventsFunction.Condition) {
-    return t`Example: Is flashing?`;
+    return t`Example: Is flashing`;
   } else if (type === gd.EventsFunction.Expression) {
-    return t`Example: Life remaining`;
+    return t`Example: Remaining life`;
   } else if (type === gd.EventsFunction.StringExpression) {
     return t`Example: Equipped shield name`;
   }
@@ -96,9 +96,9 @@ const getDescriptionHintText = (type: any): MessageDescriptor => {
   if (type === gd.EventsFunction.Condition) {
     return t`Example: Check if the object is flashing.`;
   } else if (type === gd.EventsFunction.Expression) {
-    return t`Example: Life remaining for the player.`;
+    return t`Example: Return the number of remaining lives for the player.`;
   } else if (type === gd.EventsFunction.StringExpression) {
-    return t`Example: Name of the shield equipped by the player.`;
+    return t`Example: Return the name of the shield equipped by the player.`;
   }
 
   return t`Example: Make the object flash for 5 seconds.`;

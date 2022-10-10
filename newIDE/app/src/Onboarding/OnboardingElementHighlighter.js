@@ -25,6 +25,7 @@ const styles = {
   scrollIndicator: {
     position: 'fixed',
     zIndex: 1501, // highest z-index used by MaterialUI is 1500
+    animation: '2s ease-in-out 0s infinite alternate none running verticalEaseShake'
   },
   scrollDirectionArrow: {
     color: highlighterPrimaryColor,

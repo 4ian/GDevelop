@@ -65,6 +65,7 @@ export const create = (authentication: Authentication) => {
             storageProviders,
             initialFileMetadataToOpen,
             getStorageProvider,
+            resetStorageProvider,
           }) => (
             <MainFrame
               i18n={i18n}
@@ -89,7 +90,9 @@ export const create = (authentication: Authentication) => {
                   onClose={props.onClose}
                   initialExampleShortHeader={props.initialExampleShortHeader}
                   isProjectOpening={props.isProjectOpening}
-                  onOpenProjectPreCreationDialog={props.onOpenProjectPreCreationDialog}
+                  onOpenProjectPreCreationDialog={
+                    props.onOpenProjectPreCreationDialog
+                  }
                 />
               )}
               renderGDJSDevelopmentWatcher={
@@ -102,6 +105,7 @@ export const create = (authentication: Authentication) => {
               resourceFetcher={LocalResourceFetcher}
               getStorageProviderOperations={getStorageProviderOperations}
               getStorageProvider={getStorageProvider}
+              resetStorageProvider={resetStorageProvider}
               resourceSources={localResourceSources}
               resourceExternalEditors={localResourceExternalEditors}
               extensionsLoader={makeExtensionsLoader({

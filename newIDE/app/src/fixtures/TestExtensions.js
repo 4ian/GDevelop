@@ -111,7 +111,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
   {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
-      'FakeBehavior',
+      'FakeExtension',
       'Fake extension with a fake behavior',
       'A fake extension with a fake behavior containing 2 properties.',
       '',
@@ -302,6 +302,18 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       )
       .addUnsupportedBaseObjectCapability('effect');
 
+    platform.addNewExtension(extension);
+    extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+  }
+  {
+    const extension = new gd.PlatformExtension();
+    extension.setExtensionInformation(
+      'Button',
+      'Fake event-based object',
+      'Fake event-based object',
+      '',
+      'MIT'
+    );
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }

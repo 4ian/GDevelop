@@ -111,7 +111,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
   {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
-      'FakeExtension',
+      'FakeBehavior',
       'Fake extension with a fake behavior',
       'A fake extension with a fake behavior containing 2 properties.',
       '',

@@ -363,7 +363,7 @@ describe('InstallAsset', () => {
           },
           // A fake extension loaded in makeTestExtensions:
           {
-            extensionName: 'FakeExtension',
+            extensionName: 'FakeBehavior',
             extensionVersion: '1.0.0',
           },
         ])
@@ -420,9 +420,9 @@ describe('InstallAsset', () => {
         throw new Error('Fake error');
       });
 
-      await expect(downloadExtensions(['FakeExtension'])).rejects.toMatchObject(
-        { message: 'Fake error' }
-      );
+      await expect(downloadExtensions(['FakeBehavior'])).rejects.toMatchObject({
+        message: 'Fake error',
+      });
     });
   });
 

@@ -3,6 +3,8 @@ import * as React from 'react';
 
 export type OnboardingFlowStep = {|
   elementToHighlightId: string,
+  id?: string,
+  nextStepTrigger?: {| presenceOfElement: string |},
 |};
 
 export type OnboardingState = {|

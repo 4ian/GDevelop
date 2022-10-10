@@ -1,14 +1,36 @@
 // @flow
 import * as React from 'react';
 import { useDebounce } from '../Utils/UseDebounce';
-import OnboardingContext from './OnboardingContext';
+import OnboardingContext, {
+  type OnboardingFlowStep,
+} from './OnboardingContext';
 type Props = {| children: React.Node |};
 
+const flow: Array<OnboardingFlowStep> = [
+  {
+    id: 'ClickOnNewObjectButton',
+    elementToHighlightId: '#add-new-object-button',
+    nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
+  },
+  {
+    id: 'ClickOnSearchBar',
+    elementToHighlightId: '#asset-store-search-bar',
+  },
+];
+
 const OnboardingProvider = (props: Props) => {
+  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
   const handleDomMutation = useDebounce(
-    React.useCallback(() => {
-      console.log('DOM change');
-    }, []),
+    React.useCallback(
+      () => {
+        const { nextStepTrigger } = flow[currentStepIndex];
+        if (!nextStepTrigger) return;
+        if (document.querySelector(nextStepTrigger.presenceOfElement)) {
+          setCurrentStepIndex(currentStepIndex + 1);
+        }
+      },
+      [currentStepIndex]
+    ),
     200
   );
   const domObserverRef = React.useRef<?MutationObserver>(null);
@@ -39,7 +61,7 @@ const OnboardingProvider = (props: Props) => {
     <OnboardingContext.Provider
       value={{
         flow: null,
-        currentStep: { elementToHighlightId: '#add-new-object-button' },
+        currentStep: flow[currentStepIndex],
       }}
     >
       {props.children}

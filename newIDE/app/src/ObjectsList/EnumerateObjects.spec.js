@@ -17,9 +17,9 @@ describe('EnumerateObjects', () => {
       allObjectsList,
     } = enumerateObjects(project, testLayout);
 
-    expect(containerObjectsList).toHaveLength(18);
+    expect(containerObjectsList).toHaveLength(19);
     expect(projectObjectsList).toHaveLength(2);
-    expect(allObjectsList).toHaveLength(20);
+    expect(allObjectsList).toHaveLength(21);
   });
 
   it('can enumerate groups from a project and scene', () => {

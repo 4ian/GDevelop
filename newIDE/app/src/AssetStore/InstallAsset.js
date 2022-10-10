@@ -186,34 +186,6 @@ export const addAssetToProject = async ({
     object.getConfiguration().exposeResources(resourcesRenamer);
     resourcesRenamer.delete();
 
-    objectAsset.customization.forEach(customization => {
-      if (customization.behaviorName) {
-        const { behaviorName, behaviorType } = customization;
-
-        const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-          gd.JsPlatform.get(),
-          behaviorType
-        );
-        if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
-          throw new Error(
-            'Behavior with type ' + behaviorType + ' could not be found.'
-          );
-        }
-
-        // TODO: When this feature is exposed to users, we might want to use
-        // gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors instead.
-        // And add analytics for this.
-        const behavior = object.addNewBehavior(
-          project,
-          behaviorType,
-          behaviorName
-        );
-        customization.properties.forEach(property => {
-          behavior.updateProperty(property.name, property.defaultValue);
-        });
-      }
-    });
-
     createdObjects.push(object);
   });
 
@@ -222,42 +194,21 @@ export const addAssetToProject = async ({
   };
 };
 
-type RequiredBehavior = {|
-  extensionName: string,
-  extensionVersion: string,
-  behaviorType: string,
-|};
-
-export const getRequiredBehaviorsFromAsset = (
-  asset: Asset
-): Array<RequiredBehavior> => {
-  return uniqBy(
-    flatten(
-      asset.objectAssets.map(objectAsset => {
-        return objectAsset.customization
-          .map(customization => {
-            if (customization.behaviorName) {
-              const {
-                behaviorType,
-                extensionName,
-                extensionVersion,
-              } = customization;
-              return { behaviorType, extensionName, extensionVersion };
-            }
-
-            return null;
-          })
-          .filter(Boolean);
-      })
-    ),
-    ({ behaviorType }) => behaviorType // TODO: Verify if we could use the extension name instead?
-  );
-};
-
 type RequiredExtension = {|
   extensionName: string,
   extensionVersion: string,
 |};
+
+export const getRequiredExtensionsFromAsset = (
+  asset: Asset
+): Array<RequiredExtension> => {
+  return uniqBy(
+    flatten(
+      asset.objectAssets.map(objectAsset => objectAsset.extensions || [])
+    ),
+    ({ extensionName }) => extensionName
+  );
+};
 
 export const filterMissingExtensions = (
   gd: libGDevelop,
@@ -272,19 +223,6 @@ export const filterMissingExtensions = (
 
   return requiredExtensions.filter(({ extensionName }) => {
     return !loadedExtensionNames.includes(extensionName);
-  });
-};
-
-export const filterMissingBehaviors = (
-  gd: libGDevelop,
-  requiredBehaviors: Array<RequiredBehavior>
-): Array<RequiredBehavior> => {
-  return requiredBehaviors.filter(({ behaviorType }) => {
-    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-      gd.JsPlatform.get(),
-      behaviorType
-    );
-    return gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata);
   });
 };
 
@@ -373,27 +311,25 @@ export const installAsset = async ({
   environment,
 }: InstallAssetArgs): Promise<InstallAssetOutput> => {
   const asset = await getAsset(assetShortHeader, { environment });
-  const requiredBehaviors = getRequiredBehaviorsFromAsset(asset);
-  const missingBehaviors = filterMissingBehaviors(gd, requiredBehaviors);
-  const serializedExtensions = await downloadExtensions([
-    ...missingBehaviors.map(({ extensionName }) => extensionName),
-  ]);
+  const requiredExtensions = getRequiredExtensionsFromAsset(asset);
+  const missingExtensions = filterMissingExtensions(gd, requiredExtensions);
+  const serializedExtensions = await downloadExtensions(
+    missingExtensions.map(({ extensionName }) => extensionName)
+  );
   await addSerializedExtensionsToProject(
     eventsFunctionsExtensionsState,
     project,
     serializedExtensions
   );
 
-  const stillMissingBehaviors = filterMissingBehaviors(gd, requiredBehaviors);
-  if (stillMissingBehaviors.length) {
+  const stillMissingExtensions = filterMissingExtensions(
+    gd,
+    requiredExtensions
+  );
+  if (stillMissingExtensions.length) {
     throw new Error(
-      'These behaviors could not be installed: ' +
-        missingBehaviors
-          .map(
-            ({ extensionName, behaviorType }) =>
-              `${behaviorType} (${extensionName})`
-          )
-          .join(', ')
+      'These extensions could not be installed: ' +
+        missingExtensions.map(({ extensionName }) => extensionName).join(', ')
     );
   }
 

@@ -15,28 +15,16 @@ export type SerializedParameterMetadata = {|
   type: string, // See ParameterRenderingService for valid types.
 |};
 
-export type AssetCustomization =
-  | {|
-      required: boolean,
-      extensionName: string,
-      extensionVersion: string,
-      behaviorName: string,
-      behaviorType: string,
-      properties: Array<SerializedParameterMetadata>,
-    |}
-  | {|
-      required: boolean,
-      parameters: Array<SerializedParameterMetadata>,
-      extensions: Array<{|
-        extensionName: string,
-        extensionVersion: string,
-      |}>,
-    |};
+export type ExtensionDependency = {|
+  extensionName: string,
+  extensionVersion: string,
+|};
 
 export type ObjectAsset = {|
   object: any /*(serialized gdObject)*/,
   resources: Array<any /*(serialized gdResource)*/>,
-  customization: Array<AssetCustomization>,
+  // TODO This can become mandatory after the migration of the asset repository.
+  extensions?: Array<ExtensionDependency>,
 |};
 
 export type AssetShortHeader = {|

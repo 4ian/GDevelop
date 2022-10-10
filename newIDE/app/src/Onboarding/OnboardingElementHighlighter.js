@@ -12,11 +12,11 @@ type Props = {|
 |};
 
 const highlighterPrimaryColor = '#E0E026';
+const AboveMaterialUIMaxZIndex = 1501; // highest z-index used by MaterialUI is 1500
 
 const styles = {
   rectangleHighlight: {
     position: 'fixed',
-    zIndex: 1501, // highest z-index used by MaterialUI is 1500
     outline: `1px solid ${highlighterPrimaryColor}`,
     boxShadow: `0 0 8px 6px ${highlighterPrimaryColor}`,
     boxSizing: 'border-box',
@@ -24,12 +24,19 @@ const styles = {
   },
   scrollIndicator: {
     position: 'fixed',
-    zIndex: 1501, // highest z-index used by MaterialUI is 1500
-    animation: '2s ease-in-out 0s infinite alternate none running verticalEaseShake'
+    zIndex: AboveMaterialUIMaxZIndex,
+    animation:
+      '2s ease-in-out 0s infinite alternate none running verticalEaseShake',
   },
   scrollDirectionArrow: {
     color: highlighterPrimaryColor,
   },
+};
+
+const isContainedInReactRootNode = element => {
+  const reactRootNode = document.querySelector('#root');
+  if (!reactRootNode) return false;
+  return reactRootNode.contains(element);
 };
 
 function OnboardingElementHighlighter({ element }: Props) {
@@ -104,10 +111,7 @@ function OnboardingElementHighlighter({ element }: Props) {
     },
     [scrollParent, forceUpdate]
   );
-
-  const borderRadius = getComputedStyle(element).getPropertyValue(
-    'border-radius'
-  );
+  const elementComputedStyle = getComputedStyle(element);
 
   const Icon = scrollDirection === 'top' ? ArrowTop : ArrowBottom;
   return (
@@ -118,7 +122,12 @@ function OnboardingElementHighlighter({ element }: Props) {
           style={{
             ...styles.rectangleHighlight,
             ...elementRectangle.toCSSPosition(),
-            borderRadius: borderRadius,
+            borderRadius: elementComputedStyle.getPropertyValue(
+              'border-radius'
+            ),
+            zIndex: isContainedInReactRootNode(element)
+              ? elementComputedStyle.getPropertyPriority('z-index') + 1
+              : AboveMaterialUIMaxZIndex,
           }}
         />
       )}

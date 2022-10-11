@@ -25,6 +25,7 @@ const flow: Array<OnboardingFlowStep> = [
   {
     id: 'AddAsset',
     elementToHighlightId: '#add-asset-button',
+    isTriggerFlickering: true,
     nextStepTrigger: { presenceOfElement: '#object-item-0' },
   },
   {
@@ -45,28 +46,35 @@ const OnboardingProvider = (props: Props) => {
     watchElementInputValue,
     setWatchElementInputValue,
   ] = React.useState<?string>(null);
+  const domObserverRef = React.useRef<?MutationObserver>(null);
+
+  const currentStep = flow[currentStepIndex];
+  const { isTriggerFlickering } = currentStep;
+
+  const watchDomForNextStepTrigger = React.useCallback(
+    () => {
+      console.log('MUTATION');
+      const { nextStepTrigger } = currentStep;
+      if (!nextStepTrigger) return;
+      if (
+        nextStepTrigger.presenceOfElement &&
+        document.querySelector(nextStepTrigger.presenceOfElement)
+      ) {
+        setCurrentStepIndex(currentStepIndex + 1);
+      } else if (
+        nextStepTrigger.absenceOfElement &&
+        !document.querySelector(nextStepTrigger.absenceOfElement)
+      ) {
+        setCurrentStepIndex(currentStepIndex + 1);
+      }
+    },
+    [currentStep, currentStepIndex]
+  )
+
   const handleDomMutation = useDebounce(
-    React.useCallback(
-      () => {
-        const { nextStepTrigger } = flow[currentStepIndex];
-        if (!nextStepTrigger) return;
-        if (
-          nextStepTrigger.presenceOfElement &&
-          document.querySelector(nextStepTrigger.presenceOfElement)
-        ) {
-          setCurrentStepIndex(currentStepIndex + 1);
-        } else if (
-          nextStepTrigger.absenceOfElement &&
-          !document.querySelector(nextStepTrigger.absenceOfElement)
-        ) {
-          setCurrentStepIndex(currentStepIndex + 1);
-        }
-      },
-      [currentStepIndex]
-    ),
+    watchDomForNextStepTrigger,
     200
   );
-  const domObserverRef = React.useRef<?MutationObserver>(null);
 
   React.useEffect(
     () => {
@@ -92,7 +100,6 @@ const OnboardingProvider = (props: Props) => {
 
   React.useEffect(
     () => {
-      const currentStep = flow[currentStepIndex];
       if (!currentStep) return;
       const { nextStepTrigger, elementToHighlightId } = currentStep;
       if (!elementToHighlightId) return;
@@ -100,7 +107,7 @@ const OnboardingProvider = (props: Props) => {
         setWatchElementInputValue(elementToHighlightId);
       }
     },
-    [currentStepIndex]
+    [currentStep]
   );
 
   const watchInputBeingFilled = React.useCallback(
@@ -123,6 +130,9 @@ const OnboardingProvider = (props: Props) => {
   );
 
   useInterval(watchInputBeingFilled, watchElementInputValue ? 1000 : null);
+  useInterval(watchDomForNextStepTrigger, isTriggerFlickering ? 500 : null);
+
+  console.log(currentStepIndex);
 
   return (
     <OnboardingContext.Provider

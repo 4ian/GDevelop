@@ -20,13 +20,10 @@ class Layout;
 namespace gd {
 
 /**
- * \brief Perform a search over a project or a layout, searching for layout,
- * global or object variables.
+ * \brief Perform a search over a layout, searching for layout or object custom
+ * identifiers.
  *
  * \todo Refactor this class using ArbitraryEventsWorker
- * \todo Rework this class to return the shapes (maybe even types?) of the
- * variables (in particular for structures and arrays), so we can use this
- * for better autocompletions in the variables dialogs in the IDE.
  *
  * \ingroup IDE
  */
@@ -54,14 +51,14 @@ class EventsIdentifiersFinder {
 
  private:
   /**
-   * Construct a list of the value of the arguments for parameters of type @
-   * parameterType
+   * Construct a list of the value of the arguments for parameters of type
+   * "identifier".
    *
    * \param project The project used
    * \param project The layout used
    * \param instructions The instructions to be analyzed
    * \param instructionsAreConditions True if the instructions are conditions.
-   * \param parameterType The parameters type to be analyzed
+   * \param identifierType The identifier type to be analyzed
    * \param objectName If not empty, parameters will be taken into account only
    * if the last object parameter is filled with this value.
    *
@@ -74,12 +71,12 @@ class EventsIdentifiersFinder {
       const gd::Layout& layout,
       const gd::InstructionsList& instructions,
       bool instructionsAreConditions,
-      const gd::String& parameterType,
+      const gd::String& identifierType,
       const gd::String& objectName = "");
 
   /**
-   * Construct a list of the value of the arguments for parameters of type @
-   * parameterType. It searchs in events dependencies.
+   * Construct a list of the value of the arguments for parameters of type
+   * "identifier". It searches in events dependencies.
    *
    * \param platform The platform of the project
    * \param project The project used
@@ -101,8 +98,8 @@ class EventsIdentifiersFinder {
       const gd::String& objectName = "");
 
   /**
-   * Construct a list of the value of the arguments for parameters of type @
-   * parameterType. It doesn't search in events dependencies.
+   * Construct a list of the value of the arguments for parameters of type
+   * "identifier". It doesn't search in events dependencies.
    *
    * \param platform The platform of the project
    * \param project The project used

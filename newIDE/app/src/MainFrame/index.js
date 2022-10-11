@@ -372,7 +372,10 @@ const MainFrame = (props: Props) => {
     EventsFunctionsExtensionsContext
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
-  const onboardingState = React.useContext(OnboardingContext);
+  const {
+    currentStep: onboardingCurrentStep,
+    setProject: setOnboardingProject,
+  } = React.useContext(OnboardingContext);
   const [
     fileMetadataOpeningProgress,
     setFileMetadataOpeningProgress,
@@ -682,6 +685,8 @@ const MainFrame = (props: Props) => {
           currentProject.delete();
         }
 
+        setOnboardingProject(null);
+
         return {
           ...state,
           currentProject: null,
@@ -695,6 +700,7 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
       setState,
+      setOnboardingProject,
     ]
   );
 
@@ -735,6 +741,7 @@ const MainFrame = (props: Props) => {
         currentFileMetadata: fileMetadata,
         createDialogOpen: false,
       }));
+      setOnboardingProject(project);
 
       // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
       // their editor will take care of reloading them.
@@ -778,6 +785,7 @@ const MainFrame = (props: Props) => {
       getStorageProviderOperations,
       ensureResourcesAreFetched,
       authenticatedUser,
+      setOnboardingProject
     ]
   );
 
@@ -2878,10 +2886,8 @@ const MainFrame = (props: Props) => {
           }}
         />
       )}
-      {onboardingState.currentStep && (
-        <OnboardingStepDisplayer
-          step={onboardingState.currentStep}
-        />
+      {onboardingCurrentStep && (
+        <OnboardingStepDisplayer step={onboardingCurrentStep} />
       )}
     </div>
   );

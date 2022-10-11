@@ -27,6 +27,9 @@ const flow: Array<OnboardingFlowStep> = [
     elementToHighlightId: '#add-asset-button',
     isTriggerFlickering: true,
     nextStepTrigger: { presenceOfElement: '#object-item-0' },
+    mapProjectData: {
+      FirstObject: 'lastProjectObjectName',
+    },
   },
   {
     id: 'CloseAssetStore',
@@ -42,6 +45,8 @@ const flow: Array<OnboardingFlowStep> = [
 
 const OnboardingProvider = (props: Props) => {
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
+  const [project, setProject] = React.useState<?gdProject>(null);
+  const [data, setData] = React.useState<{ [key: string]: string }>({});
   const [
     watchElementInputValue,
     setWatchElementInputValue,
@@ -54,27 +59,39 @@ const OnboardingProvider = (props: Props) => {
   const watchDomForNextStepTrigger = React.useCallback(
     () => {
       console.log('MUTATION');
-      const { nextStepTrigger } = currentStep;
+      const { nextStepTrigger, mapProjectData } = currentStep;
       if (!nextStepTrigger) return;
+      let shouldGoToNextStep = false;
       if (
         nextStepTrigger.presenceOfElement &&
         document.querySelector(nextStepTrigger.presenceOfElement)
       ) {
-        setCurrentStepIndex(currentStepIndex + 1);
+        shouldGoToNextStep = true;
       } else if (
         nextStepTrigger.absenceOfElement &&
         !document.querySelector(nextStepTrigger.absenceOfElement)
       ) {
-        setCurrentStepIndex(currentStepIndex + 1);
+        shouldGoToNextStep = true;
       }
-    },
-    [currentStep, currentStepIndex]
-  )
+      if (shouldGoToNextStep && mapProjectData) {
+        Object.entries(mapProjectData).forEach(([key, dataAccessor]) => {
+          if (dataAccessor === 'lastProjectObjectName') {
+            if (!project || project.getLayoutsCount() === 0) return;
+            const layout = project.getLayoutAt(0);
+            setData(currentData => ({
+              ...currentData,
+              [key]: layout.getObjectAt(layout.getObjectsCount() - 1).getName(),
+            }));
+          }
+        });
+      }
 
-  const handleDomMutation = useDebounce(
-    watchDomForNextStepTrigger,
-    200
+      if (shouldGoToNextStep) setCurrentStepIndex(currentStepIndex + 1);
+    },
+    [currentStep, currentStepIndex, project]
   );
+
+  const handleDomMutation = useDebounce(watchDomForNextStepTrigger, 200);
 
   React.useEffect(
     () => {
@@ -139,6 +156,7 @@ const OnboardingProvider = (props: Props) => {
       value={{
         flow: null,
         currentStep: flow[currentStepIndex],
+        setProject,
       }}
     >
       {props.children}

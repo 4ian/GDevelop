@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { useDebounce } from '../Utils/UseDebounce';
+import { useInterval } from '../Utils/UseInterval';
 import OnboardingContext, {
   type OnboardingFlowStep,
 } from './OnboardingContext';
@@ -40,6 +41,10 @@ const flow: Array<OnboardingFlowStep> = [
 
 const OnboardingProvider = (props: Props) => {
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
+  const [
+    watchElementInputValue,
+    setWatchElementInputValue,
+  ] = React.useState<?string>(null);
   const handleDomMutation = useDebounce(
     React.useCallback(
       () => {
@@ -50,7 +55,8 @@ const OnboardingProvider = (props: Props) => {
           document.querySelector(nextStepTrigger.presenceOfElement)
         ) {
           setCurrentStepIndex(currentStepIndex + 1);
-        } else if (nextStepTrigger.absenceOfElement &&
+        } else if (
+          nextStepTrigger.absenceOfElement &&
           !document.querySelector(nextStepTrigger.absenceOfElement)
         ) {
           setCurrentStepIndex(currentStepIndex + 1);
@@ -84,39 +90,39 @@ const OnboardingProvider = (props: Props) => {
     [handleDomMutation]
   );
 
-  // This handler should be used when listening for input events but
-  // it doesn't seem to work with React.
-  const handleInput = React.useCallback(
-    (event: KeyboardEvent | TouchEvent) => {
-      const { target } = event;
-      if (!(target instanceof window.HTMLInputElement)) {
-        return;
+  React.useEffect(
+    () => {
+      const currentStep = flow[currentStepIndex];
+      if (!currentStep) return;
+      const { nextStepTrigger, elementToHighlightId } = currentStep;
+      if (!elementToHighlightId) return;
+      if (nextStepTrigger && nextStepTrigger.elementIsFilled) {
+        setWatchElementInputValue(elementToHighlightId);
       }
-      if (target.value) {
-        setCurrentStepIndex(currentStepIndex + 1);
-      }
-      return target.value;
     },
     [currentStepIndex]
   );
 
-  React.useEffect(
+  const watchInputBeingFilled = React.useCallback(
     () => {
-      const { nextStepTrigger, elementToHighlightId } = flow[currentStepIndex];
-      if (!elementToHighlightId) return;
-      const elementToWatch = document.querySelector(elementToHighlightId);
-      if (!elementToWatch) return;
-      if (nextStepTrigger && nextStepTrigger.elementIsFilled) {
-        elementToWatch.addEventListener('keyup', handleInput);
-        elementToWatch.addEventListener('touchend', handleInput);
-        return () => {
-          elementToWatch.removeEventListener('keyup', handleInput);
-          elementToWatch.removeEventListener('touchend', handleInput);
-        };
+      if (!watchElementInputValue) return;
+      const elementToWatch = document.querySelector(watchElementInputValue);
+
+      if (
+        elementToWatch &&
+        // Flow errors on missing value prop in generic type HTMLElement but this
+        // line cannot break.
+        // $FlowFixMe
+        elementToWatch.value
+      ) {
+        setCurrentStepIndex(currentStepIndex + 1);
+        setWatchElementInputValue(null);
       }
     },
-    [currentStepIndex, handleInput]
+    [currentStepIndex, watchElementInputValue]
   );
+
+  useInterval(watchInputBeingFilled, watchElementInputValue ? 1000 : null);
 
   return (
     <OnboardingContext.Provider

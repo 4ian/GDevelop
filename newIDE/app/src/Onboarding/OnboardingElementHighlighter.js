@@ -126,7 +126,7 @@ function OnboardingElementHighlighter({ element }: Props) {
               'border-radius'
             ),
             zIndex: isContainedInReactRootNode(element)
-              ? elementComputedStyle.getPropertyPriority('z-index') + 1
+              ? elementComputedStyle.getPropertyPriority('z-index') + 10
               : AboveMaterialUIMaxZIndex,
           }}
         />

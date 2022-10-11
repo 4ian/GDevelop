@@ -84,11 +84,11 @@ const flow: Array<OnboardingFlowStep> = [
     elementToHighlightId:
       '#behavior-item-TopDownMovementBehavior--TopDownMovementBehavior',
     nextStepTrigger: {
-      presenceOfElement: '#object-editor-dialog #apply-button',
+      presenceOfElement: '#behavior-parameters-TopDownMovement',
     },
     tooltip: {
       content: 'Add the "Top down movement" behavior.',
-      placement: 'right',
+      placement: 'bottom',
     },
   },
   {

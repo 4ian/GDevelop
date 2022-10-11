@@ -19,6 +19,7 @@ const flow: Array<OnboardingFlowStep> = [
     elementToHighlightId: '#asset-store-search-bar',
     nextStepTrigger: { elementIsFilled: true },
     tooltip: { content: 'Search an object' },
+    skippable: true,
   },
   {
     id: 'WaitForUserToSelectAsset',
@@ -66,6 +67,7 @@ const flow: Array<OnboardingFlowStep> = [
       content: 'See the behaviors of your object here.',
       placement: 'bottom',
     },
+    skippable: true,
   },
   {
     id: 'AddBehavior',
@@ -138,25 +140,53 @@ const OnboardingProvider = (props: Props) => {
   const watchDomForNextStepTrigger = React.useCallback(
     () => {
       console.log('MUTATION');
-      const { nextStepTrigger, mapProjectData } = currentStep;
-      if (!nextStepTrigger) return;
-      let shouldGoToNextStep = false;
-      if (
-        nextStepTrigger.presenceOfElement &&
-        document.querySelector(nextStepTrigger.presenceOfElement)
-      ) {
-        shouldGoToNextStep = true;
-      } else if (
-        nextStepTrigger.absenceOfElement &&
-        !document.querySelector(nextStepTrigger.absenceOfElement)
-      ) {
-        shouldGoToNextStep = true;
+      // Find the next mandatory (not-skippable) step (It can be the current step).
+      let indexOfNextMandatoryStep = currentStepIndex;
+      while (flow[indexOfNextMandatoryStep].skippable) {
+        indexOfNextMandatoryStep += 1;
       }
-      if (shouldGoToNextStep && mapProjectData) {
+
+      let shouldGoToStepAtIndex = undefined;
+      // Browse skippable steps in reverse orders to avoid displaying
+      // element highlighter for steps that will be skipped anyway.
+      for (
+        let stepIndex = indexOfNextMandatoryStep;
+        stepIndex >= currentStepIndex;
+        stepIndex--
+      ) {
+        const { nextStepTrigger } = flow[stepIndex];
+        if (!nextStepTrigger) return;
+        if (
+          nextStepTrigger.presenceOfElement &&
+          document.querySelector(nextStepTrigger.presenceOfElement)
+        ) {
+          shouldGoToStepAtIndex = stepIndex + 1;
+          break;
+        } else if (
+          nextStepTrigger.absenceOfElement &&
+          !document.querySelector(nextStepTrigger.absenceOfElement)
+        ) {
+          shouldGoToStepAtIndex = stepIndex + 1;
+          break;
+        }
+      }
+      if (shouldGoToStepAtIndex === undefined) return;
+
+      // If a change of step is going to happen, first record the data for
+      // the current step that is about to be closed.
+      const { mapProjectData } = flow[currentStepIndex];
+
+      if (mapProjectData) {
         Object.entries(mapProjectData).forEach(([key, dataAccessor]) => {
           if (dataAccessor === 'lastProjectObjectName') {
             if (!project || project.getLayoutsCount() === 0) return;
             const layout = project.getLayoutAt(0);
+            const layoutObjectsCount = layout.getObjectsCount();
+            if (layoutObjectsCount === 0) {
+              throw new Error(
+                `No object was found in layer after step ${currentStepIndex} of flow`
+              );
+            }
             setData(currentData => ({
               ...currentData,
               [key]: layout.getObjectAt(layout.getObjectsCount() - 1).getName(),
@@ -165,9 +195,10 @@ const OnboardingProvider = (props: Props) => {
         });
       }
 
-      if (shouldGoToNextStep) setCurrentStepIndex(currentStepIndex + 1);
+      // Change step
+      setCurrentStepIndex(shouldGoToStepAtIndex);
     },
-    [currentStep, currentStepIndex, project]
+    [currentStepIndex, project]
   );
 
   const handleDomMutation = useDebounce(watchDomForNextStepTrigger, 200);

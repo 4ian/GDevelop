@@ -183,6 +183,27 @@ const AnimationPreview = ({
     [updateAnimation]
   );
 
+  const onImageLoaded = React.useCallback(
+    () => {
+      imagesLoadedArray.current[currentFrameIndexRef.current] = true;
+      // When the array of loaders changes, decide if we display the loader or not.
+      // If all images are loaded, then hide loader for instant display.
+      const hasFinishedLoadingAllResources = !imagesLoadedArray.current.some(
+        hasImageLoaded => !hasImageLoaded
+      );
+      if (hasFinishedLoadingAllResources) {
+        setIsStillLoadingResources(false);
+      }
+      // Image has loaded, so cancel the timeout if it was set.
+      if (loaderTimeout.current) {
+        clearTimeout(loaderTimeout.current);
+        loaderTimeout.current = null;
+      }
+      forceUdpate();
+    },
+    [forceUdpate]
+  );
+
   // When changing animation, the index can be out of bounds, so reset the animation.
   if (currentFrameIndexRef.current >= resourceNames.length) {
     currentFrameIndexRef.current = 0;
@@ -203,23 +224,7 @@ const AnimationPreview = ({
           hideControls={hideControls}
           fixedHeight={fixedHeight}
           fixedWidth={fixedWidth}
-          onImageLoaded={() => {
-            imagesLoadedArray.current[currentFrameIndexRef.current] = true;
-            // When the array of loaders changes, decide if we display the loader or not.
-            // If all images are loaded, then hide loader for instant display.
-            const hasFinishedLoadingAllResources = !imagesLoadedArray.current.some(
-              hasImageLoaded => !hasImageLoaded
-            );
-            if (hasFinishedLoadingAllResources) {
-              setIsStillLoadingResources(false);
-            }
-            // Image has loaded, so cancel the timeout if it was set.
-            if (loaderTimeout.current) {
-              clearTimeout(loaderTimeout.current);
-              loaderTimeout.current = null;
-            }
-            forceUdpate();
-          }}
+          onImageLoaded={onImageLoaded}
           isImagePrivate={isAssetPrivate}
           hideLoader // Handled by the animation preview, important to let the browser cache the image.
         />

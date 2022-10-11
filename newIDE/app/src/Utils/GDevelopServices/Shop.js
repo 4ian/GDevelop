@@ -56,7 +56,9 @@ export const createProductAuthorizedUrl = (
   url: string,
   token: string
 ): string => {
-  return url + '?token=' + encodeURIComponent(token);
+  return url.indexOf('?') !== -1
+    ? `${url}&token=${token}`
+    : `${url}?token=${encodeURIComponent(token)}`;
 };
 
 export const extractFilenameFromProductAuthorizedUrl = (

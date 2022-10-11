@@ -30,7 +30,7 @@ import ScrollView from '../UI/ScrollView';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import RaisedButton from '../UI/RaisedButton';
 import { AssetStoreContext } from './AssetStoreContext';
-import AssetPackDialog from './AssetPackInstallDialog';
+import AssetPackInstallDialog from './AssetPackInstallDialog';
 import { installPublicAsset } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { showErrorBox } from '../UI/Messages/MessageBox';
@@ -365,7 +365,7 @@ export default function NewObjectDialog({
         </Column>
       </Dialog>
       {isAssetPackDialogInstallOpen && searchResults && openedAssetPack && (
-        <AssetPackDialog
+        <AssetPackInstallDialog
           assetPack={openedAssetPack}
           assetShortHeaders={searchResults}
           addedAssetIds={addedAssetIds}

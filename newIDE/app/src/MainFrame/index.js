@@ -669,17 +669,28 @@ const MainFrame = (props: Props) => {
         if (serviceWorkerUpdateStatus === 'update-ready') {
           const answer = await showConfirmation({
             title: t`New update available!`,
-            message: t`A new version of GDevelop is available. Would you like to update now?`,
+            message: t`A new version of GDevelop is available. Would you like to update now? The page will be reloaded.`,
           });
           if (answer) {
-            await updateServiceWorkerToLatestVersion();
-            const cacheKeys = await caches.keys();
-            await Promise.all(cacheKeys.map(key => caches.delete(key)));
-            window.location.reload();
+            try {
+              await updateServiceWorkerToLatestVersion();
+            } catch (error) {
+              console.error('Unable to update service worker', error);
+              showErrorBox({
+                message: [
+                  i18n._(
+                    `Unable to update the application, close all tabs of GDevelop and try again.`
+                  ),
+                  i18n._(error.message),
+                ].join('\n'),
+                errorId: 'web-app-update-error',
+                rawError: error,
+              });
+            }
           }
         }
       },
-      [showConfirmation, serviceWorkerUpdateStatus]
+      [showConfirmation, serviceWorkerUpdateStatus, i18n]
     ),
     3000
   );

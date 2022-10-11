@@ -24,6 +24,17 @@ const flow: Array<OnboardingFlowStep> = [
   {
     id: 'AddAsset',
     elementToHighlightId: '#add-asset-button',
+    nextStepTrigger: { presenceOfElement: '#object-item-0' },
+  },
+  {
+    id: 'CloseAssetStore',
+    elementToHighlightId: '#new-object-dialog #close-button',
+    nextStepTrigger: { absenceOfElement: '#new-object-dialog' },
+  },
+  {
+    id: 'DragObjectToScene',
+    elementToHighlightId: '#object-item-0',
+    nextStepTrigger: { presenceOfElement: '#object-item-1' },
   },
 ];
 
@@ -37,6 +48,10 @@ const OnboardingProvider = (props: Props) => {
         if (
           nextStepTrigger.presenceOfElement &&
           document.querySelector(nextStepTrigger.presenceOfElement)
+        ) {
+          setCurrentStepIndex(currentStepIndex + 1);
+        } else if (nextStepTrigger.absenceOfElement &&
+          !document.querySelector(nextStepTrigger.absenceOfElement)
         ) {
           setCurrentStepIndex(currentStepIndex + 1);
         }

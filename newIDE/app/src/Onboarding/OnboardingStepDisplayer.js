@@ -3,6 +3,7 @@ import React from 'react';
 import { useInterval } from '../Utils/UseInterval';
 import { type OnboardingFlowStep } from './OnboardingContext';
 import OnboardingElementHighlighter from './OnboardingElementHighlighter';
+import OnboardingTooltipDisplayer from './OnboardingTooltipDisplayer';
 
 type Props = {|
   step: OnboardingFlowStep,
@@ -16,7 +17,7 @@ function OnboardingStepDisplayer({ step }: Props) {
     setElementToHighlight,
   ] = React.useState<?HTMLElement>(null);
 
-  const { elementToHighlightId } = step;
+  const { elementToHighlightId, tooltip } = step;
 
   // The element could disappear if the user closes a dialog for instance.
   // So we need to periodically query it.
@@ -35,11 +36,15 @@ function OnboardingStepDisplayer({ step }: Props) {
     },
     [elementToHighlightId]
   );
-
+  if (!elementToHighlight) return null;
   return (
     <>
-      {elementToHighlight && (
-        <OnboardingElementHighlighter element={elementToHighlight} />
+      <OnboardingElementHighlighter element={elementToHighlight} />
+      {tooltip && (
+        <OnboardingTooltipDisplayer
+          anchorElement={elementToHighlight}
+          tooltip={tooltip}
+        />
       )}
     </>
   );

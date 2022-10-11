@@ -128,9 +128,9 @@ interface ProjectHelper {
 interface EventsVariablesFinder {
     void EventsVariablesFinder();
 
-    [Const, Value] SetString STATIC_FindAllGlobalVariables([Const, Ref] Platform platform, [Const, Ref] Project project);
-    [Const, Value] SetString STATIC_FindAllLayoutVariables([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout);
-    [Const, Value] SetString STATIC_FindAllObjectVariables([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout, [Const, Ref] gdObject obj);
+    [Const, Value] SetString STATIC_FindAllGlobalVariables([Const, Ref] Platform platform, [Ref] Project project);
+    [Const, Value] SetString STATIC_FindAllLayoutVariables([Const, Ref] Platform platform, [Ref] Project project, [Ref] Layout layout);
+    [Const, Value] SetString STATIC_FindAllObjectVariables([Const, Ref] Platform platform, [Ref] Project project, [Ref] Layout layout, [Const, Ref] gdObject obj);
 
     //Inherited from ExpressionParser2NodeWorker:
 };

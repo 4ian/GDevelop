@@ -6,6 +6,7 @@ export type OnboardingFlowStep = {|
   id?: string,
   nextStepTrigger?:
     | {| presenceOfElement: string |}
+    | {| absenceOfElement: string |}
     | {| elementIsFilled: true |},
 |};
 

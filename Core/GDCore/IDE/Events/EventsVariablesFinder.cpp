@@ -75,21 +75,28 @@ class GD_CORE_API ExpressionParameterSearcher
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     bool considerFunction = objectName.empty() || node.objectName == objectName;
 
-    const gd::ExpressionMetadata &metadata = node.objectName.empty() ?
-          MetadataProvider::GetAnyExpressionMetadata(platform, node.functionName) :
+    const bool isObjectFunction = !node.objectName.empty();
+    const gd::ExpressionMetadata &metadata = isObjectFunction ?
             MetadataProvider::GetObjectAnyExpressionMetadata(
                 platform,
                 GetTypeOfObject(globalObjectsContainer, objectsContainer, objectName),
-                node.functionName);
+                node.functionName):
+            MetadataProvider::GetAnyExpressionMetadata(platform, node.functionName);
 
     if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
       return;
     }
-    
+
     for (size_t i = 0; i < node.parameters.size() &&
                        i < metadata.parameters.size();
          ++i) {
-      auto& parameterMetadata = metadata.parameters[i];
+      // Object functions 1st metadata is the object.
+      // Skip it.
+      const int metadataIndex = i + (isObjectFunction ? 1 : 0);
+      if (metadataIndex >= metadata.parameters.size()) {
+        break;
+      }
+      auto& parameterMetadata = metadata.parameters[metadataIndex];
       if (considerFunction && parameterMetadata.GetType() == parameterType) {
         // Store the value of the parameter
         results.insert(

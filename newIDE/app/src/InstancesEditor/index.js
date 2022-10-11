@@ -296,6 +296,11 @@ export default class InstancesEditor extends Component<Props> {
 
     this._mountEditorComponents(this.props);
     this._renderScene();
+    if (this.props.onViewPositionChanged) {
+      // Call it at the end, so that the top component knows the view position
+      // is initialized.
+      this.props.onViewPositionChanged(this.viewPosition);
+    }
   }
 
   /**

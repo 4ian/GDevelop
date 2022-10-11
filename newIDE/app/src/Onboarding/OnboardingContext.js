@@ -4,6 +4,7 @@ import * as React from 'react';
 export type OnboardingFlowStep = {|
   elementToHighlightId?: string,
   id?: string,
+  isTriggerFlickering?: true,
   nextStepTrigger?:
     | {| presenceOfElement: string |}
     | {| absenceOfElement: string |}

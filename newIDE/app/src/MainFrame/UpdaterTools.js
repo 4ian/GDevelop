@@ -97,10 +97,17 @@ export const useServiceWorkerUpdateStatus = () => {
 
 export const updateServiceWorkerToLatestVersion = async () => {
   const { serviceWorker } = navigator;
-  if (!serviceWorker) return;
+  if (!serviceWorker) {
+    throw new Error('Service worker not available');
+  }
   const registration = await serviceWorker.getRegistration();
-  if (!registration) return;
+  if (!registration) {
+    throw new Error('Service worker registration not available');
+  }
   await registration.unregister();
+  const cacheKeys = await caches.keys();
+  await Promise.all(cacheKeys.map(key => caches.delete(key)));
+  window.location.reload();
 };
 
 export const getServiceWorkerStatusLabel = (

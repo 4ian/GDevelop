@@ -43,10 +43,64 @@ const flow: Array<OnboardingFlowStep> = [
   {
     id: 'DragObjectToScene',
     elementToHighlightId: '#object-item-0',
-    nextStepTrigger: { presenceOfElement: '#object-item-1' },
+    nextStepTrigger: { instanceDraggedOnScene: 'firstObject' },
     tooltip: {
       content: 'Now drag {firstObject} to the scene',
       placement: 'left',
+    },
+  },
+  {
+    id: 'OpenBehaviors',
+    elementToHighlightId: '#object-item-0',
+    nextStepTrigger: { presenceOfElement: '#object-editor-dialog' },
+    tooltip: {
+      content: 'Here, right-click on it and click “Edit behaviors”',
+      placement: 'left',
+    },
+  },
+  {
+    id: 'OpenBehaviorTab',
+    elementToHighlightId: '#behaviors-tab',
+    nextStepTrigger: { presenceOfElement: '#add-behavior-button' },
+    tooltip: {
+      content: 'See the behaviors of your object here.',
+      placement: 'bottom',
+    },
+  },
+  {
+    id: 'AddBehavior',
+    elementToHighlightId: '#add-behavior-button',
+    nextStepTrigger: {
+      presenceOfElement:
+        '#behavior-item-TopDownMovementBehavior--TopDownMovementBehavior',
+    },
+    tooltip: {
+      content: 'Let’s add a behavior!',
+      placement: 'bottom',
+    },
+  },
+  {
+    id: 'SelectTopDownBehavior',
+    elementToHighlightId:
+      '#behavior-item-TopDownMovementBehavior--TopDownMovementBehavior',
+    nextStepTrigger: {
+      presenceOfElement: '#object-editor-dialog #apply-button',
+    },
+    tooltip: {
+      content: 'Add the "Top down movement" behavior.',
+      placement: 'right',
+    },
+  },
+  {
+    id: 'ApplyBehavior',
+    elementToHighlightId: '#object-editor-dialog #apply-button',
+    nextStepTrigger: {
+      presenceOfElement: '#object-item-1',
+    },
+    tooltip: {
+      content:
+        "The parameters above help you customise the behavior, but let's ignore them for now.",
+      placement: 'top',
     },
   },
 ];
@@ -73,6 +127,9 @@ const OnboardingProvider = (props: Props) => {
     watchElementInputValue,
     setWatchElementInputValue,
   ] = React.useState<?string>(null);
+  const [watchSceneInstances, setWatchSceneInstances] = React.useState<?string>(
+    null
+  );
   const domObserverRef = React.useRef<?MutationObserver>(null);
 
   const currentStep = flow[currentStepIndex];
@@ -141,12 +198,17 @@ const OnboardingProvider = (props: Props) => {
     () => {
       if (!currentStep) return;
       const { nextStepTrigger, elementToHighlightId } = currentStep;
-      if (!elementToHighlightId) return;
       if (nextStepTrigger && nextStepTrigger.elementIsFilled) {
+        if (!elementToHighlightId) return;
         setWatchElementInputValue(elementToHighlightId);
+      } else if (nextStepTrigger && nextStepTrigger.instanceDraggedOnScene) {
+        const objectKey = nextStepTrigger.instanceDraggedOnScene;
+        const objectName = data[objectKey];
+        if (!objectName) return;
+        setWatchSceneInstances(objectName);
       }
     },
-    [currentStep]
+    [currentStep, data]
   );
 
   const watchInputBeingFilled = React.useCallback(
@@ -168,7 +230,22 @@ const OnboardingProvider = (props: Props) => {
     [currentStepIndex, watchElementInputValue]
   );
 
+  const watchSceneInstanceChanges = React.useCallback(
+    () => {
+      if (!watchSceneInstances) return;
+      if (!project || project.getLayoutsCount() === 0) return;
+      const layout = project.getLayoutAt(0);
+      const instances = layout.getInitialInstances();
+      if (instances.hasInstancesOfObject(watchSceneInstances)) {
+        setCurrentStepIndex(currentStepIndex + 1);
+        setWatchSceneInstances(null);
+      }
+    },
+    [project, currentStepIndex, watchSceneInstances]
+  );
+
   useInterval(watchInputBeingFilled, watchElementInputValue ? 1000 : null);
+  useInterval(watchSceneInstanceChanges, watchSceneInstances ? 500 : null);
   useInterval(watchDomForNextStepTrigger, isTriggerFlickering ? 500 : null);
 
   console.log(currentStepIndex);

@@ -25,7 +25,8 @@ export type OnboardingFlowStep = {|
   nextStepTrigger?:
     | {| presenceOfElement: string |}
     | {| absenceOfElement: string |}
-    | {| elementIsFilled: true |},
+    | {| elementIsFilled: true |}
+    | {| instanceDraggedOnScene: string |},
   mapProjectData?: {
     [key: string]: 'lastProjectObjectName',
   },

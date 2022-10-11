@@ -104,3 +104,26 @@ export const downloadUrlsToBlobs = async <Item: { url: string }>({
 
   return results;
 };
+
+export const convertBlobToFiles = <
+  Item: { resource: gdResource, filename: string }
+>(
+  itemResults: Array<ItemResult<Item>>,
+  onError: (resourceName: string, error: Error) => void
+) =>
+  itemResults
+    .map(({ item, blob, error }) => {
+      if (error || !blob) {
+        onError(
+          item.resource.getName(),
+          error || new Error('Unknown error during download')
+        );
+        return null;
+      }
+
+      return {
+        resource: item.resource,
+        file: new File([blob], item.filename, { type: blob.type }),
+      };
+    })
+    .filter(Boolean);

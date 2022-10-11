@@ -5,14 +5,26 @@ import { action } from '@storybook/addon-actions';
 import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 import themeDecorator from '../ThemeDecorator';
-import confirmDecorator from '../ConfirmDecorator';
+import alertDecorator from '../AlertDecorator';
 import RaisedButton from '../../UI/RaisedButton';
-import ConfirmDialog from '../../UI/Confirm/ConfirmDialog';
-import useConfirmDialog from '../../UI/Confirm/useConfirmDialog';
+import AlertDialog from '../../UI/Alert/AlertDialog';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { Column, LargeSpacer } from '../../UI/Grid';
 
 export const Default = () => {
-  const { showConfirmation, showDeleteConfirmation } = useConfirmDialog();
+  const {
+    showAlert,
+    showConfirmation,
+    showDeleteConfirmation,
+  } = useAlertDialog();
+
+  const onOpenAlertDialog = async () => {
+    await showAlert({
+      title: t`Sorry`,
+      message: t`You cannot do this.`,
+    });
+    action('Dismissed')();
+  };
 
   const onOpenConfirmDialog = async () => {
     const answer = await showConfirmation({
@@ -36,6 +48,8 @@ export const Default = () => {
 
   return (
     <Column alignItems="flex-start">
+      <RaisedButton label="Open alert dialog" onClick={onOpenAlertDialog} />
+      <LargeSpacer />
       <RaisedButton label="Open confirm dialog" onClick={onOpenConfirmDialog} />
       <LargeSpacer />
       <RaisedButton
@@ -47,7 +61,7 @@ export const Default = () => {
 };
 
 export default {
-  title: 'UI Building Blocks/ConfirmDialog',
-  component: ConfirmDialog,
-  decorators: [paperDecorator, confirmDecorator, muiDecorator, themeDecorator],
+  title: 'UI Building Blocks/AlertDialog',
+  component: AlertDialog,
+  decorators: [paperDecorator, alertDecorator, muiDecorator, themeDecorator],
 };

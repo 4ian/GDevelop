@@ -6,7 +6,7 @@ import axios from 'axios';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
-import PrivateAssetPackDialog from '../../../../AssetStore/PrivateAssetPackDialog';
+import PrivateAssetPackDialog from '../../../../AssetStore/PrivateAssets/PrivateAssetPackDialog';
 import {
   GDevelopAssetApi,
   GDevelopUserApi,
@@ -96,7 +96,7 @@ export const Default = () => {
 
   return (
     <PrivateAssetPackDialog
-      privateAssetPack={privateAssetPackListingData}
+      privateAssetPackListingData={privateAssetPackListingData}
       onClose={() => action('close')()}
     />
   );
@@ -134,7 +134,7 @@ export const Loading = () => {
 
   return (
     <PrivateAssetPackDialog
-      privateAssetPack={privateAssetPackListingData}
+      privateAssetPackListingData={privateAssetPackListingData}
       onClose={() => action('close')()}
     />
   );
@@ -171,7 +171,7 @@ export const With404 = () => {
 
   return (
     <PrivateAssetPackDialog
-      privateAssetPack={privateAssetPackListingData}
+      privateAssetPackListingData={privateAssetPackListingData}
       onClose={() => action('close')()}
     />
   );
@@ -208,7 +208,7 @@ export const WithUnknownError = () => {
 
   return (
     <PrivateAssetPackDialog
-      privateAssetPack={privateAssetPackListingData}
+      privateAssetPackListingData={privateAssetPackListingData}
       onClose={() => action('close')()}
     />
   );

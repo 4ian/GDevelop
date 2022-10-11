@@ -282,6 +282,7 @@ export const WithObjectsList = () => (
                   onFetchNewlyAddedResources={action(
                     'onFetchNewlyAddedResources'
                   )}
+                  canInstallPrivateAsset={() => false}
                 />
               </TabContentContainer>
             }

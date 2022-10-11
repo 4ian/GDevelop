@@ -87,6 +87,7 @@ export const AnnouncementsFeed = ({
                         }
                       : null
                   }
+                  key={announcement.id}
                 >
                   <Text size="block-title">
                     <Trans>

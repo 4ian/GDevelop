@@ -31,6 +31,7 @@ export type OnboardingFlowStep = {|
     [key: string]: 'lastProjectObjectName',
   },
   tooltip?: OnboardingTooltip,
+  skippable?: true,
 |};
 
 export type OnboardingState = {|

@@ -1,6 +1,23 @@
 // @flow
 import * as React from 'react';
 
+export type OnboardingTooltip = {|
+  placement?:
+    | 'bottom-end'
+    | 'bottom-start'
+    | 'bottom'
+    | 'left-end'
+    | 'left-start'
+    | 'left'
+    | 'right-end'
+    | 'right-start'
+    | 'right'
+    | 'top-end'
+    | 'top-start'
+    | 'top',
+  content: string,
+|};
+
 export type OnboardingFlowStep = {|
   elementToHighlightId?: string,
   id?: string,
@@ -12,6 +29,7 @@ export type OnboardingFlowStep = {|
   mapProjectData?: {
     [key: string]: 'lastProjectObjectName',
   },
+  tooltip?: OnboardingTooltip,
 |};
 
 export type OnboardingState = {|

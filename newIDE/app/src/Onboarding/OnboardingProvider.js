@@ -12,11 +12,13 @@ const flow: Array<OnboardingFlowStep> = [
     id: 'ClickOnNewObjectButton',
     elementToHighlightId: '#add-new-object-button',
     nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
+    tooltip: { content: "let's create an object", placement: 'left' },
   },
   {
     id: 'ClickOnSearchBar',
     elementToHighlightId: '#asset-store-search-bar',
     nextStepTrigger: { elementIsFilled: true },
+    tooltip: { content: 'Search an object' },
   },
   {
     id: 'WaitForUserToSelectAsset',
@@ -27,21 +29,41 @@ const flow: Array<OnboardingFlowStep> = [
     elementToHighlightId: '#add-asset-button',
     isTriggerFlickering: true,
     nextStepTrigger: { presenceOfElement: '#object-item-0' },
+    tooltip: { content: 'Add this asset to your project' },
     mapProjectData: {
-      FirstObject: 'lastProjectObjectName',
+      firstObject: 'lastProjectObjectName',
     },
   },
   {
     id: 'CloseAssetStore',
     elementToHighlightId: '#new-object-dialog #close-button',
     nextStepTrigger: { absenceOfElement: '#new-object-dialog' },
+    tooltip: { content: "Alright, let's close this now" },
   },
   {
     id: 'DragObjectToScene',
     elementToHighlightId: '#object-item-0',
     nextStepTrigger: { presenceOfElement: '#object-item-1' },
+    tooltip: {
+      content: 'Now drag {firstObject} to the scene',
+      placement: 'left',
+    },
   },
 ];
+
+const interpolateText = (text: string, data: { [key: string]: string }) => {
+  const placeholderReplacingRegex = /{(\w+)}/g;
+  const match = text.matchAll(placeholderReplacingRegex);
+  let formattedText = text;
+  [...match].forEach(match => {
+    const keyWithBrackets = match[0];
+    const key = match[1];
+    if (Object.keys(data).includes(key)) {
+      formattedText = formattedText.replace(keyWithBrackets, data[key]);
+    }
+  });
+  return formattedText;
+};
 
 const OnboardingProvider = (props: Props) => {
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
@@ -151,11 +173,22 @@ const OnboardingProvider = (props: Props) => {
 
   console.log(currentStepIndex);
 
+  const stepTooltip = flow[currentStepIndex].tooltip;
+  const formattedStep = {
+    ...flow[currentStepIndex],
+    tooltip: stepTooltip
+      ? {
+          ...stepTooltip,
+          content: interpolateText(stepTooltip.content, data),
+        }
+      : undefined,
+  };
+
   return (
     <OnboardingContext.Provider
       value={{
         flow: null,
-        currentStep: flow[currentStepIndex],
+        currentStep: formattedStep,
         setProject,
       }}
     >

@@ -1,4 +1,5 @@
 // @flow
+export const AboveMaterialUIMaxZIndex = 1501; // highest z-index used by MaterialUI is 1500
 
 const getStyleAttribute = (element: Element, prop: string) =>
   getComputedStyle(element).getPropertyValue(prop);
@@ -41,4 +42,17 @@ export const getScrollParent = (element: Element): Element | null => {
   }
 
   return document.scrollingElement || document.documentElement;
+};
+
+export const isContainedInReactRootNode = (element: HTMLElement) => {
+  const reactRootNode = document.querySelector('#root');
+  if (!reactRootNode) return false;
+  return reactRootNode.contains(element);
+};
+
+export const getDisplayZIndexForHighlighter = (element: HTMLElement) => {
+  if (isContainedInReactRootNode(element)) {
+    return getComputedStyle(element).getPropertyPriority('z-index') + 10;
+  }
+  return AboveMaterialUIMaxZIndex;
 };

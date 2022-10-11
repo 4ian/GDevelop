@@ -3,7 +3,11 @@ import * as React from 'react';
 import Rectangle from '../Utils/Rectangle';
 import useOnResize from '../Utils/UseOnResize';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import { getScrollParent } from './HTMLUtils';
+import {
+  AboveMaterialUIMaxZIndex,
+  getDisplayZIndexForHighlighter,
+  getScrollParent,
+} from './HTMLUtils';
 import ArrowTop from '../UI/CustomSvgIcons/ArrowTop';
 import ArrowBottom from '../UI/CustomSvgIcons/ArrowBottom';
 
@@ -12,7 +16,6 @@ type Props = {|
 |};
 
 const highlighterPrimaryColor = '#E0E026';
-const AboveMaterialUIMaxZIndex = 1501; // highest z-index used by MaterialUI is 1500
 
 const styles = {
   rectangleHighlight: {
@@ -31,12 +34,6 @@ const styles = {
   scrollDirectionArrow: {
     color: highlighterPrimaryColor,
   },
-};
-
-const isContainedInReactRootNode = element => {
-  const reactRootNode = document.querySelector('#root');
-  if (!reactRootNode) return false;
-  return reactRootNode.contains(element);
 };
 
 function OnboardingElementHighlighter({ element }: Props) {
@@ -114,6 +111,7 @@ function OnboardingElementHighlighter({ element }: Props) {
   const elementComputedStyle = getComputedStyle(element);
 
   const Icon = scrollDirection === 'top' ? ArrowTop : ArrowBottom;
+
   return (
     <>
       {showHighlighter && (
@@ -125,9 +123,7 @@ function OnboardingElementHighlighter({ element }: Props) {
             borderRadius: elementComputedStyle.getPropertyValue(
               'border-radius'
             ),
-            zIndex: isContainedInReactRootNode(element)
-              ? elementComputedStyle.getPropertyPriority('z-index') + 10
-              : AboveMaterialUIMaxZIndex,
+            zIndex: getDisplayZIndexForHighlighter(element),
           }}
         />
       )}

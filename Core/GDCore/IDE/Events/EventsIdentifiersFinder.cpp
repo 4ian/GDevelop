@@ -113,7 +113,7 @@ class GD_CORE_API ExpressionParameterSearcher
                              ///< account only if related to this object.
 };
 
-std::set<gd::String> EventsIdentifiersFinder::FindAllIdentifiers(
+std::set<gd::String> EventsIdentifiersFinder::FindAllIdentifierExpressions(
     const gd::Platform& platform,
     const gd::Project& project,
     const gd::Layout& layout,

@@ -36,16 +36,16 @@ class EventsIdentifiersFinder {
   virtual ~EventsIdentifiersFinder(){};
 
   /**
-   * Construct a list containing the name of all object variables used in the
+   * Construct a list containing the expression of all identifiers used in the
    * layout.
    *
    * \param project The project
    * \param layout The layout to use.
-   * \param  identifierType The identifier to search
-   * \param  objectName The object to be scanned
+   * \param  identifierType The identifier to search.
+   * \param  objectName The object to be scanned if any.
    * \return A std::set containing the names of all object variables used.
    */
-  static std::set<gd::String> FindAllIdentifiers(
+  static std::set<gd::String> FindAllIdentifierExpressions(
       const gd::Platform& platform,
       const gd::Project& project,
       const gd::Layout& layout,

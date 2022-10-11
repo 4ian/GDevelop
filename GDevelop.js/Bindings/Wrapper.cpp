@@ -599,7 +599,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_FindAllGlobalVariables FindAllGlobalVariables
 #define STATIC_FindAllLayoutVariables FindAllLayoutVariables
 #define STATIC_FindAllObjectVariables FindAllObjectVariables
-#define STATIC_FindAllIdentifiers FindAllIdentifiers
+#define STATIC_FindAllIdentifierExpressions FindAllIdentifierExpressions
 #define STATIC_SearchInEvents SearchInEvents
 #define STATIC_UnfoldWhenContaining UnfoldWhenContaining
 #define STATIC_FoldAll FoldAll

@@ -16,6 +16,14 @@ import useForceUpdate from '../../../Utils/UseForceUpdate';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 
 const styles = {
+  imageContainer: {
+    position: 'relative',
+  },
+  loaderContainer: {
+    position: 'absolute',
+    left: 'calc(50% - 30px)',
+    top: 'calc(50% - 30px)',
+  },
   timeField: {
     width: 75,
   },
@@ -213,7 +221,7 @@ const AnimationPreview = ({
 
   return (
     <Column expand noOverflowParent noMargin>
-      <div style={{ position: 'relative' }}>
+      <div style={styles.imageContainer}>
         <ImagePreview
           resourceName={resourceName}
           imageResourceSource={getImageResourceSource(resourceName)}
@@ -229,13 +237,7 @@ const AnimationPreview = ({
           hideLoader // Handled by the animation preview, important to let the browser cache the image.
         />
         {isStillLoadingResources && (
-          <div
-            style={{
-              position: 'absolute',
-              left: 'calc(50% - 30px)',
-              top: 'calc(50% - 30px)',
-            }}
-          >
+          <div style={styles.loaderContainer}>
             <PlaceholderLoader />
           </div>
         )}

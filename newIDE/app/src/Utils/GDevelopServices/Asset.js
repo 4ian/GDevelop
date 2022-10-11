@@ -301,13 +301,11 @@ export const isPixelArt = (
 export const isPrivateAsset = (
   assetOrAssetShortHeader: AssetShortHeader | Asset
 ): boolean => {
+  const imageUrl = assetOrAssetShortHeader.previewImageUrls[0];
   return (
-    assetOrAssetShortHeader.previewImageUrls[0].startsWith(
-      'https://private-assets.gdevelop.io'
-    ) ||
-    assetOrAssetShortHeader.previewImageUrls[0].startsWith(
-      'https://private-assets-dev.gdevelop.io'
-    )
+    !!imageUrl &&
+    (imageUrl.startsWith('https://private-assets.gdevelop.io') ||
+      imageUrl.startsWith('https://private-assets-dev.gdevelop.io'))
   );
 };
 

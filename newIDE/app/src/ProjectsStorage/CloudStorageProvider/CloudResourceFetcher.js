@@ -11,7 +11,7 @@ import {
 } from '../../Utils/BlobDownloader';
 import { type FileMetadata } from '../index';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
-import { extractFilenameFromProductAuthorizedUrl } from '../../Utils/GDevelopServices/Shop';
+import { extractFilenameAndExtensionFromProductAuthorizedUrl } from '../../Utils/GDevelopServices/Shop';
 
 const isURL = (filename: string) => {
   return (
@@ -74,10 +74,16 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
 
           if (isURL(resourceFile)) {
             if (isPrivateAssetUrl(resourceFile)) {
+              const {
+                extension,
+                filenameWithoutExtension,
+              } = extractFilenameAndExtensionFromProductAuthorizedUrl(
+                resourceFile
+              );
               return {
                 resource,
                 url: resourceFile,
-                filename: extractFilenameFromProductAuthorizedUrl(resourceFile),
+                filename: filenameWithoutExtension + extension,
               };
             } else if (isBlobURL(resourceFile)) {
               result.erroredResources.push({

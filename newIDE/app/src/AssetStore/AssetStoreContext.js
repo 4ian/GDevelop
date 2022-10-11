@@ -259,7 +259,7 @@ export const AssetStoreStateProvider = ({
           publicAssetShortHeaders.forEach(assetShortHeader => {
             assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
           });
-          if (receivedAssetShortHeaders) {
+          if (ACTIVATE_ASSET_PACK_MARKETPLACE && receivedAssetShortHeaders) {
             receivedAssetShortHeaders.forEach(assetShortHeader => {
               assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
             });
@@ -294,7 +294,7 @@ export const AssetStoreStateProvider = ({
   // This can happen when the user logs in or logs out.
   React.useEffect(
     () => {
-      if (!receivedAssetShortHeaders) {
+      if (!ACTIVATE_ASSET_PACK_MARKETPLACE || !receivedAssetShortHeaders) {
         return;
       }
       // We're forcing the fetch of the assets, even if it is currently loading,

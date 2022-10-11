@@ -4,6 +4,7 @@ import PromisePool from '@supercharge/promise-pool';
 import { retryIfFailed } from '../../Utils/RetryIfFailed';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 import { type FileMetadata } from '../index';
+import { extractFilenameAndExtensionFromProductAuthorizedUrl } from '../../Utils/GDevelopServices/Shop';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const fs = optionalRequire('fs-extra');
@@ -52,12 +53,10 @@ export const moveUrlResourcesToLocalFiles = async ({
       const resource = resourcesManager.getResource(resourceName);
 
       const url = resource.getFile();
-      const urlWithoutQueryParams = url.split('?')[0];
-      const extension = path.extname(urlWithoutQueryParams);
-      const filenameWithoutExtension = path.basename(
-        urlWithoutQueryParams,
-        extension
-      );
+      const {
+        extension,
+        filenameWithoutExtension,
+      } = extractFilenameAndExtensionFromProductAuthorizedUrl(url);
       const name = newNameGenerator(filenameWithoutExtension, name => {
         const tentativePath = path.join(baseAssetsPath, name) + extension;
         return (

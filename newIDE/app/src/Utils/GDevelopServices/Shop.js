@@ -1,6 +1,8 @@
 // @flow
 import axios from 'axios';
 import { GDevelopShopApi } from './ApiConfigs';
+import optionalRequire from '../../Utils/OptionalRequire';
+const path = optionalRequire('path');
 
 const client = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
@@ -61,8 +63,17 @@ export const createProductAuthorizedUrl = (
     : `${url}?token=${encodeURIComponent(token)}`;
 };
 
-export const extractFilenameFromProductAuthorizedUrl = (
+export const extractFilenameAndExtensionFromProductAuthorizedUrl = (
   url: string
-): string => {
-  return url.split('?')[0].substring(url.lastIndexOf('/') + 1);
+): {
+  filenameWithoutExtension: string,
+  extension: string,
+} => {
+  const urlWithoutQueryParams = url.split('?')[0];
+  const extension = path.extname(urlWithoutQueryParams);
+  const filenameWithoutExtension = path.basename(
+    urlWithoutQueryParams,
+    extension
+  );
+  return { filenameWithoutExtension, extension };
 };

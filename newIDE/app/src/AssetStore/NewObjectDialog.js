@@ -315,7 +315,7 @@ export default function NewObjectDialog({
           openedAssetPack
             ? () => setIsAssetPackDialogInstallOpen(true)
             : openedAssetShortHeader
-            ? () => onInstallAsset()
+            ? onInstallAsset
             : undefined
         }
         open

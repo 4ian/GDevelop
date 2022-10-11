@@ -430,48 +430,52 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
                 screenType={screenType}
                 {...otherProps}
               />
-              <div
-                style={styles.yScrollbarDetectionZone}
-                ref={yScrollbarDetectionZone}
-              >
+              {screenType !== 'touch' && (
                 <div
-                  style={{
-                    ...styles.yScrollbarTrack,
-                    // Keep it in the DOM, so we can register the mouse down event.
-                    visibility: showScrollbars.current ? 'visible' : 'hidden',
-                  }}
-                  ref={yScrollbarTrack}
+                  style={styles.yScrollbarDetectionZone}
+                  ref={yScrollbarDetectionZone}
                 >
                   <div
                     style={{
-                      ...styles.yThumb,
-                      top: yScrollbarTopPosition,
+                      ...styles.yScrollbarTrack,
+                      // Keep it in the DOM, so we can register the mouse down event.
+                      visibility: showScrollbars.current ? 'visible' : 'hidden',
                     }}
-                    ref={yScrollbarThumb}
-                  />
+                    ref={yScrollbarTrack}
+                  >
+                    <div
+                      style={{
+                        ...styles.yThumb,
+                        top: yScrollbarTopPosition,
+                      }}
+                      ref={yScrollbarThumb}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div
-                style={styles.xScrollbarDetectionZone}
-                ref={xScrollbarDetectionZone}
-              >
+              )}
+              {screenType !== 'touch' && (
                 <div
-                  style={{
-                    ...styles.xScrollbarTrack,
-                    // Keep it in the DOM, so we can register the mouse down event.
-                    visibility: showScrollbars.current ? 'visible' : 'hidden',
-                  }}
-                  ref={xScrollbarTrack}
+                  style={styles.xScrollbarDetectionZone}
+                  ref={xScrollbarDetectionZone}
                 >
                   <div
                     style={{
-                      ...styles.xThumb,
-                      marginLeft: xScrollbarLeftPosition,
+                      ...styles.xScrollbarTrack,
+                      // Keep it in the DOM, so we can register the mouse down event.
+                      visibility: showScrollbars.current ? 'visible' : 'hidden',
                     }}
-                    ref={xScrollbarThumb}
-                  />
+                    ref={xScrollbarTrack}
+                  >
+                    <div
+                      style={{
+                        ...styles.xThumb,
+                        marginLeft: xScrollbarLeftPosition,
+                      }}
+                      ref={xScrollbarThumb}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
         </FullSizeMeasurer>

@@ -1,21 +1,17 @@
 // @flow
 import {
-  type MoveAllProjectResourcesOptions,
-  type MoveAllProjectResourcesResult,
-} from '../ResourceMover';
-import {
   getCredentialsForCloudProject,
   type UploadedProjectResourceFiles,
   uploadProjectResourceFiles,
-  extractFilenameFromProjectResourceUrl,
-  extractProjectUuidFromProjetResourceUrl,
 } from '../../Utils/GDevelopServices/Project';
-import { checkIfIsGDevelopCloudBucketUrl } from '../../Utils/CrossOrigin';
 import {
   convertBlobToFiles,
   downloadUrlsToBlobs,
   type ItemResult,
 } from '../../Utils/BlobDownloader';
+import { type FileMetadata } from '../index';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+import { extractFilenameAndExtensionFromProductAuthorizedUrl } from '../../Utils/GDevelopServices/Shop';
 
 const isURL = (filename: string) => {
   return (
@@ -27,22 +23,29 @@ const isURL = (filename: string) => {
   );
 };
 
+const isPrivateAssetUrl = (filename: string) => {
+  return (
+    filename.startsWith('https://private-assets-dev.gdevelop.io') ||
+    filename.startsWith('https://private-assets.gdevelop.io')
+  );
+};
+
 const isBlobURL = (filename: string) => {
   return filename.startsWith('blob:');
 };
 
-export const moveAllCloudProjectResourcesToCloudProject = async ({
+export const moveUrlResourcesToCloudFilesIfPrivate = async ({
   project,
+  fileMetadata,
   authenticatedUser,
-  oldFileMetadata,
-  newFileMetadata,
-  oldStorageProvider,
-  oldStorageProviderOperations,
-  newStorageProvider,
-  newStorageProviderOperations,
   onProgress,
-}: MoveAllProjectResourcesOptions): Promise<MoveAllProjectResourcesResult> => {
-  const result: MoveAllProjectResourcesResult = {
+}: {|
+  project: gdProject,
+  fileMetadata: FileMetadata,
+  authenticatedUser: AuthenticatedUser,
+  onProgress: (number, number) => void,
+|}) => {
+  const result = {
     erroredResources: [],
   };
 
@@ -52,7 +55,7 @@ export const moveAllCloudProjectResourcesToCloudProject = async ({
     filename: string,
   |};
 
-  const newCloudProjectId = newFileMetadata.fileIdentifier;
+  const cloudProjectId = fileMetadata.fileIdentifier;
 
   /**
    * Find the resources stored on GDevelop Cloud that must be downloaded and
@@ -70,22 +73,17 @@ export const moveAllCloudProjectResourcesToCloudProject = async ({
           const resourceFile = resource.getFile();
 
           if (isURL(resourceFile)) {
-            if (checkIfIsGDevelopCloudBucketUrl(resourceFile)) {
-              if (
-                extractProjectUuidFromProjetResourceUrl(resourceFile) ===
-                newCloudProjectId
-              ) {
-                // Somehow the resource is *already* stored in the new project - surely because
-                // the project resources were partially moved (like when you click "Retry" after some failures
-                // when saving a project as a new cloud project).
-                // Just ignore this resource which is already moved then.
-                return null;
-              }
-
+            if (isPrivateAssetUrl(resourceFile)) {
+              const {
+                extension,
+                filenameWithoutExtension,
+              } = extractFilenameAndExtensionFromProductAuthorizedUrl(
+                resourceFile
+              );
               return {
                 resource,
                 url: resourceFile,
-                filename: extractFilenameFromProjectResourceUrl(resourceFile),
+                filename: filenameWithoutExtension + extension,
               };
             } else if (isBlobURL(resourceFile)) {
               result.erroredResources.push({
@@ -112,13 +110,6 @@ export const moveAllCloudProjectResourcesToCloudProject = async ({
 
   const resourcesToFetchAndUpload = getResourcesToFetchAndUpload(project);
 
-  // If an error happens here, it will be thrown out of the function.
-  if (oldStorageProviderOperations.onEnsureCanAccessResources)
-    oldStorageProviderOperations.onEnsureCanAccessResources(
-      project,
-      oldFileMetadata
-    );
-
   // Download all the project resources as blob (much like what is done during an export).
   const downloadedBlobsAndResourcesToUpload: Array<
     ItemResult<ResourceToFetchAndUpload>
@@ -141,10 +132,10 @@ export const moveAllCloudProjectResourcesToCloudProject = async ({
   );
 
   // Upload the files just downloaded, for the new project.
-  await getCredentialsForCloudProject(authenticatedUser, newCloudProjectId);
+  await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
   const uploadedProjectResourceFiles: UploadedProjectResourceFiles = await uploadProjectResourceFiles(
     authenticatedUser,
-    newCloudProjectId,
+    cloudProjectId,
     downloadedFilesAndResourcesToUpload.map(({ file }) => file),
     (count, total) => {
       onProgress(total + count, total * 2);

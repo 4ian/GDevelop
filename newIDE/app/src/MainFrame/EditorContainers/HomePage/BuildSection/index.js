@@ -31,7 +31,7 @@ import ContextMenu, {
 } from '../../../../UI/Menu/ContextMenu';
 import CircularProgress from '../../../../UI/CircularProgress';
 import { type MenuItemTemplate } from '../../../../UI/Menu/Menu.flow';
-import useConfirmDialog from '../../../../UI/Confirm/useConfirmDialog';
+import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
 import { MaxProjectCountAlertMessage } from './MaxProjectCountAlertMessage';
 import optionalRequire from '../../../../Utils/OptionalRequire';
@@ -141,7 +141,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     const authenticatedUser = React.useContext(AuthenticatedUserContext);
     const { cloudProjects, limits } = authenticatedUser;
     const contextMenu = React.useRef<?ContextMenuInterface>(null);
-    const { showDeleteConfirmation } = useConfirmDialog();
+    const { showDeleteConfirmation } = useAlertDialog();
     const [pendingProject, setPendingProject] = React.useState<?string>(null);
     const windowWidth = useResponsiveWindowWidth();
     const forceUpdate = useForceUpdate();

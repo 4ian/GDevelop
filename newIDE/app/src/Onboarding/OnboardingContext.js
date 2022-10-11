@@ -9,16 +9,21 @@ export type OnboardingFlowStep = {|
     | {| presenceOfElement: string |}
     | {| absenceOfElement: string |}
     | {| elementIsFilled: true |},
+  mapProjectData?: {
+    [key: string]: 'lastProjectObjectName',
+  },
 |};
 
 export type OnboardingState = {|
   flow: string | null,
   currentStep: OnboardingFlowStep | null,
+  setProject: (?gdProject) => void,
 |};
 
 export const initialOnboardingState: OnboardingState = {
   flow: null,
   currentStep: null,
+  setProject: () => {},
 };
 
 const OnboardingContext = React.createContext<OnboardingState>(

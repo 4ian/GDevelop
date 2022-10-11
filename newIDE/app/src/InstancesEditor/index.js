@@ -265,8 +265,8 @@ export default class InstancesEditor extends Component<Props> {
     this.viewPosition = new ViewPosition({
       initialViewX: project ? project.getGameResolutionWidth() / 2 : 0,
       initialViewY: project ? project.getGameResolutionHeight() / 2 : 0,
-      width: this.props.width,
-      height: this.props.height,
+      initialWidth: this.props.width,
+      initialHeight: this.props.height,
       instancesEditorSettings: this.props.instancesEditorSettings,
     });
     this.pixiContainer.addChild(this.viewPosition.getPixiContainer());

@@ -71,6 +71,8 @@ import {
   getElectronUpdateNotificationTitle,
   getElectronUpdateNotificationBody,
   type ElectronUpdateStatus,
+  useServiceWorkerUpdateStatus,
+  updateServiceWorkerToLatestVersion,
 } from './UpdaterTools';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -146,6 +148,7 @@ import {
   useResourceFetcher,
   type ResourceFetcher,
 } from '../ProjectsStorage/ResourceFetcher';
+import { useTimeout } from '../Utils/UseTimeout';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -659,6 +662,40 @@ const MainFrame = (props: Props) => {
   };
 
   useDiscordRichPresence(currentProject);
+
+  const serviceWorkerUpdateStatus = useServiceWorkerUpdateStatus();
+
+  useTimeout(
+    React.useCallback(
+      async () => {
+        if (serviceWorkerUpdateStatus === 'update-ready') {
+          const answer = await showConfirmation({
+            title: t`New update available!`,
+            message: t`A new version of GDevelop is available. Would you like to update now? The page will be reloaded.`,
+          });
+          if (answer) {
+            try {
+              await updateServiceWorkerToLatestVersion();
+            } catch (error) {
+              console.error('Unable to update service worker', error);
+              showErrorBox({
+                message: [
+                  i18n._(
+                    `Unable to update the application, close all tabs of GDevelop and try again.`
+                  ),
+                  i18n._(error.message),
+                ].join('\n'),
+                errorId: 'web-app-update-error',
+                rawError: error,
+              });
+            }
+          }
+        }
+      },
+      [showConfirmation, serviceWorkerUpdateStatus, i18n]
+    ),
+    3000
+  );
 
   const closeProject = React.useCallback(
     (): Promise<void> => {

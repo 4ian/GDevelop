@@ -40,7 +40,7 @@ const styles = {
     marginTop: SCROLLBAR_MARGIN,
     height: SCROLLBAR_THUMB_WIDTH,
     backgroundColor: '#1D1D26',
-    outline: '1px solid #FAFAFA',
+    outline: '2px solid #FAFAFA',
     opacity: 0.3,
     borderRadius: 4,
   },
@@ -91,6 +91,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
 
   const showScrollbars = React.useRef(false);
   const timeoutHidingScrollbarsId = React.useRef<?TimeoutID>(null);
+  const isDragging = React.useRef(false);
 
   const xValue = React.useRef(0);
   const yValue = React.useRef(0);
@@ -122,13 +123,16 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   // If the mouse stops moving, hide the scrollbars after a delay.
   const mouseOutDetectionZoneHandler = React.useCallback(
     (e: MouseEvent) => {
-      hideScrollbarsAfterDelay();
+      if (!isDragging.current) {
+        hideScrollbarsAfterDelay();
+      }
     },
     [hideScrollbarsAfterDelay]
   );
 
   const handleXChange = React.useCallback(
     (distanceMouseScrolledX: number) => {
+      if (!canvasWidth.current) return;
       const mouseToPositionRatio =
         (xMax.current - xMin.current) / canvasWidth.current;
       console.log(
@@ -152,6 +156,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
 
   const handleYChange = React.useCallback(
     (distanceMouseScrolledY: number) => {
+      if (!canvasHeight.current) return;
       const mouseToPositionRatio =
         (yMax.current - yMin.current) / canvasHeight.current;
       const newYValue =
@@ -181,25 +186,29 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   );
 
   const makeMouseUpXThumbHandler = React.useCallback(
-    mouseMoveHandler => (e: MouseEvent) => {
-      // If the user releases the mouse outside of the detection zone, we want to hide the scrollbars.
-      if (
-        e.target !== xScrollbarDetectionZone.current &&
-        e.target !== xScrollbarTrack.current &&
-        e.target !== xScrollbarThumb.current
-      ) {
-        console.log('x', e.target);
-        console.log('Mouse up outside of detection zone');
-        hideScrollbarsAfterDelay();
-      }
-      document.removeEventListener('mousemove', mouseMoveHandler);
-    },
+    mouseMoveHandler =>
+      function mouseUpHandler(e: MouseEvent) {
+        isDragging.current = false;
+        // If the user releases the mouse outside of the detection zone, we want to hide the scrollbars.
+        if (
+          e.target !== xScrollbarDetectionZone.current &&
+          e.target !== xScrollbarTrack.current &&
+          e.target !== xScrollbarThumb.current
+        ) {
+          console.log('x', e.target);
+          console.log('Mouse up outside of detection zone');
+          hideScrollbarsAfterDelay();
+        }
+        document.removeEventListener('mousemove', mouseMoveHandler);
+        document.removeEventListener('mouseup', mouseUpHandler);
+      },
     [hideScrollbarsAfterDelay]
   );
 
   const mouseDownXThumbHandler = React.useCallback(
     (e: MouseEvent) => {
       console.log('mouse down on x thumb');
+      isDragging.current = true;
       const mouseMoveHandler = makeMouseMoveXHandler(e.clientX);
       const mouseUpHandler = makeMouseUpXThumbHandler(mouseMoveHandler);
       xStartScrollValue.current = xValue.current;
@@ -218,25 +227,29 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   );
 
   const makeMouseUpYThumbHandler = React.useCallback(
-    mouseMoveHandler => (e: MouseEvent) => {
-      // If the user releases the mouse outside of the detection zone, we want to hide the scrollbars.
-      if (
-        e.target !== yScrollbarDetectionZone.current &&
-        e.target !== yScrollbarTrack.current &&
-        e.target !== yScrollbarThumb.current
-      ) {
-        console.log('y', e.target);
-        console.log('Mouse up outside of detection zone');
-        hideScrollbarsAfterDelay();
-      }
-      document.removeEventListener('mousemove', mouseMoveHandler);
-    },
+    mouseMoveHandler =>
+      function mouseUpHandler(e: MouseEvent) {
+        isDragging.current = false;
+        // If the user releases the mouse outside of the detection zone, we want to hide the scrollbars.
+        if (
+          e.target !== yScrollbarDetectionZone.current &&
+          e.target !== yScrollbarTrack.current &&
+          e.target !== yScrollbarThumb.current
+        ) {
+          console.log('y', e.target);
+          console.log('Mouse up outside of detection zone');
+          hideScrollbarsAfterDelay();
+        }
+        document.removeEventListener('mousemove', mouseMoveHandler);
+        document.removeEventListener('mouseup', mouseUpHandler);
+      },
     [hideScrollbarsAfterDelay]
   );
 
   const mouseDownYThumbHandler = React.useCallback(
     (e: MouseEvent) => {
       console.log('mouse down on y thumb');
+      isDragging.current = true;
       const mouseMoveHandler = makeMouseMoveYHandler(e.clientY);
       const mouseUpHandler = makeMouseUpYThumbHandler(mouseMoveHandler);
       yStartScrollValue.current = yValue.current;
@@ -337,6 +350,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
       yValue.current = newYValue;
       canvasWidth.current = newWidth;
       canvasHeight.current = newHeight;
+      console.log(newWidth, newHeight);
       if (!showScrollbars.current) {
         showScrollbars.current = true;
         console.log('setandadjust');
@@ -377,7 +391,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
 
   // Ensure the X Scrollbar doesn't go out of bounds.
   const minXScrollbarLeftPosition = '0%';
-  const maxXScrollbarLeftPosition = `calc(100% - ${SCROLLBAR_SIZE}px)`;
+  const maxXScrollbarLeftPosition = `calc(100% - ${SCROLLBAR_SIZE}px - ${SCROLLBAR_TRACK_WIDTH}px)`;
   const expectedXScrollbarLeftPosition = `calc(${((xValue.current -
     xMin.current) /
     (xMax.current - xMin.current)) *
@@ -387,7 +401,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
 
   // Ensure the Y Scrollbar doesn't go out of bounds.
   const minYScrollbarTopPosition = '0%';
-  const maxYScrollbarTopPosition = `calc(100% - ${SCROLLBAR_SIZE}px)`;
+  const maxYScrollbarTopPosition = `calc(100% - ${SCROLLBAR_SIZE}px - ${SCROLLBAR_TRACK_WIDTH}px)`;
   const expectedYScrollbarTopPosition = `calc(${((yValue.current -
     yMin.current) /
     (yMax.current - yMin.current)) *
@@ -458,34 +472,6 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
                   />
                 </div>
               </div>
-              {/* {screenType !== 'touch' && (
-                  <Slider
-                    color="secondary"
-                    value={
-                      ((Value - xMin) /
-                        (xMax - xMin)) *
-                      100
-                    }
-                    onChange={_handleXChange}
-                    style={styles.xScrollbar}
-                    orientation="horizontal"
-                    onChangeCommitted={event => event.target.blur()}
-                  />
-                )}
-                {screenType !== 'touch' && (
-                  <Slider
-                    color="secondary"
-                    value={
-                      ((yValue - yMin) /
-                        (yMax - yMin)) *
-                      100
-                    }
-                    onChange={_handleYChange}
-                    style={styles.yScrollbar}
-                    orientation="vertical"
-                    onChangeCommitted={event => event.target.blur()}
-                  />
-                )} */}
             </div>
           )}
         </FullSizeMeasurer>

@@ -120,9 +120,7 @@ const ImagePreview = ({
   const [imageZoomFactor, setImageZoomFactor] = React.useState(
     initialZoom || 1
   );
-  const [isResizeObserverReady, setIsResizeObserverReady] = React.useState(
-    false
-  );
+  const isResizeObserverReady = React.useRef<boolean>(false);
 
   const handleImageError = () => {
     setErrored(true);
@@ -179,11 +177,11 @@ const ImagePreview = ({
         const imageLoaded = !!imageWidth && !!imageHeight && !errored;
 
         // Once the container is loaded, adapt the zoom to the image size.
-        if (!isResizeObserverReady && containerLoaded) {
+        if (!isResizeObserverReady.current && containerLoaded) {
           if (!initialZoom) {
             adaptZoomToImage(containerHeight, containerWidth);
           }
-          setIsResizeObserverReady(true);
+          isResizeObserverReady.current = true;
         }
 
         // Centre-align the image and overlays

@@ -23,10 +23,10 @@ function OnboardingStepDisplayer({ step }: Props) {
   // So we need to periodically query it.
   const queryElement = React.useCallback(
     () => {
-      if (elementToHighlight || !elementToHighlightId) return;
+      if (!elementToHighlightId) return;
       setElementToHighlight(document.querySelector(elementToHighlightId));
     },
-    [elementToHighlightId, elementToHighlight]
+    [elementToHighlightId]
   );
   useInterval(queryElement, ELEMENT_QUERY_FREQUENCY);
 
@@ -36,6 +36,7 @@ function OnboardingStepDisplayer({ step }: Props) {
     },
     [elementToHighlightId]
   );
+
   if (!elementToHighlight) return null;
   return (
     <>

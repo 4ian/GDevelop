@@ -321,6 +321,7 @@ export default class SpritesList extends Component<Props, void> {
       <div>
         <MiniToolbar justifyContent="flex-end" smallest>
           <DirectionTools
+            animationName={this.props.animationName}
             direction={this.props.direction}
             resourcesLoader={this.props.resourcesLoader}
             project={this.props.project}

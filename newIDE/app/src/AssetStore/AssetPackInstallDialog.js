@@ -2,7 +2,9 @@
 import * as React from 'react';
 import {
   type AssetShortHeader,
-  type AssetPack,
+  type PublicAssetPack,
+  type PrivateAssetPack,
+  isPrivateAsset,
 } from '../Utils/GDevelopServices/Asset';
 import Text from '../UI/Text';
 import { t, Trans } from '@lingui/macro';
@@ -11,15 +13,16 @@ import TextButton from '../UI/TextButton';
 import RaisedButton from '../UI/RaisedButton';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import { Column, Line } from '../UI/Grid';
-import { installAsset } from './InstallAsset';
+import { installPublicAsset } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import LinearProgress from '../UI/LinearProgress';
 import { AssetStoreContext } from './AssetStoreContext';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
+import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 
 type Props = {|
-  assetPack: AssetPack,
+  assetPack: PublicAssetPack | PrivateAssetPack,
   assetShortHeaders: Array<AssetShortHeader>,
   addedAssetIds: Array<string>,
   onClose: () => void,
@@ -30,7 +33,7 @@ type Props = {|
   onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
 |};
 
-export const AssetPackDialog = ({
+const AssetPackInstallDialog = ({
   assetPack,
   assetShortHeaders,
   addedAssetIds,
@@ -57,6 +60,9 @@ export const AssetPackDialog = ({
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
+  const { installPrivateAsset } = React.useContext(
+    PrivateAssetsAuthorizationContext
+  );
 
   const { environment } = React.useContext(AssetStoreContext);
 
@@ -66,16 +72,31 @@ export const AssetPackDialog = ({
       setAreAssetsBeingInstalled(true);
       try {
         const installOutputs = await Promise.all(
-          assetShortHeaders.map(assetShortHeader =>
-            installAsset({
-              assetShortHeader,
-              eventsFunctionsExtensionsState,
-              project,
-              objectsContainer,
-              environment,
-            })
-          )
+          assetShortHeaders.map(async assetShortHeader => {
+            const installOutput = isPrivateAsset(assetShortHeader)
+              ? await installPrivateAsset({
+                  assetShortHeader,
+                  eventsFunctionsExtensionsState,
+                  project,
+                  objectsContainer,
+                  environment,
+                })
+              : await installPublicAsset({
+                  assetShortHeader,
+                  eventsFunctionsExtensionsState,
+                  project,
+                  objectsContainer,
+                  environment,
+                });
+
+            if (!installOutput) {
+              throw new Error('Unable to install the asset.');
+            }
+
+            return installOutput;
+          })
         );
+
         installOutputs.forEach(installOutput => {
           installOutput.createdObjects.forEach(object => {
             onObjectAddedFromAsset(object);
@@ -105,6 +126,7 @@ export const AssetPackDialog = ({
       onAssetsAdded,
       environment,
       onFetchNewlyAddedResources,
+      installPrivateAsset,
     ]
   );
 
@@ -225,3 +247,5 @@ export const AssetPackDialog = ({
     </Dialog>
   );
 };
+
+export default AssetPackInstallDialog;

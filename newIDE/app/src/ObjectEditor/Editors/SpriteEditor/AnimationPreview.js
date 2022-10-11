@@ -2,19 +2,28 @@
 import { Trans } from '@lingui/macro';
 
 import React from 'react';
-import { Column } from '../../../../UI/Grid';
-import { LineStackLayout } from '../../../../UI/Layout';
-import ImagePreview from '../../../../ResourcesList/ResourcePreview/ImagePreview';
+import { Column } from '../../../UI/Grid';
+import { LineStackLayout } from '../../../UI/Layout';
+import ImagePreview from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import Replay from '@material-ui/icons/Replay';
 import PlayArrow from '@material-ui/icons/PlayArrow';
 import Pause from '@material-ui/icons/Pause';
 import Timer from '@material-ui/icons/Timer';
-import TextField from '../../../../UI/TextField';
-import FlatButton from '../../../../UI/FlatButton';
-import Text from '../../../../UI/Text';
-import useForceUpdate from '../../../../Utils/UseForceUpdate';
+import TextField from '../../../UI/TextField';
+import FlatButton from '../../../UI/FlatButton';
+import Text from '../../../UI/Text';
+import useForceUpdate from '../../../Utils/UseForceUpdate';
+import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 
 const styles = {
+  imageContainer: {
+    position: 'relative',
+  },
+  loaderContainer: {
+    position: 'absolute',
+    left: 'calc(50% - 30px)',
+    top: 'calc(50% - 30px)',
+  },
   timeField: {
     width: 75,
   },
@@ -25,6 +34,7 @@ const styles = {
 };
 
 type Props = {|
+  animationName: string,
   resourceNames: string[],
   getImageResourceSource: (resourceName: string) => string,
   isImageResourceSmooth: (resourceName: string) => boolean,
@@ -37,9 +47,11 @@ type Props = {|
   initialZoom?: number,
   fixedHeight?: number,
   fixedWidth?: number,
+  isAssetPrivate?: boolean,
 |};
 
 const AnimationPreview = ({
+  animationName,
   resourceNames,
   getImageResourceSource,
   isImageResourceSmooth,
@@ -52,6 +64,7 @@ const AnimationPreview = ({
   initialZoom,
   fixedHeight,
   fixedWidth,
+  isAssetPrivate,
 }: Props) => {
   const forceUdpate = useForceUpdate();
 
@@ -69,6 +82,15 @@ const AnimationPreview = ({
   const pausedRef = React.useRef(false);
   const currentFrameIndexRef = React.useRef(0);
   const isLoopingRef = React.useRef(isLooping);
+  const animationNameRef = React.useRef(animationName);
+  const imagesLoadedArray = React.useRef(
+    new Array(resourceNames.length).fill(false)
+  );
+  const loaderTimeout = React.useRef<?TimeoutID>(null);
+
+  const [isStillLoadingResources, setIsStillLoadingResources] = React.useState(
+    true
+  );
 
   // When outside variables change, we need to update the animation callback.
   React.useEffect(
@@ -80,8 +102,12 @@ const AnimationPreview = ({
       if (isLooping !== isLoopingRef.current) {
         isLoopingRef.current = isLooping;
       }
+      if (animationName !== animationNameRef.current) {
+        animationNameRef.current = animationName;
+        imagesLoadedArray.current = new Array(resourceNames.length).fill(false);
+      }
     },
-    [timeBetweenFrames, isLooping]
+    [timeBetweenFrames, isLooping, animationName, resourceNames]
   );
 
   const replay = () => {
@@ -105,7 +131,9 @@ const AnimationPreview = ({
       const isLooping = isLoopingRef.current;
       const numberOfFrames = resourceNames.length;
 
-      if (previousUpdateTimeInMs) {
+      const hasCurrentImageLoaded =
+        imagesLoadedArray.current[currentFrameIndex];
+      if (previousUpdateTimeInMs && hasCurrentImageLoaded) {
         const elapsedTime = (updateTimeInMs - previousUpdateTimeInMs) / 1000;
 
         let newFrameIndex = currentFrameIndex;
@@ -129,13 +157,21 @@ const AnimationPreview = ({
             ? newFrameIndex % numberOfFrames
             : numberOfFrames - 1;
         }
-        if (newFrameIndex < 0) newFrameIndex = 0; //May happen if there is no frame.
+        if (newFrameIndex < 0) newFrameIndex = 0; // May happen if there is no frame.
 
         currentFrameIndexRef.current = newFrameIndex;
         currentFrameElapsedTimeRef.current = newFrameElapsedTime;
         // Ensure we trigger an update if the animation changes,
         // as the refs will not do it.
         if (currentFrameIndex !== newFrameIndex) {
+          imagesLoadedArray.current[currentFrameIndexRef.current] = false;
+          // When the array of loaders changes, wait a bit to display the loader to avoid flickering.
+          loaderTimeout.current = setTimeout(() => {
+            console.warn(
+              'The image took too long to load, displaying a loader.'
+            );
+            setIsStillLoadingResources(true);
+          }, 500);
           forceUdpate();
         }
       }
@@ -155,6 +191,27 @@ const AnimationPreview = ({
     [updateAnimation]
   );
 
+  const onImageLoaded = React.useCallback(
+    () => {
+      imagesLoadedArray.current[currentFrameIndexRef.current] = true;
+      // When the array of loaders changes, decide if we display the loader or not.
+      // If all images are loaded, then hide loader for instant display.
+      const hasFinishedLoadingAllResources = !imagesLoadedArray.current.some(
+        hasImageLoaded => !hasImageLoaded
+      );
+      if (hasFinishedLoadingAllResources) {
+        setIsStillLoadingResources(false);
+      }
+      // Image has loaded, so cancel the timeout if it was set.
+      if (loaderTimeout.current) {
+        clearTimeout(loaderTimeout.current);
+        loaderTimeout.current = null;
+      }
+      forceUdpate();
+    },
+    [forceUdpate]
+  );
+
   // When changing animation, the index can be out of bounds, so reset the animation.
   if (currentFrameIndexRef.current >= resourceNames.length) {
     currentFrameIndexRef.current = 0;
@@ -164,17 +221,27 @@ const AnimationPreview = ({
 
   return (
     <Column expand noOverflowParent noMargin>
-      <ImagePreview
-        resourceName={resourceName}
-        imageResourceSource={getImageResourceSource(resourceName)}
-        isImageResourceSmooth={isImageResourceSmooth(resourceName)}
-        initialZoom={initialZoom}
-        project={project}
-        hideCheckeredBackground={hideCheckeredBackground}
-        hideControls={hideControls}
-        fixedHeight={fixedHeight}
-        fixedWidth={fixedWidth}
-      />
+      <div style={styles.imageContainer}>
+        <ImagePreview
+          resourceName={resourceName}
+          imageResourceSource={getImageResourceSource(resourceName)}
+          isImageResourceSmooth={isImageResourceSmooth(resourceName)}
+          initialZoom={initialZoom}
+          project={project}
+          hideCheckeredBackground={hideCheckeredBackground}
+          hideControls={hideControls}
+          fixedHeight={fixedHeight}
+          fixedWidth={fixedWidth}
+          onImageLoaded={onImageLoaded}
+          isImagePrivate={isAssetPrivate}
+          hideLoader // Handled by the animation preview, important to let the browser cache the image.
+        />
+        {isStillLoadingResources && (
+          <div style={styles.loaderContainer}>
+            <PlaceholderLoader />
+          </div>
+        )}
+      </div>
       {!hideControls && (
         <LineStackLayout noMargin alignItems="center">
           <Text>

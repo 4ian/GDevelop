@@ -31,6 +31,10 @@ import PreferencesContext, {
 } from '../MainFrame/Preferences/PreferencesContext';
 import { listUserCloudProjects } from '../Utils/GDevelopServices/Project';
 import { clearCloudProjectCookies } from '../ProjectsStorage/CloudStorageProvider/CloudProjectCookies';
+import {
+  listReceivedAssetShortHeaders,
+  listReceivedAssetPacks,
+} from '../Utils/GDevelopServices/Asset';
 
 type Props = {|
   authentication: Authentication,
@@ -138,6 +142,8 @@ export default class AuthenticatedUserProvider extends React.Component<
         onAcceptGameStatsEmail: this._doAcceptGameStatsEmail,
         getAuthorizationHeader: () =>
           this.props.authentication.getAuthorizationHeader(),
+        receivedAssetPacks: [], // Reset to an empty array so the store context can be updated.
+        receivedAssetShortHeaders: [], // Reset to an empty array so the store context can be updated.
       },
     }));
   }
@@ -275,6 +281,37 @@ export default class AuthenticatedUserProvider extends React.Component<
         })),
       error => {
         console.error('Error while loading user cloud projects:', error);
+      }
+    );
+    listReceivedAssetPacks(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      receivedAssetPacks =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            receivedAssetPacks,
+          },
+        })),
+      error => {
+        console.error('Error while loading received asset packs:', error);
+      }
+    );
+    listReceivedAssetShortHeaders(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      receivedAssetShortHeaders =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            receivedAssetShortHeaders,
+          },
+        })),
+      error => {
+        console.error(
+          'Error while loading received asset short headers:',
+          error
+        );
       }
     );
     this._fetchUserBadges();

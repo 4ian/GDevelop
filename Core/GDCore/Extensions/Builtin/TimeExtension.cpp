@@ -36,7 +36,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     "res/conditions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Time in seconds"))
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer")
       .SetHidden();
 
   extension
@@ -50,7 +50,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     "res/conditions/timer24.png",
                     "res/conditions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer")
       .AddParameter("relationalOperator", _("Sign of the test"), "time")
       .AddParameter("expression", _("Time in seconds"))
       .SetManipulatedType("number");
@@ -78,7 +78,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     "res/conditions/timerPaused24.png",
                     "res/conditions/timerPaused.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer")
       .MarkAsAdvanced();
 
   extension
@@ -93,7 +93,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
           "res/actions/timer24.png",
           "res/actions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Timer's name"));
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer");
 
   extension
       .AddAction("PauseTimer",
@@ -105,7 +105,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  "res/actions/pauseTimer24.png",
                  "res/actions/pauseTimer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer")
       .MarkAsAdvanced();
 
   extension
@@ -118,7 +118,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  "res/actions/unPauseTimer24.png",
                  "res/actions/unPauseTimer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer")
       .MarkAsAdvanced();
 
   extension
@@ -131,7 +131,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  "res/actions/timer24.png",
                  "res/actions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer")
       .MarkAsAdvanced();
 
   extension
@@ -191,7 +191,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                      "",
                      "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Timer's name"));
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer");
 
   extension
       .AddExpression("TimeFromStart",

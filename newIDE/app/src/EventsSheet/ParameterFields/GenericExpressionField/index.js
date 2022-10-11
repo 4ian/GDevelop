@@ -364,7 +364,9 @@ export default class ExpressionField extends React.Component<Props, State> {
     const {
       expression: newExpression,
       caretLocation: newCaretLocation,
-    } = insertAutocompletionInExpression(
+    } = expressionAutocompletion.kind === 'FullExpression' ?
+          {expression: expressionAutocompletion.completion, caretLocation: expressionAutocompletion.completion.length} :
+          insertAutocompletionInExpression(
       { expression, caretLocation },
       {
         completion: expressionAutocompletion.completion,

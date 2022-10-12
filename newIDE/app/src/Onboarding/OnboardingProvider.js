@@ -23,7 +23,7 @@ const flow: Array<OnboardingFlowStep> = [
     id: 'ClickOnSearchBar',
     elementToHighlightId: '#asset-store-search-bar',
     nextStepTrigger: { elementIsFilled: true },
-    tooltip: { title: 'Search an object' },
+    tooltip: { description: 'Search an object' },
     skippable: true,
   },
   {
@@ -35,7 +35,7 @@ const flow: Array<OnboardingFlowStep> = [
     elementToHighlightId: '#add-asset-button',
     isTriggerFlickering: true,
     nextStepTrigger: { presenceOfElement: '#object-item-0' },
-    tooltip: { title: 'Add this asset to your project' },
+    tooltip: { description: 'Add this asset to your project' },
     mapProjectData: {
       firstObject: 'lastProjectObjectName',
     },
@@ -44,14 +44,14 @@ const flow: Array<OnboardingFlowStep> = [
     id: 'CloseAssetStore',
     elementToHighlightId: '#new-object-dialog #close-button',
     nextStepTrigger: { absenceOfElement: '#new-object-dialog' },
-    tooltip: { title: "Alright, let's close this now" },
+    tooltip: { description: "Alright, let's close this now" },
   },
   {
     id: 'DragObjectToScene',
     elementToHighlightId: '#object-item-0',
     nextStepTrigger: { instanceDraggedOnScene: 'firstObject' },
     tooltip: {
-      title: 'Now drag {firstObject} to the scene',
+      description: 'Now drag {firstObject} to the scene',
       placement: 'left',
     },
   },
@@ -60,7 +60,7 @@ const flow: Array<OnboardingFlowStep> = [
     elementToHighlightId: '#object-item-0',
     nextStepTrigger: { presenceOfElement: '#object-editor-dialog' },
     tooltip: {
-      title: 'Here, right-click on it and click “Edit behaviors”',
+      description: 'Here, right-click on it and click “Edit behaviors”',
       placement: 'left',
     },
   },
@@ -69,7 +69,7 @@ const flow: Array<OnboardingFlowStep> = [
     elementToHighlightId: '#behaviors-tab',
     nextStepTrigger: { presenceOfElement: '#add-behavior-button' },
     tooltip: {
-      title: 'See the behaviors of your object here.',
+      description: 'See the behaviors of your object here.',
       placement: 'bottom',
     },
     skippable: true,
@@ -82,7 +82,7 @@ const flow: Array<OnboardingFlowStep> = [
         '#behavior-item-TopDownMovementBehavior--TopDownMovementBehavior',
     },
     tooltip: {
-      title: 'Let’s add a behavior!',
+      description: 'Let’s add a behavior!',
       placement: 'bottom',
     },
   },
@@ -94,7 +94,7 @@ const flow: Array<OnboardingFlowStep> = [
       presenceOfElement: '#behavior-parameters-TopDownMovement',
     },
     tooltip: {
-      title: 'Add the "Top down movement" behavior.',
+      description: 'Add the "Top down movement" behavior.',
       placement: 'bottom',
     },
   },
@@ -105,7 +105,7 @@ const flow: Array<OnboardingFlowStep> = [
       absenceOfElement: '#object-editor-dialog',
     },
     tooltip: {
-      title:
+      description:
         "The parameters above help you customise the behavior, but let's ignore them for now.",
       placement: 'top',
     },

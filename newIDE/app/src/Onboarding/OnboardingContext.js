@@ -15,7 +15,8 @@ export type OnboardingTooltip = {|
     | 'top-end'
     | 'top-start'
     | 'top',
-  content: string,
+  title?: string,
+  description?: string,
 |};
 
 export type OnboardingFlowStep = {|

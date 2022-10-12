@@ -12,13 +12,18 @@ const flow: Array<OnboardingFlowStep> = [
     id: 'ClickOnNewObjectButton',
     elementToHighlightId: '#add-new-object-button',
     nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
-    tooltip: { content: "let's create an object", placement: 'left' },
+    tooltip: {
+      placement: 'left',
+      title: "let's create an object",
+      description:
+        '👉 Everything you see in a game is an object: your character, the enemies, coins and potions, platforms or trees, ...',
+      },
   },
   {
     id: 'ClickOnSearchBar',
     elementToHighlightId: '#asset-store-search-bar',
     nextStepTrigger: { elementIsFilled: true },
-    tooltip: { content: 'Search an object' },
+    tooltip: { title: 'Search an object' },
     skippable: true,
   },
   {
@@ -30,7 +35,7 @@ const flow: Array<OnboardingFlowStep> = [
     elementToHighlightId: '#add-asset-button',
     isTriggerFlickering: true,
     nextStepTrigger: { presenceOfElement: '#object-item-0' },
-    tooltip: { content: 'Add this asset to your project' },
+    tooltip: { title: 'Add this asset to your project' },
     mapProjectData: {
       firstObject: 'lastProjectObjectName',
     },
@@ -39,14 +44,14 @@ const flow: Array<OnboardingFlowStep> = [
     id: 'CloseAssetStore',
     elementToHighlightId: '#new-object-dialog #close-button',
     nextStepTrigger: { absenceOfElement: '#new-object-dialog' },
-    tooltip: { content: "Alright, let's close this now" },
+    tooltip: { title: "Alright, let's close this now" },
   },
   {
     id: 'DragObjectToScene',
     elementToHighlightId: '#object-item-0',
     nextStepTrigger: { instanceDraggedOnScene: 'firstObject' },
     tooltip: {
-      content: 'Now drag {firstObject} to the scene',
+      title: 'Now drag {firstObject} to the scene',
       placement: 'left',
     },
   },
@@ -55,7 +60,7 @@ const flow: Array<OnboardingFlowStep> = [
     elementToHighlightId: '#object-item-0',
     nextStepTrigger: { presenceOfElement: '#object-editor-dialog' },
     tooltip: {
-      content: 'Here, right-click on it and click “Edit behaviors”',
+      title: 'Here, right-click on it and click “Edit behaviors”',
       placement: 'left',
     },
   },
@@ -64,7 +69,7 @@ const flow: Array<OnboardingFlowStep> = [
     elementToHighlightId: '#behaviors-tab',
     nextStepTrigger: { presenceOfElement: '#add-behavior-button' },
     tooltip: {
-      content: 'See the behaviors of your object here.',
+      title: 'See the behaviors of your object here.',
       placement: 'bottom',
     },
     skippable: true,
@@ -77,7 +82,7 @@ const flow: Array<OnboardingFlowStep> = [
         '#behavior-item-TopDownMovementBehavior--TopDownMovementBehavior',
     },
     tooltip: {
-      content: 'Let’s add a behavior!',
+      title: 'Let’s add a behavior!',
       placement: 'bottom',
     },
   },
@@ -89,7 +94,7 @@ const flow: Array<OnboardingFlowStep> = [
       presenceOfElement: '#behavior-parameters-TopDownMovement',
     },
     tooltip: {
-      content: 'Add the "Top down movement" behavior.',
+      title: 'Add the "Top down movement" behavior.',
       placement: 'bottom',
     },
   },
@@ -100,7 +105,7 @@ const flow: Array<OnboardingFlowStep> = [
       absenceOfElement: '#object-editor-dialog',
     },
     tooltip: {
-      content:
+      title:
         "The parameters above help you customise the behavior, but let's ignore them for now.",
       placement: 'top',
     },
@@ -112,13 +117,14 @@ const flow: Array<OnboardingFlowStep> = [
       presenceOfElement: '#object-item-1',
     },
     tooltip: {
-      content: "Let's play!",
+      title: "Let's play!",
       placement: 'bottom',
     },
   },
 ];
 
-const interpolateText = (text: string, data: { [key: string]: string }) => {
+const interpolateText = (text?: string, data: { [key: string]: string }) => {
+  if (!text) return undefined;
   const placeholderReplacingRegex = /{(\w+)}/g;
   const match = text.matchAll(placeholderReplacingRegex);
   let formattedText = text;
@@ -293,12 +299,14 @@ const OnboardingProvider = (props: Props) => {
   console.log(currentStepIndex);
 
   const stepTooltip = flow[currentStepIndex].tooltip;
+  console.log(stepTooltip);
   const formattedStep = {
     ...flow[currentStepIndex],
     tooltip: stepTooltip
       ? {
           ...stepTooltip,
-          content: interpolateText(stepTooltip.content, data),
+          title: interpolateText(stepTooltip.title, data),
+          description: interpolateText(stepTooltip.description, data),
         }
       : undefined,
   };

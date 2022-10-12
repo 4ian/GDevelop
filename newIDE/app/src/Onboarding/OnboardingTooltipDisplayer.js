@@ -3,11 +3,12 @@ import * as React from 'react';
 import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import Fade from '@material-ui/core/Fade';
+import Typography from '@material-ui/core/Typography';
 import { ColumnStackLayout } from '../UI/Layout';
 import { getDisplayZIndexForHighlighter } from './HTMLUtils';
 import { type OnboardingTooltip } from './OnboardingContext';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
-import { makeStyles, Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
 type Props = {|
   anchorElement: HTMLElement,
@@ -16,9 +17,18 @@ type Props = {|
 
 const styles = {
   paper: {
-    backgroundColor: 'white',
-    color: 'black',
-    padding: '8px 16px',
+    backgroundColor: '#FAFAFA', // Grey00
+    padding: '10px 20px',
+  },
+  title: {
+    color: '#1D1D26', // Grey100
+  },
+  description: {
+    color: '#494952', // Grey70
+  },
+  divider: {
+    backgroundColor: '#D9D9DE', // Grey20
+    height: 1,
   },
 };
 
@@ -120,6 +130,7 @@ function OnboardingTooltipDisplayer({ anchorElement, tooltip }: Props) {
         }}
         style={{
           zIndex: getDisplayZIndexForHighlighter(anchorElement),
+          maxWidth: 300,
         }}
       >
         {({ TransitionProps }) => (
@@ -127,7 +138,19 @@ function OnboardingTooltipDisplayer({ anchorElement, tooltip }: Props) {
             <Fade {...TransitionProps} timeout={350}>
               <Paper style={styles.paper} elevation={4}>
                 <ColumnStackLayout noMargin>
-                  <Typography>{tooltip.content}</Typography>
+                  {tooltip.title && (
+                    <Typography style={styles.title} variant="subtitle1">
+                      {tooltip.title}
+                    </Typography>
+                  )}
+                  {tooltip.title && tooltip.description && (
+                    <span style={styles.divider} />
+                  )}
+                  {tooltip.description && (
+                    <Typography style={styles.description}>
+                      {tooltip.description}
+                    </Typography>
+                  )}
                 </ColumnStackLayout>
               </Paper>
             </Fade>

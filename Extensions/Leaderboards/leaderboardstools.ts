@@ -280,30 +280,42 @@ namespace gdjs {
         let scoreSavingState: ScoreSavingState;
         if (_scoreSavingStateByLeaderboard[leaderboardId]) {
           scoreSavingState = _scoreSavingStateByLeaderboard[leaderboardId];
+          let shouldStartSaving = true;
           if (
+            shouldStartSaving &&
             scoreSavingState.isAlreadySavingThisScore({ playerName, score })
           ) {
             logger.warn(
               'There is already a request to save with this player name and this score. Ignoring this one.'
             );
-            return;
+            shouldStartSaving = false;
           }
 
-          if (scoreSavingState.isSameAsLastScore({ playerName, score })) {
+          if (
+            shouldStartSaving &&
+            scoreSavingState.isSameAsLastScore({ playerName, score })
+          ) {
             logger.warn(
               'The player and score to be sent are the same as previous one. Ignoring this one.'
             );
-            const errorCode = 'SAME_AS_PREVIOUS';
-            scoreSavingState.setError(errorCode);
-            return;
+            scoreSavingState.setError('SAME_AS_PREVIOUS');
+            shouldStartSaving = false;
           }
 
-          if (scoreSavingState.isTooSoonToSaveAnotherScore()) {
+          if (
+            shouldStartSaving &&
+            scoreSavingState.isTooSoonToSaveAnotherScore()
+          ) {
             logger.warn(
               'Last entry was sent too little time ago. Ignoring this one.'
             );
-            const errorCode = 'TOO_FAST';
-            scoreSavingState.setError(errorCode);
+            scoreSavingState.setError('TOO_FAST');
+            shouldStartSaving = false;
+            // Set the starting time to cancel all the following attempts that
+            // are started too early after this one.
+            scoreSavingState.lastScoreSavingStartedAt = Date.now();
+          }
+          if (!shouldStartSaving) {
             return;
           }
         } else {
@@ -338,28 +350,42 @@ namespace gdjs {
         }
         if (_scoreSavingStateByLeaderboard[leaderboardId]) {
           scoreSavingState = _scoreSavingStateByLeaderboard[leaderboardId];
-          if (scoreSavingState.isAlreadySavingThisScore({ playerId, score })) {
+          let shouldStartSaving = true;
+          if (
+            shouldStartSaving &&
+            scoreSavingState.isAlreadySavingThisScore({ playerId, score })
+          ) {
             logger.warn(
               'There is already a request to save with this player ID and this score. Ignoring this one.'
             );
-            return;
+            shouldStartSaving = false;
           }
 
-          if (scoreSavingState.isSameAsLastScore({ playerId, score })) {
+          if (
+            shouldStartSaving &&
+            scoreSavingState.isSameAsLastScore({ playerId, score })
+          ) {
             logger.warn(
               'The player and score to be sent are the same as previous one. Ignoring this one.'
             );
-            const errorCode = 'SAME_AS_PREVIOUS';
-            scoreSavingState.setError(errorCode);
-            return;
+            scoreSavingState.setError('SAME_AS_PREVIOUS');
+            shouldStartSaving = false;
           }
 
-          if (scoreSavingState.isTooSoonToSaveAnotherScore()) {
+          if (
+            shouldStartSaving &&
+            scoreSavingState.isTooSoonToSaveAnotherScore()
+          ) {
             logger.warn(
               'Last entry was sent too little time ago. Ignoring this one.'
             );
-            const errorCode = 'TOO_FAST';
-            scoreSavingState.setError(errorCode);
+            scoreSavingState.setError('TOO_FAST');
+            shouldStartSaving = false;
+            // Set the starting time to cancel all the following attempts that
+            // are started too early after this one.
+            scoreSavingState.lastScoreSavingStartedAt = Date.now();
+          }
+          if (!shouldStartSaving) {
             return;
           }
         } else {

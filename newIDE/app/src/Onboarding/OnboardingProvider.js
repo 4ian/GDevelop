@@ -9,7 +9,7 @@ type Props = {| children: React.Node |};
 
 const flow: Array<OnboardingFlowStep> = [
   {
-    id: 'ClickOnNewObjectButton',
+    id: 'ClickOnNewObjectButton1',
     elementToHighlightId: '#add-new-object-button',
     nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
     tooltip: {
@@ -17,7 +17,7 @@ const flow: Array<OnboardingFlowStep> = [
       title: "let's create an **object**",
       description:
         '👉 Everything you see in a game is an **object**: your character, the enemies, coins and potions, platforms or trees, ...',
-      },
+    },
   },
   {
     id: 'ClickOnSearchBar',
@@ -114,11 +114,20 @@ const flow: Array<OnboardingFlowStep> = [
     id: 'LaunchPreview1',
     elementToHighlightId: '#toolbar-preview-button',
     nextStepTrigger: {
-      presenceOfElement: '#object-item-1',
+      clickOnButton: "I'm done",
     },
     tooltip: {
       title: "Let's play!",
       placement: 'bottom',
+    },
+  },
+  {
+    id: 'ClickOnNewObjectButton2',
+    elementToHighlightId: '#add-new-object-button',
+    nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
+    tooltip: {
+      placement: 'left',
+      title: "let's create another **object** to interact with {firstObject}",
     },
   },
 ];
@@ -317,6 +326,7 @@ const OnboardingProvider = (props: Props) => {
         flow: null,
         currentStep: formattedStep,
         setProject,
+        goToNextStep: () => setCurrentStepIndex(currentStepIndex + 1),
       }}
     >
       {props.children}

@@ -785,7 +785,7 @@ const MainFrame = (props: Props) => {
       getStorageProviderOperations,
       ensureResourcesAreFetched,
       authenticatedUser,
-      setOnboardingProject
+      setOnboardingProject,
     ]
   );
 

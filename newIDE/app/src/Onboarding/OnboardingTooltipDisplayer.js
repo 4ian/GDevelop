@@ -6,14 +6,16 @@ import Fade from '@material-ui/core/Fade';
 import Typography from '@material-ui/core/Typography';
 import { ColumnStackLayout } from '../UI/Layout';
 import { getDisplayZIndexForHighlighter } from './HTMLUtils';
-import { type OnboardingTooltip } from './OnboardingContext';
+import OnboardingContext, { type OnboardingTooltip } from './OnboardingContext';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { makeStyles } from '@material-ui/core/styles';
 import { MarkdownText } from '../UI/MarkdownText';
+import RaisedButton from '../UI/RaisedButton';
 
 type Props = {|
   anchorElement: HTMLElement,
   tooltip: OnboardingTooltip,
+  buttonLabel?: string,
 |};
 
 const styles = {
@@ -98,9 +100,13 @@ const useClasses = makeStyles({
   },
 });
 
-function OnboardingTooltipDisplayer({ anchorElement, tooltip }: Props) {
+function OnboardingTooltipDisplayer({
+  anchorElement,
+  tooltip,
+  buttonLabel,
+}: Props) {
   const [show, setShow] = React.useState<boolean>(false);
-
+  const { goToNextStep } = React.useContext(OnboardingContext);
   const updateVisibility = React.useCallback(
     (entries: IntersectionObserverEntry[]) => {
       setShow(entries[0].isIntersecting);
@@ -154,6 +160,13 @@ function OnboardingTooltipDisplayer({ anchorElement, tooltip }: Props) {
                     <Typography style={styles.description}>
                       <MarkdownText source={tooltip.description} />
                     </Typography>
+                  )}
+                  {buttonLabel && (
+                    <RaisedButton
+                      primary
+                      label={buttonLabel}
+                      onClick={goToNextStep}
+                    />
                   )}
                 </ColumnStackLayout>
                 <span

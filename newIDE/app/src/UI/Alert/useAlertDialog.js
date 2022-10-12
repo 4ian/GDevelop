@@ -14,26 +14,35 @@ const useAlertDialog = () => {
     showConfirmDeleteDialog,
   } = React.useContext(AlertContext);
 
-  const showAlert = async (options: ShowAlertDialogOptions): Promise<void> =>
-    new Promise(resolve => {
-      showAlertDialog({ callback: resolve, ...options });
-    });
+  const showAlert = React.useCallback(
+    (options: ShowAlertDialogOptions): Promise<void> =>
+      new Promise(resolve => {
+        showAlertDialog({ callback: resolve, ...options });
+      }),
+    [showAlertDialog]
+  );
 
-  const showConfirmation = (
-    options: ShowConfirmDialogOptions
-  ): Promise<boolean> =>
-    new Promise(resolve => {
-      showConfirmDialog({ callback: resolve, ...options });
-    });
+  const showConfirmation = React.useCallback(
+    (options: ShowConfirmDialogOptions): Promise<boolean> =>
+      new Promise(resolve => {
+        showConfirmDialog({ callback: resolve, ...options });
+      }),
+    [showConfirmDialog]
+  );
 
-  const showDeleteConfirmation = (
-    options: ShowConfirmDeleteDialogOptions
-  ): Promise<boolean> =>
-    new Promise(resolve => {
-      showConfirmDeleteDialog({ callback: resolve, ...options });
-    });
+  const showDeleteConfirmation = React.useCallback(
+    (options: ShowConfirmDeleteDialogOptions): Promise<boolean> =>
+      new Promise(resolve => {
+        showConfirmDeleteDialog({ callback: resolve, ...options });
+      }),
+    [showConfirmDeleteDialog]
+  );
 
-  return { showAlert, showConfirmation, showDeleteConfirmation };
+  return {
+    showAlert,
+    showConfirmation,
+    showDeleteConfirmation,
+  };
 };
 
 export default useAlertDialog;

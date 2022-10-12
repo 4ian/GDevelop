@@ -23,16 +23,16 @@
 using namespace std;
 
 namespace gd {
-
+namespace {
 /**
- * \brief Go through the nodes and change the given object name to a new one.
+ * \brief Go through the nodes to search for variable occurrences.
  *
  * \see gd::ExpressionParser2
  */
-class GD_CORE_API ExpressionParameterSearcher
+class GD_CORE_API VariableFinderExpressionNodeWorker
     : public ExpressionParser2NodeWorker {
  public:
-  ExpressionParameterSearcher(const gd::Platform &platform_,
+  VariableFinderExpressionNodeWorker(const gd::Platform &platform_,
                               const gd::ObjectsContainer &globalObjectsContainer_,
                               const gd::ObjectsContainer &objectsContainer_,
                               std::set<gd::String>& results_,
@@ -44,7 +44,7 @@ class GD_CORE_API ExpressionParameterSearcher
         results(results_),
         parameterType(parameterType_),
         objectName(objectName_){};
-  virtual ~ExpressionParameterSearcher(){};
+  virtual ~VariableFinderExpressionNodeWorker(){};
 
  protected:
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
@@ -87,22 +87,22 @@ class GD_CORE_API ExpressionParameterSearcher
       return;
     }
 
-    for (size_t i = 0; i < node.parameters.size() &&
-                       i < metadata.parameters.size();
-         ++i) {
-      // Object functions 1st metadata is the object.
-      // Skip it.
-      const int metadataIndex = i + (isObjectFunction ? 1 : 0);
-      if (metadataIndex >= metadata.parameters.size()) {
-        break;
-      }
+    size_t parameterIndex = 0;
+    for (size_t metadataIndex = (isObjectFunction ? 1 : 0); metadataIndex < metadata.parameters.size()
+      && parameterIndex < node.parameters.size(); ++metadataIndex) {
       auto& parameterMetadata = metadata.parameters[metadataIndex];
+      if (parameterMetadata.IsCodeOnly()) {
+        continue;
+      }
+      auto& parameterNode = node.parameters[parameterIndex];
+      ++parameterIndex;
+
       if (considerFunction && parameterMetadata.GetType() == parameterType) {
         // Store the value of the parameter
         results.insert(
-            gd::ExpressionParser2NodePrinter::PrintNode(*node.parameters[i]));
+            gd::ExpressionParser2NodePrinter::PrintNode(*parameterNode));
       } else {
-        node.parameters[i]->Visit(*this);
+        parameterNode->Visit(*this);
       }
     }
   }
@@ -121,9 +121,7 @@ class GD_CORE_API ExpressionParameterSearcher
 };
 
 /**
- * \brief Go through the nodes and change the given object name to a new one.
- *
- * \see gd::ExpressionParser2
+ * \brief Go through the events to search for variable occurrences.
  */
 class GD_CORE_API VariableFinderEventWorker
     : public ArbitraryEventsWorkerWithContext {
@@ -162,7 +160,7 @@ class GD_CORE_API VariableFinderEventWorker
                     "string", instrInfos.parameters[pNb].type)) {
           auto node = instruction.GetParameter(pNb).GetRootNode();
 
-          ExpressionParameterSearcher searcher(
+          VariableFinderExpressionNodeWorker searcher(
               platform,
               GetGlobalObjectsContainer(),
               GetObjectsContainer(),
@@ -190,6 +188,7 @@ class GD_CORE_API VariableFinderEventWorker
   gd::String objectName;     ///< If not empty, parameters will be taken into
                              ///< account only if related to this object.
 };
+} // namespace
 
 std::set<gd::String> EventsVariablesFinder::FindAllGlobalVariables(
     const gd::Platform& platform, gd::Project& project) {

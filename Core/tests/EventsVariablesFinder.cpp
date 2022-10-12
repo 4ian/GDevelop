@@ -18,6 +18,7 @@
 #include "GDCore/Project/Variable.h"
 #include "catch.hpp"
 
+namespace {
 const void DeclareVariableExtension(gd::Project &project,
                                     gd::Platform &platform) {
   std::shared_ptr<gd::PlatformExtension> extension =
@@ -26,6 +27,11 @@ const void DeclareVariableExtension(gd::Project &project,
       *(extension.get()));
   gd::BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       *(extension.get()));
+  // Add an instruction to test expressions.
+  extension
+      ->AddAction("DoSomething", "Do something", "This does something",
+                  "Do something please", "", "", "")
+      .AddParameter("expression", "Parameter 1 (a number)");
   platform.AddExtension(extension);
   project.AddPlatform(platform);
 }
@@ -65,12 +71,48 @@ const gd::StandardEvent UseObjectVariable(const gd::String &objectName,
   return event;
 }
 
+const gd::StandardEvent UseGlobalVariableInExpression(const gd::String &name) {
+  gd::StandardEvent event;
+  gd::Instruction instruction;
+  instruction.SetType("DoSomething");
+  instruction.SetParametersCount(1);
+  instruction.SetParameter(0,
+                           gd::Expression("1 + GlobalVariable(" + name + ")"));
+  event.GetActions().Insert(instruction);
+  return event;
+}
+
+const gd::StandardEvent UseSceneVariableInExpression(const gd::String &name) {
+  gd::StandardEvent event;
+  gd::Instruction instruction;
+  instruction.SetType("DoSomething");
+  instruction.SetParametersCount(1);
+  instruction.SetParameter(0, gd::Expression("1 + Variable(" + name + ")"));
+  event.GetActions().Insert(instruction);
+  return event;
+}
+
+const gd::StandardEvent
+UseObjectVariableInExpression(const gd::String &objectName,
+                              const gd::String &variableName) {
+  gd::StandardEvent event;
+  gd::Instruction instruction;
+  instruction.SetType("DoSomething");
+  instruction.SetParametersCount(1);
+  instruction.SetParameter(
+      0,
+      gd::Expression("1 + " + objectName + ".Variable(" + variableName + ")"));
+  event.GetActions().Insert(instruction);
+  return event;
+}
+
 const void UseExternalEvents(gd::Layout &layout,
                              gd::ExternalEvents &externalEvents) {
   gd::LinkEvent linkEvent;
   linkEvent.SetTarget(externalEvents.GetName());
   layout.GetEvents().InsertEvent(linkEvent);
 }
+} // namespace
 
 TEST_CASE("EventsVariablesFinder (FindAllGlobalVariables)", "[common]") {
   SECTION("Can find global variables in scenes") {
@@ -85,7 +127,23 @@ TEST_CASE("EventsVariablesFinder (FindAllGlobalVariables)", "[common]") {
         gd::EventsVariablesFinder::FindAllGlobalVariables(platform, project);
 
     REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MyGlobalVariable") != variableNames.end());
+    REQUIRE(*(variableNames.begin()) == "MyGlobalVariable");
+  }
+
+  SECTION("Can find global variables in scene expressions") {
+    gd::Project project;
+    gd::Platform platform;
+    DeclareVariableExtension(project, platform);
+
+    auto &layout = project.InsertNewLayout("Layout1", 0);
+    layout.GetEvents().InsertEvent(
+        UseGlobalVariableInExpression("MyGlobalVariable"));
+
+    auto variableNames =
+        gd::EventsVariablesFinder::FindAllGlobalVariables(platform, project);
+
+    REQUIRE(variableNames.size() == 1);
+    REQUIRE(*(variableNames.begin()) == "MyGlobalVariable");
   }
 
   SECTION("Can find global variables in external layouts") {
@@ -103,7 +161,7 @@ TEST_CASE("EventsVariablesFinder (FindAllGlobalVariables)", "[common]") {
         gd::EventsVariablesFinder::FindAllGlobalVariables(platform, project);
 
     REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MyGlobalVariable") != variableNames.end());
+    REQUIRE(*(variableNames.begin()) == "MyGlobalVariable");
   }
 }
 
@@ -120,7 +178,23 @@ TEST_CASE("EventsVariablesFinder (FindAllLayoutVariables)", "[common]") {
         platform, project, layout);
 
     REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MySceneVariable") != variableNames.end());
+    REQUIRE(*(variableNames.begin()) == "MySceneVariable");
+  }
+
+  SECTION("Can find scene variables in scene expressions") {
+    gd::Project project;
+    gd::Platform platform;
+    DeclareVariableExtension(project, platform);
+
+    auto &layout = project.InsertNewLayout("Layout1", 0);
+    layout.GetEvents().InsertEvent(
+        UseSceneVariableInExpression("MySceneVariable"));
+
+    auto variableNames = gd::EventsVariablesFinder::FindAllLayoutVariables(
+        platform, project, layout);
+
+    REQUIRE(variableNames.size() == 1);
+    REQUIRE(*(variableNames.begin()) == "MySceneVariable");
   }
 
   SECTION("Can find scene variables in external layouts") {
@@ -137,7 +211,7 @@ TEST_CASE("EventsVariablesFinder (FindAllLayoutVariables)", "[common]") {
         platform, project, layout);
 
     REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MySceneVariable") != variableNames.end());
+    REQUIRE(*(variableNames.begin()) == "MySceneVariable");
   }
 
   SECTION("Can find scene variables the right scene") {
@@ -157,8 +231,7 @@ TEST_CASE("EventsVariablesFinder (FindAllLayoutVariables)", "[common]") {
         platform, project, layout1);
 
     REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MySceneVariableInLayout1") !=
-            variableNames.end());
+    REQUIRE(*(variableNames.begin()) == "MySceneVariableInLayout1");
   }
 
   SECTION("Can find scene variables in the right external layouts") {
@@ -184,8 +257,7 @@ TEST_CASE("EventsVariablesFinder (FindAllLayoutVariables)", "[common]") {
         platform, project, layout1);
 
     REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MySceneVariableInExternalEvents1") !=
-            variableNames.end());
+    REQUIRE(*(variableNames.begin()) == "MySceneVariableInExternalEvents1");
   }
 }
 
@@ -204,7 +276,24 @@ TEST_CASE("EventsVariablesFinder (FindAllObjectVariables)", "[common]") {
         platform, project, layout, object);
 
     REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MyObjectVariable") != variableNames.end());
+    REQUIRE(*(variableNames.begin()) == "MyObjectVariable");
+  }
+
+  SECTION("Can find object variables in scene expressions") {
+    gd::Project project;
+    gd::Platform platform;
+    DeclareVariableExtension(project, platform);
+
+    auto &layout = project.InsertNewLayout("Layout1", 0);
+    auto &object = layout.InsertNewObject(project, "", "MyObject", 0);
+    layout.GetEvents().InsertEvent(
+        UseObjectVariableInExpression("MyObject", "MyObjectVariable"));
+
+    auto variableNames = gd::EventsVariablesFinder::FindAllObjectVariables(
+        platform, project, layout, object);
+
+    REQUIRE(variableNames.size() == 1);
+    REQUIRE(*(variableNames.begin()) == "MyObjectVariable");
   }
 
   SECTION("Can find object variables in external layouts") {
@@ -223,7 +312,7 @@ TEST_CASE("EventsVariablesFinder (FindAllObjectVariables)", "[common]") {
         platform, project, layout, object);
 
     REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MyObjectVariable") != variableNames.end());
+    REQUIRE(*(variableNames.begin()) == "MyObjectVariable");
   }
 
   SECTION("Can find object variables in scenes for the right object") {
@@ -243,7 +332,7 @@ TEST_CASE("EventsVariablesFinder (FindAllObjectVariables)", "[common]") {
         platform, project, layout, object1);
 
     REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MyObjectVariable1") != variableNames.end());
+    REQUIRE(*(variableNames.begin()) == "MyObjectVariable1");
   }
 
   SECTION(
@@ -266,6 +355,6 @@ TEST_CASE("EventsVariablesFinder (FindAllObjectVariables)", "[common]") {
         platform, project, layout, object1);
 
     REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MyObjectVariable1") != variableNames.end());
+    REQUIRE(*(variableNames.begin()) == "MyObjectVariable1");
   }
 }

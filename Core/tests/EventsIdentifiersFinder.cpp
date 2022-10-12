@@ -17,12 +17,18 @@
 #include "GDCore/Project/Project.h"
 #include "catch.hpp"
 
+namespace {
 const void DeclareTimerExtension(gd::Project &project, gd::Platform &platform) {
   std::shared_ptr<gd::PlatformExtension> extension =
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
   gd::BuiltinExtensionsImplementer::ImplementsTimeExtension(*(extension.get()));
   gd::BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       *(extension.get()));
+  // Add an instruction to test expressions.
+  extension
+      ->AddAction("DoSomething", "Do something", "This does something",
+                  "Do something please", "", "", "")
+      .AddParameter("expression", "Parameter 1 (a number)");
   platform.AddExtension(extension);
   project.AddPlatform(platform);
 }
@@ -31,8 +37,9 @@ const gd::StandardEvent UseSceneTimer(const gd::String &name) {
   gd::StandardEvent event;
   gd::Instruction instruction;
   instruction.SetType("ResetTimer");
-  instruction.SetParametersCount(1);
-  instruction.SetParameter(0, gd::Expression(name));
+  instruction.SetParametersCount(2);
+  instruction.SetParameter(0, gd::Expression("scene"));
+  instruction.SetParameter(1, gd::Expression("\"" + name + "\""));
   event.GetActions().Insert(instruction);
   return event;
 }
@@ -44,7 +51,32 @@ const gd::StandardEvent UseObjectTimer(const gd::String &objectName,
   instruction.SetType("ResetObjectTimer");
   instruction.SetParametersCount(2);
   instruction.SetParameter(0, gd::Expression(objectName));
-  instruction.SetParameter(1, gd::Expression(timerName));
+  instruction.SetParameter(1, gd::Expression("\"" + timerName + "\""));
+  event.GetActions().Insert(instruction);
+  return event;
+}
+
+const gd::StandardEvent UseSceneTimerInExpression(const gd::String &name) {
+  gd::StandardEvent event;
+  gd::Instruction instruction;
+  instruction.SetType("DoSomething");
+  instruction.SetParametersCount(1);
+  instruction.SetParameter(
+      0, gd::Expression("1 + TimerElapsedTime(\"" + name + "\")"));
+  event.GetActions().Insert(instruction);
+  return event;
+}
+
+const gd::StandardEvent
+UseObjectTimerInExpression(const gd::String &objectName,
+                           const gd::String &timerName) {
+  gd::StandardEvent event;
+  gd::Instruction instruction;
+  instruction.SetType("DoSomething");
+  instruction.SetParametersCount(1);
+  instruction.SetParameter(0, gd::Expression("1 + " + objectName +
+                                             ".ObjectTimerElapsedTime(\"" + timerName +
+                                             "\")"));
   event.GetActions().Insert(instruction);
   return event;
 }
@@ -55,6 +87,7 @@ const void UseExternalEvents(gd::Layout &layout,
   linkEvent.SetTarget(externalEvents.GetName());
   layout.GetEvents().InsertEvent(linkEvent);
 }
+} // namespace
 
 TEST_CASE("EventsIdentifiersFinder (scene timers)", "[common]") {
   SECTION("Can find scene timers in scenes") {
@@ -65,12 +98,28 @@ TEST_CASE("EventsIdentifiersFinder (scene timers)", "[common]") {
     auto &layout = project.InsertNewLayout("Layout1", 0);
     layout.GetEvents().InsertEvent(UseSceneTimer("MySceneTimer"));
 
-    auto variableNames =
+    auto identifierExpressions =
         gd::EventsIdentifiersFinder::FindAllIdentifierExpressions(
             platform, project, layout, "sceneTimer");
 
-    REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MySceneTimer") != variableNames.end());
+    REQUIRE(identifierExpressions.size() == 1);
+    REQUIRE(*(identifierExpressions.begin()) == "\"MySceneTimer\"");
+  }
+
+  SECTION("Can find scene timers in scene expressions") {
+    gd::Project project;
+    gd::Platform platform;
+    DeclareTimerExtension(project, platform);
+
+    auto &layout = project.InsertNewLayout("Layout1", 0);
+    layout.GetEvents().InsertEvent(UseSceneTimerInExpression("MySceneTimer"));
+
+    auto identifierExpressions =
+        gd::EventsIdentifiersFinder::FindAllIdentifierExpressions(
+            platform, project, layout, "sceneTimer");
+
+    REQUIRE(identifierExpressions.size() == 1);
+    REQUIRE(*(identifierExpressions.begin()) == "\"MySceneTimer\"");
   }
 
   SECTION("Can find scene timers in external layouts") {
@@ -83,12 +132,12 @@ TEST_CASE("EventsIdentifiersFinder (scene timers)", "[common]") {
     externalEvents.GetEvents().InsertEvent(UseSceneTimer("MySceneTimer"));
     UseExternalEvents(layout, externalEvents);
 
-    auto variableNames =
+    auto identifierExpressions =
         gd::EventsIdentifiersFinder::FindAllIdentifierExpressions(
             platform, project, layout, "sceneTimer");
 
-    REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MySceneTimer") != variableNames.end());
+    REQUIRE(identifierExpressions.size() == 1);
+    REQUIRE(*(identifierExpressions.begin()) == "\"MySceneTimer\"");
   }
 
   SECTION("Can find scene timers the right scene") {
@@ -102,12 +151,12 @@ TEST_CASE("EventsIdentifiersFinder (scene timers)", "[common]") {
     auto &layout2 = project.InsertNewLayout("Layout2", 0);
     layout2.GetEvents().InsertEvent(UseSceneTimer("MySceneTimerInLayout2"));
 
-    auto variableNames =
+    auto identifierExpressions =
         gd::EventsIdentifiersFinder::FindAllIdentifierExpressions(
             platform, project, layout1, "sceneTimer");
 
-    REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MySceneTimerInLayout1") != variableNames.end());
+    REQUIRE(identifierExpressions.size() == 1);
+    REQUIRE(*(identifierExpressions.begin()) == "\"MySceneTimerInLayout1\"");
   }
 
   SECTION("Can find scene timers in the right external layouts") {
@@ -129,13 +178,13 @@ TEST_CASE("EventsIdentifiersFinder (scene timers)", "[common]") {
         UseSceneTimer("MySceneTimerInExternalEvents2"));
     UseExternalEvents(layout2, externalEvents2);
 
-    auto variableNames =
+    auto identifierExpressions =
         gd::EventsIdentifiersFinder::FindAllIdentifierExpressions(
             platform, project, layout1, "sceneTimer");
 
-    REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MySceneTimerInExternalEvents1") !=
-            variableNames.end());
+    REQUIRE(identifierExpressions.size() == 1);
+    REQUIRE(*(identifierExpressions.begin()) ==
+            "\"MySceneTimerInExternalEvents1\"");
   }
 }
 
@@ -149,12 +198,29 @@ TEST_CASE("EventsIdentifiersFinder (object timers)", "[common]") {
     auto &object = layout.InsertNewObject(project, "", "MyObject", 0);
     layout.GetEvents().InsertEvent(UseObjectTimer("MyObject", "MyObjectTimer"));
 
-    auto variableNames =
+    auto identifierExpressions =
         gd::EventsIdentifiersFinder::FindAllIdentifierExpressions(
             platform, project, layout, "objectTimer", object.GetName());
 
-    REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MyObjectTimer") != variableNames.end());
+    REQUIRE(identifierExpressions.size() == 1);
+    REQUIRE(*(identifierExpressions.begin()) == "\"MyObjectTimer\"");
+  }
+
+  SECTION("Can find object timers in scene expression") {
+    gd::Project project;
+    gd::Platform platform;
+    DeclareTimerExtension(project, platform);
+
+    auto &layout = project.InsertNewLayout("Layout1", 0);
+    auto &object = layout.InsertNewObject(project, "", "MyObject", 0);
+    layout.GetEvents().InsertEvent(UseObjectTimerInExpression("MyObject", "MyObjectTimer"));
+
+    auto identifierExpressions =
+        gd::EventsIdentifiersFinder::FindAllIdentifierExpressions(
+            platform, project, layout, "objectTimer", object.GetName());
+
+    REQUIRE(identifierExpressions.size() == 1);
+    REQUIRE(*(identifierExpressions.begin()) == "\"MyObjectTimer\"");
   }
 
   SECTION("Can find object timers in external layouts") {
@@ -169,12 +235,12 @@ TEST_CASE("EventsIdentifiersFinder (object timers)", "[common]") {
         UseObjectTimer("MyObject", "MyObjectTimer"));
     UseExternalEvents(layout, externalEvents);
 
-    auto variableNames =
+    auto identifierExpressions =
         gd::EventsIdentifiersFinder::FindAllIdentifierExpressions(
             platform, project, layout, "objectTimer", object.GetName());
 
-    REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MyObjectTimer") != variableNames.end());
+    REQUIRE(identifierExpressions.size() == 1);
+    REQUIRE(*(identifierExpressions.begin()) == "\"MyObjectTimer\"");
   }
 
   SECTION("Can find object timers in scenes for the right object") {
@@ -190,12 +256,12 @@ TEST_CASE("EventsIdentifiersFinder (object timers)", "[common]") {
     layout.GetEvents().InsertEvent(
         UseObjectTimer("MyObject2", "MyObjectTimer2"));
 
-    auto variableNames =
+    auto identifierExpressions =
         gd::EventsIdentifiersFinder::FindAllIdentifierExpressions(
             platform, project, layout, "objectTimer", object1.GetName());
 
-    REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MyObjectTimer1") != variableNames.end());
+    REQUIRE(identifierExpressions.size() == 1);
+    REQUIRE(*(identifierExpressions.begin()) == "\"MyObjectTimer1\"");
   }
 
   SECTION("Can find object timers in external layouts for the right object") {
@@ -213,11 +279,11 @@ TEST_CASE("EventsIdentifiersFinder (object timers)", "[common]") {
         UseObjectTimer("MyObject2", "MyObjectTimer2"));
     UseExternalEvents(layout, externalEvents);
 
-    auto variableNames =
+    auto identifierExpressions =
         gd::EventsIdentifiersFinder::FindAllIdentifierExpressions(
             platform, project, layout, "objectTimer", object1.GetName());
 
-    REQUIRE(variableNames.size() == 1);
-    REQUIRE(variableNames.find("MyObjectTimer1") != variableNames.end());
+    REQUIRE(identifierExpressions.size() == 1);
+    REQUIRE(*(identifierExpressions.begin()) == "\"MyObjectTimer1\"");
   }
 }

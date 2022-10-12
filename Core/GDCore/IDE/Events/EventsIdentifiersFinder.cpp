@@ -13,6 +13,7 @@
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
+#include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
@@ -22,16 +23,16 @@
 using namespace std;
 
 namespace gd {
-
+namespace {
 /**
- * \brief Go through the nodes and change the given object name to a new one.
+ * \brief Go through the nodes to search for identifier occurrences.
  *
  * \see gd::ExpressionParser2
  */
-class GD_CORE_API ExpressionParameterSearcher
+class GD_CORE_API IdentifierFinderExpressionNodeWorker
     : public ExpressionParser2NodeWorker {
  public:
-  ExpressionParameterSearcher(const gd::Platform &platform_,
+  IdentifierFinderExpressionNodeWorker(const gd::Platform &platform_,
                               const gd::ObjectsContainer &globalObjectsContainer_,
                               const gd::ObjectsContainer &objectsContainer_,
                               std::set<gd::String>& results_,
@@ -43,7 +44,7 @@ class GD_CORE_API ExpressionParameterSearcher
         results(results_),
         identifierType(identifierType_),
         objectName(objectName_){};
-  virtual ~ExpressionParameterSearcher(){};
+  virtual ~IdentifierFinderExpressionNodeWorker(){};
 
  protected:
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
@@ -74,28 +75,35 @@ class GD_CORE_API ExpressionParameterSearcher
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     bool considerFunction = objectName.empty() || node.objectName == objectName;
 
-    const gd::ExpressionMetadata &metadata = node.objectName.empty() ?
-          MetadataProvider::GetAnyExpressionMetadata(platform, node.functionName) :
+    const bool isObjectFunction = !node.objectName.empty();
+    const gd::ExpressionMetadata &metadata = isObjectFunction ?
             MetadataProvider::GetObjectAnyExpressionMetadata(
                 platform,
                 GetTypeOfObject(globalObjectsContainer, objectsContainer, objectName),
-                node.functionName);
+                node.functionName):
+          MetadataProvider::GetAnyExpressionMetadata(platform, node.functionName);
 
     if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
       return;
     }
     
-    for (size_t i = 0; i < node.parameters.size() &&
-                       i < metadata.parameters.size();
-         ++i) {
-      auto& parameterMetadata = metadata.parameters[i];
+    size_t parameterIndex = 0;
+    for (size_t metadataIndex = (isObjectFunction ? 1 : 0); metadataIndex < metadata.parameters.size()
+      && parameterIndex < node.parameters.size(); ++metadataIndex) {
+      auto& parameterMetadata = metadata.parameters[metadataIndex];
+      if (parameterMetadata.IsCodeOnly()) {
+        continue;
+      }
+      auto& parameterNode = node.parameters[parameterIndex];
+      ++parameterIndex;
+
       if (considerFunction && parameterMetadata.GetType() == "identifier"
        && parameterMetadata.GetExtraInfo() == identifierType) {
         // Store the value of the parameter
         results.insert(
-            gd::ExpressionParser2NodePrinter::PrintNode(*node.parameters[i]));
+            gd::ExpressionParser2NodePrinter::PrintNode(*parameterNode));
       } else {
-        node.parameters[i]->Visit(*this);
+        parameterNode->Visit(*this);
       }
     }
   }
@@ -113,10 +121,82 @@ class GD_CORE_API ExpressionParameterSearcher
                              ///< account only if related to this object.
 };
 
+/**
+ * \brief Go through the events to search for identifier occurrences.
+ */
+class GD_CORE_API IdentifierFinderEventWorker
+    : public ArbitraryEventsWorkerWithContext {
+ public:
+  IdentifierFinderEventWorker(const gd::Platform &platform_,
+                              std::set<gd::String>& results_,
+                              const gd::String& identifierType_,
+                              const gd::String& objectName_ = "")
+      : platform(platform_),
+        results(results_),
+        identifierType(identifierType_),
+        objectName(objectName_){};
+  virtual ~IdentifierFinderEventWorker(){};
+
+  void DoVisitInstructionList(gd::InstructionsList& instructions,
+                                      bool areConditions) override {
+    for (std::size_t aId = 0; aId < instructions.size(); ++aId) {
+      auto& instruction = instructions[aId];
+      gd::String lastObjectParameter = "";
+      const gd::InstructionMetadata& instrInfos =
+          areConditions ? MetadataProvider::GetConditionMetadata(
+                              platform, instruction.GetType())
+                        : MetadataProvider::GetActionMetadata(
+                              platform, instruction.GetType());
+      for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
+        // The parameter has the searched type...
+      if (instrInfos.parameters[pNb].type == "identifier"
+       && instrInfos.parameters[pNb].supplementaryInformation == identifierType) {
+          //...remember the value of the parameter.
+          if (objectName.empty() || lastObjectParameter == objectName) {
+            results.insert(instruction.GetParameter(pNb).GetPlainString());
+          }
+        }
+        // Search in expressions
+        else if (ParameterMetadata::IsExpression(
+                    "number", instrInfos.parameters[pNb].type) ||
+                ParameterMetadata::IsExpression(
+                    "string", instrInfos.parameters[pNb].type)) {
+          auto node = instruction.GetParameter(pNb).GetRootNode();
+
+          IdentifierFinderExpressionNodeWorker searcher(
+              platform,
+              GetGlobalObjectsContainer(),
+              GetObjectsContainer(),
+              results,
+              identifierType,
+              objectName);
+          node->Visit(searcher);
+        }
+        // Remember the value of the last "object" parameter.
+        else if (gd::ParameterMetadata::IsObject(
+                    instrInfos.parameters[pNb].type)) {
+          lastObjectParameter =
+              instruction.GetParameter(pNb).GetPlainString();
+        }
+      }
+    }
+  };
+
+ private:
+  const gd::Platform &platform;
+
+  std::set<gd::String>& results;  ///< Reference to the std::set where argument
+                                  ///< values must be stored.
+  gd::String identifierType;  ///< The type of the parameters to be searched for.
+  gd::String objectName;     ///< If not empty, parameters will be taken into
+                             ///< account only if related to this object.
+};
+} // namespace
+
 std::set<gd::String> EventsIdentifiersFinder::FindAllIdentifierExpressions(
     const gd::Platform& platform,
-    const gd::Project& project,
-    const gd::Layout& layout,
+    gd::Project& project,
+    gd::Layout& layout,
     const gd::String& identifierType,
     const gd::String& contextObjectName) {
   std::set<gd::String> results;
@@ -125,161 +205,50 @@ std::set<gd::String> EventsIdentifiersFinder::FindAllIdentifierExpressions(
   // The object from the context is only relevent for object identifiers.
   auto& actualObjectName = isObjectIdentifier ? contextObjectName : "";
 
-  std::set<gd::String> results2 = FindArgumentsInEventsAndDependencies(
+  FindArgumentsInEventsAndDependencies(
+      results,
       platform,
       project,
       layout,
       identifierType,
       actualObjectName);
-  results.insert(results2.begin(), results2.end());
 
   return results;
 }
 
-std::set<gd::String> EventsIdentifiersFinder::FindArgumentsInInstructions(
+void EventsIdentifiersFinder::FindArgumentsInEventsAndDependencies(
+    std::set<gd::String>& results,
     const gd::Platform& platform,
-    const gd::Project& project,
-    const gd::Layout& layout,
-    const gd::InstructionsList& instructions,
-    bool instructionsAreConditions,
+    gd::Project& project,
+    gd::Layout& layout,
     const gd::String& identifierType,
     const gd::String& objectName) {
-  std::set<gd::String> results;
-
-  for (std::size_t aId = 0; aId < instructions.size(); ++aId) {
-    gd::String lastObjectParameter = "";
-    const gd::InstructionMetadata& instrInfos =
-        instructionsAreConditions ? MetadataProvider::GetConditionMetadata(
-                                        platform, instructions[aId].GetType())
-                                  : MetadataProvider::GetActionMetadata(
-                                        platform, instructions[aId].GetType());
-    for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
-      // The parameter has the searched type...
-      if (instrInfos.parameters[pNb].type == "identifier"
-       && instrInfos.parameters[pNb].supplementaryInformation == identifierType) {
-        //...remember the value of the parameter.
-        if (objectName.empty() || lastObjectParameter == objectName) {
-          results.insert(instructions[aId].GetParameter(pNb).GetPlainString());
-        }
-      }
-      // Search in expressions
-      else if (ParameterMetadata::IsExpression(
-                   "number", instrInfos.parameters[pNb].type) ||
-               ParameterMetadata::IsExpression(
-                   "string", instrInfos.parameters[pNb].type)) {
-        auto node = instructions[aId].GetParameter(pNb).GetRootNode();
-
-        ExpressionParameterSearcher searcher(
-            platform,
-            project,
-            layout,
-            results,
-            "identifier",
-            objectName);
-        node->Visit(searcher);
-      }
-      // Remember the value of the last "object" parameter.
-      else if (gd::ParameterMetadata::IsObject(
-                   instrInfos.parameters[pNb].type)) {
-        lastObjectParameter =
-            instructions[aId].GetParameter(pNb).GetPlainString();
-      }
-    }
-
-    if (!instructions[aId].GetSubInstructions().empty())
-      FindArgumentsInInstructions(platform,
-                                  project,
-                                  layout,
-                                  instructions[aId].GetSubInstructions(),
-                                  instructionsAreConditions,
-                                  identifierType);
-  }
-
-  return results;
-}
-
-std::set<gd::String> EventsIdentifiersFinder::FindArgumentsInEventsAndDependencies(
-    const gd::Platform& platform,
-    const gd::Project& project,
-    const gd::Layout& layout,
-    const gd::String& identifierType,
-    const gd::String& objectName) {
-  std::set<gd::String> results;
-
-  std::set<gd::String> results2 = FindArgumentsInEvents(
-      platform, project, layout, layout.GetEvents(), identifierType, objectName);
-  results.insert(results2.begin(), results2.end());
+  IdentifierFinderEventWorker eventWorker(platform,
+                                        results,
+                                        identifierType,
+                                        objectName);
+  eventWorker.Launch(layout.GetEvents(), project, layout);
 
   DependenciesAnalyzer dependenciesAnalyzer = DependenciesAnalyzer(project, layout);
   dependenciesAnalyzer.Analyze();
   for (const gd::String& externalEventName : dependenciesAnalyzer.GetExternalEventsDependencies()) {
-    const gd::ExternalEvents& externalEvents = project.GetExternalEvents(externalEventName);
+    gd::ExternalEvents& externalEvents = project.GetExternalEvents(externalEventName);
 
-    std::set<gd::String> results3 = FindArgumentsInEvents(
-        platform, project, layout, externalEvents.GetEvents(), identifierType, objectName);
-    results.insert(results3.begin(), results3.end());
+    IdentifierFinderEventWorker eventWorker(platform,
+                                          results,
+                                          identifierType,
+                                          objectName);
+    eventWorker.Launch(externalEvents.GetEvents(), project, layout);
   }
   for (const gd::String& sceneName : dependenciesAnalyzer.GetScenesDependencies()) {
-    const gd::Layout& dependencyLayout = project.GetLayout(sceneName);
+    gd::Layout& dependencyLayout = project.GetLayout(sceneName);
 
-    std::set<gd::String> results3 = FindArgumentsInEvents(
-        platform, project, dependencyLayout, dependencyLayout.GetEvents(), identifierType, objectName);
-    results.insert(results3.begin(), results3.end());
+    IdentifierFinderEventWorker eventWorker(platform,
+                                          results,
+                                          identifierType,
+                                          objectName);
+    eventWorker.Launch(dependencyLayout.GetEvents(), project, dependencyLayout);
   }
-
-  return results;
-}
-
-std::set<gd::String> EventsIdentifiersFinder::FindArgumentsInEvents(
-    const gd::Platform& platform,
-    const gd::Project& project,
-    const gd::Layout& layout,
-    const gd::EventsList& events,
-    const gd::String& identifierType,
-    const gd::String& objectName) {
-  std::set<gd::String> results;
-  for (std::size_t i = 0; i < events.size(); ++i) {
-    vector<const gd::InstructionsList*> conditionsVectors =
-        events[i].GetAllConditionsVectors();
-    for (std::size_t j = 0; j < conditionsVectors.size(); ++j) {
-      std::set<gd::String> results2 =
-          FindArgumentsInInstructions(platform,
-                                      project,
-                                      layout,
-                                      *conditionsVectors[j],
-                                      /*conditions=*/true,
-                                      identifierType,
-                                      objectName);
-      results.insert(results2.begin(), results2.end());
-    }
-
-    vector<const gd::InstructionsList*> actionsVectors =
-        events[i].GetAllActionsVectors();
-    for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
-      std::set<gd::String> results2 =
-          FindArgumentsInInstructions(platform,
-                                      project,
-                                      layout,
-                                      *actionsVectors[j],
-                                      /*conditions=*/false,
-                                      identifierType,
-                                      objectName);
-      results.insert(results2.begin(), results2.end());
-    }
-
-    if (events[i].CanHaveSubEvents()) {
-      std::set<gd::String> results2 =
-          FindArgumentsInEvents(platform,
-                                project,
-                                layout,
-                                events[i].GetSubEvents(),
-                                identifierType,
-                                objectName);
-      results.insert(results2.begin(), results2.end());
-    }
-  }
-
-  return results;
 }
 
 }  // namespace gd

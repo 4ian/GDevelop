@@ -44,82 +44,34 @@ class EventsIdentifiersFinder {
    */
   static std::set<gd::String> FindAllIdentifierExpressions(
       const gd::Platform& platform,
-      const gd::Project& project,
-      const gd::Layout& layout,
+      gd::Project& project,
+      gd::Layout& layout,
       const gd::String& identifierType,
       const gd::String& objectName = "");
 
  private:
   /**
    * Construct a list of the value of the arguments for parameters of type
-   * "identifier".
-   *
-   * \param project The project used
-   * \param project The layout used
-   * \param instructions The instructions to be analyzed
-   * \param instructionsAreConditions True if the instructions are conditions.
-   * \param identifierType The identifier type to be analyzed
-   * \param objectName If not empty, parameters will be taken into account only
-   * if the last object parameter is filled with this value.
-   *
-   * \return A std::set filled with the values used for all parameters of the
-   * specified type
-   */
-  static std::set<gd::String> FindArgumentsInInstructions(
-      const gd::Platform& platform,
-      const gd::Project& project,
-      const gd::Layout& layout,
-      const gd::InstructionsList& instructions,
-      bool instructionsAreConditions,
-      const gd::String& identifierType,
-      const gd::String& objectName = "");
-
-  /**
-   * Construct a list of the value of the arguments for parameters of type
    * "identifier". It searches in events dependencies.
    *
+   * \param results A std::set to fill with the values used for all parameters of the
+   * specified type
    * \param platform The platform of the project
    * \param project The project used
    * \param layout The layout used
    * \param events The events to be analyzed
-   * \param parameterType The parameters type to be analyzed
+   * \param identifierType The parameters type to be analyzed
    * \param objectName If not empty, parameters will be taken into account
    * only if the last object parameter is filled with
    * this value.
-   *
-   * \return A std::set filled with the values used for all parameters of the
-   * specified type
    */
-  static std::set<gd::String> FindArgumentsInEventsAndDependencies(
+  static void FindArgumentsInEventsAndDependencies(
+      std::set<gd::String>& results,
       const gd::Platform& platform,
-      const gd::Project& project,
-      const gd::Layout& layout,
-      const gd::String& parameterType,
+      gd::Project& project,
+      gd::Layout& layout,
+      const gd::String& identifierType,
       const gd::String& objectName = "");
-
-  /**
-   * Construct a list of the value of the arguments for parameters of type
-   * "identifier". It doesn't search in events dependencies.
-   *
-   * \param platform The platform of the project
-   * \param project The project used
-   * \param layout The layout used
-   * \param events The events to be analyzed
-   * \param parameterType The parameters type to be analyzed
-   * \param objectName If not empty, parameters will be taken into account
-   * only if the last object parameter is filled with
-   * this value.
-   *
-   * \return A std::set filled with the values used for all parameters of the
-   * specified type
-   */
-  static std::set<gd::String> FindArgumentsInEvents(
-      const gd::Platform& platform,
-      const gd::Project& project,
-      const gd::Layout& layout,
-      const gd::EventsList& events,
-      const gd::String& parameterType,
-      const gd::String& objectName);
 };
 
 }  // namespace gd

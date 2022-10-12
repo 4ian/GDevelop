@@ -76,8 +76,10 @@ class EventsVariablesFinder {
 
   /**
    * Construct a list of the value of the arguments for parameters of type @
-   * parameterType. It searchs in events dependencies.
+   * parameterType. It searches in events dependencies.
    *
+   * \param results A std::set to fill with the values used for all parameters of the
+   * specified type
    * \param platform The platform of the project
    * \param project The project used
    * \param layout The layout used
@@ -86,9 +88,6 @@ class EventsVariablesFinder {
    * \param objectName If not empty, parameters will be taken into account
    * only if the last object parameter is filled with
    * this value.
-   *
-   * \return A std::set filled with the values used for all parameters of the
-   * specified type
    */
   static void FindArgumentsInEventsAndDependencies(
       std::set<gd::String>& results,

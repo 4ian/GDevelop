@@ -29,7 +29,7 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { useOptimisticState } from '../../Utils/UseOptimisticState';
 
 const styles = {
-  textComment: { whiteSpace: 'pre-wrap' },
+  textComment: { whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' },
   backgroundText: { padding: 0, textAlign: 'left' },
 };
 

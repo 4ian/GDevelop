@@ -196,7 +196,7 @@ namespace gdjs {
         runtimeScene,
       }: {
         leaderboardId: string;
-        playerName?: string;
+        playerName?: string | null;
         authenticatedPlayerData?: { playerId: string; playerToken: string };
         score: number;
         scoreSavingState: ScoreSavingState;
@@ -228,6 +228,7 @@ namespace gdjs {
           ] = `player-game-token ${authenticatedPlayerData.playerToken}`;
           leaderboardEntryCreationUrl += `?playerId=${authenticatedPlayerData.playerId}`;
         } else {
+          // In case playerName is empty or undefined, the formatting will generate a random name.
           payloadObject['playerName'] = formatPlayerName(playerName);
         }
         const payload = JSON.stringify(payloadObject);

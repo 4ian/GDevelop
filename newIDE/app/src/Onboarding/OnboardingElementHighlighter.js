@@ -10,6 +10,7 @@ import {
 } from './HTMLUtils';
 import ArrowTop from '../UI/CustomSvgIcons/ArrowTop';
 import ArrowBottom from '../UI/CustomSvgIcons/ArrowBottom';
+import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 
 type Props = {|
   element: HTMLElement,
@@ -39,7 +40,6 @@ const styles = {
 function OnboardingElementHighlighter({ element }: Props) {
   const forceUpdate = useForceUpdate();
   useOnResize(forceUpdate);
-  const observerRef = React.useRef<?IntersectionObserver>(null);
   const [showHighlighter, setShowHighlighter] = React.useState<boolean>(true);
 
   const scrollParent = getScrollParent(element);
@@ -63,7 +63,7 @@ function OnboardingElementHighlighter({ element }: Props) {
   });
 
   const updateHighlighterVisibility = React.useCallback(
-    entries => {
+    (entries: IntersectionObserverEntry[]) => {
       const { isIntersecting } = entries[0];
       setShowHighlighter(isIntersecting);
       if (!isIntersecting && scrollParentRectangle) {
@@ -78,22 +78,7 @@ function OnboardingElementHighlighter({ element }: Props) {
     [forceUpdate, scrollParentRectangle, elementRectangle]
   );
 
-  React.useEffect(
-    () => {
-      observerRef.current = new IntersectionObserver(
-        updateHighlighterVisibility,
-        {
-          root: null,
-          threshold: 0.8,
-        }
-      );
-      observerRef.current.observe(element);
-      return () => {
-        if (observerRef.current) observerRef.current.disconnect();
-      };
-    },
-    [element, updateHighlighterVisibility]
-  );
+  useIsElementVisibleInScroll(element, updateHighlighterVisibility);
 
   React.useEffect(
     () => {

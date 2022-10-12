@@ -147,6 +147,23 @@ const interpolateText = (text?: string, data: { [key: string]: string }) => {
   return formattedText;
 };
 
+const isStepDone = (step: OnboardingFlowStep): boolean => {
+  const { nextStepTrigger } = step;
+  if (!nextStepTrigger) return false;
+  if (
+    nextStepTrigger.presenceOfElement &&
+    document.querySelector(nextStepTrigger.presenceOfElement)
+  ) {
+    return true;
+  } else if (
+    nextStepTrigger.absenceOfElement &&
+    !document.querySelector(nextStepTrigger.absenceOfElement)
+  ) {
+    return true;
+  }
+  return false;
+};
+
 const OnboardingProvider = (props: Props) => {
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
   const [project, setProject] = React.useState<?gdProject>(null);
@@ -173,25 +190,15 @@ const OnboardingProvider = (props: Props) => {
       }
 
       let shouldGoToStepAtIndex = undefined;
-      // Browse skippable steps in reverse orders to avoid displaying
-      // element highlighter for steps that will be skipped anyway.
+      // Browse skippable steps in reverse orders to directly go to the
+      // furthest step if possible.
       for (
         let stepIndex = indexOfNextMandatoryStep;
         stepIndex >= currentStepIndex;
         stepIndex--
       ) {
-        const { nextStepTrigger } = flow[stepIndex];
-        if (!nextStepTrigger) return;
-        if (
-          nextStepTrigger.presenceOfElement &&
-          document.querySelector(nextStepTrigger.presenceOfElement)
-        ) {
-          shouldGoToStepAtIndex = stepIndex + 1;
-          break;
-        } else if (
-          nextStepTrigger.absenceOfElement &&
-          !document.querySelector(nextStepTrigger.absenceOfElement)
-        ) {
+        const isThisStepAlreadyDone = isStepDone(flow[stepIndex]);
+        if (isThisStepAlreadyDone) {
           shouldGoToStepAtIndex = stepIndex + 1;
           break;
         }
@@ -221,8 +228,15 @@ const OnboardingProvider = (props: Props) => {
         });
       }
 
+      // Check if we can go directly to next mandatory (not-skippable) step.
+      let nextStepIndex = currentStepIndex + 1;
+      while (flow[nextStepIndex].skippable && nextStepIndex < flow.length - 1) {
+        if (isStepDone(flow[nextStepIndex])) nextStepIndex += 1;
+        else break;
+      }
+
       // Change step
-      setCurrentStepIndex(shouldGoToStepAtIndex);
+      setCurrentStepIndex(nextStepIndex);
     },
     [currentStepIndex, project]
   );

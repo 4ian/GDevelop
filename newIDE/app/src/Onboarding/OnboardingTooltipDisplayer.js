@@ -129,7 +129,6 @@ function OnboardingTooltipDisplayer({ anchorElement, tooltip }: Props) {
               enabled: true,
               offset: '0,10',
             },
-            keepTogether: { enabled: true },
           },
         }}
         style={{

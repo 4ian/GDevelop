@@ -190,16 +190,14 @@ namespace gdjs {
       const saveScore = function ({
         leaderboardId,
         playerName,
-        playerId,
-        playerToken,
+        authenticatedPlayerData,
         score,
         scoreSavingState,
         runtimeScene,
       }: {
         leaderboardId: string;
         playerName?: string;
-        playerId?: string;
-        playerToken?: string;
+        authenticatedPlayerData?: { playerId: string; playerToken: string };
         score: number;
         scoreSavingState: ScoreSavingState;
         runtimeScene: gdjs.RuntimeScene;
@@ -220,19 +218,21 @@ namespace gdjs {
               ? (window as any).location.href
               : '',
         };
-        if (playerName)
-          payloadObject['playerName'] = formatPlayerName(playerName);
-        const payload = JSON.stringify(payloadObject);
         const headers = {
           'Content-Type': 'application/json',
-          Digest: computeDigest(payload),
         };
-        if (playerToken)
-          headers['Authorization'] = `player-game-token ${playerToken}`;
         let leaderboardEntryCreationUrl = `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`;
-        if (playerId) {
-          leaderboardEntryCreationUrl += `?playerId=${playerId}`;
+        if (authenticatedPlayerData) {
+          headers[
+            'Authorization'
+          ] = `player-game-token ${authenticatedPlayerData.playerToken}`;
+          leaderboardEntryCreationUrl += `?playerId=${authenticatedPlayerData.playerId}`;
+        } else {
+          payloadObject['playerName'] = formatPlayerName(playerName);
         }
+        const payload = JSON.stringify(payloadObject);
+        headers['Digest'] = computeDigest(payload);
+
         fetch(leaderboardEntryCreationUrl, {
           body: payload,
           method: 'POST',
@@ -370,8 +370,7 @@ namespace gdjs {
 
         saveScore({
           leaderboardId,
-          playerId,
-          playerToken,
+          authenticatedPlayerData: { playerId, playerToken },
           score,
           scoreSavingState,
           runtimeScene,
@@ -443,7 +442,9 @@ namespace gdjs {
           : 'NO_DATA_ERROR';
       };
 
-      export const formatPlayerName = function (rawName: string): string {
+      export const formatPlayerName = function (
+        rawName?: string | null
+      ): string {
         if (
           !rawName ||
           typeof rawName !== 'string' ||

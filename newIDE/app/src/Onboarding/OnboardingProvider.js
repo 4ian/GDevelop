@@ -97,12 +97,23 @@ const flow: Array<OnboardingFlowStep> = [
     id: 'ApplyBehavior',
     elementToHighlightId: '#object-editor-dialog #apply-button',
     nextStepTrigger: {
-      presenceOfElement: '#object-item-1',
+      absenceOfElement: '#object-editor-dialog',
     },
     tooltip: {
       content:
         "The parameters above help you customise the behavior, but let's ignore them for now.",
       placement: 'top',
+    },
+  },
+  {
+    id: 'LaunchPreview1',
+    elementToHighlightId: '#toolbar-preview-button',
+    nextStepTrigger: {
+      presenceOfElement: '#object-item-1',
+    },
+    tooltip: {
+      content: "Let's play!",
+      placement: 'bottom',
     },
   },
 ];

@@ -75,8 +75,8 @@ namespace gdjs {
 
         isTooSoonToSaveAnotherScore(): boolean {
           return (
-            !!this.lastScoreSavingSucceededAt &&
-            Date.now() - this.lastScoreSavingSucceededAt < 500
+            !!this.lastScoreSavingStartedAt &&
+            Date.now() - this.lastScoreSavingStartedAt < 500
           );
         }
 
@@ -190,16 +190,14 @@ namespace gdjs {
       const saveScore = function ({
         leaderboardId,
         playerName,
-        playerId,
-        playerToken,
+        authenticatedPlayerData,
         score,
         scoreSavingState,
         runtimeScene,
       }: {
         leaderboardId: string;
-        playerName?: string;
-        playerId?: string;
-        playerToken?: string;
+        playerName?: string | null;
+        authenticatedPlayerData?: { playerId: string; playerToken: string };
         score: number;
         scoreSavingState: ScoreSavingState;
         runtimeScene: gdjs.RuntimeScene;
@@ -220,19 +218,22 @@ namespace gdjs {
               ? (window as any).location.href
               : '',
         };
-        if (playerName)
-          payloadObject['playerName'] = formatPlayerName(playerName);
-        const payload = JSON.stringify(payloadObject);
         const headers = {
           'Content-Type': 'application/json',
-          Digest: computeDigest(payload),
         };
-        if (playerToken)
-          headers['Authorization'] = `player-game-token ${playerToken}`;
         let leaderboardEntryCreationUrl = `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`;
-        if (playerId) {
-          leaderboardEntryCreationUrl += `?playerId=${playerId}`;
+        if (authenticatedPlayerData) {
+          headers[
+            'Authorization'
+          ] = `player-game-token ${authenticatedPlayerData.playerToken}`;
+          leaderboardEntryCreationUrl += `?playerId=${authenticatedPlayerData.playerId}`;
+        } else {
+          // In case playerName is empty or undefined, the formatting will generate a random name.
+          payloadObject['playerName'] = formatPlayerName(playerName);
         }
+        const payload = JSON.stringify(payloadObject);
+        headers['Digest'] = computeDigest(payload);
+
         fetch(leaderboardEntryCreationUrl, {
           body: payload,
           method: 'POST',
@@ -279,30 +280,42 @@ namespace gdjs {
         let scoreSavingState: ScoreSavingState;
         if (_scoreSavingStateByLeaderboard[leaderboardId]) {
           scoreSavingState = _scoreSavingStateByLeaderboard[leaderboardId];
+          let shouldStartSaving = true;
           if (
+            shouldStartSaving &&
             scoreSavingState.isAlreadySavingThisScore({ playerName, score })
           ) {
             logger.warn(
               'There is already a request to save with this player name and this score. Ignoring this one.'
             );
-            return;
+            shouldStartSaving = false;
           }
 
-          if (scoreSavingState.isSameAsLastScore({ playerName, score })) {
+          if (
+            shouldStartSaving &&
+            scoreSavingState.isSameAsLastScore({ playerName, score })
+          ) {
             logger.warn(
               'The player and score to be sent are the same as previous one. Ignoring this one.'
             );
-            const errorCode = 'SAME_AS_PREVIOUS';
-            scoreSavingState.setError(errorCode);
-            return;
+            scoreSavingState.setError('SAME_AS_PREVIOUS');
+            shouldStartSaving = false;
           }
 
-          if (scoreSavingState.isTooSoonToSaveAnotherScore()) {
+          if (
+            shouldStartSaving &&
+            scoreSavingState.isTooSoonToSaveAnotherScore()
+          ) {
             logger.warn(
               'Last entry was sent too little time ago. Ignoring this one.'
             );
-            const errorCode = 'TOO_FAST';
-            scoreSavingState.setError(errorCode);
+            scoreSavingState.setError('TOO_FAST');
+            shouldStartSaving = false;
+            // Set the starting time to cancel all the following attempts that
+            // are started too early after this one.
+            scoreSavingState.lastScoreSavingStartedAt = Date.now();
+          }
+          if (!shouldStartSaving) {
             return;
           }
         } else {
@@ -337,28 +350,42 @@ namespace gdjs {
         }
         if (_scoreSavingStateByLeaderboard[leaderboardId]) {
           scoreSavingState = _scoreSavingStateByLeaderboard[leaderboardId];
-          if (scoreSavingState.isAlreadySavingThisScore({ playerId, score })) {
+          let shouldStartSaving = true;
+          if (
+            shouldStartSaving &&
+            scoreSavingState.isAlreadySavingThisScore({ playerId, score })
+          ) {
             logger.warn(
               'There is already a request to save with this player ID and this score. Ignoring this one.'
             );
-            return;
+            shouldStartSaving = false;
           }
 
-          if (scoreSavingState.isSameAsLastScore({ playerId, score })) {
+          if (
+            shouldStartSaving &&
+            scoreSavingState.isSameAsLastScore({ playerId, score })
+          ) {
             logger.warn(
               'The player and score to be sent are the same as previous one. Ignoring this one.'
             );
-            const errorCode = 'SAME_AS_PREVIOUS';
-            scoreSavingState.setError(errorCode);
-            return;
+            scoreSavingState.setError('SAME_AS_PREVIOUS');
+            shouldStartSaving = false;
           }
 
-          if (scoreSavingState.isTooSoonToSaveAnotherScore()) {
+          if (
+            shouldStartSaving &&
+            scoreSavingState.isTooSoonToSaveAnotherScore()
+          ) {
             logger.warn(
               'Last entry was sent too little time ago. Ignoring this one.'
             );
-            const errorCode = 'TOO_FAST';
-            scoreSavingState.setError(errorCode);
+            scoreSavingState.setError('TOO_FAST');
+            shouldStartSaving = false;
+            // Set the starting time to cancel all the following attempts that
+            // are started too early after this one.
+            scoreSavingState.lastScoreSavingStartedAt = Date.now();
+          }
+          if (!shouldStartSaving) {
             return;
           }
         } else {
@@ -370,8 +397,7 @@ namespace gdjs {
 
         saveScore({
           leaderboardId,
-          playerId,
-          playerToken,
+          authenticatedPlayerData: { playerId, playerToken },
           score,
           scoreSavingState,
           runtimeScene,
@@ -443,7 +469,9 @@ namespace gdjs {
           : 'NO_DATA_ERROR';
       };
 
-      export const formatPlayerName = function (rawName: string): string {
+      export const formatPlayerName = function (
+        rawName?: string | null
+      ): string {
         if (
           !rawName ||
           typeof rawName !== 'string' ||

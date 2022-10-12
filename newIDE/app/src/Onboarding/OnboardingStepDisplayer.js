@@ -45,6 +45,11 @@ function OnboardingStepDisplayer({ step }: Props) {
         <OnboardingTooltipDisplayer
           anchorElement={elementToHighlight}
           tooltip={tooltip}
+          buttonLabel={
+            step.nextStepTrigger && step.nextStepTrigger.clickOnButton
+              ? step.nextStepTrigger.clickOnButton
+              : undefined
+          }
         />
       )}
     </>

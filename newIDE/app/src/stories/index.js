@@ -25,6 +25,7 @@ import TextEditor from '../ObjectEditor/Editors/TextEditor';
 import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
 import PanelSpriteEditor from '../ObjectEditor/Editors/PanelSpriteEditor';
 import SpriteEditor from '../ObjectEditor/Editors/SpriteEditor';
+import CustomObjectPropertiesEditor from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
 import PointsEditor from '../ObjectEditor/Editors/SpriteEditor/PointsEditor';
 import CollisionMasksEditor from '../ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor';
 import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
@@ -188,6 +189,7 @@ import {
   ExamplesAccordion,
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
+import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
 
 configureActions({
   depth: 2,
@@ -2605,135 +2607,6 @@ storiesOf('NewInstructionEditorMenu', module)
     </Column>
   ));
 
-storiesOf('TextEditor', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <SerializedObjectDisplay object={testProject.textObjectConfiguration}>
-      <TextEditor
-        objectConfiguration={testProject.textObjectConfiguration}
-        project={testProject.project}
-        resourceSources={[]}
-        onChooseResource={source =>
-          action('Choose resource from source', source)
-        }
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onSizeUpdated={() => {}}
-        objectName="FakeObjectName"
-      />
-    </SerializedObjectDisplay>
-  ));
-
-storiesOf('TiledSpriteEditor', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <SerializedObjectDisplay
-      object={testProject.tiledSpriteObjectConfiguration}
-    >
-      <TiledSpriteEditor
-        objectConfiguration={testProject.tiledSpriteObjectConfiguration}
-        project={testProject.project}
-        resourceSources={[]}
-        onChooseResource={source =>
-          action('Choose resource from source', source)
-        }
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onSizeUpdated={() => {}}
-        objectName="FakeObjectName"
-      />
-    </SerializedObjectDisplay>
-  ));
-
-storiesOf('PanelSpriteEditor', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <SerializedObjectDisplay
-      object={testProject.panelSpriteObjectConfiguration}
-    >
-      <PanelSpriteEditor
-        objectConfiguration={testProject.panelSpriteObjectConfiguration}
-        project={testProject.project}
-        resourceSources={[]}
-        onChooseResource={source =>
-          action('Choose resource from source', source)
-        }
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onSizeUpdated={() => {}}
-        objectName="FakeObjectName"
-      />
-    </SerializedObjectDisplay>
-  ));
-
-storiesOf('SpriteEditor and related editors', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('SpriteEditor', () => (
-    <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
-      <DragAndDropContextProvider>
-        <SpriteEditor
-          objectConfiguration={testProject.spriteObjectConfiguration}
-          project={testProject.project}
-          resourceSources={[]}
-          onChooseResource={source =>
-            action('Choose resource from source', source)
-          }
-          resourceExternalEditors={fakeResourceExternalEditors}
-          onSizeUpdated={() => {}}
-          objectName="FakeObjectName"
-        />
-      </DragAndDropContextProvider>
-    </SerializedObjectDisplay>
-  ))
-  .add('PointsEditor', () => (
-    <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
-      <DragAndDropContextProvider>
-        <FixedHeightFlexContainer height={500}>
-          <PointsEditor
-            objectConfiguration={testProject.spriteObjectConfiguration}
-            project={testProject.project}
-            resourcesLoader={ResourcesLoader}
-          />
-        </FixedHeightFlexContainer>
-      </DragAndDropContextProvider>
-    </SerializedObjectDisplay>
-  ))
-  .add('CollisionMasksEditor', () => (
-    <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
-      <DragAndDropContextProvider>
-        <FixedHeightFlexContainer height={500}>
-          <CollisionMasksEditor
-            objectConfiguration={testProject.spriteObjectConfiguration}
-            project={testProject.project}
-            resourcesLoader={ResourcesLoader}
-          />
-        </FixedHeightFlexContainer>
-      </DragAndDropContextProvider>
-    </SerializedObjectDisplay>
-  ));
-
-storiesOf('ShapePainterEditor', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <SerializedObjectDisplay
-      object={testProject.shapePainterObjectConfiguration}
-    >
-      <ShapePainterEditor
-        objectConfiguration={testProject.shapePainterObjectConfiguration}
-        project={testProject.project}
-        resourceSources={[]}
-        onChooseResource={source =>
-          action('Choose resource from source', source)
-        }
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onSizeUpdated={() => {}}
-        objectName="FakeObjectName"
-      />
-    </SerializedObjectDisplay>
-  ));
-
 storiesOf('ImageThumbnail', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
@@ -2774,6 +2647,7 @@ storiesOf('ObjectsList', module)
             onChooseResource={() => Promise.reject('unimplemented')}
             resourceExternalEditors={fakeResourceExternalEditors}
             onEditObject={action('On edit object')}
+            onExportObject={action('On export object')}
             onAddObjectInstance={action('On add instance to the scene')}
             onObjectCreated={action('On object created')}
             selectedObjectNames={[]}
@@ -2805,6 +2679,7 @@ storiesOf('ObjectsList', module)
             onChooseResource={() => Promise.reject('unimplemented')}
             resourceExternalEditors={fakeResourceExternalEditors}
             onEditObject={action('On edit object')}
+            onExportObject={action('On export object')}
             onAddObjectInstance={action('On add instance to the scene')}
             onObjectCreated={action('On object created')}
             selectedObjectNames={[]}

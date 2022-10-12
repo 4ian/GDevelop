@@ -143,7 +143,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
       throttle(
         (e: MouseEvent) => {
           if (!canvasWidth.current) {
-            console.error('canvasHeight not initialized');
+            console.error('canvasWidth not initialized');
             return;
           }
           const newMousePosition = e.clientX;
@@ -402,21 +402,21 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
     <FullSizeMeasurer>
       {({ width, height }) => (
         <div style={styles.container}>
-          <InstancesEditor
-            onViewPositionChanged={
-              screenType !== 'touch' ? handleViewPositionChange : noop
-            }
-            ref={(editor: ?InstancesEditor) => {
-              wrappedEditorRef && wrappedEditorRef(editor);
-              if (editor) {
-                editorRef.current = editor;
+          {!!width && !!height && (
+            <InstancesEditor
+              onViewPositionChanged={
+                screenType !== 'touch' ? handleViewPositionChange : noop
               }
-            }}
-            width={width}
-            height={height}
-            screenType={screenType}
-            {...otherProps}
-          />
+              ref={(editor: ?InstancesEditor) => {
+                wrappedEditorRef && wrappedEditorRef(editor);
+                editorRef.current = editor;
+              }}
+              width={width}
+              height={height}
+              screenType={screenType}
+              {...otherProps}
+            />
+          )}
           {screenType !== 'touch' && (
             <div
               style={styles.yScrollbarDetectionZone}

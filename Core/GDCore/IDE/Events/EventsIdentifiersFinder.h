@@ -33,14 +33,16 @@ class EventsIdentifiersFinder {
   virtual ~EventsIdentifiersFinder(){};
 
   /**
-   * Construct a list containing the expression of all identifiers used in the
-   * layout.
+   * Construct a list containing all the expressions for a given identifier used
+   * in the layout.
    *
-   * \param project The project
+   * \param project The project to use.
    * \param layout The layout to use.
-   * \param  identifierType The identifier to search.
-   * \param  objectName The object to be scanned if any.
-   * \return A std::set containing the names of all object variables used.
+   * \param  identifierType The identifier type to be analyzed.
+   * \param  objectName If not empty, parameters will be taken into account
+   * only if the last object parameter is filled with
+   * this value.
+   * \return A std::set containing the names of all identifiers used.
    */
   static std::set<gd::String> FindAllIdentifierExpressions(
       const gd::Platform& platform,
@@ -51,16 +53,16 @@ class EventsIdentifiersFinder {
 
  private:
   /**
-   * Construct a list of the value of the arguments for parameters of type
-   * "identifier". It searches in events dependencies.
+   * Construct a list containing all the expressions for a given identifier used
+   * in the layout. It searches in events dependencies.
    *
-   * \param results A std::set to fill with the values used for all parameters of the
-   * specified type
+   * \param results A std::set to fill with the expressions used for all parameters of the
+   * specified identifier type
    * \param platform The platform of the project
-   * \param project The project used
-   * \param layout The layout used
+   * \param project The project to use.
+   * \param layout The layout to use.
    * \param events The events to be analyzed
-   * \param identifierType The parameters type to be analyzed
+   * \param identifierType The identifier type to be analyzed
    * \param objectName If not empty, parameters will be taken into account
    * only if the last object parameter is filled with
    * this value.

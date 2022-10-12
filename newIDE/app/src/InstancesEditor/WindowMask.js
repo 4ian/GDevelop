@@ -40,13 +40,11 @@ export default class WindowMask {
       return;
     }
 
-    const width = this.project.getGameResolutionWidth();
-    const height = this.project.getGameResolutionHeight();
     this.windowRectangle.setThroughCenter({
       centerX: this.viewPosition.getViewX(),
       centerY: this.viewPosition.getViewY(),
-      width,
-      height,
+      width: this.project.getGameResolutionWidth(),
+      height: this.project.getGameResolutionHeight(),
     });
 
     const displayedRectangle = transformRect(

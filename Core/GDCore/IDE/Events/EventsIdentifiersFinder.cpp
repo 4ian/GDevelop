@@ -32,16 +32,16 @@ namespace {
 class GD_CORE_API IdentifierFinderExpressionNodeWorker
     : public ExpressionParser2NodeWorker {
  public:
-  IdentifierFinderExpressionNodeWorker(const gd::Platform &platform_,
+  IdentifierFinderExpressionNodeWorker(std::set<gd::String>& results_,
+                              const gd::Platform &platform_,
                               const gd::ObjectsContainer &globalObjectsContainer_,
                               const gd::ObjectsContainer &objectsContainer_,
-                              std::set<gd::String>& results_,
                               const gd::String& identifierType_,
                               const gd::String& objectName_ = "")
-      : platform(platform_),
+      : results(results_),
+        platform(platform_),
         globalObjectsContainer(globalObjectsContainer_),
         objectsContainer(objectsContainer_),
-        results(results_),
         identifierType(identifierType_),
         objectName(objectName_){};
   virtual ~IdentifierFinderExpressionNodeWorker(){};
@@ -127,12 +127,12 @@ class GD_CORE_API IdentifierFinderExpressionNodeWorker
 class GD_CORE_API IdentifierFinderEventWorker
     : public ArbitraryEventsWorkerWithContext {
  public:
-  IdentifierFinderEventWorker(const gd::Platform &platform_,
-                              std::set<gd::String>& results_,
+  IdentifierFinderEventWorker(std::set<gd::String>& results_,
+                              const gd::Platform &platform_,
                               const gd::String& identifierType_,
                               const gd::String& objectName_ = "")
-      : platform(platform_),
-        results(results_),
+      : results(results_),
+        platform(platform_),
         identifierType(identifierType_),
         objectName(objectName_){};
   virtual ~IdentifierFinderEventWorker(){};
@@ -164,10 +164,10 @@ class GD_CORE_API IdentifierFinderEventWorker
           auto node = instruction.GetParameter(pNb).GetRootNode();
 
           IdentifierFinderExpressionNodeWorker searcher(
+              results,
               platform,
               GetGlobalObjectsContainer(),
               GetObjectsContainer(),
-              results,
               identifierType,
               objectName);
           node->Visit(searcher);
@@ -223,8 +223,8 @@ void EventsIdentifiersFinder::FindArgumentsInEventsAndDependencies(
     gd::Layout& layout,
     const gd::String& identifierType,
     const gd::String& objectName) {
-  IdentifierFinderEventWorker eventWorker(platform,
-                                        results,
+  IdentifierFinderEventWorker eventWorker(results,
+                                        platform,
                                         identifierType,
                                         objectName);
   eventWorker.Launch(layout.GetEvents(), project, layout);
@@ -234,8 +234,8 @@ void EventsIdentifiersFinder::FindArgumentsInEventsAndDependencies(
   for (const gd::String& externalEventName : dependenciesAnalyzer.GetExternalEventsDependencies()) {
     gd::ExternalEvents& externalEvents = project.GetExternalEvents(externalEventName);
 
-    IdentifierFinderEventWorker eventWorker(platform,
-                                          results,
+    IdentifierFinderEventWorker eventWorker(results,
+                                          platform,
                                           identifierType,
                                           objectName);
     eventWorker.Launch(externalEvents.GetEvents(), project, layout);
@@ -243,8 +243,8 @@ void EventsIdentifiersFinder::FindArgumentsInEventsAndDependencies(
   for (const gd::String& sceneName : dependenciesAnalyzer.GetScenesDependencies()) {
     gd::Layout& dependencyLayout = project.GetLayout(sceneName);
 
-    IdentifierFinderEventWorker eventWorker(platform,
-                                          results,
+    IdentifierFinderEventWorker eventWorker(results,
+                                          platform,
                                           identifierType,
                                           objectName);
     eventWorker.Launch(dependencyLayout.GetEvents(), project, dependencyLayout);

@@ -32,16 +32,16 @@ namespace {
 class GD_CORE_API VariableFinderExpressionNodeWorker
     : public ExpressionParser2NodeWorker {
  public:
-  VariableFinderExpressionNodeWorker(const gd::Platform &platform_,
+  VariableFinderExpressionNodeWorker(std::set<gd::String>& results_,
+                              const gd::Platform &platform_,
                               const gd::ObjectsContainer &globalObjectsContainer_,
                               const gd::ObjectsContainer &objectsContainer_,
-                              std::set<gd::String>& results_,
                               const gd::String& parameterType_,
                               const gd::String& objectName_ = "")
-      : platform(platform_),
+      : results(results_),
+        platform(platform_),
         globalObjectsContainer(globalObjectsContainer_),
         objectsContainer(objectsContainer_),
-        results(results_),
         parameterType(parameterType_),
         objectName(objectName_){};
   virtual ~VariableFinderExpressionNodeWorker(){};
@@ -126,12 +126,12 @@ class GD_CORE_API VariableFinderExpressionNodeWorker
 class GD_CORE_API VariableFinderEventWorker
     : public ArbitraryEventsWorkerWithContext {
  public:
-  VariableFinderEventWorker(const gd::Platform &platform_,
-                              std::set<gd::String>& results_,
+  VariableFinderEventWorker(std::set<gd::String>& results_,
+                              const gd::Platform &platform_,
                               const gd::String& parameterType_,
                               const gd::String& objectName_ = "")
-      : platform(platform_),
-        results(results_),
+      : results(results_),
+        platform(platform_),
         parameterType(parameterType_),
         objectName(objectName_){};
   virtual ~VariableFinderEventWorker(){};
@@ -161,10 +161,10 @@ class GD_CORE_API VariableFinderEventWorker
           auto node = instruction.GetParameter(pNb).GetRootNode();
 
           VariableFinderExpressionNodeWorker searcher(
+              results,
               platform,
               GetGlobalObjectsContainer(),
               GetObjectsContainer(),
-              results,
               parameterType,
               objectName);
           node->Visit(searcher);
@@ -248,8 +248,8 @@ void EventsVariablesFinder::FindArgumentsInEventsAndDependencies(
     const gd::String& parameterType,
     const gd::String& objectName) {
 
-  VariableFinderEventWorker eventWorker(platform,
-                                        results,
+  VariableFinderEventWorker eventWorker(results,
+                                        platform,
                                         parameterType,
                                         objectName);
   eventWorker.Launch(layout.GetEvents(), project, layout);
@@ -259,8 +259,8 @@ void EventsVariablesFinder::FindArgumentsInEventsAndDependencies(
   for (const gd::String& externalEventName : dependenciesAnalyzer.GetExternalEventsDependencies()) {
     gd::ExternalEvents& externalEvents = project.GetExternalEvents(externalEventName);
 
-    VariableFinderEventWorker eventWorker(platform,
-                                          results,
+    VariableFinderEventWorker eventWorker(results,
+                                          platform,
                                           parameterType,
                                           objectName);
     eventWorker.Launch(externalEvents.GetEvents(), project, layout);
@@ -268,8 +268,8 @@ void EventsVariablesFinder::FindArgumentsInEventsAndDependencies(
   for (const gd::String& sceneName : dependenciesAnalyzer.GetScenesDependencies()) {
     gd::Layout& dependencyLayout = project.GetLayout(sceneName);
 
-    VariableFinderEventWorker eventWorker(platform,
-                                          results,
+    VariableFinderEventWorker eventWorker(results,
+                                          platform,
                                           parameterType,
                                           objectName);
     eventWorker.Launch(dependencyLayout.GetEvents(), project, dependencyLayout);

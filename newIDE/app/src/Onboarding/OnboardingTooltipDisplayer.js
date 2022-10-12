@@ -34,8 +34,7 @@ const styles = {
 
 const useClasses = makeStyles({
   popper: {
-    position: 'relative',
-    '&[x-placement*="bottom"] $arrow': {
+    '&[x-placement*="bottom"] #arrow-popper': {
       top: 0,
       left: 0,
       marginTop: '-0.71em',
@@ -45,7 +44,7 @@ const useClasses = makeStyles({
         transformOrigin: '0 100%',
       },
     },
-    '&[x-placement*="top"] $arrow': {
+    '&[x-placement*="top"] #arrow-popper': {
       bottom: 0,
       left: 0,
       marginBottom: '-0.71em',
@@ -55,7 +54,7 @@ const useClasses = makeStyles({
         transformOrigin: '100% 0',
       },
     },
-    '&[x-placement*="right"] $arrow': {
+    '&[x-placement*="right"] #arrow-popper': {
       left: 0,
       marginLeft: '-0.71em',
       height: '1em',
@@ -66,7 +65,7 @@ const useClasses = makeStyles({
         transformOrigin: '100% 100%',
       },
     },
-    '&[x-placement*="left"] $arrow': {
+    '&[x-placement*="left"] #arrow-popper': {
       right: 0,
       marginRight: '-0.71em',
       height: '1em',
@@ -82,10 +81,10 @@ const useClasses = makeStyles({
     overflow: 'hidden',
     position: 'absolute',
     width: '1em',
-    height: '0.71em',
     /* = width / sqrt(2) = (length of the hypotenuse) */
+    height: '0.71em',
     boxSizing: 'border-box',
-    color: 'white',
+    color: '#FAFAFA',
     '&::before': {
       content: '""',
       margin: 'auto',
@@ -112,6 +111,8 @@ function OnboardingTooltipDisplayer({ anchorElement, tooltip }: Props) {
 
   const arrowRef = React.useRef<?HTMLSpanElement>(null);
   const classes = useClasses();
+  const placement = tooltip.placement || 'bottom';
+
   return (
     <>
       <Popper
@@ -120,12 +121,15 @@ function OnboardingTooltipDisplayer({ anchorElement, tooltip }: Props) {
         className={classes.popper}
         anchorEl={anchorElement}
         transition
-        placement={tooltip.placement}
+        placement={placement}
         popperOptions={{
           modifiers: {
-            name: 'arrow',
-            enabled: true,
-            options: { element: arrowRef },
+            arrow: { enabled: true, element: '#arrow-popper' },
+            offset: {
+              enabled: true,
+              offset: '0,10',
+            },
+            keepTogether: { enabled: true },
           },
         }}
         style={{
@@ -152,9 +156,13 @@ function OnboardingTooltipDisplayer({ anchorElement, tooltip }: Props) {
                     </Typography>
                   )}
                 </ColumnStackLayout>
+                <span
+                  id="arrow-popper"
+                  className={classes.arrow}
+                  ref={arrowRef}
+                />
               </Paper>
             </Fade>
-            <span id="arrow-popper" className={classes.arrow} ref={arrowRef} />
           </>
         )}
       </Popper>

@@ -19,10 +19,13 @@ function ConfirmProvider({ children }: Props) {
     alertDialogConfig,
     setAlertDialogConfig,
   ] = React.useState<?ShowAlertDialogOptionsWithCallback>(null);
-  const openAlertDialog = (options: ShowAlertDialogOptionsWithCallback) => {
-    setAlertDialogOpen(true);
-    setAlertDialogConfig(options);
-  };
+  const openAlertDialog = React.useCallback(
+    (options: ShowAlertDialogOptionsWithCallback) => {
+      setAlertDialogOpen(true);
+      setAlertDialogConfig(options);
+    },
+    []
+  );
 
   // Confirm
   const [confirmDialogOpen, setConfirmDialogOpen] = React.useState<boolean>(
@@ -32,10 +35,13 @@ function ConfirmProvider({ children }: Props) {
     confirmDialogConfig,
     setConfirmDialogConfig,
   ] = React.useState<?ShowConfirmDialogOptionsWithCallback>(null);
-  const openConfirmDialog = (options: ShowConfirmDialogOptionsWithCallback) => {
-    setConfirmDialogOpen(true);
-    setConfirmDialogConfig(options);
-  };
+  const openConfirmDialog = React.useCallback(
+    (options: ShowConfirmDialogOptionsWithCallback) => {
+      setConfirmDialogOpen(true);
+      setConfirmDialogConfig(options);
+    },
+    []
+  );
 
   // Confirm Delete
   const [
@@ -46,12 +52,13 @@ function ConfirmProvider({ children }: Props) {
     confirmDeleteDialogConfig,
     setConfirmDeleteDialogConfig,
   ] = React.useState<?ShowConfirmDeleteDialogOptionsWithCallback>(null);
-  const openConfirmDeleteDialog = (
-    options: ShowConfirmDeleteDialogOptionsWithCallback
-  ) => {
-    setConfirmDeleteDialogOpen(true);
-    setConfirmDeleteDialogConfig(options);
-  };
+  const openConfirmDeleteDialog = React.useCallback(
+    (options: ShowConfirmDeleteDialogOptionsWithCallback) => {
+      setConfirmDeleteDialogOpen(true);
+      setConfirmDeleteDialogConfig(options);
+    },
+    []
+  );
 
   return (
     <AlertContext.Provider

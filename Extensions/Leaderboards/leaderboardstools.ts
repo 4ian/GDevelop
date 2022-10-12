@@ -75,8 +75,8 @@ namespace gdjs {
 
         isTooSoonToSaveAnotherScore(): boolean {
           return (
-            !!this.lastScoreSavingSucceededAt &&
-            Date.now() - this.lastScoreSavingSucceededAt < 500
+            !!this.lastScoreSavingStartedAt &&
+            Date.now() - this.lastScoreSavingStartedAt < 500
           );
         }
 

@@ -40,7 +40,7 @@ type Props = {|
 
     // Allow to specify that the text should break words
     overflow?: 'hidden',
-    overflowWrap?: 'break-word',
+    overflowWrap?: 'break-word' | 'anywhere',
     whiteSpace?: 'nowrap' | 'pre-wrap',
     textOverflow?: 'ellipsis',
 

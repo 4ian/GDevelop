@@ -45,6 +45,7 @@ export const Default = () => (
           onObjectSelected={() => {}}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
           onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
+          canInstallPrivateAsset={() => false}
         />
       </div>
     </SerializedObjectDisplay>
@@ -81,6 +82,7 @@ export const WithTags = () => (
           onObjectSelected={() => {}}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
           onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
+          canInstallPrivateAsset={() => false}
         />
       </div>
     </SerializedObjectDisplay>

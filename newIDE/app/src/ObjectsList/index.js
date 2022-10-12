@@ -127,6 +127,7 @@ type Props = {|
   onChangeSelectedObjectTags: SelectedTags => void,
 
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
+  onExportObject?: (object: gdObject) => void,
   onObjectCreated: gdObject => void,
   onObjectSelected: string => void,
   onObjectPasted?: gdObject => void,
@@ -577,6 +578,14 @@ export default class ObjectsList extends React.Component<Props, State> {
         click: () => this.props.onEditObject(object, 'effects'),
         enabled: !objectMetadata.isUnsupportedBaseObjectCapability('effect'),
       },
+      this.props.onExportObject &&
+      this.props.project.hasEventsBasedObject(object.getType())
+        ? {
+            label: i18n._(t`Export object`),
+            click: () =>
+              this.props.onExportObject && this.props.onExportObject(object),
+          }
+        : null,
       { type: 'separator' },
       {
         label: i18n._(t`Rename`),

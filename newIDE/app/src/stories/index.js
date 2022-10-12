@@ -2647,6 +2647,7 @@ storiesOf('ObjectsList', module)
             onChooseResource={() => Promise.reject('unimplemented')}
             resourceExternalEditors={fakeResourceExternalEditors}
             onEditObject={action('On edit object')}
+            onExportObject={action('On export object')}
             onAddObjectInstance={action('On add instance to the scene')}
             onObjectCreated={action('On object created')}
             selectedObjectNames={[]}
@@ -2677,6 +2678,7 @@ storiesOf('ObjectsList', module)
             onChooseResource={() => Promise.reject('unimplemented')}
             resourceExternalEditors={fakeResourceExternalEditors}
             onEditObject={action('On edit object')}
+            onExportObject={action('On export object')}
             onAddObjectInstance={action('On add instance to the scene')}
             onObjectCreated={action('On object created')}
             selectedObjectNames={[]}

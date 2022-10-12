@@ -17,6 +17,7 @@ import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
 import LayerEditorDialog from '../LayersList/LayerEditorDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
+import { ObjectExporterDialog } from '../ObjectEditor/ObjectExporterDialog';
 import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
 import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
@@ -139,6 +140,7 @@ type State = {|
   layerRemoved: ?string,
   editedLayer: ?gdLayer,
   editedLayerInitialTab: 'properties' | 'effects',
+  exportedObjectWithContext: ?ObjectWithContext,
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
@@ -191,6 +193,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layerRemoved: null,
       editedLayer: null,
       editedLayerInitialTab: 'properties',
+      exportedObjectWithContext: null,
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
@@ -380,6 +383,22 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.setState({
         editedObjectWithContext: null,
         editedObjectInitialTab: 'properties',
+      });
+    }
+  };
+
+  exportObject = (editedObject: ?gdObject) => {
+    if (editedObject) {
+      this.setState({
+        exportedObjectWithContext: {
+          object: editedObject,
+          // It's not important for the export.
+          global: false,
+        },
+      });
+    } else {
+      this.setState({
+        exportedObjectWithContext: null,
       });
     }
   };
@@ -1385,6 +1404,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onChooseResource={onChooseResource}
                 selectedObjectNames={this.state.selectedObjectNames}
                 onEditObject={this.props.onEditObject || this.editObject}
+                onExportObject={this.exportObject}
                 onDeleteObject={this._onDeleteObject(i18n)}
                 canRenameObject={newName =>
                   this._canObjectOrGroupUseNewName(newName, i18n)
@@ -1540,6 +1560,14 @@ export default class SceneEditor extends React.Component<Props, State> {
             </React.Fragment>
           )}
         </I18n>
+        {this.state.exportedObjectWithContext && (
+          <ObjectExporterDialog
+            object={this.state.exportedObjectWithContext.object}
+            onClose={() => {
+              this.exportObject(null);
+            }}
+          />
+        )}
         {!!this.state.editedGroup && (
           <ObjectGroupEditorDialog
             project={project}

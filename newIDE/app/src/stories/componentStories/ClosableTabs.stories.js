@@ -268,6 +268,7 @@ export const WithObjectsList = () => (
                   onChooseResource={() => Promise.reject('unimplemented')}
                   resourceExternalEditors={fakeResourceExternalEditors}
                   onEditObject={action('On edit object')}
+                  onExportObject={action('On export object')}
                   onAddObjectInstance={action('On add instance to the scene')}
                   selectedObjectNames={[]}
                   selectedObjectTags={[]}

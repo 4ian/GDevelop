@@ -7,9 +7,9 @@ import { getLastObjectParameterValue } from './ParameterMetadataTools';
 
 const gd: libGDevelop = global.gd;
 
-type Props = {
+type Props = {|
   ...ParameterFieldProps,
-};
+|};
 
 export const IdentifierField = (props: Props) => {
   const {
@@ -34,6 +34,9 @@ export const IdentifierField = (props: Props) => {
 
   const autocompletionIdentifierNames: ExpressionAutocompletion[] = React.useMemo(
     () => {
+      if (!parameterIndex) {
+        return [];
+      }
       const parameterMetadata = instructionMetadata
         ? instructionMetadata.getParameter(parameterIndex)
         : expressionMetadata
@@ -56,14 +59,9 @@ export const IdentifierField = (props: Props) => {
               .toJSArray()
           : [];
 
-      console.log('identifierName: ' + identifierName);
-      console.log('objectName: ' + objectName);
-      console.log(allIdentifierExpressions);
-
       return allIdentifierExpressions.map(expression => ({
         kind: 'FullExpression',
         completion: expression,
-        shouldConvertToString: false,
       }));
     },
     [

@@ -14,9 +14,9 @@ const flow: Array<OnboardingFlowStep> = [
     nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
     tooltip: {
       placement: 'left',
-      title: "let's create an object",
+      title: "let's create an **object**",
       description:
-        '👉 Everything you see in a game is an object: your character, the enemies, coins and potions, platforms or trees, ...',
+        '👉 Everything you see in a game is an **object**: your character, the enemies, coins and potions, platforms or trees, ...',
       },
   },
   {

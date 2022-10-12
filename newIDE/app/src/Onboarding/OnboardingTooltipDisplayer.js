@@ -9,6 +9,7 @@ import { getDisplayZIndexForHighlighter } from './HTMLUtils';
 import { type OnboardingTooltip } from './OnboardingContext';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { makeStyles } from '@material-ui/core/styles';
+import { MarkdownText } from '../UI/MarkdownText';
 
 type Props = {|
   anchorElement: HTMLElement,
@@ -143,7 +144,7 @@ function OnboardingTooltipDisplayer({ anchorElement, tooltip }: Props) {
                 <ColumnStackLayout noMargin>
                   {tooltip.title && (
                     <Typography style={styles.title} variant="subtitle1">
-                      {tooltip.title}
+                      <MarkdownText source={tooltip.title} />
                     </Typography>
                   )}
                   {tooltip.title && tooltip.description && (
@@ -151,7 +152,7 @@ function OnboardingTooltipDisplayer({ anchorElement, tooltip }: Props) {
                   )}
                   {tooltip.description && (
                     <Typography style={styles.description}>
-                      {tooltip.description}
+                      <MarkdownText source={tooltip.description} />
                     </Typography>
                   )}
                 </ColumnStackLayout>

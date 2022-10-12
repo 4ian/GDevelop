@@ -26,41 +26,8 @@ import EffectsList from '../EffectsList';
 import VariablesList from '../VariablesList/VariablesList';
 import { sendBehaviorsEditorShown } from '../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
-import CloudUpload from '@material-ui/icons/CloudUpload';
-import { LineStackLayout } from '../UI/Layout';
-import RaisedButton from '../UI/RaisedButton';
-import Text from '../UI/Text';
-import EventsFunctionsExtensionsContext, {
-  type EventsFunctionsExtensionsState,
-} from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import Window from '../Utils/Window';
 
 const gd: libGDevelop = global.gd;
-
-const exportCustomObject = (
-  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
-  customObject: gdObject
-) => {
-  const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
-  if (!eventsFunctionsExtensionWriter)
-    return Promise.reject(new Error('Not supported'));
-
-  return eventsFunctionsExtensionWriter
-    .chooseCustomObjectFile(customObject.getName())
-    .then(pathOrUrl => {
-      if (!pathOrUrl) return;
-
-      eventsFunctionsExtensionWriter
-        .writeCustomObject(customObject, pathOrUrl)
-        .then();
-    });
-};
-
-const openGitHubIssue = () => {
-  Window.openExternalURL(
-    'https://github.com/4ian/GDevelop/issues/new?assignees=&labels=%F0%9F%93%A6+Asset+Store+submission&template=--asset-store-submission.md&title='
-  );
-};
 
 export type ObjectEditorTab =
   | 'properties'
@@ -102,16 +69,10 @@ type InnerDialogProps = {|
 |};
 
 const InnerDialog = (props: InnerDialogProps) => {
-  const eventsFunctionsExtensionsState = React.useContext(
-    EventsFunctionsExtensionsContext
-  );
-  const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
-
   const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     props.initialTab || 'properties'
   );
   const [newObjectName, setNewObjectName] = React.useState(props.objectName);
-  const [exportDialogOpen, setExportDialogOpen] = React.useState(false);
   const forceUpdate = useForceUpdate();
   const onCancelChanges = useSerializableObjectCancelableEditor({
     serializableObject: props.object,
@@ -171,17 +132,6 @@ const InnerDialog = (props: InnerDialogProps) => {
       ]}
       secondaryActions={[
         <HelpButton key="help-button" helpPagePath={props.helpPagePath} />,
-        eventsFunctionsExtensionWriter &&
-        props.project.hasEventsBasedObject(props.object.getType()) ? (
-          <FlatButton
-            leftIcon={<CloudUpload />}
-            key="export"
-            label={<Trans>Export object</Trans>}
-            onClick={() => {
-              setExportDialogOpen(true);
-            }}
-          />
-        ) : null,
         <HotReloadPreviewButton
           key="hot-reload-preview-button"
           {...props.hotReloadPreviewButtonProps}
@@ -319,58 +269,6 @@ const InnerDialog = (props: InnerDialogProps) => {
             forceUpdate /*Force update to ensure dialog is properly positionned*/
           }
         />
-      )}
-      {exportDialogOpen && (
-        <Dialog
-          secondaryActions={[
-            <HelpButton
-              key="help"
-              helpPagePath="/community/contribute-to-the-assets-store"
-            />,
-          ]}
-          actions={[
-            <FlatButton
-              label={<Trans>Close</Trans>}
-              keyboardFocused={true}
-              onClick={() => {
-                setExportDialogOpen(false);
-              }}
-              key="close"
-            />,
-          ]}
-          open
-          onRequestClose={() => {
-            setExportDialogOpen(false);
-          }}
-        >
-          <Column expand>
-            <Line>
-              <Text>
-                <Trans>
-                  You can export the object to a file to submit it for the asset
-                  store.
-                </Trans>
-              </Text>
-            </Line>
-            <LineStackLayout>
-              <RaisedButton
-                icon={<CloudUpload />}
-                primary
-                label={<Trans>Export to a file</Trans>}
-                onClick={() => {
-                  exportCustomObject(
-                    eventsFunctionsExtensionsState,
-                    props.object
-                  );
-                }}
-              />
-              <FlatButton
-                label={<Trans>Submit objects to the community</Trans>}
-                onClick={openGitHubIssue}
-              />
-            </LineStackLayout>
-          </Column>
-        </Dialog>
       )}
     </Dialog>
   );

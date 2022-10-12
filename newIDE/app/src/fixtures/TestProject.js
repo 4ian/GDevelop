@@ -8,6 +8,7 @@ export type TestProject = {|
   tiledSpriteObjectConfiguration: gdObjectConfiguration,
   panelSpriteObjectConfiguration: gdObjectConfiguration,
   spriteObjectConfiguration: gdSpriteObject,
+  customObjectConfiguration: gdObjectConfiguration,
   spriteObject: gdObject,
   spriteObjectWithBehaviors: gdObject,
   spriteObjectWithoutBehaviors: gdObject,
@@ -106,8 +107,71 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   project.getResourcesManager().addResource(jsonResource2);
   project.getResourcesManager().addResource(jsonResource3);
 
+  const buttonExtension = project.insertNewEventsFunctionsExtension(
+    'Button',
+    0
+  );
+  const buttonEventBasedObject = buttonExtension
+    .getEventsBasedObjects()
+    .insertNew('PanelSpriteButton', 0);
+  const buttonProperties = buttonEventBasedObject.getPropertyDescriptors();
+  buttonProperties
+    .insertNew('PressedLabelOffsetY', 0)
+    .setType('number')
+    .setLabel('Label offset on Y axis when pressed');
+  buttonProperties
+    .insertNew('LeftPadding', 1)
+    .setType('number')
+    .setLabel('Left padding')
+    .setGroup('Padding');
+  buttonProperties
+    .insertNew('RightPadding', 2)
+    .setType('number')
+    .setLabel('Right padding')
+    .setGroup('Padding');
+  buttonProperties
+    .insertNew('TopPadding', 3)
+    .setType('number')
+    .setLabel('Top padding')
+    .setGroup('Padding');
+  buttonProperties
+    .insertNew('DownPadding', 4)
+    .setType('number')
+    .setLabel('Down padding')
+    .setGroup('Padding');
+  buttonEventBasedObject.insertNewObject(
+    project,
+    'TextObject::Text',
+    'Label',
+    0
+  );
+  buttonEventBasedObject.insertNewObject(
+    project,
+    'PanelSpriteObject::PanelSprite',
+    'Idle',
+    1
+  );
+  buttonEventBasedObject.insertNewObject(
+    project,
+    'PanelSpriteObject::PanelSprite',
+    'Hovered',
+    2
+  );
+  buttonEventBasedObject.insertNewObject(
+    project,
+    'PanelSpriteObject::PanelSprite',
+    'Pressed',
+    3
+  );
+
   // Create and expose some objects
   const testLayout = project.insertNewLayout('TestLayout', 0);
+  const customObject = testLayout.insertNewObject(
+    project,
+    'Button::PanelSpriteButton',
+    'MyButton',
+    0
+  );
   const shapePainterObject = testLayout.insertNewObject(
     project,
     'PrimitiveDrawing::Drawer',
@@ -740,6 +804,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     textObjectConfiguration: textObject.getConfiguration(),
     tiledSpriteObjectConfiguration: tiledSpriteObject.getConfiguration(),
     panelSpriteObjectConfiguration: panelSpriteObject.getConfiguration(),
+    customObjectConfiguration: customObject.getConfiguration(),
     spriteObject,
     spriteObjectConfiguration,
     testSpriteObjectInstance,

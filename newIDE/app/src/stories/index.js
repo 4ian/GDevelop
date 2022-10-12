@@ -25,6 +25,7 @@ import TextEditor from '../ObjectEditor/Editors/TextEditor';
 import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
 import PanelSpriteEditor from '../ObjectEditor/Editors/PanelSpriteEditor';
 import SpriteEditor from '../ObjectEditor/Editors/SpriteEditor';
+import CustomObjectPropertiesEditor from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
 import PointsEditor from '../ObjectEditor/Editors/SpriteEditor/PointsEditor';
 import CollisionMasksEditor from '../ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor';
 import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
@@ -2654,6 +2655,25 @@ storiesOf('PanelSpriteEditor', module)
     >
       <PanelSpriteEditor
         objectConfiguration={testProject.panelSpriteObjectConfiguration}
+        project={testProject.project}
+        resourceSources={[]}
+        onChooseResource={source =>
+          action('Choose resource from source', source)
+        }
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onSizeUpdated={() => {}}
+        objectName="FakeObjectName"
+      />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('CustomObjectPropertiesEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={testProject.customObjectConfiguration}>
+      <CustomObjectPropertiesEditor
+        objectConfiguration={testProject.customObjectConfiguration}
         project={testProject.project}
         resourceSources={[]}
         onChooseResource={source =>

@@ -72,11 +72,11 @@ export default class LocalEventsFunctionsExtensionWriter {
         title: 'Export an object of the project',
         filters: [
           {
-            name: 'GDevelop 5 "events based" extension',
-            extensions: ['json'],
+            name: 'GDevelop 5 object configuration',
+            extensions: ['gdo'],
           },
         ],
-        defaultPath: objectName || 'Object.json',
+        defaultPath: objectName || 'Object',
       })
       .then(({ filePath }) => {
         if (!filePath) return null;

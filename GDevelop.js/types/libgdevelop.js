@@ -51,6 +51,7 @@ declare class libGDevelop {
   SetString: Class<gdSetString>;
   ProjectHelper: Class<gdProjectHelper>;
   EventsVariablesFinder: Class<gdEventsVariablesFinder>;
+  EventsIdentifiersFinder: Class<gdEventsIdentifiersFinder>;
   InstructionOrExpressionGroupMetadata: Class<gdInstructionOrExpressionGroupMetadata>;
   VersionWrapper: Class<gdVersionWrapper>;
   Platform: Class<gdPlatform>;

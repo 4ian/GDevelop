@@ -2,13 +2,31 @@
 import React from 'react';
 import { useInterval } from '../Utils/UseInterval';
 import { getElementAncestry } from './HTMLUtils';
-import { type InAppTutorialFlowStep } from './InAppTutorialContext';
+import {
+  type InAppTutorialFlowStep,
+  type EditorIdentifier,
+} from './InAppTutorialContext';
 import InAppTutorialElementHighlighter from './InAppTutorialElementHighlighter';
 import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
 
 type Props = {|
   step: InAppTutorialFlowStep,
+  expectedEditor: EditorIdentifier | null,
 |};
+
+const styles = {
+  redHeroImage: {
+    position: 'absolute',
+    left: 20,
+    bottom: 20,
+    zIndex: 5, // Scene editor mosaic z-index is 4
+    display: 'flex',
+    visibility: 'hidden',
+    boxShadow:
+      '0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)', // Same as used by Material UI for the Paper component
+    borderRadius: 30,
+  },
+};
 
 const ELEMENT_QUERY_FREQUENCY = 500;
 const HIDE_QUERY_FREQUENCY = 1000;
@@ -48,7 +66,10 @@ const isThereAnotherDialogInTheFollowingSiblings = (
   return false;
 };
 
-function InAppTutorialStepDisplayer({ step }: Props) {
+function InAppTutorialStepDisplayer({
+  step: { elementToHighlightId, tooltip, nextStepTrigger },
+  expectedEditor,
+}: Props) {
   const [
     elementToHighlight,
     setElementToHighlight,
@@ -57,7 +78,15 @@ function InAppTutorialStepDisplayer({ step }: Props) {
     hideBehindOtherDialog,
     setHideBehindOtherDialog,
   ] = React.useState<boolean>(false);
-  const { elementToHighlightId, tooltip } = step;
+  const [assistantImage, setAssistantImage] = React.useState<?HTMLDivElement>(
+    null
+  );
+
+  const defineAssistantImage = React.useCallback(node => {
+    if (node) {
+      setAssistantImage(node);
+    }
+  }, []);
 
   // The element could disappear if the user closes a dialog for instance.
   // So we need to periodically query it.
@@ -107,19 +136,56 @@ function InAppTutorialStepDisplayer({ step }: Props) {
     [elementToHighlightId]
   );
 
+  const wrongEditorTooltip = expectedEditor
+    ? {
+        title: "Oups, it looks like you're lost!",
+        description: `Go back to ${
+          expectedEditor === 'Scene'
+            ? 'the scene editor'
+            : expectedEditor === 'Home'
+            ? 'the home page'
+            : 'the events sheet'
+        } using the tabs at the top of the editor`,
+        placement: 'top',
+      }
+    : null;
+
   if (!elementToHighlight || hideBehindOtherDialog) return null;
+
   return (
     <>
-      <InAppTutorialElementHighlighter element={elementToHighlight} />
-      {tooltip && (
+      <div
+        style={{
+          ...styles.redHeroImage,
+          visibility: wrongEditorTooltip ? 'visible' : 'hidden',
+        }}
+        ref={defineAssistantImage}
+      >
+        <img
+          alt="GDevelop mascot red hero"
+          src="res/hero60.png"
+          width={60}
+          height={60}
+        />
+      </div>
+      {!wrongEditorTooltip && (
+        <InAppTutorialElementHighlighter element={elementToHighlight} />
+      )}
+      {tooltip && !wrongEditorTooltip && (
         <InAppTutorialTooltipDisplayer
           anchorElement={elementToHighlight}
           tooltip={tooltip}
           buttonLabel={
-            step.nextStepTrigger && step.nextStepTrigger.clickOnButton
-              ? step.nextStepTrigger.clickOnButton
+            nextStepTrigger && nextStepTrigger.clickOnButton
+              ? nextStepTrigger.clickOnButton
               : undefined
           }
+        />
+      )}
+      {wrongEditorTooltip && assistantImage && (
+        <InAppTutorialTooltipDisplayer
+          anchorElement={assistantImage}
+          tooltip={wrongEditorTooltip}
         />
       )}
     </>

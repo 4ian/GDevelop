@@ -2458,14 +2458,11 @@ const MainFrame = (props: Props) => {
         setCurrentEditor(null);
         return;
       }
-      const editorIdentifier = currentTab.key.startsWith(
-        'start page'
-      )
+      const editorIdentifier = currentTab.key.startsWith('start page')
         ? 'Home'
         : currentTab.key.startsWith('layout event')
-        ? 'Events'
+        ? 'EventsSheet'
         : 'Scene';
-      // $FlowFixMe
       setCurrentEditor(editorIdentifier);
     },
     [state.editorTabs, setCurrentEditor]

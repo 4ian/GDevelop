@@ -187,10 +187,14 @@ const InAppTutorialProvider = (props: Props) => {
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
   const [project, setProject] = React.useState<?gdProject>(null);
   const [data, setData] = React.useState<{ [key: string]: string }>({});
-  const expectedEditor = React.useRef<?EditorIdentifier>(null);
-  const [currentEditor, setCurrentEditor] = React.useState<?EditorIdentifier>(
-    null
-  );
+  const [
+    expectedEditor,
+    setExpectedEditor,
+  ] = React.useState<EditorIdentifier | null>(null);
+  const [
+    currentEditor,
+    setCurrentEditor,
+  ] = React.useState<EditorIdentifier | null>(null);
   const [
     watchElementInputValue,
     setWatchElementInputValue,
@@ -309,7 +313,7 @@ const InAppTutorialProvider = (props: Props) => {
     () => {
       const { id } = flow[currentStepIndex];
       if (id && inAppTutorial.editorSwitches.hasOwnProperty(id)) {
-        expectedEditor.current = inAppTutorial.editorSwitches[id];
+        setExpectedEditor(inAppTutorial.editorSwitches[id]);
       }
     },
     [currentStepIndex]
@@ -366,7 +370,7 @@ const InAppTutorialProvider = (props: Props) => {
       : undefined,
   };
 
-  React.useEffect(() => console.log(currentEditor), [currentEditor]);
+  const isWrongEditorOpened = currentEditor !== expectedEditor;
 
   return (
     <InAppTutorialContext.Provider
@@ -379,7 +383,12 @@ const InAppTutorialProvider = (props: Props) => {
       }}
     >
       {props.children}
-      {formattedStep && <InAppTutorialStepDisplayer step={formattedStep} />}
+      {formattedStep && (
+        <InAppTutorialStepDisplayer
+          step={formattedStep}
+          expectedEditor={isWrongEditorOpened ? expectedEditor : null}
+        />
+      )}
     </InAppTutorialContext.Provider>
   );
 };

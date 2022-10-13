@@ -37,7 +37,7 @@ export type InAppTutorialState = {|
   flow: string | null,
   currentStep: InAppTutorialFlowStep | null,
   setProject: (?gdProject) => void,
-  setCurrentEditor: (?EditorIdentifier) => void,
+  setCurrentEditor: (EditorIdentifier | null) => void,
   goToNextStep: () => void,
 |};
 

@@ -679,7 +679,6 @@ const MainFrame = (props: Props) => {
             currentProject
           );
           currentProject.delete();
-          resetStorageProvider();
         }
 
         return {
@@ -695,7 +694,6 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
       setState,
-      resetStorageProvider,
     ]
   );
 

@@ -148,7 +148,6 @@ import {
   type ResourceFetcher,
 } from '../ProjectsStorage/ResourceFetcher';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
-import InAppTutorialStepDisplayer from '../InAppTutorial/InAppTutorialStepDisplayer';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -373,7 +372,6 @@ const MainFrame = (props: Props) => {
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const {
-    currentStep: inAppTutorialCurrentStep,
     setProject: setInAppTutorialProject,
     setCurrentEditor,
   } = React.useContext(InAppTutorialContext);
@@ -2908,9 +2906,6 @@ const MainFrame = (props: Props) => {
             launchNewPreview();
           }}
         />
-      )}
-      {inAppTutorialCurrentStep && (
-        <InAppTutorialStepDisplayer step={inAppTutorialCurrentStep} />
       )}
     </div>
   );

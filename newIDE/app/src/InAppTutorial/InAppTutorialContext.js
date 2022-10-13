@@ -16,6 +16,7 @@ export type InAppTutorialFlowStep = {|
     | {| absenceOfElement: string |}
     | {| elementIsFilled: true |}
     | {| instanceDraggedOnScene: string |}
+    | {| previewLaunched: true |}
     | {| clickOnButton: string |},
   mapProjectData?: {
     [key: string]: 'lastProjectObjectName',
@@ -40,6 +41,7 @@ export type InAppTutorialState = {|
   setProject: (?gdProject) => void,
   setCurrentEditor: (EditorIdentifier | null) => void,
   goToNextStep: () => void,
+  onPreviewLaunch: () => void,
 |};
 
 export const initialInAppTutorialState: InAppTutorialState = {
@@ -48,6 +50,7 @@ export const initialInAppTutorialState: InAppTutorialState = {
   setProject: () => {},
   setCurrentEditor: () => {},
   goToNextStep: () => {},
+  onPreviewLaunch: () => {},
 };
 
 const InAppTutorialContext = React.createContext<InAppTutorialState>(

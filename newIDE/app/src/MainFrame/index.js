@@ -246,7 +246,6 @@ export type Props = {
     storageProvider?: ?StorageProvider
   ) => StorageProviderOperations,
   getStorageProvider: () => StorageProvider,
-  resetStorageProvider: () => void,
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   requestUpdate?: () => void,
@@ -412,7 +411,6 @@ const MainFrame = (props: Props) => {
     resourceFetcher,
     getStorageProviderOperations,
     getStorageProvider,
-    resetStorageProvider,
     initialDialog,
     initialFileMetadataToOpen,
     introDialog,
@@ -2283,10 +2281,10 @@ const MainFrame = (props: Props) => {
         currentProject.setTemplateSlug(selectedExampleShortHeader.slug);
       if (source.projectName) currentProject.setName(source.projectName);
 
-      if (!destination) {
-        // If there is no destination, ensure the storageProvider is reset.
-        resetStorageProvider();
-      } else {
+      const destinationFileMetadata = destination
+        ? destination.fileMetadata
+        : null;
+      if (destination && destinationFileMetadata) {
         // If there is a destination, save the project where asked to.
         const destinationStorageProviderOperations = getStorageProviderOperations(
           destination.storageProvider
@@ -2317,7 +2315,7 @@ const MainFrame = (props: Props) => {
 
                   await ensureResourcesAreMoved({
                     project: currentProject,
-                    newFileMetadata: destination.fileMetadata,
+                    newFileMetadata: destinationFileMetadata,
                     newStorageProvider: destination.storageProvider,
                     newStorageProviderOperations: destinationStorageProviderOperations,
                     oldFileMetadata: source.fileMetadata,

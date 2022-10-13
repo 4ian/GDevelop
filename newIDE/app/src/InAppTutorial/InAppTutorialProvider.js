@@ -21,7 +21,7 @@ const inAppTutorial: InAppTutorial = {
       nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
       tooltip: {
         placement: 'left',
-        title: "let's create an **object**",
+        title: "Let's create an **object**",
         description:
           '👉 Everything you see in a game is an **object**: your character, the enemies, coins and potions, platforms or trees, ...',
       },
@@ -41,7 +41,10 @@ const inAppTutorial: InAppTutorial = {
       id: 'ClickOnSearchBar',
       elementToHighlightId: '#asset-store-search-bar',
       nextStepTrigger: { elementIsFilled: true },
-      tooltip: { description: 'Search an object' },
+      tooltip: {
+        title: 'Choose an asset to represent your main character!',
+        description: 'Tip: search for “wizard”.',
+      },
       skippable: true,
       isOnClosableDialog: true,
     },
@@ -55,7 +58,7 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#add-asset-button',
       isTriggerFlickering: true,
       nextStepTrigger: { presenceOfElement: '#object-item-0' },
-      tooltip: { description: 'Add this asset to your project' },
+      tooltip: { description: 'Add this asset to your project.' },
       mapProjectData: {
         firstObject: 'lastProjectObjectName',
       },
@@ -65,14 +68,17 @@ const inAppTutorial: InAppTutorial = {
       id: 'CloseAssetStore',
       elementToHighlightId: '#new-object-dialog #close-button',
       nextStepTrigger: { absenceOfElement: '#new-object-dialog' },
-      tooltip: { description: "Alright, let's close this now" },
+      tooltip: {
+        description:
+          "Great! Our game now has an **object**, let's see what we can do with it.",
+      },
     },
     {
       id: 'DragObjectToScene',
       elementToHighlightId: '#object-item-0',
       nextStepTrigger: { instanceDraggedOnScene: 'firstObject' },
       tooltip: {
-        description: 'Now drag {firstObject} to the scene',
+        description: 'Drag {firstObject} from the menu to the canvas.',
         placement: 'left',
       },
     },
@@ -81,7 +87,8 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#object-item-0',
       nextStepTrigger: { presenceOfElement: '#object-editor-dialog' },
       tooltip: {
-        description: 'Here, right-click on it and click “Edit behaviors”',
+        title: "Let's make our character move! 🛹",
+        description: 'Here, right-click on it and click “Edit **behaviors**”',
         placement: 'left',
       },
     },
@@ -90,7 +97,7 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#behaviors-tab',
       nextStepTrigger: { presenceOfElement: '#add-behavior-button' },
       tooltip: {
-        description: 'See the behaviors of your object here.',
+        description: 'See the **behaviors** of your object here.',
         placement: 'bottom',
       },
       skippable: true,
@@ -104,7 +111,9 @@ const inAppTutorial: InAppTutorial = {
           '#behavior-item-TopDownMovementBehavior--TopDownMovementBehavior',
       },
       tooltip: {
-        description: 'Let’s add a behavior!',
+        title: 'Let’s add a **behavior**!',
+        description:
+          '👉 Behaviors add features to objects in a matter of clicks. They are very powerful!',
         placement: 'bottom',
       },
       isOnClosableDialog: true,
@@ -117,7 +126,7 @@ const inAppTutorial: InAppTutorial = {
         presenceOfElement: '#behavior-parameters-TopDownMovement',
       },
       tooltip: {
-        description: 'Add the "Top down movement" behavior.',
+        description: 'Add the "Top down movement" **behavior**.',
         placement: 'bottom',
       },
       isOnClosableDialog: true,
@@ -130,7 +139,7 @@ const inAppTutorial: InAppTutorial = {
       },
       tooltip: {
         description:
-          "The parameters above help you customise the behavior, but let's ignore them for now.",
+          "The parameters above help you customise the **behavior**, but let's ignore them for now.",
         placement: 'top',
       },
       isOnClosableDialog: true,
@@ -140,8 +149,9 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#toolbar-preview-button',
       nextStepTrigger: { previewLaunched: true },
       tooltip: {
-        title: "Let's play!",
-        description: 'Use the arrow keys to move {firstObject}',
+        title: "Let's play! 🎮",
+        description:
+          'Click on "**Preview**" and move your character with the **arrow keys**!',
         placement: 'bottom',
       },
     },
@@ -153,7 +163,7 @@ const inAppTutorial: InAppTutorial = {
       },
       tooltip: {
         description:
-          "Once you're done testing, close the preview and come back here.",
+          "Once you're done testing, close the **preview** and come back here.",
         placement: 'bottom',
       },
     },
@@ -163,7 +173,7 @@ const inAppTutorial: InAppTutorial = {
       nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
       tooltip: {
         placement: 'left',
-        title: "let's create another **object** to interact with {firstObject}",
+        title: "Let's now add another **object** that {firstObject} can collect!",
       },
     },
   ],

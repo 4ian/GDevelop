@@ -12,6 +12,7 @@ import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
 type Props = {|
   step: InAppTutorialFlowStep,
   expectedEditor: EditorIdentifier | null,
+  goToFallbackStep: () => void,
 |};
 
 const styles = {
@@ -69,6 +70,7 @@ const isThereAnotherDialogInTheFollowingSiblings = (
 function InAppTutorialStepDisplayer({
   step: { elementToHighlightId, tooltip, nextStepTrigger },
   expectedEditor,
+  goToFallbackStep,
 }: Props) {
   const [
     elementToHighlight,
@@ -134,6 +136,18 @@ function InAppTutorialStepDisplayer({
       setHideBehindOtherDialog(false);
     },
     [elementToHighlightId]
+  );
+
+  React.useEffect(
+    () => {
+      // If the element is missing and we are on the right editor, go back
+      // to fallback step after a delay.
+      if (!elementToHighlight && !expectedEditor) {
+        const timeoutId = setTimeout(goToFallbackStep, 1000);
+        return () => clearTimeout(timeoutId);
+      }
+    },
+    [elementToHighlight, goToFallbackStep, expectedEditor]
   );
 
   const wrongEditorTooltip = expectedEditor

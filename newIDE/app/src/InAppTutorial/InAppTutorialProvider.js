@@ -35,6 +35,7 @@ const inAppTutorial: InAppTutorial = {
         placement: 'bottom',
       },
       skippable: true,
+      isOnClosableDialog: true,
     },
     {
       id: 'ClickOnSearchBar',
@@ -42,10 +43,12 @@ const inAppTutorial: InAppTutorial = {
       nextStepTrigger: { elementIsFilled: true },
       tooltip: { description: 'Search an object' },
       skippable: true,
+      isOnClosableDialog: true,
     },
     {
       id: 'WaitForUserToSelectAsset',
       nextStepTrigger: { presenceOfElement: '#add-asset-button' },
+      isOnClosableDialog: true,
     },
     {
       id: 'AddAsset',
@@ -56,6 +59,7 @@ const inAppTutorial: InAppTutorial = {
       mapProjectData: {
         firstObject: 'lastProjectObjectName',
       },
+      isOnClosableDialog: true,
     },
     {
       id: 'CloseAssetStore',
@@ -90,6 +94,7 @@ const inAppTutorial: InAppTutorial = {
         placement: 'bottom',
       },
       skippable: true,
+      isOnClosableDialog: true,
     },
     {
       id: 'AddBehavior',
@@ -102,6 +107,7 @@ const inAppTutorial: InAppTutorial = {
         description: 'Let’s add a behavior!',
         placement: 'bottom',
       },
+      isOnClosableDialog: true,
     },
     {
       id: 'SelectTopDownBehavior',
@@ -114,6 +120,7 @@ const inAppTutorial: InAppTutorial = {
         description: 'Add the "Top down movement" behavior.',
         placement: 'bottom',
       },
+      isOnClosableDialog: true,
     },
     {
       id: 'ApplyBehavior',
@@ -126,6 +133,7 @@ const inAppTutorial: InAppTutorial = {
           "The parameters above help you customise the behavior, but let's ignore them for now.",
         placement: 'top',
       },
+      isOnClosableDialog: true,
     },
     {
       id: 'LaunchPreview1',
@@ -187,6 +195,7 @@ const InAppTutorialProvider = (props: Props) => {
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
   const [project, setProject] = React.useState<?gdProject>(null);
   const [data, setData] = React.useState<{ [key: string]: string }>({});
+  const currentStepFallbackStepIndex = React.useRef<number>(0);
   const [
     expectedEditor,
     setExpectedEditor,
@@ -311,9 +320,12 @@ const InAppTutorialProvider = (props: Props) => {
 
   React.useEffect(
     () => {
-      const { id } = flow[currentStepIndex];
+      const { id, isOnClosableDialog } = flow[currentStepIndex];
       if (id && inAppTutorial.editorSwitches.hasOwnProperty(id)) {
         setExpectedEditor(inAppTutorial.editorSwitches[id]);
+      }
+      if (!isOnClosableDialog) {
+        currentStepFallbackStepIndex.current = currentStepIndex;
       }
     },
     [currentStepIndex]
@@ -359,7 +371,7 @@ const InAppTutorialProvider = (props: Props) => {
   console.log(currentStepIndex);
 
   const stepTooltip = flow[currentStepIndex].tooltip;
-  const formattedStep = {
+  const formattedStep: InAppTutorialFlowStep = {
     ...flow[currentStepIndex],
     tooltip: stepTooltip
       ? {
@@ -383,12 +395,13 @@ const InAppTutorialProvider = (props: Props) => {
       }}
     >
       {props.children}
-      {formattedStep && (
-        <InAppTutorialStepDisplayer
-          step={formattedStep}
-          expectedEditor={isWrongEditorOpened ? expectedEditor : null}
-        />
-      )}
+      <InAppTutorialStepDisplayer
+        step={formattedStep}
+        expectedEditor={isWrongEditorOpened ? expectedEditor : null}
+        goToFallbackStep={() => {
+          setCurrentStepIndex(currentStepFallbackStepIndex.current);
+        }}
+      />
     </InAppTutorialContext.Provider>
   );
 };

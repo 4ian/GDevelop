@@ -20,6 +20,16 @@ const flow: Array<OnboardingFlowStep> = [
     },
   },
   {
+    id: 'OpenAssetTab',
+    elementToHighlightId: '#asset-store-tab',
+    nextStepTrigger: { presenceOfElement: '#asset-store' },
+    tooltip: {
+      description: "Let's choose an object from the asset store.",
+      placement: 'bottom',
+    },
+    skippable: true,
+  },
+  {
     id: 'ClickOnSearchBar',
     elementToHighlightId: '#asset-store-search-bar',
     nextStepTrigger: { elementIsFilled: true },

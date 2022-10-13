@@ -173,7 +173,8 @@ const inAppTutorial: InAppTutorial = {
       nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
       tooltip: {
         placement: 'left',
-        title: "Let's now add another **object** that {firstObject} can collect!",
+        title:
+          "Let's now add another **object** that {firstObject} can collect!",
       },
     },
   ],
@@ -246,7 +247,7 @@ const InAppTutorialProvider = (props: Props) => {
         indexOfNextMandatoryStep += 1;
       }
 
-      let shouldGoToStepAtIndex = undefined;
+      let shouldGoToStepAtIndex: number | null = null;
       // Browse skippable steps in reverse orders to directly go to the
       // furthest step if possible.
       for (
@@ -260,7 +261,7 @@ const InAppTutorialProvider = (props: Props) => {
           break;
         }
       }
-      if (shouldGoToStepAtIndex === undefined) return;
+      if (!shouldGoToStepAtIndex) return;
 
       // If a change of step is going to happen, first record the data for
       // the current step that is about to be closed.
@@ -286,14 +287,17 @@ const InAppTutorialProvider = (props: Props) => {
       }
 
       // Check if we can go directly to next mandatory (not-skippable) step.
-      let nextStepIndex = currentStepIndex + 1;
-      while (flow[nextStepIndex].skippable && nextStepIndex < flow.length - 1) {
-        if (isStepDone(flow[nextStepIndex])) nextStepIndex += 1;
+      while (
+        flow[shouldGoToStepAtIndex].skippable &&
+        shouldGoToStepAtIndex < flow.length - 1
+      ) {
+        if (isStepDone(flow[shouldGoToStepAtIndex])) shouldGoToStepAtIndex += 1;
         else break;
       }
 
       // Change step
-      setCurrentStepIndex(nextStepIndex);
+      // $FlowFixMe - shouldGoAtStepIndex cannot be null
+      setCurrentStepIndex(shouldGoToStepAtIndex);
     },
     [currentStepIndex, project]
   );

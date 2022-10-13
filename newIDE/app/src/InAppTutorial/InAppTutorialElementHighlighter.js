@@ -37,7 +37,7 @@ const styles = {
   },
 };
 
-function OnboardingElementHighlighter({ element }: Props) {
+function InAppTutorialElementHighlighter({ element }: Props) {
   const forceUpdate = useForceUpdate();
   useOnResize(forceUpdate);
   const [showHighlighter, setShowHighlighter] = React.useState<boolean>(true);
@@ -101,7 +101,7 @@ function OnboardingElementHighlighter({ element }: Props) {
     <>
       {showHighlighter && (
         <div
-          id="element-highlighter"
+          id="in-app-tutorial-element-highlighter"
           style={{
             ...styles.rectangleHighlight,
             ...elementRectangle.toCSSPosition(),
@@ -114,7 +114,7 @@ function OnboardingElementHighlighter({ element }: Props) {
       )}
       {!showHighlighter && scrollParentRectangle && (
         <div
-          id="scroll-indicator"
+          id="in-app-tutorial-scroll-indicator"
           style={{
             ...styles.scrollIndicator,
             top:
@@ -133,4 +133,4 @@ function OnboardingElementHighlighter({ element }: Props) {
   );
 }
 
-export default OnboardingElementHighlighter;
+export default InAppTutorialElementHighlighter;

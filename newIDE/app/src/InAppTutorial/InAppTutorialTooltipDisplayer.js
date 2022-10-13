@@ -6,7 +6,7 @@ import Fade from '@material-ui/core/Fade';
 import Typography from '@material-ui/core/Typography';
 import { ColumnStackLayout } from '../UI/Layout';
 import { getDisplayZIndexForHighlighter } from './HTMLUtils';
-import OnboardingContext, { type OnboardingTooltip } from './OnboardingContext';
+import InAppTutorialContext, { type InAppTutorialTooltip } from './InAppTutorialContext';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { makeStyles } from '@material-ui/core/styles';
 import { MarkdownText } from '../UI/MarkdownText';
@@ -14,7 +14,7 @@ import RaisedButton from '../UI/RaisedButton';
 
 type Props = {|
   anchorElement: HTMLElement,
-  tooltip: OnboardingTooltip,
+  tooltip: InAppTutorialTooltip,
   buttonLabel?: string,
 |};
 
@@ -100,13 +100,13 @@ const useClasses = makeStyles({
   },
 });
 
-function OnboardingTooltipDisplayer({
+function InAppTutorialTooltipDisplayer({
   anchorElement,
   tooltip,
   buttonLabel,
 }: Props) {
   const [show, setShow] = React.useState<boolean>(false);
-  const { goToNextStep } = React.useContext(OnboardingContext);
+  const { goToNextStep } = React.useContext(InAppTutorialContext);
   const updateVisibility = React.useCallback(
     (entries: IntersectionObserverEntry[]) => {
       setShow(entries[0].isIntersecting);
@@ -123,7 +123,7 @@ function OnboardingTooltipDisplayer({
   return (
     <>
       <Popper
-        id="onboarding-tooltip-displayer"
+        id="in-app-tutorial-tooltip-displayer"
         open={show}
         className={classes.popper}
         anchorEl={anchorElement}
@@ -183,4 +183,4 @@ function OnboardingTooltipDisplayer({
   );
 }
 
-export default OnboardingTooltipDisplayer;
+export default InAppTutorialTooltipDisplayer;

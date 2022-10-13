@@ -2,12 +2,12 @@
 import * as React from 'react';
 import { useDebounce } from '../Utils/UseDebounce';
 import { useInterval } from '../Utils/UseInterval';
-import OnboardingContext, {
-  type OnboardingFlowStep,
-} from './OnboardingContext';
+import InAppTutorialContext, {
+  type InAppTutorialFlowStep,
+} from './InAppTutorialContext';
 type Props = {| children: React.Node |};
 
-const flow: Array<OnboardingFlowStep> = [
+const flow: Array<InAppTutorialFlowStep> = [
   {
     id: 'ClickOnNewObjectButton1',
     elementToHighlightId: '#add-new-object-button',
@@ -157,7 +157,7 @@ const interpolateText = (text?: string, data: { [key: string]: string }) => {
   return formattedText;
 };
 
-const isStepDone = (step: OnboardingFlowStep): boolean => {
+const isStepDone = (step: InAppTutorialFlowStep): boolean => {
   const { nextStepTrigger } = step;
   if (!nextStepTrigger) return false;
   if (
@@ -174,7 +174,7 @@ const isStepDone = (step: OnboardingFlowStep): boolean => {
   return false;
 };
 
-const OnboardingProvider = (props: Props) => {
+const InAppTutorialProvider = (props: Props) => {
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
   const [project, setProject] = React.useState<?gdProject>(null);
   const [data, setData] = React.useState<{ [key: string]: string }>({});
@@ -345,7 +345,7 @@ const OnboardingProvider = (props: Props) => {
   };
 
   return (
-    <OnboardingContext.Provider
+    <InAppTutorialContext.Provider
       value={{
         flow: null,
         currentStep: formattedStep,
@@ -354,8 +354,8 @@ const OnboardingProvider = (props: Props) => {
       }}
     >
       {props.children}
-    </OnboardingContext.Provider>
+    </InAppTutorialContext.Provider>
   );
 };
 
-export default OnboardingProvider;
+export default InAppTutorialProvider;

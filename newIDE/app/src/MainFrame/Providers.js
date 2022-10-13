@@ -35,7 +35,7 @@ import { TutorialStateProvider } from '../Tutorial/TutorialContext';
 import ConfirmProvider from '../UI/Alert/AlertProvider';
 import { AnnouncementsFeedStateProvider } from '../AnnouncementsFeed/AnnouncementsFeedContext';
 import PrivateAssetsAuthorizationProvider from '../AssetStore/PrivateAssets/PrivateAssetsAuthorizationProvider';
-import OnboardingProvider from '../Onboarding/OnboardingProvider';
+import InAppTutorialProvider from '../InAppTutorial/InAppTutorialProvider';
 
 // Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
 const jss = create({
@@ -102,7 +102,7 @@ export default class Providers extends React.Component<Props, {||}> {
                                   >
                                     <ConfirmProvider>
                                       <CommandsContextProvider>
-                                        <OnboardingProvider>
+                                        <InAppTutorialProvider>
                                           <AssetStoreStateProvider>
                                             <ResourceStoreStateProvider>
                                               <ExampleStoreStateProvider>
@@ -120,7 +120,7 @@ export default class Providers extends React.Component<Props, {||}> {
                                               </ExampleStoreStateProvider>
                                             </ResourceStoreStateProvider>
                                           </AssetStoreStateProvider>
-                                        </OnboardingProvider>
+                                        </InAppTutorialProvider>
                                       </CommandsContextProvider>
                                     </ConfirmProvider>
                                   </EventsFunctionsExtensionsProvider>

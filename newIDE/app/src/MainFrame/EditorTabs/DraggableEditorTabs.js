@@ -16,7 +16,7 @@ import {
   type ClosableTabProps,
 } from '../../UI/ClosableTabs';
 
-type DraggableClosableTabsProps = {|
+type DraggableEditorTabsProps = {|
   hideLabels?: boolean,
   editorTabs: EditorTabsState,
   onClickTab: (index: number) => void,
@@ -27,7 +27,7 @@ type DraggableClosableTabsProps = {|
   onDropTab: (fromIndex: number, toHoveredIndex: number) => void,
 |};
 
-export function DraggableClosableTabs({
+export function DraggableEditorTabs({
   hideLabels,
   editorTabs,
   onClickTab,
@@ -36,7 +36,7 @@ export function DraggableClosableTabs({
   onCloseAll,
   onTabActived,
   onDropTab,
-}: DraggableClosableTabsProps) {
+}: DraggableEditorTabsProps) {
   let draggedTabIndex: ?number = null;
 
   return (

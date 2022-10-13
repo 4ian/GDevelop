@@ -24,10 +24,20 @@ export type InAppTutorialFlowStep = {|
   skippable?: true,
 |};
 
+export type EditorIdentifier = 'Scene' | 'EventsSheet' | 'Home';
+
+export type InAppTutorial = {|
+  flow: Array<InAppTutorialFlowStep>,
+  editorSwitches: {
+    [stepId: string]: EditorIdentifier,
+  },
+|};
+
 export type InAppTutorialState = {|
   flow: string | null,
   currentStep: InAppTutorialFlowStep | null,
   setProject: (?gdProject) => void,
+  setCurrentEditor: (?EditorIdentifier) => void,
   goToNextStep: () => void,
 |};
 
@@ -35,6 +45,7 @@ export const initialInAppTutorialState: InAppTutorialState = {
   flow: null,
   currentStep: null,
   setProject: () => {},
+  setCurrentEditor: () => {},
   goToNextStep: () => {},
 };
 

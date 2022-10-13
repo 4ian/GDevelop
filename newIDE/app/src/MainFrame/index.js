@@ -374,6 +374,7 @@ const MainFrame = (props: Props) => {
   const {
     setProject: setInAppTutorialProject,
     setCurrentEditor,
+    onPreviewLaunch,
   } = React.useContext(InAppTutorialContext);
   const [
     fileMetadataOpeningProgress,
@@ -1381,6 +1382,7 @@ const MainFrame = (props: Props) => {
         })
         .then(() => {
           setPreviewLoading(false);
+          onPreviewLaunch();
         });
     },
     [
@@ -1391,6 +1393,7 @@ const MainFrame = (props: Props) => {
       state.editorTabs,
       preferences.getIsMenuBarHiddenInPreview,
       preferences.getIsAlwaysOnTopInPreview,
+      onPreviewLaunch,
     ]
   );
 

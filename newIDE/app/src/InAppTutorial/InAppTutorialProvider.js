@@ -138,11 +138,22 @@ const inAppTutorial: InAppTutorial = {
     {
       id: 'LaunchPreview1',
       elementToHighlightId: '#toolbar-preview-button',
+      nextStepTrigger: { previewLaunched: true },
+      tooltip: {
+        title: "Let's play!",
+        description: 'Use the arrow keys to move {firstObject}',
+        placement: 'bottom',
+      },
+    },
+    {
+      id: 'WaitForUserToHavePlayed',
+      elementToHighlightId: '#toolbar-preview-button',
       nextStepTrigger: {
         clickOnButton: "I'm done",
       },
       tooltip: {
-        title: "Let's play!",
+        description:
+          "Once you're done testing, close the preview and come back here.",
         placement: 'bottom',
       },
     },
@@ -279,6 +290,14 @@ const InAppTutorialProvider = (props: Props) => {
 
   const handleDomMutation = useDebounce(watchDomForNextStepTrigger, 200);
 
+  const onPreviewLaunch = () => {
+    if (!currentStep) return;
+    const { nextStepTrigger } = currentStep;
+    if (nextStepTrigger && nextStepTrigger.previewLaunched) {
+      setCurrentStepIndex(currentStepIndex + 1);
+    }
+  };
+
   React.useEffect(
     () => {
       const appContainer = document.querySelector('body');
@@ -392,6 +411,7 @@ const InAppTutorialProvider = (props: Props) => {
         setProject,
         setCurrentEditor,
         goToNextStep: () => setCurrentStepIndex(currentStepIndex + 1),
+        onPreviewLaunch,
       }}
     >
       {props.children}

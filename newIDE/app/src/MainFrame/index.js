@@ -2117,11 +2117,11 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: changeCurrentTab(state.editorTabs, value),
     })).then(state =>
-      _onEditorTabActived(getCurrentTab(state.editorTabs), state)
+      _onEditorTabActivated(getCurrentTab(state.editorTabs), state)
     );
   };
 
-  const _onEditorTabActived = (
+  const _onEditorTabActivated = (
     editorTab: EditorTab,
     newState: State = state
   ) => {
@@ -2613,7 +2613,9 @@ const MainFrame = (props: Props) => {
           _onCloseOtherEditorTabs(editorTab)
         }
         onCloseAll={_onCloseAllEditorTabs}
-        onTabActived={(editorTab: EditorTab) => _onEditorTabActived(editorTab)}
+        onTabActivated={(editorTab: EditorTab) =>
+          _onEditorTabActivated(editorTab)
+        }
         onDropTab={onDropEditorTab}
       />
       <LeaderboardProvider

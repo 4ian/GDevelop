@@ -61,6 +61,10 @@ export type ExpressionAutocompletion =
   | {|
       ...BaseExpressionAutocompletion,
       kind: 'Behavior',
+    |}
+  | {|
+      ...BaseExpressionAutocompletion,
+      kind: 'FullExpression',
     |};
 
 type ExpressionAutocompletionContext = {|

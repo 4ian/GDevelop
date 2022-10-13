@@ -135,6 +135,14 @@ interface EventsVariablesFinder {
     //Inherited from ExpressionParser2NodeWorker:
 };
 
+interface EventsIdentifiersFinder {
+    void EventsIdentifiersFinder();
+
+    [Const, Value] SetString STATIC_FindAllIdentifierExpressions([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout, [Const] DOMString identifierType, [Const] DOMString contextObjectName);
+
+    //Inherited from ExpressionParser2NodeWorker:
+};
+
 interface InstructionOrExpressionGroupMetadata {
     void InstructionOrExpressionGroupMetadata();
 

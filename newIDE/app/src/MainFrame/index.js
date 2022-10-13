@@ -147,8 +147,8 @@ import {
   useResourceFetcher,
   type ResourceFetcher,
 } from '../ProjectsStorage/ResourceFetcher';
-import OnboardingContext from '../Onboarding/OnboardingContext';
-import OnboardingStepDisplayer from '../Onboarding/OnboardingStepDisplayer';
+import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
+import InAppTutorialStepDisplayer from '../InAppTutorial/InAppTutorialStepDisplayer';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -373,9 +373,9 @@ const MainFrame = (props: Props) => {
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const {
-    currentStep: onboardingCurrentStep,
-    setProject: setOnboardingProject,
-  } = React.useContext(OnboardingContext);
+    currentStep: inAppTutorialCurrentStep,
+    setProject: setInAppTutorialProject,
+  } = React.useContext(InAppTutorialContext);
   const [
     fileMetadataOpeningProgress,
     setFileMetadataOpeningProgress,
@@ -685,7 +685,7 @@ const MainFrame = (props: Props) => {
           currentProject.delete();
         }
 
-        setOnboardingProject(null);
+        setInAppTutorialProject(null);
 
         return {
           ...state,
@@ -700,7 +700,7 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
       setState,
-      setOnboardingProject,
+      setInAppTutorialProject,
     ]
   );
 
@@ -741,7 +741,7 @@ const MainFrame = (props: Props) => {
         currentFileMetadata: fileMetadata,
         createDialogOpen: false,
       }));
-      setOnboardingProject(project);
+      setInAppTutorialProject(project);
 
       // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
       // their editor will take care of reloading them.
@@ -785,7 +785,7 @@ const MainFrame = (props: Props) => {
       getStorageProviderOperations,
       ensureResourcesAreFetched,
       authenticatedUser,
-      setOnboardingProject,
+      setInAppTutorialProject,
     ]
   );
 
@@ -2886,8 +2886,8 @@ const MainFrame = (props: Props) => {
           }}
         />
       )}
-      {onboardingCurrentStep && (
-        <OnboardingStepDisplayer step={onboardingCurrentStep} />
+      {inAppTutorialCurrentStep && (
+        <InAppTutorialStepDisplayer step={inAppTutorialCurrentStep} />
       )}
     </div>
   );

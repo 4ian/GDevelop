@@ -2,12 +2,12 @@
 import React from 'react';
 import { useInterval } from '../Utils/UseInterval';
 import { getElementAncestry } from './HTMLUtils';
-import { type OnboardingFlowStep } from './OnboardingContext';
-import OnboardingElementHighlighter from './OnboardingElementHighlighter';
-import OnboardingTooltipDisplayer from './OnboardingTooltipDisplayer';
+import { type InAppTutorialFlowStep } from './InAppTutorialContext';
+import InAppTutorialElementHighlighter from './InAppTutorialElementHighlighter';
+import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
 
 type Props = {|
-  step: OnboardingFlowStep,
+  step: InAppTutorialFlowStep,
 |};
 
 const ELEMENT_QUERY_FREQUENCY = 500;
@@ -48,7 +48,7 @@ const isThereAnotherDialogInTheFollowingSiblings = (
   return false;
 };
 
-function OnboardingStepDisplayer({ step }: Props) {
+function InAppTutorialStepDisplayer({ step }: Props) {
   const [
     elementToHighlight,
     setElementToHighlight,
@@ -110,9 +110,9 @@ function OnboardingStepDisplayer({ step }: Props) {
   if (!elementToHighlight || hideBehindOtherDialog) return null;
   return (
     <>
-      <OnboardingElementHighlighter element={elementToHighlight} />
+      <InAppTutorialElementHighlighter element={elementToHighlight} />
       {tooltip && (
-        <OnboardingTooltipDisplayer
+        <InAppTutorialTooltipDisplayer
           anchorElement={elementToHighlight}
           tooltip={tooltip}
           buttonLabel={
@@ -126,4 +126,4 @@ function OnboardingStepDisplayer({ step }: Props) {
   );
 }
 
-export default OnboardingStepDisplayer;
+export default InAppTutorialStepDisplayer;

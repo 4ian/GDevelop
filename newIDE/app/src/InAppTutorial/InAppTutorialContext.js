@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react';
 
-export type OnboardingTooltip = {|
+export type InAppTutorialTooltip = {|
   placement?: 'bottom' | 'left' | 'right' | 'top',
   title?: string,
   description?: string,
 |};
 
-export type OnboardingFlowStep = {|
+export type InAppTutorialFlowStep = {|
   elementToHighlightId?: string,
   id?: string,
   isTriggerFlickering?: true,
@@ -20,26 +20,26 @@ export type OnboardingFlowStep = {|
   mapProjectData?: {
     [key: string]: 'lastProjectObjectName',
   },
-  tooltip?: OnboardingTooltip,
+  tooltip?: InAppTutorialTooltip,
   skippable?: true,
 |};
 
-export type OnboardingState = {|
+export type InAppTutorialState = {|
   flow: string | null,
-  currentStep: OnboardingFlowStep | null,
+  currentStep: InAppTutorialFlowStep | null,
   setProject: (?gdProject) => void,
   goToNextStep: () => void,
 |};
 
-export const initialOnboardingState: OnboardingState = {
+export const initialInAppTutorialState: InAppTutorialState = {
   flow: null,
   currentStep: null,
   setProject: () => {},
   goToNextStep: () => {},
 };
 
-const OnboardingContext = React.createContext<OnboardingState>(
-  initialOnboardingState
+const InAppTutorialContext = React.createContext<InAppTutorialState>(
+  initialInAppTutorialState
 );
 
-export default OnboardingContext;
+export default InAppTutorialContext;

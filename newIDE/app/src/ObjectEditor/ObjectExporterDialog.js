@@ -44,7 +44,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-export const ObjectExporterDialog = (props: Props) => {
+const ObjectExporterDialog = (props: Props) => {
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -99,3 +99,5 @@ export const ObjectExporterDialog = (props: Props) => {
     </Dialog>
   );
 };
+
+export default ObjectExporterDialog;

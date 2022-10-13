@@ -17,7 +17,7 @@ import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
 import LayerEditorDialog from '../LayersList/LayerEditorDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
-import { ObjectExporterDialog } from '../ObjectEditor/ObjectExporterDialog';
+import ObjectExporterDialog from '../ObjectEditor/ObjectExporterDialog';
 import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
 import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
@@ -78,6 +78,7 @@ import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 import { getInstancesInLayoutForObject } from '../Utils/Layout';
+import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -1262,6 +1263,11 @@ export default class SceneEditor extends React.Component<Props, State> {
       ? getObjectByName(project, layout, variablesEditedAssociatedObjectName)
       : null;
 
+    const eventsFunctionsExtensionsState = React.useContext(
+      EventsFunctionsExtensionsContext
+    );
+    const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
+
     const editors = {
       properties: {
         type: 'secondary',
@@ -1406,7 +1412,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 selectedObjectNames={this.state.selectedObjectNames}
                 canInstallPrivateAsset={this.props.canInstallPrivateAsset}
                 onEditObject={this.props.onEditObject || this.editObject}
-                onExportObject={this.exportObject}
+                onExportObject={
+                  eventsFunctionsExtensionWriter ? this.exportObject : null
+                }
                 onDeleteObject={this._onDeleteObject(i18n)}
                 canRenameObject={newName =>
                   this._canObjectOrGroupUseNewName(newName, i18n)

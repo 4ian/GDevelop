@@ -74,17 +74,14 @@ export const IdentifierField = (props: Props) => {
       objectName,
     ]
   );
-  
-  const field = React.useRef<?SearchBarInterface>(null);
 
-  React.useEffect(
-    () => {
-      if (field.current) {
-        field.current.focus();
-      }
-    },
-    []
-  );
+  const field = React.useRef<?GenericExpressionField>(null);
+
+  React.useEffect(() => {
+    if (field.current) {
+      field.current.focus();
+    }
+  }, []);
 
   return (
     <GenericExpressionField

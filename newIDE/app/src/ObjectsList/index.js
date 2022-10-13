@@ -129,7 +129,7 @@ type Props = {|
   onChangeSelectedObjectTags: SelectedTags => void,
 
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
-  onExportObject?: (object: gdObject) => void,
+  onExportObject: ?(object: gdObject) => void,
   onObjectCreated: gdObject => void,
   onObjectSelected: string => void,
   onObjectPasted?: gdObject => void,

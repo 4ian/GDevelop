@@ -217,6 +217,8 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 onChooseResource={() => Promise.resolve([])}
                 selectedObjectNames={this.state.selectedObjectNames}
                 onEditObject={this.editObject}
+                // Don't allow export as there is no assets.
+                onExportObject={null}
                 onDeleteObject={this._onDeleteObject(i18n)}
                 canRenameObject={newName =>
                   this._canObjectOrGroupUseNewName(newName, i18n)

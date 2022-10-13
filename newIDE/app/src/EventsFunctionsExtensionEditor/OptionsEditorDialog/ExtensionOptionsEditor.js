@@ -181,6 +181,9 @@ export const ExtensionOptionsEditor = ({
             fullWidth
             rows={5}
             rowsMax={15}
+            helperMarkdownText={i18n._(
+              t`Explain and give some examples of what can be achieved with this extension.`
+            )}
           />
           <TextField
             floatingLabelText={<Trans>Version</Trans>}

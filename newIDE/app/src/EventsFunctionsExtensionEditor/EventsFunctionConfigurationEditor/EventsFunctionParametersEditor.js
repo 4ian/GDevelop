@@ -110,6 +110,14 @@ const getExtraInfoArray = (parameter: gdParameterMetadata) => {
   return array;
 };
 
+const getIdentifierScope = (scopedIdentifier: string) =>
+  scopedIdentifier.startsWith('object') ? 'object' : 'scene';
+
+const getIdentifierName = (scopedIdentifier: string) =>
+  scopedIdentifier.startsWith('object')
+    ? scopedIdentifier.substring('object'.length)
+    : scopedIdentifier.substring('scene'.length);
+
 export default class EventsFunctionParametersEditor extends React.Component<
   Props,
   State
@@ -469,6 +477,10 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                   value="objectAnimationName"
                                   primaryText={t`Object animation (text)`}
                                 />
+                                <SelectOption
+                                  value="identifier"
+                                  primaryText={t`Identifier (text)`}
+                                />
                               </SelectField>
                             )}
                             {gd.ParameterMetadata.isObject(
@@ -549,6 +561,55 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                   primaryText={t`False`}
                                 />
                               </SelectField>
+                            )}
+                            {parameter.getType() === 'identifier' && (
+                              <SelectField
+                                floatingLabelText={<Trans>Scope</Trans>}
+                                value={getIdentifierScope(
+                                  parameter.getExtraInfo()
+                                )}
+                                onChange={(e, i, value) => {
+                                  const identifierName = getIdentifierName(
+                                    parameter.getExtraInfo()
+                                  );
+                                  parameter.setExtraInfo(
+                                    value + identifierName
+                                  );
+                                  this.forceUpdate();
+                                  this.props.onParametersUpdated();
+                                }}
+                                fullWidth
+                              >
+                                <SelectOption
+                                  value="scene"
+                                  primaryText={t`Scene`}
+                                />
+                                <SelectOption
+                                  value="object"
+                                  primaryText={t`Object`}
+                                />
+                              </SelectField>
+                            )}
+                            {parameter.getType() === 'identifier' && (
+                              <SemiControlledTextField
+                                commitOnBlur
+                                floatingLabelText={
+                                  <Trans>Identifier name</Trans>
+                                }
+                                floatingLabelFixed
+                                value={getIdentifierName(
+                                  parameter.getExtraInfo()
+                                )}
+                                onChange={value => {
+                                  const scope = getIdentifierScope(
+                                    parameter.getExtraInfo()
+                                  );
+                                  parameter.setExtraInfo(scope + value);
+                                  this.forceUpdate();
+                                  this.props.onParametersUpdated();
+                                }}
+                                fullWidth
+                              />
                             )}
                           </ResponsiveLineStackLayout>
                           {parameter.getType() === 'stringWithSelector' && (

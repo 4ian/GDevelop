@@ -7,6 +7,7 @@ import InAppTutorialContext, {
   type InAppTutorialFlowStep,
   type EditorIdentifier,
 } from './InAppTutorialContext';
+import InAppTutorialStepDisplayer from './InAppTutorialStepDisplayer';
 type Props = {| children: React.Node |};
 
 const inAppTutorial: InAppTutorial = {
@@ -378,6 +379,7 @@ const InAppTutorialProvider = (props: Props) => {
       }}
     >
       {props.children}
+      {formattedStep && <InAppTutorialStepDisplayer step={formattedStep} />}
     </InAppTutorialContext.Provider>
   );
 };

@@ -6,7 +6,9 @@ import Fade from '@material-ui/core/Fade';
 import Typography from '@material-ui/core/Typography';
 import { ColumnStackLayout } from '../UI/Layout';
 import { getDisplayZIndexForHighlighter } from './HTMLUtils';
-import InAppTutorialContext, { type InAppTutorialTooltip } from './InAppTutorialContext';
+import InAppTutorialContext, {
+  type InAppTutorialTooltip,
+} from './InAppTutorialContext';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { makeStyles } from '@material-ui/core/styles';
 import { MarkdownText } from '../UI/MarkdownText';
@@ -145,7 +147,7 @@ function InAppTutorialTooltipDisplayer({
       >
         {({ TransitionProps }) => (
           <>
-            <Fade {...TransitionProps} timeout={350}>
+            <Fade {...TransitionProps} timeout={{ enter: 350, exit: 0 }}>
               <Paper style={styles.paper} elevation={4}>
                 <ColumnStackLayout noMargin>
                   {tooltip.title && (

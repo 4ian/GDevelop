@@ -125,7 +125,7 @@ class GD_CORE_API IdentifierFinderExpressionNodeWorker
  * \brief Go through the events to search for identifier occurrences.
  */
 class GD_CORE_API IdentifierFinderEventWorker
-    : public ArbitraryEventsWorkerWithContext {
+    : public ReadOnlyArbitraryEventsWorkerWithContext {
  public:
   IdentifierFinderEventWorker(std::set<gd::String>& results_,
                               const gd::Platform &platform_,
@@ -137,7 +137,7 @@ class GD_CORE_API IdentifierFinderEventWorker
         objectName(objectName_){};
   virtual ~IdentifierFinderEventWorker(){};
 
-  void DoVisitInstructionList(gd::InstructionsList& instructions,
+  void DoVisitInstructionList(const gd::InstructionsList& instructions,
                                       bool areConditions) override {
     for (std::size_t aId = 0; aId < instructions.size(); ++aId) {
       auto& instruction = instructions[aId];
@@ -195,8 +195,8 @@ class GD_CORE_API IdentifierFinderEventWorker
 
 std::set<gd::String> EventsIdentifiersFinder::FindAllIdentifierExpressions(
     const gd::Platform& platform,
-    gd::Project& project,
-    gd::Layout& layout,
+    const gd::Project& project,
+    const gd::Layout& layout,
     const gd::String& identifierType,
     const gd::String& contextObjectName) {
   std::set<gd::String> results;
@@ -219,8 +219,8 @@ std::set<gd::String> EventsIdentifiersFinder::FindAllIdentifierExpressions(
 void EventsIdentifiersFinder::FindArgumentsInEventsAndDependencies(
     std::set<gd::String>& results,
     const gd::Platform& platform,
-    gd::Project& project,
-    gd::Layout& layout,
+    const gd::Project& project,
+    const gd::Layout& layout,
     const gd::String& identifierType,
     const gd::String& objectName) {
   IdentifierFinderEventWorker eventWorker(results,
@@ -232,7 +232,7 @@ void EventsIdentifiersFinder::FindArgumentsInEventsAndDependencies(
   DependenciesAnalyzer dependenciesAnalyzer = DependenciesAnalyzer(project, layout);
   dependenciesAnalyzer.Analyze();
   for (const gd::String& externalEventName : dependenciesAnalyzer.GetExternalEventsDependencies()) {
-    gd::ExternalEvents& externalEvents = project.GetExternalEvents(externalEventName);
+    const gd::ExternalEvents& externalEvents = project.GetExternalEvents(externalEventName);
 
     IdentifierFinderEventWorker eventWorker(results,
                                           platform,
@@ -241,7 +241,7 @@ void EventsIdentifiersFinder::FindArgumentsInEventsAndDependencies(
     eventWorker.Launch(externalEvents.GetEvents(), project, layout);
   }
   for (const gd::String& sceneName : dependenciesAnalyzer.GetScenesDependencies()) {
-    gd::Layout& dependencyLayout = project.GetLayout(sceneName);
+    const gd::Layout& dependencyLayout = project.GetLayout(sceneName);
 
     IdentifierFinderEventWorker eventWorker(results,
                                           platform,

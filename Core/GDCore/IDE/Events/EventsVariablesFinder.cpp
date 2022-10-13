@@ -124,7 +124,7 @@ class GD_CORE_API VariableFinderExpressionNodeWorker
  * \brief Go through the events to search for variable occurrences.
  */
 class GD_CORE_API VariableFinderEventWorker
-    : public ArbitraryEventsWorkerWithContext {
+    : public ReadOnlyArbitraryEventsWorkerWithContext {
  public:
   VariableFinderEventWorker(std::set<gd::String>& results_,
                               const gd::Platform &platform_,
@@ -136,7 +136,7 @@ class GD_CORE_API VariableFinderEventWorker
         objectName(objectName_){};
   virtual ~VariableFinderEventWorker(){};
 
-  void DoVisitInstructionList(gd::InstructionsList& instructions,
+  void DoVisitInstructionList(const gd::InstructionsList& instructions,
                                       bool areConditions) override {
     for (std::size_t aId = 0; aId < instructions.size(); ++aId) {
       auto& instruction = instructions[aId];
@@ -191,7 +191,7 @@ class GD_CORE_API VariableFinderEventWorker
 } // namespace
 
 std::set<gd::String> EventsVariablesFinder::FindAllGlobalVariables(
-    const gd::Platform& platform, gd::Project& project) {
+    const gd::Platform& platform, const gd::Project& project) {
   std::set<gd::String> results;
 
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
@@ -208,8 +208,8 @@ std::set<gd::String> EventsVariablesFinder::FindAllGlobalVariables(
 
 std::set<gd::String> EventsVariablesFinder::FindAllLayoutVariables(
     const gd::Platform& platform,
-    gd::Project& project,
-    gd::Layout& layout) {
+    const gd::Project& project,
+    const gd::Layout& layout) {
   std::set<gd::String> results;
 
   FindArgumentsInEventsAndDependencies(
@@ -224,8 +224,8 @@ std::set<gd::String> EventsVariablesFinder::FindAllLayoutVariables(
 
 std::set<gd::String> EventsVariablesFinder::FindAllObjectVariables(
     const gd::Platform& platform,
-    gd::Project& project,
-    gd::Layout& layout,
+    const gd::Project& project,
+    const gd::Layout& layout,
     const gd::Object& object) {
   std::set<gd::String> results;
 
@@ -243,8 +243,8 @@ std::set<gd::String> EventsVariablesFinder::FindAllObjectVariables(
 void EventsVariablesFinder::FindArgumentsInEventsAndDependencies(
     std::set<gd::String>& results,
     const gd::Platform& platform,
-    gd::Project& project,
-    gd::Layout& layout,
+    const gd::Project& project,
+    const gd::Layout& layout,
     const gd::String& parameterType,
     const gd::String& objectName) {
 
@@ -257,7 +257,7 @@ void EventsVariablesFinder::FindArgumentsInEventsAndDependencies(
   DependenciesAnalyzer dependenciesAnalyzer = DependenciesAnalyzer(project, layout);
   dependenciesAnalyzer.Analyze();
   for (const gd::String& externalEventName : dependenciesAnalyzer.GetExternalEventsDependencies()) {
-    gd::ExternalEvents& externalEvents = project.GetExternalEvents(externalEventName);
+    const gd::ExternalEvents& externalEvents = project.GetExternalEvents(externalEventName);
 
     VariableFinderEventWorker eventWorker(results,
                                           platform,
@@ -266,7 +266,7 @@ void EventsVariablesFinder::FindArgumentsInEventsAndDependencies(
     eventWorker.Launch(externalEvents.GetEvents(), project, layout);
   }
   for (const gd::String& sceneName : dependenciesAnalyzer.GetScenesDependencies()) {
-    gd::Layout& dependencyLayout = project.GetLayout(sceneName);
+    const gd::Layout& dependencyLayout = project.GetLayout(sceneName);
 
     VariableFinderEventWorker eventWorker(results,
                                           platform,

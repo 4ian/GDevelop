@@ -73,4 +73,54 @@ bool ArbitraryEventsWorker::VisitInstruction(gd::Instruction& instruction,
 
 ArbitraryEventsWorkerWithContext::~ArbitraryEventsWorkerWithContext() {}
 
+
+ReadOnlyArbitraryEventsWorker::~ReadOnlyArbitraryEventsWorker() {}
+
+void ReadOnlyArbitraryEventsWorker::VisitEventList(const gd::EventsList& events) {
+  DoVisitEventList(events);
+
+  for (std::size_t i = 0; i < events.size(); ++i) {
+    VisitEvent(events[i]);
+
+    if (events[i].CanHaveSubEvents()) {
+      VisitEventList(events[i].GetSubEvents());
+    }
+  }
+}
+
+void ReadOnlyArbitraryEventsWorker::VisitEvent(const gd::BaseEvent& event) {
+  DoVisitEvent(event);
+
+  const vector<const gd::InstructionsList*> conditionsVectors =
+      event.GetAllConditionsVectors();
+  for (std::size_t j = 0; j < conditionsVectors.size(); ++j) {
+    VisitInstructionList(*conditionsVectors[j], true);
+  }
+
+  const vector<const gd::InstructionsList*> actionsVectors = event.GetAllActionsVectors();
+  for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
+    VisitInstructionList(*actionsVectors[j], false);
+  }
+}
+
+void ReadOnlyArbitraryEventsWorker::VisitInstructionList(
+    const gd::InstructionsList& instructions, bool areConditions) {
+  DoVisitInstructionList(instructions, areConditions);
+
+  for (std::size_t i = 0; i < instructions.size(); ++i) {
+    VisitInstruction(instructions[i], areConditions);
+    if (!instructions[i].GetSubInstructions().empty()) {
+      VisitInstructionList(instructions[i].GetSubInstructions(),
+                            areConditions);
+    }
+  }
+}
+
+void ReadOnlyArbitraryEventsWorker::VisitInstruction(const gd::Instruction& instruction,
+                                             bool isCondition) {
+  DoVisitInstruction(instruction, isCondition);
+}
+
+ReadOnlyArbitraryEventsWorkerWithContext::~ReadOnlyArbitraryEventsWorkerWithContext() {}
+
 }  // namespace gd

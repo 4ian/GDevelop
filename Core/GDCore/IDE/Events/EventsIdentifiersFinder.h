@@ -46,8 +46,8 @@ class EventsIdentifiersFinder {
    */
   static std::set<gd::String> FindAllIdentifierExpressions(
       const gd::Platform& platform,
-      gd::Project& project,
-      gd::Layout& layout,
+      const gd::Project& project,
+      const gd::Layout& layout,
       const gd::String& identifierType,
       const gd::String& objectName = "");
 
@@ -70,8 +70,8 @@ class EventsIdentifiersFinder {
   static void FindArgumentsInEventsAndDependencies(
       std::set<gd::String>& results,
       const gd::Platform& platform,
-      gd::Project& project,
-      gd::Layout& layout,
+      const gd::Project& project,
+      const gd::Layout& layout,
       const gd::String& identifierType,
       const gd::String& objectName = "");
 };

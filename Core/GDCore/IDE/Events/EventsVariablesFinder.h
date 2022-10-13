@@ -42,7 +42,7 @@ class EventsVariablesFinder {
    * \return A std::set containing the names of all global variables used
    */
   static std::set<gd::String> FindAllGlobalVariables(
-      const gd::Platform& platform, gd::Project& project);
+      const gd::Platform& platform, const gd::Project& project);
 
   /**
    * Construct a list containing the name of all layout variables used in the
@@ -54,8 +54,8 @@ class EventsVariablesFinder {
    */
   static std::set<gd::String> FindAllLayoutVariables(
       const gd::Platform& platform,
-      gd::Project& project,
-      gd::Layout& layout);
+      const gd::Project& project,
+      const gd::Layout& layout);
 
   /**
    * Construct a list containing the name of all object variables used in the
@@ -68,8 +68,8 @@ class EventsVariablesFinder {
    */
   static std::set<gd::String> FindAllObjectVariables(
       const gd::Platform& platform,
-      gd::Project& project,
-      gd::Layout& layout,
+      const gd::Project& project,
+      const gd::Layout& layout,
       const gd::Object& object);
 
  private:
@@ -92,8 +92,8 @@ class EventsVariablesFinder {
   static void FindArgumentsInEventsAndDependencies(
       std::set<gd::String>& results,
       const gd::Platform& platform,
-      gd::Project& project,
-      gd::Layout& layout,
+      const gd::Project& project,
+      const gd::Layout& layout,
       const gd::String& parameterType,
       const gd::String& objectName = "");
 };

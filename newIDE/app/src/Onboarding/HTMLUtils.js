@@ -9,7 +9,7 @@ const getOverflowAttributes = (element: Element) =>
   getStyleAttribute(element, 'overflow-y') +
   getStyleAttribute(element, 'overflow-x');
 
-const getElementAncestry = (element: Element, elementPath: Array<Element>) => {
+export const getElementAncestry = (element: Element, elementPath: Array<Element>) => {
   if (!element.parentElement) {
     return elementPath;
   }

@@ -3,144 +3,152 @@ import * as React from 'react';
 import { useDebounce } from '../Utils/UseDebounce';
 import { useInterval } from '../Utils/UseInterval';
 import InAppTutorialContext, {
+  type InAppTutorial,
   type InAppTutorialFlowStep,
+  type EditorIdentifier,
 } from './InAppTutorialContext';
 type Props = {| children: React.Node |};
 
-const flow: Array<InAppTutorialFlowStep> = [
-  {
-    id: 'ClickOnNewObjectButton1',
-    elementToHighlightId: '#add-new-object-button',
-    nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
-    tooltip: {
-      placement: 'left',
-      title: "let's create an **object**",
-      description:
-        '👉 Everything you see in a game is an **object**: your character, the enemies, coins and potions, platforms or trees, ...',
+const inAppTutorial: InAppTutorial = {
+  editorSwitches: {
+    ClickOnNewObjectButton1: 'Scene',
+  },
+  flow: [
+    {
+      id: 'ClickOnNewObjectButton1',
+      elementToHighlightId: '#add-new-object-button',
+      nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
+      tooltip: {
+        placement: 'left',
+        title: "let's create an **object**",
+        description:
+          '👉 Everything you see in a game is an **object**: your character, the enemies, coins and potions, platforms or trees, ...',
+      },
     },
-  },
-  {
-    id: 'OpenAssetTab',
-    elementToHighlightId: '#asset-store-tab',
-    nextStepTrigger: { presenceOfElement: '#asset-store' },
-    tooltip: {
-      description: "Let's choose an object from the asset store.",
-      placement: 'bottom',
+    {
+      id: 'OpenAssetTab',
+      elementToHighlightId: '#asset-store-tab',
+      nextStepTrigger: { presenceOfElement: '#asset-store' },
+      tooltip: {
+        description: "Let's choose an object from the asset store.",
+        placement: 'bottom',
+      },
+      skippable: true,
     },
-    skippable: true,
-  },
-  {
-    id: 'ClickOnSearchBar',
-    elementToHighlightId: '#asset-store-search-bar',
-    nextStepTrigger: { elementIsFilled: true },
-    tooltip: { description: 'Search an object' },
-    skippable: true,
-  },
-  {
-    id: 'WaitForUserToSelectAsset',
-    nextStepTrigger: { presenceOfElement: '#add-asset-button' },
-  },
-  {
-    id: 'AddAsset',
-    elementToHighlightId: '#add-asset-button',
-    isTriggerFlickering: true,
-    nextStepTrigger: { presenceOfElement: '#object-item-0' },
-    tooltip: { description: 'Add this asset to your project' },
-    mapProjectData: {
-      firstObject: 'lastProjectObjectName',
+    {
+      id: 'ClickOnSearchBar',
+      elementToHighlightId: '#asset-store-search-bar',
+      nextStepTrigger: { elementIsFilled: true },
+      tooltip: { description: 'Search an object' },
+      skippable: true,
     },
-  },
-  {
-    id: 'CloseAssetStore',
-    elementToHighlightId: '#new-object-dialog #close-button',
-    nextStepTrigger: { absenceOfElement: '#new-object-dialog' },
-    tooltip: { description: "Alright, let's close this now" },
-  },
-  {
-    id: 'DragObjectToScene',
-    elementToHighlightId: '#object-item-0',
-    nextStepTrigger: { instanceDraggedOnScene: 'firstObject' },
-    tooltip: {
-      description: 'Now drag {firstObject} to the scene',
-      placement: 'left',
+    {
+      id: 'WaitForUserToSelectAsset',
+      nextStepTrigger: { presenceOfElement: '#add-asset-button' },
     },
-  },
-  {
-    id: 'OpenBehaviors',
-    elementToHighlightId: '#object-item-0',
-    nextStepTrigger: { presenceOfElement: '#object-editor-dialog' },
-    tooltip: {
-      description: 'Here, right-click on it and click “Edit behaviors”',
-      placement: 'left',
+    {
+      id: 'AddAsset',
+      elementToHighlightId: '#add-asset-button',
+      isTriggerFlickering: true,
+      nextStepTrigger: { presenceOfElement: '#object-item-0' },
+      tooltip: { description: 'Add this asset to your project' },
+      mapProjectData: {
+        firstObject: 'lastProjectObjectName',
+      },
     },
-  },
-  {
-    id: 'OpenBehaviorTab',
-    elementToHighlightId: '#behaviors-tab',
-    nextStepTrigger: { presenceOfElement: '#add-behavior-button' },
-    tooltip: {
-      description: 'See the behaviors of your object here.',
-      placement: 'bottom',
+    {
+      id: 'CloseAssetStore',
+      elementToHighlightId: '#new-object-dialog #close-button',
+      nextStepTrigger: { absenceOfElement: '#new-object-dialog' },
+      tooltip: { description: "Alright, let's close this now" },
     },
-    skippable: true,
-  },
-  {
-    id: 'AddBehavior',
-    elementToHighlightId: '#add-behavior-button',
-    nextStepTrigger: {
-      presenceOfElement:
+    {
+      id: 'DragObjectToScene',
+      elementToHighlightId: '#object-item-0',
+      nextStepTrigger: { instanceDraggedOnScene: 'firstObject' },
+      tooltip: {
+        description: 'Now drag {firstObject} to the scene',
+        placement: 'left',
+      },
+    },
+    {
+      id: 'OpenBehaviors',
+      elementToHighlightId: '#object-item-0',
+      nextStepTrigger: { presenceOfElement: '#object-editor-dialog' },
+      tooltip: {
+        description: 'Here, right-click on it and click “Edit behaviors”',
+        placement: 'left',
+      },
+    },
+    {
+      id: 'OpenBehaviorTab',
+      elementToHighlightId: '#behaviors-tab',
+      nextStepTrigger: { presenceOfElement: '#add-behavior-button' },
+      tooltip: {
+        description: 'See the behaviors of your object here.',
+        placement: 'bottom',
+      },
+      skippable: true,
+    },
+    {
+      id: 'AddBehavior',
+      elementToHighlightId: '#add-behavior-button',
+      nextStepTrigger: {
+        presenceOfElement:
+          '#behavior-item-TopDownMovementBehavior--TopDownMovementBehavior',
+      },
+      tooltip: {
+        description: 'Let’s add a behavior!',
+        placement: 'bottom',
+      },
+    },
+    {
+      id: 'SelectTopDownBehavior',
+      elementToHighlightId:
         '#behavior-item-TopDownMovementBehavior--TopDownMovementBehavior',
+      nextStepTrigger: {
+        presenceOfElement: '#behavior-parameters-TopDownMovement',
+      },
+      tooltip: {
+        description: 'Add the "Top down movement" behavior.',
+        placement: 'bottom',
+      },
     },
-    tooltip: {
-      description: 'Let’s add a behavior!',
-      placement: 'bottom',
+    {
+      id: 'ApplyBehavior',
+      elementToHighlightId: '#object-editor-dialog #apply-button',
+      nextStepTrigger: {
+        absenceOfElement: '#object-editor-dialog',
+      },
+      tooltip: {
+        description:
+          "The parameters above help you customise the behavior, but let's ignore them for now.",
+        placement: 'top',
+      },
     },
-  },
-  {
-    id: 'SelectTopDownBehavior',
-    elementToHighlightId:
-      '#behavior-item-TopDownMovementBehavior--TopDownMovementBehavior',
-    nextStepTrigger: {
-      presenceOfElement: '#behavior-parameters-TopDownMovement',
+    {
+      id: 'LaunchPreview1',
+      elementToHighlightId: '#toolbar-preview-button',
+      nextStepTrigger: {
+        clickOnButton: "I'm done",
+      },
+      tooltip: {
+        title: "Let's play!",
+        placement: 'bottom',
+      },
     },
-    tooltip: {
-      description: 'Add the "Top down movement" behavior.',
-      placement: 'bottom',
+    {
+      id: 'ClickOnNewObjectButton2',
+      elementToHighlightId: '#add-new-object-button',
+      nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
+      tooltip: {
+        placement: 'left',
+        title: "let's create another **object** to interact with {firstObject}",
+      },
     },
-  },
-  {
-    id: 'ApplyBehavior',
-    elementToHighlightId: '#object-editor-dialog #apply-button',
-    nextStepTrigger: {
-      absenceOfElement: '#object-editor-dialog',
-    },
-    tooltip: {
-      description:
-        "The parameters above help you customise the behavior, but let's ignore them for now.",
-      placement: 'top',
-    },
-  },
-  {
-    id: 'LaunchPreview1',
-    elementToHighlightId: '#toolbar-preview-button',
-    nextStepTrigger: {
-      clickOnButton: "I'm done",
-    },
-    tooltip: {
-      title: "Let's play!",
-      placement: 'bottom',
-    },
-  },
-  {
-    id: 'ClickOnNewObjectButton2',
-    elementToHighlightId: '#add-new-object-button',
-    nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
-    tooltip: {
-      placement: 'left',
-      title: "let's create another **object** to interact with {firstObject}",
-    },
-  },
-];
+  ],
+};
+const { flow } = inAppTutorial;
 
 const interpolateText = (text?: string, data: { [key: string]: string }) => {
   if (!text) return undefined;
@@ -178,6 +186,10 @@ const InAppTutorialProvider = (props: Props) => {
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
   const [project, setProject] = React.useState<?gdProject>(null);
   const [data, setData] = React.useState<{ [key: string]: string }>({});
+  const expectedEditor = React.useRef<?EditorIdentifier>(null);
+  const [currentEditor, setCurrentEditor] = React.useState<?EditorIdentifier>(
+    null
+  );
   const [
     watchElementInputValue,
     setWatchElementInputValue,
@@ -292,6 +304,16 @@ const InAppTutorialProvider = (props: Props) => {
     [currentStep, data]
   );
 
+  React.useEffect(
+    () => {
+      const { id } = flow[currentStepIndex];
+      if (id && inAppTutorial.editorSwitches.hasOwnProperty(id)) {
+        expectedEditor.current = inAppTutorial.editorSwitches[id];
+      }
+    },
+    [currentStepIndex]
+  );
+
   const watchInputBeingFilled = React.useCallback(
     () => {
       if (!watchElementInputValue) return;
@@ -332,7 +354,6 @@ const InAppTutorialProvider = (props: Props) => {
   console.log(currentStepIndex);
 
   const stepTooltip = flow[currentStepIndex].tooltip;
-  console.log(stepTooltip);
   const formattedStep = {
     ...flow[currentStepIndex],
     tooltip: stepTooltip
@@ -344,12 +365,15 @@ const InAppTutorialProvider = (props: Props) => {
       : undefined,
   };
 
+  React.useEffect(() => console.log(currentEditor), [currentEditor]);
+
   return (
     <InAppTutorialContext.Provider
       value={{
         flow: null,
         currentStep: formattedStep,
         setProject,
+        setCurrentEditor,
         goToNextStep: () => setCurrentStepIndex(currentStepIndex + 1),
       }}
     >

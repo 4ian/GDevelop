@@ -19,7 +19,7 @@ import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { TabContentContainer } from '../UI/ClosableTabs';
-import { DraggableClosableTabs } from './EditorTabs/DraggableEditorTabs';
+import { DraggableEditorTabs } from './EditorTabs/DraggableEditorTabs';
 import {
   getEditorTabsInitialState,
   openEditorTab,
@@ -375,6 +375,7 @@ const MainFrame = (props: Props) => {
   const {
     currentStep: inAppTutorialCurrentStep,
     setProject: setInAppTutorialProject,
+    setCurrentEditor,
   } = React.useContext(InAppTutorialContext);
   const [
     fileMetadataOpeningProgress,
@@ -2452,6 +2453,26 @@ const MainFrame = (props: Props) => {
     ),
   });
 
+  React.useEffect(
+    () => {
+      const currentTab = getCurrentTab(state.editorTabs);
+      if (!currentTab) {
+        setCurrentEditor(null);
+        return;
+      }
+      const editorIdentifier = currentTab.key.startsWith(
+        'start page'
+      )
+        ? 'Home'
+        : currentTab.key.startsWith('layout event')
+        ? 'Events'
+        : 'Scene';
+      // $FlowFixMe
+      setCurrentEditor(editorIdentifier);
+    },
+    [state.editorTabs, setCurrentEditor]
+  );
+
   const showLoader = isLoadingProject || previewLoading;
 
   return (
@@ -2583,7 +2604,7 @@ const MainFrame = (props: Props) => {
         }
         previewState={previewState}
       />
-      <DraggableClosableTabs
+      <DraggableEditorTabs
         hideLabels={false}
         editorTabs={state.editorTabs}
         onClickTab={(id: number) => _onChangeEditorTab(id)}

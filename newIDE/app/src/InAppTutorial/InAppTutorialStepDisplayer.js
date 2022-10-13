@@ -142,12 +142,12 @@ function InAppTutorialStepDisplayer({
     () => {
       // If the element is missing and we are on the right editor, go back
       // to fallback step after a delay.
-      if (!elementToHighlight && !expectedEditor) {
+      if (elementToHighlightId && !elementToHighlight && !expectedEditor) {
         const timeoutId = setTimeout(goToFallbackStep, 1000);
         return () => clearTimeout(timeoutId);
       }
     },
-    [elementToHighlight, goToFallbackStep, expectedEditor]
+    [elementToHighlightId, elementToHighlight, goToFallbackStep, expectedEditor]
   );
 
   const wrongEditorTooltip = expectedEditor

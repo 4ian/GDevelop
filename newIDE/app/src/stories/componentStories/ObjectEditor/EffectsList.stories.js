@@ -1,16 +1,16 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../ThemeDecorator';
-import paperDecorator from '../PaperDecorator';
-import themeDecorator from '../ThemeDecorator';
+import muiDecorator from '../../ThemeDecorator';
+import paperDecorator from '../../PaperDecorator';
+import themeDecorator from '../../ThemeDecorator';
 import GDevelopJsInitializerDecorator, {
   testProject,
-} from '../GDevelopJsInitializerDecorator';
-import EffectsList from '../../EffectsList';
-import DragAndDropContextProvider from '../../UI/DragAndDrop/DragAndDropContextProvider';
-import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
-import fakeResourceExternalEditors from '../FakeResourceExternalEditors';
+} from '../../GDevelopJsInitializerDecorator';
+import EffectsList from '../../../EffectsList';
+import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
+import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
+import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
 
 export const withSomeEffectsForALayer = () => (
   <DragAndDropContextProvider>
@@ -108,7 +108,7 @@ export const withoutEffectsForAnObject = () => (
 );
 
 export default {
-  title: 'EffectsList',
+  title: 'ObjectEditor/EffectsList',
   component: EffectsList,
   decorators: [paperDecorator, muiDecorator, themeDecorator],
 };

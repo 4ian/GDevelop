@@ -121,6 +121,101 @@ class GD_CORE_API ArbitraryEventsWorkerWithContext
   const gd::ObjectsContainer* currentObjectsContainer;
 };
 
+/**
+ * \brief ReadOnlyArbitraryEventsWorker is an abstract class used to browse events (and
+ * instructions). It can be used to implement autocompletion for example.
+ *
+ * \see gd::ReadOnlyArbitraryEventsWorkerWithContext
+ *
+ * \ingroup IDE
+ */
+class GD_CORE_API ReadOnlyArbitraryEventsWorker {
+ public:
+  ReadOnlyArbitraryEventsWorker(){};
+  virtual ~ReadOnlyArbitraryEventsWorker();
+
+  /**
+   * \brief Launch the worker on the specified events list.
+   */
+  void Launch(const gd::EventsList& events) { VisitEventList(events); };
+
+ private:
+  void VisitEventList(const gd::EventsList& events);
+  void VisitEvent(const gd::BaseEvent& event);
+  void VisitInstructionList(const gd::InstructionsList& instructions,
+                            bool areConditions);
+  void VisitInstruction(const gd::Instruction& instruction, bool isCondition);
+
+  /**
+   * Called to do some work on an event list.
+   */
+  virtual void DoVisitEventList(const gd::EventsList& events){};
+
+  /**
+   * Called to do some work on an event
+   */
+  virtual void DoVisitEvent(const gd::BaseEvent& event) {};
+
+  /**
+   * Called to do some work on an instruction list
+   */
+  virtual void DoVisitInstructionList(const gd::InstructionsList& instructions,
+                                      bool areConditions){};
+
+  /**
+   * Called to do some work on an instruction.
+   */
+  virtual void DoVisitInstruction(const gd::Instruction& instruction,
+                                  bool isCondition) {};
+};
+
+/**
+ * \brief An events worker that will know about the context (the objects
+ * container). Useful for workers working on expressions notably.
+ *
+ * \see gd::ReadOnlyArbitraryEventsWorker
+ *
+ * \ingroup IDE
+ */
+class GD_CORE_API ReadOnlyArbitraryEventsWorkerWithContext
+    : public ReadOnlyArbitraryEventsWorker {
+ public:
+  ReadOnlyArbitraryEventsWorkerWithContext()
+      : currentGlobalObjectsContainer(nullptr),
+        currentObjectsContainer(nullptr){};
+  virtual ~ReadOnlyArbitraryEventsWorkerWithContext();
+
+  /**
+   * \brief Launch the worker on the specified events list,
+   * giving the objects container on which the events are applying to.
+   */
+  void Launch(const gd::EventsList& events,
+              const gd::ObjectsContainer& globalObjectsContainer_,
+              const gd::ObjectsContainer& objectsContainer_) {
+    currentGlobalObjectsContainer = &globalObjectsContainer_;
+    currentObjectsContainer = &objectsContainer_;
+    ReadOnlyArbitraryEventsWorker::Launch(events);
+  };
+
+  void Launch(gd::EventsList& events) = delete;
+
+ protected:
+  const gd::ObjectsContainer& GetGlobalObjectsContainer() {
+    // Pointers are guaranteed to be not nullptr after
+    // Launch was called.
+    return *currentGlobalObjectsContainer;
+  };
+  const gd::ObjectsContainer& GetObjectsContainer() {
+    // Pointers are guaranteed to be not nullptr after
+    // Launch was called.
+    return *currentObjectsContainer;
+  };
+
+ private:
+  const gd::ObjectsContainer* currentGlobalObjectsContainer;
+  const gd::ObjectsContainer* currentObjectsContainer;
+};
+
 }  // namespace gd
 
 #endif  // GDCORE_ARBITRARYEVENTSWORKER_H

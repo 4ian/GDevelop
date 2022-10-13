@@ -886,7 +886,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/conditions/timer24.png",
          "res/conditions/timer.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "objectTimer")
       .AddParameter("expression", _("Time in seconds"))
       .SetHidden();
 
@@ -900,7 +900,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/conditions/timer24.png",
          "res/conditions/timer.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "objectTimer")
       .AddParameter("relationalOperator", _("Sign of the test"), "time")
       .AddParameter("expression", _("Time in seconds"))
       .SetManipulatedType("number");
@@ -913,7 +913,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "res/conditions/timerPaused24.png",
                    "res/conditions/timerPaused.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "objectTimer")
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -926,7 +926,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/actions/timer24.png",
          "res/actions/timer.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Timer's name"));
+      .AddParameter("identifier", _("Timer's name"), "objectTimer");
 
   obj.AddAction("PauseObjectTimer",
                 _("Pause an object timer"),
@@ -936,7 +936,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/pauseTimer24.png",
                 "res/actions/pauseTimer.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "objectTimer")
       .MarkAsAdvanced();
 
   obj.AddAction("UnPauseObjectTimer",
@@ -947,7 +947,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/unPauseTimer24.png",
                 "res/actions/unPauseTimer.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "objectTimer")
       .MarkAsAdvanced();
 
   obj.AddAction("RemoveObjectTimer",
@@ -958,7 +958,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/timer24.png",
                 "res/actions/timer.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "objectTimer")
       .MarkAsAdvanced();
 
   obj.AddExpression("X",
@@ -1127,7 +1127,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Object timers"),
                     "res/actions/time.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Timer's name"));
+      .AddParameter("identifier", _("Timer's name"), "objectTimer");
 
   obj.AddExpression("AngleToObject",
                     _("Angle between two objects"),

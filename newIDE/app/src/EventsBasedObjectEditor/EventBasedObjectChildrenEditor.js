@@ -5,7 +5,7 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import { Line } from '../UI/Grid';
-import ObjectsList from '../ObjectsList';
+import ObjectsList, { type ObjectsListInterface } from '../ObjectsList';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
@@ -34,7 +34,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
   Props,
   State
 > {
-  _objectsList: ?ObjectsList;
+  _objectsList: ?ObjectsListInterface;
 
   state = {
     editedObjectWithContext: null,
@@ -218,7 +218,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 selectedObjectNames={this.state.selectedObjectNames}
                 onEditObject={this.editObject}
                 // Don't allow export as there is no assets.
-                onExportObject={null}
+                onExportObject={() => {}}
                 onDeleteObject={this._onDeleteObject(i18n)}
                 canRenameObject={newName =>
                   this._canObjectOrGroupUseNewName(newName, i18n)
@@ -235,7 +235,10 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 selectedObjectTags={[]}
                 onChangeSelectedObjectTags={selectedObjectTags => {}}
                 getAllObjectTags={() => []}
-                ref={objectsList => (this._objectsList = objectsList)}
+                ref={
+                  // $FlowFixMe Make this component functional.
+                  objectsList => (this._objectsList = objectsList)
+                }
                 unsavedChanges={null}
                 // TODO EBO Hide the preview button or implement it.
                 // Note that it will be hard to do hot reload as extensions need

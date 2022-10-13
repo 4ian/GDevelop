@@ -4,9 +4,7 @@ import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import themeDecorator from '../../ThemeDecorator';
-import GDevelopJsInitializerDecorator, {
-  testProject,
-} from '../../GDevelopJsInitializerDecorator';
+import { testProject } from '../../GDevelopJsInitializerDecorator';
 import EffectsList from '../../../EffectsList';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';

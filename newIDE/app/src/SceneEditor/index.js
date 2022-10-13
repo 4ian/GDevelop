@@ -17,6 +17,7 @@ import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
 import LayerEditorDialog from '../LayersList/LayerEditorDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
+import ObjectExporterDialog from '../ObjectEditor/ObjectExporterDialog';
 import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
 import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
@@ -77,6 +78,7 @@ import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 import { getInstancesInLayoutForObject } from '../Utils/Layout';
+import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -140,6 +142,7 @@ type State = {|
   layerRemoved: ?string,
   editedLayer: ?gdLayer,
   editedLayerInitialTab: 'properties' | 'effects',
+  exportedObjectWithContext: ?ObjectWithContext,
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
@@ -192,6 +195,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layerRemoved: null,
       editedLayer: null,
       editedLayerInitialTab: 'properties',
+      exportedObjectWithContext: null,
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
@@ -381,6 +385,22 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.setState({
         editedObjectWithContext: null,
         editedObjectInitialTab: 'properties',
+      });
+    }
+  };
+
+  exportObject = (editedObject: ?gdObject) => {
+    if (editedObject) {
+      this.setState({
+        exportedObjectWithContext: {
+          object: editedObject,
+          // It's not important for the export.
+          global: false,
+        },
+      });
+    } else {
+      this.setState({
+        exportedObjectWithContext: null,
       });
     }
   };
@@ -1243,6 +1263,11 @@ export default class SceneEditor extends React.Component<Props, State> {
       ? getObjectByName(project, layout, variablesEditedAssociatedObjectName)
       : null;
 
+    const eventsFunctionsExtensionsState = React.useContext(
+      EventsFunctionsExtensionsContext
+    );
+    const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
+
     const editors = {
       properties: {
         type: 'secondary',
@@ -1387,6 +1412,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 selectedObjectNames={this.state.selectedObjectNames}
                 canInstallPrivateAsset={this.props.canInstallPrivateAsset}
                 onEditObject={this.props.onEditObject || this.editObject}
+                onExportObject={
+                  eventsFunctionsExtensionWriter ? this.exportObject : null
+                }
                 onDeleteObject={this._onDeleteObject(i18n)}
                 canRenameObject={newName =>
                   this._canObjectOrGroupUseNewName(newName, i18n)
@@ -1542,6 +1570,14 @@ export default class SceneEditor extends React.Component<Props, State> {
             </React.Fragment>
           )}
         </I18n>
+        {this.state.exportedObjectWithContext && (
+          <ObjectExporterDialog
+            object={this.state.exportedObjectWithContext.object}
+            onClose={() => {
+              this.exportObject(null);
+            }}
+          />
+        )}
         {!!this.state.editedGroup && (
           <ObjectGroupEditorDialog
             project={project}

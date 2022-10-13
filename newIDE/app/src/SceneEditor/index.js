@@ -6,7 +6,7 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import uniq from 'lodash/uniq';
-import ObjectsList from '../ObjectsList';
+import ObjectsList, { type ObjectsListInterface } from '../ObjectsList';
 import ObjectGroupsList from '../ObjectGroupsList';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import InstancesEditor from '../InstancesEditor';
@@ -78,7 +78,6 @@ import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 import { getInstancesInLayoutForObject } from '../Utils/Layout';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -177,7 +176,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   editor: ?InstancesEditor;
   contextMenu: ?ContextMenuInterface;
   editorMosaic: ?EditorMosaic;
-  _objectsList: ?ObjectsList;
+  _objectsList: ?ObjectsListInterface;
   _layersList: ?LayersList;
   _propertiesEditor: ?InstancePropertiesEditor;
   _instancesList: ?InstancesList;
@@ -481,8 +480,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       newObjectInstanceSceneCoordinates: this.editor.getLastCursorSceneCoordinates(),
     });
 
-    if (this._objectsList)
-      this._objectsList.setState({ newObjectDialogOpen: true });
+    if (this._objectsList) this._objectsList.openNewObjectDialog();
   };
 
   _onAddInstanceUnderCursor = () => {
@@ -1263,11 +1261,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       ? getObjectByName(project, layout, variablesEditedAssociatedObjectName)
       : null;
 
-    const eventsFunctionsExtensionsState = React.useContext(
-      EventsFunctionsExtensionsContext
-    );
-    const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
-
     const editors = {
       properties: {
         type: 'secondary',
@@ -1412,9 +1405,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 selectedObjectNames={this.state.selectedObjectNames}
                 canInstallPrivateAsset={this.props.canInstallPrivateAsset}
                 onEditObject={this.props.onEditObject || this.editObject}
-                onExportObject={
-                  eventsFunctionsExtensionWriter ? this.exportObject : null
-                }
+                onExportObject={this.exportObject}
                 onDeleteObject={this._onDeleteObject(i18n)}
                 canRenameObject={newName =>
                   this._canObjectOrGroupUseNewName(newName, i18n)
@@ -1431,7 +1422,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                   })
                 }
                 getAllObjectTags={this._getAllObjectTags}
-                ref={objectsList => (this._objectsList = objectsList)}
+                ref={
+                  // $FlowFixMe Make this component functional.
+                  objectsList => (this._objectsList = objectsList)
+                }
                 unsavedChanges={this.props.unsavedChanges}
                 hotReloadPreviewButtonProps={
                   this.props.hotReloadPreviewButtonProps

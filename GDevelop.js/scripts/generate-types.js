@@ -365,6 +365,12 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
       'type: string, description: string, optionalObjectType?: string, parameterIsOptional?: boolean',
       'types/gdexpressionmetadata.js'
     );
+    shell.sed(
+      '-i',
+      'type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean',
+      'type: string, description: string, optionalObjectType?: string, parameterIsOptional?: boolean',
+      'types/gdmultipleinstructionmetadata.js'
+    );
 
     // Add a notice that the file is auto-generated.
     shell.sed(

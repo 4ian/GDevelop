@@ -8,7 +8,7 @@ namespace gdjs {
    * Represents a layer of a scene, used to display objects.
    *
    * Viewports and multiple cameras are not supported.
-   * 
+   *
    * It does some optimizations but works exactly the same as
    * {@link gdjs.Layer}.
    */

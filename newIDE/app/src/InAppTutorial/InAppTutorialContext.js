@@ -52,6 +52,7 @@ export type InAppTutorialState = {|
   setCurrentEditor: (EditorIdentifier | null) => void,
   goToNextStep: () => void,
   onPreviewLaunch: () => void,
+  isFlowRunning: boolean,
 |};
 
 export const initialInAppTutorialState: InAppTutorialState = {
@@ -61,6 +62,7 @@ export const initialInAppTutorialState: InAppTutorialState = {
   setCurrentEditor: () => {},
   goToNextStep: () => {},
   onPreviewLaunch: () => {},
+  isFlowRunning: false,
 };
 
 const InAppTutorialContext = React.createContext<InAppTutorialState>(

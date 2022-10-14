@@ -88,6 +88,8 @@ export default class LocalEventsFunctionsExtensionWriter {
     customObject: gdObject,
     filepath: string
   ): Promise<void> => {
+    // TODO Fix the memory crash
+    // I think the clone method is bugged, it doesn't keep the Configuration.
     const exportedObject = customObject.clone().get();
     exportedObject.setTags('');
     exportedObject.getVariables().clear();
@@ -96,7 +98,7 @@ export default class LocalEventsFunctionsExtensionWriter {
       .getAllBehaviorNames()
       .toJSArray()
       .forEach(name => exportedObject.removeBehavior(name));
-    const serializedObject = serializeToJSObject(customObject);
+    const serializedObject = serializeToJSObject(exportedObject);
     exportedObject.delete();
     return writeJSONFile(serializedObject, filepath).catch(err => {
       console.error('Unable to write the object:', err);

@@ -160,7 +160,7 @@ function InAppTutorialTooltipDisplayer({
                   )}
                   {tooltip.description && (
                     <Typography style={styles.description}>
-                      <MarkdownText source={tooltip.description} />
+                      <MarkdownText source={tooltip.description} allowParagraphs />
                     </Typography>
                   )}
                   {buttonLabel && (

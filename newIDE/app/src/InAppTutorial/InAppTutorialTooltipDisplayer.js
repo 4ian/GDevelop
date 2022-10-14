@@ -4,7 +4,7 @@ import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import Fade from '@material-ui/core/Fade';
 import Typography from '@material-ui/core/Typography';
-import { ColumnStackLayout } from '../UI/Layout';
+import { Column, LargeSpacer } from '../UI/Grid';
 import { getDisplayZIndexForHighlighter } from './HTMLUtils';
 import InAppTutorialContext, {
   type InAppTutorialTooltip,
@@ -23,7 +23,7 @@ type Props = {|
 const styles = {
   paper: {
     backgroundColor: '#FAFAFA', // Grey00
-    padding: '10px 20px',
+    padding: '0px 20px', // vertical padding is added by markdown text paragraphs
   },
   title: {
     color: '#1D1D26', // Grey100
@@ -149,10 +149,10 @@ function InAppTutorialTooltipDisplayer({
           <>
             <Fade {...TransitionProps} timeout={{ enter: 350, exit: 0 }}>
               <Paper style={styles.paper} elevation={4}>
-                <ColumnStackLayout noMargin>
+                <Column noMargin>
                   {tooltip.title && (
                     <Typography style={styles.title} variant="subtitle1">
-                      <MarkdownText source={tooltip.title} />
+                      <MarkdownText source={tooltip.title} allowParagraphs />
                     </Typography>
                   )}
                   {tooltip.title && tooltip.description && (
@@ -160,17 +160,23 @@ function InAppTutorialTooltipDisplayer({
                   )}
                   {tooltip.description && (
                     <Typography style={styles.description}>
-                      <MarkdownText source={tooltip.description} allowParagraphs />
+                      <MarkdownText
+                        source={tooltip.description}
+                        allowParagraphs
+                      />
                     </Typography>
                   )}
                   {buttonLabel && (
-                    <RaisedButton
-                      primary
-                      label={buttonLabel}
-                      onClick={goToNextStep}
-                    />
+                    <>
+                      <RaisedButton
+                        primary
+                        label={buttonLabel}
+                        onClick={goToNextStep}
+                      />
+                      <LargeSpacer />
+                    </>
                   )}
-                </ColumnStackLayout>
+                </Column>
                 <span
                   id="arrow-popper"
                   className={classes.arrow}

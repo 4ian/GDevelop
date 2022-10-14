@@ -178,6 +178,76 @@ const inAppTutorial: InAppTutorial = {
           "Let's now add another **object** that {firstObject} can collect!",
       },
     },
+    {
+      id: 'OpenAssetTab2',
+      elementToHighlightId: '#asset-store-tab',
+      nextStepTrigger: { presenceOfElement: '#asset-store' },
+      tooltip: {
+        description: "Let's choose an object from the asset store.",
+        placement: 'bottom',
+      },
+      skippable: true,
+      isOnClosableDialog: true,
+    },
+    {
+      id: 'ClickOnSearchBar2',
+      elementToHighlightId: '#asset-store-search-bar',
+      nextStepTrigger: { elementIsFilled: true },
+      tooltip: {
+        description: 'Search for “coin” (or a potion, food, ...).',
+      },
+      isOnClosableDialog: true,
+      shortcuts: [
+        {
+          stepId: 'CloseAssetStore2',
+          trigger: { presenceOfElement: '#object-item-1' },
+        },
+      ],
+    },
+    {
+      id: 'WaitForUserToSelectAsset2',
+      nextStepTrigger: { presenceOfElement: '#add-asset-button' },
+      isOnClosableDialog: true,
+    },
+    {
+      id: 'AddAsset2',
+      elementToHighlightId: '#add-asset-button',
+      isTriggerFlickering: true,
+      nextStepTrigger: { presenceOfElement: '#object-item-1' },
+      mapProjectData: {
+        secondObject: 'lastProjectObjectName',
+      },
+      isOnClosableDialog: true,
+    },
+    {
+      id: 'CloseAssetStore2',
+      elementToHighlightId: '#new-object-dialog #close-button',
+      nextStepTrigger: { absenceOfElement: '#new-object-dialog' },
+      tooltip: {
+        description:
+          "Great! Our game now has 2 **objects**, let's see what we can do with them.",
+      },
+    },
+    {
+      id: 'DragObjectToScene',
+      elementToHighlightId: '#object-item-1',
+      nextStepTrigger: { instanceDraggedOnScene: 'secondObject' },
+      tooltip: {
+        description:
+          'Place a few {secondObject} in the scene by dragging them to the canvas.',
+        placement: 'left',
+      },
+    },
+    {
+      id: 'SwitchToEventsSheet',
+      elementToHighlightId: '[id^=tab-layout-events]',
+      nextStepTrigger: { presenceOfElement: '#add-event-button' },
+      tooltip: {
+        description:
+          "Now let's make our character collect the coins! Go to the **events** tab of the **scene**.",
+        placement: 'bottom',
+      },
+    },
   ],
 };
 const { flow } = inAppTutorial;
@@ -276,34 +346,48 @@ const InAppTutorialProvider = (props: Props) => {
           break;
         }
       }
-      if (!shouldGoToStepAtIndex) return;
-
-      // If a change of step is going to happen, first record the data for
-      // the current step that is about to be closed.
-      const { mapProjectData } = flow[currentStepIndex];
-
-      if (mapProjectData) {
-        Object.entries(mapProjectData).forEach(([key, dataAccessor]) => {
-          if (dataAccessor === 'lastProjectObjectName') {
-            if (!project || project.getLayoutsCount() === 0) return;
-            const layout = project.getLayoutAt(0);
-            const layoutObjectsCount = layout.getObjectsCount();
-            if (layoutObjectsCount === 0) {
-              throw new Error(
-                `No object was found in layer after step ${currentStepIndex} of flow`
+      if (shouldGoToStepAtIndex === null) {
+        // No trigger has been detected for the next mandatory step or the in-between
+        // skippable steps.
+        // Let's now check that, if there's a shortcut, it may have been triggered.
+        const { shortcuts } = flow[currentStepIndex];
+        if (!shortcuts) return;
+        for (let shortcutStep of shortcuts) {
+          // Find the first shortcut in the list that can be triggered.
+          if (isStepDone(shortcutStep.trigger)) {
+            shouldGoToStepAtIndex = flow.findIndex(
+              step => step.id === shortcutStep.stepId
+            );
+            if (shouldGoToStepAtIndex < 0) {
+              console.warn(
+                `Step with id ${
+                  shortcutStep.stepId
+                } could not be found. Shortcut not taken.`
               );
+              return;
             }
-            setData(currentData => ({
-              ...currentData,
-              [key]: layout.getObjectAt(layout.getObjectsCount() - 1).getName(),
-            }));
+            break;
           }
-        });
+        }
       }
 
+      // If a change of step is going to happen, first record the data for
+      // all the steps that are about to be closed.
+      const newData = gatherProjectData({
+        flow,
+        startIndex: currentStepIndex,
+        // $FlowFixMe - shouldGoToStepAtIndex cannot be null at this point.
+        endIndex: shouldGoToStepAtIndex - 1,
+        data,
+        project,
+      });
+
+      setData(newData);
+
+      // $FlowFixMe - shouldGoToStepAtIndex cannot be null at this point.
       goToStep(shouldGoToStepAtIndex);
     },
-    [currentStepIndex, project, goToStep]
+    [currentStepIndex, project, goToStep, data]
   );
 
   const handleDomMutation = useDebounce(watchDomForNextStepTrigger, 200);

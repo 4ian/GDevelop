@@ -7,9 +7,12 @@ export type InAppTutorialTooltip = {|
   description?: string,
 |};
 
-type InAppTutorialFlowStepTrigger =
+type InAppTutorialFlowStepDOMChangeTrigger =
   | {| presenceOfElement: string |}
-  | {| absenceOfElement: string |}
+  | {| absenceOfElement: string |};
+
+export type InAppTutorialFlowStepTrigger =
+  | InAppTutorialFlowStepDOMChangeTrigger
   | {| elementIsFilled: true |}
   | {| instanceDraggedOnScene: string |}
   | {| previewLaunched: true |}
@@ -20,6 +23,11 @@ export type InAppTutorialFlowStep = {|
   id?: string,
   isTriggerFlickering?: true,
   nextStepTrigger?: InAppTutorialFlowStepTrigger,
+  shortcuts?: Array<{|
+    stepId: string,
+    // TODO: Adapt provider to make it possible to use other triggers as shortcuts
+    trigger: InAppTutorialFlowStepDOMChangeTrigger,
+  |}>,
   mapProjectData?: {
     [key: string]: 'lastProjectObjectName',
   },

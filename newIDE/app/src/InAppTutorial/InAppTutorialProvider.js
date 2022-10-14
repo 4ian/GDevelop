@@ -684,6 +684,7 @@ const InAppTutorialProvider = (props: Props) => {
         setCurrentEditor,
         goToNextStep: () => setCurrentStepIndex(currentStepIndex + 1),
         onPreviewLaunch,
+        isFlowRunning: true, // TODO
       }}
     >
       {props.children}

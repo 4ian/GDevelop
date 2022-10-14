@@ -32,9 +32,9 @@ export type CreateProjectSetup = {|
     storageProvider: ?StorageProvider,
     fileMetadata: ?FileMetadata,
   |},
-  destination: ?{|
+  destination: {|
     storageProvider: StorageProvider,
-    fileMetadata: FileMetadata,
+    fileMetadata: ?FileMetadata,
   |},
 |};
 

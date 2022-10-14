@@ -285,6 +285,46 @@ const isStepDone = (
   return false;
 };
 
+const gatherProjectData = ({
+  flow,
+  startIndex,
+  endIndex,
+  data,
+  project,
+}: {
+  flow: Array<InAppTutorialFlowStep>,
+  startIndex: number,
+  endIndex: number,
+  data: { [key: string]: string },
+  project: ?gdProject,
+}): { [key: string]: string } => {
+  if (!project) return data;
+
+  let newData = { ...data };
+  for (let index = startIndex; index <= endIndex; index++) {
+    const { mapProjectData } = flow[index];
+
+    if (mapProjectData) {
+      Object.entries(mapProjectData).forEach(([key, dataAccessor]) => {
+        if (dataAccessor === 'lastProjectObjectName') {
+          if (!project || project.getLayoutsCount() === 0) return;
+          const layout = project.getLayoutAt(0);
+          const layoutObjectsCount = layout.getObjectsCount();
+          if (layoutObjectsCount === 0) {
+            throw new Error(
+              `No object was found in layer after step ${index} of flow`
+            );
+          }
+          newData[key] = layout
+            .getObjectAt(layout.getObjectsCount() - 1)
+            .getName();
+        }
+      });
+    }
+  }
+  return newData;
+};
+
 const InAppTutorialProvider = (props: Props) => {
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
   const [project, setProject] = React.useState<?gdProject>(null);
@@ -311,7 +351,10 @@ const InAppTutorialProvider = (props: Props) => {
   const { isTriggerFlickering } = currentStep;
 
   const goToStep = React.useCallback((stepIndex: number) => {
+    // TODO: Better handle end of flow
+    if (!flow[stepIndex]) return;
     let nextStepIndex = stepIndex;
+
     // Check if we can go directly to next mandatory (not-skippable) step.
     while (flow[nextStepIndex].skippable && nextStepIndex < flow.length - 1) {
       if (isStepDone(flow[nextStepIndex].nextStepTrigger)) nextStepIndex += 1;
@@ -326,6 +369,8 @@ const InAppTutorialProvider = (props: Props) => {
       console.log('MUTATION');
       // Find the next mandatory (not-skippable) step (It can be the current step).
       let indexOfNextMandatoryStep = currentStepIndex;
+      // TODO: Better handle end of flow
+      if (!flow[indexOfNextMandatoryStep]) return;
       while (flow[indexOfNextMandatoryStep].skippable) {
         indexOfNextMandatoryStep += 1;
       }

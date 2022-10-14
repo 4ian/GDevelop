@@ -27,11 +27,11 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.ShapePainterRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
       this._graphics = new PIXI.Graphics();
-      runtimeScene
+      instanceContainer
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._graphics, runtimeObject.getZOrder());

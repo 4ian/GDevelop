@@ -45,6 +45,7 @@ export type InAppTutorialEndDialog = {|
 |};
 
 export type InAppTutorial = {|
+  id: string,
   flow: Array<InAppTutorialFlowStep>,
   editorSwitches: {
     [stepId: string]: EditorIdentifier,
@@ -59,6 +60,7 @@ export type InAppTutorialState = {|
   goToNextStep: () => void,
   onPreviewLaunch: () => void,
   isFlowRunning: boolean,
+  startTutorial: (id: string) => void,
 |};
 
 export const initialInAppTutorialState: InAppTutorialState = {
@@ -68,6 +70,7 @@ export const initialInAppTutorialState: InAppTutorialState = {
   goToNextStep: () => {},
   onPreviewLaunch: () => {},
   isFlowRunning: false,
+  startTutorial: () => {},
 };
 
 const InAppTutorialContext = React.createContext<InAppTutorialState>(

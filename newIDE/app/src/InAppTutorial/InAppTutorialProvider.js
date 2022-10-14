@@ -238,6 +238,17 @@ const InAppTutorialProvider = (props: Props) => {
   const currentStep = flow[currentStepIndex];
   const { isTriggerFlickering } = currentStep;
 
+  const goToStep = React.useCallback((stepIndex: number) => {
+    let nextStepIndex = stepIndex;
+    // Check if we can go directly to next mandatory (not-skippable) step.
+    while (flow[nextStepIndex].skippable && nextStepIndex < flow.length - 1) {
+      if (isStepDone(flow[nextStepIndex])) nextStepIndex += 1;
+      else break;
+    }
+
+    setCurrentStepIndex(nextStepIndex);
+  }, []);
+
   const watchDomForNextStepTrigger = React.useCallback(
     () => {
       console.log('MUTATION');
@@ -286,20 +297,9 @@ const InAppTutorialProvider = (props: Props) => {
         });
       }
 
-      // Check if we can go directly to next mandatory (not-skippable) step.
-      while (
-        flow[shouldGoToStepAtIndex].skippable &&
-        shouldGoToStepAtIndex < flow.length - 1
-      ) {
-        if (isStepDone(flow[shouldGoToStepAtIndex])) shouldGoToStepAtIndex += 1;
-        else break;
-      }
-
-      // Change step
-      // $FlowFixMe - shouldGoAtStepIndex cannot be null
-      setCurrentStepIndex(shouldGoToStepAtIndex);
+      goToStep(shouldGoToStepAtIndex);
     },
-    [currentStepIndex, project]
+    [currentStepIndex, project, goToStep]
   );
 
   const handleDomMutation = useDebounce(watchDomForNextStepTrigger, 200);
@@ -308,7 +308,7 @@ const InAppTutorialProvider = (props: Props) => {
     if (!currentStep) return;
     const { nextStepTrigger } = currentStep;
     if (nextStepTrigger && nextStepTrigger.previewLaunched) {
-      setCurrentStepIndex(currentStepIndex + 1);
+      goToStep(currentStepIndex + 1);
     }
   };
 
@@ -376,11 +376,11 @@ const InAppTutorialProvider = (props: Props) => {
         // $FlowFixMe
         elementToWatch.value
       ) {
-        setCurrentStepIndex(currentStepIndex + 1);
+        goToStep(currentStepIndex + 1);
         setWatchElementInputValue(null);
       }
     },
-    [currentStepIndex, watchElementInputValue]
+    [currentStepIndex, goToStep, watchElementInputValue]
   );
 
   const watchSceneInstanceChanges = React.useCallback(
@@ -390,11 +390,11 @@ const InAppTutorialProvider = (props: Props) => {
       const layout = project.getLayoutAt(0);
       const instances = layout.getInitialInstances();
       if (instances.hasInstancesOfObject(watchSceneInstances)) {
-        setCurrentStepIndex(currentStepIndex + 1);
+        goToStep(currentStepIndex + 1);
         setWatchSceneInstances(null);
       }
     },
-    [project, currentStepIndex, watchSceneInstances]
+    [project, currentStepIndex, goToStep, watchSceneInstances]
   );
 
   useInterval(watchInputBeingFilled, watchElementInputValue ? 1000 : null);

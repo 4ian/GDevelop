@@ -979,7 +979,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                         onClick={stopEventPropagation}
                         errorText={nameErrors[variable.ptr]}
                         onChange={newValue => {
-                          onChangeName(nodeId, newValue);
+                          onChangeName(nodeId, newValue, depth);
                           if (nameErrors[variable.ptr]) {
                             const newNameErrors = { ...nameErrors };
                             delete newNameErrors[variable.ptr];
@@ -997,7 +997,11 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                         }}
                         value={name}
                         onBlur={event => {
-                          onChangeName(nodeId, event.currentTarget.value);
+                          onChangeName(
+                            nodeId,
+                            event.currentTarget.value,
+                            depth
+                          );
                           if (nameErrors[variable.ptr]) {
                             const newNameErrors = { ...nameErrors };
                             delete newNameErrors[variable.ptr];
@@ -1223,7 +1227,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     setExpandedNodes(values);
   };
 
-  const onChangeName = (nodeId: string, newName: ?string) => {
+  const onChangeName = (nodeId: string, newName: ?string, depth: number) => {
     const { variable, lineage, name } = getVariableContextFromNodeId(
       nodeId,
       props.variablesContainer
@@ -1242,17 +1246,13 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         });
         return;
       }
-      if (
-        newName.match(/^[0-9].*/) ||
-        newName.includes('.') ||
-        newName.includes(',')
-      ) {
+      if (depth === 0 && !newName.match(/[\p{L}_][\p{L}0-9_]*$/u)) {
         setNameErrors({
           ...nameErrors,
           [variable.ptr]: (
             <Trans>
-              Variable names should start with a letter and cannot include a
-              comma nor a dot.
+              Top variable names can contain letters from any alphabet, digits
+              and "_" character and cannot start with a digit.
             </Trans>
           ),
         });

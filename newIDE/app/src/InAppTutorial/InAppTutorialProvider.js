@@ -469,7 +469,6 @@ const InAppTutorialProvider = (props: Props) => {
   const domObserverRef = React.useRef<?MutationObserver>(null);
 
   const currentStep = flow[currentStepIndex];
-  const { isTriggerFlickering } = currentStep;
 
   const goToStep = React.useCallback((stepIndex: number) => {
     // TODO: Better handle end of flow
@@ -590,6 +589,7 @@ const InAppTutorialProvider = (props: Props) => {
 
   React.useEffect(
     () => {
+      if (!flow[currentStepIndex]) return;
       const { id, isOnClosableDialog } = flow[currentStepIndex];
       if (id && inAppTutorial.editorSwitches.hasOwnProperty(id)) {
         setExpectedEditor(inAppTutorial.editorSwitches[id]);
@@ -654,11 +654,14 @@ const InAppTutorialProvider = (props: Props) => {
 
   useInterval(watchInputBeingFilled, watchElementInputValue ? 1000 : null);
   useInterval(watchSceneInstanceChanges, watchSceneInstances ? 500 : null);
-  useInterval(watchDomForNextStepTrigger, isTriggerFlickering ? 500 : null);
+  useInterval(
+    watchDomForNextStepTrigger,
+    currentStep && currentStep.isTriggerFlickering ? 500 : null
+  );
 
   console.log(currentStepIndex);
 
-  const stepTooltip = flow[currentStepIndex].tooltip;
+  const stepTooltip = currentStep.tooltip;
   const formattedStep: InAppTutorialFlowStep = {
     ...flow[currentStepIndex],
     tooltip: stepTooltip

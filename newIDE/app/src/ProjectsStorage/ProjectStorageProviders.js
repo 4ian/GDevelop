@@ -16,18 +16,7 @@ import { type AppArguments } from '../Utils/Window';
 export const emptyStorageProvider: StorageProvider = {
   internalName: 'Empty',
   name: 'No storage',
-  createOperations: () => ({
-    onOpenWithPicker: () => Promise.reject('No storage provider set up'),
-    onOpen: () => Promise.reject('No storage provider set up'),
-    hasAutoSave: () => Promise.resolve(false),
-    onSaveProject: (project: gdProject) =>
-      Promise.reject('No storage provider set up'),
-    onChooseSaveProjectAsLocation: (project: gdProject) =>
-      Promise.reject('No storage provider set up'),
-    onSaveProjectAs: (project: gdProject) =>
-      Promise.reject('No storage provider set up'),
-    onAutoSaveProject: (project: gdProject) => Promise.resolve(),
-  }),
+  createOperations: () => ({}),
 };
 
 type Props = {|
@@ -41,7 +30,6 @@ type Props = {|
     ) => StorageProviderOperations,
     initialFileMetadataToOpen: ?FileMetadata,
     getStorageProvider: () => StorageProvider,
-    resetStorageProvider: () => void,
   }) => React.Node,
 |};
 
@@ -104,15 +92,6 @@ const ProjectStorageProviders = (props: Props) => {
 
   const closeDialog = () => {
     setRenderDialog(null);
-  };
-
-  const resetStorageProvider = () => {
-    currentStorageProvider.current = emptyStorageProvider;
-    storageProviderOperations.current = emptyStorageProvider.createOperations({
-      setDialog,
-      closeDialog,
-      authenticatedUser,
-    });
   };
 
   const getStorageProviderOperations = (
@@ -186,7 +165,6 @@ const ProjectStorageProviders = (props: Props) => {
         initialFileMetadataToOpen:
           defaultConfiguration.initialFileMetadataToOpen,
         getStorageProvider,
-        resetStorageProvider,
       })}
       {renderDialog && renderDialog()}
     </React.Fragment>

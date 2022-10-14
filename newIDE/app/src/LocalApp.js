@@ -65,7 +65,6 @@ export const create = (authentication: Authentication) => {
             storageProviders,
             initialFileMetadataToOpen,
             getStorageProvider,
-            resetStorageProvider,
           }) => (
             <MainFrame
               i18n={i18n}
@@ -105,7 +104,6 @@ export const create = (authentication: Authentication) => {
               resourceFetcher={LocalResourceFetcher}
               getStorageProviderOperations={getStorageProviderOperations}
               getStorageProvider={getStorageProvider}
-              resetStorageProvider={resetStorageProvider}
               resourceSources={localResourceSources}
               resourceExternalEditors={localResourceExternalEditors}
               extensionsLoader={makeExtensionsLoader({

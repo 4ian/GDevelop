@@ -246,7 +246,6 @@ export type Props = {
     storageProvider?: ?StorageProvider
   ) => StorageProviderOperations,
   getStorageProvider: () => StorageProvider,
-  resetStorageProvider: () => void,
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   requestUpdate?: () => void,
@@ -412,7 +411,6 @@ const MainFrame = (props: Props) => {
     resourceFetcher,
     getStorageProviderOperations,
     getStorageProvider,
-    resetStorageProvider,
     initialDialog,
     initialFileMetadataToOpen,
     introDialog,
@@ -679,7 +677,6 @@ const MainFrame = (props: Props) => {
             currentProject
           );
           currentProject.delete();
-          resetStorageProvider();
         }
 
         return {
@@ -695,7 +692,6 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
       setState,
-      resetStorageProvider,
     ]
   );
 
@@ -2285,69 +2281,61 @@ const MainFrame = (props: Props) => {
         currentProject.setTemplateSlug(selectedExampleShortHeader.slug);
       if (source.projectName) currentProject.setName(source.projectName);
 
-      if (!destination) {
-        // If there is no destination, ensure the storageProvider is reset.
-        resetStorageProvider();
-      } else {
-        // If there is a destination, save the project where asked to.
-        const destinationStorageProviderOperations = getStorageProviderOperations(
-          destination.storageProvider
-        );
+      const destinationStorageProviderOperations = getStorageProviderOperations(
+        destination.storageProvider
+      );
 
-        const { onSaveProjectAs } = destinationStorageProviderOperations;
+      const { onSaveProjectAs } = destinationStorageProviderOperations;
 
-        if (onSaveProjectAs) {
-          try {
-            const { wasSaved } = await onSaveProjectAs(
-              currentProject,
-              destination.fileMetadata,
-              {
-                onStartSaving: () => {
-                  console.log('Start saving as the new project...');
-                },
-                onMoveResources: async () => {
-                  if (
-                    !sourceStorageProvider ||
-                    !sourceStorageProviderOperations ||
-                    !source.fileMetadata
-                  ) {
-                    console.log(
-                      'No storage provider set or no previous FileMetadata (probably creating a blank project) - skipping resources copy.'
-                    );
-                    return;
-                  }
+      if (onSaveProjectAs) {
+        try {
+          const { wasSaved } = await onSaveProjectAs(
+            currentProject,
+            destination.fileMetadata,
+            {
+              onStartSaving: () => {
+                console.log('Start saving as the new project...');
+              },
+              onMoveResources: async () => {
+                if (
+                  !sourceStorageProvider ||
+                  !sourceStorageProviderOperations ||
+                  !source.fileMetadata ||
+                  !destination.fileMetadata
+                ) {
+                  console.log(
+                    'No storage provider set or no previous/destination FileMetadata (probably creating a blank project) - skipping resources copy.'
+                  );
+                  return;
+                }
 
-                  await ensureResourcesAreMoved({
-                    project: currentProject,
-                    newFileMetadata: destination.fileMetadata,
-                    newStorageProvider: destination.storageProvider,
-                    newStorageProviderOperations: destinationStorageProviderOperations,
-                    oldFileMetadata: source.fileMetadata,
-                    oldStorageProvider: sourceStorageProvider,
-                    oldStorageProviderOperations: sourceStorageProviderOperations,
-                    authenticatedUser,
-                  });
-                },
-              }
-            );
-
-            if (wasSaved) {
-              setState(state => ({
-                ...state,
-                currentFileMetadata: destination.fileMetadata,
-              }));
-              if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
-              if (destination.storageProvider.internalName === 'LocalFile') {
-                preferences.setHasProjectOpened(true);
-              }
+                await ensureResourcesAreMoved({
+                  project: currentProject,
+                  newFileMetadata: destination.fileMetadata,
+                  newStorageProvider: destination.storageProvider,
+                  newStorageProviderOperations: destinationStorageProviderOperations,
+                  oldFileMetadata: source.fileMetadata,
+                  oldStorageProvider: sourceStorageProvider,
+                  oldStorageProviderOperations: sourceStorageProviderOperations,
+                  authenticatedUser,
+                });
+              },
             }
-          } catch (rawError) {
-            // Do not prevent creating the project.
-            console.error(
-              "Couldn't save the project after creation.",
-              rawError
-            );
+          );
+
+          if (wasSaved) {
+            setState(state => ({
+              ...state,
+              currentFileMetadata: destination.fileMetadata,
+            }));
+            if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
+            if (destination.storageProvider.internalName === 'LocalFile') {
+              preferences.setHasProjectOpened(true);
+            }
           }
+        } catch (rawError) {
+          // Do not prevent creating the project.
+          console.error("Couldn't save the project after creation.", rawError);
         }
       }
 

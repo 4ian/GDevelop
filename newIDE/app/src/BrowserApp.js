@@ -63,7 +63,6 @@ export const create = (authentication: Authentication) => {
             storageProviders,
             initialFileMetadataToOpen,
             getStorageProvider,
-            resetStorageProvider,
           }) => (
             <MainFrame
               i18n={i18n}
@@ -101,7 +100,6 @@ export const create = (authentication: Authentication) => {
               onCreateBlank={onCreateBlank}
               getStorageProviderOperations={getStorageProviderOperations}
               getStorageProvider={getStorageProvider}
-              resetStorageProvider={resetStorageProvider}
               resourceSources={browserResourceSources}
               resourceExternalEditors={browserResourceExternalEditors}
               extensionsLoader={makeExtensionsLoader({

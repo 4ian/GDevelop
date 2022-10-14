@@ -172,10 +172,12 @@ export const useGenericRetryableProcessWithProgress = <DoProcessOptions>({
       setResult(null);
       setGenericError(null);
 
+      // This will display the dialog:
+      setIsFetching(true);
+
       let newResult = null;
       try {
         newResult = await onDoProcess(options, (count, total) => {
-          setIsFetching(true); // Only display the dialog if some progress happened.
           setProgress((count / total) * 100);
         });
 

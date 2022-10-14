@@ -14,6 +14,7 @@ type Props = {| children: React.Node |};
 const inAppTutorial: InAppTutorial = {
   editorSwitches: {
     ClickOnNewObjectButton1: 'Scene',
+    ClickOnNewEvent: 'EventsSheet',
   },
   flow: [
     {
@@ -244,7 +245,127 @@ const inAppTutorial: InAppTutorial = {
       nextStepTrigger: { presenceOfElement: '#add-event-button' },
       tooltip: {
         description:
-          "Now let's make our character collect the coins! Go to the **events** tab of the **scene**.",
+          "Now let's make {firstObject} collect the {secondObject}! Go to the **events** tab of the **scene**.",
+        placement: 'bottom',
+      },
+    },
+    {
+      id: 'ClickOnNewEvent',
+      elementToHighlightId: '#add-event-button',
+      nextStepTrigger: { presenceOfElement: '#add-condition-button' },
+      tooltip: {
+        title: 'Let’s add an **event**!',
+        description: '👉 **Events** are the logic to your game.',
+        placement: 'bottom',
+      },
+    },
+    {
+      id: 'ClickOnNewCondition',
+      elementToHighlightId: '#add-condition-button',
+      nextStepTrigger: { presenceOfElement: '#instruction-editor-dialog' },
+      tooltip: {
+        description:
+          '**Events** are made of a condition and an action:\n\nCondition: "**If** {firstObject} touches the {secondObject}..."\n\nAction: "... **then** the {secondObject} disappears"\n\n**Click "Add condition**"',
+        placement: 'bottom',
+      },
+    },
+    {
+      id: 'ChooseObject',
+      elementToHighlightId: '#instruction-editor-dialog #object-item-0',
+      nextStepTrigger: { presenceOfElement: '#object-instruction-selector' },
+      tooltip: {
+        description: 'Choose {firstObject}',
+        placement: 'bottom',
+      },
+      isOnClosableDialog: true,
+    },
+    {
+      id: 'ChooseCondition',
+      elementToHighlightId: '#instruction-item-CollisionNP',
+      nextStepTrigger: {
+        presenceOfElement: '#instruction-parameters-container',
+      },
+      tooltip: {
+        description: 'Then the condition we want to use: **"Collision"**.',
+        placement: 'bottom',
+      },
+      isOnClosableDialog: true,
+    },
+    {
+      id: 'SetParameter',
+      elementToHighlightId: '#parameter-1-object-selector',
+      nextStepTrigger: { elementIsFilled: true },
+      tooltip: {
+        description: 'Finally, select the target **object** ({secondObject}).',
+        placement: 'top',
+      },
+      isOnClosableDialog: true,
+    },
+    {
+      id: 'CloseInstructionEditor',
+      elementToHighlightId: '#instruction-editor-dialog #ok-button',
+      nextStepTrigger: { absenceOfElement: '#instruction-editor-dialog' },
+    },
+    {
+      id: 'ClickOnNewAction',
+      elementToHighlightId: '#add-action-button',
+      nextStepTrigger: { presenceOfElement: '#instruction-editor-dialog' },
+      tooltip: {
+        description:
+          "Let's add **what happens when the condition is met**: make {secondObject} disappear.",
+        placement: 'bottom',
+      },
+    },
+    {
+      id: 'ChooseObject2',
+      elementToHighlightId: '#instruction-editor-dialog #object-item-1',
+      nextStepTrigger: { presenceOfElement: '#object-instruction-selector' },
+      tooltip: {
+        description: 'Choose {secondObject}',
+        placement: 'bottom',
+      },
+      isOnClosableDialog: true,
+    },
+    {
+      id: 'ChooseAction',
+      elementToHighlightId: '#instruction-item-Delete',
+      nextStepTrigger: {
+        presenceOfElement: '#instruction-parameters-container',
+      },
+      tooltip: {
+        description:
+          'Then choose the **action** {secondObject} will receive : "Delete", as we want to remove it.',
+        placement: 'bottom',
+      },
+      isOnClosableDialog: true,
+    },
+    {
+      id: 'CloseInstructionEditor2',
+      elementToHighlightId: '#instruction-editor-dialog #ok-button',
+      nextStepTrigger: { absenceOfElement: '#instruction-editor-dialog' },
+      tooltip: {
+        description: 'Nothing more is needed!',
+        placement: 'top',
+      },
+    },
+    {
+      id: 'LaunchPreview2',
+      elementToHighlightId: '#toolbar-preview-button',
+      nextStepTrigger: { previewLaunched: true },
+      tooltip: {
+        title: "Let's see how it works! 🎮",
+        placement: 'bottom',
+      },
+    },
+    {
+      id: 'WaitForUserToHavePlayed2',
+      elementToHighlightId: '#toolbar-preview-button',
+      nextStepTrigger: {
+        clickOnButton: "I'm done",
+      },
+      tooltip: {
+        description:
+          "Once you're done testing, close the **preview** and come back here.",
         placement: 'bottom',
       },
     },

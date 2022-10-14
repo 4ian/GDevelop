@@ -8,6 +8,7 @@ import InAppTutorialContext, {
   type InAppTutorialFlowStepTrigger,
   type EditorIdentifier,
 } from './InAppTutorialContext';
+import InAppTutorialEndDialog from './InAppTutorialEndDialog';
 import InAppTutorialStepDisplayer from './InAppTutorialStepDisplayer';
 type Props = {| children: React.Node |};
 
@@ -15,6 +16,25 @@ const inAppTutorial: InAppTutorial = {
   editorSwitches: {
     ClickOnNewObjectButton1: 'Scene',
     ClickOnNewEvent: 'EventsSheet',
+  },
+  endDialog: {
+    content: [
+      {
+        text:
+          '## Congratulations! 🎉\n\n## You’ve built your first game! 😊\n\nYou’re now ready to learn the basics of GDevelop\n\nClick the image to start!\n\n👇👇👇',
+      },
+      {
+        cta: {
+          imageSource: 'https://i3.ytimg.com/vi/bR2BjT7JG0k/mqdefault.jpg',
+          linkHref:
+            'https://www.youtube.com/watch?v=bR2BjT7JG0k&list=PL3YlZTdKiS89Kj7IQVPoNElJCWrjZaCC8',
+        },
+      },
+      {
+        text:
+          '### Want to skip the basics?\n\nGo to the "Learn" section on the app to explore advanced materials.\n\nHave fun!',
+      },
+    ],
   },
   flow: [
     {
@@ -451,9 +471,13 @@ const gatherProjectData = ({
 };
 
 const InAppTutorialProvider = (props: Props) => {
-  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
+  const [isFlowRunning, setIsFlowRunning] = React.useState<boolean>(true);
+  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(33);
   const [project, setProject] = React.useState<?gdProject>(null);
   const [data, setData] = React.useState<{ [key: string]: string }>({});
+  const [displayEndDialog, setDisplayEndDialog] = React.useState<boolean>(
+    false
+  );
   const currentStepFallbackStepIndex = React.useRef<number>(0);
   const [
     expectedEditor,
@@ -475,8 +499,12 @@ const InAppTutorialProvider = (props: Props) => {
   const currentStep = flow[currentStepIndex];
 
   const goToStep = React.useCallback((stepIndex: number) => {
-    // TODO: Better handle end of flow
-    if (!flow[stepIndex]) return;
+    if (stepIndex >= flow.length) {
+      setDisplayEndDialog(true);
+      setIsFlowRunning(false);
+      return;
+    }
+
     let nextStepIndex = stepIndex;
 
     // Check if we can go directly to next mandatory (not-skippable) step.
@@ -493,8 +521,6 @@ const InAppTutorialProvider = (props: Props) => {
       console.log('MUTATION');
       // Find the next mandatory (not-skippable) step (It can be the current step).
       let indexOfNextMandatoryStep = currentStepIndex;
-      // TODO: Better handle end of flow
-      if (!flow[indexOfNextMandatoryStep]) return;
       while (flow[indexOfNextMandatoryStep].skippable) {
         indexOfNextMandatoryStep += 1;
       }
@@ -593,8 +619,8 @@ const InAppTutorialProvider = (props: Props) => {
 
   React.useEffect(
     () => {
-      if (!flow[currentStepIndex]) return;
-      const { id, isOnClosableDialog } = flow[currentStepIndex];
+      if (!currentStep) return;
+      const { id, isOnClosableDialog } = currentStep;
       if (id && inAppTutorial.editorSwitches.hasOwnProperty(id)) {
         setExpectedEditor(inAppTutorial.editorSwitches[id]);
       }
@@ -604,8 +630,12 @@ const InAppTutorialProvider = (props: Props) => {
       // At each step start, reset change watching logics.
       setWatchElementInputValue(null);
       setWatchSceneInstances(null);
+      if (currentStepIndex >= flow.length) {
+        setDisplayEndDialog(true);
+        setIsFlowRunning(false);
+      }
     },
-    [currentStepIndex]
+    [currentStep, currentStepIndex]
   );
 
   React.useEffect(
@@ -665,16 +695,28 @@ const InAppTutorialProvider = (props: Props) => {
 
   console.log(currentStepIndex);
 
-  const stepTooltip = currentStep.tooltip;
-  const formattedStep: InAppTutorialFlowStep = {
-    ...flow[currentStepIndex],
-    tooltip: stepTooltip
-      ? {
-          ...stepTooltip,
-          title: interpolateText(stepTooltip.title, data),
-          description: interpolateText(stepTooltip.description, data),
-        }
-      : undefined,
+  const renderStepDisplayer = () => {
+    if (!currentStep || !isFlowRunning) return null;
+    const stepTooltip = currentStep.tooltip;
+    const formattedStep: InAppTutorialFlowStep = {
+      ...flow[currentStepIndex],
+      tooltip: stepTooltip
+        ? {
+            ...stepTooltip,
+            title: interpolateText(stepTooltip.title, data),
+            description: interpolateText(stepTooltip.description, data),
+          }
+        : undefined,
+    };
+    return (
+      <InAppTutorialStepDisplayer
+        step={formattedStep}
+        expectedEditor={isWrongEditorOpened ? expectedEditor : null}
+        goToFallbackStep={() => {
+          setCurrentStepIndex(currentStepFallbackStepIndex.current);
+        }}
+      />
+    );
   };
 
   const isWrongEditorOpened = currentEditor !== expectedEditor;
@@ -683,22 +725,21 @@ const InAppTutorialProvider = (props: Props) => {
     <InAppTutorialContext.Provider
       value={{
         flow: null,
-        currentStep: formattedStep,
         setProject,
         setCurrentEditor,
-        goToNextStep: () => setCurrentStepIndex(currentStepIndex + 1),
+        goToNextStep: () => goToStep(currentStepIndex + 1),
         onPreviewLaunch,
-        isFlowRunning: true, // TODO
+        isFlowRunning,
       }}
     >
       {props.children}
-      <InAppTutorialStepDisplayer
-        step={formattedStep}
-        expectedEditor={isWrongEditorOpened ? expectedEditor : null}
-        goToFallbackStep={() => {
-          setCurrentStepIndex(currentStepFallbackStepIndex.current);
-        }}
-      />
+      {renderStepDisplayer()}
+      {displayEndDialog && (
+        <InAppTutorialEndDialog
+          endDialog={inAppTutorial.endDialog}
+          onClose={() => setDisplayEndDialog(false)}
+        />
+      )}
     </InAppTutorialContext.Provider>
   );
 };

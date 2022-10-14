@@ -147,10 +147,10 @@ namespace gdjs {
       };
 
       export const enableMetrics = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         enable: boolean
       ) {
-        runtimeScene.getGame().enableMetrics(enable);
+        instanceContainer.getGame().enableMetrics(enable);
       };
 
       /**

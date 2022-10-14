@@ -141,7 +141,7 @@ type State = {|
   layerRemoved: ?string,
   editedLayer: ?gdLayer,
   editedLayerInitialTab: 'properties' | 'effects',
-  exportedObjectWithContext: ?ObjectWithContext,
+  exportedObject: ?gdObject,
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
@@ -194,7 +194,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layerRemoved: null,
       editedLayer: null,
       editedLayerInitialTab: 'properties',
-      exportedObjectWithContext: null,
+      exportedObject: null,
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
@@ -388,18 +388,14 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  exportObject = (editedObject: ?gdObject) => {
-    if (editedObject) {
+  openObjectExporterDialog = (object: ?gdObject) => {
+    if (object) {
       this.setState({
-        exportedObjectWithContext: {
-          object: editedObject,
-          // It's not important for the export.
-          global: false,
-        },
+        exportedObject: object,
       });
     } else {
       this.setState({
-        exportedObjectWithContext: null,
+        exportedObject: null,
       });
     }
   };
@@ -1405,7 +1401,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 selectedObjectNames={this.state.selectedObjectNames}
                 canInstallPrivateAsset={this.props.canInstallPrivateAsset}
                 onEditObject={this.props.onEditObject || this.editObject}
-                onExportObject={this.exportObject}
+                onExportObject={this.openObjectExporterDialog}
                 onDeleteObject={this._onDeleteObject(i18n)}
                 canRenameObject={newName =>
                   this._canObjectOrGroupUseNewName(newName, i18n)
@@ -1564,11 +1560,11 @@ export default class SceneEditor extends React.Component<Props, State> {
             </React.Fragment>
           )}
         </I18n>
-        {this.state.exportedObjectWithContext && (
+        {this.state.exportedObject && (
           <ObjectExporterDialog
-            object={this.state.exportedObjectWithContext.object}
+            object={this.state.exportedObject}
             onClose={() => {
-              this.exportObject(null);
+              this.openObjectExporterDialog(null);
             }}
           />
         )}

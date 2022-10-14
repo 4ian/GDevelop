@@ -1,54 +1,54 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import React from 'react';
-import FlatButton from '../UI/FlatButton';
-import Dialog from '../UI/Dialog';
-import HelpButton from '../UI/HelpButton';
-import { Column, Line } from '../UI/Grid';
+import FlatButton from '../../UI/FlatButton';
+import Dialog from '../../UI/Dialog';
+import HelpButton from '../../UI/HelpButton';
+import { Column, Line } from '../../UI/Grid';
 import CloudUpload from '@material-ui/icons/CloudUpload';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
-import RaisedButton from '../UI/RaisedButton';
-import Text from '../UI/Text';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import RaisedButton from '../../UI/RaisedButton';
+import Text from '../../UI/Text';
 import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
-} from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import Window from '../Utils/Window';
+} from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import Window from '../../Utils/Window';
 
-const exportCustomObject = async (
+const exportExtension = async (
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
-  customObject: gdObject
+  eventsFunctionsExtension: gdEventsFunctionsExtension
 ) => {
   const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
   if (!eventsFunctionsExtensionWriter) {
     // This won't happen in practice because this view can't be reached from the web-app.
     throw new Error(
-      "The object can't be exported because it's not supported by the web-app."
+      "The extension can't be exported because it's not supported by the web-app."
     );
   }
-  const pathOrUrl = await eventsFunctionsExtensionWriter.chooseCustomObjectFile(
-    customObject.getName()
+  const pathOrUrl = await eventsFunctionsExtensionWriter.chooseEventsFunctionExtensionFile(
+    eventsFunctionsExtension.getName()
   );
 
   if (!pathOrUrl) return;
 
-  await eventsFunctionsExtensionWriter.writeCustomObject(
-    customObject,
+  await eventsFunctionsExtensionWriter.writeEventsFunctionsExtension(
+    eventsFunctionsExtension,
     pathOrUrl
   );
 };
 
 const openGitHubIssue = () => {
   Window.openExternalURL(
-    'https://github.com/4ian/GDevelop/issues/new?assignees=&labels=%F0%9F%93%A6+Asset+Store+submission&template=--asset-store-submission.md&title='
+    'https://github.com/GDevelopApp/GDevelop-extensions/issues/new?assignees=&labels=%E2%9C%A8+New+extension&template=new-extension.yml&title=New+extension%3A+%3Ctitle%3E'
   );
 };
 
 type Props = {|
-  object: gdObject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
   onClose: () => void,
 |};
 
-const ObjectExporterDialog = (props: Props) => {
+const ExtensionExporterDialog = (props: Props) => {
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -81,8 +81,10 @@ const ObjectExporterDialog = (props: Props) => {
         <Line>
           <Text>
             <Trans>
-              You can export the object to a file to submit it to the asset
-              store.
+              You can export the extension to a file to easily import it in
+              another project. If your extension is providing useful and
+              reusable functions or behaviors, consider sharing it with the
+              GDevelop community!
             </Trans>
           </Text>
         </Line>
@@ -92,11 +94,14 @@ const ObjectExporterDialog = (props: Props) => {
             primary
             label={<Trans>Export to a file</Trans>}
             onClick={() => {
-              exportCustomObject(eventsFunctionsExtensionsState, props.object);
+              exportExtension(
+                eventsFunctionsExtensionsState,
+                props.eventsFunctionsExtension
+              );
             }}
           />
           <FlatButton
-            label={<Trans>Submit objects to the community</Trans>}
+            label={<Trans>Submit extension to the community</Trans>}
             onClick={openGitHubIssue}
           />
         </ResponsiveLineStackLayout>
@@ -105,4 +110,4 @@ const ObjectExporterDialog = (props: Props) => {
   );
 };
 
-export default ObjectExporterDialog;
+export default ExtensionExporterDialog;

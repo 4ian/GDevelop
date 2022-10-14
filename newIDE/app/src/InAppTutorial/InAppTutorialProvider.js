@@ -305,6 +305,10 @@ const inAppTutorial: InAppTutorial = {
       id: 'CloseInstructionEditor',
       elementToHighlightId: '#instruction-editor-dialog #ok-button',
       nextStepTrigger: { absenceOfElement: '#instruction-editor-dialog' },
+      tooltip: {
+        description: "We're good.",
+        placement: 'top',
+      },
     },
     {
       id: 'ClickOnNewAction',

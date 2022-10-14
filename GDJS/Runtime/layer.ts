@@ -292,7 +292,7 @@ namespace gdjs {
 
     /**
      * Return an array containing the coordinates of the point passed as parameter
-     * in layer local coordinates (as opposed to the parent coordinate coordinates).
+     * in layer local coordinates (as opposed to the parent coordinates).
      *
      * All transformations (scale, rotation) are supported.
      *

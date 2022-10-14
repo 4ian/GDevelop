@@ -25,13 +25,13 @@ namespace gdjs {
     _timeManager: TimeManager;
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
-    _isLoaded: boolean = false;
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
 
     /** True if loadFromScene was called and the scene is being played. */
+    _isLoaded: boolean = false;
+    /** True in the first frame after resuming the paused scene */
     _isJustResumed: boolean = false;
 
-    /** True in the first frame after resuming the paused scene */
     _requestedChange: SceneChangeRequest;
     /** Black background by default. */
     _backgroundColor: integer = 0;
@@ -188,7 +188,7 @@ namespace gdjs {
     }
 
     addLayer(layerData: LayerData) {
-      this._layers.put(layerData.name, new gdjs.SceneLayer(layerData, this));
+      this._layers.put(layerData.name, new gdjs.RuntimeSceneLayer(layerData, this));
     }
 
     /**

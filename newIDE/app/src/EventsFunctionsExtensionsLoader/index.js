@@ -247,7 +247,10 @@ const generateFreeFunction = (
   codeGenerationContext: CodeGenerationContext
 ): Promise<{
   functionFile: string,
-  functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
+  functionMetadata:
+    | gdInstructionMetadata
+    | gdExpressionMetadata
+    | gdMultipleInstructionMetadata,
 }> => {
   const instructionOrExpression = declareInstructionOrExpressionMetadata(
     extension,
@@ -271,17 +274,16 @@ const generateFreeFunction = (
   );
   const functionName = codeNamespace + '.func';
 
-  const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
   const functionFile = options.eventsFunctionCodeWriter.getIncludeFileFor(
     functionName
   );
-  codeExtraInformation
+  instructionOrExpression
     .setIncludeFile(functionFile)
     .setFunctionName(functionName);
 
   // Always include the extension include files when using a free function.
   codeGenerationContext.extensionIncludeFiles.forEach(includeFile => {
-    codeExtraInformation.addIncludeFile(includeFile);
+    instructionOrExpression.addIncludeFile(includeFile);
   });
 
   if (!options.skipCodeGeneration) {
@@ -306,7 +308,7 @@ const generateFreeFunction = (
       .toNewVectorString()
       .toJSArray()
       .forEach((includeFile: string) => {
-        codeExtraInformation.addIncludeFile(includeFile);
+        instructionOrExpression.addIncludeFile(includeFile);
       });
 
     includeFiles.delete();
@@ -337,7 +339,10 @@ const generateFreeFunction = (
 const applyFunctionIncludeFilesDependencyTransitivity = (
   functionInfos: Array<{
     functionFile: string,
-    functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
+    functionMetadata:
+      | gdInstructionMetadata
+      | gdExpressionMetadata
+      | gdMultipleInstructionMetadata,
   }>
 ): void => {
   // Note that the iteration order doesn't matter, for instance for:
@@ -361,12 +366,7 @@ const applyFunctionIncludeFilesDependencyTransitivity = (
   // c -> d
   const includeFileSets = functionInfos.map(
     functionInfo =>
-      new Set(
-        functionInfo.functionMetadata
-          .getCodeExtraInformation()
-          .getIncludeFiles()
-          .toJSArray()
-      )
+      new Set(functionInfo.functionMetadata.getIncludeFiles().toJSArray())
   );
   // For any function A of the extension...
   for (let index = 0; index < functionInfos.length; index++) {
@@ -375,9 +375,7 @@ const applyFunctionIncludeFilesDependencyTransitivity = (
 
     // ...and any function B of the extension...
     for (let otherIndex = 0; otherIndex < functionInfos.length; otherIndex++) {
-      const otherCodeExtraInformation = functionInfos[
-        otherIndex
-      ].functionMetadata.getCodeExtraInformation();
+      const otherFunctionMetadata = functionInfos[otherIndex].functionMetadata;
       const otherIncludeFileSet = includeFileSets[otherIndex];
       // ...where function B depends on function A...
       if (otherIncludeFileSet.has(functionIncludeFile)) {
@@ -385,7 +383,7 @@ const applyFunctionIncludeFilesDependencyTransitivity = (
         includeFiles.forEach(includeFile => {
           if (!otherIncludeFileSet.has(includeFile)) {
             otherIncludeFileSet.add(includeFile);
-            otherCodeExtraInformation.addIncludeFile(includeFile);
+            otherFunctionMetadata.addIncludeFile(includeFile);
           }
         });
       }
@@ -459,8 +457,7 @@ function generateBehavior(
 
       if (eventsFunction.isPrivate()) instructionOrExpression.setPrivate();
 
-      const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
-      codeExtraInformation
+      instructionOrExpression
         .setIncludeFile(includeFile)
         .setFunctionName(eventsFunctionMangledName);
     });

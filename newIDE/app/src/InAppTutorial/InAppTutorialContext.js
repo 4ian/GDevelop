@@ -7,17 +7,19 @@ export type InAppTutorialTooltip = {|
   description?: string,
 |};
 
+type InAppTutorialFlowStepTrigger =
+  | {| presenceOfElement: string |}
+  | {| absenceOfElement: string |}
+  | {| elementIsFilled: true |}
+  | {| instanceDraggedOnScene: string |}
+  | {| previewLaunched: true |}
+  | {| clickOnButton: string |};
+
 export type InAppTutorialFlowStep = {|
   elementToHighlightId?: string,
   id?: string,
   isTriggerFlickering?: true,
-  nextStepTrigger?:
-    | {| presenceOfElement: string |}
-    | {| absenceOfElement: string |}
-    | {| elementIsFilled: true |}
-    | {| instanceDraggedOnScene: string |}
-    | {| previewLaunched: true |}
-    | {| clickOnButton: string |},
+  nextStepTrigger?: InAppTutorialFlowStepTrigger,
   mapProjectData?: {
     [key: string]: 'lastProjectObjectName',
   },

@@ -100,7 +100,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
   Props,
   InAppTutorialOrchestratorInterface
 >(({ tutorial, onFlowRunning, project, currentEditor }, ref) => {
-  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(33);
+  const [wrongEditorInfoOpen, setWrongEditorInfoOpen] = React.useState<boolean>(
+    false
+  );
+  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
   const [data, setData] = React.useState<{ [key: string]: string }>({});
   const [displayEndDialog, setDisplayEndDialog] = React.useState<boolean>(
     false
@@ -353,7 +356,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
     return (
       <InAppTutorialStepDisplayer
         step={formattedStep}
-        expectedEditor={isWrongEditorOpened ? expectedEditor : null}
+        expectedEditor={wrongEditorInfoOpen ? expectedEditor : null}
         goToFallbackStep={() => {
           setCurrentStepIndex(currentStepFallbackStepIndex.current);
         }}
@@ -361,7 +364,20 @@ const InAppTutorialOrchestrator = React.forwardRef<
     );
   };
 
-  const isWrongEditorOpened = currentEditor !== expectedEditor;
+  const checkIfWrongEditor = useDebounce(
+    () => {
+      console.log('salut');
+      setWrongEditorInfoOpen(expectedEditor !== currentEditor);
+    },
+    wrongEditorInfoOpen ? 0 : 1000
+  );
+
+  React.useEffect(
+    () => {
+      checkIfWrongEditor();
+    },
+    [checkIfWrongEditor, currentEditor]
+  );
 
   return (
     <>

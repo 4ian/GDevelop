@@ -5,6 +5,7 @@ import { useInterval } from '../Utils/UseInterval';
 import InAppTutorialContext, {
   type InAppTutorial,
   type InAppTutorialFlowStep,
+  type InAppTutorialFlowStepTrigger,
   type EditorIdentifier,
 } from './InAppTutorialContext';
 import InAppTutorialStepDisplayer from './InAppTutorialStepDisplayer';
@@ -196,8 +197,9 @@ const interpolateText = (text?: string, data: { [key: string]: string }) => {
   return formattedText;
 };
 
-const isStepDone = (step: InAppTutorialFlowStep): boolean => {
-  const { nextStepTrigger } = step;
+const isStepDone = (
+  nextStepTrigger?: ?InAppTutorialFlowStepTrigger
+): boolean => {
   if (!nextStepTrigger) return false;
   if (
     nextStepTrigger.presenceOfElement &&
@@ -242,7 +244,7 @@ const InAppTutorialProvider = (props: Props) => {
     let nextStepIndex = stepIndex;
     // Check if we can go directly to next mandatory (not-skippable) step.
     while (flow[nextStepIndex].skippable && nextStepIndex < flow.length - 1) {
-      if (isStepDone(flow[nextStepIndex])) nextStepIndex += 1;
+      if (isStepDone(flow[nextStepIndex].nextStepTrigger)) nextStepIndex += 1;
       else break;
     }
 
@@ -266,7 +268,9 @@ const InAppTutorialProvider = (props: Props) => {
         stepIndex >= currentStepIndex;
         stepIndex--
       ) {
-        const isThisStepAlreadyDone = isStepDone(flow[stepIndex]);
+        const isThisStepAlreadyDone = isStepDone(
+          flow[stepIndex].nextStepTrigger
+        );
         if (isThisStepAlreadyDone) {
           shouldGoToStepAtIndex = stepIndex + 1;
           break;
@@ -336,6 +340,22 @@ const InAppTutorialProvider = (props: Props) => {
 
   React.useEffect(
     () => {
+      const { id, isOnClosableDialog } = flow[currentStepIndex];
+      if (id && inAppTutorial.editorSwitches.hasOwnProperty(id)) {
+        setExpectedEditor(inAppTutorial.editorSwitches[id]);
+      }
+      if (!isOnClosableDialog) {
+        currentStepFallbackStepIndex.current = currentStepIndex;
+      }
+      // At each step start, reset change watching logics.
+      setWatchElementInputValue(null);
+      setWatchSceneInstances(null);
+    },
+    [currentStepIndex]
+  );
+
+  React.useEffect(
+    () => {
       if (!currentStep) return;
       const { nextStepTrigger, elementToHighlightId } = currentStep;
       if (nextStepTrigger && nextStepTrigger.elementIsFilled) {
@@ -351,19 +371,6 @@ const InAppTutorialProvider = (props: Props) => {
     [currentStep, data]
   );
 
-  React.useEffect(
-    () => {
-      const { id, isOnClosableDialog } = flow[currentStepIndex];
-      if (id && inAppTutorial.editorSwitches.hasOwnProperty(id)) {
-        setExpectedEditor(inAppTutorial.editorSwitches[id]);
-      }
-      if (!isOnClosableDialog) {
-        currentStepFallbackStepIndex.current = currentStepIndex;
-      }
-    },
-    [currentStepIndex]
-  );
-
   const watchInputBeingFilled = React.useCallback(
     () => {
       if (!watchElementInputValue) return;
@@ -377,7 +384,6 @@ const InAppTutorialProvider = (props: Props) => {
         elementToWatch.value
       ) {
         goToStep(currentStepIndex + 1);
-        setWatchElementInputValue(null);
       }
     },
     [currentStepIndex, goToStep, watchElementInputValue]
@@ -391,7 +397,6 @@ const InAppTutorialProvider = (props: Props) => {
       const instances = layout.getInitialInstances();
       if (instances.hasInstancesOfObject(watchSceneInstances)) {
         goToStep(currentStepIndex + 1);
-        setWatchSceneInstances(null);
       }
     },
     [project, currentStepIndex, goToStep, watchSceneInstances]

@@ -188,7 +188,10 @@ namespace gdjs {
     }
 
     addLayer(layerData: LayerData) {
-      this._layers.put(layerData.name, new gdjs.RuntimeSceneLayer(layerData, this));
+      this._layers.put(
+        layerData.name,
+        new gdjs.RuntimeSceneLayer(layerData, this)
+      );
     }
 
     /**

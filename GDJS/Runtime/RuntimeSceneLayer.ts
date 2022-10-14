@@ -5,11 +5,14 @@
  */
 namespace gdjs {
   /**
-   * Represents a layer of a container, used to display objects.
+   * Represents a layer of a scene, used to display objects.
    *
    * Viewports and multiple cameras are not supported.
+   * 
+   * It does some optimizations but works exactly the same as
+   * {@link gdjs.Layer}.
    */
-  export class SceneLayer extends gdjs.Layer {
+  export class RuntimeSceneLayer extends gdjs.Layer {
     /**
      * @param layerData The data used to initialize the layer
      * @param scene The scene in which the layer is used

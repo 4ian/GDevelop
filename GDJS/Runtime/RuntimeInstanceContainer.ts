@@ -101,26 +101,34 @@ namespace gdjs {
     ): FloatPoint;
 
     /**
-     * @return the width of the game resolution for a {@link gdjs.RuntimeScene} or the
-     * internal size for a {@link gdjs.CustomRuntimeObject}.
+     * @return the width of:
+     * - the game resolution for a {@link gdjs.RuntimeScene}
+     * - the default dimensions (the AABB of all its children) for a
+     * {@link gdjs.CustomRuntimeObject}.
      */
     abstract getViewportWidth(): float;
 
     /**
-     * @return the height of the game resolution for a {@link gdjs.RuntimeScene} or the
-     * internal size for a {@link gdjs.CustomRuntimeObject}.
+     * @return the height of:
+     * - the game resolution for a {@link gdjs.RuntimeScene}
+     * - the default dimensions (the AABB of all its children) for a
+     * {@link gdjs.CustomRuntimeObject}.
      */
     abstract getViewportHeight(): float;
 
     /**
-     * @return the center X of the game resolution for a {@link gdjs.RuntimeScene} or the
-     * internal size for a {@link gdjs.CustomRuntimeObject}.
+     * @return the center X of:
+     * - the game resolution for a {@link gdjs.RuntimeScene}
+     * - the default dimensions (the AABB of all its children) for a
+     * {@link gdjs.CustomRuntimeObject}.
      */
     abstract getViewportOriginX(): float;
 
     /**
-     * @return the center Y of the game resolution for a {@link gdjs.RuntimeScene} or the
-     * internal size for a {@link gdjs.CustomRuntimeObject}.
+     * @return the center Y of:
+     * - the game resolution for a {@link gdjs.RuntimeScene}
+     * - the default dimensions (the AABB of all its children) for a
+     * {@link gdjs.CustomRuntimeObject}.
      */
     abstract getViewportOriginY(): float;
 

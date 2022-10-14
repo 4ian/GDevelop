@@ -25,7 +25,7 @@ namespace gdjs {
     _isUntransformedHitBoxesDirty: boolean = true;
     /** It contains shallow copies of the children hitboxes */
     _untransformedHitBoxes: gdjs.Polygon[] = [];
-    /** The dimension of this object is calculated from it's children AABB. */
+    /** The dimension of this object is calculated from its children AABBs. */
     _unrotatedAABB: AABB = { min: [0, 0], max: [0, 0] };
     _scaleX: number = 1;
     _scaleY: number = 1;
@@ -81,8 +81,11 @@ namespace gdjs {
     }
 
     onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+      // Let subclasses do something before the object is destroyed.
       this.onDestroy(instanceContainer);
+      // Let behaviors do something before the object is destroyed.
       super.onDestroyFromScene(instanceContainer);
+      // Destroy the children.
       this._instanceContainer.onDestroyFromScene(instanceContainer);
     }
 

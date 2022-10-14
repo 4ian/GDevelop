@@ -246,6 +246,7 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
       
       // Add child-objects
       for (auto &childObject : eventsBasedObject.GetObjects()) {
+        // TODO EBO Use GetObjectListName(childObject, context)
         // child-object are never picked because they are not parameters.
         fullPreludeCode +=
             "var this" + childObject->GetName() +

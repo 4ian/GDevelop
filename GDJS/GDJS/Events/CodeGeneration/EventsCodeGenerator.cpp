@@ -246,15 +246,14 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
       
       // Add child-objects
       for (auto &childObject : eventsBasedObject.GetObjects()) {
-        // TODO EBO Use GetObjectListName(childObject, context)
         // child-object are never picked because they are not parameters.
+        const auto &childName = ManObjListName(childObject->GetName());
         fullPreludeCode +=
-            "var this" + childObject->GetName() +
-            "List = [...runtimeScene.getObjects(" +
+            "var this" + childName + "List = [...runtimeScene.getObjects(" +
             ConvertToStringExplicit(childObject->GetName()) + ")];\n" +
-            "var " + childObject->GetName() + " = Hashtable.newFrom({" +
-            childObject->GetName() + ": this" + childObject->GetName() +
-            "List});\n";
+            "var " + childName + " = Hashtable.newFrom({" + 
+            ConvertToStringExplicit(childObject->GetName()) +
+            ": this" + childName + "List});\n";
       }
 
       fullPreludeCode += codeGenerator.GenerateObjectEventsFunctionContext(
@@ -398,9 +397,10 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionContext(
     
     // Add child-objects
     for (auto &childObject : eventsBasedObject.GetObjects()) {
+        const auto &childName = ManObjListName(childObject->GetName());
       // child-object are never picked because they are not parameters.
-      objectsGettersMap += ", " + ConvertToStringExplicit(childObject->GetName()) + ": " + childObject->GetName() + "\n";
-      objectArraysMap += ", " + ConvertToStringExplicit(childObject->GetName()) + ": this" + childObject->GetName() + "List\n";
+      objectsGettersMap += ", " + ConvertToStringExplicit(childObject->GetName()) + ": " + childName + "\n";
+      objectArraysMap += ", " + ConvertToStringExplicit(childObject->GetName()) + ": this" + childName + "List\n";
     }
   }
 

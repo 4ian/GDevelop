@@ -2281,7 +2281,6 @@ const MainFrame = (props: Props) => {
         currentProject.setTemplateSlug(selectedExampleShortHeader.slug);
       if (source.projectName) currentProject.setName(source.projectName);
 
-      console.log(destination.storageProvider);
       const destinationStorageProviderOperations = getStorageProviderOperations(
         destination.storageProvider
       );

@@ -19,7 +19,7 @@ import {
   shouldCloseOrCancel,
   shouldSubmit,
 } from './KeyboardShortcuts/InteractionKeys';
-import { textEllispsisStyle } from './TextEllipsis';
+import { textEllipsisStyle } from './TextEllipsis';
 
 type Option =
   | {|
@@ -41,8 +41,10 @@ type Props = {|
   onChoose?: string => void,
   dataSource: DataSource,
 
-  id?: string,
+  id?: ?string,
   onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
+  onClick?: (event: SyntheticPointerEvent<HTMLInputElement>) => void,
+  commitOnInputChange?: boolean,
   onRequestClose?: () => void,
   onApply?: () => void,
   errorText?: React.Node,
@@ -55,10 +57,11 @@ type Props = {|
   textFieldStyle?: Object,
   openOnFocus?: boolean,
   style?: Object,
+  inputStyle?: Object,
 |};
 
 export type SemiControlledAutoCompleteInterface = {|
-  focus: () => void,
+  focus: (selectAll?: boolean) => void,
   forceInputValueTo: (newValue: string) => void,
 |};
 
@@ -121,7 +124,7 @@ const makeRenderItem = (i18n: I18nType) => (
       <ListItemText
         style={styles.listItemText}
         primary={
-          <div title={value} style={textEllispsisStyle}>
+          <div title={value} style={textEllipsisStyle}>
             {value}
           </div>
         }
@@ -203,6 +206,7 @@ const getDefaultStylingProps = (params: Object, props: Props): Object => {
       ...InputProps,
       className: null,
       endAdornment: null,
+      style: props.inputStyle,
     },
     inputProps: {
       ...inputProps,
@@ -236,8 +240,12 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
     const classes = useStyles();
 
     React.useImperativeHandle(ref, () => ({
-      focus: () => {
-        if (input.current) input.current.focus();
+      focus: (selectAll: boolean = false) => {
+        const { current } = input;
+        if (current) {
+          current.focus();
+          current.setSelectionRange(0, props.value.toString().length);
+        }
       },
       forceInputValueTo: (newValue: string) => {
         if (inputValue !== null) setInputValue(newValue);
@@ -257,6 +265,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
     ): void => {
       setInputValue(value);
       if (!isMenuOpen) setIsMenuOpen(true);
+      if (props.commitOnInputChange) props.onChange(value);
     };
 
     return (
@@ -292,6 +301,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
             filterOptions={(options: DataSource, state) =>
               filterFunction(options, state, currentInputValue)
             }
+            id={props.id}
             renderInput={params => {
               const {
                 InputProps,
@@ -300,6 +310,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
               } = getDefaultStylingProps(params, props);
               return (
                 <TextField
+                  color="secondary"
                   InputProps={{
                     ...InputProps,
                     placeholder:
@@ -309,6 +320,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                   }}
                   inputProps={{
                     ...inputProps,
+                    onClick: props.onClick,
                     onFocus: (
                       event: SyntheticFocusEvent<HTMLInputElement>
                     ): void => {

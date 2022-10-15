@@ -76,14 +76,14 @@ std::size_t ObjectsContainer::GetObjectsCount() const {
   return initialObjects.size();
 }
 #if defined(GD_IDE_ONLY)
-gd::Object& ObjectsContainer::InsertNewObject(gd::Project& project,
+gd::Object& ObjectsContainer::InsertNewObject(const gd::Project& project,
                                               const gd::String& objectType,
                                               const gd::String& name,
                                               std::size_t position) {
   gd::Object& newlyCreatedObject = *(*(initialObjects.insert(
       position < initialObjects.size() ? initialObjects.begin() + position
                                        : initialObjects.end(),
-      project.GetCurrentPlatform().CreateObject(objectType, name))));
+      project.CreateObject(objectType, name))));
 
   return newlyCreatedObject;
 }

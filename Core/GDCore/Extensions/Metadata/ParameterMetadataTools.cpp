@@ -14,7 +14,7 @@
 
 namespace gd {
 void ParameterMetadataTools::ParametersToObjectsContainer(
-    gd::Project& project,
+    const gd::Project& project,
     const std::vector<gd::ParameterMetadata>& parameters,
     gd::ObjectsContainer& outputObjectsContainer) {
   outputObjectsContainer.GetObjects().clear();
@@ -59,13 +59,13 @@ void ParameterMetadataTools::IterateOverParameters(
     const std::vector<gd::Expression>& parameters,
     const std::vector<gd::ParameterMetadata>& parametersMetadata,
     std::function<void(const gd::ParameterMetadata& parameterMetadata,
-                       const gd::String& parameterValue,
+                       const gd::Expression& parameterValue,
                        const gd::String& lastObjectName)> fn) {
   IterateOverParametersWithIndex(
       parameters,
       parametersMetadata,
       [&fn](const gd::ParameterMetadata& parameterMetadata,
-            const gd::String& parameterValue,
+            const gd::Expression& parameterValue,
             size_t parameterIndex,
             const gd::String& lastObjectName) {
         fn(parameterMetadata, parameterValue, lastObjectName);
@@ -76,17 +76,17 @@ void ParameterMetadataTools::IterateOverParametersWithIndex(
     const std::vector<gd::Expression>& parameters,
     const std::vector<gd::ParameterMetadata>& parametersMetadata,
     std::function<void(const gd::ParameterMetadata& parameterMetadata,
-                       const gd::String& parameterValue,
+                       const gd::Expression& parameterValue,
                        size_t parameterIndex,
                        const gd::String& lastObjectName)> fn) {
   gd::String lastObjectName = "";
   for (std::size_t pNb = 0; pNb < parametersMetadata.size(); ++pNb) {
     const gd::ParameterMetadata& parameterMetadata = parametersMetadata[pNb];
-    const gd::String& parameterValue =
+    const gd::Expression& parameterValue =
         pNb < parameters.size() ? parameters[pNb].GetPlainString() : "";
-    const gd::String& parameterValueOrDefault =
-        parameterValue.empty() && parameterMetadata.optional
-            ? parameterMetadata.GetDefaultValue()
+    const gd::Expression& parameterValueOrDefault =
+        parameterValue.GetPlainString().empty() && parameterMetadata.optional
+            ? Expression(parameterMetadata.GetDefaultValue())
             : parameterValue;
 
     fn(parameterMetadata, parameterValueOrDefault, pNb, lastObjectName);
@@ -97,7 +97,7 @@ void ParameterMetadataTools::IterateOverParametersWithIndex(
     // Search "lastObjectName" in the codebase for other place where this
     // convention is enforced.
     if (gd::ParameterMetadata::IsObject(parameterMetadata.GetType()))
-      lastObjectName = parameterValueOrDefault;
+      lastObjectName = parameterValueOrDefault.GetPlainString();
   }
 }
 

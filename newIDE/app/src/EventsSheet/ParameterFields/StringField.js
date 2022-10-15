@@ -6,8 +6,8 @@ import { type ParameterFieldProps } from './ParameterFieldCommons';
 export default class StringField extends Component<ParameterFieldProps, void> {
   _field: ?GenericExpressionField;
 
-  focus() {
-    if (this._field) this._field.focus();
+  focus(selectAll: boolean = false) {
+    if (this._field) this._field.focus(selectAll);
   }
 
   render() {

@@ -21,6 +21,13 @@ vector<gd::String> CommentEvent::GetAllSearchableStrings() const {
   return allSearchableStrings;
 }
 
+bool CommentEvent::ReplaceAllSearchableStrings(
+    std::vector<gd::String> newSearchableString) {
+  if (newSearchableString[0] == com1) return false;
+  SetComment(newSearchableString[0]);
+  return true;
+}
+
 void CommentEvent::SerializeTo(SerializerElement &element) const {
   element.AddChild("color")
       .SetAttribute("r", r)

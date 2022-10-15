@@ -2,9 +2,10 @@
 import { roundPosition } from '../Utils/GridHelpers';
 import Rectangle from '../Utils/Rectangle';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
+import { type InstanceMeasurer } from './InstancesRenderer';
 
 export default class InstancesMover {
-  instanceMeasurer: any;
+  instanceMeasurer: InstanceMeasurer;
   instancesEditorSettings: InstancesEditorSettings;
   instancePositions: { [number]: { x: number, y: number } };
   totalDeltaX: number;
@@ -18,7 +19,7 @@ export default class InstancesMover {
     instanceMeasurer,
     instancesEditorSettings,
   }: {
-    instanceMeasurer: any,
+    instanceMeasurer: InstanceMeasurer,
     instancesEditorSettings: InstancesEditorSettings,
   }) {
     this.instanceMeasurer = instanceMeasurer;
@@ -84,8 +85,14 @@ export default class InstancesMover {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
 
+    const nonLockedInstances = instances.filter(
+      instance => !instance.isLocked()
+    );
+
     // It will magnet the corner nearest to the grabbing position
-    const initialSelectionAABB = this._getOrCreateSelectionAABB(instances);
+    const initialSelectionAABB = this._getOrCreateSelectionAABB(
+      nonLockedInstances
+    );
     if (!initialSelectionAABB) return;
     const magnetLeft = this._startX < initialSelectionAABB.centerX();
     const magnetTop = this._startY < initialSelectionAABB.centerY();
@@ -122,8 +129,8 @@ export default class InstancesMover {
     const roundedTotalDeltaX = magnetPosition[0] - initialMagnetX;
     const roundedTotalDeltaY = magnetPosition[1] - initialMagnetY;
 
-    for (var i = 0; i < instances.length; i++) {
-      const selectedInstance = instances[i];
+    for (var i = 0; i < nonLockedInstances.length; i++) {
+      const selectedInstance = nonLockedInstances[i];
 
       let initialPosition = this.instancePositions[selectedInstance.ptr];
       if (!initialPosition) {

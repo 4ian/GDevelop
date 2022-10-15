@@ -12,8 +12,8 @@ export default class JsonResourceField extends Component<
 > {
   _field: ?ResourceSelector;
 
-  focus() {
-    if (this._field) this._field.focus();
+  focus(selectAll: boolean = false) {
+    if (this._field) this._field.focus(selectAll);
   }
 
   render() {

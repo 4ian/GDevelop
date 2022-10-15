@@ -76,11 +76,19 @@ namespace gdjs {
     }
 
     updateXOffset(): void {
-      this._tiledSprite.tilePosition.x = -this._object._xOffset;
+      // Known PIXI.js issue, the coordinates should not exceed the width/height of the texture,
+      // otherwise the texture will be pixelated over time.
+      // See https://github.com/pixijs/pixijs/issues/7891#issuecomment-947549553
+      this._tiledSprite.tilePosition.x =
+        -this._object._xOffset % this._tiledSprite.texture.width;
     }
 
     updateYOffset(): void {
-      this._tiledSprite.tilePosition.y = -this._object._yOffset;
+      // Known PIXI.js issue, the coordinates should not exceed the width/height of the texture,
+      // otherwise the texture will be pixelated over time.
+      // See https://github.com/pixijs/pixijs/issues/7891#issuecomment-947549553
+      this._tiledSprite.tilePosition.y =
+        -this._object._yOffset % this._tiledSprite.texture.height;
     }
 
     setColor(rgbColor): void {

@@ -15,8 +15,8 @@ export default class ObjectAnimationNameField extends Component<
 > {
   _field: ?GenericExpressionField;
 
-  focus() {
-    if (this._field) this._field.focus();
+  focus(selectAll: boolean = false) {
+    if (this._field) this._field.focus(selectAll);
   }
 
   getAnimationNames(): Array<ExpressionAutocompletion> {
@@ -47,10 +47,12 @@ export default class ObjectAnimationNameField extends Component<
     }
 
     if (object.getType() === 'Sprite') {
-      const spriteObject = gd.asSpriteObject(object);
+      const spriteConfiguration = gd.asSpriteConfiguration(
+        object.getConfiguration()
+      );
 
-      return mapFor(0, spriteObject.getAnimationsCount(), index => {
-        const animationName = spriteObject.getAnimation(index).getName();
+      return mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
+        const animationName = spriteConfiguration.getAnimation(index).getName();
         return animationName.length > 0 ? animationName : null;
       })
         .filter(Boolean)

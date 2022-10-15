@@ -2,7 +2,6 @@
 import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
-import RaisedButton from '../../UI/RaisedButton';
 import { Line, Column } from '../../UI/Grid';
 import {
   type ParameterFieldProps,
@@ -12,11 +11,10 @@ import { focusButton } from '../../UI/Button';
 import Text from '../../UI/Text';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import { MarkdownText } from '../../UI/MarkdownText';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Button from '@material-ui/core/Button';
 
 const styles = {
-  button: {
-    margin: 5,
-  },
   description: {
     marginRight: 5,
   },
@@ -26,7 +24,7 @@ export default class TrueFalseField extends Component<
   ParameterFieldProps,
   void
 > {
-  _trueButton = React.createRef<RaisedButton>();
+  _trueButton = React.createRef<Button>();
 
   focus() {
     focusButton(this._trueButton);
@@ -44,27 +42,27 @@ export default class TrueFalseField extends Component<
 
     return (
       <Column noMargin>
-        <Line>
+        <Line alignItems="center" justifyContent="space-between">
           <Text style={styles.description} displayInlineAsSpan>
             {description}
           </Text>
-          <Column noMargin>
-            <RaisedButton
-              style={styles.button}
-              label={<Trans>True</Trans>}
-              primary={effectiveValue === 'True'}
+          <ButtonGroup>
+            <Button
+              variant={effectiveValue === 'True' ? 'contained' : 'outlined'}
+              color={effectiveValue === 'True' ? 'secondary' : 'default'}
               onClick={() => this.props.onChange('True')}
               ref={this._trueButton}
-            />
-          </Column>
-          <Column noMargin>
-            <RaisedButton
-              style={styles.button}
-              label={<Trans>False</Trans>}
-              primary={effectiveValue !== 'True'}
+            >
+              <Trans>True</Trans>
+            </Button>
+            <Button
+              variant={effectiveValue !== 'True' ? 'contained' : 'outlined'}
+              color={effectiveValue !== 'True' ? 'secondary' : 'default'}
               onClick={() => this.props.onChange('False')}
-            />
-          </Column>
+            >
+              <Trans>False</Trans>
+            </Button>
+          </ButtonGroup>
         </Line>
         {longDescription ? (
           <FormHelperText variant="filled" margin="dense">

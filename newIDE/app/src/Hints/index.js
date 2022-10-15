@@ -2,21 +2,11 @@
 import { t } from '@lingui/macro';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type AlertMessageIdentifier } from '../MainFrame/Preferences/PreferencesContext';
-import { getHelpLink } from '../Utils/HelpLink';
 
 export type Hint = {|
   kind: 'warning' | 'info',
   message: MessageDescriptor,
   identifier?: AlertMessageIdentifier,
-|};
-export type TutorialHint = {|
-  kind: 'tutorial' | 'video-tutorial',
-  name: string,
-  message: MessageDescriptor,
-  iconSrc: ?string,
-  link: string,
-  identifier: string,
-  featuredForGettingStarted?: boolean,
 |};
 
 export const getDeprecatedBehaviorsInformation = (): {
@@ -25,13 +15,6 @@ export const getDeprecatedBehaviorsInformation = (): {
   'PhysicsBehavior::PhysicsBehavior': {
     warning: t`A new physics engine (Physics Engine 2.0) is now available. You should prefer using it for new game. For existing games, note that the two behaviors are not compatible, so you should only use one of them with your objects.`,
   },
-});
-
-export const getExperimentalObjects = (): {
-  [string]: boolean,
-} => ({
-  'BitmapText::BitmapTextObject': true,
-  'TileMap::TileMap': true,
 });
 
 export const getExtraObjectsInformation = (): {
@@ -54,7 +37,7 @@ export const getExtraObjectsInformation = (): {
   'BitmapText::BitmapTextObject': [
     {
       kind: 'warning',
-      message: t`This object is experimental and not yet complete. It might have bugs or incomplete support in GDevelop, be sure to read the wiki by clicking on help button bellow.`,
+      message: t`This object is experimental and not yet complete. It might have bugs or incomplete support in GDevelop, be sure to read the wiki by clicking on help button below.`,
     },
     {
       kind: 'info',
@@ -71,6 +54,12 @@ export const getExtraObjectsInformation = (): {
       message: t`The tilemap must be designed in a separated program, Tiled, that can be downloaded on mapeditor.org. Save your map as a JSON file, then select here the Atlas image that you used and the Tile map JSON file.`,
     },
   ],
+  'TextInput::TextInputObject': [
+    {
+      kind: 'warning',
+      message: t`The text input will be always shown on top of all other objects in the game - this is a limitation that can't be changed. According to the platform/device or browser running the game, the appearance can also slightly change.`,
+    },
+  ],
 });
 
 export const getExtraInstructionInformation = (type: string): ?Hint => {
@@ -81,6 +70,36 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
   use for all your objects the behavior called "Physics2" and the
   associated actions (in this case, all objects must be set up to use
   Physics2, you can't mix the behaviors).`,
+    };
+  }
+  if (type.startsWith('BoundingBox')) {
+    return {
+      kind: 'info',
+      message: t`The bounding box is an imaginary rectangle surrounding the object collision mask. Even if the object X and Y positions are not changed, this rectangle can change if the object is rotated or if an animation is being played. Usually you should use actions and conditions related to the object position or center, but the bounding box can be useful to deal with the area of the object.`,
+    };
+  }
+  if (type === 'PickedInstancesCount') {
+    return {
+      kind: 'info',
+      message: t`If no previous condition or action used the specified object(s), the picked instances count will be 0.`,
+    };
+  }
+  if (type === 'CompareTimer') {
+    return {
+      kind: 'info',
+      message: t`To start a timer, don't forget to use the action "Start (or reset) a scene timer" in another event.`,
+    };
+  }
+  if (type === 'CompareObjectTimer') {
+    return {
+      kind: 'info',
+      message: t`To start a timer, don't forget to use the action "Start (or reset) an object timer" in another event.`,
+    };
+  }
+  if (type === 'FixCamera') {
+    return {
+      kind: 'info',
+      message: t`Please prefer using the new action "Enforce camera boundaries" which is more flexible.`,
     };
   }
   if (type === 'BitmapText::Scale') {
@@ -153,304 +172,3 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
 
   return null;
 };
-
-const tutorialHints = {
-  'geometry-monster': {
-    kind: 'tutorial',
-    iconSrc: 'res/tutorial_icons/geometry-monster.png',
-    name: 'Geometry Monster Tutorial',
-    message: t`Make a hyper-casual mobile game where the player must grab shapes and avoid bombs.`,
-    link: getHelpLink('/tutorials/geometry-monster'),
-    identifier: 'geometry-monster',
-    featuredForGettingStarted: true,
-  },
-  platformer: {
-    kind: 'tutorial',
-    iconSrc: 'res/tutorial_icons/platformer.png',
-    name: 'Platformer Tutorial',
-    message: t`Make a platform game from scratch.`,
-    link: getHelpLink('/tutorials/platformer/start'),
-    identifier: 'platformer',
-    featuredForGettingStarted: true,
-  },
-  'space-shooter': {
-    kind: 'tutorial',
-    iconSrc: 'res/tutorial_icons/space-shooter.png',
-    name: 'Space Shooter Tutorial',
-    message: t`Make a space shooter game from scratch.`,
-    link: getHelpLink('/tutorials/space-shooter'),
-    identifier: 'space-shooter',
-    featuredForGettingStarted: true,
-  },
-  'simple-game-physics-particles': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/simple-game-physics-particles.jpg',
-    name: 'How to Create a Simple Game with Physics and Particles',
-    message: t`Create a game from scratch using physics and particles.`,
-    link: 'https://www.youtube.com/watch?v=w8B84Dpgkjc',
-    identifier: 'simple-game-physics-particles',
-    featuredForGettingStarted: true,
-  },
-  'tank-shooter': {
-    kind: 'tutorial',
-    iconSrc: null,
-    name: 'Tank Shooter Tutorial',
-    message: t`Make a simple tank shooter game from scratch.`,
-    link: getHelpLink('/tutorials/tank-shooter'),
-    identifier: 'tank-shooter',
-  },
-  'endless-runner': {
-    kind: 'tutorial',
-    iconSrc: null,
-    name: 'Endless Runner Tutorial',
-    message: t`Make a simple game where the player must jump on platforms for as long as possible.`,
-    link: getHelpLink('/tutorials/endless-runner'),
-    identifier: 'endless-runner',
-  },
-  'endless-car-game': {
-    kind: 'tutorial',
-    iconSrc: null,
-    name: 'Endless Car Game Tutorial',
-    message: t`Create a simple game where you must dodge the cars on the road.`,
-    link: getHelpLink('/tutorials/roadrider'),
-    identifier: 'endless-car-game',
-  },
-  'breakout-tutorial': {
-    kind: 'tutorial',
-    iconSrc: null,
-    name: 'Breakout Tutorial',
-    message: t`Create a simple breakout game where you must destroy all the bricks on the screen.`,
-    link: getHelpLink('/tutorials/breakout'),
-    identifier: 'breakout-tutorial',
-  },
-
-  'screen-shake-timer-variables': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/screen-shake-timer-variables.jpg',
-    name: 'Screen Shake Effect with Timers and Variables',
-    message: t`Learn how to add a screen shake effect when the player falls from a very high platform in a platformer.`,
-    link: 'https://www.youtube.com/watch?v=0w0NGuj4OFQ',
-    identifier: 'screen-shake-timer-variables',
-  },
-  'ghost-enemy-following-player': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/ghost-enemy-following-player.jpg',
-    name: 'Ghost Enemy Following the Player',
-    message: t`Make a ghost like enemy floating toward the player.`,
-    link: 'https://www.youtube.com/watch?v=SLUlnhKuuqE',
-    identifier: 'ghost-enemy-following-player',
-  },
-  'melee-sword-attack': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/melee-sword-attack.jpg',
-    name: 'Melee/Sword Attack',
-    message: t`Learn how to make a melee/sword attack with a randomly triggered animation each time a key is pressed.`,
-    link: 'https://www.youtube.com/watch?v=3XT40kDRp8g',
-    identifier: 'melee-sword-attack',
-  },
-  'physics-engine-platformer-game': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/physics-engine-platformer-game.jpg',
-    name: 'Platformer with the physics engine',
-    message: t`Learn how to make a platformer game using the physics engine.`,
-    link: 'https://www.youtube.com/watch?v=96gNCmnQwaE',
-    identifier: 'physics-engine-platformer-game',
-  },
-  'tween-behavior': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/tween-behavior.jpg',
-    name: 'Tween Behavior',
-    message: t`Learn how to use the Tween Behavior and how it can be used to add more life and animation to you projects.`,
-    link: 'https://www.youtube.com/watch?v=SLqnwC9D5Q4',
-    identifier: 'tween-behavior',
-  },
-  'responsive-ui': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/responsive-ui.jpg',
-    name: 'Reponsive UI',
-    message: t`Learn how to add responsive UI using anchors.`,
-    link: 'https://www.youtube.com/watch?v=VgrEhg0esCg',
-    identifier: 'responsive-ui',
-  },
-  'smooth-camera-movement': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/smooth-camera-movement.jpg',
-    name: 'Smooth Camera Movement',
-    message: t`Learn how to make the camera follow the player in a smooth movement.`,
-    link: 'https://www.youtube.com/watch?v=yUNisggNh7s',
-    identifier: 'smooth-camera-movement',
-  },
-  'pause-menu': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/pause-menu.jpg',
-    name: 'Pause Menu',
-    message: t`Learn how to stop the time and make a pause menu.`,
-    link: 'https://www.youtube.com/watch?v=k2J784esdkc',
-    identifier: 'pause-menu',
-  },
-  'character-selection-feature': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/character-selection-feature.jpg',
-    name: 'Character Selection',
-    message: t`Learn how to add a selector to choose a character (or anything else) in your game.`,
-    link: 'https://www.youtube.com/watch?v=8DpsjXHd4ro',
-    identifier: 'character-selection-feature',
-  },
-  'push-objects': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/push-objects.jpg',
-    name: 'Push Objects',
-    message: t`Learn how to push objects, like a box, in a platform game.`,
-    link: 'https://www.youtube.com/watch?v=11tjJ0JgYuk',
-    identifier: 'push-objects',
-  },
-  'save-and-load': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/save-and-load.jpg',
-    name: 'Save and Load',
-    message: t`Learn how to save the player progress, and other information, and to load them again later.`,
-    link: 'https://www.youtube.com/watch?v=bXUGJqHhuCo',
-    identifier: 'save-and-load',
-  },
-  'particle-effects': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/particle-effects.jpg',
-    name: 'Particle Effects',
-    message: t`Learn how to use particle emitters in GDevelop to create effects like fire, explosion, magic beam, etc...`,
-    link: 'https://www.youtube.com/watch?v=7sqMmTntvKs',
-    identifier: 'particle-effects',
-  },
-  'opening-chest': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/opening-chest.jpg',
-    name: 'Open a Loot Chest',
-    message: t`How to open a loot chest with a key that the player can find in the level`,
-    link: 'https://www.youtube.com/watch?v=1qsCgwFtYfg',
-    identifier: 'opening-chest',
-  },
-  'health-bar-and-health-potion': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/health-bar-and-health-potion.jpg',
-    name: 'Create a Health Bar and Health Potion',
-    message: t`How to show a health bar on screen and a potion to give back health to the player.`,
-    link: 'https://www.youtube.com/watch?v=P-scQW7PeVg',
-    identifier: 'health-bar-and-health-potion',
-  },
-  'touch-360-joystick-controller': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/touch-360-joystick-controller.jpg',
-    name: 'Create a Touch 360 Joystick Controller',
-    message: t`How to create a joystick displayed on screen, useful to control the player in mobile games.`,
-    link: 'https://www.youtube.com/watch?v=-k-bVU3QrfA',
-    identifier: 'touch-360-joystick-controller',
-  },
-  'flickering-dynamic-light-effect': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/flickering-dynamic-light-effect.jpg',
-    name: 'Create a Flickering Dynamic Light Effect',
-    message: t`Learn how to create a dynamic light following the player, with a flickering effect.`,
-    link: 'https://www.youtube.com/watch?v=HolCWx4E0TU',
-    identifier: 'flickering-dynamic-light-effect',
-  },
-  '2d-platformer-shooter': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/2d-platformer-shooter.jpg',
-    name: 'Create a 2D Platformer Shooter',
-    message: t`Create a 2D platform game where the player can shoot at enemies chasing him.`,
-    link: 'https://www.youtube.com/watch?v=OOw3Sh6rga8',
-    identifier: '2d-platformer-shooter',
-  },
-  'animated-buttons': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/animated-buttons.jpg',
-    name: 'Create Animated Buttons',
-    message: t`Create animated buttons that can be shown in your game menus (main menu, selection screen, etc...).`,
-    link: 'https://www.youtube.com/watch?v=7_oLY_x4vEk',
-    identifier: 'animated-buttons',
-  },
-  'simple-trampoline-platformer': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/simple-trampoline-platformer.jpg',
-    name: 'Make a Simple Trampoline/Jump Pad',
-    message: t`Create a trampoline in your platformer game, making the player jump very high when stepped on.`,
-    link: 'https://www.youtube.com/watch?v=p42i4omA7j8',
-    identifier: 'simple-trampoline-platformer',
-  },
-  '2d-car-physics-movement': {
-    kind: 'video-tutorial',
-    iconSrc: 'res/tutorial_icons/2d-car-physics-movement.jpg',
-    name: 'How to Make a 2D Car or Bike Movement With Physics Engine',
-    message: t`Learn how to create a physics based car movement.`,
-    link: 'https://www.youtube.com/watch?v=_-fX755cctU',
-    identifier: '2d-car-physics-movement',
-  },
-};
-
-const allTutorialHints = Object.keys(tutorialHints).map(
-  identifier => tutorialHints[identifier]
-);
-
-export const getObjectTutorialHints = (type: string): Array<TutorialHint> => {
-  if (type === 'ParticleSystem::ParticleEmitter') {
-    return [tutorialHints['particle-effects']];
-  }
-  if (type === 'Lighting::LightObject') {
-    return [tutorialHints['flickering-dynamic-light-effect']];
-  }
-
-  return [];
-};
-
-export const getBehaviorTutorialHints = (type: string): Array<TutorialHint> => {
-  if (type === 'Tween::TweenBehavior') {
-    return [tutorialHints['tween-behavior']];
-  }
-  if (type === 'AnchorBehavior::AnchorBehavior') {
-    return [tutorialHints['responsive-ui']];
-  }
-  if (type === 'Physics2::Physics2Behavior') {
-    return [
-      tutorialHints['physics-engine-platformer-game'],
-      tutorialHints['2d-car-physics-movement'],
-    ];
-  }
-
-  return [];
-};
-
-export const getInstructionTutorialHints = (
-  type: string
-): Array<TutorialHint> => {
-  if (
-    [
-      'CameraX',
-      'CameraY',
-      'RotateCamera',
-      'ZoomCamera',
-      'FixCamera',
-      'CentreCamera',
-    ].includes(type)
-  ) {
-    return [tutorialHints['smooth-camera-movement']];
-  }
-  if (type === 'ChangeTimeScale') {
-    return [tutorialHints['pause-menu']];
-  }
-  if (
-    [
-      'EcrireFichierExp',
-      'EcrireFichierTxt',
-      'LireFichierExp',
-      'LireFichierTxt',
-    ].includes(type)
-  ) {
-    return [tutorialHints['save-and-load']];
-  }
-  if (type === 'PlatformBehavior::SimulateJumpKey') {
-    return [tutorialHints['simple-trampoline-platformer']];
-  }
-
-  return [];
-};
-
-export const getAllTutorialHints = (): Array<TutorialHint> => allTutorialHints;

@@ -4,7 +4,7 @@ import { t } from '@lingui/macro';
 import React, { Component } from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
-import SelectField from '../../UI/SelectField';
+import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 
 const operatorLabels = {
@@ -16,14 +16,16 @@ const operatorLabels = {
   '!=': t`≠ (not equal to)`,
 };
 
-const mapTypeToOperators = {
+const mapTypeToOperators: { [string]: Array<string> } = {
   unknown: Object.keys(operatorLabels),
   number: ['=', '<', '>', '<=', '>=', '!='],
+  time: ['<', '>', '<=', '>='],
   string: ['=', '!='],
+  color: ['=', '!='],
 };
 
 export default class RelationalOperatorField extends Component<ParameterFieldProps> {
-  _field: ?SelectField;
+  _field: ?SelectFieldInterface;
   focus() {
     if (this._field && this._field.focus) this._field.focus();
   }
@@ -37,7 +39,8 @@ export default class RelationalOperatorField extends Component<ParameterFieldPro
     const comparedValueType = parameterMetadata
       ? parameterMetadata.getExtraInfo()
       : 'unknown';
-    const operators = mapTypeToOperators[comparedValueType || 'unknown'];
+    const operators =
+      mapTypeToOperators[comparedValueType] || mapTypeToOperators.unknown;
 
     return (
       <SelectField
@@ -50,7 +53,7 @@ export default class RelationalOperatorField extends Component<ParameterFieldPro
         value={this.props.value}
         onChange={(e, i, value: string) => this.props.onChange(value)}
         ref={field => (this._field = field)}
-        hintText={t`Choose an operator`}
+        translatableHintText={t`Choose an operator`}
       >
         {operators.map(operator => (
           <SelectOption

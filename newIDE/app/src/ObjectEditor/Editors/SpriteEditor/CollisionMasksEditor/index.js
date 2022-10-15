@@ -7,7 +7,9 @@ import { Line, Column } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';
 import PolygonsList from './PolygonsList';
 import CollisionMasksPreview from './CollisionMasksPreview';
-import ImagePreview from '../../../../ResourcesList/ResourcePreview/ImagePreview';
+import ImagePreview, {
+  isProjectImageResourceSmooth,
+} from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import {
   getCurrentElements,
   allSpritesHaveSameCollisionMasksAs,
@@ -41,7 +43,7 @@ const verticalMosaicNodes: EditorMosaicNode = {
 };
 
 type Props = {|
-  object: gdSpriteObject,
+  objectConfiguration: gdSpriteObject,
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
 |};
@@ -50,7 +52,13 @@ const CollisionMasksEditor = (props: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
-
+  const [
+    highlightedVerticePtr,
+    setHighlightedVerticePtr,
+  ] = React.useState<?number>(null);
+  const [selectedVerticePtr, setSelectedVerticePtr] = React.useState<?number>(
+    null
+  );
   // Note: these two booleans are set to false to avoid erasing points of other
   // animations/frames (and they will be updated by updateSameCollisionMasksToggles). In
   // theory, they should be set to the appropriate value at their initialization,
@@ -67,9 +75,11 @@ const CollisionMasksEditor = (props: Props) => {
   const [spriteHeight, setSpriteHeight] = React.useState(0);
   const forceUpdate = useForceUpdate();
 
-  const spriteObject = gd.asSpriteObject(props.object);
-  const { animation, sprite, hasValidSprite } = getCurrentElements(
-    spriteObject,
+  const spriteConfiguration = gd.asSpriteConfiguration(
+    props.objectConfiguration
+  );
+  const { animation, sprite } = getCurrentElements(
+    spriteConfiguration,
     animationIndex,
     directionIndex,
     spriteIndex
@@ -79,8 +89,8 @@ const CollisionMasksEditor = (props: Props) => {
     () => {
       if (animation && sprite) {
         if (sameCollisionMasksForAnimations) {
-          mapFor(0, spriteObject.getAnimationsCount(), i => {
-            const otherAnimation = spriteObject.getAnimation(i);
+          mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+            const otherAnimation = spriteConfiguration.getAnimation(i);
             copyAnimationsSpriteCollisionMasks(sprite, otherAnimation);
           });
         } else if (sameCollisionMasksForSprites) {
@@ -93,7 +103,7 @@ const CollisionMasksEditor = (props: Props) => {
     [
       animation,
       sprite,
-      spriteObject,
+      spriteConfiguration,
       sameCollisionMasksForAnimations,
       sameCollisionMasksForSprites,
       forceUpdate,
@@ -120,8 +130,8 @@ const CollisionMasksEditor = (props: Props) => {
 
     setSameCollisionMasksForAnimations(
       every(
-        mapFor(0, spriteObject.getAnimationsCount(), i => {
-          const otherAnimation = spriteObject.getAnimation(i);
+        mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+          const otherAnimation = spriteConfiguration.getAnimation(i);
           return allSpritesHaveSameCollisionMasksAs(sprite, otherAnimation);
         })
       )
@@ -172,11 +182,14 @@ const CollisionMasksEditor = (props: Props) => {
     setSpriteHeight(spriteHeight);
   };
 
+  // Note: might be worth fixing these warnings:
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(updateCollisionMasks, [
     sameCollisionMasksForAnimations,
     sameCollisionMasksForSprites,
   ]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(updateSameCollisionMasksToggles, [animationIndex]);
 
   // Keep panes vertical for small screens, side-by-side for large screens
@@ -184,7 +197,8 @@ const CollisionMasksEditor = (props: Props) => {
   const editorNodes =
     screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
 
-  if (!props.object.getAnimationsCount()) return null;
+  if (!props.objectConfiguration.getAnimationsCount()) return null;
+  const resourceName = sprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor } = {
     preview: {
@@ -193,17 +207,28 @@ const CollisionMasksEditor = (props: Props) => {
       renderEditor: () => (
         <Background>
           <ImagePreview
-            resourceName={hasValidSprite ? sprite.getImageName() : ''}
-            resourcesLoader={props.resourcesLoader}
+            resourceName={resourceName}
+            imageResourceSource={props.resourcesLoader.getResourceFullUrl(
+              props.project,
+              resourceName,
+              {}
+            )}
+            isImageResourceSmooth={isProjectImageResourceSmooth(
+              props.project,
+              resourceName
+            )}
             project={props.project}
             onSize={setCurrentSpriteSize}
             renderOverlay={overlayProps =>
-              hasValidSprite && (
+              sprite && (
                 <CollisionMasksPreview
                   {...overlayProps}
                   isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
                   polygons={sprite.getCustomCollisionMask()}
                   onPolygonsUpdated={updateCollisionMasks}
+                  highlightedVerticePtr={highlightedVerticePtr}
+                  selectedVerticePtr={selectedVerticePtr}
+                  onClickVertice={setSelectedVerticePtr}
                 />
               )
             }
@@ -219,7 +244,7 @@ const CollisionMasksEditor = (props: Props) => {
           <Line>
             <Column expand>
               <SpriteSelector
-                spriteObject={spriteObject}
+                spriteConfiguration={spriteConfiguration}
                 animationIndex={animationIndex}
                 directionIndex={directionIndex}
                 spriteIndex={spriteIndex}
@@ -247,6 +272,9 @@ const CollisionMasksEditor = (props: Props) => {
                 polygons={sprite.getCustomCollisionMask()}
                 onPolygonsUpdated={updateCollisionMasks}
                 restoreCollisionMask={() => onSetCollisionMaskAutomatic(true)}
+                onHoverVertice={setHighlightedVerticePtr}
+                onClickVertice={setSelectedVerticePtr}
+                selectedVerticePtr={selectedVerticePtr}
                 spriteWidth={spriteWidth}
                 spriteHeight={spriteHeight}
               />

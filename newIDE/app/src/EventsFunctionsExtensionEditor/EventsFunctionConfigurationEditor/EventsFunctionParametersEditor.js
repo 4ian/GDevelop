@@ -23,12 +23,13 @@ import {
   isBehaviorLifecycleEventsFunction,
   isExtensionLifecycleEventsFunction,
 } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
-import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
+import { ParametersIndexOffsets } from '../../EventsFunctionsExtensionsLoader';
 import Add from '@material-ui/icons/Add';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import { getLastObjectParameterObjectType } from '../../EventsSheet/ParameterFields/ParameterMetadataTools';
 import StringArrayEditor from '../../StringArrayEditor';
+import newNameGenerator from '../../Utils/NewNameGenerator';
 
 const gd: libGDevelop = global.gd;
 
@@ -36,6 +37,7 @@ type Props = {|
   project: gdProject,
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
+  eventsBasedObject: ?gdEventsBasedObject,
   onParametersUpdated: () => void,
   helpPagePath?: string,
   freezeParameters?: boolean,
@@ -47,6 +49,13 @@ type Props = {|
   ) => void,
   onMoveBehaviorEventsParameter?: (
     eventsBasedBehavior: gdEventsBasedBehavior,
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: (boolean) => void
+  ) => void,
+  onMoveObjectEventsParameter?: (
+    eventsBasedObject: gdEventsBasedObject,
     eventsFunction: gdEventsFunction,
     oldIndex: number,
     newIndex: number,
@@ -101,6 +110,14 @@ const getExtraInfoArray = (parameter: gdParameterMetadata) => {
   return array;
 };
 
+const getIdentifierScope = (scopedIdentifier: string) =>
+  scopedIdentifier.startsWith('object') ? 'object' : 'scene';
+
+const getIdentifierName = (scopedIdentifier: string) =>
+  scopedIdentifier.startsWith('object')
+    ? scopedIdentifier.substring('object'.length)
+    : scopedIdentifier.substring('scene'.length);
+
 export default class EventsFunctionParametersEditor extends React.Component<
   Props,
   State
@@ -112,9 +129,16 @@ export default class EventsFunctionParametersEditor extends React.Component<
   _addParameter = () => {
     const { eventsFunction } = this.props;
     const parameters = eventsFunction.getParameters();
+    const existingParameterNames = mapVector(parameters, parameterMetadata =>
+      parameterMetadata.getName()
+    );
 
     const newParameter = new gd.ParameterMetadata();
     newParameter.setType('objectList');
+    const newName = newNameGenerator('Parameter', name =>
+      existingParameterNames.includes(name)
+    );
+    newParameter.setName(newName);
     parameters.push_back(newParameter);
     newParameter.delete();
     this.forceUpdate();
@@ -156,13 +180,31 @@ export default class EventsFunctionParametersEditor extends React.Component<
   };
 
   _moveParameters = (oldIndex: number, newIndex: number) => {
-    const { eventsFunction, eventsBasedBehavior } = this.props;
+    const {
+      eventsFunction,
+      eventsBasedBehavior,
+      eventsBasedObject,
+    } = this.props;
     const parameters = eventsFunction.getParameters();
 
     if (eventsBasedBehavior) {
       if (this.props.onMoveBehaviorEventsParameter)
         this.props.onMoveBehaviorEventsParameter(
           eventsBasedBehavior,
+          eventsFunction,
+          oldIndex,
+          newIndex,
+          isDone => {
+            if (!isDone) return;
+            gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
+            this.forceUpdate();
+            this.props.onParametersUpdated();
+          }
+        );
+    } else if (eventsBasedObject) {
+      if (this.props.onMoveObjectEventsParameter)
+        this.props.onMoveObjectEventsParameter(
+          eventsBasedObject,
           eventsFunction,
           oldIndex,
           newIndex,
@@ -201,6 +243,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
       project,
       eventsFunction,
       eventsBasedBehavior,
+      eventsBasedObject,
       freezeParameters,
       helpPagePath,
     } = this.props;
@@ -250,12 +293,21 @@ export default class EventsFunctionParametersEditor extends React.Component<
     }
 
     const isParameterDisabled = index => {
-      return !!freezeParameters || (!!eventsBasedBehavior && index < 2);
+      return (
+        !!freezeParameters ||
+        (!!eventsBasedBehavior && index < 2) ||
+        (!!eventsBasedObject && index < 1)
+      );
     };
     const isParameterDescriptionAndTypeShown = index => {
       // The first two parameters of a behavior method should not be changed at all,
       // so we even hide their description and type to avoid cluttering the interface.
-      return !eventsBasedBehavior || index >= 2;
+      // Same thing for an object which has mandatory Object parameter.
+      return (
+        (!eventsBasedBehavior && !eventsBasedObject) ||
+        (!!eventsBasedBehavior && index >= 2) ||
+        (!!eventsBasedObject && index >= 1)
+      );
     };
     const isParameterLongDescriptionShown = (parameter, index): boolean => {
       if (!isParameterDescriptionAndTypeShown(index)) return false;
@@ -265,9 +317,11 @@ export default class EventsFunctionParametersEditor extends React.Component<
         !!this.state.longDescriptionShownIndexes[index]
       );
     };
-    const parametersIndexOffset = getParametersIndexOffset(
-      !!eventsBasedBehavior
-    );
+    const parametersIndexOffset = eventsBasedBehavior
+      ? ParametersIndexOffsets.BehaviorFunction
+      : eventsBasedObject
+      ? ParametersIndexOffsets.ObjectFunction
+      : ParametersIndexOffsets.FreeFunction;
 
     return (
       <I18n>
@@ -287,7 +341,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                           <SemiControlledTextField
                             commitOnBlur
                             margin="none"
-                            hintText={t`Enter the parameter name (mandatory)`}
+                            translatableHintText={t`Enter the parameter name (mandatory)`}
                             value={parameter.getName()}
                             onChange={text => {
                               if (!validateParameterName(i18n, text)) return;
@@ -359,6 +413,8 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                 value={parameter.getType()}
                                 onChange={(e, i, value: string) => {
                                   parameter.setType(value);
+                                  parameter.setOptional(false);
+                                  parameter.setDefaultValue('');
                                   this.forceUpdate();
                                   this.props.onParametersUpdated();
                                 }}
@@ -421,6 +477,10 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                   value="objectAnimationName"
                                   primaryText={t`Object animation (text)`}
                                 />
+                                <SelectOption
+                                  value="identifier"
+                                  primaryText={t`Identifier (text)`}
+                                />
                               </SelectField>
                             )}
                             {gd.ParameterMetadata.isObject(
@@ -451,6 +511,104 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                   this.props.onParametersUpdated();
                                 }}
                                 disabled={isParameterDisabled(i)}
+                              />
+                            )}
+                            {parameter.getType() === 'yesorno' && (
+                              <SelectField
+                                floatingLabelText={<Trans>Default value</Trans>}
+                                value={
+                                  parameter.getDefaultValue() === 'yes'
+                                    ? 'yes'
+                                    : 'no'
+                                }
+                                onChange={(e, i, value) => {
+                                  parameter.setOptional(true);
+                                  parameter.setDefaultValue(value);
+                                  this.forceUpdate();
+                                  this.props.onParametersUpdated();
+                                }}
+                                fullWidth
+                              >
+                                <SelectOption
+                                  value="yes"
+                                  primaryText={t`Yes`}
+                                />
+                                <SelectOption value="no" primaryText={t`No`} />
+                              </SelectField>
+                            )}
+                            {parameter.getType() === 'trueorfalse' && (
+                              <SelectField
+                                floatingLabelText={<Trans>Default value</Trans>}
+                                value={
+                                  parameter.getDefaultValue() === 'True'
+                                    ? 'True'
+                                    : 'False'
+                                }
+                                onChange={(e, i, value) => {
+                                  parameter.setOptional(true);
+                                  parameter.setDefaultValue(value);
+                                  this.forceUpdate();
+                                  this.props.onParametersUpdated();
+                                }}
+                                fullWidth
+                              >
+                                <SelectOption
+                                  value="True"
+                                  primaryText={t`True`}
+                                />
+                                <SelectOption
+                                  value="False"
+                                  primaryText={t`False`}
+                                />
+                              </SelectField>
+                            )}
+                            {parameter.getType() === 'identifier' && (
+                              <SelectField
+                                floatingLabelText={<Trans>Scope</Trans>}
+                                value={getIdentifierScope(
+                                  parameter.getExtraInfo()
+                                )}
+                                onChange={(e, i, value) => {
+                                  const identifierName = getIdentifierName(
+                                    parameter.getExtraInfo()
+                                  );
+                                  parameter.setExtraInfo(
+                                    value + identifierName
+                                  );
+                                  this.forceUpdate();
+                                  this.props.onParametersUpdated();
+                                }}
+                                fullWidth
+                              >
+                                <SelectOption
+                                  value="scene"
+                                  primaryText={t`Scene`}
+                                />
+                                <SelectOption
+                                  value="object"
+                                  primaryText={t`Object`}
+                                />
+                              </SelectField>
+                            )}
+                            {parameter.getType() === 'identifier' && (
+                              <SemiControlledTextField
+                                commitOnBlur
+                                floatingLabelText={
+                                  <Trans>Identifier name</Trans>
+                                }
+                                floatingLabelFixed
+                                value={getIdentifierName(
+                                  parameter.getExtraInfo()
+                                )}
+                                onChange={value => {
+                                  const scope = getIdentifierScope(
+                                    parameter.getExtraInfo()
+                                  );
+                                  parameter.setExtraInfo(scope + value);
+                                  this.forceUpdate();
+                                  this.props.onParametersUpdated();
+                                }}
+                                fullWidth
                               />
                             )}
                           </ResponsiveLineStackLayout>

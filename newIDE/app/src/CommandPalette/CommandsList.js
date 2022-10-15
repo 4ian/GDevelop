@@ -9,7 +9,7 @@ export type CommandName =
   | 'LAUNCH_DEBUG_PREVIEW'
   | 'LAUNCH_NETWORK_PREVIEW'
   | 'HOT_RELOAD_PREVIEW'
-  | 'OPEN_START_PAGE'
+  | 'OPEN_HOME_PAGE'
   | 'CREATE_NEW_PROJECT'
   | 'OPEN_PROJECT'
   | 'SAVE_PROJECT'
@@ -52,6 +52,8 @@ export type CommandName =
   | 'ADD_STANDARD_EVENT'
   | 'ADD_SUBEVENT'
   | 'ADD_COMMENT_EVENT'
+  | 'TOGGLE_EVENT_DISABLED'
+  | 'TOGGLE_CONDITION_INVERTED'
   | 'CHOOSE_AND_ADD_EVENT'
   | 'EVENTS_EDITOR_UNDO'
   | 'EVENTS_EDITOR_REDO'
@@ -112,7 +114,7 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     area: 'PROJECT',
     displayText: t`Apply changes to the running preview`,
   },
-  OPEN_START_PAGE: { area: 'IDE', displayText: t`Open start page` },
+  OPEN_HOME_PAGE: { area: 'IDE', displayText: t`Show Home` },
   CREATE_NEW_PROJECT: {
     area: 'GENERAL',
     displayText: t`Create a new project`,
@@ -279,6 +281,14 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     displayText: t`Add a sub-event to the selected event`,
   },
   ADD_COMMENT_EVENT: { area: 'EVENTS', displayText: t`Add a comment` },
+  TOGGLE_EVENT_DISABLED: {
+    area: 'EVENTS',
+    displayText: t`Toggle disabled event`,
+  },
+  TOGGLE_CONDITION_INVERTED: {
+    area: 'EVENTS',
+    displayText: t`Toggle inverted condition`,
+  },
   CHOOSE_AND_ADD_EVENT: {
     area: 'EVENTS',
     displayText: t`Choose and add an event...`,

@@ -6,7 +6,9 @@ import { Line, Column } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';
 import PointsList from './PointsList';
 import PointsPreview from './PointsPreview';
-import ImagePreview from '../../../../ResourcesList/ResourcePreview/ImagePreview';
+import ImagePreview, {
+  isProjectImageResourceSmooth,
+} from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import {
   getCurrentElements,
   allSpritesHaveSamePointsAs,
@@ -41,7 +43,7 @@ const verticalMosaicNodes: EditorMosaicNode = {
 };
 
 type Props = {|
-  object: gdSpriteObject,
+  objectConfiguration: gdSpriteObject,
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
 |};
@@ -50,6 +52,13 @@ const PointsEditor = (props: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
+  const [selectedPointName, setSelectedPointName] = React.useState<?string>(
+    null
+  );
+  const [
+    highlightedPointName,
+    setHighlightedPointName,
+  ] = React.useState<?string>(null);
 
   // Note: these two booleans are set to false to avoid erasing points of other
   // animations/frames (and they will be updated by updateSamePointsToggles). In
@@ -61,9 +70,11 @@ const PointsEditor = (props: Props) => {
   const [samePointsForSprites, setSamePointsForSprites] = React.useState(false);
   const forceUpdate = useForceUpdate();
 
-  const spriteObject = gd.asSpriteObject(props.object);
-  const { animation, sprite, hasValidSprite } = getCurrentElements(
-    spriteObject,
+  const spriteConfiguration = gd.asSpriteConfiguration(
+    props.objectConfiguration
+  );
+  const { animation, sprite } = getCurrentElements(
+    spriteConfiguration,
     animationIndex,
     directionIndex,
     spriteIndex
@@ -73,8 +84,8 @@ const PointsEditor = (props: Props) => {
     () => {
       if (animation && sprite) {
         if (samePointsForAnimations) {
-          mapFor(0, spriteObject.getAnimationsCount(), i => {
-            const otherAnimation = spriteObject.getAnimation(i);
+          mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+            const otherAnimation = spriteConfiguration.getAnimation(i);
             copyAnimationsSpritePoints(sprite, otherAnimation);
           });
         } else if (samePointsForSprites) {
@@ -87,7 +98,7 @@ const PointsEditor = (props: Props) => {
     [
       animation,
       sprite,
-      spriteObject,
+      spriteConfiguration,
       samePointsForAnimations,
       samePointsForSprites,
       forceUpdate,
@@ -114,8 +125,8 @@ const PointsEditor = (props: Props) => {
 
     setSamePointsForAnimations(
       every(
-        mapFor(0, spriteObject.getAnimationsCount(), i => {
-          const otherAnimation = spriteObject.getAnimation(i);
+        mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+          const otherAnimation = spriteConfiguration.getAnimation(i);
           return allSpritesHaveSamePointsAs(sprite, otherAnimation);
         })
       )
@@ -148,8 +159,11 @@ const PointsEditor = (props: Props) => {
     setSamePointsForSprites(enable);
   };
 
+  // Note: might be worth fixing these warnings:
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(updateSamePointsToggles, [animationIndex]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(updatePoints, [
     samePointsForAnimations,
     samePointsForSprites,
@@ -160,7 +174,8 @@ const PointsEditor = (props: Props) => {
   const editorNodes =
     screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
 
-  if (!props.object.getAnimationsCount()) return null;
+  if (!props.objectConfiguration.getAnimationsCount()) return null;
+  const resourceName = sprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor } = {
     preview: {
@@ -169,15 +184,26 @@ const PointsEditor = (props: Props) => {
       renderEditor: () => (
         <Background>
           <ImagePreview
-            resourceName={hasValidSprite ? sprite.getImageName() : ''}
-            resourcesLoader={props.resourcesLoader}
+            resourceName={resourceName}
+            imageResourceSource={props.resourcesLoader.getResourceFullUrl(
+              props.project,
+              resourceName,
+              {}
+            )}
+            isImageResourceSmooth={isProjectImageResourceSmooth(
+              props.project,
+              resourceName
+            )}
             project={props.project}
             renderOverlay={overlayProps =>
-              hasValidSprite && (
+              sprite && (
                 <PointsPreview
                   {...overlayProps}
                   pointsContainer={sprite}
                   onPointsUpdated={updatePoints}
+                  selectedPointName={selectedPointName}
+                  highlightedPointName={highlightedPointName}
+                  onClickPoint={setSelectedPointName}
                 />
               )
             }
@@ -194,7 +220,7 @@ const PointsEditor = (props: Props) => {
             <Line>
               <Column expand>
                 <SpriteSelector
-                  spriteObject={spriteObject}
+                  spriteConfiguration={spriteConfiguration}
                   animationIndex={animationIndex}
                   directionIndex={directionIndex}
                   spriteIndex={spriteIndex}
@@ -220,6 +246,9 @@ const PointsEditor = (props: Props) => {
               <PointsList
                 pointsContainer={sprite}
                 onPointsUpdated={updatePoints}
+                selectedPointName={selectedPointName}
+                onHoverPoint={setHighlightedPointName}
+                onSelectPoint={setSelectedPointName}
               />
             )}
             {!sprite && (

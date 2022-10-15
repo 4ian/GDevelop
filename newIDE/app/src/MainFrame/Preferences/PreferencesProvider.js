@@ -17,6 +17,11 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
+import {
+  getBrowserLanguageOrLocale,
+  setLanguageInDOM,
+  selectLanguageOrLocale,
+} from '../../Utils/Language';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -30,9 +35,60 @@ type State = Preferences;
 const LocalStorageItem = 'gd-preferences';
 const MAX_RECENT_FILES_COUNT = 20;
 
+export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
+  try {
+    const persistedState = localStorage.getItem(LocalStorageItem);
+    if (!persistedState) return null;
+
+    const values = JSON.parse(persistedState);
+
+    // "Migrate" non existing properties to their default values
+    // (useful when upgrading the preferences to a new version where
+    // a new preference was added).
+    for (const key in initialPreferences.values) {
+      if (
+        initialPreferences.values.hasOwnProperty(key) &&
+        typeof values[key] === 'undefined'
+      ) {
+        values[key] = initialPreferences.values[key];
+      }
+    }
+
+    // Migrate renamed themes.
+    if (values.themeName === 'GDevelop default') {
+      values.themeName = 'GDevelop default Light';
+    } else if (values.themeName === 'Dark') {
+      values.themeName = 'Blue Dark';
+    }
+
+    return values;
+  } catch (e) {
+    return null;
+  }
+};
+
+export const getInitialPreferences = () => {
+  let languageOrLocale = 'en';
+  const browserLanguageOrLocale = getBrowserLanguageOrLocale();
+  if (browserLanguageOrLocale)
+    languageOrLocale = selectLanguageOrLocale(
+      browserLanguageOrLocale,
+      languageOrLocale
+    );
+
+  return { ...initialPreferences.values, language: languageOrLocale };
+};
+
+const getPreferences = () => {
+  const preferences =
+    loadPreferencesFromLocalStorage() || getInitialPreferences();
+  setLanguageInDOM(preferences.language);
+  return preferences;
+};
+
 export default class PreferencesProvider extends React.Component<Props, State> {
   state = {
-    values: this._loadValuesFromLocalStorage() || initialPreferences.values,
+    values: getPreferences(),
     setLanguage: this._setLanguage.bind(this),
     setThemeName: this._setThemeName.bind(this),
     setCodeEditorThemeName: this._setCodeEditorThemeName.bind(this),
@@ -40,7 +96,11 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     checkUpdates: this._checkUpdates.bind(this),
     setAutoDisplayChangelog: this._setAutoDisplayChangelog.bind(this),
     showAlertMessage: this._showAlertMessage.bind(this),
+    showAllAlertMessages: this._showAllAlertMessages.bind(this),
     showTutorialHint: this._showTutorialHint.bind(this),
+    showAllTutorialHints: this._showAllTutorialHints.bind(this),
+    showAnnouncement: this._showAnnouncement.bind(this),
+    showAllAnnouncements: this._showAllAnnouncements.bind(this),
     verifyIfIsNewVersion: this._verifyIfIsNewVersion.bind(this),
     setEventsSheetShowObjectThumbnails: this._setEventsSheetShowObjectThumbnails.bind(
       this
@@ -83,6 +143,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setEventsSheetCancelInlineParameter: this._setEventsSheetCancelInlineParameter.bind(
       this
     ),
+    setShowCommunityExtensions: this._setShowCommunityExtensions.bind(this),
+    setShowGetStartedSection: this._setShowGetStartedSection.bind(this),
   };
 
   componentDidMount() {
@@ -90,6 +152,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _setLanguage(language: string) {
+    setLanguageInDOM(language);
     this.setState(
       state => ({
         values: {
@@ -203,6 +266,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _setShowGetStartedSection(showGetStartedSection: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showGetStartedSection,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _setThemeName(themeName: string) {
     this.setState(
       state => ({
@@ -259,6 +334,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           eventsSheetCancelInlineParameter,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setShowCommunityExtensions(showCommunityExtensions: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showCommunityExtensions,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -323,6 +410,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _showAllAlertMessages() {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hiddenAlertMessages: {},
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _showTutorialHint(identifier: string, show: boolean) {
     this.setState(
       state => ({
@@ -338,29 +437,43 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _loadValuesFromLocalStorage(): ?PreferencesValues {
-    try {
-      const persistedState = localStorage.getItem(LocalStorageItem);
-      if (!persistedState) return null;
+  _showAllTutorialHints() {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hiddenTutorialHints: {},
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
 
-      const values = JSON.parse(persistedState);
+  _showAnnouncement(identifier: string, show: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hiddenAnnouncements: {
+            ...state.values.hiddenAnnouncements,
+            [identifier]: !show,
+          },
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
 
-      // "Migrate" non existing properties to their default values
-      // (useful when upgrading the preferences to a new version where
-      // a new preference was added).
-      for (const key in initialPreferences.values) {
-        if (
-          initialPreferences.values.hasOwnProperty(key) &&
-          typeof values[key] === 'undefined'
-        ) {
-          values[key] = initialPreferences.values[key];
-        }
-      }
-
-      return values;
-    } catch (e) {
-      return null;
-    }
+  _showAllAnnouncements() {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hiddenAnnouncements: {},
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
   }
 
   _persistValuesToLocalStorage(preferences: Preferences) {
@@ -445,9 +558,13 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _insertRecentProjectFile(newRecentFile: FileMetadataAndStorageProviderName) {
+    // Do not store recent project in preferences as they will be accessible only from user account.
+    if (newRecentFile.storageProviderName === 'Cloud') return;
+
     let recentProjectFiles = this._getRecentProjectFiles();
     const isNotNewRecentFile = recentFile =>
-      JSON.stringify(recentFile) !== JSON.stringify(newRecentFile);
+      recentFile.fileMetadata.fileIdentifier !==
+      newRecentFile.fileMetadata.fileIdentifier;
     this._setRecentProjectFiles(
       [newRecentFile, ...recentProjectFiles.filter(isNotNewRecentFile)].slice(
         0,
@@ -457,10 +574,11 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _removeRecentProjectFile(recentFile: FileMetadataAndStorageProviderName) {
-    const isNotSadPathRecentFile = recentFileItem =>
-      JSON.stringify(recentFileItem) !== JSON.stringify(recentFile);
+    const isNotRemovedRecentFile = recentFileItem =>
+      recentFileItem.fileMetadata.fileIdentifier !==
+      recentFile.fileMetadata.fileIdentifier;
     this._setRecentProjectFiles(
-      [...this._getRecentProjectFiles().filter(isNotSadPathRecentFile)].slice(
+      [...this._getRecentProjectFiles().filter(isNotRemovedRecentFile)].slice(
         0,
         MAX_RECENT_FILES_COUNT
       )

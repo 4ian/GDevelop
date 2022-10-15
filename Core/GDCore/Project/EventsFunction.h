@@ -102,6 +102,19 @@ class GD_CORE_API EventsFunction {
     return *this;
   }
 
+  /**
+   * \brief Get the group of the instruction in the editor.
+   */
+  const gd::String& GetGroup() const { return group; };
+
+  /**
+   * \brief Set the group of the instruction in the editor.
+   */
+  EventsFunction& SetGroup(const gd::String& group_) {
+    group = group_;
+    return *this;
+  }
+
   enum FunctionType { Action, Condition, Expression, StringExpression };
 
   /**
@@ -188,6 +201,7 @@ class GD_CORE_API EventsFunction {
   gd::String fullName;
   gd::String description;
   gd::String sentence;
+  gd::String group;
   gd::EventsList events;
   FunctionType functionType;
   std::vector<gd::ParameterMetadata> parameters;

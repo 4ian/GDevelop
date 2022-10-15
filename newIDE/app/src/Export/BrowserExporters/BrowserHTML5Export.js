@@ -8,7 +8,7 @@ import {
   type UrlFileDescriptor,
   type TextFileDescriptor,
   type BlobFileDescriptor,
-  downloadUrlsToBlobs,
+  downloadUrlFilesToBlobFiles,
   archiveFiles,
 } from '../../Utils/BrowserArchiver';
 import {
@@ -16,7 +16,10 @@ import {
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
 import RaisedButton from '../../UI/RaisedButton';
-import { BlobDownloadUrlHolder } from '../../Utils/BlobDownloadUrlHolder';
+import {
+  BlobDownloadUrlHolder,
+  openBlobDownloadUrl,
+} from '../../Utils/BlobDownloadUrlHolder';
 import { ExplanationHeader, DoneFooter } from '../GenericExporters/HTML5Export';
 const gd: libGDevelop = global.gd;
 
@@ -40,21 +43,6 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = Blob;
 
-const openBlobDownloadUrl = (url: string, filename: string) => {
-  const { body } = document;
-  if (!body) return;
-
-  // Not using Window.openExternalURL because blob urls are blocked
-  // by Adblock Plus (and maybe other ad blockers).
-  const a = document.createElement('a');
-  body.appendChild(a);
-  a.style.display = 'none';
-  a.href = url;
-  a.download = filename;
-  a.click();
-  body.removeChild(a);
-};
-
 export const browserHTML5ExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -67,6 +55,8 @@ export const browserHTML5ExportPipeline: ExportPipeline<
   getInitialExportState: () => null,
 
   canLaunchBuild: () => true,
+
+  isNavigationDisabled: () => false,
 
   renderHeader: () => <ExplanationHeader />,
 
@@ -118,7 +108,7 @@ export const browserHTML5ExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     { textFiles, urlFiles }: ExportOutput
   ): Promise<ResourcesDownloadOutput> => {
-    return downloadUrlsToBlobs({
+    return downloadUrlFilesToBlobFiles({
       urlFiles,
       onProgress: context.updateStepProgress,
     }).then(blobFiles => ({

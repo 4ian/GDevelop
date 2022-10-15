@@ -3,13 +3,17 @@
 /*::
 export type TestProject = {|
   project: gdProject,
-  shapePainterObject: any,
-  textObject: any,
-  tiledSpriteObject: any,
-  panelSpriteObject: any,
-  spriteObject: gdSpriteObject,
-  spriteObjectWithBehaviors: gdSpriteObject,
-  spriteObjectWithoutBehaviors: gdSpriteObject,
+  shapePainterObjectConfiguration: gdObjectConfiguration,
+  textObjectConfiguration: gdObjectConfiguration,
+  particleEmitterConfiguration: gdObjectConfiguration,
+  tiledSpriteObjectConfiguration: gdObjectConfiguration,
+  panelSpriteObject: gdObject,
+  spriteObjectConfiguration: gdSpriteObject,
+  customObject: gdObject,
+  spriteObject: gdObject,
+  spriteObjectWithBehaviors: gdObject,
+  spriteObjectWithoutBehaviors: gdObject,
+  testSpriteObjectInstance: gdInitialInstance,
   testLayout: gdLayout,
   group1: gdObjectGroup,
   group2: gdObjectGroup,
@@ -31,8 +35,12 @@ export type TestProject = {|
   layerWithEffects: gdLayer,
   layerWithEffectWithoutEffectType: gdLayer,
   layerWithoutEffects: gdLayer,
-  spriteObjectWithEffects: gdSpriteObject,
-  spriteObjectWithoutEffects: gdSpriteObject,
+  spriteObjectWithEffects: gdObject,
+  spriteObjectWithoutEffects: gdObject,
+  stringRelationalOperatorParameterMetadata: gdParameterMetadata,
+  numberRelationalOperatorParameterMetadata: gdParameterMetadata,
+  colorRelationalOperatorParameterMetadata: gdParameterMetadata,
+  unknownRelationalOperatorParameterMetadata: gdParameterMetadata,
 |};
 */
 
@@ -52,6 +60,14 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   const resource3 = new gd.ImageResource();
   const resource4 = new gd.ImageResource();
   const audioResource1 = new gd.AudioResource();
+  const videoResource1 = new gd.VideoResource();
+  const videoResource2 = new gd.VideoResource();
+  const fontResource = new gd.FontResource();
+  const bitmapFontResource1 = new gd.BitmapFontResource();
+  const bitmapFontResource2 = new gd.BitmapFontResource();
+  const jsonResource1 = new gd.JsonResource();
+  const jsonResource2 = new gd.JsonResource();
+  const jsonResource3 = new gd.JsonResource();
   resource1.setName('fake-image1.png');
   resource1.setFile('fake-image1.png');
   resource2.setName('fake-image2.png');
@@ -62,28 +78,196 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   resource4.setFile('res/powered-pixijs.png');
   audioResource1.setName('fake-audio1.mp3');
   audioResource1.setFile('fake-audio1.mp3');
+  videoResource1.setName('fake-video1.mp4');
+  videoResource1.setFile('fake-video1.mp4');
+  videoResource2.setName('fake-video2.mp4');
+  videoResource2.setFile('fake-video2.mp4');
+  fontResource.setName('font.ttf');
+  fontResource.setFile('font.ttf');
+  bitmapFontResource1.setName('bmfont.xml');
+  bitmapFontResource1.setFile('bmfont.xml');
+  bitmapFontResource2.setName('super-font.fnt');
+  bitmapFontResource2.setFile('super-font.fnt');
+  jsonResource1.setName('levelData.json');
+  jsonResource1.setFile('levelData.json');
+  jsonResource2.setName('InventoryData.json');
+  jsonResource2.setFile('InventoryData.json');
+  jsonResource3.setName('text-data.json');
+  jsonResource3.setFile('text-data.json');
   project.getResourcesManager().addResource(resource1);
   project.getResourcesManager().addResource(resource2);
   project.getResourcesManager().addResource(resource3);
   project.getResourcesManager().addResource(resource4);
   project.getResourcesManager().addResource(audioResource1);
+  project.getResourcesManager().addResource(videoResource1);
+  project.getResourcesManager().addResource(videoResource2);
+  project.getResourcesManager().addResource(fontResource);
+  project.getResourcesManager().addResource(bitmapFontResource1);
+  project.getResourcesManager().addResource(bitmapFontResource2);
+  project.getResourcesManager().addResource(jsonResource1);
+  project.getResourcesManager().addResource(jsonResource2);
+  project.getResourcesManager().addResource(jsonResource3);
+
+  const buttonExtension = project.insertNewEventsFunctionsExtension(
+    'Button',
+    0
+  );
+  const buttonEventBasedObject = buttonExtension
+    .getEventsBasedObjects()
+    .insertNew('PanelSpriteButton', 0);
+  const buttonProperties = buttonEventBasedObject.getPropertyDescriptors();
+  buttonProperties
+    .insertNew('PressedLabelOffsetY', 0)
+    .setType('number')
+    .setLabel('Label offset on Y axis when pressed');
+  buttonProperties
+    .insertNew('LeftPadding', 1)
+    .setType('number')
+    .setLabel('Left padding')
+    .setGroup('Padding');
+  buttonProperties
+    .insertNew('RightPadding', 2)
+    .setType('number')
+    .setLabel('Right padding')
+    .setGroup('Padding');
+  buttonProperties
+    .insertNew('TopPadding', 3)
+    .setType('number')
+    .setLabel('Top padding')
+    .setGroup('Padding');
+  buttonProperties
+    .insertNew('DownPadding', 4)
+    .setType('number')
+    .setLabel('Down padding')
+    .setGroup('Padding');
+  buttonEventBasedObject.insertNewObject(
+    project,
+    'TextObject::Text',
+    'Label',
+    0
+  );
+  buttonEventBasedObject.insertNewObject(
+    project,
+    'PanelSpriteObject::PanelSprite',
+    'Idle',
+    1
+  );
+  buttonEventBasedObject.insertNewObject(
+    project,
+    'PanelSpriteObject::PanelSprite',
+    'Hovered',
+    2
+  );
+  buttonEventBasedObject.insertNewObject(
+    project,
+    'PanelSpriteObject::PanelSprite',
+    'Pressed',
+    3
+  );
 
   // Create and expose some objects
-  const shapePainterObject = new gd.ShapePainterObject('MyShapePainterObject');
-  const textObject = new gd.TextObject('MyTextObject');
-  const tiledSpriteObject = new gd.TiledSpriteObject('MyTiledSpriteObject');
-  const panelSpriteObject = new gd.PanelSpriteObject('MyPanelSpriteObject');
-  const spriteObject = new gd.SpriteObject('MySpriteObject');
-  const spriteObjectWithBehaviors = new gd.SpriteObject(
-    'MySpriteObjectWithBehaviors'
+  const testLayout = project.insertNewLayout('TestLayout', 0);
+  const customObject = testLayout.insertNewObject(
+    project,
+    'Button::PanelSpriteButton',
+    'MyButton',
+    0
   );
-  const spriteObjectWithoutBehaviors = new gd.SpriteObject(
-    'MySpriteObjectWithoutBehaviors'
+  const shapePainterObject = testLayout.insertNewObject(
+    project,
+    'PrimitiveDrawing::Drawer',
+    'MyShapePainterObject',
+    0
   );
-  const spriteObjectWithLongName = new gd.SpriteObject(
-    'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name'
+  const textObject = testLayout.insertNewObject(
+    project,
+    'TextObject::Text',
+    'MyTextObject',
+    0
   );
-
+  const particleEmitter = testLayout.insertNewObject(
+    project,
+    'ParticleSystem::ParticleEmitter',
+    'MyParticleEmitter',
+    0
+  );
+  const tiledSpriteObject = testLayout.insertNewObject(
+    project,
+    'TiledSpriteObject::TiledSprite',
+    'MyTiledSpriteObject',
+    0
+  );
+  const panelSpriteObject = testLayout.insertNewObject(
+    project,
+    'PanelSpriteObject::PanelSprite',
+    'MyPanelSpriteObject',
+    0
+  );
+  const spriteObject = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObject',
+    0
+  );
+  const spriteObjectWithBehaviors = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObjectWithBehaviors',
+    0
+  );
+  const spriteObjectWithoutBehaviors = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObjectWithoutBehaviors',
+    0
+  );
+  const spriteObjectWithoutEffects = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObjectWithoutEffect',
+    0
+  );
+  const spriteObjectWithEffects = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObjectWithEffects',
+    0
+  );
+  testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name',
+    14
+  );
+  testLayout.insertNewObject(
+    project,
+    'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
+    'MyFakeObjectWithUnsupportedCapability',
+    15
+  );
+  const spriteObjectConfiguration = gd.asSpriteConfiguration(
+    spriteObject.getConfiguration()
+  );
+  {
+    const variablesContainer = spriteObject.getVariables();
+    variablesContainer
+      .insert('ObjectVariable', new gd.Variable(), 0)
+      .setString('A multiline\nstr value');
+    const variable = variablesContainer.insert(
+      'OtherObjectVariable',
+      new gd.Variable(),
+      1
+    );
+    variable.setFolded(false);
+    variable.castTo('structure');
+    variable.getChild('ObjectChild1').setValue(564);
+    variable.getChild('ObjectChild2').setString('Guttentag');
+    variable.getChild('ObjectChild3').setBool(true);
+    const arrayVariable = variable.getChild('ObjectChild4');
+    arrayVariable.castTo('array');
+    arrayVariable.setFolded(true);
+    arrayVariable.pushNew().setValue(856.5);
+  }
   {
     const animation = new gd.Animation();
     animation.setDirectionsCount(1);
@@ -107,7 +291,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     animation.getDirection(0).addSprite(sprite1);
     animation.getDirection(0).addSprite(sprite2);
     animation.getDirection(0).addSprite(sprite3);
-    spriteObject.addAnimation(animation);
+    spriteObjectConfiguration.addAnimation(animation);
   }
   {
     const animation = new gd.Animation();
@@ -124,7 +308,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     animation.getDirection(0).addSprite(sprite2);
     animation.getDirection(0).addSprite(sprite3);
     animation.getDirection(0).addSprite(sprite4);
-    spriteObject.addAnimation(animation);
+    spriteObjectConfiguration.addAnimation(animation);
   }
   {
     const animation = new gd.Animation();
@@ -132,7 +316,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     const sprite1 = new gd.Sprite();
     sprite1.setImageName('pixi');
     animation.getDirection(0).addSprite(sprite1);
-    spriteObject.addAnimation(animation);
+    spriteObjectConfiguration.addAnimation(animation);
   }
 
   spriteObjectWithBehaviors.addNewBehavior(
@@ -149,17 +333,6 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   // Add some tags
   tiledSpriteObject.setTags('Tag1');
   spriteObject.setTags('Tag1, Tag2');
-
-  // Layout
-  const testLayout = project.insertNewLayout('TestLayout', 0);
-  testLayout.insertObject(shapePainterObject, 0);
-  testLayout.insertObject(textObject, 0);
-  testLayout.insertObject(tiledSpriteObject, 0);
-  testLayout.insertObject(panelSpriteObject, 0);
-  testLayout.insertObject(spriteObject, 0);
-  testLayout.insertObject(spriteObjectWithBehaviors, 0);
-  testLayout.insertObject(spriteObjectWithoutBehaviors, 0);
-  testLayout.insertObject(spriteObjectWithLongName, 14);
 
   const group1 = new gd.ObjectGroup();
   group1.setName('GroupOfSprites');
@@ -189,6 +362,30 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testLayoutInstance1.setX(10);
   testLayoutInstance1.setY(15);
 
+  const testSpriteObjectInstance = testLayout
+    .getInitialInstances()
+    .insertNewInitialInstance();
+  testSpriteObjectInstance.setObjectName(spriteObject.getName());
+
+  {
+    const variablesContainer = testSpriteObjectInstance.getVariables();
+    variablesContainer
+      .insert('InstanceVariable', new gd.Variable(), 0)
+      .setString('A multiline\nstr value');
+    const variable = variablesContainer.insert(
+      'OtherInstanceVariable',
+      new gd.Variable(),
+      1
+    );
+    variable.castTo('structure');
+    variable.getChild('InstanceChild1').setValue(1995);
+    variable.getChild('InstanceChild2').setString('Hallo');
+    variable.getChild('InstanceChild3').setBool(false);
+    const arrayVariable = variable.getChild('InstanceChild4');
+    arrayVariable.castTo('array');
+    arrayVariable.pushNew().setString('Bonjour');
+  }
+
   // Add layers
   testLayout.insertNewLayer('GUI', 0);
   testLayout.insertNewLayer('OtherLayer', 1);
@@ -205,10 +402,22 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   variable3.getChild('Child1').setString('Child1 str value');
   variable3.getChild('Child2').setString('7891011');
   variable3
-    .getChild('Child3')
+    .getChild('FoldedChild')
     .getChild('SubChild1')
     .setString('Hello\nMultiline\nWorld');
+  variable3.getChild('FoldedChild').setFolded(true);
   testLayoutVariables.insert('Variable3', variable3, 2);
+  const variable4 = new gd.Variable();
+  variable4.getAtIndex(0).setString('String value\nwith Multiline');
+  variable4.getAtIndex(1).setValue(4539.42);
+  variable4.getAtIndex(2).setBool(true);
+  variable4.setFolded(true);
+  testLayoutVariables.insert('FoldedArray', variable4, 3);
+  const variable5 = new gd.Variable();
+  variable5.getAtIndex(0).setString('PlayerName');
+  variable5.getAtIndex(1).setValue(25);
+  variable5.getAtIndex(2).setBool(false);
+  testLayoutVariables.insert('OtherArray', variable5, 4);
 
   //Create a few events
   //Add a new "standard" event to the scene:
@@ -349,12 +558,13 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   const testInstruction = makeKeyPressedCondition('Space');
 
   // Global objects
-  const globalTextObject = new gd.TextObject('GlobalTextObject');
-  const globalTiledSpriteObject = new gd.TiledSpriteObject(
-    'GlobalTiledSpriteObject'
+  project.insertNewObject(project, 'TextObject::Text', 'GlobalTextObject', 0);
+  project.insertNewObject(
+    project,
+    'TiledSpriteObject::TiledSprite',
+    'GlobalTiledSpriteObject',
+    0
   );
-  project.insertObject(globalTextObject, 0);
-  project.insertObject(globalTiledSpriteObject, 0);
 
   // External events
   const testExternalEvents1 = project.insertNewExternalEvents(
@@ -377,6 +587,17 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   // Empty events list
   const emptyEventsList = new gd.EventsList();
+
+  // Events functions extension
+  const someAlreadyInstalledExtension = project.insertNewEventsFunctionsExtension(
+    'SomeAlreadyInstalledExtension',
+    0
+  );
+  someAlreadyInstalledExtension.setNamespace('SomeAlreadyInstalledExtension');
+  someAlreadyInstalledExtension.setName('SomeAlreadyInstalledExtension');
+  someAlreadyInstalledExtension.setFullName(
+    'Some fake already installed extension'
+  );
 
   // Events functions extension
   const testEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
@@ -422,6 +643,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
 
   testEventsFunctionsExtension.insertNewEventsFunction('MyTestFunction2', 1);
+  testEventsFunctionsExtension
+    .insertNewEventsFunction('MyPrivateTestFunction3', 2)
+    .setPrivate(true);
 
   // Create more dummy objects to test events with a lot of objects
   for (var i = 0; i < 6; ++i) {
@@ -529,12 +753,6 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   const layerWithoutEffects = new gd.Layer();
 
-  const spriteObjectWithoutEffects = new gd.SpriteObject(
-    'MySpriteObjectWithoutEffects'
-  );
-  const spriteObjectWithEffects = new gd.SpriteObject(
-    'MySpriteObjectWithEffects'
-  );
   {
     const effect1 = spriteObjectWithEffects
       .getEffects()
@@ -556,13 +774,48 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     effect3.setStringParameter('image', 'my-image');
   }
 
+  // Set up some fake parameter metadata.
+  const stringRelationalOperatorParameterMetadata = new gd.ParameterMetadata();
+  stringRelationalOperatorParameterMetadata.setType('relationalOperator');
+  stringRelationalOperatorParameterMetadata.setDescription(
+    'A fake parameter (for strings)'
+  );
+  stringRelationalOperatorParameterMetadata.setExtraInfo('string');
+
+  const numberRelationalOperatorParameterMetadata = new gd.ParameterMetadata();
+  numberRelationalOperatorParameterMetadata.setType('relationalOperator');
+  numberRelationalOperatorParameterMetadata.setDescription(
+    'A fake parameter (for number)'
+  );
+  numberRelationalOperatorParameterMetadata.setExtraInfo('number');
+
+  const colorRelationalOperatorParameterMetadata = new gd.ParameterMetadata();
+  colorRelationalOperatorParameterMetadata.setType('relationalOperator');
+  colorRelationalOperatorParameterMetadata.setDescription(
+    'A fake parameter (for colors)'
+  );
+  colorRelationalOperatorParameterMetadata.setExtraInfo('color');
+
+  const unknownRelationalOperatorParameterMetadata = new gd.ParameterMetadata();
+  unknownRelationalOperatorParameterMetadata.setType('relationalOperator');
+  unknownRelationalOperatorParameterMetadata.setDescription(
+    'A fake parameter (unknown type)'
+  );
+  unknownRelationalOperatorParameterMetadata.setExtraInfo(
+    'whatever-this-is-not-recognised'
+  );
+
   return {
     project,
-    shapePainterObject,
-    textObject,
-    tiledSpriteObject,
+    shapePainterObjectConfiguration: shapePainterObject.getConfiguration(),
+    textObjectConfiguration: textObject.getConfiguration(),
+    particleEmitterConfiguration: particleEmitter.getConfiguration(),
+    tiledSpriteObjectConfiguration: tiledSpriteObject.getConfiguration(),
     panelSpriteObject,
+    customObject,
     spriteObject,
+    spriteObjectConfiguration,
+    testSpriteObjectInstance,
     spriteObjectWithBehaviors,
     spriteObjectWithoutBehaviors,
     testLayout,
@@ -588,5 +841,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     layerWithoutEffects,
     spriteObjectWithEffects,
     spriteObjectWithoutEffects,
+    stringRelationalOperatorParameterMetadata,
+    numberRelationalOperatorParameterMetadata,
+    colorRelationalOperatorParameterMetadata,
+    unknownRelationalOperatorParameterMetadata,
   };
 };

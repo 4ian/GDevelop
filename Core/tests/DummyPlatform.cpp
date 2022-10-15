@@ -7,14 +7,19 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/ObjectConfiguration.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
 #include "catch.hpp"
 
+// TODO Remove these 2 classes and write the test with events based behaviors.
 class BehaviorWithRequiredBehaviorProperty : public gd::Behavior {
  public:
-  BehaviorWithRequiredBehaviorProperty() {};
+  BehaviorWithRequiredBehaviorProperty(
+      const gd::String& name, const gd::String& type)
+      : Behavior(name, type) {};
   virtual ~BehaviorWithRequiredBehaviorProperty(){};
   virtual Behavior* Clone() const override {
     return new BehaviorWithRequiredBehaviorProperty(*this);
@@ -25,7 +30,8 @@ class BehaviorWithRequiredBehaviorProperty : public gd::Behavior {
     std::map<gd::String, gd::PropertyDescriptor> properties;
     properties["requiredBehaviorProperty"]
         .SetLabel("A required behavior")
-        .SetValue(behaviorContent.GetStringAttribute("requiredBehaviorProperty"))
+        .SetValue(
+            behaviorContent.GetStringAttribute("requiredBehaviorProperty"))
         .SetType("Behavior")
         .AddExtraInfo("MyExtension::MyBehavior");
     return properties;
@@ -48,7 +54,9 @@ class BehaviorWithRequiredBehaviorProperty : public gd::Behavior {
 class BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior
     : public gd::Behavior {
  public:
-  BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior() {};
+  BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior(
+      const gd::String& name, const gd::String& type)
+      : Behavior(name, type) {};
   virtual ~BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior(){};
   virtual Behavior* Clone() const override {
     return new BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior(
@@ -60,7 +68,8 @@ class BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior
     std::map<gd::String, gd::PropertyDescriptor> properties;
     properties["requiredBehaviorProperty"]
         .SetLabel("A required behavior")
-        .SetValue(behaviorContent.GetStringAttribute("requiredBehaviorProperty"))
+        .SetValue(
+            behaviorContent.GetStringAttribute("requiredBehaviorProperty"))
         .SetType("Behavior")
         .AddExtraInfo("MyExtension::BehaviorWithRequiredBehaviorProperty");
     return properties;
@@ -87,11 +96,26 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
 
   std::shared_ptr<gd::PlatformExtension> baseObjectExtension =
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
+
+  // Create the base object. All objects "inherits" from it.
   baseObjectExtension->SetExtensionInformation(
       "BuiltinObject", "Base Object dummy extension", "", "", "");
-  auto baseObject = baseObjectExtension->AddObject<gd::Object>(
+  auto& baseObject = baseObjectExtension->AddObject<gd::ObjectConfiguration>(
       "", "Dummy Base Object", "Dummy Base Object", "");
 
+  // Add this expression for all objects. But it requires a "capability".
+  baseObject
+      .AddStrExpression("GetSomethingRequiringEffectCapability",
+                        "Get something, but this requires the effect capability for the object.",
+                        "",
+                        "",
+                        "")
+      .AddParameter("object", _("Object"), "")
+      .AddParameter("expression", _("Number parameter"))
+      .SetRequiresBaseObjectCapability("effect")
+      .SetFunctionName("getSomethingRequiringEffectCapability");
+
+  // Create an extension with various stuff inside.
   std::shared_ptr<gd::PlatformExtension> extension =
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
   extension->SetExtensionInformation(
@@ -109,6 +133,18 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .SetFunctionName("doSomething");
 
   extension
+      ->AddAction("DoSomethingWithObjects",
+                  "Do something",
+                  "This does something",
+                  "Do something please",
+                  "",
+                  "",
+                  "")
+      .AddParameter("object", _("Object 1 parameter"))
+      .AddParameter("object", _("Object 2 parameter"))
+      .SetFunctionName("doSomethingWithObjects");
+
+  extension
       ->AddAction("DoSomethingWithResources",
                   "Do something with resources",
                   "This does something with resources",
@@ -116,7 +152,8 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                   "",
                   "",
                   "")
-      .AddParameter("bitmapFontResource", "Parameter 1 (a bitmap font resource)")
+      .AddParameter("bitmapFontResource",
+                    "Parameter 1 (a bitmap font resource)")
       .AddParameter("imageResource", "Parameter 2 (an image resource)")
       .AddParameter("soundfile", "Parameter 3 (an audio resource)")
       .SetFunctionName("doSomethingWithResources");
@@ -179,8 +216,19 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("object", _("Object 2 parameter"))
       .AddParameter("objectvar", _("Variable for object 2"))
       .SetFunctionName("getStringWith2ObjectParamAnd2ObjectVarParam");
+  extension
+      ->AddStrExpression(
+          "GetStringWith1ObjectParamAnd2ObjectVarParam",
+          "Get string with 2 objectvar param one from the same object param",
+          "",
+          "",
+          "")
+      .AddParameter("object", _("Object 1 parameter"))
+      .AddParameter("objectvar", _("Variable for object 1"))
+      .AddParameter("objectvar", _("Variable for object 2"))
+      .SetFunctionName("getStringWith1ObjectParamAnd2ObjectVarParam");
 
-  auto& object = extension->AddObject<gd::Object>(
+  auto& object = extension->AddObject<gd::SpriteObject>(
       "Sprite", "Dummy Sprite", "Dummy sprite object", "");
   object
       .AddExpression("GetObjectVariableAsNumber",
@@ -231,10 +279,11 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                                "Dummy behavior",
                                "MyBehavior",
                                "A dummy behavior for tests",
-                               "",
-                               "",
-                               "",
-                               gd::make_unique<gd::Behavior>(),
+                               "Group",
+                               "Icon.png",
+                               "MyBehavior",
+                               gd::make_unique<gd::Behavior>(
+                                  "Behavior", "MyExtension::MyBehavior"),
                                gd::make_unique<gd::BehaviorsSharedData>());
     behavior
         .AddAction("BehaviorDoSomething",
@@ -260,10 +309,10 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
         .SetFunctionName("getBehaviorStringWith1Param");
     behavior
         .AddExpression("GetBehaviorNumberWith1Param",
-                          "Get number from behavior with 1 param",
-                          "",
-                          "",
-                          "")
+                       "Get number from behavior with 1 param",
+                       "",
+                       "",
+                       "")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "MyExtension::MyBehavior")
         .AddParameter("expression", _("Number parameter"))
@@ -275,10 +324,11 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                                "Another Dummy behavior",
                                "MyOtherBehavior",
                                "Another dummy behavior for tests",
-                               "",
-                               "",
-                               "",
-                               gd::make_unique<gd::Behavior>(),
+                               "Group",
+                               "Icon.png",
+                               "MyOtherBehavior",
+                               gd::make_unique<gd::Behavior>(
+                                  "Behavior", "MyExtension::MyOtherBehavior"),
                                gd::make_unique<gd::BehaviorsSharedData>());
   }
 
@@ -288,10 +338,11 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
         "BehaviorWithRequiredBehaviorProperty",
         "BehaviorWithRequiredBehaviorProperty",
         "A dummy behavior requiring another behavior (MyBehavior)",
-        "",
-        "",
-        "",
-        gd::make_unique<BehaviorWithRequiredBehaviorProperty>(),
+        "Group",
+        "Icon.png",
+        "BehaviorWithRequiredBehaviorProperty",
+        gd::make_unique<BehaviorWithRequiredBehaviorProperty>(
+            "Behavior", "MyExtension::BehaviorWithRequiredBehaviorProperty"),
         gd::make_unique<gd::BehaviorsSharedData>());
   }
   {
@@ -302,12 +353,24 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
         "A dummy behavior requiring another behavior "
         "(BehaviorWithRequiredBehaviorProperty) that itself requires another "
         "behavior (MyBehavior)",
-        "",
-        "",
-        "",
+        "Group",
+        "Icon.png",
+        "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior",
         gd::make_unique<
-            BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior>(),
+            BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior>(
+                "Behavior",
+                "MyExtension::BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior"),
         gd::make_unique<gd::BehaviorsSharedData>());
+  }
+
+  {
+    auto& object = extension
+                       ->AddObject<gd::ObjectConfiguration>(
+                           "FakeObjectWithUnsupportedCapability",
+                           "FakeObjectWithUnsupportedCapability",
+                           "This is FakeObjectWithUnsupportedCapability",
+                           "")
+                       .AddUnsupportedBaseObjectCapability("effect");
   }
 
   platform.AddExtension(baseObjectExtension);

@@ -11,7 +11,7 @@ type IconProps =
   | {|
       children: React.Node,
     |}
-  // Support a few specific icons from iconmoon-font.css
+  // Support a few specific icons from icomoon-font.css
   | {|
       className:
         | 'icon-youtube'
@@ -25,7 +25,7 @@ type IconProps =
 // They should be self descriptive - refer to Material UI docs otherwise.
 type Props = {|
   ...IconProps,
-  onClick?: (ev: any) => void,
+  onClick?: (ev: any) => void | Promise<void>,
   onContextMenu?: () => void,
   disabled?: boolean,
   edge?: 'start' | 'end' | false,
@@ -47,6 +47,7 @@ type Props = {|
 
   tooltip?: MessageDescriptor,
   acceleratorString?: string,
+  'aria-label'?: string,
 |};
 
 /**
@@ -56,7 +57,7 @@ type Props = {|
 export default class IconButton extends React.Component<Props, {||}> {
   render() {
     const { tooltip, acceleratorString, ...otherProps } = this.props;
-    const iconButton = <MUIIconButton {...otherProps} />;
+    const iconButton = <MUIIconButton {...otherProps} color="secondary" />;
 
     return tooltip && !this.props.disabled ? (
       <I18n>

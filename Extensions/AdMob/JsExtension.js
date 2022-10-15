@@ -35,7 +35,11 @@ module.exports = {
         'Florian Rival',
         'MIT'
       )
-      .setExtensionHelpPath('/all-features/admob');
+      .setExtensionHelpPath('/all-features/admob')
+      .setCategory('Ads');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('AdMob'))
+      .setIcon('JsPlatform/Extensions/admobicon24.png');
 
     extension
       .registerProperty('AdMobAppIdAndroid')
@@ -54,7 +58,7 @@ module.exports = {
       .setName('AdMob Cordova plugin')
       .setDependencyType('cordova')
       .setExportName('gdevelop-cordova-admob-plus')
-      .setVersion('0.43.0')
+      .setVersion('0.45.0')
       .setExtraSetting(
         'APP_ID_ANDROID',
         new gd.PropertyDescriptor('AdMobAppIdAndroid').setType(
@@ -87,7 +91,7 @@ module.exports = {
             'account being flagged for invalid activity.'
         ),
         _('Enable test mode (serving test ads, for development): _PARAM0_'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -105,7 +109,7 @@ module.exports = {
           'Check if a banner is currently loading. It will be shown automatically when loaded.'
         ),
         _('Banner is loading'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -119,7 +123,7 @@ module.exports = {
         _('Banner showing'),
         _('Check if there is a banner being displayed.'),
         _('Banner is showing'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -133,7 +137,7 @@ module.exports = {
         _('Banner had an error'),
         _('Check if there was a error while displaying a banner.'),
         _('Banner ad had an error'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -159,7 +163,7 @@ module.exports = {
         _(
           'Configure the banner with Android ad unit ID: _PARAM0_, iOS ad unit ID: _PARAM1_, display at top: _PARAM2_'
         ),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -190,7 +194,7 @@ module.exports = {
         _('Show banner'),
         _('Show the banner that was previously set up.'),
         _('Show banner'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -206,7 +210,7 @@ module.exports = {
           'Hide the banner. You can show it again with the corresponding action.'
         ),
         _('Hide banner'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -224,7 +228,7 @@ module.exports = {
         _('Interstitial loading'),
         _('Check if an interstitial is currently loading.'),
         _('Interstitial is loading'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -238,7 +242,7 @@ module.exports = {
         _('Interstitial ready'),
         _('Check if an interstitial is ready to be displayed.'),
         _('Interstitial is ready'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -252,7 +256,7 @@ module.exports = {
         _('Interstitial showing'),
         _('Check if there is an interstitial being displayed.'),
         _('Interstitial is showing'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -266,7 +270,7 @@ module.exports = {
         _('Interstitial had an error'),
         _('Check if there was a error while loading the interstitial.'),
         _('Interstitial ad had an error'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -284,7 +288,7 @@ module.exports = {
         _(
           'Load interstitial with Android ad unit ID: _PARAM0_, iOS ad unit ID: _PARAM1_ (display automatically when loaded: _PARAM2_)'
         ),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -315,7 +319,7 @@ module.exports = {
           'Show the interstitial that was loaded. Will work only when the interstitial is fully loaded.'
         ),
         _('Show the loaded interstitial'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -330,7 +334,7 @@ module.exports = {
         _('Video loading'),
         _('Check if a reward video is currently loading.'),
         _('Reward video is loading'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -344,7 +348,7 @@ module.exports = {
         _('Video ready'),
         _('Check if a reward video is ready to be displayed.'),
         _('Reward video is ready'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -358,7 +362,7 @@ module.exports = {
         _('Video showing'),
         _('Check if there is a reward video being displayed.'),
         _('Reward video is showing'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -372,7 +376,7 @@ module.exports = {
         _('Video had an error'),
         _('Check if there was a error while loading the rewarded video.'),
         _('Video ad had an error'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -388,7 +392,7 @@ module.exports = {
           'Check if the reward of the video was given to the user.\nYou can mark this reward as cleared, so that the condition will be false and you can show later another reward video.'
         ),
         _('User got the reward of the video (and clear this reward: _PARAM0_)'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -413,7 +417,7 @@ module.exports = {
         _(
           'Load reward video with Android ad unit ID: _PARAM0_, iOS ad unit ID: _PARAM1_ (display automatically when loaded: _PARAM2_)'
         ),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -444,7 +448,7 @@ module.exports = {
           'Show the reward video that was loaded. Will work only when the video is fully loaded.'
         ),
         _('Show the loaded reward video'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -460,7 +464,7 @@ module.exports = {
           'Mark the video reward as claimed. Useful if you used the condition to check if the reward was given to the user without clearing the reward.'
         ),
         _('Mark the reward of the video as claimed'),
-        _('AdMob'),
+        '',
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )

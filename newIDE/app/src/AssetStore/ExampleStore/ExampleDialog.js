@@ -20,11 +20,12 @@ import { getIDEVersion } from '../../Version';
 import { Column, Line } from '../../UI/Grid';
 import { Divider } from '@material-ui/core';
 import { ColumnStackLayout } from '../../UI/Layout';
-import { ExampleIcon } from './ExampleIcon';
+import { ExampleThumbnailOrIcon } from './ExampleThumbnailOrIcon';
 import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
-import { UserPublicProfileChip } from '../../UI/UserPublicProfileChip';
+import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
+const isDev = Window.isDev();
 
 const electron = optionalRequire('electron');
 
@@ -37,7 +38,9 @@ type Props = {|
 
 export const openExampleInWebApp = (example: Example) => {
   Window.openExternalURL(
-    `https://editor.gdevelop-app.com/?project=${example.projectFileUrl}`
+    `${
+      isDev ? 'http://localhost:3000' : 'https://editor.gdevelop.io'
+    }/?project=${example.projectFileUrl}`
   );
 };
 
@@ -76,6 +79,14 @@ export function ExampleDialog({
   );
   const hasIcon = exampleShortHeader.previewImageUrls.length > 0;
 
+  const canOpenExample = !isOpening && isCompatible;
+  const onOpenExample = React.useCallback(
+    () => {
+      if (canOpenExample) onOpen();
+    },
+    [onOpen, canOpenExample]
+  );
+
   return (
     <Dialog
       actions={[
@@ -96,8 +107,8 @@ export function ExampleDialog({
               )
             }
             primary
-            onClick={onOpen}
-            disabled={isOpening || !isCompatible}
+            onClick={onOpenExample}
+            disabled={!canOpenExample}
             buildMenuTemplate={i18n => [
               {
                 label: electron
@@ -112,26 +123,26 @@ export function ExampleDialog({
           />
         </LeftLoader>,
       ]}
-      cannotBeDismissed={false}
       open
+      cannotBeDismissed={isOpening}
       onRequestClose={onClose}
+      onApply={onOpenExample}
     >
       <ColumnStackLayout expand noMargin>
         {!isCompatible && (
           <AlertMessage kind="error">
             <Trans>
               Unfortunately, this example requires a newer version of GDevelop
-              to work. Upgrade GDevelop to be able to use this extension in your
-              project.
+              to work. Update GDevelop to be able to open this example.
             </Trans>
           </AlertMessage>
         )}
         <Line alignItems="center" noMargin>
           {hasIcon ? (
-            <ExampleIcon exampleShortHeader={exampleShortHeader} size={40} />
+            <ExampleThumbnailOrIcon exampleShortHeader={exampleShortHeader} />
           ) : null}
           <Column expand noMargin={!hasIcon}>
-            <Text noMargin size="title">
+            <Text noMargin size="block-title">
               {exampleShortHeader.name}
             </Text>
           </Column>

@@ -5,7 +5,7 @@
  */
 #ifndef GDCORE_POLYGON_H
 #define GDCORE_POLYGON_H
-#include <SFML/System/Vector2.hpp>
+#include "GDCore/Vector2.h"
 #include <vector>
 
 /**
@@ -22,19 +22,19 @@ class GD_CORE_API Polygon2d {
   Polygon2d(){};
   virtual ~Polygon2d(){};
 
-  std::vector<sf::Vector2f> vertices;  ///< The vertices composing the polygon
-  mutable std::vector<sf::Vector2f>
+  std::vector<gd::Vector2f> vertices;  ///< The vertices composing the polygon
+  mutable std::vector<gd::Vector2f>
       edges;  ///< Edges. Can be computed from vertices using ComputeEdges()
 
   /**
    * \brief Get the vertices composing the polygon.
    */
-  std::vector<sf::Vector2f>& GetVertices() { return vertices; }
+  std::vector<gd::Vector2f>& GetVertices() { return vertices; }
 
   /**
    * \brief Get the vertices composing the polygon.
    */
-  const std::vector<sf::Vector2f>& GetVertices() const { return vertices; }
+  const std::vector<gd::Vector2f>& GetVertices() const { return vertices; }
 
   /**
    * \brief Moves each vertices from the given amount.
@@ -68,7 +68,7 @@ class GD_CORE_API Polygon2d {
   /**
    * \brief Return the position of the center of the polygon
    */
-  sf::Vector2f ComputeCenter() const;
+  gd::Vector2f ComputeCenter() const;
 
   /** \name Tools
    * Tool functions

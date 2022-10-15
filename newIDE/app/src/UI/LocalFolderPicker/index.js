@@ -7,9 +7,10 @@ import { type I18n as I18nType } from '@lingui/core';
 import React, { PureComponent } from 'react';
 import TextField from '../TextField';
 import RaisedButton from '../RaisedButton';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
-const dialog = electron ? electron.remote.dialog : null;
+const remote = optionalRequire('@electron/remote');
+const dialog = remote ? remote.dialog : null;
 
 const styles = {
   container: {
@@ -34,15 +35,15 @@ type Props = {|
 |};
 
 type TitleAndMessage = {|
-  title: ?string,
-  message: ?string,
+  title: string,
+  message: string,
 |};
 
 export default class LocalFolderPicker extends PureComponent<Props, {||}> {
   _onChooseFolder = ({ title, message }: TitleAndMessage) => {
     if (!dialog || !electron) return;
 
-    const browserWindow = electron.remote.getCurrentWindow();
+    const browserWindow = remote.getCurrentWindow();
     dialog
       .showOpenDialog(browserWindow, {
         title,
@@ -63,16 +64,10 @@ export default class LocalFolderPicker extends PureComponent<Props, {||}> {
         title: i18n._(t`Choose an export folder`),
         message: i18n._(t`Choose where to export the game`),
       };
-    } else if (type === 'create-game') {
-      return {
-        title: i18n._(t`Choose a folder for the new game`),
-        message: i18n._(t`Choose where to create the game`),
-      };
     }
-
     return {
-      title: undefined,
-      message: undefined,
+      title: i18n._(t`Choose a folder for the new game`),
+      message: i18n._(t`Choose where to create the game`),
     };
   };
 

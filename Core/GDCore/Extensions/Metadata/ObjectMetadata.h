@@ -7,11 +7,13 @@
 #define OBJECTMETADATA_H
 #include <functional>
 #include <map>
+#include <set>
 #include <memory>
 
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/String.h"
 namespace gd {
 class InstructionMetadata;
@@ -19,7 +21,7 @@ class MultipleInstructionMetadata;
 class ExpressionMetadata;
 }  // namespace gd
 
-typedef std::function<std::unique_ptr<gd::Object>(gd::String name)>
+typedef std::function<std::unique_ptr<gd::ObjectConfiguration>()>
     CreateFunPtr;
 
 namespace gd {
@@ -41,7 +43,17 @@ class GD_CORE_API ObjectMetadata {
                  const gd::String& fullname_,
                  const gd::String& description_,
                  const gd::String& icon24x24_,
-                 std::shared_ptr<gd::Object> blueprintObject_);
+                 std::shared_ptr<gd::ObjectConfiguration> blueprintObject_);
+  /**
+   * \brief Construct an object metadata, without "blueprint" object
+   * 
+   * \note This is used by events based objects.
+   */
+  ObjectMetadata(const gd::String& extensionNamespace_,
+                 const gd::String& name_,
+                 const gd::String& fullname_,
+                 const gd::String& description_,
+                 const gd::String& icon24x24_);
 
   /**
    * \brief Construct an object metadata, with a function that will be called
@@ -200,13 +212,48 @@ class GD_CORE_API ObjectMetadata {
     return *this;
   }
 
+  /**
+   * \brief Set the (user friendly) name of the group this object must
+   * be categorised in.
+   */
+  ObjectMetadata& SetCategoryFullName(const gd::String& categoryFullName_) {
+    categoryFullName = categoryFullName_;
+    return *this;
+  }
+
+  /**
+   * \brief The "capabilities" that are offered by the base object that are
+   * *not* supported by this object, and should be hidden in the editor
+   * inferface.
+   */
+  const std::set<gd::String>& GetUnsupportedBaseObjectCapabilities() const {
+    return unsupportedBaseObjectCapabilities;
+  }
+
+  /**
+   * \brief Add a "capability" that is offered by the base object that is *not*
+   * supported by this object, and should be hidden in the editor inferface.
+   */
+  ObjectMetadata& AddUnsupportedBaseObjectCapability(
+      const gd::String& capability) {
+    unsupportedBaseObjectCapabilities.insert(capability);
+    return *this;
+  }
+
+  /**
+   * \brief Check if a "capability" that is offered by the base object is *not*
+   * supported by this object, and should be hidden in the editor inferface.
+   */
+  bool IsUnsupportedBaseObjectCapability(const gd::String& capability) const {
+    return unsupportedBaseObjectCapabilities.find(capability) != unsupportedBaseObjectCapabilities.end();
+  }
+
   const gd::String& GetName() const { return name; }
-#if defined(GD_IDE_ONLY)
   const gd::String& GetFullName() const { return fullname; }
+  const gd::String& GetCategoryFullName() const { return categoryFullName; }
   const gd::String& GetHelpUrl() const { return helpUrl; }
   const gd::String& GetDescription() const { return description; }
   const gd::String& GetIconFilename() const { return iconFilename; }
-#endif
 
   /**
    * \brief Set the URL pointing to the help page about this object
@@ -227,7 +274,27 @@ class GD_CORE_API ObjectMetadata {
    */
   ObjectMetadata& AddIncludeFile(const gd::String& includeFile);
 
-#if defined(GD_IDE_ONLY)
+  /**
+   * \brief Return a reference to a map containing the names of the actions
+   * (as keys) and the metadata associated with (as values).
+   */
+  std::map<gd::String, gd::InstructionMetadata>& GetAllActions() { return actionsInfos; };
+
+  /**
+   * \see gd::PlatformExtension::GetAllActions
+   */
+  std::map<gd::String, gd::InstructionMetadata>& GetAllConditions() { return conditionsInfos; };
+
+  /**
+   * \see gd::PlatformExtension::GetAllActions
+   */
+  std::map<gd::String, gd::ExpressionMetadata>& GetAllExpressions() { return expressionsInfos; };
+
+  /**
+   * \see gd::PlatformExtension::GetAllActions
+   */
+  std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressions() { return strExpressionsInfos; };
+
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
@@ -235,23 +302,25 @@ class GD_CORE_API ObjectMetadata {
 
   std::vector<gd::String> includeFiles;
   gd::String className;
-#endif
   CreateFunPtr createFunPtr;
 
  private:
   gd::String extensionNamespace;
   gd::String name;
   gd::String helpPath;
-#if defined(GD_IDE_ONLY)
   gd::String helpUrl;  ///< Deprecated. Use helpPath instead.
   gd::String fullname;
   gd::String description;
   gd::String iconFilename;
-#endif
-  std::shared_ptr<gd::Object>
+  gd::String categoryFullName;
+  std::set<gd::String> unsupportedBaseObjectCapabilities;
+
+  std::shared_ptr<gd::ObjectConfiguration>
       blueprintObject;  ///< The "blueprint" object to be copied when a new
                         ///< object is asked. Can be null in case a creation
-                        ///< function is passed.
+                        ///< function is passed or for events based objects
+                        ///< (CustomObject are using EventBasedObject, they
+                        ///< don't need blueprints).
 };
 
 }  // namespace gd

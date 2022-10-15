@@ -33,13 +33,10 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
   }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
-    // This optimization is a bit more cautious than the traditional one,
-    // to still be notified when isActive goes from true to false.
-    if (!this.props.isActive && !nextProps.isActive) {
-      return false;
-    }
-
-    return true;
+    // We stop updates when the component is inactive.
+    // If it's active, was active or becoming active again we let update propagate.
+    // Especially important to note that when becoming inactive, a "last" update is allowed.
+    return this.props.isActive || nextProps.isActive;
   }
 
   componentDidUpdate(prevProps: *) {
@@ -63,6 +60,21 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
   _onBehaviorEdited = async () => {
     // Immediately trigger the reload/regeneration of extensions
     // as a change in the properties of a behavior can create changes
+    // in actions/conditions/expressions to manipulate these properties.
+    try {
+      await this.props.onLoadEventsFunctionsExtensions();
+    } catch (error) {
+      console.warn(
+        'Error while loading events functions extensions - ignoring this in the context of the EventsFunctionsExtensionEditorContainer.',
+        error
+      );
+    }
+  };
+
+  // TODO EBO factorize?
+  _onObjectEdited = async () => {
+    // Immediately trigger the reload/regeneration of extensions
+    // as a change in the properties of an object can create changes
     // in actions/conditions/expressions to manipulate these properties.
     try {
       await this.props.onLoadEventsFunctionsExtensions();
@@ -124,11 +136,13 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           resourceSources={this.props.resourceSources}
           onChooseResource={this.props.onChooseResource}
           resourceExternalEditors={this.props.resourceExternalEditors}
+          onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
           openInstructionOrExpression={this.props.openInstructionOrExpression}
           onCreateEventsFunction={this.props.onCreateEventsFunction}
           initiallyFocusedFunctionName={initiallyFocusedFunctionName}
           initiallyFocusedBehaviorName={initiallyFocusedBehaviorName}
           onBehaviorEdited={this._onBehaviorEdited}
+          onObjectEdited={this._onObjectEdited}
           ref={editor => (this.editor = editor)}
           unsavedChanges={this.props.unsavedChanges}
         />

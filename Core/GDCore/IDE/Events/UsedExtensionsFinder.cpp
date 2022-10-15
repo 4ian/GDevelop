@@ -1,11 +1,11 @@
 #include "UsedExtensionsFinder.h"
 
 #include "GDCore/Events/Instruction.h"
-#include "GDCore/Events/Parsers/ExpressionParser2.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/WholeProjectRefactorer.h"
-#include "GDCore/Project/BehaviorContent.h"
+#include "GDCore/IDE/Events/ExpressionTypeFinder.h"
+#include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
 
@@ -29,7 +29,7 @@ void UsedExtensionsFinder::DoVisitObject(gd::Object& object) {
 
 // Behaviors scanner
 
-void UsedExtensionsFinder::DoVisitBehavior(gd::BehaviorContent& behavior) {
+void UsedExtensionsFinder::DoVisitBehavior(gd::Behavior& behavior) {
   usedExtensions.insert(
       gd::MetadataProvider::GetExtensionAndBehaviorMetadata(
           project.GetCurrentPlatform(), behavior.GetTypeName())
@@ -54,13 +54,12 @@ bool UsedExtensionsFinder::DoVisitInstruction(gd::Instruction& instruction,
         metadata.GetMetadata().GetParameter(i).GetType();
     i++;
 
-    if (gd::ParameterMetadata::IsExpression("string", parameterType) ||
-        gd::ParameterMetadata::IsExpression("number", parameterType)) {
-      gd::ExpressionParser2 parser(project.GetCurrentPlatform(),
-                                   GetGlobalObjectsContainer(),
-                                   GetObjectsContainer());
-      parser.ParseExpression(parameterType, expression.GetPlainString())
-          ->Visit(*this);
+    if (gd::ParameterMetadata::IsExpression("string", parameterType)) {
+      rootType = "string";
+      expression.GetRootNode()->Visit(*this);
+    } else if (gd::ParameterMetadata::IsExpression("number", parameterType)) {
+      rootType = "number";
+      expression.GetRootNode()->Visit(*this);
     } else if (gd::ParameterMetadata::IsExpression("variable", parameterType))
       usedExtensions.insert("BuiltinVariables");
   }
@@ -113,7 +112,8 @@ void UsedExtensionsFinder::OnVisitVariableBracketAccessorNode(
 
 // Add extensions bound to Objects/Behaviors/Functions
 void UsedExtensionsFinder::OnVisitIdentifierNode(IdentifierNode& node) {
-  if (gd::ParameterMetadata::IsObject(node.type)) {
+  auto type = gd::ExpressionTypeFinder::GetType(project.GetCurrentPlatform(), GetGlobalObjectsContainer(), GetObjectsContainer(), rootType, node);
+  if (gd::ParameterMetadata::IsObject(type)) {
     usedExtensions.insert(gd::MetadataProvider::GetExtensionAndObjectMetadata(
                               project.GetCurrentPlatform(), node.identifierName)
                               .GetExtension()

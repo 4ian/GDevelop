@@ -106,6 +106,9 @@ class TopDownMovementBehaviorJsExtension : public gd::PlatformExtension {
         .SetFunctionName("ignoreDefaultControls");
     autActions["TopDownMovementBehavior::SimulateStick"].SetFunctionName(
         "simulateStick");
+    autConditions["TopDownMovementBehavior::TopDownMovementBehavior::IsUsingControl"].SetFunctionName(
+        "isUsingControl");
+    autExpressions["StickAngle"].SetFunctionName("getLastStickInputAngle");
 
     autExpressions["Acceleration"].SetFunctionName("getAcceleration");
     autExpressions["Deceleration"].SetFunctionName("getDeceleration");
@@ -116,6 +119,12 @@ class TopDownMovementBehaviorJsExtension : public gd::PlatformExtension {
     autExpressions["Angle"].SetFunctionName("getAngle");
     autExpressions["XVelocity"].SetFunctionName("getXVelocity");
     autExpressions["YVelocity"].SetFunctionName("getYVelocity");
+    autActions["TopDownMovementBehavior::TopDownMovementBehavior::SetVelocityX"]
+        .SetFunctionName("setXVelocity")
+        .SetGetter("getXVelocity");
+    autActions["TopDownMovementBehavior::TopDownMovementBehavior::SetVelocityY"]
+        .SetFunctionName("setYVelocity")
+        .SetGetter("getYVelocity");
     autExpressions["MovementAngleOffset"].SetFunctionName(
         "getMovementAngleOffset");
 

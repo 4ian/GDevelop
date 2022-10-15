@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import MUITextField from '@material-ui/core/TextField';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { MarkdownText } from './MarkdownText';
 
@@ -24,7 +25,7 @@ type ValueProps =
   // Support an "uncontrolled" field:
   | {| defaultValue: string |}
   // Support an empty field with just a hint text:
-  | {| hintText?: React.Node |};
+  | {| translatableHintText?: MessageDescriptor, hintText?: string |};
 
 // We support a subset of the props supported by Material-UI v0.x TextField
 // They should be self descriptive - refer to Material UI docs otherwise.
@@ -46,7 +47,7 @@ type Props = {|
   }) => void,
 
   // Advanced DOM events, for exceptional usage:
-  onClick?: () => void,
+  onClick?: (event: SyntheticPointerEvent<HTMLInputElement>) => void,
   onKeyPress?: (event: SyntheticKeyboardEvent<>) => void,
   onKeyUp?: (event: SyntheticKeyboardEvent<>) => void,
   onKeyDown?: (event: SyntheticKeyboardEvent<>) => void,
@@ -63,12 +64,16 @@ type Props = {|
   floatingLabelFixed?: boolean,
   floatingLabelText?: React.Node,
   name?: string,
-  hintText?: MessageDescriptor,
+  translatableHintText?: MessageDescriptor,
+  hintText?: string,
   helperMarkdownText?: ?string,
   id?: string,
 
   // Keyboard focus:
   autoFocus?: boolean,
+
+  // String text field:
+  maxLength?: number,
 
   // Number text field:
   precision?: number,
@@ -80,6 +85,9 @@ type Props = {|
   multiline?: boolean,
   rows?: number,
   rowsMax?: number,
+
+  // Support for adornments:
+  endAdornment?: ?React.Node,
 
   // Styling:
   margin?: 'none' | 'dense',
@@ -196,6 +204,7 @@ export default class TextField extends React.Component<Props, {||}> {
       <I18n>
         {({ i18n }) => (
           <MUITextField
+            color="secondary"
             // Value and change handling:
             type={props.type !== undefined ? props.type : undefined}
             value={props.value !== undefined ? props.value : undefined}
@@ -217,7 +226,13 @@ export default class TextField extends React.Component<Props, {||}> {
             }}
             label={props.floatingLabelText}
             name={props.name}
-            placeholder={props.hintText ? i18n._(props.hintText) : undefined}
+            placeholder={
+              props.hintText
+                ? props.hintText
+                : props.translatableHintText
+                ? i18n._(props.translatableHintText)
+                : undefined
+            }
             id={props.id}
             // Keyboard focus:
             autoFocus={props.autoFocus}
@@ -244,11 +259,21 @@ export default class TextField extends React.Component<Props, {||}> {
                 onKeyUp: props.onKeyUp,
                 onKeyDown: props.onKeyDown,
                 onClick: props.onClick,
+                // String field props:
+                maxLength: props.maxLength,
                 // Number field props:
                 max: props.max,
                 min: props.min,
                 step: props.step,
               },
+              // Input adornment:
+              endAdornment: props.endAdornment ? (
+                <InputAdornment position="end">
+                  {props.endAdornment}
+                </InputAdornment>
+              ) : (
+                undefined
+              ),
             }}
             style={
               props.style

@@ -10,7 +10,7 @@
     },
     "secondary": {
       "color": {
-        "value": "#D6DEEC"
+        "value": "#56B6C2"
       },
       "text-contrast-color": {
         "value": "#282C34"
@@ -70,6 +70,11 @@
       "contrast": {
         "color": {
           "value": "#D6DEEC"
+        }
+      },
+      "highlighted": {
+        "background-color": {
+          "value": "rgb(214, 222, 236, 0.3)"
         }
       }
     },
@@ -169,6 +174,35 @@
       },
       "frame-border-color": {
         "value": "#D6DEEC"
+      }
+    },
+    "drop-indicator": {
+      "can-drop": {
+        "color": {
+          "value": "#D6DEEC"
+        }
+      },
+      "cannot-drop": {
+        "color": {
+          "value": "#E06C75"
+        }
+      },
+      "border": {
+        "color": {
+          "value": "#21252B"
+        }
+      }
+    },
+    "home": {
+      "header": {
+        "background-color": {
+          "value": "{theme.surface.canvas.background-color.value}"
+        }
+      },
+      "separator": {
+        "color": {
+          "value": "#32323B"
+        }
       }
     }
   },
@@ -309,6 +343,11 @@
         },
         "background-color": {
           "value": "#E06C7544"
+        }
+      },
+      "warning": {
+        "color": {
+          "value": "#E5C07B"
         }
       }
     },

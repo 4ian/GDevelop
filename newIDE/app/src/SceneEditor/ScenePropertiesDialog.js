@@ -2,10 +2,9 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
-import FlatButton from '../UI/FlatButton';
 import TextField from '../UI/TextField';
 import RaisedButton from '../UI/RaisedButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import PropertiesEditor from '../PropertiesEditor';
@@ -56,7 +55,8 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
     };
   }
 
-  componentWillReceiveProps(newProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     if (
       (!this.props.open && newProps.open) ||
       (newProps.open && this.props.layout !== newProps.layout)
@@ -89,11 +89,10 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
       //   primary={false}
       //   onClick={this.props.onClose}
       // />,
-      <FlatButton
+      <DialogPrimaryButton
         label={<Trans>Ok</Trans>}
         key="ok"
         primary={true}
-        keyboardFocused={true}
         onClick={this._onApply}
       />,
     ];
@@ -104,32 +103,24 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
 
     const propertiesEditors = allBehaviorSharedDataNames
       .map(name => {
-        const sharedDataContent = layout.getBehaviorSharedData(name);
-        const type = sharedDataContent.getTypeName();
+        const behaviorSharedData = layout.getBehaviorSharedData(name);
 
+        // TODO Check if this extra check is needed.
         const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
           gd.JsPlatform.get(),
-          type
+          behaviorSharedData.getTypeName()
         );
         if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata))
           return null;
 
-        const behaviorSharedData = behaviorMetadata.getSharedDataInstance();
         if (isNullPtr(gd, behaviorSharedData)) return null;
 
-        const properties = behaviorSharedData.getProperties(
-          sharedDataContent.getContent()
-        );
+        const properties = behaviorSharedData.getProperties();
         const propertiesSchema = propertiesMapToSchema(
           properties,
-          sharedDataContent =>
-            behaviorSharedData.getProperties(sharedDataContent.getContent()),
+          sharedDataContent => behaviorSharedData.getProperties(),
           (sharedDataContent, name, value) => {
-            behaviorSharedData.updateProperty(
-              sharedDataContent.getContent(),
-              name,
-              value
-            );
+            behaviorSharedData.updateProperty(name, value);
           }
         );
 
@@ -138,7 +129,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
             <PropertiesEditor
               key={name}
               schema={propertiesSchema}
-              instances={[sharedDataContent]}
+              instances={[behaviorSharedData]}
             />
           )
         );
@@ -149,19 +140,20 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
       <Dialog
         title={<Trans>Scene properties</Trans>}
         actions={actions}
-        secondaryActions={
+        secondaryActions={[
           <RaisedButton
+            key="edit-scene-variables"
             label={<Trans>Edit scene variables</Trans>}
             fullWidth
             onClick={() => {
               this.props.onEditVariables();
               this.props.onClose();
             }}
-          />
-        }
-        open={this.props.open}
-        cannotBeDismissed={true}
+          />,
+        ]}
         onRequestClose={this.props.onClose}
+        onApply={this._onApply}
+        open={this.props.open}
         maxWidth="sm"
       >
         <ColumnStackLayout expand noMargin>

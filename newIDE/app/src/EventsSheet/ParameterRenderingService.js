@@ -37,10 +37,12 @@ import ObjectVariableField, {
   renderInlineObjectVariable,
 } from './ParameterFields/ObjectVariableField';
 import LayerField from './ParameterFields/LayerField';
+import ImageResourceField from './ParameterFields/ImageResourceField';
 import AudioResourceField from './ParameterFields/AudioResourceField';
 import VideoResourceField from './ParameterFields/VideoResourceField';
 import JsonResourceField from './ParameterFields/JsonResourceField';
 import BitmapFontResourceField from './ParameterFields/BitmapFontResourceField';
+import FontResourceField from './ParameterFields/FontResourceField';
 import ColorExpressionField from './ParameterFields/ColorExpressionField';
 import ForceMultiplierField, {
   renderInlineForceMultiplier,
@@ -52,7 +54,14 @@ import ObjectEffectNameField from './ParameterFields/ObjectEffectNameField';
 import ObjectEffectParameterNameField from './ParameterFields/ObjectEffectParameterNameField';
 import ObjectPointNameField from './ParameterFields/ObjectPointNameField';
 import ObjectAnimationNameField from './ParameterFields/ObjectAnimationNameField';
+import FunctionParameterNameField from './ParameterFields/FunctionParameterNameField';
+import ExternalLayoutNameField from './ParameterFields/ExternalLayoutNameField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import LeaderboardIdField, {
+  renderInlineLeaderboardIdField,
+} from './ParameterFields/LeaderboardIdField';
+import { IdentifierField } from './ParameterFields/IdentifierField';
+
 const gd: libGDevelop = global.gd;
 
 const components = {
@@ -75,9 +84,11 @@ const components = {
   file: DefaultField, //TODO
   musicfile: AudioResourceField,
   soundfile: AudioResourceField,
+  imageResource: ImageResourceField,
   videoResource: VideoResourceField,
   jsonResource: JsonResourceField,
   bitmapFontResource: BitmapFontResourceField,
+  fontResource: FontResourceField,
   color: ColorExpressionField,
   police: DefaultField, //TODO
   joyaxis: DefaultField, //TODO
@@ -89,6 +100,10 @@ const components = {
   objectEffectParameterName: ObjectEffectParameterNameField,
   objectPointName: ObjectPointNameField,
   objectAnimationName: ObjectAnimationNameField,
+  functionParameterName: FunctionParameterNameField,
+  externalLayoutName: ExternalLayoutNameField,
+  leaderboardId: LeaderboardIdField,
+  identifier: IdentifierField,
 };
 const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   default: renderInlineDefaultField,
@@ -103,6 +118,7 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   trueorfalse: renderInlineTrueFalse,
   operator: renderInlineOperator,
   relationalOperator: renderInlineRelationalOperator,
+  leaderboardId: renderInlineLeaderboardIdField,
 };
 const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   mouse: t`Mouse button`,
@@ -122,8 +138,10 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   key: t`Keyboard key`,
   musicfile: t`Audio resource`,
   soundfile: t`Audio resource`,
+  imageResource: t`Image resource`,
   videoResource: t`Video resource`,
   bitmapFontResource: t`Bitmap font resource`,
+  fontResource: t`Font resource`,
   jsonResource: t`JSON resource`,
   color: t`Color`,
   forceMultiplier: t`Instant or permanent force`,
@@ -134,9 +152,12 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   objectEffectParameterName: t`Object effect parameter name`,
   objectPointName: t`Object point name`,
   objectAnimationName: t`Object animation name`,
+  functionParameterName: t`Parameter name`,
+  externalLayoutName: t`Name of the external layout`,
+  identifier: t`Name of the identifier`,
 };
 
-export default {
+const ParameterRenderingService = {
   components,
   getParameterComponent: (rawType: string) => {
     const fieldType = gd.ParameterMetadata.isObject(rawType)
@@ -164,3 +185,5 @@ export default {
     return userFriendlyTypeName[fieldType] || null;
   },
 };
+
+export default ParameterRenderingService;

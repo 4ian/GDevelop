@@ -77,6 +77,14 @@ class GD_CORE_API PropertyDescriptor {
   }
 
   /**
+   * \brief Change the group where this property is displayed to the user, if any.
+   */
+  PropertyDescriptor& SetGroup(gd::String group_) {
+    group = group_;
+    return *this;
+  }
+
+  /**
    * \brief Set and replace the additional information for the property.
    */
   PropertyDescriptor& SetExtraInfo(const std::vector<gd::String>& info) {
@@ -100,6 +108,7 @@ class GD_CORE_API PropertyDescriptor {
   const gd::String& GetType() const { return type; }
   const gd::String& GetLabel() const { return label; }
   const gd::String& GetDescription() const { return description; }
+  const gd::String& GetGroup() const { return group; }
 
   const std::vector<gd::String>& GetExtraInfo() const {
     return extraInformation;
@@ -153,6 +162,7 @@ class GD_CORE_API PropertyDescriptor {
              ///< the class responsible for updating the property grid.
   gd::String label;        //< The user-friendly property name
   gd::String description;  //< The user-friendly property description
+  gd::String group;        //< The user-friendly property group
   std::vector<gd::String>
       extraInformation;  ///< Can be used to store for example the available
                          ///< choices, if a property is a displayed as a combo

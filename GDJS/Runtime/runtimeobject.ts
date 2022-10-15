@@ -12,6 +12,10 @@ namespace gdjs {
     max: FloatPoint;
   };
 
+  type RendererObjectInterface = {
+    visible: boolean;
+  };
+
   /**
    * Return the squared bounding radius of an object given its width/height and its center of rotation
    * (relative to the top-left of the object). The radius is relative to the center of rotation.
@@ -25,6 +29,122 @@ namespace gdjs {
     const radiusX = Math.max(centerX, width - centerX);
     const radiusY = Math.max(centerY, height - centerY);
     return Math.pow(radiusX, 2) + Math.pow(radiusY, 2);
+  };
+
+  /**
+   * Arrays and data structure that are (re)used by
+   * {@link RuntimeObject.separateFromObjects} to avoid any allocation.
+   */
+  const separateFromObjectsStatics: {
+    moveXArray: Array<float>;
+    moveYArray: Array<float>;
+  } = {
+    moveXArray: [],
+    moveYArray: [],
+  };
+
+  /**
+   * Data structure that are (re)used by
+   * {@link RuntimeObject.raycastTest} to avoid any allocation.
+   */
+  const raycastTestStatics: {
+    result: RaycastTestResult;
+  } = {
+    result: gdjs.Polygon.makeNewRaycastTestResult(),
+  };
+
+  /**
+   * Move the object using the results from collisionTest call.
+   * This moves the object according to the direction of the longest vector,
+   * and projects the others on the orthogonal vector.
+   *
+   * See {@link RuntimeObject.separateFromObjects}
+   *
+   * @param object The object to move.
+   * @param moveXArray The X coordinates of the vectors to move the object.
+   * @param moveYArray The Y coordinates of the vectors to move the object.
+   * @return true if the object was moved.
+   */
+  const moveFollowingSeparatingVectors = (
+    object: gdjs.RuntimeObject,
+    moveXArray: Array<float>,
+    moveYArray: Array<float>
+  ): boolean => {
+    if (moveXArray.length === 0) {
+      moveXArray.length = 0;
+      moveYArray.length = 0;
+      return false;
+    }
+    if (moveXArray.length === 1) {
+      // Move according to the results returned by the collision algorithm.
+      object.setPosition(
+        object.getX() + moveXArray[0],
+        object.getY() + moveYArray[0]
+      );
+      moveXArray.length = 0;
+      moveYArray.length = 0;
+      return true;
+    }
+
+    // Find the longest vector
+    let squaredDistanceMax = 0;
+    let distanceMaxIndex = 0;
+    for (let index = 0; index < moveXArray.length; index++) {
+      const moveX = moveXArray[index];
+      const moveY = moveYArray[index];
+
+      const squaredDistance = moveX * moveX + moveY * moveY;
+      if (squaredDistance > squaredDistanceMax) {
+        squaredDistanceMax = squaredDistance;
+        distanceMaxIndex = index;
+      }
+    }
+
+    const distanceMax = Math.sqrt(squaredDistanceMax);
+    // unit vector of the longest vector
+    const uX = moveXArray[distanceMaxIndex] / distanceMax;
+    const uY = moveYArray[distanceMaxIndex] / distanceMax;
+
+    // normal vector of the longest vector
+    const vX = -uY;
+    const vY = uX;
+
+    // Project other vectors on the normal
+    let scalarProductMin = 0;
+    let scalarProductMax = 0;
+    for (let index = 0; index < moveXArray.length; index++) {
+      const moveX = moveXArray[index];
+      const moveY = moveYArray[index];
+
+      const scalarProduct = moveX * vX + moveY * vY;
+      scalarProductMin = Math.min(scalarProductMin, scalarProduct);
+      scalarProductMax = Math.max(scalarProductMax, scalarProduct);
+    }
+
+    // Apply the longest vector
+    let deltaX = moveXArray[distanceMaxIndex];
+    let deltaY = moveYArray[distanceMaxIndex];
+
+    // Apply the longest projected vector if they all are in the same direction
+    // Some projections could have rounding errors,
+    // they are considered negligible under a 1 for 1,000,000 ratio.
+    const scalarProductMinIsNegligible =
+      -scalarProductMin < scalarProductMax / 1048576;
+    const scalarProductMaxIsNegligible =
+      scalarProductMax < -scalarProductMin / 1048576;
+    if (scalarProductMinIsNegligible !== scalarProductMaxIsNegligible) {
+      if (scalarProductMaxIsNegligible) {
+        deltaX += scalarProductMin * vX;
+        deltaY += scalarProductMin * vY;
+      } else {
+        deltaX += scalarProductMax * vX;
+        deltaY += scalarProductMax * vY;
+      }
+    }
+    object.setPosition(object.getX() + deltaX, object.getY() + deltaY);
+    moveXArray.length = 0;
+    moveYArray.length = 0;
+    return true;
   };
 
   /**
@@ -46,6 +166,7 @@ namespace gdjs {
     protected _livingOnScene: boolean = true;
 
     readonly id: integer;
+    private destroyCallbacks = new Set<() => void>();
     _runtimeScene: gdjs.RuntimeScene;
 
     /**
@@ -130,14 +251,15 @@ namespace gdjs {
      * (`RuntimeObject.prototype.onCreated.call(this);`).
      */
     onCreated(): void {
-      for (const effectName in this._rendererEffects) {
-        this._runtimeScene
-          .getGame()
-          .getEffectsManager()
-          .applyEffect(
-            this.getRendererObject(),
-            this._rendererEffects[effectName]
-          );
+      const rendererObject = this.getRendererObject();
+      if (rendererObject) {
+        for (const effectName in this._rendererEffects) {
+          this._runtimeScene
+            .getGame()
+            .getEffectsManager()
+            // @ts-expect-error - the effects manager is typed with the PIXI object.
+            .applyEffect(rendererObject, this._rendererEffects[effectName]);
+        }
       }
 
       for (let i = 0; i < this._behaviors.length; ++i) {
@@ -175,6 +297,8 @@ namespace gdjs {
       this.persistentUuid = null;
       this.pick = false;
       this.hitBoxesDirty = true;
+      this._defaultHitBoxes.length = 0;
+      this._defaultHitBoxes.push(gdjs.Polygon.createRectangle(0, 0));
       this.aabb.min[0] = 0;
       this.aabb.min[1] = 0;
       this.aabb.max[0] = 0;
@@ -209,6 +333,8 @@ namespace gdjs {
 
       // Make sure to delete existing timers.
       this._timers.clear();
+
+      this.destroyCallbacks.clear();
     }
 
     static supportsReinitialization = false;
@@ -245,7 +371,6 @@ namespace gdjs {
      */
     updatePreRender(runtimeScene: gdjs.RuntimeScene): void {}
 
-    //Nothing to do.
     /**
      * Called when the object is created from an initial instance at the startup of the scene.<br>
      * Note that common properties (position, angle, z order...) have already been setup.
@@ -256,7 +381,6 @@ namespace gdjs {
       initialInstanceData: InstanceData
     ): void {}
 
-    //Nothing to do.
     /**
      * Called when the object must be updated using the specified objectData. This is the
      * case during hot-reload, and is only called if the object was modified.
@@ -286,6 +410,14 @@ namespace gdjs {
       }
     }
 
+    registerDestroyCallback(callback: () => void) {
+      this.destroyCallbacks.add(callback);
+    }
+
+    unregisterDestroyCallback(callback: () => void) {
+      this.destroyCallbacks.delete(callback);
+    }
+
     /**
      * Called when the object is destroyed (because it is removed from a scene or the scene
      * is being unloaded). If you redefine this function, **make sure to call the original method**
@@ -302,8 +434,25 @@ namespace gdjs {
       for (let j = 0, lenj = this._behaviors.length; j < lenj; ++j) {
         this._behaviors[j].onDestroy();
       }
+      this.destroyCallbacks.forEach((c) => c());
       this.clearEffects();
     }
+
+    /**
+     * Called whenever the scene owning the object is paused.
+     * This should *not* impact objects, but some may need to inform their renderer.
+     *
+     * @param runtimeScene The scene owning the object.
+     */
+    onScenePaused(runtimeScene: gdjs.RuntimeScene): void {}
+
+    /**
+     * Called whenever the scene owning the object is resumed after a pause.
+     * This should *not* impact objects, but some may need to inform their renderer.
+     *
+     * @param runtimeScene The scene owning the object.
+     */
+    onSceneResumed(runtimeScene: gdjs.RuntimeScene): void {}
 
     //Rendering:
     /**
@@ -312,7 +461,7 @@ namespace gdjs {
      *
      * @return The internal rendered object (PIXI.DisplayObject...)
      */
-    getRendererObject(): any {
+    getRendererObject(): RendererObjectInterface | null | undefined {
       return undefined;
     }
 
@@ -566,11 +715,10 @@ namespace gdjs {
         return;
       }
       this.zOrder = z;
-      if (this.getRendererObject()) {
+      const rendererObject = this.getRendererObject();
+      if (rendererObject) {
         const theLayer = this._runtimeScene.getLayer(this.layer);
-        theLayer
-          .getRenderer()
-          .changeRendererObjectZOrder(this.getRendererObject(), z);
+        theLayer.getRenderer().changeRendererObjectZOrder(rendererObject, z);
       }
     }
 
@@ -779,15 +927,16 @@ namespace gdjs {
      * @param effectData The data describing the effect to add.
      */
     addEffect(effectData: EffectData): boolean {
-      return this._runtimeScene
-        .getGame()
-        .getEffectsManager()
-        .addEffect(
-          effectData,
-          this._rendererEffects,
-          this.getRendererObject(),
-          this
-        );
+      const rendererObject = this.getRendererObject();
+      if (!rendererObject) return false;
+
+      return (
+        this._runtimeScene
+          .getGame()
+          .getEffectsManager()
+          // @ts-expect-error - the effects manager is typed with the PIXI object.
+          .addEffect(effectData, this._rendererEffects, rendererObject, this)
+      );
     }
 
     /**
@@ -795,25 +944,33 @@ namespace gdjs {
      * @param effectName The name of the effect.
      */
     removeEffect(effectName: string): boolean {
-      return this._runtimeScene
-        .getGame()
-        .getEffectsManager()
-        .removeEffect(
-          this._rendererEffects,
-          this.getRendererObject(),
-          effectName
-        );
+      const rendererObject = this.getRendererObject();
+      if (!rendererObject) return false;
+
+      return (
+        this._runtimeScene
+          .getGame()
+          .getEffectsManager()
+          // @ts-expect-error - the effects manager is typed with the PIXI object.
+          .removeEffect(this._rendererEffects, rendererObject, effectName)
+      );
     }
 
     /**
      * Remove all effects.
      */
     clearEffects(): boolean {
+      const rendererObject = this.getRendererObject();
+      if (!rendererObject) return false;
+
       this._rendererEffects = {};
-      return this._runtimeScene
-        .getGame()
-        .getEffectsManager()
-        .clearEffects(this.getRendererObject());
+      return (
+        this._runtimeScene
+          .getGame()
+          .getEffectsManager()
+          // @ts-expect-error - the effects manager is typed with the PIXI object.
+          .clearEffects(rendererObject)
+      );
     }
 
     /**
@@ -1232,11 +1389,14 @@ namespace gdjs {
 
     //Hit boxes and collision :
     /**
-     * Get the hit boxes for the object.<br>
-     * The default implementation returns a basic bouding box based the size (getWidth and
+     * Get all the hit boxes for the object.
+     *
+     * For collision checks, {@link getHitBoxesAround} should be used instead.
+     *
+     * The default implementation returns a basic bounding box based the size (getWidth and
      * getHeight) and the center point of the object (getCenterX and getCenterY).
      *
-     * You should probably redefine updateHitBoxes instead of this function.
+     * You should probably redefine {@link updateHitBoxes} instead of this function.
      *
      * @return An array composed of polygon.
      */
@@ -1251,6 +1411,41 @@ namespace gdjs {
         this.hitBoxesDirty = false;
       }
       return this.hitBoxes;
+    }
+
+    /**
+     * Return at least all the hit boxes that overlap a given area.
+     *
+     * The hit boxes don't need to actually overlap the area,
+     * (i.e: it's correct to return more hit boxes than those in the specified area)
+     * but the ones that do must be returned.
+     *
+     * The default implementation returns the same as {@link getHitBoxes}.
+     *
+     * This method can be overridden by grid based objects (or other objects
+     * that can quickly compute which hitboxes are touching a given area)
+     * to optimize collision checks.
+     *
+     * When overriding this method, the following ones should be overridden too:
+     * * {@link getHitBoxes}
+     * * {@link getAABB}
+     * * {@link updateHitBoxes}
+     * * {@link updateAABB}
+     *
+     * @param left bound of the area in scene coordinates
+     * @param top bound of the area in scene coordinates
+     * @param right bound of the area in scene coordinates
+     * @param bottom bound of the area in scene coordinates
+     *
+     * @return at least all the hit boxes that overlap a given area.
+     */
+    getHitBoxesAround(
+      left: float,
+      top: float,
+      right: float,
+      bottom: float
+    ): Iterable<gdjs.Polygon> {
+      return this.getHitBoxes();
     }
 
     /**
@@ -1371,6 +1566,54 @@ namespace gdjs {
           }
         }
       }
+    }
+
+    /**
+     * Shortcut for `getAABB().min[0]`.
+     * See {@link getAABB}.
+     */
+    getAABBLeft(): float {
+      return this.getAABB().min[0];
+    }
+
+    /**
+     * Shortcut for `getAABB().min[1]`.
+     * See {@link getAABB}.
+     */
+    getAABBTop(): float {
+      return this.getAABB().min[1];
+    }
+
+    /**
+     * Shortcut for `getAABB().max[0]`.
+     * See {@link getAABB}.
+     */
+    getAABBRight(): float {
+      return this.getAABB().max[0];
+    }
+
+    /**
+     * Shortcut for `getAABB().max[1]`.
+     * See {@link getAABB}.
+     */
+    getAABBBottom(): float {
+      return this.getAABB().max[1];
+    }
+
+    /**
+     * Shortcut for getting the center on the X coordinates of the object AABB.
+     * See {@link getAABB}.
+     */
+    getAABBCenterX(): float {
+      return this.getAABB().min[0] / 2 + this.getAABB().max[0] / 2;
+    }
+
+    /**
+     * Shortcut for getting the center on the Y coordinates of the object AABB.
+     * See {@link getAABB}.
+     */
+    getAABBCenterY(): float {
+      return this.getAABB().min[1] / 2 + this.getAABB().max[1] / 2;
     }
 
     //Behaviors:
@@ -1508,10 +1751,13 @@ namespace gdjs {
     }
 
     /**
-     * Test a timer elapsed time, if the timer doesn't exist it is created
-     * @param timerName The timer name
-     * @param timeInSeconds The time value to check in seconds
-     * @return True if the timer exists and its value is greater than or equal than the given time, false otherwise
+     * Compare a timer elapsed time. If the timer does not exist, it is created.
+     *
+     * @deprecated prefer using `getTimerElapsedTimeInSecondsOrNaN`.
+     *
+     * @param timerName The timer name.
+     * @param timeInSeconds The time value to check in seconds.
+     * @return True if the timer exists and its value is greater than or equal than the given time, false otherwise.
      */
     timerElapsedTime(timerName: string, timeInSeconds: float): boolean {
       if (!this._timers.containsKey(timerName)) {
@@ -1522,9 +1768,9 @@ namespace gdjs {
     }
 
     /**
-     * Test a if a timer is paused
-     * @param timerName The timer name
-     * @return True if the timer exists and is paused, false otherwise
+     * Test a if a timer is paused.
+     * @param timerName The timer name.
+     * @return True if the timer exists and is paused, false otherwise.
      */
     timerPaused(timerName: string): boolean {
       if (!this._timers.containsKey(timerName)) {
@@ -1534,8 +1780,8 @@ namespace gdjs {
     }
 
     /**
-     * Reset a timer, if the timer doesn't exist it is created
-     * @param timerName The timer name
+     * Reset a timer. If the timer doesn't exist it is created.
+     * @param timerName The timer name.
      */
     resetTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
@@ -1545,8 +1791,8 @@ namespace gdjs {
     }
 
     /**
-     * Pause a timer, if the timer doesn't exist it is created
-     * @param timerName The timer name
+     * Pause a timer. If the timer doesn't exist it is created.
+     * @param timerName The timer name.
      */
     pauseTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
@@ -1556,8 +1802,8 @@ namespace gdjs {
     }
 
     /**
-     * Unpause a timer, if the timer doesn't exist it is created
-     * @param timerName The timer name
+     * Unpause a timer. If the timer doesn't exist it is created.
+     * @param timerName The timer name.
      */
     unpauseTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
@@ -1568,7 +1814,7 @@ namespace gdjs {
 
     /**
      * Remove a timer
-     * @param timerName The timer name
+     * @param timerName The timer name.
      */
     removeTimer(timerName: string): void {
       if (this._timers.containsKey(timerName)) {
@@ -1578,12 +1824,32 @@ namespace gdjs {
 
     /**
      * Get a timer elapsed time.
-     * @param timerName The timer name
-     * @return The timer elapsed time in seconds, 0 if the timer doesn't exist
+     *
+     * This is used by expressions to return 0 when a timer doesn't exist
+     * because numeric expressions must always return a number.
+     *
+     * @param timerName The timer name.
+     * @return The timer elapsed time in seconds, 0 if the timer doesn't exist.
      */
     getTimerElapsedTimeInSeconds(timerName: string): float {
       if (!this._timers.containsKey(timerName)) {
         return 0;
+      }
+      return this._timers.get(timerName).getTime() / 1000.0;
+    }
+
+    /**
+     * Get a timer elapsed time.
+     *
+     * This is used by conditions to return false when a timer doesn't exist,
+     * no matter the relational operator.
+     *
+     * @param timerName The timer name.
+     * @return The timer elapsed time in seconds, NaN if the timer doesn't exist.
+     */
+    getTimerElapsedTimeInSecondsOrNaN(timerName: string): float {
+      if (!this._timers.containsKey(timerName)) {
+        return Number.NaN;
       }
       return this._timers.get(timerName).getTime() / 1000.0;
     }
@@ -1599,35 +1865,52 @@ namespace gdjs {
       objects: RuntimeObject[],
       ignoreTouchingEdges: boolean
     ): boolean {
-      let moved = false;
-      let xMove = 0;
-      let yMove = 0;
-      const hitBoxes = this.getHitBoxes();
+      let moveXArray: Array<float> = separateFromObjectsStatics.moveXArray;
+      let moveYArray: Array<float> = separateFromObjectsStatics.moveYArray;
+      moveXArray.length = 0;
+      moveYArray.length = 0;
 
-      //Check if their is a collision with each object
-      for (let i = 0, len = objects.length; i < len; ++i) {
-        if (objects[i].id != this.id) {
-          const otherHitBoxes = objects[i].getHitBoxes();
-          for (let k = 0, lenk = hitBoxes.length; k < lenk; ++k) {
-            for (let l = 0, lenl = otherHitBoxes.length; l < lenl; ++l) {
-              const result = gdjs.Polygon.collisionTest(
-                hitBoxes[k],
-                otherHitBoxes[l],
-                ignoreTouchingEdges
-              );
-              if (result.collision) {
-                xMove += result.move_axis[0];
-                yMove += result.move_axis[1];
-                moved = true;
-              }
+      // We can assume that the moving object is not grid based,
+      // so there is no need for optimization:
+      // getHitBoxes can be called directly.
+      const hitBoxes = this.getHitBoxes();
+      let aabb: AABB | null = null;
+
+      // Check if there is a collision with each object
+      for (const otherObject of objects) {
+        if (otherObject.id === this.id) {
+          continue;
+        }
+        let otherHitBoxesArray = otherObject.getHitBoxes();
+        let otherHitBoxes: Iterable<gdjs.Polygon> = otherHitBoxesArray;
+        if (otherHitBoxesArray.length > 4) {
+          // The other object has a lot of hit boxes.
+          // Try to reduce the amount of hitboxes to check.
+          if (!aabb) {
+            aabb = this.getAABB();
+          }
+          otherHitBoxes = otherObject.getHitBoxesAround(
+            aabb.min[0],
+            aabb.min[1],
+            aabb.max[0],
+            aabb.max[1]
+          );
+        }
+        for (const hitBox of hitBoxes) {
+          for (const otherHitBox of otherHitBoxes) {
+            const result = gdjs.Polygon.collisionTest(
+              hitBox,
+              otherHitBox,
+              ignoreTouchingEdges
+            );
+            if (result.collision) {
+              moveXArray.push(result.move_axis[0]);
+              moveYArray.push(result.move_axis[1]);
             }
           }
         }
       }
-
-      //Move according to the results returned by the collision algorithm.
-      this.setPosition(this.getX() + xMove, this.getY() + yMove);
-      return moved;
+      return moveFollowingSeparatingVectors(this, moveXArray, moveYArray);
     }
 
     /**
@@ -1640,40 +1923,58 @@ namespace gdjs {
       objectsLists: ObjectsLists,
       ignoreTouchingEdges: boolean
     ): boolean {
-      let moved = false;
-      let xMove = 0;
-      let yMove = 0;
+      let moveXArray: Array<float> = separateFromObjectsStatics.moveXArray;
+      let moveYArray: Array<float> = separateFromObjectsStatics.moveYArray;
+      moveXArray.length = 0;
+      moveYArray.length = 0;
+
+      // We can assume that the moving object is not grid based
+      // So there is no need for optimization
+      // getHitBoxes can be called directly.
       const hitBoxes = this.getHitBoxes();
+      let aabb: AABB | null = null;
+
       for (const name in objectsLists.items) {
         if (objectsLists.items.hasOwnProperty(name)) {
-          const objects = objectsLists.items[name];
+          const otherObjects = objectsLists.items[name];
 
-          //Check if their is a collision with each object
-          for (let i = 0, len = objects.length; i < len; ++i) {
-            if (objects[i].id != this.id) {
-              const otherHitBoxes = objects[i].getHitBoxes();
-              for (let k = 0, lenk = hitBoxes.length; k < lenk; ++k) {
-                for (let l = 0, lenl = otherHitBoxes.length; l < lenl; ++l) {
-                  const result = gdjs.Polygon.collisionTest(
-                    hitBoxes[k],
-                    otherHitBoxes[l],
-                    ignoreTouchingEdges
-                  );
-                  if (result.collision) {
-                    xMove += result.move_axis[0];
-                    yMove += result.move_axis[1];
-                    moved = true;
-                  }
+          // Check if their is a collision with each object
+          for (const otherObject of otherObjects) {
+            if (otherObject.id === this.id) {
+              continue;
+            }
+            let otherHitBoxesArray = otherObject.getHitBoxes();
+            let otherHitBoxes: Iterable<gdjs.Polygon> = otherHitBoxesArray;
+            if (otherHitBoxesArray.length > 4) {
+              // The other object has a lot of hit boxes.
+              // Try to reduce the amount of hitboxes to check.
+              if (!aabb) {
+                aabb = this.getAABB();
+              }
+              otherHitBoxes = otherObject.getHitBoxesAround(
+                aabb.min[0],
+                aabb.min[1],
+                aabb.max[0],
+                aabb.max[1]
+              );
+            }
+            for (const hitBox of hitBoxes) {
+              for (const otherHitBox of otherHitBoxes) {
+                const result = gdjs.Polygon.collisionTest(
+                  hitBox,
+                  otherHitBox,
+                  ignoreTouchingEdges
+                );
+                if (result.collision) {
+                  moveXArray.push(result.move_axis[0]);
+                  moveYArray.push(result.move_axis[1]);
                 }
               }
             }
           }
         }
       }
-
-      //Move according to the results returned by the collision algorithm.
-      this.setPosition(this.getX() + xMove, this.getY() + yMove);
-      return moved;
+      return moveFollowingSeparatingVectors(this, moveXArray, moveYArray);
     }
 
     /**
@@ -1945,10 +2246,13 @@ namespace gdjs {
         )
       );
 
-      const diffX =
-        obj1.getDrawableX() + o1centerX - (obj2.getDrawableX() + o2centerX);
-      const diffY =
-        obj1.getDrawableY() + o1centerY - (obj2.getDrawableY() + o2centerY);
+      const o1AbsoluteCenterX = obj1.getDrawableX() + o1centerX;
+      const o1AbsoluteCenterY = obj1.getDrawableY() + o1centerY;
+      const o2AbsoluteCenterX = obj2.getDrawableX() + o2centerX;
+      const o2AbsoluteCenterY = obj2.getDrawableY() + o2centerY;
+
+      const diffX = o1AbsoluteCenterX - o2AbsoluteCenterX;
+      const diffY = o1AbsoluteCenterY - o2AbsoluteCenterY;
       if (
         Math.sqrt(diffX * diffX + diffY * diffY) >
         obj1BoundingRadius + obj2BoundingRadius
@@ -1957,16 +2261,24 @@ namespace gdjs {
       }
 
       // Do a real check if necessary.
-      const hitBoxes1 = obj1.getHitBoxes();
-      const hitBoxes2 = obj2.getHitBoxes();
-      for (let k = 0, lenBoxes1 = hitBoxes1.length; k < lenBoxes1; ++k) {
-        for (let l = 0, lenBoxes2 = hitBoxes2.length; l < lenBoxes2; ++l) {
+      const hitBoxes1 = obj1.getHitBoxesAround(
+        o2AbsoluteCenterX - obj2BoundingRadius,
+        o2AbsoluteCenterY - obj2BoundingRadius,
+        o2AbsoluteCenterX + obj2BoundingRadius,
+        o2AbsoluteCenterY + obj2BoundingRadius
+      );
+      const hitBoxes2 = obj2.getHitBoxesAround(
+        o1AbsoluteCenterX - obj1BoundingRadius,
+        o1AbsoluteCenterY - obj1BoundingRadius,
+        o1AbsoluteCenterX + obj1BoundingRadius,
+        o1AbsoluteCenterY + obj1BoundingRadius
+      );
+
+      for (const hitBox1 of hitBoxes1) {
+        for (const hitBox2 of hitBoxes2) {
           if (
-            gdjs.Polygon.collisionTest(
-              hitBoxes1[k],
-              hitBoxes2[l],
-              ignoreTouchingEdges
-            ).collision
+            gdjs.Polygon.collisionTest(hitBox1, hitBox2, ignoreTouchingEdges)
+              .collision
           ) {
             return true;
           }
@@ -2008,8 +2320,7 @@ namespace gdjs {
       const diffX = this.getDrawableX() + objCenterX - rayCenterWorldX;
       const diffY = this.getDrawableY() + objCenterY - rayCenterWorldY;
 
-      // @ts-ignore
-      let result = gdjs.Polygon.raycastTestStatics.result;
+      let result = raycastTestStatics.result;
       result.collision = false;
       if (
         // As an optimization, avoid computing the square root of the two boundings radius
@@ -2023,26 +2334,32 @@ namespace gdjs {
       }
 
       // Do a real check if necessary.
-      let testSqDist = closest ? raySqBoundingRadius : 0;
-      const hitBoxes = this.getHitBoxes();
-      for (let i = 0; i < hitBoxes.length; i++) {
-        const res = gdjs.Polygon.raycastTest(hitBoxes[i], x, y, endX, endY);
-        if (res.collision) {
-          if (closest && res.closeSqDist < testSqDist) {
-            testSqDist = res.closeSqDist;
-            result = res;
-          } else {
-            if (
-              !closest &&
-              res.farSqDist > testSqDist &&
-              res.farSqDist <= raySqBoundingRadius
-            ) {
-              testSqDist = res.farSqDist;
-              result = res;
-            }
+      if (closest) {
+        let sqDistMin = Number.MAX_VALUE;
+        const hitBoxes = this.getHitBoxesAround(x, y, endX, endY);
+        for (const hitBox of hitBoxes) {
+          const res = gdjs.Polygon.raycastTest(hitBox, x, y, endX, endY);
+          if (res.collision && res.closeSqDist < sqDistMin) {
+            sqDistMin = res.closeSqDist;
+            gdjs.Polygon.copyRaycastTestResult(res, result);
+          }
+        }
+      } else {
+        let sqDistMax = -Number.MAX_VALUE;
+        const hitBoxes = this.getHitBoxesAround(x, y, endX, endY);
+        for (const hitBox of hitBoxes) {
+          const res = gdjs.Polygon.raycastTest(hitBox, x, y, endX, endY);
+          if (
+            res.collision &&
+            res.farSqDist > sqDistMax &&
+            res.farSqDist <= raySqBoundingRadius
+          ) {
+            sqDistMax = res.farSqDist;
+            gdjs.Polygon.copyRaycastTestResult(res, result);
           }
         }
       }
+
       return result;
     }
 
@@ -2051,6 +2368,7 @@ namespace gdjs {
      *
      * The position should be in "world" coordinates, i.e use gdjs.Layer.convertCoords
      * if you need to pass the mouse or a touch position that you get from gdjs.InputManager.
+     * To check if a point is inside the object collision mask, you can use `isCollidingWithPoint` instead.
      *
      */
     insideObject(x: float, y: float): boolean {
@@ -2114,9 +2432,9 @@ namespace gdjs {
      * @return true if the point is inside the object collision hitboxes.
      */
     isCollidingWithPoint(pointX: float, pointY: float): boolean {
-      const hitBoxes = this.getHitBoxes();
-      for (let i = 0; i < this.hitBoxes.length; ++i) {
-        if (gdjs.Polygon.isPointInside(hitBoxes[i], pointX, pointY)) {
+      const hitBoxes = this.getHitBoxesAround(pointX, pointY, pointX, pointY);
+      for (const hitBox of hitBoxes) {
+        if (gdjs.Polygon.isPointInside(hitBox, pointX, pointY)) {
           return true;
         }
       }

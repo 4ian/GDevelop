@@ -117,7 +117,7 @@ declare interface InstanceNumberProperty {
 }
 declare interface InstanceStringProperty {
   name: string;
-  value: number;
+  value: string;
 }
 
 declare interface LayerData {
@@ -220,6 +220,7 @@ declare interface ResourceData {
   disablePreload?: boolean;
   preloadAsSound?: boolean;
   preloadAsMusic?: boolean;
+  preloadInCache?: boolean;
 }
 
 declare type ResourceKind =

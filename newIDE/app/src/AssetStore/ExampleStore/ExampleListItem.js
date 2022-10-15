@@ -13,11 +13,14 @@ import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../UI/Grid';
 import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import { getIDEVersion } from '../../Version';
-import { ExampleIcon } from './ExampleIcon';
+import { ExampleThumbnailOrIcon } from './ExampleThumbnailOrIcon';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { openExampleInWebApp } from './ExampleDialog';
-import { UserPublicProfileChip } from '../../UI/UserPublicProfileChip';
+import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
+import HighlightedText from '../../UI/Search/HighlightedText';
+import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
 
 const electron = optionalRequire('electron');
 
@@ -28,6 +31,7 @@ const styles = {
     padding: 8,
   },
   button: {
+    alignItems: 'flex-start',
     textAlign: 'left',
     flex: 1,
   },
@@ -35,6 +39,7 @@ const styles = {
 
 type Props = {|
   exampleShortHeader: ExampleShortHeader,
+  matches: ?Array<SearchMatch>,
   isOpening: boolean,
   onChoose: () => void,
   onOpen: () => void,
@@ -43,6 +48,7 @@ type Props = {|
 
 export const ExampleListItem = ({
   exampleShortHeader,
+  matches,
   isOpening,
   onChoose,
   onOpen,
@@ -79,15 +85,30 @@ export const ExampleListItem = ({
     [exampleShortHeader]
   );
 
+  const renderExampleField = (field: 'shortDescription' | 'name') => {
+    const originalField = exampleShortHeader[field];
+
+    if (!matches) return originalField;
+    const nameMatches = matches.filter(match => match.key === field);
+    if (nameMatches.length === 0) return originalField;
+
+    return (
+      <HighlightedText
+        text={originalField}
+        matchesCoordinates={nameMatches[0].indices}
+      />
+    );
+  };
+
   return (
     <div style={styles.container} ref={containerRef}>
-      <Line noMargin expand>
+      <ResponsiveLineStackLayout noMargin expand>
         <ButtonBase style={styles.button} onClick={onChoose} focusRipple>
           {!!exampleShortHeader.previewImageUrls.length && (
-            <ExampleIcon exampleShortHeader={exampleShortHeader} size={64} />
+            <ExampleThumbnailOrIcon exampleShortHeader={exampleShortHeader} />
           )}
           <Column expand>
-            <Text noMargin>{exampleShortHeader.name} </Text>
+            <Text noMargin>{renderExampleField('name')} </Text>
             {exampleShortHeader.authors && (
               <Line>
                 {exampleShortHeader.authors.map(author => (
@@ -96,33 +117,35 @@ export const ExampleListItem = ({
               </Line>
             )}
             <Text noMargin size="body2">
-              {exampleShortHeader.shortDescription}
+              {renderExampleField('shortDescription')}
             </Text>
           </Column>
         </ButtonBase>
-        <Column justifyContent="center">
-          <RaisedButtonWithSplitMenu
-            primary
-            label={<Trans>Open</Trans>}
-            disabled={isOpening || !isCompatible}
-            onClick={() => onOpen()}
-            buildMenuTemplate={i18n => [
-              {
-                label: i18n._(t`Open details`),
-                click: onChoose,
-              },
-              {
-                label: electron
-                  ? i18n._(t`Open in the web-app`)
-                  : i18n._(t`Open in a new tab`),
-                click: () => {
-                  fetchAndOpenExampleInWebApp(i18n);
+        <Column noMargin justifyContent="flex-end">
+          <Line noMargin justifyContent="flex-end">
+            <RaisedButtonWithSplitMenu
+              primary
+              label={<Trans>Open</Trans>}
+              disabled={isOpening || !isCompatible}
+              onClick={() => onOpen()}
+              buildMenuTemplate={i18n => [
+                {
+                  label: i18n._(t`Open details`),
+                  click: onChoose,
                 },
-              },
-            ]}
-          />
+                {
+                  label: electron
+                    ? i18n._(t`Open in the web-app`)
+                    : i18n._(t`Open in a new tab`),
+                  click: () => {
+                    fetchAndOpenExampleInWebApp(i18n);
+                  },
+                },
+              ]}
+            />
+          </Line>
         </Column>
-      </Line>
+      </ResponsiveLineStackLayout>
     </div>
   );
 };

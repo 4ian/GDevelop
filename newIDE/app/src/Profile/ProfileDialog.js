@@ -8,14 +8,15 @@ import Dialog from '../UI/Dialog';
 import { Column, Line } from '../UI/Grid';
 import CreateProfile from './CreateProfile';
 import AuthenticatedUserProfileDetails from './AuthenticatedUserProfileDetails';
-import EmptyMessage from '../UI/EmptyMessage';
 import HelpButton from '../UI/HelpButton';
-import UsagesDetails from './UsagesDetails';
 import SubscriptionDetails from './SubscriptionDetails';
 import ContributionsDetails from './ContributionsDetails';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
 import { GamesList } from '../GameDashboard/GamesList';
 import { ColumnStackLayout } from '../UI/Layout';
+import { getRedirectToSubscriptionPortalUrl } from '../Utils/GDevelopServices/Usage';
+import Window from '../Utils/Window';
+import { showErrorBox } from '../UI/Messages/MessageBox';
 
 type Props = {|
   currentProject: ?gdProject,
@@ -35,11 +36,34 @@ const ProfileDialog = ({
   const [currentTab, setCurrentTab] = React.useState<string>(initialTab);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
-  const _onChangeTab = React.useCallback(
-    (newTab: string) => {
-      setCurrentTab(newTab);
+  const [
+    isManageSubscriptionLoading,
+    setIsManageSubscriptionLoading,
+  ] = React.useState(false);
+  const onManageSubscription = React.useCallback(
+    async () => {
+      const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+      if (!firebaseUser) return;
+
+      try {
+        setIsManageSubscriptionLoading(true);
+        const url = await getRedirectToSubscriptionPortalUrl(
+          getAuthorizationHeader,
+          firebaseUser.uid
+        );
+        Window.openExternalURL(url);
+      } catch (error) {
+        showErrorBox({
+          message:
+            'Unable to load the portal to manage your subscription. Please contact us on billing@gdevelop.io',
+          rawError: error,
+          errorId: 'subscription-portal-error',
+        });
+      } finally {
+        setIsManageSubscriptionLoading(false);
+      }
     },
-    [setCurrentTab]
+    [authenticatedUser]
   );
 
   React.useEffect(
@@ -53,14 +77,14 @@ const ProfileDialog = ({
 
   return (
     <Dialog
-      actions={
+      actions={[
         <FlatButton
           label={<Trans>Close</Trans>}
           key="close"
           primary={false}
           onClick={onClose}
-        />
-      }
+        />,
+      ]}
       secondaryActions={[
         <HelpButton
           key="help"
@@ -79,31 +103,38 @@ const ProfileDialog = ({
         ),
       ]}
       onRequestClose={onClose}
-      cannotBeDismissed={false}
       open={open}
       noMargin
+      fullHeight
+      noTitleMargin
+      title={
+        <Tabs value={currentTab} onChange={setCurrentTab}>
+          <Tab label={<Trans>My Profile</Trans>} value="profile" />
+          <Tab label={<Trans>Games Dashboard</Trans>} value="games-dashboard" />
+        </Tabs>
+      }
+      flexColumnBody
     >
-      <Tabs value={currentTab} onChange={_onChangeTab}>
-        <Tab label={<Trans>My Profile</Trans>} value="profile" />
-        <Tab label={<Trans>Games Dashboard</Trans>} value="games-dashboard" />
-        <Tab label={<Trans>Services Usage</Trans>} value="usage" />
-      </Tabs>
       {currentTab === 'profile' &&
         (authenticatedUser.authenticated && authenticatedUser.profile ? (
-          <Column noMargin>
-            <AuthenticatedUserProfileDetails
-              authenticatedUser={authenticatedUser}
-              onEditProfile={authenticatedUser.onEdit}
-              onChangeEmail={authenticatedUser.onChangeEmail}
-            />
-            <SubscriptionDetails
-              subscription={authenticatedUser.subscription}
-              onChangeSubscription={onChangeSubscription}
-            />
-            <ContributionsDetails userId={authenticatedUser.profile.id} />
-          </Column>
+          <Line>
+            <Column expand>
+              <AuthenticatedUserProfileDetails
+                authenticatedUser={authenticatedUser}
+                onEditProfile={authenticatedUser.onEdit}
+                onChangeEmail={authenticatedUser.onChangeEmail}
+              />
+              <SubscriptionDetails
+                subscription={authenticatedUser.subscription}
+                onChangeSubscription={onChangeSubscription}
+                onManageSubscription={onManageSubscription}
+                isManageSubscriptionLoading={isManageSubscriptionLoading}
+              />
+              <ContributionsDetails userId={authenticatedUser.profile.id} />
+            </Column>
+          </Line>
         ) : (
-          <Column>
+          <Column noMargin expand justifyContent="center">
             <CreateProfile
               onLogin={authenticatedUser.onLogin}
               onCreateAccount={authenticatedUser.onCreateAccount}
@@ -113,12 +144,12 @@ const ProfileDialog = ({
       {currentTab === 'games-dashboard' &&
         (authenticatedUser.authenticated ? (
           <Line>
-            <ColumnStackLayout expand>
+            <ColumnStackLayout expand noOverflowParent>
               <GamesList project={currentProject} />
             </ColumnStackLayout>
           </Line>
         ) : (
-          <Column>
+          <Column noMargin expand justifyContent="center">
             <CreateProfile
               onLogin={authenticatedUser.onLogin}
               onCreateAccount={authenticatedUser.onCreateAccount}
@@ -131,18 +162,6 @@ const ProfileDialog = ({
               }
             />
           </Column>
-        ))}
-      {currentTab === 'usage' &&
-        (authenticatedUser.authenticated ? (
-          <Column noMargin>
-            <UsagesDetails usages={authenticatedUser.usages} />
-          </Column>
-        ) : (
-          <EmptyMessage>
-            <Trans>
-              Register to see the usage that you've made of the online services
-            </Trans>
-          </EmptyMessage>
         ))}
     </Dialog>
   );

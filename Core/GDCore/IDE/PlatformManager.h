@@ -43,12 +43,6 @@ class GD_CORE_API PlatformManager {
     return platformsLoaded;
   };
 
-  /**
-   * \brief Notify each platform that the IDE is ready, by calling their
-   * OnIDEInitialized member function.
-   */
-  void NotifyPlatformIDEInitialized() const;
-
   static PlatformManager *Get() {
     if (NULL == _singleton) {
       _singleton = new PlatformManager;
@@ -65,11 +59,6 @@ class GD_CORE_API PlatformManager {
    */
   static void DestroySingleton() {
     if (NULL != _singleton) {
-      for (std::size_t i = 0; i < _singleton->platformsLoaded.size(); ++i) {
-        if (_singleton->platformsLoaded[i] != std::shared_ptr<gd::Platform>())
-          _singleton->platformsLoaded[i]->OnIDEClosed();
-      }
-
       delete _singleton;
       _singleton = NULL;
     }

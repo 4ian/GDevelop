@@ -14,6 +14,18 @@ export type InstructionContext = {|
   indexInList: number,
 |};
 
+/**
+ * Locates the event of the selected element. It will be used to compute the
+ * event sheet's row that will be saved in history so that the event can be selected
+ * on undo or redo.
+ */
+type LocatingEvent = {| locatingEvent: gdBaseEvent |};
+
+export type InstructionContextWithLocatingEvent = {
+  ...InstructionContext,
+  ...LocatingEvent,
+};
+
 export type ParameterContext = {|
   isCondition: boolean,
   instrsList: gdInstructionsList,
@@ -30,7 +42,7 @@ export type EventContext = {|
 |};
 
 export type SelectionState = {
-  selectedInstructions: { [number]: InstructionContext },
+  selectedInstructions: { [number]: InstructionContextWithLocatingEvent },
   selectedInstructionsLists: { [number]: InstructionsListContext },
   selectedEvents: { [number]: EventContext },
 };
@@ -43,7 +55,9 @@ export const getInitialSelection = () => {
   };
 };
 
-export const getSelectedEvents = (selection: SelectionState): Array<Object> => {
+export const getSelectedEvents = (
+  selection: SelectionState
+): Array<gdBaseEvent> => {
   return values(selection.selectedEvents).map(
     (eventContext: EventContext) => eventContext.event
   );
@@ -59,13 +73,23 @@ export const getSelectedInstructions = (
   selection: SelectionState
 ): Array<gdInstruction> => {
   return values(selection.selectedInstructions).map(
-    (instructionContext: InstructionContext) => instructionContext.instruction
+    (instructionContext: InstructionContextWithLocatingEvent) =>
+      instructionContext.instruction
+  );
+};
+
+export const getSelectedInstructionsLocatingEvents = (
+  selection: SelectionState
+): Array<gdBaseEvent> => {
+  return values(selection.selectedInstructions).map(
+    (instructionContext: InstructionContextWithLocatingEvent) =>
+      instructionContext.locatingEvent
   );
 };
 
 export const getSelectedInstructionsContexts = (
   selection: SelectionState
-): Array<InstructionContext> => {
+): Array<InstructionContextWithLocatingEvent> => {
   return values(selection.selectedInstructions);
 };
 
@@ -152,6 +176,7 @@ export const selectEvent = (
 };
 
 export const selectInstruction = (
+  event: gdBaseEvent,
   selection: SelectionState,
   instructionContext: InstructionContext,
   multiSelection: boolean = false
@@ -164,7 +189,7 @@ export const selectInstruction = (
     ...existingSelection,
     selectedInstructions: {
       ...existingSelection.selectedInstructions,
-      [instruction.ptr]: instructionContext,
+      [instruction.ptr]: { ...instructionContext, locatingEvent: event },
     },
   };
 };
@@ -186,4 +211,16 @@ export const selectInstructionsList = (
       [instructionsList.ptr]: instructionsListContext,
     },
   };
+};
+
+export const selectEventsAfterHistoryChange = (
+  eventContexts: Array<EventContext>
+) => {
+  let newSelection = getInitialSelection();
+
+  eventContexts.forEach(eventContext => {
+    newSelection.selectedEvents[eventContext.event.ptr] = eventContext;
+  });
+
+  return newSelection;
 };

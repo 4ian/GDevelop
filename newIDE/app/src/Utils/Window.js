@@ -1,13 +1,15 @@
 // @flow
 
-import optionalRequire from './OptionalRequire.js';
+import optionalRequire from './OptionalRequire';
 import URLSearchParams from 'url-search-params';
 import { isWindows } from './Platform';
 const electron = optionalRequire('electron');
+const remote = optionalRequire('@electron/remote');
 const shell = electron ? electron.shell : null;
-const dialog = electron ? electron.remote.dialog : null;
+const dialog = remote ? remote.dialog : null;
 
 export type AppArguments = { [string]: any };
+type YesNoCancelDialogChoice = 'yes' | 'no' | 'cancel';
 
 /**
  * The name of the key, in AppArguments, containing the array of
@@ -22,9 +24,9 @@ let currentTitleBarColor: ?string = null;
  */
 export default class Window {
   static setTitle(title: string) {
-    if (electron) {
+    if (remote) {
       try {
-        const browserWindow = electron.remote.getCurrentWindow();
+        const browserWindow = remote.getCurrentWindow();
         browserWindow.setTitle(title);
       } catch (err) {
         // This rarely, but sometimes happen that setTitle throw.
@@ -58,18 +60,18 @@ export default class Window {
   }
 
   static setBounds(x: number, y: number, width: number, height: number) {
-    if (!electron) return;
+    if (!remote) return;
 
     let scaleFactor = 1;
     if (isWindows()) {
       // setBounds need to be called with the scale factor of the screen
       // on Windows.
       const rect = { x, y, width, height };
-      const display = electron.remote.screen.getDisplayMatching(rect);
+      const display = remote.screen.getDisplayMatching(rect);
       scaleFactor = display.scaleFactor;
     }
 
-    const browserWindow = electron.remote.getCurrentWindow();
+    const browserWindow = remote.getCurrentWindow();
     try {
       browserWindow.setBounds({
         x: Math.round(x / scaleFactor),
@@ -84,24 +86,24 @@ export default class Window {
   }
 
   static quit() {
-    if (!electron) return;
+    if (!remote) return;
 
-    const electronApp = electron.remote.app;
+    const electronApp = remote.app;
     electronApp.quit();
   }
 
   static show() {
-    if (!electron) return;
+    if (!remote) return;
 
-    const browserWindow = electron.remote.getCurrentWindow();
+    const browserWindow = remote.getCurrentWindow();
     browserWindow.showInactive();
     browserWindow.setAlwaysOnTop(true);
   }
 
   static hide(forceHide: boolean = false) {
-    if (!electron) return;
+    if (!remote) return;
 
-    const browserWindow = electron.remote.getCurrentWindow();
+    const browserWindow = remote.getCurrentWindow();
     if (!browserWindow.isFocused() || forceHide) {
       browserWindow.setAlwaysOnTop(false);
       browserWindow.hide();
@@ -109,21 +111,21 @@ export default class Window {
   }
 
   static onFocus(cb: () => void) {
-    if (!electron) return;
+    if (!remote) return;
 
-    return electron.remote.getCurrentWindow().on('focus', cb);
+    return remote.getCurrentWindow().on('focus', cb);
   }
 
   static onBlur(cb: () => void) {
-    if (!electron) return;
+    if (!remote) return;
 
-    return electron.remote.getCurrentWindow().on('blur', cb);
+    return remote.getCurrentWindow().on('blur', cb);
   }
 
   static onClose(cb: () => void) {
-    if (!electron) return;
+    if (!remote) return;
 
-    return electron.remote.getCurrentWindow().on('close', cb);
+    return remote.getCurrentWindow().on('close', cb);
   }
 
   /**
@@ -134,8 +136,8 @@ export default class Window {
    * (On the web-app, this is emulated using the "project" argument).
    */
   static getArguments(): AppArguments {
-    if (electron) {
-      return electron.remote.getGlobal('args');
+    if (remote) {
+      return remote.getGlobal('args');
     }
 
     const argumentsObject = {};
@@ -160,12 +162,44 @@ export default class Window {
       return;
     }
 
-    const browserWindow = electron.remote.getCurrentWindow();
+    const browserWindow = remote.getCurrentWindow();
     dialog.showMessageBoxSync(browserWindow, {
       message,
       type,
       buttons: ['OK'],
     });
+  }
+
+  static showYesNoCancelDialog(
+    message: string,
+    type?: 'none' | 'info' | 'error' | 'question' | 'warning'
+  ): YesNoCancelDialogChoice {
+    if (!dialog || !electron) {
+      // TODO: Find a way to display an alert with 3 buttons (not possible with the 3 native js method confirm, alert and prompt)
+      // eslint-disable-next-line
+      const answer = confirm(message);
+      if (answer) return 'yes';
+      return 'no';
+    }
+
+    const browserWindow = remote.getCurrentWindow();
+    const answer = dialog.showMessageBoxSync(browserWindow, {
+      message,
+      type,
+      cancelId: 1,
+      buttons: ['Yes', 'Cancel', 'No'], // TODO: Check on Windows and Linux how these buttons are displayed.
+      // On Mac, they are displayed vertically in the order Yes, No and Cancel from top to bottom.
+    });
+    switch (answer) {
+      case 0:
+        return 'yes';
+      case 1:
+        return 'cancel';
+      case 2:
+        return 'no';
+      default:
+        return 'cancel';
+    }
   }
 
   static showConfirmDialog(
@@ -177,10 +211,11 @@ export default class Window {
       return confirm(message);
     }
 
-    const browserWindow = electron.remote.getCurrentWindow();
+    const browserWindow = remote.getCurrentWindow();
     const answer = dialog.showMessageBoxSync(browserWindow, {
       message,
       type,
+      cancelId: 1,
       buttons: ['OK', 'Cancel'],
     });
     return answer === 0;
@@ -191,7 +226,7 @@ export default class Window {
 
     if (electron) {
       // `remote.require` since `Menu` is a main-process module.
-      var buildEditorContextMenu = electron.remote.require(
+      var buildEditorContextMenu = remote.require(
         'electron-editor-context-menu'
       );
 
@@ -205,7 +240,7 @@ export default class Window {
         // visible selection has changed. Try to wait to show the menu until after that, otherwise the
         // visible selection will update after the menu dismisses and look weird.
         setTimeout(function() {
-          menu.popup({ window: electron.remote.getCurrentWindow() });
+          menu.popup({ window: remote.getCurrentWindow() });
         }, 30);
       });
     } else if (document) {
@@ -237,17 +272,17 @@ export default class Window {
   }
 
   static isDev(): boolean {
-    if (!electron)
+    if (!electron || !remote)
       return !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
     try {
-      const isDev = electron.remote.require('electron-is').dev();
+      const isDev = remote.require('electron-is').dev();
       return isDev;
     } catch (err) {
       // This rarely, but sometimes happen that require throw ("missing remote object").
       // Catch the error in the hope that things will continue to work.
       console.error(
-        "Caught an error while calling electron.remote.require('electron-is').dev",
+        "Caught an error while calling remote.require('electron-is').dev",
         err
       );
       return false; // Assume we're not in development mode. Might be incorrect but better not consider production as development.

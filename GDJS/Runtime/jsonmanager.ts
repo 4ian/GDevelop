@@ -17,6 +17,20 @@ namespace gdjs {
     content: Object | null
   ) => void;
 
+  const checkIfCredentialsRequired = (url: string) => {
+    // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
+    // i.e: its gdevelop.io cookie, to be passed.
+    // Note that this is only useful during previews.
+    if (
+      url.startsWith('https://project-resources.gdevelop.io/') ||
+      url.startsWith('https://project-resources-dev.gdevelop.io/')
+    )
+      return true;
+
+    // For other resources, use the default way of loading resources ("anonymous" or "same-site").
+    return false;
+  };
+
   /**
    * JsonManager loads json files (using `XMLHttpRequest`), using the "json" resources
    * registered in the game resources.
@@ -29,6 +43,7 @@ namespace gdjs {
     _resources: ResourceData[];
 
     _loadedJsons: { [key: string]: Object } = {};
+    _callbacks: { [key: string]: Array<JsonManagerRequestCallback> } = {};
 
     /**
      * @param resources The resources data of the game.
@@ -113,28 +128,65 @@ namespace gdjs {
         callback(null, this._loadedJsons[resourceName]);
         return;
       }
+      // Don't fetch again an object that is already being fetched.
+      {
+        const callbacks = this._callbacks[resourceName];
+        if (callbacks) {
+          callbacks.push(callback);
+          return;
+        } else {
+          this._callbacks[resourceName] = [callback];
+        }
+      }
       const that = this;
       const xhr = new XMLHttpRequest();
       xhr.responseType = 'json';
+      xhr.withCredentials = checkIfCredentialsRequired(resource.file);
       xhr.open('GET', resource.file);
       xhr.onload = function () {
+        const callbacks = that._callbacks[resourceName];
+        if (!callbacks) {
+          return;
+        }
         if (xhr.status !== 200) {
-          callback(
-            new Error('HTTP error: ' + xhr.status + '(' + xhr.statusText + ')'),
-            null
-          );
+          for (const callback of callbacks) {
+            callback(
+              new Error(
+                'HTTP error: ' + xhr.status + '(' + xhr.statusText + ')'
+              ),
+              null
+            );
+          }
+          delete that._callbacks[resourceName];
           return;
         }
 
         // Cache the result
         that._loadedJsons[resourceName] = xhr.response;
-        callback(null, xhr.response);
+        for (const callback of callbacks) {
+          callback(null, xhr.response);
+        }
+        delete that._callbacks[resourceName];
       };
       xhr.onerror = function () {
-        callback(new Error('Network error'), null);
+        const callbacks = that._callbacks[resourceName];
+        if (!callbacks) {
+          return;
+        }
+        for (const callback of callbacks) {
+          callback(new Error('Network error'), null);
+        }
+        delete that._callbacks[resourceName];
       };
       xhr.onabort = function () {
-        callback(new Error('Request aborted'), null);
+        const callbacks = that._callbacks[resourceName];
+        if (!callbacks) {
+          return;
+        }
+        for (const callback of callbacks) {
+          callback(new Error('Request aborted'), null);
+        }
+        delete that._callbacks[resourceName];
       };
       xhr.send();
     }

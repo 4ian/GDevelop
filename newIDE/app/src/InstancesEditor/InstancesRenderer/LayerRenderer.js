@@ -22,6 +22,12 @@ export default class LayerRenderer {
   layer: gdLayer;
   viewPosition: ViewPosition;
   onInstanceClicked: gdInitialInstance => void;
+  onInstanceRightClicked: ({|
+    offsetX: number,
+    offsetY: number,
+    x: number,
+    y: number,
+  |}) => void;
   onInstanceDoubleClicked: gdInitialInstance => void;
   onOverInstance: gdInitialInstance => void;
   onOutInstance: gdInitialInstance => void;
@@ -51,6 +57,7 @@ export default class LayerRenderer {
     viewPosition,
     instances,
     onInstanceClicked,
+    onInstanceRightClicked,
     onInstanceDoubleClicked,
     onOverInstance,
     onOutInstance,
@@ -64,6 +71,12 @@ export default class LayerRenderer {
     layer: gdLayer,
     viewPosition: ViewPosition,
     onInstanceClicked: gdInitialInstance => void,
+    onInstanceRightClicked: ({|
+      offsetX: number,
+      offsetY: number,
+      x: number,
+      y: number,
+    |}) => void,
     onInstanceDoubleClicked: gdInitialInstance => void,
     onOverInstance: gdInitialInstance => void,
     onOutInstance: gdInitialInstance => void,
@@ -78,6 +91,7 @@ export default class LayerRenderer {
     // `layer` can be changed at any moment (see InstancesRenderer).
     this.viewPosition = viewPosition;
     this.onInstanceClicked = onInstanceClicked;
+    this.onInstanceRightClicked = onInstanceRightClicked;
     this.onInstanceDoubleClicked = onInstanceDoubleClicked;
     this.onOverInstance = onOverInstance;
     this.onOutInstance = onOutInstance;
@@ -95,7 +109,10 @@ export default class LayerRenderer {
     // $FlowFixMe - invoke is not writable
     this.instancesRenderer.invoke = instancePtr => {
       // $FlowFixMe - wrapPointer is not exposed
-      const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
+      const instance: gdInitialInstance = gd.wrapPointer(
+        instancePtr,
+        gd.InitialInstance
+      );
 
       //Get the "RendereredInstance" object associated to the instance and tell it to update.
       var renderedInstance: ?RenderedInstance = this.getRendererOfInstance(
@@ -105,11 +122,13 @@ export default class LayerRenderer {
 
       const pixiObject = renderedInstance.getPixiObject();
       if (pixiObject) pixiObject.zOrder = instance.getZOrder();
-      if (pixiObject) pixiObject.interactive = !instance.isLocked();
 
       // "Culling" improves rendering performance of large levels
       const isVisible = this._isInstanceVisible(instance);
-      if (pixiObject) pixiObject.visible = isVisible;
+      if (pixiObject) {
+        pixiObject.visible = isVisible;
+        pixiObject.interactive = !(instance.isLocked() && instance.isSealed());
+      }
       if (isVisible) renderedInstance.update();
 
       renderedInstance.wasUsed = true;
@@ -162,11 +181,7 @@ export default class LayerRenderer {
     const top = this.getUnrotatedInstanceTop(instance);
     const right = left + this.getUnrotatedInstanceWidth(instance);
     const bottom = top + this.getUnrotatedInstanceHeight(instance);
-
-    bounds.left = left;
-    bounds.right = right;
-    bounds.top = top;
-    bounds.bottom = bottom;
+    bounds.set({ left, top, right, bottom });
     return bounds;
   }
 
@@ -215,10 +230,7 @@ export default class LayerRenderer {
       top = Math.min(top, rotatedRectangle[i][1]);
       bottom = Math.max(bottom, rotatedRectangle[i][1]);
     }
-    bounds.left = left;
-    bounds.right = right;
-    bounds.top = top;
-    bounds.bottom = bottom;
+    bounds.set({ left, top, right, bottom });
     return bounds;
   }
 
@@ -241,15 +253,16 @@ export default class LayerRenderer {
         this.project,
         this.layout,
         instance,
-        associatedObject,
+        associatedObject.getConfiguration(),
         this.pixiContainer
       );
 
       renderedInstance._pixiObject.interactive = true;
       gesture.panable(renderedInstance._pixiObject);
       makeDoubleClickable(renderedInstance._pixiObject);
-      renderedInstance._pixiObject.on('click', () => {
-        this.onInstanceClicked(instance);
+      renderedInstance._pixiObject.on('click', event => {
+        if (event.data.originalEvent.button === 0)
+          this.onInstanceClicked(instance);
       });
       renderedInstance._pixiObject.on('doubleclick', () => {
         this.onInstanceDoubleClicked(instance);
@@ -257,13 +270,42 @@ export default class LayerRenderer {
       renderedInstance._pixiObject.on('mouseover', () => {
         this.onOverInstance(instance);
       });
-      renderedInstance._pixiObject.on('mousedown', event => {
-        const viewPoint = event.data.global;
+      renderedInstance._pixiObject.on(
+        'mousedown',
+        (event: PIXI.InteractionEvent) => {
+          if (event.data.originalEvent.button === 0) {
+            const viewPoint = event.data.global;
+            const scenePoint = this.viewPosition.toSceneCoordinates(
+              viewPoint.x,
+              viewPoint.y
+            );
+            this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
+          }
+        }
+      );
+      renderedInstance._pixiObject.on('rightclick', interactionEvent => {
+        const {
+          data: { global: viewPoint, originalEvent: event },
+        } = interactionEvent;
+
+        // First select the instance
         const scenePoint = this.viewPosition.toSceneCoordinates(
           viewPoint.x,
           viewPoint.y
         );
         this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
+
+        // Then call right click callback
+        if (this.onInstanceRightClicked) {
+          this.onInstanceRightClicked({
+            offsetX: event.offsetX,
+            offsetY: event.offsetY,
+            x: event.clientX,
+            y: event.clientY,
+          });
+        }
+
+        return false;
       });
       renderedInstance._pixiObject.on('touchstart', event => {
         if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {

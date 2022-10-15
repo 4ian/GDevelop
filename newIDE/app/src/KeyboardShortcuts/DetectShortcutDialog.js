@@ -25,6 +25,7 @@ const DetectShortcutDialog = (props: Props) => {
   const [isValid, setIsValid] = React.useState(false);
 
   const onApply = () => {
+    if (!isValid) return;
     shortcutString && props.onSet(shortcutString);
     props.onClose();
   };
@@ -47,11 +48,8 @@ const DetectShortcutDialog = (props: Props) => {
 
   return (
     <Dialog
-      onApply={onApply}
       open
       title={<Trans>Set shortcut</Trans>}
-      onRequestClose={props.onClose}
-      cannotBeDismissed={false}
       maxWidth="xs"
       actions={[
         <FlatButton
@@ -77,6 +75,8 @@ const DetectShortcutDialog = (props: Props) => {
           }}
         />,
       ]}
+      onRequestClose={props.onClose}
+      onApply={onApply}
     >
       <Typography>{props.commandText}</Typography>
       <Paper variant="outlined" style={styles.shortcutBox}>

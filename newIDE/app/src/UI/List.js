@@ -19,7 +19,7 @@ import Add from '@material-ui/icons/Add';
 import Search from '@material-ui/icons/Search';
 import { type MenuItemTemplate } from './Menu/Menu.flow';
 import { useLongTouch } from '../Utils/UseLongTouch';
-
+import { Collapse } from '@material-ui/core';
 const useDenseLists = true;
 export const listItemWith32PxIconHeight = 32;
 export const listItemWithoutIconHeight = 29;
@@ -35,6 +35,12 @@ const styles = {
     // an overflow - and it's strange in a way that Material-UI is
     // not handling this by default?)
     wordBreak: 'break-word',
+  },
+  listWithGap: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: 10,
+    flexDirection: 'column',
   },
 };
 
@@ -74,6 +80,7 @@ type ListItemProps = {|
   onDoubleClick?: (event: DoubleClickMouseEvent) => void,
   primaryText: ?React.Node,
   secondaryText?: React.Node,
+  disableAutoTranslate?: boolean,
   selected?: boolean,
   autoGenerateNestedIndicator?: boolean, // TODO: Rename?
   renderNestedItems?: () => Array<React$Element<any> | null>,
@@ -96,6 +103,8 @@ type ListItemProps = {|
   ...ListItemRightButtonProps,
 
   secondaryTextLines?: 1 | 2,
+
+  id?: ?string,
 |};
 
 export type ListItemRefType = any; // Should be a material-ui ListIten
@@ -212,6 +221,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
           {...longTouchForContextMenuProps}
           alignItems={props.secondaryTextLines === 2 ? 'flex-start' : undefined}
           ref={ref}
+          id={props.id}
         >
           {props.leftIcon && (
             <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
@@ -220,6 +230,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
             style={styles.listItemText}
             primary={props.primaryText}
             secondary={props.secondaryText}
+            className={props.disableAutoTranslate ? 'notranslate' : ''}
           />
           {renderListItemSecondaryAction()}
           {props.displayAddIcon && (
@@ -247,6 +258,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
             disabled={props.disabled}
             style={props.style}
             ref={ref}
+            id={props.id}
           >
             {props.leftIcon && (
               <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
@@ -255,6 +267,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
               style={styles.listItemText}
               primary={props.primaryText}
               secondary={props.secondaryText}
+              className={props.disableAutoTranslate ? 'notranslate' : ''}
             />
             {props.autoGenerateNestedIndicator ? (
               isItemOpen ? (
@@ -265,7 +278,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
             ) : null}
             {renderListItemSecondaryAction()}
           </MUIListItem>
-          {isItemOpen && (
+          <Collapse in={isItemOpen} timeout="auto" unmountOnExit>
             <MUIList
               component="div"
               disablePadding
@@ -277,7 +290,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
             >
               {renderNestedItems()}
             </MUIList>
-          )}
+          </Collapse>
         </React.Fragment>
       );
     }
@@ -293,17 +306,20 @@ type ListProps = {|
     flex?: 1,
     padding?: number,
   |},
+  useGap?: boolean,
 |};
 
 /**
  * List based on Material-UI List.
  */
-export class List extends React.Component<ListProps, {||}> {
-  render() {
-    return (
-      <MUIList style={this.props.style} dense={useDenseLists}>
-        {this.props.children}
-      </MUIList>
-    );
+export const List = (props: ListProps) => {
+  let listStyle = { ...props.style };
+  if (props.useGap) {
+    listStyle = { ...listStyle, ...styles.listWithGap };
   }
-}
+  return (
+    <MUIList style={listStyle} dense={useDenseLists}>
+      {props.children}
+    </MUIList>
+  );
+};

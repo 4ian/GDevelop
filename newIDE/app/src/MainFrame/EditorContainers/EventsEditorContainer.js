@@ -1,18 +1,20 @@
 // @flow
 import * as React from 'react';
-import EventsSheet from '../../EventsSheet';
+import EventsSheet, { type EventsSheetInterface } from '../../EventsSheet';
+import { sendEventsExtractedAsFunction } from '../../Utils/Analytics/EventSender';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
 
 export class EventsEditorContainer extends React.Component<RenderEditorContainerProps> {
-  editor: ?EventsSheet;
+  editor: ?EventsSheetInterface;
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
-    // Prevent any update to the editor if the editor is not active,
-    // and so not visible to the user.
-    return nextProps.isActive;
+    // We stop updates when the component is inactive.
+    // If it's active, was active or becoming active again we let update propagate.
+    // Especially important to note that when becoming inactive, a "last" update is allowed.
+    return this.props.isActive || nextProps.isActive;
   }
 
   componentDidMount() {
@@ -53,6 +55,21 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     return project.getLayout(projectItemName);
   }
 
+  onBeginCreateEventsFunction = () => {
+    sendEventsExtractedAsFunction({
+      step: 'begin',
+      parentEditor: 'scene-events-editor',
+    });
+  };
+
+  onCreateEventsFunction = (extensionName, eventsFunction) => {
+    this.props.onCreateEventsFunction(
+      extensionName,
+      eventsFunction,
+      'scene-events-editor'
+    );
+  };
+
   render() {
     const { project, projectItemName } = this.props;
     const layout = this.getLayout();
@@ -70,7 +87,8 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
         onChooseResource={this.props.onChooseResource}
         resourceExternalEditors={this.props.resourceExternalEditors}
         openInstructionOrExpression={this.props.openInstructionOrExpression}
-        onCreateEventsFunction={this.props.onCreateEventsFunction}
+        onCreateEventsFunction={this.onCreateEventsFunction}
+        onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
         unsavedChanges={this.props.unsavedChanges}
         project={project}
         scope={{
@@ -80,6 +98,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
         objectsContainer={layout}
         events={layout.getEvents()}
         onOpenExternalEvents={this.props.onOpenExternalEvents}
+        isActive={this.props.isActive}
       />
     );
   }

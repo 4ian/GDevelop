@@ -77,8 +77,6 @@ bool SerializerElement::GetBoolAttribute(const gd::String& name,
     }
   }
 
-  std::cout << "Bool attribute \"" << name << "\" not found, returning "
-            << defaultValue;
   return defaultValue;
 }
 

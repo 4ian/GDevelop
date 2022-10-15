@@ -25,13 +25,18 @@ module.exports = {
     gd /*: libGDevelop */
   ) {
     const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      'DebuggerTools',
-      _('Debugger Tools'),
-      _('Allow to interact with the editor debugger from the game.'),
-      'Arthur Pacaud (arthuro555), Aurélien Vivet (Bouh)',
-      'MIT'
-    );
+    extension
+      .setExtensionInformation(
+        'DebuggerTools',
+        _('Debugger Tools'),
+        _('Allow to interact with the editor debugger from the game.'),
+        'Arthur Pacaud (arthuro555), Aurélien Vivet (Bouh)',
+        'MIT'
+      )
+      .setCategory('Advanced');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Debugger Tools'))
+      .setIcon('res/actions/bug32.png');
 
     extension
       .addAction(
@@ -42,7 +47,7 @@ module.exports = {
             'Note that events will be still executed until the end before the game is paused.'
         ),
         _('Pause game execution'),
-        _('Debugger Tools'),
+        '',
         'res/actions/bug32.png',
         'res/actions/bug32.png'
       )
@@ -61,7 +66,7 @@ module.exports = {
         _(
           'Enable debugging view of bounding boxes/collision masks: _PARAM1_ (include invisible objects: _PARAM2_, point names: _PARAM3_, custom points: _PARAM4_)'
         ),
-        _('Debugger Tools'),
+        '',
         'res/actions/planicon24.png',
         'res/actions/planicon.png'
       )
@@ -91,7 +96,7 @@ module.exports = {
         _(
           'Log message _PARAM0_ of type _PARAM1_ to the console in group _PARAM2_'
         ),
-        _('Debugger Tools'),
+        '',
         'res/actions/bug32.png',
         'res/actions/bug32.png'
       )

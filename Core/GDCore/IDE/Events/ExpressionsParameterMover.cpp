@@ -11,7 +11,6 @@
 
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
-#include "GDCore/Events/Parsers/ExpressionParser2.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodePrinter.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
@@ -79,13 +78,16 @@ class GD_CORE_API ExpressionParameterMover
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {}
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     auto moveParameter =
-        [this](std::vector<std::unique_ptr<gd::ExpressionNode>>& parameters) {
-          if (oldIndex >= parameters.size() || newIndex >= parameters.size())
+        [this](std::vector<std::unique_ptr<gd::ExpressionNode>>& parameters, int firstWrittenParameterIndex) {
+          size_t newExpressionIndex = newIndex - firstWrittenParameterIndex;
+          size_t oldExpressionIndex = oldIndex - firstWrittenParameterIndex;
+
+          if (oldExpressionIndex >= parameters.size() || newExpressionIndex >= parameters.size())
             return;
 
-          auto movedParameterNode = std::move(parameters[oldIndex]);
-          parameters.erase(parameters.begin() + oldIndex);
-          parameters.insert(parameters.begin() + newIndex,
+          auto movedParameterNode = std::move(parameters[oldExpressionIndex]);
+          parameters.erase(parameters.begin() + oldExpressionIndex);
+          parameters.insert(parameters.begin() + newExpressionIndex,
                             std::move(movedParameterNode));
         };
 
@@ -93,10 +95,13 @@ class GD_CORE_API ExpressionParameterMover
       if (behaviorType.empty() && !objectType.empty() &&
           !node.objectName.empty()) {
         // Move parameter of an object function
+        // This refactor only applies on events object functions
+        // and events object functions doesn't exist yet.
+        // This is a dead code.
         const gd::String& thisObjectType = gd::GetTypeOfObject(
             globalObjectsContainer, objectsContainer, node.objectName);
-        if (thisObjectType == behaviorType) {
-          moveParameter(node.parameters);
+        if (thisObjectType == objectType) {
+          moveParameter(node.parameters, 1);
           hasDoneMoving = true;
         }
       } else if (!behaviorType.empty() && !node.behaviorName.empty()) {
@@ -104,12 +109,12 @@ class GD_CORE_API ExpressionParameterMover
         const gd::String& thisBehaviorType = gd::GetTypeOfBehavior(
             globalObjectsContainer, objectsContainer, node.behaviorName);
         if (thisBehaviorType == behaviorType) {
-          moveParameter(node.parameters);
+          moveParameter(node.parameters, 2);
           hasDoneMoving = true;
         }
       } else if (behaviorType.empty() && objectType.empty()) {
         // Move parameter of a free function
-        moveParameter(node.parameters);
+        moveParameter(node.parameters, 1);
         hasDoneMoving = true;
       }
     }
@@ -146,17 +151,9 @@ bool ExpressionsParameterMover::DoVisitInstruction(gd::Instruction& instruction,
                             pNb < instruction.GetParametersCount();
        ++pNb) {
     const gd::String& type = metadata.parameters[pNb].type;
-    const gd::String& expression =
-        instruction.GetParameter(pNb).GetPlainString();
+    const gd::Expression& expression = instruction.GetParameter(pNb);
 
-    gd::ExpressionParser2 parser(
-        platform, GetGlobalObjectsContainer(), GetObjectsContainer());
-
-    auto node = gd::ParameterMetadata::IsExpression("number", type)
-                    ? parser.ParseExpression("number", expression)
-                    : (gd::ParameterMetadata::IsExpression("string", type)
-                           ? parser.ParseExpression("string", expression)
-                           : std::unique_ptr<gd::ExpressionNode>());
+    auto node = expression.GetRootNode();
     if (node) {
       ExpressionParameterMover mover(GetGlobalObjectsContainer(),
                                      GetObjectsContainer(),

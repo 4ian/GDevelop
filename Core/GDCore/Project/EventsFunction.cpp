@@ -17,6 +17,7 @@ void EventsFunction::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("fullName", fullName);
   element.SetAttribute("description", description);
   element.SetAttribute("sentence", sentence);
+  element.SetAttribute("group", group);
   element.SetBoolAttribute("private", isPrivate);
   events.SerializeTo(element.AddChild("events"));
 
@@ -44,6 +45,7 @@ void EventsFunction::UnserializeFrom(gd::Project& project,
   fullName = element.GetStringAttribute("fullName");
   description = element.GetStringAttribute("description");
   sentence = element.GetStringAttribute("sentence");
+  group = element.GetStringAttribute("group");
   isPrivate = element.GetBoolAttribute("private");
   events.UnserializeFrom(project, element.GetChild("events"));
 

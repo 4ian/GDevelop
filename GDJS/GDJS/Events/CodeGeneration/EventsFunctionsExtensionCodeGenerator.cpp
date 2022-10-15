@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "EventsFunctionsExtensionCodeGenerator.h"
+
 #include "EventsCodeGenerator.h"
 #include "GDCore/Tools/Log.h"
 
@@ -14,6 +15,16 @@ EventsFunctionsExtensionCodeGenerator::GenerateFreeEventsFunctionCompleteCode(
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
+  gd::String lifecycleCleanupCode =
+      gd::String(R"jscode_template(
+if (typeof CODE_NAMESPACE !== "undefined") {
+  CODE_NAMESPACE.registeredGdjsCallbacks.forEach(callback =>
+    gdjs._unregisterCallback(callback)
+  );
+}
+)jscode_template")
+          .FindAndReplace("CODE_NAMESPACE", codeNamespace);
+
   gd::String eventsFunctionCode =
       EventsCodeGenerator::GenerateEventsFunctionCode(project,
                                                       eventsFunction,
@@ -22,13 +33,21 @@ EventsFunctionsExtensionCodeGenerator::GenerateFreeEventsFunctionCompleteCode(
                                                       compilationForRuntime);
 
   gd::String lifecycleRegistrationCode = "";
+  lifecycleRegistrationCode +=
+      gd::String("CODE_NAMESPACE.registeredGdjsCallbacks = [];")
+          .FindAndReplace("CODE_NAMESPACE", codeNamespace);
+
   if (gd::EventsFunctionsExtension::IsExtensionLifecycleEventsFunction(
           eventsFunction.GetName())) {
-    lifecycleRegistrationCode = GenerateLifecycleFunctionRegistrationCode(
+    lifecycleRegistrationCode += GenerateLifecycleFunctionRegistrationCode(
         eventsFunction, codeNamespace);
   }
 
-  return eventsFunctionCode + "\n" + lifecycleRegistrationCode;
+  // clang-format off
+  return lifecycleCleanupCode + "\n" +
+         eventsFunctionCode + "\n" +
+         lifecycleRegistrationCode;
+  // clang-format on
 }
 
 gd::String EventsFunctionsExtensionCodeGenerator::
@@ -44,49 +63,39 @@ gd::String EventsFunctionsExtensionCodeGenerator::
     return "";
   }
 
-  gd::String lifecycleRegistrationTemplateCode = "";
+  auto generateCallbackRegistrationCode =
+      [&](const gd::String& registerFunctionName) {
+        return gd::String(R"jscode_template(
+CODE_NAMESPACE.registeredGdjsCallbacks.push((runtimeScene) => {
+    CODE_NAMESPACE.func(runtimeScene, runtimeScene);
+})
+gdjs.REGISTER_FUNCTION_NAME(CODE_NAMESPACE.registeredGdjsCallbacks[CODE_NAMESPACE.registeredGdjsCallbacks.length - 1]);
+)jscode_template")
+            .FindAndReplace("CODE_NAMESPACE", codeNamespace)
+            .FindAndReplace("REGISTER_FUNCTION_NAME", registerFunctionName);
+      };
+
   if (eventsFunctionName == "onFirstSceneLoaded") {
-    lifecycleRegistrationTemplateCode += gd::String(R"jscode_template(
-gdjs.registerFirstRuntimeSceneLoadedCallback(function(runtimeScene) {
-    CODE_NAMESPACE.func(runtimeScene, runtimeScene);
-});
-)jscode_template");
+    return generateCallbackRegistrationCode(
+        "registerFirstRuntimeSceneLoadedCallback");
   } else if (eventsFunctionName == "onSceneLoaded") {
-    lifecycleRegistrationTemplateCode += gd::String(R"jscode_template(
-gdjs.registerRuntimeSceneLoadedCallback(function(runtimeScene) {
-    CODE_NAMESPACE.func(runtimeScene, runtimeScene);
-});
-)jscode_template");
+    return generateCallbackRegistrationCode(
+        "registerRuntimeSceneLoadedCallback");
   } else if (eventsFunctionName == "onScenePreEvents") {
-    lifecycleRegistrationTemplateCode += gd::String(R"jscode_template(
-gdjs.registerRuntimeScenePreEventsCallback(function(runtimeScene) {
-    CODE_NAMESPACE.func(runtimeScene, runtimeScene);
-});
-)jscode_template");
+    return generateCallbackRegistrationCode(
+        "registerRuntimeScenePreEventsCallback");
   } else if (eventsFunctionName == "onScenePostEvents") {
-    lifecycleRegistrationTemplateCode += gd::String(R"jscode_template(
-gdjs.registerRuntimeScenePostEventsCallback(function(runtimeScene) {
-    CODE_NAMESPACE.func(runtimeScene, runtimeScene);
-});
-)jscode_template");
+    return generateCallbackRegistrationCode(
+        "registerRuntimeScenePostEventsCallback");
   } else if (eventsFunctionName == "onScenePaused") {
-    lifecycleRegistrationTemplateCode += gd::String(R"jscode_template(
-gdjs.registerRuntimeScenePausedCallback(function(runtimeScene) {
-    CODE_NAMESPACE.func(runtimeScene, runtimeScene);
-});
-)jscode_template");
+    return generateCallbackRegistrationCode(
+        "registerRuntimeScenePausedCallback");
   } else if (eventsFunctionName == "onSceneResumed") {
-    lifecycleRegistrationTemplateCode += gd::String(R"jscode_template(
-gdjs.registerRuntimeSceneResumedCallback(function(runtimeScene) {
-    CODE_NAMESPACE.func(runtimeScene, runtimeScene);
-});
-)jscode_template");
+    return generateCallbackRegistrationCode(
+        "registerRuntimeSceneResumedCallback");
   } else if (eventsFunctionName == "onSceneUnloading") {
-    lifecycleRegistrationTemplateCode += gd::String(R"jscode_template(
-gdjs.registerRuntimeSceneUnloadingCallback(function(runtimeScene) {
-    CODE_NAMESPACE.func(runtimeScene, runtimeScene);
-});
-)jscode_template");
+    return generateCallbackRegistrationCode(
+        "registerRuntimeSceneUnloadingCallback");
   } else {
     gd::LogError(
         "The code generation for this lifecycle events function is not handled "
@@ -94,9 +103,6 @@ gdjs.registerRuntimeSceneUnloadingCallback(function(runtimeScene) {
         eventsFunctionName + "\"");
     return "";
   }
-
-  return lifecycleRegistrationTemplateCode.FindAndReplace("CODE_NAMESPACE",
-                                                          codeNamespace);
 }
 
 }  // namespace gdjs

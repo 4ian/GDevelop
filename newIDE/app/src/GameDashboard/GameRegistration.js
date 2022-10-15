@@ -4,13 +4,12 @@ import * as React from 'react';
 import CreateProfile from '../Profile/CreateProfile';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import AlertMessage from '../UI/AlertMessage';
-import { Line, Spacer } from '../UI/Grid';
+import { Line } from '../UI/Grid';
 import { ColumnStackLayout } from '../UI/Layout';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import PlaceholderError from '../UI/PlaceholderError';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import RaisedButton from '../UI/RaisedButton';
-import Text from '../UI/Text';
 import {
   type Game,
   getGame,
@@ -18,22 +17,23 @@ import {
 } from '../Utils/GDevelopServices/Game';
 import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import TimelineIcon from '@material-ui/icons/Timeline';
-import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import { GameDetailsDialog } from './GameDetailsDialog';
 
 type Props = {|
   project: ?gdProject,
   hideIfRegistered?: boolean,
+  hideIfSubscribed?: boolean,
   hideLoader?: boolean,
   onGameRegistered?: () => void,
 |};
 
-type DetailsTab = 'details' | 'analytics' | 'monetization';
+type DetailsTab = 'details' | 'analytics';
 type UnavailableReason = 'unauthorized' | 'not-existing' | null;
 
 export const GameRegistration = ({
   project,
   hideIfRegistered,
+  hideIfSubscribed,
   hideLoader,
   onGameRegistered,
 }: Props) => {
@@ -69,16 +69,16 @@ export const GameRegistration = ({
 
       const { id } = profile;
       setError(null);
-      setUnavailableReason(null);
       try {
         const game = await getGame(
           getAuthorizationHeader,
           id,
           project.getProjectUuid()
         );
+        setUnavailableReason(null);
         setGame(game);
       } catch (err) {
-        console.log(err);
+        console.error(err);
         if (err.response) {
           if (err.response.status === 403) {
             setUnavailableReason('unauthorized');
@@ -104,8 +104,9 @@ export const GameRegistration = ({
       try {
         await registerGame(getAuthorizationHeader, id, {
           gameId: project.getProjectUuid(),
-          authorName: project.getAuthor() || 'Unspecified author',
+          authorName: project.getAuthor() || 'Unspecified publisher',
           gameName: project.getName() || 'Untitled game',
+          templateSlug: project.getTemplateSlug(),
         });
         loadGame();
         if (onGameRegistered) onGameRegistered();
@@ -151,9 +152,11 @@ export const GameRegistration = ({
 
   React.useEffect(
     () => {
-      loadGame();
+      if (!game) {
+        loadGame();
+      }
     },
-    [loadGame]
+    [loadGame, game]
   );
 
   return (
@@ -169,6 +172,7 @@ export const GameRegistration = ({
       onRegisterGame={onRegisterGame}
       registrationInProgress={registrationInProgress}
       hideIfRegistered={hideIfRegistered}
+      hideIfSubscribed={hideIfSubscribed}
       unavailableReason={unavailableReason}
       acceptGameStatsEmailInProgress={acceptGameStatsEmailInProgress}
       onAcceptGameStatsEmail={_onAcceptGameStatsEmail}
@@ -194,6 +198,7 @@ export type GameRegistrationWidgetProps = {|
   onRegisterGame: () => Promise<void>,
   registrationInProgress: boolean,
   hideIfRegistered?: boolean,
+  hideIfSubscribed?: boolean,
   unavailableReason: ?UnavailableReason,
   acceptGameStatsEmailInProgress: boolean,
   onAcceptGameStatsEmail: () => Promise<void>,
@@ -217,6 +222,7 @@ export const GameRegistrationWidget = ({
   onRegisterGame,
   registrationInProgress,
   hideIfRegistered,
+  hideIfSubscribed,
   unavailableReason,
   acceptGameStatsEmailInProgress,
   onAcceptGameStatsEmail,
@@ -292,47 +298,26 @@ export const GameRegistrationWidget = ({
           kind="info"
           renderRightButton={() => (
             <RaisedButton
-              label={<Trans>Get weekly game stats</Trans>}
+              label={<Trans>Get game stats</Trans>}
               disabled={acceptGameStatsEmailInProgress}
               primary
               onClick={onAcceptGameStatsEmail}
             />
           )}
         >
-          <Trans>
-            You are not receiving game stats regularly. Click this button to
-            receive weekly game stats on the games you publish, like the number
-            of weekly sessions or the total sessions in the last year.
-          </Trans>
+          <Trans>Get stats about your game every week!</Trans>
         </AlertMessage>
       );
     }
+    if (hideIfSubscribed) return null;
     return (
       <ColumnStackLayout noMargin>
-        <Text>
-          <Trans>
-            Your project is registered online. This allows you to get access to
-            metrics collected anonymously, like the number of daily players and
-            retention of the players after a few days.
-          </Trans>
-        </Text>
         <Line justifyContent="center">
           <RaisedButton
-            primary
             icon={<TimelineIcon />}
             label={<Trans>Analytics</Trans>}
             onClick={() => {
               setDetailsInitialTab('analytics');
-              setDetailsOpened(true);
-            }}
-          />
-          <Spacer />
-          <RaisedButton
-            primary
-            icon={<MonetizationOnIcon />}
-            label={<Trans>Monetization</Trans>}
-            onClick={() => {
-              setDetailsInitialTab('monetization');
               setDetailsOpened(true);
             }}
           />

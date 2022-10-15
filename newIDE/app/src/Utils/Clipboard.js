@@ -1,5 +1,5 @@
 // @flow
-import optionalRequire from './OptionalRequire.js';
+import optionalRequire from './OptionalRequire';
 const electron = optionalRequire('electron');
 const electronClipboard = electron ? electron.clipboard : null;
 
@@ -47,6 +47,20 @@ export class SafeExtractor {
     const property = anything[propertyName];
 
     if (typeof property !== 'string') return null;
+
+    return property;
+  }
+
+  static extractBooleanProperty(
+    anything: any,
+    propertyName: string
+  ): boolean | null {
+    const object = this.extractObject(anything);
+    if (!object) return null;
+
+    const property = anything[propertyName];
+
+    if (typeof property !== 'boolean') return null;
 
     return property;
   }

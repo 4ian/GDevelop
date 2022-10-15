@@ -33,7 +33,7 @@ type Props = {|
   width: number,
 |};
 
-export default ({
+const LayerRow = ({
   layerName,
   nameError,
   onBlur,
@@ -105,6 +105,13 @@ export default ({
                 checkedIcon={<Visibility />}
                 uncheckedIcon={<VisibilityOff />}
                 onCheck={(e, value) => onChangeVisibility(value)}
+                tooltipOrHelperText={
+                  isVisible ? (
+                    <Trans>Hide layer</Trans>
+                  ) : (
+                    <Trans>Show layer</Trans>
+                  )
+                }
               />
               <IconButton
                 size="small"
@@ -141,3 +148,5 @@ export default ({
     )}
   </I18n>
 );
+
+export default LayerRow;

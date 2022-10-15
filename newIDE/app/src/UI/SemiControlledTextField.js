@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import TextField from './TextField';
 
 type State = {|
@@ -25,7 +26,7 @@ type Props = {|
   type?: 'text' | 'number',
 
   // Some TextField props that can be reused:
-  onClick?: () => void,
+  onClick?: (event: SyntheticPointerEvent<HTMLInputElement>) => void,
   onKeyPress?: (event: SyntheticKeyboardEvent<HTMLInputElement>) => void,
   onKeyUp?: (event: SyntheticKeyboardEvent<HTMLInputElement>) => void,
   onKeyDown?: (event: SyntheticKeyboardEvent<HTMLInputElement>) => void,
@@ -35,10 +36,12 @@ type Props = {|
   floatingLabelFixed?: boolean,
   floatingLabelText?: React.Node,
   fullWidth?: boolean,
-  hintText?: React.Node,
+  translatableHintText?: MessageDescriptor,
+  hintText?: string,
   helperMarkdownText?: ?string,
   id?: string,
   inputStyle?: Object,
+  maxLength?: number,
   max?: number,
   min?: number,
   multiline?: boolean,

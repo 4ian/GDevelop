@@ -2,16 +2,17 @@
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import { type Filters } from './Filters';
-import { type UserPublicProfileSearch } from './User';
+import { type UserPublicProfile } from './User';
 
 export type ExampleShortHeader = {|
   id: string,
+  slug: string,
   name: string,
   shortDescription: string,
   license: string,
   tags: Array<string>,
-  authors?: Array<UserPublicProfileSearch>,
-  authorIds?: Array<UserPublicProfileSearch>,
+  authors?: Array<UserPublicProfile>,
+  authorIds?: Array<string>,
   previewImageUrls: Array<string>,
   gdevelopVersion: string,
 |};

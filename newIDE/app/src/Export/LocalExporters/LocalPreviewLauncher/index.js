@@ -14,10 +14,10 @@ import {
   getDebuggerServerAddress,
   localPreviewDebuggerServer,
 } from './LocalPreviewDebuggerServer';
+import Window from '../../../Utils/Window';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
-const BrowserWindow = electron ? electron.remote.BrowserWindow : null;
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -33,8 +33,7 @@ type State = {|
   networkPreviewError: ?any,
   hotReloadsCount: number,
   previewGamePath: ?string,
-  devToolsOpen: boolean,
-  previewBrowserWindowConfig: ?{
+  previewBrowserWindowOptions: ?{
     width: number,
     height: number,
     useContentSize: boolean,
@@ -58,8 +57,7 @@ export default class LocalPreviewLauncher extends React.Component<
     networkPreviewPort: null,
     networkPreviewError: null,
     previewGamePath: null,
-    devToolsOpen: false,
-    previewBrowserWindowConfig: null,
+    previewBrowserWindowOptions: null,
     hotReloadsCount: 0,
     hideMenuBar: true,
     alwaysOnTop: true,
@@ -68,27 +66,17 @@ export default class LocalPreviewLauncher extends React.Component<
   _hotReloadSubscriptionChecker: ?SubscriptionChecker = null;
 
   _openPreviewBrowserWindow = () => {
-    if (
-      !BrowserWindow ||
-      !this.state.previewBrowserWindowConfig ||
-      !this.state.previewGamePath
-    )
-      return;
+    const { previewGamePath, previewBrowserWindowOptions } = this.state;
+    if (!previewBrowserWindowOptions || !previewGamePath) return;
 
-    const browserWindowOptions = {
-      ...this.state.previewBrowserWindowConfig,
-      parent: this.state.alwaysOnTop ? BrowserWindow.getFocusedWindow() : null,
-    };
-    const win = new BrowserWindow(browserWindowOptions);
-    win.loadURL(`file://${this.state.previewGamePath}/index.html`);
-    win.setMenuBarVisibility(this.state.hideMenuBar);
-    win.webContents.on('devtools-opened', () => {
-      this.setState({ devToolsOpen: true });
+    if (!ipcRenderer) return;
+
+    ipcRenderer.invoke('preview-open', {
+      previewBrowserWindowOptions,
+      previewGameIndexHtmlPath: `file://${previewGamePath}/index.html`,
+      alwaysOnTop: this.state.alwaysOnTop,
+      hideMenuBar: this.state.hideMenuBar,
     });
-    win.webContents.on('devtools-closed', () => {
-      this.setState({ devToolsOpen: false });
-    });
-    if (this.state.devToolsOpen) win.openDevTools();
   };
 
   _openPreviewWindow = (
@@ -98,14 +86,18 @@ export default class LocalPreviewLauncher extends React.Component<
   ): void => {
     this.setState(
       {
-        previewBrowserWindowConfig: {
+        previewBrowserWindowOptions: {
           width: project.getGameResolutionWidth(),
           height: project.getGameResolutionHeight(),
           useContentSize: true,
           title: `Preview of ${project.getName()}`,
           backgroundColor: '#000000',
           webPreferences: {
+            webSecurity: false, // Allow to access to local files,
+            // Allow Node.js API access in renderer process, as long
+            // as we've not removed dependency on it and on "@electron/remote".
             nodeIntegration: true,
+            contextIsolation: false,
           },
         },
         previewGamePath: gamePath,
@@ -151,7 +143,11 @@ export default class LocalPreviewLauncher extends React.Component<
     );
   };
 
-  _prepareExporter = (): Promise<any> => {
+  _prepareExporter = (): Promise<{|
+    outputDir: string,
+    exporter: gdjsExporter,
+    gdjsRoot: string,
+  |}> => {
     return findGDJS().then(({ gdjsRoot }) => {
       console.info('GDJS found in ', gdjsRoot);
 
@@ -165,6 +161,7 @@ export default class LocalPreviewLauncher extends React.Component<
       return {
         outputDir,
         exporter,
+        gdjsRoot,
       };
     });
   };
@@ -186,13 +183,14 @@ export default class LocalPreviewLauncher extends React.Component<
         );
       })
       .then(() => this._prepareExporter())
-      .then(({ outputDir, exporter }) => {
+      .then(({ outputDir, exporter, gdjsRoot }) => {
         timeFunction(
           () => {
             const previewExportOptions = new gd.PreviewExportOptions(
               project,
               outputDir
             );
+            previewExportOptions.setIsDevelopmentEnvironment(Window.isDev());
             previewExportOptions.setLayoutName(layout.getName());
             if (externalLayout) {
               previewExportOptions.setExternalLayoutName(
@@ -213,6 +211,18 @@ export default class LocalPreviewLauncher extends React.Component<
               const hash = includeFileHashs[includeFile];
               previewExportOptions.setIncludeFileHash(includeFile, hash);
             }
+
+            // Give the preview the path to the "@electron/remote" module of the editor,
+            // as this is required by some features and we've not removed dependency
+            // on "@electron/remote" yet.
+            previewExportOptions.setElectronRemoteRequirePath(
+              path.join(
+                gdjsRoot,
+                '../preview_node_modules',
+                '@electron/remote',
+                'renderer/index.js'
+              )
+            );
 
             const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
             const shouldHotReload =

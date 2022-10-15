@@ -16,6 +16,9 @@ type Props = {|
   imageHeight: number,
   offsetTop: number,
   offsetLeft: number,
+  highlightedVerticePtr: ?number,
+  selectedVerticePtr: ?number,
+  onClickVertice: (ptr: ?number) => void,
   imageZoomFactor: number,
   onPolygonsUpdated: () => void,
 |};
@@ -44,8 +47,10 @@ const CollisionMasksPreview = (props: Props) => {
   };
 
   const onEndDragVertex = () => {
-    const draggingWasDone = !!draggedVertex;
-    if (draggingWasDone) props.onPolygonsUpdated();
+    if (!!draggedVertex) {
+      props.onPolygonsUpdated();
+      props.onClickVertice(draggedVertex.ptr);
+    }
     setDraggedVertex(null);
   };
 
@@ -128,7 +133,18 @@ const CollisionMasksPreview = (props: Props) => {
             <circle
               onPointerDown={() => onStartDragVertex(vertex)}
               key={`polygon-${i}-vertex-${j}`}
-              fill="rgba(255,0,0,0.75)"
+              fill={
+                vertex.ptr === props.selectedVerticePtr
+                  ? 'rgba(0,0,255,0.75)'
+                  : 'rgba(255,0,0,0.75)'
+              }
+              stroke={
+                vertex.ptr === props.highlightedVerticePtr
+                  ? vertex.ptr === props.selectedVerticePtr
+                    ? 'white'
+                    : 'black'
+                  : undefined
+              }
               strokeWidth={1}
               cx={vertex.get_x() * imageZoomFactor}
               cy={vertex.get_y() * imageZoomFactor}

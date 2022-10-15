@@ -7,7 +7,8 @@ const readThemeRegistry = require('./lib/ReadThemeRegistry');
 
 let themeName = args[2];
 if (!themeName) {
-  shell.echo('❌ Please enter a theme name');
+  shell.echo('❌ Please enter a theme name as argument');
+  shell.exit(1);
 }
 
 if (themeName.toLowerCase().endsWith('theme')) {
@@ -68,7 +69,7 @@ fs.writeFileSync(
 shell.echo('✅ Updated ThemeRegistry.js');
 
 // Recompile Style Resources
-const output = shell.exec(`node scripts/build-theme-resources.js`);
+const output = shell.exec(`node ${__dirname}/build-theme-resources.js`);
 if (output.code !== 0) {
   shell.echo(
     '❌ Unable to build the theme resources. Error is:',

@@ -1,9 +1,12 @@
 // @flow
+import { makeTestExtensions } from '../fixtures/TestExtensions';
 import { createTree } from './CreateTree';
 import {
   enumerateAllInstructions,
+  enumerateObjectAndBehaviorsInstructions,
   getObjectParameterIndex,
 } from './EnumerateInstructions';
+const gd: libGDevelop = global.gd;
 
 describe('EnumerateInstructions', () => {
   it('can enumerate instructions being conditions', () => {
@@ -14,17 +17,17 @@ describe('EnumerateInstructions', () => {
       expect.arrayContaining([
         expect.objectContaining({
           displayedName: 'Animation finished',
-          fullGroupName: 'Sprite/Animations and images',
+          fullGroupName: 'General/Sprite/Animations and images',
           type: 'AnimationEnded',
         }),
         expect.objectContaining({
           displayedName: 'Trigger once while true',
-          fullGroupName: 'Advanced',
+          fullGroupName: 'Advanced/Events and control flow',
           type: 'BuiltinCommonInstructions::Once',
         }),
         expect.objectContaining({
           displayedName: 'The cursor/touch is on an object',
-          fullGroupName: 'Common conditions for all objects/Mouse and touch',
+          fullGroupName: 'General/Objects/Mouse and touch',
           type: 'SourisSurObjet',
         }),
       ])
@@ -39,12 +42,12 @@ describe('EnumerateInstructions', () => {
       expect.arrayContaining([
         expect.objectContaining({
           displayedName: 'Start (or reset) a scene timer',
-          fullGroupName: 'Timers and time',
+          fullGroupName: 'General/Timers and time',
           type: 'ResetTimer',
         }),
         expect.objectContaining({
           displayedName: 'Rotate',
-          fullGroupName: 'Common actions for all objects/Angle',
+          fullGroupName: 'General/Objects/Angle',
           type: 'Rotate',
         }),
       ])
@@ -53,19 +56,26 @@ describe('EnumerateInstructions', () => {
 
   it('can create the tree of instructions', () => {
     const instructions = enumerateAllInstructions(true);
-    expect(createTree(instructions)).toMatchObject({
+    const tree = createTree(instructions);
+    expect(tree).toHaveProperty('Advanced');
+    expect(tree).toHaveProperty('Audio');
+    expect(tree).toMatchObject({
       Advanced: {
-        'Trigger once while true': {
-          displayedName: 'Trigger once while true',
-          fullGroupName: 'Advanced',
-          type: 'BuiltinCommonInstructions::Once',
+        'Events and control flow': {
+          'Trigger once while true': {
+            displayedName: 'Trigger once while true',
+            fullGroupName: 'Advanced/Events and control flow',
+            type: 'BuiltinCommonInstructions::Once',
+          },
         },
       },
       Audio: {
-        'Global volume': {
-          displayedName: 'Global volume',
-          fullGroupName: 'Audio',
-          type: 'GlobalVolume',
+        'Sounds and music': {
+          'Global volume': {
+            displayedName: 'Global volume',
+            fullGroupName: 'Audio/Sounds and music',
+            type: 'GlobalVolume',
+          },
         },
       },
     });
@@ -100,5 +110,79 @@ describe('EnumerateInstructions', () => {
     )[0];
     expect(spriteAnimatedEnded).not.toBeUndefined();
     expect(getObjectParameterIndex(spriteAnimatedEnded.metadata)).toBe(0);
+  });
+
+  it('can enumerate instructions for an object (Sprite)', () => {
+    makeTestExtensions(gd);
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    layout.insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
+
+    // Test for the proper presence of a few conditions.
+    const spriteInstructions = enumerateObjectAndBehaviorsInstructions(
+      true,
+      project,
+      layout,
+      'MySpriteObject'
+    );
+    expect(spriteInstructions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          displayedName: 'Animation finished',
+          type: 'AnimationEnded',
+        }),
+        expect.objectContaining({
+          displayedName: 'The cursor/touch is on an object',
+          type: 'SourisSurObjet',
+        }),
+      ])
+    );
+  });
+
+  it('can enumerate instructions for an object (with an unsupported capability)', () => {
+    makeTestExtensions(gd);
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    layout.insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
+    layout.insertNewObject(
+      project,
+      'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
+      'MyFakeObjectWithUnsupportedCapability',
+      0
+    );
+
+    // Test the sprite can have effects related condition.
+    const spriteInstructions = enumerateObjectAndBehaviorsInstructions(
+      true,
+      project,
+      layout,
+      'MySpriteObject'
+    );
+    expect(spriteInstructions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          displayedName: 'Effect is enabled',
+          fullGroupName: 'Effects',
+          type: 'IsEffectEnabled',
+        }),
+      ])
+    );
+
+    // Test an object not supporting effects don't have this condition.
+    const withUnsupportedCapabilityInstructions = enumerateObjectAndBehaviorsInstructions(
+      true,
+      project,
+      layout,
+      'MyFakeObjectWithUnsupportedCapability'
+    );
+    expect(withUnsupportedCapabilityInstructions).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          displayedName: 'Effect is enabled',
+          fullGroupName: 'Effects',
+          type: 'IsEffectEnabled',
+        }),
+      ])
+    );
   });
 });

@@ -19,6 +19,8 @@
 #include "GDCore/Tools/VersionWrapper.h"
 #include "catch.hpp"
 
+// TODO: Add some tests on layouts and behavior shared data.
+
 TEST_CASE("Project", "[common]") {
   SECTION("Basics") {
     gd::Project project;
@@ -75,7 +77,11 @@ TEST_CASE("EventsList", "[common][events]") {
 
     size_t endMemory = gd::SystemStats::GetUsedVirtualMemory();
     INFO("Memory used: " << endMemory - startMemory << "KB");
-    REQUIRE(1500 >= endMemory - startMemory);
+    #if defined(WINDOWS)
+      REQUIRE(3000 >= endMemory - startMemory);
+    #else
+      REQUIRE(1500 >= endMemory - startMemory);
+    #endif
   }
 }
 

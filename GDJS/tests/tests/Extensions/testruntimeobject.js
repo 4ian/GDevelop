@@ -6,7 +6,7 @@
  * an example to start a new object, take a look at gdjs.DummyRuntimeObject
  * in the Extensions folder.
  */
- gdjs.TestRuntimeObject = class TestRuntimeObject extends gdjs.RuntimeObject {
+gdjs.TestRuntimeObject = class TestRuntimeObject extends gdjs.RuntimeObject {
   /** @type {float}  */
   _customWidth = 0;
   /** @type {float}  */
@@ -41,14 +41,30 @@
   }
 
   getRendererObject() {
-    return {};
+    return null;
   }
 
   getWidth() {
     return this._customWidth;
   }
 
+  setWidth(width) {
+    if (width !== this._customWidth) {
+      this._customWidth = width;
+      this.hitBoxesDirty = true;
+    }
+    return this._customWidth;
+  }
+
   getHeight() {
+    return this._customHeight;
+  }
+
+  setHeight(height) {
+    if (height !== this._customHeight) {
+      this._customHeight = height;
+      this.hitBoxesDirty = true;
+    }
     return this._customHeight;
   }
 

@@ -67,6 +67,7 @@ bool Exporter::ExportWholePixiProject(
     // Prepare the export directory
     fs.MkDir(exportDir);
     std::vector<gd::String> includesFiles;
+    std::vector<gd::String> resourcesFiles;
 
     // Export the resources (before generating events as some resources
     // filenames may be updated)
@@ -89,6 +90,7 @@ bool Exporter::ExportWholePixiProject(
 
     // Export files for object and behaviors
     helper.ExportObjectAndBehaviorsIncludes(exportedProject, includesFiles);
+    helper.ExportObjectAndBehaviorsRequiredFiles(exportedProject, resourcesFiles);
 
     // Export effects (after engine libraries as they auto-register themselves
     // to the engine)
@@ -121,7 +123,13 @@ bool Exporter::ExportWholePixiProject(
         fs, exportedProject, codeOutputDir + "/data.js", noRuntimeGameOptions);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
+    // Export a WebManifest with project metadata
+    if (!fs.WriteToFile(exportDir + "/manifest.webmanifest",
+                        helper.GenerateWebManifest(exportedProject)))
+      gd::LogError("Unable to export WebManifest.");
+
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
+    helper.ExportIncludesAndLibs(resourcesFiles, exportDir, false);
 
     gd::String source = gdjsRoot + "/Runtime/index.html";
     if (exportForCordova)

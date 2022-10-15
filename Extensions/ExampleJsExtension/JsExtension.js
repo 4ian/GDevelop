@@ -32,6 +32,9 @@ module.exports = {
       'Florian Rival',
       'MIT'
     );
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('My Dummy Extension'))
+      .setIcon('CppPlatform/Extensions/topdownmovementicon.png');
 
     // Register Properties
     extension
@@ -65,7 +68,7 @@ module.exports = {
       .setFullName(_('Dummy effect example'))
       .setDescription(
         _(
-          'This is an example of an effect ("shader") with an [external link to the wiki](http://wiki.compilgames.net/doku.php/gdevelop5/) and **bold letters**.'
+          'This is an example of an effect ("shader") with an [external link to the wiki](https://wiki.gdevelop.io/gdevelop5/) and **bold letters**.'
         )
       )
       .addIncludeFile('Extensions/ExampleJsExtension/dummyeffect.js');
@@ -106,7 +109,7 @@ module.exports = {
           'This is an example of a condition displayed in the events sheet. Will return true if the number is less than 10 and the length of the text is less than 5.'
         ),
         _('Call the example condition with _PARAM0_ and _PARAM1_'),
-        _('Dummy Extension'),
+        '',
         'res/conditions/camera24.png',
         'res/conditions/camera.png'
       )
@@ -123,7 +126,7 @@ module.exports = {
         'DummyExpression',
         _('Dummy expression example'),
         _('This is an example of an expression'),
-        _('Dummy Extension'),
+        '',
         'res/actions/camera.png'
       )
       .addParameter('expression', _('Maximum'), '', false)
@@ -135,7 +138,7 @@ module.exports = {
         'DummyStrExpression',
         _('Dummy string expression example'),
         _('This is an example of an expression returning a string'),
-        _('Dummy Extension'),
+        '',
         'res/actions/camera.png'
       )
       .getCodeExtraInformation()
@@ -179,7 +182,8 @@ module.exports = {
         .setValue(
           behaviorContent.getBoolAttribute('property2') ? 'true' : 'false'
         )
-        .setType('Boolean');
+        .setType('Boolean')
+        .setGroup(_('Look and Feel'));
 
       return behaviorProperties;
     };
@@ -193,7 +197,7 @@ module.exports = {
         'DummyBehavior',
         _('Dummy behavior for testing'),
         'DummyBehavior',
-        _('This dummy behavior does nothing'),
+        _('Do nothing.'),
         '',
         'CppPlatform/Extensions/topdownmovementicon.png',
         'DummyBehavior',
@@ -276,7 +280,7 @@ module.exports = {
         'DummyBehaviorWithSharedData',
         _('Dummy behavior with shared data for testing'),
         'DummyBehaviorWithSharedData',
-        _('This dummy behavior uses shared data and does nothing'),
+        _('Do nothing but use shared data.'),
         '',
         'CppPlatform/Extensions/topdownmovementicon.png',
         'DummyBehaviorWithSharedData',
@@ -409,7 +413,8 @@ module.exports = {
       .setIncludeFile('Extensions/ExampleJsExtension/dummyruntimeobject.js')
       .addIncludeFile(
         'Extensions/ExampleJsExtension/dummyruntimeobject-pixi-renderer.js'
-      );
+      )
+      .setCategoryFullName(_('Testing'));
 
     object
       .addAction(
@@ -501,7 +506,7 @@ module.exports = {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -510,7 +515,7 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );
@@ -534,7 +539,7 @@ module.exports = {
     RenderedDummyObjectInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'CppPlatform/Extensions/texticon24.png';
     };
@@ -544,7 +549,7 @@ module.exports = {
      */
     RenderedDummyObjectInstance.prototype.update = function () {
       // Read a property from the object
-      const property1Value = this._associatedObject
+      const property1Value = this._associatedObjectConfiguration
         .getProperties()
         .get('My first property')
         .getValue();

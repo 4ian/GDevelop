@@ -10,16 +10,10 @@ type Props = {|
 |};
 
 /**
- * Pass the proper size to the children according to the window size.
- * This considers a window to be "small" if *both* the width and height
- * are small.
+ * Wraps useResponsiveWindowWidth in a component.
  */
-export const ResponsiveWindowMeasurer = ({ children }: Props) => {
-  useOnResize(useForceUpdate());
-  const width = useResponsiveWindowWidth();
-
-  return children(width);
-};
+export const ResponsiveWindowMeasurer = ({ children }: Props) =>
+  children(useResponsiveWindowWidth());
 
 /**
  * Return the size of the window.

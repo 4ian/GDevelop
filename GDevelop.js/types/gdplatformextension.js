@@ -4,6 +4,8 @@ declare class gdPlatformExtension {
   setExtensionInformation(name: string, fullname: string, description: string, author: string, license: string): gdPlatformExtension;
   setExtensionHelpPath(helpPath: string): gdPlatformExtension;
   setIconUrl(iconUrl: string): gdPlatformExtension;
+  setCategory(category: string): gdPlatformExtension;
+  addInstructionOrExpressionGroupMetadata(name: string): gdInstructionOrExpressionGroupMetadata;
   markAsDeprecated(): void;
   addExpressionAndCondition(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): gdMultipleInstructionMetadata;
   addExpressionAndConditionAndAction(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): gdMultipleInstructionMetadata;
@@ -13,11 +15,14 @@ declare class gdPlatformExtension {
   addStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): gdExpressionMetadata;
   addDependency(): gdDependencyMetadata;
   addBehavior(name: string, fullname: string, defaultName: string, description: string, group: string, icon24x24: string, className: string, instance: gdBehavior, sharedDatasInstance: gdBehaviorsSharedData): gdBehaviorMetadata;
-  addObject(name: string, fullname: string, description: string, icon24x24: string, instance: gdObject): gdObjectMetadata;
+  addEventsBasedBehavior(name: string, fullname: string, description: string, group: string, icon24x24: string): gdBehaviorMetadata;
+  addObject(name: string, fullname: string, description: string, icon24x24: string, instance: gdObjectConfiguration): gdObjectMetadata;
+  addEventsBasedObject(name: string, fullname: string, description: string, icon24x24: string): gdObjectMetadata;
   addEffect(name: string): gdEffectMetadata;
   registerProperty(name: string): gdPropertyDescriptor;
   getFullName(): string;
   getName(): string;
+  getCategory(): string;
   getDescription(): string;
   getAuthor(): string;
   getLicense(): string;

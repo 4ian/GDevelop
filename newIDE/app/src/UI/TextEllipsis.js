@@ -6,7 +6,7 @@
  * where text ellipsis is used (without having yet another component).
  * Please also use a `title` prop on the div to set the text tooltip.
  */
-export const textEllispsisStyle = {
+export const textEllipsisStyle = {
   overflow: 'hidden',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',

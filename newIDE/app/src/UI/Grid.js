@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-const marginsSize = 4;
+export const marginsSize = 8;
 
 /**
  * A Line in the standard GDevelop grid to position components.
@@ -14,6 +14,7 @@ export const Line = (props: {|
   justifyContent?: string,
   expand?: boolean,
   overflow?: string,
+  useFullHeight?: boolean,
 |}) => (
   <div
     style={{
@@ -24,6 +25,10 @@ export const Line = (props: {|
       justifyContent: props.justifyContent,
       flex: props.expand ? 1 : undefined,
       overflow: props.overflow,
+      // Setting the min-height to 0 forces the flex to use
+      // all the height (if set to flex: 1) and to *not* grow
+      // larger than the parent.
+      minHeight: props.useFullHeight ? '0' : undefined,
     }}
   >
     {props.children}
@@ -47,8 +52,8 @@ export const Column = (props: {|
   <div
     style={{
       display: 'flex',
-      marginLeft: props.noMargin ? 0 : marginsSize * 2,
-      marginRight: props.noMargin ? 0 : marginsSize * 2,
+      marginLeft: props.noMargin ? 0 : marginsSize,
+      marginRight: props.noMargin ? 0 : marginsSize,
       flexDirection: 'column',
       alignItems: props.alignItems || 'stretch',
       justifyContent: props.justifyContent,
@@ -78,6 +83,17 @@ export const Spacer = () => (
     style={{
       width: marginsSize,
       height: marginsSize,
+      flexShrink: 0, // Ensure the spacer is not shrinked when in a flex container
+    }}
+  />
+);
+
+/** A large spacer that is 24px width. */
+export const LargeSpacer = () => (
+  <span
+    style={{
+      width: 24,
+      height: 24,
       flexShrink: 0, // Ensure the spacer is not shrinked when in a flex container
     }}
   />

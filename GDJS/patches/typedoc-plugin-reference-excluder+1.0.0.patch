@@ -1,0 +1,13 @@
+diff --git a/node_modules/typedoc-plugin-reference-excluder/dist/plugin.js b/node_modules/typedoc-plugin-reference-excluder/dist/plugin.js
+index e1d5219..3ef8195 100644
+--- a/node_modules/typedoc-plugin-reference-excluder/dist/plugin.js
++++ b/node_modules/typedoc-plugin-reference-excluder/dist/plugin.js
+@@ -24,7 +24,7 @@ class RegExpExcludePlugin {
+     }
+     onDeclaration(context, reflection, node) {
+         if (this.excludedFunctionOrMethodRegEx) {
+-            if (reflection.kindOf(typedoc_1.ReflectionKind.FunctionOrMethod) || reflection.kindOf(typedoc_1.ReflectionKind.Accessor)) {
++            if (reflection.kindOf(typedoc_1.ReflectionKind.FunctionOrMethod) || reflection.kindOf(typedoc_1.ReflectionKind.Accessor) || reflection.kindOf(typedoc_1.ReflectionKind.VariableOrProperty)) {
+                 let isMatch = this.excludedFunctionOrMethodRegEx.some(exp => exp.test(reflection.name));
+                 if (isMatch) {
+                     this.excludeReflection(reflection);

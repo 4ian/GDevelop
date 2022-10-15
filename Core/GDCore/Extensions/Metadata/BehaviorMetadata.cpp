@@ -14,12 +14,14 @@
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Tools/MakeUnique.h"
+#include "GDCore/Tools/Log.h"
 
 namespace gd {
 
 BehaviorMetadata::BehaviorMetadata(
     const gd::String& extensionNamespace_,
-    const gd::String& name_,
+    const gd::String& nameWithNamespace,
     const gd::String& fullname_,
     const gd::String& defaultName_,
     const gd::String& description_,
@@ -29,20 +31,49 @@ BehaviorMetadata::BehaviorMetadata(
     std::shared_ptr<gd::Behavior> instance_,
     std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance_)
     : extensionNamespace(extensionNamespace_),
+      className(className_),
+      iconFilename(icon24x24),
       instance(instance_),
-      sharedDatasInstance(sharedDatasInstance_) {
-#if defined(GD_IDE_ONLY)
+      sharedDatasInstance(sharedDatasInstance_),
+      isEventBased(false) {
   SetFullName(gd::String(fullname_));
   SetDescription(gd::String(description_));
   SetDefaultName(gd::String(defaultName_));
   SetGroup(group_);
-  className = className_;
-  iconFilename = icon24x24;
-#endif
 
-  if (instance) instance->SetTypeName(name_);
-  if (sharedDatasInstance) sharedDatasInstance->SetTypeName(name_);
+  if (!instance) {
+    gd::LogFatalError(
+        "Trying to create a BehaviorMetadata that has no "
+        "behavior. This will crash - please double check that the "
+        "BehaviorMetadata is valid for: " + nameWithNamespace);
+  }
+
+  if (instance) instance->SetTypeName(nameWithNamespace);
+  if (sharedDatasInstance) sharedDatasInstance->SetTypeName(nameWithNamespace);
 }
+
+BehaviorMetadata::BehaviorMetadata(
+    const gd::String& extensionNamespace,
+    const gd::String& nameWithNamespace,
+    const gd::String& fullname_,
+    const gd::String& defaultName_,
+    const gd::String& description_,
+    const gd::String& group_,
+    const gd::String& icon24x24_): BehaviorMetadata(
+        extensionNamespace,
+        nameWithNamespace,
+        fullname_,
+        defaultName_,
+        description_,
+        group_,
+        icon24x24_,
+        // Class name is the name, actually unused
+        defaultName_,
+        // It is only used to get the name for GetName.
+        gd::make_unique<gd::Behavior>("", nameWithNamespace),
+        nullptr){
+  isEventBased = true;
+};
 
 gd::InstructionMetadata& BehaviorMetadata::AddCondition(
     const gd::String& name,
@@ -52,7 +83,6 @@ gd::InstructionMetadata& BehaviorMetadata::AddCondition(
     const gd::String& group,
     const gd::String& icon,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace =
       extensionNamespace.empty() ? name : extensionNamespace + name;
   conditionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
@@ -66,7 +96,6 @@ gd::InstructionMetadata& BehaviorMetadata::AddCondition(
                                            .SetHelpPath(GetHelpPath())
                                            .SetIsBehaviorInstruction();
   return conditionsInfos[nameWithNamespace];
-#endif
 }
 
 gd::InstructionMetadata& BehaviorMetadata::AddAction(
@@ -77,7 +106,6 @@ gd::InstructionMetadata& BehaviorMetadata::AddAction(
     const gd::String& group,
     const gd::String& icon,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace =
       extensionNamespace.empty() ? name : extensionNamespace + name;
   actionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
@@ -91,7 +119,6 @@ gd::InstructionMetadata& BehaviorMetadata::AddAction(
                                         .SetHelpPath(GetHelpPath())
                                         .SetIsBehaviorInstruction();
   return actionsInfos[nameWithNamespace];
-#endif
 }
 
 gd::InstructionMetadata& BehaviorMetadata::AddScopedCondition(
@@ -102,7 +129,6 @@ gd::InstructionMetadata& BehaviorMetadata::AddScopedCondition(
     const gd::String& group,
     const gd::String& icon,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace =
       GetName() + gd::PlatformExtension::GetNamespaceSeparator() + name;
   conditionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
@@ -116,7 +142,6 @@ gd::InstructionMetadata& BehaviorMetadata::AddScopedCondition(
                                            .SetHelpPath(GetHelpPath())
                                            .SetIsBehaviorInstruction();
   return conditionsInfos[nameWithNamespace];
-#endif
 }
 
 gd::InstructionMetadata& BehaviorMetadata::AddScopedAction(
@@ -127,7 +152,6 @@ gd::InstructionMetadata& BehaviorMetadata::AddScopedAction(
     const gd::String& group,
     const gd::String& icon,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace =
       GetName() + gd::PlatformExtension::GetNamespaceSeparator() + name;
   actionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
@@ -141,7 +165,6 @@ gd::InstructionMetadata& BehaviorMetadata::AddScopedAction(
                                         .SetHelpPath(GetHelpPath())
                                         .SetIsBehaviorInstruction();
   return actionsInfos[nameWithNamespace];
-#endif
 }
 
 gd::ExpressionMetadata& BehaviorMetadata::AddExpression(
@@ -150,7 +173,6 @@ gd::ExpressionMetadata& BehaviorMetadata::AddExpression(
     const gd::String& description,
     const gd::String& group,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   // Be careful, behaviors expression do not have namespace (not necessary as
   // we refer to the behavior name in the expression).
   expressionsInfos[name] = ExpressionMetadata("number",
@@ -162,7 +184,6 @@ gd::ExpressionMetadata& BehaviorMetadata::AddExpression(
                                               smallicon)
                                .SetHelpPath(GetHelpPath());
   return expressionsInfos[name];
-#endif
 }
 
 gd::ExpressionMetadata& BehaviorMetadata::AddStrExpression(
@@ -171,7 +192,6 @@ gd::ExpressionMetadata& BehaviorMetadata::AddStrExpression(
     const gd::String& description,
     const gd::String& group,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   // Be careful, behaviors expression do not have namespace (not necessary as
   // we refer to the behavior name in the expression).
   strExpressionsInfos[name] = ExpressionMetadata("string",
@@ -183,7 +203,6 @@ gd::ExpressionMetadata& BehaviorMetadata::AddStrExpression(
                                                  smallicon)
                                   .SetHelpPath(GetHelpPath());
   return strExpressionsInfos[name];
-#endif
 }
 
 gd::MultipleInstructionMetadata BehaviorMetadata::AddExpressionAndCondition(
@@ -234,6 +253,40 @@ BehaviorMetadata::AddExpressionAndConditionAndAction(
     const gd::String& sentenceName,
     const gd::String& group,
     const gd::String& icon) {
+  if (type != "number" && type != "string" && type != "boolean") {
+    gd::LogError(
+        "Unrecognised type passed to AddExpressionAndConditionAndAction: " +
+        type + ". Verify this type is valid and supported.");
+  }
+
+  gd::String conditionDescriptionTemplate =
+      type == "boolean" ? _("Check if <subject>.") : _("Compare <subject>.");
+  auto& condition =
+      AddScopedCondition(name,
+                         fullname,
+                         conditionDescriptionTemplate.FindAndReplace(
+                             "<subject>", descriptionSubject),
+                         sentenceName,
+                         group,
+                         icon,
+                         icon);
+
+  gd::String actionDescriptionTemplate = type == "boolean"
+                                             ? _("Set (or unset) if <subject>.")
+                                             : _("Change <subject>.");
+  auto& action = AddScopedAction(
+      "Set" + name,
+      fullname,
+      actionDescriptionTemplate.FindAndReplace("<subject>", descriptionSubject),
+      sentenceName,
+      group,
+      icon,
+      icon);
+
+  if (type == "boolean") {
+    return MultipleInstructionMetadata::WithConditionAndAction(condition, action);
+  }
+
   gd::String expressionDescriptionTemplate = _("Return <subject>.");
   auto& expression =
       type == "number"
@@ -250,32 +303,10 @@ BehaviorMetadata::AddExpressionAndConditionAndAction(
                              group,
                              icon);
 
-  gd::String conditionDescriptionTemplate = _("Compare <subject>.");
-  auto& condition =
-      AddScopedCondition(name,
-                         fullname,
-                         conditionDescriptionTemplate.FindAndReplace(
-                             "<subject>", descriptionSubject),
-                         sentenceName,
-                         group,
-                         icon,
-                         icon);
-
-  gd::String actionDescriptionTemplate = _("Change <subject>.");
-  auto& action = AddScopedAction(
-      "Set" + name,
-      fullname,
-      actionDescriptionTemplate.FindAndReplace("<subject>", descriptionSubject),
-      sentenceName,
-      group,
-      icon,
-      icon);
-
   return MultipleInstructionMetadata::WithExpressionAndConditionAndAction(
       expression, condition, action);
 }
 
-#if defined(GD_IDE_ONLY)
 gd::InstructionMetadata& BehaviorMetadata::AddDuplicatedAction(
     const gd::String& newActionName, const gd::String& copiedActionName) {
   gd::String newNameWithNamespace = extensionNamespace + newActionName;
@@ -343,49 +374,44 @@ gd::ExpressionMetadata& BehaviorMetadata::AddDuplicatedStrExpression(
 
   return strExpressionsInfos[newNameWithNamespace];
 }
-#endif
 
 BehaviorMetadata& BehaviorMetadata::SetFullName(const gd::String& fullname_) {
-#if defined(GD_IDE_ONLY)
   fullname = fullname_;
-#endif
   return *this;
 }
 BehaviorMetadata& BehaviorMetadata::SetDefaultName(
     const gd::String& defaultName_) {
-#if defined(GD_IDE_ONLY)
   defaultName = defaultName_;
-#endif
   return *this;
 }
 BehaviorMetadata& BehaviorMetadata::SetDescription(
     const gd::String& description_) {
-#if defined(GD_IDE_ONLY)
   description = description_;
-#endif
   return *this;
 }
 BehaviorMetadata& BehaviorMetadata::SetGroup(const gd::String& group_) {
-#if defined(GD_IDE_ONLY)
   group = group_;
-#endif
   return *this;
 }
 BehaviorMetadata& BehaviorMetadata::SetIncludeFile(
     const gd::String& includeFile) {
-#if defined(GD_IDE_ONLY)
   includeFiles.clear();
   includeFiles.push_back(includeFile);
-#endif
   return *this;
 }
 BehaviorMetadata& BehaviorMetadata::AddIncludeFile(
     const gd::String& includeFile) {
-#if defined(GD_IDE_ONLY)
   if (std::find(includeFiles.begin(), includeFiles.end(), includeFile) ==
       includeFiles.end())
     includeFiles.push_back(includeFile);
-#endif
+  return *this;
+}
+
+BehaviorMetadata& BehaviorMetadata::AddRequiredFile(
+    const gd::String& requiredFile) {
+  if (std::find(requiredFiles.begin(), requiredFiles.end(), requiredFile) ==
+      requiredFiles.end())
+    requiredFiles.push_back(requiredFile);
   return *this;
 }
 
@@ -394,13 +420,25 @@ const gd::String& BehaviorMetadata::GetName() const {
 }
 
 gd::Behavior& BehaviorMetadata::Get() const {
-  if (!instance)
+  if (isEventBased) {
+    gd::LogFatalError("Error: Event-based behaviors don't have blueprint. "
+                      "This method should not never be called.");
+  }
+  if (!instance) {
     gd::LogFatalError(
         "Trying to get a behavior from a BehaviorMetadata that has no "
         "behavior. This will crash - please double check that the "
-        "BehaviorMetadata is valid.");
-
+        "BehaviorMetadata is valid for: " + className);
+  }
   return *instance;
+}
+
+gd::BehaviorsSharedData* BehaviorMetadata::GetSharedDataInstance() const { 
+  if (isEventBased) {
+    gd::LogFatalError("Error: Event-based behaviors don't have blueprint. "
+                      "This method should not never be called.");
+  }
+  return sharedDatasInstance.get();
 }
 
 }  // namespace gd

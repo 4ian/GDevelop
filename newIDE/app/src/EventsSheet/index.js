@@ -5,6 +5,7 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import EventsTree from './EventsTree';
+import { getInstructionMetadata } from './InstructionEditor/NewInstructionEditor';
 import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
 import NewInstructionEditorMenu from './InstructionEditor/NewInstructionEditorMenu';
@@ -13,11 +14,13 @@ import EventTextDialog, {
 } from './InstructionEditor/EventTextDialog';
 import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
+import { getShortcutDisplayName } from '../KeyboardShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
-import ContextMenu from '../UI/Menu/ContextMenu';
+import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import { serializeToJSObject } from '../Utils/Serializer';
 import {
   type HistoryState,
+  type RevertableActionType,
   undo,
   redo,
   canUndo,
@@ -31,6 +34,7 @@ import {
   type InstructionsListContext,
   type InstructionContext,
   type ParameterContext,
+  type InstructionContextWithLocatingEvent,
   getInitialSelection,
   selectEvent,
   selectInstruction,
@@ -44,6 +48,8 @@ import {
   clearSelection,
   getSelectedEventContexts,
   getSelectedInstructionsContexts,
+  getSelectedInstructionsLocatingEvents,
+  selectEventsAfterHistoryChange,
 } from './SelectionHandler';
 import { ensureSingleOnceInstructions } from './OnceInstructionSanitizer';
 import EventsContextAnalyzerDialog, {
@@ -65,7 +71,9 @@ import {
   enumerateEventsMetadata,
   type EventMetadata,
 } from './EnumerateEventsMetadata';
-import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import PreferencesContext, {
+  type Preferences,
+} from '../MainFrame/Preferences/PreferencesContext';
 import EventsFunctionExtractorDialog from './EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import { createNewInstructionForEventsFunction } from './EventsFunctionExtractor';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
@@ -78,13 +86,30 @@ import {
   hasClipboardConditions,
   pasteInstructionsFromClipboardInInstructionsList,
 } from './ClipboardKind';
-import InfoBar from '../UI/Messages/InfoBar';
-import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
+import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
+import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import AuthenticatedUserContext, {
+  type AuthenticatedUser,
+} from '../Profile/AuthenticatedUserContext';
+import {
+  addCreateBadgePreHookIfNotClaimed,
+  TRIVIAL_FIRST_EVENT,
+} from '../Utils/GDevelopServices/Badge';
+import LeaderboardContext, {
+  type LeaderboardState,
+} from '../Leaderboard/LeaderboardContext';
+import { TutorialContext } from '../Tutorial/TutorialContext';
+import { type Tutorial } from '../Utils/GDevelopServices/Tutorial';
 const gd: libGDevelop = global.gd;
 
 const zoomLevel = { min: 1, max: 50 };
+
+export type ChangeContext = {|
+  events?: Array<EventContext>,
+  instructions?: Array<InstructionContextWithLocatingEvent>,
+|};
 
 type Props = {|
   project: gdProject,
@@ -107,11 +132,21 @@ type Props = {|
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => void,
+  onBeginCreateEventsFunction: () => void,
   unsavedChanges?: ?UnsavedChanges,
+  isActive: boolean,
+|};
+
+type ComponentProps = {|
+  ...Props,
+  authenticatedUser: AuthenticatedUser,
+  preferences: Preferences,
+  tutorials: ?Array<Tutorial>,
+  leaderboardsManager: ?LeaderboardState,
 |};
 
 type State = {|
-  history: HistoryState,
+  eventsHistory: HistoryState,
 
   editedInstruction: {
     //TODO: This could be adapted to be a InstructionContext
@@ -119,6 +154,7 @@ type State = {|
     instruction: ?gdInstruction,
     instrsList: ?gdInstructionsList,
     indexInList: ?number,
+    locatingEvent: ?gdBaseEvent,
   },
   editedParameter: {
     // TODO: This could be adapted to be a ParameterContext
@@ -126,6 +162,7 @@ type State = {|
     instruction: ?gdInstruction,
     instrsList: ?gdInstructionsList,
     parameterIndex: number,
+    locatingEvent: ?gdBaseEvent,
   },
 
   selection: SelectionState,
@@ -133,7 +170,6 @@ type State = {|
   inlineEditing: boolean,
   inlineEditingAnchorEl: ?HTMLElement,
   inlineInstructionEditorAnchorEl: ?HTMLElement,
-  inlineEditingChangesMade: boolean,
   inlineEditingPreviousValue: ?string,
 
   analyzedEventsContextResult: ?EventsContextResult,
@@ -166,7 +202,10 @@ const styles = {
   },
 };
 
-export default class EventsSheet extends React.Component<Props, State> {
+export class EventsSheetComponentWithoutHandle extends React.Component<
+  ComponentProps,
+  State
+> {
   _eventsTree: ?EventsTree;
   _eventSearcher: ?EventsSearcher;
   _searchPanel: ?SearchPanelInterface;
@@ -191,25 +230,31 @@ export default class EventsSheet extends React.Component<Props, State> {
     },
   });
 
-  static contextType = PreferencesContext;
-
-  eventContextMenu: ContextMenu;
-  instructionContextMenu: ContextMenu;
+  eventContextMenu: ?ContextMenuInterface;
+  instructionContextMenu: ?ContextMenuInterface;
+  addNewEvent: (
+    type: string,
+    context: ?EventInsertionContext
+  ) => Array<gdBaseEvent>;
 
   state = {
-    history: getHistoryInitialState(this.props.events, { historyMaxSize: 50 }),
+    eventsHistory: getHistoryInitialState(this.props.events, {
+      historyMaxSize: 100,
+    }),
 
     editedInstruction: {
       isCondition: true,
       instruction: null,
       instrsList: null,
       indexInList: 0,
+      locatingEvent: null,
     },
     editedParameter: {
       isCondition: true,
       instruction: null,
       instrsList: null,
       parameterIndex: 0,
+      locatingEvent: null,
     },
 
     selection: getInitialSelection(),
@@ -217,7 +262,6 @@ export default class EventsSheet extends React.Component<Props, State> {
     inlineEditing: false,
     inlineEditingAnchorEl: null,
     inlineInstructionEditorAnchorEl: null,
-    inlineEditingChangesMade: false,
     inlineEditingPreviousValue: null,
 
     analyzedEventsContextResult: null,
@@ -235,14 +279,35 @@ export default class EventsSheet extends React.Component<Props, State> {
     fontSize: 14,
   };
 
+  constructor(props: ComponentProps) {
+    super(props);
+    this.addNewEvent = addCreateBadgePreHookIfNotClaimed(
+      this.props.authenticatedUser,
+      TRIVIAL_FIRST_EVENT,
+      this._addNewEvent
+    );
+  }
+
   componentDidMount() {
     this.setState({ allEventsMetadata: enumerateEventsMetadata() });
   }
 
-  componentDidUpdate(prevProps: Props, prevState: State) {
-    if (this.state.history !== prevState.history)
+  componentDidUpdate(prevProps: ComponentProps, prevState: State) {
+    this.addNewEvent = addCreateBadgePreHookIfNotClaimed(
+      this.props.authenticatedUser,
+      TRIVIAL_FIRST_EVENT,
+      this._addNewEvent
+    );
+
+    if (this.state.eventsHistory !== prevState.eventsHistory)
       if (this.props.unsavedChanges)
         this.props.unsavedChanges.triggerUnsavedChanges();
+
+    // If the tab becomes active again, we ensure the dom is focused
+    // allowing the keyboard shortcuts to work.
+    if (!prevProps.isActive && this.props.isActive) {
+      this._ensureFocused();
+    }
   }
 
   updateToolbar() {
@@ -254,12 +319,21 @@ export default class EventsSheet extends React.Component<Props, State> {
         onAddStandardEvent={this._addStandardEvent}
         onAddSubEvent={this.addSubEvents}
         canAddSubEvent={hasEventSelected(this.state.selection)}
+        canToggleEventDisabled={
+          hasEventSelected(this.state.selection) &&
+          this._selectionCanToggleDisabled()
+        }
+        canToggleInstructionInverted={hasInstructionSelected(
+          this.state.selection
+        )}
         onAddCommentEvent={this._addCommentEvent}
         onAddEvent={this.addNewEvent}
+        onToggleInvertedCondition={this._invertSelectedConditions}
+        onToggleDisabledEvent={this.toggleDisabled}
         canRemove={hasSomethingSelected(this.state.selection)}
         onRemove={this.deleteSelection}
-        canUndo={canUndo(this.state.history)}
-        canRedo={canRedo(this.state.history)}
+        canUndo={canUndo(this.state.eventsHistory)}
+        canRedo={canRedo(this.state.eventsHistory)}
         undo={this.undo}
         redo={this.redo}
         onOpenSettings={this.props.onOpenSettings}
@@ -279,6 +353,14 @@ export default class EventsSheet extends React.Component<Props, State> {
   _toggleSearchPanel = () => {
     this.setState(
       state => {
+        if (
+          state.showSearchPanel &&
+          this._searchPanel &&
+          this._searchPanel.isSearchOngoing()
+        ) {
+          this._searchPanel.focus();
+          return;
+        }
         const show = !state.showSearchPanel;
         if (!show) {
           if (this._eventSearcher) this._eventSearcher.reset();
@@ -297,27 +379,35 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   _closeSearchPanel = () => {
+    if (this._eventSearcher) this._eventSearcher.reset();
     this.setState({ showSearchPanel: false });
   };
 
   addSubEvents = () => {
     const { project } = this.props;
-
-    getSelectedEvents(this.state.selection).forEach(event => {
-      if (event.canHaveSubEvents()) {
-        event
-          .getSubEvents()
-          .insertNewEvent(
-            project,
-            'BuiltinCommonInstructions::Standard',
-            event.getSubEvents().getEventsCount()
-          );
-      }
-    });
-
-    this._saveChangesToHistory(() => {
-      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
-    });
+    const selectedEvents = getSelectedEvents(this.state.selection);
+    const newSubEvents = selectedEvents
+      .map(event => {
+        if (event.canHaveSubEvents()) {
+          return event
+            .getSubEvents()
+            .insertNewEvent(
+              project,
+              'BuiltinCommonInstructions::Standard',
+              event.getSubEvents().getEventsCount()
+            );
+        }
+        return null;
+      })
+      .filter(Boolean);
+    this._eventsTree &&
+      this._eventsTree.forceEventsUpdate(() => {
+        const positions = this._getChangedEventRows(newSubEvents);
+        this._saveChangesToHistory('ADD', {
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
+        });
+      });
   };
 
   _selectionCanHaveSubEvents = () => {
@@ -332,7 +422,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  addNewEvent = (
+  _addNewEvent = (
     type: string,
     context: ?EventInsertionContext
   ): Array<gdBaseEvent> => {
@@ -377,17 +467,21 @@ export default class EventsSheet extends React.Component<Props, State> {
         );
       }
     );
-
-    this._saveChangesToHistory(() => {
-      const eventsTree = this._eventsTree;
-      if (!eventsTree) return;
-
-      eventsTree.forceEventsUpdate(() => {
-        if (!context && !hasEventsSelected) {
-          eventsTree.scrollToEvent(newEvents[0]);
-        }
+    const currentTree = this._eventsTree;
+    if (currentTree) {
+      currentTree.forceEventsUpdate(() => {
+        const positions = this._getChangedEventRows(newEvents);
+        this._saveChangesToHistory(
+          'ADD',
+          { positionsBeforeAction: positions, positionAfterAction: positions },
+          () => {
+            if (!context && !hasEventsSelected) {
+              currentTree.scrollToRow(currentTree.getEventRow(newEvents[0]));
+            }
+          }
+        );
       });
-    });
+    }
 
     return newEvents;
   };
@@ -405,19 +499,81 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   closeEventTextDialog = () => {
+    if (this.state.textEditedEvent) {
+      const positions = this._getChangedEventRows([this.state.textEditedEvent]);
+      this._saveChangesToHistory('EDIT', {
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
+      });
+    }
     this.setState({
       textEditedEvent: null,
     });
   };
 
+  _buildInstructionContextMenu = (i18n: I18nType) => [
+    {
+      label: i18n._(t`Copy`),
+      click: () => this.copySelection(),
+      accelerator: 'CmdOrCtrl+C',
+    },
+    {
+      label: i18n._(t`Cut`),
+      click: () => this.cutSelection(),
+      accelerator: 'CmdOrCtrl+X',
+    },
+    {
+      label: i18n._(t`Paste`),
+      click: () => this.pasteInstructions(),
+      enabled: hasClipboardConditions() || hasClipboardActions(),
+      accelerator: 'CmdOrCtrl+V',
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Delete`),
+      click: () => this.deleteSelection(),
+      accelerator: 'Delete',
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Undo`),
+      click: this.undo,
+      enabled: canUndo(this.state.eventsHistory),
+      accelerator: 'CmdOrCtrl+Z',
+    },
+    {
+      label: i18n._(t`Redo`),
+      click: this.redo,
+      enabled: canRedo(this.state.eventsHistory),
+      accelerator: 'CmdOrCtrl+Shift+Z',
+    },
+    {
+      label: i18n._(t`Invert Condition`),
+      click: () => this._invertSelectedConditions(),
+      visible: hasSelectedAtLeastOneCondition(this.state.selection),
+      accelerator: getShortcutDisplayName(
+        this.props.preferences.values.userShortcutMap[
+          'TOGGLE_CONDITION_INVERTED'
+        ] || 'KeyJ'
+      ),
+    },
+    {
+      label: i18n._(t`Toggle Wait the Action to End`),
+      click: () => this._toggleAwaitingActions(),
+      visible: this._hasSelectedOptionallyAsyncActions(),
+    },
+  ];
+
   openAddInstructionContextMenu = (
+    locatingEvent: gdBaseEvent,
     button: HTMLButtonElement,
     instructionsListContext: InstructionsListContext
   ) => {
-    this.openInstructionEditor(instructionsListContext, button);
+    this.openInstructionEditor(locatingEvent, instructionsListContext, button);
   };
 
   openInstructionEditor = (
+    locatingEvent: gdBaseEvent,
     instructionContext: InstructionContext | InstructionsListContext,
     inlineInstructionEditorAnchorEl?: ?HTMLButtonElement = null
   ) => {
@@ -440,12 +596,14 @@ export default class EventsSheet extends React.Component<Props, State> {
           instructionContext.indexInList !== undefined
             ? instructionContext.indexInList
             : undefined,
+        locatingEvent,
       },
     });
   };
 
   closeInstructionEditor(saveChanges: boolean = false) {
-    const { instruction } = this.state.editedInstruction;
+    const { instruction, locatingEvent } = this.state.editedInstruction;
+
     this.setState(
       {
         editedInstruction: {
@@ -453,6 +611,7 @@ export default class EventsSheet extends React.Component<Props, State> {
           instruction: null,
           instrsList: null,
           indexInList: 0,
+          locatingEvent: null,
         },
       },
       () => {
@@ -462,15 +621,23 @@ export default class EventsSheet extends React.Component<Props, State> {
         if (instruction) {
           instruction.delete();
         }
-        if (saveChanges) {
-          this._saveChangesToHistory();
+        if (saveChanges && locatingEvent) {
+          const positions = this._getChangedEventRows([locatingEvent]);
+          this._saveChangesToHistory('EDIT', {
+            positionsBeforeAction: positions,
+            positionAfterAction: positions,
+          });
         }
       }
     );
   }
 
-  moveSelectionToInstruction = (destinationContext: InstructionContext) => {
+  moveSelectionToInstruction = (
+    locatingEvent: gdBaseEvent,
+    destinationContext: InstructionContext
+  ) => {
     this.moveSelectionToInstructionsList(
+      locatingEvent,
       {
         instrsList: destinationContext.instrsList,
         isCondition: destinationContext.isCondition,
@@ -480,6 +647,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   moveSelectionToInstructionsList = (
+    locatingEvent: gdBaseEvent,
     destinationContext: InstructionsListContext,
     indexInList: ?number = undefined
   ) => {
@@ -500,10 +668,23 @@ export default class EventsSheet extends React.Component<Props, State> {
       destinationContext.instrsList.insert(instruction, destinationIndex)
     );
 
+    const locatingEvents = getSelectedInstructionsLocatingEvents(
+      this.state.selection
+    );
+    const previousPositions = this._getChangedEventRows(locatingEvents);
+    const nextPositions = this._getChangedEventRows([locatingEvent]);
+
     if (!this._keyboardShortcuts.shouldCloneInstances()) {
-      this.deleteSelection({ deleteEvents: false });
+      this.deleteSelection({ deleteEvents: false, shouldSaveInHistory: false });
+      this._saveChangesToHistory('EDIT', {
+        positionsBeforeAction: previousPositions,
+        positionAfterAction: nextPositions,
+      });
     } else {
-      this._saveChangesToHistory();
+      this._saveChangesToHistory('EDIT', {
+        positionsBeforeAction: previousPositions,
+        positionAfterAction: nextPositions,
+      });
     }
   };
 
@@ -517,6 +698,141 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
+  collapseAll = () => {
+    if (this._eventsTree) this._eventsTree.foldAll();
+  };
+
+  expandToLevel = (level: number) => {
+    if (this._eventsTree) this._eventsTree.unfoldToLevel(level);
+  };
+
+  _buildEventContextMenu = (i18n: I18nType) => [
+    {
+      label: i18n._(t`Edit`),
+      click: () => this.openEventTextDialog(),
+      visible:
+        filterEditableWithEventTextDialog(
+          getSelectedEvents(this.state.selection)
+        ).length > 0,
+    },
+    {
+      label: i18n._(t`Copy`),
+      click: () => this.copySelection(),
+      accelerator: 'CmdOrCtrl+C',
+    },
+    {
+      label: i18n._(t`Cut`),
+      click: () => this.cutSelection(),
+      accelerator: 'CmdOrCtrl+X',
+    },
+    {
+      label: i18n._(t`Paste`),
+      click: () => this.pasteEvents(),
+      enabled: hasClipboardEvents(),
+      accelerator: 'CmdOrCtrl+V',
+    },
+    {
+      label: i18n._(t`Delete`),
+      click: () => this.deleteSelection(),
+      accelerator: 'Delete',
+    },
+    {
+      label: i18n._(t`Toggle disabled`),
+      click: () => this.toggleDisabled(),
+      enabled: this._selectionCanToggleDisabled(),
+      accelerator: getShortcutDisplayName(
+        this.props.preferences.values.userShortcutMap[
+          'TOGGLE_EVENT_DISABLED'
+        ] || 'KeyD'
+      ),
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Add New Event Below`),
+      click: () => {
+        this.addNewEvent('BuiltinCommonInstructions::Standard');
+      },
+    },
+    {
+      label: i18n._(t`Add Sub Event`),
+      click: () => this.addSubEvents(),
+      enabled: this._selectionCanHaveSubEvents(),
+    },
+    {
+      label: i18n._(t`Add Other`),
+      submenu: this.state.allEventsMetadata.map(metadata => {
+        return {
+          label: metadata.fullName,
+          click: () => {
+            this.addNewEvent(metadata.type);
+          },
+        };
+      }),
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Undo`),
+      click: this.undo,
+      enabled: canUndo(this.state.eventsHistory),
+      accelerator: 'CmdOrCtrl+Z',
+    },
+    {
+      label: i18n._(t`Redo`),
+      click: this.redo,
+      enabled: canRedo(this.state.eventsHistory),
+      accelerator: 'CmdOrCtrl+Shift+Z',
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Collapse all`),
+      click: this.collapseAll,
+    },
+    {
+      label: i18n._(t`Expand all to level`),
+      submenu: [
+        {
+          label: i18n._(t`All`),
+          click: () => this.expandToLevel(-1),
+        },
+        { type: 'separator' },
+        ...[0, 1, 2, 3, 4, 5, 6, 7, 8].map(index => {
+          return {
+            label: i18n._(t`Level ${index + 1}`),
+            click: () => this.expandToLevel(index),
+          };
+        }),
+      ],
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Extract Events to a Function`),
+      click: () => this.extractEventsToFunction(),
+    },
+    {
+      label: i18n._(t`Move Events into a Group`),
+      click: () => this.moveEventsIntoNewGroup(),
+    },
+    {
+      label: i18n._(t`Analyze Objects Used in this Event`),
+      click: this._openEventsContextAnalyzer,
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Zoom In`),
+      click: () => this.onZoomEvent('IN')(),
+      accelerator: 'CmdOrCtrl+=',
+      enabled:
+        this.props.preferences.values.eventsSheetZoomLevel < zoomLevel.max,
+    },
+    {
+      label: i18n._(t`Zoom Out`),
+      click: () => this.onZoomEvent('OUT')(),
+      accelerator: 'CmdOrCtrl+-',
+      enabled:
+        this.props.preferences.values.eventsSheetZoomLevel > zoomLevel.min,
+    },
+  ];
+
   openEventContextMenu = (x: number, y: number, eventContext: EventContext) => {
     const multiSelect = this._keyboardShortcuts.shouldMultiSelect();
     this.setState(
@@ -525,12 +841,13 @@ export default class EventsSheet extends React.Component<Props, State> {
       },
       () => {
         this.updateToolbar();
-        this.eventContextMenu.open(x, y);
+        if (this.eventContextMenu) this.eventContextMenu.open(x, y);
       }
     );
   };
 
   openInstructionContextMenu = (
+    locatingEvent: gdBaseEvent,
     x: number,
     y: number,
     instructionContext: InstructionContext
@@ -539,6 +856,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     this.setState(
       {
         selection: selectInstruction(
+          locatingEvent,
           this.state.selection,
           instructionContext,
           multiSelect
@@ -546,16 +864,20 @@ export default class EventsSheet extends React.Component<Props, State> {
       },
       () => {
         this.updateToolbar();
-        this.instructionContextMenu.open(x, y);
+        if (this.instructionContextMenu) this.instructionContextMenu.open(x, y);
       }
     );
   };
 
-  selectInstruction = (instructionContext: InstructionContext) => {
+  selectInstruction = (
+    locatingEvent: gdBaseEvent,
+    instructionContext: InstructionContext
+  ) => {
     const multiSelect = this._keyboardShortcuts.shouldMultiSelect();
     this.setState(
       {
         selection: selectInstruction(
+          locatingEvent,
           this.state.selection,
           instructionContext,
           multiSelect
@@ -565,33 +887,56 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
-  openParameterEditor = (parameterContext: ParameterContext) => {
+  openParameterEditor = (
+    locatingEvent: gdBaseEvent,
+    parameterContext: ParameterContext
+  ) => {
+    // Prevent state from changing when clicking on a parameter with inline parameter
+    // editor (it will close the editor).
+    if (this.state.editedParameter.instruction) return;
     const { instruction, parameterIndex } = parameterContext;
 
-    // $FlowFixMe
     this.setState({
-      editedParameter: parameterContext,
+      editedParameter: { locatingEvent, ...parameterContext },
       inlineEditing: true,
       inlineEditingAnchorEl: parameterContext.domEvent
         ? parameterContext.domEvent.currentTarget
         : null,
-      inlineEditingChangesMade: false,
-      inlineEditingPreviousValue: instruction.getParameter(parameterIndex),
+      inlineEditingPreviousValue: instruction
+        .getParameter(parameterIndex)
+        .getPlainString(),
     });
   };
 
   closeParameterEditor = (shouldCancel: boolean) => {
-    if (shouldCancel) {
-      const { instruction, parameterIndex } = this.state.editedParameter;
-      if (!instruction || !this.state.inlineEditingPreviousValue) return;
-
-      instruction.setParameter(
-        parameterIndex,
-        this.state.inlineEditingPreviousValue
-      );
-    } else {
-      if (this.state.inlineEditingChangesMade) {
-        this._saveChangesToHistory();
+    const {
+      instruction,
+      parameterIndex,
+      locatingEvent,
+    } = this.state.editedParameter;
+    if (instruction) {
+      // If the user canceled, revert the value to the positionsBeforeAction value, if not null.
+      if (
+        shouldCancel &&
+        typeof this.state.inlineEditingPreviousValue === 'string'
+      ) {
+        instruction.setParameter(
+          parameterIndex,
+          this.state.inlineEditingPreviousValue
+        );
+      }
+      // If the user made changes, save the value to history.
+      if (
+        !shouldCancel &&
+        this.state.inlineEditingPreviousValue !==
+          instruction.getParameter(parameterIndex) &&
+        locatingEvent
+      ) {
+        const positions = this._getChangedEventRows([locatingEvent]);
+        this._saveChangesToHistory('EDIT', {
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
+        });
       }
     }
 
@@ -599,9 +944,15 @@ export default class EventsSheet extends React.Component<Props, State> {
 
     this.setState(
       {
+        editedParameter: {
+          isCondition: true,
+          instruction: null,
+          instrsList: null,
+          parameterIndex: 0,
+          locatingEvent: null,
+        },
         inlineEditing: false,
         inlineEditingAnchorEl: null,
-        inlineEditingChangesMade: false,
       },
       () => {
         if (inlineEditingAnchorEl) {
@@ -622,32 +973,58 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   toggleDisabled = () => {
-    getSelectedEvents(this.state.selection).forEach(event =>
-      event.setDisabled(!event.isDisabled())
-    );
-    this._saveChangesToHistory(() => {
-      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+    let shouldBeSaved = false;
+    const selectedEvents = getSelectedEvents(this.state.selection);
+    selectedEvents.forEach(event => {
+      if (event.isExecutable()) {
+        event.setDisabled(!event.isDisabled());
+        shouldBeSaved = true;
+      }
     });
+    if (shouldBeSaved) {
+      const positions = this._getChangedEventRows(selectedEvents);
+      this._saveChangesToHistory(
+        'DELETE',
+        {
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
+        },
+        () => {
+          if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+        }
+      );
+    }
   };
 
   deleteSelection = ({
     deleteInstructions = true,
     deleteEvents = true,
-  }: { deleteInstructions?: boolean, deleteEvents?: boolean } = {}) => {
+    shouldSaveInHistory = true,
+  }: {
+    deleteInstructions?: boolean,
+    deleteEvents?: boolean,
+    shouldSaveInHistory?: boolean,
+  } = {}) => {
     const { events } = this.props;
     const eventsRemover = new gd.EventsRemover();
+    let eventsWithDeletion: Array<gdBaseEvent> = [];
     if (deleteEvents) {
-      getSelectedEvents(this.state.selection).forEach(event =>
-        eventsRemover.addEventToRemove(event)
-      );
+      const selectedEvents = getSelectedEvents(this.state.selection);
+      selectedEvents.forEach(event => eventsRemover.addEventToRemove(event));
+      eventsWithDeletion = eventsWithDeletion.concat(selectedEvents);
     }
     if (deleteInstructions) {
       getSelectedInstructions(this.state.selection).forEach(instruction =>
         eventsRemover.addInstructionToRemove(instruction)
       );
+      eventsWithDeletion = eventsWithDeletion.concat(
+        getSelectedInstructionsLocatingEvents(this.state.selection)
+      );
     }
 
+    const positions = this._getChangedEventRows(eventsWithDeletion);
     eventsRemover.launch(events);
+    eventsRemover.delete();
 
     // /!\ Events were changed, so any reference to an existing event can now
     // be invalid. Make sure to immediately trigger a forced update before
@@ -661,8 +1038,12 @@ export default class EventsSheet extends React.Component<Props, State> {
         inlineEditingAnchorEl: null,
       },
       () => {
-        this._saveChangesToHistory();
-
+        // If there is at least one edited instruction,
+        shouldSaveInHistory &&
+          this._saveChangesToHistory('DELETE', {
+            positionsBeforeAction: positions,
+            positionAfterAction: positions,
+          });
         // Deletion of an event/instruction will remove it from the DOM,
         // potentially losing the focus on the associated DOM elements. Ensure
         // we keep the focus on the EventsSheet.
@@ -689,10 +1070,19 @@ export default class EventsSheet extends React.Component<Props, State> {
     ) {
       return;
     }
-
-    this._saveChangesToHistory(() => {
-      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
-    });
+    const positions = this._getChangedEventRows(
+      getSelectedEvents(this.state.selection)
+    );
+    this._saveChangesToHistory(
+      'ADD',
+      {
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
+      },
+      () => {
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+      }
+    );
   };
 
   pasteInstructions = () => {
@@ -704,10 +1094,20 @@ export default class EventsSheet extends React.Component<Props, State> {
     ) {
       return;
     }
-
-    this._saveChangesToHistory(() => {
-      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
-    });
+    const locatingEvents = getSelectedInstructionsLocatingEvents(
+      this.state.selection
+    );
+    const positions = this._getChangedEventRows(locatingEvents);
+    this._saveChangesToHistory(
+      'EDIT',
+      {
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
+      },
+      () => {
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+      }
+    );
   };
 
   pasteEventsOrInstructions = () => {
@@ -719,6 +1119,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   pasteInstructionsInInstructionsList = (
+    locatingEvent: gdBaseEvent,
     instructionsListContext: InstructionsListContext
   ) => {
     if (
@@ -729,10 +1130,17 @@ export default class EventsSheet extends React.Component<Props, State> {
     ) {
       return;
     }
-
-    this._saveChangesToHistory(() => {
-      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
-    });
+    const positions = this._getChangedEventRows([locatingEvent]);
+    this._saveChangesToHistory(
+      'EDIT',
+      {
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
+      },
+      () => {
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+      }
+    );
   };
 
   _invertSelectedConditions = () => {
@@ -746,15 +1154,109 @@ export default class EventsSheet extends React.Component<Props, State> {
       }
     );
 
-    this._saveChangesToHistory(() => {
-      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+    const locatingEvent = getSelectedInstructionsLocatingEvents(
+      this.state.selection
+    );
+    const positions = this._getChangedEventRows(locatingEvent);
+    this._saveChangesToHistory(
+      'EDIT',
+      {
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
+      },
+      () => {
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+      }
+    );
+  };
+
+  _hasSelectedOptionallyAsyncActions = (): boolean => {
+    return getSelectedInstructionsContexts(this.state.selection).some(
+      instructionContext => {
+        if (!instructionContext.isCondition) {
+          const instructionMetadata = getInstructionMetadata({
+            instructionType: instructionContext.instruction.getType(),
+            project: this.props.project,
+            isCondition: false,
+          });
+
+          if (instructionMetadata && instructionMetadata.isOptionallyAsync()) {
+            return true;
+          }
+        }
+        return false;
+      }
+    );
+  };
+
+  _toggleAwaitingActions = () => {
+    getSelectedInstructionsContexts(this.state.selection).forEach(
+      instructionContext => {
+        if (!instructionContext.isCondition) {
+          const instructionMetadata = getInstructionMetadata({
+            instructionType: instructionContext.instruction.getType(),
+            project: this.props.project,
+            isCondition: false,
+          });
+
+          if (instructionMetadata && instructionMetadata.isOptionallyAsync()) {
+            instructionContext.instruction.setAwaited(
+              !instructionContext.instruction.isAwaited()
+            );
+          }
+        }
+      }
+    );
+
+    const locatingEvent = getSelectedInstructionsLocatingEvents(
+      this.state.selection
+    );
+    const positions = this._getChangedEventRows(locatingEvent);
+    this._saveChangesToHistory(
+      'EDIT',
+      {
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
+      },
+      () => {
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+      }
+    );
+  };
+
+  _onEndEditingStringEvent = (event: gdBaseEvent) => {
+    const eventRowIndex = this._getChangedEventRows([event]);
+    this._saveChangesToHistory('EDIT', {
+      positionsBeforeAction: eventRowIndex,
+      positionAfterAction: eventRowIndex,
     });
   };
 
-  _saveChangesToHistory = (cb: ?Function) => {
+  _getChangedEventRows = (events: Array<gdBaseEvent>) => {
+    const currentTree = this._eventsTree;
+    if (currentTree) {
+      return events.map(event => currentTree.getEventRow(event));
+    }
+    return [];
+  };
+
+  _saveChangesToHistory = (
+    // actionType is defined from the point of view of the event.
+    actionType: RevertableActionType,
+    positions: {
+      positionsBeforeAction: Array<number>,
+      positionAfterAction: Array<number>,
+    },
+    cb: ?Function
+  ) => {
     this.setState(
       {
-        history: saveToHistory(this.state.history, this.props.events),
+        eventsHistory: saveToHistory(
+          this.state.eventsHistory,
+          this.props.events,
+          actionType,
+          { positions }
+        ),
       },
       () => {
         this.updateToolbar();
@@ -765,39 +1267,87 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   undo = () => {
-    if (!canUndo(this.state.history)) return;
+    if (!canUndo(this.state.eventsHistory)) return;
 
     const { events, project } = this.props;
-    const newHistory = undo(this.state.history, events, project);
+    const newEventsHistory = undo(this.state.eventsHistory, events, project);
 
     // /!\ Events were changed, so any reference to an existing event can now
     // be invalid. Make sure to immediately trigger a forced update before
     // any re-render that could use a deleted/invalid event.
-    if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+    const { _eventsTree: eventsTree } = this;
+    if (!eventsTree) return;
+    eventsTree.forceEventsUpdate(() => {
+      const {
+        changeContext: { positions },
+        type,
+      } = newEventsHistory.futureActions[
+        newEventsHistory.futureActions.length - 1
+      ];
+      // Whether it is an ADD, EDIT or DELETE, scroll to the place where it was done.
+      eventsTree.scrollToRow(positions.positionsBeforeAction[0]);
 
-    // /!\ Also clear selection, that can contain reference to invalid events or
-    // events not shown on screen.
-    this.setState({ history: newHistory, selection: clearSelection() }, () =>
-      this.updateToolbar()
-    );
+      let newSelection: SelectionState = getInitialSelection();
+      // If it is a DELETE or EDIT, then the element will be present, so we can select them.
+      // If it is an ADD, then it will not be present, so we can't select them.
+      if (type === 'ADD') {
+        newSelection = clearSelection();
+      } else {
+        const eventContexts = eventsTree.getEventContextAtRowIndexes(
+          positions.positionsBeforeAction
+        );
+        newSelection = selectEventsAfterHistoryChange(eventContexts);
+      }
+      this.setState(
+        {
+          selection: newSelection,
+          eventsHistory: newEventsHistory,
+        },
+        () => this.updateToolbar()
+      );
+    });
   };
 
   redo = () => {
-    if (!canRedo(this.state.history)) return;
+    if (!canRedo(this.state.eventsHistory)) return;
 
     const { events, project } = this.props;
-    const newHistory = redo(this.state.history, events, project);
+    const newEventsHistory = redo(this.state.eventsHistory, events, project);
 
     // /!\ Events were changed, so any reference to an existing event can now
     // be invalid. Make sure to immediately trigger a forced update before
     // any re-render that could use a deleted/invalid event.
-    if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+    const { _eventsTree: eventsTree } = this;
+    if (!eventsTree) return;
+    eventsTree.forceEventsUpdate(() => {
+      const {
+        changeContext: { positions },
+        type,
+      } = newEventsHistory.previousActions[
+        newEventsHistory.previousActions.length - 1
+      ];
+      // Whether it was an ADD, EDIT or DELETE, scroll to the place where it will happen.
+      eventsTree.scrollToRow(positions.positionAfterAction);
+      // If it is a ADD or EDIT, then the element will be present, so we can select them.
+      // If it is a DELETE, then they will not be present, so we can't select them.
+      let newSelection: SelectionState = getInitialSelection();
+      if (type === 'DELETE') {
+        newSelection = clearSelection();
+      } else {
+        const eventContexts = eventsTree.getEventContextAtRowIndexes(
+          positions.positionAfterAction
+        );
+        newSelection = selectEventsAfterHistoryChange(eventContexts);
+      }
 
-    // /!\ Also clear selection, that can contain reference to invalid events or
-    // events not shown on screen.
-    this.setState({ history: newHistory, selection: clearSelection() }, () =>
-      this.updateToolbar()
-    );
+      this.setState(
+        {
+          selection: newSelection,
+          eventsHistory: newEventsHistory,
+        },
+        () => this.updateToolbar()
+      );
+    });
   };
 
   onZoomEvent = (
@@ -810,10 +1360,10 @@ export default class EventsSheet extends React.Component<Props, State> {
         domEvent.preventDefault();
         domEvent.stopPropagation();
       }
-      this.context.setEventsSheetZoomLevel(
+      this.props.preferences.setEventsSheetZoomLevel(
         Math.min(
           Math.max(
-            this.context.values.eventsSheetZoomLevel + factor * 1,
+            this.props.preferences.values.eventsSheetZoomLevel + factor * 1,
             zoomLevel.min
           ),
           zoomLevel.max
@@ -858,6 +1408,8 @@ export default class EventsSheet extends React.Component<Props, State> {
     getSelectedEvents(this.state.selection).forEach(event =>
       eventsList.insertEvent(event, eventsList.getEventsCount())
     );
+
+    this.props.onBeginCreateEventsFunction();
 
     this.setState({
       serializedEventsToExtract: serializeToJSObject(eventsList),
@@ -936,13 +1488,24 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   _replaceInEvents = (
-    doReplaceInEvents: (inputs: ReplaceInEventsInputs) => void,
+    doReplaceInEvents: (
+      inputs: ReplaceInEventsInputs,
+      cb: () => void
+    ) => Array<gdBaseEvent>,
     inputs: ReplaceInEventsInputs
   ) => {
-    doReplaceInEvents(inputs);
-    this._saveChangesToHistory(() => {
-      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+    const modifiedEvents = doReplaceInEvents(inputs, () => {
+      this.forceUpdate(() => {
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+      });
     });
+    if (modifiedEvents.length) {
+      const positions = this._getChangedEventRows(modifiedEvents);
+      this._saveChangesToHistory('EDIT', {
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
+      });
+    }
   };
 
   _searchInEvents = (
@@ -956,11 +1519,14 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  _onEventMoved = () => {
+  _onEventMoved = (previousRowIndex: number, nextRowIndex: number) => {
     // Move of the event in the list is handled by EventsTree.
     // This could be refactored and put here if the drag'n'drop of events
     // is reworked at some point.
-    this._saveChangesToHistory();
+    this._saveChangesToHistory('EDIT', {
+      positionsBeforeAction: [previousRowIndex],
+      positionAfterAction: [nextRowIndex],
+    });
   };
 
   _renderInstructionEditorDialog = (newInstructionEditorDialog: boolean) => {
@@ -1025,13 +1591,18 @@ export default class EventsSheet extends React.Component<Props, State> {
             : hasClipboardActions()
         }
         onPasteInstructions={() => {
-          const { instrsList, isCondition } = this.state.editedInstruction;
-          if (!instrsList) return;
-
-          this.pasteInstructionsInInstructionsList({
+          const {
             instrsList,
             isCondition,
-          });
+            locatingEvent,
+          } = this.state.editedInstruction;
+          if (!instrsList) return;
+
+          locatingEvent &&
+            this.pasteInstructionsInInstructionsList(locatingEvent, {
+              instrsList,
+              isCondition,
+            });
         }}
       />
     ) : (
@@ -1076,414 +1647,279 @@ export default class EventsSheet extends React.Component<Props, State> {
       onOpenLayout,
       globalObjectsContainer,
       objectsContainer,
+      preferences,
+      resourceSources,
+      onChooseResource,
+      resourceExternalEditors,
+      onCreateEventsFunction,
+      tutorials,
     } = this.props;
     if (!project) return null;
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const screenType = useScreenType();
+
     return (
-      <ScreenTypeMeasurer>
-        {screenType => (
-          <ResponsiveWindowMeasurer>
-            {windowWidth => (
-              <PreferencesContext.Consumer>
-                {({ values: preferences }) => (
-                  <EventsSearcher
-                    key={events.ptr}
-                    ref={eventSearcher => (this._eventSearcher = eventSearcher)}
-                    events={events}
+      <ResponsiveWindowMeasurer>
+        {windowWidth => (
+          <EventsSearcher
+            key={events.ptr}
+            ref={eventSearcher => (this._eventSearcher = eventSearcher)}
+            events={events}
+            globalObjectsContainer={globalObjectsContainer}
+            objectsContainer={objectsContainer}
+            selection={this.state.selection}
+            project={project}
+          >
+            {({
+              eventsSearchResultEvents,
+              searchFocusOffset,
+              searchInEvents,
+              replaceInEvents,
+              goToPreviousSearchResult,
+              goToNextSearchResult,
+            }) => (
+              <div
+                className="gd-events-sheet"
+                style={styles.container}
+                onKeyDown={this._keyboardShortcuts.onKeyDown}
+                onKeyUp={this._keyboardShortcuts.onKeyUp}
+                onDragOver={this._keyboardShortcuts.onDragOver}
+                ref={this._containerDiv}
+                tabIndex={0}
+              >
+                <EventsTree
+                  ref={eventsTree => (this._eventsTree = eventsTree)}
+                  key={events.ptr}
+                  onScroll={this._ensureFocused}
+                  events={events}
+                  project={project}
+                  scope={scope}
+                  globalObjectsContainer={globalObjectsContainer}
+                  objectsContainer={objectsContainer}
+                  selection={this.state.selection}
+                  onInstructionClick={this.selectInstruction}
+                  onInstructionDoubleClick={this.openInstructionEditor}
+                  onInstructionContextMenu={this.openInstructionContextMenu}
+                  onAddInstructionContextMenu={
+                    this.openAddInstructionContextMenu
+                  }
+                  onAddNewInstruction={this.openInstructionEditor}
+                  onPasteInstructions={this.pasteInstructionsInInstructionsList}
+                  onMoveToInstruction={this.moveSelectionToInstruction}
+                  onMoveToInstructionsList={
+                    this.moveSelectionToInstructionsList
+                  }
+                  onParameterClick={this.openParameterEditor}
+                  onEventClick={this.selectEvent}
+                  onEventContextMenu={this.openEventContextMenu}
+                  onAddNewEvent={(
+                    eventType: string,
+                    eventsList: gdEventsList
+                  ) => {
+                    this.addNewEvent(eventType, {
+                      eventsList,
+                      indexInList: eventsList.getEventsCount(),
+                    });
+                  }}
+                  onOpenExternalEvents={onOpenExternalEvents}
+                  onOpenLayout={onOpenLayout}
+                  searchResults={eventsSearchResultEvents}
+                  searchFocusOffset={searchFocusOffset}
+                  onEventMoved={this._onEventMoved}
+                  onEndEditingEvent={this._onEndEditingStringEvent}
+                  showObjectThumbnails={
+                    preferences.values.eventsSheetShowObjectThumbnails
+                  }
+                  screenType={screenType}
+                  windowWidth={windowWidth}
+                  eventsSheetHeight={
+                    this._containerDiv.current
+                      ? this._containerDiv.current.clientHeight
+                      : 0
+                  }
+                  fontSize={preferences.values.eventsSheetZoomLevel}
+                  preferences={preferences}
+                  tutorials={tutorials}
+                />
+                {this.state.showSearchPanel && (
+                  <SearchPanel
+                    ref={searchPanel => (this._searchPanel = searchPanel)}
+                    onSearchInEvents={inputs =>
+                      this._searchInEvents(searchInEvents, inputs)
+                    }
+                    onReplaceInEvents={inputs => {
+                      this._replaceInEvents(replaceInEvents, inputs);
+                    }}
+                    resultsCount={
+                      eventsSearchResultEvents
+                        ? eventsSearchResultEvents.length
+                        : null
+                    }
+                    hasEventSelected={hasEventSelected(this.state.selection)}
+                    onGoToPreviousSearchResult={() =>
+                      this._ensureEventUnfolded(goToPreviousSearchResult)
+                    }
+                    onCloseSearchPanel={() => {
+                      this._closeSearchPanel();
+                    }}
+                    onGoToNextSearchResult={() =>
+                      this._ensureEventUnfolded(goToNextSearchResult)
+                    }
+                    searchFocusOffset={searchFocusOffset}
+                  />
+                )}
+                <InlineParameterEditor
+                  open={this.state.inlineEditing}
+                  anchorEl={this.state.inlineEditingAnchorEl}
+                  onRequestClose={() => {
+                    this.closeParameterEditor(
+                      /*shouldCancel=*/ preferences.values
+                        .eventsSheetCancelInlineParameter === 'cancel'
+                    );
+                  }}
+                  onApply={() => {
+                    this.closeParameterEditor(/*shouldCancel=*/ false);
+                  }}
+                  project={project}
+                  scope={scope}
+                  globalObjectsContainer={globalObjectsContainer}
+                  objectsContainer={objectsContainer}
+                  isCondition={this.state.editedParameter.isCondition}
+                  instruction={this.state.editedParameter.instruction}
+                  parameterIndex={this.state.editedParameter.parameterIndex}
+                  onChange={value => {
+                    const {
+                      instruction,
+                      parameterIndex,
+                    } = this.state.editedParameter;
+                    if (!instruction || !this.state.inlineEditing) {
+                      // Unlikely to ever happen, but maybe a component could
+                      // fire the "onChange" while the inline editor was just
+                      // dismissed.
+                      return;
+                    }
+                    instruction.setParameter(parameterIndex, value);
+                    // Ask the component to re-render, so that the new parameter
+                    // set for the instruction in the state
+                    // is taken into account for the InlineParameterEditor.
+                    this.forceUpdate();
+                    if (this._searchPanel)
+                      this._searchPanel.markSearchResultsDirty();
+                  }}
+                  resourceSources={resourceSources}
+                  onChooseResource={onChooseResource}
+                  resourceExternalEditors={resourceExternalEditors}
+                />
+                <ContextMenu
+                  ref={eventContextMenu =>
+                    (this.eventContextMenu = eventContextMenu)
+                  }
+                  buildMenuTemplate={this._buildEventContextMenu}
+                />
+                <ContextMenu
+                  ref={instructionContextMenu =>
+                    (this.instructionContextMenu = instructionContextMenu)
+                  }
+                  buildMenuTemplate={this._buildInstructionContextMenu}
+                />
+                {this._renderInstructionEditorDialog(
+                  // Force using the new instruction editor on touch screens.
+                  preferences.values.useNewInstructionEditorDialog ||
+                    screenType === 'touch'
+                )}
+                {this.state.analyzedEventsContextResult && (
+                  <EventsContextAnalyzerDialog
+                    onClose={this._closeEventsContextAnalyzer}
+                    eventsContextResult={this.state.analyzedEventsContextResult}
+                  />
+                )}
+                {this.state.serializedEventsToExtract && (
+                  <EventsFunctionExtractorDialog
+                    project={project}
                     globalObjectsContainer={globalObjectsContainer}
                     objectsContainer={objectsContainer}
-                    selection={this.state.selection}
-                    project={project}
-                  >
-                    {({
-                      eventsSearchResultEvents,
-                      searchFocusOffset,
-                      searchInEvents,
-                      replaceInEvents,
-                      goToPreviousSearchResult,
-                      goToNextSearchResult,
-                      clearSearchResults,
-                    }) => (
-                      <div
-                        className="gd-events-sheet"
-                        style={styles.container}
-                        onKeyDown={this._keyboardShortcuts.onKeyDown}
-                        onKeyUp={this._keyboardShortcuts.onKeyUp}
-                        onDragOver={this._keyboardShortcuts.onDragOver}
-                        ref={this._containerDiv}
-                        tabIndex={0}
-                      >
-                        <EventsTree
-                          ref={eventsTree => (this._eventsTree = eventsTree)}
-                          key={events.ptr}
-                          onScroll={this._ensureFocused}
-                          events={events}
-                          project={project}
-                          scope={scope}
-                          globalObjectsContainer={globalObjectsContainer}
-                          objectsContainer={objectsContainer}
-                          selection={this.state.selection}
-                          onInstructionClick={this.selectInstruction}
-                          onInstructionDoubleClick={this.openInstructionEditor}
-                          onInstructionContextMenu={
-                            this.openInstructionContextMenu
-                          }
-                          onAddInstructionContextMenu={
-                            this.openAddInstructionContextMenu
-                          }
-                          onAddNewInstruction={this.openInstructionEditor}
-                          onPasteInstructions={
-                            this.pasteInstructionsInInstructionsList
-                          }
-                          onMoveToInstruction={this.moveSelectionToInstruction}
-                          onMoveToInstructionsList={
-                            this.moveSelectionToInstructionsList
-                          }
-                          onParameterClick={this.openParameterEditor}
-                          onEventClick={this.selectEvent}
-                          onEventContextMenu={this.openEventContextMenu}
-                          onAddNewEvent={(
-                            eventType: string,
-                            eventsList: gdEventsList
-                          ) => {
-                            this.addNewEvent(eventType, {
-                              eventsList,
-                              indexInList: eventsList.getEventsCount(),
-                            });
-                          }}
-                          onOpenExternalEvents={onOpenExternalEvents}
-                          onOpenLayout={onOpenLayout}
-                          searchResults={eventsSearchResultEvents}
-                          searchFocusOffset={searchFocusOffset}
-                          onEventMoved={this._onEventMoved}
-                          showObjectThumbnails={
-                            preferences.eventsSheetShowObjectThumbnails
-                          }
-                          screenType={screenType}
-                          windowWidth={windowWidth}
-                          eventsSheetHeight={
-                            this._containerDiv.current
-                              ? this._containerDiv.current.clientHeight
-                              : 0
-                          }
-                          fontSize={preferences.eventsSheetZoomLevel}
-                        />
-                        {this.state.showSearchPanel && (
-                          <SearchPanel
-                            ref={searchPanel =>
-                              (this._searchPanel = searchPanel)
-                            }
-                            onSearchInEvents={inputs =>
-                              this._searchInEvents(searchInEvents, inputs)
-                            }
-                            onReplaceInEvents={inputs =>
-                              this._replaceInEvents(replaceInEvents, inputs)
-                            }
-                            resultsCount={
-                              eventsSearchResultEvents
-                                ? eventsSearchResultEvents.length
-                                : null
-                            }
-                            hasEventSelected={hasEventSelected(
-                              this.state.selection
-                            )}
-                            onGoToPreviousSearchResult={() =>
-                              this._ensureEventUnfolded(
-                                goToPreviousSearchResult
-                              )
-                            }
-                            onCloseSearchPanel={() => {
-                              clearSearchResults();
-                              this._closeSearchPanel();
-                            }}
-                            onGoToNextSearchResult={() =>
-                              this._ensureEventUnfolded(goToNextSearchResult)
-                            }
-                            searchFocusOffset={searchFocusOffset}
-                          />
-                        )}
-                        <InlineParameterEditor
-                          open={this.state.inlineEditing}
-                          anchorEl={this.state.inlineEditingAnchorEl}
-                          onRequestClose={() => {
-                            this.closeParameterEditor(
-                              /*shouldCancel=*/ preferences.eventsSheetCancelInlineParameter ===
-                                'cancel'
-                            );
-                          }}
-                          onApply={() => {
-                            this.closeParameterEditor(/*shouldCancel=*/ false);
-                          }}
-                          project={project}
-                          scope={scope}
-                          globalObjectsContainer={globalObjectsContainer}
-                          objectsContainer={objectsContainer}
-                          isCondition={this.state.editedParameter.isCondition}
-                          instruction={this.state.editedParameter.instruction}
-                          parameterIndex={
-                            this.state.editedParameter.parameterIndex
-                          }
-                          onChange={value => {
-                            const {
-                              instruction,
-                              parameterIndex,
-                            } = this.state.editedParameter;
-                            if (!instruction || !this.state.inlineEditing) {
-                              // Unlikely to ever happen, but maybe a component could
-                              // fire the "onChange" while the inline editor was just
-                              // dismissed.
-                              return;
-                            }
-                            instruction.setParameter(parameterIndex, value);
-                            this.setState({
-                              inlineEditingChangesMade: true,
-                            });
-                            if (this._searchPanel)
-                              this._searchPanel.markSearchResultsDirty();
-                          }}
-                          resourceSources={this.props.resourceSources}
-                          onChooseResource={this.props.onChooseResource}
-                          resourceExternalEditors={
-                            this.props.resourceExternalEditors
-                          }
-                        />
-                        <ContextMenu
-                          ref={eventContextMenu =>
-                            (this.eventContextMenu = eventContextMenu)
-                          }
-                          buildMenuTemplate={(i18n: I18nType) => [
-                            {
-                              label: i18n._(t`Edit`),
-                              click: () => this.openEventTextDialog(),
-                              visible:
-                                filterEditableWithEventTextDialog(
-                                  getSelectedEvents(this.state.selection)
-                                ).length > 0,
-                            },
-                            {
-                              label: i18n._(t`Copy`),
-                              click: () => this.copySelection(),
-                              accelerator: 'CmdOrCtrl+C',
-                            },
-                            {
-                              label: i18n._(t`Cut`),
-                              click: () => this.cutSelection(),
-                              accelerator: 'CmdOrCtrl+X',
-                            },
-                            {
-                              label: i18n._(t`Paste`),
-                              click: () => this.pasteEvents(),
-                              enabled: hasClipboardEvents(),
-                              accelerator: 'CmdOrCtrl+V',
-                            },
-                            {
-                              label: i18n._(t`Delete`),
-                              click: () => this.deleteSelection(),
-                              accelerator: 'Delete',
-                            },
-                            {
-                              label: i18n._(t`Toggle disabled`),
-                              click: () => this.toggleDisabled(),
-                              enabled: this._selectionCanToggleDisabled(),
-                            },
-                            { type: 'separator' },
-                            {
-                              label: i18n._(t`Add New Event Below`),
-                              click: () =>
-                                this.addNewEvent(
-                                  'BuiltinCommonInstructions::Standard'
-                                ),
-                            },
-                            {
-                              label: i18n._(t`Add Sub Event`),
-                              click: () => this.addSubEvents(),
-                              enabled: this._selectionCanHaveSubEvents(),
-                            },
-                            {
-                              label: i18n._(t`Add Other`),
-                              submenu: this.state.allEventsMetadata.map(
-                                metadata => {
-                                  return {
-                                    label: metadata.fullName,
-                                    click: () =>
-                                      this.addNewEvent(metadata.type),
-                                  };
-                                }
-                              ),
-                            },
-                            { type: 'separator' },
-                            {
-                              label: i18n._(t`Undo`),
-                              click: this.undo,
-                              enabled: canUndo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Z',
-                            },
-                            {
-                              label: i18n._(t`Redo`),
-                              click: this.redo,
-                              enabled: canRedo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Shift+Z',
-                            },
-                            { type: 'separator' },
-                            {
-                              label: i18n._(t`Extract Events to a Function`),
-                              click: () => this.extractEventsToFunction(),
-                            },
-                            {
-                              label: i18n._(t`Move Events into a Group`),
-                              click: () => this.moveEventsIntoNewGroup(),
-                            },
-                            {
-                              label: i18n._(
-                                t`Analyze Objects Used in this Event`
-                              ),
-                              click: this._openEventsContextAnalyzer,
-                            },
-                            { type: 'separator' },
-                            {
-                              label: i18n._(t`Zoom In`),
-                              click: () => this.onZoomEvent('IN')(),
-                              accelerator: 'CmdOrCtrl+=',
-                              enabled:
-                                preferences.eventsSheetZoomLevel <
-                                zoomLevel.max,
-                            },
-                            {
-                              label: i18n._(t`Zoom Out`),
-                              click: () => this.onZoomEvent('OUT')(),
-                              accelerator: 'CmdOrCtrl+-',
-                              enabled:
-                                preferences.eventsSheetZoomLevel >
-                                zoomLevel.min,
-                            },
-                          ]}
-                        />
-                        <ContextMenu
-                          ref={instructionContextMenu =>
-                            (this.instructionContextMenu = instructionContextMenu)
-                          }
-                          buildMenuTemplate={(i18n: I18nType) => [
-                            {
-                              label: i18n._(t`Copy`),
-                              click: () => this.copySelection(),
-                              accelerator: 'CmdOrCtrl+C',
-                            },
-                            {
-                              label: i18n._(t`Cut`),
-                              click: () => this.cutSelection(),
-                              accelerator: 'CmdOrCtrl+X',
-                            },
-                            {
-                              label: i18n._(t`Paste`),
-                              click: () => this.pasteInstructions(),
-                              enabled:
-                                hasClipboardConditions() ||
-                                hasClipboardActions(),
-                              accelerator: 'CmdOrCtrl+V',
-                            },
-                            { type: 'separator' },
-                            {
-                              label: i18n._(t`Delete`),
-                              click: () => this.deleteSelection(),
-                              accelerator: 'Delete',
-                            },
-                            { type: 'separator' },
-                            {
-                              label: i18n._(t`Undo`),
-                              click: this.undo,
-                              enabled: canUndo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Z',
-                            },
-                            {
-                              label: i18n._(t`Redo`),
-                              click: this.redo,
-                              enabled: canRedo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Shift+Z',
-                            },
-                            {
-                              label: i18n._(t`Invert Condition`),
-                              click: () => this._invertSelectedConditions(),
-                              visible: hasSelectedAtLeastOneCondition(
-                                this.state.selection
-                              ),
-                            },
-                          ]}
-                        />
-                        {this._renderInstructionEditorDialog(
-                          // Force using the new instruction editor on touch screens.
-                          preferences.useNewInstructionEditorDialog ||
-                            screenType === 'touch'
-                        )}
-                        {this.state.analyzedEventsContextResult && (
-                          <EventsContextAnalyzerDialog
-                            onClose={this._closeEventsContextAnalyzer}
-                            eventsContextResult={
-                              this.state.analyzedEventsContextResult
-                            }
-                          />
-                        )}
-                        {this.state.serializedEventsToExtract && (
-                          <EventsFunctionExtractorDialog
-                            project={project}
-                            globalObjectsContainer={globalObjectsContainer}
-                            objectsContainer={objectsContainer}
-                            onClose={() =>
-                              this.setState({
-                                serializedEventsToExtract: null,
-                              })
-                            }
-                            serializedEvents={
-                              this.state.serializedEventsToExtract
-                            }
-                            onCreate={(extensionName, eventsFunction) => {
-                              this.props.onCreateEventsFunction(
-                                extensionName,
-                                eventsFunction
-                              );
-                              this._replaceSelectionByEventsFunction(
-                                extensionName,
-                                eventsFunction
-                              );
-                              this.setState({
-                                serializedEventsToExtract: null,
-                              });
-                            }}
-                          />
-                        )}
-                        {this.state.textEditedEvent && (
-                          <EventTextDialog
-                            event={this.state.textEditedEvent}
-                            onApply={() => {
-                              this.closeEventTextDialog();
-                              this._saveChangesToHistory();
-                            }}
-                            onClose={this.closeEventTextDialog}
-                          />
-                        )}
-                        <InfoBar
-                          identifier="edit-instruction-explanation"
-                          message={
-                            <Trans>
-                              Double click on a condition or action to edit it.
-                            </Trans>
-                          }
-                          touchScreenMessage={
-                            <Trans>
-                              Double tap a condition or action to edit it. Long
-                              press to show more options.
-                            </Trans>
-                          }
-                          show={hasInstructionSelected(this.state.selection)}
-                        />
-                      </div>
-                    )}
-                  </EventsSearcher>
+                    onClose={() =>
+                      this.setState({
+                        serializedEventsToExtract: null,
+                      })
+                    }
+                    serializedEvents={this.state.serializedEventsToExtract}
+                    onCreate={(extensionName, eventsFunction) => {
+                      onCreateEventsFunction(extensionName, eventsFunction);
+                      this._replaceSelectionByEventsFunction(
+                        extensionName,
+                        eventsFunction
+                      );
+                      this.setState({
+                        serializedEventsToExtract: null,
+                      });
+                    }}
+                  />
                 )}
-              </PreferencesContext.Consumer>
+                {this.state.textEditedEvent && (
+                  <EventTextDialog
+                    event={this.state.textEditedEvent}
+                    onApply={() => {
+                      this.closeEventTextDialog();
+                    }}
+                    onClose={this.closeEventTextDialog}
+                  />
+                )}
+                <DismissableInfoBar
+                  identifier="edit-instruction-explanation"
+                  message={
+                    <Trans>
+                      Double click on a condition or action to edit it.
+                    </Trans>
+                  }
+                  touchScreenMessage={
+                    <Trans>
+                      Double tap a condition or action to edit it. Long press to
+                      show more options.
+                    </Trans>
+                  }
+                  show={hasInstructionSelected(this.state.selection)}
+                />
+              </div>
             )}
-          </ResponsiveWindowMeasurer>
+          </EventsSearcher>
         )}
-      </ScreenTypeMeasurer>
+      </ResponsiveWindowMeasurer>
     );
   }
 }
+
+export type EventsSheetInterface = {|
+  updateToolbar: () => void,
+|};
+
+// EventsSheet is a wrapper so that the component can use multiple
+// context in class methods while correctly exposing the interface.
+const EventsSheet = (props, ref) => {
+  React.useImperativeHandle(ref, () => ({
+    updateToolbar,
+  }));
+
+  const component = React.useRef<?EventsSheetComponentWithoutHandle>(null);
+  const updateToolbar = () => {
+    if (component.current) component.current.updateToolbar();
+  };
+
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const preferences = React.useContext(PreferencesContext);
+  const { tutorials } = React.useContext(TutorialContext);
+  const leaderboardsManager = React.useContext(LeaderboardContext);
+  return (
+    <EventsSheetComponentWithoutHandle
+      ref={component}
+      authenticatedUser={authenticatedUser}
+      preferences={preferences}
+      tutorials={tutorials}
+      leaderboardsManager={leaderboardsManager}
+      {...props}
+    />
+  );
+};
+
+export default React.forwardRef<Props, EventsSheetInterface>(EventsSheet);

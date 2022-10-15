@@ -16,30 +16,30 @@ This project is released under the MIT License.
  */
 void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
   obj.AddAction("ParticleColor1",
-                _("Initial color"),
-                _("Modify initial color of particles."),
-                _("Put initial color of particles of _PARAM0_ to _PARAM1_"),
+                _("Start color"),
+                _("Modify start color of particles."),
+                _("Change particles start color of _PARAM0_ to _PARAM1_"),
                 _("Common"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .AddParameter("color", _("Initial color"));
+      .AddParameter("color", _("Start color"));
 
   obj.AddAction("ParticleColor2",
-                _("Final color"),
-                _("Modify final color of particles."),
-                _("Put final color of particles of _PARAM0_ to _PARAM1_"),
+                _("End color"),
+                _("Modify end color of particles."),
+                _("Change particles end color of _PARAM0_ to _PARAM1_"),
                 _("Common"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .AddParameter("color", _("Final color"));
+      .AddParameter("color", _("End color"));
 
   obj.AddAction(
          "ParticleRed1",
-         _("Red color, parameter 1"),
-         _("Modify parameter 1 of the red color."),
-         _("the parameter 1 of red color"),
+         _("Start color red component"),
+         _("Modify the start color red component."),
+         _("the start color red component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -48,9 +48,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleRed1",
-         _("Red color, parameter 1"),
-         _("Test parameter 1 of the red color"),
-         _("the parameter 1 of red color"),
+         _("Start color red component"),
+         _("Compare the start color red component."),
+         _("the start color red component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -59,9 +59,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddAction(
          "ParticleRed2",
-         _("Red color, parameter 2"),
-         _("Modify parameter 2 of the red color"),
-         _("the parameter 2 of red color"),
+         _("End color red component"),
+         _("Modify the end color red component."),
+         _("the end color red component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -70,9 +70,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleRed2",
-         _("Red color, parameter 2"),
-         _("Test parameter 2 of the red color"),
-         _("the parameter 2 of red color"),
+         _("End color red component"),
+         _("Compare the end color red component."),
+         _("the end color red component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -81,9 +81,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddAction(
          "ParticleBlue1",
-         _("Blue color, parameter 1"),
-         _("Modify parameter 1 of blue color"),
-         _("the parameter 1 of blue color"),
+         _("Start color blue component"),
+         _("Modify the start color blue component."),
+         _("the start color blue component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -92,9 +92,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleBlue1",
-         _("Blue color, parameter 1"),
-         _("Test parameter 1 of blue color"),
-         _("the parameter 1 of blue color"),
+         _("Start color blue component"),
+         _("Compare the start color blue component."),
+         _("the start color blue component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -103,9 +103,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddAction(
          "ParticleBlue2",
-         _("Blue color, parameter 2"),
-         _("Modify parameter 2 of blue color"),
-         _("the parameter 2 of blue color"),
+         _("End color blue component"),
+         _("Modify the end color blue component."),
+         _("the end color blue component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -114,9 +114,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleBlue2",
-         _("Blue color, parameter 2"),
-         _("Test parameter 2 of blue color"),
-         _("the parameter 2 of blue color"),
+         _("End color blue component"),
+         _("Compare the end color blue component."),
+         _("the end color blue component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -125,9 +125,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddAction(
          "ParticleGreen1",
-         _("Green color, parameter 1"),
-         _("Modify parameter 1 of green color"),
-         _("the parameter 1 of green color"),
+         _("Start color green component"),
+         _("Modify the start color green component."),
+         _("the start color green component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -136,9 +136,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleGreen1",
-         _("Green color, parameter 1"),
-         _("Test parameter 1 of green color"),
-         _("the parameter 1 of green color"),
+         _("Start color green component"),
+         _("Compare the start color green component."),
+         _("the start color green component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -147,9 +147,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddAction(
          "ParticleGreen2",
-         _("Green color, parameter 2"),
-         _("Modify the parameter 2 of the green color"),
-         _("the parameter 2 of green color"),
+         _("End color green component"),
+         _("Modify the end color green component."),
+         _("the end color green component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -158,9 +158,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleGreen2",
-         _("Green color, parameter 2"),
-         _("Test the parameter 2 of the green color"),
-         _("the parameter 2 of green color"),
+         _("End color green component"),
+         _("Compare the end color green component."),
+         _("the end color green component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -168,9 +168,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
       .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("ParticleSize1",
-                _("SIze, parameter 1"),
-                _("Modify parameter 1 of the size of particles"),
-                _("the parameter 1 of size"),
+                _("Start size"),
+                _("Modify the particle start size."),
+                _("the start size"),
                 _("Common"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
@@ -178,9 +178,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
       .UseStandardOperatorParameters("number");
 
   obj.AddCondition("ParticleSize1",
-                   _("Size, parameter 1"),
-                   _("Test parameter 1 of the size of particles"),
-                   _("the parameter 1 of the size"),
+                   _("Start size"),
+                   _("Compare the particle start size."),
+                   _("the start size"),
                    _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
@@ -188,9 +188,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
       .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("ParticleSize2",
-                _("Size, parameter 2"),
-                _("Modify parameter 2 of the size of particles"),
-                _("the parameter 2 of size"),
+                _("End size"),
+                _("Modify the particle end size."),
+                _("the end size"),
                 _("Common"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
@@ -198,9 +198,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
       .UseStandardOperatorParameters("number");
 
   obj.AddCondition("ParticleSize2",
-                   _("Size, parameter 2"),
-                   _("Test parameter 2 of the size of particles"),
-                   _("the parameter 2 of the size"),
+                   _("End size"),
+                   _("Compare the particle end size."),
+                   _("the end size"),
                    _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
@@ -210,7 +210,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
   obj.AddAction(
          "ParticleAngle1",
          _("Angle, parameter 1"),
-         _("Modify parameter 1 of the angle of particles"),
+         _("Modify parameter 1 of the angle of particles."),
          _("the parameter 1 of angle"),
          _("Common"),
          "CppPlatform/Extensions/particleSystemicon24.png",
@@ -220,7 +220,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition("ParticleAngle1",
                    _("Angle, parameter 1"),
-                   _("Test parameter 1 of the angle of particles"),
+                   _("Compare parameter 1 of the angle of particles."),
                    _("the parameter 1 of angle"),
                    _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
@@ -241,7 +241,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition("ParticleAngle2",
                    _("Angle, parameter 2"),
-                   _("Test parameter 2 of the angle of particles"),
+                   _("Compare parameter 2 of the angle of particles."),
                    _("the parameter 2 of angle"),
                    _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
@@ -250,9 +250,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
       .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("ParticleAlpha1",
-                _("Transparency, parameter 1"),
-                _("Modify parameter 1 of the transparency of particles"),
-                _("the parameter 1 of the transparency"),
+                _("Start opacity"),
+                _("Modify the start opacity of particles."),
+                _("the start opacity"),
                 _("Common"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
@@ -261,9 +261,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleAlpha1",
-         _("Transparency, parameter 1"),
-         _("Test parameter 1 of the transparency of particles"),
-         _("the parameter 1 of the transparency"),
+         _("Start opacity"),
+         _("Compare the start opacity of particles."),
+         _("the start opacity"),
          _("Common"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -271,9 +271,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
       .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("ParticleAlpha2",
-                _("Transparency, parameter 2"),
-                _("Modify parameter 2 of the transparency of particles"),
-                _("the parameter 2 of the transparency"),
+                _("End opacity"),
+                _("Modify the end opacity of particles."),
+                _("the end opacity"),
                 _("Common"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
@@ -282,9 +282,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleAlpha2",
-         _("Transparency, parameter 2"),
-         _("Test parameter 2 of the transparency of particles"),
-         _("the parameter 2 of the transparency"),
+         _("End opacity"),
+         _("Compare the end opacity of particles."),
+         _("the end opacity"),
          _("Common"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -294,8 +294,8 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
   obj.AddCondition("NoMoreParticles",
                    _("No more particles"),
                    _("Check if the object does not emit particles "
-                     "anylonger, so as to destroy it for example."),
-                   _("_PARAM0_ does not emit anylonger."),
+                     "any longer, so as to destroy it for example."),
+                   _("_PARAM0_ does not emit any longer"),
                    _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")

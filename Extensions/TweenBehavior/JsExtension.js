@@ -19,6 +19,44 @@
 import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
 */
 
+const easingChoices = JSON.stringify([
+  'linear',
+  'easeInQuad',
+  'easeOutQuad',
+  'easeInOutQuad',
+  'easeInCubic',
+  'easeOutCubic',
+  'easeInOutCubic',
+  'easeInQuart',
+  'easeOutQuart',
+  'easeInOutQuart',
+  'easeInQuint',
+  'easeOutQuint',
+  'easeInOutQuint',
+  'easeInSine',
+  'easeOutSine',
+  'easeInOutSine',
+  'easeInExpo',
+  'easeOutExpo',
+  'easeInOutExpo',
+  'easeInCirc',
+  'easeOutCirc',
+  'easeInOutCirc',
+  'easeOutBounce',
+  'easeInBack',
+  'easeOutBack',
+  'easeInOutBack',
+  'elastic',
+  'swingFromTo',
+  'swingFrom',
+  'swingTo',
+  'bounce',
+  'bouncePast',
+  'easeFromTo',
+  'easeFrom',
+  'easeTo',
+]);
+
 module.exports = {
   createExtension: function (
     _ /*: (string) => string */,
@@ -35,9 +73,260 @@ module.exports = {
         'Matthias Meike, Florian Rival',
         'Open source (MIT License)'
       )
+      .setCategory('Visual effect')
       .setExtensionHelpPath('/behaviors/tween');
+    extension.addInstructionOrExpressionGroupMetadata(_("Tweening"))
+        .setIcon("JsPlatform/Extensions/tween_behavior32.png");
 
-    var tweenBehavior = new gd.BehaviorJsImplementation();
+    extension
+      .addExpression(
+        'Ease',
+        _('Ease'),
+        _('Tween between 2 values according to an easing function.'),
+        '',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('From value'))
+      .addParameter('expression', _('To value'))
+      .addParameter('expression', _('Weighting'))
+      .setParameterLongDescription(_('From 0 to 1.'))
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.ease');
+
+    extension
+      .addAction(
+        'TweenSceneVariableNumber',
+        _('Tween a number in a scene variable'),
+        _(
+          "Tweens a scene variable's numeric value from one number to another."
+        ),
+        _(
+          'Tween variable _PARAM2_ from _PARAM3_ to _PARAM4_ for _PARAM5_ms with easing _PARAM6_ as _PARAM1_'
+        ),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+      .addParameter('scenevar', _('The variable to tween'), '', false)
+      .addParameter('expression', _('Initial value'), '', false)
+      .addParameter('expression', _('Final value'), '', false)
+      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.tweenVariableNumber');
+
+    extension
+      .addAction(
+        'TweenCameraPosition',
+        _('Tween the camera position'),
+        _('Tweens the camera position from the current one to a new one.'),
+        _(
+          'Tween camera on layer _PARAM4_ to _PARAM2_;_PARAM3_ for _PARAM5_ms with easing _PARAM6_ as _PARAM1_'
+        ),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+      .addParameter('expression', _('Target X position'), '', false)
+      .addParameter('expression', _('Target Y position'), '', false)
+      .addParameter('layer', _('Layer'), '', true)
+      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.tweenCamera');
+
+    extension
+      .addAction(
+        'TweenCameraZoom',
+        _('Tween the camera zoom'),
+        _('Tweens the camera zoom from the current zoom factor to a new one.'),
+        _(
+          'Tween the zoom of camera on layer _PARAM3_ to _PARAM2_ for _PARAM4_ms with easing _PARAM5_ as _PARAM1_'
+        ),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+      .addParameter('expression', _('Target zoom'), '', false)
+      .addParameter('layer', _('Layer'), '', true)
+      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.tweenCameraZoom');
+
+    extension
+      .addAction(
+        'TweenCameraRotation',
+        _('Tween the camera rotation'),
+        _('Tweens the camera rotation from the current angle to a new one.'),
+        _(
+          'Tween the rotation of camera on layer _PARAM3_ to _PARAM2_ for _PARAM4_ms with easing _PARAM5_ as _PARAM1_'
+        ),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+      .addParameter('expression', _('Target rotation'), '', false)
+      .addParameter('layer', _('Layer'), '', true)
+      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.tweenCameraRotation');
+
+    extension
+      .addCondition(
+        'SceneTweenExists',
+        _('Scene tween exists'),
+        _('Check if the scene tween exists.'),
+        _('Scene tween _PARAM1_ exists'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.sceneTweenExists');
+
+    extension
+      .addCondition(
+        'SceneTweenIsPlaying',
+        _('Scene tween is playing'),
+        _('Check if the scene tween is currently playing.'),
+        _('Scene tween _PARAM1_ is playing'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.sceneTweenIsPlaying');
+
+    extension
+      .addCondition(
+        'SceneTweenHasFinished',
+        _('Scene tween finished playing'),
+        _('Check if the scene tween has finished playing.'),
+        _('Scene tween _PARAM1_ has finished playing'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.sceneTweenHasFinished');
+
+    extension
+      .addAction(
+        'PauseSceneTween',
+        _('Pause a scene tween'),
+        _('Pause the running scene tween.'),
+        _('Pause the scene tween _PARAM1_'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.pauseSceneTween');
+
+    extension
+      .addAction(
+        'StopSceneTween',
+        _('Stop a scene tween'),
+        _('Stop the running scene tween.'),
+        _('Stop the scene tween _PARAM1_ (jump to the end: _PARAM2_)'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+      .addParameter('yesorno', _('Jump to the end'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.stopSceneTween');
+
+    extension
+      .addAction(
+        'ResumeSceneTween',
+        _('Resume a scene tween'),
+        _('Resume the scene tween.'),
+        _('Resume the scene tween _PARAM1_'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.resumeSceneTween');
+
+    extension
+      .addAction(
+        'RemoveSceneTween',
+        _('Remove a scene tween'),
+        _(
+          'Remove the scene tween. Call this when the tween is no longer needed to free memory.'
+        ),
+        _('Remove the scene tween _PARAM1_'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.removeSceneTween');
+
+    const tweenBehavior = new gd.BehaviorJsImplementation();
 
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     tweenBehavior.updateProperty = function (
@@ -63,7 +352,7 @@ module.exports = {
         _('Tween'),
         'Tween',
         _(
-          'Smoothly animate position, angle, scale and other properties of the object.'
+          'Smoothly animate position, angle, scale and other properties of objects.'
         ),
         '',
         'JsPlatform/Extensions/tween_behavior32.png',
@@ -72,45 +361,8 @@ module.exports = {
         new gd.BehaviorsSharedData()
       )
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js');
-
-    const easingChoices = JSON.stringify([
-      'linear',
-      'easeInQuad',
-      'easeOutQuad',
-      'easeInOutQuad',
-      'easeInCubic',
-      'easeOutCubic',
-      'easeInOutCubic',
-      'easeInQuart',
-      'easeOutQuart',
-      'easeInOutQuart',
-      'easeInQuint',
-      'easeOutQuint',
-      'easeInOutQuint',
-      'easeInSine',
-      'easeOutSine',
-      'easeInOutSine',
-      'easeInExpo',
-      'easeOutExpo',
-      'easeInOutExpo',
-      'easeInCirc',
-      'easeOutCirc',
-      'easeInOutCirc',
-      'easeOutBounce',
-      'easeInBack',
-      'easeOutBack',
-      'easeInOutBack',
-      'elastic',
-      'swingFromTo',
-      'swingFrom',
-      'swingTo',
-      'bounce',
-      'bouncePast',
-      'easeFromTo',
-      'easeFrom',
-      'easeTo',
-    ]);
 
     // Behavior related
     behavior
@@ -127,13 +379,13 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('objectvar', _('Object variable'), '', false)
       .addParameter('expression', _('From value'), '', false)
       .addParameter('expression', _('To value'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -158,12 +410,12 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To X'), '', false)
       .addParameter('expression', _('To Y'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -188,11 +440,11 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To X'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -217,11 +469,11 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To width'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -246,11 +498,11 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To height'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -275,11 +527,11 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To Y'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -304,11 +556,11 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To angle (in degrees)'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -335,12 +587,12 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To scale X'), '', false)
       .addParameter('expression', _('To scale Y'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -369,11 +621,11 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To scale X'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -402,11 +654,11 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To scale Y'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -435,11 +687,11 @@ module.exports = {
       )
       .addParameter('object', _('Text object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To character size'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -466,11 +718,11 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To opacity'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -497,11 +749,11 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('color', _('To color'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -538,7 +790,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To Hue'), '', false)
       .addParameter('yesorno', _('Animate Hue'), '', false)
       .setDefaultValue('yes')
@@ -548,7 +800,7 @@ module.exports = {
       .setDefaultValue('-1')
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -571,7 +823,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .getCodeExtraInformation()
       .setFunctionName('exists');
 
@@ -587,7 +839,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .getCodeExtraInformation()
       .setFunctionName('isPlaying');
 
@@ -603,7 +855,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .getCodeExtraInformation()
       .setFunctionName('hasFinished');
 
@@ -619,7 +871,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .getCodeExtraInformation()
       .setFunctionName('pauseTween');
 
@@ -635,7 +887,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('yesorno', _('Jump to end'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('stopTween');
@@ -652,7 +904,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .getCodeExtraInformation()
       .setFunctionName('resumeTween');
 
@@ -668,7 +920,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .getCodeExtraInformation()
       .setFunctionName('removeTween');
 
@@ -682,7 +934,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .getCodeExtraInformation()
       .setFunctionName('getProgress');
 

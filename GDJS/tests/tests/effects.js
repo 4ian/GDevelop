@@ -10,7 +10,7 @@ describe('gdjs.EffectsManager', () => {
 
   it('can add effects on a runtime object', () => {
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+    const object = new gdjs.TestRuntimeObjectWithFakeRenderer(runtimeScene, {
       name: 'obj1',
       type: '',
       variables: [],

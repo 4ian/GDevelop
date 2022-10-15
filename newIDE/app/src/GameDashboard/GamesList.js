@@ -8,7 +8,7 @@ import { type Game, getGames } from '../Utils/GDevelopServices/Game';
 import { GameCard } from './GameCard';
 import { ColumnStackLayout } from '../UI/Layout';
 import { GameRegistration } from './GameRegistration';
-import { GameDetailsDialog } from './GameDetailsDialog';
+import { GameDetailsDialog, type GamesDetailsTab } from './GameDetailsDialog';
 
 type Props = {|
   project: ?gdProject,
@@ -23,9 +23,10 @@ export const GamesList = (props: Props) => {
     getAuthorizationHeader,
   } = React.useContext(AuthenticatedUserContext);
   const [openedGame, setOpenedGame] = React.useState<?Game>(null);
-  const [openedGameInitialTab, setOpenedGameInitialTab] = React.useState<
-    'details' | 'analytics' | 'monetization'
-  >('details');
+  const [
+    openedGameInitialTab,
+    setOpenedGameInitialTab,
+  ] = React.useState<GamesDetailsTab>('details');
 
   const loadGames = React.useCallback(
     async () => {
@@ -94,18 +95,11 @@ export const GamesList = (props: Props) => {
           key={game.id}
           isCurrentGame={!!projectUuid && game.id === projectUuid}
           game={game}
-          onOpenAnalytics={() => {
-            setOpenedGameInitialTab('analytics');
+          onOpenGameManager={(tab: GamesDetailsTab) => {
+            setOpenedGameInitialTab(tab);
             setOpenedGame(game);
           }}
-          onOpenDetails={() => {
-            setOpenedGameInitialTab('details');
-            setOpenedGame(game);
-          }}
-          onOpenMonetization={() => {
-            setOpenedGameInitialTab('monetization');
-            setOpenedGame(game);
-          }}
+          onUpdateGame={loadGames}
         />
       ))}
       {openedGame && (

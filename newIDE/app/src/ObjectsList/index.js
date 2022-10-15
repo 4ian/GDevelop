@@ -10,7 +10,6 @@ import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import NewObjectDialog from '../AssetStore/NewObjectDialog';
-import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
@@ -24,6 +23,7 @@ import {
   filterObjectsList,
   isSameObjectWithContext,
 } from './EnumerateObjects';
+import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type {
   ObjectWithContextList,
   ObjectWithContext,
@@ -46,12 +46,33 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
+import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
+import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
+
+const gd: libGDevelop = global.gd;
 
 const styles = {
   listContainer: {
     flex: 1,
   },
+};
+
+const objectTypeToDefaultName = {
+  Sprite: 'NewSprite',
+  'TiledSpriteObject::TiledSprite': 'NewTiledSprite',
+  'ParticleSystem::ParticleEmitter': 'NewParticlesEmitter',
+  'PanelSpriteObject::PanelSprite': 'NewPanelSprite',
+  'PrimitiveDrawing::Drawer': 'NewShapePainter',
+  'TextObject::Text': 'NewText',
+  'BBText::BBText': 'NewBBText',
+  'BitmapText::BitmapTextObject': 'NewBitmapText',
+  'TextEntryObject::TextEntry': 'NewTextEntry',
+  'TileMap::TileMap': 'NewTileMap',
+  'TileMap::CollisionMask': 'NewTileMapMask',
+  'MyDummyExtension::DummyObject': 'NewDummyObject',
+  'Lighting::LightObject': 'NewLight',
+  'TextInput::TextInputObject': 'NewTextInput',
+  'Video::VideoObject': 'NewVideo',
 };
 
 export const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
@@ -78,7 +99,6 @@ const getPasteLabel = isGlobalObject => {
 type State = {|
   newObjectDialogOpen: boolean,
   renamedObjectWithContext: ?ObjectWithContext,
-  variablesEditedObject: ?gdObject,
   searchText: string,
   tagEditedObject: ?gdObject,
 |};
@@ -90,7 +110,8 @@ type Props = {|
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
-  events: gdEventsList,
+  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
+  onSelectAllInstancesOfObjectInLayout?: string => void,
   onDeleteObject: (
     objectWithContext: ObjectWithContext,
     cb: (boolean) => void
@@ -101,18 +122,23 @@ type Props = {|
     cb: (boolean) => void
   ) => void,
   selectedObjectNames: Array<string>,
+  canInstallPrivateAsset: () => boolean,
 
   selectedObjectTags: SelectedTags,
   getAllObjectTags: () => Tags,
   onChangeSelectedObjectTags: SelectedTags => void,
 
-  onEditObject: (object: gdObject, initialTab: ?string) => void,
+  onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onObjectCreated: gdObject => void,
   onObjectSelected: string => void,
   onObjectPasted?: gdObject => void,
   canRenameObject: (newName: string) => boolean,
+  onAddObjectInstance: (objectName: string) => void,
 
-  getThumbnail: (project: gdProject, object: Object) => string,
+  getThumbnail: (
+    project: gdProject,
+    objectConfiguration: gdObjectConfiguration
+  ) => string,
   unsavedChanges?: ?UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
@@ -123,7 +149,6 @@ export default class ObjectsList extends React.Component<Props, State> {
   state = {
     newObjectDialogOpen: false,
     renamedObjectWithContext: null,
-    variablesEditedObject: null,
     searchText: '',
     tagEditedObject: null,
   };
@@ -140,7 +165,6 @@ export default class ObjectsList extends React.Component<Props, State> {
       this.state.newObjectDialogOpen !== nextState.newObjectDialogOpen ||
       this.state.renamedObjectWithContext !==
         nextState.renamedObjectWithContext ||
-      this.state.variablesEditedObject !== nextState.variablesEditedObject ||
       this.state.searchText !== nextState.searchText ||
       this.state.tagEditedObject !== nextState.tagEditedObject
     )
@@ -170,8 +194,11 @@ export default class ObjectsList extends React.Component<Props, State> {
       onObjectSelected,
     } = this.props;
 
+    const defaultName = project.hasEventsBasedObject(objectType)
+      ? 'New' + project.getEventsBasedObject(objectType).getDefaultName()
+      : objectTypeToDefaultName[objectType] || 'NewObject';
     const name = newNameGenerator(
-      'NewObject',
+      defaultName,
       name =>
         objectsContainer.hasObjectNamed(name) || project.hasObjectNamed(name)
     );
@@ -203,18 +230,22 @@ export default class ObjectsList extends React.Component<Props, State> {
 
     object.setTags(getStringFromTags(this.props.selectedObjectTags));
     onObjectCreated(object);
+
+    this.forceUpdateList();
   };
 
   onAddNewObject = () => {
     this.setState({ newObjectDialogOpen: true });
   };
 
-  _deleteObject = (objectWithContext: ObjectWithContext) => {
+  _deleteObject = (i18n: I18nType, objectWithContext: ObjectWithContext) => {
     const { object, global } = objectWithContext;
     const { project, objectsContainer } = this.props;
 
     const answer = Window.showConfirmDialog(
-      "Are you sure you want to remove this object? This can't be undone."
+      i18n._(
+        t`Are you sure you want to remove this object? This can't be undone.`
+      )
     );
     if (!answer) return;
 
@@ -245,9 +276,9 @@ export default class ObjectsList extends React.Component<Props, State> {
     });
   };
 
-  _cutObject = (objectWithContext: ObjectWithContext) => {
+  _cutObject = (i18n: I18nType, objectWithContext: ObjectWithContext) => {
     this._copyObject(objectWithContext);
-    this._deleteObject(objectWithContext);
+    this._deleteObject(i18n, objectWithContext);
   };
 
   _duplicateObject = (objectWithContext: ObjectWithContext) => {
@@ -286,13 +317,13 @@ export default class ObjectsList extends React.Component<Props, State> {
           project,
           type,
           newName,
-          project.getObjectPosition(pasteObject.getName())
+          project.getObjectPosition(pasteObject.getName()) + 1
         )
       : objectsContainer.insertNewObject(
           project,
           type,
           newName,
-          objectsContainer.getObjectPosition(pasteObject.getName())
+          objectsContainer.getObjectPosition(pasteObject.getName()) + 1
         );
 
     unserializeFromJSObject(
@@ -320,12 +351,6 @@ export default class ObjectsList extends React.Component<Props, State> {
     );
   };
 
-  _editVariables = (object: ?gdObject) => {
-    this.setState({
-      variablesEditedObject: object,
-    });
-  };
-
   _rename = (objectWithContext: ObjectWithContext, newName: string) => {
     const { object } = objectWithContext;
     this.setState({
@@ -346,49 +371,96 @@ export default class ObjectsList extends React.Component<Props, State> {
 
   _canMoveSelectionTo = (destinationObjectWithContext: ObjectWithContext) => {
     // Check if at least one element in the selection can be moved.
-    const selectedObjects = this._displayedObjectWithContextsList.filter(
+    const selectedObjectsWithContext = this._displayedObjectWithContextsList.filter(
       objectWithContext =>
         this.props.selectedObjectNames.indexOf(
           objectWithContext.object.getName()
         ) !== -1
     );
-    return (
-      selectedObjects.filter(movedObjectWithContext => {
-        return (
-          movedObjectWithContext.global === destinationObjectWithContext.global
-        );
-      }).length > 0
+    if (
+      selectedObjectsWithContext.every(
+        selectedObject =>
+          selectedObject.global === destinationObjectWithContext.global
+      )
+    ) {
+      return true;
+    }
+
+    const displayedGlobalObjectsWithContext = this._displayedObjectWithContextsList.filter(
+      objectWithContext => objectWithContext.global
     );
+
+    if (
+      selectedObjectsWithContext.every(
+        selectedObject => !selectedObject.global
+      ) &&
+      destinationObjectWithContext.global &&
+      displayedGlobalObjectsWithContext.indexOf(
+        destinationObjectWithContext
+      ) === 0
+    ) {
+      return true;
+    }
+    return false;
   };
 
   _moveSelectionTo = (destinationObjectWithContext: ObjectWithContext) => {
     const { project, objectsContainer } = this.props;
 
-    const container: gdObjectsContainer = destinationObjectWithContext.global
-      ? project
-      : objectsContainer;
+    const displayedGlobalObjectsWithContext = this._displayedObjectWithContextsList.filter(
+      objectWithContext => objectWithContext.global
+    );
+    const displayedLocalObjectsWithContext = this._displayedObjectWithContextsList.filter(
+      objectWithContext => !objectWithContext.global
+    );
 
-    const selectedObjects = this._displayedObjectWithContextsList.filter(
+    const isDestinationItemFirstItemOfGlobalDisplayedList =
+      destinationObjectWithContext.global &&
+      displayedGlobalObjectsWithContext.indexOf(
+        destinationObjectWithContext
+      ) === 0;
+
+    const selectedObjectsWithContext = this._displayedObjectWithContextsList.filter(
       objectWithContext =>
         this.props.selectedObjectNames.indexOf(
           objectWithContext.object.getName()
         ) !== -1
     );
-    selectedObjects.forEach(movedObjectWithContext => {
+    selectedObjectsWithContext.forEach(movedObjectWithContext => {
+      let container: gdObjectsContainer;
+      let fromIndex: number;
+      let toIndex: number;
       if (
-        movedObjectWithContext.global !== destinationObjectWithContext.global
+        movedObjectWithContext.global === destinationObjectWithContext.global
       ) {
-        // Can't move an object from the objects container to the global objects
-        // or vice-versa.
+        container = destinationObjectWithContext.global
+          ? project
+          : objectsContainer;
+
+        fromIndex = container.getObjectPosition(
+          movedObjectWithContext.object.getName()
+        );
+        toIndex = container.getObjectPosition(
+          destinationObjectWithContext.object.getName()
+        );
+      } else if (
+        !movedObjectWithContext.global &&
+        isDestinationItemFirstItemOfGlobalDisplayedList
+      ) {
+        container = objectsContainer;
+        fromIndex = container.getObjectPosition(
+          movedObjectWithContext.object.getName()
+        );
+        toIndex = !this.state.searchText
+          ? container.getObjectsCount()
+          : container.getObjectPosition(
+              displayedLocalObjectsWithContext[
+                displayedLocalObjectsWithContext.length - 1
+              ].object.getName()
+            ) + 1;
+      } else {
         return;
       }
-
-      const fromIndex = container.getObjectPosition(
-        movedObjectWithContext.object.getName()
-      );
-      let toIndex = container.getObjectPosition(
-        destinationObjectWithContext.object.getName()
-      );
       if (toIndex > fromIndex) toIndex -= 1;
       container.moveObject(fromIndex, toIndex);
     });
@@ -452,21 +524,51 @@ export default class ObjectsList extends React.Component<Props, State> {
   };
 
   _getObjectThumbnail = (objectWithContext: ObjectWithContext) =>
-    this.props.getThumbnail(this.props.project, objectWithContext.object);
+    this.props.getThumbnail(
+      this.props.project,
+      objectWithContext.object.getConfiguration()
+    );
 
   _renderObjectMenuTemplate = (i18n: I18nType) => (
     objectWithContext: ObjectWithContext,
     index: number
   ) => {
     const { object } = objectWithContext;
+    const { layout, onSelectAllInstancesOfObjectInLayout } = this.props;
+    const instanceCountOnScene = layout
+      ? getInstanceCountInLayoutForObject(layout, object.getName())
+      : undefined;
+
+    const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+      this.props.project.getCurrentPlatform(),
+      object.getType()
+    );
     return [
+      {
+        label: i18n._(t`Copy`),
+        click: () => this._copyObject(objectWithContext),
+      },
+      {
+        label: i18n._(t`Cut`),
+        click: () => this._cutObject(i18n, objectWithContext),
+      },
+      {
+        label: getPasteLabel(objectWithContext.global),
+        enabled: Clipboard.has(CLIPBOARD_KIND),
+        click: () => this._paste(objectWithContext),
+      },
+      {
+        label: i18n._(t`Duplicate`),
+        click: () => this._duplicateObject(objectWithContext),
+      },
+      { type: 'separator' },
       {
         label: i18n._(t`Edit object`),
         click: () => this.props.onEditObject(object),
       },
       {
         label: i18n._(t`Edit object variables`),
-        click: () => this._editVariables(object),
+        click: () => this.props.onEditObject(object, 'variables'),
       },
       {
         label: i18n._(t`Edit behaviors`),
@@ -475,8 +577,18 @@ export default class ObjectsList extends React.Component<Props, State> {
       {
         label: i18n._(t`Edit effects`),
         click: () => this.props.onEditObject(object, 'effects'),
+        enabled: !objectMetadata.isUnsupportedBaseObjectCapability('effect'),
       },
       { type: 'separator' },
+      {
+        label: i18n._(t`Rename`),
+        click: () => this._editName(objectWithContext),
+      },
+      {
+        label: i18n._(t`Set as global object`),
+        enabled: !isObjectWithContextGlobal(objectWithContext),
+        click: () => this._setAsGlobalObject(objectWithContext),
+      },
       {
         label: i18n._(t`Tags`),
         submenu: buildTagsMenuTemplate({
@@ -491,42 +603,29 @@ export default class ObjectsList extends React.Component<Props, State> {
         }),
       },
       {
-        label: i18n._(t`Rename`),
-        click: () => this._editName(objectWithContext),
-      },
-      {
-        label: i18n._(t`Set as a global object`),
-        enabled: !isObjectWithContextGlobal(objectWithContext),
-        click: () => this._setAsGlobalObject(objectWithContext),
-      },
-      {
         label: i18n._(t`Delete`),
-        click: () => this._deleteObject(objectWithContext),
+        click: () => this._deleteObject(i18n, objectWithContext),
       },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Add instance to the scene`),
+        click: () => this.props.onAddObjectInstance(object.getName()),
+      },
+      instanceCountOnScene !== undefined && onSelectAllInstancesOfObjectInLayout
+        ? {
+            label: i18n._(
+              t`Select instances on scene (${instanceCountOnScene})`
+            ),
+            click: () => onSelectAllInstancesOfObjectInLayout(object.getName()),
+            enabled: instanceCountOnScene > 0,
+          }
+        : undefined,
       { type: 'separator' },
       {
         label: i18n._(t`Add a new object...`),
         click: () => this.onAddNewObject(),
       },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Copy`),
-        click: () => this._copyObject(objectWithContext),
-      },
-      {
-        label: i18n._(t`Cut`),
-        click: () => this._cutObject(objectWithContext),
-      },
-      {
-        label: getPasteLabel(objectWithContext.global),
-        enabled: Clipboard.has(CLIPBOARD_KIND),
-        click: () => this._paste(objectWithContext),
-      },
-      {
-        label: i18n._(t`Duplicate`),
-        click: () => this._duplicateObject(objectWithContext),
-      },
-    ];
+    ].filter(Boolean);
   };
 
   _onObjectModified = (shouldForceUpdateList: boolean) => {
@@ -546,7 +645,8 @@ export default class ObjectsList extends React.Component<Props, State> {
       onChooseResource,
       resourceExternalEditors,
       selectedObjectTags,
-      events,
+      onFetchNewlyAddedResources,
+      canInstallPrivateAsset,
     } = this.props;
     const { searchText, tagEditedObject } = this.state;
 
@@ -592,12 +692,16 @@ export default class ObjectsList extends React.Component<Props, State> {
                     height={height}
                     getItemName={getObjectWithContextName}
                     getItemThumbnail={this._getObjectThumbnail}
+                    getItemId={(objectWithContext, index) => {
+                      return 'object-item-' + index;
+                    }}
                     isItemBold={isObjectWithContextGlobal}
                     onEditItem={objectWithContext =>
                       this.props.onEditObject(objectWithContext.object)
                     }
                     onAddNewItem={this.onAddNewObject}
                     addNewItemLabel={<Trans>Add a new object</Trans>}
+                    addNewItemId="add-new-object-button"
                     selectedItems={selectedObjects}
                     onItemSelected={this._selectObject}
                     renamedItem={renamedObjectWithContext}
@@ -621,6 +725,8 @@ export default class ObjectsList extends React.Component<Props, State> {
               searchText: text,
             })
           }
+          aspect="integrated-search-bar"
+          placeholder={t`Search objects`}
         />
         {this.state.newObjectDialogOpen && (
           <NewObjectDialog
@@ -634,47 +740,11 @@ export default class ObjectsList extends React.Component<Props, State> {
             project={project}
             layout={layout}
             objectsContainer={objectsContainer}
-            events={events}
             resourceSources={resourceSources}
             onChooseResource={onChooseResource}
             resourceExternalEditors={resourceExternalEditors}
-          />
-        )}
-        {this.state.variablesEditedObject && (
-          <VariablesEditorDialog
-            open
-            variablesContainer={
-              this.state.variablesEditedObject &&
-              this.state.variablesEditedObject.getVariables()
-            }
-            onCancel={() => this._editVariables(null)}
-            onApply={() => this._editVariables(null)}
-            title={<Trans>Object Variables</Trans>}
-            emptyExplanationMessage={
-              <Trans>
-                When you add variables to an object, any instance of the object
-                put on the scene or created during the game will have these
-                variables attached to it.
-              </Trans>
-            }
-            emptyExplanationSecondMessage={
-              <Trans>
-                For example, you can have a variable called Life representing
-                the health of the object.
-              </Trans>
-            }
-            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-            onComputeAllVariableNames={() => {
-              const variablesEditedObject = this.state.variablesEditedObject;
-              return layout && variablesEditedObject
-                ? EventsRootVariablesFinder.findAllObjectVariables(
-                    project.getCurrentPlatform(),
-                    project,
-                    layout,
-                    variablesEditedObject
-                  )
-                : [];
-            }}
+            onFetchNewlyAddedResources={onFetchNewlyAddedResources}
+            canInstallPrivateAsset={canInstallPrivateAsset}
           />
         )}
         {tagEditedObject && (

@@ -9,7 +9,7 @@ const extensionsRuntimePath = path.join(gdevelopRootPath, 'Extensions');
 const gdjsRuntimePath = path.join(gdjsRootPath, 'Runtime');
 
 // The extensions to be included in the bundled Runtime (will be built with esbuild or copied).
-const allowedExtensions = ['.js', '.ts', '.html', '.json', '.xml'];
+const allowedExtensions = ['.js', '.ts', '.html', '.json', '.xml', '.map', '.wasm'];
 
 // These extensions will be built with esbuild (the other will be copied).
 const transformIncludedExtensions = ['.js', '.ts'];
@@ -31,6 +31,7 @@ const untransformedPaths = [
   'GDJS/Runtime/libs/rbush.js',
 
   // Extensions pre-built files:
+  'Extensions/Leaderboards/sha256.js',
   'Extensions/Firebase/A_firebasejs',
   'Extensions/BBText/pixi-multistyle-text/dist',
   'Extensions/DialogueTree/bondage.js/dist',
@@ -77,9 +78,7 @@ const isTestDirectory = (fileOrDirectoryPath, stats) => {
  * @param {string} filePath
  */
 const isJsExtensionDeclaration = (filePath) => {
-  return (
-    path.basename(filePath) === 'JsExtension.js'
-  );
+  return path.basename(filePath) === 'JsExtension.js';
 };
 
 /** @typedef {{inPath: string; outPath: string;}} InOutPath */

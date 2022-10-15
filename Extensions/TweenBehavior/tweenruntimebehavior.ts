@@ -1,7 +1,45 @@
+/// <reference path="shifty.d.ts" />
 namespace gdjs {
-  declare var shifty: any;
-  namespace shifty {
-    export type Tweenable = any;
+  interface IScaleable extends RuntimeObject {
+    setScaleX(x: number): void;
+    setScaleY(y: number): void;
+    getScaleX(): number;
+    getScaleY(): number;
+  }
+
+  interface IOpaque extends RuntimeObject {
+    setOpacity(opacity: number): void;
+    getOpacity(): number;
+  }
+
+  interface IColorable extends RuntimeObject {
+    setColor(color: string): void;
+    getColor(): string;
+  }
+
+  interface ICharacterScaleable extends RuntimeObject {
+    setCharacterSize(characterSize: number): void;
+    getCharacterSize(): number;
+  }
+
+  function isScaleable(o: RuntimeObject): o is IScaleable {
+    //@ts-ignore We are checking if the methods are present.
+    return o.setScaleX && o.setScaleY && o.getScaleX && o.getScaleY;
+  }
+
+  function isOpaque(o: RuntimeObject): o is IOpaque {
+    //@ts-ignore We are checking if the methods are present.
+    return o.setOpacity && o.getOpacity;
+  }
+
+  function isColorable(o: RuntimeObject): o is IColorable {
+    //@ts-ignore We are checking if the methods are present.
+    return o.setColor && o.getColor;
+  }
+
+  function isCharacterScaleable(o: RuntimeObject): o is ICharacterScaleable {
+    //@ts-ignore We are checking if the methods are present.
+    return o.setCharacterSize && o.getCharacterSize;
   }
 
   function rgbToHsl(r: number, g: number, b: number): number[] {
@@ -39,10 +77,9 @@ namespace gdjs {
   }
 
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
-    /** @type Object.<string, TweenRuntimeBehavior.TweenInstance > */
-    _tweens: { [key: string]: TweenRuntimeBehavior.TweenInstance } = {};
-    _runtimeScene: gdjs.RuntimeScene;
-    _isActive: boolean = true;
+    private _tweens: Record<string, TweenRuntimeBehavior.TweenInstance> = {};
+    private _runtimeScene: gdjs.RuntimeScene;
+    private _isActive: boolean = true;
 
     /**
      * @param runtimeScene The runtime scene the behavior belongs to.
@@ -58,125 +95,119 @@ namespace gdjs {
       this._runtimeScene = runtimeScene;
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
+    updateFromBehaviorData(
+      oldBehaviorData: BehaviorData,
+      newBehaviorData: BehaviorData
+    ): boolean {
       // Nothing to update.
       return true;
     }
 
-    _addTween(identifier, instance, startTime, totalDuration) {
+    onDestroy() {
+      const shiftyJsScene = this._runtimeScene.shiftyJsScene;
+      if (!shiftyJsScene) return;
+
+      // Stop and delete all tweens of the behavior - otherwise they could:
+      // - continue to point to the behavior, and so to the object (memory leak),
+      // - affect the object in case it's recycled (wrong/hard to debug behavior).
+      for (const identifier in this._tweens) {
+        this._tweens[identifier].instance.stop();
+        shiftyJsScene.remove(this._tweens[identifier].instance);
+      }
+    }
+
+    private _addTween(
+      identifier: string,
+      easingValue: string,
+      tweenConfig: shifty.tweenConfig,
+      startTime: number,
+      totalDuration: number,
+      destroyObjectWhenFinished: boolean
+    ): void {
+      if (!this._isActive || !!TweenRuntimeBehavior.easings[easingValue])
+        return;
+
+      // Remove any prior tween
+      if (this._tweenExists(identifier)) this.removeTween(identifier);
+
+      // Initialize the tween instance
+      const tweenable = new shifty.Tweenable();
       this._tweens[identifier] = new TweenRuntimeBehavior.TweenInstance(
-        instance,
+        tweenable,
         false,
         startTime,
         totalDuration
       );
+
+      // Attach it to the scene as it will become active and active tweens should be on the scene.
+      if (!this._runtimeScene.shiftyJsScene)
+        this._runtimeScene.shiftyJsScene = new shifty.Scene();
+      this._runtimeScene.shiftyJsScene.add(tweenable);
+
+      // Start the tween and set the needed callbacks
+      tweenable
+        .tween(tweenConfig)
+        .then(() => {
+          if (this._tweens[identifier])
+            this._tweens[identifier].hasFinished = true;
+
+          if (destroyObjectWhenFinished)
+            this.owner.deleteFromScene(this._runtimeScene);
+        })
+        .catch((e) => {});
     }
 
-    _getTween(identifier) {
-      return this._tweens[identifier];
-    }
-
-    _tweenExists(identifier) {
+    private _tweenExists(identifier: string): boolean {
       return !!this._tweens[identifier];
     }
 
-    _tweenIsPlaying(identifier) {
-      return this._tweens[identifier].instance.isPlaying();
+    private _tweenIsPlaying(identifier: string): boolean {
+      return (
+        this._tweens[identifier] &&
+        this._tweens[identifier].instance.isPlaying()
+      );
     }
 
-    _pauseTween(identifier) {
+    private _pauseTween(identifier: string): void {
       const tween = this._tweens[identifier];
 
       // Pause the tween, and remove it from the scene of living tweens
       // (the invariant is that scene only contains tweens being played).
       tween.instance.pause();
 
-      // @ts-ignore - shiftyJsScene is added to runtime scene.
       const shiftyJsScene = this._runtimeScene.shiftyJsScene;
       if (shiftyJsScene) {
         shiftyJsScene.remove(tween.instance);
       }
     }
 
-    _resumeTween(identifier) {
+    private _resumeTween(identifier: string): void {
       const tween = this._tweens[identifier];
 
       // Resume the tween, and add it back to the scene of living tweens
       // (the invariant is that scene only contains tweens being played).
       tween.instance.resume();
 
-      // @ts-ignore - shiftyJsScene is added to runtime scene.
       const shiftyJsScene = this._runtimeScene.shiftyJsScene;
       if (shiftyJsScene) {
         shiftyJsScene.add(tween.instance);
       }
     }
 
-    _stopTween(identifier, jumpToDest) {
-      return this._tweens[identifier].instance.stop(jumpToDest);
+    private _stopTween(identifier: string, jumpToDest: boolean): void {
+      this._tweens[identifier].instance.stop(jumpToDest);
     }
 
-    _setTweenFinished(identifier, hasFinished) {
-      this._tweens[identifier].hasFinished = hasFinished;
-    }
-
-    _tweenHasFinished(identifier) {
+    private _tweenHasFinished(identifier: string): boolean {
       return this._tweens[identifier].hasFinished;
     }
 
-    _removeObjectFromScene(identifier) {
-      this._removeTween(identifier);
-      return this.owner.deleteFromScene(this._runtimeScene);
-    }
-
-    _removeTween(identifier) {
-      if (!this._tweens[identifier]) {
-        return;
-      }
-      this._tweens[identifier].instance.stop();
-      TweenRuntimeBehavior.removeFromScene(
-        this._runtimeScene,
-        this._tweens[identifier].instance
-      );
-      delete this._tweens[identifier];
-    }
-
-    _setupTweenEnding(identifier, destroyObjectWhenFinished) {
-      const that = this;
-
-      // Do nothing if the Promise is rejected. Rejection is used
-      // by Shifty.js to signal that the tween was not finished.
-      // We catch it to avoid an uncaught promise error, and to
-      // ensure that the content of the "then" is always applied:
-      if (destroyObjectWhenFinished) {
-        this._tweens[identifier].instance
-          .tween()
-          .then(function () {
-            that._removeObjectFromScene(identifier);
-          })
-          .catch(function () {});
-      } else {
-        this._tweens[identifier].instance
-          .tween()
-          .then(function () {
-            if (that._tweens[identifier]) {
-              that._tweens[identifier].hasFinished = true;
-            }
-          })
-          .catch(function () {});
-      }
-    }
-
-    // Do nothing if the Promise is rejected. Rejection is used
-    // by Shifty.js to signal that the tween was not finished.
-    // We catch it to avoid an uncaught promise error, and to
-    // ensure that the content of the "then" is always applied:
     /**
      * Add an object variable tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param variable The object variable to store the tweened value
      * @param fromValue Start value
-     * @param toVaue End value
+     * @param toValue End value
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
@@ -185,44 +216,30 @@ namespace gdjs {
       identifier: string,
       variable: gdjs.Variable,
       fromValue: float,
-      toValue,
+      toValue: float,
       easingValue: string,
       durationValue: float,
       destroyObjectWhenFinished: boolean
     ) {
-      if (!this._isActive) {
-        return;
-      }
-      if (!!TweenRuntimeBehavior.easings[easingValue]) {
-        return;
-      }
-      if (this._tweenExists(identifier)) {
-        this.removeTween(identifier);
-      }
-      const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
-        this._runtimeScene
-      );
-      newTweenable.setConfig({
-        from: { value: fromValue },
-        to: { value: toValue },
-        duration: durationValue,
-        easing: easingValue,
-        step: function step(state) {
-          variable.setNumber(state.value);
-        },
-      });
       this._addTween(
         identifier,
-        newTweenable,
+        easingValue,
+        {
+          from: { value: fromValue },
+          to: { value: toValue },
+          duration: durationValue,
+          easing: easingValue,
+          render: (state) => variable.setNumber(state.value),
+        },
         this._runtimeScene.getTimeManager().getTimeFromStart(),
-        durationValue
+        durationValue,
+        destroyObjectWhenFinished
       );
-      this._setupTweenEnding(identifier, destroyObjectWhenFinished);
     }
 
     /**
      * Add an object position tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toX The target X position
      * @param toY The target Y position
      * @param easingValue Type of easing
@@ -237,41 +254,28 @@ namespace gdjs {
       durationValue: float,
       destroyObjectWhenFinished: boolean
     ) {
-      const that = this;
-      if (!this._isActive) {
-        return;
-      }
-      if (!!TweenRuntimeBehavior.easings[easingValue]) {
-        return;
-      }
-      if (this._tweenExists(identifier)) {
-        this.removeTween(identifier);
-      }
-      const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
-        this._runtimeScene
-      );
-      newTweenable.setConfig({
-        from: { x: this.owner.getX(), y: this.owner.getY() },
-        to: { x: toX, y: toY },
-        duration: durationValue,
-        easing: easingValue,
-        step: function step(state) {
-          that.owner.setX(state.x);
-          that.owner.setY(state.y);
-        },
-      });
       this._addTween(
         identifier,
-        newTweenable,
+        easingValue,
+        {
+          from: { x: this.owner.getX(), y: this.owner.getY() },
+          to: { x: toX, y: toY },
+          duration: durationValue,
+          easing: easingValue,
+          render: (state) => {
+            this.owner.setX(state.x);
+            this.owner.setY(state.y);
+          },
+        },
         this._runtimeScene.getTimeManager().getTimeFromStart(),
-        durationValue
+        durationValue,
+        destroyObjectWhenFinished
       );
-      this._setupTweenEnding(identifier, destroyObjectWhenFinished);
     }
 
     /**
      * Add an object X position tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toX The target X position
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -284,40 +288,25 @@ namespace gdjs {
       durationValue: float,
       destroyObjectWhenFinished: boolean
     ) {
-      const that = this;
-      if (!this._isActive) {
-        return;
-      }
-      if (!!TweenRuntimeBehavior.easings[easingValue]) {
-        return;
-      }
-      if (this._tweenExists(identifier)) {
-        this.removeTween(identifier);
-      }
-      const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
-        this._runtimeScene
-      );
-      newTweenable.setConfig({
-        from: { x: this.owner.getX() },
-        to: { x: toX },
-        duration: durationValue,
-        easing: easingValue,
-        step: function step(state) {
-          that.owner.setX(state.x);
-        },
-      });
       this._addTween(
         identifier,
-        newTweenable,
+        easingValue,
+        {
+          from: { x: this.owner.getX() },
+          to: { x: toX },
+          duration: durationValue,
+          easing: easingValue,
+          render: (state) => this.owner.setX(state.x),
+        },
         this._runtimeScene.getTimeManager().getTimeFromStart(),
-        durationValue
+        durationValue,
+        destroyObjectWhenFinished
       );
-      this._setupTweenEnding(identifier, destroyObjectWhenFinished);
     }
 
     /**
      * Add an object Y position tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toY The target Y position
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -330,40 +319,25 @@ namespace gdjs {
       durationValue: float,
       destroyObjectWhenFinished: boolean
     ) {
-      const that = this;
-      if (!this._isActive) {
-        return;
-      }
-      if (!!TweenRuntimeBehavior.easings[easingValue]) {
-        return;
-      }
-      if (this._tweenExists(identifier)) {
-        this.removeTween(identifier);
-      }
-      const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
-        this._runtimeScene
-      );
-      newTweenable.setConfig({
-        from: { y: this.owner.getY() },
-        to: { y: toY },
-        duration: durationValue,
-        easing: easingValue,
-        step: function step(state) {
-          that.owner.setY(state.y);
-        },
-      });
       this._addTween(
         identifier,
-        newTweenable,
+        easingValue,
+        {
+          from: { y: this.owner.getY() },
+          to: { y: toY },
+          duration: durationValue,
+          easing: easingValue,
+          render: (state) => this.owner.setY(state.y),
+        },
         this._runtimeScene.getTimeManager().getTimeFromStart(),
-        durationValue
+        durationValue,
+        destroyObjectWhenFinished
       );
-      this._setupTweenEnding(identifier, destroyObjectWhenFinished);
     }
 
     /**
      * Add an object angle tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toAngle The target angle
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -376,40 +350,27 @@ namespace gdjs {
       durationValue: float,
       destroyObjectWhenFinished: boolean
     ) {
-      const that = this;
-      if (!this._isActive) {
-        return;
-      }
-      if (!!TweenRuntimeBehavior.easings[easingValue]) {
-        return;
-      }
-      if (this._tweenExists(identifier)) {
-        this.removeTween(identifier);
-      }
-      const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
-        this._runtimeScene
-      );
-      newTweenable.setConfig({
-        from: { angle: this.owner.getAngle() },
-        to: { angle: toAngle },
-        duration: durationValue,
-        easing: easingValue,
-        step: function step(state) {
-          that.owner.setAngle(state.angle);
-        },
-      });
       this._addTween(
         identifier,
-        newTweenable,
+        easingValue,
+        {
+          from: { angle: this.owner.getAngle() },
+          to: { angle: toAngle },
+          duration: durationValue,
+          easing: easingValue,
+          render: (state) => {
+            this.owner.setAngle(state.angle);
+          },
+        },
         this._runtimeScene.getTimeManager().getTimeFromStart(),
-        durationValue
+        durationValue,
+        destroyObjectWhenFinished
       );
-      this._setupTweenEnding(identifier, destroyObjectWhenFinished);
     }
 
     /**
      * Add an object scale tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toScaleX The target X-scale
      * @param toScaleY The target Y-scale
      * @param easingValue Type of easing
@@ -426,72 +387,48 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean,
       scaleFromCenterOfObject: boolean
     ) {
-      const that = this;
-      if (!this._isActive) {
-        return;
-      }
-      // @ts-ignore
-      if (!this.owner.setScaleX || !this.owner.setScaleY) {
-        return;
-      }
-      if (!!TweenRuntimeBehavior.easings[easingValue]) {
-        return;
-      }
-      if (this._tweenExists(identifier)) {
-        this.removeTween(identifier);
-      }
-      if (toScaleX < 0) {
-        toScaleX = 0;
-      }
-      if (toScaleY < 0) {
-        toScaleY = 0;
-      }
-      const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
-        this._runtimeScene
-      );
-      let stepFunction;
-      if (scaleFromCenterOfObject) {
-        stepFunction = function step(state) {
-          const oldX = that.owner.getCenterXInScene();
-          const oldY = that.owner.getCenterYInScene();
-          // @ts-ignore - objects are duck typed
-          that.owner.setScaleX(state.scaleX);
-          // @ts-ignore - objects are duck typed
-          that.owner.setScaleY(state.scaleY);
-          that.owner.setCenterPositionInScene(oldX, oldY);
-        };
-      } else {
-        stepFunction = function step(state) {
-          // @ts-ignore - objects are duck typed
-          that.owner.setScaleX(state.scaleX);
-          // @ts-ignore - objects are duck typed
-          that.owner.setScaleY(state.scaleY);
-        };
-      }
-      newTweenable.setConfig({
-        from: {
-          // @ts-ignore - objects are duck typed
-          scaleX: this.owner.getScaleX(),
-          // @ts-ignore - objects are duck typed
-          scaleY: this.owner.getScaleY(),
-        },
-        to: { scaleX: toScaleX, scaleY: toScaleY },
-        duration: durationValue,
-        easing: easingValue,
-        step: stepFunction,
-      });
+      // Cast to IScaleable
+      if (!isScaleable(this.owner)) return;
+      const owner = this.owner;
+
+      if (toScaleX < 0) toScaleX = 0;
+      if (toScaleY < 0) toScaleY = 0;
+
+      const renderFunction = scaleFromCenterOfObject
+        ? (state) => {
+            const oldX = owner.getCenterXInScene();
+            const oldY = owner.getCenterYInScene();
+            owner.setScaleX(state.scaleX);
+            owner.setScaleY(state.scaleY);
+            owner.setCenterPositionInScene(oldX, oldY);
+          }
+        : (state) => {
+            owner.setScaleX(state.scaleX);
+            owner.setScaleY(state.scaleY);
+          };
+
       this._addTween(
         identifier,
-        newTweenable,
+        easingValue,
+        {
+          from: {
+            scaleX: owner.getScaleX(),
+            scaleY: owner.getScaleY(),
+          },
+          to: { scaleX: toScaleX, scaleY: toScaleY },
+          duration: durationValue,
+          easing: easingValue,
+          render: renderFunction,
+        },
         this._runtimeScene.getTimeManager().getTimeFromStart(),
-        durationValue
+        durationValue,
+        destroyObjectWhenFinished
       );
-      this._setupTweenEnding(identifier, destroyObjectWhenFinished);
     }
 
     /**
      * Add an object X-scale tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toScaleX The target X-scale
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -506,57 +443,37 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean,
       scaleFromCenterOfObject: boolean
     ) {
-      const that = this;
-      if (!this._isActive) {
-        return;
-      }
-      // @ts-ignore - objects are duck typed
-      if (!this.owner.setScaleX) {
-        return;
-      }
-      if (!!TweenRuntimeBehavior.easings[easingValue]) {
-        return;
-      }
-      if (this._tweenExists(identifier)) {
-        this.removeTween(identifier);
-      }
-      const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
-        this._runtimeScene
-      );
-      let stepFunction;
-      if (scaleFromCenterOfObject) {
-        stepFunction = function step(state) {
-          const oldX = that.owner.getCenterXInScene();
-          // @ts-ignore - objects are duck typed
-          that.owner.setScaleX(state.scaleX);
-          that.owner.setCenterXInScene(oldX);
-        };
-      } else {
-        stepFunction = function step(state) {
-          // @ts-ignore - objects are duck typed
-          that.owner.setScaleX(state.scaleX);
-        };
-      }
-      newTweenable.setConfig({
-        // @ts-ignore - objects are duck typed
-        from: { scaleX: this.owner.getScaleX() },
-        to: { scaleX: toScaleX },
-        duration: durationValue,
-        easing: easingValue,
-        step: stepFunction,
-      });
+      // Cast to IScaleable
+      if (!isScaleable(this.owner)) return;
+      const owner = this.owner;
+
+      const stepFunction = scaleFromCenterOfObject
+        ? (state) => {
+            const oldX = owner.getCenterXInScene();
+            owner.setScaleX(state.scaleX);
+            owner.setCenterXInScene(oldX);
+          }
+        : (state) => owner.setScaleX(state.scaleX);
+
       this._addTween(
         identifier,
-        newTweenable,
+        easingValue,
+        {
+          from: { scaleX: owner.getScaleX() },
+          to: { scaleX: toScaleX },
+          duration: durationValue,
+          easing: easingValue,
+          render: stepFunction,
+        },
         this._runtimeScene.getTimeManager().getTimeFromStart(),
-        durationValue
+        durationValue,
+        destroyObjectWhenFinished
       );
-      this._setupTweenEnding(identifier, destroyObjectWhenFinished);
     }
 
     /**
      * Add an object scale y tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toScaleY The target Y-scale
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -571,57 +488,37 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean,
       scaleFromCenterOfObject: boolean
     ) {
-      const that = this;
-      if (!this._isActive) {
-        return;
-      }
-      // @ts-ignore - objects are duck typed
-      if (!this.owner.setScaleY) {
-        return;
-      }
-      if (!!TweenRuntimeBehavior.easings[easingValue]) {
-        return;
-      }
-      if (this._tweenExists(identifier)) {
-        this.removeTween(identifier);
-      }
-      const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
-        this._runtimeScene
-      );
-      let stepFunction;
-      if (scaleFromCenterOfObject) {
-        stepFunction = function step(state) {
-          const oldY = that.owner.getCenterYInScene();
-          // @ts-ignore - objects are duck typed
-          that.owner.setScaleY(state.scaleY);
-          that.owner.setCenterYInScene(oldY);
-        };
-      } else {
-        stepFunction = function step(state) {
-          // @ts-ignore - objects are duck typed
-          that.owner.setScaleY(state.scaleY);
-        };
-      }
-      newTweenable.setConfig({
-        // @ts-ignore - objects are duck typed
-        from: { scaleY: this.owner.getScaleY() },
-        to: { scaleY: toScaleY },
-        duration: durationValue,
-        easing: easingValue,
-        step: stepFunction,
-      });
+      // Cast to IScaleable
+      if (!isScaleable(this.owner)) return;
+      const owner = this.owner;
+
+      const stepFunction = scaleFromCenterOfObject
+        ? (state) => {
+            const oldY = owner.getCenterYInScene();
+            owner.setScaleY(state.scaleY);
+            owner.setCenterYInScene(oldY);
+          }
+        : (state) => owner.setScaleY(state.scaleY);
+
       this._addTween(
         identifier,
-        newTweenable,
+        easingValue,
+        {
+          from: { scaleY: owner.getScaleY() },
+          to: { scaleY: toScaleY },
+          duration: durationValue,
+          easing: easingValue,
+          render: stepFunction,
+        },
         this._runtimeScene.getTimeManager().getTimeFromStart(),
-        durationValue
+        durationValue,
+        destroyObjectWhenFinished
       );
-      this._setupTweenEnding(identifier, destroyObjectWhenFinished);
     }
 
     /**
      * Add an object opacity tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toOpacity The target opacity
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -634,46 +531,30 @@ namespace gdjs {
       durationValue: float,
       destroyObjectWhenFinished: boolean
     ) {
-      const that = this;
-      if (!this._isActive) {
-        return;
-      }
-      // @ts-ignore - objects are duck typed
-      if (!this.owner.getOpacity || !this.owner.setOpacity) {
-        return;
-      }
-      if (!!TweenRuntimeBehavior.easings[easingValue]) {
-        return;
-      }
-      if (this._tweenExists(identifier)) {
-        this.removeTween(identifier);
-      }
-      const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
-        this._runtimeScene
-      );
-      newTweenable.setConfig({
-        // @ts-ignore - objects are duck typed
-        from: { opacity: this.owner.getOpacity() },
-        to: { opacity: toOpacity },
-        duration: durationValue,
-        easing: easingValue,
-        step: function step(state) {
-          // @ts-ignore - objects are duck typed
-          that.owner.setOpacity(state.opacity);
-        },
-      });
+      if (!isOpaque(this.owner)) return;
+      const owner = this.owner;
+
       this._addTween(
         identifier,
-        newTweenable,
+        easingValue,
+        {
+          from: { opacity: owner.getOpacity() },
+          to: { opacity: toOpacity },
+          duration: durationValue,
+          easing: easingValue,
+          render: (state) => {
+            owner.setOpacity(state.opacity);
+          },
+        },
         this._runtimeScene.getTimeManager().getTimeFromStart(),
-        durationValue
+        durationValue,
+        destroyObjectWhenFinished
       );
-      this._setupTweenEnding(identifier, destroyObjectWhenFinished);
     }
 
     /**
      * Add an object color tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toColorStr The target color
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -688,72 +569,52 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean,
       useHSLColorTransition: boolean
     ) {
-      const that = this;
-
-      if (!this._isActive) {
-        return;
-      }
-      // @ts-ignore - objects are duck typed
-      if (!this.owner.getColor || !this.owner.setColor) {
-        return;
-      }
       if (
+        !isColorable(this.owner) ||
         !toColorStr.match(
           '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]);){2}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'
         )
-      ) {
+      )
         return;
-      }
-      if (!!TweenRuntimeBehavior.easings[easingValue]) {
-        return;
-      }
-      if (this._tweenExists(identifier)) {
-        this.removeTween(identifier);
-      }
-      // @ts-ignore - objects are duck typed
-      const fromColor: string[] = this.owner.getColor().split(';');
-      const toColor: string[] = toColorStr.split(';');
-      if (toColor.length !== 3) {
-        return;
-      }
+      const owner = this.owner;
 
-      const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
-        this._runtimeScene
-      );
+      const rgbFromColor: string[] = this.owner.getColor().split(';');
+      const rgbToColor: string[] = toColorStr.split(';');
+      if (rgbToColor.length !== 3) return;
 
+      let config: shifty.tweenConfig;
       if (useHSLColorTransition) {
-        const fromColorAsHSL = rgbToHsl(
-          parseFloat(fromColor[0]),
-          parseFloat(fromColor[1]),
-          parseFloat(fromColor[2])
+        const hslFromColor = rgbToHsl(
+          parseFloat(rgbFromColor[0]),
+          parseFloat(rgbFromColor[1]),
+          parseFloat(rgbFromColor[2])
         );
-        const toColorAsHSL = rgbToHsl(
-          parseFloat(toColor[0]),
-          parseFloat(toColor[1]),
-          parseFloat(toColor[2])
+        const hslToColor = rgbToHsl(
+          parseFloat(rgbToColor[0]),
+          parseFloat(rgbToColor[1]),
+          parseFloat(rgbToColor[2])
         );
 
-        newTweenable.setConfig({
+        config = {
           from: {
-            hue: fromColorAsHSL[0],
-            saturation: fromColorAsHSL[1],
-            lightness: fromColorAsHSL[2],
+            hue: hslFromColor[0],
+            saturation: hslFromColor[1],
+            lightness: hslFromColor[2],
           },
           to: {
-            hue: toColorAsHSL[0],
-            saturation: toColorAsHSL[1],
-            lightness: toColorAsHSL[2],
+            hue: hslToColor[0],
+            saturation: hslToColor[1],
+            lightness: hslToColor[2],
           },
           duration: durationValue,
           easing: easingValue,
-          step: function step(state) {
+          render: (state) => {
             const rgbFromHslColor = hslToRgb(
               state.hue,
               state.saturation,
               state.lightness
             );
-            // @ts-ignore - objects are duck typed
-            that.owner.setColor(
+            owner.setColor(
               Math.floor(rgbFromHslColor[0]) +
                 ';' +
                 Math.floor(rgbFromHslColor[1]) +
@@ -761,16 +622,19 @@ namespace gdjs {
                 Math.floor(rgbFromHslColor[2])
             );
           },
-        });
+        };
       } else {
-        newTweenable.setConfig({
-          from: { red: fromColor[0], green: fromColor[1], blue: fromColor[2] },
-          to: { red: toColor[0], green: toColor[1], blue: toColor[2] },
+        config = {
+          from: {
+            red: rgbFromColor[0],
+            green: rgbFromColor[1],
+            blue: rgbFromColor[2],
+          },
+          to: { red: rgbToColor[0], green: rgbToColor[1], blue: rgbToColor[2] },
           duration: durationValue,
           easing: easingValue,
-          step: function step(state) {
-            // @ts-ignore - objects are duck typed
-            that.owner.setColor(
+          render: (state) => {
+            owner.setColor(
               Math.floor(state.red) +
                 ';' +
                 Math.floor(state.green) +
@@ -778,20 +642,22 @@ namespace gdjs {
                 Math.floor(state.blue)
             );
           },
-        });
+        };
       }
+
       this._addTween(
         identifier,
-        newTweenable,
+        easingValue,
+        config,
         this._runtimeScene.getTimeManager().getTimeFromStart(),
-        durationValue
+        durationValue,
+        destroyObjectWhenFinished
       );
-      this._setupTweenEnding(identifier, destroyObjectWhenFinished);
     }
 
     /**
      * Add an object color HSL tween, with the "to" color given using HSL (H: any number, S and L: 0-100).
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toHue The target hue, or the same as the from color's hue if blank
      * @param animateHue, include hue in calculations, as can't set this to -1 as default to ignore
      * @param toSaturation The target saturation, or the same as the from color's saturation if blank
@@ -810,88 +676,68 @@ namespace gdjs {
       durationValue: float,
       destroyObjectWhenFinished: boolean
     ) {
-      const that = this;
+      if (!isColorable(this.owner)) return;
+      const owner = this.owner;
 
-      if (!this._isActive) {
-        return;
-      }
-      // @ts-ignore - objects are duck typed
-      if (!this.owner.getColor || !this.owner.setColor) {
-        return;
-      }
-      if (!!TweenRuntimeBehavior.easings[easingValue]) {
-        return;
-      }
-
-      if (this._tweenExists(identifier)) {
-        this.removeTween(identifier);
-      }
-
-      // @ts-ignore - objects are duck typed
-      const fromColor: string[] = this.owner.getColor().split(';');
-      if (fromColor.length < 3) return;
-      const fromColorAsHSL = rgbToHsl(
-        parseFloat(fromColor[0]),
-        parseFloat(fromColor[1]),
-        parseFloat(fromColor[2])
+      const rgbFromColor: string[] = owner.getColor().split(';');
+      if (rgbFromColor.length < 3) return;
+      const hslFromColor = rgbToHsl(
+        parseFloat(rgbFromColor[0]),
+        parseFloat(rgbFromColor[1]),
+        parseFloat(rgbFromColor[2])
       );
 
-      const toH = animateHue ? toHue : fromColorAsHSL[0];
+      const toH = animateHue ? toHue : hslFromColor[0];
       const toS =
         -1 === toSaturation
-          ? fromColorAsHSL[1]
+          ? hslFromColor[1]
           : Math.min(Math.max(toSaturation, 0), 100);
       const toL =
         -1 === toLightness
-          ? fromColorAsHSL[2]
+          ? hslFromColor[2]
           : Math.min(Math.max(toLightness, 0), 100);
-
-      const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
-        this._runtimeScene
-      );
-
-      newTweenable.setConfig({
-        from: {
-          hue: fromColorAsHSL[0],
-          saturation: fromColorAsHSL[1],
-          lightness: fromColorAsHSL[2],
-        },
-        to: {
-          hue: toH,
-          saturation: toS,
-          lightness: toL,
-        },
-        duration: durationValue,
-        easing: easingValue,
-        step: function step(state) {
-          const rgbFromHslColor = hslToRgb(
-            state.hue,
-            state.saturation,
-            state.lightness
-          );
-          // @ts-ignore - objects are duck typed
-          that.owner.setColor(
-            Math.floor(rgbFromHslColor[0]) +
-              ';' +
-              Math.floor(rgbFromHslColor[1]) +
-              ';' +
-              Math.floor(rgbFromHslColor[2])
-          );
-        },
-      });
 
       this._addTween(
         identifier,
-        newTweenable,
+        easingValue,
+        {
+          from: {
+            hue: hslFromColor[0],
+            saturation: hslFromColor[1],
+            lightness: hslFromColor[2],
+          },
+          to: {
+            hue: toH,
+            saturation: toS,
+            lightness: toL,
+          },
+          duration: durationValue,
+          easing: easingValue,
+          render: (state) => {
+            const rgbFromHslColor = hslToRgb(
+              state.hue,
+              state.saturation,
+              state.lightness
+            );
+
+            owner.setColor(
+              Math.floor(rgbFromHslColor[0]) +
+                ';' +
+                Math.floor(rgbFromHslColor[1]) +
+                ';' +
+                Math.floor(rgbFromHslColor[2])
+            );
+          },
+        },
         this._runtimeScene.getTimeManager().getTimeFromStart(),
-        durationValue
+        durationValue,
+        destroyObjectWhenFinished
       );
-      this._setupTweenEnding(identifier, destroyObjectWhenFinished);
     }
 
     /**
      * Add a text object character size tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toSize The target character size
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -904,46 +750,30 @@ namespace gdjs {
       durationValue: float,
       destroyObjectWhenFinished: boolean
     ) {
-      const that = this;
-      if (!this._isActive) {
-        return;
-      }
-      // @ts-ignore - objects are duck typed
-      if (!this.owner.setCharacterSize) {
-        return;
-      }
-      if (!!TweenRuntimeBehavior.easings[easingValue]) {
-        return;
-      }
-      if (this._tweenExists(identifier)) {
-        this.removeTween(identifier);
-      }
-      const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
-        this._runtimeScene
-      );
-      newTweenable.setConfig({
-        // @ts-ignore - objects are duck typed
-        from: { size: this.owner.getCharacterSize() },
-        to: { size: toSize },
-        duration: durationValue,
-        easing: easingValue,
-        step: function step(state) {
-          // @ts-ignore - objects are duck typed
-          that.owner.setCharacterSize(state.size);
-        },
-      });
+      if (!isCharacterScaleable(this.owner)) return;
+      const owner = this.owner;
+
       this._addTween(
         identifier,
-        newTweenable,
+        easingValue,
+        {
+          from: { size: owner.getCharacterSize() },
+          to: { size: toSize },
+          duration: durationValue,
+          easing: easingValue,
+          render: function step(state) {
+            owner.setCharacterSize(state.size);
+          },
+        },
         this._runtimeScene.getTimeManager().getTimeFromStart(),
-        durationValue
+        durationValue,
+        destroyObjectWhenFinished
       );
-      this._setupTweenEnding(identifier, destroyObjectWhenFinished);
     }
 
     /**
      * Add an object width tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toWidth The target width
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -956,40 +786,27 @@ namespace gdjs {
       durationValue: float,
       destroyObjectWhenFinished: boolean
     ) {
-      const that = this;
-      if (!this._isActive) {
-        return;
-      }
-      if (!!TweenRuntimeBehavior.easings[easingValue]) {
-        return;
-      }
-      if (this._tweenExists(identifier)) {
-        this.removeTween(identifier);
-      }
-      const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
-        this._runtimeScene
-      );
-      newTweenable.setConfig({
-        from: { width: this.owner.getWidth() },
-        to: { width: toWidth },
-        duration: durationValue,
-        easing: easingValue,
-        step: function step(state) {
-          that.owner.setWidth(state.width);
-        },
-      });
       this._addTween(
         identifier,
-        newTweenable,
+        easingValue,
+        {
+          from: { width: this.owner.getWidth() },
+          to: { width: toWidth },
+          duration: durationValue,
+          easing: easingValue,
+          render: (state) => {
+            this.owner.setWidth(state.width);
+          },
+        },
         this._runtimeScene.getTimeManager().getTimeFromStart(),
-        durationValue
+        durationValue,
+        destroyObjectWhenFinished
       );
-      this._setupTweenEnding(identifier, destroyObjectWhenFinished);
     }
 
     /**
      * Add an object height tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toHeight The target height
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -1002,52 +819,35 @@ namespace gdjs {
       durationValue: float,
       destroyObjectWhenFinished: boolean
     ) {
-      const that = this;
-      if (!this._isActive) {
-        return;
-      }
-      if (!!TweenRuntimeBehavior.easings[easingValue]) {
-        return;
-      }
-      if (this._tweenExists(identifier)) {
-        this.removeTween(identifier);
-      }
-      const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
-        this._runtimeScene
-      );
-      newTweenable.setConfig({
-        from: { height: this.owner.getHeight() },
-        to: { height: toHeight },
-        duration: durationValue,
-        easing: easingValue,
-        step: function step(state) {
-          that.owner.setHeight(state.height);
-        },
-      });
       this._addTween(
         identifier,
-        newTweenable,
+        easingValue,
+        {
+          from: { height: this.owner.getHeight() },
+          to: { height: toHeight },
+          duration: durationValue,
+          easing: easingValue,
+          render: (state) => {
+            this.owner.setHeight(state.height);
+          },
+        },
         this._runtimeScene.getTimeManager().getTimeFromStart(),
-        durationValue
+        durationValue,
+        destroyObjectWhenFinished
       );
-      this._setupTweenEnding(identifier, destroyObjectWhenFinished);
     }
 
     /**
      * Tween is playing.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      */
     isPlaying(identifier: string): boolean {
-      if (this._tweenExists(identifier) && this._tweenIsPlaying(identifier)) {
-        return true;
-      } else {
-        return false;
-      }
+      return this._tweenExists(identifier) && this._tweenIsPlaying(identifier);
     }
 
     /**
      * Tween exists.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @returns The tween exists
      */
     exists(identifier: string): boolean {
@@ -1056,71 +856,76 @@ namespace gdjs {
 
     /**
      * Tween has finished.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      */
     hasFinished(identifier: string): boolean {
-      if (this._tweenExists(identifier)) {
-        return this._tweenHasFinished(identifier);
-      } else {
-        return false;
-      }
+      return (
+        this._tweenExists(identifier) && this._tweenHasFinished(identifier)
+      );
     }
 
     /**
      * Pause a tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      */
     pauseTween(identifier: string) {
-      if (!this._isActive) {
-        return;
-      }
-      if (this._tweenExists(identifier) && this._tweenIsPlaying(identifier)) {
+      if (
+        this._isActive &&
+        this._tweenExists(identifier) &&
+        this._tweenIsPlaying(identifier)
+      )
         this._pauseTween(identifier);
-      }
     }
 
     /**
      * Stop a tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param jumpToDest Move to destination
      */
     stopTween(identifier: string, jumpToDest: boolean) {
-      if (!this._isActive) {
-        return;
-      }
-      if (this._tweenExists(identifier) && this._tweenIsPlaying(identifier)) {
+      if (
+        this._isActive &&
+        this._tweenExists(identifier) &&
+        this._tweenIsPlaying(identifier)
+      )
         this._stopTween(identifier, jumpToDest);
-      }
     }
 
     /**
      * Resume a tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      */
     resumeTween(identifier: string) {
-      if (!this._isActive) {
-        return;
-      }
-      if (this._tweenExists(identifier) && !this._tweenIsPlaying(identifier)) {
+      if (
+        this._isActive &&
+        this._tweenExists(identifier) &&
+        !this._tweenIsPlaying(identifier)
+      )
         this._resumeTween(identifier);
-      }
     }
 
     /**
      * Remove a tween.
-     * @param identifierFirst Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      */
-    removeTween(identifier) {
-      this._removeTween(identifier);
+    removeTween(identifier: string) {
+      if (!this._tweenExists(identifier)) return;
+
+      this._tweens[identifier].instance.stop();
+      if (this._runtimeScene.shiftyJsScene)
+        this._runtimeScene.shiftyJsScene.remove(
+          this._tweens[identifier].instance
+        );
+      delete this._tweens[identifier];
     }
 
     /**
      * Get tween progress.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @returns Progress of playing tween animation (between 0.0 and 1.0)
      */
     getProgress(identifier: string): float {
-      const tween = this._getTween(identifier);
+      const tween = this._tweens[identifier];
       if (tween) {
         const currentTime = this._runtimeScene
           .getTimeManager()
@@ -1166,41 +971,6 @@ namespace gdjs {
       this._isActive = true;
     }
 
-    /**
-     * Static function to create a Tweenable associated to a scene.
-     * Don't create manually shifty.Tweenable, otherwise they won't be
-     * associated to a scene (and will play even when scene is paused).
-     *
-     * @returns The new tweenable
-     */
-    static makeNewTweenable(runtimeScene: gdjs.RuntimeScene): shifty.Tweenable {
-      // @ts-ignore - shiftyJsScene is added to runtime scene.
-      if (!runtimeScene.shiftyJsScene) {
-        // @ts-ignore - shiftyJsScene is added to runtime scene.
-        runtimeScene.shiftyJsScene = new shifty.Scene();
-      }
-      const tweenable = new shifty.Tweenable();
-      // @ts-ignore - shiftyJsScene is added to runtime scene.
-      runtimeScene.shiftyJsScene.add(tweenable);
-      return tweenable;
-    }
-
-    /**
-     * Static function to remove a Tweenable from a scene.
-     *
-     */
-    static removeFromScene(
-      runtimeScene: gdjs.RuntimeScene,
-      tweenable: shifty.Tweenable
-    ) {
-      // @ts-ignore - shiftyJsScene is added to runtime scene.
-      if (!runtimeScene.shiftyJsScene) {
-        return;
-      }
-      // @ts-ignore - shiftyJsScene is added to runtime scene.
-      runtimeScene.shiftyJsScene.remove(tweenable);
-    }
-
     static easings = [
       'linear',
       'easeInQuad',
@@ -1239,7 +1009,6 @@ namespace gdjs {
       'easeTo',
     ];
 
-    static _tweensProcessed = false;
     static _currentTweenTime = 0;
   }
   gdjs.registerBehavior('Tween::TweenBehavior', gdjs.TweenRuntimeBehavior);
@@ -1275,80 +1044,4 @@ namespace gdjs {
       }
     }
   }
-
-  // Callbacks called to pause/resume Shifty scene when a gdjs.RuntimeScene
-  // is paused/resumed
-
-  /**
-   * Stop and "destroy" all the tweens when a scene is unloaded.
-   */
-  gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
-    // @ts-ignore - shiftyJsScene is added to runtime scene.
-    const shiftyJsScene = runtimeScene.shiftyJsScene;
-    if (!shiftyJsScene) {
-      return;
-    }
-
-    // Stop and explictly remove all tweenables to be sure to drop
-    // all references to the tweenables of the scene.
-    shiftyJsScene.stop(false);
-    shiftyJsScene.tweenables.forEach(shiftyJsScene.remove.bind(shiftyJsScene));
-  });
-
-  /**
-   * When a scene is paused, pause all the tweens of this scene.
-   */
-  gdjs.registerRuntimeScenePausedCallback(function (runtimeScene) {
-    // @ts-ignore - shiftyJsScene is added to runtime scene.
-    const shiftyJsScene = runtimeScene.shiftyJsScene;
-    if (!shiftyJsScene) {
-      return;
-    }
-    shiftyJsScene.pause();
-  });
-
-  /**
-   * When a scene is paused, resume all the tweens of this scene.
-   */
-  gdjs.registerRuntimeSceneResumedCallback(function (runtimeScene) {
-    // @ts-ignore - shiftyJsScene is added to runtime scene.
-    const shiftyJsScene = runtimeScene.shiftyJsScene;
-    if (!shiftyJsScene) {
-      return;
-    }
-
-    // It is important to set immediately the current Shifty time back to the
-    // time of the scene, as the call `resume` will process the tweens.
-    // (If not done, tweens will be resumed with the time of the previous
-    // scene, that could create weird result/make tweens act as if not paused).
-    TweenRuntimeBehavior._currentTweenTime = runtimeScene
-      .getTimeManager()
-      .getTimeFromStart();
-
-    // Note that per the invariant of shiftyJsScene, shiftyJsScene will only
-    // contains tweenables that should be playing (so calling resume is safe).
-    shiftyJsScene.resume();
-  });
-
-  // Handle Shifty.js updates (the time and the "tick" of tweens
-  // is controlled by the behavior)
-  gdjs.registerRuntimeScenePreEventsCallback(function (runtimeScene) {
-    TweenRuntimeBehavior._currentTweenTime = runtimeScene
-      .getTimeManager()
-      .getTimeFromStart();
-    shifty.processTweens();
-  });
-
-  // Set up Shifty.js so that the processing ("tick"/updates) is handled
-  // by the behavior, once per frame. See above.
-  shifty.Tweenable.setScheduleFunction(function () {
-    /* Do nothing, we'll call processTweens manually. */
-  });
-
-  // Set up Shifty.js so that the time is handled by the behavior.
-  // It will be set to be the time of the current scene, and should be updated
-  // before any tween processing (processTweens, resume).
-  shifty.Tweenable.now = function () {
-    return TweenRuntimeBehavior._currentTweenTime;
-  };
 }

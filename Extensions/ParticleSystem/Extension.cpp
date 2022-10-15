@@ -11,8 +11,8 @@ This project is released under the MIT License.
 #include "ExtensionSubDeclaration2.h"
 #include "ExtensionSubDeclaration3.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/Tools/Localization.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
+#include "GDCore/Tools/Localization.h"
 #include "ParticleEmitterObject.h"
 
 void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
@@ -25,18 +25,22 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
           "explosions, magical effects, etc...",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetCategory("Visual effect")
       .SetExtensionHelpPath("/objects/particles_emitter");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Particle system"))
+      .SetIcon("CppPlatform/Extensions/particleSystemicon.png");
 
   // Declaration of all objects available
   {
-    gd::ObjectMetadata& obj = extension.AddObject<ParticleEmitterObject>(
-        "ParticleEmitter",
-        _("Particles emitter"),
-        _("Displays a large number of small particles to create visual "
-          "effects."),
-        "CppPlatform/Extensions/particleSystemicon.png");
-
-    obj.SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+    gd::ObjectMetadata& obj =
+        extension
+            .AddObject<ParticleEmitterObject>(
+                "ParticleEmitter",
+                _("Particles emitter"),
+                _("Displays a large number of small particles to create visual "
+                  "effects."),
+                "CppPlatform/Extensions/particleSystemicon.png")
+            .SetCategoryFullName(_("Visual effect"));
 
     // Declaration is too big to be compiled by GCC in one file, unless you have
     // 4GB+ ram. :/

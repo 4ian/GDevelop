@@ -16,6 +16,7 @@ import {
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Text from '../UI/Text';
 import BackgroundText from '../UI/BackgroundText';
+import EmptyMessage from '../UI/EmptyMessage';
 
 type ContributionLineProps = {|
   fullName: string,
@@ -69,17 +70,24 @@ export const ExamplesAccordion = ({
         </Text>
       </AccordionHeader>
       <AccordionBody disableGutters>
-        <Column>
-          {examples.map(example => (
-            <ContributionLine
-              shortDescription={example.shortDescription}
-              fullName={example.name}
-              previewIconUrl={
-                example.previewImageUrls ? example.previewImageUrls[0] : ''
-              }
-            />
-          ))}
-        </Column>
+        {examples.length === 0 ? (
+          <EmptyMessage>
+            <Trans>You haven't contributed any examples</Trans>
+          </EmptyMessage>
+        ) : (
+          <Column>
+            {examples.map(example => (
+              <ContributionLine
+                key={example.name}
+                shortDescription={example.shortDescription}
+                fullName={example.name}
+                previewIconUrl={
+                  example.previewImageUrls ? example.previewImageUrls[0] : ''
+                }
+              />
+            ))}
+          </Column>
+        )}
       </AccordionBody>
     </Accordion>
   );
@@ -113,15 +121,22 @@ export const ExtensionsAccordion = ({
         </Text>
       </AccordionHeader>
       <AccordionBody disableGutters>
-        <Column>
-          {extensions.map(extension => (
-            <ContributionLine
-              shortDescription={extension.shortDescription}
-              fullName={extension.fullName}
-              previewIconUrl={extension.previewIconUrl}
-            />
-          ))}
-        </Column>
+        {extensions.length === 0 ? (
+          <EmptyMessage>
+            <Trans>You haven't contributed any extensions</Trans>
+          </EmptyMessage>
+        ) : (
+          <Column>
+            {extensions.map(extension => (
+              <ContributionLine
+                key={extension.name}
+                shortDescription={extension.shortDescription}
+                fullName={extension.fullName}
+                previewIconUrl={extension.previewIconUrl}
+              />
+            ))}
+          </Column>
+        )}
       </AccordionBody>
     </Accordion>
   );
@@ -133,7 +148,7 @@ type AssetsAccordionProps = {|
 |};
 
 const AssetsAccordion = ({ examples }: AssetsAccordionProps) => (
-  <Accordion>
+  <Accordion disabled>
     <AccordionHeader>
       <Text displayInlineAsSpan>
         <Trans>Assets (coming soon!)</Trans>
@@ -146,7 +161,7 @@ type Props = {|
   userId: string,
 |};
 
-export default ({ userId }: Props) => {
+const ContributionDetails = ({ userId }: Props) => {
   const [
     extensions,
     setExtensions,
@@ -207,7 +222,7 @@ export default ({ userId }: Props) => {
     <>
       <Column>
         <Line alignItems="center">
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Contributions</Trans>
           </Text>
         </Line>
@@ -237,3 +252,5 @@ export default ({ userId }: Props) => {
     </>
   );
 };
+
+export default ContributionDetails;

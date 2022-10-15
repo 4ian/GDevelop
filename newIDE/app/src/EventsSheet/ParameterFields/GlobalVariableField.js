@@ -62,12 +62,15 @@ export default class GlobalVariableField extends React.Component<
               this.setState({ editorOpen: false });
               if (this._field) this._field.updateAutocompletions();
             }}
-            emptyExplanationMessage={
+            emptyPlaceholderTitle={
+              <Trans>Add your first global variable</Trans>
+            }
+            emptyPlaceholderDescription={
               <Trans>
-                Global variables are variables that are persisted across the
-                scenes during the game.
+                These variables hold additional information on a project.
               </Trans>
             }
+            helpPagePath={'/all-features/variables/global-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
           />
         )}

@@ -13,6 +13,12 @@ namespace gdjs {
 MathematicalToolsExtension::MathematicalToolsExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(*this);
 
+  GetAllExpressions()["Random"].SetFunctionName("gdjs.random");
+  GetAllExpressions()["RandomInRange"].SetFunctionName("gdjs.randomInRange");
+  GetAllExpressions()["RandomFloat"].SetFunctionName("gdjs.randomFloat");
+  GetAllExpressions()["RandomFloatInRange"].SetFunctionName(
+      "gdjs.randomFloatInRange");
+  GetAllExpressions()["RandomWithStep"].SetFunctionName("gdjs.randomWithStep");
   GetAllExpressions()["normalize"].SetFunctionName("gdjs.evtTools.common.normalize");
   GetAllExpressions()["clamp"].SetFunctionName("gdjs.evtTools.common.clamp");
   GetAllExpressions()["cos"].SetFunctionName("Math.cos");
@@ -31,7 +37,9 @@ MathematicalToolsExtension::MathematicalToolsExtension() {
   GetAllExpressions()["atanh"].SetFunctionName("gdjs.evtTools.common.atanh");
   GetAllExpressions()["cbrt"].SetFunctionName("gdjs.evtTools.common.cbrt");
   GetAllExpressions()["ceil"].SetFunctionName("Math.ceil");
+  GetAllExpressions()["ceilTo"].SetFunctionName("gdjs.evtTools.common.ceilTo");
   GetAllExpressions()["floor"].SetFunctionName("Math.floor");
+  GetAllExpressions()["floorTo"].SetFunctionName("gdjs.evtTools.common.floorTo");
   GetAllExpressions()["cosh"].SetFunctionName("gdjs.evtTools.common.cosh");
   GetAllExpressions()["sinh"].SetFunctionName("gdjs.evtTools.common.sinh");
   GetAllExpressions()["tanh"].SetFunctionName("gdjs.evtTools.common.tanh");
@@ -57,10 +65,12 @@ MathematicalToolsExtension::MathematicalToolsExtension() {
   GetAllExpressions()["int"].SetFunctionName("Math.round");
   GetAllExpressions()["rint"].SetFunctionName("Math.round");
   GetAllExpressions()["round"].SetFunctionName("Math.round");
+  GetAllExpressions()["roundTo"].SetFunctionName("gdjs.evtTools.common.roundTo");
   GetAllExpressions()["trunc"].SetFunctionName("gdjs.evtTools.common.trunc");
   GetAllExpressions()["lerp"].SetFunctionName("gdjs.evtTools.common.lerp");
   GetAllExpressions()["XFromAngleAndDistance"].SetFunctionName("gdjs.evtTools.common.getXFromAngleAndDistance");
   GetAllExpressions()["YFromAngleAndDistance"].SetFunctionName("gdjs.evtTools.common.getYFromAngleAndDistance");
+  GetAllExpressions()["Pi"].SetFunctionName("gdjs.evtTools.common.pi");
 
   StripUnimplementedInstructionsAndExpressions();
 }

@@ -36,10 +36,15 @@ const styles = {
 export default class GroupEvent extends React.Component<EventRendererProps, *> {
   state = {
     editing: false,
+    editingPreviousValue: null,
   };
   _textField: ?TextField = null;
 
   edit = () => {
+    const groupEvent = gd.asGroupEvent(this.props.event);
+    if (!this.state.editingPreviousValue) {
+      this.setState({ editingPreviousValue: groupEvent.getName() });
+    }
     this.setState(
       {
         editing: true,
@@ -54,6 +59,11 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
     this.setState({
       editing: false,
     });
+    const groupEvent = gd.asGroupEvent(this.props.event);
+    if (groupEvent.getName() !== this.state.editingPreviousValue) {
+      this.props.onEndEditingEvent();
+      this.setState({ editingPreviousValue: null });
+    }
   };
 
   render() {
@@ -87,7 +97,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
           <TextField
             ref={textField => (this._textField = textField)}
             value={groupEvent.getName()}
-            hintText={t`<Enter group name>`}
+            translatableHintText={t`<Enter group name>`}
             onBlur={this.endEditing}
             onChange={(e, text) => {
               groupEvent.setName(text);

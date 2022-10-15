@@ -1,11 +1,11 @@
 // @flow
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 import { type FileMetadata } from '../index';
-import { unsplit } from '../../Utils/ObjectSplitter.js';
+import { unsplit } from '../../Utils/ObjectSplitter';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
-const electron = optionalRequire('electron');
-const dialog = electron ? electron.remote.dialog : null;
+const remote = optionalRequire('@electron/remote');
+const dialog = remote ? remote.dialog : null;
 
 const readJSONFile = (filepath: string): Promise<Object> => {
   if (!fs) return Promise.reject('Filesystem is not supported.');
@@ -26,7 +26,7 @@ const readJSONFile = (filepath: string): Promise<Object> => {
 
 export const onOpenWithPicker = (): Promise<?FileMetadata> => {
   if (!dialog) return Promise.reject('Not supported');
-  const browserWindow = electron.remote.getCurrentWindow();
+  const browserWindow = remote.getCurrentWindow();
 
   return dialog
     .showOpenDialog(browserWindow, {

@@ -25,6 +25,7 @@ import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import StringArrayEditor from '../StringArrayEditor';
 import ColorField from '../UI/ColorField';
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
+import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 
 const gd: libGDevelop = global.gd;
 
@@ -123,12 +124,29 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
 
   _setChoiceExtraInfo = (property: gdNamedPropertyDescriptor) => {
     return (newExtraInfo: Array<string>) => {
+      const defaultValueIndex = getExtraInfoArray(property).indexOf(
+        property.getValue()
+      );
       const vectorString = new gd.VectorString();
       newExtraInfo.forEach(item => vectorString.push_back(item));
       property.setExtraInfo(vectorString);
       vectorString.delete();
+      property.setValue(newExtraInfo[defaultValueIndex] || '');
       this.forceUpdate();
     };
+  };
+
+  _getPropertyGroupNames = (): Array<string> => {
+    const { eventsBasedBehavior } = this.props;
+    const properties = eventsBasedBehavior.getPropertyDescriptors();
+
+    const groupNames = new Set<string>();
+    for (let i = 0; i < properties.size(); i++) {
+      const property = properties.at(i);
+      const group = property.getGroup() || '';
+      groupNames.add(group);
+    }
+    return [...groupNames].sort((a, b) => a.localeCompare(b));
   };
 
   render() {
@@ -139,7 +157,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
     return (
       <I18n>
         {({ i18n }) => (
-          <Column noMargin>
+          <Column noMargin expand>
             <Line noMargin>
               <div style={styles.propertiesContainer}>
                 {mapVector(
@@ -151,7 +169,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                           <SemiControlledTextField
                             margin="none"
                             commitOnBlur
-                            hintText={t`Enter the property name`}
+                            translatableHintText={t`Enter the property name`}
                             value={property.getName()}
                             onChange={newName => {
                               if (newName === property.getName()) return;
@@ -188,6 +206,11 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                           }}
                           checkedIcon={<Visibility />}
                           uncheckedIcon={<VisibilityOff />}
+                          disabled={
+                            property.getType() === 'Behavior' &&
+                            // Allow to make it visible just in case.
+                            !property.isHidden()
+                          }
                         />
                         <ElementWithMenu
                           element={
@@ -223,6 +246,9 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                               value={property.getType()}
                               onChange={(e, i, value: string) => {
                                 property.setType(value);
+                                if (value === 'Behavior') {
+                                  property.setHidden(false);
+                                }
                                 this.forceUpdate();
                                 this.props.onPropertiesUpdated();
                               }}
@@ -320,6 +346,28 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                 disabled={false}
                               />
                             )}
+                            {property.getType() === 'Choice' && (
+                              <SelectField
+                                floatingLabelText={<Trans>Default value</Trans>}
+                                value={property.getValue()}
+                                onChange={(e, i, value) => {
+                                  property.setValue(value);
+                                  this.forceUpdate();
+                                  this.props.onPropertiesUpdated();
+                                }}
+                                fullWidth
+                              >
+                                {getExtraInfoArray(property).map(
+                                  (choice, index) => (
+                                    <SelectOption
+                                      key={index}
+                                      value={choice}
+                                      primaryText={choice}
+                                    />
+                                  )
+                                )}
+                              </SelectField>
+                            )}
                           </ResponsiveLineStackLayout>
                           {property.getType() === 'Choice' && (
                             <StringArrayEditor
@@ -340,16 +388,46 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                               }}
                             />
                           )}
+                          <ResponsiveLineStackLayout noMargin>
+                            <SemiControlledTextField
+                              commitOnBlur
+                              floatingLabelText={<Trans>Short label</Trans>}
+                              translatableHintText={t`Make the purpose of the property easy to understand`}
+                              floatingLabelFixed
+                              value={property.getLabel()}
+                              onChange={text => {
+                                property.setLabel(text);
+                                this.forceUpdate();
+                              }}
+                              fullWidth
+                            />
+                            <SemiControlledAutoComplete
+                              floatingLabelText={<Trans>Group name</Trans>}
+                              hintText={t`Leave it empty to use the default group`}
+                              fullWidth
+                              value={property.getGroup()}
+                              onChange={text => {
+                                property.setGroup(text);
+                                this.forceUpdate();
+                                this.props.onPropertiesUpdated();
+                              }}
+                              dataSource={this._getPropertyGroupNames().map(
+                                name => ({
+                                  text: name,
+                                  value: name,
+                                })
+                              )}
+                              openOnFocus={true}
+                            />
+                          </ResponsiveLineStackLayout>
                           <SemiControlledTextField
                             commitOnBlur
-                            floatingLabelText={
-                              <Trans>Label, shown in the editor</Trans>
-                            }
-                            hintText={t`This should make the purpose of the property easy to understand`}
+                            floatingLabelText={<Trans>Description</Trans>}
+                            translatableHintText={t`Optionally, explain the purpose of the property in more details`}
                             floatingLabelFixed
-                            value={property.getLabel()}
+                            value={property.getDescription()}
                             onChange={text => {
-                              property.setLabel(text);
+                              property.setDescription(text);
                               this.forceUpdate();
                             }}
                             fullWidth

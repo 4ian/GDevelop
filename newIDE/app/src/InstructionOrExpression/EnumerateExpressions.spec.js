@@ -6,13 +6,13 @@ import {
   enumerateBehaviorExpressions,
   enumerateAllExpressions,
 } from './EnumerateExpressions';
-import { createTree } from './CreateTree';
+import { createTree, type TreeNode } from './CreateTree';
 import { makeTestExtensions } from '../fixtures/TestExtensions';
-import { type EnumeratedExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata';
 const gd: libGDevelop = global.gd;
 
 describe('EnumerateExpressions', () => {
-  it('can enumerate and filter free expressions', () => {
+  it('can enumerate and filter free expressions (number only)', () => {
     const freeExpressions = enumerateFreeExpressions('number');
 
     // Should find atan, atan2, atanh math function
@@ -24,8 +24,9 @@ describe('EnumerateExpressions', () => {
     expect(filterExpressions(freeExpressions, 'MouseX')).toHaveLength(1);
     expect(filterExpressions(freeExpressions, 'MouseY')).toHaveLength(1);
   });
-  it('can enumerate and filter free expressions (type "number|string")', () => {
-    const freeExpressions = enumerateFreeExpressions('number|string');
+
+  it('can enumerate and filter free expressions', () => {
+    const freeExpressions = enumerateFreeExpressions('string');
 
     // Should find ToString and LargeNumberToString:
     expect(filterExpressions(freeExpressions, 'ToString')).toHaveLength(2);
@@ -40,7 +41,7 @@ describe('EnumerateExpressions', () => {
     expect(filterExpressions(freeExpressions, 'MouseY')).toHaveLength(1);
   });
 
-  it('can enumerate and filter object expressions', () => {
+  it('can enumerate and filter object expressions (number only)', () => {
     const spriteObjectExpressions = enumerateObjectExpressions(
       'number',
       'Sprite'
@@ -58,9 +59,9 @@ describe('EnumerateExpressions', () => {
     );
   });
 
-  it('can enumerate and filter object expressions (type "number|string")', () => {
+  it('can enumerate object expressions', () => {
     const spriteObjectExpressions = enumerateObjectExpressions(
-      'number|string',
+      'string',
       'Sprite'
     );
     expect(filterExpressions(spriteObjectExpressions, 'PointX')).toHaveLength(
@@ -70,7 +71,7 @@ describe('EnumerateExpressions', () => {
       filterExpressions(spriteObjectExpressions, 'AnimationName')
     ).toHaveLength(1);
 
-    const objectExpressions = enumerateObjectExpressions('number|string', '');
+    const objectExpressions = enumerateObjectExpressions('string', '');
     expect(filterExpressions(objectExpressions, 'PointX')).toHaveLength(0);
     expect(filterExpressions(objectExpressions, 'Layer')).toHaveLength(1);
     expect(filterExpressions(objectExpressions, 'X')).toContainEqual(
@@ -80,7 +81,7 @@ describe('EnumerateExpressions', () => {
     );
   });
 
-  it('can enumerate and filter behavior expressions', () => {
+  it('can enumerate and filter behavior expressions (number only)', () => {
     const platformerObjectBehaviorExpressions = enumerateBehaviorExpressions(
       'number',
       'PlatformBehavior::PlatformerObjectBehavior'
@@ -103,10 +104,11 @@ describe('EnumerateExpressions', () => {
       })
     );
   });
-  it('can enumerate and filter behavior expressions (type "number|string")', () => {
+
+  it('can enumerate behavior expressions', () => {
     makeTestExtensions(gd);
     const fakeBehaviorExpressions = enumerateBehaviorExpressions(
-      'number|string',
+      'string',
       'FakeBehavior::FakeBehavior'
     );
 
@@ -145,7 +147,7 @@ describe('EnumerateExpressions', () => {
     });
   });
 
-  it('can enumerate all expressions (type "number")', () => {
+  it('can enumerate all expressions (number only)', () => {
     makeTestExtensions(gd);
     const allNumberExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
       'number'
@@ -173,38 +175,10 @@ describe('EnumerateExpressions', () => {
     ).toHaveLength(0);
   });
 
-  it('can enumerate all expressions (type "string")', () => {
-    makeTestExtensions(gd);
-    const allStringExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'string'
-    );
-    // Check a free expression:
-    expect(allStringExpressions).toContainEqual(
-      expect.objectContaining({
-        type: 'ToString',
-      })
-    );
-    // Check a behavior expression:
-    expect(allStringExpressions).toContainEqual(
-      expect.objectContaining({
-        type: 'SomethingReturningStringWith1NumberParam',
-      })
-    );
-
-    // Sanity check number expressions are not there:
-    expect(filterExpressions(allStringExpressions, 'ToNumber')).toHaveLength(0);
-    expect(
-      filterExpressions(
-        allStringExpressions,
-        'SomethingReturningNumberWith1NumberParam'
-      )
-    ).toHaveLength(0);
-  });
-
-  it('can enumerate all expressions (type "number|string")', () => {
+  it('can enumerate all expressions', () => {
     makeTestExtensions(gd);
     const allExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'number|string'
+      'string'
     );
     // Check a free expression:
     expect(allExpressions).toContainEqual(
@@ -237,11 +211,15 @@ describe('EnumerateExpressions', () => {
     const allExpressionsTree = createTree(allExpressions);
 
     // Check that some free expressions are there
-    expect(allExpressionsTree).toMatchObject({
-      Time: {
+    expect(allExpressionsTree).toHaveProperty('General');
+    const generalTreeNode: TreeNode<EnumeratedExpressionMetadata> =
+      // $FlowFixMe
+      allExpressionsTree['General'];
+    expect(generalTreeNode).toMatchObject({
+      'Timers and time': {
         'Current time': {
           displayedName: 'Current time',
-          fullGroupName: 'Time',
+          fullGroupName: 'General/Timers and time',
           iconFilename: 'res/actions/time.png',
           isPrivate: false,
           name: 'Time',
@@ -255,18 +233,16 @@ describe('EnumerateExpressions', () => {
     });
 
     // Check that some base object expressions are there
-    expect(allExpressionsTree).toHaveProperty(
-      'Common expressions for all objects'
-    );
+    expect(generalTreeNode).toHaveProperty('Objects');
     expect(
       // $FlowFixMe
-      allExpressionsTree['Common expressions for all objects']
+      generalTreeNode['Objects']
     ).toMatchObject({
       Angle: {
         Angle: {
           displayedName: 'Angle',
-          fullGroupName: 'Common expressions for all objects/Angle',
-          iconFilename: 'res/actions/direction.png',
+          fullGroupName: 'General/Objects/Angle',
+          iconFilename: 'res/actions/direction_black.png',
           isPrivate: false,
           name: 'Angle',
           scope: {
@@ -278,14 +254,14 @@ describe('EnumerateExpressions', () => {
     });
 
     // Check that some Sprite object expressions are there
-    expect(allExpressionsTree).toHaveProperty('Sprite');
+    expect(generalTreeNode).toHaveProperty('Sprite');
     // $FlowFixMe
-    expect(allExpressionsTree['Sprite']).toMatchObject({
+    expect(generalTreeNode['Sprite']).toMatchObject({
       Position: {
         'X position of a point': {
           displayedName: 'X position of a point',
-          fullGroupName: 'Sprite/Position',
-          iconFilename: 'res/actions/position.png',
+          fullGroupName: 'General/Sprite/Position',
+          iconFilename: 'res/actions/position_black.png',
           isPrivate: false,
           name: 'PointX',
           scope: {
@@ -297,14 +273,17 @@ describe('EnumerateExpressions', () => {
     });
 
     // Check that some behavior expressions are there
-    expect(allExpressionsTree).toHaveProperty('Platform Behavior');
+    const movementTreeNode: TreeNode<EnumeratedExpressionMetadata> =
+      // $FlowFixMe
+      allExpressionsTree['Movement'];
+    expect(movementTreeNode).toHaveProperty('Platform behavior');
     // $FlowFixMe
-    expect(allExpressionsTree['Platform Behavior']).toMatchObject({
+    expect(movementTreeNode['Platform behavior']).toMatchObject({
       Options: {
-        'Maximum speed': {
-          displayedName: 'Maximum speed',
-          fullGroupName: 'Platform Behavior/Options',
-          iconFilename: 'CppPlatform/Extensions/platformerobjecticon16.png',
+        'Maximum horizontal speed': {
+          displayedName: 'Maximum horizontal speed',
+          fullGroupName: 'Movement/Platform behavior/Options',
+          iconFilename: 'CppPlatform/Extensions/platformerobjecticon.png',
           isPrivate: false,
           name: 'MaxSpeed',
           scope: {

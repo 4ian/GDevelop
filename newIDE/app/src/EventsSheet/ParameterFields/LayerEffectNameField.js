@@ -16,8 +16,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function LayerEffectNameField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?GenericExpressionField>(null);
     React.useImperativeHandle(ref, () => ({
-      focus: () => {
-        if (field.current) field.current.focus();
+      focus: (selectAll: boolean = false) => {
+        if (field.current) field.current.focus(selectAll);
       },
     }));
 

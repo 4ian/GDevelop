@@ -33,7 +33,11 @@ module.exports = {
         'Florian Rival, Franco Maciel',
         'MIT'
       )
-      .setExtensionHelpPath('/behaviors/physics2');
+      .setExtensionHelpPath('/behaviors/physics2')
+      .setCategory('Movement');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Physics Engine 2.0'))
+      .setIcon('res/physics32.png');
 
     var physics2Behavior = new gd.BehaviorJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
@@ -406,7 +410,7 @@ module.exports = {
         _('Physics Engine 2.0'),
         'Physics2',
         _(
-          'Simulate realistic object physics, with gravity, forces, joints, etc.'
+          'Simulate realistic object physics with gravity, forces, joints, etc.'
         ),
         '',
         'res/physics32.png',
@@ -415,7 +419,8 @@ module.exports = {
         sharedData
       )
       .setIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
-      .addIncludeFile('Extensions/Physics2Behavior/box2d.js');
+      .addIncludeFile('Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.js')
+      .addRequiredFile('Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.wasm')
 
     // Global
     aut
@@ -425,8 +430,8 @@ module.exports = {
         _('Compare the world gravity on X axis.'),
         _('the world gravity on X axis'),
         _('Global'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -440,7 +445,7 @@ module.exports = {
         _('World gravity on X axis'),
         _('World gravity on X axis'),
         _('Global'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -454,8 +459,8 @@ module.exports = {
         _('Compare the world gravity on Y axis.'),
         _('the world gravity on Y axis'),
         _('Global'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -469,7 +474,7 @@ module.exports = {
         _('World gravity on Y axis'),
         _('World gravity on Y axis'),
         _('Global'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -487,8 +492,8 @@ module.exports = {
           ),
         _('Set the world gravity of _PARAM0_ to _PARAM2_;_PARAM3_'),
         _('Global'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -504,8 +509,8 @@ module.exports = {
         _('Compare the world time scale.'),
         _('the world time scale'),
         _('Global'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -524,9 +529,9 @@ module.exports = {
             'While an object is needed, this will apply to all objects using the behavior.'
           ),
         _('Set the world time scale of _PARAM0_ to _PARAM2_'),
-        _('Global'),
-        'res/physics24.png',
-        'res/physics16.png'
+        '',
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('objectList', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -541,7 +546,7 @@ module.exports = {
         _('World time scale'),
         _('World time scale'),
         _('Global'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -556,8 +561,8 @@ module.exports = {
         _('Test if an object is dynamic.'),
         _('_PARAM0_ is dynamic'),
         _('Dynamics'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -573,8 +578,8 @@ module.exports = {
         ),
         _('Set _PARAM0_ as dynamic'),
         _('Dynamics'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -588,8 +593,8 @@ module.exports = {
         _('Test if an object is static.'),
         _('_PARAM0_ is static'),
         _('Dynamics'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -605,8 +610,8 @@ module.exports = {
         ),
         _('Set _PARAM0_ as static'),
         _('Dynamics'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -620,8 +625,8 @@ module.exports = {
         _('Test if an object is kinematic.'),
         _('_PARAM0_ is kinematic'),
         _('Dynamics'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -637,8 +642,8 @@ module.exports = {
         ),
         _('Set _PARAM0_ as kinematic'),
         _('Dynamics'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -652,8 +657,8 @@ module.exports = {
         _('Test if an object is being treat as a bullet.'),
         _('_PARAM0_ is bullet'),
         _('Dynamics'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -669,8 +674,8 @@ module.exports = {
         ),
         _('Treat _PARAM0_ as bullet: _PARAM2_'),
         _('Dynamics'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -686,8 +691,8 @@ module.exports = {
         _('Test if an object has fixed rotation.'),
         _('_PARAM0_ has fixed rotation'),
         _('Dynamics'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -703,8 +708,8 @@ module.exports = {
         ),
         _('Set _PARAM0_ fixed rotation: _PARAM2_'),
         _('Dynamics'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -720,8 +725,8 @@ module.exports = {
         _('Test if an object can sleep.'),
         _('_PARAM0_ can sleep'),
         _('Dynamics'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -737,8 +742,8 @@ module.exports = {
         ),
         _('Allow _PARAM0_ to sleep: _PARAM2_'),
         _('Dynamics'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -754,8 +759,8 @@ module.exports = {
         _('Test if an object is sleeping.'),
         _('_PARAM0_ is sleeping'),
         _('Dynamics'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -772,8 +777,8 @@ module.exports = {
         ),
         _('the shape scale'),
         _('Body settings'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -789,8 +794,8 @@ module.exports = {
         _('Test an object density.'),
         _('the _PARAM0_ density'),
         _('Body settings'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -807,8 +812,8 @@ module.exports = {
         ),
         _('the density'),
         _('Body settings'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -823,7 +828,7 @@ module.exports = {
         _('Density of the object'),
         _('Get the density of an object.'),
         _('Body settings'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -837,8 +842,8 @@ module.exports = {
         _('Test an object friction.'),
         _('the _PARAM0_ friction'),
         _('Body settings'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -855,8 +860,8 @@ module.exports = {
         ),
         _('the friction'),
         _('Body settings'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -871,7 +876,7 @@ module.exports = {
         _('Friction of the object'),
         _('Get the friction of an object.'),
         _('Body settings'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -885,8 +890,8 @@ module.exports = {
         _('Test an object restitution.'),
         _('the _PARAM0_ restitution'),
         _('Body settings'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -903,8 +908,8 @@ module.exports = {
         ),
         _('the restitution'),
         _('Body settings'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -919,7 +924,7 @@ module.exports = {
         _('Restitution of the object'),
         _('Get the restitution of an object.'),
         _('Body settings'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -933,8 +938,8 @@ module.exports = {
         _('Test an object linear damping.'),
         _('the _PARAM0_ linear damping'),
         _('Body settings'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -951,8 +956,8 @@ module.exports = {
         ),
         _('the linear damping'),
         _('Body settings'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -967,7 +972,7 @@ module.exports = {
         _('Linear damping of the object'),
         _('Get the linear damping of an object.'),
         _('Body settings'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -981,8 +986,8 @@ module.exports = {
         _('Test an object angular damping.'),
         _('the _PARAM0_ angular damping'),
         _('Body settings'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -999,8 +1004,8 @@ module.exports = {
         ),
         _('the angular damping'),
         _('Body settings'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1015,7 +1020,7 @@ module.exports = {
         _('Angular damping of the object'),
         _('Get the angular damping of an object.'),
         _('Body settings'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1029,8 +1034,8 @@ module.exports = {
         _('Test an object gravity scale.'),
         _('the _PARAM0_ gravity scale'),
         _('Body settings'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1047,8 +1052,8 @@ module.exports = {
         ),
         _('the gravity scale'),
         _('Body settings'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1063,7 +1068,7 @@ module.exports = {
         _('Gravity scale of the object'),
         _('Get the gravity scale of an object.'),
         _('Body settings'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1078,8 +1083,8 @@ module.exports = {
         _('Test if an object has a specific layer enabled.'),
         _('_PARAM0_ has layer _PARAM2_ enabled'),
         _('Filtering'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1096,8 +1101,8 @@ module.exports = {
         ),
         _('Enable layer _PARAM2_ for _PARAM0_: _PARAM3_'),
         _('Filtering'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1114,8 +1119,8 @@ module.exports = {
         _('Test if an object has a specific mask enabled.'),
         _('_PARAM0_ has mask _PARAM2_ enabled'),
         _('Filtering'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1132,8 +1137,8 @@ module.exports = {
         ),
         _('Enable mask _PARAM2_ for _PARAM0_: _PARAM3_'),
         _('Filtering'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1151,8 +1156,8 @@ module.exports = {
         _('Test an object linear velocity on X.'),
         _('the linear velocity on X'),
         _('Velocity'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1167,8 +1172,8 @@ module.exports = {
         _('Modify an object linear velocity on X.'),
         _('the linear velocity on X'),
         _('Velocity'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1183,7 +1188,7 @@ module.exports = {
         _('Linear velocity on X axis'),
         _('Get the linear velocity of an object on X axis.'),
         _('Velocity'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1197,8 +1202,8 @@ module.exports = {
         _('Test an object linear velocity on Y.'),
         _('the linear velocity on Y'),
         _('Velocity'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1213,8 +1218,8 @@ module.exports = {
         _('Modify an object linear velocity on Y.'),
         _('the linear velocity on Y'),
         _('Velocity'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1229,7 +1234,7 @@ module.exports = {
         _('Linear velocity on Y axis'),
         _('Get the linear velocity of an object on Y axis.'),
         _('Velocity'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1243,8 +1248,8 @@ module.exports = {
         _('Test an object linear velocity length.'),
         _('the linear velocity length'),
         _('Velocity'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1258,7 +1263,7 @@ module.exports = {
         _('Linear velocity'),
         _('Get the linear velocity of an object.'),
         _('Velocity'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1272,8 +1277,8 @@ module.exports = {
         _('Test an object angular velocity.'),
         _('the angular velocity'),
         _('Velocity'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1288,8 +1293,8 @@ module.exports = {
         _('Modify an object angular velocity.'),
         _('the angular velocity'),
         _('Velocity'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1304,7 +1309,7 @@ module.exports = {
         _('Angular velocity'),
         _('Get the angular velocity of an object.'),
         _('Velocity'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1321,8 +1326,8 @@ module.exports = {
         ),
         _('Apply to _PARAM0_ a force of _PARAM2_;_PARAM3_'),
         _('Forces & impulses'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1342,8 +1347,8 @@ module.exports = {
         ),
         _('Apply to _PARAM0_ a force of angle _PARAM2_ and length _PARAM3_'),
         _('Forces & impulses'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1365,8 +1370,8 @@ module.exports = {
           'Apply to _PARAM0_ a force of length _PARAM2_ towards _PARAM3_;_PARAM4_'
         ),
         _('Forces & impulses'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1387,13 +1392,13 @@ module.exports = {
         ),
         _('Apply to _PARAM0_ an impulse of _PARAM2_;_PARAM3_'),
         _('Forces & impulses'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('expression', _('X component (N.m)'))
-      .addParameter('expression', _('Y component (N.m)'))
+      .addParameter('expression', _('X component (in Newton * seconds or kilogram * meter per second)'))
+      .addParameter('expression', _('Y component (in Newton * seconds or kilogram * meter per second)'))
       .addParameter('expression', _('Applying X position'))
       .addParameter('expression', _('Applying Y position'))
       .getCodeExtraInformation()
@@ -1410,13 +1415,13 @@ module.exports = {
           'Apply to _PARAM0_ an impulse of angle _PARAM2_ and length _PARAM3_ (applied at _PARAM4_;_PARAM5_)'
         ),
         _('Forces & impulses'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Angle'))
-      .addParameter('expression', _('Length (N.m)'))
+      .addParameter('expression', _('Length (in Newton * seconds or kilogram * meter per second)'))
       .addParameter('expression', _('Applying X position'))
       .addParameter('expression', _('Applying Y position'))
       .getCodeExtraInformation()
@@ -1433,12 +1438,12 @@ module.exports = {
           'Apply to _PARAM0_ an impulse of length _PARAM2_ towards _PARAM3_;_PARAM4_ (applied at _PARAM5_;_PARAM6_)'
         ),
         _('Forces & impulses'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('expression', _('Length (N.m)'))
+      .addParameter('expression', _('Length (in Newton * seconds or kilogram * meter per second)'))
       .addParameter('expression', _('X position'))
       .addParameter('expression', _('Y position'))
       .addParameter('expression', _('Applying X position'))
@@ -1455,8 +1460,8 @@ module.exports = {
         ),
         _('Apply to _PARAM0_ a torque of _PARAM2_'),
         _('Forces & impulses'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1473,8 +1478,8 @@ module.exports = {
         ),
         _('Apply to _PARAM0_ an angular impulse of _PARAM2_'),
         _('Forces & impulses'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1482,18 +1487,44 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('applyAngularImpulse');
 
-    aut
+      aut
       .addExpression(
-        'MassCenterX',
-        _('Mass center X'),
-        _('Mass center X'),
+        'Mass',
+        _('Mass'),
+        _('Return the mass of the object (in kilograms)'),
         '',
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .getCodeExtraInformation()
-      .setFunctionName('getMassCenterX');
+      .setFunctionName('getMass');
+
+      aut
+        .addExpression(
+          'Inertia',
+          _('Inertia'),
+          _('Return the rotational inertia of the object (in kilograms * meters * meters)'),
+          '',
+          'res/physics32.png'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+        .getCodeExtraInformation()
+        .setFunctionName('getInertia');
+
+      aut
+        .addExpression(
+          'MassCenterX',
+          _('Mass center X'),
+          _('Mass center X'),
+          '',
+          'res/physics32.png'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+        .getCodeExtraInformation()
+        .setFunctionName('getMassCenterX');
 
     aut
       .addExpression(
@@ -1501,7 +1532,7 @@ module.exports = {
         _('Mass center Y'),
         _('Mass center Y'),
         '',
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1516,8 +1547,8 @@ module.exports = {
         _('Test if an object is the first object on a joint.'),
         _('_PARAM0_ is the first object for joint _PARAM2_'),
         _('Joints'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1532,8 +1563,8 @@ module.exports = {
         _('Test if an object is the second object on a joint.'),
         _('_PARAM0_ is the second object for joint _PARAM2_'),
         _('Joints'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1547,7 +1578,7 @@ module.exports = {
         _('Joint first anchor X'),
         _('Joint first anchor X'),
         _('Joints'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1561,7 +1592,7 @@ module.exports = {
         _('Joint first anchor Y'),
         _('Joint first anchor Y'),
         _('Joints'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1575,7 +1606,7 @@ module.exports = {
         _('Joint second anchor X'),
         _('Joint second anchor X'),
         _('Joints'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1589,7 +1620,7 @@ module.exports = {
         _('Joint second anchor Y'),
         _('Joint second anchor Y'),
         _('Joints'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1604,8 +1635,8 @@ module.exports = {
         _('Test a joint reaction force.'),
         _('the joint _PARAM2_ reaction force'),
         _('Joints'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1620,7 +1651,7 @@ module.exports = {
         _('Joint reaction force'),
         _('Joint reaction force'),
         _('Joints'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1635,8 +1666,8 @@ module.exports = {
         _('Test a joint reaction torque.'),
         _('the joint _PARAM2_ reaction torque'),
         _('Joints'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1651,7 +1682,7 @@ module.exports = {
         _('Joint reaction torque'),
         _('Joint reaction torque'),
         _('Joints'),
-        'res/physics16.png'
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -1666,8 +1697,8 @@ module.exports = {
         _('Remove a joint from the scene.'),
         _('Remove joint _PARAM2_'),
         _('Joints'),
-        'res/physics24.png',
-        'res/physics16.png'
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -3728,11 +3759,11 @@ module.exports = {
       .addCondition(
         'Collision',
         _('Collision'),
-        _('Test if two objects collide.'),
+        _('Check if two objects collide.'),
         _('_PARAM0_ is colliding with _PARAM2_'),
-        '',
-        'res/physics24.png',
-        'res/physics16.png'
+       '',
+        'res/physics32.png',
+        'res/physics32.png'
       )
       .addParameter('objectList', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
@@ -3742,6 +3773,42 @@ module.exports = {
       .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
       .setFunctionName('gdjs.physics2.objectsCollide');
 
+    extension
+      .addCondition(
+        'CollisionStarted',
+        _('Collision started'),
+        _('Check if two objects just started colliding during this frame.'),
+        _('_PARAM0_ started colliding with _PARAM2_'),
+        _('Collision'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('objectList', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .addParameter('objectList', _('Object'), '', false)
+      .addCodeOnlyParameter('conditionInverted', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .setFunctionName('gdjs.physics2.haveObjectsStartedColliding');
+
+    extension
+      .addCondition(
+        'CollisionStopped',
+        _('Collision stopped'),
+        _('Check if two objects just stopped colliding at this frame.'),
+        _('_PARAM0_ stopped colliding with _PARAM2_'),
+        _('Collision'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('objectList', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .addParameter('objectList', _('Object'), '', false)
+      .addCodeOnlyParameter('conditionInverted', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .setFunctionName('gdjs.physics2.haveObjectsStoppedColliding');
+
     return extension;
   },
 
@@ -3749,6 +3816,23 @@ module.exports = {
     gd /*: libGDevelop */,
     extension /*: gdPlatformExtension*/
   ) {
-    return [];
+    const dummyBehavior = extension
+      .getBehaviorMetadata('Physics2::Physics2Behavior')
+      .get();
+    const sharedData = extension
+      .getBehaviorMetadata('Physics2::Physics2Behavior')
+      .getSharedDataInstance();
+    return [
+      gd.ProjectHelper.sanityCheckBehaviorProperty(
+        dummyBehavior,
+        'density',
+        '123'
+      ),
+      gd.ProjectHelper.sanityCheckBehaviorsSharedDataProperty(
+        sharedData,
+        'gravityY',
+        '456'
+      ),
+    ];
   },
 };

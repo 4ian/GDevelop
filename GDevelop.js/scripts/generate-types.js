@@ -18,7 +18,6 @@ const idlTempFolder = fs.mkdtempSync('gdevelopjs-cleaned-bindings-idl');
 // are not supported by the webidl2.js parser used by "webidl-tools".
 shell.cp('-f', 'Bindings/Bindings.idl', idlTempFolder);
 const idlFile = path.join(idlTempFolder, 'Bindings.idl');
-shell.sed('-i', /\[Prefix="sf::"\]/, '// Removed sf prefix', idlFile);
 shell.sed('-i', /\[Prefix="gdjs::"\]/, '//Removed gdjs prefix', idlFile);
 shell.sed(
   '-i',
@@ -178,15 +177,16 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
         `  asJsCodeEvent(gdBaseEvent): gdJsCodeEvent;`,
         `  asPlatform(gdPlatform): gdPlatform;`,
         '',
-        `  asSpriteObject(gdObject): gdSpriteObject;`,
-        `  asTiledSpriteObject(gdObject): gdTiledSpriteObject;`,
-        `  asPanelSpriteObject(gdObject): gdPanelSpriteObject;`,
-        `  asTextObject(gdObject): gdTextObject;`,
-        `  asShapePainterObject(gdObject): gdShapePainterObject;`,
-        `  asAdMobObject(gdObject): gdAdMobObject;`,
-        `  asTextEntryObject(gdObject): gdTextEntryObject;`,
-        `  asParticleEmitterObject(gdObject): gdParticleEmitterObject;`,
-        `  asObjectJsImplementation(gdObject): gdObjectJsImplementation;`,
+        `  asSpriteConfiguration(gdObjectConfiguration): gdSpriteObject;`,
+        `  asTiledSpriteConfiguration(gdObjectConfiguration): gdTiledSpriteObject;`,
+        `  asPanelSpriteConfiguration(gdObjectConfiguration): gdPanelSpriteObject;`,
+        `  asTextObjectConfiguration(gdObjectConfiguration): gdTextObject;`,
+        `  asShapePainterConfiguration(gdObjectConfiguration): gdShapePainterObject;`,
+        `  asAdMobConfiguration(gdObjectConfiguration): gdAdMobObject;`,
+        `  asTextEntryConfiguration(gdObjectConfiguration): gdTextEntryObject;`,
+        `  asParticleEmitterConfiguration(gdObjectConfiguration): gdParticleEmitterObject;`,
+        `  asObjectJsImplementation(gdObjectConfiguration): gdObjectJsImplementation;`,
+        `  asCustomObjectConfiguration(gdObjectConfiguration): gdCustomObjectConfiguration;`,
         '',
         `  asImageResource(gdResource): gdImageResource;`,
         '',
@@ -198,6 +198,12 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
       'declare class gdVectorString {',
       'declare class gdVectorString {\n  toJSArray(): Array<string>;',
       'types/gdvectorstring.js'
+    );
+    shell.sed(
+      '-i',
+      'declare class gdVectorInt {',
+      'declare class gdVectorInt {\n  toJSArray(): Array<number>;',
+      'types/gdvectorint.js'
     );
     shell.sed(
       '-i',
@@ -231,6 +237,12 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
     );
     shell.sed(
       '-i',
+      'declare class gdEventsBasedObject {',
+      'declare class gdEventsBasedObject extends gdObjectsContainer {',
+      'types/gdeventsbasedobject.js'
+    );
+    shell.sed(
+      '-i',
       'declare class gdEventsFunctionsExtension {',
       'declare class gdEventsFunctionsExtension extends gdEventsFunctionsContainer {',
       'types/gdeventsfunctionsextension.js'
@@ -238,8 +250,14 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
     shell.sed(
       '-i',
       'declare class gdObjectJsImplementation {',
-      'declare class gdObjectJsImplementation extends gdObject {',
+      'declare class gdObjectJsImplementation extends gdObjectConfiguration {',
       'types/gdobjectjsimplementation.js'
+    );
+    shell.sed(
+      '-i',
+      'declare class gdCustomObjectConfiguration {',
+      'declare class gdCustomObjectConfiguration extends gdObjectConfiguration {',
+      'types/gdcustomobjectconfiguration.js'
     );
     shell.sed(
       '-i',

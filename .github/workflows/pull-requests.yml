@@ -1,0 +1,29 @@
+name: GDevelop Issues automatic workflow
+on:
+  pull_request:
+    types: [opened]
+jobs:
+  read-locales-metadata:
+    if: contains(github.event.pull_request.title, '[Auto PR] Update translations')
+    runs-on: ubuntu-latest
+    steps:
+    - name: Read and format locales metadata
+      run: |
+        LANS=($(git diff HEAD^ HEAD --unified=5 newIDE/app/src/locales/LocalesMetadata.js | tail +6 | grep -E "^\s+\"languageName" | sed -E "s/^ *\"languageName\": \"//g" | sed -E "s/\",//g" | sed -E "s/ /_/g"))
+        ADDS=($(git diff HEAD^ HEAD --unified=0 newIDE/app/src/locales/LocalesMetadata.js | tail +6 | grep -E "^\+\s*\"translationRatio\"" | sed -E "s/^\+ *\"translationRatio\": //g"))
+        SUBS=($(git diff HEAD^ HEAD --unified=0 newIDE/app/src/locales/LocalesMetadata.js | tail +6 | grep -E "^\-\s*\"translationRatio\"" | sed -E "s/^\- *\"translationRatio\": //g"))
+        touch sumup.txt
+        for index in ${!ADDS[@]}; do
+          echo ${LANS[index]} | sed -E "s/_/ /g" >> sumup.txt
+          DELTA=$(bc <<< "scale=2;(${ADDS[index]}-${SUBS[index]})*100/1")
+          echo $DELTA % >> sumup.txt
+        done
+    - name: Store sumup in outputs
+      id: sumup
+      run: echo "::set-output name=sumupFileContent::$(cat sumup.txt)"
+    - name: Autocomment pull request with sumup
+      uses: peter-evans/create-or-update-comment@v1
+      with:
+        issue-number: ${{ github.event.number }}
+        body: ${{ steps.sumup.outputs.sumupFileContent}}
+        token: ${{ secrets.GITHUB_TOKEN }}

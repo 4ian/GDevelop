@@ -16,7 +16,6 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Project/Behavior.h"
-#include "GDCore/Project/BehaviorContent.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
 #include "GDCore/Project/InitialInstance.h"
 #include "GDCore/Project/Layer.h"
@@ -33,7 +32,7 @@ using namespace std;
 namespace gd {
 
 gd::Layer Layout::badLayer;
-gd::BehaviorContent Layout::badBehaviorContent("", "");
+gd::BehaviorsSharedData Layout::badBehaviorSharedData("", "");
 
 Layout::Layout(const Layout& other) { Init(other); }
 
@@ -51,14 +50,8 @@ Layout::Layout()
       backgroundColorB(209),
       stopSoundsOnStartup(true),
       standardSortMethod(true),
-      oglFOV(90.0f),
-      oglZNear(1.0f),
-      oglZFar(500.0f),
-      disableInputWhenNotFocused(true)
-#if defined(GD_IDE_ONLY)
-      ,
+      disableInputWhenNotFocused(true),
       profiler(NULL)
-#endif
 {
   gd::Layer layer;
   layer.SetCameraCount(1);
@@ -82,23 +75,23 @@ std::vector<gd::String> Layout::GetAllBehaviorSharedDataNames() const {
   return allNames;
 }
 
-const gd::BehaviorContent& Layout::GetBehaviorSharedData(
+const gd::BehaviorsSharedData& Layout::GetBehaviorSharedData(
     const gd::String& behaviorName) const {
   auto it = behaviorsSharedData.find(behaviorName);
   if (it != behaviorsSharedData.end()) return *it->second;
 
-  return badBehaviorContent;
+  return badBehaviorSharedData;
 }
 
-gd::BehaviorContent& Layout::GetBehaviorSharedData(
+gd::BehaviorsSharedData& Layout::GetBehaviorSharedData(
     const gd::String& behaviorName) {
   auto it = behaviorsSharedData.find(behaviorName);
   if (it != behaviorsSharedData.end()) return *it->second;
 
-  return badBehaviorContent;
+  return badBehaviorSharedData;
 }
 
-const std::map<gd::String, std::unique_ptr<gd::BehaviorContent> >&
+const std::map<gd::String, std::unique_ptr<gd::BehaviorsSharedData> >&
 Layout::GetAllBehaviorSharedData() const {
   return behaviorsSharedData;
 }
@@ -200,20 +193,20 @@ void Layout::UpdateBehaviorsSharedData(gd::Project& project) {
     std::vector<gd::String> objectBehaviors =
         initialObjects[i]->GetAllBehaviorNames();
     for (unsigned int j = 0; j < objectBehaviors.size(); ++j) {
-      auto& behaviorContent =
+      auto& behavior =
           initialObjects[i]->GetBehavior(objectBehaviors[j]);
-      allBehaviorsTypes.push_back(behaviorContent.GetTypeName());
-      allBehaviorsNames.push_back(behaviorContent.GetName());
+      allBehaviorsTypes.push_back(behavior.GetTypeName());
+      allBehaviorsNames.push_back(behavior.GetName());
     }
   }
   for (std::size_t i = 0; i < project.GetObjectsCount(); ++i) {
     std::vector<gd::String> objectBehaviors =
         project.GetObject(i).GetAllBehaviorNames();
     for (std::size_t j = 0; j < objectBehaviors.size(); ++j) {
-      auto& behaviorContent =
+      auto& behavior =
           project.GetObject(i).GetBehavior(objectBehaviors[j]);
-      allBehaviorsTypes.push_back(behaviorContent.GetTypeName());
-      allBehaviorsNames.push_back(behaviorContent.GetName());
+      allBehaviorsTypes.push_back(behavior.GetTypeName());
+      allBehaviorsNames.push_back(behavior.GetName());
     }
   }
 
@@ -225,19 +218,10 @@ void Layout::UpdateBehaviorsSharedData(gd::Project& project) {
 
     if (behaviorsSharedData.find(name) != behaviorsSharedData.end()) continue;
 
-    const gd::BehaviorMetadata& behaviorMetadata =
-        gd::MetadataProvider::GetBehaviorMetadata(project.GetCurrentPlatform(),
-                                                  allBehaviorsTypes[i]);
-    if (gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) continue;
-
-    gd::BehaviorsSharedData* behaviorSharedData =
-        behaviorMetadata.GetSharedDataInstance();
-    if (!behaviorSharedData) continue;
-
-    auto behaviorContent =
-        gd::make_unique<gd::BehaviorContent>(name, allBehaviorsTypes[i]);
-    behaviorSharedData->InitializeContent(behaviorContent->GetContent());
-    behaviorsSharedData[name] = std::move(behaviorContent);
+    auto sharedData = CreateBehaviorsSharedData(project, name, allBehaviorsTypes[i]);
+    if (sharedData) {
+      behaviorsSharedData[name] = std::move(sharedData);
+    }
   }
 
   // Remove useless shared data:
@@ -256,6 +240,33 @@ void Layout::UpdateBehaviorsSharedData(gd::Project& project) {
   }
 }
 
+std::unique_ptr<gd::BehaviorsSharedData> Layout::CreateBehaviorsSharedData(gd::Project& project, const gd::String& name, const gd::String& behaviorsType) {
+    if (project.HasEventsBasedBehavior(behaviorsType)) {
+      // Events based behaviors don't have shared data yet.
+      auto sharedData =
+          gd::make_unique<gd::BehaviorsSharedData>(name, behaviorsType);
+      sharedData->InitializeContent();
+      return std::move(sharedData);
+    }
+    const gd::BehaviorMetadata& behaviorMetadata =
+        gd::MetadataProvider::GetBehaviorMetadata(
+            project.GetCurrentPlatform(),
+            behaviorsType);
+    if (gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
+      return nullptr;
+    }
+
+    gd::BehaviorsSharedData* behaviorsSharedDataBluePrint =
+        behaviorMetadata.GetSharedDataInstance();
+    if (!behaviorsSharedDataBluePrint) return nullptr;
+
+    auto sharedData = behaviorsSharedDataBluePrint->Clone();
+    sharedData->SetName(name);
+    sharedData->SetTypeName(behaviorsType);
+    sharedData->InitializeContent();
+    return std::unique_ptr<gd::BehaviorsSharedData>(sharedData);
+}
+
 void Layout::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
   element.SetAttribute("mangledName", GetMangledName());
@@ -263,17 +274,12 @@ void Layout::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("v", (int)GetBackgroundColorGreen());
   element.SetAttribute("b", (int)GetBackgroundColorBlue());
   element.SetAttribute("title", GetWindowDefaultTitle());
-  element.SetAttribute("oglFOV", oglFOV);
-  element.SetAttribute("oglZNear", oglZNear);
-  element.SetAttribute("oglZFar", oglZFar);
   element.SetAttribute("standardSortMethod", standardSortMethod);
   element.SetAttribute("stopSoundsOnStartup", stopSoundsOnStartup);
   element.SetAttribute("disableInputWhenNotFocused",
                        disableInputWhenNotFocused);
 
-#if defined(GD_IDE_ONLY)
   editorSettings.SerializeTo(element.AddChild("uiSettings"));
-#endif
 
   GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
   GetVariables().SerializeTo(element.AddChild("variables"));
@@ -324,15 +330,11 @@ void Layout::UnserializeFrom(gd::Project& project,
                      element.GetIntAttribute("b"));
   SetWindowDefaultTitle(
       element.GetStringAttribute("title", "(No title)", "titre"));
-  oglFOV = element.GetDoubleAttribute("oglFOV");
-  oglZNear = element.GetDoubleAttribute("oglZNear");
-  oglZFar = element.GetDoubleAttribute("oglZFar");
   standardSortMethod = element.GetBoolAttribute("standardSortMethod");
   stopSoundsOnStartup = element.GetBoolAttribute("stopSoundsOnStartup");
   disableInputWhenNotFocused =
       element.GetBoolAttribute("disableInputWhenNotFocused");
 
-#if defined(GD_IDE_ONLY)
   editorSettings.UnserializeFrom(
       element.GetChild("uiSettings", 0, "UISettings"));
 
@@ -340,7 +342,6 @@ void Layout::UnserializeFrom(gd::Project& project,
       element.GetChild("objectsGroups", 0, "GroupesObjets"));
   gd::EventsListSerialization::UnserializeEventsFrom(
       project, GetEvents(), element.GetChild("events", 0, "Events"));
-#endif
 
   UnserializeObjectsFrom(project, element.GetChild("objects", 0, "Objets"));
   initialInstances.UnserializeFrom(
@@ -369,20 +370,23 @@ void Layout::UnserializeFrom(gd::Project& project,
                             "Behavior");  // Compatibility with GD <= 4
     gd::String name = sharedDataElement.GetStringAttribute("name", "", "Name");
 
-    auto behaviorContent = gd::make_unique<gd::BehaviorContent>(name, type);
-    // Compatibility with GD <= 4.0.98
-    // If there is only one child called "content" (in addition to "type" and
-    // "name"), it's the content of a JavaScript behavior. Move the content
-    // out of the "content" object (to put it directly at the root of the
-    // behavior shared data element).
-    if (sharedDataElement.HasChild("content")) {
-      behaviorContent->UnserializeFrom(sharedDataElement.GetChild("content"));
+
+    auto sharedData = CreateBehaviorsSharedData(project, name, type);
+    if (sharedData) {
+      // Compatibility with GD <= 4.0.98
+      // If there is only one child called "content" (in addition to "type" and
+      // "name"), it's the content of a JavaScript behavior. Move the content
+      // out of the "content" object (to put it directly at the root of the
+      // behavior shared data element).
+      if (sharedDataElement.HasChild("content")) {
+        sharedData->UnserializeFrom(sharedDataElement.GetChild("content"));
+      }
+      // end of compatibility code
+      else {
+        sharedData->UnserializeFrom(sharedDataElement);
+      }
+      behaviorsSharedData[name] = std::move(sharedData);
     }
-    // end of compatibility code
-    else {
-      behaviorContent->UnserializeFrom(sharedDataElement);
-    }
-    behaviorsSharedData[name] = std::move(behaviorContent);
   }
 }
 
@@ -393,9 +397,6 @@ void Layout::Init(const Layout& other) {
   backgroundColorB = other.backgroundColorB;
   standardSortMethod = other.standardSortMethod;
   title = other.title;
-  oglFOV = other.oglFOV;
-  oglZNear = other.oglZNear;
-  oglZFar = other.oglZFar;
   stopSoundsOnStartup = other.stopSoundsOnStartup;
   disableInputWhenNotFocused = other.disableInputWhenNotFocused;
   initialInstances = other.initialInstances;
@@ -407,16 +408,14 @@ void Layout::Init(const Layout& other) {
   behaviorsSharedData.clear();
   for (const auto& it : other.behaviorsSharedData) {
     behaviorsSharedData[it.first] =
-        std::unique_ptr<gd::BehaviorContent>(it.second->Clone());
+        std::unique_ptr<gd::BehaviorsSharedData>(it.second->Clone());
   }
 
-#if defined(GD_IDE_ONLY)
   events = other.events;
   editorSettings = other.editorSettings;
   objectGroups = other.objectGroups;
 
   profiler = other.profiler;
-#endif
 }
 
 std::vector<gd::String> GetHiddenLayers(const Layout& layout) {
@@ -430,7 +429,6 @@ std::vector<gd::String> GetHiddenLayers(const Layout& layout) {
   return hiddenLayers;
 }
 
-#if defined(GD_IDE_ONLY)
 gd::String GD_CORE_API GetTypeOfObject(const gd::ObjectsContainer& project,
                                        const gd::ObjectsContainer& layout,
                                        gd::String name,
@@ -444,7 +442,7 @@ gd::String GD_CORE_API GetTypeOfObject(const gd::ObjectsContainer& project,
     type = project.GetObject(name).GetType();
 
   // Search in groups
-  if (searchInGroups) {
+  else if (searchInGroups) {
     for (std::size_t i = 0; i < layout.GetObjectGroups().size(); ++i) {
       if (layout.GetObjectGroups()[i].GetName() == name) {
         // A group has the name searched
@@ -505,18 +503,16 @@ gd::String GD_CORE_API GetTypeOfBehavior(const gd::ObjectsContainer& project,
                                          gd::String name,
                                          bool searchInGroups) {
   for (std::size_t i = 0; i < layout.GetObjectsCount(); ++i) {
-    vector<gd::String> behaviors = layout.GetObject(i).GetAllBehaviorNames();
-    for (std::size_t j = 0; j < behaviors.size(); ++j) {
-      if (layout.GetObject(i).GetBehavior(behaviors[j]).GetName() == name)
-        return layout.GetObject(i).GetBehavior(behaviors[j]).GetTypeName();
+    const auto &object = layout.GetObject(i);
+    if (object.HasBehaviorNamed(name)) {
+      return object.GetBehavior(name).GetTypeName();
     }
   }
 
   for (std::size_t i = 0; i < project.GetObjectsCount(); ++i) {
-    vector<gd::String> behaviors = project.GetObject(i).GetAllBehaviorNames();
-    for (std::size_t j = 0; j < behaviors.size(); ++j) {
-      if (project.GetObject(i).GetBehavior(behaviors[j]).GetName() == name)
-        return project.GetObject(i).GetBehavior(behaviors[j]).GetTypeName();
+    const auto &object = project.GetObject(i);
+    if (object.HasBehaviorNamed(name)) {
+      return object.GetBehavior(name).GetTypeName();
     }
   }
 
@@ -612,6 +608,5 @@ GetBehaviorsOfObject(const gd::ObjectsContainer& project,
 
   return behaviors;
 }
-#endif
 
 }  // namespace gd

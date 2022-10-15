@@ -29,7 +29,8 @@ export default class ResourceThumbnail extends React.Component<Props, State> {
     this.state = this._loadFrom(props);
   }
 
-  componentWillReceiveProps(newProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     if (
       newProps.resourceName !== this.props.resourceName ||
       newProps.project !== this.props.project

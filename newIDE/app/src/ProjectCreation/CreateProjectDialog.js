@@ -1,153 +1,117 @@
 // @flow
 import { Trans } from '@lingui/macro';
-
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import Dialog from '../UI/Dialog';
+import { ExampleStore } from '../AssetStore/ExampleStore';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
-import ScrollView from '../UI/ScrollView';
-import { Tabs, Tab } from '../UI/Tabs';
-import Tutorials from './Tutorials';
 import { Column } from '../UI/Grid';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
-import { GamesShowcase } from '../GamesShowcase';
-import Window from '../Utils/Window';
-import PublishIcon from '@material-ui/icons/Publish';
-import { findEmptyPath } from './LocalPathFinder';
-import optionalRequire from '../Utils/OptionalRequire.js';
-const path = optionalRequire('path');
-const electron = optionalRequire('electron');
-const app = electron ? electron.remote.app : null;
+import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 
-type State = {|
-  currentTab: 'starters' | 'examples' | 'tutorials' | 'games-showcase',
-  outputPath: string,
-|};
-
-export type CreateProjectDialogWithComponentsProps = {|
+export type CreateProjectDialogProps = {|
   open: boolean,
   onClose: () => void,
-  onOpen: (
-    storageProvider: StorageProvider,
-    fileMetadata: FileMetadata
-  ) => Promise<void>,
-  onCreate: (
-    gdProject,
+  initialExampleShortHeader: ?ExampleShortHeader,
+  onOpenProjectPreCreationDialog: (
+    assetShortHeader: ?ExampleShortHeader
+  ) => void,
+  isProjectOpening: boolean,
+|};
+
+export type ProjectCreationSettings = {|
+  projectName: string,
+  outputPath?: string,
+|};
+
+export type CreateProjectSetup = {|
+  source: {|
+    project: ?gdProject,
+    projectName: string,
     storageProvider: ?StorageProvider,
-    fileMetadata: ?FileMetadata
-  ) => Promise<void>,
-  initialTab: 'starters' | 'tutorials' | 'games-showcase',
+    fileMetadata: ?FileMetadata,
+  |},
+  destination: {|
+    storageProvider: StorageProvider,
+    fileMetadata: ?FileMetadata,
+  |},
 |};
 
-type Props = {|
-  ...CreateProjectDialogWithComponentsProps,
-  startersComponent: any,
-  examplesComponent: any,
-|};
+export type OnCreateBlankFunction = ({|
+  i18n: I18nType,
+  settings: ProjectCreationSettings,
+|}) => Promise<?CreateProjectSetup>;
 
-export default class CreateProjectDialog extends React.Component<Props, State> {
-  state = {
-    currentTab: this.props.initialTab,
-    outputPath: app
-      ? findEmptyPath(path.join(app.getPath('documents'), 'GDevelop projects'))
-      : '',
-  };
+export type OnCreateFromExampleShortHeaderFunction = ({|
+  i18n: I18nType,
+  exampleShortHeader: ExampleShortHeader,
+  settings: ProjectCreationSettings,
+|}) => Promise<?CreateProjectSetup>;
 
-  _onChangeTab = (
-    newTab: 'starters' | 'examples' | 'tutorials' | 'games-showcase'
-  ) => {
-    this.setState({
-      currentTab: newTab,
-    });
-  };
+const CreateProjectDialog = ({
+  open,
+  onClose,
+  initialExampleShortHeader,
+  onOpenProjectPreCreationDialog,
+  isProjectOpening,
+}: CreateProjectDialogProps) => {
+  const actions = React.useMemo(
+    () => [
+      <FlatButton
+        key="close"
+        label={<Trans>Close</Trans>}
+        primary={false}
+        onClick={onClose}
+      />,
+      <DialogPrimaryButton
+        key="create-blank"
+        id="create-blank-project-button"
+        label={<Trans>Create a blank project</Trans>}
+        primary
+        onClick={() =>
+          onOpenProjectPreCreationDialog(/*exampleShortHeader*/ null)
+        }
+      />,
+    ],
+    [onClose, onOpenProjectPreCreationDialog]
+  );
 
-  _showExamples = () => this._onChangeTab('examples');
+  if (!open) return null;
 
-  render() {
-    const { open, onClose, onOpen, onCreate } = this.props;
-    if (!open) return null;
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <>
+          <Dialog
+            title={<Trans>Create a new project</Trans>}
+            actions={actions}
+            onRequestClose={onClose}
+            onApply={() => {
+              onOpenProjectPreCreationDialog(/*exampleShortHeader*/ null);
+            }}
+            open={open}
+            noMargin
+            fullHeight
+            flexBody
+          >
+            <Column expand noMargin>
+              <Column noMargin expand useFullHeight>
+                <ExampleStore
+                  focusOnMount
+                  isOpening={isProjectOpening}
+                  onOpen={async (exampleShortHeader: ExampleShortHeader) => {
+                    onOpenProjectPreCreationDialog(exampleShortHeader);
+                  }}
+                  initialExampleShortHeader={initialExampleShortHeader}
+                />
+              </Column>
+            </Column>
+          </Dialog>
+        </>
+      )}
+    </I18n>
+  );
+};
 
-    const ExamplesComponent = this.props.examplesComponent;
-    const StartersComponent = this.props.startersComponent;
-
-    return (
-      <Dialog
-        title={<Trans>Create a new project</Trans>}
-        actions={[
-          <FlatButton
-            key="close"
-            label={<Trans>Close</Trans>}
-            primary={false}
-            onClick={onClose}
-          />,
-        ]}
-        secondaryActions={[
-          this.state.currentTab === 'games-showcase' ? (
-            <FlatButton
-              key="submit-game-showcase"
-              onClick={() => {
-                Window.openExternalURL(
-                  'https://docs.google.com/forms/d/e/1FAIpQLSfjiOnkbODuPifSGuzxYY61vB5kyMWdTZSSqkJsv3H6ePRTQA/viewform?usp=sf_link'
-                );
-              }}
-              primary
-              icon={<PublishIcon />}
-              label={<Trans>Submit your game to the showcase</Trans>}
-            />
-          ) : null,
-          this.state.currentTab === 'examples' ? (
-            <FlatButton
-              key="submit-example"
-              onClick={() => {
-                Window.openExternalURL(
-                  'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
-                );
-              }}
-              primary
-              icon={<PublishIcon />}
-              label={<Trans>Submit your project as an example</Trans>}
-            />
-          ) : null,
-        ]}
-        cannotBeDismissed={false}
-        onRequestClose={onClose}
-        open={open}
-        noMargin
-        fullHeight
-        flexBody
-      >
-        <Column expand noMargin>
-          <Tabs value={this.state.currentTab} onChange={this._onChangeTab}>
-            <Tab label={<Trans>Starters</Trans>} value="starters" />
-            <Tab label={<Trans>Examples</Trans>} value="examples" />
-            <Tab label={<Trans>Tutorials</Trans>} value="tutorials" />
-            <Tab label={<Trans>Games showcase</Trans>} value="games-showcase" />
-          </Tabs>
-          {this.state.currentTab === 'starters' && (
-            <ScrollView>
-              <StartersComponent
-                onOpen={onOpen}
-                onCreate={onCreate}
-                onChangeOutputPath={outputPath => this.setState({ outputPath })}
-                onShowExamples={this._showExamples}
-                outputPath={this.state.outputPath}
-              />
-            </ScrollView>
-          )}
-          {this.state.currentTab === 'examples' && (
-            <ExamplesComponent
-              onOpen={onOpen}
-              onChangeOutputPath={outputPath => this.setState({ outputPath })}
-              outputPath={this.state.outputPath}
-            />
-          )}
-          {this.state.currentTab === 'tutorials' && (
-            <ScrollView>
-              <Tutorials />
-            </ScrollView>
-          )}
-          {this.state.currentTab === 'games-showcase' && <GamesShowcase />}
-        </Column>
-      </Dialog>
-    );
-  }
-}
+export default CreateProjectDialog;

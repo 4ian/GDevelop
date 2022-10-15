@@ -6,7 +6,12 @@ import { List, ListItem } from '../UI/List';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
 import EmptyMessage from '../UI/EmptyMessage';
 import { Column } from '../UI/Grid';
+import { Paper } from '@material-ui/core';
 const gd: libGDevelop = global.gd;
+
+const styles = {
+  objectSelector: { position: 'sticky', bottom: 0 },
+};
 
 type Props = {|
   project: ?gdProject,
@@ -16,51 +21,40 @@ type Props = {|
   onSizeUpdated?: () => void,
 |};
 
-type State = {|
-  newObjectName: string,
-|};
+const ObjectGroupEditor = ({
+  project,
+  group,
+  globalObjectsContainer,
+  objectsContainer,
+  onSizeUpdated,
+}: Props) => {
+  const [newObjectName, setNewObjectName] = React.useState<string>('');
+  const objectsInGroup = group.getAllObjectsNames().toJSArray();
 
-export default class ObjectGroupEditor extends React.Component<Props, State> {
-  state = {
-    newObjectName: '',
-  };
-
-  removeObject = (objectName: string) => {
-    const { group, onSizeUpdated } = this.props;
-
+  const removeObject = (objectName: string) => {
     group.removeObject(objectName);
 
-    this.forceUpdate();
     if (onSizeUpdated) onSizeUpdated();
   };
 
-  addObject = (objectName: string) => {
-    const { group, onSizeUpdated } = this.props;
-
+  const addObject = (objectName: string) => {
     group.addObject(objectName);
-    this.setState({
-      newObjectName: '',
-    });
+    setNewObjectName('');
     if (onSizeUpdated) onSizeUpdated();
   };
 
-  _renderExplanation() {
-    const { group, globalObjectsContainer, objectsContainer } = this.props;
-
+  const renderExplanation = () => {
     let type = undefined;
-    group
-      .getAllObjectsNames()
-      .toJSArray()
-      .forEach(objectName => {
-        const objectType = gd.getTypeOfObject(
-          globalObjectsContainer,
-          objectsContainer,
-          objectName,
-          false
-        );
-        if (type === undefined || objectType === type) type = objectType;
-        else type = '';
-      });
+    objectsInGroup.forEach(objectName => {
+      const objectType = gd.getTypeOfObject(
+        globalObjectsContainer,
+        objectsContainer,
+        objectName,
+        false
+      );
+      if (type === undefined || objectType === type) type = objectType;
+      else type = '';
+    });
 
     let message = '';
     if (type === undefined) {
@@ -73,19 +67,12 @@ export default class ObjectGroupEditor extends React.Component<Props, State> {
     }
 
     return <EmptyMessage>{message}</EmptyMessage>;
-  }
+  };
 
-  render() {
-    const {
-      project,
-      group,
-      globalObjectsContainer,
-      objectsContainer,
-    } = this.props;
-
-    return (
+  return (
+    <Column>
       <div>
-        {this._renderExplanation()}
+        {renderExplanation()}
         <List>
           {group
             .getAllObjectsNames()
@@ -96,26 +83,31 @@ export default class ObjectGroupEditor extends React.Component<Props, State> {
                   key={objectName}
                   primaryText={objectName}
                   displayRemoveButton
-                  onRemove={() => this.removeObject(objectName)}
+                  onRemove={() => removeObject(objectName)}
                 />
               );
             })}
         </List>
+      </div>
+      <Paper style={styles.objectSelector}>
         <Column>
           <ObjectSelector
             project={project}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
-            value={this.state.newObjectName}
-            onChange={name => this.setState({ newObjectName: name })}
-            onChoose={this.addObject}
+            value={newObjectName}
+            excludedObjectOrGroupNames={objectsInGroup}
+            onChange={setNewObjectName}
+            onChoose={addObject}
             openOnFocus
             noGroups
             hintText={t`Choose an object to add to the group`}
             fullWidth
           />
         </Column>
-      </div>
-    );
-  }
-}
+      </Paper>
+    </Column>
+  );
+};
+
+export default ObjectGroupEditor;

@@ -16,7 +16,7 @@
 namespace gd {
 class Project;
 class Object;
-class BehaviorContent;
+class Behavior;
 }  // namespace gd
 
 namespace gd {
@@ -31,13 +31,14 @@ class GD_CORE_API UsedExtensionsFinder
  private:
   UsedExtensionsFinder(gd::Project& project_) : project(project_){};
   gd::Project& project;
+  gd::String rootType;
   std::set<gd::String> usedExtensions;
 
   // Object Visitor
   void DoVisitObject(gd::Object& object) override;
 
   // Behavior Visitor
-  void DoVisitBehavior(gd::BehaviorContent& behavior) override;
+  void DoVisitBehavior(gd::Behavior& behavior) override;
 
   // Instructions Visitor
   bool DoVisitInstruction(gd::Instruction& instruction,

@@ -14,12 +14,15 @@ export type AlertMessageIdentifier =
   | 'automatic-lighting-layer'
   | 'object-moved-in-lighting-layer'
   | 'use-non-smoothed-textures'
+  | 'use-pixel-rounding'
   | 'use-nearest-scale-mode'
   | 'maximum-fps-too-low'
   | 'minimum-fps-too-low'
   | 'function-extractor-explanation'
   | 'events-based-behavior-explanation'
   | 'empty-events-based-behavior-explanation'
+  | 'events-based-object-explanation'
+  | 'empty-events-based-object-explanation'
   | 'too-much-effects'
   | 'effects-usage'
   | 'lighting-layer-usage'
@@ -54,6 +57,10 @@ export const allAlertMessages: Array<{
     label: <Trans>Using non smoothed textures</Trans>,
   },
   {
+    key: 'use-pixel-rounding',
+    label: <Trans>Using pixel rounding</Trans>,
+  },
+  {
     key: 'use-nearest-scale-mode',
     label: <Trans>Using Nearest Scale Mode</Trans>,
   },
@@ -76,6 +83,14 @@ export const allAlertMessages: Array<{
   {
     key: 'empty-events-based-behavior-explanation',
     label: <Trans>Using empty events based behavior</Trans>,
+  },
+  {
+    key: 'events-based-object-explanation',
+    label: <Trans>Using events based object</Trans>,
+  },
+  {
+    key: 'empty-events-based-object-explanation',
+    label: <Trans>Using empty events based object</Trans>,
   },
   {
     key: 'too-much-effects',
@@ -167,6 +182,7 @@ export type PreferencesValues = {|
   codeEditorThemeName: string,
   hiddenAlertMessages: { [AlertMessageIdentifier]: boolean },
   hiddenTutorialHints: { [string]: boolean },
+  hiddenAnnouncements: { [string]: boolean },
   autoDisplayChangelog: boolean,
   lastLaunchedVersion: ?string,
   eventsSheetShowObjectThumbnails: boolean,
@@ -188,6 +204,8 @@ export type PreferencesValues = {|
   isAlwaysOnTopInPreview: boolean,
   backdropClickBehavior: 'nothing' | 'apply' | 'cancel',
   eventsSheetCancelInlineParameter: 'cancel' | 'apply',
+  showCommunityExtensions: boolean,
+  showGetStartedSection: boolean,
 |};
 
 /**
@@ -202,7 +220,11 @@ export type Preferences = {|
   checkUpdates: (forceDownload?: boolean) => void,
   setAutoDisplayChangelog: (enabled: boolean) => void,
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => void,
+  showAllAlertMessages: () => void,
   showTutorialHint: (identifier: string, show: boolean) => void,
+  showAllTutorialHints: () => void,
+  showAnnouncement: (identifier: string, show: boolean) => void,
+  showAllAnnouncements: () => void,
   verifyIfIsNewVersion: () => boolean,
   setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
   setAutosaveOnPreview: (enabled: boolean) => void,
@@ -244,6 +266,8 @@ export type Preferences = {|
   getIsAlwaysOnTopInPreview: () => boolean,
   setIsAlwaysOnTopInPreview: (enabled: boolean) => void,
   setEventsSheetCancelInlineParameter: (value: string) => void,
+  setShowCommunityExtensions: (enabled: boolean) => void,
+  setShowGetStartedSection: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -253,11 +277,13 @@ export const initialPreferences = {
     themeName:
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'Nord'
-        : 'GDevelop default',
+        ? 'GDevelop default Dark'
+        : // TODO: Use the light theme back when it's adapted to the modern theme.
+          'GDevelop default Dark',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},
+    hiddenAnnouncements: {},
     autoDisplayChangelog: true,
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
@@ -279,6 +305,8 @@ export const initialPreferences = {
     isAlwaysOnTopInPreview: false,
     backdropClickBehavior: 'nothing',
     eventsSheetCancelInlineParameter: 'apply',
+    showCommunityExtensions: false,
+    showGetStartedSection: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -287,7 +315,11 @@ export const initialPreferences = {
   checkUpdates: () => {},
   setAutoDisplayChangelog: () => {},
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => {},
+  showAllAlertMessages: () => {},
   showTutorialHint: (identifier: string, show: boolean) => {},
+  showAllTutorialHints: () => {},
+  showAnnouncement: (identifier: string, show: boolean) => {},
+  showAllAnnouncements: () => {},
   verifyIfIsNewVersion: () => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
@@ -325,6 +357,8 @@ export const initialPreferences = {
   getIsAlwaysOnTopInPreview: () => true,
   setIsAlwaysOnTopInPreview: () => {},
   setEventsSheetCancelInlineParameter: () => {},
+  setShowCommunityExtensions: () => {},
+  setShowGetStartedSection: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

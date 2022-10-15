@@ -1,6 +1,6 @@
 // @flow
 
-export default (
+const newNameGenerator = (
   name /*:string */,
   exists /*:(string) => boolean */,
   prefix /*: string */ = ''
@@ -14,3 +14,5 @@ export default (
 
   return potentialName;
 };
+
+export default newNameGenerator;

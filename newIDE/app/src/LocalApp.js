@@ -5,15 +5,17 @@ import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
 import CreateProjectDialog from './ProjectCreation/CreateProjectDialog';
 import Authentication from './Utils/GDevelopServices/Authentication';
-import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
+import './UI/icomoon-font.css'; // Styles for Icomoon font.
 
 // Import for Electron powered IDE.
-import LocalExamples from './ProjectCreation/LocalExamples';
-import LocalStarters from './ProjectCreation/LocalStarters';
 import localResourceSources from './ResourcesList/LocalResourceSources';
 import localResourceExternalEditors from './ResourcesList/LocalResourceExternalEditors';
 import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
-import { getLocalExporters } from './Export/LocalExporters';
+import {
+  localAutomatedExporters,
+  localManualExporters,
+  localOnlineWebExporter,
+} from './Export/LocalExporters';
 import ElectronMainMenu from './MainFrame/ElectronMainMenu';
 import makeExtensionsLoader from './JsExtensionsLoader/LocalJsExtensionsLoader';
 import { makeLocalEventsFunctionCodeWriter } from './EventsFunctionsExtensionsLoader/CodeWriters/LocalEventsFunctionCodeWriter';
@@ -25,7 +27,13 @@ import LocalEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoad
 import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import LocalFileStorageProvider from './ProjectsStorage/LocalFileStorageProvider';
 import { LocalGDJSDevelopmentWatcher } from './GameEngineFinder/LocalGDJSDevelopmentWatcher';
-import { LocalResourceFetcher } from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
+import {
+  onCreateFromExampleShortHeader,
+  onCreateBlank,
+} from './ProjectCreation/services/LocalCreation';
+import FakeCloudStorageProvider from './ProjectsStorage/FakeCloudStorageProvider';
+import LocalResourceMover from './ProjectsStorage/ResourceMover/LocalResourceMover';
+import LocalResourceFetcher from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
 
 const gd: libGDevelop = global.gd;
 
@@ -42,14 +50,14 @@ export const create = (authentication: Authentication) => {
       makeEventsFunctionCodeWriter={makeLocalEventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={LocalEventsFunctionsExtensionWriter}
       eventsFunctionsExtensionOpener={LocalEventsFunctionsExtensionOpener}
-      resourceFetcher={LocalResourceFetcher}
     >
       {({ i18n }) => (
         <ProjectStorageProviders
           appArguments={appArguments}
           storageProviders={
             // Add Url provider
-            [LocalFileStorageProvider]}
+            [LocalFileStorageProvider, FakeCloudStorageProvider]
+          }
           defaultStorageProvider={LocalFileStorageProvider}
         >
           {({
@@ -65,19 +73,35 @@ export const create = (authentication: Authentication) => {
                 <LocalPreviewLauncher {...props} ref={ref} />
               )}
               renderExportDialog={props => (
-                <ExportDialog {...props} exporters={getLocalExporters()} />
+                <ExportDialog
+                  project={props.project}
+                  onSaveProject={props.onSaveProject}
+                  onChangeSubscription={props.onChangeSubscription}
+                  onClose={props.onClose}
+                  automatedExporters={localAutomatedExporters}
+                  manualExporters={localManualExporters}
+                  onlineWebExporter={localOnlineWebExporter}
+                />
               )}
               renderCreateDialog={props => (
                 <CreateProjectDialog
-                  {...props}
-                  examplesComponent={LocalExamples}
-                  startersComponent={LocalStarters}
+                  open={props.open}
+                  onClose={props.onClose}
+                  initialExampleShortHeader={props.initialExampleShortHeader}
+                  isProjectOpening={props.isProjectOpening}
+                  onOpenProjectPreCreationDialog={
+                    props.onOpenProjectPreCreationDialog
+                  }
                 />
               )}
               renderGDJSDevelopmentWatcher={
                 isDev ? () => <LocalGDJSDevelopmentWatcher /> : null
               }
+              onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
+              onCreateBlank={onCreateBlank}
               storageProviders={storageProviders}
+              resourceMover={LocalResourceMover}
+              resourceFetcher={LocalResourceFetcher}
               getStorageProviderOperations={getStorageProviderOperations}
               getStorageProvider={getStorageProvider}
               resourceSources={localResourceSources}

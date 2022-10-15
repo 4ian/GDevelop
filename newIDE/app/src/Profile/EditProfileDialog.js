@@ -1,21 +1,22 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
 
-import React, { Component } from 'react';
+import React from 'react';
 import FlatButton from '../UI/FlatButton';
-import RaisedButton from '../UI/RaisedButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import {
   type EditForm,
   type AuthError,
   type Profile,
 } from '../Utils/GDevelopServices/Authentication';
+import { type UsernameAvailability } from '../Utils/GDevelopServices/User';
 import LeftLoader from '../UI/LeftLoader';
 import { ColumnStackLayout } from '../UI/Layout';
 import {
   isUsernameValid,
   UsernameField,
-  usernameFormatError,
+  usernameFormatErrorMessage,
+  usernameAvailabilityErrorMessage,
 } from './UsernameField';
 import TextField from '../UI/TextField';
 import Checkbox from '../UI/Checkbox';
@@ -24,114 +25,131 @@ type Props = {|
   profile: Profile,
   onClose: () => void,
   onEdit: (form: EditForm) => Promise<void>,
-  editInProgress: boolean,
+  updateProfileInProgress: boolean,
   error: ?AuthError,
-|};
-
-type State = {|
-  form: EditForm,
 |};
 
 export const getUsernameErrorText = (error: ?AuthError) => {
   if (!error) return undefined;
 
   if (error.code === 'auth/username-used')
-    return 'This username is already used, please pick another one.';
-  if (error.code === 'auth/malformed-username') return usernameFormatError;
+    return usernameAvailabilityErrorMessage;
+  if (error.code === 'auth/malformed-username')
+    return usernameFormatErrorMessage;
   return undefined;
 };
 
-export default class EditDialog extends Component<Props, State> {
-  state = {
-    form: {
-      username: this.props.profile.username || '',
-      description: this.props.profile.description || '',
-      getGameStatsEmail: !!this.props.profile.getGameStatsEmail,
-    },
+const EditProfileDialog = ({
+  profile,
+  onClose,
+  onEdit,
+  updateProfileInProgress,
+  error,
+}: Props) => {
+  const [username, setUsername] = React.useState(profile.username || '');
+  const [description, setDescription] = React.useState(
+    profile.description || ''
+  );
+  const [getGameStatsEmail, setGetGameStatsEmail] = React.useState(
+    !!profile.getGameStatsEmail
+  );
+  const [getNewsletterEmail, setGetNewsletterEmail] = React.useState(
+    !!profile.getNewsletterEmail
+  );
+  const [
+    usernameAvailability,
+    setUsernameAvailability,
+  ] = React.useState<?UsernameAvailability>(null);
+  const [
+    isValidatingUsername,
+    setIsValidatingUsername,
+  ] = React.useState<boolean>(false);
+
+  const canEdit =
+    !updateProfileInProgress &&
+    isUsernameValid(username, { allowEmpty: false }) &&
+    !isValidatingUsername &&
+    (!usernameAvailability || usernameAvailability.isAvailable);
+
+  const edit = () => {
+    if (!canEdit) return;
+    onEdit({
+      username,
+      description,
+      getGameStatsEmail,
+      getNewsletterEmail,
+    });
   };
 
-  _onEdit = () => {
-    const { form } = this.state;
-    this.props.onEdit(form);
-  };
+  const actions = [
+    <FlatButton
+      label={<Trans>Back</Trans>}
+      disabled={updateProfileInProgress}
+      key="back"
+      primary={false}
+      onClick={onClose}
+    />,
+    <LeftLoader isLoading={updateProfileInProgress} key="edit">
+      <DialogPrimaryButton
+        label={<Trans>Save</Trans>}
+        primary
+        disabled={!canEdit}
+        onClick={edit}
+      />
+    </LeftLoader>,
+  ];
 
-  render() {
-    const { onClose, editInProgress, error } = this.props;
-    const actions = [
-      <FlatButton
-        label={<Trans>Back</Trans>}
-        disabled={editInProgress}
-        key="back"
-        primary={false}
-        onClick={onClose}
-      />,
-      <LeftLoader isLoading={editInProgress} key="edit">
-        <RaisedButton
-          label={<Trans>Save</Trans>}
-          primary
-          onClick={this._onEdit}
-          disabled={
-            editInProgress || !isUsernameValid(this.state.form.username)
-          }
+  return (
+    <Dialog
+      title={<Trans>Edit your GDevelop profile</Trans>}
+      actions={actions}
+      maxWidth="sm"
+      cannotBeDismissed={updateProfileInProgress}
+      onRequestClose={onClose}
+      onApply={edit}
+      open
+    >
+      <ColumnStackLayout noMargin>
+        <UsernameField
+          initialUsername={profile.username}
+          value={username}
+          onChange={(e, value) => {
+            setUsername(value);
+          }}
+          errorText={getUsernameErrorText(error)}
+          onAvailabilityChecked={setUsernameAvailability}
+          onAvailabilityCheckLoading={setIsValidatingUsername}
+          isValidatingUsername={isValidatingUsername}
         />
-      </LeftLoader>,
-    ];
+        <TextField
+          value={description}
+          floatingLabelText={<Trans>Bio</Trans>}
+          fullWidth
+          multiline
+          rows={3}
+          rowsMax={5}
+          translatableHintText={t`What are you using GDevelop for?`}
+          onChange={(e, value) => {
+            setDescription(value);
+          }}
+        />
+        <Checkbox
+          label={<Trans>I want to receive the GDevelop Newsletter</Trans>}
+          checked={getNewsletterEmail}
+          onCheck={(e, value) => {
+            setGetNewsletterEmail(value);
+          }}
+        />
+        <Checkbox
+          label={<Trans>I want to receive weekly stats about my games</Trans>}
+          checked={getGameStatsEmail}
+          onCheck={(e, value) => {
+            setGetGameStatsEmail(value);
+          }}
+        />
+      </ColumnStackLayout>
+    </Dialog>
+  );
+};
 
-    return (
-      <Dialog
-        title={<Trans>Edit your GDevelop profile</Trans>}
-        actions={actions}
-        onRequestClose={() => {
-          if (!editInProgress) onClose();
-        }}
-        maxWidth="sm"
-        cannotBeDismissed={true}
-        open
-      >
-        <ColumnStackLayout noMargin>
-          <UsernameField
-            value={this.state.form.username}
-            onChange={(e, value) => {
-              this.setState({
-                form: {
-                  ...this.state.form,
-                  username: value,
-                },
-              });
-            }}
-            errorText={getUsernameErrorText(error)}
-          />
-          <TextField
-            value={this.state.form.description}
-            floatingLabelText={<Trans>Bio</Trans>}
-            fullWidth
-            multiline
-            rows={3}
-            rowsMax={5}
-            hintText={t`What are you using GDevelop for?`}
-            onChange={(e, value) => {
-              this.setState({
-                form: {
-                  ...this.state.form,
-                  description: value,
-                },
-              });
-            }}
-          />
-          <Checkbox
-            label={<Trans>I want to receive weekly stats about my games</Trans>}
-            checked={this.state.form.getGameStatsEmail}
-            onCheck={(e, value) => {
-              this.setState({
-                form: {
-                  ...this.state.form,
-                  getGameStatsEmail: value,
-                },
-              });
-            }}
-          />
-        </ColumnStackLayout>
-      </Dialog>
-    );
-  }
-}
+export default EditProfileDialog;

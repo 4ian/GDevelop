@@ -1,18 +1,20 @@
 // @flow
 import * as React from 'react';
 import Button from '@material-ui/core/Button';
+import { type ButtonInterface } from './Button';
 import { Spacer } from './Grid';
 
 // We support a subset of the props supported by Material-UI v0.x FlatButton
 // They should be self descriptive - refer to Material UI docs otherwise.
 type Props = {|
   label: React.Node,
-  onClick: ?(ev: any) => void,
+  onClick: ?(ev: any) => void | Promise<void>,
   primary?: boolean,
   disabled?: boolean,
   keyboardFocused?: boolean,
   fullWidth?: boolean,
-  icon?: React.Node,
+  leftIcon?: React.Node,
+  rightIcon?: React.Node,
   style?: {|
     marginTop?: number,
     marginBottom?: number,
@@ -22,15 +24,26 @@ type Props = {|
     flexShrink?: 0,
   |},
   target?: '_blank',
+  id?: ?string,
 |};
 
 /**
- * A "flat" button based on Material-UI button.
+ * A "outlined" button based on Material-UI button.
  */
-export default class FlatButton extends React.Component<Props, {||}> {
-  render() {
-    const { label, primary, icon, keyboardFocused, ...otherProps } = this.props;
-
+const FlatButton = React.forwardRef<Props, ButtonInterface>(
+  (
+    {
+      label,
+      primary,
+      leftIcon,
+      rightIcon,
+      keyboardFocused,
+      disabled,
+      id,
+      ...otherProps
+    }: Props,
+    ref
+  ) => {
     // In theory, focus ripple is only shown after a keyboard interaction
     // (see https://github.com/mui-org/material-ui/issues/12067). However, as
     // it's important to get focus right in the whole app, make the ripple
@@ -39,16 +52,24 @@ export default class FlatButton extends React.Component<Props, {||}> {
 
     return (
       <Button
+        variant="outlined"
         size="small"
-        color={primary ? 'primary' : 'default'}
+        color={primary ? 'secondary' : 'default'}
         autoFocus={keyboardFocused}
         focusRipple={focusRipple}
+        disabled={disabled}
+        id={id}
         {...otherProps}
+        ref={ref}
       >
-        {icon}
-        {icon && <Spacer />}
+        {leftIcon}
+        {leftIcon && <Spacer />}
         {label}
+        {rightIcon && <Spacer />}
+        {rightIcon}
       </Button>
     );
   }
-}
+);
+
+export default FlatButton;

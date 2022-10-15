@@ -6,6 +6,7 @@ declare class gdExpressionMetadata {
   getDescription(): string;
   getGroup(): string;
   getSmallIconFilename(): string;
+  getHelpPath(): string;
   isShown(): boolean;
   isPrivate(): boolean;
   getParameter(id: number): gdParameterMetadata;
@@ -17,6 +18,8 @@ declare class gdExpressionMetadata {
   addCodeOnlyParameter(type: string, supplementaryInformation: string): gdExpressionMetadata;
   setDefaultValue(defaultValue: string): gdExpressionMetadata;
   setParameterLongDescription(longDescription: string): gdExpressionMetadata;
+  setRequiresBaseObjectCapability(capability: string): gdExpressionMetadata;
+  getRequiredBaseObjectCapability(): string;
   getCodeExtraInformation(): gdExpressionCodeGenerationInformation;
   delete(): void;
   ptr: number;

@@ -1,3 +1,4 @@
+// @flow
 import * as React from 'react';
 
 const style = {
@@ -7,8 +8,10 @@ const style = {
 type Props = {
   children: React.Node,
   height: number | string,
+  alignItems?: 'center',
+  justifyContent?: 'center',
 };
 
-export default ({ children, height }: Props) => (
-  <div style={{ ...style, height }}>{children}</div>
+export default ({ children, height, alignItems, justifyContent }: Props) => (
+  <div style={{ ...style, height, alignItems, justifyContent }}>{children}</div>
 );

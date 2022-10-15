@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import { enumerateEventsFunctionsExtensions } from '../../ProjectManager/EnumerateProjectItems';
 import { Line, Column, Spacer } from '../../UI/Grid';
@@ -91,6 +91,31 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     if (eventsFunction) eventsFunction.delete();
   }
 
+  _getFunctionGroupNames = (): Array<string> => {
+    const { createNewExtension, extensionName } = this.state;
+    if (createNewExtension || !extensionName) {
+      return [];
+    }
+    const groupNames = new Set<string>();
+    const { project } = this.props;
+    const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+      extensionName
+    );
+    for (
+      let index = 0;
+      index < eventsFunctionsExtension.getEventsFunctionsCount();
+      index++
+    ) {
+      const groupName = eventsFunctionsExtension
+        .getEventsFunctionAt(index)
+        .getGroup();
+      if (groupName) {
+        groupNames.add(groupName);
+      }
+    }
+    return [...groupNames].sort((a, b) => a.localeCompare(b));
+  };
+
   render() {
     const { project, onClose, onCreate } = this.props;
     const { eventsFunction, extensionName, createNewExtension } = this.state;
@@ -111,18 +136,20 @@ export default class EventsFunctionExtractorDialog extends React.Component<
 
     return (
       <Dialog
-        onApply={onApply}
         title={<Trans>Extract the events in a function</Trans>}
-        secondaryActions={
-          <HelpButton helpPagePath="/events/functions/extract-events" />
-        }
+        secondaryActions={[
+          <HelpButton
+            helpPagePath="/events/functions/extract-events"
+            key="help"
+          />,
+        ]}
         actions={[
           <FlatButton
             key="cancel"
             label={<Trans>Cancel</Trans>}
             onClick={onClose}
           />,
-          <FlatButton
+          <DialogPrimaryButton
             key="create"
             label={<Trans>Create</Trans>}
             primary
@@ -132,9 +159,10 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             onClick={onApply}
           />,
         ]}
-        cannotBeDismissed={true}
         open
+        cannotBeDismissed
         onRequestClose={onClose}
+        onApply={onApply}
         noMargin
       >
         <Column noMargin>
@@ -260,17 +288,20 @@ export default class EventsFunctionExtractorDialog extends React.Component<
           <EventsFunctionPropertiesEditor
             eventsFunction={eventsFunction}
             eventsBasedBehavior={null}
+            eventsBasedObject={null}
             onConfigurationUpdated={() => {
               // Force re-running logic to see if Create button is disabled.
               this.forceUpdate();
             }}
             freezeEventsFunctionType
+            getFunctionGroupNames={this._getFunctionGroupNames}
           />
           <Spacer />
           <EventsFunctionParametersEditor
             project={project}
             eventsFunction={eventsFunction}
             eventsBasedBehavior={null}
+            eventsBasedObject={null}
             onParametersUpdated={() => {
               // Force the dialog to adapt its size
               this.forceUpdate();

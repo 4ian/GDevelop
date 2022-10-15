@@ -6,6 +6,22 @@ describe('gdjs', function() {
 	it('should define gdjs', function() {
 		expect(gdjs).to.be.ok();
 	});
+
+	it('should allow to register scene callbacks (and unregister them)', () => {
+		const fakeCb = () => {};
+		const fakeCb2 = () => {};
+		gdjs.registerFirstRuntimeSceneLoadedCallback(fakeCb);
+		gdjs.registerRuntimeScenePreEventsCallback(fakeCb2);
+
+		expect(gdjs.callbacksFirstRuntimeSceneLoaded).to.contain(fakeCb);
+		expect(gdjs.callbacksRuntimeScenePreEvents).to.contain(fakeCb2);
+
+		gdjs._unregisterCallback(fakeCb);
+		expect(gdjs.callbacksFirstRuntimeSceneLoaded).not.to.contain(fakeCb);
+
+		gdjs._unregisterCallback(fakeCb2);
+		expect(gdjs.callbacksRuntimeScenePreEvents).not.to.contain(fakeCb2);
+	});
 });
 
 describe('gdjs.evtTools.object.twoListsTest', function() {
@@ -78,7 +94,7 @@ describe('gdjs.evtTools.object.pickRandomObject', function() {
 		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
 		var obj2A = new gdjs.RuntimeObject(runtimeScene, {name: "obj2", type: "", behaviors: [], effects: []});
 		var obj2B = new gdjs.RuntimeObject(runtimeScene, {name: "obj2", type: "", behaviors: [], effects: []});
-		
+
 		var map1 = new Hashtable();
 		var list1 = [obj1A, obj1B, obj1C];
 		map1.put("obj1", list1);
@@ -87,7 +103,7 @@ describe('gdjs.evtTools.object.pickRandomObject', function() {
 		expect(list1).to.have.length(1);
 		expect(gdjs.evtTools.object.pickRandomObject(runtimeScene, map1)).to.be.ok();
 		expect(list1).to.have.length(1);
-		
+
 		list1.length = 0;
 		expect(gdjs.evtTools.object.pickRandomObject(runtimeScene, map1)).to.not.be.ok();
 
@@ -108,7 +124,7 @@ describe('gdjs.evtTools.object.pickOnly', function() {
 		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [], effects: []});
 		var obj2A = new gdjs.RuntimeObject(runtimeScene, {name: "obj2", type: "", behaviors: [], effects: []});
 		var obj2B = new gdjs.RuntimeObject(runtimeScene, {name: "obj2", type: "", behaviors: [], effects: []});
-		
+
 		var map1 = new Hashtable();
 		map1.put("obj1", [obj1A, obj1B, obj1C]);
 

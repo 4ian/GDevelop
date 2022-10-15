@@ -17,9 +17,6 @@ namespace gdjs {
 AdvancedExtension::AdvancedExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsAdvancedExtension(*this);
 
-  GetAllConditions()["Toujours"].SetFunctionName(
-      "gdjs.evtTools.common.logicalNegation");
-
   GetAllActions()["SetReturnNumber"]
       .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction& instruction,

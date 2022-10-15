@@ -20,19 +20,21 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
+  extension.AddInstructionOrExpressionGroupMetadata(_("Text manipulation"))
+      .SetIcon("res/actions/text24_black.png");
 
   extension.AddStrExpression("NewLine",
                              _("Insert a new line"),
                              _("Insert a new line"),
-                             _("Manipulation of text"),
-                             "res/conditions/toujours24.png");
+                             "",
+                             "res/conditions/toujours24_black.png");
 
   extension
       .AddStrExpression("FromCodePoint",
                         _("Get character from code point"),
                         _("Get character from code point"),
-                        _("Manipulation of text"),
-                        "res/conditions/toujours24.png")
+                        "",
+                        "res/conditions/toujours24_black.png")
 
       .AddParameter("expression", _("Code point"));
 
@@ -40,8 +42,8 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
       .AddStrExpression("ToUpperCase",
                         _("Uppercase a text"),
                         _("Uppercase a text"),
-                        _("Manipulation of text"),
-                        "res/conditions/toujours24.png")
+                        "",
+                        "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"));
 
@@ -49,8 +51,8 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
       .AddStrExpression("ToLowerCase",
                         _("Lowercase a text"),
                         _("Lowercase a text"),
-                        _("Manipulation of text"),
-                        "res/conditions/toujours24.png")
+                        "",
+                        "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"));
 
@@ -58,8 +60,8 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
       .AddStrExpression("SubStr",
                         _("Get a portion of a text"),
                         _("Get a portion of a text"),
-                        _("Manipulation of text"),
-                        "res/conditions/toujours24.png")
+                        "",
+                        "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter("expression",
@@ -71,8 +73,8 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
       .AddStrExpression("StrAt",
                         _("Get a character from a text"),
                         _("Get a character from a text"),
-                        _("Manipulation of text"),
-                        "res/conditions/toujours24.png")
+                        "",
+                        "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter(
@@ -83,8 +85,8 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
       .AddStrExpression("StrRepeat",
                         _("Repeat a text"),
                         _("Repeat a text"),
-                        _("Manipulation of text"),
-                        "res/conditions/toujours24.png")
+                        "",
+                        "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text to repeat"))
       .AddParameter("expression", _("Repetition count"));
@@ -93,8 +95,8 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
       .AddExpression("StrLength",
                      _("Length of a text"),
                      _("Length of a text"),
-                     _("Manipulation of text"),
-                     "res/conditions/toujours24.png")
+                     "",
+                     "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"));
 
@@ -103,8 +105,8 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                      _("Search in a text"),
                      _("Search in a text (return the position of the result or "
                        "-1 if not found)"),
-                     _("Manipulation of text"),
-                     "res/conditions/toujours24.png")
+                     "",
+                     "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"));
@@ -114,8 +116,8 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                      "Search in a text from the end",
                      "Search in a text from the end (return the position of "
                      "the result or -1 if not found)",
-                     _("Manipulation of text"),
-                     "res/conditions/toujours24.png")
+                     "",
+                     "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"))
@@ -128,8 +130,8 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
           _("Search the last occurence in a string (return the position of "
             "the result, from the beginning of the string, or -1 if not "
             "found)"),
-          _("Manipulation of text"),
-          "res/conditions/toujours24.png")
+          "",
+          "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"));
@@ -139,8 +141,8 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                      _("Search in a text, starting from a position"),
                      _("Search in a text, starting from a position (return the "
                        "position of the result or -1 if not found)"),
-                     _("Manipulation of text"),
-                     "res/conditions/toujours24.png")
+                     "",
+                     "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"))
@@ -154,8 +156,8 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
           "Search in a text from the end, starting from a position",
           "Search in a text from the end, starting from a position (return "
           "the position of the result or -1 if not found)",
-          _("Manipulation of text"),
-          "res/conditions/toujours24.png")
+          "",
+          "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"))
@@ -172,8 +174,8 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
             "(return "
             " the position of the result, from the beginning of the string, or "
             "-1 if not found)"),
-          _("Manipulation of text"),
-          "res/conditions/toujours24.png")
+          "",
+          "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"))

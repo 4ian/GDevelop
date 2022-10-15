@@ -267,10 +267,8 @@ namespace gdjs {
     }
 
     /**
-     * Convert a point from the canvas coordinates (For example, the mouse position) to the
-     * "world" coordinates.
-     *
-     * TODO: Update this method to store the result in a static array
+     * Convert a point from the canvas coordinates (for example,
+     * the mouse position) to the scene coordinates.
      *
      * @param x The x position, in canvas coordinates.
      * @param y The y position, in canvas coordinates.
@@ -292,6 +290,14 @@ namespace gdjs {
       return [x + this.getCameraX(cameraId), y + this.getCameraY(cameraId)];
     }
 
+    /**
+     * Convert a point from the scene coordinates (for example,
+     * an object position) to the canvas coordinates.
+     *
+     * @param x The x position, in scene coordinates.
+     * @param y The y position, in scene coordinates.
+     * @param cameraId The camera number. Currently ignored.
+     */
     convertInverseCoords(x: float, y: float, cameraId?: integer): FloatPoint {
       x -= this.getCameraX(cameraId);
       y -= this.getCameraY(cameraId);

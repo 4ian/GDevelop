@@ -11,7 +11,7 @@ import { uploadLocalFile } from './LocalFileUploader';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { findGDJS } from '../../GameEngineFinder/LocalGDJSFinder';
 import { archiveLocalFolder } from '../../Utils/LocalArchiver';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 import localFileSystem from './LocalFileSystem';
 import {
   type ExportPipeline,
@@ -49,6 +49,7 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
 > = {
   name: 'local-online-cordova',
   onlineBuildType: 'cordova-build',
+  limitedBuilds: true,
   packageNameWarningType: 'mobile',
 
   getInitialExportState: () => ({
@@ -57,7 +58,16 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
     signingDialogOpen: false,
   }),
 
-  canLaunchBuild: () => true,
+  // Build can be launched only if just opened the dialog or build errored.
+  canLaunchBuild: (exportState, errored, exportStep) =>
+    errored || exportStep === '',
+
+  // Navigation is enabled when the build is errored or whilst uploading.
+  isNavigationDisabled: (exportStep, errored) =>
+    !errored &&
+    ['register', 'export', 'resources-download', 'compress', 'upload'].includes(
+      exportStep
+    ),
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
@@ -139,7 +149,12 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
   launchOnlineBuild: (
     exportState: ExportState,
     authenticatedUser: AuthenticatedUser,
-    uploadBucketKey: string
+    uploadBucketKey: string,
+    gameId: string,
+    options: {|
+      gameName: string,
+      gameVersion: string,
+    |}
   ): Promise<Build> => {
     const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
     if (!firebaseUser)
@@ -150,7 +165,9 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
       firebaseUser.uid,
       uploadBucketKey,
       exportState.targets,
-      exportState.keystore
+      exportState.keystore,
+      gameId,
+      options
     );
   },
 };

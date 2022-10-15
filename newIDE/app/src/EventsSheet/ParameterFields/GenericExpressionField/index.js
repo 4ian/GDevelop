@@ -13,7 +13,7 @@ import ExpressionParametersEditorDialog, {
 } from './ExpressionParametersEditorDialog';
 import { hasNonCodeOnlyParameters } from './ExpressionParametersEditor';
 import { formatExpressionCall } from './FormatExpressionCall';
-import { type EnumeratedExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { type ParameterFieldProps } from '../ParameterFieldCommons';
 import BackgroundHighlighting, {
   type Highlight,
@@ -32,8 +32,9 @@ import {
   getAutocompletionsInitialState,
   setNewAutocompletions,
   handleAutocompletionsKeyDown,
-  getVisibleAutocompletions,
-  getRemainingCount,
+  handleAutocompletionsScroll,
+  getRenderedAutocompletions,
+  getNonRenderedCount,
 } from './ExpressionAutocompletionsHandler';
 import ExpressionAutocompletionsDisplayer from './ExpressionAutocompletionsDisplayer';
 import { ResponsiveWindowMeasurer } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
@@ -50,7 +51,7 @@ const styles = {
   },
   textFieldContainer: {
     flex: 1,
-    minWidth: 300,
+    minWidth: 200,
   },
   textFieldAndHightlightContainer: {
     position: 'relative',
@@ -115,12 +116,21 @@ type Props = {|
 const MAX_ERRORS_COUNT = 10;
 
 const extractErrors = (
+  platform: gdPlatform,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+  expressionType: string,
   expressionNode: gdExpressionNode
 ): {|
   errorText: ?string,
   errorHighlights: Array<Highlight>,
 |} => {
-  const expressionValidator = new gd.ExpressionValidator();
+  const expressionValidator = new gd.ExpressionValidator(
+    gd.JsPlatform.get(),
+    globalObjectsContainer,
+    objectsContainer,
+    expressionType
+  );
   expressionNode.visit(expressionValidator);
   const errors = expressionValidator.getErrors();
 
@@ -179,9 +189,17 @@ export default class ExpressionField extends React.Component<Props, State> {
     }
   }
 
-  focus = () => {
+  focus = (selectAll: boolean = false) => {
     if (this._field) {
       this._field.focus();
+      if (selectAll) {
+        if (this._inputElement) {
+          this._inputElement.setSelectionRange(
+            0,
+            this.props.value.toString().length
+          );
+        }
+      }
       this._enqueueValidation();
     }
   };
@@ -250,12 +268,50 @@ export default class ExpressionField extends React.Component<Props, State> {
     parameterValues: ParameterValues
   ) => {
     if (!this._inputElement) return;
+    const {
+      globalObjectsContainer,
+      objectsContainer,
+      expressionType,
+      value,
+    } = this.props;
     const cursorPosition = this._inputElement.selectionStart;
+    const parser = new gd.ExpressionParser2();
 
-    const functionCall = formatExpressionCall(expressionInfo, parameterValues);
+    // We want to know what type the expression should be so as to convert to string
+    // when necessary.
+    // We add a fake identifier so that getNodeAtPosition will return the type of
+    // its parent. Particularly, this is needed to get the type of a parameter in
+    // a function call. We could create a worker ExpectedTypeFinder that would get
+    // the type wanted by the parent instead.
+    const expressionNode = parser
+      .parseExpression(
+        value.substr(0, cursorPosition) +
+          'fakeIdentifier' +
+          value.substr(cursorPosition)
+      )
+      .get();
+    const currentNode = gd.ExpressionNodeLocationFinder.getNodeAtPosition(
+      expressionNode,
+      cursorPosition + 'fakeIdentifier'.length - 1
+    );
+    const type = gd.ExpressionTypeFinder.getType(
+      gd.JsPlatform.get(),
+      globalObjectsContainer,
+      objectsContainer,
+      expressionType,
+      currentNode
+    );
+
+    let shouldConvertToString =
+      expressionInfo.metadata.getReturnType() === 'number' && type === 'string';
+
+    const functionCall = formatExpressionCall(expressionInfo, parameterValues, {
+      shouldConvertToString,
+    });
+
+    parser.delete();
 
     // Generate the expression with the function call
-    const { value } = this.props;
     const newValue =
       value.substr(0, cursorPosition) +
       functionCall +
@@ -285,6 +341,14 @@ export default class ExpressionField extends React.Component<Props, State> {
     }, 5);
   };
 
+  _onExpressionAutocompletionsScroll = () => {
+    if (this.state.autocompletions.renderEverything) return; // Bail out early to avoid changing the state if not needed.
+
+    this.setState({
+      autocompletions: handleAutocompletionsScroll(this.state.autocompletions),
+    });
+  };
+
   _insertAutocompletion = (
     expressionAutocompletion: ExpressionAutocompletion
   ) => {
@@ -297,23 +361,34 @@ export default class ExpressionField extends React.Component<Props, State> {
       : 0;
     const expression = this.state.validatedValue;
 
-    const {
-      expression: newExpression,
-      caretLocation: newCaretLocation,
-    } = insertAutocompletionInExpression(
-      { expression, caretLocation },
-      {
-        completion: expressionAutocompletion.completion,
-        replacementStartPosition:
-          expressionAutocompletion.replacementStartPosition,
-        replacementEndPosition: expressionAutocompletion.replacementEndPosition,
-        addParenthesis: expressionAutocompletion.addParenthesis,
-        addDot: expressionAutocompletion.addDot,
-        addParameterSeparator: expressionAutocompletion.addParameterSeparator,
-        addNamespaceSeparator: expressionAutocompletion.addNamespaceSeparator,
-        hasVisibleParameters: expressionAutocompletion.hasVisibleParameters,
-      }
-    );
+    const { expression: newExpression, caretLocation: newCaretLocation } =
+      expressionAutocompletion.kind === 'FullExpression'
+        ? {
+            expression: expressionAutocompletion.completion,
+            caretLocation: expressionAutocompletion.completion.length,
+          }
+        : insertAutocompletionInExpression(
+            { expression, caretLocation },
+            {
+              completion: expressionAutocompletion.completion,
+              replacementStartPosition:
+                expressionAutocompletion.replacementStartPosition,
+              replacementEndPosition:
+                expressionAutocompletion.replacementEndPosition,
+              addParenthesis: expressionAutocompletion.addParenthesis,
+              addDot: expressionAutocompletion.addDot,
+              addParameterSeparator:
+                expressionAutocompletion.addParameterSeparator,
+              addNamespaceSeparator:
+                expressionAutocompletion.addNamespaceSeparator,
+              hasVisibleParameters:
+                expressionAutocompletion.hasVisibleParameters,
+              shouldConvertToString:
+                expressionAutocompletion.kind === 'Expression'
+                  ? expressionAutocompletion.shouldConvertToString
+                  : null,
+            }
+          );
 
     if (this._field) {
       this._field.forceSetValue(newExpression);
@@ -353,17 +428,17 @@ export default class ExpressionField extends React.Component<Props, State> {
     // Parsing can be time consuming (~1ms for simple expression,
     // a few milliseconds for complex ones).
 
-    const parser = new gd.ExpressionParser2(
+    const parser = new gd.ExpressionParser2();
+
+    const expressionNode = parser.parseExpression(expression).get();
+
+    const { errorText, errorHighlights } = extractErrors(
       gd.JsPlatform.get(),
       globalObjectsContainer,
-      objectsContainer
+      objectsContainer,
+      expressionType,
+      expressionNode
     );
-
-    const expressionNode = parser
-      .parseExpression(expressionType, expression)
-      .get();
-
-    const { errorText, errorHighlights } = extractErrors(expressionNode);
     const extraErrorText = onExtractAdditionalErrors
       ? onExtractAdditionalErrors(expression, expressionNode)
       : null;
@@ -389,6 +464,10 @@ export default class ExpressionField extends React.Component<Props, State> {
       ? this._inputElement.selectionStart
       : 0;
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      globalObjectsContainer,
+      objectsContainer,
+      expressionType,
       expressionNode,
       cursorPosition - 1
     );
@@ -552,15 +631,16 @@ export default class ExpressionField extends React.Component<Props, State> {
                   <ExpressionAutocompletionsDisplayer
                     project={project}
                     anchorEl={this._inputElement}
-                    expressionAutocompletions={getVisibleAutocompletions(
+                    expressionAutocompletions={getRenderedAutocompletions(
                       this.state.autocompletions
                     )}
-                    remainingCount={getRemainingCount(
+                    remainingCount={getNonRenderedCount(
                       this.state.autocompletions
                     )}
                     selectedCompletionIndex={
                       this.state.autocompletions.selectedCompletionIndex
                     }
+                    onScroll={this._onExpressionAutocompletionsScroll}
                     onChoose={expressionAutocompletion => {
                       this._insertAutocompletion(expressionAutocompletion);
 

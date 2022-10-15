@@ -10,6 +10,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionsList.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
@@ -23,7 +24,7 @@ class EventsCodeGenerationContext;
 class Platform;
 class SerializerElement;
 class Instruction;
-}
+}  // namespace gd
 
 namespace gd {
 
@@ -126,18 +127,25 @@ class GD_CORE_API BaseEvent {
     return noSearchableStrings;
   };
 
+  virtual bool ReplaceAllSearchableStrings(
+      std::vector<gd::String> newSearchableString) {
+    return false;
+  };
+
   /**
    * \brief Return a list of all expressions of the event, each with their associated metadata.
    * \note Used to preprocess or search in the expressions of the event.
    */
   virtual std::vector<std::pair<gd::Expression*, gd::ParameterMetadata> >
-      GetAllExpressionsWithMetadata() {
+  GetAllExpressionsWithMetadata() {
     std::vector<std::pair<gd::Expression*, gd::ParameterMetadata> > noExpr;
     return noExpr;
   };
-  virtual std::vector<std::pair<const gd::Expression*, const gd::ParameterMetadata> >
-      GetAllExpressionsWithMetadata() const {
-    std::vector<std::pair<const gd::Expression*, const gd::ParameterMetadata> > noExpr;
+  virtual std::vector<
+      std::pair<const gd::Expression*, const gd::ParameterMetadata> >
+  GetAllExpressionsWithMetadata() const {
+    std::vector<std::pair<const gd::Expression*, const gd::ParameterMetadata> >
+        noExpr;
     return noExpr;
   };
 
@@ -200,6 +208,11 @@ class GD_CORE_API BaseEvent {
   virtual void Preprocess(gd::EventsCodeGenerator& codeGenerator,
                           gd::EventsList& eventList,
                           std::size_t indexOfTheEventInThisList);
+
+  /**
+   * A function that turns all async member actions into an Async subevent for code generation.
+   */
+  void PreprocessAsyncActions(const gd::Platform& platform);
 
   /**
    * \brief If MustBePreprocessed is redefined to return true, the

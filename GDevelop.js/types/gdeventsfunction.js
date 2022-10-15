@@ -14,6 +14,8 @@ declare class gdEventsFunction {
   getFullName(): string;
   setSentence(sentence: string): gdEventsFunction;
   getSentence(): string;
+  setGroup(group: string): gdEventsFunction;
+  getGroup(): string;
   setPrivate(isPrivate: boolean): gdEventsFunction;
   isPrivate(): boolean;
   setFunctionType(type: EventsFunction_FunctionType): gdEventsFunction;

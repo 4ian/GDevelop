@@ -201,6 +201,7 @@ const themeData = {
   },
 };
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default {
   name: 'Vibrant Ink',
   themeName: 'vibrant-ink',

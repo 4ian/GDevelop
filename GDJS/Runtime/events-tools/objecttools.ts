@@ -219,11 +219,11 @@ namespace gdjs {
       };
 
       export const hitBoxesCollisionTest = function (
-        objectsLists1,
-        objectsLists2,
-        inverted,
-        runtimeScene,
-        ignoreTouchingEdges
+        objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
+        objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
+        inverted: boolean,
+        runtimeScene: gdjs.RuntimeScene,
+        ignoreTouchingEdges: boolean
       ) {
         return gdjs.evtTools.object.twoListsTest(
           gdjs.RuntimeObject.collisionTest,
@@ -239,10 +239,10 @@ namespace gdjs {
       };
 
       export const distanceTest = function (
-        objectsLists1,
-        objectsLists2,
-        distance,
-        inverted
+        objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
+        objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
+        distance: float,
+        inverted: boolean
       ) {
         return gdjs.evtTools.object.twoListsTest(
           gdjs.evtTools.object._distanceBetweenObjects,
@@ -278,10 +278,10 @@ namespace gdjs {
       };
 
       export const movesTowardTest = function (
-        objectsLists1,
-        objectsLists2,
-        tolerance,
-        inverted
+        objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
+        objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
+        tolerance: float,
+        inverted: boolean
       ) {
         return gdjs.evtTools.object.twoListsTest(
           gdjs.evtTools.object._movesToward,
@@ -403,14 +403,14 @@ namespace gdjs {
       };
 
       export const raycastObject = function (
-        objectsLists,
-        x,
-        y,
-        angle,
-        dist,
-        varX,
-        varY,
-        inverted
+        objectsLists: Hashtable<Array<gdjs.RuntimeObject>>,
+        x: float,
+        y: float,
+        angle: float,
+        dist: float,
+        varX: gdjs.Variable,
+        varY: gdjs.Variable,
+        inverted: boolean
       ) {
         return gdjs.evtTools.object.raycastObjectToPosition(
           objectsLists,
@@ -425,22 +425,22 @@ namespace gdjs {
       };
 
       export const raycastObjectToPosition = function (
-        objectsLists,
-        x,
-        y,
-        endX,
-        endY,
-        varX,
-        varY,
-        inverted
+        objectsLists: Hashtable<Array<gdjs.RuntimeObject>>,
+        x: float,
+        y: float,
+        endX: float,
+        endY: float,
+        varX: gdjs.Variable,
+        varY: gdjs.Variable,
+        inverted: boolean
       ) {
-        let matchObject = null;
+        let matchObject: gdjs.RuntimeObject | null = null;
         let testSqDist = inverted
           ? 0
           : (endX - x) * (endX - x) + (endY - y) * (endY - y);
         let resultX = 0;
         let resultY = 0;
-        const lists = gdjs.staticArray(
+        const lists: RuntimeObject[][] = gdjs.staticArray(
           gdjs.evtTools.object.raycastObjectToPosition
         );
         objectsLists.values(lists);
@@ -547,17 +547,105 @@ namespace gdjs {
       };
 
       /**
-       * Allows events to get the number of objects picked.
+       * Return the number of instances in the specified lists of objects.
        */
-      export const pickedObjectsCount = function (objectsLists) {
-        let size = 0;
-        const lists = gdjs.staticArray(gdjs.evtTools.object.pickedObjectsCount);
+      export const getPickedInstancesCount = (objectsLists: ObjectsLists) => {
+        let count = 0;
+        const lists = gdjs.staticArray(
+          gdjs.evtTools.object.getPickedInstancesCount
+        );
         objectsLists.values(lists);
         for (let i = 0, len = lists.length; i < len; ++i) {
-          size += lists[i].length;
+          count += lists[i].length;
         }
-        return size;
+        return count;
       };
+
+      /**
+       * Return the number of instances of the specified objects living on the scene.
+       */
+      export const getSceneInstancesCount = (
+        objectsContext: EventsFunctionContext | gdjs.RuntimeScene,
+        objectsLists: ObjectsLists
+      ) => {
+        let count = 0;
+
+        const objectNames = gdjs.staticArray(
+          gdjs.evtTools.object.getSceneInstancesCount
+        );
+        objectsLists.keys(objectNames);
+
+        const uniqueObjectNames = new Set(objectNames);
+        for (const objectName of uniqueObjectNames) {
+          count += objectsContext.getInstancesCountOnScene(objectName);
+        }
+        return count;
+      };
+
+      /** @deprecated */
+      export const pickedObjectsCount = getPickedInstancesCount;
+    }
+  }
+
+  /**
+   * A container for objects lists that should last more than the current frame.
+   * It automatically removes objects that were destroyed from the objects lists.
+   */
+  export class LongLivedObjectsList {
+    private objectsLists = new Map<string, Array<RuntimeObject>>();
+    private callbacks = new Map<RuntimeObject, () => void>();
+    private parent: LongLivedObjectsList | null = null;
+
+    /**
+     * Create a new container for objects lists, inheriting from another one. This is
+     * useful should we get the objects that have not been saved in this context (using
+     * `addObject`) but saved in a parent context.
+     * This avoids to save all object lists every time we create a new `LongLivedObjectsList`,
+     * despite not all objects lists being used.
+     *
+     * @param parent
+     * @returns
+     */
+    static from(parent: LongLivedObjectsList): LongLivedObjectsList {
+      const newList = new LongLivedObjectsList();
+      newList.parent = parent;
+      return newList;
+    }
+
+    private getOrCreateList(objectName: string): RuntimeObject[] {
+      if (!this.objectsLists.has(objectName))
+        this.objectsLists.set(objectName, []);
+      return this.objectsLists.get(objectName)!;
+    }
+
+    getObjects(objectName: string): RuntimeObject[] {
+      if (!this.objectsLists.has(objectName) && this.parent)
+        return this.parent.getObjects(objectName);
+      return this.objectsLists.get(objectName) || [];
+    }
+
+    addObject(objectName: string, runtimeObject: gdjs.RuntimeObject): void {
+      const list = this.getOrCreateList(objectName);
+      if (list.includes(runtimeObject)) return;
+      list.push(runtimeObject);
+
+      // Register callbacks for when the object is destroyed
+      const onDestroy = () => this.removeObject(objectName, runtimeObject);
+      this.callbacks.set(runtimeObject, onDestroy);
+      runtimeObject.registerDestroyCallback(onDestroy);
+    }
+
+    removeObject(objectName: string, runtimeObject: gdjs.RuntimeObject): void {
+      const list = this.getOrCreateList(objectName);
+      const index = list.indexOf(runtimeObject);
+      if (index === -1) return;
+      list.splice(index, 1);
+
+      // Properly remove callbacks to not leak the object
+      runtimeObject.unregisterDestroyCallback(
+        this.callbacks.get(runtimeObject)!
+      );
+      this.callbacks.delete(runtimeObject);
     }
   }
 }

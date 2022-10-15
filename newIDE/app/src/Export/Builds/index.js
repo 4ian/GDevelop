@@ -2,26 +2,25 @@
 import React, { Component } from 'react';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import BuildsList from './BuildsList';
-import {
-  getBuilds,
-  type Build,
-  type BuildArtifactKeyName,
-  getBuildArtifactUrl,
-} from '../../Utils/GDevelopServices/Build';
-import Window from '../../Utils/Window';
+import { getBuilds, type Build } from '../../Utils/GDevelopServices/Build';
+import { type Game } from '../../Utils/GDevelopServices/Game';
 import BuildsWatcher from './BuildsWatcher';
 
 type Props = {|
-  onBuildsUpdated: ?() => void,
+  onBuildsUpdated?: () => void,
   authenticatedUser: AuthenticatedUser,
+  game: Game,
+  onGameUpdated?: Game => void,
 |};
 type State = {|
   builds: ?Array<Build>,
+  error: ?Error,
 |};
 
 export default class Builds extends Component<Props, State> {
   state = {
     builds: null,
+    error: null,
   };
   buildsWatcher = new BuildsWatcher();
 
@@ -59,8 +58,11 @@ export default class Builds extends Component<Props, State> {
       firebaseUser,
     } = this.props.authenticatedUser;
     if (!firebaseUser) return;
+    // Game is not registered yet so return an empty list of builds.
+    const gameId = this.props.game.id;
+    this.setState({ builds: null, error: null });
 
-    getBuilds(getAuthorizationHeader, firebaseUser.uid).then(
+    getBuilds(getAuthorizationHeader, firebaseUser.uid, gameId).then(
       builds => {
         this.setState(
           {
@@ -73,14 +75,38 @@ export default class Builds extends Component<Props, State> {
         );
       },
       () => {
-        //TODO: Handle error
+        this.setState({
+          error: new Error(
+            'There was an issue getting the game builds, verify your internet connection or try again later.'
+          ),
+        });
       }
     );
   };
 
-  _download = (build: Build, key: BuildArtifactKeyName) => {
-    const url = getBuildArtifactUrl(build, key);
-    if (url) Window.openExternalURL(url);
+  _onBuildUpdated = (build: Build) => {
+    this.setState((previousState: State) => {
+      if (!previousState.builds) return;
+      return {
+        ...previousState,
+        builds: previousState.builds.map((oldBuild: Build) => {
+          if (build.id === oldBuild.id) return build;
+          return oldBuild;
+        }),
+      };
+    });
+  };
+
+  _onBuildDeleted = (build: Build) => {
+    this.setState((previousState: State) => {
+      if (!previousState.builds) return;
+      return {
+        ...previousState,
+        builds: previousState.builds.filter(
+          (oldBuild: Build) => build.id !== oldBuild.id
+        ),
+      };
+    });
   };
 
   render() {
@@ -88,7 +114,12 @@ export default class Builds extends Component<Props, State> {
       <BuildsList
         builds={this.state.builds}
         authenticatedUser={this.props.authenticatedUser}
-        onDownload={this._download}
+        error={this.state.error}
+        loadBuilds={this._refreshBuilds}
+        game={this.props.game}
+        onGameUpdated={this.props.onGameUpdated}
+        onBuildUpdated={this._onBuildUpdated}
+        onBuildDeleted={this._onBuildDeleted}
       />
     );
   }

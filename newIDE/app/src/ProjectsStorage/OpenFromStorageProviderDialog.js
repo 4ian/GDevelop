@@ -6,7 +6,6 @@ import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import { type StorageProvider } from '.';
 import { List, ListItem } from '../UI/List';
-import RaisedButton from '../UI/RaisedButton';
 import optionalRequire from '../Utils/OptionalRequire';
 import BackgroundText from '../UI/BackgroundText';
 import { Column, Line } from '../UI/Grid';
@@ -16,21 +15,18 @@ type Props = {|
   storageProviders: Array<StorageProvider>,
   onChooseProvider: StorageProvider => void,
   onClose: () => void,
-  onCreateNewProject: () => void,
 |};
 
 const OpenFromStorageProviderDialog = ({
   onClose,
   storageProviders,
   onChooseProvider,
-  onCreateNewProject,
 }: Props) => {
   return (
     <I18n>
       {({ i18n }) => (
         <Dialog
           title={<Trans>Choose where to load the project from</Trans>}
-          onRequestClose={onClose}
           actions={[
             <FlatButton
               label={<Trans>Cancel</Trans>}
@@ -39,15 +35,7 @@ const OpenFromStorageProviderDialog = ({
               onClick={onClose}
             />,
           ]}
-          secondaryActions={[
-            <RaisedButton
-              label={<Trans>Create a new project</Trans>}
-              key="create-new-project"
-              primary
-              onClick={onCreateNewProject}
-            />,
-          ]}
-          cannotBeDismissed={false}
+          onRequestClose={onClose}
           open
           noMargin
           maxWidth="sm"
@@ -62,7 +50,7 @@ const OpenFromStorageProviderDialog = ({
                   primaryText={i18n._(storageProvider.name)}
                   leftIcon={
                     storageProvider.renderIcon
-                      ? storageProvider.renderIcon()
+                      ? storageProvider.renderIcon({})
                       : undefined
                   }
                   onClick={() => onChooseProvider(storageProvider)}

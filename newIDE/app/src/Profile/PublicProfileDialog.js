@@ -6,8 +6,10 @@ import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import {
   getUserPublicProfile,
+  getUserBadges,
   type UserPublicProfile,
 } from '../Utils/GDevelopServices/User';
+import { type Badge } from '../Utils/GDevelopServices/Badge';
 import ProfileDetails from './ProfileDetails';
 
 type Props = {|
@@ -17,6 +19,7 @@ type Props = {|
 
 const PublicProfileDialog = ({ userId, onClose }: Props) => {
   const [profile, setProfile] = React.useState<?UserPublicProfile>(null);
+  const [badges, setBadges] = React.useState<?(Badge[])>(null);
   const [error, setError] = React.useState<?Error>(null);
 
   const fetchProfile = React.useCallback(
@@ -33,16 +36,32 @@ const PublicProfileDialog = ({ userId, onClose }: Props) => {
     [userId]
   );
 
+  const fetchUserBadges = React.useCallback(
+    async () => {
+      if (!userId) return;
+      setBadges(null);
+      try {
+        const badges = await getUserBadges(userId);
+        setBadges(badges);
+      } catch (error) {
+        setError(error);
+      }
+    },
+    [userId]
+  );
+
   React.useEffect(
     () => {
       fetchProfile();
+      fetchUserBadges();
     },
-    [userId, fetchProfile]
+    [userId, fetchProfile, fetchUserBadges]
   );
 
   const onRetry = () => {
     setError(null);
     fetchProfile();
+    fetchUserBadges();
   };
 
   return (
@@ -57,8 +76,14 @@ const PublicProfileDialog = ({ userId, onClose }: Props) => {
           onClick={onClose}
         />,
       ]}
+      onRequestClose={onClose}
     >
-      <ProfileDetails profile={profile} error={error} onRetry={onRetry} />
+      <ProfileDetails
+        profile={profile}
+        error={error}
+        onRetry={onRetry}
+        badges={badges}
+      />
     </Dialog>
   );
 };

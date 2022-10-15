@@ -15,10 +15,13 @@ branches:
 init:
 - ps: ''
 install:
-- ps: Install-Product node 14
-# Build GDevelop.js (and run tests to ensure it works)
+- ps: Install-Product node 16
+# Build GDevelop.js (and run tests to ensure it works).
+# (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
 - cmd: >-
     cd GDevelop.js
+
+    npm -v && npm install
 
     git clone https://github.com/juj/emsdk.git
 
@@ -26,38 +29,31 @@ install:
 
     emsdk install 1.39.6
 
-    emsdk activate 1.39.6
+    CMD /C "emsdk activate 1.39.6 && cd .. && npm run build"
 
-    emsdk_env.bat
-
-    cd ..
-
-    npm install
-
-    npm run build
-
-    cd ..
+    cd ..\..
 
 # Build GDevelop IDE
 - cmd: >-
     cd newIDE\app
 
-    npm install
+    npm -v && npm install
 
     cd ..\electron-app
 
-    npm install
+    npm -v && npm install
 
     cd ..\..
 
-# Package the app for Windows.
+# Package the app for Windows (and sign it with the certificate set in environment variables).
+# Don't sign the appx (it will be signed by the Microsoft Store).
 build_script:
-- cmd: >-
+- ps: >-
     cd newIDE\electron-app
 
-    node --max-old-space-size=3072 scripts/build.js --win appx --publish=never
+    node --max-old-space-size=3072 scripts/build.js --win nsis --publish=never
 
-    node scripts/build.js --skip-app-build --win nsis --publish=never
+    Remove-Item -Path Env:CSC_LINK ; Remove-Item -Path Env:CSC_KEY_PASSWORD ; node scripts/build.js --skip-app-build --win appx --publish=never
 
     cd ..\..
 

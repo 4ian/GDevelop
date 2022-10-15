@@ -7,11 +7,9 @@
                 "${workspaceRoot}/GDJS",
                 "${workspaceRoot}/Extensions",
                 "${workspaceRoot}/Core",
-                "${workspaceRoot}/ExtLibs/SFML/include",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
                 "/usr/local/include",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
-                "/usr/include",
                 "${workspaceRoot}"
             ],
             "defines": [
@@ -27,7 +25,6 @@
                     "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
                     "/usr/local/include",
                     "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
-                    "/usr/include",
                     "${workspaceRoot}"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
@@ -48,7 +45,6 @@
                 "${workspaceRoot}/GDJS",
                 "${workspaceRoot}/Extensions",
                 "${workspaceRoot}/Core",
-                "${workspaceRoot}/ExtLibs/SFML/include",
                 "/usr/include",
                 "/usr/local/include",
                 "${workspaceRoot}"
@@ -78,7 +74,6 @@
                 "${workspaceRoot}/GDJS",
                 "${workspaceRoot}/Extensions",
                 "${workspaceRoot}/Core",
-                "${workspaceRoot}/ExtLibs/SFML/include",
                 "${workspaceRoot}"
             ],
             "defines": [

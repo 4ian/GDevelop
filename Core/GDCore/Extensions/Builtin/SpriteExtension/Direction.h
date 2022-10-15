@@ -73,6 +73,13 @@ class GD_CORE_API Direction {
   Sprite& GetSprite(std::size_t nb);
 
   /**
+   * \brief Return a vector of references to sprite names.
+   *
+   * \return A vector of all sprite names references.
+   */
+  const std::vector<gd::String>& GetSpriteNames() const;
+
+  /**
    * \brief Check if the direction contains sprites.
    *
    * \return true if the direction does not have any sprite.

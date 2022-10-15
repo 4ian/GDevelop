@@ -233,4 +233,76 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }
+  {
+    const extension = new gd.PlatformExtension();
+    extension.setExtensionInformation(
+      'FakeObjectWithUnsupportedCapability',
+      'Fake object not supporting the "effect" capability',
+      'Fake object not supporting the "effect" capability',
+      '',
+      'MIT'
+    );
+    const fakeObject = new gd.ObjectJsImplementation();
+
+    // $FlowExpectedError
+    fakeObject.updateProperty = function(
+      objectContent,
+      propertyName,
+      newValue
+    ) {
+      return false;
+    };
+    // $FlowExpectedError
+    fakeObject.getProperties = function(objectContent) {
+      const objectProperties = new gd.MapStringPropertyDescriptor();
+
+      objectProperties
+        .getOrCreate('text')
+        .setValue(objectContent.text)
+        .setType('textarea')
+        .setLabel('Text');
+
+      return objectProperties;
+    };
+    fakeObject.setRawJSONContent(
+      JSON.stringify({
+        text: 'Some text.',
+      })
+    );
+
+    // $FlowExpectedError
+    fakeObject.updateInitialInstanceProperty = function(
+      objectContent,
+      instance,
+      propertyName,
+      newValue,
+      project,
+      layout
+    ) {
+      return false;
+    };
+    // $FlowExpectedError
+    fakeObject.getInitialInstanceProperties = function(
+      content,
+      instance,
+      project,
+      layout
+    ) {
+      var instanceProperties = new gd.MapStringPropertyDescriptor();
+      return instanceProperties;
+    };
+
+    const object = extension
+      .addObject(
+        'FakeObjectWithUnsupportedCapability',
+        'FakeObjectWithUnsupportedCapability',
+        'This is FakeObjectWithUnsupportedCapability',
+        '',
+        fakeObject
+      )
+      .addUnsupportedBaseObjectCapability('effect');
+
+    platform.addNewExtension(extension);
+    extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+  }
 };

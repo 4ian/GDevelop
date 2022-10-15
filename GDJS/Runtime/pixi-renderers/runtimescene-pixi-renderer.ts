@@ -11,6 +11,7 @@ namespace gdjs {
     _debugDraw: PIXI.Graphics | null = null;
     _debugDrawContainer: PIXI.Container | null = null;
     _profilerText: PIXI.Text | null = null;
+    _showCursorAtNextRender: boolean = false;
     _debugDrawRenderedObjectsPoints: Record<
       number,
       {
@@ -59,6 +60,13 @@ namespace gdjs {
       // render the PIXI container of the scene
       this._pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
       this._pixiRenderer.render(this._pixiContainer);
+
+      // synchronize showing the cursor with rendering (useful to reduce
+      // blinking while switching from in-game cursor)
+      if (this._showCursorAtNextRender) {
+        this._pixiRenderer.view.style.cursor = '';
+        this._showCursorAtNextRender = false;
+      }
     }
 
     _renderProfileText() {
@@ -88,7 +96,6 @@ namespace gdjs {
      */
     renderDebugDraw(
       instances: gdjs.RuntimeObject[],
-      layersCameraCoordinates: Record<string, [float, float, float, float]>,
       showHiddenInstances: boolean,
       showPointsNames: boolean,
       showCustomPoints: boolean
@@ -230,11 +237,9 @@ namespace gdjs {
         debugDraw.fill.alpha = 0.3;
 
         // Draw Center point
-        const centerPointX = object.getDrawableX() + object.getCenterX();
-        const centerPointY = object.getDrawableY() + object.getCenterY();
         const centerPoint = layer.convertInverseCoords(
-          centerPointX,
-          centerPointY
+          object.getCenterXInScene(),
+          object.getCenterYInScene()
         );
 
         renderObjectPoint(
@@ -245,25 +250,43 @@ namespace gdjs {
           centerPoint[1]
         );
 
-        // Draw Origin point
-        let originPoint = [object.getDrawableX(), object.getDrawableY()];
-        if (object instanceof gdjs.SpriteRuntimeObject) {
-          // For Sprite objects get the position of the origin point.
-          originPoint = object.getPointPosition('origin');
-        }
-
-        originPoint = layer.convertInverseCoords(
-          originPoint[0],
-          originPoint[1]
+        // Draw position point
+        const positionPoint = layer.convertInverseCoords(
+          object.getX(),
+          object.getY()
         );
 
         renderObjectPoint(
           renderedObjectPoints.points,
-          'Origin',
+          'Position',
           0xff0000,
-          originPoint[0],
-          originPoint[1]
+          positionPoint[0],
+          positionPoint[1]
         );
+
+        // Draw Origin point
+        if (object instanceof gdjs.SpriteRuntimeObject) {
+          let originPoint = object.getPointPosition('origin');
+          // When there is neither rotation nor flipping,
+          // the origin point is over the position point.
+          if (
+            Math.abs(originPoint[0] - positionPoint[0]) >= 1 ||
+            Math.abs(originPoint[1] - positionPoint[1]) >= 1
+          ) {
+            originPoint = layer.convertInverseCoords(
+              originPoint[0],
+              originPoint[1]
+            );
+
+            renderObjectPoint(
+              renderedObjectPoints.points,
+              'Origin',
+              0xff0000,
+              originPoint[0],
+              originPoint[1]
+            );
+          }
+        }
 
         // Draw custom point
         if (showCustomPoints && object instanceof gdjs.SpriteRuntimeObject) {
@@ -321,6 +344,7 @@ namespace gdjs {
     }
 
     hideCursor(): void {
+      this._showCursorAtNextRender = false;
       if (!this._pixiRenderer) {
         return;
       }
@@ -328,10 +352,7 @@ namespace gdjs {
     }
 
     showCursor(): void {
-      if (!this._pixiRenderer) {
-        return;
-      }
-      this._pixiRenderer.view.style.cursor = '';
+      this._showCursorAtNextRender = true;
     }
 
     getPIXIContainer() {

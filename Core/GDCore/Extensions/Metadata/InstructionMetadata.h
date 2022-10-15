@@ -6,6 +6,7 @@
 
 #ifndef INSTRUCTIONMETADATA_H
 #define INSTRUCTIONMETADATA_H
+#include <algorithm>
 #include <functional>
 #include <map>
 #include <memory>
@@ -99,6 +100,23 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
+   * Check if the instruction is asynchronous - it will be running in the
+   * background, executing the instructions following it before the frame after
+   * it resolved.
+   */
+  bool IsAsync() const {
+    return !codeExtraInformation.asyncFunctionCallName.empty();
+  }
+
+  /**
+   * Check if the instruction asynchronicity is optional. If it is, it can either
+   * be used synchronously or asynchronously, with one function for each.
+   */
+  bool IsOptionallyAsync() const {
+    return IsAsync() && !codeExtraInformation.functionCallName.empty();
+  }
+
+  /**
    * Notify that the instruction can have sub instructions.
    */
   InstructionMetadata &SetCanHaveSubInstructions() {
@@ -138,18 +156,19 @@ class GD_CORE_API InstructionMetadata {
    * \param description Description for parameter
    * \param supplementaryInformation Additional information that can be used for
    * rendering or logic. For example:
-   * - If type is "object", this argument will describe which objects are allowed.
-   * If this argument is empty, all objects are allowed.
-   * - If type is "operator", this argument will be used to display only pertinent operators.
-   * \param parameterIsOptional true if the parameter must be optional, false
-   * otherwise.
+   * - If type is "object", this argument will describe which objects are
+   * allowed. If this argument is empty, all objects are allowed.
+   * - If type is "operator", this argument will be used to display only
+   * pertinent operators. \param parameterIsOptional true if the parameter must
+   * be optional, false otherwise.
    *
    * \see EventsCodeGenerator::GenerateParametersCodes
    */
-  InstructionMetadata &AddParameter(const gd::String &type,
-                                    const gd::String &label,
-                                    const gd::String &supplementaryInformation = "",
-                                    bool parameterIsOptional = false);
+  InstructionMetadata &AddParameter(
+      const gd::String &type,
+      const gd::String &label,
+      const gd::String &supplementaryInformation = "",
+      bool parameterIsOptional = false);
 
   /**
    * \brief Add a parameter not displayed in editor.
@@ -197,8 +216,7 @@ class GD_CORE_API InstructionMetadata {
    * \see AddParameter
    */
   InstructionMetadata &SetParameterExtraInfo(const gd::String &extraInfo) {
-    if (!parameters.empty())
-      parameters.back().SetExtraInfo(extraInfo);
+    if (!parameters.empty()) parameters.back().SetExtraInfo(extraInfo);
     return *this;
   };
 
@@ -236,16 +254,29 @@ class GD_CORE_API InstructionMetadata {
   /**
    * \brief Check if the instruction is an object instruction.
    */
-  bool IsObjectInstruction() const {
-    return isObjectInstruction;
-  }
+  bool IsObjectInstruction() const { return isObjectInstruction; }
 
   /**
    * \brief Check if the instruction is a behavior instruction.
    */
-  bool IsBehaviorInstruction() const {
-    return isBehaviorInstruction;
-  }
+  bool IsBehaviorInstruction() const { return isBehaviorInstruction; }
+
+  /**
+   * \brief Mark this (object) instruction as requiring the specified
+   * capability, offered by the base object. This is useful for some objects
+   * that don't support this capability, so that the editor can hide the
+   * instruction as it does not apply to them.
+   */
+  InstructionMetadata &SetRequiresBaseObjectCapability(
+      const gd::String &capability);
+
+  /**
+   * \brief Get the required specified capability for this (object) instruction,
+   * or an empty string if there is nothing specific required.
+   */
+  const gd::String &GetRequiredBaseObjectCapability() const {
+    return requiredBaseObjectCapability;
+  };
 
   /**
    * \brief Consider that the instruction is easy for a user to understand.
@@ -288,11 +319,23 @@ class GD_CORE_API InstructionMetadata {
     virtual ~ExtraInformation(){};
 
     /**
-     * Set the function name which will be used when generating the code.
-     * \param functionName the name of the function to call
+     * Set the name of the function which will be called in the generated code.
+     * \param functionName the name of the function to call.
      */
     ExtraInformation &SetFunctionName(const gd::String &functionName_) {
       functionCallName = functionName_;
+      return *this;
+    }
+
+    /**
+     * Set the name of the function, doing asynchronous work, which will be called in
+     * the generated code. This function should return an asynchronous task
+     * (i.e: `gdjs.AsyncTask` in the JavaScript runtime).
+     *
+     * \param functionName the name of the function doing asynchronous work to call.
+     */
+    ExtraInformation &SetAsyncFunctionName(const gd::String &functionName_) {
+      asyncFunctionCallName = functionName_;
       return *this;
     }
 
@@ -318,12 +361,12 @@ class GD_CORE_API InstructionMetadata {
      *                 _("the string"),
      *                 _("Text"),
      *                 "CppPlatform/Extensions/text24.png",
-     *                 "CppPlatform/Extensions/text.png");
+     *                 "CppPlatform/Extensions/text_black.png");
      *
      *      .AddParameter("object", _("Object"), "Text", false)
      *      .AddParameter("operator", _("Modification operator"), "string")
      *      .AddParameter("string", _("String"))
-     *      .SetFunctionName("SetString").SetManipulatedType("string").SetGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
+     *      .SetFunctionName("SetString").SetManipulatedType("string").SetGetter("GetString");
      *
      *  DECLARE_END_OBJECT_ACTION()
      * \endcode
@@ -391,6 +434,7 @@ class GD_CORE_API InstructionMetadata {
     bool HasCustomCodeGenerator() const { return hasCustomCodeGenerator; }
 
     gd::String functionCallName;
+    gd::String asyncFunctionCallName;
     gd::String type;
     AccessType accessType;
     gd::String optionalAssociatedInstruction;
@@ -423,13 +467,24 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
-   * \brief Set the function that should be called when generating the source
-   * code from events.
-   * \param functionName the name of the function to call
+   * Set the name of the function which will be called in the generated code.
+   * \param functionName the name of the function to call.
    * \note Shortcut for `codeExtraInformation.SetFunctionName`.
    */
   ExtraInformation &SetFunctionName(const gd::String &functionName) {
     return codeExtraInformation.SetFunctionName(functionName);
+  }
+
+  /**
+   * Set the name of the function, doing asynchronous work, which will be called in
+   * the generated code. This function should return an asynchronous task
+   * (i.e: `gdjs.AsyncTask` in the JavaScript runtime).
+   *
+   * \param functionName the name of the function doing asynchronous work to call.
+   * \note Shortcut for `codeExtraInformation.SetAsyncFunctionName`.
+   */
+  ExtraInformation &SetAsyncFunctionName(const gd::String &functionName) {
+    return codeExtraInformation.SetAsyncFunctionName(functionName);
   }
 
   std::vector<ParameterMetadata> parameters;
@@ -450,6 +505,7 @@ class GD_CORE_API InstructionMetadata {
   bool isPrivate;
   bool isObjectInstruction;
   bool isBehaviorInstruction;
+  gd::String requiredBaseObjectCapability;
 };
 
 }  // namespace gd

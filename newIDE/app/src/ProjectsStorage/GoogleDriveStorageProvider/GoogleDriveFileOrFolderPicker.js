@@ -27,7 +27,7 @@ const styles = {
   },
 };
 
-export default (props: Props) => {
+const GoogleDriveFileOrFolderPicker = (props: Props) => {
   return (
     <div
       style={{
@@ -39,7 +39,7 @@ export default (props: Props) => {
         floatingLabelText={props.floatingLabelText}
         floatingLabelFixed
         type="text"
-        hintText={t`Choose a file or folder`}
+        translatableHintText={t`Choose a file or folder`}
         value={props.value ? props.value.name : ''}
         onChange={() => {}}
       />
@@ -52,3 +52,5 @@ export default (props: Props) => {
     </div>
   );
 };
+
+export default GoogleDriveFileOrFolderPicker;

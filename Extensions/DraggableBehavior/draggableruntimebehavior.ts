@@ -14,9 +14,11 @@ namespace gdjs {
      * When the owner is being dragged, no other manager can start dragging it.
      */
     _draggedByDraggableManager: DraggableManager | null = null;
+    _checkCollisionMask: boolean;
 
     constructor(runtimeScene, behaviorData, owner) {
       super(runtimeScene, behaviorData, owner);
+      this._checkCollisionMask = behaviorData.checkCollisionMask ? true : false;
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -194,6 +196,14 @@ namespace gdjs {
       const position = this.getPosition(runtimeScene, draggableRuntimeBehavior);
       if (
         !draggableRuntimeBehavior.owner.insideObject(position[0], position[1])
+      ) {
+        return false;
+      } else if (
+        draggableRuntimeBehavior._checkCollisionMask &&
+        !draggableRuntimeBehavior.owner.isCollidingWithPoint(
+          position[0],
+          position[1]
+        )
       ) {
         return false;
       }

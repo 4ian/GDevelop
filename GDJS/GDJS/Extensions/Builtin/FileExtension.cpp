@@ -34,7 +34,6 @@ FileExtension::FileExtension() {
   GetAllActions()["DeleteFichier"]
       .SetGroup(_("Storage"))
       .SetFunctionName("gdjs.evtTools.storage.clearJSONFile");
-  GetAllActions()["LaunchFile"].SetFunctionName("gdjs.evtTools.window.openURL");
 
   StripUnimplementedInstructionsAndExpressions();  // Unimplemented things are
                                                    // listed here:

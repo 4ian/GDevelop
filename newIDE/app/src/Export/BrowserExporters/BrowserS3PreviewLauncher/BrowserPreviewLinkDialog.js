@@ -5,8 +5,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import React, { Component } from 'react';
-import Dialog from '../../../UI/Dialog';
-import FlatButton from '../../../UI/FlatButton';
+import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { Column, Line } from '../../../UI/Grid';
 import Text from '../../../UI/Text';
@@ -49,14 +48,15 @@ export default class BrowserPreviewLinkDialog extends Component<Props> {
         {({ i18n }) => (
           <Dialog
             actions={[
-              <FlatButton
+              <DialogPrimaryButton
                 key="launch-preview"
                 label={<Trans>Launch the preview</Trans>}
                 primary
                 onClick={this._makeOnOpen(i18n)}
               />,
             ]}
-            cannotBeDismissed={true}
+            onRequestClose={this.props.onClose}
+            onApply={this._makeOnOpen(i18n)}
             open
           >
             <Line>

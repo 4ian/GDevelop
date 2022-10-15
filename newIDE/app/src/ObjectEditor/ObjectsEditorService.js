@@ -1,3 +1,4 @@
+// @flow
 import TextEditor from './Editors/TextEditor';
 import TiledSpriteEditor from './Editors/TiledSpriteEditor';
 import PanelSpriteEditor from './Editors/PanelSpriteEditor';
@@ -6,22 +7,38 @@ import EmptyEditor from './Editors/EmptyEditor';
 import ShapePainterEditor from './Editors/ShapePainterEditor';
 import ParticleEmitterEditor from './Editors/ParticleEmitterEditor';
 import ObjectPropertiesEditor from './Editors/ObjectPropertiesEditor';
-const gd /* TODO: add flow in this file */ = global.gd;
+import CustomObjectPropertiesEditor from './Editors/CustomObjectPropertiesEditor';
+
+const gd: libGDevelop = global.gd;
 
 /**
  * A service returning editor components for each object type.
  */
-export default {
-  getEditorConfiguration(objectType: string) {
-    if (!this.editorConfigurations[objectType]) {
-      console.warn(
-        `Object with type ${objectType} has no editor configuration registered. Please use registerEditorConfiguration to register your editor.`
-      );
+const ObjectsEditorService = {
+  getEditorConfiguration(project: gdProject, objectType: string) {
+    if (this.editorConfigurations[objectType]) {
+      return this.editorConfigurations[objectType];
     }
-
-    return this.editorConfigurations[objectType];
+    if (project.hasEventsBasedObject(objectType)) {
+      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+        gd.JsPlatform.get(),
+        objectType
+      );
+      return this.getCustomObjectPropertiesEditor({
+        helpPagePath: objectMetadata.getHelpPath(),
+      });
+    }
+    console.warn(
+      `Object with type ${objectType} has no editor configuration registered. Please use registerEditorConfiguration to register your editor.`
+    );
+    return this.getDefaultObjectJsImplementationPropertiesEditor({
+      helpPagePath: '',
+    });
   },
-  registerEditorConfiguration: function(objectType, editorConfiguration) {
+  registerEditorConfiguration: function(
+    objectType: string,
+    editorConfiguration: any
+  ) {
     if (!editorConfiguration.component) {
       console.warn(
         `Tried to register editor configuration for object "${objectType}", but "component" property is not defined.`
@@ -48,65 +65,109 @@ export default {
       return;
     }
 
-    console.info(
-      `Properly registered editor configuration for object "${objectType}".`
-    );
     this.editorConfigurations[objectType] = editorConfiguration;
   },
-  getDefaultObjectJsImplementationPropertiesEditor(options) {
+  getDefaultObjectJsImplementationPropertiesEditor(options: {
+    helpPagePath: string,
+  }) {
     return {
       component: ObjectPropertiesEditor,
-      createNewObject: object =>
+      createNewObject: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdObjectConfiguration =>
         gd
-          .asObjectJsImplementation(object)
+          .asObjectJsImplementation(objectConfiguration)
           .clone()
           .release(),
-      castToObjectType: object => gd.asObjectJsImplementation(object),
+      castToObjectType: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdObjectJsImplementation =>
+        gd.asObjectJsImplementation(objectConfiguration),
+      helpPagePath: options.helpPagePath,
+    };
+  },
+  getCustomObjectPropertiesEditor(options: { helpPagePath: string }) {
+    return {
+      component: CustomObjectPropertiesEditor,
+      createNewObject: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdCustomObjectConfiguration =>
+        gd.asCustomObjectConfiguration(
+          gd
+            .asCustomObjectConfiguration(objectConfiguration)
+            .clone()
+            .release()
+        ),
+      castToObjectType: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdCustomObjectConfiguration =>
+        gd.asCustomObjectConfiguration(objectConfiguration),
       helpPagePath: options.helpPagePath,
     };
   },
   editorConfigurations: {
     Sprite: {
       component: SpriteEditor,
-      createNewObject: () => new gd.SpriteObject(''),
-      castToObjectType: object => gd.asSpriteObject(object),
+      createNewObject: (): gdSpriteObject => new gd.SpriteObject(),
+      castToObjectType: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdSpriteObject => gd.asSpriteConfiguration(objectConfiguration),
       helpPagePath: '/objects/sprite',
     },
     'TiledSpriteObject::TiledSprite': {
       component: TiledSpriteEditor,
-      createNewObject: () => new gd.TiledSpriteObject(''),
-      castToObjectType: object => gd.asTiledSpriteObject(object),
+      createNewObject: (): gdTiledSpriteObject => new gd.TiledSpriteObject(),
+      castToObjectType: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdTiledSpriteObject =>
+        gd.asTiledSpriteConfiguration(objectConfiguration),
       helpPagePath: '/objects/tiled_sprite',
     },
     'PanelSpriteObject::PanelSprite': {
       component: PanelSpriteEditor,
-      createNewObject: () => new gd.PanelSpriteObject(''),
-      castToObjectType: object => gd.asPanelSpriteObject(object),
+      createNewObject: (): gdPanelSpriteObject => new gd.PanelSpriteObject(),
+      castToObjectType: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdPanelSpriteObject =>
+        gd.asPanelSpriteConfiguration(objectConfiguration),
       helpPagePath: '/objects/panel_sprite',
     },
     'TextObject::Text': {
       component: TextEditor,
-      createNewObject: () => new gd.TextObject(''),
-      castToObjectType: object => gd.asTextObject(object),
+      createNewObject: (): gdTextObject => new gd.TextObject(),
+      castToObjectType: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdTextObject => gd.asTextObjectConfiguration(objectConfiguration),
       helpPagePath: '/objects/text',
     },
     'PrimitiveDrawing::Drawer': {
       component: ShapePainterEditor,
-      createNewObject: () => new gd.ShapePainterObject(''),
-      castToObjectType: object => gd.asShapePainterObject(object),
+      createNewObject: (): gdShapePainterObject => new gd.ShapePainterObject(),
+      castToObjectType: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdShapePainterObject =>
+        gd.asShapePainterConfiguration(objectConfiguration),
       helpPagePath: '/objects/shape_painter',
     },
     'TextEntryObject::TextEntry': {
       component: EmptyEditor,
-      createNewObject: () => new gd.TextEntryObject(''),
-      castToObjectType: object => gd.asTextEntryObject(object),
+      createNewObject: (): gdTextEntryObject => new gd.TextEntryObject(),
+      castToObjectType: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdTextEntryObject => gd.asTextEntryConfiguration(objectConfiguration),
       helpPagePath: '/objects/text_entry',
     },
     'ParticleSystem::ParticleEmitter': {
       component: ParticleEmitterEditor,
-      createNewObject: () => new gd.ParticleEmitterObject(''),
-      castToObjectType: object => gd.asParticleEmitterObject(object),
+      createNewObject: (): gdParticleEmitterObject =>
+        new gd.ParticleEmitterObject(),
+      castToObjectType: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdParticleEmitterObject =>
+        gd.asParticleEmitterConfiguration(objectConfiguration),
       helpPagePath: '/objects/particles_emitter',
     },
   },
 };
+
+export default ObjectsEditorService;

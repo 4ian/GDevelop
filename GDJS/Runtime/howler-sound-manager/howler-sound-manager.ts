@@ -15,6 +15,20 @@ namespace gdjs {
       logger.error('Error while loading an audio file: ' + error),
   };
 
+  const checkIfCredentialsRequired = (url: string) => {
+    // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
+    // i.e: its gdevelop.io cookie, to be passed.
+    // Note that this is only useful during previews.
+    if (
+      url.startsWith('https://project-resources.gdevelop.io/') ||
+      url.startsWith('https://project-resources-dev.gdevelop.io/')
+    )
+      return true;
+
+    // For other resources, use the default way of loading resources ("anonymous" or "same-site").
+    return false;
+  };
+
   /**
    * Ensure the volume is between 0 and 1.
    */
@@ -50,10 +64,14 @@ namespace gdjs {
     private _howl: Howl;
 
     /**
-     * The volume at which the sound is being played.
+     * The **initial** volume at which the sound is being played.
+     * Once the sound is started, this volume can be not in sync
+     * (in the case the sound is faded by Howler), so volume must
+     * be gotten from `this._howl` directly.
+     *
      * This value is clamped between 0 and 1.
      */
-    private _volume: float;
+    private _initialVolume: float;
 
     /**
      * Whether the sound is being played in a loop or not.
@@ -80,7 +98,7 @@ namespace gdjs {
 
     constructor(howl: Howl, volume: float, loop: boolean, rate: float) {
       this._howl = howl;
-      this._volume = clampVolume(volume);
+      this._initialVolume = clampVolume(volume);
       this._loop = loop;
       this._rate = rate;
     }
@@ -104,7 +122,7 @@ namespace gdjs {
         this._id = newID;
 
         // Set the howl properties as soon as the sound is played and we have its ID.
-        this._howl.volume(this._volume, newID); // this._volume is already clamped between 0 and 1.
+        this._howl.volume(this._initialVolume, newID); // this._initialVolume is already clamped between 0 and 1.
         this._howl.loop(this._loop, newID);
         // this._rate is not clamped, but we need to clamp it when passing it to Howler.js as it
         // only supports a specific range.
@@ -223,7 +241,8 @@ namespace gdjs {
      * @returns A float from 0 to 1.
      */
     getVolume(): float {
-      return this._volume;
+      if (this._id === null) return this._initialVolume;
+      return this._howl.volume(this._id);
     }
 
     /**
@@ -232,10 +251,10 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     setVolume(volume: float): this {
-      this._volume = clampVolume(volume);
+      this._initialVolume = clampVolume(volume);
 
       // If the sound has already started playing, then change the value directly.
-      if (this._id !== null) this._howl.volume(this._volume, this._id);
+      if (this._id !== null) this._howl.volume(this._initialVolume, this._id);
       return this;
     }
 
@@ -295,7 +314,8 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     fade(from: float, to: float, duration: float): this {
-      if (this._id !== null) this._howl.fade(from, to, duration, this._id);
+      if (this._id !== null)
+        this._howl.fade(clampVolume(from), clampVolume(to), duration, this._id);
       return this;
     }
 
@@ -511,6 +531,9 @@ namespace gdjs {
             {
               src: [soundFile],
               html5: isMusic,
+              xhr: {
+                withCredentials: checkIfCredentialsRequired(soundFile),
+              },
               // Cache the sound with no volume. This avoids a bug where it plays at full volume
               // for a split second before setting its correct volume.
               volume: 0,
@@ -545,6 +568,9 @@ namespace gdjs {
           {
             src: [soundFile],
             html5: isMusic,
+            xhr: {
+              withCredentials: checkIfCredentialsRequired(soundFile),
+            },
             // Cache the sound with no volume. This avoids a bug where it plays at full volume
             // for a split second before setting its correct volume.
             volume: 0,
@@ -618,6 +644,7 @@ namespace gdjs {
         loop,
         pitch
       );
+      this._storeSoundInArray(this._freeSounds, sound);
       sound.once('play', () => {
         if (this._paused) {
           sound.pause();
@@ -625,7 +652,6 @@ namespace gdjs {
         }
       });
       sound.play();
-      this._storeSoundInArray(this._freeSounds, sound);
     }
 
     playSoundOnChannel(
@@ -644,6 +670,7 @@ namespace gdjs {
         loop,
         pitch
       );
+      this._sounds[channel] = sound;
       sound.once('play', () => {
         if (this._paused) {
           sound.pause();
@@ -651,11 +678,10 @@ namespace gdjs {
         }
       });
       sound.play();
-      this._sounds[channel] = sound;
     }
 
-    getSoundOnChannel(channel: integer): HowlerSound {
-      return this._sounds[channel];
+    getSoundOnChannel(channel: integer): HowlerSound | null {
+      return this._sounds[channel] || null;
     }
 
     playMusic(soundName: string, loop: boolean, volume: float, pitch: float) {
@@ -666,6 +692,7 @@ namespace gdjs {
         loop,
         pitch
       );
+      this._storeSoundInArray(this._freeMusics, music);
       music.once('play', () => {
         if (this._paused) {
           music.pause();
@@ -673,7 +700,6 @@ namespace gdjs {
         }
       });
       music.play();
-      this._storeSoundInArray(this._freeMusics, music);
     }
 
     playMusicOnChannel(
@@ -692,6 +718,7 @@ namespace gdjs {
         loop,
         pitch
       );
+      this._musics[channel] = music;
       music.once('play', () => {
         if (this._paused) {
           music.pause();
@@ -699,11 +726,10 @@ namespace gdjs {
         }
       });
       music.play();
-      this._musics[channel] = music;
     }
 
-    getMusicOnChannel(channel: integer): HowlerSound {
-      return this._musics[channel];
+    getMusicOnChannel(channel: integer): HowlerSound | null {
+      return this._musics[channel] || null;
     }
 
     setGlobalVolume(volume: float): void {
@@ -755,7 +781,8 @@ namespace gdjs {
         }
       }
 
-      const totalCount = Object.keys(files).length;
+      const filesToLoad = Object.keys(files);
+      const totalCount = filesToLoad.length;
       if (totalCount === 0) return onComplete(totalCount); // Nothing to load.
 
       let loadedCount: integer = 0;
@@ -769,6 +796,7 @@ namespace gdjs {
         if (loadedCount === totalCount) return onComplete(totalCount);
 
         onProgress(loadedCount, totalCount);
+        loadNextFile();
       };
 
       const preloadAudioFile = (
@@ -783,6 +811,9 @@ namespace gdjs {
             onload: onLoadCallback,
             onloaderror: onLoadCallback,
             html5: isMusic,
+            xhr: {
+              withCredentials: checkIfCredentialsRequired(file),
+            },
             // Cache the sound with no volume. This avoids a bug where it plays at full volume
             // for a split second before setting its correct volume.
             volume: 0,
@@ -790,29 +821,48 @@ namespace gdjs {
         );
       };
 
-      for (let file in files) {
-        if (files.hasOwnProperty(file)) {
-          const fileData = files[file][0];
-          if (!fileData.preloadAsSound && !fileData.preloadAsMusic) {
-            onLoad();
-          } else if (fileData.preloadAsSound && fileData.preloadAsMusic) {
-            let loadedOnce = false;
-            const callback = (_, error) => {
-              if (!loadedOnce) {
-                loadedOnce = true;
-                return;
-              }
-              onLoad(_, error);
-            };
+      const loadNextFile = () => {
+        if (!filesToLoad.length) return;
+        const file = filesToLoad.shift()!;
+        const fileData = files[file][0];
 
-            preloadAudioFile(file, callback, /* isMusic= */ true);
-            preloadAudioFile(file, callback, /* isMusic= */ false);
-          } else if (fileData.preloadAsSound) {
-            preloadAudioFile(file, onLoad, /* isMusic= */ false);
-          } else if (fileData.preloadAsMusic)
-            preloadAudioFile(file, onLoad, /* isMusic= */ true);
+        let loadCounter = 0;
+        const callback = (_?: any, error?: string) => {
+          loadCounter--;
+          if (!loadCounter) {
+            onLoad(_, error);
+          }
+        };
+
+        if (fileData.preloadAsMusic) {
+          loadCounter++;
+          preloadAudioFile(file, callback, /* isMusic= */ true);
         }
-      }
+
+        if (fileData.preloadAsSound) {
+          loadCounter++;
+          preloadAudioFile(file, callback, /* isMusic= */ false);
+        } else if (fileData.preloadInCache) {
+          // preloading as sound already does a XHR request, hence "else if"
+          loadCounter++;
+          const sound = new XMLHttpRequest();
+          sound.withCredentials = checkIfCredentialsRequired(file);
+          sound.addEventListener('load', callback);
+          sound.addEventListener('error', (_) =>
+            callback(_, 'XHR error: ' + file)
+          );
+          sound.addEventListener('abort', (_) =>
+            callback(_, 'XHR abort: ' + file)
+          );
+          sound.open('GET', file);
+          sound.send();
+        }
+
+        if (!loadCounter) {
+          onLoad();
+        }
+      };
+      loadNextFile();
     }
   }
 

@@ -1,73 +1,21 @@
 // @flow
-import { I18n } from '@lingui/react';
-import { Trans } from '@lingui/macro';
-import * as React from 'react';
-import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import AlertMessage from '../UI/AlertMessage';
-import Window from '../Utils/Window';
-import RaisedButton from '../UI/RaisedButton';
-import YouTubeIcon from '@material-ui/icons/YouTube';
-import MenuBookIcon from '@material-ui/icons/MenuBook';
-import { type TutorialHint } from '.';
+import useDismissableTutorialMessage from './useDismissableTutorialMessage';
 
 type Props = {|
-  tutorialHint: TutorialHint,
+  tutorialId: string,
 |};
 
 /**
  * Show a link to a tutorial that can be permanently hidden. Hidden tutorials
  * will be stored in preferences.
+ * Use useDismissableTutorialMessage if you need to know if the tutorial can't be found
+ * or was previously hidden before rendering.
  */
-const DismissableTutorialMessage = ({ tutorialHint }: Props) => {
-  const preferences = React.useContext(PreferencesContext);
-  const { values, showTutorialHint } = preferences;
-
-  if (values.hiddenTutorialHints[tutorialHint.identifier]) return null;
-
-  return (
-    <I18n>
-      {({ i18n }) => (
-        <AlertMessage
-          kind={'info'}
-          children={i18n._(tutorialHint.message)}
-          renderLeftIcon={() => (
-            <img
-              alt=""
-              style={{
-                maxWidth: 128,
-                maxHeight: 128,
-              }}
-              src={tutorialHint.iconSrc}
-            />
-          )}
-          renderRightButton={() => (
-            <RaisedButton
-              icon={
-                tutorialHint.kind === 'video-tutorial' ? (
-                  <YouTubeIcon />
-                ) : (
-                  <MenuBookIcon />
-                )
-              }
-              label={
-                tutorialHint.kind === 'video-tutorial' ? (
-                  <Trans>Watch the tutorial</Trans>
-                ) : (
-                  <Trans>Read the tutorial</Trans>
-                )
-              }
-              onClick={() => {
-                Window.openExternalURL(tutorialHint.link);
-              }}
-            />
-          )}
-          onHide={() => {
-            showTutorialHint(tutorialHint.identifier, false);
-          }}
-        />
-      )}
-    </I18n>
-  );
+const DismissableTutorialMessage = ({ tutorialId }: Props) => {
+  const {
+    DismissableTutorialMessage: ReturnedDismissableTutorialMessage,
+  } = useDismissableTutorialMessage(tutorialId);
+  return ReturnedDismissableTutorialMessage;
 };
 
 export default DismissableTutorialMessage;

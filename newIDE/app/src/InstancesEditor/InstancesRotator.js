@@ -1,8 +1,9 @@
 // @flow
 import Rectangle from '../Utils/Rectangle';
+import { type InstanceMeasurer } from './InstancesRenderer';
 
 export default class InstancesRotator {
-  _instanceMeasurer: any;
+  _instanceMeasurer: InstanceMeasurer;
 
   // Initial state of the instances
   // from which the rotation is calculated.
@@ -24,7 +25,7 @@ export default class InstancesRotator {
    */
   _fixedPoint: [number, number] = [0, 0];
 
-  constructor(instanceMeasurer: any) {
+  constructor(instanceMeasurer: InstanceMeasurer) {
     this._instanceMeasurer = instanceMeasurer;
   }
 
@@ -73,12 +74,20 @@ export default class InstancesRotator {
     deltaY: number,
     proportional: boolean
   ) {
+    const nonLockedInstances = instances.filter(
+      instance => !instance.isLocked()
+    );
+
     if (!this._fixedPointIsUpToDate) {
       this._fixedPointIsUpToDate = true;
       let selectionAABB = new Rectangle();
-      selectionAABB.setRectangle(this._getOrCreateInstanceAABB(instances[0]));
-      for (let i = 1; i < instances.length; i++) {
-        selectionAABB.union(this._getOrCreateInstanceAABB(instances[i]));
+      selectionAABB.setRectangle(
+        this._getOrCreateInstanceAABB(nonLockedInstances[0])
+      );
+      for (let i = 1; i < nonLockedInstances.length; i++) {
+        selectionAABB.union(
+          this._getOrCreateInstanceAABB(nonLockedInstances[i])
+        );
       }
       this._fixedPoint[0] = selectionAABB.centerX();
       this._fixedPoint[1] = selectionAABB.centerY();
@@ -91,8 +100,8 @@ export default class InstancesRotator {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
 
-    for (let i = 0; i < instances.length; i++) {
-      const selectedInstance = instances[i];
+    for (let i = 0; i < nonLockedInstances.length; i++) {
+      const selectedInstance = nonLockedInstances[i];
 
       const initialAABB = this._getOrCreateInstanceAABB(selectedInstance);
       const initialAngle = this._getOrCreateInstanceAngle(selectedInstance);

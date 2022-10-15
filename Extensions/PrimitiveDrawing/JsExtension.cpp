@@ -170,6 +170,73 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::AreCoordinatesRelative"]
         .SetFunctionName("areCoordinatesRelative");
 
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Scale"]
+        .SetFunctionName("setScale")
+        .SetGetter("getScale");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Drawer::SetScaleX"]
+        .SetFunctionName("setScaleX")
+        .SetGetter("getScaleX");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Drawer::SetScaleY"]
+        .SetFunctionName("setScaleY")
+        .SetGetter("getScaleY");
+    GetAllConditionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ScaleX"]
+        .SetFunctionName("getScaleX");
+    GetAllConditionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ScaleY"]
+        .SetFunctionName("getScaleY");
+    GetAllExpressionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ScaleX"]
+        .SetFunctionName("getScaleX");
+    GetAllExpressionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ScaleY"]
+        .SetFunctionName("getScaleY");
+
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FlipX"]
+        .SetFunctionName("flipX");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FlipY"]
+        .SetFunctionName("flipY");
+    GetAllConditionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FlippedX"]
+        .SetFunctionName("isFlippedX");
+    GetAllConditionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FlippedY"]
+        .SetFunctionName("isFlippedY");
+
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Width"]
+        .SetFunctionName("setWidth")
+        .SetGetter("getWidth");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Height"]
+        .SetFunctionName("setHeight")
+        .SetGetter("getHeight");
+
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::SetRotationCenter"]
+        .SetFunctionName("setRotationCenter");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::SetRectangularCollisionMask"]
+        .SetFunctionName("setRectangularCollisionMask");
+
+    GetAllExpressionsForObject(
+        "PrimitiveDrawing::Drawer")["ToDrawingX"]
+        .SetFunctionName("transformToDrawingX");
+    GetAllExpressionsForObject(
+        "PrimitiveDrawing::Drawer")["ToDrawingY"]
+        .SetFunctionName("transformToDrawingY");
+    GetAllExpressionsForObject(
+        "PrimitiveDrawing::Drawer")["ToSceneX"]
+        .SetFunctionName("transformToSceneX");
+    GetAllExpressionsForObject(
+        "PrimitiveDrawing::Drawer")["ToSceneY"]
+        .SetFunctionName("transformToSceneX");
+
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };
 };

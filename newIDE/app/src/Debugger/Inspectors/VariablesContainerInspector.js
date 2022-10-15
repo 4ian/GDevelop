@@ -162,7 +162,7 @@ type Props = {|
   onEdit: EditFunction,
 |};
 
-export default (props: Props) => (
+const VariablesContainerInspector = (props: Props) => (
   <ReactJsonView
     collapsed={false}
     name={false}
@@ -176,3 +176,5 @@ export default (props: Props) => (
     validationMessage="Invalid value"
   />
 );
+
+export default VariablesContainerInspector;

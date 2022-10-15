@@ -84,7 +84,7 @@ export default class ColorField extends React.Component<Props, State> {
           floatingLabelFixed
           helperMarkdownText={this.props.helperMarkdownText}
           type="text"
-          hintText={t`Text in the format R;G;B, like 100;200;180`}
+          translatableHintText={t`Text in the format R;G;B, like 100;200;180`}
           value={this.state.color}
           onChange={event =>
             this._handleChange(event.target.value, this.state.alpha)
@@ -98,7 +98,7 @@ export default class ColorField extends React.Component<Props, State> {
             floatingLabelText="Alpha"
             floatingLabelFixed
             style={{ width: '30%' }}
-            hintText={t`Number between 0 and 1`}
+            translatableHintText={t`Number between 0 and 1`}
             value={this.state.alpha.toString()}
             onChange={(event, value) =>
               this._handleChange(this.state.color, parseFloat(value))

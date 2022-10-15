@@ -16,7 +16,7 @@ const generateLayoutObjectsOptions = (
     handler: () => onChoose(item.object, onChooseArg),
     iconSrc: ObjectsRenderingService.getThumbnail.bind(ObjectsRenderingService)(
       project,
-      item.object
+      item.object.getConfiguration()
     ),
   }));
 };

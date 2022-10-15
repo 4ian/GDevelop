@@ -35,4 +35,18 @@ void ParameterMetadata::UnserializeFrom(const SerializerElement& element) {
   name = element.GetStringAttribute("name");
 }
 
+  // TODO factorize in a file with an enum and helpers?
+  const gd::String ParameterMetadata::numberType = "number";
+  const gd::String ParameterMetadata::stringType = "string";
+
+  const gd::String &ParameterMetadata::GetExpressionValueType(const gd::String &parameterType) {
+    if (parameterType == "number" || gd::ParameterMetadata::IsExpression("number", parameterType)) {
+      return ParameterMetadata::numberType;
+    }
+    if (parameterType == "string" || gd::ParameterMetadata::IsExpression("string", parameterType)) {
+      return ParameterMetadata::stringType;
+    }
+    return parameterType;
+  }
+
 }  // namespace gd

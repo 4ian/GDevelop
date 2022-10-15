@@ -52,7 +52,7 @@ export const SetupExportHeader = ({
       >
         <FormControlLabel
           value={'androidApk'}
-          control={<Radio color="primary" />}
+          control={<Radio color="secondary" />}
           label={
             <Trans>
               APK (for testing on device or sharing outside Google Play)
@@ -61,7 +61,7 @@ export const SetupExportHeader = ({
         />
         <FormControlLabel
           value={'androidAppBundle'}
-          control={<Radio color="primary" />}
+          control={<Radio color="secondary" />}
           label={
             <Trans>Android App Bundle (for publishing on Google Play)</Trans>
           }
@@ -156,4 +156,11 @@ export const SetupExportHeader = ({
       )}
     </Column>
   );
+};
+
+export const onlineCordovaExporter = {
+  key: 'onlinecordovaexport',
+  tabName: <Trans>Mobile</Trans>,
+  name: <Trans>Android (&amp; iOS coming soon)</Trans>,
+  helpPage: '/publishing/android_and_ios',
 };

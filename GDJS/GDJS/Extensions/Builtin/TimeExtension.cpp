@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "TimeExtension.h"
+
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Tools/Localization.h"
@@ -14,7 +15,9 @@ TimeExtension::TimeExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsTimeExtension(*this);
 
   GetAllConditions()["Timer"].SetFunctionName(
-      "gdjs.evtTools.runtimeScene.timerElapsedTime");
+      "gdjs.evtTools.runtimeScene.timerElapsedTime");  // Deprecated
+  GetAllConditions()["CompareTimer"].SetFunctionName(
+      "gdjs.evtTools.runtimeScene.getTimerElapsedTimeInSecondsOrNaN");
   GetAllConditions()["TimerPaused"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.timerPaused");
   GetAllActions()["ResetTimer"].SetFunctionName(
@@ -25,6 +28,8 @@ TimeExtension::TimeExtension() {
       "gdjs.evtTools.runtimeScene.unpauseTimer");
   GetAllActions()["RemoveTimer"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.removeTimer");
+  GetAllActions()["Wait"].SetAsyncFunctionName(
+      "gdjs.evtTools.runtimeScene.wait");
   GetAllConditions()["TimeScale"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.getTimeScale");
   GetAllActions()["ChangeTimeScale"].SetFunctionName(

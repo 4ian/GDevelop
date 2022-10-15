@@ -15,8 +15,8 @@ export default class ObjectPointNameField extends Component<
 > {
   _field: ?GenericExpressionField;
 
-  focus() {
-    if (this._field) this._field.focus();
+  focus(selectAll: boolean = false) {
+    if (this._field) this._field.focus(selectAll);
   }
 
   getPointNames(): Array<ExpressionAutocompletion> {
@@ -47,9 +47,11 @@ export default class ObjectPointNameField extends Component<
     }
 
     if (object.getType() === 'Sprite') {
-      const spriteObject = gd.asSpriteObject(object);
+      const spriteConfiguration = gd.asSpriteConfiguration(
+        object.getConfiguration()
+      );
 
-      return getAllPointNames(spriteObject)
+      return getAllPointNames(spriteConfiguration)
         .map(spriteObjectName =>
           spriteObjectName.length > 0 ? spriteObjectName : null
         )

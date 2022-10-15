@@ -70,8 +70,8 @@ namespace gdjs {
       x: float,
       y: float,
       radius: float,
-      result: gdjs.BehaviorRBushAABB<gdjs.PathfindingObstacleRuntimeBehavior>[]
-    ): any {
+      result: gdjs.PathfindingObstacleRuntimeBehavior[]
+    ): void {
       const searchArea = gdjs.staticObject(
         PathfindingObstaclesManager.prototype.getAllObstaclesAround
       );
@@ -83,9 +83,13 @@ namespace gdjs {
       searchArea.maxX = x + radius;
       // @ts-ignore
       searchArea.maxY = y + radius;
-      const nearbyPlatforms = this._obstaclesRBush.search(searchArea);
+      const nearbyObstacles: gdjs.BehaviorRBushAABB<
+        gdjs.PathfindingObstacleRuntimeBehavior
+      >[] = this._obstaclesRBush.search(searchArea);
       result.length = 0;
-      result.push.apply(result, nearbyPlatforms);
+      nearbyObstacles.forEach((nearbyObstacle) =>
+        result.push(nearbyObstacle.behavior)
+      );
     }
   }
 

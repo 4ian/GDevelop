@@ -9,11 +9,12 @@
 /**
  * Draggable handle on the left of an event
  */
-.gd-events-sheet .rst__moveHandle {
+.gd-events-sheet .move-handle {
     width: 10px;
-    border: none;
-    box-shadow: none;
-    border-radius: 0;
+    margin: 0.5px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    cursor: move;
 }
 
 @media only screen and (max-width: 750px) {
@@ -21,7 +22,7 @@
      * Slightly reduce the size of the handle on small screens
      * and phones (where drag'n'drop is not supported anyway).
      */
-    .gd-events-sheet .rst__moveHandle {
+    .gd-events-sheet .move-handle {
         width: 4px;
     }
 }
@@ -102,10 +103,16 @@
     background-image: url('./unfold.png');
     background-position: 11px 3px !important;
 }
+.gd-events-sheet .DefaultLightTheme .rst__expandButton {
+    background-image: url('./unfoldDark.png');
+}
 
 .gd-events-sheet  .rst__collapseButton {
     background-image: url('./fold.png');
     background-position: center 7px !important;
+}
+.gd-events-sheet .DefaultLightTheme .rst__collapseButton {
+    background-image: url('./foldDark.png');
 }
 
 /**
@@ -125,10 +132,15 @@
     padding:0!important;
     font: inherit;
     cursor: pointer;
-    opacity: 0.3;
+    opacity: 0.6;
+
+    /** Ensure the links are not growing outside of their parents on small screens. */
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: break-word;
 }
 .gd-events-sheet .add-link:hover {
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 /**

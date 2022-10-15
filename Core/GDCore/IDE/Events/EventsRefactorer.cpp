@@ -11,15 +11,16 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
-#include "GDCore/Events/Parsers/ExpressionParser2.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodePrinter.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/Events/ExpressionValidator.h"
-#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/IDE/Events/InstructionSentenceFormatter.h"
+#include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/Project/EventsBasedObject.h"
+#include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 
 using namespace std;
 
@@ -34,18 +35,30 @@ const gd::String EventsRefactorer::searchIgnoredCharacters = ";:,#()";
  */
 class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
  public:
-  ExpressionObjectRenamer(const gd::String& objectName_,
+  ExpressionObjectRenamer(const gd::Platform &platform_,
+                          const gd::ObjectsContainer &globalObjectsContainer_,
+                          const gd::ObjectsContainer &objectsContainer_,
+                          const gd::String &rootType_,
+                          const gd::String& objectName_,
                           const gd::String& objectNewName_)
-      : hasDoneRenaming(false),
+      : platform(platform_),
+        globalObjectsContainer(globalObjectsContainer_),
+        objectsContainer(objectsContainer_),
+        rootType(rootType_),
+        hasDoneRenaming(false),
         objectName(objectName_),
         objectNewName(objectNewName_){};
   virtual ~ExpressionObjectRenamer(){};
 
-  static bool Rename(gd::ExpressionNode& node,
+  static bool Rename(const gd::Platform &platform,
+                     const gd::ObjectsContainer &globalObjectsContainer,
+                     const gd::ObjectsContainer &objectsContainer,
+                     const gd::String &rootType,
+                     gd::ExpressionNode& node,
                      const gd::String& objectName,
                      const gd::String& objectNewName) {
-    if (ExpressionValidator::HasNoErrors(node)) {
-      ExpressionObjectRenamer renamer(objectName, objectNewName);
+    if (gd::ExpressionValidator::HasNoErrors(platform, globalObjectsContainer, objectsContainer, rootType, node)) {
+      ExpressionObjectRenamer renamer(platform, globalObjectsContainer, objectsContainer, rootType, objectName, objectNewName);
       node.Visit(renamer);
 
       return renamer.HasDoneRenaming();
@@ -81,7 +94,8 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    if (gd::ParameterMetadata::IsObject(node.type) &&
+    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    if (gd::ParameterMetadata::IsObject(type) &&
         node.identifierName == objectName) {
       hasDoneRenaming = true;
       node.identifierName = objectNewName;
@@ -108,6 +122,11 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
   bool hasDoneRenaming;
   const gd::String& objectName;
   const gd::String& objectNewName;
+
+  const gd::Platform &platform;
+  const gd::ObjectsContainer &globalObjectsContainer;
+  const gd::ObjectsContainer &objectsContainer;
+  const gd::String rootType;
 };
 
 /**
@@ -118,14 +137,27 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
  */
 class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
  public:
-  ExpressionObjectFinder(const gd::String& objectName_)
-      : hasObject(false), objectName(objectName_){};
+  ExpressionObjectFinder(const gd::Platform &platform_,
+                         const gd::ObjectsContainer &globalObjectsContainer_,
+                         const gd::ObjectsContainer &objectsContainer_,
+                         const gd::String &rootType_,
+                         const gd::String& objectName_)
+      : platform(platform_),
+        globalObjectsContainer(globalObjectsContainer_),
+        objectsContainer(objectsContainer_),
+        rootType(rootType_),
+        hasObject(false),
+        objectName(objectName_){};
   virtual ~ExpressionObjectFinder(){};
 
-  static bool CheckIfHasObject(gd::ExpressionNode& node,
+  static bool CheckIfHasObject(const gd::Platform &platform,
+                               const gd::ObjectsContainer &globalObjectsContainer,
+                               const gd::ObjectsContainer &objectsContainer,
+                               const gd::String &rootType,
+                               gd::ExpressionNode& node,
                                const gd::String& objectName) {
-    if (ExpressionValidator::HasNoErrors(node)) {
-      ExpressionObjectFinder finder(objectName);
+    if (gd::ExpressionValidator::HasNoErrors(platform, globalObjectsContainer, objectsContainer, rootType, node)) {
+      ExpressionObjectFinder finder(platform, globalObjectsContainer, objectsContainer, rootType, objectName);
       node.Visit(finder);
 
       return finder.HasFoundObject();
@@ -161,7 +193,8 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    if (gd::ParameterMetadata::IsObject(node.type) &&
+    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    if (gd::ParameterMetadata::IsObject(type) &&
         node.identifierName == objectName) {
       hasObject = true;
     }
@@ -184,6 +217,11 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
  private:
   bool hasObject;
   const gd::String& objectName;
+
+  const gd::Platform &platform;
+  const gd::ObjectsContainer &globalObjectsContainer;
+  const gd::ObjectsContainer &objectsContainer;
+  const gd::String rootType;
 };
 
 bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
@@ -205,11 +243,9 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
       // Replace object's name in expressions
       else if (ParameterMetadata::IsExpression(
                    "number", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = parser.ParseExpression(
-            "number", actions[aId].GetParameter(pNb).GetPlainString());
+        auto node = actions[aId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+        if (ExpressionObjectRenamer::Rename(platform, project, layout, "number", *node, oldName, newName)) {
           actions[aId].SetParameter(
               pNb, ExpressionParser2NodePrinter::PrintNode(*node));
         }
@@ -217,11 +253,9 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
       // Replace object's name in text expressions
       else if (ParameterMetadata::IsExpression(
                    "string", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = parser.ParseExpression(
-            "string", actions[aId].GetParameter(pNb).GetPlainString());
+        auto node = actions[aId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+        if (ExpressionObjectRenamer::Rename(platform, project, layout, "string", *node, oldName, newName)) {
           actions[aId].SetParameter(
               pNb, ExpressionParser2NodePrinter::PrintNode(*node));
         }
@@ -263,11 +297,9 @@ bool EventsRefactorer::RenameObjectInConditions(
       // Replace object's name in expressions
       else if (ParameterMetadata::IsExpression(
                    "number", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = parser.ParseExpression(
-            "number", conditions[cId].GetParameter(pNb).GetPlainString());
+        auto node = conditions[cId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+        if (ExpressionObjectRenamer::Rename(platform, project, layout, "number", *node, oldName, newName)) {
           conditions[cId].SetParameter(
               pNb, ExpressionParser2NodePrinter::PrintNode(*node));
         }
@@ -275,11 +307,9 @@ bool EventsRefactorer::RenameObjectInConditions(
       // Replace object's name in text expressions
       else if (ParameterMetadata::IsExpression(
                    "string", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = parser.ParseExpression(
-            "string", conditions[cId].GetParameter(pNb).GetPlainString());
+        auto node = conditions[cId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+        if (ExpressionObjectRenamer::Rename(platform, project, layout, "string", *node, oldName, newName)) {
           conditions[cId].SetParameter(
               pNb, ExpressionParser2NodePrinter::PrintNode(*node));
         }
@@ -316,20 +346,18 @@ bool EventsRefactorer::RenameObjectInEventParameters(
   // Replace object's name in expressions
   else if (ParameterMetadata::IsExpression("number",
                                            parameterMetadata.GetType())) {
-    gd::ExpressionParser2 parser(platform, project, layout);
-    auto node = parser.ParseExpression("number", expression.GetPlainString());
+    auto node = expression.GetRootNode();
 
-    if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+    if (ExpressionObjectRenamer::Rename(platform, project, layout, "number", *node, oldName, newName)) {
       expression = ExpressionParser2NodePrinter::PrintNode(*node);
     }
   }
   // Replace object's name in text expressions
   else if (ParameterMetadata::IsExpression("string",
                                            parameterMetadata.GetType())) {
-    gd::ExpressionParser2 parser(platform, project, layout);
-    auto node = parser.ParseExpression("string", expression.GetPlainString());
+    auto node = expression.GetRootNode();
 
-    if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+    if (ExpressionObjectRenamer::Rename(platform, project, layout, "string", *node, oldName, newName)) {
       expression = ExpressionParser2NodePrinter::PrintNode(*node);
     }
   }
@@ -384,8 +412,8 @@ void EventsRefactorer::RenameObjectInEvents(const gd::Platform& platform,
 }
 
 bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
-                                             gd::ObjectsContainer& project,
-                                             gd::ObjectsContainer& layout,
+                                             gd::ObjectsContainer& globalObjectsContainer,
+                                             gd::ObjectsContainer& objectsContainer,
                                              gd::InstructionsList& actions,
                                              gd::String name) {
   bool somethingModified = false;
@@ -405,11 +433,9 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
       // Find object's name in expressions
       else if (ParameterMetadata::IsExpression(
                    "number", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = parser.ParseExpression(
-            "number", actions[aId].GetParameter(pNb).GetPlainString());
+        auto node = actions[aId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectFinder::CheckIfHasObject(*node, name)) {
+        if (ExpressionObjectFinder::CheckIfHasObject(platform, globalObjectsContainer, objectsContainer, "number", *node, name)) {
           deleteMe = true;
           break;
         }
@@ -417,11 +443,9 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
       // Find object's name in text expressions
       else if (ParameterMetadata::IsExpression(
                    "string", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = parser.ParseExpression(
-            "string", actions[aId].GetParameter(pNb).GetPlainString());
+        auto node = actions[aId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectFinder::CheckIfHasObject(*node, name)) {
+        if (ExpressionObjectFinder::CheckIfHasObject(platform, globalObjectsContainer, objectsContainer, "string", *node, name)) {
           deleteMe = true;
           break;
         }
@@ -435,8 +459,8 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
     } else if (!actions[aId].GetSubInstructions().empty())
       somethingModified =
           RemoveObjectInActions(platform,
-                                project,
-                                layout,
+                                globalObjectsContainer,
+                                objectsContainer,
                                 actions[aId].GetSubInstructions(),
                                 name) ||
           somethingModified;
@@ -447,8 +471,8 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
 
 bool EventsRefactorer::RemoveObjectInConditions(
     const gd::Platform& platform,
-    gd::ObjectsContainer& project,
-    gd::ObjectsContainer& layout,
+    gd::ObjectsContainer& globalObjectsContainer,
+    gd::ObjectsContainer& objectsContainer,
     gd::InstructionsList& conditions,
     gd::String name) {
   bool somethingModified = false;
@@ -469,11 +493,9 @@ bool EventsRefactorer::RemoveObjectInConditions(
       // Find object's name in expressions
       else if (ParameterMetadata::IsExpression(
                    "number", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = parser.ParseExpression(
-            "number", conditions[cId].GetParameter(pNb).GetPlainString());
+        auto node = conditions[cId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectFinder::CheckIfHasObject(*node, name)) {
+        if (ExpressionObjectFinder::CheckIfHasObject(platform, globalObjectsContainer, objectsContainer, "number", *node, name)) {
           deleteMe = true;
           break;
         }
@@ -481,11 +503,9 @@ bool EventsRefactorer::RemoveObjectInConditions(
       // Find object's name in text expressions
       else if (ParameterMetadata::IsExpression(
                    "string", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = parser.ParseExpression(
-            "string", conditions[cId].GetParameter(pNb).GetPlainString());
+        auto node = conditions[cId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectFinder::CheckIfHasObject(*node, name)) {
+        if (ExpressionObjectFinder::CheckIfHasObject(platform, globalObjectsContainer, objectsContainer, "string", *node, name)) {
           deleteMe = true;
           break;
         }
@@ -499,8 +519,8 @@ bool EventsRefactorer::RemoveObjectInConditions(
     } else if (!conditions[cId].GetSubInstructions().empty())
       somethingModified =
           RemoveObjectInConditions(platform,
-                                   project,
-                                   layout,
+                                   globalObjectsContainer,
+                                   objectsContainer,
                                    conditions[cId].GetSubInstructions(),
                                    name) ||
           somethingModified;
@@ -510,8 +530,8 @@ bool EventsRefactorer::RemoveObjectInConditions(
 }
 
 void EventsRefactorer::RemoveObjectInEvents(const gd::Platform& platform,
-                                            gd::ObjectsContainer& project,
-                                            gd::ObjectsContainer& layout,
+                                            gd::ObjectsContainer& globalObjectsContainer,
+                                            gd::ObjectsContainer& objectsContainer,
                                             gd::EventsList& events,
                                             gd::String name) {
   for (std::size_t i = 0; i < events.size(); ++i) {
@@ -519,31 +539,37 @@ void EventsRefactorer::RemoveObjectInEvents(const gd::Platform& platform,
         events[i].GetAllConditionsVectors();
     for (std::size_t j = 0; j < conditionsVectors.size(); ++j) {
       bool conditionsModified = RemoveObjectInConditions(
-          platform, project, layout, *conditionsVectors[j], name);
+          platform, globalObjectsContainer, objectsContainer, *conditionsVectors[j], name);
     }
 
     vector<gd::InstructionsList*> actionsVectors =
         events[i].GetAllActionsVectors();
     for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
       bool actionsModified = RemoveObjectInActions(
-          platform, project, layout, *actionsVectors[j], name);
+          platform, globalObjectsContainer, objectsContainer, *actionsVectors[j], name);
     }
 
     if (events[i].CanHaveSubEvents())
       RemoveObjectInEvents(
-          platform, project, layout, events[i].GetSubEvents(), name);
+          platform, globalObjectsContainer, objectsContainer, events[i].GetSubEvents(), name);
   }
 }
 
-void EventsRefactorer::ReplaceStringInEvents(gd::ObjectsContainer& project,
-                                             gd::ObjectsContainer& layout,
-                                             gd::EventsList& events,
-                                             gd::String toReplace,
-                                             gd::String newString,
-                                             bool matchCase,
-                                             bool inConditions,
-                                             bool inActions) {
+std::vector<EventsSearchResult> EventsRefactorer::ReplaceStringInEvents(
+    gd::ObjectsContainer& project,
+    gd::ObjectsContainer& layout,
+    gd::EventsList& events,
+    gd::String toReplace,
+    gd::String newString,
+    bool matchCase,
+    bool inConditions,
+    bool inActions,
+    bool inEventStrings) {
+  vector<EventsSearchResult> modifiedEvents;
+  if (toReplace.empty()) return modifiedEvents;
+
   for (std::size_t i = 0; i < events.size(); ++i) {
+    bool eventModified = false;
     if (inConditions) {
       vector<gd::InstructionsList*> conditionsVectors =
           events[i].GetAllConditionsVectors();
@@ -555,6 +581,13 @@ void EventsRefactorer::ReplaceStringInEvents(gd::ObjectsContainer& project,
                                       toReplace,
                                       newString,
                                       matchCase);
+        if (conditionsModified && !eventModified) {
+          modifiedEvents.push_back(EventsSearchResult(
+              std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
+              &events,
+              i));
+          eventModified = true;
+        }
       }
     }
 
@@ -568,19 +601,45 @@ void EventsRefactorer::ReplaceStringInEvents(gd::ObjectsContainer& project,
                                                       toReplace,
                                                       newString,
                                                       matchCase);
+        if (actionsModified && !eventModified) {
+          modifiedEvents.push_back(EventsSearchResult(
+              std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
+              &events,
+              i));
+          eventModified = true;
+        }
       }
     }
 
-    if (events[i].CanHaveSubEvents())
-      ReplaceStringInEvents(project,
-                            layout,
-                            events[i].GetSubEvents(),
-                            toReplace,
-                            newString,
-                            matchCase,
-                            inConditions,
-                            inActions);
+    if (inEventStrings) {
+      bool eventStringModified = ReplaceStringInEventSearchableStrings(
+          project, layout, events[i], toReplace, newString, matchCase);
+      if (eventStringModified && !eventModified) {
+        modifiedEvents.push_back(EventsSearchResult(
+            std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
+            &events,
+            i));
+        eventModified = true;
+      }
+    }
+
+    if (events[i].CanHaveSubEvents()) {
+      std::vector<EventsSearchResult> modifiedSubEvent =
+          ReplaceStringInEvents(project,
+                                layout,
+                                events[i].GetSubEvents(),
+                                toReplace,
+                                newString,
+                                matchCase,
+                                inConditions,
+                                inActions,
+                                inEventStrings);
+      std::copy(modifiedSubEvent.begin(),
+                modifiedSubEvent.end(),
+                std::back_inserter(modifiedEvents));
+    }
   }
+  return modifiedEvents;
 }
 
 gd::String ReplaceAllOccurencesCaseUnsensitive(gd::String context,
@@ -677,6 +736,29 @@ bool EventsRefactorer::ReplaceStringInConditions(
   return somethingModified;
 }
 
+bool EventsRefactorer::ReplaceStringInEventSearchableStrings(
+    gd::ObjectsContainer& project,
+    gd::ObjectsContainer& layout,
+    gd::BaseEvent& event,
+    gd::String toReplace,
+    gd::String newString,
+    bool matchCase) {
+  vector<gd::String> newEventStrings;
+  vector<gd::String> stringEvent = event.GetAllSearchableStrings();
+
+  for (std::size_t sNb = 0; sNb < stringEvent.size(); ++sNb) {
+    gd::String newStringEvent =
+        matchCase ? stringEvent[sNb].FindAndReplace(toReplace, newString, true)
+                  : ReplaceAllOccurencesCaseUnsensitive(
+                        stringEvent[sNb], toReplace, newString);
+    newEventStrings.push_back(newStringEvent);
+  }
+
+  bool somethingModified = event.ReplaceAllSearchableStrings(newEventStrings);
+
+  return somethingModified;
+}
+
 vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
     const gd::Platform& platform,
     gd::EventsList& events,
@@ -688,14 +770,16 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
     bool inEventSentences) {
   vector<EventsSearchResult> results;
 
-  const gd::String& ignored_characters = EventsRefactorer::searchIgnoredCharacters;
+  const gd::String& ignored_characters =
+      EventsRefactorer::searchIgnoredCharacters;
 
-  search.replace_if(search.begin(),
-                    search.end(),
-                    [ignored_characters](const char &c) {
-                      return ignored_characters.find(c) != gd::String::npos;
-                    },
-                    "");
+  search.replace_if(
+      search.begin(),
+      search.end(),
+      [ignored_characters](const char& c) {
+        return ignored_characters.find(c) != gd::String::npos;
+      },
+      "");
   search = search.LeftTrim().RightTrim();
   search.RemoveConsecutiveOccurrences(search.begin(), search.end(), ' ');
 
@@ -707,8 +791,11 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
           events[i].GetAllConditionsVectors();
       for (std::size_t j = 0; j < conditionsVectors.size(); ++j) {
         if (!eventAddedInResults &&
-            SearchStringInConditions(
-                platform, *conditionsVectors[j], search, matchCase, inEventSentences)) {
+            SearchStringInConditions(platform,
+                                     *conditionsVectors[j],
+                                     search,
+                                     matchCase,
+                                     inEventSentences)) {
           results.push_back(EventsSearchResult(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
@@ -721,9 +808,11 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
       vector<gd::InstructionsList*> actionsVectors =
           events[i].GetAllActionsVectors();
       for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
-        if (!eventAddedInResults &&
-            SearchStringInActions(
-                platform, *actionsVectors[j], search, matchCase, inEventSentences)) {
+        if (!eventAddedInResults && SearchStringInActions(platform,
+                                                          *actionsVectors[j],
+                                                          search,
+                                                          matchCase,
+                                                          inEventSentences)) {
           results.push_back(EventsSearchResult(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
@@ -760,12 +849,11 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
   return results;
 }
 
-bool EventsRefactorer::SearchStringInActions(
-    const gd::Platform& platform,
-    gd::InstructionsList& actions,
-    gd::String search,
-    bool matchCase,
-    bool inSentences) {
+bool EventsRefactorer::SearchStringInActions(const gd::Platform& platform,
+                                             gd::InstructionsList& actions,
+                                             gd::String search,
+                                             bool matchCase,
+                                             bool inSentences) {
   for (std::size_t aId = 0; aId < actions.size(); ++aId) {
     for (std::size_t pNb = 0; pNb < actions[aId].GetParameters().size();
          ++pNb) {
@@ -796,27 +884,30 @@ bool EventsRefactorer::SearchStringInActions(
   return false;
 }
 
-bool EventsRefactorer::SearchStringInFormattedText(
-    const gd::Platform& platform,
-    gd::Instruction& instruction,
-    gd::String search,
-    bool matchCase,
-    bool isCondition) {
+bool EventsRefactorer::SearchStringInFormattedText(const gd::Platform& platform,
+                                                   gd::Instruction& instruction,
+                                                   gd::String search,
+                                                   bool matchCase,
+                                                   bool isCondition) {
   const auto& metadata = isCondition
-                            ? gd::MetadataProvider::GetConditionMetadata(
-                                  platform, instruction.GetType())
-                            : gd::MetadataProvider::GetActionMetadata(
-                                  platform, instruction.GetType());
-  gd::String completeSentence = gd::InstructionSentenceFormatter::Get()->GetFullText(instruction, metadata);
+                             ? gd::MetadataProvider::GetConditionMetadata(
+                                   platform, instruction.GetType())
+                             : gd::MetadataProvider::GetActionMetadata(
+                                   platform, instruction.GetType());
+  gd::String completeSentence =
+      gd::InstructionSentenceFormatter::Get()->GetFullText(instruction,
+                                                           metadata);
 
-  const gd::String& ignored_characters = EventsRefactorer::searchIgnoredCharacters;
+  const gd::String& ignored_characters =
+      EventsRefactorer::searchIgnoredCharacters;
 
-  completeSentence.replace_if(completeSentence.begin(),
-                              completeSentence.end(),
-                              [ignored_characters](const char &c) {
-                                return ignored_characters.find(c) != gd::String::npos;
-                              },
-                              "");
+  completeSentence.replace_if(
+      completeSentence.begin(),
+      completeSentence.end(),
+      [ignored_characters](const char& c) {
+        return ignored_characters.find(c) != gd::String::npos;
+      },
+      "");
 
   completeSentence.RemoveConsecutiveOccurrences(
       completeSentence.begin(), completeSentence.end(), ' ');

@@ -7,14 +7,20 @@ import {
   listAllExamples,
 } from '../../Utils/GDevelopServices/Example';
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
-import { useSearchItem } from '../../UI/Search/UseSearchItem';
+import {
+  useSearchStructuredItem,
+  type SearchMatch,
+} from '../../UI/Search/UseSearchStructuredItem';
 
 const defaultSearchText = '';
+const excludedTiers = new Set(); // No tiers for examples.
+const firstExampleIds = [];
 
 type ExampleStoreState = {|
   filters: ?Filters,
-  searchResults: ?Array<ExampleShortHeader>,
+  searchResults: ?Array<{| item: ExampleShortHeader, matches: SearchMatch[] |}>,
   fetchExamplesAndFilters: () => void,
+  allExamples: ?Array<ExampleShortHeader>,
   error: ?Error,
   searchText: string,
   setSearchText: string => void,
@@ -25,6 +31,7 @@ export const ExampleStoreContext = React.createContext<ExampleStoreState>({
   filters: null,
   searchResults: null,
   fetchExamplesAndFilters: () => {},
+  allExamples: null,
   error: null,
   searchText: '',
   setSearchText: () => {},
@@ -41,16 +48,6 @@ type ExampleStoreStateProviderProps = {|
   children: React.Node,
 |};
 
-const getExampleSearchTerms = (example: ExampleShortHeader) => {
-  return (
-    example.name +
-    '\n' +
-    example.shortDescription +
-    '\n' +
-    example.tags.join(',')
-  );
-};
-
 export const ExampleStoreStateProvider = ({
   children,
 }: ExampleStoreStateProviderProps) => {
@@ -62,6 +59,11 @@ export const ExampleStoreStateProvider = ({
   }>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [error, setError] = React.useState<?Error>(null);
+  const [
+    allExamples,
+    setAllExamples,
+  ] = React.useState<?Array<ExampleShortHeader>>(null);
+
   const isLoading = React.useRef<boolean>(false);
 
   const [searchText, setSearchText] = React.useState(defaultSearchText);
@@ -80,6 +82,7 @@ export const ExampleStoreStateProvider = ({
         try {
           const allExamples: AllExamples = await listAllExamples();
           const { exampleShortHeaders, filters } = allExamples;
+          setAllExamples(exampleShortHeaders);
 
           const exampleShortHeadersById = {};
           exampleShortHeaders.forEach(exampleShortHeader => {
@@ -109,7 +112,7 @@ export const ExampleStoreStateProvider = ({
 
   React.useEffect(
     () => {
-      // Don't attempt to load again extensions and filters if they
+      // Don't attempt to load again examples and filters if they
       // were loaded already.
       if (exampleShortHeadersById || isLoading.current) return;
 
@@ -123,18 +126,23 @@ export const ExampleStoreStateProvider = ({
   );
 
   const { chosenCategory, chosenFilters } = filtersState;
-  const searchResults: ?Array<ExampleShortHeader> = useSearchItem(
-    exampleShortHeadersById,
-    getExampleSearchTerms,
+  const searchResults: ?Array<{|
+    item: ExampleShortHeader,
+    matches: SearchMatch[],
+  |}> = useSearchStructuredItem(exampleShortHeadersById, {
     searchText,
     chosenCategory,
-    chosenFilters
-  );
+    chosenFilters,
+    excludedTiers,
+    defaultFirstSearchItemIds: firstExampleIds,
+    shuffleResults: false,
+  });
 
-  const extensionStoreState = React.useMemo(
+  const exampleStoreState = React.useMemo(
     () => ({
       searchResults,
       fetchExamplesAndFilters,
+      allExamples,
       filters,
       error,
       searchText,
@@ -143,6 +151,7 @@ export const ExampleStoreStateProvider = ({
     }),
     [
       searchResults,
+      allExamples,
       error,
       filters,
       searchText,
@@ -152,7 +161,7 @@ export const ExampleStoreStateProvider = ({
   );
 
   return (
-    <ExampleStoreContext.Provider value={extensionStoreState}>
+    <ExampleStoreContext.Provider value={exampleStoreState}>
       {children}
     </ExampleStoreContext.Provider>
   );

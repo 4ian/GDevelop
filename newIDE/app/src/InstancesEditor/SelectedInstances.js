@@ -11,10 +11,12 @@ import {
   canMoveOnX,
   canMoveOnY,
 } from './InstancesResizer';
+import { type InstanceMeasurer } from './InstancesRenderer';
+import Rectangle from '../Utils/Rectangle';
 
 type Props = {|
   instancesSelection: InstancesSelection,
-  instanceMeasurer: Object, // To be typed in InstancesRenderer
+  instanceMeasurer: InstanceMeasurer,
   onResize: (
     deltaX: number,
     deltaY: number,
@@ -64,7 +66,7 @@ const resizeGrabbingIconNames = {
  */
 export default class SelectedInstances {
   instancesSelection: InstancesSelection;
-  instanceMeasurer: Object; // To be typed in InstancesRenderer
+  instanceMeasurer: InstanceMeasurer;
   onResize: (
     deltaX: number,
     deltaY: number,
@@ -125,7 +127,7 @@ export default class SelectedInstances {
       () => {
         this.onRotateEnd();
       },
-      'url("res/actions/rotate24.png"),auto'
+      'url("res/actions/rotate24_black.png"),auto'
     );
   }
 
@@ -200,8 +202,9 @@ export default class SelectedInstances {
     let y1 = 0;
     let x2 = 0;
     let y2 = 0;
+    let initialised = false;
 
-    //Update the selection rectangle of each instance
+    // Update the selection rectangle of each instance.
     for (var i = 0; i < selection.length; i++) {
       if (this.selectedRectangles.length === i) {
         const newRectangle = new PIXI.Graphics();
@@ -211,37 +214,45 @@ export default class SelectedInstances {
       }
 
       const instance = selection[i];
-      const instanceRect = this.instanceMeasurer.getInstanceRect(instance);
+      const instanceRect = this.instanceMeasurer.getInstanceAABB(
+        instance,
+        new Rectangle()
+      );
       const selectionRectangle = transformRect(
         this.toCanvasCoordinates,
         instanceRect
       );
 
       this.selectedRectangles[i].clear();
-      this.selectedRectangles[i].beginFill(0x6868e8);
-      this.selectedRectangles[i].lineStyle(1, 0x6868e8, 1);
+      const selectionRectangleColor = instance.isLocked() ? 0xbc5753 : 0x6868e8;
+      this.selectedRectangles[i].beginFill(selectionRectangleColor);
+      this.selectedRectangles[i].lineStyle(1, selectionRectangleColor, 1);
       this.selectedRectangles[i].fill.alpha = 0.3;
       this.selectedRectangles[i].alpha = 0.8;
       this.selectedRectangles[i].drawRect(
-        selectionRectangle.x,
-        selectionRectangle.y,
-        selectionRectangle.width,
-        selectionRectangle.height
+        selectionRectangle.left,
+        selectionRectangle.top,
+        selectionRectangle.width(),
+        selectionRectangle.height()
       );
       this.selectedRectangles[i].endFill();
 
-      if (i === 0) {
-        x1 = instanceRect.x;
-        y1 = instanceRect.y;
-        x2 = instanceRect.x + instanceRect.width;
-        y2 = instanceRect.y + instanceRect.height;
+      if (instance.isLocked()) {
+        continue;
+      }
+      if (!initialised) {
+        x1 = instanceRect.left;
+        y1 = instanceRect.top;
+        x2 = instanceRect.left + instanceRect.width();
+        y2 = instanceRect.top + instanceRect.height();
+        initialised = true;
       } else {
-        if (instanceRect.x < x1) x1 = instanceRect.x;
-        if (instanceRect.y < y1) y1 = instanceRect.y;
-        if (instanceRect.x + instanceRect.width > x2)
-          x2 = instanceRect.x + instanceRect.width;
-        if (instanceRect.y + instanceRect.height > y2)
-          y2 = instanceRect.y + instanceRect.height;
+        if (instanceRect.left < x1) x1 = instanceRect.left;
+        if (instanceRect.top < y1) y1 = instanceRect.top;
+        if (instanceRect.left + instanceRect.width() > x2)
+          x2 = instanceRect.left + instanceRect.width();
+        if (instanceRect.top + instanceRect.height() > y2)
+          y2 = instanceRect.top + instanceRect.height();
       }
     }
 
@@ -249,7 +260,9 @@ export default class SelectedInstances {
       this.rectanglesContainer.removeChild(this.selectedRectangles.pop());
     }
 
-    const show = selection.length !== 0;
+    // If there are no unlocked instances, hide the resize buttons.
+    const show =
+      selection.filter(instance => !instance.isLocked()).length !== 0;
 
     // Position the resize buttons.
     for (const grabbingLocation of resizeGrabbingLocationValues) {

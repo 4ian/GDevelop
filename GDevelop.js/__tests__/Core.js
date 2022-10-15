@@ -31,6 +31,10 @@ describe('libGD.js', function () {
     it('has properties that can be read and changed', function () {
       project.setName('My super project');
       expect(project.getName()).toBe('My super project');
+      project.setDescription("This is a great game I'm really proud of");
+      expect(project.getDescription()).toBe(
+        "This is a great game I'm really proud of"
+      );
       project.setVersion('1.2.34');
       expect(project.getVersion()).toBe('1.2.34');
       project.setPackageName('com.test.package');
@@ -151,9 +155,9 @@ describe('libGD.js', function () {
       expect(layout.getName()).toBe('Scene with a 官话 name');
     });
     it('can store events', function () {
-      var evts = layout.getEvents();
+      let evts = layout.getEvents();
       expect(evts.getEventsCount()).toBe(0);
-      var evt = evts.insertNewEvent(
+      let evt = evts.insertNewEvent(
         project,
         'BuiltinCommonInstructions::Standard',
         0
@@ -165,8 +169,8 @@ describe('libGD.js', function () {
       expect(evts.getEventAt(0).getSubEvents().getEventsCount()).toBe(1);
     });
     it('can have objects', function () {
-      var object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
-      var object2 = layout.insertNewObject(
+      let object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      let object2 = layout.insertNewObject(
         project,
         'TextObject::Text',
         'MyObject2',
@@ -225,6 +229,19 @@ describe('libGD.js', function () {
       effects.swapEffects(0, 1);
       expect(effects.getEffectPosition('MyEffect2')).toBe(0);
       expect(effects.getEffectPosition('MyEffect')).toBe(1);
+
+      const effect3 = new gd.Effect();
+      effect3.setName('MyEffect3');
+
+      effects.insertEffect(effect3, 2);
+      expect(effects.hasEffectNamed('MyEffect3')).toBe(true);
+      expect(effects.getEffectsCount()).toBe(3);
+
+      effects.moveEffect(2, 0);
+
+      expect(effects.getEffectPosition('MyEffect3')).toBe(0);
+      expect(effects.getEffectPosition('MyEffect2')).toBe(1);
+      expect(effects.getEffectPosition('MyEffect')).toBe(2);
 
       layer.delete();
     });
@@ -292,15 +309,15 @@ describe('libGD.js', function () {
     beforeAll(() => (project = gd.ProjectHelper.createNewGDJSProject()));
 
     it('can move objects', function () {
-      var layout = project.insertNewLayout('Scene', 0);
-      var object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
-      var object2 = layout.insertNewObject(
+      let layout = project.insertNewLayout('Scene', 0);
+      let object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      let object2 = layout.insertNewObject(
         project,
         'TextObject::Text',
         'MyObject2',
         1
       );
-      var object3 = layout.insertNewObject(
+      let object3 = layout.insertNewObject(
         project,
         'TextObject::Text',
         'MyObject3',
@@ -329,15 +346,15 @@ describe('libGD.js', function () {
     });
 
     it('can find position of objects', function () {
-      var layout = project.insertNewLayout('Scene2', 0);
-      var object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
-      var object2 = layout.insertNewObject(
+      let layout = project.insertNewLayout('Scene2', 0);
+      let object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      let object2 = layout.insertNewObject(
         project,
         'TextObject::Text',
         'MyObject2',
         1
       );
-      var object3 = layout.insertNewObject(
+      let object3 = layout.insertNewObject(
         project,
         'TextObject::Text',
         'MyObject3',
@@ -357,20 +374,14 @@ describe('libGD.js', function () {
 
   describe('gd.ObjectsContainer', function () {
     it('can move objects between containers, without moving them in memory', function () {
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+
       // Prepare two containers, one with 3 objects and one empty
       const objectsContainer1 = new gd.ObjectsContainer();
       const objectsContainer2 = new gd.ObjectsContainer();
-      const mySpriteObject = new gd.SpriteObject('MySprite');
-      const mySprite2Object = new gd.SpriteObject('MySprite2');
-      const mySprite3Object = new gd.SpriteObject('MySprite3');
-      objectsContainer1.insertObject(mySpriteObject, 0);
-      objectsContainer1.insertObject(mySprite2Object, 1);
-      objectsContainer1.insertObject(mySprite3Object, 2);
-
-      // Objects are copied when inserted in the container, so we delete them:
-      mySpriteObject.delete();
-      mySprite2Object.delete();
-      mySprite3Object.delete();
+      const mySpriteObject = objectsContainer1.insertNewObject(project, 'Sprite', 'MySprite', 0);
+      const mySprite2Object = objectsContainer1.insertNewObject(project, 'Sprite', 'MySprite2', 1);
+      const mySprite3Object = objectsContainer1.insertNewObject(project, 'Sprite', 'MySprite3', 2);
 
       // Find the pointer to the objects in memory
       expect(objectsContainer1.getObjectsCount()).toBe(3);
@@ -438,6 +449,7 @@ describe('libGD.js', function () {
       expect(gd.getPointer(objectsContainer2.getObjectAt(0))).toBe(
         mySprite3ObjectPtr
       );
+      project.delete();
     });
   });
 
@@ -452,15 +464,15 @@ describe('libGD.js', function () {
       expect(container.getInstancesCount()).toBe(0);
     });
     it('adding instances', function () {
-      var instance = container.insertNewInitialInstance();
+      let instance = container.insertNewInitialInstance();
       instance.setObjectName('MyObject1');
       instance.setZOrder(10);
 
-      var instance2 = new gd.InitialInstance();
+      let instance2 = new gd.InitialInstance();
       instance2.setObjectName('MyObject2');
       instance2 = container.insertInitialInstance(instance2);
 
-      var instance3 = container.insertNewInitialInstance();
+      let instance3 = container.insertNewInitialInstance();
       instance3.setObjectName('MyObject3');
       instance3.setZOrder(-1);
       instance3.setLayer('OtherLayer');
@@ -468,8 +480,8 @@ describe('libGD.js', function () {
       expect(container.getInstancesCount()).toBe(3);
     });
     it('iterating', function () {
-      var i = 0;
-      var functor = new gd.InitialInstanceJSFunctor();
+      let i = 0;
+      let functor = new gd.InitialInstanceJSFunctor();
       functor.invoke = function (instance) {
         instance = gd.wrapPointer(instance, gd.InitialInstance);
         expect(
@@ -484,8 +496,8 @@ describe('libGD.js', function () {
     it('can rename instances', function () {
       container.renameInstancesOfObject('MyObject1', 'MyObject');
 
-      var i = 0;
-      var functor = new gd.InitialInstanceJSFunctor();
+      let i = 0;
+      let functor = new gd.InitialInstanceJSFunctor();
       functor.invoke = function (instance) {
         instance = gd.wrapPointer(instance, gd.InitialInstance);
         expect(
@@ -498,8 +510,8 @@ describe('libGD.js', function () {
       container.iterateOverInstances(functor);
     });
     it('iterating with z ordering', function () {
-      var i = 0;
-      var functor = new gd.InitialInstanceJSFunctor();
+      let i = 0;
+      let functor = new gd.InitialInstanceJSFunctor();
       functor.invoke = function (instance) {
         instance = gd.wrapPointer(instance, gd.InitialInstance);
         expect(
@@ -513,7 +525,7 @@ describe('libGD.js', function () {
     it('moving from layers to another', function () {
       container.moveInstancesToLayer('OtherLayer', 'YetAnotherLayer');
 
-      var functor = new gd.InitialInstanceJSFunctor();
+      let functor = new gd.InitialInstanceJSFunctor();
       functor.invoke = function (instance) {
         instance = gd.wrapPointer(instance, gd.InitialInstance);
         expect(instance.getObjectName()).toBe('MyObject3');
@@ -524,7 +536,7 @@ describe('libGD.js', function () {
       containerCopy = container.clone();
       expect(containerCopy.getInstancesCount()).toBe(3);
 
-      var instance = containerCopy.insertNewInitialInstance();
+      let instance = containerCopy.insertNewInitialInstance();
       instance.setObjectName('MyObject4');
       expect(containerCopy.getInstancesCount()).toBe(4);
       expect(container.getInstancesCount()).toBe(3);
@@ -585,11 +597,11 @@ describe('libGD.js', function () {
       expect(initialInstance.getCustomHeight()).toBe(30);
     });
     it('Sprite object custom properties', function () {
-      initialInstance.updateCustomProperty('Animation', '2', project, layout);
+      initialInstance.updateCustomProperty('animation', '2', project, layout);
       expect(
         initialInstance
           .getCustomProperties(project, layout)
-          .get('Animation')
+          .get('animation')
           .getValue()
       ).toBe('2');
       expect(initialInstance.getRawDoubleProperty('animation')).toBe(2);
@@ -598,10 +610,10 @@ describe('libGD.js', function () {
       expect(initialInstance.serializeTo).not.toBe(undefined);
       expect(initialInstance.unserializeFrom).not.toBe(undefined);
 
-      var element = new gd.SerializerElement();
+      let element = new gd.SerializerElement();
       initialInstance.serializeTo(element);
 
-      var initialInstance2 = layout
+      let initialInstance2 = layout
         .getInitialInstances()
         .insertNewInitialInstance();
       initialInstance2.unserializeFrom(element);
@@ -621,7 +633,7 @@ describe('libGD.js', function () {
       initialInstance.setObjectName('MyObject');
 
       // Serialized object must have a non empty "persistentUuid".
-      var element = new gd.SerializerElement();
+      let element = new gd.SerializerElement();
       initialInstance.serializeTo(element);
       const persistentUuid = element.getStringAttribute('persistentUuid');
       expect(persistentUuid).toBeTruthy();
@@ -630,14 +642,14 @@ describe('libGD.js', function () {
       const initialInstance2 = new gd.InitialInstance();
       initialInstance2.unserializeFrom(element);
 
-      var element2 = new gd.SerializerElement();
+      let element2 = new gd.SerializerElement();
       initialInstance.serializeTo(element2);
       const persistentUuid2 = element2.getStringAttribute('persistentUuid');
       expect(persistentUuid2).toBe(persistentUuid);
 
       // The UUID can be reset
       initialInstance2.resetPersistentUuid();
-      var element3 = new gd.SerializerElement();
+      let element3 = new gd.SerializerElement();
       initialInstance2.serializeTo(element3);
       const persistentUuid3 = element3.getStringAttribute('persistentUuid');
       expect(persistentUuid3).not.toBe(persistentUuid2);
@@ -656,14 +668,14 @@ describe('libGD.js', function () {
 
   describe('gd.VariablesContainer', function () {
     it('container is empty after being created', function () {
-      var container = new gd.VariablesContainer();
+      let container = new gd.VariablesContainer();
 
       expect(container.has('Variable')).toBe(false);
       expect(container.count()).toBe(0);
       container.delete();
     });
     it('can insert variables', function () {
-      var container = new gd.VariablesContainer();
+      let container = new gd.VariablesContainer();
 
       container.insertNew('Variable', 0);
       expect(container.has('Variable')).toBe(true);
@@ -675,7 +687,7 @@ describe('libGD.js', function () {
       container.delete();
     });
     it('can rename variables', function () {
-      var container = new gd.VariablesContainer();
+      let container = new gd.VariablesContainer();
 
       container.insertNew('Variable', 0);
       container
@@ -695,7 +707,7 @@ describe('libGD.js', function () {
       container.delete();
     });
     it('can swap variables', function () {
-      var container = new gd.VariablesContainer();
+      let container = new gd.VariablesContainer();
 
       container.insertNew('Variable', 0).setValue(4);
       container
@@ -714,7 +726,7 @@ describe('libGD.js', function () {
       container.delete();
     });
     it('can move variables', function () {
-      var container = new gd.VariablesContainer();
+      let container = new gd.VariablesContainer();
 
       container.insertNew('Variable', 0).setValue(4);
       container
@@ -743,7 +755,7 @@ describe('libGD.js', function () {
 
   describe('gd.Variable', function () {
     let variable = null;
-    beforeAll(() => (variable = new gd.Variable()));
+    beforeEach(() => (variable = new gd.Variable()));
 
     it('should have initial value', function () {
       expect(variable.getValue()).toBe(0);
@@ -778,11 +790,29 @@ describe('libGD.js', function () {
       variable.removeChild('SecondChild');
       expect(variable.getType()).toBe(gd.Variable.Structure);
     });
+    it('can insert a child in structure', function () {
+      variable.getChild('FirstChild').setValue(1);
+      variable.getChild('SecondChild').setString('two');
+      expect(variable.getType()).toBe(gd.Variable.Structure);
+      const variableToInsert = new gd.Variable();
+      variableToInsert.setString('strVariable');
+      {
+        const result = variable.insertChild('FirstChild', variableToInsert);
+        expect(result).toBe(false);
+      }
+      {
+        const result = variable.insertChild('ThirdChild', variableToInsert);
+        expect(result).toBe(true);
+      }
+      variableToInsert.delete();
+      expect(variable.hasChild('ThirdChild')).toBe(true);
+      expect(variable.getChild('ThirdChild').getString()).toBe('strVariable');
+    });
     it('can expose its children', function () {
       variable.getChild('FirstChild').setValue(1);
       variable.getChild('SecondChild').setValue(1);
 
-      var childrenNames = variable.getAllChildrenNames();
+      let childrenNames = variable.getAllChildrenNames();
       expect(childrenNames.size()).toBe(2);
 
       variable.getChild(childrenNames.get(0)).setString('one');
@@ -807,15 +837,40 @@ describe('libGD.js', function () {
       variable.removeAtIndex(0);
       expect(variable.getType()).toBe(gd.Variable.Array);
     });
+    it('can move children inside array', function () {
+      variable.getAtIndex(0).setValue(1);
+      expect(variable.getType()).toBe(gd.Variable.Array);
+      variable.getAtIndex(1).setValue(2);
+      variable.getAtIndex(2).setValue(3);
+      variable.getAtIndex(3).setValue(4);
+      variable.moveChildInArray(2, 0);
+      expect(variable.getAtIndex(2).getValue()).toBe(2);
+      expect(variable.getAtIndex(0).getValue()).toBe(3);
+    });
+    it('can insert child in array', function () {
+      variable.getAtIndex(0).setValue(1);
+      expect(variable.getType()).toBe(gd.Variable.Array);
+      variable.getAtIndex(1).setValue(2);
+      variable.getAtIndex(2).setValue(3);
+      variable.getAtIndex(3).setValue(4);
+      const variableToInsert = new gd.Variable();
+      variableToInsert.setString('strVariable');
+      const result = variable.insertAtIndex(variableToInsert, 2);
+      variableToInsert.delete();
+      expect(result).toBe(true);
+      expect(variable.getAtIndex(2).getString()).toBe('strVariable');
+      expect(variable.getAtIndex(3).getValue()).toBe(3);
+      expect(variable.getAtIndex(4).getValue()).toBe(4);
+    });
     it('can search inside children and remove them recursively', function () {
-      var parentVariable = new gd.Variable();
+      let parentVariable = new gd.Variable();
 
-      var child1 = parentVariable.getChild('Child1');
-      var child2 = parentVariable.getChild('Child2');
-      var grandChild1 = parentVariable
+      let child1 = parentVariable.getChild('Child1');
+      let child2 = parentVariable.getChild('Child2');
+      let grandChild1 = parentVariable
         .getChild('Child1')
         .getChild('GrandChild');
-      var grandChild2 = parentVariable.getChild('Child2').getAtIndex(0);
+      let grandChild2 = parentVariable.getChild('Child2').getAtIndex(0);
 
       expect(parentVariable.contains(grandChild1, true)).toBe(true);
       expect(parentVariable.contains(grandChild1, false)).toBe(false);
@@ -1030,23 +1085,23 @@ describe('libGD.js', function () {
 
   describe('gd.ResourcesManager', function () {
     it('should support adding resources', function () {
-      var project = gd.ProjectHelper.createNewGDJSProject();
-      var resource = new gd.Resource();
-      var resource2 = new gd.Resource();
+      let project = gd.ProjectHelper.createNewGDJSProject();
+      let resource = new gd.Resource();
+      let resource2 = new gd.Resource();
       resource.setName('MyResource');
       resource2.setName('MyResource2');
       project.getResourcesManager().addResource(resource);
       project.getResourcesManager().addResource(resource2);
-      var allResources = project.getResourcesManager().getAllResourceNames();
+      let allResources = project.getResourcesManager().getAllResourceNames();
 
       expect(allResources.size()).toBe(2);
       project.delete();
     });
 
     it('should support finding resources', function () {
-      var project = gd.ProjectHelper.createNewGDJSProject();
-      var resource = new gd.Resource();
-      var resource2 = new gd.Resource();
+      let project = gd.ProjectHelper.createNewGDJSProject();
+      let resource = new gd.Resource();
+      let resource2 = new gd.Resource();
       resource.setName('MyResource');
       resource2.setName('MyResource2');
       project.getResourcesManager().addResource(resource);
@@ -1065,21 +1120,33 @@ describe('libGD.js', function () {
     });
 
     it('can find files that are not in the resources', function () {
-      var project = gd.ProjectHelper.createNewGDJSProject();
-      var resource = new gd.ImageResource();
-      var resource2 = new gd.AudioResource();
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const resource = new gd.ImageResource();
+      const resource2 = new gd.AudioResource();
+      const resource3 = new gd.AudioResource();
+      const resource4 = new gd.JsonResource();
       resource.setName('MyResource');
       resource.setFile('MyFile.png');
       resource2.setName('MyResource2');
       resource2.setFile('MySubFolder/MyOtherFile.mp3');
+      resource3.setName('MyResource3');
+      resource3.setFile('MySubFolder\\MyOtherFileInWindowsFormat.mp3');
+      resource4.setName('MyResource4');
+      resource4.setFile('MySubFolder/MyOtherFileInUnixFormat.json');
       project.getResourcesManager().addResource(resource);
       project.getResourcesManager().addResource(resource2);
+      project.getResourcesManager().addResource(resource3);
+      project.getResourcesManager().addResource(resource4);
 
       const filesToCheck = new gd.VectorString();
       [
         'MyFile.png',
         'MySubFolder/MyFileMissingInResource.png',
         'MySubFolder/MyOtherFile.mp3',
+        // Check that resources can be found even if specified using
+        // a different path separator:
+        'MySubFolder/MyOtherFileInWindowsFormat.mp3',
+        'MySubFolder\\MyOtherFileInUnixFormat.json',
       ].forEach((filePath) => {
         filesToCheck.push_back(filePath);
       });
@@ -1097,13 +1164,13 @@ describe('libGD.js', function () {
     });
 
     it('should support removing resources', function () {
-      var project = gd.ProjectHelper.createNewGDJSProject();
-      var resource = new gd.Resource();
+      let project = gd.ProjectHelper.createNewGDJSProject();
+      let resource = new gd.Resource();
       resource.setName('MyResource');
       project.getResourcesManager().addResource(resource);
       project.getResourcesManager().removeResource('MyResource');
 
-      var allResources = project.getResourcesManager().getAllResourceNames();
+      let allResources = project.getResourcesManager().getAllResourceNames();
       expect(allResources.size()).toBe(0);
       project.delete();
     });
@@ -1111,33 +1178,37 @@ describe('libGD.js', function () {
 
   describe('gd.ProjectResourcesAdder', function () {
     it('should support removing useless resources', function () {
-      var project = gd.ProjectHelper.createNewGDJSProject();
-      var resource1 = new gd.ImageResource();
+      let project = gd.ProjectHelper.createNewGDJSProject();
+      let resource1 = new gd.ImageResource();
       resource1.setName('Useless');
-      var resource2 = new gd.ImageResource();
+      let resource2 = new gd.ImageResource();
       resource2.setName('Used');
       project.getResourcesManager().addResource(resource1);
       project.getResourcesManager().addResource(resource2);
 
       //Create an object using a resource
-      var obj = project.insertNewObject(project, 'Sprite', 'MyObject', 0);
-      var sprite1 = new gd.Sprite();
+      let obj = project.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      let sprite1 = new gd.Sprite();
       sprite1.setImageName('Used');
 
-      var anim1 = new gd.Animation();
+      let anim1 = new gd.Animation();
       anim1.setDirectionsCount(1);
       anim1.getDirection(0).addSprite(sprite1);
 
-      gd.castObject(obj, gd.SpriteObject).addAnimation(anim1);
+      gd.castObject(obj.getConfiguration(), gd.SpriteObject).addAnimation(anim1);
 
-      var allResources = project.getResourcesManager().getAllResourceNames();
-      expect(allResources.size()).toBe(2);
+      {
+        let allResources = project.getResourcesManager().getAllResourceNames();
+        expect(allResources.size()).toBe(2);
+      }
 
       gd.ProjectResourcesAdder.removeAllUseless(project, 'image');
 
-      var allResources = project.getResourcesManager().getAllResourceNames();
-      expect(allResources.size()).toBe(1);
-      expect(allResources.get(0)).toBe('Used');
+      {
+        let allResources = project.getResourcesManager().getAllResourceNames();
+        expect(allResources.size()).toBe(1);
+        expect(allResources.get(0)).toBe('Used');
+      }
       project.delete();
     });
 
@@ -1179,17 +1250,17 @@ describe('libGD.js', function () {
 
   describe('gd.ArbitraryResourceWorker', function () {
     it('should be called with resources of the project', function (done) {
-      var project = gd.ProjectHelper.createNewGDJSProject();
-      var obj = project.insertNewObject(project, 'Sprite', 'MyObject', 0);
-      const spriteObject = gd.asSpriteObject(obj);
-      var sprite1 = new gd.Sprite();
+      let project = gd.ProjectHelper.createNewGDJSProject();
+      let obj = project.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      const spriteConfiguration = gd.asSpriteConfiguration(obj.getConfiguration());
+      let sprite1 = new gd.Sprite();
       sprite1.setImageName('Used');
       const animation = new gd.Animation();
       animation.setDirectionsCount(1);
       animation.getDirection(0).addSprite(sprite1);
-      spriteObject.addAnimation(animation);
+      spriteConfiguration.addAnimation(animation);
 
-      var worker = extend(new gd.ArbitraryResourceWorkerJS(), {
+      let worker = extend(new gd.ArbitraryResourceWorkerJS(), {
         exposeImage: function (image) {
           expect(image).toBe('Used');
           done();
@@ -1205,14 +1276,14 @@ describe('libGD.js', function () {
 
   describe('gd.ResourcesInUseHelper', function () {
     it('should find the images used by objects', function () {
-      var sprite1 = new gd.Sprite();
+      let sprite1 = new gd.Sprite();
       sprite1.setImageName('Image1');
-      var sprite2 = new gd.Sprite();
+      let sprite2 = new gd.Sprite();
       sprite2.setImageName('Image2');
-      var sprite3 = new gd.Sprite();
+      let sprite3 = new gd.Sprite();
       sprite3.setImageName('Image3');
 
-      const spriteObject = new gd.SpriteObject('My sprite object');
+      const spriteObject = new gd.SpriteObject();
       const animation = new gd.Animation();
       animation.setDirectionsCount(1);
       animation.getDirection(0).addSprite(sprite1);
@@ -1220,7 +1291,7 @@ describe('libGD.js', function () {
       animation.getDirection(0).addSprite(sprite1);
       spriteObject.addAnimation(animation);
 
-      const spriteObject2 = new gd.SpriteObject('My sprite object');
+      const spriteObject2 = new gd.SpriteObject();
       const animation2 = new gd.Animation();
       animation2.setDirectionsCount(1);
       animation2.getDirection(0).addSprite(sprite1);
@@ -1282,13 +1353,13 @@ describe('libGD.js', function () {
 
   describe('gd.BehaviorsSharedData', function () {
     it('can be created by gd.Layout.updateBehaviorsSharedData', function () {
-      var project = gd.ProjectHelper.createNewGDJSProject();
-      var layout = project.insertNewLayout('Scene', 0);
-      var object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
+      let project = gd.ProjectHelper.createNewGDJSProject();
+      let layout = project.insertNewLayout('Scene', 0);
+      let object = layout.insertNewObject(project, 'Sprite', 'MyObject', 0);
 
       layout.updateBehaviorsSharedData(project);
       expect(layout.hasBehaviorSharedData('Physics')).toBe(false);
-      var behaviorContent = object.addNewBehavior(
+      let behaviorContent = object.addNewBehavior(
         project,
         'PhysicsBehavior::PhysicsBehavior',
         'Physics'
@@ -1307,7 +1378,7 @@ describe('libGD.js', function () {
 
   describe('gd.BehaviorSharedDataJsImplementation', function () {
     it('can declare a gd.BehaviorSharedDataJsImplementation and pass sanity checks', function () {
-      var mySharedData = new gd.BehaviorSharedDataJsImplementation();
+      let mySharedData = new gd.BehaviorSharedDataJsImplementation();
       mySharedData.updateProperty = function (
         behaviorContent,
         propertyName,
@@ -1325,7 +1396,7 @@ describe('libGD.js', function () {
         return false;
       };
       mySharedData.getProperties = function (behaviorContent) {
-        var properties = new gd.MapStringPropertyDescriptor();
+        let properties = new gd.MapStringPropertyDescriptor();
 
         properties
           .getOrCreate('My first property')
@@ -1395,7 +1466,7 @@ describe('libGD.js', function () {
     it('can be serialized', function () {
       const property = makeNewProperty();
 
-      var serializerElement = new gd.SerializerElement();
+      let serializerElement = new gd.SerializerElement();
       property.serializeTo(serializerElement);
       property.delete();
 
@@ -1433,7 +1504,7 @@ describe('libGD.js', function () {
 
   describe('gd.MapStringPropertyDescriptor', function () {
     it('can be used to manipulate properties', function () {
-      var properties = new gd.MapStringPropertyDescriptor();
+      let properties = new gd.MapStringPropertyDescriptor();
       expect(properties.has('Property0')).toBe(false);
 
       // Ensure the "set" method works (though in practice, prefer "getOrCreate")
@@ -1480,7 +1551,7 @@ describe('libGD.js', function () {
 
   describe('gd.BehaviorJsImplementation', function () {
     it('can declare a gd.BehaviorJsImplementation and pass sanity checks', function () {
-      var myBehavior = new gd.BehaviorJsImplementation();
+      let myBehavior = new gd.BehaviorJsImplementation();
       myBehavior.updateProperty = function (
         behaviorContent,
         propertyName,
@@ -1498,7 +1569,7 @@ describe('libGD.js', function () {
         return false;
       };
       myBehavior.getProperties = function (behaviorContent) {
-        var properties = new gd.MapStringPropertyDescriptor();
+        let properties = new gd.MapStringPropertyDescriptor();
 
         properties
           .getOrCreate('My first property')
@@ -1541,10 +1612,10 @@ describe('libGD.js', function () {
   });
 
   describe('gd.Object', function () {
-    var project = null;
-    var layout = null;
-    var object = null;
-    var object2 = null;
+    let project = null;
+    let layout = null;
+    let object = null;
+    let object2 = null;
 
     beforeAll(() => {
       project = gd.ProjectHelper.createNewGDJSProject();
@@ -1566,7 +1637,7 @@ describe('libGD.js', function () {
     });
 
     it('can have behaviors', function () {
-      var behavior = object.addNewBehavior(
+      let behavior = object.addNewBehavior(
         project,
         'DraggableBehavior::Draggable',
         'Draggable'
@@ -1576,7 +1647,7 @@ describe('libGD.js', function () {
     });
 
     it('can have its behaviors retrieved with gd.getBehaviorsOfObject', function () {
-      var behaviors = gd.getBehaviorsOfObject(
+      let behaviors = gd.getBehaviorsOfObject(
         project,
         layout,
         'TheObject',
@@ -1587,7 +1658,7 @@ describe('libGD.js', function () {
     });
 
     it('can be un/serialized (basic)', function () {
-      var serializerElement = new gd.SerializerElement();
+      let serializerElement = new gd.SerializerElement();
       object.serializeTo(serializerElement);
       object2.unserializeFrom(project, serializerElement);
       object2.unserializeFrom(project, serializerElement); // Also check that multiple
@@ -1595,20 +1666,16 @@ describe('libGD.js', function () {
       serializerElement.delete();
 
       //Check that behaviors were persisted and restored
-      var behaviors = object2.getAllBehaviorNames();
+      let behaviors = object2.getAllBehaviorNames();
       expect(behaviors.size()).toBe(1);
       expect(behaviors.at(0)).toBe('Draggable');
     });
 
     it('can be un/serialized (with behavior content)', function () {
       const behaviorContent = object.getBehavior('Draggable');
-      behaviorContent.getContent().addChild('Child1');
-      behaviorContent
-        .getContent()
-        .addChild('Child2')
-        .setStringValue('Child2Value');
+      behaviorContent.updateProperty('checkCollisionMask', "true");
 
-      var serializerElement = new gd.SerializerElement();
+      let serializerElement = new gd.SerializerElement();
       object.serializeTo(serializerElement);
       object2.unserializeFrom(project, serializerElement);
       object2.unserializeFrom(project, serializerElement); // Also check that multiple
@@ -1616,16 +1683,14 @@ describe('libGD.js', function () {
       serializerElement.delete();
 
       //Check that behaviors were persisted and restored
-      var behaviors = object2.getAllBehaviorNames();
+      let behaviors = object2.getAllBehaviorNames();
       expect(behaviors.size()).toBe(1);
       expect(behaviors.at(0)).toBe('Draggable');
 
       const behaviorContent2 = object2.getBehavior('Draggable');
-      expect(behaviorContent2.getContent().hasChild('Child1')).toBe(true);
-      expect(behaviorContent2.getContent().hasChild('Child2')).toBe(true);
-      expect(
-        behaviorContent2.getContent().getChild('Child2').getStringValue()
-      ).toBe('Child2Value');
+      expect(behaviorContent2.getProperties()
+                             .get('checkCollisionMask')
+                             .getValue()).toBe("true");
     });
 
     afterAll(function () {
@@ -1635,7 +1700,7 @@ describe('libGD.js', function () {
 
   describe('gd.ObjectJsImplementation', function () {
     const createSampleObjectJsImplementation = () => {
-      var myObject = new gd.ObjectJsImplementation();
+      let myObject = new gd.ObjectJsImplementation();
       myObject.updateProperty = function (content, propertyName, newValue) {
         if (propertyName === 'My first property') {
           content.property1 = newValue;
@@ -1649,7 +1714,7 @@ describe('libGD.js', function () {
         return false;
       };
       myObject.getProperties = function (content) {
-        var properties = new gd.MapStringPropertyDescriptor();
+        let properties = new gd.MapStringPropertyDescriptor();
 
         properties.getOrCreate('My first property').setValue(content.property1);
         properties
@@ -1691,7 +1756,7 @@ describe('libGD.js', function () {
         project,
         layout
       ) {
-        var properties = new gd.MapStringPropertyDescriptor();
+        let properties = new gd.MapStringPropertyDescriptor();
 
         properties
           .getOrCreate('My instance property')
@@ -1709,7 +1774,7 @@ describe('libGD.js', function () {
       // see ObjectJsImplementation C++ implementation). If called directly here from JS,
       // the arguments will be mismatched. To workaround this, always case the object to
       // a base gdObject to ensure C++ methods are called.
-      return gd.castObject(myObject, gd.Object);
+      return gd.castObject(myObject, gd.ObjectConfiguration);
     };
 
     it('can create a gd.ObjectJsImplementation and pass sanity checks', function () {
@@ -1754,7 +1819,6 @@ describe('libGD.js', function () {
     });
 
     it('can clone a gd.ObjectJsImplementation', function () {
-      const project = gd.ProjectHelper.createNewGDJSProject();
       const object1 = createSampleObjectJsImplementation();
       expect(
         object1.getProperties().get('My first property').getValue() ==
@@ -1813,16 +1877,14 @@ describe('libGD.js', function () {
           propertiesObject3.get('My first property').getValue() == 'test1'
         );
       }
-
-      project.delete();
     });
   });
 
   describe('gd.ObjectGroupsContainer', function () {
-    var container = null;
-    var group1 = null;
-    var group2 = null;
-    var group3 = null;
+    let container = null;
+    let group1 = null;
+    let group2 = null;
+    let group3 = null;
 
     beforeAll(() => (container = new gd.ObjectGroupsContainer()));
 
@@ -1869,42 +1931,42 @@ describe('libGD.js', function () {
 
   describe('gd.Instruction', function () {
     it('initial values', function () {
-      var instr = new gd.Instruction();
+      let instr = new gd.Instruction();
       expect(instr.getParametersCount()).toBe(0);
       expect(instr.getSubInstructions().size()).toBe(0);
       instr.delete();
     });
     it('setting parameters', function () {
-      var instr = new gd.Instruction();
+      let instr = new gd.Instruction();
       instr.setParametersCount(3);
       expect(instr.getParametersCount()).toBe(3);
-      expect(instr.getParameter(1)).toBe('');
+      expect(instr.getParameter(1).getPlainString()).toBe('');
       instr.setParameter(2, 'MyValue');
-      expect(instr.getParameter(2)).toBe('MyValue');
+      expect(instr.getParameter(2).getPlainString()).toBe('MyValue');
       instr.delete();
     });
     it('can be cloned', function () {
-      var instr = new gd.Instruction();
+      let instr = new gd.Instruction();
       instr.setParametersCount(3);
       instr.setParameter(2, 'MyValue');
 
-      var newInstr = instr.clone();
+      let newInstr = instr.clone();
       expect(newInstr.getParametersCount()).toBe(3);
-      expect(newInstr.getParameter(1)).toBe('');
-      expect(newInstr.getParameter(2)).toBe('MyValue');
+      expect(newInstr.getParameter(1).getPlainString()).toBe('');
+      expect(newInstr.getParameter(2).getPlainString()).toBe('MyValue');
 
       newInstr.setParameter(2, 'MyChangedValue');
-      expect(instr.getParameter(2)).toBe('MyValue');
-      expect(newInstr.getParameter(2)).toBe('MyChangedValue');
+      expect(instr.getParameter(2).getPlainString()).toBe('MyValue');
+      expect(newInstr.getParameter(2).getPlainString()).toBe('MyChangedValue');
       newInstr.delete();
-      expect(instr.getParameter(2)).toBe('MyValue');
+      expect(instr.getParameter(2).getPlainString()).toBe('MyValue');
 
       instr.delete();
     });
   });
 
   describe('gd.InstructionsList', function () {
-    var list = null;
+    let list = null;
     beforeAll(() => (list = new gd.InstructionsList()));
 
     it('can insert instructions', function () {
@@ -1915,7 +1977,7 @@ describe('libGD.js', function () {
     it('can modify its instructions', function () {
       expect(list.get(0).getType()).toBe('');
 
-      var newInstr = new gd.Instruction();
+      let newInstr = new gd.Instruction();
       newInstr.setType('Type2');
       list.set(0, newInstr);
 
@@ -1923,9 +1985,9 @@ describe('libGD.js', function () {
       expect(list.size()).toBe(1);
     });
     it('can remove its instructions', function () {
-      var newInstr = new gd.Instruction();
+      let newInstr = new gd.Instruction();
       newInstr.setType('Type3');
-      var instruction = list.insert(newInstr, 1);
+      let instruction = list.insert(newInstr, 1);
       expect(list.get(1).getType()).toBe('Type3');
       expect(list.size()).toBe(2);
       expect(list.contains(instruction)).toBe(true);
@@ -1939,13 +2001,13 @@ describe('libGD.js', function () {
       expect(list.size()).toBe(0);
     });
     it('can insert events from another list', function () {
-      var list1 = new gd.InstructionsList();
-      var list2 = new gd.InstructionsList();
+      let list1 = new gd.InstructionsList();
+      let list2 = new gd.InstructionsList();
 
-      var newInstr = new gd.Instruction();
+      let newInstr = new gd.Instruction();
       newInstr.setType('Type1');
       list1.insert(newInstr, 0);
-      var newInstr2 = new gd.Instruction();
+      let newInstr2 = new gd.Instruction();
       newInstr2.setType('Type2');
       list1.insert(newInstr2, 1);
 
@@ -1964,24 +2026,24 @@ describe('libGD.js', function () {
       list2.delete();
     });
     it('can be un/serialized', function () {
-      var newInstr = new gd.Instruction();
+      let newInstr = new gd.Instruction();
       newInstr.setType('Type1');
       newInstr.setParametersCount(2);
       newInstr.setParameter(0, 'Param1');
       newInstr.setParameter(1, 'Param2');
-      var instruction = list.insert(newInstr, 1);
+      let instruction = list.insert(newInstr, 1);
 
-      var newInstr2 = new gd.Instruction();
+      let newInstr2 = new gd.Instruction();
       newInstr2.setType('Type2');
       newInstr2.setParametersCount(1);
       newInstr2.setParameter(0, 'Param3');
-      var instruction2 = list.insert(newInstr2, 1);
+      let instruction2 = list.insert(newInstr2, 1);
 
-      var project = gd.ProjectHelper.createNewGDJSProject();
-      var serializerElement = new gd.SerializerElement();
+      let project = gd.ProjectHelper.createNewGDJSProject();
+      let serializerElement = new gd.SerializerElement();
       list.serializeTo(serializerElement);
 
-      var list2 = new gd.InstructionsList();
+      let list2 = new gd.InstructionsList();
       list2.unserializeFrom(project, serializerElement);
 
       expect(list2.size()).toBe(2);
@@ -1989,9 +2051,9 @@ describe('libGD.js', function () {
       expect(list2.get(1).getType()).toBe('Type2');
       expect(list2.get(0).getParametersCount()).toBe(2);
       expect(list2.get(1).getParametersCount()).toBe(1);
-      expect(list2.get(0).getParameter(0)).toBe('Param1');
-      expect(list2.get(0).getParameter(1)).toBe('Param2');
-      expect(list2.get(1).getParameter(0)).toBe('Param3');
+      expect(list2.get(0).getParameter(0).getPlainString()).toBe('Param1');
+      expect(list2.get(0).getParameter(1).getPlainString()).toBe('Param2');
+      expect(list2.get(1).getParameter(0).getPlainString()).toBe('Param3');
 
       list2.delete();
       project.delete();
@@ -2004,12 +2066,12 @@ describe('libGD.js', function () {
 
   describe('InstructionSentenceFormatter', function () {
     it('should translate instructions (plain text or into a vector of text with formatting)', function () {
-      var action = new gd.Instruction(); //Create a simple instruction
+      let action = new gd.Instruction(); //Create a simple instruction
       action.setType('Delete');
       action.setParametersCount(2);
       action.setParameter(0, 'MyCharacter');
 
-      var formattedTexts =
+      let formattedTexts =
         gd.InstructionSentenceFormatter.get().getAsFormattedText(
           action,
           gd.MetadataProvider.getActionMetadata(gd.JsPlatform.get(), 'Delete')
@@ -2037,8 +2099,8 @@ describe('libGD.js', function () {
         /* Event 1 */
         event1 = new gd.StandardEvent();
 
-        var eventActions1 = event1.getActions();
-        var action1 = new gd.Instruction();
+        let eventActions1 = event1.getActions();
+        let action1 = new gd.Instruction();
         action1.setType('RotateTowardPosition'); // should generate the sentence `Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed _PARAM3_deg/second`
         action1.setParametersCount(4);
         action1.setParameter(0, 'Platform');
@@ -2047,8 +2109,8 @@ describe('libGD.js', function () {
         action1.setParameter(3, '90');
         eventActions1.push_back(action1);
 
-        var eventConditions1 = event1.getConditions();
-        var condition1 = new gd.Instruction();
+        let eventConditions1 = event1.getConditions();
+        let condition1 = new gd.Instruction();
         condition1.setType('PosX'); // should generate the sentence `the X position of _PARAM0_ _PARAM1_ _PARAM2_`
         condition1.setParametersCount(3);
         condition1.setParameter(0, 'MyCharacter');
@@ -2062,15 +2124,15 @@ describe('libGD.js', function () {
 
         event2 = new gd.StandardEvent();
 
-        var eventActions2 = event2.getActions();
-        var action2 = new gd.Instruction();
+        let eventActions2 = event2.getActions();
+        let action2 = new gd.Instruction();
         action2.setType('Delete'); // should generate the sentence `Delete _PARAM0_`
         action2.setParametersCount(1);
         action2.setParameter(0, 'OtherCharacter');
         eventActions2.push_back(action2);
 
-        var eventConditions2 = event2.getConditions();
-        var condition2 = new gd.Instruction();
+        let eventConditions2 = event2.getConditions();
+        let condition2 = new gd.Instruction();
         condition2.setType('Angle'); // should generate the sentence `the angle (in degrees) of _PARAM0_ _PARAM1_ _PARAM2_`
         condition2.setParametersCount(3);
         condition2.setParameter(0, 'OtherPlatform');
@@ -2089,7 +2151,7 @@ describe('libGD.js', function () {
         event1.delete();
         event2.delete();
         eventList.delete();
-      })
+      });
 
       it('should search string in parameters only and respect case', function () {
         const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
@@ -2265,9 +2327,9 @@ describe('libGD.js', function () {
 
   describe('gd.EventsList', function () {
     it('can have events', function () {
-      var list = new gd.EventsList();
+      let list = new gd.EventsList();
       list.insertEvent(new gd.StandardEvent(), 0);
-      var lastEvent = list.insertEvent(new gd.StandardEvent(), 1);
+      let lastEvent = list.insertEvent(new gd.StandardEvent(), 1);
       list.insertEvent(new gd.StandardEvent(), 1);
       expect(list.getEventsCount()).toBe(3);
       expect(list.getEventAt(2).ptr).toBe(lastEvent.ptr);
@@ -2275,10 +2337,10 @@ describe('libGD.js', function () {
     });
 
     it('can create lots of new events', function () {
-      var project = new gd.ProjectHelper.createNewGDJSProject();
-      var list = new gd.EventsList();
-      for (var i = 0; i < 500; ++i) {
-        var evt = list.insertNewEvent(
+      let project = new gd.ProjectHelper.createNewGDJSProject();
+      let list = new gd.EventsList();
+      for (let i = 0; i < 500; ++i) {
+        let evt = list.insertNewEvent(
           project,
           'BuiltinCommonInstructions::Standard',
           0
@@ -2296,10 +2358,10 @@ describe('libGD.js', function () {
     });
 
     it('can tell if it contains an event', function () {
-      var list = new gd.EventsList();
+      let list = new gd.EventsList();
 
-      var parentEvent = list.insertEvent(new gd.StandardEvent(), 0);
-      var subEvent = parentEvent
+      let parentEvent = list.insertEvent(new gd.StandardEvent(), 0);
+      let subEvent = parentEvent
         .getSubEvents()
         .insertEvent(new gd.StandardEvent(), 0);
 
@@ -2311,15 +2373,15 @@ describe('libGD.js', function () {
     });
 
     it('can move an event to another list without invalidating it/copying it in memory', function () {
-      var list1 = new gd.EventsList();
-      var list2 = new gd.EventsList();
+      let list1 = new gd.EventsList();
+      let list2 = new gd.EventsList();
 
-      var list1ParentEvent = list1.insertEvent(new gd.StandardEvent(), 0);
-      var list2ParentEvent = list2.insertEvent(new gd.StandardEvent(), 0);
-      var originalSubEvent = list1ParentEvent
+      let list1ParentEvent = list1.insertEvent(new gd.StandardEvent(), 0);
+      let list2ParentEvent = list2.insertEvent(new gd.StandardEvent(), 0);
+      let originalSubEvent = list1ParentEvent
         .getSubEvents()
         .insertEvent(new gd.StandardEvent(), 0);
-      var originalSubEventPtr = originalSubEvent.ptr;
+      let originalSubEventPtr = originalSubEvent.ptr;
 
       expect(
         list1ParentEvent
@@ -2331,7 +2393,7 @@ describe('libGD.js', function () {
           )
       ).toBe(true);
       expect(list2ParentEvent.getSubEvents().getEventsCount()).toBe(1);
-      var movedSubEvent = list2ParentEvent.getSubEvents().getEventAt(0);
+      let movedSubEvent = list2ParentEvent.getSubEvents().getEventAt(0);
       expect(movedSubEvent.ptr).toBe(originalSubEventPtr);
 
       list1.delete();
@@ -2341,9 +2403,9 @@ describe('libGD.js', function () {
 
   describe('gd.BaseEvent', function () {
     it('can have a type', function () {
-      var event = new gd.BaseEvent();
+      let event = new gd.BaseEvent();
       event.setType('Type1');
-      var event2 = new gd.BaseEvent();
+      let event2 = new gd.BaseEvent();
       event2.setType('Type2');
 
       expect(event.getType()).toBe('Type1');
@@ -2354,9 +2416,9 @@ describe('libGD.js', function () {
     });
 
     it('can be cloned', function () {
-      var event = new gd.BaseEvent();
+      let event = new gd.BaseEvent();
       event.setType('Type1');
-      var event2 = event.clone();
+      let event2 = event.clone();
 
       expect(event.getType()).toBe('Type1');
       expect(event2.getType()).toBe('Type1');
@@ -2366,7 +2428,7 @@ describe('libGD.js', function () {
     });
 
     it('can be de/serialized', function () {
-      var event = new gd.BaseEvent();
+      let event = new gd.BaseEvent();
       expect(typeof event.serializeTo).toBe('function');
       expect(typeof event.unserializeFrom).toBe('function');
       event.delete();
@@ -2376,21 +2438,21 @@ describe('libGD.js', function () {
   describe('gd.ArbitraryEventsWorker', function () {
     describe('gd.EventsParametersLister', function () {
       it('can list parameters and their types', function () {
-        var project = new gd.ProjectHelper.createNewGDJSProject();
-        var list = new gd.EventsList();
+        let project = new gd.ProjectHelper.createNewGDJSProject();
+        let list = new gd.EventsList();
 
-        var evt = new gd.StandardEvent();
-        var actions = evt.getActions();
-        var act = new gd.Instruction();
+        let evt = new gd.StandardEvent();
+        let actions = evt.getActions();
+        let act = new gd.Instruction();
         act.setType('Delete');
         act.setParametersCount(1);
         act.setParameter(0, 'MyObject');
         actions.push_back(act);
         evt = list.insertEvent(evt, 0);
 
-        var subEvt = new gd.StandardEvent();
-        var conditions = subEvt.getConditions();
-        var cnd = new gd.Instruction();
+        let subEvt = new gd.StandardEvent();
+        let conditions = subEvt.getConditions();
+        let cnd = new gd.Instruction();
         cnd.setType('PosX');
         cnd.setParametersCount(3);
         cnd.setParameter(0, 'MyObject');
@@ -2399,7 +2461,7 @@ describe('libGD.js', function () {
         conditions.push_back(cnd);
         evt.getSubEvents().insertEvent(subEvt, 0);
 
-        var parametersLister = new gd.EventsParametersLister(project);
+        let parametersLister = new gd.EventsParametersLister(project);
         parametersLister.launch(list);
 
         expect(parametersLister.getParametersAndTypes().keys().size()).toBe(3);
@@ -2412,6 +2474,68 @@ describe('libGD.js', function () {
 
         project.delete();
         list.delete();
+      });
+    });
+
+    describe('gd.EventsPositionFinder', function () {
+      it('can find positions of a list of given events', function () {
+        // evt0
+        // ├── evt00 <------- 0
+        // │   ├── evt000
+        // │   ├── evt001
+        // │   └── evt002 <-- 1
+        // ├── evt01
+        // │   └── evt010 <-- 2
+        // └── evt02
+        //     └── evt020
+        // evt1 <------------ 3
+        // └── evt10 <------- 4
+        const events = new gd.EventsList();
+
+        let evt0 = new gd.StandardEvent();
+        evt0 = events.insertEvent(evt0, 0);
+        let evt1 = new gd.StandardEvent();
+        evt1 = events.insertEvent(evt1, 1);
+
+        let evt00 = new gd.StandardEvent();
+        evt00 = evt0.getSubEvents().insertEvent(evt00, 0);
+        let evt000 = new gd.StandardEvent();
+        let evt001 = new gd.StandardEvent();
+        let evt002 = new gd.StandardEvent();
+        evt000 = evt00.getSubEvents().insertEvent(evt000, 0);
+        evt001 = evt00.getSubEvents().insertEvent(evt001, 1);
+        evt002 = evt00.getSubEvents().insertEvent(evt002, 2);
+
+        let evt01 = new gd.StandardEvent();
+        evt01 = evt0.getSubEvents().insertEvent(evt01, 1);
+        let evt010 = new gd.StandardEvent();
+        evt010 = evt01.getSubEvents().insertEvent(evt010, 0);
+
+        let evt02 = new gd.StandardEvent();
+        evt02 = evt0.getSubEvents().insertEvent(evt02, 2);
+        let evt020 = new gd.StandardEvent();
+        evt020 = evt02.getSubEvents().insertEvent(evt020, 0);
+
+        let evt10 = new gd.StandardEvent();
+        evt10 = evt1.getSubEvents().insertEvent(evt10, 0);
+
+        const missingEvent = new gd.StandardEvent();
+
+        const positionFinder = new gd.EventsPositionFinder();
+        positionFinder.addEventToSearch(evt00);
+        positionFinder.addEventToSearch(evt10);
+        positionFinder.addEventToSearch(evt1);
+        positionFinder.addEventToSearch(evt002);
+        positionFinder.addEventToSearch(evt010);
+        positionFinder.addEventToSearch(missingEvent);
+        positionFinder.launch(events);
+
+        expect(positionFinder.getPositions().size()).toBe(6);
+        expect(positionFinder.getPositions().toJSArray()).toEqual([
+          1, 10, 9, 4, 6, -1,
+        ]);
+
+        events.delete();
       });
     });
   });
@@ -2434,7 +2558,7 @@ describe('libGD.js', function () {
     });
     it('can remember parameters used to create the group from a template event', function () {
       const evt = new gd.GroupEvent();
-      var parameters = evt.getCreationParameters();
+      let parameters = evt.getCreationParameters();
       parameters.push_back('Param1');
       parameters.push_back('Param2');
 
@@ -2457,15 +2581,15 @@ describe('libGD.js', function () {
     });
     it('conditions and actions', function () {
       const evt = new gd.StandardEvent();
-      var conditions = evt.getConditions();
+      let conditions = evt.getConditions();
       expect(evt.getConditions().size()).toBe(0);
-      var cnd = new gd.Instruction();
+      let cnd = new gd.Instruction();
       conditions.push_back(cnd);
       expect(evt.getConditions().size()).toBe(1);
 
-      var actions = evt.getActions();
+      let actions = evt.getActions();
       expect(evt.getActions().size()).toBe(0);
-      var act = new gd.Instruction();
+      let act = new gd.Instruction();
       actions.push_back(act);
       expect(evt.getActions().size()).toBe(1);
     });
@@ -2508,17 +2632,18 @@ describe('libGD.js', function () {
 
   describe('gd.SpriteObject', function () {
     it('is a gd.Object and can have tags', function () {
-      var object = new gd.SpriteObject('MySpriteObject');
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      let object = project.insertNewObject(project, 'Sprite', 'MySpriteObject');
 
       expect(object instanceof gd.Object).toBe(true);
       object.setTags('tag1, tag2, tag3');
       expect(object.getTags()).toBe('tag1, tag2, tag3');
       expect(object.getVariables()).toBeTruthy();
-      object.delete();
+      project.delete();
     });
 
     it('can have animations', function () {
-      var obj = new gd.SpriteObject('MySpriteObject');
+      let obj = new gd.SpriteObject();
       obj.addAnimation(new gd.Animation());
       obj.addAnimation(new gd.Animation());
       expect(obj.getAnimationsCount()).toBe(2);
@@ -2527,12 +2652,12 @@ describe('libGD.js', function () {
     });
 
     it('can swap animations', function () {
-      var obj = new gd.SpriteObject('MySpriteObject');
+      let obj = new gd.SpriteObject();
       obj.removeAllAnimations();
-      var anim1 = new gd.Animation();
-      var anim2 = new gd.Animation();
-      var sprite1 = new gd.Sprite();
-      var sprite2 = new gd.Sprite();
+      let anim1 = new gd.Animation();
+      let anim2 = new gd.Animation();
+      let sprite1 = new gd.Sprite();
+      let sprite2 = new gd.Sprite();
 
       sprite1.setImageName('image1');
       sprite2.setImageName('image2');
@@ -2614,7 +2739,7 @@ describe('libGD.js', function () {
 
     describe('gd.Sprite', function () {
       it('can have default points', function () {
-        var sprite1 = new gd.Sprite();
+        let sprite1 = new gd.Sprite();
         sprite1.getCenter().setX(2);
         sprite1.getCenter().setY(3);
         sprite1.getOrigin().setX(4);
@@ -2626,8 +2751,8 @@ describe('libGD.js', function () {
       });
 
       it('can have custom points', function () {
-        var sprite1 = new gd.Sprite();
-        var point = new gd.Point('test');
+        let sprite1 = new gd.Sprite();
+        let point = new gd.Point('test');
         sprite1.addPoint(point);
         point.delete();
 
@@ -2652,7 +2777,7 @@ describe('libGD.js', function () {
 
     describe('gd.ObjectMetadata', function () {
       it('can return standard information about Sprite object', function () {
-        var objMetadata = gd.MetadataProvider.getObjectMetadata(
+        let objMetadata = gd.MetadataProvider.getObjectMetadata(
           gd.JsPlatform.get(),
           'Sprite'
         );
@@ -2662,10 +2787,68 @@ describe('libGD.js', function () {
         expect(objMetadata.getDescription().length).not.toBe(0);
         expect(objMetadata.getIconFilename().length).not.toBe(0);
       });
+      it('can have conditions and actions added at the same time for booleans', function () {
+        const extension = new gd.PlatformExtension();
+        extension.setExtensionInformation(
+          'TestExtensionName',
+          'Full name of test extension',
+          'Description of test extension',
+          'Author of test extension',
+          'License of test extension'
+        );
+        const fakeObject = new gd.ObjectJsImplementation();
+        const objectMetadata = extension.addObject(
+          'FakeObject',
+          'FakeObject',
+          'This is FakeObject',
+          '',
+          fakeObject
+        );
+
+        objectMetadata
+          .addExpressionAndConditionAndAction(
+            'boolean',
+            'Disabled',
+            'Disabled',
+            'the object is disabled',
+            'disabled',
+            '',
+            'Disable.png'
+          )
+          .addParameter('object', 'My object', 'MyObject', false)
+          .useStandardParameters('boolean')
+          .setFunctionName('setDisabled')
+          .setGetter('isDisabled');
+
+        expect(
+          objectMetadata
+            .getAllConditions()
+            .has('TestExtensionName::FakeObject::Disabled')
+        ).toBe(true);
+        expect(
+          objectMetadata
+            .getAllActions()
+            .has('TestExtensionName::FakeObject::SetDisabled')
+        ).toBe(true);
+
+        // Check sentences are properly set up.
+        expect(
+          objectMetadata
+            .getAllConditions()
+            .get('TestExtensionName::FakeObject::Disabled')
+            .getSentence()
+        ).toBe('_PARAM0_ is disabled');
+        expect(
+          objectMetadata
+            .getAllActions()
+            .get('TestExtensionName::FakeObject::SetDisabled')
+            .getSentence()
+        ).toBe('Set _PARAM0_ as disabled: _PARAM1_');
+      });
     });
     describe('gd.BehaviorMetadata', function () {
       it('have standard methods to get information', function () {
-        var autoMetadata = gd.MetadataProvider.getBehaviorMetadata(
+        let autoMetadata = gd.MetadataProvider.getBehaviorMetadata(
           gd.JsPlatform.get(),
           'NotExistingBehavior'
         );
@@ -2677,10 +2860,72 @@ describe('libGD.js', function () {
         expect(autoMetadata.getIconFilename).not.toBe(undefined);
         expect(autoMetadata.getObjectType).not.toBe(undefined);
       });
+      it('can have conditions and actions added at the same time for booleans', function () {
+        const extension = new gd.PlatformExtension();
+        extension.setExtensionInformation(
+          'TestExtensionName',
+          'Full name of test extension',
+          'Description of test extension',
+          'Author of test extension',
+          'License of test extension'
+        );
+        const dummyBehavior = new gd.BehaviorJsImplementation();
+        const behaviorMetadata = extension.addBehavior(
+          'DummyBehavior',
+          'Dummy behavior for testing',
+          'DummyBehavior',
+          'Do nothing.',
+          '',
+          '',
+          'DummyBehavior',
+          dummyBehavior,
+          new gd.BehaviorsSharedData()
+        );
+
+        behaviorMetadata
+          .addExpressionAndConditionAndAction(
+            'boolean',
+            'Disabled',
+            'Disabled',
+            'the object is disabled',
+            'disabled',
+            '',
+            'Disable.png'
+          )
+          .addParameter('object', 'My object', '', false)
+          .useStandardParameters('boolean')
+          .setFunctionName('setDisabled')
+          .setGetter('isDisabled');
+
+        expect(
+          behaviorMetadata
+            .getAllConditions()
+            .has('TestExtensionName::DummyBehavior::Disabled')
+        ).toBe(true);
+        expect(
+          behaviorMetadata
+            .getAllActions()
+            .has('TestExtensionName::DummyBehavior::SetDisabled')
+        ).toBe(true);
+
+        // Check sentences are properly set up.
+        expect(
+          behaviorMetadata
+            .getAllConditions()
+            .get('TestExtensionName::DummyBehavior::Disabled')
+            .getSentence()
+        ).toBe('_PARAM0_ is disabled');
+        expect(
+          behaviorMetadata
+            .getAllActions()
+            .get('TestExtensionName::DummyBehavior::SetDisabled')
+            .getSentence()
+        ).toBe('Set _PARAM0_ as disabled: _PARAM1_');
+      });
     });
     describe('gd.EffectMetadata', function () {
       it('have standard methods to get information', function () {
-        var autoMetadata = gd.MetadataProvider.getEffectMetadata(
+        let autoMetadata = gd.MetadataProvider.getEffectMetadata(
           gd.JsPlatform.get(),
           'NotExistingEffect'
         );
@@ -2920,9 +3165,9 @@ describe('libGD.js', function () {
 
   describe('gd.Exporter (and gd.AbstractFileSystemJS)', function () {
     it('should export a layout for preview', function (done) {
-      var fs = new gd.AbstractFileSystemJS();
-      var project = new gd.ProjectHelper.createNewGDJSProject();
-      var layout = project.insertNewLayout('Scene', 0);
+      let fs = new gd.AbstractFileSystemJS();
+      let project = new gd.ProjectHelper.createNewGDJSProject();
+      let layout = project.insertNewLayout('Scene', 0);
 
       fs.mkDir = fs.clearDir = function () {};
       fs.getTempDir = function (path) {
@@ -2957,12 +3202,12 @@ describe('libGD.js', function () {
 
   describe('gd.EventsRemover', function () {
     it('should remove events', function () {
-      var list = new gd.EventsList();
-      var event1 = list.insertEvent(new gd.StandardEvent(), 0);
-      var event2 = list.insertEvent(new gd.StandardEvent(), 1);
-      var event3 = list.insertEvent(new gd.StandardEvent(), 2);
+      let list = new gd.EventsList();
+      let event1 = list.insertEvent(new gd.StandardEvent(), 0);
+      let event2 = list.insertEvent(new gd.StandardEvent(), 1);
+      let event3 = list.insertEvent(new gd.StandardEvent(), 2);
 
-      var remover = new gd.EventsRemover();
+      let remover = new gd.EventsRemover();
       remover.addEventToRemove(event1);
       remover.addEventToRemove(event3);
       remover.launch(list);
@@ -2974,10 +3219,10 @@ describe('libGD.js', function () {
 
   describe('gd.WholeProjectRefactorer', function () {
     it('should rename and delete an object', function () {
-      var project = new gd.ProjectHelper.createNewGDJSProject();
-      var layout = project.insertNewLayout('Scene', 0);
-      var instance1 = layout.getInitialInstances().insertNewInitialInstance();
-      var instance2 = layout.getInitialInstances().insertNewInitialInstance();
+      let project = new gd.ProjectHelper.createNewGDJSProject();
+      let layout = project.insertNewLayout('Scene', 0);
+      let instance1 = layout.getInitialInstances().insertNewInitialInstance();
+      let instance2 = layout.getInitialInstances().insertNewInitialInstance();
       instance1.setObjectName('Object1');
       instance2.setObjectName('Object2');
 
@@ -3031,18 +3276,36 @@ describe('libGD.js', function () {
       type,
       expression,
       expectedError,
-      expectedErrorPosition
+      expectedErrorPosition,
+      expectedError2,
+      expectedErrorPosition2
     ) {
-      const parser = new gd.ExpressionParser2(
+      const parser = new gd.ExpressionParser2();
+      const expressionNode = parser.parseExpression(expression).get();
+
+      const expressionValidator = new gd.ExpressionValidator(
         gd.JsPlatform.get(),
         project,
-        layout
-      );
-      const expressionNode = parser.parseExpression(type, expression).get();
-
-      const expressionValidator = new gd.ExpressionValidator();
+        layout,
+        type);
       expressionNode.visit(expressionValidator);
-      if (expectedError) {
+      if (expectedError2) {
+        expect(expressionValidator.getErrors().size()).toBe(2);
+        expect(expressionValidator.getErrors().at(0).getMessage()).toBe(
+          expectedError
+        );
+        if (expectedErrorPosition)
+          expect(expressionValidator.getErrors().at(0).getStartPosition()).toBe(
+            expectedErrorPosition
+          );
+        expect(expressionValidator.getErrors().at(1).getMessage()).toBe(
+          expectedError2
+        );
+        if (expectedErrorPosition2)
+          expect(expressionValidator.getErrors().at(1).getStartPosition()).toBe(
+            expectedErrorPosition2
+          );
+      } else if (expectedError) {
         expect(expressionValidator.getErrors().size()).toBe(1);
         expect(expressionValidator.getErrors().at(0).getMessage()).toBe(
           expectedError
@@ -3103,6 +3366,8 @@ describe('libGD.js', function () {
       testExpression(
         'number',
         '3..14',
+        'More than one term was found. Verify that your expression is properly written.',
+        2,
         'No operator found. Did you forget to enter an operator (like +, -, * or /) between numbers or expressions?',
         2
       );
@@ -3152,12 +3417,12 @@ describe('libGD.js', function () {
       testExpression(
         'number',
         'abs(-5, 3)',
-        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name."
+        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name. The number of parameters must be exactly 1"
       );
       testExpression(
         'number',
         'MouseX("", 0, 0) + 1',
-        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name."
+        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name. The number of parameters must be: 0-2"
       );
     });
 
@@ -3176,7 +3441,7 @@ describe('libGD.js', function () {
       testExpression(
         'number',
         'MySpriteObject.PointX("Point", 2)',
-        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name."
+        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name. The number of parameters must be exactly 1"
       );
     });
 
@@ -3207,14 +3472,14 @@ describe('libGD.js', function () {
       }
       const expression = expressionWithCaret.replace('|', '');
 
-      const parser = new gd.ExpressionParser2(
-        gd.JsPlatform.get(),
-        project,
-        layout
-      );
-      const expressionNode = parser.parseExpression(type, expression).get();
+      const parser = new gd.ExpressionParser2();
+      const expressionNode = parser.parseExpression(expression).get();
       const completionDescriptions =
         gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+          gd.JsPlatform.get(),
+          project,
+          layout,
+          type,
           expressionNode,
           // We're looking for completion for the character just before the caret.
           Math.max(0, caretPosition - 1)
@@ -3359,10 +3624,15 @@ describe('libGD.js', function () {
         expect(vectorVector2f.at(1).get_x()).toBe(2);
         expect(vectorVector2f.at(2).get_x()).toBe(3);
 
+        gd.moveVector2fInVector(vectorVector2f, 2, 0);
+        expect(vectorVector2f.at(0).get_x()).toBe(3);
+        expect(vectorVector2f.at(1).get_x()).toBe(1);
+        expect(vectorVector2f.at(2).get_x()).toBe(2);
+
         gd.removeFromVectorVector2f(vectorVector2f, 1);
         expect(vectorVector2f.size()).toBe(2);
-        expect(vectorVector2f.at(0).get_x()).toBe(1);
-        expect(vectorVector2f.at(1).get_x()).toBe(3);
+        expect(vectorVector2f.at(0).get_x()).toBe(3);
+        expect(vectorVector2f.at(1).get_x()).toBe(2);
 
         vectorVector2f.clear();
         expect(vectorVector2f.size()).toBe(0);
@@ -3512,6 +3782,38 @@ describe('libGD.js', function () {
         .getAllExpressions()
         .get('TestExtensionName::PlayerHealth');
       expect(declaredExpression.getParametersCount()).toBe(2);
+    });
+    it('can have conditions and actions added at the same time for booleans', function () {
+      const extension = makeTestExtension();
+      extension
+        .addExpressionAndConditionAndAction(
+          'boolean',
+          'Disabled',
+          'Disabled',
+          'the object is disabled',
+          'disabled',
+          '',
+          'Disable.png'
+        )
+        .addParameter('object', 'My object', 'MyObject', false)
+        .useStandardParameters('boolean')
+        .setFunctionName('setDisabled')
+        .setGetter('isDisabled');
+
+      expect(
+        extension.getAllConditions().has('TestExtensionName::Disabled')
+      ).toBe(true);
+      const declaredCondition = extension
+        .getAllConditions()
+        .get('TestExtensionName::Disabled');
+
+      expect(
+        extension.getAllActions().has('TestExtensionName::SetDisabled')
+      ).toBe(true);
+      const declaredAction = extension
+        .getAllActions()
+        .get('TestExtensionName::SetDisabled');
+      expect(declaredAction.getParametersCount()).toBe(2);
     });
   });
 
@@ -3697,7 +3999,7 @@ describe('libGD.js', function () {
       const eventsFunction = new gd.EventsFunction();
       const events = eventsFunction.getEvents();
       expect(events.getEventsCount()).toBe(0);
-      var evt = events.insertNewEvent(
+      let evt = events.insertNewEvent(
         project,
         'BuiltinCommonInstructions::Standard',
         0

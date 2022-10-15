@@ -15,6 +15,14 @@ type Props = {|
   icon?: React.Node,
   onClick: ?() => void,
   buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
+  style?: {|
+    marginTop?: number,
+    marginBottom?: number,
+    marginLeft?: number,
+    marginRight?: number,
+    margin?: number,
+    flexShrink?: 0,
+  |},
 |};
 
 const shouldNeverBeCalled = () => {
@@ -23,9 +31,13 @@ const shouldNeverBeCalled = () => {
   );
 };
 
+const styles = {
+  mainButton: { flex: 1 },
+};
+
 /**
  * A raised button based on Material-UI button, that has a menu displayed
- * when the the dropdown arrow is clicked.
+ * when the dropdown arrow is clicked.
  */
 const RaisedButtonWithSplitMenu = (props: Props) => {
   const { buildMenuTemplate, onClick, label, primary, icon, disabled } = props;
@@ -38,14 +50,20 @@ const RaisedButtonWithSplitMenu = (props: Props) => {
 
   return (
     <ButtonGroup
-      variant="contained"
-      color={primary ? 'primary' : 'default'}
+      variant={primary ? 'contained' : 'outlined'}
+      disableElevation
+      color={primary ? 'primary' : 'secondary'}
       disabled={disabled}
       size="small"
+      style={props.style}
     >
-      <Button focusRipple={focusRipple} onClick={onClick}>
+      <Button
+        focusRipple={focusRipple}
+        onClick={onClick}
+        style={styles.mainButton}
+      >
         {icon}
-        {icon && <Spacer />}
+        {!!icon && !!label && <Spacer />}
         {label}
       </Button>
       <ElementWithMenu

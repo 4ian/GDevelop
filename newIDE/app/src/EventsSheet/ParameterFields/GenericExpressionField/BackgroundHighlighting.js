@@ -28,7 +28,7 @@ const highlightedText = {
   borderBottom: '3px solid rgba(244, 67, 54, 0.7)',
 };
 
-export default ({ value, style, highlights }: Props) => {
+const BackgroundHighlighting = ({ value, style, highlights }: Props) => {
   const sortedHighlights = highlights
     .slice()
     .sort((highlight1, highlight2) => highlight1.begin - highlight2.begin);
@@ -63,3 +63,5 @@ export default ({ value, style, highlights }: Props) => {
 
   return <div style={{ ...defaultStyle, ...style }}>{elements}</div>;
 };
+
+export default BackgroundHighlighting;

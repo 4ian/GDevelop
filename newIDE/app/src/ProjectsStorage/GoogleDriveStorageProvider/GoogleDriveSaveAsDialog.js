@@ -2,7 +2,7 @@
 import { t } from '@lingui/macro';
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import { Column, Line } from '../../UI/Grid';
 import GoogleDriveFileOrFolderPicker from './GoogleDriveFileOrFolderPicker';
@@ -27,7 +27,7 @@ type Props = {|
  * A "Save as" dialog for Google Drive, allowing to pick a file to overwrite or a folder
  * and a new filename where to save the game.
  */
-export default (props: Props) => {
+const GoogleDriveSaveAsDialog = (props: Props) => {
   const [selectedFileOrFolder, setSelectedFileOrFolder] = React.useState(
     (null: ?GoogleDriveFileOrFolder)
   );
@@ -44,7 +44,7 @@ export default (props: Props) => {
     return selectedFileOrFolder.type === 'FOLDER' ? !!newFileName : true;
   };
   const save = () => {
-    if (!selectedFileOrFolder) return;
+    if (!canSave() || !selectedFileOrFolder) return;
 
     setSaveError(null);
     setSaving(true);
@@ -97,7 +97,7 @@ export default (props: Props) => {
           onClick={props.onCancel}
         />,
         <LeftLoader key="save" isLoading={saving}>
-          <FlatButton
+          <DialogPrimaryButton
             label={<Trans>Save</Trans>}
             primary
             disabled={!canSave()}
@@ -105,9 +105,10 @@ export default (props: Props) => {
           />
         </LeftLoader>,
       ]}
-      cannotBeDismissed={true}
-      open
+      cannotBeDismissed={saving}
       onRequestClose={cancel}
+      onApply={save}
+      open
       maxWidth="sm"
     >
       <Column noMargin>
@@ -126,7 +127,7 @@ export default (props: Props) => {
               floatingLabelText={<Trans>New file name</Trans>}
               floatingLabelFixed
               type="text"
-              hintText={t`YourGame.json`}
+              translatableHintText={t`YourGame.json`}
               value={newFileName}
               onChange={(event, newFileName) => setNewFileName(newFileName)}
               fullWidth
@@ -154,3 +155,5 @@ export default (props: Props) => {
     </Dialog>
   );
 };
+
+export default GoogleDriveSaveAsDialog;

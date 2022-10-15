@@ -1,21 +1,19 @@
 // @flow
 import { serializeToJSObject, serializeToJSON } from '../../Utils/Serializer';
 import { type FileMetadata } from '../index';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 import {
   split,
   splitPaths,
   getSlugifiedUniqueNameFromProperty,
 } from '../../Utils/ObjectSplitter';
-import localFileSystem from '../../Export/LocalExporters/LocalFileSystem';
-import assignIn from 'lodash/assignIn';
-
-const gd: libGDevelop = global.gd;
+import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import { t } from '@lingui/macro';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
-const electron = optionalRequire('electron');
-const dialog = electron ? electron.remote.dialog : null;
+const remote = optionalRequire('@electron/remote');
+const dialog = remote ? remote.dialog : null;
 
 const checkFileContent = (filePath: string, expectedContent: string) => {
   const time = performance.now();
@@ -124,64 +122,75 @@ export const onSaveProject = (
   fileMetadata: FileMetadata,
 |}> => {
   const filePath = fileMetadata.fileIdentifier;
+  const now = Date.now();
   if (!filePath) {
     return Promise.reject(
       'Project file is empty, "Save as" should have been called?'
     );
   }
+  const newFileMetadata = {
+    ...fileMetadata,
+    lastModifiedDate: now,
+  };
 
   const projectPath = path.dirname(filePath);
   return writeProjectFiles(project, filePath, projectPath).then(() => {
-    return { wasSaved: true, fileMetadata }; // Save was properly done
+    return { wasSaved: true, fileMetadata: newFileMetadata }; // Save was properly done
   });
 };
 
-export const onSaveProjectAs = (
+export const onChooseSaveProjectAsLocation = async (
   project: gdProject,
-  fileMetadata: ?FileMetadata
+  fileMetadata: ?FileMetadata // This is the current location.
 ): Promise<{|
-  wasSaved: boolean,
-  fileMetadata: ?FileMetadata,
+  fileMetadata: ?FileMetadata, // This is the newly chosen location (or null if cancelled).
 |}> => {
   const defaultPath = fileMetadata ? fileMetadata.fileIdentifier : '';
-  const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
-  const browserWindow = electron.remote.getCurrentWindow();
-  const options = {
+  const browserWindow = remote.getCurrentWindow();
+  const saveDialogOptions = {
     defaultPath,
     filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
   };
 
   if (!dialog) {
-    return Promise.reject('Unsupported');
+    throw new Error('Unsupported');
   }
-  const filePath = dialog.showSaveDialogSync(browserWindow, options);
+  const filePath = dialog.showSaveDialogSync(browserWindow, saveDialogOptions);
   if (!filePath) {
-    return Promise.resolve({ wasSaved: false, fileMetadata });
+    return { fileMetadata: null };
   }
+
+  return {
+    fileMetadata: {
+      fileIdentifier: filePath,
+    },
+  };
+};
+
+export const onSaveProjectAs = async (
+  project: gdProject,
+  fileMetadata: ?FileMetadata,
+  options: {|
+    onStartSaving: () => void,
+    onMoveResources: () => Promise<void>,
+  |}
+): Promise<{|
+  wasSaved: boolean,
+|}> => {
+  if (!fileMetadata)
+    throw new Error('A location was not chosen before saving as.');
+
+  if (options && options.onStartSaving) options.onStartSaving();
+  await options.onMoveResources();
+
+  const filePath = fileMetadata.fileIdentifier;
   const projectPath = path.dirname(filePath);
-
-  // TODO: Ideally, errors while copying resources should be reported.
-  gd.ProjectResourcesCopier.copyAllResourcesTo(
-    project,
-    fileSystem,
-    projectPath,
-    true, // Update the project with the new resource paths
-    false, // Don't move absolute files
-    true // Keep relative files folders structure.
-  );
-
-  // Update the project with the new file path (resources have already been updated)
   project.setProjectFile(filePath);
 
-  return writeProjectFiles(project, filePath, projectPath).then(() => {
-    return {
-      wasSaved: true,
-      fileMetadata: {
-        ...fileMetadata,
-        fileIdentifier: filePath,
-      },
-    }; // Save was properly done
-  });
+  await writeProjectFiles(project, filePath, projectPath);
+  return {
+    wasSaved: true,
+  };
 };
 
 export const onAutoSaveProject = (
@@ -196,3 +205,6 @@ export const onAutoSaveProject = (
     }
   );
 };
+
+export const getWriteErrorMessage = (error: Error): MessageDescriptor =>
+  t`An error occurred when saving the project. Please try again by choosing another location.`;

@@ -2,7 +2,6 @@
 import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
-import RaisedButton from '../../UI/RaisedButton';
 import { Line, Column } from '../../UI/Grid';
 import {
   type ParameterFieldProps,
@@ -12,18 +11,17 @@ import { focusButton } from '../../UI/Button';
 import Text from '../../UI/Text';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import { MarkdownText } from '../../UI/MarkdownText';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Button from '@material-ui/core/Button';
 
 const styles = {
-  button: {
-    margin: 5,
-  },
   description: {
     marginRight: 5,
   },
 };
 
 export default class YesNoField extends Component<ParameterFieldProps, void> {
-  _yesButton = React.createRef<RaisedButton>();
+  _yesButton = React.createRef<Button>();
 
   focus() {
     focusButton(this._yesButton);
@@ -41,27 +39,27 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
 
     return (
       <Column noMargin>
-        <Line>
+        <Line alignItems="center" justifyContent="space-between">
           <Text style={styles.description} displayInlineAsSpan>
             {description}
           </Text>
-          <Column noMargin>
-            <RaisedButton
-              style={styles.button}
-              label={<Trans>Yes</Trans>}
-              primary={effectiveValue === 'yes'}
+          <ButtonGroup>
+            <Button
+              variant={effectiveValue === 'yes' ? 'contained' : 'outlined'}
+              color={effectiveValue === 'yes' ? 'secondary' : 'default'}
               onClick={() => this.props.onChange('yes')}
               ref={this._yesButton}
-            />
-          </Column>
-          <Column noMargin>
-            <RaisedButton
-              style={styles.button}
-              label={<Trans>No</Trans>}
-              primary={effectiveValue !== 'yes'}
+            >
+              <Trans>Yes</Trans>
+            </Button>
+            <Button
+              variant={effectiveValue !== 'yes' ? 'contained' : 'outlined'}
+              color={effectiveValue !== 'yes' ? 'secondary' : 'default'}
               onClick={() => this.props.onChange('no')}
-            />
-          </Column>
+            >
+              <Trans>No</Trans>
+            </Button>
+          </ButtonGroup>
         </Line>
         {longDescription ? (
           <FormHelperText variant="filled" margin="dense">

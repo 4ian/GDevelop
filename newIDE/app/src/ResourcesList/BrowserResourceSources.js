@@ -16,6 +16,7 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { useDebounce } from '../Utils/UseDebounce';
 import axios from 'axios';
 import AlertMessage from '../UI/AlertMessage';
+import { FileToCloudProjectResourceUploader } from './FileToCloudProjectResourceUploader';
 
 type ResourceStoreChooserProps = {
   options: ChooseResourceOptions,
@@ -51,15 +52,17 @@ export const UrlChooser = ({
 }: ResourceStoreChooserProps) => {
   const [inputValue, setInputValue] = React.useState('');
   const [error, setError] = React.useState<?Error>(null);
-  const [erroredUrls, setErroredUrls] = React.useState<boolean[]>([]);
-  const hasErroredUrls = erroredUrls.filter(Boolean).length;
+  const [urlsErroredBooleanArray, setUrlsErroredBooleanArray] = React.useState<
+    boolean[]
+  >([]);
+  const hasErroredUrls = !!urlsErroredBooleanArray.filter(Boolean).length;
 
   const validateInputValue = useDebounce(async (inputValue: string) => {
     const urls = options.multiSelection
       ? inputValue.split('\n').filter(Boolean)
       : [inputValue];
     setError(null);
-    setErroredUrls([]);
+    setUrlsErroredBooleanArray([]);
 
     try {
       const responses = await Promise.all(
@@ -71,7 +74,7 @@ export const UrlChooser = ({
         })
       );
 
-      setErroredUrls(
+      setUrlsErroredBooleanArray(
         responses.map(
           response => !(response.status >= 200 && response.status < 400)
         )
@@ -113,6 +116,7 @@ export const UrlChooser = ({
               primary
               label={<Trans>Choose</Trans>}
               style={style}
+              disabled={!!error || hasErroredUrls}
             />
           )}
           renderTextField={() => (
@@ -139,7 +143,7 @@ export const UrlChooser = ({
                 ) : hasErroredUrls ? (
                   <Trans>
                     Unable to verify URLs{' '}
-                    {erroredUrls
+                    {urlsErroredBooleanArray
                       .map((isErrored, index) => {
                         if (isErrored) return '#' + (index + 1);
                         return null;
@@ -177,19 +181,37 @@ const browserResourceSources: Array<ResourceSource> = [
         createNewResource={createNewResource}
         onChooseResources={props.onChooseResources}
         options={props.options}
+        key={`resource-store-${kind}`}
+      />
+    ),
+  })),
+  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
+    name: `upload-${kind}`,
+    displayName: t`File(s) from your device`,
+    displayTab: 'import',
+    kind,
+    renderComponent: (props: ResourceSourceComponentProps) => (
+      <FileToCloudProjectResourceUploader
+        createNewResource={createNewResource}
+        onChooseResources={props.onChooseResources}
+        options={props.options}
+        fileMetadata={props.fileMetadata}
+        getStorageProvider={props.getStorageProvider}
+        key={`url-chooser-${kind}`}
       />
     ),
   })),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
     name: `url-chooser-${kind}`,
-    displayName: t`Use an URL`,
-    displayTab: 'import',
+    displayName: t`Use a public URL`,
+    displayTab: 'import-advanced',
     kind,
     renderComponent: (props: ResourceSourceComponentProps) => (
       <UrlChooser
         createNewResource={createNewResource}
         onChooseResources={props.onChooseResources}
         options={props.options}
+        key={`url-chooser-${kind}`}
       />
     ),
   })),

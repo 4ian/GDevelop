@@ -5,7 +5,6 @@ Copyright (c) 2012-2016 Victor Levasseur (victorlevasseur01@orange.fr)
 This project is released under the MIT License.
 */
 
-#include <SFML/Graphics.hpp>
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/InitialInstance.h"
@@ -20,9 +19,8 @@ This project is released under the MIT License.
 
 using namespace std;
 
-PanelSpriteObject::PanelSpriteObject(gd::String name_)
-    : Object(name_),
-      textureName(""),
+PanelSpriteObject::PanelSpriteObject()
+    : textureName(""),
       width(32),
       height(32),
       leftMargin(0),

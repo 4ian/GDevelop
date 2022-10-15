@@ -4,7 +4,6 @@
  * The zip should be uploaded with one of the git releases (use gitRelease variable for version where you released it)
  */
 var shell = require('shelljs');
-var https = require('follow-redirects').https;
 var fs = require('fs');
 var unzipper = require('unzipper');
 var process = require('process');
@@ -116,12 +115,12 @@ editorHasCorrectHash().then(({ isHashCorrect }) => {
         );
       }
     },
-    () => {
+    (e) => {
       shell.echo(
         `❌ Can't download ` +
           editor +
           `-editor.zip (${
-            response.statusMessage
+            e
           }), please check your internet connection`
       );
       shell.exit(1);

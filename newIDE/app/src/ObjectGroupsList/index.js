@@ -1,30 +1,32 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 
-import React, { Component } from 'react';
-import { AutoSizer, List } from 'react-virtualized';
+import React from 'react';
+import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
-import GroupRow from './GroupRow';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { showWarningBox } from '../UI/Messages/MessageBox';
-import { AddListItem } from '../UI/ListCommonItem';
-import { SortableContainer, SortableElement } from 'react-sortable-hoc';
+import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
 import {
   filterGroupsList,
   enumerateGroups,
+  isSameGroupWithContext,
 } from '../ObjectsList/EnumerateObjects';
 import {
   type GroupWithContextList,
   type GroupWithContext,
 } from '../ObjectsList/EnumerateObjects';
-import { listItemWithoutIconHeight } from '../UI/List';
 import Window from '../Utils/Window';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 
-// TODO: This component should be updated to be implemented using SortableVirtualizedItemList,
-// so that drag'n'drop is identical to other lists (and to benefit from better typing + future improvements
-// in SortableVirtualizedItemList).
+export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 
 const styles = {
   listContainer: {
@@ -32,97 +34,14 @@ const styles = {
   },
 };
 
-const SortableGroupRow = SortableElement(props => {
-  const { style, ...otherProps } = props;
-  return (
-    <div style={style}>
-      <GroupRow {...otherProps} />
-    </div>
-  );
-});
-
-const SortableAddGroupRow = SortableElement(props => {
-  const { style, ...otherProps } = props;
-  return (
-    <div style={style}>
-      <AddListItem {...otherProps} />
-    </div>
-  );
-});
-
-class GroupsList extends Component<*, *> {
-  list: ?List;
-
-  forceUpdateGrid() {
-    if (this.list) this.list.forceUpdateGrid();
-  }
-
-  render() {
-    const { height, width, fullList } = this.props;
-
-    return (
-      <List
-        ref={list => (this.list = list)}
-        height={height}
-        rowCount={fullList.length}
-        rowHeight={listItemWithoutIconHeight}
-        rowRenderer={({ index, key, style }) => {
-          const groupWithContext = fullList[index];
-          if (groupWithContext.key === 'add-groups-row') {
-            return (
-              <SortableAddGroupRow
-                index={fullList.length}
-                key={key}
-                style={style}
-                disabled
-                onClick={this.props.onAddGroup}
-                primaryText={<Trans>Click to add a group</Trans>}
-              />
-            );
-          }
-
-          const nameBeingEdited =
-            this.props.renamedGroupWithScope &&
-            this.props.renamedGroupWithScope.group === groupWithContext.group &&
-            this.props.renamedGroupWithScope.global === groupWithContext.global;
-
-          return (
-            <SortableGroupRow
-              index={index}
-              key={groupWithContext.group.ptr}
-              group={groupWithContext.group}
-              style={style}
-              onEdit={
-                this.props.onEditGroup
-                  ? () => this.props.onEditGroup(groupWithContext.group)
-                  : undefined
-              }
-              onEditName={() => this.props.onEditName(groupWithContext)}
-              onDelete={() => this.props.onDelete(groupWithContext)}
-              onRename={newName =>
-                this.props.onRename(groupWithContext, newName)
-              }
-              editingName={nameBeingEdited}
-              isGlobalGroup={groupWithContext.global}
-              canSetAsGlobalGroup={this.props.canSetAsGlobalGroup}
-              onSetAsGlobalGroup={
-                groupWithContext.global
-                  ? undefined
-                  : () => this.props.onSetAsGlobalGroup(groupWithContext)
-              }
-            />
-          );
-        }}
-        width={width}
-      />
-    );
-  }
-}
-
-const SortableGroupsList = SortableContainer(GroupsList, { withRef: true });
+const getGroupWithContextName = (groupWithContext: GroupWithContext): string =>
+  groupWithContext.group.getName();
+const isGroupWithContextGlobal = (groupWithContext: GroupWithContext) =>
+  groupWithContext.global;
 
 type State = {|
-  renamedGroupWithScope: ?GroupWithContext,
+  renamedGroupWithContext: ?GroupWithContext,
+  selectedGroupWithContext: ?GroupWithContext,
   searchText: string,
 |};
 
@@ -155,11 +74,12 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     ) => cb(true),
   };
 
-  sortableList: any;
-  objectGroupsList: GroupWithContextList = [];
-  globalObjectGroupsList: GroupWithContextList = [];
+  sortableList: ?SortableVirtualizedItemList<GroupWithContext>;
+  displayedObjectGroupsList: GroupWithContextList = [];
+  displayedGlobalObjectGroupsList: GroupWithContextList = [];
   state: State = {
-    renamedGroupWithScope: null,
+    renamedGroupWithContext: null,
+    selectedGroupWithContext: null,
     searchText: '',
   };
 
@@ -172,7 +92,10 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     // call forceUpdate.
 
     if (
-      this.state.renamedGroupWithScope !== nextState.renamedGroupWithScope ||
+      this.state.renamedGroupWithContext !==
+        nextState.renamedGroupWithContext ||
+      this.state.selectedGroupWithContext !==
+        nextState.selectedGroupWithContext ||
       this.state.searchText !== nextState.searchText
     )
       return true;
@@ -231,10 +154,43 @@ export default class GroupsListContainer extends React.Component<Props, State> {
   _onEditName = (groupWithContext: GroupWithContext) => {
     this.setState(
       {
-        renamedGroupWithScope: groupWithContext,
+        renamedGroupWithContext: groupWithContext,
       },
-      () => this.sortableList.getWrappedInstance().forceUpdateGrid()
+      () => {
+        if (this.sortableList) this.sortableList.forceUpdateGrid();
+      }
     );
+  };
+
+  _onDuplicate = (groupWithContext: GroupWithContext): ?GroupWithContext => {
+    const { group, global } = groupWithContext;
+    const { globalObjectGroups, objectGroups } = this.props;
+
+    const container: gdObjectGroupsContainer = global
+      ? globalObjectGroups
+      : objectGroups;
+
+    const newName = newNameGenerator(
+      group.getName(),
+      name => container.has(name),
+      ''
+    );
+
+    const newGroup = container.insertNew(
+      newName,
+      container.getPosition(group.getName()) + 1
+    );
+
+    unserializeFromJSObject(
+      newGroup,
+      serializeToJSObject(group),
+      'unserializeFrom'
+    );
+    newGroup.setName(newName); // Unserialization has overwritten the name.
+
+    this._onObjectGroupModified();
+
+    return { group: newGroup, global };
   };
 
   _onRename = (groupWithContext: GroupWithContext, newName: string) => {
@@ -242,7 +198,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     const { globalObjectGroups, objectGroups } = this.props;
 
     this.setState({
-      renamedGroupWithScope: null,
+      renamedGroupWithContext: null,
     });
 
     if (group.getName() === newName) return;
@@ -266,34 +222,6 @@ export default class GroupsListContainer extends React.Component<Props, State> {
         }
       });
     }
-  };
-
-  _onMove = (oldIndex: number, newIndex: number) => {
-    const { globalObjectGroups, objectGroups } = this.props;
-
-    const isInGroupsList = oldIndex < this.objectGroupsList.length;
-    if (isInGroupsList) {
-      objectGroups.move(
-        oldIndex,
-        Math.min(newIndex, this.objectGroupsList.length - 1)
-      );
-    } else {
-      const globalObjectGroupsOldIndex =
-        oldIndex - this.objectGroupsList.length;
-      const globalObjectGroupsNewIndex =
-        newIndex - this.objectGroupsList.length;
-
-      globalObjectGroups.move(
-        globalObjectGroupsOldIndex,
-        Math.min(
-          globalObjectGroupsNewIndex,
-          this.globalObjectGroupsList.length - 1
-        )
-      );
-    }
-
-    this._onObjectGroupModified();
-    this.sortableList.getWrappedInstance().forceUpdateGrid();
   };
 
   _setAsGlobalGroup = (groupWithContext: GroupWithContext) => {
@@ -326,6 +254,112 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     this.forceUpdate();
   };
 
+  _canMoveSelectionTo = (targetGroupWithContext: GroupWithContext) => {
+    if (!this.state.selectedGroupWithContext) return false;
+
+    if (
+      this.state.selectedGroupWithContext.global ===
+      targetGroupWithContext.global
+    ) {
+      return true;
+    }
+
+    if (
+      !this.state.selectedGroupWithContext.global &&
+      targetGroupWithContext.global &&
+      this.displayedGlobalObjectGroupsList.indexOf(targetGroupWithContext) === 0
+    ) {
+      // Allow drop on first element of global items to put local item at the end of its list
+      return true;
+    }
+
+    return false;
+  };
+
+  _moveSelectionTo = (targetGroupWithContext: GroupWithContext) => {
+    const { selectedGroupWithContext } = this.state;
+    if (!selectedGroupWithContext) return;
+
+    const { globalObjectGroups, objectGroups } = this.props;
+    let container: gdObjectGroupsContainer;
+    let fromIndex: number;
+    let toIndex: number;
+
+    const areSelectedAndTargetItemsFromSameContext =
+      selectedGroupWithContext.global === targetGroupWithContext.global;
+
+    const isDroppingLocalItemOnFirstGlobalItemOfDisplayedList =
+      !selectedGroupWithContext.global &&
+      targetGroupWithContext.global &&
+      globalObjectGroups.getPosition(targetGroupWithContext.group.getName()) ===
+        0;
+
+    if (areSelectedAndTargetItemsFromSameContext) {
+      container = selectedGroupWithContext.global
+        ? globalObjectGroups
+        : objectGroups;
+
+      fromIndex = container.getPosition(
+        selectedGroupWithContext.group.getName()
+      );
+      toIndex = container.getPosition(targetGroupWithContext.group.getName());
+    } else if (isDroppingLocalItemOnFirstGlobalItemOfDisplayedList) {
+      container = objectGroups;
+      fromIndex = container.getPosition(
+        selectedGroupWithContext.group.getName()
+      );
+      toIndex = !this.state.searchText
+        ? container.count()
+        : container.getPosition(
+            this.displayedObjectGroupsList[
+              this.displayedObjectGroupsList.length - 1
+            ].group.getName()
+          ) + 1;
+    } else {
+      return;
+    }
+    if (toIndex > fromIndex) toIndex -= 1;
+
+    container.move(fromIndex, toIndex);
+    this._onObjectGroupModified();
+    if (this.sortableList) this.sortableList.forceUpdateGrid();
+  };
+
+  _renderGroupMenuTemplate = (i18n: I18nType) => (
+    groupWithContext: GroupWithContext,
+    index: number
+  ) => [
+    {
+      label: i18n._(t`Duplicate`),
+      click: () => this._onDuplicate(groupWithContext),
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Edit group`),
+      click: () => this.props.onEditGroup(groupWithContext.group),
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Rename`),
+      click: () => this._onEditName(groupWithContext),
+    },
+    {
+      label: i18n._(t`Set as global group`),
+      enabled: !isGroupWithContextGlobal(groupWithContext),
+      click: () => this._setAsGlobalGroup(groupWithContext),
+      visible: this.props.canSetAsGlobalGroup !== false,
+    },
+    {
+      label: i18n._(t`Delete`),
+      click: () => this._onDelete(groupWithContext),
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Add a new group...`),
+      click: this.addGroup,
+    },
+  ];
+
   render() {
     const { globalObjectGroups, objectGroups } = this.props;
     const { searchText } = this.state;
@@ -336,49 +370,70 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     const globalObjectGroupsList: GroupWithContextList = enumerateGroups(
       globalObjectGroups
     ).map(group => ({ group, global: true }));
-    this.objectGroupsList = filterGroupsList(objectGroupsList, { searchText });
-    this.globalObjectGroupsList = filterGroupsList(globalObjectGroupsList, {
+    this.displayedObjectGroupsList = filterGroupsList(objectGroupsList, {
       searchText,
     });
-    const allGroupsList = filterGroupsList(
+    this.displayedGlobalObjectGroupsList = filterGroupsList(
+      globalObjectGroupsList,
+      {
+        searchText,
+      }
+    );
+    const fullList = filterGroupsList(
       [...objectGroupsList, ...globalObjectGroupsList],
       { searchText }
     );
-    const fullList = allGroupsList.concat({
-      key: 'add-groups-row',
-      object: null,
-    });
 
     // Force List component to be mounted again if globalObjectGroups or objectGroups
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
     const listKey = objectGroups.ptr + ';' + globalObjectGroups.ptr;
 
+    const renamedGroupWithContext = this.state.renamedGroupWithContext
+      ? fullList.find(
+          isSameGroupWithContext(this.state.renamedGroupWithContext)
+        )
+      : null;
+
     return (
       <Background>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
-              <SortableGroupsList
-                key={listKey}
-                ref={sortableList => (this.sortableList = sortableList)}
-                fullList={fullList}
-                width={width}
-                height={height}
-                renamedGroupWithScope={this.state.renamedGroupWithScope}
-                onEditGroup={this.props.onEditGroup}
-                onAddGroup={this.addGroup}
-                onEditName={this._onEditName}
-                onDelete={this._onDelete}
-                onRename={this._onRename}
-                canSetAsGlobalGroup={this.props.canSetAsGlobalGroup}
-                onSetAsGlobalGroup={this._setAsGlobalGroup}
-                onSortEnd={({ oldIndex, newIndex }) =>
-                  this._onMove(oldIndex, newIndex)
-                }
-                helperClass="sortable-helper"
-                distance={20}
-              />
+              <I18n>
+                {({ i18n }) => (
+                  <SortableVirtualizedItemList
+                    key={listKey}
+                    ref={sortableList => (this.sortableList = sortableList)}
+                    fullList={fullList}
+                    width={width}
+                    height={height}
+                    getItemName={getGroupWithContextName}
+                    getItemId={(groupWithContext, index) => {
+                      return 'group-item-' + index;
+                    }}
+                    isItemBold={isGroupWithContextGlobal}
+                    onEditItem={groupWithContext =>
+                      this.props.onEditGroup(groupWithContext.group)
+                    }
+                    onAddNewItem={this.addGroup}
+                    addNewItemLabel={<Trans>Add a new group</Trans>}
+                    addNewItemId="add-new-group-button"
+                    selectedItems={[]}
+                    onItemSelected={groupWithContext => {
+                      this.setState({
+                        selectedGroupWithContext: groupWithContext,
+                      });
+                    }}
+                    renamedItem={renamedGroupWithContext}
+                    onRename={this._onRename}
+                    buildMenuTemplate={this._renderGroupMenuTemplate(i18n)}
+                    onMoveSelectionToItem={this._moveSelectionTo}
+                    canMoveSelectionToItem={this._canMoveSelectionTo}
+                    reactDndType={groupWithContextReactDndType}
+                  />
+                )}
+              </I18n>
             )}
           </AutoSizer>
         </div>
@@ -390,6 +445,8 @@ export default class GroupsListContainer extends React.Component<Props, State> {
               searchText: text,
             })
           }
+          aspect="integrated-search-bar"
+          placeholder={t`Search object groups`}
         />
       </Background>
     );

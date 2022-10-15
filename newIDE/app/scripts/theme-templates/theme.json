@@ -38,7 +38,7 @@
         "value": "{gdevelop.color.selection.value}"
       },
       "color": {
-        "value": "white"
+        "value": "#FFFFFF"
       }
     },
     "text": {
@@ -159,6 +159,23 @@
       },
       "frame-border-color": {
         "value": "#000000"
+      }
+    },
+    "drop-indicator": {
+      "can-drop": {
+        "color": {
+          "value": "{gdevelop.color.dark-blue.value}"
+        }
+      },
+      "cannot-drop": {
+        "color": {
+          "value": "#ff5c5c"
+        }
+      },
+      "border": {
+        "color": {
+          "value": "{theme.surface.canvas.background-color.value}"
+        }
       }
     }
   },
@@ -342,7 +359,7 @@
   "mosaic": {
     "title": {
       "color": {
-        "value": "white"
+        "value": "#FFFFFF"
       }
     },
     "layout": {
@@ -393,7 +410,7 @@
           "value": "#4c92ff"
         },
         "color": {
-          "value": "white"
+          "value": "#FFFFFF"
         }
       }
     }

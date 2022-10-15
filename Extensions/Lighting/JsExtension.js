@@ -32,7 +32,8 @@ module.exports = {
       'This provides a light object, and a behavior to mark other objects as being obstacles for the lights. This is a great way to create a special atmosphere to your game, along with effects, make it more realistic or to create gameplays based on lights.',
       'Harsimran Virk',
       'MIT'
-    );
+    )
+    .setCategory('Visual effect');
 
     const lightObstacleBehavior = new gd.BehaviorJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
@@ -59,7 +60,7 @@ module.exports = {
         _('Light Obstacle Behavior'),
         'LightObstacleBehavior',
         _(
-          'This behavior makes the object an obstacle to the light. The light emitted by light objects will be stopped by the object.'
+          'Flag objects as being obstacles to light. The light emitted by light objects will be stopped by the object.'
         ),
         '',
         'CppPlatform/Extensions/lightObstacleIcon32.png',
@@ -132,6 +133,7 @@ module.exports = {
               'When activated, display the lines used to render the light - useful to understand how the light is rendered on screen.'
             )
           )
+          .setGroup(_('Advanced'))
       );
 
       objectProperties
@@ -193,7 +195,8 @@ module.exports = {
       )
       .setIncludeFile('Extensions/Lighting/lightruntimeobject.js')
       .addIncludeFile('Extensions/Lighting/lightruntimeobject-pixi-renderer.js')
-      .addIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js');
+      .addIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js')
+      .setCategoryFullName(_('Visual effect'));
 
     object
       .addAction(
@@ -241,7 +244,7 @@ module.exports = {
     objectsEditorService.registerEditorConfiguration(
       'Lighting::LightObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/light',
+        helpPagePath: '/all-features/lighting/reference',
       })
     );
   },
@@ -267,7 +270,7 @@ module.exports = {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -276,19 +279,19 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );
       this._radius = parseFloat(
-        this._associatedObject
+        this._associatedObjectConfiguration
           .getProperties(this.project)
           .get('radius')
           .getValue()
       );
       if (this._radius <= 0) this._radius = 1;
       const colorHex = objectsRenderingService.rgbOrHexToHexNumber(
-        this._associatedObject
+        this._associatedObjectConfiguration
           .getProperties(this.project)
           .get('color')
           .getValue()
@@ -368,7 +371,7 @@ module.exports = {
     RenderedLightObjectInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'CppPlatform/Extensions/lightIcon32.png';
     };

@@ -6,6 +6,7 @@ import {
   getUserSubscription,
   getUserLimits,
 } from '../Utils/GDevelopServices/Usage';
+import { getUserBadges } from '../Utils/GDevelopServices/User';
 import Authentication, {
   type LoginForm,
   type RegisterForm,
@@ -25,6 +26,15 @@ import CreateAccountDialog from './CreateAccountDialog';
 import EditProfileDialog from './EditProfileDialog';
 import ChangeEmailDialog from './ChangeEmailDialog';
 import EmailVerificationPendingDialog from './EmailVerificationPendingDialog';
+import PreferencesContext, {
+  type PreferencesValues,
+} from '../MainFrame/Preferences/PreferencesContext';
+import { listUserCloudProjects } from '../Utils/GDevelopServices/Project';
+import { clearCloudProjectCookies } from '../ProjectsStorage/CloudStorageProvider/CloudProjectCookies';
+import {
+  listReceivedAssetShortHeaders,
+  listReceivedAssetPacks,
+} from '../Utils/GDevelopServices/Asset';
 
 type Props = {|
   authentication: Authentication,
@@ -72,7 +82,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._resetAuthenticatedUser();
 
     // Listen to when the user log out so that we reset the user profile.
-    this.props.authentication.setOnUserLogoutCallback(
+    this.props.authentication.addUserLogoutListener(
       this._fetchUserProfileWithoutThrowingErrors
     );
 
@@ -85,7 +95,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     //   refresh.
     // - at any other moment (Firebase user was updated), in which case it's probably
     //   not a problem to fetch again the user profile.
-    this.props.authentication.setOnUserUpdateCallback(() => {
+    this.props.authentication.addUserUpdateListener(() => {
       if (this._automaticallyUpdateUserProfile) {
         console.info(
           'Fetching user profile as the authenticated user changed...'
@@ -118,6 +128,8 @@ export default class AuthenticatedUserProvider extends React.Component<
       authenticatedUser: {
         ...initialAuthenticatedUser,
         onLogout: this._doLogout,
+        onBadgesChanged: this._fetchUserBadges,
+        onCloudProjectsChanged: this._fetchUserCloudProjects,
         onLogin: () => this.openLoginDialog(true),
         onEdit: () => this.openEditProfileDialog(true),
         onChangeEmail: () => this.openChangeEmailDialog(true),
@@ -130,6 +142,8 @@ export default class AuthenticatedUserProvider extends React.Component<
         onAcceptGameStatsEmail: this._doAcceptGameStatsEmail,
         getAuthorizationHeader: () =>
           this.props.authentication.getAuthorizationHeader(),
+        receivedAssetPacks: [], // Reset to an empty array so the store context can be updated.
+        receivedAssetShortHeaders: [], // Reset to an empty array so the store context can be updated.
       },
     }));
   }
@@ -181,10 +195,36 @@ export default class AuthenticatedUserProvider extends React.Component<
   _fetchUserProfile = async () => {
     const { authentication } = this.props;
 
+    this.setState(({ authenticatedUser }) => ({
+      authenticatedUser: {
+        ...authenticatedUser,
+        loginState: 'loggingIn',
+      },
+    }));
+
     // First ensure the Firebase authenticated user is up to date
     // (and let the error propagate if any).
-    const firebaseUser = await this._reloadFirebaseProfile();
-    if (!firebaseUser) return;
+    let firebaseUser;
+    try {
+      firebaseUser = await this._reloadFirebaseProfile();
+      if (!firebaseUser) {
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            loginState: 'done',
+          },
+        }));
+        return;
+      }
+    } catch (error) {
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          loginState: 'done',
+        },
+      }));
+      throw error;
+    }
 
     // Fetching user profile related information, but independently from
     // the user profile itself, to not block in case one of these calls
@@ -228,6 +268,53 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading user limits:', error);
       }
     );
+    listUserCloudProjects(
+      authentication.getAuthorizationHeader,
+      firebaseUser.uid
+    ).then(
+      cloudProjects =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            cloudProjects,
+          },
+        })),
+      error => {
+        console.error('Error while loading user cloud projects:', error);
+      }
+    );
+    listReceivedAssetPacks(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      receivedAssetPacks =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            receivedAssetPacks,
+          },
+        })),
+      error => {
+        console.error('Error while loading received asset packs:', error);
+      }
+    );
+    listReceivedAssetShortHeaders(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      receivedAssetShortHeaders =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            receivedAssetShortHeaders,
+          },
+        })),
+      error => {
+        console.error(
+          'Error while loading received asset short headers:',
+          error
+        );
+      }
+    );
+    this._fetchUserBadges();
 
     // Load and wait for the user profile to be fetched.
     // (and let the error propagate if any).
@@ -235,17 +322,70 @@ export default class AuthenticatedUserProvider extends React.Component<
       authentication.getAuthorizationHeader
     );
 
+    if (!userProfile.isCreator) {
+      // If the user is not a creator, then update the profile to say they now are.
+      try {
+        await authentication.editUserProfile(
+          authentication.getAuthorizationHeader,
+          { isCreator: true }
+        );
+      } catch (error) {
+        // Catch the error so that the user profile is still fetched.
+        console.error('Error while updating the user profile:', error);
+      }
+    }
+
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...authenticatedUser,
         profile: userProfile,
+        loginState: 'done',
       },
     }));
+  };
+
+  _fetchUserCloudProjects = async () => {
+    const { authentication } = this.props;
+    const { firebaseUser } = this.state.authenticatedUser;
+    if (!firebaseUser) return;
+
+    listUserCloudProjects(
+      authentication.getAuthorizationHeader,
+      firebaseUser.uid
+    ).then(
+      cloudProjects =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            cloudProjects,
+          },
+        })),
+      error => {
+        console.error('Error while loading user cloud projects:', error);
+      }
+    );
+  };
+
+  _fetchUserBadges = async () => {
+    const { firebaseUser } = this.state.authenticatedUser;
+    if (!firebaseUser) return;
+    try {
+      const badges = await getUserBadges(firebaseUser.uid);
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          badges,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user badges:', error);
+    }
   };
 
   _doLogout = () => {
     if (this.props.authentication) this.props.authentication.logout();
     this._resetAuthenticatedUser();
+    clearCloudProjectCookies();
   };
 
   _doLogin = async (form: LoginForm) => {
@@ -254,6 +394,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       loginInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -269,18 +410,25 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = true;
   };
 
-  _doEdit = async (form: EditForm) => {
+  _doEdit = async (form: EditForm, preferences: PreferencesValues) => {
     const { authentication } = this.props;
     if (!authentication) return;
 
     this.setState({
       editInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
       await authentication.editUserProfile(
         authentication.getAuthorizationHeader,
-        form
+        {
+          username: form.username,
+          description: form.description,
+          getGameStatsEmail: form.getGameStatsEmail,
+          getNewsletterEmail: form.getNewsletterEmail,
+          appLanguage: preferences.language,
+        }
       );
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openEditProfileDialog(false);
@@ -293,12 +441,16 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = true;
   };
 
-  _doCreateAccount = async (form: RegisterForm) => {
+  _doCreateAccount = async (
+    form: RegisterForm,
+    preferences: PreferencesValues
+  ) => {
     const { authentication } = this.props;
     if (!authentication) return;
 
     this.setState({
       createAccountInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -307,7 +459,8 @@ export default class AuthenticatedUserProvider extends React.Component<
       try {
         await authentication.createUser(
           authentication.getAuthorizationHeader,
-          form
+          form,
+          preferences.language
         );
       } catch (error) {
         // Ignore this error - this is a best effort call
@@ -333,6 +486,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       forgotPasswordInProgress: true,
+      authError: null,
     });
     try {
       await authentication.forgotPassword(form);
@@ -362,6 +516,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       editInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -384,6 +539,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       changeEmailInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -447,66 +603,74 @@ export default class AuthenticatedUserProvider extends React.Component<
 
   render() {
     return (
-      <React.Fragment>
-        <AuthenticatedUserContext.Provider value={this.state.authenticatedUser}>
-          {this.props.children}
-        </AuthenticatedUserContext.Provider>
-        {this.state.loginDialogOpen && (
-          <LoginDialog
-            onClose={() => this.openLoginDialog(false)}
-            onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
-            onLogin={this._doLogin}
-            loginInProgress={this.state.loginInProgress}
-            error={this.state.authError}
-            onForgotPassword={this._doForgotPassword}
-            resetPasswordDialogOpen={this.state.resetPasswordDialogOpen}
-            onCloseResetPasswordDialog={() => this.openResetPassword(false)}
-            forgotPasswordInProgress={this.state.forgotPasswordInProgress}
-          />
+      <PreferencesContext.Consumer>
+        {({ values: preferences }) => (
+          <React.Fragment>
+            <AuthenticatedUserContext.Provider
+              value={this.state.authenticatedUser}
+            >
+              {this.props.children}
+            </AuthenticatedUserContext.Provider>
+            {this.state.loginDialogOpen && (
+              <LoginDialog
+                onClose={() => this.openLoginDialog(false)}
+                onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
+                onLogin={this._doLogin}
+                loginInProgress={this.state.loginInProgress}
+                error={this.state.authError}
+                onForgotPassword={this._doForgotPassword}
+                resetPasswordDialogOpen={this.state.resetPasswordDialogOpen}
+                onCloseResetPasswordDialog={() => this.openResetPassword(false)}
+                forgotPasswordInProgress={this.state.forgotPasswordInProgress}
+              />
+            )}
+            {this.state.authenticatedUser.profile &&
+              this.state.editProfileDialogOpen && (
+                <EditProfileDialog
+                  profile={this.state.authenticatedUser.profile}
+                  onClose={() => this.openEditProfileDialog(false)}
+                  onEdit={form => this._doEdit(form, preferences)}
+                  updateProfileInProgress={this.state.editInProgress}
+                  error={this.state.authError}
+                />
+              )}
+            {this.state.authenticatedUser.firebaseUser &&
+              this.state.changeEmailDialogOpen && (
+                <ChangeEmailDialog
+                  firebaseUser={this.state.authenticatedUser.firebaseUser}
+                  onClose={() => this.openChangeEmailDialog(false)}
+                  onChangeEmail={this._doChangeEmail}
+                  changeEmailInProgress={this.state.changeEmailInProgress}
+                  error={this.state.authError}
+                />
+              )}
+            {this.state.createAccountDialogOpen && (
+              <CreateAccountDialog
+                onClose={() => this.openCreateAccountDialog(false)}
+                onGoToLogin={() => this.openLoginDialog(true)}
+                onCreateAccount={form =>
+                  this._doCreateAccount(form, preferences)
+                }
+                createAccountInProgress={this.state.createAccountInProgress}
+                error={this.state.authError}
+              />
+            )}
+            {this.state.emailVerificationPendingDialogOpen && (
+              <EmailVerificationPendingDialog
+                authenticatedUser={this.state.authenticatedUser}
+                onClose={() => {
+                  this.openEmailVerificationPendingDialog(false);
+                  this.state.authenticatedUser
+                    .onRefreshFirebaseProfile()
+                    .catch(() => {
+                      // Ignore any error, we can't do much.
+                    });
+                }}
+              />
+            )}
+          </React.Fragment>
         )}
-        {this.state.authenticatedUser.profile &&
-          this.state.editProfileDialogOpen && (
-            <EditProfileDialog
-              profile={this.state.authenticatedUser.profile}
-              onClose={() => this.openEditProfileDialog(false)}
-              onEdit={this._doEdit}
-              editInProgress={this.state.editInProgress}
-              error={this.state.authError}
-            />
-          )}
-        {this.state.authenticatedUser.firebaseUser &&
-          this.state.changeEmailDialogOpen && (
-            <ChangeEmailDialog
-              firebaseUser={this.state.authenticatedUser.firebaseUser}
-              onClose={() => this.openChangeEmailDialog(false)}
-              onChangeEmail={this._doChangeEmail}
-              changeEmailInProgress={this.state.changeEmailInProgress}
-              error={this.state.authError}
-            />
-          )}
-        {this.state.createAccountDialogOpen && (
-          <CreateAccountDialog
-            onClose={() => this.openCreateAccountDialog(false)}
-            onGoToLogin={() => this.openLoginDialog(true)}
-            onCreateAccount={this._doCreateAccount}
-            createAccountInProgress={this.state.createAccountInProgress}
-            error={this.state.authError}
-          />
-        )}
-        {this.state.emailVerificationPendingDialogOpen && (
-          <EmailVerificationPendingDialog
-            authenticatedUser={this.state.authenticatedUser}
-            onClose={() => {
-              this.openEmailVerificationPendingDialog(false);
-              this.state.authenticatedUser
-                .onRefreshFirebaseProfile()
-                .catch(() => {
-                  // Ignore any error, we can't do much.
-                });
-            }}
-          />
-        )}
-      </React.Fragment>
+      </PreferencesContext.Consumer>
     );
   }
 }

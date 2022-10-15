@@ -33,7 +33,10 @@ module.exports = {
         'Todor Imreorov',
         'Open source (MIT License)'
       )
-      .setExtensionHelpPath('/objects/bbtext');
+      .setExtensionHelpPath('/objects/bbtext')
+      .setCategory('User interface');
+    extension.addInstructionOrExpressionGroupMetadata(_("BBCode Text Object"))
+        .setIcon("JsPlatform/Extensions/bbcode32.png");
 
     var objectBBText = new gd.ObjectJsImplementation();
     // $FlowExpectedError
@@ -67,19 +70,22 @@ module.exports = {
         .getOrCreate('color')
         .setValue(objectContent.color)
         .setType('color')
-        .setLabel(_('Base color'));
+        .setLabel(_('Base color'))
+        .setGroup(_('Appearance'));
 
       objectProperties
         .getOrCreate('opacity')
         .setValue(objectContent.opacity.toString())
         .setType('number')
-        .setLabel(_('Opacity (0-255)'));
+        .setLabel(_('Opacity (0-255)'))
+        .setGroup(_('Appearance'));
 
       objectProperties
         .getOrCreate('fontSize')
         .setValue(objectContent.fontSize.toString())
         .setType('number')
-        .setLabel(_('Base size'));
+        .setLabel(_('Base size'))
+        .setGroup(_('Font'));
 
       objectProperties
         .getOrCreate('align')
@@ -88,33 +94,36 @@ module.exports = {
         .addExtraInfo('left')
         .addExtraInfo('center')
         .addExtraInfo('right')
-        .setLabel(_('Base alignment'));
+        .setLabel(_('Base alignment'))
+        .setGroup(_('Appearance'));
 
       objectProperties
         .getOrCreate('fontFamily')
         .setValue(objectContent.fontFamily)
         .setType('resource')
         .addExtraInfo('font')
-        .setLabel(_('Base font family'));
+        .setLabel(_('Font'))
+        .setGroup(_('Font'));
 
       objectProperties
         .getOrCreate('wordWrap')
         .setValue(objectContent.wordWrap ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Word wrapping'));
+        .setLabel(_('Word wrapping'))
+        .setGroup(_('Appearance'));
 
       objectProperties
         .getOrCreate('visible')
         .setValue(objectContent.visible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Visible on start'));
+        .setLabel(_('Visible on start'))
+        .setGroup(_('Appearance'));
 
       return objectProperties;
     };
     objectBBText.setRawJSONContent(
       JSON.stringify({
-        text:
-          '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
+        text: '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
         opacity: 255,
         fontSize: 20,
         visible: true,
@@ -161,7 +170,8 @@ module.exports = {
       .addIncludeFile('Extensions/BBText/bbtextruntimeobject-pixi-renderer.js')
       .addIncludeFile(
         'Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd.js'
-      );
+      )
+      .setCategoryFullName(_('User interface'));
 
     /**
      * Utility function to add both a setter and a getter to a property from a list.
@@ -282,7 +292,7 @@ module.exports = {
     const setterAndGetterProperties = [
       {
         functionName: 'BBText',
-        iconPath: 'res/actions/text24.png',
+        iconPath: 'res/actions/text24_black.png',
         type: 'string',
         paramLabel: _('BBCode text'),
         conditionDescription: _('Compare the value of the BBCode text.'),
@@ -357,7 +367,7 @@ module.exports = {
       },
       {
         functionName: 'WordWrap',
-        iconPath: 'res/actions/scaleWidth24.png',
+        iconPath: 'res/actions/scaleWidth24_black.png',
         type: 'boolean',
         paramLabel: _('Word wrap'),
         conditionDescription: _('Check if word wrap is enabled.'),
@@ -369,7 +379,7 @@ module.exports = {
       },
       {
         functionName: 'WrappingWidth',
-        iconPath: 'res/actions/scaleWidth24.png',
+        iconPath: 'res/actions/scaleWidth24_black.png',
         type: 'number',
         paramLabel: _('Wrapping width'),
         conditionDescription: _(
@@ -447,7 +457,7 @@ module.exports = {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -456,7 +466,7 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );
@@ -491,7 +501,7 @@ module.exports = {
     RenderedBBTextInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'JsPlatform/Extensions/bbcode24.png';
     };
@@ -500,7 +510,8 @@ module.exports = {
      * This is called to update the PIXI object on the scene editor
      */
     RenderedBBTextInstance.prototype.update = function () {
-      const properties = this._associatedObject.getProperties();
+      const properties = this._associatedObjectConfiguration
+        .getProperties();
 
       const rawText = properties.get('text').getValue();
       if (rawText !== this._pixiObject.text) {
@@ -511,7 +522,8 @@ module.exports = {
       this._pixiObject.alpha = opacity / 255;
 
       const color = properties.get('color').getValue();
-      this._pixiObject.textStyles.default.fill = objectsRenderingService.rgbOrHexToHexNumber(color);
+      this._pixiObject.textStyles.default.fill =
+        objectsRenderingService.rgbOrHexToHexNumber(color);
 
       const fontSize = properties.get('fontSize').getValue();
       this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;

@@ -4,10 +4,8 @@
  */
 
 .gd-events-sheet .events-tree {
-    /* Use the fonts provided by the operating system(s) as possible. */
-    /* If you update this font list, be sure to do it in all the other places using fonts in the codebase. */
-    font-family: var(--gdevelop-font-family) !important;
-    background: var(--event-sheet-event-tree-background-color);
+  font-family: var(--gdevelop-classic-font-family) !important;
+  background: var(--event-sheet-event-tree-background-color);
 }
 
 /**
@@ -15,18 +13,18 @@
  * of horizontal scrollbar.
  */
 .gd-events-sheet .rst__virtualScrollOverride {
-    overflow-x: hidden !important;
+  overflow-x: hidden !important;
 }
 
 /**
  * Draggable handle on the left of an event
  */
-.gd-events-sheet .rst__moveHandle {
-    background: var(--event-sheet-rst-move-handle-background-color);
+.gd-events-sheet .move-handle {
+  background: var(--event-sheet-rst-move-handle-background-color);
 }
 
-.gd-events-sheet .rst__moveHandle:hover {
-    background-color: var(--event-sheet-rst-move-handle-hover-background-color);
+.gd-events-sheet .move-handle:hover {
+  background-color: var(--event-sheet-rst-move-handle-hover-background-color);
 }
 
 /**
@@ -36,196 +34,202 @@
 .gd-events-sheet .rst__lineFullVertical::after,
 .gd-events-sheet .rst__lineHalfVerticalTop::after,
 .gd-events-sheet .rst__lineHalfVerticalBottom::after {
-    background-color: var(--event-sheet-rst-line-background-color);
+  background-color: var(--event-sheet-rst-line-background-color);
 }
 
 /**
  * Background and default text color of content of an event
  */
 .gd-events-sheet .rst__rowContents {
-    background-color: var(--event-sheet-rst-row-contents-background-color);
-    color: var(--event-sheet-rst-row-contents-color);
+  background-color: var(--event-sheet-rst-row-contents-background-color);
+  color: var(--event-sheet-rst-row-contents-color);
 }
 
 /**
  * Selectable area (instructions)
  */
 .gd-events-sheet .selectable:hover {
-    background-color: var(--event-sheet-selectable-background-color);
+  background-color: var(--event-sheet-selectable-background-color);
 }
 
 .gd-events-sheet .selectable.selected {
-    background-color: var(--event-sheet-selectable-background-color);
-    border: var(--event-sheet-selectable-selected-border) !important;
+  background-color: var(--event-sheet-selectable-background-color);
+  border: var(--event-sheet-selectable-selected-border) !important;
 }
 
 /**
  * Large selectable area (events)
  */
 .gd-events-sheet .large-selectable {
-    border:  var(--event-sheet-selectable-border) !important;
+  border:  var(--event-sheet-selectable-border) !important;
 }
 
 .gd-events-sheet .large-selectable.large-selected {
-    border: var(--event-sheet-selectable-selected-border) !important;
+  border: var(--event-sheet-selectable-selected-border) !important;
 }
 
 /**
  * Conditions and actions containers
  */
 .gd-events-sheet .conditions-container {
-    background: var(--event-sheet-conditions-background-color);
-    border: var(--event-sheet-conditions-border);
-    color: var(--event-sheet-conditions-color);
-    border-right-color: var(--event-sheet-conditions-border-right-color);
-    padding-left: 5px;
-    padding-right: 5px;
-    /* Prevent container to growing outside its parent - and still don't have a ridiculously small size */
-    min-width: 100px;
+  background: var(--event-sheet-conditions-background-color);
+  border: var(--event-sheet-conditions-border);
+  color: var(--event-sheet-conditions-color);
+  border-right-color: var(--event-sheet-conditions-border-right-color);
+  padding-left: 5px;
+  padding-right: 5px;
+  /* Prevent container to growing outside its parent - and still don't have a ridiculously small size */
+  min-width: 100px;
 }
 
 .gd-events-sheet .conditions-container.small-width-container {
-    border-right-color: var(--event-sheet-conditions-border-color);
-    border-bottom-color: var(--event-sheet-conditions-border-color);
+  border-right-color: var(--event-sheet-conditions-border-color);
+  border-bottom-color: var(--event-sheet-conditions-border-color);
 }
 
 .gd-events-sheet .actions-container {
-    background: var(--event-sheet-actions-background-color);
-    color: var(--event-sheet-actions-color);
-    padding-left: 5px;
-    padding-right: 5px;
-    /* Prevent container to growing outside its parent. We don't have a way to prevent an infinitely
+  background: var(--event-sheet-actions-background-color);
+  color: var(--event-sheet-actions-color);
+  padding-left: 5px;
+  padding-right: 5px;
+  /* Prevent container to growing outside its parent. We don't have a way to prevent an infinitely
      * small action column, but responsive design should avoid the problem on small screens. */
-    min-width: 0;
+  min-width: 0;
 }
 
 .gd-events-sheet .actions-container.small-width-container {
-    padding-left: 20px;
+  padding-left: 20px;
 }
 
 .gd-events-sheet .sub-instructions-container {
-    margin-left: 9px;
-    margin-top: 1px;
-    border-right: none;
-    border-left: var(--event-sheet-sub-instructions-border);
+  margin-left: 9px;
+  margin-top: 1px;
+  border-right: none;
+  border-left: var(--event-sheet-sub-instructions-border);
 }
 
 /**
  * Instructions parameters color scheme
  */
 .gd-events-sheet .instruction-parameter {
-    color: var(--event-sheet-instruction-parameter-base-color);
+  color: var(--event-sheet-instruction-parameter-base-color);
 }
 
 .gd-events-sheet .instruction-parameter.expression {
-    color: var(--event-sheet-instruction-parameter-expression-color);
+  color: var(--event-sheet-instruction-parameter-expression-color);
 }
 
 .gd-events-sheet .instruction-parameter.object,
 .gd-events-sheet .instruction-parameter.objectPtr,
 .gd-events-sheet .instruction-parameter.objectList,
-.gd-events-sheet .instruction-parameter.objectListWithoutPicking {
-    color:var(--event-sheet-instruction-parameter-object-color);
-    font-weight: bold;
+.gd-events-sheet .instruction-parameter.objectListOrEmptyIfJustDeclared,
+.gd-events-sheet .instruction-parameter.objectListOrEmptyWithoutPicking {
+  color:var(--event-sheet-instruction-parameter-object-color);
+  font-weight: bold;
 }
 
 .gd-events-sheet .instruction-parameter.behavior {
-    color: var(--event-sheet-instruction-parameter-behavior-color);
+  color: var(--event-sheet-instruction-parameter-behavior-color);
 }
 
 .gd-events-sheet .instruction-parameter.operator {
-    color: var(--event-sheet-instruction-parameter-operator-color);
+  color: var(--event-sheet-instruction-parameter-operator-color);
 }
 
 .gd-events-sheet .instruction-parameter.objectvar {
-    color: var(--event-sheet-instruction-parameter-var-color);
+  color: var(--event-sheet-instruction-parameter-var-color);
 }
 
 .gd-events-sheet .instruction-parameter.scenevar {
-    color: var(--event-sheet-instruction-parameter-var-color);
+  color: var(--event-sheet-instruction-parameter-var-color);
 }
 
 .gd-events-sheet .instruction-parameter.globalvar {
-    color: var(--event-sheet-instruction-parameter-var-color);
+  color: var(--event-sheet-instruction-parameter-var-color);
 }
 
 .gd-events-sheet .instruction-parameter .instruction-invalid-parameter {
-    color: var(--event-sheet-instruction-parameter-error-color);
-    text-decoration:  var(--event-sheet-instruction-parameter-error-color) underline wavy;
+  color: var(--event-sheet-instruction-parameter-error-color);
+  text-decoration:  var(--event-sheet-instruction-parameter-error-color) underline wavy;
+}
+
+.gd-events-sheet .instruction-parameter .instruction-warning-parameter {
+  color: var(--event-sheet-instruction-parameter-warning-color);
+  text-decoration:  var(--event-sheet-instruction-parameter-warning-color) underline wavy;
 }
 
 .gd-events-sheet .instruction-parameter .instruction-missing-parameter {
-    display: inline-flex;
-    background-color: var(--event-sheet-instruction-parameter-error-background-color);
-    border-bottom: 1px dashed  var(--event-sheet-instruction-parameter-error-color);
-    min-width: 25px;
-    min-height: 14px;
+  display: inline-flex;
+  background-color: var(--event-sheet-instruction-parameter-error-background-color);
+  border-bottom: 1px dashed  var(--event-sheet-instruction-parameter-error-color);
+  min-width: 25px;
+  min-height: 14px;
 }
 
 /**
  * Search results highlight
  */
 .gd-events-sheet .with-search-results .rst__rowSearchMatch {
-    outline: none;
+  outline: none;
 }
-.gd-events-sheet .with-search-results .rst__rowSearchMatch .rst__moveHandle {
-    background: var(--event-sheet-events-highlighted-color);
+.gd-events-sheet .with-search-results .rst__rowSearchMatch .move-handle {
+  background: var(--event-sheet-events-highlighted-color);
 }
-.gd-events-sheet .with-search-results .rst__rowSearchMatch .rst__moveHandle:hover {
-    filter: brightness(120%);
+.gd-events-sheet .with-search-results .rst__rowSearchMatch .move-handle:hover {
+  filter: brightness(120%);
 }
 .gd-events-sheet .with-search-results .rst__rowSearchMatch .conditions-container {
-    outline: none;
-    background-color: var(--event-sheet-events-highlighted-background-color);
+  outline: none;
+  background-color: var(--event-sheet-events-highlighted-background-color);
 }
 .gd-events-sheet .with-search-results .rst__rowSearchMatch .actions-container {
-    outline: none;
-    background-color: var(--event-sheet-events-highlighted-background-color);
+  outline: none;
+  background-color: var(--event-sheet-events-highlighted-background-color);
 }
 
-.gd-events-sheet .with-search-results .rst__rowSearchFocus .rst__moveHandle {
-    width: 15px;
+.gd-events-sheet .with-search-results .rst__rowSearchFocus .move-handle {
+  width: 15px;
 }
 
 /**
-* Drag'n'drop indicator (events)
+* Drag'n'drop indicator (events - instructions)
 */
 .gd-events-sheet .drop-indicator {
-    border-top: 2px solid var(--event-sheet-drop-indicator-can-drop-border-top-color);
-    height: 0;
-    margin-top: -1px;
-    margin-bottom: -1px;
-    width: 100%;
-    box-sizing: border-box;
+  border-top: 2px solid var(--event-sheet-drop-indicator-can-drop-border-top-color);
+  height: 0;
+  margin-top: -1px;
+  margin-bottom: -1px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .gd-events-sheet .cant-drop-indicator {
-    border-top: 2px solid var(--event-sheet-drop-indicator-can-drop-border-top-color);
-    height: 0;
-    margin-top: -1px;
-    margin-bottom: -1px;
-    width: 100%;
-    box-sizing: border-box;
+  border-top: 2px solid var(--event-sheet-drop-indicator-can-drop-border-top-color);
+  height: 0;
+  margin-top: -1px;
+  margin-bottom: -1px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /**
 * Skinning the "Link" event
 */
 .gd-events-sheet .link-container {
-    background: var(--event-sheet-link-container-background-color);
+  background: var(--event-sheet-link-container-background-color);
 }
 .gd-events-sheet-dark-theme .link-container span {
-    color: var(--event-sheet-link-container-color);
+  color: var(--event-sheet-link-container-color);
 }
 
 .gd-events-sheet .link-container .selectable {
-    color: var(--event-sheet-link-selectable-link-color);
-    font-weight: bold;
+  color: var(--event-sheet-link-selectable-link-color);
+  font-weight: bold;
 }
 
 /* Theming icons */
 .gd-events-sheet .icon {
-    padding-right: 2px;
-    width: 16px;
-    height: 16px;
+  padding-right: 2px;
+  width: 16px;
+  height: 16px;
 }

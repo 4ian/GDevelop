@@ -47,6 +47,8 @@ class GD_CORE_API CommentEvent : public gd::BaseEvent {
   void SetComment(const gd::String& comment) { com1 = comment; }
 
   virtual std::vector<gd::String> GetAllSearchableStrings() const;
+  virtual bool ReplaceAllSearchableStrings(
+      std::vector<gd::String> newSearchableString);
 
   virtual void SerializeTo(SerializerElement& element) const;
   virtual void UnserializeFrom(gd::Project& project,

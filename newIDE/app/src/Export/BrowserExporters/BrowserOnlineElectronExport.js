@@ -15,7 +15,7 @@ import {
   type UrlFileDescriptor,
   type TextFileDescriptor,
   type BlobFileDescriptor,
-  downloadUrlsToBlobs,
+  downloadUrlFilesToBlobFiles,
   archiveFiles,
 } from '../../Utils/BrowserArchiver';
 import {
@@ -55,13 +55,23 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
 > = {
   name: 'browser-online-electron',
   onlineBuildType: 'electron-build',
+  limitedBuilds: true,
   packageNameWarningType: 'desktop',
 
   getInitialExportState: () => ({
     targets: ['winExe'],
   }),
 
-  canLaunchBuild: (exportState: ExportState) => !!exportState.targets.length,
+  // Build can be launched only if just opened the dialog or build errored.
+  canLaunchBuild: (exportState, errored, exportStep) =>
+    !!exportState.targets.length && (errored || exportStep === ''),
+
+  // Navigation is enabled when the build is errored or whilst uploading.
+  isNavigationDisabled: (exportStep, errored) =>
+    !errored &&
+    ['register', 'export', 'resources-download', 'compress', 'upload'].includes(
+      exportStep
+    ),
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
@@ -113,7 +123,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     { textFiles, urlFiles }: ExportOutput
   ): Promise<ResourcesDownloadOutput> => {
-    return downloadUrlsToBlobs({
+    return downloadUrlFilesToBlobFiles({
       urlFiles,
       onProgress: context.updateStepProgress,
     }).then(blobFiles => ({
@@ -150,7 +160,12 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
   launchOnlineBuild: (
     exportState: ExportState,
     authenticatedUser: AuthenticatedUser,
-    uploadBucketKey: string
+    uploadBucketKey: string,
+    gameId: string,
+    options: {|
+      gameName: string,
+      gameVersion: string,
+    |}
   ): Promise<Build> => {
     const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
     if (!firebaseUser)
@@ -160,7 +175,9 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
       getAuthorizationHeader,
       firebaseUser.uid,
       uploadBucketKey,
-      exportState.targets
+      exportState.targets,
+      gameId,
+      options
     );
   },
 };

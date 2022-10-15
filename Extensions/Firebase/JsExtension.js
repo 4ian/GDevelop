@@ -28,7 +28,11 @@ module.exports = {
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
-      .setExtensionHelpPath('/all-features/firebase');
+      .setExtensionHelpPath('/all-features/firebase')
+      .setCategory('Network');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Firebase'))
+      .setIcon('JsPlatform/Extensions/firebase.png');
 
     extension
       .registerProperty('FirebaseConfig')
@@ -42,7 +46,7 @@ module.exports = {
         _('Enable analytics'),
         _('Enables Analytics for that project.'),
         _('Enable analytics'),
-        _('Firebase/Analytics'),
+        _('Analytics'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -64,7 +68,7 @@ module.exports = {
             'Can also pass additional data to the Analytics'
         ),
         _('Trigger Event _PARAM0_ with argument _PARAM1_'),
-        _('Firebase/Analytics'),
+        _('Analytics'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -90,7 +94,7 @@ module.exports = {
             'For advanced usage only.'
         ),
         _("Set current user's ID to _PARAM0_"),
-        _('Firebase/Analytics'),
+        _('Analytics'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -114,7 +118,7 @@ module.exports = {
             'Can be used to classify user in Analytics.'
         ),
         _('Set property _PARAM0_ of the current user to _PARAM1_'),
-        _('Firebase/Analytics'),
+        _('Analytics'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -136,7 +140,7 @@ module.exports = {
         'GetRemoteConfigString',
         _('Get Remote setting as String'),
         _('Get a setting from Firebase Remote Config as a string.'),
-        _('Firebase/Remote Config'),
+        _('Remote Config'),
         'JsPlatform/Extensions/firebase.png'
       )
       .addParameter('string', _('Setting Name'), '', false)
@@ -156,7 +160,7 @@ module.exports = {
         'GetRemoteConfigNumber',
         _('Get Remote setting as Number'),
         _('Get a setting from Firebase Remote Config as Number.'),
-        _('Firebase/Remote Config'),
+        _('Remote Config'),
         'JsPlatform/Extensions/firebase.png'
       )
       .addParameter('string', _('Setting Name'), '', false)
@@ -177,7 +181,7 @@ module.exports = {
         _('Set Remote Config Auto Update Inteval'),
         _('Sets Remote Config Auto Update Inteval.'),
         _('Set Remote Config Auto Update Inteval to _PARAM0_'),
-        _('Firebase/Remote Config'),
+        _('Remote Config'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -205,7 +209,7 @@ module.exports = {
             'the config is still loading.'
         ),
         _('Set default config to _PARAM0_'),
-        _('Firebase/Remote Config'),
+        _('Remote Config'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -229,7 +233,7 @@ module.exports = {
         _('Force sync the configuration'),
         _('Use this to sync the Remote Config with the client at any time.'),
         _('Synchronize Remote Config'),
-        _('Firebase/Remote Config'),
+        _('Remote Config'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -245,10 +249,10 @@ module.exports = {
     extension
       .addAction(
         'CreateBasicAccount',
-        _('Create account with with email'),
+        _('Create account with email'),
         _('Create an account with email and password as credentials.'),
         _('Create account with email _PARAM0_ and password _PARAM1_'),
-        _('Firebase/Authentication'),
+        _('Authentication'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -275,7 +279,7 @@ module.exports = {
         _('Sign into an account with email'),
         _('Sign into an account with email and password as credentials. '),
         _('Connect to account with email _PARAM0_ and password _PARAM1_'),
-        _('Firebase/Authentication'),
+        _('Authentication'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -300,7 +304,7 @@ module.exports = {
         _('Log out of the account'),
         _('Logs out of the current account. '),
         _('Log out from the account'),
-        _('Firebase/Authentication'),
+        _('Authentication'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -321,7 +325,7 @@ module.exports = {
             'Provider authentication only works in the browser! Not on previews or pc/mobile exports.'
         ),
         _('Connect to account with Provider _PARAM0_'),
-        _('Firebase/Authentication'),
+        _('Authentication'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -350,7 +354,7 @@ module.exports = {
         _('Sign In as an anonymous guest'),
         _('Sign into a temporary anonymous account.'),
         _('Authenticate anonymously'),
-        _('Firebase/Authentication'),
+        _('Authentication'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -376,7 +380,7 @@ module.exports = {
             'this before actions requiring authentications.'
         ),
         _('Check for authentication'),
-        _('Firebase/Authentication'),
+        _('Authentication'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -394,7 +398,7 @@ module.exports = {
         _(
           'Get the user authentififcation token. The token is the proof of authentication.'
         ),
-        _('Firebase/Authentication'),
+        _('Authentication'),
         'JsPlatform/Extensions/firebase.png'
       )
       .addParameter('string', _('Setting Name'), '', false)
@@ -412,7 +416,7 @@ module.exports = {
         _('Is the user email address verified'),
         _('Checks if the email address of the user got verified.'),
         _('The email of the user is verified'),
-        _('Firebase/Authentication/User Management'),
+        _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -430,7 +434,7 @@ module.exports = {
         'GetUserEmail',
         _('Get the user email address'),
         _('Gets the user email address.'),
-        _('Firebase/Authentication/User Management'),
+        _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -447,7 +451,7 @@ module.exports = {
         'GetAccountCreationTime',
         _('Get the accounts creation time'),
         _('Gets the accounts creation time.'),
-        _('Firebase/Authentication/User Management'),
+        _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -464,7 +468,7 @@ module.exports = {
         'GetLastLoginTime',
         _('Get the user last login time'),
         _('Gets the user last login time.'),
-        _('Firebase/Authentication/User Management'),
+        _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -481,7 +485,7 @@ module.exports = {
         'GetUserDisplayName',
         _('Get the user display name'),
         _('Gets the user display name.'),
-        _('Firebase/Authentication/User Management'),
+        _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -498,7 +502,7 @@ module.exports = {
         'GetPhoneNumber',
         _('Get the user phone number'),
         _('Gets the user phone number.'),
-        _('Firebase/Authentication/User Management'),
+        _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -518,7 +522,7 @@ module.exports = {
           'Gets the user Unique IDentifier. Use that to link data to an ' +
             'user instead of the name or email.'
         ),
-        _('Firebase/Authentication/User Management'),
+        _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -535,7 +539,7 @@ module.exports = {
         'GetTenantID',
         _('Get the user tenant ID'),
         _('Gets the user tenant ID. For advanced usage only.'),
-        _('Firebase/Authentication/User Management'),
+        _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -552,7 +556,7 @@ module.exports = {
         'GetRefreshToken',
         _('Get the user refresh token'),
         _('Gets the user refresh token. For advanced usage only.'),
-        _('Firebase/Authentication/User Management'),
+        _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -569,7 +573,7 @@ module.exports = {
         'GetPhotoURL',
         _('Get the user profile picture URL'),
         _('Gets an URL to the user profile picture.'),
-        _('Firebase/Authentication/User Management'),
+        _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -587,7 +591,7 @@ module.exports = {
         _('Send a verification email'),
         _('Send a link per email to verify the user email.'),
         _('Send verification email'),
-        _('Firebase/Authentication/User Management'),
+        _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -606,7 +610,7 @@ module.exports = {
         _('Set display name'),
         _('Sets the user display name.'),
         _("Set the user's display name to _PARAM0_"),
-        _('Firebase/Authentication/User Management'),
+        _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -626,7 +630,7 @@ module.exports = {
         _('Set the user profile picture'),
         _('Sets the user profile picture URL to a new one.'),
         _("Set the user's profile picture URL to _PARAM0_"),
-        _('Firebase/Authentication/User Management'),
+        _('Authentication/User Management'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -652,7 +656,7 @@ module.exports = {
         _(
           "Change the user's email to _PARAM0_ and store result in _PARAM4_ (send verification email: _PARAM3_)"
         ),
-        _('Firebase/Authentication/User Management/Advanced'),
+        _('Authentication/User Management/Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -693,7 +697,7 @@ module.exports = {
         _(
           "Change the user's email to _PARAM0_ and store result in _PARAM2_ (send verification email: _PARAM1_)"
         ),
-        _('Firebase/Authentication/User Management/Advanced'),
+        _('Authentication/User Management/Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -732,7 +736,7 @@ module.exports = {
           'Change the user password to _PARAM2_ and store result in ' +
             '_PARAM4_ (send verification email: _PARAM3_)'
         ),
-        _('Firebase/Authentication/User Management/Advanced'),
+        _('Authentication/User Management/Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -774,7 +778,7 @@ module.exports = {
           'Change the user password to _PARAM0_ and store result in ' +
             '_PARAM2_ (send verification email: _PARAM1_)'
         ),
-        _('Firebase/Authentication/User Management/Advanced'),
+        _('Authentication/User Management/Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -810,7 +814,7 @@ module.exports = {
             'Deletes the user account.'
         ),
         _('Delete the user account and store result in _PARAM2_'),
-        _('Firebase/Authentication/User Management/Advanced'),
+        _('Authentication/User Management/Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -841,7 +845,7 @@ module.exports = {
             'This is the same as "Delete the user account" but reauthenticates via an external provider.'
         ),
         _('Delete the user account and store result in _PARAM0_'),
-        _('Firebase/Authentication/User Management/Advanced'),
+        _('Authentication/User Management/Advanced'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -868,7 +872,7 @@ module.exports = {
         _('Enable performance measuring'),
         _('Enables performance measuring.'),
         _('Enable performance measuring'),
-        _('Firebase/Performance Measuring'),
+        _('Performance Measuring'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -889,7 +893,7 @@ module.exports = {
             'They are used to measure performance of custom events.'
         ),
         _('Create performance tracker: _PARAM0_'),
-        _('Firebase/Performance Measuring'),
+        _('Performance Measuring'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -911,7 +915,7 @@ module.exports = {
         _('Start a tracer'),
         _('Start measuring performance for that tracer'),
         _('Start performance measuring on tracer _PARAM0_'),
-        _('Firebase/Performance Measuring'),
+        _('Performance Measuring'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -933,7 +937,7 @@ module.exports = {
         _('Stop a tracer'),
         _('Stop measuring performance for that tracer'),
         _('Stop performance measuring on tracer _PARAM0_'),
-        _('Firebase/Performance Measuring'),
+        _('Performance Measuring'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -960,7 +964,7 @@ module.exports = {
         _(
           'Record performance for _PARAM1_ms with a delay of _PARAM2_ms (store in tracker _PARAM0_)'
         ),
-        _('Firebase/Performance Measuring'),
+        _('Performance Measuring'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -996,7 +1000,7 @@ module.exports = {
           'Call HTTP Function _PARAM0_ with parameter(s) _PARAM1_ ' +
             '(Callback variables: Value: _PARAM2_ State: _PARAM3_)'
         ),
-        _('Firebase/Functions'),
+        _('Functions'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1033,7 +1037,7 @@ module.exports = {
             _('Enable Messaging'),
 			_('Enables Firebase push messaging.'),
 			_('Enable Firebase Messaging with Public Key _PARAM0_.'),
-            _('Firebase/Messaging'),
+            _('Messaging'),
 			'JsPlatform/Extensions/firebase.png',
 			'JsPlatform/Extensions/firebase.png'
 		  )
@@ -1055,7 +1059,7 @@ module.exports = {
         _(
           'Set a field to the timstamp on the server when the request arrives there'
         ),
-        _('Firebase/Cloud Firestore'),
+        _('Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png'
       )
       .getCodeExtraInformation()
@@ -1080,7 +1084,7 @@ module.exports = {
             'A query allows to get a filtered and ordered list of documents in a collection.'
         ),
         _('Create a query named _PARAM0_ for collection _PARAM1_'),
-        _('Firebase/Cloud Firestore/Queries/Initialize'),
+        _('Cloud Firestore/Queries/Initialize'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1103,7 +1107,7 @@ module.exports = {
         _('Start a query from another query'),
         _('Start a query with the same collection and filters as another one.'),
         _('Create a query named _PARAM0_ from query _PARAM1_'),
-        _('Firebase/Cloud Firestore/Queries/Initialize'),
+        _('Cloud Firestore/Queries/Initialize'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1134,7 +1138,7 @@ module.exports = {
         _(
           'Filter query _PARAM0_ to remove documents whose field _PARAM1_ is not _PARAM2__PARAM3_'
         ),
-        _('Firebase/Cloud Firestore/Queries/Filters'),
+        _('Cloud Firestore/Queries/Filters'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1167,7 +1171,7 @@ module.exports = {
         _(
           'Filter query _PARAM0_ to remove documents whose field _PARAM1_ is not _PARAM2__PARAM3_'
         ),
-        _('Firebase/Cloud Firestore/Queries/Filters'),
+        _('Cloud Firestore/Queries/Filters'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1198,7 +1202,7 @@ module.exports = {
         _('Order by field value'),
         _('Orders all documents in the query by a the value of a field.'),
         _('Order query _PARAM0_ by field _PARAM1_ (direction: _PARAM2_)'),
-        _('Firebase/Cloud Firestore/Queries/Filters'),
+        _('Cloud Firestore/Queries/Filters'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1234,7 +1238,7 @@ module.exports = {
         _(
           'Limit query _PARAM0_ to _PARAM1_ documents (begin from the end: _PARAM2_)'
         ),
-        _('Firebase/Cloud Firestore/Queries/Filters'),
+        _('Cloud Firestore/Queries/Filters'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1266,7 +1270,7 @@ module.exports = {
         _(
           'Skip documents with fields (before: _PARAM2_) value _PARAM1_ in query _PARAM0_ (include documents at that value: _PARAM3_)'
         ),
-        _('Firebase/Cloud Firestore/Queries/Filters'),
+        _('Cloud Firestore/Queries/Filters'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1308,7 +1312,7 @@ module.exports = {
         _(
           'Execute query _PARAM0_ and store results into _PARAM1_ (store result state in _PARAM2_)'
         ),
-        _('Firebase/Cloud Firestore/Queries/Execute'),
+        _('Cloud Firestore/Queries/Execute'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1320,7 +1324,7 @@ module.exports = {
         true
       )
       .setParameterLongDescription(
-        'See the shape of the returned data on [the wiki page](http://wiki.compilgames.net/doku.php/gdevelop5/all-features/firebase/firestore#the_query_result).'
+        'See the shape of the returned data on [the wiki page](https://wiki.gdevelop.io/gdevelop5/all-features/firebase/firestore#the_query_result).'
       )
       .addParameter(
         'scenevar',
@@ -1350,7 +1354,7 @@ module.exports = {
         _(
           'Watch and automatically execute query _PARAM0_ and store results into _PARAM1_ (store result state in _PARAM2_)'
         ),
-        _('Firebase/Cloud Firestore/Queries/Execute'),
+        _('Cloud Firestore/Queries/Execute'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1392,7 +1396,7 @@ module.exports = {
             'This needs to be called before any other firestore operation, otherwise it will fail.'
         ),
         _('Enable persistence'),
-        _('Firebase/Cloud Firestore'),
+        _('Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1416,7 +1420,7 @@ module.exports = {
             'This needs to be called before any other firestore operation, otherwise it will fail.'
         ),
         _('Disable persistence'),
-        _('Firebase/Cloud Firestore'),
+        _('Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1437,7 +1441,7 @@ module.exports = {
         _('Re-enable network'),
         _('Re-enables the connection to the database after disabling it.'),
         _('Re-enable network'),
-        _('Firebase/Cloud Firestore'),
+        _('Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1462,7 +1466,7 @@ module.exports = {
             'cache, and any write operations will be queued until the network is restored.'
         ),
         _('Disable network'),
-        _('Firebase/Cloud Firestore'),
+        _('Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1485,7 +1489,7 @@ module.exports = {
         _(
           'Write _PARAM2_ to firestore in document _PARAM1_ of collection _PARAM0_ (store result state in _PARAM3_)'
         ),
-        _('Firebase/Cloud Firestore/Documents'),
+        _('Cloud Firestore/Documents'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1517,7 +1521,7 @@ module.exports = {
         _(
           'Add _PARAM1_ to firestore collection _PARAM0_ (store result state in _PARAM2_)'
         ),
-        _('Firebase/Cloud Firestore/Documents'),
+        _('Cloud Firestore/Documents'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1548,7 +1552,7 @@ module.exports = {
         _(
           'Write _PARAM3_ to firestore in field _PARAM2_ of document _PARAM1_ in collection _PARAM0_ (store result state in _PARAM4_, Merge: _PARAM5_)'
         ),
-        _('Firebase/Cloud Firestore/Fields'),
+        _('Cloud Firestore/Fields'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1582,7 +1586,7 @@ module.exports = {
         _(
           'Update firestore document _PARAM1_ in collection _PARAM0_ with _PARAM2_ (store result state in _PARAM3_)'
         ),
-        _('Firebase/Cloud Firestore/Documents'),
+        _('Cloud Firestore/Documents'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1614,7 +1618,7 @@ module.exports = {
         _(
           'Update field _PARAM2_ of firestore document _PARAM1_ in collection _PARAM0_ with _PARAM3_ (store result state in _PARAM4_)'
         ),
-        _('Firebase/Cloud Firestore/Fields'),
+        _('Cloud Firestore/Fields'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1647,7 +1651,7 @@ module.exports = {
         _(
           'Delete firestore document _PARAM1_ in collection _PARAM0_ (store result state in _PARAM2_)'
         ),
-        _('Firebase/Cloud Firestore/Documents'),
+        _('Cloud Firestore/Documents'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1678,7 +1682,7 @@ module.exports = {
         _(
           'Delete field _PARAM2_ of firestore document _PARAM1_ in collection _PARAM0_ with (store result state in _PARAM3_)'
         ),
-        _('Firebase/Cloud Firestore/Fields'),
+        _('Cloud Firestore/Fields'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1710,7 +1714,7 @@ module.exports = {
         _(
           'Load firestore document _PARAM1_ from collection _PARAM0_ into _PARAM2_ (store result state in _PARAM3_)'
         ),
-        _('Firebase/Cloud Firestore/Documents'),
+        _('Cloud Firestore/Documents'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1747,7 +1751,7 @@ module.exports = {
         _(
           'Load field _PARAM2_ of firestore document _PARAM1_ in collection _PARAM0_ into _PARAM3_ (store result state in _PARAM4_)'
         ),
-        _('Firebase/Cloud Firestore/Fields'),
+        _('Cloud Firestore/Fields'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1782,12 +1786,12 @@ module.exports = {
         'FirestoreHasDocument',
         _("Check for a document's existence"),
         _(
-          'Checks for the existence of a document. Sets the result variable to 1 if it exists else to 2.'
+          'Checks for the existence of a document. Sets the result variable to true if it exists else to false.'
         ),
         _(
           'Check for existence of _PARAM1_ in collection _PARAM0_ and store result in _PARAM2_ (store result state in _PARAM3_)'
         ),
-        _('Firebase/Cloud Firestore/Documents'),
+        _('Cloud Firestore/Documents'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1826,7 +1830,7 @@ module.exports = {
         _(
           'Check for existence of _PARAM2_ in document _PARAM1_ of collection _PARAM0_ and store result in _PARAM3_ (store result state in _PARAM4_)'
         ),
-        _('Firebase/Cloud Firestore/Fields'),
+        _('Cloud Firestore/Fields'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1866,7 +1870,7 @@ module.exports = {
         _(
           'List all documents in _PARAM0_ and store result in _PARAM1_ (store result state in _PARAM2_)'
         ),
-        _('Firebase/Cloud Firestore'),
+        _('Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1905,7 +1909,7 @@ module.exports = {
         _(
           'Save _PARAM0_ in location _PARAM1_ to Firebase storage and store access URL in _PARAM3_ (Format: _PARAM2_, Store result state in _PARAM4_)'
         ),
-        _('Firebase/Storage'),
+        _('Storage'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1946,7 +1950,7 @@ module.exports = {
         _(
           'Get a download url for _PARAM0_ and store it in _PARAM1_ (store result state in _PARAM2_)'
         ),
-        _('Firebase/Storage'),
+        _('Storage'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1980,7 +1984,7 @@ module.exports = {
         _(
           'Write _PARAM1_ to Database in _PARAM0_ (store result state in _PARAM2_)'
         ),
-        _('Firebase/Realtime Database'),
+        _('Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -2007,7 +2011,7 @@ module.exports = {
         _(
           'Write _PARAM2_ in field _PARAM1_ of _PARAM0_ (store result state in _PARAM3_)'
         ),
-        _('Firebase/Realtime Database'),
+        _('Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -2035,7 +2039,7 @@ module.exports = {
         _(
           'Update varable _PARAM0_ with _PARAM1_ (store result state in _PARAM2_)'
         ),
-        _('Firebase/Realtime Database'),
+        _('Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -2062,7 +2066,7 @@ module.exports = {
         _(
           'Update field _PARAM1_ of _PARAM0_ with _PARAM2_ (store result state in _PARAM3_)'
         ),
-        _('Firebase/Realtime Database'),
+        _('Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -2090,7 +2094,7 @@ module.exports = {
         _(
           'Delete variable _PARAM0_ from database (store result state in _PARAM1_)'
         ),
-        _('Firebase/Realtime Database'),
+        _('Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -2116,7 +2120,7 @@ module.exports = {
         _(
           'Delete field _PARAM1_ of variable _PARAM0_ on the database (store result state in _PARAM2_)'
         ),
-        _('Firebase/Realtime Database'),
+        _('Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -2145,7 +2149,7 @@ module.exports = {
         _(
           'Load database variable _PARAM0_ into _PARAM1_ (store result state in _PARAM2_)'
         ),
-        _('Firebase/Realtime Database'),
+        _('Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -2179,7 +2183,7 @@ module.exports = {
         _(
           'Load field _PARAM1_ of database variable _PARAM0_ into _PARAM2_ (store result state in _PARAM3_)'
         ),
-        _('Firebase/Realtime Database'),
+        _('Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -2214,7 +2218,7 @@ module.exports = {
         _(
           'Check for existence of _PARAM0_ and store result in _PARAM1_ (store result state in _PARAM2_)'
         ),
-        _('Firebase/Realtime Database'),
+        _('Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -2248,7 +2252,7 @@ module.exports = {
         _(
           'Check for existence of _PARAM1_ in database variable _PARAM0_ and store result in _PARAM2_ (store result state in _PARAM3_)'
         ),
-        _('Firebase/Realtime Database'),
+        _('Realtime Database'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )

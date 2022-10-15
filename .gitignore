@@ -8,6 +8,7 @@
 /Binaries/.embuild*
 /Binaries/build*
 /Binaries/embuild*
+/emsdk
 *.dll
 *.exe
 *.a

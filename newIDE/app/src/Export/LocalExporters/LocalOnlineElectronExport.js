@@ -11,7 +11,7 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { findGDJS } from '../../GameEngineFinder/LocalGDJSFinder';
 import { uploadLocalFile } from './LocalFileUploader';
 import { archiveLocalFolder } from '../../Utils/LocalArchiver';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 import localFileSystem from './LocalFileSystem';
 import {
   type ExportPipeline,
@@ -49,13 +49,23 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
 > = {
   name: 'local-online-electron',
   onlineBuildType: 'electron-build',
+  limitedBuilds: true,
   packageNameWarningType: 'desktop',
 
   getInitialExportState: () => ({
     targets: ['winExe'],
   }),
 
-  canLaunchBuild: (exportState: ExportState) => !!exportState.targets.length,
+  // Build can be launched only if just opened the dialog or build errored.
+  canLaunchBuild: (exportState, errored, exportStep) =>
+    !!exportState.targets.length && (errored || exportStep === ''),
+
+  // Navigation is enabled when the build is errored or whilst uploading.
+  isNavigationDisabled: (exportStep, errored) =>
+    !errored &&
+    ['register', 'export', 'resources-download', 'compress', 'upload'].includes(
+      exportStep
+    ),
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
@@ -137,7 +147,12 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
   launchOnlineBuild: (
     exportState: ExportState,
     authenticatedUser: AuthenticatedUser,
-    uploadBucketKey: string
+    uploadBucketKey: string,
+    gameId: string,
+    options: {|
+      gameName: string,
+      gameVersion: string,
+    |}
   ): Promise<Build> => {
     const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
     if (!firebaseUser)
@@ -147,7 +162,9 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
       getAuthorizationHeader,
       firebaseUser.uid,
       uploadBucketKey,
-      exportState.targets
+      exportState.targets,
+      gameId,
+      options
     );
   },
 };

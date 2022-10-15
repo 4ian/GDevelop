@@ -1,85 +1,90 @@
-// TODO: this needs to be flow-typed
+// @flow
 import React from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import { type MenuItemTemplate } from './Menu.flow';
 import Menu from '@material-ui/core/Menu';
 import Fade from '@material-ui/core/Fade';
 import ElectronMenuImplementation from './ElectronMenuImplementation';
 import MaterialUIMenuImplementation from './MaterialUIMenuImplementation';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 
-class MaterialUIContextMenu extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      open: false,
-      anchorX: 0,
-      anchorY: 0,
-    };
-    this.menuImplementation = new MaterialUIMenuImplementation({
-      onClose: this._onClose,
-    });
-  }
+export type ContextMenuInterface = {|
+  open: (x: number, y: number, options: any) => void,
+|};
 
-  open = (x, y) => {
-    this.setState(
-      {
-        anchorX: x,
-        anchorY: y,
-      },
-      () => {
-        this.setState({
-          open: true,
-        });
-      }
-    );
+type ContextMenuProps = {|
+  buildMenuTemplate: (i18n: I18nType, options: any) => Array<MenuItemTemplate>,
+|};
+
+const MaterialUIContextMenu = React.forwardRef<
+  ContextMenuProps,
+  ContextMenuInterface
+>((props, ref) => {
+  const [anchorPosition, setAnchorPosition] = React.useState<Array<number>>([
+    0,
+    0,
+  ]);
+  const [openMenu, setOpenMenu] = React.useState<boolean>(false);
+  const [buildOptions, setBuildOptions] = React.useState<any>({});
+
+  const menuImplementation = new MaterialUIMenuImplementation({
+    onClose: () => setOpenMenu(false),
+  });
+
+  const open = (x, y, options) => {
+    setAnchorPosition([x, y]);
+    setBuildOptions(options);
+    setOpenMenu(true);
   };
 
-  _onClose = () => {
-    this.setState({
-      open: false,
-    });
-  };
+  React.useImperativeHandle(ref, () => ({
+    open,
+  }));
 
-  render() {
-    return this.state.open ? (
-      <I18n>
-        {({ i18n }) => (
-          <Menu
-            open={this.state.open}
-            anchorPosition={{
-              left: this.state.anchorX,
-              top: this.state.anchorY,
-            }}
-            anchorReference={'anchorPosition'}
-            onClose={this._onClose}
-            TransitionComponent={Fade}
-            {...this.menuImplementation.getMenuProps()}
-          >
-            {this.menuImplementation.buildFromTemplate(
-              this.props.buildMenuTemplate(i18n)
-            )}
-          </Menu>
-        )}
-      </I18n>
-    ) : // Don't render the menu when it's not opened, as `buildMenuTemplate` could
-    // be running logic to compute some labels or `enabled` flag values - and might
-    // not be prepared to do that when the menu is not opened.
-    null;
-  }
-}
+  return openMenu ? (
+    <I18n>
+      {({ i18n }) => (
+        <Menu
+          open
+          anchorPosition={{
+            left: anchorPosition[0],
+            top: anchorPosition[1],
+          }}
+          anchorReference={'anchorPosition'}
+          onClose={() => setOpenMenu(false)}
+          TransitionComponent={Fade}
+          {...menuImplementation.getMenuProps()}
+        >
+          {menuImplementation.buildFromTemplate(
+            props.buildMenuTemplate(i18n, buildOptions)
+          )}
+        </Menu>
+      )}
+    </I18n>
+  ) : // Don't render the menu when it's not opened, as `buildMenuTemplate` could
+  // be running logic to compute some labels or `enabled` flag values - and might
+  // not be prepared to do that when the menu is not opened.
+  null;
+});
 
-class ElectronContextMenu extends React.Component {
-  constructor(props) {
-    super(props);
-    this.menuImplementation = new ElectronMenuImplementation();
-  }
+type ElectronContextMenuProps = {|
+  ...ContextMenuProps,
+  i18n: I18nType,
+|};
 
-  open = (x, y) => {
-    this.menuImplementation.buildFromTemplate(
-      this.props.buildMenuTemplate(this.props.i18n)
+const ElectronContextMenu = React.forwardRef<
+  ElectronContextMenuProps,
+  ContextMenuInterface
+>((props, ref) => {
+  const menuImplementation = new ElectronMenuImplementation();
+
+  const open = (x, y, options) => {
+    menuImplementation.buildFromTemplate(
+      props.buildMenuTemplate(props.i18n, options)
     );
-    this.menuImplementation.showMenu({
+    menuImplementation.showMenu({
       left: x || 0,
       top: y || 0,
       width: 0,
@@ -87,16 +92,22 @@ class ElectronContextMenu extends React.Component {
     });
   };
 
-  render() {
-    return null;
-  }
-}
-
-const ElectronContextMenuWrapper = React.forwardRef((props, ref) => {
-  const electronContextMenu = React.useRef(null);
   React.useImperativeHandle(ref, () => ({
-    open: (x, y) => {
-      if (electronContextMenu.current) electronContextMenu.current.open(x, y);
+    open,
+  }));
+
+  return null;
+});
+
+const ElectronContextMenuWrapper = React.forwardRef<
+  ContextMenuProps,
+  ContextMenuInterface
+>((props, ref) => {
+  const electronContextMenu = React.useRef<?ContextMenuInterface>(null);
+  React.useImperativeHandle(ref, () => ({
+    open: (x, y, options) => {
+      if (electronContextMenu.current)
+        electronContextMenu.current.open(x, y, options);
     },
   }));
 

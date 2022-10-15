@@ -11,13 +11,16 @@ import { uploadLocalFile } from './LocalFileUploader';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { findGDJS } from '../../GameEngineFinder/LocalGDJSFinder';
 import { archiveLocalFolder } from '../../Utils/LocalArchiver';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 import localFileSystem from './LocalFileSystem';
 import {
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
-import { ExplanationHeader } from '../GenericExporters/OnlineWebExport';
+import {
+  ExplanationHeader,
+  OnlineGameLink,
+} from '../GenericExporters/OnlineWebExport';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const gd: libGDevelop = global.gd;
@@ -51,11 +54,33 @@ export const localOnlineWebExportPipeline: ExportPipeline<
 
   getInitialExportState: () => null,
 
-  canLaunchBuild: () => true,
+  // Build can be launched if just opened the dialog or build errored, re-enabled when done.
+  canLaunchBuild: (exportState, errored, exportStep) =>
+    errored || exportStep === '' || exportStep === 'done',
+
+  // Navigation is enabled when the build is errored or if the build is not done.
+  isNavigationDisabled: (exportStep, errored) =>
+    !errored && !['', 'done'].includes(exportStep),
 
   renderHeader: () => <ExplanationHeader />,
 
-  renderLaunchButtonLabel: () => <Trans>Publish online</Trans>,
+  renderLaunchButtonLabel: () => <Trans>Generate link</Trans>,
+
+  renderCustomStepsProgress: ({
+    build,
+    project,
+    onSaveProject,
+    errored,
+    exportStep,
+  }) => (
+    <OnlineGameLink
+      build={build}
+      project={project}
+      onSaveProject={onSaveProject}
+      errored={errored}
+      exportStep={exportStep}
+    />
+  ),
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
@@ -113,6 +138,7 @@ export const localOnlineWebExportPipeline: ExportPipeline<
     return archiveLocalFolder({
       path: temporaryOutputDir,
       outputFilename: path.join(archiveOutputDir, 'game-archive.zip'),
+      sizeLimit: 250 * 1000 * 1000,
     });
   },
 
@@ -132,12 +158,23 @@ export const localOnlineWebExportPipeline: ExportPipeline<
   launchOnlineBuild: (
     exportState: ExportState,
     authenticatedUser: AuthenticatedUser,
-    uploadBucketKey: string
+    uploadBucketKey: string,
+    gameId: string,
+    options: {|
+      gameName: string,
+      gameVersion: string,
+    |}
   ): Promise<Build> => {
     const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
     if (!firebaseUser)
       return Promise.reject(new Error('User is not authenticated'));
 
-    return buildWeb(getAuthorizationHeader, firebaseUser.uid, uploadBucketKey);
+    return buildWeb(
+      getAuthorizationHeader,
+      firebaseUser.uid,
+      uploadBucketKey,
+      gameId,
+      options
+    );
   },
 };

@@ -3,34 +3,32 @@
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
-  "homepage": "https://gdevelop-app.com",
+  "homepage": "https://gdevelop.io",
   "//": "We use esbuild for a near instant build (important for quick feedback loop when developing). Typechecking is a separate process as much longer.",
   "devDependencies": {
-    "@types/electron": "^1.6.10",
     "@types/expect.js": "^0.3.29",
     "@types/mocha": "^5.2.7",
     "@types/node": "^14.11.1",
     "better-docs": "^2.3.2",
     "esbuild": "^0.13.12",
-    "jsdoc": "^3.6.6",
-    "jsdoc-autoprivate": "0.0.1",
-    "jsdoc-fresh": "^1.0.5",
-    "jsdoc-plugin-intersection": "^1.0.2",
-    "jsdoc-typeof-plugin": "^1.0.0",
     "lebab": "^3.1.0",
     "minimist": "^1.2.5",
+    "patch-package": "^6.4.7",
     "pixi.js": "^6.1.2",
     "prettier": "2.1.2",
     "recursive-readdir": "^2.2.2",
     "shelljs": "^0.8.4",
+    "typedoc": "^0.22.11",
+    "typedoc-plugin-reference-excluder": "^1.0.0",
     "typescript": "4.3.2"
   },
   "scripts": {
+    "postinstall": "patch-package",
     "check-types": "tsc",
     "build": "node scripts/build.js",
     "test": "cd tests && npm run test-benchmark",
     "format": "prettier --write \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\" \"../Extensions/**/*.spec.js\"",
     "check-format": "prettier --list-different \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\" \"../Extensions/**/*.spec.js\"",
-    "generate-doc": "jsdoc -c docs/jsdoc.conf.json docs/DocMainPage.md"
+    "generate-doc": "typedoc --options docs/typedoc.json"
   }
 }

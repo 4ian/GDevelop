@@ -3,15 +3,14 @@ import { Trans } from '@lingui/macro';
 
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
-import RaisedButton from '../UI/RaisedButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { type AuthenticatedUser } from './AuthenticatedUserContext';
 import { Column, Line, Spacer } from '../UI/Grid';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import BackgroundText from '../UI/BackgroundText';
 import VerifiedUser from '@material-ui/icons/VerifiedUser';
 import Text from '../UI/Text';
 import { useInterval } from '../Utils/UseInterval';
+import CircularProgress from '../UI/CircularProgress';
 
 type Props = {|
   onClose: Function,
@@ -39,7 +38,7 @@ export default function SubscriptionPendingDialog({
     <Dialog
       actions={[
         hasPlan ? (
-          <RaisedButton
+          <DialogPrimaryButton
             label={<Trans>Done!</Trans>}
             key="close"
             primary
@@ -54,8 +53,8 @@ export default function SubscriptionPendingDialog({
           />
         ),
       ]}
+      onRequestClose={onClose}
       maxWidth="sm"
-      cannotBeDismissed={true}
       open
       noMargin
     >
@@ -66,11 +65,10 @@ export default function SubscriptionPendingDialog({
               <Trans>
                 Thanks for getting a subscription and supporting GDevelop!
               </Trans>{' '}
-              {'❤️'}
+              {'💜'}{' '}
               <b>
                 <Trans>
-                  Your browser will now open to enter your payment details
-                  (handled securely by Stripe.com).
+                  Your browser will now open to enter your payment details.
                 </Trans>
               </b>
             </Text>
@@ -98,7 +96,7 @@ export default function SubscriptionPendingDialog({
               <Trans>
                 Thanks for getting a subscription and supporting GDevelop!
               </Trans>{' '}
-              {'❤️'}
+              {'💜'}
             </Text>
           </Line>
           <Line justifyContent="center" alignItems="center">
@@ -106,7 +104,7 @@ export default function SubscriptionPendingDialog({
             <Spacer />
             <Text>
               <b>
-                <Trans>Your new plan is now activated</Trans>
+                <Trans>Your new plan is now activated.</Trans>
               </b>
             </Text>
           </Line>

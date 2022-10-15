@@ -20,6 +20,13 @@ export const shouldValidate = (event: SupportedEvent) => {
 };
 
 /**
+ * Check if the user asked to go to previous match.
+ */
+export const shouldBrowsePrevious = (event: SupportedEvent) => {
+  return event.shiftKey && event.key === 'Enter';
+};
+
+/**
  * Check if the user asked to activate something.
  */
 export const shouldActivate = (event: SupportedEvent) => {
@@ -33,6 +40,13 @@ export const shouldActivate = (event: SupportedEvent) => {
  */
 export const shouldSubmit = (event: SupportedEvent) => {
   return (event.metaKey || event.ctrlKey) && event.key === 'Enter';
+};
+
+/**
+ * Check if the user wants to zoom when scrolling.
+ */
+export const shouldZoom = (event: SupportedEvent) => {
+  return event.metaKey || event.ctrlKey;
 };
 
 /**

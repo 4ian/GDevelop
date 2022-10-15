@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { t } from '@lingui/macro';
-import Dialog from './Dialog';
+import Dialog, { DialogPrimaryButton } from './Dialog';
 import TextField from './TextField';
 import FlatButton from './FlatButton';
 import { Trans } from '@lingui/macro';
@@ -36,6 +36,19 @@ export default class EditTagsDialog extends React.Component<Props, State> {
     }, 10);
   }
 
+  _canEdit = () => {
+    const { tagsString } = this.state;
+    const tags = getTagsFromString(tagsString);
+
+    return !!this.props.tagsString || !!tags.length;
+  };
+
+  _onEdit = (tags: Tags) => {
+    if (!this._canEdit()) return;
+
+    this.props.onEdit(tags);
+  };
+
   render() {
     const { onCancel, onEdit } = this.props;
     const { tagsString } = this.state;
@@ -51,7 +64,7 @@ export default class EditTagsDialog extends React.Component<Props, State> {
             primary={false}
             onClick={onCancel}
           />,
-          <FlatButton
+          <DialogPrimaryButton
             key="add"
             label={
               this.props.tagsString && !tags.length ? (
@@ -61,13 +74,13 @@ export default class EditTagsDialog extends React.Component<Props, State> {
               )
             }
             primary
-            onClick={() => onEdit(tags)}
-            disabled={!this.props.tagsString && !tags.length}
+            onClick={() => this._onEdit(tags)}
+            disabled={!this._canEdit()}
           />,
         ]}
-        cannotBeDismissed={false}
-        open
         onRequestClose={onCancel}
+        onApply={() => this._onEdit(tags)}
+        open
       >
         <TextField
           fullWidth
@@ -78,7 +91,7 @@ export default class EditTagsDialog extends React.Component<Props, State> {
             })
           }
           floatingLabelText="Tag(s) (comma-separated)"
-          hintText={t`For example: player, spaceship, inventory...`}
+          translatableHintText={t`For example: player, spaceship, inventory...`}
           onKeyPress={event => {
             if (shouldValidate(event)) {
               onEdit(tags);

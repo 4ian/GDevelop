@@ -4,6 +4,7 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
   declare var rbush: any;
+  type SearchArea = { minX: float; minY: float; maxX: float; maxY: float };
 
   /**
    * Manages the common objects shared by objects having a
@@ -18,12 +19,7 @@ namespace gdjs {
      * @param object The object
      */
     constructor(runtimeScene: gdjs.RuntimeScene) {
-      this._platformRBush = new rbush(9, [
-        '.owner.getAABB().min[0]',
-        '.owner.getAABB().min[1]',
-        '.owner.getAABB().max[0]',
-        '.owner.getAABB().max[1]',
-      ]);
+      this._platformRBush = new rbush();
     }
 
     /**
@@ -46,7 +42,13 @@ namespace gdjs {
      * Add a platform to the list of existing platforms.
      */
     addPlatform(platformBehavior: gdjs.PlatformRuntimeBehavior) {
-      this._platformRBush.insert(platformBehavior);
+      if (platformBehavior.currentRBushAABB)
+        platformBehavior.currentRBushAABB.updateAABBFromOwner();
+      else
+        platformBehavior.currentRBushAABB = new gdjs.BehaviorRBushAABB(
+          platformBehavior
+        );
+      this._platformRBush.insert(platformBehavior.currentRBushAABB);
     }
 
     /**
@@ -54,7 +56,7 @@ namespace gdjs {
      * added before.
      */
     removePlatform(platformBehavior: gdjs.PlatformRuntimeBehavior) {
-      this._platformRBush.remove(platformBehavior);
+      this._platformRBush.remove(platformBehavior.currentRBushAABB);
     }
 
     /**
@@ -65,7 +67,7 @@ namespace gdjs {
     getAllPlatformsAround(
       object: gdjs.RuntimeObject,
       maxMovementLength: number,
-      result: gdjs.PlatformRuntimeBehavior[]
+      result: PlatformRuntimeBehavior[]
     ): any {
       // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
       // is not necessarily in the middle of the object (for sprites for example).
@@ -73,20 +75,37 @@ namespace gdjs {
       const oh = object.getHeight();
       const x = object.getDrawableX() + object.getCenterX();
       const y = object.getDrawableY() + object.getCenterY();
-      const searchArea = gdjs.staticObject(
+      const searchArea: SearchArea = gdjs.staticObject(
         PlatformObjectsManager.prototype.getAllPlatformsAround
-      );
-      // @ts-ignore
+      ) as SearchArea;
       searchArea.minX = x - ow / 2 - maxMovementLength;
-      // @ts-ignore
       searchArea.minY = y - oh / 2 - maxMovementLength;
-      // @ts-ignore
       searchArea.maxX = x + ow / 2 + maxMovementLength;
-      // @ts-ignore
       searchArea.maxY = y + oh / 2 + maxMovementLength;
-      const nearbyPlatforms = this._platformRBush.search(searchArea);
+      const nearbyPlatforms: gdjs.BehaviorRBushAABB<
+        PlatformRuntimeBehavior
+      >[] = this._platformRBush.search(searchArea);
+
       result.length = 0;
-      result.push.apply(result, nearbyPlatforms);
+
+      // Extra check on the platform owner AABB
+      // TODO: PR https://github.com/4ian/GDevelop/pull/2602 should remove the need
+      // for this extra check once merged.
+      for (let i = 0; i < nearbyPlatforms.length; i++) {
+        const platform = nearbyPlatforms[i].behavior;
+        const platformAABB = platform.owner.getAABB();
+        const platformIsStillAround =
+          platformAABB.min[0] <= searchArea.maxX &&
+          platformAABB.min[1] <= searchArea.maxY &&
+          platformAABB.max[0] >= searchArea.minX &&
+          platformAABB.max[1] >= searchArea.minY;
+        // Filter platforms that are not in the searched area anymore.
+        // This can happen because platforms are not updated in the RBush before that
+        // characters movement are being processed.
+        if (platformIsStillAround) {
+          result.push(platform);
+        }
+      }
     }
   }
 
@@ -106,6 +125,9 @@ namespace gdjs {
     _oldWidth: float = 0;
     _oldHeight: float = 0;
     _oldAngle: float = 0;
+    currentRBushAABB: gdjs.BehaviorRBushAABB<
+      PlatformRuntimeBehavior
+    > | null = null;
     _manager: gdjs.PlatformObjectsManager;
     _registeredInManager: boolean = false;
 

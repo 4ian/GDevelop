@@ -8,18 +8,18 @@ namespace gdjs {
    * called. This is used to avoid scrolling in a webpage when these keys are pressed
    * in the game.
    */
-  const defaultPreventedKeys = [
-    'ArrowUp',
-    'ArrowDown',
-    'ArrowLeft',
-    'ArrowRight',
+  const defaultPreventedKeyCodes = [
+    37, // ArrowLeft
+    38, // ArrowUp
+    39, // ArrowRight
+    40, // ArrowDown
   ];
 
   /**
    * The renderer for a gdjs.RuntimeGame using Pixi.js.
    */
   export class RuntimeGamePixiRenderer {
-    _game: any;
+    _game: gdjs.RuntimeGame;
     _isFullPage: boolean = true;
 
     //Used to track if the canvas is displayed on the full page.
@@ -27,7 +27,9 @@ namespace gdjs {
 
     //Used to track if the window is displayed as fullscreen (see setFullscreen method).
     _forceFullscreen: any;
+
     _pixiRenderer: PIXI.Renderer | null = null;
+    private _domElementsContainer: HTMLDivElement | null = null;
 
     // Current width of the canvas (might be scaled down/up compared to renderer)
     _canvasWidth: float = 0;
@@ -39,7 +41,6 @@ namespace gdjs {
     _marginTop: any;
     _marginRight: any;
     _marginBottom: any;
-    _notifySceneForResize: any;
 
     _nextFrameId: integer = 0;
 
@@ -60,26 +61,62 @@ namespace gdjs {
      * Create a standard canvas inside canvasArea.
      *
      */
-    createStandardCanvas(parentElement) {
-      //Create the renderer and setup the rendering area
-      //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
+    createStandardCanvas(parentElement: HTMLElement) {
+      // Create the renderer and setup the rendering area.
+      // "preserveDrawingBuffer: true" is needed to avoid flickering
+      // and background issues on some mobile phones (see #585 #572 #566 #463).
       this._pixiRenderer = PIXI.autoDetectRenderer({
         width: this._game.getGameResolutionWidth(),
         height: this._game.getGameResolutionHeight(),
         preserveDrawingBuffer: true,
         antialias: false,
       }) as PIXI.Renderer;
-      parentElement.appendChild(
-        // add the renderer view element to the DOM
-        this._pixiRenderer.view
-      );
-      this._pixiRenderer.view.style['position'] = 'absolute';
-      //Ensure that the canvas has the focus.
-      this._pixiRenderer.view.tabIndex = 1;
+      const gameCanvas = this._pixiRenderer.view;
+
+      // Add the renderer view element to the DOM
+      parentElement.appendChild(gameCanvas);
+      gameCanvas.style.position = 'absolute';
+
+      // Ensure that the canvas has the focus.
+      gameCanvas.tabIndex = 1;
+
+      // Ensure long press can't create a selection
+      gameCanvas.style.userSelect = 'none';
+      gameCanvas.style.outline = 'none'; // No selection/focus ring on the canvas.
+
+      // Set up the container for HTML elements on top of the game canvas.
+      const domElementsContainer = document.createElement('div');
+      domElementsContainer.style.position = 'absolute';
+      domElementsContainer.style.overflow = 'hidden'; // Never show anything outside the container.
+      domElementsContainer.style.outline = 'none'; // No selection/focus ring on this container.
+      domElementsContainer.style.pointerEvents = 'none'; // Clicks go through the container.
+
+      // The container should *never* scroll.
+      // Elements are put inside with the same coordinates (with a scaling factor)
+      // as on the game canvas.
+      domElementsContainer.addEventListener('scroll', (event) => {
+        domElementsContainer.scrollLeft = 0;
+        domElementsContainer.scrollTop = 0;
+        event.preventDefault();
+      });
+
+      // When clicking outside an input, (or other HTML element),
+      // give back focus to the game canvas so that this element is blurred.
+      gameCanvas.addEventListener('pointerdown', () => {
+        gameCanvas.focus();
+      });
+
+      // Prevent magnifying glass on iOS with a long press.
+      // Note that there are related bugs on iOS 15 (see https://bugs.webkit.org/show_bug.cgi?id=231161)
+      // but it seems not to affect us as the `domElementsContainer` has `pointerEvents` set to `none`.
+      domElementsContainer.style['-webkit-user-select'] = 'none';
+
+      parentElement.appendChild(domElementsContainer);
+      this._domElementsContainer = domElementsContainer;
 
       this._resizeCanvas();
 
-      // Handle scale mode
+      // Handle scale mode.
       if (this._game.getScaleMode() === 'nearest') {
         this._pixiRenderer.view.style['image-rendering'] = '-moz-crisp-edges';
         this._pixiRenderer.view.style['image-rendering'] =
@@ -89,19 +126,20 @@ namespace gdjs {
         this._pixiRenderer.view.style['image-rendering'] = 'pixelated';
       }
 
-      // Handle pixels rounding
+      // Handle pixels rounding.
       if (this._game.getPixelsRounding()) {
         PIXI.settings.ROUND_PIXELS = true;
       }
 
-      //Handle resize
-      const that = this;
-      window.addEventListener('resize', function () {
-        that._game.onWindowInnerSizeChanged();
-        that._resizeCanvas();
-        that._game._notifySceneForResize = true;
+      // Handle resize: immediately adjust the game canvas (and dom element container)
+      // and notify the game (that may want to adjust to the new size of the window).
+      window.addEventListener('resize', () => {
+        this._game.onWindowInnerSizeChanged();
+        this._resizeCanvas();
       });
-      return this._pixiRenderer;
+
+      // Focus the canvas when created.
+      gameCanvas.focus();
     }
 
     static getWindowInnerWidth() {
@@ -145,6 +183,7 @@ namespace gdjs {
             promise.catch(() => {});
           }
         } else {
+          // @ts-ignore
           window.screen.orientation.lock(gameOrientation).catch(() => {});
         }
       } catch (error) {
@@ -158,7 +197,7 @@ namespace gdjs {
      *
      */
     private _resizeCanvas() {
-      if (!this._pixiRenderer) return;
+      if (!this._pixiRenderer || !this._domElementsContainer) return;
 
       // Set the Pixi renderer size to the game size.
       // There is no "smart" resizing to be done here: the rendering of the game
@@ -205,12 +244,22 @@ namespace gdjs {
           canvasHeight *= factor;
         }
       }
-      this._pixiRenderer.view.style['top'] =
+
+      // Apply the calculations to the canvas element...
+      this._pixiRenderer.view.style.top =
         this._marginTop + (maxHeight - canvasHeight) / 2 + 'px';
-      this._pixiRenderer.view.style['left'] =
+      this._pixiRenderer.view.style.left =
         this._marginLeft + (maxWidth - canvasWidth) / 2 + 'px';
       this._pixiRenderer.view.style.width = canvasWidth + 'px';
       this._pixiRenderer.view.style.height = canvasHeight + 'px';
+
+      // ...and to the div on top of it showing DOM elements (like inputs).
+      this._domElementsContainer.style.top =
+        this._marginTop + (maxHeight - canvasHeight) / 2 + 'px';
+      this._domElementsContainer.style.left =
+        this._marginLeft + (maxWidth - canvasWidth) / 2 + 'px';
+      this._domElementsContainer.style.width = canvasWidth + 'px';
+      this._domElementsContainer.style.height = canvasHeight + 'px';
 
       // Store the canvas size for fast access to it.
       this._canvasWidth = canvasWidth;
@@ -227,7 +276,6 @@ namespace gdjs {
       }
       this._keepRatio = enable;
       this._resizeCanvas();
-      this._game._notifySceneForResize = true;
     }
 
     /**
@@ -247,7 +295,6 @@ namespace gdjs {
       this._marginBottom = bottom;
       this._marginLeft = left;
       this._resizeCanvas();
-      this._game._notifySceneForResize = true;
     }
 
     /**
@@ -256,10 +303,10 @@ namespace gdjs {
      * @param height The new height, in pixels.
      */
     setWindowSize(width: float, height: float): void {
-      const electron = this.getElectron();
-      if (electron) {
+      const remote = this.getElectronRemote();
+      if (remote) {
         // Use Electron BrowserWindow API
-        const browserWindow = electron.remote.getCurrentWindow();
+        const browserWindow = remote.getCurrentWindow();
         if (browserWindow) {
           browserWindow.setContentSize(width, height);
         }
@@ -272,10 +319,10 @@ namespace gdjs {
      * Center the window on screen.
      */
     centerWindow() {
-      const electron = this.getElectron();
-      if (electron) {
+      const remote = this.getElectronRemote();
+      if (remote) {
         // Use Electron BrowserWindow API
-        const browserWindow = electron.remote.getCurrentWindow();
+        const browserWindow = remote.getCurrentWindow();
         if (browserWindow) {
           browserWindow.center();
         }
@@ -293,10 +340,10 @@ namespace gdjs {
       }
       if (this._isFullscreen !== enable) {
         this._isFullscreen = !!enable;
-        const electron = this.getElectron();
-        if (electron) {
+        const remote = this.getElectronRemote();
+        if (remote) {
           // Use Electron BrowserWindow API
-          const browserWindow = electron.remote.getCurrentWindow();
+          const browserWindow = remote.getCurrentWindow();
           if (browserWindow) {
             browserWindow.setFullScreen(this._isFullscreen);
           }
@@ -342,7 +389,6 @@ namespace gdjs {
           }
         }
         this._resizeCanvas();
-        this._notifySceneForResize = true;
       }
     }
 
@@ -350,9 +396,9 @@ namespace gdjs {
      * Checks if the game is in full screen.
      */
     isFullScreen(): boolean {
-      const electron = this.getElectron();
-      if (electron) {
-        return electron.remote.getCurrentWindow().isFullScreen();
+      const remote = this.getElectronRemote();
+      if (remote) {
+        return remote.getCurrentWindow().isFullScreen();
       }
 
       // Height check is used to detect user triggered full screen (for example F11 shortcut).
@@ -360,9 +406,43 @@ namespace gdjs {
     }
 
     /**
+     * Convert a point from the canvas coordinates to the dom element container coordinates.
+     *
+     * @param canvasCoords The point in the canvas coordinates.
+     * @returns The point in the dom element container coordinates.
+     */
+    convertCanvasToDomElementContainerCoords(
+      canvasCoords: FloatPoint
+    ): FloatPoint {
+      const pageCoords: FloatPoint = [canvasCoords[0], canvasCoords[1]];
+
+      // Handle the fact that the game is stretched to fill the canvas.
+      pageCoords[0] /=
+        this._game.getGameResolutionWidth() / (this._canvasWidth || 1);
+      pageCoords[1] /=
+        this._game.getGameResolutionHeight() / (this._canvasHeight || 1);
+
+      return pageCoords;
+    }
+
+    /**
+     * Return the scale factor between the renderer height and the actual canvas height,
+     * which is also the height of the container for DOM elements to be superimposed on top of it.
+     *
+     * Useful to scale font sizes of DOM elements so that they follow the size of the game.
+     */
+    getCanvasToDomElementContainerHeightScale(): float {
+      return (this._canvasHeight || 1) / this._game.getGameResolutionHeight();
+    }
+
+    /**
      * Add the standard events handler.
      */
-    bindStandardEvents(manager, window, document) {
+    bindStandardEvents(
+      manager: gdjs.InputManager,
+      window: Window,
+      document: Document
+    ) {
       const renderer = this._pixiRenderer;
       if (!renderer) return;
       const canvas = renderer.view;
@@ -371,30 +451,27 @@ namespace gdjs {
       //to game coordinates.
       const that = this;
 
-      function getEventPosition(e) {
-        const pos = [0, 0];
-        if (e.pageX) {
-          pos[0] = e.pageX - canvas.offsetLeft;
-          pos[1] = e.pageY - canvas.offsetTop;
-        } else {
-          pos[0] =
-            e.clientX +
-            document.body.scrollLeft +
-            document.documentElement.scrollLeft -
-            canvas.offsetLeft;
-          pos[1] =
-            e.clientY +
-            document.body.scrollTop +
-            document.documentElement.scrollTop -
-            canvas.offsetTop;
-        }
+      function getEventPosition(e: MouseEvent | Touch) {
+        const pos = [e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop];
 
-        //Handle the fact that the game is stretched to fill the canvas.
+        // Handle the fact that the game is stretched to fill the canvas.
         pos[0] *=
           that._game.getGameResolutionWidth() / (that._canvasWidth || 1);
         pos[1] *=
           that._game.getGameResolutionHeight() / (that._canvasHeight || 1);
         return pos;
+      }
+
+      function isInsideCanvas(e: MouseEvent | Touch) {
+        const x = e.pageX - canvas.offsetLeft;
+        const y = e.pageY - canvas.offsetTop;
+
+        return (
+          0 <= x &&
+          x < (that._canvasWidth || 1) &&
+          0 <= y &&
+          y < (that._canvasHeight || 1)
+        );
       }
 
       //Some browsers lacks definition of some variables used to do calculations
@@ -415,6 +492,7 @@ namespace gdjs {
           document.documentElement === undefined ||
           document.documentElement === null
         ) {
+          // @ts-ignore
           document.documentElement = {};
         }
         if (isNaN(document.documentElement.scrollLeft)) {
@@ -429,28 +507,61 @@ namespace gdjs {
         }
       })();
 
-      //Keyboard
+      // Keyboard: listen at the document level to capture even when the canvas
+      // is not focused.
+
+      const isFocusingDomElement = () => {
+        // Fast bailout when the game canvas should receive the inputs (i.e: almost always).
+        // Also check the document body or null for activeElement, as all of these should go
+        // to the game.
+        if (
+          document.activeElement === canvas ||
+          document.activeElement === document.body ||
+          document.activeElement === null
+        )
+          return false;
+
+        return true;
+      };
       document.onkeydown = function (e) {
-        if (defaultPreventedKeys.includes(e.keyCode)) {
+        if (isFocusingDomElement()) {
+          // Bail out if the game canvas is not focused. For example,
+          // an `<input>` element can be focused, and needs to receive
+          // arrow keys events.
+          return;
+        }
+
+        if (defaultPreventedKeyCodes.includes(e.keyCode)) {
+          // Some keys are "default prevented" to avoid scrolling when the game
+          // is integrated in a page as an iframe.
           e.preventDefault();
         }
 
         manager.onKeyPressed(e.keyCode, e.location);
       };
       document.onkeyup = function (e) {
-        if (defaultPreventedKeys.includes(e.keyCode)) {
+        if (isFocusingDomElement()) {
+          // Bail out if the game canvas is not focused. For example,
+          // an `<input>` element can be focused, and needs to receive
+          // arrow keys events.
+          return;
+        }
+
+        if (defaultPreventedKeyCodes.includes(e.keyCode)) {
+          // Some keys are "default prevented" to avoid scrolling when the game
+          // is integrated in a page as an iframe.
           e.preventDefault();
         }
 
         manager.onKeyReleased(e.keyCode, e.location);
       };
 
-      //Mouse
-      renderer.view.onmousemove = function (e) {
+      // Mouse:
+      canvas.onmousemove = function (e) {
         const pos = getEventPosition(e);
         manager.onMouseMove(pos[0], pos[1]);
       };
-      renderer.view.onmousedown = function (e) {
+      canvas.onmousedown = function (e) {
         manager.onMouseButtonPressed(
           e.button === 2
             ? gdjs.InputManager.MOUSE_RIGHT_BUTTON
@@ -463,7 +574,7 @@ namespace gdjs {
         }
         return false;
       };
-      renderer.view.onmouseup = function (e) {
+      canvas.onmouseup = function (e) {
         manager.onMouseButtonReleased(
           e.button === 2
             ? gdjs.InputManager.MOUSE_RIGHT_BUTTON
@@ -472,6 +583,52 @@ namespace gdjs {
             : gdjs.InputManager.MOUSE_LEFT_BUTTON
         );
         return false;
+      };
+      canvas.onmouseleave = function (e) {
+        manager.onMouseLeave();
+      };
+      canvas.onmouseenter = function (e) {
+        manager.onMouseEnter();
+        // There is no mouse event when the cursor is outside of the canvas.
+        // We catchup what happened.
+        {
+          const leftIsPressed = (e.buttons & 1) !== 0;
+          const leftWasPressed = manager.isMouseButtonPressed(
+            gdjs.InputManager.MOUSE_LEFT_BUTTON
+          );
+          if (leftIsPressed && !leftWasPressed) {
+            manager.onMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON);
+          }
+          if (!leftIsPressed && leftWasPressed) {
+            manager.onMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON);
+          }
+        }
+        {
+          const rightIsPressed = (e.buttons & 2) !== 0;
+          const rightWasPressed = manager.isMouseButtonPressed(
+            gdjs.InputManager.MOUSE_RIGHT_BUTTON
+          );
+          if (rightIsPressed && !rightWasPressed) {
+            manager.onMouseButtonPressed(gdjs.InputManager.MOUSE_RIGHT_BUTTON);
+          }
+          if (!rightIsPressed && rightWasPressed) {
+            manager.onMouseButtonReleased(gdjs.InputManager.MOUSE_RIGHT_BUTTON);
+          }
+        }
+        {
+          const middleIsPressed = (e.buttons & 4) !== 0;
+          const middleWasPressed = manager.isMouseButtonPressed(
+            gdjs.InputManager.MOUSE_MIDDLE_BUTTON
+          );
+          if (middleIsPressed && !middleWasPressed) {
+            manager.onMouseButtonPressed(gdjs.InputManager.MOUSE_MIDDLE_BUTTON);
+          }
+          if (!middleIsPressed && middleWasPressed) {
+            manager.onMouseButtonReleased(
+              gdjs.InputManager.MOUSE_MIDDLE_BUTTON
+            );
+          }
+        }
       };
       window.addEventListener(
         'click',
@@ -484,28 +641,50 @@ namespace gdjs {
         },
         false
       );
-      renderer.view.oncontextmenu = function (event) {
+      canvas.oncontextmenu = function (event) {
         event.preventDefault();
         event.stopPropagation();
         return false;
       };
       // @ts-ignore
-      renderer.view.onwheel = function (event) {
+      canvas.onwheel = function (event) {
         manager.onMouseWheel(-event.deltaY);
       };
 
-      //Touches
-      //Also simulate mouse events when receiving touch events
+      // Touches:
       window.addEventListener('touchmove', function (e) {
+        if (isFocusingDomElement()) {
+          // Bail out if the game canvas is not focused. For example,
+          // an `<input>` element can be focused, and needs to receive
+          // touch events to move the selection (and do other native gestures).
+          return;
+        }
+
         e.preventDefault();
         if (e.changedTouches) {
           for (let i = 0; i < e.changedTouches.length; ++i) {
             const pos = getEventPosition(e.changedTouches[i]);
             manager.onTouchMove(e.changedTouches[i].identifier, pos[0], pos[1]);
+            // This works because touch events are sent
+            // when they continue outside of the canvas.
+            if (manager.isSimulatingMouseWithTouch()) {
+              if (isInsideCanvas(e.changedTouches[i])) {
+                manager.onMouseEnter();
+              } else {
+                manager.onMouseLeave();
+              }
+            }
           }
         }
       });
       window.addEventListener('touchstart', function (e) {
+        if (isFocusingDomElement()) {
+          // Bail out if the game canvas is not focused. For example,
+          // an `<input>` element can be focused, and needs to receive
+          // touch events to move the selection (and do other native gestures).
+          return;
+        }
+
         e.preventDefault();
         if (e.changedTouches) {
           for (let i = 0; i < e.changedTouches.length; ++i) {
@@ -520,6 +699,13 @@ namespace gdjs {
         return false;
       });
       window.addEventListener('touchend', function (e) {
+        if (isFocusingDomElement()) {
+          // Bail out if the game canvas is not focused. For example,
+          // an `<input>` element can be focused, and needs to receive
+          // touch events to move the selection (and do other native gestures).
+          return;
+        }
+
         e.preventDefault();
         if (e.changedTouches) {
           for (let i = 0; i < e.changedTouches.length; ++i) {
@@ -563,6 +749,10 @@ namespace gdjs {
       return this._pixiRenderer;
     }
 
+    getDomElementContainer() {
+      return this._domElementsContainer;
+    }
+
     /**
      * Open the given URL in the system browser (or a new tab)
      */
@@ -588,9 +778,9 @@ namespace gdjs {
     stopGame() {
       // Try to detect the environment to use the most adapted
       // way of closing the app
-      const electron = this.getElectron();
-      if (electron) {
-        const browserWindow = electron.remote.getCurrentWindow();
+      const remote = this.getElectronRemote();
+      if (remote) {
+        const browserWindow = remote.getCurrentWindow();
         if (browserWindow) {
           browserWindow.close();
         }
@@ -632,11 +822,36 @@ namespace gdjs {
      * Get the electron module, if running as a electron renderer process.
      */
     getElectron() {
-      if (typeof require !== 'undefined') {
+      if (typeof require === 'function') {
         return require('electron');
       }
       return null;
     }
+
+    /**
+     * Helper to get the electron remote module, if running on Electron.
+     * Note that is not guaranteed to be supported in the future - avoid if possible.
+     */
+    getElectronRemote = () => {
+      if (typeof require === 'function') {
+        const runtimeGameOptions = this._game.getAdditionalOptions();
+        const moduleId =
+          runtimeGameOptions && runtimeGameOptions.electronRemoteRequirePath
+            ? runtimeGameOptions.electronRemoteRequirePath
+            : '@electron/remote';
+
+        try {
+          return require(moduleId);
+        } catch (requireError) {
+          console.error(
+            `Could not load @electron/remote from "${moduleId}". Error is:`,
+            requireError
+          );
+        }
+      }
+
+      return null;
+    };
   }
 
   //Register the class to let the engine use it.

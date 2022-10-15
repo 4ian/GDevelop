@@ -16,7 +16,6 @@ build
 
 # misc
 .DS_Store
-.env
 .env.local
 npm-debug.log
 
@@ -37,6 +36,7 @@ public/external/__MACOSX/
 
 # Resources
 resources/GDJS
+resources/preview_node_modules
 
 # locales build files
 src/locales/_build

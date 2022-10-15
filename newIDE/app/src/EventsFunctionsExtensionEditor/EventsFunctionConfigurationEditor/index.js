@@ -21,9 +21,10 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
+  eventsBasedObject: ?gdEventsBasedObject,
   onParametersOrGroupsUpdated: () => void,
   helpPagePath?: string,
-  onConfigurationUpdated?: () => void,
+  onConfigurationUpdated?: (whatChanged?: 'type') => void,
   renderConfigurationHeader?: () => React.Node,
   freezeParameters?: boolean,
   freezeEventsFunctionType?: boolean,
@@ -40,7 +41,15 @@ type Props = {|
     newIndex: number,
     done: (boolean) => void
   ) => void,
+  onMoveObjectEventsParameter?: (
+    eventsBasedObject: gdEventsBasedObject,
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: (boolean) => void
+  ) => void,
   unsavedChanges?: ?UnsavedChanges,
+  getFunctionGroupNames?: () => string[],
 |};
 
 type TabNames = 'config' | 'parameters' | 'groups';
@@ -153,6 +162,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       objectsContainer,
       eventsFunction,
       eventsBasedBehavior,
+      eventsBasedObject,
       freezeEventsFunctionType,
       onConfigurationUpdated,
       onParametersOrGroupsUpdated,
@@ -161,6 +171,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       renderConfigurationHeader,
       onMoveFreeEventsParameter,
       onMoveBehaviorEventsParameter,
+      onMoveObjectEventsParameter,
+      getFunctionGroupNames,
     } = this.props;
 
     return (
@@ -185,10 +197,12 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
               <EventsFunctionPropertiesEditor
                 eventsFunction={eventsFunction}
                 eventsBasedBehavior={eventsBasedBehavior}
+                eventsBasedObject={eventsBasedObject}
                 helpPagePath={helpPagePath}
                 onConfigurationUpdated={onConfigurationUpdated}
                 renderConfigurationHeader={renderConfigurationHeader}
                 freezeEventsFunctionType={freezeEventsFunctionType}
+                getFunctionGroupNames={getFunctionGroupNames}
               />
             </Line>
           </ScrollView>
@@ -200,11 +214,13 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 project={project}
                 eventsFunction={eventsFunction}
                 eventsBasedBehavior={eventsBasedBehavior}
+                eventsBasedObject={eventsBasedObject}
                 onParametersUpdated={onParametersOrGroupsUpdated}
                 helpPagePath={helpPagePath}
                 freezeParameters={freezeParameters}
                 onMoveFreeEventsParameter={onMoveFreeEventsParameter}
                 onMoveBehaviorEventsParameter={onMoveBehaviorEventsParameter}
+                onMoveObjectEventsParameter={onMoveObjectEventsParameter}
                 key={eventsFunction ? eventsFunction.ptr : null}
               />
             </Line>

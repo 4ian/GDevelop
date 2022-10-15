@@ -84,6 +84,18 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
+    name: 'Leaderboards',
+    // $FlowExpectedError - this path is ignored for Flow.
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Leaderboards/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
+    name: 'PlayerAuthentication',
+    // $FlowExpectedError - this path is ignored for Flow.
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/PlayerAuthentication/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'DialogueTree',
     // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DialogueTree/JsExtension.js'),
@@ -106,7 +118,7 @@ const jsExtensions = [
       // $FlowExpectedError - this path is ignored for Flow.
       'pixi-tilemap/dist/pixi-tilemap.umd': require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd'),
       // $FlowExpectedError - this path is ignored for Flow.
-      'pixi-tilemap-helper': require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/pixi-tilemap-helper'),
+      'helper/TileMapHelper': require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/helper/TileMapHelper.js'),
       // $FlowExpectedError - this path is ignored for Flow.
       'pako/dist/pako.min': require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/pako/dist/pako.min'),
     },
@@ -145,6 +157,12 @@ const jsExtensions = [
     name: 'Screenshot',
     // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Screenshot/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
+    name: 'TextInput',
+    // $FlowExpectedError - this path is ignored for Flow.
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/TextInput/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
 ];

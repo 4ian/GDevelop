@@ -1,21 +1,21 @@
+// @flow
 import React from 'react';
-import ThemeConsumer from './Theme/ThemeConsumer';
+import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
-export default props => {
+const ToolbarSeparator = () => {
+  const theme = React.useContext(GDevelopThemeContext);
   return (
-    <ThemeConsumer>
-      {muiTheme => (
-        <span
-          style={{
-            height: 32,
-            marginLeft: 3,
-            marginRight: 3,
-            borderLeftStyle: 'solid',
-            borderLeftWidth: 1,
-            borderColor: muiTheme.toolbar.separatorColor,
-          }}
-        />
-      )}
-    </ThemeConsumer>
+    <span
+      style={{
+        height: 32,
+        marginLeft: 3,
+        marginRight: 3,
+        borderLeftStyle: 'solid',
+        borderLeftWidth: 1,
+        borderColor: theme.toolbar.separatorColor,
+      }}
+    />
   );
 };
+
+export default ToolbarSeparator;

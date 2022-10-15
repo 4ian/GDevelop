@@ -8,9 +8,11 @@ export const isDocumentationAbsoluteUrl = (path: string) => {
   return path.startsWith('http://') || path.startsWith('https://');
 };
 
-export const getHelpLink = (path: string): string => {
+export const getHelpLink = (path: string, anchor: string = ''): string => {
   if (isRelativePathToDocumentationRoot(path))
-    return `http://wiki.compilgames.net/doku.php/gdevelop5${path}?utm_source=gdevelop&utm_medium=help-link`;
+    return `https://wiki.gdevelop.io/gdevelop5${path}?utm_source=gdevelop&utm_medium=help-link${
+      anchor ? `#${anchor}` : ''
+    }`;
 
   if (isDocumentationAbsoluteUrl(path)) return path;
 

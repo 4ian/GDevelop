@@ -11,19 +11,21 @@ import SearchBar from '../UI/SearchBar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import Background from '../UI/Background';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import Tooltip from '@material-ui/core/Tooltip';
 import {
   enumerateEventsFunctions,
   filterEventFunctionsList,
 } from './EnumerateEventsFunctions';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import Window from '../Utils/Window';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-
 const EVENTS_FUNCTION_CLIPBOARD_KIND = 'Events Function';
+const gd: libGDevelop = global.gd;
 
 const styles = {
   listContainer: {
@@ -36,8 +38,23 @@ export type EventsFunctionCreationParameters = {|
   name: ?string,
 |};
 
+const renderEventsFunctionLabel = (eventsFunction: gdEventsFunction) =>
+  eventsFunction.isPrivate() ? (
+    <>
+      <Tooltip title="This function won't be visible in the events editor">
+        <VisibilityOffIcon
+          fontSize="small"
+          style={{ marginRight: 5, verticalAlign: 'bottom' }}
+        />
+      </Tooltip>
+      <span title={eventsFunction.getName()}>{eventsFunction.getName()}</span>
+    </>
+  ) : (
+    eventsFunction.getName()
+  );
+
 const getEventsFunctionName = (eventsFunction: gdEventsFunction) =>
-  eventsFunction.getName() + (eventsFunction.isPrivate() ? ' (private)' : '');
+  eventsFunction.getName();
 
 type State = {|
   renamedEventsFunction: ?gdEventsFunction,
@@ -123,6 +140,46 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     );
   };
 
+  _getFunctionThumbnail = (eventsFunction: gdEventsFunction) => {
+    switch (eventsFunction.getFunctionType()) {
+      default:
+        return 'res/functions/function.svg';
+      case gd.EventsFunction.Action:
+        switch (eventsFunction.getName()) {
+          default:
+            return 'res/functions/action.svg';
+
+          case 'onSceneUnloading':
+          case 'onDestroy':
+            return 'res/functions/destroy.svg';
+
+          case 'onSceneResumed':
+          case 'onActivate':
+            return 'res/functions/activate.svg';
+
+          case 'onScenePaused':
+          case 'onDeActivate':
+            return 'res/functions/deactivate.svg';
+
+          case 'onScenePreEvents':
+          case 'onScenePostEvents':
+          case 'doStepPreEvents':
+          case 'doStepPostEvents':
+            return 'res/functions/step.svg';
+
+          case 'onSceneLoaded':
+          case 'onFirstSceneLoaded':
+          case 'onCreated':
+            return 'res/functions/create.svg';
+        }
+      case gd.EventsFunction.Condition:
+        return 'res/functions/condition.svg';
+      case gd.EventsFunction.Expression:
+        return 'res/functions/expression.svg';
+      case gd.EventsFunction.StringExpression:
+        return 'res/functions/expression.svg';
+    }
+  };
   _rename = (eventsFunction: gdEventsFunction, newName: string) => {
     const { eventsFunctionsContainer } = this.props;
     this.setState({
@@ -210,6 +267,28 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     this.props.onEventsFunctionAdded(newEventsFunction);
 
     this._onEventsFunctionModified();
+    this.props.onSelectEventsFunction(newEventsFunction);
+    this._editName(newEventsFunction);
+  };
+
+  _duplicateEventsFunction = (
+    eventsFunction: gdEventsFunction,
+    newFunctionIndex: number
+  ) => {
+    const { eventsFunctionsContainer } = this.props;
+    const newName = newNameGenerator(eventsFunction.getName(), name =>
+      eventsFunctionsContainer.hasEventsFunctionNamed(name)
+    );
+    const newEventsFunction = eventsFunctionsContainer.insertEventsFunction(
+      eventsFunction,
+      newFunctionIndex
+    );
+    newEventsFunction.setName(newName);
+    this.props.onEventsFunctionAdded(newEventsFunction);
+
+    this._onEventsFunctionModified();
+    this.props.onSelectEventsFunction(newEventsFunction);
+    this._editName(newEventsFunction);
   };
 
   _onEventsFunctionModified() {
@@ -232,10 +311,11 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
         label: eventsFunction.isPrivate()
           ? i18n._(t`Make public`)
           : i18n._(t`Make private`),
+        enabled: this.props.canRename(eventsFunction),
         click: () => this._togglePrivate(eventsFunction),
       },
       {
-        label: i18n._(t`Remove`),
+        label: i18n._(t`Delete`),
         click: () =>
           this._deleteEventsFunction(eventsFunction, {
             askForConfirmation: true,
@@ -255,7 +335,11 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       {
         label: i18n._(t`Paste`),
         enabled: Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND),
-        click: () => this._pasteEventsFunction(index),
+        click: () => this._pasteEventsFunction(index + 1),
+      },
+      {
+        label: i18n._(t`Duplicate`),
+        click: () => this._duplicateEventsFunction(eventsFunction, index + 1),
       },
     ];
   };
@@ -282,6 +366,11 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
         eventsFunction.setFunctionType(parameters.functionType);
         this.props.onEventsFunctionAdded(eventsFunction);
         this._onEventsFunctionModified();
+
+        this.props.onSelectEventsFunction(eventsFunction);
+        if (this.props.canRename(eventsFunction)) {
+          this._editName(eventsFunction);
+        }
       }
     );
   };
@@ -322,7 +411,9 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
                     height={height}
                     onAddNewItem={this._addNewEventsFunction}
                     addNewItemLabel={<Trans>Add a new function</Trans>}
+                    renderItemLabel={renderEventsFunctionLabel}
                     getItemName={getEventsFunctionName}
+                    getItemThumbnail={this._getFunctionThumbnail}
                     selectedItems={
                       selectedEventsFunction ? [selectedEventsFunction] : []
                     }
@@ -348,6 +439,8 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
               searchText: text,
             })
           }
+          aspect="integrated-search-bar"
+          placeholder={t`Search functions`}
         />
       </Background>
     );

@@ -18,9 +18,10 @@ type MainMenuEvent =
   | 'main-menu-close'
   | 'main-menu-close-app'
   | 'main-menu-export'
-  | 'main-menu-create'
+  | 'main-menu-create-blank'
+  | 'main-menu-create-template'
   | 'main-menu-open-project-manager'
-  | 'main-menu-open-start-page'
+  | 'main-menu-open-home-page'
   | 'main-menu-open-debugger'
   | 'main-menu-open-about'
   | 'main-menu-open-preferences'
@@ -91,9 +92,20 @@ const buildAndSendMenuTemplate = (
     label: i18n._(t`File`),
     submenu: [
       {
-        label: i18n._(t`Create a New Project...`),
-        accelerator: getElectronAccelerator(shortcutMap['CREATE_NEW_PROJECT']),
-        onClickSendEvent: 'main-menu-create',
+        label: i18n._(t`Create`),
+        submenu: [
+          {
+            label: i18n._(t`New empty project...`),
+            accelerator: getElectronAccelerator(
+              shortcutMap['CREATE_NEW_PROJECT']
+            ),
+            onClickSendEvent: 'main-menu-create-blank',
+          },
+          {
+            label: i18n._(t`New project from template...`),
+            onClickSendEvent: 'main-menu-create-template',
+          },
+        ],
       },
       { type: 'separator' },
       {
@@ -193,8 +205,8 @@ const buildAndSendMenuTemplate = (
         enabled: !!project,
       },
       {
-        label: i18n._(t`Show Start Page`),
-        onClickSendEvent: 'main-menu-open-start-page',
+        label: i18n._(t`Show Home`),
+        onClickSendEvent: 'main-menu-open-home-page',
       },
       {
         label: i18n._(t`Open Debugger`),
@@ -220,12 +232,12 @@ const buildAndSendMenuTemplate = (
     submenu: [
       {
         label: i18n._(t`GDevelop website`),
-        onClickOpenLink: 'http://gdevelop-app.com',
+        onClickOpenLink: 'http://gdevelop.io',
       },
       { type: 'separator' },
       {
         label: i18n._(t`Community Forums`),
-        onClickOpenLink: 'https://forum.gdevelop-app.com',
+        onClickOpenLink: 'https://forum.gdevelop.io',
       },
       {
         label: i18n._(t`Community Discord Chat`),
@@ -234,7 +246,7 @@ const buildAndSendMenuTemplate = (
       { type: 'separator' },
       {
         label: i18n._(t`Contribute to GDevelop`),
-        onClickOpenLink: 'https://gdevelop-app.com/contribute/',
+        onClickOpenLink: 'https://gdevelop.io/page/contribute',
       },
       {
         label: i18n._(t`Create Extensions for GDevelop`),
@@ -342,12 +354,13 @@ const ElectronMainMenu = (props: MainMenuProps) => {
   useIPCEventListener('main-menu-close', props.onCloseProject);
   useIPCEventListener('main-menu-close-app', props.onCloseApp);
   useIPCEventListener('main-menu-export', props.onExportProject);
-  useIPCEventListener('main-menu-create', props.onCreateProject);
+  useIPCEventListener('main-menu-create-template', props.onCreateProject);
+  useIPCEventListener('main-menu-create-blank', props.onCreateBlank);
   useIPCEventListener(
     'main-menu-open-project-manager',
     props.onOpenProjectManager
   );
-  useIPCEventListener('main-menu-open-start-page', props.onOpenStartPage);
+  useIPCEventListener('main-menu-open-home-page', props.onOpenHomePage);
   useIPCEventListener('main-menu-open-debugger', props.onOpenDebugger);
   useIPCEventListener('main-menu-open-about', props.onOpenAbout);
   useIPCEventListener('main-menu-open-preferences', props.onOpenPreferences);
@@ -357,7 +370,7 @@ const ElectronMainMenu = (props: MainMenuProps) => {
     'main-menu-open-games-dashboard',
     props.onOpenGamesDashboard
   );
-  useIPCEventListener('update-status', props.setUpdateStatus);
+  useIPCEventListener('update-status', props.setElectronUpdateStatus);
 
   React.useEffect(
     () => {

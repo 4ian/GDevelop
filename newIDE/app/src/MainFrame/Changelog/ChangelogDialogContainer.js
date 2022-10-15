@@ -3,47 +3,30 @@ import * as React from 'react';
 import ChangelogDialog from './ChangelogDialog';
 import PreferencesContext from '../Preferences/PreferencesContext';
 
-type ContainerProps = {|
+type InnerContainerProps = {|
   defaultOpen: boolean,
 |};
 
-type ContainerState = {|
-  open: boolean,
-|};
+const ChangelogDialogInnerContainer = ({
+  defaultOpen,
+}: InnerContainerProps) => {
+  const [open, setOpen] = React.useState(defaultOpen);
 
-class ChangelogDialogContainer extends React.Component<
-  ContainerProps,
-  ContainerState
-> {
-  state = {
-    open: this.props.defaultOpen,
-  };
-
-  render() {
-    const { open } = this.state;
-    return (
-      <ChangelogDialog
-        open={open}
-        onClose={() =>
-          this.setState({
-            open: false,
-          })
-        }
-      />
-    );
-  }
-}
+  return <ChangelogDialog open={open} onClose={() => setOpen(false)} />;
+};
 
 /**
  * The container showing the ChangelogDialog only if a a new version
  * of GDevelop is detected.
  */
-export default (props: {||}) => (
+const ChangelogDialogContainer = (props: {||}) => (
   <PreferencesContext.Consumer>
     {({ values, verifyIfIsNewVersion }) => (
-      <ChangelogDialogContainer
+      <ChangelogDialogInnerContainer
         defaultOpen={verifyIfIsNewVersion() && values.autoDisplayChangelog}
       />
     )}
   </PreferencesContext.Consumer>
 );
+
+export default ChangelogDialogContainer;

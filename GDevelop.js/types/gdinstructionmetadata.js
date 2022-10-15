@@ -15,6 +15,8 @@ declare class gdInstructionMetadata {
   getUsageComplexity(): number;
   isHidden(): boolean;
   isPrivate(): boolean;
+  isAsync(): boolean;
+  isOptionallyAsync(): boolean;
   setCanHaveSubInstructions(): gdInstructionMetadata;
   setHelpPath(helpPath: string): gdInstructionMetadata;
   setHidden(): gdInstructionMetadata;
@@ -26,6 +28,8 @@ declare class gdInstructionMetadata {
   setParameterExtraInfo(extraInfo: string): gdInstructionMetadata;
   useStandardOperatorParameters(type: string): gdInstructionMetadata;
   useStandardRelationalOperatorParameters(type: string): gdInstructionMetadata;
+  setRequiresBaseObjectCapability(capability: string): gdInstructionMetadata;
+  getRequiredBaseObjectCapability(): string;
   markAsSimple(): gdInstructionMetadata;
   markAsAdvanced(): gdInstructionMetadata;
   markAsComplex(): gdInstructionMetadata;

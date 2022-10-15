@@ -7,11 +7,9 @@ import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { type EditorProps } from './EditorProps.flow';
-import { Column, Line } from '../../UI/Grid';
-import {
-  getExtraObjectsInformation,
-  getObjectTutorialHints,
-} from '../../Hints';
+import { Line } from '../../UI/Grid';
+import { getExtraObjectsInformation } from '../../Hints';
+import { getObjectTutorialIds } from '../../Utils/GDevelopServices/Tutorial';
 import AlertMessage from '../../UI/AlertMessage';
 import { ColumnStackLayout } from '../../UI/Layout';
 import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
@@ -20,80 +18,84 @@ const gd: libGDevelop = global.gd;
 
 type Props = EditorProps;
 
-export default class ObjectPropertiesEditor extends React.Component<Props> {
-  render() {
-    const {
-      object,
-      project,
-      resourceSources,
-      onChooseResource,
-      resourceExternalEditors,
-    } = this.props;
+const ObjectPropertiesEditor = (props: Props) => {
+  const {
+    objectConfiguration,
+    project,
+    resourceSources,
+    onChooseResource,
+    resourceExternalEditors,
+    unsavedChanges,
+  } = props;
 
-    // TODO: Workaround a bad design of ObjectJsImplementation. When getProperties
-    // and associated methods are redefined in JS, they have different arguments (
-    // see ObjectJsImplementation C++ implementation). If called directly here from JS,
-    // the arguments will be mismatched. To workaround this, always case the object to
-    // a base gdObject to ensure C++ methods are called.
-    const objectAsGdObject = gd.castObject(object, gd.gdObject);
-    const properties = objectAsGdObject.getProperties();
+  // TODO: Workaround a bad design of ObjectJsImplementation. When getProperties
+  // and associated methods are redefined in JS, they have different arguments (
+  // see ObjectJsImplementation C++ implementation). If called directly here from JS,
+  // the arguments will be mismatched. To workaround this, always case the object to
+  // a base gdObject to ensure C++ methods are called.
+  const objectConfigurationAsGd = gd.castObject(
+    objectConfiguration,
+    gd.ObjectConfiguration
+  );
+  const properties = objectConfigurationAsGd.getProperties();
 
-    const propertiesSchema = propertiesMapToSchema(
-      properties,
-      object => object.getProperties(),
-      (object, name, value) => object.updateProperty(name, value)
-    );
+  const propertiesSchema = propertiesMapToSchema(
+    properties,
+    object => object.getProperties(),
+    (object, name, value) => object.updateProperty(name, value)
+  );
 
-    const extraInformation = getExtraObjectsInformation()[
-      objectAsGdObject.getType()
-    ];
+  const extraInformation = getExtraObjectsInformation()[
+    objectConfigurationAsGd.getType()
+  ];
 
-    const tutorialHints = getObjectTutorialHints(objectAsGdObject.getType());
+  const tutorialIds = getObjectTutorialIds(objectConfigurationAsGd.getType());
 
-    return (
-      <I18n>
-        {({ i18n }) => (
-          <ColumnStackLayout>
-            {tutorialHints.map(tutorialHint => (
-              <DismissableTutorialMessage
-                key={tutorialHint.identifier}
-                tutorialHint={tutorialHint}
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <ColumnStackLayout>
+          {tutorialIds.map(tutorialId => (
+            <DismissableTutorialMessage
+              key={tutorialId}
+              tutorialId={tutorialId}
+            />
+          ))}
+          {propertiesSchema.length ? (
+            <React.Fragment>
+              {extraInformation ? (
+                <Line>
+                  <ColumnStackLayout noMargin>
+                    {extraInformation.map(({ kind, message }, index) => (
+                      <AlertMessage kind={kind} key={index}>
+                        {i18n._(message)}
+                      </AlertMessage>
+                    ))}
+                  </ColumnStackLayout>
+                </Line>
+              ) : null}
+              <PropertiesEditor
+                unsavedChanges={unsavedChanges}
+                schema={propertiesSchema}
+                instances={[objectConfigurationAsGd]}
+                project={project}
+                resourceSources={resourceSources}
+                onChooseResource={onChooseResource}
+                resourceExternalEditors={resourceExternalEditors}
               />
-            ))}
-            {propertiesSchema.length ? (
-              <React.Fragment>
-                {extraInformation ? (
-                  <Line>
-                    <Column noMargin>
-                      {extraInformation.map(({ kind, message }, index) => (
-                        <AlertMessage kind={kind} key={index}>
-                          {i18n._(message)}
-                        </AlertMessage>
-                      ))}
-                    </Column>
-                  </Line>
-                ) : null}
-                <PropertiesEditor
-                  unsavedChanges={this.props.unsavedChanges}
-                  schema={propertiesSchema}
-                  instances={[objectAsGdObject]}
-                  project={project}
-                  resourceSources={resourceSources}
-                  onChooseResource={onChooseResource}
-                  resourceExternalEditors={resourceExternalEditors}
-                />
-              </React.Fragment>
-            ) : (
-              <EmptyMessage>
-                <Trans>
-                  There is nothing to configure for this object. You can still
-                  use events to interact with the object.
-                </Trans>
-              </EmptyMessage>
-            )}
-          </ColumnStackLayout>
-        )}
-      </I18n>
-    );
-  }
-}
+            </React.Fragment>
+          ) : (
+            <EmptyMessage>
+              <Trans>
+                There is nothing to configure for this object. You can still use
+                events to interact with the object.
+              </Trans>
+            </EmptyMessage>
+          )}
+        </ColumnStackLayout>
+      )}
+    </I18n>
+  );
+};
+
+export default ObjectPropertiesEditor;

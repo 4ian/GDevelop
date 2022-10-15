@@ -3,8 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
-import RaisedButton from '../UI/RaisedButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { Column } from '../UI/Grid';
 import TextField from '../UI/TextField';
 import {
@@ -42,7 +41,13 @@ export default class LoginDialog extends Component<Props, State> {
     },
   };
 
+  _canLogin = () => {
+    return !(this.props.loginInProgress || this.props.forgotPasswordInProgress);
+  };
+
   _onLogin = () => {
+    if (!this._canLogin()) return;
+
     const { form } = this.state;
     this.props.onLogin(form);
   };
@@ -65,17 +70,17 @@ export default class LoginDialog extends Component<Props, State> {
     const actions = [
       <FlatButton
         label={<Trans>Back</Trans>}
-        disabled={loginInProgress || forgotPasswordInProgress}
+        disabled={!this._canLogin()}
         key="back"
         primary={false}
         onClick={onClose}
       />,
       <LeftLoader isLoading={loginInProgress} key="login">
-        <RaisedButton
+        <DialogPrimaryButton
           label={<Trans>Login</Trans>}
           primary
           onClick={this._onLogin}
-          disabled={loginInProgress || forgotPasswordInProgress}
+          disabled={!this._canLogin()}
         />
       </LeftLoader>,
     ];
@@ -97,11 +102,10 @@ export default class LoginDialog extends Component<Props, State> {
             />
           </RightLoader>,
         ]}
-        onRequestClose={() => {
-          if (!loginInProgress && !forgotPasswordInProgress) onClose();
-        }}
+        cannotBeDismissed={loginInProgress || forgotPasswordInProgress}
+        onRequestClose={onClose}
+        onApply={this._onLogin}
         maxWidth="sm"
-        cannotBeDismissed={true}
         open
       >
         <ColumnStackLayout noMargin>
@@ -150,7 +154,6 @@ export default class LoginDialog extends Component<Props, State> {
           />
         </ColumnStackLayout>
         <Dialog
-          cannotBeDismissed={true}
           open={resetPasswordDialogOpen}
           title={<Trans>Reset your password</Trans>}
           actions={[
@@ -160,6 +163,8 @@ export default class LoginDialog extends Component<Props, State> {
               onClick={onCloseResetPasswordDialog}
             />,
           ]}
+          cannotBeDismissed={forgotPasswordInProgress}
+          onRequestClose={onCloseResetPasswordDialog}
         >
           <Column noMargin>
             <Text>

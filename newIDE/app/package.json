@@ -7,32 +7,35 @@
   "devDependencies": {
     "@lingui/cli": "^2.7.3",
     "@lingui/macro": "^2.7.3",
-    "@storybook/addon-essentials": "6.3.8",
-    "@storybook/react": "6.3.8",
+    "@storybook/addon-essentials": "6.3.12",
+    "@storybook/react": "6.3.12",
     "axios-mock-adapter": "^1.19.0",
     "babel-core": "^7.0.0-bridge.0",
-    "babel-loader": "8.0.6",
+    "babel-loader": "8.1.0",
     "flow-bin": "0.131.0",
     "flow-coverage-report": "^0.4.0",
     "folder-hash": "^3.0.0",
     "follow-redirects": "^1.2.3",
     "iso-639-1": "^2.0.3",
     "minimist": "1.2.5",
+    "patch-package": "^6.4.7",
     "prettier": "1.15.3",
-    "react-scripts": "3.4.0",
-    "recursive-copy": "^2.0.10",
+    "react-error-overlay": "^6.0.9",
+    "react-scripts": "4.0.3",
+    "recursive-copy": "^2.0.14",
     "recursive-readdir": "^2.2.2",
     "shelljs": "0.8.4",
+    "storybook-addon-mock": "^1.7.0",
     "style-dictionary": "^2.10.2",
     "typescript": "^4.1.3",
     "unzipper": "^0.9.11",
-    "webpack": "4.41.5",
+    "webpack": "4.44.2",
     "workbox-build": "^4.3.1"
   },
   "dependencies": {
     "@blueprintjs/core": "file:src/Utils/BlueprintJsPlaceholder",
     "@blueprintjs/icons": "file:src/Utils/BlueprintJsPlaceholder",
-    "@lingui/react": "git://github.com/4ian/lingui-react.git#master",
+    "@lingui/react": "github:4ian/lingui-react#master",
     "@material-ui/core": "4.11.0",
     "@material-ui/icons": "4.9.1",
     "@material-ui/lab": "4.0.0-alpha.56",
@@ -46,42 +49,47 @@
     "element-closest": "2.0.2",
     "firebase": "9.0.0-beta.2",
     "fontfaceobserver": "2.0.13",
+    "fuse.js": "^6.5.3",
     "js-worker-search": "^1.4.1",
     "jss-rtl": "^0.3.0",
     "keen-tracking": "1.1.3",
     "lodash": "4.17.4",
     "node-require-function": "^1.2.0",
-    "pixi-simple-gesture": "git://github.com/4ian/pixi-simple-gesture#v0.3.3",
+    "pixi-simple-gesture": "github:4ian/pixi-simple-gesture#v0.3.3",
     "pixi.js-legacy": "^6.1.2",
+    "posthog-js": "^1.20.4",
     "prop-types": "^15.5.10",
     "randomcolor": "^0.5.3",
     "raven-js": "^3.19.1",
-    "react": "16.8.6",
+    "react": "16.14.0",
     "react-color": "2.13.8",
     "react-dnd": "7.7.0",
     "react-dnd-html5-backend": "7.7.0",
     "react-dnd-multi-backend": "3.2.2",
     "react-dnd-touch-backend": "0.8.3",
-    "react-dom": "16.8.6",
+    "react-dom": "16.14.0",
     "react-error-boundary": "^1.2.0",
     "react-json-view": "^1.16.1",
     "react-markdown": "^4.0.6",
     "react-measure": "2.3.0",
     "react-monaco-editor": "^0.18.0",
-    "react-mosaic-component": "git://github.com/4ian/react-mosaic#v3.1.0",
+    "react-mosaic-component": "github:4ian/react-mosaic#v3.1.0",
+    "react-share": "^4.4.0",
     "react-sortable-hoc": "1.5.0",
     "react-sortable-tree": "2.6.2",
-    "react-test-renderer": "16.8.6",
+    "react-test-renderer": "16.14.0",
     "react-virtualized": "9.21.1",
+    "recharts": "^2.1.10",
     "semver": "7.0.0",
     "slugs": "0.1.3",
     "source-map-explorer": "^2.0.1",
     "url-search-params": "^1.0.2",
+    "userflow.js": "^2.2.0",
     "wait-promise": "0.4.1",
     "xxhashjs": "^0.2.2"
   },
   "scripts": {
-    "postinstall": "cd ../../GDJS && npm install && cd ../newIDE/app && npm run import-resources && npm run make-version-metadata",
+    "postinstall": "patch-package && cd ../../GDJS && npm install && cd ../newIDE/app && npm run import-resources && npm run make-version-metadata",
     "import-resources": "npm run import-zipped-external-editors && npm run build-theme-resources && cd scripts && node import-libGD.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-external-libs.js",
     "make-version-metadata": "cd scripts && node make-version-metadata.js",
     "make-service-worker": "cd scripts && node make-service-worker.js",
@@ -103,10 +111,41 @@
     "reload-extensions": "node scripts/import-GDJS-Runtime.js --skip-clean",
     "build-theme-resources": "node scripts/build-theme-resources.js",
     "create-new-theme": "node scripts/create-new-theme.js",
-    "import-zipped-external-editors": "cd scripts && node import-zipped-editor.js piskel 5.0.0-beta82 b8e4d57b160ff93d3680168cd271af795412ea6c4c0da321aee2946345c7fb75 && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6 && node import-zipped-editor.js yarn 5.0.0-beta103 155f6d074dbb025b082ede0f9b6acd55ed293457441f4c55f084c2d27fbda61d"
+    "import-zipped-external-editors": "cd scripts && node import-zipped-editor.js piskel 5.0.0-beta82 b8e4d57b160ff93d3680168cd271af795412ea6c4c0da321aee2946345c7fb75 && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6 && node import-zipped-editor.js yarn 5.0.134 ba8558cad00ec9b18cf3c6fd8647f8c1478ca67c894bca94a152a3740af209cc"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "rules": {
+      "no-restricted-imports": [
+        "error",
+        {
+          "paths": [
+            {
+              "name": "@lingui/react",
+              "importNames": [
+                "Trans"
+              ],
+              "message": "Please import Trans from @lingui/macro"
+            },
+            {
+              "name": "prop-types",
+              "message": "Don't import anything from prop-types - use Flow/TypeScript types instead."
+            }
+          ]
+        }
+      ]
+    },
+    "overrides": [
+      {
+        "files": [
+          "src/stories/componentStories/**/*.stories.js",
+          "src/stories/*.stories.js"
+        ],
+        "rules": {
+          "import/no-anonymous-default-export": "off"
+        }
+      }
+    ]
   },
   "flow-coverage-report": {
     "includeGlob": [

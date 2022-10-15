@@ -22,6 +22,7 @@ exports[`HelpButton renders the button linking to a GDevelop documentation help 
   onTouchStart={[Function]}
   tabIndex={0}
   target="_blank"
+  translate="yes"
   type="button"
 >
   <span
@@ -41,8 +42,8 @@ exports[`HelpButton renders the button linking to a GDevelop documentation help 
       style={
         Object {
           "flexShrink": 0,
-          "height": 4,
-          "width": 4,
+          "height": 8,
+          "width": 8,
         }
       }
     />

@@ -23,6 +23,7 @@ import axios from 'axios';
 import { useIsMounted } from '../../Utils/UseIsMounted';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { UsersAutocomplete } from '../../Utils/UsersAutocomplete';
+import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 
 const downloadSvgAsBase64 = async (url: string): Promise<string> => {
   try {
@@ -180,6 +181,9 @@ export const ExtensionOptionsEditor = ({
             fullWidth
             rows={5}
             rowsMax={15}
+            helperMarkdownText={i18n._(
+              t`Explain and give some examples of what can be achieved with this extension.`
+            )}
           />
           <TextField
             floatingLabelText={<Trans>Version</Trans>}
@@ -189,6 +193,65 @@ export const ExtensionOptionsEditor = ({
               forceUpdate();
             }}
             fullWidth
+          />
+          <SemiControlledAutoComplete
+            floatingLabelText={<Trans>Category (shown in the editor)</Trans>}
+            fullWidth
+            value={eventsFunctionsExtension.getCategory()}
+            onChange={category => {
+              eventsFunctionsExtension.setCategory(category);
+              forceUpdate();
+            }}
+            dataSource={[
+              {
+                text: '',
+                value: 'General',
+              },
+              {
+                text: 'Ads',
+                value: 'Ads',
+              },
+              {
+                text: 'Visual effect',
+                value: 'Visual effect',
+              },
+              {
+                text: 'Audio',
+                value: 'Audio',
+              },
+              {
+                text: 'Advanced',
+                value: 'Advanced',
+              },
+              {
+                text: 'Camera',
+                value: 'Camera',
+              },
+              {
+                text: 'Input',
+                value: 'Input',
+              },
+              {
+                text: 'Game mechanic',
+                value: 'Game mechanic',
+              },
+              {
+                text: 'Movement',
+                value: 'Movement',
+              },
+              {
+                text: 'Network',
+                value: 'Network',
+              },
+              {
+                text: 'Third-party',
+                value: 'Third-party',
+              },
+              {
+                text: 'User interface',
+                value: 'User interface',
+              },
+            ]}
           />
           <SemiControlledTextField
             floatingLabelText={<Trans>Tags (comma separated)</Trans>}
@@ -219,7 +282,12 @@ export const ExtensionOptionsEditor = ({
             }}
           />
           <UsersAutocomplete
-            userIds={eventsFunctionsExtension.getAuthorIds()}
+            userIds={eventsFunctionsExtension.getAuthorIds().toJSArray()}
+            onChange={userIds => {
+              const projectAuthorIds = eventsFunctionsExtension.getAuthorIds();
+              projectAuthorIds.clear();
+              userIds.forEach(userId => projectAuthorIds.push_back(userId));
+            }}
             floatingLabelText={<Trans>Authors</Trans>}
             helperText={
               <Trans>
@@ -242,9 +310,11 @@ export const ExtensionOptionsEditor = ({
                   }}
                 />,
               ]}
-              cannotBeDismissed={false}
               open
               noMargin
+              onRequestClose={() => {
+                setResourceStoreOpen(false);
+              }}
             >
               <ResourceStore
                 onChoose={resource => {

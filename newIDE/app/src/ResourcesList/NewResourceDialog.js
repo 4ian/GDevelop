@@ -13,14 +13,13 @@ import FlatButton from '../UI/FlatButton';
 import { Column, Line } from '../UI/Grid';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
-import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
-import Window from '../Utils/Window';
-import optionalRequire from '../Utils/OptionalRequire';
-
-const electron = optionalRequire('electron');
+import Toggle from '../UI/Toggle';
+import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 
 type Props = {|
   project: gdProject,
+  fileMetadata: ?FileMetadata,
+  getStorageProvider: () => StorageProvider,
   i18n: I18nType,
   options: ChooseResourceOptions,
   resourceSources: Array<ResourceSource>,
@@ -30,13 +29,14 @@ type Props = {|
 
 export const NewResourceDialog = ({
   project,
+  fileMetadata,
+  getStorageProvider,
   options,
   i18n,
   resourceSources,
   onClose,
   onChooseResources,
 }: Props) => {
-  const screenType = useScreenType();
   const preferences = React.useContext(PreferencesContext);
   const possibleResourceSources = resourceSources.filter(
     ({ kind }) => kind === options.resourceKind
@@ -46,6 +46,9 @@ export const NewResourceDialog = ({
   );
   const importTabResourceSources = possibleResourceSources.filter(
     ({ displayTab }) => displayTab === 'import'
+  );
+  const importTabAdvancedResourceSources = possibleResourceSources.filter(
+    ({ displayTab }) => displayTab === 'import-advanced'
   );
   const initialSource = possibleResourceSources.find(
     ({ name }) => name === options.initialSourceName
@@ -62,6 +65,7 @@ export const NewResourceDialog = ({
 
     return 'import';
   });
+  const [isShowingAdvanced, setIsShowingAdvanced] = React.useState(false);
 
   React.useEffect(
     () => {
@@ -75,6 +79,8 @@ export const NewResourceDialog = ({
             i18n,
             options,
             project,
+            fileMetadata,
+            getStorageProvider,
             getLastUsedPath: preferences.getLastUsedPath,
             setLastUsedPath: preferences.setLastUsedPath,
           });
@@ -94,22 +100,8 @@ export const NewResourceDialog = ({
   return (
     <Dialog
       open
-      onRequestClose={onClose}
       fullHeight
       flexBody
-      secondaryActions={[
-        !electron && screenType !== 'touch' ? (
-          <FlatButton
-            key="download-gdevelop"
-            label={
-              <Trans>Download GDevelop to use images from your computer</Trans>
-            }
-            onClick={() =>
-              Window.openExternalURL('https://gdevelop-app.com/download')
-            }
-          />
-        ) : null,
-      ]}
       actions={[
         <FlatButton
           key="close"
@@ -118,14 +110,34 @@ export const NewResourceDialog = ({
           onClick={onClose}
         />,
       ]}
+      secondaryActions={[
+        importTabAdvancedResourceSources.length > 0 ? (
+          <Toggle
+            key="show-advanced-toggle"
+            onToggle={(e, check) => setIsShowingAdvanced(check)}
+            toggled={isShowingAdvanced}
+            labelPosition="right"
+            label={<Trans>Show advanced import options</Trans>}
+          />
+        ) : null,
+      ]}
+      onRequestClose={onClose}
       noMargin
     >
       <Column expand noMargin>
         <Tabs value={currentTab} onChange={setCurrentTab}>
           {standaloneTabResourceSources.map(({ name, displayName }) => (
-            <Tab label={i18n._(displayName)} value={'standalone-' + name} />
+            <Tab
+              label={i18n._(displayName)}
+              value={'standalone-' + name}
+              key={name}
+            />
           ))}
-          <Tab label={<Trans>Choose a file</Trans>} value="import" />
+          <Tab
+            label={<Trans>Choose a file</Trans>}
+            value="import"
+            key="import"
+          />
         </Tabs>
         {standaloneTabResourceSources.map(source => {
           if (currentTab !== 'standalone-' + source.name) return null;
@@ -134,6 +146,8 @@ export const NewResourceDialog = ({
             i18n,
             options,
             project,
+            fileMetadata,
+            getStorageProvider,
             getLastUsedPath: preferences.getLastUsedPath,
             setLastUsedPath: preferences.setLastUsedPath,
             onChooseResources,
@@ -143,18 +157,36 @@ export const NewResourceDialog = ({
           <Line expand>
             <ColumnStackLayout expand>
               {importTabResourceSources.map(source => (
-                <>
-                  <Text size="title">{i18n._(source.displayName)}</Text>
+                <React.Fragment key={source.name}>
+                  <Text size="block-title">{i18n._(source.displayName)}</Text>
                   {source.renderComponent({
                     i18n,
                     options,
                     project,
+                    fileMetadata,
+                    getStorageProvider,
                     getLastUsedPath: preferences.getLastUsedPath,
                     setLastUsedPath: preferences.setLastUsedPath,
                     onChooseResources,
                   })}
-                </>
+                </React.Fragment>
               ))}
+              {isShowingAdvanced &&
+                importTabAdvancedResourceSources.map(source => (
+                  <React.Fragment key={source.name}>
+                    <Text size="block-title">{i18n._(source.displayName)}</Text>
+                    {source.renderComponent({
+                      i18n,
+                      options,
+                      project,
+                      fileMetadata,
+                      getStorageProvider,
+                      getLastUsedPath: preferences.getLastUsedPath,
+                      setLastUsedPath: preferences.setLastUsedPath,
+                      onChooseResources,
+                    })}
+                  </React.Fragment>
+                ))}
             </ColumnStackLayout>
           </Line>
         ) : null}

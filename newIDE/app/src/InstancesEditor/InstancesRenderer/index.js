@@ -4,12 +4,23 @@ import ViewPosition from '../ViewPosition';
 import * as PIXI from 'pixi.js-legacy';
 import Rectangle from '../../Utils/Rectangle';
 
+export type InstanceMeasurer = {|
+  getInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
+  getUnrotatedInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
+|};
+
 export default class InstancesRenderer {
   project: gdProject;
   instances: gdInitialInstancesContainer;
   layout: gdLayout;
   viewPosition: ViewPosition;
   onInstanceClicked: gdInitialInstance => void;
+  onInstanceRightClicked: ({|
+    offsetX: number,
+    offsetY: number,
+    x: number,
+    y: number,
+  |}) => void;
   onInstanceDoubleClicked: gdInitialInstance => void;
   onOverInstance: gdInitialInstance => void;
   onOutInstance: gdInitialInstance => void;
@@ -22,7 +33,7 @@ export default class InstancesRenderer {
   pixiContainer: PIXI.Container;
 
   temporaryRectangle: Rectangle;
-  instanceMeasurer: any;
+  instanceMeasurer: InstanceMeasurer;
 
   constructor({
     project,
@@ -30,6 +41,7 @@ export default class InstancesRenderer {
     instances,
     viewPosition,
     onInstanceClicked,
+    onInstanceRightClicked,
     onInstanceDoubleClicked,
     onOverInstance,
     onOutInstance,
@@ -42,6 +54,12 @@ export default class InstancesRenderer {
     layout: gdLayout,
     viewPosition: ViewPosition,
     onInstanceClicked: gdInitialInstance => void,
+    onInstanceRightClicked: ({|
+      offsetX: number,
+      offsetY: number,
+      x: number,
+      y: number,
+    |}) => void,
     onInstanceDoubleClicked: gdInitialInstance => void,
     onOverInstance: gdInitialInstance => void,
     onOutInstance: gdInitialInstance => void,
@@ -54,6 +72,7 @@ export default class InstancesRenderer {
     this.layout = layout;
     this.viewPosition = viewPosition;
     this.onInstanceClicked = onInstanceClicked;
+    this.onInstanceRightClicked = onInstanceRightClicked;
     this.onInstanceDoubleClicked = onInstanceDoubleClicked;
     this.onOverInstance = onOverInstance;
     this.onOutInstance = onOutInstance;
@@ -94,19 +113,6 @@ export default class InstancesRenderer {
 
         return layerRenderer.getUnrotatedInstanceAABB(instance, bounds);
       },
-      //TODO Replace by getInstanceAABB (make TransformRect uses Rectangle)
-      getInstanceRect: instance => {
-        const aabb = this.instanceMeasurer.getInstanceAABB(
-          instance,
-          this.temporaryRectangle
-        );
-        return {
-          x: aabb.left,
-          y: aabb.top,
-          width: aabb.width(),
-          height: aabb.height(),
-        };
-      },
     };
   }
 
@@ -132,6 +138,7 @@ export default class InstancesRenderer {
           viewPosition: this.viewPosition,
           layer: layer,
           onInstanceClicked: this.onInstanceClicked,
+          onInstanceRightClicked: this.onInstanceRightClicked,
           onInstanceDoubleClicked: this.onInstanceDoubleClicked,
           onOverInstance: this.onOverInstance,
           onOutInstance: this.onOutInstance,

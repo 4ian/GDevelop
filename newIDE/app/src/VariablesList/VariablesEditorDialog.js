@@ -2,13 +2,15 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
-import VariablesList from './index';
-import useForceUpdate from '../Utils/UseForceUpdate';
 import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
+import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
+import { Column, Line } from '../UI/Grid';
+import VariablesList from './VariablesList';
+import HelpButton from '../UI/HelpButton';
 
 type Props = {|
   onCancel: () => void,
@@ -16,11 +18,13 @@ type Props = {|
   open: boolean,
   onEditObjectVariables?: () => void,
   title: React.Node,
-  emptyExplanationMessage?: React.Node,
-  emptyExplanationSecondMessage?: React.Node,
+  emptyPlaceholderTitle?: React.Node,
+  emptyPlaceholderDescription?: React.Node,
   variablesContainer: gdVariablesContainer,
+  inheritedVariablesContainer?: gdVariablesContainer,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
   onComputeAllVariableNames: () => Array<string>,
+  helpPagePath: ?string,
 |};
 
 const VariablesEditorDialog = ({
@@ -29,39 +33,38 @@ const VariablesEditorDialog = ({
   open,
   onEditObjectVariables,
   title,
-  emptyExplanationMessage,
-  emptyExplanationSecondMessage,
+  emptyPlaceholderTitle,
+  emptyPlaceholderDescription,
   variablesContainer,
+  inheritedVariablesContainer,
   hotReloadPreviewButtonProps,
   onComputeAllVariableNames,
+  helpPagePath,
 }: Props) => {
-  const forceUpdate = useForceUpdate();
   const onCancelChanges = useSerializableObjectCancelableEditor({
     serializableObject: variablesContainer,
     onCancel,
   });
+  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
+    'intro-variables'
+  );
 
   return (
     <Dialog
-      onApply={onApply}
       noMargin
       actions={[
         <FlatButton
           label={<Trans>Cancel</Trans>}
           onClick={onCancelChanges}
-          key={'Cancel'}
+          key="Cancel"
         />,
-        <FlatButton
+        <DialogPrimaryButton
           label={<Trans>Apply</Trans>}
           primary
-          keyboardFocused
           onClick={onApply}
-          key={'Apply'}
+          key="Apply"
         />,
       ]}
-      open={open}
-      cannotBeDismissed={true}
-      onRequestClose={onCancelChanges}
       secondaryActions={[
         onEditObjectVariables ? (
           <FlatButton
@@ -77,25 +80,33 @@ const VariablesEditorDialog = ({
             {...hotReloadPreviewButtonProps}
           />
         ) : null,
+        helpPagePath ? (
+          <HelpButton helpPagePath={helpPagePath} key="help" />
+        ) : null,
       ]}
+      onRequestClose={onCancelChanges}
+      onApply={onApply}
+      open={open}
       title={title}
+      flexBody
+      fullHeight
     >
-      <VariablesList
-        commitVariableValueOnBlur={
-          // Reduce the number of re-renders by saving the variable value only when the field is blurred.
-          // We don't do that by default because the VariablesList can be used in a component like
-          // InstancePropertiesEditor, that can be unmounted at any time, before the text fields get a
-          // chance to be blurred.
-          true
-        }
-        variablesContainer={variablesContainer}
-        emptyExplanationMessage={emptyExplanationMessage}
-        emptyExplanationSecondMessage={emptyExplanationSecondMessage}
-        onSizeUpdated={
-          forceUpdate /*Force update to ensure dialog is properly positioned*/
-        }
-        onComputeAllVariableNames={onComputeAllVariableNames}
-      />
+      <Column expand noMargin>
+        {variablesContainer.count() > 0 && DismissableTutorialMessage && (
+          <Line>
+            <Column expand>{DismissableTutorialMessage}</Column>
+          </Line>
+        )}
+        <VariablesList
+          commitChangesOnBlur
+          variablesContainer={variablesContainer}
+          inheritedVariablesContainer={inheritedVariablesContainer}
+          emptyPlaceholderTitle={emptyPlaceholderTitle}
+          emptyPlaceholderDescription={emptyPlaceholderDescription}
+          onComputeAllVariableNames={onComputeAllVariableNames}
+          helpPagePath={helpPagePath}
+        />
+      </Column>
     </Dialog>
   );
 };

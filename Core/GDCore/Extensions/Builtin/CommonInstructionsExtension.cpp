@@ -4,7 +4,6 @@
  * reserved. This project is released under the MIT License.
  */
 #include "AllBuiltinExtensions.h"
-#include "GDCore/Tools/Localization.h"
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
@@ -14,6 +13,7 @@
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Events/Builtin/WhileEvent.h"
 #include "GDCore/Events/Event.h"
+#include "GDCore/Tools/Localization.h"
 
 using namespace std;
 namespace gd {
@@ -24,21 +24,45 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
   extension
       .SetExtensionInformation(
           "BuiltinCommonInstructions",
-          _("Builtin events"),
+          _("Events and control flow"),
           "GDevelop comes with a set of events and conditions that allow to "
           "express the game logic and rules.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetCategory("Advanced")
       .SetExtensionHelpPath("/all-features/advanced-conditions");
+  extension
+      .AddInstructionOrExpressionGroupMetadata(_("Events and control flow"))
+      .SetIcon("res/conditions/toujours24_black.png");
+
+  extension
+      .AddCondition("Always",
+                    _("Always"),
+                    _("This condition always returns true (or always false, if "
+                      "the condition is inverted)."),
+                    _("Always"),
+                    "",
+                    "res/conditions/toujours24_black.png",
+                    "res/conditions/toujours_black.png")
+      .SetHelpPath("/all-features/advanced-conditions")
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.0.127
+  extension
+      .AddDuplicatedCondition(
+          "Toujours", "BuiltinCommonInstructions::Always", {.unscoped = true})
+      .SetHidden();
+  // end of compatibility code
 
   extension
       .AddCondition("Or",
                     _("Or"),
                     _("Check if one of the sub conditions is true"),
                     _("If one of these conditions is true:"),
-                    _("Advanced"),
-                    "res/conditions/or24.png",
-                    "res/conditions/or.png")
+                    "",
+                    "res/conditions/or24_black.png",
+                    "res/conditions/or_black.png")
       .SetCanHaveSubInstructions()
       .MarkAsAdvanced();
 
@@ -47,9 +71,9 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                     _("And"),
                     _("Check if all sub conditions are true"),
                     _("If all of these conditions are true:"),
-                    _("Advanced"),
-                    "res/conditions/and24.png",
-                    "res/conditions/and.png")
+                    "",
+                    "res/conditions/and24_black.png",
+                    "res/conditions/and_black.png")
       .SetCanHaveSubInstructions()
       .MarkAsAdvanced();
 
@@ -59,9 +83,9 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
           _("Not"),
           _("Return the contrary of the result of the sub conditions"),
           _("Invert the logical result of these conditions:"),
-          _("Advanced"),
-          "res/conditions/not24.png",
-          "res/conditions/not.png")
+          "",
+          "res/conditions/not24_black.png",
+          "res/conditions/not_black.png")
       .SetCanHaveSubInstructions()
       .MarkAsAdvanced();
 
@@ -70,9 +94,51 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       _("Trigger once while true"),
       _("Run actions only once, for each time the conditions have been met."),
       _("Trigger once"),
-      _("Advanced"),
+      "",
       "res/conditions/once24.png",
       "res/conditions/once.png");
+
+  extension
+      .AddCondition("CompareNumbers",
+                    _("Compare two numbers"),
+                    _("Compare the two numbers."),
+                    _("_PARAM0_ _PARAM1_ _PARAM2_"),
+                    "",
+                    "res/conditions/egal24_black.png",
+                    "res/conditions/egal_black.png")
+      .SetHelpPath("/all-features/advanced-conditions")
+      .AddParameter("expression", _("First expression"))
+      .AddParameter("relationalOperator", _("Sign of the test"), "number")
+      .AddParameter("expression", _("Second expression"))
+      .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.0.127
+  extension
+      .AddDuplicatedCondition(
+          "Egal", "BuiltinCommonInstructions::CompareNumbers", {.unscoped = true})
+      .SetHidden();
+  // end of compatibility code
+
+  extension
+      .AddCondition("CompareStrings",
+                    _("Compare two strings"),
+                    _("Compare the two strings."),
+                    _("_PARAM0_ _PARAM1_ _PARAM2_"),
+                    "",
+                    "res/conditions/egal24_black.png",
+                    "res/conditions/egal_black.png")
+      .SetHelpPath("/all-features/advanced-conditions")
+      .AddParameter("string", _("First string expression"))
+      .AddParameter("relationalOperator", _("Sign of the test"), "string")
+      .AddParameter("string", _("Second string expression"))
+      .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.0.127
+  extension
+      .AddDuplicatedCondition(
+          "StrEqual", "BuiltinCommonInstructions::CompareStrings", {.unscoped = true})
+      .SetHidden();
+  // end of compatibility code
 
   extension.AddEvent(
       "Standard",

@@ -33,11 +33,4 @@ gd::Platform* PlatformManager::GetPlatform(
   return NULL;
 }
 
-void PlatformManager::NotifyPlatformIDEInitialized() const {
-  for (std::size_t i = 0; i < platformsLoaded.size(); ++i) {
-    if (platformsLoaded[i] != std::shared_ptr<gd::Platform>())
-      platformsLoaded[i]->OnIDEInitialized();
-  }
-}
-
 }  // namespace gd

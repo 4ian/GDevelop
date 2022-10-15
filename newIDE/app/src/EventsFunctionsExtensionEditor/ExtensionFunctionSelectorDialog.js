@@ -11,7 +11,9 @@ import HelpButton from '../UI/HelpButton';
 import Create from '../UI/CustomSvgIcons/Behaviors/Create';
 import Step from '../UI/CustomSvgIcons/Behaviors/Step';
 import Destroy from '../UI/CustomSvgIcons/Behaviors/Destroy';
-import Function from '../UI/CustomSvgIcons/Behaviors/Function';
+import Action from '../UI/CustomSvgIcons/Behaviors/Action';
+import Condition from '../UI/CustomSvgIcons/Behaviors/Condition';
+import Expression from '../UI/CustomSvgIcons/Behaviors/Expression';
 import Activate from '../UI/CustomSvgIcons/Behaviors/Activate';
 import Deactivate from '../UI/CustomSvgIcons/Behaviors/Deactivate';
 import Visibility from '@material-ui/icons/Visibility';
@@ -76,7 +78,6 @@ export default function BehaviorMethodSelectorDialog({
           key={'close'}
         />,
       ]}
-      cannotBeDismissed={false}
       open
       noMargin
       title={<Trans>Choose a new extension function</Trans>}
@@ -84,7 +85,7 @@ export default function BehaviorMethodSelectorDialog({
     >
       <List>
         <FunctionListItem
-          icon={<Function style={styles.icon} />}
+          icon={<Action style={styles.icon} />}
           name={<Trans>Action</Trans>}
           onChoose={() =>
             onChoose({
@@ -100,7 +101,7 @@ export default function BehaviorMethodSelectorDialog({
           }
         />
         <FunctionListItem
-          icon={<Function style={styles.icon} />}
+          icon={<Condition style={styles.icon} />}
           name={<Trans>Condition</Trans>}
           onChoose={() =>
             onChoose({
@@ -111,12 +112,12 @@ export default function BehaviorMethodSelectorDialog({
           description={
             <Trans>
               A condition that can be used in other events sheet. You can define
-              the conditions parameters: objects, texts, numbers, layers, etc...
+              the condition parameters: objects, texts, numbers, layers, etc...
             </Trans>
           }
         />
         <FunctionListItem
-          icon={<Function style={styles.icon} />}
+          icon={<Expression style={styles.icon} />}
           name={<Trans>Expression</Trans>}
           onChoose={() =>
             onChoose({
@@ -276,14 +277,14 @@ export default function BehaviorMethodSelectorDialog({
       <Line justifyContent="center" alignItems="center">
         {!showAdvanced ? (
           <FlatButton
-            icon={<Visibility />}
+            leftIcon={<Visibility />}
             primary={false}
             onClick={() => setShowAdvanced(true)}
             label={<Trans>Show lifecycle functions (advanced)</Trans>}
           />
         ) : (
           <FlatButton
-            icon={<VisibilityOff />}
+            leftIcon={<VisibilityOff />}
             primary={false}
             onClick={() => setShowAdvanced(false)}
             label={<Trans>Hide lifecycle functions (advanced)</Trans>}

@@ -2,6 +2,7 @@
 import { mapFor } from '../Utils/MapFor';
 import { type Schema, type Instance } from '.';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
+import { type Field } from '.';
 
 /**
  * Transform a MapStringPropertyDescriptor to a schema that can be used in PropertiesEditor.
@@ -10,7 +11,7 @@ import { type ResourceKind } from '../ResourcesList/ResourceSource';
  * @param {*} getProperties The function called to read again the properties
  * @param {*} onUpdateProperty The function called to update a property of an object
  */
-export default (
+const propertiesMapToSchema = (
   properties: gdMapStringPropertyDescriptor,
   getProperties: (instance: Instance) => any,
   onUpdateProperty: (
@@ -21,9 +22,19 @@ export default (
   object: ?gdObject
 ): Schema => {
   const propertyNames = properties.keys();
-  const propertyFields = mapFor(0, propertyNames.size(), i => {
+  // Aggregate field by groups to be able to build field groups with a title.
+  const fieldsByGroups = new Map<string, Array<Field>>();
+  mapFor(0, propertyNames.size(), i => {
     const name = propertyNames.at(i);
     const property = properties.get(name);
+
+    const groupName = property.getGroup() || '';
+    let fields = fieldsByGroups.get(groupName);
+    if (!fields) {
+      fields = [];
+      fieldsByGroups.set(groupName, fields);
+    }
+
     const propertyDescription = property.getDescription();
     const valueType = property.getType().toLowerCase();
     const getLabel = (instance: Instance) => {
@@ -44,7 +55,7 @@ export default (
     if (property.isHidden()) return null;
 
     if (valueType === 'number') {
-      return {
+      fields.push({
         name,
         valueType,
         getValue: (instance: Instance): number => {
@@ -61,9 +72,10 @@ export default (
         },
         getLabel,
         getDescription,
-      };
+      });
+      return null;
     } else if (valueType === 'string' || valueType === '') {
-      return {
+      fields.push({
         name,
         valueType: 'string',
         getValue: (instance: Instance): string => {
@@ -76,9 +88,10 @@ export default (
         },
         getLabel,
         getDescription,
-      };
+      });
+      return null;
     } else if (valueType === 'boolean') {
-      return {
+      fields.push({
         name,
         valueType,
         getValue: (instance: Instance): boolean => {
@@ -93,14 +106,15 @@ export default (
         },
         getLabel,
         getDescription,
-      };
+      });
+      return null;
     } else if (valueType === 'choice') {
       // Choice is a "string" (with a selector for the user in the UI)
       const choices = property
         .getExtraInfo()
         .toJSArray()
         .map(value => ({ value, label: value }));
-      return {
+      fields.push({
         name,
         valueType: 'string',
         getChoices: () => choices,
@@ -114,11 +128,12 @@ export default (
         },
         getLabel,
         getDescription,
-      };
+      });
+      return null;
     } else if (valueType === 'behavior') {
       const behaviorType =
         property.getExtraInfo().size() > 0 ? property.getExtraInfo().at(0) : '';
-      return {
+      fields.push({
         name,
         valueType: 'string',
         getChoices: () => {
@@ -145,12 +160,13 @@ export default (
         },
         getLabel,
         getDescription,
-      };
+      });
+      return null;
     } else if (valueType === 'resource') {
       // Resource is a "string" (with a selector in the UI)
       // $FlowFixMe - assume the passed resource kind is always valid.
       const kind: ResourceKind = property.getExtraInfo().toJSArray()[0] || '';
-      return {
+      fields.push({
         name,
         valueType: 'resource',
         resourceKind: kind,
@@ -164,9 +180,10 @@ export default (
         },
         getLabel,
         getDescription,
-      };
+      });
+      return null;
     } else if (valueType === 'color') {
-      return {
+      fields.push({
         name,
         valueType: 'color',
         getValue: (instance: Instance): string => {
@@ -179,9 +196,10 @@ export default (
         },
         getLabel,
         getDescription,
-      };
+      });
+      return null;
     } else if (valueType === 'textarea') {
-      return {
+      fields.push({
         name,
         valueType: 'textarea',
         getValue: (instance: Instance): string => {
@@ -194,14 +212,34 @@ export default (
         },
         getLabel,
         getDescription,
-      };
+      });
+      return null;
     } else {
       console.error(
         `A property with type=${valueType} could not be mapped to a field. Ensure that this type is correct and understood by the IDE.`
       );
       return null;
     }
-  }).filter(Boolean);
-
-  return propertyFields;
+  });
+  if (fieldsByGroups.size === 0) {
+    return [];
+  }
+  const defaultGroupField = fieldsByGroups.get('');
+  if (fieldsByGroups.size === 1 && defaultGroupField) {
+    // Avoid to create a blank title
+    return defaultGroupField;
+  }
+  // Create a group for the default one too because it would look weird with the indentation.
+  const groupNames = [...fieldsByGroups.keys()].sort((a, b) =>
+    a.localeCompare(b)
+  );
+  return groupNames.map(groupName => ({
+    name: groupName,
+    type: 'column',
+    title: groupName,
+    // The group actually always exists here.
+    children: fieldsByGroups.get(groupName) || [],
+  }));
 };
+
+export default propertiesMapToSchema;

@@ -50,13 +50,17 @@ Refer to the [GDevelop IDE Readme](./README.md) for more information about the i
 
 > ℹ️ Implement your extension in a file called `extensionnametools.ts` (for general functions), `objectnameruntimeobject.ts` (for objects) or `behaviornameruntimebehavior.ts` (for behaviors). See then the next section for declaring these files and the content of the extension to the IDE.
 
-Check the [GDJS game engine documentation here](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation/index.html). It's also a good idea to check the [Runtime folder of GDJS](../GDJS/README.md) to see directly how the game engine is done when needed. Files for the game engine should [almost all be written in TypeScript, with a few precautions to ensure good performance (click to learn more)](https://github.com/4ian/GDevelop/blob/master/newIDE/docs/Supported-JavaScript-features-and-coding-style.md).
+Check the [GDJS game engine documentation here](https://docs.gdevelop.io/GDJS%20Runtime%20Documentation/index.html). It's also a good idea to check the [Runtime folder of GDJS](../GDJS/README.md) to see directly how the game engine is done when needed. Files for the game engine should [almost all be written in TypeScript, with a few precautions to ensure good performance (click to learn more)](https://github.com/4ian/GDevelop/blob/master/newIDE/docs/Supported-JavaScript-features-and-coding-style.md).
 
 #### How to create functions to be called by events
 
 See examples in [examplejsextensiontools.ts](../Extensions/ExampleJsExtension/examplejsextensiontools.ts).
 
-Read about [`gdjs.RuntimeScene`](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation//RuntimeScene.html), the class representing a scene being played, as lots of events can need it.
+Read about [`gdjs.RuntimeScene`](https://docs.gdevelop.io/GDJS%20Runtime%20Documentation/classes/gdjs.RuntimeScene.html), the class representing a scene being played, as lots of events can need it.
+
+##### How to create an asynchronous function
+
+You can make an asynchronous action by making your function return an instance of an AsyncTask (don't forget to also declare your function as async!). You can make an `AsyncTask` yourself by extending the `gdjs.AsyncTask` abstract base class, or, if you are using JavaScript async functions/promises, by instanciating a new `gdjs.PromiseTask` with your promise as argument.
 
 #### How to create a behavior by extending `gdjs.RuntimeBehavior`
 
@@ -65,7 +69,7 @@ See examples in [dummyruntimebehavior.ts](../Extensions/ExampleJsExtension/dummy
 You'll be interested in the constructor (to initialize things), `onDeActivate` (called when behavior is deactivated), `doStepPreEvents`
 and `doStepPostEvents` (to run logic before/after the events at each frame).
 
-Read about [`gdjs.RuntimeBehavior`](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation/RuntimeBehavior.html), the base class inherited by all behaviors, to see everything that is available.
+Read about [`gdjs.RuntimeBehavior`](https://docs.gdevelop.io/GDJS%20Runtime%20Documentation/classes/gdjs.RuntimeBehavior.html), the base class inherited by all behaviors, to see everything that is available.
 
 #### How to create an object by extending `gdjs.RuntimeObject`
 
@@ -73,7 +77,7 @@ See example in [dummyruntimeobject.ts](../Extensions/ExampleJsExtension/dummyrun
 
 You'll be interested in the constructor (to initialize things), `update` (called every frame) and the other methods. In the PIXI renderer, check the constructor (where PixiJS objects are created). Other methods depend on the renderer.
 
-Read about [`gdjs.RuntimeObject`](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation/RuntimeObject.html), the base class inherited by all objects.
+Read about [`gdjs.RuntimeObject`](https://docs.gdevelop.io/GDJS%20Runtime%20Documentation/classes/gdjs.RuntimeObject.html), the base class inherited by all objects.
 
 #### How to create an effect ("shader", PixiJS "filter")
 
@@ -89,16 +93,20 @@ The API to declare extensions is almost 100% equivalent to the way extensions ar
 
 #### Declare the extension information
 
-Use [`extension.setExtensionInformation`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_platform_extension.html#ac53e5af617a9ed91c280d652899557c3) to declare basic information about your extension.
+Use [`extension.setExtensionInformation`](https://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_platform_extension.html#ac53e5af617a9ed91c280d652899557c3) to declare basic information about your extension.
 
 > 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).
 
 #### Declare actions, conditions and expressions
 
-Use [`addAction`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_platform_extension.html#a34e95be54f2dfa80b804e8e4830e7d9c), `addCondition`, `addExpression` or `addStrExpression` to declare actions, conditions or expressions.
+Use [`addAction`](https://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_platform_extension.html#a34e95be54f2dfa80b804e8e4830e7d9c), `addCondition`, `addExpression` or `addStrExpression` to declare actions, conditions or expressions.
 
--   Chain calls to [`addParameter`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_instruction_metadata.html#a95486188a843f9ac8cdb1b0700c6c7e5) to declare the parameters of your action/condition/expression.
--   Call `getCodeExtraInformation()` and then functions like [`setFunctionName` and `setIncludeFile`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_instruction_metadata_1_1_extra_information.html) to declare the JavaScript function to be called and the file to be included.
+-   Chain calls to [`addParameter`](https://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_instruction_metadata.html#a95486188a843f9ac8cdb1b0700c6c7e5) to declare the parameters of your action/condition/expression.
+-   Call `getCodeExtraInformation()` and then functions like [`setFunctionName` and `setIncludeFile`](https://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_instruction_metadata_1_1_extra_information.html) to declare the JavaScript function to be called and the file to be included.
+  -   If your function is asynchronous, call `setAsyncFunctionName` instead to tell GDevelop to wait for the returned `Task` to resolve before executing subsequent actions and subevents. 
+	-   If you want to be able to toggle the awaiting on and off, make one implementation of the function that returns a `Task` and one that doesn't, and use both `setFunctionName` and `setAsyncFunctionName` respectively to declare both to GDevelop, making the action optionally async.
+	-   If you just want to return a promise to be awaited, you do not need to create your own task. Simply return `new gd.PromiseTask(yourPromise)`.
+	-   Note that, as of now, *only actions can be asynchronous*. Giving other functions an async function name will not have any effect.
 
 > You can call these functions on the `extension` object, or on the objects returned by `extension.addObject` (for objects) or `extension.addBehavior` (for behaviors). See below.
 
@@ -108,7 +116,7 @@ Use [`addAction`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1
 
 #### Declare behaviors
 
-Add a behavior using [`addBehavior`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_platform_extension.html#a75992fed9afce730db56af9d4d8177ca). The last two parameters are the `gd.Behavior` and the `gd.BehaviorsSharedData` object representing the behavior and its (optional) shared data
+Add a behavior using [`addBehavior`](https://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_platform_extension.html#a75992fed9afce730db56af9d4d8177ca). The last two parameters are the `gd.Behavior` and the `gd.BehaviorsSharedData` object representing the behavior and its (optional) shared data
 
 -   For the behavior, create a `new gd.BehaviorJsImplementation()` and define `initializeContent`, `updateProperty` and `getProperties`.
 -   For the shared data (which are properties shared between all behaviors of the same type), if you don't need it, just pass the `new gd.BehaviorsSharedData()`. If you need shared data, create a `new gd.BehaviorSharedDataJsImplementation()` and define `initializeContent`, `updateProperty` and `getProperties`.
@@ -119,7 +127,7 @@ Add a behavior using [`addBehavior`](https://docs.gdevelop-app.com/GDCore%20Docu
 
 #### Declare objects
 
-Add an object using [`addObject`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_platform_extension.html#a554baca486909e8741e902133cceeec0). The last parameter is the `gd.Object` representing the object:
+Add an object using [`addObject`](https://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_platform_extension.html#a554baca486909e8741e902133cceeec0). The last parameter is the `gd.Object` representing the object:
 
 -   Create a `new gd.ObjectJsImplementation()` and define `updateProperty` and `getProperties` (for the object properties) and `updateInitialInstanceProperty` and `getInitialInstanceProperties` (for the optional properties that are attached to each instance).
 
@@ -229,7 +237,7 @@ Finally, to have the instances of your object displayed properly on the scene ed
 
 #### Declare effects
 
-Add an effect using [`addEffect`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_platform_extension.html) in your _JsExtension.js_ file.
+Add an effect using [`addEffect`](https://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_platform_extension.html) in your _JsExtension.js_ file.
 
 > 👉 See an example in the [Effects extension _JsExtension.js_ file](../Extensions/Effects/JsExtension.js). Learn more about [properties here](docs/Properties-schema-and-PropertiesEditor-explanations.md).
 

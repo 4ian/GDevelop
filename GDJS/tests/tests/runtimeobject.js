@@ -4,7 +4,7 @@
  * See README.md for more information.
  */
 
- describe('gdjs.RuntimeObject', () => {
+describe('gdjs.RuntimeObject', () => {
   const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     // @ts-ignore TODO: make a function to create an empty game and use it across tests.
@@ -54,6 +54,14 @@
       max: [10, 20],
     });
 
+    // Verify the shortcut functions too:
+    expect(object.getAABBLeft()).to.be(0);
+    expect(object.getAABBTop()).to.be(0);
+    expect(object.getAABBRight()).to.be(10);
+    expect(object.getAABBBottom()).to.be(20);
+    expect(object.getAABBCenterX()).to.be(5);
+    expect(object.getAABBCenterY()).to.be(10);
+
     object.setPosition(15, 20);
     expect(object.getAABB()).to.eql({
       min: [15, 20],
@@ -79,6 +87,14 @@
       min: [-5, 20],
       max: [15, 30],
     });
+
+    // Verify the shortcut functions again too:
+    expect(object.getAABBLeft()).to.be(-5);
+    expect(object.getAABBTop()).to.be(20);
+    expect(object.getAABBRight()).to.be(15);
+    expect(object.getAABBBottom()).to.be(30);
+    expect(object.getAABBCenterX()).to.be(5);
+    expect(object.getAABBCenterY()).to.be(25);
   });
 
   it('handles collision', () => {
@@ -212,11 +228,21 @@
 
     // Vertical raycast, far from the origin, to the edge of the object:
     object1.setPosition(20, 300);
-    expect(object1.raycastTest(25, 500, 25, 300+19, true).collision).to.be(true);
-    expect(object1.raycastTest(25, 500, 25, 300+20, true).collision).to.be(true);
-    expect(object1.raycastTest(25, 500, 25, 300+20.1, true).collision).to.be(false);
-    expect(object1.raycastTest(25, 500, 25, 300+20.5, true).collision).to.be(false);
-    expect(object1.raycastTest(25, 500, 25, 300+21, true).collision).to.be(false);
+    expect(object1.raycastTest(25, 500, 25, 300 + 19, true).collision).to.be(
+      true
+    );
+    expect(object1.raycastTest(25, 500, 25, 300 + 20, true).collision).to.be(
+      true
+    );
+    expect(object1.raycastTest(25, 500, 25, 300 + 20.1, true).collision).to.be(
+      false
+    );
+    expect(object1.raycastTest(25, 500, 25, 300 + 20.5, true).collision).to.be(
+      false
+    );
+    expect(object1.raycastTest(25, 500, 25, 300 + 21, true).collision).to.be(
+      false
+    );
 
     // Horizontal raycast, far from the origin:
     object1.setPosition(200, 30);
@@ -224,14 +250,171 @@
 
     // Horizontal raycast, far from the origin, to the edge of the object:
     object1.setPosition(200, 30);
-    expect(object1.raycastTest(500, 35, 200+9, 35, true).collision).to.be(true);
-    expect(object1.raycastTest(500, 35, 200+10, 35, true).collision).to.be(true);
-    expect(object1.raycastTest(500, 35, 200+10.1, 35, true).collision).to.be(false);
-    expect(object1.raycastTest(500, 35, 200+10.5, 35, true).collision).to.be(false);
-    expect(object1.raycastTest(500, 35, 200+11, 35, true).collision).to.be(false);
+    expect(object1.raycastTest(500, 35, 200 + 9, 35, true).collision).to.be(
+      true
+    );
+    expect(object1.raycastTest(500, 35, 200 + 10, 35, true).collision).to.be(
+      true
+    );
+    expect(object1.raycastTest(500, 35, 200 + 10.1, 35, true).collision).to.be(
+      false
+    );
+    expect(object1.raycastTest(500, 35, 200 + 10.5, 35, true).collision).to.be(
+      false
+    );
+    expect(object1.raycastTest(500, 35, 200 + 11, 35, true).collision).to.be(
+      false
+    );
 
     // Raycast not intersecting with the object
     object1.setPosition(20, 30);
     expect(object1.raycastTest(10, 10, 105, 55, true).collision).to.be(false);
+  });
+
+  it('handles raycast (object with multiple hitboxes)', () => {
+    const objectWithTwoHitboxes = new gdjs.TestSpriteRuntimeObject(
+      runtimeScene,
+      {
+        name: 'objectWithTwoHitboxes',
+        type: '',
+        behaviors: [],
+        effects: [],
+        animations: [
+          {
+            name: 'animation',
+            directions: [
+              {
+                sprites: [
+                  {
+                    originPoint: { x: 0, y: 0 },
+                    centerPoint: { x: 50, y: 50 },
+                    points: [
+                      { name: 'Center', x: 0, y: 0 },
+                      { name: 'Origin', x: 50, y: 50 },
+                    ],
+                    hasCustomCollisionMask: true,
+                    customCollisionMask: [
+                      [
+                        { x: 75, y: 100 },
+                        { x: 0, y: 100 },
+                        { x: 0, y: 25 },
+                      ],
+                      [
+                        { x: 25, y: 0 },
+                        { x: 100, y: 75 },
+                        { x: 100, y: 0 },
+                      ],
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      }
+    );
+    runtimeScene.addObject(objectWithTwoHitboxes);
+    objectWithTwoHitboxes.setUnscaledWidthAndHeight(100, 100);
+    objectWithTwoHitboxes.setCustomWidthAndHeight(100, 100);
+
+    // Ray going through the "tunnel" left by the two triangle hitboxes:
+    objectWithTwoHitboxes.setPosition(0, 0);
+    expect(
+      objectWithTwoHitboxes.raycastTest(0, 0, 300, 300, true).collision
+    ).to.be(false);
+    expect(
+      objectWithTwoHitboxes.raycastTest(0, 10, 300, 300 + 10, true).collision
+    ).to.be(false);
+    expect(
+      objectWithTwoHitboxes.raycastTest(10, 0, 300 + 10, 300, true).collision
+    ).to.be(false);
+
+    const rayCastFromCenterToRightResult = objectWithTwoHitboxes.raycastTest(
+      50,
+      50,
+      300,
+      50,
+      true
+    );
+    expect(rayCastFromCenterToRightResult.collision).to.be(true);
+    expect(rayCastFromCenterToRightResult.closeX).to.be(75);
+    expect(rayCastFromCenterToRightResult.closeY).to.be(50);
+
+    const rayCastFromCenterToRightFarResult = objectWithTwoHitboxes.raycastTest(
+      50,
+      50,
+      300,
+      50,
+      false
+    );
+    expect(rayCastFromCenterToRightFarResult.collision).to.be(true);
+    expect(rayCastFromCenterToRightFarResult.farX).to.be(100);
+    expect(rayCastFromCenterToRightFarResult.farY).to.be(50);
+
+    const rayCastFromCenterToLeftResult = objectWithTwoHitboxes.raycastTest(
+      50,
+      50,
+      -300,
+      50,
+      true
+    );
+    expect(rayCastFromCenterToLeftResult.collision).to.be(true);
+    expect(rayCastFromCenterToLeftResult.closeX).to.be(25);
+    expect(rayCastFromCenterToLeftResult.closeY).to.be(50);
+
+    const rayCastFromCenterToLeftFarResult = objectWithTwoHitboxes.raycastTest(
+      50,
+      50,
+      -300,
+      50,
+      true
+    );
+    expect(rayCastFromCenterToLeftFarResult.collision).to.be(true);
+    expect(rayCastFromCenterToLeftFarResult.farX).to.be(0);
+    expect(rayCastFromCenterToLeftFarResult.farY).to.be(50);
+
+    const rayCastFromMiddleTopResult = objectWithTwoHitboxes.raycastTest(
+      50,
+      -20,
+      50,
+      300,
+      true
+    );
+    expect(rayCastFromMiddleTopResult.collision).to.be(true);
+    expect(rayCastFromMiddleTopResult.closeX).to.be(50);
+    expect(rayCastFromMiddleTopResult.closeY).to.be(0);
+
+    const rayCastFromMiddleTopFarResult = objectWithTwoHitboxes.raycastTest(
+      50,
+      -20,
+      50,
+      300,
+      false
+    );
+    expect(rayCastFromMiddleTopFarResult.collision).to.be(true);
+    expect(rayCastFromMiddleTopFarResult.farX).to.be(50);
+    expect(rayCastFromMiddleTopFarResult.farY).to.be(100);
+
+    const rayCastFromMiddleLeftResult = objectWithTwoHitboxes.raycastTest(
+      -20,
+      50,
+      300,
+      50,
+      true
+    );
+    expect(rayCastFromMiddleLeftResult.collision).to.be(true);
+    expect(rayCastFromMiddleLeftResult.closeX).to.be(0);
+    expect(rayCastFromMiddleLeftResult.closeY).to.be(50);
+
+    const rayCastFromMiddleLeftFarResult = objectWithTwoHitboxes.raycastTest(
+      -20,
+      50,
+      300,
+      50,
+      false
+    );
+    expect(rayCastFromMiddleLeftFarResult.collision).to.be(true);
+    expect(rayCastFromMiddleLeftFarResult.farX).to.be(100);
+    expect(rayCastFromMiddleLeftFarResult.farY).to.be(50);
   });
 });

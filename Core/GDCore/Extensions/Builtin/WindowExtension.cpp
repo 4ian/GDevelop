@@ -14,13 +14,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
   extension
       .SetExtensionInformation(
           "BuiltinWindow",
-          _("Window features"),
+          _("Game window and resolution"),
           "Provides actions and conditions to manipulate the game window. "
           "Depending on the platform on which the game is running, not all of "
           "these features can be applied.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetCategory("User interface")
       .SetExtensionHelpPath("/all-features/window");
+  extension
+      .AddInstructionOrExpressionGroupMetadata(
+          _("Game window and resolution"))
+      .SetIcon("res/actions/window24.png");
 
   extension
       .AddAction(
@@ -28,7 +33,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
           _("De/activate fullscreen"),
           _("This action activates or deactivates fullscreen."),
           _("Activate fullscreen: _PARAM1_ (keep aspect ratio: _PARAM2_)"),
-          _("Game's window and resolution"),
+          "",
           "res/actions/fullscreen24.png",
           "res/actions/fullscreen.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -44,19 +49,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
                     _("Fullscreen activated?"),
                     _("Check if the game is currently in fullscreen."),
                     _("The game is in fullscreen"),
-                    _("Game's window and resolution"),
+                    "",
                     "res/actions/fullscreen24.png",
                     "res/actions/fullscreen.png")
       .AddCodeOnlyParameter("currentScene", "");
 
   extension
       .AddAction("SetWindowMargins",
-                 _("Change the window's margins"),
+                 _("Window's margins"),
                  _("This action changes the margins, in pixels, between the "
                    "game frame and the window borders."),
                  _("Set margins of game window to "
                    "_PARAM1_;_PARAM2_;_PARAM3_;_PARAM4_"),
-                 _("Game's window and resolution"),
+                 "",
                  "res/actions/window24.png",
                  "res/actions/window.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -67,12 +72,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
 
   extension
       .AddAction("SetGameResolutionSize",
-                 _("Change the resolution of the game"),
+                 _("Game resolution"),
                  _("Changes the resolution of the game, effectively changing "
                    "the game area size. This won't change the size of the "
                    "window in which the game is running."),
                  _("Set game resolution to _PARAM1_x_PARAM2_"),
-                 _("Game's window and resolution"),
+                 "",
                  "res/actions/window24.png",
                  "res/actions/window.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -89,7 +94,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
             "window size. Game resolution can still be updated."),
           _("Set game window size to _PARAM1_x_PARAM2_ (also update game "
             "resolution: _PARAM3_)"),
-          _("Game's window and resolution"),
+          "",
           "res/actions/window24.png",
           "res/actions/window.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -106,19 +111,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
                    "only works on Windows, macOS and Linux (not when the game "
                    "is executed in a web-browser or on iOS/Android)."),
                  _("Center the game window"),
-                 _("Game's window and resolution"),
+                 "",
                  "res/actions/window24.png",
                  "res/actions/window.png")
       .AddCodeOnlyParameter("currentScene", "");
 
   extension
       .AddAction("SetGameResolutionResizeMode",
-                 _("Change the game resolution resize mode"),
+                 _("Game resolution resize mode"),
                  _("Set if the width or the height of the game resolution "
                    "should be changed to fit the game window - or if the game "
                    "resolution should not be updated automatically."),
                  _("Set game resolution resize mode to _PARAM1_"),
-                 _("Game's window and resolution"),
+                 "",
                  "res/actions/window24.png",
                  "res/actions/window.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -139,7 +144,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
                    "be the case if the game resolution resize mode is "
                    "configured to adapt the width or the height of the game."),
                  _("Automatically adapt the game resolution: _PARAM1_"),
-                 _("Game's window and resolution"),
+                 "",
                  "res/actions/window24.png",
                  "res/actions/window.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -149,10 +154,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
 
   extension
       .AddAction("SetWindowIcon",
-                 _("Change the window's icon"),
+                 _("Window's icon"),
                  _("This action changes the icon of the game's window."),
                  _("Use _PARAM1_ as the icon for the game's window."),
-                 _("Game's window and resolution"),
+                 "",
                  "res/actions/window24.png",
                  "res/actions/window.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -160,10 +165,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
 
   extension
       .AddAction("SetWindowTitle",
-                 _("Change the window's title"),
+                 _("Window's title"),
                  _("This action changes the title of the game's window."),
                  _("Change window title to _PARAM1_"),
-                 _("Game's window and resolution"),
+                 "",
                  "res/actions/window24.png",
                  "res/actions/window.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -174,7 +179,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
           "SceneWindowWidth",
           _("Width of the scene window"),
           _("Width of the scene window (or scene canvas for HTML5 games)"),
-          _("Screen"),
+          "",
           "res/window.png")
       .AddCodeOnlyParameter("currentScene", "");
 
@@ -183,7 +188,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
           "SceneWindowHeight",
           _("Height of the scene window"),
           _("Height of the scene window (or scene canvas for HTML5 games)"),
-          _("Screen"),
+          "",
           "res/window.png")
       .AddCodeOnlyParameter("currentScene", "");
 
@@ -191,27 +196,27 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
       "ScreenWidth",
       _("Width of the screen/page"),
       _("Width of the screen (or the page for HTML5 games in browser)"),
-      _("Screen"),
+      "",
       "res/display16.png");
 
   extension.AddExpression(
       "ScreenHeight",
       _("Height of the screen/page"),
       _("Height of the screen (or the page for HTML5 games in browser)"),
-      _("Screen"),
+      "",
       "res/display16.png");
 
   extension.AddExpression("ColorDepth",
                           _("Color depth"),
                           _("Color depth"),
-                          _("Screen"),
+                          "",
                           "res/display16.png");
 
   extension
       .AddStrExpression("WindowTitle",
                         _("Window's title"),
                         _("Window's title"),
-                        _("Screen"),
+                        "",
                         "res/window.png")
       .AddCodeOnlyParameter("currentScene", "");
 }

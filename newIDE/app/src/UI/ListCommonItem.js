@@ -7,6 +7,7 @@ import BackgroundText from './BackgroundText';
 type Props = {|
   onClick?: () => void,
   primaryText: ?React.Node,
+  id?: ?string,
 |};
 
 export const AddListItem = (props: Props) => {
@@ -15,6 +16,7 @@ export const AddListItem = (props: Props) => {
       onClick={props.onClick}
       primaryText={<BackgroundText>{props.primaryText}</BackgroundText>}
       displayAddIcon
+      id={props.id}
     />
   );
 };
@@ -25,6 +27,7 @@ export const SearchListItem = (props: Props) => {
       onClick={props.onClick}
       primaryText={<BackgroundText>{props.primaryText}</BackgroundText>}
       displaySearchIcon
+      id={props.id}
     />
   );
 };

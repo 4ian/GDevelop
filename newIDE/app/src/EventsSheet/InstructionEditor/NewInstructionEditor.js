@@ -12,7 +12,7 @@ import {
 import {
   type EnumeratedInstructionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
-} from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+} from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 const gd: libGDevelop = global.gd;
 
@@ -145,7 +145,7 @@ export const useNewInstructionEditor = ({
         );
         if (objectParameterIndex !== -1) {
           return getChosenObjectState(
-            instruction.getParameter(objectParameterIndex),
+            instruction.getParameter(objectParameterIndex).getPlainString(),
             false /* Even if the instruction is invalid for the object, show it as it's what we have already */
           );
         }

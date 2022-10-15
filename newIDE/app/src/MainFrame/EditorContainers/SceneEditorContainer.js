@@ -23,11 +23,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     // children, and in particular SceneEditor and InstancesEditor, to be notified when isActive
     // goes from true to false (in which case PIXI rendering is halted). If isActive was false
     // and remains false, it's safe to stop update here (PIXI rendering is already halted).
-    if (!this.props.isActive && !nextProps.isActive) {
-      return false;
-    }
-
-    return true;
+    return this.props.isActive || nextProps.isActive;
   }
 
   componentDidMount() {
@@ -90,6 +86,8 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         resourceSources={this.props.resourceSources}
         onChooseResource={this.props.onChooseResource}
         resourceExternalEditors={this.props.resourceExternalEditors}
+        onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
+        canInstallPrivateAsset={this.props.canInstallPrivateAsset}
         unsavedChanges={this.props.unsavedChanges}
         ref={editor => (this.editor = editor)}
         project={project}
@@ -100,6 +98,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
             serializeToJSObject(layout.getAssociatedEditorSettings())
           )
         }
+        onOpenEvents={this.props.onOpenEvents}
         isActive={isActive}
         hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
       />

@@ -16,6 +16,20 @@ namespace gdjs {
   // Set this to 0 to unload from memory ("uninstall") as soon as a font is unused.
   const uninstallCacheSize = 5;
 
+  const checkIfCredentialsRequired = (url: string) => {
+    // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
+    // i.e: its gdevelop.io cookie, to be passed.
+    // Note that this is only useful during previews.
+    if (
+      url.startsWith('https://project-resources.gdevelop.io/') ||
+      url.startsWith('https://project-resources-dev.gdevelop.io/')
+    )
+      return true;
+
+    // For other resources, use the default way of loading resources ("anonymous" or "same-site").
+    return false;
+  };
+
   /**
    * We patch the installed font to use a name that is unique for each font data and texture,
    * to avoid conflicts between different font files using the same font name (by default, the
@@ -261,7 +275,14 @@ namespace gdjs {
       let loadedCount = 0;
       return Promise.all(
         bitmapFontResources.map((bitmapFontResource) => {
-          return fetch(bitmapFontResource.file)
+          return fetch(bitmapFontResource.file, {
+            credentials: checkIfCredentialsRequired(bitmapFontResource.file)
+              ? // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
+                // i.e: its gdevelop.io cookie, to be passed.
+                'include'
+              : // For other resources, use "same-origin" as done by default by fetch.
+                'same-origin',
+          })
             .then((response) => response.text())
             .then((fontData) => {
               this._loadedFontsData[bitmapFontResource.name] = fontData;

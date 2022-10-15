@@ -11,7 +11,6 @@
 
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
-#include "GDCore/Events/Parsers/ExpressionParser2.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodePrinter.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
@@ -156,18 +155,9 @@ bool ExpressionsRenamer::DoVisitInstruction(gd::Instruction& instruction,
   for (std::size_t pNb = 0; pNb < metadata.parameters.size() &&
                             pNb < instruction.GetParametersCount();
        ++pNb) {
-    const gd::String& type = metadata.parameters[pNb].type;
-    const gd::String& expression =
-        instruction.GetParameter(pNb).GetPlainString();
+    const gd::Expression& expression = instruction.GetParameter(pNb);
 
-    gd::ExpressionParser2 parser(
-        platform, GetGlobalObjectsContainer(), GetObjectsContainer());
-
-    auto node = gd::ParameterMetadata::IsExpression("number", type)
-                    ? parser.ParseExpression("number", expression)
-                    : (gd::ParameterMetadata::IsExpression("string", type)
-                           ? parser.ParseExpression("string", expression)
-                           : std::unique_ptr<gd::ExpressionNode>());
+    auto node = expression.GetRootNode();
     if (node) {
       ExpressionFunctionRenamer renamer(GetGlobalObjectsContainer(),
                                         GetObjectsContainer(),

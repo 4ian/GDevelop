@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react';
-import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow.js';
 import { type Build } from '../Utils/GDevelopServices/Build';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
+import { type BuildStep } from './Builds/BuildStepsProgress';
 
 export type ExportPipelineContext<ExportState> = {|
   project: gdProject,
@@ -22,6 +22,7 @@ export type ExportPipeline<
 > = {|
   name: string,
   onlineBuildType?: string,
+  limitedBuilds?: boolean,
   packageNameWarningType?: 'mobile' | 'desktop',
 
   getInitialExportState: (project: gdProject) => ExportState,
@@ -33,9 +34,24 @@ export type ExportPipeline<
       updater: (prevExportState: ExportState) => ExportState
     ) => void,
   |}) => React.Node,
+
   renderLaunchButtonLabel: () => React.Node,
 
-  canLaunchBuild: (exportState: ExportState) => boolean,
+  canLaunchBuild: (
+    exportState: ExportState,
+    errored: boolean,
+    exportStep: BuildStep
+  ) => boolean,
+
+  isNavigationDisabled: (exportStep: BuildStep, errored: boolean) => boolean,
+
+  renderCustomStepsProgress?: ({
+    build: ?Build,
+    project: gdProject,
+    onSaveProject: () => Promise<void>,
+    errored: boolean,
+    exportStep: BuildStep,
+  }) => React.Node,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
@@ -74,7 +90,12 @@ export type ExportPipeline<
   launchOnlineBuild?: (
     exportState: ExportState,
     authenticatedUser: AuthenticatedUser,
-    uploadBucketKey: string
+    uploadBucketKey: string,
+    gameId: string,
+    options: {|
+      gameName: string,
+      gameVersion: string,
+    |}
   ) => Promise<Build>,
 
   /**

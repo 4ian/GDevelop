@@ -1,54 +1,60 @@
 // @flow
 import { Trans } from '@lingui/macro';
 
-import React, { Component } from 'react';
+import React from 'react';
 import Dialog from '../../UI/Dialog';
 import HelpButton from '../../UI/HelpButton';
 import FlatButton from '../../UI/FlatButton';
 import Builds from '.';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+import useForceUpdate from '../../Utils/UseForceUpdate';
+import { type Game } from '../../Utils/GDevelopServices/Game';
 
 type Props = {|
   authenticatedUser: AuthenticatedUser,
+  game: Game,
   open: boolean,
   onClose: () => void,
+  onGameUpdated: () => void,
 |};
-type State = {||};
 
-export default class BuildsDialog extends Component<Props, State> {
-  _onBuildsUpdated = () => {
-    // Force the Dialog repositioning
-    this.forceUpdate();
-  };
+const BuildsDialog = ({
+  authenticatedUser,
+  game,
+  open,
+  onClose,
+  onGameUpdated,
+}: Props) => {
+  const forceUpdate = useForceUpdate();
+  if (!open) return null;
 
-  render() {
-    const { open, onClose, authenticatedUser } = this.props;
-    if (!open) return null;
+  return (
+    <Dialog
+      title={<Trans>Your game builds</Trans>}
+      actions={[
+        <FlatButton
+          label={<Trans>Close</Trans>}
+          key="close"
+          primary={false}
+          onClick={onClose}
+        />,
+      ]}
+      secondaryActions={[
+        <HelpButton key="help" helpPagePath={'/publishing'} />,
+      ]}
+      onRequestClose={onClose}
+      open={open}
+      noMargin
+    >
+      <Builds
+        // Force the Dialog repositioning
+        onBuildsUpdated={forceUpdate}
+        authenticatedUser={authenticatedUser}
+        game={game}
+        onGameUpdated={onGameUpdated}
+      />
+    </Dialog>
+  );
+};
 
-    return (
-      <Dialog
-        title={<Trans>All your builds</Trans>}
-        onRequestClose={onClose}
-        actions={[
-          <FlatButton
-            label={<Trans>Close</Trans>}
-            key="close"
-            primary={false}
-            onClick={onClose}
-          />,
-        ]}
-        secondaryActions={[
-          <HelpButton key="help" helpPagePath={'/publishing'} />,
-        ]}
-        cannotBeDismissed={false}
-        open={open}
-        noMargin
-      >
-        <Builds
-          onBuildsUpdated={this._onBuildsUpdated}
-          authenticatedUser={authenticatedUser}
-        />
-      </Dialog>
-    );
-  }
-}
+export default BuildsDialog;

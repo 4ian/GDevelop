@@ -15,7 +15,7 @@ class SerializerElement;
 }
 
 /**
- * \brief Behavior that allows objects to be dragged with the mouse (or touch).
+ * \brief Behavior that destroys object outside the screen.
  */
 class GD_EXTENSION_API DestroyOutsideBehavior : public gd::Behavior {
  public:

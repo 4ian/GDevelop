@@ -7,17 +7,31 @@ import {
   type ExtensionShortHeader,
 } from '../../Utils/GDevelopServices/Extension';
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
-import { useSearchItem } from '../../UI/Search/UseSearchItem';
+import {
+  useSearchStructuredItem,
+  type SearchMatch,
+} from '../../UI/Search/UseSearchStructuredItem';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
-const defaultSearchText = '';
+const emptySearchText = '';
+
+const noExcludedTiers = new Set();
+const excludedCommunityTiers = new Set(['community']);
 
 type ExtensionStoreState = {|
   filters: ?Filters,
-  searchResults: ?Array<ExtensionShortHeader>,
+  searchResults: ?Array<{|
+    item: ExtensionShortHeader,
+    matches: SearchMatch[],
+  |}>,
   fetchExtensionsAndFilters: () => void,
   error: ?Error,
   searchText: string,
   setSearchText: string => void,
+  allCategories: string[],
+  chosenCategory: string,
+  setChosenCategory: string => void,
+  extensionShortHeadersByName: { [name: string]: ExtensionShortHeader },
   filtersState: FiltersState,
 |};
 
@@ -28,6 +42,11 @@ export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
   error: null,
   searchText: '',
   setSearchText: () => {},
+  allCategories: [],
+  // '' means all categories.
+  chosenCategory: '',
+  setChosenCategory: () => {},
+  extensionShortHeadersByName: {},
   filtersState: {
     chosenFilters: new Set(),
     addFilter: () => {},
@@ -39,39 +58,41 @@ export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
 
 type ExtensionStoreStateProviderProps = {|
   children: React.Node,
+  defaultSearchText?: string,
 |};
-
-const getExtensionSearchTerms = (extension: ExtensionShortHeader) => {
-  return (
-    extension.name +
-    '\n' +
-    extension.shortDescription +
-    '\n' +
-    extension.tags.join(',')
-  );
-};
 
 export const ExtensionStoreStateProvider = ({
   children,
+  defaultSearchText,
 }: ExtensionStoreStateProviderProps) => {
   const [
     extensionShortHeadersByName,
     setExtensionShortHeadersByName,
-  ] = React.useState<?{
+  ] = React.useState<{
     [string]: ExtensionShortHeader,
-  }>(null);
+  }>({});
+  const preferences = React.useContext(PreferencesContext);
+  const { showCommunityExtensions } = preferences.values;
   const [filters, setFilters] = React.useState<?Filters>(null);
+  const [allCategories, setAllCategories] = React.useState<Array<string>>([]);
+  const [firstExtensionIds, setFirstExtensionIds] = React.useState<
+    Array<string>
+  >([]);
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
 
-  const [searchText, setSearchText] = React.useState(defaultSearchText);
+  const [searchText, setSearchText] = React.useState(
+    defaultSearchText || emptySearchText
+  );
+  const [chosenCategory, setChosenCategory] = React.useState('');
   const filtersState = useFilters();
 
   const fetchExtensionsAndFilters = React.useCallback(
     () => {
       // Don't attempt to load again resources and filters if they
       // were loaded already.
-      if (extensionShortHeadersByName || isLoading.current) return;
+      if (Object.keys(extensionShortHeadersByName).length || isLoading.current)
+        return;
 
       (async () => {
         setError(null);
@@ -79,9 +100,18 @@ export const ExtensionStoreStateProvider = ({
 
         try {
           const extensionRegistry: ExtensionsRegistry = await getExtensionsRegistry();
-          const { extensionShortHeaders, allTags } = extensionRegistry;
+          const {
+            extensionShortHeaders,
+            allTags,
+            allCategories,
+          } = extensionRegistry;
 
           const sortedTags = allTags
+            .slice()
+            .sort((tag1, tag2) =>
+              tag1.toLowerCase().localeCompare(tag2.toLowerCase())
+            );
+          const sortedCategories = allCategories
             .slice()
             .sort((tag1, tag2) =>
               tag1.toLowerCase().localeCompare(tag2.toLowerCase())
@@ -103,6 +133,12 @@ export const ExtensionStoreStateProvider = ({
             defaultTags: sortedTags,
             tagsTree: [],
           });
+          setAllCategories(sortedCategories);
+          setFirstExtensionIds(
+            extensionRegistry.views
+              ? extensionRegistry.views.default.firstExtensionIds
+              : []
+          );
         } catch (error) {
           console.error(
             `Unable to load the extensions from the extension store:`,
@@ -121,7 +157,8 @@ export const ExtensionStoreStateProvider = ({
     () => {
       // Don't attempt to load again extensions and filters if they
       // were loaded already.
-      if (extensionShortHeadersByName || isLoading.current) return;
+      if (Object.keys(extensionShortHeadersByName).length || isLoading.current)
+        return;
 
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching extensions from extension store...');
@@ -132,30 +169,43 @@ export const ExtensionStoreStateProvider = ({
     [fetchExtensionsAndFilters, extensionShortHeadersByName, isLoading]
   );
 
-  const { chosenCategory, chosenFilters } = filtersState;
-  const searchResults: ?Array<ExtensionShortHeader> = useSearchItem(
-    extensionShortHeadersByName,
-    getExtensionSearchTerms,
+  const searchResults: ?Array<{|
+    item: ExtensionShortHeader,
+    matches: SearchMatch[],
+  |}> = useSearchStructuredItem(extensionShortHeadersByName, {
     searchText,
-    chosenCategory,
-    chosenFilters
-  );
+    chosenItemCategory: chosenCategory,
+    chosenCategory: filtersState.chosenCategory,
+    chosenFilters: filtersState.chosenFilters,
+    excludedTiers: showCommunityExtensions
+      ? noExcludedTiers
+      : excludedCommunityTiers,
+    defaultFirstSearchItemIds: firstExtensionIds,
+  });
 
   const extensionStoreState = React.useMemo(
     () => ({
       searchResults,
       fetchExtensionsAndFilters,
       filters,
+      allCategories,
+      chosenCategory,
+      setChosenCategory,
       error,
       searchText,
       setSearchText,
+      extensionShortHeadersByName,
       filtersState,
     }),
     [
       searchResults,
       error,
       filters,
+      allCategories,
+      chosenCategory,
+      setChosenCategory,
       searchText,
+      extensionShortHeadersByName,
       filtersState,
       fetchExtensionsAndFilters,
     ]

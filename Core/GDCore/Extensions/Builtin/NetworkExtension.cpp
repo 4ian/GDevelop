@@ -14,12 +14,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
   extension
       .SetExtensionInformation(
           "BuiltinNetwork",
-          _("Basic internet features"),
+          _("Network"),
           _("Features to send web requests, communicate with external \"APIs\" "
             "and other network related tasks."),
           "Florian Rival",
           "Open source (MIT License)")
-      .SetExtensionHelpPath("/all-features/network");
+      .SetExtensionHelpPath("/all-features/network")
+      .SetCategory("Network");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Network"))
+      .SetIcon("res/actions/net24.png");
 
   extension
       .AddAction(
@@ -30,7 +33,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
           "as specified below, except if the server is configured to answer "
           "to all requests (cross-domain requests).",
           "Send _PARAM3_ request to _PARAM0__PARAM1_ with body: _PARAM2_",
-          _("Network"),
+          "",
           "res/actions/net24.png",
           "res/actions/net.png")
       .AddParameter("string", "Host, with protocol")
@@ -65,7 +68,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
             "to all requests (cross-domain requests)."),
           _("Send a _PARAM2_ request to _PARAM0_ with body: _PARAM1_, and "
             "store the result in _PARAM4_ (or in _PARAM5_ in case of error)"),
-          _("Network"),
+          "",
           "res/actions/net24.png",
           "res/actions/net.png")
       .AddParameter("string", _("URL (API or web-page address)"))
@@ -92,12 +95,29 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
             "explore the results with a *structure variable*."))
       .AddParameter(
           "scenevar", _("Variable where to store the error message"), "", true)
-      .SetParameterLongDescription(
-          _("Optional, only used if an error occurs. This will contain the "
-            "error message (if request could not be sent) or the [\"status "
-            "code\"](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes), "
-            "if the server returns a status >= 400."))
+      .SetParameterLongDescription(_(
+          "Optional, only used if an error occurs. This will contain the "
+          "[\"status "
+          "code\"](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) "
+          "if the server returns a status >= 400. If the request was not sent "
+          "at all (e.g. no internet or CORS issues), the variable will be set "
+          "to "
+          "\"REQUEST_NOT_SENT\"."))
       .MarkAsComplex();
+
+  extension
+      .AddAction("LaunchFile",
+                 _("Open a URL (web page) or a file"),
+                 _("This action launches the specified file or URL, in a "
+                   "browser (or in a new tab if the game is using the Web "
+                   "platform and is launched inside a browser)."),
+                 _("Open URL _PARAM0_ in a browser (or new tab)"),
+                 "",
+                 "res/actions/net24.png",
+                 "res/actions/net.png")
+      .AddParameter("string", _("URL (or filename)"))
+      .AddCodeOnlyParameter("currentScene", "")
+      .MarkAsAdvanced();
 
   extension
       .AddAction(
@@ -105,7 +125,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
           _("Download a file"),
           _("Download a file from a web site"),
           _("Download file _PARAM1_ from _PARAM0_ under the name of _PARAM2_"),
-          _("Network"),
+          "",
           "res/actions/net24.png",
           "res/actions/net.png")
       .AddParameter("string", _("Host (for example : http://www.website.com)"))
@@ -123,78 +143,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
             "terms of service of your game and if they player gave their "
             "consent, depending on how your game/company handles this."),
           _("Enable analytics metrics: _PARAM1_"),
-          _("Network"),
+          "",
           "res/actions/net24.png",
           "res/actions/net.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("yesorno", _("Enable the metrics?"));
-
-  extension
-      .AddAction(
-          "JSONToVariableStructure",
-          _("Convert JSON to a scene variable"),
-          _("Parse a JSON object and store it into a scene variable"),
-          _("Parse JSON string _PARAM0_ and store it into variable _PARAM1_"),
-          _("Network"),
-          "res/actions/net24.png",
-          "res/actions/net.png")
-      .AddParameter("string", _("JSON string"))
-      .AddParameter("scenevar", _("Variable where store the JSON object"))
-      .MarkAsAdvanced();
-
-  extension
-      .AddAction("JSONToGlobalVariableStructure",
-                 _("Convert JSON to global variable"),
-                 _("Parse a JSON object and store it into a global variable"),
-                 _("Parse JSON string _PARAM0_ and store it into global "
-                   "variable _PARAM1_"),
-                 _("Network"),
-                 "res/actions/net24.png",
-                 "res/actions/net.png")
-      .AddParameter("string", _("JSON string"))
-      .AddParameter("globalvar",
-                    _("Global variable where store the JSON object"))
-      .MarkAsAdvanced();
-
-  extension
-      .AddAction("JSONToObjectVariableStructure",
-                 _("Convert JSON to object variable"),
-                 _("Parse a JSON object and store it into an object variable"),
-                 _("Parse JSON string _PARAM0_ and store it into variable "
-                   "_PARAM2_ of _PARAM1_"),
-                 _("Network"),
-                 "res/actions/net24.png",
-                 "res/actions/net.png")
-      .AddParameter("string", _("JSON string"))
-      .AddParameter("objectPtr", _("Object"))
-      .AddParameter("objectvar",
-                    _("Object variable where store the JSON object"))
-      .MarkAsAdvanced();
-
-  extension
-      .AddStrExpression("ToJSON",
-                        _("Convert scene variable to JSON"),
-                        _("Convert a scene variable to JSON"),
-                        _("Conversion"),
-                        "res/conditions/toujours24.png")
-      .AddParameter("scenevar", _("Scene variable to be stringified"));
-
-  extension
-      .AddStrExpression("GlobalVarToJSON",
-                        _("Convert global variable to JSON"),
-                        _("Convert a global variable to JSON"),
-                        _("Conversion"),
-                        "res/conditions/toujours24.png")
-      .AddParameter("globalvar", _("The global variable to be stringified"));
-
-  extension
-      .AddStrExpression("ObjectVarToJSON",
-                        _("Convert object variable to JSON"),
-                        _("Convert an object variable to JSON"),
-                        _("Conversion"),
-                        "res/conditions/toujours24.png")
-      .AddParameter("objectPtr", _("The object with the variable"))
-      .AddParameter("objectvar", _("The object variable to be stringified"));
 }
 
 }  // namespace gd

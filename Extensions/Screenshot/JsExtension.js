@@ -33,7 +33,11 @@ module.exports = {
         'Matthias Meike',
         'Open source (MIT License)'
       )
-      .setExtensionHelpPath('/all-features/screenshot');
+      .setExtensionHelpPath('/all-features/screenshot')
+      .setCategory('Advanced');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Screenshot'))
+      .setIcon('JsPlatform/Extensions/take_screenshot32.png');
 
     extension
       .addAction(
@@ -43,8 +47,8 @@ module.exports = {
           'Take a screenshot of the game, and save it to a png file (supported only when running on Windows/Linux/macOS).'
         ),
         _('Take a screenshot and save at _PARAM1_'),
-        _('Screenshot'),
-        'JsPlatform/Extensions/take_screenshot24.png',
+        '',
+        'JsPlatform/Extensions/take_screenshot32.png',
         'JsPlatform/Extensions/take_screenshot32.png'
       )
       .addCodeOnlyParameter('currentScene', '')

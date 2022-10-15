@@ -1,14 +1,26 @@
 // @flow
 import * as React from 'react';
-import { type PreviewOptions } from '../../Export/PreviewLauncher.flow';
 import { type UnsavedChanges } from '../UnsavedChangesContext';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource';
+import type { StorageProvider } from '../../ProjectsStorage';
 import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
+import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
+import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
+import { type OnFetchNewlyAddedResourcesFunction } from '../../ProjectsStorage/ResourceFetcher';
+
+export type EditorContainerExtraProps = {|
+  // Events function extension editor
+  initiallyFocusedFunctionName?: ?string,
+  initiallyFocusedBehaviorName?: ?string,
+
+  // Homepage
+  storageProviders?: Array<StorageProvider>,
+|};
 
 export type RenderEditorContainerProps = {|
   isActive: boolean,
@@ -23,6 +35,7 @@ export type RenderEditorContainerProps = {|
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
+  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
 
   unsavedChanges: ?UnsavedChanges,
 
@@ -37,6 +50,7 @@ export type RenderEditorContainerProps = {|
   // Opening other editors:
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
+  onOpenEvents: (sceneName: string) => void,
   openInstructionOrExpression: (
     extension: gdPlatformExtension,
     type: string
@@ -46,22 +60,29 @@ export type RenderEditorContainerProps = {|
   onLoadEventsFunctionsExtensions: () => Promise<void>,
   onCreateEventsFunction: (
     extensionName: string,
-    eventsFunction: gdEventsFunction
+    eventsFunction: gdEventsFunction,
+    editorIdentifier:
+      | 'scene-events-editor'
+      | 'extension-events-editor'
+      | 'external-events-editor'
   ) => void,
 
   // Project opening
   canOpen: boolean,
-  onOpen: () => void,
-  onCreate: () => void,
+  onChooseProject: () => void,
+  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   onOpenProjectManager: () => void,
   onCloseProject: () => Promise<void>,
 
   // Other dialogs opening:
-  onOpenTutorials: () => void,
-  onOpenGamesShowcase: () => void,
+  onCreateProject: (?ExampleShortHeader) => void,
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
+  onOpenOnboardingDialog: () => void,
   onChangeSubscription: () => void,
+  onOpenProfile: () => void,
+  onOpenPreferences: () => void,
+  onOpenAbout: () => void,
 
   // Resources handling
   onDeleteResource: (resource: gdResource, cb: (boolean) => void) => void,
@@ -70,14 +91,13 @@ export type RenderEditorContainerProps = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+  canInstallPrivateAsset: () => boolean,
+
+  // Project creation
+  onOpenProjectPreCreationDialog: (?ExampleShortHeader) => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|
   ref: any => any, // TODO - improve the typing of this ref.
   ...RenderEditorContainerProps,
-|};
-
-export type EditorContainerExtraProps = {|
-  initiallyFocusedFunctionName?: ?string,
-  initiallyFocusedBehaviorName?: ?string,
 |};

@@ -7,7 +7,7 @@ import ResourcesList from '../ResourcesList';
 import ResourcePropertiesEditor from './ResourcePropertiesEditor';
 import Toolbar from './Toolbar';
 import EditorMosaic from '../UI/EditorMosaic';
-import InfoBar from '../UI/Messages/InfoBar';
+import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
@@ -17,7 +17,7 @@ import {
   type ChooseResourceFunction,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource';
-import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils.js';
+import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils';
 
 const gd: libGDevelop = global.gd;
 
@@ -71,6 +71,10 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     showPropertiesInfoBar: false,
     selectedResource: null,
   };
+
+  refreshResourcesList() {
+    if (this._resourcesList) this._resourcesList.forceUpdate();
+  }
 
   updateToolbar() {
     this.props.setToolbar(
@@ -178,7 +182,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
   openProjectFolder = () => {
     const project = this.props.project;
-    if (shell) shell.openItem(path.dirname(project.getProjectFile()));
+    if (shell) shell.openPath(path.dirname(project.getProjectFile()));
   };
 
   openProperties = () => {
@@ -271,7 +275,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             />
           )}
         </PreferencesContext.Consumer>
-        <InfoBar
+        <DismissableInfoBar
           message={
             <Trans>
               Properties panel is already opened. After selecting a resource,

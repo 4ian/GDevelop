@@ -4,29 +4,28 @@
  * reserved. This project is released under the MIT License.
  */
 
+#include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
+
 #include <algorithm>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/Animation.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/Direction.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/Sprite.h"
-#include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Project/InitialInstance.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
-
-#include <SFML/Graphics.hpp>
-#include "GDCore/Project/PropertyDescriptor.h"
-#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 
 namespace gd {
 
 Animation SpriteObject::badAnimation;
 
-SpriteObject::SpriteObject(gd::String name_)
-    : Object(name_), updateIfNotVisible(false) {}
+SpriteObject::SpriteObject() : updateIfNotVisible(false) {}
 
 SpriteObject::~SpriteObject(){};
 
@@ -103,7 +102,8 @@ void SpriteObject::DoSerializeTo(gd::SerializerElement& element) const {
   }
 }
 
-std::map<gd::String, gd::PropertyDescriptor> SpriteObject::GetProperties() const {
+std::map<gd::String, gd::PropertyDescriptor> SpriteObject::GetProperties()
+    const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   properties[_("Animate even if hidden or far from the screen")]
       .SetValue(updateIfNotVisible ? "true" : "false")
@@ -135,22 +135,30 @@ void SpriteObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {
 }
 
 std::map<gd::String, gd::PropertyDescriptor>
-SpriteObject::GetInitialInstanceProperties(const gd::InitialInstance& position,
-                                           gd::Project& project,
-                                           gd::Layout& scene) {
+SpriteObject::GetInitialInstanceProperties(
+    const gd::InitialInstance& initialInstance,
+    gd::Project& project,
+    gd::Layout& scene) {
   std::map<gd::String, gd::PropertyDescriptor> properties;
-  properties[_("Animation")] = gd::String::From(position.GetRawDoubleProperty("animation"));
+  properties["animation"] =
+      gd::PropertyDescriptor(
+          gd::String::From(initialInstance.GetRawDoubleProperty("animation")))
+          .SetLabel(_("Animation"))
+          .SetType("number");
 
   return properties;
 }
 
-bool SpriteObject::UpdateInitialInstanceProperty(gd::InitialInstance& position,
-                                                 const gd::String& name,
-                                                 const gd::String& value,
-                                                 gd::Project& project,
-                                                 gd::Layout& scene) {
-  if (name == _("Animation"))
-    position.SetRawDoubleProperty("animation", value.To<int>());
+bool SpriteObject::UpdateInitialInstanceProperty(
+    gd::InitialInstance& initialInstance,
+    const gd::String& name,
+    const gd::String& value,
+    gd::Project& project,
+    gd::Layout& scene) {
+  if (name == "animation") {
+    initialInstance.SetRawDoubleProperty(
+        "animation", std::max(0, value.empty() ? 0 : value.To<int>()));
+  }
 
   return true;
 }

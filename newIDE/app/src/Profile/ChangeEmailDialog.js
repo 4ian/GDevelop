@@ -3,8 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
-import RaisedButton from '../UI/RaisedButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { User as FirebaseUser } from 'firebase/auth';
 import {
   type ChangeEmailForm,
@@ -35,6 +34,8 @@ export default class ChangeEmailDialog extends Component<Props, State> {
   };
 
   _onChangeEmail = () => {
+    if (this.props.changeEmailInProgress) return;
+
     const { form } = this.state;
     this.props.onChangeEmail(form);
   };
@@ -50,7 +51,7 @@ export default class ChangeEmailDialog extends Component<Props, State> {
         onClick={onClose}
       />,
       <LeftLoader isLoading={changeEmailInProgress} key="change-email">
-        <RaisedButton
+        <DialogPrimaryButton
           label={<Trans>Save</Trans>}
           primary
           onClick={this._onChangeEmail}
@@ -63,11 +64,10 @@ export default class ChangeEmailDialog extends Component<Props, State> {
       <Dialog
         title={<Trans>Change your email</Trans>}
         actions={actions}
-        onRequestClose={() => {
-          if (!changeEmailInProgress) onClose();
-        }}
         maxWidth="sm"
-        cannotBeDismissed={true}
+        cannotBeDismissed={changeEmailInProgress}
+        onRequestClose={onClose}
+        onApply={this._onChangeEmail}
         open
       >
         <ColumnStackLayout noMargin>

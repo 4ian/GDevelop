@@ -1,10 +1,12 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { Line } from '../UI/Grid';
 import ResourcesLoader from '../ResourcesLoader';
 import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
@@ -32,13 +34,21 @@ type Props = {|
 |};
 
 type State = {|
+  thumbnailResourceName: string,
   desktopIconResourceNames: Array<string>,
   androidIconResourceNames: Array<string>,
+  androidWindowSplashScreenAnimatedIconResourceName: string,
   iosIconResourceNames: Array<string>,
 |};
 
 const desktopSizes = [512];
 const androidSizes = [192, 144, 96, 72, 48, 36];
+/**
+ * The recommended size for the image containing the Android SplashScreen icon.
+ * It's based on the recommended 288dp for a xxdpi (=480 dpi) screen, which results in
+ * 288 * 480 / 160 = "288 @ 3x" = 864px.
+ */
+const androidWindowSplashScreenAnimatedIconRecommendedSize = 864;
 const iosSizes = [
   1024,
   180,
@@ -71,20 +81,26 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
   }
 
   _loadFrom(project: gdProject): State {
+    const platformSpecificAssets = project.getPlatformSpecificAssets();
     return {
+      thumbnailResourceName: platformSpecificAssets.get('liluo', `thumbnail`),
       desktopIconResourceNames: desktopSizes.map(size =>
-        project.getPlatformSpecificAssets().get('desktop', `icon-${size}`)
+        platformSpecificAssets.get('desktop', `icon-${size}`)
       ),
       androidIconResourceNames: androidSizes.map(size =>
-        project.getPlatformSpecificAssets().get('android', `icon-${size}`)
+        platformSpecificAssets.get('android', `icon-${size}`)
       ),
+      androidWindowSplashScreenAnimatedIconResourceName: project
+        .getPlatformSpecificAssets()
+        .get('android', `windowSplashScreenAnimatedIcon`),
       iosIconResourceNames: iosSizes.map(size =>
-        project.getPlatformSpecificAssets().get('ios', `icon-${size}`)
+        platformSpecificAssets.get('ios', `icon-${size}`)
       ),
     };
   }
 
-  componentWillReceiveProps(newProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     if (
       (!this.props.open && newProps.open) ||
       (newProps.open && this.props.project !== newProps.project)
@@ -139,6 +155,16 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             }
           )
         ),
+        resizeImage(
+          fullPath,
+          path.join(projectPath, 'android-windowSplashScreenAnimatedIcon.png'),
+          {
+            width: androidWindowSplashScreenAnimatedIconRecommendedSize,
+            height: androidWindowSplashScreenAnimatedIconRecommendedSize,
+            transparentBorderSize:
+              androidWindowSplashScreenAnimatedIconRecommendedSize / 6,
+          }
+        ),
         ...iosSizes.map(size =>
           resizeImage(
             fullPath,
@@ -164,6 +190,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         const allResourcesNames = [
           ...desktopSizes.map(size => `desktop-icon-${size}.png`),
           ...androidSizes.map(size => `android-icon-${size}.png`),
+          'android-windowSplashScreenAnimatedIcon.png',
           ...iosSizes.map(size => `ios-icon-${size}.png`),
         ];
         allResourcesNames.forEach(resourceName => {
@@ -192,6 +219,8 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             androidIconResourceNames: androidSizes.map(
               size => `android-icon-${size}.png`
             ),
+            androidWindowSplashScreenAnimatedIconResourceName:
+              'android-windowSplashScreenAnimatedIcon.png',
             iosIconResourceNames: iosSizes.map(size => `ios-icon-${size}.png`),
           });
         }, 200 /* Let a bit of time so that image files can be found */);
@@ -202,25 +231,42 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
   onApply = () => {
     const { project } = this.props;
     const {
+      thumbnailResourceName,
       desktopIconResourceNames,
       androidIconResourceNames,
+      androidWindowSplashScreenAnimatedIconResourceName,
       iosIconResourceNames,
     } = this.state;
 
+    const platformSpecificAssets = project.getPlatformSpecificAssets();
+
+    platformSpecificAssets.set('liluo', `thumbnail`, thumbnailResourceName);
+
     desktopSizes.forEach((size, index) => {
-      project
-        .getPlatformSpecificAssets()
-        .set('desktop', `icon-${size}`, desktopIconResourceNames[index]);
+      platformSpecificAssets.set(
+        'desktop',
+        `icon-${size}`,
+        desktopIconResourceNames[index]
+      );
     });
     androidSizes.forEach((size, index) => {
-      project
-        .getPlatformSpecificAssets()
-        .set('android', `icon-${size}`, androidIconResourceNames[index]);
+      platformSpecificAssets.set(
+        'android',
+        `icon-${size}`,
+        androidIconResourceNames[index]
+      );
     });
+    platformSpecificAssets.set(
+      'android',
+      `windowSplashScreenAnimatedIcon`,
+      androidWindowSplashScreenAnimatedIconResourceName
+    );
     iosSizes.forEach((size, index) => {
-      project
-        .getPlatformSpecificAssets()
-        .set('ios', `icon-${size}`, iosIconResourceNames[index]);
+      platformSpecificAssets.set(
+        'ios',
+        `icon-${size}`,
+        iosIconResourceNames[index]
+      );
     });
 
     this.props.onApply();
@@ -234,11 +280,10 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         primary={false}
         onClick={this.props.onClose}
       />,
-      <FlatButton
+      <DialogPrimaryButton
         key="apply"
         label={<Trans>Apply</Trans>}
         primary={true}
-        keyboardFocused={true}
         onClick={this.onApply}
       />,
     ];
@@ -249,21 +294,39 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
       resourceExternalEditors,
     } = this.props;
     const {
+      thumbnailResourceName,
       desktopIconResourceNames,
       androidIconResourceNames,
+      androidWindowSplashScreenAnimatedIconResourceName,
       iosIconResourceNames,
     } = this.state;
 
     return (
       <Dialog
-        onApply={this.onApply}
         title={<Trans>Project icons</Trans>}
         actions={actions}
         open={this.props.open}
-        cannotBeDismissed={true}
         onRequestClose={this.props.onClose}
+        onApply={this.onApply}
       >
         <ColumnStackLayout noMargin>
+          <Text size="sub-title">
+            <Trans>Liluo.io thumbnail</Trans>
+          </Text>
+          <ResourceSelectorWithThumbnail
+            floatingLabelText={`Liluo.io thumbnail (1920x1080 px)`}
+            project={project}
+            resourceSources={resourceSources}
+            onChooseResource={onChooseResource}
+            resourceExternalEditors={resourceExternalEditors}
+            resourceKind="image"
+            resourceName={thumbnailResourceName}
+            onChange={resourceName => {
+              this.setState({
+                thumbnailResourceName: resourceName,
+              });
+            }}
+          />
           <Line justifyContent="center">
             {isResizeSupported() ? (
               <RaisedButton
@@ -280,8 +343,8 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
               </Text>
             )}
           </Line>
-          <Text>
-            <Trans>Desktop (Windows, macOS and Linux) icon:</Trans>
+          <Text size="sub-title">
+            <Trans>Desktop (Windows, macOS and Linux) icon</Trans>
           </Text>
           {desktopSizes.map((size, index) => (
             <ResourceSelectorWithThumbnail
@@ -302,9 +365,30 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
               }}
             />
           ))}
-          <Text>
-            <Trans>Android icons:</Trans>
+          <Text size="sub-title">
+            <Trans>Android icons and Android 12+ splashscreen</Trans>
           </Text>
+          <I18n>
+            {({ i18n }) => (
+              <ResourceSelectorWithThumbnail
+                floatingLabelText={`Android 12+ splashscreen icon (576x576 px)`}
+                project={project}
+                resourceSources={resourceSources}
+                onChooseResource={onChooseResource}
+                resourceExternalEditors={resourceExternalEditors}
+                resourceKind="image"
+                resourceName={androidWindowSplashScreenAnimatedIconResourceName}
+                onChange={resourceName => {
+                  this.setState({
+                    androidWindowSplashScreenAnimatedIconResourceName: resourceName,
+                  });
+                }}
+                helperMarkdownText={i18n._(
+                  t`The image should be at least 864x864px, and the logo must fit [within a circle of 576px](https://developer.android.com/guide/topics/ui/splash-screen#splash_screen_dimensions). Transparent borders are automatically added when generated to help ensuring this.`
+                )}
+              />
+            )}
+          </I18n>
           {androidSizes.map((size, index) => (
             <ResourceSelectorWithThumbnail
               key={size}
@@ -324,8 +408,8 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
               }}
             />
           ))}
-          <Text>
-            <Trans>iOS (iPhone and iPad) icons:</Trans>
+          <Text size="sub-title">
+            <Trans>iOS (iPhone and iPad) icons</Trans>
           </Text>
           {iosSizes.map((size, index) => (
             <ResourceSelectorWithThumbnail

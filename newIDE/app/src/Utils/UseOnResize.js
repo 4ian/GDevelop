@@ -7,12 +7,14 @@ import React from 'react';
 const listeners: Set<() => void> = new Set();
 
 // Event listener set-up
-const callListeners = () => listeners.forEach(callback => callback());
-let timeout;
-window.addEventListener('resize', () => {
-  clearTimeout(timeout);
-  timeout = setTimeout(callListeners, 200);
-});
+if (typeof window !== 'undefined') {
+  const callListeners = () => listeners.forEach(callback => callback());
+  let timeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(timeout);
+    timeout = setTimeout(callListeners, 200);
+  });
+}
 
 /**
  * A hook to call a callback when the window is resized,

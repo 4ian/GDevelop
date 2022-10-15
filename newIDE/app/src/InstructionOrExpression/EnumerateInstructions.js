@@ -2,9 +2,7 @@
 import {
   type EnumeratedInstructionMetadata,
   type InstructionOrExpressionScope,
-  type EnumeratedInstructionOrExpressionMetadata,
-} from './EnumeratedInstructionOrExpressionMetadata.js';
-import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
+} from './EnumeratedInstructionOrExpressionMetadata';
 
 const gd: libGDevelop = global.gd;
 
@@ -31,7 +29,8 @@ const freeConditionsToAddToObject: ExtensionsExtraInstructions = {
       'AjoutHasard',
       'AjoutObjConcern',
       'CollisionNP',
-      'NbObjet',
+      'SceneInstancesCount',
+      'PickedInstancesCount',
       'PickNearest',
       'Distance',
       'SeDirige',
@@ -45,7 +44,11 @@ const freeActionsToAddToBehavior: ExtensionsExtraInstructions = {};
 
 const freeConditionsToAddToBehavior: ExtensionsExtraInstructions = {
   Physics2: {
-    'Physics2::Physics2Behavior': ['Physics2::Collision'],
+    'Physics2::Physics2Behavior': [
+      'Physics2::Collision',
+      'Physics2::CollisionStarted',
+      'Physics2::CollisionStopped',
+    ],
   },
 };
 
@@ -61,6 +64,10 @@ const freeInstructionsToRemove = {
     // $FlowFixMe
     ...freeConditionsToAddToBehavior.Physics2['Physics2::Physics2Behavior'],
   ],
+};
+
+export const getExtensionPrefix = (extension: gdPlatformExtension): string => {
+  return extension.getCategory() + GROUP_DELIMITER + extension.getFullName();
 };
 
 /**
@@ -164,7 +171,9 @@ const enumerateInstruction = (
   const displayedName = instrMetadata.getFullName();
   const groupName = instrMetadata.getGroup();
   const iconFilename = instrMetadata.getIconFilename();
-  const fullGroupName = prefix + groupName;
+  const fullGroupName = [prefix, groupName]
+    .filter(Boolean)
+    .join(GROUP_DELIMITER);
 
   return {
     type,
@@ -192,6 +201,14 @@ const enumerateExtensionInstructions = (
     const instrMetadata = instructions.get(type);
     if (instrMetadata.isHidden()) continue;
 
+    if (
+      scope.objectMetadata &&
+      scope.objectMetadata.isUnsupportedBaseObjectCapability(
+        instrMetadata.getRequiredBaseObjectCapability()
+      )
+    )
+      continue; // Skip instructions not supported by the object.
+
     allInstructions.push(
       enumerateInstruction(prefix, type, instrMetadata, scope)
     );
@@ -216,17 +233,7 @@ export const enumerateAllInstructions = (
     const extensionName = extension.getName();
     const allObjectsTypes = extension.getExtensionObjectsTypes();
     const allBehaviorsTypes = extension.getBehaviorsTypes();
-
-    let prefix = '';
-    if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
-      prefix =
-        extensionName === 'BuiltinObject'
-          ? 'Common ' +
-            (isCondition ? 'conditions' : 'actions') +
-            ' for all objects'
-          : extension.getFullName();
-      prefix += GROUP_DELIMITER;
-    }
+    const prefix = getExtensionPrefix(extension);
 
     //Free instructions
     const extensionFreeInstructions = enumerateExtensionInstructions(
@@ -349,87 +356,80 @@ export const enumerateObjectAndBehaviorsInstructions = (
       )
     )
   );
-  const baseObjectType = ''; /* An empty string means the base object */
 
+  // Enumerate instructions of the object.
+  const extensionAndObjectMetadata = gd.MetadataProvider.getExtensionAndObjectMetadata(
+    gd.JsPlatform.get(),
+    objectType
+  );
+  const extension = extensionAndObjectMetadata.getExtension();
+  const objectMetadata = extensionAndObjectMetadata.getMetadata();
+  const scope = { extension, objectMetadata };
+  const prefix = '';
+
+  allInstructions = [
+    ...allInstructions,
+    ...enumerateExtensionInstructions(
+      prefix,
+      isCondition
+        ? extension.getAllConditionsForObject(objectType)
+        : extension.getAllActionsForObject(objectType),
+      scope
+    ),
+    ...enumerateExtraObjectInstructions(
+      isCondition,
+      extension,
+      objectType,
+      prefix,
+      scope
+    ),
+  ];
+
+  // Enumerate instructions of the base object that the object "inherits" from.
+  const baseObjectType = ''; /* An empty string means the base object */
+  if (objectType !== baseObjectType) {
+    const baseExtensionAndObjectMetadata = gd.MetadataProvider.getExtensionAndObjectMetadata(
+      gd.JsPlatform.get(),
+      baseObjectType
+    );
+    const baseObjectExtension = baseExtensionAndObjectMetadata.getExtension();
+
+    allInstructions = [
+      ...allInstructions,
+      ...enumerateExtensionInstructions(
+        prefix,
+        isCondition
+          ? baseObjectExtension.getAllConditionsForObject(baseObjectType)
+          : baseObjectExtension.getAllActionsForObject(baseObjectType),
+        scope
+      ),
+      ...enumerateExtraObjectInstructions(
+        isCondition,
+        baseObjectExtension,
+        baseObjectType,
+        prefix,
+        scope
+      ),
+    ];
+  }
+
+  // Enumerate behaviors instructions.
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
-    const hasObjectType =
-      extension
-        .getExtensionObjectsTypes()
-        .toJSArray()
-        .indexOf(objectType) !== -1;
-    const hasBaseObjectType =
-      extension
-        .getExtensionObjectsTypes()
-        .toJSArray()
-        .indexOf(baseObjectType) !== -1;
     const behaviorTypes = extension
       .getBehaviorsTypes()
       .toJSArray()
       .filter(behaviorType => objectBehaviorTypes.has(behaviorType));
 
-    if (!hasObjectType && !hasBaseObjectType && behaviorTypes.length === 0) {
-      continue;
-    }
-
-    const prefix = '';
-
-    //Objects instructions:
-    if (objectType !== baseObjectType && hasObjectType) {
-      const objectMetadata = extension.getObjectMetadata(objectType);
-      const scope = { extension, objectMetadata };
-
-      allInstructions = [
-        ...allInstructions,
-        ...enumerateExtensionInstructions(
-          prefix,
-          isCondition
-            ? extension.getAllConditionsForObject(objectType)
-            : extension.getAllActionsForObject(objectType),
-          scope
-        ),
-        ...enumerateExtraObjectInstructions(
-          isCondition,
-          extension,
-          baseObjectType,
-          prefix,
-          scope
-        ),
-      ];
-    }
-
-    if (hasBaseObjectType) {
-      const objectMetadata = extension.getObjectMetadata(baseObjectType);
-      const scope = { extension, objectMetadata };
-
-      allInstructions = [
-        ...allInstructions,
-        ...enumerateExtensionInstructions(
-          prefix,
-          isCondition
-            ? extension.getAllConditionsForObject(baseObjectType)
-            : extension.getAllActionsForObject(baseObjectType),
-          scope
-        ),
-        ...enumerateExtraObjectInstructions(
-          isCondition,
-          extension,
-          baseObjectType,
-          prefix,
-          scope
-        ),
-      ];
-    }
-
-    //Behaviors instructions (show them at the top of the list):
     // eslint-disable-next-line
     behaviorTypes.forEach(behaviorType => {
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
       const scope = { extension, behaviorMetadata };
 
+      // Show them at the top of the list.
       allInstructions = [
         ...enumerateExtensionInstructions(
           prefix,
@@ -468,14 +468,7 @@ export const enumerateFreeInstructions = (
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
     const extensionName: string = extension.getName();
-    const allObjectsTypes = extension.getExtensionObjectsTypes();
-    const allBehaviorsTypes = extension.getBehaviorsTypes();
-
-    let prefix = '';
-    if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
-      prefix = extensionName === 'BuiltinObject' ? '' : extension.getFullName();
-      prefix += GROUP_DELIMITER;
-    }
+    const prefix = getExtensionPrefix(extension);
 
     //Free instructions
     const extensionFreeInstructions = enumerateExtensionInstructions(
@@ -502,39 +495,6 @@ export const enumerateFreeInstructions = (
 export type InstructionFilteringOptions = {|
   searchText: string,
 |};
-
-export const filterInstructionsList = <
-  T: EnumeratedInstructionOrExpressionMetadata
->(
-  list: Array<T>,
-  { searchText }: InstructionFilteringOptions
-): Array<T> => {
-  if (!searchText) {
-    return list;
-  }
-
-  const directMatches = [];
-  const fuzzyMatches = [];
-  const lowercaseSearch = searchText.toLowerCase();
-
-  list.forEach(option => {
-    const lowerCaseDisplayedName = option.displayedName.toLowerCase();
-    const lowerCaseFullGroupName = option.fullGroupName.toLowerCase();
-    // favor direct matches first
-    if (lowerCaseDisplayedName.includes(lowercaseSearch)) {
-      return directMatches.push(option);
-    }
-    // then add fuzzy matches
-    if (
-      fuzzyOrEmptyFilter(lowercaseSearch, lowerCaseDisplayedName) ||
-      fuzzyOrEmptyFilter(lowercaseSearch, lowerCaseFullGroupName)
-    ) {
-      return fuzzyMatches.push(option);
-    }
-  });
-
-  return [...directMatches, ...fuzzyMatches];
-};
 
 export const getObjectParameterIndex = (
   instructionMetadata: gdInstructionMetadata

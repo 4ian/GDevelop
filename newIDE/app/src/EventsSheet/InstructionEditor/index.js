@@ -1,8 +1,10 @@
 // @flow
 import * as React from 'react';
 import Paper from '@material-ui/core/Paper';
-import InstructionSelector from './InstructionOrExpressionSelector/InstructionSelector.js';
-import InstructionParametersEditor from './InstructionParametersEditor.js';
+import InstructionSelector from './InstructionOrExpressionSelector/InstructionSelector';
+import InstructionParametersEditor, {
+  type InstructionParametersEditorInterface,
+} from './InstructionParametersEditor';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -42,7 +44,7 @@ type Props = {|
 type State = {||};
 
 export default class InstructionEditor extends React.Component<Props, State> {
-  _instructionParametersEditor: ?InstructionParametersEditor;
+  _instructionParametersEditor: ?InstructionParametersEditorInterface;
 
   chooseType = (type: string) => {
     const { instruction } = this.props;

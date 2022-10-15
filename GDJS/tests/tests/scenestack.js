@@ -3,7 +3,7 @@
 /**
  * Tests for gdjs.SceneStack.
  */
-describe('gdjs.SceneStack', function() {
+describe('gdjs.SceneStack', function () {
   var runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     // @ts-expect-error ts-migrate(2740) FIXME: Type '{ windowWidth: number; windowHeight: number;... Remove this comment to see the full error message
@@ -38,33 +38,39 @@ describe('gdjs.SceneStack', function() {
         variables: [],
       },
     ],
-    resources: { resources: [] }
+    resources: { resources: [] },
   });
   var sceneStack = runtimeGame._sceneStack;
 
-  it('should support pushing, replacing and popping scenes', function() {
-    // Set up some global callbacks
-    var firstLoadedScene = null;
-    var lastLoadedScene = null;
-    var lastUnloadedScene = null;
-    var lastPausedScene = null;
-    var lastResumedScene = null;
+  it('should support pushing, replacing and popping scenes', function () {
+    // Set up some scene callbacks.
+    let firstLoadedScene = null;
+    let lastLoadedScene = null;
+    let lastUnloadedScene = null;
+    let lastPausedScene = null;
+    let lastResumedScene = null;
 
-    gdjs.registerFirstRuntimeSceneLoadedCallback(function(runtimeScene) {
+    const onFirstRuntimeSceneLoaded = (runtimeScene) => {
       firstLoadedScene = runtimeScene;
-    });
-    gdjs.registerRuntimeSceneLoadedCallback(function(runtimeScene) {
+    };
+    const onRuntimeSceneLoaded = (runtimeScene) => {
       lastLoadedScene = runtimeScene;
-    });
-    gdjs.registerRuntimeSceneUnloadedCallback(function(runtimeScene) {
+    };
+    const onRuntimeSceneUnloaded = (runtimeScene) => {
       lastUnloadedScene = runtimeScene;
-    });
-    gdjs.registerRuntimeScenePausedCallback(function(runtimeScene) {
+    };
+    const onRuntimeScenePaused = (runtimeScene) => {
       lastPausedScene = runtimeScene;
-    });
-    gdjs.registerRuntimeSceneResumedCallback(function(runtimeScene) {
+    };
+    const onRuntimeSceneResumed = (runtimeScene) => {
       lastResumedScene = runtimeScene;
-    });
+    };
+
+    gdjs.registerFirstRuntimeSceneLoadedCallback(onFirstRuntimeSceneLoaded);
+    gdjs.registerRuntimeSceneLoadedCallback(onRuntimeSceneLoaded);
+    gdjs.registerRuntimeSceneUnloadedCallback(onRuntimeSceneUnloaded);
+    gdjs.registerRuntimeScenePausedCallback(onRuntimeScenePaused);
+    gdjs.registerRuntimeSceneResumedCallback(onRuntimeSceneResumed);
 
     // Test the stack
     expect(sceneStack.pop()).to.be(null);
@@ -122,6 +128,10 @@ describe('gdjs.SceneStack', function() {
     expect(sceneStack.wasFirstSceneLoaded()).to.be(true);
 
     // Remove all the global callbacks
-    gdjs.clearGlobalCallbacks();
+    gdjs._unregisterCallback(onFirstRuntimeSceneLoaded);
+    gdjs._unregisterCallback(onRuntimeSceneLoaded);
+    gdjs._unregisterCallback(onRuntimeSceneUnloaded);
+    gdjs._unregisterCallback(onRuntimeScenePaused);
+    gdjs._unregisterCallback(onRuntimeSceneResumed);
   });
 });

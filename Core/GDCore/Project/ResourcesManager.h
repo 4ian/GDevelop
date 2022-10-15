@@ -60,7 +60,7 @@ class GD_CORE_API Resource {
    * \see gd::Resource::GetFile
    * \see gd::Resource::SetFile
    */
-  virtual bool UseFile() { return false; }
+  virtual bool UseFile() const { return false; }
 
   /**
    * \brief Return, if applicable, the String containing the file used by the
@@ -104,7 +104,6 @@ class GD_CORE_API Resource {
    */
   virtual const gd::String& GetMetadata() const { return metadata; }
 
-#if defined(GD_IDE_ONLY)
   /** \name Resources properties
    * Reading and updating resources properties
    */
@@ -136,7 +135,6 @@ class GD_CORE_API Resource {
     return false;
   };
 ///@}
-#endif
 
   /**
    * \brief Serialize the object
@@ -186,8 +184,7 @@ class GD_CORE_API ImageResource : public Resource {
    */
   virtual void SetFile(const gd::String& newFile) override;
 
-#if defined(GD_IDE_ONLY)
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name, const gd::String& value) override;
@@ -196,7 +193,6 @@ class GD_CORE_API ImageResource : public Resource {
    * \brief Serialize the object
    */
   void SerializeTo(SerializerElement& element) const override;
-#endif
 
   /**
    * \brief Unserialize the objectt.
@@ -227,7 +223,7 @@ class GD_CORE_API ImageResource : public Resource {
  */
 class GD_CORE_API AudioResource : public Resource {
  public:
-  AudioResource() : Resource(), preloadAsMusic(false), preloadAsSound(false) {
+  AudioResource() : Resource(), preloadAsMusic(false), preloadAsSound(false), preloadInCache(false) {
     SetKind("audio");
   };
   virtual ~AudioResource(){};
@@ -238,14 +234,12 @@ class GD_CORE_API AudioResource : public Resource {
   virtual const gd::String& GetFile() const override { return file; };
   virtual void SetFile(const gd::String& newFile) override;
 
-#if defined(GD_IDE_ONLY)
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name, const gd::String& value) override;
 
   void SerializeTo(SerializerElement& element) const override;
-#endif
 
   void UnserializeFrom(const SerializerElement& element) override;
 
@@ -269,10 +263,21 @@ class GD_CORE_API AudioResource : public Resource {
    */
   void SetPreloadAsSound(bool enable = true) { preloadAsSound = enable; }
 
+  /**
+   * \brief Return true if the audio resource should be preloaded in cache (without decoding into memory).
+   */
+  bool PreloadInCache() const { return preloadInCache; }
+
+  /**
+   * \brief Set if the audio resource should be preloaded in cache (without decoding into memory).
+   */
+  void SetPreloadInCache(bool enable = true) { preloadInCache = enable; }
+
  private:
   gd::String file;
   bool preloadAsSound;
   bool preloadAsMusic;
+  bool preloadInCache;
 };
 
 /**
@@ -292,10 +297,8 @@ class GD_CORE_API FontResource : public Resource {
   virtual const gd::String& GetFile() const override { return file; };
   virtual void SetFile(const gd::String& newFile) override;
 
-#if defined(GD_IDE_ONLY)
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
   void SerializeTo(SerializerElement& element) const override;
-#endif
 
   void UnserializeFrom(const SerializerElement& element) override;
 
@@ -320,10 +323,8 @@ class GD_CORE_API VideoResource : public Resource {
   virtual const gd::String& GetFile() const override { return file; };
   virtual void SetFile(const gd::String& newFile) override;
 
-#if defined(GD_IDE_ONLY)
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
   void SerializeTo(SerializerElement& element) const override;
-#endif
 
   void UnserializeFrom(const SerializerElement& element) override;
 
@@ -348,14 +349,12 @@ class GD_CORE_API JsonResource : public Resource {
   virtual const gd::String& GetFile() const override { return file; };
   virtual void SetFile(const gd::String& newFile) override;
 
-#if defined(GD_IDE_ONLY)
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name, const gd::String& value) override;
 
   void SerializeTo(SerializerElement& element) const override;
-#endif
 
   void UnserializeFrom(const SerializerElement& element) override;
 
@@ -391,10 +390,8 @@ class GD_CORE_API BitmapFontResource : public Resource {
   virtual const gd::String& GetFile() const override { return file; };
   virtual void SetFile(const gd::String& newFile) override;
 
-#if defined(GD_IDE_ONLY)
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
   void SerializeTo(SerializerElement& element) const override;
-#endif
 
   void UnserializeFrom(const SerializerElement& element) override;
 
@@ -461,9 +458,8 @@ class GD_CORE_API ResourcesManager {
    * \brief Return a list of the files, from the specified input list,
    * that are not used as files by the resources.
    */
-  std::vector<gd::String> FindFilesNotInResources(const std::vector<gd::String>& filesToCheck) const;
+  std::vector<gd::String> FindFilesNotInResources(const std::vector<gd::String>& filePathsToCheck) const;
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Return a (smart) pointer to a resource.
    */
@@ -557,7 +553,6 @@ class GD_CORE_API ResourcesManager {
    * \brief Serialize the object
    */
   void SerializeTo(SerializerElement& element) const;
-#endif
 
   /**
    * \brief Unserialize the objectt.
@@ -568,18 +563,13 @@ class GD_CORE_API ResourcesManager {
   void Init(const ResourcesManager& other);
 
   std::vector<std::shared_ptr<Resource> > resources;
-#if defined(GD_IDE_ONLY)
   std::vector<ResourceFolder> folders;
-#endif
 
-#if defined(GD_IDE_ONLY)
   static ResourceFolder badFolder;
-#endif
   static Resource badResource;
   static gd::String badResourceName;
 };
 
-#if defined(GD_IDE_ONLY)
 class GD_CORE_API ResourceFolder {
  public:
   ResourceFolder(){};
@@ -654,7 +644,6 @@ class GD_CORE_API ResourceFolder {
   void Init(const ResourceFolder& other);
   static Resource badResource;
 };
-#endif
 
 }  // namespace gd
 

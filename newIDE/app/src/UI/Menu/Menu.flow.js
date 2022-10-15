@@ -11,7 +11,7 @@ export type MenuItemTemplate =
       visible?: boolean,
       enabled?: boolean,
       disabled?: boolean,
-      click?: ?() => void,
+      click?: ?() => void | Promise<void>,
       accelerator?: string,
     |}
   // Sub menu
@@ -26,7 +26,7 @@ export type MenuItemTemplate =
       visible?: boolean,
       enabled?: boolean,
       checked: boolean,
-      click?: ?() => void,
+      click?: ?() => void | (() => Promise<void>),
     |}
   // A separator
   | {| type: 'separator' |};

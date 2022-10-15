@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
@@ -9,13 +10,21 @@ import { ExtensionStore } from '.';
 import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import HelpButton from '../../UI/HelpButton';
 import { importExtension, installExtension } from './InstallExtension';
-import InfoBar from '../../UI/Messages/InfoBar';
+import DismissableInfoBar from '../../UI/Messages/DismissableInfoBar';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import {
+  addCreateBadgePreHookIfNotClaimed,
+  TRIVIAL_FIRST_EXTENSION,
+} from '../../Utils/GDevelopServices/Badge';
+import Add from '@material-ui/icons/Add';
 
 type Props = {|
   project: gdProject,
   onClose: () => void,
   onInstallExtension: ExtensionShortHeader => void,
+  onExtensionInstalled?: (extensionShortHeader?: ExtensionShortHeader) => void,
+  onCreateNew?: () => void,
 |};
 
 /**
@@ -25,6 +34,8 @@ export default function ExtensionsSearchDialog({
   project,
   onClose,
   onInstallExtension,
+  onExtensionInstalled,
+  onCreateNew,
 }: Props) {
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
@@ -33,12 +44,56 @@ export default function ExtensionsSearchDialog({
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+
+  const installDisplayedExtension = addCreateBadgePreHookIfNotClaimed(
+    authenticatedUser,
+    TRIVIAL_FIRST_EXTENSION,
+    installExtension
+  );
+
+  const installOrImportExtension = async (
+    i18n: I18nType,
+    extensionShortHeader?: ExtensionShortHeader
+  ) => {
+    setIsInstalling(true);
+    try {
+      let wasExtensionInstalledOrImported;
+      if (!!extensionShortHeader) {
+        onInstallExtension(extensionShortHeader);
+        wasExtensionInstalledOrImported = await installDisplayedExtension(
+          i18n,
+          project,
+          eventsFunctionsExtensionsState,
+          extensionShortHeader
+        );
+      } else {
+        wasExtensionInstalledOrImported = await importExtension(
+          i18n,
+          eventsFunctionsExtensionsState,
+          project
+        );
+      }
+
+      if (wasExtensionInstalledOrImported) {
+        setExtensionWasInstalled(true);
+        if (onExtensionInstalled) onExtensionInstalled();
+        return true;
+      }
+
+      return false;
+    } finally {
+      setIsInstalling(false);
+    }
+  };
+
   const eventsFunctionsExtensionOpener = eventsFunctionsExtensionsState.getEventsFunctionsExtensionOpener();
 
   return (
     <I18n>
       {({ i18n }) => (
         <Dialog
+          fullHeight
           title={<Trans>Search for New Extensions</Trans>}
           actions={[
             <FlatButton
@@ -53,50 +108,39 @@ export default function ExtensionsSearchDialog({
             <HelpButton key="help" helpPagePath="/extensions/search" />,
             eventsFunctionsExtensionOpener ? (
               <FlatButton
-                icon={<CloudDownload />}
+                leftIcon={<CloudDownload />}
                 key="import"
                 label={<Trans>Import extension</Trans>}
                 onClick={() => {
-                  (async () => {
-                    setIsInstalling(true);
-                    const wasExtensionImported = await importExtension(
-                      i18n,
-                      eventsFunctionsExtensionsState,
-                      project
-                    );
-                    setExtensionWasInstalled(wasExtensionImported);
-                    setIsInstalling(false);
-                  })();
+                  installOrImportExtension(i18n);
                 }}
                 disabled={isInstalling}
               />
             ) : null,
+            onCreateNew ? (
+              <FlatButton
+                key="create-new"
+                onClick={onCreateNew}
+                label={<Trans>Create a new extension</Trans>}
+                leftIcon={<Add />}
+              />
+            ) : null,
           ]}
-          cannotBeDismissed={true}
           flexBody
           open
           noMargin
+          cannotBeDismissed={isInstalling}
           onRequestClose={onClose}
         >
           <ExtensionStore
             isInstalling={isInstalling}
-            onInstall={async extensionShortHeader => {
-              setIsInstalling(true);
-              onInstallExtension(extensionShortHeader);
-              const wasExtensionInstalled = await installExtension(
-                i18n,
-                project,
-                eventsFunctionsExtensionsState,
-                extensionShortHeader
-              );
-
-              setExtensionWasInstalled(wasExtensionInstalled);
-              setIsInstalling(false);
-            }}
+            onInstall={async extensionShortHeader =>
+              installOrImportExtension(i18n, extensionShortHeader)
+            }
             project={project}
             showOnlyWithBehaviors={false}
           />
-          <InfoBar
+          <DismissableInfoBar
             identifier="extension-installed-explanation"
             message={
               <Trans>

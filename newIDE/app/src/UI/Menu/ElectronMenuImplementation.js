@@ -1,5 +1,6 @@
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
+const remote = optionalRequire('@electron/remote');
 
 /**
  * Wraps an Electron Menu
@@ -13,8 +14,8 @@ export default class ElectronMenuImplementation {
   showMenu(dimensions) {
     if (!electron) return;
 
-    const { Menu } = electron.remote;
-    const browserWindow = electron.remote.getCurrentWindow();
+    const { Menu } = remote;
+    const browserWindow = remote.getCurrentWindow();
     this.menu = Menu.buildFromTemplate(this.menuTemplate);
     this.menu.popup({
       window: browserWindow,

@@ -48,6 +48,8 @@ export const localHTML5ExportPipeline: ExportPipeline<
 
   canLaunchBuild: exportState => !!exportState.outputDir,
 
+  isNavigationDisabled: () => false,
+
   renderHeader: ({ project, exportState, updateExportState }) => (
     <Column noMargin>
       <Line>
@@ -121,7 +123,7 @@ export const localHTML5ExportPipeline: ExportPipeline<
 
   renderDoneFooter: ({ exportState, onClose }) => {
     const openExportFolder = () => {
-      if (shell) shell.openItem(exportState.outputDir);
+      if (shell) shell.openPath(exportState.outputDir);
     };
 
     return (

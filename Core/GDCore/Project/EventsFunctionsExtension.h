@@ -3,7 +3,6 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#if defined(GD_IDE_ONLY)
 #ifndef GDCORE_EVENTSFUNCTIONEXTENSION_H
 #define GDCORE_EVENTSFUNCTIONEXTENSION_H
 
@@ -11,6 +10,7 @@
 
 #include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/SerializableWithNameList.h"
@@ -85,6 +85,12 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
     return *this;
   }
 
+  const gd::String& GetCategory() const { return category; };
+  EventsFunctionsExtension& SetCategory(const gd::String& category_) {
+    category = category_;
+    return *this;
+  }
+
   const std::vector<gd::String>& GetTags() const { return tags; };
   std::vector<gd::String>& GetTags() { return tags; };
 
@@ -140,6 +146,38 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
     return eventsBasedBehaviors;
   }
 
+  /**
+   * \brief Return a reference to the list of the events based objects.
+   */
+  gd::SerializableWithNameList<EventsBasedObject>& GetEventsBasedObjects() {
+    return eventsBasedObjects;
+  }
+
+  /**
+   * \brief Return a const reference to the list of the events based objects.
+   */
+  const gd::SerializableWithNameList<EventsBasedObject>&
+  GetEventsBasedObjects() const {
+    return eventsBasedObjects;
+  }
+
+  /**
+   * \brief Sets an extension origin. This method is not present since the
+   * beginning so the projects created before that will have extensions
+   * installed from the store without an origin. Keep that in mind when creating
+   * features that rely on an extension's origin.
+   */
+  virtual void SetOrigin(const gd::String& originName_,
+                         const gd::String& originIdentifier_) {
+    originName = originName_;
+    originIdentifier = originIdentifier_;
+  }
+
+  virtual const gd::String& GetOriginName() const { return originName; }
+  virtual const gd::String& GetOriginIdentifier() const {
+    return originIdentifier;
+  }
+
   /** \name Dependencies
    */
   ///@{
@@ -178,10 +216,26 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   void SerializeTo(gd::SerializerElement& element) const;
 
   /**
-   * \brief Load the EventsFunctionsExtension from the specified element
+   * \brief Load the EventsFunctionsExtension from the specified element.
    */
   void UnserializeFrom(gd::Project& project,
                        const gd::SerializerElement& element);
+
+  /**
+   * \brief Load the extension without free functions, behaviors and objects
+   * implementation.
+   */
+  void UnserializeExtensionDeclarationFrom(
+      gd::Project& project,
+      const gd::SerializerElement& element);
+
+  /**
+   * \brief Load free functions, behaviors and objects implementation
+   * (in opposition to load just their "declaration" by reading their name).
+   */
+  void UnserializeExtensionImplementationFrom(
+      gd::Project& project,
+      const gd::SerializerElement& element);
   ///@}
 
   /** \name Lifecycle event functions
@@ -222,18 +276,21 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   gd::String description;
   gd::String name;
   gd::String fullName;
+  gd::String category;
   std::vector<gd::String> tags;
   std::vector<gd::String> authorIds;
   gd::String author;
   gd::String previewIconUrl;
+  gd::String originName;
+  gd::String originIdentifier;
   gd::String iconUrl;
   gd::String helpPath;  ///< The relative path to the help for this extension in
                         ///< the documentation (or an absolute URL).
   gd::SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
+  gd::SerializableWithNameList<EventsBasedObject> eventsBasedObjects;
   std::vector<gd::DependencyMetadata> dependencies;
 };
 
 }  // namespace gd
 
 #endif  // GDCORE_EVENTSFUNCTIONEXTENSION_H
-#endif

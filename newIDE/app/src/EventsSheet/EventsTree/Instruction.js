@@ -33,6 +33,9 @@ import {
   shouldActivate,
   shouldValidate,
 } from '../../UI/KeyboardShortcuts/InteractionKeys';
+import AsyncIcon from '../../UI/CustomSvgIcons/Async';
+import Tooltip from '@material-ui/core/Tooltip';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -41,6 +44,18 @@ const styles = {
     wordWrap: 'break-word',
     cursor: 'pointer',
     marginBottom: 1,
+  },
+  input: {
+    fontFamily: '"Lucida Console", Monaco, monospace',
+    lineHeight: 1.4,
+  },
+  backgroundHighlightingInline: {
+    marginTop: 0, //Properly align with the text field
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
+  textFieldAndHightlightContainer: {
+    position: 'relative',
   },
 };
 
@@ -91,6 +106,9 @@ type Props = {|
 
   screenType: ScreenType,
   windowWidth: WidthType,
+
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
 |};
 
 const Instruction = (props: Props) => {
@@ -100,6 +118,8 @@ const Instruction = (props: Props) => {
     onClick,
     onMoveToInstruction,
     onContextMenu,
+    globalObjectsContainer,
+    objectsContainer,
   } = props;
 
   const instrFormatter = React.useMemo(
@@ -107,6 +127,10 @@ const Instruction = (props: Props) => {
     []
   );
   const preferences = React.useContext(PreferencesContext);
+  const {
+    palette: { type },
+  } = React.useContext(GDevelopThemeContext);
+
   const useAssignmentOperators =
     preferences.values.eventsSheetUseAssignmentOperators;
 
@@ -147,6 +171,44 @@ const Instruction = (props: Props) => {
 
           const parameterMetadata = metadata.getParameter(parameterIndex);
           const parameterType = parameterMetadata.getType();
+          let expressionIsValid = true;
+          if (
+            gd.ParameterMetadata.isExpression('number', parameterType) ||
+            gd.ParameterMetadata.isExpression('string', parameterType) ||
+            gd.ParameterMetadata.isExpression('variable', parameterType)
+          ) {
+            const expressionNode = instruction
+              .getParameter(parameterIndex)
+              .getRootNode();
+            const expressionValidator = new gd.ExpressionValidator(
+              gd.JsPlatform.get(),
+              globalObjectsContainer,
+              objectsContainer,
+              parameterType
+            );
+            expressionNode.visit(expressionValidator);
+            expressionIsValid = expressionValidator.getErrors().size() === 0;
+            expressionValidator.delete();
+          } else if (gd.ParameterMetadata.isObject(parameterType)) {
+            const objectOrGroupName = instruction
+              .getParameter(parameterIndex)
+              .getPlainString();
+            expressionIsValid =
+              (globalObjectsContainer.hasObjectNamed(objectOrGroupName) ||
+                objectsContainer.hasObjectNamed(objectOrGroupName) ||
+                globalObjectsContainer
+                  .getObjectGroups()
+                  .has(objectOrGroupName) ||
+                objectsContainer.getObjectGroups().has(objectOrGroupName)) &&
+              (!parameterMetadata.getExtraInfo() ||
+                gd.getTypeOfObject(
+                  globalObjectsContainer,
+                  objectsContainer,
+                  objectOrGroupName,
+                  /*searchInGroups=*/ true
+                ) === parameterMetadata.getExtraInfo());
+          }
+
           return (
             <span
               key={i}
@@ -175,6 +237,7 @@ const Instruction = (props: Props) => {
             >
               {ParameterRenderingService.renderInlineParameter({
                 value: formattedTexts.getString(i),
+                expressionIsValid,
                 parameterMetadata,
                 renderObjectThumbnail,
                 InvalidParameterValue,
@@ -236,11 +299,16 @@ const Instruction = (props: Props) => {
               instruction.getType()
             );
 
+        const smallIconFilename = metadata.getSmallIconFilename();
         // The instruction itself can be dragged and is a target for
         // another instruction to be dropped. It's IMPORTANT NOT to have
         // the subinstructions list inside the connectDropTarget/connectDragSource
         // as otherwise this can confuse react-dnd ("Expected to find a valid target")
         // (surely due to components re-mounting/rerendering ?).
+        const isBlackIcon =
+          smallIconFilename.startsWith('data:image/svg+xml') ||
+          smallIconFilename.includes('_black');
+
         const instructionDragSourceElement = connectDragSource(
           <div
             style={styles.container}
@@ -289,12 +357,36 @@ const Instruction = (props: Props) => {
                 alt="Condition is negated"
               />
             )}
+            {metadata.isAsync() &&
+              (!metadata.isOptionallyAsync() || instruction.isAwaited()) && (
+                <Tooltip
+                  title={
+                    <Trans>
+                      Next actions (and sub-events) will wait for this action to
+                      be finished before running.
+                    </Trans>
+                  }
+                  placement="top"
+                >
+                  <AsyncIcon
+                    className={classNames({
+                      [icon]: true,
+                    })}
+                  />
+                </Tooltip>
+              )}
             <img
               className={classNames({
                 [icon]: true,
               })}
-              src={metadata.getSmallIconFilename()}
+              src={smallIconFilename}
               alt=""
+              style={{
+                filter:
+                  type === 'dark' && isBlackIcon
+                    ? 'grayscale(1) invert(1)'
+                    : undefined,
+              }}
             />
             {renderInstructionText(metadata)}
           </div>
@@ -333,6 +425,8 @@ const Instruction = (props: Props) => {
                 renderObjectThumbnail={props.renderObjectThumbnail}
                 screenType={props.screenType}
                 windowWidth={props.windowWidth}
+                globalObjectsContainer={props.globalObjectsContainer}
+                objectsContainer={props.objectsContainer}
               />
             )}
           </React.Fragment>

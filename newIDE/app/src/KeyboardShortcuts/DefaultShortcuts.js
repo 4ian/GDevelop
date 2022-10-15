@@ -10,7 +10,7 @@ const defaultShortcuts: ShortcutMap = {
   LAUNCH_DEBUG_PREVIEW: 'F6',
   HOT_RELOAD_PREVIEW: 'F5',
   LAUNCH_NETWORK_PREVIEW: 'F8',
-  OPEN_START_PAGE: '',
+  OPEN_HOME_PAGE: '',
   CREATE_NEW_PROJECT: 'CmdOrCtrl+Alt+KeyN',
   OPEN_PROJECT: 'CmdOrCtrl+KeyO',
   SAVE_PROJECT: 'CmdOrCtrl+KeyS',
@@ -51,6 +51,8 @@ const defaultShortcuts: ShortcutMap = {
   ADD_STANDARD_EVENT: 'Shift+KeyA',
   ADD_SUBEVENT: 'Shift+KeyD',
   ADD_COMMENT_EVENT: '',
+  TOGGLE_EVENT_DISABLED: 'KeyD',
+  TOGGLE_CONDITION_INVERTED: 'KeyJ',
   CHOOSE_AND_ADD_EVENT: 'Shift+KeyW',
   OPEN_EXTENSION_SETTINGS: '',
 };

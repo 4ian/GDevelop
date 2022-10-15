@@ -9,17 +9,36 @@ import {
 } from './Utils/Analytics/EventSender';
 import { installRaven } from './Utils/Analytics/Raven';
 import { register } from './serviceWorker';
-import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
-import optionalRequire from './Utils/OptionalRequire.js';
-import { loadScript } from './Utils/LoadScript.js';
+import './UI/icomoon-font.css'; // Styles for Icomoon font.
+import optionalRequire from './Utils/OptionalRequire';
+import { loadScript } from './Utils/LoadScript';
 import { showErrorBox } from './UI/Messages/MessageBox';
 import VersionMetadata from './Version/VersionMetadata';
+import { loadPreferencesFromLocalStorage } from './MainFrame/Preferences/PreferencesProvider';
+import { getTheme } from './UI/Theme';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 // No i18n in this file
 
 const electron = optionalRequire('electron');
+
+// Use the user preferred theme to define the loading screen color.
+
+let color = 'f0f0f0';
+
+try {
+  const values = loadPreferencesFromLocalStorage();
+  if (values && values.themeName) {
+    const theme = getTheme({
+      themeName: values.themeName,
+      language: 'en', // language is not important here as we only look for a color
+    });
+    color = theme.muiTheme.palette.background.default;
+  }
+} catch {}
+
+document.getElementsByTagName('body')[0].style.backgroundColor = color;
 
 const styles = {
   loadingMessage: {
@@ -80,6 +99,7 @@ class Bootstrapper extends Component<{}, State> {
           'libGD.js initialization done',
           performance.now(),
         ]);
+        sendProgramOpening();
 
         if (electron) {
           import(/* webpackChunkName: "local-app" */ './LocalApp')
@@ -141,4 +161,3 @@ if (rootElement) {
 
 // registerServiceWorker();
 register();
-sendProgramOpening();

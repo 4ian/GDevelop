@@ -14,6 +14,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Tools/Log.h"
 
 namespace gd {
 
@@ -22,30 +23,40 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
                                const gd::String& fullname_,
                                const gd::String& description_,
                                const gd::String& icon24x24,
-                               std::shared_ptr<gd::Object> blueprintObject_)
-    : extensionNamespace(extensionNamespace_),
-      blueprintObject(blueprintObject_) {
-  name = name_;
-#if defined(GD_IDE_ONLY)
-  SetFullName(gd::String(fullname_));
-  SetDescription(gd::String(description_));
-  iconFilename = icon24x24;
-#endif
-  createFunPtr =
-      [blueprintObject_](gd::String name) -> std::unique_ptr<gd::Object> {
-    if (blueprintObject_ == std::shared_ptr<gd::Object>()) {
-      std::cout
-          << "Error: Unable to create object. Have you declared an extension "
-             "(or ObjectMetadata) without specifying an object as blueprint?"
-          << std::endl;
+                               std::shared_ptr<gd::ObjectConfiguration> blueprintObject_)
+    : ObjectMetadata(extensionNamespace_,
+                     name_,
+                     fullname_,
+                     description_,
+                     icon24x24,
+                     [blueprintObject_]() -> std::unique_ptr<gd::ObjectConfiguration> {
+    if (blueprintObject_ == std::shared_ptr<gd::ObjectConfiguration>()) {
+      gd::LogFatalError(
+          "Error: Unable to create object. Have you declared an extension "
+          "(or ObjectMetadata) without specifying an object as blueprint?");
       return nullptr;
     }
-
-    std::unique_ptr<gd::Object> newObject = blueprintObject_->Clone();
-    newObject->SetName(name);
-    return newObject;
-  };
+    return blueprintObject_->Clone();
+  }) {
+  blueprintObject = blueprintObject_;
 }
+
+ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
+                               const gd::String& name_,
+                               const gd::String& fullname_,
+                               const gd::String& description_,
+                               const gd::String& icon24x24)
+    : ObjectMetadata(extensionNamespace_,
+                     name_,
+                     fullname_,
+                     description_,
+                     icon24x24,
+                     []() -> std::unique_ptr<gd::ObjectConfiguration> {
+      gd::LogFatalError(
+          "Error: Event-based objects don't have blueprint. "
+          "This method should not never be called.");
+      return nullptr;
+    }) {}
 
 ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
                                const gd::String& name_,
@@ -53,14 +64,12 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
                                const gd::String& description_,
                                const gd::String& icon24x24,
                                CreateFunPtr createFunPtrP)
-    : extensionNamespace(extensionNamespace_) {
-  name = name_;
-#if defined(GD_IDE_ONLY)
+    : name(name_),
+      iconFilename(icon24x24),
+      createFunPtr(createFunPtrP),
+      extensionNamespace(extensionNamespace_) {
   SetFullName(gd::String(fullname_));
   SetDescription(gd::String(description_));
-  iconFilename = icon24x24;
-#endif
-  createFunPtr = createFunPtrP;
 }
 
 gd::InstructionMetadata& ObjectMetadata::AddCondition(
@@ -261,23 +270,14 @@ ObjectMetadata::AddExpressionAndConditionAndAction(
     const gd::String& sentenceName,
     const gd::String& group,
     const gd::String& icon) {
-  gd::String expressionDescriptionTemplate = _("Return <subject>.");
-  auto& expression =
-      type == "number"
-          ? AddExpression(name,
-                          fullname,
-                          expressionDescriptionTemplate.FindAndReplace(
-                              "<subject>", descriptionSubject),
-                          group,
-                          icon)
-          : AddStrExpression(name,
-                             fullname,
-                             expressionDescriptionTemplate.FindAndReplace(
-                                 "<subject>", descriptionSubject),
-                             group,
-                             icon);
+  if (type != "number" && type != "string" && type != "boolean") {
+    gd::LogError(
+        "Unrecognised type passed to AddExpressionAndConditionAndAction: " +
+        type + ". Verify this type is valid and supported.");
+  }
 
-  gd::String conditionDescriptionTemplate = _("Compare <subject>.");
+  gd::String conditionDescriptionTemplate =
+      type == "boolean" ? _("Check if <subject>.") : _("Compare <subject>.");
   auto& condition =
       AddScopedCondition(name,
                          fullname,
@@ -288,7 +288,9 @@ ObjectMetadata::AddExpressionAndConditionAndAction(
                          icon,
                          icon);
 
-  gd::String actionDescriptionTemplate = _("Change <subject>.");
+  gd::String actionDescriptionTemplate = type == "boolean"
+                                             ? _("Set (or unset) if <subject>.")
+                                             : _("Change <subject>.");
   auto& action = AddScopedAction(
       "Set" + name,
       fullname,
@@ -297,6 +299,27 @@ ObjectMetadata::AddExpressionAndConditionAndAction(
       group,
       icon,
       icon);
+
+
+  if (type == "boolean") {
+    return MultipleInstructionMetadata::WithConditionAndAction(condition, action);
+  }
+
+  gd::String expressionDescriptionTemplate = _("Return <subject>.");
+  auto& expression =
+      type == "number"
+          ? AddExpression(name,
+                          fullname,
+                          expressionDescriptionTemplate.FindAndReplace(
+                              "<subject>", descriptionSubject),
+                          group,
+                          icon)
+          : AddStrExpression(name,
+                            fullname,
+                            expressionDescriptionTemplate.FindAndReplace(
+                                "<subject>", descriptionSubject),
+                            group,
+                            icon);
 
   return MultipleInstructionMetadata::WithExpressionAndConditionAndAction(
       expression, condition, action);

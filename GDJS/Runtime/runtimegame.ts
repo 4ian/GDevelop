@@ -30,6 +30,23 @@ namespace gdjs {
     websocketDebuggerServerAddress?: string;
     /** The port of the debugger server, to reach out using WebSocket. */
     websocketDebuggerServerPort?: string;
+
+    /**
+     * The path to require `@electron/remote` module.
+     * This is only useful in a preview, where this can't be required from
+     * `@electron/remote` directly as previews don't have any node_modules.
+     * On the contrary, a game packaged with Electron as a standalone app
+     * has its node_modules.
+     * This can be removed once there are no more dependencies on
+     * `@electron/remote` in the game engine and extensions.
+     */
+    electronRemoteRequirePath?: string;
+
+    /**
+     * If set, the game should use the specified environment for making calls
+     * to GDevelop APIs ("dev" = development APIs).
+     */
+    environment?: 'dev';
   };
 
   /**
@@ -55,6 +72,8 @@ namespace gdjs {
     _scaleMode: 'linear' | 'nearest';
     _pixelsRounding: boolean;
     _renderer: RuntimeGameRenderer;
+    _sessionId: string | null;
+    _playerId: string | null;
 
     //Game loop management (see startGameLoop method)
     _sceneStack: SceneStack;
@@ -120,6 +139,14 @@ namespace gdjs {
         ? new gdjs.DebuggerClient(this)
         : null;
       this._isPreview = this._options.isPreview || false;
+      this._sessionId = null;
+      this._playerId = null;
+
+      if (this.isUsingGDevelopDevelopmentEnvironment()) {
+        logger.info(
+          'This game will run on the development version of GDevelop APIs.'
+        );
+      }
     }
 
     /**
@@ -526,6 +553,9 @@ namespace gdjs {
                           if (progressCallback) progressCallback(percent);
                         })
                         .then(() => loadingScreen.unload())
+                        .then(() =>
+                          gdjs.getAllAsynchronouslyLoadingLibraryPromise()
+                        )
                         .then(() => {
                           callback();
                         });
@@ -648,9 +678,22 @@ namespace gdjs {
         return;
       }
       const baseUrl = 'https://api.gdevelop-app.com/analytics';
-      const playerId = this._makePlayerUuid();
-      let sessionId: string | null = null;
-      let lastSessionHitTime = Date.now();
+      this._playerId = this._makePlayerUuid();
+      /**
+       * The duration that is already sent to the service
+       * (in milliseconds).
+       **/
+      let sentDuration = 0;
+      /**
+       * The duration that is not yet sent to the service to avoid flooding
+       * (in milliseconds).
+       **/
+      let notYetSentDuration = 0;
+      /**
+       * The last time when duration has been counted
+       * either in sendedDuration or notYetSentDuration.
+       **/
+      let lastSessionResumeTime = Date.now();
       fetch(baseUrl + '/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -659,7 +702,7 @@ namespace gdjs {
         // precisely identify someone.
         body: JSON.stringify({
           gameId: this._data.properties.projectUuid,
-          playerId: playerId,
+          playerId: this._playerId,
           game: {
             name: this._data.properties.name || '',
             packageName: this._data.properties.packageName || '',
@@ -691,34 +734,49 @@ namespace gdjs {
         })
         .then((response) => response.text())
         .then((returnedSessionId) => {
-          sessionId = returnedSessionId;
+          this._sessionId = returnedSessionId;
         })
         .catch(() => {});
 
       /* Ignore any error */
       const sendSessionHit = () => {
-        if (!sessionId) {
+        if (!this._sessionId) {
           return;
         }
 
+        const now = Date.now();
+        notYetSentDuration += now - lastSessionResumeTime;
+        lastSessionResumeTime = now;
+
         // Group repeated calls to sendSessionHit - which could
         // happen because of multiple event listeners being fired.
-        if (Date.now() - lastSessionHitTime < 3 * 1000) {
+        if (notYetSentDuration < 5 * 1000) {
           return;
         }
-        lastSessionHitTime = Date.now();
+        // The backend use seconds for duration.
+        // The milliseconds will stay in notYetSentDuration.
+        const toBeSentDuration = Math.floor(notYetSentDuration / 1000) * 1000;
+        sentDuration += toBeSentDuration;
+        notYetSentDuration -= toBeSentDuration;
+
         navigator.sendBeacon(
           baseUrl + '/session-hit',
           JSON.stringify({
             gameId: this._data.properties.projectUuid,
-            playerId: playerId,
-            sessionId: sessionId,
+            playerId: this._playerId,
+            sessionId: this._sessionId,
+            duration: Math.floor(sentDuration / 1000),
           })
         );
       };
       if (typeof navigator !== 'undefined' && typeof document !== 'undefined') {
         document.addEventListener('visibilitychange', () => {
-          sendSessionHit();
+          if (document.visibilityState === 'visible') {
+            // Skip the duration the game was hidden.
+            lastSessionResumeTime = Date.now();
+          } else {
+            sendSessionHit();
+          }
         });
         window.addEventListener(
           'pagehide',
@@ -741,6 +799,7 @@ namespace gdjs {
         }
       }
       this._sessionMetricsInitialized = true;
+      this._sessionId = this._sessionId;
     }
 
     /**
@@ -760,6 +819,14 @@ namespace gdjs {
       } catch (err) {
         return gdjs.makeUuid();
       }
+    }
+
+    getSessionId(): string | null {
+      return this._sessionId;
+    }
+
+    getPlayerId(): string | null {
+      return this._playerId;
     }
 
     /**
@@ -827,6 +894,15 @@ namespace gdjs {
      */
     isPreview(): boolean {
       return this._isPreview;
+    }
+
+    /**
+     * Check if the game should call GDevelop development APIs or not.
+     *
+     * Unless you are contributing to GDevelop, avoid using this.
+     */
+    isUsingGDevelopDevelopmentEnvironment(): boolean {
+      return this._options.environment === 'dev';
     }
 
     /**

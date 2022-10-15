@@ -8,8 +8,8 @@ type ToolbarProps = {|
 
 type ToolbarGroupProps = {|
   children?: React.Node,
-  firstChild?: true, // Not used, but could be useful one day for styling
-  lastChild?: true, // Not used, but could be useful one day for styling
+  firstChild?: boolean,
+  lastChild?: boolean,
 |};
 
 export const Toolbar = React.memo<ToolbarProps>(
@@ -17,12 +17,12 @@ export const Toolbar = React.memo<ToolbarProps>(
     <ThemeConsumer>
       {muiTheme => (
         <div
+          className="almost-invisible-scrollbar"
           style={{
             backgroundColor: muiTheme.toolbar.backgroundColor,
             padding: 3,
             flexShrink: 0,
             display: 'flex',
-            justifyContent: 'space-between',
             overflowX: 'auto',
             overflowY: 'hidden',
           }}
@@ -34,13 +34,19 @@ export const Toolbar = React.memo<ToolbarProps>(
   )
 );
 
-const toolbarGroupStyle = {
+const toolbarGroupStyle = props => ({
+  flex: 1,
   display: 'flex',
   alignItems: 'center',
-};
+  justifyContent: props.firstChild
+    ? 'flex-start'
+    : props.lastChild
+    ? 'flex-end'
+    : 'center',
+});
 
 export const ToolbarGroup = React.memo<ToolbarGroupProps>(
-  ({ children }: ToolbarGroupProps) => (
-    <span style={toolbarGroupStyle}>{children}</span>
+  (props: ToolbarGroupProps) => (
+    <span style={toolbarGroupStyle(props)}>{props.children}</span>
   )
 );

@@ -10,10 +10,10 @@
     },
     "secondary": {
       "color": {
-        "value": "#EEE"
+        "value": "#2799b9"
       },
       "text-contrast-color": {
-        "value": "#000"
+        "value": "#fff"
       }
     },
     "surface": {
@@ -38,7 +38,7 @@
         "value": "#047AA6"
       },
       "color": {
-        "value": "white"
+        "value": "#FFFFFF"
       }
     },
     "text": {
@@ -60,6 +60,11 @@
       "contrast": {
         "color": {
           "value": "#fff"
+        }
+      },
+      "highlighted": {
+        "background-color": {
+          "value": "rgb(255, 255, 255, 0.3)"
         }
       }
     },
@@ -160,6 +165,35 @@
       "frame-border-color": {
         "value": "#dcdcdc"
       }
+    },
+    "drop-indicator": {
+      "can-drop": {
+        "color": {
+          "value": "#DCDCDC"
+        }
+      },
+      "cannot-drop": {
+        "color": {
+          "value": "#BF616A"
+        }
+      },
+      "border": {
+        "color": {
+          "value": "{theme.surface.canvas.background-color.value}"
+        }
+      }
+    },
+    "home": {
+      "header": {
+        "background-color": {
+          "value": "{theme.surface.canvas.background-color.value}"
+        }
+      },
+      "separator": {
+        "color": {
+          "value": "#32323B"
+        }
+      }
     }
   },
   "input": {
@@ -171,7 +205,7 @@
   },
   "tabs": {
     "background-color": {
-      "value": "#047AA6"
+      "value": "#586e75"
     }
   },
   "event-sheet": {
@@ -299,6 +333,11 @@
         },
         "background-color": {
           "value": "rgba(238, 255, 0, 0.05)"
+        }
+      },
+      "warning": {
+        "color": {
+          "value": "#ffa500"
         }
       }
     },

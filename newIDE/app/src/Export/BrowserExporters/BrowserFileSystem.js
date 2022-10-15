@@ -35,6 +35,7 @@ const isURL = (filename: string) => {
 // with webpack, so we're using `path` directly. As it's for the web-app,
 // it should always be the posix version. In tests on Windows,
 // it's necessary to use path.posix.
+// Search for "pathPosix" in the codebase for other places where this is used.
 const pathPosix = path.posix || path;
 
 // TODO: Merge BrowserS3FileSystem into this? The way URLs are handled

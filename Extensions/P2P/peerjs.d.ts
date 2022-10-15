@@ -170,7 +170,9 @@ declare namespace Peer {
     validateId(id: string): boolean;
     pack: any;
     unpack: any;
-    chunk(blob: Blob): {
+    chunk(
+      blob: Blob
+    ): {
       __peerData: number;
       n: number;
       total: number;

@@ -42,15 +42,16 @@ std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
         ExpressionParserLocation(textStartPosition, GetCurrentPosition());
     return text;
   }
+  char matchingQuote = GetCurrentChar();
   SkipChar();
 
   gd::String parsedText = "";
   bool textParsingHasEnded = false;
   bool expectEscapedCharacter = false;
   while (!IsEndReached() && !textParsingHasEnded) {
-    if (GetCurrentChar() == '"') {
+    if (GetCurrentChar() == matchingQuote) {
       if (expectEscapedCharacter) {
-        parsedText += '"';
+        parsedText += GetCurrentChar();
         expectEscapedCharacter = false;
       } else {
         textParsingHasEnded = true;

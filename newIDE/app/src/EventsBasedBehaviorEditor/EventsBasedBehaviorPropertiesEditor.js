@@ -206,6 +206,11 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                           }}
                           checkedIcon={<Visibility />}
                           uncheckedIcon={<VisibilityOff />}
+                          disabled={
+                            property.getType() === 'Behavior' &&
+                            // Allow to make it visible just in case.
+                            !property.isHidden()
+                          }
                         />
                         <ElementWithMenu
                           element={
@@ -241,6 +246,9 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                               value={property.getType()}
                               onChange={(e, i, value: string) => {
                                 property.setType(value);
+                                if (value === 'Behavior') {
+                                  property.setHidden(false);
+                                }
                                 this.forceUpdate();
                                 this.props.onPropertiesUpdated();
                               }}
@@ -380,34 +388,46 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                               }}
                             />
                           )}
-                          <SemiControlledAutoComplete
-                            floatingLabelText={<Trans>Group name</Trans>}
-                            hintText={t`Leave it empty to use the default group.`}
-                            fullWidth
-                            value={property.getGroup()}
-                            onChange={text => {
-                              property.setGroup(text);
-                              this.forceUpdate();
-                              this.props.onPropertiesUpdated();
-                            }}
-                            dataSource={this._getPropertyGroupNames().map(
-                              name => ({
-                                text: name,
-                                value: name,
-                              })
-                            )}
-                            openOnFocus={true}
-                          />
+                          <ResponsiveLineStackLayout noMargin>
+                            <SemiControlledTextField
+                              commitOnBlur
+                              floatingLabelText={<Trans>Short label</Trans>}
+                              translatableHintText={t`Make the purpose of the property easy to understand`}
+                              floatingLabelFixed
+                              value={property.getLabel()}
+                              onChange={text => {
+                                property.setLabel(text);
+                                this.forceUpdate();
+                              }}
+                              fullWidth
+                            />
+                            <SemiControlledAutoComplete
+                              floatingLabelText={<Trans>Group name</Trans>}
+                              hintText={t`Leave it empty to use the default group`}
+                              fullWidth
+                              value={property.getGroup()}
+                              onChange={text => {
+                                property.setGroup(text);
+                                this.forceUpdate();
+                                this.props.onPropertiesUpdated();
+                              }}
+                              dataSource={this._getPropertyGroupNames().map(
+                                name => ({
+                                  text: name,
+                                  value: name,
+                                })
+                              )}
+                              openOnFocus={true}
+                            />
+                          </ResponsiveLineStackLayout>
                           <SemiControlledTextField
                             commitOnBlur
-                            floatingLabelText={
-                              <Trans>Label, shown in the editor</Trans>
-                            }
-                            translatableHintText={t`This should make the purpose of the property easy to understand`}
+                            floatingLabelText={<Trans>Description</Trans>}
+                            translatableHintText={t`Optionally, explain the purpose of the property in more details`}
                             floatingLabelFixed
-                            value={property.getLabel()}
+                            value={property.getDescription()}
                             onChange={text => {
-                              property.setLabel(text);
+                              property.setDescription(text);
                               this.forceUpdate();
                             }}
                             fullWidth

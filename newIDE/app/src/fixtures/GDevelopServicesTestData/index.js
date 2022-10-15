@@ -23,10 +23,11 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import {
   type AssetShortHeader,
   type Asset,
-  type AssetPacks,
+  type PublicAssetPacks,
 } from '../../Utils/GDevelopServices/Asset';
 import { formatISO, subDays } from 'date-fns';
 import { type Comment } from '../../Utils/GDevelopServices/Play';
+import { type Announcement } from '../../Utils/GDevelopServices/Announcement';
 
 export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
@@ -63,6 +64,9 @@ export const indieUserProfile: Profile = {
   username: 'im-the-indie-user',
   description: 'Just here to develop indie games',
   getGameStatsEmail: false,
+  getNewsletterEmail: true,
+  isCreator: true,
+  isPlayer: false,
 };
 
 export const usagesForIndieUser: Usages = [
@@ -101,19 +105,75 @@ export const noSubscription: Subscription = {
 };
 
 export const limitsForIndieUser: Limits = {
-  'cordova-build': {
-    current: 2,
-    max: 10,
-    limitReached: false,
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 50,
+      canMaximumCountBeIncreased: true,
+    },
   },
+  limits: {
+    'cordova-build': {
+      current: 2,
+      max: 10,
+      limitReached: false,
+    },
+  },
+  message: undefined,
+};
+
+export const limitsForProUser: Limits = {
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 100,
+      canMaximumCountBeIncreased: false,
+    },
+  },
+  limits: {
+    'cordova-build': {
+      current: 2,
+      max: 70,
+      limitReached: false,
+    },
+  },
+  message: undefined,
 };
 
 export const limitsReached: Limits = {
-  'cordova-build': {
-    current: 10,
-    max: 10,
-    limitReached: true,
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 10,
+      canMaximumCountBeIncreased: false,
+    },
   },
+  limits: {
+    'cordova-build': {
+      current: 10,
+      max: 10,
+      limitReached: true,
+    },
+  },
+  message: undefined,
 };
 
 export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
@@ -126,6 +186,8 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   subscription: subscriptionForIndieUser,
   usages: usagesForIndieUser,
   limits: limitsForIndieUser,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
   onLogout: () => {},
   onLogin: () => {},
   onEdit: () => {},
@@ -158,6 +220,8 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   subscription: noSubscription,
   usages: usagesForIndieUser,
   limits: limitsForIndieUser,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
   onLogout: () => {},
   onLogin: () => {},
   onEdit: () => {},
@@ -190,6 +254,8 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   subscription: noSubscription,
   usages: usagesForIndieUser,
   limits: limitsForIndieUser,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
   onLogout: () => {},
   onLogin: () => {},
   onEdit: () => {},
@@ -222,6 +288,8 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   subscription: null,
   usages: null,
   limits: null,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
   onLogout: () => {},
   onLogin: () => {},
   onEdit: () => {},
@@ -254,6 +322,8 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   subscription: null,
   usages: null,
   limits: null,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
   onLogout: () => {},
   onLogin: () => {},
   onEdit: () => {},
@@ -642,36 +712,6 @@ export const fakeAssetWithEventCustomizationsAndFlashExtension1: Asset = {
               extensionVersion: '1.0.0',
             },
           ],
-          events: [
-            {
-              disabled: false,
-              folded: false,
-              type: 'BuiltinCommonInstructions::Standard',
-              conditions: [
-                {
-                  type: { inverted: false, value: 'VarScene' },
-                  parameters: [
-                    'Counter',
-                    '<',
-                    'TEXT_TO_REPLACE + PlayerSpaceship.Variable(test)',
-                  ],
-                  subInstructions: [],
-                },
-              ],
-              actions: [
-                {
-                  type: { inverted: false, value: 'ModVarScene' },
-                  parameters: [
-                    'Counter',
-                    '=',
-                    'TEXT_TO_REPLACE + PlayerSpaceship.Variable(test2)',
-                  ],
-                  subInstructions: [],
-                },
-              ],
-              events: [],
-            },
-          ],
           parameters: [
             {
               codeOnly: false,
@@ -721,16 +761,6 @@ export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
               extensionVersion: '1.0.0',
             },
           ],
-          events: [
-            {
-              disabled: false,
-              folded: false,
-              type: 'BuiltinCommonInstructions::Standard',
-              conditions: [],
-              actions: [],
-              events: [],
-            },
-          ],
           parameters: [
             {
               codeOnly: false,
@@ -776,6 +806,7 @@ export const fakeAssetShortHeader1: AssetShortHeader = {
 
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
   tier: 'reviewed',
+  authorIds: [],
   shortDescription:
     'Allow the object to fire bullets, with customizable speed, angle and fire rate.',
   extensionNamespace: '',
@@ -786,6 +817,7 @@ export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
   headerUrl:
     'https://resources.gdevelop-app.com/extensions/FireBullet-header.json',
   tags: ['fire', 'bullets', 'spawn', 'firerate'],
+  category: 'Movement',
   previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
@@ -817,6 +849,7 @@ export const alreadyInstalledCommunityExtensionShortHeader: ExtensionShortHeader
 
 export const flashExtensionShortHeader: ExtensionShortHeader = {
   tier: 'reviewed',
+  authorIds: [],
   shortDescription:
     'Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nTrigger the effect by using the Flash action.',
   extensionNamespace: '',
@@ -826,6 +859,7 @@ export const flashExtensionShortHeader: ExtensionShortHeader = {
   url: 'Extensions/Flash.json',
   headerUrl: 'Extensions/Flash-header.json',
   tags: ['flash', 'blink', 'visible', 'invisible', 'hit', 'damage'],
+  category: 'Visual effect',
   previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
@@ -833,6 +867,7 @@ export const flashExtensionShortHeader: ExtensionShortHeader = {
 
 export const communityTierExtensionShortHeader: ExtensionShortHeader = {
   tier: 'community',
+  authorIds: [],
   shortDescription:
     'This is an example of an extension that is a community extension (not reviewed).',
   extensionNamespace: '',
@@ -844,6 +879,7 @@ export const communityTierExtensionShortHeader: ExtensionShortHeader = {
   headerUrl:
     'https://resources.gdevelop-app.com/extensions/FakeCommunityExtension-header.json',
   tags: ['fire', 'bullets', 'spawn', 'firerate'],
+  category: '',
   previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
@@ -863,6 +899,7 @@ export const game1: Game = {
   gameName: 'My Great Game',
   createdAt: 1606065498,
   publicWebBuildId: 'fake-publicwebbuild-id',
+  displayAdsOnGamePage: true,
 };
 
 export const game2: Game = {
@@ -870,6 +907,16 @@ export const game2: Game = {
   authorName: 'My company',
   gameName: 'My Other Game',
   createdAt: 1607065498,
+};
+
+export const gameWithDisplayAdsOnGamePageEnabled: Game = {
+  ...game1,
+  displayAdsOnGamePage: true,
+};
+
+export const gameWithDisplayAdsOnGamePageDisabled: Game = {
+  ...game1,
+  displayAdsOnGamePage: false,
 };
 
 /**
@@ -1113,7 +1160,7 @@ export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
   gdevelopVersion: '',
 };
 
-export const fakeAssetPacks: AssetPacks = {
+export const fakeAssetPacks: PublicAssetPacks = {
   starterPacks: [
     {
       name: 'GDevelop Platformer',
@@ -1211,11 +1258,11 @@ export const fakeAssetPacks: AssetPacks = {
   ],
 };
 
-export const commentUnsolved: Comment = {
-  id: 'comment-unsolved-id',
+export const commentUnprocessed: Comment = {
+  id: 'comment-unprocessed-id',
   type: 'FEEDBACK',
-  gameId: 'game-id',
-  buildId: 'build-id',
+  gameId: 'complete-game-id',
+  buildId: 'complete-build-id',
   text:
     "This is my honest feedback: I think the art is cute. Specially on the screen when it jumps over the chickens. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
   ratings: {
@@ -1230,11 +1277,11 @@ export const commentUnsolved: Comment = {
   updatedAt: 1515084393000,
 };
 
-export const commentSolved: Comment = {
-  id: 'comment-solved-id',
+export const commentProcessed: Comment = {
+  id: 'comment-processed-id',
   type: 'FEEDBACK',
-  gameId: 'game-id',
-  buildId: 'build-id',
+  gameId: 'complete-game-id',
+  buildId: 'complete-build-id',
   text:
     "This is my honest feedback: I think the art is cute. Specially on the screen when it jumps over the chickens. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
   ratings: {
@@ -1249,3 +1296,59 @@ export const commentSolved: Comment = {
   updatedAt: 1515084393000,
   processedAt: 1515084393000,
 };
+
+export const fakeAnnouncements: Announcement[] = [
+  {
+    id: '123',
+    type: 'info',
+    level: 'normal',
+    titleByLocale: {
+      en: 'Some title',
+    },
+    markdownMessageByLocale: {
+      en:
+        'Something to announce which is really really cool [with a link](https://gdevelop.io) and *other* **markdown** ~~formatting~~!',
+    },
+  },
+  {
+    id: '124',
+    type: 'info',
+    level: 'urgent',
+    titleByLocale: {
+      en: 'Some title',
+    },
+    markdownMessageByLocale: {
+      en:
+        'Something nothing important but urgent to announce, with a button and [with a link](https://gdevelop.io) too.',
+    },
+    buttonLabelByLocale: { en: 'View' },
+    buttonUrl: 'https://gdevelop.io',
+  },
+  {
+    id: '125',
+    type: 'warning',
+    level: 'urgent',
+    titleByLocale: {
+      en: 'Some title',
+    },
+    markdownMessageByLocale: {
+      en: 'Something important and urgent to announce.\n\n- With\n- a list',
+    },
+    buttonLabelByLocale: { en: 'View' },
+    buttonUrl: 'https://gdevelop.io',
+  },
+  {
+    id: '126',
+    type: 'warning',
+    level: 'normal',
+    titleByLocale: {
+      en: 'Some title',
+    },
+    markdownMessageByLocale: {
+      en:
+        'Something important but not urgent to announce, with a big image.\n\n![some image](https://raw.githubusercontent.com/4ian/GDevelop/master/newIDE/GDevelop%20banner.png)',
+    },
+    buttonLabelByLocale: { en: 'View' },
+    buttonUrl: 'https://gdevelop.io',
+  },
+];

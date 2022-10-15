@@ -33,10 +33,16 @@ export type StorageProviderOperations = {|
     content: Object,
   |}>,
   getOpenErrorMessage?: (error: Error) => MessageDescriptor,
+  getWriteErrorMessage?: (error: Error) => MessageDescriptor,
 
   // If set to true, opening a project at startup with this storage provider
   // will trigger a confirmation modal (so that a user interaction happen).
   doesInitialOpenRequireUserInteraction?: boolean,
+
+  onEnsureCanAccessResources?: (
+    project: gdProject,
+    fileMetadata: FileMetadata
+  ) => Promise<void>,
 
   // Project saving:
   onSaveProject?: (
@@ -46,13 +52,21 @@ export type StorageProviderOperations = {|
     wasSaved: boolean,
     fileMetadata: FileMetadata,
   |}>,
+  onChooseSaveProjectAsLocation?: (
+    project: gdProject,
+    fileMetadata: ?FileMetadata // This is the current location.
+  ) => Promise<{|
+    fileMetadata: ?FileMetadata, // This is the newly chosen location (or null if cancelled).
+  |}>,
   onSaveProjectAs?: (
     project: gdProject,
     fileMetadata: ?FileMetadata,
-    options?: { context?: 'duplicateCurrentProject', onStartSaving: () => void }
+    options: {|
+      onStartSaving: () => void,
+      onMoveResources: () => Promise<void>,
+    |}
   ) => Promise<{|
     wasSaved: boolean,
-    fileMetadata: ?FileMetadata,
   |}>,
 
   // Project properties saving:
@@ -84,7 +98,7 @@ export type StorageProvider = {|
   hiddenInOpenDialog?: boolean,
   hiddenInSaveDialog?: boolean,
   disabled?: boolean,
-  renderIcon?: () => React.Node,
+  renderIcon?: ({| size?: 'small' | 'medium' |}) => React.Node,
   getFileMetadataFromAppArguments?: AppArguments => ?FileMetadata,
   createOperations: ({
     /** Open a dialog (a render function) */

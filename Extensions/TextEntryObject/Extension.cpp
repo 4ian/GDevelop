@@ -18,6 +18,7 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
             "entered with a keyboard by a player."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetCategory("User interface")
       .SetExtensionHelpPath("/objects/text_entry");
 
   gd::ObjectMetadata& obj =
@@ -27,7 +28,7 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
                                       _("Invisible object used to get the text "
                                         "entered with the keyboard."),
                                       "CppPlatform/Extensions/textentry.png")
-          .SetCategoryFullName(_("Advanced"));
+          .SetCategoryFullName(_("User interface"));
 
   obj.AddAction("String",
                 _("Text in memory"),

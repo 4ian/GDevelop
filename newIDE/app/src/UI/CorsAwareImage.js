@@ -38,7 +38,6 @@ const addSearchParameterToUrl = (
 export const CorsAwareImage = (props: Props) => (
   <img // eslint-disable-line jsx-a11y/alt-text
     {...props}
-    crossOrigin="anonymous"
     src={
       // To avoid strange/hard to understand CORS issues, we add a dummy parameter.
       // By doing so, we force browser to consider this URL as different than the one traditionally

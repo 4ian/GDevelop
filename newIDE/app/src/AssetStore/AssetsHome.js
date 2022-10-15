@@ -1,21 +1,24 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
+import GridListTile from '@material-ui/core/GridListTile';
+import GridList from '@material-ui/core/GridList';
+import Paper from '@material-ui/core/Paper';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import Text from '../UI/Text';
-import { type AssetPacks } from '../Utils/GDevelopServices/Asset';
-import {
-  GridListTile,
-  GridList,
-  Paper,
-  makeStyles,
-  createStyles,
-} from '@material-ui/core';
+import PriceTag from '../UI/PriceTag';
+import type {
+  PublicAssetPacks,
+  PublicAssetPack,
+} from '../Utils/GDevelopServices/Asset';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { Line, Column } from '../UI/Grid';
 import ScrollView from '../UI/ScrollView';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import ThemeContext from '../UI/Theme/ThemeContext';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 const columns = 3;
 const columnsForSmallWindow = 2;
@@ -23,12 +26,19 @@ const cellSpacing = 2;
 
 const styles = {
   grid: { margin: '0 10px' },
+  priceTagContainer: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    cursor: 'default',
+  },
   previewImage: {
     width: '100%',
     // Prevent cumulative layout shift by enforcing
     // the 16:9 ratio.
     aspectRatio: '16 / 9',
     objectFit: 'cover',
+    position: 'relative',
   },
   cardContainer: {
     overflow: 'hidden',
@@ -57,18 +67,173 @@ const useStylesForGridListItem = makeStyles(theme =>
   })
 );
 
+const PublicAssetPackTile = ({
+  assetPack,
+  onSelect,
+  style,
+}: {|
+  assetPack: PublicAssetPack,
+  onSelect: () => void,
+  /** Props needed so that GidList component can adjust tile size */
+  style?: any,
+|}) => {
+  const classesForGridListItem = useStylesForGridListItem();
+  const gdevelopTheme = React.useContext(ThemeContext);
+
+  return (
+    <GridListTile
+      classes={classesForGridListItem}
+      key={assetPack.tag}
+      tabIndex={0}
+      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
+        if (shouldValidate(event)) {
+          onSelect();
+        }
+      }}
+      style={style}
+      onClick={onSelect}
+    >
+      <Paper
+        elevation={2}
+        style={{
+          ...styles.paper,
+          backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+        }}
+      >
+        <CorsAwareImage
+          key={assetPack.name}
+          style={styles.previewImage}
+          src={assetPack.thumbnailUrl}
+          alt={`Preview image of asset pack ${assetPack.name}`}
+        />
+        <Column>
+          <Line justifyContent="space-between" noMargin>
+            <Text style={styles.packTitle} size="body2">
+              {assetPack.name}
+            </Text>
+            <Text style={styles.packTitle} color="primary" size="body2">
+              <Trans>{assetPack.assetsCount} Assets</Trans>
+              {assetPack.userFriendlyPrice
+                ? ' - ' + assetPack.userFriendlyPrice
+                : null}
+            </Text>
+          </Line>
+        </Column>
+      </Paper>
+    </GridListTile>
+  );
+};
+
+const PrivateAssetPackTile = ({
+  assetPackListingData,
+  onSelect,
+  style,
+  owned,
+}: {|
+  assetPackListingData: PrivateAssetPackListingData,
+  onSelect: () => void,
+  /** Props needed so that GidList component can adjust tile size */
+  style?: any,
+  owned: boolean,
+|}) => {
+  const classesForGridListItem = useStylesForGridListItem();
+  const gdevelopTheme = React.useContext(ThemeContext);
+  return (
+    <GridListTile
+      classes={classesForGridListItem}
+      key={assetPackListingData.id}
+      tabIndex={0}
+      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
+        if (shouldValidate(event)) {
+          onSelect();
+        }
+      }}
+      style={style}
+      onClick={onSelect}
+    >
+      <Paper
+        elevation={2}
+        style={{
+          ...styles.paper,
+          backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+        }}
+      >
+        <CorsAwareImage
+          key={assetPackListingData.name}
+          style={styles.previewImage}
+          src={assetPackListingData.thumbnailUrls[0]}
+          alt={`Preview image of asset pack ${assetPackListingData.name}`}
+        />
+        {!owned && (
+          <div style={styles.priceTagContainer}>
+            <PriceTag
+              value={assetPackListingData.prices[0].value}
+              withOverlay
+            />
+          </div>
+        )}
+        <Column>
+          <Line justifyContent="space-between" noMargin>
+            <Text style={styles.packTitle} size="body2">
+              {assetPackListingData.name}
+            </Text>
+            <Text style={styles.packTitle} color="primary" size="body2">
+              <Trans>{assetPackListingData.description}</Trans>
+            </Text>
+          </Line>
+        </Column>
+      </Paper>
+    </GridListTile>
+  );
+};
+
 type Props = {|
-  assetPacks: AssetPacks,
-  onPackSelection: string => void,
+  publicAssetPacks: PublicAssetPacks,
+  privateAssetPacksListingData: Array<PrivateAssetPackListingData>,
+  assetPackRandomOrdering: Array<number>,
+  onPublicAssetPackSelection: PublicAssetPack => void,
+  onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
 |};
 
 export const AssetsHome = ({
-  assetPacks: { starterPacks },
-  onPackSelection,
+  publicAssetPacks: { starterPacks },
+  privateAssetPacksListingData,
+  assetPackRandomOrdering,
+  onPublicAssetPackSelection,
+  onPrivateAssetPackSelection,
 }: Props) => {
-  const classesForGridListItem = useStylesForGridListItem();
   const windowWidth = useResponsiveWindowWidth();
-  const gdevelopTheme = React.useContext(ThemeContext);
+  const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
+
+  const starterPacksTiles = starterPacks.map(assetPack => (
+    <PublicAssetPackTile
+      assetPack={assetPack}
+      onSelect={() => onPublicAssetPackSelection(assetPack)}
+      key={assetPack.tag}
+    />
+  ));
+
+  const privateAssetPacksTiles = privateAssetPacksListingData.map(
+    assetPackListingData => (
+      <PrivateAssetPackTile
+        assetPackListingData={assetPackListingData}
+        onSelect={() => {
+          onPrivateAssetPackSelection(assetPackListingData);
+        }}
+        owned={
+          !!receivedAssetPacks &&
+          !!receivedAssetPacks.find(pack => pack.id === assetPackListingData.id)
+        }
+        key={assetPackListingData.id}
+      />
+    )
+  );
+
+  const allTiles = starterPacksTiles
+    .concat(privateAssetPacksTiles)
+    .map((tile, index) => ({ pos: assetPackRandomOrdering[index], tile }))
+    .sort((a, b) => a.pos - b.pos)
+    .map(sortObject => sortObject.tile);
 
   return (
     <ScrollView>
@@ -78,49 +243,7 @@ export const AssetsHome = ({
         cellHeight="auto"
         spacing={cellSpacing}
       >
-        {starterPacks.map((pack, index) => (
-          <GridListTile
-            classes={classesForGridListItem}
-            key={pack.tag}
-            tabIndex={0}
-            onKeyPress={(
-              event: SyntheticKeyboardEvent<HTMLLIElement>
-            ): void => {
-              if (shouldValidate(event)) {
-                onPackSelection(pack.tag);
-              }
-            }}
-            onClick={() => onPackSelection(pack.tag)}
-          >
-            <Paper
-              elevation={2}
-              style={{
-                ...styles.paper,
-                backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
-              }}
-            >
-              <CorsAwareImage
-                key={pack.name}
-                style={styles.previewImage}
-                src={pack.thumbnailUrl}
-                alt={pack.name}
-              />
-              <Column>
-                <Line justifyContent="space-between" noMargin>
-                  <Text style={styles.packTitle} size="body2">
-                    {pack.name}
-                  </Text>
-                  <Text style={styles.packTitle} color="primary" size="body2">
-                    <Trans>{pack.assetsCount} Assets</Trans>
-                    {pack.userFriendlyPrice
-                      ? ' - ' + pack.userFriendlyPrice
-                      : null}
-                  </Text>
-                </Line>
-              </Column>
-            </Paper>
-          </GridListTile>
-        ))}
+        {allTiles}
       </GridList>
     </ScrollView>
   );

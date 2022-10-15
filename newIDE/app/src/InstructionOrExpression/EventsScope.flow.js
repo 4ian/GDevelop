@@ -9,5 +9,6 @@ export type EventsScope = {|
   externalEvents?: ?gdExternalEvents,
   eventsFunctionsExtension?: gdEventsFunctionsExtension,
   eventsBasedBehavior?: ?gdEventsBasedBehavior,
+  eventsBasedObject?: ?gdEventsBasedObject,
   eventsFunction?: gdEventsFunction,
 |};

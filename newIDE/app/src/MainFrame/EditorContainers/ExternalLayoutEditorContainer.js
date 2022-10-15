@@ -168,6 +168,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             resourceSources={this.props.resourceSources}
             onChooseResource={this.props.onChooseResource}
             resourceExternalEditors={this.props.resourceExternalEditors}
+            onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
             unsavedChanges={this.props.unsavedChanges}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             ref={editor => (this.editor = editor)}
@@ -184,6 +185,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             onOpenEvents={this.props.onOpenEvents}
             onOpenMoreSettings={this.openExternalPropertiesDialog}
             isActive={isActive}
+            canInstallPrivateAsset={this.props.canInstallPrivateAsset}
           />
         )}
         {!layout && (

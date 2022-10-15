@@ -21,6 +21,8 @@ export type AlertMessageIdentifier =
   | 'function-extractor-explanation'
   | 'events-based-behavior-explanation'
   | 'empty-events-based-behavior-explanation'
+  | 'events-based-object-explanation'
+  | 'empty-events-based-object-explanation'
   | 'too-much-effects'
   | 'effects-usage'
   | 'lighting-layer-usage'
@@ -81,6 +83,14 @@ export const allAlertMessages: Array<{
   {
     key: 'empty-events-based-behavior-explanation',
     label: <Trans>Using empty events based behavior</Trans>,
+  },
+  {
+    key: 'events-based-object-explanation',
+    label: <Trans>Using events based object</Trans>,
+  },
+  {
+    key: 'empty-events-based-object-explanation',
+    label: <Trans>Using empty events based object</Trans>,
   },
   {
     key: 'too-much-effects',
@@ -172,6 +182,7 @@ export type PreferencesValues = {|
   codeEditorThemeName: string,
   hiddenAlertMessages: { [AlertMessageIdentifier]: boolean },
   hiddenTutorialHints: { [string]: boolean },
+  hiddenAnnouncements: { [string]: boolean },
   autoDisplayChangelog: boolean,
   lastLaunchedVersion: ?string,
   eventsSheetShowObjectThumbnails: boolean,
@@ -212,6 +223,8 @@ export type Preferences = {|
   showAllAlertMessages: () => void,
   showTutorialHint: (identifier: string, show: boolean) => void,
   showAllTutorialHints: () => void,
+  showAnnouncement: (identifier: string, show: boolean) => void,
+  showAllAnnouncements: () => void,
   verifyIfIsNewVersion: () => boolean,
   setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
   setAutosaveOnPreview: (enabled: boolean) => void,
@@ -270,6 +283,7 @@ export const initialPreferences = {
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},
+    hiddenAnnouncements: {},
     autoDisplayChangelog: true,
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
@@ -304,6 +318,8 @@ export const initialPreferences = {
   showAllAlertMessages: () => {},
   showTutorialHint: (identifier: string, show: boolean) => {},
   showAllTutorialHints: () => {},
+  showAnnouncement: (identifier: string, show: boolean) => {},
+  showAllAnnouncements: () => {},
   verifyIfIsNewVersion: () => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},

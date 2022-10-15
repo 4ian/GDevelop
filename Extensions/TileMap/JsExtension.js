@@ -26,7 +26,7 @@ const defineTileMap = function (
   extension,
   _ /*: (string) => string */,
   gd /*: libGDevelop */) {
-  
+
   var objectTileMap = new gd.ObjectJsImplementation();
   // $FlowExpectedError - ignore Flow warning as we're creating an object
   objectTileMap.updateProperty = function (
@@ -435,8 +435,8 @@ const defineTileMap = function (
     _("Modify the scale of the specified object."),
     _("the scale"),
     _("Size"),
-    "res/actions/scale24.png",
-    "res/actions/scale.png"
+    "res/actions/scale24_black.png",
+    "res/actions/scale_black.png"
   )
   .addParameter('object', _('Tile map'), 'TileMap', false)
   .useStandardOperatorParameters("number")
@@ -452,7 +452,7 @@ object
     _("the width's scale of an object"),
     _("the width's scale"),
     _("Size"),
-    "res/actions/scaleWidth24.png"
+    "res/actions/scaleWidth24_black.png"
   )
   .addParameter('object', _('Tile map'), 'TileMap', false)
   .useStandardParameters("number")
@@ -468,7 +468,7 @@ object
     _("the height's scale of an object"),
     _("the height's scale"),
     _("Size"),
-    "res/actions/scaleHeight24.png"
+    "res/actions/scaleHeight24_black.png"
   )
   .addParameter('object', _('Tile map'), 'TileMap', false)
   .useStandardParameters("number")
@@ -483,8 +483,8 @@ object
       _("Change the width of an object."),
       _("the width"),
       _("Size"),
-      "res/actions/scaleWidth24.png",
-      "res/actions/scale.png"
+      "res/actions/scaleWidth24_black.png",
+      "res/actions/scaleWidth_black.png"
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
     .useStandardOperatorParameters("number")
@@ -499,8 +499,8 @@ object
       _("Change the height of an object."),
       _("the height"),
       _("Size"),
-      "res/actions/scaleHeight24.png",
-      "res/actions/scale.png"
+      "res/actions/scaleHeight24_black.png",
+      "res/actions/scaleHeight_black.png"
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
     .useStandardOperatorParameters("number")
@@ -514,7 +514,7 @@ const defineCollisionMask = function (
   extension,
   _ /*: (string) => string */,
   gd /*: libGDevelop */) {
-  
+
   var collisionMaskObject = new gd.ObjectJsImplementation();
   // $FlowExpectedError - ignore Flow warning as we're creating an object
   collisionMaskObject.updateProperty = function (
@@ -768,15 +768,15 @@ const defineCollisionMask = function (
       _("Modify the scale of the specified object."),
       _("the scale"),
       _("Size"),
-      "res/actions/scale24.png",
-      "res/actions/scale.png"
+      "res/actions/scale24_black.png",
+      "res/actions/scale_black.png"
     )
     .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
     .useStandardOperatorParameters("number")
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('setScale');
-  
+
   object
     .addExpressionAndConditionAndAction(
       "number",
@@ -785,7 +785,7 @@ const defineCollisionMask = function (
       _("the width's scale of an object"),
       _("the width's scale"),
       _("Size"),
-      "res/actions/scaleWidth24.png"
+      "res/actions/scaleWidth24_black.png"
     )
     .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
     .useStandardParameters("number")
@@ -801,7 +801,7 @@ const defineCollisionMask = function (
       _("the height's scale of an object"),
       _("the height's scale"),
       _("Size"),
-      "res/actions/scaleHeight24.png"
+      "res/actions/scaleHeight24_black.png"
     )
     .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
     .useStandardParameters("number")
@@ -816,15 +816,15 @@ const defineCollisionMask = function (
         _("Change the width of an object."),
         _("the width"),
         _("Size"),
-        "res/actions/scaleWidth24.png",
-        "res/actions/scale.png"
+        "res/actions/scaleWidth24_black.png",
+        "res/actions/scaleWidth_black.png"
       )
       .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
       .useStandardOperatorParameters("number")
       .markAsAdvanced()
       .getCodeExtraInformation()
       .setFunctionName('setWidth');
-  
+
     object
       .addAction(
         "Height",
@@ -832,15 +832,15 @@ const defineCollisionMask = function (
         _("Change the height of an object."),
         _("the height"),
         _("Size"),
-        "res/actions/scaleHeight24.png",
-        "res/actions/scale.png"
+        "res/actions/scaleHeight24_black.png",
+        "res/actions/scaleHeight_black.png"
       )
       .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
       .useStandardOperatorParameters("number")
       .markAsAdvanced()
       .getCodeExtraInformation()
       .setFunctionName('setHeight');
-  
+
 };
 
 module.exports = {
@@ -858,8 +858,11 @@ module.exports = {
         'Todor Imreorov',
         'Open source (MIT License)'
       )
+      .setCategory('Advanced')
       .setExtensionHelpPath('/objects/tilemap');
-    
+      extension.addInstructionOrExpressionGroupMetadata(_("Tilemap"))
+          .setIcon("JsPlatform/Extensions/tile_map.svg");
+
       defineTileMap(extension, _, gd);
       defineCollisionMask(extension, _, gd);
 
@@ -940,7 +943,7 @@ module.exports = {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -949,12 +952,15 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );
 
-      this.tileMapPixiObject = new Tilemap.CompositeRectTileLayer(0);
+      // This setting allows tile maps with more than 16K tiles.
+      Tilemap.settings.use32bitIndex = true;
+
+      this.tileMapPixiObject = new Tilemap.CompositeTilemap();
       this._pixiObject = this.tileMapPixiObject;
 
       // Implement `containsPoint` so that we can set `interactive` to true and
@@ -1004,7 +1010,7 @@ module.exports = {
     RenderedTileMapInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'JsPlatform/Extensions/tile_map.svg';
     };
@@ -1014,26 +1020,26 @@ module.exports = {
      */
     RenderedTileMapInstance.prototype.updateTileMap = function () {
       // Get the tileset resource to use
-      const tilemapAtlasImage = this._associatedObject
+      const tilemapAtlasImage = this._associatedObjectConfiguration
         .getProperties(this.project)
         .get('tilemapAtlasImage')
         .getValue();
-      const tilemapJsonFile = this._associatedObject
+      const tilemapJsonFile = this._associatedObjectConfiguration
         .getProperties(this.project)
         .get('tilemapJsonFile')
         .getValue();
-      const tilesetJsonFile = this._associatedObject
+      const tilesetJsonFile = this._associatedObjectConfiguration
         .getProperties(this.project)
         .get('tilesetJsonFile')
         .getValue();
       const layerIndex = parseInt(
-        this._associatedObject
+        this._associatedObjectConfiguration
           .getProperties(this.project)
           .get('layerIndex')
           .getValue(),
         10
       );
-      const displayMode = this._associatedObject
+      const displayMode = this._associatedObjectConfiguration
         .getProperties(this.project)
         .get('displayMode')
         .getValue();
@@ -1181,7 +1187,7 @@ module.exports = {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -1190,7 +1196,7 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );
@@ -1246,7 +1252,7 @@ module.exports = {
      RenderedCollisionMaskInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'JsPlatform/Extensions/tile_map_collision_mask24.svg';
     };
@@ -1256,39 +1262,39 @@ module.exports = {
      */
      RenderedCollisionMaskInstance.prototype.updateTileMap = function () {
       // Get the tileset resource to use
-      const tilemapAtlasImage = this._associatedObject
+      const tilemapAtlasImage = this._associatedObjectConfiguration
       .getProperties(this.project)
       .get('tilemapAtlasImage')
       .getValue();
-    const tilemapJsonFile = this._associatedObject
+    const tilemapJsonFile = this._associatedObjectConfiguration
       .getProperties(this.project)
       .get('tilemapJsonFile')
       .getValue();
-    const tilesetJsonFile = this._associatedObject
+    const tilesetJsonFile = this._associatedObjectConfiguration
       .getProperties(this.project)
       .get('tilesetJsonFile')
       .getValue();
-    const collisionMaskTag = this._associatedObject
+    const collisionMaskTag = this._associatedObjectConfiguration
       .getProperties(this.project)
       .get('collisionMaskTag')
       .getValue();
     const outlineColor = objectsRenderingService.rgbOrHexToHexNumber(
-      this._associatedObject
+      this._associatedObjectConfiguration
         .getProperties(this.project)
         .get('outlineColor')
         .getValue()
     );
     const fillColor = objectsRenderingService.rgbOrHexToHexNumber(
-      this._associatedObject
+      this._associatedObjectConfiguration
         .getProperties(this.project)
         .get('fillColor')
         .getValue()
     );
-    const outlineOpacity = this._associatedObject
+    const outlineOpacity = this._associatedObjectConfiguration
       .getProperties(this.project)
       .get('outlineOpacity')
       .getValue() / 255;
-    const fillOpacity = this._associatedObject
+    const fillOpacity = this._associatedObjectConfiguration
       .getProperties(this.project)
       .get('fillOpacity')
       .getValue() / 255;

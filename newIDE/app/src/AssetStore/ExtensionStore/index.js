@@ -17,7 +17,11 @@ import {
 import useDismissableTutorialMessage from '../../Hints/useDismissableTutorialMessage';
 import { t } from '@lingui/macro';
 import { ColumnStackLayout } from '../../UI/Layout';
+import { Column } from '../../UI/Grid';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import SearchBarSelectField from '../../UI/SearchBarSelectField';
+import SelectOption from '../../UI/SelectOption';
 
 type Props = {|
   isInstalling: boolean,
@@ -48,6 +52,9 @@ export const ExtensionStore = ({
     filtersState,
     searchText,
     setSearchText,
+    allCategories,
+    chosenCategory,
+    setChosenCategory,
   } = React.useContext(ExtensionStoreContext);
 
   React.useEffect(
@@ -94,14 +101,33 @@ export const ExtensionStore = ({
         {windowWidth => (
           <ColumnStackLayout expand noMargin useFullHeight>
             <ColumnStackLayout>
-              <SearchBar
-                value={searchText}
-                onChange={setSearchText}
-                onRequestSearch={() => {}}
-                tagsHandler={tagsHandler}
-                tags={filters && filters.allTags}
-                placeholder={t`Search extensions`}
-              />
+              <ResponsiveLineStackLayout noMargin>
+                <SearchBarSelectField
+                  value={chosenCategory}
+                  onChange={(e, i, value: string) => {
+                    setChosenCategory(value);
+                  }}
+                >
+                  <SelectOption value="" primaryText={t`All categories`} />
+                  {allCategories.map(category => (
+                    <SelectOption
+                      key={category}
+                      value={category}
+                      primaryText={category}
+                    />
+                  ))}
+                </SearchBarSelectField>
+                <Column expand noMargin>
+                  <SearchBar
+                    value={searchText}
+                    onChange={setSearchText}
+                    onRequestSearch={() => {}}
+                    tagsHandler={tagsHandler}
+                    tags={filters && filters.allTags}
+                    placeholder={t`Search extensions`}
+                  />
+                </Column>
+              </ResponsiveLineStackLayout>
               <Toggle
                 onToggle={(e, check) =>
                   preferences.setShowCommunityExtensions(check)

@@ -14,6 +14,7 @@ class ObjectsContainer;
 class ParameterMetadata;
 class EventsFunction;
 class EventsBasedBehavior;
+class EventsBasedObject;
 class Expression;
 }  // namespace gd
 
@@ -48,6 +49,21 @@ class GD_CORE_API EventsFunctionTools {
   static void BehaviorEventsFunctionToObjectsContainer(
       const gd::Project& project,
       const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::EventsFunction& eventsFunction,
+      gd::ObjectsContainer& outputGlobalObjectsContainer,
+      gd::ObjectsContainer& outputObjectsContainer);
+  /**
+   * \brief Given a parent-object events function, initialize the given objects container
+   * with objects described in the events function parameters, in
+   * the events function groups and in the parent-object properties for
+   * child-objects.
+   *
+   * This is useful to create the "context" of a function, before code
+   * generation for example.
+   */
+  static void ObjectEventsFunctionToObjectsContainer(
+      const gd::Project& project,
+      const gd::EventsBasedObject& eventsBasedObject,
       const gd::EventsFunction& eventsFunction,
       gd::ObjectsContainer& outputGlobalObjectsContainer,
       gd::ObjectsContainer& outputObjectsContainer);

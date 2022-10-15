@@ -178,7 +178,7 @@ export declare type TiledTileset = {
   /** The number of tile columns in the tileset */
   columns: integer;
   /** GID corresponding to the first tile in the set */
-  firstgid: integer;
+  firstgid?: integer;
   /** (optional) */
   grid?: TiledGrid;
   /** Image used for tiles in this set */

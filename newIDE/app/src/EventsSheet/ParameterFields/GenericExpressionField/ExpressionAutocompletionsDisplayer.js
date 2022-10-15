@@ -157,7 +157,7 @@ const DisplayedObjectAutocompletion = React.forwardRef(
       project && expressionAutocompletion.object
         ? ObjectsRenderingService.getThumbnail(
             project,
-            expressionAutocompletion.object
+            expressionAutocompletion.object.getConfiguration()
           )
         : 'res/types/object.png';
 
@@ -313,6 +313,7 @@ export default function ExpressionAutocompletionsDisplayer({
                     : undefined;
 
                   return expressionAutocompletion.kind === 'Text' ||
+                    expressionAutocompletion.kind === 'FullExpression' ||
                     expressionAutocompletion.kind === 'Variable' ? (
                     <DisplayedTextAutocompletion
                       key={index}

@@ -21,7 +21,10 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
           "avoiding obstacles on the way.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetCategory("Movement")
       .SetExtensionHelpPath("/behaviors/pathfinding");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Pathfinding behavior"))
+      .SetIcon("CppPlatform/Extensions/AStaricon16.png");
 
   {
     gd::BehaviorMetadata& aut =

@@ -219,11 +219,11 @@ namespace gdjs {
       };
 
       export const hitBoxesCollisionTest = function (
-        objectsLists1,
-        objectsLists2,
-        inverted,
-        runtimeScene,
-        ignoreTouchingEdges
+        objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
+        objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
+        inverted: boolean,
+        runtimeScene: gdjs.RuntimeScene,
+        ignoreTouchingEdges: boolean
       ) {
         return gdjs.evtTools.object.twoListsTest(
           gdjs.RuntimeObject.collisionTest,
@@ -239,10 +239,10 @@ namespace gdjs {
       };
 
       export const distanceTest = function (
-        objectsLists1,
-        objectsLists2,
-        distance,
-        inverted
+        objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
+        objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
+        distance: float,
+        inverted: boolean
       ) {
         return gdjs.evtTools.object.twoListsTest(
           gdjs.evtTools.object._distanceBetweenObjects,
@@ -278,10 +278,10 @@ namespace gdjs {
       };
 
       export const movesTowardTest = function (
-        objectsLists1,
-        objectsLists2,
-        tolerance,
-        inverted
+        objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
+        objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
+        tolerance: float,
+        inverted: boolean
       ) {
         return gdjs.evtTools.object.twoListsTest(
           gdjs.evtTools.object._movesToward,
@@ -403,14 +403,14 @@ namespace gdjs {
       };
 
       export const raycastObject = function (
-        objectsLists,
-        x,
-        y,
-        angle,
-        dist,
-        varX,
-        varY,
-        inverted
+        objectsLists: Hashtable<Array<gdjs.RuntimeObject>>,
+        x: float,
+        y: float,
+        angle: float,
+        dist: float,
+        varX: gdjs.Variable,
+        varY: gdjs.Variable,
+        inverted: boolean
       ) {
         return gdjs.evtTools.object.raycastObjectToPosition(
           objectsLists,
@@ -425,22 +425,22 @@ namespace gdjs {
       };
 
       export const raycastObjectToPosition = function (
-        objectsLists,
-        x,
-        y,
-        endX,
-        endY,
-        varX,
-        varY,
-        inverted
+        objectsLists: Hashtable<Array<gdjs.RuntimeObject>>,
+        x: float,
+        y: float,
+        endX: float,
+        endY: float,
+        varX: gdjs.Variable,
+        varY: gdjs.Variable,
+        inverted: boolean
       ) {
-        let matchObject = null;
+        let matchObject: gdjs.RuntimeObject | null = null;
         let testSqDist = inverted
           ? 0
           : (endX - x) * (endX - x) + (endY - y) * (endY - y);
         let resultX = 0;
         let resultY = 0;
-        const lists = gdjs.staticArray(
+        const lists: RuntimeObject[][] = gdjs.staticArray(
           gdjs.evtTools.object.raycastObjectToPosition
         );
         objectsLists.values(lists);

@@ -16,6 +16,7 @@ export type SearchResult<T> = {|
 
 type SearchOptions = {|
   searchText: string,
+  chosenItemCategory?: string,
   chosenCategory: ?ChosenCategory,
   chosenFilters: Set<string>,
   excludedTiers: Set<string>,
@@ -75,9 +76,11 @@ export const filterSearchResults = <
     tags: Array<string>,
     // Some search items can have tiers:
     +tier?: string,
+    +category?: string,
   }
 >(
   searchResults: ?Array<SearchResult<SearchItem>>,
+  chosenItemCategory: ?string,
   chosenCategory: ?ChosenCategory,
   chosenFilters: Set<string>,
   excludedTiers: Set<string>
@@ -86,6 +89,9 @@ export const filterSearchResults = <
 
   const startTime = performance.now();
   const filteredSearchResults = searchResults
+    .filter(
+      ({ item }) => !chosenItemCategory || item.category === chosenItemCategory
+    )
     .filter(({ item: { tags } }) => {
       if (!chosenCategory) return true;
 
@@ -136,11 +142,13 @@ export const useSearchStructuredItem = <
     tags: Array<string>,
     // Some search items can have tiers:
     +tier?: string,
+    +category?: string,
   }
 >(
   searchItemsById: ?{ [string]: SearchItem },
   {
     searchText,
+    chosenItemCategory,
     chosenCategory,
     chosenFilters,
     excludedTiers,
@@ -228,6 +236,7 @@ export const useSearchStructuredItem = <
         setSearchResults(
           filterSearchResults(
             orderedSearchResults,
+            chosenItemCategory,
             chosenCategory,
             chosenFilters,
             excludedTiers
@@ -259,6 +268,7 @@ export const useSearchStructuredItem = <
               item: result.item,
               matches: tuneMatches(result, searchText),
             })),
+            chosenItemCategory,
             chosenCategory,
             chosenFilters,
             excludedTiers
@@ -276,6 +286,7 @@ export const useSearchStructuredItem = <
       orderedSearchResults,
       searchItemsById,
       searchText,
+      chosenItemCategory,
       chosenCategory,
       chosenFilters,
       searchApi,

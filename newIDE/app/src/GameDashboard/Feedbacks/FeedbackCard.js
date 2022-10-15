@@ -29,7 +29,7 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { useOptimisticState } from '../../Utils/UseOptimisticState';
 
 const styles = {
-  textComment: { whiteSpace: 'pre-wrap' },
+  textComment: { whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' },
   backgroundText: { padding: 0, textAlign: 'left' },
 };
 
@@ -96,7 +96,7 @@ const FeedbackCard = ({
       console.error(`Unable to update comment: `, error);
       showErrorBox({
         message:
-          i18n._(t`Unable to change resolved status of feedback.`) +
+          i18n._(t`Unable to change read status of feedback.`) +
           ' ' +
           i18n._(t`Verify your internet connection or try again later.`),
         rawError: error,
@@ -119,7 +119,7 @@ const FeedbackCard = ({
           cardCornerAction={
             <IconButton
               size="small"
-              tooltip={processed ? t`Unresolve` : t`Resolve`}
+              tooltip={processed ? t`Mark as unread` : t`Mark as read`}
               onClick={() => setProcessed(!processed, i18n)}
             >
               {processed ? (

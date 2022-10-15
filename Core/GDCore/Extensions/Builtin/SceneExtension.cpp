@@ -112,7 +112,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
 
   extension
       .AddAction("SceneBackground",
-                 _("Change background color"),
+                 _("Background color"),
                  _("Change the background color of the scene."),
                  _("Set background color to _PARAM1_"),
                  "",

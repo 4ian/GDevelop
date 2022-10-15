@@ -2,7 +2,7 @@
 import * as React from 'react';
 import Typography from '@material-ui/core/Typography';
 
-type textSize =
+type TextSize =
   | 'bold-title'
   | 'title'
   | 'section-title'
@@ -11,15 +11,15 @@ type textSize =
   | 'body'
   | 'body2';
 
-type textColor = 'error' | 'primary' | 'secondary' | 'inherit';
+type TextColor = 'error' | 'primary' | 'secondary' | 'inherit';
 
 type Props = {|
   /** The text to display. */
   children: ?React.Node,
   /** Size of the text. `body` if not specified. */
-  size?: textSize,
+  size?: TextSize,
   /** Color of the text */
-  color?: textColor,
+  color?: TextColor,
   /** The text alignment. */
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify',
   /** Don't shrink the text if there is not enough place in a flex container. */
@@ -28,6 +28,8 @@ type Props = {|
   noMargin?: boolean,
   /** Allow user to select content */
   allowSelection?: boolean,
+  /** When false, prevents browser auto translate features to translate the content (useful for user input, like a username) */
+  allowBrowserAutoTranslate?: boolean,
   /** By default the text is a paragraph (`p`). It can be shown inline  */
   displayInlineAsSpan?: boolean,
   /** A limited set of styling is supported. */
@@ -38,7 +40,7 @@ type Props = {|
 
     // Allow to specify that the text should break words
     overflow?: 'hidden',
-    overflowWrap?: 'break-word',
+    overflowWrap?: 'break-word' | 'anywhere',
     whiteSpace?: 'nowrap' | 'pre-wrap',
     textOverflow?: 'ellipsis',
 
@@ -52,7 +54,7 @@ type Props = {|
 
 type Interface = {||};
 
-const getVariantFromSize = (size: ?textSize) => {
+const getVariantFromSize = (size: ?TextSize) => {
   switch (size) {
     case 'bold-title':
       return 'h1';
@@ -72,7 +74,7 @@ const getVariantFromSize = (size: ?textSize) => {
   }
 };
 
-const getTextColorFromColor = (color: ?textColor) => {
+const getTextColorFromColor = (color: ?TextColor) => {
   switch (color) {
     case 'error':
       return 'error';
@@ -101,6 +103,7 @@ const Text = React.forwardRef<Props, Interface>(
       noShrink,
       noMargin,
       allowSelection,
+      allowBrowserAutoTranslate = true,
       displayInlineAsSpan,
       ...otherProps // Used by possible parent element (such as Tooltip) to pass down props.
     },
@@ -109,6 +112,7 @@ const Text = React.forwardRef<Props, Interface>(
     <Typography
       variant={getVariantFromSize(size)}
       ref={ref}
+      translate={allowBrowserAutoTranslate ? 'yes' : 'no'}
       color={getTextColorFromColor(color)}
       component={displayInlineAsSpan ? 'span' : undefined}
       style={{

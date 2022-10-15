@@ -37,6 +37,7 @@ struct PreviewExportOptions {
         useWindowMessageDebuggerClient(false),
         projectDataOnlyExport(false),
         fullLoadingScreen(false),
+        isDevelopmentEnvironment(false),
         nonRuntimeScriptsCacheBurst(0){};
 
   /**
@@ -106,6 +107,15 @@ struct PreviewExportOptions {
   }
 
   /**
+   * \brief Set if the export should consider to be in a development environment
+   * of GDevelop (the game should use GDevelop development APIs).
+   */
+  PreviewExportOptions &SetIsDevelopmentEnvironment(bool enable) {
+    isDevelopmentEnvironment = enable;
+    return *this;
+  }
+
+  /**
    * \brief If set to a non zero value, the exported script URLs will have an
    * extra search parameter added (with the given value) to ensure browser cache
    * is bypassed when they are loaded.
@@ -137,6 +147,7 @@ struct PreviewExportOptions {
   std::map<gd::String, int> includeFileHashes;
   bool projectDataOnlyExport;
   bool fullLoadingScreen;
+  bool isDevelopmentEnvironment;
   unsigned int nonRuntimeScriptsCacheBurst;
   gd::String electronRemoteRequirePath;
 };
@@ -242,6 +253,12 @@ class ExporterHelper {
    */
   void ExportObjectAndBehaviorsIncludes(const gd::Project &project,
                                         std::vector<gd::String> &includesFiles);
+  /**
+   * \brief Add the required files for all the objects of the project
+   * and their behaviors.
+   */
+  void ExportObjectAndBehaviorsRequiredFiles(const gd::Project &project,
+                                         std::vector<gd::String> &includesFiles);
 
   /**
    * \brief Copy the external source files used by the game into the export

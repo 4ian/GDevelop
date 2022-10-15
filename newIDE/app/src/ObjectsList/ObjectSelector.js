@@ -77,7 +77,10 @@ const getObjectsAndGroupsDataSource = ({
         ? () => (
             <ListIcon
               iconSize={iconSize}
-              src={ObjectsRenderingService.getThumbnail(project, object)}
+              src={ObjectsRenderingService.getThumbnail(
+                project,
+                object.getConfiguration()
+              )}
             />
           )
         : undefined,

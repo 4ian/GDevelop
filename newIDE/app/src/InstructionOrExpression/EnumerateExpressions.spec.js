@@ -242,7 +242,7 @@ describe('EnumerateExpressions', () => {
         Angle: {
           displayedName: 'Angle',
           fullGroupName: 'General/Objects/Angle',
-          iconFilename: 'res/actions/direction.png',
+          iconFilename: 'res/actions/direction_black.png',
           isPrivate: false,
           name: 'Angle',
           scope: {
@@ -261,7 +261,7 @@ describe('EnumerateExpressions', () => {
         'X position of a point': {
           displayedName: 'X position of a point',
           fullGroupName: 'General/Sprite/Position',
-          iconFilename: 'res/actions/position.png',
+          iconFilename: 'res/actions/position_black.png',
           isPrivate: false,
           name: 'PointX',
           scope: {
@@ -273,13 +273,16 @@ describe('EnumerateExpressions', () => {
     });
 
     // Check that some behavior expressions are there
-    expect(generalTreeNode).toHaveProperty('Platform behavior');
+    const movementTreeNode: TreeNode<EnumeratedExpressionMetadata> =
+      // $FlowFixMe
+      allExpressionsTree['Movement'];
+    expect(movementTreeNode).toHaveProperty('Platform behavior');
     // $FlowFixMe
-    expect(generalTreeNode['Platform behavior']).toMatchObject({
+    expect(movementTreeNode['Platform behavior']).toMatchObject({
       Options: {
         'Maximum horizontal speed': {
           displayedName: 'Maximum horizontal speed',
-          fullGroupName: 'General/Platform behavior/Options',
+          fullGroupName: 'Movement/Platform behavior/Options',
           iconFilename: 'CppPlatform/Extensions/platformerobjecticon.png',
           isPrivate: false,
           name: 'MaxSpeed',

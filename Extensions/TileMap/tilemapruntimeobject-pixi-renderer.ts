@@ -10,10 +10,9 @@ namespace gdjs {
    */
   export class TileMapRuntimeObjectPixiRenderer {
     private _object: any;
-    private _runtimeScene: gdjs.RuntimeScene;
     private _tileMap: TileMapHelper.EditableTileMap | null = null;
 
-    private _pixiObject: PIXI.tilemap.CompositeRectTileLayer;
+    private _pixiObject: PIXI.tilemap.CompositeTilemap;
 
     /**
      * @param runtimeObject The object to render
@@ -24,10 +23,12 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ) {
       this._object = runtimeObject;
-      this._runtimeScene = runtimeScene;
+
+      // This setting allows tile maps with more than 16K tiles.
+      PIXI.tilemap.settings.use32bitIndex = true;
 
       // Load (or reset)
-      this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
+      this._pixiObject = new PIXI.tilemap.CompositeTilemap();
       this._pixiObject.tileAnim = [0, 0];
 
       runtimeScene

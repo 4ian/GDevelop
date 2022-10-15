@@ -59,18 +59,32 @@ export class PixiTileMapHelper {
       tilewidth * columns + spacing * (columns - 1) + margin * 2;
     const expectedAtlasHeight =
       tileheight * rows + spacing * (rows - 1) + margin * 2;
+    // When users use an atlas images that are not divisible by the tile width,
+    // Tiled automatically chooses a number of column that fit in the atlas for
+    // a given tile size.
+    // So the atlas images can have unused pixels at the right and bottom.
     if (
-      (atlasTexture.width !== 1 && expectedAtlasWidth !== atlasTexture.width) ||
-      (atlasTexture.height !== 1 && expectedAtlasHeight !== atlasTexture.height)
+      (atlasTexture.width !== 1 && atlasTexture.width < expectedAtlasWidth) ||
+      atlasTexture.width >= expectedAtlasWidth + spacing + tilewidth ||
+      (atlasTexture.height !== 1 &&
+        atlasTexture.height < expectedAtlasHeight) ||
+      atlasTexture.height >= expectedAtlasHeight + spacing + tileheight
     ) {
-      const expectedSize = expectedAtlasWidth + "x" + expectedAtlasHeight;
-      const actualSize = atlasTexture.width + "x" + atlasTexture.height;
+      console.error(
+        "It seems the atlas file was resized, which is not supported. " +
+          `It should be ${expectedAtlasWidth}x${expectedAtlasHeight} px, ` +
+          `but it's ${atlasTexture.width}x${atlasTexture.height} px.`
+      );
+      return null;
+    }
+    if (
+      (atlasTexture.width !== 1 && atlasTexture.width !== expectedAtlasWidth) ||
+      (atlasTexture.height !== 1 && atlasTexture.height !== expectedAtlasHeight)
+    ) {
       console.warn(
-        "It seems the atlas file was resized, which is not supported. It should be " +
-          expectedSize +
-          "px, but it's " +
-          actualSize +
-          " px."
+        "It seems the atlas file has unused pixels. " +
+          `It should be ${expectedAtlasWidth}x${expectedAtlasHeight} px, ` +
+          `but it's ${atlasTexture.width}x${atlasTexture.height} px.`
       );
       return null;
     }
@@ -123,7 +137,7 @@ export class PixiTileMapHelper {
     layerIndex: number
   ): void {
     // The extension doesn't handle the Pixi sub-namespace very well.
-    const pixiTileMap = untypedPixiTileMap as PIXI.tilemap.CompositeRectTileLayer;
+    const pixiTileMap = untypedPixiTileMap as PIXI.tilemap.CompositeTilemap;
     if (!pixiTileMap) return;
     pixiTileMap.clear();
 
@@ -132,53 +146,57 @@ export class PixiTileMapHelper {
         (displayMode === "index" && layerIndex !== layer.id) ||
         (displayMode === "visible" && !layer.isVisible())
       ) {
-        return;
+        continue;
       }
 
       if (layer instanceof EditableObjectLayer) {
         const objectLayer = layer as EditableObjectLayer;
         for (const object of objectLayer.objects) {
-          const texture = textureCache.findTileTexture(
-            object.getTileId(),
-            object.isFlippedHorizontally(),
-            object.isFlippedVertically(),
-            object.isFlippedDiagonally()
-          );
+          const texture = textureCache.findTileTexture(object.getTileId());
           if (texture) {
-            pixiTileMap.addFrame(
+            const rotate = textureCache.getPixiRotate(
+              object.isFlippedHorizontally(),
+              object.isFlippedVertically(),
+              object.isFlippedDiagonally()
+            );
+            pixiTileMap.tile(
               texture,
               object.x,
-              object.y - objectLayer.tileMap.getTileHeight()
+              object.y - objectLayer.tileMap.getTileHeight(),
+              { rotate }
             );
           }
         }
       } else if (layer instanceof EditableTileMapLayer) {
         const tileLayer = layer as EditableTileMapLayer;
 
-        for (let y = 0; y < tileLayer.tileMap.getDimensionY(); y++) {
-          for (let x = 0; x < tileLayer.tileMap.getDimensionX(); x++) {
-            const tileWidth = tileLayer.tileMap.getTileWidth();
+        const tileWidth = tileLayer.tileMap.getTileWidth();
+        const tileHeight = tileLayer.tileMap.getTileHeight();
+        const dimensionX = tileLayer.tileMap.getDimensionX();
+        const dimensionY = tileLayer.tileMap.getDimensionY();
+
+        for (let y = 0; y < dimensionY; y++) {
+          for (let x = 0; x < dimensionX; x++) {
             const xPos = tileWidth * x;
-            const yPos = tileLayer.tileMap.getTileHeight() * y;
+            const yPos = tileHeight * y;
 
             const tileId = tileLayer.get(x, y);
             if (tileId === undefined) {
               continue;
             }
-            const tileTexture = textureCache.findTileTexture(
-              tileId,
+            const tileTexture = textureCache.findTileTexture(tileId);
+            if (!tileTexture) {
+              console.warn(`Unknown tile id: ${tileId} at (${x}, ${y})`);
+              continue;
+            }
+            const rotate = textureCache.getPixiRotate(
               tileLayer.isFlippedHorizontally(x, y),
               tileLayer.isFlippedVertically(x, y),
               tileLayer.isFlippedDiagonally(x, y)
             );
-            if (!tileTexture) {
-              continue;
-            }
-            const pixiTilemapFrame = pixiTileMap.addFrame(
-              tileTexture,
-              xPos,
-              yPos
-            );
+            const pixiTilemapFrame = pixiTileMap.tile(tileTexture, xPos, yPos, {
+              rotate,
+            });
 
             const tileDefinition = tileLayer.tileMap.getTileDefinition(tileId);
 
@@ -247,16 +265,18 @@ export class PixiTileMapHelper {
               for (let index = 0; index < vertices.length; index++) {
                 let vertexX = vertices[index][0];
                 let vertexY = vertices[index][1];
+                // It's important to do the diagonal flipping first,
+                // because the other flipping "move" the origin.
+                if (isFlippedDiagonally) {
+                  const swap = vertexX;
+                  vertexX = vertexY;
+                  vertexY = swap;
+                }
                 if (isFlippedHorizontally) {
                   vertexX = tileWidth - vertexX;
                 }
                 if (isFlippedVertically) {
                   vertexY = tileHeight - vertexY;
-                }
-                if (isFlippedDiagonally) {
-                  const swap = vertexX;
-                  vertexX = vertexY;
-                  vertexY = swap;
                 }
                 if (index === 0) {
                   pixiGraphics.moveTo(xPos + vertexX, yPos + vertexY);

@@ -9,7 +9,7 @@ import paperDecorator from '../../../PaperDecorator';
 import FeedbackCard from '../../../../GameDashboard/Feedbacks/FeedbackCard';
 
 import { fakeIndieAuthenticatedUser } from '../../../../fixtures/GDevelopServicesTestData';
-import { commentUnsolved } from '../../../../fixtures/GDevelopServicesTestData';
+import { commentUnprocessed } from '../../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'GameDashboard/Feedback/FeedbackCard',
@@ -19,7 +19,7 @@ export default {
 
 export const DefaultFeedbackCard = () => (
   <FeedbackCard
-    comment={commentUnsolved}
+    comment={commentUnprocessed}
     authenticatedUser={fakeIndieAuthenticatedUser}
     onCommentUpdated={action('onCommentUpdated')}
   />
@@ -27,7 +27,7 @@ export const DefaultFeedbackCard = () => (
 
 export const FeedbackCardWithNamedBuild = () => (
   <FeedbackCard
-    comment={commentUnsolved}
+    comment={commentUnprocessed}
     buildProperties={{
       id: 'build-id',
       name: 'My magnificient build',
@@ -40,7 +40,7 @@ export const FeedbackCardWithNamedBuild = () => (
 
 export const FeedbackCardWithUnnamedBuild = () => (
   <FeedbackCard
-    comment={commentUnsolved}
+    comment={commentUnprocessed}
     buildProperties={{ id: 'build-id', isDeleted: false }}
     authenticatedUser={fakeIndieAuthenticatedUser}
     onCommentUpdated={action('onCommentUpdated')}
@@ -49,7 +49,7 @@ export const FeedbackCardWithUnnamedBuild = () => (
 
 export const FeedbackCardWithDeletedBuild = () => (
   <FeedbackCard
-    comment={commentUnsolved}
+    comment={commentUnprocessed}
     buildProperties={{ id: 'build-id', isDeleted: true }}
     authenticatedUser={fakeIndieAuthenticatedUser}
     onCommentUpdated={action('onCommentUpdated')}

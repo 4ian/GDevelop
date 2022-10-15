@@ -4,7 +4,7 @@ import Window from '../Window';
 const isDev = Window.isDev();
 
 export const GDevelopGamePreviews = {
-  baseUrl: `https://game-previews.gdevelop-app.com/`,
+  baseUrl: `https://game-previews.gdevelop.io/`,
 };
 
 export const GDevelopGamesPlatform = {
@@ -83,6 +83,12 @@ export const GDevelopPlayApi = {
     : 'https://api.gdevelop.io/play',
 };
 
+export const GDevelopShopApi = {
+  baseUrl: isDev
+    ? 'https://api-dev.gdevelop.io/shop'
+    : 'https://api.gdevelop.io/shop',
+};
+
 export const GDevelopProjectApi = {
   baseUrl: isDev
     ? 'https://api-dev.gdevelop.io/project'
@@ -93,4 +99,10 @@ export const GDevelopProjectResourcesStorage = {
   baseUrl: isDev
     ? 'https://project-resources-dev.gdevelop.io'
     : 'https://project-resources.gdevelop.io',
+};
+
+export const GDevelopPrivateAssetsStorage = {
+  baseUrl: isDev
+    ? 'https://private-assets-dev.gdevelop.io'
+    : 'https://private-assets.gdevelop.io',
 };

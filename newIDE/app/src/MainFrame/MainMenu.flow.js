@@ -1,6 +1,6 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
-import { type UpdateStatus } from './UpdaterTools';
+import { type ElectronUpdateStatus } from './UpdaterTools';
 import { type FileMetadataAndStorageProviderName } from '../ProjectsStorage';
 
 export type MainMenuProps = {|
@@ -16,6 +16,7 @@ export type MainMenuProps = {|
   onCloseApp: () => void,
   onExportProject: (open?: boolean) => void,
   onCreateProject: (open?: boolean) => void,
+  onCreateBlank: () => void,
   onOpenProjectManager: (open?: boolean) => void,
   onOpenHomePage: () => void,
   onOpenDebugger: () => void,
@@ -24,6 +25,6 @@ export type MainMenuProps = {|
   onOpenLanguage: (open?: boolean) => void,
   onOpenProfile: (open?: boolean) => void,
   onOpenGamesDashboard: (open?: boolean) => void,
-  setUpdateStatus: UpdateStatus => void,
+  setElectronUpdateStatus: ElectronUpdateStatus => void,
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
 |};

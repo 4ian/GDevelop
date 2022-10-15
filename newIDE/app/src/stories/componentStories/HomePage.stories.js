@@ -18,6 +18,7 @@ import AuthenticatedUserContext, {
   initialAuthenticatedUser,
   type AuthenticatedUser,
 } from '../../Profile/AuthenticatedUserContext';
+import CloudStorageProvider from '../../ProjectsStorage/CloudStorageProvider';
 import {
   fakeIndieAuthenticatedUser,
   indieUserProfile,
@@ -83,7 +84,8 @@ const WrappedHomePage = ({
                 projectItemName={null}
                 setToolbar={() => {}}
                 canOpen={true}
-                onOpen={() => action('onOpen')()}
+                storageProviders={[CloudStorageProvider]}
+                onChooseProject={() => action('onChooseProject')()}
                 onOpenRecentFile={() => action('onOpenRecentFile')()}
                 onCreateProject={() => action('onCreateProject')()}
                 onOpenProjectManager={() => action('onOpenProjectManager')()}
@@ -92,14 +94,13 @@ const WrappedHomePage = ({
                 onOpenOnboardingDialog={() =>
                   action('open onboarding dialog')()
                 }
-                onCreateFromExampleShortHeader={() =>
-                  action('create from example')()
-                }
-                onOpenProjectAfterCreation={() =>
-                  action('call callback after project creation')()
+                onOpenProjectPreCreationDialog={() =>
+                  action('open precreation dialog')()
                 }
                 onOpenProfile={() => action('open profile')()}
-                onCreateBlank={() => action('create blank')()}
+                onChangeSubscription={() => action('change subscription')()}
+                onOpenPreferences={() => action('open preferences')()}
+                onOpenAbout={() => action('open about')()}
               />
             </GamesShowcaseStateProvider>
           </TutorialStateProvider>

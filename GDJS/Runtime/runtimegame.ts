@@ -41,6 +41,12 @@ namespace gdjs {
      * `@electron/remote` in the game engine and extensions.
      */
     electronRemoteRequirePath?: string;
+
+    /**
+     * If set, the game should use the specified environment for making calls
+     * to GDevelop APIs ("dev" = development APIs).
+     */
+    environment?: 'dev';
   };
 
   /**
@@ -135,6 +141,12 @@ namespace gdjs {
       this._isPreview = this._options.isPreview || false;
       this._sessionId = null;
       this._playerId = null;
+
+      if (this.isUsingGDevelopDevelopmentEnvironment()) {
+        logger.info(
+          'This game will run on the development version of GDevelop APIs.'
+        );
+      }
     }
 
     /**
@@ -541,6 +553,9 @@ namespace gdjs {
                           if (progressCallback) progressCallback(percent);
                         })
                         .then(() => loadingScreen.unload())
+                        .then(() =>
+                          gdjs.getAllAsynchronouslyLoadingLibraryPromise()
+                        )
                         .then(() => {
                           callback();
                         });
@@ -879,6 +894,15 @@ namespace gdjs {
      */
     isPreview(): boolean {
       return this._isPreview;
+    }
+
+    /**
+     * Check if the game should call GDevelop development APIs or not.
+     *
+     * Unless you are contributing to GDevelop, avoid using this.
+     */
+    isUsingGDevelopDevelopmentEnvironment(): boolean {
+      return this._options.environment === 'dev';
     }
 
     /**

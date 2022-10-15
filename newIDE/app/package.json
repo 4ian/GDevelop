@@ -22,7 +22,7 @@
     "prettier": "1.15.3",
     "react-error-overlay": "^6.0.9",
     "react-scripts": "4.0.3",
-    "recursive-copy": "^2.0.10",
+    "recursive-copy": "^2.0.14",
     "recursive-readdir": "^2.2.2",
     "shelljs": "0.8.4",
     "storybook-addon-mock": "^1.7.0",
@@ -111,7 +111,7 @@
     "reload-extensions": "node scripts/import-GDJS-Runtime.js --skip-clean",
     "build-theme-resources": "node scripts/build-theme-resources.js",
     "create-new-theme": "node scripts/create-new-theme.js",
-    "import-zipped-external-editors": "cd scripts && node import-zipped-editor.js piskel 5.0.0-beta82 b8e4d57b160ff93d3680168cd271af795412ea6c4c0da321aee2946345c7fb75 && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6 && node import-zipped-editor.js yarn 5.0.134 0199d369d80b72597118a1deaeb99b259d684c34a2bd3f6588a2a9aaa3a0a22f"
+    "import-zipped-external-editors": "cd scripts && node import-zipped-editor.js piskel 5.0.0-beta82 b8e4d57b160ff93d3680168cd271af795412ea6c4c0da321aee2946345c7fb75 && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6 && node import-zipped-editor.js yarn 5.0.134 ba8558cad00ec9b18cf3c6fd8647f8c1478ca67c894bca94a152a3740af209cc"
   },
   "eslintConfig": {
     "extends": "react-app",
@@ -138,7 +138,7 @@
     "overrides": [
       {
         "files": [
-          "src/stories/componentStories/*.stories.js",
+          "src/stories/componentStories/**/*.stories.js",
           "src/stories/*.stories.js"
         ],
         "rules": {

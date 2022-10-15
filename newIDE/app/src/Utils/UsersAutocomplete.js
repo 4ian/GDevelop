@@ -5,9 +5,8 @@ import { t } from '@lingui/macro';
 import { useDebounce } from './UseDebounce';
 import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
 import {
-  searchUserPublicProfilesByUsername,
+  searchCreatorPublicProfilesByUsername,
   type UserPublicProfile,
-  type UserPublicProfileSearch,
   getUserPublicProfilesByIds,
 } from './GDevelopServices/User';
 import { type AutocompleteOption } from '../UI/SemiControlledMultiAutoComplete';
@@ -40,7 +39,7 @@ export const UsersAutocomplete = ({
   const [
     completionUserPublicProfiles,
     setCompletionUserPublicProfiles,
-  ] = React.useState<Array<UserPublicProfileSearch>>([]);
+  ] = React.useState<Array<UserPublicProfile>>([]);
   const [error, setError] = React.useState(null);
 
   // Recalculate if the userInput has changed.
@@ -52,7 +51,7 @@ export const UsersAutocomplete = ({
     }
     try {
       setLoading(true);
-      const userPublicProfiles = await searchUserPublicProfilesByUsername(
+      const userPublicProfiles = await searchCreatorPublicProfilesByUsername(
         userInput
       );
       setCompletionUserPublicProfiles(userPublicProfiles);
@@ -136,7 +135,7 @@ export const UsersAutocomplete = ({
         setUserInput(value);
       }}
       dataSource={completionUserPublicProfiles
-        .map((userPublicProfile: UserPublicProfileSearch) => {
+        .map((userPublicProfile: UserPublicProfile) => {
           if (userPublicProfile.username && userPublicProfile.id) {
             return {
               text: userPublicProfile.username,

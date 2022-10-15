@@ -53,6 +53,7 @@ export type CommandName =
   | 'ADD_SUBEVENT'
   | 'ADD_COMMENT_EVENT'
   | 'TOGGLE_EVENT_DISABLED'
+  | 'TOGGLE_CONDITION_INVERTED'
   | 'CHOOSE_AND_ADD_EVENT'
   | 'EVENTS_EDITOR_UNDO'
   | 'EVENTS_EDITOR_REDO'
@@ -283,6 +284,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   TOGGLE_EVENT_DISABLED: {
     area: 'EVENTS',
     displayText: t`Toggle disabled event`,
+  },
+  TOGGLE_CONDITION_INVERTED: {
+    area: 'EVENTS',
+    displayText: t`Toggle inverted condition`,
   },
   CHOOSE_AND_ADD_EVENT: {
     area: 'EVENTS',

@@ -9,8 +9,9 @@ import {
   type Asset,
   type Author,
   type ObjectAsset,
-  getAsset,
+  getPublicAsset,
   isPixelArt,
+  isPrivateAsset,
 } from '../Utils/GDevelopServices/Asset';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
@@ -32,6 +33,8 @@ import { SimilarAssetStoreSearchFilter } from './AssetStoreSearchFilter';
 import EmptyMessage from '../UI/EmptyMessage';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import Link from '../UI/Link';
+import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
+import AuthorizedAssetImage from './PrivateAssets/AuthorizedAssetImage';
 
 const FIXED_HEIGHT = 250;
 const FIXED_WIDTH = 300;
@@ -100,21 +103,43 @@ export const AssetDetails = ({
   onOpenDetails,
 }: Props) => {
   const gdevelopTheme = React.useContext(ThemeContext);
-  const { authors, licenses } = React.useContext(AssetStoreContext);
+  const {
+    authors,
+    licenses,
+    environment,
+    error: filterError,
+    fetchAssetsAndFilters,
+    useSearchItem,
+  } = React.useContext(AssetStoreContext);
   const [asset, setAsset] = React.useState<?Asset>(null);
   const [
     selectedAnimationName,
     setSelectedAnimationName,
   ] = React.useState<?string>(null);
   const [error, setError] = React.useState<?Error>(null);
+  const isAssetPrivate = isPrivateAsset(assetShortHeader);
+  const { fetchPrivateAsset } = React.useContext(
+    PrivateAssetsAuthorizationContext
+  );
   const loadAsset = React.useCallback(
     () => {
       (async () => {
         try {
           // Reinitialise asset to trigger a loader and recalculate all parameters. (for instance zoom)
           setAsset(null);
-          const loadedAsset = await getAsset(assetShortHeader);
+          const loadedAsset = isAssetPrivate
+            ? await fetchPrivateAsset(assetShortHeader, {
+                environment,
+              })
+            : await getPublicAsset(assetShortHeader, {
+                environment,
+              });
+          if (!loadedAsset) {
+            console.error('Cannot load private asset');
+            throw new Error('Cannot load private asset');
+          }
           setAsset(loadedAsset);
+
           if (loadedAsset.objectType === 'sprite') {
             // Only sprites have animations and we select the first one.
             const firstAnimationName =
@@ -127,7 +152,7 @@ export const AssetDetails = ({
         }
       })();
     },
-    [assetShortHeader]
+    [assetShortHeader, environment, isAssetPrivate, fetchPrivateAsset]
   );
 
   const isImageResourceSmooth = React.useMemo(
@@ -176,11 +201,6 @@ export const AssetDetails = ({
     () => [new SimilarAssetStoreSearchFilter(assetShortHeader)],
     [assetShortHeader]
   );
-  const {
-    error: filterError,
-    fetchAssetsAndFilters,
-    useSearchItem,
-  } = React.useContext(AssetStoreContext);
   const searchResults = useSearchItem('', null, null, similarAssetFilters);
   const truncatedSearchResults = searchResults && searchResults.slice(0, 60);
 
@@ -250,9 +270,11 @@ export const AssetDetails = ({
             {asset ? (
               <>
                 {asset.objectType === 'sprite' &&
-                  animationResources &&
+                animationResources &&
+                typeof selectedAnimationName === 'string' && // Animation name can be empty string.
                   direction && (
                     <AnimationPreview
+                      animationName={selectedAnimationName}
                       resourceNames={animationResources.map(({ name }) => name)}
                       getImageResourceSource={(resourceName: string) => {
                         const resource = assetResources[resourceName];
@@ -267,16 +289,24 @@ export const AssetDetails = ({
                       initialZoom={140 / Math.max(asset.width, asset.height)}
                       fixedHeight={FIXED_HEIGHT}
                       fixedWidth={FIXED_WIDTH}
+                      isAssetPrivate={isAssetPrivate}
                     />
                   )}
-                {(asset.objectType === 'tiled' ||
-                  asset.objectType === '9patch') && (
+                {asset.objectType !== 'sprite' && (
                   <div style={styles.previewBackground}>
-                    <CorsAwareImage
-                      style={styles.previewImage}
-                      src={asset.previewImageUrls[0]}
-                      alt={asset.name}
-                    />
+                    {isAssetPrivate ? (
+                      <AuthorizedAssetImage
+                        style={styles.previewImage}
+                        url={asset.previewImageUrls[0]}
+                        alt={asset.name}
+                      />
+                    ) : (
+                      <CorsAwareImage
+                        style={styles.previewImage}
+                        src={asset.previewImageUrls[0]}
+                        alt={asset.name}
+                      />
+                    )}
                   </div>
                 )}
               </>

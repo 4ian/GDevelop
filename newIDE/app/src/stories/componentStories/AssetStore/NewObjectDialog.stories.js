@@ -23,7 +23,6 @@ export const Default = () => (
       onClose={action('onClose')}
       onCreateNewObject={action('onCreateNewObject')}
       onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
-      events={testProject.testLayout.getEvents()}
       objectsContainer={testProject.testLayout}
       resourceExternalEditors={fakeResourceExternalEditors}
       onChooseResource={() => {
@@ -31,6 +30,8 @@ export const Default = () => (
         return Promise.reject();
       }}
       resourceSources={[]}
+      onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
+      canInstallPrivateAsset={() => false}
     />
   </AssetStoreStateProvider>
 );

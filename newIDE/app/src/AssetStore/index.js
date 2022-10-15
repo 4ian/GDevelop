@@ -13,7 +13,11 @@ import {
   sendAssetOpened,
   sendAssetPackOpened,
 } from '../Utils/Analytics/EventSender';
-import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import {
+  type AssetShortHeader,
+  type PublicAssetPack,
+} from '../Utils/GDevelopServices/Asset';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
 import {
@@ -32,6 +36,10 @@ import IconButton from '../UI/IconButton';
 import { AssetDetails } from './AssetDetails';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Home from '@material-ui/icons/Home';
+import PrivateAssetPackDialog from './PrivateAssets/PrivateAssetPackDialog';
+import PlaceholderError from '../UI/PlaceholderError';
+import AlertMessage from '../UI/AlertMessage';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 type Props = {|
   project: gdProject,
@@ -39,7 +47,8 @@ type Props = {|
 
 export const AssetStore = ({ project }: Props) => {
   const {
-    assetPacks,
+    publicAssetPacks,
+    privateAssetPacks,
     searchResults,
     error,
     fetchAssetsAndFilters,
@@ -47,6 +56,7 @@ export const AssetStore = ({ project }: Props) => {
     searchText,
     setSearchText,
     assetFiltersState,
+    assetPackRandomOrdering,
   } = React.useContext(AssetStoreContext);
   const {
     isOnHomePage,
@@ -54,17 +64,14 @@ export const AssetStore = ({ project }: Props) => {
     openedAssetShortHeader,
     filtersState,
   } = navigationState.getCurrentPage();
-
-  React.useEffect(
-    () => {
-      fetchAssetsAndFilters();
-    },
-    [fetchAssetsAndFilters]
-  );
-
   const searchBar = React.useRef<?SearchBarInterface>(null);
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
+  const [
+    selectedPrivateAssetPackListingData,
+    setSelectedPrivateAssetPackListingData,
+  ] = React.useState<?PrivateAssetPackListingData>(null);
+  const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
 
   const onOpenDetails = (assetShortHeader: AssetShortHeader) => {
     sendAssetOpened({
@@ -76,16 +83,8 @@ export const AssetStore = ({ project }: Props) => {
 
   // When a pack is selected from the home page,
   // we set it as the chosen category and open the filters panel.
-  const selectPack = (tag: string) => {
-    if (!assetPacks) return;
-
-    sendAssetPackOpened(tag);
-
-    const assetPack = assetPacks.starterPacks.find(pack => pack.tag === tag);
-    if (!assetPack) {
-      // This can't actually happen.
-      return;
-    }
+  const selectPublicAssetPack = (assetPack: PublicAssetPack) => {
+    sendAssetPackOpened(assetPack.tag);
 
     if (assetPack.externalWebLink) {
       Window.openExternalURL(assetPack.externalWebLink);
@@ -95,13 +94,42 @@ export const AssetStore = ({ project }: Props) => {
     }
   };
 
+  // When a private pack is selected from the home page,
+  // if the user owns it, we set it as the chosen category,
+  // otherwise we open the dialog to buy it.
+  const selectPrivateAssetPack = (
+    assetPackListingData: PrivateAssetPackListingData
+  ) => {
+    sendAssetPackOpened(assetPackListingData.name);
+
+    const receivedAssetPack = receivedAssetPacks
+      ? receivedAssetPacks.find(pack => pack.id === assetPackListingData.id)
+      : null;
+
+    if (!receivedAssetPack) {
+      // The user has not received the pack, open the dialog to buy it.
+      setSelectedPrivateAssetPackListingData(assetPackListingData);
+      return;
+    }
+
+    // The user has received the pack, open it.
+    navigationState.openPackPage(receivedAssetPack);
+    setIsFiltersPanelOpen(true);
+  };
+
   // When a tag is selected from the asset details page,
-  // we set it as the chosen category, clear old filters and open the filters panel.
+  // first determine if it's a public or private pack,
+  // then set it as the chosen category, clear old filters and open the filters panel.
   const selectTag = (tag: string) => {
-    const assetPack =
-      assetPacks && assetPacks.starterPacks.find(pack => pack.tag === tag);
-    if (assetPack) {
-      navigationState.openPackPage(assetPack);
+    const privateAssetPack =
+      receivedAssetPacks && receivedAssetPacks.find(pack => pack.tag === tag);
+    const publicAssetPack =
+      publicAssetPacks &&
+      publicAssetPacks.starterPacks.find(pack => pack.tag === tag);
+    if (privateAssetPack) {
+      navigationState.openPackPage(privateAssetPack);
+    } else if (publicAssetPack) {
+      navigationState.openPackPage(publicAssetPack);
     } else {
       navigationState.openTagPage(tag);
     }
@@ -189,12 +217,12 @@ export const AssetStore = ({ project }: Props) => {
                         <>
                           <Column expand alignItems="center">
                             <Text size="block-title" noMargin>
-                              {filtersState.chosenCategory
+                              {openedAssetPack
+                                ? openedAssetPack.name
+                                : filtersState.chosenCategory
                                 ? capitalize(
                                     filtersState.chosenCategory.node.name
                                   )
-                                : openedAssetPack
-                                ? openedAssetPack.name
                                 : ''}
                             </Text>
                           </Column>
@@ -265,13 +293,21 @@ export const AssetStore = ({ project }: Props) => {
                     )}
                   </Background>
                 )}
-                {isOnHomePage && !assetPacks && <PlaceholderLoader />}
-                {isOnHomePage && assetPacks && (
-                  <AssetsHome
-                    assetPacks={assetPacks}
-                    onPackSelection={selectPack}
-                  />
-                )}
+                {isOnHomePage &&
+                  !(publicAssetPacks && privateAssetPacks) &&
+                  !error && <PlaceholderLoader />}
+                {isOnHomePage &&
+                  publicAssetPacks &&
+                  privateAssetPacks &&
+                  assetPackRandomOrdering && (
+                    <AssetsHome
+                      publicAssetPacks={publicAssetPacks}
+                      privateAssetPacksListingData={privateAssetPacks}
+                      assetPackRandomOrdering={assetPackRandomOrdering}
+                      onPublicAssetPackSelection={selectPublicAssetPack}
+                      onPrivateAssetPackSelection={selectPrivateAssetPack}
+                    />
+                  )}
                 {!isOnHomePage && !openedAssetShortHeader && (
                   <BoxSearchResults
                     baseSize={128}
@@ -292,12 +328,30 @@ export const AssetStore = ({ project }: Props) => {
                     }
                   />
                 )}
+                {isOnHomePage && error && (
+                  <PlaceholderError onRetry={fetchAssetsAndFilters}>
+                    <AlertMessage kind="error">
+                      <Trans>
+                        An error occurred when fetching the asset store content.
+                        Please try again later.
+                      </Trans>
+                    </AlertMessage>
+                  </PlaceholderError>
+                )}
                 {openedAssetShortHeader && (
                   <AssetDetails
                     project={project}
                     onTagSelection={selectTag}
                     assetShortHeader={openedAssetShortHeader}
                     onOpenDetails={onOpenDetails}
+                  />
+                )}
+                {selectedPrivateAssetPackListingData && (
+                  <PrivateAssetPackDialog
+                    privateAssetPackListingData={
+                      selectedPrivateAssetPackListingData
+                    }
+                    onClose={() => setSelectedPrivateAssetPackListingData(null)}
                   />
                 )}
               </Line>

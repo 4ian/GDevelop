@@ -11,6 +11,8 @@ declare class gdInitialInstance {
   setAngle(angle: number): void;
   isLocked(): boolean;
   setLocked(lock: boolean): void;
+  isSealed(): boolean;
+  setSealed(seal: boolean): void;
   getZOrder(): number;
   setZOrder(zOrder: number): void;
   getLayer(): string;

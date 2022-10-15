@@ -20,6 +20,7 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
                                  "or other short-lived objects."),
                                "Florian Rival",
                                "Open source (MIT License)")
+      .SetCategory("Game mechanic")
       .SetExtensionHelpPath("/behaviors/destroyoutside");
 
   gd::BehaviorMetadata& aut =

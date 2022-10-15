@@ -199,7 +199,8 @@ class GD_CORE_API ParameterMetadata {
              parameterType == "objectAnimationName" ||
              parameterType == "functionParameterName" ||
              parameterType == "externalLayoutName" ||
-             parameterType == "leaderboardId";
+             parameterType == "leaderboardId" ||
+             parameterType == "identifier";
     } else if (type == "variable") {
       return parameterType == "objectvar" || parameterType == "globalvar" ||
              parameterType == "scenevar";

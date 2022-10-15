@@ -11,9 +11,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/UUID/UUID.h"
-#if defined(GD_IDE_ONLY)
 #include "GDCore/Project/PropertyDescriptor.h"
-#endif
 
 namespace gd {
 
@@ -30,6 +28,7 @@ InitialInstance::InitialInstance()
       width(0),
       height(0),
       locked(false),
+      sealed(false),
       persistentUuid(UUID::MakeUuid4()) {}
 
 void InitialInstance::UnserializeFrom(const SerializerElement& element) {
@@ -44,6 +43,7 @@ void InitialInstance::UnserializeFrom(const SerializerElement& element) {
   SetZOrder(element.GetIntAttribute("zOrder", 0, "plan"));
   SetLayer(element.GetStringAttribute("layer"));
   SetLocked(element.GetBoolAttribute("locked", false));
+  SetSealed(element.GetBoolAttribute("sealed", false));
 
   persistentUuid = element.GetStringAttribute("persistentUuid");
   if (persistentUuid.empty()) ResetPersistentUuid();
@@ -83,7 +83,8 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("customSize", HasCustomSize());
   element.SetAttribute("width", GetCustomWidth());
   element.SetAttribute("height", GetCustomHeight());
-  element.SetAttribute("locked", IsLocked());
+  if (IsLocked()) element.SetAttribute("locked", IsLocked());
+  if (IsSealed()) element.SetAttribute("sealed", IsSealed());
 
   if (persistentUuid.empty()) persistentUuid = UUID::MakeUuid4();
   element.SetStringAttribute("persistentUuid", persistentUuid);
@@ -112,15 +113,14 @@ InitialInstance& InitialInstance::ResetPersistentUuid() {
   return *this;
 }
 
-#if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor>
 InitialInstance::GetCustomProperties(gd::Project& project, gd::Layout& layout) {
   // Find an object
   if (layout.HasObjectNamed(GetObjectName()))
-    return layout.GetObject(GetObjectName())
+    return layout.GetObject(GetObjectName()).GetConfiguration()
         .GetInitialInstanceProperties(*this, project, layout);
   else if (project.HasObjectNamed(GetObjectName()))
-    return project.GetObject(GetObjectName())
+    return project.GetObject(GetObjectName()).GetConfiguration()
         .GetInitialInstanceProperties(*this, project, layout);
 
   std::map<gd::String, gd::PropertyDescriptor> nothing;
@@ -132,15 +132,14 @@ bool InitialInstance::UpdateCustomProperty(const gd::String& name,
                                            gd::Project& project,
                                            gd::Layout& layout) {
   if (layout.HasObjectNamed(GetObjectName()))
-    return layout.GetObject(GetObjectName())
+    return layout.GetObject(GetObjectName()).GetConfiguration()
         .UpdateInitialInstanceProperty(*this, name, value, project, layout);
   else if (project.HasObjectNamed(GetObjectName()))
-    return project.GetObject(GetObjectName())
+    return project.GetObject(GetObjectName()).GetConfiguration()
         .UpdateInitialInstanceProperty(*this, name, value, project, layout);
 
   return false;
 }
-#endif
 
 double InitialInstance::GetRawDoubleProperty(const gd::String& name) const {
   const auto& it = numberProperties.find(name);

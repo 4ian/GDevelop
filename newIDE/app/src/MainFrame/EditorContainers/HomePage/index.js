@@ -1,14 +1,13 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import Paper from '@material-ui/core/Paper';
 import { Line, Column } from '../../../UI/Grid';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
-  type OnCreateFromExampleShortHeaderFunction,
-  type OnCreateBlankFunction,
-  type OnOpenProjectAfterCreationFunction,
-} from '../../../ProjectCreation/CreateProjectDialog';
-import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
+  type FileMetadataAndStorageProviderName,
+  type StorageProvider,
+} from '../../../ProjectsStorage';
 import GetStartedSection from './GetStartedSection';
 import BuildSection, { type BuildSectionInterface } from './BuildSection';
 import LearnSection from './LearnSection';
@@ -21,6 +20,9 @@ import { HomePageHeader } from './HomePageHeader';
 import { HomePageMenu, type HomeTab } from './HomePageMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
+import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
+import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 
 type Props = {|
   project: ?gdProject,
@@ -29,12 +31,13 @@ type Props = {|
   projectItemName: ?string,
   project: ?gdProject,
   setToolbar: (?React.Node) => void,
+  storageProviders: Array<StorageProvider>,
 
   // Project opening
   canOpen: boolean,
-  onOpen: () => void,
+  onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onCreateProject: () => void,
+  onCreateProject: (ExampleShortHeader | null) => void,
   onOpenProjectManager: () => void,
 
   // Other dialogs opening:
@@ -42,11 +45,12 @@ type Props = {|
   onOpenLanguageDialog: () => void,
   onOpenProfile: () => void,
   onOpenOnboardingDialog: () => void,
+  onChangeSubscription: () => void,
+  onOpenPreferences: () => void,
+  onOpenAbout: () => void,
 
   // Project creation
-  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
-  onCreateBlank: OnCreateBlankFunction,
-  onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
+  onOpenProjectPreCreationDialog: (?ExampleShortHeader) => void,
 |};
 
 type HomePageEditorInterface = {|
@@ -61,11 +65,9 @@ export const HomePage = React.memo<Props>(
       {
         project,
         canOpen,
-        onOpen,
+        onChooseProject,
         onOpenRecentFile,
-        onCreateFromExampleShortHeader,
-        onCreateBlank,
-        onOpenProjectAfterCreation,
+        onOpenProjectPreCreationDialog,
         onCreateProject,
         onOpenProjectManager,
         onOpenHelpFinder,
@@ -73,7 +75,11 @@ export const HomePage = React.memo<Props>(
         onOpenProfile,
         setToolbar,
         onOpenOnboardingDialog,
+        onChangeSubscription,
+        onOpenPreferences,
+        onOpenAbout,
         isActive,
+        storageProviders,
       }: Props,
       ref
     ) => {
@@ -81,6 +87,7 @@ export const HomePage = React.memo<Props>(
         AuthenticatedUserContext
       );
       const { fetchTutorials } = React.useContext(TutorialContext);
+      const { announcements } = React.useContext(AnnouncementsFeedContext);
       const { fetchShowcasedGamesAndFilters } = React.useContext(
         GamesShowcaseContext
       );
@@ -161,36 +168,59 @@ export const HomePage = React.memo<Props>(
                   <HomePageMenu
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
+                    onOpenPreferences={onOpenPreferences}
+                    onOpenAbout={onOpenAbout}
                   />
-                  {activeTab === 'get-started' && (
-                    <GetStartedSection
-                      onTabChange={setActiveTab}
-                      onCreateProject={onCreateProject}
-                      onOpenOnboardingDialog={onOpenOnboardingDialog}
-                      showGetStartedSection={showGetStartedSection}
-                      setShowGetStartedSection={setShowGetStartedSection}
-                    />
-                  )}
-                  {activeTab === 'build' && (
-                    <BuildSection
-                      ref={buildSectionRef}
-                      project={project}
-                      canOpen={canOpen}
-                      onOpen={onOpen}
-                      onCreateProject={onCreateProject}
-                      onOpenRecentFile={onOpenRecentFile}
-                    />
-                  )}
-                  {activeTab === 'learn' && (
-                    <LearnSection
-                      onOpenOnboardingDialog={onOpenOnboardingDialog}
-                      onCreateProject={onCreateProject}
-                      onTabChange={setActiveTab}
-                      onOpenHelpFinder={onOpenHelpFinder}
-                    />
-                  )}
-                  {activeTab === 'play' && <PlaySection />}
-                  {activeTab === 'community' && <CommunitySection />}
+                  <Column noMargin expand>
+                    {activeTab !== 'community' && !!announcements && (
+                      <Paper elevation={0} style={{}} square>
+                        <AnnouncementsFeed level="urgent" canClose addMargins />
+                      </Paper>
+                    )}
+                    {activeTab === 'get-started' && (
+                      <GetStartedSection
+                        onTabChange={setActiveTab}
+                        onCreateProject={() =>
+                          onCreateProject(/*exampleShortHeader=*/ null)
+                        }
+                        onOpenOnboardingDialog={onOpenOnboardingDialog}
+                        showGetStartedSection={showGetStartedSection}
+                        setShowGetStartedSection={setShowGetStartedSection}
+                      />
+                    )}
+                    {activeTab === 'build' && (
+                      <BuildSection
+                        ref={buildSectionRef}
+                        project={project}
+                        canOpen={canOpen}
+                        onChooseProject={onChooseProject}
+                        onOpenProjectPreCreationDialog={
+                          onOpenProjectPreCreationDialog
+                        }
+                        onShowAllExamples={() =>
+                          onCreateProject(/*exampleShortHeader=*/ null)
+                        }
+                        onSelectExample={exampleShortHeader =>
+                          onCreateProject(exampleShortHeader)
+                        }
+                        onOpenRecentFile={onOpenRecentFile}
+                        onChangeSubscription={onChangeSubscription}
+                        storageProviders={storageProviders}
+                      />
+                    )}
+                    {activeTab === 'learn' && (
+                      <LearnSection
+                        onOpenOnboardingDialog={onOpenOnboardingDialog}
+                        onCreateProject={() =>
+                          onCreateProject(/*exampleShortHeader=*/ null)
+                        }
+                        onTabChange={setActiveTab}
+                        onOpenHelpFinder={onOpenHelpFinder}
+                      />
+                    )}
+                    {activeTab === 'play' && <PlaySection />}
+                    {activeTab === 'community' && <CommunitySection />}
+                  </Column>
                 </Line>
               </Column>
             </>
@@ -214,16 +244,20 @@ export const renderHomePageContainer = (
     projectItemName={props.projectItemName}
     setToolbar={props.setToolbar}
     canOpen={props.canOpen}
-    onOpen={props.onOpen}
+    onChooseProject={props.onChooseProject}
     onOpenRecentFile={props.onOpenRecentFile}
     onCreateProject={props.onCreateProject}
-    onCreateFromExampleShortHeader={props.onCreateFromExampleShortHeader}
-    onCreateBlank={props.onCreateBlank}
-    onOpenProjectAfterCreation={props.onOpenProjectAfterCreation}
+    onOpenProjectPreCreationDialog={props.onOpenProjectPreCreationDialog}
     onOpenProjectManager={props.onOpenProjectManager}
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
     onOpenOnboardingDialog={props.onOpenOnboardingDialog}
+    onChangeSubscription={props.onChangeSubscription}
+    onOpenPreferences={props.onOpenPreferences}
+    onOpenAbout={props.onOpenAbout}
+    storageProviders={
+      (props.extraEditorProps && props.extraEditorProps.storageProviders) || []
+    }
   />
 );

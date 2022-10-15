@@ -165,7 +165,7 @@ module.exports = {
         'JsPlatform/Extensions/p2picon.svg'
       )
       .addParameter('string', _('Host'), '', false)
-      .addParameter('number', _('Port'), '', false)
+      .addParameter('expression', _('Port'), '', false)
       .addParameter('string', _('Path'), '', false)
       .addParameter('string', _('Key'), '', false)
       .addParameter('yesorno', _('SSl enabled?'), '', false)

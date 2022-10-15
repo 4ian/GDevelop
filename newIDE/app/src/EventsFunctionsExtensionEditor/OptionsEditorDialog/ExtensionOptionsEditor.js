@@ -181,6 +181,9 @@ export const ExtensionOptionsEditor = ({
             fullWidth
             rows={5}
             rowsMax={15}
+            helperMarkdownText={i18n._(
+              t`Explain and give some examples of what can be achieved with this extension.`
+            )}
           />
           <TextField
             floatingLabelText={<Trans>Version</Trans>}
@@ -209,6 +212,10 @@ export const ExtensionOptionsEditor = ({
                 value: 'Ads',
               },
               {
+                text: 'Visual effect',
+                value: 'Visual effect',
+              },
+              {
                 text: 'Audio',
                 value: 'Audio',
               },
@@ -217,12 +224,20 @@ export const ExtensionOptionsEditor = ({
                 value: 'Advanced',
               },
               {
-                text: 'Device',
-                value: 'Device',
+                text: 'Camera',
+                value: 'Camera',
               },
               {
                 text: 'Input',
                 value: 'Input',
+              },
+              {
+                text: 'Game mechanic',
+                value: 'Game mechanic',
+              },
+              {
+                text: 'Movement',
+                value: 'Movement',
               },
               {
                 text: 'Network',
@@ -231,6 +246,10 @@ export const ExtensionOptionsEditor = ({
               {
                 text: 'Third-party',
                 value: 'Third-party',
+              },
+              {
+                text: 'User interface',
+                value: 'User interface',
               },
             ]}
           />

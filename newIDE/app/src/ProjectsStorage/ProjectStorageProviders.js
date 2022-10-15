@@ -10,20 +10,13 @@ import { type AppArguments } from '../Utils/Window';
 
 /**
  * An empty StorageProvider doing nothing.
+ * Use only for tests or for case where no storage provider was set
+ * (this is a "null object").
  */
-const emptyStorageProvider: StorageProvider = {
+export const emptyStorageProvider: StorageProvider = {
   internalName: 'Empty',
   name: 'No storage',
-  createOperations: () => ({
-    onOpenWithPicker: () => Promise.reject('No storage provider set up'),
-    onOpen: () => Promise.reject('No storage provider set up'),
-    hasAutoSave: () => Promise.resolve(false),
-    onSaveProject: (project: gdProject) =>
-      Promise.reject('No storage provider set up'),
-    onSaveProjectAs: (project: gdProject) =>
-      Promise.reject('No storage provider set up'),
-    onAutoSaveProject: (project: gdProject) => Promise.resolve(),
-  }),
+  createOperations: () => ({}),
 };
 
 type Props = {|
@@ -33,10 +26,7 @@ type Props = {|
   children: ({
     storageProviders: Array<StorageProvider>,
     getStorageProviderOperations: (
-      ?{
-        storageProvider: StorageProvider,
-        doNotKeepForNextOperations?: boolean,
-      }
+      newStorageProvider?: ?StorageProvider
     ) => StorageProviderOperations,
     initialFileMetadataToOpen: ?FileMetadata,
     getStorageProvider: () => StorageProvider,
@@ -105,12 +95,9 @@ const ProjectStorageProviders = (props: Props) => {
   };
 
   const getStorageProviderOperations = (
-    options: ?{
-      storageProvider: StorageProvider,
-      doNotKeepForNextOperations?: boolean,
-    }
+    newStorageProvider?: ?StorageProvider
   ): StorageProviderOperations => {
-    if (!options) {
+    if (!newStorageProvider) {
       if (!storageProviderOperations.current) {
         currentStorageProvider.current = emptyStorageProvider;
         storageProviderOperations.current = emptyStorageProvider.createOperations(
@@ -123,11 +110,6 @@ const ProjectStorageProviders = (props: Props) => {
       }
       return storageProviderOperations.current;
     }
-
-    const {
-      storageProvider: newStorageProvider,
-      doNotKeepForNextOperations,
-    } = options;
 
     // Avoid creating a new storageProviderOperations
     // if we're not changing the storage provider.
@@ -144,7 +126,10 @@ const ProjectStorageProviders = (props: Props) => {
       authenticatedUser,
     });
 
-    if (!doNotKeepForNextOperations) {
+    // If the storage provider is unable to open a project, we won't keep it, we just
+    // return it for a one time usage (example: DownloadFileStorageProvider).
+    const keepForNextOperations = !!storageProviderOperationsToUse.onOpen;
+    if (keepForNextOperations) {
       currentStorageProvider.current = newStorageProvider;
       storageProviderOperations.current = storageProviderOperationsToUse;
     }

@@ -506,7 +506,7 @@ module.exports = {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -515,7 +515,7 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );
@@ -539,7 +539,7 @@ module.exports = {
     RenderedDummyObjectInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'CppPlatform/Extensions/texticon24.png';
     };
@@ -549,7 +549,7 @@ module.exports = {
      */
     RenderedDummyObjectInstance.prototype.update = function () {
       // Read a property from the object
-      const property1Value = this._associatedObject
+      const property1Value = this._associatedObjectConfiguration
         .getProperties()
         .get('My first property')
         .getValue();

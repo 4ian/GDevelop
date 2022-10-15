@@ -214,6 +214,7 @@ export default class SpritesList extends Component<Props, void> {
           copySpritePolygons(direction.getSprite(0), sprite);
         }
         direction.addSprite(sprite);
+        sprite.delete();
       });
 
       // Important, we are responsible for deleting the resources that were given to us.
@@ -320,6 +321,7 @@ export default class SpritesList extends Component<Props, void> {
       <div>
         <MiniToolbar justifyContent="flex-end" smallest>
           <DirectionTools
+            animationName={this.props.animationName}
             direction={this.props.direction}
             resourcesLoader={this.props.resourcesLoader}
             project={this.props.project}

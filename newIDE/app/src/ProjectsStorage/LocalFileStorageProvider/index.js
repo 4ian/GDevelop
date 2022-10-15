@@ -10,8 +10,10 @@ import {
 } from './LocalProjectOpener';
 import {
   onSaveProject,
+  onChooseSaveProjectAsLocation,
   onSaveProjectAs,
   onAutoSaveProject,
+  getWriteErrorMessage,
 } from './LocalProjectWriter';
 import {
   type AppArguments,
@@ -27,7 +29,7 @@ import Computer from '../../UI/CustomSvgIcons/Computer';
 export default ({
   internalName: 'LocalFile',
   name: t`Your computer`,
-  renderIcon: () => <Computer />,
+  renderIcon: props => <Computer fontSize={props.size} />,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY]) return null;
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY].length) return null;
@@ -41,11 +43,13 @@ export default ({
     onOpen,
     hasAutoSave,
     onSaveProject,
+    onChooseSaveProjectAsLocation,
     onSaveProjectAs,
     onAutoSaveProject,
     onGetAutoSave,
     getOpenErrorMessage: (error: Error): MessageDescriptor => {
       return t`Check that the file exists, that this file is a proper game created with GDevelop and that you have the authorization to open it.`;
     },
+    getWriteErrorMessage,
   }),
 }: StorageProvider);

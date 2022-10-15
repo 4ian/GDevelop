@@ -7,10 +7,8 @@ import {
   splitPaths,
   getSlugifiedUniqueNameFromProperty,
 } from '../../Utils/ObjectSplitter';
-import localFileSystem from '../../Export/LocalExporters/LocalFileSystem';
-import assignIn from 'lodash/assignIn';
-
-const gd: libGDevelop = global.gd;
+import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import { t } from '@lingui/macro';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -141,16 +139,13 @@ export const onSaveProject = (
   });
 };
 
-export const onSaveProjectAs = (
+export const onChooseSaveProjectAsLocation = async (
   project: gdProject,
-  fileMetadata: ?FileMetadata,
-  options?: { context?: 'duplicateCurrentProject', onStartSaving: () => void }
+  fileMetadata: ?FileMetadata // This is the current location.
 ): Promise<{|
-  wasSaved: boolean,
-  fileMetadata: ?FileMetadata,
+  fileMetadata: ?FileMetadata, // This is the newly chosen location (or null if cancelled).
 |}> => {
   const defaultPath = fileMetadata ? fileMetadata.fileIdentifier : '';
-  const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
   const browserWindow = remote.getCurrentWindow();
   const saveDialogOptions = {
     defaultPath,
@@ -158,39 +153,44 @@ export const onSaveProjectAs = (
   };
 
   if (!dialog) {
-    return Promise.reject('Unsupported');
+    throw new Error('Unsupported');
   }
   const filePath = dialog.showSaveDialogSync(browserWindow, saveDialogOptions);
   if (!filePath) {
-    return Promise.resolve({ wasSaved: false, fileMetadata });
+    return { fileMetadata: null };
   }
-  const projectPath = path.dirname(filePath);
+
+  return {
+    fileMetadata: {
+      fileIdentifier: filePath,
+    },
+  };
+};
+
+export const onSaveProjectAs = async (
+  project: gdProject,
+  fileMetadata: ?FileMetadata,
+  options: {|
+    onStartSaving: () => void,
+    onMoveResources: () => Promise<void>,
+  |}
+): Promise<{|
+  wasSaved: boolean,
+|}> => {
+  if (!fileMetadata)
+    throw new Error('A location was not chosen before saving as.');
 
   if (options && options.onStartSaving) options.onStartSaving();
+  await options.onMoveResources();
 
-  // TODO: Ideally, errors while copying resources should be reported.
-  gd.ProjectResourcesCopier.copyAllResourcesTo(
-    project,
-    fileSystem,
-    projectPath,
-    true, // Update the project with the new resource paths
-    false, // Don't move absolute files
-    true // Keep relative files folders structure.
-  );
-
-  // Update the project with the new file path (resources have already been updated)
+  const filePath = fileMetadata.fileIdentifier;
+  const projectPath = path.dirname(filePath);
   project.setProjectFile(filePath);
 
-  return writeProjectFiles(project, filePath, projectPath).then(() => {
-    return {
-      wasSaved: true,
-      fileMetadata: {
-        ...fileMetadata,
-        fileIdentifier: filePath,
-        lastModifiedDate: Date.now(),
-      },
-    }; // Save was properly done
-  });
+  await writeProjectFiles(project, filePath, projectPath);
+  return {
+    wasSaved: true,
+  };
 };
 
 export const onAutoSaveProject = (
@@ -205,3 +205,6 @@ export const onAutoSaveProject = (
     }
   );
 };
+
+export const getWriteErrorMessage = (error: Error): MessageDescriptor =>
+  t`An error occurred when saving the project. Please try again by choosing another location.`;

@@ -6,6 +6,7 @@ import ExpressionParametersEditor from './ExpressionParametersEditor';
 import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import Text from '../../../UI/Text';
 import { Column } from '../../../UI/Grid';
+import HelpButton from '../../../UI/HelpButton';
 
 export type ParameterValues = Array<string>;
 
@@ -59,6 +60,16 @@ const ExpressionParametersEditorDialog = ({
           onClick={() => onDone(parameterValues)}
         />,
       ]}
+      secondaryActions={
+        expressionMetadata.getHelpPath()
+          ? [
+              <HelpButton
+                key="help-button"
+                helpPagePath={expressionMetadata.getHelpPath()}
+              />,
+            ]
+          : []
+      }
       noMargin
       onRequestClose={onRequestClose}
       onApply={() => onDone(parameterValues)}

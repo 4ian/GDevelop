@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
@@ -19,6 +19,7 @@ import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource';
+import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import {
   sendAssetAddedToProject,
@@ -29,11 +30,15 @@ import ScrollView from '../UI/ScrollView';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import RaisedButton from '../UI/RaisedButton';
 import { AssetStoreContext } from './AssetStoreContext';
-import { AssetPackDialog } from './AssetPackDialog';
-import { installAsset } from './InstallAsset';
+import AssetPackInstallDialog from './AssetPackInstallDialog';
+import { installPublicAsset } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import Window from '../Utils/Window';
+import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
+import { isPrivateAsset } from '../Utils/GDevelopServices/Asset';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
+const isDev = Window.isDev();
 
 const ObjectListItem = ({
   objectMetadata,
@@ -71,11 +76,12 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
+  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
-  events: gdEventsList,
   onClose: () => void,
   onCreateNewObject: (type: string) => void,
   onObjectAddedFromAsset: gdObject => void,
+  canInstallPrivateAsset: () => boolean,
 |};
 
 export default function NewObjectDialog({
@@ -84,11 +90,12 @@ export default function NewObjectDialog({
   objectsContainer,
   resourceSources,
   onChooseResource,
+  onFetchNewlyAddedResources,
   resourceExternalEditors,
-  events,
   onClose,
   onCreateNewObject,
   onObjectAddedFromAsset,
+  canInstallPrivateAsset,
 }: Props) {
   const {
     setNewObjectDialogDefaultTab,
@@ -126,9 +133,13 @@ export default function NewObjectDialog({
     'intro-object-types'
   );
 
-  const { searchResults, navigationState } = React.useContext(
-    AssetStoreContext
-  );
+  const {
+    searchResults,
+    navigationState,
+    fetchAssetsAndFilters,
+    environment,
+    setEnvironment,
+  } = React.useContext(AssetStoreContext);
   const {
     openedAssetPack,
     openedAssetShortHeader,
@@ -145,12 +156,15 @@ export default function NewObjectDialog({
     isAssetBeingInstalled,
     setIsAssetBeingInstalled,
   ] = React.useState<boolean>(false);
-  const resourcesFetcher = useResourceFetcher();
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
   const isAssetAddedToScene =
     openedAssetShortHeader && addedAssetIds.includes(openedAssetShortHeader.id);
+  const { installPrivateAsset } = React.useContext(
+    PrivateAssetsAuthorizationContext
+  );
+  const { showAlert } = useAlertDialog();
 
   const onInstallAsset = React.useCallback(
     () => {
@@ -158,24 +172,46 @@ export default function NewObjectDialog({
       (async () => {
         if (!openedAssetShortHeader) return;
         try {
-          const installOutput = await installAsset({
-            assetShortHeader: openedAssetShortHeader,
-            eventsFunctionsExtensionsState,
-            project,
-            objectsContainer,
-            events,
-          });
+          const isPrivate = isPrivateAsset(openedAssetShortHeader);
+          if (isPrivate) {
+            const canUserInstallPrivateAsset = await canInstallPrivateAsset();
+            if (!canUserInstallPrivateAsset) {
+              await showAlert({
+                title: t`No cloud project`,
+                message: t`You need to save this project as a cloud project to install this asset. Save your project and try again!`,
+              });
+              setIsAssetBeingInstalled(false);
+              return;
+            }
+          }
+          const installOutput = isPrivate
+            ? await installPrivateAsset({
+                assetShortHeader: openedAssetShortHeader,
+                eventsFunctionsExtensionsState,
+                project,
+                objectsContainer,
+                environment,
+              })
+            : await installPublicAsset({
+                assetShortHeader: openedAssetShortHeader,
+                eventsFunctionsExtensionsState,
+                project,
+                objectsContainer,
+                environment,
+              });
+          if (!installOutput) {
+            throw new Error('Unable to install private Asset.');
+          }
           sendAssetAddedToProject({
             id: openedAssetShortHeader.id,
             name: openedAssetShortHeader.name,
           });
-          console.log('Asset successfully installed.');
 
           installOutput.createdObjects.forEach(object => {
             onObjectAddedFromAsset(object);
           });
 
-          await resourcesFetcher.ensureResourcesAreFetched(project);
+          await onFetchNewlyAddedResources();
         } catch (error) {
           console.error('Error while installing the asset:', error);
           showErrorBox({
@@ -191,14 +227,29 @@ export default function NewObjectDialog({
       })();
     },
     [
-      resourcesFetcher,
       eventsFunctionsExtensionsState,
       project,
       objectsContainer,
-      events,
       onObjectAddedFromAsset,
       openedAssetShortHeader,
+      environment,
+      onFetchNewlyAddedResources,
+      installPrivateAsset,
+      canInstallPrivateAsset,
+      showAlert,
     ]
+  );
+
+  // Load assets and filters when the dialog is opened or when the environment changes.
+  React.useEffect(
+    () => {
+      // The variable environment is always defined, this check is a hack
+      // to ensure we call fetchAssetsAndFilters every time the value changes.
+      if (environment) {
+        fetchAssetsAndFilters();
+      }
+    },
+    [fetchAssetsAndFilters, environment]
   );
 
   const mainAction = openedAssetPack ? (
@@ -225,6 +276,20 @@ export default function NewObjectDialog({
       onClick={onInstallAsset}
       disabled={isAssetBeingInstalled}
       id="add-asset-button"
+    />
+  ) : isDev ? (
+    <RaisedButton
+      key="show-dev-assets"
+      label={
+        environment === 'staging' ? (
+          <Trans>Show live assets</Trans>
+        ) : (
+          <Trans>Show staging assets</Trans>
+        )
+      }
+      onClick={() => {
+        setEnvironment(environment === 'staging' ? 'live' : 'staging');
+      }}
     />
   ) : (
     undefined
@@ -261,10 +326,15 @@ export default function NewObjectDialog({
       >
         <Column noMargin expand>
           <Tabs value={currentTab} onChange={setCurrentTab}>
-            <Tab label={<Trans>Asset Store</Trans>} value="asset-store" />
+            <Tab
+              label={<Trans>Asset Store</Trans>}
+              value="asset-store"
+              id="asset-store-tab"
+            />
             <Tab
               label={<Trans>New object from scratch</Trans>}
               value="new-object"
+              id="new-object-from-scratch-tab"
             />
           </Tabs>
           {currentTab === 'asset-store' && <AssetStore project={project} />}
@@ -300,7 +370,7 @@ export default function NewObjectDialog({
         </Column>
       </Dialog>
       {isAssetPackDialogInstallOpen && searchResults && openedAssetPack && (
-        <AssetPackDialog
+        <AssetPackInstallDialog
           assetPack={openedAssetPack}
           assetShortHeaders={searchResults}
           addedAssetIds={addedAssetIds}
@@ -310,11 +380,10 @@ export default function NewObjectDialog({
           }}
           project={project}
           objectsContainer={objectsContainer}
-          events={events}
           onObjectAddedFromAsset={onObjectAddedFromAsset}
+          onFetchNewlyAddedResources={onFetchNewlyAddedResources}
         />
       )}
-      {resourcesFetcher.renderResourceFetcherDialog()}
     </>
   );
 }

@@ -9,6 +9,7 @@ import {
   type OnCreateBlankFunction,
   type OnCreateFromExampleShortHeaderFunction,
 } from '../CreateProjectDialog';
+import { emptyStorageProvider } from '../../ProjectsStorage/ProjectStorageProviders';
 
 const gd: libGDevelop = global.gd;
 
@@ -22,10 +23,16 @@ export const onCreateBlank: OnCreateBlankFunction = async ({
 
   const project = gd.ProjectHelper.createNewGDJSProject();
   return {
-    project,
-    projectName,
-    storageProvider: null,
-    fileMetadata: null,
+    source: {
+      project,
+      projectName,
+      storageProvider: null,
+      fileMetadata: null,
+    },
+    destination: {
+      storageProvider: emptyStorageProvider,
+      fileMetadata: null,
+    },
   };
 };
 
@@ -43,11 +50,17 @@ export const onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunct
       exampleSlug: exampleShortHeader.slug,
     });
     return {
-      storageProvider: UrlStorageProvider,
-      projectName,
-      fileMetadata: {
-        fileIdentifier: example.projectFileUrl,
-        lastModifiedDate: Date.now(),
+      source: {
+        project: null,
+        projectName,
+        storageProvider: UrlStorageProvider,
+        fileMetadata: {
+          fileIdentifier: example.projectFileUrl,
+        },
+      },
+      destination: {
+        storageProvider: emptyStorageProvider,
+        fileMetadata: null,
       },
     };
   } catch (error) {

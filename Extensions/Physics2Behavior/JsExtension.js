@@ -34,7 +34,7 @@ module.exports = {
         'MIT'
       )
       .setExtensionHelpPath('/behaviors/physics2')
-      .setCategory('Advanced');
+      .setCategory('Movement');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Physics Engine 2.0'))
       .setIcon('res/physics32.png');
@@ -419,7 +419,8 @@ module.exports = {
         sharedData
       )
       .setIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
-      .addIncludeFile('Extensions/Physics2Behavior/box2d.js')
+      .addIncludeFile('Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.js')
+      .addRequiredFile('Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.wasm')
 
     // Global
     aut
@@ -3815,6 +3816,23 @@ module.exports = {
     gd /*: libGDevelop */,
     extension /*: gdPlatformExtension*/
   ) {
-    return [];
+    const dummyBehavior = extension
+      .getBehaviorMetadata('Physics2::Physics2Behavior')
+      .get();
+    const sharedData = extension
+      .getBehaviorMetadata('Physics2::Physics2Behavior')
+      .getSharedDataInstance();
+    return [
+      gd.ProjectHelper.sanityCheckBehaviorProperty(
+        dummyBehavior,
+        'density',
+        '123'
+      ),
+      gd.ProjectHelper.sanityCheckBehaviorsSharedDataProperty(
+        sharedData,
+        'gravityY',
+        '456'
+      ),
+    ];
   },
 };

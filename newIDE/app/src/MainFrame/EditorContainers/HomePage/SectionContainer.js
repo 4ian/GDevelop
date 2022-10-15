@@ -4,7 +4,6 @@ import { Column, Line } from '../../../UI/Grid';
 import Paper from '@material-ui/core/Paper';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Text from '../../../UI/Text';
-import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
 import ArrowLeft from '../../../UI/CustomSvgIcons/ArrowLeft';
 import TextButton from '../../../UI/TextButton';
 import { Trans } from '@lingui/macro';
@@ -13,12 +12,20 @@ export const SECTION_PADDING = 30;
 
 const styles = {
   mobileScrollContainer: {
-    padding: 5,
+    paddingTop: 10,
+    paddingLeft: 5,
+    paddingRight: 5,
   },
   desktopScrollContainer: {
     paddingTop: SECTION_PADDING,
     paddingLeft: SECTION_PADDING,
     paddingRight: SECTION_PADDING,
+  },
+  mobileFooter: {
+    padding: 5,
+  },
+  desktopFooter: {
+    paddingLeft: SECTION_PADDING,
   },
   rowContainer: {
     display: 'flex',
@@ -37,6 +44,7 @@ type Props = {|
   subtitle?: React.Node,
   backAction?: () => void,
   flexBody?: boolean,
+  renderFooter?: () => React.Node,
 |};
 
 const SectionContainer = ({
@@ -45,16 +53,17 @@ const SectionContainer = ({
   subtitle,
   backAction,
   flexBody,
+  renderFooter,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const GDevelopTheme = React.useContext(GDevelopThemeContext);
+
   return (
     <Column useFullHeight noMargin expand>
       <Paper
+        elevation={0}
         style={{
           ...styles.scrollContainer,
           display: flexBody ? 'flex' : 'block',
-          borderLeft: `1px solid ${GDevelopTheme.home.separator.color}`,
           ...(windowWidth === 'small'
             ? styles.mobileScrollContainer
             : styles.desktopScrollContainer),
@@ -86,6 +95,17 @@ const SectionContainer = ({
           {children}
         </Column>
       </Paper>
+      {renderFooter && (
+        <Paper
+          elevation={0}
+          style={
+            windowWidth === 'small' ? styles.mobileFooter : styles.desktopFooter
+          }
+          square
+        >
+          {renderFooter()}
+        </Paper>
+      )}
     </Column>
   );
 };

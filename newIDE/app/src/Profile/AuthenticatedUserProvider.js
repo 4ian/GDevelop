@@ -31,6 +31,10 @@ import PreferencesContext, {
 } from '../MainFrame/Preferences/PreferencesContext';
 import { listUserCloudProjects } from '../Utils/GDevelopServices/Project';
 import { clearCloudProjectCookies } from '../ProjectsStorage/CloudStorageProvider/CloudProjectCookies';
+import {
+  listReceivedAssetShortHeaders,
+  listReceivedAssetPacks,
+} from '../Utils/GDevelopServices/Asset';
 
 type Props = {|
   authentication: Authentication,
@@ -138,6 +142,8 @@ export default class AuthenticatedUserProvider extends React.Component<
         onAcceptGameStatsEmail: this._doAcceptGameStatsEmail,
         getAuthorizationHeader: () =>
           this.props.authentication.getAuthorizationHeader(),
+        receivedAssetPacks: [], // Reset to an empty array so the store context can be updated.
+        receivedAssetShortHeaders: [], // Reset to an empty array so the store context can be updated.
       },
     }));
   }
@@ -277,6 +283,37 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading user cloud projects:', error);
       }
     );
+    listReceivedAssetPacks(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      receivedAssetPacks =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            receivedAssetPacks,
+          },
+        })),
+      error => {
+        console.error('Error while loading received asset packs:', error);
+      }
+    );
+    listReceivedAssetShortHeaders(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      receivedAssetShortHeaders =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            receivedAssetShortHeaders,
+          },
+        })),
+      error => {
+        console.error(
+          'Error while loading received asset short headers:',
+          error
+        );
+      }
+    );
     this._fetchUserBadges();
 
     // Load and wait for the user profile to be fetched.
@@ -284,6 +321,19 @@ export default class AuthenticatedUserProvider extends React.Component<
     const userProfile = await authentication.getUserProfile(
       authentication.getAuthorizationHeader
     );
+
+    if (!userProfile.isCreator) {
+      // If the user is not a creator, then update the profile to say they now are.
+      try {
+        await authentication.editUserProfile(
+          authentication.getAuthorizationHeader,
+          { isCreator: true }
+        );
+      } catch (error) {
+        // Catch the error so that the user profile is still fetched.
+        console.error('Error while updating the user profile:', error);
+      }
+    }
 
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
@@ -344,6 +394,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       loginInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -365,13 +416,19 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       editInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
       await authentication.editUserProfile(
         authentication.getAuthorizationHeader,
-        form,
-        preferences.language
+        {
+          username: form.username,
+          description: form.description,
+          getGameStatsEmail: form.getGameStatsEmail,
+          getNewsletterEmail: form.getNewsletterEmail,
+          appLanguage: preferences.language,
+        }
       );
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openEditProfileDialog(false);
@@ -393,6 +450,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       createAccountInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -428,6 +486,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       forgotPasswordInProgress: true,
+      authError: null,
     });
     try {
       await authentication.forgotPassword(form);
@@ -457,6 +516,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       editInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -479,6 +539,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       changeEmailInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -569,7 +630,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                   profile={this.state.authenticatedUser.profile}
                   onClose={() => this.openEditProfileDialog(false)}
                   onEdit={form => this._doEdit(form, preferences)}
-                  editInProgress={this.state.editInProgress}
+                  updateProfileInProgress={this.state.editInProgress}
                   error={this.state.authError}
                 />
               )}

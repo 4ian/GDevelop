@@ -13,10 +13,11 @@ import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import {
   isBehaviorLifecycleEventsFunction,
+  isObjectLifecycleEventsFunction,
   isExtensionLifecycleEventsFunction,
 } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import EmptyMessage from '../../UI/EmptyMessage';
-import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
+import { ParametersIndexOffsets } from '../../EventsFunctionsExtensionsLoader';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
@@ -27,6 +28,7 @@ const gd: libGDevelop = global.gd;
 type Props = {|
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
+  eventsBasedObject: ?gdEventsBasedObject,
   helpPagePath?: string,
   onConfigurationUpdated?: (whatChanged?: 'type') => void,
   renderConfigurationHeader?: () => React.Node,
@@ -36,9 +38,10 @@ type Props = {|
 
 type State = {||};
 
-const getSentenceErrorText = (
+export const getSentenceErrorText = (
   i18n: I18nType,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
+  eventsBasedObject: ?gdEventsBasedObject,
   eventsFunction: gdEventsFunction
 ) => {
   const sentence = eventsFunction.getSentence();
@@ -47,7 +50,11 @@ const getSentenceErrorText = (
       t`Enter the sentence that will be displayed in the events sheet`
     );
 
-  const parametersIndexOffset = getParametersIndexOffset(!!eventsBasedBehavior);
+  const parametersIndexOffset = eventsBasedBehavior
+    ? ParametersIndexOffsets.BehaviorFunction
+    : eventsBasedObject
+    ? ParametersIndexOffsets.ObjectFunction
+    : ParametersIndexOffsets.FreeFunction;
 
   const missingParameters = mapVector(
     eventsFunction.getParameters(),
@@ -63,11 +70,34 @@ const getSentenceErrorText = (
     }
   ).filter(Boolean);
 
-  if (missingParameters.length) {
-    return (
-      i18n._(t`The sentence is probably missing this/these parameter(s):`) +
-      missingParameters.join(', ')
-    );
+  const parametersLength = eventsFunction.getParameters().size();
+  const paramsMatches = sentence.matchAll(/_PARAM(\d+)_/g);
+  const nonExpectedParameters = [];
+  for (const paramsMatch of paramsMatches) {
+    const paramIndex = parseInt(paramsMatch[1], 10);
+    if (
+      paramIndex - parametersIndexOffset >= parametersLength ||
+      paramIndex - parametersIndexOffset < 0
+    ) {
+      nonExpectedParameters.push(paramsMatch[0]);
+    }
+  }
+
+  if (missingParameters.length || nonExpectedParameters.length) {
+    return [
+      missingParameters.length
+        ? i18n._(t`The sentence is probably missing this/these parameter(s):`) +
+          ' ' +
+          missingParameters.join(', ')
+        : null,
+      nonExpectedParameters.length
+        ? i18n._(t`The sentence displays one or more wrongs parameters:`) +
+          ' ' +
+          nonExpectedParameters.join(', ')
+        : null,
+    ]
+      .filter(Boolean)
+      .join(' - ');
   }
 
   return undefined;
@@ -75,9 +105,9 @@ const getSentenceErrorText = (
 
 const getFullNameHintText = (type: any): MessageDescriptor => {
   if (type === gd.EventsFunction.Condition) {
-    return t`Example: Is flashing?`;
+    return t`Example: Is flashing`;
   } else if (type === gd.EventsFunction.Expression) {
-    return t`Example: Life remaining`;
+    return t`Example: Remaining life`;
   } else if (type === gd.EventsFunction.StringExpression) {
     return t`Example: Equipped shield name`;
   }
@@ -89,9 +119,9 @@ const getDescriptionHintText = (type: any): MessageDescriptor => {
   if (type === gd.EventsFunction.Condition) {
     return t`Example: Check if the object is flashing.`;
   } else if (type === gd.EventsFunction.Expression) {
-    return t`Example: Life remaining for the player.`;
+    return t`Example: Return the number of remaining lives for the player.`;
   } else if (type === gd.EventsFunction.StringExpression) {
-    return t`Example: Name of the shield equipped by the player.`;
+    return t`Example: Return the name of the shield equipped by the player.`;
   }
 
   return t`Example: Make the object flash for 5 seconds.`;
@@ -109,12 +139,14 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
       helpPagePath,
       renderConfigurationHeader,
       eventsBasedBehavior,
+      eventsBasedObject,
       getFunctionGroupNames,
     } = this.props;
 
     const type = eventsFunction.getFunctionType();
     const isABehaviorLifecycleEventsFunction =
       !!eventsBasedBehavior &&
+      !eventsBasedObject &&
       isBehaviorLifecycleEventsFunction(eventsFunction.getName());
     if (isABehaviorLifecycleEventsFunction) {
       return (
@@ -128,8 +160,24 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
       );
     }
 
+    const isAnObjectLifecycleEventsFunction =
+      !!eventsBasedObject &&
+      !eventsBasedBehavior &&
+      isObjectLifecycleEventsFunction(eventsFunction.getName());
+    if (isAnObjectLifecycleEventsFunction) {
+      return (
+        <EmptyMessage>
+          <Trans>
+            This is a "lifecycle method". It will be called automatically by the
+            game engine for each instance living on the scene.
+          </Trans>
+        </EmptyMessage>
+      );
+    }
+
     const isAnExtensionLifecycleEventsFunction =
       !eventsBasedBehavior &&
+      !eventsBasedObject &&
       isExtensionLifecycleEventsFunction(eventsFunction.getName());
     if (isAnExtensionLifecycleEventsFunction) {
       return (
@@ -263,6 +311,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                   errorText={getSentenceErrorText(
                     i18n,
                     eventsBasedBehavior,
+                    eventsBasedObject,
                     eventsFunction
                   )}
                 />

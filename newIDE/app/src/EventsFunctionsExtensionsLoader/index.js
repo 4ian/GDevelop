@@ -5,12 +5,16 @@ import { caseSensitiveSlug } from '../Utils/CaseSensitiveSlug';
 import {
   declareInstructionOrExpressionMetadata,
   declareBehaviorInstructionOrExpressionMetadata,
+  declareObjectInstructionOrExpressionMetadata,
   declareEventsFunctionParameters,
   declareBehaviorMetadata,
+  declareObjectMetadata,
   declareExtension,
   isBehaviorLifecycleEventsFunction,
+  isObjectLifecycleEventsFunction,
   isExtensionLifecycleEventsFunction,
   declareBehaviorPropertiesInstructionAndExpressions,
+  declareObjectPropertiesInstructionAndExpressions,
 } from './MetadataDeclarationHelpers';
 
 const gd: libGDevelop = global.gd;
@@ -59,6 +63,14 @@ const getBehaviorFunctionCodeNamespace = (
   codeNamespacePrefix: string
 ) => {
   return codeNamespacePrefix + '__' + mangleName(eventsBasedBehavior.getName());
+};
+
+/** Generate the namespace for an object function. */
+const getObjectFunctionCodeNamespace = (
+  eventsBasedObject: gdEventsBasedObject,
+  codeNamespacePrefix: string
+) => {
+  return codeNamespacePrefix + '__' + mangleName(eventsBasedObject.getName());
 };
 
 /**
@@ -183,6 +195,24 @@ const generateEventsFunctionExtension = (
     )
   )
     .then(() =>
+      // Generate all objects and their functions
+      Promise.all(
+        mapVector(
+          eventsFunctionsExtension.getEventsBasedObjects(),
+          eventsBasedObject => {
+            return generateObject(
+              project,
+              extension,
+              eventsFunctionsExtension,
+              eventsBasedObject,
+              options,
+              codeGenerationContext
+            );
+          }
+        )
+      )
+    )
+    .then(() =>
       // Generate all free functions
       Promise.all(
         mapFor(0, eventsFunctionsExtension.getEventsFunctionsCount(), i => {
@@ -280,6 +310,7 @@ const generateFreeFunction = (
       });
 
     includeFiles.delete();
+    eventsFunctionsExtensionCodeGenerator.delete();
 
     return options.eventsFunctionCodeWriter
       .writeFunctionCode(functionName, code)
@@ -477,6 +508,88 @@ function generateBehavior(
   });
 }
 
+function generateObject(
+  project: gdProject,
+  extension: gdPlatformExtension,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsBasedObject: gdEventsBasedObject,
+  options: Options,
+  codeGenerationContext: CodeGenerationContext
+): Promise<void> {
+  const objectMetadata = declareObjectMetadata(extension, eventsBasedObject);
+
+  const eventsFunctionsContainer = eventsBasedObject.getEventsFunctions();
+  const codeNamespace = getObjectFunctionCodeNamespace(
+    eventsBasedObject,
+    codeGenerationContext.codeNamespacePrefix
+  );
+  const includeFile = options.eventsFunctionCodeWriter.getIncludeFileFor(
+    codeNamespace
+  );
+
+  objectMetadata.setIncludeFile(includeFile);
+
+  // Always include the extension include files when using an object.
+  codeGenerationContext.extensionIncludeFiles.forEach(includeFile => {
+    objectMetadata.addIncludeFile(includeFile);
+  });
+
+  return Promise.resolve().then(() => {
+    const objectMethodMangledNames = new gd.MapStringString();
+
+    // Declare the instructions/expressions for properties
+    declareObjectPropertiesInstructionAndExpressions(
+      options.i18n,
+      extension,
+      objectMetadata,
+      eventsBasedObject
+    );
+
+    // Declare all the object functions
+    mapFor(0, eventsFunctionsContainer.getEventsFunctionsCount(), i => {
+      const eventsFunction = eventsFunctionsContainer.getEventsFunctionAt(i);
+
+      const eventsFunctionMangledName = mangleName(eventsFunction.getName());
+      objectMethodMangledNames.set(
+        eventsFunction.getName(),
+        eventsFunctionMangledName
+      );
+
+      const instructionOrExpression = declareObjectInstructionOrExpressionMetadata(
+        extension,
+        objectMetadata,
+        eventsBasedObject,
+        eventsFunction
+      );
+      declareEventsFunctionParameters(eventsFunction, instructionOrExpression);
+
+      // Hide "lifecycle" methods as they are called automatically by
+      // the game engine.
+      if (isObjectLifecycleEventsFunction(eventsFunction.getName())) {
+        instructionOrExpression.setHidden();
+      }
+
+      if (eventsFunction.isPrivate()) instructionOrExpression.setPrivate();
+
+      const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
+      codeExtraInformation
+        .setIncludeFile(includeFile)
+        .setFunctionName(eventsFunctionMangledName);
+    });
+
+    // Generate code for the object and its methods
+    if (!options.skipCodeGeneration) {
+      // TODO EBO Generate the code.
+      objectMethodMangledNames.delete();
+      return Promise.resolve();
+    } else {
+      // Skip code generation
+      objectMethodMangledNames.delete();
+      return Promise.resolve();
+    }
+  });
+}
+
 /**
  * Unload all extensions providing events functions of a project
  */
@@ -550,14 +663,16 @@ export const getFreeEventsFunctionType = (
 };
 
 /**
- * Return the index of the first parameter to be shown to the user:
- * * 0 for a behavior "method",
- * * 1 for a free function (as the first parameter is by convention the runtimeScene).
+ * The index of the first parameter to be shown to the user.
  */
-export const getParametersIndexOffset = (
-  isEventsBasedBehaviorMethod: boolean
-) => {
-  return isEventsBasedBehaviorMethod
-    ? 0 /*In the case of a behavior events function, the first two parameters are by convention the "Object" and "Behavior" */
-    : 1; /*In the case of a free events function (i.e: not tied to a behavior), the first parameter is by convention the current scene and is not shown.*/
-};
+export const ParametersIndexOffsets = Object.freeze({
+  // In the case of a free events function (i.e: not tied to a behavior),
+  // the first parameter is by convention the current scene and is not shown.
+  FreeFunction: 1,
+  // In the case of a behavior events function, the first two parameters
+  // are by convention the "Object" and "Behavior".
+  BehaviorFunction: 0,
+  // In the case of an object events function, the first parameter
+  // is by convention the "Object".
+  ObjectFunction: 0,
+});

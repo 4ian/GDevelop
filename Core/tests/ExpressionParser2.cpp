@@ -113,16 +113,36 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(textNode.text == "hello world");
     }
     {
+      auto node = parser.ParseExpression("'hello world'");
+      REQUIRE(node != nullptr);
+      auto &textNode = dynamic_cast<gd::TextNode &>(*node);
+      REQUIRE(textNode.text == "hello world");
+    }
+    {
       auto node = parser.ParseExpression("\"\"");
       REQUIRE(node != nullptr);
       auto &textNode = dynamic_cast<gd::TextNode &>(*node);
       REQUIRE(textNode.text == "");
     }
     {
+      auto node = parser.ParseExpression("'\"'");
+      REQUIRE(node != nullptr);
+      auto &textNode = dynamic_cast<gd::TextNode &>(*node);
+      REQUIRE(textNode.text == "\"");
+    }
+    {
       auto node = parser.ParseExpression("\"hello \\\"world\\\"\"");
       REQUIRE(node != nullptr);
       auto &textNode = dynamic_cast<gd::TextNode &>(*node);
       REQUIRE(textNode.text == "hello \"world\"");
+    }
+    {
+      // TODO: Fix this test!
+      auto node = parser.ParseExpression("'hello \"\\\"\" \\'world\\''");
+      REQUIRE(node != nullptr);
+      // The error comes from the cast here, apparently. Is this not parsed as a TextNode?
+      auto &textNode = dynamic_cast<gd::TextNode &>(*node);
+      REQUIRE(textNode.text == "hello \"\\\"\" 'world'");
     }
 
     {
@@ -224,6 +244,42 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "A text must end with a double quote (\"). Add a double quote to "
               "terminate the text.");
       REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 12);
+    }
+    {
+      auto node = parser.ParseExpression("'hello world");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "A text must end with a double quote (\"). Add a double quote to "
+              "terminate the text.");
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 12);
+    }
+    {
+      auto node = parser.ParseExpression("'hello world\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "A text must end with a double quote (\"). Add a double quote to "
+              "terminate the text.");
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 13);
+    }
+    {
+      auto node = parser.ParseExpression("\"hello world'");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "A text must end with a double quote (\"). Add a double quote to "
+              "terminate the text.");
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 13);
     }
     {
       auto node = parser.ParseExpression("\"\"\"");

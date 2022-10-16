@@ -25,7 +25,6 @@ export const Default = () => (
       eventsBasedObject={testProject.testEventsBasedObject}
       onApply={action('apply')}
       onRenameProperty={action('property rename')}
-      onFetchNewlyAddedResources={async () => {}}
     />
   </DragAndDropContextProvider>
 );

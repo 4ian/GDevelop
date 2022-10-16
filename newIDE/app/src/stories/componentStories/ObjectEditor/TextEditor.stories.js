@@ -11,6 +11,7 @@ import paperDecorator from '../../PaperDecorator';
 import TextEditor from '../../../ObjectEditor/Editors/TextEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'ObjectEditor/TextEditor',
@@ -24,6 +25,7 @@ export const Default = () => (
       objectConfiguration={testProject.textObjectConfiguration}
       project={testProject.project}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),

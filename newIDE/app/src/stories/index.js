@@ -151,6 +151,7 @@ import {
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
 import subscriptionSuggestionDecorator from './SubscriptionSuggestionDecorator';
+import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 
 configureActions({
   depth: 2,
@@ -2449,6 +2450,7 @@ storiesOf('InstructionEditorDialog', module)
       isNewInstruction={false}
       instruction={testProject.testInstruction}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceExternalEditors: fakeResourceExternalEditors,
         onChooseResource: () => {
@@ -2475,6 +2477,7 @@ storiesOf('InstructionEditorDialog', module)
       isNewInstruction={false}
       instruction={testProject.testInstruction}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceExternalEditors: fakeResourceExternalEditors,
         onChooseResource: () => {
@@ -2508,6 +2511,7 @@ storiesOf('InstructionEditorDialog', module)
         isNewInstruction={true}
         instruction={testProject.testInstruction}
         resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
           resourceExternalEditors: fakeResourceExternalEditors,
           onChooseResource: () => {
@@ -2548,6 +2552,7 @@ storiesOf('InstructionEditorMenu', module)
             isNewInstruction={false}
             instruction={testProject.testInstruction}
             resourceManagementProps={{
+              getStorageProvider: () => emptyStorageProvider,
               onFetchNewlyAddedResources: async () => {},
               resourceSources: [],
               onChooseResource: () => Promise.reject('Unimplemented'),
@@ -2936,6 +2941,7 @@ storiesOf('ProjectManager', module)
       freezeUpdate={false}
       hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),
@@ -2981,6 +2987,7 @@ storiesOf('ProjectManager', module)
       freezeUpdate={false}
       hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),
@@ -3154,6 +3161,7 @@ storiesOf('ProjectPropertiesDialog', module)
       onApply={async () => true}
       onPropertiesApplied={action('onPropertiesApplied')}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),
@@ -3172,6 +3180,7 @@ storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
       onChangeSubscription={action('onChangeSubscription')}
       project={testProject.project}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),

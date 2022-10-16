@@ -170,6 +170,7 @@ import {
   ExamplesAccordion,
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
+import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 
 configureActions({
   depth: 2,
@@ -2457,6 +2458,7 @@ storiesOf('InstructionEditor', module)
         isCondition
         instruction={testProject.testInstruction}
         resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
           resourceExternalEditors: fakeResourceExternalEditors,
           onChooseResource: () => {
@@ -2479,6 +2481,7 @@ storiesOf('InstructionEditor', module)
         isCondition
         instruction={testProject.testInstruction}
         resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
           resourceExternalEditors: fakeResourceExternalEditors,
           onChooseResource: () => {
@@ -2506,6 +2509,7 @@ storiesOf('NewInstructionEditorDialog', module)
       isNewInstruction={false}
       instruction={testProject.testInstruction}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceExternalEditors: fakeResourceExternalEditors,
         onChooseResource: () => {
@@ -2532,6 +2536,7 @@ storiesOf('NewInstructionEditorDialog', module)
       isNewInstruction={false}
       instruction={testProject.testInstruction}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceExternalEditors: fakeResourceExternalEditors,
         onChooseResource: () => {
@@ -2565,6 +2570,7 @@ storiesOf('NewInstructionEditorDialog', module)
         isNewInstruction={true}
         instruction={testProject.testInstruction}
         resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
           resourceExternalEditors: fakeResourceExternalEditors,
           onChooseResource: () => {
@@ -2605,6 +2611,7 @@ storiesOf('NewInstructionEditorMenu', module)
             isNewInstruction={false}
             instruction={testProject.testInstruction}
             resourceManagementProps={{
+              getStorageProvider: () => emptyStorageProvider,
               onFetchNewlyAddedResources: async () => {},
               resourceSources: [],
               onChooseResource: () => Promise.reject('Unimplemented'),
@@ -3016,6 +3023,7 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       resourceKind="image"
       project={testProject.project}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),
@@ -3031,6 +3039,7 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       resourceKind="image"
       project={testProject.project}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),
@@ -3047,6 +3056,7 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       resourceKind="image"
       project={testProject.project}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),
@@ -3062,6 +3072,7 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       resourceKind="image"
       project={testProject.project}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),
@@ -3076,6 +3087,7 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       resourceKind="audio"
       project={testProject.project}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),
@@ -3092,6 +3104,7 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       resourceKind="font"
       project={testProject.project}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),
@@ -3109,6 +3122,7 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       resourceKind="font"
       project={testProject.project}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),
@@ -3225,6 +3239,7 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
           setToolbar={() => {}}
           resourceManagementProps={{
+            getStorageProvider: () => emptyStorageProvider,
             onFetchNewlyAddedResources: async () => {},
             resourceSources: [],
             onChooseResource: () => Promise.reject('Unimplemented'),
@@ -3361,6 +3376,7 @@ storiesOf('ProjectManager', module)
       freezeUpdate={false}
       hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),
@@ -3407,6 +3423,7 @@ storiesOf('ProjectManager', module)
       freezeUpdate={false}
       hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),
@@ -3600,6 +3617,7 @@ storiesOf('ProjectPropertiesDialog', module)
       onPropertiesApplied={action('onPropertiesApplied')}
       onChangeSubscription={action('onChangeSubscription')}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),
@@ -3617,6 +3635,7 @@ storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
       onChangeSubscription={action('onChangeSubscription')}
       project={testProject.project}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),

@@ -13,6 +13,7 @@ import ObjectsList from '../../../ObjectsList';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'LayoutEditor/ObjectsList',
@@ -30,6 +31,7 @@ export const Default = () => (
           objectsContainer={testProject.testLayout}
           layout={testProject.testLayout}
           resourceManagementProps={{
+            getStorageProvider: () => emptyStorageProvider,
             onFetchNewlyAddedResources: async () => {},
             resourceSources: [],
             onChooseResource: () => Promise.reject('Unimplemented'),
@@ -64,6 +66,7 @@ export const WithTags = () => (
           objectsContainer={testProject.testLayout}
           layout={testProject.testLayout}
           resourceManagementProps={{
+            getStorageProvider: () => emptyStorageProvider,
             onFetchNewlyAddedResources: async () => {},
             resourceSources: [],
             onChooseResource: () => Promise.reject('Unimplemented'),

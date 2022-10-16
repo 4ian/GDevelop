@@ -10,6 +10,7 @@ import paperDecorator from '../../PaperDecorator';
 import BehaviorsEditor from '../../../BehaviorsEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'ObjectEditor/BehaviorsEditor',
@@ -23,6 +24,8 @@ export const Default = () => (
       project={testProject.project}
       object={testProject.spriteObjectWithBehaviors}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),
@@ -39,6 +42,8 @@ export const WithoutAnyBehaviors = () => (
       project={testProject.project}
       object={testProject.spriteObjectWithoutBehaviors}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),

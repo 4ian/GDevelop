@@ -260,7 +260,7 @@ const generateFreeFunction = (
   );
   // By convention, first parameter is always the Runtime Scene.
   instructionOrExpression.addCodeOnlyParameter('currentScene', '');
-  declareEventsFunctionParameters(eventsFunction, instructionOrExpression);
+  declareEventsFunctionParameters(eventsFunction, instructionOrExpression, 0);
 
   // Hide "lifecycle" functions as they are called automatically by
   // the game engine.
@@ -448,7 +448,11 @@ function generateBehavior(
         eventsBasedBehavior,
         eventsFunction
       );
-      declareEventsFunctionParameters(eventsFunction, instructionOrExpression);
+      declareEventsFunctionParameters(
+        eventsFunction,
+        instructionOrExpression,
+        2
+      );
 
       // Hide "lifecycle" methods as they are called automatically by
       // the game engine.
@@ -564,7 +568,11 @@ function generateObject(
         eventsBasedObject,
         eventsFunction
       );
-      declareEventsFunctionParameters(eventsFunction, instructionOrExpression);
+      declareEventsFunctionParameters(
+        eventsFunction,
+        instructionOrExpression,
+        1
+      );
 
       // Hide "lifecycle" methods as they are called automatically by
       // the game engine.
@@ -574,8 +582,7 @@ function generateObject(
 
       if (eventsFunction.isPrivate()) instructionOrExpression.setPrivate();
 
-      const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
-      codeExtraInformation
+      instructionOrExpression
         .setIncludeFile(includeFile)
         .setFunctionName(eventsFunctionMangledName);
     });

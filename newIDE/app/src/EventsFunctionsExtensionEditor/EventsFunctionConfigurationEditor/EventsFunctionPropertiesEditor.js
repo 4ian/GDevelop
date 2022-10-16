@@ -58,7 +58,7 @@ export const getSentenceErrorText = (
 
   const type = eventsFunction.getFunctionType();
   const param0isImplicit =
-    eventsBasedBehavior &&
+    (eventsBasedBehavior || eventsBasedObject) &&
     (type === gd.EventsFunction.ExpressionAndCondition ||
       type === gd.EventsFunction.StringExpressionAndCondition);
   const missingParameters = mapVector(

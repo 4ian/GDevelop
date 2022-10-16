@@ -35,6 +35,7 @@ import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
 import UrlStorageProvider from './ProjectsStorage/UrlStorageProvider';
 import LocalResourceMover from './ProjectsStorage/ResourceMover/LocalResourceMover';
 import LocalResourceFetcher from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
+import FakeCloudStorageProvider from './ProjectsStorage/FakeCloudStorageProvider';
 
 const gd: libGDevelop = global.gd;
 
@@ -43,6 +44,10 @@ export const create = (authentication: Authentication) => {
 
   const appArguments = Window.getArguments();
   const isDev = Window.isDev();
+
+  // Search "activate cloud projects" in the codebase for everything to
+  // remove once cloud projects are activated for the desktop app.
+  const supportsCloudProjects = Window.isDev();
 
   return (
     <Providers
@@ -55,9 +60,11 @@ export const create = (authentication: Authentication) => {
       {({ i18n }) => (
         <ProjectStorageProviders
           appArguments={appArguments}
-          storageProviders={
-            [LocalFileStorageProvider, UrlStorageProvider, CloudStorageProvider]
-          }
+          storageProviders={[
+            LocalFileStorageProvider,
+            UrlStorageProvider,
+            supportsCloudProjects ? CloudStorageProvider : FakeCloudStorageProvider,
+          ]}
           defaultStorageProvider={LocalFileStorageProvider}
         >
           {({

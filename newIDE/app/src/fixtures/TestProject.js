@@ -43,7 +43,7 @@ export type TestProject = {|
   numberRelationalOperatorParameterMetadata: gdParameterMetadata,
   colorRelationalOperatorParameterMetadata: gdParameterMetadata,
   unknownRelationalOperatorParameterMetadata: gdParameterMetadata,
-  fakeObjectsContainer: gdObjectsContainer,
+  emptyObjectsContainer: gdObjectsContainer,
 |};
 */
 
@@ -857,6 +857,6 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     numberRelationalOperatorParameterMetadata,
     colorRelationalOperatorParameterMetadata,
     unknownRelationalOperatorParameterMetadata,
-    fakeObjectsContainer: new gd.ObjectsContainer(),
+    emptyObjectsContainer: new gd.ObjectsContainer(),
   };
 };

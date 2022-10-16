@@ -20,7 +20,7 @@ export const Default = () => (
   <DragAndDropContextProvider>
     <EventsBasedObjectEditorDialog
       project={testProject.project}
-      globalObjectsContainer={testProject.fakeObjectsContainer}
+      globalObjectsContainer={testProject.emptyObjectsContainer}
       eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
       eventsBasedObject={testProject.testEventsBasedObject}
       onApply={action('apply')}

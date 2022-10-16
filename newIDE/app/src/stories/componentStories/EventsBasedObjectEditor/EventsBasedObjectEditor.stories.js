@@ -19,7 +19,7 @@ export default {
 export const Default = () => (
   <EventsBasedObjectEditor
     project={testProject.project}
-    globalObjectsContainer={testProject.fakeObjectsContainer}
+    globalObjectsContainer={testProject.emptyObjectsContainer}
     eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
     eventsBasedObject={testProject.testEventsBasedObject}
     onPropertiesUpdated={action('properties updated')}

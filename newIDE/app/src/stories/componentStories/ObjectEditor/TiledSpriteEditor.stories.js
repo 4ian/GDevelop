@@ -1,7 +1,6 @@
 // @flow
 
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -23,9 +22,12 @@ export const Default = () => (
     <TiledSpriteEditor
       objectConfiguration={testProject.tiledSpriteObjectConfiguration}
       project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={source => action('Choose resource from source', source)}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       onSizeUpdated={() => {}}
       objectName="FakeObjectName"
     />

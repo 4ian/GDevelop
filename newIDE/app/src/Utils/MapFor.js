@@ -1,11 +1,11 @@
 // @flow
 // Note: this file does not use export/imports and use Flow comments to allow its usage from Node.js
 
-const mapFor = /*:: <T>*/ (
+const mapFor = /*:: <T> */ (
   start /*: number */,
   end /*: number */,
   func /*: (number) => T */
-) /*:Array<T> */ => {
+) /*: Array<T> */ => {
   const result = [];
   for (let i = start; i < end; i++) {
     result.push(func(i));
@@ -13,11 +13,11 @@ const mapFor = /*:: <T>*/ (
   return result;
 };
 
-const mapReverseFor = /*:: <T>*/ (
+const mapReverseFor = /*:: <T> */ (
   start /*: number */,
   end /*: number */,
   func /*: (number) => T */
-) /*:Array<T> */ => {
+) /*: Array<T> */ => {
   const result = [];
   for (let i = end - 1; i >= start; i--) {
     result.push(func(i));
@@ -32,11 +32,13 @@ type CppVector<T> = {
 }
 */
 
-const mapVector = /*:: <T, U>*/ (
+const mapVector = /*:: <T, U> */ (
   cppVector /*: CppVector<T> */,
-  func /*: (T, number) => U */
-) /*:Array<U> */ => {
-  return mapFor(0, cppVector.size(), i => func(cppVector.at(i), i));
+  func /*: (T, number) => U */,
+  startIndex = 0 /*: number */,
+  endExcludedIndex = cppVector.size() /*: number */
+) /*: Array<U> */ => {
+  return mapFor(startIndex, endExcludedIndex, i => func(cppVector.at(i), i));
 };
 
 module.exports = {

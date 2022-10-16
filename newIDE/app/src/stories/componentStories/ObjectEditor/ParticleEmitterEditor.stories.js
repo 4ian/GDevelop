@@ -15,7 +15,7 @@ import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
 export default {
   title: 'ObjectEditor/ParticleEmitterEditor',
   component: ParticleEmitterEditor,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 export const Default = () => (

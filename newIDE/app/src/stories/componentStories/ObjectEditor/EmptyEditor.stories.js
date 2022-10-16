@@ -9,7 +9,7 @@ import EmptyEditor from '../../../ObjectEditor/Editors/EmptyEditor';
 export default {
   title: 'ObjectEditor/EmptyEditor',
   component: EmptyEditor,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 export const Default = () => <EmptyEditor />;

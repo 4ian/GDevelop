@@ -15,7 +15,7 @@ import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 export default {
   title: 'LayoutEditor/InstancePropertiesEditor',
   component: InstancePropertiesEditor,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 export const Default = () => (

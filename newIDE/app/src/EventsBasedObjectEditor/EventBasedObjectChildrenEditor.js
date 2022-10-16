@@ -12,6 +12,7 @@ import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Window from '../Utils/Window';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
+import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 
 const gd: libGDevelop = global.gd;
 
@@ -214,6 +215,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   resourceSources: [],
                   resourceExternalEditors: [],
                   onChooseResource: async () => [],
+                  getStorageProvider: () => emptyStorageProvider,
                   onFetchNewlyAddedResources: async () => {},
                 }}
                 selectedObjectNames={this.state.selectedObjectNames}
@@ -262,6 +264,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   resourceSources: [],
                   resourceExternalEditors: [],
                   onChooseResource: async () => [],
+                  getStorageProvider: () => emptyStorageProvider,
                   onFetchNewlyAddedResources: async () => {},
                 }}
                 onComputeAllVariableNames={() => {

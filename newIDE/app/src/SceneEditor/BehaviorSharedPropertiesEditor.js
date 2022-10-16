@@ -6,18 +6,12 @@ import PropertiesEditor from '../PropertiesEditor';
 import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
 import EmptyMessage from '../UI/EmptyMessage';
 import { Column } from '../UI/Grid';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 
 type Props = {|
   behaviorSharedData: gdBehaviorsSharedData,
   project: gdProject,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
 |};
 
 export default class BehaviorSharedPropertiesEditor extends React.Component<Props> {
@@ -38,6 +32,7 @@ export default class BehaviorSharedPropertiesEditor extends React.Component<Prop
           <PropertiesEditor
             schema={propertiesSchema}
             instances={[behaviorSharedData]}
+            resourceManagementProps={this.props.resourceManagementProps}
           />
         ) : (
           <EmptyMessage>

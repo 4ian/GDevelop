@@ -379,22 +379,6 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
               </AlertMessage>
             </Line>
           ) : null}
-          <Line justifyContent="center">
-            {isResizeSupported() ? (
-              <RaisedButton
-                primary
-                label={<Trans>Generate icons from a file</Trans>}
-                onClick={this._generateFromFile}
-              />
-            ) : (
-              <Text>
-                <Trans>
-                  Download GDevelop desktop version to generate the Android and
-                  iOS icons of your game.
-                </Trans>
-              </Text>
-            )}
-          </Line>
           <Text size="sub-title">
             <Trans>Desktop (Windows, macOS and Linux) icon</Trans>
           </Text>

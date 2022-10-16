@@ -9,6 +9,7 @@ import EffectsList from '../../../EffectsList';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 
 export const withSomeEffectsForALayer = () => (
   <DragAndDropContextProvider>
@@ -17,6 +18,7 @@ export const withSomeEffectsForALayer = () => (
         target="layer"
         project={testProject.project}
         resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
           resourceSources: [],
           onChooseResource: () => Promise.reject('Unimplemented'),
@@ -36,6 +38,7 @@ export const withSomeEffectsForAnObject = () => (
         target="object"
         project={testProject.project}
         resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
           resourceSources: [],
           onChooseResource: () => Promise.reject('Unimplemented'),
@@ -55,6 +58,7 @@ export const withAnEffectWithoutEffectTypeForALayer = () => (
         target="layer"
         project={testProject.project}
         resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
           resourceSources: [],
           onChooseResource: () => Promise.reject('Unimplemented'),
@@ -74,6 +78,7 @@ export const withoutEffectsForALayer = () => (
         target="layer"
         project={testProject.project}
         resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
           resourceSources: [],
           onChooseResource: () => Promise.reject('Unimplemented'),
@@ -93,6 +98,7 @@ export const withoutEffectsForAnObject = () => (
         target="object"
         project={testProject.project}
         resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
           resourceSources: [],
           onChooseResource: () => Promise.reject('Unimplemented'),

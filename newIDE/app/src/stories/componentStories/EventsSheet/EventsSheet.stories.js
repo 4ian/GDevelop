@@ -9,6 +9,7 @@ import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropConte
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'EventsSheet/EventsSheet',
@@ -27,6 +28,7 @@ export const DefaultNoScope = () => (
         events={testProject.testLayout.getEvents()}
         onOpenExternalEvents={action('Open external events')}
         resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
           resourceSources: [],
           onChooseResource: () => Promise.reject('Unimplemented'),
@@ -55,6 +57,7 @@ export const EmptyNoScope = () => (
         events={testProject.emptyLayout.getEvents()}
         onOpenExternalEvents={action('Open external events')}
         resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
           resourceSources: [],
           onChooseResource: () => Promise.reject('Unimplemented'),

@@ -25,11 +25,7 @@ import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
 import { IconContainer } from '../UI/IconContainer';
 import { getBehaviorTutorialIds } from '../Utils/GDevelopServices/Tutorial';
 import ScrollView from '../UI/ScrollView';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 
 const gd: libGDevelop = global.gd;
 
@@ -41,9 +37,7 @@ type Props = {|
   onClose: () => void,
   onOpenMoreSettings?: ?() => void,
   onEditVariables: () => void,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
 |};
 
 type State = {|
@@ -200,10 +194,8 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
                       key={behaviorName}
                       behaviorSharedData={behaviorSharedData}
                       project={this.props.project}
-                      resourceSources={this.props.resourceSources}
-                      onChooseResource={this.props.onChooseResource}
-                      resourceExternalEditors={
-                        this.props.resourceExternalEditors
+                      resourceManagementProps={
+                        this.props.resourceManagementProps
                       }
                     />
                   </Line>

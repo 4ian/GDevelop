@@ -25,6 +25,5 @@ export const Default = () => (
     onPropertiesUpdated={action('properties updated')}
     onTabChanged={action('tab changed')}
     onRenameProperty={action('property rename')}
-    onFetchNewlyAddedResources={async () => {}}
   />
 );

@@ -15,7 +15,7 @@ import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
 export default {
   title: 'ObjectEditor/CustomObjectPropertiesEditor',
   component: CustomObjectPropertiesEditor,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 export const ButtonObject = () => (

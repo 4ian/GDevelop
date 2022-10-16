@@ -12,7 +12,7 @@ import ObjectGroupEditor from '../../../ObjectGroupEditor';
 export default {
   title: 'LayoutEditor/ObjectGroupEditor',
   component: ObjectGroupEditor,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 export const Default = () => (

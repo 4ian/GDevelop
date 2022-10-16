@@ -14,7 +14,7 @@ import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 export default {
   title: 'LayoutEditor/ObjectGroupsList',
   component: ObjectGroupsList,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 export const Default = () => (

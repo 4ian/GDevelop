@@ -18,7 +18,7 @@ import ResourcesLoader from '../../../ResourcesLoader';
 export default {
   title: 'ObjectEditor/SpriteEditor',
   component: SpriteEditor,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 export const Default = () => (

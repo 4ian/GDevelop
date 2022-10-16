@@ -7,6 +7,7 @@ import { action } from '@storybook/addon-actions';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 import fakeHotReloadPreviewButtonProps from '../../FakeHotReloadPreviewButtonProps';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
@@ -22,6 +23,7 @@ export const Default = () => (
   <LayersList
     project={testProject.project}
     resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
       onFetchNewlyAddedResources: async () => {},
       resourceSources: [],
       onChooseResource: () => Promise.reject('Unimplemented'),
@@ -46,6 +48,7 @@ export const SmallWidthAndHeight = () => (
     <LayersList
       project={testProject.project}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),

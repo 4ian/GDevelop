@@ -10,6 +10,7 @@ import paperDecorator from '../../PaperDecorator';
 import SpriteEditor from '../../../ObjectEditor/Editors/SpriteEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import ResourcesLoader from '../../../ResourcesLoader';
@@ -27,6 +28,7 @@ export const Default = () => (
         objectConfiguration={testProject.spriteObjectConfiguration}
         project={testProject.project}
         resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
           resourceSources: [],
           onChooseResource: () => Promise.reject('Unimplemented'),

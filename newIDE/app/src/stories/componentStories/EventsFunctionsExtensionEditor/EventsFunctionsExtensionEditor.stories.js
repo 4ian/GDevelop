@@ -11,6 +11,7 @@ import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import EventsFunctionsExtensionEditor from '../../../EventsFunctionsExtensionEditor';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'EventsFunctionsExtensionEditor/index',
@@ -25,16 +26,17 @@ export const Default = () => (
         project={testProject.project}
         eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
         setToolbar={() => {}}
-        resourceSources={[]}
-        onChooseResource={source =>
-          action('Choose resource from source', source)
-        }
-        resourceExternalEditors={fakeResourceExternalEditors}
+        resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
+          onFetchNewlyAddedResources: async () => {},
+          resourceSources: [],
+          onChooseResource: () => Promise.reject('Unimplemented'),
+          resourceExternalEditors: fakeResourceExternalEditors,
+        }}
         openInstructionOrExpression={action('open instruction or expression')}
         initiallyFocusedFunctionName={null}
         initiallyFocusedBehaviorName={null}
         onCreateEventsFunction={action('on create events function')}
-        onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>

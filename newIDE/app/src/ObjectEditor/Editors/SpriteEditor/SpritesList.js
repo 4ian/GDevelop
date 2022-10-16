@@ -25,6 +25,7 @@ import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExte
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
 import RaisedButton from '../../../UI/RaisedButton';
 import ElementWithMenu from '../../../UI/Menu/ElementWithMenu';
+import Window from '../../../Utils/Window';
 const gd: libGDevelop = global.gd;
 const path = require('path');
 
@@ -50,11 +51,18 @@ type AddSpriteButtonProps = {|
   resourceManagementProps: ResourceManagementProps,
 |};
 
+// Search "activate cloud projects" in the codebase for everything to
+// remove once cloud projects are activated for the desktop app.
+const supportsCloudProjects = Window.isDev();
+
 const AddSpriteButton = SortableElement(
   ({ onAdd, resourceManagementProps }: AddSpriteButtonProps) => {
     return (
       <div style={thumbnailContainerStyle}>
         <ElementWithMenu
+          exceptionallyDontShowMenuAndFakeClickOnFirstElement={
+            !supportsCloudProjects
+          }
           element={
             <RaisedButton
               onClick={() => {

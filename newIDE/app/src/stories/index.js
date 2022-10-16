@@ -170,6 +170,7 @@ import {
   ExamplesAccordion,
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
+import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 
 configureActions({
   depth: 2,
@@ -1451,7 +1452,22 @@ storiesOf('PropertiesEditor', module)
           disabled: true,
           getValue: instance => 'Disabled field',
           setValue: (instance, newValue) => {},
-          onEditButtonClick: instance => action('edit button clicked'),
+        },
+        {
+          name: 'Some field with edit buttons',
+          valueType: 'string',
+          getValue: instance => 'Click to test',
+          setValue: (instance, newValue) => {},
+          onEditButtonBuildMenuTemplate: () => [
+            {
+              label: 'Option 1',
+              click: action('Option 1'),
+            },
+            {
+              label: 'Option 2',
+              click: action('Option 2'),
+            },
+          ],
         },
         {
           name: 'Position',
@@ -1502,9 +1518,24 @@ storiesOf('PropertiesEditor', module)
           disabled: true,
           getValue: instance => 'Disabled field',
           setValue: (instance, newValue) => {},
-          onEditButtonClick: instance => action('edit button clicked'),
           getDescription: () =>
             'This is a description. It can be fairly long and even have some *Markdown*, including [links](http://example.com).',
+        },
+        {
+          name: 'Some field with edit buttons',
+          valueType: 'string',
+          getValue: instance => 'Click to test',
+          setValue: (instance, newValue) => {},
+          onEditButtonBuildMenuTemplate: () => [
+            {
+              label: 'Option 1',
+              click: action('Option 1'),
+            },
+            {
+              label: 'Option 2',
+              click: action('Option 2'),
+            },
+          ],
         },
         {
           name: 'Position',
@@ -2426,12 +2457,16 @@ storiesOf('InstructionEditor', module)
         objectsContainer={testProject.testLayout}
         isCondition
         instruction={testProject.testInstruction}
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onChooseResource={() => {
-          action('onChooseResource');
-          return Promise.reject();
+        resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
+          onFetchNewlyAddedResources: async () => {},
+          resourceExternalEditors: fakeResourceExternalEditors,
+          onChooseResource: () => {
+            action('onChooseResource');
+            return Promise.reject();
+          },
+          resourceSources: [],
         }}
-        resourceSources={[]}
         openInstructionOrExpression={action('open instruction or expression')}
       />
     </FixedHeightFlexContainer>
@@ -2445,12 +2480,16 @@ storiesOf('InstructionEditor', module)
         objectsContainer={testProject.testLayout}
         isCondition
         instruction={testProject.testInstruction}
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onChooseResource={() => {
-          action('onChooseResource');
-          return Promise.reject();
+        resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
+          onFetchNewlyAddedResources: async () => {},
+          resourceExternalEditors: fakeResourceExternalEditors,
+          onChooseResource: () => {
+            action('onChooseResource');
+            return Promise.reject();
+          },
+          resourceSources: [],
         }}
-        resourceSources={[]}
         openInstructionOrExpression={action('open instruction or expression')}
       />
     </FixedHeightFlexContainer>
@@ -2469,12 +2508,16 @@ storiesOf('NewInstructionEditorDialog', module)
       isCondition
       isNewInstruction={false}
       instruction={testProject.testInstruction}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceExternalEditors: fakeResourceExternalEditors,
+        onChooseResource: () => {
+          action('onChooseResource');
+          return Promise.reject();
+        },
+        resourceSources: [],
       }}
-      resourceSources={[]}
       openInstructionOrExpression={action('open instruction or expression')}
       onCancel={action('cancel')}
       onSubmit={action('submit')}
@@ -2492,12 +2535,16 @@ storiesOf('NewInstructionEditorDialog', module)
       isCondition
       isNewInstruction={false}
       instruction={testProject.testInstruction}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceExternalEditors: fakeResourceExternalEditors,
+        onChooseResource: () => {
+          action('onChooseResource');
+          return Promise.reject();
+        },
+        resourceSources: [],
       }}
-      resourceSources={[]}
       openInstructionOrExpression={action('open instruction or expression')}
       onCancel={action('cancel')}
       onSubmit={action('submit')}
@@ -2522,12 +2569,16 @@ storiesOf('NewInstructionEditorDialog', module)
         isCondition
         isNewInstruction={true}
         instruction={testProject.testInstruction}
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onChooseResource={() => {
-          action('onChooseResource');
-          return Promise.reject();
+        resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
+          onFetchNewlyAddedResources: async () => {},
+          resourceExternalEditors: fakeResourceExternalEditors,
+          onChooseResource: () => {
+            action('onChooseResource');
+            return Promise.reject();
+          },
+          resourceSources: [],
         }}
-        resourceSources={[]}
         openInstructionOrExpression={action('open instruction or expression')}
         onCancel={action('cancel')}
         onSubmit={action('submit')}
@@ -2559,12 +2610,13 @@ storiesOf('NewInstructionEditorMenu', module)
             isCondition
             isNewInstruction={false}
             instruction={testProject.testInstruction}
-            resourceExternalEditors={fakeResourceExternalEditors}
-            onChooseResource={() => {
-              action('onChooseResource');
-              return Promise.reject();
+            resourceManagementProps={{
+              getStorageProvider: () => emptyStorageProvider,
+              onFetchNewlyAddedResources: async () => {},
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
             }}
-            resourceSources={[]}
             openInstructionOrExpression={action(
               'open instruction or expression'
             )}
@@ -2970,9 +3022,13 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
     <ResourceSelector
       resourceKind="image"
       project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       initialResourceName="resource-that-does-not-exists-in-the-project"
       onChange={action('on change')}
       resourcesLoader={ResourcesLoader}
@@ -2982,9 +3038,13 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
     <ResourceSelector
       resourceKind="image"
       project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       initialResourceName="icon128.png"
       onChange={action('on change')}
       resourcesLoader={ResourcesLoader}
@@ -2995,9 +3055,13 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       margin="none"
       resourceKind="image"
       project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       initialResourceName="icon128.png"
       onChange={action('on change')}
       resourcesLoader={ResourcesLoader}
@@ -3007,9 +3071,13 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
     <ResourceSelectorWithThumbnail
       resourceKind="image"
       project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       resourceName="icon128.png"
       onChange={action('on change')}
     />
@@ -3018,9 +3086,13 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
     <ResourceSelector
       resourceKind="audio"
       project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       initialResourceName="fake-audio1.mp3"
       onChange={action('on change')}
       resourcesLoader={ResourcesLoader}
@@ -3031,9 +3103,13 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       canBeReset
       resourceKind="font"
       project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       initialResourceName="font.otf"
       onChange={action('on change')}
       resourcesLoader={ResourcesLoader}
@@ -3045,9 +3121,13 @@ storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
       margin="none"
       resourceKind="font"
       project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       initialResourceName="font.otf"
       onChange={action('on change')}
       resourcesLoader={ResourcesLoader}
@@ -3158,16 +3238,17 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           project={testProject.project}
           eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
           setToolbar={() => {}}
-          resourceSources={[]}
-          onChooseResource={source =>
-            action('Choose resource from source', source)
-          }
-          resourceExternalEditors={fakeResourceExternalEditors}
+          resourceManagementProps={{
+            getStorageProvider: () => emptyStorageProvider,
+            onFetchNewlyAddedResources: async () => {},
+            resourceSources: [],
+            onChooseResource: () => Promise.reject('Unimplemented'),
+            resourceExternalEditors: fakeResourceExternalEditors,
+          }}
           openInstructionOrExpression={action('open instruction or expression')}
           initiallyFocusedFunctionName={null}
           initiallyFocusedBehaviorName={null}
           onCreateEventsFunction={action('on create events function')}
-          onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -3294,9 +3375,13 @@ storiesOf('ProjectManager', module)
       )}
       freezeUpdate={false}
       hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
     />
   ))
   .add('Error in functions', () => (
@@ -3337,9 +3422,13 @@ storiesOf('ProjectManager', module)
       )}
       freezeUpdate={false}
       hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
     />
   ));
 
@@ -3527,9 +3616,13 @@ storiesOf('ProjectPropertiesDialog', module)
       onApply={async () => true}
       onPropertiesApplied={action('onPropertiesApplied')}
       onChangeSubscription={action('onChangeSubscription')}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
     />
   ));
 
@@ -3541,8 +3634,12 @@ storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
       loadingScreen={testProject.project.getLoadingScreen()}
       onChangeSubscription={action('onChangeSubscription')}
       project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
     />
   ));

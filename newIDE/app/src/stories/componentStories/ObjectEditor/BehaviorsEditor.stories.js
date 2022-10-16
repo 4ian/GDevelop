@@ -10,6 +10,7 @@ import paperDecorator from '../../PaperDecorator';
 import BehaviorsEditor from '../../../BehaviorsEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'ObjectEditor/BehaviorsEditor',
@@ -22,9 +23,14 @@ export const Default = () => (
     <BehaviorsEditor
       project={testProject.project}
       object={testProject.spriteObjectWithBehaviors}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       onUpdateBehaviorsSharedData={() => {}}
     />
   </SerializedObjectDisplay>
@@ -35,9 +41,14 @@ export const WithoutAnyBehaviors = () => (
     <BehaviorsEditor
       project={testProject.project}
       object={testProject.spriteObjectWithoutBehaviors}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       onUpdateBehaviorsSharedData={() => {}}
     />
   </SerializedObjectDisplay>

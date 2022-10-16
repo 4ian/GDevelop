@@ -7,6 +7,7 @@ import { action } from '@storybook/addon-actions';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 import fakeHotReloadPreviewButtonProps from '../../FakeHotReloadPreviewButtonProps';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
@@ -21,12 +22,13 @@ export default {
 export const Default = () => (
   <LayersList
     project={testProject.project}
-    resourceExternalEditors={fakeResourceExternalEditors}
-    onChooseResource={() => {
-      action('onChooseResource');
-      return Promise.reject();
+    resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
     }}
-    resourceSources={[]}
     onEditLayerEffects={action('onEditLayerEffects')}
     onEditLayer={action('onEditLayer')}
     onRemoveLayer={(layerName, cb) => {
@@ -44,12 +46,13 @@ export const SmallWidthAndHeight = () => (
   <div style={{ width: 250, height: 200 }}>
     <LayersList
       project={testProject.project}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
       }}
-      resourceSources={[]}
       onEditLayerEffects={action('onEditLayerEffects')}
       onEditLayer={action('onEditLayer')}
       onRemoveLayer={(layerName, cb) => {

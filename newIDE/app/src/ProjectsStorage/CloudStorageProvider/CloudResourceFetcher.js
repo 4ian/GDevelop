@@ -11,7 +11,10 @@ import {
 } from '../../Utils/BlobDownloader';
 import { type FileMetadata } from '../index';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
-import { extractFilenameAndExtensionFromProductAuthorizedUrl } from '../../Utils/GDevelopServices/Shop';
+import {
+  extractFilenameFromProductAuthorizedUrl,
+  isPrivateAssetUrl,
+} from '../../Utils/GDevelopServices/Shop';
 
 const isURL = (filename: string) => {
   return (
@@ -20,13 +23,6 @@ const isURL = (filename: string) => {
     filename.startsWith('ftp://') ||
     filename.startsWith('blob:') ||
     filename.startsWith('data:')
-  );
-};
-
-const isPrivateAssetUrl = (filename: string) => {
-  return (
-    filename.startsWith('https://private-assets-dev.gdevelop.io') ||
-    filename.startsWith('https://private-assets.gdevelop.io')
   );
 };
 
@@ -74,16 +70,10 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
 
           if (isURL(resourceFile)) {
             if (isPrivateAssetUrl(resourceFile)) {
-              const {
-                extension,
-                filenameWithoutExtension,
-              } = extractFilenameAndExtensionFromProductAuthorizedUrl(
-                resourceFile
-              );
               return {
                 resource,
                 url: resourceFile,
-                filename: filenameWithoutExtension + extension,
+                filename: extractFilenameFromProductAuthorizedUrl(resourceFile),
               };
             } else if (isBlobURL(resourceFile)) {
               result.erroredResources.push({

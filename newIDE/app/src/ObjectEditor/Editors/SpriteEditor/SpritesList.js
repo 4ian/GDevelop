@@ -1,6 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
-
+import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../../../Utils/MapFor';
@@ -19,12 +19,14 @@ import {
 import ResourcesLoader from '../../../ResourcesLoader';
 import {
   type ResourceSource,
-  type ChooseResourceFunction,
+  type ResourceManagementProps,
 } from '../../../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
 import FlatButton from '../../../UI/FlatButton';
 import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
+import ElementWithMenu from '../../../UI/Menu/ElementWithMenu';
+import Window from '../../../Utils/Window';
 const gd: libGDevelop = global.gd;
 const path = require('path');
 
@@ -45,26 +47,60 @@ const styles = {
   },
 };
 
-const AddSpriteButton = SortableElement(({ displayHint, onAdd }) => {
-  return (
-    <ThemeConsumer>
-      {muiTheme => (
-        <div
-          style={{
-            ...thumbnailContainerStyle,
-            backgroundColor: muiTheme.list.itemsBackgroundColor,
-          }}
-        >
-          <FlatButton
-            onClick={onAdd}
-            label={<Trans>Add</Trans>}
-            leftIcon={<Add />}
-          />
-        </div>
-      )}
-    </ThemeConsumer>
-  );
-});
+type AddSpriteButtonProps = {|
+  onAdd: (resourceSource: ResourceSource) => void,
+  resourceManagementProps: ResourceManagementProps,
+|};
+
+// Search "activate cloud projects" in the codebase for everything to
+// remove once cloud projects are activated for the desktop app.
+const supportsCloudProjects = Window.isDev();
+
+const AddSpriteButton = SortableElement(
+  ({ onAdd, resourceManagementProps }: AddSpriteButtonProps) => {
+    return (
+      <ThemeConsumer>
+        {muiTheme => (
+          <div
+            style={{
+              ...thumbnailContainerStyle,
+              backgroundColor: muiTheme.list.itemsBackgroundColor,
+            }}
+          >
+            <ElementWithMenu
+              exceptionallyDontShowMenuAndFakeClickOnFirstElement={
+                !supportsCloudProjects
+              }
+              element={
+                <FlatButton
+                  onClick={() => {
+                    /* Will be replaced by ElementWithMenu. */
+                  }}
+                  label={<Trans>Add</Trans>}
+                  leftIcon={<Add />}
+                />
+              }
+              buildMenuTemplate={(i18n: I18nType) => {
+                const storageProvider = resourceManagementProps.getStorageProvider();
+                return resourceManagementProps.resourceSources
+                  .filter(source => source.kind === 'image')
+                  .filter(
+                    ({ onlyForStorageProvider }) =>
+                      !onlyForStorageProvider ||
+                      onlyForStorageProvider === storageProvider.internalName
+                  )
+                  .map(source => ({
+                    label: i18n._(source.displayName),
+                    click: () => onAdd(source),
+                  }));
+              }}
+            />
+          </div>
+        )}
+      </ThemeConsumer>
+    );
+  }
+);
 
 const SortableSpriteThumbnail = SortableElement(
   ({ sprite, project, resourcesLoader, selected, onSelect, onContextMenu }) => {
@@ -89,6 +125,7 @@ const SortableList = SortableContainer(
     project,
     resourcesLoader,
     onAddSprite,
+    resourceManagementProps,
     selectedSprites,
     onSelectSprite,
     onSpriteContextMenu,
@@ -118,6 +155,7 @@ const SortableList = SortableContainer(
             disabled
             index={spritesCount}
             onAdd={onAddSprite}
+            resourceManagementProps={resourceManagementProps}
           />,
         ]}
       </div>
@@ -152,9 +190,7 @@ type Props = {|
   direction: gdDirection,
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
-  resourceSources: Array<ResourceSource>,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
-  onChooseResource: ChooseResourceFunction,
+  resourceManagementProps: ResourceManagementProps,
   onSpriteContextMenu: (x: number, y: number, sprite: gdSprite) => void,
   selectedSprites: {
     [number]: boolean,
@@ -178,51 +214,43 @@ export default class SpritesList extends Component<Props, void> {
     this.forceUpdate();
   };
 
-  onAddSprite = () => {
-    const {
-      resourceSources,
-      onChooseResource,
-      project,
-      direction,
-    } = this.props;
-    if (!resourceSources) return;
-    const sources = resourceSources.filter(source => source.kind === 'image');
-    if (!sources.length) return;
+  onAddSprite = async (resourceSource: ResourceSource) => {
+    const { resourceManagementProps, project, direction } = this.props;
 
     const {
       allDirectionSpritesHaveSameCollisionMasks,
       allDirectionSpritesHaveSamePoints,
     } = checkDirectionPointsAndCollisionsMasks(direction);
 
-    onChooseResource({
-      // Should be updated once new sources are introduced in the desktop app.
-      // Search for "sources[0]" in the codebase for other places like this.
-      initialSourceName: sources[0].name,
+    const resources = await resourceManagementProps.onChooseResource({
+      initialSourceName: resourceSource.name,
       multiSelection: true,
       resourceKind: 'image',
-    }).then(resources => {
-      resources.forEach(resource => {
-        applyResourceDefaults(project, resource);
-        project.getResourcesManager().addResource(resource);
-
-        const sprite = new gd.Sprite();
-        sprite.setImageName(resource.getName());
-        if (allDirectionSpritesHaveSamePoints) {
-          copySpritePoints(direction.getSprite(0), sprite);
-        }
-        if (allDirectionSpritesHaveSameCollisionMasks) {
-          copySpritePolygons(direction.getSprite(0), sprite);
-        }
-        direction.addSprite(sprite);
-        sprite.delete();
-      });
-
-      // Important, we are responsible for deleting the resources that were given to us.
-      // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-      resources.forEach(resource => resource.delete());
-
-      this.forceUpdate();
     });
+
+    resources.forEach(resource => {
+      applyResourceDefaults(project, resource);
+      project.getResourcesManager().addResource(resource);
+
+      const sprite = new gd.Sprite();
+      sprite.setImageName(resource.getName());
+      if (allDirectionSpritesHaveSamePoints) {
+        copySpritePoints(direction.getSprite(0), sprite);
+      }
+      if (allDirectionSpritesHaveSameCollisionMasks) {
+        copySpritePolygons(direction.getSprite(0), sprite);
+      }
+      direction.addSprite(sprite);
+      sprite.delete();
+    });
+
+    // Important, we are responsible for deleting the resources that were given to us.
+    // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+    resources.forEach(resource => resource.delete());
+
+    this.forceUpdate();
+
+    await resourceManagementProps.onFetchNewlyAddedResources();
   };
 
   editWith = (externalEditor: ResourceExternalEditor) => {
@@ -325,7 +353,9 @@ export default class SpritesList extends Component<Props, void> {
             direction={this.props.direction}
             resourcesLoader={this.props.resourcesLoader}
             project={this.props.project}
-            resourceExternalEditors={this.props.resourceExternalEditors}
+            resourceExternalEditors={
+              this.props.resourceManagementProps.resourceExternalEditors
+            }
             onEditWith={this.editWith}
           />
         </MiniToolbar>
@@ -335,6 +365,7 @@ export default class SpritesList extends Component<Props, void> {
           project={this.props.project}
           onSortEnd={this.onSortEnd}
           onAddSprite={this.onAddSprite}
+          resourceManagementProps={this.props.resourceManagementProps}
           selectedSprites={this.props.selectedSprites}
           onSelectSprite={this.props.onSelectSprite}
           onSpriteContextMenu={this.props.onSpriteContextMenu}

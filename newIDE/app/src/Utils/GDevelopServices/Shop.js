@@ -63,17 +63,16 @@ export const createProductAuthorizedUrl = (
     : `${url}?token=${encodeURIComponent(token)}`;
 };
 
-export const extractFilenameAndExtensionFromProductAuthorizedUrl = (
-  url: string
-): {
-  filenameWithoutExtension: string,
-  extension: string,
-} => {
-  const urlWithoutQueryParams = url.split('?')[0];
-  const extension = path.extname(urlWithoutQueryParams);
-  const filenameWithoutExtension = path.basename(
-    urlWithoutQueryParams,
-    extension
+export const isPrivateAssetUrl = (url: string) => {
+  return (
+    url.startsWith('https://private-assets-dev.gdevelop.io') ||
+    url.startsWith('https://private-assets.gdevelop.io')
   );
-  return { filenameWithoutExtension, extension };
+};
+
+export const extractFilenameFromProductAuthorizedUrl = (
+  url: string
+): string => {
+  const urlWithoutQueryParams = url.split('?')[0];
+  return path.basename(urlWithoutQueryParams);
 };

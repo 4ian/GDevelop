@@ -32,6 +32,8 @@ export type TestProject = {|
   testEmptyEventsBasedBehavior: gdEventsBasedBehavior,
   testBehaviorEventsFunction: gdEventsFunction,
   testBehaviorLifecycleEventsFunction: gdEventsFunction,
+  testEventsBasedObject: gdEventsBasedObject,
+  testObjectEventsFunction: gdEventsFunction,
   layerWithEffects: gdLayer,
   layerWithEffectWithoutEffectType: gdLayer,
   layerWithoutEffects: gdLayer,
@@ -41,6 +43,7 @@ export type TestProject = {|
   numberRelationalOperatorParameterMetadata: gdParameterMetadata,
   colorRelationalOperatorParameterMetadata: gdParameterMetadata,
   unknownRelationalOperatorParameterMetadata: gdParameterMetadata,
+  emptyObjectsContainer: gdObjectsContainer,
 |};
 */
 
@@ -164,6 +167,13 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'Pressed',
     3
   );
+  // Add a function
+  const testObjectEventsFunction = buttonEventBasedObject
+    .getEventsFunctions()
+    .insertNewEventsFunction('MyTestFunction', 0);
+  testObjectEventsFunction
+    .getEvents()
+    .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
 
   // Create and expose some objects
   const testLayout = project.insertNewLayout('TestLayout', 0);
@@ -836,6 +846,8 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     testEmptyEventsBasedBehavior,
     testBehaviorEventsFunction,
     testBehaviorLifecycleEventsFunction,
+    testEventsBasedObject: buttonEventBasedObject,
+    testObjectEventsFunction,
     layerWithEffects,
     layerWithEffectWithoutEffectType,
     layerWithoutEffects,
@@ -845,5 +857,6 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     numberRelationalOperatorParameterMetadata,
     colorRelationalOperatorParameterMetadata,
     unknownRelationalOperatorParameterMetadata,
+    emptyObjectsContainer: new gd.ObjectsContainer(),
   };
 };

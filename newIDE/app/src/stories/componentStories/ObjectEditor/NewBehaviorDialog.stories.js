@@ -7,14 +7,13 @@ import { action } from '@storybook/addon-actions';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import muiDecorator from '../../ThemeDecorator';
-import paperDecorator from '../../PaperDecorator';
 import NewBehaviorDialog from '../../../BehaviorsEditor/NewBehaviorDialog';
 import { ExtensionStoreStateProvider } from '../../../AssetStore/ExtensionStore/ExtensionStoreContext';
 
 export default {
   title: 'ObjectEditor/NewBehaviorDialog',
   component: NewBehaviorDialog,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [muiDecorator],
 };
 
 export const DefaultForSpriteObject = () => (

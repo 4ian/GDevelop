@@ -175,8 +175,9 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       case gd.EventsFunction.Condition:
         return 'res/functions/condition.svg';
       case gd.EventsFunction.Expression:
-        return 'res/functions/expression.svg';
+      case gd.EventsFunction.ExpressionAndCondition:
       case gd.EventsFunction.StringExpression:
+      case gd.EventsFunction.StringExpressionCondition:
         return 'res/functions/expression.svg';
     }
   };

@@ -206,7 +206,7 @@ class GD_CORE_API InstructionMetadata {
     if (!parameters.empty())
       parameters.back().SetLongDescription(longDescription);
     return *this;
-  };
+  }
 
   /**
    * \brief Set the additional information, used for some parameters
@@ -218,7 +218,7 @@ class GD_CORE_API InstructionMetadata {
   InstructionMetadata &SetParameterExtraInfo(const gd::String &extraInfo) {
     if (!parameters.empty()) parameters.back().SetExtraInfo(extraInfo);
     return *this;
-  };
+  }
 
   /**
    * \brief Add the default parameters for an instruction manipulating the
@@ -276,7 +276,7 @@ class GD_CORE_API InstructionMetadata {
    */
   const gd::String &GetRequiredBaseObjectCapability() const {
     return requiredBaseObjectCapability;
-  };
+  }
 
   /**
    * \brief Consider that the instruction is easy for a user to understand.
@@ -486,6 +486,29 @@ class GD_CORE_API InstructionMetadata {
   ExtraInformation &SetAsyncFunctionName(const gd::String &functionName) {
     return codeExtraInformation.SetAsyncFunctionName(functionName);
   }
+
+  /**
+   * \brief Erase any existing include file and add the specified include.
+   */
+  InstructionMetadata &SetIncludeFile(const gd::String &includeFile) {
+    codeExtraInformation.SetIncludeFile(includeFile);
+    return *this;
+  }
+
+  /**
+   * \brief Add a file to the already existing include files.
+   */
+  InstructionMetadata &AddIncludeFile(const gd::String &includeFile) {
+    codeExtraInformation.AddIncludeFile(includeFile);
+    return *this;
+  }
+
+  /**
+   * \brief Get the files that must be included to use the instruction.
+   */
+  const std::vector<gd::String>& GetIncludeFiles() const {
+    return codeExtraInformation.GetIncludeFiles();
+  };
 
   std::vector<ParameterMetadata> parameters;
 

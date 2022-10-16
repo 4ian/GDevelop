@@ -46,21 +46,27 @@ const ResourceStoreChooser = ({
   );
 };
 
+// Search "activate cloud projects" in the codebase for everything to
+// remove once cloud projects are activated for the desktop app.
+const supportsCloudProjects = Window.isDev();
+
 const localResourceSources: Array<ResourceSource> = [
-  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
-    name: `resource-store-${kind}`,
-    displayName: t`Choose from asset store`,
-    displayTab: 'standalone',
-    kind,
-    renderComponent: (props: ResourceSourceComponentProps) => (
-      <ResourceStoreChooser
-        createNewResource={createNewResource}
-        onChooseResources={props.onChooseResources}
-        options={props.options}
-        key={`resource-store-${kind}`}
-      />
-    ),
-  })),
+  ...(supportsCloudProjects
+    ? allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
+        name: `resource-store-${kind}`,
+        displayName: t`Choose from asset store`,
+        displayTab: 'standalone',
+        kind,
+        renderComponent: (props: ResourceSourceComponentProps) => (
+          <ResourceStoreChooser
+            createNewResource={createNewResource}
+            onChooseResources={props.onChooseResources}
+            options={props.options}
+            key={`resource-store-${kind}`}
+          />
+        ),
+      }))
+    : []),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
     name: `upload-${kind}`,
     displayName: t`File(s) from your device`,

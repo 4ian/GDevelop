@@ -10,6 +10,10 @@ type Props = {|
   buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
   openMenuWithSecondaryClick?: boolean,
   passExtraProps?: boolean,
+
+  // Search "activate cloud projects" in the codebase for everything to
+  // remove once cloud projects are activated for the desktop app.
+  exceptionallyDontShowMenuAndFakeClickOnFirstElement?: boolean,
 |};
 
 type State = {||};
@@ -25,6 +29,19 @@ export default class ElementWithMenu extends React.Component<Props, State> {
   open = () => {
     const { _contextMenu } = this;
     if (!_contextMenu) return;
+
+    // Search "activate cloud projects" in the codebase for everything to
+    // remove once cloud projects are activated for the desktop app.
+    if (this.props.exceptionallyDontShowMenuAndFakeClickOnFirstElement) {
+      const fakeI18n = { _: messageIdentifier => messageIdentifier.id };
+      // $FlowFixMe - we pass a fake i18n object as we don't care about translations.
+      const menuItemTemplates = this.props.buildMenuTemplate(fakeI18n);
+      if (menuItemTemplates[0] && menuItemTemplates[0].click) {
+        menuItemTemplates[0].click();
+      }
+
+      return;
+    }
 
     const node = ReactDOM.findDOMNode(this._wrappedElement);
     if (node instanceof HTMLElement) {

@@ -9,6 +9,7 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 import muiDecorator from '../../ThemeDecorator';
 import ObjectEditorDialog from '../../../ObjectEditor/ObjectEditorDialog';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 import EventsFunctionsExtensionsContext from '../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import LocalEventsFunctionsExtensionWriter from '../../../EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionWriter';
 import LocalEventsFunctionsExtensionOpener from '../../../EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionOpener';
@@ -43,9 +44,13 @@ export const CustomObject = () => (
       onRename={() => action('Rename object')}
       canRenameObject={name => true}
       project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={source => action('Choose resource from source', source)}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       onComputeAllVariableNames={() => []}
       onUpdateBehaviorsSharedData={() => {}}
       initialTab={null}
@@ -70,9 +75,13 @@ export const StandardObject = () => (
       onRename={() => action('Rename object')}
       canRenameObject={name => true}
       project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={source => action('Choose resource from source', source)}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       onComputeAllVariableNames={() => []}
       onUpdateBehaviorsSharedData={() => {}}
       initialTab={null}

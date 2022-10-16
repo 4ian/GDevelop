@@ -18,6 +18,7 @@ import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../GDevelopJsInitializerDecorator';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
+import { emptyStorageProvider } from '../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'UI Building Blocks/ClosableTabs',
@@ -265,6 +266,7 @@ export const WithObjectsList = () => (
                   objectsContainer={testProject.testLayout}
                   layout={testProject.testLayout}
                   resourceManagementProps={{
+                    getStorageProvider: () => emptyStorageProvider,
                     onFetchNewlyAddedResources: async () => {},
                     resourceSources: [],
                     onChooseResource: () => Promise.reject('Unimplemented'),

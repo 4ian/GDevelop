@@ -15,7 +15,7 @@ import LayersList from '../../../LayersList';
 export default {
   title: 'LayoutEditor/LayersList',
   component: LayersList,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 export const Default = () => (

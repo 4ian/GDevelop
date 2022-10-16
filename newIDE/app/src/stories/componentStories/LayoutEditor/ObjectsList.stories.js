@@ -17,7 +17,7 @@ import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
 export default {
   title: 'LayoutEditor/ObjectsList',
   component: ObjectsList,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 export const Default = () => (

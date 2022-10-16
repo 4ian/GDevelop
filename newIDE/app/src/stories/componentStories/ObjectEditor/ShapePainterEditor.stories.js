@@ -15,7 +15,7 @@ import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
 export default {
   title: 'ObjectEditor/ShapePainterEditor',
   component: ShapePainterEditor,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 export const Default = () => (

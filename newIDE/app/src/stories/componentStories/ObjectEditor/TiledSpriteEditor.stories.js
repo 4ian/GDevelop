@@ -10,6 +10,7 @@ import paperDecorator from '../../PaperDecorator';
 import TiledSpriteEditor from '../../../ObjectEditor/Editors/TiledSpriteEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'ObjectEditor/TiledSpriteEditor',
@@ -23,6 +24,7 @@ export const Default = () => (
       objectConfiguration={testProject.tiledSpriteObjectConfiguration}
       project={testProject.project}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),

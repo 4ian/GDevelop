@@ -8,6 +8,7 @@ import ResourceSelector from '../../../ResourcesList/ResourceSelector';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
 import ResourcesLoader from '../../../ResourcesLoader';
 import ResourceSelectorWithThumbnail from '../../../ResourcesList/ResourceSelectorWithThumbnail';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'ResourcesList/ResourceSelector',
@@ -20,6 +21,7 @@ export const ImageNotSelected = () => (
     resourceKind="image"
     project={testProject.project}
     resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
       onFetchNewlyAddedResources: async () => {},
       resourceSources: [],
       onChooseResource: () => Promise.reject('Unimplemented'),
@@ -36,6 +38,7 @@ export const ImageSelected = () => (
     resourceKind="image"
     project={testProject.project}
     resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
       onFetchNewlyAddedResources: async () => {},
       resourceSources: [],
       onChooseResource: () => Promise.reject('Unimplemented'),
@@ -90,6 +93,7 @@ export const ImageNoMargin = () => (
     resourceKind="image"
     project={testProject.project}
     resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
       onFetchNewlyAddedResources: async () => {},
       resourceSources: [],
       onChooseResource: () => Promise.reject('Unimplemented'),
@@ -106,6 +110,7 @@ export const ImageWithThumbnail = () => (
     resourceKind="image"
     project={testProject.project}
     resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
       onFetchNewlyAddedResources: async () => {},
       resourceSources: [],
       onChooseResource: () => Promise.reject('Unimplemented'),
@@ -121,6 +126,7 @@ export const Audio = () => (
     resourceKind="audio"
     project={testProject.project}
     resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
       onFetchNewlyAddedResources: async () => {},
       resourceSources: [],
       onChooseResource: () => Promise.reject('Unimplemented'),
@@ -138,6 +144,7 @@ export const FontWithResetButton = () => (
     resourceKind="font"
     project={testProject.project}
     resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
       onFetchNewlyAddedResources: async () => {},
       resourceSources: [],
       onChooseResource: () => Promise.reject('Unimplemented'),
@@ -156,6 +163,7 @@ export const FontNoMarginWithResetButton = () => (
     resourceKind="font"
     project={testProject.project}
     resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
       onFetchNewlyAddedResources: async () => {},
       resourceSources: [],
       onChooseResource: () => Promise.reject('Unimplemented'),

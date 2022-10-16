@@ -643,9 +643,6 @@ export default class ProjectManager extends React.Component<Props, State> {
       eventsFunctionsExtensionsError,
       onReloadEventsFunctionsExtensions,
       onInstallExtension,
-      resourceSources,
-      onChooseResource,
-      resourceExternalEditors,
     } = this.props;
     const {
       renamedItemKind,
@@ -1132,9 +1129,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                   );
                   this._onOpenLayoutProperties(null);
                 }}
-                resourceSources={resourceSources}
-                resourceExternalEditors={resourceExternalEditors}
-                onChooseResource={onChooseResource}
+                resourceManagementProps={this.props.resourceManagementProps}
               />
             )}
             {!!this.state.editedVariablesLayout && (

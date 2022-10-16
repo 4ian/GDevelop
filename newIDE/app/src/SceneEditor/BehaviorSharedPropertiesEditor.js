@@ -32,6 +32,7 @@ export default class BehaviorSharedPropertiesEditor extends React.Component<Prop
           <PropertiesEditor
             schema={propertiesSchema}
             instances={[behaviorSharedData]}
+            resourceManagementProps={this.props.resourceManagementProps}
           />
         ) : (
           <EmptyMessage>

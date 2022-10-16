@@ -24,6 +24,7 @@ import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
 import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
 import { IconContainer } from '../UI/IconContainer';
 import { getBehaviorTutorialIds } from '../Utils/GDevelopServices/Tutorial';
+import ScrollView from '../UI/ScrollView';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 
 const gd: libGDevelop = global.gd;
@@ -39,6 +40,12 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
 |};
 
+type State = {|
+  windowTitle: string,
+  shouldStopSoundsOnStartup: boolean,
+  backgroundColor: ?RGBColor,
+|};
+
 const ScenePropertiesDialog = ({
   open,
   layout,
@@ -47,7 +54,7 @@ const ScenePropertiesDialog = ({
   onClose,
   onOpenMoreSettings,
   onEditVariables,
-  resourceManagementProps
+  resourceManagementProps,
 }: Props) => {
   const [windowTitle, setWindowTitle] = React.useState<string>(
     layout.getWindowDefaultTitle()

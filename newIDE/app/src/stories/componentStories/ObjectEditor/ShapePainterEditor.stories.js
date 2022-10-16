@@ -10,6 +10,7 @@ import paperDecorator from '../../PaperDecorator';
 import ShapePainterEditor from '../../../ObjectEditor/Editors/ShapePainterEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'ObjectEditor/ShapePainterEditor',
@@ -23,6 +24,7 @@ export const Default = () => (
       objectConfiguration={testProject.shapePainterObjectConfiguration}
       project={testProject.project}
       resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
         resourceSources: [],
         onChooseResource: () => Promise.reject('Unimplemented'),

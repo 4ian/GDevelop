@@ -99,7 +99,7 @@ PlatformerObjectBehavior::GetProperties(
           behaviorContent.GetDoubleAttribute("xGrabTolerance", 10)));
   properties["useLegacyTrajectory"]
       .SetLabel(_("Use frame rate dependent trajectories (deprecated, it's "
-                  "recommended to let this unchecked)"))
+                  "recommended to leave this unchecked)"))
       .SetGroup(_("Deprecated options (advanced)"))
       .SetValue(behaviorContent.GetBoolAttribute("useLegacyTrajectory", true)
                     ? "true"

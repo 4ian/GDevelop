@@ -35,8 +35,8 @@ type CppVector<T> = {
 const mapVector = /*:: <T, U> */ (
   cppVector /*: CppVector<T> */,
   func /*: (T, number) => U */,
-  startIndex = 0 /*: number */,
-  endExcludedIndex = cppVector.size() /*: number */
+  startIndex /*: number */ = 0,
+  endExcludedIndex /*: number */ = cppVector.size()
 ) /*: Array<U> */ => {
   return mapFor(startIndex, endExcludedIndex, i => func(cppVector.at(i), i));
 };

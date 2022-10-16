@@ -343,7 +343,8 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getFullName() || eventsFunction.getName(),
       removeTailingDot(eventsFunction.getDescription()) ||
         eventsFunction.getFullName(),
-      eventsFunction.getSentence(),
+      // An operator and an operand are inserted before user parameters.
+      shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
       eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
     );
@@ -354,7 +355,8 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getFullName() || eventsFunction.getName(),
       removeTailingDot(eventsFunction.getDescription()) ||
         eventsFunction.getFullName(),
-      eventsFunction.getSentence(),
+      // An operator and an operand are inserted before user parameters.
+      shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
       eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
     );
@@ -379,6 +381,34 @@ export const declareInstructionOrExpressionMetadata = (
       getExtensionIconUrl(extension)
     );
   }
+};
+
+const shiftSentenceParamIndexes = (
+  sentence: string,
+  offset: number
+): string => {
+  const parameterIndexesStrings = sentence.match(/(?<=_PARAM)(\d+)(?=_)/g);
+  if (!parameterIndexesStrings) {
+    return sentence;
+  }
+  const parameterIndexes = parameterIndexesStrings.map(indexString =>
+    Number.parseInt(indexString)
+  );
+  const sentenceElements = sentence.split(/_PARAM\d+_/);
+  let shiftedSentence = '';
+  for (let index = 0; index < parameterIndexes.length; index++) {
+    shiftedSentence +=
+      sentenceElements[index] +
+      '_PARAM' +
+      (parameterIndexes[index] + offset) +
+      '_';
+  }
+  const sentenceIsEndingWithAnElement =
+    sentenceElements.length > parameterIndexes.length;
+  if (sentenceIsEndingWithAnElement) {
+    shiftedSentence += sentenceElements[sentenceElements.length - 1];
+  }
+  return shiftedSentence;
 };
 
 /**
@@ -422,7 +452,8 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       eventsFunction.getFullName() || eventsFunction.getName(),
       removeTailingDot(eventsFunction.getDescription()) ||
         eventsFunction.getFullName(),
-      eventsFunction.getSentence(),
+      // An operator and an operand are inserted before user parameters.
+      shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
       eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
     );
@@ -433,7 +464,8 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       eventsFunction.getFullName() || eventsFunction.getName(),
       removeTailingDot(eventsFunction.getDescription()) ||
         eventsFunction.getFullName(),
-      eventsFunction.getSentence(),
+      // An operator and an operand are inserted before user parameters.
+      shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
       eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
     );
@@ -479,7 +511,10 @@ export const declareObjectInstructionOrExpressionMetadata = (
   objectMetadata: gdObjectMetadata,
   eventsBasedObject: gdEventsBasedObject,
   eventsFunction: gdEventsFunction
-): gdInstructionMetadata | gdExpressionMetadata => {
+):
+  | gdInstructionMetadata
+  | gdExpressionMetadata
+  | gdMultipleInstructionMetadata => {
   const functionType = eventsFunction.getFunctionType();
   if (functionType === gd.EventsFunction.Expression) {
     return objectMetadata.addExpression(
@@ -499,6 +534,30 @@ export const declareObjectInstructionOrExpressionMetadata = (
       eventsFunction.getGroup() ||
         eventsBasedObject.getFullName() ||
         eventsBasedObject.getName(),
+      getExtensionIconUrl(extension)
+    );
+  } else if (functionType === gd.EventsFunction.ExpressionAndCondition) {
+    return objectMetadata.addExpressionAndCondition(
+      'number',
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      removeTailingDot(eventsFunction.getDescription()) ||
+        eventsFunction.getFullName(),
+      // An operator and an operand are inserted before user parameters.
+      shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
+      eventsFunction.getGroup() || '',
+      getExtensionIconUrl(extension)
+    );
+  } else if (functionType === gd.EventsFunction.StringExpressionAndCondition) {
+    return objectMetadata.addExpressionAndCondition(
+      'string',
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      removeTailingDot(eventsFunction.getDescription()) ||
+        eventsFunction.getFullName(),
+      // An operator and an operand are inserted before user parameters.
+      shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
+      eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.Condition) {
@@ -970,29 +1029,34 @@ export const declareEventsFunctionParameters = (
   instructionOrExpression:
     | gdInstructionMetadata
     | gdExpressionMetadata
-    | gdMultipleInstructionMetadata
+    | gdMultipleInstructionMetadata,
+  userDefinedFirstParameterIndex: number
 ) => {
+  const addParameter = (parameter: gdParameterMetadata) => {
+    if (!parameter.isCodeOnly()) {
+      instructionOrExpression.addParameter(
+        parameter.getType(),
+        parameter.getDescription(),
+        parameter.getExtraInfo(),
+        parameter.isOptional()
+      );
+      instructionOrExpression.setParameterLongDescription(
+        parameter.getLongDescription()
+      );
+      instructionOrExpression.setDefaultValue(parameter.getDefaultValue());
+    } else {
+      instructionOrExpression.addCodeOnlyParameter(
+        parameter.getType(),
+        parameter.getExtraInfo()
+      );
+    }
+  };
+
   mapVector(
     eventsFunction.getParameters(),
-    (parameter: gdParameterMetadata) => {
-      if (!parameter.isCodeOnly()) {
-        instructionOrExpression.addParameter(
-          parameter.getType(),
-          parameter.getDescription(),
-          parameter.getExtraInfo(),
-          parameter.isOptional()
-        );
-        instructionOrExpression.setParameterLongDescription(
-          parameter.getLongDescription()
-        );
-        instructionOrExpression.setDefaultValue(parameter.getDefaultValue());
-      } else {
-        instructionOrExpression.addCodeOnlyParameter(
-          parameter.getType(),
-          parameter.getExtraInfo()
-        );
-      }
-    }
+    addParameter,
+    0,
+    userDefinedFirstParameterIndex
   );
 
   const functionType = eventsFunction.getFunctionType();
@@ -1005,6 +1069,12 @@ export const declareEventsFunctionParameters = (
       'string'
     );
   }
+
+  mapVector(
+    eventsFunction.getParameters(),
+    addParameter,
+    userDefinedFirstParameterIndex
+  );
 
   // By convention, latest parameter is always the eventsFunctionContext of the calling function
   // (if any).

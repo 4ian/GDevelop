@@ -86,7 +86,7 @@ const gatherProjectData = ({
 
 type Props = {|
   tutorial: InAppTutorial,
-  onFlowRunning: boolean => void,
+  endTutorial: () => void,
   project: ?gdProject,
   currentEditor: EditorIdentifier | null,
 |};
@@ -99,7 +99,7 @@ export type InAppTutorialOrchestratorInterface = {|
 const InAppTutorialOrchestrator = React.forwardRef<
   Props,
   InAppTutorialOrchestratorInterface
->(({ tutorial, onFlowRunning, project, currentEditor }, ref) => {
+>(({ tutorial, endTutorial, project, currentEditor }, ref) => {
   const [wrongEditorInfoOpen, setWrongEditorInfoOpen] = React.useState<boolean>(
     false
   );
@@ -392,7 +392,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
           endDialog={endDialog}
           onClose={() => {
             setDisplayEndDialog(false);
-            onFlowRunning(false);
+            endTutorial();
           }}
         />
       )}

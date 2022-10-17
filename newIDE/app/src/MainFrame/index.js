@@ -2407,14 +2407,6 @@ const MainFrame = (props: Props) => {
       : () => {}
   );
 
-  const onUserflowRunningUpdate = () => {
-    // Userflow dialog has a variable exported which knows if the
-    // onboarding is running or not.
-    // To ensure all components are aware of this variable when it changes,
-    // we need to force a re-render.
-    forceUpdate();
-  };
-
   useMainFrameCommands({
     i18n,
     project: state.currentProject,
@@ -2891,7 +2883,6 @@ const MainFrame = (props: Props) => {
           onClose={() => {
             openOnboardingDialog(false);
           }}
-          onUserflowRunningUpdate={onUserflowRunningUpdate}
         />
       )}
       {state.gdjsDevelopmentWatcherEnabled &&

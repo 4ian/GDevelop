@@ -9,8 +9,6 @@ import { MarkdownText } from '../../UI/MarkdownText';
 import { ColumnStackLayout } from '../../UI/Layout';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
-export let isUserflowRunning = false;
-
 const styles = {
   imgContainer: {
     marginBottom: 16,
@@ -30,13 +28,11 @@ We highly recommend it!
 type Props = {|
   open: boolean,
   onClose: () => void,
-  onUserflowRunningUpdate: () => void,
 |};
 
 const OnboardingDialog = ({
   open,
   onClose,
-  onUserflowRunningUpdate,
 }: Props) => {
   const { startTutorial } = React.useContext(InAppTutorialContext);
 

@@ -11,6 +11,8 @@ import onboardingTutorial from './Tutorials/OnboardingTutorial';
 
 type Props = {| children: React.Node |};
 
+export let currentlyRunningInAppTutorial = null;
+
 const InAppTutorialProvider = (props: Props) => {
   const [isFlowRunning, setIsFlowRunning] = React.useState<boolean>(true);
   const [tutorial, setTutorial] = React.useState<?InAppTutorial>(null);
@@ -26,6 +28,7 @@ const InAppTutorialProvider = (props: Props) => {
   const startTutorial = (tutorialId: string) => {
     if (tutorialId === onboardingTutorial.id) {
       setTutorial(onboardingTutorial);
+      currentlyRunningInAppTutorial = tutorialId;
       setIsFlowRunning(true);
     }
   };
@@ -36,6 +39,11 @@ const InAppTutorialProvider = (props: Props) => {
 
   const goToNextStep = () => {
     if (orchestratorRef.current) orchestratorRef.current.goToNextStep();
+  };
+
+  const endTutorial = () => {
+    currentlyRunningInAppTutorial = null;
+    setIsFlowRunning(false);
   };
 
   return (
@@ -55,7 +63,7 @@ const InAppTutorialProvider = (props: Props) => {
         <InAppTutorialOrchestrator
           ref={orchestratorRef}
           tutorial={tutorial}
-          onFlowRunning={setIsFlowRunning}
+          endTutorial={endTutorial}
           project={project}
           currentEditor={currentEditor}
         />

@@ -18,6 +18,7 @@ import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import { List, ListItem } from '../../../UI/List';
+import { Column } from '../../../UI/Grid';
 
 export default {
   title: 'In-app tutorial/ElementHighlighterAndTooltipDisplayer',
@@ -130,25 +131,28 @@ export const Default = () => {
           </ColumnStackLayout>
         </ResponsiveLineStackLayout>
         <ResponsiveLineStackLayout>
-          <FixedHeightFlexContainer height={150}>
-            <ScrollView>
-              <List>
-                <ListItem primaryText="First choice" />
-                <ListItem primaryText="Another choice" />
-                <ListItem primaryText="Choice paradox hits" />
-                <ListItem
-                  primaryText="I want this one"
-                  ref={ref => setListItemRef(ref)}
-                />
-                <ListItem primaryText="Why not me?" />
-                <ListItem primaryText="There's a choice to do?" />
-                <ListItem primaryText="No one told me" />
-                <ListItem primaryText="I don't have time for that" />
-                <ListItem primaryText="Near the end" />
-                <ListItem primaryText="Last but not least" />
-              </List>
-            </ScrollView>
-          </FixedHeightFlexContainer>
+          <Column expand>
+            <FixedHeightFlexContainer height={150}>
+              <ScrollView>
+                <List>
+                  <ListItem primaryText="First choice" />
+                  <ListItem primaryText="Another choice" />
+                  <ListItem primaryText="Choice paradox hits" />
+                  <ListItem
+                    primaryText="I want this one"
+                    ref={ref => setListItemRef(ref)}
+                  />
+                  <ListItem primaryText="Why not me?" />
+                  <ListItem primaryText="There's a choice to do?" />
+                  <ListItem primaryText="No one told me" />
+                  <ListItem primaryText="I don't have time for that" />
+                  <ListItem primaryText="Near the end" />
+                  <ListItem primaryText="Last but not least" />
+                </List>
+              </ScrollView>
+            </FixedHeightFlexContainer>
+          </Column>
+          <Column expand />
         </ResponsiveLineStackLayout>
       </ColumnStackLayout>
 

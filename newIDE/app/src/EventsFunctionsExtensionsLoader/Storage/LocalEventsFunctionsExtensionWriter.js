@@ -88,8 +88,6 @@ export default class LocalEventsFunctionsExtensionWriter {
     customObject: gdObject,
     filepath: string
   ): Promise<void> => {
-    // TODO Fix the memory crash
-    // I think the clone method is bugged, it doesn't keep the Configuration.
     const exportedObject = customObject.clone().get();
     exportedObject.setTags('');
     exportedObject.getVariables().clear();

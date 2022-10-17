@@ -20,7 +20,7 @@ if (typeof window !== 'undefined') {
  * A hook to call a callback when the window is resized,
  * while having only one resize DOM event handler.
  */
-export const useOnResize = (callback: () => void) => {
+const useOnResize = (callback: () => void) => {
   React.useEffect(
     () => {
       listeners.add(callback);
@@ -31,3 +31,5 @@ export const useOnResize = (callback: () => void) => {
     [callback]
   );
 };
+
+export default useOnResize;

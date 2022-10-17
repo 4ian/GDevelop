@@ -6,11 +6,14 @@ import ObjectSelector from '../../ObjectsList/ObjectSelector';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { Trans } from '@lingui/macro';
 import { nameAndIconContainer } from '../EventsTree/ClassNames';
+import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
 export default class ObjectField extends React.Component<
   ParameterFieldProps,
   {||}
 > {
+  static contextType = InAppTutorialContext;
+
   _description: ?string;
   _longDescription: ?string;
   _allowedObjectType: ?string;
@@ -35,7 +38,11 @@ export default class ObjectField extends React.Component<
   }
 
   focus(selectAll: boolean = false) {
-    if (this._field) this._field.focus(selectAll);
+    const { isFlowRunning } = this.context;
+    // Prevent focus of field if an in-app tutorial is running because
+    // the popper of the tooltip and the popper of the semi controlled
+    // autocomplete's dropdown are conflicting.
+    if (this._field && !isFlowRunning) this._field.focus(selectAll);
   }
 
   render() {

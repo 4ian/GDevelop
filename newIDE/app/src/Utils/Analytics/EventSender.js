@@ -11,7 +11,7 @@ import { getStartupTimesSummary } from '../StartupTimes';
 import { getIDEVersion, getIDEVersionWithHash } from '../../Version';
 import { loadPreferencesFromLocalStorage } from '../../MainFrame/Preferences/PreferencesProvider';
 import { getBrowserLanguageOrLocale } from '../Language';
-import { isUserflowRunning } from '../../MainFrame/Onboarding/OnboardingDialog';
+import { currentlyRunningInAppTutorial } from '../../InAppTutorial/InAppTutorialProvider';
 import optionalRequire from '../OptionalRequire';
 import Window from '../Window';
 const electron = optionalRequire('electron');
@@ -44,7 +44,7 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
   keenClient.recordEvent(name, metadata);
   posthog.capture(name, {
     ...metadata,
-    isInAppTutorialRunning: isUserflowRunning,
+    isInAppTutorialRunning: !!currentlyRunningInAppTutorial,
     isInDesktopApp: isElectronApp,
     isInWebApp: !isElectronApp,
   });
@@ -168,7 +168,8 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
       },
       tutorials: {
         // Useful to differentiate if an event is part of a tutorial or not.
-        isInAppTutorialRunning: isUserflowRunning,
+        isInAppTutorialRunning: !!currentlyRunningInAppTutorial,
+        tutorial: currentlyRunningInAppTutorial,
       },
       language: {
         appLanguage,

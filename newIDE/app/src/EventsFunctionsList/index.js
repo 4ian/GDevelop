@@ -171,6 +171,9 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
           case 'onFirstSceneLoaded':
           case 'onCreated':
             return 'res/functions/create.svg';
+
+          case 'onHotReloading':
+            return 'res/functions/reload.svg';
         }
       case gd.EventsFunction.Condition:
         return 'res/functions/condition.svg';

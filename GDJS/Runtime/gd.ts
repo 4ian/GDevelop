@@ -26,7 +26,7 @@ namespace gdjs {
 
   type RuntimeSceneCallback = (runtimeScene: gdjs.RuntimeScene) => void;
   type RuntimeSceneRuntimeObjectCallback = (
-    runtimeScene: gdjs.RuntimeScene,
+    instanceContainer: gdjs.RuntimeInstanceContainer,
     runtimeObject: gdjs.RuntimeObject
   ) => void;
 

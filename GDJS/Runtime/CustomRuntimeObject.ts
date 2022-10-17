@@ -586,5 +586,6 @@ namespace gdjs {
   }
 
   // Others initialization and internal state management :
-  CustomRuntimeObject.supportsReinitialization = true;
+  // TODO EBO Activate and test instance recycling.
+  CustomRuntimeObject.supportsReinitialization = false;
 }

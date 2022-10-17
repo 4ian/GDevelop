@@ -16,7 +16,7 @@ type Props = {|
   element: HTMLElement,
 |};
 
-const highlighterPrimaryColor = '#E0E026';
+const highlighterPrimaryColor = '#FFA929';
 
 const styles = {
   rectangleHighlight: {

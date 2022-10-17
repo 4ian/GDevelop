@@ -14,7 +14,7 @@ type Props = {| children: React.Node |};
 export let currentlyRunningInAppTutorial = null;
 
 const InAppTutorialProvider = (props: Props) => {
-  const [isFlowRunning, setIsFlowRunning] = React.useState<boolean>(true);
+  const [isFlowRunning, setIsFlowRunning] = React.useState<boolean>(false);
   const [tutorial, setTutorial] = React.useState<?InAppTutorial>(null);
   const [project, setProject] = React.useState<?gdProject>(null);
   const [

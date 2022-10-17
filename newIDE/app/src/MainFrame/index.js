@@ -2883,6 +2883,7 @@ const MainFrame = (props: Props) => {
       {onboardingDialogOpen && (
         <OnboardingDialog
           open
+          onStartOnboarding={() => askToCloseProject()}
           onClose={() => {
             openOnboardingDialog(false);
           }}

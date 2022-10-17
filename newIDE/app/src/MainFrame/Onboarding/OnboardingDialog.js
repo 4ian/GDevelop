@@ -28,12 +28,17 @@ We highly recommend it!
 type Props = {|
   open: boolean,
   onClose: () => void,
+  onStartOnboarding: () => Promise<boolean>,
 |};
 
-const OnboardingDialog = ({ open, onClose }: Props) => {
+const OnboardingDialog = ({ open, onClose, onStartOnboarding }: Props) => {
   const { startTutorial } = React.useContext(InAppTutorialContext);
 
-  const startOnboarding = () => {
+  const startOnboarding = async () => {
+    const projectIsClosed = await onStartOnboarding();
+    if (!projectIsClosed) {
+      return;
+    }
     startTutorial('onboarding');
     onClose();
   };

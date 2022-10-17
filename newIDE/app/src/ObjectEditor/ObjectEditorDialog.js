@@ -26,6 +26,7 @@ import EffectsList from '../EffectsList';
 import VariablesList from '../VariablesList/VariablesList';
 import { sendBehaviorsEditorShown } from '../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
+
 const gd: libGDevelop = global.gd;
 
 export type ObjectEditorTab =

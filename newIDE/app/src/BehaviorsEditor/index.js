@@ -143,7 +143,11 @@ const BehaviorsEditor = (props: Props) => {
               );
               if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
                 return (
-                  <Accordion key={behaviorName} defaultExpanded>
+                  <Accordion
+                    key={behaviorName}
+                    defaultExpanded
+                    id={`behavior-parameters-${behaviorName}`}
+                  >
                     <AccordionHeader
                       actions={[
                         <IconButton
@@ -191,7 +195,11 @@ const BehaviorsEditor = (props: Props) => {
               const iconUrl = behaviorMetadata.getIconFilename();
 
               return (
-                <Accordion key={behaviorName} defaultExpanded>
+                <Accordion
+                  key={behaviorName}
+                  defaultExpanded
+                  id={`behavior-parameters-${behaviorName}`}
+                >
                   <AccordionHeader
                     actions={[
                       <HelpIcon

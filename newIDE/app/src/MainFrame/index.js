@@ -2093,19 +2093,23 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  /**
+   * Returns true if the project has been closed and false if the user refused to close it.
+   */
   const askToCloseProject = React.useCallback(
-    (): Promise<void> => {
-      if (unsavedChanges && unsavedChanges.hasUnsavedChanges) {
-        if (!currentProject) return Promise.resolve();
+    async (): Promise<boolean> => {
+      if (!currentProject) return true;
 
+      if (unsavedChanges && unsavedChanges.hasUnsavedChanges) {
         const answer = Window.showConfirmDialog(
           i18n._(
             t`Close the project? Any changes that have not been saved will be lost.`
           )
         );
-        if (!answer) return Promise.resolve();
+        if (!answer) return false;
       }
-      return closeProject();
+      await closeProject();
+      return true;
     },
     [currentProject, unsavedChanges, i18n, closeProject]
   );
@@ -2424,7 +2428,9 @@ const MainFrame = (props: Props) => {
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
     onCloseApp: closeApp,
-    onCloseProject: askToCloseProject,
+    onCloseProject: async () => {
+      askToCloseProject();
+    },
     onExportGame: React.useCallback(() => openExportDialog(true), []),
     onOpenLayout: openLayout,
     onOpenExternalEvents: openExternalEvents,

@@ -6,7 +6,7 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import uniq from 'lodash/uniq';
-import ObjectsList from '../ObjectsList';
+import ObjectsList, { type ObjectsListInterface } from '../ObjectsList';
 import ObjectGroupsList from '../ObjectGroupsList';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import InstancesEditor from '../InstancesEditor';
@@ -17,6 +17,7 @@ import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
 import LayerEditorDialog from '../LayersList/LayerEditorDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
+import ObjectExporterDialog from '../ObjectEditor/ObjectExporterDialog';
 import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
 import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
@@ -140,6 +141,7 @@ type State = {|
   layerRemoved: ?string,
   editedLayer: ?gdLayer,
   editedLayerInitialTab: 'properties' | 'effects',
+  exportedObject: ?gdObject,
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
@@ -174,7 +176,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   editor: ?InstancesEditor;
   contextMenu: ?ContextMenuInterface;
   editorMosaic: ?EditorMosaic;
-  _objectsList: ?ObjectsList;
+  _objectsList: ?ObjectsListInterface;
   _layersList: ?LayersList;
   _propertiesEditor: ?InstancePropertiesEditor;
   _instancesList: ?InstancesList;
@@ -192,6 +194,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layerRemoved: null,
       editedLayer: null,
       editedLayerInitialTab: 'properties',
+      exportedObject: null,
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
@@ -385,6 +388,18 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  openObjectExporterDialog = (object: ?gdObject) => {
+    if (object) {
+      this.setState({
+        exportedObject: object,
+      });
+    } else {
+      this.setState({
+        exportedObject: null,
+      });
+    }
+  };
+
   editObjectByName = (objectName: string, initialTab?: ObjectEditorTab) => {
     const { project, layout } = this.props;
     if (layout.hasObjectNamed(objectName))
@@ -461,8 +476,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       newObjectInstanceSceneCoordinates: this.editor.getLastCursorSceneCoordinates(),
     });
 
-    if (this._objectsList)
-      this._objectsList.setState({ newObjectDialogOpen: true });
+    if (this._objectsList) this._objectsList.openNewObjectDialog();
   };
 
   _onAddInstanceUnderCursor = () => {
@@ -1387,6 +1401,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 selectedObjectNames={this.state.selectedObjectNames}
                 canInstallPrivateAsset={this.props.canInstallPrivateAsset}
                 onEditObject={this.props.onEditObject || this.editObject}
+                onExportObject={this.openObjectExporterDialog}
                 onDeleteObject={this._onDeleteObject(i18n)}
                 canRenameObject={newName =>
                   this._canObjectOrGroupUseNewName(newName, i18n)
@@ -1403,7 +1418,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                   })
                 }
                 getAllObjectTags={this._getAllObjectTags}
-                ref={objectsList => (this._objectsList = objectsList)}
+                ref={
+                  // $FlowFixMe Make this component functional.
+                  objectsList => (this._objectsList = objectsList)
+                }
                 unsavedChanges={this.props.unsavedChanges}
                 hotReloadPreviewButtonProps={
                   this.props.hotReloadPreviewButtonProps
@@ -1542,6 +1560,14 @@ export default class SceneEditor extends React.Component<Props, State> {
             </React.Fragment>
           )}
         </I18n>
+        {this.state.exportedObject && (
+          <ObjectExporterDialog
+            object={this.state.exportedObject}
+            onClose={() => {
+              this.openObjectExporterDialog(null);
+            }}
+          />
+        )}
         {!!this.state.editedGroup && (
           <ObjectGroupEditorDialog
             project={project}

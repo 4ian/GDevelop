@@ -99,7 +99,6 @@ export default class LocalEventsFunctionsExtensionWriter {
       .toJSArray()
       .forEach(name => exportedObject.removeBehavior(name));
     const serializedObject = serializeToJSObject(exportedObject);
-    exportedObject.delete();
     return writeJSONFile(serializedObject, filepath).catch(err => {
       console.error('Unable to write the object:', err);
       throw err;

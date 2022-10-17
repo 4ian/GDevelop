@@ -26,25 +26,25 @@ const interpolateText = (text?: string, data: { [key: string]: string }) => {
   return formattedText;
 };
 
-const isStepDone = (
-  nextStepTrigger?: ?InAppTutorialFlowStepTrigger
+const isDomBasedTriggerComplete = (
+  trigger?: ?InAppTutorialFlowStepTrigger
 ): boolean => {
-  if (!nextStepTrigger) return false;
+  if (!trigger) return false;
   if (
-    nextStepTrigger.presenceOfElement &&
-    document.querySelector(nextStepTrigger.presenceOfElement)
+    trigger.presenceOfElement &&
+    document.querySelector(trigger.presenceOfElement)
   ) {
     return true;
   } else if (
-    nextStepTrigger.absenceOfElement &&
-    !document.querySelector(nextStepTrigger.absenceOfElement)
+    trigger.absenceOfElement &&
+    !document.querySelector(trigger.absenceOfElement)
   ) {
     return true;
   }
   return false;
 };
 
-const gatherProjectData = ({
+const gatherProjectDataOnMultipleSteps = ({
   flow,
   startIndex,
   endIndex,
@@ -123,6 +123,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
   );
   const domObserverRef = React.useRef<?MutationObserver>(null);
 
+  // Reset current step index on tutorial change.
   React.useEffect(
     () => {
       setCurrentStepIndex(0);
@@ -144,7 +145,8 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
       // Check if we can go directly to next mandatory (not-skippable) step.
       while (flow[nextStepIndex].skippable && nextStepIndex < flow.length - 1) {
-        if (isStepDone(flow[nextStepIndex].nextStepTrigger)) nextStepIndex += 1;
+        if (isDomBasedTriggerComplete(flow[nextStepIndex].nextStepTrigger))
+          nextStepIndex += 1;
         else break;
       }
 
@@ -165,12 +167,13 @@ const InAppTutorialOrchestrator = React.forwardRef<
       let shouldGoToStepAtIndex: number | null = null;
       // Browse skippable steps in reverse orders to directly go to the
       // furthest step if possible.
+      // TODO: Add support for not-dom based triggers
       for (
         let stepIndex = indexOfNextMandatoryStep;
         stepIndex >= currentStepIndex;
         stepIndex--
       ) {
-        const isThisStepAlreadyDone = isStepDone(
+        const isThisStepAlreadyDone = isDomBasedTriggerComplete(
           flow[stepIndex].nextStepTrigger
         );
         if (isThisStepAlreadyDone) {
@@ -186,7 +189,8 @@ const InAppTutorialOrchestrator = React.forwardRef<
         if (!shortcuts) return;
         for (let shortcutStep of shortcuts) {
           // Find the first shortcut in the list that can be triggered.
-          if (isStepDone(shortcutStep.trigger)) {
+          // TODO: Add support for not-dom based triggers
+          if (isDomBasedTriggerComplete(shortcutStep.trigger)) {
             shouldGoToStepAtIndex = flow.findIndex(
               step => step.id === shortcutStep.stepId
             );
@@ -206,14 +210,13 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
       // If a change of step is going to happen, first record the data for
       // all the steps that are about to be closed.
-      const newData = gatherProjectData({
+      const newData = gatherProjectDataOnMultipleSteps({
         flow,
         startIndex: currentStepIndex,
         endIndex: shouldGoToStepAtIndex - 1,
         data,
         project,
       });
-
       setData(newData);
 
       goToStep(shouldGoToStepAtIndex);
@@ -240,9 +243,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
   React.useImperativeHandle(ref, () => ({ onPreviewLaunch, goToNextStep }));
 
+  // Set up mutation observer to be able to detect any change in the dom.
   React.useEffect(
     () => {
-      const appContainer = document.querySelector('body');
+      const appContainer = document.querySelector('body'); // We could have only watch the React root node but Material UI created dialog out of this node.
       if (!appContainer) return;
       const observer = new MutationObserver(handleDomMutation);
       observer.observe(appContainer, {
@@ -266,15 +270,18 @@ const InAppTutorialOrchestrator = React.forwardRef<
     () => {
       if (!currentStep) return;
       const { id, isOnClosableDialog } = currentStep;
+      // Set expected editor on each step change
       if (id && editorSwitches.hasOwnProperty(id)) {
         setExpectedEditor(editorSwitches[id]);
       }
+      // Set fallback step index to the new step index if it is not on a closable dialog.
       if (!isOnClosableDialog) {
         currentStepFallbackStepIndex.current = currentStepIndex;
       }
       // At each step start, reset change watching logics.
       setWatchElementInputValue(null);
       setWatchSceneInstances(null);
+      // If index out of bounds, display end dialog.
       if (currentStepIndex >= flow.length) {
         setDisplayEndDialog(true);
       }
@@ -282,6 +289,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
     [currentStep, currentStepIndex, flow.length, editorSwitches]
   );
 
+  // Set up watchers if the next step trigger is not dom-based.
   React.useEffect(
     () => {
       if (!currentStep) return;
@@ -290,6 +298,8 @@ const InAppTutorialOrchestrator = React.forwardRef<
         if (!elementToHighlightId) return;
         const elementToWatch = document.querySelector(elementToHighlightId);
 
+        // Flow errors on missing value prop in generic type HTMLElement but this
+        // line cannot break.
         // $FlowFixMe
         if (elementToWatch) InputInitialValueRef.current = elementToWatch.value;
         setWatchElementInputValue(elementToHighlightId);
@@ -305,7 +315,6 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
   const watchInputBeingFilled = React.useCallback(
     () => {
-      console.log('WATCH INPUT');
       if (!watchElementInputValue) return;
       const elementToWatch = document.querySelector(watchElementInputValue);
 
@@ -324,7 +333,6 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
   const watchSceneInstanceChanges = React.useCallback(
     () => {
-      console.log('WATCH INSTANCE');
       if (!watchSceneInstances) return;
       if (!project || project.getLayoutsCount() === 0) return;
       const layout = project.getLayoutAt(0);
@@ -371,7 +379,6 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
   const checkIfWrongEditor = useDebounce(
     () => {
-      console.log('salut');
       setWrongEditorInfoOpen(expectedEditor !== currentEditor);
     },
     wrongEditorInfoOpen ? 0 : 1000

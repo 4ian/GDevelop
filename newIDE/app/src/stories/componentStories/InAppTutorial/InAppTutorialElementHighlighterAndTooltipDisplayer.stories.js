@@ -62,7 +62,6 @@ export const Default = () => {
     } = event;
     setElementToHighlightId(event.target.value);
     if (value === 'element-in-list') {
-      console.log(listItemRef);
       setElementToHighlight(listItemRef);
     }
   };

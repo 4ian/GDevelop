@@ -38,7 +38,7 @@ export default class ObjectField extends React.Component<
   }
 
   focus(selectAll: boolean = false) {
-    const {isFlowRunning} = this.context;
+    const { isFlowRunning } = this.context;
     // Prevent focus of field if an in-app tutorial is running because
     // the popper of the tooltip and the popper of the semi controlled
     // autocomplete's dropdown are conflicting.

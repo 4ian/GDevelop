@@ -30,10 +30,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const OnboardingDialog = ({
-  open,
-  onClose,
-}: Props) => {
+const OnboardingDialog = ({ open, onClose }: Props) => {
   const { startTutorial } = React.useContext(InAppTutorialContext);
 
   const startOnboarding = () => {

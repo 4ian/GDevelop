@@ -14,7 +14,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const styles = { imageLink: { cursor: 'pointer' } };
+const styles = { imageLink: { cursor: 'pointer', maxWidth: 350 } };
 
 function InAppTutorialEndDialog({ endDialog, onClose }: Props) {
   return (

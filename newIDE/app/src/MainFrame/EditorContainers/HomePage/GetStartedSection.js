@@ -4,9 +4,7 @@ import { Line, Column } from '../../../UI/Grid';
 import Text from '../../../UI/Text';
 import { Trans } from '@lingui/macro';
 import { type HomeTab } from './HomePageMenu';
-import { isUserflowRunning } from '../../Onboarding/OnboardingDialog';
 import { isMobile } from '../../../Utils/Platform';
-import optionalRequire from '../../../Utils/OptionalRequire';
 import { sendOnboardingManuallyOpened } from '../../../Utils/Analytics/EventSender';
 import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
 import SectionContainer, { SectionRow } from './SectionContainer';
@@ -18,7 +16,7 @@ import { CardWidget, LARGE_WIDGET_SIZE } from './CardWidget';
 import Checkbox from '../../../UI/Checkbox';
 import { GridList, GridListTile } from '@material-ui/core';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
-const electron = optionalRequire('electron');
+import InAppTutorialContext from '../../../InAppTutorial/InAppTutorialContext';
 
 const getColumnsFromWidth = (width: WidthType) => {
   switch (width) {
@@ -84,8 +82,8 @@ const GetStartedSection = ({
   setShowGetStartedSection,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const shouldShowOnboardingButton =
-    !electron && !isMobile() && windowWidth !== 'small';
+  const { isFlowRunning } = React.useContext(InAppTutorialContext);
+  const shouldShowOnboardingButton = !isMobile() && windowWidth !== 'small';
   const items: {
     key: string,
     title: React.Node,
@@ -148,7 +146,7 @@ const GetStartedSection = ({
                   onOpenOnboardingDialog();
                 }}
                 size="banner"
-                disabled={isUserflowRunning}
+                disabled={isFlowRunning}
               >
                 <ResponsiveLineStackLayout noMargin expand>
                   <img

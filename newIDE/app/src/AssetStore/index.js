@@ -155,7 +155,7 @@ export const AssetStore = ({ project }: Props) => {
       <ResponsiveWindowMeasurer>
         {windowWidth => (
           <>
-            <Column expand noMargin useFullHeight>
+            <Column expand noMargin useFullHeight id="asset-store">
               <Line>
                 <Spacer />
                 <IconButton

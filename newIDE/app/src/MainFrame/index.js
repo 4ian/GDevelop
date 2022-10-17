@@ -671,6 +671,7 @@ const MainFrame = (props: Props) => {
     (): Promise<void> => {
       setHasProjectOpened(false);
       setPreviewState(initialPreviewState);
+      setInAppTutorialProject(null);
       return setState(state => {
         if (!currentProject) {
           // It's important to return a new object to ensure that the promise
@@ -678,14 +679,10 @@ const MainFrame = (props: Props) => {
           return { ...state };
         }
 
-        if (currentProject) {
-          eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
-            currentProject
-          );
-          currentProject.delete();
-        }
-
-        setInAppTutorialProject(null);
+        eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
+          currentProject
+        );
+        currentProject.delete();
 
         return {
           ...state,

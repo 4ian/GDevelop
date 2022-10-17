@@ -5,6 +5,7 @@ import { type InAppTutorial } from '../InAppTutorialContext';
 const inAppTutorial: InAppTutorial = {
   id: 'onboarding',
   editorSwitches: {
+    GoToBuildSection: 'Home',
     ClickOnNewObjectButton1: 'Scene',
     ClickOnNewEvent: 'EventsSheet',
   },
@@ -28,6 +29,35 @@ const inAppTutorial: InAppTutorial = {
     ],
   },
   flow: [
+    {
+      id: 'GoToBuildSection',
+      elementToHighlightId: '#home-build-tab',
+      nextStepTrigger: { presenceOfElement: '#home-create-project-button' },
+      tooltip: {
+        description: 'Head over to the **Build section**',
+        placement: 'right',
+      },
+    },
+    {
+      id: 'CreateProject',
+      elementToHighlightId: '#home-create-project-button',
+      nextStepTrigger: { presenceOfElement: '#create-project-button' },
+      tooltip: {
+        description:
+          "We'll create a simple game with **a character that can collect coins**.\n\nLet's create a new project!",
+      },
+    },
+    {
+      id: 'ValidateProjectCreation',
+      elementToHighlightId: '#create-project-button',
+      nextStepTrigger: {
+        presenceOfElement: '#tab-layout-Untitled-scene-button',
+      },
+      tooltip: {
+        description: "Let's go!",
+      },
+      isOnClosableDialog: true,
+    },
     {
       id: 'ClickOnNewObjectButton1',
       elementToHighlightId: '#add-new-object-button',

@@ -5,7 +5,7 @@
  */
 namespace gdjs {
   /**
-   * Represents a layer of a scene, used to display objects.
+   * Represents a layer of a container, used to display objects.
    *
    * Viewports and multiple cameras are not supported.
    */
@@ -19,10 +19,8 @@ namespace gdjs {
     _initialEffectsData: Array<EffectData>;
     _cameraX: float;
     _cameraY: float;
-    _cachedGameResolutionWidth: integer;
-    _cachedGameResolutionHeight: integer;
 
-    _runtimeScene: gdjs.RuntimeScene;
+    _runtimeScene: gdjs.RuntimeInstanceContainer;
     _effectsManager: gdjs.EffectsManager;
 
     // Lighting layer properties.
@@ -31,26 +29,23 @@ namespace gdjs {
     _clearColor: Array<integer>;
 
     _rendererEffects: Record<string, PixiFiltersTools.Filter> = {};
-    _renderer: LayerRenderer;
+    _renderer: gdjs.LayerRenderer;
 
     /**
      * @param layerData The data used to initialize the layer
-     * @param runtimeScene The scene in which the layer is used
+     * @param instanceContainer The container in which the layer is used
      */
-    constructor(layerData: LayerData, runtimeScene: gdjs.RuntimeScene) {
+    constructor(
+      layerData: LayerData,
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
       this._name = layerData.name;
       this._hidden = !layerData.visibility;
       this._initialEffectsData = layerData.effects || [];
-      this._cameraX = runtimeScene.getGame().getGameResolutionWidth() / 2;
-      this._cameraY = runtimeScene.getGame().getGameResolutionHeight() / 2;
-      this._cachedGameResolutionWidth = runtimeScene
-        .getGame()
-        .getGameResolutionWidth();
-      this._cachedGameResolutionHeight = runtimeScene
-        .getGame()
-        .getGameResolutionHeight();
-      this._runtimeScene = runtimeScene;
-      this._effectsManager = runtimeScene.getGame().getEffectsManager();
+      this._runtimeScene = instanceContainer;
+      this._cameraX = this.getWidth() / 2;
+      this._cameraY = this.getHeight() / 2;
+      this._effectsManager = instanceContainer.getGame().getEffectsManager();
       this._isLightingLayer = layerData.isLightingLayer;
       this._followBaseLayerCamera = layerData.followBaseLayerCamera;
       this._clearColor = [
@@ -59,7 +54,11 @@ namespace gdjs {
         layerData.ambientLightColorB / 255,
         1.0,
       ];
-      this._renderer = new gdjs.LayerRenderer(this, runtimeScene.getRenderer());
+      this._renderer = new gdjs.LayerRenderer(
+        this,
+        instanceContainer.getRenderer(),
+        instanceContainer.getGame().getRenderer().getPIXIRenderer()
+      );
       this.show(!this._hidden);
       for (let i = 0; i < layerData.effects.length; ++i) {
         this.addEffect(layerData.effects[i]);
@@ -90,16 +89,10 @@ namespace gdjs {
      * Called by the RuntimeScene whenever the game resolution size is changed.
      * Updates the layer width/height and position.
      */
-    onGameResolutionResized(): void {
-      const oldGameResolutionWidth = this._cachedGameResolutionWidth;
-      const oldGameResolutionHeight = this._cachedGameResolutionHeight;
-      this._cachedGameResolutionWidth = this._runtimeScene
-        .getGame()
-        .getGameResolutionWidth();
-      this._cachedGameResolutionHeight = this._runtimeScene
-        .getGame()
-        .getGameResolutionHeight();
-
+    onGameResolutionResized(
+      oldGameResolutionOriginX: float,
+      oldGameResolutionOriginY: float
+    ): void {
       // Adapt position of the camera center as:
       // * Most cameras following a player/object on the scene will be updating this
       // in events anyway.
@@ -108,24 +101,24 @@ namespace gdjs {
       // move from its initial position (which is centered in the screen) - and anchor
       // behavior would behave counterintuitively.
       this._cameraX +=
-        (this._cachedGameResolutionWidth - oldGameResolutionWidth) / 2;
+        this._runtimeScene.getViewportOriginX() - oldGameResolutionOriginX;
       this._cameraY +=
-        (this._cachedGameResolutionHeight - oldGameResolutionHeight) / 2;
+        this._runtimeScene.getViewportOriginY() - oldGameResolutionOriginY;
       this._renderer.updatePosition();
     }
 
     /**
-     * Returns the scene the layer belongs to
-     * @returns the scene the layer belongs to
+     * Returns the scene the layer belongs to directly or indirectly
+     * @returns the scene the layer belongs to directly or indirectly
      */
     getRuntimeScene(): gdjs.RuntimeScene {
-      return this._runtimeScene;
+      return this._runtimeScene.getScene();
     }
 
     /**
      * Called at each frame, after events are run and before rendering.
      */
-    updatePreRender(runtimeScene?: gdjs.RuntimeScene): void {
+    updatePreRender(instanceContainer?: gdjs.RuntimeInstanceContainer): void {
       if (this._followBaseLayerCamera) {
         this.followBaseLayer();
       }
@@ -148,6 +141,7 @@ namespace gdjs {
      * @return The x position of the camera
      */
     getCameraX(cameraId?: integer): float {
+      this._forceDimensionUpdate();
       return this._cameraX;
     }
 
@@ -158,6 +152,7 @@ namespace gdjs {
      * @return The y position of the camera
      */
     getCameraY(cameraId?: integer): float {
+      this._forceDimensionUpdate();
       return this._cameraY;
     }
 
@@ -168,6 +163,7 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      */
     setCameraX(x: float, cameraId?: integer): void {
+      this._forceDimensionUpdate();
       this._cameraX = x;
       this._renderer.updatePosition();
     }
@@ -179,6 +175,7 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      */
     setCameraY(y: float, cameraId?: integer): void {
+      this._forceDimensionUpdate();
       this._cameraY = y;
       this._renderer.updatePosition();
     }
@@ -191,7 +188,7 @@ namespace gdjs {
      * @return The width of the camera
      */
     getCameraWidth(cameraId?: integer): float {
-      return (+this._cachedGameResolutionWidth * 1) / this._zoomFactor;
+      return this.getWidth() / this._zoomFactor;
     }
 
     /**
@@ -202,7 +199,7 @@ namespace gdjs {
      * @return The height of the camera
      */
     getCameraHeight(cameraId?: integer): float {
-      return (+this._cachedGameResolutionHeight * 1) / this._zoomFactor;
+      return this.getHeight() / this._zoomFactor;
     }
 
     /**
@@ -268,15 +265,51 @@ namespace gdjs {
 
     /**
      * Convert a point from the canvas coordinates (for example,
-     * the mouse position) to the scene coordinates.
+     * the mouse position) to the container coordinates.
      *
      * @param x The x position, in canvas coordinates.
      * @param y The y position, in canvas coordinates.
      * @param cameraId The camera number. Currently ignored.
+     * @param result The point instance that is used to return the result.
      */
-    convertCoords(x: float, y: float, cameraId?: integer): FloatPoint {
-      x -= this._cachedGameResolutionWidth / 2;
-      y -= this._cachedGameResolutionHeight / 2;
+    convertCoords(
+      x: float,
+      y: float,
+      cameraId: integer = 0,
+      result: FloatPoint
+    ): FloatPoint {
+      // The result parameter used to be optional.
+      let position = result || [0, 0];
+      // TODO EBO use an AffineTransformation to avoid chained calls.
+      position = this._runtimeScene.convertCoords(x, y, position);
+      return this.applyLayerInverseTransformation(
+        position[0],
+        position[1],
+        cameraId,
+        position
+      );
+    }
+
+    /**
+     * Return an array containing the coordinates of the point passed as parameter
+     * in layer local coordinates (as opposed to the parent coordinates).
+     *
+     * All transformations (scale, rotation) are supported.
+     *
+     * @param x The X position of the point, in parent coordinates.
+     * @param y The Y position of the point, in parent coordinates.
+     * @param result Array that will be updated with the result
+     * @param result The point instance that is used to return the result.
+     * (x and y position of the point in layer coordinates).
+     */
+    applyLayerInverseTransformation(
+      x: float,
+      y: float,
+      cameraId: integer,
+      result: FloatPoint
+    ): FloatPoint {
+      x -= this._runtimeScene.getViewportOriginX();
+      y -= this._runtimeScene.getViewportOriginY();
       x /= Math.abs(this._zoomFactor);
       y /= Math.abs(this._zoomFactor);
 
@@ -287,18 +320,54 @@ namespace gdjs {
       const sinValue = Math.sin(angleInRadians);
       x = cosValue * x - sinValue * y;
       y = sinValue * tmp + cosValue * y;
-      return [x + this.getCameraX(cameraId), y + this.getCameraY(cameraId)];
+      result[0] = x + this.getCameraX(cameraId);
+      result[1] = y + this.getCameraY(cameraId);
+
+      return result;
     }
 
     /**
-     * Convert a point from the scene coordinates (for example,
+     * Convert a point from the container coordinates (for example,
      * an object position) to the canvas coordinates.
      *
-     * @param x The x position, in scene coordinates.
-     * @param y The y position, in scene coordinates.
+     * @param x The x position, in container coordinates.
+     * @param y The y position, in container coordinates.
      * @param cameraId The camera number. Currently ignored.
+     * @param result The point instance that is used to return the result.
      */
-    convertInverseCoords(x: float, y: float, cameraId?: integer): FloatPoint {
+    convertInverseCoords(
+      x: float,
+      y: float,
+      cameraId: integer = 0,
+      result: FloatPoint
+    ): FloatPoint {
+      let position = result || [0, 0];
+      // TODO EBO use an AffineTransformation to avoid chained calls.
+      this.applyLayerTransformation(x, y, cameraId, position);
+      return this._runtimeScene.convertInverseCoords(
+        position[0],
+        position[1],
+        position
+      );
+    }
+
+    /**
+     * Return an array containing the coordinates of the point passed as parameter
+     * in parent coordinate coordinates (as opposed to the layer local coordinates).
+     *
+     * All transformations (scale, rotation) are supported.
+     *
+     * @param x The X position of the point, in layer coordinates.
+     * @param y The Y position of the point, in layer coordinates.
+     * @param result Array that will be updated with the result
+     * (x and y position of the point in parent coordinates).
+     */
+    applyLayerTransformation(
+      x: float,
+      y: float,
+      cameraId: integer,
+      result: FloatPoint
+    ): FloatPoint {
       x -= this.getCameraX(cameraId);
       y -= this.getCameraY(cameraId);
 
@@ -311,18 +380,31 @@ namespace gdjs {
       y = sinValue * tmp + cosValue * y;
       x *= Math.abs(this._zoomFactor);
       y *= Math.abs(this._zoomFactor);
-      return [
-        x + this._cachedGameResolutionWidth / 2,
-        y + this._cachedGameResolutionHeight / 2,
-      ];
+      x += this._runtimeScene.getViewportOriginX();
+      y += this._runtimeScene.getViewportOriginY();
+
+      result[0] = x;
+      result[1] = y;
+      return result;
     }
 
     getWidth(): float {
-      return this._cachedGameResolutionWidth;
+      return this._runtimeScene.getViewportWidth();
     }
 
     getHeight(): float {
-      return this._cachedGameResolutionHeight;
+      return this._runtimeScene.getViewportHeight();
+    }
+
+    /**
+     * This ensure that the viewport dimensions are up to date.
+     *
+     * It's needed because custom objects dimensions are only updated on
+     * demand for efficiency reasons.
+     */
+    private _forceDimensionUpdate(): void {
+      // This will update dimensions.
+      this._runtimeScene.getViewportWidth();
     }
 
     /**
@@ -464,10 +546,12 @@ namespace gdjs {
     /**
      * Return the time elapsed since the last frame,
      * in milliseconds, for objects on the layer.
+     *
+     * @param instanceContainer The instance container the layer belongs to (deprecated - can be omitted).
      */
-    getElapsedTime(runtimeScene?: RuntimeScene): float {
-      runtimeScene = runtimeScene || this._runtimeScene;
-      return runtimeScene.getTimeManager().getElapsedTime() * this._timeScale;
+    getElapsedTime(instanceContainer?: gdjs.RuntimeInstanceContainer): float {
+      const container = instanceContainer || this._runtimeScene;
+      return container.getElapsedTime() * this._timeScale;
     }
 
     /**

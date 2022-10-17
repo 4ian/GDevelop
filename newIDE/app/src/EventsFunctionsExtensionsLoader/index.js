@@ -23,6 +23,7 @@ export type EventsFunctionCodeWriter = {|
   getIncludeFileFor: (functionName: string) => string,
   writeFunctionCode: (functionName: string, code: string) => Promise<void>,
   writeBehaviorCode: (behaviorName: string, code: string) => Promise<void>,
+  writeObjectCode: (objectName: string, code: string) => Promise<void>,
 |};
 
 export type IncludeFileContent = {|
@@ -516,13 +517,18 @@ function generateObject(
   options: Options,
   codeGenerationContext: CodeGenerationContext
 ): Promise<void> {
-  const objectMetadata = declareObjectMetadata(extension, eventsBasedObject);
+  const objectMetadata = declareObjectMetadata(
+    options.i18n,
+    extension,
+    eventsBasedObject
+  );
 
   const eventsFunctionsContainer = eventsBasedObject.getEventsFunctions();
   const codeNamespace = getObjectFunctionCodeNamespace(
     eventsBasedObject,
     codeGenerationContext.codeNamespacePrefix
   );
+  // TODO EBO Handle name collision between objects and behaviors.
   const includeFile = options.eventsFunctionCodeWriter.getIncludeFileFor(
     codeNamespace
   );
@@ -579,9 +585,39 @@ function generateObject(
 
     // Generate code for the object and its methods
     if (!options.skipCodeGeneration) {
-      // TODO EBO Generate the code.
+      const includeFiles = new gd.SetString();
+      const objectCodeGenerator = new gd.ObjectCodeGenerator(project);
+      const code = objectCodeGenerator.generateRuntimeObjectCompleteCode(
+        eventsFunctionsExtension.getName(),
+        eventsBasedObject,
+        codeNamespace,
+        objectMethodMangledNames,
+        includeFiles,
+
+        // For now, always generate functions for runtime (this disables
+        // generation of profiling for groups (see EventsCodeGenerator))
+        // as extensions generated can be used either for preview or export.
+        true
+      );
+      objectCodeGenerator.delete();
       objectMethodMangledNames.delete();
-      return Promise.resolve();
+
+      // Add any include file required by the functions to the list
+      // of include files for this object (so that when used, the "dependencies"
+      // are transitively included).
+      includeFiles
+        .toNewVectorString()
+        .toJSArray()
+        .forEach((includeFile: string) => {
+          objectMetadata.addIncludeFile(includeFile);
+        });
+
+      includeFiles.delete();
+
+      return options.eventsFunctionCodeWriter.writeObjectCode(
+        codeNamespace,
+        code
+      );
     } else {
       // Skip code generation
       objectMethodMangledNames.delete();

@@ -25,7 +25,9 @@ namespace gdjs {
        * In **rare cases** you may want to run code at the start of the scene. You can define a callback
        * that will be called at this moment.
        */
-      gdjs.registerRuntimeSceneLoadedCallback(function (runtimeScene) {
+      gdjs.registerRuntimeSceneLoadedCallback(function (
+        runtimeScene: gdjs.RuntimeScene
+      ) {
         logger.log('A gdjs.RuntimeScene was loaded:', runtimeScene);
       });
 
@@ -33,7 +35,9 @@ namespace gdjs {
        * In **rare cases** you may want to run code at the end of a scene. You can define a callback
        * that will be called at this moment.
        */
-      gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
+      gdjs.registerRuntimeSceneUnloadedCallback(function (
+        runtimeScene: gdjs.RuntimeScene
+      ) {
         logger.log('A gdjs.RuntimeScene was unloaded:', runtimeScene);
       });
 
@@ -41,12 +45,12 @@ namespace gdjs {
        * In **very rare cases** you may want to run code whenever an object is deleted.
        */
       gdjs.registerObjectDeletedFromSceneCallback(function (
-        runtimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         runtimeObject
       ) {
         logger.log(
           'A gdjs.RuntimeObject was deleted from a gdjs.RuntimeScene:',
-          runtimeScene,
+          instanceContainer,
           runtimeObject
         );
       });

@@ -16,11 +16,11 @@ namespace gdjs {
 
     /**
      * @param runtimeObject The object to render
-     * @param runtimeScene The gdjs.RuntimeScene in which the object is
+     * @param instanceContainer The gdjs.RuntimeScene in which the object is
      */
     constructor(
       runtimeObject: gdjs.TileMapRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
 
@@ -31,7 +31,7 @@ namespace gdjs {
       this._pixiObject = new PIXI.tilemap.CompositeTilemap();
       this._pixiObject.tileAnim = [0, 0];
 
-      runtimeScene
+      instanceContainer
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
@@ -44,7 +44,7 @@ namespace gdjs {
       return this._pixiObject;
     }
 
-    incrementAnimationFrameX(runtimeScene: gdjs.RuntimeScene) {
+    incrementAnimationFrameX(instanceContainer: gdjs.RuntimeInstanceContainer) {
       this._pixiObject.tileAnim[0] += 1;
     }
 

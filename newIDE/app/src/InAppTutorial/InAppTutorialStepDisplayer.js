@@ -3,14 +3,14 @@ import React from 'react';
 import { useInterval } from '../Utils/UseInterval';
 import { getElementAncestry } from './HTMLUtils';
 import {
-  type InAppTutorialFlowStep,
+  type InAppTutorialFlowFormattedStep,
   type EditorIdentifier,
 } from './InAppTutorialContext';
 import InAppTutorialElementHighlighter from './InAppTutorialElementHighlighter';
 import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
 
 type Props = {|
-  step: InAppTutorialFlowStep,
+  step: InAppTutorialFlowFormattedStep,
   expectedEditor: EditorIdentifier | null,
   goToFallbackStep: () => void,
 |};

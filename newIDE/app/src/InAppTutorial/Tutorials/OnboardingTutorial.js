@@ -1,5 +1,6 @@
 // @flow
 
+import { t } from '@lingui/macro';
 import { type InAppTutorial } from '../InAppTutorialContext';
 
 const inAppTutorial: InAppTutorial = {
@@ -12,8 +13,19 @@ const inAppTutorial: InAppTutorial = {
   endDialog: {
     content: [
       {
-        text:
-          '## Congratulations! 🎉\n\n## You’ve built your first game! 😊\n\nYou’re now ready to learn the basics of GDevelop\n\nClick the image to start!\n\n👇👇👇',
+        messageDescriptor: t`## Congratulations! 🎉`,
+      },
+      {
+        messageDescriptor: t`### You’ve built your first game! 😊`,
+      },
+      {
+        messageDescriptor: t`You’re now ready to learn the basics of GDevelop.`,
+      },
+      {
+        messageDescriptor: t`Click the image to start!`,
+      },
+      {
+        messageDescriptor: t`👇👇👇`,
       },
       {
         cta: {
@@ -23,8 +35,13 @@ const inAppTutorial: InAppTutorial = {
         },
       },
       {
-        text:
-          '### Want to skip the basics?\n\nGo to the "Learn" section on the app to explore advanced materials.\n\nHave fun!',
+        messageDescriptor: t`### Want to skip the basics?`,
+      },
+      {
+        messageDescriptor: t`Go to the "Learn" section on the app to explore advanced materials.`,
+      },
+      {
+        messageDescriptor: t`Have fun!`,
       },
     ],
   },
@@ -34,7 +51,9 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#home-build-tab',
       nextStepTrigger: { presenceOfElement: '#home-create-project-button' },
       tooltip: {
-        description: 'Head over to the **Build section**',
+        description: {
+          messageDescriptor: t`Head over to the **Build section**`,
+        },
         placement: 'right',
       },
     },
@@ -43,8 +62,10 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#home-create-project-button',
       nextStepTrigger: { presenceOfElement: '#create-project-button' },
       tooltip: {
-        description:
-          "We'll create a simple game with **a character that can collect coins**.\n\nLet's create a new project!",
+        description: {
+          messageDescriptor: t`We'll create a simple game with **a character that can collect coins**.
+          Let's create a new project!`,
+        },
       },
     },
     {
@@ -54,7 +75,7 @@ const inAppTutorial: InAppTutorial = {
         presenceOfElement: '#tab-layout-Untitled-scene-button',
       },
       tooltip: {
-        description: "Let's go!",
+        description: { messageDescriptor: t`Let's go!` },
       },
       isOnClosableDialog: true,
     },
@@ -64,9 +85,10 @@ const inAppTutorial: InAppTutorial = {
       nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
       tooltip: {
         placement: 'left',
-        title: "Let's create an **object**",
-        description:
-          '👉 Everything you see in a game is an **object**: your character, the enemies, coins and potions, platforms or trees, ...',
+        title: { messageDescriptor: t`Let's create an **object**` },
+        description: {
+          messageDescriptor: t`👉 Everything you see in a game is an **object**: your character, the enemies, coins and potions, platforms or trees, ...`,
+        },
       },
     },
     {
@@ -74,7 +96,9 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#asset-store-tab',
       nextStepTrigger: { presenceOfElement: '#asset-store' },
       tooltip: {
-        description: "Let's choose an object from the asset store.",
+        description: {
+          messageDescriptor: t`Let's choose an object from the asset store.`,
+        },
         placement: 'bottom',
       },
       skippable: true,
@@ -85,8 +109,10 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#asset-store-search-bar',
       nextStepTrigger: { elementIsFilled: true },
       tooltip: {
-        title: 'Choose an asset to represent your main character!',
-        description: 'Tip: search for “wizard”.',
+        title: {
+          messageDescriptor: t`Choose an asset to represent your main character!`,
+        },
+        description: { messageDescriptor: t`Tip: search for “wizard”.` },
       },
       skippable: true,
       isOnClosableDialog: true,
@@ -101,7 +127,9 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#add-asset-button',
       isTriggerFlickering: true,
       nextStepTrigger: { presenceOfElement: '#object-item-0' },
-      tooltip: { description: 'Add this asset to your project.' },
+      tooltip: {
+        description: { messageDescriptor: t`Add this asset to your project.` },
+      },
       mapProjectData: {
         firstObject: 'lastProjectObjectName',
       },
@@ -112,8 +140,9 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#new-object-dialog #close-button',
       nextStepTrigger: { absenceOfElement: '#new-object-dialog' },
       tooltip: {
-        description:
-          "Great! Our game now has an **object**, let's see what we can do with it.",
+        description: {
+          messageDescriptor: t`Great! Our game now has an **object**, let's see what we can do with it.`,
+        },
       },
     },
     {
@@ -121,7 +150,9 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#object-item-0',
       nextStepTrigger: { instanceDraggedOnScene: 'firstObject' },
       tooltip: {
-        description: 'Drag {firstObject} from the menu to the canvas.',
+        description: {
+          messageDescriptor: t`Drag $(firstObject) from the menu to the canvas.`,
+        },
         placement: 'left',
       },
     },
@@ -130,8 +161,10 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#object-item-0',
       nextStepTrigger: { presenceOfElement: '#object-editor-dialog' },
       tooltip: {
-        title: "Let's make our character move! 🛹",
-        description: 'Here, right-click on it and click “Edit **behaviors**”',
+        title: { messageDescriptor: t`Let's make our character move! 🛹` },
+        description: {
+          messageDescriptor: t`Here, right-click on it and click “Edit **behaviors**”`,
+        },
         placement: 'left',
       },
     },
@@ -140,7 +173,9 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#behaviors-tab',
       nextStepTrigger: { presenceOfElement: '#add-behavior-button' },
       tooltip: {
-        description: 'See the **behaviors** of your object here.',
+        description: {
+          messageDescriptor: t`See the **behaviors** of your object here.`,
+        },
         placement: 'bottom',
       },
       skippable: true,
@@ -154,9 +189,10 @@ const inAppTutorial: InAppTutorial = {
           '#behavior-item-TopDownMovementBehavior--TopDownMovementBehavior',
       },
       tooltip: {
-        title: 'Let’s add a **behavior**!',
-        description:
-          '👉 Behaviors add features to objects in a matter of clicks. They are very powerful!',
+        title: { messageDescriptor: t`Let’s add a **behavior**!` },
+        description: {
+          messageDescriptor: t`👉 Behaviors add features to objects in a matter of clicks. They are very powerful!`,
+        },
         placement: 'bottom',
       },
       isOnClosableDialog: true,
@@ -169,7 +205,9 @@ const inAppTutorial: InAppTutorial = {
         presenceOfElement: '#behavior-parameters-TopDownMovement',
       },
       tooltip: {
-        description: 'Add the "Top down movement" **behavior**.',
+        description: {
+          messageDescriptor: t`Add the "Top down movement" **behavior**.`,
+        },
         placement: 'bottom',
       },
       isOnClosableDialog: true,
@@ -181,8 +219,9 @@ const inAppTutorial: InAppTutorial = {
         absenceOfElement: '#object-editor-dialog',
       },
       tooltip: {
-        description:
-          "The parameters above help you customise the **behavior**, but let's ignore them for now.",
+        description: {
+          messageDescriptor: t`The parameters above help you customise the **behavior**, but let's ignore them for now.`,
+        },
         placement: 'top',
       },
       isOnClosableDialog: true,
@@ -192,9 +231,10 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#toolbar-preview-button',
       nextStepTrigger: { previewLaunched: true },
       tooltip: {
-        title: "Let's play! 🎮",
-        description:
-          'Click on "**Preview**" and move your character with the **arrow keys**!',
+        title: { messageDescriptor: t`Let's play! 🎮` },
+        description: {
+          messageDescriptor: t`Click on "**Preview**" and move your character with the **arrow keys**!`,
+        },
         placement: 'bottom',
       },
     },
@@ -205,8 +245,9 @@ const inAppTutorial: InAppTutorial = {
         clickOnButton: "I'm done",
       },
       tooltip: {
-        description:
-          "Once you're done testing, close the **preview** and come back here.",
+        description: {
+          messageDescriptor: t`Once you're done testing, close the **preview** and come back here.`,
+        },
         placement: 'bottom',
       },
     },
@@ -216,8 +257,9 @@ const inAppTutorial: InAppTutorial = {
       nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
       tooltip: {
         placement: 'left',
-        title:
-          "Let's now add another **object** that {firstObject} can collect!",
+        title: {
+          messageDescriptor: t`Let's now add another **object** that $(firstObject) can collect!`,
+        },
       },
     },
     {
@@ -225,7 +267,9 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#asset-store-tab',
       nextStepTrigger: { presenceOfElement: '#asset-store' },
       tooltip: {
-        description: "Let's choose an object from the asset store.",
+        description: {
+          messageDescriptor: t`Let's choose an object from the asset store.`,
+        },
         placement: 'bottom',
       },
       skippable: true,
@@ -236,7 +280,9 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#asset-store-search-bar',
       nextStepTrigger: { elementIsFilled: true },
       tooltip: {
-        description: 'Search for “coin” (or a potion, food, ...).',
+        description: {
+          messageDescriptor: t`Search for “coin” (or a potion, food, ...).`,
+        },
       },
       isOnClosableDialog: true,
       shortcuts: [
@@ -266,8 +312,9 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#new-object-dialog #close-button',
       nextStepTrigger: { absenceOfElement: '#new-object-dialog' },
       tooltip: {
-        description:
-          "Great! Our game now has 2 **objects**, let's see what we can do with them.",
+        description: {
+          messageDescriptor: t`Great! Our game now has 2 **objects**, let's see what we can do with them.`,
+        },
       },
     },
     {
@@ -275,8 +322,9 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#object-item-1',
       nextStepTrigger: { instanceDraggedOnScene: 'secondObject' },
       tooltip: {
-        description:
-          'Place a few {secondObject} in the scene by dragging them to the canvas.',
+        description: {
+          messageDescriptor: t`Place a few $(secondObject) in the scene by dragging them to the canvas.`,
+        },
         placement: 'left',
       },
     },
@@ -285,8 +333,9 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '[id^=tab-layout-events]',
       nextStepTrigger: { presenceOfElement: '#add-event-button' },
       tooltip: {
-        description:
-          "Now let's make {firstObject} collect the {secondObject}! Go to the **events** tab of the **scene**.",
+        description: {
+          messageDescriptor: t`Now let's make $(firstObject) collect the $(secondObject)! Go to the **events** tab of the **scene**.`,
+        },
         placement: 'bottom',
       },
     },
@@ -295,8 +344,10 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#add-event-button',
       nextStepTrigger: { presenceOfElement: '#add-condition-button' },
       tooltip: {
-        title: 'Let’s add an **event**!',
-        description: '👉 **Events** are the logic to your game.',
+        title: { messageDescriptor: t`Let’s add an **event**!` },
+        description: {
+          messageDescriptor: t`👉 **Events** are the logic to your game.`,
+        },
         placement: 'bottom',
       },
     },
@@ -305,8 +356,12 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#add-condition-button',
       nextStepTrigger: { presenceOfElement: '#instruction-editor-dialog' },
       tooltip: {
-        description:
-          '**Events** are made of a condition and an action:\n\nCondition: "**If** {firstObject} touches the {secondObject}..."\n\nAction: "... **then** the {secondObject} disappears"\n\n**Click "Add condition**"',
+        description: {
+          messageDescriptor: t`**Events** are made of a condition and an action:
+          Condition: "**If** $(firstObject) touches the $(secondObject)..."
+          Action: "... **then** the $(secondObject) disappears"
+          **Click "Add condition**"`,
+        },
         placement: 'bottom',
       },
     },
@@ -315,7 +370,7 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#instruction-editor-dialog #object-item-0',
       nextStepTrigger: { presenceOfElement: '#object-instruction-selector' },
       tooltip: {
-        description: 'Choose {firstObject}',
+        description: { messageDescriptor: t`Choose $(firstObject)` },
         placement: 'bottom',
       },
       isOnClosableDialog: true,
@@ -327,7 +382,9 @@ const inAppTutorial: InAppTutorial = {
         presenceOfElement: '#instruction-parameters-container',
       },
       tooltip: {
-        description: 'Then the condition we want to use: **"Collision"**.',
+        description: {
+          messageDescriptor: t`Then the condition we want to use: **"Collision"**.`,
+        },
         placement: 'bottom',
       },
       isOnClosableDialog: true,
@@ -337,7 +394,9 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#parameter-1-object-selector',
       nextStepTrigger: { elementIsFilled: true },
       tooltip: {
-        description: 'Finally, select the target **object** ({secondObject}).',
+        description: {
+          messageDescriptor: t`Finally, select the target **object** ($(secondObject)).`,
+        },
         placement: 'top',
       },
       isOnClosableDialog: true,
@@ -347,7 +406,7 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#instruction-editor-dialog #ok-button',
       nextStepTrigger: { absenceOfElement: '#instruction-editor-dialog' },
       tooltip: {
-        description: "We're good.",
+        description: { messageDescriptor: t`We're good.` },
         placement: 'top',
       },
     },
@@ -356,8 +415,9 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#add-action-button',
       nextStepTrigger: { presenceOfElement: '#instruction-editor-dialog' },
       tooltip: {
-        description:
-          "Let's add **what happens when the condition is met**: make {secondObject} disappear.",
+        description: {
+          messageDescriptor: t`Let's add **what happens when the condition is met**: make $(secondObject) disappear.`,
+        },
         placement: 'bottom',
       },
     },
@@ -366,7 +426,7 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#instruction-editor-dialog #object-item-1',
       nextStepTrigger: { presenceOfElement: '#object-instruction-selector' },
       tooltip: {
-        description: 'Choose {secondObject}',
+        description: { messageDescriptor: t`Choose $(secondObject)` },
         placement: 'bottom',
       },
       isOnClosableDialog: true,
@@ -378,8 +438,9 @@ const inAppTutorial: InAppTutorial = {
         presenceOfElement: '#instruction-parameters-container',
       },
       tooltip: {
-        description:
-          'Then choose the **action** {secondObject} will receive : "Delete", as we want to remove it.',
+        description: {
+          messageDescriptor: t`Then choose the **action** $(secondObject) will receive : "Delete", as we want to remove it.`,
+        },
         placement: 'bottom',
       },
       isOnClosableDialog: true,
@@ -389,7 +450,7 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#instruction-editor-dialog #ok-button',
       nextStepTrigger: { absenceOfElement: '#instruction-editor-dialog' },
       tooltip: {
-        description: 'Nothing more is needed!',
+        description: { messageDescriptor: t`Nothing more is needed!` },
         placement: 'top',
       },
     },
@@ -398,7 +459,7 @@ const inAppTutorial: InAppTutorial = {
       elementToHighlightId: '#toolbar-preview-button',
       nextStepTrigger: { previewLaunched: true },
       tooltip: {
-        title: "Let's see how it works! 🎮",
+        title: { messageDescriptor: t`Let's see how it works! 🎮` },
         placement: 'bottom',
       },
     },
@@ -409,8 +470,9 @@ const inAppTutorial: InAppTutorial = {
         clickOnButton: "I'm done",
       },
       tooltip: {
-        description:
-          "Once you're done testing, close the **preview** and come back here.",
+        description: {
+          messageDescriptor: t`Once you're done testing, close the **preview** and come back here.`,
+        },
         placement: 'bottom',
       },
     },

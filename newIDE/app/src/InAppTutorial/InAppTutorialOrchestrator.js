@@ -1,19 +1,23 @@
 // @flow
 import * as React from 'react';
+import { I18n } from '@lingui/react';
+import { I18n as I18nType } from '@lingui/core';
 import { useDebounce } from '../Utils/UseDebounce';
 import { useInterval } from '../Utils/UseInterval';
 import {
   type InAppTutorial,
   type InAppTutorialFlowStep,
+  type InAppTutorialFlowFormattedStep,
   type InAppTutorialFlowStepTrigger,
+  type TranslatedText,
   type EditorIdentifier,
 } from './InAppTutorialContext';
 import InAppTutorialEndDialog from './InAppTutorialEndDialog';
 import InAppTutorialStepDisplayer from './InAppTutorialStepDisplayer';
+import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 
-const interpolateText = (text?: string, data: { [key: string]: string }) => {
-  if (!text) return undefined;
-  const placeholderReplacingRegex = /{(\w+)}/g;
+const interpolateText = (text: string, data: { [key: string]: string }) => {
+  const placeholderReplacingRegex = /\$\((\w+)\)/g;
   const match = text.matchAll(placeholderReplacingRegex);
   let formattedText = text;
   [...match].forEach(match => {
@@ -24,6 +28,25 @@ const interpolateText = (text?: string, data: { [key: string]: string }) => {
     }
   });
   return formattedText;
+};
+
+const translateAndInterpolateText = ({
+  text,
+  data,
+  i18n,
+}: {|
+  text?: TranslatedText,
+  data: { [key: string]: string },
+  i18n: I18nType,
+|}) => {
+  if (!text) return undefined;
+  let translatedText;
+  if (text.messageByLocale) {
+    translatedText = selectMessageByLocale(i18n, text.messageByLocale);
+  } else {
+    translatedText = i18n._(text.messageDescriptor, data);
+  }
+  return interpolateText(translatedText, data);
 };
 
 const isDomBasedTriggerComplete = (
@@ -353,16 +376,24 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
   console.log(currentStepIndex);
 
-  const renderStepDisplayer = () => {
+  const renderStepDisplayer = (i18n: I18nType) => {
     if (!currentStep) return null;
     const stepTooltip = currentStep.tooltip;
-    const formattedStep: InAppTutorialFlowStep = {
+    const formattedStep: InAppTutorialFlowFormattedStep = {
       ...flow[currentStepIndex],
       tooltip: stepTooltip
         ? {
             ...stepTooltip,
-            title: interpolateText(stepTooltip.title, data),
-            description: interpolateText(stepTooltip.description, data),
+            title: translateAndInterpolateText({
+              text: stepTooltip.title,
+              data,
+              i18n,
+            }),
+            description: translateAndInterpolateText({
+              text: stepTooltip.description,
+              data,
+              i18n,
+            }),
           }
         : undefined,
     };
@@ -392,18 +423,22 @@ const InAppTutorialOrchestrator = React.forwardRef<
   );
 
   return (
-    <>
-      {renderStepDisplayer()}
-      {displayEndDialog && (
-        <InAppTutorialEndDialog
-          endDialog={endDialog}
-          onClose={() => {
-            setDisplayEndDialog(false);
-            endTutorial();
-          }}
-        />
+    <I18n>
+      {({ i18n }) => (
+        <>
+          {renderStepDisplayer(i18n)}
+          {displayEndDialog && (
+            <InAppTutorialEndDialog
+              endDialog={endDialog}
+              onClose={() => {
+                setDisplayEndDialog(false);
+                endTutorial();
+              }}
+            />
+          )}
+        </>
       )}
-    </>
+    </I18n>
   );
 });
 

@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import { Column, LargeSpacer } from '../UI/Grid';
 import { getDisplayZIndexForHighlighter } from './HTMLUtils';
 import InAppTutorialContext, {
-  type InAppTutorialTooltip,
+  type InAppTutorialFormattedTooltip,
 } from './InAppTutorialContext';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { makeStyles } from '@material-ui/core/styles';
@@ -16,7 +16,7 @@ import RaisedButton from '../UI/RaisedButton';
 
 type Props = {|
   anchorElement: HTMLElement,
-  tooltip: InAppTutorialTooltip,
+  tooltip: InAppTutorialFormattedTooltip,
   buttonLabel?: string,
 |};
 

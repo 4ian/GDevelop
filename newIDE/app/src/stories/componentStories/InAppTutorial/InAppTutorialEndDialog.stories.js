@@ -15,8 +15,14 @@ export default {
 const endDialog = {
   content: [
     {
-      text:
-        '## Congratulations\n\nyou made it until the end of the tutorial!\n\nYou can be proud. You just discovered all the **concepts** of GDevelop',
+      messageByLocale: { en: '## Congratulations' },
+    },
+    { messageByLocale: { en: 'you made it until the end of the tutorial!' } },
+    {
+      messageByLocale: {
+        en:
+          'You can be proud. You just discovered all the **concepts** of GDevelop',
+      },
     },
     {
       cta: {
@@ -26,9 +32,11 @@ const endDialog = {
       },
     },
     {
-      text:
-        'To know more about all you just saw, click on the image above.\n\nSee you later!',
+      messageByLocale: {
+        en: 'To know more about all you just saw, click on the image above.',
+      },
     },
+    { messageByLocale: { en: 'See you later!' } },
   ],
 };
 

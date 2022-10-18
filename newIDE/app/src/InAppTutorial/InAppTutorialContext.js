@@ -1,8 +1,20 @@
 // @flow
 import * as React from 'react';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { type MessageByLocale } from '../Utils/i18n/MessageByLocale';
+
+export type TranslatedText =
+  | {| messageDescriptor: MessageDescriptor |}
+  | {| messageByLocale: MessageByLocale |};
 
 export type InAppTutorialTooltip = {|
   placement?: 'bottom' | 'left' | 'right' | 'top',
+  title?: TranslatedText,
+  description?: TranslatedText,
+|};
+
+export type InAppTutorialFormattedTooltip = {|
+  ...InAppTutorialTooltip,
   title?: string,
   description?: string,
 |};
@@ -36,11 +48,16 @@ export type InAppTutorialFlowStep = {|
   isOnClosableDialog?: true,
 |};
 
+export type InAppTutorialFlowFormattedStep = {|
+  ...InAppTutorialFlowStep,
+  tooltip?: InAppTutorialFormattedTooltip,
+|};
+
 export type EditorIdentifier = 'Scene' | 'EventsSheet' | 'Home';
 
 export type InAppTutorialEndDialog = {|
   content: Array<
-    {| text: string |} | {| cta: {| imageSource: string, linkHref: string |} |}
+    TranslatedText | {| cta: {| imageSource: string, linkHref: string |} |}
   >,
 |};
 

@@ -84,34 +84,45 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
     hideScrollbarsAfterDelay();
   }, 500);
 
+  const showScrollbarsThrottled = throttle(
+    () => {
+      if (!showScrollbars.current) {
+        showScrollbars.current = true;
+        forceUpdate();
+      }
+      if (timeoutHidingScrollbarsId.current) {
+        clearTimeout(timeoutHidingScrollbarsId.current);
+        timeoutHidingScrollbarsId.current = null;
+      }
+    },
+    1000,
+    { leading: true, trailing: false }
+  );
+
   const onMouseMoveOverInstanceEditor = React.useCallback(
     (event: MouseEvent) => {
       if (!editorRef.current) {
         return;
       }
-      let shouldDisplayScrollBars = false;
 
-      shouldDisplayScrollBars = !canvasRectangle.containsPoint(
+      const shouldDisplayScrollBars = !canvasRectangle.containsPoint(
         event.clientX,
         event.clientY
       );
 
       if (shouldDisplayScrollBars) {
-        if (!showScrollbars.current) {
-          showScrollbars.current = true;
-          forceUpdate();
-        }
-        if (timeoutHidingScrollbarsId.current) {
-          clearTimeout(timeoutHidingScrollbarsId.current);
-          timeoutHidingScrollbarsId.current = null;
-        }
+        showScrollbarsThrottled();
       } else {
         if (!isDragging.current) {
-          hideScrollbarsAfterDelay();
+          hideScrollbarsAfterDelayDebounced();
         }
       }
     },
-    [canvasRectangle, forceUpdate, hideScrollbarsAfterDelay]
+    [
+      canvasRectangle,
+      hideScrollbarsAfterDelayDebounced,
+      showScrollbarsThrottled,
+    ]
   );
 
   // When the mouse is moving after dragging the thumb:

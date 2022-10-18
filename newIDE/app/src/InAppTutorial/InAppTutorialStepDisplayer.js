@@ -1,5 +1,8 @@
 // @flow
 import React from 'react';
+import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import { useInterval } from '../Utils/UseInterval';
 import { getElementAncestry } from './HTMLUtils';
 import {
@@ -150,59 +153,69 @@ function InAppTutorialStepDisplayer({
     [elementToHighlightId, elementToHighlight, goToFallbackStep, expectedEditor]
   );
 
-  const wrongEditorTooltip = expectedEditor
-    ? {
-        title: "Oups, it looks like you're lost!",
-        description: `Go back to ${
-          expectedEditor === 'Scene'
-            ? 'the scene editor'
-            : expectedEditor === 'Home'
-            ? 'the home page'
-            : 'the events sheet'
-        } using the tabs at the top of the editor`,
-        placement: 'top',
-      }
-    : null;
+  const getWrongEditorTooltip = (i18n: I18nType) => {
+    if (!expectedEditor) return null;
+    const translatedExpectedEditor =
+      expectedEditor === 'Scene'
+        ? i18n._(t`the scene editor`)
+        : expectedEditor === 'Home'
+        ? i18n._(t`the home page`)
+        : i18n._(t`the events sheet`);
+    return {
+      title: i18n._(t`Oups, it looks like you're lost!`),
+      description: i18n._(
+        t`Go back to ${translatedExpectedEditor} using the tabs at the top of the editor`
+      ),
+      placement: 'top',
+    };
+  };
 
   if (!elementToHighlight || hideBehindOtherDialog) return null;
 
   return (
-    <>
-      <div
-        style={{
-          ...styles.redHeroImage,
-          visibility: wrongEditorTooltip ? 'visible' : 'hidden',
-        }}
-        ref={defineAssistantImage}
-      >
-        <img
-          alt="GDevelop mascot red hero"
-          src="res/hero60.png"
-          width={60}
-          height={60}
-        />
-      </div>
-      {!wrongEditorTooltip && (
-        <InAppTutorialElementHighlighter element={elementToHighlight} />
-      )}
-      {tooltip && !wrongEditorTooltip && (
-        <InAppTutorialTooltipDisplayer
-          anchorElement={elementToHighlight}
-          tooltip={tooltip}
-          buttonLabel={
-            nextStepTrigger && nextStepTrigger.clickOnButton
-              ? nextStepTrigger.clickOnButton
-              : undefined
-          }
-        />
-      )}
-      {wrongEditorTooltip && assistantImage && (
-        <InAppTutorialTooltipDisplayer
-          anchorElement={assistantImage}
-          tooltip={wrongEditorTooltip}
-        />
-      )}
-    </>
+    <I18n>
+      {({ i18n }) => {
+        const wrongEditorTooltip = getWrongEditorTooltip(i18n);
+        return (
+          <>
+            <div
+              style={{
+                ...styles.redHeroImage,
+                visibility: wrongEditorTooltip ? 'visible' : 'hidden',
+              }}
+              ref={defineAssistantImage}
+            >
+              <img
+                alt="GDevelop mascot red hero"
+                src="res/hero60.png"
+                width={60}
+                height={60}
+              />
+            </div>
+            {!wrongEditorTooltip && (
+              <InAppTutorialElementHighlighter element={elementToHighlight} />
+            )}
+            {tooltip && !wrongEditorTooltip && (
+              <InAppTutorialTooltipDisplayer
+                anchorElement={elementToHighlight}
+                tooltip={tooltip}
+                buttonLabel={
+                  nextStepTrigger && nextStepTrigger.clickOnButton
+                    ? nextStepTrigger.clickOnButton
+                    : undefined
+                }
+              />
+            )}
+            {wrongEditorTooltip && assistantImage && (
+              <InAppTutorialTooltipDisplayer
+                anchorElement={assistantImage}
+                tooltip={wrongEditorTooltip}
+              />
+            )}
+          </>
+        );
+      }}
+    </I18n>
   );
 }
 

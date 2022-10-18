@@ -72,6 +72,7 @@ enum TestEvent {
   FreeFunctionWithExpression,
   FreeConditionFromExpressionAndCondition,
   FreeExpressionFromExpressionAndCondition,
+  FreeActionWithOperator,
   FreeFunctionWithObjects,
   FreeFunctionWithObjectExpression,
 
@@ -85,6 +86,7 @@ enum TestEvent {
   NoParameterIllNamedBehaviorExpression,
   BehaviorConditionFromExpressionAndCondition,
   BehaviorExpressionFromExpressionAndCondition,
+  BehaviorActionWithOperator,
 
   ObjectAction,
   ObjectPropertyAction,
@@ -96,6 +98,7 @@ enum TestEvent {
   NoParameterIllNamedObjectExpression,
   ObjectConditionFromExpressionAndCondition,
   ObjectExpressionFromExpressionAndCondition,
+  ObjectActionWithOperator,
 };
 
 const std::vector<const gd::EventsList *> GetEventsLists(gd::Project &project) {
@@ -201,6 +204,35 @@ const void SetupEvents(gd::EventsList &eventList) {
           0,
           gd::Expression(
               "2 + MyEventsExtension::MyEventsFunctionExpressionAndCondition(111, 222)"));
+      event.GetActions().Insert(action);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != FreeActionWithOperator) {
+      throw std::logic_error("Invalid events setup: " + std::to_string(eventList.GetEventsCount()));
+    }
+    // Create an event referring to
+    // MyEventsExtension::MyEventsFunctionActionWithOperator
+    {
+      gd::StandardEvent event;
+      gd::Instruction action;
+      action.SetType("MyEventsExtension::MyEventsFunctionActionWithOperator");
+      action.SetParametersCount(5);
+      action.SetParameter(
+          0,
+          gd::Expression("scene"));
+      action.SetParameter(
+          1,
+          gd::Expression("+"));
+      action.SetParameter(
+          2,
+          gd::Expression("2"));
+      action.SetParameter(
+          3,
+          gd::Expression("111"));
+      action.SetParameter(
+          4,
+          gd::Expression("222"));
       event.GetActions().Insert(action);
       eventList.InsertEvent(event);
     }
@@ -386,7 +418,7 @@ const void SetupEvents(gd::EventsList &eventList) {
     if (eventList.GetEventsCount() != BehaviorConditionFromExpressionAndCondition) {
       throw std::logic_error("Invalid events setup: " + std::to_string(eventList.GetEventsCount()));
     }
-    // Create an event in the external events referring to
+    // Create an event referring to
     // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionExpressionAndCondition
     // as a condition.
     {
@@ -420,7 +452,7 @@ const void SetupEvents(gd::EventsList &eventList) {
     if (eventList.GetEventsCount() != BehaviorExpressionFromExpressionAndCondition) {
       throw std::logic_error("Invalid events setup: " + std::to_string(eventList.GetEventsCount()));
     }
-    // Create an event in the external events referring to
+    // Create an event referring to
     // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionExpressionAndCondition
     // as an expression.
     {
@@ -433,6 +465,39 @@ const void SetupEvents(gd::EventsList &eventList) {
           gd::Expression("5 + "
                           "ObjectWithMyBehavior.MyBehavior::"
                           "MyBehaviorEventsFunctionExpressionAndCondition(111, 222)"));
+      event.GetActions().Insert(action);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != BehaviorActionWithOperator) {
+      throw std::logic_error("Invalid events setup: " + std::to_string(eventList.GetEventsCount()));
+    }
+    // Create an event referring to
+    // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionActionWithOperator
+    {
+      gd::StandardEvent event;
+      gd::Instruction action;
+      action.SetType("MyEventsExtension::MyEventsBasedBehavior::"
+          "MyBehaviorEventsFunctionActionWithOperator");
+      action.SetParametersCount(6);
+      action.SetParameter(
+          0,
+          gd::Expression("ObjectWithMyBehavior"));
+      action.SetParameter(
+          1,
+          gd::Expression("MyBehavior"));
+      action.SetParameter(
+          2,
+          gd::Expression("+"));
+      action.SetParameter(
+          3,
+          gd::Expression("5"));
+      action.SetParameter(
+          4,
+          gd::Expression("111"));
+      action.SetParameter(
+          5,
+          gd::Expression("222"));
       event.GetActions().Insert(action);
       eventList.InsertEvent(event);
     }
@@ -579,10 +644,11 @@ const void SetupEvents(gd::EventsList &eventList) {
       event.GetActions().Insert(instruction);
       eventList.InsertEvent(event);
     }
+
     if (eventList.GetEventsCount() != ObjectConditionFromExpressionAndCondition) {
       throw std::logic_error("Invalid events setup: " + std::to_string(eventList.GetEventsCount()));
     }
-    // Create an event in the external events referring to
+    // Create an event referring to
     // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunctionExpressionAndCondition
     // as a condition.
     {
@@ -613,7 +679,7 @@ const void SetupEvents(gd::EventsList &eventList) {
     if (eventList.GetEventsCount() != ObjectExpressionFromExpressionAndCondition) {
       throw std::logic_error("Invalid events setup: " + std::to_string(eventList.GetEventsCount()));
     }
-    // Create an event in the external events referring to
+    // Create an event referring to
     // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunctionExpressionAndCondition
     // as an expression.
     {
@@ -626,6 +692,36 @@ const void SetupEvents(gd::EventsList &eventList) {
           gd::Expression("5 + "
                           "MyCustomObject."
                           "MyObjectEventsFunctionExpressionAndCondition(111, 222)"));
+      event.GetActions().Insert(action);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != ObjectActionWithOperator) {
+      throw std::logic_error("Invalid events setup: " + std::to_string(eventList.GetEventsCount()));
+    }
+    // Create an event referring to
+    // MyEventsExtension::MyEventsBasedObject::MyObjectEventsFunctionActionWithOperator
+    {
+      gd::StandardEvent event;
+      gd::Instruction action;
+      action.SetType("MyEventsExtension::MyEventsBasedObject::"
+          "MyObjectEventsFunctionActionWithOperator");
+      action.SetParametersCount(5);
+      action.SetParameter(
+          0,
+          gd::Expression("MyCustomObject"));
+      action.SetParameter(
+          1,
+          gd::Expression("+"));
+      action.SetParameter(
+          2,
+          gd::Expression("5"));
+      action.SetParameter(
+          3,
+          gd::Expression("111"));
+      action.SetParameter(
+          4,
+          gd::Expression("222"));
       event.GetActions().Insert(action);
       eventList.InsertEvent(event);
     }
@@ -706,6 +802,11 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
             .SetName("Value2")
             .SetType("expression"));
 
+    behaviorEventsFunctions
+        .InsertNewEventsFunction("MyBehaviorEventsFunctionActionWithOperator", 2)
+        .SetFunctionType(gd::EventsFunction::ActionWithOperator)
+        .SetGetterName("MyBehaviorEventsFunctionExpressionAndCondition");
+
     // Add property
     eventsBasedBehavior.GetPropertyDescriptors()
         .InsertNew("MyProperty", 0)
@@ -763,6 +864,11 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
         gd::ParameterMetadata()
             .SetName("Value2")
             .SetType("expression"));
+
+    objectEventsFunctions
+        .InsertNewEventsFunction("MyObjectEventsFunctionActionWithOperator", 2)
+        .SetFunctionType(gd::EventsFunction::ActionWithOperator)
+        .SetGetterName("MyObjectEventsFunctionExpressionAndCondition");
 
     // Add a property
     eventsBasedObject.GetPropertyDescriptors()
@@ -825,8 +931,20 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
                                              .SetType("")
                                              .SetCodeOnly(true));
 
-    eventsExtension.InsertNewEventsFunction("MyEventsFunctionExpressionAndCondition", 2)
+    auto &freeExpressionAndCondition = eventsExtension.InsertNewEventsFunction("MyEventsFunctionExpressionAndCondition", 2)
         .SetFunctionType(gd::EventsFunction::ExpressionAndCondition);
+    freeExpressionAndCondition.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("Value1")
+            .SetType("expression"));
+    freeExpressionAndCondition.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("Value2")
+            .SetType("expression"));
+
+    eventsExtension.InsertNewEventsFunction("MyEventsFunctionActionWithOperator", 2)
+        .SetFunctionType(gd::EventsFunction::ActionWithOperator)
+        .SetGetterName("MyEventsFunctionExpressionAndCondition");
   }
 
   // Add some usages in events
@@ -1255,6 +1373,12 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                     eventsList->GetEvent(FreeExpressionFromExpressionAndCondition)) ==
               "2 + MyRenamedExtension::MyEventsFunctionExpressionAndCondition(111, 222)");
 
+      // Check that events function calls from an ActionWithOperator has
+      // been renamed.
+      REQUIRE(GetEventFirstActionType(
+                    eventsList->GetEvent(FreeActionWithOperator)) ==
+              "MyRenamedExtension::MyEventsFunctionActionWithOperator");
+
       // Check that the type of the behavior was changed in the behaviors of
       // objects. Name is *not* changed.
       REQUIRE(project.GetLayout("Scene")
@@ -1296,6 +1420,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                     eventsList->GetEvent(BehaviorConditionFromExpressionAndCondition)) ==
           "MyRenamedExtension::MyEventsBasedBehavior::"
           "MyBehaviorEventsFunctionExpressionAndCondition");
+      REQUIRE(
+          GetEventFirstActionType(
+                    eventsList->GetEvent(BehaviorActionWithOperator)) ==
+          "MyRenamedExtension::MyEventsBasedBehavior::"
+          "MyBehaviorEventsFunctionActionWithOperator");
       
       // Check if events-based behaviors properties have been renamed in
       // instructions
@@ -1339,6 +1468,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                     eventsList->GetEvent(ObjectConditionFromExpressionAndCondition)) ==
           "MyRenamedExtension::MyEventsBasedObject::"
           "MyObjectEventsFunctionExpressionAndCondition");
+      REQUIRE(
+          GetEventFirstActionType(
+                    eventsList->GetEvent(ObjectActionWithOperator)) ==
+          "MyRenamedExtension::MyEventsBasedObject::"
+          "MyObjectEventsFunctionActionWithOperator");
 
       // Check if events-based object properties have been renamed in
       // instructions
@@ -1484,6 +1618,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(GetEventFirstConditionType(
                   eventsList->GetEvent(FreeConditionFromExpressionAndCondition)) ==
               "MyEventsExtension::MyRenamedFunctionExpressionAndCondition");
+
+      // Check that the action still refer to the right ExpressionAndCondition.
+      REQUIRE(eventsExtension.GetEventsFunction("MyEventsFunctionActionWithOperator")
+          .GetGetterName() == "MyRenamedFunctionExpressionAndCondition");
     }
   }
 
@@ -1597,6 +1735,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                   eventsList->GetEvent(BehaviorConditionFromExpressionAndCondition)) ==
           "MyEventsExtension::MyRenamedEventsBasedBehavior::"
           "MyBehaviorEventsFunctionExpressionAndCondition");
+      REQUIRE(GetEventFirstActionType(
+                  eventsList->GetEvent(BehaviorActionWithOperator)) ==
+          "MyEventsExtension::MyRenamedEventsBasedBehavior::"
+          "MyBehaviorEventsFunctionActionWithOperator");
 
       // Check if events-based behaviors properties have been renamed in
       // instructions
@@ -1695,6 +1837,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                   eventsList->GetEvent(ObjectConditionFromExpressionAndCondition)) ==
           "MyEventsExtension::MyRenamedEventsBasedObject::"
           "MyObjectEventsFunctionExpressionAndCondition");
+      REQUIRE(GetEventFirstActionType(
+                  eventsList->GetEvent(ObjectActionWithOperator)) ==
+          "MyEventsExtension::MyRenamedEventsBasedObject::"
+          "MyObjectEventsFunctionActionWithOperator");
 
       // Check if events-based object properties have been renamed in
       // instructions
@@ -1943,6 +2089,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                   eventsList->GetEvent(BehaviorConditionFromExpressionAndCondition)) ==
           "MyEventsExtension::MyEventsBasedBehavior::"
           "MyRenamedBehaviorEventsFunctionExpressionAndCondition");
+
+      // Check that the action still refer to the right ExpressionAndCondition.
+      REQUIRE(eventsBasedBehavior.GetEventsFunctions()
+          .GetEventsFunction("MyBehaviorEventsFunctionActionWithOperator")
+          .GetGetterName() == "MyRenamedBehaviorEventsFunctionExpressionAndCondition");
     }
   }
 
@@ -1975,6 +2126,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                   eventsList->GetEvent(ObjectConditionFromExpressionAndCondition)) ==
           "MyEventsExtension::MyEventsBasedObject::"
           "MyRenamedObjectEventsFunctionExpressionAndCondition");
+
+      // Check that the action still refer to the right ExpressionAndCondition.
+      REQUIRE(eventsBasedObject.GetEventsFunctions()
+          .GetEventsFunction("MyObjectEventsFunctionActionWithOperator")
+          .GetGetterName() == "MyRenamedObjectEventsFunctionExpressionAndCondition");
     }
   }
 

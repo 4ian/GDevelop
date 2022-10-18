@@ -29,6 +29,7 @@ class EventsFunctionsExtensionCodeGenerator {
    * \brief Generate the complete code for the specified events function.
    */
   gd::String GenerateFreeEventsFunctionCompleteCode(
+      const gd::EventsFunctionsExtension& extension,
       const gd::EventsFunction& eventsFunction,
       const gd::String& codeNamespace,
       std::set<gd::String>& includeFiles,

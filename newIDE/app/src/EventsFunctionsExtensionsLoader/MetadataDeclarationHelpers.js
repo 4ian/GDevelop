@@ -360,6 +360,37 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
     );
+  } else if (functionType === gd.EventsFunction.ActionWithOperator) {
+    const getterFunction = eventsFunctionsExtension.hasEventsFunctionNamed(
+      eventsFunction.getGetterName()
+    )
+      ? eventsFunctionsExtension.getEventsFunction(
+          eventsFunction.getGetterName()
+        )
+      : null;
+    const action = extension.addAction(
+      eventsFunction.getName(),
+      getterFunction.getFullName() || eventsFunction.getName(),
+      'Change ' +
+        (getterFunction.getDescription() || eventsFunction.getFullName()),
+      // An operator and an operand are inserted before user parameters.
+      shiftSentenceParamIndexes(getterFunction.getSentence(), 2),
+      getterFunction.getGroup() || '',
+      getExtensionIconUrl(extension),
+      getExtensionIconUrl(extension)
+    );
+    if (getterFunction) {
+      action
+        .getCodeExtraInformation()
+        .setManipulatedType(
+          getterFunction.getFunctionType() ===
+            gd.EventsFunction.StringExpressionAndCondition
+            ? 'string'
+            : 'number'
+        )
+        .setGetter(getterFunction.getName());
+    }
+    return action;
   } else if (functionType === gd.EventsFunction.Condition) {
     return extension.addCondition(
       eventsFunction.getName(),
@@ -469,6 +500,40 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
     );
+  } else if (functionType === gd.EventsFunction.ActionWithOperator) {
+    const eventsFunctionsContainer = eventsBasedBehavior.getEventsFunctions();
+    const getterFunction = eventsFunctionsContainer.hasEventsFunctionNamed(
+      eventsFunction.getGetterName()
+    )
+      ? eventsFunctionsContainer.getEventsFunction(
+          eventsFunction.getGetterName()
+        )
+      : null;
+    const action = behaviorMetadata.addScopedAction(
+      eventsFunction.getName(),
+      getterFunction.getFullName() || eventsFunction.getName(),
+      'Change ' +
+        (getterFunction.getDescription() || eventsFunction.getFullName()),
+      // An operator and an operand are inserted before user parameters.
+      shiftSentenceParamIndexes(getterFunction.getSentence(), 2),
+      getterFunction.getGroup() ||
+        eventsBasedBehavior.getFullName() ||
+        eventsBasedBehavior.getName(),
+      getExtensionIconUrl(extension),
+      getExtensionIconUrl(extension)
+    );
+    if (getterFunction) {
+      action
+        .getCodeExtraInformation()
+        .setManipulatedType(
+          getterFunction.getFunctionType() ===
+            gd.EventsFunction.StringExpressionAndCondition
+            ? 'string'
+            : 'number'
+        )
+        .setGetter(getterFunction.getName());
+    }
+    return action;
   } else if (functionType === gd.EventsFunction.Condition) {
     // Use the new "scoped" way to declare an instruction, because
     // we want to prevent any conflict between free functions and
@@ -560,6 +625,40 @@ export const declareObjectInstructionOrExpressionMetadata = (
       eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
     );
+  } else if (functionType === gd.EventsFunction.ActionWithOperator) {
+    const eventsFunctionsContainer = eventsBasedObject.getEventsFunctions();
+    const getterFunction = eventsFunctionsContainer.hasEventsFunctionNamed(
+      eventsFunction.getGetterName()
+    )
+      ? eventsFunctionsContainer.getEventsFunction(
+          eventsFunction.getGetterName()
+        )
+      : null;
+    const action = objectMetadata.addScopedAction(
+      eventsFunction.getName(),
+      getterFunction.getFullName() || eventsFunction.getName(),
+      'Change ' +
+        (getterFunction.getDescription() || eventsFunction.getFullName()),
+      // An operator and an operand are inserted before user parameters.
+      shiftSentenceParamIndexes(getterFunction.getSentence(), 2),
+      getterFunction.getGroup() ||
+        eventsBasedObject.getFullName() ||
+        eventsBasedObject.getName(),
+      getExtensionIconUrl(extension),
+      getExtensionIconUrl(extension)
+    );
+    if (getterFunction) {
+      action
+        .getCodeExtraInformation()
+        .setManipulatedType(
+          getterFunction.getFunctionType() ===
+            gd.EventsFunction.StringExpressionAndCondition
+            ? 'string'
+            : 'number'
+        )
+        .setGetter(getterFunction.getName());
+    }
+    return action;
   } else if (functionType === gd.EventsFunction.Condition) {
     // Use the new "scoped" way to declare an instruction, because
     // we want to prevent any conflict between free functions and
@@ -1027,6 +1126,7 @@ export const declareObjectPropertiesInstructionAndExpressions = (
  * expected by the events function.
  */
 export const declareEventsFunctionParameters = (
+  eventsFunctionsContainer: gdEventsFunctionsContainer,
   eventsFunction: gdEventsFunction,
   instructionOrExpression:
     | gdInstructionMetadata
@@ -1034,6 +1134,7 @@ export const declareEventsFunctionParameters = (
     | gdMultipleInstructionMetadata,
   userDefinedFirstParameterIndex: number
 ) => {
+  console.log(eventsFunction.getName());
   const addParameter = (parameter: gdParameterMetadata) => {
     if (!parameter.isCodeOnly()) {
       instructionOrExpression.addParameter(
@@ -1046,6 +1147,7 @@ export const declareEventsFunctionParameters = (
         parameter.getLongDescription()
       );
       instructionOrExpression.setDefaultValue(parameter.getDefaultValue());
+      console.log(parameter.getName() + ' : ' + parameter.getType());
     } else {
       instructionOrExpression.addCodeOnlyParameter(
         parameter.getType(),
@@ -1054,14 +1156,20 @@ export const declareEventsFunctionParameters = (
     }
   };
 
-  mapVector(
-    eventsFunction.getParameters(),
-    addParameter,
-    0,
-    userDefinedFirstParameterIndex
-  );
-
   const functionType = eventsFunction.getFunctionType();
+  const getterFunction = eventsFunctionsContainer.hasEventsFunctionNamed(
+    eventsFunction.getGetterName()
+  )
+    ? eventsFunctionsContainer.getEventsFunction(eventsFunction.getGetterName())
+    : null;
+  const parameters = (functionType === gd.EventsFunction.ActionWithOperator &&
+  getterFunction
+    ? getterFunction
+    : eventsFunction
+  ).getParameters();
+
+  mapVector(parameters, addParameter, 0, userDefinedFirstParameterIndex);
+
   if (functionType === gd.EventsFunction.ExpressionAndCondition) {
     ((instructionOrExpression: any): gdMultipleInstructionMetadata).useStandardParameters(
       'number'
@@ -1070,13 +1178,16 @@ export const declareEventsFunctionParameters = (
     ((instructionOrExpression: any): gdMultipleInstructionMetadata).useStandardParameters(
       'string'
     );
+  } else if (functionType === gd.EventsFunction.ActionWithOperator) {
+    ((instructionOrExpression: any): gdInstructionMetadata).useStandardOperatorParameters(
+      getterFunction.getFunctionType() ===
+        gd.EventsFunction.StringExpressionAndCondition
+        ? 'string'
+        : 'number'
+    );
   }
 
-  mapVector(
-    eventsFunction.getParameters(),
-    addParameter,
-    userDefinedFirstParameterIndex
-  );
+  mapVector(parameters, addParameter, userDefinedFirstParameterIndex);
 
   // By convention, latest parameter is always the eventsFunctionContext of the calling function
   // (if any).

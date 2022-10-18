@@ -1000,6 +1000,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       editedEventsBasedObject,
     } = this.state;
 
+    const selectedEventsBasedEntity =
+      selectedEventsBasedBehavior || selectedEventsBasedObject;
+
     const editors = {
       'choose-editor': {
         type: 'primary',
@@ -1029,6 +1032,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     eventsFunction={selectedEventsFunction}
                     eventsBasedBehavior={selectedEventsBasedBehavior}
                     eventsBasedObject={selectedEventsBasedObject}
+                    eventsFunctionsContainer={
+                      (selectedEventsBasedEntity &&
+                        selectedEventsBasedEntity.getEventsFunctions()) ||
+                      eventsFunctionsExtension
+                    }
                     globalObjectsContainer={this._globalObjectsContainer}
                     objectsContainer={this._objectsContainer}
                     onConfigurationUpdated={this._onConfigurationUpdated}

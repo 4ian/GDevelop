@@ -8,7 +8,7 @@ import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
-import { mapVector } from '../../Utils/MapFor';
+import { mapVector, mapFor } from '../../Utils/MapFor';
 import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import {
@@ -29,6 +29,7 @@ type Props = {|
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   eventsBasedObject: ?gdEventsBasedObject,
+  eventsFunctionsContainer: gdEventsFunctionsContainer,
   helpPagePath?: string,
   onConfigurationUpdated?: (whatChanged?: 'type') => void,
   renderConfigurationHeader?: () => React.Node,
@@ -150,6 +151,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
       eventsBasedBehavior,
       eventsBasedObject,
       getFunctionGroupNames,
+      eventsFunctionsContainer,
     } = this.props;
 
     const type = eventsFunction.getFunctionType();
@@ -214,6 +216,17 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
       );
     }
 
+    const getterFunction =
+      eventsFunctionsContainer &&
+      type === gd.EventsFunction.ActionWithOperator &&
+      eventsFunctionsContainer.hasEventsFunctionNamed(
+        eventsFunction.getGetterName()
+      )
+        ? eventsFunctionsContainer.getEventsFunction(
+            eventsFunction.getGetterName()
+          )
+        : null;
+
     return (
       <I18n>
         {({ i18n }) => (
@@ -257,73 +270,165 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                     value={gd.EventsFunction.StringExpressionAndCondition}
                     primaryText={t`String Expression and condition`}
                   />
+                  <SelectOption
+                    value={gd.EventsFunction.ActionWithOperator}
+                    primaryText={t`Action with operator`}
+                  />
                 </SelectField>
               </Line>
-              <SemiControlledTextField
-                commitOnBlur
-                floatingLabelText={<Trans>Full name displayed in editor</Trans>}
-                translatableHintText={getFullNameHintText(type)}
-                value={eventsFunction.getFullName()}
-                onChange={text => {
-                  eventsFunction.setFullName(text);
-                  if (onConfigurationUpdated) onConfigurationUpdated();
-                  this.forceUpdate();
-                }}
-                fullWidth
-              />
+              {type === gd.EventsFunction.ActionWithOperator ? (
+                <SelectField
+                  value={(getterFunction && getterFunction.getName()) || ''}
+                  floatingLabelText={
+                    <Trans>Related action and expression</Trans>
+                  }
+                  fullWidth
+                  onChange={(e, i, value: string) => {
+                    // $FlowFixMe
+                    eventsFunction.setGetterName(value);
+                    if (onConfigurationUpdated) onConfigurationUpdated();
+                    this.forceUpdate();
+                  }}
+                >
+                  {eventsFunctionsContainer
+                    ? mapFor(
+                        0,
+                        eventsFunctionsContainer.getEventsFunctionsCount(),
+                        i => {
+                          const eventsFunction = eventsFunctionsContainer.getEventsFunctionAt(
+                            i
+                          );
+
+                          return (
+                            (eventsFunction.getFunctionType() ===
+                              gd.EventsFunction.ExpressionAndCondition ||
+                              eventsFunction.getFunctionType() ===
+                                gd.EventsFunction
+                                  .StringExpressionAndCondition) && (
+                              <SelectOption
+                                key={eventsFunction.getName()}
+                                value={eventsFunction.getName()}
+                                primaryText={
+                                  eventsFunction.getFullName() ||
+                                  eventsFunction.getName()
+                                }
+                              />
+                            )
+                          );
+                        }
+                      )
+                    : []}
+                </SelectField>
+              ) : (
+                <SemiControlledTextField
+                  commitOnBlur
+                  floatingLabelText={
+                    <Trans>Full name displayed in editor</Trans>
+                  }
+                  translatableHintText={getFullNameHintText(type)}
+                  value={eventsFunction.getFullName()}
+                  onChange={text => {
+                    eventsFunction.setFullName(text);
+                    if (onConfigurationUpdated) onConfigurationUpdated();
+                    this.forceUpdate();
+                  }}
+                  fullWidth
+                />
+              )}
+              {type === gd.EventsFunction.ActionWithOperator ? (
+                <SemiControlledTextField
+                  disabled
+                  floatingLabelText={<Trans>Group name</Trans>}
+                  fullWidth
+                  value={getterFunction ? getterFunction.getGroup() : ''}
+                  onChange={text => {}}
+                />
+              ) : (
+                <SemiControlledAutoComplete
+                  floatingLabelText={<Trans>Group name</Trans>}
+                  hintText={t`Leave it empty to use the default group for this extension.`}
+                  fullWidth
+                  value={eventsFunction.getGroup()}
+                  onChange={text => {
+                    eventsFunction.setGroup(text);
+                    if (onConfigurationUpdated) onConfigurationUpdated();
+                    this.forceUpdate();
+                  }}
+                  dataSource={
+                    getFunctionGroupNames
+                      ? getFunctionGroupNames().map(name => ({
+                          text: name,
+                          value: name,
+                        }))
+                      : []
+                  }
+                  openOnFocus={true}
+                />
+              )}
             </ResponsiveLineStackLayout>
             <Line noMargin>
-              <SemiControlledAutoComplete
-                floatingLabelText={<Trans>Group name</Trans>}
-                hintText={t`Leave it empty to use the default group for this extension.`}
-                fullWidth
-                value={eventsFunction.getGroup()}
-                onChange={text => {
-                  eventsFunction.setGroup(text);
-                  if (onConfigurationUpdated) onConfigurationUpdated();
-                  this.forceUpdate();
-                }}
-                dataSource={
-                  getFunctionGroupNames
-                    ? getFunctionGroupNames().map(name => ({
-                        text: name,
-                        value: name,
-                      }))
-                    : []
-                }
-                openOnFocus={true}
-              />
-            </Line>
-            <Line noMargin>
-              <SemiControlledTextField
-                commitOnBlur
-                floatingLabelText={
-                  type === gd.EventsFunction.ExpressionAndCondition ||
-                  type === gd.EventsFunction.StringExpressionAndCondition ? (
-                    <Trans>
-                      Description, displayed in editor (automatically prefixed
-                      by "Compare" or "Return")
-                    </Trans>
-                  ) : (
+              {type === gd.EventsFunction.ActionWithOperator ? (
+                <SemiControlledTextField
+                  disabled
+                  commitOnBlur
+                  floatingLabelText={
                     <Trans>Description, displayed in editor</Trans>
-                  )
-                }
-                translatableHintText={getDescriptionHintText(type)}
-                fullWidth
-                multiline
-                value={eventsFunction.getDescription()}
-                onChange={text => {
-                  eventsFunction.setDescription(text);
-                  if (onConfigurationUpdated) onConfigurationUpdated();
-                  this.forceUpdate();
-                }}
-              />
+                  }
+                  fullWidth
+                  multiline
+                  value={
+                    getterFunction
+                      ? 'Change ' + getterFunction.getDescription()
+                      : ''
+                  }
+                  onChange={text => {}}
+                />
+              ) : (
+                <SemiControlledTextField
+                  commitOnBlur
+                  floatingLabelText={
+                    type === gd.EventsFunction.ExpressionAndCondition ||
+                    type === gd.EventsFunction.StringExpressionAndCondition ? (
+                      <Trans>
+                        Description, displayed in editor (automatically prefixed
+                        by "Compare" or "Return")
+                      </Trans>
+                    ) : (
+                      <Trans>Description, displayed in editor</Trans>
+                    )
+                  }
+                  translatableHintText={getDescriptionHintText(type)}
+                  fullWidth
+                  multiline
+                  value={eventsFunction.getDescription()}
+                  onChange={text => {
+                    eventsFunction.setDescription(text);
+                    if (onConfigurationUpdated) onConfigurationUpdated();
+                    this.forceUpdate();
+                  }}
+                />
+              )}
             </Line>
             <Line noMargin>
-              {type === gd.EventsFunction.Action ||
-              type === gd.EventsFunction.Condition ||
-              type === gd.EventsFunction.ExpressionAndCondition ||
-              type === gd.EventsFunction.StringExpressionAndCondition ? (
+              {type === gd.EventsFunction.ActionWithOperator ? (
+                <SemiControlledTextField
+                  disabled
+                  commitOnBlur
+                  floatingLabelText={<Trans>Sentence in Events Sheet</Trans>}
+                  fullWidth
+                  value={
+                    getterFunction
+                      ? 'Change ' +
+                        getterFunction.getSentence() +
+                        ' of _PARAM0_'
+                      : ''
+                  }
+                  onChange={text => {}}
+                />
+              ) : type === gd.EventsFunction.Action ||
+                type === gd.EventsFunction.Condition ||
+                type === gd.EventsFunction.ExpressionAndCondition ||
+                type === gd.EventsFunction.StringExpressionAndCondition ? (
                 <SemiControlledTextField
                   commitOnBlur
                   floatingLabelText={

@@ -291,6 +291,18 @@ export default class EventsFunctionParametersEditor extends React.Component<
         </Column>
       );
     }
+    if (
+      eventsFunction.getFunctionType() === gd.EventsFunction.ActionWithOperator
+    ) {
+      return (
+        <EmptyMessage>
+          <Trans>
+            Actions with an operator use its expression parameters. There is
+            nothing to configure.
+          </Trans>
+        </EmptyMessage>
+      );
+    }
 
     const isParameterDisabled = index => {
       return (

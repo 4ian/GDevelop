@@ -260,7 +260,12 @@ const generateFreeFunction = (
   );
   // By convention, first parameter is always the Runtime Scene.
   instructionOrExpression.addCodeOnlyParameter('currentScene', '');
-  declareEventsFunctionParameters(eventsFunction, instructionOrExpression, 0);
+  declareEventsFunctionParameters(
+    eventsFunctionsExtension,
+    eventsFunction,
+    instructionOrExpression,
+    0
+  );
 
   // Hide "lifecycle" functions as they are called automatically by
   // the game engine.
@@ -293,6 +298,7 @@ const generateFreeFunction = (
       project
     );
     const code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+      eventsFunctionsExtension,
       eventsFunction,
       codeNamespace,
       includeFiles,
@@ -449,6 +455,7 @@ function generateBehavior(
         eventsFunction
       );
       declareEventsFunctionParameters(
+        eventsFunctionsContainer,
         eventsFunction,
         instructionOrExpression,
         2
@@ -569,6 +576,7 @@ function generateObject(
         eventsFunction
       );
       declareEventsFunctionParameters(
+        eventsFunctionsContainer,
         eventsFunction,
         instructionOrExpression,
         1

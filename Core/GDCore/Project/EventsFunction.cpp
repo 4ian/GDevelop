@@ -18,6 +18,7 @@ void EventsFunction::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("description", description);
   element.SetAttribute("sentence", sentence);
   element.SetAttribute("group", group);
+  element.SetAttribute("getterName", getterName);
   element.SetBoolAttribute("private", isPrivate);
   events.SerializeTo(element.AddChild("events"));
 
@@ -32,6 +33,8 @@ void EventsFunction::SerializeTo(SerializerElement& element) const {
     functionTypeStr = "ExpressionAndCondition";
   else if (functionType == StringExpressionAndCondition)
     functionTypeStr = "StringExpressionAndCondition";
+  else if (functionType == ActionWithOperator)
+    functionTypeStr = "ActionWithOperator";
   element.SetAttribute("functionType", functionTypeStr);
 
   gd::SerializerElement& parametersElement = element.AddChild("parameters");
@@ -50,6 +53,7 @@ void EventsFunction::UnserializeFrom(gd::Project& project,
   description = element.GetStringAttribute("description");
   sentence = element.GetStringAttribute("sentence");
   group = element.GetStringAttribute("group");
+  getterName = element.GetStringAttribute("getterName");
   isPrivate = element.GetBoolAttribute("private");
   events.UnserializeFrom(project, element.GetChild("events"));
 
@@ -64,6 +68,8 @@ void EventsFunction::UnserializeFrom(gd::Project& project,
     functionType = ExpressionAndCondition;
   else if (functionTypeStr == "StringExpressionAndCondition")
     functionType = StringExpressionAndCondition;
+  else if (functionTypeStr == "ActionWithOperator")
+    functionType = ActionWithOperator;
   else
     functionType = Action;
 

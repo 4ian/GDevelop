@@ -83,7 +83,7 @@ const getObjectWithContextName = (objectWithContext: ObjectWithContext) =>
 const isObjectWithContextGlobal = (objectWithContext: ObjectWithContext) =>
   objectWithContext.global;
 
-const getPasteLabel = isGlobalObject => {
+const getPasteLabel = (i18n: I18nType, isGlobalObject: boolean) => {
   let clipboardObjectName = '';
   if (Clipboard.has(CLIPBOARD_KIND)) {
     const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
@@ -92,8 +92,8 @@ const getPasteLabel = isGlobalObject => {
   }
 
   return isGlobalObject
-    ? 'Paste ' + clipboardObjectName + ' as a Global Object'
-    : 'Paste ' + clipboardObjectName;
+    ? i18n._(t`Paste ${clipboardObjectName} as a Global Object`)
+    : i18n._(t`Paste ${clipboardObjectName}`);
 };
 
 type State = {|
@@ -553,7 +553,7 @@ export default class ObjectsList extends React.Component<Props, State> {
         click: () => this._cutObject(i18n, objectWithContext),
       },
       {
-        label: getPasteLabel(objectWithContext.global),
+        label: getPasteLabel(i18n, objectWithContext.global),
         enabled: Clipboard.has(CLIPBOARD_KIND),
         click: () => this._paste(objectWithContext),
       },

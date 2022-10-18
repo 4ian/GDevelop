@@ -9,6 +9,7 @@ import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { useDebounce } from '../Utils/UseDebounce';
+import Rectangle from '../Utils/Rectangle';
 
 const SCROLLBAR_DETECTION_WIDTH = 50;
 const SCROLLBAR_TRACK_WIDTH = 16;
@@ -22,19 +23,12 @@ const styles = {
   container: {
     overflow: 'hidden',
   },
-  xScrollbarDetectionZone: {
+  xScrollbarTrack: {
     position: 'absolute',
     left: 0,
-    right: 0,
+    right: SCROLLBAR_TRACK_WIDTH - SCROLLBAR_MARGIN,
     bottom: 0,
-    height: SCROLLBAR_DETECTION_WIDTH,
-  },
-  xScrollbarTrack: {
-    position: 'relative',
     display: 'inline-block',
-    width: '100%',
-    marginTop: SCROLLBAR_DETECTION_WIDTH - SCROLLBAR_TRACK_WIDTH,
-    marginRight: SCROLLBAR_TRACK_WIDTH - SCROLLBAR_MARGIN, // leave some margin for the vertical scrollbar
     height: SCROLLBAR_TRACK_WIDTH,
   },
   xThumb: {
@@ -46,20 +40,14 @@ const styles = {
     outline: '2px solid #FAFAFA',
     opacity: 0.3,
     borderRadius: 4,
-  },
-  yScrollbarDetectionZone: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    right: 0,
-    width: SCROLLBAR_DETECTION_WIDTH,
+    pointerEvents: 'all',
   },
   yScrollbarTrack: {
-    position: 'relative',
+    position: 'absolute',
+    top: 0,
+    bottom: SCROLLBAR_TRACK_WIDTH - SCROLLBAR_MARGIN,
+    right: 0,
     display: 'inline-block',
-    height: '100%',
-    marginLeft: SCROLLBAR_DETECTION_WIDTH - SCROLLBAR_TRACK_WIDTH,
-    marginBottom: SCROLLBAR_TRACK_WIDTH - SCROLLBAR_MARGIN, // leave some margin for the vertical scrollbar
     width: SCROLLBAR_TRACK_WIDTH,
   },
   yThumb: {
@@ -71,6 +59,7 @@ const styles = {
     outline: '1px solid #FAFAFA',
     opacity: 0.3,
     borderRadius: 4,
+    pointerEvents: 'all',
   },
 };
 
@@ -85,10 +74,8 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   const { wrappedEditorRef, ...otherProps } = props;
 
   const editorRef = React.useRef<?InstancesEditor>(null);
-  const xScrollbarDetectionZone = React.useRef<?HTMLDivElement>(null);
   const xScrollbarTrack = React.useRef<?HTMLDivElement>(null);
   const xScrollbarThumb = React.useRef<?HTMLDivElement>(null);
-  const yScrollbarDetectionZone = React.useRef<?HTMLDivElement>(null);
   const yScrollbarTrack = React.useRef<?HTMLDivElement>(null);
   const yScrollbarThumb = React.useRef<?HTMLDivElement>(null);
 
@@ -107,6 +94,18 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
 
   const forceUpdate = useForceUpdate();
 
+  const canvasRectangle = React.useMemo(() => new Rectangle(), []);
+
+  if (editorRef.current) {
+    const elementBoundingRect = editorRef.current.getBoundingClientRect();
+    canvasRectangle.set({
+      left: elementBoundingRect.left,
+      top: elementBoundingRect.top,
+      right: elementBoundingRect.right - SCROLLBAR_DETECTION_WIDTH,
+      bottom: elementBoundingRect.bottom - SCROLLBAR_DETECTION_WIDTH,
+    });
+  }
+
   const hideScrollbarsAfterDelay = React.useCallback(
     () => {
       if (timeoutHidingScrollbarsId.current) {
@@ -124,14 +123,34 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
     hideScrollbarsAfterDelay();
   }, 500);
 
-  // If the mouse gets out of the detection zone, whilst not dragging, hide the scrollbars.
-  const mouseOutDetectionZoneHandler = React.useCallback(
-    (e: MouseEvent) => {
-      if (!isDragging.current) {
-        hideScrollbarsAfterDelay();
+  const onMouseMoveOverInstanceEditor = React.useCallback(
+    (event: MouseEvent) => {
+      if (!editorRef.current) {
+        return;
+      }
+      let shouldDisplayScrollBars = false;
+
+      shouldDisplayScrollBars = !canvasRectangle.containsPoint(
+        event.clientX,
+        event.clientY
+      );
+
+      if (shouldDisplayScrollBars) {
+        if (!showScrollbars.current) {
+          showScrollbars.current = true;
+          forceUpdate();
+        }
+        if (timeoutHidingScrollbarsId.current) {
+          clearTimeout(timeoutHidingScrollbarsId.current);
+          timeoutHidingScrollbarsId.current = null;
+        }
+      } else {
+        if (!isDragging.current) {
+          hideScrollbarsAfterDelay();
+        }
       }
     },
-    [hideScrollbarsAfterDelay]
+    [canvasRectangle, forceUpdate, hideScrollbarsAfterDelay]
   );
 
   // When the mouse is moving after dragging the thumb:
@@ -199,7 +218,6 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
         isDragging.current = false;
         // If the user releases the mouse outside of the detection zone, we want to hide the scrollbars.
         if (
-          e.target !== xScrollbarDetectionZone.current &&
           e.target !== xScrollbarTrack.current &&
           e.target !== xScrollbarThumb.current
         ) {
@@ -216,7 +234,6 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
         isDragging.current = false;
         // If the user releases the mouse outside of the detection zone, we want to hide the scrollbars.
         if (
-          e.target !== yScrollbarDetectionZone.current &&
           e.target !== yScrollbarTrack.current &&
           e.target !== yScrollbarThumb.current
         ) {
@@ -282,50 +299,6 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
       );
     },
     [mouseDownXThumbHandler, mouseDownYThumbHandler]
-  );
-
-  // When the mouse is over the detection zone, show the scrollbars,
-  // and ensure the timeout to hide them is cleared.
-  const mouseOverDetectionZoneHandler = React.useCallback(
-    (e: MouseEvent) => {
-      if (!showScrollbars.current) {
-        showScrollbars.current = true;
-        forceUpdate();
-      }
-      if (timeoutHidingScrollbarsId.current) {
-        clearTimeout(timeoutHidingScrollbarsId.current);
-        timeoutHidingScrollbarsId.current = null;
-      }
-    },
-    [forceUpdate]
-  );
-
-  // Add the mouse over and out events once on mount.
-  React.useEffect(
-    () => {
-      const xScrollbarDetectionZoneElement = xScrollbarDetectionZone.current;
-      const yScrollbarDetectionZoneElement = yScrollbarDetectionZone.current;
-      if (!xScrollbarDetectionZoneElement || !yScrollbarDetectionZoneElement)
-        return;
-
-      xScrollbarDetectionZoneElement.addEventListener(
-        'mouseover',
-        mouseOverDetectionZoneHandler
-      );
-      xScrollbarDetectionZoneElement.addEventListener(
-        'mouseout',
-        mouseOutDetectionZoneHandler
-      );
-      yScrollbarDetectionZoneElement.addEventListener(
-        'mouseover',
-        mouseOverDetectionZoneHandler
-      );
-      yScrollbarDetectionZoneElement.addEventListener(
-        'mouseout',
-        mouseOutDetectionZoneHandler
-      );
-    },
-    [mouseOverDetectionZoneHandler, mouseOutDetectionZoneHandler]
   );
 
   const setAndAdjust = React.useCallback(
@@ -414,53 +387,44 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
               width={width}
               height={height}
               screenType={screenType}
+              onMouseMove={onMouseMoveOverInstanceEditor}
               {...otherProps}
             />
           )}
           {screenType !== 'touch' && (
             <div
-              style={styles.yScrollbarDetectionZone}
-              ref={yScrollbarDetectionZone}
+              style={{
+                ...styles.yScrollbarTrack,
+                // Keep it in the DOM, so we can register the mouse down event.
+                visibility: showScrollbars.current ? 'visible' : 'hidden',
+              }}
+              ref={yScrollbarTrack}
             >
               <div
                 style={{
-                  ...styles.yScrollbarTrack,
-                  // Keep it in the DOM, so we can register the mouse down event.
-                  visibility: showScrollbars.current ? 'visible' : 'hidden',
+                  ...styles.yThumb,
+                  top: yScrollbarTopPosition,
                 }}
-                ref={yScrollbarTrack}
-              >
-                <div
-                  style={{
-                    ...styles.yThumb,
-                    top: yScrollbarTopPosition,
-                  }}
-                  ref={yScrollbarThumb}
-                />
-              </div>
+                ref={yScrollbarThumb}
+              />
             </div>
           )}
           {screenType !== 'touch' && (
             <div
-              style={styles.xScrollbarDetectionZone}
-              ref={xScrollbarDetectionZone}
+              style={{
+                ...styles.xScrollbarTrack,
+                // Keep it in the DOM, so we can register the mouse down event.
+                visibility: showScrollbars.current ? 'visible' : 'hidden',
+              }}
+              ref={xScrollbarTrack}
             >
               <div
                 style={{
-                  ...styles.xScrollbarTrack,
-                  // Keep it in the DOM, so we can register the mouse down event.
-                  visibility: showScrollbars.current ? 'visible' : 'hidden',
+                  ...styles.xThumb,
+                  marginLeft: xScrollbarLeftPosition,
                 }}
-                ref={xScrollbarTrack}
-              >
-                <div
-                  style={{
-                    ...styles.xThumb,
-                    marginLeft: xScrollbarLeftPosition,
-                  }}
-                  ref={xScrollbarThumb}
-                />
-              </div>
+                ref={xScrollbarThumb}
+              />
             </div>
           )}
         </div>

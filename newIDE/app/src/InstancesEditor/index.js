@@ -85,6 +85,7 @@ type Props = {|
   width: number,
   height: number,
   onViewPositionChanged: ViewPosition => void,
+  onMouseMove: MouseEvent => void,
   screenType: ScreenType,
 |};
 
@@ -207,6 +208,9 @@ export default class InstancesEditor extends Component<Props> {
     this.pixiRenderer.view.addEventListener(
       'mouseup',
       this.keyboardShortcuts.onMouseUp
+    );
+    this.pixiRenderer.view.addEventListener('mousemove', event =>
+      this.props.onMouseMove(event)
     );
 
     this.pixiContainer = new PIXI.Container();
@@ -814,6 +818,11 @@ export default class InstancesEditor extends Component<Props> {
 
   scrollTo(x: number, y: number) {
     this.viewPosition.scrollTo(x, y);
+  }
+
+  getBoundingClientRect() {
+    if (!this.canvasArea) return { left: 0, top: 0, right: 0, bottom: 0 };
+    return this.canvasArea.getBoundingClientRect();
   }
 
   zoomToFitContent() {

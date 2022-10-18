@@ -41,13 +41,8 @@ import {
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 
 const gd: libGDevelop = global.gd;
 
@@ -107,11 +102,8 @@ type Props = {|
   project: gdProject,
   layout: ?gdLayout,
   objectsContainer: gdObjectsContainer,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
-  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
   onSelectAllInstancesOfObjectInLayout?: string => void,
+  resourceManagementProps: ResourceManagementProps,
   onDeleteObject: (
     objectWithContext: ObjectWithContext,
     cb: (boolean) => void
@@ -641,11 +633,8 @@ export default class ObjectsList extends React.Component<Props, State> {
       project,
       layout,
       objectsContainer,
-      resourceSources,
-      onChooseResource,
-      resourceExternalEditors,
+      resourceManagementProps,
       selectedObjectTags,
-      onFetchNewlyAddedResources,
       canInstallPrivateAsset,
     } = this.props;
     const { searchText, tagEditedObject } = this.state;
@@ -740,10 +729,7 @@ export default class ObjectsList extends React.Component<Props, State> {
             project={project}
             layout={layout}
             objectsContainer={objectsContainer}
-            resourceSources={resourceSources}
-            onChooseResource={onChooseResource}
-            resourceExternalEditors={resourceExternalEditors}
-            onFetchNewlyAddedResources={onFetchNewlyAddedResources}
+            resourceManagementProps={resourceManagementProps}
             canInstallPrivateAsset={canInstallPrivateAsset}
           />
         )}

@@ -2,11 +2,7 @@
 import { Trans } from '@lingui/macro';
 import Popover from '@material-ui/core/Popover';
 import * as React from 'react';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import {
   useNewInstructionEditor,
   getInstructionMetadata,
@@ -42,9 +38,7 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   instruction: gdInstruction,
   isCondition: boolean,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   style?: Object,
   anchorEl: ?HTMLElement,
   isNewInstruction: boolean,

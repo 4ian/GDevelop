@@ -109,20 +109,31 @@ export const copyAllToProjectFolder = (
   );
 };
 
+const isURL = (filename: string) => {
+  return (
+    filename.startsWith('http://') ||
+    filename.startsWith('https://') ||
+    filename.startsWith('ftp://') ||
+    filename.startsWith('blob:') ||
+    filename.startsWith('data:')
+  );
+};
+
 export const getResourceFilePathStatus = (
   project: gdProject,
   resourceName: string
 ) => {
   if (!fs) return '';
-  const resourcePath = path.normalize(
-    getLocalResourceFullPath(project, resourceName)
-  );
+  const resourcePath = getLocalResourceFullPath(project, resourceName);
+  if (isURL(resourcePath)) return '';
+
+  const normalizedResourcePath = path.normalize(resourcePath);
 
   // The resource path doesn't exist
-  if (!fs.existsSync(resourcePath)) return 'error';
+  if (!fs.existsSync(normalizedResourcePath)) return 'error';
 
   // The resource path is outside of the project folder
-  if (!isPathInProjectFolder(project, resourcePath)) return 'warning';
+  if (!isPathInProjectFolder(project, normalizedResourcePath)) return 'warning';
 
   // The resource path seems ok
   return '';

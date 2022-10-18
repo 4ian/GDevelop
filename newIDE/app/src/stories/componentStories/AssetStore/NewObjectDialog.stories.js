@@ -8,6 +8,7 @@ import NewObjectDialog from '../../../AssetStore/NewObjectDialog';
 import { AssetStoreStateProvider } from '../../../AssetStore/AssetStoreContext';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'AssetStore/NewObjectDialog',
@@ -24,13 +25,13 @@ export const Default = () => (
       onCreateNewObject={action('onCreateNewObject')}
       onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
       objectsContainer={testProject.testLayout}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
       }}
-      resourceSources={[]}
-      onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
       canInstallPrivateAsset={() => false}
     />
   </AssetStoreStateProvider>

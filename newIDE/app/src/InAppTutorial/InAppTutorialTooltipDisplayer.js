@@ -152,7 +152,10 @@ function InAppTutorialTooltipDisplayer({
                 <Column noMargin>
                   {tooltip.title && (
                     <Typography style={styles.title} variant="subtitle1">
-                      <MarkdownText source={tooltip.title} allowParagraphs />
+                      <MarkdownText
+                        source={tooltip.title.replace(/\\n/g, '\n')} // i18n translation escapes new lines so we have to set them back.
+                        allowParagraphs
+                      />
                     </Typography>
                   )}
                   {tooltip.title && tooltip.description && (
@@ -161,7 +164,7 @@ function InAppTutorialTooltipDisplayer({
                   {tooltip.description && (
                     <Typography style={styles.description}>
                       <MarkdownText
-                        source={tooltip.description}
+                        source={tooltip.description.replace(/\\n/g, '\n')} // i18n translation escapes new lines so we have to set them back.
                         allowParagraphs
                       />
                     </Typography>

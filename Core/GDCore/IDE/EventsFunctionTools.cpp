@@ -20,6 +20,7 @@ namespace gd {
 
 void EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
     const gd::Project& project,
+    const gd::EventsFunctionsContainer functionContainer,
     const gd::EventsFunction& eventsFunction,
     gd::ObjectsContainer& outputGlobalObjectsContainer,
     gd::ObjectsContainer& outputObjectsContainer) {
@@ -31,8 +32,17 @@ void EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
   // to parameters
   outputObjectsContainer.GetObjects().clear();
   outputObjectsContainer.GetObjectGroups().Clear();
+
+  // ActionWithOperator functions use their getter parameters.
+  auto &parameters = (
+      (eventsFunction.GetFunctionType() == gd::EventsFunction::ActionWithOperator &&
+      functionContainer.HasEventsFunctionNamed(eventsFunction.GetGetterName())) ?
+          functionContainer.GetEventsFunction(eventsFunction.GetGetterName()) :
+          eventsFunction).GetParameters();
   gd::ParameterMetadataTools::ParametersToObjectsContainer(
-      project, eventsFunction.GetParameters(), outputObjectsContainer);
+      project,
+      parameters,
+      outputObjectsContainer);
   outputObjectsContainer.GetObjectGroups() = eventsFunction.GetObjectGroups();
 }
 
@@ -44,6 +54,7 @@ void EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
     gd::ObjectsContainer& outputObjectsContainer) {
   // The context is build the same way as free function...
   FreeEventsFunctionToObjectsContainer(project,
+                                       eventsBasedBehavior.GetEventsFunctions(),
                                        eventsFunction,
                                        outputGlobalObjectsContainer,
                                        outputObjectsContainer);
@@ -81,6 +92,7 @@ void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
     gd::ObjectsContainer& outputObjectsContainer) {
   // The context is build the same way as free function...
   FreeEventsFunctionToObjectsContainer(project,
+                                       eventsBasedObject.GetEventsFunctions(),
                                        eventsFunction,
                                        outputGlobalObjectsContainer,
                                        outputObjectsContainer);

@@ -154,7 +154,11 @@ void WholeProjectRefactorer::ExposeProjectEvents(
       gd::ObjectsContainer globalObjectsAndGroups;
       gd::ObjectsContainer objectsAndGroups;
       gd::EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
-          project, *eventsFunction, globalObjectsAndGroups, objectsAndGroups);
+          project,
+          eventsFunctionsExtension,
+          *eventsFunction,
+          globalObjectsAndGroups,
+          objectsAndGroups);
 
       worker.Launch(eventsFunction->GetEvents(),
                     globalObjectsAndGroups,
@@ -550,6 +554,16 @@ void WholeProjectRefactorer::RenameEventsFunction(
                                 oldFunctionName),
       GetEventsFunctionFullType(eventsFunctionsExtension.GetName(),
                                 newFunctionName));
+  
+  if (eventsFunction.GetFunctionType() == gd::EventsFunction::ExpressionAndCondition) {
+    for (auto&& otherFunction : eventsFunctionsExtension.GetInternalVector())
+    {
+      if (otherFunction->GetFunctionType() == gd::EventsFunction::ActionWithOperator &&
+          otherFunction->GetGetterName() == oldFunctionName) {
+        otherFunction->SetGetterName(newFunctionName);
+      }
+    }
+  }
 }
 
 void WholeProjectRefactorer::RenameBehaviorEventsFunction(
@@ -588,6 +602,15 @@ void WholeProjectRefactorer::RenameBehaviorEventsFunction(
                                           newFunctionName));
     ExposeProjectEvents(project, renamer);
   }
+  if (eventsFunction.GetFunctionType() == gd::EventsFunction::ExpressionAndCondition) {
+    for (auto&& otherFunction : eventsBasedBehavior.GetEventsFunctions().GetInternalVector())
+    {
+      if (otherFunction->GetFunctionType() == gd::EventsFunction::ActionWithOperator &&
+          otherFunction->GetGetterName() == oldFunctionName) {
+        otherFunction->SetGetterName(newFunctionName);
+      }
+    }
+  }
 }
 
 void WholeProjectRefactorer::RenameObjectEventsFunction(
@@ -622,6 +645,15 @@ void WholeProjectRefactorer::RenameObjectEventsFunction(
                                           eventsBasedObject.GetName(),
                                           newFunctionName));
     ExposeProjectEvents(project, renamer);
+  }
+  if (eventsFunction.GetFunctionType() == gd::EventsFunction::ExpressionAndCondition) {
+    for (auto&& otherFunction : eventsBasedObject.GetEventsFunctions().GetInternalVector())
+    {
+      if (otherFunction->GetFunctionType() == gd::EventsFunction::ActionWithOperator &&
+          otherFunction->GetGetterName() == oldFunctionName) {
+        otherFunction->SetGetterName(newFunctionName);
+      }
+    }
   }
 }
 

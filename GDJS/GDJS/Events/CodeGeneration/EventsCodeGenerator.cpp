@@ -116,6 +116,7 @@ gd::String EventsCodeGenerator::GenerateLayoutCode(
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     gd::Project& project,
+    const gd::EventsFunctionsContainer functionContainer,
     const gd::EventsFunction& eventsFunction,
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
@@ -123,7 +124,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
   gd::ObjectsContainer globalObjectsAndGroups;
   gd::ObjectsContainer objectsAndGroups;
   gd::EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
-      project, eventsFunction, globalObjectsAndGroups, objectsAndGroups);
+      project, functionContainer, eventsFunction, globalObjectsAndGroups, objectsAndGroups);
 
   EventsCodeGenerator codeGenerator(globalObjectsAndGroups, objectsAndGroups);
   codeGenerator.SetCodeNamespace(codeNamespace);

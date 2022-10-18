@@ -9,6 +9,7 @@
 function generateCompiledEventsForEventsFunction(
   gd,
   project,
+  extension,
   eventsFunction,
   logCode = false
 ) {
@@ -19,6 +20,7 @@ function generateCompiledEventsForEventsFunction(
   const includeFiles = new gd.SetString();
   const code =
     eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+      extension,
       eventsFunction,
       namespace,
       includeFiles,
@@ -55,12 +57,14 @@ function generateCompiledEventsFromSerializedEvents(
   eventsSerializerElement
 ) {
   const project = new gd.ProjectHelper.createNewGDJSProject();
+  const eventsFunctionExtension = new gd.EventsFunctionsExtension();
   const eventsFunction = new gd.EventsFunction();
   eventsFunction.getEvents().unserializeFrom(project, eventsSerializerElement);
 
   const runCompiledEvents = generateCompiledEventsForEventsFunction(
     gd,
     project,
+    extension,
     eventsFunction
   );
 

@@ -6,6 +6,7 @@ declare class gdEventsFunction {
   static StringExpression: 3;
   static ExpressionAndCondition: 4;
   static StringExpressionAndCondition: 5;
+  static ActionWithOperator: 6;
   constructor(): void;
   clone(): gdEventsFunction;
   setDescription(description: string): gdEventsFunction;
@@ -18,8 +19,15 @@ declare class gdEventsFunction {
   getSentence(): string;
   setGroup(group: string): gdEventsFunction;
   getGroup(): string;
+  setGetterName(group: string): gdEventsFunction;
+  getGetterName(): string;
   setPrivate(isPrivate: boolean): gdEventsFunction;
   isPrivate(): boolean;
+  isAction(): boolean;
+  isExpression(): boolean;
+  isNumberExpression(): boolean;
+  isStringExpression(): boolean;
+  isCondition(): boolean;
   setFunctionType(type: EventsFunction_FunctionType): gdEventsFunction;
   getFunctionType(): EventsFunction_FunctionType;
   getEvents(): gdEventsList;

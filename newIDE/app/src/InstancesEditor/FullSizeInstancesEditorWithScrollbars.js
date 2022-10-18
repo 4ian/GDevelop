@@ -12,53 +12,15 @@ import { useDebounce } from '../Utils/UseDebounce';
 import Rectangle from '../Utils/Rectangle';
 
 const SCROLLBAR_DETECTION_WIDTH = 50;
-const SCROLLBAR_TRACK_WIDTH = 16;
+// Those scrollbar dimensions should be the same as in the CSS file Scrollbar.css
 const SCROLLBAR_THUMB_WIDTH = 8;
 const SCROLLBAR_SIZE = 200;
-const VERTICAL_SCROLLBAR_PADDING = 1;
-const HORIZONTAL_SCROLLBAR_PADDING = 3;
 
 const THROTTLE_TIME = 1000 / 60; // 60 FPS
 
 const styles = {
   container: {
     overflow: 'hidden',
-  },
-  xScrollbarTrack: {
-    position: 'absolute',
-    left: 0,
-    right: SCROLLBAR_TRACK_WIDTH - VERTICAL_SCROLLBAR_PADDING,
-    bottom: 0,
-    paddingBottom: HORIZONTAL_SCROLLBAR_PADDING,
-  },
-  xThumb: {
-    position: 'relative',
-    width: SCROLLBAR_SIZE,
-    height: SCROLLBAR_THUMB_WIDTH,
-    backgroundColor: '#8d8d8dcc', // Theme-invariant color
-    border: '1px solid transparent',
-    boxSizing: 'border-box',
-    backgroundClip: 'content-box',
-    borderRadius: 4,
-    pointerEvents: 'all',
-  },
-  yScrollbarTrack: {
-    position: 'absolute',
-    top: 0,
-    bottom: SCROLLBAR_TRACK_WIDTH - HORIZONTAL_SCROLLBAR_PADDING,
-    right: 0,
-    paddingRight: VERTICAL_SCROLLBAR_PADDING,
-  },
-  yThumb: {
-    position: 'relative',
-    height: SCROLLBAR_SIZE,
-    width: SCROLLBAR_THUMB_WIDTH,
-    backgroundColor: '#8d8d8dcc', // Theme-invariant color
-    border: '1px solid transparent',
-    boxSizing: 'border-box',
-    backgroundClip: 'content-box',
-    borderRadius: 4,
-    pointerEvents: 'all',
   },
 };
 
@@ -350,7 +312,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
 
   // Ensure the X Scrollbar doesn't go out of bounds.
   const minXScrollbarLeftPosition = '0%';
-  const maxXScrollbarLeftPosition = `calc(100% - ${SCROLLBAR_SIZE}px - ${SCROLLBAR_TRACK_WIDTH}px)`;
+  const maxXScrollbarLeftPosition = `calc(100% - ${SCROLLBAR_SIZE}px - ${SCROLLBAR_THUMB_WIDTH}px)`;
   const expectedXScrollbarLeftPosition = `calc(${((xValue.current -
     xMin.current) /
     (xMax.current - xMin.current)) *
@@ -360,7 +322,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
 
   // Ensure the Y Scrollbar doesn't go out of bounds.
   const minYScrollbarTopPosition = '0%';
-  const maxYScrollbarTopPosition = `calc(100% - ${SCROLLBAR_SIZE}px - ${SCROLLBAR_TRACK_WIDTH}px)`;
+  const maxYScrollbarTopPosition = `calc(100% - ${SCROLLBAR_SIZE}px - ${SCROLLBAR_THUMB_WIDTH}px)`;
   const expectedYScrollbarTopPosition = `calc(${((yValue.current -
     yMin.current) /
     (yMax.current - yMin.current)) *
@@ -393,17 +355,17 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
           {screenType !== 'touch' && (
             <div
               style={{
-                ...styles.yScrollbarTrack,
                 // Keep it in the DOM, so we can register the mouse down event.
                 visibility: showScrollbars.current ? 'visible' : 'hidden',
               }}
+              className="canvas-vertical-scrollbar-track"
               ref={yScrollbarTrack}
             >
               <div
                 style={{
-                  ...styles.yThumb,
                   top: yScrollbarTopPosition,
                 }}
+                className="canvas-scrollbar-thumb canvas-vertical-scrollbar-thumb"
                 ref={yScrollbarThumb}
               />
             </div>
@@ -411,17 +373,17 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
           {screenType !== 'touch' && (
             <div
               style={{
-                ...styles.xScrollbarTrack,
                 // Keep it in the DOM, so we can register the mouse down event.
                 visibility: showScrollbars.current ? 'visible' : 'hidden',
               }}
+              className="canvas-horizontal-scrollbar-track"
               ref={xScrollbarTrack}
             >
               <div
                 style={{
-                  ...styles.xThumb,
                   marginLeft: xScrollbarLeftPosition,
                 }}
+                className="canvas-scrollbar-thumb canvas-horizontal-scrollbar-thumb"
                 ref={xScrollbarThumb}
               />
             </div>

@@ -9,7 +9,7 @@ import {
 import Text from '../../UI/Text';
 import { t, Trans } from '@lingui/macro';
 import Dialog from '../../UI/Dialog';
-import PriceTag from '../../UI/PriceTag';
+import PriceTag, { formatPrice } from '../../UI/PriceTag';
 import TextButton from '../../UI/TextButton';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
@@ -30,6 +30,10 @@ import Cross from '../../UI/CustomSvgIcons/Cross';
 import Paper from '@material-ui/core/Paper';
 import ResponsiveImagesGallery from '../../UI/ResponsiveImagesGallery';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import RaisedButton from '../../UI/RaisedButton';
+import { sendAssetPackBuyClicked } from '../../Utils/Analytics/EventSender';
+import PrivateAssetPackPurchaseDialog from './PrivateAssetPackPurchaseDialog';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 
 const sortedContentType = [
   'sprite',
@@ -61,11 +65,17 @@ type Props = {|
 |};
 
 const PrivateAssetPackDialog = ({
-  privateAssetPackListingData: { id, name, description, sellerId, prices },
+  privateAssetPackListingData,
   onClose,
 }: Props) => {
+  const { id, name, sellerId, prices } = privateAssetPackListingData;
   const [assetPack, setAssetPack] = React.useState<?PrivateAssetPack>(null);
+  const { onRefreshUserProfile } = React.useContext(AuthenticatedUserContext);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
+  const [
+    isAssetPackPurchaseDialogOpen,
+    setIsAssetPackPurchaseDialogOpen,
+  ] = React.useState<boolean>(false);
   const [
     openSellerPublicProfileDialog,
     setOpenSellerPublicProfileDialog,
@@ -107,6 +117,17 @@ const PrivateAssetPackDialog = ({
     [id, sellerId]
   );
 
+  const onBuy = () => {
+    if (!assetPack) return;
+    const assetPackId = assetPack.id;
+    try {
+      sendAssetPackBuyClicked(assetPackId);
+      setIsAssetPackPurchaseDialogOpen(true);
+    } catch (e) {
+      console.error('Unable to send event', e);
+    }
+  };
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -120,6 +141,20 @@ const PrivateAssetPackDialog = ({
                 key="cancel"
                 label={<Trans>Cancel</Trans>}
                 onClick={onClose}
+              />,
+              <RaisedButton
+                key="buy-asset-pack"
+                primary
+                label={
+                  !assetPack || isAssetPackPurchaseDialogOpen ? (
+                    <Trans>Processing...</Trans>
+                  ) : (
+                    <Trans>Buy for {formatPrice(i18n, prices[0].value)}</Trans>
+                  )
+                }
+                onClick={onBuy}
+                disabled={!assetPack || isAssetPackPurchaseDialogOpen}
+                id="buy-asset-pack"
               />,
             ]}
             onApply={() => {}}
@@ -168,8 +203,29 @@ const PrivateAssetPackDialog = ({
                       style={{ padding: windowWidth === 'small' ? 20 : 30 }}
                     >
                       <ColumnStackLayout noMargin useLargeSpacer>
-                        <Line noMargin>
+                        <Line
+                          noMargin
+                          expand
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
                           <PriceTag value={prices[0].value} />
+                          <RaisedButton
+                            primary
+                            label={
+                              !assetPack || isAssetPackPurchaseDialogOpen ? (
+                                <Trans>Processing...</Trans>
+                              ) : (
+                                <Trans>
+                                  Buy for {formatPrice(i18n, prices[0].value)}
+                                </Trans>
+                              )
+                            }
+                            onClick={onBuy}
+                            disabled={
+                              !assetPack || isAssetPackPurchaseDialogOpen
+                            }
+                          />
                         </Line>
                         <Text noMargin>{assetPack.longDescription}</Text>
                         <ResponsiveLineStackLayout noMargin noColumnMargin>
@@ -241,6 +297,20 @@ const PrivateAssetPackDialog = ({
             <PublicProfileDialog
               userId={sellerId}
               onClose={() => setOpenSellerPublicProfileDialog(false)}
+            />
+          )}
+          {isAssetPackPurchaseDialogOpen && (
+            <PrivateAssetPackPurchaseDialog
+              privateAssetPackListingData={privateAssetPackListingData}
+              onClose={() => setIsAssetPackPurchaseDialogOpen(false)}
+              onSuccessfulPurchase={() => {
+                // Refreshing the user profile to update the purchased asset packs.
+                onRefreshUserProfile();
+              }}
+              onCloseAfterSuccessfulPurchase={() => {
+                setIsAssetPackPurchaseDialogOpen(false);
+                onClose();
+              }}
             />
           )}
         </>

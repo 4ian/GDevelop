@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 
 import Text from './Text';
 import { makeStyles } from '@material-ui/core';
@@ -45,6 +46,14 @@ const useStyles = makeStyles(theme => {
   };
 });
 
+export const formatPrice = (i18n: I18nType, value: number) =>
+  `€ ${i18n
+    .number(value / 100, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+    .replace(/\D00$/, '')}`;
+
 function PriceTag({ value, withOverlay }: Props) {
   const classes = useStyles({ withOverlay });
   return (
@@ -52,13 +61,7 @@ function PriceTag({ value, withOverlay }: Props) {
       {({ i18n }) => (
         <div className={classes.container}>
           <Text noMargin size="sub-title" color="inherit">
-            €
-            {i18n
-              .number(value / 100, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })
-              .replace(/\D00$/, '')}
+            {formatPrice(i18n, value)}
           </Text>
         </div>
       )}

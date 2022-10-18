@@ -857,6 +857,9 @@ export default class InstancesEditor extends Component<Props> {
       const idealZoom = this.viewPosition.fitToRectangle(contentAABB);
       this.setZoomFactor(idealZoom);
     }
+    if (this.props.onViewPositionChanged) {
+      this.props.onViewPositionChanged(this.viewPosition);
+    }
   }
 
   zoomToInitialPosition() {
@@ -864,6 +867,9 @@ export default class InstancesEditor extends Component<Props> {
     const y = this.props.project.getGameResolutionHeight() / 2;
     this.viewPosition.scrollTo(x, y);
     this.setZoomFactor(1);
+    if (this.props.onViewPositionChanged) {
+      this.props.onViewPositionChanged(this.viewPosition);
+    }
   }
 
   zoomToFitSelection(instances: Array<gdInitialInstance>) {
@@ -883,6 +889,9 @@ export default class InstancesEditor extends Component<Props> {
       selectedInstancesRectangle
     );
     this.setZoomFactor(idealZoom);
+    if (this.props.onViewPositionChanged) {
+      this.props.onViewPositionChanged(this.viewPosition);
+    }
   }
 
   centerViewOnLastInstance(instances: Array<gdInitialInstance>) {

@@ -284,6 +284,12 @@ export const sendAssetPackOpened = (assetPackTag: string) => {
   });
 };
 
+export const sendAssetPackBuyClicked = (id: string) => {
+  recordEvent('asset_pack_buy_clicked', {
+    id,
+  });
+};
+
 export const sendHelpFinderOpened = () => {
   recordEvent('help_finder_opened', {});
 };

@@ -15,7 +15,8 @@ const SCROLLBAR_DETECTION_WIDTH = 50;
 const SCROLLBAR_TRACK_WIDTH = 16;
 const SCROLLBAR_THUMB_WIDTH = 8;
 const SCROLLBAR_SIZE = 200;
-const SCROLLBAR_MARGIN = (SCROLLBAR_TRACK_WIDTH - SCROLLBAR_THUMB_WIDTH) / 2;
+const VERTICAL_SCROLLBAR_PADDING = 1;
+const HORIZONTAL_SCROLLBAR_PADDING = 3;
 
 const THROTTLE_TIME = 1000 / 60; // 60 FPS
 
@@ -26,38 +27,36 @@ const styles = {
   xScrollbarTrack: {
     position: 'absolute',
     left: 0,
-    right: SCROLLBAR_TRACK_WIDTH - SCROLLBAR_MARGIN,
+    right: SCROLLBAR_TRACK_WIDTH - VERTICAL_SCROLLBAR_PADDING,
     bottom: 0,
-    display: 'inline-block',
-    height: SCROLLBAR_TRACK_WIDTH,
+    paddingBottom: HORIZONTAL_SCROLLBAR_PADDING,
   },
   xThumb: {
     position: 'relative',
     width: SCROLLBAR_SIZE,
-    marginTop: SCROLLBAR_MARGIN,
     height: SCROLLBAR_THUMB_WIDTH,
-    backgroundColor: '#1D1D26',
-    outline: '2px solid #FAFAFA',
-    opacity: 0.3,
+    backgroundColor: '#8d8d8dcc', // Theme-invariant color
+    border: '1px solid transparent',
+    boxSizing: 'border-box',
+    backgroundClip: 'content-box',
     borderRadius: 4,
     pointerEvents: 'all',
   },
   yScrollbarTrack: {
     position: 'absolute',
     top: 0,
-    bottom: SCROLLBAR_TRACK_WIDTH - SCROLLBAR_MARGIN,
+    bottom: SCROLLBAR_TRACK_WIDTH - HORIZONTAL_SCROLLBAR_PADDING,
     right: 0,
-    display: 'inline-block',
-    width: SCROLLBAR_TRACK_WIDTH,
+    paddingRight: VERTICAL_SCROLLBAR_PADDING,
   },
   yThumb: {
     position: 'relative',
     height: SCROLLBAR_SIZE,
-    marginLeft: SCROLLBAR_MARGIN,
     width: SCROLLBAR_THUMB_WIDTH,
-    backgroundColor: '#1D1D26',
-    outline: '1px solid #FAFAFA',
-    opacity: 0.3,
+    backgroundColor: '#8d8d8dcc', // Theme-invariant color
+    border: '1px solid transparent',
+    boxSizing: 'border-box',
+    backgroundClip: 'content-box',
     borderRadius: 4,
     pointerEvents: 'all',
   },

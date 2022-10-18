@@ -115,7 +115,29 @@ class GD_CORE_API EventsFunction {
     return *this;
   }
 
-  enum FunctionType { Action, Condition, Expression, StringExpression, ExpressionAndCondition, StringExpressionAndCondition };
+  /**
+   * \brief Get the name of the ExpressionAndCondition to use as an operand
+   * that is defined in the editor.
+   */
+  const gd::String& GetGetterName() const { return getterName; };
+
+  /**
+   * \brief Set the name of the ExpressionAndCondition to use as an operand
+   * that is defined in the editor.
+   */
+  EventsFunction& SetGetterName(const gd::String& getterName_) {
+    getterName = getterName_;
+    return *this;
+  }
+
+  enum FunctionType {
+      Action,
+      Condition,
+      Expression,
+      StringExpression,
+      ExpressionAndCondition,
+      StringExpressionAndCondition,
+      ActionWithOperator };
 
   /**
    * \brief Set the type of the function
@@ -134,7 +156,8 @@ class GD_CORE_API EventsFunction {
    * \brief Return true if the function is an action.
    */
   bool IsAction() const {
-    return functionType == gd::EventsFunction::Action;
+    return functionType == gd::EventsFunction::Action || 
+           functionType == gd::EventsFunction::ActionWithOperator;
  }
 
   /**
@@ -143,9 +166,27 @@ class GD_CORE_API EventsFunction {
    * Note that a function can be both an expression and a condition.
    */
   bool IsExpression() const {
+    return IsNumberExpression() ||
+           IsStringExpression();
+ }
+
+  /**
+   * \brief Return true if the function is a number expression.
+   * 
+   * Note that a function can be both an expression and a condition.
+   */
+  bool IsNumberExpression() const {
     return functionType == gd::EventsFunction::Expression ||
-           functionType == gd::EventsFunction::StringExpression ||
-           functionType == gd::EventsFunction::ExpressionAndCondition ||
+           functionType == gd::EventsFunction::ExpressionAndCondition;
+ }
+
+  /**
+   * \brief Return true if the function is a string expression.
+   * 
+   * Note that a function can be both an expression and a condition.
+   */
+  bool IsStringExpression() const {
+    return functionType == gd::EventsFunction::StringExpression ||
            functionType == gd::EventsFunction::StringExpressionAndCondition;
  }
 
@@ -232,6 +273,7 @@ class GD_CORE_API EventsFunction {
   gd::String description;
   gd::String sentence;
   gd::String group;
+  gd::String getterName;
   gd::EventsList events;
   FunctionType functionType;
   std::vector<gd::ParameterMetadata> parameters;

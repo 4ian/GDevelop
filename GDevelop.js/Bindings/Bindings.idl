@@ -1356,7 +1356,7 @@ interface ParameterMetadataTools {
 };
 
 interface EventsFunctionTools {
-    void STATIC_FreeEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
+    void STATIC_FreeEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsFunctionsContainer functionsContainer, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
     void STATIC_BehaviorEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
     void STATIC_ObjectEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsBasedObject eventsBasedObject, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
 };
@@ -2258,7 +2258,8 @@ enum EventsFunction_FunctionType {
   "EventsFunction::Expression",
   "EventsFunction::StringExpression",
   "EventsFunction::ExpressionAndCondition",
-  "EventsFunction::StringExpressionAndCondition"
+  "EventsFunction::StringExpressionAndCondition",
+  "EventsFunction::ActionWithOperator"
 };
 
 interface EventsFunction {
@@ -2275,8 +2276,15 @@ interface EventsFunction {
     [Const, Ref] DOMString GetSentence();
     [Ref] EventsFunction SetGroup([Const] DOMString group);
     [Const, Ref] DOMString GetGroup();
+    [Ref] EventsFunction SetGetterName([Const] DOMString group);
+    [Const, Ref] DOMString GetGetterName();
     [Ref] EventsFunction SetPrivate(boolean isPrivate);
     boolean IsPrivate();
+    boolean IsAction();
+    boolean IsExpression();
+    boolean IsNumberExpression();
+    boolean IsStringExpression();
+    boolean IsCondition();
     [Ref] EventsFunction SetFunctionType(EventsFunction_FunctionType type);
     EventsFunction_FunctionType GetFunctionType();
 
@@ -2962,7 +2970,7 @@ interface ObjectCodeGenerator {
 [Prefix="gdjs::"]
 interface EventsFunctionsExtensionCodeGenerator {
     void EventsFunctionsExtensionCodeGenerator([Ref] Project project);
-    [Const, Value] DOMString GenerateFreeEventsFunctionCompleteCode([Const, Ref] EventsFunction eventsFunction, [Const] DOMString codeNamespac, [Ref] SetString includes, boolean compilationForRuntime);
+    [Const, Value] DOMString GenerateFreeEventsFunctionCompleteCode([Const, Ref] EventsFunctionsExtension extension, [Const, Ref] EventsFunction eventsFunction, [Const] DOMString codeNamespac, [Ref] SetString includes, boolean compilationForRuntime);
 };
 
 [Prefix="gdjs::"]

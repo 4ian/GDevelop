@@ -145,6 +145,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       default:
         return 'res/functions/function.svg';
       case gd.EventsFunction.Action:
+      case gd.EventsFunction.ActionWithOperator:
         switch (eventsFunction.getName()) {
           default:
             return 'res/functions/action.svg';

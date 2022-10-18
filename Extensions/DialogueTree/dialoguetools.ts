@@ -30,16 +30,16 @@ namespace gdjs {
   /**
    * Load the Dialogue Tree data from a JSON resource.
    *
-   * @param runtimeScene The scene where the dialogue is running.
+   * @param instanceContainer The scene where the dialogue is running.
    * @param jsonResourceName The JSON resource where to load the Dialogue Tree data from. The data is a JSON string usually created with [Yarn Dialogue Editor](https://github.com/InfiniteAmmoInc/Yarn).
    * @param startDialogueNode The Dialogue Branch to start the Dialogue Tree from. If left empty, the data will only be loaded, but can later be initialized via another action
    */
   gdjs.dialogueTree.loadFromJsonFile = function (
-    runtimeScene: gdjs.RuntimeScene,
+    instanceContainer: gdjs.RuntimeInstanceContainer,
     jsonResourceName: string,
     startDialogueNode: string
   ) {
-    runtimeScene
+    instanceContainer
       .getGame()
       .getJsonManager()
       .loadJson(jsonResourceName, function (error, content) {

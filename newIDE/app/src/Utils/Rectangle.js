@@ -17,6 +17,10 @@ export default class Rectangle {
     this.bottom = bottom;
   }
 
+  static fromDOMRect(domRect: DOMRect | ClientRect) {
+    return new this(domRect.left, domRect.top, domRect.right, domRect.bottom);
+  }
+
   set({
     left,
     top,
@@ -89,6 +93,15 @@ export default class Rectangle {
     if (rectangle.bottom > this.bottom) {
       this.bottom = rectangle.bottom;
     }
+  }
+
+  toCSSPosition() {
+    return {
+      top: this.top,
+      left: this.left,
+      width: this.width(),
+      height: this.height(),
+    };
   }
 
   toString() {

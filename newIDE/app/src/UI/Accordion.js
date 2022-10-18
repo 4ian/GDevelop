@@ -106,6 +106,7 @@ type AccordionProps = {|
   // Use accordion in controlled mode
   expanded?: boolean,
   onChange?: (open: boolean) => void,
+  id?: string,
 |};
 
 /**

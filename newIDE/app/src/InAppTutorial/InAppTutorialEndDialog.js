@@ -2,9 +2,8 @@
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import React from 'react';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { MarkdownText } from '../UI/MarkdownText';
-import RaisedButton from '../UI/RaisedButton';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { type InAppTutorialEndDialog as InAppTutorialEndDialogType } from './InAppTutorialContext';
 import Window from '../Utils/Window';
@@ -27,7 +26,7 @@ function InAppTutorialEndDialog({ endDialog, onClose }: Props) {
           onApply={onClose}
           open
           actions={[
-            <RaisedButton
+            <DialogPrimaryButton
               key="ok"
               onClick={onClose}
               label={<Trans>Close</Trans>}

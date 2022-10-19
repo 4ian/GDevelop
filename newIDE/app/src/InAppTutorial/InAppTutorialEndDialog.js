@@ -43,7 +43,7 @@ function InAppTutorialEndDialog({ endDialog, onClose }: Props) {
               if (item.messageDescriptor) {
                 return (
                   <MarkdownText
-                    // $FlowFixMe - Message descriptor are usually and object with a `id` key containing the translation key.
+                    // $FlowFixMe - Message descriptor are usually an object with a `id` key containing the translation key.
                     key={item.messageDescriptor.id || item.messageDescriptor}
                     translatableSource={item.messageDescriptor}
                   />

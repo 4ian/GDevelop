@@ -252,7 +252,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
     if (!currentStep) return;
     const { nextStepTrigger } = currentStep;
     if (nextStepTrigger && nextStepTrigger.previewLaunched) {
-      goToStep(currentStepIndex + 1);
+      goToNextStep();
     }
   };
 
@@ -347,10 +347,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
         // $FlowFixMe
         elementToWatch.value !== InputInitialValueRef.current
       ) {
-        goToStep(currentStepIndex + 1);
+        goToNextStep();
       }
     },
-    [currentStepIndex, goToStep, watchElementInputValue]
+    [goToNextStep, watchElementInputValue]
   );
 
   const watchSceneInstanceChanges = React.useCallback(
@@ -360,10 +360,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
       const layout = project.getLayoutAt(0);
       const instances = layout.getInitialInstances();
       if (instances.hasInstancesOfObject(watchSceneInstances)) {
-        goToStep(currentStepIndex + 1);
+        goToNextStep();
       }
     },
-    [project, currentStepIndex, goToStep, watchSceneInstances]
+    [project, goToNextStep, watchSceneInstances]
   );
 
   useInterval(watchInputBeingFilled, watchElementInputValue ? 1000 : null);

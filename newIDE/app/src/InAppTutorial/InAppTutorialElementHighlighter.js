@@ -30,7 +30,7 @@ const styles = {
     position: 'fixed',
     zIndex: AboveMaterialUIMaxZIndex,
     animation:
-      '2s ease-in-out 0s infinite alternate none running verticalEaseShake',
+      '2s ease-in-out 0s infinite alternate none running vertical-translate',
   },
   scrollDirectionArrow: {
     color: highlighterPrimaryColor,

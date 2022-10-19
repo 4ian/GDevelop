@@ -325,8 +325,8 @@ const InAppTutorialOrchestrator = React.forwardRef<
         // $FlowFixMe
         if (elementToWatch) InputInitialValueRef.current = elementToWatch.value;
         setWatchElementInputValue(elementToHighlightId);
-      } else if (nextStepTrigger && nextStepTrigger.instanceDraggedOnScene) {
-        const objectKey = nextStepTrigger.instanceDraggedOnScene;
+      } else if (nextStepTrigger && nextStepTrigger.instanceAddedOnScene) {
+        const objectKey = nextStepTrigger.instanceAddedOnScene;
         const objectName = data[objectKey];
         if (!objectName) return;
         setWatchSceneInstances(objectName);

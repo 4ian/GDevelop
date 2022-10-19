@@ -148,7 +148,7 @@ const inAppTutorial: InAppTutorial = {
     {
       id: 'DragObjectToScene',
       elementToHighlightId: '#object-item-0',
-      nextStepTrigger: { instanceDraggedOnScene: 'firstObject' },
+      nextStepTrigger: { instanceAddedOnScene: 'firstObject' },
       tooltip: {
         description: {
           messageDescriptor: t`Drag $(firstObject) from the menu to the canvas.`,
@@ -320,7 +320,7 @@ const inAppTutorial: InAppTutorial = {
     {
       id: 'DragObjectToScene',
       elementToHighlightId: '#object-item-1',
-      nextStepTrigger: { instanceDraggedOnScene: 'secondObject' },
+      nextStepTrigger: { instanceAddedOnScene: 'secondObject' },
       tooltip: {
         description: {
           messageDescriptor: t`Place a few $(secondObject) in the scene by dragging them to the canvas.`,

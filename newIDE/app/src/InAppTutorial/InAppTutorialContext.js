@@ -28,7 +28,7 @@ export type InAppTutorialFlowStepTrigger =
   | {| valueHasChanged: true |}
   | {| instanceAddedOnScene: string |}
   | {| previewLaunched: true |}
-  | {| clickOnButton: string |};
+  | {| clickOnTooltipButton: string |};
 
 export type InAppTutorialFlowStep = {|
   elementToHighlightId?: string,

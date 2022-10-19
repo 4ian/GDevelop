@@ -200,8 +200,8 @@ function InAppTutorialStepDisplayer({
                 anchorElement={elementToHighlight}
                 tooltip={tooltip}
                 buttonLabel={
-                  nextStepTrigger && nextStepTrigger.clickOnButton
-                    ? nextStepTrigger.clickOnButton
+                  nextStepTrigger && nextStepTrigger.clickOnTooltipButton
+                    ? nextStepTrigger.clickOnTooltipButton
                     : undefined
                 }
               />

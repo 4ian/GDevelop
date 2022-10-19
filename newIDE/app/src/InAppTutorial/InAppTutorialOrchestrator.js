@@ -15,6 +15,7 @@ import {
 import InAppTutorialEndDialog from './InAppTutorialEndDialog';
 import InAppTutorialStepDisplayer from './InAppTutorialStepDisplayer';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
+import { sendInAppTutorialProgress } from '../Utils/Analytics/EventSender';
 
 const interpolateText = (text: string, data: { [key: string]: string }) => {
   const placeholderReplacingRegex = /\$\((\w+)\)/g;
@@ -146,20 +147,33 @@ const InAppTutorialOrchestrator = React.forwardRef<
   );
   const domObserverRef = React.useRef<?MutationObserver>(null);
 
+  const { flow, endDialog, editorSwitches, id: tutorialId } = tutorial;
+  const stepCount = flow.length;
+  const currentStep = flow[currentStepIndex];
+
+  const changeStep = React.useCallback(
+    (stepIndex: number) => {
+      setCurrentStepIndex(stepIndex);
+      sendInAppTutorialProgress({
+        tutorialId: tutorialId,
+        step: stepIndex,
+        isCompleted: stepIndex >= stepCount - 1,
+      });
+    },
+    [tutorialId, stepCount]
+  );
+
   // Reset current step index on tutorial change.
   React.useEffect(
     () => {
-      setCurrentStepIndex(0);
+      changeStep(0);
     },
-    [tutorial]
+    [tutorial, changeStep]
   );
-
-  const { flow, endDialog, editorSwitches } = tutorial;
-  const currentStep = flow[currentStepIndex];
 
   const goToStep = React.useCallback(
     (stepIndex: number) => {
-      if (stepIndex >= flow.length) {
+      if (stepIndex >= stepCount) {
         setDisplayEndDialog(true);
         return;
       }
@@ -167,15 +181,15 @@ const InAppTutorialOrchestrator = React.forwardRef<
       let nextStepIndex = stepIndex;
 
       // Check if we can go directly to next mandatory (not-skippable) step.
-      while (flow[nextStepIndex].skippable && nextStepIndex < flow.length - 1) {
+      while (flow[nextStepIndex].skippable && nextStepIndex < stepCount - 1) {
         if (isDomBasedTriggerComplete(flow[nextStepIndex].nextStepTrigger))
           nextStepIndex += 1;
         else break;
       }
 
-      setCurrentStepIndex(nextStepIndex);
+      changeStep(nextStepIndex);
     },
-    [flow]
+    [flow, changeStep, stepCount]
   );
 
   const watchDomForNextStepTrigger = React.useCallback(
@@ -304,11 +318,11 @@ const InAppTutorialOrchestrator = React.forwardRef<
       setWatchElementInputValue(null);
       setWatchSceneInstances(null);
       // If index out of bounds, display end dialog.
-      if (currentStepIndex >= flow.length) {
+      if (currentStepIndex >= stepCount) {
         setDisplayEndDialog(true);
       }
     },
-    [currentStep, currentStepIndex, flow.length, editorSwitches]
+    [currentStep, currentStepIndex, stepCount, editorSwitches]
   );
 
   // Set up watchers if the next step trigger is not dom-based.
@@ -399,7 +413,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
         step={formattedStep}
         expectedEditor={wrongEditorInfoOpen ? expectedEditor : null}
         goToFallbackStep={() => {
-          setCurrentStepIndex(currentStepFallbackStepIndex.current);
+          changeStep(currentStepFallbackStepIndex.current);
         }}
         endTutorial={endTutorial}
       />

@@ -380,37 +380,39 @@ export const sendExternalEditorOpened = (editorName: string) => {
   recordEvent('open_external_editor', { editorName });
 };
 
-export const sendBehaviorsEditorShown = ({
-  parentEditor,
-}: {|
+export const sendBehaviorsEditorShown = (metadata: {|
   parentEditor: 'object-editor-dialog',
 |}) => {
-  recordEvent('behaviors-editor-shown', { parentEditor });
+  recordEvent('behaviors-editor-shown', metadata);
 };
 
-export const sendBehaviorAdded = ({
-  behaviorType,
-  parentEditor,
-}: {|
+export const sendBehaviorAdded = (metadata: {|
   behaviorType: string,
   parentEditor: 'behaviors-editor' | 'instruction-editor-dialog',
 |}) => {
-  recordEvent('behavior-added', { behaviorType, parentEditor });
+  recordEvent('behavior-added', metadata);
 };
 
-export const sendEventsExtractedAsFunction = ({
-  step,
-  parentEditor,
-}: {|
+export const sendEventsExtractedAsFunction = (metadata: {|
   step: 'begin' | 'end',
   parentEditor:
     | 'scene-events-editor'
     | 'extension-events-editor'
     | 'external-events-editor',
 |}) => {
-  recordEvent('events-extracted-as-function', {
-    step,
-    parentEditor,
-  });
+  recordEvent('events-extracted-as-function', metadata);
 };
 
+export const sendInAppTutorialProgress = (metadata: {|
+  tutorialId: string,
+  step: number,
+  isCompleted: boolean,
+|}) => {
+  const builtInTutorialIds = ['onboarding'];
+  recordEvent(
+    builtInTutorialIds.includes(metadata.tutorialId)
+      ? 'in-app-tutorial-built-in'
+      : 'in-app-tutorial-external',
+    metadata
+  );
+};

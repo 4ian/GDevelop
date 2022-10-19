@@ -189,12 +189,10 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   );
 
   // When the user releases the thumb, we need to stop listening to mouse move and up events.
-  // In the case the user releases outside of the detection zone, we need to hide the scrollbars.
   const makeMouseUpXThumbHandler = React.useCallback(
     mouseMoveHandler =>
       function mouseUpHandler(e: MouseEvent) {
         isDragging.current = false;
-        // If the user releases the mouse outside of the detection zone, we want to hide the scrollbars.
         if (
           e.target !== xScrollbarTrack.current &&
           e.target !== xScrollbarThumb.current
@@ -210,7 +208,6 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
     mouseMoveHandler =>
       function mouseUpHandler(e: MouseEvent) {
         isDragging.current = false;
-        // If the user releases the mouse outside of the detection zone, we want to hide the scrollbars.
         if (
           e.target !== yScrollbarTrack.current &&
           e.target !== yScrollbarThumb.current

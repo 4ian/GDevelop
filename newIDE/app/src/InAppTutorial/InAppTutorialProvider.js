@@ -14,7 +14,7 @@ type Props = {| children: React.Node |};
 export let currentlyRunningInAppTutorial = null;
 
 const InAppTutorialProvider = (props: Props) => {
-  const [isFlowRunning, setIsFlowRunning] = React.useState<boolean>(false);
+  const [isInAppTutorialRunning, setIsInAppTutorialRunning] = React.useState<boolean>(false);
   const [tutorial, setTutorial] = React.useState<?InAppTutorial>(null);
   const [project, setProject] = React.useState<?gdProject>(null);
   const [
@@ -29,7 +29,7 @@ const InAppTutorialProvider = (props: Props) => {
     if (tutorialId === onboardingTutorial.id) {
       setTutorial(onboardingTutorial);
       currentlyRunningInAppTutorial = tutorialId;
-      setIsFlowRunning(true);
+      setIsInAppTutorialRunning(true);
     }
   };
 
@@ -43,7 +43,7 @@ const InAppTutorialProvider = (props: Props) => {
 
   const endTutorial = () => {
     currentlyRunningInAppTutorial = null;
-    setIsFlowRunning(false);
+    setIsInAppTutorialRunning(false);
   };
 
   return (
@@ -54,12 +54,12 @@ const InAppTutorialProvider = (props: Props) => {
         setCurrentEditor,
         goToNextStep,
         onPreviewLaunch,
-        isFlowRunning,
+        isInAppTutorialRunning,
         startTutorial,
       }}
     >
       {props.children}
-      {tutorial && isFlowRunning && (
+      {tutorial && isInAppTutorialRunning && (
         <InAppTutorialOrchestrator
           ref={orchestratorRef}
           tutorial={tutorial}

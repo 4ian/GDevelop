@@ -95,7 +95,7 @@ const MainPage = ({
   tutorials,
 }: Props) => {
   const classes = useStyles();
-  const { isFlowRunning } = React.useContext(InAppTutorialContext);
+  const { isInAppTutorialRunning } = React.useContext(InAppTutorialContext);
   const windowWidth = useResponsiveWindowWidth();
   const shouldShowOnboardingButton = !isMobile();
   const helpItems: {
@@ -114,7 +114,7 @@ const MainPage = ({
             sendOnboardingManuallyOpened();
             onOpenOnboardingDialog();
           },
-          disabled: isFlowRunning,
+          disabled: isInAppTutorialRunning,
         }
       : undefined,
     {

@@ -76,7 +76,7 @@ export type InAppTutorialState = {|
   setCurrentEditor: (EditorIdentifier | null) => void,
   goToNextStep: () => void,
   onPreviewLaunch: () => void,
-  isFlowRunning: boolean,
+  isInAppTutorialRunning: boolean,
   startTutorial: (id: string) => void,
 |};
 
@@ -86,7 +86,7 @@ export const initialInAppTutorialState: InAppTutorialState = {
   setCurrentEditor: () => {},
   goToNextStep: () => {},
   onPreviewLaunch: () => {},
-  isFlowRunning: false,
+  isInAppTutorialRunning: false,
   startTutorial: () => {},
 };
 

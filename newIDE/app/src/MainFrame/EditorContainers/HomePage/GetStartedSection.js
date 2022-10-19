@@ -82,7 +82,7 @@ const GetStartedSection = ({
   setShowGetStartedSection,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const { isFlowRunning } = React.useContext(InAppTutorialContext);
+  const { isInAppTutorialRunning } = React.useContext(InAppTutorialContext);
   const shouldShowOnboardingButton = !isMobile() && windowWidth !== 'small';
   const items: {
     key: string,
@@ -146,7 +146,7 @@ const GetStartedSection = ({
                   onOpenOnboardingDialog();
                 }}
                 size="banner"
-                disabled={isFlowRunning}
+                disabled={isInAppTutorialRunning}
               >
                 <ResponsiveLineStackLayout noMargin expand>
                   <img

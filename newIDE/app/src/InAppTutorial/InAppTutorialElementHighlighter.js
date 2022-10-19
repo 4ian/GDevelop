@@ -83,10 +83,8 @@ function InAppTutorialElementHighlighter({ element }: Props) {
   React.useEffect(
     () => {
       if (scrollParent) {
-        // $FlowFixMe - Flow declaration does not seem to support scroll event
-        scrollParent.addEventListener('scroll', forceUpdate, { passive: true });
+        scrollParent.addEventListener('scroll', forceUpdate);
         return () => {
-          // $FlowFixMe - Flow declaration does not seem to support scroll event
           scrollParent.removeEventListener('scroll', forceUpdate);
         };
       }

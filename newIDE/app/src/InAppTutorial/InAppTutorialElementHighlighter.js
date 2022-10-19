@@ -4,7 +4,7 @@ import Rectangle from '../Utils/Rectangle';
 import useOnResize from '../Utils/UseOnResize';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import {
-  AboveMaterialUIMaxZIndex,
+  aboveMaterialUiMaxZIndex,
   getDisplayZIndexForHighlighter,
   getScrollParent,
 } from './HTMLUtils';
@@ -28,7 +28,7 @@ const styles = {
   },
   scrollIndicator: {
     position: 'fixed',
-    zIndex: AboveMaterialUIMaxZIndex,
+    zIndex: aboveMaterialUiMaxZIndex,
     animation:
       '2s ease-in-out 0s infinite alternate none running vertical-translate',
   },

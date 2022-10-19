@@ -2,6 +2,7 @@
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 import { mapVector } from '../Utils/MapFor';
+import { getFreeFunctionCodeName } from '.';
 const gd: libGDevelop = global.gd;
 
 // This file contains the logic to declare extension metadata from
@@ -370,12 +371,16 @@ export const declareInstructionOrExpressionMetadata = (
       : null;
     const action = extension.addAction(
       eventsFunction.getName(),
-      getterFunction.getFullName() || eventsFunction.getName(),
+      (getterFunction && getterFunction.getFullName()) ||
+        eventsFunction.getName(),
       'Change ' +
-        (getterFunction.getDescription() || eventsFunction.getFullName()),
+        ((getterFunction && getterFunction.getDescription()) ||
+          eventsFunction.getFullName()),
       // An operator and an operand are inserted before user parameters.
-      shiftSentenceParamIndexes(getterFunction.getSentence(), 2),
-      getterFunction.getGroup() || '',
+      getterFunction
+        ? shiftSentenceParamIndexes(getterFunction.getSentence(), 2)
+        : '',
+      (getterFunction && getterFunction.getGroup()) || '',
       getExtensionIconUrl(extension),
       getExtensionIconUrl(extension)
     );
@@ -388,7 +393,10 @@ export const declareInstructionOrExpressionMetadata = (
             ? 'string'
             : 'number'
         )
-        .setGetter(getterFunction.getName());
+        // TODO Use an helper method
+        .setGetter(
+          getFreeFunctionCodeName(eventsFunctionsExtension, getterFunction)
+        );
     }
     return action;
   } else if (functionType === gd.EventsFunction.Condition) {
@@ -511,12 +519,16 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       : null;
     const action = behaviorMetadata.addScopedAction(
       eventsFunction.getName(),
-      getterFunction.getFullName() || eventsFunction.getName(),
+      (getterFunction && getterFunction.getFullName()) ||
+        eventsFunction.getName(),
       'Change ' +
-        (getterFunction.getDescription() || eventsFunction.getFullName()),
+        ((getterFunction && getterFunction.getDescription()) ||
+          eventsFunction.getFullName()),
       // An operator and an operand are inserted before user parameters.
-      shiftSentenceParamIndexes(getterFunction.getSentence(), 2),
-      getterFunction.getGroup() ||
+      getterFunction
+        ? shiftSentenceParamIndexes(getterFunction.getSentence(), 2)
+        : '',
+      (getterFunction && getterFunction.getGroup()) ||
         eventsBasedBehavior.getFullName() ||
         eventsBasedBehavior.getName(),
       getExtensionIconUrl(extension),
@@ -636,12 +648,16 @@ export const declareObjectInstructionOrExpressionMetadata = (
       : null;
     const action = objectMetadata.addScopedAction(
       eventsFunction.getName(),
-      getterFunction.getFullName() || eventsFunction.getName(),
+      (getterFunction && getterFunction.getFullName()) ||
+        eventsFunction.getName(),
       'Change ' +
-        (getterFunction.getDescription() || eventsFunction.getFullName()),
+        ((getterFunction && getterFunction.getDescription()) ||
+          eventsFunction.getFullName()),
       // An operator and an operand are inserted before user parameters.
-      shiftSentenceParamIndexes(getterFunction.getSentence(), 2),
-      getterFunction.getGroup() ||
+      getterFunction
+        ? shiftSentenceParamIndexes(getterFunction.getSentence(), 2)
+        : '',
+      (getterFunction && getterFunction.getGroup()) ||
         eventsBasedObject.getFullName() ||
         eventsBasedObject.getName(),
       getExtensionIconUrl(extension),
@@ -1132,7 +1148,6 @@ export const declareEventsFunctionParameters = (
     | gdMultipleInstructionMetadata,
   userDefinedFirstParameterIndex: number
 ) => {
-  console.log(eventsFunction.getName());
   const addParameter = (parameter: gdParameterMetadata) => {
     if (!parameter.isCodeOnly()) {
       instructionOrExpression.addParameter(
@@ -1145,7 +1160,6 @@ export const declareEventsFunctionParameters = (
         parameter.getLongDescription()
       );
       instructionOrExpression.setDefaultValue(parameter.getDefaultValue());
-      console.log(parameter.getName() + ' : ' + parameter.getType());
     } else {
       instructionOrExpression.addCodeOnlyParameter(
         parameter.getType(),
@@ -1160,6 +1174,8 @@ export const declareEventsFunctionParameters = (
   )
     ? eventsFunctionsContainer.getEventsFunction(eventsFunction.getGetterName())
     : null;
+  // This is used instead of getParametersForEvents because the Value parameter
+  // is already add by useStandardOperatorParameters.
   const parameters = (functionType === gd.EventsFunction.ActionWithOperator &&
   getterFunction
     ? getterFunction
@@ -1178,8 +1194,9 @@ export const declareEventsFunctionParameters = (
     );
   } else if (functionType === gd.EventsFunction.ActionWithOperator) {
     ((instructionOrExpression: any): gdInstructionMetadata).useStandardOperatorParameters(
-      getterFunction.getFunctionType() ===
-        gd.EventsFunction.StringExpressionAndCondition
+      getterFunction &&
+        getterFunction.getFunctionType() ===
+          gd.EventsFunction.StringExpressionAndCondition
         ? 'string'
         : 'number'
     );

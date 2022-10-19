@@ -38,7 +38,9 @@ const mapVector = /*:: <T, U> */ (
   startIndex /*: number */ = 0,
   endExcludedIndex /*: number */ = cppVector.size()
 ) /*: Array<U> */ => {
-  return mapFor(startIndex, endExcludedIndex, i => func(cppVector.at(i), i));
+  return mapFor(startIndex, Math.min(endExcludedIndex, cppVector.size()), i =>
+    func(cppVector.at(i), i)
+  );
 };
 
 module.exports = {

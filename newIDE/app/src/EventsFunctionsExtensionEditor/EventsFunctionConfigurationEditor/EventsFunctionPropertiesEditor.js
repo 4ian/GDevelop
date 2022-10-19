@@ -29,7 +29,7 @@ type Props = {|
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   eventsBasedObject: ?gdEventsBasedObject,
-  eventsFunctionsContainer: gdEventsFunctionsContainer,
+  eventsFunctionsContainer: ?gdEventsFunctionsContainer,
   helpPagePath?: string,
   onConfigurationUpdated?: (whatChanged?: 'type') => void,
   renderConfigurationHeader?: () => React.Node,

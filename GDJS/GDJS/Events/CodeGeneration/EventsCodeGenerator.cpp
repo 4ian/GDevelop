@@ -134,9 +134,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       codeGenerator,
       codeGenerator.GetCodeNamespaceAccessor() + "func",
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParameters(), 0, true),
+          eventsFunction.GetParametersForEvents(functionContainer), 0, true),
       codeGenerator.GenerateFreeEventsFunctionContext(
-          eventsFunction.GetParameters(), "runtimeScene.getOnceTriggers()"),
+          eventsFunction.GetParametersForEvents(functionContainer), "runtimeScene.getOnceTriggers()"),
       eventsFunction.GetEvents(),
       "",
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
@@ -186,7 +186,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       "var Behavior = this.name;\n" +
       codeGenerator.GenerateBehaviorEventsFunctionContext(
           eventsBasedBehavior,
-          eventsFunction.GetParameters(),
+          eventsFunction.GetParametersForEvents(
+              eventsBasedBehavior.GetEventsFunctions()),
           onceTriggersVariable,
           // Pass the names of the parameters considered as the current
           // object and behavior parameters:
@@ -197,7 +198,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       codeGenerator,
       fullyQualifiedFunctionName,
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParameters(), 2, false),
+          eventsFunction.GetParametersForEvents(
+              eventsBasedBehavior.GetEventsFunctions()), 2, false),
       fullPreludeCode,
       eventsFunction.GetEvents(),
       "",
@@ -259,7 +261,8 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
 
       fullPreludeCode += codeGenerator.GenerateObjectEventsFunctionContext(
           eventsBasedObject,
-          eventsFunction.GetParameters(),
+          eventsFunction.GetParametersForEvents(
+              eventsBasedObject.GetEventsFunctions()),
           onceTriggersVariable,
           // Pass the names of the parameters considered as the current
           // object and behavior parameters:
@@ -270,7 +273,8 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
       fullyQualifiedFunctionName,
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
         // TODO EBO use constants for firstParameterIndex
-          eventsFunction.GetParameters(), 1, false),
+          eventsFunction.GetParametersForEvents(
+              eventsBasedObject.GetEventsFunctions()), 1, false),
       fullPreludeCode,
       eventsFunction.GetEvents(),
       endingCode,

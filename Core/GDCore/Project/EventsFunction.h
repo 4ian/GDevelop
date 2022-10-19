@@ -19,6 +19,7 @@
 namespace gd {
 class SerializerElement;
 class Project;
+class EventsFunctionsContainer;
 }  // namespace gd
 
 namespace gd {
@@ -225,7 +226,20 @@ class GD_CORE_API EventsFunction {
   gd::EventsList& GetEvents() { return events; };
 
   /**
-   * \brief Return the parameters of the function.
+   * \brief Return the parameters of the function that are used in the events.
+   *
+   * \note During code/extension generation, new parameters are added
+   * to the generated function, like "runtimeScene" and "eventsFunctionContext".
+   * This should be transparent to the user.
+   */
+  const std::vector<gd::ParameterMetadata>& GetParametersForEvents(
+      const gd::EventsFunctionsContainer& functionsContainer) const;
+
+  /**
+   * \brief Return the parameters of the function that are filled in the editor.
+   * 
+   * \note They won't be used for ActionWithOperator, but they need to be kept
+   * to avoid to loose them when the function type is changed.
    *
    * \note During code/extension generation, new parameters are added
    * to the generated function, like "runtimeScene" and "eventsFunctionContext".
@@ -277,6 +291,7 @@ class GD_CORE_API EventsFunction {
   gd::EventsList events;
   FunctionType functionType;
   std::vector<gd::ParameterMetadata> parameters;
+  mutable std::vector<gd::ParameterMetadata> actionWithOperationParameters;
   gd::ObjectGroupsContainer objectGroups;
   bool isPrivate = false;
 };

@@ -25,7 +25,18 @@ namespace gd {
  */
 class GD_CORE_API EventsFunctionsContainer
     : private SerializableWithNameList<gd::EventsFunction> {
- public:
+public:
+  enum FunctionSource {
+      Extension,
+      Object,
+      Behavior};
+
+  EventsFunctionsContainer(FunctionSource source_) : source(source_) {}
+
+  FunctionSource GetSource() const {
+    return source;
+  }
+
   /** \name Events Functions management
    */
   ///@{
@@ -139,6 +150,9 @@ class GD_CORE_API EventsFunctionsContainer
   void Init(const gd::EventsFunctionsContainer& other) {
     return SerializableWithNameList<gd::EventsFunction>::Init(other);
   };
+
+private:
+FunctionSource source;
 };
 
 }  // namespace gd

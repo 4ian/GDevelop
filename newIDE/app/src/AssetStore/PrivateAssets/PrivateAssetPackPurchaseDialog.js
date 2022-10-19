@@ -47,6 +47,7 @@ const PrivateAssetPackPurchaseDialog = ({
       const checkoutUrl = await getStripeCheckoutUrl(getAuthorizationHeader, {
         stripePriceId: privateAssetPackListingData.prices[0].stripePriceId,
         userId: profile.id,
+        customerEmail: profile.email,
       });
       Window.openExternalURL(checkoutUrl);
     } catch (error) {
@@ -65,7 +66,7 @@ const PrivateAssetPackPurchaseDialog = ({
       if (!profile) return;
       const userPurchases = await listUserPurchases(getAuthorizationHeader, {
         userId: profile.id,
-        productType: 'ASSET_PACK',
+        productType: 'asset-pack',
         role: 'receiver',
       });
       if (
@@ -120,7 +121,7 @@ const PrivateAssetPackPurchaseDialog = ({
       onApply={onContinue}
       flexColumnBody
     >
-      {!profile && (
+      {!profile ? (
         <CreateProfile
           onLogin={onLogin}
           onCreateAccount={onCreateAccount}
@@ -132,25 +133,18 @@ const PrivateAssetPackPurchaseDialog = ({
           }
           justifyContent="center"
         />
-      )}
-      {profile && !isBuying && (
-        <>
-          <Text>
-            <Trans>
-              You are about to purchase the asset pack{' '}
-              <b>{privateAssetPackListingData.name}</b> and link it to your user
-              account with email
-              {profile.email}. You will be able to use it in all your projects.
-            </Trans>
-          </Text>
-          <Text>
-            <Trans>
-              A new secure window will open to complete the purchase.
-            </Trans>
-          </Text>
-        </>
-      )}
-      {profile && isBuying && (
+      ) : purchaseSuccessful ? (
+        <Text>
+          <Trans>
+            {privateAssetPackListingData.name} has now been added to your
+            account!
+          </Trans>
+          <Trans>
+            You can close this window and go back to the asset store to download
+            your assets.
+          </Trans>
+        </Text>
+      ) : isBuying ? (
         <>
           <Line>
             <Text>
@@ -176,18 +170,22 @@ const PrivateAssetPackPurchaseDialog = ({
             </BackgroundText>
           </Line>
         </>
-      )}
-      {profile && purchaseSuccessful && (
-        <Text>
-          <Trans>
-            {privateAssetPackListingData.name} has now been added to your
-            account!
-          </Trans>
-          <Trans>
-            You can close this window and go back to the asset store to download
-            your assets.
-          </Trans>
-        </Text>
+      ) : (
+        <>
+          <Text>
+            <Trans>
+              You are about to purchase the asset pack{' '}
+              <b>{privateAssetPackListingData.name}</b> and link it to your user
+              account with email
+              {profile.email}. You will be able to use it in all your projects.
+            </Trans>
+          </Text>
+          <Text>
+            <Trans>
+              A new secure window will open to complete the purchase.
+            </Trans>
+          </Text>
+        </>
       )}
     </Dialog>
   );

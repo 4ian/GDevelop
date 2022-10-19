@@ -169,7 +169,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     project: gdProject,
     eventsFunction: gdEventsFunction,
     eventsBasedBehavior: ?gdEventsBasedBehavior,
-    eventsBasedObject: ?gdEventsBasedObject
+    eventsBasedObject: ?gdEventsBasedObject,
+    eventsFunctionsExtension: ?gdEventsFunctionsExtension
   ) => {
     // Initialize this "context" of objects with the function
     // (as done during code generation).
@@ -189,9 +190,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         this._globalObjectsContainer,
         this._objectsContainer
       );
-    } else {
+    } else if (eventsFunctionsExtension) {
       gd.EventsFunctionTools.freeEventsFunctionToObjectsContainer(
         project,
+        eventsFunctionsExtension,
         eventsFunction,
         this._globalObjectsContainer,
         this._objectsContainer
@@ -258,7 +260,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this.props.project,
       selectedEventsFunction,
       selectedEventsBasedBehavior,
-      selectedEventsBasedObject
+      selectedEventsBasedObject,
+      this.props.eventsFunctionsExtension
     );
     this.setState(
       {
@@ -592,7 +595,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this._loadEventsFunctionFrom(
         this.props.project,
         this.state.selectedEventsFunction,
-        this.state.selectedEventsBasedBehavior
+        this.state.selectedEventsBasedBehavior,
+        this.state.selectedEventsBasedObject,
+        this.props.eventsFunctionsExtension
       );
     }
   };
@@ -611,7 +616,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         this.props.project,
         this.state.selectedEventsFunction,
         this.state.selectedEventsBasedBehavior,
-        this.state.selectedEventsBasedObject
+        this.state.selectedEventsBasedObject,
+        this.props.eventsFunctionsExtension
       );
     }
   };
@@ -825,7 +831,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
               this.props.project,
               this.state.selectedEventsFunction,
               this.state.selectedEventsBasedBehavior,
-              this.state.selectedEventsBasedObject
+              this.state.selectedEventsBasedObject,
+              this.props.eventsFunctionsExtension
             );
           }
         }
@@ -867,7 +874,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
               this.props.project,
               this.state.selectedEventsFunction,
               this.state.selectedEventsBasedBehavior,
-              this.state.selectedEventsBasedObject
+              this.state.selectedEventsBasedObject,
+              this.props.eventsFunctionsExtension
             );
           }
         }
@@ -1053,7 +1061,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                         project,
                         selectedEventsFunction,
                         selectedEventsBasedBehavior,
-                        selectedEventsBasedObject
+                        selectedEventsBasedObject,
+                        this.props.eventsFunctionsExtension
                       );
                       this.forceUpdate();
                     }}

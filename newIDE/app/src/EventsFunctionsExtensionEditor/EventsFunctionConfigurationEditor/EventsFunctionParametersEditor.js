@@ -38,6 +38,7 @@ type Props = {|
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   eventsBasedObject: ?gdEventsBasedObject,
+  eventsFunctionsContainer: ?gdEventsFunctionsContainer,
   onParametersUpdated: () => void,
   helpPagePath?: string,
   freezeParameters?: boolean,
@@ -244,11 +245,11 @@ export default class EventsFunctionParametersEditor extends React.Component<
       eventsFunction,
       eventsBasedBehavior,
       eventsBasedObject,
+      eventsFunctionsContainer,
       freezeParameters,
       helpPagePath,
     } = this.props;
 
-    const parameters = eventsFunction.getParameters();
     const isABehaviorLifecycleEventsFunction =
       !!eventsBasedBehavior &&
       isBehaviorLifecycleEventsFunction(eventsFunction.getName());
@@ -291,21 +292,17 @@ export default class EventsFunctionParametersEditor extends React.Component<
         </Column>
       );
     }
-    if (
+
+    const parameters =
+      eventsFunctionsContainer &&
       eventsFunction.getFunctionType() === gd.EventsFunction.ActionWithOperator
-    ) {
-      return (
-        <EmptyMessage>
-          <Trans>
-            Actions with an operator use its expression parameters. There is
-            nothing to configure.
-          </Trans>
-        </EmptyMessage>
-      );
-    }
+        ? eventsFunction.getParametersForEvents(eventsFunctionsContainer)
+        : eventsFunction.getParameters();
 
     const isParameterDisabled = index => {
       return (
+        eventsFunction.getFunctionType() ===
+          gd.EventsFunction.ActionWithOperator ||
         !!freezeParameters ||
         (!!eventsBasedBehavior && index < 2) ||
         (!!eventsBasedObject && index < 1)

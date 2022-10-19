@@ -33,12 +33,7 @@ void EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
   outputObjectsContainer.GetObjects().clear();
   outputObjectsContainer.GetObjectGroups().Clear();
 
-  // ActionWithOperator functions use their getter parameters.
-  auto &parameters = (
-      (eventsFunction.GetFunctionType() == gd::EventsFunction::ActionWithOperator &&
-      functionContainer.HasEventsFunctionNamed(eventsFunction.GetGetterName())) ?
-          functionContainer.GetEventsFunction(eventsFunction.GetGetterName()) :
-          eventsFunction).GetParameters();
+  auto &parameters = eventsFunction.GetParametersForEvents(functionContainer);
   gd::ParameterMetadataTools::ParametersToObjectsContainer(
       project,
       parameters,

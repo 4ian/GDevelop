@@ -9,7 +9,6 @@
 function generateCompiledEventsForEventsFunction(
   gd,
   project,
-  extension,
   eventsFunction,
   logCode = false
 ) {
@@ -18,6 +17,7 @@ function generateCompiledEventsForEventsFunction(
     new gd.EventsFunctionsExtensionCodeGenerator(project);
 
   const includeFiles = new gd.SetString();
+  const extension = new gd.EventsFunctionsExtension();
   const code =
     eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
       extension,
@@ -28,6 +28,7 @@ function generateCompiledEventsForEventsFunction(
     );
 
   eventsFunctionsExtensionCodeGenerator.delete();
+  extension.delete();
   includeFiles.delete();
 
   if (logCode) console.log(code);
@@ -57,14 +58,12 @@ function generateCompiledEventsFromSerializedEvents(
   eventsSerializerElement
 ) {
   const project = new gd.ProjectHelper.createNewGDJSProject();
-  const eventsFunctionExtension = new gd.EventsFunctionsExtension();
   const eventsFunction = new gd.EventsFunction();
   eventsFunction.getEvents().unserializeFrom(project, eventsSerializerElement);
 
   const runCompiledEvents = generateCompiledEventsForEventsFunction(
     gd,
     project,
-    extension,
     eventsFunction
   );
 

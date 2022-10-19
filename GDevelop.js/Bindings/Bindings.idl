@@ -2290,6 +2290,7 @@ interface EventsFunction {
 
     [Ref] EventsList GetEvents();
     [Ref] VectorParameterMetadata GetParameters();
+    [Const, Ref] VectorParameterMetadata GetParametersForEvents([Const, Ref] EventsFunctionsContainer functionsContainer);
     [Ref] ObjectGroupsContainer GetObjectGroups();
 
     void SerializeTo([Ref] SerializerElement element);

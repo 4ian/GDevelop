@@ -822,6 +822,20 @@ export default class InstancesEditor extends Component<Props> {
 
   scrollTo(x: number, y: number) {
     this.viewPosition.scrollTo(x, y);
+    if (this.props.onViewPositionChanged) {
+      this.props.onViewPositionChanged(this.viewPosition);
+    }
+  }
+
+  fitViewToRectangle(
+    rectangle: Rectangle,
+    { adaptZoom }: { adaptZoom: boolean }
+  ) {
+    const idealZoom = this.viewPosition.fitToRectangle(rectangle);
+    if (adaptZoom) this.setZoomFactor(idealZoom);
+    if (this.props.onViewPositionChanged) {
+      this.props.onViewPositionChanged(this.viewPosition);
+    }
   }
 
   getBoundingClientRect() {
@@ -857,23 +871,14 @@ export default class InstancesEditor extends Component<Props> {
     // $FlowFixMe - JSFunctor is incompatible with Functor
     initialInstances.iterateOverInstances(getInstanceRectangle);
     getInstanceRectangle.delete();
-    if (contentAABB) {
-      const idealZoom = this.viewPosition.fitToRectangle(contentAABB);
-      this.setZoomFactor(idealZoom);
-    }
-    if (this.props.onViewPositionChanged) {
-      this.props.onViewPositionChanged(this.viewPosition);
-    }
+    if (contentAABB) this.fitViewToRectangle(contentAABB, { adaptZoom: true });
   }
 
   zoomToInitialPosition() {
     const x = this.props.project.getGameResolutionWidth() / 2;
     const y = this.props.project.getGameResolutionHeight() / 2;
-    this.viewPosition.scrollTo(x, y);
     this.setZoomFactor(1);
-    if (this.props.onViewPositionChanged) {
-      this.props.onViewPositionChanged(this.viewPosition);
-    }
+    this.scrollTo(x, y);
   }
 
   zoomToFitSelection(instances: Array<gdInitialInstance>) {
@@ -889,13 +894,7 @@ export default class InstancesEditor extends Component<Props> {
         instanceMeasurer.getInstanceAABB(instance, new Rectangle())
       );
     });
-    const idealZoom = this.viewPosition.fitToRectangle(
-      selectedInstancesRectangle
-    );
-    this.setZoomFactor(idealZoom);
-    if (this.props.onViewPositionChanged) {
-      this.props.onViewPositionChanged(this.viewPosition);
-    }
+    this.fitViewToRectangle(selectedInstancesRectangle, { adaptZoom: true });
   }
 
   centerViewOnLastInstance(instances: Array<gdInitialInstance>) {
@@ -906,10 +905,7 @@ export default class InstancesEditor extends Component<Props> {
       instances[instances.length - 1],
       new Rectangle()
     );
-    this.viewPosition.fitToRectangle(lastInstanceRectangle);
-    if (this.props.onViewPositionChanged) {
-      this.props.onViewPositionChanged(this.viewPosition);
-    }
+    this.fitViewToRectangle(lastInstanceRectangle, { adaptZoom: false });
   }
 
   getLastContextMenuSceneCoordinates = () => {

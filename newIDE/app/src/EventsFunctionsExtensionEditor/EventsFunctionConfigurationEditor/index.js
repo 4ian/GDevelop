@@ -218,6 +218,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 eventsFunction={eventsFunction}
                 eventsBasedBehavior={eventsBasedBehavior}
                 eventsBasedObject={eventsBasedObject}
+                eventsFunctionsContainer={eventsFunctionsContainer}
                 onParametersUpdated={onParametersOrGroupsUpdated}
                 helpPagePath={helpPagePath}
                 freezeParameters={freezeParameters}

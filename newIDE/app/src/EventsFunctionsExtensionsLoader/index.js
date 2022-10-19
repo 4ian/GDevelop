@@ -50,12 +50,30 @@ const mangleName = (name: string) => {
   return caseSensitiveSlug(name, '_', []);
 };
 
+const getExtensionCodeNamespacePrefix = (
+  eventsFunctionsExtension: gdEventsFunctionsExtension
+) => {
+  return 'gdjs.evtsExt__' + mangleName(eventsFunctionsExtension.getName());
+};
+
 /** Generate the namespace for a free function. */
 const getFreeFunctionCodeNamespace = (
   eventsFunction: gdEventsFunction,
   codeNamespacePrefix: string
 ) => {
   return codeNamespacePrefix + '__' + mangleName(eventsFunction.getName());
+};
+
+export const getFreeFunctionCodeName = (
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsFunction: gdEventsFunction
+) => {
+  return (
+    getFreeFunctionCodeNamespace(
+      eventsFunction,
+      getExtensionCodeNamespacePrefix(eventsFunctionsExtension)
+    ) + '.func'
+  );
 };
 
 /** Generate the namespace for a behavior function. */

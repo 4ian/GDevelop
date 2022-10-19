@@ -7,10 +7,51 @@
 #include "EventsFunction.h"
 #include <vector>
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Project/EventsFunctionsContainer.h"
+#include "GDCore/Extensions/Metadata/ParameterMetadata.h"
 
 namespace gd {
 
 EventsFunction::EventsFunction() : functionType(Action) {}
+
+const std::vector<gd::ParameterMetadata>& EventsFunction::GetParametersForEvents(
+    const gd::EventsFunctionsContainer& functionsContainer) const {
+  if (functionType != FunctionType::ActionWithOperator) {
+    return parameters;
+  }
+  actionWithOperationParameters.clear();
+  if (!functionsContainer.HasEventsFunctionNamed(getterName)) {
+    return actionWithOperationParameters;
+  }
+  const auto& expression = functionsContainer.GetEventsFunction(getterName);
+  const auto& expressionParameters = expression.parameters;
+  const auto functionsSource = functionsContainer.GetSource();
+  const int expressionValueParameterIndex =
+      functionsSource == gd::EventsFunctionsContainer::FunctionSource::Behavior ?
+      2 : 
+      functionsSource == gd::EventsFunctionsContainer::FunctionSource::Object ?
+      1 :
+      0;
+  
+  for (size_t i = 0;
+       i < expressionValueParameterIndex && i < expressionParameters.size();
+       i++)
+  {
+    actionWithOperationParameters.push_back(expressionParameters[i]);
+  }
+  gd::ParameterMetadata parameterMetadata;
+  parameterMetadata.SetName("Value")
+                   .SetType(expression.IsStringExpression() ? "string" : "number");
+  actionWithOperationParameters.push_back(parameterMetadata);
+  for (size_t i = expressionValueParameterIndex;
+       i < expressionParameters.size();
+       i++)
+  {
+    actionWithOperationParameters.push_back(expressionParameters[i]);
+  }
+
+  return actionWithOperationParameters;
+}
 
 void EventsFunction::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", name);

@@ -71,7 +71,8 @@ body {
   border-radius: var(--canvas-scrollbar-border-radius);
   pointer-events: all;
 }
-.canvas-scrollbar-thumb:hover {
+.canvas-scrollbar-thumb:hover,
+.canvas-scrollbar-thumb:active {
   background-color: #8d8d8d;
 }
 

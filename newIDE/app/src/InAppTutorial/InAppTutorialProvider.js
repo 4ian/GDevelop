@@ -11,7 +11,7 @@ import onboardingTutorial from './Tutorials/OnboardingTutorial';
 
 type Props = {| children: React.Node |};
 
-export let currentlyRunningInAppTutorial = null;
+export let currentlyRunningInAppTutorial = false;
 
 const InAppTutorialProvider = (props: Props) => {
   const [isInAppTutorialRunning, setIsInAppTutorialRunning] = React.useState<boolean>(false);

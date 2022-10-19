@@ -44,7 +44,7 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
   keenClient.recordEvent(name, metadata);
   posthog.capture(name, {
     ...metadata,
-    isInAppTutorialRunning: !!currentlyRunningInAppTutorial,
+    isInAppTutorialRunning: currentlyRunningInAppTutorial,
     isInDesktopApp: isElectronApp,
     isInWebApp: !isElectronApp,
   });

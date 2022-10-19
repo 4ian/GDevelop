@@ -1,7 +1,7 @@
 /* This is the styling applied to markdown (like the one used for Changelog). */
 
 .gd-markdown {
-  font-family: var(--gdevelop-classic-font-family);
+  font-family: var(--gdevelop-modern-font-family);
 }
 
 .gd-markdown.standalone-text-container {

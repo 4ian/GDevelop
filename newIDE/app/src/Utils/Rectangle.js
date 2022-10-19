@@ -91,6 +91,10 @@ export default class Rectangle {
     }
   }
 
+  containsPoint(x: number, y: number): boolean {
+    return this.left <= x && this.right > x && this.bottom > y && this.top <= y;
+  }
+
   toString() {
     return (
       '[' +

@@ -85,6 +85,8 @@ type Props = {|
   width: number,
   height: number,
   onViewPositionChanged: ViewPosition => void,
+  onMouseMove: MouseEvent => void,
+  onMouseLeave: MouseEvent => void,
   screenType: ScreenType,
 |};
 
@@ -208,6 +210,12 @@ export default class InstancesEditor extends Component<Props> {
       'mouseup',
       this.keyboardShortcuts.onMouseUp
     );
+    this.pixiRenderer.view.addEventListener('mousemove', event =>
+      this.props.onMouseMove(event)
+    );
+    this.pixiRenderer.view.addEventListener('mouseout', event => {
+      this.props.onMouseLeave(event);
+    });
 
     this.pixiContainer = new PIXI.Container();
 
@@ -814,6 +822,25 @@ export default class InstancesEditor extends Component<Props> {
 
   scrollTo(x: number, y: number) {
     this.viewPosition.scrollTo(x, y);
+    if (this.props.onViewPositionChanged) {
+      this.props.onViewPositionChanged(this.viewPosition);
+    }
+  }
+
+  fitViewToRectangle(
+    rectangle: Rectangle,
+    { adaptZoom }: { adaptZoom: boolean }
+  ) {
+    const idealZoom = this.viewPosition.fitToRectangle(rectangle);
+    if (adaptZoom) this.setZoomFactor(idealZoom);
+    if (this.props.onViewPositionChanged) {
+      this.props.onViewPositionChanged(this.viewPosition);
+    }
+  }
+
+  getBoundingClientRect() {
+    if (!this.canvasArea) return { left: 0, top: 0, right: 0, bottom: 0 };
+    return this.canvasArea.getBoundingClientRect();
   }
 
   zoomToFitContent() {
@@ -844,17 +871,14 @@ export default class InstancesEditor extends Component<Props> {
     // $FlowFixMe - JSFunctor is incompatible with Functor
     initialInstances.iterateOverInstances(getInstanceRectangle);
     getInstanceRectangle.delete();
-    if (contentAABB) {
-      const idealZoom = this.viewPosition.fitToRectangle(contentAABB);
-      this.setZoomFactor(idealZoom);
-    }
+    if (contentAABB) this.fitViewToRectangle(contentAABB, { adaptZoom: true });
   }
 
   zoomToInitialPosition() {
     const x = this.props.project.getGameResolutionWidth() / 2;
     const y = this.props.project.getGameResolutionHeight() / 2;
-    this.viewPosition.scrollTo(x, y);
     this.setZoomFactor(1);
+    this.scrollTo(x, y);
   }
 
   zoomToFitSelection(instances: Array<gdInitialInstance>) {
@@ -870,10 +894,7 @@ export default class InstancesEditor extends Component<Props> {
         instanceMeasurer.getInstanceAABB(instance, new Rectangle())
       );
     });
-    const idealZoom = this.viewPosition.fitToRectangle(
-      selectedInstancesRectangle
-    );
-    this.setZoomFactor(idealZoom);
+    this.fitViewToRectangle(selectedInstancesRectangle, { adaptZoom: true });
   }
 
   centerViewOnLastInstance(instances: Array<gdInitialInstance>) {
@@ -884,10 +905,7 @@ export default class InstancesEditor extends Component<Props> {
       instances[instances.length - 1],
       new Rectangle()
     );
-    this.viewPosition.fitToRectangle(lastInstanceRectangle);
-    if (this.props.onViewPositionChanged) {
-      this.props.onViewPositionChanged(this.viewPosition);
-    }
+    this.fitViewToRectangle(lastInstanceRectangle, { adaptZoom: false });
   }
 
   getLastContextMenuSceneCoordinates = () => {

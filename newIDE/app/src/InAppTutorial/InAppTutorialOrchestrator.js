@@ -94,7 +94,7 @@ const gatherProjectDataOnMultipleSteps = ({
           const layoutObjectsCount = layout.getObjectsCount();
           if (layoutObjectsCount === 0) {
             throw new Error(
-              `No object was found in layer after step ${index} of flow`
+              `No object was found in layout after step ${index} of flow`
             );
           }
           newData[key] = layout
@@ -180,7 +180,6 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
   const watchDomForNextStepTrigger = React.useCallback(
     () => {
-      console.log('MUTATION');
       // Find the next mandatory (not-skippable) step (It can be the current step).
       let indexOfNextMandatoryStep = currentStepIndex;
       while (flow[indexOfNextMandatoryStep].skippable) {
@@ -373,8 +372,6 @@ const InAppTutorialOrchestrator = React.forwardRef<
     watchDomForNextStepTrigger,
     currentStep && currentStep.isTriggerFlickering ? 500 : null
   );
-
-  console.log(currentStepIndex);
 
   const renderStepDisplayer = (i18n: I18nType) => {
     if (!currentStep) return null;

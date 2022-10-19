@@ -162,7 +162,7 @@ function InAppTutorialStepDisplayer({
         ? i18n._(t`the home page`)
         : i18n._(t`the events sheet`);
     return {
-      title: i18n._(t`Oups, it looks like you're lost!`),
+      title: i18n._(t`Oops, it looks like you're lost!`),
       description: i18n._(
         t`Go back to ${translatedExpectedEditor} using the tabs at the top of the editor`
       ),

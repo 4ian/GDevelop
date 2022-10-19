@@ -14,12 +14,6 @@ import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
 import Link from '@material-ui/core/Link';
 import Text from '../UI/Text';
 
-type Props = {|
-  step: InAppTutorialFlowFormattedStep,
-  expectedEditor: EditorIdentifier | null,
-  goToFallbackStep: () => void,
-|};
-
 const styles = {
   redHeroImage: {
     position: 'absolute',
@@ -73,10 +67,18 @@ const isThereAnotherDialogInTheFollowingSiblings = (
   return false;
 };
 
+type Props = {|
+  step: InAppTutorialFlowFormattedStep,
+  expectedEditor: EditorIdentifier | null,
+  goToFallbackStep: () => void,
+  endTutorial: () => void,
+|};
+
 function InAppTutorialStepDisplayer({
   step: { elementToHighlightId, tooltip, nextStepTrigger },
   expectedEditor,
   goToFallbackStep,
+  endTutorial,
 }: Props) {
   const [
     elementToHighlight,
@@ -166,7 +168,7 @@ function InAppTutorialStepDisplayer({
         : i18n._(t`the events sheet`);
 
     const inlineLink = (
-      <Link onClick={() => console.log('on quit')} style={styles.link}>
+      <Link onClick={endTutorial} style={styles.link}>
         {i18n._(t`click here`)}
       </Link>
     );

@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 import paperDecorator from '../../PaperDecorator';
 import muiDecorator from '../../ThemeDecorator';
 import InAppTutorialStepDisplayer from '../../../InAppTutorial/InAppTutorialStepDisplayer';
@@ -19,6 +20,7 @@ export const WrongEditorInfo = () => {
         step={{ elementToHighlightId: '#step-text' }}
         expectedEditor="Scene"
         goToFallbackStep={() => {}}
+        endTutorial={() => action('end tutorial')()}
       />
     </>
   );

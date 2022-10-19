@@ -401,6 +401,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
         goToFallbackStep={() => {
           setCurrentStepIndex(currentStepFallbackStepIndex.current);
         }}
+        endTutorial={endTutorial}
       />
     );
   };

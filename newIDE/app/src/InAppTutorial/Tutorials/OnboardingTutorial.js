@@ -107,7 +107,7 @@ const inAppTutorial: InAppTutorial = {
     {
       id: 'ClickOnSearchBar',
       elementToHighlightId: '#asset-store-search-bar',
-      nextStepTrigger: { elementIsFilled: true },
+      nextStepTrigger: { valueHasChanged: true },
       tooltip: {
         title: {
           messageDescriptor: t`Choose an asset to represent your main character!`,
@@ -278,7 +278,7 @@ const inAppTutorial: InAppTutorial = {
     {
       id: 'ClickOnSearchBarForCoin',
       elementToHighlightId: '#asset-store-search-bar',
-      nextStepTrigger: { elementIsFilled: true },
+      nextStepTrigger: { valueHasChanged: true },
       tooltip: {
         description: {
           messageDescriptor: t`Search for “coin” (or a potion, food, ...).`,
@@ -392,7 +392,7 @@ const inAppTutorial: InAppTutorial = {
     {
       id: 'SetParameter',
       elementToHighlightId: '#parameter-1-object-selector',
-      nextStepTrigger: { elementIsFilled: true },
+      nextStepTrigger: { valueHasChanged: true },
       tooltip: {
         description: {
           messageDescriptor: t`Finally, select the target **object** ($(secondObject)).`,

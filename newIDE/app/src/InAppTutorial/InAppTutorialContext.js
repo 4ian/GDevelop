@@ -25,7 +25,7 @@ type InAppTutorialFlowStepDOMChangeTrigger =
 
 export type InAppTutorialFlowStepTrigger =
   | InAppTutorialFlowStepDOMChangeTrigger
-  | {| elementIsFilled: true |}
+  | {| valueHasChanged: true |}
   | {| instanceDraggedOnScene: string |}
   | {| previewLaunched: true |}
   | {| clickOnButton: string |};

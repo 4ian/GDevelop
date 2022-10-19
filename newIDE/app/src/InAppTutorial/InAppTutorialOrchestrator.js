@@ -316,7 +316,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
     () => {
       if (!currentStep) return;
       const { nextStepTrigger, elementToHighlightId } = currentStep;
-      if (nextStepTrigger && nextStepTrigger.elementIsFilled) {
+      if (nextStepTrigger && nextStepTrigger.valueHasChanged) {
         if (!elementToHighlightId) return;
         const elementToWatch = document.querySelector(elementToHighlightId);
 
@@ -335,7 +335,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
     [currentStep, data]
   );
 
-  const watchInputBeingFilled = React.useCallback(
+  const watchInputChanges = React.useCallback(
     () => {
       if (!watchElementInputValue) return;
       const elementToWatch = document.querySelector(watchElementInputValue);
@@ -366,7 +366,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
     [project, goToNextStep, watchSceneInstances]
   );
 
-  useInterval(watchInputBeingFilled, watchElementInputValue ? 1000 : null);
+  useInterval(watchInputChanges, watchElementInputValue ? 1000 : null);
   useInterval(watchSceneInstanceChanges, watchSceneInstances ? 500 : null);
   useInterval(
     watchDomForNextStepTrigger,

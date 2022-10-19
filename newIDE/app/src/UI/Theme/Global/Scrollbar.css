@@ -83,6 +83,7 @@ body {
   );
   bottom: 0px;
   padding-bottom: var(--canvas-horizontal-scrollbar-padding);
+  pointer-events: none;
 }
 .canvas-horizontal-scrollbar-thumb {
   width: var(--canvas-scrollbar-length);
@@ -96,6 +97,7 @@ body {
   );
   right: 0px;
   padding-right: var(--canvas-vertical-scrollbar-padding);
+  pointer-events: none;
 }
 .canvas-vertical-scrollbar-thumb {
   height: var(--canvas-scrollbar-length);

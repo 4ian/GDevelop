@@ -99,6 +99,12 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
     { leading: true, trailing: false }
   );
 
+  const hideScrollbarsAfterDelayThrottled = throttle(
+    hideScrollbarsAfterDelay,
+    1000,
+    { leading: true, trailing: false }
+  );
+
   const onMouseMoveOverInstanceEditor = React.useCallback(
     (event: MouseEvent) => {
       if (!editorRef.current) {
@@ -114,13 +120,13 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
         showScrollbarsThrottled();
       } else {
         if (!isDragging.current) {
-          hideScrollbarsAfterDelayDebounced();
+          hideScrollbarsAfterDelayThrottled();
         }
       }
     },
     [
       canvasRectangle,
-      hideScrollbarsAfterDelayDebounced,
+      hideScrollbarsAfterDelayThrottled,
       showScrollbarsThrottled,
     ]
   );
@@ -360,6 +366,23 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
               height={height}
               screenType={screenType}
               onMouseMove={onMouseMoveOverInstanceEditor}
+              onMouseLeave={(event: MouseEvent) => {
+                const { relatedTarget } = event;
+                if (!isDragging.current && relatedTarget) {
+                  if (
+                    // Flow says className is not present in ElementTarget but this piece
+                    // of code cannot break.
+                    // $FlowFixMe
+                    relatedTarget.className &&
+                    typeof relatedTarget.className === 'string' &&
+                    // Hide only if the mouse is not leaving to go on one of the scrollbars' thumb.
+                    // $FlowFixMe
+                    !relatedTarget.className.includes('canvas-scrollbar-thumb')
+                  ) {
+                    hideScrollbarsAfterDelay();
+                  }
+                }
+              }}
               {...otherProps}
             />
           )}
@@ -378,6 +401,9 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
                 }}
                 className="canvas-scrollbar-thumb canvas-vertical-scrollbar-thumb"
                 ref={yScrollbarThumb}
+                onMouseLeave={(event: MouseEvent) => {
+                  if (!isDragging.current) hideScrollbarsAfterDelay();
+                }}
               />
             </div>
           )}
@@ -396,6 +422,9 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
                 }}
                 className="canvas-scrollbar-thumb canvas-horizontal-scrollbar-thumb"
                 ref={xScrollbarThumb}
+                onMouseLeave={(event: MouseEvent) => {
+                  if (!isDragging.current) hideScrollbarsAfterDelay();
+                }}
               />
             </div>
           )}

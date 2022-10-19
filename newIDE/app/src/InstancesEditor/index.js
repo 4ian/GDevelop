@@ -86,6 +86,7 @@ type Props = {|
   height: number,
   onViewPositionChanged: ViewPosition => void,
   onMouseMove: MouseEvent => void,
+  onMouseLeave: MouseEvent => void,
   screenType: ScreenType,
 |};
 
@@ -212,6 +213,9 @@ export default class InstancesEditor extends Component<Props> {
     this.pixiRenderer.view.addEventListener('mousemove', event =>
       this.props.onMouseMove(event)
     );
+    this.pixiRenderer.view.addEventListener('mouseout', event => {
+      this.props.onMouseLeave(event);
+    });
 
     this.pixiContainer = new PIXI.Container();
 

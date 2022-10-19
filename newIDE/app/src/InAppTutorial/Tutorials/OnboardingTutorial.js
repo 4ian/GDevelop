@@ -64,7 +64,7 @@ const inAppTutorial: InAppTutorial = {
       tooltip: {
         description: {
           messageDescriptor: t`We'll create a simple game with **a character that can collect coins**.
-          \n\nLet's create a new project!`,
+          \\n\\nLet's create a new project!`,
         },
       },
     },
@@ -358,9 +358,9 @@ const inAppTutorial: InAppTutorial = {
       tooltip: {
         description: {
           messageDescriptor: t`**Events** are made of a condition and an action:
-          \n\nCondition: "**If** $(firstObject) touches the $(secondObject)..."
-          \n\nAction: "... **then** the $(secondObject) disappears"
-          \n\n**Click "Add condition**"`,
+          \\n\\nCondition: "**If** $(firstObject) touches the $(secondObject)..."
+          \\n\\nAction: "... **then** the $(secondObject) disappears"
+          \\n\\n**Click "Add condition**"`,
         },
         placement: 'bottom',
       },

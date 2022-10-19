@@ -25,7 +25,7 @@ const endDialog = {
       },
     },
     {
-      cta: {
+      image: {
         imageSource:
           'https://resources.gdevelop-app.com/games-showcase/images/1e3QbK4hN5LXABOOcXQ3tRnmj_qPc23Wi',
         linkHref: 'https://gdevelop.io',

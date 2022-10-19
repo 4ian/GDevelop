@@ -57,7 +57,7 @@ export type EditorIdentifier = 'Scene' | 'EventsSheet' | 'Home';
 
 export type InAppTutorialEndDialog = {|
   content: Array<
-    TranslatedText | {| cta: {| imageSource: string, linkHref: string |} |}
+    TranslatedText | {| image: {| imageSource: string, linkHref?: string |} |}
   >,
 |};
 

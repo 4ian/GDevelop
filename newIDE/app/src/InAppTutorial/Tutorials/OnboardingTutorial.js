@@ -28,7 +28,7 @@ const inAppTutorial: InAppTutorial = {
         messageDescriptor: t`👇👇👇`,
       },
       {
-        cta: {
+        image: {
           imageSource: 'https://i3.ytimg.com/vi/bR2BjT7JG0k/mqdefault.jpg',
           linkHref:
             'https://www.youtube.com/watch?v=bR2BjT7JG0k&list=PL3YlZTdKiS89Kj7IQVPoNElJCWrjZaCC8',

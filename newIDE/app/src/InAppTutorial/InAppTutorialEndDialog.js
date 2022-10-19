@@ -57,20 +57,29 @@ function InAppTutorialEndDialog({ endDialog, onClose }: Props) {
                   />
                 );
               }
-              if (item.cta) {
-                return (
-                  <Link
-                    key={item.cta.linkHref}
-                    href={item.cta.linkHref}
-                    onClick={() => Window.openExternalURL(item.cta.linkHref)}
-                  >
-                    <CorsAwareImage
-                      style={styles.imageLink}
-                      src={item.cta.imageSource}
-                      alt="End of dialog suggestion"
-                    />
-                  </Link>
-                );
+              if (item.image) {
+                const { linkHref, imageSource } = item.image;
+                if (linkHref) {
+                  return (
+                    <Link
+                      key={linkHref}
+                      href={linkHref}
+                      onClick={() => Window.openExternalURL(linkHref)}
+                    >
+                      <CorsAwareImage
+                        style={styles.imageLink}
+                        src={imageSource}
+                        alt="End of tutorial dialog image"
+                      />
+                    </Link>
+                  );
+                } else {
+                  <CorsAwareImage
+                    style={styles.imageLink}
+                    src={imageSource}
+                    alt="End of tutorial dialog image"
+                  />;
+                }
               }
               return null;
             })}

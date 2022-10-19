@@ -20,8 +20,6 @@ In 5 minutes, you will have:
   - Created a game
   - Learned the fundamentals of GDevelop
 
-(The tour is only available in 4 languages: 🇬🇧/🇺🇸 English, 🇫🇷 French, 🇪🇸 Spanish, 🇵🇹 Portuguese)
-
 We highly recommend it!
 `;
 

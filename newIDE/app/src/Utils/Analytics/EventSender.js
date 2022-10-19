@@ -414,13 +414,3 @@ export const sendEventsExtractedAsFunction = ({
   });
 };
 
-const trackInAppTutorialProgress = (
-  stepIndex: number,
-  isCompleted: boolean = false
-) => {
-  recordEvent('user-flow-onboarding', { stepIndex, isCompleted });
-};
-
-// Make this function global so it can be accessed from userflow's
-// step "Evaluate JS" actions
-global.trackInAppTutorialProgress = trackInAppTutorialProgress;

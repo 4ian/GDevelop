@@ -40,18 +40,18 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   const yScrollbarTrack = React.useRef<?HTMLDivElement>(null);
   const yScrollbarThumb = React.useRef<?HTMLDivElement>(null);
 
-  const showScrollbars = React.useRef(false);
+  const showScrollbars = React.useRef<boolean>(false);
   const timeoutHidingScrollbarsId = React.useRef<?TimeoutID>(null);
-  const isDragging = React.useRef(false);
+  const isDragging = React.useRef<boolean>(false);
 
-  const xValue = React.useRef(0);
-  const yValue = React.useRef(0);
-  const xMin = React.useRef(-5000);
-  const xMax = React.useRef(5000);
-  const yMin = React.useRef(-5000);
-  const yMax = React.useRef(5000);
-  const canvasWidth = React.useRef(0);
-  const canvasHeight = React.useRef(0);
+  const xValue = React.useRef<number>(0);
+  const yValue = React.useRef<number>(0);
+  const xMin = React.useRef<number>(-5000);
+  const xMax = React.useRef<number>(5000);
+  const yMin = React.useRef<number>(-5000);
+  const yMax = React.useRef<number>(5000);
+  const canvasWidth = React.useRef<number>(0);
+  const canvasHeight = React.useRef<number>(0);
 
   const forceUpdate = useForceUpdate();
 
@@ -117,9 +117,12 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
       );
 
       if (shouldDisplayScrollBars) {
-        showScrollbarsThrottled();
+        if (timeoutHidingScrollbarsId.current) {
+          clearTimeout(timeoutHidingScrollbarsId.current);
+        }
+        if (!showScrollbars.current) showScrollbarsThrottled();
       } else {
-        if (!isDragging.current) {
+        if (!isDragging.current && showScrollbars.current) {
           hideScrollbarsAfterDelayThrottled();
         }
       }
@@ -324,6 +327,15 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
     [setAndAdjust]
   );
 
+  const onMouseEnterThumb = (event: MouseEvent) => {
+    if (timeoutHidingScrollbarsId.current) {
+      clearTimeout(timeoutHidingScrollbarsId.current);
+    }
+  };
+  const onMouseLeaveThumb = (event: MouseEvent) => {
+    if (!isDragging.current) hideScrollbarsAfterDelay();
+  };
+
   // Ensure the X Scrollbar doesn't go out of bounds.
   const minXScrollbarLeftPosition = '0%';
   const maxXScrollbarLeftPosition = `calc(100% - ${SCROLLBAR_SIZE}px - ${SCROLLBAR_THUMB_WIDTH}px)`;
@@ -398,9 +410,8 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
                 }}
                 className="canvas-scrollbar-thumb canvas-vertical-scrollbar-thumb"
                 ref={yScrollbarThumb}
-                onMouseLeave={(event: MouseEvent) => {
-                  if (!isDragging.current) hideScrollbarsAfterDelay();
-                }}
+                onMouseEnter={onMouseEnterThumb}
+                onMouseLeave={onMouseLeaveThumb}
               />
             </div>
           )}
@@ -419,9 +430,8 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
                 }}
                 className="canvas-scrollbar-thumb canvas-horizontal-scrollbar-thumb"
                 ref={xScrollbarThumb}
-                onMouseLeave={(event: MouseEvent) => {
-                  if (!isDragging.current) hideScrollbarsAfterDelay();
-                }}
+                onMouseEnter={onMouseEnterThumb}
+                onMouseLeave={onMouseLeaveThumb}
               />
             </div>
           )}

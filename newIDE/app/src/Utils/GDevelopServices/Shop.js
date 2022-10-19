@@ -119,16 +119,19 @@ export const getStripeCheckoutUrl = async (
   {
     stripePriceId,
     userId,
-  }: {
+    customerEmail,
+  }: {|
     stripePriceId: string,
     userId: string,
-  }
+    customerEmail: string,
+  |}
 ): Promise<string> => {
   const authorizationHeader = await getAuthorizationHeader();
   const response = await client.post(
     '/purchase/action/create-stripe-checkout-session',
     {
       stripePriceId,
+      customerEmail,
     },
     {
       headers: { Authorization: authorizationHeader },

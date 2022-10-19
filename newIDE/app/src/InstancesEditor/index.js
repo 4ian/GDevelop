@@ -85,6 +85,8 @@ type Props = {|
   width: number,
   height: number,
   onViewPositionChanged: ViewPosition => void,
+  onMouseMove: MouseEvent => void,
+  onMouseLeave: MouseEvent => void,
   screenType: ScreenType,
 |};
 
@@ -208,6 +210,12 @@ export default class InstancesEditor extends Component<Props> {
       'mouseup',
       this.keyboardShortcuts.onMouseUp
     );
+    this.pixiRenderer.view.addEventListener('mousemove', event =>
+      this.props.onMouseMove(event)
+    );
+    this.pixiRenderer.view.addEventListener('mouseout', event => {
+      this.props.onMouseLeave(event);
+    });
 
     this.pixiContainer = new PIXI.Container();
 
@@ -816,6 +824,11 @@ export default class InstancesEditor extends Component<Props> {
     this.viewPosition.scrollTo(x, y);
   }
 
+  getBoundingClientRect() {
+    if (!this.canvasArea) return { left: 0, top: 0, right: 0, bottom: 0 };
+    return this.canvasArea.getBoundingClientRect();
+  }
+
   zoomToFitContent() {
     const { initialInstances } = this.props;
     if (initialInstances.getInstancesCount() === 0) return;
@@ -848,6 +861,9 @@ export default class InstancesEditor extends Component<Props> {
       const idealZoom = this.viewPosition.fitToRectangle(contentAABB);
       this.setZoomFactor(idealZoom);
     }
+    if (this.props.onViewPositionChanged) {
+      this.props.onViewPositionChanged(this.viewPosition);
+    }
   }
 
   zoomToInitialPosition() {
@@ -855,6 +871,9 @@ export default class InstancesEditor extends Component<Props> {
     const y = this.props.project.getGameResolutionHeight() / 2;
     this.viewPosition.scrollTo(x, y);
     this.setZoomFactor(1);
+    if (this.props.onViewPositionChanged) {
+      this.props.onViewPositionChanged(this.viewPosition);
+    }
   }
 
   zoomToFitSelection(instances: Array<gdInitialInstance>) {
@@ -874,6 +893,9 @@ export default class InstancesEditor extends Component<Props> {
       selectedInstancesRectangle
     );
     this.setZoomFactor(idealZoom);
+    if (this.props.onViewPositionChanged) {
+      this.props.onViewPositionChanged(this.viewPosition);
+    }
   }
 
   centerViewOnLastInstance(instances: Array<gdInitialInstance>) {

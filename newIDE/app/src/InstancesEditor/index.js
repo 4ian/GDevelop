@@ -181,16 +181,13 @@ export default class InstancesEditor extends Component<Props> {
         this.zoomOnCursorBy(-event.deltaY / 5000);
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
         const deltaX = event.deltaY / (5 * zoomFactor);
-        this.viewPosition.scrollBy(-deltaX, 0);
+        this.scrollBy(-deltaX, 0);
       } else {
         const deltaX = event.deltaX / (5 * zoomFactor);
         const deltaY = event.deltaY / (5 * zoomFactor);
-        this.viewPosition.scrollBy(deltaX, deltaY);
+        this.scrollBy(deltaX, deltaY);
       }
 
-      if (this.props.onViewPositionChanged) {
-        this.props.onViewPositionChanged(this.viewPosition);
-      }
       event.preventDefault();
     };
     this.pixiRenderer.view.setAttribute('tabIndex', -1);
@@ -526,13 +523,10 @@ export default class InstancesEditor extends Component<Props> {
     this.setZoomFactor(this.getZoomFactor() + value);
     const afterZoomCursorPosition = this.getLastCursorSceneCoordinates();
     // Compensate for the cursor change in position
-    this.viewPosition.scrollBy(
+    this.scrollBy(
       beforeZoomCursorPosition[0] - afterZoomCursorPosition[0],
       beforeZoomCursorPosition[1] - afterZoomCursorPosition[1]
     );
-    if (this.props.onViewPositionChanged) {
-      this.props.onViewPositionChanged(this.viewPosition);
-    }
   }
 
   getZoomFactor = () => {
@@ -590,11 +584,7 @@ export default class InstancesEditor extends Component<Props> {
       const sceneDeltaX = deltaX / this.getZoomFactor();
       const sceneDeltaY = deltaY / this.getZoomFactor();
 
-      this.viewPosition.scrollBy(-sceneDeltaX, -sceneDeltaY);
-
-      if (this.props.onViewPositionChanged) {
-        this.props.onViewPositionChanged(this.viewPosition);
-      }
+      this.scrollBy(-sceneDeltaX, -sceneDeltaY);
     } else {
       this.selectionRectangle.updateSelectionRectangle(x, y);
     }
@@ -724,11 +714,7 @@ export default class InstancesEditor extends Component<Props> {
     // to move the view, move it, then unpress it and continue to move the instance.
     // This means that while we're in "_onMoveInstance", we must handle view moving.
     if (this.keyboardShortcuts.shouldMoveView()) {
-      this.viewPosition.scrollBy(-sceneDeltaX, -sceneDeltaY);
-
-      if (this.props.onViewPositionChanged) {
-        this.props.onViewPositionChanged(this.viewPosition);
-      }
+      this.scrollBy(-sceneDeltaX, -sceneDeltaY);
       return;
     }
 
@@ -819,6 +805,14 @@ export default class InstancesEditor extends Component<Props> {
     });
     this.props.onInstancesMoved(unlockedSelectedInstances);
   };
+
+  scrollBy(x: number, y: number) {
+    this.viewPosition.scrollBy(x, y);
+
+    if (this.props.onViewPositionChanged) {
+      this.props.onViewPositionChanged(this.viewPosition);
+    }
+  }
 
   scrollTo(x: number, y: number) {
     this.viewPosition.scrollTo(x, y);

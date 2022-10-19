@@ -11,6 +11,8 @@ import {
 } from './InAppTutorialContext';
 import InAppTutorialElementHighlighter from './InAppTutorialElementHighlighter';
 import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
+import Link from '@material-ui/core/Link';
+import Text from '../UI/Text';
 
 type Props = {|
   step: InAppTutorialFlowFormattedStep,
@@ -30,6 +32,7 @@ const styles = {
       '0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)', // Same as used by Material UI for the Paper component
     borderRadius: 30,
   },
+  link: { cursor: 'pointer' },
 };
 
 const ELEMENT_QUERY_FREQUENCY = 500;
@@ -161,12 +164,27 @@ function InAppTutorialStepDisplayer({
         : expectedEditor === 'Home'
         ? i18n._(t`the home page`)
         : i18n._(t`the events sheet`);
+
+    const inlineLink = (
+      <Link onClick={() => console.log('on quit')} style={styles.link}>
+        {i18n._(t`click here`)}
+      </Link>
+    );
+
+    const getDescriptionNode = style => (
+      <Text style={style}>
+        <span>
+          {i18n._(
+            t`Go back to ${translatedExpectedEditor} to keep creating your game, or`
+          )}
+        </span>{' '}
+        {inlineLink} <span>{i18n._(t`to quit the tutorial.`)}</span>
+      </Text>
+    );
     return {
-      title: i18n._(t`Oops, it looks like you're lost!`),
-      description: i18n._(
-        t`Go back to ${translatedExpectedEditor} using the tabs at the top of the editor`
-      ),
+      title: i18n._(t`You're leaving the game tutorial`),
       placement: 'top',
+      getDescriptionNode,
     };
   };
 

@@ -158,10 +158,13 @@ function InAppTutorialTooltipDisplayer({
                       />
                     </Typography>
                   )}
-                  {tooltip.title && tooltip.description && (
-                    <span style={styles.divider} />
-                  )}
-                  {tooltip.description && (
+                  {tooltip.title &&
+                    (tooltip.description || tooltip.getDescriptionNode) && (
+                      <span style={styles.divider} />
+                    )}
+                  {tooltip.getDescriptionNode &&
+                    tooltip.getDescriptionNode(styles.description)}
+                  {tooltip.description && !tooltip.getDescriptionNode && (
                     <Typography style={styles.description}>
                       <MarkdownText
                         source={tooltip.description.replace(/\\n/g, '\n')} // i18n translation escapes new lines so we have to set them back.

@@ -17,6 +17,7 @@ export type InAppTutorialFormattedTooltip = {|
   ...InAppTutorialTooltip,
   title?: string,
   description?: string,
+  getDescriptionNode?: (style: Object) => React.Node,
 |};
 
 type InAppTutorialFlowStepDOMChangeTrigger =

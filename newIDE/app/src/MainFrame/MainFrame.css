@@ -27,7 +27,7 @@ html {
   padding-left: env(safe-area-inset-left);
 
   /* Smoother startup */
-  animation: fadein 0.5s;
+  animation: fade-in 0.5s;
 }
 
 /* A container adding padding to fit on the screen, useful for dialogs on non square screens ("notch"). */

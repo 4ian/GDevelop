@@ -17,6 +17,10 @@ export default class Rectangle {
     this.bottom = bottom;
   }
 
+  static fromDOMRect(domRect: DOMRect | ClientRect) {
+    return new this(domRect.left, domRect.top, domRect.right, domRect.bottom);
+  }
+
   set({
     left,
     top,
@@ -93,6 +97,15 @@ export default class Rectangle {
 
   containsPoint(x: number, y: number): boolean {
     return this.left <= x && this.right > x && this.bottom > y && this.top <= y;
+  }
+
+  toCSSPosition() {
+    return {
+      top: this.top,
+      left: this.left,
+      width: this.width(),
+      height: this.height(),
+    };
   }
 
   toString() {

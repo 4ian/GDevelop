@@ -43,9 +43,10 @@
 
 .mosaic-gd-theme .mosaic-split.-column:hover .mosaic-split-line {
   background-color: var(--mosaic-toolbar-border-color-hover);
-  transform: scaleY(2);
+  transform: scaleY(2.5);
   box-shadow: none !important;
   cursor: ns-resize;
+  z-index: 5;
 }
 
 /* Separator draggable background (vertical split) */
@@ -60,7 +61,8 @@
 
 .mosaic-gd-theme .mosaic-split.-row:hover .mosaic-split-line {
   background-color: var(--mosaic-toolbar-border-color-hover);
-  transform: scaleX(2);
+  transform: scaleX(2.5);
   box-shadow: none !important;
   cursor: ew-resize;
+  z-index: 5;
 }

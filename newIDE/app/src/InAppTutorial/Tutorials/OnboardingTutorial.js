@@ -7,7 +7,7 @@ const inAppTutorial: InAppTutorial = {
   id: 'onboarding',
   editorSwitches: {
     GoToBuildSection: 'Home',
-    ClickOnNewObjectButton1: 'Scene',
+    ClickOnNewObjectButtonForCharacter: 'Scene',
     ClickOnNewEvent: 'EventsSheet',
   },
   endDialog: {
@@ -80,7 +80,7 @@ const inAppTutorial: InAppTutorial = {
       isOnClosableDialog: true,
     },
     {
-      id: 'ClickOnNewObjectButton1',
+      id: 'ClickOnNewObjectButtonForCharacter',
       elementToHighlightId: '#add-new-object-button',
       nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
       tooltip: {
@@ -227,7 +227,7 @@ const inAppTutorial: InAppTutorial = {
       isOnClosableDialog: true,
     },
     {
-      id: 'LaunchPreview1',
+      id: 'LaunchPreviewCharacterOnly',
       elementToHighlightId: '#toolbar-preview-button',
       nextStepTrigger: { previewLaunched: true },
       tooltip: {
@@ -252,7 +252,7 @@ const inAppTutorial: InAppTutorial = {
       },
     },
     {
-      id: 'ClickOnNewObjectButton2',
+      id: 'ClickOnNewObjectButtonForCoin',
       elementToHighlightId: '#add-new-object-button',
       nextStepTrigger: { presenceOfElement: '#new-object-dialog' },
       tooltip: {
@@ -263,7 +263,7 @@ const inAppTutorial: InAppTutorial = {
       },
     },
     {
-      id: 'OpenAssetTab2',
+      id: 'OpenAssetTabForCoin',
       elementToHighlightId: '#asset-store-tab',
       nextStepTrigger: { presenceOfElement: '#asset-store' },
       tooltip: {
@@ -276,7 +276,7 @@ const inAppTutorial: InAppTutorial = {
       isOnClosableDialog: true,
     },
     {
-      id: 'ClickOnSearchBar2',
+      id: 'ClickOnSearchBarForCoin',
       elementToHighlightId: '#asset-store-search-bar',
       nextStepTrigger: { elementIsFilled: true },
       tooltip: {
@@ -287,18 +287,18 @@ const inAppTutorial: InAppTutorial = {
       isOnClosableDialog: true,
       shortcuts: [
         {
-          stepId: 'CloseAssetStore2',
+          stepId: 'CloseAssetStoreForCoin',
           trigger: { presenceOfElement: '#object-item-1' },
         },
       ],
     },
     {
-      id: 'WaitForUserToSelectAsset2',
+      id: 'WaitForUserToSelectAssetForCoin',
       nextStepTrigger: { presenceOfElement: '#add-asset-button' },
       isOnClosableDialog: true,
     },
     {
-      id: 'AddAsset2',
+      id: 'AddAssetForCoin',
       elementToHighlightId: '#add-asset-button',
       isTriggerFlickering: true,
       nextStepTrigger: { presenceOfElement: '#object-item-1' },
@@ -308,7 +308,7 @@ const inAppTutorial: InAppTutorial = {
       isOnClosableDialog: true,
     },
     {
-      id: 'CloseAssetStore2',
+      id: 'CloseAssetStoreForCoin',
       elementToHighlightId: '#new-object-dialog #close-button',
       nextStepTrigger: { absenceOfElement: '#new-object-dialog' },
       tooltip: {
@@ -366,7 +366,7 @@ const inAppTutorial: InAppTutorial = {
       },
     },
     {
-      id: 'ChooseObject',
+      id: 'ChooseCharacterForCondition',
       elementToHighlightId: '#instruction-editor-dialog #object-item-0',
       nextStepTrigger: { presenceOfElement: '#object-instruction-selector' },
       tooltip: {
@@ -402,7 +402,7 @@ const inAppTutorial: InAppTutorial = {
       isOnClosableDialog: true,
     },
     {
-      id: 'CloseInstructionEditor',
+      id: 'CloseInstructionEditorForCondition',
       elementToHighlightId: '#instruction-editor-dialog #ok-button',
       nextStepTrigger: { absenceOfElement: '#instruction-editor-dialog' },
       tooltip: {
@@ -422,7 +422,7 @@ const inAppTutorial: InAppTutorial = {
       },
     },
     {
-      id: 'ChooseObject2',
+      id: 'ChoseCoinForAction',
       elementToHighlightId: '#instruction-editor-dialog #object-item-1',
       nextStepTrigger: { presenceOfElement: '#object-instruction-selector' },
       tooltip: {
@@ -446,7 +446,7 @@ const inAppTutorial: InAppTutorial = {
       isOnClosableDialog: true,
     },
     {
-      id: 'CloseInstructionEditor2',
+      id: 'CloseInstructionEditorForAction',
       elementToHighlightId: '#instruction-editor-dialog #ok-button',
       nextStepTrigger: { absenceOfElement: '#instruction-editor-dialog' },
       tooltip: {
@@ -455,7 +455,7 @@ const inAppTutorial: InAppTutorial = {
       },
     },
     {
-      id: 'LaunchPreview2',
+      id: 'LaunchPreviewWithCoinCollection',
       elementToHighlightId: '#toolbar-preview-button',
       nextStepTrigger: { previewLaunched: true },
       tooltip: {
@@ -464,7 +464,7 @@ const inAppTutorial: InAppTutorial = {
       },
     },
     {
-      id: 'WaitForUserToHavePlayed2',
+      id: 'WaitForUserToHavePlayedWithCoinCollection',
       elementToHighlightId: '#toolbar-preview-button',
       nextStepTrigger: {
         clickOnButton: "I'm done",

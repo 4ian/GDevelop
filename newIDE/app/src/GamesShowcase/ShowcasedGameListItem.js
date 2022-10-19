@@ -80,7 +80,7 @@ export const ShowcasedGameListItem = ({
       style={{
         ...styles.container,
         visibility: isLoaded ? undefined : 'hidden',
-        animation: isLoaded ? 'fadein 0.5s' : undefined,
+        animation: isLoaded ? 'fade-in 0.5s' : undefined,
       }}
       ref={containerRef}
     >

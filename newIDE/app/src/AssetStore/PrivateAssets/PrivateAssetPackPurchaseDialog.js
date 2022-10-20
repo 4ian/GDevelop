@@ -18,6 +18,7 @@ import { Line, Spacer } from '../../UI/Grid';
 import CircularProgress from '../../UI/CircularProgress';
 import BackgroundText from '../../UI/BackgroundText';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
+import VerifiedUser from '@material-ui/icons/VerifiedUser';
 
 type Props = {|
   privateAssetPackListingData: PrivateAssetPackListingData,
@@ -131,12 +132,18 @@ const PrivateAssetPackPurchaseDialog = ({
         />
       ) : purchaseSuccessful ? (
         <>
-          <Text>
-            <Trans>
-              {privateAssetPackListingData.name} has now been added to your
-              account!
-            </Trans>
-          </Text>
+          <Line justifyContent="center" alignItems="center">
+            <VerifiedUser />
+            <Spacer />
+            <Text>
+              <b>
+                <Trans>
+                  {privateAssetPackListingData.name} has now been added to your
+                  account!
+                </Trans>
+              </b>
+            </Text>
+          </Line>
           <Text>
             <Trans>
               You can close this window and go back to the asset store to

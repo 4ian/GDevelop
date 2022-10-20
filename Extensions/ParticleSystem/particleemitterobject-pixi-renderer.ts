@@ -197,8 +197,12 @@ namespace gdjs {
     }
 
     setForce(min: float, max: float): void {
-      this.emitter.startSpeed.value = max;
-      this.emitter.minimumSpeedMultiplier = max !== 0 ? min / max : 1;
+      // If max force is zero, PIXI seems to not be able to compute correctly
+      // the angle of the emitter, resulting in it staying at 0° or 180°.
+      // See https://github.com/4ian/GDevelop/issues/4312.
+      const _max = max || 0.000001;
+      this.emitter.startSpeed.value = _max;
+      this.emitter.minimumSpeedMultiplier = min / _max;
     }
 
     setZoneRadius(radius: float): void {

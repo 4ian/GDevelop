@@ -7,10 +7,51 @@
 #include "EventsFunction.h"
 #include <vector>
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Project/EventsFunctionsContainer.h"
+#include "GDCore/Extensions/Metadata/ParameterMetadata.h"
 
 namespace gd {
 
 EventsFunction::EventsFunction() : functionType(Action) {}
+
+const std::vector<gd::ParameterMetadata>& EventsFunction::GetParametersForEvents(
+    const gd::EventsFunctionsContainer& functionsContainer) const {
+  if (functionType != FunctionType::ActionWithOperator) {
+    return parameters;
+  }
+  actionWithOperationParameters.clear();
+  if (!functionsContainer.HasEventsFunctionNamed(getterName)) {
+    return actionWithOperationParameters;
+  }
+  const auto& expression = functionsContainer.GetEventsFunction(getterName);
+  const auto& expressionParameters = expression.parameters;
+  const auto functionsSource = functionsContainer.GetSource();
+  const int expressionValueParameterIndex =
+      functionsSource == gd::EventsFunctionsContainer::FunctionSource::Behavior ?
+      2 : 
+      functionsSource == gd::EventsFunctionsContainer::FunctionSource::Object ?
+      1 :
+      0;
+  
+  for (size_t i = 0;
+       i < expressionValueParameterIndex && i < expressionParameters.size();
+       i++)
+  {
+    actionWithOperationParameters.push_back(expressionParameters[i]);
+  }
+  gd::ParameterMetadata parameterMetadata;
+  parameterMetadata.SetName("Value")
+                   .SetType(expression.IsStringExpression() ? "string" : "number");
+  actionWithOperationParameters.push_back(parameterMetadata);
+  for (size_t i = expressionValueParameterIndex;
+       i < expressionParameters.size();
+       i++)
+  {
+    actionWithOperationParameters.push_back(expressionParameters[i]);
+  }
+
+  return actionWithOperationParameters;
+}
 
 void EventsFunction::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", name);
@@ -18,6 +59,7 @@ void EventsFunction::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("description", description);
   element.SetAttribute("sentence", sentence);
   element.SetAttribute("group", group);
+  element.SetAttribute("getterName", getterName);
   element.SetBoolAttribute("private", isPrivate);
   events.SerializeTo(element.AddChild("events"));
 
@@ -28,6 +70,12 @@ void EventsFunction::SerializeTo(SerializerElement& element) const {
     functionTypeStr = "Expression";
   else if (functionType == StringExpression)
     functionTypeStr = "StringExpression";
+  else if (functionType == ExpressionAndCondition)
+    functionTypeStr = "ExpressionAndCondition";
+  else if (functionType == StringExpressionAndCondition)
+    functionTypeStr = "StringExpressionAndCondition";
+  else if (functionType == ActionWithOperator)
+    functionTypeStr = "ActionWithOperator";
   element.SetAttribute("functionType", functionTypeStr);
 
   gd::SerializerElement& parametersElement = element.AddChild("parameters");
@@ -46,6 +94,7 @@ void EventsFunction::UnserializeFrom(gd::Project& project,
   description = element.GetStringAttribute("description");
   sentence = element.GetStringAttribute("sentence");
   group = element.GetStringAttribute("group");
+  getterName = element.GetStringAttribute("getterName");
   isPrivate = element.GetBoolAttribute("private");
   events.UnserializeFrom(project, element.GetChild("events"));
 
@@ -56,6 +105,12 @@ void EventsFunction::UnserializeFrom(gd::Project& project,
     functionType = Expression;
   else if (functionTypeStr == "StringExpression")
     functionType = StringExpression;
+  else if (functionTypeStr == "ExpressionAndCondition")
+    functionType = ExpressionAndCondition;
+  else if (functionTypeStr == "StringExpressionAndCondition")
+    functionType = StringExpressionAndCondition;
+  else if (functionTypeStr == "ActionWithOperator")
+    functionType = ActionWithOperator;
   else
     functionType = Action;
 

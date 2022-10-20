@@ -20,7 +20,9 @@ class Project;
 }  // namespace gd
 
 namespace gd {
-
+// TODO Remove the EventsFunctionsContainer extension and make it an attribute.
+// This will allow to get EventsFunctionsContainer the same way for extensions,
+// objects and behaviors.
 /**
  * \brief Hold a list of Events Functions (gd::EventsFunction) and Events Based
  * Behaviors.

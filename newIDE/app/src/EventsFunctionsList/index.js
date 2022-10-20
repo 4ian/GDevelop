@@ -145,6 +145,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       default:
         return 'res/functions/function.svg';
       case gd.EventsFunction.Action:
+      case gd.EventsFunction.ActionWithOperator:
         switch (eventsFunction.getName()) {
           default:
             return 'res/functions/action.svg';
@@ -178,8 +179,9 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       case gd.EventsFunction.Condition:
         return 'res/functions/condition.svg';
       case gd.EventsFunction.Expression:
-        return 'res/functions/expression.svg';
+      case gd.EventsFunction.ExpressionAndCondition:
       case gd.EventsFunction.StringExpression:
+      case gd.EventsFunction.StringExpressionAndCondition:
         return 'res/functions/expression.svg';
     }
   };

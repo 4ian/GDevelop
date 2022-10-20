@@ -93,6 +93,9 @@ type EventsFunction_FunctionType = 0 | 1 | 2 | 3`
         '  static Condition: 1;',
         '  static Expression: 2;',
         '  static StringExpression: 3;',
+        '  static ExpressionAndCondition: 4;',
+        '  static StringExpressionAndCondition: 5;',
+        '  static ActionWithOperator: 6;',
       ].join('\n'),
       'types/gdeventsfunction.js'
     );

@@ -117,7 +117,7 @@ const CreateAccountDialog = ({
       title={<Trans>Create a new GDevelop account</Trans>}
       actions={[
         <FlatButton
-          label={<Trans>Back</Trans>}
+          label={<Trans>Cancel</Trans>}
           disabled={createAccountInProgress}
           key="close"
           primary={false}

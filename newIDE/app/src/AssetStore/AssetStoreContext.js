@@ -279,9 +279,7 @@ export const AssetStoreStateProvider = ({
           setAuthors(authors);
           setLicenses(licenses);
           setPrivateAssetPacks(privateAssetPacks);
-          if (receivedAssetPacks) {
-            setLoadedReceivedAssetPackInStore(receivedAssetPacks);
-          }
+          setLoadedReceivedAssetPackInStore(receivedAssetPacks);
         } catch (error) {
           console.error(
             `Unable to load the assets from the asset store:`,
@@ -296,19 +294,28 @@ export const AssetStoreStateProvider = ({
     [isLoading, environment, receivedAssetShortHeaders, receivedAssetPacks]
   );
 
-  // We're listening to the received assets changing to update the list of assets.
-  // This can happen when the user logs in or logs out.
+  // In case the user logs in, we need to fetch the private assets.
   React.useEffect(
     () => {
-      if (!receivedAssetShortHeaders) {
-        return;
+      if (receivedAssetShortHeaders) {
+        // We're forcing the fetch of the assets, even if it is currently loading,
+        // in case the pre-fetching of the assets is happening at the same time,
+        // or the user opens the asset store at the same time.
+        fetchAssetsAndFilters({ force: true });
       }
-      // We're forcing the fetch of the assets, even if it is currently loading,
-      // in case the pre-fetching of the assets is happening at the same time,
-      // or the user opens the asset store at the same time.
-      fetchAssetsAndFilters({ force: true });
     },
     [receivedAssetShortHeaders, fetchAssetsAndFilters]
+  );
+
+  // In case the user logs out, we detect that the received assets are null
+  // and we reset the list of assets.
+  React.useEffect(
+    () => {
+      if (loadedReceivedAssetPackInStore && !receivedAssetPacks) {
+        fetchAssetsAndFilters({ force: true });
+      }
+    },
+    [fetchAssetsAndFilters, loadedReceivedAssetPackInStore, receivedAssetPacks]
   );
 
   // Preload the assets and filters when the app loads, in case the user

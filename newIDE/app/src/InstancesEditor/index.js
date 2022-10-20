@@ -39,6 +39,12 @@ const styles = {
   dropCursor: { cursor: 'copy' },
 };
 
+const isNoDialogOpened = (): boolean => {
+  return !document.querySelector(
+    'body > div[role="presentation"].MuiDialog-root'
+  );
+};
+
 const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
 
 export type InstancesEditorShortcutsCallbacks = {|
@@ -926,7 +932,7 @@ export default class InstancesEditor extends Component<Props> {
     if (this._renderingPaused) return;
 
     // Avoid killing the CPU by limiting the rendering calls.
-    if (this.fpsLimiter.shouldUpdate()) {
+    if (this.fpsLimiter.shouldUpdate() && isNoDialogOpened()) {
       this.backgroundColor.render();
       this.viewPosition.render();
       this.canvasCursor.render();

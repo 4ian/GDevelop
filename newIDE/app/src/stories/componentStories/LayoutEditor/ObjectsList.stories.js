@@ -33,6 +33,7 @@ export const Default = () => (
           onChooseResource={() => Promise.reject('unimplemented')}
           resourceExternalEditors={fakeResourceExternalEditors}
           onEditObject={action('On edit object')}
+          onExportObject={action('On export object')}
           onAddObjectInstance={action('On add instance to the scene')}
           onObjectCreated={action('On object created')}
           selectedObjectNames={[]}
@@ -65,6 +66,7 @@ export const WithTags = () => (
           onChooseResource={() => Promise.reject('unimplemented')}
           resourceExternalEditors={fakeResourceExternalEditors}
           onEditObject={action('On edit object')}
+          onExportObject={action('On export object')}
           onAddObjectInstance={action('On add instance to the scene')}
           onObjectCreated={action('On object created')}
           selectedObjectNames={[]}

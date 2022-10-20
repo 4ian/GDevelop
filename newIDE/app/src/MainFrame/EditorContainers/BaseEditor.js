@@ -72,7 +72,7 @@ export type RenderEditorContainerProps = {|
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   onOpenProjectManager: () => void,
-  onCloseProject: () => Promise<void>,
+  onCloseProject: () => Promise<boolean>,
 
   // Other dialogs opening:
   onCreateProject: (?ExampleShortHeader) => void,

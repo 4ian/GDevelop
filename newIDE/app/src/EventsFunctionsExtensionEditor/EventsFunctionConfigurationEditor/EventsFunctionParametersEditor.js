@@ -695,6 +695,10 @@ export default class EventsFunctionParametersEditor extends React.Component<
                         label={<Trans>Add a parameter</Trans>}
                         onClick={this._addParameter}
                         icon={<Add />}
+                        disabled={
+                          eventsFunction.getFunctionType() ===
+                          gd.EventsFunction.ActionWithOperator
+                        }
                       />
                     )}
                   </Line>

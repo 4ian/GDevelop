@@ -198,6 +198,12 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
+  onSubscriptionUpdated: async () => {
+    console.info('This should refresh the subscriptions');
+  },
+  onPurchaseSuccessful: async () => {
+    console.info('This should refresh the assets');
+  },
   onRefreshFirebaseProfile: async () => {
     console.info('This should refresh the firebase profile');
   },
@@ -231,6 +237,12 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
+  },
+  onSubscriptionUpdated: async () => {
+    console.info('This should refresh the subscriptions');
+  },
+  onPurchaseSuccessful: async () => {
+    console.info('This should refresh the assets');
   },
   onRefreshFirebaseProfile: async () => {
     console.info('This should refresh the firebase profile');
@@ -266,6 +278,12 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
+  onSubscriptionUpdated: async () => {
+    console.info('This should refresh the subscriptions');
+  },
+  onPurchaseSuccessful: async () => {
+    console.info('This should refresh the assets');
+  },
   onRefreshFirebaseProfile: async () => {
     console.info('This should refresh the firebase profile');
   },
@@ -300,6 +318,12 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
+  onSubscriptionUpdated: async () => {
+    console.info('This should refresh the subscriptions');
+  },
+  onPurchaseSuccessful: async () => {
+    console.info('This should refresh the assets');
+  },
   onRefreshFirebaseProfile: async () => {
     console.info('This should refresh the firebase profile');
   },
@@ -333,6 +357,12 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
+  },
+  onSubscriptionUpdated: async () => {
+    console.info('This should refresh the subscriptions');
+  },
+  onPurchaseSuccessful: async () => {
+    console.info('This should refresh the assets');
   },
   onRefreshFirebaseProfile: async () => {
     console.info('This should refresh the firebase profile');

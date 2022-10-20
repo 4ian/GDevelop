@@ -21,15 +21,13 @@ import { showErrorBox } from '../../UI/Messages/MessageBox';
 
 type Props = {|
   privateAssetPackListingData: PrivateAssetPackListingData,
-  onSuccessfulPurchase: () => void,
+  onSuccessfulPurchase: PrivateAssetPackListingData => Promise<void>,
   onClose: () => void,
-  onCloseAfterSuccessfulPurchase: () => void,
 |};
 
 const PrivateAssetPackPurchaseDialog = ({
   privateAssetPackListingData,
   onClose,
-  onCloseAfterSuccessfulPurchase,
   onSuccessfulPurchase,
 }: Props) => {
   const {
@@ -77,7 +75,7 @@ const PrivateAssetPackPurchaseDialog = ({
       ) {
         setIsBuying(false);
         setPurchaseSuccessful(true);
-        onSuccessfulPurchase();
+        await onSuccessfulPurchase(privateAssetPackListingData);
       }
     },
     [
@@ -112,13 +110,11 @@ const PrivateAssetPackPurchaseDialog = ({
           label={
             purchaseSuccessful ? <Trans>Close</Trans> : <Trans>Continue</Trans>
           }
-          onClick={
-            purchaseSuccessful ? onCloseAfterSuccessfulPurchase : onContinue
-          }
+          onClick={purchaseSuccessful ? onClose : onContinue}
           disabled={!profile || isBuying}
         />,
       ]}
-      onApply={onContinue}
+      onApply={purchaseSuccessful ? onClose : onContinue}
       flexColumnBody
     >
       {!profile ? (
@@ -134,19 +130,23 @@ const PrivateAssetPackPurchaseDialog = ({
           justifyContent="center"
         />
       ) : purchaseSuccessful ? (
-        <Text>
-          <Trans>
-            {privateAssetPackListingData.name} has now been added to your
-            account!
-          </Trans>
-          <Trans>
-            You can close this window and go back to the asset store to download
-            your assets.
-          </Trans>
-        </Text>
+        <>
+          <Text>
+            <Trans>
+              {privateAssetPackListingData.name} has now been added to your
+              account!
+            </Trans>
+          </Text>
+          <Text>
+            <Trans>
+              You can close this window and go back to the asset store to
+              download your assets.
+            </Trans>
+          </Text>
+        </>
       ) : isBuying ? (
         <>
-          <Line>
+          <Line justifyContent="center" alignItems="center">
             <Text>
               <b>
                 <Trans>

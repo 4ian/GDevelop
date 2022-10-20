@@ -44,6 +44,7 @@ type Props = {|
   onAvailabilityChecked: (?UsernameAvailability) => void,
   errorText?: ?React.Node,
   allowEmpty?: boolean,
+  disabled?: boolean,
 |};
 
 export const UsernameField = ({
@@ -55,6 +56,7 @@ export const UsernameField = ({
   onAvailabilityChecked,
   onAvailabilityCheckLoading,
   isValidatingUsername,
+  disabled,
 }: Props) => {
   const usernameFormattingError = isUsernameValid(value, {
     allowEmpty: !!allowEmpty,
@@ -150,6 +152,7 @@ export const UsernameField = ({
           <CircularProgress style={styles.circularProgress} />
         )
       }
+      disabled={disabled}
     />
   );
 };

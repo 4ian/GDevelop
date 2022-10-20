@@ -72,7 +72,7 @@ const inAppTutorial: InAppTutorial = {
       id: 'ValidateProjectCreation',
       elementToHighlightId: '#create-project-button',
       nextStepTrigger: {
-        presenceOfElement: '#tab-layout-Untitled-scene-button',
+        presenceOfElement: '[id^=tab-layout]:not([id^=tab-layout-events])',
       },
       tooltip: {
         description: { messageDescriptor: t`Let's go!` },

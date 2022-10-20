@@ -207,48 +207,6 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .UseStandardRelationalOperatorParameters("number");
 
-  obj.AddAction(
-         "ParticleAngle1",
-         _("Angle, parameter 1"),
-         _("Modify parameter 1 of the angle of particles."),
-         _("the parameter 1 of angle"),
-         _("Common"),
-         "CppPlatform/Extensions/particleSystemicon24.png",
-         "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardOperatorParameters("number");
-
-  obj.AddCondition("ParticleAngle1",
-                   _("Angle, parameter 1"),
-                   _("Compare parameter 1 of the angle of particles."),
-                   _("the parameter 1 of angle"),
-                   _("Common"),
-                   "CppPlatform/Extensions/particleSystemicon24.png",
-                   "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardRelationalOperatorParameters("number");
-
-  obj.AddAction(
-         "ParticleAngle2",
-         _("Angle, parameter 2"),
-         _("Modify parameter 2 of the angle of particles"),
-         _("the parameter 2 of angle"),
-         _("Common"),
-         "CppPlatform/Extensions/particleSystemicon24.png",
-         "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardOperatorParameters("number");
-
-  obj.AddCondition("ParticleAngle2",
-                   _("Angle, parameter 2"),
-                   _("Compare parameter 2 of the angle of particles."),
-                   _("the parameter 2 of angle"),
-                   _("Common"),
-                   "CppPlatform/Extensions/particleSystemicon24.png",
-                   "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardRelationalOperatorParameters("number");
-
   obj.AddAction("ParticleAlpha1",
                 _("Start opacity"),
                 _("Modify the start opacity of particles."),

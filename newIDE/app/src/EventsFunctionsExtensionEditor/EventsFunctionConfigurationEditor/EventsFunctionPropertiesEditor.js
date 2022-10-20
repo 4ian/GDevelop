@@ -37,7 +37,9 @@ type Props = {|
   getFunctionGroupNames?: () => string[],
 |};
 
-type State = {||};
+type State = {|
+  isStringExpression: boolean,
+|};
 
 export const getSentenceErrorText = (
   i18n: I18nType,
@@ -141,6 +143,10 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
   Props,
   State
 > {
+  state = {
+    isStringExpression: false,
+  };
+
   render() {
     const {
       eventsFunction,
@@ -235,13 +241,28 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
             <ResponsiveLineStackLayout alignItems="center" noMargin>
               <Line alignItems="center" noMargin>
                 <SelectField
-                  value={type}
+                  value={
+                    type === gd.EventsFunction.StringExpression
+                      ? gd.EventsFunction.Expression
+                      : type === gd.EventsFunction.StringExpressionAndCondition
+                      ? gd.EventsFunction.ExpressionAndCondition
+                      : type
+                  }
                   floatingLabelText={<Trans>Function type</Trans>}
                   fullWidth
                   disabled={!!freezeEventsFunctionType}
-                  onChange={(e, i, value: string) => {
+                  onChange={(e, i, valueSting: string) => {
                     // $FlowFixMe
-                    eventsFunction.setFunctionType(value);
+                    const value: EventsFunction_FunctionType = valueSting;
+                    eventsFunction.setFunctionType(
+                      this.state.isStringExpression
+                        ? type === gd.EventsFunction.Expression
+                          ? gd.EventsFunction.StringExpression
+                          : type === gd.EventsFunction.ExpressionAndCondition
+                          ? gd.EventsFunction.StringExpressionAndCondition
+                          : value
+                        : value
+                    );
                     if (onConfigurationUpdated) onConfigurationUpdated('type');
                     this.forceUpdate();
                   }}
@@ -263,108 +284,140 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                     primaryText={t`Expression and condition`}
                   />
                   <SelectOption
-                    value={gd.EventsFunction.StringExpression}
-                    primaryText={t`String Expression`}
-                  />
-                  <SelectOption
-                    value={gd.EventsFunction.StringExpressionAndCondition}
-                    primaryText={t`String Expression and condition`}
-                  />
-                  <SelectOption
                     value={gd.EventsFunction.ActionWithOperator}
                     primaryText={t`Action with operator`}
                   />
                 </SelectField>
               </Line>
-              {type === gd.EventsFunction.ActionWithOperator ? (
-                <SelectField
-                  value={(getterFunction && getterFunction.getName()) || ''}
-                  floatingLabelText={
-                    <Trans>Related action and expression</Trans>
-                  }
-                  fullWidth
-                  onChange={(e, i, value: string) => {
-                    // $FlowFixMe
-                    eventsFunction.setGetterName(value);
-                    if (onConfigurationUpdated) onConfigurationUpdated();
-                    this.forceUpdate();
-                  }}
-                >
-                  {eventsFunctionsContainer
-                    ? mapFor(
-                        0,
-                        eventsFunctionsContainer.getEventsFunctionsCount(),
-                        i => {
-                          const eventsFunction = eventsFunctionsContainer.getEventsFunctionAt(
-                            i
-                          );
+              {eventsFunction.isExpression() && (
+                <Line alignItems="center" noMargin>
+                  <SelectField
+                    value={
+                      eventsFunction.isStringExpression() ? 'string' : 'number'
+                    }
+                    floatingLabelText={<Trans>Type</Trans>}
+                    fullWidth
+                    disabled={!!freezeEventsFunctionType}
+                    onChange={(e, i, value: string) => {
+                      // $FlowFixMe
+                      const isStringExpression = value === 'string';
+                      this.setState({
+                        isStringExpression,
+                      });
+                      const isExpressionAndCondition =
+                        type === gd.EventsFunction.ExpressionAndCondition ||
+                        type === gd.EventsFunction.StringExpressionAndCondition;
+                      eventsFunction.setFunctionType(
+                        isExpressionAndCondition
+                          ? isStringExpression
+                            ? gd.EventsFunction.StringExpressionAndCondition
+                            : gd.EventsFunction.ExpressionAndCondition
+                          : isStringExpression
+                          ? gd.EventsFunction.StringExpression
+                          : gd.EventsFunction.Expression
+                      );
+                      if (onConfigurationUpdated)
+                        onConfigurationUpdated('type');
+                      this.forceUpdate();
+                    }}
+                  >
+                    <SelectOption value={'number'} primaryText={t`Number`} />
+                    <SelectOption value={'string'} primaryText={t`String`} />
+                  </SelectField>
+                </Line>
+              )}
+              <Column expand noMargin>
+                {type === gd.EventsFunction.ActionWithOperator ? (
+                  <SelectField
+                    value={(getterFunction && getterFunction.getName()) || ''}
+                    floatingLabelText={
+                      <Trans>Related action and expression</Trans>
+                    }
+                    fullWidth
+                    onChange={(e, i, value: string) => {
+                      eventsFunction.setGetterName(value);
+                      if (onConfigurationUpdated) onConfigurationUpdated();
+                      this.forceUpdate();
+                    }}
+                  >
+                    {eventsFunctionsContainer
+                      ? mapFor(
+                          0,
+                          eventsFunctionsContainer.getEventsFunctionsCount(),
+                          i => {
+                            const eventsFunction = eventsFunctionsContainer.getEventsFunctionAt(
+                              i
+                            );
 
-                          return (
-                            (eventsFunction.getFunctionType() ===
-                              gd.EventsFunction.ExpressionAndCondition ||
-                              eventsFunction.getFunctionType() ===
-                                gd.EventsFunction
-                                  .StringExpressionAndCondition) && (
-                              <SelectOption
-                                key={eventsFunction.getName()}
-                                value={eventsFunction.getName()}
-                                primaryText={
-                                  eventsFunction.getFullName() ||
-                                  eventsFunction.getName()
-                                }
-                              />
-                            )
-                          );
-                        }
-                      )
-                    : []}
-                </SelectField>
-              ) : (
-                <SemiControlledTextField
-                  commitOnBlur
-                  floatingLabelText={
-                    <Trans>Full name displayed in editor</Trans>
-                  }
-                  translatableHintText={getFullNameHintText(type)}
-                  value={eventsFunction.getFullName()}
-                  onChange={text => {
-                    eventsFunction.setFullName(text);
-                    if (onConfigurationUpdated) onConfigurationUpdated();
-                    this.forceUpdate();
-                  }}
-                  fullWidth
-                />
-              )}
-              {type === gd.EventsFunction.ActionWithOperator ? (
-                <SemiControlledTextField
-                  disabled
-                  floatingLabelText={<Trans>Group name</Trans>}
-                  fullWidth
-                  value={getterFunction ? getterFunction.getGroup() : ''}
-                  onChange={text => {}}
-                />
-              ) : (
-                <SemiControlledAutoComplete
-                  floatingLabelText={<Trans>Group name</Trans>}
-                  hintText={t`Leave it empty to use the default group for this extension.`}
-                  fullWidth
-                  value={eventsFunction.getGroup()}
-                  onChange={text => {
-                    eventsFunction.setGroup(text);
-                    if (onConfigurationUpdated) onConfigurationUpdated();
-                    this.forceUpdate();
-                  }}
-                  dataSource={
-                    getFunctionGroupNames
-                      ? getFunctionGroupNames().map(name => ({
-                          text: name,
-                          value: name,
-                        }))
-                      : []
-                  }
-                  openOnFocus={true}
-                />
-              )}
+                            return (
+                              (eventsFunction.getFunctionType() ===
+                                gd.EventsFunction.ExpressionAndCondition ||
+                                eventsFunction.getFunctionType() ===
+                                  gd.EventsFunction
+                                    .StringExpressionAndCondition) && (
+                                <SelectOption
+                                  key={eventsFunction.getName()}
+                                  value={eventsFunction.getName()}
+                                  primaryText={
+                                    eventsFunction.getFullName() ||
+                                    eventsFunction.getName()
+                                  }
+                                />
+                              )
+                            );
+                          }
+                        )
+                      : []}
+                  </SelectField>
+                ) : (
+                  <SemiControlledTextField
+                    commitOnBlur
+                    floatingLabelText={
+                      <Trans>Full name displayed in editor</Trans>
+                    }
+                    translatableHintText={getFullNameHintText(type)}
+                    value={eventsFunction.getFullName()}
+                    onChange={text => {
+                      eventsFunction.setFullName(text);
+                      if (onConfigurationUpdated) onConfigurationUpdated();
+                      this.forceUpdate();
+                    }}
+                    fullWidth
+                  />
+                )}
+              </Column>
+              <Column expand noMargin>
+                {type === gd.EventsFunction.ActionWithOperator ? (
+                  <SemiControlledTextField
+                    disabled
+                    floatingLabelText={<Trans>Group name</Trans>}
+                    fullWidth
+                    value={getterFunction ? getterFunction.getGroup() : ''}
+                    onChange={text => {}}
+                  />
+                ) : (
+                  <SemiControlledAutoComplete
+                    floatingLabelText={<Trans>Group name</Trans>}
+                    hintText={t`Leave it empty to use the default group for this extension.`}
+                    fullWidth
+                    value={eventsFunction.getGroup()}
+                    onChange={text => {
+                      eventsFunction.setGroup(text);
+                      if (onConfigurationUpdated) onConfigurationUpdated();
+                      this.forceUpdate();
+                    }}
+                    dataSource={
+                      getFunctionGroupNames
+                        ? getFunctionGroupNames().map(name => ({
+                            text: name,
+                            value: name,
+                          }))
+                        : []
+                    }
+                    openOnFocus={true}
+                  />
+                )}
+              </Column>
             </ResponsiveLineStackLayout>
             <Line noMargin>
               {type === gd.EventsFunction.ActionWithOperator ? (

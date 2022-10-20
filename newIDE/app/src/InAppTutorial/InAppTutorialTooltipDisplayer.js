@@ -153,7 +153,7 @@ function InAppTutorialTooltipDisplayer({
                   {tooltip.title && (
                     <Typography style={styles.title} variant="subtitle1">
                       <MarkdownText
-                        source={tooltip.title.replace(/\\n/g, '\n')} // i18n translation escapes new lines so we have to set them back.
+                        source={tooltip.title}
                         allowParagraphs
                       />
                     </Typography>
@@ -167,7 +167,7 @@ function InAppTutorialTooltipDisplayer({
                   {tooltip.description && !tooltip.getDescriptionNode && (
                     <Typography style={styles.description}>
                       <MarkdownText
-                        source={tooltip.description.replace(/\\n/g, '\n')} // i18n translation escapes new lines so we have to set them back.
+                        source={tooltip.description}
                         allowParagraphs
                       />
                     </Typography>

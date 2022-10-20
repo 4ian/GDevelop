@@ -9,7 +9,7 @@ import {
 import Text from '../../UI/Text';
 import { t, Trans } from '@lingui/macro';
 import Dialog from '../../UI/Dialog';
-import PriceTag from '../../UI/PriceTag';
+import PriceTag, { formatPrice } from '../../UI/PriceTag';
 import TextButton from '../../UI/TextButton';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
@@ -30,6 +30,8 @@ import Cross from '../../UI/CustomSvgIcons/Cross';
 import Paper from '@material-ui/core/Paper';
 import ResponsiveImagesGallery from '../../UI/ResponsiveImagesGallery';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import RaisedButton from '../../UI/RaisedButton';
+import { sendAssetPackBuyClicked } from '../../Utils/Analytics/EventSender';
 
 const sortedContentType = [
   'sprite',
@@ -58,12 +60,17 @@ const styles = {
 type Props = {|
   privateAssetPackListingData: PrivateAssetPackListingData,
   onClose: () => void,
+  onOpenPurchaseDialog: () => void,
+  isPurchaseDialogOpen: boolean,
 |};
 
 const PrivateAssetPackDialog = ({
-  privateAssetPackListingData: { id, name, description, sellerId, prices },
+  privateAssetPackListingData,
   onClose,
+  onOpenPurchaseDialog,
+  isPurchaseDialogOpen,
 }: Props) => {
+  const { id, name, sellerId, prices } = privateAssetPackListingData;
   const [assetPack, setAssetPack] = React.useState<?PrivateAssetPack>(null);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
   const [
@@ -107,6 +114,17 @@ const PrivateAssetPackDialog = ({
     [id, sellerId]
   );
 
+  const onBuy = () => {
+    if (!assetPack) return;
+    const assetPackId = assetPack.id;
+    try {
+      sendAssetPackBuyClicked(assetPackId);
+      onOpenPurchaseDialog();
+    } catch (e) {
+      console.error('Unable to send event', e);
+    }
+  };
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -120,6 +138,20 @@ const PrivateAssetPackDialog = ({
                 key="cancel"
                 label={<Trans>Cancel</Trans>}
                 onClick={onClose}
+              />,
+              <RaisedButton
+                key="buy-asset-pack"
+                primary
+                label={
+                  !assetPack || isPurchaseDialogOpen ? (
+                    <Trans>Processing...</Trans>
+                  ) : (
+                    <Trans>Buy for {formatPrice(i18n, prices[0].value)}</Trans>
+                  )
+                }
+                onClick={onBuy}
+                disabled={!assetPack || isPurchaseDialogOpen}
+                id="buy-asset-pack"
               />,
             ]}
             onApply={() => {}}
@@ -168,8 +200,27 @@ const PrivateAssetPackDialog = ({
                       style={{ padding: windowWidth === 'small' ? 20 : 30 }}
                     >
                       <ColumnStackLayout noMargin useLargeSpacer>
-                        <Line noMargin>
+                        <Line
+                          noMargin
+                          expand
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
                           <PriceTag value={prices[0].value} />
+                          <RaisedButton
+                            primary
+                            label={
+                              !assetPack || isPurchaseDialogOpen ? (
+                                <Trans>Processing...</Trans>
+                              ) : (
+                                <Trans>
+                                  Buy for {formatPrice(i18n, prices[0].value)}
+                                </Trans>
+                              )
+                            }
+                            onClick={onBuy}
+                            disabled={!assetPack || isPurchaseDialogOpen}
+                          />
                         </Line>
                         <Text noMargin>{assetPack.longDescription}</Text>
                         <ResponsiveLineStackLayout noMargin noColumnMargin>

@@ -36,10 +36,11 @@ import IconButton from '../UI/IconButton';
 import { AssetDetails } from './AssetDetails';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Home from '@material-ui/icons/Home';
-import PrivateAssetPackDialog from './PrivateAssets/PrivateAssetPackDialog';
+import PrivateAssetPackInformationDialog from './PrivateAssets/PrivateAssetPackInformationDialog';
 import PlaceholderError from '../UI/PlaceholderError';
 import AlertMessage from '../UI/AlertMessage';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import PrivateAssetPackPurchaseDialog from './PrivateAssets/PrivateAssetPackPurchaseDialog';
 
 type Props = {|
   project: gdProject,
@@ -49,6 +50,7 @@ export const AssetStore = ({ project }: Props) => {
   const {
     publicAssetPacks,
     privateAssetPacks,
+    loadedReceivedAssetPackInStore,
     searchResults,
     error,
     fetchAssetsAndFilters,
@@ -71,71 +73,124 @@ export const AssetStore = ({ project }: Props) => {
     selectedPrivateAssetPackListingData,
     setSelectedPrivateAssetPackListingData,
   ] = React.useState<?PrivateAssetPackListingData>(null);
-  const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
+  const [
+    purchasingPrivateAssetPackListingData,
+    setPurchasingPrivateAssetPackListingData,
+  ] = React.useState<?PrivateAssetPackListingData>(null);
+  const { onPurchaseSuccessful } = React.useContext(AuthenticatedUserContext);
 
-  const onOpenDetails = (assetShortHeader: AssetShortHeader) => {
-    sendAssetOpened({
-      id: assetShortHeader.id,
-      name: assetShortHeader.name,
-    });
-    navigationState.openDetailPage(assetShortHeader);
-  };
+  const onOpenDetails = React.useCallback(
+    (assetShortHeader: AssetShortHeader) => {
+      sendAssetOpened({
+        id: assetShortHeader.id,
+        name: assetShortHeader.name,
+      });
+      navigationState.openDetailPage(assetShortHeader);
+    },
+    [navigationState]
+  );
 
   // When a pack is selected from the home page,
   // we set it as the chosen category and open the filters panel.
-  const selectPublicAssetPack = (assetPack: PublicAssetPack) => {
-    sendAssetPackOpened(assetPack.tag);
+  const selectPublicAssetPack = React.useCallback(
+    (assetPack: PublicAssetPack) => {
+      sendAssetPackOpened(assetPack.tag);
 
-    if (assetPack.externalWebLink) {
-      Window.openExternalURL(assetPack.externalWebLink);
-    } else {
-      navigationState.openPackPage(assetPack);
-      setIsFiltersPanelOpen(true);
-    }
-  };
+      if (assetPack.externalWebLink) {
+        Window.openExternalURL(assetPack.externalWebLink);
+      } else {
+        navigationState.openPackPage(assetPack);
+        setIsFiltersPanelOpen(true);
+      }
+    },
+    [navigationState]
+  );
 
   // When a private pack is selected from the home page,
   // if the user owns it, we set it as the chosen category,
   // otherwise we open the dialog to buy it.
-  const selectPrivateAssetPack = (
-    assetPackListingData: PrivateAssetPackListingData
-  ) => {
-    sendAssetPackOpened(assetPackListingData.name);
+  const selectPrivateAssetPack = React.useCallback(
+    (assetPackListingData: PrivateAssetPackListingData) => {
+      sendAssetPackOpened(assetPackListingData.name);
 
-    const receivedAssetPack = receivedAssetPacks
-      ? receivedAssetPacks.find(pack => pack.id === assetPackListingData.id)
-      : null;
+      const receivedAssetPack = loadedReceivedAssetPackInStore
+        ? loadedReceivedAssetPackInStore.find(
+            pack => pack.id === assetPackListingData.id
+          )
+        : null;
 
-    if (!receivedAssetPack) {
-      // The user has not received the pack, open the dialog to buy it.
-      setSelectedPrivateAssetPackListingData(assetPackListingData);
-      return;
-    }
+      if (!receivedAssetPack) {
+        // The user has not received the pack, open the dialog to buy it.
+        setSelectedPrivateAssetPackListingData(assetPackListingData);
+        return;
+      }
 
-    // The user has received the pack, open it.
-    navigationState.openPackPage(receivedAssetPack);
-    setIsFiltersPanelOpen(true);
-  };
+      // The user has received the pack, open it.
+      navigationState.openPackPage(receivedAssetPack);
+      setIsFiltersPanelOpen(true);
+    },
+    [navigationState, loadedReceivedAssetPackInStore]
+  );
+
+  // If the user has received the pack they are currently viewing,
+  // we update the window to show it if they are not already on the pack page.
+  React.useEffect(
+    () => {
+      if (!purchasingPrivateAssetPackListingData) return;
+      // Ensure the user is not already on the pack page, to trigger the effect only once.
+      const currentPage = navigationState.getCurrentPage();
+      const isOnPrivatePackPage =
+        currentPage.openedAssetPack &&
+        currentPage.openedAssetPack.id &&
+        currentPage.openedAssetPack.id ===
+          purchasingPrivateAssetPackListingData.id;
+      if (loadedReceivedAssetPackInStore && !isOnPrivatePackPage) {
+        const receivedAssetPack = loadedReceivedAssetPackInStore.find(
+          pack => pack.id === purchasingPrivateAssetPackListingData.id
+        );
+        if (receivedAssetPack) {
+          // The user has received the pack, close the pack information dialog, and open the pack in the search.
+          setIsFiltersPanelOpen(true);
+          navigationState.openPackPage(receivedAssetPack);
+          setSelectedPrivateAssetPackListingData(null);
+        }
+      }
+    },
+    [
+      loadedReceivedAssetPackInStore,
+      purchasingPrivateAssetPackListingData,
+      navigationState,
+    ]
+  );
 
   // When a tag is selected from the asset details page,
   // first determine if it's a public or private pack,
   // then set it as the chosen category, clear old filters and open the filters panel.
-  const selectTag = (tag: string) => {
-    const privateAssetPack =
-      receivedAssetPacks && receivedAssetPacks.find(pack => pack.tag === tag);
-    const publicAssetPack =
-      publicAssetPacks &&
-      publicAssetPacks.starterPacks.find(pack => pack.tag === tag);
-    if (privateAssetPack) {
-      navigationState.openPackPage(privateAssetPack);
-    } else if (publicAssetPack) {
-      navigationState.openPackPage(publicAssetPack);
-    } else {
-      navigationState.openTagPage(tag);
-    }
-    clearAllFilters(assetFiltersState);
-    setIsFiltersPanelOpen(true);
-  };
+  const selectTag = React.useCallback(
+    (tag: string) => {
+      const privateAssetPack =
+        loadedReceivedAssetPackInStore &&
+        loadedReceivedAssetPackInStore.find(pack => pack.tag === tag);
+      const publicAssetPack =
+        publicAssetPacks &&
+        publicAssetPacks.starterPacks.find(pack => pack.tag === tag);
+      if (privateAssetPack) {
+        navigationState.openPackPage(privateAssetPack);
+      } else if (publicAssetPack) {
+        navigationState.openPackPage(publicAssetPack);
+      } else {
+        navigationState.openTagPage(tag);
+      }
+      clearAllFilters(assetFiltersState);
+      setIsFiltersPanelOpen(true);
+    },
+    [
+      publicAssetPacks,
+      loadedReceivedAssetPackInStore,
+      navigationState,
+      assetFiltersState,
+    ]
+  );
 
   const capitalize = (str: string) => {
     return str ? str[0].toUpperCase() + str.substr(1) : '';
@@ -346,12 +401,36 @@ export const AssetStore = ({ project }: Props) => {
                     onOpenDetails={onOpenDetails}
                   />
                 )}
-                {selectedPrivateAssetPackListingData && (
-                  <PrivateAssetPackDialog
+                {!!selectedPrivateAssetPackListingData && (
+                  <PrivateAssetPackInformationDialog
                     privateAssetPackListingData={
                       selectedPrivateAssetPackListingData
                     }
-                    onClose={() => setSelectedPrivateAssetPackListingData(null)}
+                    onClose={() => {
+                      setSelectedPrivateAssetPackListingData(null);
+                    }}
+                    onOpenPurchaseDialog={() =>
+                      setPurchasingPrivateAssetPackListingData(
+                        selectedPrivateAssetPackListingData
+                      )
+                    }
+                    isPurchaseDialogOpen={
+                      !!purchasingPrivateAssetPackListingData
+                    }
+                  />
+                )}
+                {!!purchasingPrivateAssetPackListingData && (
+                  <PrivateAssetPackPurchaseDialog
+                    privateAssetPackListingData={
+                      purchasingPrivateAssetPackListingData
+                    }
+                    onClose={() =>
+                      setPurchasingPrivateAssetPackListingData(null)
+                    }
+                    onSuccessfulPurchase={async () => {
+                      // Do not close the purchase dialog, we let the user do it themselves.
+                      await onPurchaseSuccessful();
+                    }}
                   />
                 )}
               </Line>

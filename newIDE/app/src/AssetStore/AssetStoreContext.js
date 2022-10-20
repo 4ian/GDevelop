@@ -4,6 +4,7 @@ import { type Filters } from '../Utils/GDevelopServices/Filters';
 import {
   type AssetShortHeader,
   type PublicAssetPacks,
+  type PrivateAssetPack,
   type Author,
   type License,
   type Environment,
@@ -56,6 +57,7 @@ type AssetStoreState = {|
   publicAssetPacks: ?PublicAssetPacks,
   privateAssetPacks: ?Array<PrivateAssetPackListingData>,
   assetPackRandomOrdering: ?Array<number>,
+  loadedReceivedAssetPackInStore: ?Array<PrivateAssetPack>,
   authors: ?Array<Author>,
   licenses: ?Array<License>,
   environment: Environment,
@@ -81,6 +83,7 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   publicAssetPacks: null,
   privateAssetPacks: null,
   assetPackRandomOrdering: null,
+  loadedReceivedAssetPackInStore: null,
   authors: null,
   licenses: null,
   environment: 'live',
@@ -147,9 +150,13 @@ export const AssetStoreStateProvider = ({
   const [assetShortHeadersById, setAssetShortHeadersById] = React.useState<?{
     [string]: AssetShortHeader,
   }>(null);
-  const { receivedAssetShortHeaders } = React.useContext(
+  const { receivedAssetShortHeaders, receivedAssetPacks } = React.useContext(
     AuthenticatedUserContext
   );
+  const [
+    loadedReceivedAssetPackInStore,
+    setLoadedReceivedAssetPackInStore,
+  ] = React.useState<?(PrivateAssetPack[])>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [
     publicAssetPacks,
@@ -272,6 +279,9 @@ export const AssetStoreStateProvider = ({
           setAuthors(authors);
           setLicenses(licenses);
           setPrivateAssetPacks(privateAssetPacks);
+          if (receivedAssetPacks) {
+            setLoadedReceivedAssetPackInStore(receivedAssetPacks);
+          }
         } catch (error) {
           console.error(
             `Unable to load the assets from the asset store:`,
@@ -283,7 +293,7 @@ export const AssetStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [isLoading, environment, receivedAssetShortHeaders]
+    [isLoading, environment, receivedAssetShortHeaders, receivedAssetPacks]
   );
 
   // We're listening to the received assets changing to update the list of assets.
@@ -356,6 +366,7 @@ export const AssetStoreStateProvider = ({
       publicAssetPacks,
       privateAssetPacks,
       assetPackRandomOrdering,
+      loadedReceivedAssetPackInStore,
       authors,
       licenses,
       environment,
@@ -401,6 +412,7 @@ export const AssetStoreStateProvider = ({
       publicAssetPacks,
       privateAssetPacks,
       assetPackRandomOrdering,
+      loadedReceivedAssetPackInStore,
       authors,
       licenses,
       environment,

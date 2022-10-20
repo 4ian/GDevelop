@@ -19,10 +19,11 @@ import CircularProgress from '../../UI/CircularProgress';
 import BackgroundText from '../../UI/BackgroundText';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import VerifiedUser from '@material-ui/icons/VerifiedUser';
+import { AssetStoreContext } from '../AssetStoreContext';
 
 type Props = {|
   privateAssetPackListingData: PrivateAssetPackListingData,
-  onSuccessfulPurchase: PrivateAssetPackListingData => Promise<void>,
+  onSuccessfulPurchase: () => Promise<void>,
   onClose: () => void,
 |};
 
@@ -36,8 +37,16 @@ const PrivateAssetPackPurchaseDialog = ({
     getAuthorizationHeader,
     onLogin,
     onCreateAccount,
+    receivedAssetPacks,
   } = React.useContext(AuthenticatedUserContext);
+  const { loadedReceivedAssetPackInStore } = React.useContext(
+    AssetStoreContext
+  );
   const [isBuying, setIsBuying] = React.useState(false);
+  const [
+    isCheckingPurchasesAfterLogin,
+    setIsCheckingPurchasesAfterLogin,
+  ] = React.useState(!receivedAssetPacks);
   const [purchaseSuccessful, setPurchaseSuccessful] = React.useState(false);
   const onContinue = async () => {
     if (!profile) return;
@@ -63,20 +72,29 @@ const PrivateAssetPackPurchaseDialog = ({
   const checkUserPurchases = React.useCallback(
     async () => {
       if (!profile) return;
-      const userPurchases = await listUserPurchases(getAuthorizationHeader, {
-        userId: profile.id,
-        productType: 'asset-pack',
-        role: 'receiver',
-      });
-      if (
-        userPurchases.find(
-          userPurchase =>
-            userPurchase.productId === privateAssetPackListingData.id
-        )
-      ) {
-        setIsBuying(false);
-        setPurchaseSuccessful(true);
-        await onSuccessfulPurchase(privateAssetPackListingData);
+      try {
+        const userPurchases = await listUserPurchases(getAuthorizationHeader, {
+          userId: profile.id,
+          productType: 'asset-pack',
+          role: 'receiver',
+        });
+        if (
+          userPurchases.find(
+            userPurchase =>
+              userPurchase.productId === privateAssetPackListingData.id
+          )
+        ) {
+          // We found the purchase, the user has bought the asset pack.
+          // We do not close the dialog yet, as we need to trigger a refresh of the asset store.
+          await onSuccessfulPurchase();
+        }
+      } catch (error) {
+        console.error('Unable to get the user purchases', error);
+        showErrorBox({
+          message: `Unable to retrieve your purchases. Please try again later.`,
+          rawError: error,
+          errorId: 'asset-pack-purchase-error',
+        });
       }
     },
     [
@@ -93,6 +111,136 @@ const PrivateAssetPackPurchaseDialog = ({
     },
     isBuying ? 3900 : null
   );
+
+  // Listen to the received asset pack, to know when a user has just logged in.
+  // In this case, start a timeout to remove the loader and give some time for the asset store to refresh.
+  React.useEffect(
+    () => {
+      let timeoutId;
+      (async () => {
+        if (receivedAssetPacks) {
+          timeoutId = setTimeout(
+            () => setIsCheckingPurchasesAfterLogin(false),
+            3000
+          );
+        }
+      })();
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    },
+    [receivedAssetPacks]
+  );
+
+  // If the user has received this particular pack, either:
+  // - they just logged in, and already have it, so we close the dialog.
+  // - they just bought it, we display the success message.
+  React.useEffect(
+    () => {
+      if (loadedReceivedAssetPackInStore) {
+        const receivedAssetPack = loadedReceivedAssetPackInStore.find(
+          pack => pack.id === privateAssetPackListingData.id
+        );
+        if (receivedAssetPack) {
+          if (isBuying) {
+            setIsBuying(false);
+            setPurchaseSuccessful(true);
+          } else if (!purchaseSuccessful) {
+            onClose();
+          }
+        }
+      }
+    },
+    [
+      loadedReceivedAssetPackInStore,
+      privateAssetPackListingData,
+      isBuying,
+      onClose,
+      isCheckingPurchasesAfterLogin,
+      purchaseSuccessful,
+    ]
+  );
+
+  const dialogContents = !profile
+    ? {
+        subtitle: <Trans>Log-in to purchase this item</Trans>,
+        content: (
+          <CreateProfile
+            onLogin={onLogin}
+            onCreateAccount={onCreateAccount}
+            message={
+              <Trans>
+                Asset packs will be linked to your user account and available
+                for all your Projects. Log-in or Sign-up to purchase this pack.
+              </Trans>
+            }
+            justifyContent="center"
+          />
+        ),
+      }
+    : purchaseSuccessful
+    ? {
+        subtitle: <Trans>Your purchase has been processed!</Trans>,
+        content: (
+          <Line justifyContent="center" alignItems="center">
+            <Text>
+              <Trans>
+                You can close this window and go back to the asset store to
+                download your assets.
+              </Trans>
+            </Text>
+          </Line>
+        ),
+      }
+    : isBuying
+    ? {
+        subtitle: <Trans>Complete your payment on the web browser</Trans>,
+        content: (
+          <>
+            <Line justifyContent="center" alignItems="center">
+              <CircularProgress size={20} />
+              <Spacer />
+              <Text>Waiting for the purchase confirmation...</Text>
+            </Line>
+            <Spacer />
+            <Line justifyContent="center">
+              <BackgroundText>
+                <Trans>
+                  Once you're done, come back to GDevelop and the assets will be
+                  added to your account automatically.
+                </Trans>
+              </BackgroundText>
+            </Line>
+          </>
+        ),
+      }
+    : isCheckingPurchasesAfterLogin
+    ? {
+        subtitle: <Trans>Loading your profile...</Trans>,
+        content: (
+          <Line justifyContent="center" alignItems="center">
+            <CircularProgress size={20} />
+          </Line>
+        ),
+      }
+    : {
+        subtitle: (
+          <Trans>
+            The Asset Pack {privateAssetPackListingData.name} will be linked to
+            your account {profile.email}
+          </Trans>
+        ),
+        content: (
+          <Line justifyContent="center" alignItems="center">
+            <Text>
+              <Trans>
+                A new secure window will open to complete the purchase.
+              </Trans>
+            </Text>
+          </Line>
+        ),
+      };
+
   return (
     <Dialog
       title={<Trans>{privateAssetPackListingData.name}</Trans>}
@@ -102,98 +250,36 @@ const PrivateAssetPackPurchaseDialog = ({
       actions={[
         <TextButton
           key="cancel"
-          label={<Trans>Cancel</Trans>}
+          label={
+            purchaseSuccessful ? <Trans>Accept</Trans> : <Trans>Cancel</Trans>
+          }
           onClick={onClose}
         />,
-        <RaisedButton
-          key="continue"
-          primary
-          label={
-            purchaseSuccessful ? <Trans>Close</Trans> : <Trans>Continue</Trans>
-          }
-          onClick={purchaseSuccessful ? onClose : onContinue}
-          disabled={!profile || isBuying}
-        />,
+        profile && !purchaseSuccessful ? (
+          <RaisedButton
+            key="continue"
+            primary
+            label={<Trans>Continue</Trans>}
+            onClick={onContinue}
+            disabled={isBuying}
+          />
+        ) : null,
       ]}
       onApply={purchaseSuccessful ? onClose : onContinue}
       flexColumnBody
     >
-      {!profile ? (
-        <CreateProfile
-          onLogin={onLogin}
-          onCreateAccount={onCreateAccount}
-          message={
-            <Trans>
-              Asset packs will be linked to your user account. Create an account
-              or login first to proceed with the purchase.
-            </Trans>
-          }
-          justifyContent="center"
-        />
-      ) : purchaseSuccessful ? (
-        <>
-          <Line justifyContent="center" alignItems="center">
+      <Line justifyContent="center" alignItems="center">
+        {purchaseSuccessful && (
+          <>
             <VerifiedUser />
             <Spacer />
-            <Text>
-              <b>
-                <Trans>
-                  {privateAssetPackListingData.name} has now been added to your
-                  account!
-                </Trans>
-              </b>
-            </Text>
-          </Line>
-          <Text>
-            <Trans>
-              You can close this window and go back to the asset store to
-              download your assets.
-            </Trans>
-          </Text>
-        </>
-      ) : isBuying ? (
-        <>
-          <Line justifyContent="center" alignItems="center">
-            <Text>
-              <b>
-                <Trans>
-                  Your browser will now open to enter your payment details.
-                </Trans>
-              </b>
-            </Text>
-          </Line>
-          <Line justifyContent="center" alignItems="center">
-            <CircularProgress size={20} />
-            <Spacer />
-            <Text>Waiting for the purchase confirmation...</Text>
-          </Line>
-          <Spacer />
-          <Line justifyContent="center">
-            <BackgroundText>
-              <Trans>
-                Once you're done, come back to GDevelop and the assets will be
-                added to your account automatically.
-              </Trans>
-            </BackgroundText>
-          </Line>
-        </>
-      ) : (
-        <>
-          <Text>
-            <Trans>
-              You are about to purchase the asset pack{' '}
-              <b>{privateAssetPackListingData.name}</b> and link it to your user
-              account with email
-              {profile.email}. You will be able to use it in all your projects.
-            </Trans>
-          </Text>
-          <Text>
-            <Trans>
-              A new secure window will open to complete the purchase.
-            </Trans>
-          </Text>
-        </>
-      )}
+          </>
+        )}
+        <Text>
+          <b>{dialogContents.subtitle}</b>
+        </Text>
+      </Line>
+      {dialogContents.content}
     </Dialog>
   );
 };

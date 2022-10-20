@@ -13,6 +13,7 @@ import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { makeStyles } from '@material-ui/core/styles';
 import { MarkdownText } from '../UI/MarkdownText';
 import RaisedButton from '../UI/RaisedButton';
+import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
 type Props = {|
   anchorElement: HTMLElement,
@@ -22,7 +23,6 @@ type Props = {|
 
 const styles = {
   paper: {
-    backgroundColor: '#FAFAFA', // Grey00
     padding: '0px 20px', // vertical padding is added by markdown text paragraphs
   },
   title: {
@@ -89,7 +89,6 @@ const useClasses = makeStyles({
     /* = width / sqrt(2) = (length of the hypotenuse) */
     height: '0.71em',
     boxSizing: 'border-box',
-    color: '#FAFAFA',
     '&::before': {
       content: '""',
       margin: 'auto',
@@ -107,6 +106,9 @@ function InAppTutorialTooltipDisplayer({
   tooltip,
   buttonLabel,
 }: Props) {
+  const {
+    palette: { type: paletteType },
+  } = React.useContext(GDevelopThemeContext);
   const [show, setShow] = React.useState<boolean>(false);
   const { goToNextStep } = React.useContext(InAppTutorialContext);
   const updateVisibility = React.useCallback(
@@ -121,6 +123,10 @@ function InAppTutorialTooltipDisplayer({
   const arrowRef = React.useRef<?HTMLSpanElement>(null);
   const classes = useClasses();
   const placement = tooltip.placement || 'bottom';
+  const backgroundColor =
+    paletteType === 'light'
+      ? '#EBEBED' // Grey10
+      : '#FAFAFA'; // Grey00
 
   return (
     <>
@@ -148,14 +154,11 @@ function InAppTutorialTooltipDisplayer({
         {({ TransitionProps }) => (
           <>
             <Fade {...TransitionProps} timeout={{ enter: 350, exit: 0 }}>
-              <Paper style={styles.paper} elevation={4}>
+              <Paper style={{ ...styles.paper, backgroundColor }} elevation={4}>
                 <Column noMargin>
                   {tooltip.title && (
                     <Typography style={styles.title} variant="subtitle1">
-                      <MarkdownText
-                        source={tooltip.title}
-                        allowParagraphs
-                      />
+                      <MarkdownText source={tooltip.title} allowParagraphs />
                     </Typography>
                   )}
                   {tooltip.title &&
@@ -187,6 +190,7 @@ function InAppTutorialTooltipDisplayer({
                   id="arrow-popper"
                   className={classes.arrow}
                   ref={arrowRef}
+                  style={{ color: backgroundColor }}
                 />
               </Paper>
             </Fade>

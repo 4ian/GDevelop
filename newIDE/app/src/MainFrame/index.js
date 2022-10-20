@@ -19,7 +19,7 @@ import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { TabContentContainer } from '../UI/ClosableTabs';
-import { DraggableClosableTabs } from './EditorTabs/DraggableEditorTabs';
+import { DraggableEditorTabs } from './EditorTabs/DraggableEditorTabs';
 import {
   getEditorTabsInitialState,
   openEditorTab,
@@ -147,6 +147,7 @@ import {
   useResourceFetcher,
   type ResourceFetcher,
 } from '../ProjectsStorage/ResourceFetcher';
+import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -370,6 +371,11 @@ const MainFrame = (props: Props) => {
     EventsFunctionsExtensionsContext
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
+  const {
+    setProject: setInAppTutorialProject,
+    setCurrentEditor,
+    onPreviewLaunch,
+  } = React.useContext(InAppTutorialContext);
   const [
     fileMetadataOpeningProgress,
     setFileMetadataOpeningProgress,
@@ -665,6 +671,7 @@ const MainFrame = (props: Props) => {
     (): Promise<void> => {
       setHasProjectOpened(false);
       setPreviewState(initialPreviewState);
+      setInAppTutorialProject(null);
       return setState(state => {
         if (!currentProject) {
           // It's important to return a new object to ensure that the promise
@@ -672,12 +679,10 @@ const MainFrame = (props: Props) => {
           return { ...state };
         }
 
-        if (currentProject) {
-          eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
-            currentProject
-          );
-          currentProject.delete();
-        }
+        eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
+          currentProject
+        );
+        currentProject.delete();
 
         return {
           ...state,
@@ -692,6 +697,7 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
       setState,
+      setInAppTutorialProject,
     ]
   );
 
@@ -732,6 +738,7 @@ const MainFrame = (props: Props) => {
         currentFileMetadata: fileMetadata,
         createDialogOpen: false,
       }));
+      setInAppTutorialProject(project);
 
       // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
       // their editor will take care of reloading them.
@@ -775,6 +782,7 @@ const MainFrame = (props: Props) => {
       getStorageProviderOperations,
       ensureResourcesAreFetched,
       authenticatedUser,
+      setInAppTutorialProject,
     ]
   );
 
@@ -1371,6 +1379,7 @@ const MainFrame = (props: Props) => {
         })
         .then(() => {
           setPreviewLoading(false);
+          onPreviewLaunch();
         });
     },
     [
@@ -1381,6 +1390,7 @@ const MainFrame = (props: Props) => {
       state.editorTabs,
       preferences.getIsMenuBarHiddenInPreview,
       preferences.getIsAlwaysOnTopInPreview,
+      onPreviewLaunch,
     ]
   );
 
@@ -2083,19 +2093,23 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  /**
+   * Returns true if the project has been closed and false if the user refused to close it.
+   */
   const askToCloseProject = React.useCallback(
-    (): Promise<void> => {
-      if (unsavedChanges && unsavedChanges.hasUnsavedChanges) {
-        if (!currentProject) return Promise.resolve();
+    async (): Promise<boolean> => {
+      if (!currentProject) return true;
 
+      if (unsavedChanges && unsavedChanges.hasUnsavedChanges) {
         const answer = Window.showConfirmDialog(
           i18n._(
             t`Close the project? Any changes that have not been saved will be lost.`
           )
         );
-        if (!answer) return Promise.resolve();
+        if (!answer) return false;
       }
-      return closeProject();
+      await closeProject();
+      return true;
     },
     [currentProject, unsavedChanges, i18n, closeProject]
   );
@@ -2105,11 +2119,11 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: changeCurrentTab(state.editorTabs, value),
     })).then(state =>
-      _onEditorTabActived(getCurrentTab(state.editorTabs), state)
+      _onEditorTabActivated(getCurrentTab(state.editorTabs), state)
     );
   };
 
-  const _onEditorTabActived = (
+  const _onEditorTabActivated = (
     editorTab: EditorTab,
     newState: State = state
   ) => {
@@ -2394,14 +2408,6 @@ const MainFrame = (props: Props) => {
       : () => {}
   );
 
-  const onUserflowRunningUpdate = () => {
-    // Userflow dialog has a variable exported which knows if the
-    // onboarding is running or not.
-    // To ensure all components are aware of this variable when it changes,
-    // we need to force a re-render.
-    forceUpdate();
-  };
-
   useMainFrameCommands({
     i18n,
     project: state.currentProject,
@@ -2422,7 +2428,9 @@ const MainFrame = (props: Props) => {
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
     onCloseApp: closeApp,
-    onCloseProject: askToCloseProject,
+    onCloseProject: async () => {
+      askToCloseProject();
+    },
     onExportGame: React.useCallback(() => openExportDialog(true), []),
     onOpenLayout: openLayout,
     onOpenExternalEvents: openExternalEvents,
@@ -2440,6 +2448,23 @@ const MainFrame = (props: Props) => {
       []
     ),
   });
+
+  React.useEffect(
+    () => {
+      const currentTab = getCurrentTab(state.editorTabs);
+      if (!currentTab) {
+        setCurrentEditor(null);
+        return;
+      }
+      const editorIdentifier = currentTab.key.startsWith('start page')
+        ? 'Home'
+        : currentTab.key.startsWith('layout event')
+        ? 'EventsSheet'
+        : 'Scene';
+      setCurrentEditor(editorIdentifier);
+    },
+    [state.editorTabs, setCurrentEditor]
+  );
 
   const showLoader = isLoadingProject || previewLoading;
 
@@ -2572,7 +2597,7 @@ const MainFrame = (props: Props) => {
         }
         previewState={previewState}
       />
-      <DraggableClosableTabs
+      <DraggableEditorTabs
         hideLabels={false}
         editorTabs={state.editorTabs}
         onClickTab={(id: number) => _onChangeEditorTab(id)}
@@ -2581,7 +2606,9 @@ const MainFrame = (props: Props) => {
           _onCloseOtherEditorTabs(editorTab)
         }
         onCloseAll={_onCloseAllEditorTabs}
-        onTabActived={(editorTab: EditorTab) => _onEditorTabActived(editorTab)}
+        onTabActivated={(editorTab: EditorTab) =>
+          _onEditorTabActivated(editorTab)
+        }
         onDropTab={onDropEditorTab}
       />
       <LeaderboardProvider
@@ -2856,10 +2883,10 @@ const MainFrame = (props: Props) => {
       {onboardingDialogOpen && (
         <OnboardingDialog
           open
+          onStartOnboarding={askToCloseProject}
           onClose={() => {
             openOnboardingDialog(false);
           }}
-          onUserflowRunningUpdate={onUserflowRunningUpdate}
         />
       )}
       {state.gdjsDevelopmentWatcherEnabled &&

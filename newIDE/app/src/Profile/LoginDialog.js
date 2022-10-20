@@ -65,9 +65,9 @@ const LoginDialog = ({
 
   const actions = [
     <FlatButton
-      label={<Trans>Back</Trans>}
+      label={<Trans>Cancel</Trans>}
       disabled={actionInProgress}
-      key="back"
+      key="cancel"
       primary={false}
       onClick={onClose}
     />,

@@ -5,9 +5,7 @@ import {
   listUserPurchases,
   type PrivateAssetPackListingData,
 } from '../../Utils/GDevelopServices/Shop';
-import Dialog from '../../UI/Dialog';
-import TextButton from '../../UI/TextButton';
-import RaisedButton from '../../UI/RaisedButton';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import CreateProfile from '../../Profile/CreateProfile';
 import Text from '../../UI/Text';
@@ -20,6 +18,7 @@ import BackgroundText from '../../UI/BackgroundText';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import VerifiedUser from '@material-ui/icons/VerifiedUser';
 import { AssetStoreContext } from '../AssetStoreContext';
+import FlatButton from '../../UI/FlatButton';
 
 type Props = {|
   privateAssetPackListingData: PrivateAssetPackListingData,
@@ -241,31 +240,36 @@ const PrivateAssetPackPurchaseDialog = ({
         ),
       };
 
+  const showContinueButton =
+    profile &&
+    !isBuying &&
+    !purchaseSuccessful &&
+    !isCheckingPurchasesAfterLogin;
+  const dialogActions = [
+    <FlatButton
+      key="cancel"
+      label={purchaseSuccessful ? <Trans>Accept</Trans> : <Trans>Cancel</Trans>}
+      onClick={onClose}
+    />,
+    showContinueButton ? (
+      <DialogPrimaryButton
+        key="continue"
+        primary
+        label={<Trans>Continue</Trans>}
+        onClick={onContinue}
+      />
+    ) : null,
+  ];
+
   return (
     <Dialog
       title={<Trans>{privateAssetPackListingData.name}</Trans>}
       maxWidth="sm"
       open
       onRequestClose={onClose}
-      actions={[
-        <TextButton
-          key="cancel"
-          label={
-            purchaseSuccessful ? <Trans>Accept</Trans> : <Trans>Cancel</Trans>
-          }
-          onClick={onClose}
-        />,
-        profile && !purchaseSuccessful ? (
-          <RaisedButton
-            key="continue"
-            primary
-            label={<Trans>Continue</Trans>}
-            onClick={onContinue}
-            disabled={isBuying}
-          />
-        ) : null,
-      ]}
+      actions={dialogActions}
       onApply={purchaseSuccessful ? onClose : onContinue}
+      cannotBeDismissed // Prevent the user from continuing by clicking outside.
       flexColumnBody
     >
       <Line justifyContent="center" alignItems="center">

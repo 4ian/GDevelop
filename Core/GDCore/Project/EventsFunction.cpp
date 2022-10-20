@@ -41,7 +41,7 @@ const std::vector<gd::ParameterMetadata>& EventsFunction::GetParametersForEvents
   }
   gd::ParameterMetadata parameterMetadata;
   parameterMetadata.SetName("Value")
-                   .SetType(expression.IsStringExpression() ? "string" : "number");
+                   .SetType(expression.IsStringExpression() ? "string" : "expression");
   actionWithOperationParameters.push_back(parameterMetadata);
   for (size_t i = expressionValueParameterIndex;
        i < expressionParameters.size();

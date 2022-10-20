@@ -191,6 +191,7 @@ class ParticleSystemJsExtension : public gd::PlatformExtension {
     expressions["EmitterAngle"].SetFunctionName("getAngle");
     expressions["EmitterAngleA"].SetFunctionName("getEmitterAngleA");
     expressions["EmitterAngleB"].SetFunctionName("getEmitterAngleB");
+    expressions["ConeSprayAngle"].SetFunctionName("getConeSprayAngle");
     expressions["ZoneRadius"].SetFunctionName("getZoneRadius");
     expressions["ParticleGravityX"].SetFunctionName("getParticleGravityX");
     expressions["ParticleGravityY"].SetFunctionName("getParticleGravityY");

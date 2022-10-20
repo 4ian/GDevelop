@@ -12,9 +12,7 @@ import {
   type Tutorial,
 } from '../../../../Utils/GDevelopServices/Tutorial';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
-import { isUserflowRunning } from '../../../Onboarding/OnboardingDialog';
 import { isMobile } from '../../../../Utils/Platform';
-import optionalRequire from '../../../../Utils/OptionalRequire';
 import { sendOnboardingManuallyOpened } from '../../../../Utils/Analytics/EventSender';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import FlatButton from '../../../../UI/FlatButton';
@@ -29,7 +27,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import ImageTileRow from '../../../../UI/ImageTileRow';
 import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
 import ArrowRight from '@material-ui/icons/ArrowRight';
-const electron = optionalRequire('electron');
+import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
 
 const useStyles = makeStyles({
   tile: {
@@ -97,8 +95,9 @@ const MainPage = ({
   tutorials,
 }: Props) => {
   const classes = useStyles();
+  const { isInAppTutorialRunning } = React.useContext(InAppTutorialContext);
   const windowWidth = useResponsiveWindowWidth();
-  const shouldShowOnboardingButton = !electron && !isMobile();
+  const shouldShowOnboardingButton = !isMobile();
   const helpItems: {
     title: React.Node,
     description: React.Node,
@@ -115,7 +114,7 @@ const MainPage = ({
             sendOnboardingManuallyOpened();
             onOpenOnboardingDialog();
           },
-          disabled: isUserflowRunning,
+          disabled: isInAppTutorialRunning,
         }
       : undefined,
     {

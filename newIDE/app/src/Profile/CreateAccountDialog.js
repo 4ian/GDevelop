@@ -164,6 +164,7 @@ const CreateAccountDialog = ({
           onAvailabilityChecked={setUsernameAvailability}
           onAvailabilityCheckLoading={setIsValidatingUsername}
           isValidatingUsername={isValidatingUsername}
+          disabled={createAccountInProgress}
         />
         <TextField
           value={email}
@@ -174,6 +175,7 @@ const CreateAccountDialog = ({
           onChange={(e, value) => {
             setEmail(value);
           }}
+          disabled={createAccountInProgress}
         />
         <TextField
           value={password}
@@ -185,6 +187,7 @@ const CreateAccountDialog = ({
           onChange={(e, value) => {
             setPassword(value);
           }}
+          disabled={createAccountInProgress}
         />
         <Checkbox
           label={<Trans>I want to receive the GDevelop Newsletter</Trans>}
@@ -192,6 +195,7 @@ const CreateAccountDialog = ({
           onCheck={(e, value) => {
             setGetNewsletterEmail(value);
           }}
+          disabled={createAccountInProgress}
         />
       </ColumnStackLayout>
     </Dialog>

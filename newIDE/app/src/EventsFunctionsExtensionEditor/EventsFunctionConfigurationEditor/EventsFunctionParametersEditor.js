@@ -298,30 +298,33 @@ export default class EventsFunctionParametersEditor extends React.Component<
       eventsFunction.getFunctionType() === gd.EventsFunction.ActionWithOperator
         ? eventsFunction.getParametersForEvents(eventsFunctionsContainer)
         : eventsFunction.getParameters();
-
+        
+    const firstParameterIndex = (eventsBasedBehavior ? 2 : eventsBasedObject ? 1 : 0);
     const isParameterDisabled = index => {
       return (
         eventsFunction.getFunctionType() ===
           gd.EventsFunction.ActionWithOperator ||
-        !!freezeParameters ||
-        (!!eventsBasedBehavior && index < 2) ||
-        (!!eventsBasedObject && index < 1)
+        freezeParameters ||
+        index < firstParameterIndex
       );
     };
-    const isParameterDescriptionAndTypeShown = index => {
+    const typeShownFirstIndex = firstParameterIndex;
+    const labelShownFirstIndex = firstParameterIndex +
+        (eventsFunction.getFunctionType() === gd.EventsFunction.ActionWithOperator ? 1 : 0);
+    const isParameterTypeShown = index => {
       // The first two parameters of a behavior method should not be changed at all,
       // so we even hide their description and type to avoid cluttering the interface.
       // Same thing for an object which has mandatory Object parameter.
-      return (
-        (!eventsBasedBehavior && !eventsBasedObject) ||
-        (!!eventsBasedBehavior && index >= 2) ||
-        (!!eventsBasedObject && index >= 1)
-      );
+      return index >= typeShownFirstIndex;
+    };
+    const isParameterDescriptionShown = index => {
+      // The first two parameters of a behavior method should not be changed at all,
+      // so we even hide their description and type to avoid cluttering the interface.
+      // Same thing for an object which has mandatory Object parameter.
+      return index >= labelShownFirstIndex;
     };
     const isParameterLongDescriptionShown = (parameter, index): boolean => {
-      if (!isParameterDescriptionAndTypeShown(index)) return false;
-
-      return (
+      return isParameterDescriptionShown(index) && (
         !!parameter.getLongDescription() ||
         !!this.state.longDescriptionShownIndexes[index]
       );
@@ -416,7 +419,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                       <Line>
                         <ColumnStackLayout expand>
                           <ResponsiveLineStackLayout noMargin>
-                            {isParameterDescriptionAndTypeShown(i) && (
+                            {isParameterTypeShown(i) && (
                               <SelectField
                                 floatingLabelText={<Trans>Type</Trans>}
                                 value={parameter.getType()}
@@ -629,7 +632,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               )}
                             />
                           )}
-                          {isParameterDescriptionAndTypeShown(i) && (
+                          {isParameterDescriptionShown(i) && (
                             <SemiControlledTextField
                               commitOnBlur
                               floatingLabelText={<Trans>Label</Trans>}
@@ -641,7 +644,8 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               }}
                               fullWidth
                               disabled={
-                                false /* Label, if shown, can always be changed */
+                                /* When parameter are freezed, long description (if shown) can always be changed */
+                                isParameterDisabled(i) && !freezeParameters
                               }
                             />
                           )}
@@ -660,7 +664,8 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               multiline
                               fullWidth
                               disabled={
-                                false /* Long description, if shown, can always be changed */
+                                /* When parameter are freezed, long description (if shown) can always be changed */
+                                isParameterDisabled(i) && !freezeParameters
                               }
                             />
                           )}

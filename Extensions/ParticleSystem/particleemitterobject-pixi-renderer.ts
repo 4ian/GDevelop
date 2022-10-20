@@ -154,12 +154,10 @@ namespace gdjs {
         min: -objectData.emitterAngleB / 2.0,
         max: objectData.emitterAngleB / 2.0,
       };
-      const mediumLifetime =
-        (objectData.particleLifeTimeMin + objectData.particleLifeTimeMax) / 2.0;
       // @ts-ignore
       config.rotationSpeed = {
-        min: objectData.particleAngle1 / mediumLifetime,
-        max: objectData.particleAngle2 / mediumLifetime,
+        min: objectData.particleAngle1,
+        max: objectData.particleAngle2,
       };
       // @ts-ignore
       config.blendMode = objectData.additive ? 'ADD' : 'NORMAL';

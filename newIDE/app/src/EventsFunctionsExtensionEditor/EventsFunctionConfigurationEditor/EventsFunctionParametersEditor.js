@@ -298,8 +298,12 @@ export default class EventsFunctionParametersEditor extends React.Component<
       eventsFunction.getFunctionType() === gd.EventsFunction.ActionWithOperator
         ? eventsFunction.getParametersForEvents(eventsFunctionsContainer)
         : eventsFunction.getParameters();
-        
-    const firstParameterIndex = (eventsBasedBehavior ? 2 : eventsBasedObject ? 1 : 0);
+
+    const firstParameterIndex = eventsBasedBehavior
+      ? 2
+      : eventsBasedObject
+      ? 1
+      : 0;
     const isParameterDisabled = index => {
       return (
         eventsFunction.getFunctionType() ===
@@ -309,8 +313,11 @@ export default class EventsFunctionParametersEditor extends React.Component<
       );
     };
     const typeShownFirstIndex = firstParameterIndex;
-    const labelShownFirstIndex = firstParameterIndex +
-        (eventsFunction.getFunctionType() === gd.EventsFunction.ActionWithOperator ? 1 : 0);
+    const labelShownFirstIndex =
+      firstParameterIndex +
+      (eventsFunction.getFunctionType() === gd.EventsFunction.ActionWithOperator
+        ? 1
+        : 0);
     const isParameterTypeShown = index => {
       // The first two parameters of a behavior method should not be changed at all,
       // so we even hide their description and type to avoid cluttering the interface.
@@ -324,9 +331,10 @@ export default class EventsFunctionParametersEditor extends React.Component<
       return index >= labelShownFirstIndex;
     };
     const isParameterLongDescriptionShown = (parameter, index): boolean => {
-      return isParameterDescriptionShown(index) && (
-        !!parameter.getLongDescription() ||
-        !!this.state.longDescriptionShownIndexes[index]
+      return (
+        isParameterDescriptionShown(index) &&
+        (!!parameter.getLongDescription() ||
+          !!this.state.longDescriptionShownIndexes[index])
       );
     };
     const parametersIndexOffset = eventsBasedBehavior

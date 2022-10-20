@@ -82,6 +82,8 @@ export default function EventsBasedBehaviorEditorDialog({
         <EventsBasedBehaviorPropertiesEditor
           allowRequiredBehavior
           project={project}
+          extension={this.props.eventsFunctionsExtension}
+          eventsBasedBehavior={eventsBasedBehavior}
           properties={eventsBasedBehavior.getPropertyDescriptors()}
           onRenameProperty={onRenameProperty}
           behaviorObjectType={eventsBasedBehavior.getObjectType()}

@@ -32,6 +32,8 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
+  extension: gdEventsFunctionsExtension,
+  eventsBasedBehavior: gdEventsBasedBehavior,
   properties: gdNamedPropertyDescriptorsList,
   allowRequiredBehavior?: boolean,
   onPropertiesUpdated?: () => void,
@@ -86,6 +88,35 @@ const getExtraInfoArray = (property: gdNamedPropertyDescriptor) => {
   return extraInfoVector.toJSArray();
 };
 
+const capitalizeFirstLetter = (text: string): string => {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
+
+const uncapitalizeFirstLetter = (text: string): string => {
+  return text.charAt(0).toLowerCase() + text.slice(1);
+};
+
+const functionIsExpressionAndAction = (
+  getterFunction: gdEventsFunction
+): boolean => {
+  return (
+    getterFunction.getFunctionType() ===
+      gd.EventsFunction.ExpressionAndCondition ||
+    getterFunction.getFunctionType() ===
+      gd.EventsFunction.StringExpressionAndCondition
+  );
+};
+
+const propertyIsNumber = (property: gdNamedPropertyDescriptor) => {
+  const type = property.getType();
+  return type === 'Number';
+};
+
+const propertyIsString = (property: gdNamedPropertyDescriptor) => {
+  const type = property.getType();
+  return type === 'String' || type === 'Choice' || type === 'Color';
+};
+
 export default class EventsBasedBehaviorPropertiesEditor extends React.Component<
   Props,
   {||}
@@ -114,6 +145,105 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
     properties.move(oldIndex, newIndex);
     this.forceUpdate();
     this.props.onPropertiesUpdated && this.props.onPropertiesUpdated();
+  };
+
+  _canGenerateGetterAndSetter = (name: string) => {
+    const { eventsBasedBehavior } = this.props;
+    const properties = eventsBasedBehavior.getPropertyDescriptors();
+    const property = properties.get(name);
+    if (!propertyIsNumber(property) && !propertyIsString(property)) {
+      return false;
+    }
+
+    const functionsContainer = eventsBasedBehavior.getEventsFunctions();
+    const getterName = capitalizeFirstLetter(property.getName());
+    const setterName = 'Set' + getterName;
+    return (
+      !functionsContainer.hasEventsFunctionNamed(setterName) &&
+      (!functionsContainer.hasEventsFunctionNamed(getterName) ||
+        functionIsExpressionAndAction(
+          functionsContainer.getEventsFunction(getterName)
+        ))
+    );
+  };
+
+  // TODO Move the implementation to Core
+  _generateGetterAndSetter = (name: string) => {
+    const { project, extension, eventsBasedBehavior } = this.props;
+    const properties = eventsBasedBehavior.getPropertyDescriptors();
+    const property = properties.get(name);
+    const functionsContainer = eventsBasedBehavior.getEventsFunctions();
+    const getterName = capitalizeFirstLetter(property.getName());
+    const setterName = 'Set' + getterName;
+    const propertyType = propertyIsNumber(property) ? 'Number' : 'String';
+    if (!functionsContainer.hasEventsFunctionNamed(getterName)) {
+      const getter = functionsContainer.insertNewEventsFunction(
+        getterName,
+        functionsContainer.getEventsFunctionsCount()
+      );
+      getter.setFunctionType(
+        propertyIsNumber(property)
+          ? gd.EventsFunction.ExpressionAndCondition
+          : gd.EventsFunction.StringExpressionAndCondition
+      );
+      getter.setFullName(property.getLabel());
+      getter.setGroup(
+        eventsBasedBehavior.getFullName() ||
+          eventsBasedBehavior.getName() +
+            ' ' +
+            uncapitalizeFirstLetter(property.getGroup()) +
+            ' configuration'
+      );
+      getter.setDescription(
+        'the ' +
+          uncapitalizeFirstLetter(property.getLabel()) +
+          ' of the object.' +
+          (property.getDescription() ? ' ' + property.getDescription() : '')
+      );
+      getter.setSentence('the ' + uncapitalizeFirstLetter(property.getLabel()));
+
+      const event = gd.asStandardEvent(
+        getter
+          .getEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0)
+      );
+      const action = new gd.Instruction();
+      action.setType('SetReturn' + propertyType);
+      action.setParametersCount(1);
+      action.setParameter(
+        0,
+        'Object.Behavior::Property' + property.getName() + '()'
+      );
+      event.getActions().insert(action, 0);
+    }
+    if (!functionsContainer.hasEventsFunctionNamed(setterName)) {
+      const setter = functionsContainer.insertNewEventsFunction(
+        setterName,
+        functionsContainer.getEventsFunctionsCount()
+      );
+      setter.setFunctionType(gd.EventsFunction.ActionWithOperator);
+      setter.setGetterName(getterName);
+
+      const event = gd.asStandardEvent(
+        setter
+          .getEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0)
+      );
+      const action = new gd.Instruction();
+      action.setType(
+        extension.getName() +
+          '::' +
+          eventsBasedBehavior.getName() +
+          '::SetProperty' +
+          property.getName()
+      );
+      action.setParametersCount(4);
+      action.setParameter(0, 'Object');
+      action.setParameter(1, 'Behavior');
+      action.setParameter(2, '=');
+      action.setParameter(3, 'GetArgumentAs' + propertyType + '("Value")');
+      event.getActions().insert(action, 0);
+    }
   };
 
   _setChoiceExtraInfo = (property: gdNamedPropertyDescriptor) => {
@@ -224,6 +354,16 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                           label: i18n._(t`Move down`),
                           click: () => this._moveProperty(i, i + 1),
                           enabled: i + 1 < properties.getCount(),
+                        },
+                        {
+                          label: i18n._(t`Generate functions`),
+                          click: () =>
+                            this._generateGetterAndSetter(
+                              property.getName()
+                            ),
+                          disabled: this._canGenerateGetterAndSetter(
+                            property.getName()
+                          ),
                         },
                       ]}
                     />

@@ -75,6 +75,8 @@ const styles = {
   },
 };
 
+const getTabId = (identifier: string) => `project-manager-tab-${identifier}`;
+
 type Props = {|
   project: gdProject,
   onChangeProjectName: string => Promise<void>,
@@ -673,6 +675,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             <List style={styles.list}>
               {this._renderMenu()}
               <ProjectStructureItem
+                id={getTabId('game-settings')}
                 primaryText={<Trans>Game settings</Trans>}
                 leftIcon={
                   <ListIcon
@@ -686,24 +689,28 @@ export default class ProjectManager extends React.Component<Props, State> {
                 indentNestedItems
                 renderNestedItems={() => [
                   <ListItem
+                    id={getTabId('game-properties')}
                     key="properties"
                     primaryText={<Trans>Properties</Trans>}
                     leftIcon={<SettingsApplications />}
                     onClick={this._openProjectProperties}
                   />,
                   <ListItem
+                    id={getTabId('global-variables')}
                     key="global-variables"
                     primaryText={<Trans>Global variables</Trans>}
                     leftIcon={<VariableTree />}
                     onClick={this._openProjectVariables}
                   />,
                   <ListItem
+                    id={getTabId('game-icons')}
                     key="icons"
                     primaryText={<Trans>Icons and thumbnail</Trans>}
                     leftIcon={<PhotoLibrary />}
                     onClick={this.props.onOpenPlatformSpecificAssets}
                   />,
                   <ListItem
+                    id={getTabId('game-resources')}
                     key="resources"
                     primaryText={<Trans>Resources</Trans>}
                     leftIcon={<ArtTrack />}
@@ -712,6 +719,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 ]}
               />
               <ProjectStructureItem
+                id={getTabId('scenes')}
                 primaryText={<Trans>Scenes</Trans>}
                 leftIcon={
                   <ListIcon
@@ -798,6 +806,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 }
               />
               <ProjectStructureItem
+                id={getTabId('external-events')}
                 primaryText={<Trans>External events</Trans>}
                 leftIcon={
                   <ListIcon
@@ -874,6 +883,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 }
               />
               <ProjectStructureItem
+                id={getTabId('external-layouts')}
                 primaryText={<Trans>External layouts</Trans>}
                 leftIcon={
                   <ListIcon
@@ -950,6 +960,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 }
               />
               <ProjectStructureItem
+                id={getTabId('extensions')}
                 primaryText={<Trans>Extensions</Trans>}
                 error={eventsFunctionsExtensionsError}
                 onRefresh={onReloadEventsFunctionsExtensions}

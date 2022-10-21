@@ -24,7 +24,7 @@ namespace gdjs {
         graphics.drawCircle(0, 0, objectData.rendererParam1);
       } else if (objectData.rendererType === 'Line') {
         graphics.drawRect(
-          objectData.rendererParam1,
+          0,
           0,
           objectData.rendererParam1,
           objectData.rendererParam2

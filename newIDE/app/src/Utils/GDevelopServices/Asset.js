@@ -25,7 +25,7 @@ export type ObjectAsset = {|
   object: any /*(serialized gdObjectConfiguration)*/,
   resources: Array<any /*(serialized gdResource)*/>,
   // TODO This can become mandatory after the migration of the asset repository.
-  extensions?: Array<ExtensionDependency>,
+  requiredExtensions?: Array<ExtensionDependency>,
 |};
 
 export type AssetShortHeader = {|

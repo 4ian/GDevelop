@@ -552,7 +552,7 @@ export const fakeAsset1: Asset = {
     {
       object: spaceshipSerializedObject,
       resources: spaceshipSerializedResources,
-      extensions: [],
+      requiredExtensions: [],
     },
   ],
 };
@@ -671,7 +671,7 @@ export const fakeAssetWithCustomObject: Asset = {
           },
         },
       ],
-      extensions: [
+      requiredExtensions: [
         {
           extensionName: 'Button',
           extensionVersion: '1.0.0',
@@ -712,7 +712,7 @@ export const fakeAssetWithUnknownExtension1: Asset = {
     {
       object: spaceshipSerializedObject,
       resources: spaceshipSerializedResources,
-      extensions: [
+      requiredExtensions: [
         {
           extensionName: 'UnknownExtension',
           extensionVersion: '1.0.0',
@@ -744,7 +744,7 @@ export const fakeAssetWithFlashExtensionDependency1: Asset = {
     {
       object: spaceshipSerializedObject,
       resources: spaceshipSerializedResources,
-      extensions: [
+      requiredExtensions: [
         {
           extensionName: 'Flash',
           extensionVersion: '1.0.0',

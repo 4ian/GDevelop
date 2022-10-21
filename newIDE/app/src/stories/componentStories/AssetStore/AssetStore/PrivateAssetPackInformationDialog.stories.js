@@ -6,7 +6,7 @@ import axios from 'axios';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
-import PrivateAssetPackDialog from '../../../../AssetStore/PrivateAssets/PrivateAssetPackDialog';
+import PrivateAssetPackInformationDialog from '../../../../AssetStore/PrivateAssets/PrivateAssetPackInformationDialog';
 import {
   GDevelopAssetApi,
   GDevelopUserApi,
@@ -14,8 +14,8 @@ import {
 import { client as assetApiAxiosClient } from '../../../../Utils/GDevelopServices/Asset';
 
 export default {
-  title: 'AssetStore/AssetStore/PrivateAssetPackDialog',
-  component: PrivateAssetPackDialog,
+  title: 'AssetStore/AssetStore/PrivateAssetPackInformationDialog',
+  component: PrivateAssetPackInformationDialog,
   decorators: [paperDecorator, muiDecorator],
 };
 
@@ -95,9 +95,49 @@ export const Default = () => {
     });
 
   return (
-    <PrivateAssetPackDialog
+    <PrivateAssetPackInformationDialog
       privateAssetPackListingData={privateAssetPackListingData}
       onClose={() => action('close')()}
+      isPurchaseDialogOpen={false}
+      onOpenPurchaseDialog={() => action('open purchase dialog')()}
+    />
+  );
+};
+export const WithPurchaseDialogOpen = () => {
+  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
+  axiosMock
+    .onGet(
+      `${GDevelopUserApi.baseUrl}/user-public-profile/${
+        privateAssetPackListingData.sellerId
+      }`
+    )
+    .reply(200, sellerPublicProfile)
+    .onGet(
+      `${GDevelopUserApi.baseUrl}/user/${
+        privateAssetPackListingData.sellerId
+      }/badge`
+    )
+    .reply(200, [])
+    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
+    .reply(200, []);
+  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
+  assetServiceMock
+    .onGet(
+      `${GDevelopAssetApi.baseUrl}/asset-pack/${privateAssetPackListingData.id}`
+    )
+    .reply(200, privateAssetPackDetails)
+    .onAny()
+    .reply(config => {
+      console.error(`Unexpected call to ${config.url} (${config.method})`);
+      return [504, null];
+    });
+
+  return (
+    <PrivateAssetPackInformationDialog
+      privateAssetPackListingData={privateAssetPackListingData}
+      onClose={() => action('close')()}
+      isPurchaseDialogOpen
+      onOpenPurchaseDialog={() => action('open purchase dialog')()}
     />
   );
 };
@@ -133,9 +173,11 @@ export const Loading = () => {
     });
 
   return (
-    <PrivateAssetPackDialog
+    <PrivateAssetPackInformationDialog
       privateAssetPackListingData={privateAssetPackListingData}
       onClose={() => action('close')()}
+      isPurchaseDialogOpen={false}
+      onOpenPurchaseDialog={() => action('open purchase dialog')()}
     />
   );
 };
@@ -170,9 +212,11 @@ export const With404 = () => {
     });
 
   return (
-    <PrivateAssetPackDialog
+    <PrivateAssetPackInformationDialog
       privateAssetPackListingData={privateAssetPackListingData}
       onClose={() => action('close')()}
+      isPurchaseDialogOpen={false}
+      onOpenPurchaseDialog={() => action('open purchase dialog')()}
     />
   );
 };
@@ -207,9 +251,11 @@ export const WithUnknownError = () => {
     });
 
   return (
-    <PrivateAssetPackDialog
+    <PrivateAssetPackInformationDialog
       privateAssetPackListingData={privateAssetPackListingData}
       onClose={() => action('close')()}
+      isPurchaseDialogOpen={false}
+      onOpenPurchaseDialog={() => action('open purchase dialog')()}
     />
   );
 };

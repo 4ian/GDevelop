@@ -27,10 +27,46 @@ export type PrivateAssetPackListingData = {|
   prices: StripePrice[],
 |};
 
+type Purchase = {|
+  id: string,
+  productId: string,
+  buyerId: string,
+  receiverId: string,
+  createdAt: string,
+  cancelledAt?: string,
+  stripeCheckoutSessionId?: string,
+|};
+
 export const listListedPrivateAssetPacks = async (): Promise<
   Array<PrivateAssetPackListingData>
 > => {
   const response = await client.get('/asset-pack');
+  return response.data;
+};
+
+export const listUserPurchases = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    productType,
+    role,
+  }: {|
+    userId: string,
+    productType: 'asset-pack',
+    role: 'receiver' | 'buyer',
+  |}
+): Promise<Array<Purchase>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.get('/purchase', {
+    params: {
+      userId,
+      productType,
+      role,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
   return response.data;
 };
 
@@ -76,4 +112,34 @@ export const extractFilenameAndExtensionFromProductAuthorizedUrl = (
     extension
   );
   return { filenameWithoutExtension, extension };
+};
+
+export const getStripeCheckoutUrl = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    stripePriceId,
+    userId,
+    customerEmail,
+  }: {|
+    stripePriceId: string,
+    userId: string,
+    customerEmail: string,
+  |}
+): Promise<string> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.post(
+    '/purchase/action/create-stripe-checkout-session',
+    {
+      stripePriceId,
+      customerEmail,
+    },
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+  if (!response.data) throw new Error('Could not create the checkout session.');
+  if (!response.data.sessionUrl)
+    throw new Error('Could not find the session url.');
+  return response.data.sessionUrl;
 };

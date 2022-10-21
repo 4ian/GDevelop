@@ -116,7 +116,7 @@ gd::String EventsCodeGenerator::GenerateLayoutCode(
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     gd::Project& project,
-    const gd::EventsFunctionsContainer functionContainer,
+    const gd::EventsFunctionsContainer& functionsContainer,
     const gd::EventsFunction& eventsFunction,
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
@@ -124,7 +124,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
   gd::ObjectsContainer globalObjectsAndGroups;
   gd::ObjectsContainer objectsAndGroups;
   gd::EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
-      project, functionContainer, eventsFunction, globalObjectsAndGroups, objectsAndGroups);
+      project, functionsContainer, eventsFunction, globalObjectsAndGroups, objectsAndGroups);
 
   EventsCodeGenerator codeGenerator(globalObjectsAndGroups, objectsAndGroups);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -134,9 +134,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       codeGenerator,
       codeGenerator.GetCodeNamespaceAccessor() + "func",
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParametersForEvents(functionContainer), 0, true),
+          eventsFunction.GetParametersForEvents(functionsContainer), 0, true),
       codeGenerator.GenerateFreeEventsFunctionContext(
-          eventsFunction.GetParametersForEvents(functionContainer), "runtimeScene.getOnceTriggers()"),
+          eventsFunction.GetParametersForEvents(functionsContainer), "runtimeScene.getOnceTriggers()"),
       eventsFunction.GetEvents(),
       "",
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));

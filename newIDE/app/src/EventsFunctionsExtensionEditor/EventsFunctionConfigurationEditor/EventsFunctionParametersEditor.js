@@ -312,22 +312,22 @@ export default class EventsFunctionParametersEditor extends React.Component<
         index < firstParameterIndex
       );
     };
+    // The first two parameters of a behavior method should not be changed at all,
+    // so we even hide their description and type to avoid cluttering the interface.
+    // Same thing for an object which has mandatory Object parameter.
     const typeShownFirstIndex = firstParameterIndex;
+    const isParameterTypeShown = index => {
+      return index >= typeShownFirstIndex;
+    };
+    // The first two parameters of a behavior method should not be changed at all,
+    // so we even hide their description and type to avoid cluttering the interface.
+    // Same thing for an object which has mandatory Object parameter.
     const labelShownFirstIndex =
       firstParameterIndex +
       (eventsFunction.getFunctionType() === gd.EventsFunction.ActionWithOperator
         ? 1
         : 0);
-    const isParameterTypeShown = index => {
-      // The first two parameters of a behavior method should not be changed at all,
-      // so we even hide their description and type to avoid cluttering the interface.
-      // Same thing for an object which has mandatory Object parameter.
-      return index >= typeShownFirstIndex;
-    };
     const isParameterDescriptionShown = index => {
-      // The first two parameters of a behavior method should not be changed at all,
-      // so we even hide their description and type to avoid cluttering the interface.
-      // Same thing for an object which has mandatory Object parameter.
       return index >= labelShownFirstIndex;
     };
     const isParameterLongDescriptionShown = (parameter, index): boolean => {

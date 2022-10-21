@@ -33,6 +33,12 @@ public:
 
   EventsFunctionsContainer(FunctionSource source_) : source(source_) {}
 
+  /**
+   * \brief Get the source of the function container.
+   * 
+   * \note For instance, it can be useful to handle specific parameters for
+   * behaviors.
+   */
   FunctionSource GetSource() const {
     return source;
   }
@@ -152,7 +158,7 @@ public:
   };
 
 private:
-FunctionSource source;
+  FunctionSource source;
 };
 
 }  // namespace gd

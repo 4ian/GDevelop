@@ -17,8 +17,10 @@ EventsFunction::EventsFunction() : functionType(Action) {}
 const std::vector<gd::ParameterMetadata>& EventsFunction::GetParametersForEvents(
     const gd::EventsFunctionsContainer& functionsContainer) const {
   if (functionType != FunctionType::ActionWithOperator) {
+    // For most function types, the parameters are specified in the function.
     return parameters;
   }
+  // For ActionWithOperator, the parameters are auto generated.
   actionWithOperationParameters.clear();
   if (!functionsContainer.HasEventsFunctionNamed(getterName)) {
     return actionWithOperationParameters;

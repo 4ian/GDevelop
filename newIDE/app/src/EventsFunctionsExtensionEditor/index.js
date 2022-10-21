@@ -198,6 +198,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         this._globalObjectsContainer,
         this._objectsContainer
       );
+    } else {
+      throw new Error(
+        'No extension, behavior or object was specified when loading a function'
+      );
     }
   };
 

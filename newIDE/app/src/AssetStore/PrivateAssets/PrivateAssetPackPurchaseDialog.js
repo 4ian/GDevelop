@@ -19,6 +19,7 @@ import { showErrorBox } from '../../UI/Messages/MessageBox';
 import VerifiedUser from '@material-ui/icons/VerifiedUser';
 import { AssetStoreContext } from '../AssetStoreContext';
 import FlatButton from '../../UI/FlatButton';
+import { LineStackLayout } from '../../UI/Layout';
 
 type Props = {|
   privateAssetPackListingData: PrivateAssetPackListingData,
@@ -41,16 +42,16 @@ const PrivateAssetPackPurchaseDialog = ({
   const { loadedReceivedAssetPackInStore } = React.useContext(
     AssetStoreContext
   );
-  const [isBuying, setIsBuying] = React.useState(false);
+  const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [
     isCheckingPurchasesAfterLogin,
     setIsCheckingPurchasesAfterLogin,
   ] = React.useState(!receivedAssetPacks);
   const [purchaseSuccessful, setPurchaseSuccessful] = React.useState(false);
-  const onContinue = async () => {
+  const onStartPurchase = async () => {
     if (!profile) return;
     try {
-      setIsBuying(true);
+      setIsPurchasing(true);
       const checkoutUrl = await getStripeCheckoutUrl(getAuthorizationHeader, {
         stripePriceId: privateAssetPackListingData.prices[0].stripePriceId,
         userId: profile.id,
@@ -59,7 +60,7 @@ const PrivateAssetPackPurchaseDialog = ({
       Window.openExternalURL(checkoutUrl);
     } catch (error) {
       console.error('Unable to get the checkout URL', error);
-      setIsBuying(false);
+      setIsPurchasing(false);
       showErrorBox({
         message: `Unable to get the checkout URL. Please try again later.`,
         rawError: error,
@@ -90,7 +91,7 @@ const PrivateAssetPackPurchaseDialog = ({
       } catch (error) {
         console.error('Unable to get the user purchases', error);
         showErrorBox({
-          message: `Unable to retrieve your purchases. Please try again later.`,
+          message: `An error happened while checking if your purchase was successful. If you have finished the payment, refresh the app to see your asset pack!`,
           rawError: error,
           errorId: 'asset-pack-purchase-error',
         });
@@ -108,10 +109,10 @@ const PrivateAssetPackPurchaseDialog = ({
     () => {
       checkUserPurchases();
     },
-    isBuying ? 3900 : null
+    isPurchasing ? 3900 : null
   );
 
-  // Listen to the received asset pack, to know when a user has just logged in.
+  // Listen to the received asset pack, to know when a user has just logged in and the received asset packs have been loaded.
   // In this case, start a timeout to remove the loader and give some time for the asset store to refresh.
   React.useEffect(
     () => {
@@ -141,8 +142,8 @@ const PrivateAssetPackPurchaseDialog = ({
           pack => pack.id === privateAssetPackListingData.id
         );
         if (receivedAssetPack) {
-          if (isBuying) {
-            setIsBuying(false);
+          if (isPurchasing) {
+            setIsPurchasing(false);
             setPurchaseSuccessful(true);
           } else if (!purchaseSuccessful) {
             onClose();
@@ -153,7 +154,7 @@ const PrivateAssetPackPurchaseDialog = ({
     [
       loadedReceivedAssetPackInStore,
       privateAssetPackListingData,
-      isBuying,
+      isPurchasing,
       onClose,
       isCheckingPurchasesAfterLogin,
       purchaseSuccessful,
@@ -170,7 +171,7 @@ const PrivateAssetPackPurchaseDialog = ({
             message={
               <Trans>
                 Asset packs will be linked to your user account and available
-                for all your Projects. Log-in or Sign-up to purchase this pack.
+                for all your projects. Log-in or sign-up to purchase this pack.
               </Trans>
             }
             justifyContent="center"
@@ -191,7 +192,7 @@ const PrivateAssetPackPurchaseDialog = ({
           </Line>
         ),
       }
-    : isBuying
+    : isPurchasing
     ? {
         subtitle: <Trans>Complete your payment on the web browser</Trans>,
         content: (
@@ -225,7 +226,7 @@ const PrivateAssetPackPurchaseDialog = ({
     : {
         subtitle: (
           <Trans>
-            The Asset Pack {privateAssetPackListingData.name} will be linked to
+            The asset pack {privateAssetPackListingData.name} will be linked to
             your account {profile.email}
           </Trans>
         ),
@@ -240,23 +241,23 @@ const PrivateAssetPackPurchaseDialog = ({
         ),
       };
 
-  const showContinueButton =
+  const allowPurchase =
     profile &&
-    !isBuying &&
+    !isPurchasing &&
     !purchaseSuccessful &&
     !isCheckingPurchasesAfterLogin;
   const dialogActions = [
     <FlatButton
       key="cancel"
-      label={purchaseSuccessful ? <Trans>Accept</Trans> : <Trans>Cancel</Trans>}
+      label={purchaseSuccessful ? <Trans>Close</Trans> : <Trans>Cancel</Trans>}
       onClick={onClose}
     />,
-    showContinueButton ? (
+    allowPurchase ? (
       <DialogPrimaryButton
         key="continue"
         primary
         label={<Trans>Continue</Trans>}
-        onClick={onContinue}
+        onClick={onStartPurchase}
       />
     ) : null,
   ];
@@ -268,21 +269,14 @@ const PrivateAssetPackPurchaseDialog = ({
       open
       onRequestClose={onClose}
       actions={dialogActions}
-      onApply={purchaseSuccessful ? onClose : onContinue}
+      onApply={purchaseSuccessful ? onClose : onStartPurchase}
       cannotBeDismissed // Prevent the user from continuing by clicking outside.
       flexColumnBody
     >
-      <Line justifyContent="center" alignItems="center">
-        {purchaseSuccessful && (
-          <>
-            <VerifiedUser />
-            <Spacer />
-          </>
-        )}
-        <Text>
-          <b>{dialogContents.subtitle}</b>
-        </Text>
-      </Line>
+      <LineStackLayout justifyContent="center" alignItems="center">
+        {purchaseSuccessful && <VerifiedUser />}
+        <Text size="sub-title">{dialogContents.subtitle}</Text>
+      </LineStackLayout>
       {dialogContents.content}
     </Dialog>
   );

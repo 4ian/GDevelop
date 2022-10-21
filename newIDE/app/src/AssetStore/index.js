@@ -427,10 +427,7 @@ export const AssetStore = ({ project }: Props) => {
                     onClose={() =>
                       setPurchasingPrivateAssetPackListingData(null)
                     }
-                    onSuccessfulPurchase={async () => {
-                      // Do not close the purchase dialog, we let the user do it themselves.
-                      await onPurchaseSuccessful();
-                    }}
+                    onSuccessfulPurchase={onPurchaseSuccessful}
                   />
                 )}
               </Line>

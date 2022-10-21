@@ -83,8 +83,7 @@ const ExportDialog = ({
   );
   const [game, setGame] = React.useState<?Game>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const profile = authenticatedUser.profile;
-  const getAuthorizationHeader = authenticatedUser.getAuthorizationHeader;
+  const { profile, getAuthorizationHeader } = authenticatedUser;
   const onlineStatus = useOnlineStatus();
   const cantExportBecauseOffline = !!allExportersRequireOnline && !onlineStatus;
 

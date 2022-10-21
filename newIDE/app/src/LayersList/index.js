@@ -19,6 +19,7 @@ import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
 import Background from '../UI/Background';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
+import useForceUpdate from '../Utils/UseForceUpdate';
 
 const SortableLayerRow = SortableElement(LayerRow);
 
@@ -131,9 +132,9 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
-type State = {|
-  effectsEditedLayer: ?gdLayer,
-|};
+export type LayersListInterface = {
+  forceUpdate: () => void,
+};
 
 const hasLightingLayer = (layout: gdLayout) => {
   const layersCount = layout.getLayersCount();
@@ -144,43 +145,48 @@ const hasLightingLayer = (layout: gdLayout) => {
   );
 };
 
-export default class LayersList extends Component<Props, State> {
-  _addLayer = () => {
-    const { layersContainer } = this.props;
-    const name = newNameGenerator('Layer', name =>
-      layersContainer.hasLayerNamed(name)
-    );
-    layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
-    this._onLayerModified();
-    this.props.onCreateLayer();
-  };
+const LayersList = React.forwardRef<Props, LayersListInterface>(
+  (props, ref) => {
+    const forceUpdate = useForceUpdate();
 
-  _addLightingLayer = () => {
-    const { layersContainer } = this.props;
-    const name = newNameGenerator('Lighting', name =>
-      layersContainer.hasLayerNamed(name)
-    );
-    layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
-    const layer = layersContainer.getLayer(name);
-    layer.setLightingLayer(true);
-    layer.setFollowBaseLayerCamera(true);
-    layer.setAmbientLightColor(200, 200, 200);
-    this._onLayerModified();
-    this.props.onCreateLayer();
-  };
+    React.useImperativeHandle(ref, () => ({
+      forceUpdate,
+    }));
 
-  _onLayerModified = () => {
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
-    this.forceUpdate();
-  };
+    const addLayer = () => {
+      const { layersContainer } = props;
+      const name = newNameGenerator('Layer', name =>
+        layersContainer.hasLayerNamed(name)
+      );
+      layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
+      onLayerModified();
+      props.onCreateLayer();
+    };
 
-  render() {
+    const addLightingLayer = () => {
+      const { layersContainer } = props;
+      const name = newNameGenerator('Lighting', name =>
+        layersContainer.hasLayerNamed(name)
+      );
+      layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
+      const layer = layersContainer.getLayer(name);
+      layer.setLightingLayer(true);
+      layer.setFollowBaseLayerCamera(true);
+      layer.setAmbientLightColor(200, 200, 200);
+      onLayerModified();
+      props.onCreateLayer();
+    };
+
+    const onLayerModified = () => {
+      if (props.unsavedChanges) props.unsavedChanges.triggerUnsavedChanges();
+      forceUpdate();
+    };
+
     // Force the list to be mounted again if layersContainer
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
-    const listKey = this.props.layersContainer.ptr;
-    const isLightingLayerPresent = hasLightingLayer(this.props.layersContainer);
+    const listKey = props.layersContainer.ptr;
+    const isLightingLayerPresent = hasLightingLayer(props.layersContainer);
 
     return (
       <Background>
@@ -191,22 +197,22 @@ export default class LayersList extends Component<Props, State> {
               // using SortableVirtualizedItemList.
               <SortableLayersListBody
                 key={listKey}
-                layersContainer={this.props.layersContainer}
-                onEditEffects={this.props.onEditLayerEffects}
-                onEdit={this.props.onEditLayer}
-                onRemoveLayer={this.props.onRemoveLayer}
-                onRenameLayer={this.props.onRenameLayer}
+                layersContainer={props.layersContainer}
+                onEditEffects={props.onEditLayerEffects}
+                onEdit={props.onEditLayer}
+                onRemoveLayer={props.onRemoveLayer}
+                onRenameLayer={props.onRenameLayer}
                 onSortEnd={({ oldIndex, newIndex }) => {
-                  const layersCount = this.props.layersContainer.getLayersCount();
-                  this.props.layersContainer.moveLayer(
+                  const layersCount = props.layersContainer.getLayersCount();
+                  props.layersContainer.moveLayer(
                     layersCount - 1 - oldIndex,
                     layersCount - 1 - newIndex
                   );
-                  this._onLayerModified();
+                  onLayerModified();
                 }}
                 helperClass="sortable-helper"
                 useDragHandle
-                unsavedChanges={this.props.unsavedChanges}
+                unsavedChanges={props.unsavedChanges}
                 width={width}
               />
             )}
@@ -216,13 +222,13 @@ export default class LayersList extends Component<Props, State> {
               <RaisedButtonWithSplitMenu
                 label={<Trans>Add a layer</Trans>}
                 primary
-                onClick={this._addLayer}
+                onClick={addLayer}
                 icon={<Add />}
                 buildMenuTemplate={i18n => [
                   {
                     label: i18n._(t`Add lighting layer`),
                     enabled: !isLightingLayerPresent,
-                    click: this._addLightingLayer,
+                    click: addLightingLayer,
                   },
                 ]}
               />
@@ -232,4 +238,6 @@ export default class LayersList extends Component<Props, State> {
       </Background>
     );
   }
-}
+);
+
+export default LayersList;

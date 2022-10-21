@@ -12,7 +12,7 @@ import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService
 import InstancesEditor from '../InstancesEditor';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
 import InstancesList from '../InstancesEditor/InstancesList';
-import LayersList from '../LayersList';
+import LayersList, { type LayersListInterface } from '../LayersList';
 import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
 import LayerEditorDialog from '../LayersList/LayerEditorDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
@@ -175,7 +175,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   contextMenu: ?ContextMenuInterface;
   editorMosaic: ?EditorMosaic;
   _objectsList: ?ObjectsList;
-  _layersList: ?LayersList;
+  _layersList: ?LayersListInterface;
   _propertiesEditor: ?InstancePropertiesEditor;
   _instancesList: ?InstancesList;
 
@@ -674,6 +674,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   ) => {
     this.props.initialInstances.moveInstancesToLayer(oldName, newName);
     done(true);
+    this.forceUpdatePropertiesEditor();
+  };
+
+  _onCreateLayer = () => {
+    this.forceUpdatePropertiesEditor();
   };
 
   _onDeleteObject = (i18n: I18nType) => (
@@ -1295,6 +1300,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onEditLayer={this.editLayer}
             onRemoveLayer={this._onRemoveLayer}
             onRenameLayer={this._onRenameLayer}
+            onCreateLayer={this._onCreateLayer}
             layersContainer={layout}
             unsavedChanges={this.props.unsavedChanges}
             ref={layersList => (this._layersList = layersList)}

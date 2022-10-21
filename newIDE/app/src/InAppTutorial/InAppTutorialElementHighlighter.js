@@ -3,14 +3,11 @@ import * as React from 'react';
 import Rectangle from '../Utils/Rectangle';
 import useOnResize from '../Utils/UseOnResize';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import {
-  aboveMaterialUiMaxZIndex,
-  getDisplayZIndexForHighlighter,
-  getScrollParent,
-} from './HTMLUtils';
+import { getDisplayZIndexForHighlighter, getScrollParent } from './HTMLUtils';
 import ArrowTop from '../UI/CustomSvgIcons/ArrowTop';
 import ArrowBottom from '../UI/CustomSvgIcons/ArrowBottom';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
+import { aboveMaterialUiMaxZIndex } from '../UI/MaterialUISpecificUtil';
 
 type Props = {|
   element: HTMLElement,

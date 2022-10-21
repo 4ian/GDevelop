@@ -149,17 +149,17 @@ namespace gdjs {
         minimumScaleMultiplier: m,
         isStepped: false,
       };
+      // Angle of the spray cone
       // @ts-ignore
       config.startRotation = {
         min: -objectData.emitterAngleB / 2.0,
         max: objectData.emitterAngleB / 2.0,
       };
-      const mediumLifetime =
-        (objectData.particleLifeTimeMin + objectData.particleLifeTimeMax) / 2.0;
+      // Rotation speed of the particles
       // @ts-ignore
       config.rotationSpeed = {
-        min: objectData.particleAngle1 / mediumLifetime,
-        max: objectData.particleAngle2 / mediumLifetime,
+        min: objectData.particleAngle1,
+        max: objectData.particleAngle2,
       };
       // @ts-ignore
       config.blendMode = objectData.additive ? 'ADD' : 'NORMAL';

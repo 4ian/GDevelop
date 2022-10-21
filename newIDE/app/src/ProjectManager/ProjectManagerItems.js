@@ -28,6 +28,7 @@ const styles = {
 };
 
 type ProjectStructureItemProps = {|
+  id?: string,
   autoGenerateNestedIndicator?: boolean,
   initiallyOpen?: boolean,
   leftIcon?: React$Element<any>,
@@ -40,6 +41,7 @@ type ProjectStructureItemProps = {|
 |};
 
 export const ProjectStructureItem = ({
+  id,
   error,
   leftIcon,
   onRefresh,
@@ -53,6 +55,7 @@ export const ProjectStructureItem = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <ListItem
+      id={id}
       open={open}
       autoGenerateNestedIndicator={autoGenerateNestedIndicator}
       initiallyOpen={initiallyOpen}

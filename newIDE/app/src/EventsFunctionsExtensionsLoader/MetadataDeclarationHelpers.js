@@ -2,6 +2,7 @@
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 import { mapVector } from '../Utils/MapFor';
+import { getFreeFunctionCodeName } from '.';
 const gd: libGDevelop = global.gd;
 
 // This file contains the logic to declare extension metadata from
@@ -301,6 +302,12 @@ export const isExtensionLifecycleEventsFunction = (functionName: string) => {
   );
 };
 
+const removeTrailingDot = (description: string): string => {
+  return description.endsWith('.')
+    ? description.slice(0, description.length - 1)
+    : description;
+};
+
 /**
  * Declare the instruction (action/condition) or expression for the given
  * (free) events function.
@@ -309,7 +316,10 @@ export const declareInstructionOrExpressionMetadata = (
   extension: gdPlatformExtension,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsFunction: gdEventsFunction
-): gdInstructionMetadata | gdExpressionMetadata => {
+):
+  | gdInstructionMetadata
+  | gdExpressionMetadata
+  | gdMultipleInstructionMetadata => {
   const functionType = eventsFunction.getFunctionType();
   if (functionType === gd.EventsFunction.Expression) {
     return extension.addExpression(
@@ -327,6 +337,68 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
     );
+  } else if (functionType === gd.EventsFunction.ExpressionAndCondition) {
+    return extension.addExpressionAndCondition(
+      'number',
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      removeTrailingDot(eventsFunction.getDescription()) ||
+        eventsFunction.getFullName(),
+      // An operator and an operand are inserted before user parameters.
+      shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
+      eventsFunction.getGroup() || '',
+      getExtensionIconUrl(extension)
+    );
+  } else if (functionType === gd.EventsFunction.StringExpressionAndCondition) {
+    return extension.addExpressionAndCondition(
+      'string',
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      removeTrailingDot(eventsFunction.getDescription()) ||
+        eventsFunction.getFullName(),
+      // An operator and an operand are inserted before user parameters.
+      shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
+      eventsFunction.getGroup() || '',
+      getExtensionIconUrl(extension)
+    );
+  } else if (functionType === gd.EventsFunction.ActionWithOperator) {
+    const getterFunction = eventsFunctionsExtension.hasEventsFunctionNamed(
+      eventsFunction.getGetterName()
+    )
+      ? eventsFunctionsExtension.getEventsFunction(
+          eventsFunction.getGetterName()
+        )
+      : null;
+    const action = extension.addAction(
+      eventsFunction.getName(),
+      (getterFunction && getterFunction.getFullName()) ||
+        eventsFunction.getName(),
+      'Change ' +
+        ((getterFunction && getterFunction.getDescription()) ||
+          eventsFunction.getFullName()),
+      // An operator and an operand are inserted before user parameters.
+      getterFunction
+        ? shiftSentenceParamIndexes(getterFunction.getSentence(), 2)
+        : '',
+      (getterFunction && getterFunction.getGroup()) || '',
+      getExtensionIconUrl(extension),
+      getExtensionIconUrl(extension)
+    );
+    if (getterFunction) {
+      action
+        .getCodeExtraInformation()
+        .setManipulatedType(
+          getterFunction.getFunctionType() ===
+            gd.EventsFunction.StringExpressionAndCondition
+            ? 'string'
+            : 'number'
+        )
+        // TODO Use an helper method
+        .setGetter(
+          getFreeFunctionCodeName(eventsFunctionsExtension, getterFunction)
+        );
+    }
+    return action;
   } else if (functionType === gd.EventsFunction.Condition) {
     return extension.addCondition(
       eventsFunction.getName(),
@@ -350,6 +422,34 @@ export const declareInstructionOrExpressionMetadata = (
   }
 };
 
+export const shiftSentenceParamIndexes = (
+  sentence: string,
+  offset: number
+): string => {
+  const parameterIndexesStrings = sentence.match(/(?<=_PARAM)(\d+)(?=_)/g);
+  if (!parameterIndexesStrings) {
+    return sentence;
+  }
+  const parameterIndexes = parameterIndexesStrings.map(indexString =>
+    Number.parseInt(indexString)
+  );
+  const sentenceElements = sentence.split(/_PARAM\d+_/);
+  let shiftedSentence = '';
+  for (let index = 0; index < parameterIndexes.length; index++) {
+    shiftedSentence +=
+      sentenceElements[index] +
+      '_PARAM' +
+      (parameterIndexes[index] + offset) +
+      '_';
+  }
+  const sentenceIsEndingWithAnElement =
+    sentenceElements.length > parameterIndexes.length;
+  if (sentenceIsEndingWithAnElement) {
+    shiftedSentence += sentenceElements[sentenceElements.length - 1];
+  }
+  return shiftedSentence;
+};
+
 /**
  * Declare the instruction (action/condition) or expression for the given
  * behavior events function.
@@ -359,7 +459,10 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
   behaviorMetadata: gdBehaviorMetadata,
   eventsBasedBehavior: gdEventsBasedBehavior,
   eventsFunction: gdEventsFunction
-): gdInstructionMetadata | gdExpressionMetadata => {
+):
+  | gdInstructionMetadata
+  | gdExpressionMetadata
+  | gdMultipleInstructionMetadata => {
   const functionType = eventsFunction.getFunctionType();
   if (functionType === gd.EventsFunction.Expression) {
     return behaviorMetadata.addExpression(
@@ -381,6 +484,68 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
         eventsBasedBehavior.getName(),
       getExtensionIconUrl(extension)
     );
+  } else if (functionType === gd.EventsFunction.ExpressionAndCondition) {
+    return behaviorMetadata.addExpressionAndCondition(
+      'number',
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      removeTrailingDot(eventsFunction.getDescription()) ||
+        eventsFunction.getFullName(),
+      // An operator and an operand are inserted before user parameters.
+      shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
+      eventsFunction.getGroup() || '',
+      getExtensionIconUrl(extension)
+    );
+  } else if (functionType === gd.EventsFunction.StringExpressionAndCondition) {
+    return behaviorMetadata.addExpressionAndCondition(
+      'string',
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      removeTrailingDot(eventsFunction.getDescription()) ||
+        eventsFunction.getFullName(),
+      // An operator and an operand are inserted before user parameters.
+      shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
+      eventsFunction.getGroup() || '',
+      getExtensionIconUrl(extension)
+    );
+  } else if (functionType === gd.EventsFunction.ActionWithOperator) {
+    const eventsFunctionsContainer = eventsBasedBehavior.getEventsFunctions();
+    const getterFunction = eventsFunctionsContainer.hasEventsFunctionNamed(
+      eventsFunction.getGetterName()
+    )
+      ? eventsFunctionsContainer.getEventsFunction(
+          eventsFunction.getGetterName()
+        )
+      : null;
+    const action = behaviorMetadata.addScopedAction(
+      eventsFunction.getName(),
+      (getterFunction && getterFunction.getFullName()) ||
+        eventsFunction.getName(),
+      'Change ' +
+        ((getterFunction && getterFunction.getDescription()) ||
+          eventsFunction.getFullName()),
+      // An operator and an operand are inserted before user parameters.
+      getterFunction
+        ? shiftSentenceParamIndexes(getterFunction.getSentence(), 2)
+        : '',
+      (getterFunction && getterFunction.getGroup()) ||
+        eventsBasedBehavior.getFullName() ||
+        eventsBasedBehavior.getName(),
+      getExtensionIconUrl(extension),
+      getExtensionIconUrl(extension)
+    );
+    if (getterFunction) {
+      action
+        .getCodeExtraInformation()
+        .setManipulatedType(
+          getterFunction.getFunctionType() ===
+            gd.EventsFunction.StringExpressionAndCondition
+            ? 'string'
+            : 'number'
+        )
+        .setGetter(getterFunction.getName());
+    }
+    return action;
   } else if (functionType === gd.EventsFunction.Condition) {
     // Use the new "scoped" way to declare an instruction, because
     // we want to prevent any conflict between free functions and
@@ -423,7 +588,10 @@ export const declareObjectInstructionOrExpressionMetadata = (
   objectMetadata: gdObjectMetadata,
   eventsBasedObject: gdEventsBasedObject,
   eventsFunction: gdEventsFunction
-): gdInstructionMetadata | gdExpressionMetadata => {
+):
+  | gdInstructionMetadata
+  | gdExpressionMetadata
+  | gdMultipleInstructionMetadata => {
   const functionType = eventsFunction.getFunctionType();
   if (functionType === gd.EventsFunction.Expression) {
     return objectMetadata.addExpression(
@@ -445,6 +613,68 @@ export const declareObjectInstructionOrExpressionMetadata = (
         eventsBasedObject.getName(),
       getExtensionIconUrl(extension)
     );
+  } else if (functionType === gd.EventsFunction.ExpressionAndCondition) {
+    return objectMetadata.addExpressionAndCondition(
+      'number',
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      removeTrailingDot(eventsFunction.getDescription()) ||
+        eventsFunction.getFullName(),
+      // An operator and an operand are inserted before user parameters.
+      shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
+      eventsFunction.getGroup() || '',
+      getExtensionIconUrl(extension)
+    );
+  } else if (functionType === gd.EventsFunction.StringExpressionAndCondition) {
+    return objectMetadata.addExpressionAndCondition(
+      'string',
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      removeTrailingDot(eventsFunction.getDescription()) ||
+        eventsFunction.getFullName(),
+      // An operator and an operand are inserted before user parameters.
+      shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
+      eventsFunction.getGroup() || '',
+      getExtensionIconUrl(extension)
+    );
+  } else if (functionType === gd.EventsFunction.ActionWithOperator) {
+    const eventsFunctionsContainer = eventsBasedObject.getEventsFunctions();
+    const getterFunction = eventsFunctionsContainer.hasEventsFunctionNamed(
+      eventsFunction.getGetterName()
+    )
+      ? eventsFunctionsContainer.getEventsFunction(
+          eventsFunction.getGetterName()
+        )
+      : null;
+    const action = objectMetadata.addScopedAction(
+      eventsFunction.getName(),
+      (getterFunction && getterFunction.getFullName()) ||
+        eventsFunction.getName(),
+      'Change ' +
+        ((getterFunction && getterFunction.getDescription()) ||
+          eventsFunction.getFullName()),
+      // An operator and an operand are inserted before user parameters.
+      getterFunction
+        ? shiftSentenceParamIndexes(getterFunction.getSentence(), 2)
+        : '',
+      (getterFunction && getterFunction.getGroup()) ||
+        eventsBasedObject.getFullName() ||
+        eventsBasedObject.getName(),
+      getExtensionIconUrl(extension),
+      getExtensionIconUrl(extension)
+    );
+    if (getterFunction) {
+      action
+        .getCodeExtraInformation()
+        .setManipulatedType(
+          getterFunction.getFunctionType() ===
+            gd.EventsFunction.StringExpressionAndCondition
+            ? 'string'
+            : 'number'
+        )
+        .setGetter(getterFunction.getName());
+    }
+    return action;
   } else if (functionType === gd.EventsFunction.Condition) {
     // Use the new "scoped" way to declare an instruction, because
     // we want to prevent any conflict between free functions and
@@ -910,37 +1140,69 @@ export const declareObjectPropertiesInstructionAndExpressions = (
  * expected by the events function.
  */
 export const declareEventsFunctionParameters = (
+  eventsFunctionsContainer: gdEventsFunctionsContainer,
   eventsFunction: gdEventsFunction,
-  instructionOrExpression: gdInstructionMetadata | gdExpressionMetadata
+  instructionOrExpression:
+    | gdInstructionMetadata
+    | gdExpressionMetadata
+    | gdMultipleInstructionMetadata,
+  userDefinedFirstParameterIndex: number
 ) => {
-  mapVector(
-    eventsFunction.getParameters(),
-    (parameter: gdParameterMetadata) => {
-      if (!parameter.isCodeOnly()) {
-        instructionOrExpression.addParameter(
-          parameter.getType(),
-          parameter.getDescription(),
-          '', // See below for adding the extra information
-          parameter.isOptional()
-        );
-        instructionOrExpression.setParameterLongDescription(
-          parameter.getLongDescription()
-        );
-        instructionOrExpression.setDefaultValue(parameter.getDefaultValue());
-      } else {
-        instructionOrExpression.addCodeOnlyParameter(
-          parameter.getType(),
-          '' // See below for adding the extra information
-        );
-      }
-      // Manually add the "extra info" without relying on addParameter (or addCodeOnlyParameter)
-      // as these methods are prefixing the value passed with the extension namespace (this
-      // was done to ease extension declarations when dealing with object).
-      instructionOrExpression
-        .getParameter(instructionOrExpression.getParametersCount() - 1)
-        .setExtraInfo(parameter.getExtraInfo());
+  const addParameter = (parameter: gdParameterMetadata) => {
+    if (!parameter.isCodeOnly()) {
+      instructionOrExpression.addParameter(
+        parameter.getType(),
+        parameter.getDescription(),
+        parameter.getExtraInfo(),
+        parameter.isOptional()
+      );
+      instructionOrExpression.setParameterLongDescription(
+        parameter.getLongDescription()
+      );
+      instructionOrExpression.setDefaultValue(parameter.getDefaultValue());
+    } else {
+      instructionOrExpression.addCodeOnlyParameter(
+        parameter.getType(),
+        parameter.getExtraInfo()
+      );
     }
-  );
+  };
+
+  const functionType = eventsFunction.getFunctionType();
+  const getterFunction = eventsFunctionsContainer.hasEventsFunctionNamed(
+    eventsFunction.getGetterName()
+  )
+    ? eventsFunctionsContainer.getEventsFunction(eventsFunction.getGetterName())
+    : null;
+  // This is used instead of getParametersForEvents because the Value parameter
+  // is already add by useStandardOperatorParameters.
+  const parameters = (functionType === gd.EventsFunction.ActionWithOperator &&
+  getterFunction
+    ? getterFunction
+    : eventsFunction
+  ).getParameters();
+
+  mapVector(parameters, addParameter, 0, userDefinedFirstParameterIndex);
+
+  if (functionType === gd.EventsFunction.ExpressionAndCondition) {
+    ((instructionOrExpression: any): gdMultipleInstructionMetadata).useStandardParameters(
+      'number'
+    );
+  } else if (functionType === gd.EventsFunction.StringExpressionAndCondition) {
+    ((instructionOrExpression: any): gdMultipleInstructionMetadata).useStandardParameters(
+      'string'
+    );
+  } else if (functionType === gd.EventsFunction.ActionWithOperator) {
+    ((instructionOrExpression: any): gdInstructionMetadata).useStandardOperatorParameters(
+      getterFunction &&
+        getterFunction.getFunctionType() ===
+          gd.EventsFunction.StringExpressionAndCondition
+        ? 'string'
+        : 'number'
+    );
+  }
+
+  mapVector(parameters, addParameter, userDefinedFirstParameterIndex);
 
   // By convention, latest parameter is always the eventsFunctionContext of the calling function
   // (if any).

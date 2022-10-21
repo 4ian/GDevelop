@@ -1168,6 +1168,8 @@ export const declareEventsFunctionParameters = (
     }
   };
 
+  const applyBetween = (T, number) => {};
+
   const functionType = eventsFunction.getFunctionType();
   const getterFunction = eventsFunctionsContainer.hasEventsFunctionNamed(
     eventsFunction.getGetterName()
@@ -1182,7 +1184,11 @@ export const declareEventsFunctionParameters = (
     : eventsFunction
   ).getParameters();
 
-  mapVector(parameters, addParameter, 0, userDefinedFirstParameterIndex);
+  mapVector(
+    parameters,
+    (parameter: gdParameterMetadata, index: number) =>
+      index < userDefinedFirstParameterIndex && addParameter(parameter)
+  );
 
   if (functionType === gd.EventsFunction.ExpressionAndCondition) {
     ((instructionOrExpression: any): gdMultipleInstructionMetadata).useStandardParameters(
@@ -1202,7 +1208,11 @@ export const declareEventsFunctionParameters = (
     );
   }
 
-  mapVector(parameters, addParameter, userDefinedFirstParameterIndex);
+  mapVector(
+    parameters,
+    (parameter: gdParameterMetadata, index: number) =>
+      index >= userDefinedFirstParameterIndex && addParameter(parameter)
+  );
 
   // By convention, latest parameter is always the eventsFunctionContext of the calling function
   // (if any).

@@ -138,12 +138,12 @@ export default class AuthenticatedUserProvider extends React.Component<
         onRefreshFirebaseProfile: async () => {
           await this._reloadFirebaseProfile();
         },
+        onSubscriptionUpdated: this._fetchUserSubscriptionLimitsAndUsages,
+        onPurchaseSuccessful: this._fetchUserAssets,
         onSendEmailVerification: this._doSendEmailVerification,
         onAcceptGameStatsEmail: this._doAcceptGameStatsEmail,
         getAuthorizationHeader: () =>
           this.props.authentication.getAuthorizationHeader(),
-        receivedAssetPacks: [], // Reset to an empty array so the store context can be updated.
-        receivedAssetShortHeaders: [], // Reset to an empty array so the store context can be updated.
       },
     }));
   }
@@ -342,6 +342,99 @@ export default class AuthenticatedUserProvider extends React.Component<
         loginState: 'done',
       },
     }));
+  };
+
+  _fetchUserSubscriptionLimitsAndUsages = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const usages = await getUserUsages(
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid
+      );
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          usages,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user usages:', error);
+    }
+
+    try {
+      const subscription = await getUserSubscription(
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid
+      );
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          subscription,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user subscriptions:', error);
+    }
+
+    try {
+      const limits = await getUserLimits(
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid
+      );
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          limits,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user limits:', error);
+    }
+  };
+
+  _fetchUserAssets = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const receivedAssetPacks = await listReceivedAssetPacks(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          receivedAssetPacks,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading received asset packs:', error);
+    }
+
+    try {
+      const receivedAssetShortHeaders = await listReceivedAssetShortHeaders(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          receivedAssetShortHeaders,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading received asset short headers:', error);
+    }
   };
 
   _fetchUserCloudProjects = async () => {

@@ -628,12 +628,12 @@ describe('InstallAsset', () => {
 
       // Fake an asset with a custom object of type "Button::PanelSpriteButton",
       // that is installed already.
-      mockFn(Asset.getAsset).mockImplementationOnce(
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(
         () => fakeAssetWithCustomObject
       );
 
       // Install the asset
-      await installAsset({
+      await installPublicAsset({
         assetShortHeader: fakeAssetShortHeader1,
         project,
         objectsContainer: layout,

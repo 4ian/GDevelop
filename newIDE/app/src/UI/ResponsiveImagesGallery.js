@@ -32,6 +32,7 @@ const styles = {
     display: 'block',
   },
   grid: {
+    width: '100%',
     overflowX: 'scroll',
     overflowY: 'hidden',
   },

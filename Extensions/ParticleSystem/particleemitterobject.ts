@@ -90,6 +90,10 @@ namespace gdjs {
     flow: number;
     tank: number;
     destroyWhenNoParticles: boolean;
+    particleRotationMinSpeed: number;
+    particleRotationMaxSpeed: number;
+    maxParticlesCount: number;
+    additiveRendering: boolean;
     _posDirty: boolean = true;
     _angleDirty: boolean = true;
     _forceDirty: boolean = true;
@@ -101,6 +105,9 @@ namespace gdjs {
     _alphaDirty: boolean = true;
     _flowDirty: boolean = true;
     _tankDirty: boolean = true;
+    _particleRotationSpeedDirty: boolean = true;
+    _maxParticlesCountDirty: boolean = true;
+    _additiveRenderingDirty: boolean = true;
     // Don't mark texture as dirty if not using one.
     _textureDirty: boolean;
 
@@ -147,6 +154,10 @@ namespace gdjs {
       this.flow = particleObjectData.flow;
       this.tank = particleObjectData.tank;
       this.destroyWhenNoParticles = particleObjectData.destroyWhenNoParticles;
+      this.particleRotationMinSpeed = particleObjectData.particleAngle1;
+      this.particleRotationMaxSpeed = particleObjectData.particleAngle2;
+      this.maxParticlesCount = particleObjectData.maxParticleNb;
+      this.additiveRendering = particleObjectData.additive;
       this._textureDirty = this.texture !== '';
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -190,6 +201,18 @@ namespace gdjs {
       }
       if (oldObjectData.emitterForceMin !== newObjectData.emitterForceMin) {
         this.setEmitterForceMin(newObjectData.emitterForceMin);
+      }
+      if (oldObjectData.particleAngle1 !== newObjectData.particleAngle1) {
+        this.setParticleRotationMinSpeed(newObjectData.particleAngle1);
+      }
+      if (oldObjectData.particleAngle2 !== newObjectData.particleAngle2) {
+        this.setParticleRotationMaxSpeed(newObjectData.particleAngle2);
+      }
+      if (oldObjectData.maxParticleNb !== newObjectData.maxParticleNb) {
+        this.setMaxParticlesCount(newObjectData.maxParticleNb);
+      }
+      if (oldObjectData.additive !== newObjectData.additive) {
+        this.setAdditiveRendering(newObjectData.additive);
       }
       if (oldObjectData.emitterForceMax !== newObjectData.emitterForceMax) {
         this.setEmitterForceMax(newObjectData.emitterForceMax);
@@ -303,6 +326,18 @@ namespace gdjs {
       if (this._posDirty) {
         this._renderer.setPosition(this.getX(), this.getY());
       }
+      if (this._particleRotationSpeedDirty) {
+        this._renderer.setParticleRotationSpeed(
+          this.particleRotationMinSpeed,
+          this.particleRotationMaxSpeed
+        );
+      }
+      if (this._maxParticlesCountDirty) {
+        this._renderer.setMaxParticlesCount(this.maxParticlesCount);
+      }
+      if (this._additiveRenderingDirty) {
+        this._renderer.setAdditiveRendering(this.additiveRendering);
+      }
       if (this._angleDirty) {
         const angle = this.getAngle();
         this._renderer.setAngle(
@@ -347,6 +382,7 @@ namespace gdjs {
       this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = false;
       this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = false;
       this._alphaDirty = this._flowDirty = this._textureDirty = this._tankDirty = false;
+      this._additiveRenderingDirty = this._maxParticlesCountDirty = this._particleRotationSpeedDirty = false;
       this._renderer.update(this.getElapsedTime() / 1000.0);
       if (
         this._renderer.hasStarted() &&
@@ -388,6 +424,50 @@ namespace gdjs {
         this._forceDirty = true;
         this.forceMax = force;
       }
+    }
+
+    setParticleRotationMinSpeed(speed: number): void {
+      if (this.particleRotationMinSpeed !== speed) {
+        this._particleRotationSpeedDirty = true;
+        this.particleRotationMinSpeed = speed;
+      }
+    }
+
+    getParticleRotationMinSpeed(): number {
+      return this.particleRotationMinSpeed;
+    }
+
+    setParticleRotationMaxSpeed(speed: number): void {
+      if (this.particleRotationMaxSpeed !== speed) {
+        this._particleRotationSpeedDirty = true;
+        this.particleRotationMaxSpeed = speed;
+      }
+    }
+
+    getParticleRotationMaxSpeed(): number {
+      return this.particleRotationMaxSpeed;
+    }
+
+    setMaxParticlesCount(count: number): void {
+      if (this.maxParticlesCount !== count) {
+        this._maxParticlesCountDirty = true;
+        this.maxParticlesCount = count;
+      }
+    }
+
+    getMaxParticlesCount(): number {
+      return this.maxParticlesCount;
+    }
+
+    setAdditiveRendering(enabled: boolean) {
+      if (this.additiveRendering !== enabled) {
+        this._additiveRenderingDirty = true;
+        this.additiveRendering = enabled;
+      }
+    }
+
+    getAdditiveRendering(): boolean {
+      return this.additiveRendering;
     }
 
     /**

@@ -164,6 +164,9 @@ namespace gdjs {
       // @ts-ignore
       config.blendMode = objectData.additive ? 'ADD' : 'NORMAL';
       this.renderer = new PIXI.Container();
+      // The embedded particle emitter is supposed to be the last minor version
+      // of the version 4 of the particle emitter object
+      // See source https://github.com/pixijs/particle-emitter/blob/v4.3.1/src/Emitter.ts
       // @ts-ignore
       this.emitter = new PIXI.particles.Emitter(this.renderer, texture, config);
       this.start();
@@ -244,6 +247,21 @@ namespace gdjs {
       if (this.emitter.startScale.next) {
         this.emitter.startScale.next.value = size2 / 100.0;
       }
+    }
+
+    setParticleRotationSpeed(min: float, max: float): void {
+      this.emitter.minRotationSpeed = min;
+      this.emitter.maxRotationSpeed = max;
+    }
+
+    setMaxParticlesCount(count: float): void {
+      this.emitter.maxParticles = count;
+    }
+
+    setAdditiveRendering(enabled: boolean): void {
+      this.emitter.particleBlendMode = enabled
+        ? PIXI.BLEND_MODES.ADD
+        : PIXI.BLEND_MODES.NORMAL;
     }
 
     setAlpha(alpha1: number, alpha2: number): void {

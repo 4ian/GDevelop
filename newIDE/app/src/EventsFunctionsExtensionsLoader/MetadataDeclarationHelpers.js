@@ -162,7 +162,7 @@ export const declareObjectMetadata = (
     .useStandardParameters('number')
     .markAsAdvanced()
     .setFunctionName('setScaleX')
-    .setGetter('getScaleY');
+    .setGetter('getScaleX');
 
   objectMetadata
     .addExpressionAndConditionAndAction(

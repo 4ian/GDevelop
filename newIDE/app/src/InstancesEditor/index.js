@@ -32,6 +32,7 @@ import InstancesSelection from './InstancesSelection';
 import LongTouchHandler from './LongTouchHandler';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
 import Rectangle from '../Utils/Rectangle';
+import { isNoDialogOpened } from '../UI/MaterialUISpecificUtil';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -926,7 +927,7 @@ export default class InstancesEditor extends Component<Props> {
     if (this._renderingPaused) return;
 
     // Avoid killing the CPU by limiting the rendering calls.
-    if (this.fpsLimiter.shouldUpdate()) {
+    if (this.fpsLimiter.shouldUpdate() && isNoDialogOpened()) {
       this.backgroundColor.render();
       this.viewPosition.render();
       this.canvasCursor.render();

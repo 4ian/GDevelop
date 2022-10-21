@@ -688,6 +688,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   ) => {
     this.props.initialInstances.moveInstancesToLayer(oldName, newName);
     done(true);
+    this.forceUpdatePropertiesEditor();
+  };
+
+  _onCreateLayer = () => {
+    this.forceUpdatePropertiesEditor();
   };
 
   _onDeleteObject = (i18n: I18nType) => (
@@ -1309,6 +1314,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onEditLayer={this.editLayer}
             onRemoveLayer={this._onRemoveLayer}
             onRenameLayer={this._onRenameLayer}
+            onCreateLayer={this._onCreateLayer}
             layersContainer={layout}
             unsavedChanges={this.props.unsavedChanges}
             ref={layersList => (this._layersList = layersList)}

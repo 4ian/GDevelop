@@ -10,6 +10,7 @@
 #include "GDCore/String.h"
 namespace gd {
 class Project;
+class EventsFunctionsContainer;
 class ObjectsContainer;
 class ParameterMetadata;
 class EventsFunction;
@@ -34,6 +35,7 @@ class GD_CORE_API EventsFunctionTools {
    */
   static void FreeEventsFunctionToObjectsContainer(
       const gd::Project& project,
+      const gd::EventsFunctionsContainer functionContainer,
       const gd::EventsFunction& eventsFunction,
       gd::ObjectsContainer& outputGlobalObjectsContainer,
       gd::ObjectsContainer& outputObjectsContainer);

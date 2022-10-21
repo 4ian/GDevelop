@@ -124,6 +124,7 @@ type Props = {|
     newName: string,
     cb: (done: boolean) => void
   ) => void,
+  onCreateLayer: () => void,
   unsavedChanges?: ?UnsavedChanges,
 
   // Preview:
@@ -151,6 +152,7 @@ export default class LayersList extends Component<Props, State> {
     );
     layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
     this._onLayerModified();
+    this.props.onCreateLayer();
   };
 
   _addLightingLayer = () => {
@@ -164,6 +166,7 @@ export default class LayersList extends Component<Props, State> {
     layer.setFollowBaseLayerCamera(true);
     layer.setAmbientLightColor(200, 200, 200);
     this._onLayerModified();
+    this.props.onCreateLayer();
   };
 
   _onLayerModified = () => {

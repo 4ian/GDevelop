@@ -32,17 +32,12 @@ import InstancesSelection from './InstancesSelection';
 import LongTouchHandler from './LongTouchHandler';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
 import Rectangle from '../Utils/Rectangle';
+import { isNoDialogOpened } from '../UI/MaterialUISpecificUtil';
 const gd: libGDevelop = global.gd;
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
   dropCursor: { cursor: 'copy' },
-};
-
-const isNoDialogOpened = (): boolean => {
-  return !document.querySelector(
-    'body > div[role="presentation"].MuiDialog-root'
-  );
 };
 
 const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);

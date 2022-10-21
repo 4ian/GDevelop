@@ -125,24 +125,25 @@ const PrivateAssetPackDialog = ({
     }
   };
 
-  const getBuyButton = i18n => (
-    <RaisedButton
-      key="buy-asset-pack"
-      primary
-      label={
-        !assetPack ? (
-          <Trans>Loading...</Trans>
-        ) : isPurchaseDialogOpen ? (
-          <Trans>Processing...</Trans>
-        ) : (
-          <Trans>Buy for {formatPrice(i18n, prices[0].value)}</Trans>
-        )
-      }
-      onClick={onClickBuy}
-      disabled={!assetPack || isPurchaseDialogOpen}
-      id="buy-asset-pack"
-    />
-  );
+  const getBuyButton = i18n =>
+    !errorText ? (
+      <RaisedButton
+        key="buy-asset-pack"
+        primary
+        label={
+          !assetPack ? (
+            <Trans>Loading...</Trans>
+          ) : isPurchaseDialogOpen ? (
+            <Trans>Processing...</Trans>
+          ) : (
+            <Trans>Buy for {formatPrice(i18n, prices[0].value)}</Trans>
+          )
+        }
+        onClick={onClickBuy}
+        disabled={!assetPack || isPurchaseDialogOpen}
+        id="buy-asset-pack"
+      />
+    ) : null;
 
   return (
     <I18n>
@@ -165,7 +166,9 @@ const PrivateAssetPackDialog = ({
             fullHeight
           >
             {errorText ? (
-              <AlertMessage kind="error">{errorText}</AlertMessage>
+              <Line alignItems="center" justifyContent="center" expand>
+                <AlertMessage kind="error">{errorText}</AlertMessage>
+              </Line>
             ) : isFetching ? (
               <>
                 <Text size="title">{name}</Text>

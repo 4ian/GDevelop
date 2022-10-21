@@ -91,7 +91,7 @@ const PrivateAssetPackPurchaseDialog = ({
       } catch (error) {
         console.error('Unable to get the user purchases', error);
         showErrorBox({
-          message: `An error happened while checking if your purchase was successful. If you have finished the payment, refresh the app to see your asset pack!`,
+          message: `An error happened while checking if your purchase was successful. If you have completed the payment, close and re-open the asset store to see your asset pack!`,
           rawError: error,
           errorId: 'asset-pack-purchase-error',
         });

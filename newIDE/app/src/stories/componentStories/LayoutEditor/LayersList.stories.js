@@ -35,6 +35,7 @@ export const Default = () => (
     onRenameLayer={(oldName, newName, cb) => {
       cb(true);
     }}
+    onCreateLayer={action('onCreateLayer')}
     layersContainer={testProject.testLayout}
     hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
   />
@@ -58,6 +59,7 @@ export const SmallWidthAndHeight = () => (
       onRenameLayer={(oldName, newName, cb) => {
         cb(true);
       }}
+      onCreateLayer={action('onCreateLayer')}
       layersContainer={testProject.testLayout}
       hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
     />

@@ -1,0 +1,126 @@
+{
+  "id": "flingGamePart1",
+  "editorSwitches": {
+    "OpenPropertiesManager": "Home"
+  },
+  "flow": [
+    {
+      "id": "OpenPropertiesManager",
+      "elementToHighlightId": "#open-project-manager-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the **Project Manager**"
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "id": "",
+      "elementToHighlightId": "#project-manager-tab-game-settings",
+      "nextStepTrigger": {
+        "presenceOfElement": "#project-manager-tab-game-properties"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the **Game Settings** tab."
+          }
+        }
+      }
+    },
+    {
+      "id": "",
+      "elementToHighlightId": "#project-manager-tab-game-properties",
+      "nextStepTrigger": {
+        "presenceOfElement": "#project-properties-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the game properties."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "id": "",
+      "elementToHighlightId": "#game-resolution-width",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the width to 1280 pixels."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "id": "",
+      "elementToHighlightId": "#game-resolution-height",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the height to 720 pixels."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "id": "",
+      "elementToHighlightId": "#game-resolution-resize-mode",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Set this to **no changes in game size**."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "id": "",
+      "elementToHighlightId": "#project-properties-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#project-properties-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done."
+          }
+        }
+      }
+    },
+    {
+      "id": "STOP",
+      "elementToHighlightId": "",
+      "nextStepTrigger": {
+        "presenceOfElement": ""
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": ""
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    }
+  ]
+}

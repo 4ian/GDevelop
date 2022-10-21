@@ -115,14 +115,14 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
         await changeUserSubscription(getAuthorizationHeader, profile.id, {
           planId: null,
         });
-        await authenticatedUser.onRefreshUserProfile();
+        await authenticatedUser.onSubscriptionUpdated();
         showMessageBox(
           i18n._(
             t`Your subscription is now cancelled. We're sorry to see you go!`
           )
         );
       } catch (rawError) {
-        await authenticatedUser.onRefreshUserProfile();
+        await authenticatedUser.onSubscriptionUpdated();
         showErrorBox({
           message: i18n._(
             t`Your subscription could not be cancelled. Please try again later!`
@@ -150,7 +150,7 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
           await changeUserSubscription(getAuthorizationHeader, profile.id, {
             planId: plan.planId,
           });
-          await authenticatedUser.onRefreshUserProfile();
+          await authenticatedUser.onSubscriptionUpdated();
           showMessageBox(
             i18n._(
               t`Congratulations, your new subscription is now active! You can now use the services unlocked with this plan.`
@@ -174,7 +174,7 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
           await changeUserSubscription(getAuthorizationHeader, profile.id, {
             planId: '',
           });
-          await authenticatedUser.onRefreshUserProfile();
+          await authenticatedUser.onSubscriptionUpdated();
         } catch (rawError) {
           showErrorBox({
             message: i18n._(
@@ -346,7 +346,7 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
                 authenticatedUser={authenticatedUser}
                 onClose={() => {
                   setSubscriptionPendingDialogOpen(false);
-                  authenticatedUser.onRefreshUserProfile();
+                  authenticatedUser.onSubscriptionUpdated();
                 }}
               />
             )}

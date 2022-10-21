@@ -4,6 +4,7 @@ import { type Filters } from '../Utils/GDevelopServices/Filters';
 import {
   type AssetShortHeader,
   type PublicAssetPacks,
+  type PrivateAssetPack,
   type Author,
   type License,
   type Environment,
@@ -35,8 +36,6 @@ import shuffle from 'lodash/shuffle';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 const defaultSearchText = '';
-// TODO: Remove once the marketplace is up and running.
-const ACTIVATE_ASSET_PACK_MARKETPLACE = false;
 
 export type AssetFiltersState = {|
   animatedFilter: AnimatedAssetStoreSearchFilter,
@@ -58,6 +57,7 @@ type AssetStoreState = {|
   publicAssetPacks: ?PublicAssetPacks,
   privateAssetPacks: ?Array<PrivateAssetPackListingData>,
   assetPackRandomOrdering: ?Array<number>,
+  loadedReceivedAssetPackInStore: ?Array<PrivateAssetPack>,
   authors: ?Array<Author>,
   licenses: ?Array<License>,
   environment: Environment,
@@ -83,6 +83,7 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   publicAssetPacks: null,
   privateAssetPacks: null,
   assetPackRandomOrdering: null,
+  loadedReceivedAssetPackInStore: null,
   authors: null,
   licenses: null,
   environment: 'live',
@@ -140,7 +141,7 @@ const getAssetShortHeaderSearchTerms = (assetShortHeader: AssetShortHeader) => {
 const getAssetPackRandomOrdering = (length: number): Array<number> => {
   const array = new Array(length).fill(0).map((_, index) => index);
 
-  return ACTIVATE_ASSET_PACK_MARKETPLACE ? shuffle(array) : array;
+  return shuffle(array);
 };
 
 export const AssetStoreStateProvider = ({
@@ -149,9 +150,13 @@ export const AssetStoreStateProvider = ({
   const [assetShortHeadersById, setAssetShortHeadersById] = React.useState<?{
     [string]: AssetShortHeader,
   }>(null);
-  const { receivedAssetShortHeaders } = React.useContext(
+  const { receivedAssetShortHeaders, receivedAssetPacks } = React.useContext(
     AuthenticatedUserContext
   );
+  const [
+    loadedReceivedAssetPackInStore,
+    setLoadedReceivedAssetPackInStore,
+  ] = React.useState<?(PrivateAssetPack[])>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [
     publicAssetPacks,
@@ -251,15 +256,13 @@ export const AssetStoreStateProvider = ({
           } = await listAllPublicAssets({ environment });
           const authors = await listAllAuthors({ environment });
           const licenses = await listAllLicenses({ environment });
-          const privateAssetPacks = ACTIVATE_ASSET_PACK_MARKETPLACE
-            ? await listListedPrivateAssetPacks()
-            : [];
+          const privateAssetPacks = await listListedPrivateAssetPacks();
 
           const assetShortHeadersById = {};
           publicAssetShortHeaders.forEach(assetShortHeader => {
             assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
           });
-          if (ACTIVATE_ASSET_PACK_MARKETPLACE && receivedAssetShortHeaders) {
+          if (receivedAssetShortHeaders) {
             receivedAssetShortHeaders.forEach(assetShortHeader => {
               assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
             });
@@ -276,6 +279,7 @@ export const AssetStoreStateProvider = ({
           setAuthors(authors);
           setLicenses(licenses);
           setPrivateAssetPacks(privateAssetPacks);
+          setLoadedReceivedAssetPackInStore(receivedAssetPacks);
         } catch (error) {
           console.error(
             `Unable to load the assets from the asset store:`,
@@ -287,22 +291,31 @@ export const AssetStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [isLoading, environment, receivedAssetShortHeaders]
+    [isLoading, environment, receivedAssetShortHeaders, receivedAssetPacks]
   );
 
-  // We're listening to the received assets changing to update the list of assets.
-  // This can happen when the user logs in or logs out.
+  // In case the user logs in, we need to fetch the private assets.
   React.useEffect(
     () => {
-      if (!ACTIVATE_ASSET_PACK_MARKETPLACE || !receivedAssetShortHeaders) {
-        return;
+      if (receivedAssetShortHeaders) {
+        // We're forcing the fetch of the assets, even if it is currently loading,
+        // in case the pre-fetching of the assets is happening at the same time,
+        // or the user opens the asset store at the same time.
+        fetchAssetsAndFilters({ force: true });
       }
-      // We're forcing the fetch of the assets, even if it is currently loading,
-      // in case the pre-fetching of the assets is happening at the same time,
-      // or the user opens the asset store at the same time.
-      fetchAssetsAndFilters({ force: true });
     },
     [receivedAssetShortHeaders, fetchAssetsAndFilters]
+  );
+
+  // In case the user logs out, we detect that the received assets are null
+  // and we reset the list of assets.
+  React.useEffect(
+    () => {
+      if (loadedReceivedAssetPackInStore && !receivedAssetPacks) {
+        fetchAssetsAndFilters({ force: true });
+      }
+    },
+    [fetchAssetsAndFilters, loadedReceivedAssetPackInStore, receivedAssetPacks]
   );
 
   // Preload the assets and filters when the app loads, in case the user
@@ -360,6 +373,7 @@ export const AssetStoreStateProvider = ({
       publicAssetPacks,
       privateAssetPacks,
       assetPackRandomOrdering,
+      loadedReceivedAssetPackInStore,
       authors,
       licenses,
       environment,
@@ -405,6 +419,7 @@ export const AssetStoreStateProvider = ({
       publicAssetPacks,
       privateAssetPacks,
       assetPackRandomOrdering,
+      loadedReceivedAssetPackInStore,
       authors,
       licenses,
       environment,

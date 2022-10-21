@@ -13,6 +13,7 @@ import InAppTutorialElementHighlighter from './InAppTutorialElementHighlighter';
 import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
 import Link from '@material-ui/core/Link';
 import Text from '../UI/Text';
+import { isElementADialog } from '../UI/MaterialUISpecificUtil';
 
 const styles = {
   redHeroImage: {
@@ -32,9 +33,6 @@ const styles = {
 const ELEMENT_QUERY_FREQUENCY = 500;
 const HIDE_QUERY_FREQUENCY = 1000;
 
-const isElementADialog = (element: Element) =>
-  element.tagName === 'DIV' && element.getAttribute('role') === 'presentation';
-
 const getElementToHighlightRootDialog = (
   element: HTMLElement
 ): Element | null => {
@@ -53,12 +51,12 @@ const getElementToHighlightRootDialog = (
   return null;
 };
 
-const isThereAnotherDialogInTheFollowingSiblings = (
+const isThereAnOpenDialogInTheFollowingSiblings = (
   element: Element
 ): boolean => {
   let nextElement = element.nextElementSibling;
   while (nextElement) {
-    if (isElementADialog(nextElement)) {
+    if (isElementADialog(nextElement, { isVisible: true })) {
       return true;
     } else {
       nextElement = nextElement.nextElementSibling;
@@ -130,7 +128,7 @@ function InAppTutorialStepDisplayer({
         // behind a dialog if there's one, so no need to force-hide it.
         return;
       }
-      if (isThereAnotherDialogInTheFollowingSiblings(rootDialog)) {
+      if (isThereAnOpenDialogInTheFollowingSiblings(rootDialog)) {
         setHideBehindOtherDialog(true);
       }
     },

@@ -16,7 +16,7 @@ import { Line, Spacer } from '../../UI/Grid';
 import CircularProgress from '../../UI/CircularProgress';
 import BackgroundText from '../../UI/BackgroundText';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
-import VerifiedUser from '@material-ui/icons/VerifiedUser';
+import Mark from '../../UI/CustomSvgIcons/Mark';
 import { AssetStoreContext } from '../AssetStoreContext';
 import FlatButton from '../../UI/FlatButton';
 import { LineStackLayout } from '../../UI/Layout';
@@ -274,7 +274,7 @@ const PrivateAssetPackPurchaseDialog = ({
       flexColumnBody
     >
       <LineStackLayout justifyContent="center" alignItems="center">
-        {purchaseSuccessful && <VerifiedUser />}
+        {purchaseSuccessful && <Mark />}
         <Text size="sub-title">{dialogContents.subtitle}</Text>
       </LineStackLayout>
       {dialogContents.content}

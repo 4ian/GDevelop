@@ -62,8 +62,10 @@ InstructionMetadata& InstructionMetadata::AddParameter(
   info.supplementaryInformation =
       // For objects/behavior, the supplementary information
       // parameter is an object/behavior type...
-      (gd::ParameterMetadata::IsObject(type) ||
+      ((gd::ParameterMetadata::IsObject(type) ||
        gd::ParameterMetadata::IsBehavior(type))
+       // Prefix with the namespace if it's not already there.
+       && !(supplementaryInformation.rfind(extensionNamespace, 0) == 0))
           ? (supplementaryInformation.empty()
                  ? ""
                  : extensionNamespace +
@@ -118,6 +120,8 @@ InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
     }
   } else {
     AddParameter("operator", _("Modification's sign"), type);
+    // The type "string" is not forced because it's declined in several subtype
+    // (see ParameterMetadata).
     AddParameter(type == "number" ? "expression" : type, _("Value"));
 
     size_t operatorParamIndex = parameters.size() - 2;
@@ -169,6 +173,8 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
     }
   } else {
     AddParameter("relationalOperator", _("Sign of the test"), type);
+    // The type "string" is not forced because it's declined in several subtype
+    // (see ParameterMetadata).
     AddParameter(type == "number" ? "expression" : type, _("Value to compare"));
     size_t operatorParamIndex = parameters.size() - 2;
     size_t valueParamIndex = parameters.size() - 1;

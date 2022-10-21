@@ -357,8 +357,14 @@ const getAutocompletionsForText = function(
       return [];
     }
   } else if (type === 'functionParameterName') {
-    if (scope.eventsFunction) {
+    const eventsBasedEntity =
+      scope.eventsBasedBehavior || scope.eventsBasedObject;
+    const functionsContainer = eventsBasedEntity
+      ? eventsBasedEntity.getEventsFunctions()
+      : scope.eventsFunctionsExtension;
+    if (scope.eventsFunction && functionsContainer) {
       autocompletionTexts = enumerateParametersUsableInExpressions(
+        functionsContainer,
         scope.eventsFunction
       ).map(parameterMetadata => `"${parameterMetadata.getName()}"`);
     }

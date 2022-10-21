@@ -302,7 +302,7 @@ export const isExtensionLifecycleEventsFunction = (functionName: string) => {
   );
 };
 
-export const removeTailingDot = (description: string): string => {
+export const removeTrailingDot = (description: string): string => {
   return description.endsWith('.')
     ? description.slice(0, description.length - 1)
     : description;
@@ -342,7 +342,7 @@ export const declareInstructionOrExpressionMetadata = (
       'number',
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
-      removeTailingDot(eventsFunction.getDescription()) ||
+      removeTrailingDot(eventsFunction.getDescription()) ||
         eventsFunction.getFullName(),
       // An operator and an operand are inserted before user parameters.
       shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
@@ -354,7 +354,7 @@ export const declareInstructionOrExpressionMetadata = (
       'string',
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
-      removeTailingDot(eventsFunction.getDescription()) ||
+      removeTrailingDot(eventsFunction.getDescription()) ||
         eventsFunction.getFullName(),
       // An operator and an operand are inserted before user parameters.
       shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
@@ -489,7 +489,7 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       'number',
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
-      removeTailingDot(eventsFunction.getDescription()) ||
+      removeTrailingDot(eventsFunction.getDescription()) ||
         eventsFunction.getFullName(),
       // An operator and an operand are inserted before user parameters.
       shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
@@ -501,7 +501,7 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       'string',
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
-      removeTailingDot(eventsFunction.getDescription()) ||
+      removeTrailingDot(eventsFunction.getDescription()) ||
         eventsFunction.getFullName(),
       // An operator and an operand are inserted before user parameters.
       shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
@@ -618,7 +618,7 @@ export const declareObjectInstructionOrExpressionMetadata = (
       'number',
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
-      removeTailingDot(eventsFunction.getDescription()) ||
+      removeTrailingDot(eventsFunction.getDescription()) ||
         eventsFunction.getFullName(),
       // An operator and an operand are inserted before user parameters.
       shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
@@ -630,7 +630,7 @@ export const declareObjectInstructionOrExpressionMetadata = (
       'string',
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
-      removeTailingDot(eventsFunction.getDescription()) ||
+      removeTrailingDot(eventsFunction.getDescription()) ||
         eventsFunction.getFullName(),
       // An operator and an operand are inserted before user parameters.
       shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),

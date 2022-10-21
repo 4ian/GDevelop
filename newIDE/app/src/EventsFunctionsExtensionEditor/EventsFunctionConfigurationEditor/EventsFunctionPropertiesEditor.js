@@ -242,6 +242,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
               <Line alignItems="center" noMargin>
                 <SelectField
                   value={
+                    // Remove the string/number distinction form the type.
                     type === gd.EventsFunction.StringExpression
                       ? gd.EventsFunction.Expression
                       : type === gd.EventsFunction.StringExpressionAndCondition
@@ -251,10 +252,11 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                   floatingLabelText={<Trans>Function type</Trans>}
                   fullWidth
                   disabled={!!freezeEventsFunctionType}
-                  onChange={(e, i, valueSting: string) => {
+                  onChange={(e, i, valueString: string) => {
                     // $FlowFixMe
-                    const value: EventsFunction_FunctionType = valueSting;
+                    const value: EventsFunction_FunctionType = valueString;
                     eventsFunction.setFunctionType(
+                      // Put back the string/number distinction in the type.
                       this.state.isStringExpression
                         ? type === gd.EventsFunction.Expression
                           ? gd.EventsFunction.StringExpression

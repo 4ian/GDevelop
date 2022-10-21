@@ -410,14 +410,14 @@ namespace gdjs {
     }
 
     /**
-     * @deprecated Data not used
+     * @deprecated This function returns data that is not used.
      */
     getEmitterAngleA(): float {
       return this.angleA;
     }
 
     /**
-     * @deprecated Data not used
+     * @deprecated This function sets data that is not used.
      */
     setEmitterAngleA(angle: float): void {
       if (this.angleA !== angle) {

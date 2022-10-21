@@ -7,6 +7,7 @@ This project is released under the MIT License.
 
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 
 #include "Extension.h"
 #include "ParticleEmitterObject.h"
@@ -258,5 +259,60 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter");
+
+  obj.AddExpressionAndConditionAndAction(
+          "number",
+          "ParticleRotationMinSpeed",
+          _("Particle rotation min speed"),
+          _("the minimum rotation speed of the particles"),
+          _("the particles minimum rotation speed"),
+          _("Common"),
+          "CppPlatform/Extensions/particleSystemicon24.png")
+      .AddParameter("object", _("Object"), "ParticleEmitter")
+      .UseStandardParameters("number")
+      .MarkAsAdvanced()
+      .SetFunctionName("setParticleRotationMinSpeed")
+      .SetGetter("getParticleRotationMinSpeed");
+
+  obj.AddExpressionAndConditionAndAction(
+          "number",
+          "ParticleRotationMaxSpeed",
+          _("Particle rotation max speed"),
+          _("the maximum rotation speed of the particles"),
+          _("the particles maximum rotation speed"),
+          _("Common"),
+          "CppPlatform/Extensions/particleSystemicon24.png")
+      .AddParameter("object", _("Object"), "ParticleEmitter")
+      .UseStandardParameters("number")
+      .MarkAsAdvanced()
+      .SetFunctionName("setParticleRotationMaxSpeed")
+      .SetGetter("getParticleRotationMaxSpeed");
+
+  obj.AddExpressionAndConditionAndAction(
+          "number",
+          "MaxParticlesCount",
+          _("Number of displayed particles"),
+          _("the maximum number of displayed particles"),
+          _("the maximum number of displayed particles"),
+          _("Common"),
+          "CppPlatform/Extensions/particleSystemicon24.png")
+      .AddParameter("object", _("Object"), "ParticleEmitter")
+      .UseStandardParameters("number")
+      .SetFunctionName("setMaxParticlesCount")
+      .SetGetter("getMaxParticlesCount");
+
+  obj.AddExpressionAndConditionAndAction(
+          "boolean",
+          "AdditiveRendering",
+          _("Activate particles additive rendering"),
+          _("the particles additive rendering is activated"),
+          _("displaying particles with additive rendering activated"),
+          _("Common"),
+          "CppPlatform/Extensions/particleSystemicon24.png")
+      .AddParameter("object", _("Object"), "ParticleEmitter")
+      .UseStandardParameters("boolean")
+      .MarkAsAdvanced()
+      .SetFunctionName("setAdditiveRendering")
+      .SetGetter("getAdditiveRendering");
 
 }

@@ -24,10 +24,7 @@ import {
   isSameObjectWithContext,
 } from './EnumerateObjects';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
-import type {
-  ObjectWithContextList,
-  ObjectWithContext,
-} from '../ObjectsList/EnumerateObjects';
+import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { CLIPBOARD_KIND } from './ClipboardKind';
 import TagChips from '../UI/TagChips';
 import EditTagsDialog from '../UI/EditTagsDialog';
@@ -753,6 +750,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         paste,
         project,
         setAsGlobalObject,
+        eventsFunctionsExtensionWriter,
       ]
     );
 

@@ -35,6 +35,7 @@ const ProfileDialog = ({
 }: Props) => {
   const [currentTab, setCurrentTab] = React.useState<string>(initialTab);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const isUserLoading = authenticatedUser.loginState !== 'done';
 
   const [
     isManageSubscriptionLoading,
@@ -99,6 +100,7 @@ const ProfileDialog = ({
             label={<Trans>Logout</Trans>}
             key="logout"
             onClick={authenticatedUser.onLogout}
+            disabled={isUserLoading}
           />
         ),
       ]}

@@ -479,6 +479,7 @@ describe('libGD.js - GDJS related tests', function () {
         new gd.EventsFunctionsExtensionCodeGenerator(project);
       const code =
         eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+          new gd.EventsFunctionsExtension(),
           eventsFunction,
           namespace,
           includeFiles,
@@ -583,6 +584,7 @@ describe('libGD.js - GDJS related tests', function () {
         new gd.EventsFunctionsExtensionCodeGenerator(project);
       const code =
         eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+          new gd.EventsFunctionsExtension(),
           eventsFunction,
           namespace,
           includeFiles,

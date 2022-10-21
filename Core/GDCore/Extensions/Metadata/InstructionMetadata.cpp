@@ -64,6 +64,7 @@ InstructionMetadata& InstructionMetadata::AddParameter(
       // parameter is an object/behavior type...
       ((gd::ParameterMetadata::IsObject(type) ||
        gd::ParameterMetadata::IsBehavior(type))
+       // Prefix with the namespace if it's not already there.
        && !(supplementaryInformation.rfind(extensionNamespace, 0) == 0))
           ? (supplementaryInformation.empty()
                  ? ""

@@ -10,7 +10,7 @@ import Text from '../../UI/Text';
 import { t, Trans } from '@lingui/macro';
 import Dialog from '../../UI/Dialog';
 import PriceTag, { formatPrice } from '../../UI/PriceTag';
-import TextButton from '../../UI/TextButton';
+import FlatButton from '../../UI/FlatButton';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import {
@@ -114,16 +114,35 @@ const PrivateAssetPackDialog = ({
     [id, sellerId]
   );
 
-  const onBuy = () => {
+  const onClickBuy = () => {
     if (!assetPack) return;
     const assetPackId = assetPack.id;
     try {
-      sendAssetPackBuyClicked(assetPackId);
       onOpenPurchaseDialog();
+      sendAssetPackBuyClicked(assetPackId);
     } catch (e) {
-      console.error('Unable to send event', e);
+      console.warn('Unable to send event', e);
     }
   };
+
+  const getBuyButton = i18n => (
+    <RaisedButton
+      key="buy-asset-pack"
+      primary
+      label={
+        !assetPack ? (
+          <Trans>Loading...</Trans>
+        ) : isPurchaseDialogOpen ? (
+          <Trans>Processing...</Trans>
+        ) : (
+          <Trans>Buy for {formatPrice(i18n, prices[0].value)}</Trans>
+        )
+      }
+      onClick={onClickBuy}
+      disabled={!assetPack || isPurchaseDialogOpen}
+      id="buy-asset-pack"
+    />
+  );
 
   return (
     <I18n>
@@ -134,27 +153,14 @@ const PrivateAssetPackDialog = ({
             open
             onRequestClose={onClose}
             actions={[
-              <TextButton
+              <FlatButton
                 key="cancel"
                 label={<Trans>Cancel</Trans>}
                 onClick={onClose}
               />,
-              <RaisedButton
-                key="buy-asset-pack"
-                primary
-                label={
-                  !assetPack || isPurchaseDialogOpen ? (
-                    <Trans>Processing...</Trans>
-                  ) : (
-                    <Trans>Buy for {formatPrice(i18n, prices[0].value)}</Trans>
-                  )
-                }
-                onClick={onBuy}
-                disabled={!assetPack || isPurchaseDialogOpen}
-                id="buy-asset-pack"
-              />,
+              getBuyButton(i18n),
             ]}
-            onApply={() => {}}
+            onApply={onClickBuy}
             flexColumnBody
             fullHeight
           >
@@ -207,20 +213,7 @@ const PrivateAssetPackDialog = ({
                           alignItems="center"
                         >
                           <PriceTag value={prices[0].value} />
-                          <RaisedButton
-                            primary
-                            label={
-                              !assetPack || isPurchaseDialogOpen ? (
-                                <Trans>Processing...</Trans>
-                              ) : (
-                                <Trans>
-                                  Buy for {formatPrice(i18n, prices[0].value)}
-                                </Trans>
-                              )
-                            }
-                            onClick={onBuy}
-                            disabled={!assetPack || isPurchaseDialogOpen}
-                          />
+                          {getBuyButton(i18n)}
                         </Line>
                         <Text noMargin>{assetPack.longDescription}</Text>
                         <ResponsiveLineStackLayout noMargin noColumnMargin>

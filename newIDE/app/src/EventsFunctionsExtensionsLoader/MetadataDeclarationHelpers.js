@@ -302,7 +302,7 @@ export const isExtensionLifecycleEventsFunction = (functionName: string) => {
   );
 };
 
-export const removeTrailingDot = (description: string): string => {
+const removeTrailingDot = (description: string): string => {
   return description.endsWith('.')
     ? description.slice(0, description.length - 1)
     : description;
@@ -422,7 +422,7 @@ export const declareInstructionOrExpressionMetadata = (
   }
 };
 
-const shiftSentenceParamIndexes = (
+export const shiftSentenceParamIndexes = (
   sentence: string,
   offset: number
 ): string => {

@@ -1168,8 +1168,6 @@ export const declareEventsFunctionParameters = (
     }
   };
 
-  const applyBetween = (T, number) => {};
-
   const functionType = eventsFunction.getFunctionType();
   const getterFunction = eventsFunctionsContainer.hasEventsFunctionNamed(
     eventsFunction.getGetterName()

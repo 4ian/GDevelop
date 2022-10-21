@@ -5,10 +5,9 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
+#include "Extension.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
-
-#include "Extension.h"
 #include "ParticleEmitterObject.h"
 
 /**
@@ -241,11 +240,19 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                     _("Emission angle A"),
                     _("Advanced"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter", false);
+      .AddParameter("object", _("Object"), "ParticleEmitter", false)
+      .SetHidden();
   obj.AddExpression("EmitterAngleB",
                     _("Emission angle B"),
                     _("Emission angle B"),
                     _("Advanced"),
+                    "CppPlatform/Extensions/particleSystemicon16.png")
+      .AddParameter("object", _("Object"), "ParticleEmitter", false)
+      .SetHidden();
+  obj.AddExpression("ConeSprayAngle",
+                    _("Angle of the spray cone"),
+                    _("Angle of the spray cone"),
+                    _("Common"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
   obj.AddExpression("ZoneRadius",
@@ -350,17 +357,4 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                     _("Setup"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
-  obj.AddExpression("ParticleAngle1",
-                    _("Parameter 1 of angle"),
-                    _("Parameter 1 of angle"),
-                    _("Setup"),
-                    "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter", false);
-  obj.AddExpression("ParticleAngle2",
-                    _("Parameter 2 of angle"),
-                    _("Parameter 2 of angle"),
-                    _("Setup"),
-                    "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter", false);
-
 }

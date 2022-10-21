@@ -6,8 +6,14 @@
 
 namespace gdjs {
   export type ParticleEmitterObjectDataType = {
+    /**
+     * @deprecated Data not used
+     */
     emitterAngleA: number;
     emitterForceMin: number;
+    /**
+     * Cone spray angle (degrees)
+     */
     emitterAngleB: number;
     zoneRadius: number;
     emitterForceMax: number;
@@ -23,7 +29,13 @@ namespace gdjs {
     particleBlue1: number;
     particleSize2: number;
     particleSize1: number;
+    /**
+     * Particle max rotation speed (degrees/second)
+     */
     particleAngle2: number;
+    /**
+     * Particle min rotation speed (degrees/second)
+     */
     particleAngle1: number;
     particleAlpha1: number;
     rendererType: string;
@@ -49,6 +61,9 @@ namespace gdjs {
    * Displays particles.
    */
   export class ParticleEmitterObject extends gdjs.RuntimeObject {
+    /**
+     * @deprecated Data not used
+     */
     angleA: number;
     angleB: number;
     forceMin: number;
@@ -93,7 +108,7 @@ namespace gdjs {
     _renderer: gdjs.ParticleEmitterObjectRenderer;
 
     /**
-     * @param the object belongs to
+     * @param instanceContainer the container the object belongs to
      * @param particleObjectData The initial properties of the object
      */
     constructor(
@@ -291,8 +306,8 @@ namespace gdjs {
       if (this._angleDirty) {
         const angle = this.getAngle();
         this._renderer.setAngle(
-          this.angle - this.angleB / 2.0,
-          this.angle + this.angleB / 2.0
+          angle - this.angleB / 2.0,
+          angle + this.angleB / 2.0
         );
       }
       if (this._forceDirty) {
@@ -375,10 +390,16 @@ namespace gdjs {
       }
     }
 
+    /**
+     * @deprecated Prefer using getAngle
+     */
     getEmitterAngle(): float {
       return (this.angleA + this.angleB) / 2.0;
     }
 
+    /**
+     * @deprecated Prefer using setAngle
+     */
     setEmitterAngle(angle: float): void {
       const oldAngle = this.getEmitterAngle();
       if (angle !== oldAngle) {
@@ -388,10 +409,16 @@ namespace gdjs {
       }
     }
 
+    /**
+     * @deprecated This function returns data that is not used.
+     */
     getEmitterAngleA(): float {
       return this.angleA;
     }
 
+    /**
+     * @deprecated This function sets data that is not used.
+     */
     setEmitterAngleA(angle: float): void {
       if (this.angleA !== angle) {
         this._angleDirty = true;
@@ -411,17 +438,11 @@ namespace gdjs {
     }
 
     getConeSprayAngle(): float {
-      return Math.abs(this.angleB - this.angleA);
+      return this.getEmitterAngleB();
     }
 
     setConeSprayAngle(angle: float): void {
-      const oldCone = this.getConeSprayAngle();
-      if (oldCone !== angle) {
-        this._angleDirty = true;
-        const midAngle = this.getEmitterAngle();
-        this.angleA = midAngle - angle / 2.0;
-        this.angleB = midAngle + angle / 2.0;
-      }
+      this.setEmitterAngleB(angle);
     }
 
     getZoneRadius(): float {

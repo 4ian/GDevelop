@@ -204,7 +204,9 @@ export const getRequiredExtensionsFromAsset = (
 ): Array<RequiredExtension> => {
   return uniqBy(
     flatten(
-      asset.objectAssets.map(objectAsset => objectAsset.requiredExtensions || [])
+      asset.objectAssets.map(
+        objectAsset => objectAsset.requiredExtensions || []
+      )
     ),
     ({ extensionName }) => extensionName
   );

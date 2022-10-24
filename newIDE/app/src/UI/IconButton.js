@@ -30,6 +30,7 @@ type Props = {|
   onContextMenu?: () => void,
   disabled?: boolean,
   edge?: 'start' | 'end' | false,
+  id?: string,
 
   style?: {|
     padding?: number,
@@ -38,6 +39,7 @@ type Props = {|
     transform?: string,
     transition?: string,
     opacity?: number,
+    borderRadius?: number,
     margin?: number,
     marginRight?: number,
     marginLeft?: number,

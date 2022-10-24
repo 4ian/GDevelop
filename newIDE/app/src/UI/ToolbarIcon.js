@@ -5,6 +5,7 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import GDevelopThemeContext from './Theme/ThemeContext';
 
 type Props = {|
+  id?: string,
   src: string,
   tooltip?: MessageDescriptor,
   acceleratorString?: string,
@@ -18,13 +19,14 @@ type Props = {|
  */
 const ToolbarIcon = React.forwardRef<Props, IconButton>(
   (
-    { src, tooltip, acceleratorString, disabled, onClick, onContextMenu },
+    { id, src, tooltip, acceleratorString, disabled, onClick, onContextMenu },
     ref
   ) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
     return (
       <IconButton
+        id={id}
         onClick={onClick}
         onContextMenu={onContextMenu}
         size="small"

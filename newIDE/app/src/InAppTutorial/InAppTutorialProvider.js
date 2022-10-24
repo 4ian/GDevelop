@@ -8,10 +8,10 @@ import InAppTutorialOrchestrator, {
   type InAppTutorialOrchestratorInterface,
 } from './InAppTutorialOrchestrator';
 import onboardingTutorial from './Tutorials/OnboardingTutorial';
+import { setCurrentlyRunningInAppTutorial } from '../Utils/Analytics/EventSender';
 
 type Props = {| children: React.Node |};
 
-export let currentlyRunningInAppTutorial = false;
 
 const InAppTutorialProvider = (props: Props) => {
   const [
@@ -31,7 +31,7 @@ const InAppTutorialProvider = (props: Props) => {
   const startTutorial = (tutorialId: string) => {
     if (tutorialId === onboardingTutorial.id) {
       setTutorial(onboardingTutorial);
-      currentlyRunningInAppTutorial = tutorialId;
+      setCurrentlyRunningInAppTutorial(tutorialId);
       setIsInAppTutorialRunning(true);
     }
   };
@@ -45,7 +45,7 @@ const InAppTutorialProvider = (props: Props) => {
   };
 
   const endTutorial = () => {
-    currentlyRunningInAppTutorial = null;
+    setCurrentlyRunningInAppTutorial(null);
     setIsInAppTutorialRunning(false);
   };
 

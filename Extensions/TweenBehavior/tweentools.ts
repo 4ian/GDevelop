@@ -138,7 +138,13 @@ namespace gdjs {
       };
 
       /**
-       * @deprecated
+       * @deprecated Use tweenVariableNumber2 instead.
+       * This function is misleading since one could think that the tween starts
+       * right at the moment this function is called whereas the value of the variable
+       * will change at the next frame only. Moreover, the variable will not start from
+       * the start value exactly since time will have passed at the moment the next
+       * frame is rendered.
+       * See https://github.com/4ian/GDevelop/issues/4270
        */
       export const tweenVariableNumber = (
         runtimeScene: RuntimeScene,

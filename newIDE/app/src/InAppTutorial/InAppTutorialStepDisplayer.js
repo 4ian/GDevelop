@@ -65,6 +65,42 @@ const isThereAnOpenDialogInTheFollowingSiblings = (
   return false;
 };
 
+const getWrongEditorTooltip = (
+  i18n: I18nType,
+  expectedEditor: EditorIdentifier | null,
+  onEndTutorial: () => void
+) => {
+  if (!expectedEditor) return null;
+  const translatedExpectedEditor =
+    expectedEditor === 'Scene'
+      ? i18n._(t`the scene editor`)
+      : expectedEditor === 'Home'
+      ? i18n._(t`the home page`)
+      : i18n._(t`the events sheet`);
+
+  const inlineLink = (
+    <Link onClick={onEndTutorial} style={styles.link}>
+      {i18n._(t`click here`)}
+    </Link>
+  );
+
+  const getDescriptionNode = style => (
+    <Text style={style}>
+      <span>
+        {i18n._(
+          t`Go back to ${translatedExpectedEditor} to keep creating your game, or`
+        )}
+      </span>{' '}
+      {inlineLink} <span>{i18n._(t`to quit the tutorial.`)}</span>
+    </Text>
+  );
+  return {
+    title: i18n._(t`You're leaving the game tutorial`),
+    placement: 'top',
+    getDescriptionNode,
+  };
+};
+
 type Props = {|
   step: InAppTutorialFlowFormattedStep,
   expectedEditor: EditorIdentifier | null,
@@ -156,50 +192,62 @@ function InAppTutorialStepDisplayer({
     [elementToHighlightId, elementToHighlight, goToFallbackStep, expectedEditor]
   );
 
-  const getWrongEditorTooltip = (i18n: I18nType) => {
-    if (!expectedEditor) return null;
-    const translatedExpectedEditor =
-      expectedEditor === 'Scene'
-        ? i18n._(t`the scene editor`)
-        : expectedEditor === 'Home'
-        ? i18n._(t`the home page`)
-        : i18n._(t`the events sheet`);
-
-    const inlineLink = (
-      <Link onClick={endTutorial} style={styles.link}>
-        {i18n._(t`click here`)}
-      </Link>
-    );
-
-    const getDescriptionNode = style => (
-      <Text style={style}>
-        <span>
-          {i18n._(
-            t`Go back to ${translatedExpectedEditor} to keep creating your game, or`
-          )}
-        </span>{' '}
-        {inlineLink} <span>{i18n._(t`to quit the tutorial.`)}</span>
-      </Text>
-    );
-    return {
-      title: i18n._(t`You're leaving the game tutorial`),
-      placement: 'top',
-      getDescriptionNode,
-    };
+  const renderHighlighter = () => {
+    if (
+      // hide highlighter if
+      expectedEditor || // the user is on the wrong editor
+      !elementToHighlight || // there's no element to highlight
+      hideBehindOtherDialog // the element to highlight is on a dialog hidden behind another one
+    )
+      return null;
+    return <InAppTutorialElementHighlighter element={elementToHighlight} />;
   };
 
-  if (!elementToHighlight || hideBehindOtherDialog) return null;
+  const renderTooltip = (i18n: I18nType) => {
+    if (tooltip && !expectedEditor) {
+      const anchorElement = tooltip.standalone
+        ? assistantImage
+        : elementToHighlight || null;
+      if (!anchorElement) return null;
+      return (
+        <InAppTutorialTooltipDisplayer
+          anchorElement={anchorElement}
+          tooltip={tooltip}
+          buttonLabel={
+            nextStepTrigger && nextStepTrigger.clickOnTooltipButton
+              ? nextStepTrigger.clickOnTooltipButton
+              : undefined
+          }
+        />
+      );
+    }
+    const wrongEditorTooltip = getWrongEditorTooltip(
+      i18n,
+      expectedEditor,
+      endTutorial
+    );
+    if (wrongEditorTooltip && assistantImage) {
+      return (
+        <InAppTutorialTooltipDisplayer
+          anchorElement={assistantImage}
+          tooltip={wrongEditorTooltip}
+        />
+      );
+    }
+    return null;
+  };
 
   return (
     <I18n>
       {({ i18n }) => {
-        const wrongEditorTooltip = getWrongEditorTooltip(i18n);
+        const displayRedHero =
+          expectedEditor || (tooltip && tooltip.standalone);
         return (
           <>
             <div
               style={{
                 ...styles.redHeroImage,
-                visibility: wrongEditorTooltip ? 'visible' : 'hidden',
+                visibility: displayRedHero ? 'visible' : 'hidden',
               }}
               ref={defineAssistantImage}
             >
@@ -210,26 +258,8 @@ function InAppTutorialStepDisplayer({
                 height={60}
               />
             </div>
-            {!wrongEditorTooltip && (
-              <InAppTutorialElementHighlighter element={elementToHighlight} />
-            )}
-            {tooltip && !wrongEditorTooltip && (
-              <InAppTutorialTooltipDisplayer
-                anchorElement={elementToHighlight}
-                tooltip={tooltip}
-                buttonLabel={
-                  nextStepTrigger && nextStepTrigger.clickOnTooltipButton
-                    ? nextStepTrigger.clickOnTooltipButton
-                    : undefined
-                }
-              />
-            )}
-            {wrongEditorTooltip && assistantImage && (
-              <InAppTutorialTooltipDisplayer
-                anchorElement={assistantImage}
-                tooltip={wrongEditorTooltip}
-              />
-            )}
+            {renderHighlighter()}
+            {renderTooltip(i18n)}
           </>
         );
       }}

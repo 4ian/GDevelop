@@ -25,3 +25,22 @@ export const WrongEditorInfo = () => {
     </>
   );
 };
+
+export const StandaloneTooltip = () => {
+  return (
+    <>
+      <div id="step-text">Test text</div>
+      <InAppTutorialStepDisplayer
+        step={{
+          tooltip: {
+            standalone: true,
+            description: 'This is a standalone tooltip description',
+          },
+        }}
+        expectedEditor={null}
+        goToFallbackStep={() => {}}
+        endTutorial={() => action('end tutorial')()}
+      />
+    </>
+  );
+};

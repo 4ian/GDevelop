@@ -205,6 +205,7 @@ namespace gdjs {
     }
 
     /**
+     * @deprecated
      * Add an object variable tween.
      * @param identifier Unique id to identify the tween
      * @param variable The object variable to store the tweened value
@@ -228,6 +229,39 @@ namespace gdjs {
         easingValue,
         {
           from: { value: fromValue },
+          to: { value: toValue },
+          duration: durationValue,
+          easing: easingValue,
+          render: (state) => variable.setNumber(state.value),
+        },
+        this._runtimeScene.getTimeManager().getTimeFromStart(),
+        durationValue,
+        destroyObjectWhenFinished
+      );
+    }
+
+    /**
+     * Add an object variable tween.
+     * @param identifier Unique id to identify the tween
+     * @param variable The object variable to store the tweened value
+     * @param toValue End value
+     * @param easingValue Type of easing
+     * @param durationValue Duration in milliseconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addVariableTween2(
+      identifier: string,
+      variable: gdjs.Variable,
+      toValue: float,
+      easingValue: string,
+      durationValue: float,
+      destroyObjectWhenFinished: boolean
+    ) {
+      this._addTween(
+        identifier,
+        easingValue,
+        {
+          from: { value: variable.getValue() },
           to: { value: toValue },
           duration: durationValue,
           easing: easingValue,

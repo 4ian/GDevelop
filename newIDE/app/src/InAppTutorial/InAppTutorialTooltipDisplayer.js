@@ -35,6 +35,9 @@ const styles = {
     backgroundColor: '#D9D9DE', // Grey20
     height: 1,
   },
+  descriptionImage: {
+    margin: 'auto',
+  },
 };
 
 const useClasses = makeStyles({
@@ -174,6 +177,19 @@ function InAppTutorialTooltipDisplayer({
                         allowParagraphs
                       />
                     </Typography>
+                  )}
+                  {tooltip.image && (
+                    <>
+                      <img
+                        src={tooltip.image.dataUrl}
+                        alt="Tutorial helper"
+                        style={{
+                          ...styles.descriptionImage,
+                          width: tooltip.image.width || '100%',
+                        }}
+                      />
+                      <LargeSpacer />
+                    </>
                   )}
                   {buttonLabel && (
                     <>

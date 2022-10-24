@@ -637,7 +637,7 @@ module.exports = {
         'AddObjectScaleTween',
         _('Tween object scale'),
         _(
-          'Tweens an object scale from its current scale to a new one (Note: the scale can never be less than 0).'
+          'Tweens an object scale from its current scale to a new one (note: the scale can never be less than 0).'
         ),
         _(
           'Tween the scale of _PARAM0_ to X-scale: _PARAM3_, Y-scale: _PARAM4_ (from center: _PARAM8_) with easing _PARAM5_ over _PARAM6_ms as _PARAM2_'
@@ -671,7 +671,7 @@ module.exports = {
         'AddObjectScaleXTween',
         _('Tween object X-scale'),
         _(
-          'Tweens an object X-scale from its current value to a new one (Note: the scale can never be less than 0).'
+          'Tweens an object X-scale from its current value to a new one (note: the scale can never be less than 0).'
         ),
         _(
           'Tween the X-scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
@@ -704,7 +704,7 @@ module.exports = {
         'AddObjectScaleYTween',
         _('Tween object Y-scale'),
         _(
-          'Tweens an object Y-scale from its current value to a new one (Note: the scale can never be less than 0).'
+          'Tweens an object Y-scale from its current value to a new one (note: the scale can never be less than 0).'
         ),
         _(
           'Tween the Y-scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
@@ -737,7 +737,7 @@ module.exports = {
         'AddTextObjectCharacterSizeTween',
         _('Tween text size'),
         _(
-          'Tweens the text object character size from tis current value to a new one (Note: the size can never be less than 1).'
+          'Tweens the text object character size from its current value to a new one (note: the size can never be less than 1).'
         ),
         _(
           'Tween the character size of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
@@ -768,7 +768,7 @@ module.exports = {
         'AddObjectOpacityTween',
         _('Tween object opacity'),
         _(
-          'Tweens the object opacity from its current value to a new one (Note: the value shall stay between 0 and 255).'
+          'Tweens the object opacity from its current value to a new one (note: the value shall stay between 0 and 255).'
         ),
         _(
           'Tween the opacity of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'

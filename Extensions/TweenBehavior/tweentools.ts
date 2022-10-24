@@ -137,6 +137,9 @@ namespace gdjs {
         tween.stop().dispose();
       };
 
+      /**
+       * @deprecated
+       */
       export const tweenVariableNumber = (
         runtimeScene: RuntimeScene,
         identifier: string,
@@ -148,6 +151,26 @@ namespace gdjs {
       ) => {
         const tween = shifty.tween({
           from: { value: from },
+          to: { value: to },
+          easing,
+          duration,
+          render: ({ value }) => variable.setNumber(value),
+        });
+
+        getTweensMap(runtimeScene).set(identifier, tween);
+        getShiftyScene(runtimeScene).add(tween);
+      };
+
+      export const tweenVariableNumber2 = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        variable: Variable,
+        to: number,
+        duration: number,
+        easing: shifty.easingFunction
+      ) => {
+        const tween = shifty.tween({
+          from: { value: variable.getValue() },
           to: { value: to },
           easing,
           duration,

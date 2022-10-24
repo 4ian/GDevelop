@@ -105,7 +105,7 @@ module.exports = {
           "Tweens a scene variable's numeric value from one number to another."
         ),
         _(
-          'Tween variable _PARAM2_ from _PARAM3_ to _PARAM4_ for _PARAM5_ms with easing _PARAM6_ as _PARAM1_'
+          'Tween variable _PARAM2_ from _PARAM3_ to _PARAM4_ over _PARAM5_ms with easing _PARAM6_ as _PARAM1_'
         ),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -118,6 +118,7 @@ module.exports = {
       .addParameter('expression', _('Final value'), '', false)
       .addParameter('expression', _('Duration'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .setHidden()
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
       .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
@@ -126,11 +127,37 @@ module.exports = {
 
     extension
       .addAction(
+        'TweenSceneVariableNumber2',
+        _('Tween a number in a scene variable'),
+        _(
+          "Tweens a scene variable's numeric value from current value to another."
+        ),
+        _(
+          'Tween variable _PARAM2_ to _PARAM3_ over _PARAM4_ms with easing _PARAM5_ as _PARAM1_'
+        ),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+      .addParameter('scenevar', _('The variable to tween'), '', false)
+      .addParameter('expression', _('Final value'), '', false)
+      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.tweenVariableNumber2');
+
+    extension
+      .addAction(
         'TweenCameraPosition',
         _('Tween the camera position'),
         _('Tweens the camera position from the current one to a new one.'),
         _(
-          'Tween camera on layer _PARAM4_ to _PARAM2_;_PARAM3_ for _PARAM5_ms with easing _PARAM6_ as _PARAM1_'
+          'Tween camera on layer _PARAM4_ to _PARAM2_;_PARAM3_ over _PARAM5_ms with easing _PARAM6_ as _PARAM1_'
         ),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -155,7 +182,7 @@ module.exports = {
         _('Tween the camera zoom'),
         _('Tweens the camera zoom from the current zoom factor to a new one.'),
         _(
-          'Tween the zoom of camera on layer _PARAM3_ to _PARAM2_ for _PARAM4_ms with easing _PARAM5_ as _PARAM1_'
+          'Tween the zoom of camera on layer _PARAM3_ to _PARAM2_ over _PARAM4_ms with easing _PARAM5_ as _PARAM1_'
         ),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -179,7 +206,7 @@ module.exports = {
         _('Tween the camera rotation'),
         _('Tweens the camera rotation from the current angle to a new one.'),
         _(
-          'Tween the rotation of camera on layer _PARAM3_ to _PARAM2_ for _PARAM4_ms with easing _PARAM5_ as _PARAM1_'
+          'Tween the rotation of camera on layer _PARAM3_ to _PARAM2_ over _PARAM4_ms with easing _PARAM5_ as _PARAM1_'
         ),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -393,8 +420,39 @@ module.exports = {
         false
       )
       .setDefaultValue('no')
+      .setHidden()
       .getCodeExtraInformation()
       .setFunctionName('addVariableTween');
+
+    behavior
+      .addAction(
+        'AddObjectVariableTween2',
+        _('Add object variable tween'),
+        _('Add a tween animation for an object variable.'),
+        _(
+          'Tween the variable _PARAM3_ of _PARAM0_ to _PARAM4_ with easing _PARAM5_ over _PARAM6_ms as _PARAM2_'
+        ),
+        _('Variables'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+      .addParameter('objectvar', _('Object variable'), '', false)
+      .addParameter('expression', _('To value'), '', false)
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
+      .addParameter(
+        'yesorno',
+        _('Destroy this object when tween finishes'),
+        '',
+        false
+      )
+      .setDefaultValue('no')
+      .getCodeExtraInformation()
+      .setFunctionName('addVariableTween2');
 
     behavior
       .addAction(

@@ -203,10 +203,27 @@
       "tooltip": {
         "description": {
           "messageByLocale": {
-            "en": "Drag $(firstObject) from the menu to the canvas."
+            "en": "Drag $(border) from the menu to the canvas."
           }
         },
         "placement": "left"
+      }
+    },
+    {
+      "nextStepTrigger": {
+        "clickOnTooltipButton": "I'm done"
+      },
+      "tooltip": {
+        "standalone": true,
+        "description": {
+          "messageByLocale": {
+            "en": "Place and resize at least 4 instances of $(border) to create a closed frame around your screen ($(instancesCount:border)/4)."
+          }
+        },
+        "placement": "top",
+        "image": {
+          "dataUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSI1Mi45MzEgMzAuMDE2IDE0MC4yNzkgOTUuMTY4IiB3aWR0aD0iMTQwLjI3OSIgaGVpZ2h0PSI5NS4xNjgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHJlY3QgeD0iNTIuOTMxIiB5PSIzMC4wMTYiIHdpZHRoPSIxNDAuMjc5IiBoZWlnaHQ9Ijk1LjE2OCIgc3R5bGU9InN0cm9rZTogcmdiKDAsIDAsIDApOyBmaWxsOiBub25lOyBzdHJva2Utd2lkdGg6IDJweDsiLz4KICA8cmVjdCB4PSI1NS4wMjMiIHk9IjEwOS45NjciIHdpZHRoPSIxMzYuMTkiIGhlaWdodD0iMTIuODA3IiBzdHlsZT0iZmlsbDogcmdiKDU0LCAyMjAsIDM5KTsiLz4KICA8cmVjdCB4PSI1NS4wMjMiIHk9IjMyLjIwNSIgd2lkdGg9IjEzNi4xOSIgaGVpZ2h0PSIxMi44MDciIHN0eWxlPSJmaWxsOiByZ2IoNTQsIDIyMCwgMzkpOyIvPgogIDxyZWN0IHg9IjE3OC4yMjQiIHk9IjQ2LjIxMyIgd2lkdGg9IjEyLjg1OCIgaGVpZ2h0PSI2Mi4zMzYiIHN0eWxlPSJmaWxsOiByZ2IoNTQsIDIyMCwgMzkpOyIvPgogIDxyZWN0IHg9IjU1LjAxNCIgeT0iNDYuMjczIiB3aWR0aD0iMTIuODU4IiBoZWlnaHQ9IjYyLjMzNiIgc3R5bGU9ImZpbGw6IHJnYig1NCwgMjIwLCAzOSk7Ii8+Cjwvc3ZnPg=="
+        }
       }
     },
     {

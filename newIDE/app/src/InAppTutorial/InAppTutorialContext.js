@@ -12,6 +12,7 @@ export type InAppTutorialTooltip = {|
   placement?: 'bottom' | 'left' | 'right' | 'top',
   title?: TranslatedText,
   description?: TranslatedText,
+  image?: { dataUrl: string, width?: string },
 |};
 
 export type InAppTutorialFormattedTooltip = {|
@@ -19,6 +20,7 @@ export type InAppTutorialFormattedTooltip = {|
   title?: string,
   description?: string,
   getDescriptionNode?: (style: Object) => React.Node,
+  image?: { dataUrl: string, width?: string },
 |};
 
 type InAppTutorialFlowStepDOMChangeTrigger =

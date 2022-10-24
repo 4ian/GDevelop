@@ -2049,7 +2049,6 @@
     "@lingui/babel-plugin-transform-react" "2.9.2"
 
 "@lingui/react@github:4ian/lingui-react#master":
-  "integrity" "sha512-eoYJ8TI+8IolPh4fue9aIwX2OVp0YrPnV86QBZLfGhxknodVeNmx+4Ic4ym7rI5/davbk9AUZHcssiH+YZWVxw=="
   "resolved" "git+ssh://git@github.com/4ian/lingui-react.git#dc6b1e013470d952cf85f96cc4affdd28e29634a"
   "version" "2.7.3"
   dependencies:
@@ -4819,7 +4818,7 @@
     "babel-runtime" "^6.22.0"
 
 "babel-plugin-add-react-displayname@^0.0.5":
-  "integrity" "sha1-M51M3be2X9YtHfnbn+BN4TQSK9U="
+  "integrity" "sha512-LY3+Y0XVDYcShHHorshrDbt4KFWL4bSeniCtl4SYZbask+Syngk1uMPCeN9+nSiZo6zX5s0RTq/J9Pnaaf/KHw=="
   "resolved" "https://registry.npmjs.org/babel-plugin-add-react-displayname/-/babel-plugin-add-react-displayname-0.0.5.tgz"
   "version" "0.0.5"
 
@@ -13146,7 +13145,6 @@
   "version" "4.0.5"
 
 "pixi-simple-gesture@github:4ian/pixi-simple-gesture#v0.3.3":
-  "integrity" "sha512-DG1BxP8SK2iPMYWMOPGz5gKDXFmA8JPUpcyyNyIH55fpQraenuLYlosYFFMTRXEy0RZViTUu11H3VrYlfG2CgA=="
   "resolved" "git+ssh://git@github.com/4ian/pixi-simple-gesture.git#c84e0cc3c62edeca019e708d9897ef6b97a0d18a"
   "version" "0.3.3"
 
@@ -14667,7 +14665,6 @@
     "prop-types" "^15.6.2"
 
 "react-mosaic-component@github:4ian/react-mosaic#v3.1.0":
-  "integrity" "sha512-Izfw/EkG1g39nrZbOqzY52rqFkVFA1SUSv1TLwk7soS1Wy7iHm6zrUgzJdfwKRC2GaDn9WAfSe5ZQ2vIJ/mu5A=="
   "resolved" "git+ssh://git@github.com/4ian/react-mosaic.git#d5ef155119d786c08c7c72e34997dcef2f01f98b"
   "version" "3.1.0"
   dependencies:
@@ -17230,11 +17227,6 @@
   "resolved" "https://registry.npmjs.org/type-detect/-/type-detect-4.0.8.tgz"
   "version" "4.0.8"
 
-"type-fest@^0.13.1":
-  "integrity" "sha512-34R7HTnG0XIJcBSn5XhDd7nNFPRcXYRZrBB2O2jdKqYODldSzBAqzsWoZYYvduky73toYS/ESqxPvkDf/F0XMg=="
-  "resolved" "https://registry.npmjs.org/type-fest/-/type-fest-0.13.1.tgz"
-  "version" "0.13.1"
-
 "type-fest@^0.20.2":
   "integrity" "sha512-Ne+eE4r0/iWnpAxD852z3A+N0Bt5RN//NjJwRd2VFHEmrywxf5vsZlh4R6lixl6B+wz/8d+maTSAkN1FIkI3LQ=="
   "resolved" "https://registry.npmjs.org/type-fest/-/type-fest-0.20.2.tgz"
@@ -17623,11 +17615,6 @@
   "integrity" "sha512-cwESVXlO3url9YWlFW/TA9cshCEhtu7IKJ/p5soJ/gGpj7vbvFrAY/eIioQ6Dw23KjZhYgiIo8HOs1nQ2vr/oQ=="
   "resolved" "https://registry.npmjs.org/use/-/use-3.1.1.tgz"
   "version" "3.1.1"
-
-"userflow.js@^2.2.0":
-  "integrity" "sha512-voimujGKB3xX+ORYt/ZEiqPE2qT9FUtO2zLduNZu3y5tCZLWrMNkJQY9oBt+qcp7a9ivJF66q62l/dTt7s7kew=="
-  "resolved" "https://registry.npmjs.org/userflow.js/-/userflow.js-2.2.0.tgz"
-  "version" "2.2.0"
 
 "util-deprecate@^1.0.1", "util-deprecate@^1.0.2", "util-deprecate@~1.0.1":
   "integrity" "sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8="

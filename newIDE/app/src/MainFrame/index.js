@@ -2184,6 +2184,10 @@ const MainFrame = (props: Props) => {
       if (wasSaved && unsavedChanges) unsavedChanges.sealUnsavedChanges();
       updateWindowTitle();
     }
+    await setState(state => ({
+      ...state,
+      currentFileMetadata: { ...currentFileMetadata, name: newName },
+    }));
   };
 
   const onSaveProjectProperties = async (options: {

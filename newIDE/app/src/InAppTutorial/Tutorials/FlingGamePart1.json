@@ -1,12 +1,12 @@
 {
   "id": "flingGamePart1",
   "editorSwitches": {
-    "OpenPropertiesManager": "Home"
+    "OpenPropertiesManager": "Scene"
   },
   "flow": [
     {
       "id": "OpenPropertiesManager",
-      "elementToHighlightId": "#open-project-manager-button",
+      "elementToHighlightId": "#main-toolbar-project-manager-button",
       "nextStepTrigger": {
         "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings"
       },
@@ -105,6 +105,108 @@
             "en": "We're done."
           }
         }
+      }
+    },
+    {
+      "id": "ClickOnNewObjectButtonForBorder",
+      "elementToHighlightId": "#add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "First, let's find a border for our ring."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#asset-store-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#asset-store"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's choose an object from the asset store"
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#asset-store-search-bar",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "title": {
+          "messageByLocale": {
+            "en": "We're looking for a tiled sprite that we can resize easily"
+          }
+        },
+        "description": {
+          "messageByLocale": {
+            "en": "Tip: search for “tiled sprite”."
+          }
+        }
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-asset-button"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-asset-button",
+      "isTriggerFlickering": true,
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-item-0"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add this asset to your project."
+          }
+        }
+      },
+      "mapProjectData": {
+        "border": "lastProjectObjectName"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#new-object-dialog #close-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's add the $(border) to our game!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#object-item-0",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "border"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Drag $(firstObject) from the menu to the canvas."
+          }
+        },
+        "placement": "left"
       }
     },
     {

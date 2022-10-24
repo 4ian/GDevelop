@@ -8,6 +8,7 @@ export type TranslatedText =
   | {| messageByLocale: MessageByLocale |};
 
 export type InAppTutorialTooltip = {|
+  standalone?: true,
   placement?: 'bottom' | 'left' | 'right' | 'top',
   title?: TranslatedText,
   description?: TranslatedText,

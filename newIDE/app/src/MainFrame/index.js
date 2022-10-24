@@ -71,7 +71,6 @@ import {
   getElectronUpdateNotificationTitle,
   getElectronUpdateNotificationBody,
   type ElectronUpdateStatus,
-  useServiceWorkerCheckAndAskToUpdate,
 } from './UpdaterTools';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -664,8 +663,6 @@ const MainFrame = (props: Props) => {
   };
 
   useDiscordRichPresence(currentProject);
-
-  useServiceWorkerCheckAndAskToUpdate();
 
   const closeProject = React.useCallback(
     (): Promise<void> => {

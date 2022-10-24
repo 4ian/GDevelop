@@ -1,9 +1,8 @@
 // @flow
 // See ElectronEventsBridge, AboutDialog and electron-app/main.js for handling the updates.
 
-import { t, Trans } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import React from 'react';
-import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 export type ElectronUpdateStatus = {
   message: string,
@@ -95,53 +94,6 @@ export const useServiceWorkerUpdateStatus = () => {
   }, []);
 
   return serviceWorkerUpdateStatus;
-};
-
-export const useServiceWorkerCheckAndAskToUpdate = () => {
-  const serviceWorkerUpdateStatus = useServiceWorkerUpdateStatus();
-  const { showConfirmation, showAlert } = useAlertDialog();
-  React.useEffect(
-    () => {
-      if (serviceWorkerUpdateStatus === 'update-ready') {
-        const timeoutId = setTimeout(() => {
-          (async () => {
-            const answer = await showConfirmation({
-              title: t`New update available!`,
-              message: t`A new version of GDevelop is available. Would you like to update now? The app will be reloaded.`,
-            });
-            if (answer) {
-              try {
-                await clearServiceWorkerAndForceReload();
-              } catch (error) {
-                console.error('Unable to update service worker', error);
-                await showAlert({
-                  title: t`Unable to update`,
-                  message: t`Unable to update the app. Please close all your tabs and try again.`,
-                });
-              }
-            }
-          })();
-        }, 3000); // Let a bit of time for the app to load before showing the update dialog.
-        return () => clearTimeout(timeoutId);
-      }
-    },
-    [serviceWorkerUpdateStatus, showConfirmation, showAlert]
-  );
-};
-
-const clearServiceWorkerAndForceReload = async () => {
-  const { serviceWorker } = navigator;
-  if (!serviceWorker) {
-    throw new Error('Service worker not available');
-  }
-  const registration = await serviceWorker.getRegistration();
-  if (!registration) {
-    throw new Error('Service worker registration not available');
-  }
-  await registration.unregister();
-  const cacheKeys = await caches.keys();
-  await Promise.all(cacheKeys.map(key => caches.delete(key)));
-  window.location.reload();
 };
 
 export const getServiceWorkerStatusLabel = (

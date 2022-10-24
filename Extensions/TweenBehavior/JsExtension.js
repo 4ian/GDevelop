@@ -105,7 +105,7 @@ module.exports = {
           "Tweens a scene variable's numeric value from one number to another."
         ),
         _(
-          'Tween variable _PARAM2_ from _PARAM3_ to _PARAM4_ for _PARAM5_ms with easing _PARAM6_ as _PARAM1_'
+          'Tween variable _PARAM2_ from _PARAM3_ to _PARAM4_ over _PARAM5_ms with easing _PARAM6_ as _PARAM1_'
         ),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -133,7 +133,7 @@ module.exports = {
           "Tweens a scene variable's numeric value from its current value to another."
         ),
         _(
-          'Tween variable _PARAM2_ to _PARAM3_ for _PARAM4_ms with easing _PARAM5_ as _PARAM1_'
+          'Tween variable _PARAM2_ to _PARAM3_ over _PARAM4_ms with easing _PARAM5_ as _PARAM1_'
         ),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -157,7 +157,7 @@ module.exports = {
         _('Tween the camera position'),
         _('Tweens the camera position from the current one to a new one.'),
         _(
-          'Tween camera on layer _PARAM4_ to _PARAM2_;_PARAM3_ for _PARAM5_ms with easing _PARAM6_ as _PARAM1_'
+          'Tween camera on layer _PARAM4_ to _PARAM2_;_PARAM3_ over _PARAM5_ms with easing _PARAM6_ as _PARAM1_'
         ),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -182,7 +182,7 @@ module.exports = {
         _('Tween the camera zoom'),
         _('Tweens the camera zoom from the current zoom factor to a new one.'),
         _(
-          'Tween the zoom of camera on layer _PARAM3_ to _PARAM2_ for _PARAM4_ms with easing _PARAM5_ as _PARAM1_'
+          'Tween the zoom of camera on layer _PARAM3_ to _PARAM2_ over _PARAM4_ms with easing _PARAM5_ as _PARAM1_'
         ),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -206,7 +206,7 @@ module.exports = {
         _('Tween the camera rotation'),
         _('Tweens the camera rotation from the current angle to a new one.'),
         _(
-          'Tween the rotation of camera on layer _PARAM3_ to _PARAM2_ for _PARAM4_ms with easing _PARAM5_ as _PARAM1_'
+          'Tween the rotation of camera on layer _PARAM3_ to _PARAM2_ over _PARAM4_ms with easing _PARAM5_ as _PARAM1_'
         ),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',

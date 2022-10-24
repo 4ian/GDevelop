@@ -16,16 +16,40 @@ import InAppTutorialEndDialog from './InAppTutorialEndDialog';
 import InAppTutorialStepDisplayer from './InAppTutorialStepDisplayer';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 import { sendInAppTutorialProgress } from '../Utils/Analytics/EventSender';
+import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 
-const interpolateText = (text: string, data: { [key: string]: string }) => {
-  const placeholderReplacingRegex = /\$\((\w+)\)/g;
+const interpolateText = (
+  text: string,
+  data: { [key: string]: string },
+  project: ?gdProject
+) => {
+  const placeholderReplacingRegex = /\$\(([\w:]+)\)/g;
   const match = text.matchAll(placeholderReplacingRegex);
   let formattedText = text;
   [...match].forEach(match => {
-    const keyWithBrackets = match[0];
-    const key = match[1];
-    if (Object.keys(data).includes(key)) {
-      formattedText = formattedText.replace(keyWithBrackets, data[key]);
+    let replacement;
+    const instructionWithBrackets = match[0];
+    const instruction = match[1];
+    if (instruction.startsWith('instancesCount:')) {
+      const key = instruction.split(':')[1];
+      const objectName = data[key];
+      if (objectName && project && project.getLayoutsCount() > 0) {
+        const layout = project.getLayoutAt(0);
+        replacement = getInstanceCountInLayoutForObject(
+          layout,
+          objectName
+        ).toString();
+      }
+    }
+    if (!replacement && Object.keys(data).includes(instruction)) {
+      // If the instruction is a key in the data, use it
+      replacement = data[instruction];
+    }
+    if (replacement) {
+      formattedText = formattedText.replace(
+        instructionWithBrackets,
+        replacement
+      );
     }
   });
   return formattedText;
@@ -35,10 +59,12 @@ const translateAndInterpolateText = ({
   text,
   data,
   i18n,
+  project,
 }: {|
   text?: TranslatedText,
   data: { [key: string]: string },
   i18n: I18nType,
+  project: ?gdProject,
 |}) => {
   if (!text) return undefined;
   let translatedText;
@@ -47,7 +73,7 @@ const translateAndInterpolateText = ({
   } else {
     translatedText = i18n._(text.messageDescriptor, data);
   }
-  return interpolateText(translatedText, data);
+  return interpolateText(translatedText, data, project);
 };
 
 const isDomBasedTriggerComplete = (
@@ -399,11 +425,13 @@ const InAppTutorialOrchestrator = React.forwardRef<
               text: stepTooltip.title,
               data,
               i18n,
+              project,
             }),
             description: translateAndInterpolateText({
               text: stepTooltip.description,
               data,
               i18n,
+              project,
             }),
           }
         : undefined,

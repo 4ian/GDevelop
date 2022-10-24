@@ -289,7 +289,7 @@ export const initialPreferences = {
     eventsSheetShowObjectThumbnails: true,
     autosaveOnPreview: true,
     useNewInstructionEditorDialog: true,
-    useUndefinedVariablesInAutocompletion: false,
+    useUndefinedVariablesInAutocompletion: true,
     useGDJSDevelopmentWatcher: true,
     eventsSheetUseAssignmentOperators: false,
     eventsSheetZoomLevel: 14,

@@ -32,7 +32,7 @@ bool EventsLeaderboardsRenamer::DoVisitInstruction(gd::Instruction& instruction,
        ++i) {
     const gd::ParameterMetadata parameter = instrInfo.GetParameter(i);
 
-    if (parameter.type == "leaderboardId") {
+    if (parameter.GetType() == "leaderboardId") {
       const gd::String leaderboardId =
           instruction.GetParameter(i).GetPlainString();
 

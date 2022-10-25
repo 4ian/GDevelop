@@ -116,6 +116,7 @@ gd::String EventsCodeGenerator::GenerateLayoutCode(
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     gd::Project& project,
+    const gd::EventsFunctionsContainer& functionsContainer,
     const gd::EventsFunction& eventsFunction,
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
@@ -123,7 +124,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
   gd::ObjectsContainer globalObjectsAndGroups;
   gd::ObjectsContainer objectsAndGroups;
   gd::EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
-      project, eventsFunction, globalObjectsAndGroups, objectsAndGroups);
+      project, functionsContainer, eventsFunction, globalObjectsAndGroups, objectsAndGroups);
 
   EventsCodeGenerator codeGenerator(globalObjectsAndGroups, objectsAndGroups);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -133,9 +134,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       codeGenerator,
       codeGenerator.GetCodeNamespaceAccessor() + "func",
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParameters(), 0, true),
+          eventsFunction.GetParametersForEvents(functionsContainer), 0, true),
       codeGenerator.GenerateFreeEventsFunctionContext(
-          eventsFunction.GetParameters(), "runtimeScene.getOnceTriggers()"),
+          eventsFunction.GetParametersForEvents(functionsContainer), "runtimeScene.getOnceTriggers()"),
       eventsFunction.GetEvents(),
       "",
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
@@ -185,7 +186,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       "var Behavior = this.name;\n" +
       codeGenerator.GenerateBehaviorEventsFunctionContext(
           eventsBasedBehavior,
-          eventsFunction.GetParameters(),
+          eventsFunction.GetParametersForEvents(
+              eventsBasedBehavior.GetEventsFunctions()),
           onceTriggersVariable,
           // Pass the names of the parameters considered as the current
           // object and behavior parameters:
@@ -196,7 +198,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       codeGenerator,
       fullyQualifiedFunctionName,
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParameters(), 2, false),
+          eventsFunction.GetParametersForEvents(
+              eventsBasedBehavior.GetEventsFunctions()), 2, false),
       fullPreludeCode,
       eventsFunction.GetEvents(),
       "",
@@ -258,7 +261,8 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
 
       fullPreludeCode += codeGenerator.GenerateObjectEventsFunctionContext(
           eventsBasedObject,
-          eventsFunction.GetParameters(),
+          eventsFunction.GetParametersForEvents(
+              eventsBasedObject.GetEventsFunctions()),
           onceTriggersVariable,
           // Pass the names of the parameters considered as the current
           // object and behavior parameters:
@@ -269,7 +273,8 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
       fullyQualifiedFunctionName,
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
         // TODO EBO use constants for firstParameterIndex
-          eventsFunction.GetParameters(), 1, false),
+          eventsFunction.GetParametersForEvents(
+              eventsBasedObject.GetEventsFunctions()), 1, false),
       fullPreludeCode,
       eventsFunction.GetEvents(),
       endingCode,
@@ -557,16 +562,20 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionReturn(
     const gd::EventsFunction& eventsFunction) {
+  // We don't use IsCondition because ExpressionAndCondition event functions
+  // don't need a boolean function. They use the expression function with a
+  // relational operator.
   if (eventsFunction.GetFunctionType() == gd::EventsFunction::Condition) {
     return "return !!eventsFunctionContext.returnValue;";
-  } else if (eventsFunction.GetFunctionType() ==
-             gd::EventsFunction::Expression) {
-    return "return Number(eventsFunctionContext.returnValue) || 0;";
-  } else if (eventsFunction.GetFunctionType() ==
-             gd::EventsFunction::StringExpression) {
-    return "return \"\" + eventsFunctionContext.returnValue;";
+  } else if (eventsFunction.IsExpression()) {
+    if (eventsFunction.GetExpressionType().IsNumber()) {
+      return "return Number(eventsFunctionContext.returnValue) || 0;";
+    } else {
+      // Default on string because it's more likely that future expression
+      // types are strings.
+      return "return \"\" + eventsFunctionContext.returnValue;";
+    }
   }
-
   return "return;";
 }
 
@@ -683,7 +692,7 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(
   for (std::size_t i = 0; i < instrInfos.parameters.size();
        ++i)  // Some conditions already have a "conditionInverted" parameter
   {
-    if (instrInfos.parameters[i].type == "conditionInverted")
+    if (instrInfos.parameters[i].GetType() == "conditionInverted")
       conditionAlreadyTakeCareOfInversion = true;
   }
   if (!conditionAlreadyTakeCareOfInversion && conditionInverted)
@@ -1100,17 +1109,17 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   gd::String argOutput;
 
   // Code only parameter type
-  if (metadata.type == "currentScene") {
+  if (metadata.GetType() == "currentScene") {
     argOutput = "runtimeScene";
   }
   // Code only parameter type
-  else if (metadata.type == "objectsContext") {
+  else if (metadata.GetType() == "objectsContext") {
     argOutput =
         "(typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext "
         ": runtimeScene)";
   }
   // Code only parameter type
-  else if (metadata.type == "eventsFunctionContext") {
+  else if (metadata.GetType() == "eventsFunctionContext") {
     argOutput =
         "(typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext "
         ": undefined)";

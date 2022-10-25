@@ -206,23 +206,23 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   // Scene editor toolbar commands
   OPEN_OBJECTS_PANEL: {
     area: 'SCENE',
-    displayText: t`Open the objects editor`,
+    displayText: t`Open Objects Panel`,
   },
   OPEN_OBJECT_GROUPS_PANEL: {
     area: 'SCENE',
-    displayText: t`Open the object groups editor`,
+    displayText: t`Open Object Groups Panel`,
   },
   OPEN_PROPERTIES_PANEL: {
     area: 'SCENE',
-    displayText: t`Open the properties panel`,
+    displayText: t`Open Properties Panel`,
   },
   TOGGLE_INSTANCES_PANEL: {
     area: 'SCENE',
-    displayText: t`Open the list of instances`,
+    displayText: t`Open Instances List Panel`,
   },
   TOGGLE_LAYERS_PANEL: {
     area: 'SCENE',
-    displayText: t`Open the layers editor`,
+    displayText: t`Open Layers Panel`,
   },
   SCENE_EDITOR_UNDO: {
     area: 'SCENE',

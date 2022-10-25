@@ -1324,7 +1324,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       'instances-list': {
         type: 'secondary',
-        title: t`Instances list`,
+        title: t`Instances List`,
         renderEditor: () => (
           <InstancesList
             instances={initialInstances}

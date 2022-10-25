@@ -164,13 +164,14 @@ const InAppTutorialOrchestrator = React.forwardRef<
     setExpectedEditor,
   ] = React.useState<EditorIdentifier | null>(null);
   const [
-    watchElementInputValue,
-    setWatchElementInputValue,
+    elementWithValueToWatch,
+    setElementWithValueToWatch,
   ] = React.useState<?string>(null);
   const InputInitialValueRef = React.useRef<?string>(null);
-  const [watchSceneInstances, setWatchSceneInstances] = React.useState<?string>(
-    null
-  );
+  const [
+    objectSceneInstancesToWatch,
+    setObjectSceneInstancesToWatch,
+  ] = React.useState<?string>(null);
   const domObserverRef = React.useRef<?MutationObserver>(null);
 
   const { flow, endDialog, editorSwitches, id: tutorialId } = tutorial;
@@ -341,8 +342,8 @@ const InAppTutorialOrchestrator = React.forwardRef<
         currentStepFallbackStepIndex.current = currentStepIndex;
       }
       // At each step start, reset change watching logics.
-      setWatchElementInputValue(null);
-      setWatchSceneInstances(null);
+      setElementWithValueToWatch(null);
+      setObjectSceneInstancesToWatch(null);
       // If index out of bounds, display end dialog.
       if (currentStepIndex >= stepCount) {
         setDisplayEndDialog(true);
@@ -364,12 +365,12 @@ const InAppTutorialOrchestrator = React.forwardRef<
         // line cannot break.
         // $FlowFixMe
         if (elementToWatch) InputInitialValueRef.current = elementToWatch.value;
-        setWatchElementInputValue(elementToHighlightId);
+        setElementWithValueToWatch(elementToHighlightId);
       } else if (nextStepTrigger && nextStepTrigger.instanceAddedOnScene) {
         const objectKey = nextStepTrigger.instanceAddedOnScene;
         const objectName = data[objectKey];
         if (!objectName) return;
-        setWatchSceneInstances(objectName);
+        setObjectSceneInstancesToWatch(objectName);
       }
     },
     [currentStep, data]
@@ -377,8 +378,8 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
   const watchInputChanges = React.useCallback(
     () => {
-      if (!watchElementInputValue) return;
-      const elementToWatch = document.querySelector(watchElementInputValue);
+      if (!elementWithValueToWatch) return;
+      const elementToWatch = document.querySelector(elementWithValueToWatch);
 
       if (
         elementToWatch &&
@@ -390,24 +391,27 @@ const InAppTutorialOrchestrator = React.forwardRef<
         goToNextStep();
       }
     },
-    [goToNextStep, watchElementInputValue]
+    [goToNextStep, elementWithValueToWatch]
   );
 
   const watchSceneInstanceChanges = React.useCallback(
     () => {
-      if (!watchSceneInstances) return;
+      if (!objectSceneInstancesToWatch) return;
       if (!project || project.getLayoutsCount() === 0) return;
       const layout = project.getLayoutAt(0);
       const instances = layout.getInitialInstances();
-      if (instances.hasInstancesOfObject(watchSceneInstances)) {
+      if (instances.hasInstancesOfObject(objectSceneInstancesToWatch)) {
         goToNextStep();
       }
     },
-    [project, goToNextStep, watchSceneInstances]
+    [project, goToNextStep, objectSceneInstancesToWatch]
   );
 
-  useInterval(watchInputChanges, watchElementInputValue ? 1000 : null);
-  useInterval(watchSceneInstanceChanges, watchSceneInstances ? 500 : null);
+  useInterval(watchInputChanges, elementWithValueToWatch ? 1000 : null);
+  useInterval(
+    watchSceneInstanceChanges,
+    objectSceneInstancesToWatch ? 500 : null
+  );
   useInterval(
     watchDomForNextStepTrigger,
     currentStep && currentStep.isTriggerFlickering ? 500 : null

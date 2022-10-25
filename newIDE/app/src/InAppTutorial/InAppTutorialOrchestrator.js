@@ -358,7 +358,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
       const observer = new MutationObserver(handleDomMutation);
       observer.observe(appContainer, {
         childList: true,
-        attributes: true,
+        attributes: false,
         subtree: true,
         characterData: true,
       });

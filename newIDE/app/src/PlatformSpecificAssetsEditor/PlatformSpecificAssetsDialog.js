@@ -20,6 +20,7 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import optionalRequire from '../Utils/OptionalRequire';
 import Text from '../UI/Text';
 import { ColumnStackLayout } from '../UI/Layout';
+import AlertMessage from '../UI/AlertMessage';
 const path = optionalRequire('path');
 const gd: libGDevelop = global.gd;
 
@@ -39,6 +40,7 @@ type State = {|
   androidIconResourceNames: Array<string>,
   androidWindowSplashScreenAnimatedIconResourceName: string,
   iosIconResourceNames: Array<string>,
+  displayLiluoThumbnailWarning: boolean,
 |};
 
 const desktopSizes = [512];
@@ -96,6 +98,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
       iosIconResourceNames: iosSizes.map(size =>
         platformSpecificAssets.get('ios', `icon-${size}`)
       ),
+      displayLiluoThumbnailWarning: false,
     };
   }
 
@@ -299,6 +302,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
       androidIconResourceNames,
       androidWindowSplashScreenAnimatedIconResourceName,
       iosIconResourceNames,
+      displayLiluoThumbnailWarning,
     } = this.state;
 
     return (
@@ -324,9 +328,23 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             onChange={resourceName => {
               this.setState({
                 thumbnailResourceName: resourceName,
+                displayLiluoThumbnailWarning:
+                  resourceName !== this.state.thumbnailResourceName,
               });
             }}
           />
+          {displayLiluoThumbnailWarning ? (
+            <Line>
+              <AlertMessage kind="warning">
+                <Trans>
+                  You're about to change the thumbnail displayed on Liluo.io for
+                  your game. Once you have applied changes here, you will then
+                  need to publish a new version of your game on Liluo.io so that
+                  this new thumbnail is used.
+                </Trans>
+              </AlertMessage>
+            </Line>
+          ) : null}
           <Line justifyContent="center">
             {isResizeSupported() ? (
               <RaisedButton

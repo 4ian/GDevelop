@@ -17,6 +17,11 @@ import InAppTutorialStepDisplayer from './InAppTutorialStepDisplayer';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 import { sendInAppTutorialProgress } from '../Utils/Analytics/EventSender';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
+import useForceUpdate from '../Utils/UseForceUpdate';
+
+const textInterpolationProjectDataAccessors = {
+  instancesCount: 'instancesCount:',
+};
 
 const interpolateText = (
   text: string,
@@ -30,7 +35,11 @@ const interpolateText = (
     let replacement;
     const instructionWithBrackets = match[0];
     const instruction = match[1];
-    if (instruction.startsWith('instancesCount:')) {
+    if (
+      instruction.startsWith(
+        textInterpolationProjectDataAccessors.instancesCount
+      )
+    ) {
       const key = instruction.split(':')[1];
       const objectName = data[key];
       if (objectName && project && project.getLayoutsCount() > 0) {
@@ -74,6 +83,33 @@ const translateAndInterpolateText = ({
     translatedText = i18n._(text.messageDescriptor, data);
   }
   return interpolateText(translatedText, data, project);
+};
+
+const containsProjectDataToDisplay = (text?: TranslatedText): boolean => {
+  if (!text) return false;
+  if (text.messageByLocale) {
+    return Object.values(text.messageByLocale).some(localizedText =>
+      // $FlowFixMe - known error where Flow returns mixed for object value https://github.com/facebook/flow/issues/2221
+      localizedText.includes(
+        `$(${textInterpolationProjectDataAccessors.instancesCount}`
+      )
+    );
+  } else {
+    return (
+      (typeof text.messageDescriptor === 'string' &&
+        text.messageDescriptor.includes(
+          `$(${textInterpolationProjectDataAccessors.instancesCount}`
+        )) ||
+      (typeof text.messageDescriptor === 'object' &&
+        Object.values(text.messageDescriptor).some(
+          value =>
+            typeof value === 'string' &&
+            value.includes(
+              `$(${textInterpolationProjectDataAccessors.instancesCount}`
+            )
+        ))
+    );
+  }
 };
 
 const isDomBasedTriggerComplete = (
@@ -150,6 +186,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
   Props,
   InAppTutorialOrchestratorInterface
 >(({ tutorial, endTutorial, project, currentEditor }, ref) => {
+  const forceUpdate = useForceUpdate();
   const [wrongEditorInfoOpen, setWrongEditorInfoOpen] = React.useState<boolean>(
     false
   );
@@ -173,6 +210,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
     setObjectSceneInstancesToWatch,
   ] = React.useState<?string>(null);
   const domObserverRef = React.useRef<?MutationObserver>(null);
+  const [
+    shouldWatchProjectChanges,
+    setShouldWatchProjectChanges,
+  ] = React.useState<boolean>(false);
 
   const { flow, endDialog, editorSwitches, id: tutorialId } = tutorial;
   const stepCount = flow.length;
@@ -289,14 +330,6 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
   const handleDomMutation = useDebounce(watchDomForNextStepTrigger, 200);
 
-  const onPreviewLaunch = () => {
-    if (!currentStep) return;
-    const { nextStepTrigger } = currentStep;
-    if (nextStepTrigger && nextStepTrigger.previewLaunched) {
-      goToNextStep();
-    }
-  };
-
   const goToNextStep = React.useCallback(
     () => {
       goToStep(currentStepIndex + 1);
@@ -305,6 +338,17 @@ const InAppTutorialOrchestrator = React.forwardRef<
   );
 
   React.useImperativeHandle(ref, () => ({ onPreviewLaunch, goToNextStep }));
+
+  const onPreviewLaunch = React.useCallback(
+    () => {
+      if (!currentStep) return;
+      const { nextStepTrigger } = currentStep;
+      if (nextStepTrigger && nextStepTrigger.previewLaunched) {
+        goToNextStep();
+      }
+    },
+    [goToNextStep, currentStep]
+  );
 
   // Set up mutation observer to be able to detect any change in the dom.
   React.useEffect(
@@ -344,6 +388,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
       // At each step start, reset change watching logics.
       setElementWithValueToWatch(null);
       setObjectSceneInstancesToWatch(null);
+      setShouldWatchProjectChanges(false);
       // If index out of bounds, display end dialog.
       if (currentStepIndex >= stepCount) {
         setDisplayEndDialog(true);
@@ -374,6 +419,23 @@ const InAppTutorialOrchestrator = React.forwardRef<
       }
     },
     [currentStep, data]
+  );
+
+  // Detect in tooltip texts if project changes should be watched
+  React.useEffect(
+    () => {
+      if (!currentStep) return;
+      const { tooltip } = currentStep;
+      if (!tooltip) return;
+      if (
+        [tooltip.description, tooltip.title].some(translatedText =>
+          containsProjectDataToDisplay(translatedText)
+        )
+      ) {
+        setShouldWatchProjectChanges(true);
+      }
+    },
+    [currentStep]
   );
 
   const watchInputChanges = React.useCallback(
@@ -407,6 +469,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
     [project, goToNextStep, objectSceneInstancesToWatch]
   );
 
+  useInterval(forceUpdate, shouldWatchProjectChanges ? 500 : null);
   useInterval(watchInputChanges, elementWithValueToWatch ? 1000 : null);
   useInterval(
     watchSceneInstanceChanges,
@@ -420,26 +483,31 @@ const InAppTutorialOrchestrator = React.forwardRef<
   const renderStepDisplayer = (i18n: I18nType) => {
     if (!currentStep) return null;
     const stepTooltip = currentStep.tooltip;
+    let formattedTooltip;
+    if (stepTooltip) {
+      const title = translateAndInterpolateText({
+        text: stepTooltip.title,
+        data,
+        i18n,
+        project,
+      });
+      const description = translateAndInterpolateText({
+        text: stepTooltip.description,
+        data,
+        i18n,
+        project,
+      });
+      formattedTooltip = {
+        ...stepTooltip,
+        title,
+        description,
+      };
+    }
     const formattedStep: InAppTutorialFlowFormattedStep = {
       ...flow[currentStepIndex],
-      tooltip: stepTooltip
-        ? {
-            ...stepTooltip,
-            title: translateAndInterpolateText({
-              text: stepTooltip.title,
-              data,
-              i18n,
-              project,
-            }),
-            description: translateAndInterpolateText({
-              text: stepTooltip.description,
-              data,
-              i18n,
-              project,
-            }),
-          }
-        : undefined,
+      tooltip: formattedTooltip,
     };
+
     return (
       <InAppTutorialStepDisplayer
         step={formattedStep}

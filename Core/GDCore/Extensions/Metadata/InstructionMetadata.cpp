@@ -55,11 +55,11 @@ InstructionMetadata& InstructionMetadata::AddParameter(
     const gd::String& supplementaryInformation,
     bool parameterIsOptional) {
   ParameterMetadata info;
-  info.type = type;
+  info.SetType(type);
   info.description = description;
   info.codeOnly = false;
-  info.optional = parameterIsOptional;
-  info.supplementaryInformation =
+  info.SetOptional(parameterIsOptional);
+  info.SetExtraInfo(
       // For objects/behavior, the supplementary information
       // parameter is an object/behavior type...
       (gd::ParameterMetadata::IsObject(type) ||
@@ -71,7 +71,7 @@ InstructionMetadata& InstructionMetadata::AddParameter(
                                                  // extension
                                                  // namespace.
              )
-          : supplementaryInformation;  // Otherwise don't change anything
+          : supplementaryInformation);  // Otherwise don't change anything
 
   // TODO: Assert against supplementaryInformation === "emsc" (when running with
   // Emscripten), and warn about a missing argument when calling addParameter.
@@ -83,9 +83,9 @@ InstructionMetadata& InstructionMetadata::AddParameter(
 InstructionMetadata& InstructionMetadata::AddCodeOnlyParameter(
     const gd::String& type, const gd::String& supplementaryInformation) {
   ParameterMetadata info;
-  info.type = type;
+  info.SetType(type);
   info.codeOnly = true;
-  info.supplementaryInformation = supplementaryInformation;
+  info.SetExtraInfo(supplementaryInformation);
 
   parameters.push_back(info);
   return *this;

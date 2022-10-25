@@ -30,7 +30,7 @@ bool EventsLeaderboardsLister::DoVisitInstruction(gd::Instruction& instruction,
   for (int i = 0; i < instruction.GetParametersCount() &&
                   i < instrInfo.GetParametersCount();
        ++i)
-    if (instrInfo.GetParameter(i).type == "leaderboardId") {
+    if (instrInfo.GetParameter(i).GetType() == "leaderboardId") {
       leaderboardIds.insert(instruction.GetParameter(i).GetPlainString());
     }
   return false;

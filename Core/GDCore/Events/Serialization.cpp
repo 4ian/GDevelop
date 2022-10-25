@@ -184,8 +184,8 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(
     for (std::size_t j = 0;
          j < parameters.size() && j < metadata.parameters.size();
          ++j) {
-      if (metadata.parameters[j].type == "relationalOperator" ||
-          metadata.parameters[j].type == "operator") {
+      if (metadata.parameters[j].GetType() == "relationalOperator" ||
+          metadata.parameters[j].GetType() == "operator") {
         if (j == parameters.size() - 1) {
           std::cout << "ERROR: No more parameters after a [relational]operator "
                        "when trying to update an instruction from GD2.x";

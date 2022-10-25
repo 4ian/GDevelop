@@ -112,7 +112,7 @@
       "tooltip": {
         "description": {
           "messageByLocale": {
-            "en": "Change the width to 1280 pixels."
+            "en": "Change the width to **1280** pixels."
           }
         }
       },
@@ -126,7 +126,7 @@
       "tooltip": {
         "description": {
           "messageByLocale": {
-            "en": "Change the height to 720 pixels."
+            "en": "Change the height to **720** pixels."
           }
         }
       },
@@ -235,6 +235,7 @@
       "isOnClosableDialog": true
     },
     {
+      "id": "CloseAssetStoreForBorder",
       "elementToHighlightId": "#new-object-dialog #close-button",
       "nextStepTrigger": {
         "absenceOfElement": "#new-object-dialog"
@@ -317,14 +318,14 @@
       "tooltip": {
         "description": {
           "messageByLocale": {
-            "en": "Select a circular sprite object that you'd like to throw."
+            "en": "Select a circular sprite object that you'd like to throw (try **ball**)."
           }
         }
       },
       "isOnClosableDialog": true,
       "shortcuts": [
         {
-          "stepId": "CloseAssetStoreForCoin",
+          "stepId": "CloseAssetStoreForProjectile",
           "trigger": {
             "presenceOfElement": "#object-item-1"
           }
@@ -349,6 +350,7 @@
       "isOnClosableDialog": true
     },
     {
+      "id": "CloseAssetStoreForProjectile",
       "elementToHighlightId": "#new-object-dialog #close-button",
       "nextStepTrigger": {
         "absenceOfElement": "#new-object-dialog"
@@ -420,7 +422,7 @@
       "isOnClosableDialog": true,
       "shortcuts": [
         {
-          "stepId": "CloseAssetStoreForCoin",
+          "stepId": "CloseAssetStoreForTarget",
           "trigger": {
             "presenceOfElement": "#object-item-2"
           }
@@ -445,6 +447,7 @@
       "isOnClosableDialog": true
     },
     {
+      "id": "CloseAssetStoreForTarget",
       "elementToHighlightId": "#new-object-dialog #close-button",
       "nextStepTrigger": {
         "absenceOfElement": "#new-object-dialog"
@@ -509,14 +512,14 @@
       "tooltip": {
         "description": {
           "messageByLocale": {
-            "en": "Select a block object you would like to use as an obstacle for your $(projectile)."
+            "en": "Select a **block** object you would like to use as an obstacle for your $(projectile)."
           }
         }
       },
       "isOnClosableDialog": true,
       "shortcuts": [
         {
-          "stepId": "CloseAssetStoreForCoin",
+          "stepId": "CloseAssetStoreForBlock",
           "trigger": {
             "presenceOfElement": "#object-item-3"
           }
@@ -541,6 +544,7 @@
       "isOnClosableDialog": true
     },
     {
+      "id": "CloseAssetStoreForBlock",
       "elementToHighlightId": "#new-object-dialog #close-button",
       "nextStepTrigger": {
         "absenceOfElement": "#new-object-dialog"

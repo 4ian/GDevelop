@@ -227,7 +227,7 @@
       }
     },
     {
-      "id": "ClickOnNewObjectButtonProjectile",
+      "id": "ClickOnNewObjectButtonForProjectile",
       "elementToHighlightId": "#add-new-object-button",
       "nextStepTrigger": {
         "presenceOfElement": "#new-object-dialog"
@@ -318,6 +318,198 @@
         "description": {
           "messageByLocale": {
             "en": "Add 3 instances of $(projectile) inside the frame."
+          }
+        }
+      }
+    },
+    {
+      "id": "ClickOnNewObjectButtonForTarget",
+      "elementToHighlightId": "#add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's find a target to aim."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#asset-store-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#asset-store"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's choose an object from the asset store."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#asset-store-search-bar",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select an object that you would like to use as a target to throw $(projectile) at."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "shortcuts": [
+        {
+          "stepId": "CloseAssetStoreForCoin",
+          "trigger": {
+            "presenceOfElement": "#object-item-2"
+          }
+        }
+      ]
+    },
+    {
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-asset-button"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-asset-button",
+      "isTriggerFlickering": true,
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-item-2"
+      },
+      "mapProjectData": {
+        "target": "lastProjectObjectName"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#new-object-dialog #close-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Perfect, let's add it to the scene."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#object-item-2",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "target"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add $(target) inside the frame."
+          }
+        }
+      }
+    },
+    {
+      "id": "ClickOnNewObjectButtonForBlock",
+      "elementToHighlightId": "#add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Finally let's find something to protect $(target)."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#asset-store-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#asset-store"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's choose an object from the asset store."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#asset-store-search-bar",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select a block object you would like to use as an obstacle for your $(projectile)."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "shortcuts": [
+        {
+          "stepId": "CloseAssetStoreForCoin",
+          "trigger": {
+            "presenceOfElement": "#object-item-3"
+          }
+        }
+      ]
+    },
+    {
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-asset-button"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-asset-button",
+      "isTriggerFlickering": true,
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-item-3"
+      },
+      "mapProjectData": {
+        "block": "lastProjectObjectName"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#new-object-dialog #close-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Perfect, let's add it to the scene."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#object-item-3",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "block"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add multiple $(block)s inside the frame."
           }
         }
       }

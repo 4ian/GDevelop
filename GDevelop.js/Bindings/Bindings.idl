@@ -1330,9 +1330,39 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetCodeOnly(boolean codeOnly_);
     [Const, Ref] DOMString GetDefaultValue();
     [Ref] ParameterMetadata SetDefaultValue([Const] DOMString defaultValue_);
+
+    [Ref] ParameterMetadata SetValueTypeMetadata([Const, Ref] ValueTypeMetadata type);
+    [Const, Ref] ValueTypeMetadata GetValueTypeMetadata();
+
     boolean STATIC_IsObject([Const] DOMString param);
     boolean STATIC_IsBehavior([Const] DOMString param);
     boolean STATIC_IsExpression([Const] DOMString type_, [Const] DOMString parameterType);
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
+};
+
+interface ValueTypeMetadata {
+    void ValueTypeMetadata();
+
+    [Const, Ref] DOMString GetName();
+    [Ref] ValueTypeMetadata SetName([Const] DOMString name_);
+    [Const, Ref] DOMString GetExtraInfo();
+    [Ref] ValueTypeMetadata SetExtraInfo([Const] DOMString extraInfo_);
+    boolean IsOptional();
+    [Ref] ValueTypeMetadata SetOptional(boolean optional_);
+    [Const, Ref] DOMString GetDefaultValue();
+    [Ref] ValueTypeMetadata SetDefaultValue([Const] DOMString defaultValue_);
+
+    boolean IsObject();
+    boolean IsBehavior();
+    boolean IsNumber();
+    boolean IsString();
+    boolean IsVariable();
+
+    boolean STATIC_TypeIsObject([Const] DOMString param);
+    boolean STATIC_TypeIsBehavior([Const] DOMString param);
+    boolean STATIC_TypeIsExpression([Const] DOMString type_, [Const] DOMString parameterType);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);

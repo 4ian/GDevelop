@@ -28,13 +28,11 @@ class GD_EXTENSION_API DraggableBehavior : public gd::Behavior {
     return new DraggableBehavior(*this);
   }
 
-#if defined(GD_IDE_ONLY)
   virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
       const gd::SerializerElement& behaviorContent) const override;
   virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
                               const gd::String& name,
                               const gd::String& value) override;
-#endif
 
   virtual void InitializeContent(
       gd::SerializerElement& behaviorContent) override;

@@ -3,6 +3,20 @@
   "editorSwitches": {
     "OpenPropertiesManager": "Scene"
   },
+  "endDialog": {
+    "content": [
+      {
+        "messageByLocale": {
+          "en": "## Congratulations"
+        }
+      },
+      {
+        "messageByLocale": {
+          "en": "You just finished the first part of the fling game tutorial."
+        }
+      }
+    ]
+  },
   "flow": [
     {
       "id": "OpenPropertiesManager",
@@ -20,8 +34,7 @@
       }
     },
     {
-      "id": "",
-      "elementToHighlightId": "#project-manager-tab-game-settings",
+      "elementToHighlightId": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings",
       "nextStepTrigger": {
         "presenceOfElement": "#project-manager-tab-game-properties"
       },
@@ -31,10 +44,10 @@
             "en": "Open the **Game Settings** tab."
           }
         }
-      }
+      },
+      "isOnClosableDialog": true
     },
     {
-      "id": "",
       "elementToHighlightId": "#project-manager-tab-game-properties",
       "nextStepTrigger": {
         "presenceOfElement": "#project-properties-dialog"
@@ -49,7 +62,6 @@
       "isOnClosableDialog": true
     },
     {
-      "id": "",
       "elementToHighlightId": "#game-resolution-width",
       "nextStepTrigger": {
         "valueHasChanged": true
@@ -64,7 +76,6 @@
       "isOnClosableDialog": true
     },
     {
-      "id": "",
       "elementToHighlightId": "#game-resolution-height",
       "nextStepTrigger": {
         "valueHasChanged": true
@@ -79,7 +90,6 @@
       "isOnClosableDialog": true
     },
     {
-      "id": "",
       "elementToHighlightId": "#game-resolution-resize-mode",
       "nextStepTrigger": {
         "valueHasChanged": true
@@ -94,7 +104,6 @@
       "isOnClosableDialog": true
     },
     {
-      "id": "",
       "elementToHighlightId": "#project-properties-dialog #apply-button",
       "nextStepTrigger": {
         "absenceOfElement": "#project-properties-dialog"
@@ -515,19 +524,511 @@
       }
     },
     {
-      "id": "STOP",
-      "elementToHighlightId": "",
+      "elementToHighlightId": "#object-item-0",
       "nextStepTrigger": {
-        "presenceOfElement": ""
+        "presenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "title": {
+          "messageByLocale": {
+            "en": "Let's add some sense of physics now."
+          }
+        },
+        "description": {
+          "messageByLocale": {
+            "en": "Right click on $(border) and select “Edit behaviors”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#behaviors-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-behavior-button"
       },
       "tooltip": {
         "description": {
           "messageByLocale": {
-            "en": ""
+            "en": "See the behaviors of the object here."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-behavior-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-item-Physics2--Physics2Behavior"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Add a new behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#behavior-item-Physics2--Physics2Behavior",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-parameters-Physics2"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Select the Physics behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#physics2-parameter-body-type",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select static."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We'll see later how to use the other parameters. We're good now."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#object-item-1",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now click on $(projectile) and select “Edit behaviors”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#behaviors-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-behavior-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "See the behaviors of the object here."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-behavior-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-item-Physics2--Physics2Behavior"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Add a new behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#behavior-item-Physics2--Physics2Behavior",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-parameters-Physics2"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Select the Physics behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#physics2-parameter-shape",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select Circle."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#physics2-parameter-density",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the density to 5."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#physics2-parameter-angular-damping",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the angular damping to 15."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're good."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#object-item-2",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now click on $(target) and select “Edit behaviors”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#behaviors-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-behavior-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "See the behaviors of the object here."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-behavior-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-item-Physics2--Physics2Behavior"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#behavior-item-Physics2--Physics2Behavior",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-parameters-Physics2"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Select the Physics behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "No need to change anything."
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#object-item-3",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now click on $(block) and select “Edit behaviors”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#behaviors-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-behavior-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "See the behaviors of the object here."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-behavior-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-item-Physics2--Physics2Behavior"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#behavior-item-Physics2--Physics2Behavior",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-parameters-Physics2"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Select the Physics behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      }
+    },
+    {
+      "id": "OpenPropertiesManagerForExtension",
+      "elementToHighlightId": "#main-toolbar-project-manager-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-extensions"
+      },
+      "tooltip": {
+        "title": {
+          "messageByLocale": {
+            "en": "Now we'll make it possible to drag the $(projectile)."
+          }
+        },
+        "description": {
+          "messageByLocale": {
+            "en": "For this, we will install an **extension**.\n\nOpen the **Project Manager**"
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-extensions",
+      "nextStepTrigger": {
+        "presenceOfElement": "#project-manager-extension-search-or-create"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the **Extensions** tab."
           }
         }
       },
       "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#project-manager-extension-search-or-create",
+      "nextStepTrigger": {
+        "presenceOfElement": "#extension-search-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the extension store"
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#extension-search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#extension-list-item-DraggablePhysics"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search the draggable extension (for physics objects)."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "skippable": true
+    },
+    {
+      "elementToHighlightId": "#extension-list-item-DraggablePhysics",
+      "nextStepTrigger": {
+        "presenceOfElement": "#extension-install-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click on the extension."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#extension-install-dialog #install-extension-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#extension-install-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Install the extension."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#extension-search-dialog #close-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#extension-search-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Close the store."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#object-item-1",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now click on $(projectile) and select “Edit behaviors”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#behaviors-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-behavior-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "See the behaviors of the object here."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-behavior-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-item-DraggablePhysics--DraggablePhysics"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Add a new behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#behavior-item-DraggablePhysics--DraggablePhysics",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-parameters-DraggablePhysics"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Select the Draggable behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "That's it!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "That's it!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#toolbar-preview-button",
+      "nextStepTrigger": {
+        "previewLaunched": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click on the **Preview** button to see how you can click and drag your $(projectile) around the scene!"
+          }
+        },
+        "placement": "bottom"
+      }
     }
   ]
 }

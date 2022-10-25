@@ -227,6 +227,102 @@
       }
     },
     {
+      "id": "ClickOnNewObjectButtonProjectile",
+      "elementToHighlightId": "#add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's find an object that we can throw."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#asset-store-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#asset-store"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's choose an object from the asset store."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#asset-store-search-bar",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select a circular sprite object that you'd like to throw."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "shortcuts": [
+        {
+          "stepId": "CloseAssetStoreForCoin",
+          "trigger": {
+            "presenceOfElement": "#object-item-1"
+          }
+        }
+      ]
+    },
+    {
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-asset-button"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-asset-button",
+      "isTriggerFlickering": true,
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-item-1"
+      },
+      "mapProjectData": {
+        "projectile": "lastProjectObjectName"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#new-object-dialog #close-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Perfect, let's see how to throw it easily."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#object-item-1",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "projectile"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add 3 instances of $(projectile) inside the frame."
+          }
+        }
+      }
+    },
+    {
       "id": "STOP",
       "elementToHighlightId": "",
       "nextStepTrigger": {

@@ -4,7 +4,6 @@ GDevelop - Draggable Behavior Extension
 Copyright (c) 2014-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
-#if defined(GD_IDE_ONLY)
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
 
@@ -32,6 +31,11 @@ class DraggableBehaviorJsExtension : public gd::PlatformExtension {
         .SetFunctionName("isDragged")
         .SetIncludeFile(
             "Extensions/DraggableBehavior/draggableruntimebehavior.js");
+    GetAllConditionsForBehavior(
+        "DraggableBehavior::Draggable")["DraggableBehavior::Dropped"]
+        .SetFunctionName("wasJustDropped")
+        .SetIncludeFile(
+            "Extensions/DraggableBehavior/draggableruntimebehavior.js");
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };
 };
@@ -48,5 +52,4 @@ extern "C" gd::PlatformExtension* CreateGDJSDraggableBehaviorExtension() {
 extern "C" gd::PlatformExtension* GD_EXTENSION_API CreateGDJSExtension() {
   return new DraggableBehaviorJsExtension;
 }
-#endif
 #endif

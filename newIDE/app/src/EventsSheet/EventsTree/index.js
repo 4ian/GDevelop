@@ -120,6 +120,7 @@ type EventsContainerProps = {|
   eventsSheetHeight: number,
 
   connectDragSource: ConnectDragSource,
+  windowWidth: WidthType,
 |};
 
 /**
@@ -158,7 +159,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
         onClick={this.props.onEventClick}
         onContextMenu={this._onEventContextMenu}
       >
-        {EventComponent && (
+        {!!EventComponent && (
           <div style={styles.eventComponentContainer}>
             {this.props.connectDragSource(<div className={handle} />)}
             <div style={styles.container}>
@@ -192,6 +193,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
                 renderObjectThumbnail={this.props.renderObjectThumbnail}
                 screenType={this.props.screenType}
                 eventsSheetHeight={this.props.eventsSheetHeight}
+                windowWidth={this.props.windowWidth}
               />
             </div>
           </div>
@@ -781,6 +783,7 @@ export default class ThemableEventsTree extends Component<
                 screenType={this.props.screenType}
                 eventsSheetHeight={this.props.eventsSheetHeight}
                 connectDragSource={connectDragSource}
+                windowWidth={this.props.windowWidth}
               />
               {this.state.draggedNode && (
                 <DropContainer

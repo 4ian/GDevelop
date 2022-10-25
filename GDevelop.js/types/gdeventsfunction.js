@@ -3,10 +3,8 @@ declare class gdEventsFunction {
   static Action: 0;
   static Condition: 1;
   static Expression: 2;
-  static StringExpression: 3;
-  static ExpressionAndCondition: 4;
-  static StringExpressionAndCondition: 5;
-  static ActionWithOperator: 6;
+  static ExpressionAndCondition: 3;
+  static ActionWithOperator: 4;
   constructor(): void;
   clone(): gdEventsFunction;
   setDescription(description: string): gdEventsFunction;
@@ -21,12 +19,12 @@ declare class gdEventsFunction {
   getGroup(): string;
   setGetterName(group: string): gdEventsFunction;
   getGetterName(): string;
+  setExpressionType(type: gdValueTypeMetadata): gdEventsFunction;
+  getExpressionType(): gdValueTypeMetadata;
   setPrivate(isPrivate: boolean): gdEventsFunction;
   isPrivate(): boolean;
   isAction(): boolean;
   isExpression(): boolean;
-  isNumberExpression(): boolean;
-  isStringExpression(): boolean;
   isCondition(): boolean;
   setFunctionType(type: EventsFunction_FunctionType): gdEventsFunction;
   getFunctionType(): EventsFunction_FunctionType;

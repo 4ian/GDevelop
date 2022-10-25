@@ -2286,9 +2286,7 @@ enum EventsFunction_FunctionType {
   "EventsFunction::Action",
   "EventsFunction::Condition",
   "EventsFunction::Expression",
-  "EventsFunction::StringExpression",
   "EventsFunction::ExpressionAndCondition",
-  "EventsFunction::StringExpressionAndCondition",
   "EventsFunction::ActionWithOperator"
 };
 
@@ -2308,12 +2306,12 @@ interface EventsFunction {
     [Const, Ref] DOMString GetGroup();
     [Ref] EventsFunction SetGetterName([Const] DOMString group);
     [Const, Ref] DOMString GetGetterName();
+    [Ref] EventsFunction SetExpressionType([Const, Ref] ValueTypeMetadata type);
+    [Const, Ref] ValueTypeMetadata GetExpressionType();
     [Ref] EventsFunction SetPrivate(boolean isPrivate);
     boolean IsPrivate();
     boolean IsAction();
     boolean IsExpression();
-    boolean IsNumberExpression();
-    boolean IsStringExpression();
     boolean IsCondition();
     [Ref] EventsFunction SetFunctionType(EventsFunction_FunctionType type);
     EventsFunction_FunctionType GetFunctionType();

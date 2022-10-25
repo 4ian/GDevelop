@@ -259,6 +259,11 @@ export function getMuiOverrides(
         backgroundColor: alternateCanvasBackgroundColor,
       },
     },
+    MuiAutocomplete: {
+      paper: {
+        backgroundColor: alternateCanvasBackgroundColor,
+      },
+    },
   };
 }
 

@@ -1061,6 +1061,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     })
                     .concat(
                       <SearchListItem
+                        id="project-manager-extension-search-or-create"
                         key={'extensions-search'}
                         primaryText={
                           <Trans>Create or search for new extensions</Trans>

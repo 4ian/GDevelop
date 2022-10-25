@@ -197,6 +197,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
           <ScrollView>
             <Line>
               <EventsFunctionPropertiesEditor
+                project={project}
                 eventsFunction={eventsFunction}
                 eventsBasedBehavior={eventsBasedBehavior}
                 eventsBasedObject={eventsBasedObject}

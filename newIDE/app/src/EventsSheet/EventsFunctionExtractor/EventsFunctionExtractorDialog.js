@@ -286,6 +286,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             ) : null}
           </Column>
           <EventsFunctionPropertiesEditor
+            project={project}
             eventsFunction={eventsFunction}
             eventsBasedBehavior={null}
             eventsBasedObject={null}

@@ -1147,11 +1147,13 @@ export const declareEventsFunctionParameters = (
 
   if (functionType === gd.EventsFunction.ExpressionAndCondition) {
     ((instructionOrExpression: any): gdMultipleInstructionMetadata).useStandardParameters(
-      eventsFunction ? eventsFunction.getExpressionType().getName() : 'string'
+      eventsFunction ? eventsFunction.getExpressionType().getName() : 'string',
+      eventsFunction ? eventsFunction.getExpressionType().getExtraInfo() : ''
     );
   } else if (functionType === gd.EventsFunction.ActionWithOperator) {
     ((instructionOrExpression: any): gdInstructionMetadata).useStandardOperatorParameters(
-      getterFunction ? getterFunction.getExpressionType().getName() : 'string'
+      getterFunction ? getterFunction.getExpressionType().getName() : 'string',
+      getterFunction ? getterFunction.getExpressionType().getExtraInfo() : ''
     );
   }
 

@@ -683,7 +683,7 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(
   for (std::size_t i = 0; i < instrInfos.parameters.size();
        ++i)  // Some conditions already have a "conditionInverted" parameter
   {
-    if (instrInfos.parameters[i].type == "conditionInverted")
+    if (instrInfos.parameters[i].GetType() == "conditionInverted")
       conditionAlreadyTakeCareOfInversion = true;
   }
   if (!conditionAlreadyTakeCareOfInversion && conditionInverted)
@@ -1100,17 +1100,17 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   gd::String argOutput;
 
   // Code only parameter type
-  if (metadata.type == "currentScene") {
+  if (metadata.GetType() == "currentScene") {
     argOutput = "runtimeScene";
   }
   // Code only parameter type
-  else if (metadata.type == "objectsContext") {
+  else if (metadata.GetType() == "objectsContext") {
     argOutput =
         "(typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext "
         ": runtimeScene)";
   }
   // Code only parameter type
-  else if (metadata.type == "eventsFunctionContext") {
+  else if (metadata.GetType() == "eventsFunctionContext") {
     argOutput =
         "(typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext "
         ": undefined)";

@@ -85,7 +85,7 @@ void ParameterMetadataTools::IterateOverParametersWithIndex(
     const gd::Expression& parameterValue =
         pNb < parameters.size() ? parameters[pNb].GetPlainString() : "";
     const gd::Expression& parameterValueOrDefault =
-        parameterValue.GetPlainString().empty() && parameterMetadata.optional
+        parameterValue.GetPlainString().empty() && parameterMetadata.IsOptional()
             ? Expression(parameterMetadata.GetDefaultValue())
             : parameterValue;
 

@@ -1200,8 +1200,8 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] InstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
-    [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type);
-    [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type);
+    [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type, [Const] optional DOMString typeExtraInfo = "");
+    [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type, [Const] optional DOMString typeExtraInfo = "");
 
     [Ref] InstructionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
     [Const, Ref] DOMString GetRequiredBaseObjectCapability();
@@ -1275,7 +1275,7 @@ interface MultipleInstructionMetadata {
     [Ref] MultipleInstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] MultipleInstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
 
-    [Ref] MultipleInstructionMetadata UseStandardParameters([Const] DOMString type);
+    [Ref] MultipleInstructionMetadata UseStandardParameters([Const] DOMString type,  [Const] optional DOMString typeExtraInfo = "");
 
     [Ref] MultipleInstructionMetadata SetHidden();
 

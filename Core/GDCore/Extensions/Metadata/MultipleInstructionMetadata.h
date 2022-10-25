@@ -116,9 +116,9 @@ class GD_CORE_API MultipleInstructionMetadata {
    * \see gd::InstructionMetadata::UseStandardOperatorParameters
    * \see gd::InstructionMetadata::UseStandardRelationalOperatorParameters
    */
-  MultipleInstructionMetadata &UseStandardParameters(const gd::String &type) {
-    if (condition) condition->UseStandardRelationalOperatorParameters(type);
-    if (action) action->UseStandardOperatorParameters(type);
+  MultipleInstructionMetadata &UseStandardParameters(const gd::String &type, const gd::String& typeExtraInfo = "") {
+    if (condition) condition->UseStandardRelationalOperatorParameters(type, typeExtraInfo);
+    if (action) action->UseStandardOperatorParameters(type, typeExtraInfo);
     return *this;
   }
 

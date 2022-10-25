@@ -536,8 +536,9 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     const setterName = gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(
       propertyName
     );
-    const propertyLabel =
-      property.getLabel() || i18n._(t`${propertyName} property`);
+    const propertyLabel = i18n._(
+      t`${property.getLabel() || propertyName} property`
+    );
 
     if (propertyType === 'String' || propertyType === 'Choice') {
       addObjectAndBehaviorParameters(
@@ -660,7 +661,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
         behaviorMetadata.addScopedCondition(
           gd.EventsBasedBehavior.getPropertyConditionName(propertyName),
           propertyLabel,
-          i18n._(t`Check the color ${propertyLabel}`),
+          i18n._(t`Check the color of ${propertyLabel}`),
           i18n._(t`Color ${propertyName}`),
           eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
           getExtensionIconUrl(extension),
@@ -740,8 +741,9 @@ export const declareObjectPropertiesInstructionAndExpressions = (
     const setterName = gd.ObjectCodeGenerator.getObjectPropertySetterName(
       propertyName
     );
-    const propertyLabel =
-      property.getLabel() || i18n._(t`${propertyName} property`);
+    const propertyLabel = i18n._(
+      t`${property.getLabel() || propertyName} property`
+    );
 
     if (propertyType === 'String' || propertyType === 'Choice') {
       addObjectParameter(
@@ -864,7 +866,7 @@ export const declareObjectPropertiesInstructionAndExpressions = (
         objectMetadata.addScopedCondition(
           gd.EventsBasedObject.getPropertyConditionName(propertyName),
           propertyLabel,
-          i18n._(t`Check the color ${propertyLabel}`),
+          i18n._(t`Check the color of ${propertyLabel}`),
           i18n._(t`Color ${propertyName}`),
           eventsBasedObject.getFullName() || eventsBasedObject.getName(),
           getExtensionIconUrl(extension),

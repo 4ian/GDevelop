@@ -235,6 +235,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
   React.useEffect(
     () => {
       changeStep(0);
+      currentStepFallbackStepIndex.current = 0;
     },
     [tutorial, changeStep]
   );

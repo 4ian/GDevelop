@@ -7,6 +7,7 @@ import { useInterval } from '../Utils/UseInterval';
 import { getElementAncestry } from './HTMLUtils';
 import {
   type InAppTutorialFlowFormattedStep,
+  type InAppTutorialFormattedTooltip,
   type EditorIdentifier,
 } from './InAppTutorialContext';
 import InAppTutorialElementHighlighter from './InAppTutorialElementHighlighter';
@@ -69,7 +70,7 @@ const getWrongEditorTooltip = (
   i18n: I18nType,
   expectedEditor: EditorIdentifier | null,
   onEndTutorial: () => void
-) => {
+): InAppTutorialFormattedTooltip | null => {
   if (!expectedEditor) return null;
   const translatedExpectedEditor =
     expectedEditor === 'Scene'

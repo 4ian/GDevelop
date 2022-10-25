@@ -22,6 +22,7 @@ type Props = {|
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   eventsBasedObject: ?gdEventsBasedObject,
+  eventsFunctionsContainer: gdEventsFunctionsContainer,
   onParametersOrGroupsUpdated: () => void,
   helpPagePath?: string,
   onConfigurationUpdated?: (whatChanged?: 'type') => void,
@@ -173,6 +174,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       onMoveBehaviorEventsParameter,
       onMoveObjectEventsParameter,
       getFunctionGroupNames,
+      eventsFunctionsContainer,
     } = this.props;
 
     return (
@@ -195,9 +197,11 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
           <ScrollView>
             <Line>
               <EventsFunctionPropertiesEditor
+                project={project}
                 eventsFunction={eventsFunction}
                 eventsBasedBehavior={eventsBasedBehavior}
                 eventsBasedObject={eventsBasedObject}
+                eventsFunctionsContainer={eventsFunctionsContainer}
                 helpPagePath={helpPagePath}
                 onConfigurationUpdated={onConfigurationUpdated}
                 renderConfigurationHeader={renderConfigurationHeader}
@@ -215,6 +219,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 eventsFunction={eventsFunction}
                 eventsBasedBehavior={eventsBasedBehavior}
                 eventsBasedObject={eventsBasedObject}
+                eventsFunctionsContainer={eventsFunctionsContainer}
                 onParametersUpdated={onParametersOrGroupsUpdated}
                 helpPagePath={helpPagePath}
                 freezeParameters={freezeParameters}

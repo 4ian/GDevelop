@@ -13,11 +13,13 @@ import Add from '@material-ui/icons/Add';
 type StringArrayEditorProps = {|
   extraInfo: Array<string>,
   setExtraInfo: (Array<string>) => void,
+  disabled?: boolean,
 |};
 
 const StringArrayEditor = ({
   extraInfo,
   setExtraInfo,
+  disabled,
 }: StringArrayEditorProps) => {
   const updateExtraInfo = () => setExtraInfo(extraInfo);
 
@@ -27,6 +29,7 @@ const StringArrayEditor = ({
         {extraInfo.map((item, index) => (
           <Line key={index} justifyContent="flex-end" expand>
             <SemiControlledTextField
+              disabled={disabled}
               commitOnBlur
               value={item}
               onChange={text => {
@@ -36,6 +39,7 @@ const StringArrayEditor = ({
               fullWidth
             />
             <IconButton
+              disabled={disabled}
               tooltip={t`Delete option`}
               onClick={() => {
                 extraInfo.splice(index, 1);
@@ -49,6 +53,7 @@ const StringArrayEditor = ({
 
         <Line justifyContent="flex-end" expand>
           <RaisedButton
+            disabled={disabled}
             primary
             onClick={() => {
               extraInfo.push('New Option');

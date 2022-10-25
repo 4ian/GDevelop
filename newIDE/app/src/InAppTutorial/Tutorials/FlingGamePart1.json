@@ -1,6 +1,7 @@
 {
   "id": "flingGamePart1",
   "editorSwitches": {
+    "GoToBuildSection": "Home",
     "OpenPropertiesManager": "Scene"
   },
   "endDialog": {
@@ -18,6 +19,48 @@
     ]
   },
   "flow": [
+    {
+      "id": "GoToBuildSection",
+      "elementToHighlightId": "#home-build-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#home-create-project-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Head over to the **Build section**"
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "#home-create-project-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#create-project-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's create a new project for this tutorial!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#create-project-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "[id^=tab-layout]:not([id^=tab-layout-events])"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's go!"
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
     {
       "id": "OpenPropertiesManager",
       "elementToHighlightId": "#main-toolbar-project-manager-button",

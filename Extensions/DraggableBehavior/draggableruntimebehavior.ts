@@ -15,6 +15,7 @@ namespace gdjs {
      */
     _draggedByDraggableManager: DraggableManager | null = null;
     _checkCollisionMask: boolean;
+    _justDropped = false;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -41,6 +42,7 @@ namespace gdjs {
     _endDrag() {
       if (this._draggedByDraggableManager) {
         this._draggedByDraggableManager.endDrag();
+        this._justDropped = true;
       }
       this._draggedByDraggableManager = null;
     }
@@ -56,9 +58,8 @@ namespace gdjs {
       const inputManager = instanceContainer.getGame().getInputManager();
 
       //Try mouse
-      const mouseDraggableManager = DraggableManager.getMouseManager(
-        instanceContainer
-      );
+      const mouseDraggableManager =
+        DraggableManager.getMouseManager(instanceContainer);
       if (
         inputManager.isMouseButtonPressed(0) &&
         !mouseDraggableManager.isDragging(this)
@@ -119,17 +120,22 @@ namespace gdjs {
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
-      const mouseDraggableManager = DraggableManager.getMouseManager(
-        instanceContainer
-      );
+      const mouseDraggableManager =
+        DraggableManager.getMouseManager(instanceContainer);
       mouseDraggableManager.leftPressedLastFrame = instanceContainer
         .getGame()
         .getInputManager()
         .isMouseButtonPressed(0);
+
+      this._justDropped = false;
     }
 
-    isDragged(instanceContainer: gdjs.RuntimeInstanceContainer): boolean {
+    isDragged(): boolean {
       return !!this._draggedByDraggableManager;
+    }
+
+    wasJustDropped(): boolean {
+      return this._justDropped;
     }
   }
 
@@ -186,9 +192,8 @@ namespace gdjs {
       if (!instanceContainer.touchDraggableManagers[touchId]) {
         //Create the shared manager if necessary.
         // @ts-ignore
-        instanceContainer.touchDraggableManagers[
-          touchId
-        ] = new TouchDraggableManager(instanceContainer, touchId);
+        instanceContainer.touchDraggableManagers[touchId] =
+          new TouchDraggableManager(instanceContainer, touchId);
       }
       // @ts-ignore
       return instanceContainer.touchDraggableManagers[touchId];

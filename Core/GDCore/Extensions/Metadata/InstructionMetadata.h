@@ -222,12 +222,12 @@ class GD_CORE_API InstructionMetadata {
 
   /**
    * \brief Add the default parameters for an instruction manipulating the
-   * specified type ("string", "number", "boolean") with the default operators.
+   * specified type ("string", "number") with the default operators.
    * 
    * \note The type "string" can be declined in several subtypes.
    * \see ParameterMetadata
    */
-  InstructionMetadata &UseStandardOperatorParameters(const gd::String &type);
+  InstructionMetadata &UseStandardOperatorParameters(const gd::String &type, const gd::String& typeExtraInfo = "");
 
   /**
    * \brief Add the default parameters for an instruction comparing the
@@ -237,7 +237,7 @@ class GD_CORE_API InstructionMetadata {
    * \see ParameterMetadata
    */
   InstructionMetadata &UseStandardRelationalOperatorParameters(
-      const gd::String &type);
+      const gd::String &type, const gd::String& typeExtraInfo = "");
 
   /**
    * \brief Mark the instruction as an object instruction. Automatically called

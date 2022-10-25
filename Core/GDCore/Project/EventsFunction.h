@@ -12,6 +12,7 @@
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/String.h"
+#include "GDCore/Extensions/Metadata/ValueTypeMetadata.h"
 // TODO: In theory (for separation of concerns between Project and
 // extensions/events), this include should be removed and gd::ParameterMetadata
 // replaced by a new gd::EventsFunctionParameter class.
@@ -131,13 +132,24 @@ class GD_CORE_API EventsFunction {
     return *this;
   }
 
+  /**
+   * \brief Set the type of the expression
+   */
+  EventsFunction& SetExpressionType(const gd::ValueTypeMetadata& type) {
+    expressionType = type;
+    return *this;
+  }
+
+  /**
+   * \brief Get the type of the expression
+   */
+  const gd::ValueTypeMetadata& GetExpressionType() const { return expressionType; }
+
   enum FunctionType {
       Action,
       Condition,
       Expression,
-      StringExpression,
       ExpressionAndCondition,
-      StringExpressionAndCondition,
       ActionWithOperator };
 
   /**
@@ -167,28 +179,8 @@ class GD_CORE_API EventsFunction {
    * Note that a function can be both an expression and a condition.
    */
   bool IsExpression() const {
-    return IsNumberExpression() ||
-           IsStringExpression();
- }
-
-  /**
-   * \brief Return true if the function is a number expression.
-   * 
-   * Note that a function can be both an expression and a condition.
-   */
-  bool IsNumberExpression() const {
     return functionType == gd::EventsFunction::Expression ||
            functionType == gd::EventsFunction::ExpressionAndCondition;
- }
-
-  /**
-   * \brief Return true if the function is a string expression.
-   * 
-   * Note that a function can be both an expression and a condition.
-   */
-  bool IsStringExpression() const {
-    return functionType == gd::EventsFunction::StringExpression ||
-           functionType == gd::EventsFunction::StringExpressionAndCondition;
  }
 
   /**
@@ -198,8 +190,7 @@ class GD_CORE_API EventsFunction {
    */
   bool IsCondition() const {
     return functionType == gd::EventsFunction::Condition ||
-           functionType == gd::EventsFunction::ExpressionAndCondition ||
-           functionType == gd::EventsFunction::StringExpressionAndCondition;
+           functionType == gd::EventsFunction::ExpressionAndCondition;
  }
 
   /**
@@ -288,6 +279,7 @@ class GD_CORE_API EventsFunction {
   gd::String sentence;
   gd::String group;
   gd::String getterName;
+  gd::ValueTypeMetadata expressionType;
   gd::EventsList events;
   FunctionType functionType;
   std::vector<gd::ParameterMetadata> parameters;

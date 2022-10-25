@@ -562,20 +562,20 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionReturn(
     const gd::EventsFunction& eventsFunction) {
+  // We don't use IsCondition because ExpressionAndCondition event functions
+  // don't need a boolean function. They use the expression function with a
+  // relational operator.
   if (eventsFunction.GetFunctionType() == gd::EventsFunction::Condition) {
     return "return !!eventsFunctionContext.returnValue;";
-  } else if (eventsFunction.GetFunctionType() ==
-             gd::EventsFunction::Expression
-          || eventsFunction.GetFunctionType() ==
-             gd::EventsFunction::ExpressionAndCondition) {
-    return "return Number(eventsFunctionContext.returnValue) || 0;";
-  } else if (eventsFunction.GetFunctionType() ==
-             gd::EventsFunction::StringExpression
-          || eventsFunction.GetFunctionType() ==
-             gd::EventsFunction::StringExpressionAndCondition) {
-    return "return \"\" + eventsFunctionContext.returnValue;";
+  } else if (eventsFunction.IsExpression()) {
+    if (eventsFunction.GetExpressionType().IsNumber()) {
+      return "return Number(eventsFunctionContext.returnValue) || 0;";
+    } else {
+      // Default on string because it's more likely that future expression
+      // types are strings.
+      return "return \"\" + eventsFunctionContext.returnValue;";
+    }
   }
-
   return "return;";
 }
 

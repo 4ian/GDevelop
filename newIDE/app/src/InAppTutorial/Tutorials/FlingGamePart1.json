@@ -264,7 +264,11 @@
     },
     {
       "nextStepTrigger": {
-        "clickOnTooltipButton": "I'm done"
+        "clickOnTooltipButton": {
+          "messageByLocale": {
+            "en": "I'm done"
+          }
+        }
       },
       "tooltip": {
         "standalone": true,

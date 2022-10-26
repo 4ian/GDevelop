@@ -504,9 +504,26 @@ const InAppTutorialOrchestrator = React.forwardRef<
         description,
       };
     }
+
+    let formattedStepTrigger;
+    const stepTrigger = currentStep.nextStepTrigger;
+    if (stepTrigger && stepTrigger.clickOnTooltipButton) {
+      const formattedButtonLabel = translateAndInterpolateText({
+        text: stepTrigger.clickOnTooltipButton,
+        data,
+        i18n,
+        project,
+      });
+      formattedStepTrigger = formattedButtonLabel
+        ? {
+            clickOnTooltipButton: formattedButtonLabel,
+          }
+        : undefined;
+    }
     const formattedStep: InAppTutorialFlowFormattedStep = {
       ...flow[currentStepIndex],
       tooltip: formattedTooltip,
+      nextStepTrigger: formattedStepTrigger,
     };
 
     return (

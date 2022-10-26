@@ -31,6 +31,13 @@ export type InAppTutorialFlowStepTrigger =
   | {| valueHasChanged: true |}
   | {| instanceAddedOnScene: string |}
   | {| previewLaunched: true |}
+  | {| clickOnTooltipButton: TranslatedText |};
+
+export type InAppTutorialFlowStepFormattedTrigger =
+  | InAppTutorialFlowStepDOMChangeTrigger
+  | {| valueHasChanged: true |}
+  | {| instanceAddedOnScene: string |}
+  | {| previewLaunched: true |}
   | {| clickOnTooltipButton: string |};
 
 export type InAppTutorialFlowStep = {|
@@ -54,6 +61,7 @@ export type InAppTutorialFlowStep = {|
 export type InAppTutorialFlowFormattedStep = {|
   ...InAppTutorialFlowStep,
   tooltip?: InAppTutorialFormattedTooltip,
+  nextStepTrigger?: InAppTutorialFlowStepFormattedTrigger,
 |};
 
 export type EditorIdentifier = 'Scene' | 'EventsSheet' | 'Home';

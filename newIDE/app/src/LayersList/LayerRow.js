@@ -68,6 +68,7 @@ const LayerRow = ({
     () => makeDragSourceAndDropTarget('layers-list'),
     []
   );
+  const isBaseLayer = !layerName;
   return (
     <I18n>
       {({ i18n }) => (
@@ -103,7 +104,9 @@ const LayerRow = ({
                   <TreeTableCell expand>
                     <TextField
                       margin="none"
-                      defaultValue={layerName || i18n._(t`Base layer`)}
+                      defaultValue={
+                        isBaseLayer ? i18n._(t`Base layer`) : layerName
+                      }
                       id={layerName}
                       errorText={
                         nameError ? (
@@ -112,7 +115,7 @@ const LayerRow = ({
                           undefined
                         )
                       }
-                      disabled={!layerName}
+                      disabled={isBaseLayer}
                       onBlur={onBlur}
                       fullWidth
                     />
@@ -145,7 +148,7 @@ const LayerRow = ({
                           { type: 'separator' },
                           {
                             label: i18n._(t`Delete`),
-                            enabled: !!layerName,
+                            enabled: !isBaseLayer,
                             click: onRemove,
                           },
                         ]}
@@ -192,7 +195,7 @@ const LayerRow = ({
                         <IconButton
                           size="small"
                           onClick={onRemove}
-                          disabled={!layerName}
+                          disabled={isBaseLayer}
                           tooltip={t`Delete the layer`}
                         >
                           <Delete />

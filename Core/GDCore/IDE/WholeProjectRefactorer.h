@@ -208,6 +208,21 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newPropertyName);
 
   /**
+   * \brief Refactor the project **before** a property of a behavior is
+   * renamed.
+   *
+   * \warning Do the renaming of the specified property after calling this.
+   * This is because the property is expected to have its old name for the
+   * refactoring.
+   */
+  static void RenameEventsBasedBehaviorSharedProperty(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& oldPropertyName,
+      const gd::String& newPropertyName);
+
+  /**
    * \brief Refactor the project **before** a property of an object is
    * renamed.
    *

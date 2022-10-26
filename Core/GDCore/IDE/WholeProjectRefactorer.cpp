@@ -835,6 +835,49 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
   }
 }
 
+void WholeProjectRefactorer::RenameEventsBasedBehaviorSharedProperty(
+    gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+    const gd::EventsBasedBehavior& eventsBasedBehavior,
+    const gd::String& oldPropertyName,
+    const gd::String& newPropertyName) {
+  auto& properties = eventsBasedBehavior.GetPropertyDescriptors();
+  if (!properties.Has(oldPropertyName)) return;
+
+  // Properties that represent primitive values will be used through
+  // their related actions/conditions/expressions. Rename these.
+
+  // Order is important: we first rename the expressions then the
+  // instructions, to avoid being unable to fetch the metadata (the types of
+  // parameters) of instructions after they are renamed.
+  gd::ExpressionsRenamer expressionRenamer =
+      gd::ExpressionsRenamer(project.GetCurrentPlatform());
+  expressionRenamer.SetReplacedFreeExpression(
+      EventsBasedBehavior::GetPropertyExpressionName(oldPropertyName),
+      EventsBasedBehavior::GetPropertyExpressionName(newPropertyName));
+  ExposeProjectEvents(project, expressionRenamer);
+
+  gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
+      project,
+      GetEventsFunctionFullType(
+          eventsFunctionsExtension.GetName(),
+          EventsBasedBehavior::GetPropertyActionName(oldPropertyName)),
+      GetEventsFunctionFullType(
+          eventsFunctionsExtension.GetName(),
+          EventsBasedBehavior::GetPropertyActionName(newPropertyName)));
+  ExposeProjectEvents(project, actionRenamer);
+
+  gd::InstructionsTypeRenamer conditionRenamer = gd::InstructionsTypeRenamer(
+      project,
+      GetEventsFunctionFullType(
+          eventsFunctionsExtension.GetName(),
+          EventsBasedBehavior::GetPropertyConditionName(oldPropertyName)),
+      GetEventsFunctionFullType(
+          eventsFunctionsExtension.GetName(),
+          EventsBasedBehavior::GetPropertyConditionName(newPropertyName)));
+  ExposeProjectEvents(project, conditionRenamer);
+}
+
 void WholeProjectRefactorer::RenameEventsBasedObjectProperty(
     gd::Project& project,
     const gd::EventsFunctionsExtension& eventsFunctionsExtension,

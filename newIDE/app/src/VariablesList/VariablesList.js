@@ -300,12 +300,14 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     props.historyHandler
       ? props.historyHandler.undo()
       : setHistory(undo(history, props.variablesContainer));
+    setSelectedNodes([]);
   };
 
   const _redo = () => {
     props.historyHandler
       ? props.historyHandler.redo()
       : setHistory(redo(history, props.variablesContainer));
+    setSelectedNodes([]);
   };
   const _canUndo = (): boolean =>
     props.historyHandler ? props.historyHandler.canUndo() : canUndo(history);

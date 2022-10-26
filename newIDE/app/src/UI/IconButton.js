@@ -39,7 +39,7 @@ type Props = {|
     transform?: string,
     transition?: string,
     opacity?: number,
-    borderRadius?: number,
+    +borderRadius?: number,
     margin?: number,
     marginRight?: number,
     marginLeft?: number,

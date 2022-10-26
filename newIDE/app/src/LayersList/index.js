@@ -1,10 +1,9 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
-import React, { Component } from 'react';
-import { SortableContainer, SortableElement } from 'react-sortable-hoc';
+import * as React from 'react';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { mapReverseFor } from '../Utils/MapFor';
-import LayerRow from './LayerRow';
+import LayerRow, { styles } from './LayerRow';
 import BackgroundColorRow from './BackgroundColorRow';
 import { Column, Line } from '../UI/Grid';
 import Add from '@material-ui/icons/Add';
@@ -20,17 +19,18 @@ import Background from '../UI/Background';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import useForceUpdate from '../Utils/UseForceUpdate';
-
-const SortableLayerRow = SortableElement(LayerRow);
+import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
+import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 
 type LayersListBodyState = {|
   nameErrors: { [string]: boolean },
 |};
 
-class LayersListBody extends Component<*, LayersListBodyState> {
+class LayersListBody extends React.Component<*, LayersListBodyState> {
   state = {
     nameErrors: {},
   };
+  draggedLayerIndex: number | null = null;
 
   _onLayerModified = () => {
     if (this.props.unsavedChanges)
@@ -38,8 +38,24 @@ class LayersListBody extends Component<*, LayersListBodyState> {
     this.forceUpdate();
   };
 
+  _onDropLayer = (targetIndex: number) => {
+    const { draggedLayerIndex } = this;
+    if (draggedLayerIndex === null) return;
+
+    if (targetIndex !== draggedLayerIndex) {
+      this.props.layersContainer.moveLayer(
+        draggedLayerIndex,
+        targetIndex < draggedLayerIndex ? targetIndex + 1 : targetIndex
+      );
+      this._onLayerModified();
+    }
+    this.draggedLayerIndex = null;
+  };
+
   render() {
     const { layersContainer, onEditEffects, onEdit, width } = this.props;
+
+    const DropTarget = makeDropTarget('layers-list');
 
     const layersCount = layersContainer.getLayersCount();
     const containerLayersList = mapReverseFor(0, layersCount, i => {
@@ -48,8 +64,7 @@ class LayersListBody extends Component<*, LayersListBodyState> {
       const isLightingLayer = layer.isLightingLayer();
 
       return (
-        <SortableLayerRow
-          index={layersCount - 1 - i}
+        <LayerRow
           key={'layer-' + layerName}
           layer={layer}
           layerName={layerName}
@@ -58,8 +73,12 @@ class LayersListBody extends Component<*, LayersListBodyState> {
           effectsCount={layer.getEffects().getEffectsCount()}
           onEditEffects={() => onEditEffects(layer)}
           onEdit={() => onEdit(layer)}
+          onBeginDrag={() => {
+            this.draggedLayerIndex = i;
+          }}
+          onDrop={() => this._onDropLayer(i)}
           onBlur={event => {
-            const newName = event.target.value;
+            const newName = event.currentTarget.value;
             if (layerName === newName) return;
 
             let success = true;
@@ -98,18 +117,41 @@ class LayersListBody extends Component<*, LayersListBodyState> {
     });
 
     return (
-      <Column noMargin expand>
-        {containerLayersList}
-        <BackgroundColorRow
-          layout={layersContainer}
-          onBackgroundColorChanged={() => this._onLayerModified()}
-        />
-      </Column>
+      <ThemeConsumer>
+        {gdevelopTheme => (
+          <Column noMargin expand>
+            {containerLayersList}
+            <DropTarget
+              canDrop={() => true}
+              drop={() => {
+                this._onDropLayer(-1);
+              }}
+            >
+              {({ connectDropTarget, isOver, canDrop }) =>
+                connectDropTarget(
+                  <div>
+                    {isOver && (
+                      <div
+                        style={{
+                          ...styles.dropIndicator,
+                          outlineColor: gdevelopTheme.dropIndicator.canDrop,
+                        }}
+                      />
+                    )}
+                    <BackgroundColorRow
+                      layout={layersContainer}
+                      onBackgroundColorChanged={() => this._onLayerModified()}
+                    />
+                  </div>
+                )
+              }
+            </DropTarget>
+          </Column>
+        )}
+      </ThemeConsumer>
     );
   }
 }
-
-const SortableLayersListBody = SortableContainer(LayersListBody);
 
 type Props = {|
   project: gdProject,
@@ -195,23 +237,13 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
             {({ width }) => (
               // TODO: The list is costly to render when there are many layers, consider
               // using SortableVirtualizedItemList.
-              <SortableLayersListBody
+              <LayersListBody
                 key={listKey}
                 layersContainer={props.layersContainer}
                 onEditEffects={props.onEditLayerEffects}
                 onEdit={props.onEditLayer}
                 onRemoveLayer={props.onRemoveLayer}
                 onRenameLayer={props.onRenameLayer}
-                onSortEnd={({ oldIndex, newIndex }) => {
-                  const layersCount = props.layersContainer.getLayersCount();
-                  props.layersContainer.moveLayer(
-                    layersCount - 1 - oldIndex,
-                    layersCount - 1 - newIndex
-                  );
-                  onLayerModified();
-                }}
-                helperClass="sortable-helper"
-                useDragHandle
                 unsavedChanges={props.unsavedChanges}
                 width={width}
               />

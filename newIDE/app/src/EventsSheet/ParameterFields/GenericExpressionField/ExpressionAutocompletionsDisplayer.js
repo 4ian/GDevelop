@@ -14,6 +14,7 @@ import { type ParameterRenderingServiceType } from '../ParameterFieldCommons';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { Column, Line, Spacer } from '../../../UI/Grid';
 import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
+import { useTheme } from '@material-ui/styles';
 
 const defaultTextStyle = {
   // Break words if they are too long to fit on a single line.
@@ -273,6 +274,8 @@ export default function ExpressionAutocompletionsDisplayer({
   onScroll,
   parameterRenderingService,
 }: Props) {
+  const muiTheme = useTheme();
+
   const scrollView = React.useRef((null: ?ScrollViewInterface));
   const selectedAutocompletionElement = React.useRef(
     (null: ?React$Component<any, any>)
@@ -303,7 +306,14 @@ export default function ExpressionAutocompletionsDisplayer({
             false
           }
         >
-          <Paper variant="outlined" square style={styles.container}>
+          <Paper
+            variant="outlined"
+            square
+            style={{
+              ...styles.container,
+              backgroundColor: muiTheme.palette.background.alternate,
+            }}
+          >
             <ScrollView ref={scrollView} onScroll={onScroll}>
               {expressionAutocompletions.map(
                 (expressionAutocompletion, index) => {
@@ -365,7 +375,14 @@ export default function ExpressionAutocompletionsDisplayer({
             expressionAutocompletions[selectedCompletionIndex].kind ===
               'Expression' &&
             !expressionAutocompletions[selectedCompletionIndex].isExact && (
-              <Paper variant="outlined" square style={styles.container}>
+              <Paper
+                variant="outlined"
+                square
+                style={{
+                  ...styles.container,
+                  backgroundColor: muiTheme.palette.background.alternate,
+                }}
+              >
                 <ScrollView autoHideScrollbar>
                   <Column>
                     <Line noMargin expand alignItems="center">

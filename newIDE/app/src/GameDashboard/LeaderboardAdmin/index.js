@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
+import { useTheme } from '@material-ui/styles';
 
 import Avatar from '@material-ui/core/Avatar';
 import Divider from '@material-ui/core/Divider';
@@ -183,6 +184,7 @@ export const LeaderboardAdmin = ({
   leaderboardIdToSelectAtOpening,
 }: Props) => {
   const isOnline = useOnlineStatus();
+  const muiTheme = useTheme();
   const windowWidth = useResponsiveWindowWidth();
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
     false
@@ -839,7 +841,13 @@ export const LeaderboardAdmin = ({
         <>
           <ResponsiveLineStackLayout noMargin expand noColumnMargin>
             <div style={styles.leftColumn}>
-              <Paper elevation={5} style={styles.leaderboardConfigurationPaper}>
+              <Paper
+                elevation={5}
+                style={{
+                  ...styles.leaderboardConfigurationPaper,
+                  backgroundColor: muiTheme.palette.background.alternate,
+                }}
+              >
                 <Column>
                   <Line>
                     {currentLeaderboard && leaderboards ? (

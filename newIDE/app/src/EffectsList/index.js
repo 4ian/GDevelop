@@ -45,6 +45,8 @@ import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
+const DragSourceAndDropTarget = makeDragSourceAndDropTarget('effects-list');
+
 const styles = {
   rowContainer: {
     display: 'flex',
@@ -93,10 +95,6 @@ export default function EffectsList(props: Props) {
   const setShowEffectParameterNames = preferences.setShowEffectParameterNames;
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
     {}
-  );
-  const DragSourceAndDropTarget = React.useMemo(
-    () => makeDragSourceAndDropTarget('effects-list'),
-    []
   );
 
   const allEffectMetadata = React.useMemo(

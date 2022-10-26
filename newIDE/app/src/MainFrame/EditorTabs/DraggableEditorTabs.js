@@ -16,6 +16,10 @@ import {
   type ClosableTabProps,
 } from '../../UI/ClosableTabs';
 
+const DragSourceAndDropTarget = makeDragSourceAndDropTarget<EditorTab>(
+  'draggable-closable-tab'
+);
+
 type DraggableEditorTabsProps = {|
   hideLabels?: boolean,
   editorTabs: EditorTabsState,
@@ -96,10 +100,6 @@ export function DraggableClosableTab({
   onBeginDrag,
   onDrop,
 }: DraggableClosableTabProps) {
-  const DragSourceAndDropTarget = makeDragSourceAndDropTarget<EditorTab>(
-    'draggable-closable-tab'
-  );
-
   return (
     <ScreenTypeMeasurer>
       {screenType => (

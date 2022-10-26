@@ -1,10 +1,9 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
-import React, { Component } from 'react';
-import { SortableContainer, SortableElement } from 'react-sortable-hoc';
+import * as React from 'react';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { mapReverseFor } from '../Utils/MapFor';
-import LayerRow from './LayerRow';
+import LayerRow, { styles } from './LayerRow';
 import BackgroundColorRow from './BackgroundColorRow';
 import { Column, Line } from '../UI/Grid';
 import Add from '@material-ui/icons/Add';
@@ -20,96 +19,149 @@ import Background from '../UI/Background';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
+import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
-const SortableLayerRow = SortableElement(LayerRow);
+const DropTarget = makeDropTarget('layers-list');
 
-type LayersListBodyState = {|
-  nameErrors: { [string]: boolean },
+type LayersListBodyProps = {|
+  layersContainer: gdLayout,
+  unsavedChanges?: ?UnsavedChanges,
+  onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
+  onRenameLayer: (
+    oldName: string,
+    newName: string,
+    cb: (done: boolean) => void
+  ) => void,
+  onEditEffects: (layer: ?gdLayer) => void,
+  onEdit: (layer: ?gdLayer) => void,
+  width: number,
 |};
 
-class LayersListBody extends Component<*, LayersListBodyState> {
-  state = {
-    nameErrors: {},
+const LayersListBody = (props: LayersListBodyProps) => {
+  const forceUpdate = useForceUpdate();
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const [nameErrors, setNameErrors] = React.useState<{
+    [key: string]: React.Node,
+  }>({});
+  const draggedLayerIndexRef = React.useRef<number | null>(null);
+
+  const {
+    layersContainer,
+    onEditEffects,
+    onEdit,
+    width,
+    onRenameLayer,
+    onRemoveLayer,
+    unsavedChanges,
+  } = props;
+
+  const onLayerModified = () => {
+    if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+    forceUpdate();
   };
 
-  _onLayerModified = () => {
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
-    this.forceUpdate();
-  };
+  const onDropLayer = (targetIndex: number) => {
+    const { current: draggedLayerIndex } = draggedLayerIndexRef;
+    if (draggedLayerIndex === null) return;
 
-  render() {
-    const { layersContainer, onEditEffects, onEdit, width } = this.props;
-
-    const layersCount = layersContainer.getLayersCount();
-    const containerLayersList = mapReverseFor(0, layersCount, i => {
-      const layer = layersContainer.getLayerAt(i);
-      const layerName = layer.getName();
-      const isLightingLayer = layer.isLightingLayer();
-
-      return (
-        <SortableLayerRow
-          index={layersCount - 1 - i}
-          key={'layer-' + layerName}
-          layer={layer}
-          layerName={layerName}
-          isLightingLayer={isLightingLayer}
-          nameError={this.state.nameErrors[layerName]}
-          effectsCount={layer.getEffects().getEffectsCount()}
-          onEditEffects={() => onEditEffects(layer)}
-          onEdit={() => onEdit(layer)}
-          onBlur={event => {
-            const newName = event.target.value;
-            if (layerName === newName) return;
-
-            let success = true;
-            if (layersContainer.hasLayerNamed(newName)) {
-              success = false;
-            } else {
-              this.props.onRenameLayer(layerName, newName, doRename => {
-                if (doRename)
-                  layersContainer.getLayer(layerName).setName(newName);
-              });
-            }
-
-            this.setState({
-              nameErrors: {
-                ...this.state.nameErrors,
-                [layerName]: !success,
-              },
-            });
-          }}
-          onRemove={() => {
-            this.props.onRemoveLayer(layerName, doRemove => {
-              if (!doRemove) return;
-
-              layersContainer.removeLayer(layerName);
-              this._onLayerModified();
-            });
-          }}
-          isVisible={layer.getVisibility()}
-          onChangeVisibility={visible => {
-            layer.setVisibility(visible);
-            this._onLayerModified();
-          }}
-          width={width}
-        />
+    if (targetIndex !== draggedLayerIndex) {
+      layersContainer.moveLayer(
+        draggedLayerIndex,
+        targetIndex < draggedLayerIndex ? targetIndex + 1 : targetIndex
       );
-    });
+      onLayerModified();
+    }
+    draggedLayerIndexRef.current = null;
+  };
+
+  const layersCount = layersContainer.getLayersCount();
+  const containerLayersList = mapReverseFor(0, layersCount, i => {
+    const layer = layersContainer.getLayerAt(i);
+    const layerName = layer.getName();
 
     return (
-      <Column noMargin expand>
-        {containerLayersList}
-        <BackgroundColorRow
-          layout={layersContainer}
-          onBackgroundColorChanged={() => this._onLayerModified()}
-        />
-      </Column>
-    );
-  }
-}
+      <LayerRow
+        key={'layer-' + layer.ptr}
+        layer={layer}
+        nameError={nameErrors[layerName]}
+        effectsCount={layer.getEffects().getEffectsCount()}
+        onEditEffects={() => onEditEffects(layer)}
+        onEdit={() => onEdit(layer)}
+        onBeginDrag={() => {
+          draggedLayerIndexRef.current = i;
+        }}
+        onDrop={() => onDropLayer(i)}
+        onBlur={newName => {
+          setNameErrors(currentValue => ({
+            ...currentValue,
+            [layerName]: null,
+          }));
 
-const SortableLayersListBody = SortableContainer(LayersListBody);
+          if (layerName === newName) return;
+
+          const isNameAlreadyTaken = layersContainer.hasLayerNamed(newName);
+          if (isNameAlreadyTaken) {
+            setNameErrors(currentValue => ({
+              ...currentValue,
+              [layerName]: <Trans>The name {newName} is already taken</Trans>,
+            }));
+          } else {
+            onRenameLayer(layerName, newName, doRename => {
+              if (doRename)
+                layersContainer.getLayer(layerName).setName(newName);
+            });
+          }
+        }}
+        onRemove={() => {
+          onRemoveLayer(layerName, doRemove => {
+            if (!doRemove) return;
+
+            layersContainer.removeLayer(layerName);
+            onLayerModified();
+          });
+        }}
+        isVisible={layer.getVisibility()}
+        onChangeVisibility={visible => {
+          layer.setVisibility(visible);
+          onLayerModified();
+        }}
+        width={width}
+      />
+    );
+  });
+
+  return (
+    <Column noMargin expand>
+      {containerLayersList}
+      <DropTarget
+        canDrop={() => true}
+        drop={() => {
+          onDropLayer(-1);
+        }}
+      >
+        {({ connectDropTarget, isOver, canDrop }) =>
+          connectDropTarget(
+            <div>
+              {isOver && (
+                <div
+                  style={{
+                    ...styles.dropIndicator,
+                    outlineColor: gdevelopTheme.dropIndicator.canDrop,
+                  }}
+                />
+              )}
+              <BackgroundColorRow
+                layout={layersContainer}
+                onBackgroundColorChanged={onLayerModified}
+              />
+            </div>
+          )
+        }
+      </DropTarget>
+    </Column>
+  );
+};
 
 type Props = {|
   project: gdProject,
@@ -195,23 +247,13 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
             {({ width }) => (
               // TODO: The list is costly to render when there are many layers, consider
               // using SortableVirtualizedItemList.
-              <SortableLayersListBody
+              <LayersListBody
                 key={listKey}
                 layersContainer={props.layersContainer}
                 onEditEffects={props.onEditLayerEffects}
                 onEdit={props.onEditLayer}
                 onRemoveLayer={props.onRemoveLayer}
                 onRenameLayer={props.onRenameLayer}
-                onSortEnd={({ oldIndex, newIndex }) => {
-                  const layersCount = props.layersContainer.getLayersCount();
-                  props.layersContainer.moveLayer(
-                    layersCount - 1 - oldIndex,
-                    layersCount - 1 - newIndex
-                  );
-                  onLayerModified();
-                }}
-                helperClass="sortable-helper"
-                useDragHandle
                 unsavedChanges={props.unsavedChanges}
                 width={width}
               />

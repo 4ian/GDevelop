@@ -341,7 +341,9 @@ export const declareInstructionOrExpressionMetadata = (
     }
   } else if (functionType === gd.EventsFunction.ExpressionAndCondition) {
     return extension.addExpressionAndCondition(
-      eventsFunction.getExpressionType().isNumber() ? 'number' : 'string',
+      gd.ValueTypeMetadata.getExpressionValueType(
+        eventsFunction.getExpressionType().getName()
+      ),
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
       removeTrailingDot(eventsFunction.getDescription()) ||
@@ -377,7 +379,11 @@ export const declareInstructionOrExpressionMetadata = (
     if (getterFunction) {
       action
         .getCodeExtraInformation()
-        .setManipulatedType(getterFunction.getExpressionType().getName())
+        .setManipulatedType(
+          gd.ValueTypeMetadata.getExpressionValueType(
+            getterFunction.getExpressionType().getName()
+          )
+        )
         // TODO Use an helper method
         .setGetter(
           getFreeFunctionCodeName(eventsFunctionsExtension, getterFunction)
@@ -473,7 +479,9 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
     }
   } else if (functionType === gd.EventsFunction.ExpressionAndCondition) {
     return behaviorMetadata.addExpressionAndCondition(
-      eventsFunction.getExpressionType().isNumber() ? 'number' : 'string',
+      gd.ValueTypeMetadata.getExpressionValueType(
+        eventsFunction.getExpressionType().getName()
+      ),
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
       removeTrailingDot(eventsFunction.getDescription()) ||
@@ -512,7 +520,11 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
     if (getterFunction) {
       action
         .getCodeExtraInformation()
-        .setManipulatedType(getterFunction.getExpressionType().getName())
+        .setManipulatedType(
+          gd.ValueTypeMetadata.getExpressionValueType(
+            getterFunction.getExpressionType().getName()
+          )
+        )
         .setGetter(getterFunction.getName());
     }
     return action;
@@ -587,7 +599,9 @@ export const declareObjectInstructionOrExpressionMetadata = (
     }
   } else if (functionType === gd.EventsFunction.ExpressionAndCondition) {
     return objectMetadata.addExpressionAndCondition(
-      eventsFunction.getExpressionType().isNumber() ? 'number' : 'string',
+      gd.ValueTypeMetadata.getExpressionValueType(
+        eventsFunction.getExpressionType().getName()
+      ),
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
       removeTrailingDot(eventsFunction.getDescription()) ||
@@ -626,7 +640,11 @@ export const declareObjectInstructionOrExpressionMetadata = (
     if (getterFunction) {
       action
         .getCodeExtraInformation()
-        .setManipulatedType(getterFunction.getExpressionType().getName())
+        .setManipulatedType(
+          gd.ValueTypeMetadata.getExpressionValueType(
+            getterFunction.getExpressionType().getName()
+          )
+        )
         .setGetter(getterFunction.getName());
     }
     return action;

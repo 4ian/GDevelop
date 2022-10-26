@@ -514,6 +514,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_TypeIsObject TypeIsObject
 #define STATIC_TypeIsBehavior TypeIsBehavior
 #define STATIC_TypeIsExpression TypeIsExpression
+#define STATIC_GetExpressionValueType GetExpressionValueType
 #define STATIC_Get Get
 #define STATIC_GetAllUseless GetAllUseless
 #define STATIC_RemoveAllUseless RemoveAllUseless

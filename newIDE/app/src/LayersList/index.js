@@ -20,138 +20,148 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
-import ThemeConsumer from '../UI/Theme/ThemeConsumer';
+import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
-type LayersListBodyState = {|
-  nameErrors: { [string]: boolean },
+type LayersListBodyProps = {|
+  layersContainer: gdLayout,
+  unsavedChanges?: ?UnsavedChanges,
+  onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
+  onRenameLayer: (
+    oldName: string,
+    newName: string,
+    cb: (done: boolean) => void
+  ) => void,
+  onEditEffects: (layer: ?gdLayer) => void,
+  onEdit: (layer: ?gdLayer) => void,
+  width: number,
 |};
 
-class LayersListBody extends React.Component<*, LayersListBodyState> {
-  state = {
-    nameErrors: {},
-  };
-  draggedLayerIndex: number | null = null;
+const LayersListBody = (props: LayersListBodyProps) => {
+  const forceUpdate = useForceUpdate();
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const [nameErrors, setNameErrors] = React.useState<{
+    [key: string]: boolean,
+  }>({});
+  const draggedLayerIndexRef = React.useRef<number | null>(null);
 
-  _onLayerModified = () => {
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
-    this.forceUpdate();
+  const {
+    layersContainer,
+    onEditEffects,
+    onEdit,
+    width,
+    onRenameLayer,
+    onRemoveLayer,
+    unsavedChanges,
+  } = props;
+
+  const onLayerModified = () => {
+    if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+    forceUpdate();
   };
 
-  _onDropLayer = (targetIndex: number) => {
-    const { draggedLayerIndex } = this;
+  const onDropLayer = (targetIndex: number) => {
+    const { current: draggedLayerIndex } = draggedLayerIndexRef;
     if (draggedLayerIndex === null) return;
 
     if (targetIndex !== draggedLayerIndex) {
-      this.props.layersContainer.moveLayer(
+      layersContainer.moveLayer(
         draggedLayerIndex,
         targetIndex < draggedLayerIndex ? targetIndex + 1 : targetIndex
       );
-      this._onLayerModified();
+      onLayerModified();
     }
-    this.draggedLayerIndex = null;
+    draggedLayerIndexRef.current = null;
   };
 
-  render() {
-    const { layersContainer, onEditEffects, onEdit, width } = this.props;
+  const DropTarget = React.useMemo(() => makeDropTarget('layers-list'), []);
 
-    const DropTarget = makeDropTarget('layers-list');
-
-    const layersCount = layersContainer.getLayersCount();
-    const containerLayersList = mapReverseFor(0, layersCount, i => {
-      const layer = layersContainer.getLayerAt(i);
-      const layerName = layer.getName();
-      const isLightingLayer = layer.isLightingLayer();
-
-      return (
-        <LayerRow
-          key={'layer-' + layerName}
-          layer={layer}
-          layerName={layerName}
-          isLightingLayer={isLightingLayer}
-          nameError={this.state.nameErrors[layerName]}
-          effectsCount={layer.getEffects().getEffectsCount()}
-          onEditEffects={() => onEditEffects(layer)}
-          onEdit={() => onEdit(layer)}
-          onBeginDrag={() => {
-            this.draggedLayerIndex = i;
-          }}
-          onDrop={() => this._onDropLayer(i)}
-          onBlur={event => {
-            const newName = event.currentTarget.value;
-            if (layerName === newName) return;
-
-            let success = true;
-            if (layersContainer.hasLayerNamed(newName)) {
-              success = false;
-            } else {
-              this.props.onRenameLayer(layerName, newName, doRename => {
-                if (doRename)
-                  layersContainer.getLayer(layerName).setName(newName);
-              });
-            }
-
-            this.setState({
-              nameErrors: {
-                ...this.state.nameErrors,
-                [layerName]: !success,
-              },
-            });
-          }}
-          onRemove={() => {
-            this.props.onRemoveLayer(layerName, doRemove => {
-              if (!doRemove) return;
-
-              layersContainer.removeLayer(layerName);
-              this._onLayerModified();
-            });
-          }}
-          isVisible={layer.getVisibility()}
-          onChangeVisibility={visible => {
-            layer.setVisibility(visible);
-            this._onLayerModified();
-          }}
-          width={width}
-        />
-      );
-    });
+  const layersCount = layersContainer.getLayersCount();
+  const containerLayersList = mapReverseFor(0, layersCount, i => {
+    const layer = layersContainer.getLayerAt(i);
+    const layerName = layer.getName();
+    const isLightingLayer = layer.isLightingLayer();
 
     return (
-      <ThemeConsumer>
-        {gdevelopTheme => (
-          <Column noMargin expand>
-            {containerLayersList}
-            <DropTarget
-              canDrop={() => true}
-              drop={() => {
-                this._onDropLayer(-1);
-              }}
-            >
-              {({ connectDropTarget, isOver, canDrop }) =>
-                connectDropTarget(
-                  <div>
-                    {isOver && (
-                      <div
-                        style={{
-                          ...styles.dropIndicator,
-                          outlineColor: gdevelopTheme.dropIndicator.canDrop,
-                        }}
-                      />
-                    )}
-                    <BackgroundColorRow
-                      layout={layersContainer}
-                      onBackgroundColorChanged={() => this._onLayerModified()}
-                    />
-                  </div>
-                )
-              }
-            </DropTarget>
-          </Column>
-        )}
-      </ThemeConsumer>
+      <LayerRow
+        key={'layer-' + layerName}
+        layer={layer}
+        layerName={layerName}
+        isLightingLayer={isLightingLayer}
+        nameError={nameErrors[layerName]}
+        effectsCount={layer.getEffects().getEffectsCount()}
+        onEditEffects={() => onEditEffects(layer)}
+        onEdit={() => onEdit(layer)}
+        onBeginDrag={() => {
+          draggedLayerIndexRef.current = i;
+        }}
+        onDrop={() => onDropLayer(i)}
+        onBlur={event => {
+          const newName = event.currentTarget.value;
+          if (layerName === newName) return;
+
+          let success = true;
+          if (layersContainer.hasLayerNamed(newName)) {
+            success = false;
+          } else {
+            onRenameLayer(layerName, newName, doRename => {
+              if (doRename)
+                layersContainer.getLayer(layerName).setName(newName);
+            });
+          }
+          setNameErrors(currentValue => ({
+            ...currentValue,
+            [layerName]: !success,
+          }));
+        }}
+        onRemove={() => {
+          onRemoveLayer(layerName, doRemove => {
+            if (!doRemove) return;
+
+            layersContainer.removeLayer(layerName);
+            onLayerModified();
+          });
+        }}
+        isVisible={layer.getVisibility()}
+        onChangeVisibility={visible => {
+          layer.setVisibility(visible);
+          onLayerModified();
+        }}
+        width={width}
+      />
     );
-  }
-}
+  });
+
+  return (
+    <Column noMargin expand>
+      {containerLayersList}
+      <DropTarget
+        canDrop={() => true}
+        drop={() => {
+          onDropLayer(-1);
+        }}
+      >
+        {({ connectDropTarget, isOver, canDrop }) =>
+          connectDropTarget(
+            <div>
+              {isOver && (
+                <div
+                  style={{
+                    ...styles.dropIndicator,
+                    outlineColor: gdevelopTheme.dropIndicator.canDrop,
+                  }}
+                />
+              )}
+              <BackgroundColorRow
+                layout={layersContainer}
+                onBackgroundColorChanged={onLayerModified}
+              />
+            </div>
+          )
+        }
+      </DropTarget>
+    </Column>
+  );
+};
 
 type Props = {|
   project: gdProject,

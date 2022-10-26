@@ -96,6 +96,7 @@ const AchievementList = ({
                   >
                     <Text
                       noMargin
+                      size="sub-title"
                       style={
                         achievementWithBadgeData.unlockedAt
                           ? styles.unlockedAchievement

@@ -148,16 +148,16 @@ class GD_CORE_API VariableFinderEventWorker
                               platform, instruction.GetType());
       for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
         // The parameter has the searched type...
-        if (instrInfos.parameters[pNb].type == parameterType) {
+        if (instrInfos.parameters[pNb].GetType() == parameterType) {
           //...remember the value of the parameter.
           if (objectName.empty() || lastObjectParameter == objectName)
             results.insert(instruction.GetParameter(pNb).GetPlainString());
         }
         // Search in expressions
         else if (ParameterMetadata::IsExpression(
-                    "number", instrInfos.parameters[pNb].type) ||
+                    "number", instrInfos.parameters[pNb].GetType()) ||
                 ParameterMetadata::IsExpression(
-                    "string", instrInfos.parameters[pNb].type)) {
+                    "string", instrInfos.parameters[pNb].GetType())) {
           auto node = instruction.GetParameter(pNb).GetRootNode();
 
           VariableFinderExpressionNodeWorker searcher(
@@ -171,7 +171,7 @@ class GD_CORE_API VariableFinderEventWorker
         }
         // Remember the value of the last "object" parameter.
         else if (gd::ParameterMetadata::IsObject(
-                    instrInfos.parameters[pNb].type)) {
+                    instrInfos.parameters[pNb].GetType())) {
           lastObjectParameter =
               instruction.GetParameter(pNb).GetPlainString();
         }

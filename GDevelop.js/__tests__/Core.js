@@ -2468,8 +2468,11 @@ describe('libGD.js', function () {
         expect(parametersLister.getParametersAndTypes().get('MyObject')).toBe(
           'object'
         );
+        // There are a lot of parameter definitions with 'expression' instead
+        // of 'number'. They both means the same thing but 'expression' is
+        // deprecated.
         expect(parametersLister.getParametersAndTypes().get('300')).toBe(
-          'expression'
+          'number'
         );
 
         project.delete();

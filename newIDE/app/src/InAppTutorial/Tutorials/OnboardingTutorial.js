@@ -242,7 +242,7 @@ const inAppTutorial: InAppTutorial = {
       id: 'WaitForUserToHavePlayed',
       elementToHighlightId: '#toolbar-preview-button',
       nextStepTrigger: {
-        clickOnTooltipButton: "I'm done",
+        clickOnTooltipButton: { messageDescriptor: t`I'm done` },
       },
       tooltip: {
         description: {
@@ -467,7 +467,7 @@ const inAppTutorial: InAppTutorial = {
       id: 'WaitForUserToHavePlayedWithCoinCollection',
       elementToHighlightId: '#toolbar-preview-button',
       nextStepTrigger: {
-        clickOnTooltipButton: "I'm done",
+        clickOnTooltipButton: { messageDescriptor: t`I'm done` },
       },
       tooltip: {
         description: {

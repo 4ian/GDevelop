@@ -769,6 +769,21 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
+  _onBehaviorSharedPropertyRenamed = (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    oldName: string,
+    newName: string
+  ) => {
+    const { project, eventsFunctionsExtension } = this.props;
+    gd.WholeProjectRefactorer.renameEventsBasedBehaviorSharedProperty(
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
+      oldName,
+      newName
+    );
+  };
+
   _onObjectPropertyRenamed = (
     eventsBasedObject: gdEventsBasedObject,
     oldName: string,
@@ -1503,6 +1518,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             }}
             onRenameProperty={(oldName, newName) =>
               this._onBehaviorPropertyRenamed(
+                editedEventsBasedBehavior,
+                oldName,
+                newName
+              )
+            }
+            onRenameSharedProperty={(oldName, newName) =>
+              this._onBehaviorSharedPropertyRenamed(
                 editedEventsBasedBehavior,
                 oldName,
                 newName

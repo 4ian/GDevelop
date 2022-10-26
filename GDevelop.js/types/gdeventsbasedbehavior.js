@@ -11,6 +11,7 @@ declare class gdEventsBasedBehavior {
   getObjectType(): string;
   getEventsFunctions(): gdEventsFunctionsContainer;
   getPropertyDescriptors(): gdNamedPropertyDescriptorsList;
+  getSharedPropertyDescriptors(): gdNamedPropertyDescriptorsList;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   static getPropertyActionName(propertyName: string): string;

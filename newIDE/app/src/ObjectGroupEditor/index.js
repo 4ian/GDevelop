@@ -1,12 +1,15 @@
 // @flow
+import * as React from 'react';
 import { t } from '@lingui/macro';
 
-import * as React from 'react';
 import { List, ListItem } from '../UI/List';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
 import EmptyMessage from '../UI/EmptyMessage';
 import { Column } from '../UI/Grid';
 import { Paper } from '@material-ui/core';
+import ListIcon from '../UI/ListIcon';
+import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
+import getObjectByName from '../Utils/GetObjectByName';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -78,12 +81,28 @@ const ObjectGroupEditor = ({
             .getAllObjectsNames()
             .toJSArray()
             .map(objectName => {
+              let object = getObjectByName(
+                globalObjectsContainer,
+                objectsContainer,
+                objectName
+              );
+              const icon =
+                project && object ? (
+                  <ListIcon
+                    iconSize={24}
+                    src={ObjectsRenderingService.getThumbnail(
+                      project,
+                      object.getConfiguration()
+                    )}
+                  />
+                ) : null;
               return (
                 <ListItem
                   key={objectName}
                   primaryText={objectName}
                   displayRemoveButton
                   onRemove={() => removeObject(objectName)}
+                  leftIcon={icon}
                 />
               );
             })}

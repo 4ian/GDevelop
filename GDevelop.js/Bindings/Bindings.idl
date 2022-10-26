@@ -1010,6 +1010,7 @@ interface HighestZOrderFinder {
     void RestrictSearchToLayer([Const] DOMString layer);
     long GetHighestZOrder();
     long GetLowestZOrder();
+    void Reset();
     unsigned long GetInstancesCount();
 };
 

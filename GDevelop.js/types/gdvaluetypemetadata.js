@@ -14,9 +14,10 @@ declare class gdValueTypeMetadata {
   isNumber(): boolean;
   isString(): boolean;
   isVariable(): boolean;
-  static typeIsObject(param: string): boolean;
-  static typeIsBehavior(param: string): boolean;
-  static typeIsExpression(type_: string, parameterType: string): boolean;
+  static typeIsObject(parameterType: string): boolean;
+  static typeIsBehavior(parameterType: string): boolean;
+  static typeIsExpression(type: string, parameterType: string): boolean;
+  static getExpressionValueType(parameterType: string): string;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   delete(): void;

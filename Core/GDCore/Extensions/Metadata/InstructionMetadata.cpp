@@ -95,7 +95,9 @@ InstructionMetadata& InstructionMetadata::AddCodeOnlyParameter(
 
 InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
     const gd::String& type, const gd::String& typeExtraInfo) {
-  SetManipulatedType(type);
+  const gd::String& expressionValueType =
+      gd::ValueTypeMetadata::GetExpressionValueType(type);
+  SetManipulatedType(expressionValueType);
 
   if (type == "boolean") {
     AddParameter("yesorno", _("New value"));
@@ -119,7 +121,7 @@ InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
                               "_PARAM" + gd::String::From(valueParamIndex) + "_");
     }
   } else {
-    AddParameter("operator", _("Modification's sign"), type);
+    AddParameter("operator", _("Modification's sign"), expressionValueType);
     AddParameter(type, _("Value"), typeExtraInfo);
 
     size_t operatorParamIndex = parameters.size() - 2;
@@ -154,7 +156,9 @@ InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
 InstructionMetadata&
 InstructionMetadata::UseStandardRelationalOperatorParameters(
     const gd::String& type, const gd::String& typeExtraInfo) {
-  SetManipulatedType(type);
+  const gd::String& expressionValueType =
+      gd::ValueTypeMetadata::GetExpressionValueType(type);
+  SetManipulatedType(expressionValueType);
 
   if (type == "boolean") {
     if (isObjectInstruction || isBehaviorInstruction) {
@@ -170,7 +174,7 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
           templateSentence.FindAndReplace("<subject>", sentence);
     }
   } else {
-    AddParameter("relationalOperator", _("Sign of the test"), type);
+    AddParameter("relationalOperator", _("Sign of the test"), expressionValueType);
     AddParameter(type, _("Value to compare"), typeExtraInfo);
     size_t operatorParamIndex = parameters.size() - 2;
     size_t valueParamIndex = parameters.size() - 1;

@@ -22,6 +22,8 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
+const DropTarget = makeDropTarget('layers-list');
+
 type LayersListBodyProps = {|
   layersContainer: gdLayout,
   unsavedChanges?: ?UnsavedChanges,
@@ -72,8 +74,6 @@ const LayersListBody = (props: LayersListBodyProps) => {
     }
     draggedLayerIndexRef.current = null;
   };
-
-  const DropTarget = React.useMemo(() => makeDropTarget('layers-list'), []);
 
   const layersCount = layersContainer.getLayersCount();
   const containerLayersList = mapReverseFor(0, layersCount, i => {

@@ -75,6 +75,8 @@ import { normalizeString } from '../Utils/Search';
 import { I18n } from '@lingui/react';
 const gd: libGDevelop = global.gd;
 
+const DragSourceAndDropTarget = makeDragSourceAndDropTarget('variable-editor');
+
 const stopEventPropagation = (event: SyntheticPointerEvent<HTMLInputElement>) =>
   event.stopPropagation();
 const preventEventDefaultEffect = (
@@ -184,11 +186,6 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
-
-  const DragSourceAndDropTarget = React.useMemo(
-    () => makeDragSourceAndDropTarget('variable-editor'),
-    []
-  );
 
   const triggerSearch = React.useCallback(
     () => {

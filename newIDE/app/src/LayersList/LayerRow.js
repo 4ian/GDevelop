@@ -20,6 +20,8 @@ import Badge from '../UI/Badge';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
+const DragSourceAndDropTarget = makeDragSourceAndDropTarget('layers-list');
+
 export const styles = {
   dropIndicator: {
     outline: '1px solid white',
@@ -56,10 +58,7 @@ const LayerRow = ({
   onEdit,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const DragSourceAndDropTarget = React.useMemo(
-    () => makeDragSourceAndDropTarget('layers-list'),
-    []
-  );
+
   const layerName = layer.getName();
   const isLightingLayer = layer.isLightingLayer();
 

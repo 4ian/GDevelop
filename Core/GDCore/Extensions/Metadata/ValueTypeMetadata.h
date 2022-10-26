@@ -17,9 +17,10 @@ class SerializerElement;
 namespace gd {
 
 /**
- * \brief Describe a parameter of an instruction (action, condition) or of an
- * expression: type, user-friendly description, etc...
+ * \brief Define a type for parameters of a function (action, condition or
+ * expression) or the returned value of an expression.
  *
+ * \see gd::EventsFunction
  * \ingroup Events
  */
 class GD_CORE_API ValueTypeMetadata {
@@ -91,7 +92,7 @@ class GD_CORE_API ValueTypeMetadata {
   }
 
   /**
-   * \brief Return true if the type of the parameter is representing one object
+   * \brief Return true if the type is representing one object
    * (or more, i.e: an object group).
    */
   bool IsObject() const {
@@ -99,37 +100,29 @@ class GD_CORE_API ValueTypeMetadata {
   }
 
   /**
-   * \brief Return true if the type of the parameter is "behavior".
+   * \brief Return true if the type is "behavior".
    */
   bool IsBehavior() const {
     return gd::ValueTypeMetadata::TypeIsBehavior(name);
   }
 
   /**
-   * \brief Return true if the type of the parameter is an expression of the
+   * \brief Return true if the type is an expression of the
    * given type.
-   * \note If you had a new type of parameter, also add it in the IDE (
-   * see EventsFunctionParametersEditor, ParameterRenderingService
-   * and ExpressionAutocompletion) and in the EventsCodeGenerator.
    */
   bool IsNumber() const {
     return gd::ValueTypeMetadata::TypeIsExpression("number", name);
   }
 
   /**
-   * \brief Return true if the type of the parameter is an expression of the
-   * given type.
-   * \note If you had a new type of parameter, also add it in the IDE (
-   * see EventsFunctionParametersEditor, ParameterRenderingService
-   * and ExpressionAutocompletion) and in the EventsCodeGenerator.
+   * \brief Return true if the type is a string.
    */
   bool IsString() const {
     return gd::ValueTypeMetadata::TypeIsExpression("string", name);
   }
 
   /**
-   * \brief Return true if the type of the parameter is an expression of the
-   * given type.
+   * \brief Return true if the type of the parameter is a number.
    * \note If you had a new type of parameter, also add it in the IDE (
    * see EventsFunctionParametersEditor, ParameterRenderingService
    * and ExpressionAutocompletion) and in the EventsCodeGenerator.
@@ -139,7 +132,7 @@ class GD_CORE_API ValueTypeMetadata {
   }
 
   /**
-   * \brief Return true if the type of the parameter is representing one object
+   * \brief Return true if the type is representing one object
    * (or more, i.e: an object group).
    */
   static bool TypeIsObject(const gd::String &parameterType) {
@@ -150,16 +143,15 @@ class GD_CORE_API ValueTypeMetadata {
   }
 
   /**
-   * \brief Return true if the type of the parameter is "behavior".
+   * \brief Return true if the type is "behavior".
    */
   static bool TypeIsBehavior(const gd::String &parameterType) {
     return parameterType == "behavior";
   }
 
   /**
-   * \brief Return true if the type of the parameter is an expression of the
-   * given type.
-   * \note If you had a new type of parameter, also add it in the IDE (
+   * \brief Return true if the type is an expression of the given type.
+   * \note If you are adding a new type of parameter, also add it in the IDE (
    * see EventsFunctionParametersEditor, ParameterRenderingService
    * and ExpressionAutocompletion) and in the EventsCodeGenerator.
    */

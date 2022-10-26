@@ -40,7 +40,7 @@ const LayersListBody = (props: LayersListBodyProps) => {
   const forceUpdate = useForceUpdate();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [nameErrors, setNameErrors] = React.useState<{
-    [key: string]: boolean,
+    [key: string]: React.Node,
   }>({});
   const draggedLayerIndexRef = React.useRef<number | null>(null);
 
@@ -79,14 +79,11 @@ const LayersListBody = (props: LayersListBodyProps) => {
   const containerLayersList = mapReverseFor(0, layersCount, i => {
     const layer = layersContainer.getLayerAt(i);
     const layerName = layer.getName();
-    const isLightingLayer = layer.isLightingLayer();
 
     return (
       <LayerRow
-        key={'layer-' + layerName}
+        key={'layer-' + layer.ptr}
         layer={layer}
-        layerName={layerName}
-        isLightingLayer={isLightingLayer}
         nameError={nameErrors[layerName]}
         effectsCount={layer.getEffects().getEffectsCount()}
         onEditEffects={() => onEditEffects(layer)}
@@ -95,23 +92,26 @@ const LayersListBody = (props: LayersListBodyProps) => {
           draggedLayerIndexRef.current = i;
         }}
         onDrop={() => onDropLayer(i)}
-        onBlur={event => {
-          const newName = event.currentTarget.value;
+        onBlur={newName => {
+          setNameErrors(currentValue => ({
+            ...currentValue,
+            [layerName]: null,
+          }));
+
           if (layerName === newName) return;
 
-          let success = true;
-          if (layersContainer.hasLayerNamed(newName)) {
-            success = false;
+          const isNameAlreadyTaken = layersContainer.hasLayerNamed(newName);
+          if (isNameAlreadyTaken) {
+            setNameErrors(currentValue => ({
+              ...currentValue,
+              [layerName]: <Trans>The name {newName} is already taken</Trans>,
+            }));
           } else {
             onRenameLayer(layerName, newName, doRename => {
               if (doRename)
                 layersContainer.getLayer(layerName).setName(newName);
             });
           }
-          setNameErrors(currentValue => ({
-            ...currentValue,
-            [layerName]: !success,
-          }));
         }}
         onRemove={() => {
           onRemoveLayer(layerName, doRemove => {

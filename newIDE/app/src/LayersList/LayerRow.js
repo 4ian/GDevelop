@@ -10,7 +10,7 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import FlareIcon from '@material-ui/icons/Flare';
 import IconButton from '../UI/IconButton';
 import Delete from '@material-ui/icons/Delete';
-import TextField from '../UI/TextField';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
 import DragHandle from '../UI/DragHandle';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import MoreVert from '@material-ui/icons/MoreVert';
@@ -28,18 +28,12 @@ export const styles = {
 
 type Props = {|
   layer: gdLayer,
-  layerName: string,
-  nameError: boolean,
-  onBlur: ({
-    currentTarget: {
-      value: string,
-    },
-  }) => void,
+  nameError: React.Node,
+  onBlur: string => void,
   onRemove: () => void,
   onBeginDrag: () => void,
   onDrop: () => void,
   isVisible: boolean,
-  isLightingLayer: boolean,
   onChangeVisibility: boolean => void,
   effectsCount: number,
   onEditEffects: () => void,
@@ -49,7 +43,6 @@ type Props = {|
 
 const LayerRow = ({
   layer,
-  layerName,
   nameError,
   onBlur,
   onRemove,
@@ -60,7 +53,6 @@ const LayerRow = ({
   onBeginDrag,
   onDrop,
   width,
-  isLightingLayer,
   onEdit,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -68,7 +60,11 @@ const LayerRow = ({
     () => makeDragSourceAndDropTarget('layers-list'),
     []
   );
+  const layerName = layer.getName();
+  const isLightingLayer = layer.isLightingLayer();
+
   const isBaseLayer = !layerName;
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -102,21 +98,14 @@ const LayerRow = ({
                     )}
                   </TreeTableCell>
                   <TreeTableCell expand>
-                    <TextField
+                    <SemiControlledTextField
                       margin="none"
-                      defaultValue={
-                        isBaseLayer ? i18n._(t`Base layer`) : layerName
-                      }
+                      value={isBaseLayer ? i18n._(t`Base layer`) : layerName}
                       id={layerName}
-                      errorText={
-                        nameError ? (
-                          <Trans>This name is already taken</Trans>
-                        ) : (
-                          undefined
-                        )
-                      }
+                      errorText={nameError}
                       disabled={isBaseLayer}
-                      onBlur={onBlur}
+                      onChange={onBlur}
+                      commitOnBlur
                       fullWidth
                     />
                   </TreeTableCell>

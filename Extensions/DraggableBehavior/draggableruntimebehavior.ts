@@ -15,6 +15,7 @@ namespace gdjs {
      */
     _draggedByDraggableManager: DraggableManager | null = null;
     _checkCollisionMask: boolean;
+    _justDropped = false;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -41,6 +42,7 @@ namespace gdjs {
     _endDrag() {
       if (this._draggedByDraggableManager) {
         this._draggedByDraggableManager.endDrag();
+        this._justDropped = true;
       }
       this._draggedByDraggableManager = null;
     }
@@ -126,10 +128,16 @@ namespace gdjs {
         .getGame()
         .getInputManager()
         .isMouseButtonPressed(0);
+
+      this._justDropped = false;
     }
 
-    isDragged(instanceContainer: gdjs.RuntimeInstanceContainer): boolean {
+    isDragged(): boolean {
       return !!this._draggedByDraggableManager;
+    }
+
+    wasJustDropped(): boolean {
+      return this._justDropped;
     }
   }
 

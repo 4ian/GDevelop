@@ -29,7 +29,9 @@ namespace gd {
  */
 class GD_CORE_API AbstractEventsBasedEntity {
  public:
-  AbstractEventsBasedEntity(const gd::String& _name);
+  AbstractEventsBasedEntity(
+      const gd::String& _name,
+      gd::EventsFunctionsContainer::FunctionSource functionContainerSource);
   virtual ~AbstractEventsBasedEntity(){};
 
   /**

@@ -1199,8 +1199,8 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] InstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
-    [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type);
-    [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type);
+    [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type, [Const] optional DOMString typeExtraInfo = "");
+    [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type, [Const] optional DOMString typeExtraInfo = "");
 
     [Ref] InstructionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
     [Const, Ref] DOMString GetRequiredBaseObjectCapability();
@@ -1210,6 +1210,12 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata MarkAsComplex();
 
     [Ref] ExtraInformation GetCodeExtraInformation();
+
+    [Ref] ExtraInformation SetFunctionName([Const] DOMString functionName);
+
+    [Ref] InstructionMetadata SetIncludeFile([Const] DOMString includeFile);
+    [Ref] InstructionMetadata AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 };
 
 interface ExpressionMetadata {
@@ -1250,6 +1256,12 @@ interface ExpressionMetadata {
     [Const, Ref] DOMString GetRequiredBaseObjectCapability();
 
     [Ref] ExpressionCodeGenerationInformation GetCodeExtraInformation();
+
+    [Ref] ExpressionCodeGenerationInformation SetFunctionName([Const] DOMString functionName);
+
+    [Ref] ExpressionMetadata SetIncludeFile([Const] DOMString includeFile);
+    [Ref] ExpressionMetadata AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 };
 
 interface MultipleInstructionMetadata {
@@ -1262,7 +1274,7 @@ interface MultipleInstructionMetadata {
     [Ref] MultipleInstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] MultipleInstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
 
-    [Ref] MultipleInstructionMetadata UseStandardParameters([Const] DOMString type);
+    [Ref] MultipleInstructionMetadata UseStandardParameters([Const] DOMString type,  [Const] optional DOMString typeExtraInfo = "");
 
     [Ref] MultipleInstructionMetadata SetHidden();
 
@@ -1271,10 +1283,12 @@ interface MultipleInstructionMetadata {
 
     [Ref] MultipleInstructionMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] MultipleInstructionMetadata AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 
     [Ref] MultipleInstructionMetadata MarkAsSimple();
     [Ref] MultipleInstructionMetadata MarkAsAdvanced();
     [Ref] MultipleInstructionMetadata MarkAsComplex();
+    [Ref] MultipleInstructionMetadata SetPrivate();
 };
 
 interface DependencyMetadata {
@@ -1316,9 +1330,40 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetCodeOnly(boolean codeOnly_);
     [Const, Ref] DOMString GetDefaultValue();
     [Ref] ParameterMetadata SetDefaultValue([Const] DOMString defaultValue_);
+
+    [Ref] ParameterMetadata SetValueTypeMetadata([Const, Ref] ValueTypeMetadata type);
+    [Const, Ref] ValueTypeMetadata GetValueTypeMetadata();
+
     boolean STATIC_IsObject([Const] DOMString param);
     boolean STATIC_IsBehavior([Const] DOMString param);
     boolean STATIC_IsExpression([Const] DOMString type_, [Const] DOMString parameterType);
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
+};
+
+interface ValueTypeMetadata {
+    void ValueTypeMetadata();
+
+    [Const, Ref] DOMString GetName();
+    [Ref] ValueTypeMetadata SetName([Const] DOMString name_);
+    [Const, Ref] DOMString GetExtraInfo();
+    [Ref] ValueTypeMetadata SetExtraInfo([Const] DOMString extraInfo_);
+    boolean IsOptional();
+    [Ref] ValueTypeMetadata SetOptional(boolean optional_);
+    [Const, Ref] DOMString GetDefaultValue();
+    [Ref] ValueTypeMetadata SetDefaultValue([Const] DOMString defaultValue_);
+
+    boolean IsObject();
+    boolean IsBehavior();
+    boolean IsNumber();
+    boolean IsString();
+    boolean IsVariable();
+
+    boolean STATIC_TypeIsObject([Const] DOMString parameterType);
+    boolean STATIC_TypeIsBehavior([Const] DOMString parameterType);
+    boolean STATIC_TypeIsExpression([Const] DOMString type, [Const] DOMString parameterType);
+    [Const, Ref] DOMString STATIC_GetExpressionValueType([Const] DOMString parameterType);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -1342,7 +1387,7 @@ interface ParameterMetadataTools {
 };
 
 interface EventsFunctionTools {
-    void STATIC_FreeEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
+    void STATIC_FreeEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsFunctionsContainer functionsContainer, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
     void STATIC_BehaviorEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
     void STATIC_ObjectEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsBasedObject eventsBasedObject, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
 };
@@ -2242,7 +2287,8 @@ enum EventsFunction_FunctionType {
   "EventsFunction::Action",
   "EventsFunction::Condition",
   "EventsFunction::Expression",
-  "EventsFunction::StringExpression"
+  "EventsFunction::ExpressionAndCondition",
+  "EventsFunction::ActionWithOperator"
 };
 
 interface EventsFunction {
@@ -2259,13 +2305,21 @@ interface EventsFunction {
     [Const, Ref] DOMString GetSentence();
     [Ref] EventsFunction SetGroup([Const] DOMString group);
     [Const, Ref] DOMString GetGroup();
+    [Ref] EventsFunction SetGetterName([Const] DOMString group);
+    [Const, Ref] DOMString GetGetterName();
+    [Ref] EventsFunction SetExpressionType([Const, Ref] ValueTypeMetadata type);
+    [Const, Ref] ValueTypeMetadata GetExpressionType();
     [Ref] EventsFunction SetPrivate(boolean isPrivate);
     boolean IsPrivate();
+    boolean IsAction();
+    boolean IsExpression();
+    boolean IsCondition();
     [Ref] EventsFunction SetFunctionType(EventsFunction_FunctionType type);
     EventsFunction_FunctionType GetFunctionType();
 
     [Ref] EventsList GetEvents();
     [Ref] VectorParameterMetadata GetParameters();
+    [Const, Ref] VectorParameterMetadata GetParametersForEvents([Const, Ref] EventsFunctionsContainer functionsContainer);
     [Ref] ObjectGroupsContainer GetObjectGroups();
 
     void SerializeTo([Ref] SerializerElement element);
@@ -2946,7 +3000,7 @@ interface ObjectCodeGenerator {
 [Prefix="gdjs::"]
 interface EventsFunctionsExtensionCodeGenerator {
     void EventsFunctionsExtensionCodeGenerator([Ref] Project project);
-    [Const, Value] DOMString GenerateFreeEventsFunctionCompleteCode([Const, Ref] EventsFunction eventsFunction, [Const] DOMString codeNamespac, [Ref] SetString includes, boolean compilationForRuntime);
+    [Const, Value] DOMString GenerateFreeEventsFunctionCompleteCode([Const, Ref] EventsFunctionsExtension extension, [Const, Ref] EventsFunction eventsFunction, [Const] DOMString codeNamespac, [Ref] SetString includes, boolean compilationForRuntime);
 };
 
 [Prefix="gdjs::"]

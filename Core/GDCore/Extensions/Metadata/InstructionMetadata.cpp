@@ -55,15 +55,17 @@ InstructionMetadata& InstructionMetadata::AddParameter(
     const gd::String& supplementaryInformation,
     bool parameterIsOptional) {
   ParameterMetadata info;
-  info.type = type;
+  info.SetType(type);
   info.description = description;
   info.codeOnly = false;
-  info.optional = parameterIsOptional;
-  info.supplementaryInformation =
+  info.SetOptional(parameterIsOptional);
+  info.SetExtraInfo(
       // For objects/behavior, the supplementary information
       // parameter is an object/behavior type...
-      (gd::ParameterMetadata::IsObject(type) ||
+      ((gd::ParameterMetadata::IsObject(type) ||
        gd::ParameterMetadata::IsBehavior(type))
+       // Prefix with the namespace if it's not already there.
+       && !(supplementaryInformation.rfind(extensionNamespace, 0) == 0))
           ? (supplementaryInformation.empty()
                  ? ""
                  : extensionNamespace +
@@ -71,7 +73,7 @@ InstructionMetadata& InstructionMetadata::AddParameter(
                                                  // extension
                                                  // namespace.
              )
-          : supplementaryInformation;  // Otherwise don't change anything
+          : supplementaryInformation);  // Otherwise don't change anything
 
   // TODO: Assert against supplementaryInformation === "emsc" (when running with
   // Emscripten), and warn about a missing argument when calling addParameter.
@@ -83,17 +85,19 @@ InstructionMetadata& InstructionMetadata::AddParameter(
 InstructionMetadata& InstructionMetadata::AddCodeOnlyParameter(
     const gd::String& type, const gd::String& supplementaryInformation) {
   ParameterMetadata info;
-  info.type = type;
+  info.SetType(type);
   info.codeOnly = true;
-  info.supplementaryInformation = supplementaryInformation;
+  info.SetExtraInfo(supplementaryInformation);
 
   parameters.push_back(info);
   return *this;
 }
 
 InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
-    const gd::String& type) {
-  SetManipulatedType(type);
+    const gd::String& type, const gd::String& typeExtraInfo) {
+  const gd::String& expressionValueType =
+      gd::ValueTypeMetadata::GetExpressionValueType(type);
+  SetManipulatedType(expressionValueType);
 
   if (type == "boolean") {
     AddParameter("yesorno", _("New value"));
@@ -117,8 +121,8 @@ InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
                               "_PARAM" + gd::String::From(valueParamIndex) + "_");
     }
   } else {
-    AddParameter("operator", _("Modification's sign"), type);
-    AddParameter(type == "number" ? "expression" : type, _("Value"));
+    AddParameter("operator", _("Modification's sign"), expressionValueType);
+    AddParameter(type, _("Value"), typeExtraInfo);
 
     size_t operatorParamIndex = parameters.size() - 2;
     size_t valueParamIndex = parameters.size() - 1;
@@ -151,8 +155,10 @@ InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
 
 InstructionMetadata&
 InstructionMetadata::UseStandardRelationalOperatorParameters(
-    const gd::String& type) {
-  SetManipulatedType(type);
+    const gd::String& type, const gd::String& typeExtraInfo) {
+  const gd::String& expressionValueType =
+      gd::ValueTypeMetadata::GetExpressionValueType(type);
+  SetManipulatedType(expressionValueType);
 
   if (type == "boolean") {
     if (isObjectInstruction || isBehaviorInstruction) {
@@ -168,8 +174,8 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
           templateSentence.FindAndReplace("<subject>", sentence);
     }
   } else {
-    AddParameter("relationalOperator", _("Sign of the test"), type);
-    AddParameter(type == "number" ? "expression" : type, _("Value to compare"));
+    AddParameter("relationalOperator", _("Sign of the test"), expressionValueType);
+    AddParameter(type, _("Value to compare"), typeExtraInfo);
     size_t operatorParamIndex = parameters.size() - 2;
     size_t valueParamIndex = parameters.size() - 1;
 

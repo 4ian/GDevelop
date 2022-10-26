@@ -839,7 +839,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     selectedInstances.forEach(instance => {
       if (!instance.isLocked()) {
         const extremeZOrder = extremeZOrderByLayer[instance.getLayer()];
+        // If instance is already at the extreme z order, do nothing.
         if (instance.getZOrder() === extremeZOrder) return;
+
         instance.setZOrder(extremeZOrder + (where === 'front' ? 1 : -1));
       }
     });

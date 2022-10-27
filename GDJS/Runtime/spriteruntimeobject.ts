@@ -471,14 +471,19 @@ namespace gdjs {
       ];
       const oldFrame = this._currentFrame;
 
-      //*Optimization*: Animation is finished, don't change the current frame
-      //and compute nothing more.
-      if (!direction.loop && this._currentFrame >= direction.frames.length - 1) {
+      const elapsedTime = this.getElapsedTime() / 1000;
+      this._frameElapsedTime += this._animationPaused
+        ? 0
+        : elapsedTime * this._animationSpeedScale;
+
+      if (
+        !direction.loop &&
+        this._currentFrame >= direction.frames.length - 1 &&
+        this._frameElapsedTime > direction.timeBetweenFrames
+      ) {
+        // *Optimization*: Animation is finished, don't change the current frame
+        // and compute nothing more.
       } else {
-        const elapsedTime = this.getElapsedTime() / 1000;
-        this._frameElapsedTime += this._animationPaused
-          ? 0
-          : elapsedTime * this._animationSpeedScale;
         if (this._frameElapsedTime > direction.timeBetweenFrames) {
           const count = Math.floor(
             this._frameElapsedTime / direction.timeBetweenFrames
@@ -750,7 +755,10 @@ namespace gdjs {
     }
 
     /**
+     * @deprecated
      * Return true if animation has ended.
+     * Prefer using hasAnimationEnded2. This method returns true as soon as
+     * the animation enters the last frame, not at the end of the last frame.
      */
     hasAnimationEnded(): boolean {
       if (
@@ -767,6 +775,33 @@ namespace gdjs {
         return false;
       }
       return this._currentFrame === direction.frames.length - 1;
+    }
+
+    /**
+     * Return true if animation has ended.
+     * The animation had ended if:
+     * - it's not configured as a loop;
+     * - the current frame is the last frame;
+     * - the last frame has been displayed long enough.
+     */
+    hasAnimationEnded2(): boolean {
+      if (
+        this._currentAnimation >= this._animations.length ||
+        this._currentDirection >=
+          this._animations[this._currentAnimation].directions.length
+      ) {
+        return true;
+      }
+      const direction = this._animations[this._currentAnimation].directions[
+        this._currentDirection
+      ];
+      if (direction.loop) {
+        return false;
+      }
+      return (
+        this._currentFrame === direction.frames.length - 1 &&
+        this._frameElapsedTime > direction.timeBetweenFrames
+      );
     }
 
     animationPaused() {

@@ -259,6 +259,11 @@ export function getMuiOverrides(
         backgroundColor: alternateCanvasBackgroundColor,
       },
     },
+    MuiAutocomplete: {
+      paper: {
+        backgroundColor: alternateCanvasBackgroundColor,
+      },
+    },
   };
 }
 
@@ -343,6 +348,8 @@ export function createGdevelopTheme({
       palette: {
         type: paletteType,
         canvasColor: styles['ThemeSurfaceCanvasBackgroundColor'],
+        alternateCanvasColor:
+          styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
         primary: styles['ThemePrimaryColor'],
         secondary: styles['ThemeSecondaryColor'],
       },
@@ -356,6 +363,10 @@ export function createGdevelopTheme({
         separatorColor: styles['ThemeToolbarSeparatorColor'],
       },
       text: {
+        color: {
+          primary: styles['ThemeTextDefaultColor'],
+          secondary: styles['ThemeTextSecondaryColor'],
+        },
         highlighted: {
           backgroundColor: styles['ThemeTextHighlightedBackgroundColor'],
         },

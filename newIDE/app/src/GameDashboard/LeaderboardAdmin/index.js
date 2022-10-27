@@ -67,6 +67,7 @@ import LeaderboardSortOptionsDialog from './LeaderboardSortOptionsDialog';
 import { type LeaderboardSortOption } from '../../Utils/GDevelopServices/Play';
 import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
 import Toggle from '../../UI/Toggle';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 
 type Props = {|
   onLoading: boolean => void,
@@ -183,6 +184,7 @@ export const LeaderboardAdmin = ({
   leaderboardIdToSelectAtOpening,
 }: Props) => {
   const isOnline = useOnlineStatus();
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const windowWidth = useResponsiveWindowWidth();
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
     false
@@ -839,7 +841,13 @@ export const LeaderboardAdmin = ({
         <>
           <ResponsiveLineStackLayout noMargin expand noColumnMargin>
             <div style={styles.leftColumn}>
-              <Paper elevation={5} style={styles.leaderboardConfigurationPaper}>
+              <Paper
+                elevation={5}
+                style={{
+                  ...styles.leaderboardConfigurationPaper,
+                  backgroundColor: gdevelopTheme.palette.alternateCanvasColor,
+                }}
+              >
                 <Column>
                   <Line>
                     {currentLeaderboard && leaderboards ? (

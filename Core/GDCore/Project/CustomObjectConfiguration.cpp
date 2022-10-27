@@ -12,6 +12,7 @@
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Log.h"
+#include "GDCore/Project/CustomConfigurationHelper.h"
 
 using namespace gd;
 
@@ -67,50 +68,7 @@ std::map<gd::String, gd::PropertyDescriptor> CustomObjectConfiguration::GetPrope
     const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
     const auto &properties = eventsBasedObject.GetPropertyDescriptors();
 
-    for (auto &property : properties.GetInternalVector()) {
-      const auto &propertyName = property->GetName();
-      const auto &propertyType = property->GetType();
-
-      // TODO Move this into a PropertyDescriptor copy method.
-      auto &newProperty = objectProperties[propertyName]
-            .SetType(property->GetType())
-            .SetDescription(property->GetDescription())
-            .SetGroup(property->GetGroup())
-            .SetLabel(property->GetLabel())
-            .SetValue(property->GetValue())
-            .SetHidden(property->IsHidden());
-      
-      for (auto &extraInfo : property->GetExtraInfo()) {
-        newProperty.AddExtraInfo(extraInfo);
-      }
-
-      if (objectContent.HasChild(propertyName)) {
-        if (
-          propertyType == "String" ||
-          propertyType == "Choice" ||
-          propertyType == "Color"
-        ) {
-          newProperty.SetValue(
-            objectContent.GetChild(propertyName).GetStringValue()
-          );
-        } else if (propertyType == "Number") {
-          newProperty.SetValue(
-            gd::String::From(objectContent.GetChild(propertyName).GetDoubleValue())
-          );
-        } else if (propertyType == "Boolean") {
-          newProperty.SetValue(
-            objectContent.GetChild(propertyName).GetBoolValue()
-              ? "true"
-              : "false"
-          );
-        }
-      } else {
-        // No value was serialized for this property. `newProperty`
-        // will have the default value coming from `enumeratedProperty`.
-      }
-    }
-
-    return objectProperties;
+    return gd::CustomConfigurationHelper::GetProperties(properties, objectContent);
 }
 
 bool CustomObjectConfiguration::UpdateProperty(const gd::String& propertyName,
@@ -120,27 +78,12 @@ bool CustomObjectConfiguration::UpdateProperty(const gd::String& propertyName,
     }
     const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
     const auto &properties = eventsBasedObject.GetPropertyDescriptors();
-    if (!properties.Has(propertyName)) {
-      return false;
-    }
-    const auto &property = properties.Get(propertyName);
-
-    auto &element = objectContent.AddChild(propertyName);
-    const gd::String &propertyType = property.GetType();
-
-    if (
-      propertyType == "String" ||
-      propertyType == "Choice" ||
-      propertyType == "Color"
-    ) {
-      element.SetStringValue(newValue);
-    } else if (propertyType == "Number") {
-      element.SetDoubleValue(newValue.To<double>());
-    } else if (propertyType == "Boolean") {
-      element.SetBoolValue(newValue == "1");
-    }
-
-    return true;
+    
+    return gd::CustomConfigurationHelper::UpdateProperty(
+        properties,
+        objectContent,
+        propertyName,
+        newValue);
 }
 
 std::map<gd::String, gd::PropertyDescriptor>

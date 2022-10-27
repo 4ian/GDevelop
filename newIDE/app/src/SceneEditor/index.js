@@ -811,6 +811,44 @@ export default class SceneEditor extends React.Component<Props, State> {
     done(true);
   };
 
+  _onMoveInstancesZOrder = (where: 'front' | 'back') => {
+    const selectedInstances = this.instancesSelection.getSelectedInstances();
+
+    const layerNames = selectedInstances.reduce(
+      (acc: Set<string>, instance) => {
+        if (!instance.isLocked()) acc.add(instance.getLayer());
+        return acc;
+      },
+      new Set()
+    );
+
+    const highestZOrderFinder = new gd.HighestZOrderFinder();
+
+    const extremeZOrderByLayerName = {};
+    layerNames.forEach(layerName => {
+      highestZOrderFinder.reset();
+      highestZOrderFinder.restrictSearchToLayer(layerName);
+      this.props.initialInstances.iterateOverInstances(highestZOrderFinder);
+      extremeZOrderByLayerName[layerName] =
+        where === 'back'
+          ? highestZOrderFinder.getLowestZOrder()
+          : highestZOrderFinder.getHighestZOrder();
+    });
+    highestZOrderFinder.delete();
+
+    selectedInstances.forEach(instance => {
+      if (!instance.isLocked()) {
+        const extremeZOrder = extremeZOrderByLayerName[instance.getLayer()];
+        // If instance is already at the extreme z order, do nothing.
+        if (instance.getZOrder() === extremeZOrder) return;
+
+        instance.setZOrder(extremeZOrder + (where === 'front' ? 1 : -1));
+      }
+    });
+    this.forceUpdateInstancesList();
+    this.forceUpdatePropertiesEditor();
+  };
+
   _onDeleteGroup = (
     groupWithContext: GroupWithContext,
     done: boolean => void
@@ -1013,8 +1051,24 @@ export default class SceneEditor extends React.Component<Props, State> {
         },
         {
           label: i18n._(t`Duplicate`),
+          enabled: this.instancesSelection.hasSelectedInstances(),
           click: () => {
             this.duplicateSelection();
+          },
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Bring to front`),
+          enabled: this.instancesSelection.hasSelectedInstances(),
+          click: () => {
+            this._onMoveInstancesZOrder('front');
+          },
+        },
+        {
+          label: i18n._(t`Send to back`),
+          enabled: this.instancesSelection.hasSelectedInstances(),
+          click: () => {
+            this._onMoveInstancesZOrder('back');
           },
         },
         { type: 'separator' },

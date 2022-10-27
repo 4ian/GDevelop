@@ -7,7 +7,6 @@ import { action } from '@storybook/addon-actions';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import muiDecorator from '../../ThemeDecorator';
-import paperDecorator from '../../PaperDecorator';
 import ObjectExporterDialog from '../../../ObjectEditor/ObjectExporterDialog';
 import EventsFunctionsExtensionsContext from '../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import LocalEventsFunctionsExtensionWriter from '../../../EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionWriter';
@@ -16,7 +15,7 @@ import LocalEventsFunctionsExtensionOpener from '../../../EventsFunctionsExtensi
 export default {
   title: 'LayoutEditor/ObjectExporterDialog',
   component: ObjectExporterDialog,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [muiDecorator],
 };
 
 const fakeEventsFunctionsExtensionsContext = {

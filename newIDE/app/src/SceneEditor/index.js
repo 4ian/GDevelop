@@ -1789,6 +1789,9 @@ export default class SceneEditor extends React.Component<Props, State> {
             onApply={() => this.openSceneProperties(false)}
             onEditVariables={() => this.editLayoutVariables(true)}
             onOpenMoreSettings={this.props.onOpenMoreSettings}
+            resourceSources={resourceSources}
+            resourceExternalEditors={resourceExternalEditors}
+            onChooseResource={onChooseResource}
           />
         )}
         {!!this.state.layoutVariablesDialogOpen && (

@@ -348,6 +348,7 @@ export function createGdevelopTheme({
       palette: {
         type: paletteType,
         canvasColor: styles['ThemeSurfaceCanvasBackgroundColor'],
+        alternateCanvasColor: styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
         primary: styles['ThemePrimaryColor'],
         secondary: styles['ThemeSecondaryColor'],
       },

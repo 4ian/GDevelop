@@ -3,7 +3,6 @@ import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import { useTheme } from '@material-ui/styles';
 
 import Avatar from '@material-ui/core/Avatar';
 import Divider from '@material-ui/core/Divider';
@@ -68,6 +67,7 @@ import LeaderboardSortOptionsDialog from './LeaderboardSortOptionsDialog';
 import { type LeaderboardSortOption } from '../../Utils/GDevelopServices/Play';
 import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
 import Toggle from '../../UI/Toggle';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 
 type Props = {|
   onLoading: boolean => void,
@@ -184,7 +184,7 @@ export const LeaderboardAdmin = ({
   leaderboardIdToSelectAtOpening,
 }: Props) => {
   const isOnline = useOnlineStatus();
-  const muiTheme = useTheme();
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const windowWidth = useResponsiveWindowWidth();
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
     false
@@ -845,7 +845,7 @@ export const LeaderboardAdmin = ({
                 elevation={5}
                 style={{
                   ...styles.leaderboardConfigurationPaper,
-                  backgroundColor: muiTheme.palette.background.alternate,
+                  backgroundColor: gdevelopTheme.palette.alternateCanvasColor,
                 }}
               >
                 <Column>

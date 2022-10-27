@@ -14,7 +14,7 @@ import { type ParameterRenderingServiceType } from '../ParameterFieldCommons';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { Column, Line, Spacer } from '../../../UI/Grid';
 import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
-import { useTheme } from '@material-ui/styles';
+import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
 
 const defaultTextStyle = {
   // Break words if they are too long to fit on a single line.
@@ -274,8 +274,7 @@ export default function ExpressionAutocompletionsDisplayer({
   onScroll,
   parameterRenderingService,
 }: Props) {
-  const muiTheme = useTheme();
-
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const scrollView = React.useRef((null: ?ScrollViewInterface));
   const selectedAutocompletionElement = React.useRef(
     (null: ?React$Component<any, any>)
@@ -311,7 +310,7 @@ export default function ExpressionAutocompletionsDisplayer({
             square
             style={{
               ...styles.container,
-              backgroundColor: muiTheme.palette.background.alternate,
+              backgroundColor: gdevelopTheme.palette.alternateCanvasColor,
             }}
           >
             <ScrollView ref={scrollView} onScroll={onScroll}>
@@ -380,7 +379,7 @@ export default function ExpressionAutocompletionsDisplayer({
                 square
                 style={{
                   ...styles.container,
-                  backgroundColor: muiTheme.palette.background.alternate,
+                  backgroundColor: gdevelopTheme.palette.alternateCanvasColor,
                 }}
               >
                 <ScrollView autoHideScrollbar>

@@ -824,12 +824,12 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const highestZOrderFinder = new gd.HighestZOrderFinder();
 
-    const extremeZOrderByLayer = {};
+    const extremeZOrderByLayerName = {};
     layerNames.forEach(layerName => {
       highestZOrderFinder.reset();
       highestZOrderFinder.restrictSearchToLayer(layerName);
       this.props.initialInstances.iterateOverInstances(highestZOrderFinder);
-      extremeZOrderByLayer[layerName] =
+      extremeZOrderByLayerName[layerName] =
         where === 'back'
           ? highestZOrderFinder.getLowestZOrder()
           : highestZOrderFinder.getHighestZOrder();
@@ -838,7 +838,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     selectedInstances.forEach(instance => {
       if (!instance.isLocked()) {
-        const extremeZOrder = extremeZOrderByLayer[instance.getLayer()];
+        const extremeZOrder = extremeZOrderByLayerName[instance.getLayer()];
         // If instance is already at the extreme z order, do nothing.
         if (instance.getZOrder() === extremeZOrder) return;
 

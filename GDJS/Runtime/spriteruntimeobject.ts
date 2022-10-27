@@ -473,7 +473,7 @@ namespace gdjs {
 
       //*Optimization*: Animation is finished, don't change the current frame
       //and compute nothing more.
-      if (!direction.loop && this._currentFrame >= direction.frames.length) {
+      if (!direction.loop && this._currentFrame >= direction.frames.length - 1) {
       } else {
         const elapsedTime = this.getElapsedTime() / 1000;
         this._frameElapsedTime += this._animationPaused

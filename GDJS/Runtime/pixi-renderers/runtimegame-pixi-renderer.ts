@@ -409,24 +409,20 @@ namespace gdjs {
      * Convert a point from the canvas coordinates to the dom element container coordinates.
      *
      * @param canvasCoords The point in the canvas coordinates.
-     * @param result The point to return.
      * @returns The point in the dom element container coordinates.
      */
     convertCanvasToDomElementContainerCoords(
-      canvasCoords: FloatPoint,
-      result: FloatPoint
+      canvasCoords: FloatPoint
     ): FloatPoint {
-      const pageCoords = result || [0, 0];
+      const pageCoords: FloatPoint = [0, 0];
+      const gameResolutionWidth = this._game.getGameResolutionWidth();
+      const canvasWidth = this._canvasWidth || 1;
+      const gameResolutionHeight = this._game.getGameResolutionHeight();
+      const canvasHeight = this._canvasHeight || 1;
 
       // Handle the fact that the game is stretched to fill the canvas.
-      pageCoords[0] =
-        canvasCoords[0] /
-        this._game.getGameResolutionWidth() /
-        (this._canvasWidth || 1);
-      pageCoords[1] =
-        canvasCoords[1] /
-        this._game.getGameResolutionHeight() /
-        (this._canvasHeight || 1);
+      pageCoords[0] = (canvasCoords[0] * canvasWidth) / gameResolutionWidth;
+      pageCoords[1] = (canvasCoords[1] * canvasHeight) / gameResolutionHeight;
 
       return pageCoords;
     }

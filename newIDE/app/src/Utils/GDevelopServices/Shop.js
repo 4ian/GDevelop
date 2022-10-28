@@ -99,6 +99,10 @@ export const createProductAuthorizedUrl = (
     : `${url}?token=${encodeURIComponent(token)}`;
 };
 
+export const isProductAuthorizedResourceUrl = (url: string): boolean =>
+  url.startsWith('https://private-assets.gdevelop.io/') ||
+  url.startsWith('https://private-assets-dev.gdevelop.io/');
+
 export const extractFilenameAndExtensionFromProductAuthorizedUrl = (
   url: string
 ): {

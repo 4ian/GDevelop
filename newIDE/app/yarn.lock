@@ -2049,6 +2049,7 @@
     "@lingui/babel-plugin-transform-react" "2.9.2"
 
 "@lingui/react@github:4ian/lingui-react#master":
+  "integrity" "sha512-eoYJ8TI+8IolPh4fue9aIwX2OVp0YrPnV86QBZLfGhxknodVeNmx+4Ic4ym7rI5/davbk9AUZHcssiH+YZWVxw=="
   "resolved" "git+ssh://git@github.com/4ian/lingui-react.git#dc6b1e013470d952cf85f96cc4affdd28e29634a"
   "version" "2.7.3"
   dependencies:
@@ -13145,6 +13146,7 @@
   "version" "4.0.5"
 
 "pixi-simple-gesture@github:4ian/pixi-simple-gesture#v0.3.3":
+  "integrity" "sha512-DG1BxP8SK2iPMYWMOPGz5gKDXFmA8JPUpcyyNyIH55fpQraenuLYlosYFFMTRXEy0RZViTUu11H3VrYlfG2CgA=="
   "resolved" "git+ssh://git@github.com/4ian/pixi-simple-gesture.git#c84e0cc3c62edeca019e708d9897ef6b97a0d18a"
   "version" "0.3.3"
 
@@ -14665,6 +14667,7 @@
     "prop-types" "^15.6.2"
 
 "react-mosaic-component@github:4ian/react-mosaic#v3.1.0":
+  "integrity" "sha512-Izfw/EkG1g39nrZbOqzY52rqFkVFA1SUSv1TLwk7soS1Wy7iHm6zrUgzJdfwKRC2GaDn9WAfSe5ZQ2vIJ/mu5A=="
   "resolved" "git+ssh://git@github.com/4ian/react-mosaic.git#d5ef155119d786c08c7c72e34997dcef2f01f98b"
   "version" "3.1.0"
   dependencies:

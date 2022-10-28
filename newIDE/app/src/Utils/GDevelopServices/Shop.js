@@ -1,8 +1,7 @@
 // @flow
 import axios from 'axios';
+import path from 'path';
 import { GDevelopShopApi } from './ApiConfigs';
-import optionalRequire from '../../Utils/OptionalRequire';
-const path = optionalRequire('path');
 
 const client = axios.create({
   baseURL: GDevelopShopApi.baseUrl,

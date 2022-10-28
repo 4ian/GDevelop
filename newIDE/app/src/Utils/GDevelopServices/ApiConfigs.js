@@ -106,3 +106,8 @@ export const GDevelopPrivateAssetsStorage = {
     ? 'https://private-assets-dev.gdevelop.io'
     : 'https://private-assets.gdevelop.io',
 };
+
+export const GDevelopPublicAssetResourcesStorageBaseUrl =
+  'https://asset-resources.gdevelop.io';
+export const GDevelopPublicAssetResourcesStorageStagingBaseUrl =
+  'https://asset-resources.gdevelop.io/staging';

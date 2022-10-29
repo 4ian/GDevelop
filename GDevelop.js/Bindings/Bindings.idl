@@ -1280,7 +1280,6 @@ interface MultipleInstructionMetadata {
     [Ref] MultipleInstructionMetadata UseStandardParameters([Const] DOMString type,  [Const] optional DOMString typeExtraInfo = "");
 
     [Ref] MultipleInstructionMetadata SetHidden();
-    [Ref] MultipleInstructionMetadata SetPrivate();
 
     [Ref] MultipleInstructionMetadata SetFunctionName([Const] DOMString functionName);
     [Ref] MultipleInstructionMetadata SetGetter([Const] DOMString getter);

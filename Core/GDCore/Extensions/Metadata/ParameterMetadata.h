@@ -233,14 +233,14 @@ class GD_CORE_API ParameterMetadata {
 
   // TODO: Deprecated public fields. Any direct usage should be moved to
   // getter/setter.
-  gd::String type;                      ///< Parameter type
-  gd::String supplementaryInformation;  ///< Used if needed
-  bool optional;                        ///< True if the parameter is optional
 
   gd::String description;  ///< Description shown in editor
   bool codeOnly;  ///< True if parameter is relative to code generation only,
                   ///< i.e. must not be shown in editor
  private:
+  gd::String type;                      ///< Parameter type
+  gd::String supplementaryInformation;  ///< Used if needed
+  bool optional;                        ///< True if the parameter is optional
   gd::String longDescription;  ///< Long description shown in the editor.
   gd::String defaultValue;     ///< Used as a default value in editor or if an
                                ///< optional parameter is empty.

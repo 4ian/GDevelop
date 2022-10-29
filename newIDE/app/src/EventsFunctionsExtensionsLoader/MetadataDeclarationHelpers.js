@@ -1144,9 +1144,6 @@ export const declareEventsFunctionParameters = (
         parameter.getExtraInfo()
       );
     }
-    instructionOrExpression.getParameter(
-      instructionOrExpression.getParametersCount() - 1
-    );
   };
 
   const functionType = eventsFunction.getFunctionType();

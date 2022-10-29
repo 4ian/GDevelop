@@ -27,6 +27,7 @@ export const DefaultFreeFunction = () => (
       eventsFunction={testProject.testEventsFunction}
       eventsBasedBehavior={null}
       eventsBasedObject={null}
+      eventsFunctionsContainer={testProject.testEventsFunctionsExtension}
       onParametersOrGroupsUpdated={action('Parameters or groups were updated')}
     />
   </FixedHeightFlexContainer>
@@ -42,6 +43,7 @@ export const DefaultBehaviorFunction = () => (
       eventsFunction={testProject.testBehaviorEventsFunction}
       eventsBasedBehavior={testProject.testEventsBasedBehavior}
       eventsBasedObject={null}
+      eventsFunctionsContainer={testProject.testEventsBasedBehavior.getEventsFunctions()}
       onParametersOrGroupsUpdated={action('Parameters or groups were updated')}
     />
   </FixedHeightFlexContainer>
@@ -57,6 +59,7 @@ export const DefaultBehaviorLifecycleFunction = () => (
       eventsFunction={testProject.testBehaviorLifecycleEventsFunction}
       eventsBasedBehavior={testProject.testEventsBasedBehavior}
       eventsBasedObject={null}
+      eventsFunctionsContainer={testProject.testEventsBasedBehavior.getEventsFunctions()}
       onParametersOrGroupsUpdated={action('Parameters or groups were updated')}
     />
   </FixedHeightFlexContainer>
@@ -72,6 +75,7 @@ export const DefaultObjectFunction = () => (
       eventsFunction={testProject.testObjectEventsFunction}
       eventsBasedBehavior={null}
       eventsBasedObject={testProject.testEventsBasedObject}
+      eventsFunctionsContainer={testProject.testEventsBasedObject.getEventsFunctions()}
       onParametersOrGroupsUpdated={action('Parameters or groups were updated')}
     />
   </FixedHeightFlexContainer>

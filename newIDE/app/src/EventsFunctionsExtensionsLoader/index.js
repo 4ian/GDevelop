@@ -50,12 +50,30 @@ const mangleName = (name: string) => {
   return caseSensitiveSlug(name, '_', []);
 };
 
+const getExtensionCodeNamespacePrefix = (
+  eventsFunctionsExtension: gdEventsFunctionsExtension
+) => {
+  return 'gdjs.evtsExt__' + mangleName(eventsFunctionsExtension.getName());
+};
+
 /** Generate the namespace for a free function. */
 const getFreeFunctionCodeNamespace = (
   eventsFunction: gdEventsFunction,
   codeNamespacePrefix: string
 ) => {
   return codeNamespacePrefix + '__' + mangleName(eventsFunction.getName());
+};
+
+export const getFreeFunctionCodeName = (
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsFunction: gdEventsFunction
+) => {
+  return (
+    getFreeFunctionCodeNamespace(
+      eventsFunction,
+      getExtensionCodeNamespacePrefix(eventsFunctionsExtension)
+    ) + '.func'
+  );
 };
 
 /** Generate the namespace for a behavior function. */
@@ -248,7 +266,10 @@ const generateFreeFunction = (
   codeGenerationContext: CodeGenerationContext
 ): Promise<{
   functionFile: string,
-  functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
+  functionMetadata:
+    | gdInstructionMetadata
+    | gdExpressionMetadata
+    | gdMultipleInstructionMetadata,
 }> => {
   const instructionOrExpression = declareInstructionOrExpressionMetadata(
     extension,
@@ -257,7 +278,12 @@ const generateFreeFunction = (
   );
   // By convention, first parameter is always the Runtime Scene.
   instructionOrExpression.addCodeOnlyParameter('currentScene', '');
-  declareEventsFunctionParameters(eventsFunction, instructionOrExpression);
+  declareEventsFunctionParameters(
+    eventsFunctionsExtension,
+    eventsFunction,
+    instructionOrExpression,
+    0
+  );
 
   // Hide "lifecycle" functions as they are called automatically by
   // the game engine.
@@ -272,17 +298,16 @@ const generateFreeFunction = (
   );
   const functionName = codeNamespace + '.func';
 
-  const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
   const functionFile = options.eventsFunctionCodeWriter.getIncludeFileFor(
     functionName
   );
-  codeExtraInformation
+  instructionOrExpression
     .setIncludeFile(functionFile)
     .setFunctionName(functionName);
 
   // Always include the extension include files when using a free function.
   codeGenerationContext.extensionIncludeFiles.forEach(includeFile => {
-    codeExtraInformation.addIncludeFile(includeFile);
+    instructionOrExpression.addIncludeFile(includeFile);
   });
 
   if (!options.skipCodeGeneration) {
@@ -291,6 +316,7 @@ const generateFreeFunction = (
       project
     );
     const code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+      eventsFunctionsExtension,
       eventsFunction,
       codeNamespace,
       includeFiles,
@@ -307,7 +333,7 @@ const generateFreeFunction = (
       .toNewVectorString()
       .toJSArray()
       .forEach((includeFile: string) => {
-        codeExtraInformation.addIncludeFile(includeFile);
+        instructionOrExpression.addIncludeFile(includeFile);
       });
 
     includeFiles.delete();
@@ -338,7 +364,10 @@ const generateFreeFunction = (
 const applyFunctionIncludeFilesDependencyTransitivity = (
   functionInfos: Array<{
     functionFile: string,
-    functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
+    functionMetadata:
+      | gdInstructionMetadata
+      | gdExpressionMetadata
+      | gdMultipleInstructionMetadata,
   }>
 ): void => {
   // Note that the iteration order doesn't matter, for instance for:
@@ -362,12 +391,7 @@ const applyFunctionIncludeFilesDependencyTransitivity = (
   // c -> d
   const includeFileSets = functionInfos.map(
     functionInfo =>
-      new Set(
-        functionInfo.functionMetadata
-          .getCodeExtraInformation()
-          .getIncludeFiles()
-          .toJSArray()
-      )
+      new Set(functionInfo.functionMetadata.getIncludeFiles().toJSArray())
   );
   // For any function A of the extension...
   for (let index = 0; index < functionInfos.length; index++) {
@@ -376,9 +400,7 @@ const applyFunctionIncludeFilesDependencyTransitivity = (
 
     // ...and any function B of the extension...
     for (let otherIndex = 0; otherIndex < functionInfos.length; otherIndex++) {
-      const otherCodeExtraInformation = functionInfos[
-        otherIndex
-      ].functionMetadata.getCodeExtraInformation();
+      const otherFunctionMetadata = functionInfos[otherIndex].functionMetadata;
       const otherIncludeFileSet = includeFileSets[otherIndex];
       // ...where function B depends on function A...
       if (otherIncludeFileSet.has(functionIncludeFile)) {
@@ -386,7 +408,7 @@ const applyFunctionIncludeFilesDependencyTransitivity = (
         includeFiles.forEach(includeFile => {
           if (!otherIncludeFileSet.has(includeFile)) {
             otherIncludeFileSet.add(includeFile);
-            otherCodeExtraInformation.addIncludeFile(includeFile);
+            otherFunctionMetadata.addIncludeFile(includeFile);
           }
         });
       }
@@ -450,7 +472,12 @@ function generateBehavior(
         eventsBasedBehavior,
         eventsFunction
       );
-      declareEventsFunctionParameters(eventsFunction, instructionOrExpression);
+      declareEventsFunctionParameters(
+        eventsFunctionsContainer,
+        eventsFunction,
+        instructionOrExpression,
+        2
+      );
 
       // Hide "lifecycle" methods as they are called automatically by
       // the game engine.
@@ -460,8 +487,7 @@ function generateBehavior(
 
       if (eventsFunction.isPrivate()) instructionOrExpression.setPrivate();
 
-      const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
-      codeExtraInformation
+      instructionOrExpression
         .setIncludeFile(includeFile)
         .setFunctionName(eventsFunctionMangledName);
     });
@@ -567,7 +593,12 @@ function generateObject(
         eventsBasedObject,
         eventsFunction
       );
-      declareEventsFunctionParameters(eventsFunction, instructionOrExpression);
+      declareEventsFunctionParameters(
+        eventsFunctionsContainer,
+        eventsFunction,
+        instructionOrExpression,
+        1
+      );
 
       // Hide "lifecycle" methods as they are called automatically by
       // the game engine.
@@ -577,8 +608,7 @@ function generateObject(
 
       if (eventsFunction.isPrivate()) instructionOrExpression.setPrivate();
 
-      const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
-      codeExtraInformation
+      instructionOrExpression
         .setIncludeFile(includeFile)
         .setFunctionName(eventsFunctionMangledName);
     });

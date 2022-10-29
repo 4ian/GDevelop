@@ -707,7 +707,9 @@ const convertPropertyTypeToValueType = (propertyType: string): string => {
       return 'boolean';
     case 'Color':
       return 'color';
-
+    case 'Choice':
+      return 'stringWithSelector';
+    case 'String':
     default:
       return 'string';
   }
@@ -949,6 +951,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
         getExtensionIconUrl(extension)
       )
     )
+    .useStandardParameters(convertPropertyTypeToValueType(propertyType))
       .setFunctionName(
         gd.BehaviorCodeGenerator.getBehaviorSharedPropertySetterName(
           propertyName

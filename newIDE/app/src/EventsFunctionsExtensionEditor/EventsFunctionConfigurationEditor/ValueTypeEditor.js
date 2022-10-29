@@ -2,9 +2,7 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import { Column, Line } from '../../UI/Grid';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
@@ -13,8 +11,6 @@ import BehaviorTypeSelector from '../../BehaviorTypeSelector';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import StringArrayEditor from '../../StringArrayEditor';
 import useForceUpdate from '../../Utils/UseForceUpdate';
-
-const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,

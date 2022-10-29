@@ -206,7 +206,7 @@ class GD_CORE_API InstructionMetadata {
     if (!parameters.empty())
       parameters.back().SetLongDescription(longDescription);
     return *this;
-  };
+  }
 
   /**
    * \brief Set the additional information, used for some parameters
@@ -218,20 +218,26 @@ class GD_CORE_API InstructionMetadata {
   InstructionMetadata &SetParameterExtraInfo(const gd::String &extraInfo) {
     if (!parameters.empty()) parameters.back().SetExtraInfo(extraInfo);
     return *this;
-  };
+  }
 
   /**
    * \brief Add the default parameters for an instruction manipulating the
    * specified type ("string", "number") with the default operators.
+   * 
+   * \note The type "string" can be declined in several subtypes.
+   * \see ParameterMetadata
    */
-  InstructionMetadata &UseStandardOperatorParameters(const gd::String &type);
+  InstructionMetadata &UseStandardOperatorParameters(const gd::String &type, const gd::String& typeExtraInfo = "");
 
   /**
    * \brief Add the default parameters for an instruction comparing the
    * specified type ("string", "number") with the default relational operators.
+   * 
+   * \note The type "string" can be declined in several subtypes.
+   * \see ParameterMetadata
    */
   InstructionMetadata &UseStandardRelationalOperatorParameters(
-      const gd::String &type);
+      const gd::String &type, const gd::String& typeExtraInfo = "");
 
   /**
    * \brief Mark the instruction as an object instruction. Automatically called
@@ -276,7 +282,7 @@ class GD_CORE_API InstructionMetadata {
    */
   const gd::String &GetRequiredBaseObjectCapability() const {
     return requiredBaseObjectCapability;
-  };
+  }
 
   /**
    * \brief Consider that the instruction is easy for a user to understand.
@@ -486,6 +492,29 @@ class GD_CORE_API InstructionMetadata {
   ExtraInformation &SetAsyncFunctionName(const gd::String &functionName) {
     return codeExtraInformation.SetAsyncFunctionName(functionName);
   }
+
+  /**
+   * \brief Erase any existing include file and add the specified include.
+   */
+  InstructionMetadata &SetIncludeFile(const gd::String &includeFile) {
+    codeExtraInformation.SetIncludeFile(includeFile);
+    return *this;
+  }
+
+  /**
+   * \brief Add a file to the already existing include files.
+   */
+  InstructionMetadata &AddIncludeFile(const gd::String &includeFile) {
+    codeExtraInformation.AddIncludeFile(includeFile);
+    return *this;
+  }
+
+  /**
+   * \brief Get the files that must be included to use the instruction.
+   */
+  const std::vector<gd::String>& GetIncludeFiles() const {
+    return codeExtraInformation.GetIncludeFiles();
+  };
 
   std::vector<ParameterMetadata> parameters;
 

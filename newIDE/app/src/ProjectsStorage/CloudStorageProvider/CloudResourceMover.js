@@ -130,6 +130,9 @@ export const moveAllCloudProjectResourcesToCloudProject = async ({
   });
 
   // Transform Blobs into Files.
+  // TODO: in the future, avoid to load everything in memory at once - download and upload by chunks,
+  // once a certain amount of blob size is read in memory (so that we don't have more than
+  // X MB of blobs loaded in memory at the same time).
   const downloadedFilesAndResourcesToUpload = convertBlobToFiles(
     downloadedBlobsAndResourcesToUpload,
     (resourceName, error) => {

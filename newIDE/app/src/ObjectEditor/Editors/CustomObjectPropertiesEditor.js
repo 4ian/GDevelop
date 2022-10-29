@@ -32,9 +32,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
   const {
     objectConfiguration,
     project,
-    resourceSources,
-    onChooseResource,
-    resourceExternalEditors,
+    resourceManagementProps,
     unsavedChanges,
   } = props;
 
@@ -91,9 +89,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                 schema={propertiesSchema}
                 instances={[customObjectConfiguration]}
                 project={project}
-                resourceSources={resourceSources}
-                onChooseResource={onChooseResource}
-                resourceExternalEditors={resourceExternalEditors}
+                resourceManagementProps={resourceManagementProps}
               />
               {eventBasedObject &&
                 mapFor(0, eventBasedObject.getObjectsCount(), i => {
@@ -163,10 +159,8 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                               <EditorComponent
                                 objectConfiguration={childObjectConfiguration}
                                 project={project}
-                                resourceSources={resourceSources}
-                                onChooseResource={onChooseResource}
-                                resourceExternalEditors={
-                                  resourceExternalEditors
+                                resourceManagementProps={
+                                  resourceManagementProps
                                 }
                                 onSizeUpdated={
                                   forceUpdate /*Force update to ensure dialog is properly positionned*/

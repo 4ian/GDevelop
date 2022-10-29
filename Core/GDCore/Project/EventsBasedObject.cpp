@@ -10,7 +10,10 @@
 namespace gd {
 
 EventsBasedObject::EventsBasedObject()
-    : AbstractEventsBasedEntity("MyObject"), ObjectsContainer() {
+    : AbstractEventsBasedEntity(
+        "MyObject",
+        gd::EventsFunctionsContainer::FunctionSource::Object),
+    ObjectsContainer() {
 }
 
 EventsBasedObject::~EventsBasedObject() {}

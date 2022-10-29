@@ -18,6 +18,7 @@ declare class gdExpressionMetadata {
   addCodeOnlyParameter(type: string, supplementaryInformation: string): gdExpressionMetadata;
   setDefaultValue(defaultValue: string): gdExpressionMetadata;
   setParameterLongDescription(longDescription: string): gdExpressionMetadata;
+  setParameterExtraInfo(extraInfo: string): gdExpressionMetadata;
   setRequiresBaseObjectCapability(capability: string): gdExpressionMetadata;
   getRequiredBaseObjectCapability(): string;
   getCodeExtraInformation(): gdExpressionCodeGenerationInformation;

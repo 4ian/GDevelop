@@ -4,6 +4,7 @@ declare class gdMultipleInstructionMetadata {
   addCodeOnlyParameter(type: string, supplementaryInformation: string): gdMultipleInstructionMetadata;
   setDefaultValue(defaultValue: string): gdMultipleInstructionMetadata;
   setParameterLongDescription(longDescription: string): gdMultipleInstructionMetadata;
+  setParameterExtraInfo(extraInfo: string): gdMultipleInstructionMetadata;
   useStandardParameters(type: string, typeExtraInfo?: string): gdMultipleInstructionMetadata;
   setHidden(): gdMultipleInstructionMetadata;
   setFunctionName(functionName: string): gdMultipleInstructionMetadata;

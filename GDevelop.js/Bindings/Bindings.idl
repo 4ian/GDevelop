@@ -1252,6 +1252,7 @@ interface ExpressionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] ExpressionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] ExpressionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] ExpressionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
     [Ref] ExpressionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
     [Const, Ref] DOMString GetRequiredBaseObjectCapability();
@@ -1274,6 +1275,7 @@ interface MultipleInstructionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] MultipleInstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] MultipleInstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] MultipleInstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
     [Ref] MultipleInstructionMetadata UseStandardParameters([Const] DOMString type,  [Const] optional DOMString typeExtraInfo = "");
 

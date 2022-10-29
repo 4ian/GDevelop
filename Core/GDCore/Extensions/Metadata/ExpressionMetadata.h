@@ -223,6 +223,18 @@ class GD_CORE_API ExpressionMetadata {
   };
 
   /**
+   * \brief Set the additional information, used for some parameters
+   * with special type (for example, it can contains the type of object accepted
+   * by the parameter), for the last added parameter.
+   *
+   * \see AddParameter
+   */
+  ExpressionMetadata &SetParameterExtraInfo(const gd::String &extraInfo) {
+    if (!parameters.empty()) parameters.back().SetExtraInfo(extraInfo);
+    return *this;
+  }
+
+  /**
    * \brief Mark this (object) expression as requiring the specified capability,
    * offered by the base object.
    * This is useful for some objects that don't support this capability, so that

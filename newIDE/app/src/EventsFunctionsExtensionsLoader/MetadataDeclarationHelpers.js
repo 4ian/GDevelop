@@ -701,19 +701,17 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     instructionOrExpression: T
   ): T => {
     // By convention, first parameter is always the object:
-    instructionOrExpression.addParameter(
-      'object',
-      'Object',
-      '', // See below for adding the extra information
-      false
-    );
-
-    // Manually add the "extra info" without relying on addParameter
-    // as this method is prefixing the value passed with the extension namespace (this
-    // was done to ease extension declarations when dealing with object).
     instructionOrExpression
-      .getParameter(instructionOrExpression.getParametersCount() - 1)
-      .setExtraInfo(eventsBasedBehavior.getObjectType());
+      .addParameter(
+        'object',
+        'Object',
+        '', // See below for adding the extra information
+        false
+      )
+      // Manually add the "extra info" without relying on addParameter
+      // as this method is prefixing the value passed with the extension namespace (this
+      // was done to ease extension declarations when dealing with object).
+      .setParameterExtraInfo(eventsBasedBehavior.getObjectType());
 
     // By convention, second parameter is always the behavior:
     instructionOrExpression.addParameter(
@@ -1125,12 +1123,17 @@ export const declareEventsFunctionParameters = (
 ) => {
   const addParameter = (parameter: gdParameterMetadata) => {
     if (!parameter.isCodeOnly()) {
-      instructionOrExpression.addParameter(
-        parameter.getType(),
-        parameter.getDescription(),
-        parameter.getExtraInfo(),
-        parameter.isOptional()
-      );
+      instructionOrExpression
+        .addParameter(
+          parameter.getType(),
+          parameter.getDescription(),
+          '', // See below for adding the extra information
+          parameter.isOptional()
+        )
+        // Manually add the "extra info" without relying on addParameter (or addCodeOnlyParameter)
+        // as these methods are prefixing the value passed with the extension namespace (this
+        // was done to ease extension declarations when dealing with object).
+        .setParameterExtraInfo(parameter.getExtraInfo());
       instructionOrExpression.setParameterLongDescription(
         parameter.getLongDescription()
       );
@@ -1141,6 +1144,9 @@ export const declareEventsFunctionParameters = (
         parameter.getExtraInfo()
       );
     }
+    instructionOrExpression.getParameter(
+      instructionOrExpression.getParametersCount() - 1
+    );
   };
 
   const functionType = eventsFunction.getFunctionType();

@@ -81,6 +81,16 @@ class GD_CORE_API MultipleInstructionMetadata {
   };
 
   /**
+   * \see gd::InstructionMetadata::SetParameterExtraInfo
+   */
+  MultipleInstructionMetadata &SetParameterExtraInfo(const gd::String &defaultValue) {
+    if (expression) expression->SetParameterExtraInfo(defaultValue);
+    if (condition) condition->SetParameterExtraInfo(defaultValue);
+    if (action) action->SetParameterExtraInfo(defaultValue);
+    return *this;
+  };
+
+  /**
    * \see gd::InstructionMetadata::SetParameterLongDescription
    */
   MultipleInstructionMetadata &SetParameterLongDescription(

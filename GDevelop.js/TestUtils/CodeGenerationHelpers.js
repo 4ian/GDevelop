@@ -17,8 +17,10 @@ function generateCompiledEventsForEventsFunction(
     new gd.EventsFunctionsExtensionCodeGenerator(project);
 
   const includeFiles = new gd.SetString();
+  const extension = new gd.EventsFunctionsExtension();
   const code =
     eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+      extension,
       eventsFunction,
       namespace,
       includeFiles,
@@ -26,6 +28,7 @@ function generateCompiledEventsForEventsFunction(
     );
 
   eventsFunctionsExtensionCodeGenerator.delete();
+  extension.delete();
   includeFiles.delete();
 
   if (logCode) console.log(code);

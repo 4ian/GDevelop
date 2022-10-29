@@ -818,6 +818,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
         getExtensionIconUrl(extension)
       )
     )
+    .useStandardParameters(convertPropertyTypeToValueType(propertyType))
       .setFunctionName(
         gd.BehaviorCodeGenerator.getBehaviorSharedPropertySetterName(
           propertyName

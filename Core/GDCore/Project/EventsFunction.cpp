@@ -13,7 +13,7 @@
 namespace gd {
 
 EventsFunction::EventsFunction() : functionType(Action) {
-  expressionType.SetName("number");
+  expressionType.SetName("expression");
 }
 
 const std::vector<gd::ParameterMetadata>& EventsFunction::GetParametersForEvents(

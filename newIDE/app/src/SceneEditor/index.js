@@ -39,12 +39,7 @@ import { shortenString } from '../Utils/StringHelpers';
 import getObjectByName from '../Utils/GetObjectByName';
 import UseSceneEditorCommands from './UseSceneEditorCommands';
 import { type InstancesEditorSettings } from '../InstancesEditor/InstancesEditorSettings';
-
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import {
   type HistoryState,
   undo,
@@ -76,7 +71,6 @@ import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
-import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 import { getInstancesInLayoutForObject } from '../Utils/Layout';
 
 const gd: libGDevelop = global.gd;
@@ -120,10 +114,7 @@ type Props = {|
   onOpenEvents: (sceneName: string) => void,
   project: gdProject,
   setToolbar: (?React.Node) => void,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
-  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
+  resourceManagementProps: ResourceManagementProps,
   isActive: boolean,
   unsavedChanges?: ?UnsavedChanges,
   canInstallPrivateAsset: () => boolean,
@@ -1302,9 +1293,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       project,
       layout,
       initialInstances,
-      resourceSources,
-      onChooseResource,
-      resourceExternalEditors,
+      resourceManagementProps,
       isActive,
     } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
@@ -1361,9 +1350,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         renderEditor: () => (
           <LayersList
             project={project}
-            resourceSources={resourceSources}
-            resourceExternalEditors={resourceExternalEditors}
-            onChooseResource={onChooseResource}
+            resourceManagementProps={this.props.resourceManagementProps}
             onEditLayerEffects={this.editLayerEffects}
             onEditLayer={this.editLayer}
             onRemoveLayer={this._onRemoveLayer}
@@ -1452,12 +1439,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                 project={project}
                 objectsContainer={layout}
                 layout={layout}
-                resourceSources={resourceSources}
                 onSelectAllInstancesOfObjectInLayout={
                   this.onSelectAllInstancesOfObjectInLayout
                 }
-                resourceExternalEditors={resourceExternalEditors}
-                onChooseResource={onChooseResource}
+                resourceManagementProps={this.props.resourceManagementProps}
                 selectedObjectNames={this.state.selectedObjectNames}
                 canInstallPrivateAsset={this.props.canInstallPrivateAsset}
                 onEditObject={this.props.onEditObject || this.editObject}
@@ -1485,9 +1470,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                 unsavedChanges={this.props.unsavedChanges}
                 hotReloadPreviewButtonProps={
                   this.props.hotReloadPreviewButtonProps
-                }
-                onFetchNewlyAddedResources={
-                  this.props.onFetchNewlyAddedResources
                 }
               />
             )}
@@ -1568,9 +1550,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   object={this.state.editedObjectWithContext.object}
                   initialTab={this.state.editedObjectInitialTab}
                   project={project}
-                  resourceSources={resourceSources}
-                  resourceExternalEditors={resourceExternalEditors}
-                  onChooseResource={onChooseResource}
+                  resourceManagementProps={resourceManagementProps}
                   onComputeAllVariableNames={() => {
                     const { editedObjectWithContext } = this.state;
                     if (!editedObjectWithContext) return [];
@@ -1766,9 +1746,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         {!!this.state.editedLayer && (
           <LayerEditorDialog
             project={project}
-            resourceSources={resourceSources}
-            onChooseResource={onChooseResource}
-            resourceExternalEditors={resourceExternalEditors}
+            resourceManagementProps={this.props.resourceManagementProps}
             layer={this.state.editedLayer}
             initialInstances={initialInstances}
             initialTab={this.state.editedLayerInitialTab}
@@ -1789,9 +1767,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onApply={() => this.openSceneProperties(false)}
             onEditVariables={() => this.editLayoutVariables(true)}
             onOpenMoreSettings={this.props.onOpenMoreSettings}
-            resourceSources={resourceSources}
-            resourceExternalEditors={resourceExternalEditors}
-            onChooseResource={onChooseResource}
+            resourceManagementProps={this.props.resourceManagementProps}
           />
         )}
         {!!this.state.layoutVariablesDialogOpen && (

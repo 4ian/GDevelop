@@ -7,10 +7,54 @@
 #include "EventsFunction.h"
 #include <vector>
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Project/EventsFunctionsContainer.h"
+#include "GDCore/Extensions/Metadata/ParameterMetadata.h"
 
 namespace gd {
 
-EventsFunction::EventsFunction() : functionType(Action) {}
+EventsFunction::EventsFunction() : functionType(Action) {
+  expressionType.SetName("expression");
+}
+
+const std::vector<gd::ParameterMetadata>& EventsFunction::GetParametersForEvents(
+    const gd::EventsFunctionsContainer& functionsContainer) const {
+  if (functionType != FunctionType::ActionWithOperator) {
+    // For most function types, the parameters are specified in the function.
+    return parameters;
+  }
+  // For ActionWithOperator, the parameters are auto generated.
+  actionWithOperationParameters.clear();
+  if (!functionsContainer.HasEventsFunctionNamed(getterName)) {
+    return actionWithOperationParameters;
+  }
+  const auto& expression = functionsContainer.GetEventsFunction(getterName);
+  const auto& expressionParameters = expression.parameters;
+  const auto functionsSource = functionsContainer.GetOwner();
+  const int expressionValueParameterIndex =
+      functionsSource == gd::EventsFunctionsContainer::FunctionOwner::Behavior ?
+      2 : 
+      functionsSource == gd::EventsFunctionsContainer::FunctionOwner::Object ?
+      1 :
+      0;
+  
+  for (size_t i = 0;
+       i < expressionValueParameterIndex && i < expressionParameters.size();
+       i++)
+  {
+    actionWithOperationParameters.push_back(expressionParameters[i]);
+  }
+  gd::ParameterMetadata parameterMetadata;
+  parameterMetadata.SetName("Value").SetValueTypeMetadata(expression.expressionType);
+  actionWithOperationParameters.push_back(parameterMetadata);
+  for (size_t i = expressionValueParameterIndex;
+       i < expressionParameters.size();
+       i++)
+  {
+    actionWithOperationParameters.push_back(expressionParameters[i]);
+  }
+
+  return actionWithOperationParameters;
+}
 
 void EventsFunction::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", name);
@@ -18,18 +62,33 @@ void EventsFunction::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("description", description);
   element.SetAttribute("sentence", sentence);
   element.SetAttribute("group", group);
+  element.SetAttribute("getterName", getterName);
   element.SetBoolAttribute("private", isPrivate);
   events.SerializeTo(element.AddChild("events"));
 
   gd::String functionTypeStr = "Action";
   if (functionType == Condition)
     functionTypeStr = "Condition";
-  else if (functionType == Expression)
+  else if (functionType == Expression) {
     functionTypeStr = "Expression";
-  else if (functionType == StringExpression)
-    functionTypeStr = "StringExpression";
+
+    // Compatibility code for version 5.1.147 and older.
+    // There is no longer distinction between number and string in the function
+    // type directly. The expression type is now used for this.
+    if (expressionType.IsString()) {
+      functionTypeStr = "StringExpression";
+    }
+  }
+  else if (functionType == ExpressionAndCondition) {
+    functionTypeStr = "ExpressionAndCondition";
+  }
+  else if (functionType == ActionWithOperator)
+    functionTypeStr = "ActionWithOperator";
   element.SetAttribute("functionType", functionTypeStr);
 
+  if (this->IsExpression()) {
+    expressionType.SerializeTo(element.AddChild("expressionType"));
+  }
   gd::SerializerElement& parametersElement = element.AddChild("parameters");
   parametersElement.ConsiderAsArrayOf("parameter");
   for (const auto& parameter : parameters) {
@@ -46,16 +105,32 @@ void EventsFunction::UnserializeFrom(gd::Project& project,
   description = element.GetStringAttribute("description");
   sentence = element.GetStringAttribute("sentence");
   group = element.GetStringAttribute("group");
+  getterName = element.GetStringAttribute("getterName");
   isPrivate = element.GetBoolAttribute("private");
   events.UnserializeFrom(project, element.GetChild("events"));
 
   gd::String functionTypeStr = element.GetStringAttribute("functionType");
+
   if (functionTypeStr == "Condition")
     functionType = Condition;
-  else if (functionTypeStr == "Expression")
+  else if (functionTypeStr == "Expression" || functionTypeStr == "StringExpression") {
     functionType = Expression;
-  else if (functionTypeStr == "StringExpression")
-    functionType = StringExpression;
+    if (element.HasChild("expressionType")) {
+      expressionType.UnserializeFrom(element.GetChild("expressionType"));
+    }
+    else {
+      // Compatibility code for version 5.1.147 and older.
+      // There is no longer distinction between number and string in the function
+      // type directly. The expression type is now used for this.
+      expressionType.SetName(functionTypeStr == "StringExpression" ? "string" : "expression");
+    }
+  }
+  else if (functionTypeStr == "ExpressionAndCondition") {
+    functionType = ExpressionAndCondition;
+    expressionType.UnserializeFrom(element.GetChild("expressionType"));
+  }
+  else if (functionTypeStr == "ActionWithOperator")
+    functionType = ActionWithOperator;
   else
     functionType = Action;
 

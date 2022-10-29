@@ -928,7 +928,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     );
 
     addObjectAndBehaviorParameters(
-      extension.addExpressionAndConditionAndAction(
+      behaviorMetadata.addExpressionAndConditionAndAction(
         convertPropertyTypeToValueType(propertyType),
         gd.EventsBasedBehavior.getSharedPropertyExpressionName(propertyName),
         propertyLabel,
@@ -938,7 +938,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
         getExtensionIconUrl(extension)
       )
     )
-    .useStandardParameters(convertPropertyTypeToValueType(propertyType))
+      .useStandardParameters(convertPropertyTypeToValueType(propertyType))
       .setFunctionName(
         gd.BehaviorCodeGenerator.getBehaviorSharedPropertySetterName(
           propertyName

@@ -31,7 +31,7 @@ class GD_CORE_API AbstractEventsBasedEntity {
  public:
   AbstractEventsBasedEntity(
       const gd::String& _name,
-      gd::EventsFunctionsContainer::FunctionSource functionContainerSource);
+      gd::EventsFunctionsContainer::FunctionOwner functionContainerSource);
   virtual ~AbstractEventsBasedEntity(){};
 
   /**

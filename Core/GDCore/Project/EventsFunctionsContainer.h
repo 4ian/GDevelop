@@ -26,12 +26,12 @@ namespace gd {
 class GD_CORE_API EventsFunctionsContainer
     : private SerializableWithNameList<gd::EventsFunction> {
 public:
-  enum FunctionSource {
+  enum FunctionOwner {
       Extension,
       Object,
       Behavior};
 
-  EventsFunctionsContainer(FunctionSource source_) : source(source_) {}
+  EventsFunctionsContainer(FunctionOwner source_) : owner(source_) {}
 
   /**
    * \brief Get the source of the function container.
@@ -39,8 +39,8 @@ public:
    * \note For instance, it can be useful to handle specific parameters for
    * behaviors.
    */
-  FunctionSource GetSource() const {
-    return source;
+  FunctionOwner GetOwner() const {
+    return owner;
   }
 
   /** \name Events Functions management
@@ -158,7 +158,7 @@ public:
   };
 
 private:
-  FunctionSource source;
+  FunctionOwner owner;
 };
 
 }  // namespace gd

@@ -15,12 +15,12 @@ namespace gd {
 
 EventsFunctionsExtension::EventsFunctionsExtension() :
     gd::EventsFunctionsContainer(
-        gd::EventsFunctionsContainer::FunctionSource::Extension) {}
+        gd::EventsFunctionsContainer::FunctionOwner::Extension) {}
 
 EventsFunctionsExtension::EventsFunctionsExtension(
     const EventsFunctionsExtension& other) :
     gd::EventsFunctionsContainer(
-        gd::EventsFunctionsContainer::FunctionSource::Extension) {
+        gd::EventsFunctionsContainer::FunctionOwner::Extension) {
   Init(other);
 }
 

@@ -12,7 +12,7 @@ namespace gd {
 EventsBasedObject::EventsBasedObject()
     : AbstractEventsBasedEntity(
         "MyObject",
-        gd::EventsFunctionsContainer::FunctionSource::Object),
+        gd::EventsFunctionsContainer::FunctionOwner::Object),
     ObjectsContainer() {
 }
 

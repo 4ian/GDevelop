@@ -36,7 +36,7 @@ void ValueTypeMetadata::UnserializeFrom(const SerializerElement& element) {
 const gd::String ValueTypeMetadata::numberType = "number";
 const gd::String ValueTypeMetadata::stringType = "string";
 
-const gd::String &ValueTypeMetadata::GetExpressionValueType(const gd::String &parameterType) {
+const gd::String &ValueTypeMetadata::GetPrimitiveValueType(const gd::String &parameterType) {
   if (parameterType == "number" || gd::ValueTypeMetadata::TypeIsExpression("number", parameterType)) {
     return ValueTypeMetadata::numberType;
   }

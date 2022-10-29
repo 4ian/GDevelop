@@ -167,6 +167,8 @@ class GD_CORE_API ParameterMetadata {
     return *this;
   }
 
+  // TODO Remove these deprecated functions.
+
   /**
    * \brief Return true if the type of the parameter is representing one object
    * (or more, i.e: an object group).
@@ -208,7 +210,7 @@ class GD_CORE_API ParameterMetadata {
    * \deprecated Use gd::ValueTypeMetadata instead.
    */
   static const gd::String &GetExpressionValueType(const gd::String &parameterType) {
-    return gd::ValueTypeMetadata::GetExpressionValueType(parameterType);
+    return gd::ValueTypeMetadata::GetPrimitiveValueType(parameterType);
   }
 
   /** \name Serialization

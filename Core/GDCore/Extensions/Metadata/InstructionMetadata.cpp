@@ -96,7 +96,7 @@ InstructionMetadata& InstructionMetadata::AddCodeOnlyParameter(
 InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
     const gd::String& type, const gd::String& typeExtraInfo) {
   const gd::String& expressionValueType =
-      gd::ValueTypeMetadata::GetExpressionValueType(type);
+      gd::ValueTypeMetadata::GetPrimitiveValueType(type);
   SetManipulatedType(expressionValueType);
 
   if (type == "boolean") {
@@ -157,7 +157,7 @@ InstructionMetadata&
 InstructionMetadata::UseStandardRelationalOperatorParameters(
     const gd::String& type, const gd::String& typeExtraInfo) {
   const gd::String& expressionValueType =
-      gd::ValueTypeMetadata::GetExpressionValueType(type);
+      gd::ValueTypeMetadata::GetPrimitiveValueType(type);
   SetManipulatedType(expressionValueType);
 
   if (type == "boolean") {

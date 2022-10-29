@@ -29,11 +29,11 @@ const std::vector<gd::ParameterMetadata>& EventsFunction::GetParametersForEvents
   }
   const auto& expression = functionsContainer.GetEventsFunction(getterName);
   const auto& expressionParameters = expression.parameters;
-  const auto functionsSource = functionsContainer.GetSource();
+  const auto functionsSource = functionsContainer.GetOwner();
   const int expressionValueParameterIndex =
-      functionsSource == gd::EventsFunctionsContainer::FunctionSource::Behavior ?
+      functionsSource == gd::EventsFunctionsContainer::FunctionOwner::Behavior ?
       2 : 
-      functionsSource == gd::EventsFunctionsContainer::FunctionSource::Object ?
+      functionsSource == gd::EventsFunctionsContainer::FunctionOwner::Object ?
       1 :
       0;
   

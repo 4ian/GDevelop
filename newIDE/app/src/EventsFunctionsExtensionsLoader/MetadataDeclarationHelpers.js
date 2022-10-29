@@ -341,7 +341,7 @@ export const declareInstructionOrExpressionMetadata = (
     }
   } else if (functionType === gd.EventsFunction.ExpressionAndCondition) {
     return extension.addExpressionAndCondition(
-      gd.ValueTypeMetadata.getExpressionValueType(
+      gd.ValueTypeMetadata.getPrimitiveValueType(
         eventsFunction.getExpressionType().getName()
       ),
       eventsFunction.getName(),
@@ -380,7 +380,7 @@ export const declareInstructionOrExpressionMetadata = (
       action
         .getCodeExtraInformation()
         .setManipulatedType(
-          gd.ValueTypeMetadata.getExpressionValueType(
+          gd.ValueTypeMetadata.getPrimitiveValueType(
             getterFunction.getExpressionType().getName()
           )
         )
@@ -479,7 +479,7 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
     }
   } else if (functionType === gd.EventsFunction.ExpressionAndCondition) {
     return behaviorMetadata.addExpressionAndCondition(
-      gd.ValueTypeMetadata.getExpressionValueType(
+      gd.ValueTypeMetadata.getPrimitiveValueType(
         eventsFunction.getExpressionType().getName()
       ),
       eventsFunction.getName(),
@@ -521,7 +521,7 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       action
         .getCodeExtraInformation()
         .setManipulatedType(
-          gd.ValueTypeMetadata.getExpressionValueType(
+          gd.ValueTypeMetadata.getPrimitiveValueType(
             getterFunction.getExpressionType().getName()
           )
         )
@@ -599,7 +599,7 @@ export const declareObjectInstructionOrExpressionMetadata = (
     }
   } else if (functionType === gd.EventsFunction.ExpressionAndCondition) {
     return objectMetadata.addExpressionAndCondition(
-      gd.ValueTypeMetadata.getExpressionValueType(
+      gd.ValueTypeMetadata.getPrimitiveValueType(
         eventsFunction.getExpressionType().getName()
       ),
       eventsFunction.getName(),
@@ -641,7 +641,7 @@ export const declareObjectInstructionOrExpressionMetadata = (
       action
         .getCodeExtraInformation()
         .setManipulatedType(
-          gd.ValueTypeMetadata.getExpressionValueType(
+          gd.ValueTypeMetadata.getPrimitiveValueType(
             getterFunction.getExpressionType().getName()
           )
         )

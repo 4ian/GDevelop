@@ -81,6 +81,16 @@ class GD_CORE_API MultipleInstructionMetadata {
   };
 
   /**
+   * \see gd::InstructionMetadata::SetParameterExtraInfo
+   */
+  MultipleInstructionMetadata &SetParameterExtraInfo(const gd::String &defaultValue) {
+    if (expression) expression->SetParameterExtraInfo(defaultValue);
+    if (condition) condition->SetParameterExtraInfo(defaultValue);
+    if (action) action->SetParameterExtraInfo(defaultValue);
+    return *this;
+  };
+
+  /**
    * \see gd::InstructionMetadata::SetParameterLongDescription
    */
   MultipleInstructionMetadata &SetParameterLongDescription(
@@ -116,9 +126,9 @@ class GD_CORE_API MultipleInstructionMetadata {
    * \see gd::InstructionMetadata::UseStandardOperatorParameters
    * \see gd::InstructionMetadata::UseStandardRelationalOperatorParameters
    */
-  MultipleInstructionMetadata &UseStandardParameters(const gd::String &type) {
-    if (condition) condition->UseStandardRelationalOperatorParameters(type);
-    if (action) action->UseStandardOperatorParameters(type);
+  MultipleInstructionMetadata &UseStandardParameters(const gd::String &type, const gd::String& typeExtraInfo = "") {
+    if (condition) condition->UseStandardRelationalOperatorParameters(type, typeExtraInfo);
+    if (action) action->UseStandardOperatorParameters(type, typeExtraInfo);
     return *this;
   }
 
@@ -151,6 +161,34 @@ class GD_CORE_API MultipleInstructionMetadata {
     if (condition)
       condition->GetCodeExtraInformation().AddIncludeFile(includeFile);
     if (action) action->GetCodeExtraInformation().AddIncludeFile(includeFile);
+    return *this;
+  }
+
+  /**
+   * \brief Get the files that must be included to use the instruction.
+   */
+  const std::vector<gd::String>& GetIncludeFiles() const {
+    if (expression)
+      return expression->GetCodeExtraInformation().GetIncludeFiles();
+    if (condition)
+      return condition->GetCodeExtraInformation().GetIncludeFiles();
+    if (action)
+      return action->GetCodeExtraInformation().GetIncludeFiles();
+    // It can't actually happen.
+    throw std::logic_error("no instruction metadata");
+  }
+
+  /**
+   * Set that the instruction is private - it can't be used outside of the
+   * object/ behavior that it is attached too.
+   */
+  MultipleInstructionMetadata &SetPrivate() {
+    if (expression)
+      expression->SetPrivate();
+    if (condition)
+      condition->SetPrivate();
+    if (action)
+      action->SetPrivate();
     return *this;
   }
 

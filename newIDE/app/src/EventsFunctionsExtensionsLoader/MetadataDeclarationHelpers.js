@@ -683,7 +683,8 @@ export const declareObjectInstructionOrExpressionMetadata = (
 
 type gdInstructionOrExpressionMetadata =
   | gdInstructionMetadata
-  | gdExpressionMetadata;
+  | gdExpressionMetadata
+  | gdMultipleInstructionMetadata;
 
 const convertPropertyTypeToValueType = (propertyType: string): string => {
   switch (propertyType) {
@@ -920,25 +921,30 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     const propertyType = property.getType();
     const propertyName = property.getName();
     const propertyLabel = i18n._(
-      t`${property.getLabel() || propertyName} property`
+      t`${property.getLabel() ||
+        propertyName} ${eventsBasedBehavior.getName()} shared property`
     );
 
-    extension
-      .addExpressionAndConditionAndAction(
+    addObjectAndBehaviorParameters(
+      extension.addExpressionAndConditionAndAction(
         convertPropertyTypeToValueType(propertyType),
-        gd.EventsBasedBehavior.getPropertyExpressionName(propertyName),
+        gd.EventsBasedBehavior.getSharedPropertyExpressionName(propertyName),
         propertyLabel,
         i18n._(t`the value of ${propertyLabel}`),
         i18n._(t`the value of ${propertyLabel}`),
         eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
         getExtensionIconUrl(extension)
       )
-      .addCodeOnlyParameter('currentScene', '')
+    )
       .setFunctionName(
-        gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(propertyName)
+        gd.BehaviorCodeGenerator.getBehaviorSharedPropertySetterName(
+          propertyName
+        )
       )
       .setGetter(
-        gd.BehaviorCodeGenerator.getBehaviorPropertyGetterName(propertyName)
+        gd.BehaviorCodeGenerator.getBehaviorSharedPropertyGetterName(
+          propertyName
+        )
       )
       // All property actions/conditions/expressions are private, meaning
       // they can only be used from the behavior events.

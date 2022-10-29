@@ -177,7 +177,7 @@ class GD_CORE_API ParameterMetadata {
    * \deprecated Use gd::ValueTypeMetadata instead.
    */
   static bool IsObject(const gd::String &parameterType) {
-    return gd::ValueTypeMetadata::TypeIsObject(parameterType);
+    return gd::ValueTypeMetadata::IsTypeObject(parameterType);
   }
 
   /**
@@ -187,7 +187,7 @@ class GD_CORE_API ParameterMetadata {
    * \deprecated Use gd::ValueTypeMetadata instead.
    */
   static bool IsBehavior(const gd::String &parameterType) {
-    return gd::ValueTypeMetadata::TypeIsBehavior(parameterType);
+    return gd::ValueTypeMetadata::IsTypeBehavior(parameterType);
   }
 
   /**
@@ -200,7 +200,7 @@ class GD_CORE_API ParameterMetadata {
    */
   static bool IsExpression(const gd::String &type,
                            const gd::String &parameterType) {
-    return gd::ValueTypeMetadata::TypeIsExpression(type, parameterType);
+    return gd::ValueTypeMetadata::IsTypeExpression(type, parameterType);
   }
 
   /**

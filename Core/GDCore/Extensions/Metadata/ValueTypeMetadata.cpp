@@ -37,10 +37,10 @@ const gd::String ValueTypeMetadata::numberType = "number";
 const gd::String ValueTypeMetadata::stringType = "string";
 
 const gd::String &ValueTypeMetadata::GetPrimitiveValueType(const gd::String &parameterType) {
-  if (parameterType == "number" || gd::ValueTypeMetadata::TypeIsExpression("number", parameterType)) {
+  if (parameterType == "number" || gd::ValueTypeMetadata::IsTypeExpression("number", parameterType)) {
     return ValueTypeMetadata::numberType;
   }
-  if (parameterType == "string" || gd::ValueTypeMetadata::TypeIsExpression("string", parameterType)) {
+  if (parameterType == "string" || gd::ValueTypeMetadata::IsTypeExpression("string", parameterType)) {
     return ValueTypeMetadata::stringType;
   }
   return parameterType;

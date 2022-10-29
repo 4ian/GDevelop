@@ -96,14 +96,14 @@ class GD_CORE_API ValueTypeMetadata {
    * (or more, i.e: an object group).
    */
   bool IsObject() const {
-    return gd::ValueTypeMetadata::TypeIsObject(name);
+    return gd::ValueTypeMetadata::IsTypeObject(name);
   }
 
   /**
    * \brief Return true if the type is "behavior".
    */
   bool IsBehavior() const {
-    return gd::ValueTypeMetadata::TypeIsBehavior(name);
+    return gd::ValueTypeMetadata::IsTypeBehavior(name);
   }
 
   /**
@@ -111,14 +111,14 @@ class GD_CORE_API ValueTypeMetadata {
    * given type.
    */
   bool IsNumber() const {
-    return gd::ValueTypeMetadata::TypeIsExpression("number", name);
+    return gd::ValueTypeMetadata::IsTypeExpression("number", name);
   }
 
   /**
    * \brief Return true if the type is a string.
    */
   bool IsString() const {
-    return gd::ValueTypeMetadata::TypeIsExpression("string", name);
+    return gd::ValueTypeMetadata::IsTypeExpression("string", name);
   }
 
   /**
@@ -128,14 +128,14 @@ class GD_CORE_API ValueTypeMetadata {
    * and ExpressionAutocompletion) and in the EventsCodeGenerator.
    */
   bool IsVariable() const {
-    return gd::ValueTypeMetadata::TypeIsExpression("variable", name);
+    return gd::ValueTypeMetadata::IsTypeExpression("variable", name);
   }
 
   /**
    * \brief Return true if the type is representing one object
    * (or more, i.e: an object group).
    */
-  static bool TypeIsObject(const gd::String &parameterType) {
+  static bool IsTypeObject(const gd::String &parameterType) {
     return parameterType == "object" || parameterType == "objectPtr" ||
            parameterType == "objectList" ||
            parameterType == "objectListOrEmptyIfJustDeclared" ||
@@ -145,7 +145,7 @@ class GD_CORE_API ValueTypeMetadata {
   /**
    * \brief Return true if the type is "behavior".
    */
-  static bool TypeIsBehavior(const gd::String &parameterType) {
+  static bool IsTypeBehavior(const gd::String &parameterType) {
     return parameterType == "behavior";
   }
 
@@ -155,7 +155,7 @@ class GD_CORE_API ValueTypeMetadata {
    * see EventsFunctionParametersEditor, ParameterRenderingService
    * and ExpressionAutocompletion) and in the EventsCodeGenerator.
    */
-  static bool TypeIsExpression(const gd::String &type,
+  static bool IsTypeExpression(const gd::String &type,
                            const gd::String &parameterType) {
     if (type == "number") {
       return parameterType == "number" || parameterType == "expression" ||

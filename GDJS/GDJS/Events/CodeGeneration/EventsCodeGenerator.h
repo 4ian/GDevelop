@@ -14,6 +14,7 @@
 #include "GDCore/Events/InstructionsList.h"
 namespace gd {
 class ObjectsContainer;
+class EventsFunctionsContainer;
 class EventsFunction;
 class EventsBasedBehavior;
 class EventsBasedObject;
@@ -55,6 +56,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * Generate JavaScript for executing events of an events based function.
    *
    * \param project Project used.
+   * \param functionsContainer The container of the compiled event function.
    * \param eventsFunction The events function to be compiled.
    * \param codeNamespace Where to store the context used by the function.
    * \param includeFiles Will be filled with the necessary include files.
@@ -65,6 +67,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   static gd::String GenerateEventsFunctionCode(
       gd::Project& project,
+      const gd::EventsFunctionsContainer& functionsContainer,
       const gd::EventsFunction& eventsFunction,
       const gd::String& codeNamespace,
       std::set<gd::String>& includeFiles,

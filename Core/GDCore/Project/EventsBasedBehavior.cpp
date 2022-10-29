@@ -11,7 +11,9 @@
 namespace gd {
 
 EventsBasedBehavior::EventsBasedBehavior()
-    : AbstractEventsBasedEntity("MyBehavior") {}
+    : AbstractEventsBasedEntity(
+        "MyBehavior",
+        gd::EventsFunctionsContainer::FunctionOwner::Behavior) {}
 
 void EventsBasedBehavior::SerializeTo(SerializerElement& element) const {
   AbstractEventsBasedEntity::SerializeTo(element);

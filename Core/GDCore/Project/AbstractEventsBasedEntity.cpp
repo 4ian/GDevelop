@@ -10,8 +10,10 @@
 
 namespace gd {
 
-AbstractEventsBasedEntity::AbstractEventsBasedEntity(const gd::String& _name)
-    : name(_name), fullName("") {}
+AbstractEventsBasedEntity::AbstractEventsBasedEntity(
+    const gd::String& _name,
+    gd::EventsFunctionsContainer::FunctionOwner functionContainerSource)
+    : name(_name), fullName(""), eventsFunctionsContainer(functionContainerSource) {}
 
 void AbstractEventsBasedEntity::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("description", description);

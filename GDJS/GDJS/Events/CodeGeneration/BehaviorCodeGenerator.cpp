@@ -50,7 +50,7 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
   auto generateInitializeSharedPropertiesCode = [&]() {
     gd::String runtimeBehaviorSharedDataInitializationCode;
     for (auto& property :
-          eventsBasedBehavior.GetPropertyDescriptors().GetInternalVector()) {
+          eventsBasedBehavior.GetSharedPropertyDescriptors().GetInternalVector()) {
       runtimeBehaviorSharedDataInitializationCode +=
           property->IsHidden()
               ? GenerateInitializeSharedPropertyFromDefaultValueCode(*property)
@@ -63,7 +63,7 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
   auto generateSharedPropertiesCode = [&]() {
     gd::String runtimeBehaviorSharedPropertyMethodsCode;
     for (auto& property :
-          eventsBasedBehavior.GetPropertyDescriptors().GetInternalVector()) {
+          eventsBasedBehavior.GetSharedPropertyDescriptors().GetInternalVector()) {
       runtimeBehaviorSharedPropertyMethodsCode +=
           GenerateRuntimeBehaviorSharedPropertyTemplateCode(
               eventsBasedBehavior, *property);
@@ -170,12 +170,12 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAMESharedData = class RUNTIME_BEHAVIOR_CLA
   }
 }
 
-CODE_NAMESPACE.getSharedData(instanceContainer, behaviorName) {
+CODE_NAMESPACE.getSharedData = function(instanceContainer, behaviorName) {
   if (!instanceContainer.RUNTIME_BEHAVIOR_CLASSNAMESharedData) {
     const initialData = instanceContainer.getInitialSharedDataForBehavior(
       behaviorName
     );
-    instanceContainer.RUNTIME_BEHAVIOR_CLASSNAMESharedData = new gdjs.RUNTIME_BEHAVIOR_CLASSNAMESharedData(
+    instanceContainer.RUNTIME_BEHAVIOR_CLASSNAMESharedData = new CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAMESharedData(
       initialData
     );
   }
@@ -186,9 +186,9 @@ CODE_NAMESPACE.getSharedData(instanceContainer, behaviorName) {
  * Behavior generated from BEHAVIOR_FULL_NAME
  */
 CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = class RUNTIME_BEHAVIOR_CLASSNAME extends gdjs.RuntimeBehavior {
-  constructor(runtimeScene, behaviorData, owner) {
-    super(runtimeScene, behaviorData, owner);
-    this._runtimeScene = runtimeScene;
+  constructor(instanceContainer, behaviorData, owner) {
+    super(instanceContainer, behaviorData, owner);
+    this._runtimeScene = instanceContainer;
 
     this._onceTriggers = new gdjs.OnceTriggers();
     this._behaviorData = {};
@@ -224,13 +224,14 @@ gdjs.registerBehavior("EXTENSION_NAME::BEHAVIOR_NAME", CODE_NAMESPACE.RUNTIME_BE
       .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
                       eventsBasedBehavior.GetName())
       .FindAndReplace("CODE_NAMESPACE", codeNamespace)
-      .FindAndReplace("INITIALIZE_PROPERTIES_CODE",
-                      generateInitializePropertiesCode())
       .FindAndReplace("INITIALIZE_SHARED_PROPERTIES_CODE",
                       generateInitializeSharedPropertiesCode())
+      .FindAndReplace("INITIALIZE_PROPERTIES_CODE",
+                      generateInitializePropertiesCode())
       .FindAndReplace("UPDATE_FROM_BEHAVIOR_DATA_CODE", generateUpdateFromBehaviorDataCode())
-      .FindAndReplace("PROPERTIES_CODE", generatePropertiesCode())
+      // It must be done before PROPERTIES_CODE.
       .FindAndReplace("SHARED_PROPERTIES_CODE", generateSharedPropertiesCode())
+      .FindAndReplace("PROPERTIES_CODE", generatePropertiesCode())
       .FindAndReplace("METHODS_CODE", generateMethodsCode());
   ;
 }
@@ -301,9 +302,9 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorSharedPropertyTemplateC
   })jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
       .FindAndReplace("GETTER_NAME",
-                      GetBehaviorPropertyGetterName(property.GetName()))
+                      GetBehaviorSharedPropertyGetterName(property.GetName()))
       .FindAndReplace("SETTER_NAME",
-                      GetBehaviorPropertySetterName(property.GetName()))
+                      GetBehaviorSharedPropertySetterName(property.GetName()))
       .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property))
       .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
                       eventsBasedBehavior.GetName());

@@ -103,6 +103,11 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
     return sharedPropertyDescriptors;
   }
 
+  /**
+   * \brief Get the name of the expression to get a property.
+   */
+  static gd::String GetSharedPropertyExpressionName(const gd::String& propertyName) { return "SharedProperty" + propertyName; };
+
   void SerializeTo(SerializerElement& element) const override;
 
   void UnserializeFrom(gd::Project& project,

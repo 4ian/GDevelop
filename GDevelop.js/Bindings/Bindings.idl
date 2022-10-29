@@ -2375,6 +2375,7 @@ interface EventsBasedBehavior {
     [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyExpressionName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetSharedPropertyExpressionName([Const] DOMString propertyName);
 };
 
 interface EventsBasedBehaviorsList {
@@ -3003,6 +3004,8 @@ interface BehaviorCodeGenerator {
     [Const, Value] DOMString GenerateRuntimeBehaviorCompleteCode([Const] DOMString extensionName, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const] DOMString codeNamespace, [Const, Ref] MapStringString behaviorMethodMangledNames, [Ref] SetString includes, boolean compilationForRuntime);
     [Const, Value] DOMString STATIC_GetBehaviorPropertyGetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetBehaviorPropertySetterName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetBehaviorSharedPropertyGetterName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetBehaviorSharedPropertySetterName([Const] DOMString propertyName);
 };
 
 [Prefix="gdjs::"]

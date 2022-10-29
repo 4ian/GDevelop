@@ -19,6 +19,7 @@ declare class gdEventsBasedBehavior {
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;
+  static getSharedPropertyExpressionName(propertyName: string): string;
   delete(): void;
   ptr: number;
 };

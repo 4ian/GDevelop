@@ -63,7 +63,7 @@ class BehaviorCodeGenerator {
    */
   static gd::String GetBehaviorSharedPropertyGetterName(
       const gd::String& propertyName) {
-    return "._getShared" + propertyName;
+    return "_getShared" + propertyName;
   }
 
   /**
@@ -72,7 +72,7 @@ class BehaviorCodeGenerator {
    */
   static gd::String GetBehaviorSharedPropertySetterName(
       const gd::String& propertyName) {
-    return "._setShared" + propertyName;
+    return "_setShared" + propertyName;
   }
 
  private:

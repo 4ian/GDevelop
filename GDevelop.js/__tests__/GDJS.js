@@ -475,10 +475,12 @@ describe('libGD.js - GDJS related tests', function () {
       gd.asRepeatEvent(evt).getActions().insert(action2, 1);
 
       const namespace = 'gdjs.eventsFunction.myTest';
+      const extension = new gd.EventsFunctionsExtension();
       const eventsFunctionsExtensionCodeGenerator =
         new gd.EventsFunctionsExtensionCodeGenerator(project);
       const code =
         eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+          extension,
           eventsFunction,
           namespace,
           includeFiles,
@@ -531,6 +533,7 @@ describe('libGD.js - GDJS related tests', function () {
 
       condition.delete();
       action.delete();
+      extension.delete();
     });
 
     it('can generate code for an events function, with groups', function () {
@@ -583,6 +586,7 @@ describe('libGD.js - GDJS related tests', function () {
         new gd.EventsFunctionsExtensionCodeGenerator(project);
       const code =
         eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+          new gd.EventsFunctionsExtension(),
           eventsFunction,
           namespace,
           includeFiles,

@@ -119,6 +119,7 @@ declare class libGDevelop {
   MultipleInstructionMetadata: Class<gdMultipleInstructionMetadata>;
   DependencyMetadata: Class<gdDependencyMetadata>;
   ParameterMetadata: Class<gdParameterMetadata>;
+  ValueTypeMetadata: Class<gdValueTypeMetadata>;
   VectorParameterMetadata: Class<gdVectorParameterMetadata>;
   ParameterMetadataTools: Class<gdParameterMetadataTools>;
   EventsFunctionTools: Class<gdEventsFunctionTools>;

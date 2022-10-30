@@ -391,6 +391,43 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
         // extension name
       };
 
+  auto renameBehaviorSharedPropertyFunctions =
+      [&project, &oldName, &newName](
+          const gd::EventsBasedBehavior& eventsBasedBehavior,
+          const gd::NamedPropertyDescriptor& property) {
+        gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
+            project,
+            GetBehaviorEventsFunctionFullType(
+                oldName,
+                eventsBasedBehavior.GetName(),
+                gd::EventsBasedBehavior::GetSharedPropertyActionName(
+                    property.GetName())),
+            GetBehaviorEventsFunctionFullType(
+                newName,
+                eventsBasedBehavior.GetName(),
+                gd::EventsBasedBehavior::GetSharedPropertyActionName(
+                    property.GetName())));
+        ExposeProjectEvents(project, actionRenamer);
+
+        gd::InstructionsTypeRenamer conditionRenamer =
+            gd::InstructionsTypeRenamer(
+                project,
+                GetBehaviorEventsFunctionFullType(
+                    oldName,
+                    eventsBasedBehavior.GetName(),
+                    gd::EventsBasedBehavior::GetSharedPropertyConditionName(
+                        property.GetName())),
+                GetBehaviorEventsFunctionFullType(
+                    newName,
+                    eventsBasedBehavior.GetName(),
+                    gd::EventsBasedBehavior::GetSharedPropertyConditionName(
+                        property.GetName())));
+        ExposeProjectEvents(project, conditionRenamer);
+
+        // Nothing to do for expressions, expressions are not including the
+        // extension name
+      };
+
   auto renameObjectEventsFunction =
       [&project, &oldName, &newName](
           const gd::EventsBasedObject& eventsBasedObject,
@@ -488,12 +525,18 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
   }
 
   // Behavior properties
-  for (auto&& eventsBasedBehavior :
+  for (auto &&eventsBasedBehavior :
        eventsFunctionsExtension.GetEventsBasedBehaviors().GetInternalVector()) {
-    auto& behaviorProperties = eventsBasedBehavior->GetPropertyDescriptors();
-    for (auto&& propertyDescriptor : behaviorProperties.GetInternalVector()) {
+    for (auto &&propertyDescriptor :
+         eventsBasedBehavior->GetPropertyDescriptors().GetInternalVector()) {
       renameBehaviorPropertyFunctions(*eventsBasedBehavior,
                                       *propertyDescriptor);
+    }
+    for (auto &&propertyDescriptor :
+         eventsBasedBehavior->GetSharedPropertyDescriptors()
+             .GetInternalVector()) {
+      renameBehaviorSharedPropertyFunctions(*eventsBasedBehavior,
+                                            *propertyDescriptor);
     }
   }
 
@@ -835,6 +878,72 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
   }
 }
 
+void WholeProjectRefactorer::RenameEventsBasedBehaviorSharedProperty(
+    gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+    const gd::EventsBasedBehavior& eventsBasedBehavior,
+    const gd::String& oldPropertyName,
+    const gd::String& newPropertyName) {
+  auto& properties = eventsBasedBehavior.GetPropertyDescriptors();
+  if (!properties.Has(oldPropertyName)) return;
+
+  if (properties.Get(oldPropertyName).GetType() == "Behavior") {
+    // This is a property representing another behavior that must exist on the
+    // object.
+
+    // This other "required behavior" uses the property name, that is about to
+    // change, as its name.
+    // So we must change all reference to this name in the events of the
+    // behavior functions.
+    gd::EventsBehaviorRenamer behaviorRenamer(project.GetCurrentPlatform(),
+                                              behaviorObjectParameterName,
+                                              oldPropertyName,
+                                              newPropertyName);
+
+    ExposeEventsBasedBehaviorEvents(
+        project, eventsBasedBehavior, behaviorRenamer);
+  } else {
+    // Properties that represent primitive values will be used through
+    // their related actions/conditions/expressions. Rename these.
+
+    // Order is important: we first rename the expressions then the
+    // instructions, to avoid being unable to fetch the metadata (the types of
+    // parameters) of instructions after they are renamed.
+    gd::ExpressionsRenamer expressionRenamer =
+        gd::ExpressionsRenamer(project.GetCurrentPlatform());
+    expressionRenamer.SetReplacedBehaviorExpression(
+        GetBehaviorFullType(eventsFunctionsExtension.GetName(),
+                            eventsBasedBehavior.GetName()),
+        EventsBasedBehavior::GetSharedPropertyExpressionName(oldPropertyName),
+        EventsBasedBehavior::GetSharedPropertyExpressionName(newPropertyName));
+    ExposeProjectEvents(project, expressionRenamer);
+
+    gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
+        project,
+        GetBehaviorEventsFunctionFullType(
+            eventsFunctionsExtension.GetName(),
+            eventsBasedBehavior.GetName(),
+            EventsBasedBehavior::GetSharedPropertyActionName(oldPropertyName)),
+        GetBehaviorEventsFunctionFullType(
+            eventsFunctionsExtension.GetName(),
+            eventsBasedBehavior.GetName(),
+            EventsBasedBehavior::GetSharedPropertyActionName(newPropertyName)));
+    ExposeProjectEvents(project, actionRenamer);
+
+    gd::InstructionsTypeRenamer conditionRenamer = gd::InstructionsTypeRenamer(
+        project,
+        GetBehaviorEventsFunctionFullType(
+            eventsFunctionsExtension.GetName(),
+            eventsBasedBehavior.GetName(),
+            EventsBasedBehavior::GetSharedPropertyConditionName(oldPropertyName)),
+        GetBehaviorEventsFunctionFullType(
+            eventsFunctionsExtension.GetName(),
+            eventsBasedBehavior.GetName(),
+            EventsBasedBehavior::GetSharedPropertyConditionName(newPropertyName)));
+    ExposeProjectEvents(project, conditionRenamer);
+  }
+}
+
 void WholeProjectRefactorer::RenameEventsBasedObjectProperty(
     gd::Project& project,
     const gd::EventsFunctionsExtension& eventsFunctionsExtension,
@@ -1160,6 +1269,40 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
     // the behavior
   };
 
+  auto renameBehaviorSharedProperty = [&project,
+                                 &eventsFunctionsExtension,
+                                 &oldBehaviorName,
+                                 &newBehaviorName](
+                                    const gd::NamedPropertyDescriptor&
+                                        property) {
+    gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
+        project,
+        GetBehaviorEventsFunctionFullType(
+            eventsFunctionsExtension.GetName(),
+            oldBehaviorName,
+            EventsBasedBehavior::GetSharedPropertyActionName(property.GetName())),
+        GetBehaviorEventsFunctionFullType(
+            eventsFunctionsExtension.GetName(),
+            newBehaviorName,
+            EventsBasedBehavior::GetSharedPropertyActionName(property.GetName())));
+    ExposeProjectEvents(project, actionRenamer);
+
+    gd::InstructionsTypeRenamer conditionRenamer = gd::InstructionsTypeRenamer(
+        project,
+        GetBehaviorEventsFunctionFullType(
+            eventsFunctionsExtension.GetName(),
+            oldBehaviorName,
+            EventsBasedBehavior::GetSharedPropertyConditionName(property.GetName())),
+        GetBehaviorEventsFunctionFullType(
+            eventsFunctionsExtension.GetName(),
+            newBehaviorName,
+            EventsBasedBehavior::GetSharedPropertyConditionName(property.GetName())));
+    ExposeProjectEvents(project, conditionRenamer);
+
+    // Nothing to do for expression, expressions are not including the name of
+    // the behavior
+  };
+
   // Order is important: we first rename the expressions then the instructions,
   // to avoid being unable to fetch the metadata (the types of parameters) of
   // instructions after they are renamed.
@@ -1180,9 +1323,11 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
   }
 
   // Behavior properties
-  auto& properties = eventsBasedBehavior.GetPropertyDescriptors();
-  for (auto&& property : properties.GetInternalVector()) {
+  for (auto&& property : eventsBasedBehavior.GetPropertyDescriptors().GetInternalVector()) {
     renameBehaviorProperty(*property);
+  }
+  for (auto&& property : eventsBasedBehavior.GetSharedPropertyDescriptors().GetInternalVector()) {
+    renameBehaviorSharedProperty(*property);
   }
 
   DoRenameBehavior(

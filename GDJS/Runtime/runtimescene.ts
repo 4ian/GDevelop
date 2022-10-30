@@ -13,9 +13,6 @@ namespace gdjs {
   export class RuntimeScene extends gdjs.RuntimeInstanceContainer {
     _eventsFunction: null | ((runtimeScene: RuntimeScene) => void) = null;
 
-    // TODO EBO move behavior shared data up to the instances container.
-    /** Contains the objects data stored in the project */
-    _initialBehaviorSharedData: Hashtable<BehaviorSharedData | null>;
     _renderer: RuntimeSceneRenderer;
     _debuggerRenderer: gdjs.DebuggerRenderer;
     _variables: gdjs.VariablesContainer;
@@ -49,7 +46,6 @@ namespace gdjs {
      */
     constructor(runtimeGame: gdjs.RuntimeGame) {
       super();
-      this._initialBehaviorSharedData = new Hashtable();
       this._runtimeGame = runtimeGame;
       this._variables = new gdjs.VariablesContainer();
       this._timeManager = new gdjs.TimeManager();
@@ -593,32 +589,6 @@ namespace gdjs {
      */
     getVariables() {
       return this._variables;
-    }
-
-    /**
-     * Get the data representing the initial shared data of the scene for the specified behavior.
-     * @param name The name of the behavior
-     * @returns The shared data for the behavior, if any.
-     */
-    getInitialSharedDataForBehavior(name: string): BehaviorSharedData | null {
-      const behaviorSharedData = this._initialBehaviorSharedData.get(name);
-      if (behaviorSharedData) {
-        return behaviorSharedData;
-      }
-      logger.error("Can't find shared data for behavior with name: " + name);
-      return null;
-    }
-
-    /**
-     * Set the data representing the initial shared data of the scene for the specified behavior.
-     * @param name The name of the behavior
-     * @param sharedData The shared data for the behavior, or null to remove it.
-     */
-    setInitialSharedDataForBehavior(
-      name: string,
-      sharedData: BehaviorSharedData | null
-    ): void {
-      this._initialBehaviorSharedData.put(name, sharedData);
     }
 
     /**

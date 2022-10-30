@@ -11,11 +11,13 @@ declare class gdEventsBasedBehavior {
   getObjectType(): string;
   getEventsFunctions(): gdEventsFunctionsContainer;
   getPropertyDescriptors(): gdNamedPropertyDescriptorsList;
+  getSharedPropertyDescriptors(): gdNamedPropertyDescriptorsList;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;
+  static getSharedPropertyExpressionName(propertyName: string): string;
   delete(): void;
   ptr: number;
 };

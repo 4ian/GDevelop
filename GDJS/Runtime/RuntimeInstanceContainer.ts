@@ -13,6 +13,8 @@ namespace gdjs {
    * A container of object instances rendered on screen.
    */
   export abstract class RuntimeInstanceContainer {
+    _initialBehaviorSharedData: Hashtable<BehaviorSharedData | null>;
+
     /** Contains the instances living on the container */
     _instances: Hashtable<RuntimeObject[]>;
 
@@ -43,6 +45,7 @@ namespace gdjs {
     _debugDrawShowCustomPoints: boolean = false;
 
     constructor() {
+      this._initialBehaviorSharedData = new Hashtable();
       this._instances = new Hashtable();
       this._instancesCache = new Hashtable();
       this._objects = new Hashtable();
@@ -264,6 +267,32 @@ namespace gdjs {
           newObject.extraInitializationFromInitialInstance(instanceData);
         }
       }
+    }
+
+    /**
+     * Get the data representing the initial shared data of the scene for the specified behavior.
+     * @param name The name of the behavior
+     * @returns The shared data for the behavior, if any.
+     */
+    getInitialSharedDataForBehavior(name: string): BehaviorSharedData | null {
+      const behaviorSharedData = this._initialBehaviorSharedData.get(name);
+      if (behaviorSharedData) {
+        return behaviorSharedData;
+      }
+      logger.error("Can't find shared data for behavior with name: " + name);
+      return null;
+    }
+
+    /**
+     * Set the data representing the initial shared data of the scene for the specified behavior.
+     * @param name The name of the behavior
+     * @param sharedData The shared data for the behavior, or null to remove it.
+     */
+    setInitialSharedDataForBehavior(
+      name: string,
+      sharedData: BehaviorSharedData | null
+    ): void {
+      this._initialBehaviorSharedData.put(name, sharedData);
     }
 
     /**

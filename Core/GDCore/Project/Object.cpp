@@ -114,7 +114,7 @@ gd::Behavior* Object::AddNewBehavior(const gd::Project& project,
     if (gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
       gd::LogWarning("Tried to create a behavior with an unknown type: " + type
                      + " on object " + GetName() + "!");
-    // It's probably an events-based object that was removed.
+    // It's probably an events-based behavior that was removed.
     // Create a custom behavior to preserve the properties values.
     return initializeAndAdd(
         gd::make_unique<CustomBehavior>(name, project, type));

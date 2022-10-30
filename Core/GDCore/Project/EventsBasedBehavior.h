@@ -73,6 +73,26 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
     return *this;
   }
 
+  /**
+   * \brief Return a reference to the list of shared properties.
+   */
+  SerializableWithNameList<NamedPropertyDescriptor>& GetSharedPropertyDescriptors() {
+    return sharedPropertyDescriptors;
+  }
+
+  /**
+   * \brief Return a const reference to the list of shared properties.
+   */
+  const SerializableWithNameList<NamedPropertyDescriptor>& GetSharedPropertyDescriptors()
+      const {
+    return sharedPropertyDescriptors;
+  }
+
+  /**
+   * \brief Get the name of the expression to get a property.
+   */
+  static gd::String GetSharedPropertyExpressionName(const gd::String& propertyName) { return "SharedProperty" + propertyName; };
+
   void SerializeTo(SerializerElement& element) const override;
 
   void UnserializeFrom(gd::Project& project,
@@ -80,6 +100,7 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
 
  private:
   gd::String objectType;
+  SerializableWithNameList<NamedPropertyDescriptor> sharedPropertyDescriptors;
 };
 
 }  // namespace gd

@@ -18,12 +18,16 @@ EventsBasedBehavior::EventsBasedBehavior()
 void EventsBasedBehavior::SerializeTo(SerializerElement& element) const {
   AbstractEventsBasedEntity::SerializeTo(element);
   element.SetAttribute("objectType", objectType);
+  sharedPropertyDescriptors.SerializeElementsTo(
+      "propertyDescriptor", element.AddChild("sharedPropertyDescriptors"));
 }
 
 void EventsBasedBehavior::UnserializeFrom(gd::Project& project,
                                           const SerializerElement& element) {
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
   objectType = element.GetStringAttribute("objectType");
+  sharedPropertyDescriptors.UnserializeElementsFrom(
+      "propertyDescriptor", element.GetChild("sharedPropertyDescriptors"));
 }
 
 }  // namespace gd

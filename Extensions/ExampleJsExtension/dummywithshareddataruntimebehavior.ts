@@ -16,7 +16,6 @@ namespace gdjs {
 
       // You can also access to the shared data:
       const sharedData = instanceContainer
-        .getScene()
         .getInitialSharedDataForBehavior(behaviorData.name);
       this._textToSet = (sharedData as any).sharedProperty1;
 

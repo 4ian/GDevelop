@@ -104,9 +104,26 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
   }
 
   /**
-   * \brief Get the name of the expression to get a property.
+   * \brief Get the name of the action to change a shared property.
    */
-  static gd::String GetSharedPropertyExpressionName(const gd::String& propertyName) { return "SharedProperty" + propertyName; };
+  static gd::String GetSharedPropertyActionName(const gd::String &propertyName) {
+    return "SetSharedProperty" + propertyName;
+  };
+
+  /**
+   * \brief Get the name of the condition to compare a shared property.
+   */
+  static gd::String GetSharedPropertyConditionName(const gd::String &propertyName) {
+    return "SharedProperty" + propertyName;
+  };
+
+  /**
+   * \brief Get the name of the expression to get a shared property.
+   */
+  static gd::String
+  GetSharedPropertyExpressionName(const gd::String &propertyName) {
+    return "SharedProperty" + propertyName;
+  };
 
   void SerializeTo(SerializerElement& element) const override;
 

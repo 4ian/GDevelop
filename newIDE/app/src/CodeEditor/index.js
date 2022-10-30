@@ -163,8 +163,7 @@ export class CodeEditor extends React.Component<Props, State> {
                 // (so no need to scroll horizontally
                 // on small code editors) or at 80 columns max
                 // (as a good practice).
-                wordWrap: 'bounded',
-                wordWrapColumn: 80,
+                wordWrap: 'on',
               }}
             />
           )}

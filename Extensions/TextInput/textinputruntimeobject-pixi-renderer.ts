@@ -170,19 +170,21 @@ namespace gdjs {
       // Position the input on the container on top of the canvas.
       workingPoint[0] = canvasLeft;
       workingPoint[1] = canvasTop;
-      const topLeftPageCoordinates = runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
+      runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
+        workingPoint,
         workingPoint
       );
-      const pageLeft = topLeftPageCoordinates[0];
-      const pageTop = topLeftPageCoordinates[1];
+      const pageLeft = workingPoint[0];
+      const pageTop = workingPoint[1];
 
       workingPoint[0] = canvasRight;
       workingPoint[1] = canvasBottom;
-      const bottomRightPageCoordinates = runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
+      runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
+        workingPoint,
         workingPoint
       );
-      const pageRight = bottomRightPageCoordinates[0];
-      const pageBottom = bottomRightPageCoordinates[1];
+      const pageRight = workingPoint[0];
+      const pageBottom = workingPoint[1];
 
       const widthInContainer = pageRight - pageLeft;
       const heightInContainer = pageBottom - pageTop;

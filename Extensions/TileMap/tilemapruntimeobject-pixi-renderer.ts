@@ -1,8 +1,6 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 /// <reference path="pixi-tilemap/dist/pixi-tilemap.d.ts" />
 namespace gdjs {
-  const logger = new gdjs.Logger('Tilemap object');
-
   /**
    * The PIXI.js renderer for the Tile map runtime object.
    *

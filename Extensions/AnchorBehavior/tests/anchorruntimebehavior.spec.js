@@ -62,16 +62,6 @@ describe('gdjs.AnchorRuntimeBehavior', function () {
     return object;
   }
 
-  function getAnchorBehavior(object) {
-    const behavior = object.getBehavior(anchorBehaviorName);
-    if (!(behavior instanceof gdjs.AnchorRuntimeBehavior)) {
-      throw new Error(
-        'Expected behavior to be an instance of gdjs.AnchorBehavior'
-      );
-    }
-    return behavior;
-  }
-
   describe('(anchor horizontal edge)', function () {
     ['rightEdgeAnchor', 'leftEdgeAnchor'].forEach((objectEdge) => {
       it(`anchors the ${objectEdge} edge of object to window left (fixed)`, function () {

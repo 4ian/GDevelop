@@ -2,7 +2,6 @@
 namespace gdjs {
   import PIXI = GlobalPIXIModule.PIXI;
 
-  const logger = new gdjs.Logger('Tilemap object');
   /**
    * Displays a Tilemap object (mapeditor.org supported).
    */

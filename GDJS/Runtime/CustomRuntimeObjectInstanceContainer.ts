@@ -5,9 +5,6 @@
  */
 namespace gdjs {
   const logger = new gdjs.Logger('CustomRuntimeObject');
-  const setupWarningLogger = new gdjs.Logger(
-    'CustomRuntimeObject (setup warnings)'
-  );
 
   /**
    * The instance container of a custom object, containing instances of objects rendered on screen.
@@ -200,12 +197,8 @@ namespace gdjs {
      */
     _updateObjectsPreRender() {
       const allInstancesList = this.getAdhocListOfAllInstances();
-      for (
-        let i = 0, len = this.getAdhocListOfAllInstances().length;
-        i < len;
-        ++i
-      ) {
-        const object = this.getAdhocListOfAllInstances()[i];
+      for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+        const object = allInstancesList[i];
         const rendererObject = object.getRendererObject();
         if (rendererObject) {
           rendererObject.visible = !object.isHidden();
@@ -222,7 +215,7 @@ namespace gdjs {
         // to see what is rendered).
         if (this._debugDrawEnabled) {
           this._debuggerRenderer.renderDebugDraw(
-            this.getAdhocListOfAllInstances(),
+            allInstancesList,
             this._debugDrawShowHiddenInstances,
             this._debugDrawShowPointsNames,
             this._debugDrawShowCustomPoints

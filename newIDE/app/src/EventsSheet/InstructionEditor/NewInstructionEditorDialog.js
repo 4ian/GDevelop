@@ -1,5 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
@@ -194,10 +196,10 @@ export default function NewInstructionEditorDialog({
     chooseObject(chosenObject.getName());
   };
 
-  const onExtensionInstalled = () => {
+  const onExtensionInstalled = (i18n: I18nType) => {
     setNewExtensionDialogOpen(false);
     freeInstructionComponentRef.current &&
-      freeInstructionComponentRef.current.reEnumerateInstructions();
+      freeInstructionComponentRef.current.reEnumerateInstructions(i18n);
   };
 
   // Focus the parameters when showing them
@@ -225,31 +227,38 @@ export default function NewInstructionEditorDialog({
     : undefined;
 
   const renderInstructionOrObjectSelector = () => (
-    <InstructionOrObjectSelector
-      key="instruction-or-object-selector"
-      style={styles.fullHeightSelector}
-      project={project}
-      scope={scope}
-      ref={freeInstructionComponentRef}
-      currentTab={currentInstructionOrObjectSelectorTab}
-      onChangeTab={setCurrentInstructionOrObjectSelectorTab}
-      globalObjectsContainer={globalObjectsContainer}
-      objectsContainer={objectsContainer}
-      isCondition={isCondition}
-      chosenInstructionType={!chosenObjectName ? instructionType : undefined}
-      onChooseInstruction={(instructionType: string) => {
-        chooseInstruction(instructionType);
-        setStep('parameters');
-      }}
-      chosenObjectName={chosenObjectName}
-      onChooseObject={(chosenObjectName: string) => {
-        chooseObject(chosenObjectName);
-        setStep('object-instructions');
-      }}
-      focusOnMount={!instructionType}
-      onSearchStartOrReset={forceUpdate}
-      onClickMore={() => setNewExtensionDialogOpen(true)}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <InstructionOrObjectSelector
+          key="instruction-or-object-selector"
+          style={styles.fullHeightSelector}
+          project={project}
+          scope={scope}
+          ref={freeInstructionComponentRef}
+          currentTab={currentInstructionOrObjectSelectorTab}
+          onChangeTab={setCurrentInstructionOrObjectSelectorTab}
+          globalObjectsContainer={globalObjectsContainer}
+          objectsContainer={objectsContainer}
+          isCondition={isCondition}
+          chosenInstructionType={
+            !chosenObjectName ? instructionType : undefined
+          }
+          onChooseInstruction={(instructionType: string) => {
+            chooseInstruction(instructionType);
+            setStep('parameters');
+          }}
+          chosenObjectName={chosenObjectName}
+          onChooseObject={(chosenObjectName: string) => {
+            chooseObject(chosenObjectName);
+            setStep('object-instructions');
+          }}
+          focusOnMount={!instructionType}
+          onSearchStartOrReset={forceUpdate}
+          onClickMore={() => setNewExtensionDialogOpen(true)}
+          i18n={i18n}
+        />
+      )}
+    </I18n>
   );
 
   const renderParameters = () => (
@@ -399,12 +408,16 @@ export default function NewInstructionEditorDialog({
         />
       )}
       {newExtensionDialogOpen && (
-        <ExtensionsSearchDialog
-          project={project}
-          onClose={() => setNewExtensionDialogOpen(false)}
-          onInstallExtension={() => {}}
-          onExtensionInstalled={onExtensionInstalled}
-        />
+        <I18n>
+          {({ i18n }) => (
+            <ExtensionsSearchDialog
+              project={project}
+              onClose={() => setNewExtensionDialogOpen(false)}
+              onInstallExtension={() => {}}
+              onExtensionInstalled={() => onExtensionInstalled(i18n)}
+            />
+          )}
+        </I18n>
       )}
     </>
   );

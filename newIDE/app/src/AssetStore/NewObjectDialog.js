@@ -1,5 +1,6 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
@@ -38,6 +39,7 @@ import Window from '../Utils/Window';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import { isPrivateAsset } from '../Utils/GDevelopServices/Asset';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories';
 const isDev = Window.isDev();
 
 const ObjectListItem = ({
@@ -82,6 +84,7 @@ type Props = {|
   onCreateNewObject: (type: string) => void,
   onObjectAddedFromAsset: gdObject => void,
   canInstallPrivateAsset: () => boolean,
+  i18n: I18nType,
 |};
 
 export default function NewObjectDialog({
@@ -96,6 +99,7 @@ export default function NewObjectDialog({
   onCreateNewObject,
   onObjectAddedFromAsset,
   canInstallPrivateAsset,
+  i18n,
 }: Props) {
   const {
     setNewObjectDialogDefaultTab,
@@ -113,7 +117,10 @@ export default function NewObjectDialog({
     () => {
       const objectsByCategory = {};
       allObjectMetadata.forEach(objectMetadata => {
-        const category = objectMetadata.categoryFullName;
+        const category = translateExtensionCategory(
+          objectMetadata.categoryFullName,
+          i18n
+        );
         objectsByCategory[category] = [
           ...(objectsByCategory[category] || []),
           objectMetadata,
@@ -121,7 +128,7 @@ export default function NewObjectDialog({
       });
       return objectsByCategory;
     },
-    [allObjectMetadata]
+    [allObjectMetadata, i18n]
   );
 
   React.useEffect(() => setNewObjectDialogDefaultTab(currentTab), [

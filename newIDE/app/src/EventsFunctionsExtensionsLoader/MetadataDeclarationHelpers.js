@@ -94,11 +94,12 @@ export const declareObjectMetadata = (
       eventsBasedObject.getDescription(),
       getExtensionIconUrl(extension)
     )
-    // TODO Set untranslated categories and make the UI translated them.
-    // TODO Update every built-in extension accordingly.
-    // The category metadata should not be translated as it's an identifier.
-    // The translation should be done by the UI when categories are shown.
-    .setCategoryFullName(i18n._('User interface'));
+    // TODO Change the metadata model to only set a category on the extension.
+    // If an extension has behavior or object across several categories,
+    // we can assume it's not scoped correctly.
+    // Note: We shouldn't rely on gdPlatformExtension but this line will
+    // be removed soon.
+    .setCategoryFullName(extension.getCategory());
 
   // TODO EBO Use full type to identify object to avoid collision.
   // Objects are identified by their name alone.

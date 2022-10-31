@@ -813,19 +813,24 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           placeholder={t`Search objects`}
         />
         {newObjectDialogOpen && (
-          <NewObjectDialog
-            onClose={() => setNewObjectDialogOpen(false)}
-            onCreateNewObject={addObject}
-            onObjectAddedFromAsset={onObjectAddedFromAsset}
-            project={project}
-            layout={layout}
-            objectsContainer={objectsContainer}
-            resourceSources={resourceSources}
-            onChooseResource={onChooseResource}
-            resourceExternalEditors={resourceExternalEditors}
-            onFetchNewlyAddedResources={onFetchNewlyAddedResources}
-            canInstallPrivateAsset={canInstallPrivateAsset}
-          />
+          <I18n>
+            {({ i18n }) => (
+              <NewObjectDialog
+                onClose={() => setNewObjectDialogOpen(false)}
+                onCreateNewObject={addObject}
+                onObjectAddedFromAsset={onObjectAddedFromAsset}
+                project={project}
+                layout={layout}
+                objectsContainer={objectsContainer}
+                resourceSources={resourceSources}
+                onChooseResource={onChooseResource}
+                resourceExternalEditors={resourceExternalEditors}
+                onFetchNewlyAddedResources={onFetchNewlyAddedResources}
+                canInstallPrivateAsset={canInstallPrivateAsset}
+                i18n={i18n}
+              />
+            )}
+          </I18n>
         )}
         {tagEditedObject && (
           <EditTagsDialog

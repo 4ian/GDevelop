@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { I18n } from '@lingui/react';
 import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../../ThemeDecorator';
@@ -17,21 +18,26 @@ export default {
 
 export const Default = () => (
   <AssetStoreStateProvider>
-    <NewObjectDialog
-      project={testProject.project}
-      layout={testProject.testLayout}
-      onClose={action('onClose')}
-      onCreateNewObject={action('onCreateNewObject')}
-      onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
-      objectsContainer={testProject.testLayout}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
-      canInstallPrivateAsset={() => false}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <NewObjectDialog
+          project={testProject.project}
+          layout={testProject.testLayout}
+          onClose={action('onClose')}
+          onCreateNewObject={action('onCreateNewObject')}
+          onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
+          objectsContainer={testProject.testLayout}
+          resourceExternalEditors={fakeResourceExternalEditors}
+          onChooseResource={() => {
+            action('onChooseResource');
+            return Promise.reject();
+          }}
+          resourceSources={[]}
+          onFetchNewlyAddedResources={action('onFetchNewlyAddedResources')}
+          canInstallPrivateAsset={() => false}
+          i18n={i18n}
+        />
+      )}
+    </I18n>
   </AssetStoreStateProvider>
 );

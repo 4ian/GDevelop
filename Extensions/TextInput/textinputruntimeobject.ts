@@ -1,6 +1,4 @@
 namespace gdjs {
-  const logger = new gdjs.Logger('Text input object');
-
   const supportedInputTypes = [
     'text',
     'email',

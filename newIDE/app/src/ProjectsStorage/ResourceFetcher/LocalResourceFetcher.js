@@ -1,9 +1,10 @@
 // @flow
 import {
   type ResourceFetcher,
-  type FetchAllProjectResourcesOptions,
   type FetchAllProjectResourcesResult,
   type FetchAllProjectResourcesFunction,
+  type CleanAndFetchAllProjectResourcesOptionsWithoutProgress,
+  cleanUpResourceNames,
 } from './index';
 import LocalFileStorageProvider from '../LocalFileStorageProvider';
 import { moveUrlResourcesToLocalFiles } from '../LocalFileStorageProvider/LocalFileResourceMover';
@@ -23,8 +24,20 @@ const fetchers: {
 
 const LocalResourceFetcher: ResourceFetcher = {
   fetchAllProjectResources: async (
-    options: FetchAllProjectResourcesOptions
+    options: CleanAndFetchAllProjectResourcesOptionsWithoutProgress
   ): Promise<FetchAllProjectResourcesResult> => {
+    cleanUpResourceNames(options);
+
+    if (
+      !options.storageProvider ||
+      !options.storageProviderOperations ||
+      !options.fileMetadata
+    ) {
+      return {
+        erroredResources: [],
+      };
+    }
+
     const { storageProvider } = options;
     const fetcher = fetchers[storageProvider.internalName];
     if (!fetcher)

@@ -1,6 +1,5 @@
 // @flow
 import { renameResourcesInProject } from './ResourceUtils';
-import { makeTestProject } from '../fixtures/TestProject';
 const gd: libGDevelop = global.gd;
 
 const addNewAnimationWithImageToSpriteObject = (

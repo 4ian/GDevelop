@@ -1,9 +1,10 @@
 // @flow
 import {
   type ResourceFetcher,
-  type FetchAllProjectResourcesOptions,
+  type CleanAndFetchAllProjectResourcesOptionsWithoutProgress,
   type FetchAllProjectResourcesResult,
   type FetchAllProjectResourcesFunction,
+  cleanUpResourceNames,
 } from './index';
 import CloudStorageProvider from '../CloudStorageProvider';
 import { moveUrlResourcesToCloudFilesIfPrivate } from '../CloudStorageProvider/CloudResourceFetcher';
@@ -33,8 +34,20 @@ const fetchers: {
 
 const BrowserResourceFetcher: ResourceFetcher = {
   fetchAllProjectResources: async (
-    options: FetchAllProjectResourcesOptions
+    options: CleanAndFetchAllProjectResourcesOptionsWithoutProgress
   ): Promise<FetchAllProjectResourcesResult> => {
+    cleanUpResourceNames(options);
+
+    if (
+      !options.storageProvider ||
+      !options.storageProviderOperations ||
+      !options.fileMetadata
+    ) {
+      return {
+        erroredResources: [],
+      };
+    }
+
     const { storageProvider } = options;
     const fetcher = fetchers[storageProvider.internalName];
     if (!fetcher)

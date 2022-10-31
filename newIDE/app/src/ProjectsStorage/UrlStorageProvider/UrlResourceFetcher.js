@@ -1,25 +1,8 @@
 // @flow
 import PromisePool from '@supercharge/promise-pool';
 import axios from 'axios';
+import { isFetchableUrl, isURL } from '../../ResourcesList/ResourceUtils';
 import { type FileMetadata } from '../index';
-
-const isURL = (filename: string) => {
-  return (
-    filename.startsWith('http://') ||
-    filename.startsWith('https://') ||
-    filename.startsWith('ftp://') ||
-    filename.startsWith('blob:') ||
-    filename.startsWith('data:')
-  );
-};
-
-const isFetchableUrl = (url: string) => {
-  return (
-    url.startsWith('http://') ||
-    url.startsWith('https://') ||
-    url.startsWith('ftp://')
-  );
-};
 
 type Options = {
   project: gdProject,

@@ -98,19 +98,16 @@ export const createProductAuthorizedUrl = (
     : `${url}?token=${encodeURIComponent(token)}`;
 };
 
-export const extractFilenameAndExtensionFromProductAuthorizedUrl = (
+export const isProductAuthorizedResourceUrl = (url: string): boolean =>
+  url.startsWith('https://private-assets.gdevelop.io/') ||
+  url.startsWith('https://private-assets-dev.gdevelop.io/');
+
+export const extractFilenameWithExtensionFromProductAuthorizedUrl = (
   url: string
-): {
-  filenameWithoutExtension: string,
-  extension: string,
-} => {
+): string => {
   const urlWithoutQueryParams = url.split('?')[0];
-  const extension = path.extname(urlWithoutQueryParams);
-  const filenameWithoutExtension = path.basename(
-    urlWithoutQueryParams,
-    extension
-  );
-  return { filenameWithoutExtension, extension };
+  const filenameWithExtension = path.basename(urlWithoutQueryParams);
+  return filenameWithExtension;
 };
 
 export const getStripeCheckoutUrl = async (

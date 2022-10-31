@@ -1,9 +1,17 @@
 // @flow
 import axios from 'axios';
-import { GDevelopAssetApi, GDevelopPrivateAssetsStorage } from './ApiConfigs';
+import {
+  GDevelopAssetApi,
+  GDevelopPrivateAssetsStorage,
+  GDevelopPublicAssetResourcesStorageBaseUrl,
+  GDevelopPublicAssetResourcesStorageStagingBaseUrl,
+} from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
 import { type Filters } from './Filters';
-import { createProductAuthorizedUrl } from './Shop';
+import {
+  createProductAuthorizedUrl,
+  isProductAuthorizedResourceUrl,
+} from './Shop';
 
 export type SerializedParameterMetadata = {|
   codeOnly: boolean,
@@ -290,11 +298,7 @@ export const isPrivateAsset = (
   assetOrAssetShortHeader: AssetShortHeader | Asset
 ): boolean => {
   const imageUrl = assetOrAssetShortHeader.previewImageUrls[0];
-  return (
-    !!imageUrl &&
-    (imageUrl.startsWith('https://private-assets.gdevelop.io') ||
-      imageUrl.startsWith('https://private-assets-dev.gdevelop.io'))
-  );
+  return !!imageUrl && isProductAuthorizedResourceUrl(imageUrl);
 };
 
 export const listReceivedAssetShortHeaders = async (
@@ -327,4 +331,27 @@ export const listReceivedAssetPacks = async (
     params: { userId },
   });
   return response.data;
+};
+
+export const isPublicAssetResourceUrl = (url: string) =>
+  url.startsWith(GDevelopPublicAssetResourcesStorageBaseUrl) ||
+  url.startsWith(GDevelopPublicAssetResourcesStorageStagingBaseUrl);
+const escapeStringForRegExp = string =>
+  string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+const resourceFilenameRegex = new RegExp(
+  `(${escapeStringForRegExp(
+    GDevelopPublicAssetResourcesStorageBaseUrl
+  )}|${escapeStringForRegExp(
+    GDevelopPublicAssetResourcesStorageStagingBaseUrl
+  )})\\/public-resources\\/(.*)\\/([a-z0-9]{64})_(.*)`
+);
+export const extractFilenameWithExtensionFromPublicAssetResourceUrl = (
+  url: string
+): string => {
+  const matches = resourceFilenameRegex.exec(url);
+  if (!matches) {
+    throw new Error('The URL is not a valid public asset resource URL: ' + url);
+  }
+  const filenameWithExtension = matches[4];
+  return filenameWithExtension;
 };

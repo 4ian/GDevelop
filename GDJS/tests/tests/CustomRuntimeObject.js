@@ -567,12 +567,14 @@ describe('gdjs.CustomRuntimeObject', function () {
     /** @type {gdjs.CustomRuntimeObject} */
     let topCustomObject;
     /** @type {gdjs.RuntimeObject} */
+    // @ts-ignore - we do not use this variable
     let topLeftSprite;
     /** @type {gdjs.RuntimeObject} */
     let topRightSprite;
     /** @type {gdjs.CustomRuntimeObject} */
     let bottomCustomObject;
     /** @type {gdjs.RuntimeObject} */
+    // @ts-ignore - we do not use this variable
     let bottomLeftSprite;
     /** @type {gdjs.RuntimeObject} */
     let bottomRightSprite;

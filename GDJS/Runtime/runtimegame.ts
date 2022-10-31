@@ -393,8 +393,6 @@ namespace gdjs {
           const windowInnerHeight = gdjs.RuntimeGameRenderer.getWindowInnerHeight();
 
           // Enlarge either the width or the eight to fill the inner window space.
-          let width = this._gameResolutionWidth;
-          let height = this._gameResolutionHeight;
           if (this._resizeMode === 'adaptWidth') {
             this._gameResolutionWidth =
               (this._gameResolutionHeight * windowInnerWidth) /

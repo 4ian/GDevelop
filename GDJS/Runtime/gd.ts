@@ -18,6 +18,7 @@ namespace gdjs {
    * @memberOf gdjs
    */
   export namespace evtTools {
+    // @ts-ignore - This variable is unused on purpose.
     const thisIsUnusedButEnsureTheNamespaceIsDeclared = true;
   }
 

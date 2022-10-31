@@ -87,12 +87,18 @@ export const declareObjectMetadata = (
   extension: gdPlatformExtension,
   eventsBasedObject: gdEventsBasedObject
 ): gdObjectMetadata => {
-  const objectMetadata = extension.addEventsBasedObject(
-    eventsBasedObject.getName(),
-    eventsBasedObject.getFullName() || eventsBasedObject.getName(),
-    eventsBasedObject.getDescription(),
-    getExtensionIconUrl(extension)
-  );
+  const objectMetadata = extension
+    .addEventsBasedObject(
+      eventsBasedObject.getName(),
+      eventsBasedObject.getFullName() || eventsBasedObject.getName(),
+      eventsBasedObject.getDescription(),
+      getExtensionIconUrl(extension)
+    )
+    // TODO Set untranslated categories and make the UI translated them.
+    // TODO Update every built-in extension accordingly.
+    // The category metadata should not be translated as it's an identifier.
+    // The translation should be done by the UI when categories are shown.
+    .setCategoryFullName(i18n._('User interface'));
 
   // TODO EBO Use full type to identify object to avoid collision.
   // Objects are identified by their name alone.
@@ -1053,7 +1059,7 @@ export const declareObjectPropertiesInstructionAndExpressions = (
           gd.EventsBasedObject.getPropertyActionName(propertyName),
           propertyLabel,
           i18n._(t`Update the value of ${propertyLabel}`),
-          i18n._(t`Set property ${propertyName} of _PARAM0_ to _PARAM2_`),
+          i18n._(t`Set property ${propertyName} of _PARAM0_ to _PARAM1_`),
           eventsBasedObject.getFullName() || eventsBasedObject.getName(),
           getExtensionIconUrl(extension),
           getExtensionIconUrl(extension)
@@ -1083,7 +1089,7 @@ export const declareObjectPropertiesInstructionAndExpressions = (
           gd.EventsBasedObject.getPropertyActionName(propertyName),
           propertyLabel,
           i18n._(t`Update the color of ${propertyLabel}`),
-          i18n._(t`Change color ${propertyName} of _PARAM0_ to _PARAM2_`),
+          i18n._(t`Change color ${propertyName} of _PARAM0_ to _PARAM1_`),
           eventsBasedObject.getFullName() || eventsBasedObject.getName(),
           getExtensionIconUrl(extension),
           getExtensionIconUrl(extension)

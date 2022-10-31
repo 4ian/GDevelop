@@ -343,19 +343,15 @@ const resourceFilenameRegex = new RegExp(
     GDevelopPublicAssetResourcesStorageBaseUrl
   )}|${escapeStringForRegExp(
     GDevelopPublicAssetResourcesStorageStagingBaseUrl
-  )})\\/public-resources\\/(.*)\\/([a-z0-9]{64})_(.*)(\\..*)`
+  )})\\/public-resources\\/(.*)\\/([a-z0-9]{64})_(.*)`
 );
-export const extractFilenameAndExtensionFromPublicAssetResourceUrl = (
+export const extractFilenameWithExtensionFromPublicAssetResourceUrl = (
   url: string
-): {
-  filenameWithoutExtension: string,
-  extension: string,
-} => {
+): string => {
   const matches = resourceFilenameRegex.exec(url);
   if (!matches) {
     throw new Error('The URL is not a valid public asset resource URL: ' + url);
   }
-  const filenameWithoutExtension = matches[4];
-  const extension = matches[5];
-  return { filenameWithoutExtension, extension };
+  const filenameWithExtension = matches[4];
+  return filenameWithExtension;
 };

@@ -743,30 +743,33 @@ const MainFrame = (props: Props) => {
         project
       );
 
+      let storageProvider;
+      let storageProviderOperations;
+
       if (fileMetadata) {
         project.setProjectFile(fileMetadata.fileIdentifier);
 
-        const storageProvider = getStorageProvider();
-        const storageProviderOperations = getStorageProviderOperations(
+        storageProvider = getStorageProvider();
+        storageProviderOperations = getStorageProviderOperations(
           storageProvider
         );
-
-        // Fetch the resources if needed, for example:
-        // - if opening a local file, with resources stored as URL
-        //   (which can happen after downloading it from the web-app),
-        //   in which case URLs will be downloaded.
-        // - if opening from a URL, with resources that are relative
-        //   to this base URL and which will be converted to full URLs.
-        // ...
-        // See `ResourceFetcher` for all the cases.
-        await ensureResourcesAreFetched({
-          project,
-          fileMetadata,
-          storageProvider,
-          storageProviderOperations,
-          authenticatedUser,
-        });
       }
+
+      // Fetch the resources if needed, for example:
+      // - if opening a local file, with resources stored as URL
+      //   (which can happen after downloading it from the web-app),
+      //   in which case URLs will be downloaded.
+      // - if opening from a URL, with resources that are relative
+      //   to this base URL and which will be converted to full URLs.
+      // ...
+      // See `ResourceFetcher` for all the cases.
+      await ensureResourcesAreFetched({
+        project,
+        fileMetadata,
+        storageProvider,
+        storageProviderOperations,
+        authenticatedUser,
+      });
 
       return state;
     },

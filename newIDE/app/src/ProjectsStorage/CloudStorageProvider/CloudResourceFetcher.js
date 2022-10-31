@@ -12,7 +12,7 @@ import {
 import { type FileMetadata } from '../index';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import {
-  extractFilenameAndExtensionFromProductAuthorizedUrl,
+  extractFilenameWithExtensionFromProductAuthorizedUrl,
   isProductAuthorizedResourceUrl,
 } from '../../Utils/GDevelopServices/Shop';
 
@@ -70,16 +70,13 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
 
           if (isURL(resourceFile)) {
             if (isProductAuthorizedResourceUrl(resourceFile)) {
-              const {
-                extension,
-                filenameWithoutExtension,
-              } = extractFilenameAndExtensionFromProductAuthorizedUrl(
+              const filenameWithExtension = extractFilenameWithExtensionFromProductAuthorizedUrl(
                 resourceFile
               );
               return {
                 resource,
                 url: resourceFile,
-                filename: filenameWithoutExtension + extension,
+                filename: filenameWithExtension,
               };
             } else if (isBlobURL(resourceFile)) {
               result.erroredResources.push({

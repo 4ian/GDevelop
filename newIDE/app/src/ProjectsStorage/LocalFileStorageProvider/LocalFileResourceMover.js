@@ -5,25 +5,18 @@ import { retryIfFailed } from '../../Utils/RetryIfFailed';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 import { type FileMetadata } from '../index';
 import {
-  extractFilenameAndExtensionFromProductAuthorizedUrl,
+  extractFilenameWithExtensionFromProductAuthorizedUrl,
   isProductAuthorizedResourceUrl,
 } from '../../Utils/GDevelopServices/Shop';
 import {
-  extractFilenameAndExtensionFromPublicAssetResourceUrl,
+  extractFilenameWithExtensionFromPublicAssetResourceUrl,
   isPublicAssetResourceUrl,
 } from '../../Utils/GDevelopServices/Asset';
+import { isFetchableUrl } from '../../ResourcesList/ResourceUtils';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
-
-const isFetchableUrl = (filename: string) => {
-  return (
-    filename.startsWith('http://') ||
-    filename.startsWith('https://') ||
-    filename.startsWith('ftp://')
-  );
-};
 
 type Options = {|
   project: gdProject,
@@ -60,25 +53,26 @@ export const moveUrlResourcesToLocalFiles = async ({
       const resource = resourcesManager.getResource(resourceName);
 
       const url = resource.getFile();
-      let extension;
-      let filenameWithoutExtension;
+      let filenameWithExtension;
       if (isProductAuthorizedResourceUrl(url)) {
         // Resource is a private asset.
-        const result = extractFilenameAndExtensionFromProductAuthorizedUrl(url);
-        extension = result.extension;
-        filenameWithoutExtension = result.filenameWithoutExtension;
-      } else if (isPublicAssetResourceUrl(url)) {
-        // Resource is a public asset.
-        const result = extractFilenameAndExtensionFromPublicAssetResourceUrl(
+        filenameWithExtension = extractFilenameWithExtensionFromProductAuthorizedUrl(
           url
         );
-        extension = result.extension;
-        filenameWithoutExtension = result.filenameWithoutExtension;
+      } else if (isPublicAssetResourceUrl(url)) {
+        // Resource is a public asset.
+        filenameWithExtension = extractFilenameWithExtensionFromPublicAssetResourceUrl(
+          url
+        );
       } else {
         // Resource is a generic url.
-        extension = path.extname(url);
-        filenameWithoutExtension = path.basename(url, extension);
+        filenameWithExtension = path.basename(url);
       }
+      const extension = path.extname(filenameWithExtension);
+      const filenameWithoutExtension = path.basename(
+        filenameWithExtension,
+        extension
+      );
       const name = newNameGenerator(filenameWithoutExtension, name => {
         const tentativePath = path.join(baseAssetsPath, name) + extension;
         return (

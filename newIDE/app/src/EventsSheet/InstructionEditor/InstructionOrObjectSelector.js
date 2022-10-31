@@ -15,8 +15,8 @@ import {
 } from '../../InstructionOrExpression/CreateTree';
 import {
   enumerateAllInstructions,
-  enumerateFreeInstructions,
   deduplicateInstructionsList,
+  enumerateFreeInstructionsWithTranslatedCategories,
 } from '../../InstructionOrExpression/EnumerateInstructions';
 import {
   type EnumeratedInstructionMetadata,
@@ -96,6 +96,7 @@ type Props = {|
   onSearchStartOrReset?: () => void,
   style?: Object,
   onClickMore?: () => void,
+  i18n: I18nType,
 |};
 
 const iconSize = 24;
@@ -120,7 +121,10 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 
   // Free instructions, to be displayed in a tab next to the objects.
   freeInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateFreeInstructions(this.props.isCondition),
+    enumerateFreeInstructionsWithTranslatedCategories(
+      this.props.isCondition,
+      this.props.i18n
+    ),
     this.props.scope
   );
   freeInstructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
@@ -136,9 +140,12 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   groupSearchApi = null;
   tagSearchApi = null;
 
-  reEnumerateInstructions = () => {
+  reEnumerateInstructions = (i18n: I18nType) => {
     this.freeInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
-      enumerateFreeInstructions(this.props.isCondition),
+      enumerateFreeInstructionsWithTranslatedCategories(
+        this.props.isCondition,
+        i18n
+      ),
       this.props.scope
     );
     this.freeInstructionsInfoTree = createTree(this.freeInstructionsInfo);

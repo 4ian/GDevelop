@@ -2359,24 +2359,29 @@ storiesOf('InstructionOrObjectSelector', module)
     <ValueStateHolder
       initialValue={'free-instructions'}
       render={(value, onChange) => (
-        <FixedHeightFlexContainer height={400}>
-          <InstructionOrObjectSelector
-            style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
-            project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
-            currentTab={value}
-            onChangeTab={onChange}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
-            isCondition
-            chosenInstructionType={'KeyPressed'}
-            onChooseInstruction={action('instruction chosen')}
-            chosenObjectName={null}
-            onChooseObject={action('choose object')}
-            focusOnMount
-            onClickMore={action('See new behaviors')}
-          />
-        </FixedHeightFlexContainer>
+        <I18n>
+          {({ i18n }) => (
+            <FixedHeightFlexContainer height={400}>
+              <InstructionOrObjectSelector
+                style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
+                project={testProject.project}
+                scope={{ layout: testProject.testLayout }}
+                currentTab={value}
+                onChangeTab={onChange}
+                globalObjectsContainer={testProject.project}
+                objectsContainer={testProject.testLayout}
+                isCondition
+                chosenInstructionType={'KeyPressed'}
+                onChooseInstruction={action('instruction chosen')}
+                chosenObjectName={null}
+                onChooseObject={action('choose object')}
+                focusOnMount
+                onClickMore={action('See new behaviors')}
+                i18n={i18n}
+              />
+            </FixedHeightFlexContainer>
+          )}
+        </I18n>
       )}
     />
   ))
@@ -2384,24 +2389,29 @@ storiesOf('InstructionOrObjectSelector', module)
     <ValueStateHolder
       initialValue={'objects'}
       render={(value, onChange) => (
-        <FixedHeightFlexContainer height={400}>
-          <InstructionOrObjectSelector
-            style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
-            project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
-            currentTab={value}
-            onChangeTab={onChange}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
-            isCondition
-            chosenInstructionType={''}
-            onChooseInstruction={action('instruction chosen')}
-            chosenObjectName={'MySpriteObject'}
-            onChooseObject={action('choose object')}
-            focusOnMount
-            onClickMore={action('See new behaviors')}
-          />
-        </FixedHeightFlexContainer>
+        <I18n>
+          {({ i18n }) => (
+            <FixedHeightFlexContainer height={400}>
+              <InstructionOrObjectSelector
+                style={{ flex: 1, display: 'flex', flexDirection: 'column' }} // TODO
+                project={testProject.project}
+                scope={{ layout: testProject.testLayout }}
+                currentTab={value}
+                onChangeTab={onChange}
+                globalObjectsContainer={testProject.project}
+                objectsContainer={testProject.testLayout}
+                isCondition
+                chosenInstructionType={''}
+                onChooseInstruction={action('instruction chosen')}
+                chosenObjectName={'MySpriteObject'}
+                onChooseObject={action('choose object')}
+                focusOnMount
+                onClickMore={action('See new behaviors')}
+                i18n={i18n}
+              />
+            </FixedHeightFlexContainer>
+          )}
+        </I18n>
       )}
     />
   ));

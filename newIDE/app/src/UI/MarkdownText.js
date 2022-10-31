@@ -64,7 +64,7 @@ export const MarkdownText = (props: Props) => {
       {({ i18n }) => (
         <ReactMarkdown
           escapeHtml
-          source={
+          children={
             props.translatableSource
               ? i18n._(props.translatableSource)
               : props.source

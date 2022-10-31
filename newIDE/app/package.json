@@ -70,7 +70,7 @@
     "react-dom": "16.14.0",
     "react-error-boundary": "^1.2.0",
     "react-json-view": "^1.16.1",
-    "react-markdown": "^4.0.6",
+    "react-markdown": "^8.0.3",
     "react-measure": "2.3.0",
     "react-monaco-editor": "^0.18.0",
     "react-mosaic-component": "github:4ian/react-mosaic#v3.1.0",

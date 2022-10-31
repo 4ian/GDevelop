@@ -89,7 +89,7 @@ export type InAppTutorialState = {|
   goToNextStep: () => void,
   onPreviewLaunch: () => void,
   isInAppTutorialRunning: boolean,
-  startTutorial: (id: string) => void,
+  startTutorial: (id: string) => Promise<void>,
   inAppTutorialShortHeaders: ?Array<InAppTutorialShortHeader>,
 |};
 
@@ -100,7 +100,7 @@ export const initialInAppTutorialState: InAppTutorialState = {
   goToNextStep: () => {},
   onPreviewLaunch: () => {},
   isInAppTutorialRunning: false,
-  startTutorial: () => {},
+  startTutorial: async () => {},
   inAppTutorialShortHeaders: null,
 };
 

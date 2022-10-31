@@ -10,6 +10,7 @@ import InAppTutorialOrchestrator, {
 import onboardingTutorial from './Tutorials/OnboardingTutorial';
 import { setCurrentlyRunningInAppTutorial } from '../Utils/Analytics/EventSender';
 import {
+  fetchInAppTutorial,
   fetchInAppTutorialShortHeaders,
   type InAppTutorialShortHeader,
 } from '../Utils/GDevelopServices/InAppTutorial';
@@ -35,12 +36,26 @@ const InAppTutorialProvider = (props: Props) => {
     setInAppTutorialShortHeaders,
   ] = React.useState<?Array<InAppTutorialShortHeader>>(null);
 
-  const startTutorial = (tutorialId: string) => {
+  const startTutorial = async (tutorialId: string) => {
     if (tutorialId === onboardingTutorial.id) {
       setTutorial(onboardingTutorial);
       setCurrentlyRunningInAppTutorial(tutorialId);
       setIsInAppTutorialRunning(true);
+      return;
     }
+
+    if (!inAppTutorialShortHeaders) return;
+
+    const inAppTutorialShortHeader = inAppTutorialShortHeaders.find(
+      shortHeader => shortHeader.id === tutorialId
+    );
+
+    if (!inAppTutorialShortHeader) return;
+
+    const inAppTutorial = await fetchInAppTutorial(inAppTutorialShortHeader);
+    setTutorial(inAppTutorial);
+    setCurrentlyRunningInAppTutorial(tutorialId);
+    setIsInAppTutorialRunning(true);
   };
 
   const onPreviewLaunch = () => {

@@ -185,6 +185,7 @@ export default class DirectionTools extends Component<Props, State> {
                 this.setState({ timeBetweenFrames: text })
               }
               isLooping={direction.isLooping()}
+              hideAnimationLoader // No need to show a loader in the Direction Tools.
             />
           </Dialog>
         )}

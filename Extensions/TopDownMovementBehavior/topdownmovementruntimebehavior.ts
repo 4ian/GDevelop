@@ -24,8 +24,6 @@ namespace gdjs {
     private _angle: float = 0;
 
     //Attributes used when moving
-    private _x: float = 0;
-    private _y: float = 0;
     private _xVelocity: float = 0;
     private _yVelocity: float = 0;
     private _angularSpeed: float = 0;

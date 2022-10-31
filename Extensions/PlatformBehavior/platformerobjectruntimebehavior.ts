@@ -1144,6 +1144,14 @@ namespace gdjs {
     }
 
     /**
+     * Get maximum angle of a slope for the Platformer Object to run on it as a floor.
+     * @returns the slope maximum angle, in degrees.
+     */
+    getSlopeMaxAngle(): float {
+      return this._slopeMaxAngle;
+    }
+
+    /**
      * Get the maximum falling speed of the Platformer Object.
      * @returns The maximum falling speed.
      */

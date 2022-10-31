@@ -6,6 +6,7 @@
     "noEmit": true,
     "allowJs": true,
     "noImplicitReturns": true,
+    "noUnusedLocals": true,
     "noFallthroughCasesInSwitch": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,

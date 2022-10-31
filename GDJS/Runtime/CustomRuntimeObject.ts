@@ -265,7 +265,6 @@ namespace gdjs {
       cy *= absScaleY;
 
       // Rotation
-      const oldX = x;
       const angleInRadians = (this.angle / 180) * Math.PI;
       const cosValue = Math.cos(angleInRadians);
       const sinValue = Math.sin(angleInRadians);

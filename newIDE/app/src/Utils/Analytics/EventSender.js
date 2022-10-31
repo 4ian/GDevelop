@@ -11,7 +11,6 @@ import { getStartupTimesSummary } from '../StartupTimes';
 import { getIDEVersion, getIDEVersionWithHash } from '../../Version';
 import { loadPreferencesFromLocalStorage } from '../../MainFrame/Preferences/PreferencesProvider';
 import { getBrowserLanguageOrLocale } from '../Language';
-import { currentlyRunningInAppTutorial } from '../../InAppTutorial/InAppTutorialProvider';
 import optionalRequire from '../OptionalRequire';
 import Window from '../Window';
 const electron = optionalRequire('electron');
@@ -23,8 +22,12 @@ let startupTimesSummary = null;
 let posthogLoaded = false;
 const posthogAliasMade = [];
 let posthogLastPropertiesSent = '';
+let currentlyRunningInAppTutorial = null;
 
 let keenClient = null;
+
+export const setCurrentlyRunningInAppTutorial = (tutorial: string | null) =>
+  (currentlyRunningInAppTutorial = tutorial);
 
 const recordEvent = (name: string, metadata?: { [string]: any }) => {
   if (isDev || !keenClient) return;

@@ -16,16 +16,49 @@ import InAppTutorialEndDialog from './InAppTutorialEndDialog';
 import InAppTutorialStepDisplayer from './InAppTutorialStepDisplayer';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 import { sendInAppTutorialProgress } from '../Utils/Analytics/EventSender';
+import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
+import useForceUpdate from '../Utils/UseForceUpdate';
 
-const interpolateText = (text: string, data: { [key: string]: string }) => {
-  const placeholderReplacingRegex = /\$\((\w+)\)/g;
+const textInterpolationProjectDataAccessors = {
+  instancesCount: 'instancesCount:',
+};
+
+const interpolateText = (
+  text: string,
+  data: { [key: string]: string },
+  project: ?gdProject
+) => {
+  const placeholderReplacingRegex = /\$\(([\w:]+)\)/g;
   const match = text.matchAll(placeholderReplacingRegex);
   let formattedText = text;
   [...match].forEach(match => {
-    const keyWithBrackets = match[0];
-    const key = match[1];
-    if (Object.keys(data).includes(key)) {
-      formattedText = formattedText.replace(keyWithBrackets, data[key]);
+    let replacement;
+    const instructionWithBrackets = match[0];
+    const instruction = match[1];
+    if (
+      instruction.startsWith(
+        textInterpolationProjectDataAccessors.instancesCount
+      )
+    ) {
+      const key = instruction.split(':')[1];
+      const objectName = data[key];
+      if (objectName && project && project.getLayoutsCount() > 0) {
+        const layout = project.getLayoutAt(0);
+        replacement = getInstanceCountInLayoutForObject(
+          layout,
+          objectName
+        ).toString();
+      }
+    }
+    if (!replacement && Object.keys(data).includes(instruction)) {
+      // If the instruction is a key in the data, use it
+      replacement = data[instruction];
+    }
+    if (replacement) {
+      formattedText = formattedText.replace(
+        instructionWithBrackets,
+        replacement
+      );
     }
   });
   return formattedText;
@@ -35,10 +68,12 @@ const translateAndInterpolateText = ({
   text,
   data,
   i18n,
+  project,
 }: {|
   text?: TranslatedText,
   data: { [key: string]: string },
   i18n: I18nType,
+  project: ?gdProject,
 |}) => {
   if (!text) return undefined;
   let translatedText;
@@ -47,7 +82,34 @@ const translateAndInterpolateText = ({
   } else {
     translatedText = i18n._(text.messageDescriptor, data);
   }
-  return interpolateText(translatedText, data);
+  return interpolateText(translatedText, data, project);
+};
+
+const containsProjectDataToDisplay = (text?: TranslatedText): boolean => {
+  if (!text) return false;
+  if (text.messageByLocale) {
+    return Object.values(text.messageByLocale).some(localizedText =>
+      // $FlowFixMe - known error where Flow returns mixed for object value https://github.com/facebook/flow/issues/2221
+      localizedText.includes(
+        `$(${textInterpolationProjectDataAccessors.instancesCount}`
+      )
+    );
+  } else {
+    return (
+      (typeof text.messageDescriptor === 'string' &&
+        text.messageDescriptor.includes(
+          `$(${textInterpolationProjectDataAccessors.instancesCount}`
+        )) ||
+      (typeof text.messageDescriptor === 'object' &&
+        Object.values(text.messageDescriptor).some(
+          value =>
+            typeof value === 'string' &&
+            value.includes(
+              `$(${textInterpolationProjectDataAccessors.instancesCount}`
+            )
+        ))
+    );
+  }
 };
 
 const isDomBasedTriggerComplete = (
@@ -124,6 +186,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
   Props,
   InAppTutorialOrchestratorInterface
 >(({ tutorial, endTutorial, project, currentEditor }, ref) => {
+  const forceUpdate = useForceUpdate();
   const [wrongEditorInfoOpen, setWrongEditorInfoOpen] = React.useState<boolean>(
     false
   );
@@ -138,14 +201,19 @@ const InAppTutorialOrchestrator = React.forwardRef<
     setExpectedEditor,
   ] = React.useState<EditorIdentifier | null>(null);
   const [
-    watchElementInputValue,
-    setWatchElementInputValue,
+    elementWithValueToWatch,
+    setElementWithValueToWatch,
   ] = React.useState<?string>(null);
   const InputInitialValueRef = React.useRef<?string>(null);
-  const [watchSceneInstances, setWatchSceneInstances] = React.useState<?string>(
-    null
-  );
+  const [
+    objectSceneInstancesToWatch,
+    setObjectSceneInstancesToWatch,
+  ] = React.useState<?string>(null);
   const domObserverRef = React.useRef<?MutationObserver>(null);
+  const [
+    shouldWatchProjectChanges,
+    setShouldWatchProjectChanges,
+  ] = React.useState<boolean>(false);
 
   const { flow, endDialog, editorSwitches, id: tutorialId } = tutorial;
   const stepCount = flow.length;
@@ -167,6 +235,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
   React.useEffect(
     () => {
       changeStep(0);
+      currentStepFallbackStepIndex.current = 0;
     },
     [tutorial, changeStep]
   );
@@ -262,14 +331,6 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
   const handleDomMutation = useDebounce(watchDomForNextStepTrigger, 200);
 
-  const onPreviewLaunch = () => {
-    if (!currentStep) return;
-    const { nextStepTrigger } = currentStep;
-    if (nextStepTrigger && nextStepTrigger.previewLaunched) {
-      goToNextStep();
-    }
-  };
-
   const goToNextStep = React.useCallback(
     () => {
       goToStep(currentStepIndex + 1);
@@ -279,6 +340,17 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
   React.useImperativeHandle(ref, () => ({ onPreviewLaunch, goToNextStep }));
 
+  const onPreviewLaunch = React.useCallback(
+    () => {
+      if (!currentStep) return;
+      const { nextStepTrigger } = currentStep;
+      if (nextStepTrigger && nextStepTrigger.previewLaunched) {
+        goToNextStep();
+      }
+    },
+    [goToNextStep, currentStep]
+  );
+
   // Set up mutation observer to be able to detect any change in the dom.
   React.useEffect(
     () => {
@@ -287,7 +359,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
       const observer = new MutationObserver(handleDomMutation);
       observer.observe(appContainer, {
         childList: true,
-        attributes: true,
+        attributes: false,
         subtree: true,
         characterData: true,
       });
@@ -315,8 +387,9 @@ const InAppTutorialOrchestrator = React.forwardRef<
         currentStepFallbackStepIndex.current = currentStepIndex;
       }
       // At each step start, reset change watching logics.
-      setWatchElementInputValue(null);
-      setWatchSceneInstances(null);
+      setElementWithValueToWatch(null);
+      setObjectSceneInstancesToWatch(null);
+      setShouldWatchProjectChanges(false);
       // If index out of bounds, display end dialog.
       if (currentStepIndex >= stepCount) {
         setDisplayEndDialog(true);
@@ -338,21 +411,38 @@ const InAppTutorialOrchestrator = React.forwardRef<
         // line cannot break.
         // $FlowFixMe
         if (elementToWatch) InputInitialValueRef.current = elementToWatch.value;
-        setWatchElementInputValue(elementToHighlightId);
+        setElementWithValueToWatch(elementToHighlightId);
       } else if (nextStepTrigger && nextStepTrigger.instanceAddedOnScene) {
         const objectKey = nextStepTrigger.instanceAddedOnScene;
         const objectName = data[objectKey];
         if (!objectName) return;
-        setWatchSceneInstances(objectName);
+        setObjectSceneInstancesToWatch(objectName);
       }
     },
     [currentStep, data]
   );
 
+  // Detect in tooltip texts if project changes should be watched
+  React.useEffect(
+    () => {
+      if (!currentStep) return;
+      const { tooltip } = currentStep;
+      if (!tooltip) return;
+      if (
+        [tooltip.description, tooltip.title].some(translatedText =>
+          containsProjectDataToDisplay(translatedText)
+        )
+      ) {
+        setShouldWatchProjectChanges(true);
+      }
+    },
+    [currentStep]
+  );
+
   const watchInputChanges = React.useCallback(
     () => {
-      if (!watchElementInputValue) return;
-      const elementToWatch = document.querySelector(watchElementInputValue);
+      if (!elementWithValueToWatch) return;
+      const elementToWatch = document.querySelector(elementWithValueToWatch);
 
       if (
         elementToWatch &&
@@ -364,24 +454,28 @@ const InAppTutorialOrchestrator = React.forwardRef<
         goToNextStep();
       }
     },
-    [goToNextStep, watchElementInputValue]
+    [goToNextStep, elementWithValueToWatch]
   );
 
   const watchSceneInstanceChanges = React.useCallback(
     () => {
-      if (!watchSceneInstances) return;
+      if (!objectSceneInstancesToWatch) return;
       if (!project || project.getLayoutsCount() === 0) return;
       const layout = project.getLayoutAt(0);
       const instances = layout.getInitialInstances();
-      if (instances.hasInstancesOfObject(watchSceneInstances)) {
+      if (instances.hasInstancesOfObject(objectSceneInstancesToWatch)) {
         goToNextStep();
       }
     },
-    [project, goToNextStep, watchSceneInstances]
+    [project, goToNextStep, objectSceneInstancesToWatch]
   );
 
-  useInterval(watchInputChanges, watchElementInputValue ? 1000 : null);
-  useInterval(watchSceneInstanceChanges, watchSceneInstances ? 500 : null);
+  useInterval(forceUpdate, shouldWatchProjectChanges ? 500 : null);
+  useInterval(watchInputChanges, elementWithValueToWatch ? 1000 : null);
+  useInterval(
+    watchSceneInstanceChanges,
+    objectSceneInstancesToWatch ? 500 : null
+  );
   useInterval(
     watchDomForNextStepTrigger,
     currentStep && currentStep.isTriggerFlickering ? 500 : null
@@ -390,24 +484,48 @@ const InAppTutorialOrchestrator = React.forwardRef<
   const renderStepDisplayer = (i18n: I18nType) => {
     if (!currentStep) return null;
     const stepTooltip = currentStep.tooltip;
+    let formattedTooltip;
+    if (stepTooltip) {
+      const title = translateAndInterpolateText({
+        text: stepTooltip.title,
+        data,
+        i18n,
+        project,
+      });
+      const description = translateAndInterpolateText({
+        text: stepTooltip.description,
+        data,
+        i18n,
+        project,
+      });
+      formattedTooltip = {
+        ...stepTooltip,
+        title,
+        description,
+      };
+    }
+
+    let formattedStepTrigger;
+    const stepTrigger = currentStep.nextStepTrigger;
+    if (stepTrigger && stepTrigger.clickOnTooltipButton) {
+      const formattedButtonLabel = translateAndInterpolateText({
+        text: stepTrigger.clickOnTooltipButton,
+        data,
+        i18n,
+        project,
+      });
+      formattedStepTrigger = formattedButtonLabel
+        ? {
+            clickOnTooltipButton: formattedButtonLabel,
+          }
+        : undefined;
+    }
     const formattedStep: InAppTutorialFlowFormattedStep = {
       ...flow[currentStepIndex],
-      tooltip: stepTooltip
-        ? {
-            ...stepTooltip,
-            title: translateAndInterpolateText({
-              text: stepTooltip.title,
-              data,
-              i18n,
-            }),
-            description: translateAndInterpolateText({
-              text: stepTooltip.description,
-              data,
-              i18n,
-            }),
-          }
-        : undefined,
+      tooltip: formattedTooltip,
+      nextStepTrigger: formattedStepTrigger,
     };
+
     return (
       <InAppTutorialStepDisplayer
         step={formattedStep}

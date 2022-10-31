@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type InAppTutorialShortHeader } from '../Utils/GDevelopServices/InAppTutorial';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type MessageByLocale } from '../Utils/i18n/MessageByLocale';
 
@@ -8,9 +9,11 @@ export type TranslatedText =
   | {| messageByLocale: MessageByLocale |};
 
 export type InAppTutorialTooltip = {|
+  standalone?: true,
   placement?: 'bottom' | 'left' | 'right' | 'top',
   title?: TranslatedText,
   description?: TranslatedText,
+  image?: { dataUrl: string, width?: string },
 |};
 
 export type InAppTutorialFormattedTooltip = {|
@@ -25,6 +28,13 @@ type InAppTutorialFlowStepDOMChangeTrigger =
   | {| absenceOfElement: string |};
 
 export type InAppTutorialFlowStepTrigger =
+  | InAppTutorialFlowStepDOMChangeTrigger
+  | {| valueHasChanged: true |}
+  | {| instanceAddedOnScene: string |}
+  | {| previewLaunched: true |}
+  | {| clickOnTooltipButton: TranslatedText |};
+
+export type InAppTutorialFlowStepFormattedTrigger =
   | InAppTutorialFlowStepDOMChangeTrigger
   | {| valueHasChanged: true |}
   | {| instanceAddedOnScene: string |}
@@ -52,6 +62,7 @@ export type InAppTutorialFlowStep = {|
 export type InAppTutorialFlowFormattedStep = {|
   ...InAppTutorialFlowStep,
   tooltip?: InAppTutorialFormattedTooltip,
+  nextStepTrigger?: InAppTutorialFlowStepFormattedTrigger,
 |};
 
 export type EditorIdentifier = 'Scene' | 'EventsSheet' | 'Home';
@@ -78,7 +89,8 @@ export type InAppTutorialState = {|
   goToNextStep: () => void,
   onPreviewLaunch: () => void,
   isInAppTutorialRunning: boolean,
-  startTutorial: (id: string) => void,
+  startTutorial: (id: string) => Promise<void>,
+  inAppTutorialShortHeaders: ?Array<InAppTutorialShortHeader>,
 |};
 
 export const initialInAppTutorialState: InAppTutorialState = {
@@ -88,7 +100,8 @@ export const initialInAppTutorialState: InAppTutorialState = {
   goToNextStep: () => {},
   onPreviewLaunch: () => {},
   isInAppTutorialRunning: false,
-  startTutorial: () => {},
+  startTutorial: async () => {},
+  inAppTutorialShortHeaders: null,
 };
 
 const InAppTutorialContext = React.createContext<InAppTutorialState>(

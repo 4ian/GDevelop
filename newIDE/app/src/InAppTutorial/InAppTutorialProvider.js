@@ -8,10 +8,14 @@ import InAppTutorialOrchestrator, {
   type InAppTutorialOrchestratorInterface,
 } from './InAppTutorialOrchestrator';
 import onboardingTutorial from './Tutorials/OnboardingTutorial';
+import { setCurrentlyRunningInAppTutorial } from '../Utils/Analytics/EventSender';
+import {
+  fetchInAppTutorial,
+  fetchInAppTutorialShortHeaders,
+  type InAppTutorialShortHeader,
+} from '../Utils/GDevelopServices/InAppTutorial';
 
 type Props = {| children: React.Node |};
-
-export let currentlyRunningInAppTutorial = false;
 
 const InAppTutorialProvider = (props: Props) => {
   const [
@@ -27,13 +31,31 @@ const InAppTutorialProvider = (props: Props) => {
   const orchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
     null
   );
+  const [
+    inAppTutorialShortHeaders,
+    setInAppTutorialShortHeaders,
+  ] = React.useState<?Array<InAppTutorialShortHeader>>(null);
 
-  const startTutorial = (tutorialId: string) => {
+  const startTutorial = async (tutorialId: string) => {
     if (tutorialId === onboardingTutorial.id) {
       setTutorial(onboardingTutorial);
-      currentlyRunningInAppTutorial = tutorialId;
+      setCurrentlyRunningInAppTutorial(tutorialId);
       setIsInAppTutorialRunning(true);
+      return;
     }
+
+    if (!inAppTutorialShortHeaders) return;
+
+    const inAppTutorialShortHeader = inAppTutorialShortHeaders.find(
+      shortHeader => shortHeader.id === tutorialId
+    );
+
+    if (!inAppTutorialShortHeader) return;
+
+    const inAppTutorial = await fetchInAppTutorial(inAppTutorialShortHeader);
+    setTutorial(inAppTutorial);
+    setCurrentlyRunningInAppTutorial(tutorialId);
+    setIsInAppTutorialRunning(true);
   };
 
   const onPreviewLaunch = () => {
@@ -45,9 +67,26 @@ const InAppTutorialProvider = (props: Props) => {
   };
 
   const endTutorial = () => {
-    currentlyRunningInAppTutorial = null;
+    setCurrentlyRunningInAppTutorial(null);
     setIsInAppTutorialRunning(false);
   };
+
+  const loadInAppTutorials = React.useCallback(async () => {
+    const fetchedInAppTutorialShortHeaders = await fetchInAppTutorialShortHeaders();
+    setInAppTutorialShortHeaders(fetchedInAppTutorialShortHeaders);
+  }, []);
+
+  // Preload the in-app tutorial short headers when the app loads.
+  React.useEffect(
+    () => {
+      const timeoutId = setTimeout(() => {
+        console.info('Pre-fetching in-app tutorials...');
+        loadInAppTutorials();
+      }, 1000);
+      return () => clearTimeout(timeoutId);
+    },
+    [loadInAppTutorials]
+  );
 
   return (
     <InAppTutorialContext.Provider
@@ -59,6 +98,7 @@ const InAppTutorialProvider = (props: Props) => {
         onPreviewLaunch,
         isInAppTutorialRunning,
         startTutorial,
+        inAppTutorialShortHeaders,
       }}
     >
       {props.children}

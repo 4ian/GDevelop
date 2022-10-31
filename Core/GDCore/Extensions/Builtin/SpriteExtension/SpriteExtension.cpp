@@ -325,6 +325,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    "res/conditions/animation.png")
 
       .AddParameter("object", _("Object"), "Sprite")
+      .MarkAsSimple()
+      .SetHidden();
+
+  obj.AddCondition("AnimationEnded2",
+                   _("Animation finished"),
+                   _("Check if the animation being played by the Sprite object "
+                     "is finished."),
+                   _("The animation of _PARAM0_ is finished"),
+                   _("Animations and images"),
+                   "res/conditions/animation24.png",
+                   "res/conditions/animation.png")
+
+      .AddParameter("object", _("Object"), "Sprite")
       .MarkAsSimple();
 
   obj.AddCondition("ScaleWidth",

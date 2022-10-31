@@ -16,9 +16,6 @@ import useForceUpdate from '../../../Utils/UseForceUpdate';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 
 const styles = {
-  imageContainer: {
-    position: 'relative',
-  },
   loaderContainer: {
     position: 'absolute',
     left: 'calc(50% - 30px)',

@@ -7,21 +7,13 @@ import ThemeContext from './Theme/ThemeContext';
 import classNames from 'classnames';
 
 // Sensible defaults for react-markdown
-const makeMarkdownCustomRenderers = (
+const makeMarkdownCustomComponents = (
   isStandaloneText: boolean,
   allowParagraphs: boolean
 ) => ({
+  '**': props => (isStandaloneText ? <div {...props} /> : <span {...props} />),
   // Ensure link are opened in a new page
-  root: props => (isStandaloneText ? <div {...props} /> : <span {...props} />),
-  link: props =>
-    props.href ? (
-      <a href={props.href} target="_blank" rel="noopener noreferrer">
-        {props.children}
-      </a>
-    ) : (
-      props.children
-    ),
-  linkReference: props =>
+  a: props =>
     props.href ? (
       <a href={props.href} target="_blank" rel="noopener noreferrer">
         {props.children}
@@ -30,7 +22,7 @@ const makeMarkdownCustomRenderers = (
       props.children
     ),
   // Add paragraphs only if we explictly opt in.
-  paragraph: props =>
+  p: props =>
     isStandaloneText || allowParagraphs ? (
       <p>{props.children}</p>
     ) : (
@@ -50,9 +42,9 @@ type Props = {|
  */
 export const MarkdownText = (props: Props) => {
   const gdevelopTheme = React.useContext(ThemeContext);
-  const markdownCustomRenderers = React.useMemo(
+  const markdownCustomComponents = React.useMemo(
     () =>
-      makeMarkdownCustomRenderers(
+      makeMarkdownCustomComponents(
         props.isStandaloneText || false,
         props.allowParagraphs || false
       ),
@@ -63,19 +55,17 @@ export const MarkdownText = (props: Props) => {
     <I18n>
       {({ i18n }) => (
         <ReactMarkdown
-          escapeHtml
-          children={
-            props.translatableSource
-              ? i18n._(props.translatableSource)
-              : props.source
-          }
           className={classNames({
             'gd-markdown': true,
             [gdevelopTheme.markdownRootClassName]: true,
             'standalone-text-container': props.isStandaloneText,
           })}
-          renderers={markdownCustomRenderers}
-        />
+          components={markdownCustomComponents}
+        >
+          {props.translatableSource
+            ? i18n._(props.translatableSource)
+            : props.source}
+        </ReactMarkdown>
       )}
     </I18n>
   );

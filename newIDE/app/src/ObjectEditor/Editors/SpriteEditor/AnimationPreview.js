@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import React from 'react';
-import { Column } from '../../../UI/Grid';
+import { Column, Line } from '../../../UI/Grid';
 import { LineStackLayout } from '../../../UI/Layout';
 import ImagePreview from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import Replay from '@material-ui/icons/Replay';
@@ -16,9 +16,6 @@ import useForceUpdate from '../../../Utils/UseForceUpdate';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 
 const styles = {
-  imageContainer: {
-    position: 'relative',
-  },
   loaderContainer: {
     position: 'absolute',
     left: 'calc(50% - 30px)',
@@ -48,6 +45,7 @@ type Props = {|
   fixedHeight?: number,
   fixedWidth?: number,
   isAssetPrivate?: boolean,
+  hideAnimationLoader?: boolean,
 |};
 
 const AnimationPreview = ({
@@ -65,6 +63,7 @@ const AnimationPreview = ({
   fixedHeight,
   fixedWidth,
   isAssetPrivate,
+  hideAnimationLoader,
 }: Props) => {
   const forceUdpate = useForceUpdate();
 
@@ -81,6 +80,7 @@ const AnimationPreview = ({
   const timeBetweenFramesRef = React.useRef(timeBetweenFrames);
   const pausedRef = React.useRef(false);
   const currentFrameIndexRef = React.useRef(0);
+  const currentResourceNameRef = React.useRef(resourceNames[0]);
   const isLoopingRef = React.useRef(isLooping);
   const animationNameRef = React.useRef(animationName);
   const imagesLoadedArray = React.useRef(
@@ -161,17 +161,28 @@ const AnimationPreview = ({
 
         currentFrameIndexRef.current = newFrameIndex;
         currentFrameElapsedTimeRef.current = newFrameElapsedTime;
-        // Ensure we trigger an update if the animation changes,
+        const newResourceName = resourceNames[currentFrameIndexRef.current];
+        // Ensure we trigger an update if the frame changes,
         // as the refs will not do it.
         if (currentFrameIndex !== newFrameIndex) {
-          imagesLoadedArray.current[currentFrameIndexRef.current] = false;
-          // When the array of loaders changes, wait a bit to display the loader to avoid flickering.
-          loaderTimeout.current = setTimeout(() => {
-            console.warn(
-              'The image took too long to load, displaying a loader.'
-            );
-            setIsStillLoadingResources(true);
-          }, 500);
+          if (newResourceName === currentResourceNameRef.current) {
+            // Important: if the resource name is the same on the following frame,
+            // it means the same image is used for multiple frames in the animation.
+            // In this case, we can consider the image as already loaded.
+            // Not doing so will cause the animation to be stuck on this frame,
+            // as the image onLoad will never be triggered.
+            imagesLoadedArray.current[currentFrameIndexRef.current] = true;
+          } else {
+            imagesLoadedArray.current[currentFrameIndexRef.current] = false;
+            // When the array of loaders changes, wait a bit to display the loader to avoid flickering.
+            loaderTimeout.current = setTimeout(() => {
+              console.warn(
+                'The image took too long to load, displaying a loader.'
+              );
+              setIsStillLoadingResources(true);
+            }, 500);
+          }
+          currentResourceNameRef.current = newResourceName;
           forceUdpate();
         }
       }
@@ -221,7 +232,7 @@ const AnimationPreview = ({
 
   return (
     <Column expand noOverflowParent noMargin>
-      <div style={styles.imageContainer}>
+      <Line noMargin expand>
         <ImagePreview
           resourceName={resourceName}
           imageResourceSource={getImageResourceSource(resourceName)}
@@ -236,12 +247,12 @@ const AnimationPreview = ({
           isImagePrivate={isAssetPrivate}
           hideLoader // Handled by the animation preview, important to let the browser cache the image.
         />
-        {isStillLoadingResources && (
+        {!hideAnimationLoader && isStillLoadingResources && (
           <div style={styles.loaderContainer}>
             <PlaceholderLoader />
           </div>
         )}
-      </div>
+      </Line>
       {!hideControls && (
         <LineStackLayout noMargin alignItems="center">
           <Text>

@@ -713,7 +713,6 @@ namespace gdjs {
         e.preventDefault();
         if (e.changedTouches) {
           for (let i = 0; i < e.changedTouches.length; ++i) {
-            const pos = getEventPosition(e.changedTouches[i]);
             manager.onTouchEnd(e.changedTouches[i].identifier);
           }
         }

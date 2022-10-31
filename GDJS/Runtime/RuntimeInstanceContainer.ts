@@ -5,9 +5,6 @@
  */
 namespace gdjs {
   const logger = new gdjs.Logger('RuntimeInstanceContainer');
-  const setupWarningLogger = new gdjs.Logger(
-    'RuntimeInstanceContainer (setup warnings)'
-  );
 
   /**
    * A container of object instances rendered on screen.

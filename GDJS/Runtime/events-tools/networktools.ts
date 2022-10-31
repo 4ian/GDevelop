@@ -6,8 +6,6 @@
 namespace gdjs {
   export namespace evtTools {
     export namespace network {
-      const logger = new gdjs.Logger('Network requests');
-
       /**
        * Send an asynchronous request to the specified URL, with the specified (text)
        * body, method and contentType (defaults to `application/x-www-form-urlencoded`).

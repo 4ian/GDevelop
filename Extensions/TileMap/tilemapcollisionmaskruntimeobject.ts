@@ -1,7 +1,5 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
-  const logger = new gdjs.Logger('Tilemap object');
-
   /**
    * An object that handle hitboxes for a tile map.
    * @extends gdjs.RuntimeObject
@@ -182,7 +180,7 @@ namespace gdjs {
     updateHitBoxes(): void {
       this.updateTransformation();
       // Update the RuntimeObject hitboxes attribute.
-      for (const hitboxes of this._collisionTileMap.getAllHitboxes(
+      for (const _ of this._collisionTileMap.getAllHitboxes(
         this._collisionMaskTag
       )) {
         // RuntimeObject.hitBoxes contains the same polygons instances as the

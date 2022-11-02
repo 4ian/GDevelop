@@ -891,9 +891,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     locatingEvent: gdBaseEvent,
     parameterContext: ParameterContext
   ) => {
-    // Prevent state from changing when clicking on a parameter with inline parameter
-    // editor (it will close the editor).
-    if (this.state.editedParameter.instruction) return;
     const { instruction, parameterIndex } = parameterContext;
 
     this.setState({

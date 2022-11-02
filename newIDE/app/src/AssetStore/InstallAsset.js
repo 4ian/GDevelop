@@ -5,6 +5,8 @@ import {
   type Environment,
   getPublicAsset,
   isPixelArt,
+  isPublicAssetResourceUrl,
+  extractFilenameWithExtensionFromPublicAssetResourceUrl,
 } from '../Utils/GDevelopServices/Asset';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { unserializeFromJSObject } from '../Utils/Serializer';
@@ -72,16 +74,23 @@ export const installResource = (
   // Check if the resource that must be installed is already present. Use the "origin"
   // of the resource (if present), otherwise for compatibility we use the URL.
   const resourceFileUrl: string = serializedResource.file;
-  const resourceOriginName: string = serializedResource.origin
+  const resourceOriginRawName: string = serializedResource.origin
     ? serializedResource.origin.name
     : '';
+  // We clean up the name of the resource, to avoid having a resource with a name
+  // too long (for instance, a resource with a SHA for public assets).
+  const resourceOriginCleanedName: string = isPublicAssetResourceUrl(
+    resourceFileUrl
+  )
+    ? extractFilenameWithExtensionFromPublicAssetResourceUrl(resourceFileUrl)
+    : resourceOriginRawName;
   const resourceOriginIdentifier: string = serializedResource.origin
     ? serializedResource.origin.identifier
     : '';
   const existingResourceNameFromSameOrigin =
-    resourceOriginName && resourceOriginIdentifier
+    resourceOriginCleanedName && resourceOriginIdentifier
       ? resourcesManager.getResourceNameWithOrigin(
-          resourceOriginName,
+          resourceOriginCleanedName,
           resourceOriginIdentifier
         )
       : '';
@@ -118,7 +127,7 @@ export const installResource = (
   newResource.setSmooth(
     project.getScaleMode() !== 'nearest' && !isPixelArt(asset)
   );
-  newResource.setOrigin(resourceOriginName, resourceOriginIdentifier);
+  newResource.setOrigin(resourceOriginCleanedName, resourceOriginIdentifier);
   resourcesManager.addResource(newResource);
   newResource.delete();
 

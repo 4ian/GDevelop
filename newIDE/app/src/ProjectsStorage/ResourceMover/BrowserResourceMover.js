@@ -11,20 +11,8 @@ import UrlStorageProvider from '../UrlStorageProvider';
 import DownloadFileStorageProvider from '../DownloadFileStorageProvider';
 import { checkIfIsGDevelopCloudBucketUrl } from '../../Utils/CrossOrigin';
 import { moveAllCloudProjectResourcesToCloudProject } from '../CloudStorageProvider/CloudResourceMover';
+import { isBlobURL, isURL } from '../../ResourcesList/ResourceUtils';
 
-const isURL = (filename: string) => {
-  return (
-    filename.startsWith('http://') ||
-    filename.startsWith('https://') ||
-    filename.startsWith('ftp://') ||
-    filename.startsWith('blob:') ||
-    filename.startsWith('data:')
-  );
-};
-
-const isBlobURL = (filename: string) => {
-  return filename.startsWith('blob:');
-};
 const ensureNoCloudProjectResources = async ({
   project,
 }: MoveAllProjectResourcesOptions): Promise<MoveAllProjectResourcesResult> => {

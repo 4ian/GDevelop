@@ -28,6 +28,8 @@ declare class gdBehaviorMetadata {
   addRequiredFile(resourceFile: string): gdBehaviorMetadata;
   setObjectType(objectType: string): gdBehaviorMetadata;
   getObjectType(): string;
+  isPrivate(): boolean;
+  setPrivate(): gdBehaviorMetadata;
   get(): gdBehavior;
   getSharedDataInstance(): gdBehaviorsSharedData;
   delete(): void;

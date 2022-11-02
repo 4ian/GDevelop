@@ -15,7 +15,8 @@ export type EnumeratedBehaviorMetadata = {|
 
 export const enumerateBehaviorsMetadata = (
   platform: gdPlatform,
-  project: gdProject
+  project: gdProject,
+  eventsFunctionsExtension?: gdEventsFunctionsExtension
 ): Array<EnumeratedBehaviorMetadata> => {
   const extensionsList = platform.getAllPlatformExtensions();
 
@@ -30,16 +31,23 @@ export const enumerateBehaviorsMetadata = (
           behaviorType,
           behaviorMetadata: extension.getBehaviorMetadata(behaviorType),
         }))
-        .map(({ behaviorType, behaviorMetadata }) => ({
-          extension,
-          behaviorMetadata,
-          type: behaviorType,
-          defaultName: behaviorMetadata.getDefaultName(),
-          fullName: behaviorMetadata.getFullName(),
-          description: behaviorMetadata.getDescription(),
-          iconFilename: behaviorMetadata.getIconFilename(),
-          objectType: behaviorMetadata.getObjectType(),
-        }));
+        .map(({ behaviorType, behaviorMetadata }) =>
+          !behaviorMetadata.isPrivate() ||
+          (eventsFunctionsExtension &&
+            extension.getName() === eventsFunctionsExtension.getName())
+            ? {
+                extension,
+                behaviorMetadata,
+                type: behaviorType,
+                defaultName: behaviorMetadata.getDefaultName(),
+                fullName: behaviorMetadata.getFullName(),
+                description: behaviorMetadata.getDescription(),
+                iconFilename: behaviorMetadata.getIconFilename(),
+                objectType: behaviorMetadata.getObjectType(),
+              }
+            : null
+        )
+        .filter(Boolean);
     })
   );
 };

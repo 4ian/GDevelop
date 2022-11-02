@@ -424,12 +424,14 @@ export const shiftSentenceParamIndexes = (
   sentence: string,
   offset: number
 ): string => {
-  const parameterIndexesStrings = sentence.match(/(?<=_PARAM)(\d+)(?=_)/g);
+  const parameterIndexesStrings = sentence.match(/_PARAM\d+_/g);
   if (!parameterIndexesStrings) {
     return sentence;
   }
   const parameterIndexes = parameterIndexesStrings.map(indexString =>
-    Number.parseInt(indexString)
+    Number.parseInt(
+      indexString.substring('_PARAM'.length, indexString.length - '_'.length)
+    )
   );
   const sentenceElements = sentence.split(/_PARAM\d+_/);
   let shiftedSentence = '';

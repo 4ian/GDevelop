@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import Popover from '@material-ui/core/Popover';
 import * as React from 'react';
 import {
@@ -138,31 +139,38 @@ export default function NewInstructionEditorMenu({
   };
 
   const renderInstructionOrObjectSelector = () => (
-    <InstructionOrObjectSelector
-      key="instruction-or-object-selector"
-      style={styles.fullHeightSelector}
-      project={project}
-      scope={scope}
-      currentTab={currentInstructionOrObjectSelectorTab}
-      onChangeTab={setCurrentInstructionOrObjectSelectorTab}
-      globalObjectsContainer={globalObjectsContainer}
-      objectsContainer={objectsContainer}
-      isCondition={isCondition}
-      chosenInstructionType={!chosenObjectName ? instructionType : undefined}
-      onChooseInstruction={(instructionType: string) => {
-        const { instruction, chosenObjectName } = chooseInstruction(
-          instructionType
-        );
-        submitInstruction({ instruction, chosenObjectName });
-      }}
-      chosenObjectName={chosenObjectName}
-      onChooseObject={chosenObjectName => {
-        chooseObject(chosenObjectName);
-        setStep('object-instructions');
-      }}
-      focusOnMount={!instructionType}
-      onSearchStartOrReset={forceUpdate}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <InstructionOrObjectSelector
+          key="instruction-or-object-selector"
+          style={styles.fullHeightSelector}
+          project={project}
+          scope={scope}
+          currentTab={currentInstructionOrObjectSelectorTab}
+          onChangeTab={setCurrentInstructionOrObjectSelectorTab}
+          globalObjectsContainer={globalObjectsContainer}
+          objectsContainer={objectsContainer}
+          isCondition={isCondition}
+          chosenInstructionType={
+            !chosenObjectName ? instructionType : undefined
+          }
+          onChooseInstruction={(instructionType: string) => {
+            const { instruction, chosenObjectName } = chooseInstruction(
+              instructionType
+            );
+            submitInstruction({ instruction, chosenObjectName });
+          }}
+          chosenObjectName={chosenObjectName}
+          onChooseObject={chosenObjectName => {
+            chooseObject(chosenObjectName);
+            setStep('object-instructions');
+          }}
+          focusOnMount={!instructionType}
+          onSearchStartOrReset={forceUpdate}
+          i18n={i18n}
+        />
+      )}
+    </I18n>
   );
 
   const renderObjectInstructionSelector = () =>

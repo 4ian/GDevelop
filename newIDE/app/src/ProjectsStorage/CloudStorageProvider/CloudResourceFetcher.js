@@ -11,28 +11,11 @@ import {
 } from '../../Utils/BlobDownloader';
 import { type FileMetadata } from '../index';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
-import { extractFilenameAndExtensionFromProductAuthorizedUrl } from '../../Utils/GDevelopServices/Shop';
-
-const isURL = (filename: string) => {
-  return (
-    filename.startsWith('http://') ||
-    filename.startsWith('https://') ||
-    filename.startsWith('ftp://') ||
-    filename.startsWith('blob:') ||
-    filename.startsWith('data:')
-  );
-};
-
-const isPrivateAssetUrl = (filename: string) => {
-  return (
-    filename.startsWith('https://private-assets-dev.gdevelop.io') ||
-    filename.startsWith('https://private-assets.gdevelop.io')
-  );
-};
-
-const isBlobURL = (filename: string) => {
-  return filename.startsWith('blob:');
-};
+import {
+  extractFilenameWithExtensionFromProductAuthorizedUrl,
+  isProductAuthorizedResourceUrl,
+} from '../../Utils/GDevelopServices/Shop';
+import { isBlobURL, isURL } from '../../ResourcesList/ResourceUtils';
 
 export const moveUrlResourcesToCloudFilesIfPrivate = async ({
   project,
@@ -73,17 +56,14 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
           const resourceFile = resource.getFile();
 
           if (isURL(resourceFile)) {
-            if (isPrivateAssetUrl(resourceFile)) {
-              const {
-                extension,
-                filenameWithoutExtension,
-              } = extractFilenameAndExtensionFromProductAuthorizedUrl(
+            if (isProductAuthorizedResourceUrl(resourceFile)) {
+              const filenameWithExtension = extractFilenameWithExtensionFromProductAuthorizedUrl(
                 resourceFile
               );
               return {
                 resource,
                 url: resourceFile,
-                filename: filenameWithoutExtension + extension,
+                filename: filenameWithExtension,
               };
             } else if (isBlobURL(resourceFile)) {
               result.erroredResources.push({

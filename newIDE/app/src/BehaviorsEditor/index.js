@@ -38,6 +38,7 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
+  eventsFunctionsExtension?: gdEventsFunctionsExtension,
   object: gdObject,
   onUpdateBehaviorsSharedData: () => void,
   onSizeUpdated?: ?() => void,
@@ -51,7 +52,7 @@ const BehaviorsEditor = (props: Props) => {
     false
   );
 
-  const { object, project } = props;
+  const { object, project, eventsFunctionsExtension } = props;
   const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
   const forceUpdate = useForceUpdate();
 
@@ -300,6 +301,7 @@ const BehaviorsEditor = (props: Props) => {
           onClose={() => setNewBehaviorDialogOpen(false)}
           onChoose={addBehavior}
           project={project}
+          eventsFunctionsExtension={eventsFunctionsExtension}
         />
       )}
     </Column>

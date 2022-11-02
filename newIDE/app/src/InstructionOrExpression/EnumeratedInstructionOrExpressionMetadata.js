@@ -57,38 +57,35 @@ export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
   scope: EventsScope
 ): Array<T> => {
   return list.filter(enumeratedInstructionOrExpressionMetadata => {
-    if (!enumeratedInstructionOrExpressionMetadata.isPrivate) return true;
-
-    // The instruction or expression is marked as "private":
-    // we now compare its scope (where it was declared) and the current scope
-    // (where we are) to see if we should filter it or not.
-
     const {
       behaviorMetadata,
       extension,
     } = enumeratedInstructionOrExpressionMetadata.scope;
     const { eventsBasedBehavior, eventsFunctionsExtension } = scope;
 
-    // Show private behavior functions when editing the behavior
-    if (
-      behaviorMetadata &&
-      eventsBasedBehavior &&
-      eventsFunctionsExtension &&
-      getBehaviorFullType(
-        eventsFunctionsExtension.getName(),
-        eventsBasedBehavior.getName()
-      ) === behaviorMetadata.getName()
-    )
-      return true;
+    return (
+      (!enumeratedInstructionOrExpressionMetadata.isPrivate &&
+        (!behaviorMetadata || !behaviorMetadata.isPrivate())) ||
+      // The instruction or expression is marked as "private":
+      // we now compare its scope (where it was declared) and the current scope
+      // (where we are) to see if we should filter it or not.
 
-    // Show private non-behavior functions when editing the extension
-    if (
-      !behaviorMetadata &&
-      eventsFunctionsExtension &&
-      eventsFunctionsExtension.getName() === extension.getName()
-    )
-      return true;
-
-    return false;
+      // Show public functions of a private behavior when editing the extension.
+      (!enumeratedInstructionOrExpressionMetadata.isPrivate &&
+        eventsFunctionsExtension &&
+        eventsFunctionsExtension.getName() === extension.getName()) ||
+      // Show private behavior functions when editing the behavior
+      (behaviorMetadata &&
+        eventsBasedBehavior &&
+        eventsFunctionsExtension &&
+        getBehaviorFullType(
+          eventsFunctionsExtension.getName(),
+          eventsBasedBehavior.getName()
+        ) === behaviorMetadata.getName()) ||
+      // Show private non-behavior functions when editing the extension
+      (!behaviorMetadata &&
+        eventsFunctionsExtension &&
+        eventsFunctionsExtension.getName() === extension.getName())
+    );
   });
 };

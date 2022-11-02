@@ -56,6 +56,9 @@ type Props = {|
   onUpdateBehaviorsSharedData: () => void,
   initialTab: ?ObjectEditorTab,
 
+  // Passed down to the behaviors editor:
+  eventsFunctionsExtension?: gdEventsFunctionsExtension,
+
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
@@ -224,6 +227,7 @@ const InnerDialog = (props: InnerDialogProps) => {
         <BehaviorsEditor
           object={props.object}
           project={props.project}
+          eventsFunctionsExtension={props.eventsFunctionsExtension}
           resourceSources={props.resourceSources}
           onChooseResource={props.onChooseResource}
           resourceExternalEditors={props.resourceExternalEditors}

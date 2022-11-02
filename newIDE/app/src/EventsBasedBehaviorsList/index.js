@@ -22,8 +22,29 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import Tooltip from '@material-ui/core/Tooltip';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
+
+const renderEventsBehaviorLabel = (
+  eventsBasedBehavior: gdEventsBasedBehavior
+) =>
+  eventsBasedBehavior.isPrivate() ? (
+    <>
+      <Tooltip title="This function won't be visible in the events editor">
+        <VisibilityOffIcon
+          fontSize="small"
+          style={{ marginRight: 5, verticalAlign: 'bottom' }}
+        />
+      </Tooltip>
+      <span title={eventsBasedBehavior.getName()}>
+        {eventsBasedBehavior.getName()}
+      </span>
+    </>
+  ) : (
+    eventsBasedBehavior.getName()
+  );
 
 const styles = {
   listContainer: {
@@ -161,6 +182,11 @@ export default class EventsBasedBehaviorsList extends React.Component<
     this.forceUpdateList();
   };
 
+  _togglePrivate = (eventsBasedBehavior: gdEventsBasedBehavior) => {
+    eventsBasedBehavior.setPrivate(!eventsBasedBehavior.isPrivate());
+    this.forceUpdate();
+  };
+
   forceUpdateList = () => {
     this._onEventsBasedBehaviorModified();
     if (this.sortableList) this.sortableList.forceUpdateGrid();
@@ -241,6 +267,12 @@ export default class EventsBasedBehaviorsList extends React.Component<
           }),
       },
       {
+        label: eventsBasedBehavior.isPrivate()
+          ? i18n._(t`Make public`)
+          : i18n._(t`Make private`),
+        click: () => this._togglePrivate(eventsBasedBehavior),
+      },
+      {
         type: 'separator',
       },
       {
@@ -315,6 +347,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
                     height={height}
                     onAddNewItem={this._addNewEventsBasedBehavior}
                     addNewItemLabel={<Trans>Add a new behavior</Trans>}
+                    renderItemLabel={renderEventsBehaviorLabel}
                     getItemName={getEventsBasedBehaviorName}
                     selectedItems={
                       selectedEventsBasedBehavior

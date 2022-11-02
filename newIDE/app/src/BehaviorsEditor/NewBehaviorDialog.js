@@ -82,6 +82,7 @@ const BehaviorListItem = ({
 
 type Props = {|
   project: gdProject,
+  eventsFunctionsExtension?: gdEventsFunctionsExtension,
   objectType: string,
   objectBehaviorsTypes: Array<string>,
   open: boolean,
@@ -91,6 +92,7 @@ type Props = {|
 
 export default function NewBehaviorDialog({
   project,
+  eventsFunctionsExtension,
   open,
   onClose,
   onChoose,
@@ -119,13 +121,17 @@ export default function NewBehaviorDialog({
   );
 
   const platform = project.getCurrentPlatform();
-  const behaviorMetadata: Array<EnumeratedBehaviorMetadata> = React.useMemo(
+  const behaviorsMetadata: Array<EnumeratedBehaviorMetadata> = React.useMemo(
     () => {
       return project && platform
-        ? enumerateBehaviorsMetadata(platform, project)
+        ? enumerateBehaviorsMetadata(
+            platform,
+            project,
+            eventsFunctionsExtension
+          )
         : [];
     },
-    [project, platform, extensionInstallTime] // eslint-disable-line react-hooks/exhaustive-deps
+    [project, platform, eventsFunctionsExtension, extensionInstallTime] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
@@ -144,7 +150,7 @@ export default function NewBehaviorDialog({
   const deprecatedBehaviorsInformation = getDeprecatedBehaviorsInformation();
 
   const filteredBehaviorMetadata = filterEnumeratedBehaviorMetadata(
-    behaviorMetadata,
+    behaviorsMetadata,
     searchText
   );
   const behaviors = filteredBehaviorMetadata.filter(

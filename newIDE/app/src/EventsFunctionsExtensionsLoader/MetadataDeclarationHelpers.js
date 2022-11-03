@@ -803,8 +803,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     const propertyType = property.getType();
     const propertyName = property.getName();
     const propertyLabel = i18n._(
-      t`${property.getLabel() ||
-        propertyName} ${eventsBasedBehavior.getName()} shared property`
+      t`${property.getLabel() || propertyName} shared property`
     );
 
     addObjectAndBehaviorParameters(
@@ -818,7 +817,10 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
         getExtensionIconUrl(extension)
       )
     )
-      .useStandardParameters(convertPropertyTypeToValueType(propertyType))
+      .useStandardParameters(
+        convertPropertyTypeToValueType(propertyType),
+        getStringifiedExtraInfo(property)
+      )
       .setFunctionName(
         gd.BehaviorCodeGenerator.getBehaviorSharedPropertySetterName(
           propertyName

@@ -31,6 +31,7 @@ const styles = {
   listContainer: {
     flex: 1,
   },
+  tooltip: { marginRight: 5, verticalAlign: 'bottom' },
 };
 
 export type EventsFunctionCreationParameters = {|
@@ -41,11 +42,12 @@ export type EventsFunctionCreationParameters = {|
 const renderEventsFunctionLabel = (eventsFunction: gdEventsFunction) =>
   eventsFunction.isPrivate() ? (
     <>
-      <Tooltip title="This function won't be visible in the events editor">
-        <VisibilityOffIcon
-          fontSize="small"
-          style={{ marginRight: 5, verticalAlign: 'bottom' }}
-        />
+      <Tooltip
+        title={
+          <Trans>This function won't be visible in the events editor.</Trans>
+        }
+      >
+        <VisibilityOffIcon fontSize="small" style={styles.tooltip} />
       </Tooltip>
       <span title={eventsFunction.getName()}>{eventsFunction.getName()}</span>
     </>

@@ -27,16 +27,24 @@ import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 
+const styles = {
+  listContainer: {
+    flex: 1,
+  },
+  tooltip: { marginRight: 5, verticalAlign: 'bottom' },
+};
+
 const renderEventsBehaviorLabel = (
   eventsBasedBehavior: gdEventsBasedBehavior
 ) =>
   eventsBasedBehavior.isPrivate() ? (
     <>
-      <Tooltip title="This function won't be visible in the events editor">
-        <VisibilityOffIcon
-          fontSize="small"
-          style={{ marginRight: 5, verticalAlign: 'bottom' }}
-        />
+      <Tooltip
+        title={
+          <Trans>This behavior won't be visible in the events editor.</Trans>
+        }
+      >
+        <VisibilityOffIcon fontSize="small" style={styles.tooltip} />
       </Tooltip>
       <span title={eventsBasedBehavior.getName()}>
         {eventsBasedBehavior.getName()}
@@ -45,12 +53,6 @@ const renderEventsBehaviorLabel = (
   ) : (
     eventsBasedBehavior.getName()
   );
-
-const styles = {
-  listContainer: {
-    flex: 1,
-  },
-};
 
 type State = {|
   renamedEventsBasedBehavior: ?gdEventsBasedBehavior,

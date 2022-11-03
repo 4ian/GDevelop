@@ -67,7 +67,7 @@ export const declareBehaviorMetadata = (
   extension: gdPlatformExtension,
   eventsBasedBehavior: gdEventsBasedBehavior
 ): gdBehaviorMetadata => {
-  return extension
+  const behaviorMetadata = extension
     .addEventsBasedBehavior(
       eventsBasedBehavior.getName(),
       eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
@@ -76,6 +76,10 @@ export const declareBehaviorMetadata = (
       getExtensionIconUrl(extension)
     )
     .setObjectType(eventsBasedBehavior.getObjectType());
+
+  if (eventsBasedBehavior.isPrivate()) behaviorMetadata.setPrivate();
+
+  return behaviorMetadata;
 };
 
 /**

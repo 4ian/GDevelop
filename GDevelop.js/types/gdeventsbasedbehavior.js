@@ -9,6 +9,8 @@ declare class gdEventsBasedBehavior {
   getFullName(): string;
   setObjectType(fullName: string): gdEventsBasedBehavior;
   getObjectType(): string;
+  setPrivate(isPrivate: boolean): gdEventsBasedBehavior;
+  isPrivate(): boolean;
   getEventsFunctions(): gdEventsFunctionsContainer;
   getPropertyDescriptors(): gdNamedPropertyDescriptorsList;
   serializeTo(element: gdSerializerElement): void;

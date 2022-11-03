@@ -236,7 +236,6 @@ class GD_CORE_API BehaviorMetadata {
   }
 
   const gd::String& GetName() const;
-#if defined(GD_IDE_ONLY)
   const gd::String& GetFullName() const { return fullname; }
   const gd::String& GetDefaultName() const { return defaultName; }
   const gd::String& GetDescription() const { return description; }
@@ -257,7 +256,21 @@ class GD_CORE_API BehaviorMetadata {
    * \note An empty string means the base object, so any object.
    */
   const gd::String& GetObjectType() const { return objectType; }
-#endif
+
+  /**
+   * Check if the behavior is private - it can't be used outside of its
+   * extension.
+   */
+  bool IsPrivate() const { return isPrivate; }
+
+  /**
+   * Set that the behavior is private - it can't be used outside of its
+   * extension.
+   */
+  BehaviorMetadata &SetPrivate() {
+    isPrivate = true;
+    return *this;
+  }
 
   /**
    * \brief Return the associated gd::Behavior, handling behavior contents.
@@ -315,6 +328,7 @@ class GD_CORE_API BehaviorMetadata {
   gd::String group;
   gd::String iconFilename;
   gd::String objectType;
+  bool isPrivate = false;
 
   // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.
   std::shared_ptr<gd::Behavior> instance;

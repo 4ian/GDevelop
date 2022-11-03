@@ -14,6 +14,7 @@ type Props = {|
   value: string,
   onChange: string => void,
   disabled?: boolean,
+  eventsFunctionsExtension?: gdEventsFunctionsExtension,
 |};
 type State = {|
   behaviorMetadata: Array<EnumeratedBehaviorMetadata>,
@@ -26,7 +27,8 @@ export default class BehaviorTypeSelector extends React.Component<
   state = {
     behaviorMetadata: enumerateBehaviorsMetadata(
       this.props.project.getCurrentPlatform(),
-      this.props.project
+      this.props.project,
+      this.props.eventsFunctionsExtension
     ),
   };
 

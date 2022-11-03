@@ -711,6 +711,12 @@ const convertPropertyTypeToValueType = (propertyType: string): string => {
   }
 };
 
+const getStringifiedExtraInfo = (property: gdPropertyDescriptor) => {
+  return property.getType() === 'Choice'
+    ? JSON.stringify(property.getExtraInfo().toJSArray())
+    : '';
+};
+
 /**
  * Declare the instructions (actions/conditions) and expressions for the
  * properties of the given events based behavior.
@@ -779,7 +785,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     )
       .useStandardParameters(
         convertPropertyTypeToValueType(propertyType),
-        JSON.stringify(property.getExtraInfo().toJSArray())
+        getStringifiedExtraInfo(property)
       )
       .setFunctionName(
         gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(propertyName)
@@ -840,7 +846,7 @@ export const declareObjectPropertiesInstructionAndExpressions = (
     )
       .useStandardParameters(
         convertPropertyTypeToValueType(propertyType),
-        JSON.stringify(property.getExtraInfo().toJSArray())
+        getStringifiedExtraInfo(property)
       )
       .setFunctionName(
         gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(propertyName)

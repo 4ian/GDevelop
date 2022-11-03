@@ -124,7 +124,7 @@ describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
         index < 200 && tileMap._collisionTileMap.getDimensionX() === 0;
         index++
       ) {
-        await delay(25);
+        await delay(100);
       }
       if (tileMap._collisionTileMap.getDimensionX() === 0) {
         throw new Error('Timeout reading the tile map JSON file.');

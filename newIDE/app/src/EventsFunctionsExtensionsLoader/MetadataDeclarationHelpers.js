@@ -195,8 +195,8 @@ export const declareObjectMetadata = (
       i18n._('Flip the object horizontally'),
       i18n._('Flip horizontally _PARAM0_: _PARAM1_'),
       i18n._('Effects'),
-      'res/actions/flipX24_black.png',
-      'res/actions/flipX_black.png'
+      'res/actions/flipX24.png',
+      'res/actions/flipX.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
     .addParameter('yesorno', i18n._('Activate flipping'))
@@ -211,8 +211,8 @@ export const declareObjectMetadata = (
       i18n._('Flip the object vertically'),
       i18n._('Flip vertically _PARAM0_: _PARAM1_'),
       i18n._('Effects'),
-      'res/actions/flipY24_black.png',
-      'res/actions/flipY_black.png'
+      'res/actions/flipY24.png',
+      'res/actions/flipY.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
     .addParameter('yesorno', i18n._('Activate flipping'))
@@ -227,8 +227,8 @@ export const declareObjectMetadata = (
       i18n._('Check if the object is horizontally flipped'),
       i18n._('_PARAM0_ is horizontally flipped'),
       i18n._('Effects'),
-      'res/actions/flipX24_black.png',
-      'res/actions/flipX_black.png'
+      'res/actions/flipX24.png',
+      'res/actions/flipX.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
     .getCodeExtraInformation()
@@ -241,8 +241,8 @@ export const declareObjectMetadata = (
       i18n._('Check if the object is vertically flipped'),
       i18n._('_PARAM0_ is vertically flipped'),
       i18n._('Effects'),
-      'res/actions/flipY24_black.png',
-      'res/actions/flipY_black.png'
+      'res/actions/flipY24.png',
+      'res/actions/flipY.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
     .getCodeExtraInformation()

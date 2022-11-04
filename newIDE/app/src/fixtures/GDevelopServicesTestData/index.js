@@ -120,7 +120,7 @@ export const limitsForIndieUser: Limits = {
     leaderboards: {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
-    }
+    },
   },
   limits: {
     'cordova-build': {
@@ -148,7 +148,7 @@ export const limitsForProUser: Limits = {
     leaderboards: {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
-    }
+    },
   },
   limits: {
     'cordova-build': {
@@ -176,7 +176,7 @@ export const limitsReached: Limits = {
     leaderboards: {
       maximumCountPerGame: 3,
       canMaximumCountPerGameBeIncreased: true,
-    }
+    },
   },
   limits: {
     'cordova-build': {

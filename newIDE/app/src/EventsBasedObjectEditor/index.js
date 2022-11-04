@@ -8,6 +8,7 @@ import TextField from '../UI/TextField';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { Tabs, Tab } from '../UI/Tabs';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
+import AlertMessage from '../UI/AlertMessage';
 import EventsBasedObjectPropertiesEditor from './EventsBasedObjectPropertiesEditor';
 import EventBasedObjectChildrenEditor from './EventBasedObjectChildrenEditor';
 import { ColumnStackLayout } from '../UI/Layout';
@@ -69,6 +70,13 @@ export default class EventsBasedObjectEditor extends React.Component<
         <Line expand useFullHeight>
           {currentTab === 'configuration' && (
             <ColumnStackLayout expand>
+              <AlertMessage kind="warning">
+                <Trans>
+                  The object editor is at a very early stage. A lot of features
+                  are missing or broken. Extensions written with it may no
+                  longer work in future GDevelop releases.
+                </Trans>
+              </AlertMessage>
               <DismissableAlertMessage
                 identifier="events-based-object-explanation"
                 kind="info"

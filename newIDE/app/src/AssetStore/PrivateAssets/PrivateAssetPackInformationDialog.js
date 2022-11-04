@@ -13,11 +13,7 @@ import PriceTag, { formatPrice } from '../../UI/PriceTag';
 import FlatButton from '../../UI/FlatButton';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
-import {
-  ColumnStackLayout,
-  ResponsiveLineStackLayout,
-  LineStackLayout,
-} from '../../UI/Layout';
+import { ResponsiveLineStackLayout, LineStackLayout } from '../../UI/Layout';
 import { Column, Line } from '../../UI/Grid';
 import {
   getUserPublicProfile,
@@ -32,6 +28,7 @@ import ResponsiveImagesGallery from '../../UI/ResponsiveImagesGallery';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import RaisedButton from '../../UI/RaisedButton';
 import { sendAssetPackBuyClicked } from '../../Utils/Analytics/EventSender';
+import { MarkdownText } from '../../UI/MarkdownText';
 
 const sortedContentType = [
   'sprite',
@@ -208,7 +205,7 @@ const PrivateAssetPackDialog = ({
                       variant="outlined"
                       style={{ padding: windowWidth === 'small' ? 20 : 30 }}
                     >
-                      <ColumnStackLayout noMargin useLargeSpacer>
+                      <Column noMargin>
                         <Line
                           noMargin
                           expand
@@ -218,7 +215,12 @@ const PrivateAssetPackDialog = ({
                           <PriceTag value={prices[0].value} />
                           {getBuyButton(i18n)}
                         </Line>
-                        <Text noMargin>{assetPack.longDescription}</Text>
+                        <Text size="body2" displayInlineAsSpan>
+                          <MarkdownText
+                            source={assetPack.longDescription}
+                            allowParagraphs
+                          />
+                        </Text>
                         <ResponsiveLineStackLayout noMargin noColumnMargin>
                           <Column noMargin expand>
                             <Text size="sub-title">
@@ -277,7 +279,7 @@ const PrivateAssetPackDialog = ({
                             </LineStackLayout>
                           </Column>
                         </ResponsiveLineStackLayout>
-                      </ColumnStackLayout>
+                      </Column>
                     </Paper>
                   </Column>
                 </ResponsiveLineStackLayout>

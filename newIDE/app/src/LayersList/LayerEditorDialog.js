@@ -53,7 +53,10 @@ const LayerEditorDialog = (props: Props) => {
     hotReloadPreviewButtonProps,
   } = props;
   const forceUpdate = useForceUpdate();
-  const onCancelChanges = useSerializableObjectCancelableEditor({
+  const {
+    onCancelChanges,
+    notifyOfChange,
+  } = useSerializableObjectCancelableEditor({
     serializableObject: layer,
     onCancel: onClose,
   });
@@ -143,6 +146,7 @@ const LayerEditorDialog = (props: Props) => {
               onCheck={(e, checked) => {
                 layer.setVisibility(!checked);
                 forceUpdate();
+                notifyOfChange();
               }}
               tooltipOrHelperText={
                 <Trans>
@@ -163,6 +167,7 @@ const LayerEditorDialog = (props: Props) => {
                   onCheck={(e, checked) => {
                     layer.setFollowBaseLayerCamera(checked);
                     forceUpdate();
+                    notifyOfChange();
                   }}
                 />
                 <ColorField
@@ -174,15 +179,21 @@ const LayerEditorDialog = (props: Props) => {
                     g: layer.getAmbientLightColorGreen(),
                     b: layer.getAmbientLightColorBlue(),
                   })}
-                  onChange={color => {
-                    const rgbColor = rgbStringAndAlphaToRGBColor(color);
-                    if (rgbColor) {
+                  onChange={newColor => {
+                    const currentRgbColor = {
+                      r: layer.getAmbientLightColorRed(),
+                      g: layer.getAmbientLightColorGreen(),
+                      b: layer.getAmbientLightColorBlue(),
+                    };
+                    const newRgbColor = rgbStringAndAlphaToRGBColor(newColor);
+                    if (newRgbColor) {
                       layer.setAmbientLightColor(
-                        rgbColor.r,
-                        rgbColor.g,
-                        rgbColor.b
+                        newRgbColor.r,
+                        newRgbColor.g,
+                        newRgbColor.b
                       );
                       forceUpdate();
+                      if (currentRgbColor !== newRgbColor) notifyOfChange();
                     }
                   }}
                 />
@@ -204,9 +215,10 @@ const LayerEditorDialog = (props: Props) => {
             onChooseResource={props.onChooseResource}
             resourceExternalEditors={props.resourceExternalEditors}
             effectsContainer={layer.getEffects()}
-            onEffectsUpdated={
-              forceUpdate /*Force update to ensure dialog is properly positioned*/
-            }
+            onEffectsUpdated={() => {
+              forceUpdate(); /*Force update to ensure dialog is properly positioned*/
+              notifyOfChange();
+            }}
           />
         )}
       </Column>

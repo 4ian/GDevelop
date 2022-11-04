@@ -44,6 +44,7 @@ type Props = {|
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
+  onBehaviorsUpdated?: () => void,
 |};
 
 const BehaviorsEditor = (props: Props) => {
@@ -76,6 +77,7 @@ const BehaviorsEditor = (props: Props) => {
     forceUpdate();
     if (props.onSizeUpdated) props.onSizeUpdated();
     props.onUpdateBehaviorsSharedData();
+    if (props.onBehaviorsUpdated) props.onBehaviorsUpdated();
   };
 
   const onChangeBehaviorName = (behavior: gdBehavior, newName: string) => {
@@ -88,6 +90,7 @@ const BehaviorsEditor = (props: Props) => {
     if (object.hasBehaviorNamed(newName)) return;
     object.renameBehavior(behavior.getName(), newName);
     forceUpdate();
+    if (props.onBehaviorsUpdated) props.onBehaviorsUpdated();
   };
 
   const onRemoveBehavior = (behaviorName: string) => {
@@ -110,6 +113,7 @@ const BehaviorsEditor = (props: Props) => {
       dependentBehaviors.forEach(name => object.removeBehavior(name));
       if (props.onSizeUpdated) props.onSizeUpdated();
     }
+    if (props.onBehaviorsUpdated) props.onBehaviorsUpdated();
   };
 
   return (
@@ -155,6 +159,8 @@ const BehaviorsEditor = (props: Props) => {
                           onClick={ev => {
                             ev.stopPropagation();
                             onRemoveBehavior(behaviorName);
+                            if (props.onBehaviorsUpdated)
+                              props.onBehaviorsUpdated();
                           }}
                         >
                           <Delete />
@@ -213,6 +219,8 @@ const BehaviorsEditor = (props: Props) => {
                         onClick={ev => {
                           ev.stopPropagation();
                           onRemoveBehavior(behaviorName);
+                          if (props.onBehaviorsUpdated)
+                            props.onBehaviorsUpdated();
                         }}
                       >
                         <Delete />

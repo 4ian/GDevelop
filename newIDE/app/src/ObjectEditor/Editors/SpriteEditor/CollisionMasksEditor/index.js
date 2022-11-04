@@ -46,9 +46,15 @@ type Props = {|
   objectConfiguration: gdSpriteObject,
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
+  onMasksUpdated?: () => void,
 |};
 
-const CollisionMasksEditor = (props: Props) => {
+const CollisionMasksEditor = ({
+  objectConfiguration,
+  resourcesLoader,
+  project,
+  onMasksUpdated,
+}: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
@@ -75,9 +81,7 @@ const CollisionMasksEditor = (props: Props) => {
   const [spriteHeight, setSpriteHeight] = React.useState(0);
   const forceUpdate = useForceUpdate();
 
-  const spriteConfiguration = gd.asSpriteConfiguration(
-    props.objectConfiguration
-  );
+  const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
   const { animation, sprite } = getCurrentElements(
     spriteConfiguration,
     animationIndex,
@@ -99,6 +103,7 @@ const CollisionMasksEditor = (props: Props) => {
       }
 
       forceUpdate(); // Refresh the preview and the list
+      if (onMasksUpdated) onMasksUpdated();
     },
     [
       animation,
@@ -107,6 +112,7 @@ const CollisionMasksEditor = (props: Props) => {
       sameCollisionMasksForAnimations,
       sameCollisionMasksForSprites,
       forceUpdate,
+      onMasksUpdated,
     ]
   );
 
@@ -197,7 +203,7 @@ const CollisionMasksEditor = (props: Props) => {
   const editorNodes =
     screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
 
-  if (!props.objectConfiguration.getAnimationsCount()) return null;
+  if (!objectConfiguration.getAnimationsCount()) return null;
   const resourceName = sprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor } = {
@@ -208,16 +214,16 @@ const CollisionMasksEditor = (props: Props) => {
         <Background>
           <ImagePreview
             resourceName={resourceName}
-            imageResourceSource={props.resourcesLoader.getResourceFullUrl(
-              props.project,
+            imageResourceSource={resourcesLoader.getResourceFullUrl(
+              project,
               resourceName,
               {}
             )}
             isImageResourceSmooth={isProjectImageResourceSmooth(
-              props.project,
+              project,
               resourceName
             )}
-            project={props.project}
+            project={project}
             onSize={setCurrentSpriteSize}
             renderOverlay={overlayProps =>
               sprite && (

@@ -107,6 +107,7 @@ type Props = {|
   commitChangesOnBlur: boolean,
   /** If set to small, will collapse variable row by default. */
   size?: 'small',
+  onVariablesUpdated?: () => void,
 |};
 
 const StyledTreeItem = withStyles(theme => ({
@@ -287,10 +288,11 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         .filter(Boolean)
     : [];
 
-  const _saveToHistory = () => {
+  const _onChange = () => {
     props.historyHandler
       ? props.historyHandler.saveToHistory()
       : setHistory(saveToHistory(history, props.variablesContainer));
+    if (props.onVariablesUpdated) props.onVariablesUpdated();
   };
 
   const _undo = () => {
@@ -451,7 +453,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         }
       }
     });
-    _saveToHistory();
+    _onChange();
     setSelectedNodes(newSelectedNodes);
   };
 
@@ -478,7 +480,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const deleteNode = (nodeId: string): void => {
     const success = _deleteNode(nodeId);
     if (success) {
-      _saveToHistory();
+      _onChange();
     }
   };
 
@@ -730,7 +732,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         movementHasBeenMade = false;
     }
     if (movementHasBeenMade) {
-      _saveToHistory();
+      _onChange();
       forceUpdate();
     }
   };
@@ -750,7 +752,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       );
       variable.getChild(name).setString('');
     } else if (type === gd.Variable.Array) variable.pushNew();
-    _saveToHistory();
+    _onChange();
     if (variable.isFolded()) variable.setFolded(false);
     setExpandedNodes([...expandedNodes, nodeId]);
   };
@@ -773,7 +775,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       newVariable,
       props.variablesContainer.count()
     );
-    _saveToHistory();
+    _onChange();
     setSelectedNodes([inheritedVariableName]);
     setExpandedNodes([...expandedNodes, inheritedVariableName]);
     newVariable.delete();
@@ -791,7 +793,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         null,
         props.variablesContainer.count()
       );
-      _saveToHistory();
+      _onChange();
       setSelectedNodes([newName]);
       setVariablePtrToFocus(variable.ptr);
       return;
@@ -816,7 +818,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       null,
       position
     );
-    _saveToHistory();
+    _onChange();
     setSelectedNodes([newName]);
     setVariablePtrToFocus(variable.ptr);
   };
@@ -1278,7 +1280,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       hasBeenRenamed = parentVariable.renameChild(name, newName);
     }
     if (hasBeenRenamed) {
-      _saveToHistory();
+      _onChange();
       updateExpandedAndSelectedNodesFollowingNameChange(nodeId, newName);
     } else {
       if (variable)
@@ -1298,7 +1300,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     );
     if (!variable) return;
     variable.castTo(newType);
-    _saveToHistory();
+    _onChange();
   };
 
   const onChangeValue = (nodeId: string, newValue: string) => {
@@ -1373,7 +1375,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
           `Cannot set variable with type ${variable.getType()} - are you sure it's a primitive type?`
         );
     }
-    _saveToHistory();
+    _onChange();
     forceUpdate();
   };
 

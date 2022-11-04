@@ -48,6 +48,10 @@ export type Capabilities = {
     maximumCount: number,
     canMaximumCountBeIncreased: boolean,
   },
+  leaderboards: {
+    maximumCountPerGame: number,
+    canMaximumCountPerGameBeIncreased: boolean,
+  },
 };
 
 export type CurrentUsages = {

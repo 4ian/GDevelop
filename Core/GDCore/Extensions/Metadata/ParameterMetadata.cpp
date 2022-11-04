@@ -15,9 +15,12 @@ ParameterMetadata::ParameterMetadata() : codeOnly(false) {}
 void ParameterMetadata::SerializeTo(SerializerElement& element) const {
   valueTypeMetadata.SerializeTo(element);
   element.SetAttribute("description", description);
-  element.SetAttribute("longDescription", longDescription);
-  element.SetAttribute("codeOnly", codeOnly);
-  element.SetAttribute("defaultValue", defaultValue);
+  if (!longDescription.empty()) {
+    element.SetAttribute("longDescription", longDescription);
+  }
+  if (codeOnly) {
+   element.SetAttribute("codeOnly", codeOnly);
+  }
   element.SetAttribute("name", name);
 }
 
@@ -26,7 +29,6 @@ void ParameterMetadata::UnserializeFrom(const SerializerElement& element) {
   description = element.GetStringAttribute("description");
   longDescription = element.GetStringAttribute("longDescription");
   codeOnly = element.GetBoolAttribute("codeOnly");
-  defaultValue = element.GetStringAttribute("defaultValue");
   name = element.GetStringAttribute("name");
 }
 

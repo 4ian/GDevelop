@@ -25,7 +25,10 @@ const ObjectGroupEditorDialog = ({
   objectsContainer,
 }: Props) => {
   const forceUpdate = useForceUpdate();
-  const onCancelChanges = useSerializableObjectCancelableEditor({
+  const {
+    onCancelChanges,
+    notifyOfChange,
+  } = useSerializableObjectCancelableEditor({
     serializableObject: group,
     onCancel,
   });
@@ -61,6 +64,7 @@ const ObjectGroupEditorDialog = ({
         onSizeUpdated={
           forceUpdate /*Force update to ensure dialog is properly positionned*/
         }
+        onObjectGroupUpdated={notifyOfChange}
       />
     </Dialog>
   );

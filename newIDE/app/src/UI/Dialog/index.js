@@ -74,7 +74,7 @@ type Props = {|
    * If `onApply` is also specified, this must be interpreted as a "cancelling"
    * of changes.
    */
-  onRequestClose?: () => void,
+  onRequestClose?: () => void | Promise<void>,
 
   /**
    * If specified, will be called when the dialog is dismissed in a way where changes

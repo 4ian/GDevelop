@@ -3362,6 +3362,7 @@ storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
   .add('default', () => (
     <LoadingScreenEditor
       loadingScreen={testProject.project.getLoadingScreen()}
+      onLoadingScreenUpdated={action('onLoadingscreenUpdated')}
       onChangeSubscription={action('onChangeSubscription')}
       project={testProject.project}
       resourceSources={[]}

@@ -198,6 +198,7 @@ type AnimationsListContainerProps = {|
   extraBottomTools: React.Node,
   onSizeUpdated: () => void,
   objectName: string,
+  onObjectUpdated?: () => void,
 |};
 
 type AnimationsListContainerState = {|
@@ -227,6 +228,7 @@ class AnimationsListContainer extends React.Component<
     emptyAnimation.delete();
     this.forceUpdate();
     this.props.onSizeUpdated();
+    if (this.props.onObjectUpdated) this.props.onObjectUpdated();
   };
 
   removeAnimation = i => {
@@ -238,6 +240,7 @@ class AnimationsListContainer extends React.Component<
       this.props.spriteConfiguration.removeAnimation(i);
       this.forceUpdate();
       this.props.onSizeUpdated();
+      if (this.props.onObjectUpdated) this.props.onObjectUpdated();
     }
   };
 
@@ -264,6 +267,7 @@ class AnimationsListContainer extends React.Component<
 
     spriteConfiguration.getAnimation(i).setName(newName);
     this.forceUpdate();
+    if (this.props.onObjectUpdated) this.props.onObjectUpdated();
   };
 
   deleteSelection = () => {
@@ -277,6 +281,7 @@ class AnimationsListContainer extends React.Component<
     this.setState({
       selectedSprites: {},
     });
+    if (this.props.onObjectUpdated) this.props.onObjectUpdated();
   };
 
   duplicateSelection = () => {
@@ -290,6 +295,7 @@ class AnimationsListContainer extends React.Component<
     this.setState({
       selectedSprites: {},
     });
+    if (this.props.onObjectUpdated) this.props.onObjectUpdated();
   };
 
   openSpriteContextMenu = (x, y, sprite, index) => {
@@ -311,6 +317,7 @@ class AnimationsListContainer extends React.Component<
       .getAnimation(animationId)
       .setDirection(newDirection, directionId);
     this.forceUpdate();
+    if (this.props.onObjectUpdated) this.props.onObjectUpdated();
   };
 
   render() {
@@ -393,6 +400,7 @@ export default function SpriteEditor({
   onChooseResource,
   resourceExternalEditors,
   onSizeUpdated,
+  onObjectUpdated,
   objectName,
 }: EditorProps) {
   const [pointsEditorOpen, setPointsEditorOpen] = React.useState(false);
@@ -415,6 +423,7 @@ export default function SpriteEditor({
         project={project}
         objectName={objectName}
         onSizeUpdated={onSizeUpdated}
+        onObjectUpdated={onObjectUpdated}
         extraBottomTools={
           <ResponsiveLineStackLayout noMargin noColumnMargin>
             <RaisedButton
@@ -466,6 +475,7 @@ export default function SpriteEditor({
                 spriteConfiguration.setUpdateIfNotVisible(!value);
 
                 forceUpdate();
+                if (onObjectUpdated) onObjectUpdated();
               }}
             />
           </Column>
@@ -498,6 +508,7 @@ export default function SpriteEditor({
             objectConfiguration={spriteConfiguration}
             resourcesLoader={ResourcesLoader}
             project={project}
+            onPointsUpdated={onObjectUpdated}
           />
         </Dialog>
       )}
@@ -528,6 +539,7 @@ export default function SpriteEditor({
             objectConfiguration={spriteConfiguration}
             resourcesLoader={ResourcesLoader}
             project={project}
+            onMasksUpdated={onObjectUpdated}
           />
         </Dialog>
       )}

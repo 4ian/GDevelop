@@ -46,9 +46,15 @@ type Props = {|
   objectConfiguration: gdSpriteObject,
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
+  onPointsUpdated?: () => void,
 |};
 
-const PointsEditor = (props: Props) => {
+const PointsEditor = ({
+  objectConfiguration,
+  resourcesLoader,
+  project,
+  onPointsUpdated,
+}: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
@@ -70,9 +76,7 @@ const PointsEditor = (props: Props) => {
   const [samePointsForSprites, setSamePointsForSprites] = React.useState(false);
   const forceUpdate = useForceUpdate();
 
-  const spriteConfiguration = gd.asSpriteConfiguration(
-    props.objectConfiguration
-  );
+  const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
   const { animation, sprite } = getCurrentElements(
     spriteConfiguration,
     animationIndex,
@@ -94,6 +98,7 @@ const PointsEditor = (props: Props) => {
       }
 
       forceUpdate(); // Refresh the preview
+      if (onPointsUpdated) onPointsUpdated();
     },
     [
       animation,
@@ -102,6 +107,7 @@ const PointsEditor = (props: Props) => {
       samePointsForAnimations,
       samePointsForSprites,
       forceUpdate,
+      onPointsUpdated,
     ]
   );
 
@@ -174,7 +180,7 @@ const PointsEditor = (props: Props) => {
   const editorNodes =
     screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
 
-  if (!props.objectConfiguration.getAnimationsCount()) return null;
+  if (!objectConfiguration.getAnimationsCount()) return null;
   const resourceName = sprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor } = {
@@ -185,16 +191,16 @@ const PointsEditor = (props: Props) => {
         <Background>
           <ImagePreview
             resourceName={resourceName}
-            imageResourceSource={props.resourcesLoader.getResourceFullUrl(
-              props.project,
+            imageResourceSource={resourcesLoader.getResourceFullUrl(
+              project,
               resourceName,
               {}
             )}
             isImageResourceSmooth={isProjectImageResourceSmooth(
-              props.project,
+              project,
               resourceName
             )}
-            project={props.project}
+            project={project}
             renderOverlay={overlayProps =>
               sprite && (
                 <PointsPreview

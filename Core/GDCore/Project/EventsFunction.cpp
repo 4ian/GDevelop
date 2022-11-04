@@ -59,11 +59,19 @@ const std::vector<gd::ParameterMetadata>& EventsFunction::GetParametersForEvents
 void EventsFunction::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", name);
   element.SetAttribute("fullName", fullName);
-  element.SetAttribute("description", description);
+  if (!description.empty()) {
+    element.SetAttribute("description", description);
+  }
   element.SetAttribute("sentence", sentence);
-  element.SetAttribute("group", group);
-  element.SetAttribute("getterName", getterName);
-  element.SetBoolAttribute("private", isPrivate);
+  if (!group.empty()) {
+    element.SetAttribute("group", group);
+  }
+  if (!getterName.empty()) {
+    element.SetAttribute("getterName", getterName);
+  }
+  if (isPrivate) {
+    element.SetBoolAttribute("private", isPrivate);
+  }
   events.SerializeTo(element.AddChild("events"));
 
   gd::String functionTypeStr = "Action";

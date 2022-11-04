@@ -61,6 +61,7 @@ export const MarkdownText = (props: Props) => {
             'standalone-text-container': props.isStandaloneText,
           })}
           components={markdownCustomComponents}
+          linkTarget="_blank"
         >
           {props.translatableSource
             ? i18n._(props.translatableSource)

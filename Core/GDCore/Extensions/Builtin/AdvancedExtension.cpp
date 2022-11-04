@@ -81,7 +81,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .AddExpression(
           "GetArgumentAsNumber",
           _("Get function parameter value"),
-          _("Get function parameter (also called \"argument\") value"),
+          _("Get function parameter (also called \"argument\") value."),
           "",
           "res/function16.png")
       .AddParameter("functionParameterName", "Parameter name");
@@ -90,10 +90,34 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .AddStrExpression(
           "GetArgumentAsString",
           _("Get function parameter text"),
-          _("Get function parameter (also called \"argument\") text "),
+          _("Get function parameter (also called \"argument\") text."),
           "",
           "res/function16.png")
       .AddParameter("functionParameterName", "Parameter name");
+
+  extension
+      .AddCondition(
+          "CompareArgumentAsNumber",
+          _("Compare function parameter value"),
+          _("Compare function parameter (also called \"argument\") value."),
+          _("Parameter _PARAM0_"),
+          "",
+          "res/function32.png",
+          "res/function16.png")
+      .AddParameter("functionParameterName", "Parameter name")
+      .UseStandardRelationalOperatorParameters("number");
+
+  extension
+      .AddCondition(
+          "CompareArgumentAsString",
+          _("Compare function parameter text"),
+          _("Compare function parameter (also called \"argument\") text."),
+          _("Parameter _PARAM0_"),
+          "",
+          "res/function32.png",
+          "res/function16.png")
+      .AddParameter("functionParameterName", "Parameter name")
+      .UseStandardRelationalOperatorParameters("string");
 }
 
 }  // namespace gd

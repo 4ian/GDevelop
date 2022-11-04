@@ -670,6 +670,18 @@ gd::String EventsCodeGenerator::GenerateActionsListCode(
   return outputCode;
 }
 
+const gd::String EventsCodeGenerator::GenerateRelationalOperatorCodes(const gd::String &operatorString) {
+    if (operatorString == "=") {
+        return "==";
+    }
+    if (operatorString != "<" && operatorString != ">" &&
+        operatorString != "<=" && operatorString != ">=" && operatorString != "!=") {
+      cout << "Warning: Bad relational operator: Set to == by default." << endl;
+      return "==";
+    }
+    return operatorString;
+}
+
 gd::String EventsCodeGenerator::GenerateParameterCodes(
     const gd::Expression& parameter,
     const gd::ParameterMetadata& metadata,
@@ -694,14 +706,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     argOutput =
         GenerateObject(parameter.GetPlainString(), metadata.GetType(), context);
   } else if (metadata.GetType() == "relationalOperator") {
-    auto parameterString = parameter.GetPlainString();
-    argOutput += parameterString == "=" ? "==" : parameterString;
-    if (argOutput != "==" && argOutput != "<" && argOutput != ">" &&
-        argOutput != "<=" && argOutput != ">=" && argOutput != "!=") {
-      cout << "Warning: Bad relational operator: Set to == by default." << endl;
-      argOutput = "==";
-    }
-
+    argOutput += GenerateRelationalOperatorCodes(parameter.GetPlainString());
     argOutput = "\"" + argOutput + "\"";
   } else if (metadata.GetType() == "operator") {
     argOutput += parameter.GetPlainString();

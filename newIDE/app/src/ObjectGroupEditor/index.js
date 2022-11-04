@@ -50,12 +50,6 @@ const ObjectGroupEditor = ({
     if (onObjectGroupUpdated) onObjectGroupUpdated();
   };
 
-  const editObject = (newObjectName: string) => {
-    if (newObjectName === objectName) return;
-    setObjectName(objectName);
-    if (onObjectGroupUpdated) onObjectGroupUpdated();
-  };
-
   const renderExplanation = () => {
     let type = undefined;
     objectsInGroup.forEach(objectName => {
@@ -126,7 +120,7 @@ const ObjectGroupEditor = ({
             objectsContainer={objectsContainer}
             value={objectName}
             excludedObjectOrGroupNames={objectsInGroup}
-            onChange={editObject}
+            onChange={setObjectName}
             onChoose={addObject}
             openOnFocus
             noGroups

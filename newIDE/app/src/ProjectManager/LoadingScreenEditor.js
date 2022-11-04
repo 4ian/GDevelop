@@ -133,8 +133,7 @@ export const LoadingScreenEditor = ({
                   return;
               }
               loadingScreen.showGDevelopSplash(checked);
-              forceUpdate();
-              onLoadingScreenUpdated();
+              onUpdate();
             }}
           />
           <SelectField
@@ -145,8 +144,7 @@ export const LoadingScreenEditor = ({
               const currentGDevelopLogoStyle = loadingScreen.getGDevelopLogoStyle();
               if (currentGDevelopLogoStyle === newGdevelopLogoStyle) return;
               loadingScreen.setGDevelopLogoStyle(newGdevelopLogoStyle);
-              forceUpdate();
-              onLoadingScreenUpdated();
+              onUpdate();
             }}
           >
             <SelectOption value="light" primaryText={t`Light (plain)`} />
@@ -220,8 +218,7 @@ export const LoadingScreenEditor = ({
             checked={loadingScreen.getShowProgressBar()}
             onCheck={(e, checked) => {
               loadingScreen.setShowProgressBar(checked);
-              forceUpdate();
-              onLoadingScreenUpdated();
+              onUpdate();
             }}
           />
           <ResponsiveLineStackLayout noMargin>
@@ -300,8 +297,7 @@ export const LoadingScreenEditor = ({
                 return;
               }
               loadingScreen.setProgressBarHeight(newProgressBarHeight);
-              forceUpdate();
-              onLoadingScreenUpdated();
+              onUpdate();
             }}
           />
           <ColorField
@@ -316,8 +312,7 @@ export const LoadingScreenEditor = ({
                 return;
               }
               loadingScreen.setProgressBarColor(newProgressBarColor);
-              forceUpdate();
-              onLoadingScreenUpdated();
+              onUpdate();
             }}
           />
           <Text size="block-title">
@@ -338,8 +333,7 @@ export const LoadingScreenEditor = ({
                 return;
               }
               loadingScreen.setMinDuration(newMinDuration);
-              forceUpdate();
-              onLoadingScreenUpdated();
+              onUpdate();
             }}
             helperMarkdownText={i18n._(
               t`When previewing the game in the editor, this duration is ignored (the game preview starts as soon as possible).`

@@ -400,6 +400,7 @@ export default function NewInstructionEditorDialog({
       {newBehaviorDialogOpen && chosenObject && (
         <NewBehaviorDialog
           project={project}
+          eventsFunctionsExtension={scope.eventsFunctionsExtension}
           open={newBehaviorDialogOpen}
           objectType={chosenObject.getType()}
           objectBehaviorsTypes={listObjectBehaviorsTypes(chosenObject)}

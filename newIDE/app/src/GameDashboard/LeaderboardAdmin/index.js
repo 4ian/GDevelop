@@ -849,7 +849,7 @@ export const LeaderboardAdmin = ({
                 }}
               >
                 <Column>
-                  <Line>
+                  <Line noMargin>
                     {currentLeaderboard && leaderboards ? (
                       <SelectField
                         fullWidth

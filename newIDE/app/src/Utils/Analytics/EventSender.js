@@ -90,23 +90,33 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
       ...(isElectronApp ? { usedDesktopApp: true } : { usedWebApp: true }),
     };
 
+    // If the user is logged in, alias the user with its firebase id.
     if (firebaseUser) {
       const aliasKey = firebaseUser.uid + '#' + getUserUUID();
       if (!posthogAliasMade.includes(aliasKey)) {
-        // Alias the random UUID to the signed in user id
-        // so we avoid to consider this as a different user in stats.
-        posthog.alias(firebaseUser.uid, getUserUUID());
+        // Try to Alias the random UUID to the Firebase ID.
+        // 2 cases:
+        // - Either it's the first time the user logs in and posthog does not know
+        //   about the Firebase ID, in which case we specify the firebaseId as 2nd parameter
+        //   of the alias method.
+        // - Or the user has already logged in and posthog knows about the Firebase ID,
+        //   in which case PostHog will reject the merging of the 2 users.
+        //   We then need to ensure we identify the user by its Firebase ID.
+        posthog.alias(getUserUUID(), firebaseUser.uid);
         posthogAliasMade.push(aliasKey);
       }
     }
 
-    // Send user information, after de-duplicating the call to avoid useless
-    // calls.
+    // Identify which user is using the app, after de-duplicating the call to
+    // avoid useless calls.
     // This is so we can build stats on the used version, languages and usage
     // of GDevelop features.
     const stringifiedUserProperties = JSON.stringify(userProperties);
     if (stringifiedUserProperties !== posthogLastPropertiesSent) {
-      posthog.identify(getUserUUID(), userProperties);
+      // If the user is not logged in, identify the user by its random UUID.
+      // If the user is logged in, identify the user by its Firebase ID.
+      const userId = firebaseUser ? firebaseUser.uid : getUserUUID();
+      posthog.identify(userId, userProperties);
       posthogLastPropertiesSent = stringifiedUserProperties;
     }
   };

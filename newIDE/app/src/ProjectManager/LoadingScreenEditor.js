@@ -23,8 +23,9 @@ import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import Text from '../UI/Text';
 
-type Props = {
+type Props = {|
   loadingScreen: gdLoadingScreen,
+  onLoadingScreenUpdated: () => void,
   onChangeSubscription: () => void,
 
   // For resources:
@@ -32,10 +33,11 @@ type Props = {
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
-};
+|};
 
 export const LoadingScreenEditor = ({
   loadingScreen,
+  onLoadingScreenUpdated,
   onChangeSubscription,
   project,
   resourceSources,
@@ -44,6 +46,11 @@ export const LoadingScreenEditor = ({
 }: Props) => {
   const subscriptionChecker = React.useRef<?SubscriptionChecker>(null);
   const forceUpdate = useForceUpdate();
+
+  const onUpdate = () => {
+    forceUpdate();
+    onLoadingScreenUpdated();
+  };
 
   return (
     <I18n>
@@ -61,9 +68,11 @@ export const LoadingScreenEditor = ({
               resourceExternalEditors={resourceExternalEditors}
               resourceKind="image"
               resourceName={loadingScreen.getBackgroundImageResourceName()}
-              onChange={resourceName => {
-                loadingScreen.setBackgroundImageResourceName(resourceName);
-                forceUpdate();
+              onChange={newResourceName => {
+                const currentResourceName = loadingScreen.getBackgroundImageResourceName();
+                if (currentResourceName === newResourceName) return;
+                loadingScreen.setBackgroundImageResourceName(newResourceName);
+                onUpdate();
               }}
             />
           </Line>
@@ -73,9 +82,12 @@ export const LoadingScreenEditor = ({
               floatingLabelText={<Trans>Background color</Trans>}
               disableAlpha
               color={hexNumberToRGBString(loadingScreen.getBackgroundColor())}
-              onChange={color => {
-                loadingScreen.setBackgroundColor(rgbStringToHexNumber(color));
-                forceUpdate();
+              onChange={newColor => {
+                const currentBackgroundColor = loadingScreen.getBackgroundColor();
+                const newBackgroundColor = rgbStringToHexNumber(newColor);
+                if (currentBackgroundColor === newBackgroundColor) return;
+                loadingScreen.setBackgroundColor(newBackgroundColor);
+                onUpdate();
               }}
             />
             <SemiControlledTextField
@@ -86,11 +98,21 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getBackgroundFadeInDuration()}
-              onChange={value => {
-                loadingScreen.setBackgroundFadeInDuration(
-                  Math.max(0, parseFloat(value))
+              onChange={newValue => {
+                const currentBackgroundFadeInDuration = loadingScreen.getBackgroundFadeInDuration();
+                const newBackgroundFadeInDuration = Math.max(
+                  0,
+                  parseFloat(newValue)
                 );
-                forceUpdate();
+                if (
+                  currentBackgroundFadeInDuration ===
+                  newBackgroundFadeInDuration
+                )
+                  return;
+                loadingScreen.setBackgroundFadeInDuration(
+                  newBackgroundFadeInDuration
+                );
+                onUpdate();
               }}
             />
           </ResponsiveLineStackLayout>
@@ -112,15 +134,19 @@ export const LoadingScreenEditor = ({
               }
               loadingScreen.showGDevelopSplash(checked);
               forceUpdate();
+              onLoadingScreenUpdated();
             }}
           />
           <SelectField
             fullWidth
             floatingLabelText={<Trans>GDevelop logo style</Trans>}
             value={loadingScreen.getGDevelopLogoStyle()}
-            onChange={(e, i, value: string) => {
-              loadingScreen.setGDevelopLogoStyle(value);
+            onChange={(e, i, newGdevelopLogoStyle: string) => {
+              const currentGDevelopLogoStyle = loadingScreen.getGDevelopLogoStyle();
+              if (currentGDevelopLogoStyle === newGdevelopLogoStyle) return;
+              loadingScreen.setGDevelopLogoStyle(newGdevelopLogoStyle);
               forceUpdate();
+              onLoadingScreenUpdated();
             }}
           >
             <SelectOption value="light" primaryText={t`Light (plain)`} />
@@ -143,11 +169,21 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getLogoAndProgressLogoFadeInDelay()}
-              onChange={value => {
-                loadingScreen.setLogoAndProgressLogoFadeInDelay(
-                  Math.max(0, parseFloat(value))
+              onChange={newValue => {
+                const currentLogoAndProgressLogoFadeInDelay = loadingScreen.getLogoAndProgressLogoFadeInDelay();
+                const newLogoAndProgressLogoFadeInDelay = Math.max(
+                  0,
+                  parseFloat(newValue)
                 );
-                forceUpdate();
+                if (
+                  currentLogoAndProgressLogoFadeInDelay ===
+                  newLogoAndProgressLogoFadeInDelay
+                )
+                  return;
+                loadingScreen.setLogoAndProgressLogoFadeInDelay(
+                  newLogoAndProgressLogoFadeInDelay
+                );
+                onUpdate();
               }}
             />
             <SemiControlledTextField
@@ -158,11 +194,21 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getLogoAndProgressFadeInDuration()}
-              onChange={value => {
-                loadingScreen.setLogoAndProgressFadeInDuration(
-                  Math.max(0, parseFloat(value))
+              onChange={newValue => {
+                const currentLogoAndProgressFadeInDuration = loadingScreen.getLogoAndProgressFadeInDuration();
+                const newLogoAndProgressFadeInDuration = Math.max(
+                  0,
+                  parseFloat(newValue)
                 );
-                forceUpdate();
+                if (
+                  currentLogoAndProgressFadeInDuration ===
+                  newLogoAndProgressFadeInDuration
+                )
+                  return;
+                loadingScreen.setLogoAndProgressFadeInDuration(
+                  newLogoAndProgressFadeInDuration
+                );
+                onUpdate();
               }}
             />
           </ResponsiveLineStackLayout>
@@ -175,6 +221,7 @@ export const LoadingScreenEditor = ({
             onCheck={(e, checked) => {
               loadingScreen.setShowProgressBar(checked);
               forceUpdate();
+              onLoadingScreenUpdated();
             }}
           />
           <ResponsiveLineStackLayout noMargin>
@@ -183,11 +230,17 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getProgressBarMinWidth()}
-              onChange={value => {
-                loadingScreen.setProgressBarMinWidth(
-                  Math.max(0, parseFloat(value))
+              onChange={newValue => {
+                const currentProgressBarMinWidth = loadingScreen.getProgressBarMinWidth();
+                const newProgressBarMinWidth = Math.max(
+                  0,
+                  parseFloat(newValue)
                 );
-                forceUpdate();
+                if (currentProgressBarMinWidth === newProgressBarMinWidth) {
+                  return;
+                }
+                loadingScreen.setProgressBarMinWidth(newProgressBarMinWidth);
+                onUpdate();
               }}
               helperMarkdownText={i18n._(t`In pixels. 0 to ignore.`)}
             />
@@ -196,11 +249,22 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getProgressBarWidthPercent()}
-              onChange={value => {
-                loadingScreen.setProgressBarWidthPercent(
-                  Math.min(100, Math.max(1, parseFloat(value)))
+              onChange={newValue => {
+                const currentProgressBarWidthPercent = loadingScreen.getProgressBarWidthPercent();
+                const newProgressBarWidthPercent = Math.min(
+                  100,
+                  Math.max(1, parseFloat(newValue))
                 );
-                forceUpdate();
+                if (
+                  currentProgressBarWidthPercent === newProgressBarWidthPercent
+                ) {
+                  return;
+                }
+
+                loadingScreen.setProgressBarWidthPercent(
+                  newProgressBarWidthPercent
+                );
+                onUpdate();
               }}
               helperMarkdownText={i18n._(t`As a percent of the game width.`)}
             />
@@ -209,11 +273,17 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getProgressBarMaxWidth()}
-              onChange={value => {
-                loadingScreen.setProgressBarMaxWidth(
-                  Math.max(0, parseFloat(value))
+              onChange={newValue => {
+                const currentProgressBarMaxWidth = loadingScreen.getProgressBarMaxWidth();
+                const newProgressBarMaxWidth = Math.max(
+                  0,
+                  parseFloat(newValue)
                 );
-                forceUpdate();
+                if (currentProgressBarMaxWidth === newProgressBarMaxWidth) {
+                  return;
+                }
+                loadingScreen.setProgressBarMaxWidth(newProgressBarMaxWidth);
+                onUpdate();
               }}
               helperMarkdownText={i18n._(t`In pixels. 0 to ignore.`)}
             />
@@ -223,11 +293,15 @@ export const LoadingScreenEditor = ({
             fullWidth
             type="number"
             value={'' + loadingScreen.getProgressBarHeight()}
-            onChange={value => {
-              loadingScreen.setProgressBarHeight(
-                Math.max(1, parseFloat(value))
-              );
+            onChange={newValue => {
+              const currentProgressBarHeight = loadingScreen.getProgressBarHeight();
+              const newProgressBarHeight = Math.max(1, parseFloat(newValue));
+              if (currentProgressBarHeight === newProgressBarHeight) {
+                return;
+              }
+              loadingScreen.setProgressBarHeight(newProgressBarHeight);
               forceUpdate();
+              onLoadingScreenUpdated();
             }}
           />
           <ColorField
@@ -235,9 +309,15 @@ export const LoadingScreenEditor = ({
             floatingLabelText={<Trans>Progress bar color</Trans>}
             disableAlpha
             color={hexNumberToRGBString(loadingScreen.getProgressBarColor())}
-            onChange={color => {
-              loadingScreen.setProgressBarColor(rgbStringToHexNumber(color));
+            onChange={newColor => {
+              const currentProgressBarColor = loadingScreen.getProgressBarColor();
+              const newProgressBarColor = rgbStringToHexNumber(newColor);
+              if (currentProgressBarColor === newProgressBarColor) {
+                return;
+              }
+              loadingScreen.setProgressBarColor(newProgressBarColor);
               forceUpdate();
+              onLoadingScreenUpdated();
             }}
           />
           <Text size="block-title">
@@ -251,9 +331,15 @@ export const LoadingScreenEditor = ({
             fullWidth
             type="number"
             value={'' + loadingScreen.getMinDuration()}
-            onChange={value => {
-              loadingScreen.setMinDuration(Math.max(0, parseFloat(value)));
+            onChange={newValue => {
+              const currentMinDuration = loadingScreen.getMinDuration();
+              const newMinDuration = Math.max(0, parseFloat(newValue));
+              if (currentMinDuration === newMinDuration) {
+                return;
+              }
+              loadingScreen.setMinDuration(newMinDuration);
               forceUpdate();
+              onLoadingScreenUpdated();
             }}
             helperMarkdownText={i18n._(
               t`When previewing the game in the editor, this duration is ignored (the game preview starts as soon as possible).`

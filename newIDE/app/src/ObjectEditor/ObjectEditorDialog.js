@@ -74,7 +74,10 @@ const InnerDialog = (props: InnerDialogProps) => {
   );
   const [newObjectName, setNewObjectName] = React.useState(props.objectName);
   const forceUpdate = useForceUpdate();
-  const onCancelChanges = useSerializableObjectCancelableEditor({
+  const {
+    onCancelChanges,
+    notifyOfChange,
+  } = useSerializableObjectCancelableEditor({
     serializableObject: props.object,
     useProjectToUnserialize: props.project,
     onCancel: props.onCancel,
@@ -202,6 +205,7 @@ const InnerDialog = (props: InnerDialogProps) => {
 
                   if (props.canRenameObject(text)) {
                     setNewObjectName(text);
+                    notifyOfChange();
                   }
                 }}
               />
@@ -217,6 +221,7 @@ const InnerDialog = (props: InnerDialogProps) => {
               forceUpdate /*Force update to ensure dialog is properly positionned*/
             }
             objectName={props.objectName}
+            onObjectUpdated={notifyOfChange}
           />
         </Column>
       )}
@@ -231,6 +236,7 @@ const InnerDialog = (props: InnerDialogProps) => {
             forceUpdate /*Force update to ensure dialog is properly positionned*/
           }
           onUpdateBehaviorsSharedData={props.onUpdateBehaviorsSharedData}
+          onBehaviorsUpdated={notifyOfChange}
         />
       )}
       {currentTab === 'variables' && (
@@ -254,6 +260,7 @@ const InnerDialog = (props: InnerDialogProps) => {
             }
             helpPagePath={'/all-features/variables/object-variables'}
             onComputeAllVariableNames={props.onComputeAllVariableNames}
+            onVariablesUpdated={notifyOfChange}
           />
         </Column>
       )}
@@ -265,9 +272,10 @@ const InnerDialog = (props: InnerDialogProps) => {
           onChooseResource={props.onChooseResource}
           resourceExternalEditors={props.resourceExternalEditors}
           effectsContainer={props.object.getEffects()}
-          onEffectsUpdated={
-            forceUpdate /*Force update to ensure dialog is properly positionned*/
-          }
+          onEffectsUpdated={() => {
+            forceUpdate(); /*Force update to ensure dialog is properly positionned*/
+            notifyOfChange();
+          }}
         />
       )}
     </Dialog>

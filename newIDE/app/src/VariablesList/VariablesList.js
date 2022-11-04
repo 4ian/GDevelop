@@ -107,6 +107,7 @@ type Props = {|
   commitChangesOnBlur: boolean,
   /** If set to small, will collapse variable row by default. */
   size?: 'small',
+  onVariablesUpdated?: () => void,
 |};
 
 const StyledTreeItem = withStyles(theme => ({
@@ -291,6 +292,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     props.historyHandler
       ? props.historyHandler.saveToHistory()
       : setHistory(saveToHistory(history, props.variablesContainer));
+    if (props.onVariablesUpdated) props.onVariablesUpdated();
   };
 
   const _undo = () => {

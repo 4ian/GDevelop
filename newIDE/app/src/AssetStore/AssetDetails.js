@@ -35,6 +35,7 @@ import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import Link from '../UI/Link';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import AuthorizedAssetImage from './PrivateAssets/AuthorizedAssetImage';
+import { MarkdownText } from '../UI/MarkdownText';
 
 const FIXED_HEIGHT = 250;
 const FIXED_WIDTH = 300;
@@ -410,7 +411,9 @@ export const AssetDetails = ({
                     </Trans>
                   )}
                 </Text>
-                <Text size="body">{asset.description}</Text>
+                <Text size="body" displayInlineAsSpan>
+                  <MarkdownText source={asset.description} />
+                </Text>
               </React.Fragment>
             ) : error ? (
               <PlaceholderError onRetry={loadAsset}>

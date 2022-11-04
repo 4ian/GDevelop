@@ -159,8 +159,6 @@ const BehaviorsEditor = (props: Props) => {
                           onClick={ev => {
                             ev.stopPropagation();
                             onRemoveBehavior(behaviorName);
-                            if (props.onBehaviorsUpdated)
-                              props.onBehaviorsUpdated();
                           }}
                         >
                           <Delete />
@@ -219,8 +217,6 @@ const BehaviorsEditor = (props: Props) => {
                         onClick={ev => {
                           ev.stopPropagation();
                           onRemoveBehavior(behaviorName);
-                          if (props.onBehaviorsUpdated)
-                            props.onBehaviorsUpdated();
                         }}
                       >
                         <Delete />

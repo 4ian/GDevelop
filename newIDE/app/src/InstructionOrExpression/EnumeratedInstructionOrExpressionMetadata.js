@@ -70,10 +70,6 @@ export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
       // we now compare its scope (where it was declared) and the current scope
       // (where we are) to see if we should filter it or not.
 
-      // Show public functions of a private behavior when editing the extension.
-      (!enumeratedInstructionOrExpressionMetadata.isPrivate &&
-        eventsFunctionsExtension &&
-        eventsFunctionsExtension.getName() === extension.getName()) ||
       // Show private behavior functions when editing the behavior
       (behaviorMetadata &&
         eventsBasedBehavior &&
@@ -82,10 +78,13 @@ export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
           eventsFunctionsExtension.getName(),
           eventsBasedBehavior.getName()
         ) === behaviorMetadata.getName()) ||
-      // Show private non-behavior functions when editing the extension
-      (!behaviorMetadata &&
-        eventsFunctionsExtension &&
-        eventsFunctionsExtension.getName() === extension.getName())
+      // When editing the extension...
+      (eventsFunctionsExtension &&
+        eventsFunctionsExtension.getName() === extension.getName() &&
+        // ...show public functions of a private behavior
+        (!enumeratedInstructionOrExpressionMetadata.isPrivate ||
+          // ...show private non-behavior functions
+          !behaviorMetadata))
     );
   });
 };

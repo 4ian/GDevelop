@@ -49,11 +49,11 @@ import {
   type Leaderboard,
   type LeaderboardCustomizationSettings,
   type LeaderboardUpdatePayload,
+  type LeaderboardDisplayData,
   shortenUuidForDisplay,
 } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardProvider from '../../Leaderboard/LeaderboardProvider';
-import Window from '../../Utils/Window';
 import LeaderboardEntriesTable from './LeaderboardEntriesTable';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
@@ -71,6 +71,7 @@ import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import SubscriptionDialog from '../../Profile/SubscriptionDialog';
 import MaxLeaderboardCountAlertMessage from './MaxLeaderboardCountAlertMessage';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
 
 type Props = {|
   onLoading: boolean => void,
@@ -192,6 +193,7 @@ export const LeaderboardAdmin = ({
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
     false
   );
+  const { showConfirmation } = useAlertDialog();
   const [
     displayMaxLeaderboardCountReachedWarning,
     setDisplayMaxLeaderboardCountReachedWarning,
@@ -359,11 +361,11 @@ export const LeaderboardAdmin = ({
   };
 
   const onResetLeaderboard = async (i18n: I18nType) => {
-    const answer = Window.showConfirmDialog(
-      i18n._(
-        t`All current entries will be deleted, are you sure you want to reset this leaderboard? This can't be undone.`
-      )
-    );
+    if (!currentLeaderboard) return;
+    const answer = showConfirmation({
+      title: t`Reset leaderboard ${currentLeaderboard.name}`,
+      message: t`All current entries will be deleted, are you sure you want to reset this leaderboard? This can't be undone.`,
+    });
     if (!answer) return;
 
     setIsLoading(true);
@@ -393,11 +395,11 @@ export const LeaderboardAdmin = ({
   };
 
   const onDeleteLeaderboard = async (i18n: I18nType) => {
-    const answer = Window.showConfirmDialog(
-      i18n._(
-        t`Are you sure you want to delete this leaderboard and all of its entries? This can't be undone.`
-      )
-    );
+    if (!currentLeaderboard) return;
+    const answer = showConfirmation({
+      title: t`Delete leaderboard ${currentLeaderboard.name}`,
+      message: t`Are you sure you want to delete this leaderboard and all of its entries? This can't be undone.`,
+    });
     if (!answer) return;
 
     setIsLoading(true);
@@ -420,18 +422,21 @@ export const LeaderboardAdmin = ({
     }
   };
 
-  const onDeleteEntry = async (i18n: I18nType, entryId: string) => {
-    const answer = Window.showConfirmDialog(
-      i18n._(
-        t`Are you sure you want to delete this entry? This can't be undone.`
-      )
-    );
+  const onDeleteEntry = async (
+    i18n: I18nType,
+    entry: LeaderboardDisplayData
+  ) => {
+    if (!currentLeaderboard) return;
+    const answer = showConfirmation({
+      title: t`Delete score ${entry.score} from ${entry.playerName}`,
+      message: t`Are you sure you want to delete this entry? This can't be undone.`,
+    });
     if (!answer) return;
 
     setIsLoading(true);
     setApiError(null);
     try {
-      await deleteLeaderboardEntry(entryId);
+      await deleteLeaderboardEntry(entry.id);
     } catch (err) {
       console.error('An error occurred when deleting entry', err);
       setApiError({
@@ -441,7 +446,7 @@ export const LeaderboardAdmin = ({
             An error occurred when deleting the entry, please try again.
           </Trans>
         ),
-        itemId: entryId,
+        itemId: entry.id,
       });
     } finally {
       setIsLoading(false);
@@ -1038,7 +1043,7 @@ export const LeaderboardAdmin = ({
                         ? currentLeaderboard.customizationSettings
                         : null
                     }
-                    onDeleteEntry={entryId => onDeleteEntry(i18n, entryId)}
+                    onDeleteEntry={entry => onDeleteEntry(i18n, entry)}
                     isLoading={isRequestPending || isEditingName}
                     navigation={{
                       goToNextPage,

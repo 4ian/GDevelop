@@ -216,7 +216,10 @@ const PrivateAssetPackDialog = ({
                           {getBuyButton(i18n)}
                         </Line>
                         <Text size="body2" displayInlineAsSpan>
-                          <MarkdownText source={assetPack.longDescription} />
+                          <MarkdownText
+                            source={assetPack.longDescription}
+                            allowParagraphs
+                          />
                         </Text>
                         <ResponsiveLineStackLayout noMargin noColumnMargin>
                           <Column noMargin expand>

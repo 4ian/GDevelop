@@ -412,7 +412,7 @@ export const AssetDetails = ({
                   )}
                 </Text>
                 <Text size="body" displayInlineAsSpan>
-                  <MarkdownText source={asset.description} />
+                  <MarkdownText source={asset.description} allowParagraphs />
                 </Text>
               </React.Fragment>
             ) : error ? (

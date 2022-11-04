@@ -46,11 +46,8 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { ParametersIndexOffsets } from '../EventsFunctionsExtensionsLoader';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
-import Window from '../Utils/Window';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 const gd: libGDevelop = global.gd;
-
-const isDev = Window.isDev();
 
 type Props = {|
   project: gdProject,
@@ -96,9 +93,9 @@ type State = {|
 
 // The event based object editor is hidden in releases
 // because it's not handled by GDJS.
-const initialMosaicEditorNodes = {
+const getInitialMosaicEditorNodes = (showEventBasedObjectsEditor: boolean) => ({
   direction: 'row',
-  first: isDev
+  first: showEventBasedObjectsEditor
     ? {
         direction: 'column',
         first: 'free-functions-list',
@@ -123,7 +120,7 @@ const initialMosaicEditorNodes = {
     splitPercentage: 25,
   },
   splitPercentage: 25,
-};
+});
 
 export default class EventsFunctionsExtensionEditor extends React.Component<
   Props,
@@ -1424,6 +1421,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 {({
                   getDefaultEditorMosaicNode,
                   setDefaultEditorMosaicNode,
+                  getShowEventBasedObjectsEditor,
                 }) => (
                   <EditorMosaic
                     ref={editorMosaic => (this._editorMosaic = editorMosaic)}
@@ -1435,21 +1433,28 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       )
                     }
                     initialNodes={
-                      // "objects-list" must only appear in dev mode.
-                      isDev ===
+                      // "objects-list" must only appear when the setting is enabled
+                      // and reciprocally.
+                      getShowEventBasedObjectsEditor() ===
                       mosaicContainsNode(
                         getDefaultEditorMosaicNode(
                           'events-functions-extension-editor'
-                        ) || initialMosaicEditorNodes,
+                        ) ||
+                          getInitialMosaicEditorNodes(
+                            getShowEventBasedObjectsEditor()
+                          ),
                         'objects-list'
                       )
                         ? getDefaultEditorMosaicNode(
                             'events-functions-extension-editor'
-                          ) || initialMosaicEditorNodes
+                          ) ||
+                          getInitialMosaicEditorNodes(
+                            getShowEventBasedObjectsEditor()
+                          )
                         : // Force the mosaic to reset to default.
-                          // It contains "objects-list" only
-                          // in dev mode.
-                          initialMosaicEditorNodes
+                          getInitialMosaicEditorNodes(
+                            getShowEventBasedObjectsEditor()
+                          )
                     }
                   />
                 )}

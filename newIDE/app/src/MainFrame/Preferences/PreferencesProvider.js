@@ -145,6 +145,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ),
     setShowCommunityExtensions: this._setShowCommunityExtensions.bind(this),
     setShowGetStartedSection: this._setShowGetStartedSection.bind(this),
+    setShowEventBasedObjectsEditor: this._setShowEventBasedObjectsEditor.bind(
+      this
+    ),
+    getShowEventBasedObjectsEditor: this._getShowEventBasedObjectsEditor.bind(
+      this
+    ),
   };
 
   componentDidMount() {
@@ -350,6 +356,22 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );
+  }
+
+  _setShowEventBasedObjectsEditor(showEventBasedObjectsEditor: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showEventBasedObjectsEditor,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getShowEventBasedObjectsEditor() {
+    return this.state.values.showEventBasedObjectsEditor;
   }
 
   _checkUpdates(forceDownload?: boolean) {

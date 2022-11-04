@@ -41,7 +41,10 @@ const VariablesEditorDialog = ({
   onComputeAllVariableNames,
   helpPagePath,
 }: Props) => {
-  const onCancelChanges = useSerializableObjectCancelableEditor({
+  const {
+    onCancelChanges,
+    notifyOfChange,
+  } = useSerializableObjectCancelableEditor({
     serializableObject: variablesContainer,
     onCancel,
   });
@@ -105,6 +108,7 @@ const VariablesEditorDialog = ({
           emptyPlaceholderDescription={emptyPlaceholderDescription}
           onComputeAllVariableNames={onComputeAllVariableNames}
           helpPagePath={helpPagePath}
+          onVariablesUpdated={notifyOfChange}
         />
       </Column>
     </Dialog>

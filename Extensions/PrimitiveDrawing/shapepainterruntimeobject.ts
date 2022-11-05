@@ -63,14 +63,14 @@ namespace gdjs {
     private static readonly _pointForTransformation: FloatPoint = [0, 0];
 
     /**
-     * @param instanceContainer The container the object belongs to.
+     * @param runtimeScene The scene the object belongs to.
      * @param shapePainterObjectData The initial properties of the object
      */
     constructor(
-      instanceContainer: gdjs.RuntimeInstanceContainer,
+      runtimeScene: gdjs.RuntimeScene,
       shapePainterObjectData: ShapePainterObjectData
     ) {
-      super(instanceContainer, shapePainterObjectData);
+      super(runtimeScene, shapePainterObjectData);
       this._fillColor = parseInt(
         gdjs.rgbToHex(
           shapePainterObjectData.fillColor.r,
@@ -96,7 +96,7 @@ namespace gdjs {
       this._antialiasingQuality = shapePainterObjectData.antialiasingQuality;
       this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(
         this,
-        instanceContainer
+        runtimeScene
       );
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -166,12 +166,12 @@ namespace gdjs {
       return true;
     }
 
-    stepBehaviorsPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+    stepBehaviorsPreEvents(runtimeScene: gdjs.RuntimeScene) {
       //We redefine stepBehaviorsPreEvents just to clear the graphics before running events.
       if (this._clearBetweenFrames) {
         this.clear();
       }
-      super.stepBehaviorsPreEvents(instanceContainer);
+      super.stepBehaviorsPreEvents(runtimeScene);
     }
 
     /**
@@ -497,7 +497,7 @@ namespace gdjs {
       }
       super.setAngle(angle);
       this._renderer.updateAngle();
-      this.invalidateHitboxes();
+      this.hitBoxesDirty = true;
     }
 
     /**
@@ -613,7 +613,7 @@ namespace gdjs {
       }
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this._renderer.updateScaleX();
-      this.invalidateHitboxes();
+      this.hitBoxesDirty = true;
     }
 
     /**
@@ -630,7 +630,7 @@ namespace gdjs {
       }
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this._renderer.updateScaleY();
-      this.invalidateHitboxes();
+      this.hitBoxesDirty = true;
     }
 
     flipX(enable: boolean): void {
@@ -638,7 +638,7 @@ namespace gdjs {
         this._scaleX *= -1;
         this._flippedX = enable;
         this._renderer.updateScaleX();
-        this.invalidateHitboxes();
+        this.hitBoxesDirty = true;
       }
     }
 
@@ -647,7 +647,7 @@ namespace gdjs {
         this._scaleY *= -1;
         this._flippedY = enable;
         this._renderer.updateScaleY();
-        this.invalidateHitboxes();
+        this.hitBoxesDirty = true;
       }
     }
 
@@ -689,7 +689,7 @@ namespace gdjs {
     }
 
     invalidateBounds() {
-      this.invalidateHitboxes();
+      this.hitBoxesDirty = true;
     }
 
     getDrawableX(): float {
@@ -708,7 +708,7 @@ namespace gdjs {
       return this._renderer.getHeight();
     }
 
-    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    updatePreRender(runtimeScene: gdjs.RuntimeScene): void {
       this._renderer.updatePreRender();
     }
 
@@ -770,7 +770,7 @@ namespace gdjs {
       rectangle[3][0] = left;
       rectangle[3][1] = bottom;
 
-      this.invalidateHitboxes();
+      this.hitBoxesDirty = true;
     }
 
     updateHitBoxes(): void {

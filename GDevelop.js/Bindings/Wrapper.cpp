@@ -420,6 +420,7 @@ typedef std::vector<gd::ExpressionCompletionDescription>
 typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>
     MapExtensionProperties;
 typedef gd::Variable::Type Variable_Type;
+typedef gd::SerializerGroup SerializerGroup;
 typedef std::map<gd::String, gd::SerializerValue> MapStringSerializerValue;
 typedef std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement>>>
     VectorPairStringSharedPtrSerializerElement;

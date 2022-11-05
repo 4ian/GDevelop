@@ -236,6 +236,12 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllExpressionsForObject(
         "PrimitiveDrawing::Drawer")["ToSceneY"]
         .SetFunctionName("transformToSceneX");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::SetAntialiasing"]
+        .SetFunctionName("setAntialiasingOn");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::SetAntialiasingQuality"]
+        .SetFunctionName("getAntialiasingQuality");
 
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };

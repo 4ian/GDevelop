@@ -7,7 +7,9 @@
 #ifndef GDCORE_SERIALIZER_H
 #define GDCORE_SERIALIZER_H
 #include <string>
+
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Serialization/SerializerGroup.h"
 class TiXmlElement;
 
 namespace gd {
@@ -42,7 +44,9 @@ class GD_CORE_API Serializer {
   /**
    * \brief Serialize a gd::SerializerElement to a JSON string.
    */
-  static gd::String ToJSON(const SerializerElement& element);
+  static gd::String ToJSON(
+      const SerializerElement& element,
+      const SerializerGroup& group = SerializerGroup::defaultGroup);
 
   /**
    * \brief Construct a gd::SerializerElement from a JSON string.

@@ -29,6 +29,10 @@ namespace gdjs {
     absoluteCoordinates: boolean;
     /** Clear the previous render before the next draw? */
     clearBetweenFrames: boolean;
+    /** Is antialiasing enabled on the object? */
+    antialiasing: boolean;
+    /**Quality of the antialiasing filter */
+    antialiasingQuality: integer;
   };
 
   export type ShapePainterObjectData = ObjectData & ShapePainterObjectDataType;
@@ -52,6 +56,8 @@ namespace gdjs {
     _outlineSize: float;
     _useAbsoluteCoordinates: boolean;
     _clearBetweenFrames: boolean;
+    _antialiasing: boolean;
+    _antialiasingQuality: integer;
     _renderer: gdjs.ShapePainterRuntimeObjectRenderer;
 
     private static readonly _pointForTransformation: FloatPoint = [0, 0];
@@ -86,6 +92,8 @@ namespace gdjs {
       this._outlineSize = shapePainterObjectData.outlineSize;
       this._useAbsoluteCoordinates = shapePainterObjectData.absoluteCoordinates;
       this._clearBetweenFrames = shapePainterObjectData.clearBetweenFrames;
+      this._antialiasing = shapePainterObjectData.antialiasing;
+      this._antialiasingQuality = shapePainterObjectData.antialiasingQuality;
       this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(
         this,
         runtimeScene
@@ -336,6 +344,27 @@ namespace gdjs {
     isClearedBetweenFrames(): boolean {
       return this._clearBetweenFrames;
     }
+
+    setAntialiasingOn(value: boolean): void {
+      this._antialiasing = value;
+    }
+    
+    isAntialiasingOn(): boolean {
+      return this._antialiasing;
+    }
+
+    setAntialiasingQuality(value: integer): void {
+      if(value !== 2 && value !== 4 && value !== 8) {
+        //by default, assume we want the lowest quality to avoid crashing the game.
+        value = 2;
+      }
+      this._antialiasingQuality = value;
+    }
+
+    getAntialiasingQuality(): integer {
+      return this._antialiasingQuality;
+    }
+
 
     setCoordinatesRelative(value: boolean): void {
       this._useAbsoluteCoordinates = !value;

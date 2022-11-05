@@ -235,7 +235,9 @@ void EventsListSerialization::SerializeEventsTo(const EventsList& list,
 
     if (event.IsDisabled())
       eventElem.SetAttribute("disabled", event.IsDisabled());
-    if (event.IsFolded()) eventElem.SetAttribute("folded", event.IsFolded());
+    if (event.IsFolded())
+      eventElem.SetAttribute(
+          "folded", event.IsFolded(), gd::SerializerGroup::editorGroup);
     eventElem.AddChild("type").SetValue(event.GetType());
 
     event.SerializeTo(eventElem);

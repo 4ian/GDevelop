@@ -34,7 +34,7 @@ export function serializeToJSObject(
  */
 export function serializeToJSON(
   serializable: gdSerializable,
-  methodName: string = 'serializeTo'
+  methodName: string = 'serializeTo',
 ): string {
   const serializedElement = new gd.SerializerElement();
   serializable[methodName](serializedElement);

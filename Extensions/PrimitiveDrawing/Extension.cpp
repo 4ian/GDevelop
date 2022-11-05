@@ -775,6 +775,19 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/antialiasing .png")
         .AddParameter("object", _("Object"), "Drawer")
         .AddParameter("expression", _("Level of antialiasing. 2 (LOW), 4 (MEDIUM), or 8 (HIGH). Any other number will be assumed as 2."), "Number");
-
+  obj.AddScopedCondition("IsAntialiasingOn",
+  _("Is the antialiasing activated for the shape drawer"),
+  _("Checks if the antialiasing is activated for a shape drawer"),
+  _("Is the antialiasing on for _PARAM0_ ?"),
+  _("Setup"),
+  "res/actions/antialiasing24.png",
+  "res/actions/antialiasing.png")
+    .AddParameter("object", _("Object"), "Drawer"); 
+  obj.AddExpression("GetAntialiasingQualityLevel",
+  _("Current quality level of antialiasing on a shape drawer"),
+  _("Returns current antialiasing level of the shape drawer"),
+  _("Setup"),
+  "res/actions/antialiasing .png")
+    .AddParameter("object", _("Object"), "Drawer");
 #endif
 }

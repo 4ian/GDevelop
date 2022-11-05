@@ -74,7 +74,7 @@ void ShapePainterObjectBase::DoUnserializeFrom(
   element.HasChild("antialiasing")
   ? element.GetChild("antialiasing").GetValue().GetBool()
   : true;
-    antialiasingQuality = 
+  antialiasingQuality = 
   element.HasChild("antialiasingQuality")
   ? element.GetChild("antialiasingQuality").GetValue().GetInt()
   : 2;

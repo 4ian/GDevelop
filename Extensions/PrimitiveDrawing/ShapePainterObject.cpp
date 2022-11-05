@@ -31,7 +31,8 @@ ShapePainterObjectBase::ShapePainterObjectBase()
       outlineColorB(0),
       outlineOpacity(255),
       clearBetweenFrames(true),
-      absoluteCoordinates(false) {}
+      absoluteCoordinates(false),
+      antialiasing(true) {}
 
 ShapePainterObject::ShapePainterObject() {}
 
@@ -67,6 +68,15 @@ void ShapePainterObjectBase::DoUnserializeFrom(
       element.HasChild("clearBetweenFrames")
           ? element.GetChild("clearBetweenFrames").GetValue().GetBool()
           : true;
+
+  antialiasing = 
+  element.HasChild("antialiasing")
+  ? element.GetChild("antialiasing").GetValue().GetBool()
+  : true;
+    antialiasingQuality = 
+  element.HasChild("antialiasingQuality")
+  ? element.GetChild("antialiasingQuality").GetValue().GetInt()
+  : 2;
 }
 
 void ShapePainterObject::DoUnserializeFrom(
@@ -90,6 +100,8 @@ void ShapePainterObjectBase::DoSerializeTo(
       .SetAttribute("b", (int)outlineColorB);
   element.AddChild("absoluteCoordinates").SetValue(absoluteCoordinates);
   element.AddChild("clearBetweenFrames").SetValue(clearBetweenFrames);
+  element.AddChild("antialiasing").SetValue(antialiasing);
+  element.AddChild("antialiasingQuality").SetValue(antialiasingQuality);
 }
 
 void ShapePainterObject::DoSerializeTo(gd::SerializerElement& element) const {

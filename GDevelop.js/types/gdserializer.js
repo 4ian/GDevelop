@@ -3,7 +3,7 @@ declare class gdSerializer {
   static fromJSObject(object: Object): gdSerializerElement;
   static toJSObject(element: gdSerializerElement): any;
 
-  static toJSON(element: gdSerializerElement): string;
+  static toJSON(element: gdSerializerElement, group: SerializerGroup): string;
   static fromJSON(json: string): gdSerializerElement;
   delete(): void;
   ptr: number;

@@ -24,6 +24,7 @@ export const Default = () => (
     onPropertiesUpdated={action('properties updated')}
     onTabChanged={action('tab changed')}
     onRenameProperty={action('property rename')}
+    onRenameSharedProperty={action('shared property rename')}
   />
 );
 
@@ -35,5 +36,6 @@ export const WithoutFunction = () => (
     onPropertiesUpdated={action('properties updated')}
     onTabChanged={action('tab changed')}
     onRenameProperty={action('property rename')}
+    onRenameSharedProperty={action('shared property rename')}
   />
 );

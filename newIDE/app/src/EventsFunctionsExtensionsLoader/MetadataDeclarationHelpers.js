@@ -696,7 +696,30 @@ export const declareObjectInstructionOrExpressionMetadata = (
 
 type gdInstructionOrExpressionMetadata =
   | gdInstructionMetadata
-  | gdExpressionMetadata;
+  | gdExpressionMetadata
+  | gdMultipleInstructionMetadata;
+
+const convertPropertyTypeToValueType = (propertyType: string): string => {
+  switch (propertyType) {
+    case 'Number':
+      return 'number';
+    case 'Boolean':
+      return 'boolean';
+    case 'Color':
+      return 'color';
+    case 'Choice':
+      return 'stringWithSelector';
+    case 'String':
+    default:
+      return 'string';
+  }
+};
+
+const getStringifiedExtraInfo = (property: gdPropertyDescriptor) => {
+  return property.getType() === 'Choice'
+    ? JSON.stringify(property.getExtraInfo().toJSArray())
+    : '';
+};
 
 /**
  * Declare the instructions (actions/conditions) and expressions for the
@@ -913,6 +936,43 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
         .getCodeExtraInformation()
         .setFunctionName(getterName);
     }
+  });
+
+  mapVector(eventsBasedBehavior.getSharedPropertyDescriptors(), property => {
+    const propertyType = property.getType();
+    const propertyName = property.getName();
+    const propertyLabel = i18n._(
+      t`${property.getLabel() || propertyName} shared property`
+    );
+
+    addObjectAndBehaviorParameters(
+      behaviorMetadata.addExpressionAndConditionAndAction(
+        convertPropertyTypeToValueType(propertyType),
+        gd.EventsBasedBehavior.getSharedPropertyExpressionName(propertyName),
+        propertyLabel,
+        i18n._(t`the value of ${propertyLabel}`),
+        i18n._(t`the value of ${propertyLabel}`),
+        eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+        getExtensionIconUrl(extension)
+      )
+    )
+      .useStandardParameters(
+        convertPropertyTypeToValueType(propertyType),
+        getStringifiedExtraInfo(property)
+      )
+      .setFunctionName(
+        gd.BehaviorCodeGenerator.getBehaviorSharedPropertySetterName(
+          propertyName
+        )
+      )
+      .setGetter(
+        gd.BehaviorCodeGenerator.getBehaviorSharedPropertyGetterName(
+          propertyName
+        )
+      )
+      // All property actions/conditions/expressions are private, meaning
+      // they can only be used from the behavior events.
+      .setPrivate();
   });
 };
 

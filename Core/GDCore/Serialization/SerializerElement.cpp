@@ -13,6 +13,7 @@ SerializerElement::SerializerElement(const SerializerValue& value)
 
 SerializerElement::~SerializerElement() {}
 
+
 const SerializerValue& SerializerElement::GetValue() const {
   if (valueUndefined && attributes.find("value") != attributes.end())
     return attributes.find("value")->second;
@@ -21,42 +22,53 @@ const SerializerValue& SerializerElement::GetValue() const {
 }
 
 SerializerElement& SerializerElement::SetAttribute(const gd::String& name,
-                                                   bool value) {
+                                                   bool value,
+                                                   const gd::SerializerGroup& group) {
   RemoveChild(name);  // Ideally, only children would be used, but we still
                       // support code using attributes. Make sure that any
                       // existing child with this name is removed (otherwise it
                       // would erase the attribute at serialization).
   attributes[name].SetBool(value);
+    attributes[name].SetGroup(group);
+
   return *this;
 }
 
 SerializerElement& SerializerElement::SetAttribute(const gd::String& name,
-                                                   const gd::String& value) {
+                                                   const gd::String& value,
+                                                   const gd::SerializerGroup& group) {
   RemoveChild(name);  // Ideally, only children would be used, but we still
                       // support code using attributes. Make sure that any
                       // existing child with this name is removed (otherwise it
                       // would erase the attribute at serialization).
   attributes[name].SetString(value);
+  attributes[name].SetGroup(group);
   return *this;
 }
 
 SerializerElement& SerializerElement::SetAttribute(const gd::String& name,
-                                                   int value) {
+                                                   int value,
+                                                   const gd::SerializerGroup& group) {
   RemoveChild(name);  // Ideally, only children would be used, but we still
                       // support code using attributes. Make sure that any
                       // existing child with this name is removed (otherwise it
                       // would erase the attribute at serialization).
   attributes[name].SetInt(value);
+    attributes[name].SetGroup(group);
+
   return *this;
 }
 
 SerializerElement& SerializerElement::SetAttribute(const gd::String& name,
-                                                   double value) {
+                                                   double value,
+                                                   const gd::SerializerGroup& group) {
   RemoveChild(name);  // Ideally, only children would be used, but we still
                       // support code using attributes. Make sure that any
                       // existing child with this name is removed (otherwise it
                       // would erase the attribute at serialization).
   attributes[name].SetDouble(value);
+    attributes[name].SetGroup(group);
+
   return *this;
 }
 

@@ -12,6 +12,8 @@
 #include <vector>
 #include "GDCore/Serialization/SerializerValue.h"
 #include "GDCore/String.h"
+#include "GDCore/Serialization/SerializerGroup.h"
+
 
 namespace gd {
 
@@ -193,43 +195,48 @@ class GD_CORE_API SerializerElement {
    * \brief Set the boolean value of an attribute of the element
    * \param name The name of the attribute.
    * \param value The value of the attribute.
+   * \param group The group of the attribute.
    */
-  SerializerElement &SetAttribute(const gd::String &name, bool value);
+  SerializerElement &SetAttribute(const gd::String &name, bool value, const gd::SerializerGroup &group = gd::SerializerGroup::defaultGroup);
 
   /**
    * \brief Set the boolean value of an attribute of the element
    * \param name The name of the attribute.
    * \param value The value of the attribute.
+   * \param group The group of the attribute.
    */
-  SerializerElement &SetBoolAttribute(const gd::String &name, bool value) {
-    return SetAttribute(name, value);
+  SerializerElement &SetBoolAttribute(const gd::String &name, bool value, const gd::SerializerGroup &group = gd::SerializerGroup::defaultGroup) {
+    return SetAttribute(name, value, group);
   }
 
   /**
    * \brief Set the string value of an attribute of the element
    * \param name The name of the attribute.
    * \param value The value of the attribute.
+   * \param group The group of the attribute.
    */
   SerializerElement &SetAttribute(const gd::String &name,
-                                  const gd::String &value);
+                                  const gd::String &value, const gd::SerializerGroup &group = gd::SerializerGroup::defaultGroup);
 
   /**
    * \brief Set the string value of an attribute of the element
    * \param name The name of the attribute.
    * \param value The value of the attribute.
+   * \param group The group of the attribute.
    */
   SerializerElement &SetStringAttribute(const gd::String &name,
-                                        const gd::String &value) {
-    return SetAttribute(name, value);
+                                        const gd::String &value, const gd::SerializerGroup &group = gd::SerializerGroup::defaultGroup) {
+    return SetAttribute(name, value, group);
   }
 
   /**
    * \brief Set the string value of an attribute of the element
    * \param name The name of the attribute.
    * \param value The value of the attribute.
+   * \param group The group of the attribute.
    */
-  SerializerElement &SetAttribute(const gd::String &name, const char *value) {
-    if (value) SetAttribute(name, gd::String(value));
+  SerializerElement &SetAttribute(const gd::String &name, const char *value, const gd::SerializerGroup &group = gd::SerializerGroup::defaultGroup) {
+    if (value) SetAttribute(name, gd::String(value), group);
     return *this;
   };
 
@@ -237,32 +244,36 @@ class GD_CORE_API SerializerElement {
    * \brief Set the integer value of an attribute of the element
    * \param name The name of the attribute.
    * \param value The value of the attribute.
+   * \param group The group of the attribute.
    */
-  SerializerElement &SetAttribute(const gd::String &name, int value);
+  SerializerElement &SetAttribute(const gd::String &name, int value, const gd::SerializerGroup &group = gd::SerializerGroup::defaultGroup);
 
   /**
    * \brief Set the integer value of an attribute of the element
    * \param name The name of the attribute.
    * \param value The value of the attribute.
+   * \param group The group of the attribute.
    */
-  SerializerElement &SetIntAttribute(const gd::String &name, int value) {
-    return SetAttribute(name, value);
+  SerializerElement &SetIntAttribute(const gd::String &name, int value, const gd::SerializerGroup &group = gd::SerializerGroup::defaultGroup) {
+    return SetAttribute(name, value, group);
   }
 
   /**
    * \brief Set the double precision floating point number value of an attribute
    * of the element \param name The name of the attribute. \param value The
    * value of the attribute.
+   * \param group The group of the attribute.
    */
-  SerializerElement &SetAttribute(const gd::String &name, double value);
+  SerializerElement &SetAttribute(const gd::String &name, double value, const gd::SerializerGroup &group = gd::SerializerGroup::defaultGroup);
 
   /**
    * \brief Set the double precision floating point number value of an attribute
    * of the element \param name The name of the attribute. \param value The
    * value of the attribute.
+   * \param group The group of the attribute.
    */
-  SerializerElement &SetDoubleAttribute(const gd::String &name, double value) {
-    return SetAttribute(name, value);
+  SerializerElement &SetDoubleAttribute(const gd::String &name, double value, const gd::SerializerGroup &group = gd::SerializerGroup::defaultGroup) {
+    return SetAttribute(name, value, group);
   }
 
   /**
@@ -423,6 +434,8 @@ class GD_CORE_API SerializerElement {
    * \param name The name of the child to remove.
    */
   void RemoveChild(const gd::String &name);
+
+
 
   /**
    * \brief Return all the children of the element.

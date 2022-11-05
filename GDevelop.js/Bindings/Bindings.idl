@@ -208,6 +208,8 @@ enum Variable_Type {
     "Variable::Array"
 };
 
+
+
 interface Variable {
     void Variable();
 
@@ -268,6 +270,8 @@ interface VariablesContainer {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
+
+
 
 interface ObjectGroup {
     void ObjectGroup();
@@ -1087,8 +1091,13 @@ interface SharedPtrSerializerElement {
 };
 
 interface Serializer {
-    [Const, Value] DOMString STATIC_ToJSON([Const, Ref] SerializerElement element);
+    [Const, Value] DOMString STATIC_ToJSON([Const, Ref] SerializerElement element, SerializerGroup group);
     [Value] SerializerElement STATIC_FromJSON([Const] DOMString json);
+};
+
+enum SerializerGroup {
+    "SerializerGroup::defaultGroup",
+    "SerializerGroup::editorGroup",
 };
 
 interface InstructionsList {

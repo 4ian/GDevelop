@@ -6,7 +6,10 @@
 
 #ifndef GDCORE_SERIALIZERVALUE_H
 #define GDCORE_SERIALIZERVALUE_H
+
 #include <string>
+
+#include "GDCore/Serialization/SerializerGroup.h"
 #include "GDCore/String.h"
 
 namespace gd {
@@ -30,6 +33,11 @@ class GD_CORE_API SerializerValue {
    * Set the value, its type being a boolean.
    */
   void SetBool(bool val);
+
+  /**
+   * Set the group of a SerializerElement.
+   */
+  void SetGroup(const gd::SerializerGroup &groupToSet) { group = groupToSet; };
 
   /**
    * Set the value, its type being a gd::String.
@@ -57,6 +65,11 @@ class GD_CORE_API SerializerValue {
   bool GetBool() const;
 
   /**
+   * Get the Group object of a SerializerElement.
+   */
+  gd::SerializerGroup GetGroup() const { return group; };
+
+  /**
    * Get the value, its type being a gd::String.
    */
   gd::String GetString() const;
@@ -65,7 +78,7 @@ class GD_CORE_API SerializerValue {
    * Get the string value, without attempting any conversion.
    * Make sure to check that IsString is true beforehand.
    */
-  const gd::String& GetRawString() const { return stringValue; };
+  const gd::String &GetRawString() const { return stringValue; };
 
   /**
    * Get the value, its type being an int.
@@ -106,6 +119,8 @@ class GD_CORE_API SerializerValue {
   gd::String stringValue;
   int intValue;
   double doubleValue;
+
+  gd::SerializerGroup group = gd::SerializerGroup::defaultGroup;
 };
 
 }  // namespace gd

@@ -144,7 +144,8 @@ void RapidJsonValueToElement(const Value& value,
 
 void ElementToRapidJson(const gd::SerializerElement& element,
                         Value& value,
-                        Document::AllocatorType& allocator) {
+                        Document::AllocatorType& allocator,
+                        const gd::SerializerGroup& group) {
   if (!element.IsValueUndefined()) {
     const SerializerValue& serializerValue = element.GetValue();
     // TODO: use GetRaw to avoid conversions
@@ -166,7 +167,7 @@ void ElementToRapidJson(const gd::SerializerElement& element,
 
     for (const auto& child : children) {
       Value childValue;
-      ElementToRapidJson(*child.second, childValue, allocator);
+      ElementToRapidJson(*child.second, childValue, allocator, group);
       value.PushBack(childValue, allocator);
     }
   } else {
@@ -176,17 +177,21 @@ void ElementToRapidJson(const gd::SerializerElement& element,
     const auto& children = element.GetAllChildren();
 
     for (const auto& attribute : attributes) {
+      if (attribute.second.GetGroup() != group) {
+        continue;
+      }
       Value name(attribute.first.c_str(),
                  allocator);  // Copying the name is required.
       Value childValue;
-      ElementToRapidJson(attribute.second, childValue, allocator);
+      ElementToRapidJson(attribute.second, childValue, allocator, group);
+
       value.AddMember(name, childValue, allocator);
     }
     for (const auto& child : children) {
       Value name(child.first.c_str(),
                  allocator);  // Copying the name is required.
       Value childValue;
-      ElementToRapidJson(*child.second, childValue, allocator);
+      ElementToRapidJson(*child.second, childValue, allocator, group);
       value.AddMember(name, childValue, allocator);
     }
   }
@@ -214,11 +219,11 @@ SerializerElement Serializer::FromJSON(const char* json) {
   return element;
 }
 
-gd::String Serializer::ToJSON(const SerializerElement& element) {
+gd::String Serializer::ToJSON(const SerializerElement& element,
+                              const SerializerGroup& group) {
   Document document;
   Document::AllocatorType& allocator = document.GetAllocator();
-
-  ElementToRapidJson(element, document, allocator);
+  ElementToRapidJson(element, document, allocator, group);
 
   StringBuffer buffer;
   Writer<StringBuffer> writer(buffer);

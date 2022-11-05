@@ -47,7 +47,7 @@ export const Default = () => (
 export const WithObjectEditor = () => {
   const preferences: Preferences = {
     ...initialPreferences,
-    values: { ...initialPreferences.values, showEventBasedObjectsEditor: true },
+    getShowEventBasedObjectsEditor: () => true,
   };
 
   return (

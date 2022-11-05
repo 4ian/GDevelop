@@ -83,6 +83,10 @@ class GD_EXTENSION_API ShapePainterObjectBase {
 
   bool absoluteCoordinates;
   bool clearBetweenFrames;
+
+  //Antialiasing
+  bool antialiasing;
+  unsigned int antialiasingQuality;
 };
 
 /**

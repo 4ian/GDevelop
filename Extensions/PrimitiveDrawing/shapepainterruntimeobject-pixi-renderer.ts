@@ -313,6 +313,7 @@ namespace gdjs {
 
     updatePreRender(): void {
       this.updatePositionIfNeeded();
+      this.applyAntialiasing();
     }
 
     updatePositionX(): void {
@@ -485,8 +486,35 @@ namespace gdjs {
       point[1] = position.y;
       return point;
     }
+    applyAntialiasing(): void {
+      if (this._object.isAntialiasingOn()) {
+        let antialiasingFilter = new PIXI.filters.FXAAFilter();
+        antialiasingFilter.enabled = true;
+        switch (this._object.getAntialiasingQuality()) {
+          case 2:
+            antialiasingFilter.multisample = PIXI.MSAA_QUALITY.LOW;
+            break;
+          case 4:
+            antialiasingFilter.multisample = PIXI.MSAA_QUALITY.MEDIUM;
+            break;
+          case 8:
+            antialiasingFilter.multisample = PIXI.MSAA_QUALITY.HIGH;
+            break;
+          default:
+            //Should never be executed but if it's not a valid value, set the quality to LOW.
+            antialiasingFilter.multisample = PIXI.MSAA_QUALITY.LOW;
+
+            break;
+        }
+        this._graphics.filters = [antialiasingFilter];
+      } else {
+        this._graphics.filters = [];
+      }
+    }
   }
 
-  export const ShapePainterRuntimeObjectRenderer = ShapePainterRuntimeObjectPixiRenderer;
-  export type ShapePainterRuntimeObjectRenderer = ShapePainterRuntimeObjectPixiRenderer;
+  export const ShapePainterRuntimeObjectRenderer =
+    ShapePainterRuntimeObjectPixiRenderer;
+  export type ShapePainterRuntimeObjectRenderer =
+    ShapePainterRuntimeObjectPixiRenderer;
 }

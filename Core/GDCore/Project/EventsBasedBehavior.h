@@ -73,6 +73,21 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
     return *this;
   }
 
+  /**
+   * \brief Check if the behavior is private - it can't be used outside of its
+   * extension.
+   */
+  bool IsPrivate() { return isPrivate; }
+
+  /**
+   * \brief Set that the behavior is private - it can't be used outside of its
+   * extension.
+   */
+  EventsBasedBehavior& SetPrivate(bool _isPrivate) {
+    isPrivate = _isPrivate;
+    return *this;
+  }
+
   void SerializeTo(SerializerElement& element) const override;
 
   void UnserializeFrom(gd::Project& project,
@@ -80,6 +95,7 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
 
  private:
   gd::String objectType;
+  bool isPrivate = false;
 };
 
 }  // namespace gd

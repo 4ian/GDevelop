@@ -1579,6 +1579,9 @@ interface BehaviorMetadata {
 
     [Ref] BehaviorMetadata SetObjectType([Const] DOMString objectType);
     [Const, Ref] DOMString GetObjectType();
+    
+    boolean IsPrivate();
+    [Ref] BehaviorMetadata SetPrivate();
 
     [Ref] Behavior Get();
     BehaviorsSharedData GetSharedDataInstance();
@@ -2352,6 +2355,8 @@ interface EventsBasedBehavior {
     [Const, Ref] DOMString GetFullName();
     [Ref] EventsBasedBehavior SetObjectType([Const] DOMString fullName);
     [Const, Ref] DOMString GetObjectType();
+    [Ref] EventsBasedBehavior SetPrivate(boolean isPrivate);
+    boolean IsPrivate();
 
     [Ref] EventsFunctionsContainer GetEventsFunctions();
     [Ref] NamedPropertyDescriptorsList GetPropertyDescriptors();

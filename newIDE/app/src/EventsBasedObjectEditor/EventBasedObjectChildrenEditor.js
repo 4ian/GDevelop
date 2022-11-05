@@ -192,7 +192,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
   };
 
   render() {
-    const { eventsBasedObject, project } = this.props;
+    const { eventsBasedObject, project, eventsFunctionsExtension } = this.props;
 
     // TODO EBO When adding an object, filter the object types to excludes
     // object that depend (transitively) on this object to avoid cycles.
@@ -260,6 +260,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 object={this.state.editedObjectWithContext.object}
                 initialTab={this.state.editedObjectInitialTab}
                 project={project}
+                eventsFunctionsExtension={eventsFunctionsExtension}
                 resourceSources={[]}
                 resourceExternalEditors={[]}
                 onChooseResource={() => Promise.resolve([])}

@@ -27,11 +27,11 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.ShapePainterRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
       this._graphics = new PIXI.Graphics();
-      runtimeScene
+      instanceContainer
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._graphics, runtimeObject.getZOrder());
@@ -47,7 +47,6 @@ namespace gdjs {
     }
 
     drawRectangle(x1: float, y1: float, x2: float, y2: float) {
-      
       this.updateOutline();
       this._graphics.beginFill(
         this._object._fillColor,
@@ -59,20 +58,17 @@ namespace gdjs {
     }
 
     drawCircle(x: float, y: float, radius: float) {
-        
-        this.updateOutline();
-        this._graphics.beginFill(
-          this._object._fillColor,
-          this._object._fillOpacity / 255
-        );
-        this._graphics.drawCircle(x, y, radius);
-        this._graphics.endFill();
-        this.invalidateBounds();
-      
+      this.updateOutline();
+      this._graphics.beginFill(
+        this._object._fillColor,
+        this._object._fillOpacity / 255
+      );
+      this._graphics.drawCircle(x, y, radius);
+      this._graphics.endFill();
+      this.invalidateBounds();
     }
 
     drawLine(x1: float, y1: float, x2: float, y2: float, thickness: float) {
-      
       this._graphics.beginFill(
         this._object._fillColor,
         this._object._fillOpacity / 255
@@ -99,7 +95,6 @@ namespace gdjs {
     }
 
     drawLineV2(x1: float, y1: float, x2: float, y2: float, thickness: float) {
-      
       this._graphics.lineStyle(
         thickness,
         this._object._outlineColor,
@@ -112,7 +107,6 @@ namespace gdjs {
     }
 
     drawEllipse(x1: float, y1: float, width: float, height: float) {
-      
       this.updateOutline();
       this._graphics.beginFill(
         this._object._fillColor,
@@ -130,7 +124,6 @@ namespace gdjs {
       y2: float,
       radius: float
     ) {
-      
       this.updateOutline();
       this._graphics.beginFill(
         this._object._fillColor,
@@ -150,7 +143,6 @@ namespace gdjs {
       innerRadius: float,
       rotation: float
     ) {
-      
       this.updateOutline();
       this._graphics.beginFill(
         this._object._fillColor,
@@ -251,18 +243,15 @@ namespace gdjs {
     }
 
     endFillPath() {
-      
       this._graphics.endFill();
       this.invalidateBounds();
     }
 
     drawPathMoveTo(x1: float, y1: float) {
-      
       this._graphics.moveTo(x1, y1);
     }
 
     drawPathLineTo(x1: float, y1: float) {
-      
       this._graphics.lineTo(x1, y1);
       this.invalidateBounds();
     }
@@ -275,7 +264,6 @@ namespace gdjs {
       toX: float,
       toY: float
     ) {
-      
       this._graphics.bezierCurveTo(cpX, cpY, cpX2, cpY2, toX, toY);
       this.invalidateBounds();
     }
@@ -300,19 +288,16 @@ namespace gdjs {
     }
 
     drawPathQuadraticCurveTo(cpX: float, cpY: float, toX: float, toY: float) {
-      
       this._graphics.quadraticCurveTo(cpX, cpY, toX, toY);
       this.invalidateBounds();
     }
 
     closePath() {
-      
       this._graphics.closePath();
       this.invalidateBounds();
     }
 
     updateOutline(): void {
-      
       this._graphics.lineStyle(
         this._object._outlineSize,
         this._object._outlineColor,
@@ -321,15 +306,14 @@ namespace gdjs {
     }
 
     invalidateBounds() {
-      
       this._object.invalidateBounds();
       this._positionXIsUpToDate = false;
       this._positionYIsUpToDate = false;
     }
 
     updatePreRender(): void {
-      this.applyAntialiasing();
       this.updatePositionIfNeeded();
+      this.applyAntialiasing();
     }
 
     updatePositionX(): void {
@@ -502,7 +486,6 @@ namespace gdjs {
       point[1] = position.y;
       return point;
     }
-
     applyAntialiasing(): void {
       if (this._object.isAntialiasingOn()) {
         let antialiasingFilter = new PIXI.filters.FXAAFilter();

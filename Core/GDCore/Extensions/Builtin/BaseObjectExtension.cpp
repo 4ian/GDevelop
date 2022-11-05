@@ -28,7 +28,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   extension.AddInstructionOrExpressionGroupMetadata(_("Movement using forces"))
       .SetIcon("res/actions/force24.png");
 
-  gd::ObjectMetadata& obj = extension.AddObject<gd::Object>(
+  gd::ObjectMetadata& obj = extension.AddObject<gd::ObjectConfiguration>(
       "", _("Base object"), _("Base object"), "res/objeticon24.png");
 
   obj.AddCondition("PosX",
@@ -36,8 +36,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Compare the X position of the object."),
                    _("the X position"),
                    _("Position"),
-                   "res/conditions/position24.png",
-                   "res/conditions/position.png")
+                   "res/conditions/position24_black.png",
+                   "res/conditions/position_black.png")
 
       .AddParameter("object", _("Object"))
       .UseStandardRelationalOperatorParameters("number")
@@ -48,8 +48,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Change the X position of an object."),
                 _("the X position"),
                 _("Position"),
-                "res/actions/position24.png",
-                "res/actions/position.png")
+                "res/actions/position24_black.png",
+                "res/actions/position_black.png")
 
       .AddParameter("object", _("Object"))
       .UseStandardOperatorParameters("number")
@@ -60,8 +60,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Compare the Y position of an object."),
                    _("the Y position"),
                    _("Position"),
-                   "res/conditions/position24.png",
-                   "res/conditions/position.png")
+                   "res/conditions/position24_black.png",
+                   "res/conditions/position_black.png")
 
       .AddParameter("object", _("Object"))
       .UseStandardRelationalOperatorParameters("number")
@@ -72,8 +72,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Change the Y position of an object."),
                 _("the Y position"),
                 _("Position"),
-                "res/actions/position24.png",
-                "res/actions/position.png")
+                "res/actions/position24_black.png",
+                "res/actions/position_black.png")
 
       .AddParameter("object", _("Object"))
       .UseStandardOperatorParameters("number")
@@ -85,8 +85,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Change the position of _PARAM0_: _PARAM1_ _PARAM2_ (x "
                   "axis), _PARAM3_ _PARAM4_ (y axis)"),
                 _("Position"),
-                "res/actions/position24.png",
-                "res/actions/position.png")
+                "res/actions/position24_black.png",
+                "res/actions/position_black.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("operator", _("Modification's sign"), "number")
@@ -102,8 +102,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                   "_PARAM2_ (x "
                   "axis), _PARAM3_ _PARAM4_ (y axis)"),
                 _("Position/Center"),
-                "res/actions/position24.png",
-                "res/actions/position.png")
+                "res/actions/position24_black.png",
+                "res/actions/position_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("X position"))
@@ -118,7 +118,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("the X position of the center of rotation"),
          _("the X position of the center"),
          _("Position/Center"),
-         "res/actions/position24.png")
+         "res/actions/position24_black.png")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -129,7 +129,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("the Y position of the center of rotation"),
          _("the Y position of the center"),
          _("Position/Center"),
-         "res/actions/position24.png")
+         "res/actions/position24_black.png")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -140,7 +140,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                   "the object) left position"),
                                 _("the bounding box left position"),
                                 _("Position/Bounding Box"),
-                                "res/conditions/bounding-box-left.svg")
+                                "res/conditions/bounding-box-left_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -151,7 +151,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("the bounding box (the area encapsulating the object) top position"),
          _("the bounding box top position"),
          _("Position/Bounding Box"),
-         "res/conditions/bounding-box-top.svg")
+         "res/conditions/bounding-box-top_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -162,7 +162,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                   "the object) right position"),
                                 _("the bounding box right position"),
                                 _("Position/Bounding Box"),
-                                "res/conditions/bounding-box-right.svg")
+                                "res/conditions/bounding-box-right_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -173,7 +173,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                   "the object) bottom position"),
                                 _("the bounding box bottom position"),
                                 _("Position/Bounding Box"),
-                                "res/conditions/bounding-box-bottom.svg")
+                                "res/conditions/bounding-box-bottom_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -184,7 +184,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                   "the object) center X position"),
                                 _("the bounding box center X position"),
                                 _("Position/Bounding Box"),
-                                "res/conditions/bounding-box-center.svg")
+                                "res/conditions/bounding-box-center_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -195,7 +195,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                   "the object) center Y position"),
                                 _("the bounding box center Y position"),
                                 _("Position/Bounding Box"),
-                                "res/conditions/bounding-box-center.svg")
+                                "res/conditions/bounding-box-center_black.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -219,11 +219,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("SetAngle",
                 _("Angle"),
-                _("Change the angle of rotation of an object."),
+                _("Change the angle of rotation of an object (in degrees)."),
                 _("the angle"),
                 _("Angle"),
-                "res/actions/direction24.png",
-                "res/actions/direction.png")
+                "res/actions/direction24_black.png",
+                "res/actions/direction_black.png")
 
       .AddParameter("object", _("Object"))
       .UseStandardOperatorParameters("number");
@@ -234,8 +234,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                   "counterclockwise otherwise."),
                 _("Rotate _PARAM0_ at speed _PARAM1_ deg/second"),
                 _("Angle"),
-                "res/actions/direction24.png",
-                "res/actions/direction.png")
+                "res/actions/rotate24_black.png",
+                "res/actions/rotate_black.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angular speed (in degrees per second)"))
@@ -248,8 +248,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Rotate an object towards an angle with the specified speed."),
          _("Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_ deg/second"),
          _("Angle"),
-         "res/actions/direction24.png",
-         "res/actions/direction.png")
+         "res/actions/rotate24_black.png",
+         "res/actions/rotate_black.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angle to rotate towards (in degrees)"))
@@ -264,8 +264,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed "
            "_PARAM3_ deg/second"),
          _("Angle"),
-         "res/actions/direction24.png",
-         "res/actions/direction.png")
+         "res/actions/rotate24_black.png",
+         "res/actions/rotate_black.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("X position"))
@@ -289,7 +289,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Speed on X axis (in pixels per second)"))
       .AddParameter("expression", _("Speed on Y axis (in pixels per second)"))
-      .AddParameter("forceMultiplier", _("Force multiplier"));
+      .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
+      .SetDefaultValue("0");
 
   obj.AddAction("AddForceAL",
                 _("Add a force (angle)"),
@@ -305,7 +306,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angle"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
-      .AddParameter("forceMultiplier", _("Force multiplier"))
+      .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
+      .SetDefaultValue("0")
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -323,7 +325,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
-      .AddParameter("forceMultiplier", _("Force multiplier"))
+      .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
+      .SetDefaultValue("0")
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -390,7 +393,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/layer.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("layer", _("Move it to this layer (base layer if empty)"))
+      .AddParameter("layer", _("Move it to this layer"))
       .SetDefaultValue("\"\"")
       .MarkAsAdvanced();
 
@@ -509,8 +512,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Compare the angle of the specified object."),
                    _("the angle (in degrees)"),
                    _("Angle"),
-                   "res/conditions/direction24.png",
-                   "res/conditions/direction.png")
+                   "res/conditions/direction24_black.png",
+                   "res/conditions/direction_black.png")
 
       .AddParameter("object", _("Object"))
       .UseStandardRelationalOperatorParameters("number")
@@ -756,7 +759,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Target Object"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
-      .AddParameter("forceMultiplier", _("Force multiplier"))
+      .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
+      .SetDefaultValue("0")
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -776,7 +780,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectPtr", _("Rotate around this object"))
       .AddParameter("expression", _("Speed (in degrees per second)"))
       .AddParameter("expression", _("Distance (in pixels)"))
-      .AddParameter("forceMultiplier", _("Force multiplier"))
+      .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
+      .SetDefaultValue("0")
       .MarkAsAdvanced();
 
   obj.AddAction("MettreAutour",
@@ -881,7 +886,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/conditions/timer24.png",
          "res/conditions/timer.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "objectTimer")
       .AddParameter("expression", _("Time in seconds"))
       .SetHidden();
 
@@ -895,7 +900,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/conditions/timer24.png",
          "res/conditions/timer.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "objectTimer")
       .AddParameter("relationalOperator", _("Sign of the test"), "time")
       .AddParameter("expression", _("Time in seconds"))
       .SetManipulatedType("number");
@@ -908,7 +913,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "res/conditions/timerPaused24.png",
                    "res/conditions/timerPaused.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "objectTimer")
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -921,7 +926,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/actions/timer24.png",
          "res/actions/timer.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Timer's name"));
+      .AddParameter("identifier", _("Timer's name"), "objectTimer");
 
   obj.AddAction("PauseObjectTimer",
                 _("Pause an object timer"),
@@ -931,7 +936,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/pauseTimer24.png",
                 "res/actions/pauseTimer.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "objectTimer")
       .MarkAsAdvanced();
 
   obj.AddAction("UnPauseObjectTimer",
@@ -942,7 +947,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/unPauseTimer24.png",
                 "res/actions/unPauseTimer.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "objectTimer")
       .MarkAsAdvanced();
 
   obj.AddAction("RemoveObjectTimer",
@@ -953,28 +958,28 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/timer24.png",
                 "res/actions/timer.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "objectTimer")
       .MarkAsAdvanced();
 
   obj.AddExpression("X",
                     _("X position"),
                     _("X position of the object"),
                     _("Position"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("Y",
                     _("Y position"),
                     _("Y position of the object"),
                     _("Position"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("Angle",
                     _("Angle"),
                     _("Current angle, in degrees, of the object"),
                     _("Angle"),
-                    "res/actions/direction.png")
+                    "res/actions/direction_black.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("ForceX",
@@ -993,7 +998,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddExpression("ForceAngle",
                     _("Angle of the sum of forces"),
-                    _("Angle of the sum of forces"),
+                    _("Angle of the sum of forces (in degrees)"),
                     _("Movement using forces"),
                     "res/actions/force.png")
       .AddParameter("object", _("Object"));
@@ -1017,14 +1022,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Width"),
                     _("Width of the object"),
                     _("Size"),
-                    "res/actions/scaleWidth.png")
+                    "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("Largeur",
                     _("Width"),
                     _("Width of the object"),
                     _("Size"),
-                    "res/actions/scaleWidth.png")
+                    "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"))
       .SetHidden();
 
@@ -1032,14 +1037,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Height"),
                     _("Height of the object"),
                     _("Size"),
-                    "res/actions/scaleHeight.png")
+                    "res/actions/scaleHeight_black.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("Hauteur",
                     _("Height"),
                     _("Height of the object"),
                     _("Size"),
-                    "res/actions/scaleHeight.png")
+                    "res/actions/scaleHeight_black.png")
       .AddParameter("object", _("Object"))
       .SetHidden();
 
@@ -1093,7 +1098,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Target Y position"));
 
   obj.AddExpression("Variable",
-                    _("Object variable"),
+                    _("Value of an object variable"),
                     _("Value of an object variable"),
                     _("Variables"),
                     "res/actions/var.png")
@@ -1109,7 +1114,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"));
 
   obj.AddStrExpression("VariableString",
-                       _("Object variable"),
+                       _("Text of an object variable"),
                        _("Text of an object variable"),
                        _("Variables"),
                        "res/actions/var.png")
@@ -1122,14 +1127,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Object timers"),
                     "res/actions/time.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Timer's name"));
+      .AddParameter("identifier", _("Timer's name"), "objectTimer");
 
   obj.AddExpression("AngleToObject",
                     _("Angle between two objects"),
-                    _("Compute the angle between two objects. If you need the "
-                      "angle to an arbitrary position, use AngleToPosition."),
+                    _("Compute the angle between two objects (in degrees). "
+                      "If you need the angle to an arbitrary position, "
+                      "use AngleToPosition."),
                     _("Angle"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Object"));
 
@@ -1140,7 +1146,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                       "getting the cartesian coordinates of a 2D vector, using "
                       "its polar coordinates."),
                     _("Position"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angle, in degrees"))
       .AddParameter("expression", _("Distance"));
@@ -1152,7 +1158,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                       "getting the cartesian coordinates of a 2D vector, using "
                       "its polar coordinates."),
                     _("Position"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angle, in degrees"))
       .AddParameter("expression", _("Distance"));
@@ -1160,10 +1166,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddExpression("AngleToPosition",
                     _("Angle between an object and a position"),
                     _("Compute the angle between the object center and a "
-                      "\"target\" position. If you need the angle between two "
-                      "objects, use AngleToObject."),
+                      "\"target\" position (in degrees). If you need the angle "
+                      "between two objects, use AngleToObject."),
                     _("Angle"),
-                    "res/actions/position.png")
+                    "res/actions/position_black.png")
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Target X position"))
       .AddParameter("expression", _("Target Y position"));
@@ -1523,7 +1529,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
             "object will become the only one taken into account.\nIf "
             "the condition is inverted, the object to be intersected "
             "will be the farthest one within the ray radius."),
-          _("Cast a ray from from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ "
+          _("Cast a ray from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ "
             "against _PARAM0_, and save the "
             "result in _PARAM5_, _PARAM6_"),
           "",
@@ -1559,7 +1565,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                        _("Object name"),
                        _("Return the name of the object"),
                        "",
-                       "res/conditions/text.png")
+                       "res/conditions/text_black.png")
       .AddParameter("object", _("Object"));
 
   obj.AddStrExpression("Layer",

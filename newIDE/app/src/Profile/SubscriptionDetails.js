@@ -6,17 +6,27 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import RaisedButton from '../UI/RaisedButton';
 import { Trans } from '@lingui/macro';
 import Text from '../UI/Text';
+import LeftLoader from '../UI/LeftLoader';
+import { ResponsiveLineStackLayout } from '../UI/Layout';
+import FlatButton from '../UI/FlatButton';
 
 type Props = {
   subscription: ?Subscription,
-  onChangeSubscription: Function,
+  onChangeSubscription: () => void,
+  onManageSubscription: () => void | Promise<void>,
+  isManageSubscriptionLoading: boolean,
 };
 
-const SubscriptionDetails = ({ subscription, onChangeSubscription }: Props) =>
+const SubscriptionDetails = ({
+  subscription,
+  onChangeSubscription,
+  isManageSubscriptionLoading,
+  onManageSubscription,
+}: Props) =>
   subscription ? (
     <Column>
       <Line alignItems="center">
-        <Text size="title">My online services subscriptions</Text>
+        <Text size="block-title">My online services subscriptions</Text>
       </Line>
       {subscription.planId ? (
         <>
@@ -29,13 +39,20 @@ const SubscriptionDetails = ({ subscription, onChangeSubscription }: Props) =>
               </Trans>
             </Text>
           </Line>
-          <Line justifyContent="flex-end">
+          <ResponsiveLineStackLayout justifyContent="flex-end">
+            <LeftLoader isLoading={isManageSubscriptionLoading}>
+              <FlatButton
+                label={<Trans>Manage online</Trans>}
+                primary
+                onClick={onManageSubscription}
+              />
+            </LeftLoader>
             <RaisedButton
-              label={<Trans>Upgrade/change</Trans>}
+              label={<Trans>Upgrade or cancel</Trans>}
               primary
               onClick={onChangeSubscription}
             />
-          </Line>
+          </ResponsiveLineStackLayout>
         </>
       ) : (
         <>

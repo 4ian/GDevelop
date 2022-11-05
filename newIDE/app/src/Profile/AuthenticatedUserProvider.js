@@ -29,6 +29,12 @@ import EmailVerificationPendingDialog from './EmailVerificationPendingDialog';
 import PreferencesContext, {
   type PreferencesValues,
 } from '../MainFrame/Preferences/PreferencesContext';
+import { listUserCloudProjects } from '../Utils/GDevelopServices/Project';
+import { clearCloudProjectCookies } from '../ProjectsStorage/CloudStorageProvider/CloudProjectCookies';
+import {
+  listReceivedAssetShortHeaders,
+  listReceivedAssetPacks,
+} from '../Utils/GDevelopServices/Asset';
 
 type Props = {|
   authentication: Authentication,
@@ -123,6 +129,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         ...initialAuthenticatedUser,
         onLogout: this._doLogout,
         onBadgesChanged: this._fetchUserBadges,
+        onCloudProjectsChanged: this._fetchUserCloudProjects,
         onLogin: () => this.openLoginDialog(true),
         onEdit: () => this.openEditProfileDialog(true),
         onChangeEmail: () => this.openChangeEmailDialog(true),
@@ -131,6 +138,8 @@ export default class AuthenticatedUserProvider extends React.Component<
         onRefreshFirebaseProfile: async () => {
           await this._reloadFirebaseProfile();
         },
+        onSubscriptionUpdated: this._fetchUserSubscriptionLimitsAndUsages,
+        onPurchaseSuccessful: this._fetchUserAssets,
         onSendEmailVerification: this._doSendEmailVerification,
         onAcceptGameStatsEmail: this._doAcceptGameStatsEmail,
         getAuthorizationHeader: () =>
@@ -186,10 +195,36 @@ export default class AuthenticatedUserProvider extends React.Component<
   _fetchUserProfile = async () => {
     const { authentication } = this.props;
 
+    this.setState(({ authenticatedUser }) => ({
+      authenticatedUser: {
+        ...authenticatedUser,
+        loginState: 'loggingIn',
+      },
+    }));
+
     // First ensure the Firebase authenticated user is up to date
     // (and let the error propagate if any).
-    const firebaseUser = await this._reloadFirebaseProfile();
-    if (!firebaseUser) return;
+    let firebaseUser;
+    try {
+      firebaseUser = await this._reloadFirebaseProfile();
+      if (!firebaseUser) {
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            loginState: 'done',
+          },
+        }));
+        return;
+      }
+    } catch (error) {
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          loginState: 'done',
+        },
+      }));
+      throw error;
+    }
 
     // Fetching user profile related information, but independently from
     // the user profile itself, to not block in case one of these calls
@@ -233,6 +268,52 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading user limits:', error);
       }
     );
+    listUserCloudProjects(
+      authentication.getAuthorizationHeader,
+      firebaseUser.uid
+    ).then(
+      cloudProjects =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            cloudProjects,
+          },
+        })),
+      error => {
+        console.error('Error while loading user cloud projects:', error);
+      }
+    );
+    listReceivedAssetPacks(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      receivedAssetPacks =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            receivedAssetPacks,
+          },
+        })),
+      error => {
+        console.error('Error while loading received asset packs:', error);
+      }
+    );
+    listReceivedAssetShortHeaders(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      receivedAssetShortHeaders =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            receivedAssetShortHeaders,
+          },
+        })),
+      error => {
+        console.error(
+          'Error while loading received asset short headers:',
+          error
+        );
+      }
+    );
     this._fetchUserBadges();
 
     // Load and wait for the user profile to be fetched.
@@ -241,12 +322,141 @@ export default class AuthenticatedUserProvider extends React.Component<
       authentication.getAuthorizationHeader
     );
 
+    if (!userProfile.isCreator) {
+      // If the user is not a creator, then update the profile to say they now are.
+      try {
+        await authentication.editUserProfile(
+          authentication.getAuthorizationHeader,
+          { isCreator: true }
+        );
+      } catch (error) {
+        // Catch the error so that the user profile is still fetched.
+        console.error('Error while updating the user profile:', error);
+      }
+    }
+
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...authenticatedUser,
         profile: userProfile,
+        loginState: 'done',
       },
     }));
+  };
+
+  _fetchUserSubscriptionLimitsAndUsages = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const usages = await getUserUsages(
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid
+      );
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          usages,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user usages:', error);
+    }
+
+    try {
+      const subscription = await getUserSubscription(
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid
+      );
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          subscription,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user subscriptions:', error);
+    }
+
+    try {
+      const limits = await getUserLimits(
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid
+      );
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          limits,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user limits:', error);
+    }
+  };
+
+  _fetchUserAssets = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const receivedAssetPacks = await listReceivedAssetPacks(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          receivedAssetPacks,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading received asset packs:', error);
+    }
+
+    try {
+      const receivedAssetShortHeaders = await listReceivedAssetShortHeaders(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          receivedAssetShortHeaders,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading received asset short headers:', error);
+    }
+  };
+
+  _fetchUserCloudProjects = async () => {
+    const { authentication } = this.props;
+    const { firebaseUser } = this.state.authenticatedUser;
+    if (!firebaseUser) return;
+
+    listUserCloudProjects(
+      authentication.getAuthorizationHeader,
+      firebaseUser.uid
+    ).then(
+      cloudProjects =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            cloudProjects,
+          },
+        })),
+      error => {
+        console.error('Error while loading user cloud projects:', error);
+      }
+    );
   };
 
   _fetchUserBadges = async () => {
@@ -268,6 +478,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _doLogout = () => {
     if (this.props.authentication) this.props.authentication.logout();
     this._resetAuthenticatedUser();
+    clearCloudProjectCookies();
   };
 
   _doLogin = async (form: LoginForm) => {
@@ -276,6 +487,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       loginInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -297,13 +509,19 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       editInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
       await authentication.editUserProfile(
         authentication.getAuthorizationHeader,
-        form,
-        preferences.language
+        {
+          username: form.username,
+          description: form.description,
+          getGameStatsEmail: form.getGameStatsEmail,
+          getNewsletterEmail: form.getNewsletterEmail,
+          appLanguage: preferences.language,
+        }
       );
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openEditProfileDialog(false);
@@ -325,6 +543,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       createAccountInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -360,6 +579,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       forgotPasswordInProgress: true,
+      authError: null,
     });
     try {
       await authentication.forgotPassword(form);
@@ -389,6 +609,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       editInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -411,6 +632,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       changeEmailInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -501,7 +723,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                   profile={this.state.authenticatedUser.profile}
                   onClose={() => this.openEditProfileDialog(false)}
                   onEdit={form => this._doEdit(form, preferences)}
-                  editInProgress={this.state.editInProgress}
+                  updateProfileInProgress={this.state.editInProgress}
                   error={this.state.authError}
                 />
               )}

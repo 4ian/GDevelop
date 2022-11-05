@@ -3,7 +3,6 @@ import * as React from 'react';
 import Button from '@material-ui/core/Button';
 import { type ButtonInterface } from './Button';
 import { Spacer } from './Grid';
-import GDevelopThemeContext from './Theme/ThemeContext';
 
 // We support a subset of the props supported by Material-UI v0.x RaisedButton
 // They should be self descriptive - refer to Material UI docs otherwise.
@@ -39,20 +38,13 @@ const RaisedButton = React.forwardRef<Props, ButtonInterface>(
     // it's important to get focus right in the whole app, make the ripple
     // always visible to be sure we're getting focusing right.
     const focusRipple = true;
-    const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
     return (
       <Button
         variant="contained"
         size="small"
-        disableElevation={gdevelopTheme.isModern}
-        color={
-          primary
-            ? gdevelopTheme.isModern
-              ? 'secondary'
-              : 'primary'
-            : 'default'
-        }
+        disableElevation
+        color={primary ? 'primary' : 'default'}
         focusRipple={focusRipple}
         {...otherProps}
         ref={ref}

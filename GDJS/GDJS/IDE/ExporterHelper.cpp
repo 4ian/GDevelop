@@ -9,6 +9,7 @@
 #include <emscripten.h>
 #endif
 #include <algorithm>
+#include <array>
 #include <fstream>
 #include <functional>
 #include <sstream>
@@ -30,6 +31,8 @@
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/EventsBasedObject.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Project/SourceFile.h"
 #include "GDCore/Serialization/Serializer.h"
@@ -76,6 +79,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   fs.MkDir(options.exportPath);
   fs.ClearDir(options.exportPath);
   std::vector<gd::String> includesFiles;
+  std::vector<gd::String> resourcesFiles;
 
   // TODO Try to remove side effects to avoid the copy
   // that destroys the AST in cache.
@@ -113,6 +117,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   // Export files for object and behaviors
   ExportObjectAndBehaviorsIncludes(immutableProject, includesFiles);
+  ExportObjectAndBehaviorsRequiredFiles(immutableProject, resourcesFiles);
 
   // Export effects (after engine libraries as they auto-register themselves to
   // the engine)
@@ -159,6 +164,9 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       .SetStringValue(options.websocketDebuggerServerPort);
   runtimeGameOptions.AddChild("electronRemoteRequirePath")
       .SetStringValue(options.electronRemoteRequirePath);
+  if (options.isDevelopmentEnvironment) {
+    runtimeGameOptions.AddChild("environment").SetStringValue("dev");
+  }
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
   auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");
@@ -183,6 +191,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   // Copy all the dependencies and their source maps
   ExportIncludesAndLibs(includesFiles, options.exportPath, true);
+  ExportIncludesAndLibs(resourcesFiles, options.exportPath, true);
 
   // Create the index file
   if (!ExportPixiIndexFile(exportedProject,
@@ -272,6 +281,18 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
                                      "\" density=\"" + size.second + "\" />\n")
                                   : "";
     }
+
+    // Splashscreen icon for Android 12+.
+    gd::String splashScreenIconFilename = getIconFilename("android", "windowSplashScreenAnimatedIcon");
+    if (!splashScreenIconFilename.empty())
+      output += "<preference name=\"AndroidWindowSplashScreenAnimatedIcon\" value=\""
+        + splashScreenIconFilename + "\" />\n";
+
+    // Splashscreen "branding" image for Android 12+.
+    gd::String splashScreenBrandingImageFilename = getIconFilename("android", "windowSplashScreenBrandingImage");
+    if (!splashScreenBrandingImageFilename.empty())
+      output += "<preference name=\"AndroidWindowSplashScreenBrandingImage\" value=\""
+        + splashScreenBrandingImageFilename + "\" />\n";
 
     return output;
   };
@@ -538,13 +559,15 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
   InsertUnique(includesFiles, "timemanager.js");
+  InsertUnique(includesFiles, "polygon.js");
   InsertUnique(includesFiles, "runtimeobject.js");
   InsertUnique(includesFiles, "profiler.js");
+  InsertUnique(includesFiles, "RuntimeInstanceContainer.js");
   InsertUnique(includesFiles, "runtimescene.js");
   InsertUnique(includesFiles, "scenestack.js");
-  InsertUnique(includesFiles, "polygon.js");
   InsertUnique(includesFiles, "force.js");
   InsertUnique(includesFiles, "layer.js");
+  InsertUnique(includesFiles, "RuntimeSceneLayer.js");
   InsertUnique(includesFiles, "timer.js");
   InsertUnique(includesFiles, "runtimegame.js");
   InsertUnique(includesFiles, "variable.js");
@@ -552,6 +575,9 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "oncetriggers.js");
   InsertUnique(includesFiles, "runtimebehavior.js");
   InsertUnique(includesFiles, "spriteruntimeobject.js");
+  InsertUnique(includesFiles, "affinetransformation.js");
+  InsertUnique(includesFiles, "CustomRuntimeObjectInstanceContainer.js");
+  InsertUnique(includesFiles, "CustomRuntimeObject.js");
 
   // Common includes for events only.
   InsertUnique(includesFiles, "events-tools/commontools.js");
@@ -598,6 +624,10 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "pixi-renderers/pixi-bitmapfont-manager.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/spriteruntimeobject-pixi-renderer.js");
+    InsertUnique(includesFiles,
+                 "pixi-renderers/CustomObjectPixiRenderer.js");
+    InsertUnique(includesFiles,
+                 "pixi-renderers/DebuggerPixiRenderer.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/loadingscreen-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-effects-manager.js");
@@ -799,10 +829,63 @@ void ExporterHelper::ExportObjectAndBehaviorsIncludes(
         }
       };
 
+  // TODO UsedExtensionsFinder should be used instead to find the file to include.
+  // The Exporter class already use it.
   addObjectsIncludeFiles(project);
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
     const gd::Layout &layout = project.GetLayout(i);
     addObjectsIncludeFiles(layout);
+  }
+  
+  // Event based objects children
+  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount(); e++) {
+    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
+    for (auto&& eventsBasedObjectUniquePtr :
+        eventsFunctionsExtension.GetEventsBasedObjects()
+            .GetInternalVector()) {
+      auto eventsBasedObject = eventsBasedObjectUniquePtr.get();
+
+      addObjectsIncludeFiles(*eventsBasedObject);
+    }
+  }
+}
+
+void ExporterHelper::ExportObjectAndBehaviorsRequiredFiles(
+    const gd::Project &project, std::vector<gd::String> &requiredFiles) {
+  auto addRequiredFiles = [&](const std::vector<gd::String> &newRequiredFiles) {
+    for (const auto &requiredFile : newRequiredFiles) {
+      InsertUnique(requiredFiles, requiredFile);
+    }
+  };
+
+  auto addObjectRequiredFiles = [&](const gd::Object &object) {
+    // Ensure needed files are included for the object type and its behaviors.
+
+    // TODO: Handle required files declared by objects. For now, no objects has
+    // a need for additional required files, so the object metadata do not even
+    // have `requiredFiles`.
+
+    std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
+    for (std::size_t j = 0; j < behaviors.size(); ++j) {
+      const gd::BehaviorMetadata &metadata =
+          gd::MetadataProvider::GetBehaviorMetadata(
+              JsPlatform::Get(),
+              object.GetBehavior(behaviors[j]).GetTypeName());
+      addRequiredFiles(metadata.requiredFiles);
+    }
+  };
+
+  auto addObjectsRequiredFiles =
+      [&](const gd::ObjectsContainer &objectsContainer) {
+        for (std::size_t i = 0; i < objectsContainer.GetObjectsCount(); ++i) {
+          addObjectRequiredFiles(objectsContainer.GetObject(i));
+        }
+      };
+
+  addObjectsRequiredFiles(project);
+  for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
+    const gd::Layout &layout = project.GetLayout(i);
+    addObjectsRequiredFiles(layout);
   }
 }
 
@@ -843,5 +926,82 @@ void ExporterHelper::AddDeprecatedFontFilesToFontResources(
   }
   // end of compatibility code
 }
+
+const std::array<int, 20> IOS_ICONS_SIZES = {
+    180, 60,  120, 76, 152, 40, 80, 57,  114, 72,
+    144, 167, 29,  58, 87,  50, 20, 100, 167, 1024,
+};
+const std::array<int, 6> ANDROID_ICONS_SIZES = {36, 48, 72, 96, 144, 192};
+
+const gd::String ExporterHelper::GenerateWebManifest(
+    const gd::Project &project) {
+  const gd::String &orientation = project.GetOrientation();
+  gd::String icons = "[";
+
+  {
+    std::map<int, gd::String> resourcesForSizes;
+    const auto getFileNameForIcon = [&project](const gd::String &platform,
+                                               const int size) {
+      const gd::String iconName = "icon-" + gd::String::From(size);
+      return project.GetPlatformSpecificAssets().Has(platform, iconName)
+                 ? project.GetResourcesManager()
+                       .GetResource(project.GetPlatformSpecificAssets().Get(
+                           platform, iconName))
+                       .GetFile()
+                 : "";
+    };
+
+    for (const int size : IOS_ICONS_SIZES) {
+      const auto iconFile = getFileNameForIcon("ios", size);
+      if (!iconFile.empty()) resourcesForSizes[size] = iconFile;
+    };
+
+    for (const int size : ANDROID_ICONS_SIZES) {
+      const auto iconFile = getFileNameForIcon("android", size);
+      if (!iconFile.empty()) resourcesForSizes[size] = iconFile;
+    };
+
+    const auto desktopIconFile = getFileNameForIcon("desktop", 512);
+    if (!desktopIconFile.empty()) resourcesForSizes[512] = desktopIconFile;
+
+    for (const auto &sizeAndFile : resourcesForSizes) {
+      icons +=
+          gd::String(R"({
+        "src": "{FILE}",
+        "sizes": "{SIZE}x{SIZE}"
+      },)")
+              .FindAndReplace("{SIZE}", gd::String::From(sizeAndFile.first))
+              .FindAndReplace("{FILE}", sizeAndFile.second);
+    }
+  }
+
+  icons = icons.RightTrim(",") + "]";
+
+  gd::String jsonName =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetName()));
+  gd::String jsonPackageName =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetPackageName()));
+  gd::String jsonDescription =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetDescription()));
+
+  return gd::String(R"webmanifest({
+  "name": {NAME},
+  "short_name": {NAME},
+  "id": {PACKAGE_ID},
+  "description": {DESCRIPTION},
+  "orientation": "{ORIENTATION}",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "black",
+  "categories": ["games", "entertainment"],
+  "icons": {ICONS}
+})webmanifest")
+      .FindAndReplace("{NAME}", jsonName)
+      .FindAndReplace("{PACKAGE_ID}", jsonPackageName)
+      .FindAndReplace("{DESCRIPTION}", jsonDescription)
+      .FindAndReplace("{ORIENTATION}",
+                      orientation == "default" ? "any" : orientation)
+      .FindAndReplace("{ICONS}", icons);
+};
 
 }  // namespace gdjs

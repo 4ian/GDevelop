@@ -3,7 +3,6 @@ import * as React from 'react';
 import Button from '@material-ui/core/Button';
 import { type ButtonInterface } from './Button';
 import { Spacer } from './Grid';
-import GDevelopThemeContext from './Theme/ThemeContext';
 
 // We support a subset of the props supported by Material-UI v0.x FlatButton
 // They should be self descriptive - refer to Material UI docs otherwise.
@@ -14,7 +13,8 @@ type Props = {|
   disabled?: boolean,
   keyboardFocused?: boolean,
   fullWidth?: boolean,
-  icon?: React.Node,
+  leftIcon?: React.Node,
+  rightIcon?: React.Node,
   style?: {|
     marginTop?: number,
     marginBottom?: number,
@@ -35,7 +35,8 @@ const FlatButton = React.forwardRef<Props, ButtonInterface>(
     {
       label,
       primary,
-      icon,
+      leftIcon,
+      rightIcon,
       keyboardFocused,
       disabled,
       id,
@@ -49,13 +50,11 @@ const FlatButton = React.forwardRef<Props, ButtonInterface>(
     // always visible to be sure we're getting focusing right.
     const focusRipple = true;
 
-    const gdevelopTheme = React.useContext(GDevelopThemeContext);
-
     return (
       <Button
-        variant={gdevelopTheme.isModern ? 'outlined' : 'text'}
+        variant="outlined"
         size="small"
-        color={primary ? 'primary' : 'default'}
+        color={primary ? 'secondary' : 'default'}
         autoFocus={keyboardFocused}
         focusRipple={focusRipple}
         disabled={disabled}
@@ -63,9 +62,11 @@ const FlatButton = React.forwardRef<Props, ButtonInterface>(
         {...otherProps}
         ref={ref}
       >
-        {icon}
-        {icon && <Spacer />}
+        {leftIcon}
+        {leftIcon && <Spacer />}
         {label}
+        {rightIcon && <Spacer />}
+        {rightIcon}
       </Button>
     );
   }

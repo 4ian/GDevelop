@@ -54,6 +54,13 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
       }
     }
 
+    // Migrate renamed themes.
+    if (values.themeName === 'GDevelop default') {
+      values.themeName = 'GDevelop default Light';
+    } else if (values.themeName === 'Dark') {
+      values.themeName = 'Blue Dark';
+    }
+
     return values;
   } catch (e) {
     return null;
@@ -92,6 +99,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     showAllAlertMessages: this._showAllAlertMessages.bind(this),
     showTutorialHint: this._showTutorialHint.bind(this),
     showAllTutorialHints: this._showAllTutorialHints.bind(this),
+    showAnnouncement: this._showAnnouncement.bind(this),
+    showAllAnnouncements: this._showAllAnnouncements.bind(this),
     verifyIfIsNewVersion: this._verifyIfIsNewVersion.bind(this),
     setEventsSheetShowObjectThumbnails: this._setEventsSheetShowObjectThumbnails.bind(
       this
@@ -134,6 +143,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setEventsSheetCancelInlineParameter: this._setEventsSheetCancelInlineParameter.bind(
       this
     ),
+    setShowCommunityExtensions: this._setShowCommunityExtensions.bind(this),
+    setShowGetStartedSection: this._setShowGetStartedSection.bind(this),
   };
 
   componentDidMount() {
@@ -255,6 +266,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _setShowGetStartedSection(showGetStartedSection: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showGetStartedSection,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _setThemeName(themeName: string) {
     this.setState(
       state => ({
@@ -311,6 +334,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           eventsSheetCancelInlineParameter,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setShowCommunityExtensions(showCommunityExtensions: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showCommunityExtensions,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -414,6 +449,33 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _showAnnouncement(identifier: string, show: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hiddenAnnouncements: {
+            ...state.values.hiddenAnnouncements,
+            [identifier]: !show,
+          },
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _showAllAnnouncements() {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hiddenAnnouncements: {},
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _persistValuesToLocalStorage(preferences: Preferences) {
     try {
       localStorage.setItem(
@@ -496,9 +558,13 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _insertRecentProjectFile(newRecentFile: FileMetadataAndStorageProviderName) {
+    // Do not store recent project in preferences as they will be accessible only from user account.
+    if (newRecentFile.storageProviderName === 'Cloud') return;
+
     let recentProjectFiles = this._getRecentProjectFiles();
     const isNotNewRecentFile = recentFile =>
-      JSON.stringify(recentFile) !== JSON.stringify(newRecentFile);
+      recentFile.fileMetadata.fileIdentifier !==
+      newRecentFile.fileMetadata.fileIdentifier;
     this._setRecentProjectFiles(
       [newRecentFile, ...recentProjectFiles.filter(isNotNewRecentFile)].slice(
         0,
@@ -508,10 +574,11 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _removeRecentProjectFile(recentFile: FileMetadataAndStorageProviderName) {
-    const isNotSadPathRecentFile = recentFileItem =>
-      JSON.stringify(recentFileItem) !== JSON.stringify(recentFile);
+    const isNotRemovedRecentFile = recentFileItem =>
+      recentFileItem.fileMetadata.fileIdentifier !==
+      recentFile.fileMetadata.fileIdentifier;
     this._setRecentProjectFiles(
-      [...this._getRecentProjectFiles().filter(isNotSadPathRecentFile)].slice(
+      [...this._getRecentProjectFiles().filter(isNotRemovedRecentFile)].slice(
         0,
         MAX_RECENT_FILES_COUNT
       )

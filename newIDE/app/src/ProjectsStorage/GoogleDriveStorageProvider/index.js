@@ -276,7 +276,7 @@ const showFilePicker = ({
 export default ({
   internalName: 'GoogleDrive',
   name: t`Google Drive`,
-  renderIcon: () => <GoogleDrive />,
+  renderIcon: props => <GoogleDrive fontSize={props.size} />,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
     if (appArguments.state) {
       try {
@@ -375,74 +375,81 @@ export default ({
       },
       onSaveProject: (project: gdProject, fileMetadata: FileMetadata) => {
         const fileId = fileMetadata.fileIdentifier;
+        const newFileMetadata = {
+          ...fileMetadata,
+          lastModifiedDate: Date.now(),
+        };
 
         const content = serializeToJSON(project);
         return authenticate()
           .then(googleUser => patchJsonFile(fileId, googleUser, content))
           .then(() => ({
             wasSaved: true,
-            fileMetadata,
+            fileMetadata: newFileMetadata,
           }));
       },
-      onSaveProjectAs: (project: gdProject, fileMetadata: ?FileMetadata) => {
+      onChooseSaveProjectAsLocation: (
+        project: gdProject,
+        fileMetadata: ?FileMetadata
+      ) => {
         return new Promise(resolve => {
           setDialog(() => (
             <GoogleDriveSaveAsDialog
               onShowFilePicker={showFilePicker}
               onCancel={() => {
                 closeDialog();
-                resolve({ wasSaved: false, fileMetadata });
+                resolve({ fileMetadata: null });
               }}
-              onSave={({ selectedFileOrFolder, newFileName }) => {
-                const content = serializeToJSON(project);
-
+              onSave={async ({ selectedFileOrFolder, newFileName }) => {
+                await authenticate();
                 if (selectedFileOrFolder.type === 'FOLDER') {
-                  return authenticate().then(googleUser =>
-                    createNewJsonFile(
-                      selectedFileOrFolder.id,
-                      newFileName
-                    ).then(newFileId =>
-                      patchJsonFile(newFileId, googleUser, content).then(() => {
-                        closeDialog();
-                        resolve({
-                          wasSaved: true,
-                          fileMetadata: {
-                            fileIdentifier: newFileId,
-                          },
-                        });
-                      })
-                    )
+                  const newFileId = await createNewJsonFile(
+                    selectedFileOrFolder.id,
+                    newFileName
                   );
+                  resolve({
+                    fileMetadata: {
+                      fileIdentifier: newFileId,
+                    },
+                  });
                 } else {
-                  return authenticate()
-                    .then(googleUser =>
-                      patchJsonFile(
-                        selectedFileOrFolder.id,
-                        googleUser,
-                        content
-                      )
-                    )
-                    .then(() => {
-                      closeDialog();
-                      resolve({
-                        wasSaved: true,
-                        fileMetadata: {
-                          fileIdentifier: selectedFileOrFolder.id,
-                        },
-                      });
-                    });
+                  resolve({
+                    fileMetadata: {
+                      fileIdentifier: selectedFileOrFolder.id,
+                    },
+                  });
                 }
               }}
             />
           ));
         });
       },
+      onSaveProjectAs: async (
+        project: gdProject,
+        fileMetadata: ?FileMetadata,
+        options
+      ) => {
+        if (!fileMetadata)
+          throw new Error('A location was not chosen before saving as.');
+
+        const content = serializeToJSON(project);
+        if (options && options.onStartSaving) options.onStartSaving();
+
+        const googleUser = await authenticate();
+        await options.onMoveResources();
+        await patchJsonFile(fileMetadata.fileIdentifier, googleUser, content);
+
+        closeDialog();
+        return {
+          wasSaved: true,
+        };
+      },
       getOpenErrorMessage: (error: Error): MessageDescriptor => {
         if (!apisLoaded) {
           return t`Google Drive could not be loaded. Check that you are not offline and have a proper internet connection, then try again.`;
         }
 
-        return t`Check that you don't have any blocked popup (if so, allow them and retry) and that you have the authorizations for reading the file you're trying to access.`;
+        return t`Check that you don't have any blocked popup (if so, allow them and retry) and that you have the authorization for reading the file you're trying to access.`;
       },
     };
   },

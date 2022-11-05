@@ -13,7 +13,7 @@ namespace gdjs {
        * @param runtimeObject The object to keep in the lists
        */
       export const pickOnly = function (
-        objectsLists: Hashtable<Array<gdjs.RuntimeObject>>,
+        objectsLists: ObjectsLists,
         runtimeObject: gdjs.RuntimeObject
       ) {
         for (const listName in objectsLists.items) {
@@ -36,7 +36,7 @@ namespace gdjs {
       /**
        * Do a test on two tables of objects so as to pick only the pair of objects for which the test is true.
        *
-       * Note that the predicate method is not called stricly for each pair: When considering a pair of objects, if
+       * Note that the predicate method is not called strictly for each pair: When considering a pair of objects, if
        * these objects have already been marked as picked, the predicate method won't be called again.
        *
        * Cost (Worst case, predicate being always false):
@@ -63,8 +63,8 @@ namespace gdjs {
           object2: gdjs.RuntimeObject,
           extraArg: any
         ) => boolean,
-        objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
-        objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
         inverted: boolean,
         extraArg: any
       ) {
@@ -170,7 +170,7 @@ namespace gdjs {
        */
       export const pickObjectsIf = function (
         predicate: Function,
-        objectsLists: Hashtable<Array<gdjs.RuntimeObject>>,
+        objectsLists: ObjectsLists,
         negatePredicate: boolean,
         extraArg: any
       ): boolean {
@@ -219,11 +219,11 @@ namespace gdjs {
       };
 
       export const hitBoxesCollisionTest = function (
-        objectsLists1,
-        objectsLists2,
-        inverted,
-        runtimeScene,
-        ignoreTouchingEdges
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
+        inverted: boolean,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        ignoreTouchingEdges: boolean
       ) {
         return gdjs.evtTools.object.twoListsTest(
           gdjs.RuntimeObject.collisionTest,
@@ -239,10 +239,10 @@ namespace gdjs {
       };
 
       export const distanceTest = function (
-        objectsLists1,
-        objectsLists2,
-        distance,
-        inverted
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
+        distance: float,
+        inverted: boolean
       ) {
         return gdjs.evtTools.object.twoListsTest(
           gdjs.evtTools.object._distanceBetweenObjects,
@@ -278,10 +278,10 @@ namespace gdjs {
       };
 
       export const movesTowardTest = function (
-        objectsLists1,
-        objectsLists2,
-        tolerance,
-        inverted
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
+        tolerance: float,
+        inverted: boolean
       ) {
         return gdjs.evtTools.object.twoListsTest(
           gdjs.evtTools.object._movesToward,
@@ -337,7 +337,10 @@ namespace gdjs {
         return true;
       };
 
-      export const pickRandomObject = function (runtimeScene, objectsLists) {
+      export const pickRandomObject = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        objectsLists: ObjectsLists
+      ) {
         // Compute one many objects we have
         let objectsCount = 0;
         for (let listName in objectsLists.items) {
@@ -403,14 +406,14 @@ namespace gdjs {
       };
 
       export const raycastObject = function (
-        objectsLists,
-        x,
-        y,
-        angle,
-        dist,
-        varX,
-        varY,
-        inverted
+        objectsLists: ObjectsLists,
+        x: float,
+        y: float,
+        angle: float,
+        dist: float,
+        varX: gdjs.Variable,
+        varY: gdjs.Variable,
+        inverted: boolean
       ) {
         return gdjs.evtTools.object.raycastObjectToPosition(
           objectsLists,
@@ -425,22 +428,22 @@ namespace gdjs {
       };
 
       export const raycastObjectToPosition = function (
-        objectsLists,
-        x,
-        y,
-        endX,
-        endY,
-        varX,
-        varY,
-        inverted
+        objectsLists: ObjectsLists,
+        x: float,
+        y: float,
+        endX: float,
+        endY: float,
+        varX: gdjs.Variable,
+        varY: gdjs.Variable,
+        inverted: boolean
       ) {
-        let matchObject = null;
+        let matchObject: gdjs.RuntimeObject | null = null;
         let testSqDist = inverted
           ? 0
           : (endX - x) * (endX - x) + (endY - y) * (endY - y);
         let resultX = 0;
         let resultY = 0;
-        const lists = gdjs.staticArray(
+        const lists: RuntimeObject[][] = gdjs.staticArray(
           gdjs.evtTools.object.raycastObjectToPosition
         );
         objectsLists.values(lists);
@@ -481,9 +484,9 @@ namespace gdjs {
       export const doCreateObjectOnScene = function (
         objectsContext: EventsFunctionContext | gdjs.RuntimeScene,
         objectName: string,
-        objectsLists: Hashtable<Array<gdjs.RuntimeObject>>,
-        x,
-        y,
+        objectsLists: ObjectsLists,
+        x: float,
+        y: float,
         layerName: string
       ) {
         // objectsContext will either be the gdjs.RuntimeScene or, in an events function, the
@@ -509,19 +512,19 @@ namespace gdjs {
        * Allows events to create a new object on a scene.
        */
       export const createObjectOnScene = function (
-        objectsContext,
-        objectsLists,
-        x,
-        y,
-        layer
+        objectsContext: EventsFunctionContext | gdjs.RuntimeScene,
+        objectsLists: ObjectsLists,
+        x: float,
+        y: float,
+        layerName: string
       ) {
         gdjs.evtTools.object.doCreateObjectOnScene(
           objectsContext,
-          objectsLists.firstKey(),
+          objectsLists.firstKey() as string,
           objectsLists,
           x,
           y,
-          layer
+          layerName
         );
       };
 
@@ -529,12 +532,12 @@ namespace gdjs {
        * Allows events to create a new object on a scene.
        */
       export const createObjectFromGroupOnScene = function (
-        objectsContext,
-        objectsLists,
-        objectName,
-        x,
-        y,
-        layer
+        objectsContext: EventsFunctionContext | gdjs.RuntimeScene,
+        objectsLists: ObjectsLists,
+        objectName: string,
+        x: float,
+        y: float,
+        layerName: string
       ) {
         gdjs.evtTools.object.doCreateObjectOnScene(
           objectsContext,
@@ -542,7 +545,7 @@ namespace gdjs {
           objectsLists,
           x,
           y,
-          layer
+          layerName
         );
       };
 

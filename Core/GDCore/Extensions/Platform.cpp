@@ -7,7 +7,9 @@
 
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/Log.h"
 
 using namespace std;
 
@@ -91,24 +93,22 @@ std::shared_ptr<gd::PlatformExtension> Platform::GetExtension(
   return std::shared_ptr<gd::PlatformExtension>();
 }
 
-std::unique_ptr<gd::Object> Platform::CreateObject(
-    gd::String type, const gd::String& name) const {
+std::unique_ptr<gd::ObjectConfiguration> Platform::CreateObjectConfiguration(
+    gd::String type) const {
   if (creationFunctionTable.find(type) == creationFunctionTable.end()) {
-    std::cout << "Tried to create an object with an unknown type: " << type
-              << " for platform " << GetName() << "!" << std::endl;
+    gd::LogWarning("Tried to create an object with an unknown type: " + type
+              + " for platform " + GetName() + "!");
     type = "";
     if (creationFunctionTable.find("") == creationFunctionTable.end()) {
-      std::cout << "Unable to create a Base object!" << std::endl;
+      gd::LogError("Unable to create a Base object!");
       return nullptr;
     }
   }
 
   // Create a new object with the type we want.
-  std::unique_ptr<gd::Object> object =
-      (creationFunctionTable.find(type)->second)(name);
-  object->SetType(type);
-
-  return std::unique_ptr<gd::Object>(std::move(object));
+  auto objectConfiguration = (creationFunctionTable.find(type)->second)();
+  objectConfiguration->SetType(type);
+  return objectConfiguration;
 }
 
 #if defined(GD_IDE_ONLY)

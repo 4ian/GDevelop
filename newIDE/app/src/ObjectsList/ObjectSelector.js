@@ -27,6 +27,9 @@ type Props = {|
 
   noGroups?: boolean,
 
+  /** A list of object names to exclude from the autocomplete list (for exasmple if they have already been selected). */
+  excludedObjectOrGroupNames?: Array<string>,
+
   onChoose?: string => void,
   onChange: string => void,
   onRequestClose?: () => void,
@@ -52,12 +55,14 @@ const getObjectsAndGroupsDataSource = ({
   objectsContainer,
   noGroups,
   allowedObjectType,
+  excludedObjectOrGroupNames,
 }: {|
   project: ?gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   noGroups: ?boolean,
   allowedObjectType: ?string,
+  excludedObjectOrGroupNames: ?Array<string>,
 |}): DataSource => {
   const list = enumerateObjectsAndGroups(
     globalObjectsContainer,
@@ -72,7 +77,10 @@ const getObjectsAndGroupsDataSource = ({
         ? () => (
             <ListIcon
               iconSize={iconSize}
-              src={ObjectsRenderingService.getThumbnail(project, object)}
+              src={ObjectsRenderingService.getThumbnail(
+                project,
+                object.getConfiguration()
+              )}
             />
           )
         : undefined,
@@ -87,7 +95,13 @@ const getObjectsAndGroupsDataSource = ({
         };
       });
 
-  return [...objects, { type: 'separator' }, ...groups];
+  const fullList = [...objects, { type: 'separator' }, ...groups];
+  return excludedObjectOrGroupNames
+    ? fullList.filter(
+        //$FlowFixMe
+        ({ value }) => !excludedObjectOrGroupNames.includes(value)
+      )
+    : fullList;
 };
 
 const checkHasRequiredCapability = ({
@@ -153,6 +167,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       onRequestClose,
       onApply,
       id,
+      excludedObjectOrGroupNames,
       ...rest
     } = this.props;
 
@@ -162,6 +177,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       objectsContainer,
       noGroups,
       allowedObjectType,
+      excludedObjectOrGroupNames,
     });
     const hasValidChoice =
       objectAndGroups.filter(

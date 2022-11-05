@@ -24,7 +24,10 @@ class ExternalEvents;
 class ResourcesManager;
 class ExternalLayout;
 class EventsFunctionsExtension;
+class EventsBasedObject;
+class EventsBasedBehavior;
 class Object;
+class ObjectConfiguration;
 class VariablesContainer;
 class ArbitraryResourceWorker;
 class SourceFile;
@@ -455,20 +458,20 @@ class GD_CORE_API Project : public ObjectsContainer {
 
   /**
    * Create an object of the given type with the specified name.
-   *
-   * \note A project can use more than one platform. In this case, the first
-   * platform supporting the object is used, unless \a platformName argument is
-   * not empty.<br> It is assumed that each platform provides an equivalent
-   * object.
-   *
+   * 
    * \param type The type of the object
    * \param name The name of the object
-   * \param platformName The name of the platform to be used. If empty, the
-   * first platform supporting the object is used.
    */
   std::unique_ptr<gd::Object> CreateObject(const gd::String& type,
-                                           const gd::String& name,
-                                           const gd::String& platformName = "");
+                                           const gd::String& name) const;
+
+  /**
+   * Create an object configuration of the given type.
+   * 
+   * \param type The type of the object
+   */
+  std::unique_ptr<gd::ObjectConfiguration> CreateObjectConfiguration(
+      const gd::String& type) const;
 
   /**
    * Create an event of the given type.
@@ -827,6 +830,37 @@ class GD_CORE_API Project : public ObjectsContainer {
    * \brief Remove all the events functions extensions.
    */
   void ClearEventsFunctionsExtensions();
+
+  /**
+   * \brief  Check if events based object with a given type exists.
+   */
+  bool HasEventsBasedObject(const gd::String& type) const;
+
+  /**
+   * \brief Return the events based object with a given type.
+   */
+  gd::EventsBasedObject& GetEventsBasedObject(const gd::String& type);
+
+  /**
+   * \brief Return the events based object with a given type.
+   */
+  const gd::EventsBasedObject& GetEventsBasedObject(const gd::String& type) const;
+
+  /**
+   * \brief  Check if events based behavior with a given type exists.
+   */
+  bool HasEventsBasedBehavior(const gd::String& type) const;
+
+  /**
+   * \brief Return the events based behavior with a given type.
+   */
+  gd::EventsBasedBehavior& GetEventsBasedBehavior(const gd::String& type);
+
+  /**
+   * \brief Return the events based behavior with a given type.
+   */
+  const gd::EventsBasedBehavior& GetEventsBasedBehavior(const gd::String& type) const;
+
   ///@}
 
   /** \name Resources management

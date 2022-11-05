@@ -15,20 +15,40 @@ import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import { sendExampleDetailsOpened } from '../../Utils/Analytics/EventSender';
 import { t } from '@lingui/macro';
 
-type Props = {|
-  isOpening: boolean,
-  onOpen: ExampleShortHeader => Promise<void>,
-  focusOnMount?: boolean,
-|};
+// When showing examples, always put the starters first.
+export const prepareExamples = (
+  examples: Array<ExampleShortHeader>
+): Array<ExampleShortHeader> =>
+  examples.sort((example1, example2) => {
+    const isExample1Starter = example1.tags.includes('Starter');
+    const isExample2Starter = example2.tags.includes('Starter');
+    return isExample1Starter && !isExample2Starter
+      ? -1
+      : !isExample1Starter && isExample2Starter
+      ? 1
+      : 0;
+  });
 
 const getExampleName = (exampleShortHeader: ExampleShortHeader) =>
   exampleShortHeader.name;
 
-export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
+type Props = {|
+  isOpening: boolean,
+  onOpen: ExampleShortHeader => Promise<void>,
+  focusOnMount?: boolean,
+  initialExampleShortHeader: ?ExampleShortHeader,
+|};
+
+export const ExampleStore = ({
+  isOpening,
+  onOpen,
+  focusOnMount,
+  initialExampleShortHeader,
+}: Props) => {
   const [
     selectedExampleShortHeader,
     setSelectedExampleShortHeader,
-  ] = React.useState<?ExampleShortHeader>(null);
+  ] = React.useState<?ExampleShortHeader>(initialExampleShortHeader);
   const {
     filters,
     searchResults,
@@ -81,16 +101,19 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
       <ResponsiveWindowMeasurer>
         {windowWidth => (
           <Column expand noMargin useFullHeight>
-            <SearchBar
-              value={searchText}
-              onChange={setSearchText}
-              onRequestSearch={() => {}}
-              aspect="add-margins-only-if-modern-theme"
-              tagsHandler={tagsHandler}
-              tags={filters && filters.defaultTags}
-              ref={searchBarRef}
-              placeholder={t`Search examples`}
-            />
+            <Line>
+              <Column expand>
+                <SearchBar
+                  value={searchText}
+                  onChange={setSearchText}
+                  onRequestSearch={() => {}}
+                  tagsHandler={tagsHandler}
+                  tags={filters && filters.defaultTags}
+                  ref={searchBarRef}
+                  placeholder={t`Search examples`}
+                />
+              </Column>
+            </Line>
             <Line
               expand
               overflow={
@@ -103,7 +126,8 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
                 onRetry={fetchExamplesAndFilters}
                 error={error}
                 searchItems={
-                  searchResults && searchResults.map(({ item }) => item)
+                  searchResults &&
+                  prepareExamples(searchResults.map(({ item }) => item))
                 }
                 getSearchItemUniqueId={getExampleName}
                 renderSearchItem={(exampleShortHeader, onHeightComputed) => (

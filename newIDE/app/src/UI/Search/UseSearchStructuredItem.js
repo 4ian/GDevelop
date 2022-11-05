@@ -4,8 +4,25 @@ import { type ChosenCategory } from './FiltersChooser';
 import shuffle from 'lodash/shuffle';
 import Fuse from 'fuse.js';
 
-export type SearchMatch = {| key: string, indices: number[][], value: string |};
-export type SearchResult<T> = {| item: T, matches: SearchMatch[] |};
+export type SearchMatch = {|
+  key: string,
+  indices: number[][],
+  value: string,
+|};
+export type SearchResult<T> = {|
+  item: T,
+  matches: SearchMatch[],
+|};
+
+type SearchOptions = {|
+  searchText: string,
+  chosenItemCategory?: string,
+  chosenCategory: ?ChosenCategory,
+  chosenFilters: Set<string>,
+  excludedTiers: Set<string>,
+  defaultFirstSearchItemIds: Array<string>,
+  shuffleResults?: boolean,
+|};
 
 export const sharedFuseConfiguration = {
   minMatchCharLength: 1,
@@ -53,15 +70,28 @@ export const tuneMatches = <T>(result: SearchResult<T>, searchText: string) =>
  * Filter a list of items according to the chosen category
  * and the chosen filters.
  */
-export const filterSearchResults = <SearchItem: { tags: Array<string> }>(
-  searchResults: ?Array<{| item: SearchItem, matches: SearchMatch[] |}>,
+export const filterSearchResults = <
+  SearchItem: {
+    // All search items have tags:
+    tags: Array<string>,
+    // Some search items can have tiers:
+    +tier?: string,
+    +category?: string,
+  }
+>(
+  searchResults: ?Array<SearchResult<SearchItem>>,
+  chosenItemCategory: ?string,
   chosenCategory: ?ChosenCategory,
-  chosenFilters: Set<string>
-): ?Array<{| item: SearchItem, matches: SearchMatch[] |}> => {
+  chosenFilters: Set<string>,
+  excludedTiers: Set<string>
+): ?Array<SearchResult<SearchItem>> => {
   if (!searchResults) return null;
 
   const startTime = performance.now();
   const filteredSearchResults = searchResults
+    .filter(
+      ({ item }) => !chosenItemCategory || item.category === chosenItemCategory
+    )
     .filter(({ item: { tags } }) => {
       if (!chosenCategory) return true;
 
@@ -84,15 +114,17 @@ export const filterSearchResults = <SearchItem: { tags: Array<string> }>(
 
       return true;
     })
-    .filter(({ item: { tags } }) => {
-      return (
-        chosenFilters.size === 0 || tags.some(tag => chosenFilters.has(tag))
-      );
+    .filter(({ item: { tags, tier } }) => {
+      const passTier = !tier || !excludedTiers.has(tier);
+      const passChosenFilters =
+        chosenFilters.size === 0 || tags.some(tag => chosenFilters.has(tag));
+
+      return passTier && passChosenFilters;
     });
 
   const totalTime = performance.now() - startTime;
   console.info(
-    `Filtered items by category/filters in ${totalTime.toFixed(3)}ms.`
+    `Filtered items by category/filters/tier in ${totalTime.toFixed(3)}ms.`
   );
   return filteredSearchResults;
 };
@@ -104,32 +136,54 @@ export const filterSearchResults = <SearchItem: { tags: Array<string> }>(
  * then returns the results of the search (according to the
  * search text and the chosen category/filters).
  */
-export const useSearchItem = <SearchItem: { tags: Array<string> }>(
+export const useSearchStructuredItem = <
+  SearchItem: {
+    // All search items have tags:
+    tags: Array<string>,
+    // Some search items can have tiers:
+    +tier?: string,
+    +category?: string,
+  }
+>(
   searchItemsById: ?{ [string]: SearchItem },
-  searchText: string,
-  chosenCategory: ?ChosenCategory,
-  chosenFilters: Set<string>
+  {
+    searchText,
+    chosenItemCategory,
+    chosenCategory,
+    chosenFilters,
+    excludedTiers,
+    defaultFirstSearchItemIds,
+    shuffleResults = true,
+  }: SearchOptions
 ): ?Array<{| item: SearchItem, matches: SearchMatch[] |}> => {
   const searchApiRef = React.useRef<?any>(null);
   const [searchResults, setSearchResults] = React.useState<?Array<{|
     item: SearchItem,
     matches: SearchMatch[],
   |}>>(null);
-
   // Keep in memory a list of all the items, shuffled for
   // easing random discovery of items when no search is done.
-  const shuffledSearchResults = React.useMemo(
+  const orderedSearchResults: Array<
+    SearchResult<SearchItem>
+  > | null = React.useMemo(
     () => {
       if (!searchItemsById || !Object.keys(searchItemsById).length) return null;
 
-      return shuffle(
-        Object.keys(searchItemsById).map(id => ({
-          item: searchItemsById[id],
-          matches: [],
-        }))
+      const alreadyOrderedIds = new Set<string>(defaultFirstSearchItemIds);
+      const nonOrderedIds = Object.keys(searchItemsById).filter(
+        id => !alreadyOrderedIds.has(id)
       );
+
+      // Return the ordered results first, and shuffle the rest.
+      return [
+        ...defaultFirstSearchItemIds,
+        ...(shuffleResults ? shuffle(nonOrderedIds) : nonOrderedIds),
+      ].map(id => ({
+        item: searchItemsById[id],
+        matches: [],
+      }));
     },
-    [searchItemsById]
+    [searchItemsById, defaultFirstSearchItemIds, shuffleResults]
   );
 
   // Index items that have been loaded.
@@ -181,9 +235,11 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
       if (!searchText) {
         setSearchResults(
           filterSearchResults(
-            shuffledSearchResults,
+            orderedSearchResults,
+            chosenItemCategory,
             chosenCategory,
-            chosenFilters
+            chosenFilters,
+            excludedTiers
           )
         );
       } else {
@@ -212,8 +268,10 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
               item: result.item,
               matches: tuneMatches(result, searchText),
             })),
+            chosenItemCategory,
             chosenCategory,
-            chosenFilters
+            chosenFilters,
+            excludedTiers
           )
         );
       }
@@ -225,12 +283,14 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
       };
     },
     [
-      shuffledSearchResults,
+      orderedSearchResults,
       searchItemsById,
       searchText,
+      chosenItemCategory,
       chosenCategory,
       chosenFilters,
       searchApi,
+      excludedTiers,
     ]
   );
 

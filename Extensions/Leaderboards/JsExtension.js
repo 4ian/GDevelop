@@ -34,7 +34,7 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/all-features/leaderboards')
-      .setCategory('Leaderboards')
+      .setCategory('Players')
       .addInstructionOrExpressionGroupMetadata(_('Leaderboards (experimental)'))
       .setIcon('JsPlatform/Extensions/leaderboard.svg');
 
@@ -44,7 +44,7 @@ module.exports = {
         _('Save player score'),
         _("Save the player's score to the given leaderboard."),
         _(
-          'Send to leaderboard _PARAM1_ the score _PARAM2_ with player name: _PARAM3_.'
+          'Send to leaderboard _PARAM1_ the score _PARAM2_ with player name: _PARAM3_'
         ),
         _('Save score'),
         'JsPlatform/Extensions/leaderboard.svg',
@@ -64,6 +64,32 @@ module.exports = {
       .setIncludeFile('Extensions/Leaderboards/sha256.js')
       .addIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.savePlayerScore');
+
+    extension
+      .addAction(
+        'SaveConnectedPlayerScore',
+        _('Save connected player score'),
+        _("Save the connected player's score to the given leaderboard."),
+        _(
+          'Send to leaderboard _PARAM1_ the score _PARAM2_ for the connected player'
+        ),
+        _('Save score'),
+        'JsPlatform/Extensions/leaderboard.svg',
+        'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('leaderboardId', _('Leaderboard'), '', false)
+      .addParameter(
+        'expression',
+        _('Score to register for the player'),
+        '',
+        false
+      )
+      .setHelpPath('/all-features/leaderboards')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Leaderboards/sha256.js')
+      .addIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setFunctionName('gdjs.evtTools.leaderboards.saveConnectedPlayerScore');
 
     extension
       .addCondition(
@@ -133,7 +159,7 @@ module.exports = {
         'LastSaveError',
         _('Error of last save attempt'),
         _('Get the error of the last save attempt.'),
-        _('Error of last save attempt in leaderboard _PARAM0_'),
+        _('Save score'),
         'JsPlatform/Extensions/leaderboard.svg'
       )
       .addParameter('leaderboardId', _('Leaderboard'), '', true)

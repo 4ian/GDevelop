@@ -117,11 +117,11 @@ namespace gdjs {
     private _manager: gdjs.PlatformObjectsManager;
 
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
       owner: gdjs.RuntimeObject
     ) {
-      super(runtimeScene, behaviorData, owner);
+      super(instanceContainer, behaviorData, owner);
       this._gravity = behaviorData.gravity;
       this._maxFallingSpeed = behaviorData.maxFallingSpeed;
       this._ladderClimbingSpeed = behaviorData.ladderClimbingSpeed || 150;
@@ -146,7 +146,7 @@ namespace gdjs {
       this._potentialCollidingObjects = [];
       this._overlappedJumpThru = [];
 
-      this._manager = gdjs.PlatformObjectsManager.getManager(runtimeScene);
+      this._manager = gdjs.PlatformObjectsManager.getManager(instanceContainer);
 
       this._falling = new Falling(this);
       this._onFloor = new OnFloor(this);
@@ -210,7 +210,7 @@ namespace gdjs {
       return true;
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
+    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;
@@ -219,13 +219,13 @@ namespace gdjs {
       const RSHIFTKEY = 2016;
       const SPACEKEY = 32;
       const object = this.owner;
-      const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
+      const timeDelta = this.owner.getElapsedTime() / 1000;
 
       //0.1) Get the player input:
       this._requestedDeltaX = 0;
       this._requestedDeltaY = 0;
 
-      const inputManager = runtimeScene.getGame().getInputManager();
+      const inputManager = instanceContainer.getGame().getInputManager();
       this._leftKey ||
         (this._leftKey =
           !this._ignoreDefaultControls && inputManager.isKeyPressed(LEFTKEY));
@@ -329,7 +329,7 @@ namespace gdjs {
       this._lastDeltaY = object.getY() - oldY;
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     private _updateSpeed(timeDelta: float): float {
       const previousSpeed = this._currentSpeed;
@@ -1032,6 +1032,7 @@ namespace gdjs {
         ) {
           continue;
         }
+
         if (
           gdjs.RuntimeObject.collisionTest(
             this.owner,
@@ -1140,6 +1141,14 @@ namespace gdjs {
      */
     getGravity(): float {
       return this._gravity;
+    }
+
+    /**
+     * Get maximum angle of a slope for the Platformer Object to run on it as a floor.
+     * @returns the slope maximum angle, in degrees.
+     */
+    getSlopeMaxAngle(): float {
+      return this._slopeMaxAngle;
     }
 
     /**
@@ -1714,6 +1723,17 @@ namespace gdjs {
         behavior._overlappedJumpThru.push(this._floorPlatform!);
         behavior._setFalling();
       }
+
+      // It was originally in checkTransitionBeforeY.
+      // The character is ignoring the floor when moving on X to be able to
+      // follow up a slope when moving Y (it enter inside it).
+      // When the current floor and the wall the character is facing is part of
+      // the same instance, the wall is also ignored when moving on X, but the
+      // wall is too high to follow and it is seen as colliding an obstacle
+      // from behind.
+      // Moving against a wall before jumping in this configuration was making
+      // jumps being aborted.
+      behavior._checkTransitionJumping();
     }
 
     beforeMovingX() {
@@ -1726,10 +1746,8 @@ namespace gdjs {
 
     checkTransitionBeforeY(timeDelta: float) {
       const behavior = this._behavior;
-      //Go on a ladder
+      // Go on a ladder
       behavior._checkTransitionOnLadder();
-      //Jumping
-      behavior._checkTransitionJumping();
     }
 
     beforeMovingY(timeDelta: float, oldX: float) {

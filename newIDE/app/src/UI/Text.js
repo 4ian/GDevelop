@@ -2,13 +2,24 @@
 import * as React from 'react';
 import Typography from '@material-ui/core/Typography';
 
+type TextSize =
+  | 'bold-title'
+  | 'title'
+  | 'section-title'
+  | 'block-title'
+  | 'sub-title'
+  | 'body'
+  | 'body2';
+
+type TextColor = 'error' | 'primary' | 'secondary' | 'inherit';
+
 type Props = {|
   /** The text to display. */
   children: ?React.Node,
   /** Size of the text. `body` if not specified. */
-  size?: 'body' | 'body2' | 'title' | 'bold-title',
+  size?: TextSize,
   /** Color of the text */
-  color?: 'error' | 'primary' | 'secondary',
+  color?: TextColor,
   /** The text alignment. */
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify',
   /** Don't shrink the text if there is not enough place in a flex container. */
@@ -17,6 +28,8 @@ type Props = {|
   noMargin?: boolean,
   /** Allow user to select content */
   allowSelection?: boolean,
+  /** When false, prevents browser auto translate features to translate the content (useful for user input, like a username) */
+  allowBrowserAutoTranslate?: boolean,
   /** By default the text is a paragraph (`p`). It can be shown inline  */
   displayInlineAsSpan?: boolean,
   /** A limited set of styling is supported. */
@@ -27,7 +40,7 @@ type Props = {|
 
     // Allow to specify that the text should break words
     overflow?: 'hidden',
-    overflowWrap?: 'break-word',
+    overflowWrap?: 'break-word' | 'anywhere',
     whiteSpace?: 'nowrap' | 'pre-wrap',
     textOverflow?: 'ellipsis',
 
@@ -40,6 +53,41 @@ type Props = {|
 |};
 
 type Interface = {||};
+
+const getVariantFromSize = (size: ?TextSize) => {
+  switch (size) {
+    case 'bold-title':
+      return 'h1';
+    case 'title':
+      return 'h2';
+    case 'section-title':
+      return 'h3';
+    case 'block-title':
+      return 'h4';
+    case 'sub-title':
+      return 'h5';
+    case 'body2':
+      return 'body2';
+    case 'body':
+    default:
+      return 'body1';
+  }
+};
+
+const getTextColorFromColor = (color: ?TextColor) => {
+  switch (color) {
+    case 'error':
+      return 'error';
+    case 'primary':
+      return 'textPrimary';
+    case 'secondary':
+      return 'textSecondary';
+    case 'inherit':
+      return 'inherit';
+    default:
+      return 'textPrimary';
+  }
+};
 
 // A Text to be displayed in the app. Prefer using this
 // than a `<p>`/`<span>` or `<div>` as this will help to maintain
@@ -55,23 +103,17 @@ const Text = React.forwardRef<Props, Interface>(
       noShrink,
       noMargin,
       allowSelection,
+      allowBrowserAutoTranslate = true,
       displayInlineAsSpan,
       ...otherProps // Used by possible parent element (such as Tooltip) to pass down props.
     },
     ref
   ) => (
     <Typography
-      variant={
-        size === 'bold-title'
-          ? 'h5'
-          : size === 'title'
-          ? 'h6'
-          : size === 'body2'
-          ? 'body2'
-          : 'body1'
-      }
+      variant={getVariantFromSize(size)}
       ref={ref}
-      color={color}
+      translate={allowBrowserAutoTranslate ? 'yes' : 'no'}
+      color={getTextColorFromColor(color)}
       component={displayInlineAsSpan ? 'span' : undefined}
       style={{
         ...style,

@@ -6,6 +6,7 @@
 /* Mosaic window and tile */
 .mosaic-gd-theme .mosaic-window-toolbar {
   background: var(--mosaic-toolbar-background-color) !important;
+  box-shadow: none !important;
 }
 
 .mosaic-gd-theme .mosaic-window-body {
@@ -13,9 +14,10 @@
 }
 
 .mosaic-gd-theme .mosaic-window .mosaic-window-title {
-  color: white !important;
+  padding-left: 8px; /* Follow same spacing as in the rest of the app. */
+  color: var(--mosaic-title-color) !important;
   font-weight: 400 !important;
-  font-family: var(--gdevelop-classic-font-family);
+  font-family: var(--gdevelop-modern-font-family);
   font-size: 15px; /* Same as ClosableTabs font size */
 }
 
@@ -41,9 +43,10 @@
 
 .mosaic-gd-theme .mosaic-split.-column:hover .mosaic-split-line {
   background-color: var(--mosaic-toolbar-border-color-hover);
-  transform: scaleY(2);
+  transform: scaleY(2.5);
   box-shadow: none !important;
   cursor: ns-resize;
+  z-index: 5;
 }
 
 /* Separator draggable background (vertical split) */
@@ -58,7 +61,8 @@
 
 .mosaic-gd-theme .mosaic-split.-row:hover .mosaic-split-line {
   background-color: var(--mosaic-toolbar-border-color-hover);
-  transform: scaleX(2);
+  transform: scaleX(2.5);
   box-shadow: none !important;
   cursor: ew-resize;
+  z-index: 5;
 }

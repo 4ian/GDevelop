@@ -75,6 +75,8 @@ import { normalizeString } from '../Utils/Search';
 import { I18n } from '@lingui/react';
 const gd: libGDevelop = global.gd;
 
+const DragSourceAndDropTarget = makeDragSourceAndDropTarget('variable-editor');
+
 const stopEventPropagation = (event: SyntheticPointerEvent<HTMLInputElement>) =>
   event.stopPropagation();
 const preventEventDefaultEffect = (
@@ -105,6 +107,7 @@ type Props = {|
   commitChangesOnBlur: boolean,
   /** If set to small, will collapse variable row by default. */
   size?: 'small',
+  onVariablesUpdated?: () => void,
 |};
 
 const StyledTreeItem = withStyles(theme => ({
@@ -184,11 +187,6 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
-
-  const DragSourceAndDropTarget = React.useMemo(
-    () => makeDragSourceAndDropTarget('variable-editor'),
-    []
-  );
 
   const triggerSearch = React.useCallback(
     () => {
@@ -290,22 +288,25 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         .filter(Boolean)
     : [];
 
-  const _saveToHistory = () => {
+  const _onChange = () => {
     props.historyHandler
       ? props.historyHandler.saveToHistory()
       : setHistory(saveToHistory(history, props.variablesContainer));
+    if (props.onVariablesUpdated) props.onVariablesUpdated();
   };
 
   const _undo = () => {
     props.historyHandler
       ? props.historyHandler.undo()
       : setHistory(undo(history, props.variablesContainer));
+    setSelectedNodes([]);
   };
 
   const _redo = () => {
     props.historyHandler
       ? props.historyHandler.redo()
       : setHistory(redo(history, props.variablesContainer));
+    setSelectedNodes([]);
   };
   const _canUndo = (): boolean =>
     props.historyHandler ? props.historyHandler.canUndo() : canUndo(history);
@@ -452,7 +453,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         }
       }
     });
-    _saveToHistory();
+    _onChange();
     setSelectedNodes(newSelectedNodes);
   };
 
@@ -479,7 +480,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const deleteNode = (nodeId: string): void => {
     const success = _deleteNode(nodeId);
     if (success) {
-      _saveToHistory();
+      _onChange();
     }
   };
 
@@ -731,7 +732,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         movementHasBeenMade = false;
     }
     if (movementHasBeenMade) {
-      _saveToHistory();
+      _onChange();
       forceUpdate();
     }
   };
@@ -751,7 +752,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       );
       variable.getChild(name).setString('');
     } else if (type === gd.Variable.Array) variable.pushNew();
-    _saveToHistory();
+    _onChange();
     if (variable.isFolded()) variable.setFolded(false);
     setExpandedNodes([...expandedNodes, nodeId]);
   };
@@ -774,7 +775,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       newVariable,
       props.variablesContainer.count()
     );
-    _saveToHistory();
+    _onChange();
     setSelectedNodes([inheritedVariableName]);
     setExpandedNodes([...expandedNodes, inheritedVariableName]);
     newVariable.delete();
@@ -792,7 +793,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         null,
         props.variablesContainer.count()
       );
-      _saveToHistory();
+      _onChange();
       setSelectedNodes([newName]);
       setVariablePtrToFocus(variable.ptr);
       return;
@@ -817,7 +818,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       null,
       position
     );
-    _saveToHistory();
+    _onChange();
     setSelectedNodes([newName]);
     setVariablePtrToFocus(variable.ptr);
   };
@@ -979,7 +980,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                         onClick={stopEventPropagation}
                         errorText={nameErrors[variable.ptr]}
                         onChange={newValue => {
-                          onChangeName(nodeId, newValue);
+                          onChangeName(nodeId, newValue, depth);
                           if (nameErrors[variable.ptr]) {
                             const newNameErrors = { ...nameErrors };
                             delete newNameErrors[variable.ptr];
@@ -997,7 +998,11 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                         }}
                         value={name}
                         onBlur={event => {
-                          onChangeName(nodeId, event.currentTarget.value);
+                          onChangeName(
+                            nodeId,
+                            event.currentTarget.value,
+                            depth
+                          );
                           if (nameErrors[variable.ptr]) {
                             const newNameErrors = { ...nameErrors };
                             delete newNameErrors[variable.ptr];
@@ -1223,7 +1228,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     setExpandedNodes(values);
   };
 
-  const onChangeName = (nodeId: string, newName: ?string) => {
+  const onChangeName = (nodeId: string, newName: ?string, depth: number) => {
     const { variable, lineage, name } = getVariableContextFromNodeId(
       nodeId,
       props.variablesContainer
@@ -1242,17 +1247,13 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         });
         return;
       }
-      if (
-        newName.match(/^[0-9].*/) ||
-        newName.includes('.') ||
-        newName.includes(',')
-      ) {
+      if (depth === 0 && !newName.match(/^[\p{L}_][\p{L}0-9_]*$/u)) {
         setNameErrors({
           ...nameErrors,
           [variable.ptr]: (
             <Trans>
-              Variable names should start with a letter and cannot include a
-              comma nor a dot.
+              Top variable names can contain letters from any alphabet, digits
+              and "_" character and cannot start with a digit.
             </Trans>
           ),
         });
@@ -1279,7 +1280,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       hasBeenRenamed = parentVariable.renameChild(name, newName);
     }
     if (hasBeenRenamed) {
-      _saveToHistory();
+      _onChange();
       updateExpandedAndSelectedNodesFollowingNameChange(nodeId, newName);
     } else {
       if (variable)
@@ -1299,7 +1300,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     );
     if (!variable) return;
     variable.castTo(newType);
-    _saveToHistory();
+    _onChange();
   };
 
   const onChangeValue = (nodeId: string, newValue: string) => {
@@ -1374,7 +1375,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
           `Cannot set variable with type ${variable.getType()} - are you sure it's a primitive type?`
         );
     }
-    _saveToHistory();
+    _onChange();
     forceUpdate();
   };
 

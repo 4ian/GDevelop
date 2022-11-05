@@ -24,8 +24,6 @@ namespace gdjs {
     private _angle: float = 0;
 
     //Attributes used when moving
-    private _x: float = 0;
-    private _y: float = 0;
     private _xVelocity: float = 0;
     private _yVelocity: float = 0;
     private _angularSpeed: float = 0;
@@ -48,11 +46,11 @@ namespace gdjs {
     private _temporaryPointForTransformations: FloatPoint = [0, 0];
 
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
       owner: gdjs.RuntimeObject
     ) {
-      super(runtimeScene, behaviorData, owner);
+      super(instanceContainer, behaviorData, owner);
       this._allowDiagonals = behaviorData.allowDiagonals;
       this._acceleration = behaviorData.acceleration;
       this._deceleration = behaviorData.deceleration;
@@ -227,7 +225,7 @@ namespace gdjs {
       return this._movementAngleOffset;
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
+    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;
@@ -237,21 +235,21 @@ namespace gdjs {
       // @ts-ignore
       this._leftKey |=
         !this._ignoreDefaultControls &&
-        runtimeScene.getGame().getInputManager().isKeyPressed(LEFTKEY);
+        instanceContainer.getGame().getInputManager().isKeyPressed(LEFTKEY);
       // @ts-ignore
       this._rightKey |=
         !this._ignoreDefaultControls &&
-        runtimeScene.getGame().getInputManager().isKeyPressed(RIGHTKEY);
+        instanceContainer.getGame().getInputManager().isKeyPressed(RIGHTKEY);
       // @ts-ignore
       this._downKey |=
         !this._ignoreDefaultControls &&
-        runtimeScene.getGame().getInputManager().isKeyPressed(DOWNKEY);
+        instanceContainer.getGame().getInputManager().isKeyPressed(DOWNKEY);
       // @ts-ignore
       this._upKey |=
         !this._ignoreDefaultControls &&
-        runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
+        instanceContainer.getGame().getInputManager().isKeyPressed(UPKEY);
 
-      const elapsedTime = this.owner.getElapsedTime(runtimeScene);
+      const elapsedTime = this.owner.getElapsedTime();
 
       if (!this._leftKey) {
         this._leftKeyPressedDuration = 0;
@@ -330,7 +328,7 @@ namespace gdjs {
       }
 
       const object = this.owner;
-      const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
+      const timeDelta = this.owner.getElapsedTime() / 1000;
       const previousVelocityX = this._xVelocity;
       const previousVelocityY = this._yVelocity;
       this._wasStickUsed = false;
@@ -443,8 +441,7 @@ namespace gdjs {
         if (this._rotateObject) {
           object.rotateTowardAngle(
             directionInDeg + this._angleOffset,
-            this._angularSpeed,
-            runtimeScene
+            this._angularSpeed
           );
         }
       }

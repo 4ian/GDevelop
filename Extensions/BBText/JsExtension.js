@@ -33,7 +33,10 @@ module.exports = {
         'Todor Imreorov',
         'Open source (MIT License)'
       )
-      .setExtensionHelpPath('/objects/bbtext');
+      .setExtensionHelpPath('/objects/bbtext')
+      .setCategory('User interface');
+    extension.addInstructionOrExpressionGroupMetadata(_("BBCode Text Object"))
+        .setIcon("JsPlatform/Extensions/bbcode32.png");
 
     var objectBBText = new gd.ObjectJsImplementation();
     // $FlowExpectedError
@@ -168,7 +171,7 @@ module.exports = {
       .addIncludeFile(
         'Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd.js'
       )
-      .setCategoryFullName(_('Texts'));
+      .setCategoryFullName(_('User interface'));
 
     /**
      * Utility function to add both a setter and a getter to a property from a list.
@@ -289,7 +292,7 @@ module.exports = {
     const setterAndGetterProperties = [
       {
         functionName: 'BBText',
-        iconPath: 'res/actions/text24.png',
+        iconPath: 'res/actions/text24_black.png',
         type: 'string',
         paramLabel: _('BBCode text'),
         conditionDescription: _('Compare the value of the BBCode text.'),
@@ -364,7 +367,7 @@ module.exports = {
       },
       {
         functionName: 'WordWrap',
-        iconPath: 'res/actions/scaleWidth24.png',
+        iconPath: 'res/actions/scaleWidth24_black.png',
         type: 'boolean',
         paramLabel: _('Word wrap'),
         conditionDescription: _('Check if word wrap is enabled.'),
@@ -376,7 +379,7 @@ module.exports = {
       },
       {
         functionName: 'WrappingWidth',
-        iconPath: 'res/actions/scaleWidth24.png',
+        iconPath: 'res/actions/scaleWidth24_black.png',
         type: 'number',
         paramLabel: _('Wrapping width'),
         conditionDescription: _(
@@ -454,7 +457,7 @@ module.exports = {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -463,7 +466,7 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );
@@ -498,7 +501,7 @@ module.exports = {
     RenderedBBTextInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'JsPlatform/Extensions/bbcode24.png';
     };
@@ -507,7 +510,8 @@ module.exports = {
      * This is called to update the PIXI object on the scene editor
      */
     RenderedBBTextInstance.prototype.update = function () {
-      const properties = this._associatedObject.getProperties();
+      const properties = this._associatedObjectConfiguration
+        .getProperties();
 
       const rawText = properties.get('text').getValue();
       if (rawText !== this._pixiObject.text) {

@@ -20,6 +20,7 @@ void DeclareDraggableBehaviorExtension(gd::PlatformExtension& extension) {
             "or disable the behavior when needed."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetCategory("User interface")
       .SetExtensionHelpPath("/behaviors/draggable");
 
   gd::BehaviorMetadata& aut = extension.AddBehavior(
@@ -33,10 +34,9 @@ void DeclareDraggableBehaviorExtension(gd::PlatformExtension& extension) {
       std::make_shared<DraggableBehavior>(),
       std::shared_ptr<gd::BehaviorsSharedData>());
 
-#if defined(GD_IDE_ONLY)
   aut.AddCondition("Dragged",
                    _("Being dragged"),
-                   _("Check if the object is being dragged"),
+                   _("Check if the object is being dragged."),
                    _("_PARAM0_ is being dragged"),
                    "",
                    "CppPlatform/Extensions/draggableicon24.png",
@@ -45,5 +45,16 @@ void DeclareDraggableBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "Draggable")
       .SetFunctionName("IsDragged");
-#endif
+
+  aut.AddCondition("Dropped",
+                   _("Was just dropped"),
+                   _("Check if the object was just dropped after being dragged."),
+                   _("_PARAM0_ was just dropped"),
+                   "",
+                   "CppPlatform/Extensions/draggableicon24.png",
+                   "CppPlatform/Extensions/draggableicon16.png")
+
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "Draggable")
+      .SetFunctionName("WasJustDropped");
 }

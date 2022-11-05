@@ -36,6 +36,14 @@ export type Game = {
   description?: string,
   thumbnailUrl?: string,
   discoverable?: boolean,
+  acceptsBuildComments?: boolean,
+  acceptsGameComments?: boolean,
+  displayAdsOnGamePage?: boolean,
+};
+
+export type GameCategory = {
+  name: string,
+  type: 'user-defined' | 'admin-only',
 };
 
 export type GameSlug = {
@@ -81,24 +89,9 @@ export type GameApiError = {|
   code: 'game-deletion/leaderboards-exist',
 |};
 
-export const allGameCategories = [
-  'action',
-  'adventure',
-  'shooter',
-  'platformer',
-  'rpg',
-  'horror',
-  'strategy',
-  'puzzle',
-  'story-rich',
-  'survival',
-  'racing',
-  'building',
-  'simulation',
-  'sport',
-  'multiplayer',
-  'leaderboard',
-];
+const capitalize = (str: string) => {
+  return str ? str[0].toUpperCase() + str.substr(1) : '';
+};
 
 export const getCategoryName = (category: string, i18n: I18nType) => {
   switch (category) {
@@ -134,8 +127,10 @@ export const getCategoryName = (category: string, i18n: I18nType) => {
       return i18n._(t`Multiplayer`);
     case 'leaderboard':
       return i18n._(t`Leaderboard`);
+    case 'educational':
+      return i18n._(t`Educational`);
     default:
-      return category;
+      return capitalize(category);
   }
 };
 
@@ -225,6 +220,9 @@ export const updateGame = (
     orientation,
     thumbnailUrl,
     discoverable,
+    acceptsBuildComments,
+    acceptsGameComments,
+    displayAdsOnGamePage,
   }: {|
     gameName?: string,
     categories?: string[],
@@ -237,6 +235,9 @@ export const updateGame = (
     orientation?: string,
     thumbnailUrl?: ?string,
     discoverable?: boolean,
+    acceptsBuildComments?: boolean,
+    acceptsGameComments?: boolean,
+    displayAdsOnGamePage?: boolean,
   |}
 ): Promise<Game> => {
   return getAuthorizationHeader()
@@ -255,6 +256,9 @@ export const updateGame = (
           orientation,
           thumbnailUrl,
           discoverable,
+          acceptsBuildComments,
+          acceptsGameComments,
+          displayAdsOnGamePage,
         },
         {
           params: {
@@ -407,5 +411,11 @@ export const getGameSlugs = (
         },
       })
     )
+    .then(response => response.data);
+};
+
+export const getGameCategories = (): Promise<GameCategory[]> => {
+  return axios
+    .get(`${GDevelopGameApi.baseUrl}/game-category`)
     .then(response => response.data);
 };

@@ -11,7 +11,7 @@ import { getStartupTimesSummary } from '../StartupTimes';
 import { getIDEVersion, getIDEVersionWithHash } from '../../Version';
 import { loadPreferencesFromLocalStorage } from '../../MainFrame/Preferences/PreferencesProvider';
 import { getBrowserLanguageOrLocale } from '../Language';
-import { isUserflowRunning } from '../../MainFrame/Onboarding/OnboardingDialog';
+import { currentlyRunningInAppTutorial } from '../../InAppTutorial/InAppTutorialProvider';
 import optionalRequire from '../OptionalRequire';
 import Window from '../Window';
 const electron = optionalRequire('electron');
@@ -44,7 +44,7 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
   keenClient.recordEvent(name, metadata);
   posthog.capture(name, {
     ...metadata,
-    isInAppTutorialRunning: isUserflowRunning,
+    isInAppTutorialRunning: currentlyRunningInAppTutorial,
     isInDesktopApp: isElectronApp,
     isInWebApp: !isElectronApp,
   });
@@ -86,6 +86,7 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
       appLanguage,
       browserLanguage,
       programOpeningCount: getProgramOpeningCount(),
+      themeName: userPreferences ? userPreferences.themeName : 'Unknown',
       ...(isElectronApp ? { usedDesktopApp: true } : { usedWebApp: true }),
     };
 
@@ -167,7 +168,8 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
       },
       tutorials: {
         // Useful to differentiate if an event is part of a tutorial or not.
-        isInAppTutorialRunning: isUserflowRunning,
+        isInAppTutorialRunning: !!currentlyRunningInAppTutorial,
+        tutorial: currentlyRunningInAppTutorial,
       },
       language: {
         appLanguage,
@@ -273,9 +275,19 @@ export const sendTutorialOpened = (tutorialName: string) => {
   });
 };
 
+export const sendOnboardingManuallyOpened = () => {
+  recordEvent('onboarding_manually_opened');
+};
+
 export const sendAssetPackOpened = (assetPackTag: string) => {
   recordEvent('asset_pack_opened', {
     assetPackTag,
+  });
+};
+
+export const sendAssetPackBuyClicked = (id: string) => {
+  recordEvent('asset_pack_buy_clicked', {
+    id,
   });
 };
 
@@ -374,47 +386,39 @@ export const sendExternalEditorOpened = (editorName: string) => {
   recordEvent('open_external_editor', { editorName });
 };
 
-export const sendBehaviorsEditorShown = ({
-  parentEditor,
-}: {|
+export const sendBehaviorsEditorShown = (metadata: {|
   parentEditor: 'object-editor-dialog',
 |}) => {
-  recordEvent('behaviors-editor-shown', { parentEditor });
+  recordEvent('behaviors-editor-shown', metadata);
 };
 
-export const sendBehaviorAdded = ({
-  behaviorType,
-  parentEditor,
-}: {|
+export const sendBehaviorAdded = (metadata: {|
   behaviorType: string,
   parentEditor: 'behaviors-editor' | 'instruction-editor-dialog',
 |}) => {
-  recordEvent('behavior-added', { behaviorType, parentEditor });
+  recordEvent('behavior-added', metadata);
 };
 
-export const sendEventsExtractedAsFunction = ({
-  step,
-  parentEditor,
-}: {|
+export const sendEventsExtractedAsFunction = (metadata: {|
   step: 'begin' | 'end',
   parentEditor:
     | 'scene-events-editor'
     | 'extension-events-editor'
     | 'external-events-editor',
 |}) => {
-  recordEvent('events-extracted-as-function', {
-    step,
-    parentEditor,
-  });
+  recordEvent('events-extracted-as-function', metadata);
 };
 
-const trackInAppTutorialProgress = (
-  stepIndex: number,
-  isCompleted: boolean = false
-) => {
-  recordEvent('user-flow-onboarding', { stepIndex, isCompleted });
+export const sendInAppTutorialProgress = (metadata: {|
+  tutorialId: string,
+  step: number,
+  isCompleted: boolean,
+|}) => {
+  const builtInTutorialIds = ['onboarding'];
+  recordEvent(
+    builtInTutorialIds.includes(metadata.tutorialId)
+      ? 'in-app-tutorial-built-in'
+      : 'in-app-tutorial-external',
+    metadata
+  );
 };
-
-// Make this function global so it can be accessed from userflow's
-// step "Evaluate JS" actions
-global.trackInAppTutorialProgress = trackInAppTutorialProgress;

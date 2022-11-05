@@ -43,12 +43,18 @@ const verticalMosaicNodes: EditorMosaicNode = {
 };
 
 type Props = {|
-  object: gdSpriteObject,
+  objectConfiguration: gdSpriteObject,
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
+  onPointsUpdated?: () => void,
 |};
 
-const PointsEditor = (props: Props) => {
+const PointsEditor = ({
+  objectConfiguration,
+  resourcesLoader,
+  project,
+  onPointsUpdated,
+}: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
@@ -70,9 +76,9 @@ const PointsEditor = (props: Props) => {
   const [samePointsForSprites, setSamePointsForSprites] = React.useState(false);
   const forceUpdate = useForceUpdate();
 
-  const spriteObject = gd.asSpriteObject(props.object);
-  const { animation, sprite, hasValidSprite } = getCurrentElements(
-    spriteObject,
+  const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
+  const { animation, sprite } = getCurrentElements(
+    spriteConfiguration,
     animationIndex,
     directionIndex,
     spriteIndex
@@ -82,8 +88,8 @@ const PointsEditor = (props: Props) => {
     () => {
       if (animation && sprite) {
         if (samePointsForAnimations) {
-          mapFor(0, spriteObject.getAnimationsCount(), i => {
-            const otherAnimation = spriteObject.getAnimation(i);
+          mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+            const otherAnimation = spriteConfiguration.getAnimation(i);
             copyAnimationsSpritePoints(sprite, otherAnimation);
           });
         } else if (samePointsForSprites) {
@@ -92,14 +98,16 @@ const PointsEditor = (props: Props) => {
       }
 
       forceUpdate(); // Refresh the preview
+      if (onPointsUpdated) onPointsUpdated();
     },
     [
       animation,
       sprite,
-      spriteObject,
+      spriteConfiguration,
       samePointsForAnimations,
       samePointsForSprites,
       forceUpdate,
+      onPointsUpdated,
     ]
   );
 
@@ -123,8 +131,8 @@ const PointsEditor = (props: Props) => {
 
     setSamePointsForAnimations(
       every(
-        mapFor(0, spriteObject.getAnimationsCount(), i => {
-          const otherAnimation = spriteObject.getAnimation(i);
+        mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+          const otherAnimation = spriteConfiguration.getAnimation(i);
           return allSpritesHaveSamePointsAs(sprite, otherAnimation);
         })
       )
@@ -172,8 +180,8 @@ const PointsEditor = (props: Props) => {
   const editorNodes =
     screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
 
-  if (!props.object.getAnimationsCount()) return null;
-  const resourceName = hasValidSprite ? sprite.getImageName() : '';
+  if (!objectConfiguration.getAnimationsCount()) return null;
+  const resourceName = sprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor } = {
     preview: {
@@ -183,18 +191,18 @@ const PointsEditor = (props: Props) => {
         <Background>
           <ImagePreview
             resourceName={resourceName}
-            imageResourceSource={props.resourcesLoader.getResourceFullUrl(
-              props.project,
+            imageResourceSource={resourcesLoader.getResourceFullUrl(
+              project,
               resourceName,
               {}
             )}
             isImageResourceSmooth={isProjectImageResourceSmooth(
-              props.project,
+              project,
               resourceName
             )}
-            project={props.project}
+            project={project}
             renderOverlay={overlayProps =>
-              hasValidSprite && (
+              sprite && (
                 <PointsPreview
                   {...overlayProps}
                   pointsContainer={sprite}
@@ -218,7 +226,7 @@ const PointsEditor = (props: Props) => {
             <Line>
               <Column expand>
                 <SpriteSelector
-                  spriteObject={spriteObject}
+                  spriteConfiguration={spriteConfiguration}
                   animationIndex={animationIndex}
                   directionIndex={directionIndex}
                   spriteIndex={spriteIndex}

@@ -1,8 +1,10 @@
 // @flow
+import { type I18n as I18nType } from '@lingui/core';
 import {
   type EnumeratedInstructionMetadata,
   type InstructionOrExpressionScope,
 } from './EnumeratedInstructionOrExpressionMetadata';
+import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories.js';
 
 const gd: libGDevelop = global.gd;
 
@@ -44,7 +46,11 @@ const freeActionsToAddToBehavior: ExtensionsExtraInstructions = {};
 
 const freeConditionsToAddToBehavior: ExtensionsExtraInstructions = {
   Physics2: {
-    'Physics2::Physics2Behavior': ['Physics2::Collision'],
+    'Physics2::Physics2Behavior': [
+      'Physics2::Collision',
+      'Physics2::CollisionStarted',
+      'Physics2::CollisionStopped',
+    ],
   },
 };
 
@@ -64,6 +70,17 @@ const freeInstructionsToRemove = {
 
 export const getExtensionPrefix = (extension: gdPlatformExtension): string => {
   return extension.getCategory() + GROUP_DELIMITER + extension.getFullName();
+};
+
+const getExtensionTranslatedPrefix = (
+  extension: gdPlatformExtension,
+  i18n: I18nType
+): string => {
+  return (
+    translateExtensionCategory(extension.getCategory(), i18n) +
+    GROUP_DELIMITER +
+    extension.getFullName()
+  );
 };
 
 /**
@@ -455,6 +472,30 @@ export const enumerateObjectAndBehaviorsInstructions = (
  */
 export const enumerateFreeInstructions = (
   isCondition: boolean
+): Array<EnumeratedInstructionMetadata> => {
+  return doEnumerateFreeInstructions(isCondition, getExtensionPrefix);
+};
+
+/**
+ * Enumerate all the instructions that are not directly tied
+ * to an object.
+ */
+export const enumerateFreeInstructionsWithTranslatedCategories = (
+  isCondition: boolean,
+  i18n: I18nType
+): Array<EnumeratedInstructionMetadata> => {
+  return doEnumerateFreeInstructions(isCondition, extension =>
+    getExtensionTranslatedPrefix(extension, i18n)
+  );
+};
+
+/**
+ * Enumerate all the instructions that are not directly tied
+ * to an object.
+ */
+const doEnumerateFreeInstructions = (
+  isCondition: boolean,
+  getExtensionPrefix: (extension: gdPlatformExtension) => string
 ): Array<EnumeratedInstructionMetadata> => {
   let allFreeInstructions = [];
 

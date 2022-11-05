@@ -16,6 +16,12 @@ import { CategoryChooser } from '../UI/Search/CategoryChooser';
 const getShowcasedGameTitle = (showcasedGame: ShowcasedGame) =>
   showcasedGame.title;
 
+const styles = {
+  categories: {
+    width: 250,
+  },
+};
+
 type Props = {};
 
 export const GamesShowcase = (props: Props) => {
@@ -40,13 +46,16 @@ export const GamesShowcase = (props: Props) => {
     <ResponsiveWindowMeasurer>
       {windowWidth => (
         <Column expand noMargin useFullHeight>
-          <SearchBar
-            value={searchText}
-            onChange={setSearchText}
-            onRequestSearch={() => {}}
-            aspect="add-margins-only-if-modern-theme"
-            placeholder={t`Search games`}
-          />
+          <Line>
+            <Column expand noMargin>
+              <SearchBar
+                value={searchText}
+                onChange={setSearchText}
+                onRequestSearch={() => {}}
+                placeholder={t`Search games`}
+              />
+            </Column>
+          </Line>
           <Line
             expand
             overflow={
@@ -54,23 +63,21 @@ export const GamesShowcase = (props: Props) => {
             }
             noMargin
           >
-            <Background
-              noFullHeight
-              noExpand
-              width={windowWidth === 'small' ? 150 : 250}
-            >
-              <ScrollView>
-                <Subheader>
-                  <Trans>Categories</Trans>
-                </Subheader>
-                <CategoryChooser
-                  allItemsLabel={<Trans>All games</Trans>}
-                  allFilters={filters}
-                  filtersState={filtersState}
-                  error={error}
-                />
-              </ScrollView>
-            </Background>
+            {windowWidth !== 'small' /* Hide categories on small screens */ && (
+              <Background noFullHeight noExpand width={styles.categories.width}>
+                <ScrollView>
+                  <Subheader>
+                    <Trans>Categories</Trans>
+                  </Subheader>
+                  <CategoryChooser
+                    allItemsLabel={<Trans>All games</Trans>}
+                    allFilters={filters}
+                    filtersState={filtersState}
+                    error={error}
+                  />
+                </ScrollView>
+              </Background>
+            )}
             <ListSearchResults
               onRetry={fetchShowcasedGamesAndFilters}
               error={error}

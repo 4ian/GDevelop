@@ -4,23 +4,20 @@ import { t, Trans } from '@lingui/macro';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import Tune from '@material-ui/icons/Tune';
 import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
-import DoubleChevronArrow from '../UI/CustomSvgIcons/DoubleChevronArrow';
+import DoubleChevronArrowLeft from '../UI/CustomSvgIcons/DoubleChevronArrowLeft';
 import { Column, Line, Spacer } from '../UI/Grid';
 import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
 import Window from '../Utils/Window';
 import {
-  sendAssetAddedToProject,
   sendAssetOpened,
   sendAssetPackOpened,
 } from '../Utils/Analytics/EventSender';
-import RaisedButton from '../UI/RaisedButton';
 import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+  type AssetShortHeader,
+  type PublicAssetPack,
+} from '../Utils/GDevelopServices/Asset';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
 import {
@@ -37,40 +34,23 @@ import TextButton from '../UI/TextButton';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
 import { AssetDetails } from './AssetDetails';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import { installAsset } from './InstallAsset';
-import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
-import { showErrorBox } from '../UI/Messages/MessageBox';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import { enumerateObjects } from '../ObjectsList/EnumerateObjects';
-import { AssetPackDialog } from './AssetPackDialog';
 import Home from '@material-ui/icons/Home';
+import PrivateAssetPackInformationDialog from './PrivateAssets/PrivateAssetPackInformationDialog';
+import PlaceholderError from '../UI/PlaceholderError';
+import AlertMessage from '../UI/AlertMessage';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import PrivateAssetPackPurchaseDialog from './PrivateAssets/PrivateAssetPackPurchaseDialog';
 
-type Props = {
+type Props = {|
   project: gdProject,
-  objectsContainer: gdObjectsContainer,
-  events: gdEventsList,
-  focusOnMount?: boolean,
-  onObjectAddedFromAsset: (object: gdObject) => void,
-  layout: ?gdLayout,
-  resourceSources: Array<ResourceSource>,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
-  onChooseResource: ChooseResourceFunction,
-};
+|};
 
-export const AssetStore = ({
-  project,
-  objectsContainer,
-  events,
-  focusOnMount,
-  onObjectAddedFromAsset,
-  layout,
-  resourceSources,
-  resourceExternalEditors,
-  onChooseResource,
-}: Props) => {
+export const AssetStore = ({ project }: Props) => {
   const {
-    assetPacks,
+    publicAssetPacks,
+    privateAssetPacks,
+    loadedReceivedAssetPackInStore,
     searchResults,
     error,
     fetchAssetsAndFilters,
@@ -78,6 +58,7 @@ export const AssetStore = ({
     searchText,
     setSearchText,
     assetFiltersState,
+    assetPackRandomOrdering,
   } = React.useContext(AssetStoreContext);
   const {
     isOnHomePage,
@@ -85,126 +66,131 @@ export const AssetStore = ({
     openedAssetShortHeader,
     filtersState,
   } = navigationState.getCurrentPage();
-
-  React.useEffect(
-    () => {
-      fetchAssetsAndFilters();
-    },
-    [fetchAssetsAndFilters]
-  );
-
   const searchBar = React.useRef<?SearchBarInterface>(null);
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
   const [
-    isAssetPackDialogInstallOpen,
-    setIsAssetPackDialogInstallOpen,
-  ] = React.useState(false);
+    selectedPrivateAssetPackListingData,
+    setSelectedPrivateAssetPackListingData,
+  ] = React.useState<?PrivateAssetPackListingData>(null);
   const [
-    isAssetBeingInstalled,
-    setIsAssetBeingInstalled,
-  ] = React.useState<boolean>(false);
+    purchasingPrivateAssetPackListingData,
+    setPurchasingPrivateAssetPackListingData,
+  ] = React.useState<?PrivateAssetPackListingData>(null);
+  const { onPurchaseSuccessful } = React.useContext(AuthenticatedUserContext);
 
-  const { containerObjectsList } = enumerateObjects(project, objectsContainer);
-  const addedAssetIds = containerObjectsList
-    .map(({ object }) => object.getAssetStoreId())
-    .filter(Boolean);
-
-  const eventsFunctionsExtensionsState = React.useContext(
-    EventsFunctionsExtensionsContext
-  );
-
-  const resourcesFetcher = useResourceFetcher();
-
-  const onOpenDetails = (assetShortHeader: AssetShortHeader) => {
-    sendAssetOpened({
-      id: assetShortHeader.id,
-      name: assetShortHeader.name,
-    });
-    navigationState.openDetailPage(assetShortHeader);
-  };
-
-  const onInstallAsset = React.useCallback(
+  const onOpenDetails = React.useCallback(
     (assetShortHeader: AssetShortHeader) => {
-      setIsAssetBeingInstalled(true);
-      (async () => {
-        try {
-          const installOutput = await installAsset({
-            assetShortHeader,
-            eventsFunctionsExtensionsState,
-            project,
-            objectsContainer,
-            events,
-          });
-          sendAssetAddedToProject({
-            id: assetShortHeader.id,
-            name: assetShortHeader.name,
-          });
-          console.log('Asset successfully installed.');
-
-          installOutput.createdObjects.forEach(object => {
-            onObjectAddedFromAsset(object);
-          });
-
-          await resourcesFetcher.ensureResourcesAreFetched(project);
-        } catch (error) {
-          console.error('Error while installing the asset:', error);
-          showErrorBox({
-            message: `There was an error while installing the asset "${
-              assetShortHeader.name
-            }". Verify your internet connection or try again later.`,
-            rawError: error,
-            errorId: 'install-asset-error',
-          });
-        }
-
-        setIsAssetBeingInstalled(false);
-      })();
+      sendAssetOpened({
+        id: assetShortHeader.id,
+        name: assetShortHeader.name,
+      });
+      navigationState.openDetailPage(assetShortHeader);
     },
-    [
-      resourcesFetcher,
-      eventsFunctionsExtensionsState,
-      project,
-      objectsContainer,
-      events,
-      onObjectAddedFromAsset,
-    ]
+    [navigationState]
   );
 
   // When a pack is selected from the home page,
   // we set it as the chosen category and open the filters panel.
-  const selectPack = (tag: string) => {
-    if (!assetPacks) return;
+  const selectPublicAssetPack = React.useCallback(
+    (assetPack: PublicAssetPack) => {
+      sendAssetPackOpened(assetPack.tag);
 
-    sendAssetPackOpened(tag);
+      if (assetPack.externalWebLink) {
+        Window.openExternalURL(assetPack.externalWebLink);
+      } else {
+        navigationState.openPackPage(assetPack);
+        setIsFiltersPanelOpen(true);
+      }
+    },
+    [navigationState]
+  );
 
-    const assetPack = assetPacks.starterPacks.find(pack => pack.tag === tag);
-    if (!assetPack) {
-      // This can't actually happen.
-      return;
-    }
+  // When a private pack is selected from the home page,
+  // if the user owns it, we set it as the chosen category,
+  // otherwise we open the dialog to buy it.
+  const selectPrivateAssetPack = React.useCallback(
+    (assetPackListingData: PrivateAssetPackListingData) => {
+      sendAssetPackOpened(assetPackListingData.name);
 
-    if (assetPack.externalWebLink) {
-      Window.openExternalURL(assetPack.externalWebLink);
-    } else {
-      navigationState.openPackPage(assetPack);
+      const receivedAssetPack = loadedReceivedAssetPackInStore
+        ? loadedReceivedAssetPackInStore.find(
+            pack => pack.id === assetPackListingData.id
+          )
+        : null;
+
+      if (!receivedAssetPack) {
+        // The user has not received the pack, open the dialog to buy it.
+        setSelectedPrivateAssetPackListingData(assetPackListingData);
+        return;
+      }
+
+      // The user has received the pack, open it.
+      navigationState.openPackPage(receivedAssetPack);
       setIsFiltersPanelOpen(true);
-    }
-  };
+    },
+    [navigationState, loadedReceivedAssetPackInStore]
+  );
+
+  // If the user has received the pack they are currently viewing,
+  // we update the window to show it if they are not already on the pack page.
+  React.useEffect(
+    () => {
+      if (!purchasingPrivateAssetPackListingData) return;
+      // Ensure the user is not already on the pack page, to trigger the effect only once.
+      const currentPage = navigationState.getCurrentPage();
+      const isOnPrivatePackPage =
+        currentPage.openedAssetPack &&
+        currentPage.openedAssetPack.id &&
+        currentPage.openedAssetPack.id ===
+          purchasingPrivateAssetPackListingData.id;
+      if (loadedReceivedAssetPackInStore && !isOnPrivatePackPage) {
+        const receivedAssetPack = loadedReceivedAssetPackInStore.find(
+          pack => pack.id === purchasingPrivateAssetPackListingData.id
+        );
+        if (receivedAssetPack) {
+          // The user has received the pack, close the pack information dialog, and open the pack in the search.
+          setIsFiltersPanelOpen(true);
+          navigationState.openPackPage(receivedAssetPack);
+          setSelectedPrivateAssetPackListingData(null);
+        }
+      }
+    },
+    [
+      loadedReceivedAssetPackInStore,
+      purchasingPrivateAssetPackListingData,
+      navigationState,
+    ]
+  );
 
   // When a tag is selected from the asset details page,
-  // we set it as the chosen category, clear old filters and open the filters panel.
-  const selectTag = (tag: string) => {
-    const assetPack =
-      assetPacks && assetPacks.starterPacks.find(pack => pack.tag === tag);
-    if (assetPack) {
-      navigationState.openPackPage(assetPack);
-    } else {
-      navigationState.openTagPage(tag);
-    }
-    clearAllFilters(assetFiltersState);
-    setIsFiltersPanelOpen(true);
-  };
+  // first determine if it's a public or private pack,
+  // then set it as the chosen category, clear old filters and open the filters panel.
+  const selectTag = React.useCallback(
+    (tag: string) => {
+      const privateAssetPack =
+        loadedReceivedAssetPackInStore &&
+        loadedReceivedAssetPackInStore.find(pack => pack.tag === tag);
+      const publicAssetPack =
+        publicAssetPacks &&
+        publicAssetPacks.starterPacks.find(pack => pack.tag === tag);
+      if (privateAssetPack) {
+        navigationState.openPackPage(privateAssetPack);
+      } else if (publicAssetPack) {
+        navigationState.openPackPage(publicAssetPack);
+      } else {
+        navigationState.openTagPage(tag);
+      }
+      clearAllFilters(assetFiltersState);
+      setIsFiltersPanelOpen(true);
+    },
+    [
+      publicAssetPacks,
+      loadedReceivedAssetPackInStore,
+      navigationState,
+      assetFiltersState,
+    ]
+  );
 
   const capitalize = (str: string) => {
     return str ? str[0].toUpperCase() + str.substr(1) : '';
@@ -212,11 +198,11 @@ export const AssetStore = ({
 
   React.useEffect(
     () => {
-      if (focusOnMount && shouldAutofocusSearchbar && searchBar.current) {
+      if (shouldAutofocusSearchbar && searchBar.current) {
         searchBar.current.focus();
       }
     },
-    [shouldAutofocusSearchbar, focusOnMount]
+    [shouldAutofocusSearchbar]
   );
 
   return (
@@ -224,7 +210,7 @@ export const AssetStore = ({
       <ResponsiveWindowMeasurer>
         {windowWidth => (
           <>
-            <Column expand noMargin useFullHeight>
+            <Column expand noMargin useFullHeight id="asset-store">
               <Line>
                 <Spacer />
                 <IconButton
@@ -263,7 +249,7 @@ export const AssetStore = ({
                   alignItems="center"
                 >
                   {isOnHomePage ? (
-                    <Text size="title">
+                    <Text size="block-title">
                       <Trans>Discover</Trans>
                     </Text>
                   ) : (
@@ -282,38 +268,21 @@ export const AssetStore = ({
                           }}
                         />
                       </Column>
-                      {!openedAssetPack && filtersState.chosenCategory && (
+                      {(openedAssetPack || filtersState.chosenCategory) && (
                         <>
                           <Column expand alignItems="center">
-                            <Text size="title" noMargin>
-                              {capitalize(
-                                filtersState.chosenCategory.node.name
-                              )}
+                            <Text size="block-title" noMargin>
+                              {openedAssetPack
+                                ? openedAssetPack.name
+                                : filtersState.chosenCategory
+                                ? capitalize(
+                                    filtersState.chosenCategory.node.name
+                                  )
+                                : ''}
                             </Text>
                           </Column>
                           {/* to center the title */}
                           <Column expand alignItems="flex-end" noMargin />
-                        </>
-                      )}
-                      {openedAssetPack && (
-                        <>
-                          <Column expand alignItems="center">
-                            <Text size="title" noMargin>
-                              {openedAssetPack.name}
-                            </Text>
-                          </Column>
-                          <Column expand alignItems="flex-end" noMargin>
-                            <RaisedButton
-                              primary
-                              label={<Trans>Add all assets to my scene</Trans>}
-                              onClick={() =>
-                                setIsAssetPackDialogInstallOpen(true)
-                              }
-                              disabled={
-                                !searchResults || searchResults.length === 0
-                              }
-                            />
-                          </Column>
                         </>
                       )}
                     </>
@@ -361,7 +330,7 @@ export const AssetStore = ({
                           <IconButton
                             onClick={() => setIsFiltersPanelOpen(false)}
                           >
-                            <DoubleChevronArrow />
+                            <DoubleChevronArrowLeft />
                           </IconButton>
                         </Line>
                         <Line
@@ -379,13 +348,21 @@ export const AssetStore = ({
                     )}
                   </Background>
                 )}
-                {isOnHomePage && !assetPacks && <PlaceholderLoader />}
-                {isOnHomePage && assetPacks && (
-                  <AssetsHome
-                    assetPacks={assetPacks}
-                    onPackSelection={selectPack}
-                  />
-                )}
+                {isOnHomePage &&
+                  !(publicAssetPacks && privateAssetPacks) &&
+                  !error && <PlaceholderLoader />}
+                {isOnHomePage &&
+                  publicAssetPacks &&
+                  privateAssetPacks &&
+                  assetPackRandomOrdering && (
+                    <AssetsHome
+                      publicAssetPacks={publicAssetPacks}
+                      privateAssetPacksListingData={privateAssetPacks}
+                      assetPackRandomOrdering={assetPackRandomOrdering}
+                      onPublicAssetPackSelection={selectPublicAssetPack}
+                      onPrivateAssetPackSelection={selectPrivateAssetPack}
+                    />
+                  )}
                 {!isOnHomePage && !openedAssetShortHeader && (
                   <BoxSearchResults
                     baseSize={128}
@@ -406,41 +383,55 @@ export const AssetStore = ({
                     }
                   />
                 )}
+                {isOnHomePage && error && (
+                  <PlaceholderError onRetry={fetchAssetsAndFilters}>
+                    <AlertMessage kind="error">
+                      <Trans>
+                        An error occurred when fetching the asset store content.
+                        Please try again later.
+                      </Trans>
+                    </AlertMessage>
+                  </PlaceholderError>
+                )}
                 {openedAssetShortHeader && (
                   <AssetDetails
                     project={project}
-                    objectsContainer={objectsContainer}
-                    resourceSources={resourceSources}
-                    resourceExternalEditors={resourceExternalEditors}
                     onTagSelection={selectTag}
                     assetShortHeader={openedAssetShortHeader}
-                    onAdd={() => onInstallAsset(openedAssetShortHeader)}
-                    onClose={() => navigationState.backToPreviousPage()}
-                    isAddedToScene={addedAssetIds.includes(
-                      openedAssetShortHeader.id
-                    )}
-                    isBeingAddedToScene={isAssetBeingInstalled}
                     onOpenDetails={onOpenDetails}
+                  />
+                )}
+                {!!selectedPrivateAssetPackListingData && (
+                  <PrivateAssetPackInformationDialog
+                    privateAssetPackListingData={
+                      selectedPrivateAssetPackListingData
+                    }
+                    onClose={() => {
+                      setSelectedPrivateAssetPackListingData(null);
+                    }}
+                    onOpenPurchaseDialog={() =>
+                      setPurchasingPrivateAssetPackListingData(
+                        selectedPrivateAssetPackListingData
+                      )
+                    }
+                    isPurchaseDialogOpen={
+                      !!purchasingPrivateAssetPackListingData
+                    }
+                  />
+                )}
+                {!!purchasingPrivateAssetPackListingData && (
+                  <PrivateAssetPackPurchaseDialog
+                    privateAssetPackListingData={
+                      purchasingPrivateAssetPackListingData
+                    }
+                    onClose={() =>
+                      setPurchasingPrivateAssetPackListingData(null)
+                    }
+                    onSuccessfulPurchase={onPurchaseSuccessful}
                   />
                 )}
               </Line>
             </Column>
-            {resourcesFetcher.renderResourceFetcherDialog()}
-            {isAssetPackDialogInstallOpen && searchResults && openedAssetPack && (
-              <AssetPackDialog
-                assetPack={openedAssetPack}
-                assetShortHeaders={searchResults}
-                addedAssetIds={addedAssetIds}
-                onClose={() => setIsAssetPackDialogInstallOpen(false)}
-                onAssetsAdded={() => {
-                  setIsAssetPackDialogInstallOpen(false);
-                }}
-                project={project}
-                objectsContainer={objectsContainer}
-                events={events}
-                onObjectAddedFromAsset={onObjectAddedFromAsset}
-              />
-            )}
           </>
         )}
       </ResponsiveWindowMeasurer>

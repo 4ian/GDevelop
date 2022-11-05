@@ -7,7 +7,8 @@ import PreferencesContext, {
   type AlertMessageIdentifier,
 } from '../../MainFrame/Preferences/PreferencesContext';
 import { useScreenType } from '../Reponsive/ScreenTypeMeasurer';
-import { isUserflowRunning } from '../../MainFrame/Onboarding/OnboardingDialog';
+import GDevelopThemeContext from '../Theme/ThemeContext';
+import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
 type Props = {|
   identifier: AlertMessageIdentifier,
@@ -22,10 +23,12 @@ const DismissableInfoBar = ({
   touchScreenMessage,
   message,
 }: Props) => {
+  const { isInAppTutorialRunning } = React.useContext(InAppTutorialContext);
   const preferences = React.useContext(PreferencesContext);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const screenType = useScreenType();
 
-  return isUserflowRunning ? null : (
+  return isInAppTutorialRunning ? null : (
     <Snackbar
       open={show && !preferences.values.hiddenAlertMessages[identifier]}
       message={
@@ -36,7 +39,9 @@ const DismissableInfoBar = ({
       action={
         <Button
           key="undo"
-          color="primary"
+          color={
+            gdevelopTheme.palette.type === 'light' ? 'secondary' : 'primary'
+          }
           size="small"
           onClick={() => {
             preferences.showAlertMessage(identifier, false);

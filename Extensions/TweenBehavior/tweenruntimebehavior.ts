@@ -1,9 +1,5 @@
 /// <reference path="shifty.d.ts" />
 namespace gdjs {
-  export interface RuntimeScene {
-    shiftyJsScene: shifty.Scene;
-  }
-
   interface IScaleable extends RuntimeObject {
     setScaleX(x: number): void;
     setScaleY(y: number): void;
@@ -80,23 +76,25 @@ namespace gdjs {
     ];
   }
 
+  // TODO EBO Rewrite this behavior to use standard method to step.
+  // This could also fix layer time scale that seems to be ignored.
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
     private _tweens: Record<string, TweenRuntimeBehavior.TweenInstance> = {};
     private _runtimeScene: gdjs.RuntimeScene;
     private _isActive: boolean = true;
 
     /**
-     * @param runtimeScene The runtime scene the behavior belongs to.
+     * @param instanceContainer The instance container the behavior belongs to.
      * @param behaviorData The data to initialize the behavior
      * @param owner The runtime object the behavior belongs to.
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData: BehaviorData,
       owner: gdjs.RuntimeObject
     ) {
-      super(runtimeScene, behaviorData, owner);
-      this._runtimeScene = runtimeScene;
+      super(instanceContainer, behaviorData, owner);
+      this._runtimeScene = instanceContainer.getScene();
     }
 
     updateFromBehaviorData(
@@ -208,6 +206,13 @@ namespace gdjs {
 
     /**
      * Add an object variable tween.
+     * @deprecated Use addVariableTween2 instead.
+     * This function is misleading since one could think that the tween starts
+     * right at the moment this function is called whereas the value of the variable
+     * will change at the next frame only. Moreover, the variable will not start from
+     * the start value exactly since time will have passed at the moment the next
+     * frame is rendered.
+     * See https://github.com/4ian/GDevelop/issues/4270
      * @param identifier Unique id to identify the tween
      * @param variable The object variable to store the tweened value
      * @param fromValue Start value
@@ -242,7 +247,40 @@ namespace gdjs {
     }
 
     /**
-     * Add an object position tween.
+     * Tween an object variable.
+     * @param identifier Unique id to identify the tween
+     * @param variable The object variable to store the tweened value
+     * @param toValue End value
+     * @param easingValue Type of easing
+     * @param durationValue Duration in milliseconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addVariableTween2(
+      identifier: string,
+      variable: gdjs.Variable,
+      toValue: float,
+      easingValue: string,
+      durationValue: float,
+      destroyObjectWhenFinished: boolean
+    ) {
+      this._addTween(
+        identifier,
+        easingValue,
+        {
+          from: { value: variable.getValue() },
+          to: { value: toValue },
+          duration: durationValue,
+          easing: easingValue,
+          render: (state) => variable.setNumber(state.value),
+        },
+        this._runtimeScene.getTimeManager().getTimeFromStart(),
+        durationValue,
+        destroyObjectWhenFinished
+      );
+    }
+
+    /**
+     * Tween an object position.
      * @param identifier Unique id to identify the tween
      * @param toX The target X position
      * @param toY The target Y position
@@ -278,7 +316,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object X position tween.
+     * Tween an object X position.
      * @param identifier Unique id to identify the tween
      * @param toX The target X position
      * @param easingValue Type of easing
@@ -309,7 +347,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object Y position tween.
+     * Tween an object Y position.
      * @param identifier Unique id to identify the tween
      * @param toY The target Y position
      * @param easingValue Type of easing
@@ -340,7 +378,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object angle tween.
+     * Tween an object angle.
      * @param identifier Unique id to identify the tween
      * @param toAngle The target angle
      * @param easingValue Type of easing
@@ -373,7 +411,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object scale tween.
+     * Tween an object scale.
      * @param identifier Unique id to identify the tween
      * @param toScaleX The target X-scale
      * @param toScaleY The target Y-scale
@@ -431,7 +469,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object X-scale tween.
+     * Tween an object X-scale.
      * @param identifier Unique id to identify the tween
      * @param toScaleX The target X-scale
      * @param easingValue Type of easing
@@ -476,7 +514,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object scale y tween.
+     * Tween an object Y-scale.
      * @param identifier Unique id to identify the tween
      * @param toScaleY The target Y-scale
      * @param easingValue Type of easing
@@ -521,7 +559,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object opacity tween.
+     * Tween an object opacity.
      * @param identifier Unique id to identify the tween
      * @param toOpacity The target opacity
      * @param easingValue Type of easing
@@ -557,9 +595,9 @@ namespace gdjs {
     }
 
     /**
-     * Add an object color tween.
+     * Tween an object color.
      * @param identifier Unique id to identify the tween
-     * @param toColorStr The target color
+     * @param toColorStr The target RGB color (format "128;200;255" with values between 0 and 255 for red, green and blue)
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
@@ -660,7 +698,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object color HSL tween, with the "to" color given using HSL (H: any number, S and L: 0-100).
+     * Tween an object HSL color, with the "to" color given using HSL (H: any number, S and L: 0-100).
      * @param identifier Unique id to identify the tween
      * @param toHue The target hue, or the same as the from color's hue if blank
      * @param animateHue, include hue in calculations, as can't set this to -1 as default to ignore
@@ -740,7 +778,7 @@ namespace gdjs {
     }
 
     /**
-     * Add a text object character size tween.
+     * Tween a text object character size.
      * @param identifier Unique id to identify the tween
      * @param toSize The target character size
      * @param easingValue Type of easing
@@ -776,7 +814,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object width tween.
+     * Tween an object width.
      * @param identifier Unique id to identify the tween
      * @param toWidth The target width
      * @param easingValue Type of easing
@@ -809,7 +847,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object height tween.
+     * Tween an object height.
      * @param identifier Unique id to identify the tween
      * @param toHeight The target height
      * @param easingValue Type of easing
@@ -1048,70 +1086,4 @@ namespace gdjs {
       }
     }
   }
-
-  // Callbacks called to pause/resume Shifty scene when a gdjs.RuntimeScene
-  // is paused/resumed
-
-  /**
-   * Stop and "destroy" all the tweens when a scene is unloaded.
-   */
-  gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
-    const shiftyJsScene = runtimeScene.shiftyJsScene;
-    if (!shiftyJsScene) return;
-
-    // Stop and explicitly remove all tweenables to be sure to drop
-    // all references to the tweenables of the scene.
-    shiftyJsScene.stop(false);
-    shiftyJsScene.empty();
-  });
-
-  /**
-   * When a scene is paused, pause all the tweens of this scene.
-   */
-  gdjs.registerRuntimeScenePausedCallback(function (runtimeScene) {
-    const shiftyJsScene = runtimeScene.shiftyJsScene;
-    if (shiftyJsScene) shiftyJsScene.pause();
-  });
-
-  /**
-   * When a scene is paused, resume all the tweens of this scene.
-   */
-  gdjs.registerRuntimeSceneResumedCallback(function (runtimeScene) {
-    const shiftyJsScene = runtimeScene.shiftyJsScene;
-    if (!shiftyJsScene) return;
-
-    // It is important to set immediately the current Shifty time back to the
-    // time of the scene, as the call `resume` will process the tweens.
-    // (If not done, tweens will be resumed with the time of the previous
-    // scene, that could create weird result/make tweens act as if not paused).
-    TweenRuntimeBehavior._currentTweenTime = runtimeScene
-      .getTimeManager()
-      .getTimeFromStart();
-
-    // Note that per the invariant of shiftyJsScene, shiftyJsScene will only
-    // contains tweenables that should be playing (so calling resume is safe).
-    shiftyJsScene.resume();
-  });
-
-  // Handle Shifty.js updates (the time and the "tick" of tweens
-  // is controlled by the behavior)
-  gdjs.registerRuntimeScenePreEventsCallback(function (runtimeScene) {
-    TweenRuntimeBehavior._currentTweenTime = runtimeScene
-      .getTimeManager()
-      .getTimeFromStart();
-    shifty.processTweens();
-  });
-
-  // Set up Shifty.js so that the processing ("tick"/updates) is handled
-  // by the behavior, once per frame. See above.
-  shifty.Tweenable.setScheduleFunction(function () {
-    /* Do nothing, we'll call processTweens manually. */
-  });
-
-  // Set up Shifty.js so that the time is handled by the behavior.
-  // It will be set to be the time of the current scene, and should be updated
-  // before any tween processing (processTweens, resume).
-  shifty.Tweenable.now = function () {
-    return TweenRuntimeBehavior._currentTweenTime;
-  };
 }

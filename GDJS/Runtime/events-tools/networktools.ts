@@ -66,6 +66,37 @@ namespace gdjs {
         }
       };
 
+      export const sendAwaitableAsyncRequest = (
+        url: string,
+        body: string,
+        method: string,
+        contentType: string,
+        responseVar: gdjs.Variable,
+        errorVar: gdjs.Variable
+      ) => {
+        return new gdjs.PromiseTask(
+          fetch(url, {
+            body: method !== 'GET' ? body : undefined,
+            method,
+            headers: {
+              'Content-Type':
+                contentType || 'application/x-www-form-urlencoded',
+            },
+          }).then(
+            async (response) => {
+              const result = await response.text();
+              if (response.status >= 400) {
+                errorVar.setString('' + response.status);
+              }
+              responseVar.setString(result);
+            },
+            (error) => {
+              errorVar.setString('' + error);
+            }
+          )
+        );
+      };
+
       /**
        * @deprecated
        */
@@ -114,10 +145,10 @@ namespace gdjs {
       };
 
       export const enableMetrics = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         enable: boolean
       ) {
-        runtimeScene.getGame().enableMetrics(enable);
+        instanceContainer.getGame().enableMetrics(enable);
       };
 
       /**

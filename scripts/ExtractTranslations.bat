@@ -5,7 +5,7 @@ dir ..\GDJS\GDJS\*.cpp /L /B /S |find /v /i "\Dialogs\" > %TEMP%\listfile.txt
 dir ..\GDJS\GDJS\*.h /L /B /S |find /v /i "\Dialogs\" >> %TEMP%\listfile.txt
 dir ..\Extensions\*.cpp /L /B /S >> %TEMP%\listfile.txt
 dir ..\Extensions\*.h /L /B /S >> %TEMP%\listfile.txt
-dir ..\Extensions\*.js /L /B /S  |find /v /i "box2d.js" |find /v /i "\bondage.js" |find /v /i "\ExampleJsExtension" >> %TEMP%\listfile.txt
+dir ..\Extensions\*.js /L /B /S  |find /v /i ".umd.js" |find /v /i ".min.js" |find /v /i ".benchmark.js" |find /v /i ".spec.js" |find /v /i "box2d.js" |find /v /i "\bondage.js" |find /v /i "\node_modules" |find /v /i "\ExampleJsExtension" >> %TEMP%\listfile.txt
 dir ..\Core\GDCore\*.cpp /L /B /S |find /v /i "\Dialogs\" >> %TEMP%\listfile.txt
 dir ..\Core\GDCore\*.h /L /B /S |find /v /i "\Dialogs\" >> %TEMP%\listfile.txt
 

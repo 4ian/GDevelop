@@ -268,12 +268,50 @@ export default class ExpressionField extends React.Component<Props, State> {
     parameterValues: ParameterValues
   ) => {
     if (!this._inputElement) return;
+    const {
+      globalObjectsContainer,
+      objectsContainer,
+      expressionType,
+      value,
+    } = this.props;
     const cursorPosition = this._inputElement.selectionStart;
+    const parser = new gd.ExpressionParser2();
 
-    const functionCall = formatExpressionCall(expressionInfo, parameterValues);
+    // We want to know what type the expression should be so as to convert to string
+    // when necessary.
+    // We add a fake identifier so that getNodeAtPosition will return the type of
+    // its parent. Particularly, this is needed to get the type of a parameter in
+    // a function call. We could create a worker ExpectedTypeFinder that would get
+    // the type wanted by the parent instead.
+    const expressionNode = parser
+      .parseExpression(
+        value.substr(0, cursorPosition) +
+          'fakeIdentifier' +
+          value.substr(cursorPosition)
+      )
+      .get();
+    const currentNode = gd.ExpressionNodeLocationFinder.getNodeAtPosition(
+      expressionNode,
+      cursorPosition + 'fakeIdentifier'.length - 1
+    );
+    const type = gd.ExpressionTypeFinder.getType(
+      gd.JsPlatform.get(),
+      globalObjectsContainer,
+      objectsContainer,
+      expressionType,
+      currentNode
+    );
+
+    let shouldConvertToString =
+      expressionInfo.metadata.getReturnType() === 'number' && type === 'string';
+
+    const functionCall = formatExpressionCall(expressionInfo, parameterValues, {
+      shouldConvertToString,
+    });
+
+    parser.delete();
 
     // Generate the expression with the function call
-    const { value } = this.props;
     const newValue =
       value.substr(0, cursorPosition) +
       functionCall +
@@ -323,23 +361,34 @@ export default class ExpressionField extends React.Component<Props, State> {
       : 0;
     const expression = this.state.validatedValue;
 
-    const {
-      expression: newExpression,
-      caretLocation: newCaretLocation,
-    } = insertAutocompletionInExpression(
-      { expression, caretLocation },
-      {
-        completion: expressionAutocompletion.completion,
-        replacementStartPosition:
-          expressionAutocompletion.replacementStartPosition,
-        replacementEndPosition: expressionAutocompletion.replacementEndPosition,
-        addParenthesis: expressionAutocompletion.addParenthesis,
-        addDot: expressionAutocompletion.addDot,
-        addParameterSeparator: expressionAutocompletion.addParameterSeparator,
-        addNamespaceSeparator: expressionAutocompletion.addNamespaceSeparator,
-        hasVisibleParameters: expressionAutocompletion.hasVisibleParameters,
-      }
-    );
+    const { expression: newExpression, caretLocation: newCaretLocation } =
+      expressionAutocompletion.kind === 'FullExpression'
+        ? {
+            expression: expressionAutocompletion.completion,
+            caretLocation: expressionAutocompletion.completion.length,
+          }
+        : insertAutocompletionInExpression(
+            { expression, caretLocation },
+            {
+              completion: expressionAutocompletion.completion,
+              replacementStartPosition:
+                expressionAutocompletion.replacementStartPosition,
+              replacementEndPosition:
+                expressionAutocompletion.replacementEndPosition,
+              addParenthesis: expressionAutocompletion.addParenthesis,
+              addDot: expressionAutocompletion.addDot,
+              addParameterSeparator:
+                expressionAutocompletion.addParameterSeparator,
+              addNamespaceSeparator:
+                expressionAutocompletion.addNamespaceSeparator,
+              hasVisibleParameters:
+                expressionAutocompletion.hasVisibleParameters,
+              shouldConvertToString:
+                expressionAutocompletion.kind === 'Expression'
+                  ? expressionAutocompletion.shouldConvertToString
+                  : null,
+            }
+          );
 
     if (this._field) {
       this._field.forceSetValue(newExpression);

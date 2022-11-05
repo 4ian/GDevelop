@@ -23,6 +23,7 @@ import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import Window from '../../Utils/Window';
 import { useExtensionUpdate } from './UseExtensionUpdates';
+import HelpButton from '../../UI/HelpButton';
 
 const getTransformedDescription = (extensionHeader: ExtensionHeader) => {
   if (
@@ -124,7 +125,11 @@ const ExtensionInstallDialog = ({
                 <Trans>Not compatible</Trans>
               ) : alreadyInstalled ? (
                 extensionUpdate ? (
-                  <Trans>Update</Trans>
+                  extensionShortHeader.tier === 'community' ? (
+                    <Trans>Update (could break the project)</Trans>
+                  ) : (
+                    <Trans>Update</Trans>
+                  )
                 ) : (
                   <Trans>Re-install</Trans>
                 )
@@ -138,40 +143,39 @@ const ExtensionInstallDialog = ({
           />
         </LeftLoader>,
       ]}
-      secondaryActions={
-        onEdit
-          ? [
-              <FlatButton
-                key="edit-extension"
-                label={<Trans>Open in editor</Trans>}
-                onClick={onEdit}
-              />,
-            ]
-          : undefined
-      }
+      secondaryActions={[
+        onEdit ? (
+          <FlatButton
+            key="edit-extension"
+            label={<Trans>Open in editor</Trans>}
+            onClick={onEdit}
+          />
+        ) : (
+          undefined
+        ),
+        extensionHeader && extensionHeader.helpPath ? (
+          <HelpButton
+            key="help-button"
+            helpPagePath={extensionHeader.helpPath}
+          />
+        ) : (
+          undefined
+        ),
+      ].filter(Boolean)}
       open
       cannotBeDismissed={isInstalling}
       onRequestClose={onClose}
       onApply={onInstallExtension}
     >
       <ColumnStackLayout expand noMargin>
-        {!isCompatible && (
-          <AlertMessage kind="error">
-            <Trans>
-              Unfortunately, this extension requires a newer version of GDevelop
-              to work. Update GDevelop to be able to use this extension in your
-              project.
-            </Trans>
-          </AlertMessage>
-        )}
-        <Line alignItems="center" noMargin>
+        <Line alignItems="flex-start" noMargin>
           <IconContainer
             alt={extensionShortHeader.fullName}
             src={extensionShortHeader.previewIconUrl}
             size={64}
           />
           <Column expand>
-            <Text noMargin size="title">
+            <Text noMargin size="block-title">
               {extensionShortHeader.fullName}
             </Text>
             <Text noMargin size="body2">
@@ -196,6 +200,27 @@ const ExtensionInstallDialog = ({
             source={getTransformedDescription(extensionHeader)}
             isStandaloneText
           />
+        )}
+        {extensionShortHeader.tier === 'community' && (
+          <AlertMessage kind="warning">
+            <Trans>
+              This is an extension made by a community member — but not reviewed
+              by the GDevelop extension team. As such, we can't guarantee it
+              meets all the quality standards of official extensions. It could
+              also not be compatible with older GDevelop versions. In case of
+              doubt, contact the author to know more about what the extension
+              does or inspect its content before using it.
+            </Trans>
+          </AlertMessage>
+        )}
+        {!isCompatible && (
+          <AlertMessage kind="error">
+            <Trans>
+              Unfortunately, this extension requires a newer version of GDevelop
+              to work. Update GDevelop to be able to use this extension in your
+              project.
+            </Trans>
+          </AlertMessage>
         )}
         {!extensionHeader && !error && <PlaceholderLoader />}
         {!extensionHeader && error && (

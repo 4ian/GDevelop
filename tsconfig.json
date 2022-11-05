@@ -6,6 +6,7 @@
     "noEmit": true,
     "allowJs": true,
     "noImplicitReturns": true,
+    "noUnusedLocals": true,
     "noFallthroughCasesInSwitch": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
@@ -32,19 +33,15 @@
     "GDJS/tests/tests-utils/**/*.js",
     "GDJS/tests/benchmarks/**/*.js"
   ],
-  // As Cocos2D-JS renderers are not maintained, we exclude them from TypeScript checks.
-  // Also exclude some libraries or deprecated extensions.
+  // Exclude pre-built js code
   "exclude": [
-    "GDJS/Runtime/cocos-renderers",
-    "GDJS/Runtime/cocos-sound-manager",
-    "Extensions/**/*-cocos-renderer.ts",
     "GDJS/Runtime/pixi-renderers/pixi.js",
-    "GDJS/Runtime/Cocos2d",
     "GDJS/Runtime/Cordova",
     "GDJS/Runtime/Electron",
     "GDJS/Runtime/FacebookInstantGames",
     "GDJS/Runtime/libs/CocoonJS",
     "Extensions/**/JsExtension.js",
-    "Extensions/Effects/pixi-filters/filter-alpha.js"
+    "Extensions/Effects/pixi-filters/filter-alpha.js",
+    "Extensions/P2P/A_peer.js"
   ]
 }

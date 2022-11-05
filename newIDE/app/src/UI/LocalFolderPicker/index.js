@@ -35,8 +35,8 @@ type Props = {|
 |};
 
 type TitleAndMessage = {|
-  title: ?string,
-  message: ?string,
+  title: string,
+  message: string,
 |};
 
 export default class LocalFolderPicker extends PureComponent<Props, {||}> {
@@ -64,16 +64,10 @@ export default class LocalFolderPicker extends PureComponent<Props, {||}> {
         title: i18n._(t`Choose an export folder`),
         message: i18n._(t`Choose where to export the game`),
       };
-    } else if (type === 'create-game') {
-      return {
-        title: i18n._(t`Choose a folder for the new game`),
-        message: i18n._(t`Choose where to create the game`),
-      };
     }
-
     return {
-      title: undefined,
-      message: undefined,
+      title: i18n._(t`Choose a folder for the new game`),
+      message: i18n._(t`Choose where to create the game`),
     };
   };
 

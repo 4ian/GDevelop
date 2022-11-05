@@ -68,7 +68,7 @@ jobs:
 
       - run:
           name: Clean dist folder to keep only installers/binaries.
-          command: rm -rf "newIDE/electron-app/dist/mac/GDevelop 5.app"
+          command: rm -rf "newIDE/electron-app/dist/mac/GDevelop 5.app" && rm -rf "newIDE/electron-app/dist/mac-arm64/GDevelop 5.app"
 
       # Upload artifacts (CircleCI)
       - store_artifacts:
@@ -143,11 +143,11 @@ jobs:
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       - run:
           name: Build GDevelop IDE
-          command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && npm run build -- --linux AppImage zip deb --publish=never
+          command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && npm run build -- --linux --publish=never
 
       - run:
           name: Clean dist folder to keep only installers/binaries.
-          command: rm -rf newIDE/electron-app/dist/linux-unpacked
+          command: rm -rf newIDE/electron-app/dist/linux-unpacked && rm -rf newIDE/electron-app/dist/linux-arm64-unpacked
 
       # Upload artifacts (CircleCI)
       - store_artifacts:

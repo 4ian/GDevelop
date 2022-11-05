@@ -7,7 +7,7 @@ import RaisedButton from '../UI/RaisedButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
-import PropertiesEditor from '../PropertiesEditor';
+import BehaviorSharedPropertiesEditor from './BehaviorSharedPropertiesEditor';
 import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
 import some from 'lodash/some';
 import Checkbox from '../UI/Checkbox';
@@ -18,6 +18,19 @@ import {
   rgbStringAndAlphaToRGBColor,
   type RGBColor,
 } from '../Utils/ColorTransformer';
+import HelpIcon from '../UI/HelpIcon';
+import { Column, Line } from '../UI/Grid';
+import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
+import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
+import { IconContainer } from '../UI/IconContainer';
+import { getBehaviorTutorialIds } from '../Utils/GDevelopServices/Tutorial';
+import ScrollView from '../UI/ScrollView';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../ResourcesList/ResourceSource';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -28,6 +41,9 @@ type Props = {|
   onClose: () => void,
   onOpenMoreSettings?: ?() => void,
   onEditVariables: () => void,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
 |};
 
 type State = {|
@@ -102,43 +118,98 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
       .toJSArray();
 
     const propertiesEditors = allBehaviorSharedDataNames
-      .map(name => {
-        const sharedDataContent = layout.getBehaviorSharedData(name);
-        const type = sharedDataContent.getTypeName();
+      .map(behaviorName => {
+        const behaviorSharedData = layout.getBehaviorSharedData(behaviorName);
+
+        if (isNullPtr(gd, behaviorSharedData)) return null;
+
+        const properties = behaviorSharedData.getProperties();
+        const propertiesSchema = propertiesMapToSchema(
+          properties,
+          sharedDataContent => behaviorSharedData.getProperties(),
+          (sharedDataContent, name, value) => {
+            behaviorSharedData.updateProperty(name, value);
+          }
+        );
+        const behaviorTypeName = behaviorSharedData.getTypeName();
 
         const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
           gd.JsPlatform.get(),
-          type
+          behaviorTypeName
         );
-        if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata))
-          return null;
-
-        const behaviorSharedData = behaviorMetadata.getSharedDataInstance();
-        if (isNullPtr(gd, behaviorSharedData)) return null;
-
-        const properties = behaviorSharedData.getProperties(
-          sharedDataContent.getContent()
-        );
-        const propertiesSchema = propertiesMapToSchema(
-          properties,
-          sharedDataContent =>
-            behaviorSharedData.getProperties(sharedDataContent.getContent()),
-          (sharedDataContent, name, value) => {
-            behaviorSharedData.updateProperty(
-              sharedDataContent.getContent(),
-              name,
-              value
-            );
-          }
-        );
+        const tutorialIds = getBehaviorTutorialIds(behaviorTypeName);
+        // TODO Make this a functional component to use PreferencesContext
+        const enabledTutorialIds = [];
+        const iconUrl = behaviorMetadata.getIconFilename();
 
         return (
           !!propertiesSchema.length && (
-            <PropertiesEditor
-              key={name}
-              schema={propertiesSchema}
-              instances={[sharedDataContent]}
-            />
+            <Accordion
+              key={behaviorName}
+              defaultExpanded
+              id={`behavior-parameters-${behaviorName}`}
+            >
+              <AccordionHeader
+                actions={[
+                  <HelpIcon
+                    key="help"
+                    size="small"
+                    helpPagePath={behaviorMetadata.getHelpPath()}
+                  />,
+                ]}
+              >
+                {iconUrl ? (
+                  <IconContainer
+                    src={iconUrl}
+                    alt={behaviorMetadata.getFullName()}
+                    size={20}
+                  />
+                ) : null}
+                <Column expand>
+                  <TextField
+                    value={behaviorName}
+                    margin="none"
+                    fullWidth
+                    disabled
+                    onChange={(e, text) => {}}
+                    id={`behavior-${behaviorName}-name-text-field`}
+                  />
+                </Column>
+              </AccordionHeader>
+              <AccordionBody>
+                <Column
+                  expand
+                  noMargin
+                  // Avoid Physics2 behavior overflow on small screens
+                  noOverflowParent
+                >
+                  {enabledTutorialIds.length ? (
+                    <Line>
+                      <ColumnStackLayout expand>
+                        {tutorialIds.map(tutorialId => (
+                          <DismissableTutorialMessage
+                            key={tutorialId}
+                            tutorialId={tutorialId}
+                          />
+                        ))}
+                      </ColumnStackLayout>
+                    </Line>
+                  ) : null}
+                  <Line>
+                    <BehaviorSharedPropertiesEditor
+                      key={behaviorName}
+                      behaviorSharedData={behaviorSharedData}
+                      project={this.props.project}
+                      resourceSources={this.props.resourceSources}
+                      onChooseResource={this.props.onChooseResource}
+                      resourceExternalEditors={
+                        this.props.resourceExternalEditors
+                      }
+                    />
+                  </Line>
+                </Column>
+              </AccordionBody>
+            </Accordion>
           )
         );
       })
@@ -164,55 +235,57 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         open={this.props.open}
         maxWidth="sm"
       >
-        <ColumnStackLayout expand noMargin>
-          <TextField
-            floatingLabelText={<Trans>Window title</Trans>}
-            fullWidth
-            type="text"
-            value={this.state.windowTitle}
-            onChange={(e, value) => this.setState({ windowTitle: value })}
-          />
-          <Checkbox
-            checked={this.state.shouldStopSoundsOnStartup}
-            label={<Trans>Stop music and sounds on startup</Trans>}
-            onCheck={(e, check) =>
-              this.setState({
-                shouldStopSoundsOnStartup: check,
-              })
-            }
-          />
-          <ColorField
-            floatingLabelText={<Trans>Scene background color</Trans>}
-            fullWidth
-            disableAlpha
-            color={rgbColorToRGBString(this.state.backgroundColor)}
-            onChange={color =>
-              this.setState({
-                backgroundColor: rgbStringAndAlphaToRGBColor(color),
-              })
-            }
-          />
-          {!some(propertiesEditors) && (
-            <EmptyMessage>
-              <Trans>
-                Any additional properties will appear here if you add behaviors
-                to objects, like Physics behavior.
-              </Trans>
-            </EmptyMessage>
-          )}
-          {propertiesEditors}
-          {this.props.onOpenMoreSettings && (
-            <RaisedButton
-              label={<Trans>Open advanced settings</Trans>}
+        <ScrollView>
+          <ColumnStackLayout expand noMargin>
+            <TextField
+              floatingLabelText={<Trans>Window title</Trans>}
               fullWidth
-              onClick={() => {
-                if (this.props.onOpenMoreSettings)
-                  this.props.onOpenMoreSettings();
-                this.props.onClose();
-              }}
+              type="text"
+              value={this.state.windowTitle}
+              onChange={(e, value) => this.setState({ windowTitle: value })}
             />
-          )}
-        </ColumnStackLayout>
+            <Checkbox
+              checked={this.state.shouldStopSoundsOnStartup}
+              label={<Trans>Stop music and sounds on startup</Trans>}
+              onCheck={(e, check) =>
+                this.setState({
+                  shouldStopSoundsOnStartup: check,
+                })
+              }
+            />
+            <ColorField
+              floatingLabelText={<Trans>Scene background color</Trans>}
+              fullWidth
+              disableAlpha
+              color={rgbColorToRGBString(this.state.backgroundColor)}
+              onChange={color =>
+                this.setState({
+                  backgroundColor: rgbStringAndAlphaToRGBColor(color),
+                })
+              }
+            />
+            {!some(propertiesEditors) && (
+              <EmptyMessage>
+                <Trans>
+                  Any additional properties will appear here if you add
+                  behaviors to objects, like Physics behavior.
+                </Trans>
+              </EmptyMessage>
+            )}
+            {propertiesEditors}
+            {this.props.onOpenMoreSettings && (
+              <RaisedButton
+                label={<Trans>Open advanced settings</Trans>}
+                fullWidth
+                onClick={() => {
+                  if (this.props.onOpenMoreSettings)
+                    this.props.onOpenMoreSettings();
+                  this.props.onClose();
+                }}
+              />
+            )}
+          </ColumnStackLayout>
+        </ScrollView>
       </Dialog>
     );
   }

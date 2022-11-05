@@ -36,11 +36,20 @@
  * Fade in the element. Used for the MainFrame at startup, and
  * can be used to smoothly show other elements after a loading.
  */
-@keyframes fadein {
+@keyframes fade-in {
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes vertical-translate {
+  from {
+   transform: translateY(-15px);
+  }
+  to {
+    transform: translateY(15px);
   }
 }

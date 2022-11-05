@@ -2,13 +2,11 @@
 import {
   addAssetToProject,
   addSerializedExtensionsToProject,
-  getRequiredBehaviorsFromAsset,
-  filterMissingBehaviors,
+  getRequiredExtensionsFromAsset,
   downloadExtensions,
-  installAsset,
-  getRequiredExtensionsForEventsFromAsset,
   filterMissingExtensions,
   sanitizeObjectName,
+  installPublicAsset,
 } from './InstallAsset';
 import { makeTestProject } from '../fixtures/TestProject';
 import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
@@ -16,13 +14,11 @@ import {
   fakeAssetShortHeader1,
   fakeAsset1,
   fakePixelArtAsset1,
-  fakeAssetWithBehaviorCustomizations1,
-  fakeAssetWithUnknownBehaviorCustomizations1,
-  fakeAssetWithFlashBehaviorCustomizations1,
-  fakeAssetWithEventCustomizationsAndFlashExtension1,
+  fakeAssetWithUnknownExtension1,
+  fakeAssetWithFlashExtensionDependency1,
   flashExtensionShortHeader,
   fireBulletExtensionShortHeader,
-  fakeAssetWithEventCustomizationsAndUnknownExtension1,
+  fakeAssetWithCustomObject,
 } from '../fixtures/GDevelopServicesTestData';
 import { makeTestExtensions } from '../fixtures/TestExtensions';
 import {
@@ -35,7 +31,7 @@ const gd: libGDevelop = global.gd;
 jest.mock('../Utils/GDevelopServices/Extension');
 
 // $FlowFixMe - overriding method to do a mocked network call.
-Asset.getAsset = jest.fn();
+Asset.getPublicAsset = jest.fn();
 
 const mockFn = (fn: Function): JestMockFn<any, any> => fn;
 
@@ -61,7 +57,6 @@ describe('InstallAsset', () => {
       const output = await addAssetToProject({
         project,
         objectsContainer: layout,
-        events: layout.getEvents(),
         asset: fakeAsset1,
       });
 
@@ -86,7 +81,6 @@ describe('InstallAsset', () => {
       const output = await addAssetToProject({
         project,
         objectsContainer: layout,
-        events: layout.getEvents(),
         asset: fakeAsset1,
       });
 
@@ -125,7 +119,6 @@ describe('InstallAsset', () => {
       await addAssetToProject({
         project,
         objectsContainer: layout,
-        events: layout.getEvents(),
         asset: fakeAsset1,
       });
 
@@ -167,7 +160,6 @@ describe('InstallAsset', () => {
       await addAssetToProject({
         project,
         objectsContainer: layout,
-        events: layout.getEvents(),
         asset: fakeAsset1,
       });
 
@@ -206,7 +198,6 @@ describe('InstallAsset', () => {
       await addAssetToProject({
         project,
         objectsContainer: layout,
-        events: layout.getEvents(),
         asset: fakeAsset1,
       });
 
@@ -234,7 +225,7 @@ describe('InstallAsset', () => {
       const object = layout.getObject('PlayerSpaceship');
 
       const resourcesInUse = new gd.ResourcesInUseHelper();
-      object.exposeResources(resourcesInUse);
+      object.getConfiguration().exposeResources(resourcesInUse);
       const objectResourceNames = resourcesInUse
         .getAllImages()
         .toNewVectorString()
@@ -254,7 +245,6 @@ describe('InstallAsset', () => {
       await addAssetToProject({
         project,
         objectsContainer: layout,
-        events: layout.getEvents(),
         asset: fakeAsset1,
       });
 
@@ -288,7 +278,6 @@ describe('InstallAsset', () => {
       await addAssetToProject({
         project,
         objectsContainer: layout,
-        events: layout.getEvents(),
         asset: fakePixelArtAsset1,
       });
 
@@ -322,7 +311,6 @@ describe('InstallAsset', () => {
       await addAssetToProject({
         project,
         objectsContainer: layout,
-        events: layout.getEvents(),
         asset: fakeAsset1,
       });
 
@@ -347,171 +335,18 @@ describe('InstallAsset', () => {
           .isSmooth()
       ).toBe(false);
     });
-
-    it('installs an object asset in the project, adding the required behaviors', async () => {
-      makeTestExtensions(gd);
-      const { project } = makeTestProject(gd);
-      const layout = project.insertNewLayout('MyTestLayout', 0);
-
-      await addAssetToProject({
-        project,
-        objectsContainer: layout,
-        events: layout.getEvents(),
-        asset: fakeAssetWithBehaviorCustomizations1,
-      });
-
-      expect(layout.hasObjectNamed('PlayerSpaceship')).toBe(true);
-      expect(
-        layout
-          .getObject('PlayerSpaceship')
-          .getAllBehaviorNames()
-          .toJSArray()
-      ).toEqual(['MyBehavior']);
-      expect(
-        layout
-          .getObject('PlayerSpaceship')
-          .getBehavior('MyBehavior')
-          .getTypeName()
-      ).toBe('FakeBehavior::FakeBehavior');
-
-      // Check that the properties from customization were set.
-      expect(
-        gd.Serializer.toJSON(
-          layout
-            .getObject('PlayerSpaceship')
-            .getBehavior('MyBehavior')
-            .getContent()
-        )
-      ).toBe('{"property1":"Overriden value","property2":true}');
-    });
-
-    it('installs an object asset in the project, adding the required events', async () => {
-      makeTestExtensions(gd);
-      const { project } = makeTestProject(gd);
-      const layout = project.insertNewLayout('MyTestLayout', 0);
-      const eventsList = new gd.EventsList();
-
-      await addAssetToProject({
-        project,
-        objectsContainer: layout,
-        events: eventsList,
-        asset: fakeAssetWithEventCustomizationsAndFlashExtension1,
-      });
-
-      expect(layout.hasObjectNamed('PlayerSpaceship')).toBe(true);
-      expect(eventsList.getEventsCount()).toBe(1);
-
-      // Check that the events had their customization parameters properly applied
-      const serializedEvents = new gd.SerializerElement();
-      eventsList.serializeTo(serializedEvents);
-      const serializedEventsJson = gd.Serializer.toJSON(serializedEvents);
-      expect(serializedEventsJson).toMatch(
-        '3 + PlayerSpaceship.Variable(test)'
-      );
-      expect(serializedEventsJson).toMatch(
-        '3 + PlayerSpaceship.Variable(test2)'
-      );
-    });
-
-    it('renames the object if name is already used, including in events', async () => {
-      makeTestExtensions(gd);
-      const { project } = makeTestProject(gd);
-      const layout = project.insertNewLayout('MyTestLayout', 0);
-      const eventsList = new gd.EventsList();
-
-      // Add an object with the same name as the object asset.
-      layout.insertNewObject(project, 'Sprite', 'PlayerSpaceship', 0);
-      expect(layout.hasObjectNamed('PlayerSpaceship')).toBe(true);
-
-      await addAssetToProject({
-        project,
-        objectsContainer: layout,
-        events: eventsList,
-        asset: fakeAssetWithEventCustomizationsAndFlashExtension1,
-      });
-
-      expect(layout.hasObjectNamed('PlayerSpaceship2')).toBe(true);
-      expect(eventsList.getEventsCount()).toBe(1);
-
-      // Check that the events had their customization parameters properly applied
-      // and the object renamed.
-      const serializedEvents = new gd.SerializerElement();
-      eventsList.serializeTo(serializedEvents);
-      const serializedEventsJson = gd.Serializer.toJSON(serializedEvents);
-      expect(serializedEventsJson).toMatch(
-        '3 + PlayerSpaceship2.Variable(test)'
-      );
-      expect(serializedEventsJson).toMatch(
-        '3 + PlayerSpaceship2.Variable(test2)'
-      );
-    });
   });
 
-  describe('getRequiredBehaviorsFromAsset', () => {
-    it('get the behaviors required for an asset', () => {
-      expect(
-        getRequiredBehaviorsFromAsset(
-          fakeAssetWithEventCustomizationsAndFlashExtension1
-        )
-      ).toEqual([]);
-      expect(
-        getRequiredBehaviorsFromAsset(fakeAssetWithBehaviorCustomizations1)
-      ).toEqual([
-        {
-          behaviorType: 'FakeBehavior::FakeBehavior',
-          extensionName: 'FakeBehavior',
-          extensionVersion: '1.0.0',
-        },
-      ]);
-    });
-  });
-
-  describe('getRequiredExtensionsForEventsFromAsset', () => {
-    it('get the extensions required for an asset', () => {
-      expect(
-        getRequiredExtensionsForEventsFromAsset(
-          fakeAssetWithBehaviorCustomizations1
-        )
-      ).toEqual([]);
-      expect(
-        getRequiredExtensionsForEventsFromAsset(
-          fakeAssetWithEventCustomizationsAndFlashExtension1
-        )
-      ).toEqual([
-        {
-          extensionName: 'Flash',
-          extensionVersion: '1.0.0',
-        },
-      ]);
-    });
-  });
-
-  describe('filterMissingBehaviors', () => {
-    it('filters behaviors that are not loaded ', () => {
-      makeTestExtensions(gd);
-
-      expect(
-        filterMissingBehaviors(gd, [
-          // An unknown behavior not loaded:
+  describe('getRequiredExtensionsFromAsset', () => {
+    it('get the required extensions for custom objects in an asset', () => {
+      expect(getRequiredExtensionsFromAsset(fakeAssetWithCustomObject)).toEqual(
+        [
           {
-            extensionName: 'NotExistingExtension',
-            extensionVersion: '1.0.0',
-            behaviorType: 'NotExistingExtension::MissingBehavior',
-          },
-          // A fake behavior loaded in makeTestExtensions:
-          {
-            behaviorType: 'FakeBehavior::FakeBehavior',
-            extensionName: 'FakeBehavior',
+            extensionName: 'Button',
             extensionVersion: '1.0.0',
           },
-        ])
-      ).toEqual([
-        {
-          extensionName: 'NotExistingExtension',
-          extensionVersion: '1.0.0',
-          behaviorType: 'NotExistingExtension::MissingBehavior',
-        },
-      ]);
+        ]
+      );
     });
   });
 
@@ -521,7 +356,7 @@ describe('InstallAsset', () => {
 
       expect(
         filterMissingExtensions(gd, [
-          // An unknown behavior not loaded:
+          // An unknown extension not loaded:
           {
             extensionName: 'NotExistingExtension',
             extensionVersion: '1.0.0',
@@ -546,6 +381,7 @@ describe('InstallAsset', () => {
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
         allTags: [''],
+        allCategories: [''],
         extensionShortHeaders: [
           flashExtensionShortHeader,
           fireBulletExtensionShortHeader,
@@ -565,6 +401,7 @@ describe('InstallAsset', () => {
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
         allTags: [''],
+        allCategories: [''],
         extensionShortHeaders: [
           flashExtensionShortHeader,
           fireBulletExtensionShortHeader,
@@ -583,9 +420,9 @@ describe('InstallAsset', () => {
         throw new Error('Fake error');
       });
 
-      await expect(downloadExtensions(['FakeExtension'])).rejects.toMatchObject(
-        { message: 'Fake error' }
-      );
+      await expect(downloadExtensions(['FakeBehavior'])).rejects.toMatchObject({
+        message: 'Fake error',
+      });
     });
   });
 
@@ -656,7 +493,7 @@ describe('InstallAsset', () => {
 
   describe('installAsset', () => {
     beforeEach(() => {
-      mockFn(Asset.getAsset).mockReset();
+      mockFn(Asset.getPublicAsset).mockReset();
       mockFn(getExtensionsRegistry).mockReset();
       mockFn(getExtension).mockReset();
     });
@@ -677,18 +514,17 @@ describe('InstallAsset', () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
       const layout = project.insertNewLayout('MyTestLayout', 0);
-      const eventsList = new gd.EventsList();
-      mockFn(Asset.getAsset).mockImplementationOnce(() => {
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(() => {
         throw new Error('Fake error - unable to download');
       });
 
       await expect(
-        installAsset({
+        installPublicAsset({
           assetShortHeader: fakeAssetShortHeader1,
-          events: eventsList,
           project,
           objectsContainer: layout,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+          environment: 'live',
         })
       ).rejects.toMatchObject({
         message: 'Fake error - unable to download',
@@ -698,59 +534,21 @@ describe('InstallAsset', () => {
       expect(getExtension).not.toHaveBeenCalled();
     });
 
-    it("throws if an extension for a behavior can't be found in the registry", async () => {
-      makeTestExtensions(gd);
-      const { project } = makeTestProject(gd);
-      const layout = project.insertNewLayout('MyTestLayout', 0);
-      const eventsList = new gd.EventsList();
-
-      // Get an asset that uses a behavior...
-      mockFn(Asset.getAsset).mockImplementationOnce(
-        () => fakeAssetWithUnknownBehaviorCustomizations1
-      );
-
-      // ...but this behavior extension does not exist in the registry
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        allTags: [''],
-        extensionShortHeaders: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
-      }));
-
-      // Check that the extension is stated as not found in the registry
-      await expect(
-        installAsset({
-          assetShortHeader: fakeAssetShortHeader1,
-          events: eventsList,
-          project,
-          objectsContainer: layout,
-          eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
-        })
-      ).rejects.toMatchObject({
-        message: 'Unable to find extension UnknownBehavior in the registry.',
-      });
-
-      expect(getExtensionsRegistry).toHaveBeenCalledTimes(1);
-      expect(getExtension).not.toHaveBeenCalled();
-    });
-
     it("throws if an extension can't be found in the registry", async () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
       const layout = project.insertNewLayout('MyTestLayout', 0);
-      const eventsList = new gd.EventsList();
 
       // Get an asset that uses an extension...
-      mockFn(Asset.getAsset).mockImplementationOnce(
-        () => fakeAssetWithEventCustomizationsAndUnknownExtension1
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(
+        () => fakeAssetWithUnknownExtension1
       );
 
       // ...but this extension does not exist in the registry
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
         allTags: [''],
+        allCategories: [''],
         extensionShortHeaders: [
           flashExtensionShortHeader,
           fireBulletExtensionShortHeader,
@@ -759,12 +557,12 @@ describe('InstallAsset', () => {
 
       // Check that the extension is stated as not found in the registry
       await expect(
-        installAsset({
+        installPublicAsset({
           assetShortHeader: fakeAssetShortHeader1,
-          events: eventsList,
           project,
           objectsContainer: layout,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+          environment: 'live',
         })
       ).rejects.toMatchObject({
         message: 'Unable to find extension UnknownExtension in the registry.',
@@ -774,64 +572,21 @@ describe('InstallAsset', () => {
       expect(getExtension).not.toHaveBeenCalled();
     });
 
-    it("throws if a behavior can't be installed, even if its extension was properly found in the registry", async () => {
+    it("throws if an extension can't be installed, even if its extension was properly found in the registry", async () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
       const layout = project.insertNewLayout('MyTestLayout', 0);
-      const eventsList = new gd.EventsList();
-
-      // Get an asset that uses a behavior...
-      mockFn(Asset.getAsset).mockImplementationOnce(
-        () => fakeAssetWithFlashBehaviorCustomizations1
-      );
-
-      // ...and this behavior extension is in the registry
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        allTags: [''],
-        extensionShortHeaders: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
-      }));
-
-      mockFn(getExtension).mockImplementationOnce(
-        () => flashExtensionShortHeader
-      );
-
-      // Verify that, because we use `mockEventsFunctionsExtensionsState`, the
-      // extension won't be loaded, so the behavior won't be installed.
-      await expect(
-        installAsset({
-          assetShortHeader: fakeAssetShortHeader1,
-          events: eventsList,
-          project,
-          objectsContainer: layout,
-          eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
-        })
-      ).rejects.toMatchObject({
-        message: 'These behaviors could not be installed: Flash::Flash (Flash)',
-      });
-
-      expect(getExtensionsRegistry).toHaveBeenCalledTimes(1);
-      expect(getExtension).toHaveBeenCalledTimes(1);
-    });
-
-    it("throws if an extension can't be installed, even if it was properly found in the registry", async () => {
-      makeTestExtensions(gd);
-      const { project } = makeTestProject(gd);
-      const layout = project.insertNewLayout('MyTestLayout', 0);
-      const eventsList = new gd.EventsList();
 
       // Get an asset that uses an extension...
-      mockFn(Asset.getAsset).mockImplementationOnce(
-        () => fakeAssetWithEventCustomizationsAndFlashExtension1
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(
+        () => fakeAssetWithFlashExtensionDependency1
       );
 
       // ...and this extension is in the registry
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
         allTags: [''],
+        allCategories: [''],
         extensionShortHeaders: [
           flashExtensionShortHeader,
           fireBulletExtensionShortHeader,
@@ -843,14 +598,14 @@ describe('InstallAsset', () => {
       );
 
       // Verify that, because we use `mockEventsFunctionsExtensionsState`, the
-      // extension won't be loaded, so the extension won't be installed.
+      // extension won't be loaded.
       await expect(
-        installAsset({
+        installPublicAsset({
           assetShortHeader: fakeAssetShortHeader1,
-          events: eventsList,
           project,
           objectsContainer: layout,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+          environment: 'live',
         })
       ).rejects.toMatchObject({
         message: 'These extensions could not be installed: Flash',
@@ -860,40 +615,42 @@ describe('InstallAsset', () => {
       expect(getExtension).toHaveBeenCalledTimes(1);
     });
 
-    it('install an asset, with a behavior that is already installed', async () => {
+    // TODO EBO Add a test for a custom object that contains another custom objet.
+    // There are 2 cases:
+    // - an event-based object from the same extension (this should already work).
+    // - an event-based object from another extension (this won't work because
+    //   it needs extension dependencies).
+
+    it('install an asset with an event-based object that is already installed', async () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
       const layout = project.insertNewLayout('MyTestLayout', 0);
-      const eventsList = new gd.EventsList();
 
-      // Fake an asset with a behavior of type "FakeBehavior::FakeBehavior",
+      // Fake an asset with a custom object of type "Button::PanelSpriteButton",
       // that is installed already.
-      mockFn(Asset.getAsset).mockImplementationOnce(
-        () => fakeAssetWithBehaviorCustomizations1
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(
+        () => fakeAssetWithCustomObject
       );
 
       // Install the asset
-      await installAsset({
+      await installPublicAsset({
         assetShortHeader: fakeAssetShortHeader1,
-        events: eventsList,
         project,
         objectsContainer: layout,
         eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+        environment: 'live',
       });
 
-      // No extensions fetched because the behavior is already installed.
+      // No extensions fetched because the extension is already installed.
       expect(getExtension).not.toHaveBeenCalled();
       expect(getExtensionsRegistry).not.toHaveBeenCalled();
 
-      // Check that the object was created, with the proper behavior:
+      // Check that the object was created.
       expect(layout.getObjectsCount()).toBe(1);
-      expect(layout.getObjectAt(0).getName()).toBe('PlayerSpaceship');
-      expect(
-        layout
-          .getObjectAt(0)
-          .getAllBehaviorNames()
-          .toJSArray()
-      ).toEqual(['MyBehavior']);
+      expect(layout.getObjectAt(0).getName()).toBe('YellowButton');
+      expect(layout.getObjectAt(0).getType()).toEqual(
+        'Button::PanelSpriteButton'
+      );
     });
   });
 });

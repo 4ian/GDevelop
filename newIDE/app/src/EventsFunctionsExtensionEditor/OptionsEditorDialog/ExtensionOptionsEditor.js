@@ -181,6 +181,9 @@ export const ExtensionOptionsEditor = ({
             fullWidth
             rows={5}
             rowsMax={15}
+            helperMarkdownText={i18n._(
+              t`Explain and give some examples of what can be achieved with this extension.`
+            )}
           />
           <TextField
             floatingLabelText={<Trans>Version</Trans>}
@@ -199,38 +202,67 @@ export const ExtensionOptionsEditor = ({
               eventsFunctionsExtension.setCategory(category);
               forceUpdate();
             }}
+            // TODO Sort by translated value.
             dataSource={[
               {
                 text: '',
                 value: 'General',
+                translatableValue: 'General',
               },
               {
                 text: 'Ads',
                 value: 'Ads',
+                translatableValue: 'Ads',
+              },
+              {
+                text: 'Visual effect',
+                value: 'Visual effect',
+                translatableValue: 'Visual effect',
               },
               {
                 text: 'Audio',
                 value: 'Audio',
+                translatableValue: 'Audio',
               },
               {
                 text: 'Advanced',
                 value: 'Advanced',
+                translatableValue: 'Advanced',
               },
               {
-                text: 'Device',
-                value: 'Device',
+                text: 'Camera',
+                value: 'Camera',
+                translatableValue: 'Camera',
               },
               {
                 text: 'Input',
                 value: 'Input',
+                translatableValue: 'Input',
+              },
+              {
+                text: 'Game mechanic',
+                value: 'Game mechanic',
+                translatableValue: 'Game mechanic',
+              },
+              {
+                text: 'Movement',
+                value: 'Movement',
+                translatableValue: 'Movement',
               },
               {
                 text: 'Network',
                 value: 'Network',
+                translatableValue: 'Network',
               },
               {
                 text: 'Third-party',
                 value: 'Third-party',
+                translatableValue: 'Third-party',
+              },
+              {
+                text: 'User interface',
+                value: 'User interface',
+                translatableValue: 'User interface',
               },
             ]}
           />

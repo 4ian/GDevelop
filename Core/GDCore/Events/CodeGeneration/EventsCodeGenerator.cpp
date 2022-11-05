@@ -43,7 +43,7 @@ gd::String EventsCodeGenerator::GenerateRelationalOperatorCall(
   std::size_t relationalOperatorIndex = instrInfos.parameters.size();
   for (std::size_t i = startFromArgument; i < instrInfos.parameters.size();
        ++i) {
-    if (instrInfos.parameters[i].type == "relationalOperator")
+    if (instrInfos.parameters[i].GetType() == "relationalOperator")
       relationalOperatorIndex = i;
   }
   // Ensure that there is at least one parameter after the relational operator
@@ -95,7 +95,7 @@ gd::String EventsCodeGenerator::GenerateOperatorCall(
   std::size_t operatorIndex = instrInfos.parameters.size();
   for (std::size_t i = startFromArgument; i < instrInfos.parameters.size();
        ++i) {
-    if (instrInfos.parameters[i].type == "operator") operatorIndex = i;
+    if (instrInfos.parameters[i].GetType() == "operator") operatorIndex = i;
   }
 
   // Ensure that there is at least one parameter after the operator
@@ -164,7 +164,7 @@ gd::String EventsCodeGenerator::GenerateCompoundOperatorCall(
   std::size_t operatorIndex = instrInfos.parameters.size();
   for (std::size_t i = startFromArgument; i < instrInfos.parameters.size();
        ++i) {
-    if (instrInfos.parameters[i].type == "operator") operatorIndex = i;
+    if (instrInfos.parameters[i].GetType() == "operator") operatorIndex = i;
   }
 
   // Ensure that there is at least one parameter after the operator
@@ -215,7 +215,7 @@ gd::String EventsCodeGenerator::GenerateMutatorCall(
   std::size_t operatorIndex = instrInfos.parameters.size();
   for (std::size_t i = startFromArgument; i < instrInfos.parameters.size();
        ++i) {
-    if (instrInfos.parameters[i].type == "operator") operatorIndex = i;
+    if (instrInfos.parameters[i].GetType() == "operator") operatorIndex = i;
   }
 
   // Ensure that there is at least one parameter after the operator
@@ -293,7 +293,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
 
   // Verify that there are no mismatchs between object type in parameters.
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
-    if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].type)) {
+    if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType())) {
       gd::String objectInParameter =
           condition.GetParameter(pNb).GetPlainString();
 
@@ -303,11 +303,11 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
           !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
               objectInParameter)) {
         return "/* Unknown object - skipped. */";
-      } else if (!instrInfos.parameters[pNb].supplementaryInformation.empty() &&
+      } else if (!instrInfos.parameters[pNb].GetExtraInfo().empty() &&
                  gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
                                      GetObjectsAndGroups(),
                                      objectInParameter) !=
-                     instrInfos.parameters[pNb].supplementaryInformation) {
+                     instrInfos.parameters[pNb].GetExtraInfo()) {
         return "/* Mismatched object type - skipped. */";
       }
     }
@@ -468,6 +468,14 @@ gd::String EventsCodeGenerator::GenerateActionCode(
         action, *this, context);
   }
 
+  // Get the correct function name depending on whether it should be async or
+  // not.
+  const gd::String& functionCallName =
+      instrInfos.IsAsync() &&
+              (!instrInfos.IsOptionallyAsync() || action.IsAwaited())
+          ? instrInfos.codeExtraInformation.asyncFunctionCallName
+          : instrInfos.codeExtraInformation.functionCallName;
+
   // Be sure there is no lack of parameter.
   while (action.GetParameters().size() < instrInfos.parameters.size()) {
     vector<gd::Expression> parameters = action.GetParameters();
@@ -477,7 +485,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
 
   // Verify that there are no mismatchs between object type in parameters.
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
-    if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].type)) {
+    if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType())) {
       gd::String objectInParameter = action.GetParameter(pNb).GetPlainString();
       if (!GetObjectsAndGroups().HasObjectNamed(objectInParameter) &&
           !GetGlobalObjectsAndGroups().HasObjectNamed(objectInParameter) &&
@@ -485,11 +493,11 @@ gd::String EventsCodeGenerator::GenerateActionCode(
           !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
               objectInParameter)) {
         return "/* Unknown object - skipped. */";
-      } else if (!instrInfos.parameters[pNb].supplementaryInformation.empty() &&
+      } else if (!instrInfos.parameters[pNb].GetExtraInfo().empty() &&
                  gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
                                      GetObjectsAndGroups(),
                                      objectInParameter) !=
-                     instrInfos.parameters[pNb].supplementaryInformation) {
+                     instrInfos.parameters[pNb].GetExtraInfo()) {
         return "/* Mismatched object type - skipped. */";
       }
     }
@@ -522,6 +530,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
               action.GetParameters(), instrInfos.parameters, context);
           actionCode += GenerateObjectAction(realObjects[i],
                                              objInfo,
+                                             functionCallName,
                                              arguments,
                                              instrInfos,
                                              context,
@@ -556,6 +565,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
             GenerateBehaviorAction(realObjects[i],
                                    action.GetParameter(1).GetPlainString(),
                                    autoInfo,
+                                   functionCallName,
                                    arguments,
                                    instrInfos,
                                    context,
@@ -567,8 +577,11 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   } else {
     vector<gd::String> arguments = GenerateParametersCodes(
         action.GetParameters(), instrInfos.parameters, context);
-    actionCode +=
-        GenerateFreeAction(arguments, instrInfos, context, optionalAsyncCallbackName);
+    actionCode += GenerateFreeAction(functionCallName,
+                                     arguments,
+                                     instrInfos,
+                                     context,
+                                     optionalAsyncCallbackName);
   }
 
   return actionCode;
@@ -666,20 +679,21 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
         supplementaryParametersTypes) {
   gd::String argOutput;
 
-  if (ParameterMetadata::IsExpression("number", metadata.type)) {
+  if (ParameterMetadata::IsExpression("number", metadata.GetType())) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
         *this, context, "number", parameter, lastObjectName);
-  } else if (ParameterMetadata::IsExpression("string", metadata.type)) {
+  } else if (ParameterMetadata::IsExpression("string", metadata.GetType())) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
         *this, context, "string", parameter, lastObjectName);
-  } else if (ParameterMetadata::IsExpression("variable", metadata.type)) {
+  } else if (ParameterMetadata::IsExpression("variable", metadata.GetType())) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
-        *this, context, metadata.type, parameter, lastObjectName);
-  } else if (ParameterMetadata::IsObject(metadata.type)) {
+        *this, context, metadata.GetType(), parameter, lastObjectName);
+  } else if (ParameterMetadata::IsObject(metadata.GetType())) {
     // It would be possible to run a gd::ExpressionCodeGenerator if later
     // objects can have nested objects, or function returning objects.
-    argOutput = GenerateObject(parameter.GetPlainString(), metadata.type, context);
-  } else if (metadata.type == "relationalOperator") {
+    argOutput =
+        GenerateObject(parameter.GetPlainString(), metadata.GetType(), context);
+  } else if (metadata.GetType() == "relationalOperator") {
     auto parameterString = parameter.GetPlainString();
     argOutput += parameterString == "=" ? "==" : parameterString;
     if (argOutput != "==" && argOutput != "<" && argOutput != ">" &&
@@ -689,7 +703,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     }
 
     argOutput = "\"" + argOutput + "\"";
-  } else if (metadata.type == "operator") {
+  } else if (metadata.GetType() == "operator") {
     argOutput += parameter.GetPlainString();
     if (argOutput != "=" && argOutput != "+" && argOutput != "-" &&
         argOutput != "/" && argOutput != "*") {
@@ -698,48 +712,50 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     }
 
     argOutput = "\"" + argOutput + "\"";
-  } else if (ParameterMetadata::IsBehavior(metadata.type)) {
+  } else if (ParameterMetadata::IsBehavior(metadata.GetType())) {
     argOutput = GenerateGetBehaviorNameCode(parameter.GetPlainString());
-  } else if (metadata.type == "key") {
+  } else if (metadata.GetType() == "key") {
     argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
-  } else if (metadata.type == "audioResource" ||
-             metadata.type == "bitmapFontResource" ||
-             metadata.type == "fontResource" ||
-             metadata.type == "imageResource" ||
-             metadata.type == "jsonResource" ||
-             metadata.type == "videoResource" ||
+  } else if (metadata.GetType() == "audioResource" ||
+             metadata.GetType() == "bitmapFontResource" ||
+             metadata.GetType() == "fontResource" ||
+             metadata.GetType() == "imageResource" ||
+             metadata.GetType() == "jsonResource" ||
+             metadata.GetType() == "videoResource" ||
              // Deprecated, old parameter names:
-             metadata.type == "password" || metadata.type == "musicfile" ||
-             metadata.type == "soundfile" || metadata.type == "police") {
+             metadata.GetType() == "password" || metadata.GetType() == "musicfile" ||
+             metadata.GetType() == "soundfile" || metadata.GetType() == "police") {
     argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
-  } else if (metadata.type == "mouse") {
+  } else if (metadata.GetType() == "mouse") {
     argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
-  } else if (metadata.type == "yesorno") {
+  } else if (metadata.GetType() == "yesorno") {
     auto parameterString = parameter.GetPlainString();
-    argOutput += (parameterString == "yes" || parameterString == "oui") ? GenerateTrue()
-                                                            : GenerateFalse();
-  } else if (metadata.type == "trueorfalse") {
+    argOutput += (parameterString == "yes" || parameterString == "oui")
+                     ? GenerateTrue()
+                     : GenerateFalse();
+  } else if (metadata.GetType() == "trueorfalse") {
     auto parameterString = parameter.GetPlainString();
     // This is duplicated in AdvancedExtension.cpp for GDJS
-    argOutput += (parameterString == "True" || parameterString == "Vrai") ? GenerateTrue()
-                                                              : GenerateFalse();
+    argOutput += (parameterString == "True" || parameterString == "Vrai")
+                     ? GenerateTrue()
+                     : GenerateFalse();
   }
   // Code only parameter type
-  else if (metadata.type == "inlineCode") {
-    argOutput += metadata.supplementaryInformation;
+  else if (metadata.GetType() == "inlineCode") {
+    argOutput += metadata.GetExtraInfo();
   } else {
     // Try supplementary types if provided
     if (supplementaryParametersTypes) {
       for (std::size_t i = 0; i < supplementaryParametersTypes->size(); ++i) {
-        if ((*supplementaryParametersTypes)[i].first == metadata.type)
+        if ((*supplementaryParametersTypes)[i].first == metadata.GetType())
           argOutput += (*supplementaryParametersTypes)[i].second;
       }
     }
 
     // Type unknown
     if (argOutput.empty()) {
-      if (!metadata.type.empty())
-        cout << "Warning: Unknown type of parameter \"" << metadata.type
+      if (!metadata.GetType().empty())
+        cout << "Warning: Unknown type of parameter \"" << metadata.GetType()
              << "\"." << std::endl;
       argOutput += "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
     }
@@ -1014,7 +1030,7 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(
   for (std::size_t i = 0; i < instrInfos.parameters.size();
        ++i)  // Some conditions already have a "conditionInverted" parameter
   {
-    if (instrInfos.parameters[i].type == "conditionInverted")
+    if (instrInfos.parameters[i].GetType() == "conditionInverted")
       conditionAlreadyTakeCareOfInversion = true;
   }
   if (!conditionAlreadyTakeCareOfInversion && conditionInverted)
@@ -1035,7 +1051,7 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(
   // Prepare call
   // Add a static_cast if necessary
   gd::String objectFunctionCallNamePart =
-      (!instrInfos.parameters[0].supplementaryInformation.empty())
+      (!instrInfos.parameters[0].GetExtraInfo().empty())
           ? "static_cast<" + objInfo.className + "*>(" +
                 GetObjectListName(objectName, context) + "[i])->" +
                 instrInfos.codeExtraInformation.functionCallName
@@ -1082,6 +1098,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
 }
 
 gd::String EventsCodeGenerator::GenerateFreeAction(
+      const gd::String& functionCallName,
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
     gd::EventsCodeGenerationContext& context,
@@ -1095,21 +1112,21 @@ gd::String EventsCodeGenerator::GenerateFreeAction(
       call = GenerateOperatorCall(
           instrInfos,
           arguments,
-          instrInfos.codeExtraInformation.functionCallName,
+          functionCallName,
           instrInfos.codeExtraInformation.optionalAssociatedInstruction);
     else if (instrInfos.codeExtraInformation.accessType ==
              gd::InstructionMetadata::ExtraInformation::Mutators)
       call =
           GenerateMutatorCall(instrInfos,
                               arguments,
-                              instrInfos.codeExtraInformation.functionCallName);
+                              functionCallName);
     else
       call = GenerateCompoundOperatorCall(
           instrInfos,
           arguments,
-          instrInfos.codeExtraInformation.functionCallName);
+          functionCallName);
   } else {
-    call = instrInfos.codeExtraInformation.functionCallName + "(" +
+    call = functionCallName + "(" +
            GenerateArgumentsList(arguments) + ")";
   }
 
@@ -1123,6 +1140,7 @@ gd::String EventsCodeGenerator::GenerateFreeAction(
 gd::String EventsCodeGenerator::GenerateObjectAction(
     const gd::String& objectName,
     const gd::ObjectMetadata& objInfo,
+    const gd::String& functionCallName,
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
     gd::EventsCodeGenerationContext& context,
@@ -1136,27 +1154,25 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
       call = GenerateOperatorCall(
           instrInfos,
           arguments,
-          instrInfos.codeExtraInformation.functionCallName,
+          functionCallName,
           instrInfos.codeExtraInformation.optionalAssociatedInstruction,
           2);
     else
       call = GenerateCompoundOperatorCall(
-          instrInfos,
-          arguments,
-          instrInfos.codeExtraInformation.functionCallName,
-          2);
+          instrInfos, arguments, functionCallName, 2);
 
     return "For each picked object \"" + objectName + "\", call " + call +
            ".\n";
   } else {
     gd::String argumentsStr = GenerateArgumentsList(arguments, 1);
 
-    call = instrInfos.codeExtraInformation.functionCallName + "(" +
-           argumentsStr + ")";
+    call = functionCallName + "(" + argumentsStr + ")";
 
     return "For each picked object \"" + objectName + "\", call " + call + "(" +
            argumentsStr + ")" +
-           (optionalAsyncCallbackName.empty() ? "" : (", then call" + optionalAsyncCallbackName)) +
+           (optionalAsyncCallbackName.empty()
+                ? ""
+                : (", then call" + optionalAsyncCallbackName)) +
            ".\n";
   }
 }
@@ -1165,6 +1181,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
     const gd::String& objectName,
     const gd::String& behaviorName,
     const gd::BehaviorMetadata& autoInfo,
+    const gd::String& functionCallName,
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
     gd::EventsCodeGenerationContext& context,
@@ -1178,26 +1195,28 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
       call = GenerateOperatorCall(
           instrInfos,
           arguments,
-          instrInfos.codeExtraInformation.functionCallName,
+          functionCallName,
           instrInfos.codeExtraInformation.optionalAssociatedInstruction,
           2);
     else
       call = GenerateCompoundOperatorCall(
           instrInfos,
           arguments,
-          instrInfos.codeExtraInformation.functionCallName,
+          functionCallName,
           2);
     return "For each picked object \"" + objectName + "\", call " + call +
            " for behavior \"" + behaviorName + "\".\n";
   } else {
     gd::String argumentsStr = GenerateArgumentsList(arguments, 2);
 
-    call = instrInfos.codeExtraInformation.functionCallName + "(" +
+    call = functionCallName + "(" +
            argumentsStr + ")";
 
     return "For each picked object \"" + objectName + "\", call " + call + "(" +
            argumentsStr + ")" + " for behavior \"" + behaviorName + "\"" +
-           (optionalAsyncCallbackName.empty() ? "" : (", then call" + optionalAsyncCallbackName)) +
+           (optionalAsyncCallbackName.empty()
+                ? ""
+                : (", then call" + optionalAsyncCallbackName)) +
            ".\n";
   }
 }

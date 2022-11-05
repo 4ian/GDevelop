@@ -17,11 +17,44 @@ export default class Rectangle {
     this.bottom = bottom;
   }
 
-  set(left: number, top: number, right: number, bottom: number) {
+  static fromDOMRect(domRect: DOMRect | ClientRect) {
+    return new this(domRect.left, domRect.top, domRect.right, domRect.bottom);
+  }
+
+  set({
+    left,
+    top,
+    right,
+    bottom,
+  }: {
+    left: number,
+    top: number,
+    right: number,
+    bottom: number,
+  }) {
     this.left = left;
     this.top = top;
     this.right = right;
     this.bottom = bottom;
+  }
+
+  setThroughCenter({
+    centerX,
+    centerY,
+    width,
+    height,
+  }: {
+    centerX: number,
+    centerY: number,
+    width: number,
+    height: number,
+  }) {
+    this.set({
+      left: centerX - width / 2,
+      top: centerY - height / 2,
+      right: centerX + width / 2,
+      bottom: centerY + height / 2,
+    });
   }
 
   setRectangle(rectangle: Rectangle) {
@@ -60,6 +93,19 @@ export default class Rectangle {
     if (rectangle.bottom > this.bottom) {
       this.bottom = rectangle.bottom;
     }
+  }
+
+  containsPoint(x: number, y: number): boolean {
+    return this.left <= x && this.right > x && this.bottom > y && this.top <= y;
+  }
+
+  toCSSPosition() {
+    return {
+      top: this.top,
+      left: this.left,
+      width: this.width(),
+      height: this.height(),
+    };
   }
 
   toString() {

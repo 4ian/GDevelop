@@ -127,7 +127,7 @@ const GoogleDriveSaveAsDialog = (props: Props) => {
               floatingLabelText={<Trans>New file name</Trans>}
               floatingLabelFixed
               type="text"
-              hintText={t`YourGame.json`}
+              translatableHintText={t`YourGame.json`}
               value={newFileName}
               onChange={(event, newFileName) => setNewFileName(newFileName)}
               fullWidth

@@ -19,6 +19,7 @@
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/IDE/Events/InstructionSentenceFormatter.h"
 #include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 
 using namespace std;
@@ -121,7 +122,7 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
   bool hasDoneRenaming;
   const gd::String& objectName;
   const gd::String& objectNewName;
-  
+
   const gd::Platform &platform;
   const gd::ObjectsContainer &globalObjectsContainer;
   const gd::ObjectsContainer &objectsContainer;
@@ -216,7 +217,7 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
  private:
   bool hasObject;
   const gd::String& objectName;
-  
+
   const gd::Platform &platform;
   const gd::ObjectsContainer &globalObjectsContainer;
   const gd::ObjectsContainer &objectsContainer;
@@ -236,12 +237,12 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
         MetadataProvider::GetActionMetadata(platform, actions[aId].GetType());
     for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
       // Replace object's name in parameters
-      if (gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) &&
+      if (gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType()) &&
           actions[aId].GetParameter(pNb).GetPlainString() == oldName)
         actions[aId].SetParameter(pNb, gd::Expression(newName));
       // Replace object's name in expressions
       else if (ParameterMetadata::IsExpression(
-                   "number", instrInfos.parameters[pNb].type)) {
+                   "number", instrInfos.parameters[pNb].GetType())) {
         auto node = actions[aId].GetParameter(pNb).GetRootNode();
 
         if (ExpressionObjectRenamer::Rename(platform, project, layout, "number", *node, oldName, newName)) {
@@ -251,7 +252,7 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
       }
       // Replace object's name in text expressions
       else if (ParameterMetadata::IsExpression(
-                   "string", instrInfos.parameters[pNb].type)) {
+                   "string", instrInfos.parameters[pNb].GetType())) {
         auto node = actions[aId].GetParameter(pNb).GetRootNode();
 
         if (ExpressionObjectRenamer::Rename(platform, project, layout, "string", *node, oldName, newName)) {
@@ -290,12 +291,12 @@ bool EventsRefactorer::RenameObjectInConditions(
                                                conditions[cId].GetType());
     for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
       // Replace object's name in parameters
-      if (gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) &&
+      if (gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType()) &&
           conditions[cId].GetParameter(pNb).GetPlainString() == oldName)
         conditions[cId].SetParameter(pNb, gd::Expression(newName));
       // Replace object's name in expressions
       else if (ParameterMetadata::IsExpression(
-                   "number", instrInfos.parameters[pNb].type)) {
+                   "number", instrInfos.parameters[pNb].GetType())) {
         auto node = conditions[cId].GetParameter(pNb).GetRootNode();
 
         if (ExpressionObjectRenamer::Rename(platform, project, layout, "number", *node, oldName, newName)) {
@@ -305,7 +306,7 @@ bool EventsRefactorer::RenameObjectInConditions(
       }
       // Replace object's name in text expressions
       else if (ParameterMetadata::IsExpression(
-                   "string", instrInfos.parameters[pNb].type)) {
+                   "string", instrInfos.parameters[pNb].GetType())) {
         auto node = conditions[cId].GetParameter(pNb).GetRootNode();
 
         if (ExpressionObjectRenamer::Rename(platform, project, layout, "string", *node, oldName, newName)) {
@@ -411,8 +412,8 @@ void EventsRefactorer::RenameObjectInEvents(const gd::Platform& platform,
 }
 
 bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
-                                             gd::ObjectsContainer& project,
-                                             gd::ObjectsContainer& layout,
+                                             gd::ObjectsContainer& globalObjectsContainer,
+                                             gd::ObjectsContainer& objectsContainer,
                                              gd::InstructionsList& actions,
                                              gd::String name) {
   bool somethingModified = false;
@@ -424,27 +425,27 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
         MetadataProvider::GetActionMetadata(platform, actions[aId].GetType());
     for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
       // Find object's name in parameters
-      if (gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) &&
+      if (gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType()) &&
           actions[aId].GetParameter(pNb).GetPlainString() == name) {
         deleteMe = true;
         break;
       }
       // Find object's name in expressions
       else if (ParameterMetadata::IsExpression(
-                   "number", instrInfos.parameters[pNb].type)) {
+                   "number", instrInfos.parameters[pNb].GetType())) {
         auto node = actions[aId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectFinder::CheckIfHasObject(platform, project, layout, "number", *node, name)) {
+        if (ExpressionObjectFinder::CheckIfHasObject(platform, globalObjectsContainer, objectsContainer, "number", *node, name)) {
           deleteMe = true;
           break;
         }
       }
       // Find object's name in text expressions
       else if (ParameterMetadata::IsExpression(
-                   "string", instrInfos.parameters[pNb].type)) {
+                   "string", instrInfos.parameters[pNb].GetType())) {
         auto node = actions[aId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectFinder::CheckIfHasObject(platform, project, layout, "string", *node, name)) {
+        if (ExpressionObjectFinder::CheckIfHasObject(platform, globalObjectsContainer, objectsContainer, "string", *node, name)) {
           deleteMe = true;
           break;
         }
@@ -458,8 +459,8 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
     } else if (!actions[aId].GetSubInstructions().empty())
       somethingModified =
           RemoveObjectInActions(platform,
-                                project,
-                                layout,
+                                globalObjectsContainer,
+                                objectsContainer,
                                 actions[aId].GetSubInstructions(),
                                 name) ||
           somethingModified;
@@ -470,8 +471,8 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
 
 bool EventsRefactorer::RemoveObjectInConditions(
     const gd::Platform& platform,
-    gd::ObjectsContainer& project,
-    gd::ObjectsContainer& layout,
+    gd::ObjectsContainer& globalObjectsContainer,
+    gd::ObjectsContainer& objectsContainer,
     gd::InstructionsList& conditions,
     gd::String name) {
   bool somethingModified = false;
@@ -484,27 +485,27 @@ bool EventsRefactorer::RemoveObjectInConditions(
                                                conditions[cId].GetType());
     for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
       // Find object's name in parameters
-      if (gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) &&
+      if (gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType()) &&
           conditions[cId].GetParameter(pNb).GetPlainString() == name) {
         deleteMe = true;
         break;
       }
       // Find object's name in expressions
       else if (ParameterMetadata::IsExpression(
-                   "number", instrInfos.parameters[pNb].type)) {
+                   "number", instrInfos.parameters[pNb].GetType())) {
         auto node = conditions[cId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectFinder::CheckIfHasObject(platform, project, layout, "number", *node, name)) {
+        if (ExpressionObjectFinder::CheckIfHasObject(platform, globalObjectsContainer, objectsContainer, "number", *node, name)) {
           deleteMe = true;
           break;
         }
       }
       // Find object's name in text expressions
       else if (ParameterMetadata::IsExpression(
-                   "string", instrInfos.parameters[pNb].type)) {
+                   "string", instrInfos.parameters[pNb].GetType())) {
         auto node = conditions[cId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectFinder::CheckIfHasObject(platform, project, layout, "string", *node, name)) {
+        if (ExpressionObjectFinder::CheckIfHasObject(platform, globalObjectsContainer, objectsContainer, "string", *node, name)) {
           deleteMe = true;
           break;
         }
@@ -518,8 +519,8 @@ bool EventsRefactorer::RemoveObjectInConditions(
     } else if (!conditions[cId].GetSubInstructions().empty())
       somethingModified =
           RemoveObjectInConditions(platform,
-                                   project,
-                                   layout,
+                                   globalObjectsContainer,
+                                   objectsContainer,
                                    conditions[cId].GetSubInstructions(),
                                    name) ||
           somethingModified;
@@ -529,8 +530,8 @@ bool EventsRefactorer::RemoveObjectInConditions(
 }
 
 void EventsRefactorer::RemoveObjectInEvents(const gd::Platform& platform,
-                                            gd::ObjectsContainer& project,
-                                            gd::ObjectsContainer& layout,
+                                            gd::ObjectsContainer& globalObjectsContainer,
+                                            gd::ObjectsContainer& objectsContainer,
                                             gd::EventsList& events,
                                             gd::String name) {
   for (std::size_t i = 0; i < events.size(); ++i) {
@@ -538,19 +539,19 @@ void EventsRefactorer::RemoveObjectInEvents(const gd::Platform& platform,
         events[i].GetAllConditionsVectors();
     for (std::size_t j = 0; j < conditionsVectors.size(); ++j) {
       bool conditionsModified = RemoveObjectInConditions(
-          platform, project, layout, *conditionsVectors[j], name);
+          platform, globalObjectsContainer, objectsContainer, *conditionsVectors[j], name);
     }
 
     vector<gd::InstructionsList*> actionsVectors =
         events[i].GetAllActionsVectors();
     for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
       bool actionsModified = RemoveObjectInActions(
-          platform, project, layout, *actionsVectors[j], name);
+          platform, globalObjectsContainer, objectsContainer, *actionsVectors[j], name);
     }
 
     if (events[i].CanHaveSubEvents())
       RemoveObjectInEvents(
-          platform, project, layout, events[i].GetSubEvents(), name);
+          platform, globalObjectsContainer, objectsContainer, events[i].GetSubEvents(), name);
   }
 }
 
@@ -565,6 +566,8 @@ std::vector<EventsSearchResult> EventsRefactorer::ReplaceStringInEvents(
     bool inActions,
     bool inEventStrings) {
   vector<EventsSearchResult> modifiedEvents;
+  if (toReplace.empty()) return modifiedEvents;
+
   for (std::size_t i = 0; i < events.size(); ++i) {
     bool eventModified = false;
     if (inConditions) {

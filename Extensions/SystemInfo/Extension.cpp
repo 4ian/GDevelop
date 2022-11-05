@@ -15,7 +15,7 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
       _("Get information about the system and device running the game."),
       "Florian Rival",
       "Open source (MIT License)")
-      .SetCategory("Device");
+      .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("System information"))
       .SetIcon("CppPlatform/Extensions/systeminfoicon.png");
 
@@ -29,8 +29,7 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
           "CppPlatform/Extensions/systeminfoicon.png",
           "CppPlatform/Extensions/systeminfoicon.png")
 
-      .SetFunctionName("SystemInfo::IsMobile")
-      .SetIncludeFile("SystemInfo/SystemInfoTools.h");
+      .SetFunctionName("SystemInfo::IsMobile");
 
   extension
       .AddCondition("IsWebGLSupported",
@@ -43,8 +42,7 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
                     "CppPlatform/Extensions/systeminfoicon.png")
 
       .AddCodeOnlyParameter("currentScene", "")
-      .SetFunctionName("SystemInfo::IsWebGLSupported")
-      .SetIncludeFile("SystemInfo/SystemInfoTools.h");
+      .SetFunctionName("SystemInfo::IsWebGLSupported");
 
   extension
       .AddCondition(

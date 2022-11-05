@@ -1,5 +1,5 @@
 // @ts-check
-describe.only('gdjs.AnchorRuntimeBehavior', function () {
+describe('gdjs.AnchorRuntimeBehavior', function () {
   const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     resources: { resources: [] },
@@ -60,16 +60,6 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
     object.setCustomWidthAndHeight(10, 10);
     runtimeScene.addObject(object);
     return object;
-  }
-
-  function getAnchorBehavior(object) {
-    const behavior = object.getBehavior(anchorBehaviorName);
-    if (!(behavior instanceof gdjs.AnchorRuntimeBehavior)) {
-      throw new Error(
-        'Expected behavior to be an instance of gdjs.AnchorBehavior'
-      );
-    }
-    return behavior;
   }
 
   describe('(anchor horizontal edge)', function () {

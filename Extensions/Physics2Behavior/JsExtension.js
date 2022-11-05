@@ -34,7 +34,7 @@ module.exports = {
         'MIT'
       )
       .setExtensionHelpPath('/behaviors/physics2')
-      .setCategory('Advanced');
+      .setCategory('Movement');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Physics Engine 2.0'))
       .setIcon('res/physics32.png');
@@ -419,7 +419,8 @@ module.exports = {
         sharedData
       )
       .setIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
-      .addIncludeFile('Extensions/Physics2Behavior/box2d.js');
+      .addIncludeFile('Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.js')
+      .addRequiredFile('Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.wasm')
 
     // Global
     aut
@@ -1396,8 +1397,8 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('expression', _('X component (N.m)'))
-      .addParameter('expression', _('Y component (N.m)'))
+      .addParameter('expression', _('X component (in Newton * seconds or kilogram * meter per second)'))
+      .addParameter('expression', _('Y component (in Newton * seconds or kilogram * meter per second)'))
       .addParameter('expression', _('Applying X position'))
       .addParameter('expression', _('Applying Y position'))
       .getCodeExtraInformation()
@@ -1420,7 +1421,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Angle'))
-      .addParameter('expression', _('Length (N.m)'))
+      .addParameter('expression', _('Length (in Newton * seconds or kilogram * meter per second)'))
       .addParameter('expression', _('Applying X position'))
       .addParameter('expression', _('Applying Y position'))
       .getCodeExtraInformation()
@@ -1442,7 +1443,7 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('expression', _('Length (N.m)'))
+      .addParameter('expression', _('Length (in Newton * seconds or kilogram * meter per second)'))
       .addParameter('expression', _('X position'))
       .addParameter('expression', _('Y position'))
       .addParameter('expression', _('Applying X position'))
@@ -1486,18 +1487,44 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('applyAngularImpulse');
 
-    aut
+      aut
       .addExpression(
-        'MassCenterX',
-        _('Mass center X'),
-        _('Mass center X'),
+        'Mass',
+        _('Mass'),
+        _('Return the mass of the object (in kilograms)'),
         '',
         'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .getCodeExtraInformation()
-      .setFunctionName('getMassCenterX');
+      .setFunctionName('getMass');
+
+      aut
+        .addExpression(
+          'Inertia',
+          _('Inertia'),
+          _('Return the rotational inertia of the object (in kilograms * meters * meters)'),
+          '',
+          'res/physics32.png'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+        .getCodeExtraInformation()
+        .setFunctionName('getInertia');
+
+      aut
+        .addExpression(
+          'MassCenterX',
+          _('Mass center X'),
+          _('Mass center X'),
+          '',
+          'res/physics32.png'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+        .getCodeExtraInformation()
+        .setFunctionName('getMassCenterX');
 
     aut
       .addExpression(
@@ -3732,9 +3759,9 @@ module.exports = {
       .addCondition(
         'Collision',
         _('Collision'),
-        _('Test if two objects collide.'),
+        _('Check if two objects collide.'),
         _('_PARAM0_ is colliding with _PARAM2_'),
-        '',
+       '',
         'res/physics32.png',
         'res/physics32.png'
       )
@@ -3746,6 +3773,42 @@ module.exports = {
       .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
       .setFunctionName('gdjs.physics2.objectsCollide');
 
+    extension
+      .addCondition(
+        'CollisionStarted',
+        _('Collision started'),
+        _('Check if two objects just started colliding during this frame.'),
+        _('_PARAM0_ started colliding with _PARAM2_'),
+        _('Collision'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('objectList', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .addParameter('objectList', _('Object'), '', false)
+      .addCodeOnlyParameter('conditionInverted', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .setFunctionName('gdjs.physics2.haveObjectsStartedColliding');
+
+    extension
+      .addCondition(
+        'CollisionStopped',
+        _('Collision stopped'),
+        _('Check if two objects just stopped colliding at this frame.'),
+        _('_PARAM0_ stopped colliding with _PARAM2_'),
+        _('Collision'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('objectList', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .addParameter('objectList', _('Object'), '', false)
+      .addCodeOnlyParameter('conditionInverted', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .setFunctionName('gdjs.physics2.haveObjectsStoppedColliding');
+
     return extension;
   },
 
@@ -3753,6 +3816,23 @@ module.exports = {
     gd /*: libGDevelop */,
     extension /*: gdPlatformExtension*/
   ) {
-    return [];
+    const dummyBehavior = extension
+      .getBehaviorMetadata('Physics2::Physics2Behavior')
+      .get();
+    const sharedData = extension
+      .getBehaviorMetadata('Physics2::Physics2Behavior')
+      .getSharedDataInstance();
+    return [
+      gd.ProjectHelper.sanityCheckBehaviorProperty(
+        dummyBehavior,
+        'density',
+        '123'
+      ),
+      gd.ProjectHelper.sanityCheckBehaviorsSharedDataProperty(
+        sharedData,
+        'gravityY',
+        '456'
+      ),
+    ];
   },
 };

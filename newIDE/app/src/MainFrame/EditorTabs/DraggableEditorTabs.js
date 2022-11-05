@@ -16,27 +16,31 @@ import {
   type ClosableTabProps,
 } from '../../UI/ClosableTabs';
 
-type DraggableClosableTabsProps = {|
+const DragSourceAndDropTarget = makeDragSourceAndDropTarget<EditorTab>(
+  'draggable-closable-tab'
+);
+
+type DraggableEditorTabsProps = {|
   hideLabels?: boolean,
   editorTabs: EditorTabsState,
   onClickTab: (index: number) => void,
   onCloseTab: (editor: EditorTab) => void,
   onCloseOtherTabs: (editor: EditorTab) => void,
   onCloseAll: () => void,
-  onTabActived: (editor: EditorTab) => void,
+  onTabActivated: (editor: EditorTab) => void,
   onDropTab: (fromIndex: number, toHoveredIndex: number) => void,
 |};
 
-export function DraggableClosableTabs({
+export function DraggableEditorTabs({
   hideLabels,
   editorTabs,
   onClickTab,
   onCloseTab,
   onCloseOtherTabs,
   onCloseAll,
-  onTabActived,
+  onTabActivated,
   onDropTab,
-}: DraggableClosableTabsProps) {
+}: DraggableEditorTabsProps) {
   let draggedTabIndex: ?number = null;
 
   return (
@@ -55,7 +59,7 @@ export function DraggableClosableTabs({
             onClose={() => onCloseTab(editorTab)}
             onCloseOthers={() => onCloseOtherTabs(editorTab)}
             onCloseAll={onCloseAll}
-            onActivated={() => onTabActived(editorTab)}
+            onActivated={() => onTabActivated(editorTab)}
             closable={editorTab.closable}
             onBeginDrag={() => {
               draggedTabIndex = id;
@@ -96,10 +100,6 @@ export function DraggableClosableTab({
   onBeginDrag,
   onDrop,
 }: DraggableClosableTabProps) {
-  const DragSourceAndDropTarget = makeDragSourceAndDropTarget<EditorTab>(
-    'draggable-closable-tab'
-  );
-
   return (
     <ScreenTypeMeasurer>
       {screenType => (

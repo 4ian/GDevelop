@@ -96,13 +96,13 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
                      _("Difference between two angles"),
                      "",
                      "res/mathfunction.png")
-      .AddParameter("expression", _("First angle"))
-      .AddParameter("expression", _("Second angle"));
+      .AddParameter("expression", _("First angle, in degrees"))
+      .AddParameter("expression", _("Second angle, in degrees"));
 
   extension
       .AddExpression("AngleBetweenPositions",
                      _("Angle between two positions"),
-                     _("Compute the angle between two positions."),
+                     _("Compute the angle between two positions (in degrees)."),
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("First point X position"))
@@ -159,7 +159,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
   extension
       .AddExpression("acos",
                      _("Arccosine"),
-                     _("Arccosine"),
+                     _("Arccosine, return an angle (in radian). "
+                       "`ToDeg` allows to convert it to degrees."),
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
@@ -175,7 +176,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
   extension
       .AddExpression("asin",
                      _("Arcsine"),
-                     _("Arcsine"),
+                     _("Arcsine, return an angle (in radian). "
+                       "`ToDeg` allows to convert it to degrees."),
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
@@ -191,7 +193,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
   extension
       .AddExpression("atan",
                      _("Arctangent"),
-                     _("Arctangent"),
+                     _("Arctangent, return an angle (in radian). "
+                       "`ToDeg` allows to convert it to degrees."),
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
@@ -258,7 +261,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
   extension
       .AddExpression("cos",
                      _("Cosine"),
-                     _("Cosine of a number"),
+                     _("Cosine of an angle (in radian). "
+                       "If you want to use degrees, use`ToRad`: `sin(ToRad(45))`."),
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
@@ -400,7 +404,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
   extension
       .AddExpression("sin",
                      _("Sine"),
-                     _("Sine of a number"),
+                     _("Sine of an angle (in radian). "
+                       "If you want to use degrees, use`ToRad`: `sin(ToRad(45))`."),
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
@@ -424,7 +429,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
   extension
       .AddExpression("tan",
                      _("Tangent"),
-                     _("Tangent of a number"),
+                     _("Tangent of an angle (in radian). "
+                       "If you want to use degrees, use`ToRad`: `tan(ToRad(45))`."),
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
@@ -479,6 +485,13 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("Angle, in degrees"))
       .AddParameter("expression", _("Distance"));
 
+  extension
+      .AddExpression("Pi",
+                     _("Number Pi (3.1415...)"),
+                     _("The number Pi (3.1415...)"),
+                     "",
+                     "res/mathfunction.png")
+      .SetHelpPath("/all-features/expressions");
 }
 
 }  // namespace gd

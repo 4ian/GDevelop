@@ -264,11 +264,11 @@ export const WithObjectsList = () => (
                   project={testProject.project}
                   objectsContainer={testProject.testLayout}
                   layout={testProject.testLayout}
-                  events={testProject.testLayout.getEvents()}
                   resourceSources={[]}
                   onChooseResource={() => Promise.reject('unimplemented')}
                   resourceExternalEditors={fakeResourceExternalEditors}
                   onEditObject={action('On edit object')}
+                  onExportObject={action('On export object')}
                   onAddObjectInstance={action('On add instance to the scene')}
                   selectedObjectNames={[]}
                   selectedObjectTags={[]}
@@ -280,6 +280,10 @@ export const WithObjectsList = () => (
                   onObjectCreated={() => {}}
                   onObjectSelected={() => {}}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+                  onFetchNewlyAddedResources={action(
+                    'onFetchNewlyAddedResources'
+                  )}
+                  canInstallPrivateAsset={() => false}
                 />
               </TabContentContainer>
             }

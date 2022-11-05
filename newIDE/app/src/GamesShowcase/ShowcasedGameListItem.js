@@ -39,7 +39,8 @@ const styles = {
     display: 'flex',
     textAlign: 'left',
     overflow: 'hidden',
-    padding: 8,
+    paddingBottom: 8,
+    paddingTop: 8,
   },
 };
 
@@ -79,7 +80,7 @@ export const ShowcasedGameListItem = ({
       style={{
         ...styles.container,
         visibility: isLoaded ? undefined : 'hidden',
-        animation: isLoaded ? 'fadein 0.5s' : undefined,
+        animation: isLoaded ? 'fade-in 0.5s' : undefined,
       }}
       ref={containerRef}
     >

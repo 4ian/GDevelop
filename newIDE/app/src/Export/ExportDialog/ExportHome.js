@@ -67,7 +67,7 @@ const ExportHome = ({
       <ColumnStackLayout alignItems="center" expand>
         <div style={styles.titleContainer}>
           <Line>
-            <Text size="title">
+            <Text size="block-title">
               <Trans>Publish and share with friends on Liluo.io</Trans>
             </Text>
           </Line>
@@ -91,7 +91,7 @@ const ExportHome = ({
       <ColumnStackLayout alignItems="center" expand>
         <div style={styles.titleContainer}>
           <Line>
-            <Text size="title">
+            <Text size="block-title">
               <Trans>Export and publish on other platforms</Trans>
             </Text>
           </Line>

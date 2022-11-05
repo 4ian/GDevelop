@@ -18,7 +18,7 @@ describe('EnumerateInstructions', () => {
         expect.objectContaining({
           displayedName: 'Animation finished',
           fullGroupName: 'General/Sprite/Animations and images',
-          type: 'AnimationEnded',
+          type: 'AnimationEnded2',
         }),
         expect.objectContaining({
           displayedName: 'Trigger once while true',
@@ -70,10 +70,10 @@ describe('EnumerateInstructions', () => {
         },
       },
       Audio: {
-        'Sounds and musics': {
+        'Sounds and music': {
           'Global volume': {
             displayedName: 'Global volume',
-            fullGroupName: 'Audio/Sounds and musics',
+            fullGroupName: 'Audio/Sounds and music',
             type: 'GlobalVolume',
           },
         },
@@ -105,11 +105,11 @@ describe('EnumerateInstructions', () => {
     expect(triggerOnce).not.toBeUndefined();
     expect(getObjectParameterIndex(triggerOnce.metadata)).toBe(-1);
 
-    const spriteAnimatedEnded = conditions.filter(
-      ({ type }) => type === 'AnimationEnded'
+    const spriteAnimationEnded = conditions.filter(
+      ({ type }) => type === 'AnimationEnded2'
     )[0];
-    expect(spriteAnimatedEnded).not.toBeUndefined();
-    expect(getObjectParameterIndex(spriteAnimatedEnded.metadata)).toBe(0);
+    expect(spriteAnimationEnded).not.toBeUndefined();
+    expect(getObjectParameterIndex(spriteAnimationEnded.metadata)).toBe(0);
   });
 
   it('can enumerate instructions for an object (Sprite)', () => {
@@ -129,7 +129,7 @@ describe('EnumerateInstructions', () => {
       expect.arrayContaining([
         expect.objectContaining({
           displayedName: 'Animation finished',
-          type: 'AnimationEnded',
+          type: 'AnimationEnded2',
         }),
         expect.objectContaining({
           displayedName: 'The cursor/touch is on an object',

@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-import React, { Component, useEffect } from 'react';
+import React, { useEffect, Component, type ComponentType } from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -26,6 +26,7 @@ import EffectsList from '../EffectsList';
 import VariablesList from '../VariablesList/VariablesList';
 import { sendBehaviorsEditorShown } from '../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
+
 const gd: libGDevelop = global.gd;
 
 export type ObjectEditorTab =
@@ -61,7 +62,7 @@ type Props = {|
 
 type InnerDialogProps = {|
   ...Props,
-  editorComponent: ?Class<React.Component<EditorProps, any>>,
+  editorComponent: ?ComponentType<EditorProps>,
   objectName: string,
   helpPagePath: ?string,
   object: gdObject,
@@ -73,7 +74,10 @@ const InnerDialog = (props: InnerDialogProps) => {
   );
   const [newObjectName, setNewObjectName] = React.useState(props.objectName);
   const forceUpdate = useForceUpdate();
-  const onCancelChanges = useSerializableObjectCancelableEditor({
+  const {
+    onCancelChanges,
+    notifyOfChange,
+  } = useSerializableObjectCancelableEditor({
     serializableObject: props.object,
     useProjectToUnserialize: props.project,
     onCancel: props.onCancel,
@@ -88,7 +92,8 @@ const InnerDialog = (props: InnerDialogProps) => {
     [props.project, props.object]
   );
 
-  const EditorComponent = props.editorComponent;
+  // TODO: Type this variable.
+  const EditorComponent: any = props.editorComponent;
 
   const onApply = () => {
     props.onApply();
@@ -194,19 +199,20 @@ const InnerDialog = (props: InnerDialogProps) => {
                 floatingLabelText={<Trans>Object name</Trans>}
                 floatingLabelFixed
                 value={newObjectName}
-                hintText={t`Object Name`}
+                translatableHintText={t`Object Name`}
                 onChange={text => {
                   if (text === newObjectName) return;
 
                   if (props.canRenameObject(text)) {
                     setNewObjectName(text);
+                    notifyOfChange();
                   }
                 }}
               />
             </Column>
           </Line>
           <EditorComponent
-            object={props.object}
+            objectConfiguration={props.object.getConfiguration()}
             project={props.project}
             resourceSources={props.resourceSources}
             onChooseResource={props.onChooseResource}
@@ -215,6 +221,7 @@ const InnerDialog = (props: InnerDialogProps) => {
               forceUpdate /*Force update to ensure dialog is properly positionned*/
             }
             objectName={props.objectName}
+            onObjectUpdated={notifyOfChange}
           />
         </Column>
       )}
@@ -229,6 +236,7 @@ const InnerDialog = (props: InnerDialogProps) => {
             forceUpdate /*Force update to ensure dialog is properly positionned*/
           }
           onUpdateBehaviorsSharedData={props.onUpdateBehaviorsSharedData}
+          onBehaviorsUpdated={notifyOfChange}
         />
       )}
       {currentTab === 'variables' && (
@@ -252,6 +260,7 @@ const InnerDialog = (props: InnerDialogProps) => {
             }
             helpPagePath={'/all-features/variables/object-variables'}
             onComputeAllVariableNames={props.onComputeAllVariableNames}
+            onVariablesUpdated={notifyOfChange}
           />
         </Column>
       )}
@@ -263,9 +272,10 @@ const InnerDialog = (props: InnerDialogProps) => {
           onChooseResource={props.onChooseResource}
           resourceExternalEditors={props.resourceExternalEditors}
           effectsContainer={props.object.getEffects()}
-          onEffectsUpdated={
-            forceUpdate /*Force update to ensure dialog is properly positionned*/
-          }
+          onEffectsUpdated={() => {
+            forceUpdate(); /*Force update to ensure dialog is properly positionned*/
+            notifyOfChange();
+          }}
         />
       )}
     </Dialog>
@@ -273,8 +283,10 @@ const InnerDialog = (props: InnerDialogProps) => {
 };
 
 type State = {|
-  editorComponent: ?Class<React.Component<EditorProps, any>>,
-  castToObjectType: ?(object: gdObject) => gdObject,
+  editorComponent: ?ComponentType<EditorProps>,
+  castToObjectType: ?(
+    objectConfiguration: gdObjectConfiguration
+  ) => gdObjectConfiguration,
   helpPagePath: ?string,
   objectName: string,
 |};
@@ -306,6 +318,7 @@ export default class ObjectEditorDialog extends Component<Props, State> {
     if (!object) return;
 
     const editorConfiguration = ObjectsEditorService.getEditorConfiguration(
+      this.props.project,
       object.getType()
     );
     if (!editorConfiguration) {
@@ -335,7 +348,7 @@ export default class ObjectEditorDialog extends Component<Props, State> {
         editorComponent={editorComponent}
         key={this.props.object && this.props.object.ptr}
         helpPagePath={helpPagePath}
-        object={castToObjectType(object)}
+        object={object}
         objectName={this.state.objectName}
         initialTab={initialTab}
       />

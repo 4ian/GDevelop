@@ -60,6 +60,8 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import LeaderboardIdField, {
   renderInlineLeaderboardIdField,
 } from './ParameterFields/LeaderboardIdField';
+import { IdentifierField } from './ParameterFields/IdentifierField';
+
 const gd: libGDevelop = global.gd;
 
 const components = {
@@ -70,6 +72,7 @@ const components = {
   operator: OperatorField,
   yesorno: YesNoField,
   trueorfalse: TrueFalseField,
+  number: ExpressionField,
   expression: ExpressionField,
   string: StringField,
   stringWithSelector: StringWithSelectorField,
@@ -101,6 +104,7 @@ const components = {
   functionParameterName: FunctionParameterNameField,
   externalLayoutName: ExternalLayoutNameField,
   leaderboardId: LeaderboardIdField,
+  identifier: IdentifierField,
 };
 const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   default: renderInlineDefaultField,
@@ -125,6 +129,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   yesorno: t`Yes or No`,
   trueorfalse: t`True or False`,
   expression: t`Number`,
+  number: t`Number`,
   string: t`String`,
   stringWithSelector: t`String`,
   behavior: t`Behavior`,
@@ -151,6 +156,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   objectAnimationName: t`Object animation name`,
   functionParameterName: t`Parameter name`,
   externalLayoutName: t`Name of the external layout`,
+  identifier: t`Name of the identifier`,
 };
 
 const ParameterRenderingService = {

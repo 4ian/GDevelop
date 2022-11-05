@@ -286,8 +286,11 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             ) : null}
           </Column>
           <EventsFunctionPropertiesEditor
+            project={project}
             eventsFunction={eventsFunction}
             eventsBasedBehavior={null}
+            eventsBasedObject={null}
+            eventsFunctionsContainer={null}
             onConfigurationUpdated={() => {
               // Force re-running logic to see if Create button is disabled.
               this.forceUpdate();
@@ -300,6 +303,8 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             project={project}
             eventsFunction={eventsFunction}
             eventsBasedBehavior={null}
+            eventsBasedObject={null}
+            eventsFunctionsContainer={null}
             onParametersUpdated={() => {
               // Force the dialog to adapt its size
               this.forceUpdate();

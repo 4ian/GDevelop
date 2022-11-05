@@ -34,7 +34,7 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/all-features/filesystem')
-      .setCategory('Device');
+      .setCategory('Advanced');
     extension
       .addInstructionOrExpressionGroupMetadata(_('File system'))
       .setIcon('JsPlatform/Extensions/filesystem_create_folder32.png');
@@ -203,6 +203,18 @@ module.exports = {
         '',
         true
       )
+      .addParameter(
+        'yesorno',
+        _('Normalize the file content (recommended)'),
+        '',
+        true
+      )
+      .setParameterLongDescription(
+        _(
+          'This replaces Windows new lines characters ("CRLF") by a single new line character.'
+        )
+      )
+      .setDefaultValue('yes')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
       .setFunctionName('gdjs.fileSystem.loadStringFromFileAsync');
@@ -229,6 +241,18 @@ module.exports = {
         '',
         true
       )
+      .addParameter(
+        'yesorno',
+        _('Normalize the file content (recommended)'),
+        '',
+        true
+      )
+      .setParameterLongDescription(
+        _(
+          'This replaces Windows new lines characters ("CRLF") by a single new line character.'
+        )
+      )
+      .setDefaultValue('yes')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
       .setFunctionName('gdjs.fileSystem.loadStringFromFile');
@@ -255,6 +279,18 @@ module.exports = {
         '',
         true
       )
+      .addParameter(
+        'yesorno',
+        _('Normalize the file content (recommended)'),
+        '',
+        true
+      )
+      .setParameterLongDescription(
+        _(
+          'This replaces Windows new lines characters ("CRLF") by a single new line character.'
+        )
+      )
+      .setDefaultValue('yes')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
       .setFunctionName('gdjs.fileSystem.loadVariableFromJSONFile');
@@ -281,6 +317,18 @@ module.exports = {
         '',
         true
       )
+      .addParameter(
+        'yesorno',
+        _('Normalize the file content (recommended)'),
+        '',
+        true
+      )
+      .setParameterLongDescription(
+        _(
+          'This replaces Windows new lines characters ("CRLF") by a single new line character.'
+        )
+      )
+      .setDefaultValue('yes')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
       .setFunctionName('gdjs.fileSystem.loadVariableFromJSONFileAsync');

@@ -5,6 +5,7 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import EventsTree from './EventsTree';
+import { getInstructionMetadata } from './InstructionEditor/NewInstructionEditor';
 import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
 import NewInstructionEditorMenu from './InstructionEditor/NewInstructionEditorMenu';
@@ -318,9 +319,16 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         onAddStandardEvent={this._addStandardEvent}
         onAddSubEvent={this.addSubEvents}
         canAddSubEvent={hasEventSelected(this.state.selection)}
-        canToggleEventDisabled={hasEventSelected(this.state.selection)}
+        canToggleEventDisabled={
+          hasEventSelected(this.state.selection) &&
+          this._selectionCanToggleDisabled()
+        }
+        canToggleInstructionInverted={hasInstructionSelected(
+          this.state.selection
+        )}
         onAddCommentEvent={this._addCommentEvent}
         onAddEvent={this.addNewEvent}
+        onToggleInvertedCondition={this._invertSelectedConditions}
         onToggleDisabledEvent={this.toggleDisabled}
         canRemove={hasSomethingSelected(this.state.selection)}
         onRemove={this.deleteSelection}
@@ -543,6 +551,16 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       label: i18n._(t`Invert Condition`),
       click: () => this._invertSelectedConditions(),
       visible: hasSelectedAtLeastOneCondition(this.state.selection),
+      accelerator: getShortcutDisplayName(
+        this.props.preferences.values.userShortcutMap[
+          'TOGGLE_CONDITION_INVERTED'
+        ] || 'KeyJ'
+      ),
+    },
+    {
+      label: i18n._(t`Toggle Wait the Action to End`),
+      click: () => this._toggleAwaitingActions(),
+      visible: this._hasSelectedOptionallyAsyncActions(),
     },
   ];
 
@@ -873,9 +891,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     locatingEvent: gdBaseEvent,
     parameterContext: ParameterContext
   ) => {
-    // Prevent state from changing when clicking on a parameter with inline parameter
-    // editor (it will close the editor).
-    if (this.state.editedParameter.instruction) return;
     const { instruction, parameterIndex } = parameterContext;
 
     this.setState({
@@ -1006,6 +1021,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     const positions = this._getChangedEventRows(eventsWithDeletion);
     eventsRemover.launch(events);
+    eventsRemover.delete();
 
     // /!\ Events were changed, so any reference to an existing event can now
     // be invalid. Make sure to immediately trigger a forced update before
@@ -1131,6 +1147,60 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           instructionContext.instruction.setInverted(
             !instructionContext.instruction.isInverted()
           );
+        }
+      }
+    );
+
+    const locatingEvent = getSelectedInstructionsLocatingEvents(
+      this.state.selection
+    );
+    const positions = this._getChangedEventRows(locatingEvent);
+    this._saveChangesToHistory(
+      'EDIT',
+      {
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
+      },
+      () => {
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+      }
+    );
+  };
+
+  _hasSelectedOptionallyAsyncActions = (): boolean => {
+    return getSelectedInstructionsContexts(this.state.selection).some(
+      instructionContext => {
+        if (!instructionContext.isCondition) {
+          const instructionMetadata = getInstructionMetadata({
+            instructionType: instructionContext.instruction.getType(),
+            project: this.props.project,
+            isCondition: false,
+          });
+
+          if (instructionMetadata && instructionMetadata.isOptionallyAsync()) {
+            return true;
+          }
+        }
+        return false;
+      }
+    );
+  };
+
+  _toggleAwaitingActions = () => {
+    getSelectedInstructionsContexts(this.state.selection).forEach(
+      instructionContext => {
+        if (!instructionContext.isCondition) {
+          const instructionMetadata = getInstructionMetadata({
+            instructionType: instructionContext.instruction.getType(),
+            project: this.props.project,
+            isCondition: false,
+          });
+
+          if (instructionMetadata && instructionMetadata.isOptionallyAsync()) {
+            instructionContext.instruction.setAwaited(
+              !instructionContext.instruction.isAwaited()
+            );
+          }
         }
       }
     );

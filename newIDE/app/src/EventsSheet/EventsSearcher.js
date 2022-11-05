@@ -18,7 +18,7 @@ export type SearchInEventsInputs = {|
 export type ReplaceInEventsInputs = {|
   searchInSelection: boolean,
   searchText: string,
-  replaceText: ?string,
+  replaceText: string,
   matchCase: boolean,
   searchInConditions: boolean,
   searchInActions: boolean,
@@ -72,6 +72,7 @@ const getSearchInitialOffset = (
     selectedEventPosition,
     ...searchResultsPositions
   ] = positionFinder.getPositions().toJSArray();
+  positionFinder.delete();
 
   // Search results are considered to be sorted by position
   // (top to bottom in the flatten event tree)
@@ -154,7 +155,6 @@ export default class EventsSearcher extends React.Component<Props, State> {
       // function to be done in C++.
       console.error('Replace in selection is not implemented yet');
     }
-    if (!replaceText) return [];
 
     const modifiedEvents = gd.EventsRefactorer.replaceStringInEvents(
       globalObjectsContainer,

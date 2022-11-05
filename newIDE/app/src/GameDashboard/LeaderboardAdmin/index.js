@@ -5,7 +5,6 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import Avatar from '@material-ui/core/Avatar';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -13,7 +12,6 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Paper from '@material-ui/core/Paper';
-import Switch from '@material-ui/core/Switch';
 import Tooltip from '@material-ui/core/Tooltip';
 
 import Add from '@material-ui/icons/Add';
@@ -37,20 +35,21 @@ import Loop from '@material-ui/icons/Loop';
 import Copy from '../../UI/CustomSvgIcons/Copy';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
-import { Column, Line, Spacer } from '../../UI/Grid';
+import { Column, LargeSpacer, Line, Spacer } from '../../UI/Grid';
 import IconButton from '../../UI/IconButton';
 import PlaceholderError from '../../UI/PlaceholderError';
 import AlertMessage from '../../UI/AlertMessage';
 import RaisedButton from '../../UI/RaisedButton';
 import TextField from '../../UI/TextField';
 import SelectField from '../../UI/SelectField';
+import CircularProgress from '../../UI/CircularProgress';
 import SelectOption from '../../UI/SelectOption';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import {
   type Leaderboard,
   type LeaderboardCustomizationSettings,
   type LeaderboardUpdatePayload,
-  breakUuid,
+  shortenUuidForDisplay,
 } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardProvider from '../../Leaderboard/LeaderboardProvider';
@@ -67,6 +66,8 @@ import FlatButton from '../../UI/FlatButton';
 import LeaderboardSortOptionsDialog from './LeaderboardSortOptionsDialog';
 import { type LeaderboardSortOption } from '../../Utils/GDevelopServices/Play';
 import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
+import Toggle from '../../UI/Toggle';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 
 type Props = {|
   onLoading: boolean => void,
@@ -183,6 +184,7 @@ export const LeaderboardAdmin = ({
   leaderboardIdToSelectAtOpening,
 }: Props) => {
   const isOnline = useOnlineStatus();
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const windowWidth = useResponsiveWindowWidth();
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
     false
@@ -496,7 +498,7 @@ export const LeaderboardAdmin = ({
   if (apiError && apiError.action === 'leaderboardsFetching') {
     return (
       <CenteredError>
-        <PlaceholderError onRetry={onListLeaderboards} kind="error">
+        <PlaceholderError onRetry={onListLeaderboards}>
           {apiError.message}
         </PlaceholderError>
       </CenteredError>
@@ -507,7 +509,7 @@ export const LeaderboardAdmin = ({
 
     return (
       <CenteredError>
-        <PlaceholderError onRetry={onListLeaderboards} kind="error">
+        <PlaceholderError onRetry={onListLeaderboards}>
           <Trans>
             An error occurred when retrieving leaderboards, please try again
             later.
@@ -615,7 +617,9 @@ export const LeaderboardAdmin = ({
       avatar: <Fingerprint />,
       text: (
         <Tooltip title={currentLeaderboard.id}>
-          <Text size="body2">{breakUuid(currentLeaderboard.id)}</Text>
+          <Text size="body2">
+            {shortenUuidForDisplay(currentLeaderboard.id)}
+          </Text>
         </Tooltip>
       ),
       secondaryText: null,
@@ -837,7 +841,13 @@ export const LeaderboardAdmin = ({
         <>
           <ResponsiveLineStackLayout noMargin expand noColumnMargin>
             <div style={styles.leftColumn}>
-              <Paper elevation={5} style={styles.leaderboardConfigurationPaper}>
+              <Paper
+                elevation={5}
+                style={{
+                  ...styles.leaderboardConfigurationPaper,
+                  backgroundColor: gdevelopTheme.palette.alternateCanvasColor,
+                }}
+              >
                 <Column>
                   <Line>
                     {currentLeaderboard && leaderboards ? (
@@ -904,7 +914,7 @@ export const LeaderboardAdmin = ({
                       </List>
                       <Line justifyContent="space-between">
                         <FlatButton
-                          icon={<Delete />}
+                          leftIcon={<Delete />}
                           label={<Trans>Delete</Trans>}
                           disabled={isRequestPending || isEditingName}
                           onClick={() => onDeleteLeaderboard(i18n)}
@@ -930,9 +940,7 @@ export const LeaderboardAdmin = ({
                       {apiError &&
                       (apiError.action === 'leaderboardDeletion' ||
                         apiError.action === 'leaderboardPrimaryUpdate') ? (
-                        <PlaceholderError kind="error">
-                          {apiError.message}
-                        </PlaceholderError>
+                        <PlaceholderError>{apiError.message}</PlaceholderError>
                       ) : null}
                     </>
                   ) : null}
@@ -946,22 +954,26 @@ export const LeaderboardAdmin = ({
               }}
             >
               <Line alignItems="center" justifyContent="flex-end">
-                <Tooltip
-                  title={i18n._(
-                    t`When checked, will only display the best score of each player (only for the display below).`
-                  )}
-                >
-                  <Text size="body2">
-                    <Trans>Player best entry</Trans>
-                  </Text>
-                </Tooltip>
-                <Switch
-                  color="primary"
+                <Toggle
                   size="small"
-                  checked={displayOnlyBestEntry}
-                  onClick={() => setDisplayOnlyBestEntry(!displayOnlyBestEntry)}
+                  labelPosition="left"
+                  toggled={displayOnlyBestEntry}
+                  onToggle={(e, newValue) => setDisplayOnlyBestEntry(newValue)}
+                  label={
+                    <Tooltip
+                      title={i18n._(
+                        t`When checked, will only display the best score of each player (only for the display below).`
+                      )}
+                    >
+                      <Text size="body2">
+                        <Trans>Player best entry</Trans>
+                      </Text>
+                    </Tooltip>
+                  }
                 />
+                <LargeSpacer />
                 <Divider orientation="vertical" />
+                <Spacer />
                 <IconButton
                   onClick={onFetchLeaderboardEntries}
                   disabled={isRequestPending || isEditingName}
@@ -974,10 +986,7 @@ export const LeaderboardAdmin = ({
               </Line>
               {apiError && apiError.action === 'entriesFetching' ? (
                 <CenteredError>
-                  <PlaceholderError
-                    onRetry={onFetchLeaderboardEntries}
-                    kind="error"
-                  >
+                  <PlaceholderError onRetry={onFetchLeaderboardEntries}>
                     {apiError.message}
                   </PlaceholderError>
                 </CenteredError>

@@ -17,23 +17,54 @@ export function getRootClassNames(theme: string) {
 }
 
 export function getMuiOverrides(
-  isModern: boolean,
   tabTextColor: string,
   tabBackgroundColor: string,
   inputBorderBottomColor: string,
   appBarBackgroundColor: string,
+  appBarTextColor: string,
   iconColor: string,
-  outlinedButtonBorderColor: string
+  outlinedButtonBorderColor: string,
+  alternateCanvasBackgroundColor: string
 ) {
   return {
     MuiTypography: {
+      h1: {
+        fontSize: '44px',
+        lineHeight: '56px',
+        fontWeight: 900,
+        letterSpacing: '0.01em',
+      },
+      h2: {
+        fontSize: '33px',
+        lineHeight: '40px',
+        fontWeight: 700,
+      },
+      h3: {
+        fontSize: '25px',
+        lineHeight: '32px',
+        fontWeight: 700,
+      },
+      h4: {
+        fontSize: '19px',
+        lineHeight: '24px',
+        fontWeight: 700,
+        letterSpacing: '0.01em',
+      },
       h5: {
-        // Make h6, used in Drawer title bars, use the same weight as tabs and mosaic windows
-        fontWeight: isModern ? 600 : 400,
+        fontSize: '14px',
+        lineHeight: '20px',
+        fontWeight: 700,
+        letterSpacing: '0.02em',
       },
       h6: {
         // Make h6, used in Drawer title bars, use the same weight as tabs and mosaic windows
-        fontWeight: isModern ? 600 : 400,
+        fontWeight: 600,
+      },
+      body1: {
+        fontSize: '14px',
+        lineHeight: '20px',
+        fontWeight: 400,
+        letterSpacing: '0.01em',
       },
     },
     MuiInput: {
@@ -49,7 +80,9 @@ export function getMuiOverrides(
     },
     MuiAppBar: {
       colorPrimary: {
+        // Use some colors as mosaic titles:
         backgroundColor: appBarBackgroundColor,
+        color: appBarTextColor,
       },
     },
     MuiIconButton: {
@@ -69,9 +102,6 @@ export function getMuiOverrides(
       secondaryAction: {
         paddingRight: 40,
       },
-      gutters: {
-        paddingRight: 8,
-      },
     },
     MuiListItemSecondaryAction: {
       root: {
@@ -87,18 +117,13 @@ export function getMuiOverrides(
     },
     MuiTab: {
       textColorPrimary: {
-        color:
-          (isModern ? darken(tabTextColor, 0.2) : tabTextColor) + ' !important',
-        textTransform: isModern ? 'none' : 'uppercase',
-        fontWeight: isModern ? 600 : 500,
-        letterSpacing: isModern ? '0.3px' : '',
-        ...(isModern
-          ? {
-              '&.Mui-selected': {
-                color: tabTextColor + ' !important',
-              },
-            }
-          : {}),
+        color: darken(tabTextColor, 0.2) + ' !important',
+        textTransform: 'none',
+        fontWeight: 600,
+        letterSpacing: '0.3px',
+        '&.Mui-selected': {
+          color: tabTextColor + ' !important',
+        },
       },
       root: {
         // Reduce the height of tabs to 32px
@@ -150,19 +175,34 @@ export function getMuiOverrides(
     },
     MuiPaper: {
       rounded: {
-        borderRadius: isModern ? 8 : 4,
+        borderRadius: 8,
       },
     },
     MuiButton: {
       root: {
-        borderRadius: isModern ? 8 : 0,
-        textTransform: isModern ? 'none' : 'uppercase',
-        fontWeight: isModern ? 600 : 400, // Lower a bit the weight of buttons
-        letterSpacing: isModern ? '0.3px' : '',
+        borderRadius: 8,
+        textTransform: 'none',
+        fontWeight: 600,
+        letterSpacing: '0.3px',
       },
-      ...(isModern
-        ? { outlined: { borderColor: outlinedButtonBorderColor } }
-        : {}),
+      outlined: { borderColor: outlinedButtonBorderColor },
+      outlinedSizeSmall: {
+        fontSize: '12px',
+        fontWeight: 700,
+      },
+      containedSizeSmall: {
+        fontSize: '12px',
+        fontWeight: 700,
+      },
+      textSizeSmall: {
+        fontSize: '12px',
+        fontWeight: 700,
+      },
+    },
+    MuiSvgIcon: {
+      fontSizeSmall: {
+        fontSize: '15px',
+      },
     },
     // Make MuiAccordion much more compact than default.
     // Some (or all) of these styles can be removed on MUIv5,
@@ -208,10 +248,26 @@ export function getMuiOverrides(
         padding: 8,
       },
     },
+    MuiCardHeader: {
+      root: {
+        padding: 0,
+        flexGrow: 0,
+      },
+    },
+    MuiMenu: {
+      paper: {
+        backgroundColor: alternateCanvasBackgroundColor,
+      },
+    },
+    MuiAutocomplete: {
+      paper: {
+        backgroundColor: alternateCanvasBackgroundColor,
+      },
+    },
   };
 }
 
-export function getThemeMode(color: string, contrastText: string) {
+function getThemeModeFromMainColor(color: string, contrastText: string) {
   return {
     light: lighten(color, 0.05),
     main: color,
@@ -220,24 +276,82 @@ export function getThemeMode(color: string, contrastText: string) {
   };
 }
 
+function getThemeColors(styles: any) {
+  // If there is no dark variant on the primary color, we consider:
+  // - light and dark variants have to be computed from the main color
+  // - the theme will use Material UI default values for Success, Info, Warning and Error colors.
+  if (!styles['ThemePrimaryDark'])
+    return {
+      primary: getThemeModeFromMainColor(
+        styles['ThemePrimaryColor'],
+        styles['ThemePrimaryTextContrastColor']
+      ),
+      secondary: getThemeModeFromMainColor(
+        styles['ThemeSecondaryColor'],
+        styles['ThemeSecondaryTextContrastColor']
+      ),
+    };
+
+  return {
+    primary: {
+      light: styles['ThemePrimaryLight'],
+      main: styles['ThemePrimaryColor'],
+      dark: styles['ThemePrimaryDark'],
+      contrastText: styles['ThemePrimaryTextContrastColor'],
+    },
+    secondary: {
+      light: styles['ThemeSecondaryLight'],
+      main: styles['ThemeSecondaryColor'],
+      dark: styles['ThemeSecondaryDark'],
+      contrastText: styles['ThemeSecondaryTextContrastColor'],
+    },
+    success: {
+      light: styles['ThemeSuccessLight'],
+      main: styles['ThemeSuccessColor'],
+      dark: styles['ThemeSuccessDark'],
+      contrastText: styles['ThemeSuccessTextContrastColor'],
+    },
+    info: {
+      light: styles['ThemeInfoLight'],
+      main: styles['ThemeInfoColor'],
+      dark: styles['ThemeInfoDark'],
+      contrastText: styles['ThemeInfoTextContrastColor'],
+    },
+    warning: {
+      light: styles['ThemeWarningLight'],
+      main: styles['ThemeWarningColor'],
+      dark: styles['ThemeWarningDark'],
+      contrastText: styles['ThemeWarningTextContrastColor'],
+    },
+    error: {
+      light: styles['ThemeErrorLight'],
+      main: styles['ThemeErrorColor'],
+      dark: styles['ThemeErrorDark'],
+      contrastText: styles['ThemeErrorTextContrastColor'],
+    },
+  };
+}
+
 export function createGdevelopTheme({
   styles,
-  isModern,
   rootClassNameIdentifier,
   paletteType,
   gdevelopIconsCSSFilter,
 }: {
   styles: any,
-  isModern?: boolean,
   rootClassNameIdentifier: string,
   paletteType: string,
   gdevelopIconsCSSFilter: ?string,
 }) {
   return {
     gdevelopTheme: {
-      isModern: !!isModern,
       palette: {
+        type: paletteType,
         canvasColor: styles['ThemeSurfaceCanvasBackgroundColor'],
+        alternateCanvasColor:
+          styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
+        primary: styles['ThemePrimaryColor'],
+        secondary: styles['ThemeSecondaryColor'],
       },
       message: {
         warning: styles['ThemeMessageWarningColor'],
@@ -249,8 +363,20 @@ export function createGdevelopTheme({
         separatorColor: styles['ThemeToolbarSeparatorColor'],
       },
       text: {
+        color: {
+          primary: styles['ThemeTextDefaultColor'],
+          secondary: styles['ThemeTextSecondaryColor'],
+        },
         highlighted: {
           backgroundColor: styles['ThemeTextHighlightedBackgroundColor'],
+        },
+      },
+      home: {
+        header: {
+          backgroundColor: styles['ThemeHomeHeaderBackgroundColor'],
+        },
+        separator: {
+          color: styles['ThemeHomeSeparatorColor'],
         },
       },
       dropIndicator: {
@@ -259,7 +385,7 @@ export function createGdevelopTheme({
         border: styles['ThemeDropIndicatorBorderColor'],
       },
       closableTabs: {
-        fontFamily: styles['GdevelopFontFamily'],
+        fontFamily: styles['GdevelopModernFontFamily'],
         containerBackgroundColor: styles['ThemeSurfaceWindowBackgroundColor'],
         backgroundColor: styles['ThemeClosableTabsDefaultBackgroundColor'],
         textColor: styles['ThemeClosableTabsDefaultColor'],
@@ -306,12 +432,21 @@ export function createGdevelopTheme({
         src: 'res/GD-logo-big.png',
       },
       gdevelopIconsCSSFilter,
+      chart: {
+        fontFamily: styles['GdevelopModernFontFamily'],
+        tooltipBackgroundColor:
+          styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
+        dataColor1:
+          paletteType === 'dark'
+            ? lighten(styles['ThemePrimaryColor'], 0.3)
+            : styles['ThemePrimaryColor'],
+        textColor: styles['ThemeTextDefaultColor'],
+        gridColor: styles['ThemeTextDisabledColor'],
+      },
     },
     muiThemeOptions: {
       typography: {
-        fontFamily: isModern
-          ? styles['GdevelopModernFontFamily']
-          : styles['GdevelopFontFamily'],
+        fontFamily: styles['GdevelopModernFontFamily'],
       },
       palette: {
         type: paletteType,
@@ -322,15 +457,9 @@ export function createGdevelopTheme({
         background: {
           paper: styles['ThemeSurfaceCanvasBackgroundColor'],
           default: styles['ThemeSurfaceWindowBackgroundColor'],
+          alternate: styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
         },
-        primary: getThemeMode(
-          styles['ThemePrimaryColor'],
-          styles['ThemePrimaryTextContrastColor']
-        ),
-        secondary: getThemeMode(
-          styles['ThemeSecondaryColor'],
-          styles['ThemeSecondaryTextContrastColor']
-        ),
+        ...getThemeColors(styles),
         text: {
           primary: styles['ThemeTextDefaultColor'],
           secondary: styles['ThemeTextSecondaryColor'],
@@ -339,13 +468,14 @@ export function createGdevelopTheme({
         },
       },
       overrides: getMuiOverrides(
-        !!isModern,
         styles['ThemeTextContrastColor'],
         styles['TabsBackgroundColor'],
         styles['InputBorderBottomColor'],
         styles['MosaicToolbarBackgroundColor'],
+        styles['MosaicTitleColor'],
         styles['ThemeTextDefaultColor'],
-        styles['ThemeTextDefaultColor']
+        styles['ThemeTextDefaultColor'],
+        styles['ThemeSurfaceAlternateCanvasBackgroundColor']
       ),
     },
   };

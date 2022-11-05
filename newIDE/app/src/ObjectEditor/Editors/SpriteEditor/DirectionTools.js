@@ -37,6 +37,7 @@ const styles = {
 const formatTime = (time: number) => Number(time.toFixed(6));
 
 type Props = {|
+  animationName: string,
   direction: gdDirection,
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
@@ -170,6 +171,7 @@ export default class DirectionTools extends Component<Props, State> {
             flexBody
           >
             <AnimationPreview
+              animationName={this.props.animationName}
               resourceNames={direction.getSpriteNames().toJSArray()}
               getImageResourceSource={(name: string) =>
                 resourcesLoader.getResourceFullUrl(project, name, {})
@@ -183,6 +185,7 @@ export default class DirectionTools extends Component<Props, State> {
                 this.setState({ timeBetweenFrames: text })
               }
               isLooping={direction.isLooping()}
+              hideAnimationLoader // No need to show a loader in the Direction Tools.
             />
           </Dialog>
         )}

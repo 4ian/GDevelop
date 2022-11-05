@@ -184,8 +184,8 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(
     for (std::size_t j = 0;
          j < parameters.size() && j < metadata.parameters.size();
          ++j) {
-      if (metadata.parameters[j].type == "relationalOperator" ||
-          metadata.parameters[j].type == "operator") {
+      if (metadata.parameters[j].GetType() == "relationalOperator" ||
+          metadata.parameters[j].GetType() == "operator") {
         if (j == parameters.size() - 1) {
           std::cout << "ERROR: No more parameters after a [relational]operator "
                        "when trying to update an instruction from GD2.x";
@@ -271,6 +271,9 @@ void gd::EventsListSerialization::UnserializeInstructionsFrom(
         instrElement.GetChild("type", 0, "Type")
             .GetBoolAttribute("inverted", false, "Contraire"));
 
+    instruction.SetAwaited(
+        instrElement.GetChild("type", 0, "Type").GetBoolAttribute("await"));
+
     // Read parameters
     vector<gd::Expression> parameters;
 
@@ -348,6 +351,8 @@ void gd::EventsListSerialization::SerializeInstructionsTo(
 
     if (list[k].IsInverted())
       instruction.GetChild("type").SetAttribute("inverted", true);
+    if (list[k].IsAwaited())
+      instruction.GetChild("type").SetAttribute("await", true);
 
     // Parameters
     SerializerElement& parameters = instruction.AddChild("parameters");

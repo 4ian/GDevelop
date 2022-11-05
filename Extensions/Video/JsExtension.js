@@ -28,12 +28,15 @@ module.exports = {
     extension
       .setExtensionInformation(
         'Video',
-        'Video',
-        'Provides an object to display a video on the scene. The recommended file format is MPEG4, with H264 video codec and AAC audio codec, to maximize the support of the video on different platform and browsers.',
+        _('Video'),
+        _('Provides an object to display a video on the scene. The recommended file format is MPEG4, with H264 video codec and AAC audio codec, to maximize the support of the video on different platform and browsers.'),
         'Aurélien Vivet',
         'Open source (MIT License)'
       )
+      .setCategory('User interface')
       .setExtensionHelpPath('/objects/video');
+    extension.addInstructionOrExpressionGroupMetadata(_("Video"))
+        .setIcon("JsPlatform/Extensions/videoicon16.png");
 
     var videoObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating an object
@@ -133,7 +136,7 @@ module.exports = {
       )
       .setIncludeFile('Extensions/Video/videoruntimeobject.js')
       .addIncludeFile('Extensions/Video/videoruntimeobject-pixi-renderer.js')
-      .setCategoryFullName(_('Multimedia'));
+      .setCategoryFullName(_('User interface'));
 
     object
       .addAction(
@@ -528,7 +531,7 @@ module.exports = {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -537,7 +540,7 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );
@@ -561,14 +564,14 @@ module.exports = {
     RenderedVideoObjectInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'JsPlatform/Extensions/videoicon24.png';
     };
 
     RenderedVideoObjectInstance.prototype._getVideoTexture = function () {
       // Get the video resource to use
-      const videoResource = this._associatedObject
+      const videoResource = this._associatedObjectConfiguration
         .getProperties()
         .get('videoResource')
         .getValue();
@@ -585,7 +588,7 @@ module.exports = {
      */
     RenderedVideoObjectInstance.prototype.update = function () {
       // Check if the video resource has changed
-      const videoResource = this._associatedObject
+      const videoResource = this._associatedObjectConfiguration
         .getProperties()
         .get('videoResource')
         .getValue();
@@ -606,7 +609,7 @@ module.exports = {
       }
 
       // Update opacity
-      const opacity = this._associatedObject
+      const opacity = this._associatedObjectConfiguration
         .getProperties()
         .get('Opacity')
         .getValue();

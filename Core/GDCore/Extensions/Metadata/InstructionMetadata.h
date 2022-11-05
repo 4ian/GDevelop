@@ -6,10 +6,10 @@
 
 #ifndef INSTRUCTIONMETADATA_H
 #define INSTRUCTIONMETADATA_H
+#include <algorithm>
 #include <functional>
 #include <map>
 #include <memory>
-#include <algorithm>
 
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/String.h"
@@ -104,16 +104,16 @@ class GD_CORE_API InstructionMetadata {
    * background, executing the instructions following it before the frame after
    * it resolved.
    */
-  bool IsAsync() const { return isAsync; }
+  bool IsAsync() const {
+    return !codeExtraInformation.asyncFunctionCallName.empty();
+  }
 
   /**
-   * Set that the instruction is asynchronous - it will be running in the
-   * background, executing the instructions following it before the frame after
-   * it resolved.
+   * Check if the instruction asynchronicity is optional. If it is, it can either
+   * be used synchronously or asynchronously, with one function for each.
    */
-  InstructionMetadata &SetAsync() {
-    isAsync = true;
-    return *this;
+  bool IsOptionallyAsync() const {
+    return IsAsync() && !codeExtraInformation.functionCallName.empty();
   }
 
   /**
@@ -206,7 +206,7 @@ class GD_CORE_API InstructionMetadata {
     if (!parameters.empty())
       parameters.back().SetLongDescription(longDescription);
     return *this;
-  };
+  }
 
   /**
    * \brief Set the additional information, used for some parameters
@@ -218,20 +218,26 @@ class GD_CORE_API InstructionMetadata {
   InstructionMetadata &SetParameterExtraInfo(const gd::String &extraInfo) {
     if (!parameters.empty()) parameters.back().SetExtraInfo(extraInfo);
     return *this;
-  };
+  }
 
   /**
    * \brief Add the default parameters for an instruction manipulating the
    * specified type ("string", "number") with the default operators.
+   * 
+   * \note The type "string" can be declined in several subtypes.
+   * \see ParameterMetadata
    */
-  InstructionMetadata &UseStandardOperatorParameters(const gd::String &type);
+  InstructionMetadata &UseStandardOperatorParameters(const gd::String &type, const gd::String& typeExtraInfo = "");
 
   /**
    * \brief Add the default parameters for an instruction comparing the
    * specified type ("string", "number") with the default relational operators.
+   * 
+   * \note The type "string" can be declined in several subtypes.
+   * \see ParameterMetadata
    */
   InstructionMetadata &UseStandardRelationalOperatorParameters(
-      const gd::String &type);
+      const gd::String &type, const gd::String& typeExtraInfo = "");
 
   /**
    * \brief Mark the instruction as an object instruction. Automatically called
@@ -276,7 +282,7 @@ class GD_CORE_API InstructionMetadata {
    */
   const gd::String &GetRequiredBaseObjectCapability() const {
     return requiredBaseObjectCapability;
-  };
+  }
 
   /**
    * \brief Consider that the instruction is easy for a user to understand.
@@ -319,11 +325,23 @@ class GD_CORE_API InstructionMetadata {
     virtual ~ExtraInformation(){};
 
     /**
-     * Set the function name which will be used when generating the code.
-     * \param functionName the name of the function to call
+     * Set the name of the function which will be called in the generated code.
+     * \param functionName the name of the function to call.
      */
     ExtraInformation &SetFunctionName(const gd::String &functionName_) {
       functionCallName = functionName_;
+      return *this;
+    }
+
+    /**
+     * Set the name of the function, doing asynchronous work, which will be called in
+     * the generated code. This function should return an asynchronous task
+     * (i.e: `gdjs.AsyncTask` in the JavaScript runtime).
+     *
+     * \param functionName the name of the function doing asynchronous work to call.
+     */
+    ExtraInformation &SetAsyncFunctionName(const gd::String &functionName_) {
+      asyncFunctionCallName = functionName_;
       return *this;
     }
 
@@ -349,12 +367,12 @@ class GD_CORE_API InstructionMetadata {
      *                 _("the string"),
      *                 _("Text"),
      *                 "CppPlatform/Extensions/text24.png",
-     *                 "CppPlatform/Extensions/text.png");
+     *                 "CppPlatform/Extensions/text_black.png");
      *
      *      .AddParameter("object", _("Object"), "Text", false)
      *      .AddParameter("operator", _("Modification operator"), "string")
      *      .AddParameter("string", _("String"))
-     *      .SetFunctionName("SetString").SetManipulatedType("string").SetGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
+     *      .SetFunctionName("SetString").SetManipulatedType("string").SetGetter("GetString");
      *
      *  DECLARE_END_OBJECT_ACTION()
      * \endcode
@@ -422,6 +440,7 @@ class GD_CORE_API InstructionMetadata {
     bool HasCustomCodeGenerator() const { return hasCustomCodeGenerator; }
 
     gd::String functionCallName;
+    gd::String asyncFunctionCallName;
     gd::String type;
     AccessType accessType;
     gd::String optionalAssociatedInstruction;
@@ -454,14 +473,48 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
-   * \brief Set the function that should be called when generating the source
-   * code from events.
-   * \param functionName the name of the function to call
+   * Set the name of the function which will be called in the generated code.
+   * \param functionName the name of the function to call.
    * \note Shortcut for `codeExtraInformation.SetFunctionName`.
    */
   ExtraInformation &SetFunctionName(const gd::String &functionName) {
     return codeExtraInformation.SetFunctionName(functionName);
   }
+
+  /**
+   * Set the name of the function, doing asynchronous work, which will be called in
+   * the generated code. This function should return an asynchronous task
+   * (i.e: `gdjs.AsyncTask` in the JavaScript runtime).
+   *
+   * \param functionName the name of the function doing asynchronous work to call.
+   * \note Shortcut for `codeExtraInformation.SetAsyncFunctionName`.
+   */
+  ExtraInformation &SetAsyncFunctionName(const gd::String &functionName) {
+    return codeExtraInformation.SetAsyncFunctionName(functionName);
+  }
+
+  /**
+   * \brief Erase any existing include file and add the specified include.
+   */
+  InstructionMetadata &SetIncludeFile(const gd::String &includeFile) {
+    codeExtraInformation.SetIncludeFile(includeFile);
+    return *this;
+  }
+
+  /**
+   * \brief Add a file to the already existing include files.
+   */
+  InstructionMetadata &AddIncludeFile(const gd::String &includeFile) {
+    codeExtraInformation.AddIncludeFile(includeFile);
+    return *this;
+  }
+
+  /**
+   * \brief Get the files that must be included to use the instruction.
+   */
+  const std::vector<gd::String>& GetIncludeFiles() const {
+    return codeExtraInformation.GetIncludeFiles();
+  };
 
   std::vector<ParameterMetadata> parameters;
 
@@ -479,7 +532,6 @@ class GD_CORE_API InstructionMetadata {
   int usageComplexity;  ///< Evaluate the instruction from 0 (simple&easy to
                         ///< use) to 10 (complex to understand)
   bool isPrivate;
-  bool isAsync;
   bool isObjectInstruction;
   bool isBehaviorInstruction;
   gd::String requiredBaseObjectCapability;

@@ -17,6 +17,7 @@ import CheckeredBackground from '../CheckeredBackground';
 import { getPixelatedImageRendering } from '../../Utils/CssHelpers';
 import { shouldZoom } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import Slider from '../../UI/Slider';
+import AuthorizedAssetImage from '../../AssetStore/PrivateAssets/AuthorizedAssetImage';
 const gd: libGDevelop = global.gd;
 
 const MARGIN = 50;
@@ -36,11 +37,11 @@ const styles = {
     overflow: 'hidden',
   },
   imagePreviewContainer: {
+    display: 'flex',
     position: 'relative',
     width: '100%',
     height: '100%',
     boxSizing: 'border-box',
-    overflow: 'auto',
 
     // The container contains the image and the "overlay" that can display
     // points or polygons that can be drag'n'dropped. `touch-action` must
@@ -51,7 +52,6 @@ const styles = {
   spriteThumbnailImage: {
     position: 'relative',
     pointerEvents: 'none',
-    margin: MARGIN,
   },
   sliderContainer: {
     maxWidth: 150,
@@ -68,6 +68,7 @@ type Props = {|
   isImageResourceSmooth: boolean,
   initialZoom?: number,
   fixedHeight?: number,
+  fixedWidth?: number,
   renderOverlay?: ({|
     imageWidth: number,
     imageHeight: number,
@@ -78,6 +79,9 @@ type Props = {|
   onSize?: (number, number) => void,
   hideCheckeredBackground?: boolean,
   hideControls?: boolean,
+  isImagePrivate?: boolean,
+  onImageLoaded?: () => void,
+  hideLoader?: boolean,
 |};
 
 export const isProjectImageResourceSmooth = (
@@ -100,11 +104,15 @@ const ImagePreview = ({
   imageResourceSource,
   isImageResourceSmooth,
   fixedHeight,
+  fixedWidth,
   renderOverlay,
   onSize,
   hideCheckeredBackground,
   hideControls,
   initialZoom,
+  isImagePrivate,
+  onImageLoaded,
+  hideLoader,
 }: Props) => {
   const [errored, setErrored] = React.useState(false);
   const [imageWidth, setImageWidth] = React.useState(null);
@@ -148,6 +156,7 @@ const ImagePreview = ({
     setImageHeight(newImageHeight);
     setImageWidth(newImageWidth);
     if (onSize) onSize(newImageWidth, newImageHeight);
+    if (onImageLoaded) onImageLoaded();
   };
 
   const zoomBy = (imageZoomFactorDelta: number) => {
@@ -166,37 +175,49 @@ const ImagePreview = ({
       {({ contentRect, measureRef }) => {
         const containerWidth = contentRect.bounds.width;
         const containerHeight = contentRect.bounds.height;
-        // Once the image is loaded, adapt the zoom to the image size.
-        if (!isResizeObserverReady && !!containerWidth && !!containerHeight) {
+        const containerLoaded = !!containerWidth && !!containerHeight;
+        const imageLoaded = !!imageWidth && !!imageHeight && !errored;
+
+        // Once the container is loaded, adapt the zoom to the image size.
+        if (!isResizeObserverReady && containerLoaded) {
           if (!initialZoom) {
             adaptZoomToImage(containerHeight, containerWidth);
           }
           setIsResizeObserverReady(true);
         }
 
-        const imageLoaded = !!imageWidth && !!imageHeight && !errored;
-
         // Centre-align the image and overlays
         const imagePositionTop = Math.max(
           0,
-          containerHeight / 2 -
+          (containerHeight || 0) / 2 -
             ((imageHeight || 0) * imageZoomFactor) / 2 -
             MARGIN
         );
         const imagePositionLeft = Math.max(
           0,
-          containerWidth / 2 -
+          (containerWidth || 0) / 2 -
             ((imageWidth || 0) * imageZoomFactor) / 2 -
             MARGIN
         );
 
+        // We display the elements only when the image is loaded and
+        // the zoom is applied to avoid a shift in the image.
+        // We use "visibility": "hidden" instead of "display": "none"
+        // so that the image takes the space of the container whilst being hidden.
+        // TODO: handle a proper loader.
+        const visibility = containerLoaded ? undefined : 'hidden';
+        const width = imageWidth ? imageWidth * imageZoomFactor : undefined;
+        const height = imageHeight ? imageHeight * imageZoomFactor : undefined;
+
         const imageStyle = {
           ...styles.spriteThumbnailImage,
-          top: imagePositionTop || 0,
-          left: imagePositionLeft || 0,
-          width: imageWidth ? imageWidth * imageZoomFactor : undefined,
-          height: imageHeight ? imageHeight * imageZoomFactor : undefined,
-          visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
+          // Apply margin only once the container is loaded, to avoid a shift in the image
+          margin: containerLoaded ? MARGIN : 0,
+          top: imagePositionTop,
+          left: imagePositionLeft,
+          width,
+          height,
+          visibility,
           ...(!isImageResourceSmooth
             ? styles.previewImagePixelated
             : undefined),
@@ -204,11 +225,11 @@ const ImagePreview = ({
 
         const frameStyle = {
           position: 'absolute',
-          top: imagePositionTop + MARGIN || 0,
-          left: imagePositionLeft + MARGIN || 0,
-          width: imageWidth ? imageWidth * imageZoomFactor : undefined,
-          height: imageHeight ? imageHeight * imageZoomFactor : undefined,
-          visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
+          top: imagePositionTop + MARGIN,
+          left: imagePositionLeft + MARGIN,
+          width,
+          height,
+          visibility,
           border: `1px solid ${frameBorderColor}`,
           boxSizing: 'border-box',
         };
@@ -219,7 +240,7 @@ const ImagePreview = ({
           left: 0,
           width: '100%',
           height: '100%',
-          visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
+          visibility,
         };
 
         return (
@@ -261,6 +282,7 @@ const ImagePreview = ({
               style={{
                 ...styles.contentContainer,
                 height: fixedHeight || '100%',
+                width: fixedWidth,
               }}
             >
               {!hideCheckeredBackground && <CheckeredBackground />}
@@ -268,7 +290,10 @@ const ImagePreview = ({
                 dir={
                   'ltr' /* Force LTR layout to avoid issues with image positioning */
                 }
-                style={styles.imagePreviewContainer}
+                style={{
+                  ...styles.imagePreviewContainer,
+                  overflow: containerLoaded ? 'auto' : 'hidden',
+                }}
                 ref={measureRef}
                 onWheel={event => {
                   const { deltaY } = event;
@@ -288,15 +313,25 @@ const ImagePreview = ({
                     </Text>
                   </PlaceholderMessage>
                 )}
-                {!errored && (
-                  <CorsAwareImage
-                    style={imageStyle}
-                    alt={resourceName}
-                    src={imageResourceSource}
-                    onError={handleImageError}
-                    onLoad={handleImageLoaded}
-                  />
-                )}
+                {!errored &&
+                  (isImagePrivate ? (
+                    <AuthorizedAssetImage
+                      style={imageStyle}
+                      alt={resourceName}
+                      url={imageResourceSource}
+                      onError={handleImageError}
+                      onLoad={handleImageLoaded}
+                      hideLoader={hideLoader}
+                    />
+                  ) : (
+                    <CorsAwareImage
+                      style={imageStyle}
+                      alt={resourceName}
+                      src={imageResourceSource}
+                      onError={handleImageError}
+                      onLoad={handleImageLoaded}
+                    />
+                  ))}
                 {imageLoaded && renderOverlay && <div style={frameStyle} />}
                 {imageLoaded && renderOverlay && (
                   <div style={overlayStyle}>

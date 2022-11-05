@@ -14,8 +14,10 @@
 #include "GDCore/Events/InstructionsList.h"
 namespace gd {
 class ObjectsContainer;
+class EventsFunctionsContainer;
 class EventsFunction;
 class EventsBasedBehavior;
+class EventsBasedObject;
 class ObjectMetadata;
 class BehaviorMetadata;
 class InstructionMetadata;
@@ -54,6 +56,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * Generate JavaScript for executing events of an events based function.
    *
    * \param project Project used.
+   * \param functionsContainer The container of the compiled event function.
    * \param eventsFunction The events function to be compiled.
    * \param codeNamespace Where to store the context used by the function.
    * \param includeFiles Will be filled with the necessary include files.
@@ -64,6 +67,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   static gd::String GenerateEventsFunctionCode(
       gd::Project& project,
+      const gd::EventsFunctionsContainer& functionsContainer,
       const gd::EventsFunction& eventsFunction,
       const gd::String& codeNamespace,
       std::set<gd::String>& includeFiles,
@@ -76,10 +80,13 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \param project Project used.
    * \param eventsFunction The events function to be compiled.
    * \param codeNamespace Where to store the context used by the function.
-   * \param includeFiles Will be filled with the necessary include files.
+   * \param fullyQualifiedFunctionName The function name with its namespace.
    * \param onceTriggersVariable The code to access the variable holding
-   * OnceTriggers. \param preludeCode The code to run just before the events
-   * generated code. \param compilationForRuntime Set this to true if the code
+   * OnceTriggers.
+   * \param preludeCode The code to run just before the events
+   * generated code.
+   * \param includeFiles Will be filled with the necessary include files.
+   * \param compilationForRuntime Set this to true if the code
    * is generated for runtime.
    *
    * \return JavaScript code
@@ -92,6 +99,39 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& fullyQualifiedFunctionName,
       const gd::String& onceTriggersVariable,
       const gd::String& preludeCode,
+      std::set<gd::String>& includeFiles,
+      bool compilationForRuntime = false);
+
+  /**
+   * Generate JavaScript for executing events of a events based object
+   * function.
+   *
+   * \param project Project used.
+   * \param eventsBasedObject The object that contains the function to be compiled.
+   * \param eventsFunction The events function to be compiled.
+   * \param codeNamespace Where to store the context used by the function.
+   * \param fullyQualifiedFunctionName The function name with its namespace.
+   * \param onceTriggersVariable The code to access the variable holding
+   * OnceTriggers.
+   * \param preludeCode The code to run right before the events
+   * generated code.
+   * \param endingCode The code to run right after the events
+   * generated code.
+   * \param includeFiles Will be filled with the necessary include files.
+   * \param compilationForRuntime Set this to true if the code
+   * is generated for runtime.
+   *
+   * \return JavaScript code
+   */
+  static gd::String GenerateObjectEventsFunctionCode(
+      gd::Project& project,
+      const gd::EventsBasedObject& eventsBasedObject,
+      const gd::EventsFunction& eventsFunction,
+      const gd::String& codeNamespace,
+      const gd::String& fullyQualifiedFunctionName,
+      const gd::String& onceTriggersVariable,
+      const gd::String& preludeCode,
+      const gd::String& endingCode,
       std::set<gd::String>& includeFiles,
       bool compilationForRuntime = false);
 
@@ -227,6 +267,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   virtual gd::String GenerateObjectAction(
       const gd::String& objectName,
       const gd::ObjectMetadata& objInfo,
+      const gd::String& functionCallName,
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
@@ -236,6 +277,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& objectName,
       const gd::String& behaviorName,
       const gd::BehaviorMetadata& autoInfo,
+      const gd::String& functionCallName,
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
@@ -294,6 +336,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       gd::String functionArgumentsCode,
       gd::String functionPreEventsCode,
       const gd::EventsList& events,
+      gd::String functionPostEventsCode,
       gd::String functionReturnCode);
 
   /**
@@ -322,7 +365,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   gd::String GenerateEventsFunctionParameterDeclarationsList(
       const std::vector<gd::ParameterMetadata>& parameters,
-      bool isBehaviorEventsFunction);
+      int firstParameterIndex,
+      bool addsSceneParameter);
 
   /**
    * \brief Generate the "eventsFunctionContext" object that allow a free
@@ -344,6 +388,17 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& onceTriggersVariable,
       const gd::String& thisObjectName,
       const gd::String& thisBehaviorName);
+
+  /**
+   * \brief Generate the "eventsFunctionContext" object that allow an object
+   * function to provides access objects, object creation and access to
+   * arguments from the rest of the events.
+   */
+  gd::String GenerateObjectEventsFunctionContext(
+      const gd::EventsBasedObject& eventsBasedObject,
+      const std::vector<gd::ParameterMetadata>& parameters,
+      const gd::String& onceTriggersVariable,
+      const gd::String& thisObjectName);
 
   gd::String GenerateEventsFunctionReturn(
       const gd::EventsFunction& eventFunction);

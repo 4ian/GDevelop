@@ -43,10 +43,7 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardOperatorParameters("number")
-      .SetFunctionName("SetAngle")
-      .SetGetter("GetAngle")
-      .SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+      .UseStandardOperatorParameters("number");
 
   obj.AddCondition("EmitterAngle",
                    _("Emission angle"),
@@ -66,7 +63,8 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardOperatorParameters("number");
+      .UseStandardOperatorParameters("number")
+      .SetHidden(); // Angle A is not used.
 
   obj.AddCondition("EmitterAngleA",
                    _("Emission angle 1"),
@@ -76,7 +74,8 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardRelationalOperatorParameters("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .SetHidden(); // Angle A is not used.
 
   obj.AddAction("EmitterAngleB",
                 _("Emission angle 2"),
@@ -86,7 +85,8 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardOperatorParameters("number");
+      .UseStandardOperatorParameters("number")
+      .SetHidden(); // Angle B is the same as cone spray angle
 
   obj.AddCondition("EmitterAngleB",
                    _("Emission angle 2"),
@@ -96,7 +96,8 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardRelationalOperatorParameters("number");
+      .UseStandardRelationalOperatorParameters("number")
+      .SetHidden(); // Angle B is the same as cone spray angle
 
   obj.AddAction(
          "ConeSprayAngle",

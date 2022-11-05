@@ -17,6 +17,20 @@ namespace gdjs {
     content: Object | null
   ) => void;
 
+  const checkIfCredentialsRequired = (url: string) => {
+    // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
+    // i.e: its gdevelop.io cookie, to be passed.
+    // Note that this is only useful during previews.
+    if (
+      url.startsWith('https://project-resources.gdevelop.io/') ||
+      url.startsWith('https://project-resources-dev.gdevelop.io/')
+    )
+      return true;
+
+    // For other resources, use the default way of loading resources ("anonymous" or "same-site").
+    return false;
+  };
+
   /**
    * JsonManager loads json files (using `XMLHttpRequest`), using the "json" resources
    * registered in the game resources.
@@ -127,6 +141,7 @@ namespace gdjs {
       const that = this;
       const xhr = new XMLHttpRequest();
       xhr.responseType = 'json';
+      xhr.withCredentials = checkIfCredentialsRequired(resource.file);
       xhr.open('GET', resource.file);
       xhr.onload = function () {
         const callbacks = that._callbacks[resourceName];

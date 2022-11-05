@@ -5,12 +5,16 @@ import { caseSensitiveSlug } from '../Utils/CaseSensitiveSlug';
 import {
   declareInstructionOrExpressionMetadata,
   declareBehaviorInstructionOrExpressionMetadata,
+  declareObjectInstructionOrExpressionMetadata,
   declareEventsFunctionParameters,
   declareBehaviorMetadata,
+  declareObjectMetadata,
   declareExtension,
   isBehaviorLifecycleEventsFunction,
+  isObjectLifecycleEventsFunction,
   isExtensionLifecycleEventsFunction,
   declareBehaviorPropertiesInstructionAndExpressions,
+  declareObjectPropertiesInstructionAndExpressions,
 } from './MetadataDeclarationHelpers';
 
 const gd: libGDevelop = global.gd;
@@ -19,6 +23,7 @@ export type EventsFunctionCodeWriter = {|
   getIncludeFileFor: (functionName: string) => string,
   writeFunctionCode: (functionName: string, code: string) => Promise<void>,
   writeBehaviorCode: (behaviorName: string, code: string) => Promise<void>,
+  writeObjectCode: (objectName: string, code: string) => Promise<void>,
 |};
 
 export type IncludeFileContent = {|
@@ -45,6 +50,12 @@ const mangleName = (name: string) => {
   return caseSensitiveSlug(name, '_', []);
 };
 
+const getExtensionCodeNamespacePrefix = (
+  eventsFunctionsExtension: gdEventsFunctionsExtension
+) => {
+  return 'gdjs.evtsExt__' + mangleName(eventsFunctionsExtension.getName());
+};
+
 /** Generate the namespace for a free function. */
 const getFreeFunctionCodeNamespace = (
   eventsFunction: gdEventsFunction,
@@ -53,12 +64,32 @@ const getFreeFunctionCodeNamespace = (
   return codeNamespacePrefix + '__' + mangleName(eventsFunction.getName());
 };
 
+export const getFreeFunctionCodeName = (
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsFunction: gdEventsFunction
+) => {
+  return (
+    getFreeFunctionCodeNamespace(
+      eventsFunction,
+      getExtensionCodeNamespacePrefix(eventsFunctionsExtension)
+    ) + '.func'
+  );
+};
+
 /** Generate the namespace for a behavior function. */
 const getBehaviorFunctionCodeNamespace = (
   eventsBasedBehavior: gdEventsBasedBehavior,
   codeNamespacePrefix: string
 ) => {
   return codeNamespacePrefix + '__' + mangleName(eventsBasedBehavior.getName());
+};
+
+/** Generate the namespace for an object function. */
+const getObjectFunctionCodeNamespace = (
+  eventsBasedObject: gdEventsBasedObject,
+  codeNamespacePrefix: string
+) => {
+  return codeNamespacePrefix + '__' + mangleName(eventsBasedObject.getName());
 };
 
 /**
@@ -183,6 +214,24 @@ const generateEventsFunctionExtension = (
     )
   )
     .then(() =>
+      // Generate all objects and their functions
+      Promise.all(
+        mapVector(
+          eventsFunctionsExtension.getEventsBasedObjects(),
+          eventsBasedObject => {
+            return generateObject(
+              project,
+              extension,
+              eventsFunctionsExtension,
+              eventsBasedObject,
+              options,
+              codeGenerationContext
+            );
+          }
+        )
+      )
+    )
+    .then(() =>
       // Generate all free functions
       Promise.all(
         mapFor(0, eventsFunctionsExtension.getEventsFunctionsCount(), i => {
@@ -217,7 +266,10 @@ const generateFreeFunction = (
   codeGenerationContext: CodeGenerationContext
 ): Promise<{
   functionFile: string,
-  functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
+  functionMetadata:
+    | gdInstructionMetadata
+    | gdExpressionMetadata
+    | gdMultipleInstructionMetadata,
 }> => {
   const instructionOrExpression = declareInstructionOrExpressionMetadata(
     extension,
@@ -226,7 +278,12 @@ const generateFreeFunction = (
   );
   // By convention, first parameter is always the Runtime Scene.
   instructionOrExpression.addCodeOnlyParameter('currentScene', '');
-  declareEventsFunctionParameters(eventsFunction, instructionOrExpression);
+  declareEventsFunctionParameters(
+    eventsFunctionsExtension,
+    eventsFunction,
+    instructionOrExpression,
+    0
+  );
 
   // Hide "lifecycle" functions as they are called automatically by
   // the game engine.
@@ -241,17 +298,16 @@ const generateFreeFunction = (
   );
   const functionName = codeNamespace + '.func';
 
-  const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
   const functionFile = options.eventsFunctionCodeWriter.getIncludeFileFor(
     functionName
   );
-  codeExtraInformation
+  instructionOrExpression
     .setIncludeFile(functionFile)
     .setFunctionName(functionName);
 
   // Always include the extension include files when using a free function.
   codeGenerationContext.extensionIncludeFiles.forEach(includeFile => {
-    codeExtraInformation.addIncludeFile(includeFile);
+    instructionOrExpression.addIncludeFile(includeFile);
   });
 
   if (!options.skipCodeGeneration) {
@@ -260,6 +316,7 @@ const generateFreeFunction = (
       project
     );
     const code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+      eventsFunctionsExtension,
       eventsFunction,
       codeNamespace,
       includeFiles,
@@ -276,10 +333,11 @@ const generateFreeFunction = (
       .toNewVectorString()
       .toJSArray()
       .forEach((includeFile: string) => {
-        codeExtraInformation.addIncludeFile(includeFile);
+        instructionOrExpression.addIncludeFile(includeFile);
       });
 
     includeFiles.delete();
+    eventsFunctionsExtensionCodeGenerator.delete();
 
     return options.eventsFunctionCodeWriter
       .writeFunctionCode(functionName, code)
@@ -306,7 +364,10 @@ const generateFreeFunction = (
 const applyFunctionIncludeFilesDependencyTransitivity = (
   functionInfos: Array<{
     functionFile: string,
-    functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
+    functionMetadata:
+      | gdInstructionMetadata
+      | gdExpressionMetadata
+      | gdMultipleInstructionMetadata,
   }>
 ): void => {
   // Note that the iteration order doesn't matter, for instance for:
@@ -330,12 +391,7 @@ const applyFunctionIncludeFilesDependencyTransitivity = (
   // c -> d
   const includeFileSets = functionInfos.map(
     functionInfo =>
-      new Set(
-        functionInfo.functionMetadata
-          .getCodeExtraInformation()
-          .getIncludeFiles()
-          .toJSArray()
-      )
+      new Set(functionInfo.functionMetadata.getIncludeFiles().toJSArray())
   );
   // For any function A of the extension...
   for (let index = 0; index < functionInfos.length; index++) {
@@ -344,9 +400,7 @@ const applyFunctionIncludeFilesDependencyTransitivity = (
 
     // ...and any function B of the extension...
     for (let otherIndex = 0; otherIndex < functionInfos.length; otherIndex++) {
-      const otherCodeExtraInformation = functionInfos[
-        otherIndex
-      ].functionMetadata.getCodeExtraInformation();
+      const otherFunctionMetadata = functionInfos[otherIndex].functionMetadata;
       const otherIncludeFileSet = includeFileSets[otherIndex];
       // ...where function B depends on function A...
       if (otherIncludeFileSet.has(functionIncludeFile)) {
@@ -354,7 +408,7 @@ const applyFunctionIncludeFilesDependencyTransitivity = (
         includeFiles.forEach(includeFile => {
           if (!otherIncludeFileSet.has(includeFile)) {
             otherIncludeFileSet.add(includeFile);
-            otherCodeExtraInformation.addIncludeFile(includeFile);
+            otherFunctionMetadata.addIncludeFile(includeFile);
           }
         });
       }
@@ -418,7 +472,12 @@ function generateBehavior(
         eventsBasedBehavior,
         eventsFunction
       );
-      declareEventsFunctionParameters(eventsFunction, instructionOrExpression);
+      declareEventsFunctionParameters(
+        eventsFunctionsContainer,
+        eventsFunction,
+        instructionOrExpression,
+        2
+      );
 
       // Hide "lifecycle" methods as they are called automatically by
       // the game engine.
@@ -428,8 +487,7 @@ function generateBehavior(
 
       if (eventsFunction.isPrivate()) instructionOrExpression.setPrivate();
 
-      const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
-      codeExtraInformation
+      instructionOrExpression
         .setIncludeFile(includeFile)
         .setFunctionName(eventsFunctionMangledName);
     });
@@ -472,6 +530,127 @@ function generateBehavior(
     } else {
       // Skip code generation
       behaviorMethodMangledNames.delete();
+      return Promise.resolve();
+    }
+  });
+}
+
+function generateObject(
+  project: gdProject,
+  extension: gdPlatformExtension,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsBasedObject: gdEventsBasedObject,
+  options: Options,
+  codeGenerationContext: CodeGenerationContext
+): Promise<void> {
+  const objectMetadata = declareObjectMetadata(
+    options.i18n,
+    extension,
+    eventsBasedObject
+  );
+
+  const eventsFunctionsContainer = eventsBasedObject.getEventsFunctions();
+  const codeNamespace = getObjectFunctionCodeNamespace(
+    eventsBasedObject,
+    codeGenerationContext.codeNamespacePrefix
+  );
+  // TODO EBO Handle name collision between objects and behaviors.
+  const includeFile = options.eventsFunctionCodeWriter.getIncludeFileFor(
+    codeNamespace
+  );
+
+  objectMetadata.setIncludeFile(includeFile);
+
+  // Always include the extension include files when using an object.
+  codeGenerationContext.extensionIncludeFiles.forEach(includeFile => {
+    objectMetadata.addIncludeFile(includeFile);
+  });
+
+  return Promise.resolve().then(() => {
+    const objectMethodMangledNames = new gd.MapStringString();
+
+    // Declare the instructions/expressions for properties
+    declareObjectPropertiesInstructionAndExpressions(
+      options.i18n,
+      extension,
+      objectMetadata,
+      eventsBasedObject
+    );
+
+    // Declare all the object functions
+    mapFor(0, eventsFunctionsContainer.getEventsFunctionsCount(), i => {
+      const eventsFunction = eventsFunctionsContainer.getEventsFunctionAt(i);
+
+      const eventsFunctionMangledName = mangleName(eventsFunction.getName());
+      objectMethodMangledNames.set(
+        eventsFunction.getName(),
+        eventsFunctionMangledName
+      );
+
+      const instructionOrExpression = declareObjectInstructionOrExpressionMetadata(
+        extension,
+        objectMetadata,
+        eventsBasedObject,
+        eventsFunction
+      );
+      declareEventsFunctionParameters(
+        eventsFunctionsContainer,
+        eventsFunction,
+        instructionOrExpression,
+        1
+      );
+
+      // Hide "lifecycle" methods as they are called automatically by
+      // the game engine.
+      if (isObjectLifecycleEventsFunction(eventsFunction.getName())) {
+        instructionOrExpression.setHidden();
+      }
+
+      if (eventsFunction.isPrivate()) instructionOrExpression.setPrivate();
+
+      instructionOrExpression
+        .setIncludeFile(includeFile)
+        .setFunctionName(eventsFunctionMangledName);
+    });
+
+    // Generate code for the object and its methods
+    if (!options.skipCodeGeneration) {
+      const includeFiles = new gd.SetString();
+      const objectCodeGenerator = new gd.ObjectCodeGenerator(project);
+      const code = objectCodeGenerator.generateRuntimeObjectCompleteCode(
+        eventsFunctionsExtension.getName(),
+        eventsBasedObject,
+        codeNamespace,
+        objectMethodMangledNames,
+        includeFiles,
+
+        // For now, always generate functions for runtime (this disables
+        // generation of profiling for groups (see EventsCodeGenerator))
+        // as extensions generated can be used either for preview or export.
+        true
+      );
+      objectCodeGenerator.delete();
+      objectMethodMangledNames.delete();
+
+      // Add any include file required by the functions to the list
+      // of include files for this object (so that when used, the "dependencies"
+      // are transitively included).
+      includeFiles
+        .toNewVectorString()
+        .toJSArray()
+        .forEach((includeFile: string) => {
+          objectMetadata.addIncludeFile(includeFile);
+        });
+
+      includeFiles.delete();
+
+      return options.eventsFunctionCodeWriter.writeObjectCode(
+        codeNamespace,
+        code
+      );
+    } else {
+      // Skip code generation
+      objectMethodMangledNames.delete();
       return Promise.resolve();
     }
   });
@@ -550,14 +729,16 @@ export const getFreeEventsFunctionType = (
 };
 
 /**
- * Return the index of the first parameter to be shown to the user:
- * * 0 for a behavior "method",
- * * 1 for a free function (as the first parameter is by convention the runtimeScene).
+ * The index of the first parameter to be shown to the user.
  */
-export const getParametersIndexOffset = (
-  isEventsBasedBehaviorMethod: boolean
-) => {
-  return isEventsBasedBehaviorMethod
-    ? 0 /*In the case of a behavior events function, the first two parameters are by convention the "Object" and "Behavior" */
-    : 1; /*In the case of a free events function (i.e: not tied to a behavior), the first parameter is by convention the current scene and is not shown.*/
-};
+export const ParametersIndexOffsets = Object.freeze({
+  // In the case of a free events function (i.e: not tied to a behavior),
+  // the first parameter is by convention the current scene and is not shown.
+  FreeFunction: 1,
+  // In the case of a behavior events function, the first two parameters
+  // are by convention the "Object" and "Behavior".
+  BehaviorFunction: 0,
+  // In the case of an object events function, the first parameter
+  // is by convention the "Object".
+  ObjectFunction: 0,
+});

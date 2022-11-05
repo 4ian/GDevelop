@@ -10,8 +10,9 @@ import SelectOption from '../UI/SelectOption';
 import { t } from '@lingui/macro';
 import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
 import {
-  allGameCategories,
   getCategoryName,
+  getGameCategories,
+  type GameCategory,
 } from '../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { I18n } from '@lingui/react';
@@ -117,6 +118,22 @@ export function PublicGameProperties({
   const hasValidGameSlug =
     hasGameSlug && (profile && userSlug !== profile.username);
 
+  const [allGameCategories, setAllGameCategories] = React.useState<
+    GameCategory[]
+  >([]);
+
+  const fetchGameCategories = React.useCallback(async () => {
+    const categories = await getGameCategories();
+    setAllGameCategories(categories);
+  }, []);
+
+  React.useEffect(
+    () => {
+      fetchGameCategories();
+    },
+    [fetchGameCategories]
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -165,18 +182,26 @@ export function PublicGameProperties({
                     setCategories(
                       values ? values.map(category => category.value) : []
                     );
+                    setCategoryInput('');
                   }}
                   inputValue={categoryInput}
-                  onInputChange={(event, value) => {
-                    setCategoryInput(value);
+                  onInputChange={(event, value, reason) => {
+                    // It seems that the input is triggered with a "reset" reason,
+                    // after each input change. (https://github.com/mui/material-ui/issues/20939)
+                    // We handle this manually to avoid the input to be reseted.
+                    if (reason === 'input') {
+                      setCategoryInput(value);
+                    }
                   }}
                   dataSource={allGameCategories.map(category => ({
-                    value: category,
-                    text: getCategoryName(category, i18n),
+                    value: category.name,
+                    text: getCategoryName(category.name, i18n),
+                    disabled: category.type === 'admin-only',
                   }))}
                   fullWidth
                   optionsLimit={4}
-                  loading={disabled}
+                  disabled={disabled}
+                  loading={allGameCategories.length === 0}
                 />
               )}
               {setDiscoverable && (

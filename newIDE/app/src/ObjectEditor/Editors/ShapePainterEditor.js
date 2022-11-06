@@ -11,6 +11,9 @@ import {
 import { type EditorProps } from './EditorProps.flow';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
+import Text from '../../UI/Text';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 const gd = global.gd;
 
 export default class PanelSpriteEditor extends React.Component<
@@ -132,6 +135,34 @@ export default class PanelSpriteEditor extends React.Component<
               this.forceUpdate();
             }}
           />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout alignItems={'center'}>
+          <Checkbox
+            label={<Trans>Use antialiasing (Smooths the drawn shapes) </Trans>}
+            checked={shapePainterConfiguration.isAntialiased()}
+            onCheck={(e, checked) => {
+              shapePainterConfiguration.setAntialiased(checked);
+              this.forceUpdate();
+            }}
+          />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout alignItems={'center'}>
+          <Text>
+            <Trans>Antialiasing Quality : </Trans>
+          </Text>
+          <SelectField
+            value={shapePainterConfiguration.getAntialiasingQuality()}
+            onChange={value => {
+              shapePainterConfiguration.setAntialiasingQuality(
+                value.target.value
+              );
+              this.forceUpdate();
+            }}
+          >
+            <SelectOption value={'LOW'} primaryText={'Low quality'} />
+            <SelectOption value={'MEDIUM'} primaryText={'Medium quality'} />
+            <SelectOption value={'HIGH'} primaryText={'High quality'} />
+          </SelectField>
         </ResponsiveLineStackLayout>
       </ColumnStackLayout>
     );

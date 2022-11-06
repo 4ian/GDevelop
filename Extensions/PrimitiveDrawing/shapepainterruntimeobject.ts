@@ -784,8 +784,8 @@ namespace gdjs {
       const centerY = this.getCenterY();
       const vertices = this.hitBoxes[0].vertices;
       if (this._customCollisionMask) {
-        const customCollisionMaskVertices =
-          this._customCollisionMask[0].vertices;
+        const customCollisionMaskVertices = this._customCollisionMask[0]
+          .vertices;
         for (let i = 0; i < 4; i++) {
           const point = this.transformToScene(
             customCollisionMaskVertices[i][0],

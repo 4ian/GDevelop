@@ -20,6 +20,9 @@ namespace gdjs {
      */
     _transformationIsUpToDate = false;
 
+    /** The antialiasing filter */
+    _antialiasingFilter: null | PIXI.Filter = null;
+
     private static readonly _positionForTransformation: PIXI.IPointData = {
       x: 0,
       y: 0,
@@ -35,6 +38,7 @@ namespace gdjs {
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._graphics, runtimeObject.getZOrder());
+      this.updateAntialiasing();
     }
 
     getRendererObject() {
@@ -313,7 +317,6 @@ namespace gdjs {
 
     updatePreRender(): void {
       this.updatePositionIfNeeded();
-      this.applyAntialiasing();
     }
 
     updatePositionX(): void {
@@ -486,29 +489,33 @@ namespace gdjs {
       point[1] = position.y;
       return point;
     }
-    applyAntialiasing(): void {
-      if (this._object.isAntialiasingOn()) {
-        let antialiasingFilter = new PIXI.filters.FXAAFilter();
+    updateAntialiasing(): void {
+      if (this._object.isAntialiased()) {
+        const antialiasingFilter =
+          this._antialiasingFilter ||
+          (this._antialiasingFilter = new PIXI.filters.FXAAFilter());
         antialiasingFilter.enabled = true;
-        switch (this._object.getAntialiasingQuality()) {
-          case 2:
-            antialiasingFilter.multisample = PIXI.MSAA_QUALITY.LOW;
-            break;
-          case 4:
-            antialiasingFilter.multisample = PIXI.MSAA_QUALITY.MEDIUM;
-            break;
-          case 8:
-            antialiasingFilter.multisample = PIXI.MSAA_QUALITY.HIGH;
-            break;
-          default:
-            //Should never be executed but if it's not a valid value, set the quality to LOW.
-            antialiasingFilter.multisample = PIXI.MSAA_QUALITY.LOW;
+        antialiasingFilter.multisample =
+          PIXI.MSAA_QUALITY[this._object.getAntialiasingQuality()] ||
+          PIXI.MSAA_QUALITY.LOW;
 
-            break;
+        if (!this._graphics.filters) {
+          this._graphics.filters = [];
         }
-        this._graphics.filters = [antialiasingFilter];
-      } else {
-        this._graphics.filters = [];
+        // does not apply filter if it already exists
+        if (this._graphics.filters.indexOf(this._antialiasingFilter) === -1) {
+          this._graphics.filters.push(antialiasingFilter);
+        }
+      } else if (this._antialiasingFilter != null) {
+        let antialiasingFilterIndex = this._graphics.filters?.indexOf(
+          this._antialiasingFilter
+        );
+        if (
+          antialiasingFilterIndex != -1 &&
+          antialiasingFilterIndex != undefined
+        ) {
+          this._graphics.filters?.splice(antialiasingFilterIndex, 1);
+        }
       }
     }
   }

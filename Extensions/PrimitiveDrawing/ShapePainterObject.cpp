@@ -33,7 +33,7 @@ ShapePainterObjectBase::ShapePainterObjectBase()
       clearBetweenFrames(true),
       absoluteCoordinates(false),
       antialiasing(true),
-      antialiasingQuality(2) {}
+      antialiasingQuality("LOW") {}
 
 ShapePainterObject::ShapePainterObject() {}
 
@@ -76,8 +76,8 @@ void ShapePainterObjectBase::DoUnserializeFrom(
   : true;
   antialiasingQuality = 
   element.HasChild("antialiasingQuality")
-  ? element.GetChild("antialiasingQuality").GetValue().GetInt()
-  : 2;
+  ? element.GetChild("antialiasingQuality").GetValue().GetString()
+  : "LOW";
 }
 
 void ShapePainterObject::DoUnserializeFrom(

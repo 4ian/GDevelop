@@ -28,11 +28,11 @@ namespace gdjs {
     /** Use absolute coordinates? */
     absoluteCoordinates: boolean;
     /** Clear the previous render before the next draw? */
-    clearBetweenFrames: boolean; 
+    clearBetweenFrames: boolean;
     /** Is antialiasing enabled on the object? */
     antialiasing: boolean;
     /**Quality of the antialiasing filter */
-    antialiasingQuality: integer; 
+    antialiasingQuality: 'LOW' | 'MEDIUM' | 'HIGH';
   };
 
   export type ShapePainterObjectData = ObjectData & ShapePainterObjectDataType;
@@ -57,7 +57,7 @@ namespace gdjs {
     _useAbsoluteCoordinates: boolean;
     _clearBetweenFrames: boolean;
     _antialiasing: boolean;
-    _antialiasingQuality: integer;
+    _antialiasingQuality: 'LOW' | 'MEDIUM' | 'HIGH';
     _renderer: gdjs.ShapePainterRuntimeObjectRenderer;
 
     private static readonly _pointForTransformation: FloatPoint = [0, 0];
@@ -345,24 +345,28 @@ namespace gdjs {
       return this._clearBetweenFrames;
     }
 
-    setAntialiasingOn(value: boolean): void {
+    setAntialiasing(value: boolean): void {
       this._antialiasing = value;
+      this._renderer.updateAntialiasing();
     }
-    
-    isAntialiasingOn(): boolean {
+
+    isAntialiased(): boolean {
       return this._antialiasing;
     }
 
-    setAntialiasingQuality(value: integer): void {
-      if(value !== 2 && value !== 4 && value !== 8) {
-        //by default, assume we want the lowest quality to avoid crashing the game.
-        value = 2;
-      }
+    setAntialiasingQuality(value: 'LOW' | 'MEDIUM' | 'HIGH'): void {
       this._antialiasingQuality = value;
+      this._renderer.updateAntialiasing();
     }
 
-    getAntialiasingQuality(): integer {
+    getAntialiasingQuality(): 'LOW' | 'MEDIUM' | 'HIGH' {
       return this._antialiasingQuality;
+    }
+
+    checkAntialiasingQuality(
+      valueToCompare: 'LOW' | 'MEDIUM' | 'HIGH'
+    ): boolean {
+      return this._antialiasingQuality === valueToCompare;
     }
 
     setCoordinatesRelative(value: boolean): void {
@@ -780,8 +784,8 @@ namespace gdjs {
       const centerY = this.getCenterY();
       const vertices = this.hitBoxes[0].vertices;
       if (this._customCollisionMask) {
-        const customCollisionMaskVertices = this._customCollisionMask[0]
-          .vertices;
+        const customCollisionMaskVertices =
+          this._customCollisionMask[0].vertices;
         for (let i = 0; i < 4; i++) {
           const point = this.transformToScene(
             customCollisionMaskVertices[i][0],

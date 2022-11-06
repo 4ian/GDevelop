@@ -5,10 +5,10 @@ Copyright (c) 2008-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 #if defined(GD_IDE_ONLY)
+#include <iostream>
+
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
-
-#include <iostream>
 
 void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension);
 
@@ -26,7 +26,9 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetObjectMetadata("PrimitiveDrawing::Drawer")
         .SetIncludeFile(
             "Extensions/PrimitiveDrawing/shapepainterruntimeobject.js")
-        .AddIncludeFile("Extensions/PrimitiveDrawing/pixi-graphics-extras/graphics-extras.min.js")
+        .AddIncludeFile(
+            "Extensions/PrimitiveDrawing/pixi-graphics-extras/"
+            "graphics-extras.min.js")
         .AddIncludeFile(
             "Extensions/PrimitiveDrawing/"
             "shapepainterruntimeobject-pixi-renderer.js");
@@ -37,8 +39,7 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Circle"]
         .SetFunctionName("drawCircle");
-    GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Line"]
+    GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Line"]
         .SetFunctionName("drawLine");
 
     GetAllActionsForObject(
@@ -50,11 +51,9 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::RoundedRectangle"]
         .SetFunctionName("drawRoundedRectangle");
-    GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Star"]
+    GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Star"]
         .SetFunctionName("drawStar");
-    GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Arc"]
+    GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Arc"]
         .SetFunctionName("drawArc");
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::BezierCurve"]
@@ -93,10 +92,10 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::RoundedRectangle"]
         .SetFunctionName("drawRoundedRectangle");
-    GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Star"]
+    GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Star"]
         .SetFunctionName("drawStar");
-    // These actions are not exposed yet as the way they work is unsure. See https://github.com/4ian/GDevelop/pull/1256
+    // These actions are not exposed yet as the way they work is unsure. See
+    // https://github.com/4ian/GDevelop/pull/1256
     /*GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Arc"]
         .SetFunctionName("drawArc");
@@ -220,36 +219,34 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::SetRotationCenter"]
         .SetFunctionName("setRotationCenter");
-    GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::SetRectangularCollisionMask"]
-        .SetFunctionName("setRectangularCollisionMask");
+    GetAllActionsForObject("PrimitiveDrawing::Drawer")
+        ["PrimitiveDrawing::SetRectangularCollisionMask"]
+            .SetFunctionName("setRectangularCollisionMask");
 
-    GetAllExpressionsForObject(
-        "PrimitiveDrawing::Drawer")["ToDrawingX"]
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["ToDrawingX"]
         .SetFunctionName("transformToDrawingX");
-    GetAllExpressionsForObject(
-        "PrimitiveDrawing::Drawer")["ToDrawingY"]
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["ToDrawingY"]
         .SetFunctionName("transformToDrawingY");
-    GetAllExpressionsForObject(
-        "PrimitiveDrawing::Drawer")["ToSceneX"]
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["ToSceneX"]
         .SetFunctionName("transformToSceneX");
-    GetAllExpressionsForObject(
-        "PrimitiveDrawing::Drawer")["ToSceneY"]
+    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")["ToSceneY"]
         .SetFunctionName("transformToSceneX");
+
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::SetAntialiasing"]
-        .SetFunctionName("setAntialiasingOn");
+        .SetFunctionName("setAntialiasing");
     GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")
-        ["PrimitiveDrawing::SetAntialiasingQuality"]
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::SetAntialiasingQuality"]
         .SetFunctionName("setAntialiasingQuality");
-    GetAllConditionsForObject("PrimitiveDrawing::Drawer")
-    ["PrimitiveDrawing::IsAntialiasingOn"]
-        .SetFunctionName("isAntialiasingOn");
-    GetAllExpressionsForObject("PrimitiveDrawing::Drawer")
-        ["GetAntialiasingQualityLevel"]
+    GetAllConditionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::IsAntialiasingOn"]
+        .SetFunctionName("isAntialiased");
+    GetAllStrExpressionsForObject(
+        "PrimitiveDrawing::Drawer")["AntialiasingQuality"]
         .SetFunctionName("getAntialiasingQuality");
-
+    GetAllConditionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::IsAntialiasingQuality"]
+        .SetFunctionName("checkAntialiasingQuality");
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };
 };

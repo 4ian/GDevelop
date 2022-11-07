@@ -346,6 +346,19 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                 disabled={false}
                               />
                             )}
+                            {property.getType() === 'Color' && (
+                              <ColorField
+                                floatingLabelText={<Trans>Default value</Trans>}
+                                disableAlpha
+                                fullWidth
+                                color={property.getValue()}
+                                onChange={color => {
+                                  property.setValue(color);
+                                  this.forceUpdate();
+                                  this.props.onPropertiesUpdated();
+                                }}
+                              />
+                            )}
                             {property.getType() === 'Choice' && (
                               <SelectField
                                 floatingLabelText={<Trans>Default value</Trans>}
@@ -373,19 +386,6 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             <StringArrayEditor
                               extraInfo={getExtraInfoArray(property)}
                               setExtraInfo={this._setChoiceExtraInfo(property)}
-                            />
-                          )}
-                          {property.getType() === 'Color' && (
-                            <ColorField
-                              floatingLabelText={<Trans>Color</Trans>}
-                              disableAlpha
-                              fullWidth
-                              color={property.getValue()}
-                              onChange={color => {
-                                property.setValue(color);
-                                this.forceUpdate();
-                                this.props.onPropertiesUpdated();
-                              }}
                             />
                           )}
                           <ResponsiveLineStackLayout noMargin>

@@ -168,6 +168,9 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAMESharedData = class RUNTIME_BEHAVIOR_CLA
   constructor(sharedData) {
     INITIALIZE_SHARED_PROPERTIES_CODE
   }
+  
+  // Shared properties:
+  SHARED_PROPERTIES_CODE
 }
 
 CODE_NAMESPACE.getSharedData = function(instanceContainer, behaviorName) {
@@ -208,9 +211,6 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = class RUNTIME_BEHAVIOR_CLASSNAME ext
 
   // Properties:
   PROPERTIES_CODE
-
-  // Shared properties:
-  SHARED_PROPERTIES_CODE
 }
 
 // Methods:
@@ -295,16 +295,16 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorSharedPropertyTemplateC
     const gd::NamedPropertyDescriptor& property) {
   return gd::String(R"jscode_template(
   GETTER_NAME() {
-    return this._sharedData.PROPERTY_NAME !== undefined ? this._sharedData.PROPERTY_NAME : DEFAULT_VALUE;
+    return this.PROPERTY_NAME !== undefined ? this.PROPERTY_NAME : DEFAULT_VALUE;
   }
   SETTER_NAME(newValue) {
-    this._sharedData.PROPERTY_NAME = newValue;
+    this.PROPERTY_NAME = newValue;
   })jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
       .FindAndReplace("GETTER_NAME",
-                      GetBehaviorSharedPropertyGetterName(property.GetName()))
+                      GetBehaviorSharedPropertyGetterInternalName(property.GetName()))
       .FindAndReplace("SETTER_NAME",
-                      GetBehaviorSharedPropertySetterName(property.GetName()))
+                      GetBehaviorSharedPropertySetterInternalName(property.GetName()))
       .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property))
       .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
                       eventsBasedBehavior.GetName());
@@ -370,4 +370,23 @@ gd::String BehaviorCodeGenerator::GenerateDoStepPreEventsPreludeCode() {
   return "this._onceTriggers.startNewFrame();";
 }
 
+gd::String BehaviorCodeGenerator::GetBehaviorSharedPropertyGetterName(
+    const gd::String& propertyName) {
+  return "_sharedData." + GetBehaviorSharedPropertyGetterInternalName(propertyName);
+}
+
+gd::String BehaviorCodeGenerator::GetBehaviorSharedPropertySetterName(
+    const gd::String& propertyName) {
+  return "_sharedData." + GetBehaviorSharedPropertySetterInternalName(propertyName);
+}
+
+gd::String BehaviorCodeGenerator::GetBehaviorSharedPropertyGetterInternalName(
+    const gd::String& propertyName) {
+  return "_get" + propertyName;
+}
+
+gd::String BehaviorCodeGenerator::GetBehaviorSharedPropertySetterInternalName(
+    const gd::String& propertyName) {
+  return "_set" + propertyName;
+}
 }  // namespace gdjs

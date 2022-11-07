@@ -62,20 +62,30 @@ class BehaviorCodeGenerator {
    * of a behavior.
    */
   static gd::String GetBehaviorSharedPropertyGetterName(
-      const gd::String& propertyName) {
-    return "_getShared" + propertyName;
-  }
+      const gd::String& propertyName);
 
   /**
    * \brief Generate the name of the method to set the value of the shared property
    * of a behavior.
    */
   static gd::String GetBehaviorSharedPropertySetterName(
-      const gd::String& propertyName) {
-    return "_setShared" + propertyName;
-  }
+      const gd::String& propertyName);
 
  private:
+  /**
+   * \brief Generate the name of the method to get the value of the shared property
+   * of a behavior form within the shared data class.
+   */
+  static gd::String GetBehaviorSharedPropertyGetterInternalName(
+      const gd::String& propertyName);
+
+  /**
+   * \brief Generate the name of the method to set the value of the shared property
+   * of a behavior form within the shared data class.
+   */
+  static gd::String GetBehaviorSharedPropertySetterInternalName(
+      const gd::String& propertyName);
+
   gd::String GenerateRuntimeBehaviorTemplateCode(
       const gd::String& extensionName,
       const gd::EventsBasedBehavior& eventsBasedBehavior,

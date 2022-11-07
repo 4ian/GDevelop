@@ -830,7 +830,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
         gd.BehaviorCodeGenerator.getBehaviorSharedPropertyGetterName(
           propertyName
         )
-      )
+      );
   });
 };
 

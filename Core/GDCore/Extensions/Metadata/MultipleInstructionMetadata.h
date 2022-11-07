@@ -178,7 +178,6 @@ class GD_CORE_API MultipleInstructionMetadata {
     throw std::logic_error("no instruction metadata");
   }
 
-
   /**
    * \see gd::InstructionMetadata::SetPrivate
    */

@@ -1,6 +1,8 @@
 // @ts-check
 describe('gdjs.PathfindingRuntimeBehavior', function () {
   // limit tests cases on the legacy collision methods.
+  // Not that the legacy collision mode is still the only mode that exists
+  // because the new one were never merged.
   let doLegacyPathFindingTests = (
     cellSize,
     objectCenteredOnCells,

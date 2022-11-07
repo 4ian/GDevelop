@@ -262,7 +262,6 @@ namespace gdjs {
       }
 
       //0.2) Track changes in object size
-      this._state.beforeUpdatingObstacles(timeDelta);
       this._onFloor._oldHeight = object.getHeight();
 
       //0.3) Update list of platforms around/related to the object
@@ -329,7 +328,10 @@ namespace gdjs {
       this._lastDeltaY = object.getY() - oldY;
     }
 
-    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      const timeDelta = this.owner.getElapsedTime() / 1000;
+      this._state.doStepPostEvents(timeDelta);
+    }
 
     private _updateSpeed(timeDelta: float): float {
       const previousSpeed = this._currentSpeed;
@@ -1610,7 +1612,7 @@ namespace gdjs {
      * Called before the obstacle search.
      * The object position may need adjustments to handle external changes.
      */
-    beforeUpdatingObstacles(timeDelta: float): void;
+    doStepPostEvents(timeDelta: float): void;
     /**
      * Check if transitions to other states are needed and apply them before moving horizontally.
      */
@@ -1665,9 +1667,10 @@ namespace gdjs {
       this._floorLastY = this._floorPlatform!.owner.getY();
     }
 
-    beforeUpdatingObstacles(timeDelta: float) {
-      const object = this._behavior.owner;
-      //Stick the object to the floor if its height has changed.
+    doStepPostEvents(timeDelta: float) {
+      const behavior = this._behavior;
+      const object = behavior.owner;
+      // Stick the object to the floor if its height has changed.
       if (this._oldHeight !== object.getHeight()) {
         object.setY(
           this._floorLastY -
@@ -1697,11 +1700,14 @@ namespace gdjs {
       const deltaY = this._floorPlatform!.owner.getY() - this._floorLastY;
       if (
         deltaY !== 0 &&
-        Math.abs(deltaY) <=
-          Math.abs(this._behavior._maxFallingSpeed * timeDelta)
+        Math.abs(deltaY) <= Math.abs(behavior._maxFallingSpeed * timeDelta)
       ) {
         object.setY(object.getY() + deltaY);
       }
+
+      // Shift the object according to the floor movement.
+      const deltaX = this._floorPlatform!.owner.getX() - this._floorLastX;
+      object.setX(object.getX() + deltaX);
     }
 
     checkTransitionBeforeX() {
@@ -1736,13 +1742,7 @@ namespace gdjs {
       behavior._checkTransitionJumping();
     }
 
-    beforeMovingX() {
-      const behavior = this._behavior;
-      // Shift the object according to the floor movement.
-      behavior._requestedDeltaX +=
-        this._floorPlatform!.owner.getX() - this._floorLastX;
-      // See `beforeUpdatingObstacles` for the logic for the Y axis.
-    }
+    beforeMovingX() {}
 
     checkTransitionBeforeY(timeDelta: float) {
       const behavior = this._behavior;
@@ -1935,7 +1935,7 @@ namespace gdjs {
 
     leave() {}
 
-    beforeUpdatingObstacles(timeDelta: float) {}
+    doStepPostEvents(timeDelta: float) {}
 
     checkTransitionBeforeX() {}
 
@@ -2008,7 +2008,7 @@ namespace gdjs {
       this._currentJumpSpeed = 0;
     }
 
-    beforeUpdatingObstacles(timeDelta: float) {}
+    doStepPostEvents(timeDelta: float) {}
 
     checkTransitionBeforeX() {}
 
@@ -2103,7 +2103,7 @@ namespace gdjs {
       this._grabbedPlatform = null;
     }
 
-    beforeUpdatingObstacles(timeDelta: float) {}
+    doStepPostEvents(timeDelta: float) {}
 
     checkTransitionBeforeX() {
       const behavior = this._behavior;
@@ -2169,7 +2169,7 @@ namespace gdjs {
 
     leave() {}
 
-    beforeUpdatingObstacles(timeDelta: float) {}
+    doStepPostEvents(timeDelta: float) {}
 
     checkTransitionBeforeX() {}
 

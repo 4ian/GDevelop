@@ -59,13 +59,15 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
 
       // Check that the object follow the platform, even if the
       // movement is less than one pixel.
-      platform.setX(platform.getX() + 0.12);
-      runtimeScene.renderAndStep(1000 / 60);
-      platform.setX(platform.getX() + 0.12);
-      runtimeScene.renderAndStep(1000 / 60);
-      platform.setX(platform.getX() + 0.12);
-      runtimeScene.renderAndStep(1000 / 60);
-
+      runtimeScene.renderAndStepWithEventsFunction(1000 / 60, () => {
+        platform.setX(platform.getX() + 0.12);
+      });
+      runtimeScene.renderAndStepWithEventsFunction(1000 / 60, () => {
+        platform.setX(platform.getX() + 0.12);
+      });
+      runtimeScene.renderAndStepWithEventsFunction(1000 / 60, () => {
+        platform.setX(platform.getX() + 0.12);
+      });
       expect(object.getX()).to.be(0.36);
     });
 
@@ -240,11 +242,12 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             // Check that the object follow the platform, even if the
             // movement is less than one pixel.
             for (let i = 0; i < 5; ++i) {
-              platform.setPosition(
-                platform.getX() + deltaX,
-                platform.getY() + deltaY
-              );
-              runtimeScene.renderAndStep(1000 / 60);
+              runtimeScene.renderAndStepWithEventsFunction(1000 / 60, () => {
+                platform.setPosition(
+                  platform.getX() + deltaX,
+                  platform.getY() + deltaY
+                );
+              });
               expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
               expect(object.getBehavior('auto1').isFalling()).to.be(false);
               expect(object.getBehavior('auto1').isMoving()).to.be(false);
@@ -378,11 +381,12 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
               // Check that the object follow the platform, even if the
               // movement is less than one pixel.
               for (let i = 0; i < 5; ++i) {
-                platform.setPosition(
-                  platform.getX() + deltaX,
-                  platform.getY() + deltaY
-                );
-                runtimeScene.renderAndStep(1000 / 60);
+                runtimeScene.renderAndStepWithEventsFunction(1000 / 60, () => {
+                  platform.setPosition(
+                    platform.getX() + deltaX,
+                    platform.getY() + deltaY
+                  );
+                });
                 expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
                 expect(object.getBehavior('auto1').isFalling()).to.be(false);
                 expect(object.getBehavior('auto1').isMoving()).to.be(false);

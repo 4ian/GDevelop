@@ -831,9 +831,6 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           propertyName
         )
       )
-      // All property actions/conditions/expressions are private, meaning
-      // they can only be used from the behavior events.
-      .setPrivate();
   });
 };
 

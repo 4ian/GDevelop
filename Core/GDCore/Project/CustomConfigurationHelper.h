@@ -3,8 +3,8 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_CustomConfigurationHelper_H
-#define GDCORE_CustomConfigurationHelper_H
+#ifndef GDCORE_CUSTOMCONFIGURATIONHELPER_H
+#define GDCORE_CUSTOMCONFIGURATIONHELPER_H
 
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
@@ -17,8 +17,8 @@ using namespace gd;
 
 namespace gd {
 /**
- * \brief A gd::Behavior that stores its content in JSON and forward the
- * properties related functions to Javascript with Emscripten.
+ * \brief Helper functions that gd::CustomBehavior and gd::CustomBehaviorsSharedData use to
+ * store their content in JSON.
  */
 class CustomConfigurationHelper {
 public:
@@ -40,4 +40,4 @@ public:
 };
 }  // namespace gd
 
-#endif  // GDCORE_CustomConfigurationHelper_H
+#endif  // GDCORE_CUSTOMCONFIGURATIONHELPER_H

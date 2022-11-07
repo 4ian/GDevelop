@@ -17,16 +17,13 @@ using namespace gd;
 
 namespace gd {
 /**
- * \brief A gd::Behavior that stores its content in JSON and forward the
- * properties related functions to Javascript with Emscripten.
+ * \brief A gd::BehaviorsSharedData that stores its content in JSON.
  */
 class CustomBehaviorsSharedData : public gd::BehaviorsSharedData {
 public:
-  CustomBehaviorsSharedData(const gd::String &name,
-                 const Project &project_,
-                 const gd::String &fullType)
-      : BehaviorsSharedData(name, fullType),
-        project(project_) {}
+  CustomBehaviorsSharedData(const gd::String &name, const Project &project_,
+                            const gd::String &fullType)
+      : BehaviorsSharedData(name, fullType), project(project_) {}
   CustomBehaviorsSharedData *Clone() const override;
 
   using BehaviorsSharedData::GetProperties;
@@ -34,18 +31,16 @@ public:
   using BehaviorsSharedData::UpdateProperty;
 
 protected:
-  virtual std::map<gd::String, gd::PropertyDescriptor>
+  std::map<gd::String, gd::PropertyDescriptor>
   GetProperties(const gd::SerializerElement &behaviorContent) const override;
-  virtual bool UpdateProperty(gd::SerializerElement &behaviorContent,
-                              const gd::String &name,
-                              const gd::String &value) override;
-  virtual void
-  InitializeContent(gd::SerializerElement &behaviorContent) override;
+  bool UpdateProperty(gd::SerializerElement &behaviorContent,
+                      const gd::String &name, const gd::String &value) override;
+  void InitializeContent(gd::SerializerElement &behaviorContent) override;
 
 private:
   const Project &project; ///< The project is used to get the
                           ///< EventBasedBehavior from the fullType.
 };
-}  // namespace gd
+} // namespace gd
 
-#endif  // GDCORE_CUSTOMBEHAVIORSSHAREDDATA_H
+#endif // GDCORE_CUSTOMBEHAVIORSSHAREDDATA_H

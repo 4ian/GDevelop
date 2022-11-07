@@ -1,6 +1,5 @@
 // @ts-check
 describe('gdjs.PathfindingRuntimeBehavior', function () {
-  const epsilon = 1 / (2 << 16);
   // tests cases where every collisionMethod has the same behavior.
   let doCommonPathFindingTests = (
     collisionMethod,
@@ -111,14 +110,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
       return obstacle;
     };
 
-    let runtimeScene;
-    let player;
-    beforeEach(function () {
-      runtimeScene = createScene();
-      player = addPlayer(runtimeScene);
-    });
-
-    const getPathLength = () => {
+    const getPathLength = (player) => {
       /** @type gdjs.PathfindingRuntimeBehavior */
       const behavior = player.getBehavior(pathFindingName);
       if (behavior.getNodeCount() < 2) {
@@ -137,11 +129,18 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
       return pathLength;
     };
 
+    let runtimeScene;
+    let player;
+    beforeEach(function () {
+      runtimeScene = createScene();
+      player = addPlayer(runtimeScene);
+    });
+
     it('can find a path without any obstacle at all', function () {
       player.setPosition(480, 300);
       player.getBehavior(pathFindingName).moveTo(runtimeScene, 720, 300);
       expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
-      expect(getPathLength()).to.be(720 - 480);
+      expect(getPathLength(player)).to.be(720 - 480);
     });
 
     it('can find a path without any obstacle in the way', function () {
@@ -179,7 +178,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
       player.setPosition(480, 300);
       player.getBehavior(pathFindingName).moveTo(runtimeScene, 720, 300);
       expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
-      expect(getPathLength()).to.be.above(720 - 480 + 50);
+      expect(getPathLength(player)).to.be.above(720 - 480 + 50);
     });
 
     it('can find a path between 2 obstacles', function () {
@@ -194,7 +193,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
       player.setPosition(480, 300);
       player.getBehavior(pathFindingName).moveTo(runtimeScene, 720, 300);
       expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
-      expect(getPathLength()).to.be(720 - 480);
+      expect(getPathLength(player)).to.be(720 - 480);
     });
 
     it("mustn't find a path to a closed room", function () {

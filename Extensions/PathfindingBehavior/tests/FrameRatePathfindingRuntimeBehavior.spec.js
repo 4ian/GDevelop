@@ -106,11 +106,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
       return obstacle;
     };
 
-    let runtimeScene;
-    /** @type gdjs.RuntimeObject */
-    let player;
-
-    const getPathLength = () => {
+    const getPathLength = (player) => {
       /** @type gdjs.PathfindingRuntimeBehavior */
       const behavior = player.getBehavior(pathFindingName);
       if (behavior.getNodeCount() < 2) {
@@ -130,6 +126,9 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
     };
 
     describe(`(allowDiagonals: true)`, function () {
+      let runtimeScene;
+      let player;
+
       beforeEach(function () {
         runtimeScene = createScene();
         const allowDiagonals = true;
@@ -149,7 +148,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
             player.setPosition(480, 300);
             player.getBehavior(pathFindingName).moveTo(runtimeScene, 720, 300);
             expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
-            expect(getPathLength()).to.be.above(720 - 480 + 50);
+            expect(getPathLength(player)).to.be.above(720 - 480 + 50);
 
             // Move on the path and stop before the last 1/10 of second.
             for (let i = 0; i < (framePerSecond * 17) / 10; i++) {
@@ -181,6 +180,9 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
       });
     });
     describe(`(allowDiagonals: false)`, function () {
+      let runtimeScene;
+      let player;
+
       beforeEach(function () {
         runtimeScene = createScene();
         const allowDiagonals = false;
@@ -200,7 +202,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
             player.setPosition(480, 300);
             player.getBehavior(pathFindingName).moveTo(runtimeScene, 720, 300);
             expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
-            expect(getPathLength()).to.be.above(720 - 480 + 100);
+            expect(getPathLength(player)).to.be.above(720 - 480 + 100);
 
             // Move on the path and stop before the last 1/10 of second.
             for (let i = 0; i < (framePerSecond * 20) / 10; i++) {

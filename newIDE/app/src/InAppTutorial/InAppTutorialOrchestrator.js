@@ -553,7 +553,9 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
   const checkIfWrongEditor = useDebounce(
     () => {
-      setWrongEditorInfoOpen(expectedEditor !== currentEditor);
+      setWrongEditorInfoOpen(
+        !!expectedEditor && expectedEditor !== currentEditor
+      );
     },
     wrongEditorInfoOpen ? 0 : 1000
   );

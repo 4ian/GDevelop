@@ -50,7 +50,7 @@ const MaxLeaderboardCountAlertMessage = ({
             {leaderboardLimits.canMaximumCountPerGameBeIncreased ? (
               <Trans>
                 Update to GDevelop Premium to get more leaderboards, storage,
-                and a shiny unicorn!
+                and one-click packagings!
               </Trans>
             ) : (
               // This should not happen at the moment since leaderboards are unlimited

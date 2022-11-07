@@ -45,8 +45,8 @@ export const MaxProjectCountAlertMessage = ({ onUpgrade, limits }: Props) => {
           <Text>
             {canMaximumCountBeIncreased ? (
               <Trans>
-                Update to GDevelop Premium to get more storage, one click
-                packagings, and a shiny unicorn!
+                Update to GDevelop Premium to get more storage, leaderboards,
+                and one-click packagings!
               </Trans>
             ) : (
               <Trans>

@@ -112,7 +112,6 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
     };
 
     let runtimeScene;
-    /** @type gdjs.RuntimeObject */
     let player;
     beforeEach(function () {
       runtimeScene = createScene();

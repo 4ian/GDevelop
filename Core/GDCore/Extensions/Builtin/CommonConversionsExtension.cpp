@@ -96,7 +96,7 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
           "JSONToVariableStructure",
           _("Convert JSON to a scene variable"),
           _("Parse a JSON object and store it into a scene variable"),
-          _("Parse JSON string _PARAM0_ and store it into variable _PARAM1_"),
+          _("Convert JSON string _PARAM0_ and store it into variable _PARAM1_"),
           "",
           "res/actions/net24.png",
           "res/actions/net.png")
@@ -108,7 +108,7 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
       .AddAction("JSONToGlobalVariableStructure",
                  _("Convert JSON to global variable"),
                  _("Parse a JSON object and store it into a global variable"),
-                 _("Parse JSON string _PARAM0_ and store it into global "
+                 _("Convert JSON string _PARAM0_ and store it into global "
                    "variable _PARAM1_"),
                  "",
                  "res/actions/net24.png",

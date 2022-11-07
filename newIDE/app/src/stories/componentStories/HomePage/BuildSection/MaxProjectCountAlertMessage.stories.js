@@ -18,13 +18,13 @@ export default {
 export const ForIndieUser = () => (
   <MaxProjectCountAlertMessage
     limits={limitsForIndieUser}
-    onUpgrade={action('onUpgrade')}
+    onUpgrade={() => action('onUpgrade')()}
   />
 );
 
 export const ForProUser = () => (
   <MaxProjectCountAlertMessage
     limits={limitsForProUser}
-    onUpgrade={action('onUpgrade')}
+    onUpgrade={() => action('onUpgrade')()}
   />
 );

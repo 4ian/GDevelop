@@ -48,6 +48,14 @@ export type Capabilities = {
     maximumCount: number,
     canMaximumCountBeIncreased: boolean,
   },
+  /**
+   * leaderboards is marked as optional to prevent bugs at the moment
+   * the limit is enforced (endpoint deployed after the new version is released)
+   */
+  leaderboards?: {
+    maximumCountPerGame: number,
+    canMaximumCountPerGameBeIncreased: boolean,
+  },
 };
 
 export type CurrentUsages = {

@@ -58,6 +58,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setIsAlwaysOnTopInPreview,
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
+    setShowEventBasedObjectsEditor,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -326,6 +327,16 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               <Trans>
                 Show community (non reviewed) extensions in the list of
                 extensions
+              </Trans>
+            }
+          />
+          <Toggle
+            onToggle={(e, check) => setShowEventBasedObjectsEditor(check)}
+            toggled={values.showEventBasedObjectsEditor}
+            labelPosition="right"
+            label={
+              <Trans>
+                Show custom objects in the extension editor (experimental)
               </Trans>
             }
           />

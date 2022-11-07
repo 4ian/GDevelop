@@ -404,7 +404,9 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
 
         // Make the platform under the character feet smaller.
-        object.setCustomWidthAndHeight(object.getWidth(), 9);
+        runtimeScene.renderAndStepWithEventsFunction(1000 / 60, () => {
+          object.setCustomWidthAndHeight(object.getWidth(), 9);
+        });
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isFalling()).to.be(false);
         expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
@@ -679,18 +681,11 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be.within(140.6297999, 140.6298001);
 
       // Move the platform by 6 pixels to the right.
-      platform.setX(platform.getX() + 1);
-      runtimeScene.renderAndStep(1000 / 60);
-      platform.setX(platform.getX() + 1);
-      runtimeScene.renderAndStep(1000 / 60);
-      platform.setX(platform.getX() + 1);
-      runtimeScene.renderAndStep(1000 / 60);
-      platform.setX(platform.getX() + 1);
-      runtimeScene.renderAndStep(1000 / 60);
-      platform.setX(platform.getX() + 1);
-      runtimeScene.renderAndStep(1000 / 60);
-      platform.setX(platform.getX() + 1);
-      runtimeScene.renderAndStep(1000 / 60);
+      for (let index = 0; index < 6; index++) {
+        runtimeScene.renderAndStepWithEventsFunction(1000 / 60, () => {
+          platform.setX(platform.getX() + 1);
+        });
+      }
 
       // Ensure the object followed the platform on the X axis.
       // If the floating point errors caused oscillations between two Y positions,

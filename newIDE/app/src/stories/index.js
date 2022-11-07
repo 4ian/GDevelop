@@ -157,6 +157,7 @@ import {
 } from '../UI/Accordion';
 import ProjectPropertiesDialog from '../ProjectManager/ProjectPropertiesDialog';
 import { LoadingScreenEditor } from '../ProjectManager/LoadingScreenEditor';
+import PreferencesDialog from '../MainFrame/Preferences/PreferencesDialog';
 import {
   ExtensionsAccordion,
   ExamplesAccordion,
@@ -3369,4 +3370,14 @@ storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
       onChooseResource={() => Promise.reject('unimplemented')}
       resourceExternalEditors={fakeResourceExternalEditors}
     />
+  ));
+
+storiesOf('PreferencesDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <I18n>
+      {({ i18n }) => (
+        <PreferencesDialog i18n={i18n} onClose={action('onClose')} />
+      )}
+    </I18n>
   ));

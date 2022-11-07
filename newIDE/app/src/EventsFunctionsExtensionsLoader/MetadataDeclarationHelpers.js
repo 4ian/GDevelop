@@ -798,6 +798,40 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
         gd.BehaviorCodeGenerator.getBehaviorPropertyGetterName(propertyName)
       );
   });
+
+  mapVector(eventsBasedBehavior.getSharedPropertyDescriptors(), property => {
+    const propertyType = property.getType();
+    const propertyName = property.getName();
+    const propertyLabel = i18n._(
+      t`${property.getLabel() || propertyName} shared property`
+    );
+
+    addObjectAndBehaviorParameters(
+      behaviorMetadata.addExpressionAndConditionAndAction(
+        convertPropertyTypeToValueType(propertyType),
+        gd.EventsBasedBehavior.getSharedPropertyExpressionName(propertyName),
+        propertyLabel,
+        i18n._(t`the value of ${propertyLabel}`),
+        i18n._(t`the value of ${propertyLabel}`),
+        eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+        getExtensionIconUrl(extension)
+      )
+    )
+      .useStandardParameters(
+        convertPropertyTypeToValueType(propertyType),
+        getStringifiedExtraInfo(property)
+      )
+      .setFunctionName(
+        gd.BehaviorCodeGenerator.getBehaviorSharedPropertySetterName(
+          propertyName
+        )
+      )
+      .setGetter(
+        gd.BehaviorCodeGenerator.getBehaviorSharedPropertyGetterName(
+          propertyName
+        )
+      )
+  });
 };
 
 /**

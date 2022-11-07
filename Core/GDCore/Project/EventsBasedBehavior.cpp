@@ -21,6 +21,8 @@ void EventsBasedBehavior::SerializeTo(SerializerElement& element) const {
   if (isPrivate) {
     element.SetBoolAttribute("private", isPrivate);
   }
+  sharedPropertyDescriptors.SerializeElementsTo(
+      "propertyDescriptor", element.AddChild("sharedPropertyDescriptors"));
 }
 
 void EventsBasedBehavior::UnserializeFrom(gd::Project& project,
@@ -28,6 +30,8 @@ void EventsBasedBehavior::UnserializeFrom(gd::Project& project,
   AbstractEventsBasedEntity::UnserializeFrom(project, element);
   objectType = element.GetStringAttribute("objectType");
   isPrivate = element.GetBoolAttribute("private");
+  sharedPropertyDescriptors.UnserializeElementsFrom(
+      "propertyDescriptor", element.GetChild("sharedPropertyDescriptors"));
 }
 
 }  // namespace gd

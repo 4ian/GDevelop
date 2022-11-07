@@ -73,8 +73,8 @@ export default class EventsBasedObjectEditor extends React.Component<
               <AlertMessage kind="warning">
                 <Trans>
                   The custom object editor is at a very early stage. A lot of
-                  features are missing or broken. Extensions written with it
-                  may no longer work in future GDevelop releases.
+                  features are missing or broken. Extensions written with it may
+                  no longer work in future GDevelop releases.
                 </Trans>
               </AlertMessage>
               <DismissableAlertMessage

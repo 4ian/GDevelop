@@ -18,11 +18,12 @@ import {
 type Props = {| children: React.Node |};
 
 const InAppTutorialProvider = (props: Props) => {
+  const flingTutorial = require('./Tutorials/flingGame.json')
   const [
     isInAppTutorialRunning,
     setIsInAppTutorialRunning,
-  ] = React.useState<boolean>(false);
-  const [tutorial, setTutorial] = React.useState<?InAppTutorial>(null);
+  ] = React.useState<boolean>(true);
+  const [tutorial, setTutorial] = React.useState<?InAppTutorial>(flingTutorial);
   const [project, setProject] = React.useState<?gdProject>(null);
   const [
     currentEditor,

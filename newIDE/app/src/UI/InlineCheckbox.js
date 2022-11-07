@@ -20,6 +20,7 @@ const useFormGroupStyles = makeStyles({
 });
 
 type Props = {|
+  id?: string,
   label?: ?React.Node,
   checked: boolean,
   onCheck?: (e: {||}, checked: boolean) => void | Promise<void>,
@@ -34,6 +35,7 @@ type Props = {|
  * without having it taking the full width of its container.
  */
 const InlineCheckbox = ({
+  id,
   onCheck,
   disabled,
   checked,
@@ -46,6 +48,7 @@ const InlineCheckbox = ({
   const formGroupClasses = useFormGroupStyles();
   const checkbox = (
     <Checkbox
+      id={id}
       disabled={disabled}
       checked={checked}
       onChange={

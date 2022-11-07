@@ -19,10 +19,8 @@ const MaxLeaderboardCountAlertMessage = ({
   onClose,
   limits,
 }: Props) => {
-  const {
-    maximumCountPerGame,
-    canMaximumCountPerGameBeIncreased,
-  } = limits.capabilities.leaderboards;
+  const leaderboardLimits = limits.capabilities.leaderboards;
+  if (!leaderboardLimits) return null;
 
   return (
     <Line>
@@ -31,7 +29,7 @@ const MaxLeaderboardCountAlertMessage = ({
           kind="warning"
           onHide={onClose}
           renderRightButton={
-            canMaximumCountPerGameBeIncreased
+            leaderboardLimits.canMaximumCountPerGameBeIncreased
               ? () => (
                   <RaisedButton
                     primary
@@ -44,12 +42,12 @@ const MaxLeaderboardCountAlertMessage = ({
         >
           <Text size="block-title">
             <Trans>
-              You've reached your maximum of {maximumCountPerGame} leaderboards
-              for your game
+              You've reached your maximum of{' '}
+              {leaderboardLimits.maximumCountPerGame} leaderboards for your game
             </Trans>
           </Text>
           <Text>
-            {canMaximumCountPerGameBeIncreased ? (
+            {leaderboardLimits.canMaximumCountPerGameBeIncreased ? (
               <Trans>
                 Update to GDevelop Premium to get more leaderboards, storage,
                 and a shiny unicorn!

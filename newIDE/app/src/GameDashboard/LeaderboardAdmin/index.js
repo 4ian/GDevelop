@@ -329,12 +329,12 @@ export const LeaderboardAdmin = ({
     setApiError(null);
     try {
       if (limits && leaderboards) {
-        const {
-          capabilities: {
-            leaderboards: { maximumCountPerGame },
-          },
-        } = limits;
-        if (leaderboards.length >= maximumCountPerGame) {
+        const leaderboardLimits = limits.capabilities.leaderboards;
+        if (
+          leaderboardLimits &&
+          leaderboardLimits.maximumCountPerGame > 0 &&
+          leaderboards.length >= leaderboardLimits.maximumCountPerGame
+        ) {
           setDisplayMaxLeaderboardCountReachedWarning(true);
           return;
         }

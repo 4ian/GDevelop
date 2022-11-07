@@ -117,6 +117,10 @@ export const limitsForIndieUser: Limits = {
       maximumCount: 50,
       canMaximumCountBeIncreased: true,
     },
+    leaderboards: {
+      maximumCountPerGame: -1,
+      canMaximumCountPerGameBeIncreased: false,
+    },
   },
   limits: {
     'cordova-build': {
@@ -141,6 +145,10 @@ export const limitsForProUser: Limits = {
       maximumCount: 100,
       canMaximumCountBeIncreased: false,
     },
+    leaderboards: {
+      maximumCountPerGame: -1,
+      canMaximumCountPerGameBeIncreased: false,
+    },
   },
   limits: {
     'cordova-build': {
@@ -164,6 +172,10 @@ export const limitsReached: Limits = {
     cloudProjects: {
       maximumCount: 10,
       canMaximumCountBeIncreased: false,
+    },
+    leaderboards: {
+      maximumCountPerGame: 3,
+      canMaximumCountPerGameBeIncreased: true,
     },
   },
   limits: {

@@ -10,7 +10,7 @@ import { type Leaderboard } from '../../../Utils/GDevelopServices/Play';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 
 export default {
-  title: 'LeaderboardAdmin',
+  title: 'Leaderboard/LeaderboardAdmin',
   component: LeaderboardAdmin,
   decorators: [paperDecorator, muiDecorator],
 };

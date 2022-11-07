@@ -370,6 +370,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                 }}
               >
                 <SearchBar
+                  id="search-bar"
                   value={searchText}
                   onChange={searchText => {
                     const oldSearchText = this.state.searchText;
@@ -510,6 +511,10 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                         displayedInstructionsList.map(
                           ({ item: instructionMetadata, matches }) =>
                             renderInstructionOrExpressionListItem({
+                              id: `instruction-item-${instructionMetadata.type.replace(
+                                /:/g,
+                                '-'
+                              )}`,
                               instructionOrExpressionMetadata: instructionMetadata,
                               iconSize: iconSize,
                               onClick: () =>

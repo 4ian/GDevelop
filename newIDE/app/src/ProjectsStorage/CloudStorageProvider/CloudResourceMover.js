@@ -16,20 +16,7 @@ import {
   downloadUrlsToBlobs,
   type ItemResult,
 } from '../../Utils/BlobDownloader';
-
-const isURL = (filename: string) => {
-  return (
-    filename.startsWith('http://') ||
-    filename.startsWith('https://') ||
-    filename.startsWith('ftp://') ||
-    filename.startsWith('blob:') ||
-    filename.startsWith('data:')
-  );
-};
-
-const isBlobURL = (filename: string) => {
-  return filename.startsWith('blob:');
-};
+import { isBlobURL, isURL } from '../../ResourcesList/ResourceUtils';
 
 export const moveAllCloudProjectResourcesToCloudProject = async ({
   project,

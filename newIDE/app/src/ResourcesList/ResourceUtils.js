@@ -152,3 +152,25 @@ export const renameResourcesInProject = (
   project.exposeResources(resourcesRenamer);
   resourcesRenamer.delete();
 };
+
+export const isFetchableUrl = (url: string) => {
+  return (
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('ftp://')
+  );
+};
+
+export const isURL = (filename: string) => {
+  return (
+    filename.startsWith('http://') ||
+    filename.startsWith('https://') ||
+    filename.startsWith('ftp://') ||
+    filename.startsWith('blob:') ||
+    filename.startsWith('data:')
+  );
+};
+
+export const isBlobURL = (filename: string) => {
+  return filename.startsWith('blob:');
+};

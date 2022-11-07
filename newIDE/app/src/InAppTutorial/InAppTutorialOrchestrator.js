@@ -18,6 +18,10 @@ import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 import { sendInAppTutorialProgress } from '../Utils/Analytics/EventSender';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import {
+  getMuiCheckboxValue,
+  isMuiCheckbox,
+} from '../UI/MaterialUISpecificUtil';
 
 const textInterpolationProjectDataAccessors = {
   instancesCount: 'instancesCount:',
@@ -128,6 +132,16 @@ const isDomBasedTriggerComplete = (
     return true;
   }
   return false;
+};
+
+const getInputValue = (element: HTMLElement): any => {
+  if (isMuiCheckbox(element)) {
+    return getMuiCheckboxValue(element);
+  }
+  // Flow errors on missing value prop in generic type HTMLElement but this
+  // line cannot break.
+  // $FlowFixMe
+  return element.value;
 };
 
 const gatherProjectDataOnMultipleSteps = ({
@@ -407,10 +421,9 @@ const InAppTutorialOrchestrator = React.forwardRef<
         if (!elementToHighlightId) return;
         const elementToWatch = document.querySelector(elementToHighlightId);
 
-        // Flow errors on missing value prop in generic type HTMLElement but this
-        // line cannot break.
-        // $FlowFixMe
-        if (elementToWatch) InputInitialValueRef.current = elementToWatch.value;
+        if (elementToWatch) {
+          InputInitialValueRef.current = getInputValue(elementToWatch);
+        }
         setElementWithValueToWatch(elementToHighlightId);
       } else if (nextStepTrigger && nextStepTrigger.instanceAddedOnScene) {
         const objectKey = nextStepTrigger.instanceAddedOnScene;
@@ -449,7 +462,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
         // Flow errors on missing value prop in generic type HTMLElement but this
         // line cannot break.
         // $FlowFixMe
-        elementToWatch.value !== InputInitialValueRef.current
+        getInputValue(elementToWatch) !== InputInitialValueRef.current
       ) {
         goToNextStep();
       }

@@ -206,6 +206,7 @@ export type PreferencesValues = {|
   eventsSheetCancelInlineParameter: 'cancel' | 'apply',
   showCommunityExtensions: boolean,
   showGetStartedSection: boolean,
+  showEventBasedObjectsEditor: boolean,
 |};
 
 /**
@@ -268,6 +269,8 @@ export type Preferences = {|
   setEventsSheetCancelInlineParameter: (value: string) => void,
   setShowCommunityExtensions: (enabled: boolean) => void,
   setShowGetStartedSection: (enabled: boolean) => void,
+  setShowEventBasedObjectsEditor: (enabled: boolean) => void,
+  getShowEventBasedObjectsEditor: () => boolean,
 |};
 
 export const initialPreferences = {
@@ -307,6 +310,7 @@ export const initialPreferences = {
     eventsSheetCancelInlineParameter: 'apply',
     showCommunityExtensions: false,
     showGetStartedSection: true,
+    showEventBasedObjectsEditor: false,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -359,6 +363,8 @@ export const initialPreferences = {
   setEventsSheetCancelInlineParameter: () => {},
   setShowCommunityExtensions: () => {},
   setShowGetStartedSection: (enabled: boolean) => {},
+  setShowEventBasedObjectsEditor: (enabled: boolean) => {},
+  getShowEventBasedObjectsEditor: () => false,
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

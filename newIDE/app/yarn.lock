@@ -2583,10 +2583,10 @@
     "estree-walker" "^1.0.1"
     "picomatch" "^2.2.2"
 
-"@sentry/types@^6.11.0":
-  "integrity" "sha512-jH84pDYE+hHIbVnab3Hr+ZXr1v8QABfhx39KknxqKWr2l0oEItzepV0URvbEhB446lk/S/59230dlUUIBGsXbg=="
-  "resolved" "https://registry.npmjs.org/@sentry/types/-/types-6.19.7.tgz"
-  "version" "6.19.7"
+"@sentry/types@^7.2.0":
+  "integrity" "sha512-QJj8vO4AtxuzQfJIzDnECSmoxwnS+WJsm1Ta2Cwdy+TUCBJyWpW7aIJJGta76zb9gNPGb3UcAbeEjhMJBJeRMQ=="
+  "resolved" "https://registry.npmjs.org/@sentry/types/-/types-7.17.4.tgz"
+  "version" "7.17.4"
 
 "@sinonjs/commons@^1.7.0":
   "integrity" "sha512-xkNcLAn/wZaX14RPlwizcKicDk9G3F8m2nU3L7Ukm5zBgTwiT0wsoFAHx9Jq56fJA1z/7uKGtCRu16sOUCLIHQ=="
@@ -13956,14 +13956,14 @@
     "picocolors" "^1.0.0"
     "source-map-js" "^1.0.2"
 
-"posthog-js@^1.20.4":
-  "integrity" "sha512-z4A7z+OXNmDaBy046SdQR3LlbG+ycFP4puLPArRsQsv5abN2nhDD+RKIO/jnhNaME9d4b59+proDUdCSaEg/tA=="
-  "resolved" "https://registry.npmjs.org/posthog-js/-/posthog-js-1.20.4.tgz"
-  "version" "1.20.4"
+"posthog-js@^1.34.0":
+  "integrity" "sha512-HkRwwzdz31N5ykQIO3SIkSS8nwhdqqnuDZ/qltitX4FhxrV9/tSRavEXz0YLvioOXeNVmQWtsN3krKajErwkwg=="
+  "resolved" "https://registry.npmjs.org/posthog-js/-/posthog-js-1.34.0.tgz"
+  "version" "1.34.0"
   dependencies:
-    "@sentry/types" "^6.11.0"
+    "@sentry/types" "^7.2.0"
     "fflate" "^0.4.1"
-    "rrweb-snapshot" "^1.1.7"
+    "rrweb-snapshot" "^1.1.14"
 
 "prelude-ls@^1.2.1":
   "integrity" "sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g=="
@@ -15517,7 +15517,7 @@
     "@types/node" "*"
     "acorn" "^7.1.0"
 
-"rrweb-snapshot@^1.1.7":
+"rrweb-snapshot@^1.1.14":
   "integrity" "sha512-eP5pirNjP5+GewQfcOQY4uBiDnpqxNRc65yKPW0eSoU1XamDfc4M8oqpXGMyUyvLyxFDB0q0+DChuxxiU2FXBQ=="
   "resolved" "https://registry.npmjs.org/rrweb-snapshot/-/rrweb-snapshot-1.1.14.tgz"
   "version" "1.1.14"

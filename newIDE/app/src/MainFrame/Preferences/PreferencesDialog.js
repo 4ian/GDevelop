@@ -336,7 +336,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             labelPosition="right"
             label={
               <Trans>
-                Show event-based objects in the extension editor (experimental)
+                Show custom objects in the extension editor (experimental)
               </Trans>
             }
           />

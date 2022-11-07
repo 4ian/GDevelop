@@ -696,7 +696,30 @@ export const declareObjectInstructionOrExpressionMetadata = (
 
 type gdInstructionOrExpressionMetadata =
   | gdInstructionMetadata
-  | gdExpressionMetadata;
+  | gdExpressionMetadata
+  | gdMultipleInstructionMetadata;
+
+const convertPropertyTypeToValueType = (propertyType: string): string => {
+  switch (propertyType) {
+    case 'Number':
+      return 'number';
+    case 'Boolean':
+      return 'boolean';
+    case 'Color':
+      return 'color';
+    case 'Choice':
+      return 'stringWithSelector';
+    case 'String':
+    default:
+      return 'string';
+  }
+};
+
+const getStringifiedExtraInfo = (property: gdPropertyDescriptor) => {
+  return property.getType() === 'Choice'
+    ? JSON.stringify(property.getExtraInfo().toJSArray())
+    : '';
+};
 
 /**
  * Declare the instructions (actions/conditions) and expressions for the
@@ -743,176 +766,37 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
 
   mapVector(eventsBasedBehavior.getPropertyDescriptors(), property => {
     const propertyType = property.getType();
+    if (propertyType === 'Behavior') {
+      // Required behaviors don't need accessors and mutators.
+      return;
+    }
+
     const propertyName = property.getName();
-    const getterName = gd.BehaviorCodeGenerator.getBehaviorPropertyGetterName(
-      propertyName
-    );
-    const setterName = gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(
-      propertyName
-    );
     const propertyLabel = i18n._(
       t`${property.getLabel() || propertyName} property`
     );
 
-    if (propertyType === 'String' || propertyType === 'Choice') {
-      addObjectAndBehaviorParameters(
-        behaviorMetadata.addStrExpression(
-          gd.EventsBasedBehavior.getPropertyExpressionName(propertyName),
-          propertyLabel,
-          propertyLabel,
-          eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          getExtensionIconUrl(extension)
-        )
+    addObjectAndBehaviorParameters(
+      behaviorMetadata.addExpressionAndConditionAndAction(
+        convertPropertyTypeToValueType(propertyType),
+        gd.EventsBasedBehavior.getPropertyExpressionName(propertyName),
+        propertyLabel,
+        i18n._(t`the value of ${propertyLabel}`),
+        i18n._(t`the value of ${propertyLabel}`),
+        eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+        getExtensionIconUrl(extension)
       )
-        .getCodeExtraInformation()
-        .setFunctionName(getterName);
-
-      addObjectAndBehaviorParameters(
-        behaviorMetadata.addScopedCondition(
-          gd.EventsBasedBehavior.getPropertyConditionName(propertyName),
-          propertyLabel,
-          i18n._(t`Compare the content of ${propertyLabel}`),
-          i18n._(t`the property ${propertyName}`),
-          eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          getExtensionIconUrl(extension),
-          getExtensionIconUrl(extension)
-        )
+    )
+      .useStandardParameters(
+        convertPropertyTypeToValueType(propertyType),
+        getStringifiedExtraInfo(property)
       )
-        .useStandardRelationalOperatorParameters('string')
-        .getCodeExtraInformation()
-        .setFunctionName(getterName);
-
-      addObjectAndBehaviorParameters(
-        behaviorMetadata.addScopedAction(
-          gd.EventsBasedBehavior.getPropertyActionName(propertyName),
-          propertyLabel,
-          i18n._(t`Change the content of ${propertyLabel}`),
-          i18n._(t`the property ${propertyName}`),
-          eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          getExtensionIconUrl(extension),
-          getExtensionIconUrl(extension)
-        )
+      .setFunctionName(
+        gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(propertyName)
       )
-        .useStandardOperatorParameters('string')
-        .getCodeExtraInformation()
-        .setFunctionName(setterName)
-        .setManipulatedType('string')
-        .setGetter(getterName);
-    } else if (propertyType === 'Number') {
-      addObjectAndBehaviorParameters(
-        behaviorMetadata.addExpression(
-          gd.EventsBasedBehavior.getPropertyExpressionName(propertyName),
-          propertyLabel,
-          propertyLabel,
-          eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .getCodeExtraInformation()
-        .setFunctionName(getterName);
-
-      addObjectAndBehaviorParameters(
-        behaviorMetadata.addScopedCondition(
-          gd.EventsBasedBehavior.getPropertyConditionName(propertyName),
-          propertyLabel,
-          i18n._(t`Compare the value of ${propertyLabel}`),
-          i18n._(t`the property ${propertyName}`),
-          eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          getExtensionIconUrl(extension),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .useStandardRelationalOperatorParameters('number')
-        .getCodeExtraInformation()
-        .setFunctionName(getterName);
-
-      addObjectAndBehaviorParameters(
-        behaviorMetadata.addScopedAction(
-          gd.EventsBasedBehavior.getPropertyActionName(propertyName),
-          propertyLabel,
-          i18n._(t`Change the value of ${propertyLabel}`),
-          i18n._(t`the property ${propertyName}`),
-          eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          getExtensionIconUrl(extension),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .useStandardOperatorParameters('number')
-        .getCodeExtraInformation()
-        .setFunctionName(setterName)
-        .setGetter(getterName);
-    } else if (propertyType === 'Boolean') {
-      addObjectAndBehaviorParameters(
-        behaviorMetadata.addScopedCondition(
-          gd.EventsBasedBehavior.getPropertyConditionName(propertyName),
-          propertyLabel,
-          i18n._(t`Check the value of ${propertyLabel}`),
-          i18n._(t`Property ${propertyName} of _PARAM0_ is true`),
-          eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          getExtensionIconUrl(extension),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .getCodeExtraInformation()
-        .setFunctionName(getterName);
-
-      addObjectAndBehaviorParameters(
-        behaviorMetadata.addScopedAction(
-          gd.EventsBasedBehavior.getPropertyActionName(propertyName),
-          propertyLabel,
-          i18n._(t`Update the value of ${propertyLabel}`),
-          i18n._(t`Set property ${propertyName} of _PARAM0_ to _PARAM2_`),
-          eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          getExtensionIconUrl(extension),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .addParameter('yesorno', i18n._(t`New value to set`), '', false)
-        .getCodeExtraInformation()
-        .setFunctionName(setterName);
-    } else if (propertyType === 'Color') {
-      addObjectAndBehaviorParameters(
-        behaviorMetadata.addScopedCondition(
-          gd.EventsBasedBehavior.getPropertyConditionName(propertyName),
-          propertyLabel,
-          i18n._(t`Check the color of ${propertyLabel}`),
-          i18n._(t`Color ${propertyName}`),
-          eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          getExtensionIconUrl(extension),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .useStandardRelationalOperatorParameters('string')
-        .getCodeExtraInformation()
-        .setFunctionName(getterName);
-
-      addObjectAndBehaviorParameters(
-        behaviorMetadata.addScopedAction(
-          gd.EventsBasedBehavior.getPropertyActionName(propertyName),
-          propertyLabel,
-          i18n._(t`Update the color of ${propertyLabel}`),
-          i18n._(t`Change color ${propertyName} of _PARAM0_ to _PARAM2_`),
-          eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          getExtensionIconUrl(extension),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .addParameter('color', i18n._(t`New color to set`), '', false)
-        .getCodeExtraInformation()
-        .setFunctionName(setterName);
-
-      addObjectAndBehaviorParameters(
-        behaviorMetadata.addStrExpression(
-          gd.EventsBasedBehavior.getPropertyExpressionName(propertyName),
-          propertyLabel,
-          propertyLabel,
-          eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .getCodeExtraInformation()
-        .setFunctionName(getterName);
-    }
+      .setGetter(
+        gd.BehaviorCodeGenerator.getBehaviorPropertyGetterName(propertyName)
+      );
   });
 };
 
@@ -945,6 +829,36 @@ export const declareObjectPropertiesInstructionAndExpressions = (
 
     return instructionOrExpression;
   };
+
+  mapVector(eventsBasedObject.getPropertyDescriptors(), property => {
+    const propertyType = property.getType();
+    const propertyName = property.getName();
+    const propertyLabel = i18n._(
+      t`${property.getLabel() || propertyName} property`
+    );
+
+    addObjectParameter(
+      objectMetadata.addExpressionAndConditionAndAction(
+        convertPropertyTypeToValueType(propertyType),
+        gd.EventsBasedObject.getPropertyExpressionName(propertyName),
+        propertyLabel,
+        i18n._(t`the value of ${propertyLabel}`),
+        i18n._(t`the value of ${propertyLabel}`),
+        eventsBasedObject.getFullName() || eventsBasedObject.getName(),
+        getExtensionIconUrl(extension)
+      )
+    )
+      .useStandardParameters(
+        convertPropertyTypeToValueType(propertyType),
+        getStringifiedExtraInfo(property)
+      )
+      .setFunctionName(
+        gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(propertyName)
+      )
+      .setGetter(
+        gd.BehaviorCodeGenerator.getBehaviorPropertyGetterName(propertyName)
+      );
+  });
 
   mapVector(eventsBasedObject.getPropertyDescriptors(), property => {
     const propertyType = property.getType();

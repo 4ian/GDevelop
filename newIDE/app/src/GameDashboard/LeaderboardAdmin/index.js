@@ -193,7 +193,7 @@ export const LeaderboardAdmin = ({
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
     false
   );
-  const { showConfirmation } = useAlertDialog();
+  const { showConfirmation, showDeleteConfirmation } = useAlertDialog();
   const [
     displayMaxLeaderboardCountReachedWarning,
     setDisplayMaxLeaderboardCountReachedWarning,
@@ -362,7 +362,7 @@ export const LeaderboardAdmin = ({
 
   const onResetLeaderboard = async (i18n: I18nType) => {
     if (!currentLeaderboard) return;
-    const answer = showConfirmation({
+    const answer = await showConfirmation({
       title: t`Reset leaderboard ${currentLeaderboard.name}`,
       message: t`All current entries will be deleted, are you sure you want to reset this leaderboard? This can't be undone.`,
     });
@@ -396,9 +396,11 @@ export const LeaderboardAdmin = ({
 
   const onDeleteLeaderboard = async (i18n: I18nType) => {
     if (!currentLeaderboard) return;
-    const answer = showConfirmation({
+    const answer = await showDeleteConfirmation({
       title: t`Delete leaderboard ${currentLeaderboard.name}`,
       message: t`Are you sure you want to delete this leaderboard and all of its entries? This can't be undone.`,
+      confirmText: currentLeaderboard.name,
+      fieldMessage: t`Type the name of the leaderboard:`,
     });
     if (!answer) return;
 
@@ -427,7 +429,7 @@ export const LeaderboardAdmin = ({
     entry: LeaderboardDisplayData
   ) => {
     if (!currentLeaderboard) return;
-    const answer = showConfirmation({
+    const answer = await showConfirmation({
       title: t`Delete score ${entry.score} from ${entry.playerName}`,
       message: t`Are you sure you want to delete this entry? This can't be undone.`,
     });

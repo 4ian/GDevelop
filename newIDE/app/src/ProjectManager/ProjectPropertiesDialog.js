@@ -248,6 +248,7 @@ function ProjectPropertiesDialog(props: Props) {
       {({ i18n }) => (
         <React.Fragment>
           <Dialog
+            id="project-properties-dialog"
             actions={[
               <FlatButton
                 label={<Trans>Cancel</Trans>}
@@ -256,6 +257,7 @@ function ProjectPropertiesDialog(props: Props) {
                 key="cancel"
               />,
               <DialogPrimaryButton
+                id="apply-button"
                 label={<Trans>Apply</Trans>}
                 primary={true}
                 onClick={onApply}
@@ -447,6 +449,7 @@ function ProjectPropertiesDialog(props: Props) {
                 </Text>
                 <ResponsiveLineStackLayout noMargin>
                   <SemiControlledTextField
+                    id="game-resolution-width"
                     floatingLabelText={<Trans>Game resolution width</Trans>}
                     fullWidth
                     type="number"
@@ -464,6 +467,7 @@ function ProjectPropertiesDialog(props: Props) {
                     }}
                   />
                   <SemiControlledTextField
+                    id="game-resolution-height"
                     floatingLabelText={<Trans>Game resolution height</Trans>}
                     fullWidth
                     type="number"
@@ -482,6 +486,7 @@ function ProjectPropertiesDialog(props: Props) {
                   />
                 </ResponsiveLineStackLayout>
                 <SelectField
+                  id="game-resolution-resize-mode"
                   fullWidth
                   floatingLabelText={
                     <Trans>

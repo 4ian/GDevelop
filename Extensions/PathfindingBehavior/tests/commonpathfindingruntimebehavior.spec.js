@@ -153,7 +153,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
       player.setPosition(480, 300);
       player.getBehavior(pathFindingName).moveTo(runtimeScene, 720, 300);
       expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
-      expect(getPathLength()).to.be(720 - 480);
+      expect(getPathLength(player)).to.be(720 - 480);
     });
 
     it("mustn't find a path to the obstacle inside", function () {

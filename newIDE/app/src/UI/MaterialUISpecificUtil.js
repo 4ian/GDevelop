@@ -20,3 +20,31 @@ export const isElementADialog = (
   }
   return true;
 };
+
+/**
+ * Checks if an input element is a Material UI checkbox.
+ */
+export const isMuiCheckbox = (element: HTMLElement): boolean => {
+  console.log(element.attributes.getNamedItem('type').value);
+  return (
+    element.attributes.getNamedItem('type').value === 'checkbox' &&
+    'indeterminate' in element.dataset
+  );
+};
+
+/**
+ * Returns the value of a Material UI checkbox.
+ * Material UI does not use the value of the input element
+ * (See https://v4.mui.com/api/checkbox/#props) so we have to check
+ * the classes of the grand parent of the input element.
+ */
+export const getMuiCheckboxValue = (element: HTMLElement): boolean => {
+  const { parentElement } = element;
+  if (parentElement) {
+    const { parentElement: grandParentElement } = parentElement;
+    return grandParentElement
+      ? grandParentElement.classList.contains('Mui-checked')
+      : false;
+  }
+  return true;
+};

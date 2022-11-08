@@ -824,7 +824,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 objectsContainer={objectsContainer}
                 resourceSources={resourceSources}
                 onChooseResource={onChooseResource}
-                resourceExternalEditors={resourceExternalEditors}
                 onFetchNewlyAddedResources={onFetchNewlyAddedResources}
                 canInstallPrivateAsset={canInstallPrivateAsset}
                 i18n={i18n}

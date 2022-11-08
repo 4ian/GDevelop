@@ -63,6 +63,7 @@ const ShareDialog = ({ game, onClose }: Props) => {
   return (
     <Dialog
       open
+      id="share-dialog"
       actions={[
         <FlatButton
           key="close"

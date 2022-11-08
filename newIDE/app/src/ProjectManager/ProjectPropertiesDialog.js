@@ -25,7 +25,7 @@ import Window from '../Utils/Window';
 import { I18n } from '@lingui/react';
 import AlertMessage from '../UI/AlertMessage';
 import { GameRegistration } from '../GameDashboard/GameRegistration';
-import { Tab, Tabs } from '../UI/Tabs';
+import { Tabs } from '../UI/Tabs';
 import { LoadingScreenEditor } from './LoadingScreenEditor';
 import {
   type ResourceSource,
@@ -280,25 +280,21 @@ function ProjectPropertiesDialog(props: Props) {
             ]}
             onRequestClose={onCancelChanges}
             onApply={onApply}
-            noTitleMargin
             open={props.open}
             fullHeight
-            flexBody
-            title={
-              <div>
-                <Tabs value={currentTab} onChange={setCurrentTab}>
-                  <Tab
-                    label={<Trans>Properties</Trans>}
-                    value={'properties'}
-                    key={'properties'}
-                  />
-                  <Tab
-                    label={<Trans>Loading Screen</Trans>}
-                    value={'loading-screen'}
-                    key={'loading-screen'}
-                  />
-                </Tabs>
-              </div>
+            title={<Trans>Game properties</Trans>}
+            fixedContent={
+              <Tabs
+                value={currentTab}
+                onChange={setCurrentTab}
+                options={[
+                  { label: <Trans>Properties</Trans>, value: 'properties' },
+                  {
+                    label: <Trans>Loading screen</Trans>,
+                    value: 'loading-screen',
+                  },
+                ]}
+              />
             }
           >
             {currentTab === 'properties' && (

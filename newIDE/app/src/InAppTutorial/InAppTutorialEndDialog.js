@@ -23,6 +23,7 @@ function InAppTutorialEndDialog({ endDialog, onClose }: Props) {
     <I18n>
       {({ i18n }) => (
         <Dialog
+          title={null} // Specific end dialog where the title is handled by the content.
           onApply={onClose}
           open
           actions={[
@@ -38,7 +39,7 @@ function InAppTutorialEndDialog({ endDialog, onClose }: Props) {
           fullHeight
           cannotBeDismissed
         >
-          <ColumnStackLayout>
+          <ColumnStackLayout noMargin>
             {endDialog.content.map(item => {
               if (item.messageDescriptor) {
                 return (

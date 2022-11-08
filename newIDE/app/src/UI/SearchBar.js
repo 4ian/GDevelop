@@ -5,7 +5,6 @@ import * as React from 'react';
 import { makeStyles } from '@material-ui/styles';
 import IconButton from './IconButton';
 import TextField from './TextField';
-import Paper from '@material-ui/core/Paper';
 import {
   Collapse,
   Typography,
@@ -25,7 +24,7 @@ import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 import { Column, Line } from './Grid';
 import TagChips from './TagChips';
 import { I18n } from '@lingui/react';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import Paper from './Paper';
 
 type TagsHandler = {|
   remove: string => void,
@@ -170,8 +169,6 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       }
     };
 
-    const gdevelopTheme = React.useContext(GDevelopThemeContext);
-
     // This variable represents the content of the input (text field)
     const [value, setValue] = React.useState<string>(parentValue);
     // This variable represents the value of the autocomplete, used to
@@ -291,12 +288,9 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
           <Column noMargin>
             <Line noMargin>
               <Paper
-                style={{
-                  backgroundColor: gdevelopTheme.searchBar.backgroundColor,
-                  ...styles.root,
-                }}
+                style={styles.root}
                 square={aspect === 'integrated-search-bar'}
-                elevation={0}
+                background="light"
               >
                 <div style={styles.searchContainer}>
                   {tags ? (

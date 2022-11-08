@@ -50,15 +50,16 @@ export const GenericRetryableProcessWithProgressDialog = ({
 
   return (
     <Dialog
+      title={null} // Specific loading dialog where we don't want a title.
       actions={[
-        <FlatButton
-          label={
-            onAbandon ? <Trans>Ignore</Trans> : <Trans>Please wait...</Trans>
-          }
-          disabled={!onAbandon}
-          onClick={onAbandon}
-          key="close"
-        />,
+        onAbandon ? (
+          <FlatButton
+            label={<Trans>Ignore</Trans>}
+            disabled={!onAbandon}
+            onClick={onAbandon}
+            key="close"
+          />
+        ) : null,
         onRetry ? (
           <DialogPrimaryButton
             label={<Trans>Retry</Trans>}
@@ -69,7 +70,6 @@ export const GenericRetryableProcessWithProgressDialog = ({
         ) : null,
       ]}
       cannotBeDismissed={!hasErrors}
-      noMargin
       open
       maxWidth="sm"
     >

@@ -163,7 +163,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                   properties,
                   (property: gdNamedPropertyDescriptor, i: number) => (
                     <React.Fragment key={i}>
-                      <MiniToolbar>
+                      <MiniToolbar noPadding>
                         <Column expand noMargin>
                           <SemiControlledTextField
                             margin="none"
@@ -233,7 +233,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                         />
                       </MiniToolbar>
                       <Line>
-                        <ColumnStackLayout expand>
+                        <ColumnStackLayout expand noMargin>
                           <ResponsiveLineStackLayout noMargin>
                             <SelectField
                               floatingLabelText={<Trans>Type</Trans>}

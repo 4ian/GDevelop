@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import Paper from '@material-ui/core/Paper';
 import { Line, Column } from '../../../UI/Grid';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
@@ -14,7 +13,6 @@ import LearnSection from './LearnSection';
 import PlaySection from './PlaySection';
 import CommunitySection from './CommunitySection';
 import { TutorialContext } from '../../../Tutorial/TutorialContext';
-import { GamesShowcaseContext } from '../../../GamesShowcase/GamesShowcaseContext';
 import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { HomePageHeader } from './HomePageHeader';
 import { HomePageMenu, type HomeTab } from './HomePageMenu';
@@ -86,11 +84,8 @@ export const HomePage = React.memo<Props>(
       const { authenticated, onCloudProjectsChanged } = React.useContext(
         AuthenticatedUserContext
       );
-      const { fetchTutorials } = React.useContext(TutorialContext);
       const { announcements } = React.useContext(AnnouncementsFeedContext);
-      const { fetchShowcasedGamesAndFilters } = React.useContext(
-        GamesShowcaseContext
-      );
+      const { fetchTutorials } = React.useContext(TutorialContext);
       const { fetchExamplesAndFilters } = React.useContext(ExampleStoreContext);
       const {
         values: { showGetStartedSection },
@@ -101,11 +96,10 @@ export const HomePage = React.memo<Props>(
       // Load everything when the user opens the home page, to avoid future loading times.
       React.useEffect(
         () => {
-          fetchShowcasedGamesAndFilters();
           fetchExamplesAndFilters();
           fetchTutorials();
         },
-        [fetchExamplesAndFilters, fetchShowcasedGamesAndFilters, fetchTutorials]
+        [fetchExamplesAndFilters, fetchTutorials]
       );
 
       // Fetch user cloud projects when home page becomes active
@@ -173,9 +167,7 @@ export const HomePage = React.memo<Props>(
                   />
                   <Column noMargin expand>
                     {activeTab !== 'community' && !!announcements && (
-                      <Paper elevation={0} style={{}} square>
-                        <AnnouncementsFeed level="urgent" canClose addMargins />
-                      </Paper>
+                      <AnnouncementsFeed canClose level="urgent" addMargins />
                     )}
                     {activeTab === 'get-started' && (
                       <GetStartedSection

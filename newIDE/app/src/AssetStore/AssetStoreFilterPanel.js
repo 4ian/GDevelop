@@ -237,7 +237,7 @@ export const AssetStoreFilterPanel = ({
   onChoiceChange,
 }: AssetStoreFilterPanelProps) => {
   return (
-    <Column>
+    <Column noMargin>
       <MultipleChoiceFilter
         filterKey="Animation"
         title={<Trans>Animation</Trans>}

@@ -306,6 +306,7 @@ export default function NewInstructionEditorDialog({
   return (
     <>
       <Dialog
+        title={isCondition ? <Trans>Condition</Trans> : <Trans>Action</Trans>}
         actions={[
           <FlatButton
             label={<Trans>Cancel</Trans>}
@@ -351,7 +352,6 @@ export default function NewInstructionEditorDialog({
         onRequestClose={onCancel}
         onApply={instructionType ? onSubmit : null}
         maxWidth={false}
-        noMargin
         flexBody
         fullHeight={
           true /* Always use full height to avoid a very small dialog when there are not a lot of objects. */

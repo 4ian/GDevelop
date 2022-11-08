@@ -1766,11 +1766,11 @@ namespace gdjs {
       this._floorLastX = floorX;
       // See `beforeUpdatingObstacles` for the logic for the Y axis.
     }
-    
+
     followCurrentPlatformOnX(timeDelta: float): boolean {
       let hasMoved = false;
       const object = this._behavior.owner;
-      
+
       // Shift the object according to the floor movement.
       const floorX = this._floorPlatform!.owner.getX();
       const deltaX = floorX - this._floorLastX;

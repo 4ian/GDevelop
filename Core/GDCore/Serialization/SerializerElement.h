@@ -183,7 +183,7 @@ class GD_CORE_API SerializerElement {
    * \brief Save the value either as a string or as an array of strings if it
    * has line breaks.
    */
-  void SetMultilineStringValue(const gd::String &value);
+  void SetMultilineStringValue(const gd::String &value, bool shouldAlwayUseSetString = true);
 
   /**
    * \brief Read the value, either represented as a string or as an array of strings,

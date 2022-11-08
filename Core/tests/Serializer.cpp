@@ -85,7 +85,7 @@ TEST_CASE("SerializerElement", "[common]") {
     SerializerElement element;
 
     // A single line is saved as a string.
-    element.SetMultilineStringValue("test");
+    element.SetMultilineStringValue("test", false);
     REQUIRE(element.GetMultilineStringValue() == "test");
     REQUIRE(element.GetStringValue() == "test");
 
@@ -94,12 +94,12 @@ TEST_CASE("SerializerElement", "[common]") {
     REQUIRE(element.GetMultilineStringValue() == "test of\nsomething\nsaved as a string");
 
     // A multi lines string is saved as an array.
-    element.SetMultilineStringValue("test\nwith\nmultiple lines.");
+    element.SetMultilineStringValue("test\nwith\nmultiple lines.", false);
     REQUIRE(element.ConsideredAsArray() == true);
     REQUIRE(element.GetChildrenCount() == 3);
     REQUIRE(element.GetMultilineStringValue() == "test\nwith\nmultiple lines.");
 
-    element.SetMultilineStringValue("test\n\nwith\n\nmultiple lines.\n");
+    element.SetMultilineStringValue("test\n\nwith\n\nmultiple lines.\n", false);
     REQUIRE(element.ConsideredAsArray() == true);
     REQUIRE(element.GetChildrenCount() == 6);
     REQUIRE(element.GetMultilineStringValue() == "test\n\nwith\n\nmultiple lines.\n");

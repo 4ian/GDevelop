@@ -42,7 +42,10 @@ JsCodeEvent::GetAllExpressionsWithMetadata() const {
 }
 
 void JsCodeEvent::SerializeTo(gd::SerializerElement& element) const {
-  element.AddChild("inlineCode").SetMultilineStringValue(inlineCode);
+  // TODO Use the multi line serialization in a release that follows the 150.
+  // element.AddChild("inlineCode").SetMultilineStringValue(inlineCode);
+  element.AddChild("inlineCode").SetValue(inlineCode);
+
   element.AddChild("parameterObjects")
       .SetValue(parameterObjects.GetPlainString());
   element.AddChild("useStrict").SetValue(useStrict);

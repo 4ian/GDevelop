@@ -54,7 +54,7 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("version", version);
   element.SetAttribute("extensionNamespace", extensionNamespace);
   element.SetAttribute("shortDescription", shortDescription);
-  element.SetAttribute("description", description);
+  element.AddChild("description").SetMultilineStringValue(description);
   element.SetAttribute("name", name);
   element.SetAttribute("fullName", fullName);
   element.SetAttribute("category", category);
@@ -100,7 +100,7 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
   version = element.GetStringAttribute("version");
   extensionNamespace = element.GetStringAttribute("extensionNamespace");
   shortDescription = element.GetStringAttribute("shortDescription");
-  description = element.GetStringAttribute("description");
+  description = element.GetChild("description").GetMultilineStringValue();
   name = element.GetStringAttribute("name");
   fullName = element.GetStringAttribute("fullName");
   category = element.GetStringAttribute("category");

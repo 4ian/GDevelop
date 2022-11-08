@@ -25,9 +25,10 @@ export const isElementADialog = (
  * Checks if an input element is a Material UI checkbox.
  */
 export const isMuiCheckbox = (element: HTMLElement): boolean => {
-  console.log(element.attributes.getNamedItem('type').value);
+  const typeAttribute = element.attributes.getNamedItem('type');
   return (
-    element.attributes.getNamedItem('type').value === 'checkbox' &&
+    typeAttribute &&
+    typeAttribute.value === 'checkbox' &&
     'indeterminate' in element.dataset
   );
 };

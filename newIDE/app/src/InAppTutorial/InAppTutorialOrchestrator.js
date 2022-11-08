@@ -138,6 +138,9 @@ const getInputValue = (element: HTMLElement): any => {
   if (isMuiCheckbox(element)) {
     return getMuiCheckboxValue(element);
   }
+  if (element.tagName === 'TEXTAREA') {
+    return element.textContent;
+  }
   // Flow errors on missing value prop in generic type HTMLElement but this
   // line cannot break.
   // $FlowFixMe

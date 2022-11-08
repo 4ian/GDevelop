@@ -16,6 +16,7 @@ import { MarkdownText } from '../UI/MarkdownText';
 import RaisedButton from '../UI/RaisedButton';
 import IconButton from '../UI/IconButton';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import Pause from '../UI/CustomSvgIcons/Pause';
 
 type Props = {|
   anchorElement: HTMLElement,
@@ -244,6 +245,13 @@ const InAppTutorialTooltipDisplayer = React.forwardRef<
                       <ChevronArrowBottom />
                     </IconButton>
                   ) : null}
+                  <IconButton
+                    size="small"
+                    useCurrentColor
+                    style={styles.sideButton}
+                  >
+                    <Pause />
+                  </IconButton>
                 </div>
               </Paper>
             </Fade>

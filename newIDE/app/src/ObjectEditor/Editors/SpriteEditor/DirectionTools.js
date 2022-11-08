@@ -155,6 +155,7 @@ export default class DirectionTools extends Component<Props, State> {
         />
         {this.state.previewOpen && (
           <Dialog
+            title={<Trans>Preview {this.props.animationName}</Trans>}
             actions={[
               <DialogPrimaryButton
                 label={<Trans>Ok</Trans>}
@@ -163,7 +164,6 @@ export default class DirectionTools extends Component<Props, State> {
                 key="ok"
               />,
             ]}
-            noMargin
             onRequestClose={() => this.openPreview(false)}
             onApply={() => this.openPreview(false)}
             open={this.state.previewOpen}

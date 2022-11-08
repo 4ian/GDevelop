@@ -3,7 +3,6 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Popper from '@material-ui/core/Popper';
-import Paper from '@material-ui/core/Paper';
 import muiZIndex from '@material-ui/core/styles/zIndex';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import { type ExpressionAutocompletion } from '../../../ExpressionAutocompletion';
@@ -14,7 +13,7 @@ import { type ParameterRenderingServiceType } from '../ParameterFieldCommons';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { Column, Line, Spacer } from '../../../UI/Grid';
 import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
-import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
+import Paper from '../../../UI/Paper';
 
 const defaultTextStyle = {
   // Break words if they are too long to fit on a single line.
@@ -274,7 +273,6 @@ export default function ExpressionAutocompletionsDisplayer({
   onScroll,
   parameterRenderingService,
 }: Props) {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const scrollView = React.useRef((null: ?ScrollViewInterface));
   const selectedAutocompletionElement = React.useRef(
     (null: ?React$Component<any, any>)
@@ -308,10 +306,8 @@ export default function ExpressionAutocompletionsDisplayer({
           <Paper
             variant="outlined"
             square
-            style={{
-              ...styles.container,
-              backgroundColor: gdevelopTheme.palette.alternateCanvasColor,
-            }}
+            style={styles.container}
+            background="light"
           >
             <ScrollView ref={scrollView} onScroll={onScroll}>
               {expressionAutocompletions.map(
@@ -377,10 +373,8 @@ export default function ExpressionAutocompletionsDisplayer({
               <Paper
                 variant="outlined"
                 square
-                style={{
-                  ...styles.container,
-                  backgroundColor: gdevelopTheme.palette.alternateCanvasColor,
-                }}
+                style={styles.container}
+                background="light"
               >
                 <ScrollView autoHideScrollbar>
                   <Column>

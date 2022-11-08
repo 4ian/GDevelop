@@ -4,7 +4,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import { Trans } from '@lingui/macro';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import Dialog from '../UI/Dialog';
-import { Tabs, Tab } from '../UI/Tabs';
+import { Tabs } from '../UI/Tabs';
 import {
   type ChooseResourceOptions,
   type ResourceSource,
@@ -99,9 +99,10 @@ export const NewResourceDialog = ({
 
   return (
     <Dialog
+      title={<Trans>New resource</Trans>}
       open
       fullHeight
-      flexBody
+      flexColumnBody
       actions={[
         <FlatButton
           key="close"
@@ -112,51 +113,66 @@ export const NewResourceDialog = ({
       ]}
       secondaryActions={[
         importTabAdvancedResourceSources.length > 0 ? (
-          <Toggle
-            key="show-advanced-toggle"
-            onToggle={(e, check) => setIsShowingAdvanced(check)}
-            toggled={isShowingAdvanced}
-            labelPosition="right"
-            label={<Trans>Show advanced import options</Trans>}
-          />
+          <Column>
+            <Toggle
+              key="show-advanced-toggle"
+              onToggle={(e, check) => setIsShowingAdvanced(check)}
+              toggled={isShowingAdvanced}
+              labelPosition="right"
+              label={<Trans>Show advanced import options</Trans>}
+            />
+          </Column>
         ) : null,
       ]}
       onRequestClose={onClose}
-      noMargin
+      fixedContent={
+        <Tabs
+          value={currentTab}
+          onChange={setCurrentTab}
+          options={[
+            ...standaloneTabResourceSources.map(({ name, displayName }) => ({
+              label: i18n._(displayName),
+              value: 'standalone-' + name,
+            })),
+            { label: <Trans>Choose a file</Trans>, value: 'import' },
+          ]}
+        />
+      }
     >
-      <Column expand noMargin>
-        <Tabs value={currentTab} onChange={setCurrentTab}>
-          {standaloneTabResourceSources.map(({ name, displayName }) => (
-            <Tab
-              label={i18n._(displayName)}
-              value={'standalone-' + name}
-              key={name}
-            />
-          ))}
-          <Tab
-            label={<Trans>Choose a file</Trans>}
-            value="import"
-            key="import"
-          />
-        </Tabs>
-        {standaloneTabResourceSources.map(source => {
-          if (currentTab !== 'standalone-' + source.name) return null;
+      {standaloneTabResourceSources.map(source => {
+        if (currentTab !== 'standalone-' + source.name) return null;
 
-          return source.renderComponent({
-            i18n,
-            options,
-            project,
-            fileMetadata,
-            getStorageProvider,
-            getLastUsedPath: preferences.getLastUsedPath,
-            setLastUsedPath: preferences.setLastUsedPath,
-            onChooseResources,
-          });
-        })}
-        {currentTab === 'import' ? (
-          <Line expand>
-            <ColumnStackLayout expand>
-              {importTabResourceSources.map(source => (
+        return source.renderComponent({
+          i18n,
+          options,
+          project,
+          fileMetadata,
+          getStorageProvider,
+          getLastUsedPath: preferences.getLastUsedPath,
+          setLastUsedPath: preferences.setLastUsedPath,
+          onChooseResources,
+        });
+      })}
+      {currentTab === 'import' ? (
+        <Line expand noMargin>
+          <ColumnStackLayout expand noMargin>
+            {importTabResourceSources.map(source => (
+              <React.Fragment key={source.name}>
+                <Text size="block-title">{i18n._(source.displayName)}</Text>
+                {source.renderComponent({
+                  i18n,
+                  options,
+                  project,
+                  fileMetadata,
+                  getStorageProvider,
+                  getLastUsedPath: preferences.getLastUsedPath,
+                  setLastUsedPath: preferences.setLastUsedPath,
+                  onChooseResources,
+                })}
+              </React.Fragment>
+            ))}
+            {isShowingAdvanced &&
+              importTabAdvancedResourceSources.map(source => (
                 <React.Fragment key={source.name}>
                   <Text size="block-title">{i18n._(source.displayName)}</Text>
                   {source.renderComponent({
@@ -171,26 +187,9 @@ export const NewResourceDialog = ({
                   })}
                 </React.Fragment>
               ))}
-              {isShowingAdvanced &&
-                importTabAdvancedResourceSources.map(source => (
-                  <React.Fragment key={source.name}>
-                    <Text size="block-title">{i18n._(source.displayName)}</Text>
-                    {source.renderComponent({
-                      i18n,
-                      options,
-                      project,
-                      fileMetadata,
-                      getStorageProvider,
-                      getLastUsedPath: preferences.getLastUsedPath,
-                      setLastUsedPath: preferences.setLastUsedPath,
-                      onChooseResources,
-                    })}
-                  </React.Fragment>
-                ))}
-            </ColumnStackLayout>
-          </Line>
-        ) : null}
-      </Column>
+          </ColumnStackLayout>
+        </Line>
+      ) : null}
     </Dialog>
   );
 };

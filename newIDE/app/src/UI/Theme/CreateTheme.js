@@ -16,16 +16,29 @@ export function getRootClassNames(theme: string) {
   };
 }
 
-export function getMuiOverrides(
+export function getMuiOverrides({
+  tabTextColor,
+  tabSelectedTextColor,
+  tabBackgroundColor,
+  tabSelectedBackgroundColor,
+  inputBorderBottomColor,
+  appBarBackgroundColor,
+  appBarTextColor,
+  iconColor,
+  outlinedButtonBorderColor,
+  alternateCanvasBackgroundColor,
+}: {
   tabTextColor: string,
+  tabSelectedTextColor: string,
   tabBackgroundColor: string,
+  tabSelectedBackgroundColor: string,
   inputBorderBottomColor: string,
   appBarBackgroundColor: string,
   appBarTextColor: string,
   iconColor: string,
   outlinedButtonBorderColor: string,
-  alternateCanvasBackgroundColor: string
-) {
+  alternateCanvasBackgroundColor: string,
+}) {
   return {
     MuiTypography: {
       h1: {
@@ -111,25 +124,29 @@ export function getMuiOverrides(
     // Use a more visible color scheme for tabs:
     MuiTabs: {
       root: {
+        height: 28,
+        minHeight: 28,
         backgroundColor: tabBackgroundColor,
-        minHeight: 32, // Reduce the height of tabs to 32px
       },
     },
     MuiTab: {
       textColorPrimary: {
-        color: darken(tabTextColor, 0.2) + ' !important',
+        color: `${tabTextColor} !important`,
+        backgroundColor: tabBackgroundColor,
         textTransform: 'none',
         fontWeight: 600,
+        minWidth: 130, // Keep enough space for long terms not to wrap.
         letterSpacing: '0.3px',
         '&.Mui-selected': {
-          color: tabTextColor + ' !important',
+          color: `${tabSelectedTextColor} !important`,
+          backgroundColor: tabSelectedBackgroundColor,
         },
       },
       root: {
-        // Reduce the height of tabs to 32px
-        paddingTop: 0,
-        paddingBottom: 0,
-        minHeight: 32,
+        paddingTop: 4,
+        paddingBottom: 4,
+        height: 28,
+        minHeight: 28,
       },
     },
     MuiButtonBase: {
@@ -359,7 +376,7 @@ export function createGdevelopTheme({
         valid: styles['ThemeMessageValidColor'],
       },
       toolbar: {
-        backgroundColor: styles['ThemeSurfaceWindowBackgroundColor'],
+        backgroundColor: styles['ThemeSurfaceCanvasBackgroundColor'],
         separatorColor: styles['ThemeToolbarSeparatorColor'],
       },
       text: {
@@ -379,6 +396,18 @@ export function createGdevelopTheme({
           color: styles['ThemeHomeSeparatorColor'],
         },
       },
+      dialog: {
+        backgroundColor: styles['ThemeDialogBackgroundColor'],
+        separator: styles['ThemeDialogSeparatorColor'],
+      },
+      tabs: {
+        indicator: {
+          backgroundColor: styles['ThemeTabsIndicatorColor'],
+        },
+        separator: {
+          color: styles['ThemeTabsSeparatorColor'],
+        },
+      },
       dropIndicator: {
         canDrop: styles['ThemeDropIndicatorCanDropColor'],
         cannotDrop: styles['ThemeDropIndicatorCannotDropColor'],
@@ -386,7 +415,7 @@ export function createGdevelopTheme({
       },
       closableTabs: {
         fontFamily: styles['GdevelopModernFontFamily'],
-        containerBackgroundColor: styles['ThemeSurfaceWindowBackgroundColor'],
+        containerBackgroundColor: styles['ThemeSurfaceCanvasBackgroundColor'],
         backgroundColor: styles['ThemeClosableTabsDefaultBackgroundColor'],
         textColor: styles['ThemeClosableTabsDefaultColor'],
         selectedBackgroundColor:
@@ -404,7 +433,7 @@ export function createGdevelopTheme({
       },
       list: {
         itemsBackgroundColor:
-          styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
+          styles['ThemeSurfaceAlternateCanvasLightBackgroundColor'],
       },
       searchBar: {
         backgroundColor: styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
@@ -424,6 +453,13 @@ export function createGdevelopTheme({
         selectedErrorBackgroundColor: styles['ThemeListItemErrorColor'],
         selectedWarningBackgroundColor: styles['ThemeListItemWarningColor'],
       },
+      paper: {
+        backgroundColor: {
+          dark: styles['ThemeSurfaceCanvasWindowBackgroundColor'],
+          medium: styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
+          light: styles['ThemeSurfaceAlternateCanvasLightBackgroundColor'],
+        },
+      },
       emptyMessage: {
         shadowColor: styles['ThemeMessageEmptyShadowColor'],
       },
@@ -434,8 +470,6 @@ export function createGdevelopTheme({
       gdevelopIconsCSSFilter,
       chart: {
         fontFamily: styles['GdevelopModernFontFamily'],
-        tooltipBackgroundColor:
-          styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
         dataColor1:
           paletteType === 'dark'
             ? lighten(styles['ThemePrimaryColor'], 0.3)
@@ -467,16 +501,19 @@ export function createGdevelopTheme({
           hint: styles['ThemeTextSecondaryColor'],
         },
       },
-      overrides: getMuiOverrides(
-        styles['ThemeTextContrastColor'],
-        styles['TabsBackgroundColor'],
-        styles['InputBorderBottomColor'],
-        styles['MosaicToolbarBackgroundColor'],
-        styles['MosaicTitleColor'],
-        styles['ThemeTextDefaultColor'],
-        styles['ThemeTextDefaultColor'],
-        styles['ThemeSurfaceAlternateCanvasBackgroundColor']
-      ),
+      overrides: getMuiOverrides({
+        tabTextColor: styles['ThemeTabsTextColor'],
+        tabSelectedTextColor: styles['ThemeTabsSelectedTextColor'],
+        tabBackgroundColor: styles['ThemeTabsBackgroundColor'],
+        tabSelectedBackgroundColor: styles['ThemeTabsSelectedBackgroundColor'],
+        inputBorderBottomColor: styles['InputBorderBottomColor'],
+        appBarBackgroundColor: styles['MosaicToolbarBackgroundColor'],
+        appBarTextColor: styles['MosaicTitleColor'],
+        iconColor: styles['ThemeTextDefaultColor'],
+        outlinedButtonBorderColor: styles['ThemeTextDefaultColor'],
+        alternateCanvasBackgroundColor:
+          styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
+      }),
     },
   };
 }

@@ -3,10 +3,10 @@ import * as React from 'react';
 import { ListItem } from '../List';
 import ListIcon from '../ListIcon';
 import TextField, { noMarginTextFieldInListItemTopOffset } from '../TextField';
-import ThemeConsumer from '../Theme/ThemeConsumer';
 import { type MenuItemTemplate } from '../Menu/Menu.flow';
 import { shouldValidate } from '../KeyboardShortcuts/InteractionKeys';
 import { textEllipsisStyle } from '../TextEllipsis';
+import GDevelopThemeContext from '../Theme/ThemeContext';
 
 const styles = {
   textField: {
@@ -35,142 +35,130 @@ type Props<Item> = {|
   connectIconDragSource?: ?(React.Element<any>) => ?React.Node,
 |};
 
-class ItemRow<Item> extends React.Component<Props<Item>> {
-  textField: ?TextField;
+function ItemRow<Item>({
+  item,
+  itemName,
+  id,
+  isBold,
+  onRename,
+  editingName,
+  getThumbnail,
+  renderItemLabel,
+  selected,
+  onItemSelected,
+  errorStatus,
+  buildMenuTemplate,
+  onEdit,
+  hideMenuButton,
+  scaleUpItemIconWhenSelected,
+  connectIconDragSource,
+}: Props<Item>) {
+  const [textField, setTextField] = React.useState<?TextField>(null);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
-  componentDidMount() {
-    if (this.props.editingName) {
-      setTimeout(() => {
-        if (this.textField) this.textField.focus();
-      }, 100);
-    }
-  }
+  React.useEffect(
+    () => {
+      if (editingName) {
+        const timeoutId = setTimeout(() => {
+          if (textField) textField.focus();
+        }, 100);
+        return () => clearTimeout(timeoutId);
+      }
+    },
+    [editingName, textField]
+  );
 
-  componentDidUpdate(prevProps: Props<Item>) {
-    if (!prevProps.editingName && this.props.editingName) {
-      setTimeout(() => {
-        if (this.textField) this.textField.focus();
-      }, 100);
-    }
-  }
+  const label = editingName ? (
+    <TextField
+      id="rename-item-field"
+      margin="none"
+      ref={textField => setTextField(textField)}
+      defaultValue={itemName}
+      onBlur={e => onRename(e.currentTarget.value)}
+      onKeyPress={event => {
+        if (shouldValidate(event)) {
+          if (textField) textField.blur();
+        }
+      }}
+      fullWidth
+      style={styles.textField}
+    />
+  ) : (
+    <div
+      title={typeof itemName === 'string' ? itemName : undefined}
+      style={{
+        ...textEllipsisStyle,
+        color: selected ? gdevelopTheme.listItem.selectedTextColor : undefined,
+        fontStyle: isBold ? 'italic' : undefined,
+        fontWeight: isBold ? 'bold' : 'normal',
+      }}
+    >
+      {renderItemLabel ? renderItemLabel() : itemName}
+    </div>
+  );
 
-  render() {
-    const {
-      item,
-      itemName,
-      id,
-      renderItemLabel,
-      isBold,
-      selected,
-      getThumbnail,
-      errorStatus,
-      onEdit,
-      onItemSelected,
-      hideMenuButton,
-      scaleUpItemIconWhenSelected,
-      connectIconDragSource,
-    } = this.props;
+  const itemStyle = {
+    borderBottom: `1px solid ${gdevelopTheme.listItem.separatorColor}`,
+    backgroundColor: selected
+      ? errorStatus === ''
+        ? gdevelopTheme.listItem.selectedBackgroundColor
+        : errorStatus === 'error'
+        ? gdevelopTheme.listItem.selectedErrorBackgroundColor
+        : gdevelopTheme.listItem.selectedWarningBackgroundColor
+      : undefined,
+    color:
+      errorStatus === ''
+        ? undefined
+        : errorStatus === 'error'
+        ? gdevelopTheme.listItem.errorTextColor
+        : gdevelopTheme.listItem.warningTextColor,
+  };
 
-    return (
-      <ThemeConsumer>
-        {muiTheme => {
-          const label = this.props.editingName ? (
-            <TextField
-              id="rename-item-field"
-              margin="none"
-              ref={textField => (this.textField = textField)}
-              defaultValue={itemName}
-              onBlur={e => this.props.onRename(e.currentTarget.value)}
-              onKeyPress={event => {
-                if (shouldValidate(event)) {
-                  if (this.textField) this.textField.blur();
-                }
-              }}
-              fullWidth
-              style={styles.textField}
-            />
-          ) : (
-            <div
-              title={typeof itemName === 'string' ? itemName : undefined}
-              style={{
-                ...textEllipsisStyle,
-                color: selected
-                  ? muiTheme.listItem.selectedTextColor
-                  : undefined,
-                fontStyle: isBold ? 'italic' : undefined,
-                fontWeight: isBold ? 'bold' : 'normal',
-              }}
-            >
-              {renderItemLabel ? renderItemLabel() : itemName}
-            </div>
-          );
+  const leftIcon = getThumbnail ? (
+    <ListIcon
+      iconSize={24}
+      src={getThumbnail()}
+      cssAnimation={
+        scaleUpItemIconWhenSelected && selected
+          ? 'scale-and-jiggle 0.8s forwards'
+          : ''
+      }
+    />
+  ) : null;
 
-          const itemStyle = {
-            borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-            backgroundColor: selected
-              ? errorStatus === ''
-                ? muiTheme.listItem.selectedBackgroundColor
-                : errorStatus === 'error'
-                ? muiTheme.listItem.selectedErrorBackgroundColor
-                : muiTheme.listItem.selectedWarningBackgroundColor
-              : undefined,
-            color:
-              errorStatus === ''
-                ? undefined
-                : errorStatus === 'error'
-                ? muiTheme.listItem.errorTextColor
-                : muiTheme.listItem.warningTextColor,
-          };
+  return (
+    <ListItem
+      style={{ ...itemStyle }}
+      primaryText={label}
+      leftIcon={
+        connectIconDragSource && leftIcon
+          ? connectIconDragSource(<div>{leftIcon}</div>)
+          : leftIcon
+      }
+      displayMenuButton={!hideMenuButton}
+      rightIconColor={
+        selected
+          ? gdevelopTheme.listItem.selectedRightIconColor
+          : gdevelopTheme.listItem.rightIconColor
+      }
+      buildMenuTemplate={buildMenuTemplate}
+      onClick={() => {
+        if (!onItemSelected) return;
+        if (editingName) return;
 
-          const leftIcon = getThumbnail ? (
-            <ListIcon
-              iconSize={24}
-              src={getThumbnail()}
-              cssAnimation={
-                scaleUpItemIconWhenSelected && selected
-                  ? 'scale-and-jiggle 0.8s forwards'
-                  : ''
-              }
-            />
-          ) : null;
+        onItemSelected(selected ? null : item);
+      }}
+      onDoubleClick={event => {
+        if (event.button !== LEFT_MOUSE_BUTTON) return;
+        if (!onEdit) return;
+        if (editingName) return;
 
-          return (
-            <ListItem
-              style={{ ...itemStyle }}
-              primaryText={label}
-              leftIcon={
-                connectIconDragSource && leftIcon
-                  ? connectIconDragSource(<div>{leftIcon}</div>)
-                  : leftIcon
-              }
-              displayMenuButton={!hideMenuButton}
-              rightIconColor={
-                selected
-                  ? muiTheme.listItem.selectedRightIconColor
-                  : muiTheme.listItem.rightIconColor
-              }
-              buildMenuTemplate={this.props.buildMenuTemplate}
-              onClick={() => {
-                if (!onItemSelected) return;
-                if (this.props.editingName) return;
-
-                onItemSelected(selected ? null : item);
-              }}
-              onDoubleClick={event => {
-                if (event.button !== LEFT_MOUSE_BUTTON) return;
-                if (!onEdit) return;
-                if (this.props.editingName) return;
-
-                onItemSelected(null);
-                onEdit(item);
-              }}
-              id={id}
-            />
-          );
-        }}
-      </ThemeConsumer>
-    );
-  }
+        onItemSelected(null);
+        onEdit(item);
+      }}
+      id={id}
+    />
+  );
 }
 
 export default ItemRow;

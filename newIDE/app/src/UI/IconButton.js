@@ -50,6 +50,9 @@ type Props = {|
   tooltip?: MessageDescriptor,
   acceleratorString?: string,
   'aria-label'?: string,
+
+  /** To be used only when button should have a constant color, independently from the theme. */
+  useCurrentColor?: boolean,
 |};
 
 /**
@@ -58,8 +61,23 @@ type Props = {|
  */
 export default class IconButton extends React.Component<Props, {||}> {
   render() {
-    const { tooltip, acceleratorString, ...otherProps } = this.props;
-    const iconButton = <MUIIconButton {...otherProps} color="secondary" />;
+    const {
+      tooltip,
+      acceleratorString,
+      useCurrentColor,
+      style,
+      ...otherProps
+    } = this.props;
+    const iconButton = (
+      <MUIIconButton
+        {...otherProps}
+        style={{
+          ...style,
+          color: useCurrentColor ? 'currentColor' : undefined,
+        }}
+        color={useCurrentColor ? undefined : 'secondary'}
+      />
+    );
 
     return tooltip && !this.props.disabled ? (
       <I18n>

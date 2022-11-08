@@ -54,7 +54,11 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("version", version);
   element.SetAttribute("extensionNamespace", extensionNamespace);
   element.SetAttribute("shortDescription", shortDescription);
+
+  // TODO Use the multi line serialization in a release that follows the 150.
+  // element.AddChild("description").SetMultilineStringValue(description);
   element.SetAttribute("description", description);
+
   element.SetAttribute("name", name);
   element.SetAttribute("fullName", fullName);
   element.SetAttribute("category", category);
@@ -100,7 +104,7 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
   version = element.GetStringAttribute("version");
   extensionNamespace = element.GetStringAttribute("extensionNamespace");
   shortDescription = element.GetStringAttribute("shortDescription");
-  description = element.GetStringAttribute("description");
+  description = element.GetChild("description").GetMultilineStringValue();
   name = element.GetStringAttribute("name");
   fullName = element.GetStringAttribute("fullName");
   category = element.GetStringAttribute("category");

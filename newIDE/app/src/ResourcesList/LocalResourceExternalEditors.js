@@ -4,6 +4,7 @@ import { openJfxr } from './LocalJfxrBridge';
 import { openYarn } from './LocalYarnBridge';
 import { type ResourceExternalEditor } from './ResourceExternalEditor.flow';
 import { sendExternalEditorOpened } from '../Utils/Analytics/EventSender';
+import { t } from '@lingui/macro';
 
 /**
  * This is the list of editors that can be used to edit resources
@@ -12,7 +13,7 @@ import { sendExternalEditorOpened } from '../Utils/Analytics/EventSender';
 const editors: Array<ResourceExternalEditor> = [
   {
     name: 'piskel-app',
-    displayName: 'Edit with Piskel',
+    displayName: t`Create/Edit with Piskel`,
     kind: 'image',
     edit: options => {
       sendExternalEditorOpened('piskel');
@@ -21,7 +22,7 @@ const editors: Array<ResourceExternalEditor> = [
   },
   {
     name: 'Jfxr',
-    displayName: 'Create/Edit a Sound effect with Jfxr (*.wav)',
+    displayName: t`Create/Edit with Jfxr`,
     kind: 'audio',
     edit: options => {
       sendExternalEditorOpened('jfxr');
@@ -30,7 +31,7 @@ const editors: Array<ResourceExternalEditor> = [
   },
   {
     name: 'Yarn',
-    displayName: 'Create/Edit a Dialogue Tree with Yarn (*.json)',
+    displayName: t`Create/Edit with Yarn`,
     kind: 'json',
     edit: options => {
       sendExternalEditorOpened('yarn');

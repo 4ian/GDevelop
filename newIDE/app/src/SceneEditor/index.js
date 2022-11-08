@@ -1361,9 +1361,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         renderEditor: () => (
           <LayersList
             project={project}
-            resourceSources={resourceSources}
-            resourceExternalEditors={resourceExternalEditors}
-            onChooseResource={onChooseResource}
             onEditLayerEffects={this.editLayerEffects}
             onEditLayer={this.editLayer}
             onRemoveLayer={this._onRemoveLayer}

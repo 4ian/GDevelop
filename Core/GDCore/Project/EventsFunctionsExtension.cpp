@@ -55,8 +55,6 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("extensionNamespace", extensionNamespace);
   element.SetAttribute("shortDescription", shortDescription);
   element.AddChild("description").SetMultilineStringValue(description);
-  element.SetAttribute("description", description);
-
   element.SetAttribute("name", name);
   element.SetAttribute("fullName", fullName);
   element.SetAttribute("category", category);

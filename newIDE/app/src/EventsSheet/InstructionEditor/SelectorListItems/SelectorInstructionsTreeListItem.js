@@ -56,7 +56,10 @@ export const renderInstructionOrExpressionTree = <
             key={value}
             primaryText={key}
             selected={selected}
-            id={'instruction-item-' + instructionInformation.type}
+            id={
+              'instruction-item-' +
+              instructionInformation.type.replace(/:/g, '-')
+            }
             leftIcon={
               <ListIcon
                 iconSize={iconSize}

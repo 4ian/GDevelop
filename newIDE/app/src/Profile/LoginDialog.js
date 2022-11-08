@@ -73,6 +73,7 @@ const LoginDialog = ({
     />,
     <LeftLoader isLoading={loginInProgress} key="login">
       <DialogPrimaryButton
+        id="login-button"
         label={<Trans>Login</Trans>}
         primary
         onClick={doLogin}
@@ -83,6 +84,7 @@ const LoginDialog = ({
 
   return (
     <Dialog
+      id="login-dialog"
       title={<Trans>Login to your GDevelop account</Trans>}
       actions={actions}
       secondaryActions={[

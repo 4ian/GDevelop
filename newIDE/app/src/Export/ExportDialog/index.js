@@ -141,6 +141,7 @@ const ExportDialog = ({
 
   return (
     <Dialog
+      id="export-dialog"
       title={
         chosenExporterSection === 'automated' ? (
           <Trans>Publish your game</Trans>

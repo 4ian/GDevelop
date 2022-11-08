@@ -179,6 +179,7 @@ export function ClosableTab({
           onClick={onClick}
           onAuxClick={closable ? closeOnMiddleClick : undefined}
           onContextMenu={openContextMenu}
+          data-active={active ? 'true' : undefined}
           id={id ? `${id}-button` : undefined}
           {...longTouchForContextMenuProps}
           focusRipple

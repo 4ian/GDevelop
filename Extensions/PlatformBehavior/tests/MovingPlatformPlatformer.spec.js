@@ -68,6 +68,9 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       runtimeScene.renderAndStepWithEventsFunction(1000 / 60, () => {
         platform.setX(platform.getX() + 0.12);
       });
+      // TODO Remove the 1-frame delay
+      expect(object.getX()).to.be(0.24);
+      runtimeScene.renderAndStep(1000 / 60);
       expect(object.getX()).to.be(0.36);
     });
 
@@ -242,6 +245,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             // Check that the object follow the platform, even if the
             // movement is less than one pixel.
             for (let i = 0; i < 5; ++i) {
+              const previousPlatformY = platform.getY();
               runtimeScene.renderAndStepWithEventsFunction(1000 / 60, () => {
                 platform.setPosition(
                   platform.getX() + deltaX,
@@ -254,11 +258,15 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
               // The object follow the platform
               // The rounding error is probably due to a separate call.
               // TODO Try to make it exact or find why
+              // TODO Remove the 1-frame delay
               expect(object.getY()).to.be.within(
-                platform.getY() - object.getHeight() - epsilon,
-                platform.getY() - object.getHeight() + epsilon
+                previousPlatformY - object.getHeight() - epsilon,
+                previousPlatformY - object.getHeight() + epsilon
               );
             }
+            // TODO Remove the 1-frame delay
+            expect(object.getX()).to.be(0 + 4 * deltaX);
+            runtimeScene.renderAndStep(1000 / 60);
             expect(object.getX()).to.be(0 + 5 * deltaX);
           });
         });
@@ -381,6 +389,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
               // Check that the object follow the platform, even if the
               // movement is less than one pixel.
               for (let i = 0; i < 5; ++i) {
+                const previousPlatformY = platform.getY();
                 runtimeScene.renderAndStepWithEventsFunction(1000 / 60, () => {
                   platform.setPosition(
                     platform.getX() + deltaX,
@@ -391,11 +400,15 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
                 expect(object.getBehavior('auto1').isFalling()).to.be(false);
                 expect(object.getBehavior('auto1').isMoving()).to.be(false);
                 // The object must not be inside the platform or it gets stuck
+                // TODO Remove the 1-frame delay
                 expect(object.getY()).to.be.within(
-                  platform.getY() - object.getHeight() - epsilon,
-                  platform.getY() - object.getHeight() + epsilon
+                  previousPlatformY - object.getHeight() - epsilon,
+                  previousPlatformY - object.getHeight() + epsilon
                 );
               }
+              // TODO Remove the 1-frame delay
+              expect(object.getX()).to.be(0 + 4 * deltaX);
+              runtimeScene.renderAndStep(1000 / 60);
               expect(object.getX()).to.be(0 + 5 * deltaX);
             });
           });

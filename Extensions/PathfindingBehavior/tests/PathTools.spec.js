@@ -4,7 +4,7 @@ describe('gdjs.pathfinding', function () {
     expect(gdjs.pathfinding.simplifyPath([], 1)).to.eql([]);
   });
 
-  it('can give back a path with only one vertex', function () {
+  it('can give back a path with only 1 vertex', function () {
     expect(gdjs.pathfinding.simplifyPath([[2, 4]], 1)).to.eql([[2, 4]]);
   });
 

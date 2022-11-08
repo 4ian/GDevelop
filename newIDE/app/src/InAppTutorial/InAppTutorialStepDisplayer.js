@@ -11,13 +11,16 @@ import {
   type EditorIdentifier,
 } from './InAppTutorialContext';
 import InAppTutorialElementHighlighter from './InAppTutorialElementHighlighter';
-import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
+import InAppTutorialTooltipDisplayer, {
+  type InAppTutorialTooltipDisplayerInterface,
+} from './InAppTutorialTooltipDisplayer';
 import Link from '@material-ui/core/Link';
 import Text from '../UI/Text';
 import { isElementADialog } from '../UI/MaterialUISpecificUtil';
+import { ButtonBase } from '@material-ui/core';
 
 const styles = {
-  redHeroImage: {
+  avatarContainer: {
     position: 'absolute',
     left: 20,
     bottom: 20,
@@ -29,6 +32,7 @@ const styles = {
     borderRadius: 30,
   },
   link: { cursor: 'pointer' },
+  avatarImage: { cursor: 'pointer' },
 };
 
 const ELEMENT_QUERY_FREQUENCY = 500;
@@ -115,6 +119,9 @@ function InAppTutorialStepDisplayer({
   goToFallbackStep,
   endTutorial,
 }: Props) {
+  const tooltipDisplayerRef = React.useRef<?InAppTutorialTooltipDisplayerInterface>(
+    null
+  );
   const [
     elementToHighlight,
     setElementToHighlight,
@@ -212,6 +219,7 @@ function InAppTutorialStepDisplayer({
       if (!anchorElement) return null;
       return (
         <InAppTutorialTooltipDisplayer
+          ref={tooltipDisplayerRef}
           anchorElement={anchorElement}
           tooltip={tooltip}
           buttonLabel={
@@ -238,6 +246,12 @@ function InAppTutorialStepDisplayer({
     return null;
   };
 
+  const onClickAvatar = () => {
+    if (tooltipDisplayerRef.current) {
+      tooltipDisplayerRef.current.showTooltip();
+    }
+  };
+
   return (
     <I18n>
       {({ i18n }) => {
@@ -247,17 +261,20 @@ function InAppTutorialStepDisplayer({
           <>
             <div
               style={{
-                ...styles.redHeroImage,
+                ...styles.avatarContainer,
                 visibility: displayRedHero ? 'visible' : 'hidden',
               }}
               ref={defineAssistantImage}
             >
-              <img
-                alt="GDevelop mascot red hero"
-                src="res/hero60.png"
-                width={60}
-                height={60}
-              />
+              <ButtonBase onClick={onClickAvatar}>
+                <img
+                  alt="GDevelop mascot red hero"
+                  src="res/hero60.png"
+                  width={60}
+                  height={60}
+                  style={styles.avatarImage}
+                />
+              </ButtonBase>
             </div>
             {renderHighlighter()}
             {renderTooltip(i18n)}

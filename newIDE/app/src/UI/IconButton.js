@@ -36,6 +36,7 @@ type Props = {|
     padding?: number,
     width?: number,
     height?: number,
+    cursor?: 'pointer',
     transform?: string,
     transition?: string,
     opacity?: number,

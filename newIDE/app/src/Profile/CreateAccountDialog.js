@@ -134,6 +134,7 @@ const CreateAccountDialog = ({
   return (
     <Dialog
       title={null} // This dialog has a custom design to be more welcoming, the title is set in the content.
+      id="create-account-dialog"
       actions={[
         <FlatButton
           label={<Trans>Cancel</Trans>}
@@ -145,6 +146,7 @@ const CreateAccountDialog = ({
         <LeftLoader isLoading={createAccountInProgress} key="create-account">
           <DialogPrimaryButton
             label={<Trans>Create account</Trans>}
+            id="create-account-button"
             primary
             disabled={!canCreateAccount}
             onClick={createAccount}

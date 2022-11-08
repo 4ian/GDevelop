@@ -694,9 +694,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').isFalling()).to.be(false);
       expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
       expect(object.getY()).to.be.within(140.6297999, 140.6298001);
-      // TODO Remove the 1-frame delay
-      expect(object.getX()).to.be(5);
-      runtimeScene.renderAndStep(1000 / 60);
       expect(object.getX()).to.be(6);
     });
   });

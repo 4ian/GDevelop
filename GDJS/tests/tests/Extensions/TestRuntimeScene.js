@@ -15,7 +15,8 @@ gdjs.TestRuntimeScene = class TestRuntimeScene extends gdjs.RuntimeScene {
    * @param {() => void} eventsFunction 
    */
   renderAndStepWithEventsFunction(elapsedTime, eventsFunction) {
-    this._eventsFunction = eventsFunction.bind(this, this);
+    const runtimeScene = this;
+    this._eventsFunction = (runtimeScene) => eventsFunction();
     this.renderAndStep(elapsedTime);
     this._eventsFunction = null;
   }

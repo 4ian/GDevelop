@@ -19,8 +19,16 @@ import ResourcesLoader from '../ResourcesLoader';
 import { applyResourceDefaults } from './ResourceUtils';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
-import { TextFieldWithButtonLayout } from '../UI/Layout';
+import { LineStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import IconButton from '../UI/IconButton';
+import RaisedButton from '../UI/RaisedButton';
+import { type I18n as I18nType } from '@lingui/core';
+import { I18n } from '@lingui/react';
+import { Column } from '../UI/Grid';
+
+const styles = {
+  textFieldStyle: { display: 'flex', flex: 1 },
+};
 
 type Props = {|
   project: gdProject,
@@ -267,62 +275,76 @@ export default class ResourceSelector extends React.Component<Props, State> {
       externalEditor => externalEditor.kind === this.props.resourceKind
     );
     return (
-      <TextFieldWithButtonLayout
-        noFloatingLabelText={!this.props.floatingLabelText}
-        margin={this.props.margin}
-        renderTextField={() => (
-          <SemiControlledAutoComplete
-            style={this.props.style}
-            floatingLabelText={this.props.floatingLabelText}
-            helperMarkdownText={this.props.helperMarkdownText}
-            hintText={this.props.hintText}
-            openOnFocus
-            dataSource={this.autoCompleteData || []}
-            value={this.state.resourceName}
-            onChange={this._onChangeResourceName}
-            errorText={errorText}
-            fullWidth={this.props.fullWidth}
-            margin={this.props.margin}
-            onRequestClose={this.props.onRequestClose}
-            onApply={this.props.onApply}
-            ref={autoComplete => (this._autoComplete = autoComplete)}
-          />
-        )}
-        renderButton={style => (
-          <React.Fragment>
-            {this.props.canBeReset && (
-              <IconButton
-                size="small"
-                onClick={() => {
-                  this._onResetResourceName();
-                }}
-              >
-                <BackspaceIcon />
-              </IconButton>
+      <I18n>
+        {({ i18n }) => (
+          <ResponsiveLineStackLayout noMargin expand alignItems="center">
+            <Column expand noMargin>
+              <LineStackLayout expand noMargin>
+                <SemiControlledAutoComplete
+                  style={this.props.style}
+                  textFieldStyle={styles.textFieldStyle}
+                  floatingLabelText={this.props.floatingLabelText}
+                  helperMarkdownText={this.props.helperMarkdownText}
+                  hintText={this.props.hintText}
+                  openOnFocus
+                  dataSource={this.autoCompleteData || []}
+                  value={this.state.resourceName}
+                  onChange={this._onChangeResourceName}
+                  errorText={errorText}
+                  fullWidth={this.props.fullWidth}
+                  margin={this.props.margin}
+                  onRequestClose={this.props.onRequestClose}
+                  onApply={this.props.onApply}
+                  ref={autoComplete => (this._autoComplete = autoComplete)}
+                />
+                {this.props.canBeReset && (
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      this._onResetResourceName();
+                    }}
+                  >
+                    <BackspaceIcon />
+                  </IconButton>
+                )}
+              </LineStackLayout>
+            </Column>
+            <RaisedButton
+              label={<Trans>Choose local file</Trans>}
+              onClick={() => {
+                this._autoComplete && this._autoComplete.focus();
+              }}
+              primary
+            />
+            {externalEditors.length === 1 && (
+              <RaisedButton
+                icon={<Brush />}
+                label={i18n._(externalEditors[0].displayName)}
+                onClick={() => this._editWith(externalEditors[0])}
+              />
             )}
-            {!!externalEditors.length ? (
+            {externalEditors.length > 1 ? (
               <RaisedButtonWithMenu
-                style={style}
                 icon={<Brush />}
                 label={
                   this.state.resourceName ? (
-                    <Trans>Edit</Trans>
+                    <Trans>Edit with...</Trans>
                   ) : (
-                    <Trans>Create</Trans>
+                    <Trans>Create with...</Trans>
                   )
                 }
                 primary
-                buildMenuTemplate={() =>
+                buildMenuTemplate={(i18n: I18nType) =>
                   externalEditors.map(externalEditor => ({
-                    label: externalEditor.displayName,
+                    label: i18n._(externalEditor.displayName),
                     click: () => this._editWith(externalEditor),
                   }))
                 }
               />
             ) : null}
-          </React.Fragment>
+          </ResponsiveLineStackLayout>
         )}
-      />
+      </I18n>
     );
   }
 }

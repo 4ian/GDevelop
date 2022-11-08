@@ -7,7 +7,7 @@
       },
       properties: { windowWidth: 800, windowHeight: 600 },
     });
-    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
     runtimeScene.loadFromScene({
       layers: [{ name: '', visibility: true, effects: [] }],
       variables: [],

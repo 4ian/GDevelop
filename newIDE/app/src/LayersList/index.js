@@ -82,7 +82,8 @@ const LayersListBody = (props: LayersListBodyProps) => {
 
     return (
       <LayerRow
-        key={'layer-' + layer.ptr}
+        key={`layer-${layer.ptr}`}
+        id={`layer-${i}`}
         layer={layer}
         nameError={nameErrors[layerName]}
         effectsCount={layer.getEffects().getEffectsCount()}
@@ -263,6 +264,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
             <Line justifyContent="flex-end" expand>
               <RaisedButtonWithSplitMenu
                 label={<Trans>Add a layer</Trans>}
+                id="add-layer-button"
                 primary
                 onClick={addLayer}
                 icon={<Add />}

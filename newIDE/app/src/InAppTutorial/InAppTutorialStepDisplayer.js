@@ -7,15 +7,20 @@ import { useInterval } from '../Utils/UseInterval';
 import { getElementAncestry } from './HTMLUtils';
 import {
   type InAppTutorialFlowFormattedStep,
+  type InAppTutorialFormattedTooltip,
   type EditorIdentifier,
 } from './InAppTutorialContext';
 import InAppTutorialElementHighlighter from './InAppTutorialElementHighlighter';
-import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
+import InAppTutorialTooltipDisplayer, {
+  type InAppTutorialTooltipDisplayerInterface,
+} from './InAppTutorialTooltipDisplayer';
 import Link from '@material-ui/core/Link';
 import Text from '../UI/Text';
+import { isElementADialog } from '../UI/MaterialUISpecificUtil';
+import { ButtonBase } from '@material-ui/core';
 
 const styles = {
-  redHeroImage: {
+  avatarContainer: {
     position: 'absolute',
     left: 20,
     bottom: 20,
@@ -27,13 +32,11 @@ const styles = {
     borderRadius: 30,
   },
   link: { cursor: 'pointer' },
+  avatarImage: { cursor: 'pointer' },
 };
 
 const ELEMENT_QUERY_FREQUENCY = 500;
 const HIDE_QUERY_FREQUENCY = 1000;
-
-const isElementADialog = (element: Element) =>
-  element.tagName === 'DIV' && element.getAttribute('role') === 'presentation';
 
 const getElementToHighlightRootDialog = (
   element: HTMLElement
@@ -53,18 +56,54 @@ const getElementToHighlightRootDialog = (
   return null;
 };
 
-const isThereAnotherDialogInTheFollowingSiblings = (
+const isThereAnOpenDialogInTheFollowingSiblings = (
   element: Element
 ): boolean => {
   let nextElement = element.nextElementSibling;
   while (nextElement) {
-    if (isElementADialog(nextElement)) {
+    if (isElementADialog(nextElement, { isVisible: true })) {
       return true;
     } else {
       nextElement = nextElement.nextElementSibling;
     }
   }
   return false;
+};
+
+const getWrongEditorTooltip = (
+  i18n: I18nType,
+  expectedEditor: EditorIdentifier | null,
+  onEndTutorial: () => void
+): InAppTutorialFormattedTooltip | null => {
+  if (!expectedEditor) return null;
+  const translatedExpectedEditor =
+    expectedEditor === 'Scene'
+      ? i18n._(t`the scene editor`)
+      : expectedEditor === 'Home'
+      ? i18n._(t`the home page`)
+      : i18n._(t`the events sheet`);
+
+  const inlineLink = (
+    <Link onClick={onEndTutorial} style={styles.link}>
+      {i18n._(t`click here`)}
+    </Link>
+  );
+
+  const getDescriptionNode = style => (
+    <Text style={style}>
+      <span>
+        {i18n._(
+          t`Go back to ${translatedExpectedEditor} to keep creating your game, or`
+        )}
+      </span>{' '}
+      {inlineLink} <span>{i18n._(t`to quit the tutorial.`)}</span>
+    </Text>
+  );
+  return {
+    title: i18n._(t`You're leaving the game tutorial`),
+    placement: 'top',
+    getDescriptionNode,
+  };
 };
 
 type Props = {|
@@ -80,6 +119,9 @@ function InAppTutorialStepDisplayer({
   goToFallbackStep,
   endTutorial,
 }: Props) {
+  const tooltipDisplayerRef = React.useRef<?InAppTutorialTooltipDisplayerInterface>(
+    null
+  );
   const [
     elementToHighlight,
     setElementToHighlight,
@@ -130,7 +172,7 @@ function InAppTutorialStepDisplayer({
         // behind a dialog if there's one, so no need to force-hide it.
         return;
       }
-      if (isThereAnotherDialogInTheFollowingSiblings(rootDialog)) {
+      if (isThereAnOpenDialogInTheFollowingSiblings(rootDialog)) {
         setHideBehindOtherDialog(true);
       }
     },
@@ -158,80 +200,84 @@ function InAppTutorialStepDisplayer({
     [elementToHighlightId, elementToHighlight, goToFallbackStep, expectedEditor]
   );
 
-  const getWrongEditorTooltip = (i18n: I18nType) => {
-    if (!expectedEditor) return null;
-    const translatedExpectedEditor =
-      expectedEditor === 'Scene'
-        ? i18n._(t`the scene editor`)
-        : expectedEditor === 'Home'
-        ? i18n._(t`the home page`)
-        : i18n._(t`the events sheet`);
-
-    const inlineLink = (
-      <Link onClick={endTutorial} style={styles.link}>
-        {i18n._(t`click here`)}
-      </Link>
-    );
-
-    const getDescriptionNode = style => (
-      <Text style={style}>
-        <span>
-          {i18n._(
-            t`Go back to ${translatedExpectedEditor} to keep creating your game, or`
-          )}
-        </span>{' '}
-        {inlineLink} <span>{i18n._(t`to quit the tutorial.`)}</span>
-      </Text>
-    );
-    return {
-      title: i18n._(t`You're leaving the game tutorial`),
-      placement: 'top',
-      getDescriptionNode,
-    };
+  const renderHighlighter = () => {
+    if (
+      // hide highlighter if
+      expectedEditor || // the user is on the wrong editor
+      !elementToHighlight || // there's no element to highlight
+      hideBehindOtherDialog // the element to highlight is on a dialog hidden behind another one
+    )
+      return null;
+    return <InAppTutorialElementHighlighter element={elementToHighlight} />;
   };
 
-  if (!elementToHighlight || hideBehindOtherDialog) return null;
+  const renderTooltip = (i18n: I18nType) => {
+    if (tooltip && !expectedEditor) {
+      const anchorElement = tooltip.standalone
+        ? assistantImage
+        : elementToHighlight || null;
+      if (!anchorElement) return null;
+      return (
+        <InAppTutorialTooltipDisplayer
+          ref={tooltipDisplayerRef}
+          anchorElement={anchorElement}
+          tooltip={tooltip}
+          buttonLabel={
+            nextStepTrigger && nextStepTrigger.clickOnTooltipButton
+              ? nextStepTrigger.clickOnTooltipButton
+              : undefined
+          }
+        />
+      );
+    }
+    const wrongEditorTooltip = getWrongEditorTooltip(
+      i18n,
+      expectedEditor,
+      endTutorial
+    );
+    if (wrongEditorTooltip && assistantImage) {
+      return (
+        <InAppTutorialTooltipDisplayer
+          anchorElement={assistantImage}
+          tooltip={wrongEditorTooltip}
+        />
+      );
+    }
+    return null;
+  };
+
+  const onClickAvatar = () => {
+    if (tooltipDisplayerRef.current) {
+      tooltipDisplayerRef.current.showTooltip();
+    }
+  };
 
   return (
     <I18n>
       {({ i18n }) => {
-        const wrongEditorTooltip = getWrongEditorTooltip(i18n);
+        const displayRedHero =
+          expectedEditor || (tooltip && tooltip.standalone);
         return (
           <>
             <div
               style={{
-                ...styles.redHeroImage,
-                visibility: wrongEditorTooltip ? 'visible' : 'hidden',
+                ...styles.avatarContainer,
+                visibility: displayRedHero ? 'visible' : 'hidden',
               }}
               ref={defineAssistantImage}
             >
-              <img
-                alt="GDevelop mascot red hero"
-                src="res/hero60.png"
-                width={60}
-                height={60}
-              />
+              <ButtonBase onClick={onClickAvatar}>
+                <img
+                  alt="GDevelop mascot red hero"
+                  src="res/hero60.png"
+                  width={60}
+                  height={60}
+                  style={styles.avatarImage}
+                />
+              </ButtonBase>
             </div>
-            {!wrongEditorTooltip && (
-              <InAppTutorialElementHighlighter element={elementToHighlight} />
-            )}
-            {tooltip && !wrongEditorTooltip && (
-              <InAppTutorialTooltipDisplayer
-                anchorElement={elementToHighlight}
-                tooltip={tooltip}
-                buttonLabel={
-                  nextStepTrigger && nextStepTrigger.clickOnTooltipButton
-                    ? nextStepTrigger.clickOnTooltipButton
-                    : undefined
-                }
-              />
-            )}
-            {wrongEditorTooltip && assistantImage && (
-              <InAppTutorialTooltipDisplayer
-                anchorElement={assistantImage}
-                tooltip={wrongEditorTooltip}
-              />
-            )}
+            {renderHighlighter()}
+            {renderTooltip(i18n)}
           </>
         );
       }}

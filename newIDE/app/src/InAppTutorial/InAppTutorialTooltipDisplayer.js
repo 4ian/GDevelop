@@ -9,11 +9,14 @@ import { getDisplayZIndexForHighlighter } from './HTMLUtils';
 import InAppTutorialContext, {
   type InAppTutorialFormattedTooltip,
 } from './InAppTutorialContext';
+import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { makeStyles } from '@material-ui/core/styles';
 import { MarkdownText } from '../UI/MarkdownText';
 import RaisedButton from '../UI/RaisedButton';
+import IconButton from '../UI/IconButton';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import Pause from '../UI/CustomSvgIcons/Pause';
 
 type Props = {|
   anchorElement: HTMLElement,
@@ -23,7 +26,7 @@ type Props = {|
 
 const styles = {
   paper: {
-    padding: '0px 20px', // vertical padding is added by markdown text paragraphs
+    padding: '0px 30px 0px 20px', // vertical padding is added by markdown text paragraphs
   },
   title: {
     color: '#1D1D26', // Grey100
@@ -34,6 +37,18 @@ const styles = {
   divider: {
     backgroundColor: '#D9D9DE', // Grey20
     height: 1,
+  },
+  descriptionImage: {
+    margin: 'auto',
+  },
+  sideButton: { cursor: 'pointer' },
+  sideButtonsContainer: {
+    position: 'absolute',
+    right: 3,
+    top: 8,
+    color: '#494952',
+    display: 'flex',
+    flexDirection: 'column',
   },
 };
 
@@ -101,11 +116,14 @@ const useClasses = makeStyles({
   },
 });
 
-function InAppTutorialTooltipDisplayer({
-  anchorElement,
-  tooltip,
-  buttonLabel,
-}: Props) {
+export type InAppTutorialTooltipDisplayerInterface = {|
+  showTooltip: () => void,
+|};
+
+const InAppTutorialTooltipDisplayer = React.forwardRef<
+  Props,
+  InAppTutorialTooltipDisplayerInterface
+>(({ anchorElement, tooltip, buttonLabel }, ref) => {
   const {
     palette: { type: paletteType },
   } = React.useContext(GDevelopThemeContext);
@@ -117,6 +135,14 @@ function InAppTutorialTooltipDisplayer({
     },
     []
   );
+
+  React.useImperativeHandle(ref, () => ({
+    showTooltip: () => {
+      if (tooltip.standalone && !show) {
+        setShow(true);
+      }
+    },
+  }));
 
   useIsElementVisibleInScroll(anchorElement, updateVisibility);
 
@@ -175,6 +201,19 @@ function InAppTutorialTooltipDisplayer({
                       />
                     </Typography>
                   )}
+                  {tooltip.image && (
+                    <>
+                      <img
+                        src={tooltip.image.dataUrl}
+                        alt="Tutorial helper"
+                        style={{
+                          ...styles.descriptionImage,
+                          width: tooltip.image.width || '100%',
+                        }}
+                      />
+                      <LargeSpacer />
+                    </>
+                  )}
                   {buttonLabel && (
                     <>
                       <RaisedButton
@@ -192,6 +231,28 @@ function InAppTutorialTooltipDisplayer({
                   ref={arrowRef}
                   style={{ color: backgroundColor }}
                 />
+                <div style={styles.sideButtonsContainer}>
+                  {tooltip.standalone ? (
+                    // Display the hide button only if standalone because the only
+                    // way to show it back is to click on the avatar (through
+                    // ref handle method).
+                    <IconButton
+                      size="small"
+                      useCurrentColor
+                      style={styles.sideButton}
+                      onClick={() => setShow(false)}
+                    >
+                      <ChevronArrowBottom />
+                    </IconButton>
+                  ) : null}
+                  <IconButton
+                    size="small"
+                    useCurrentColor
+                    style={styles.sideButton}
+                  >
+                    <Pause />
+                  </IconButton>
+                </div>
               </Paper>
             </Fade>
           </>
@@ -199,6 +260,6 @@ function InAppTutorialTooltipDisplayer({
       </Popper>
     </>
   );
-}
+});
 
 export default InAppTutorialTooltipDisplayer;

@@ -110,6 +110,7 @@ const ExtensionInstallDialog = ({
 
   return (
     <Dialog
+      id="extension-install-dialog"
       actions={[
         <FlatButton
           key="close"
@@ -120,6 +121,7 @@ const ExtensionInstallDialog = ({
         />,
         <LeftLoader isLoading={isInstalling} key="install">
           <DialogPrimaryButton
+            id="install-extension-button"
             label={
               !isCompatible ? (
                 <Trans>Not compatible</Trans>

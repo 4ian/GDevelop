@@ -299,6 +299,7 @@ const OnlineGameLink = ({
           {isShareDialogOpen && (
             <Dialog
               title={<Trans>Share your game</Trans>}
+              id="share-dialog"
               actions={dialogActions}
               open
               onRequestClose={() => setIsShareDialogOpen(false)}

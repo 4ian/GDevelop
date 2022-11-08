@@ -55,31 +55,31 @@ const Toolbar = (props: Props) => {
       />
       <ToolbarGroup lastChild>
         <ToolbarIcon
-          id="open-objects-panel-button"
+          id="toolbar-open-objects-panel-button"
           onClick={props.openObjectsList}
           src="res/ribbon_default/objects64.png"
           tooltip={t`Open Objects Panel`}
         />
         <ToolbarIcon
-          id="open-object-groups-panel-button"
+          id="toolbar-open-object-groups-panel-button"
           onClick={props.openObjectGroupsList}
           src={'res/ribbon_default/objectsgroups64.png'}
           tooltip={t`Open Object Groups Panel`}
         />
         <ToolbarIcon
-          id="open-properties-panel-button"
+          id="toolbar-open-properties-panel-button"
           onClick={props.openProperties}
           src="res/ribbon_default/editprop32.png"
           tooltip={t`Open Properties Panel`}
         />
         <ToolbarIcon
-          id="open-instances-list-panel-button"
+          id="toolbar-open-instances-list-panel-button"
           onClick={props.toggleInstancesList}
           src="res/ribbon_default/ObjectsPositionsList32.png"
           tooltip={t`Open Instances List Panel`}
         />
         <ToolbarIcon
-          id="open-layers-panel-button"
+          id="toolbar-open-layers-panel-button"
           onClick={props.toggleLayersList}
           src="res/ribbon_default/layers32.png"
           tooltip={t`Open Layers Panel`}

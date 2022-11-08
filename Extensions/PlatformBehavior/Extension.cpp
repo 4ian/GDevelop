@@ -650,9 +650,9 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddScopedAction("FollowCurrentPlatform",
                      _("Follow the floor"),
-                     _("Move the object to follow the platform it's currently on. "
-                     "This action allows to avoid the 1-frame delay induced by "
-                     "the automatic following."),
+                     _("Move the object to follow the platform it's currently" 
+                     "on if any. This action allows to avoid the 1-frame "
+                     "delay induced by the automatic following."),
                      _("Move _PARAM0_ to follow the floor"),
                      _(""),
                      "CppPlatform/Extensions/platformerobjecticon.png",

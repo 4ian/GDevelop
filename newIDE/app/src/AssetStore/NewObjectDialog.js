@@ -14,7 +14,7 @@ import {
 } from '../ObjectsList/EnumerateObjects';
 import HelpButton from '../UI/HelpButton';
 import { Column, Line } from '../UI/Grid';
-import { Tabs, Tab } from '../UI/Tabs';
+import { Tabs } from '../UI/Tabs';
 import { AssetStore } from '.';
 import {
   type ResourceSource,
@@ -259,53 +259,54 @@ export default function NewObjectDialog({
     [fetchAssetsAndFilters, environment]
   );
 
-  const mainAction = openedAssetPack ? (
-    <RaisedButton
-      key="add-all-assets"
-      primary
-      label={<Trans>Add all assets to my scene</Trans>}
-      onClick={() => setIsAssetPackDialogInstallOpen(true)}
-      disabled={!searchResults || searchResults.length === 0}
-    />
-  ) : openedAssetShortHeader ? (
-    <RaisedButton
-      key="add-asset"
-      primary={!isAssetAddedToScene}
-      label={
-        isAssetBeingInstalled ? (
-          <Trans>Adding...</Trans>
-        ) : isAssetAddedToScene ? (
-          <Trans>Add again</Trans>
-        ) : (
-          <Trans>Add to the scene</Trans>
-        )
-      }
-      onClick={onInstallAsset}
-      disabled={isAssetBeingInstalled}
-      id="add-asset-button"
-    />
-  ) : isDev ? (
-    <RaisedButton
-      key="show-dev-assets"
-      label={
-        environment === 'staging' ? (
-          <Trans>Show live assets</Trans>
-        ) : (
-          <Trans>Show staging assets</Trans>
-        )
-      }
-      onClick={() => {
-        setEnvironment(environment === 'staging' ? 'live' : 'staging');
-      }}
-    />
-  ) : (
-    undefined
-  );
+  const mainAction =
+    currentTab !== 'asset-store' ? null : openedAssetPack ? (
+      <RaisedButton
+        key="add-all-assets"
+        primary
+        label={<Trans>Add all assets to my scene</Trans>}
+        onClick={() => setIsAssetPackDialogInstallOpen(true)}
+        disabled={!searchResults || searchResults.length === 0}
+      />
+    ) : openedAssetShortHeader ? (
+      <RaisedButton
+        key="add-asset"
+        primary={!isAssetAddedToScene}
+        label={
+          isAssetBeingInstalled ? (
+            <Trans>Adding...</Trans>
+          ) : isAssetAddedToScene ? (
+            <Trans>Add again</Trans>
+          ) : (
+            <Trans>Add to the scene</Trans>
+          )
+        }
+        onClick={onInstallAsset}
+        disabled={isAssetBeingInstalled}
+        id="add-asset-button"
+      />
+    ) : isDev ? (
+      <RaisedButton
+        key="show-dev-assets"
+        label={
+          environment === 'staging' ? (
+            <Trans>Show live assets</Trans>
+          ) : (
+            <Trans>Show staging assets</Trans>
+          )
+        }
+        onClick={() => {
+          setEnvironment(environment === 'staging' ? 'live' : 'staging');
+        }}
+      />
+    ) : (
+      undefined
+    );
 
   return (
     <>
       <Dialog
-        title={<Trans>Add a new object</Trans>}
+        title={<Trans>New object</Trans>}
         secondaryActions={[<HelpButton helpPagePath="/objects" key="help" />]}
         actions={[
           <FlatButton
@@ -327,54 +328,57 @@ export default function NewObjectDialog({
         }
         open
         flexBody
-        noMargin
         fullHeight
         id="new-object-dialog"
+        fixedContent={
+          <Tabs
+            value={currentTab}
+            onChange={setCurrentTab}
+            options={[
+              {
+                label: <Trans>Asset Store</Trans>,
+                value: 'asset-store',
+                id: 'asset-store-tab',
+              },
+              {
+                label: <Trans>New object from scratch</Trans>,
+                value: 'new-object',
+                id: 'new-object-from-scratch-tab',
+              },
+            ]}
+          />
+        }
       >
-        <Column noMargin expand>
-          <Tabs value={currentTab} onChange={setCurrentTab}>
-            <Tab
-              label={<Trans>Asset Store</Trans>}
-              value="asset-store"
-              id="asset-store-tab"
-            />
-            <Tab
-              label={<Trans>New object from scratch</Trans>}
-              value="new-object"
-              id="new-object-from-scratch-tab"
-            />
-          </Tabs>
-          {currentTab === 'asset-store' && <AssetStore project={project} />}
-          {currentTab === 'new-object' && (
-            <ScrollView>
-              {DismissableTutorialMessage && (
-                <Line>
-                  <Column expand>{DismissableTutorialMessage}</Column>
-                </Line>
-              )}
-              <List>
-                {Object.keys(objectsByCategory).map(category => {
-                  const categoryObjectMetadata = objectsByCategory[category];
-                  return (
-                    <React.Fragment key={category}>
-                      <Subheader>{category}</Subheader>
-                      {categoryObjectMetadata.map(objectMetadata => (
-                        <ObjectListItem
-                          key={objectMetadata.name}
-                          objectMetadata={objectMetadata}
-                          onClick={() => {
-                            sendNewObjectCreated(objectMetadata.name);
-                            onCreateNewObject(objectMetadata.name);
-                          }}
-                        />
-                      ))}
-                    </React.Fragment>
-                  );
-                })}
-              </List>
-            </ScrollView>
-          )}
-        </Column>
+        {currentTab === 'asset-store' && <AssetStore project={project} />}
+        {currentTab === 'new-object' && (
+          <ScrollView>
+            {DismissableTutorialMessage && (
+              <Line>
+                <Column expand>{DismissableTutorialMessage}</Column>
+              </Line>
+            )}
+            <List>
+              {Object.keys(objectsByCategory).map(category => {
+                const categoryObjectMetadata = objectsByCategory[category];
+                return (
+                  <React.Fragment key={category}>
+                    <Subheader>{category}</Subheader>
+                    {categoryObjectMetadata.map(objectMetadata => (
+                      <ObjectListItem
+                        key={objectMetadata.name}
+                        objectMetadata={objectMetadata}
+                        onClick={() => {
+                          sendNewObjectCreated(objectMetadata.name);
+                          onCreateNewObject(objectMetadata.name);
+                        }}
+                      />
+                    ))}
+                  </React.Fragment>
+                );
+              })}
+            </List>
+          </ScrollView>
+        )}
       </Dialog>
       {isAssetPackDialogInstallOpen && searchResults && openedAssetPack && (
         <AssetPackInstallDialog

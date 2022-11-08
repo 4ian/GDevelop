@@ -7,9 +7,10 @@ import CloudUpload from '@material-ui/icons/CloudUpload';
 import HelpButton from '../../UI/HelpButton';
 import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { ExtensionOptionsEditor } from './ExtensionOptionsEditor';
-import { Tab, Tabs } from '../../UI/Tabs';
+import { Tabs } from '../../UI/Tabs';
 import { ExtensionDependenciesEditor } from './ExtensionDependenciesEditor';
 import ExtensionExporterDialog from './ExtensionExporterDialog';
+import { Line } from '../../UI/Grid';
 
 type TabName = 'options' | 'dependencies';
 
@@ -35,6 +36,7 @@ export default function OptionsEditorDialog({
 
   return (
     <Dialog
+      title={<Trans>Edit extension options</Trans>}
       secondaryActions={[
         <HelpButton key="help" helpPagePath="/extensions/create" />,
         eventsFunctionsExtensionWriter ? (
@@ -60,27 +62,40 @@ export default function OptionsEditorDialog({
         />,
       ]}
       open={open}
-      noTitleMargin
-      title={
-        <Tabs value={currentTab} onChange={setCurrentTab}>
-          <Tab label={<Trans>Options</Trans>} value="options" />
-          <Tab label={<Trans>Dependencies</Trans>} value="dependencies" />
-        </Tabs>
+      fixedContent={
+        <Tabs
+          value={currentTab}
+          onChange={setCurrentTab}
+          options={[
+            {
+              value: 'options',
+              label: <Trans>Options</Trans>,
+            },
+            {
+              value: 'dependencies',
+              label: <Trans>Dependencies</Trans>,
+            },
+          ]}
+        />
       }
       cannotBeDismissed={isLoading}
       onRequestClose={isLoading ? () => {} : onClose}
     >
       {currentTab === 'options' && (
-        <ExtensionOptionsEditor
-          eventsFunctionsExtension={eventsFunctionsExtension}
-          onLoadChange={setIsLoading}
-          isLoading={isLoading}
-        />
+        <Line>
+          <ExtensionOptionsEditor
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            onLoadChange={setIsLoading}
+            isLoading={isLoading}
+          />
+        </Line>
       )}
       {currentTab === 'dependencies' && (
-        <ExtensionDependenciesEditor
-          eventsFunctionsExtension={eventsFunctionsExtension}
-        />
+        <Line>
+          <ExtensionDependenciesEditor
+            eventsFunctionsExtension={eventsFunctionsExtension}
+          />
+        </Line>
       )}
       {exportDialogOpen && (
         <ExtensionExporterDialog

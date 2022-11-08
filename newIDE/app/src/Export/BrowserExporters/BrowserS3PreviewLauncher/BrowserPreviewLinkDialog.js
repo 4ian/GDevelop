@@ -47,6 +47,7 @@ export default class BrowserPreviewLinkDialog extends Component<Props> {
       <I18n>
         {({ i18n }) => (
           <Dialog
+            title={<Trans>Preview</Trans>}
             actions={[
               <DialogPrimaryButton
                 key="launch-preview"
@@ -60,7 +61,7 @@ export default class BrowserPreviewLinkDialog extends Component<Props> {
             open
           >
             <Line>
-              <Column>
+              <Column noMargin>
                 <Text>
                   <Trans>
                     Your preview is ready! Click on the button to launch the
@@ -70,7 +71,7 @@ export default class BrowserPreviewLinkDialog extends Component<Props> {
               </Column>
             </Line>
             <Line>
-              <Column>
+              <Column noMargin>
                 <Text>
                   <Trans>
                     To skip this dialog and{' '}

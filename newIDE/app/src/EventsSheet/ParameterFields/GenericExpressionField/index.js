@@ -20,7 +20,6 @@ import BackgroundHighlighting, {
 } from './BackgroundHighlighting';
 import debounce from 'lodash/debounce';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import Paper from '@material-ui/core/Paper';
 import { TextFieldWithButtonLayout } from '../../../UI/Layout';
 import {
   type ExpressionAutocompletion,
@@ -42,6 +41,7 @@ import {
   shouldCloseOrCancel,
   shouldSubmit,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
+import Paper from '../../../UI/Paper';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -609,6 +609,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                               ? styles.expressionSelectorPopoverContentSmall
                               : styles.expressionSelectorPopoverContent
                           }
+                          background="light"
                         >
                           <ExpressionSelector
                             selectedType=""

@@ -16,7 +16,7 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import PreferencesContext from './PreferencesContext';
 import Text from '../../UI/Text';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
-import { Tabs, Tab } from '../../UI/Tabs';
+import { Tabs } from '../../UI/Tabs';
 import RaisedButton from '../../UI/RaisedButton';
 import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
 import LanguageSelector from './LanguageSelector';
@@ -44,7 +44,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setAutoDisplayChangelog,
     setEventsSheetShowObjectThumbnails,
     setAutosaveOnPreview,
-    setUseNewInstructionEditorDialog,
     setUseUndefinedVariablesInAutocompletion,
     setUseGDJSDevelopmentWatcher,
     setEventsSheetUseAssignmentOperators,
@@ -73,18 +72,21 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
       ]}
       onRequestClose={() => onClose(languageDidChange)}
       open
-      noTitleMargin
       maxWidth="sm"
-      noMargin
-      title={
-        <Tabs value={currentTab} onChange={setCurrentTab}>
-          <Tab label={<Trans>Preferences</Trans>} value="preferences" />
-          <Tab label={<Trans>Keyboard Shortcuts</Trans>} value="shortcuts" />
-        </Tabs>
+      title={<Trans>Preferences</Trans>}
+      fixedContent={
+        <Tabs
+          value={currentTab}
+          onChange={setCurrentTab}
+          options={[
+            { value: 'preferences', label: <Trans>Preferences</Trans> },
+            { value: 'shortcuts', label: <Trans>Keyboard Shortcuts</Trans> },
+          ]}
+        />
       }
     >
       {currentTab === 'preferences' && (
-        <ColumnStackLayout>
+        <ColumnStackLayout noMargin>
           <Text size="block-title">
             <Trans>Language</Trans>
           </Text>
@@ -241,12 +243,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             label={<Trans>Display assignment operators in Events Sheets</Trans>}
           />
           <Toggle
-            onToggle={(e, check) => setUseNewInstructionEditorDialog(check)}
-            toggled={values.useNewInstructionEditorDialog}
-            labelPosition="right"
-            label={<Trans>Use the new action/condition editor</Trans>}
-          />
-          <Toggle
             onToggle={(e, check) =>
               setUseUndefinedVariablesInAutocompletion(check)
             }
@@ -379,7 +375,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
       )}
       {currentTab === 'shortcuts' && (
         <Line expand>
-          <Column expand>
+          <Column expand noMargin>
             <ShortcutsList
               i18n={i18n}
               userShortcutMap={values.userShortcutMap}

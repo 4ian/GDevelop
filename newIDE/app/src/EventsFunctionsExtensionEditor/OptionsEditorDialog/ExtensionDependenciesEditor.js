@@ -10,7 +10,6 @@ import {
   TableHeader,
   TableHeaderColumn,
 } from '../../UI/Table';
-import Paper from '@material-ui/core/Paper';
 import RaisedButton from '../../UI/RaisedButton';
 import IconButton from '../../UI/IconButton';
 import Add from '@material-ui/icons/Add';
@@ -25,6 +24,11 @@ import newNameGenerator from '../../Utils/NewNameGenerator';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import BackgroundText from '../../UI/BackgroundText';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
+import Paper from '../../UI/Paper';
+
+const styles = {
+  paper: { minWidth: '100%' },
+};
 
 const checkNameExists = (
   name: string,
@@ -58,11 +62,11 @@ export const ExtensionDependenciesEditor = ({
   };
 
   return (
-    <Column>
+    <Column noMargin>
       <Line expand>
         <TableContainer
           component={({ children }) => (
-            <Paper elevation={4} style={{ minWidth: '100%' }}>
+            <Paper style={styles.paper} background="medium">
               {children}
             </Paper>
           )}

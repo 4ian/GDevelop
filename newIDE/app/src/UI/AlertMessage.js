@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import Paper from '@material-ui/core/Paper';
 import Info from '@material-ui/icons/Info';
 import Warning from '@material-ui/icons/Warning';
 import Error from '@material-ui/icons/Error';
@@ -10,6 +9,7 @@ import GDevelopThemeContext from './Theme/ThemeContext';
 import { ResponsiveLineStackLayout } from './Layout';
 import Close from '@material-ui/icons/Close';
 import IconButton from './IconButton';
+import Paper from './Paper';
 
 const styles = {
   icon: { width: 28, height: 28, marginRight: 10, marginLeft: 10 },
@@ -41,7 +41,7 @@ const AlertMessage = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (
-    <Paper variant="outlined" style={styles.paper}>
+    <Paper variant="outlined" style={styles.paper} background="dark">
       <Column expand>
         <Line expand>
           <ResponsiveLineStackLayout

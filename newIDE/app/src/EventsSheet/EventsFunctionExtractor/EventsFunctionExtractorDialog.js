@@ -6,7 +6,7 @@ import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import { enumerateEventsFunctionsExtensions } from '../../ProjectManager/EnumerateProjectItems';
-import { Line, Column, Spacer } from '../../UI/Grid';
+import { Line, Column } from '../../UI/Grid';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
@@ -24,7 +24,7 @@ import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import EventsFunctionParametersEditor from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/EventsFunctionParametersEditor';
 import EventsFunctionPropertiesEditor from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/EventsFunctionPropertiesEditor';
 import HelpButton from '../../UI/HelpButton';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -163,19 +163,18 @@ export default class EventsFunctionExtractorDialog extends React.Component<
         cannotBeDismissed
         onRequestClose={onClose}
         onApply={onApply}
-        noMargin
       >
-        <Column noMargin>
-          <Column>
-            <DismissableAlertMessage
-              identifier="function-extractor-explanation"
-              kind="info"
-            >
-              After creating a function, it will be usable in the events sheet.
-              Functions are grouped by extensions. Choose, or enter the name of
-              a new extension, and a function name, then configure the function
-              and its parameters.
-            </DismissableAlertMessage>
+        <ColumnStackLayout noMargin>
+          <DismissableAlertMessage
+            identifier="function-extractor-explanation"
+            kind="info"
+          >
+            After creating a function, it will be usable in the events sheet.
+            Functions are grouped by extensions. Choose, or enter the name of a
+            new extension, and a function name, then configure the function and
+            its parameters.
+          </DismissableAlertMessage>
+          <Column noMargin>
             <ResponsiveLineStackLayout noMargin expand>
               <SelectField
                 floatingLabelText={
@@ -298,7 +297,6 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             freezeEventsFunctionType
             getFunctionGroupNames={this._getFunctionGroupNames}
           />
-          <Spacer />
           <EventsFunctionParametersEditor
             project={project}
             eventsFunction={eventsFunction}
@@ -311,7 +309,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             }}
             freezeParameters
           />
-        </Column>
+        </ColumnStackLayout>
       </Dialog>
     );
   }

@@ -31,7 +31,7 @@ export default class EventsBasedObjectEditorDialog extends React.Component<
 
     return (
       <Dialog
-        noMargin
+        title={<Trans>Edit the object</Trans>}
         fullHeight
         flexColumnBody
         secondaryActions={[
@@ -51,7 +51,6 @@ export default class EventsBasedObjectEditorDialog extends React.Component<
         open
         onRequestClose={onApply}
         onApply={onApply}
-        title={<Trans>Edit the object</Trans>}
       >
         <EventsBasedObjectEditor
           project={project}

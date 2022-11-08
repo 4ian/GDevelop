@@ -24,9 +24,17 @@ import EditorMosaic, {
   type EditorMosaicNode,
 } from '../../../../UI/EditorMosaic';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import Background from '../../../../UI/Background';
 import ScrollView from '../../../../UI/ScrollView';
+import Paper from '../../../../UI/Paper';
 const gd: libGDevelop = global.gd;
+
+const styles = {
+  container: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+};
 
 const horizontalMosaicNodes: EditorMosaicNode = {
   direction: 'row',
@@ -188,7 +196,7 @@ const PointsEditor = ({
       type: 'primary',
       noTitleBar: true,
       renderEditor: () => (
-        <Background>
+        <Paper background="medium" style={styles.container}>
           <ImagePreview
             resourceName={resourceName}
             imageResourceSource={resourcesLoader.getResourceFullUrl(
@@ -214,14 +222,14 @@ const PointsEditor = ({
               )
             }
           />
-        </Background>
+        </Paper>
       ),
     },
     properties: {
       type: 'secondary',
       noTitleBar: true,
       renderEditor: () => (
-        <Background>
+        <Paper background="medium" style={styles.container}>
           <ScrollView>
             <Line>
               <Column expand>
@@ -263,7 +271,7 @@ const PointsEditor = ({
               </EmptyMessage>
             )}
           </ScrollView>
-        </Background>
+        </Paper>
       ),
     },
   };

@@ -18,7 +18,7 @@ const styles = {
     height: 3,
   },
   tabScrollButton: {
-    width: 25,
+    display: 'none',
   },
 };
 
@@ -50,7 +50,7 @@ type TabsProps<TabName> = {|
     id?: string,
     disabled?: boolean,
   |}>,
-  variant?: 'scrollable',
+  variant?: 'scrollable', // Allow overriding the scrollable variant for specific cases.
 |};
 
 /**
@@ -108,7 +108,7 @@ export function Tabs<TabName>({
             tabIndex={index}
             key={index}
             style={{
-              flex: 1, // Ensure the tab is taking all the space available.
+              flexGrow: 1, // Ensure the tab is taking space depending on its text length.
               ...(isTabSelected
                 ? styles.selectedTab
                 : isTabDistant

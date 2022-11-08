@@ -41,6 +41,7 @@ import {
   TRIVIAL_FIRST_EXTENSION,
 } from '../Utils/GDevelopServices/Badge';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
   disabledItem: { opacity: 0.6 },
@@ -99,6 +100,7 @@ export default function NewBehaviorDialog({
   objectType,
   objectBehaviorsTypes,
 }: Props) {
+  const windowWidth = useResponsiveWindowWidth();
   const [showDeprecated, setShowDeprecated] = React.useState(false);
   const [searchText, setSearchText] = React.useState('');
   const [currentTab, setCurrentTab] = React.useState<'installed' | 'search'>(
@@ -254,6 +256,8 @@ export default function NewBehaviorDialog({
                   value: 'search',
                 },
               ]}
+              // Enforce scroll on small screen, because the tabs have long names.
+              variant={windowWidth === 'small' ? 'scrollable' : undefined}
             />
           }
         >

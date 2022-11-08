@@ -21,6 +21,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
 import LanguageSelector from './LanguageSelector';
 import Link from '../../UI/Link';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -29,6 +30,7 @@ type Props = {|
 |};
 
 const PreferencesDialog = ({ i18n, onClose }: Props) => {
+  const windowWidth = useResponsiveWindowWidth();
   const [currentTab, setCurrentTab] = React.useState('preferences');
   const [languageDidChange, setLanguageDidChange] = React.useState<boolean>(
     false
@@ -82,6 +84,8 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             { value: 'preferences', label: <Trans>Preferences</Trans> },
             { value: 'shortcuts', label: <Trans>Keyboard Shortcuts</Trans> },
           ]}
+          // Enforce scroll on small screen, because the tabs have long names.
+          variant={windowWidth === 'small' ? 'scrollable' : undefined}
         />
       }
     >

@@ -27,7 +27,8 @@ export function getMuiOverrides({
   iconColor,
   outlinedButtonBorderColor,
   alternateCanvasBackgroundColor,
-}: {
+  alternateCanvasLightBackgroundColor,
+}: {|
   tabTextColor: string,
   tabSelectedTextColor: string,
   tabBackgroundColor: string,
@@ -38,7 +39,8 @@ export function getMuiOverrides({
   iconColor: string,
   outlinedButtonBorderColor: string,
   alternateCanvasBackgroundColor: string,
-}) {
+  alternateCanvasLightBackgroundColor: string,
+|}) {
   return {
     MuiTypography: {
       h1: {
@@ -273,7 +275,7 @@ export function getMuiOverrides({
     },
     MuiMenu: {
       paper: {
-        backgroundColor: alternateCanvasBackgroundColor,
+        backgroundColor: alternateCanvasLightBackgroundColor,
       },
     },
     MuiAutocomplete: {
@@ -513,6 +515,8 @@ export function createGdevelopTheme({
         outlinedButtonBorderColor: styles['ThemeTextDefaultColor'],
         alternateCanvasBackgroundColor:
           styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
+        alternateCanvasLightBackgroundColor:
+          styles['ThemeSurfaceAlternateCanvasLightBackgroundColor'],
       }),
     },
   };

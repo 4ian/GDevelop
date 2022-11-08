@@ -23,6 +23,7 @@ import {
   shouldValidate,
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { Tabs } from '../UI/Tabs';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 type Props = {|
   onSearchInEvents: SearchInEventsInputs => void,
@@ -54,6 +55,7 @@ const SearchPanel = (
   }: Props,
   ref
 ) => {
+  const windowWidth = useResponsiveWindowWidth();
   const searchTextField = React.useRef<?TextField>(null);
 
   const [searchText, setSearchText] = React.useState<string>('');
@@ -176,6 +178,8 @@ const SearchPanel = (
                   label: <Trans>Search in event sentences</Trans>,
                 },
               ]}
+              // Enforce scroll on small screen, because the tabs have long names.
+              variant={windowWidth === 'small' ? 'scrollable' : undefined}
             />
           </Column>
         </Line>

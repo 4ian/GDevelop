@@ -162,6 +162,7 @@ type DialogProps = {|
   // Size
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false,
   fullHeight?: boolean,
+  noMobileFullScreen?: boolean,
 
   id?: ?string,
 |};
@@ -188,6 +189,7 @@ const Dialog = ({
   fullHeight,
   id,
   cannotBeDismissed,
+  noMobileFullScreen,
 }: DialogProps) => {
   const preferences = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -285,7 +287,7 @@ const Dialog = ({
       open={open}
       onClose={onCloseDialog}
       fullWidth
-      fullScreen={size === 'small'}
+      fullScreen={size === 'small' && !noMobileFullScreen}
       className={classNames({
         'safe-area-aware-container': size === 'small',
       })}

@@ -40,6 +40,7 @@ import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuth
 import { isPrivateAsset } from '../Utils/GDevelopServices/Asset';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 const isDev = Window.isDev();
 
 const ObjectListItem = ({
@@ -101,6 +102,7 @@ export default function NewObjectDialog({
   canInstallPrivateAsset,
   i18n,
 }: Props) {
+  const windowWidth = useResponsiveWindowWidth();
   const {
     setNewObjectDialogDefaultTab,
     getNewObjectDialogDefaultTab,
@@ -346,6 +348,8 @@ export default function NewObjectDialog({
                 id: 'new-object-from-scratch-tab',
               },
             ]}
+            // Enforce scroll on small screen, because the tabs have long names.
+            variant={windowWidth === 'small' ? 'scrollable' : undefined}
           />
         }
       >

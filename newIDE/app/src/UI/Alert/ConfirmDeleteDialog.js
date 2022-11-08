@@ -56,6 +56,7 @@ function ConfirmDeleteDialog(props: Props) {
             />,
           ]}
           title={i18n._(props.title)}
+          noMobileFullScreen
         >
           <Text size="body">{i18n._(props.message)}</Text>
           <LargeSpacer />

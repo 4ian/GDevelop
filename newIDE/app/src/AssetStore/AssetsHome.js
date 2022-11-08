@@ -20,7 +20,8 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Paper from '../UI/Paper';
 
 const columns = 3;
-const columnsForSmallWindow = 2;
+const columnsForSmallWindow = 1;
+const columnsForMediumWindow = 2;
 const cellSpacing = 2;
 
 const styles = {
@@ -222,7 +223,13 @@ export const AssetsHome = ({
   return (
     <ScrollView>
       <GridList
-        cols={windowWidth === 'small' ? columnsForSmallWindow : columns}
+        cols={
+          windowWidth === 'small'
+            ? columnsForSmallWindow
+            : windowWidth === 'medium'
+            ? columnsForMediumWindow
+            : columns
+        }
         style={styles.grid}
         cellHeight="auto"
         spacing={cellSpacing}

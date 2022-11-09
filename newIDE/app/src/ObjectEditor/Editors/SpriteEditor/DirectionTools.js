@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
+import { I18n } from '@lingui/react';
 import Timer from '@material-ui/icons/Timer';
 import TextButton from '../../../UI/TextButton';
 import Checkbox from '../../../UI/Checkbox';
@@ -112,84 +113,94 @@ export default class DirectionTools extends Component<Props, State> {
       ({ kind }) => kind === 'image'
     );
 
+    const hasSprites = direction.getSpritesCount();
+
     return (
-      <div style={styles.container}>
-        <ResponsiveWindowMeasurer>
-          {windowWidth =>
-            windowWidth !== 'small' &&
-            !!imageResourceExternalEditors.length && (
-              <TextButton
-                label={imageResourceExternalEditors[0].displayName}
-                icon={<Brush />}
-                onClick={() => onEditWith(imageResourceExternalEditors[0])}
-              />
-            )
-          }
-        </ResponsiveWindowMeasurer>
-        <TextButton
-          label={<Trans>Preview</Trans>}
-          icon={<PlayArrow />}
-          onClick={() => this.openPreview(true)}
-        />
-        <Timer style={styles.timeIcon} />
-        <TextField
-          value={this.state.timeBetweenFrames}
-          onChange={(e, text) =>
-            this.setState({ timeBetweenFrames: parseFloat(text) || 0 })
-          }
-          onBlur={() => this.saveTimeBetweenFrames()}
-          id="direction-time-between-frames"
-          margin="none"
-          style={styles.timeField}
-          type="number"
-          step={0.005}
-          precision={2}
-          min={0.01}
-          max={5}
-        />
-        <span style={styles.spacer} />
-        <Checkbox
-          checked={direction.isLooping()}
-          label={<Trans>Loop</Trans>}
-          onCheck={(e, check) => this.setLooping(check)}
-        />
-        {this.state.previewOpen && (
-          <Dialog
-            actions={[
-              <DialogPrimaryButton
-                label={<Trans>Ok</Trans>}
-                primary
-                onClick={() => this.openPreview(false)}
-                key="ok"
-              />,
-            ]}
-            noMargin
-            onRequestClose={() => this.openPreview(false)}
-            onApply={() => this.openPreview(false)}
-            open={this.state.previewOpen}
-            fullHeight
-            flexBody
-          >
-            <AnimationPreview
-              animationName={this.props.animationName}
-              resourceNames={direction.getSpriteNames().toJSArray()}
-              getImageResourceSource={(name: string) =>
-                resourcesLoader.getResourceFullUrl(project, name, {})
+      <I18n>
+        {({ i18n }) => (
+          <div style={styles.container}>
+            <ResponsiveWindowMeasurer>
+              {windowWidth =>
+                windowWidth !== 'small' &&
+                !!imageResourceExternalEditors.length && (
+                  <TextButton
+                    label={i18n._(
+                      hasSprites
+                        ? imageResourceExternalEditors[0].editDisplayName
+                        : imageResourceExternalEditors[0].createDisplayName
+                    )}
+                    icon={<Brush />}
+                    onClick={() => onEditWith(imageResourceExternalEditors[0])}
+                  />
+                )
               }
-              isImageResourceSmooth={(name: string) =>
-                isProjectImageResourceSmooth(project, name)
-              }
-              project={project}
-              timeBetweenFrames={this.state.timeBetweenFrames}
-              onChangeTimeBetweenFrames={text =>
-                this.setState({ timeBetweenFrames: text })
-              }
-              isLooping={direction.isLooping()}
-              hideAnimationLoader // No need to show a loader in the Direction Tools.
+            </ResponsiveWindowMeasurer>
+            <TextButton
+              label={<Trans>Preview</Trans>}
+              icon={<PlayArrow />}
+              onClick={() => this.openPreview(true)}
             />
-          </Dialog>
+            <Timer style={styles.timeIcon} />
+            <TextField
+              value={this.state.timeBetweenFrames}
+              onChange={(e, text) =>
+                this.setState({ timeBetweenFrames: parseFloat(text) || 0 })
+              }
+              onBlur={() => this.saveTimeBetweenFrames()}
+              id="direction-time-between-frames"
+              margin="none"
+              style={styles.timeField}
+              type="number"
+              step={0.005}
+              precision={2}
+              min={0.01}
+              max={5}
+            />
+            <span style={styles.spacer} />
+            <Checkbox
+              checked={direction.isLooping()}
+              label={<Trans>Loop</Trans>}
+              onCheck={(e, check) => this.setLooping(check)}
+            />
+            {this.state.previewOpen && (
+              <Dialog
+                actions={[
+                  <DialogPrimaryButton
+                    label={<Trans>Ok</Trans>}
+                    primary
+                    onClick={() => this.openPreview(false)}
+                    key="ok"
+                  />,
+                ]}
+                noMargin
+                onRequestClose={() => this.openPreview(false)}
+                onApply={() => this.openPreview(false)}
+                open={this.state.previewOpen}
+                fullHeight
+                flexBody
+              >
+                <AnimationPreview
+                  animationName={this.props.animationName}
+                  resourceNames={direction.getSpriteNames().toJSArray()}
+                  getImageResourceSource={(name: string) =>
+                    resourcesLoader.getResourceFullUrl(project, name, {})
+                  }
+                  isImageResourceSmooth={(name: string) =>
+                    isProjectImageResourceSmooth(project, name)
+                  }
+                  project={project}
+                  timeBetweenFrames={this.state.timeBetweenFrames}
+                  onChangeTimeBetweenFrames={text =>
+                    this.setState({ timeBetweenFrames: text })
+                  }
+                  isLooping={direction.isLooping()}
+                  hideAnimationLoader // No need to show a loader in the Direction Tools.
+                />
+              </Dialog>
+            )}
+          </div>
         )}
-      </div>
+      </I18n>
     );
   }
 }

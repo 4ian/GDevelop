@@ -21,9 +21,6 @@ import HelpFinder from '../HelpFinder';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalFilePicker from '../UI/LocalFilePicker';
 import LocalNetworkPreviewDialog from '../Export/LocalExporters/LocalPreviewLauncher/LocalNetworkPreviewDialog';
-import ImageThumbnail from '../ResourcesList/ResourceThumbnail/ImageThumbnail';
-import ResourceSelector from '../ResourcesList/ResourceSelector';
-import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
 import ExternalEventsAutoComplete from '../EventsSheet/EventsTree/Renderers/LinkEvent/ExternalEventsAutoComplete';
 import LayerField from '../EventsSheet/ParameterFields/LayerField';
 import MouseField from '../EventsSheet/ParameterFields/MouseField';
@@ -44,15 +41,12 @@ import paperDecorator from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
 import RefGetter from './RefGetter';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
-import ResourcesLoader from '../ResourcesLoader';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/ParameterRenderingService';
 import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
 import CreateProfile from '../Profile/CreateProfile';
 import AuthenticatedUserProfileDetails from '../Profile/AuthenticatedUserProfileDetails';
 import CurrentUsageDisplayer from '../Profile/CurrentUsageDisplayer';
-import ResourcePreview from '../ResourcesList/ResourcePreview';
-import ResourcesList from '../ResourcesList';
 import {
   subscriptionForIndieUser,
   limitsForIndieUser,
@@ -2581,26 +2575,6 @@ storiesOf('NewInstructionEditorMenu', module)
       </PopoverButton>
     </Column>
   ));
-
-storiesOf('ImageThumbnail', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <ImageThumbnail
-      project={testProject.project}
-      resourceName="res/icon128.png"
-      resourcesLoader={ResourcesLoader}
-    />
-  ))
-  .add('selectable', () => (
-    <ImageThumbnail
-      selectable
-      project={testProject.project}
-      resourceName="res/icon128.png"
-      resourcesLoader={ResourcesLoader}
-    />
-  ));
-
 storiesOf('ObjectSelector', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
@@ -2941,143 +2915,6 @@ storiesOf('SubscriptionCheckDialog', module)
         mode="mandatory"
       />
     </RefGetter>
-  ));
-
-storiesOf('ResourcePreview', module)
-  .addDecorator(muiDecorator)
-  .add('not existing/missing resource', () => (
-    <ResourcePreview
-      project={testProject.project}
-      resourceName="resource-that-does-not-exists-in-the-project"
-      resourcesLoader={ResourcesLoader}
-    />
-  ))
-  .add('image resource', () => (
-    <ResourcePreview
-      project={testProject.project}
-      resourceName="icon128.png"
-      resourcesLoader={ResourcesLoader}
-    />
-  ))
-  .add('audio resource', () => (
-    <ResourcePreview
-      project={testProject.project}
-      resourceName="fake-audio1.mp3"
-      resourcesLoader={ResourcesLoader}
-    />
-  ));
-
-storiesOf('ResourceSelector (and ResourceSelectorWithThumbnail)', module)
-  .addDecorator(muiDecorator)
-  .add('image resource (not existing/missing resource)', () => (
-    <ResourceSelector
-      resourceKind="image"
-      project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      initialResourceName="resource-that-does-not-exists-in-the-project"
-      onChange={action('on change')}
-      resourcesLoader={ResourcesLoader}
-    />
-  ))
-  .add('image resource', () => (
-    <ResourceSelector
-      resourceKind="image"
-      project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      initialResourceName="icon128.png"
-      onChange={action('on change')}
-      resourcesLoader={ResourcesLoader}
-    />
-  ))
-  .add('image resource, no margin', () => (
-    <ResourceSelector
-      margin="none"
-      resourceKind="image"
-      project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      initialResourceName="icon128.png"
-      onChange={action('on change')}
-      resourcesLoader={ResourcesLoader}
-    />
-  ))
-  .add('image resource, with thumbnail', () => (
-    <ResourceSelectorWithThumbnail
-      resourceKind="image"
-      project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      resourceName="icon128.png"
-      onChange={action('on change')}
-    />
-  ))
-  .add('audio resource', () => (
-    <ResourceSelector
-      resourceKind="audio"
-      project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      initialResourceName="fake-audio1.mp3"
-      onChange={action('on change')}
-      resourcesLoader={ResourcesLoader}
-    />
-  ))
-  .add('font resource, with reset button', () => (
-    <ResourceSelector
-      canBeReset
-      resourceKind="font"
-      project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      initialResourceName="font.otf"
-      onChange={action('on change')}
-      resourcesLoader={ResourcesLoader}
-    />
-  ))
-  .add('font resource, no margin, with reset button', () => (
-    <ResourceSelector
-      canBeReset
-      margin="none"
-      resourceKind="font"
-      project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('Unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      initialResourceName="font.otf"
-      onChange={action('on change')}
-      resourcesLoader={ResourcesLoader}
-    />
-  ));
-
-storiesOf('ResourcesList', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <DragAndDropContextProvider>
-      <div style={{ height: 200 }}>
-        <ValueStateHolder
-          initialValue={null}
-          render={(value, onChange) => (
-            <ResourcesList
-              onSelectResource={onChange}
-              selectedResource={value}
-              onDeleteResource={() => {}}
-              onRenameResource={() => {}}
-              project={testProject.project}
-              onRemoveUnusedResources={() => {}}
-              onRemoveAllResourcesWithInvalidPath={() => {}}
-            />
-          )}
-        />
-      </div>
-    </DragAndDropContextProvider>
   ));
 
 storiesOf('ProjectManager', module)

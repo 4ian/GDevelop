@@ -18,7 +18,7 @@ import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEd
 import ResourcesLoader from '../ResourcesLoader';
 import { applyResourceDefaults } from './ResourceUtils';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
+import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import IconButton from '../UI/IconButton';
 import RaisedButton from '../UI/RaisedButton';
@@ -329,15 +329,14 @@ export default class ResourceSelector extends React.Component<Props, State> {
               />
             )}
             {externalEditors.length > 1 ? (
-              <RaisedButtonWithMenu
+              <RaisedButtonWithSplitMenu
                 icon={<Brush fontSize="small" />}
-                label={
-                  this.state.resourceName ? (
-                    <Trans>Edit with...</Trans>
-                  ) : (
-                    <Trans>Create with...</Trans>
-                  )
-                }
+                label={i18n._(
+                  this.state.resourceName
+                    ? externalEditors[0].editDisplayName
+                    : externalEditors[0].createDisplayName
+                )}
+                onClick={() => this._editWith(externalEditors[0])}
                 buildMenuTemplate={(i18n: I18nType) =>
                   externalEditors.map(externalEditor => ({
                     label: i18n._(

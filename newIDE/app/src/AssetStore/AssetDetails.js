@@ -19,13 +19,11 @@ import { ResponsiveLineStackLayout } from '../UI/Layout';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { AssetStoreContext } from './AssetStoreContext';
 import Window from '../Utils/Window';
-import Paper from '@material-ui/core/Paper';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import IconButton from '../UI/IconButton';
 import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
-import ThemeContext from '../UI/Theme/ThemeContext';
 import AnimationPreview from '../ObjectEditor/Editors/SpriteEditor/AnimationPreview';
 import ScrollView from '../UI/ScrollView';
 import { AssetCard } from './AssetCard';
@@ -36,6 +34,7 @@ import Link from '../UI/Link';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import AuthorizedAssetImage from './PrivateAssets/AuthorizedAssetImage';
 import { MarkdownText } from '../UI/MarkdownText';
+import Paper from '../UI/Paper';
 
 const FIXED_HEIGHT = 250;
 const FIXED_WIDTH = 300;
@@ -103,7 +102,6 @@ export const AssetDetails = ({
   assetShortHeader,
   onOpenDetails,
 }: Props) => {
-  const gdevelopTheme = React.useContext(ThemeContext);
   const {
     authors,
     licenses,
@@ -319,13 +317,7 @@ export const AssetDetails = ({
             {assetAnimations &&
               assetAnimations.length > 1 &&
               typeof selectedAnimationName === 'string' && (
-                <Paper
-                  elevation={4}
-                  variant="outlined"
-                  style={{
-                    backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
-                  }}
-                >
+                <Paper elevation={4} variant="outlined" background="dark">
                   <Line justifyContent="center" alignItems="center" noMargin>
                     <div style={styles.arrowContainer}>
                       <IconButton

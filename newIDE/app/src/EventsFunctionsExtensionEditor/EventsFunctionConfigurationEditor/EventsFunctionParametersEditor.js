@@ -244,7 +244,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
       isExtensionLifecycleEventsFunction(eventsFunction.getName());
     if (isAnExtensionLifecycleEventsFunction) {
       return (
-        <Column>
+        <Column noMargin>
           <DismissableAlertMessage
             kind="info"
             identifier="lifecycle-events-function-included-only-if-extension-used"
@@ -328,7 +328,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                   parameters,
                   (parameter: gdParameterMetadata, i: number) => (
                     <React.Fragment key={i}>
-                      <MiniToolbar>
+                      <MiniToolbar noPadding>
                         <MiniToolbarText firstChild>
                           <Trans>Parameter #{i + parametersIndexOffset}:</Trans>
                         </MiniToolbarText>
@@ -400,7 +400,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                         />
                       </MiniToolbar>
                       <Line>
-                        <ColumnStackLayout expand>
+                        <ColumnStackLayout expand noMargin>
                           <ValueTypeEditor
                             project={project}
                             valueTypeMetadata={parameter.getValueTypeMetadata()}

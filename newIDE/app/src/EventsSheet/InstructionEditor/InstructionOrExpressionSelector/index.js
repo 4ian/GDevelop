@@ -15,7 +15,6 @@ import {
   type TreeNode,
   findInTree,
 } from '../../../InstructionOrExpression/CreateTree';
-import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
 import { renderInstructionOrExpressionListItem } from '../SelectorListItems/SelectorInstructionOrExpressionListItem';
 import { renderInstructionOrExpressionTree } from '../SelectorListItems/SelectorInstructionsTreeListItem';
 import EmptyMessage from '../../../UI/EmptyMessage';
@@ -134,106 +133,98 @@ export default class InstructionOrExpressionSelector<
     };
 
     return (
-      <ThemeConsumer>
-        {muiTheme => (
-          <div
-            style={{
-              backgroundColor: muiTheme.list.itemsBackgroundColor,
-              ...style,
-            }}
-            id={id}
-          >
-            <SearchBar
-              value={searchText}
-              onChange={searchText =>
-                this.setState({
-                  searchText,
-                })
-              }
-              onRequestSearch={onSubmitSearch}
-              aspect="integrated-search-bar"
-              placeholder={
-                searchPlaceholderObjectName
-                  ? searchPlaceholderIsCondition
-                    ? t`Search ${searchPlaceholderObjectName} conditions`
-                    : t`Search ${searchPlaceholderObjectName} actions`
-                  : undefined
-              }
-              helpPagePath={helpPagePath}
-              ref={searchBar => (this._searchBar = searchBar)}
-            />
-            <ScrollView
-              ref={
-                // $FlowFixMe - improper typing of ScrollView?
-                this._scrollView
-              }
-            >
-              {hasResults && (
-                <List>
-                  {searchText ? (
-                    displayedInstructionsList.map(
-                      ({
-                        item: enumeratedInstructionOrExpressionMetadata,
-                        matches,
-                      }) =>
-                        renderInstructionOrExpressionListItem({
-                          instructionOrExpressionMetadata: enumeratedInstructionOrExpressionMetadata,
-                          iconSize: iconSize,
-                          onClick: () =>
-                            onChoose(
-                              enumeratedInstructionOrExpressionMetadata.type,
-                              enumeratedInstructionOrExpressionMetadata
-                            ),
-                          matches,
-                          selectedValue: getInstructionListItemValue(
-                            selectedType
-                          ),
-                        })
-                    )
-                  ) : (
-                    <>
-                      {renderInstructionOrExpressionTree({
-                        instructionTreeNode: instructionsInfoTree,
-                        iconSize,
-                        onChoose,
-                        useSubheaders,
-                        selectedValue: getInstructionListItemValue(
-                          selectedType
+      <div
+        style={{
+          // Important for the component to not take the full height in a dialog,
+          // allowing to let the scrollview do its job.
+          minHeight: 0,
+          ...style,
+        }}
+        id={id}
+      >
+        <SearchBar
+          value={searchText}
+          onChange={searchText =>
+            this.setState({
+              searchText,
+            })
+          }
+          onRequestSearch={onSubmitSearch}
+          placeholder={
+            searchPlaceholderObjectName
+              ? searchPlaceholderIsCondition
+                ? t`Search ${searchPlaceholderObjectName} conditions`
+                : t`Search ${searchPlaceholderObjectName} actions`
+              : undefined
+          }
+          helpPagePath={helpPagePath}
+          ref={searchBar => (this._searchBar = searchBar)}
+        />
+        <ScrollView
+          autoHideScrollbar
+          ref={
+            // $FlowFixMe - improper typing of ScrollView?
+            this._scrollView
+          }
+        >
+          {hasResults && (
+            <List>
+              {searchText ? (
+                displayedInstructionsList.map(
+                  ({
+                    item: enumeratedInstructionOrExpressionMetadata,
+                    matches,
+                  }) =>
+                    renderInstructionOrExpressionListItem({
+                      instructionOrExpressionMetadata: enumeratedInstructionOrExpressionMetadata,
+                      iconSize: iconSize,
+                      onClick: () =>
+                        onChoose(
+                          enumeratedInstructionOrExpressionMetadata.type,
+                          enumeratedInstructionOrExpressionMetadata
                         ),
-                        initiallyOpenedPath: this.initialInstructionTypePath,
-                        selectedItemRef: this._selectedItem,
-                        getGroupIconSrc,
-                      })}
-                      {onClickMore && (
-                        <ResponsiveLineStackLayout justifyContent="center">
-                          <RaisedButton
-                            primary
-                            icon={<Add />}
-                            onClick={onClickMore}
-                            label={
-                              <Trans>Add a new behavior to the object</Trans>
-                            }
-                          />
-                        </ResponsiveLineStackLayout>
-                      )}
-                    </>
+                      matches,
+                      selectedValue: getInstructionListItemValue(selectedType),
+                    })
+                )
+              ) : (
+                <>
+                  {renderInstructionOrExpressionTree({
+                    instructionTreeNode: instructionsInfoTree,
+                    iconSize,
+                    onChoose,
+                    useSubheaders,
+                    selectedValue: getInstructionListItemValue(selectedType),
+                    initiallyOpenedPath: this.initialInstructionTypePath,
+                    selectedItemRef: this._selectedItem,
+                    getGroupIconSrc,
+                  })}
+                  {onClickMore && (
+                    <ResponsiveLineStackLayout justifyContent="center">
+                      <RaisedButton
+                        primary
+                        icon={<Add />}
+                        onClick={onClickMore}
+                        label={<Trans>Add a new behavior to the object</Trans>}
+                      />
+                    </ResponsiveLineStackLayout>
                   )}
-                </List>
+                </>
               )}
-              {!hasResults && (
-                <Line>
-                  <EmptyMessage>
-                    <Trans>
-                      Nothing corresponding to your search. Try browsing the
-                      list instead.
-                    </Trans>
-                  </EmptyMessage>
-                </Line>
-              )}
-            </ScrollView>
-          </div>
-        )}
-      </ThemeConsumer>
+            </List>
+          )}
+          {!hasResults && (
+            <Line>
+              <EmptyMessage>
+                <Trans>
+                  Nothing corresponding to your search. Try browsing the list
+                  instead.
+                </Trans>
+              </EmptyMessage>
+            </Line>
+          )}
+        </ScrollView>
+      </div>
     );
   }
 }

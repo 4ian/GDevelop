@@ -55,6 +55,7 @@ const ObjectExporterDialog = (props: Props) => {
 
   return (
     <Dialog
+      title={<Trans>Export object</Trans>}
       secondaryActions={[
         <HelpButton
           key="help"

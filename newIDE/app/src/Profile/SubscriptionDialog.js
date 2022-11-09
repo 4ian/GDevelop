@@ -325,7 +325,7 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
                 <Text>
                   <Trans>
                     Create a GDevelop account to continue. It's free and you'll
-                    be able to access to online services like one-click builds:
+                    get access to online services like one-click builds
                   </Trans>
                 </Text>
                 <LineStackLayout justifyContent="center">

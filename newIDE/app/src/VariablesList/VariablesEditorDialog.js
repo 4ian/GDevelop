@@ -54,7 +54,6 @@ const VariablesEditorDialog = ({
 
   return (
     <Dialog
-      noMargin
       actions={[
         <FlatButton
           label={<Trans>Cancel</Trans>}

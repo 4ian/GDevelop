@@ -324,7 +324,6 @@ export const ExtensionOptionsEditor = ({
                 />,
               ]}
               open
-              noMargin
               onRequestClose={() => {
                 setResourceStoreOpen(false);
               }}

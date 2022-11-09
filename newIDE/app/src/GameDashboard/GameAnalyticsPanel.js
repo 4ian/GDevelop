@@ -35,7 +35,7 @@ import {
   daysShownForYear,
   durationValues,
 } from './GameAnalyticsEvaluator';
-import Paper from '@material-ui/core/Paper';
+import Paper from '../UI/Paper';
 
 const chartMargins = {
   top: 5,
@@ -70,7 +70,7 @@ const CustomTooltip = ({
   customStyle: Object,
 |}) =>
   payload ? (
-    <Paper style={customStyle}>
+    <Paper style={customStyle} background="light">
       <ColumnStackLayout>
         <Text size="sub-title" noMargin>
           {label}
@@ -157,7 +157,6 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
       width: 100,
     },
     tooltipContent: {
-      backgroundColor: gdevelopTheme.chart.tooltipBackgroundColor,
       color: gdevelopTheme.chart.textColor,
       padding: 10,
     },

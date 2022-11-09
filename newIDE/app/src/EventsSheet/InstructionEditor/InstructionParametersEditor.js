@@ -197,21 +197,7 @@ const InstructionParametersEditor = React.forwardRef<
     };
 
     const renderEmpty = () => {
-      return (
-        <div style={{ ...styles.emptyContainer, ...style }}>
-          <EmptyMessage>
-            {isCondition ? (
-              <Trans>
-                Choose a condition (or an object then a condition) on the left
-              </Trans>
-            ) : (
-              <Trans>
-                Choose an action (or an object then an action) on the left
-              </Trans>
-            )}
-          </EmptyMessage>
-        </div>
-      );
+      return <div style={{ ...styles.emptyContainer, ...style }} />;
     };
 
     React.useEffect(

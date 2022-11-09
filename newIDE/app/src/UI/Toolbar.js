@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import ThemeConsumer from './Theme/ThemeConsumer';
+import GDevelopThemeContext from './Theme/ThemeContext';
 
 type ToolbarProps = {|
   children: React.Node,
@@ -13,25 +13,24 @@ type ToolbarGroupProps = {|
 |};
 
 export const Toolbar = React.memo<ToolbarProps>(
-  ({ children }: ToolbarProps) => (
-    <ThemeConsumer>
-      {muiTheme => (
-        <div
-          className="almost-invisible-scrollbar"
-          style={{
-            backgroundColor: muiTheme.toolbar.backgroundColor,
-            padding: 3,
-            flexShrink: 0,
-            display: 'flex',
-            overflowX: 'auto',
-            overflowY: 'hidden',
-          }}
-        >
-          {children}
-        </div>
-      )}
-    </ThemeConsumer>
-  )
+  ({ children }: ToolbarProps) => {
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
+    return (
+      <div
+        className="almost-invisible-scrollbar"
+        style={{
+          backgroundColor: gdevelopTheme.toolbar.backgroundColor,
+          padding: 3,
+          flexShrink: 0,
+          display: 'flex',
+          overflowX: 'auto',
+          overflowY: 'hidden',
+        }}
+      >
+        {children}
+      </div>
+    );
+  }
 );
 
 const toolbarGroupStyle = props => ({

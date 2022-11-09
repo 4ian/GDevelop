@@ -18,7 +18,10 @@ import {
   type PublicAssetPack,
 } from '../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
-import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
+import {
+  BoxSearchResults,
+  type BoxSearchResultsInterface,
+} from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
 import {
   AssetStoreFilterPanel,
@@ -29,7 +32,7 @@ import { AssetCard } from './AssetCard';
 import { NoResultPlaceholder } from './NoResultPlaceholder';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import Subheader from '../UI/Subheader';
-import { AssetsHome } from './AssetsHome';
+import { AssetsHome, type AssetsHomeInterface } from './AssetsHome';
 import TextButton from '../UI/TextButton';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
@@ -67,6 +70,9 @@ export const AssetStore = ({ project }: Props) => {
     filtersState,
   } = navigationState.getCurrentPage();
   const searchBar = React.useRef<?SearchBarInterface>(null);
+  const assetsHome = React.useRef<?AssetsHomeInterface>(null);
+  const boxSearchResults = React.useRef<?BoxSearchResultsInterface>(null);
+  const scrollView = assetsHome.current || boxSearchResults.current;
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
   const [
@@ -79,15 +85,37 @@ export const AssetStore = ({ project }: Props) => {
   ] = React.useState<?PrivateAssetPackListingData>(null);
   const { onPurchaseSuccessful } = React.useContext(AuthenticatedUserContext);
 
+  const scrollPosition = navigationState.getCurrentPage().scrollPosition;
+  if (
+    scrollPosition &&
+    scrollView &&
+    // Make sure the ref is not from the previous view.
+    ((assetsHome.current && isOnHomePage) ||
+      (boxSearchResults.current && !isOnHomePage && !openedAssetShortHeader))
+  ) {
+    scrollView.scrollToPosition(scrollPosition);
+    navigationState.getCurrentPage().scrollPosition = null;
+  }
+
+  const saveScrollPosition = React.useCallback(
+    () => {
+      if (scrollView) {
+        navigationState.getCurrentPage().scrollPosition = scrollView.getScrollPosition();
+      }
+    },
+    [navigationState, scrollView]
+  );
+
   const onOpenDetails = React.useCallback(
     (assetShortHeader: AssetShortHeader) => {
       sendAssetOpened({
         id: assetShortHeader.id,
         name: assetShortHeader.name,
       });
+      saveScrollPosition();
       navigationState.openDetailPage(assetShortHeader);
     },
-    [navigationState]
+    [navigationState, saveScrollPosition]
   );
 
   // When a pack is selected from the home page,
@@ -99,11 +127,12 @@ export const AssetStore = ({ project }: Props) => {
       if (assetPack.externalWebLink) {
         Window.openExternalURL(assetPack.externalWebLink);
       } else {
+        saveScrollPosition();
         navigationState.openPackPage(assetPack);
         setIsFiltersPanelOpen(true);
       }
     },
-    [navigationState]
+    [navigationState, saveScrollPosition]
   );
 
   // When a private pack is selected from the home page,
@@ -126,10 +155,11 @@ export const AssetStore = ({ project }: Props) => {
       }
 
       // The user has received the pack, open it.
+      saveScrollPosition();
       navigationState.openPackPage(receivedAssetPack);
       setIsFiltersPanelOpen(true);
     },
-    [navigationState, loadedReceivedAssetPackInStore]
+    [loadedReceivedAssetPackInStore, saveScrollPosition, navigationState]
   );
 
   // If the user has received the pack they are currently viewing,
@@ -151,6 +181,7 @@ export const AssetStore = ({ project }: Props) => {
         if (receivedAssetPack) {
           // The user has received the pack, close the pack information dialog, and open the pack in the search.
           setIsFiltersPanelOpen(true);
+          saveScrollPosition();
           navigationState.openPackPage(receivedAssetPack);
           setSelectedPrivateAssetPackListingData(null);
         }
@@ -160,6 +191,7 @@ export const AssetStore = ({ project }: Props) => {
       loadedReceivedAssetPackInStore,
       purchasingPrivateAssetPackListingData,
       navigationState,
+      saveScrollPosition,
     ]
   );
 
@@ -175,20 +207,24 @@ export const AssetStore = ({ project }: Props) => {
         publicAssetPacks &&
         publicAssetPacks.starterPacks.find(pack => pack.tag === tag);
       if (privateAssetPack) {
+        saveScrollPosition();
         navigationState.openPackPage(privateAssetPack);
       } else if (publicAssetPack) {
+        saveScrollPosition();
         navigationState.openPackPage(publicAssetPack);
       } else {
+        saveScrollPosition();
         navigationState.openTagPage(tag);
       }
       clearAllFilters(assetFiltersState);
       setIsFiltersPanelOpen(true);
     },
     [
-      publicAssetPacks,
       loadedReceivedAssetPackInStore,
-      navigationState,
+      publicAssetPacks,
       assetFiltersState,
+      saveScrollPosition,
+      navigationState,
     ]
   );
 
@@ -356,6 +392,7 @@ export const AssetStore = ({ project }: Props) => {
                   privateAssetPacks &&
                   assetPackRandomOrdering && (
                     <AssetsHome
+                      ref={assetsHome}
                       publicAssetPacks={publicAssetPacks}
                       privateAssetPacksListingData={privateAssetPacks}
                       assetPackRandomOrdering={assetPackRandomOrdering}
@@ -365,6 +402,7 @@ export const AssetStore = ({ project }: Props) => {
                   )}
                 {!isOnHomePage && !openedAssetShortHeader && (
                   <BoxSearchResults
+                    ref={boxSearchResults}
                     baseSize={128}
                     onRetry={fetchAssetsAndFilters}
                     error={error}

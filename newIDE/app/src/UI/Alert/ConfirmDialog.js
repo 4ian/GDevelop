@@ -39,6 +39,7 @@ function ConfirmDialog(props: Props) {
           ]}
           maxWidth="xs"
           title={i18n._(props.title)}
+          noMobileFullScreen
         >
           <Text>{i18n._(props.message)}</Text>
         </Dialog>

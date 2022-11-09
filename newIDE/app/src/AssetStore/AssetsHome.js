@@ -4,7 +4,6 @@ import { Trans } from '@lingui/macro';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridList from '@material-ui/core/GridList';
-import Paper from '@material-ui/core/Paper';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import Text from '../UI/Text';
 import PriceTag from '../UI/PriceTag';
@@ -17,11 +16,12 @@ import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { Line, Column } from '../UI/Grid';
 import ScrollView from '../UI/ScrollView';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import ThemeContext from '../UI/Theme/ThemeContext';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import Paper from '../UI/Paper';
 
 const columns = 3;
-const columnsForSmallWindow = 2;
+const columnsForSmallWindow = 1;
+const columnsForMediumWindow = 2;
 const cellSpacing = 2;
 
 const styles = {
@@ -78,8 +78,6 @@ const PublicAssetPackTile = ({
   style?: any,
 |}) => {
   const classesForGridListItem = useStylesForGridListItem();
-  const gdevelopTheme = React.useContext(ThemeContext);
-
   return (
     <GridListTile
       classes={classesForGridListItem}
@@ -93,13 +91,7 @@ const PublicAssetPackTile = ({
       style={style}
       onClick={onSelect}
     >
-      <Paper
-        elevation={2}
-        style={{
-          ...styles.paper,
-          backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
-        }}
-      >
+      <Paper elevation={2} style={styles.paper} background="light">
         <CorsAwareImage
           key={assetPack.name}
           style={styles.previewImage}
@@ -137,7 +129,6 @@ const PrivateAssetPackTile = ({
   owned: boolean,
 |}) => {
   const classesForGridListItem = useStylesForGridListItem();
-  const gdevelopTheme = React.useContext(ThemeContext);
   return (
     <GridListTile
       classes={classesForGridListItem}
@@ -151,13 +142,7 @@ const PrivateAssetPackTile = ({
       style={style}
       onClick={onSelect}
     >
-      <Paper
-        elevation={2}
-        style={{
-          ...styles.paper,
-          backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
-        }}
-      >
+      <Paper elevation={2} style={styles.paper} background="light">
         <CorsAwareImage
           key={assetPackListingData.name}
           style={styles.previewImage}
@@ -238,7 +223,13 @@ export const AssetsHome = ({
   return (
     <ScrollView>
       <GridList
-        cols={windowWidth === 'small' ? columnsForSmallWindow : columns}
+        cols={
+          windowWidth === 'small'
+            ? columnsForSmallWindow
+            : windowWidth === 'medium'
+            ? columnsForMediumWindow
+            : columns
+        }
         style={styles.grid}
         cellHeight="auto"
         spacing={cellSpacing}

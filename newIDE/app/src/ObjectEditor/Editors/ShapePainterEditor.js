@@ -24,7 +24,7 @@ export default class PanelSpriteEditor extends React.Component<
     );
 
     return (
-      <ColumnStackLayout>
+      <ColumnStackLayout noMargin>
         <Checkbox
           label={
             <Trans>

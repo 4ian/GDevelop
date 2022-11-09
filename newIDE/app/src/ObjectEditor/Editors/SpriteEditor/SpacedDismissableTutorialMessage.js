@@ -12,7 +12,7 @@ const SpacedDismissableTutorialMessage = () => {
     'intermediate-changing-animations'
   );
   return DismissableTutorialMessage ? (
-    <Column>
+    <Column noMargin>
       {DismissableTutorialMessage}
       <Spacer />
     </Column>

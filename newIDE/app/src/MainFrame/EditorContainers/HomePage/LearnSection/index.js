@@ -11,12 +11,12 @@ import { Trans } from '@lingui/macro';
 import { TutorialContext } from '../../../../Tutorial/TutorialContext';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
-import { Paper } from '@material-ui/core';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { sendTutorialOpened } from '../../../../Utils/Analytics/EventSender';
 import Window from '../../../../Utils/Window';
 import { secondsToMinutesAndSeconds } from '../../../../Utils/DateDisplay';
 import { type ImageTileComponent } from '../../../../UI/ImageTileGrid';
+import Paper from '../../../../UI/Paper';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -104,7 +104,7 @@ const LearnSection = ({
 
   if (tutorialLoadingError)
     return (
-      <Paper square style={styles.paper}>
+      <Paper square style={styles.paper} background="dark">
         <PlaceholderError onRetry={fetchTutorials}>
           <Trans>
             Can't load the tutorials. Verify your internet connection or retry

@@ -79,7 +79,7 @@ export default class ColorField extends React.Component<Props, State> {
         <TextField
           id={this.props.id}
           fullWidth={this.props.disableAlpha}
-          style={!this.props.disableAlpha ? { width: '60%' } : undefined}
+          style={!this.props.disableAlpha ? { width: '70%' } : undefined}
           floatingLabelText={this.props.floatingLabelText}
           floatingLabelFixed
           helperMarkdownText={this.props.helperMarkdownText}

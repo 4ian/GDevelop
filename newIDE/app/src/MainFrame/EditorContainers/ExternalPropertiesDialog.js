@@ -21,7 +21,7 @@ type Props = {|
   layoutName?: ?string,
   onClose: () => void,
   project: gdProject,
-  title?: React.Node,
+  title: React.Node,
   helpTexts?: Array<React.Node>,
 |};
 
@@ -79,7 +79,7 @@ export default function ExternalPropertiesDialog({
       onApply={onClick}
       maxWidth="sm"
     >
-      <Column>
+      <Column noMargin>
         {helpTexts &&
           helpTexts.map((helpText, index) => (
             <Line key={index}>

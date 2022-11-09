@@ -35,7 +35,6 @@ import YesNoField from '../EventsSheet/ParameterFields/YesNoField';
 import ForceMultiplierField from '../EventsSheet/ParameterFields/ForceMultiplierField';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
 import ExternalPropertiesDialog from '../MainFrame/EditorContainers/ExternalPropertiesDialog';
-import InstructionEditor from '../EventsSheet/InstructionEditor';
 import muiDecorator from './ThemeDecorator';
 import paperDecorator from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
@@ -60,7 +59,6 @@ import {
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
-  showcasedGame1,
   geometryMonsterExampleShortHeader,
   fireBulletExtensionShortHeader,
   flashExtensionShortHeader,
@@ -140,9 +138,6 @@ import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import ScrollView from '../UI/ScrollView';
 import '../UI/Theme/Global/Scrollbar.css';
 import '../UI/Theme/Global/Animation.css';
-import { GamesShowcase } from '../GamesShowcase';
-import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
-import { ShowcasedGameListItem } from '../GamesShowcase/ShowcasedGameListItem';
 import {
   Accordion,
   AccordionActions,
@@ -529,7 +524,7 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
     <ValueStateHolder
       initialValue={'Choice 6'}
       render={(value, onChange) => (
-        <Dialog open>
+        <Dialog open title="some title">
           <SemiControlledAutoComplete
             value={value}
             onChange={onChange}
@@ -2411,48 +2406,6 @@ storiesOf('InstructionOrObjectSelector', module)
     />
   ));
 
-storiesOf('InstructionEditor', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default (no scope)', () => (
-    <FixedHeightFlexContainer height={400}>
-      <InstructionEditor
-        project={testProject.project}
-        scope={{ layout: testProject.testLayout }}
-        globalObjectsContainer={testProject.project}
-        objectsContainer={testProject.testLayout}
-        isCondition
-        instruction={testProject.testInstruction}
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onChooseResource={() => {
-          action('onChooseResource');
-          return Promise.reject();
-        }}
-        resourceSources={[]}
-        openInstructionOrExpression={action('open instruction or expression')}
-      />
-    </FixedHeightFlexContainer>
-  ))
-  .add('without layout (no scope)', () => (
-    <FixedHeightFlexContainer height={400}>
-      <InstructionEditor
-        project={testProject.project}
-        scope={{ layout: null }}
-        globalObjectsContainer={testProject.project}
-        objectsContainer={testProject.testLayout}
-        isCondition
-        instruction={testProject.testInstruction}
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onChooseResource={() => {
-          action('onChooseResource');
-          return Promise.reject();
-        }}
-        resourceSources={[]}
-        openInstructionOrExpression={action('open instruction or expression')}
-      />
-    </FixedHeightFlexContainer>
-  ));
-
 storiesOf('NewInstructionEditorDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
@@ -3154,25 +3107,6 @@ storiesOf('HotReloadLogsDialog', module)
       ]}
       onClose={() => {}}
       onLaunchNewPreview={() => {}}
-    />
-  ));
-
-storiesOf('GamesShowcase', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <FixedHeightFlexContainer height={400}>
-      <GamesShowcaseStateProvider>
-        <GamesShowcase />
-      </GamesShowcaseStateProvider>
-    </FixedHeightFlexContainer>
-  ));
-
-storiesOf('GamesShowcase/ShowcasedGameListItem', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <ShowcasedGameListItem
-      onHeightComputed={() => {}}
-      showcasedGame={showcasedGame1}
     />
   ));
 

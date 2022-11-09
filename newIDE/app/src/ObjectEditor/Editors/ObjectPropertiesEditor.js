@@ -54,7 +54,7 @@ const ObjectPropertiesEditor = (props: Props) => {
   return (
     <I18n>
       {({ i18n }) => (
-        <ColumnStackLayout>
+        <ColumnStackLayout noMargin>
           {tutorialIds.map(tutorialId => (
             <DismissableTutorialMessage
               key={tutorialId}

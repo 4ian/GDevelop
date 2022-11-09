@@ -22,7 +22,7 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import { setupInstructionParameters } from '../../InstructionOrExpression/SetupInstructionParameters';
 import TextButton from '../../UI/TextButton';
 import Paste from '../../UI/CustomSvgIcons/Paste';
-import { Line } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 
 const styles = {
   fullHeightSelector: {
@@ -209,33 +209,45 @@ export default function NewInstructionEditorMenu({
         horizontal: 'left',
       }}
     >
-      <SelectColumns
-        columnsRenderer={{
-          'instruction-or-object-selector': renderInstructionOrObjectSelector,
-          'object-instruction-selector': renderObjectInstructionSelector,
-        }}
-        getColumns={() => {
-          if (step === 'object-or-free-instructions') {
-            return ['instruction-or-object-selector'];
-          } else {
-            return ['object-instruction-selector'];
-          }
-        }}
-      />
-      <Line noMargin justifyContent="flex-end">
-        <TextButton
-          label={
-            isCondition ? (
-              <Trans>Paste condition(s)</Trans>
-            ) : (
-              <Trans>Paste action(s)</Trans>
-            )
-          }
-          icon={<Paste />}
-          disabled={!canPasteInstructions}
-          onClick={() => onPasteInstructions()}
-        />
-      </Line>
+      <Column>
+        <Line>
+          <SelectColumns
+            columnsRenderer={{
+              'instruction-or-object-selector': renderInstructionOrObjectSelector,
+              'object-instruction-selector': renderObjectInstructionSelector,
+            }}
+            getColumns={() => {
+              if (step === 'object-or-free-instructions') {
+                return [
+                  {
+                    columnName: 'instruction-or-object-selector',
+                  },
+                ];
+              } else {
+                return [
+                  {
+                    columnName: 'object-instruction-selector',
+                  },
+                ];
+              }
+            }}
+          />
+        </Line>
+        <Line noMargin justifyContent="flex-end">
+          <TextButton
+            label={
+              isCondition ? (
+                <Trans>Paste condition(s)</Trans>
+              ) : (
+                <Trans>Paste action(s)</Trans>
+              )
+            }
+            icon={<Paste />}
+            disabled={!canPasteInstructions}
+            onClick={() => onPasteInstructions()}
+          />
+        </Line>
+      </Column>
     </Popover>
   );
 }

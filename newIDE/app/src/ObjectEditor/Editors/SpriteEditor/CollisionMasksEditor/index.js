@@ -25,8 +25,16 @@ import EditorMosaic, {
   type EditorMosaicNode,
 } from '../../../../UI/EditorMosaic';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import Background from '../../../../UI/Background';
+import Paper from '../../../../UI/Paper';
 const gd: libGDevelop = global.gd;
+
+const styles = {
+  container: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+};
 
 const horizontalMosaicNodes: EditorMosaicNode = {
   direction: 'row',
@@ -211,7 +219,7 @@ const CollisionMasksEditor = ({
       type: 'primary',
       noTitleBar: true,
       renderEditor: () => (
-        <Background>
+        <Paper background="medium" style={styles.container}>
           <ImagePreview
             resourceName={resourceName}
             imageResourceSource={resourcesLoader.getResourceFullUrl(
@@ -239,14 +247,14 @@ const CollisionMasksEditor = ({
               )
             }
           />
-        </Background>
+        </Paper>
       ),
     },
     properties: {
       type: 'secondary',
       noTitleBar: true,
       renderEditor: () => (
-        <Background>
+        <Paper background="medium" style={styles.container}>
           <Line>
             <Column expand>
               <SpriteSelector
@@ -310,7 +318,7 @@ const CollisionMasksEditor = ({
               </Trans>
             </EmptyMessage>
           )}
-        </Background>
+        </Paper>
       ),
     },
   };

@@ -306,6 +306,7 @@ export default function NewInstructionEditorDialog({
   return (
     <>
       <Dialog
+        title={isCondition ? <Trans>Condition</Trans> : <Trans>Action</Trans>}
         actions={[
           <FlatButton
             label={<Trans>Cancel</Trans>}
@@ -351,7 +352,6 @@ export default function NewInstructionEditorDialog({
         onRequestClose={onCancel}
         onApply={instructionType ? onSubmit : null}
         maxWidth={false}
-        noMargin
         flexBody
         fullHeight={
           true /* Always use full height to avoid a very small dialog when there are not a lot of objects. */
@@ -366,32 +366,55 @@ export default function NewInstructionEditorDialog({
           }}
           getColumns={() => {
             if (windowWidth === 'large') {
-              if (chosenObjectName) {
-                return [
-                  'instruction-or-object-selector',
-                  'object-instruction-selector',
-                  'parameters',
-                ];
-              } else {
-                return ['instruction-or-object-selector', 'parameters'];
-              }
+              return [
+                {
+                  columnName: 'instruction-or-object-selector',
+                },
+                chosenObjectName
+                  ? {
+                      columnName: 'object-instruction-selector',
+                    }
+                  : null,
+                {
+                  columnName: 'parameters',
+                  ratio: !chosenObjectName ? 2 : 1,
+                },
+              ].filter(Boolean);
             } else if (windowWidth === 'medium') {
               if (step === 'object-or-free-instructions') {
-                return ['instruction-or-object-selector'];
+                return [
+                  {
+                    columnName: 'instruction-or-object-selector',
+                    ratio: 1,
+                  },
+                ];
               } else {
-                if (chosenObjectName) {
-                  return ['object-instruction-selector', 'parameters'];
-                } else {
-                  return ['parameters'];
-                }
+                return [
+                  chosenObjectName
+                    ? { columnName: 'object-instruction-selector' }
+                    : null,
+                  { columnName: 'parameters' },
+                ].filter(Boolean);
               }
             } else {
               if (step === 'object-or-free-instructions') {
-                return ['instruction-or-object-selector'];
+                return [
+                  {
+                    columnName: 'instruction-or-object-selector',
+                  },
+                ];
               } else if (step === 'object-instructions') {
-                return ['object-instruction-selector'];
+                return [
+                  {
+                    columnName: 'object-instruction-selector',
+                  },
+                ];
               } else {
-                return ['parameters'];
+                return [
+                  {
+                    columnName: 'parameters',
+                  },
+                ];
               }
             }
           }}

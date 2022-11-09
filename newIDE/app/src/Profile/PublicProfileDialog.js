@@ -66,6 +66,7 @@ const PublicProfileDialog = ({ userId, onClose }: Props) => {
 
   return (
     <Dialog
+      title={<Trans>User profile</Trans>}
       open={true}
       maxWidth="sm"
       actions={[

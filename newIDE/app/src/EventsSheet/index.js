@@ -7,7 +7,6 @@ import * as React from 'react';
 import EventsTree from './EventsTree';
 import { getInstructionMetadata } from './InstructionEditor/NewInstructionEditor';
 import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
-import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
 import NewInstructionEditorMenu from './InstructionEditor/NewInstructionEditorMenu';
 import EventTextDialog, {
   filterEditableWithEventTextDialog,
@@ -1526,7 +1525,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  _renderInstructionEditorDialog = (newInstructionEditorDialog: boolean) => {
+  _renderInstructionEditorDialog = () => {
     const {
       project,
       scope,
@@ -1537,9 +1536,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // Choose the dialog to use
     const Dialog = this.state.inlineInstructionEditorAnchorEl
       ? NewInstructionEditorMenu
-      : newInstructionEditorDialog
-      ? NewInstructionEditorDialog
-      : InstructionEditorDialog;
+      : NewInstructionEditorDialog;
 
     return this.state.editedInstruction.instruction ? (
       <Dialog
@@ -1820,11 +1817,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   }
                   buildMenuTemplate={this._buildInstructionContextMenu}
                 />
-                {this._renderInstructionEditorDialog(
-                  // Force using the new instruction editor on touch screens.
-                  preferences.values.useNewInstructionEditorDialog ||
-                    screenType === 'touch'
-                )}
+                {this._renderInstructionEditorDialog()}
                 {this.state.analyzedEventsContextResult && (
                   <EventsContextAnalyzerDialog
                     onClose={this._closeEventsContextAnalyzer}

@@ -1,15 +1,16 @@
 // @flow
 import * as React from 'react';
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import { List, ListItem } from '../UI/List';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
-import EmptyMessage from '../UI/EmptyMessage';
 import { Column } from '../UI/Grid';
-import { Paper } from '@material-ui/core';
 import ListIcon from '../UI/ListIcon';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import getObjectByName from '../Utils/GetObjectByName';
+import Paper from '../UI/Paper';
+import { ColumnStackLayout } from '../UI/Layout';
+import AlertMessage from '../UI/AlertMessage';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -63,57 +64,61 @@ const ObjectGroupEditor = ({
       else type = '';
     });
 
-    let message = '';
-    if (type === undefined) {
-      message = 'This group is empty';
-    } else if (type === '') {
-      message =
-        "This group contains objects of different kinds. You'll only be able to use actions and conditions common to all objects with this group.";
-    } else {
-      message = `This group contains objects of the same kind (${type}). You can use actions and conditions related to this kind of objects in events with this group.`;
-    }
+    const message =
+      type === undefined ? (
+        <Trans>'This group is empty'</Trans>
+      ) : type === '' ? (
+        <Trans>
+          This group contains objects of different kinds. You'll only be able to
+          use actions and conditions common to all objects with this group.
+        </Trans>
+      ) : (
+        <Trans>
+          This group contains objects of the same kind ({type}). You can use
+          actions and conditions related to this kind of objects in events with
+          this group.
+        </Trans>
+      );
 
-    return <EmptyMessage>{message}</EmptyMessage>;
+    return <AlertMessage kind="info">{message}</AlertMessage>;
   };
 
   return (
-    <Column>
-      <div>
-        {renderExplanation()}
-        <List>
-          {group
-            .getAllObjectsNames()
-            .toJSArray()
-            .map(objectName => {
-              let object = getObjectByName(
-                globalObjectsContainer,
-                objectsContainer,
-                objectName
-              );
-              const icon =
-                project && object ? (
-                  <ListIcon
-                    iconSize={24}
-                    src={ObjectsRenderingService.getThumbnail(
-                      project,
-                      object.getConfiguration()
-                    )}
-                  />
-                ) : null;
-              return (
-                <ListItem
-                  key={objectName}
-                  primaryText={objectName}
-                  displayRemoveButton
-                  onRemove={() => removeObject(objectName)}
-                  leftIcon={icon}
+    <ColumnStackLayout noMargin>
+      {renderExplanation()}
+      <List>
+        {group
+          .getAllObjectsNames()
+          .toJSArray()
+          .map(objectName => {
+            let object = getObjectByName(
+              globalObjectsContainer,
+              objectsContainer,
+              objectName
+            );
+            const icon =
+              project && object ? (
+                <ListIcon
+                  iconSize={24}
+                  src={ObjectsRenderingService.getThumbnail(
+                    project,
+                    object.getConfiguration()
+                  )}
                 />
-              );
-            })}
-        </List>
-      </div>
-      <Paper style={styles.objectSelector}>
-        <Column>
+              ) : null;
+            return (
+              <ListItem
+                key={objectName}
+                primaryText={objectName}
+                displayRemoveButton
+                onRemove={() => removeObject(objectName)}
+                leftIcon={icon}
+              />
+            );
+          })}
+      </List>
+      <Paper style={styles.objectSelector} background="medium">
+        <Column noMargin>
           <ObjectSelector
             project={project}
             globalObjectsContainer={globalObjectsContainer}
@@ -129,7 +134,7 @@ const ObjectGroupEditor = ({
           />
         </Column>
       </Paper>
-    </Column>
+    </ColumnStackLayout>
   );
 };
 

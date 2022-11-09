@@ -102,7 +102,7 @@ export const ExampleStore = ({
         {windowWidth => (
           <Column expand noMargin useFullHeight>
             <Line>
-              <Column expand>
+              <Column expand noMargin>
                 <SearchBar
                   value={searchText}
                   onChange={setSearchText}

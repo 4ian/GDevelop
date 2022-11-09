@@ -21,7 +21,7 @@ const SceneVariablesDialog = (props: Props) => {
       variablesContainer={props.layout.getVariables()}
       onCancel={props.onClose}
       onApply={props.onApply}
-      title={<Trans>Scene Variables</Trans>}
+      title={<Trans>Variables of scene "{props.layout.getName()}"</Trans>}
       emptyPlaceholderTitle={<Trans>Add your first scene variable</Trans>}
       emptyPlaceholderDescription={
         <Trans>These variables hold additional information on a scene.</Trans>

@@ -88,7 +88,7 @@ class Animation extends React.Component<AnimationProps, void> {
     const animationName = animation.getName();
     return (
       <div>
-        <MiniToolbar>
+        <MiniToolbar noPadding>
           <DragHandle />
           <MiniToolbarText>Animation #{id} </MiniToolbarText>
           <Column expand>
@@ -357,7 +357,7 @@ class AnimationsListContainer extends React.Component<
               lockAxis="y"
               axis="y"
             />
-            <Column>
+            <Column noMargin>
               <ResponsiveLineStackLayout
                 justifyContent="space-between"
                 noColumnMargin
@@ -449,6 +449,7 @@ export default function SpriteEditor({
       />
       {advancedOptionsOpen && (
         <Dialog
+          title={<Trans>Sprite options</Trans>}
           actions={[
             <FlatButton
               key="close"
@@ -483,6 +484,7 @@ export default function SpriteEditor({
       )}
       {pointsEditorOpen && (
         <Dialog
+          title={<Trans>Edit points</Trans>}
           actions={[
             <FlatButton
               key="close"
@@ -498,7 +500,6 @@ export default function SpriteEditor({
             />,
           ]}
           onRequestClose={() => setPointsEditorOpen(false)}
-          noMargin
           maxWidth="lg"
           flexBody
           fullHeight
@@ -514,6 +515,7 @@ export default function SpriteEditor({
       )}
       {collisionMasksEditorOpen && (
         <Dialog
+          title={<Trans>Edit collision masks</Trans>}
           actions={[
             <FlatButton
               key="close"
@@ -528,7 +530,6 @@ export default function SpriteEditor({
               key="help"
             />,
           ]}
-          noMargin
           maxWidth="lg"
           flexBody
           fullHeight

@@ -243,7 +243,7 @@ const AssetPackInstallDialog = ({
       ]}
       onApply={dialogContent.onApply}
     >
-      <Column>{dialogContent.content}</Column>
+      <Column noMargin>{dialogContent.content}</Column>
     </Dialog>
   );
 };

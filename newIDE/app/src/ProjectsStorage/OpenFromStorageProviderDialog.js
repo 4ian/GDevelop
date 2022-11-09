@@ -37,7 +37,6 @@ const OpenFromStorageProviderDialog = ({
           ]}
           onRequestClose={onClose}
           open
-          noMargin
           maxWidth="sm"
         >
           <List>
@@ -59,7 +58,7 @@ const OpenFromStorageProviderDialog = ({
           </List>
           {!electron && (
             <Line>
-              <Column>
+              <Column noMargin>
                 <BackgroundText>
                   <Trans>
                     If you have a popup blocker interrupting the opening, allow

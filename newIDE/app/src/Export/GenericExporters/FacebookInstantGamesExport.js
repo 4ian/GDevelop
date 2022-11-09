@@ -2,10 +2,11 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Text from '../../UI/Text';
-import { Column, Line } from '../../UI/Grid';
+import { Column } from '../../UI/Grid';
 import FlatButton from '../../UI/FlatButton';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
 
 export const ExplanationHeader = () => (
   <Text>
@@ -36,14 +37,14 @@ export const DoneFooter = ({
           done, and upload the generated archive.
         </Trans>
       </Text>
-      <Line justifyContent="center">
+      <ResponsiveLineStackLayout justifyContent="center">
         {renderGameButton()}
         <FlatButton
           label={<Trans>Learn more about Instant Games publication</Trans>}
           primary
           onClick={openLearnMore}
         />
-      </Line>
+      </ResponsiveLineStackLayout>
     </Column>
   );
 };

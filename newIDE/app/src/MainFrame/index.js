@@ -367,6 +367,8 @@ const MainFrame = (props: Props) => {
     setProject: setInAppTutorialProject,
     setCurrentEditor,
     onPreviewLaunch,
+    currentlyRunningInAppTutorial,
+    getProgress,
   } = React.useContext(InAppTutorialContext);
   const [
     fileMetadataOpeningProgress,
@@ -1917,10 +1919,21 @@ const MainFrame = (props: Props) => {
         const enrichedFileMetadata = fileMetadata.name
           ? fileMetadata
           : { ...fileMetadata, name: projectName };
-        preferences.insertRecentProjectFile({
+        const fileMetadataAndStorageProviderName = {
           fileMetadata: enrichedFileMetadata,
           storageProviderName: storageProviderInternalName,
-        });
+        };
+        preferences.insertRecentProjectFile(fileMetadataAndStorageProviderName);
+        if (currentlyRunningInAppTutorial) {
+          preferences.saveTutorialProgress({
+            tutorialId: currentlyRunningInAppTutorial,
+            userId: authenticatedUser.profile
+              ? authenticatedUser.profile.id
+              : null,
+            ...getProgress(),
+            fileMetadataAndStorageProviderName,
+          });
+        }
 
         // Ensure resources are re-loaded from their new location.
         ResourcesLoader.burstAllUrlsCache();
@@ -1964,6 +1977,8 @@ const MainFrame = (props: Props) => {
       preferences,
       ensureResourcesAreMoved,
       authenticatedUser,
+      getProgress,
+      currentlyRunningInAppTutorial,
     ]
   );
 
@@ -2037,10 +2052,24 @@ const MainFrame = (props: Props) => {
           const enrichedFileMetadata = fileMetadata.name
             ? fileMetadata
             : { ...fileMetadata, name: projectName };
-          preferences.insertRecentProjectFile({
+
+          const fileMetadataAndStorageProviderName = {
             fileMetadata: enrichedFileMetadata,
             storageProviderName: storageProviderInternalName,
-          });
+          };
+          preferences.insertRecentProjectFile(
+            fileMetadataAndStorageProviderName
+          );
+          if (currentlyRunningInAppTutorial) {
+            preferences.saveTutorialProgress({
+              tutorialId: currentlyRunningInAppTutorial,
+              userId: authenticatedUser.profile
+                ? authenticatedUser.profile.id
+                : null,
+              ...getProgress(),
+              fileMetadataAndStorageProviderName,
+            });
+          }
           if (isCurrentProjectStale(currentProjectRef, currentProject)) {
             // We do not want to change the current file metadata if the
             // project has changed since the beginning of the save, which
@@ -2080,6 +2109,9 @@ const MainFrame = (props: Props) => {
       getStorageProvider,
       preferences,
       setState,
+      authenticatedUser,
+      getProgress,
+      currentlyRunningInAppTutorial,
     ]
   );
 

@@ -2118,6 +2118,12 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_RenameEventsBasedBehaviorSharedProperty(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
     void STATIC_RenameEventsBasedObjectProperty(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2360,6 +2366,7 @@ interface EventsBasedBehavior {
 
     [Ref] EventsFunctionsContainer GetEventsFunctions();
     [Ref] NamedPropertyDescriptorsList GetPropertyDescriptors();
+    [Ref] NamedPropertyDescriptorsList GetSharedPropertyDescriptors();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
@@ -2367,6 +2374,7 @@ interface EventsBasedBehavior {
     [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyExpressionName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetSharedPropertyExpressionName([Const] DOMString propertyName);
 };
 
 interface EventsBasedBehaviorsList {
@@ -2995,6 +3003,8 @@ interface BehaviorCodeGenerator {
     [Const, Value] DOMString GenerateRuntimeBehaviorCompleteCode([Const] DOMString extensionName, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const] DOMString codeNamespace, [Const, Ref] MapStringString behaviorMethodMangledNames, [Ref] SetString includes, boolean compilationForRuntime);
     [Const, Value] DOMString STATIC_GetBehaviorPropertyGetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetBehaviorPropertySetterName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetBehaviorSharedPropertyGetterName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetBehaviorSharedPropertySetterName([Const] DOMString propertyName);
 };
 
 [Prefix="gdjs::"]

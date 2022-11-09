@@ -22,6 +22,7 @@ export const Default = () => (
     eventsBasedBehavior={testProject.testEventsBasedBehavior}
     onApply={action('apply')}
     onRenameProperty={action('property rename')}
+    onRenameSharedProperty={action('shared property rename')}
   />
 );
 
@@ -32,5 +33,6 @@ export const WithoutFunction = () => (
     eventsBasedBehavior={testProject.testEmptyEventsBasedBehavior}
     onApply={action('apply')}
     onRenameProperty={action('property rename')}
+    onRenameSharedProperty={action('shared property rename')}
   />
 );

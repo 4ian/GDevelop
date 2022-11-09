@@ -319,14 +319,18 @@ export default class ResourceSelector extends React.Component<Props, State> {
             />
             {externalEditors.length === 1 && (
               <FlatButton
-                leftIcon={<Brush />}
-                label={i18n._(externalEditors[0].displayName)}
+                leftIcon={<Brush fontSize="small" />}
+                label={i18n._(
+                  this.state.resourceName
+                    ? externalEditors[0].editDisplayName
+                    : externalEditors[0].createDisplayName
+                )}
                 onClick={() => this._editWith(externalEditors[0])}
               />
             )}
             {externalEditors.length > 1 ? (
               <RaisedButtonWithMenu
-                icon={<Brush />}
+                icon={<Brush fontSize="small" />}
                 label={
                   this.state.resourceName ? (
                     <Trans>Edit with...</Trans>
@@ -336,7 +340,11 @@ export default class ResourceSelector extends React.Component<Props, State> {
                 }
                 buildMenuTemplate={(i18n: I18nType) =>
                   externalEditors.map(externalEditor => ({
-                    label: i18n._(externalEditor.displayName),
+                    label: i18n._(
+                      this.state.resourceName
+                        ? externalEditor.editDisplayName
+                        : externalEditor.createDisplayName
+                    ),
                     click: () => this._editWith(externalEditor),
                   }))
                 }

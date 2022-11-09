@@ -13,7 +13,8 @@ import { t } from '@lingui/macro';
 const editors: Array<ResourceExternalEditor> = [
   {
     name: 'piskel-app',
-    displayName: t`Create/Edit with Piskel`,
+    createDisplayName: t`Create with Piskel`,
+    editDisplayName: t`Edit with Piskel`,
     kind: 'image',
     edit: options => {
       sendExternalEditorOpened('piskel');
@@ -22,7 +23,8 @@ const editors: Array<ResourceExternalEditor> = [
   },
   {
     name: 'Jfxr',
-    displayName: t`Create/Edit with Jfxr`,
+    createDisplayName: t`Create with Jfxr`,
+    editDisplayName: t`Edit with Jfxr`,
     kind: 'audio',
     edit: options => {
       sendExternalEditorOpened('jfxr');
@@ -31,7 +33,8 @@ const editors: Array<ResourceExternalEditor> = [
   },
   {
     name: 'Yarn',
-    displayName: t`Create/Edit with Yarn`,
+    createDisplayName: t`Create with Yarn`,
+    editDisplayName: t`Edit with Yarn`,
     kind: 'json',
     edit: options => {
       sendExternalEditorOpened('yarn');

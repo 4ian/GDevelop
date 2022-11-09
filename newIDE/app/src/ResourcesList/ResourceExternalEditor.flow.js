@@ -30,7 +30,8 @@ export type ExternalEditorOpenOptions = {|
 
 export type ResourceExternalEditor = {|
   name: string,
-  displayName: MessageDescriptor,
+  createDisplayName: MessageDescriptor,
+  editDisplayName: MessageDescriptor,
   kind: ResourceKind,
   edit: ExternalEditorOpenOptions => void,
 |};

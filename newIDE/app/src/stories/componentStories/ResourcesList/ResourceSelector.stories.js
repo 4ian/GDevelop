@@ -15,7 +15,20 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-export const Image = () => (
+export const ImageNotSelected = () => (
+  <ResourceSelector
+    resourceKind="image"
+    project={testProject.project}
+    resourceSources={[]}
+    onChooseResource={() => Promise.reject('Unimplemented')}
+    resourceExternalEditors={fakeResourceExternalEditors}
+    initialResourceName=""
+    onChange={action('on change')}
+    resourcesLoader={ResourcesLoader}
+  />
+);
+
+export const ImageSelected = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
@@ -23,6 +36,30 @@ export const Image = () => (
     onChooseResource={() => Promise.reject('Unimplemented')}
     resourceExternalEditors={fakeResourceExternalEditors}
     initialResourceName="icon128.png"
+    onChange={action('on change')}
+    resourcesLoader={ResourcesLoader}
+  />
+);
+
+export const ImageWithMultipleExternalEditors = () => (
+  <ResourceSelector
+    resourceKind="image"
+    project={testProject.project}
+    resourceSources={[]}
+    onChooseResource={() => Promise.reject('Unimplemented')}
+    resourceExternalEditors={[
+      ...fakeResourceExternalEditors,
+      {
+        name: 'fake-image-editor-2',
+        createDisplayName: 'Create with Super Image Editor 2',
+        editDisplayName: 'Edit with Super Image Editor 2',
+        kind: 'image',
+        edit: options => {
+          console.log('Open the image editor with these options:', options);
+        },
+      },
+    ]}
+    initialResourceName=""
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}
   />

@@ -16,6 +16,10 @@ import useForceUpdate from '../../../Utils/UseForceUpdate';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 
 const styles = {
+  // This container is important to have the loader positioned on top of the image.
+  imageContainer: {
+    position: 'relative',
+  },
   loaderContainer: {
     position: 'absolute',
     left: 'calc(50% - 30px)',
@@ -233,25 +237,27 @@ const AnimationPreview = ({
   return (
     <Column expand noOverflowParent noMargin>
       <Line noMargin expand>
-        <ImagePreview
-          resourceName={resourceName}
-          imageResourceSource={getImageResourceSource(resourceName)}
-          isImageResourceSmooth={isImageResourceSmooth(resourceName)}
-          initialZoom={initialZoom}
-          project={project}
-          hideCheckeredBackground={hideCheckeredBackground}
-          hideControls={hideControls}
-          fixedHeight={fixedHeight}
-          fixedWidth={fixedWidth}
-          onImageLoaded={onImageLoaded}
-          isImagePrivate={isAssetPrivate}
-          hideLoader // Handled by the animation preview, important to let the browser cache the image.
-        />
-        {!hideAnimationLoader && isStillLoadingResources && (
-          <div style={styles.loaderContainer}>
-            <PlaceholderLoader />
-          </div>
-        )}
+        <div style={styles.imageContainer}>
+          <ImagePreview
+            resourceName={resourceName}
+            imageResourceSource={getImageResourceSource(resourceName)}
+            isImageResourceSmooth={isImageResourceSmooth(resourceName)}
+            initialZoom={initialZoom}
+            project={project}
+            hideCheckeredBackground={hideCheckeredBackground}
+            hideControls={hideControls}
+            fixedHeight={fixedHeight}
+            fixedWidth={fixedWidth}
+            onImageLoaded={onImageLoaded}
+            isImagePrivate={isAssetPrivate}
+            hideLoader // Handled by the animation preview, important to let the browser cache the image.
+          />
+          {!hideAnimationLoader && isStillLoadingResources && (
+            <div style={styles.loaderContainer}>
+              <PlaceholderLoader />
+            </div>
+          )}
+        </div>
       </Line>
       {!hideControls && (
         <LineStackLayout noMargin alignItems="center">

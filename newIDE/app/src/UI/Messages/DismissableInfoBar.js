@@ -23,12 +23,12 @@ const DismissableInfoBar = ({
   touchScreenMessage,
   message,
 }: Props) => {
-  const { isInAppTutorialRunning } = React.useContext(InAppTutorialContext);
+  const { currentlyRunningInAppTutorial } = React.useContext(InAppTutorialContext);
   const preferences = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const screenType = useScreenType();
 
-  return isInAppTutorialRunning ? null : (
+  return !!currentlyRunningInAppTutorial ? null : (
     <Snackbar
       open={show && !preferences.values.hiddenAlertMessages[identifier]}
       message={

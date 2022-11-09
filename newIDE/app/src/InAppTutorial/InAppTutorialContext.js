@@ -88,7 +88,7 @@ export type InAppTutorialState = {|
   setCurrentEditor: (EditorIdentifier | null) => void,
   goToNextStep: () => void,
   onPreviewLaunch: () => void,
-  isInAppTutorialRunning: boolean,
+  currentlyRunningInAppTutorial: string | null,
   startTutorial: (id: string) => Promise<void>,
   inAppTutorialShortHeaders: ?Array<InAppTutorialShortHeader>,
 |};
@@ -99,7 +99,7 @@ export const initialInAppTutorialState: InAppTutorialState = {
   setCurrentEditor: () => {},
   goToNextStep: () => {},
   onPreviewLaunch: () => {},
-  isInAppTutorialRunning: false,
+  currentlyRunningInAppTutorial: null,
   startTutorial: async () => {},
   inAppTutorialShortHeaders: null,
 };

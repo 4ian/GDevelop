@@ -19,10 +19,6 @@ type Props = {| children: React.Node |};
 
 const InAppTutorialProvider = (props: Props) => {
   const flingTutorial = require('./Tutorials/flingGame.json')
-  const [
-    isInAppTutorialRunning,
-    setIsInAppTutorialRunning,
-  ] = React.useState<boolean>(true);
   const [tutorial, setTutorial] = React.useState<?InAppTutorial>(flingTutorial);
   const [project, setProject] = React.useState<?gdProject>(null);
   const [
@@ -41,7 +37,6 @@ const InAppTutorialProvider = (props: Props) => {
     if (tutorialId === onboardingTutorial.id) {
       setTutorial(onboardingTutorial);
       setCurrentlyRunningInAppTutorial(tutorialId);
-      setIsInAppTutorialRunning(true);
       return;
     }
 
@@ -56,7 +51,6 @@ const InAppTutorialProvider = (props: Props) => {
     const inAppTutorial = await fetchInAppTutorial(inAppTutorialShortHeader);
     setTutorial(inAppTutorial);
     setCurrentlyRunningInAppTutorial(tutorialId);
-    setIsInAppTutorialRunning(true);
   };
 
   const onPreviewLaunch = () => {
@@ -68,8 +62,8 @@ const InAppTutorialProvider = (props: Props) => {
   };
 
   const endTutorial = () => {
+    setTutorial(null);
     setCurrentlyRunningInAppTutorial(null);
-    setIsInAppTutorialRunning(false);
   };
 
   const loadInAppTutorials = React.useCallback(async () => {
@@ -97,13 +91,13 @@ const InAppTutorialProvider = (props: Props) => {
         setCurrentEditor,
         goToNextStep,
         onPreviewLaunch,
-        isInAppTutorialRunning,
+        currentlyRunningInAppTutorial: tutorial ? tutorial.id : null,
         startTutorial,
         inAppTutorialShortHeaders,
       }}
     >
       {props.children}
-      {tutorial && isInAppTutorialRunning && (
+      {tutorial && (
         <InAppTutorialOrchestrator
           ref={orchestratorRef}
           tutorial={tutorial}

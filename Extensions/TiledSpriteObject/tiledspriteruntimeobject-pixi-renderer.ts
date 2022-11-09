@@ -66,13 +66,13 @@ namespace gdjs {
       return this._tiledSprite.height;
     }
 
-    setWidth(width): void {
+    setWidth(width: float): void {
       this._tiledSprite.width = width;
       this._tiledSprite.pivot.x = width / 2;
       this.updatePosition();
     }
 
-    setHeight(height): void {
+    setHeight(height: float): void {
       this._tiledSprite.height = height;
       this._tiledSprite.pivot.y = height / 2;
       this.updatePosition();
@@ -94,7 +94,7 @@ namespace gdjs {
         -this._object._yOffset % this._tiledSprite.texture.height;
     }
 
-    setColor(rgbColor): void {
+    setColor(rgbColor: string): void {
       const colors = rgbColor.split(';');
       if (colors.length < 3) {
         return;

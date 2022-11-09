@@ -84,7 +84,7 @@ const GetStartedSection = ({
 }: Props) => {
   const { inAppTutorialShortHeaders } = React.useContext(InAppTutorialContext);
   const windowWidth = useResponsiveWindowWidth();
-  const { isInAppTutorialRunning } = React.useContext(InAppTutorialContext);
+  const { currentlyRunningInAppTutorial } = React.useContext(InAppTutorialContext);
   const shouldShowOnboardingButton = !isMobile() && windowWidth !== 'small';
   const items: {
     key: string,
@@ -148,7 +148,7 @@ const GetStartedSection = ({
                   onOpenOnboardingDialog();
                 }}
                 size="banner"
-                disabled={isInAppTutorialRunning}
+                disabled={!!currentlyRunningInAppTutorial}
               >
                 {inAppTutorialShortHeaders === null ? (
                   <PlaceholderLoader />

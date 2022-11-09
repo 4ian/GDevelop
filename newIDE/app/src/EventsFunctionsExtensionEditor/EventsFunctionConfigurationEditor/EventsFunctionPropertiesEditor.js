@@ -199,7 +199,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
       isExtensionLifecycleEventsFunction(eventsFunction.getName());
     if (isAnExtensionLifecycleEventsFunction) {
       return (
-        <Column>
+        <Column noMargin>
           <DismissableAlertMessage
             kind="info"
             identifier="lifecycle-events-function-included-only-if-extension-used"
@@ -237,7 +237,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
     return (
       <I18n>
         {({ i18n }) => (
-          <ColumnStackLayout expand>
+          <ColumnStackLayout expand noMargin>
             {renderConfigurationHeader ? renderConfigurationHeader() : null}
             <ResponsiveLineStackLayout alignItems="center" noMargin>
               <Line alignItems="center" noMargin>

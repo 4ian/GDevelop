@@ -26,6 +26,7 @@ type IconProps =
 type Props = {|
   ...IconProps,
   onClick?: (ev: any) => void | Promise<void>,
+  target?: string,
   onContextMenu?: () => void,
   disabled?: boolean,
   edge?: 'start' | 'end' | false,

@@ -100,7 +100,7 @@ export const ExtensionStore = ({
       <ResponsiveWindowMeasurer>
         {windowWidth => (
           <ColumnStackLayout expand noMargin useFullHeight>
-            <ColumnStackLayout>
+            <ColumnStackLayout noMargin>
               <ResponsiveLineStackLayout noMargin>
                 <SearchBarSelectField
                   value={chosenCategory}
@@ -128,18 +128,20 @@ export const ExtensionStore = ({
                   />
                 </Column>
               </ResponsiveLineStackLayout>
-              <Toggle
-                onToggle={(e, check) =>
-                  preferences.setShowCommunityExtensions(check)
-                }
-                toggled={preferences.values.showCommunityExtensions}
-                labelPosition="right"
-                label={
-                  <Trans>
-                    Show community extensions (not officially reviewed)
-                  </Trans>
-                }
-              />
+              <Column>
+                <Toggle
+                  onToggle={(e, check) =>
+                    preferences.setShowCommunityExtensions(check)
+                  }
+                  toggled={preferences.values.showCommunityExtensions}
+                  labelPosition="right"
+                  label={
+                    <Trans>
+                      Show community extensions (not officially reviewed)
+                    </Trans>
+                  }
+                />
+              </Column>
               {DismissableTutorialMessage}
             </ColumnStackLayout>
             <ListSearchResults

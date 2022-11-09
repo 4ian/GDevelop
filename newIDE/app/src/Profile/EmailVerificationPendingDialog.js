@@ -36,6 +36,7 @@ export default function EmailVerificationPendingDialog({
 
   return (
     <Dialog
+      title={<Trans>Verifying your email</Trans>}
       actions={[
         isVerified ? (
           <DialogPrimaryButton
@@ -55,7 +56,6 @@ export default function EmailVerificationPendingDialog({
       ]}
       maxWidth="sm"
       open
-      noMargin
       onRequestClose={onClose}
       onApply={onClose}
     >

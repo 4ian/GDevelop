@@ -48,7 +48,7 @@ const styles = {
   buildButtonIcon: { height: 16, width: 16, opacity: 0.6 },
   openForFeedbackIndicator: { height: 4, width: 4, borderRadius: 4 },
   cardContent: { flex: 1 },
-  textField: { width: '60%' },
+  textField: { width: '70%' },
   circularProgress: { height: 20, width: 20 },
 };
 

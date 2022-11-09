@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import Paper from '@material-ui/core/Paper';
+import Paper from './Paper';
 
 const styles = {
   container: {
@@ -13,7 +13,7 @@ const styles = {
 };
 
 type Props = {|
-  children: ?React.Node,
+  children: React.Node,
   maxWidth?: boolean,
   width?: number | string,
   /** Sometimes required on Safari */
@@ -35,6 +35,7 @@ const Background = (props: Props) => (
       flex: props.noExpand ? undefined : 1,
       ...(props.maxWidth ? styles.maxWidth : undefined),
     }}
+    background="dark"
   >
     {props.children}
   </Paper>

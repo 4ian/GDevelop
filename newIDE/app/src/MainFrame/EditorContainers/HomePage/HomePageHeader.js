@@ -15,6 +15,7 @@ import RaisedButton from '../../../UI/RaisedButton';
 import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import TextButton from '../../../UI/TextButton';
+import Paper from '../../../UI/Paper';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -37,11 +38,12 @@ export const HomePageHeader = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <div
+        <Paper
           style={{
             borderBottom: `1px solid ${GDevelopTheme.home.separator.color}`,
-            backgroundColor: GDevelopTheme.home.header.backgroundColor,
           }}
+          background="medium"
+          square
         >
           <Line expand>
             <LineStackLayout
@@ -87,7 +89,7 @@ export const HomePageHeader = ({
               </Column>
             </LineStackLayout>
           </Line>
-        </div>
+        </Paper>
       )}
     </I18n>
   );

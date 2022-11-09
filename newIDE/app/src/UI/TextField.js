@@ -95,7 +95,7 @@ type Props = {|
   style?: {|
     fontSize?: 14 | 18 | '1.3em',
     fontStyle?: 'normal' | 'italic',
-    width?: number | '30%' | '60%' | '100%',
+    width?: number | '30%' | '70%' | '100%',
     flex?: 1,
     top?: number,
     padding?: number,

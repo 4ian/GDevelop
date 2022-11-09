@@ -57,6 +57,7 @@ export default class EditTagsDialog extends React.Component<Props, State> {
 
     return (
       <Dialog
+        title={<Trans>Edit object tags</Trans>}
         actions={[
           <FlatButton
             key="close"

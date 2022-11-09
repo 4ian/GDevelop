@@ -6,7 +6,6 @@ import Tune from '@material-ui/icons/Tune';
 import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
 import DoubleChevronArrowLeft from '../UI/CustomSvgIcons/DoubleChevronArrowLeft';
 import { Column, Line, Spacer } from '../UI/Grid';
-import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
 import Window from '../Utils/Window';
 import {
@@ -41,6 +40,8 @@ import PlaceholderError from '../UI/PlaceholderError';
 import AlertMessage from '../UI/AlertMessage';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PrivateAssetPackPurchaseDialog from './PrivateAssets/PrivateAssetPackPurchaseDialog';
+import { LineStackLayout } from '../UI/Layout';
+import Paper from '../UI/Paper';
 
 type Props = {|
   project: gdProject,
@@ -211,8 +212,7 @@ export const AssetStore = ({ project }: Props) => {
         {windowWidth => (
           <>
             <Column expand noMargin useFullHeight id="asset-store">
-              <Line>
-                <Spacer />
+              <LineStackLayout>
                 <IconButton
                   key="back-discover"
                   tooltip={t`Back to discover`}
@@ -225,7 +225,7 @@ export const AssetStore = ({ project }: Props) => {
                 >
                   <Home />
                 </IconButton>
-                <Column expand useFullHeight>
+                <Column expand useFullHeight noMargin>
                   <SearchBar
                     placeholder={t`Search assets`}
                     value={searchText}
@@ -240,9 +240,9 @@ export const AssetStore = ({ project }: Props) => {
                     id="asset-store-search-bar"
                   />
                 </Column>
-              </Line>
+              </LineStackLayout>
               {!isOnHomePage && <Spacer />}
-              <Column>
+              <Column noMargin>
                 <Line
                   justifyContent="space-between"
                   noMargin
@@ -291,62 +291,68 @@ export const AssetStore = ({ project }: Props) => {
               </Column>
               <Line
                 expand
+                noMargin
                 overflow={
                   'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
                 }
               >
                 {!openedAssetShortHeader && ( // Don't show filters on asset page.
-                  <Background
-                    noFullHeight
-                    noExpand
-                    width={
-                      !isFiltersPanelOpen
-                        ? 50
-                        : windowWidth === 'small'
-                        ? 205
-                        : 250
-                    }
-                  >
-                    {!isFiltersPanelOpen ? (
-                      <Line justifyContent="center">
-                        <IconButton onClick={() => setIsFiltersPanelOpen(true)}>
-                          <Tune />
-                        </IconButton>
-                      </Line>
-                    ) : (
-                      <ScrollView>
-                        <Line
-                          justifyContent="space-between"
-                          alignItems="center"
-                        >
-                          <Column>
-                            <Line alignItems="center">
+                  <Column noMargin>
+                    <ScrollView>
+                      <Paper
+                        style={{
+                          width: !isFiltersPanelOpen
+                            ? 50
+                            : windowWidth === 'small'
+                            ? 205
+                            : 250,
+                        }}
+                        background="medium"
+                      >
+                        {!isFiltersPanelOpen ? (
+                          <Line justifyContent="center">
+                            <IconButton
+                              onClick={() => setIsFiltersPanelOpen(true)}
+                            >
                               <Tune />
-                              <Subheader>
-                                <Trans>Object filters</Trans>
-                              </Subheader>
+                            </IconButton>
+                          </Line>
+                        ) : (
+                          <>
+                            <Line
+                              justifyContent="space-between"
+                              alignItems="center"
+                            >
+                              <Column noMargin>
+                                <Line alignItems="center">
+                                  <Tune />
+                                  <Subheader>
+                                    <Trans>Object filters</Trans>
+                                  </Subheader>
+                                </Line>
+                              </Column>
+                              <IconButton
+                                onClick={() => setIsFiltersPanelOpen(false)}
+                              >
+                                <DoubleChevronArrowLeft />
+                              </IconButton>
                             </Line>
-                          </Column>
-                          <IconButton
-                            onClick={() => setIsFiltersPanelOpen(false)}
-                          >
-                            <DoubleChevronArrowLeft />
-                          </IconButton>
-                        </Line>
-                        <Line
-                          justifyContent="space-between"
-                          alignItems="center"
-                        >
-                          <AssetStoreFilterPanel
-                            assetFiltersState={assetFiltersState}
-                            onChoiceChange={() => {
-                              navigationState.openSearchIfNeeded();
-                            }}
-                          />
-                        </Line>
-                      </ScrollView>
-                    )}
-                  </Background>
+                            <Line
+                              justifyContent="space-between"
+                              alignItems="center"
+                            >
+                              <AssetStoreFilterPanel
+                                assetFiltersState={assetFiltersState}
+                                onChoiceChange={() => {
+                                  navigationState.openSearchIfNeeded();
+                                }}
+                              />
+                            </Line>
+                          </>
+                        )}
+                      </Paper>
+                    </ScrollView>
+                  </Column>
                 )}
                 {isOnHomePage &&
                   !(publicAssetPacks && privateAssetPacks) &&

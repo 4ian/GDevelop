@@ -44,7 +44,6 @@ const BuildsDialog = ({
       ]}
       onRequestClose={onClose}
       open={open}
-      noMargin
     >
       <Builds
         // Force the Dialog repositioning

@@ -70,11 +70,10 @@ const ExpressionParametersEditorDialog = ({
             ]
           : []
       }
-      noMargin
       onRequestClose={onRequestClose}
       onApply={() => onDone(parameterValues)}
     >
-      <Column>
+      <Column noMargin>
         <div style={styles.minHeightContainer}>
           <Text>{expressionMetadata.getDescription()}</Text>
           <ExpressionParametersEditor

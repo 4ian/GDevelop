@@ -10,17 +10,11 @@ import ExportLauncher from './ExportLauncher';
 import { type ExportPipeline } from '../ExportPipeline.flow';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import AlertMessage from '../../UI/AlertMessage';
-import { Tab, Tabs } from '../../UI/Tabs';
+import { Tabs } from '../../UI/Tabs';
 import ExportHome from './ExportHome';
 import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
 import TutorialButton from '../../UI/TutorialButton';
-
-const styles = {
-  icon: { width: 40, height: 40 },
-  disabledItem: { opacity: 0.6 },
-  content: { padding: 8 },
-};
 
 export type ExporterSection = 'automated' | 'manual' | 'home';
 export type ExporterKey =
@@ -188,7 +182,29 @@ const ExportDialog = ({
       ]}
       onRequestClose={onClose}
       open
-      noMargin
+      fixedContent={
+        chosenExporterSection === 'automated' ? (
+          <Tabs
+            value={chosenExporterKey}
+            onChange={setChosenExporterKey}
+            options={automatedExporters.map(exporter => ({
+              value: exporter.key,
+              label: exporter.tabName,
+              disabled: isNavigationDisabled,
+            }))}
+          />
+        ) : chosenExporterSection === 'manual' ? (
+          <Tabs
+            value={chosenExporterKey}
+            onChange={setChosenExporterKey}
+            options={manualExporters.map(exporter => ({
+              value: exporter.key,
+              label: exporter.tabName,
+              disabled: isNavigationDisabled,
+            }))}
+          />
+        ) : null
+      }
     >
       {cantExportBecauseOffline && (
         <AlertMessage kind="error">
@@ -198,7 +214,7 @@ const ExportDialog = ({
           </Trans>
         </AlertMessage>
       )}
-      {chosenExporterSection === 'home' && (
+      {chosenExporterSection === 'home' ? (
         <ExportHome
           cantExportBecauseOffline={cantExportBecauseOffline}
           onlineWebExporter={onlineWebExporter}
@@ -212,44 +228,17 @@ const ExportDialog = ({
           setIsNavigationDisabled={setIsNavigationDisabled}
           onGameUpdated={setGame}
         />
-      )}
-      {chosenExporterSection === 'automated' && (
-        <Tabs value={chosenExporterKey} onChange={setChosenExporterKey}>
-          {automatedExporters.map(exporter => (
-            <Tab
-              label={exporter.tabName}
-              value={exporter.key}
-              key={exporter.key}
-              disabled={isNavigationDisabled}
-            />
-          ))}
-        </Tabs>
-      )}
-      {chosenExporterSection === 'manual' && (
-        <Tabs value={chosenExporterKey} onChange={setChosenExporterKey}>
-          {manualExporters.map(exporter => (
-            <Tab
-              label={exporter.tabName}
-              value={exporter.key}
-              key={exporter.key}
-              disabled={isNavigationDisabled}
-            />
-          ))}
-        </Tabs>
-      )}
-      {chosenExporterSection !== 'home' && (
-        <div style={styles.content}>
-          <ExportLauncher
-            exportPipeline={exporter.exportPipeline}
-            project={project}
-            onSaveProject={onSaveProject}
-            onChangeSubscription={onChangeSubscription}
-            authenticatedUser={authenticatedUser}
-            key={chosenExporterKey}
-            setIsNavigationDisabled={setIsNavigationDisabled}
-            onGameUpdated={setGame}
-          />
-        </div>
+      ) : (
+        <ExportLauncher
+          exportPipeline={exporter.exportPipeline}
+          project={project}
+          onSaveProject={onSaveProject}
+          onChangeSubscription={onChangeSubscription}
+          authenticatedUser={authenticatedUser}
+          key={chosenExporterKey}
+          setIsNavigationDisabled={setIsNavigationDisabled}
+          onGameUpdated={setGame}
+        />
       )}
       {game && (
         <BuildsDialog

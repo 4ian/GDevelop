@@ -19,7 +19,7 @@ import AlertMessage from '../../UI/AlertMessage';
 import { getIDEVersion } from '../../Version';
 import { Column, Line } from '../../UI/Grid';
 import { Divider } from '@material-ui/core';
-import { ColumnStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import { ExampleThumbnailOrIcon } from './ExampleThumbnailOrIcon';
 import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import Window from '../../Utils/Window';
@@ -89,6 +89,7 @@ export function ExampleDialog({
 
   return (
     <Dialog
+      title={exampleShortHeader.name}
       actions={[
         <FlatButton
           key="close"
@@ -137,31 +138,31 @@ export function ExampleDialog({
             </Trans>
           </AlertMessage>
         )}
-        <Line alignItems="center" noMargin>
+        <ResponsiveLineStackLayout alignItems="center" noMargin>
           {hasIcon ? (
             <ExampleThumbnailOrIcon exampleShortHeader={exampleShortHeader} />
           ) : null}
-          <Column expand noMargin={!hasIcon}>
-            <Text noMargin size="block-title">
-              {exampleShortHeader.name}
-            </Text>
+          <Column>
+            {exampleShortHeader.authors && (
+              <Line>
+                {exampleShortHeader.authors.map(author => (
+                  <UserPublicProfileChip
+                    user={author}
+                    key={author.id}
+                    isClickable
+                  />
+                ))}
+              </Line>
+            )}
+            <Text noMargin>{exampleShortHeader.shortDescription}</Text>
           </Column>
-        </Line>
-        {exampleShortHeader.authors && (
-          <Line>
-            {exampleShortHeader.authors.map(author => (
-              <UserPublicProfileChip
-                user={author}
-                key={author.id}
-                isClickable
-              />
-            ))}
-          </Line>
-        )}
-        <Text noMargin>{exampleShortHeader.shortDescription}</Text>
-        <Divider />
-        {example && (
-          <MarkdownText source={example.description} isStandaloneText />
+        </ResponsiveLineStackLayout>
+
+        {example && example.description && (
+          <>
+            <Divider />
+            <MarkdownText source={example.description} isStandaloneText />
+          </>
         )}
         {!example && !error && <PlaceholderLoader />}
         {!example && error && (

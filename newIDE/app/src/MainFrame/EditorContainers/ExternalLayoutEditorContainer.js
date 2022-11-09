@@ -193,7 +193,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             <Text>
               <Trans>
                 To edit the external layout, choose the scene in which it will
-                be included:
+                be included
               </Trans>
             </Text>
             <Line justifyContent="center">

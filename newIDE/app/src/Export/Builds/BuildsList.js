@@ -107,7 +107,7 @@ const BuildsList = ({
   return (
     <Column noMargin expand>
       <ResponsiveLineStackLayout justifyContent="space-between">
-        <Column>
+        <Column noMargin>
           <EmptyMessage messageStyle={styles.emptyMessageStyle}>
             <Trans>
               This is the list of builds that you've done for this game. <br />
@@ -116,7 +116,7 @@ const BuildsList = ({
             </Trans>
           </EmptyMessage>
         </Column>
-        <Column>
+        <Column noMargin>
           <SelectField
             floatingLabelText={<Trans>Show</Trans>}
             value={buildFilter}
@@ -153,7 +153,7 @@ const BuildsList = ({
         {authenticatedUser.authenticated &&
           displayedBuilds &&
           displayedBuilds.length !== 0 && (
-            <ColumnStackLayout expand>
+            <ColumnStackLayout expand noMargin>
               {displayedBuilds.map((build: Build) => (
                 <BuildCard
                   build={build}

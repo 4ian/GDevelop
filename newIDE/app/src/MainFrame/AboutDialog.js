@@ -5,7 +5,7 @@ import React from 'react';
 import { List, ListItem } from '../UI/List';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
-import { Tabs, Tab } from '../UI/Tabs';
+import { Tabs } from '../UI/Tabs';
 import { Column, Line } from '../UI/Grid';
 import Window from '../Utils/Window';
 import Text from '../UI/Text';
@@ -279,6 +279,7 @@ export default function AboutDialog({ onClose, updateStatus }: Props) {
 
   return (
     <Dialog
+      title={<Trans>About GDevelop</Trans>}
       actions={[
         <FlatButton
           key="website"
@@ -308,108 +309,111 @@ export default function AboutDialog({ onClose, updateStatus }: Props) {
       onRequestClose={onClose}
       open
       maxWidth="sm"
-      noMargin
+      fixedContent={
+        <ColumnStackLayout noMargin>
+          <img src="res/GD-logo.png" alt="GDevelop logo" style={styles.logo} />
+          <Tabs
+            value={currentTab}
+            onChange={setCurrentTab}
+            options={[
+              { value: 'about', label: <Trans>About GDevelop</Trans> },
+              { value: 'changelog', label: <Trans>What's new?</Trans> },
+              { value: 'contributors', label: <Trans>Contributors</Trans> },
+            ]}
+          />
+        </ColumnStackLayout>
+      }
     >
-      <Column noMargin>
-        <img src="res/GD-logo.png" alt="GDevelop logo" style={styles.logo} />
-        <Tabs value={currentTab} onChange={setCurrentTab}>
-          <Tab label={<Trans>About GDevelop</Trans>} value="about" />
-          <Tab label={<Trans>What's new?</Trans>} value="changelog" />
-          <Tab label={<Trans>Contributors</Trans>} value="contributors" />
-        </Tabs>
-        {currentTab === 'about' && (
-          <React.Fragment>
-            <Line>
-              <ColumnStackLayout>
-                <Text>
-                  <Trans>
-                    GDevelop is a full-featured, open-source game engine. Build
-                    and publish games for any mobile, desktop or web game store.
-                    It's super fast, easy to learn and powered by a community
-                    making it better every day.
-                  </Trans>
-                </Text>
-                <Text allowSelection>
-                  <Trans>This version of GDevelop is:</Trans> {getIDEVersion()}{' '}
-                  (editor full version: {getIDEVersionWithHash()}, core version:{' '}
-                  {getGDCoreVersion()})
-                </Text>
-                <Text size="sub-title">
-                  <Trans>Updates</Trans>
-                </Text>
-                {!!electron && electronUpdateStatusString ? (
-                  <ColumnStackLayout noMargin>
-                    <Text>{electronUpdateStatusString}</Text>
-                    <FlatButton
-                      label={electronUpdateButtonLabel}
-                      onClick={() =>
-                        checkUpdates(
-                          canDownloadElectronUpdate(updateStatus.status)
-                        )
-                      }
-                    />
-                  </ColumnStackLayout>
-                ) : (
-                  <Text>
-                    <Trans>No information about available updates.</Trans>
-                  </Text>
-                )}
-                {!electron && (
-                  <Text>
-                    {getServiceWorkerStatusLabel(serviceWorkerUpdateStatus)}
-                  </Text>
-                )}
-              </ColumnStackLayout>
-            </Line>
-          </React.Fragment>
-        )}
-        {currentTab === 'changelog' && (
-          <Column>
-            <Changelog />
-          </Column>
-        )}
-        {currentTab === 'contributors' && (
-          <React.Fragment>
-            <Column>
-              <Text>
-                <Trans>GDevelop was created by Florian "4ian" Rival.</Trans>
-              </Text>
-              <Text>
-                <Trans>Contributors, in no particular order:</Trans>
-              </Text>
-            </Column>
-            <List>
-              {contributors.map(contributor => (
-                <ListItem
-                  key={contributor.name}
-                  primaryText={contributor.name}
-                  secondaryText={contributor.description}
-                  secondaryTextLines={
-                    contributor.description.length < 30 ? 1 : 2
-                  }
-                  displayLinkButton={contributor.link ? true : false}
-                  onOpenLink={() => openLink(contributor.link || '')}
-                />
-              ))}
-            </List>
-            <Column expand>
+      {currentTab === 'about' && (
+        <React.Fragment>
+          <Line>
+            <ColumnStackLayout>
               <Text>
                 <Trans>
-                  Thanks to all users of GDevelop! There must be missing tons of
-                  people, please send your name if you've contributed and you're
-                  not listed.
+                  GDevelop is a full-featured, open-source game engine. Build
+                  and publish games for any mobile, desktop or web game store.
+                  It's super fast, easy to learn and powered by a community
+                  making it better every day.
                 </Trans>
               </Text>
-              <Line alignItems="center" justifyContent="center">
-                <FlatButton
-                  label={<Trans>Contribute to GDevelop</Trans>}
-                  onClick={openContributePage}
-                />
-              </Line>
-            </Column>
-          </React.Fragment>
-        )}
-      </Column>
+              <Text allowSelection>
+                <Trans>This version of GDevelop is:</Trans> {getIDEVersion()}{' '}
+                (editor full version: {getIDEVersionWithHash()}, core version:{' '}
+                {getGDCoreVersion()})
+              </Text>
+              <Text size="sub-title">
+                <Trans>Updates</Trans>
+              </Text>
+              {!!electron && electronUpdateStatusString ? (
+                <ColumnStackLayout noMargin>
+                  <Text>{electronUpdateStatusString}</Text>
+                  <FlatButton
+                    label={electronUpdateButtonLabel}
+                    onClick={() =>
+                      checkUpdates(
+                        canDownloadElectronUpdate(updateStatus.status)
+                      )
+                    }
+                  />
+                </ColumnStackLayout>
+              ) : (
+                <Text>
+                  <Trans>No information about available updates.</Trans>
+                </Text>
+              )}
+              {!electron && (
+                <Text>
+                  {getServiceWorkerStatusLabel(serviceWorkerUpdateStatus)}
+                </Text>
+              )}
+            </ColumnStackLayout>
+          </Line>
+        </React.Fragment>
+      )}
+      {currentTab === 'changelog' && (
+        <Column>
+          <Changelog />
+        </Column>
+      )}
+      {currentTab === 'contributors' && (
+        <React.Fragment>
+          <Column>
+            <Text>
+              <Trans>GDevelop was created by Florian "4ian" Rival.</Trans>
+            </Text>
+            <Text>
+              <Trans>Contributors, in no particular order:</Trans>
+            </Text>
+          </Column>
+          <List>
+            {contributors.map(contributor => (
+              <ListItem
+                key={contributor.name}
+                primaryText={contributor.name}
+                secondaryText={contributor.description}
+                secondaryTextLines={contributor.description.length < 30 ? 1 : 2}
+                displayLinkButton={contributor.link ? true : false}
+                onOpenLink={() => openLink(contributor.link || '')}
+              />
+            ))}
+          </List>
+          <Column expand>
+            <Text>
+              <Trans>
+                Thanks to all users of GDevelop! There must be missing tons of
+                people, please send your name if you've contributed and you're
+                not listed.
+              </Trans>
+            </Text>
+            <Line alignItems="center" justifyContent="center">
+              <FlatButton
+                label={<Trans>Contribute to GDevelop</Trans>}
+                onClick={openContributePage}
+              />
+            </Line>
+          </Column>
+        </React.Fragment>
+      )}
     </Dialog>
   );
 }

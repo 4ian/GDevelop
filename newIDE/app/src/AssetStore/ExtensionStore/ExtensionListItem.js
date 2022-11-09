@@ -67,7 +67,7 @@ export const ExtensionListItem = ({
   return (
     <ButtonBase onClick={onChoose} focusRipple style={styles.button}>
       <div style={styles.container} ref={containerRef}>
-        <Line>
+        <LineStackLayout>
           <IconContainer
             alt={extensionShortHeader.fullName}
             src={extensionShortHeader.previewIconUrl}
@@ -103,7 +103,7 @@ export const ExtensionListItem = ({
               {renderExtensionField('shortDescription')}
             </Text>
           </Column>
-        </Line>
+        </LineStackLayout>
       </div>
     </ButtonBase>
   );

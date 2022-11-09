@@ -10,6 +10,7 @@ import {
 import ResourceThumbnail from './ResourceThumbnail';
 import { type ResourceExternalEditor } from './ResourceExternalEditor.flow';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { LineStackLayout } from '../UI/Layout';
 
 type Props = {|
   project: gdProject,
@@ -24,12 +25,6 @@ type Props = {|
   helperMarkdownText?: ?string,
 |};
 
-const styles = {
-  container: { flex: 1, display: 'flex', alignItems: 'flex-end' },
-  selectorContainer: { flex: 1 },
-  resourceThumbnail: { marginLeft: 10, marginBottom: 4 },
-};
-
 const ResourceSelectorWithThumbnail = ({
   project,
   resourceSources,
@@ -43,30 +38,27 @@ const ResourceSelectorWithThumbnail = ({
   helperMarkdownText,
 }: Props) => {
   return (
-    <div style={styles.container}>
-      <div style={styles.selectorContainer}>
-        <ResourceSelector
-          project={project}
-          resourceSources={resourceSources}
-          onChooseResource={onChooseResource}
-          resourceExternalEditors={resourceExternalEditors}
-          resourcesLoader={ResourcesLoader}
-          resourceKind={resourceKind}
-          fullWidth
-          initialResourceName={resourceName}
-          onChange={onChange}
-          floatingLabelText={floatingLabelText}
-          hintText={hintText}
-          helperMarkdownText={helperMarkdownText}
-        />
-      </div>
+    <LineStackLayout noMargin expand alignItems="flex-end">
+      <ResourceSelector
+        project={project}
+        resourceSources={resourceSources}
+        onChooseResource={onChooseResource}
+        resourceExternalEditors={resourceExternalEditors}
+        resourcesLoader={ResourcesLoader}
+        resourceKind={resourceKind}
+        fullWidth
+        initialResourceName={resourceName}
+        onChange={onChange}
+        floatingLabelText={floatingLabelText}
+        hintText={hintText}
+        helperMarkdownText={helperMarkdownText}
+      />
       <ResourceThumbnail
         resourceName={resourceName}
         resourcesLoader={ResourcesLoader}
         project={project}
-        style={styles.resourceThumbnail}
       />
-    </div>
+    </LineStackLayout>
   );
 };
 

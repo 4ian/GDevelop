@@ -1,6 +1,7 @@
 // @flow
 import { type ResourceKind } from './ResourceSource';
 import ResourcesLoader from '../ResourcesLoader';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 /**
  * These are the options passed to an external editor to edit one or more resources.
@@ -27,9 +28,10 @@ export type ExternalEditorOpenOptions = {|
   },
 |};
 
-export type ResourceExternalEditor = {
+export type ResourceExternalEditor = {|
   name: string,
-  displayName: string,
+  createDisplayName: MessageDescriptor,
+  editDisplayName: MessageDescriptor,
   kind: ResourceKind,
   edit: ExternalEditorOpenOptions => void,
-};
+|};

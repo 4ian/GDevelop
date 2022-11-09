@@ -21,6 +21,7 @@ import AuthorizedAssetImage from '../../AssetStore/PrivateAssets/AuthorizedAsset
 const gd: libGDevelop = global.gd;
 
 const MARGIN = 50;
+const SPRITE_MARGIN_RATIO = 1.3;
 const MAX_ZOOM_FACTOR = 10;
 const MIN_ZOOM_FACTOR = 0.1;
 
@@ -132,15 +133,13 @@ const ImagePreview = ({
     containerHeight: number,
     containerWidth: number
   ) => {
-    const zoomFactor =
-      !imageHeight || !imageWidth
-        ? 1
-        : getBoundedZoomFactor(
-            Math.min(
-              containerWidth / (imageWidth + 2 * MARGIN),
-              containerHeight / (imageHeight + 2 * MARGIN)
-            )
-          );
+    if (!imageWidth || !imageHeight) return;
+    const zoomFactor = getBoundedZoomFactor(
+      Math.min(
+        containerWidth / (imageWidth * SPRITE_MARGIN_RATIO),
+        containerHeight / (imageHeight * SPRITE_MARGIN_RATIO)
+      )
+    );
     setImageZoomFactor(zoomFactor);
   };
 

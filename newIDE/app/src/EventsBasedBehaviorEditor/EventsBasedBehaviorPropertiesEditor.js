@@ -344,7 +344,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                   }}
                                   disabled={false}
                                 />
-                            )}
+                              )}
                             {property.getType() === 'Color' && (
                               <ColorField
                                 floatingLabelText={<Trans>Default value</Trans>}

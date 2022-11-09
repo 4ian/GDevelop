@@ -28,7 +28,7 @@ import { AssetCard } from './AssetCard';
 import { NoResultPlaceholder } from './NoResultPlaceholder';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import Subheader from '../UI/Subheader';
-import { AssetsHome } from './AssetsHome';
+import { AssetsHome, type AssetsHomeInterface } from './AssetsHome';
 import TextButton from '../UI/TextButton';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
@@ -68,6 +68,7 @@ export const AssetStore = ({ project }: Props) => {
     filtersState,
   } = navigationState.getCurrentPage();
   const searchBar = React.useRef<?SearchBarInterface>(null);
+  const assetsHome = React.useRef<?AssetsHomeInterface>(null);
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
   const [
@@ -79,6 +80,12 @@ export const AssetStore = ({ project }: Props) => {
     setPurchasingPrivateAssetPackListingData,
   ] = React.useState<?PrivateAssetPackListingData>(null);
   const { onPurchaseSuccessful } = React.useContext(AuthenticatedUserContext);
+
+  const scrollPosition = navigationState.getCurrentPage().scrollPosition;
+  if (scrollPosition && assetsHome.current) {
+    assetsHome.current.scrollToPosition(scrollPosition);
+    navigationState.getCurrentPage().scrollPosition = null;
+  }
 
   const onOpenDetails = React.useCallback(
     (assetShortHeader: AssetShortHeader) => {
@@ -100,6 +107,9 @@ export const AssetStore = ({ project }: Props) => {
       if (assetPack.externalWebLink) {
         Window.openExternalURL(assetPack.externalWebLink);
       } else {
+        if (assetsHome.current) {
+          navigationState.getCurrentPage().scrollPosition = assetsHome.current.getScrollPosition();
+        }
         navigationState.openPackPage(assetPack);
         setIsFiltersPanelOpen(true);
       }
@@ -127,6 +137,9 @@ export const AssetStore = ({ project }: Props) => {
       }
 
       // The user has received the pack, open it.
+      if (assetsHome.current) {
+        navigationState.getCurrentPage().scrollPosition = assetsHome.current.getScrollPosition();
+      }
       navigationState.openPackPage(receivedAssetPack);
       setIsFiltersPanelOpen(true);
     },
@@ -362,6 +375,7 @@ export const AssetStore = ({ project }: Props) => {
                   privateAssetPacks &&
                   assetPackRandomOrdering && (
                     <AssetsHome
+                      ref={assetsHome}
                       publicAssetPacks={publicAssetPacks}
                       privateAssetPacksListingData={privateAssetPacks}
                       assetPackRandomOrdering={assetPackRandomOrdering}

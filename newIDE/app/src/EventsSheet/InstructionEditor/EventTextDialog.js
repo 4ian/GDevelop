@@ -142,7 +142,6 @@ const EventTextDialog = (props: Props) => {
     <Dialog
       title={<Trans>Edit the event text</Trans>}
       open
-      noMargin
       actions={[
         <FlatButton
           key="close"
@@ -161,7 +160,7 @@ const EventTextDialog = (props: Props) => {
       onApply={onApply}
     >
       <Column noMargin>
-        <MiniToolbar>
+        <MiniToolbar noPadding>
           <MiniToolbarText firstChild>
             <Trans>Background color:</Trans>
           </MiniToolbarText>
@@ -191,7 +190,7 @@ const EventTextDialog = (props: Props) => {
           )}
         </MiniToolbar>
         <Line noMargin>
-          <Column expand>
+          <Column expand noMargin>
             <Line>
               <SemiControlledTextField
                 commitOnBlur

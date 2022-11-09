@@ -161,9 +161,6 @@ const styles = {
     flex: 1,
     width: 'auto',
   },
-  subPropertiesEditorContainer: {
-    marginLeft: 15,
-  },
   subHeader: {
     paddingLeft: 0,
   },
@@ -608,23 +605,21 @@ const PropertiesEditor = ({
         return (
           <div key={field.name}>
             <Subheader>{field.name}</Subheader>
-            <div style={styles.subPropertiesEditorContainer}>
-              <UnsavedChangesContext.Consumer key={field.name}>
-                {unsavedChanges => (
-                  <PropertiesEditor
-                    project={project}
-                    resourceSources={resourceSources}
-                    onChooseResource={onChooseResource}
-                    resourceExternalEditors={resourceExternalEditors}
-                    schema={field.children}
-                    instances={instances}
-                    mode="column"
-                    unsavedChanges={unsavedChanges}
-                    onInstancesModified={onInstancesModified}
-                  />
-                )}
-              </UnsavedChangesContext.Consumer>
-            </div>
+            <UnsavedChangesContext.Consumer key={field.name}>
+              {unsavedChanges => (
+                <PropertiesEditor
+                  project={project}
+                  resourceSources={resourceSources}
+                  onChooseResource={onChooseResource}
+                  resourceExternalEditors={resourceExternalEditors}
+                  schema={field.children}
+                  instances={instances}
+                  mode="column"
+                  unsavedChanges={unsavedChanges}
+                  onInstancesModified={onInstancesModified}
+                />
+              )}
+            </UnsavedChangesContext.Consumer>
           </div>
         );
       } else if (field.valueType === 'resource') {

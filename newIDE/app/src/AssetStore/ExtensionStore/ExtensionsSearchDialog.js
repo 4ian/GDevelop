@@ -128,7 +128,6 @@ export default function ExtensionsSearchDialog({
           ]}
           flexBody
           open
-          noMargin
           cannotBeDismissed={isInstalling}
           onRequestClose={onClose}
         >

@@ -66,6 +66,7 @@ const PublicProfileDialog = ({ userId, onClose }: Props) => {
 
   return (
     <Dialog
+      title={null} // Specific case where the title is handled by the content.
       open={true}
       maxWidth="sm"
       actions={[

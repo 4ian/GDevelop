@@ -9,7 +9,7 @@ import HelpButton from '../UI/HelpButton';
 import FlatButton from '../UI/FlatButton';
 import Subheader from '../UI/Subheader';
 import ListIcon from '../UI/ListIcon';
-import { Tabs, Tab } from '../UI/Tabs';
+import { Tabs } from '../UI/Tabs';
 import { List, ListItem } from '../UI/List';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
@@ -41,6 +41,7 @@ import {
   TRIVIAL_FIRST_EXTENSION,
 } from '../Utils/GDevelopServices/Badge';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
   disabledItem: { opacity: 0.6 },
@@ -99,6 +100,7 @@ export default function NewBehaviorDialog({
   objectType,
   objectBehaviorsTypes,
 }: Props) {
+  const windowWidth = useResponsiveWindowWidth();
   const [showDeprecated, setShowDeprecated] = React.useState(false);
   const [searchText, setSearchText] = React.useState('');
   const [currentTab, setCurrentTab] = React.useState<'installed' | 'search'>(
@@ -237,52 +239,76 @@ export default function NewBehaviorDialog({
           ]}
           open
           onRequestClose={onClose}
-          flexBody
-          noMargin
+          flexColumnBody
           fullHeight
           id="new-behavior-dialog"
+          fixedContent={
+            <Tabs
+              value={currentTab}
+              onChange={setCurrentTab}
+              options={[
+                {
+                  label: <Trans>Installed behaviors</Trans>,
+                  value: 'installed',
+                },
+                {
+                  label: <Trans>Search new behaviors</Trans>,
+                  value: 'search',
+                },
+              ]}
+              // Enforce scroll on small screen, because the tabs have long names.
+              variant={windowWidth === 'small' ? 'scrollable' : undefined}
+            />
+          }
         >
-          <Column expand noMargin>
-            <Tabs value={currentTab} onChange={setCurrentTab}>
-              <Tab
-                label={<Trans>Installed Behaviors</Trans>}
-                value="installed"
-              />
-              <Tab label={<Trans>Search New Behaviors</Trans>} value="search" />
-            </Tabs>
-            {currentTab === 'installed' && (
-              <React.Fragment>
-                <Line>
-                  <Column expand>
-                    <SearchBar
-                      value={searchText}
-                      onRequestSearch={() => {
-                        if (behaviors.length) {
-                          chooseBehavior(i18n, behaviors[0]);
-                        } else if (
-                          showDeprecated &&
-                          deprecatedBehaviors.length
-                        ) {
-                          chooseBehavior(i18n, deprecatedBehaviors[0]);
-                        }
-                      }}
-                      onChange={setSearchText}
-                      ref={searchBar}
-                      placeholder={t`Search installed behaviors`}
+          {currentTab === 'installed' && (
+            <React.Fragment>
+              <Line>
+                <Column expand noMargin>
+                  <SearchBar
+                    value={searchText}
+                    onRequestSearch={() => {
+                      if (behaviors.length) {
+                        chooseBehavior(i18n, behaviors[0]);
+                      } else if (showDeprecated && deprecatedBehaviors.length) {
+                        chooseBehavior(i18n, deprecatedBehaviors[0]);
+                      }
+                    }}
+                    onChange={setSearchText}
+                    ref={searchBar}
+                    placeholder={t`Search installed behaviors`}
+                  />
+                </Column>
+              </Line>
+              {hasSearchNoResult && (
+                <EmptyMessage>
+                  <Trans>
+                    No behavior found for your search. Try another search, or
+                    search for new behaviors to install.
+                  </Trans>
+                </EmptyMessage>
+              )}
+              <ScrollView ref={scrollView}>
+                <List>
+                  {behaviors.map((behaviorMetadata, index) => (
+                    <BehaviorListItem
+                      i18n={i18n}
+                      key={index}
+                      behaviorMetadata={behaviorMetadata}
+                      alreadyInstalled={isAmongObjectBehaviors(
+                        behaviorMetadata
+                      )}
+                      onClick={() => chooseBehavior(i18n, behaviorMetadata)}
+                      disabled={!canBehaviorBeUsed(behaviorMetadata)}
                     />
-                  </Column>
-                </Line>
-                {hasSearchNoResult && (
-                  <EmptyMessage>
-                    <Trans>
-                      No behavior found for your search. Try another search, or
-                      search for new behaviors to install.
-                    </Trans>
-                  </EmptyMessage>
-                )}
-                <ScrollView ref={scrollView}>
-                  <List>
-                    {behaviors.map((behaviorMetadata, index) => (
+                  ))}
+                  {showDeprecated && !!deprecatedBehaviors.length && (
+                    <Subheader>
+                      Deprecated (old, prefer not to use anymore)
+                    </Subheader>
+                  )}
+                  {showDeprecated &&
+                    deprecatedBehaviors.map((behaviorMetadata, index) => (
                       <BehaviorListItem
                         i18n={i18n}
                         key={index}
@@ -294,78 +320,59 @@ export default function NewBehaviorDialog({
                         disabled={!canBehaviorBeUsed(behaviorMetadata)}
                       />
                     ))}
-                    {showDeprecated && !!deprecatedBehaviors.length && (
-                      <Subheader>
-                        Deprecated (old, prefer not to use anymore)
-                      </Subheader>
-                    )}
-                    {showDeprecated &&
-                      deprecatedBehaviors.map((behaviorMetadata, index) => (
-                        <BehaviorListItem
-                          i18n={i18n}
-                          key={index}
-                          behaviorMetadata={behaviorMetadata}
-                          alreadyInstalled={isAmongObjectBehaviors(
-                            behaviorMetadata
-                          )}
-                          onClick={() => chooseBehavior(i18n, behaviorMetadata)}
-                          disabled={!canBehaviorBeUsed(behaviorMetadata)}
-                        />
-                      ))}
-                  </List>
-                  <Line justifyContent="center" alignItems="center">
-                    {!showDeprecated ? (
-                      <FlatButton
-                        key="toggle-experimental"
-                        leftIcon={<Visibility />}
-                        primary={false}
-                        onClick={() => {
-                          setShowDeprecated(true);
-                        }}
-                        label={<Trans>Show deprecated (old) behaviors</Trans>}
-                      />
-                    ) : (
-                      <FlatButton
-                        key="toggle-experimental"
-                        leftIcon={<VisibilityOff />}
-                        primary={false}
-                        onClick={() => {
-                          setShowDeprecated(false);
-                        }}
-                        label={<Trans>Show deprecated (old) behaviors</Trans>}
-                      />
-                    )}
-                  </Line>
-                  <Line justifyContent="center" alignItems="center">
+                </List>
+                <Line justifyContent="center" alignItems="center">
+                  {!showDeprecated ? (
                     <FlatButton
-                      leftIcon={<Create />}
+                      key="toggle-experimental"
+                      leftIcon={<Visibility />}
                       primary={false}
-                      onClick={() =>
-                        Window.openExternalURL(
-                          getHelpLink('/behaviors/events-based-behaviors')
-                        )
-                      }
-                      label={<Trans>Create your own behavior</Trans>}
+                      onClick={() => {
+                        setShowDeprecated(true);
+                      }}
+                      label={<Trans>Show deprecated (old) behaviors</Trans>}
                     />
-                  </Line>
-                </ScrollView>
-              </React.Fragment>
-            )}
-            {currentTab === 'search' && (
-              <Line expand>
-                <Column expand noMargin>
-                  <ExtensionStore
-                    project={project}
-                    isInstalling={isInstalling}
-                    onInstall={async extensionShortHeader =>
-                      onInstallExtension(i18n, extensionShortHeader)
+                  ) : (
+                    <FlatButton
+                      key="toggle-experimental"
+                      leftIcon={<VisibilityOff />}
+                      primary={false}
+                      onClick={() => {
+                        setShowDeprecated(false);
+                      }}
+                      label={<Trans>Show deprecated (old) behaviors</Trans>}
+                    />
+                  )}
+                </Line>
+                <Line justifyContent="center" alignItems="center">
+                  <FlatButton
+                    leftIcon={<Create />}
+                    primary={false}
+                    onClick={() =>
+                      Window.openExternalURL(
+                        getHelpLink('/behaviors/events-based-behaviors')
+                      )
                     }
-                    showOnlyWithBehaviors
+                    label={<Trans>Create your own behavior</Trans>}
                   />
-                </Column>
-              </Line>
-            )}
-          </Column>
+                </Line>
+              </ScrollView>
+            </React.Fragment>
+          )}
+          {currentTab === 'search' && (
+            <Line expand>
+              <Column expand noMargin>
+                <ExtensionStore
+                  project={project}
+                  isInstalling={isInstalling}
+                  onInstall={async extensionShortHeader =>
+                    onInstallExtension(i18n, extensionShortHeader)
+                  }
+                  showOnlyWithBehaviors
+                />
+              </Column>
+            </Line>
+          )}
           <DismissableInfoBar
             identifier="extension-installed-explanation"
             message={

@@ -66,6 +66,11 @@ const InAppTutorialProvider = (props: Props) => {
     setCurrentlyRunningInAppTutorial(null);
   };
 
+  const getProgress = () => {
+    if (!orchestratorRef.current) return { step: 0, progress: 0 };
+    return orchestratorRef.current.getProgress();
+  };
+
   const loadInAppTutorials = React.useCallback(async () => {
     const fetchedInAppTutorialShortHeaders = await fetchInAppTutorialShortHeaders();
     setInAppTutorialShortHeaders(fetchedInAppTutorialShortHeaders);
@@ -94,6 +99,7 @@ const InAppTutorialProvider = (props: Props) => {
         currentlyRunningInAppTutorial: tutorial ? tutorial.id : null,
         startTutorial,
         inAppTutorialShortHeaders,
+        getProgress,
       }}
     >
       {props.children}

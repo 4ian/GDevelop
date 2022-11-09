@@ -2,6 +2,7 @@
 import Window from '../Utils/Window';
 import { type ResourceExternalEditor } from './ResourceExternalEditor.flow';
 import { sendExternalEditorOpened } from '../Utils/Analytics/EventSender';
+import { t } from '@lingui/macro';
 
 /**
  * This is the list of editors that can be used to edit resources
@@ -10,7 +11,8 @@ import { sendExternalEditorOpened } from '../Utils/Analytics/EventSender';
 const editors: Array<ResourceExternalEditor> = [
   {
     name: 'piskel-app',
-    displayName: 'Edit with Piskel',
+    createDisplayName: t`Create with Piskel`,
+    editDisplayName: t`Edit with Piskel`,
     kind: 'image',
     edit: () => {
       sendExternalEditorOpened('piskel');
@@ -21,7 +23,8 @@ const editors: Array<ResourceExternalEditor> = [
   },
   {
     name: 'jfxr-app',
-    displayName: 'Edit with Jfxr',
+    createDisplayName: t`Create with Jfxr`,
+    editDisplayName: t`Edit with Jfxr`,
     kind: 'audio',
     edit: () => {
       sendExternalEditorOpened('jfxr');
@@ -32,7 +35,8 @@ const editors: Array<ResourceExternalEditor> = [
   },
   {
     name: 'yarn-app',
-    displayName: 'Edit with Yarn',
+    createDisplayName: t`Create with Yarn`,
+    editDisplayName: t`Edit with Yarn`,
     kind: 'json',
     edit: () => {
       sendExternalEditorOpened('yarn');

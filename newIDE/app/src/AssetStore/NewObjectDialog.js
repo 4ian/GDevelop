@@ -21,7 +21,6 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import {
   sendAssetAddedToProject,
   sendNewObjectCreated,
@@ -79,7 +78,6 @@ type Props = {|
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
   onClose: () => void,
   onCreateNewObject: (type: string) => void,
   onObjectAddedFromAsset: gdObject => void,
@@ -94,7 +92,6 @@ export default function NewObjectDialog({
   resourceSources,
   onChooseResource,
   onFetchNewlyAddedResources,
-  resourceExternalEditors,
   onClose,
   onCreateNewObject,
   onObjectAddedFromAsset,

@@ -197,6 +197,7 @@ type Props = {|
 export type InAppTutorialOrchestratorInterface = {|
   onPreviewLaunch: () => void,
   goToNextStep: () => void,
+  getProgress: () => {| step: number, progress: number |},
 |};
 
 const InAppTutorialOrchestrator = React.forwardRef<
@@ -278,6 +279,13 @@ const InAppTutorialOrchestrator = React.forwardRef<
     [flow, changeStep, stepCount]
   );
 
+  const getProgress = () => {
+    return {
+      step: currentStepIndex,
+      progress: Math.round((currentStepIndex / tutorial.flow.length) * 100),
+    };
+  };
+
   const watchDomForNextStepTrigger = React.useCallback(
     () => {
       // Find the next mandatory (not-skippable) step (It can be the current step).
@@ -355,7 +363,11 @@ const InAppTutorialOrchestrator = React.forwardRef<
     [currentStepIndex, goToStep]
   );
 
-  React.useImperativeHandle(ref, () => ({ onPreviewLaunch, goToNextStep }));
+  React.useImperativeHandle(ref, () => ({
+    onPreviewLaunch,
+    goToNextStep,
+    getProgress,
+  }));
 
   const onPreviewLaunch = React.useCallback(
     () => {

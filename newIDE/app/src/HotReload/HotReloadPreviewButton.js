@@ -4,6 +4,8 @@ import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
 import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import IconButton from '../UI/IconButton';
 
 export type HotReloadPreviewButtonProps = {|
   hasPreviewsRunning: boolean,
@@ -18,19 +20,27 @@ export default function HotReloadPreviewButton({
   launchProjectDataOnlyPreview,
   hasPreviewsRunning,
 }: HotReloadPreviewButtonProps) {
-  return (
+  const windowWidth = useResponsiveWindowWidth();
+  const icon = hasPreviewsRunning ? (
+    <HotReloadPreviewIcon />
+  ) : (
+    <NewPreviewIcon />
+  );
+  const label = hasPreviewsRunning ? (
+    <Trans>Apply changes to preview</Trans>
+  ) : (
+    <Trans>Run a preview</Trans>
+  );
+
+  return windowWidth !== 'small' ? (
     <FlatButton
-      leftIcon={
-        hasPreviewsRunning ? <HotReloadPreviewIcon /> : <NewPreviewIcon />
-      }
-      label={
-        hasPreviewsRunning ? (
-          <Trans>Apply changes to preview</Trans>
-        ) : (
-          <Trans>Run a preview</Trans>
-        )
-      }
-      onClick={() => launchProjectDataOnlyPreview()}
+      leftIcon={icon}
+      label={label}
+      onClick={launchProjectDataOnlyPreview}
     />
+  ) : (
+    <IconButton onClick={launchProjectDataOnlyPreview} size="small">
+      {icon}
+    </IconButton>
   );
 }

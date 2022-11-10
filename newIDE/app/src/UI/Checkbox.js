@@ -10,6 +10,8 @@ const useStyles = makeStyles({
   root: {
     marginLeft: 9,
     marginRight: 9,
+    marginTop: 0, // Material UI adds negative margin triggering a scrollbar.
+    marginBottom: 0, // Material UI adds negative margin triggering a scrollbar.
     padding: 0,
   },
 });

@@ -62,6 +62,7 @@ const ShareDialog = ({ game, onClose }: Props) => {
   if (!gameUrl) return null;
   return (
     <Dialog
+      title={<Trans>Share your game</Trans>}
       open
       actions={[
         <FlatButton
@@ -70,7 +71,6 @@ const ShareDialog = ({ game, onClose }: Props) => {
           onClick={onClose}
         />,
       ]}
-      title={<Trans>Share your game</Trans>}
       onRequestClose={onClose}
     >
       {!isFetchingGameSlug ? (

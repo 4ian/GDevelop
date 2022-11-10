@@ -23,8 +23,7 @@ import {
 } from '../../../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
-import FlatButton from '../../../UI/FlatButton';
-import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
+import RaisedButton from '../../../UI/RaisedButton';
 const gd: libGDevelop = global.gd;
 const path = require('path');
 
@@ -47,22 +46,14 @@ const styles = {
 
 const AddSpriteButton = SortableElement(({ displayHint, onAdd }) => {
   return (
-    <ThemeConsumer>
-      {muiTheme => (
-        <div
-          style={{
-            ...thumbnailContainerStyle,
-            backgroundColor: muiTheme.list.itemsBackgroundColor,
-          }}
-        >
-          <FlatButton
-            onClick={onAdd}
-            label={<Trans>Add</Trans>}
-            leftIcon={<Add />}
-          />
-        </div>
-      )}
-    </ThemeConsumer>
+    <div style={thumbnailContainerStyle}>
+      <RaisedButton
+        onClick={onAdd}
+        label={<Trans>Add a sprite</Trans>}
+        icon={<Add />}
+        primary
+      />
+    </div>
   );
 });
 
@@ -319,7 +310,7 @@ export default class SpritesList extends Component<Props, void> {
   render() {
     return (
       <div>
-        <MiniToolbar justifyContent="flex-end" smallest>
+        <MiniToolbar justifyContent="flex-end">
           <DirectionTools
             animationName={this.props.animationName}
             direction={this.props.direction}

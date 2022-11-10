@@ -8,7 +8,7 @@ import * as React from 'react';
 import TextField from '../UI/TextField';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import ObjectTypeSelector from '../ObjectTypeSelector';
-import { Tabs, Tab } from '../UI/Tabs';
+import { Tabs } from '../UI/Tabs';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import AlertMessage from '../UI/AlertMessage';
 import EventsBasedBehaviorPropertiesEditor from './EventsBasedBehaviorPropertiesEditor';
@@ -16,7 +16,7 @@ import { ColumnStackLayout } from '../UI/Layout';
 import { Line } from '../UI/Grid';
 const gd: libGDevelop = global.gd;
 
-type TabName = 'configuration' | 'properties';
+type TabName = 'configuration' | 'behavior-properties' | 'scene-properties';
 
 type Props = {|
   project: gdProject,
@@ -65,20 +65,27 @@ export default class EventsBasedBehaviorEditor extends React.Component<
       <I18n>
         {({ i18n }: { i18n: I18nType }) => (
           <React.Fragment>
-            <Tabs value={currentTab} onChange={this._changeTab}>
-              <Tab label={<Trans>Configuration</Trans>} value="configuration" />
-              <Tab
-                label={<Trans>Behavior properties</Trans>}
-                value="behavior-properties"
-              />
-              <Tab
-                label={<Trans>Scene properties</Trans>}
-                value="shared-properties"
-              />
-            </Tabs>
+            <Tabs
+              value={currentTab}
+              onChange={this._changeTab}
+              options={[
+                {
+                  value: 'configuration',
+                  label: <Trans>Configuration</Trans>,
+                },
+                {
+                  value: 'behavior-properties',
+                  label: <Trans>Behavior properties</Trans>,
+                },
+                {
+                  value: 'scene-properties',
+                  label: <Trans>Scene properties</Trans>,
+                },
+              ]}
+            />
             <Line>
               {currentTab === 'configuration' && (
-                <ColumnStackLayout expand>
+                <ColumnStackLayout expand noMargin>
                   <DismissableAlertMessage
                     identifier="events-based-behavior-explanation"
                     kind="info"

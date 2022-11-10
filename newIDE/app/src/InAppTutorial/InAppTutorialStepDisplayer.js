@@ -67,8 +67,7 @@ const isThereAnOpenDialogInTheFollowingSiblings = (
 
 const getWrongEditorTooltip = (
   i18n: I18nType,
-  expectedEditor: EditorIdentifier | null,
-  onEndTutorial: () => void
+  expectedEditor: EditorIdentifier | null
 ): InAppTutorialFormattedTooltip | null => {
   if (!expectedEditor) return null;
   const translatedExpectedEditor =
@@ -199,6 +198,7 @@ function InAppTutorialStepDisplayer({
       if (!anchorElement) return null;
       return (
         <InAppTutorialTooltipDisplayer
+          endTutorial={endTutorial}
           anchorElement={anchorElement}
           tooltip={tooltip}
           progress={progress}
@@ -210,14 +210,11 @@ function InAppTutorialStepDisplayer({
         />
       );
     }
-    const wrongEditorTooltip = getWrongEditorTooltip(
-      i18n,
-      expectedEditor,
-      endTutorial
-    );
+    const wrongEditorTooltip = getWrongEditorTooltip(i18n, expectedEditor);
     if (wrongEditorTooltip && assistantImage) {
       return (
         <InAppTutorialTooltipDisplayer
+          endTutorial={endTutorial}
           anchorElement={assistantImage}
           tooltip={wrongEditorTooltip}
           progress={progress}

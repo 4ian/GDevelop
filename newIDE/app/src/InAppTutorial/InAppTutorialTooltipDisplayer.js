@@ -169,6 +169,7 @@ type TooltipHeaderProps = {|
   displayFoldButton: boolean,
   onClickFoldButton: () => void,
   tooltipContent?: string,
+  endTutorial: () => void,
 |};
 
 const TooltipHeader = ({
@@ -177,6 +178,7 @@ const TooltipHeader = ({
   displayFoldButton,
   onClickFoldButton,
   tooltipContent,
+  endTutorial,
 }: TooltipHeaderProps) => {
   const progressColor =
     paletteType === 'light' ? themeColors.grey40 : themeColors.grey30;
@@ -201,7 +203,9 @@ const TooltipHeader = ({
       </Typography>
       <LineStackLayout noMargin alignItems="center" overflow="hidden">
         {tooltipContent ? null : (
-          <ButtonBase>
+          // When the tooltip is folded, the tooltip content is not null and we
+          // hide the quit button
+          <ButtonBase onClick={endTutorial}>
             <div
               style={{
                 ...styles.iconButtonContainer,
@@ -246,6 +250,7 @@ type Props = {|
   tooltip: InAppTutorialFormattedTooltip,
   buttonLabel?: string,
   progress: number,
+  endTutorial: () => void,
 |};
 
 const InAppTutorialTooltipDisplayer = ({
@@ -253,6 +258,7 @@ const InAppTutorialTooltipDisplayer = ({
   tooltip,
   buttonLabel,
   progress,
+  endTutorial,
 }: Props) => {
   const {
     palette: { type: paletteType },
@@ -324,6 +330,7 @@ const InAppTutorialTooltipDisplayer = ({
                       folded ? tooltip.title || tooltip.description : undefined
                     }
                     onClickFoldButton={() => setFolded(!folded)}
+                    endTutorial={endTutorial}
                   />
                   {!folded && (
                     <TooltipBody tooltip={tooltip} buttonLabel={buttonLabel} />

@@ -140,32 +140,24 @@ const TooltipBody = ({ tooltip, buttonLabel }: TooltipBodyProps) => {
           <MarkdownText source={tooltip.title} allowParagraphs />
         </Typography>
       )}
-      {tooltip.title && (tooltip.description || tooltip.getDescriptionNode) && (
-        <span style={styles.divider} />
-      )}
-      {tooltip.getDescriptionNode &&
-        tooltip.getDescriptionNode(styles.description)}
-      {tooltip.description && !tooltip.getDescriptionNode && (
+      {tooltip.title && tooltip.description && <span style={styles.divider} />}
+      {tooltip.description && (
         <Typography style={styles.description} noMargin>
           <MarkdownText source={tooltip.description} allowParagraphs />
         </Typography>
       )}
       {tooltip.image && (
-        <>
-          <img
-            src={tooltip.image.dataUrl}
-            alt="Tutorial helper"
-            style={{
-              ...styles.descriptionImage,
-              width: tooltip.image.width || '100%',
-            }}
-          />
-        </>
+        <img
+          src={tooltip.image.dataUrl}
+          alt="Tutorial helper"
+          style={{
+            ...styles.descriptionImage,
+            width: tooltip.image.width || '100%',
+          }}
+        />
       )}
       {buttonLabel && (
-        <>
-          <RaisedButton primary label={buttonLabel} onClick={goToNextStep} />
-        </>
+        <RaisedButton primary label={buttonLabel} onClick={goToNextStep} />
       )}
     </>
   );

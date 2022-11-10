@@ -279,10 +279,13 @@ const InAppTutorialOrchestrator = React.forwardRef<
     [flow, changeStep, stepCount]
   );
 
+  const computeProgress = () =>
+    Math.round((currentStepIndex / tutorial.flow.length) * 100);
+
   const getProgress = () => {
     return {
       step: currentStepIndex,
-      progress: Math.round((currentStepIndex / tutorial.flow.length) * 100),
+      progress: computeProgress(),
     };
   };
 
@@ -562,6 +565,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
           changeStep(currentStepFallbackStepIndex.current);
         }}
         endTutorial={endTutorial}
+        progress={computeProgress()}
       />
     );
   };

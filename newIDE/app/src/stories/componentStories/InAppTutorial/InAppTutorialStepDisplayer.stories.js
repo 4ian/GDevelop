@@ -17,6 +17,7 @@ export const WrongEditorInfo = () => {
     <>
       <div id="step-text">Test text</div>
       <InAppTutorialStepDisplayer
+        progress={28}
         step={{ elementToHighlightId: '#step-text' }}
         expectedEditor="Scene"
         goToFallbackStep={() => {}}
@@ -43,6 +44,7 @@ export const StandaloneTooltip = () => {
             },
           },
         }}
+        progress={28}
         expectedEditor={null}
         goToFallbackStep={() => {}}
         endTutorial={() => action('end tutorial')()}

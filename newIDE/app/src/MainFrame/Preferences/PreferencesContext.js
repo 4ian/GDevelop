@@ -213,6 +213,7 @@ export type PreferencesValues = {|
         /** Rounded progress in percentage */
         progress: number,
         fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
+        projectData: {| [key: string]: string |},
       |},
     },
   },
@@ -285,6 +286,7 @@ export type Preferences = {|
     step: number,
     progress: number,
     fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
+    projectData: {| [key: string]: string |},
   |}) => void,
   getTutorialProgress: ({|
     tutorialId: string,
@@ -293,6 +295,7 @@ export type Preferences = {|
     step: number,
     progress: number,
     fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
+    projectData: {| [key: string]: string |},
   |},
 |};
 

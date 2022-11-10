@@ -95,7 +95,9 @@ const MainPage = ({
   tutorials,
 }: Props) => {
   const classes = useStyles();
-  const { currentlyRunningInAppTutorial } = React.useContext(InAppTutorialContext);
+  const { currentlyRunningInAppTutorial } = React.useContext(
+    InAppTutorialContext
+  );
   const windowWidth = useResponsiveWindowWidth();
   const shouldShowOnboardingButton = !isMobile();
   const helpItems: {

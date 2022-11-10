@@ -198,15 +198,14 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   _saveTutorialProgress({
     tutorialId,
     userId,
-    step,
-    progress,
-    fileMetadataAndStorageProviderName,
+    ...tutorialProgress
   }: {|
     tutorialId: string,
     userId: ?string,
     step: number,
     progress: number,
     fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
+    projectData: {| [key: string]: string |},
   |}) {
     const userIdKey: string = userId || 'anonymous';
     this.setState(
@@ -218,11 +217,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
               ...values.inAppTutorialsProgress,
               [tutorialId]: {
                 ...values.inAppTutorialsProgress[tutorialId],
-                [userIdKey]: {
-                  step,
-                  progress,
-                  fileMetadataAndStorageProviderName,
-                },
+                [userIdKey]: tutorialProgress,
               },
             },
           },

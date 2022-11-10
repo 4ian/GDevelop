@@ -19,6 +19,8 @@ const styles = {
   // This container is important to have the loader positioned on top of the image.
   imageContainer: {
     position: 'relative',
+    display: 'flex',
+    flex: 1,
   },
   loaderContainer: {
     position: 'absolute',

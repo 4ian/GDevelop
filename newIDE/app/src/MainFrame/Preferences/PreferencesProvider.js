@@ -206,7 +206,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     userId: ?string,
     step: number,
     progress: number,
-    fileMetadataAndStorageProviderName?: FileMetadataAndStorageProviderName,
+    fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
   |}) {
     const userIdKey: string = userId || 'anonymous';
     this.setState(

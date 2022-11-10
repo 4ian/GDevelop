@@ -212,7 +212,7 @@ export type PreferencesValues = {|
         step: number,
         /** Rounded progress in percentage */
         progress: number,
-        fileMetadataAndStorageProviderName?: FileMetadataAndStorageProviderName,
+        fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
       |},
     },
   },
@@ -284,7 +284,7 @@ export type Preferences = {|
     userId: ?string,
     step: number,
     progress: number,
-    fileMetadataAndStorageProviderName?: FileMetadataAndStorageProviderName,
+    fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
   |}) => void,
   getTutorialProgress: ({|
     tutorialId: string,
@@ -292,7 +292,7 @@ export type Preferences = {|
   |}) => ?{|
     step: number,
     progress: number,
-    fileMetadataAndStorageProviderName?: FileMetadataAndStorageProviderName,
+    fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
   |},
 |};
 

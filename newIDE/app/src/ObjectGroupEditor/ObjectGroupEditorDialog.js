@@ -35,7 +35,7 @@ const ObjectGroupEditorDialog = ({
 
   return (
     <Dialog
-      title={<Trans>Edit {group.getName()} group</Trans>}
+      title={<Trans>Edit {group.getName()}</Trans>}
       key={group.ptr}
       actions={[
         <FlatButton

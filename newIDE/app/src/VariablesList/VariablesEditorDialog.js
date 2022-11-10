@@ -54,6 +54,7 @@ const VariablesEditorDialog = ({
 
   return (
     <Dialog
+      title={title}
       actions={[
         <FlatButton
           label={<Trans>Cancel</Trans>}
@@ -89,7 +90,6 @@ const VariablesEditorDialog = ({
       onRequestClose={onCancelChanges}
       onApply={onApply}
       open={open}
-      title={title}
       flexBody
       fullHeight
     >

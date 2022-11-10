@@ -223,8 +223,8 @@ const AssetPackInstallDialog = ({
 
   return (
     <Dialog
-      maxWidth="sm"
       title={assetPack.name}
+      maxWidth="sm"
       open
       onRequestClose={() => {
         if (!areAssetsBeingInstalled) onClose();

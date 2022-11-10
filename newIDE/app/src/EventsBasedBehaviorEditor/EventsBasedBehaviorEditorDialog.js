@@ -27,7 +27,7 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
 
     return (
       <Dialog
-        title={<Trans>Edit the behavior</Trans>}
+        title={<Trans>Edit {eventsBasedBehavior.getName()}</Trans>}
         secondaryActions={[
           <HelpButton
             key="help"

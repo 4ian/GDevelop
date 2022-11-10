@@ -34,6 +34,7 @@ function ConfirmDeleteDialog(props: Props) {
     <I18n>
       {({ i18n }) => (
         <Dialog
+          title={i18n._(props.title)}
           open={props.open}
           isDangerous
           onApply={onConfirm}
@@ -55,7 +56,6 @@ function ConfirmDeleteDialog(props: Props) {
               disabled={!canConfirm}
             />,
           ]}
-          title={i18n._(props.title)}
           noMobileFullScreen
         >
           <Text size="body">{i18n._(props.message)}</Text>

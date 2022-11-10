@@ -449,7 +449,7 @@ export default function SpriteEditor({
       />
       {advancedOptionsOpen && (
         <Dialog
-          title={<Trans>Sprite options</Trans>}
+          title={<Trans>Advanced options</Trans>}
           actions={[
             <FlatButton
               key="close"

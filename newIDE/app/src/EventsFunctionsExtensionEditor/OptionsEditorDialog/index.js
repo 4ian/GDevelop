@@ -36,7 +36,7 @@ export default function OptionsEditorDialog({
 
   return (
     <Dialog
-      title={<Trans>Edit extension options</Trans>}
+      title={<Trans>{eventsFunctionsExtension.getName()} options</Trans>}
       secondaryActions={[
         <HelpButton key="help" helpPagePath="/extensions/create" />,
         eventsFunctionsExtensionWriter ? (

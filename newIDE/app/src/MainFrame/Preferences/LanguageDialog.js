@@ -31,6 +31,7 @@ const LanguageDialog = ({ open, onClose }: Props) => {
 
         return (
           <Dialog
+            title={<Trans>Language</Trans>}
             actions={[
               <FlatButton
                 label={
@@ -63,7 +64,6 @@ const LanguageDialog = ({ open, onClose }: Props) => {
             cannotBeDismissed={isLoadingLanguage}
             onRequestClose={() => onClose(languageDidChange)}
             open={open}
-            title={<Trans>Language</Trans>}
             maxWidth="sm"
           >
             <LanguageSelector

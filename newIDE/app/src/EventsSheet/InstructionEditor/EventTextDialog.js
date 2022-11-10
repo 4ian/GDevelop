@@ -140,7 +140,13 @@ const EventTextDialog = (props: Props) => {
 
   return (
     <Dialog
-      title={<Trans>Edit the event text</Trans>}
+      title={
+        eventType === 'BuiltinCommonInstructions::Comment' ? (
+          <Trans>Edit comment</Trans>
+        ) : (
+          <Trans>Edit group</Trans>
+        )
+      }
       open
       actions={[
         <FlatButton

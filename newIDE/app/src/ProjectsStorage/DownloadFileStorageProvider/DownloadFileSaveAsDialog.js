@@ -227,6 +227,7 @@ export default function DownloadFileSaveAsDialog({ project, onDone }: Props) {
 
   return (
     <Dialog
+      title={<Trans>Download a copy</Trans>}
       actions={[
         <FlatButton
           key="download"
@@ -244,7 +245,6 @@ export default function DownloadFileSaveAsDialog({ project, onDone }: Props) {
       onRequestClose={onDone}
       open
       maxWidth="sm"
-      title={<Trans>Download a copy</Trans>}
     >
       <ColumnStackLayout noMargin>
         <Text>

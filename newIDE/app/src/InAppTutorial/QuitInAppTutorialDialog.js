@@ -4,21 +4,18 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
+import { Line } from '../UI/Grid';
+import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
 
 type Props = {|
   onSaveProject: () => Promise<void>,
+  canEndTutorial: boolean,
   endTutorial: () => void,
   onClose: () => void,
 |};
 
 const QuitInAppTutorialDialog = (props: Props) => {
-  const saveAndQuitTutorial = async () => {
-    await props.onSaveProject();
-    props.endTutorial();
-    props.onClose();
-  };
-
   const quitTutorial = () => {
     props.endTutorial();
     props.onClose();
@@ -29,6 +26,12 @@ const QuitInAppTutorialDialog = (props: Props) => {
       open
       maxWidth="sm"
       title="Quit tutorial"
+      onRequestClose={props.onClose}
+      onApply={() => {
+        if (props.canEndTutorial) {
+          props.endTutorial();
+        }
+      }}
       secondaryActions={[
         <FlatButton
           key="exit"
@@ -44,9 +47,10 @@ const QuitInAppTutorialDialog = (props: Props) => {
         />,
         <DialogPrimaryButton
           primary
-          label={<Trans>Save and Exit</Trans>}
+          disabled={!props.canEndTutorial}
+          label={<Trans>Exit</Trans>}
           key="save-and-exit"
-          onClick={saveAndQuitTutorial}
+          onClick={quitTutorial}
         />,
       ]}
       flexColumnBody
@@ -60,6 +64,14 @@ const QuitInAppTutorialDialog = (props: Props) => {
           later!
         </Trans>
       </Text>
+      <Line justifyContent="center">
+        <RaisedButton
+          primary
+          label={<Trans>Save project</Trans>}
+          disabled={props.canEndTutorial}
+          onClick={props.onSaveProject}
+        />
+      </Line>
     </Dialog>
   );
 };

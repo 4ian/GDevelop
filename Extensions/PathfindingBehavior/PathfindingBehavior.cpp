@@ -63,7 +63,8 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("smoothingMaxCellGap")))
       .SetGroup(_("Path smoothing"))
-      .SetDescription(_("It's recommended to leave a max gap of 1 cell."));
+      .SetDescription(_("It's recommended to leave a max gap of 1 cell. "
+                        "Setting it to 0 disable the smoothing."));
 
   return properties;
 }

@@ -37,7 +37,7 @@ export default class ParticleEmitterEditor extends React.Component<
     const tutorialIds = getObjectTutorialIds(objectConfiguration.getType());
 
     return (
-      <ColumnStackLayout>
+      <ColumnStackLayout noMargin>
         {tutorialIds.map(tutorialId => (
           <DismissableTutorialMessage
             key={tutorialId}

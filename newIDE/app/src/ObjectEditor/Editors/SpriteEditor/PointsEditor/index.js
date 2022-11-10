@@ -24,9 +24,15 @@ import EditorMosaic, {
   type EditorMosaicNode,
 } from '../../../../UI/EditorMosaic';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import Background from '../../../../UI/Background';
 import ScrollView from '../../../../UI/ScrollView';
+import Paper from '../../../../UI/Paper';
 const gd: libGDevelop = global.gd;
+
+const styles = {
+  container: {
+    display: 'flex',
+  },
+};
 
 const horizontalMosaicNodes: EditorMosaicNode = {
   direction: 'row',
@@ -188,82 +194,88 @@ const PointsEditor = ({
       type: 'primary',
       noTitleBar: true,
       renderEditor: () => (
-        <Background>
-          <ImagePreview
-            resourceName={resourceName}
-            imageResourceSource={resourcesLoader.getResourceFullUrl(
-              project,
-              resourceName,
-              {}
-            )}
-            isImageResourceSmooth={isProjectImageResourceSmooth(
-              project,
-              resourceName
-            )}
-            project={project}
-            renderOverlay={overlayProps =>
-              sprite && (
-                <PointsPreview
-                  {...overlayProps}
-                  pointsContainer={sprite}
-                  onPointsUpdated={updatePoints}
-                  selectedPointName={selectedPointName}
-                  highlightedPointName={highlightedPointName}
-                  onClickPoint={setSelectedPointName}
-                />
-              )
-            }
-          />
-        </Background>
+        <Paper background="medium" style={styles.container}>
+          <Column noMargin expand>
+            <ImagePreview
+              resourceName={resourceName}
+              imageResourceSource={resourcesLoader.getResourceFullUrl(
+                project,
+                resourceName,
+                {}
+              )}
+              isImageResourceSmooth={isProjectImageResourceSmooth(
+                project,
+                resourceName
+              )}
+              project={project}
+              renderOverlay={overlayProps =>
+                sprite && (
+                  <PointsPreview
+                    {...overlayProps}
+                    pointsContainer={sprite}
+                    onPointsUpdated={updatePoints}
+                    selectedPointName={selectedPointName}
+                    highlightedPointName={highlightedPointName}
+                    onClickPoint={setSelectedPointName}
+                  />
+                )
+              }
+            />
+          </Column>
+        </Paper>
       ),
     },
     properties: {
       type: 'secondary',
       noTitleBar: true,
       renderEditor: () => (
-        <Background>
-          <ScrollView>
-            <Line>
-              <Column expand>
-                <SpriteSelector
-                  spriteConfiguration={spriteConfiguration}
-                  animationIndex={animationIndex}
-                  directionIndex={directionIndex}
-                  spriteIndex={spriteIndex}
-                  chooseAnimation={chooseAnimation}
-                  chooseDirection={chooseDirection}
-                  chooseSprite={chooseSprite}
-                  sameForAllAnimations={samePointsForAnimations}
-                  sameForAllSprites={samePointsForSprites}
-                  setSameForAllAnimations={setSamePointsForAllAnimations}
-                  setSameForAllSprites={setSamePointsForAllSprites}
-                  setSameForAllAnimationsLabel={
-                    <Trans>Share same points for all animations</Trans>
-                  }
-                  setSameForAllSpritesLabel={
-                    <Trans>
-                      Share same points for all sprites of this animation
-                    </Trans>
-                  }
+        <Paper background="medium" style={styles.container}>
+          <Column noMargin expand>
+            <ScrollView>
+              <Line>
+                <Column expand>
+                  <SpriteSelector
+                    spriteConfiguration={spriteConfiguration}
+                    animationIndex={animationIndex}
+                    directionIndex={directionIndex}
+                    spriteIndex={spriteIndex}
+                    chooseAnimation={chooseAnimation}
+                    chooseDirection={chooseDirection}
+                    chooseSprite={chooseSprite}
+                    sameForAllAnimations={samePointsForAnimations}
+                    sameForAllSprites={samePointsForSprites}
+                    setSameForAllAnimations={setSamePointsForAllAnimations}
+                    setSameForAllSprites={setSamePointsForAllSprites}
+                    setSameForAllAnimationsLabel={
+                      <Trans>Share same points for all animations</Trans>
+                    }
+                    setSameForAllSpritesLabel={
+                      <Trans>
+                        Share same points for all sprites of this animation
+                      </Trans>
+                    }
+                  />
+                </Column>
+              </Line>
+              {!!sprite && (
+                <PointsList
+                  pointsContainer={sprite}
+                  onPointsUpdated={updatePoints}
+                  selectedPointName={selectedPointName}
+                  onHoverPoint={setHighlightedPointName}
+                  onSelectPoint={setSelectedPointName}
                 />
-              </Column>
-            </Line>
-            {!!sprite && (
-              <PointsList
-                pointsContainer={sprite}
-                onPointsUpdated={updatePoints}
-                selectedPointName={selectedPointName}
-                onHoverPoint={setHighlightedPointName}
-                onSelectPoint={setSelectedPointName}
-              />
-            )}
-            {!sprite && (
-              <EmptyMessage>
-                <Trans>Choose an animation and frame to edit the points</Trans>
-              </EmptyMessage>
-            )}
-          </ScrollView>
-        </Background>
+              )}
+              {!sprite && (
+                <EmptyMessage>
+                  <Trans>
+                    Choose an animation and frame to edit the points
+                  </Trans>
+                </EmptyMessage>
+              )}
+            </ScrollView>
+          </Column>
+        </Paper>
       ),
     },
   };

@@ -23,6 +23,7 @@ function ConfirmDialog(props: Props) {
     <I18n>
       {({ i18n }) => (
         <Dialog
+          title={i18n._(props.title)}
           open={props.open}
           actions={[
             <FlatButton
@@ -38,7 +39,7 @@ function ConfirmDialog(props: Props) {
             />,
           ]}
           maxWidth="xs"
-          title={i18n._(props.title)}
+          noMobileFullScreen
         >
           <Text>{i18n._(props.message)}</Text>
         </Dialog>

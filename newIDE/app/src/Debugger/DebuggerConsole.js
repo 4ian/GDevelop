@@ -313,8 +313,8 @@ export const DebuggerConsole = ({
 
       {editingHiddenGroups && (
         <Dialog
-          open
           title={<Trans>Select log groups to display</Trans>}
+          open
           actions={[
             <FlatButton
               key="close"

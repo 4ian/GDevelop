@@ -27,7 +27,7 @@ import IconButton from '../../UI/IconButton';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import { getObjectParameterIndex } from '../../InstructionOrExpression/EnumerateInstructions';
 import Text from '../../UI/Text';
-import { getInstructionMetadata } from './NewInstructionEditor';
+import { getInstructionMetadata } from './InstructionEditor';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { setupInstructionParameters } from '../../InstructionOrExpression/SetupInstructionParameters';
 import ScrollView from '../../UI/ScrollView';
@@ -197,21 +197,7 @@ const InstructionParametersEditor = React.forwardRef<
     };
 
     const renderEmpty = () => {
-      return (
-        <div style={{ ...styles.emptyContainer, ...style }}>
-          <EmptyMessage>
-            {isCondition ? (
-              <Trans>
-                Choose a condition (or an object then a condition) on the left
-              </Trans>
-            ) : (
-              <Trans>
-                Choose an action (or an object then an action) on the left
-              </Trans>
-            )}
-          </EmptyMessage>
-        </div>
-      );
+      return <div style={{ ...styles.emptyContainer, ...style }} />;
     };
 
     React.useEffect(

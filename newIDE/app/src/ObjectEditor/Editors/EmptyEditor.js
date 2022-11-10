@@ -6,7 +6,7 @@ import EmptyMessage from '../../UI/EmptyMessage';
 
 export default function EmptyEditor() {
   return (
-    <Column>
+    <Column noMargin>
       <Line>
         <EmptyMessage>
           <Trans>

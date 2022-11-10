@@ -36,6 +36,7 @@ export default function SubscriptionPendingDialog({
 
   return (
     <Dialog
+      title={<Trans>Confirming your subscription</Trans>}
       actions={[
         hasPlan ? (
           <DialogPrimaryButton
@@ -56,10 +57,9 @@ export default function SubscriptionPendingDialog({
       onRequestClose={onClose}
       maxWidth="sm"
       open
-      noMargin
     >
       {!hasPlan ? (
-        <Column>
+        <Column noMargin>
           <Line>
             <Text>
               <Trans>
@@ -90,7 +90,7 @@ export default function SubscriptionPendingDialog({
           </Line>
         </Column>
       ) : (
-        <Column>
+        <Column noMargin>
           <Line>
             <Text>
               <Trans>

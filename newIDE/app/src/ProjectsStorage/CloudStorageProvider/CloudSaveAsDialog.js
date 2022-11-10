@@ -33,6 +33,7 @@ const CloudSaveAsDialog = (props: Props) => {
     <I18n>
       {({ i18n }) => (
         <Dialog
+          title={<Trans>Choose a name for your new project</Trans>}
           onApply={() => onSave(i18n)}
           actions={[
             <FlatButton
@@ -51,7 +52,6 @@ const CloudSaveAsDialog = (props: Props) => {
           open
           onRequestClose={props.onCancel}
           maxWidth="sm"
-          title={<Trans>Choose a name for your new project</Trans>}
           flexBody
         >
           <TextField

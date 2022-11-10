@@ -31,9 +31,11 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
-  eventsBasedBehavior: gdEventsBasedBehavior,
+  properties: gdNamedPropertyDescriptorsList,
+  allowRequiredBehavior?: boolean,
   onPropertiesUpdated: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
+  behaviorObjectType?: string,
 |};
 
 const styles = {
@@ -94,8 +96,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
   {||}
 > {
   _addProperty = () => {
-    const { eventsBasedBehavior } = this.props;
-    const properties = eventsBasedBehavior.getPropertyDescriptors();
+    const { properties } = this.props;
 
     const newName = newNameGenerator('Property', name => properties.has(name));
     const property = properties.insertNew(newName, properties.getCount());
@@ -105,8 +106,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
   };
 
   _removeProperty = (name: string) => {
-    const { eventsBasedBehavior } = this.props;
-    const properties = eventsBasedBehavior.getPropertyDescriptors();
+    const { properties } = this.props;
 
     properties.remove(name);
     this.forceUpdate();
@@ -114,8 +114,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
   };
 
   _moveProperty = (oldIndex: number, newIndex: number) => {
-    const { eventsBasedBehavior } = this.props;
-    const properties = eventsBasedBehavior.getPropertyDescriptors();
+    const { properties } = this.props;
 
     properties.move(oldIndex, newIndex);
     this.forceUpdate();
@@ -137,8 +136,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
   };
 
   _getPropertyGroupNames = (): Array<string> => {
-    const { eventsBasedBehavior } = this.props;
-    const properties = eventsBasedBehavior.getPropertyDescriptors();
+    const { properties } = this.props;
 
     const groupNames = new Set<string>();
     for (let i = 0; i < properties.size(); i++) {
@@ -150,9 +148,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
   };
 
   render() {
-    const { eventsBasedBehavior } = this.props;
-
-    const properties = eventsBasedBehavior.getPropertyDescriptors();
+    const { properties } = this.props;
 
     return (
       <I18n>
@@ -274,10 +270,12 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                 value="Color"
                                 primaryText={t`Color (text)`}
                               />
-                              <SelectOption
-                                value="Behavior"
-                                primaryText={t`Required behavior`}
-                              />
+                              {this.props.allowRequiredBehavior && (
+                                <SelectOption
+                                  value="Behavior"
+                                  primaryText={t`Required behavior`}
+                                />
+                              )}
                             </SelectField>
                             {(property.getType() === 'String' ||
                               property.getType() === 'Number') && (
@@ -323,29 +321,30 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                 />
                               </SelectField>
                             )}
-                            {property.getType() === 'Behavior' && (
-                              <BehaviorTypeSelector
-                                project={this.props.project}
-                                objectType={this.props.eventsBasedBehavior.getObjectType()}
-                                value={
-                                  property.getExtraInfo().size() === 0
-                                    ? ''
-                                    : property.getExtraInfo().at(0)
-                                }
-                                onChange={(newValue: string) => {
-                                  // Change the type of the required behavior.
-                                  const extraInfo = property.getExtraInfo();
-                                  if (extraInfo.size() === 0) {
-                                    extraInfo.push_back(newValue);
-                                  } else {
-                                    extraInfo.set(0, newValue);
+                            {property.getType() === 'Behavior' &&
+                              this.props.behaviorObjectType && (
+                                <BehaviorTypeSelector
+                                  project={this.props.project}
+                                  objectType={this.props.behaviorObjectType}
+                                  value={
+                                    property.getExtraInfo().size() === 0
+                                      ? ''
+                                      : property.getExtraInfo().at(0)
                                   }
-                                  this.forceUpdate();
-                                  this.props.onPropertiesUpdated();
-                                }}
-                                disabled={false}
-                              />
-                            )}
+                                  onChange={(newValue: string) => {
+                                    // Change the type of the required behavior.
+                                    const extraInfo = property.getExtraInfo();
+                                    if (extraInfo.size() === 0) {
+                                      extraInfo.push_back(newValue);
+                                    } else {
+                                      extraInfo.set(0, newValue);
+                                    }
+                                    this.forceUpdate();
+                                    this.props.onPropertiesUpdated();
+                                  }}
+                                  disabled={false}
+                                />
+                              )}
                             {property.getType() === 'Color' && (
                               <ColorField
                                 floatingLabelText={<Trans>Default value</Trans>}

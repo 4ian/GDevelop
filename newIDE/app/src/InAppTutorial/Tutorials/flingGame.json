@@ -212,9 +212,18 @@
         }
       },
       "skippable": true,
-      "isOnClosableDialog": true
+      "isOnClosableDialog": true,
+      "shortcuts": [
+        {
+          "stepId": "WaitForUserForBorder",
+          "trigger": {
+            "absenceOfElement": "#add-asset-button"
+          }
+        }
+      ]
     },
     {
+      "id": "WaitForUserForBorder",
       "nextStepTrigger": {
         "presenceOfElement": "#add-asset-button"
       },
@@ -337,10 +346,17 @@
           "trigger": {
             "presenceOfElement": "#object-item-1"
           }
+        },
+        {
+          "stepId": "WaitForUserForBall",
+          "trigger": {
+            "absenceOfElement": "#add-asset-button"
+          }
         }
       ]
     },
     {
+      "id": "WaitForUserForBall",
       "nextStepTrigger": {
         "presenceOfElement": "#add-asset-button"
       },
@@ -434,10 +450,17 @@
           "trigger": {
             "presenceOfElement": "#object-item-2"
           }
+        },
+        {
+          "stepId": "WaitForUserForTarget",
+          "trigger": {
+            "absenceOfElement": "#add-asset-button"
+          }
         }
       ]
     },
     {
+      "id": "WaitForUserForTarget",
       "nextStepTrigger": {
         "presenceOfElement": "#add-asset-button"
       },
@@ -531,10 +554,17 @@
           "trigger": {
             "presenceOfElement": "#object-item-3"
           }
+        },
+        {
+          "stepId": "WaitForUserForBlock",
+          "trigger": {
+            "absenceOfElement": "#add-asset-button"
+          }
         }
       ]
     },
     {
+      "id": "WaitForUserForBlock",
       "nextStepTrigger": {
         "presenceOfElement": "#add-asset-button"
       },
@@ -1140,10 +1170,17 @@
           "trigger": {
             "presenceOfElement": "#object-item-4"
           }
+        },
+        {
+          "stepId": "WaitForUserForBackground",
+          "trigger": {
+            "absenceOfElement": "#add-asset-button"
+          }
         }
       ]
     },
     {
+      "id": "WaitForUserForBackground",
       "nextStepTrigger": {
         "presenceOfElement": "#add-asset-button"
       },
@@ -1272,10 +1309,17 @@
           "trigger": {
             "presenceOfElement": "#object-item-5"
           }
+        },
+        {
+          "stepId": "WaitForUserForObstacle",
+          "trigger": {
+            "absenceOfElement": "#add-asset-button"
+          }
         }
       ]
     },
     {
+      "id": "WaitForUserForObstacle",
       "nextStepTrigger": {
         "presenceOfElement": "#add-asset-button"
       },
@@ -1884,11 +1928,18 @@
           "trigger": {
             "presenceOfElement": "#object-item-7"
           }
+        },
+        {
+          "stepId": "WaitForUserForGrabArea",
+          "trigger": {
+            "absenceOfElement": "#add-asset-button"
+          }
         }
       ],
       "isOnClosableDialog": true
     },
     {
+      "id": "WaitForUserForGrabArea",
       "nextStepTrigger": {
         "presenceOfElement": "#add-asset-button"
       },

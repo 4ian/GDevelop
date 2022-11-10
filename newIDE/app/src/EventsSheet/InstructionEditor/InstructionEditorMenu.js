@@ -9,9 +9,9 @@ import {
 } from '../../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 import {
-  useNewInstructionEditor,
+  useInstructionEditor,
   getInstructionMetadata,
-} from './NewInstructionEditor';
+} from './InstructionEditor';
 import InstructionOrObjectSelector, {
   type TabName,
 } from './InstructionOrObjectSelector';
@@ -22,7 +22,7 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import { setupInstructionParameters } from '../../InstructionOrExpression/SetupInstructionParameters';
 import TextButton from '../../UI/TextButton';
 import Paste from '../../UI/CustomSvgIcons/Paste';
-import { Line } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 
 const styles = {
   fullHeightSelector: {
@@ -64,7 +64,7 @@ type Props = {|
  * An instruction editor in a popover.
  * Does not show the parameters for the instruction.
  */
-export default function NewInstructionEditorMenu({
+const InstructionEditorMenu = ({
   project,
   globalObjectsContainer,
   objectsContainer,
@@ -78,12 +78,12 @@ export default function NewInstructionEditorMenu({
   onSubmit,
   canPasteInstructions,
   onPasteInstructions,
-}: Props) {
+}: Props) => {
   const forceUpdate = useForceUpdate();
   const [
-    newInstructionEditorState,
-    newInstructionEditorSetters,
-  ] = useNewInstructionEditor({
+    instructionEditorState,
+    instructionEditorSetters,
+  ] = useInstructionEditor({
     instruction,
     isCondition,
     project,
@@ -96,12 +96,12 @@ export default function NewInstructionEditorMenu({
     chosenObjectName,
     chosenObjectInstructionsInfo,
     chosenObjectInstructionsInfoTree,
-  } = newInstructionEditorState;
+  } = instructionEditorState;
   const {
     chooseInstruction,
     chooseObject,
     chooseObjectInstruction,
-  } = newInstructionEditorSetters;
+  } = instructionEditorSetters;
   // As we're in a context menu, always start from 'object-or-free-instructions' step and with 'objects' tab.
   const [step, setStep] = React.useState<StepName>(
     'object-or-free-instructions'
@@ -209,33 +209,47 @@ export default function NewInstructionEditorMenu({
         horizontal: 'left',
       }}
     >
-      <SelectColumns
-        columnsRenderer={{
-          'instruction-or-object-selector': renderInstructionOrObjectSelector,
-          'object-instruction-selector': renderObjectInstructionSelector,
-        }}
-        getColumns={() => {
-          if (step === 'object-or-free-instructions') {
-            return ['instruction-or-object-selector'];
-          } else {
-            return ['object-instruction-selector'];
-          }
-        }}
-      />
-      <Line noMargin justifyContent="flex-end">
-        <TextButton
-          label={
-            isCondition ? (
-              <Trans>Paste condition(s)</Trans>
-            ) : (
-              <Trans>Paste action(s)</Trans>
-            )
-          }
-          icon={<Paste />}
-          disabled={!canPasteInstructions}
-          onClick={() => onPasteInstructions()}
-        />
-      </Line>
+      <Column>
+        <Line>
+          <SelectColumns
+            columnsRenderer={{
+              'instruction-or-object-selector': renderInstructionOrObjectSelector,
+              'object-instruction-selector': renderObjectInstructionSelector,
+            }}
+            getColumns={() => {
+              if (step === 'object-or-free-instructions') {
+                return [
+                  {
+                    columnName: 'instruction-or-object-selector',
+                  },
+                ];
+              } else {
+                return [
+                  {
+                    columnName: 'object-instruction-selector',
+                  },
+                ];
+              }
+            }}
+          />
+        </Line>
+        <Line noMargin justifyContent="flex-end">
+          <TextButton
+            label={
+              isCondition ? (
+                <Trans>Paste condition(s)</Trans>
+              ) : (
+                <Trans>Paste action(s)</Trans>
+              )
+            }
+            icon={<Paste />}
+            disabled={!canPasteInstructions}
+            onClick={() => onPasteInstructions()}
+          />
+        </Line>
+      </Column>
     </Popover>
   );
-}
+};
+
+export default InstructionEditorMenu;

@@ -32,7 +32,7 @@ export default class BrowserPreviewErrorDialog extends Component<Props> {
             open
           >
             <Line>
-              <Column>
+              <Column noMargin>
                 <Text>
                   {// $FlowFixMe - AWS returned errors can have extra fields
                   error.code === 'NetworkingError' ? (
@@ -49,7 +49,7 @@ export default class BrowserPreviewErrorDialog extends Component<Props> {
               </Column>
             </Line>
             <Line>
-              <Column>
+              <Column noMargin>
                 <Text>
                   <Trans>
                     Make sure you're online, have a proper internet connection

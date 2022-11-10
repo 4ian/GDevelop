@@ -100,6 +100,7 @@ function LeaderboardSortOptionsDialog({
     <I18n>
       {({ i18n }) => (
         <Dialog
+          title={<Trans>Leaderboard options</Trans>}
           open={open}
           maxWidth="sm"
           secondaryActions={[

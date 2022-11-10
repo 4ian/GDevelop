@@ -1,14 +1,14 @@
 // @flow
 import React from 'react';
-import Paper from '@material-ui/core/Paper';
 import { type StoryDecorator } from '@storybook/react';
+import Paper from '../UI/Paper';
 
 const style = {
   padding: 10,
 };
 
 const paperDecorator: StoryDecorator = (Story, context) => (
-  <Paper style={style}>
+  <Paper background="dark" style={style}>
     <Story />
   </Paper>
 );

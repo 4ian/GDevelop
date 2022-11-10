@@ -5,8 +5,7 @@ import { I18n } from '@lingui/react';
 import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { makeStyles } from '@material-ui/core';
-import GDevelopThemeContext from './Theme/ThemeContext';
-import Paper from '@material-ui/core/Paper';
+import Paper from './Paper';
 
 const INVALID_VALUE = '';
 const stopPropagation = event => event.stopPropagation();
@@ -91,7 +90,6 @@ const SearchBarSelectField = React.forwardRef<
     focus,
   }));
 
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const selectStyles = useSelectStyles(props.textAlign);
 
   const onChange = props.onChange || undefined;
@@ -117,14 +115,7 @@ const SearchBarSelectField = React.forwardRef<
   return (
     <I18n>
       {({ i18n }) => (
-        <Paper
-          style={{
-            backgroundColor: gdevelopTheme.searchBar.backgroundColor,
-            ...styles.root,
-          }}
-          square={false}
-          elevation={0}
-        >
+        <Paper style={styles.root} background="light">
           <div style={styles.searchContainer}>
             <TextField
               select

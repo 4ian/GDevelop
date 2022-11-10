@@ -168,7 +168,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             <Text>
               <Trans>
                 To edit the external events, choose the scene in which it will
-                be included:
+                be included
               </Trans>
             </Text>
             <Line justifyContent="center">

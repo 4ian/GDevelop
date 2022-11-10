@@ -55,8 +55,9 @@ function ConfirmDeleteDialog(props: Props) {
               disabled={!canConfirm}
             />,
           ]}
+          title={i18n._(props.title)}
+          noMobileFullScreen
         >
-          <Text size="block-title">{i18n._(props.title)}</Text>
           <Text size="body">{i18n._(props.message)}</Text>
           <LargeSpacer />
           <TextField

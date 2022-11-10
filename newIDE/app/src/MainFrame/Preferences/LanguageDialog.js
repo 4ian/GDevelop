@@ -64,6 +64,7 @@ const LanguageDialog = ({ open, onClose }: Props) => {
             onRequestClose={() => onClose(languageDidChange)}
             open={open}
             title={<Trans>Language</Trans>}
+            maxWidth="sm"
           >
             <LanguageSelector
               onLanguageChanged={() => setLanguageDidChange(true)}

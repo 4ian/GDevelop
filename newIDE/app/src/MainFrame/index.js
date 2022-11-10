@@ -1772,7 +1772,7 @@ const MainFrame = (props: Props) => {
     (
       fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
     ) => {
-      if (unsavedChanges && unsavedChanges.hasUnsavedChanges) {
+      if (unsavedChanges.hasUnsavedChanges) {
         const answer = Window.showConfirmDialog(
           i18n._(
             t`Open a new project? Any changes that have not been saved will be lost.`
@@ -1913,7 +1913,7 @@ const MainFrame = (props: Props) => {
 
         if (!wasSaved) return; // Save was cancelled, don't do anything.
 
-        if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
+        unsavedChanges.sealUnsavedChanges();
         _replaceSnackMessage(i18n._(t`Project properly saved`));
 
         if (!fileMetadata) {
@@ -2093,7 +2093,7 @@ const MainFrame = (props: Props) => {
             }));
           }
 
-          if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
+          unsavedChanges.sealUnsavedChanges();
           _replaceSnackMessage(i18n._(t`Project properly saved`));
         }
       } catch (rawError) {
@@ -2134,7 +2134,7 @@ const MainFrame = (props: Props) => {
     async (): Promise<boolean> => {
       if (!currentProject) return true;
 
-      if (unsavedChanges && unsavedChanges.hasUnsavedChanges) {
+      if (unsavedChanges.hasUnsavedChanges) {
         const answer = Window.showConfirmDialog(
           i18n._(
             t`Close the project? Any changes that have not been saved will be lost.`
@@ -2215,7 +2215,7 @@ const MainFrame = (props: Props) => {
         currentFileMetadata,
         { name: newName }
       );
-      if (wasSaved && unsavedChanges) unsavedChanges.sealUnsavedChanges();
+      if (wasSaved) unsavedChanges.sealUnsavedChanges();
     }
     await setState(state => ({
       ...state,
@@ -2372,7 +2372,7 @@ const MainFrame = (props: Props) => {
             ...state,
             currentFileMetadata: fileMetadata,
           }));
-          if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
+          unsavedChanges.sealUnsavedChanges();
           if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
             preferences.setHasProjectOpened(true);
           }
@@ -2912,7 +2912,7 @@ const MainFrame = (props: Props) => {
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}
         language={props.i18n.language}
-        hasUnsavedChanges={!!unsavedChanges && unsavedChanges.hasUnsavedChanges}
+        hasUnsavedChanges={unsavedChanges.hasUnsavedChanges}
       />
       <ChangelogDialogContainer />
       {onboardingDialogOpen && (

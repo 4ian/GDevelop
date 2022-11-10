@@ -223,8 +223,8 @@ const AssetPackInstallDialog = ({
 
   return (
     <Dialog
-      maxWidth="sm"
       title={assetPack.name}
+      maxWidth="sm"
       open
       onRequestClose={() => {
         if (!areAssetsBeingInstalled) onClose();
@@ -243,7 +243,7 @@ const AssetPackInstallDialog = ({
       ]}
       onApply={dialogContent.onApply}
     >
-      <Column>{dialogContent.content}</Column>
+      <Column noMargin>{dialogContent.content}</Column>
     </Dialog>
   );
 };

@@ -205,6 +205,7 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
     <I18n>
       {({ i18n }) => (
         <Dialog
+          title={<Trans>GDevelop Premium</Trans>}
           actions={[
             <FlatButton
               label={<Trans>Close</Trans>}
@@ -213,7 +214,6 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
               onClick={onClose}
             />,
           ]}
-          title={<Trans>GDevelop Premium</Trans>}
           onRequestClose={onClose}
           open={open}
         >
@@ -325,7 +325,7 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
                 <Text>
                   <Trans>
                     Create a GDevelop account to continue. It's free and you'll
-                    be able to access to online services like one-click builds:
+                    get access to online services like one-click builds
                   </Trans>
                 </Text>
                 <LineStackLayout justifyContent="center">

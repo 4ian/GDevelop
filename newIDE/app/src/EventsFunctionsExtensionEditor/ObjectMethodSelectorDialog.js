@@ -72,6 +72,7 @@ export default function ObjectMethodSelectorDialog({
 
   return (
     <Dialog
+      title={<Trans>Choose a new object function ("method")</Trans>}
       secondaryActions={[
         <HelpButton
           key="help"
@@ -88,8 +89,6 @@ export default function ObjectMethodSelectorDialog({
         />,
       ]}
       open
-      noMargin
-      title={<Trans>Choose a new object function ("method")</Trans>}
       onRequestClose={onCancel}
     >
       <List>

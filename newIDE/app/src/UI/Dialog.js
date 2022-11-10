@@ -4,24 +4,40 @@ import { makeStyles } from '@material-ui/core/styles';
 import MuiDialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 import classNames from 'classnames';
-import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import {
   shouldCloseOrCancel,
   shouldSubmit,
-} from '../KeyboardShortcuts/InteractionKeys';
-import { LineStackLayout } from '../Layout';
-import RaisedButton from '../RaisedButton';
+} from './KeyboardShortcuts/InteractionKeys';
+import { LineStackLayout } from './Layout';
+import RaisedButton from './RaisedButton';
+import Text from './Text';
+import Cross from './CustomSvgIcons/Cross';
+import IconButton from './IconButton';
+import { Line } from './Grid';
+import GDevelopThemeContext from './Theme/ThemeContext';
+
+// Default.
+const dialogPaddingX = 24;
+const dialogTitlePadding = 16;
+const dialogActionPadding = 24;
+
+// Mobile.
+const dialogSmallPadding = 8;
 
 const styles = {
-  defaultBody: {
-    overflowX: 'hidden',
+  dialogContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    overflowY: 'auto',
   },
-  noMarginBody: {
-    padding: 0,
+  dialogContent: {
     overflowX: 'hidden',
+    paddingLeft: 0, // Remove the default padding of MUI DialogContent.
+    paddingRight: 0, // Remove the default padding of MUI DialogContent.
   },
   flexColumnBody: {
     display: 'flex',
@@ -30,19 +46,29 @@ const styles = {
   flexBody: {
     display: 'flex',
   },
+  titleContainer: {
+    paddingBottom: dialogTitlePadding,
+    textAlign: 'left',
+  },
+  fixedContentContainer: {
+    paddingBottom: 8,
+  },
+  actionsContainer: {
+    paddingTop: dialogActionPadding,
+    paddingBottom: 0, // Remove the default padding of MUI DialogActions.
+    paddingLeft: 0, // Remove the default padding of MUI DialogActions.
+    paddingRight: 0, // Remove the default padding of MUI DialogActions.
+  },
   actionsContainerWithSecondaryActions: {
     display: 'flex',
     justifyContent: 'space-between',
-  },
-  noTitleMargin: {
-    padding: 0,
   },
   fullHeightModal: {
     minHeight: 'calc(100% - 64px)',
   },
 };
 
-const useDangerousStyles = makeStyles(theme => ({
+const useDangerousStylesForDialog = makeStyles(theme => ({
   paper: {
     '&:before': {
       content: '""',
@@ -56,11 +82,38 @@ const useDangerousStyles = makeStyles(theme => ({
   },
 }));
 
+// Customize scrollbar inside Dialog so that it gives a bit of space
+// to the content.
+const useStylesForDialogContent = makeStyles({
+  root: {
+    '&::-webkit-scrollbar': {
+      width: 11,
+    },
+    '&::-webkit-scrollbar-track': {
+      background: 'rgba(0, 0, 0, 0.04)',
+      borderRadius: 6,
+    },
+    '&::-webkit-scrollbar-thumb': {
+      border: '3px solid rgba(0, 0, 0, 0)',
+      backgroundClip: 'padding-box',
+      borderRadius: 6,
+    },
+  },
+});
+
+// Customize the background appearing when the dialog is open, based on the theme.
+const useStylesForDialogBackdrop = makeStyles({
+  root: {
+    backdropFilter: 'blur(1px)',
+  },
+});
+
 // We support a subset of the props supported by Material-UI v0.x Dialog
 // They should be self descriptive - refer to Material UI docs otherwise.
-type Props = {|
+type DialogProps = {|
   open?: boolean,
-  title?: React.Node,
+  title: React.Node,
+  fixedContent?: React.Node,
   actions?: Array<?React.Node>,
   secondaryActions?: Array<?React.Node>,
   isDangerous?: boolean,
@@ -100,21 +153,10 @@ type Props = {|
   // Size
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false,
   fullHeight?: boolean,
-
-  // Style:
-  noMargin?: boolean,
-  noTitleMargin?: boolean,
+  noMobileFullScreen?: boolean,
 
   id?: ?string,
 |};
-
-// Help Flow to understand the type of the dialog content style.
-type DialogContentStyle = {
-  padding?: 0,
-  overflowX?: 'hidden',
-  display?: 'flex',
-  flexDirection?: 'row' | 'column',
-};
 
 export const DialogPrimaryButton = RaisedButton;
 
@@ -130,21 +172,27 @@ const Dialog = ({
   open,
   onRequestClose,
   maxWidth,
-  noMargin,
   title,
+  fixedContent,
   children,
   flexColumnBody,
   flexBody,
   fullHeight,
-  noTitleMargin,
   id,
   cannotBeDismissed,
-}: Props) => {
+  noMobileFullScreen,
+}: DialogProps) => {
   const preferences = React.useContext(PreferencesContext);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backdropClickBehavior = preferences.values.backdropClickBehavior;
   const size = useResponsiveWindowWidth();
+  const hasActions =
+    (actions && actions.filter(Boolean).length > 0) ||
+    (secondaryActions && secondaryActions.filter(Boolean).length > 0);
 
-  const classesForDangerousDialog = useDangerousStyles();
+  const classesForDangerousDialog = useDangerousStylesForDialog();
+  const classesForDialogContent = useStylesForDialogContent();
+  const classesForDialogBackdrop = useStylesForDialogBackdrop();
 
   const dialogActions = React.useMemo(
     () => (
@@ -164,10 +212,28 @@ const Dialog = ({
     [actions, secondaryActions]
   );
 
-  const dialogContentStyle: DialogContentStyle = {
-    ...(noMargin ? styles.noMarginBody : styles.defaultBody),
-    ...((flexColumnBody ? styles.flexColumnBody : {}): DialogContentStyle),
-    ...((flexBody ? styles.flexBody : {}): DialogContentStyle),
+  const flexStyle = flexColumnBody
+    ? styles.flexColumnBody
+    : flexBody
+    ? styles.flexBody
+    : {};
+  const additionalPaddingStyle = {
+    paddingTop: title ? 0 : dialogTitlePadding, // Ensure the padding is here if there is no title.
+    paddingBottom: hasActions ? 0 : dialogActionPadding, // Ensure the padding is here if there are no actions.
+  };
+  const contentStyle = {
+    ...styles.dialogContent,
+    ...flexStyle,
+    ...additionalPaddingStyle,
+  };
+
+  const dialogContainerStyle = {
+    ...styles.dialogContainer,
+    // Ensure we don't spread an object here, to avoid a styling bug when resizing.
+    margin:
+      size === 'small'
+        ? dialogSmallPadding
+        : `${dialogTitlePadding}px ${dialogPaddingX}px ${dialogActionPadding}px ${dialogPaddingX}px`,
   };
 
   const onCloseDialog = React.useCallback(
@@ -216,30 +282,62 @@ const Dialog = ({
       open={open}
       onClose={onCloseDialog}
       fullWidth
-      fullScreen={size === 'small'}
+      fullScreen={size === 'small' && !noMobileFullScreen}
       className={classNames({
         'safe-area-aware-container': size === 'small',
       })}
-      PaperProps={{ style: fullHeight ? styles.fullHeightModal : {}, id }}
+      PaperProps={{
+        id,
+        style: {
+          backgroundColor: gdevelopTheme.dialog.backgroundColor,
+          ...(fullHeight ? styles.fullHeightModal : {}),
+        },
+      }}
       maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
       disableBackdropClick={false}
       onKeyDown={handleKeyDown}
+      BackdropProps={{
+        classes: classesForDialogBackdrop,
+      }}
     >
-      {title && (
-        <DialogTitle style={noTitleMargin ? styles.noTitleMargin : undefined}>
-          {title}
-        </DialogTitle>
-      )}
-      <DialogContent style={dialogContentStyle}>{children}</DialogContent>
-      <DialogActions
-        style={
-          secondaryActions
-            ? styles.actionsContainerWithSecondaryActions
-            : undefined
-        }
-      >
-        {dialogActions}
-      </DialogActions>
+      <div style={dialogContainerStyle}>
+        {title && (
+          <div style={styles.titleContainer}>
+            <Line noMargin justifyContent="space-between">
+              <Text noMargin size="section-title">
+                {title}
+              </Text>
+              {onRequestClose && !cannotBeDismissed && (
+                <IconButton
+                  onClick={onRequestClose}
+                  size="small"
+                  disabled={cannotBeDismissed}
+                >
+                  <Cross />
+                </IconButton>
+              )}
+            </Line>
+          </div>
+        )}
+        {fixedContent && (
+          <div style={styles.fixedContentContainer}>{fixedContent}</div>
+        )}
+        <DialogContent classes={classesForDialogContent} style={contentStyle}>
+          {children}
+        </DialogContent>
+        {hasActions && (
+          <DialogActions
+            style={{
+              ...styles.actionsContainer,
+              ...(secondaryActions
+                ? styles.actionsContainerWithSecondaryActions
+                : {}),
+            }}
+          >
+            {dialogActions}
+          </DialogActions>
+        )}
+      </div>
     </MuiDialog>
   );
 };

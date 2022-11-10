@@ -35,7 +35,6 @@ import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 // Import default style of react-sortable-tree and the override made for EventsSheet.
 import 'react-sortable-tree/style.css';
 import './style.css';
-import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import BottomButtons from './BottomButtons';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
@@ -48,6 +47,7 @@ import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndD
 import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
 import { AutoScroll, DropContainer } from './DropContainer';
 import { isDescendant, type MoveFunctionArguments } from './helpers';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 const gd: libGDevelop = global.gd;
 
 const eventsSheetEventsDnDType = 'events-sheet-events-dnd-type';
@@ -203,18 +203,17 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
   }
 }
 
-const SortableTree = ({ className, ...otherProps }) => (
-  <ThemeConsumer>
-    {muiTheme => (
-      <SortableTreeWithoutDndContext
-        className={`${eventsTree} ${
-          muiTheme.eventsSheetRootClassName
-        } ${className}`}
-        {...otherProps}
-      />
-    )}
-  </ThemeConsumer>
-);
+const SortableTree = ({ className, ...otherProps }) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  return (
+    <SortableTreeWithoutDndContext
+      className={`${eventsTree} ${
+        gdevelopTheme.eventsSheetRootClassName
+      } ${className}`}
+      {...otherProps}
+    />
+  );
+};
 
 const noop = () => {};
 

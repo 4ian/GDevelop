@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../../UI/Grid';
-import { Drawer, Paper } from '@material-ui/core';
+import { Drawer } from '@material-ui/core';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import IconButton from '../../../UI/IconButton';
 import DoubleChevronArrowRight from '../../../UI/CustomSvgIcons/DoubleChevronArrowRight';
@@ -16,6 +16,7 @@ import Sun from '../../../UI/CustomSvgIcons/Sun';
 import Preferences from '../../../UI/CustomSvgIcons/Preferences';
 import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
+import Paper from '../../../UI/Paper';
 
 export const styles = {
   desktopMenu: {
@@ -128,6 +129,7 @@ export const HomePageMenu = ({
           borderRight: `1px solid ${GDevelopTheme.home.separator.color}`,
         }}
         square
+        background="dark"
       >
         <Column expand>
           {windowWidth !== 'large' && (

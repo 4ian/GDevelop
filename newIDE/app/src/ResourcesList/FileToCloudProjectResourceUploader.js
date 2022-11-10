@@ -1,7 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import React from 'react';
-import Paper from '@material-ui/core/Paper';
 import { type ChooseResourceOptions } from './ResourceSource';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import AlertMessage from '../UI/AlertMessage';
@@ -16,8 +15,8 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { Line, Column } from '../UI/Grid';
 import LinearProgress from '../UI/LinearProgress';
-
-const styles = { fileInput: {} };
+import Paper from '../UI/Paper';
+import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
 type FileToCloudProjectResourceUploaderProps = {
   options: ChooseResourceOptions,
@@ -44,6 +43,7 @@ export const FileToCloudProjectResourceUploader = ({
   createNewResource,
 }: FileToCloudProjectResourceUploaderProps) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [isUploading, setIsUploading] = React.useState(false);
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
@@ -147,12 +147,14 @@ export const FileToCloudProjectResourceUploader = ({
           </Trans>
         </AlertMessage>
       ) : null}
-      <Paper variant="outlined">
+      <Paper variant="outlined" background="medium">
         <Line expand>
           <Column expand>
             <input
               accept={resourceKindToInputAcceptedFiles[options.resourceKind]}
-              style={styles.fileInput}
+              style={{
+                color: gdevelopTheme.text.color.primary,
+              }}
               multiple={options.multiSelection}
               type="file"
               ref={inputRef}

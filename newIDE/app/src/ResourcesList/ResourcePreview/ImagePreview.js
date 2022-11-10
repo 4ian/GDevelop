@@ -245,7 +245,7 @@ const ImagePreview = ({
         return (
           <Column expand noMargin useFullHeight>
             {!hideControls && (
-              <MiniToolbar>
+              <MiniToolbar noPadding>
                 <IconButton
                   onClick={() => zoomBy(-0.2)}
                   tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}

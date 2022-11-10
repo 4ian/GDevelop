@@ -6,7 +6,6 @@ import * as React from 'react';
 import { ExampleStore } from '../AssetStore/ExampleStore';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
-import { Column } from '../UI/Grid';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 
@@ -82,33 +81,26 @@ const CreateProjectDialog = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <>
-          <Dialog
-            title={<Trans>Create a new project</Trans>}
-            actions={actions}
-            onRequestClose={onClose}
-            onApply={() => {
-              onOpenProjectPreCreationDialog(/*exampleShortHeader*/ null);
+        <Dialog
+          title={<Trans>Create a new project</Trans>}
+          actions={actions}
+          onRequestClose={onClose}
+          onApply={() => {
+            onOpenProjectPreCreationDialog(/*exampleShortHeader*/ null);
+          }}
+          open={open}
+          fullHeight
+          flexColumnBody
+        >
+          <ExampleStore
+            focusOnMount
+            isOpening={isProjectOpening}
+            onOpen={async (exampleShortHeader: ExampleShortHeader) => {
+              onOpenProjectPreCreationDialog(exampleShortHeader);
             }}
-            open={open}
-            noMargin
-            fullHeight
-            flexBody
-          >
-            <Column expand noMargin>
-              <Column noMargin expand useFullHeight>
-                <ExampleStore
-                  focusOnMount
-                  isOpening={isProjectOpening}
-                  onOpen={async (exampleShortHeader: ExampleShortHeader) => {
-                    onOpenProjectPreCreationDialog(exampleShortHeader);
-                  }}
-                  initialExampleShortHeader={initialExampleShortHeader}
-                />
-              </Column>
-            </Column>
-          </Dialog>
-        </>
+            initialExampleShortHeader={initialExampleShortHeader}
+          />
+        </Dialog>
       )}
     </I18n>
   );

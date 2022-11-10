@@ -205,7 +205,7 @@ const TooltipHeader = ({
         {tooltipContent ? null : (
           // When the tooltip is folded, the tooltip content is not null and we
           // hide the quit button
-          <ButtonBase onClick={endTutorial}>
+          <ButtonBase disableRipple onClick={endTutorial}>
             <div
               style={{
                 ...styles.iconButtonContainer,
@@ -229,7 +229,7 @@ const TooltipHeader = ({
           </Typography>
         )}
         {displayFoldButton ? (
-          <ButtonBase onClick={onClickFoldButton}>
+          <ButtonBase disableRipple onClick={onClickFoldButton}>
             <span
               style={{
                 ...styles.iconButtonContainer,

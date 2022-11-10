@@ -82,29 +82,17 @@ export type InAppTutorial = {|
 |};
 
 export type InAppTutorialState = {|
-  setProject: (?gdProject) => void,
-  setCurrentEditor: (EditorIdentifier | null) => void,
-  goToNextStep: () => void,
-  onPreviewLaunch: () => void,
-  currentlyRunningInAppTutorial: string | null,
+  currentlyRunningInAppTutorial: InAppTutorial | null,
   startTutorial: (id: string) => Promise<void>,
+  endTutorial: () => void,
   inAppTutorialShortHeaders: ?Array<InAppTutorialShortHeader>,
-  getProgress: () => {|
-    step: number,
-    progress: number,
-    projectData: {| [key: string]: string |},
-  |},
 |};
 
 export const initialInAppTutorialState: InAppTutorialState = {
-  setProject: () => {},
-  setCurrentEditor: () => {},
-  goToNextStep: () => {},
-  onPreviewLaunch: () => {},
   currentlyRunningInAppTutorial: null,
   startTutorial: async () => {},
+  endTutorial: () => {},
   inAppTutorialShortHeaders: null,
-  getProgress: () => ({ step: 0, progress: 0, projectData: {} }),
 };
 
 const InAppTutorialContext = React.createContext<InAppTutorialState>(

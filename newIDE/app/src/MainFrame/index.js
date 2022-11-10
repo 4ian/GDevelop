@@ -146,6 +146,8 @@ import {
   type ResourceFetcher,
 } from '../ProjectsStorage/ResourceFetcher';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
+import { type InAppTutorialOrchestratorInterface } from '../InAppTutorial/InAppTutorialOrchestrator';
+import useInAppTutorialOrchestrator from '../InAppTutorial/useInAppTutorialOrchestrator';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -349,6 +351,10 @@ const MainFrame = (props: Props) => {
   const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
+  const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
+    null
+  );
+
   const eventsFunctionsExtensionsContext = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -373,13 +379,13 @@ const MainFrame = (props: Props) => {
     EventsFunctionsExtensionsContext
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
+  const { currentlyRunningInAppTutorial, endTutorial } = React.useContext(
+    InAppTutorialContext
+  );
   const {
-    setProject: setInAppTutorialProject,
-    setCurrentEditor,
-    onPreviewLaunch,
-    currentlyRunningInAppTutorial,
-    getProgress,
-  } = React.useContext(InAppTutorialContext);
+    InAppTutorialOrchestrator,
+    orchestratorProps,
+  } = useInAppTutorialOrchestrator({ editorTabs: state.editorTabs });
   const [
     fileMetadataOpeningProgress,
     setFileMetadataOpeningProgress,
@@ -687,7 +693,6 @@ const MainFrame = (props: Props) => {
     (): Promise<void> => {
       setHasProjectOpened(false);
       setPreviewState(initialPreviewState);
-      setInAppTutorialProject(null);
       return setState(state => {
         if (!currentProject) {
           // It's important to return a new object to ensure that the promise
@@ -713,7 +718,6 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
       setState,
-      setInAppTutorialProject,
     ]
   );
 
@@ -754,7 +758,6 @@ const MainFrame = (props: Props) => {
         currentFileMetadata: fileMetadata,
         createDialogOpen: false,
       }));
-      setInAppTutorialProject(project);
 
       // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
       // their editor will take care of reloading them.
@@ -798,7 +801,6 @@ const MainFrame = (props: Props) => {
       getStorageProviderOperations,
       ensureResourcesAreFetched,
       authenticatedUser,
-      setInAppTutorialProject,
     ]
   );
 
@@ -1395,7 +1397,9 @@ const MainFrame = (props: Props) => {
         })
         .then(() => {
           setPreviewLoading(false);
-          onPreviewLaunch();
+          if (inAppTutorialOrchestratorRef.current) {
+            inAppTutorialOrchestratorRef.current.onPreviewLaunch();
+          }
         });
     },
     [
@@ -1406,7 +1410,6 @@ const MainFrame = (props: Props) => {
       state.editorTabs,
       preferences.getIsMenuBarHiddenInPreview,
       preferences.getIsAlwaysOnTopInPreview,
-      onPreviewLaunch,
     ]
   );
 
@@ -1956,13 +1959,16 @@ const MainFrame = (props: Props) => {
           storageProviderName: storageProviderInternalName,
         };
         preferences.insertRecentProjectFile(fileMetadataAndStorageProviderName);
-        if (currentlyRunningInAppTutorial) {
+        if (
+          currentlyRunningInAppTutorial &&
+          inAppTutorialOrchestratorRef.current
+        ) {
           preferences.saveTutorialProgress({
-            tutorialId: currentlyRunningInAppTutorial,
+            tutorialId: currentlyRunningInAppTutorial.id,
             userId: authenticatedUser.profile
               ? authenticatedUser.profile.id
               : null,
-            ...getProgress(),
+            ...inAppTutorialOrchestratorRef.current.getProgress(),
             fileMetadataAndStorageProviderName,
           });
         }
@@ -2009,7 +2015,6 @@ const MainFrame = (props: Props) => {
       updateWindowTitle,
       ensureResourcesAreMoved,
       authenticatedUser,
-      getProgress,
       currentlyRunningInAppTutorial,
     ]
   );
@@ -2092,13 +2097,16 @@ const MainFrame = (props: Props) => {
           preferences.insertRecentProjectFile(
             fileMetadataAndStorageProviderName
           );
-          if (currentlyRunningInAppTutorial) {
+          if (
+            currentlyRunningInAppTutorial &&
+            inAppTutorialOrchestratorRef.current
+          ) {
             preferences.saveTutorialProgress({
-              tutorialId: currentlyRunningInAppTutorial,
+              tutorialId: currentlyRunningInAppTutorial.id,
               userId: authenticatedUser.profile
                 ? authenticatedUser.profile.id
                 : null,
-              ...getProgress(),
+              ...inAppTutorialOrchestratorRef.current.getProgress(),
               fileMetadataAndStorageProviderName,
             });
           }
@@ -2142,7 +2150,6 @@ const MainFrame = (props: Props) => {
       preferences,
       setState,
       authenticatedUser,
-      getProgress,
       currentlyRunningInAppTutorial,
     ]
   );
@@ -2506,23 +2513,6 @@ const MainFrame = (props: Props) => {
       []
     ),
   });
-
-  React.useEffect(
-    () => {
-      const currentTab = getCurrentTab(state.editorTabs);
-      if (!currentTab) {
-        setCurrentEditor(null);
-        return;
-      }
-      const editorIdentifier = currentTab.key.startsWith('start page')
-        ? 'Home'
-        : currentTab.key.startsWith('layout event')
-        ? 'EventsSheet'
-        : 'Scene';
-      setCurrentEditor(editorIdentifier);
-    },
-    [state.editorTabs, setCurrentEditor]
-  );
 
   const showLoader = isLoadingProject || previewLoading;
 
@@ -2958,6 +2948,15 @@ const MainFrame = (props: Props) => {
             clearHotReloadLogs();
             launchNewPreview();
           }}
+        />
+      )}
+      {currentlyRunningInAppTutorial && (
+        <InAppTutorialOrchestrator
+          ref={inAppTutorialOrchestratorRef}
+          tutorial={currentlyRunningInAppTutorial}
+          project={currentProject}
+          endTutorial={endTutorial}
+          {...orchestratorProps}
         />
       )}
     </div>

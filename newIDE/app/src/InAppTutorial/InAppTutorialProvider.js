@@ -8,17 +8,18 @@ import InAppTutorialOrchestrator, {
   type InAppTutorialOrchestratorInterface,
 } from './InAppTutorialOrchestrator';
 import onboardingTutorial from './Tutorials/OnboardingTutorial';
+import { setCurrentlyRunningInAppTutorial } from '../Utils/Analytics/EventSender';
+import {
+  fetchInAppTutorial,
+  fetchInAppTutorialShortHeaders,
+  type InAppTutorialShortHeader,
+} from '../Utils/GDevelopServices/InAppTutorial';
 
 type Props = {| children: React.Node |};
 
-export let currentlyRunningInAppTutorial = false;
-
 const InAppTutorialProvider = (props: Props) => {
-  const [
-    isInAppTutorialRunning,
-    setIsInAppTutorialRunning,
-  ] = React.useState<boolean>(false);
-  const [tutorial, setTutorial] = React.useState<?InAppTutorial>(null);
+  const flingTutorial = require('./Tutorials/flingGame.json')
+  const [tutorial, setTutorial] = React.useState<?InAppTutorial>(flingTutorial);
   const [project, setProject] = React.useState<?gdProject>(null);
   const [
     currentEditor,
@@ -27,13 +28,29 @@ const InAppTutorialProvider = (props: Props) => {
   const orchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
     null
   );
+  const [
+    inAppTutorialShortHeaders,
+    setInAppTutorialShortHeaders,
+  ] = React.useState<?Array<InAppTutorialShortHeader>>(null);
 
-  const startTutorial = (tutorialId: string) => {
+  const startTutorial = async (tutorialId: string) => {
     if (tutorialId === onboardingTutorial.id) {
       setTutorial(onboardingTutorial);
-      currentlyRunningInAppTutorial = tutorialId;
-      setIsInAppTutorialRunning(true);
+      setCurrentlyRunningInAppTutorial(tutorialId);
+      return;
     }
+
+    if (!inAppTutorialShortHeaders) return;
+
+    const inAppTutorialShortHeader = inAppTutorialShortHeaders.find(
+      shortHeader => shortHeader.id === tutorialId
+    );
+
+    if (!inAppTutorialShortHeader) return;
+
+    const inAppTutorial = await fetchInAppTutorial(inAppTutorialShortHeader);
+    setTutorial(inAppTutorial);
+    setCurrentlyRunningInAppTutorial(tutorialId);
   };
 
   const onPreviewLaunch = () => {
@@ -45,9 +62,31 @@ const InAppTutorialProvider = (props: Props) => {
   };
 
   const endTutorial = () => {
-    currentlyRunningInAppTutorial = null;
-    setIsInAppTutorialRunning(false);
+    setTutorial(null);
+    setCurrentlyRunningInAppTutorial(null);
   };
+
+  const getProgress = () => {
+    if (!orchestratorRef.current) return { step: 0, progress: 0 };
+    return orchestratorRef.current.getProgress();
+  };
+
+  const loadInAppTutorials = React.useCallback(async () => {
+    const fetchedInAppTutorialShortHeaders = await fetchInAppTutorialShortHeaders();
+    setInAppTutorialShortHeaders(fetchedInAppTutorialShortHeaders);
+  }, []);
+
+  // Preload the in-app tutorial short headers when the app loads.
+  React.useEffect(
+    () => {
+      const timeoutId = setTimeout(() => {
+        console.info('Pre-fetching in-app tutorials...');
+        loadInAppTutorials();
+      }, 1000);
+      return () => clearTimeout(timeoutId);
+    },
+    [loadInAppTutorials]
+  );
 
   return (
     <InAppTutorialContext.Provider
@@ -57,12 +96,14 @@ const InAppTutorialProvider = (props: Props) => {
         setCurrentEditor,
         goToNextStep,
         onPreviewLaunch,
-        isInAppTutorialRunning,
+        currentlyRunningInAppTutorial: tutorial ? tutorial.id : null,
         startTutorial,
+        inAppTutorialShortHeaders,
+        getProgress,
       }}
     >
       {props.children}
-      {tutorial && isInAppTutorialRunning && (
+      {tutorial && (
         <InAppTutorialOrchestrator
           ref={orchestratorRef}
           tutorial={tutorial}

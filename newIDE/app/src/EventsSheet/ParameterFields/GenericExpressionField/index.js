@@ -552,6 +552,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                   highlights={this.state.errorHighlights}
                 />
                 <SemiControlledTextField
+                  id={this.props.id}
                   margin={this.props.isInline ? 'none' : 'dense'}
                   value={value}
                   floatingLabelText={description}

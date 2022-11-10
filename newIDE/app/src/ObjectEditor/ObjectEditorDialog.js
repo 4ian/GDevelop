@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-import React, { useEffect, Component, type ComponentType } from 'react';
+import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -65,7 +65,7 @@ type Props = {|
 
 type InnerDialogProps = {|
   ...Props,
-  editorComponent: ?ComponentType<EditorProps>,
+  editorComponent: ?React.ComponentType<EditorProps>,
   objectName: string,
   helpPagePath: ?string,
   object: gdObject,
@@ -95,8 +95,8 @@ const InnerDialog = (props: InnerDialogProps) => {
     [props.project, props.object]
   );
 
-  // TODO: Type this variable.
-  const EditorComponent: any = props.editorComponent;
+  const EditorComponent: ?React.ComponentType<EditorProps> =
+    props.editorComponent;
 
   const onApply = () => {
     props.onApply();
@@ -110,7 +110,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     'intro-variables'
   );
 
-  useEffect(
+  React.useEffect(
     () => {
       if (currentTab === 'behaviors') {
         sendBehaviorsEditorShown({ parentEditor: 'object-editor-dialog' });
@@ -183,7 +183,7 @@ const InnerDialog = (props: InnerDialogProps) => {
       }
       id="object-editor-dialog"
     >
-      {currentTab === 'properties' && EditorComponent && (
+      {currentTab === 'properties' && EditorComponent ? (
         <Column
           noMargin
           expand
@@ -198,6 +198,7 @@ const InnerDialog = (props: InnerDialogProps) => {
             <Column expand>
               <SemiControlledTextField
                 fullWidth
+                id="object-name"
                 commitOnBlur
                 floatingLabelText={<Trans>Object name</Trans>}
                 floatingLabelFixed
@@ -227,7 +228,7 @@ const InnerDialog = (props: InnerDialogProps) => {
             onObjectUpdated={notifyOfChange}
           />
         </Column>
-      )}
+      ) : null}
       {currentTab === 'behaviors' && (
         <BehaviorsEditor
           object={props.object}
@@ -287,7 +288,7 @@ const InnerDialog = (props: InnerDialogProps) => {
 };
 
 type State = {|
-  editorComponent: ?ComponentType<EditorProps>,
+  editorComponent: ?React.ComponentType<EditorProps>,
   castToObjectType: ?(
     objectConfiguration: gdObjectConfiguration
   ) => gdObjectConfiguration,
@@ -295,7 +296,7 @@ type State = {|
   objectName: string,
 |};
 
-export default class ObjectEditorDialog extends Component<Props, State> {
+export default class ObjectEditorDialog extends React.Component<Props, State> {
   state = {
     editorComponent: null,
     castToObjectType: null,

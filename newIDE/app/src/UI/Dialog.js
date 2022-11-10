@@ -21,10 +21,8 @@ import GDevelopThemeContext from './Theme/ThemeContext';
 
 // Default.
 const dialogPaddingX = 24;
-const dialogTitlePaddingTop = 16;
-const dialogTitlePaddingBottom = 16;
-const dialogActionPaddingTop = 24;
-const dialogActionPaddingBottom = 24;
+const dialogTitlePadding = 16;
+const dialogActionPadding = 24;
 
 // Mobile.
 const dialogSmallPadding = 8;
@@ -35,13 +33,6 @@ const styles = {
     flexDirection: 'column',
     flex: 1,
     overflowY: 'auto',
-    marginTop: dialogTitlePaddingTop,
-    marginBottom: dialogActionPaddingBottom,
-    marginLeft: dialogPaddingX,
-    marginRight: dialogPaddingX,
-  },
-  dialogSmallContainer: {
-    margin: dialogSmallPadding,
   },
   dialogContent: {
     overflowX: 'hidden',
@@ -56,17 +47,17 @@ const styles = {
     display: 'flex',
   },
   titleContainer: {
-    paddingBottom: dialogTitlePaddingBottom,
+    paddingBottom: dialogTitlePadding,
     textAlign: 'left',
   },
   fixedContentContainer: {
     paddingBottom: 8,
   },
   actionsContainer: {
-    paddingTop: dialogActionPaddingTop,
+    paddingTop: dialogActionPadding,
     paddingBottom: 0, // Remove the default padding of MUI DialogActions.
-    paddingLeft: 0, // Remove the default padding of MUI DialogContent.
-    paddingRight: 0, // Remove the default padding of MUI DialogContent.
+    paddingLeft: 0, // Remove the default padding of MUI DialogActions.
+    paddingRight: 0, // Remove the default padding of MUI DialogActions.
   },
   actionsContainerWithSecondaryActions: {
     display: 'flex',
@@ -227,8 +218,8 @@ const Dialog = ({
     ? styles.flexBody
     : {};
   const additionalPaddingStyle = {
-    paddingTop: title ? 0 : dialogTitlePaddingTop,
-    paddingBottom: hasActions ? 0 : dialogActionPaddingBottom,
+    paddingTop: title ? 0 : dialogTitlePadding, // Ensure the padding is here if there is no title.
+    paddingBottom: hasActions ? 0 : dialogActionPadding, // Ensure the padding is here if there are no actions.
   };
   const contentStyle = {
     ...styles.dialogContent,
@@ -238,7 +229,11 @@ const Dialog = ({
 
   const dialogContainerStyle = {
     ...styles.dialogContainer,
-    ...(size === 'small' ? styles.dialogSmallContainer : {}),
+    // Ensure we don't spread an object here, to avoid a styling bug when resizing.
+    margin:
+      size === 'small'
+        ? dialogSmallPadding
+        : `${dialogTitlePadding}px ${dialogPaddingX}px ${dialogActionPadding}px ${dialogPaddingX}px`,
   };
 
   const onCloseDialog = React.useCallback(

@@ -78,6 +78,7 @@ const ProfileDialog = ({
 
   return (
     <Dialog
+      title={<Trans>My profile</Trans>}
       actions={[
         <FlatButton
           label={<Trans>Close</Trans>}
@@ -107,7 +108,6 @@ const ProfileDialog = ({
       onRequestClose={onClose}
       open={open}
       fullHeight
-      title={<Trans>My profile</Trans>}
       flexColumnBody
       fixedContent={
         <Tabs

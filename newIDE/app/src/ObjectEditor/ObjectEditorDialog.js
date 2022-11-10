@@ -121,7 +121,7 @@ const InnerDialog = (props: InnerDialogProps) => {
 
   return (
     <Dialog
-      title={<Trans>Edit object "{objectName}"</Trans>}
+      title={<Trans>Edit {objectName}</Trans>}
       key={props.object && props.object.ptr}
       actions={[
         <FlatButton

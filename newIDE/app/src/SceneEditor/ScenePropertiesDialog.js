@@ -217,7 +217,7 @@ const ScenePropertiesDialog = ({
 
   return (
     <Dialog
-      title={<Trans>Properties of scene "{layout.getName()}"</Trans>}
+      title={<Trans>{layout.getName()} properties</Trans>}
       actions={actions}
       secondaryActions={[
         <RaisedButton

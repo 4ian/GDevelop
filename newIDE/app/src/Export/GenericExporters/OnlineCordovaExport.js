@@ -81,6 +81,7 @@ export const SetupExportHeader = ({
       </Line>
       {exportState.signingDialogOpen && (
         <Dialog
+          title={<Trans>Signing options</Trans>}
           actions={[
             <FlatButton
               key="close"
@@ -102,7 +103,6 @@ export const SetupExportHeader = ({
             />,
           ]}
           open
-          title={<Trans>Signing options</Trans>}
           onRequestClose={() => {
             updateExportState(prevExportState => ({
               ...prevExportState,

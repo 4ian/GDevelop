@@ -48,8 +48,8 @@ const DetectShortcutDialog = (props: Props) => {
 
   return (
     <Dialog
-      open
       title={<Trans>Set shortcut</Trans>}
+      open
       maxWidth="xs"
       actions={[
         <FlatButton

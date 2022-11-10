@@ -64,6 +64,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
 
   return (
     <Dialog
+      title={<Trans>Preferences</Trans>}
       actions={[
         <FlatButton
           key="close"
@@ -75,7 +76,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
       onRequestClose={() => onClose(languageDidChange)}
       open
       maxWidth="sm"
-      title={<Trans>Preferences</Trans>}
       fixedContent={
         <Tabs
           value={currentTab}

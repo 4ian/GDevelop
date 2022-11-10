@@ -20,6 +20,7 @@ export default class BrowserPreviewErrorDialog extends Component<Props> {
       <I18n>
         {({ i18n }) => (
           <Dialog
+            title={<Trans>Could not launch the preview</Trans>}
             actions={[
               <FlatButton
                 key="close"
@@ -27,7 +28,6 @@ export default class BrowserPreviewErrorDialog extends Component<Props> {
                 onClick={onClose}
               />,
             ]}
-            title={<Trans>Could not launch the preview</Trans>}
             onRequestClose={onClose}
             open
           >

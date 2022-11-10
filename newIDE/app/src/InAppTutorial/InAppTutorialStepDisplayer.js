@@ -12,8 +12,6 @@ import {
 } from './InAppTutorialContext';
 import InAppTutorialElementHighlighter from './InAppTutorialElementHighlighter';
 import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
-import Link from '@material-ui/core/Link';
-import Text from '../UI/Text';
 import { isElementADialog } from '../UI/MaterialUISpecificUtil';
 
 const styles = {
@@ -80,26 +78,12 @@ const getWrongEditorTooltip = (
       ? i18n._(t`the home page`)
       : i18n._(t`the events sheet`);
 
-  const inlineLink = (
-    <Link onClick={onEndTutorial} style={styles.link}>
-      {i18n._(t`click here`)}
-    </Link>
-  );
-
-  const getDescriptionNode = style => (
-    <Text style={style}>
-      <span>
-        {i18n._(
-          t`Go back to ${translatedExpectedEditor} to keep creating your game, or`
-        )}
-      </span>{' '}
-      {inlineLink} <span>{i18n._(t`to quit the tutorial.`)}</span>
-    </Text>
-  );
   return {
     title: i18n._(t`You're leaving the game tutorial`),
     placement: 'top',
-    getDescriptionNode,
+    description: i18n._(
+      t`Go back to ${translatedExpectedEditor} to keep creating your game.`
+    ),
   };
 };
 

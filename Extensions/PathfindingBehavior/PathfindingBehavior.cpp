@@ -24,6 +24,7 @@ void PathfindingBehavior::InitializeContent(
   behaviorContent.SetAttribute("gridOffsetX", 0);
   behaviorContent.SetAttribute("gridOffsetY", 0);
   behaviorContent.SetAttribute("extraBorder", 0);
+  behaviorContent.SetAttribute("smoothingMaxCellGap", 1);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -34,6 +35,7 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
   properties[_("Allows diagonals")]
       .SetValue(behaviorContent.GetBoolAttribute("allowDiagonals") ? "true"
                                                                    : "false")
+      .SetGroup(_("Path smoothing"))
       .SetType("Boolean");
   properties[_("Acceleration")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
@@ -57,6 +59,12 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
       gd::String::From(behaviorContent.GetDoubleAttribute("gridOffsetY", 0)));
   properties[_("Extra border size")].SetGroup(_("Collision")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("extraBorder")));
+  properties[_("Smoothing max cell gap")]
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("smoothingMaxCellGap")))
+      .SetGroup(_("Path smoothing"))
+      .SetDescription(_("It's recommended to leave a max gap of 1 cell. "
+                        "Setting it to 0 disable the smoothing."));
 
   return properties;
 }
@@ -95,6 +103,8 @@ bool PathfindingBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
     behaviorContent.SetAttribute("gridOffsetX", value.To<float>());
   else if (name == _("Virtual grid Y offset"))
     behaviorContent.SetAttribute("gridOffsetY", value.To<float>());
+  else if (name == _("Smoothing max cell gap"))
+    behaviorContent.SetAttribute("smoothingMaxCellGap", value.To<float>());
   else
     return false;
 

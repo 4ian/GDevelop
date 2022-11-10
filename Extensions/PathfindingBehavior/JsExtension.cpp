@@ -27,7 +27,10 @@ class PathfindingBehaviorJsExtension : public gd::PlatformExtension {
             "Extensions/PathfindingBehavior/pathfindingruntimebehavior.js")
         .AddIncludeFile(
             "Extensions/PathfindingBehavior/"
-            "pathfindingobstacleruntimebehavior.js");
+            "pathfindingobstacleruntimebehavior.js")
+        .AddIncludeFile(
+            "Extensions/PathfindingBehavior/"
+            "PathTools.js");
 
     {
       std::map<gd::String, gd::InstructionMetadata>& autActions =

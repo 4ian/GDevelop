@@ -10,6 +10,10 @@ namespace gdjs {
    */
   export class PathfindingRuntimeBehavior extends gdjs.RuntimeBehavior {
     _path: Array<FloatPoint> = [];
+    /** Used by the path simplification algorithm */
+    static _smoothingResultVertices: Array<FloatPoint> = [];
+    /** Used by the path simplification algorithm */
+    static _smoothingWorkingVertices: Array<FloatPoint> = [];
 
     //Behavior configuration:
     _allowDiagonals: boolean;
@@ -23,6 +27,7 @@ namespace gdjs {
     _gridOffsetX: float;
     _gridOffsetY: float;
     _extraBorder: float;
+    _smoothingMaxCellGap: float;
 
     //Attributes used for traveling on the path:
     _pathFound: boolean = false;
@@ -60,6 +65,7 @@ namespace gdjs {
       this._gridOffsetX = behaviorData.gridOffsetX || 0;
       this._gridOffsetY = behaviorData.gridOffsetY || 0;
       this._extraBorder = behaviorData.extraBorder;
+      this._smoothingMaxCellGap = behaviorData.smoothingMaxCellGap || 0;
       this._manager = gdjs.PathfindingObstaclesManager.getManager(
         instanceContainer
       );
@@ -101,6 +107,12 @@ namespace gdjs {
       }
       if (oldBehaviorData.extraBorder !== newBehaviorData.extraBorder) {
         this.setExtraBorder(newBehaviorData.extraBorder);
+      }
+      if (
+        oldBehaviorData.smoothingMaxCellGap !==
+        newBehaviorData.smoothingMaxCellGap
+      ) {
+        this._smoothingMaxCellGap = newBehaviorData.smoothingMaxCellGap;
       }
       return true;
     }
@@ -377,6 +389,20 @@ namespace gdjs {
         this._path.reverse();
         this._path[0][0] = owner.getX();
         this._path[0][1] = owner.getY();
+
+        if (this._allowDiagonals && this._smoothingMaxCellGap > 0) {
+          gdjs.pathfinding.simplifyPath(
+            this._path,
+            this._smoothingMaxCellGap *
+              Math.min(this._cellWidth, this._cellHeight),
+            gdjs.PathfindingRuntimeBehavior._smoothingResultVertices,
+            gdjs.PathfindingRuntimeBehavior._smoothingWorkingVertices
+          );
+          let swapArray = this._path;
+          this._path = gdjs.PathfindingRuntimeBehavior._smoothingResultVertices;
+          gdjs.PathfindingRuntimeBehavior._smoothingResultVertices = swapArray;
+        }
+
         this._enterSegment(0);
         this._pathFound = true;
         return;

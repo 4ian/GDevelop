@@ -47,7 +47,7 @@ type Props = {|
     // Allow to expand the text
     flex?: 1,
 
-    // Allow to change color
+    // Allow to change color to easily simulate disabled text
     opacity?: number,
   |},
 |};

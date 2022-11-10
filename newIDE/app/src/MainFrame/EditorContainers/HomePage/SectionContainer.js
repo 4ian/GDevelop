@@ -1,12 +1,12 @@
 // @flow
 import * as React from 'react';
 import { Column, Line } from '../../../UI/Grid';
-import Paper from '@material-ui/core/Paper';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Text from '../../../UI/Text';
 import ArrowLeft from '../../../UI/CustomSvgIcons/ArrowLeft';
 import TextButton from '../../../UI/TextButton';
 import { Trans } from '@lingui/macro';
+import Paper from '../../../UI/Paper';
 
 export const SECTION_PADDING = 30;
 
@@ -60,7 +60,6 @@ const SectionContainer = ({
   return (
     <Column useFullHeight noMargin expand>
       <Paper
-        elevation={0}
         style={{
           ...styles.scrollContainer,
           display: flexBody ? 'flex' : 'block',
@@ -69,6 +68,7 @@ const SectionContainer = ({
             : styles.desktopScrollContainer),
         }}
         square
+        background="dark"
       >
         <Column expand>
           <SectionRow>
@@ -97,11 +97,11 @@ const SectionContainer = ({
       </Paper>
       {renderFooter && (
         <Paper
-          elevation={0}
           style={
             windowWidth === 'small' ? styles.mobileFooter : styles.desktopFooter
           }
           square
+          background="dark"
         >
           {renderFooter()}
         </Paper>

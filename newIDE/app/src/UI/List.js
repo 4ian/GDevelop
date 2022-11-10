@@ -50,7 +50,7 @@ type DoubleClickMouseEvent = {| button: 0 | 1 | 2 |};
 type ListItemRightButtonProps =
   | {|
       displayReloadButton: boolean,
-      reloadButtonTooltip: string,
+      reloadButtonTooltip: React.Node,
       onReload?: () => void,
     |}
   | {|

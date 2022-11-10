@@ -49,25 +49,25 @@ type Parameters = {|
   objectsContainer: gdObjectsContainer,
 |};
 
-type NewInstructionEditorState = {|
+type InstructionEditorState = {|
   chosenObjectName: ?string,
   chosenObjectInstructionsInfo: ?Array<EnumeratedInstructionMetadata>,
   chosenObjectInstructionsInfoTree: ?InstructionTreeNode,
 |};
 
-type NewInstructionEditorSetters = {|
+type InstructionEditorSetters = {|
   /** Select an instruction - which can be a free or an object instruction. */
   chooseInstruction: (
     type: string
-  ) => {| ...NewInstructionEditorState, instruction: gdInstruction |},
+  ) => {| ...InstructionEditorState, instruction: gdInstruction |},
   /** Select an object, so that then this object specific instructions can be searched and selected. */
   chooseObject: (
     objectName: string
-  ) => {| ...NewInstructionEditorState, instruction: gdInstruction |},
+  ) => {| ...InstructionEditorState, instruction: gdInstruction |},
   /** Select an instruction for the currently selected object. */
   chooseObjectInstruction: (
     type: string
-  ) => {| ...NewInstructionEditorState, instruction: gdInstruction |},
+  ) => {| ...InstructionEditorState, instruction: gdInstruction |},
 |};
 
 const findInstruction = (
@@ -78,7 +78,7 @@ const findInstruction = (
 };
 
 /** React Hook handling the state of an instruction editor. */
-export const useNewInstructionEditor = ({
+export const useInstructionEditor = ({
   instruction,
   isCondition,
   project,
@@ -86,11 +86,11 @@ export const useNewInstructionEditor = ({
   scope,
   globalObjectsContainer,
   objectsContainer,
-}: Parameters): [NewInstructionEditorState, NewInstructionEditorSetters] => {
+}: Parameters): [InstructionEditorState, InstructionEditorSetters] => {
   const getChosenObjectState = (
     objectName: string,
     discardInstructionTypeIfNotInObjectInstructions: boolean
-  ): NewInstructionEditorState => {
+  ): InstructionEditorState => {
     const chosenObjectInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
       enumerateObjectAndBehaviorsInstructions(
         isCondition,
@@ -125,7 +125,7 @@ export const useNewInstructionEditor = ({
     };
   };
 
-  const getInitialState = (): NewInstructionEditorState => {
+  const getInitialState = (): InstructionEditorState => {
     if (!isNewInstruction) {
       // Check if the instruction is an object/behavior instruction. If yes
       // select the object, which is the first parameter of the instruction.

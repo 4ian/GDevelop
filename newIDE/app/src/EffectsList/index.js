@@ -51,6 +51,7 @@ const styles = {
   rowContainer: {
     display: 'flex',
     flexDirection: 'column',
+    marginTop: 5,
   },
   rowContent: {
     display: 'flex',
@@ -214,189 +215,200 @@ export default function EffectsList(props: Props) {
                     </Column>
                   </Line>
                 )}
-                <Column noMargin>
-                  {mapFor(
-                    0,
-                    effectsContainer.getEffectsCount(),
-                    (i: number) => {
-                      const effect: gdEffect = effectsContainer.getEffectAt(i);
-                      const effectType = effect.getEffectType();
-                      const effectMetadata = getEnumeratedEffectMetadata(
-                        allEffectMetadata,
-                        effectType
-                      );
+                <Line>
+                  <Column noMargin expand>
+                    {mapFor(
+                      0,
+                      effectsContainer.getEffectsCount(),
+                      (i: number) => {
+                        const effect: gdEffect = effectsContainer.getEffectAt(
+                          i
+                        );
+                        const effectType = effect.getEffectType();
+                        const effectMetadata = getEnumeratedEffectMetadata(
+                          allEffectMetadata,
+                          effectType
+                        );
 
-                      return (
-                        <DragSourceAndDropTarget
-                          key={effect.ptr}
-                          beginDrag={() => {
-                            draggedEffect.current = effect;
-                            return {};
-                          }}
-                          canDrag={() => true}
-                          canDrop={() => true}
-                          drop={() => {
-                            moveEffect(effect);
-                          }}
-                        >
-                          {({
-                            connectDragSource,
-                            connectDropTarget,
-                            isOver,
-                            canDrop,
-                          }) =>
-                            connectDropTarget(
-                              <div key={effect.ptr} style={styles.rowContainer}>
-                                {isOver && <DropIndicator canDrop={canDrop} />}
+                        return (
+                          <DragSourceAndDropTarget
+                            key={effect.ptr}
+                            beginDrag={() => {
+                              draggedEffect.current = effect;
+                              return {};
+                            }}
+                            canDrag={() => true}
+                            canDrop={() => true}
+                            drop={() => {
+                              moveEffect(effect);
+                            }}
+                          >
+                            {({
+                              connectDragSource,
+                              connectDropTarget,
+                              isOver,
+                              canDrop,
+                            }) =>
+                              connectDropTarget(
                                 <div
-                                  style={{
-                                    ...styles.rowContent,
-                                    backgroundColor:
-                                      gdevelopTheme.list.itemsBackgroundColor,
-                                  }}
+                                  key={effect.ptr}
+                                  style={styles.rowContainer}
                                 >
-                                  {connectDragSource(
-                                    <span>
-                                      <Spacer />
-                                      <DragHandleIcon />
-                                      <Spacer />
-                                    </span>
+                                  {isOver && (
+                                    <DropIndicator canDrop={canDrop} />
                                   )}
-                                  <ResponsiveLineStackLayout expand>
-                                    <Line noMargin expand alignItems="center">
-                                      <Text noMargin noShrink>
-                                        <Trans>Effect name:</Trans>
-                                      </Text>
-                                      <Spacer />
-                                      <SemiControlledTextField
-                                        margin="none"
-                                        commitOnBlur
-                                        errorText={nameErrors[effect.ptr]}
-                                        translatableHintText={t`Enter the effect name`}
-                                        value={effect.getName()}
-                                        onChange={newName => {
-                                          renameEffect(effect, newName);
-                                        }}
-                                        fullWidth
-                                      />
-                                    </Line>
-                                    <Line noMargin expand alignItems="center">
-                                      <Text noMargin noShrink>
-                                        <Trans>Type:</Trans>
-                                      </Text>
-                                      <Spacer />
-                                      <SelectField
-                                        margin="none"
-                                        value={effectType}
-                                        onChange={(
-                                          e,
-                                          i,
-                                          newEffectType: string
-                                        ) =>
-                                          chooseEffectType(
-                                            effect,
-                                            newEffectType
-                                          )
-                                        }
-                                        fullWidth
-                                        translatableHintText={t`Choose the effect to apply`}
-                                      >
-                                        {allEffectMetadata.map(
-                                          effectMetadata => (
-                                            <SelectOption
-                                              key={effectMetadata.type}
-                                              value={effectMetadata.type}
-                                              primaryText={
-                                                effectMetadata.fullName
-                                              }
-                                              disabled={
-                                                props.target === 'object' &&
-                                                effectMetadata.isMarkedAsNotWorkingForObjects
-                                              }
-                                            />
-                                          )
-                                        )}
-                                      </SelectField>
-                                    </Line>
-                                  </ResponsiveLineStackLayout>
-                                  <ElementWithMenu
-                                    element={
-                                      <IconButton size="small">
-                                        <MoreVert />
-                                      </IconButton>
-                                    }
-                                    buildMenuTemplate={(i18n: I18nType) => [
-                                      {
-                                        label: i18n._(t`Delete`),
-                                        click: () =>
-                                          removeEffect(effect.getName()),
-                                      },
-                                      { type: 'separator' },
-                                      {
-                                        type: 'checkbox',
-                                        label: i18n._(t`Show Parameter Names`),
-                                        checked: showEffectParameterNames,
-                                        click: () =>
-                                          setShowEffectParameterNames(
-                                            !showEffectParameterNames
-                                          ),
-                                      },
-                                    ]}
-                                  />
-                                  <Spacer />
-                                </div>
-                                {effectType && (
-                                  <Line expand noMargin>
-                                    <Column expand>
-                                      {effectMetadata ? (
-                                        <React.Fragment>
-                                          <Line>
-                                            <BackgroundText>
-                                              <MarkdownText
-                                                source={
-                                                  effectMetadata.description
+                                  <div
+                                    style={{
+                                      ...styles.rowContent,
+                                      backgroundColor:
+                                        gdevelopTheme.list.itemsBackgroundColor,
+                                    }}
+                                  >
+                                    {connectDragSource(
+                                      <span>
+                                        <Spacer />
+                                        <DragHandleIcon />
+                                        <Spacer />
+                                      </span>
+                                    )}
+                                    <ResponsiveLineStackLayout expand>
+                                      <Line noMargin expand alignItems="center">
+                                        <Text noMargin noShrink>
+                                          <Trans>Effect name:</Trans>
+                                        </Text>
+                                        <Spacer />
+                                        <SemiControlledTextField
+                                          margin="none"
+                                          commitOnBlur
+                                          errorText={nameErrors[effect.ptr]}
+                                          translatableHintText={t`Enter the effect name`}
+                                          value={effect.getName()}
+                                          onChange={newName => {
+                                            renameEffect(effect, newName);
+                                          }}
+                                          fullWidth
+                                        />
+                                      </Line>
+                                      <Line noMargin expand alignItems="center">
+                                        <Text noMargin noShrink>
+                                          <Trans>Type:</Trans>
+                                        </Text>
+                                        <Spacer />
+                                        <SelectField
+                                          margin="none"
+                                          value={effectType}
+                                          onChange={(
+                                            e,
+                                            i,
+                                            newEffectType: string
+                                          ) =>
+                                            chooseEffectType(
+                                              effect,
+                                              newEffectType
+                                            )
+                                          }
+                                          fullWidth
+                                          translatableHintText={t`Choose the effect to apply`}
+                                        >
+                                          {allEffectMetadata.map(
+                                            effectMetadata => (
+                                              <SelectOption
+                                                key={effectMetadata.type}
+                                                value={effectMetadata.type}
+                                                primaryText={
+                                                  effectMetadata.fullName
+                                                }
+                                                disabled={
+                                                  props.target === 'object' &&
+                                                  effectMetadata.isMarkedAsNotWorkingForObjects
                                                 }
                                               />
-                                            </BackgroundText>
-                                          </Line>
-                                          <PropertiesEditor
-                                            instances={[effect]}
-                                            schema={
-                                              effectMetadata.parametersSchema
-                                            }
-                                            project={props.project}
-                                            resourceSources={
-                                              props.resourceSources
-                                            }
-                                            onChooseResource={
-                                              props.onChooseResource
-                                            }
-                                            resourceExternalEditors={
-                                              props.resourceExternalEditors
-                                            }
-                                            renderExtraDescriptionText={
-                                              showEffectParameterNames
-                                                ? parameterName =>
-                                                    i18n._(
-                                                      t`Parameter name in events: \`${parameterName}\` `
-                                                    )
-                                                : undefined
-                                            }
-                                          />
-                                        </React.Fragment>
-                                      ) : null}
-                                      <Spacer />
-                                    </Column>
-                                  </Line>
-                                )}
-                              </div>
-                            )
-                          }
-                        </DragSourceAndDropTarget>
-                      );
-                    }
-                  )}
-                </Column>
+                                            )
+                                          )}
+                                        </SelectField>
+                                      </Line>
+                                    </ResponsiveLineStackLayout>
+                                    <ElementWithMenu
+                                      element={
+                                        <IconButton size="small">
+                                          <MoreVert />
+                                        </IconButton>
+                                      }
+                                      buildMenuTemplate={(i18n: I18nType) => [
+                                        {
+                                          label: i18n._(t`Delete`),
+                                          click: () =>
+                                            removeEffect(effect.getName()),
+                                        },
+                                        { type: 'separator' },
+                                        {
+                                          type: 'checkbox',
+                                          label: i18n._(
+                                            t`Show Parameter Names`
+                                          ),
+                                          checked: showEffectParameterNames,
+                                          click: () =>
+                                            setShowEffectParameterNames(
+                                              !showEffectParameterNames
+                                            ),
+                                        },
+                                      ]}
+                                    />
+                                    <Spacer />
+                                  </div>
+                                  {effectType && (
+                                    <Line expand noMargin>
+                                      <Column expand>
+                                        {effectMetadata ? (
+                                          <React.Fragment>
+                                            <Line>
+                                              <BackgroundText>
+                                                <MarkdownText
+                                                  source={
+                                                    effectMetadata.description
+                                                  }
+                                                />
+                                              </BackgroundText>
+                                            </Line>
+                                            <PropertiesEditor
+                                              instances={[effect]}
+                                              schema={
+                                                effectMetadata.parametersSchema
+                                              }
+                                              project={props.project}
+                                              resourceSources={
+                                                props.resourceSources
+                                              }
+                                              onChooseResource={
+                                                props.onChooseResource
+                                              }
+                                              resourceExternalEditors={
+                                                props.resourceExternalEditors
+                                              }
+                                              renderExtraDescriptionText={
+                                                showEffectParameterNames
+                                                  ? parameterName =>
+                                                      i18n._(
+                                                        t`Parameter name in events: \`${parameterName}\` `
+                                                      )
+                                                  : undefined
+                                              }
+                                            />
+                                          </React.Fragment>
+                                        ) : null}
+                                        <Spacer />
+                                      </Column>
+                                    </Line>
+                                  )}
+                                </div>
+                              )
+                            }
+                          </DragSourceAndDropTarget>
+                        );
+                      }
+                    )}
+                  </Column>
+                </Line>
               </ScrollView>
               <Column>
                 <Line justifyContent="flex-end" expand>

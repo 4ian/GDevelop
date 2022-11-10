@@ -35,6 +35,7 @@ const ObjectGroupEditorDialog = ({
 
   return (
     <Dialog
+      title={<Trans>Edit {group.getName()}</Trans>}
       key={group.ptr}
       actions={[
         <FlatButton
@@ -50,11 +51,9 @@ const ObjectGroupEditorDialog = ({
           onClick={onApply}
         />,
       ]}
-      noMargin
       onRequestClose={onCancelChanges}
       onApply={onApply}
       open
-      title={`Edit ${group.getName()} group`}
     >
       <ObjectGroupEditor
         project={project}

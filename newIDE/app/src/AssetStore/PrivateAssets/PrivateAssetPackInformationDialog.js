@@ -23,12 +23,12 @@ import PublicProfileDialog from '../../Profile/PublicProfileDialog';
 import Link from '../../UI/Link';
 import Mark from '../../UI/CustomSvgIcons/Mark';
 import Cross from '../../UI/CustomSvgIcons/Cross';
-import Paper from '@material-ui/core/Paper';
 import ResponsiveImagesGallery from '../../UI/ResponsiveImagesGallery';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import RaisedButton from '../../UI/RaisedButton';
 import { sendAssetPackBuyClicked } from '../../Utils/Analytics/EventSender';
 import { MarkdownText } from '../../UI/MarkdownText';
+import Paper from '../../UI/Paper';
 
 const sortedContentType = [
   'sprite',
@@ -147,6 +147,7 @@ const PrivateAssetPackDialog = ({
       {({ i18n }) => (
         <>
           <Dialog
+            title={name}
             maxWidth="lg"
             open
             onRequestClose={onClose}
@@ -167,16 +168,12 @@ const PrivateAssetPackDialog = ({
                 <AlertMessage kind="error">{errorText}</AlertMessage>
               </Line>
             ) : isFetching ? (
-              <>
-                <Text size="title">{name}</Text>
-                <Column expand>
-                  <PlaceholderLoader />
-                </Column>
-              </>
+              <Column expand>
+                <PlaceholderLoader />
+              </Column>
             ) : assetPack && sellerPublicProfile ? (
               <>
                 <Column noMargin>
-                  <Text size="title">{name}</Text>
                   <Text size="body2">
                     <Trans>by</Trans>{' '}
                     <Link
@@ -204,6 +201,7 @@ const PrivateAssetPackDialog = ({
                     <Paper
                       variant="outlined"
                       style={{ padding: windowWidth === 'small' ? 20 : 30 }}
+                      background="medium"
                     >
                       <Column noMargin>
                         <Line

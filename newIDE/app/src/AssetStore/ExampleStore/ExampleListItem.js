@@ -28,7 +28,9 @@ const styles = {
   container: {
     display: 'flex',
     overflow: 'hidden',
-    padding: 8,
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingRight: 8,
   },
   button: {
     alignItems: 'flex-start',
@@ -124,7 +126,6 @@ export const ExampleListItem = ({
         <Column noMargin justifyContent="flex-end">
           <Line noMargin justifyContent="flex-end">
             <RaisedButtonWithSplitMenu
-              primary
               label={<Trans>Open</Trans>}
               disabled={isOpening || !isCompatible}
               onClick={() => onOpen()}

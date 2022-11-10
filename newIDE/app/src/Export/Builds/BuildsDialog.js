@@ -30,7 +30,7 @@ const BuildsDialog = ({
 
   return (
     <Dialog
-      title={<Trans>Your game builds</Trans>}
+      title={<Trans>{game.gameName} builds</Trans>}
       actions={[
         <FlatButton
           label={<Trans>Close</Trans>}
@@ -44,7 +44,6 @@ const BuildsDialog = ({
       ]}
       onRequestClose={onClose}
       open={open}
-      noMargin
     >
       <Builds
         // Force the Dialog repositioning

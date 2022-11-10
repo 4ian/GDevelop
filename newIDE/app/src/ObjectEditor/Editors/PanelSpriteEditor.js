@@ -26,7 +26,7 @@ export default class PanelSpriteEditor extends React.Component<
     );
 
     return (
-      <ColumnStackLayout>
+      <ColumnStackLayout noMargin>
         <ResourceSelectorWithThumbnail
           project={project}
           resourceSources={resourceSources}

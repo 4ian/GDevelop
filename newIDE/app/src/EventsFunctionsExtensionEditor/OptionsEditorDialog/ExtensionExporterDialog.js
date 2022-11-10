@@ -2,12 +2,10 @@
 import { Trans } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../../UI/FlatButton';
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import HelpButton from '../../UI/HelpButton';
 import { Column, Line } from '../../UI/Grid';
 import CloudUpload from '@material-ui/icons/CloudUpload';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
-import RaisedButton from '../../UI/RaisedButton';
 import Text from '../../UI/Text';
 import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
@@ -55,10 +53,15 @@ const ExtensionExporterDialog = (props: Props) => {
 
   return (
     <Dialog
+      title={<Trans>Export extension</Trans>}
       secondaryActions={[
         <HelpButton
           key="help"
           helpPagePath="/community/contribute-to-the-assets-store"
+        />,
+        <FlatButton
+          label={<Trans>Submit to the community</Trans>}
+          onClick={openGitHubIssue}
         />,
       ]}
       actions={[
@@ -70,14 +73,24 @@ const ExtensionExporterDialog = (props: Props) => {
           }}
           key="close"
         />,
+        <DialogPrimaryButton
+          key="export"
+          icon={<CloudUpload />}
+          primary
+          label={<Trans>Export to a file</Trans>}
+          onClick={() => {
+            exportExtension(
+              eventsFunctionsExtensionsState,
+              props.eventsFunctionsExtension
+            );
+          }}
+        />,
       ]}
       open
-      onRequestClose={() => {
-        props.onClose();
-      }}
+      onRequestClose={props.onClose}
       maxWidth="sm"
     >
-      <Column expand>
+      <Column expand noMargin>
         <Line>
           <Text>
             <Trans>
@@ -88,23 +101,6 @@ const ExtensionExporterDialog = (props: Props) => {
             </Trans>
           </Text>
         </Line>
-        <ResponsiveLineStackLayout>
-          <RaisedButton
-            icon={<CloudUpload />}
-            primary
-            label={<Trans>Export to a file</Trans>}
-            onClick={() => {
-              exportExtension(
-                eventsFunctionsExtensionsState,
-                props.eventsFunctionsExtension
-              );
-            }}
-          />
-          <FlatButton
-            label={<Trans>Submit extension to the community</Trans>}
-            onClick={openGitHubIssue}
-          />
-        </ResponsiveLineStackLayout>
       </Column>
     </Dialog>
   );

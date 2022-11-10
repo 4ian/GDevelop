@@ -110,6 +110,7 @@ const ExtensionInstallDialog = ({
 
   return (
     <Dialog
+      title={extensionShortHeader.fullName}
       actions={[
         <FlatButton
           key="close"
@@ -175,9 +176,6 @@ const ExtensionInstallDialog = ({
             size={64}
           />
           <Column expand>
-            <Text noMargin size="block-title">
-              {extensionShortHeader.fullName}
-            </Text>
             <Text noMargin size="body2">
               <Trans>Version {' ' + extensionShortHeader.version}</Trans>
             </Text>

@@ -20,7 +20,9 @@ function AlertDialog(props: Props) {
     <I18n>
       {({ i18n }) => (
         <Dialog
+          title={i18n._(props.title)}
           open={props.open}
+          noMobileFullScreen
           actions={[
             <FlatButton
               key="dismiss"
@@ -30,7 +32,6 @@ function AlertDialog(props: Props) {
             />,
           ]}
           maxWidth="xs"
-          title={i18n._(props.title)}
         >
           <Text>{i18n._(props.message)}</Text>
         </Dialog>

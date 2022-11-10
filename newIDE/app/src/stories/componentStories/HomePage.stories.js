@@ -7,7 +7,6 @@ import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../GDevelopJsInitializerDecorator';
 import { ExampleStoreStateProvider } from '../../AssetStore/ExampleStore/ExampleStoreContext';
-import { GamesShowcaseStateProvider } from '../../GamesShowcase/GamesShowcaseContext';
 import { TutorialStateProvider } from '../../Tutorial/TutorialContext';
 import PreferencesContext, {
   initialPreferences,
@@ -77,32 +76,28 @@ const WrappedHomePage = ({
       <AuthenticatedUserContext.Provider value={user}>
         <ExampleStoreStateProvider>
           <TutorialStateProvider>
-            <GamesShowcaseStateProvider>
-              <HomePage
-                project={project}
-                isActive={true}
-                projectItemName={null}
-                setToolbar={() => {}}
-                canOpen={true}
-                storageProviders={[CloudStorageProvider]}
-                onChooseProject={() => action('onChooseProject')()}
-                onOpenRecentFile={() => action('onOpenRecentFile')()}
-                onCreateProject={() => action('onCreateProject')()}
-                onOpenProjectManager={() => action('onOpenProjectManager')()}
-                onOpenHelpFinder={() => action('onOpenHelpFinder')()}
-                onOpenLanguageDialog={() => action('open language dialog')()}
-                onOpenOnboardingDialog={() =>
-                  action('open onboarding dialog')()
-                }
-                onOpenProjectPreCreationDialog={() =>
-                  action('open precreation dialog')()
-                }
-                onOpenProfile={() => action('open profile')()}
-                onChangeSubscription={() => action('change subscription')()}
-                onOpenPreferences={() => action('open preferences')()}
-                onOpenAbout={() => action('open about')()}
-              />
-            </GamesShowcaseStateProvider>
+            <HomePage
+              project={project}
+              isActive={true}
+              projectItemName={null}
+              setToolbar={() => {}}
+              canOpen={true}
+              storageProviders={[CloudStorageProvider]}
+              onChooseProject={() => action('onChooseProject')()}
+              onOpenRecentFile={() => action('onOpenRecentFile')()}
+              onCreateProject={() => action('onCreateProject')()}
+              onOpenProjectManager={() => action('onOpenProjectManager')()}
+              onOpenHelpFinder={() => action('onOpenHelpFinder')()}
+              onOpenLanguageDialog={() => action('open language dialog')()}
+              onOpenOnboardingDialog={() => action('open onboarding dialog')()}
+              onOpenProjectPreCreationDialog={() =>
+                action('open precreation dialog')()
+              }
+              onOpenProfile={() => action('open profile')()}
+              onChangeSubscription={() => action('change subscription')()}
+              onOpenPreferences={() => action('open preferences')()}
+              onOpenAbout={() => action('open about')()}
+            />
           </TutorialStateProvider>
         </ExampleStoreStateProvider>
       </AuthenticatedUserContext.Provider>

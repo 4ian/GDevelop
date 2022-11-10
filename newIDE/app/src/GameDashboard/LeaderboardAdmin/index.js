@@ -11,7 +11,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
-import Paper from '@material-ui/core/Paper';
 import Tooltip from '@material-ui/core/Tooltip';
 
 import Add from '@material-ui/icons/Add';
@@ -67,11 +66,11 @@ import LeaderboardSortOptionsDialog from './LeaderboardSortOptionsDialog';
 import { type LeaderboardSortOption } from '../../Utils/GDevelopServices/Play';
 import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
 import Toggle from '../../UI/Toggle';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import SubscriptionDialog from '../../Profile/SubscriptionDialog';
 import MaxLeaderboardCountAlertMessage from './MaxLeaderboardCountAlertMessage';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import Paper from '../../UI/Paper';
 
 type Props = {|
   onLoading: boolean => void,
@@ -106,7 +105,12 @@ const CenteredError = ({ children }: {| children: React.Node |}) => (
 );
 
 const styles = {
-  leftColumn: { display: 'flex', flexDirection: 'column', flex: 1, padding: 5 },
+  leftColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    paddingRight: 5,
+  },
   rightColumn: {
     display: 'flex',
     flexDirection: 'column',
@@ -188,7 +192,6 @@ export const LeaderboardAdmin = ({
   leaderboardIdToSelectAtOpening,
 }: Props) => {
   const isOnline = useOnlineStatus();
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const windowWidth = useResponsiveWindowWidth();
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
     false
@@ -885,11 +888,9 @@ export const LeaderboardAdmin = ({
             <ResponsiveLineStackLayout noMargin expand noColumnMargin>
               <div style={styles.leftColumn}>
                 <Paper
-                  elevation={5}
-                  style={{
-                    ...styles.leaderboardConfigurationPaper,
-                    backgroundColor: gdevelopTheme.palette.alternateCanvasColor,
-                  }}
+                  elevation={3}
+                  style={styles.leaderboardConfigurationPaper}
+                  background="light"
                 >
                   <Column>
                     <Line noMargin>

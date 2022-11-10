@@ -139,8 +139,8 @@ const LoginDialog = ({
         />
       </ColumnStackLayout>
       <Dialog
-        open={resetPasswordDialogOpen}
         title={<Trans>Reset your password</Trans>}
+        open={resetPasswordDialogOpen}
         actions={[
           <FlatButton
             label={<Trans>Close</Trans>}

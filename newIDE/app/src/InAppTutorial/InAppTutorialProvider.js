@@ -67,7 +67,8 @@ const InAppTutorialProvider = (props: Props) => {
   };
 
   const getProgress = () => {
-    if (!orchestratorRef.current) return { step: 0, progress: 0 };
+    if (!orchestratorRef.current)
+      return { step: 0, progress: 0, projectData: {} };
     return orchestratorRef.current.getProgress();
   };
 

@@ -197,7 +197,11 @@ type Props = {|
 export type InAppTutorialOrchestratorInterface = {|
   onPreviewLaunch: () => void,
   goToNextStep: () => void,
-  getProgress: () => {| step: number, progress: number |},
+  getProgress: () => {|
+    step: number,
+    progress: number,
+    projectData: {| [key: string]: string |},
+  |},
 |};
 
 const InAppTutorialOrchestrator = React.forwardRef<
@@ -209,7 +213,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
     false
   );
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
-  const [data, setData] = React.useState<{ [key: string]: string }>({});
+  const [data, setData] = React.useState<{| [key: string]: string |}>({});
   const [displayEndDialog, setDisplayEndDialog] = React.useState<boolean>(
     false
   );
@@ -286,6 +290,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
     return {
       step: currentStepIndex,
       progress: computeProgress(),
+      projectData: data,
     };
   };
 

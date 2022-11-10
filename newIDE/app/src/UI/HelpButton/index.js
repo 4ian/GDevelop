@@ -6,7 +6,7 @@ import Window from '../../Utils/Window';
 import { getHelpLink } from '../../Utils/HelpLink';
 import { Trans } from '@lingui/macro';
 import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer';
-import IconButton from '../IconButton';
+import HelpIcon from '../HelpIcon';
 
 type PropsType = {
   helpPagePath: ?string,
@@ -37,9 +37,7 @@ const HelpButton = (props: PropsType) => {
       icon={<HelpOutline />}
     />
   ) : (
-    <IconButton onClick={onClick} target="_blank">
-      <HelpOutline />
-    </IconButton>
+    <HelpIcon size="small" helpPagePath={props.helpPagePath} />
   );
 };
 

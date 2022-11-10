@@ -39,7 +39,7 @@ export default function HotReloadPreviewButton({
       onClick={launchProjectDataOnlyPreview}
     />
   ) : (
-    <IconButton onClick={launchProjectDataOnlyPreview} target="_blank">
+    <IconButton onClick={launchProjectDataOnlyPreview} size="small">
       {icon}
     </IconButton>
   );

@@ -3,11 +3,11 @@ namespace gdjs {
     /**
      * Simplify a path according to an allowed gap.
      *
-     * The simplified path vertices are the same instance as the one in
-     * the source. They must be clones to make them truly independent from each
+     * The simplified path vertices are the same instances as the one in
+     * the source. They must be cloned to make them truly independent from each
      * other.
      *
-     * @param sourceVertices
+     * @param sourceVertices The path to simplify.
      * @param maxGap The maximum distance the edge of the contour may deviate
      * from the source geometry.
      * @param simplifiedVertices The simplified path.

@@ -84,7 +84,9 @@ const GetStartedSection = ({
 }: Props) => {
   const { inAppTutorialShortHeaders } = React.useContext(InAppTutorialContext);
   const windowWidth = useResponsiveWindowWidth();
-  const { currentlyRunningInAppTutorial } = React.useContext(InAppTutorialContext);
+  const { currentlyRunningInAppTutorial } = React.useContext(
+    InAppTutorialContext
+  );
   const shouldShowOnboardingButton = !isMobile() && windowWidth !== 'small';
   const items: {
     key: string,

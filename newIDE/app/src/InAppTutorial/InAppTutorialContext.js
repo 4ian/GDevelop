@@ -90,7 +90,11 @@ export type InAppTutorialState = {|
   currentlyRunningInAppTutorial: string | null,
   startTutorial: (id: string) => Promise<void>,
   inAppTutorialShortHeaders: ?Array<InAppTutorialShortHeader>,
-  getProgress: () => {| step: number, progress: number |},
+  getProgress: () => {|
+    step: number,
+    progress: number,
+    projectData: {| [key: string]: string |},
+  |},
 |};
 
 export const initialInAppTutorialState: InAppTutorialState = {
@@ -102,7 +106,7 @@ export const initialInAppTutorialState: InAppTutorialState = {
   currentlyRunningInAppTutorial: null,
   startTutorial: async () => {},
   inAppTutorialShortHeaders: null,
-  getProgress: () => ({ step: 0, progress: 0 }),
+  getProgress: () => ({ step: 0, progress: 0, projectData: {} }),
 };
 
 const InAppTutorialContext = React.createContext<InAppTutorialState>(

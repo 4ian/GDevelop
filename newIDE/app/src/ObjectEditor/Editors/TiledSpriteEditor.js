@@ -25,7 +25,7 @@ export default class TiledSpriteEditor extends React.Component<
     );
 
     return (
-      <ColumnStackLayout>
+      <ColumnStackLayout noMargin>
         <ResourceSelectorWithThumbnail
           project={project}
           resourceSources={resourceSources}

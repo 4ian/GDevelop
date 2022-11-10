@@ -7,7 +7,7 @@ import ObjectsEditorService from './ObjectsEditorService';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import BehaviorsEditor from '../BehaviorsEditor';
-import { Tabs, Tab } from '../UI/Tabs';
+import { Tabs } from '../UI/Tabs';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { Column, Line } from '../UI/Grid';
@@ -75,7 +75,7 @@ const InnerDialog = (props: InnerDialogProps) => {
   const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     props.initialTab || 'properties'
   );
-  const [newObjectName, setNewObjectName] = React.useState(props.objectName);
+  const [objectName, setObjectName] = React.useState(props.objectName);
   const forceUpdate = useForceUpdate();
   const {
     onCancelChanges,
@@ -103,7 +103,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     // Do the renaming *after* applying changes, as "withSerializableObject"
     // HOC will unserialize the object to apply modifications, which will
     // override the name.
-    props.onRename(newObjectName);
+    props.onRename(objectName);
   };
 
   const { DismissableTutorialMessage } = useDismissableTutorialMessage(
@@ -121,6 +121,7 @@ const InnerDialog = (props: InnerDialogProps) => {
 
   return (
     <Dialog
+      title={<Trans>Edit object "{objectName}"</Trans>}
       key={props.object && props.object.ptr}
       actions={[
         <FlatButton
@@ -146,40 +147,34 @@ const InnerDialog = (props: InnerDialogProps) => {
       onRequestClose={onCancelChanges}
       onApply={onApply}
       open={props.open}
-      noMargin
-      noTitleMargin
       fullHeight
       flexBody
-      title={
-        <div>
-          <Tabs value={currentTab} onChange={setCurrentTab}>
-            <Tab
-              label={<Trans>Properties</Trans>}
-              value={'properties'}
-              key={'properties'}
-            />
-            <Tab
-              label={<Trans>Behaviors</Trans>}
-              value={'behaviors'}
-              key={'behaviors'}
-              id="behaviors-tab"
-            />
-            <Tab
-              label={<Trans>Variables</Trans>}
-              value={'variables'}
-              key={'variables'}
-            />
-            {objectMetadata.isUnsupportedBaseObjectCapability(
-              'effect'
-            ) ? null : (
-              <Tab
-                label={<Trans>Effects</Trans>}
-                value={'effects'}
-                key={'effects'}
-              />
-            )}
-          </Tabs>
-        </div>
+      fixedContent={
+        <Tabs
+          value={currentTab}
+          onChange={setCurrentTab}
+          options={[
+            {
+              label: <Trans>Properties</Trans>,
+              value: 'properties',
+            },
+            {
+              label: <Trans>Behaviors</Trans>,
+              value: 'behaviors',
+              id: 'behaviors-tab',
+            },
+            {
+              label: <Trans>Variables</Trans>,
+              value: 'variables',
+            },
+            objectMetadata.isUnsupportedBaseObjectCapability('effect')
+              ? null
+              : {
+                  label: <Trans>Effects</Trans>,
+                  value: 'effects',
+                },
+          ].filter(Boolean)}
+        />
       }
       id="object-editor-dialog"
     >
@@ -195,19 +190,19 @@ const InnerDialog = (props: InnerDialogProps) => {
           }
         >
           <Line>
-            <Column expand>
+            <Column expand noMargin>
               <SemiControlledTextField
                 fullWidth
                 commitOnBlur
                 floatingLabelText={<Trans>Object name</Trans>}
                 floatingLabelFixed
-                value={newObjectName}
+                value={objectName}
                 translatableHintText={t`Object Name`}
-                onChange={text => {
-                  if (text === newObjectName) return;
+                onChange={newObjectName => {
+                  if (newObjectName === objectName) return;
 
-                  if (props.canRenameObject(text)) {
-                    setNewObjectName(text);
+                  if (props.canRenameObject(newObjectName)) {
+                    setObjectName(newObjectName);
                     notifyOfChange();
                   }
                 }}
@@ -248,7 +243,9 @@ const InnerDialog = (props: InnerDialogProps) => {
           {props.object.getVariables().count() > 0 &&
             DismissableTutorialMessage && (
               <Line>
-                <Column expand>{DismissableTutorialMessage}</Column>
+                <Column noMargin expand>
+                  {DismissableTutorialMessage}
+                </Column>
               </Line>
             )}
           <VariablesList

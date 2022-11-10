@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import ObjectGroupsListWithObjectGroupEditor from '../../ObjectGroupsList/ObjectGroupsListWithObjectGroupEditor';
-import { Tabs, Tab } from '../../UI/Tabs';
+import { Tabs } from '../../UI/Tabs';
 import EventsFunctionParametersEditor from './EventsFunctionParametersEditor';
 import EventsFunctionPropertiesEditor from './EventsFunctionPropertiesEditor';
 import ScrollView from '../../UI/ScrollView';
@@ -178,21 +178,29 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     } = this.props;
 
     return (
-      <Column expand noMargin useFullHeight>
-        <Tabs value={this.state.currentTab} onChange={this._chooseTab}>
-          <Tab
-            label={<Trans>Configuration</Trans>}
-            value={('config': TabNames)}
-          />
-          <Tab
-            label={<Trans>Parameters</Trans>}
-            value={('parameters': TabNames)}
-          />
-          <Tab
-            label={<Trans>Object groups</Trans>}
-            value={('groups': TabNames)}
-          />
-        </Tabs>
+      <Column expand useFullHeight>
+        <Line>
+          <Column noMargin expand>
+            <Tabs
+              value={this.state.currentTab}
+              onChange={this._chooseTab}
+              options={[
+                {
+                  value: ('config': TabNames),
+                  label: <Trans>Configuration</Trans>,
+                },
+                {
+                  value: ('parameters': TabNames),
+                  label: <Trans>Parameters</Trans>,
+                },
+                {
+                  value: ('groups': TabNames),
+                  label: <Trans>Object groups</Trans>,
+                },
+              ]}
+            />
+          </Column>
+        </Line>
         {this.state.currentTab === 'config' ? (
           <ScrollView>
             <Line>

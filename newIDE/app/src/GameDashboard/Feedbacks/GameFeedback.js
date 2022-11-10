@@ -241,7 +241,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
           </PlaceholderError>
         )}
         {authenticatedUser.authenticated && displayedFeedbacks && (
-          <Column expand>
+          <Column expand noMargin>
             <ResponsiveLineStackLayout justifyContent="space-between">
               <Column justifyContent="center">
                 <LineStackLayout noMargin alignItems="center">

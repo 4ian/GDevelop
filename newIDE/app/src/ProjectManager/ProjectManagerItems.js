@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import WarningIcon from '@material-ui/icons/Warning';
@@ -8,7 +8,6 @@ import WarningIcon from '@material-ui/icons/Warning';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { IconContainer } from '../UI/IconContainer';
 import { ListItem } from '../UI/List';
-import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import TextField, {
   noMarginTextFieldInListItemTopOffset,
 } from '../UI/TextField';
@@ -17,6 +16,7 @@ import { textEllipsisStyle } from '../UI/TextEllipsis';
 
 import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
+import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
 const styles = {
   noIndentNestedList: {
@@ -39,43 +39,41 @@ type ProjectStructureItemProps = {|
   open?: boolean,
 |};
 
-export const ProjectStructureItem = (props: ProjectStructureItemProps) => (
-  <ThemeConsumer>
-    {muiTheme => {
-      const {
-        error,
-        leftIcon,
-        onRefresh,
-        indentNestedItems,
-        autoGenerateNestedIndicator,
-        initiallyOpen,
-        open,
-        primaryText,
-        renderNestedItems,
-      } = props;
-      return (
-        <ListItem
-          open={open}
-          autoGenerateNestedIndicator={autoGenerateNestedIndicator}
-          initiallyOpen={initiallyOpen}
-          primaryText={primaryText}
-          renderNestedItems={renderNestedItems}
-          onReload={onRefresh}
-          style={{
-            backgroundColor: muiTheme.listItem.groupBackgroundColor,
-            borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-          }}
-          nestedListStyle={
-            indentNestedItems ? undefined : styles.noIndentNestedList
-          }
-          leftIcon={error ? <WarningIcon /> : leftIcon}
-          displayReloadButton={!!error}
-          reloadButtonTooltip={`An error has occured in functions. Click to reload them.`}
-        />
-      );
-    }}
-  </ThemeConsumer>
-);
+export const ProjectStructureItem = ({
+  error,
+  leftIcon,
+  onRefresh,
+  indentNestedItems,
+  autoGenerateNestedIndicator,
+  initiallyOpen,
+  open,
+  primaryText,
+  renderNestedItems,
+}: ProjectStructureItemProps) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  return (
+    <ListItem
+      open={open}
+      autoGenerateNestedIndicator={autoGenerateNestedIndicator}
+      initiallyOpen={initiallyOpen}
+      primaryText={primaryText}
+      renderNestedItems={renderNestedItems}
+      onReload={onRefresh}
+      style={{
+        backgroundColor: gdevelopTheme.listItem.groupBackgroundColor,
+        borderBottom: `1px solid ${gdevelopTheme.listItem.separatorColor}`,
+      }}
+      nestedListStyle={
+        indentNestedItems ? undefined : styles.noIndentNestedList
+      }
+      leftIcon={error ? <WarningIcon /> : leftIcon}
+      displayReloadButton={!!error}
+      reloadButtonTooltip={
+        <Trans>An error has occured in functions. Click to reload them.</Trans>
+      }
+    />
+  );
+};
 
 type ItemProps = {|
   primaryText: string,
@@ -125,6 +123,7 @@ export const Item = ({
   style,
 }: ItemProps) => {
   const textField = React.useRef<?TextField>(null);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   React.useEffect(
     () => {
@@ -172,80 +171,76 @@ export const Item = ({
   );
 
   return (
-    <ThemeConsumer>
-      {muiTheme => (
-        <I18n>
-          {({ i18n }) => (
-            <ListItem
-              style={{
-                borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-                ...style,
-              }}
-              primaryText={label}
-              leftIcon={leftIcon}
-              displayMenuButton
-              buildMenuTemplate={(i18n: I18nType) => [
-                {
-                  label: i18n._(t`Edit`),
-                  click: onEdit,
-                },
-                ...(buildExtraMenuTemplate ? buildExtraMenuTemplate(i18n) : []),
-                { type: 'separator' },
-                {
-                  label: i18n._(t`Rename`),
-                  click: onEditName,
-                },
-                {
-                  label: i18n._(t`Delete`),
-                  click: onDelete,
-                },
-                {
-                  label: i18n._(addLabel),
-                  visible: !!onAdd,
-                  click: onAdd,
-                },
-                { type: 'separator' },
-                {
-                  label: i18n._(t`Copy`),
-                  click: onCopy,
-                },
-                {
-                  label: i18n._(t`Cut`),
-                  click: onCut,
-                },
-                {
-                  label: i18n._(t`Paste`),
-                  enabled: canPaste(),
-                  click: onPaste,
-                },
-                {
-                  label: i18n._(t`Duplicate`),
-                  click: onDuplicate,
-                },
-                { type: 'separator' },
-                {
-                  label: i18n._(t`Move up`),
-                  enabled: canMoveUp,
-                  click: onMoveUp,
-                },
-                {
-                  label: i18n._(t`Move down`),
-                  enabled: canMoveDown,
-                  click: onMoveDown,
-                },
-              ]}
-              onClick={() => {
-                // It's essential to discard clicks when editing the name,
-                // to avoid weird opening of an editor (accompanied with a
-                // closing of the project manager) when clicking on the text
-                // field.
-                if (!editingName) onEdit();
-              }}
-            />
-          )}
-        </I18n>
+    <I18n>
+      {({ i18n }) => (
+        <ListItem
+          style={{
+            borderBottom: `1px solid ${gdevelopTheme.listItem.separatorColor}`,
+            ...style,
+          }}
+          primaryText={label}
+          leftIcon={leftIcon}
+          displayMenuButton
+          buildMenuTemplate={(i18n: I18nType) => [
+            {
+              label: i18n._(t`Edit`),
+              click: onEdit,
+            },
+            ...(buildExtraMenuTemplate ? buildExtraMenuTemplate(i18n) : []),
+            { type: 'separator' },
+            {
+              label: i18n._(t`Rename`),
+              click: onEditName,
+            },
+            {
+              label: i18n._(t`Delete`),
+              click: onDelete,
+            },
+            {
+              label: i18n._(addLabel),
+              visible: !!onAdd,
+              click: onAdd,
+            },
+            { type: 'separator' },
+            {
+              label: i18n._(t`Copy`),
+              click: onCopy,
+            },
+            {
+              label: i18n._(t`Cut`),
+              click: onCut,
+            },
+            {
+              label: i18n._(t`Paste`),
+              enabled: canPaste(),
+              click: onPaste,
+            },
+            {
+              label: i18n._(t`Duplicate`),
+              click: onDuplicate,
+            },
+            { type: 'separator' },
+            {
+              label: i18n._(t`Move up`),
+              enabled: canMoveUp,
+              click: onMoveUp,
+            },
+            {
+              label: i18n._(t`Move down`),
+              enabled: canMoveDown,
+              click: onMoveDown,
+            },
+          ]}
+          onClick={() => {
+            // It's essential to discard clicks when editing the name,
+            // to avoid weird opening of an editor (accompanied with a
+            // closing of the project manager) when clicking on the text
+            // field.
+            if (!editingName) onEdit();
+          }}
+        />
       )}
-    </ThemeConsumer>
+    </I18n>
   );
 };
 

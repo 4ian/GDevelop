@@ -160,7 +160,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                   properties,
                   (property: gdNamedPropertyDescriptor, i: number) => (
                     <React.Fragment key={i}>
-                      <MiniToolbar>
+                      <MiniToolbar noPadding>
                         <Column expand noMargin>
                           <SemiControlledTextField
                             margin="none"
@@ -186,28 +186,30 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             fullWidth
                           />
                         </Column>
-                        <InlineCheckbox
-                          label={
-                            property.isHidden() ? (
-                              <Trans>Hidden</Trans>
-                            ) : (
-                              <Trans>Visible in editor</Trans>
-                            )
-                          }
-                          checked={!property.isHidden()}
-                          onCheck={(e, checked) => {
-                            property.setHidden(!checked);
-                            this.forceUpdate();
-                            this.props.onPropertiesUpdated();
-                          }}
-                          checkedIcon={<Visibility />}
-                          uncheckedIcon={<VisibilityOff />}
-                          disabled={
-                            property.getType() === 'Behavior' &&
-                            // Allow to make it visible just in case.
-                            !property.isHidden()
-                          }
-                        />
+                        <Column>
+                          <InlineCheckbox
+                            label={
+                              property.isHidden() ? (
+                                <Trans>Hidden</Trans>
+                              ) : (
+                                <Trans>Visible in editor</Trans>
+                              )
+                            }
+                            checked={!property.isHidden()}
+                            onCheck={(e, checked) => {
+                              property.setHidden(!checked);
+                              this.forceUpdate();
+                              this.props.onPropertiesUpdated();
+                            }}
+                            checkedIcon={<Visibility />}
+                            uncheckedIcon={<VisibilityOff />}
+                            disabled={
+                              property.getType() === 'Behavior' &&
+                              // Allow to make it visible just in case.
+                              !property.isHidden()
+                            }
+                          />
+                        </Column>
                         <ElementWithMenu
                           element={
                             <IconButton>
@@ -235,7 +237,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                         />
                       </MiniToolbar>
                       <Line>
-                        <ColumnStackLayout expand>
+                        <ColumnStackLayout expand noMargin>
                           <ResponsiveLineStackLayout noMargin>
                             <SelectField
                               floatingLabelText={<Trans>Type</Trans>}

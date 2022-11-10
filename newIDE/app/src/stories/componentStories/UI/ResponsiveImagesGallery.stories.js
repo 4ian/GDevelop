@@ -7,7 +7,7 @@ import ResponsiveImagesGallery from '../../../UI/ResponsiveImagesGallery';
 import Text from '../../../UI/Text';
 import { Column } from '../../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
-import { Paper } from '@material-ui/core';
+import Paper from '../../../UI/Paper';
 
 export default {
   title: 'UI Building Blocks/ResponsiveImagesGallery',
@@ -16,7 +16,7 @@ export default {
 };
 
 export const Default = () => (
-  <Paper>
+  <Paper background="dark">
     <Column>
       <ResponsiveLineStackLayout noColumnMargin>
         <Column expand noOverflowParent noMargin>

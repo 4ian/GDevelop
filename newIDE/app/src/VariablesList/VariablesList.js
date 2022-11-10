@@ -1449,7 +1449,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                 onKeyDown={keyboardShortcuts.onKeyDown}
                 onKeyUp={keyboardShortcuts.onKeyUp}
               >
-                <Column expand useFullHeight>
+                <Column expand useFullHeight noMargin>
                   {isNarrow ? null : toolbar}
                   {props.variablesContainer.count() === 0 &&
                   (!props.inheritedVariablesContainer ||

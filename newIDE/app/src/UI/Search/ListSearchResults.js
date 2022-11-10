@@ -117,8 +117,6 @@ export const ListSearchResults = <SearchItem>({
       >
         <AutoSizer>
           {({ width, height }) => {
-            if (!width || !height) return null;
-
             // Reset the cached heights in case the width changed.
             if (cachedHeightsForWidth.current !== width) {
               cachedHeights.current = {};

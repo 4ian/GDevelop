@@ -28,7 +28,7 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
 
     return (
       <Dialog
-        noMargin
+        title={<Trans>Edit the behavior</Trans>}
         secondaryActions={[
           <HelpButton
             key="help"
@@ -46,7 +46,6 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
         open
         onRequestClose={onApply}
         onApply={onApply}
-        title={<Trans>Edit the behavior</Trans>}
       >
         <EventsBasedBehaviorEditor
           project={project}

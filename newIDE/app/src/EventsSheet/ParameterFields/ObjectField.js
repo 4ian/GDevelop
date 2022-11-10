@@ -42,7 +42,8 @@ export default class ObjectField extends React.Component<
     // Prevent focus of field if an in-app tutorial is running because
     // the popper of the tooltip and the popper of the semi controlled
     // autocomplete's dropdown are conflicting.
-    if (this._field && !currentlyRunningInAppTutorial) this._field.focus(selectAll);
+    if (this._field && !currentlyRunningInAppTutorial)
+      this._field.focus(selectAll);
   }
 
   render() {

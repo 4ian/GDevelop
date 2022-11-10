@@ -77,8 +77,14 @@ const LayerEditorDialog = (props: Props) => {
 
   return (
     <Dialog
+      title={
+        layer.getName() ? (
+          <Trans>{layer.getName()} properties</Trans>
+        ) : (
+          <Trans>Base layer properties</Trans>
+        )
+      }
       open
-      title={<Trans>Edit Layer Properties</Trans>}
       secondaryActions={[
         <HelpButton
           key="help"

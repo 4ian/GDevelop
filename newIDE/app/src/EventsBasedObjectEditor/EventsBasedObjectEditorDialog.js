@@ -31,7 +31,7 @@ export default class EventsBasedObjectEditorDialog extends React.Component<
 
     return (
       <Dialog
-        title={<Trans>Edit the object</Trans>}
+        title={<Trans>Edit {eventsBasedObject.getName()}</Trans>}
         fullHeight
         flexColumnBody
         secondaryActions={[

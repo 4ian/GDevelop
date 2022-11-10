@@ -248,6 +248,7 @@ function ProjectPropertiesDialog(props: Props) {
       {({ i18n }) => (
         <React.Fragment>
           <Dialog
+            title={<Trans>Game properties</Trans>}
             actions={[
               <FlatButton
                 label={<Trans>Cancel</Trans>}
@@ -282,7 +283,6 @@ function ProjectPropertiesDialog(props: Props) {
             onApply={onApply}
             open={props.open}
             fullHeight
-            title={<Trans>Game properties</Trans>}
             fixedContent={
               <Tabs
                 value={currentTab}

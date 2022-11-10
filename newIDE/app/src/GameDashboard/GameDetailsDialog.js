@@ -301,13 +301,7 @@ export const GameDetailsDialog = ({
     <I18n>
       {({ i18n }) => (
         <Dialog
-          title={
-            <span>
-              {game.gameName}
-              {' - '}
-              <Trans>Dashboard</Trans>
-            </span>
-          }
+          title={<Trans>{game.gameName} Dashboard</Trans>}
           open
           flexColumnBody
           fullHeight={currentTab === 'leaderboards'}

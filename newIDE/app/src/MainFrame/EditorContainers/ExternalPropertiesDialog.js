@@ -72,9 +72,9 @@ export default function ExternalPropertiesDialog({
 
   return (
     <Dialog
+      title={title}
       actions={actions}
       open={open}
-      title={title}
       onRequestClose={onClose}
       onApply={onClick}
       maxWidth="sm"

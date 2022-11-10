@@ -31,6 +31,7 @@ const gd: libGDevelop = global.gd;
 const styles = {
   container: {
     display: 'flex',
+    overflow: 'hidden', // Ensure large images are not overflowing the other panel.
   },
 };
 
@@ -194,7 +195,7 @@ const PointsEditor = ({
       type: 'primary',
       noTitleBar: true,
       renderEditor: () => (
-        <Paper background="medium" style={styles.container}>
+        <Paper background="medium" style={styles.container} square>
           <Column noMargin expand>
             <ImagePreview
               resourceName={resourceName}
@@ -229,7 +230,7 @@ const PointsEditor = ({
       type: 'secondary',
       noTitleBar: true,
       renderEditor: () => (
-        <Paper background="medium" style={styles.container}>
+        <Paper background="medium" style={styles.container} square>
           <Column noMargin expand>
             <ScrollView>
               <Line>

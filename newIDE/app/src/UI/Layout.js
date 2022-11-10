@@ -83,6 +83,7 @@ type LineStackLayoutProps = {|
   noMargin?: boolean,
   children: React.Node,
   useLargeSpacer?: boolean,
+  overflow?: string,
 |};
 
 export const LineStackLayout = ({
@@ -92,6 +93,7 @@ export const LineStackLayout = ({
   noMargin,
   children,
   useLargeSpacer,
+  overflow,
 }: LineStackLayoutProps) => {
   let isFirstChild = true;
   return (
@@ -100,6 +102,7 @@ export const LineStackLayout = ({
       justifyContent={justifyContent}
       expand={expand}
       noMargin={noMargin}
+      overflow={overflow}
     >
       {React.Children.map(children, (child, index) => {
         if (!child) return null;

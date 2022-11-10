@@ -23,7 +23,9 @@ const DismissableInfoBar = ({
   touchScreenMessage,
   message,
 }: Props) => {
-  const { currentlyRunningInAppTutorial } = React.useContext(InAppTutorialContext);
+  const { currentlyRunningInAppTutorial } = React.useContext(
+    InAppTutorialContext
+  );
   const preferences = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const screenType = useScreenType();

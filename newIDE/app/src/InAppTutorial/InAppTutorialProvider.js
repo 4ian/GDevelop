@@ -92,7 +92,6 @@ const InAppTutorialProvider = (props: Props) => {
   return (
     <InAppTutorialContext.Provider
       value={{
-        flow: null,
         setProject,
         setCurrentEditor,
         goToNextStep,

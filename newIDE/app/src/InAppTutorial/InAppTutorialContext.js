@@ -82,7 +82,6 @@ export type InAppTutorial = {|
 |};
 
 export type InAppTutorialState = {|
-  flow: string | null,
   setProject: (?gdProject) => void,
   setCurrentEditor: (EditorIdentifier | null) => void,
   goToNextStep: () => void,
@@ -98,7 +97,6 @@ export type InAppTutorialState = {|
 |};
 
 export const initialInAppTutorialState: InAppTutorialState = {
-  flow: null,
   setProject: () => {},
   setCurrentEditor: () => {},
   goToNextStep: () => {},

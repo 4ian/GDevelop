@@ -2960,7 +2960,13 @@ const MainFrame = (props: Props) => {
           ref={inAppTutorialOrchestratorRef}
           tutorial={currentlyRunningInAppTutorial}
           project={currentProject}
-          endTutorial={() => setQuitInAppTutorialDialogOpen(true)}
+          endTutorial={() => {
+            if (!currentFileMetadata || unsavedChanges.hasUnsavedChanges) {
+              setQuitInAppTutorialDialogOpen(true);
+            } else {
+              endTutorial();
+            }
+          }}
           {...orchestratorProps}
         />
       )}
@@ -2968,6 +2974,9 @@ const MainFrame = (props: Props) => {
         <QuitInAppTutorialDialog
           onSaveProject={saveProject}
           onClose={() => setQuitInAppTutorialDialogOpen(false)}
+          canEndTutorial={
+            !!currentFileMetadata && !unsavedChanges.hasUnsavedChanges
+          }
           endTutorial={endTutorial}
         />
       )}

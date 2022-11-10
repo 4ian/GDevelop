@@ -46,19 +46,11 @@ export const BoxSearchResults = React.forwardRef<
     }: Props<SearchItem>,
     ref
   ) => {
+    const scrollTop = React.useRef<?number>(null);
     const grid = React.useRef<?Grid>(null);
     React.useImperativeHandle(ref, () => ({
       getScrollPosition: () => {
-        const gridElement = grid.current;
-        if (!gridElement) return 0;
-
-        // TODO Find a clean way to get the scroll position.
-        // Using the internal state of a component is hacky.
-        // Grid probably doesn't expose the scroll position
-        // because it became irrelevant when the dimensions change.
-        // Though, it's easier to use it and the chance that the Grid is
-        // resized is low.
-        return gridElement.state.scrollTop;
+        return scrollTop ? scrollTop.current : 0;
       },
       scrollToPosition: (y: number) => {
         const scrollViewElement = grid.current;
@@ -138,6 +130,9 @@ export const BoxSearchResults = React.forwardRef<
                   rowCount={rowCount}
                   cellRenderer={cellRenderer}
                   style={styles.grid}
+                  onScroll={event => {
+                    scrollTop.current = event.scrollTop;
+                  }}
                 />
               );
             }}

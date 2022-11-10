@@ -24,6 +24,7 @@ type Props = {|
   eventsBasedBehavior: gdEventsBasedBehavior,
   onPropertiesUpdated: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
+  onRenameSharedProperty: (oldName: string, newName: string) => void,
   onTabChanged: () => void,
 |};
 
@@ -66,7 +67,14 @@ export default class EventsBasedBehaviorEditor extends React.Component<
           <React.Fragment>
             <Tabs value={currentTab} onChange={this._changeTab}>
               <Tab label={<Trans>Configuration</Trans>} value="configuration" />
-              <Tab label={<Trans>Properties</Trans>} value="properties" />
+              <Tab
+                label={<Trans>Behavior properties</Trans>}
+                value="behavior-properties"
+              />
+              <Tab
+                label={<Trans>Scene properties</Trans>}
+                value="shared-properties"
+              />
             </Tabs>
             <Line>
               {currentTab === 'configuration' && (
@@ -163,12 +171,22 @@ export default class EventsBasedBehaviorEditor extends React.Component<
                   )}
                 </ColumnStackLayout>
               )}
-              {currentTab === 'properties' && (
+              {currentTab === 'behavior-properties' && (
                 <EventsBasedBehaviorPropertiesEditor
+                  allowRequiredBehavior
                   project={project}
-                  eventsBasedBehavior={eventsBasedBehavior}
+                  properties={eventsBasedBehavior.getPropertyDescriptors()}
                   onPropertiesUpdated={this.props.onPropertiesUpdated}
                   onRenameProperty={this.props.onRenameProperty}
+                  behaviorObjectType={eventsBasedBehavior.getObjectType()}
+                />
+              )}
+              {currentTab === 'shared-properties' && (
+                <EventsBasedBehaviorPropertiesEditor
+                  project={project}
+                  properties={eventsBasedBehavior.getSharedPropertyDescriptors()}
+                  onPropertiesUpdated={this.props.onPropertiesUpdated}
+                  onRenameProperty={this.props.onRenameSharedProperty}
                 />
               )}
             </Line>

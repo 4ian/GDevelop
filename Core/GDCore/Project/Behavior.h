@@ -13,7 +13,8 @@ namespace gd {
 
 /**
  * \brief Base class used to represents a behavior that can be applied to an
- * object. It stores the content (i.e: the properties) of a behavior of an object.
+ * object. It stores the content (i.e: the properties) of a behavior of an object
+ * and forward the properties related functions to Javascript with Emscripten.
  *
  * \see gd::BehaviorsSharedData
  * \see gd::Object

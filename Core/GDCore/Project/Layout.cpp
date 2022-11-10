@@ -17,6 +17,7 @@
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
+#include "GDCore/Project/CustomBehaviorsSharedData.h"
 #include "GDCore/Project/InitialInstance.h"
 #include "GDCore/Project/Layer.h"
 #include "GDCore/Project/Object.h"
@@ -26,6 +27,7 @@
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/PolymorphicClone.h"
+#include "GDCore/Tools/Log.h"
 
 using namespace std;
 
@@ -240,11 +242,11 @@ void Layout::UpdateBehaviorsSharedData(gd::Project& project) {
   }
 }
 
-std::unique_ptr<gd::BehaviorsSharedData> Layout::CreateBehaviorsSharedData(gd::Project& project, const gd::String& name, const gd::String& behaviorsType) {
+std::unique_ptr<gd::BehaviorsSharedData> Layout::CreateBehaviorsSharedData(
+        gd::Project& project, const gd::String& name, const gd::String& behaviorsType) {
     if (project.HasEventsBasedBehavior(behaviorsType)) {
-      // Events based behaviors don't have shared data yet.
       auto sharedData =
-          gd::make_unique<gd::BehaviorsSharedData>(name, behaviorsType);
+          gd::make_unique<gd::CustomBehaviorsSharedData>(name, project, behaviorsType);
       sharedData->InitializeContent();
       return std::move(sharedData);
     }
@@ -253,7 +255,14 @@ std::unique_ptr<gd::BehaviorsSharedData> Layout::CreateBehaviorsSharedData(gd::P
             project.GetCurrentPlatform(),
             behaviorsType);
     if (gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
-      return nullptr;
+      gd::LogWarning("Tried to create a behavior shared data with an unknown type: " +
+                     behaviorsType + " on object " + GetName() + "!");
+    // It's probably an events-based behavior that was removed.
+    // Create a custom behavior shared data to preserve the properties values.
+      auto sharedData =
+          gd::make_unique<gd::CustomBehaviorsSharedData>(name, project, behaviorsType);
+      sharedData->InitializeContent();
+      return std::move(sharedData);
     }
 
     gd::BehaviorsSharedData* behaviorsSharedDataBluePrint =

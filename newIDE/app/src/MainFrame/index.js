@@ -145,6 +145,7 @@ import {
   useResourceFetcher,
   type ResourceFetcher,
 } from '../ProjectsStorage/ResourceFetcher';
+import QuitInAppTutorialDialog from '../InAppTutorial/QuitInAppTutorialDialog';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import { type InAppTutorialOrchestratorInterface } from '../InAppTutorial/InAppTutorialOrchestrator';
 import useInAppTutorialOrchestrator from '../InAppTutorial/useInAppTutorialOrchestrator';
@@ -386,6 +387,10 @@ const MainFrame = (props: Props) => {
     InAppTutorialOrchestrator,
     orchestratorProps,
   } = useInAppTutorialOrchestrator({ editorTabs: state.editorTabs });
+  const [
+    quitInAppTutorialDialogOpen,
+    setQuitInAppTutorialDialogOpen,
+  ] = React.useState<boolean>(false);
   const [
     fileMetadataOpeningProgress,
     setFileMetadataOpeningProgress,
@@ -2955,8 +2960,15 @@ const MainFrame = (props: Props) => {
           ref={inAppTutorialOrchestratorRef}
           tutorial={currentlyRunningInAppTutorial}
           project={currentProject}
-          endTutorial={endTutorial}
+          endTutorial={() => setQuitInAppTutorialDialogOpen(true)}
           {...orchestratorProps}
+        />
+      )}
+      {quitInAppTutorialDialogOpen && (
+        <QuitInAppTutorialDialog
+          onSaveProject={saveProject}
+          onClose={() => setQuitInAppTutorialDialogOpen(false)}
+          endTutorial={endTutorial}
         />
       )}
     </div>

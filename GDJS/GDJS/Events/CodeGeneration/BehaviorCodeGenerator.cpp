@@ -202,15 +202,15 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.SharedData = class RUNTIME_BEHAVIOR_CL
 }
 
 CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.getSharedData = function(instanceContainer, behaviorName) {
-  if (!instanceContainer.RUNTIME_BEHAVIOR_CLASSNAMESharedData) {
+  if (!instanceContainer._EXTENSION_NAME_RUNTIME_BEHAVIOR_CLASSNAMESharedData) {
     const initialData = instanceContainer.getInitialSharedDataForBehavior(
       behaviorName
     );
-    instanceContainer.RUNTIME_BEHAVIOR_CLASSNAMESharedData = new CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.SharedData(
+    instanceContainer._EXTENSION_NAME_RUNTIME_BEHAVIOR_CLASSNAMESharedData = new CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.SharedData(
       initialData
     );
   }
-  return instanceContainer.RUNTIME_BEHAVIOR_CLASSNAMESharedData;
+  return instanceContainer._EXTENSION_NAME_RUNTIME_BEHAVIOR_CLASSNAMESharedData;
 }
 
 // Methods:

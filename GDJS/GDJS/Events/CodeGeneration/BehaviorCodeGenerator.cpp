@@ -162,30 +162,6 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorTemplateCode(
 CODE_NAMESPACE = CODE_NAMESPACE || {};
 
 /**
- * Shared data generated from BEHAVIOR_FULL_NAME
- */
-CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAMESharedData = class RUNTIME_BEHAVIOR_CLASSNAMESharedData {
-  constructor(sharedData) {
-    INITIALIZE_SHARED_PROPERTIES_CODE
-  }
-  
-  // Shared properties:
-  SHARED_PROPERTIES_CODE
-}
-
-CODE_NAMESPACE.getSharedData = function(instanceContainer, behaviorName) {
-  if (!instanceContainer.RUNTIME_BEHAVIOR_CLASSNAMESharedData) {
-    const initialData = instanceContainer.getInitialSharedDataForBehavior(
-      behaviorName
-    );
-    instanceContainer.RUNTIME_BEHAVIOR_CLASSNAMESharedData = new CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAMESharedData(
-      initialData
-    );
-  }
-  return instanceContainer.RUNTIME_BEHAVIOR_CLASSNAMESharedData;
-}
-
-/**
  * Behavior generated from BEHAVIOR_FULL_NAME
  */
 CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = class RUNTIME_BEHAVIOR_CLASSNAME extends gdjs.RuntimeBehavior {
@@ -195,7 +171,7 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = class RUNTIME_BEHAVIOR_CLASSNAME ext
 
     this._onceTriggers = new gdjs.OnceTriggers();
     this._behaviorData = {};
-    this._sharedData = CODE_NAMESPACE.getSharedData(
+    this._sharedData = CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.getSharedData(
       instanceContainer,
       behaviorData.name
     );
@@ -211,6 +187,30 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = class RUNTIME_BEHAVIOR_CLASSNAME ext
 
   // Properties:
   PROPERTIES_CODE
+}
+
+/**
+ * Shared data generated from BEHAVIOR_FULL_NAME
+ */
+CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.SharedData = class RUNTIME_BEHAVIOR_CLASSNAMESharedData {
+  constructor(sharedData) {
+    INITIALIZE_SHARED_PROPERTIES_CODE
+  }
+  
+  // Shared properties:
+  SHARED_PROPERTIES_CODE
+}
+
+CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.getSharedData = function(instanceContainer, behaviorName) {
+  if (!instanceContainer.RUNTIME_BEHAVIOR_CLASSNAMESharedData) {
+    const initialData = instanceContainer.getInitialSharedDataForBehavior(
+      behaviorName
+    );
+    instanceContainer.RUNTIME_BEHAVIOR_CLASSNAMESharedData = new CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.SharedData(
+      initialData
+    );
+  }
+  return instanceContainer.RUNTIME_BEHAVIOR_CLASSNAMESharedData;
 }
 
 // Methods:

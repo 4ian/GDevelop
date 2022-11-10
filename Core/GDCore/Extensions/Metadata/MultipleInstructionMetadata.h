@@ -179,8 +179,7 @@ class GD_CORE_API MultipleInstructionMetadata {
   }
 
   /**
-   * Set that the instruction is private - it can't be used outside of the
-   * object/ behavior that it is attached too.
+   * \see gd::InstructionMetadata::SetPrivate
    */
   MultipleInstructionMetadata &SetPrivate() {
     if (expression)

@@ -3,7 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "CustomBehavior.h"
+#include "CustomBehaviorsSharedData.h"
 
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Project/Behavior.h"
@@ -17,41 +17,41 @@
 
 using namespace gd;
 
-CustomBehavior *CustomBehavior::Clone() const {
-  CustomBehavior *clone = new CustomBehavior(*this);
+CustomBehaviorsSharedData *CustomBehaviorsSharedData::Clone() const {
+  CustomBehaviorsSharedData *clone = new CustomBehaviorsSharedData(*this);
   return clone;
 }
 
-void CustomBehavior::InitializeContent(gd::SerializerElement &behaviorContent) {
+void CustomBehaviorsSharedData::InitializeContent(gd::SerializerElement &behaviorContent) {
   if (!project.HasEventsBasedBehavior(GetTypeName())) {
     return;
   }
   const auto &eventsBasedBehavior = project.GetEventsBasedBehavior(GetTypeName());
-  const auto &properties = eventsBasedBehavior.GetPropertyDescriptors();
+  const auto &properties = eventsBasedBehavior.GetSharedPropertyDescriptors();
 
   gd::CustomConfigurationHelper::InitializeContent(properties, behaviorContent);
 }
 
-std::map<gd::String, gd::PropertyDescriptor> CustomBehavior::GetProperties(
+std::map<gd::String, gd::PropertyDescriptor> CustomBehaviorsSharedData::GetProperties(
     const gd::SerializerElement &behaviorContent) const {
   if (!project.HasEventsBasedBehavior(GetTypeName())) {
     auto behaviorProperties = std::map<gd::String, gd::PropertyDescriptor>();
     return behaviorProperties;
   }
   const auto &eventsBasedBehavior = project.GetEventsBasedBehavior(GetTypeName());
-  const auto &properties = eventsBasedBehavior.GetPropertyDescriptors();
+  const auto &properties = eventsBasedBehavior.GetSharedPropertyDescriptors();
 
   return gd::CustomConfigurationHelper::GetProperties(properties, behaviorContent);
 }
 
-bool CustomBehavior::UpdateProperty(gd::SerializerElement &behaviorContent,
+bool CustomBehaviorsSharedData::UpdateProperty(gd::SerializerElement &behaviorContent,
                                     const gd::String &propertyName,
                                     const gd::String &newValue) {
   if (!project.HasEventsBasedBehavior(GetTypeName())) {
     return false;
   }
   const auto &eventsBasedBehavior = project.GetEventsBasedBehavior(GetTypeName());
-  const auto &properties = eventsBasedBehavior.GetPropertyDescriptors();
+  const auto &properties = eventsBasedBehavior.GetSharedPropertyDescriptors();
 
   return gd::CustomConfigurationHelper::UpdateProperty(
       properties,

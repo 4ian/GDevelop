@@ -74,8 +74,8 @@ const ProjectPreCreationDialog = ({
 
   return (
     <Dialog
-      id="project-pre-creation-dialog"
       title={<Trans>New Project</Trans>}
+      id="project-pre-creation-dialog"
       maxWidth="sm"
       open={open}
       actions={[

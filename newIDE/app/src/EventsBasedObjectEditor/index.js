@@ -6,7 +6,7 @@ import { I18n } from '@lingui/react';
 import * as React from 'react';
 import TextField from '../UI/TextField';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
-import { Tabs, Tab } from '../UI/Tabs';
+import { Tabs } from '../UI/Tabs';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import AlertMessage from '../UI/AlertMessage';
 import EventsBasedObjectPropertiesEditor from './EventsBasedObjectPropertiesEditor';
@@ -62,14 +62,27 @@ export default class EventsBasedObjectEditor extends React.Component<
 
     return (
       <React.Fragment>
-        <Tabs value={currentTab} onChange={this._changeTab}>
-          <Tab label={<Trans>Configuration</Trans>} value="configuration" />
-          <Tab label={<Trans>Properties</Trans>} value="properties" />
-          <Tab label={<Trans>Children</Trans>} value="children" />
-        </Tabs>
+        <Tabs
+          value={currentTab}
+          onChange={this._changeTab}
+          options={[
+            {
+              value: 'configuration',
+              label: <Trans>Configuration</Trans>,
+            },
+            {
+              value: 'properties',
+              label: <Trans>Properties</Trans>,
+            },
+            {
+              value: 'children',
+              label: <Trans>Children</Trans>,
+            },
+          ]}
+        />
         <Line expand useFullHeight>
           {currentTab === 'configuration' && (
-            <ColumnStackLayout expand>
+            <ColumnStackLayout expand noMargin>
               <AlertMessage kind="warning">
                 <Trans>
                   The custom object editor is at a very early stage. A lot of

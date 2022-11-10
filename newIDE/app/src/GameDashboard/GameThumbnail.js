@@ -1,8 +1,8 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import { Paper } from '@material-ui/core';
 import * as React from 'react';
 import EmptyMessage from '../UI/EmptyMessage';
+import Paper from '../UI/Paper';
 
 const styles = {
   image: {
@@ -40,6 +40,7 @@ export const GameThumbnail = ({ thumbnailUrl, gameName }: Props) =>
         whiteSpace: 'normal',
         display: 'flex',
       }}
+      background="light"
     >
       <EmptyMessage>
         <Trans>No thumbnail set</Trans>

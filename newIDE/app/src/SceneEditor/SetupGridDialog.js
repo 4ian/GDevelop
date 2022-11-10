@@ -65,9 +65,8 @@ export default function SetupGridDialog(props: Props) {
       onApply={props.onApply}
       open
       maxWidth="sm"
-      noMargin
     >
-      <ColumnStackLayout>
+      <ColumnStackLayout noMargin>
         <ResponsiveLineStackLayout noMargin expand>
           <ColorField
             floatingLabelText={<Trans>Line color</Trans>}

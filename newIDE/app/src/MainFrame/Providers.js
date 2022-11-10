@@ -30,7 +30,6 @@ import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
-import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
 import { TutorialStateProvider } from '../Tutorial/TutorialContext';
 import ConfirmProvider from '../UI/Alert/AlertProvider';
 import { AnnouncementsFeedStateProvider } from '../AnnouncementsFeed/AnnouncementsFeedContext';
@@ -107,15 +106,13 @@ export default class Providers extends React.Component<Props, {||}> {
                                             <ResourceStoreStateProvider>
                                               <ExampleStoreStateProvider>
                                                 <ExtensionStoreStateProvider>
-                                                  <GamesShowcaseStateProvider>
-                                                    <TutorialStateProvider>
-                                                      <AnnouncementsFeedStateProvider>
-                                                        <PrivateAssetsAuthorizationProvider>
-                                                          {children({ i18n })}
-                                                        </PrivateAssetsAuthorizationProvider>
-                                                      </AnnouncementsFeedStateProvider>
-                                                    </TutorialStateProvider>
-                                                  </GamesShowcaseStateProvider>
+                                                  <TutorialStateProvider>
+                                                    <AnnouncementsFeedStateProvider>
+                                                      <PrivateAssetsAuthorizationProvider>
+                                                        {children({ i18n })}
+                                                      </PrivateAssetsAuthorizationProvider>
+                                                    </AnnouncementsFeedStateProvider>
+                                                  </TutorialStateProvider>
                                                 </ExtensionStoreStateProvider>
                                               </ExampleStoreStateProvider>
                                             </ResourceStoreStateProvider>

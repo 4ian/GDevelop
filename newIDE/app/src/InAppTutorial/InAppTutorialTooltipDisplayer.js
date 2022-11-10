@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import Fade from '@material-ui/core/Fade';
 import Typography from '@material-ui/core/Typography';
@@ -14,6 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { MarkdownText } from '../UI/MarkdownText';
 import RaisedButton from '../UI/RaisedButton';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import Paper from '@material-ui/core/Paper';
 
 type Props = {|
   anchorElement: HTMLElement,

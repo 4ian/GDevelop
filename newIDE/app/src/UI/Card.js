@@ -41,6 +41,7 @@ const Card = ({
     <MUICard
       style={{
         opacity: disabled ? 0.5 : 1,
+        backgroundColor: gdevelopTheme.paper.backgroundColor.medium,
         ...(isHighlighted
           ? {
               borderLeftWidth: 4,

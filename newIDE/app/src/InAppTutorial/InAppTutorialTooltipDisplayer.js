@@ -1,54 +1,64 @@
 // @flow
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
+import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import Fade from '@material-ui/core/Fade';
 import Typography from '@material-ui/core/Typography';
-import { Column, LargeSpacer } from '../UI/Grid';
+import ButtonBase from '@material-ui/core/ButtonBase';
+
+import { Column } from '../UI/Grid';
 import { getDisplayZIndexForHighlighter } from './HTMLUtils';
 import InAppTutorialContext, {
   type InAppTutorialFormattedTooltip,
 } from './InAppTutorialContext';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
-import { makeStyles } from '@material-ui/core/styles';
 import { MarkdownText } from '../UI/MarkdownText';
 import RaisedButton from '../UI/RaisedButton';
-import IconButton from '../UI/IconButton';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import Cross from '../UI/CustomSvgIcons/Cross';
+import { LineStackLayout } from '../UI/Layout';
+import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
+import { textEllipsisStyle } from '../UI/TextEllipsis';
 
-type Props = {|
-  anchorElement: HTMLElement,
-  tooltip: InAppTutorialFormattedTooltip,
-  buttonLabel?: string,
-|};
+const themeColors = {
+  grey10: '#EBEBED',
+  grey20: '#D9D9DE',
+  grey30: '#C5C5C9',
+  grey40: '#A6A6AB',
+  grey50: '#7F7F85',
+  grey70: '#494952',
+  grey100: '#1D1D26',
+};
 
 const styles = {
   paper: {
-    padding: '0px 30px 0px 20px', // vertical padding is added by markdown text paragraphs
+    padding: '10px 12px', // vertical padding is added by markdown text paragraphs
+    minWidth: 180,
   },
   title: {
-    color: '#1D1D26', // Grey100
+    color: themeColors.grey100,
   },
   description: {
-    color: '#494952', // Grey70
+    color: themeColors.grey70,
   },
   divider: {
-    backgroundColor: '#D9D9DE', // Grey20
+    backgroundColor: themeColors.grey20,
     height: 1,
   },
   descriptionImage: {
     margin: 'auto',
   },
-  sideButton: { cursor: 'pointer' },
-  sideButtonsContainer: {
-    position: 'absolute',
-    right: 3,
-    top: 8,
-    color: '#494952',
+  iconButtonContainer: {
+    cursor: 'pointer',
+    borderRadius: 5,
     display: 'flex',
-    flexDirection: 'column',
+    alignItems: 'center',
   },
+  headerText: { fontSize: 12 },
+  headerContentPreview: { color: themeColors.grey100 },
 };
 
 const useClasses = makeStyles({
@@ -115,19 +125,148 @@ const useClasses = makeStyles({
   },
 });
 
-export type InAppTutorialTooltipDisplayerInterface = {|
-  showTooltip: () => void,
+type TooltipBodyProps = {|
+  tooltip: InAppTutorialFormattedTooltip,
+  buttonLabel?: string,
 |};
 
-const InAppTutorialTooltipDisplayer = React.forwardRef<
-  Props,
-  InAppTutorialTooltipDisplayerInterface
->(({ anchorElement, tooltip, buttonLabel }, ref) => {
+const TooltipBody = ({ tooltip, buttonLabel }: TooltipBodyProps) => {
+  const { goToNextStep } = React.useContext(InAppTutorialContext);
+
+  return (
+    <>
+      {tooltip.title && (
+        <Typography style={styles.title} variant="subtitle" noMargin>
+          <MarkdownText source={tooltip.title} allowParagraphs />
+        </Typography>
+      )}
+      {tooltip.title && (tooltip.description || tooltip.getDescriptionNode) && (
+        <span style={styles.divider} />
+      )}
+      {tooltip.getDescriptionNode &&
+        tooltip.getDescriptionNode(styles.description)}
+      {tooltip.description && !tooltip.getDescriptionNode && (
+        <Typography style={styles.description} noMargin>
+          <MarkdownText source={tooltip.description} allowParagraphs />
+        </Typography>
+      )}
+      {tooltip.image && (
+        <>
+          <img
+            src={tooltip.image.dataUrl}
+            alt="Tutorial helper"
+            style={{
+              ...styles.descriptionImage,
+              width: tooltip.image.width || '100%',
+            }}
+          />
+        </>
+      )}
+      {buttonLabel && (
+        <>
+          <RaisedButton primary label={buttonLabel} onClick={goToNextStep} />
+        </>
+      )}
+    </>
+  );
+};
+
+type TooltipHeaderProps = {|
+  paletteType: 'dark' | 'light',
+  progress: number,
+  displayFoldButton: boolean,
+  onClickFoldButton: () => void,
+  tooltipContent?: string,
+|};
+
+const TooltipHeader = ({
+  paletteType,
+  progress,
+  displayFoldButton,
+  onClickFoldButton,
+  tooltipContent,
+}: TooltipHeaderProps) => {
+  const progressColor =
+    paletteType === 'light' ? themeColors.grey40 : themeColors.grey30;
+  const iconButtonContainerColors =
+    paletteType === 'light'
+      ? {
+          color: themeColors.grey50,
+          backgroundColor: themeColors.grey20,
+        }
+      : {
+          color: themeColors.grey40,
+          backgroundColor: themeColors.grey10,
+        };
+  return (
+    <LineStackLayout
+      alignItems="center"
+      noMargin
+      justifyContent={tooltipContent ? undefined : 'space-between'}
+    >
+      <Typography style={{ ...styles.headerText, color: progressColor }}>
+        {progress}%
+      </Typography>
+      <LineStackLayout noMargin alignItems="center" overflow="hidden">
+        {tooltipContent ? null : (
+          <ButtonBase>
+            <div
+              style={{
+                ...styles.iconButtonContainer,
+                ...iconButtonContainerColors,
+                paddingRight: 5,
+              }}
+            >
+              <Cross />
+              <Typography style={styles.headerText}>
+                <Trans>Quit tutorial</Trans>
+              </Typography>
+            </div>
+          </ButtonBase>
+        )}
+        {tooltipContent && (
+          <Typography
+            variant="body2"
+            style={{ ...styles.headerContentPreview, ...textEllipsisStyle }}
+          >
+            {tooltipContent}
+          </Typography>
+        )}
+        {displayFoldButton ? (
+          <ButtonBase onClick={onClickFoldButton}>
+            <span
+              style={{
+                ...styles.iconButtonContainer,
+                ...iconButtonContainerColors,
+              }}
+            >
+              {tooltipContent ? <ChevronArrowTop /> : <ChevronArrowBottom />}
+            </span>
+          </ButtonBase>
+        ) : null}
+      </LineStackLayout>
+    </LineStackLayout>
+  );
+};
+
+type Props = {|
+  anchorElement: HTMLElement,
+  tooltip: InAppTutorialFormattedTooltip,
+  buttonLabel?: string,
+  progress: number,
+|};
+
+const InAppTutorialTooltipDisplayer = ({
+  anchorElement,
+  tooltip,
+  buttonLabel,
+  progress,
+}: Props) => {
   const {
     palette: { type: paletteType },
   } = React.useContext(GDevelopThemeContext);
   const [show, setShow] = React.useState<boolean>(false);
-  const { goToNextStep } = React.useContext(InAppTutorialContext);
+  const [folded, setFolded] = React.useState<boolean>(false);
   const updateVisibility = React.useCallback(
     (entries: IntersectionObserverEntry[]) => {
       setShow(entries[0].isIntersecting);
@@ -135,18 +274,11 @@ const InAppTutorialTooltipDisplayer = React.forwardRef<
     []
   );
 
-  React.useImperativeHandle(ref, () => ({
-    showTooltip: () => {
-      if (tooltip.standalone && !show) {
-        setShow(true);
-      }
-    },
-  }));
-
   // If tooltip changes, we reopen the tooltip anyway.
   React.useEffect(
     () => {
       setShow(true);
+      setFolded(false);
     },
     [tooltip]
   );
@@ -189,47 +321,20 @@ const InAppTutorialTooltipDisplayer = React.forwardRef<
             <Fade {...TransitionProps} timeout={{ enter: 350, exit: 0 }}>
               <Paper style={{ ...styles.paper, backgroundColor }} elevation={4}>
                 <Column noMargin>
-                  {tooltip.title && (
-                    <Typography style={styles.title} variant="subtitle1">
-                      <MarkdownText source={tooltip.title} allowParagraphs />
-                    </Typography>
-                  )}
-                  {tooltip.title &&
-                    (tooltip.description || tooltip.getDescriptionNode) && (
-                      <span style={styles.divider} />
-                    )}
-                  {tooltip.getDescriptionNode &&
-                    tooltip.getDescriptionNode(styles.description)}
-                  {tooltip.description && !tooltip.getDescriptionNode && (
-                    <Typography style={styles.description}>
-                      <MarkdownText
-                        source={tooltip.description}
-                        allowParagraphs
-                      />
-                    </Typography>
-                  )}
-                  {tooltip.image && (
-                    <>
-                      <img
-                        src={tooltip.image.dataUrl}
-                        alt="Tutorial helper"
-                        style={{
-                          ...styles.descriptionImage,
-                          width: tooltip.image.width || '100%',
-                        }}
-                      />
-                      <LargeSpacer />
-                    </>
-                  )}
-                  {buttonLabel && (
-                    <>
-                      <RaisedButton
-                        primary
-                        label={buttonLabel}
-                        onClick={goToNextStep}
-                      />
-                      <LargeSpacer />
-                    </>
+                  <TooltipHeader
+                    paletteType={paletteType}
+                    // Display the hide button only if standalone because the only
+                    // way to show it back is to click on the avatar (through
+                    // ref handle method).
+                    displayFoldButton={!!tooltip.standalone}
+                    progress={progress}
+                    tooltipContent={
+                      folded ? tooltip.title || tooltip.description : undefined
+                    }
+                    onClickFoldButton={() => setFolded(!folded)}
+                  />
+                  {!folded && (
+                    <TooltipBody tooltip={tooltip} buttonLabel={buttonLabel} />
                   )}
                 </Column>
                 <span
@@ -238,21 +343,6 @@ const InAppTutorialTooltipDisplayer = React.forwardRef<
                   ref={arrowRef}
                   style={{ color: backgroundColor }}
                 />
-                <div style={styles.sideButtonsContainer}>
-                  {tooltip.standalone ? (
-                    // Display the hide button only if standalone because the only
-                    // way to show it back is to click on the avatar (through
-                    // ref handle method).
-                    <IconButton
-                      size="small"
-                      useCurrentColor
-                      style={styles.sideButton}
-                      onClick={() => setShow(false)}
-                    >
-                      <ChevronArrowBottom />
-                    </IconButton>
-                  ) : null}
-                </div>
               </Paper>
             </Fade>
           </>
@@ -260,6 +350,6 @@ const InAppTutorialTooltipDisplayer = React.forwardRef<
       </Popper>
     </>
   );
-});
+};
 
 export default InAppTutorialTooltipDisplayer;

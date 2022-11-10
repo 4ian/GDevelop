@@ -11,9 +11,10 @@ type Props = {|
 |};
 
 const useInAppTutorialOrchestrator = ({ editorTabs }: Props) => {
-  const [currentEditor, setCurrentEditor] = React.useState<EditorIdentifier | null>(
-    null
-  );
+  const [
+    currentEditor,
+    setCurrentEditor,
+  ] = React.useState<EditorIdentifier | null>(null);
 
   React.useEffect(
     () => {

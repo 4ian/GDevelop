@@ -2,11 +2,7 @@
 import * as React from 'react';
 import InAppTutorialContext, {
   type InAppTutorial,
-  type EditorIdentifier,
 } from './InAppTutorialContext';
-import InAppTutorialOrchestrator, {
-  type InAppTutorialOrchestratorInterface,
-} from './InAppTutorialOrchestrator';
 import onboardingTutorial from './Tutorials/OnboardingTutorial';
 import { setCurrentlyRunningInAppTutorial } from '../Utils/Analytics/EventSender';
 import {
@@ -18,16 +14,8 @@ import {
 type Props = {| children: React.Node |};
 
 const InAppTutorialProvider = (props: Props) => {
-  const flingTutorial = require('./Tutorials/flingGame.json')
-  const [tutorial, setTutorial] = React.useState<?InAppTutorial>(flingTutorial);
-  const [project, setProject] = React.useState<?gdProject>(null);
-  const [
-    currentEditor,
-    setCurrentEditor,
-  ] = React.useState<EditorIdentifier | null>(null);
-  const orchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
-    null
-  );
+  const flingTutorial = require('./Tutorials/flingGame.json');
+  const [tutorial, setTutorial] = React.useState<InAppTutorial | null>(flingTutorial);
   const [
     inAppTutorialShortHeaders,
     setInAppTutorialShortHeaders,
@@ -53,23 +41,9 @@ const InAppTutorialProvider = (props: Props) => {
     setCurrentlyRunningInAppTutorial(tutorialId);
   };
 
-  const onPreviewLaunch = () => {
-    if (orchestratorRef.current) orchestratorRef.current.onPreviewLaunch();
-  };
-
-  const goToNextStep = () => {
-    if (orchestratorRef.current) orchestratorRef.current.goToNextStep();
-  };
-
   const endTutorial = () => {
     setTutorial(null);
     setCurrentlyRunningInAppTutorial(null);
-  };
-
-  const getProgress = () => {
-    if (!orchestratorRef.current)
-      return { step: 0, progress: 0, projectData: {} };
-    return orchestratorRef.current.getProgress();
   };
 
   const loadInAppTutorials = React.useCallback(async () => {
@@ -92,26 +66,13 @@ const InAppTutorialProvider = (props: Props) => {
   return (
     <InAppTutorialContext.Provider
       value={{
-        setProject,
-        setCurrentEditor,
-        goToNextStep,
-        onPreviewLaunch,
-        currentlyRunningInAppTutorial: tutorial ? tutorial.id : null,
-        startTutorial,
         inAppTutorialShortHeaders,
-        getProgress,
+        currentlyRunningInAppTutorial: tutorial,
+        startTutorial,
+        endTutorial,
       }}
     >
       {props.children}
-      {tutorial && (
-        <InAppTutorialOrchestrator
-          ref={orchestratorRef}
-          tutorial={tutorial}
-          endTutorial={endTutorial}
-          project={project}
-          currentEditor={currentEditor}
-        />
-      )}
     </InAppTutorialContext.Provider>
   );
 };

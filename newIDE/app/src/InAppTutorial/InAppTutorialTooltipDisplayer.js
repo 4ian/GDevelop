@@ -10,9 +10,7 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 
 import { Column } from '../UI/Grid';
 import { getDisplayZIndexForHighlighter } from './HTMLUtils';
-import InAppTutorialContext, {
-  type InAppTutorialFormattedTooltip,
-} from './InAppTutorialContext';
+import { type InAppTutorialFormattedTooltip } from './InAppTutorialContext';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { MarkdownText } from '../UI/MarkdownText';
@@ -128,11 +126,14 @@ const useClasses = makeStyles({
 type TooltipBodyProps = {|
   tooltip: InAppTutorialFormattedTooltip,
   buttonLabel?: string,
+  goToNextStep: () => void,
 |};
 
-const TooltipBody = ({ tooltip, buttonLabel }: TooltipBodyProps) => {
-  const { goToNextStep } = React.useContext(InAppTutorialContext);
-
+const TooltipBody = ({
+  tooltip,
+  buttonLabel,
+  goToNextStep,
+}: TooltipBodyProps) => {
   return (
     <>
       {tooltip.title && (
@@ -251,6 +252,7 @@ type Props = {|
   buttonLabel?: string,
   progress: number,
   endTutorial: () => void,
+  goToNextStep: () => void,
 |};
 
 const InAppTutorialTooltipDisplayer = ({
@@ -259,6 +261,7 @@ const InAppTutorialTooltipDisplayer = ({
   buttonLabel,
   progress,
   endTutorial,
+  goToNextStep,
 }: Props) => {
   const {
     palette: { type: paletteType },
@@ -335,7 +338,11 @@ const InAppTutorialTooltipDisplayer = ({
                     endTutorial={endTutorial}
                   />
                   {!folded && (
-                    <TooltipBody tooltip={tooltip} buttonLabel={buttonLabel} />
+                    <TooltipBody
+                      tooltip={tooltip}
+                      buttonLabel={buttonLabel}
+                      goToNextStep={goToNextStep}
+                    />
                   )}
                 </Column>
                 <span

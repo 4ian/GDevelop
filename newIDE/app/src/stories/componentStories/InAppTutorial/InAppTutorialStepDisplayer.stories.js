@@ -22,6 +22,7 @@ export const WrongEditorInfo = () => {
         expectedEditor="Scene"
         goToFallbackStep={() => {}}
         endTutorial={() => action('end tutorial')()}
+        goToNextStep={() => action('go to next step')()}
       />
     </>
   );
@@ -48,6 +49,7 @@ export const StandaloneTooltip = () => {
         expectedEditor={null}
         goToFallbackStep={() => {}}
         endTutorial={() => action('end tutorial')()}
+        goToNextStep={() => action('go to next step')()}
       />
     </>
   );

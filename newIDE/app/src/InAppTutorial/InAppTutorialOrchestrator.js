@@ -196,7 +196,6 @@ type Props = {|
 
 export type InAppTutorialOrchestratorInterface = {|
   onPreviewLaunch: () => void,
-  goToNextStep: () => void,
   getProgress: () => {|
     step: number,
     progress: number,
@@ -283,8 +282,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
     [flow, changeStep, stepCount]
   );
 
-  const computeProgress = () =>
-    Math.round((currentStepIndex / tutorial.flow.length) * 100);
+  const computeProgress = React.useCallback(
+    () => Math.round((currentStepIndex / tutorial.flow.length) * 100),
+    [currentStepIndex, tutorial.flow]
+  );
 
   const getProgress = () => {
     return {
@@ -373,7 +374,6 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
   React.useImperativeHandle(ref, () => ({
     onPreviewLaunch,
-    goToNextStep,
     getProgress,
   }));
 
@@ -571,6 +571,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
         }}
         endTutorial={endTutorial}
         progress={computeProgress()}
+        goToNextStep={goToNextStep}
       />
     );
   };

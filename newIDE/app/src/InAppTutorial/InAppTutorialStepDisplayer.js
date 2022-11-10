@@ -92,6 +92,7 @@ type Props = {|
   goToFallbackStep: () => void,
   endTutorial: () => void,
   progress: number,
+  goToNextStep: () => void,
 |};
 
 function InAppTutorialStepDisplayer({
@@ -100,6 +101,7 @@ function InAppTutorialStepDisplayer({
   goToFallbackStep,
   endTutorial,
   progress,
+  goToNextStep,
 }: Props) {
   const [
     elementToHighlight,
@@ -202,6 +204,7 @@ function InAppTutorialStepDisplayer({
           anchorElement={anchorElement}
           tooltip={tooltip}
           progress={progress}
+          goToNextStep={goToNextStep}
           buttonLabel={
             nextStepTrigger && nextStepTrigger.clickOnTooltipButton
               ? nextStepTrigger.clickOnTooltipButton
@@ -218,6 +221,7 @@ function InAppTutorialStepDisplayer({
           anchorElement={assistantImage}
           tooltip={wrongEditorTooltip}
           progress={progress}
+          goToNextStep={goToNextStep}
         />
       );
     }

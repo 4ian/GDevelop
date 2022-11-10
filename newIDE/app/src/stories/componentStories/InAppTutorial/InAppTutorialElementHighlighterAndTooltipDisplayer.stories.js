@@ -164,6 +164,7 @@ export const Default = () => {
             tooltip={elementIdToTooltip[elementToHighlightId]}
             progress={28}
             endTutorial={() => action('end tutorial')()}
+            goToNextStep={() => action('go to next step')()}
           />
         </>
       )}

@@ -87,9 +87,9 @@ module.exports = {
     extension
       .addAction(
         'GooglePlayServicesAndroidAPI',
-        _('Call Google Play Services Android API'),
-        _('Call Google Play Services Android API.'),
-        _('Call Google Play Services Android API method _PARAM0_ then save results to scene variable _PARAM1_'),
+        _('Calls Google Play Services Android API'),
+        _('Calls Google Play Services Android API.'),
+        _('Calls Google Play Services Android API method _PARAM0_ then save results to scene variable _PARAM1_'),
         '',
         'https://developers.google.com/static/games/services/images/not-yet-friends.svg',
         'https://developers.google.com/static/games/services/images/not-yet-friends.svg'
@@ -109,9 +109,9 @@ module.exports = {
     extension
       .addAction(
         'GooglePlayServicesAndroidAPIwParameters',
-        _('Call Google Play Services Android API w/ Parameters'),
-        _('Call Google Play Services Android API w/ Parameters.'),
-        _('Call Google Play Services Android API method _PARAM0_ with parameter scene variable _PARAM1_ then save results to scene variable _PARAM2_'),
+        _('Calls Google Play Services Android API w/ Parameters'),
+        _('Calls Google Play Services Android API w/ Parameters.'),
+        _('Calls Google Play Services Android API method _PARAM0_ with parameter scene variable _PARAM1_ then save results to scene variable _PARAM2_'),
         '',
         'https://developers.google.com/static/games/services/images/not-yet-friends.svg',
         'https://developers.google.com/static/games/services/images/not-yet-friends.svg'

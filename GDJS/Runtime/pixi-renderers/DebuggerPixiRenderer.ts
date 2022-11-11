@@ -112,67 +112,67 @@ namespace gdjs {
 
       const workingPoint: FloatPoint = [0, 0];
       if (showCollisionMasks) {
-      // Draw AABB
-      for (let i = 0; i < instances.length; i++) {
-        const object = instances[i];
-        const layer = this._instanceContainer.getLayer(object.getLayer());
+        // Draw AABB
+        for (let i = 0; i < instances.length; i++) {
+          const object = instances[i];
+          const layer = this._instanceContainer.getLayer(object.getLayer());
 
-        if (
-          (!object.isVisible() || !layer.isVisible()) &&
-          !showHiddenInstances
-        ) {
-          continue;
+          if (
+            (!object.isVisible() || !layer.isVisible()) &&
+            !showHiddenInstances
+          ) {
+            continue;
+          }
+
+          const rendererObject = object.getRendererObject();
+          if (!rendererObject) {
+            continue;
+          }
+          const aabb = object.getAABB();
+          debugDraw.fill.alpha = 0.2;
+          debugDraw.line.color = 0x778ee8;
+          debugDraw.fill.color = 0x778ee8;
+
+          const polygon: float[] = [];
+          polygon.push.apply(
+            polygon,
+            layer.applyLayerTransformation(
+              aabb.min[0],
+              aabb.min[1],
+              0,
+              workingPoint
+            )
+          );
+          polygon.push.apply(
+            polygon,
+            layer.applyLayerTransformation(
+              aabb.max[0],
+              aabb.min[1],
+              0,
+              workingPoint
+            )
+          );
+          polygon.push.apply(
+            polygon,
+            layer.applyLayerTransformation(
+              aabb.max[0],
+              aabb.max[1],
+              0,
+              workingPoint
+            )
+          );
+          polygon.push.apply(
+            polygon,
+            layer.applyLayerTransformation(
+              aabb.min[0],
+              aabb.max[1],
+              0,
+              workingPoint
+            )
+          );
+
+          debugDraw.drawPolygon(polygon);
         }
-
-        const rendererObject = object.getRendererObject();
-        if (!rendererObject) {
-          continue;
-        }
-        const aabb = object.getAABB();
-        debugDraw.fill.alpha = 0.2;
-        debugDraw.line.color = 0x778ee8;
-        debugDraw.fill.color = 0x778ee8;
-
-        const polygon: float[] = [];
-        polygon.push.apply(
-          polygon,
-          layer.applyLayerTransformation(
-            aabb.min[0],
-            aabb.min[1],
-            0,
-            workingPoint
-          )
-        );
-        polygon.push.apply(
-          polygon,
-          layer.applyLayerTransformation(
-            aabb.max[0],
-            aabb.min[1],
-            0,
-            workingPoint
-          )
-        );
-        polygon.push.apply(
-          polygon,
-          layer.applyLayerTransformation(
-            aabb.max[0],
-            aabb.max[1],
-            0,
-            workingPoint
-          )
-        );
-        polygon.push.apply(
-          polygon,
-          layer.applyLayerTransformation(
-            aabb.min[0],
-            aabb.max[1],
-            0,
-            workingPoint
-          )
-        );
-
-        debugDraw.drawPolygon(polygon);
-      }
       }
 
       // Draw hitboxes and points
@@ -204,90 +204,90 @@ namespace gdjs {
         renderedObjectPoints.wasRendered = true;
 
         if (showCollisionMasks) {
-        // Draw hitboxes (sub-optimal performance)
-        const hitboxes = object.getHitBoxes();
-        for (let j = 0; j < hitboxes.length; j++) {
-          // Note that this conversion is sub-optimal, but we don't care
-          // as this is for debug draw.
-          const polygon: float[] = [];
-          hitboxes[j].vertices.forEach((point) => {
-            point = layer.applyLayerTransformation(
-              point[0],
-              point[1],
-              0,
-              workingPoint
-            );
+          // Draw hitboxes (sub-optimal performance)
+          const hitboxes = object.getHitBoxes();
+          for (let j = 0; j < hitboxes.length; j++) {
+            // Note that this conversion is sub-optimal, but we don't care
+            // as this is for debug draw.
+            const polygon: float[] = [];
+            hitboxes[j].vertices.forEach((point) => {
+              point = layer.applyLayerTransformation(
+                point[0],
+                point[1],
+                0,
+                workingPoint
+              );
 
-            polygon.push(point[0]);
-            polygon.push(point[1]);
-          });
-          debugDraw.fill.alpha = 0;
-          debugDraw.line.alpha = 0.5;
-          debugDraw.line.color = 0xff0000;
-          debugDraw.drawPolygon(polygon);
-        }
+              polygon.push(point[0]);
+              polygon.push(point[1]);
+            });
+            debugDraw.fill.alpha = 0;
+            debugDraw.line.alpha = 0.5;
+            debugDraw.line.color = 0xff0000;
+            debugDraw.drawPolygon(polygon);
+          }
         }
 
         // Draw points
         debugDraw.fill.alpha = 0.3;
 
         if (showPositions) {
-        // Draw Center point
-        const centerPoint = layer.applyLayerTransformation(
-          object.getCenterXInScene(),
-          object.getCenterYInScene(),
-          0,
-          workingPoint
-        );
+          // Draw Center point
+          const centerPoint = layer.applyLayerTransformation(
+            object.getCenterXInScene(),
+            object.getCenterYInScene(),
+            0,
+            workingPoint
+          );
 
-        renderObjectPoint(
-          renderedObjectPoints.points,
-          'Center',
-          0xffff00,
-          centerPoint[0],
-          centerPoint[1]
-        );
+          renderObjectPoint(
+            renderedObjectPoints.points,
+            'Center',
+            0xffff00,
+            centerPoint[0],
+            centerPoint[1]
+          );
 
-        // Draw position point
-        const positionPoint = layer.applyLayerTransformation(
-          object.getX(),
-          object.getY(),
-          0,
-          workingPoint
-        );
+          // Draw position point
+          const positionPoint = layer.applyLayerTransformation(
+            object.getX(),
+            object.getY(),
+            0,
+            workingPoint
+          );
 
-        renderObjectPoint(
-          renderedObjectPoints.points,
-          'Position',
-          0xff0000,
-          positionPoint[0],
-          positionPoint[1]
-        );
+          renderObjectPoint(
+            renderedObjectPoints.points,
+            'Position',
+            0xff0000,
+            positionPoint[0],
+            positionPoint[1]
+          );
 
-        // Draw Origin point
-        if (object instanceof gdjs.SpriteRuntimeObject) {
-          let originPoint = object.getPointPosition('origin');
-          // When there is neither rotation nor flipping,
-          // the origin point is over the position point.
-          if (
-            Math.abs(originPoint[0] - positionPoint[0]) >= 1 ||
-            Math.abs(originPoint[1] - positionPoint[1]) >= 1
-          ) {
-            originPoint = layer.applyLayerTransformation(
-              originPoint[0],
-              originPoint[1],
-              0,
-              workingPoint
-            );
+          // Draw Origin point
+          if (object instanceof gdjs.SpriteRuntimeObject) {
+            let originPoint = object.getPointPosition('origin');
+            // When there is neither rotation nor flipping,
+            // the origin point is over the position point.
+            if (
+              Math.abs(originPoint[0] - positionPoint[0]) >= 1 ||
+              Math.abs(originPoint[1] - positionPoint[1]) >= 1
+            ) {
+              originPoint = layer.applyLayerTransformation(
+                originPoint[0],
+                originPoint[1],
+                0,
+                workingPoint
+              );
 
-            renderObjectPoint(
-              renderedObjectPoints.points,
-              'Origin',
-              0xff0000,
-              originPoint[0],
-              originPoint[1]
-            );
-          }
+              renderObjectPoint(
+                renderedObjectPoints.points,
+                'Origin',
+                0xff0000,
+                originPoint[0],
+                originPoint[1]
+              );
+            }
           }
         }
 

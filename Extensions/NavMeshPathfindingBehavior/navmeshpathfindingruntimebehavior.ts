@@ -428,7 +428,9 @@ namespace gdjs {
       if (!this._isVisualDebugEnabled) {
         return;
       }
-      const graphics = instanceContainer.getDebuggerRenderer().getDebugRenderer();
+      const graphics = instanceContainer
+        .getDebuggerRenderer()
+        .getDebugRenderer();
       if (!graphics) {
         return;
       }

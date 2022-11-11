@@ -142,7 +142,7 @@ namespace gdjs {
     /**
      * Activate or deactivate the debug visualization for collisions and points.
      */
-     enableDebugDraw(
+    enableDebugDraw(
       enableDebugDraw: boolean,
       showHiddenInstances: boolean,
       showPointsNames: boolean,

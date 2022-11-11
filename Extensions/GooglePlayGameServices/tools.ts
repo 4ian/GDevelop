@@ -6,8 +6,6 @@ namespace gdjs {
     runtimeSceneContainer: gdjs.RuntimeScene;
   }
 
-  const logger = new gdjs.Logger('Google Play Services extension');
-
   export namespace evtTools {
     export namespace googlePlayGameServices {
       /** Initial Extension data */

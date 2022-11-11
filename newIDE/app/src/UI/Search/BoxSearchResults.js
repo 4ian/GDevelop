@@ -17,6 +17,7 @@ type Props<SearchItem> = {|
   // so make sure to limit the number of items to a reasonable number for performance.
   noScroll?: boolean,
   noResultPlaceholder?: React.Node,
+  onScroll?: number => void,
 |};
 
 const styles = {
@@ -25,7 +26,6 @@ const styles = {
 };
 
 export type BoxSearchResultsInterface = {|
-  getScrollPosition: () => number,
   scrollToPosition: (y: number) => void,
 |};
 
@@ -43,15 +43,12 @@ export const BoxSearchResults = React.forwardRef<
       baseSize,
       noResultPlaceholder,
       noScroll,
+      onScroll,
     }: Props<SearchItem>,
     ref
   ) => {
-    const scrollTop = React.useRef<?number>(null);
     const grid = React.useRef<?Grid>(null);
     React.useImperativeHandle(ref, () => ({
-      getScrollPosition: () => {
-        return scrollTop ? scrollTop.current : 0;
-      },
       scrollToPosition: (y: number) => {
         const scrollViewElement = grid.current;
         if (!scrollViewElement) return;
@@ -59,6 +56,11 @@ export const BoxSearchResults = React.forwardRef<
         scrollViewElement.scrollToPosition({ scrollLeft: 0, scrollTop: y });
       },
     }));
+
+    const handleScroll = React.useCallback(
+      (event: ScrollParams) => onScroll && onScroll(event.scrollTop),
+      [onScroll]
+    );
 
     if (!searchItems) {
       if (!error) return <PlaceholderLoader />;
@@ -130,9 +132,7 @@ export const BoxSearchResults = React.forwardRef<
                   rowCount={rowCount}
                   cellRenderer={cellRenderer}
                   style={styles.grid}
-                  onScroll={event => {
-                    scrollTop.current = event.scrollTop;
-                  }}
+                  onScroll={handleScroll}
                 />
               );
             }}

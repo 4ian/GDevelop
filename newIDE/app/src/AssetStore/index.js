@@ -45,6 +45,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PrivateAssetPackPurchaseDialog from './PrivateAssets/PrivateAssetPackPurchaseDialog';
 import { LineStackLayout } from '../UI/Layout';
 import Paper from '../UI/Paper';
+import useForceUpdate from '../Utils/UseForceUpdate';
 
 type Props = {|
   project: gdProject,
@@ -71,9 +72,13 @@ export const AssetStore = ({ project }: Props) => {
     filtersState,
   } = navigationState.getCurrentPage();
   const searchBar = React.useRef<?SearchBarInterface>(null);
+
   const assetsHome = React.useRef<?AssetsHomeInterface>(null);
   const boxSearchResults = React.useRef<?BoxSearchResultsInterface>(null);
-  const scrollView = assetsHome.current || boxSearchResults.current;
+  const assetDetails = React.useRef<?AssetDetailsInterface>(null);
+  const scrollView = assetsHome.current || boxSearchResults.current || assetDetails.current;
+  const scrollTop = React.useRef<?number>(null);
+
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
   const [
@@ -87,24 +92,35 @@ export const AssetStore = ({ project }: Props) => {
   const { onPurchaseSuccessful } = React.useContext(AuthenticatedUserContext);
 
   const scrollPosition = navigationState.getCurrentPage().scrollPosition;
+  console.log(assetsHome.current + ' ' + boxSearchResults.current);
+  console.log('scroll: ' + scrollPosition);
+  // TODO use a props instead of this !!!
   if (
-    scrollPosition &&
+    scrollPosition != null &&
     scrollView &&
     // Make sure the ref is not from the previous view.
     ((assetsHome.current && isOnHomePage) ||
-      (boxSearchResults.current && !isOnHomePage && !openedAssetShortHeader))
+    (boxSearchResults.current && !isOnHomePage && !openedAssetShortHeader) ||
+    (assetDetails.current && openedAssetShortHeader && openedAssetShortHeader === assetDetails.current.getAssetShortHeader()))
   ) {
+    console.log('scroll to: ' + scrollPosition);
     scrollView.scrollToPosition(scrollPosition);
     navigationState.getCurrentPage().scrollPosition = null;
   }
 
   const saveScrollPosition = React.useCallback(
     () => {
-      if (scrollView) {
-        navigationState.getCurrentPage().scrollPosition = scrollView.getScrollPosition();
-      }
+      console.log('save scroll: ' + scrollTop.current);
+      navigationState.getCurrentPage().scrollPosition = scrollTop.current;
     },
-    [navigationState, scrollView]
+    [navigationState]
+  );
+
+  const handleScroll = React.useCallback(
+    (y) => {
+      scrollTop.current = y;
+    },
+    [scrollTop]
   );
 
   const onOpenDetails = React.useCallback(
@@ -404,6 +420,7 @@ export const AssetStore = ({ project }: Props) => {
                       assetPackRandomOrdering={assetPackRandomOrdering}
                       onPublicAssetPackSelection={selectPublicAssetPack}
                       onPrivateAssetPackSelection={selectPrivateAssetPack}
+                      onScroll={handleScroll}
                     />
                   )}
                 {!isOnHomePage && !openedAssetShortHeader && (
@@ -425,6 +442,7 @@ export const AssetStore = ({ project }: Props) => {
                         onClear={() => clearAllFilters(assetFiltersState)}
                       />
                     }
+                    onScroll={handleScroll}
                   />
                 )}
                 {isOnHomePage && error && (
@@ -439,10 +457,12 @@ export const AssetStore = ({ project }: Props) => {
                 )}
                 {openedAssetShortHeader && (
                   <AssetDetails
+                    ref={assetDetails}
                     project={project}
                     onTagSelection={selectTag}
                     assetShortHeader={openedAssetShortHeader}
                     onOpenDetails={onOpenDetails}
+                    onScroll={handleScroll}
                   />
                 )}
                 {!!selectedPrivateAssetPackListingData && (

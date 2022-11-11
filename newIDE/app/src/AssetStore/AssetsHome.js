@@ -173,7 +173,6 @@ const PrivateAssetPackTile = ({
 };
 
 export type AssetsHomeInterface = {|
-  getScrollPosition: () => number,
   scrollToPosition: (y: number) => void,
 |};
 
@@ -183,6 +182,7 @@ type Props = {|
   assetPackRandomOrdering: Array<number>,
   onPublicAssetPackSelection: PublicAssetPack => void,
   onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
+  onScroll: number => void,
 |};
 
 export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
@@ -193,6 +193,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       assetPackRandomOrdering,
       onPublicAssetPackSelection,
       onPrivateAssetPackSelection,
+      onScroll,
     }: Props,
     ref
   ) => {
@@ -201,9 +202,6 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
 
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
-      getScrollPosition: () => {
-        return scrollView.current ? scrollView.current.getScrollPosition() : 0;
-      },
       scrollToPosition: (y: number) => {
         const scrollViewElement = scrollView.current;
         if (!scrollViewElement) return;
@@ -245,7 +243,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       .map(sortObject => sortObject.tile);
 
     return (
-      <ScrollView ref={scrollView}>
+      <ScrollView ref={scrollView} onScroll={onScroll}>
         <GridList
           cols={
             windowWidth === 'small'

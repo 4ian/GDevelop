@@ -82,6 +82,7 @@ type Props = {|
   onTagSelection: (tag: string) => void,
   assetShortHeader: AssetShortHeader,
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
+  onScroll: number => void,
 |};
 
 const getObjectAssetResourcesByName = (
@@ -96,12 +97,22 @@ const getObjectAssetResourcesByName = (
   return resourcesByName;
 };
 
-export const AssetDetails = ({
-  project,
-  onTagSelection,
-  assetShortHeader,
-  onOpenDetails,
-}: Props) => {
+export type AssetDetailsInterface = {|
+  scrollToPosition: (y: number) => void,
+  getAssetShortHeader: () => string,
+|};
+
+export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
+  (
+    {
+      project,
+      onTagSelection,
+      assetShortHeader,
+      onOpenDetails,
+      onScroll,
+    }: Props,
+    ref
+  ) => {
   const {
     authors,
     licenses,
@@ -120,6 +131,23 @@ export const AssetDetails = ({
   const { fetchPrivateAsset } = React.useContext(
     PrivateAssetsAuthorizationContext
   );
+
+  const scrollView = React.useRef<?ScrollViewInterface>(null);
+  React.useImperativeHandle(ref, () => ({
+    scrollToPosition: (y: number) => {
+      const scrollViewElement = scrollView.current;
+      if (!scrollViewElement) return;
+
+      scrollViewElement.scrollToPosition(y);
+    },
+    /**
+     * It allows the asset store to identify the view.
+     */
+    getAssetShortHeader: () => {
+      return assetShortHeader;
+    }
+  }));
+
   const loadAsset = React.useCallback(
     () => {
       (async () => {
@@ -204,7 +232,7 @@ export const AssetDetails = ({
   const truncatedSearchResults = searchResults && searchResults.slice(0, 60);
 
   return (
-    <ScrollView style={styles.scrollView}>
+    <ScrollView ref={scrollView} style={styles.scrollView} onScroll={onScroll}>
       <Column expand noMargin>
         <Line justifyContent="space-between" noMargin>
           <Column>
@@ -457,4 +485,4 @@ export const AssetDetails = ({
       </Column>
     </ScrollView>
   );
-};
+});

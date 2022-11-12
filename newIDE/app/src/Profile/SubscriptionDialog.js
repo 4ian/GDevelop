@@ -6,7 +6,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Card from '../UI/Card';
 import FlatButton from '../UI/FlatButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
 import { Column, Line } from '../UI/Grid';
 import {
@@ -21,7 +21,6 @@ import CheckCircle from '@material-ui/icons/CheckCircle';
 import EmptyMessage from '../UI/EmptyMessage';
 import { showMessageBox, showErrorBox } from '../UI/Messages/MessageBox';
 import LeftLoader from '../UI/LeftLoader';
-import PlaceholderMessage from '../UI/PlaceholderMessage';
 import {
   sendSubscriptionDialogShown,
   sendChoosePlanClicked,
@@ -31,7 +30,10 @@ import Window from '../Utils/Window';
 import Text from '../UI/Text';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
+import RedeemIcon from '@material-ui/icons/Redeem';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import RedeemCodeDialog from './RedeemCodeDialog';
+import TextButton from '../UI/TextButton';
 
 const styles = {
   descriptionText: {
@@ -74,6 +76,7 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
     subscriptionPendingDialogOpen,
     setSubscriptionPendingDialogOpen,
   ] = React.useState(false);
+  const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showConfirmation } = useAlertDialog();
@@ -93,10 +96,7 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
     sendChoosePlanClicked(plan.planId);
 
     // Subscribing from an account without a subscription.
-    if (
-      !subscription.stripeSubscriptionId &&
-      !subscription.paypalSubscriptionId
-    ) {
+    if (!subscription.planId) {
       setSubscriptionPendingDialogOpen(true);
       Window.openExternalURL(
         getRedirectToCheckoutUrl(plan.planId || '', profile.id, profile.email)
@@ -214,6 +214,16 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
               onClick={onClose}
             />,
           ]}
+          secondaryActions={[
+            <FlatButton
+              leftIcon={<RedeemIcon />}
+              label={<Trans>Redeem a code</Trans>}
+              key="redeem-code"
+              disabled={!authenticatedUser.authenticated || isLoading}
+              primary={false}
+              onClick={() => setRedeemCodeDialogOpen(true)}
+            />,
+          ]}
           onRequestClose={onClose}
           open={open}
         >
@@ -321,25 +331,37 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
               </Line>
             </Column>
             {!authenticatedUser.authenticated && (
-              <PlaceholderMessage>
-                <Text>
-                  <Trans>
-                    Create a GDevelop account to continue. It's free and you'll
-                    get access to online services like one-click builds
-                  </Trans>
-                </Text>
-                <LineStackLayout justifyContent="center">
-                  <RaisedButton
+              <Dialog
+                open
+                title={<Trans>Create a GDevelop account to continue</Trans>}
+                maxWidth="sm"
+                cannotBeDismissed
+                secondaryActions={[
+                  <TextButton
+                    key="later"
+                    label={<Trans>Maybe later</Trans>}
+                    onClick={onClose}
+                  />,
+                ]}
+                actions={[
+                  <FlatButton
+                    key="login"
+                    label={<Trans>Login</Trans>}
+                    onClick={authenticatedUser.onLogin}
+                  />,
+                  <DialogPrimaryButton
+                    key="create-account"
                     label={<Trans>Create my account</Trans>}
                     primary
                     onClick={authenticatedUser.onCreateAccount}
-                  />
-                  <FlatButton
-                    label={<Trans>Not now, thanks</Trans>}
-                    onClick={onClose}
-                  />
-                </LineStackLayout>
-              </PlaceholderMessage>
+                  />,
+                ]}
+              >
+                <Text>
+                  It's free and you'll get access to online services: cloud
+                  projects, leaderboards, player feedbacks, cloud builds...
+                </Text>
+              </Dialog>
             )}
             {subscriptionPendingDialogOpen && (
               <SubscriptionPendingDialog
@@ -347,6 +369,24 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
                 onClose={() => {
                   setSubscriptionPendingDialogOpen(false);
                   authenticatedUser.onSubscriptionUpdated();
+                }}
+              />
+            )}
+            {redeemCodeDialogOpen && (
+              <RedeemCodeDialog
+                authenticatedUser={authenticatedUser}
+                onClose={async hasJustRedeemedCode => {
+                  setRedeemCodeDialogOpen(false);
+
+                  if (hasJustRedeemedCode) {
+                    try {
+                      setIsChangingSubscription(true);
+                      await authenticatedUser.onSubscriptionUpdated();
+                    } finally {
+                      setIsChangingSubscription(false);
+                      setSubscriptionPendingDialogOpen(true);
+                    }
+                  }
                 }}
               />
             )}

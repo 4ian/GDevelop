@@ -5,6 +5,11 @@ import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import EventsBasedObjectEditor from './index';
 import HelpButton from '../UI/HelpButton';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
+import { Tabs } from '../UI/Tabs';
+import EventsBasedObjectPropertiesEditor from './EventsBasedObjectPropertiesEditor';
+import EventBasedObjectChildrenEditor from './EventBasedObjectChildrenEditor';
+
+type TabName = 'configuration' | 'properties' | 'children';
 
 type Props = {|
   onApply: () => void,
@@ -16,10 +21,24 @@ type Props = {|
   onRenameProperty: (oldName: string, newName: string) => void,
 |};
 
+type State = {|
+  currentTab: TabName,
+|};
+
 export default class EventsBasedObjectEditorDialog extends React.Component<
   Props,
-  {||}
+  State
 > {
+  state = {
+    currentTab: 'configuration',
+  };
+
+  _changeTab = (newTab: TabName) => {
+    this.setState({
+      currentTab: newTab,
+    });
+  };
+
   render() {
     const {
       onApply,
@@ -29,11 +48,11 @@ export default class EventsBasedObjectEditorDialog extends React.Component<
       globalObjectsContainer,
     } = this.props;
 
+    const { currentTab } = this.state;
+
     return (
       <Dialog
         title={<Trans>Edit {eventsBasedObject.getName()}</Trans>}
-        fullHeight
-        flexColumnBody
         secondaryActions={[
           <HelpButton
             key="help"
@@ -51,23 +70,49 @@ export default class EventsBasedObjectEditorDialog extends React.Component<
         open
         onRequestClose={onApply}
         onApply={onApply}
+        fullHeight
+        flexBody
+        fixedContent={
+          <Tabs
+            value={currentTab}
+            onChange={this._changeTab}
+            options={[
+              {
+                value: 'configuration',
+                label: <Trans>Configuration</Trans>,
+              },
+              {
+                value: 'properties',
+                label: <Trans>Properties</Trans>,
+              },
+              {
+                value: 'children',
+                label: <Trans>Children</Trans>,
+              },
+            ]}
+          />
+        }
       >
-        <EventsBasedObjectEditor
-          project={project}
-          onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
-          globalObjectsContainer={globalObjectsContainer}
-          eventsFunctionsExtension={eventsFunctionsExtension}
-          eventsBasedObject={eventsBasedObject}
-          onTabChanged={
-            () =>
-              this.forceUpdate() /*Force update to ensure dialog is properly positioned*/
-          }
-          onPropertiesUpdated={
-            () =>
-              this.forceUpdate() /*Force update to ensure dialog is properly positioned*/
-          }
-          onRenameProperty={this.props.onRenameProperty}
-        />
+        {currentTab === 'configuration' && (
+          <EventsBasedObjectEditor eventsBasedObject={eventsBasedObject} />
+        )}
+        {currentTab === 'properties' && (
+          <EventsBasedObjectPropertiesEditor
+            project={project}
+            eventsBasedObject={eventsBasedObject}
+            onPropertiesUpdated={() => {}}
+            onRenameProperty={this.props.onRenameProperty}
+          />
+        )}
+        {currentTab === 'children' && (
+          <EventBasedObjectChildrenEditor
+            project={project}
+            onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
+            globalObjectsContainer={globalObjectsContainer}
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            eventsBasedObject={eventsBasedObject}
+          />
+        )}
       </Dialog>
     );
   }

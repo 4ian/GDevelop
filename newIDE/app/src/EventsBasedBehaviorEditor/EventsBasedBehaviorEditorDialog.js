@@ -105,7 +105,7 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
             behaviorObjectType={eventsBasedBehavior.getObjectType()}
           />
         )}
-        {currentTab === 'shared-properties' && (
+        {currentTab === 'scene-properties' && (
           <EventsBasedBehaviorPropertiesEditor
             project={project}
             properties={eventsBasedBehavior.getSharedPropertyDescriptors()}

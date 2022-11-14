@@ -4,6 +4,7 @@ import { ListItem } from '../List';
 import ListIcon from '../ListIcon';
 import TextField, { noMarginTextFieldInListItemTopOffset } from '../TextField';
 import { type MenuItemTemplate } from '../Menu/Menu.flow';
+import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { shouldValidate } from '../KeyboardShortcuts/InteractionKeys';
 import { textEllipsisStyle } from '../TextEllipsis';
 import GDevelopThemeContext from '../Theme/ThemeContext';
@@ -20,6 +21,7 @@ type Props<Item> = {|
   item: Item,
   itemName: string,
   id?: ?string,
+  data?: HTMLDataset,
   isBold: boolean,
   onRename: string => void,
   editingName: boolean,
@@ -39,6 +41,7 @@ function ItemRow<Item>({
   item,
   itemName,
   id,
+  data,
   isBold,
   onRename,
   editingName,
@@ -157,6 +160,7 @@ function ItemRow<Item>({
         onEdit(item);
       }}
       id={id}
+      data={data}
     />
   );
 }

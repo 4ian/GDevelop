@@ -212,15 +212,7 @@
         }
       },
       "skippable": true,
-      "isOnClosableDialog": true,
-      "shortcuts": [
-        {
-          "stepId": "WaitForUserForBorder",
-          "trigger": {
-            "absenceOfElement": "#add-asset-button"
-          }
-        }
-      ]
+      "isOnClosableDialog": true
     },
     {
       "id": "WaitForUserForBorder",
@@ -346,12 +338,6 @@
           "trigger": {
             "presenceOfElement": "#object-item-1"
           }
-        },
-        {
-          "stepId": "WaitForUserForBall",
-          "trigger": {
-            "absenceOfElement": "#add-asset-button"
-          }
         }
       ]
     },
@@ -450,12 +436,6 @@
           "trigger": {
             "presenceOfElement": "#object-item-2"
           }
-        },
-        {
-          "stepId": "WaitForUserForTarget",
-          "trigger": {
-            "absenceOfElement": "#add-asset-button"
-          }
         }
       ]
     },
@@ -553,12 +533,6 @@
           "stepId": "CloseAssetStoreForBlock",
           "trigger": {
             "presenceOfElement": "#object-item-3"
-          }
-        },
-        {
-          "stepId": "WaitForUserForBlock",
-          "trigger": {
-            "absenceOfElement": "#add-asset-button"
           }
         }
       ]
@@ -1170,12 +1144,6 @@
           "trigger": {
             "presenceOfElement": "#object-item-4"
           }
-        },
-        {
-          "stepId": "WaitForUserForBackground",
-          "trigger": {
-            "absenceOfElement": "#add-asset-button"
-          }
         }
       ]
     },
@@ -1308,12 +1276,6 @@
           "stepId": "CloseAssetStoreForObstacle",
           "trigger": {
             "presenceOfElement": "#object-item-5"
-          }
-        },
-        {
-          "stepId": "WaitForUserForObstacle",
-          "trigger": {
-            "absenceOfElement": "#add-asset-button"
           }
         }
       ]
@@ -1927,12 +1889,6 @@
           "stepId": "CloseAssetStoreForGrabArea",
           "trigger": {
             "presenceOfElement": "#object-item-7"
-          }
-        },
-        {
-          "stepId": "WaitForUserForGrabArea",
-          "trigger": {
-            "absenceOfElement": "#add-asset-button"
           }
         }
       ],

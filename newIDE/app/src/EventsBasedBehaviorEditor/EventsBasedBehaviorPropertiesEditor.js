@@ -27,6 +27,10 @@ import ColorField from '../UI/ColorField';
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import ScrollView from '../UI/ScrollView';
+import {
+  convertPropertyTypeToValueType,
+  getStringifiedExtraInfo,
+} from '../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 
 const gd: libGDevelop = global.gd;
 
@@ -181,11 +185,11 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
         getterName,
         functionsContainer.getEventsFunctionsCount()
       );
-      getter.setFunctionType(
-        propertyIsNumber(property)
-          ? gd.EventsFunction.ExpressionAndCondition
-          : gd.EventsFunction.StringExpressionAndCondition
-      );
+      getter.setFunctionType(gd.EventsFunction.ExpressionAndCondition);
+      getter
+        .getExpressionType()
+        .setName(convertPropertyTypeToValueType(property.getType()))
+        .setExtraInfo(getStringifiedExtraInfo(property));
       getter.setFullName(property.getLabel());
       getter.setGroup(
         eventsBasedBehavior.getFullName() ||

@@ -5,6 +5,11 @@ import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import EventsBasedObjectEditor from './index';
 import HelpButton from '../UI/HelpButton';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
+import { Tabs } from '../UI/Tabs';
+import EventsBasedObjectPropertiesEditor from './EventsBasedObjectPropertiesEditor';
+import EventBasedObjectChildrenEditor from './EventBasedObjectChildrenEditor';
+
+type TabName = 'configuration' | 'properties' | 'children';
 
 type Props = {|
   onApply: () => void,
@@ -16,59 +21,77 @@ type Props = {|
   onRenameProperty: (oldName: string, newName: string) => void,
 |};
 
-export default class EventsBasedObjectEditorDialog extends React.Component<
-  Props,
-  {||}
-> {
-  render() {
-    const {
-      onApply,
-      eventsBasedObject,
-      eventsFunctionsExtension,
-      project,
-      globalObjectsContainer,
-    } = this.props;
+export default function EventsBasedObjectEditorDialog({
+  onApply,
+  project,
+  onFetchNewlyAddedResources,
+  globalObjectsContainer,
+  eventsFunctionsExtension,
+  eventsBasedObject,
+  onRenameProperty,
+}: Props) {
+  const [currentTab, setCurrentTab] = React.useState<TabName>('configuration');
 
-    return (
-      <Dialog
-        title={<Trans>Edit {eventsBasedObject.getName()}</Trans>}
-        fullHeight
-        flexColumnBody
-        secondaryActions={[
-          <HelpButton
-            key="help"
-            helpPagePath="/objects/events-based-objects"
-          />,
-        ]}
-        actions={[
-          <DialogPrimaryButton
-            label={<Trans>Apply</Trans>}
-            primary
-            onClick={onApply}
-            key={'Apply'}
-          />,
-        ]}
-        open
-        onRequestClose={onApply}
-        onApply={onApply}
-      >
-        <EventsBasedObjectEditor
+  return (
+    <Dialog
+      title={<Trans>Edit {eventsBasedObject.getName()}</Trans>}
+      secondaryActions={[
+        <HelpButton key="help" helpPagePath="/objects/events-based-objects" />,
+      ]}
+      actions={[
+        <DialogPrimaryButton
+          label={<Trans>Apply</Trans>}
+          primary
+          onClick={onApply}
+          key={'Apply'}
+        />,
+      ]}
+      open
+      onRequestClose={onApply}
+      onApply={onApply}
+      fullHeight
+      flexBody
+      fixedContent={
+        <Tabs
+          value={currentTab}
+          onChange={setCurrentTab}
+          options={[
+            {
+              value: 'configuration',
+              label: <Trans>Configuration</Trans>,
+            },
+            {
+              value: 'properties',
+              label: <Trans>Properties</Trans>,
+            },
+            {
+              value: 'children',
+              label: <Trans>Children</Trans>,
+            },
+          ]}
+        />
+      }
+    >
+      {currentTab === 'configuration' && (
+        <EventsBasedObjectEditor eventsBasedObject={eventsBasedObject} />
+      )}
+      {currentTab === 'properties' && (
+        <EventsBasedObjectPropertiesEditor
           project={project}
-          onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
+          eventsBasedObject={eventsBasedObject}
+          onPropertiesUpdated={() => {}}
+          onRenameProperty={onRenameProperty}
+        />
+      )}
+      {currentTab === 'children' && (
+        <EventBasedObjectChildrenEditor
+          project={project}
+          onFetchNewlyAddedResources={onFetchNewlyAddedResources}
           globalObjectsContainer={globalObjectsContainer}
           eventsFunctionsExtension={eventsFunctionsExtension}
           eventsBasedObject={eventsBasedObject}
-          onTabChanged={
-            () =>
-              this.forceUpdate() /*Force update to ensure dialog is properly positioned*/
-          }
-          onPropertiesUpdated={
-            () =>
-              this.forceUpdate() /*Force update to ensure dialog is properly positioned*/
-          }
-          onRenameProperty={this.props.onRenameProperty}
         />
-      </Dialog>
-    );
-  }
+      )}
+    </Dialog>
+  );
 }

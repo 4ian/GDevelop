@@ -87,6 +87,8 @@ export default function RedeemCodeDialog({
     }
   };
 
+  const canRedeem = !!redemptionCode && !isLoading;
+
   return (
     <Dialog
       title={<Trans>Redeem a code</Trans>}
@@ -101,7 +103,7 @@ export default function RedeemCodeDialog({
         <LeftLoader isLoading={isLoading}>
           <DialogPrimaryButton
             label={<Trans>Redeem</Trans>}
-            disabled={!redemptionCode || isLoading}
+            disabled={!canRedeem}
             primary
             key="redeem"
             onClick={onRedeemCode}
@@ -110,7 +112,9 @@ export default function RedeemCodeDialog({
       ]}
       cannotBeDismissed={isLoading}
       onRequestClose={() => onClose(false)}
-      onApply={onRedeemCode}
+      onApply={() => {
+        if (canRedeem) onRedeemCode();
+      }}
       maxWidth="sm"
       open
     >

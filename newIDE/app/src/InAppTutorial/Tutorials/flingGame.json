@@ -254,7 +254,7 @@
       }
     },
     {
-      "elementToHighlightId": "#object-item-0",
+      "elementToHighlightId": "objectInObjectsList:border",
       "nextStepTrigger": {
         "instanceAddedOnScene": "border"
       },
@@ -374,7 +374,7 @@
       }
     },
     {
-      "elementToHighlightId": "#object-item-1",
+      "elementToHighlightId": "objectInObjectsList:projectile",
       "nextStepTrigger": {
         "instanceAddedOnScene": "projectile"
       },
@@ -472,7 +472,7 @@
       }
     },
     {
-      "elementToHighlightId": "#object-item-2",
+      "elementToHighlightId": "objectInObjectsList:target",
       "nextStepTrigger": {
         "instanceAddedOnScene": "target"
       },
@@ -570,7 +570,7 @@
       }
     },
     {
-      "elementToHighlightId": "#object-item-3",
+      "elementToHighlightId": "objectInObjectsList:block",
       "nextStepTrigger": {
         "instanceAddedOnScene": "block"
       },
@@ -583,7 +583,7 @@
       }
     },
     {
-      "elementToHighlightId": "#object-item-0",
+      "elementToHighlightId": "objectInObjectsList:border",
       "nextStepTrigger": {
         "presenceOfElement": "#object-editor-dialog"
       },
@@ -670,7 +670,7 @@
       }
     },
     {
-      "elementToHighlightId": "#object-item-1",
+      "elementToHighlightId": "objectInObjectsList:projectile",
       "nextStepTrigger": {
         "presenceOfElement": "#object-editor-dialog"
       },
@@ -782,7 +782,7 @@
       }
     },
     {
-      "elementToHighlightId": "#object-item-2",
+      "elementToHighlightId": "objectInObjectsList:target",
       "nextStepTrigger": {
         "presenceOfElement": "#object-editor-dialog"
       },
@@ -842,7 +842,7 @@
       }
     },
     {
-      "elementToHighlightId": "#object-item-3",
+      "elementToHighlightId": "objectInObjectsList:block",
       "nextStepTrigger": {
         "presenceOfElement": "#object-editor-dialog"
       },
@@ -1001,7 +1001,7 @@
       }
     },
     {
-      "elementToHighlightId": "#object-item-1",
+      "elementToHighlightId": "objectInObjectsList:projectile",
       "nextStepTrigger": {
         "presenceOfElement": "#object-editor-dialog"
       },
@@ -1180,7 +1180,7 @@
       }
     },
     {
-      "elementToHighlightId": "#object-item-4",
+      "elementToHighlightId": "objectInObjectsList:background",
       "nextStepTrigger": {
         "instanceAddedOnScene": "background"
       },
@@ -1313,7 +1313,7 @@
       }
     },
     {
-      "elementToHighlightId": "#object-item-5",
+      "elementToHighlightId": "objectInObjectsList:obstacle",
       "nextStepTrigger": {
         "presenceOfElement": "#object-editor-dialog"
       },
@@ -1400,7 +1400,7 @@
       }
     },
     {
-      "elementToHighlightId": "#object-item-5",
+      "elementToHighlightId": "objectInObjectsList:obstacle",
       "nextStepTrigger": {
         "instanceAddedOnScene": "obstacle"
       },
@@ -1519,7 +1519,7 @@
       }
     },
     {
-      "elementToHighlightId": "#object-item-6",
+      "elementToHighlightId": "objectInObjectsList:youWinText",
       "nextStepTrigger": {
         "instanceAddedOnScene": "youWinText"
       },
@@ -1647,7 +1647,7 @@
       }
     },
     {
-      "elementToHighlightId": "#instruction-editor-dialog #object-item-1",
+      "elementToHighlightId": "objectInObjectOrResourceSelector:projectile",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-item-Physics2--Collision"
       },
@@ -1717,7 +1717,7 @@
       }
     },
     {
-      "elementToHighlightId": "#instruction-editor-dialog #object-item-2",
+      "elementToHighlightId": "objectInObjectOrResourceSelector:target",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-item-Delete"
       },
@@ -1927,7 +1927,7 @@
       }
     },
     {
-      "elementToHighlightId": "#object-item-7",
+      "elementToHighlightId": "objectInObjectsList:grabArea",
       "nextStepTrigger": {
         "instanceAddedOnScene": "grabArea"
       },
@@ -2016,7 +2016,7 @@
       }
     },
     {
-      "elementToHighlightId": "#instruction-editor-dialog #object-item-1",
+      "elementToHighlightId": "objectInObjectOrResourceSelector:projectile",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-item-CollisionNP"
       },
@@ -2100,7 +2100,7 @@
       }
     },
     {
-      "elementToHighlightId": "#instruction-editor-dialog #object-item-1",
+      "elementToHighlightId": "objectInObjectOrResourceSelector:projectile",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-item-DraggablePhysics--DraggablePhysics--ReleaseDrag"
       },

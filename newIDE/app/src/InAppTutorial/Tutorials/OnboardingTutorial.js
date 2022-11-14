@@ -147,7 +147,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'DragObjectToScene',
-      elementToHighlightId: '#object-item-0',
+      elementToHighlightId: 'objectInObjectsList:firstObject',
       nextStepTrigger: { instanceAddedOnScene: 'firstObject' },
       tooltip: {
         description: {
@@ -158,7 +158,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'OpenBehaviors',
-      elementToHighlightId: '#object-item-0',
+      elementToHighlightId: 'objectInObjectsList:firstObject',
       nextStepTrigger: { presenceOfElement: '#object-editor-dialog' },
       tooltip: {
         title: { messageDescriptor: t`Let's make our character move! 🛹` },
@@ -319,7 +319,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'DragObjectToScene',
-      elementToHighlightId: '#object-item-1',
+      elementToHighlightId: 'objectInObjectsList:secondObject',
       nextStepTrigger: { instanceAddedOnScene: 'secondObject' },
       tooltip: {
         description: {
@@ -367,7 +367,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'ChooseCharacterForCondition',
-      elementToHighlightId: '#instruction-editor-dialog #object-item-0',
+      elementToHighlightId: 'objectInObjectOrResourceSelector:firstObject',
       nextStepTrigger: { presenceOfElement: '#object-instruction-selector' },
       tooltip: {
         description: { messageDescriptor: t`Choose $(firstObject)` },
@@ -423,7 +423,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'ChoseCoinForAction',
-      elementToHighlightId: '#instruction-editor-dialog #object-item-1',
+      elementToHighlightId: 'objectInObjectOrResourceSelector:secondObject',
       nextStepTrigger: { presenceOfElement: '#object-instruction-selector' },
       tooltip: {
         description: { messageDescriptor: t`Choose $(secondObject)` },

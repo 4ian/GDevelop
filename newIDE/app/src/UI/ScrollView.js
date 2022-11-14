@@ -52,9 +52,11 @@ export default React.forwardRef<Props, ScrollViewInterface>(
        * Scroll the view to the target position.
        */
       scrollToPosition: (y: number) => {
+        console.log("scrollToPosition: " + y);
         const scrollViewElement = scrollView.current;
         if (!scrollViewElement) return;
 
+        console.log("do scrollToPosition: " + y);
         const scrollViewYPosition = scrollViewElement.getBoundingClientRect()
           .top;
         scrollViewElement.scrollTop += y - scrollViewYPosition;

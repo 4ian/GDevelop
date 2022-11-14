@@ -77,7 +77,6 @@ export const AssetStore = ({ project }: Props) => {
   const boxSearchResults = React.useRef<?BoxSearchResultsInterface>(null);
   const assetDetails = React.useRef<?AssetDetailsInterface>(null);
   const scrollView = assetsHome.current || boxSearchResults.current || assetDetails.current;
-  const scrollTop = React.useRef<?number>(null);
 
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
@@ -91,36 +90,42 @@ export const AssetStore = ({ project }: Props) => {
   ] = React.useState<?PrivateAssetPackListingData>(null);
   const { onPurchaseSuccessful } = React.useContext(AuthenticatedUserContext);
 
-  const scrollPosition = navigationState.getCurrentPage().scrollPosition;
-  console.log(assetsHome.current + ' ' + boxSearchResults.current);
-  console.log('scroll: ' + scrollPosition);
-  // TODO use a props instead of this !!!
-  if (
-    scrollPosition != null &&
-    scrollView &&
-    // Make sure the ref is not from the previous view.
-    ((assetsHome.current && isOnHomePage) ||
-    (boxSearchResults.current && !isOnHomePage && !openedAssetShortHeader) ||
-    (assetDetails.current && openedAssetShortHeader && openedAssetShortHeader === assetDetails.current.getAssetShortHeader()))
-  ) {
-    console.log('scroll to: ' + scrollPosition);
-    scrollView.scrollToPosition(scrollPosition);
-    navigationState.getCurrentPage().scrollPosition = null;
-  }
-
-  const saveScrollPosition = React.useCallback(
+  // The saved scroll position must not be reset by a scroll event until it
+  // has been applied.
+  const hasAppliedSavedScrollPosition = React.useRef<boolean>(false);
+  // The saved scroll position must not be applied after users have scrolled.
+  const hasScrolled = React.useRef<boolean>(false);
+  const needScrollUpdate = React.useCallback(
     () => {
-      console.log('save scroll: ' + scrollTop.current);
-      navigationState.getCurrentPage().scrollPosition = scrollTop.current;
+      hasAppliedSavedScrollPosition.current = false;
+      hasScrolled.current = false;
     },
-    [navigationState]
+    []
   );
+
+  console.log('hasBackupScrollPosition: ' + hasAppliedSavedScrollPosition.current);
+  console.log('hasScrolled: ' + hasScrolled.current);
+  React.useLayoutEffect(() => {
+    const scrollPosition = navigationState.getCurrentPage().scrollPosition;
+    console.log('useLayoutEffect');
+    console.log(assetsHome.current + ' ' + boxSearchResults.current);
+    console.log('scroll: ' + scrollPosition);
+    if (scrollPosition != null && scrollView && !hasScrolled.current) {
+      console.log('scroll to: ' + scrollPosition);
+      scrollView.scrollToPosition(scrollPosition);
+      //navigationState.getCurrentPage().scrollPosition = null;
+    }
+    hasAppliedSavedScrollPosition.current = true;
+  }, [isOnHomePage, navigationState, openedAssetShortHeader, scrollView]);
 
   const handleScroll = React.useCallback(
     (y) => {
-      scrollTop.current = y;
+      if (hasAppliedSavedScrollPosition.current) {
+        navigationState.getCurrentPage().scrollPosition = y;
+        hasScrolled.current = true;
+      }
     },
-    [scrollTop]
+    [navigationState]
   );
 
   const onOpenDetails = React.useCallback(
@@ -129,10 +134,9 @@ export const AssetStore = ({ project }: Props) => {
         id: assetShortHeader.id,
         name: assetShortHeader.name,
       });
-      saveScrollPosition();
       navigationState.openDetailPage(assetShortHeader);
     },
-    [navigationState, saveScrollPosition]
+    [navigationState]
   );
 
   // When a pack is selected from the home page,
@@ -144,12 +148,11 @@ export const AssetStore = ({ project }: Props) => {
       if (assetPack.externalWebLink) {
         Window.openExternalURL(assetPack.externalWebLink);
       } else {
-        saveScrollPosition();
         navigationState.openPackPage(assetPack);
         setIsFiltersPanelOpen(true);
       }
     },
-    [navigationState, saveScrollPosition]
+    [navigationState]
   );
 
   // When a private pack is selected from the home page,
@@ -172,11 +175,10 @@ export const AssetStore = ({ project }: Props) => {
       }
 
       // The user has received the pack, open it.
-      saveScrollPosition();
       navigationState.openPackPage(receivedAssetPack);
       setIsFiltersPanelOpen(true);
     },
-    [loadedReceivedAssetPackInStore, saveScrollPosition, navigationState]
+    [loadedReceivedAssetPackInStore, navigationState]
   );
 
   // If the user has received the pack they are currently viewing,
@@ -198,7 +200,6 @@ export const AssetStore = ({ project }: Props) => {
         if (receivedAssetPack) {
           // The user has received the pack, close the pack information dialog, and open the pack in the search.
           setIsFiltersPanelOpen(true);
-          saveScrollPosition();
           navigationState.openPackPage(receivedAssetPack);
           setSelectedPrivateAssetPackListingData(null);
         }
@@ -208,7 +209,6 @@ export const AssetStore = ({ project }: Props) => {
       loadedReceivedAssetPackInStore,
       purchasingPrivateAssetPackListingData,
       navigationState,
-      saveScrollPosition,
     ]
   );
 
@@ -224,13 +224,10 @@ export const AssetStore = ({ project }: Props) => {
         publicAssetPacks &&
         publicAssetPacks.starterPacks.find(pack => pack.tag === tag);
       if (privateAssetPack) {
-        saveScrollPosition();
         navigationState.openPackPage(privateAssetPack);
       } else if (publicAssetPack) {
-        saveScrollPosition();
         navigationState.openPackPage(publicAssetPack);
       } else {
-        saveScrollPosition();
         navigationState.openTagPage(tag);
       }
       clearAllFilters(assetFiltersState);
@@ -240,7 +237,6 @@ export const AssetStore = ({ project }: Props) => {
       loadedReceivedAssetPackInStore,
       publicAssetPacks,
       assetFiltersState,
-      saveScrollPosition,
       navigationState,
     ]
   );
@@ -269,6 +265,7 @@ export const AssetStore = ({ project }: Props) => {
                   key="back-discover"
                   tooltip={t`Back to discover`}
                   onClick={() => {
+                    needScrollUpdate();
                     navigationState.openHome();
                     clearAllFilters(assetFiltersState);
                     setIsFiltersPanelOpen(false);
@@ -312,6 +309,7 @@ export const AssetStore = ({ project }: Props) => {
                           label={<Trans>Back</Trans>}
                           primary={false}
                           onClick={() => {
+                            needScrollUpdate();
                             navigationState.backToPreviousPage();
                             if (navigationState.getCurrentPage().isOnHomePage) {
                               clearAllFilters(assetFiltersState);

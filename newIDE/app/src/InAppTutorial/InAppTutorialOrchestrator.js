@@ -210,7 +210,15 @@ const gatherProjectDataOnMultipleSteps = ({
 
     if (mapProjectData) {
       Object.entries(mapProjectData).forEach(([key, dataAccessor]) => {
-        if (dataAccessor === 'lastProjectObjectName') {
+        if (dataAccessor === 'lastProjectSceneName') {
+          if (!project) return;
+          if (project.getLayoutsCount() === 0) {
+            throw new Error(
+              `No layout was found in project after step ${index} of flow`
+            );
+          }
+          newData[key] = project.getLayoutAt(0).getName();
+        } else if (dataAccessor === 'lastProjectObjectName') {
           if (!project || project.getLayoutsCount() === 0) return;
           const layout = project.getLayoutAt(0);
           const layoutObjectsCount = layout.getObjectsCount();

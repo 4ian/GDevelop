@@ -1432,12 +1432,14 @@ const MainFrame = (props: Props) => {
       const sceneEditorOptions = {
         label: name,
         projectItemName: name,
+        tabOptions: { data: { scene: name, type: 'layout' } },
         renderEditorContainer: renderSceneEditorContainer,
         key: 'layout ' + name,
       };
       const eventsEditorOptions = {
         label: name + ' ' + i18n._(t`(Events)`),
         projectItemName: name,
+        tabOptions: { data: { scene: name, type: 'layout-events' } },
         renderEditorContainer: renderEventsEditorContainer,
         key: 'layout events ' + name,
         dontFocusTab: openSceneEditor,

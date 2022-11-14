@@ -769,9 +769,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     height={height}
                     getItemName={getObjectWithContextName}
                     getItemThumbnail={getObjectThumbnail}
-                    getItemId={(objectWithContext, index) => {
-                      return 'object-item-' + index;
-                    }}
+                    getItemId={(objectWithContext, index) =>
+                      'object-item-' + index
+                    }
+                    getItemData={(objectWithContext, index) => ({
+                      objectName: objectWithContext.object.getName(),
+                    })}
                     isItemBold={isObjectWithContextGlobal}
                     onEditItem={objectWithContext =>
                       onEditObject(objectWithContext.object)

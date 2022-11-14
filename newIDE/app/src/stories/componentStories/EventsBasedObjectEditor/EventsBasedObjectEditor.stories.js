@@ -18,13 +18,6 @@ export default {
 
 export const Default = () => (
   <EventsBasedObjectEditor
-    project={testProject.project}
-    globalObjectsContainer={testProject.emptyObjectsContainer}
-    eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
     eventsBasedObject={testProject.testEventsBasedObject}
-    onPropertiesUpdated={action('properties updated')}
-    onTabChanged={action('tab changed')}
-    onRenameProperty={action('property rename')}
-    onFetchNewlyAddedResources={async () => {}}
   />
 );

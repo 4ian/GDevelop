@@ -21,10 +21,6 @@ export const Default = () => (
     project={testProject.project}
     eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
     eventsBasedBehavior={testProject.testEventsBasedBehavior}
-    onPropertiesUpdated={action('properties updated')}
-    onTabChanged={action('tab changed')}
-    onRenameProperty={action('property rename')}
-    onRenameSharedProperty={action('shared property rename')}
   />
 );
 
@@ -33,9 +29,5 @@ export const WithoutFunction = () => (
     project={testProject.project}
     eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
     eventsBasedBehavior={testProject.testEmptyEventsBasedBehavior}
-    onPropertiesUpdated={action('properties updated')}
-    onTabChanged={action('tab changed')}
-    onRenameProperty={action('property rename')}
-    onRenameSharedProperty={action('shared property rename')}
   />
 );

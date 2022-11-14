@@ -33,9 +33,9 @@ const SubscriptionDetails = ({
           <Line>
             <Text>
               <Trans>
-                You are subscribed to {subscription.planId}. Congratulations!
-                You have access to more online services, including building your
-                game for Android, Windows, macOS and Linux in one click!
+                You are subscribed to <b>{subscription.planId}</b>.
+                Congratulations! You have access to more cloud projects,
+                leaderboards, player feedbacks, cloud builds.
               </Trans>
             </Text>
           </Line>
@@ -59,10 +59,9 @@ const SubscriptionDetails = ({
           <Line>
             <Text>
               <Trans>
-                If you don't have a subscription, consider getting one now.
-                Accounts allow you to access all of the online services. With
-                just one click, you can build your game for Android, Windows,
-                macOS and Linux!
+                Get a subscription to unlock more cloud projects, more
+                leaderboards and more player feedbacks. You'll also have more
+                cloud builds to publish your game to Android and on desktop.
               </Trans>
             </Text>
           </Line>

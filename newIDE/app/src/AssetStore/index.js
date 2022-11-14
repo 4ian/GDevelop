@@ -35,7 +35,7 @@ import { AssetsHome, type AssetsHomeInterface } from './AssetsHome';
 import TextButton from '../UI/TextButton';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
-import { AssetDetails } from './AssetDetails';
+import { AssetDetails, type AssetDetailsInterface } from './AssetDetails';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Home from '@material-ui/icons/Home';
 import PrivateAssetPackInformationDialog from './PrivateAssets/PrivateAssetPackInformationDialog';
@@ -45,7 +45,6 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PrivateAssetPackPurchaseDialog from './PrivateAssets/PrivateAssetPackPurchaseDialog';
 import { LineStackLayout } from '../UI/Layout';
 import Paper from '../UI/Paper';
-import useForceUpdate from '../Utils/UseForceUpdate';
 
 type Props = {|
   project: gdProject,
@@ -76,7 +75,8 @@ export const AssetStore = ({ project }: Props) => {
   const assetsHome = React.useRef<?AssetsHomeInterface>(null);
   const boxSearchResults = React.useRef<?BoxSearchResultsInterface>(null);
   const assetDetails = React.useRef<?AssetDetailsInterface>(null);
-  const scrollView = assetsHome.current || boxSearchResults.current || assetDetails.current;
+  const scrollView =
+    assetsHome.current || boxSearchResults.current || assetDetails.current;
 
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
@@ -95,31 +95,24 @@ export const AssetStore = ({ project }: Props) => {
   const hasAppliedSavedScrollPosition = React.useRef<boolean>(false);
   // The saved scroll position must not be applied after users have scrolled.
   const hasScrolled = React.useRef<boolean>(false);
-  const needScrollUpdate = React.useCallback(
+  const needScrollUpdate = React.useCallback(() => {
+    hasAppliedSavedScrollPosition.current = false;
+    hasScrolled.current = false;
+  }, []);
+
+  React.useLayoutEffect(
     () => {
-      hasAppliedSavedScrollPosition.current = false;
-      hasScrolled.current = false;
+      const scrollPosition = navigationState.getCurrentPage().scrollPosition;
+      if (scrollPosition != null && scrollView && !hasScrolled.current) {
+        scrollView.scrollToPosition(scrollPosition);
+      }
+      hasAppliedSavedScrollPosition.current = true;
     },
-    []
+    [isOnHomePage, navigationState, openedAssetShortHeader, scrollView]
   );
 
-  console.log('hasBackupScrollPosition: ' + hasAppliedSavedScrollPosition.current);
-  console.log('hasScrolled: ' + hasScrolled.current);
-  React.useLayoutEffect(() => {
-    const scrollPosition = navigationState.getCurrentPage().scrollPosition;
-    console.log('useLayoutEffect');
-    console.log(assetsHome.current + ' ' + boxSearchResults.current);
-    console.log('scroll: ' + scrollPosition);
-    if (scrollPosition != null && scrollView && !hasScrolled.current) {
-      console.log('scroll to: ' + scrollPosition);
-      scrollView.scrollToPosition(scrollPosition);
-      //navigationState.getCurrentPage().scrollPosition = null;
-    }
-    hasAppliedSavedScrollPosition.current = true;
-  }, [isOnHomePage, navigationState, openedAssetShortHeader, scrollView]);
-
   const handleScroll = React.useCallback(
-    (y) => {
+    y => {
       if (hasAppliedSavedScrollPosition.current) {
         navigationState.getCurrentPage().scrollPosition = y;
         hasScrolled.current = true;

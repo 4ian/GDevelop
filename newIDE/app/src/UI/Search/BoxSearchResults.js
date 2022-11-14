@@ -4,7 +4,7 @@ import * as React from 'react';
 import PlaceholderLoader from '../PlaceholderLoader';
 import PlaceholderError from '../PlaceholderError';
 import ErrorBoundary from '../ErrorBoundary';
-import { AutoSizer, Grid } from 'react-virtualized';
+import { AutoSizer, Grid, type ScrollParams } from 'react-virtualized';
 import EmptyMessage from '../EmptyMessage';
 
 type Props<SearchItem> = {|

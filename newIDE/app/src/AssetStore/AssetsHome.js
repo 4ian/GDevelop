@@ -182,7 +182,7 @@ type Props = {|
   assetPackRandomOrdering: Array<number>,
   onPublicAssetPackSelection: PublicAssetPack => void,
   onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
-  onScroll: number => void,
+  onScroll?: number => void,
 |};
 
 export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(

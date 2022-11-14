@@ -104,7 +104,9 @@ const interpolateElementId = (
     const splittedElementId = elementId.split(':');
     const sceneName = splittedElementId[1];
     const editorType = splittedElementId[2];
-    const sceneNameFilter = sceneName ? `[data-scene="${data[sceneName]}"]` : '';
+    const sceneNameFilter = sceneName
+      ? `[data-scene="${data[sceneName]}"]`
+      : '';
     return `button[id^="tab"][data-type="${
       editorType === 'Scene' ? 'layout' : 'layout-events'
     }]${sceneNameFilter}`;
@@ -251,6 +253,7 @@ export type InAppTutorialOrchestratorInterface = {|
     progress: number,
     projectData: {| [key: string]: string |},
   |},
+  changeData: (oldName: string, newName: string) => void,
 |};
 
 const InAppTutorialOrchestrator = React.forwardRef<
@@ -422,9 +425,23 @@ const InAppTutorialOrchestrator = React.forwardRef<
     [currentStepIndex, goToStep]
   );
 
+  const changeData = (oldName: string, newName: string) => {
+    let foundKey: string | null = null;
+    Object.entries(data).forEach(([key, value]) => {
+      if (value === oldName) {
+        foundKey = key;
+        return;
+      }
+    });
+    if (foundKey) {
+      data[foundKey] = data[newName];
+    }
+  };
+
   React.useImperativeHandle(ref, () => ({
     onPreviewLaunch,
     getProgress,
+    changeData,
   }));
 
   const onPreviewLaunch = React.useCallback(

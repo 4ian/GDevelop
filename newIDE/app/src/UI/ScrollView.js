@@ -57,7 +57,7 @@ export default React.forwardRef<Props, ScrollViewInterface>(
 
         const scrollViewYPosition = scrollViewElement.getBoundingClientRect()
           .top;
-        scrollViewElement.scrollTop += y - scrollViewYPosition;
+        scrollViewElement.scrollTop = y - scrollViewYPosition;
       },
       /**
        * Scroll the view to the bottom.

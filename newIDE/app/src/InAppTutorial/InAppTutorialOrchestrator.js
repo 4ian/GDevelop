@@ -104,9 +104,10 @@ const interpolateElementId = (
     const splittedElementId = elementId.split(':');
     const sceneName = splittedElementId[1];
     const editorType = splittedElementId[2];
+    const sceneNameFilter = sceneName ? `[data-scene="${data[sceneName]}"]` : '';
     return `button[id^="tab"][data-type="${
       editorType === 'Scene' ? 'layout' : 'layout-events'
-    }"][data-scene="${data[sceneName]}"]`;
+    }]${sceneNameFilter}`;
   } else if (
     elementId.startsWith(
       selectorInterpolationProjectDataAccessors.objectInObjectsList

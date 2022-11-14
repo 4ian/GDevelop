@@ -205,6 +205,7 @@ export const useSearchStructuredItem = <
             { name: 'name', weight: 2 },
             { name: 'fullName', weight: 5 },
             { name: 'shortDescription', weight: 1 },
+            { name: 'tags', weight: 4 },
           ],
           minMatchCharLength: 2,
           threshold: 0.35,

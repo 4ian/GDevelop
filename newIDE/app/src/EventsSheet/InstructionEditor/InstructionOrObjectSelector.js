@@ -453,6 +453,9 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                                 )
                               : undefined,
                             id: 'object-item-' + index,
+                            data: {
+                              objectName: objectWithContext.object.getName(),
+                            },
                           })
                       )}
 

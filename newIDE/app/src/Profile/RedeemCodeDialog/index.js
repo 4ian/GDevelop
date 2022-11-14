@@ -32,7 +32,12 @@ export const getRedeemCodeErrorText = (error: ?Error) => {
       extractedStatusAndCode.code ===
       'redemption-code/cannot-be-redeemed-anymore'
     )
-      return <Trans>This code was valid but can't be redeemed anymore.</Trans>;
+      return (
+        <Trans>
+          This code was valid but can't be redeemed anymore. If this is
+          unexpected, contact us or the code provider.
+        </Trans>
+      );
     if (
       extractedStatusAndCode.code ===
       'user-redeemed-code/already-redeemed-by-user'
@@ -105,6 +110,7 @@ export default function RedeemCodeDialog({
       ]}
       cannotBeDismissed={isLoading}
       onRequestClose={() => onClose(false)}
+      onApply={onRedeemCode}
       maxWidth="sm"
       open
     >

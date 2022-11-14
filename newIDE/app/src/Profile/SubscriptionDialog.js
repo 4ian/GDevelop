@@ -30,7 +30,7 @@ import Window from '../Utils/Window';
 import Text from '../UI/Text';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
-import RedeemIcon from '@material-ui/icons/Redeem';
+import RedemptionCodeIcon from '../UI/CustomSvgIcons/RedemptionCode';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import RedeemCodeDialog from './RedeemCodeDialog';
 
@@ -215,7 +215,7 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
           ]}
           secondaryActions={[
             <FlatButton
-              leftIcon={<RedeemIcon />}
+              leftIcon={<RedemptionCodeIcon />}
               label={<Trans>Redeem a code</Trans>}
               key="redeem-code"
               disabled={!authenticatedUser.authenticated || isLoading}

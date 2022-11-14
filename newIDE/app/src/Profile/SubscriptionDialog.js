@@ -33,7 +33,6 @@ import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import RedeemIcon from '@material-ui/icons/Redeem';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import RedeemCodeDialog from './RedeemCodeDialog';
-import TextButton from '../UI/TextButton';
 
 const styles = {
   descriptionText: {
@@ -337,7 +336,7 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
                 maxWidth="sm"
                 cannotBeDismissed
                 secondaryActions={[
-                  <TextButton
+                  <FlatButton
                     key="later"
                     label={<Trans>Maybe later</Trans>}
                     onClick={onClose}

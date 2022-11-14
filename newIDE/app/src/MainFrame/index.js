@@ -1133,6 +1133,9 @@ const MainFrame = (props: Props) => {
       editorTabs: closeLayoutTabs(state.editorTabs, layout),
     })).then(state => {
       layout.setName(newName);
+      if (inAppTutorialOrchestratorRef.current) {
+        inAppTutorialOrchestratorRef.current.changeData(oldName, newName);
+      }
       if (shouldChangeProjectFirstLayout)
         currentProject.setFirstLayout(newName);
       _onProjectItemModified();

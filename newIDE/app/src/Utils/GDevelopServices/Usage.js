@@ -276,3 +276,26 @@ export const getRedirectToCheckoutUrl = (
     userEmail
   )}`;
 };
+
+export const redeemCode = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  code: string
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  await axios.post(
+    `${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`,
+    {
+      code,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+};

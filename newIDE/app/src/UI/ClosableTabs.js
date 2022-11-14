@@ -8,6 +8,7 @@ import ContextMenu, { type ContextMenuInterface } from './Menu/ContextMenu';
 import { useLongTouch } from '../Utils/UseLongTouch';
 import { Spacer } from './Grid';
 import GDevelopThemeContext from './Theme/ThemeContext';
+import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 
 const styles = {
   tabContentContainer: {
@@ -96,6 +97,7 @@ export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => {
 
 export type ClosableTabProps = {|
   id?: string,
+  data?: HTMLDataset,
   active: boolean,
   label: ?React.Node,
   icon: ?React.Node,
@@ -109,6 +111,7 @@ export type ClosableTabProps = {|
 
 export function ClosableTab({
   id,
+  data,
   active,
   onClose,
   onCloseOthers,
@@ -181,6 +184,7 @@ export function ClosableTab({
           onContextMenu={openContextMenu}
           data-active={active ? 'true' : undefined}
           id={id ? `${id}-button` : undefined}
+          {...dataObjectToProps(data)}
           {...longTouchForContextMenuProps}
           focusRipple
           // If the touch ripple is not disabled, the dragged preview will

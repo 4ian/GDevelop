@@ -26,6 +26,11 @@ import {
 const textInterpolationProjectDataAccessors = {
   instancesCount: 'instancesCount:',
 };
+const selectorInterpolationProjectDataAccessors = {
+  objectInObjectsList: 'objectInObjectsList:',
+  objectInObjectOrResourceSelector: 'objectInObjectOrResourceSelector:',
+  editorTab: 'editorTab:',
+};
 
 const interpolateText = (
   text: string,
@@ -87,6 +92,42 @@ const translateAndInterpolateText = ({
     translatedText = i18n._(text.messageDescriptor, data);
   }
   return interpolateText(translatedText, data, project);
+};
+
+const interpolateElementId = (
+  elementId: string,
+  data: { [key: string]: string }
+): string => {
+  if (
+    elementId.startsWith(selectorInterpolationProjectDataAccessors.editorTab)
+  ) {
+    const splittedElementId = elementId.split(':');
+    const sceneName = splittedElementId[1];
+    const editorType = splittedElementId[2];
+    return `button[id^="tab"][data-type="${
+      editorType === 'Scene' ? 'layout' : 'layout-events'
+    }"][data-scene="${data[sceneName]}"]`;
+  } else if (
+    elementId.startsWith(
+      selectorInterpolationProjectDataAccessors.objectInObjectsList
+    )
+  ) {
+    const splittedElementId = elementId.split(':');
+    const objectName = splittedElementId[1];
+    return `#objects-list div[data-object-name="${data[objectName]}"]`;
+  } else if (
+    elementId.startsWith(
+      selectorInterpolationProjectDataAccessors.objectInObjectOrResourceSelector
+    )
+  ) {
+    const splittedElementId = elementId.split(':');
+    const objectName = splittedElementId[1];
+    return `#instruction-or-object-selector div[data-object-name="${
+      data[objectName]
+    }"]`;
+  }
+
+  return elementId;
 };
 
 const containsProjectDataToDisplay = (text?: TranslatedText): boolean => {
@@ -557,10 +598,16 @@ const InAppTutorialOrchestrator = React.forwardRef<
         : undefined;
     }
     const formattedStep: InAppTutorialFlowFormattedStep = {
-      ...flow[currentStepIndex],
+      ...currentStep,
       tooltip: formattedTooltip,
       nextStepTrigger: formattedStepTrigger,
     };
+    if (currentStep.elementToHighlightId) {
+      formattedStep.elementToHighlightId = interpolateElementId(
+        currentStep.elementToHighlightId,
+        data
+      );
+    }
 
     return (
       <InAppTutorialStepDisplayer

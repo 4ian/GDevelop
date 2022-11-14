@@ -171,7 +171,7 @@ export const AssetStore = ({ project }: Props) => {
       navigationState.openPackPage(receivedAssetPack);
       setIsFiltersPanelOpen(true);
     },
-    [loadedReceivedAssetPackInStore, navigationState]
+    [navigationState, loadedReceivedAssetPackInStore]
   );
 
   // If the user has received the pack they are currently viewing,
@@ -227,10 +227,10 @@ export const AssetStore = ({ project }: Props) => {
       setIsFiltersPanelOpen(true);
     },
     [
-      loadedReceivedAssetPackInStore,
       publicAssetPacks,
-      assetFiltersState,
+      loadedReceivedAssetPackInStore,
       navigationState,
+      assetFiltersState,
     ]
   );
 

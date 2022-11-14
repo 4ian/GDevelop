@@ -1,6 +1,7 @@
 // @flow
 import { t } from '@lingui/macro';
 import * as React from 'react';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 const gd = global.gd;
 
@@ -29,6 +30,8 @@ export const useSerializableObjectCancelableEditor = ({
   const numberOfChangesRef = React.useRef(0);
   const startTimeRef = React.useRef(Date.now());
   const { showConfirmation } = useAlertDialog();
+  const preferences = React.useContext(PreferencesContext);
+  const backdropClickBehavior = preferences.values.backdropClickBehavior;
 
   React.useEffect(
     () => {
@@ -64,13 +67,19 @@ export const useSerializableObjectCancelableEditor = ({
       if (!serializedElement) return;
 
       let continueCanceling = false;
+      const hasCancelBackdropPreference = backdropClickBehavior === 'cancel';
 
+      // We show a warning if:
+      // - the user has not set the backdrop click behavior to "cancel", as we assume they know what they are doing
+      // - the user has made a significant number of changes
+      // - the user has been editing for a significant amount of time
       const shouldShowWarning =
-        numberOfChangesRef.current >= changesBeforeShowingWarning ||
-        (numberOfChangesRef.current >=
-          changesBeforeShowingWarningAfterTimeout &&
-          Date.now() - startTimeRef.current >
-            timeoutBeforeShowingFasterWarning);
+        !hasCancelBackdropPreference &&
+        (numberOfChangesRef.current >= changesBeforeShowingWarning ||
+          (numberOfChangesRef.current >=
+            changesBeforeShowingWarningAfterTimeout &&
+            Date.now() - startTimeRef.current >
+              timeoutBeforeShowingFasterWarning));
 
       if (shouldShowWarning) {
         const answer = await showConfirmation({
@@ -94,7 +103,13 @@ export const useSerializableObjectCancelableEditor = ({
 
       onCancel();
     },
-    [serializableObject, useProjectToUnserialize, onCancel, showConfirmation]
+    [
+      serializableObject,
+      useProjectToUnserialize,
+      onCancel,
+      showConfirmation,
+      backdropClickBehavior,
+    ]
   );
 
   return { onCancelChanges, notifyOfChange };

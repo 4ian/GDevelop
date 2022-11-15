@@ -72,7 +72,7 @@ const inAppTutorial: InAppTutorial = {
       id: 'ValidateProjectCreation',
       elementToHighlightId: '#create-project-button',
       nextStepTrigger: {
-        presenceOfElement: '[id^=tab-layout]:not([id^=tab-layout-events])',
+        presenceOfElement: '[id^=tab-layout]',
       },
       tooltip: {
         description: { messageDescriptor: t`Let's go!` },
@@ -330,7 +330,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'SwitchToEventsSheet',
-      elementToHighlightId: '[id^=tab-layout-events]',
+      elementToHighlightId: 'editorTab::EventsSheet',
       nextStepTrigger: { presenceOfElement: '#add-event-button' },
       tooltip: {
         description: {

@@ -78,6 +78,9 @@
           }
         },
         "placement": "right"
+      },
+      "mapProjectData": {
+        "playScene": "lastProjectSceneName"
       }
     },
     {
@@ -1607,7 +1610,7 @@
       }
     },
     {
-      "elementToHighlightId": "[id^=tab-layout-events]",
+      "elementToHighlightId": "editorTab:playScene:EventsSheet",
       "nextStepTrigger": {
         "presenceOfElement": "#add-event-button"
       },
@@ -1829,7 +1832,7 @@
       }
     },
     {
-      "elementToHighlightId": "[id^=tab-layout]:not([id^=tab-layout-events])",
+      "elementToHighlightId": "editorTab:playScene:Scene",
       "nextStepTrigger": {
         "presenceOfElement": "[id^=tab-layout]:not([id^=tab-layout-events])[data-active]"
       },
@@ -1975,7 +1978,7 @@
       }
     },
     {
-      "elementToHighlightId": "[id^=tab-layout-events]",
+      "elementToHighlightId": "editorTab:playScene:EventsSheet",
       "nextStepTrigger": {
         "presenceOfElement": "#toolbar-add-event-button"
       },
@@ -2142,7 +2145,7 @@
       }
     },
     {
-      "elementToHighlightId": "[id^=tab-layout]:not([id^=tab-layout-events])",
+      "elementToHighlightId": "editorTab:playScene:Scene",
       "nextStepTrigger": {
         "presenceOfElement": "[id^=tab-layout]:not([id^=tab-layout-events])[data-active]"
       },

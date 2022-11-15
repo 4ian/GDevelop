@@ -109,7 +109,7 @@ const interpolateElementId = (
       : '';
     return `button[id^="tab"][data-type="${
       editorType === 'Scene' ? 'layout' : 'layout-events'
-    }]${sceneNameFilter}`;
+    }"]${sceneNameFilter}`;
   } else if (
     elementId.startsWith(
       selectorInterpolationProjectDataAccessors.objectInObjectsList

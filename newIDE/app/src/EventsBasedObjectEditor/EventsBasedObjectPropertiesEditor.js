@@ -31,7 +31,7 @@ const gd: libGDevelop = global.gd;
 type Props = {|
   project: gdProject,
   eventsBasedObject: gdEventsBasedObject,
-  onPropertiesUpdated: () => void,
+  onPropertiesUpdated?: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
 |};
 

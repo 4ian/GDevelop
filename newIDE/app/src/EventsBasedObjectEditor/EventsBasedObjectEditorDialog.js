@@ -79,7 +79,6 @@ export default function EventsBasedObjectEditorDialog({
         <EventsBasedObjectPropertiesEditor
           project={project}
           eventsBasedObject={eventsBasedObject}
-          onPropertiesUpdated={() => {}}
           onRenameProperty={onRenameProperty}
         />
       )}

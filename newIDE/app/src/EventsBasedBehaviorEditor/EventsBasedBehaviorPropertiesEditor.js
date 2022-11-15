@@ -34,7 +34,7 @@ type Props = {|
   project: gdProject,
   properties: gdNamedPropertyDescriptorsList,
   allowRequiredBehavior?: boolean,
-  onPropertiesUpdated: () => void,
+  onPropertiesUpdated?: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
   behaviorObjectType?: string,
 |};

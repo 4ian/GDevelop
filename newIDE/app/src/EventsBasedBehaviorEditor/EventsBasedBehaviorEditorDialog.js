@@ -83,7 +83,6 @@ export default function EventsBasedBehaviorEditorDialog({
           allowRequiredBehavior
           project={project}
           properties={eventsBasedBehavior.getPropertyDescriptors()}
-          onPropertiesUpdated={() => {}}
           onRenameProperty={onRenameProperty}
           behaviorObjectType={eventsBasedBehavior.getObjectType()}
         />
@@ -92,7 +91,6 @@ export default function EventsBasedBehaviorEditorDialog({
         <EventsBasedBehaviorPropertiesEditor
           project={project}
           properties={eventsBasedBehavior.getSharedPropertyDescriptors()}
-          onPropertiesUpdated={() => {}}
           onRenameProperty={onRenameSharedProperty}
         />
       )}

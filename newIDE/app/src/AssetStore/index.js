@@ -73,7 +73,9 @@ export const AssetStore = ({ project }: Props) => {
   const searchBar = React.useRef<?SearchBarInterface>(null);
 
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
-  const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
+  const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(
+    !isOnHomePage && !openedAssetShortHeader
+  );
   const [
     selectedPrivateAssetPackListingData,
     setSelectedPrivateAssetPackListingData,

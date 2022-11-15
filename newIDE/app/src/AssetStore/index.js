@@ -17,7 +17,10 @@ import {
   type PublicAssetPack,
 } from '../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
-import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
+import {
+  BoxSearchResults,
+  type BoxSearchResultsInterface,
+} from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
 import {
   AssetStoreFilterPanel,
@@ -28,11 +31,11 @@ import { AssetCard } from './AssetCard';
 import { NoResultPlaceholder } from './NoResultPlaceholder';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import Subheader from '../UI/Subheader';
-import { AssetsHome } from './AssetsHome';
+import { AssetsHome, type AssetsHomeInterface } from './AssetsHome';
 import TextButton from '../UI/TextButton';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
-import { AssetDetails } from './AssetDetails';
+import { AssetDetails, type AssetDetailsInterface } from './AssetDetails';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Home from '@material-ui/icons/Home';
 import PrivateAssetPackInformationDialog from './PrivateAssets/PrivateAssetPackInformationDialog';
@@ -68,8 +71,11 @@ export const AssetStore = ({ project }: Props) => {
     filtersState,
   } = navigationState.getCurrentPage();
   const searchBar = React.useRef<?SearchBarInterface>(null);
+
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
-  const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
+  const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(
+    !isOnHomePage && !openedAssetShortHeader
+  );
   const [
     selectedPrivateAssetPackListingData,
     setSelectedPrivateAssetPackListingData,
@@ -79,6 +85,65 @@ export const AssetStore = ({ project }: Props) => {
     setPurchasingPrivateAssetPackListingData,
   ] = React.useState<?PrivateAssetPackListingData>(null);
   const { onPurchaseSuccessful } = React.useContext(AuthenticatedUserContext);
+
+  // The saved scroll position must not be reset by a scroll event until it
+  // has been applied.
+  const hasAppliedSavedScrollPosition = React.useRef<boolean>(false);
+  const isAssetDetailLoading = React.useRef<boolean>(
+    openedAssetShortHeader != null
+  );
+  const setScrollUpdateIsNeeded = React.useCallback(
+    () => {
+      hasAppliedSavedScrollPosition.current = false;
+      isAssetDetailLoading.current =
+        navigationState.getCurrentPage().openedAssetShortHeader != null;
+    },
+    [navigationState]
+  );
+
+  const assetsHome = React.useRef<?AssetsHomeInterface>(null);
+  const boxSearchResults = React.useRef<?BoxSearchResultsInterface>(null);
+  const assetDetails = React.useRef<?AssetDetailsInterface>(null);
+  // This is also called when the asset detail page has loaded.
+  const applyBackScrollPosition = React.useCallback(
+    () => {
+      if (hasAppliedSavedScrollPosition.current) {
+        return;
+      }
+      const scrollView =
+        assetsHome.current || boxSearchResults.current || assetDetails.current;
+      if (!scrollView) {
+        return;
+      }
+      const scrollPosition = navigationState.getCurrentPage().scrollPosition;
+      scrollPosition && scrollView.scrollToPosition(scrollPosition);
+      hasAppliedSavedScrollPosition.current = true;
+    },
+    [navigationState]
+  );
+
+  React.useLayoutEffect(
+    () => {
+      if (!isAssetDetailLoading.current) {
+        applyBackScrollPosition();
+      }
+    },
+    [applyBackScrollPosition]
+  );
+
+  const handleScroll = React.useCallback(
+    y => {
+      if (
+        navigationState.getCurrentPage().scrollPosition == null ||
+        hasAppliedSavedScrollPosition.current
+      ) {
+        navigationState.getCurrentPage().scrollPosition = y;
+        // The scroll position is right, we can continue to save it.
+        hasAppliedSavedScrollPosition.current = true;
+      }
+    },
+    [navigationState]
+  );
 
   const onOpenDetails = React.useCallback(
     (assetShortHeader: AssetShortHeader) => {
@@ -218,6 +283,7 @@ export const AssetStore = ({ project }: Props) => {
                   tooltip={t`Back to discover`}
                   onClick={() => {
                     navigationState.openHome();
+                    setScrollUpdateIsNeeded();
                     clearAllFilters(assetFiltersState);
                     setIsFiltersPanelOpen(false);
                   }}
@@ -261,6 +327,7 @@ export const AssetStore = ({ project }: Props) => {
                           primary={false}
                           onClick={() => {
                             navigationState.backToPreviousPage();
+                            setScrollUpdateIsNeeded();
                             if (navigationState.getCurrentPage().isOnHomePage) {
                               clearAllFilters(assetFiltersState);
                               setIsFiltersPanelOpen(false);
@@ -362,15 +429,18 @@ export const AssetStore = ({ project }: Props) => {
                   privateAssetPacks &&
                   assetPackRandomOrdering && (
                     <AssetsHome
+                      ref={assetsHome}
                       publicAssetPacks={publicAssetPacks}
                       privateAssetPacksListingData={privateAssetPacks}
                       assetPackRandomOrdering={assetPackRandomOrdering}
                       onPublicAssetPackSelection={selectPublicAssetPack}
                       onPrivateAssetPackSelection={selectPrivateAssetPack}
+                      onScroll={handleScroll}
                     />
                   )}
                 {!isOnHomePage && !openedAssetShortHeader && (
                   <BoxSearchResults
+                    ref={boxSearchResults}
                     baseSize={128}
                     onRetry={fetchAssetsAndFilters}
                     error={error}
@@ -387,6 +457,7 @@ export const AssetStore = ({ project }: Props) => {
                         onClear={() => clearAllFilters(assetFiltersState)}
                       />
                     }
+                    onScroll={handleScroll}
                   />
                 )}
                 {isOnHomePage && error && (
@@ -401,10 +472,13 @@ export const AssetStore = ({ project }: Props) => {
                 )}
                 {openedAssetShortHeader && (
                   <AssetDetails
+                    ref={assetDetails}
                     project={project}
                     onTagSelection={selectTag}
                     assetShortHeader={openedAssetShortHeader}
                     onOpenDetails={onOpenDetails}
+                    onScroll={handleScroll}
+                    onAssetLoaded={applyBackScrollPosition}
                   />
                 )}
                 {!!selectedPrivateAssetPackListingData && (

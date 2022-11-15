@@ -32,6 +32,7 @@ const styles = {
   container: {
     display: 'flex',
     overflow: 'hidden', // Ensure large images are not overflowing the other panel.
+    flexDirection: 'column', // Ensure the panel provides a scroll bar if needed.
   },
 };
 
@@ -219,7 +220,7 @@ const CollisionMasksEditor = ({
       noTitleBar: true,
       renderEditor: () => (
         <Paper background="medium" style={styles.container} square>
-          <Column expand noMargin>
+          <Column expand noMargin useFullHeight>
             <ImagePreview
               resourceName={resourceName}
               imageResourceSource={resourcesLoader.getResourceFullUrl(

@@ -434,7 +434,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
       }
     });
     if (foundKey) {
-      data[foundKey] = data[newName];
+      data[foundKey] = newName;
     }
   };
 

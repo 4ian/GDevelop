@@ -9,11 +9,13 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import SpriteEditor from '../../../ObjectEditor/Editors/SpriteEditor';
+import CollisionMasksEditor from '../../../ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import ResourcesLoader from '../../../ResourcesLoader';
+import PointsEditor from '../../../ObjectEditor/Editors/SpriteEditor/PointsEditor';
 
 export default {
   title: 'ObjectEditor/SpriteEditor',
@@ -39,7 +41,7 @@ export const Default = () => (
   </SerializedObjectDisplay>
 );
 
-export const PointsEditor = () => (
+export const Points = () => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
@@ -53,7 +55,7 @@ export const PointsEditor = () => (
   </SerializedObjectDisplay>
 );
 
-export const CollisionMasksEditor = () => (
+export const CollisionMasks = () => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>

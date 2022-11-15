@@ -2328,6 +2328,325 @@
         "placement": "top"
       },
       "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:background",
+      "nextStepTrigger": {
+        "presenceOfElement": "#objects-list [id^=object-item][data-global=true]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Right click on your $(background), and click “set as global object”."
+          }
+        },
+        "placement": "left"
+      }
+    },
+    {
+      "elementToHighlightId": "#main-toolbar-project-manager-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings"
+      },
+      "tooltip": {
+        "title": {
+          "messageByLocale": {
+            "en": "Now let's create a new scene for our start screen."
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "#project-manager #add-new-scene-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#scene-item-1"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click here."
+          }
+        },
+        "placement": "right"
+      },
+      "mapProjectData": {
+        "startScene": "projectLastSceneName"
+      }
+    },
+    {
+      "elementToHighlightId": "#project-manager #scene-item-1",
+      "nextStepTrigger": {
+        "presenceOfElement": "editorTab:startScene:Scene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Right click on the new scene and change its name to “StartScreen”.\n\nOnce you're done, click on the item to open the new scene."
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:background",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "background:startScene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Drag $(background) into the scene."
+          }
+        },
+        "placement": "left"
+      }
+    },
+    {
+      "nextStepTrigger": {
+        "clickOnTooltipButton": {
+          "messageByLocale": {
+            "en": "I'm done"
+          }
+        }
+      },
+      "tooltip": {
+        "standalone": true,
+        "description": {
+          "messageByLocale": {
+            "en": "Drag to expand the size $(background) until it stretches over your entire game area."
+          }
+        },
+        "image": {
+          "dataUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSI1Mi45MzEgMzAuMDE2IDE0MC4yNzkgOTUuMTY4IiB3aWR0aD0iMTQwLjI3OSIgaGVpZ2h0PSI5NS4xNjgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSIxMjMuMDcxIiB5MT0iMzAuMDE2IiB4Mj0iMTIzLjA3MSIgeTI9IjEyNS4xODQiIGlkPSJncmFkaWVudC0wIiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KDAuOTYyNTc4LCAwLCAwLCAwLjk2MjU3OCwgNC42MDU1NTksIDEuMTIzMjU4KSIgc3ByZWFkTWV0aG9kPSJwYWQiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0eWxlPSJzdG9wLWNvbG9yOiByZ2IoMCwgMjA4LCAyNTUpOyIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0eWxlPSJzdG9wLWNvbG9yOiByZ2IoMTY0LCAyMzcsIDI1NSk7Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB4PSI1Mi45MzEiIHk9IjMwLjAxNiIgd2lkdGg9IjE0MC4yNzkiIGhlaWdodD0iOTUuMTY4IiBzdHlsZT0ic3Ryb2tlLXdpZHRoOiAycHg7IGZpbGw6IHVybCgjZ3JhZGllbnQtMCk7IGZpbGwtb3BhY2l0eTogMTsgZmlsbC1ydWxlOiBub256ZXJvOyIvPgogIDxwYXRoIHN0eWxlPSJmaWxsOiByZ2IoMTY1LCAxNTgsIDg1KTsiIGQ9Ik0gNTIuNzY3IDEyNS4xNjkgTCA1Mi44MSAxMTIuNDMgTCAxMTQuNjM3IDExMC44NDggTCAxNDYuNDIgOTEuNDUgTCAxNTguOTU5IDgxLjkyNCBMIDE2Ny41MTUgNzEuMTg0IEwgMTc3Ljc4OCA2MS40MTEgTCAxODMuMzYgNTYuNjU4IEwgMTkzLjI3OSA2NS42OTcgTCAxOTMuMTg2IDEyNS4yOTMgTCA1Mi43NjcgMTI1LjE2OSBaIi8+CiAgPHBvbHlnb24gc3R5bGU9ImZpbGw6IHJnYig3LCAxMTUsIDMwKTsiIHBvaW50cz0iNzIuNjEgMTA5LjgwOCA4NS41NzYgMTAxLjgzIDc0LjE0MSAxMDEuMDE1IDg0Ljg1MiA5MC41MiA3Ny4yNSA4OS42NjcgODYuNjk0IDgxLjYzNyA4MS42MjkgODAuOTE4IDkwLjQzNyA2Ny45MjUgOTUuNzI2IDgxLjU3MiA5MS41MDYgODEuODUgOTcuMDMxIDkxLjkwOCA5Mi4xNjQgOTEuNjY4IDEwMC41NzggMTAxLjg1NCA5My4yMzYgMTAxLjU1NCAxMDUuNTE4IDExMy40OTYiLz4KICA8cG9seWdvbiBzdHlsZT0iZmlsbDogcmdiKDcsIDExNSwgMzApOyIgcG9pbnRzPSI5Ni4xNTMgNzUuNjA3IDEwNy4zMzkgODMuNzk3IDk3LjY2OSA4NC41IDEwNi44MjkgOTMuMTUzIDEwMC42MDEgOTMuMzY5IDEwNy4xODkgMTAwLjcwNyAxMDQuMDcgMTAwLjk3NSAxMTAuNTg3IDExMi43NjUgMTE3LjI4OCA5OS41NjQgMTEzLjYwMyAxMDAuMjYgMTE3LjUzNSA5MS4zOTcgMTEyLjkxMiA5My4xNzQgMTE5Ljc3MSA4NC43MTkgMTEzLjgxNyA4NC4wMzUgMTIxLjE3MSA3NC4zMTciIHRyYW5zZm9ybT0ibWF0cml4KC0xLCAwLCAwLCAtMSwgMjIwLjU3ODAwMywgMTg2Ljc3OCkiLz4KICA8cGF0aCBzdHlsZT0iZmlsbDogcmdiKDI1NSwgMjU1LCAyNTUpOyIgZD0iTSAxNzUuMjI2IDc5LjYxMyBMIDE2Mi44NDYgNzYuOTI4IEwgMTY3LjUxNSA3MS4xODQgTCAxNzcuNzg4IDYxLjQxMSBMIDE4My4zNiA1Ni42NTggTCAxOTMuMjc5IDY1LjY5NyBMIDE5My4xODYgNzYuMzM5IFoiLz4KICA8cmVjdCB4PSI1Mi45NSIgeT0iMjkuOTg0IiB3aWR0aD0iMTQwLjI3OSIgaGVpZ2h0PSI5NS4xNjgiIHN0eWxlPSJzdHJva2U6IHJnYigwLCAwLCAwKTsgZmlsbDogbm9uZTsgc3Ryb2tlLXdpZHRoOiAycHg7Ii8+Cjwvc3ZnPg=="
+        }
+      }
+    },
+    {
+      "id": "ClickOnNewObjectButtonForStartScreenTitle",
+      "elementToHighlightId": "#scene-editor[data-active=true] #add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's create a title!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#new-object-from-scratch-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-category-TextObject--Text"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "This time, we'll create a text from scratch."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-category-TextObject--Text",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-name"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **Text** object"
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-name",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the object name to “Title”."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#text-object-font-size",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the font size to **200**."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#text-object-initial-text",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the initial text to display whatever you want the title of your game to be."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done."
+          }
+        }
+      },
+      "mapProjectData": {
+        "title": "sceneLastObjectName:startScene"
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:title",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "title:startScene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Drag $(title) into the scene where you'd like your title to be."
+          }
+        },
+        "placement": "left"
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:title",
+      "nextStepTrigger": {
+        "presenceOfElement": "#scene-editor[data-active=true] #object-item-2"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Right-click on $(title) and select “Duplicate”."
+          }
+        },
+        "placement": "left"
+      },
+      "mapProjectData": {
+        "startText": "sceneLastObjectName:startScene"
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:startText",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Double click on $(startText)."
+          }
+        },
+        "placement": "left"
+      }
+    },
+    {
+      "elementToHighlightId": "#object-name",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the object name to “Start”."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#text-object-font-size",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the font size to **50**."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#text-object-initial-text",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the initial text to “Start Game”."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done."
+          }
+        }
+      },
+      "mapProjectData": {
+        "startText": "sceneLastObjectName:startScene"
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:startText",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "startText:startScene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Drag $(startText) into the scene where you'd like the start button to be."
+          }
+        },
+        "placement": "left"
+      }
     }
   ]
 }

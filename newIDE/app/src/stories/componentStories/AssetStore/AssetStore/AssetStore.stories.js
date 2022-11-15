@@ -4,6 +4,7 @@ import withMock from 'storybook-addon-mock';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
+import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import { testProject } from '../../../GDevelopJsInitializerDecorator';
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
 import { AssetStore } from '../../../../AssetStore';
@@ -42,21 +43,25 @@ const apiDataFakePacks = {
 };
 
 export const Default = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-    <AssetStoreStateProvider>
-      <AssetStore project={testProject.project} />
-    </AssetStoreStateProvider>
-  </AuthenticatedUserContext.Provider>
+  <FixedHeightFlexContainer height={500}>
+    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+      <AssetStoreStateProvider>
+        <AssetStore project={testProject.project} />
+      </AssetStoreStateProvider>
+    </AuthenticatedUserContext.Provider>
+  </FixedHeightFlexContainer>
 );
 Default.decorators = [withMock];
 Default.parameters = apiDataFakePacks;
 
 export const LoadingError = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-    <AssetStoreStateProvider>
-      <AssetStore project={testProject.project} />
-    </AssetStoreStateProvider>
-  </AuthenticatedUserContext.Provider>
+  <FixedHeightFlexContainer height={500}>
+    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+      <AssetStoreStateProvider>
+        <AssetStore project={testProject.project} />
+      </AssetStoreStateProvider>
+    </AuthenticatedUserContext.Provider>
+  </FixedHeightFlexContainer>
 );
 LoadingError.decorators = [withMock];
 LoadingError.parameters = apiDataServerSideError;

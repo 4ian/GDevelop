@@ -13,6 +13,7 @@ export type AssetStorePageState = {|
   openedAssetShortHeader: ?AssetShortHeader,
   filtersState: FiltersState,
   ignoreTextualSearch: boolean,
+  scrollPosition?: ?number,
 |};
 
 export type NavigationState = {|

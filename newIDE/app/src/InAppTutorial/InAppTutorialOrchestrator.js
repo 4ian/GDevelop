@@ -224,7 +224,9 @@ const gatherProjectDataOnMultipleSteps = ({
               `No layout was found in project after step ${index} of flow`
             );
           }
-          newData[key] = project.getLayoutAt(0).getName();
+          newData[key] = project
+            .getLayoutAt(project.getLayoutsCount() - 1)
+            .getName();
         } else if (dataAccessor === 'lastProjectObjectName') {
           if (!project || project.getLayoutsCount() === 0) return;
           const layout = project.getLayoutAt(0);

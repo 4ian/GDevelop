@@ -660,7 +660,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     return (
       <I18n>
         {({ i18n }) => (
-          <div style={styles.container}>
+          <div style={styles.container} id="project-manager">
             <ProjectManagerCommands
               project={this.props.project}
               onOpenProjectProperties={this._openProjectProperties}
@@ -737,6 +737,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                       const name = layout.getName();
                       return (
                         <Item
+                          id={`scene-item-${i}`}
                           key={i}
                           primaryText={name}
                           textEndAdornment={
@@ -796,6 +797,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     })
                     .concat(
                       <AddListItem
+                        id="add-new-scene-button"
                         key={'add-scene'}
                         onClick={() =>
                           this._addLayout(project.getLayoutsCount(), i18n)

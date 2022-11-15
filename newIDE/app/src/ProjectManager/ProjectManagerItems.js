@@ -79,6 +79,7 @@ export const ProjectStructureItem = ({
 };
 
 type ItemProps = {|
+  id?: string,
   primaryText: string,
   textEndAdornment?: React.Node,
   editingName: boolean,
@@ -103,6 +104,7 @@ type ItemProps = {|
 |};
 
 export const Item = ({
+  id,
   primaryText,
   textEndAdornment,
   editingName,
@@ -177,6 +179,7 @@ export const Item = ({
     <I18n>
       {({ i18n }) => (
         <ListItem
+          id={id}
           style={{
             borderBottom: `1px solid ${gdevelopTheme.listItem.separatorColor}`,
             ...style,

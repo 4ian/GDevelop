@@ -281,7 +281,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                   <SelectField
                     value={(getterFunction && getterFunction.getName()) || ''}
                     floatingLabelText={
-                      <Trans>Related action and expression</Trans>
+                      <Trans>Related expression and condition</Trans>
                     }
                     fullWidth
                     onChange={(e, i, value: string) => {

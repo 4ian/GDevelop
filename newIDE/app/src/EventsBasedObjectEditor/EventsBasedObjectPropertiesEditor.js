@@ -31,7 +31,7 @@ const gd: libGDevelop = global.gd;
 type Props = {|
   project: gdProject,
   eventsBasedObject: gdEventsBasedObject,
-  onPropertiesUpdated: () => void,
+  onPropertiesUpdated?: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
 |};
 
@@ -100,7 +100,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
     const property = properties.insertNew(newName, properties.getCount());
     property.setType('Number');
     this.forceUpdate();
-    this.props.onPropertiesUpdated();
+    this.props.onPropertiesUpdated && this.props.onPropertiesUpdated();
   };
 
   _removeProperty = (name: string) => {
@@ -109,7 +109,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
 
     properties.remove(name);
     this.forceUpdate();
-    this.props.onPropertiesUpdated();
+    this.props.onPropertiesUpdated && this.props.onPropertiesUpdated();
   };
 
   _moveProperty = (oldIndex: number, newIndex: number) => {
@@ -118,7 +118,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
 
     properties.move(oldIndex, newIndex);
     this.forceUpdate();
-    this.props.onPropertiesUpdated();
+    this.props.onPropertiesUpdated && this.props.onPropertiesUpdated();
   };
 
   _setChoiceExtraInfo = (property: gdNamedPropertyDescriptor) => {
@@ -184,7 +184,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
 
                               property.setName(newName);
                               this.forceUpdate();
-                              this.props.onPropertiesUpdated();
+                              this.props.onPropertiesUpdated &&
+                                this.props.onPropertiesUpdated();
                             }}
                             fullWidth
                           />
@@ -201,7 +202,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                           onCheck={(e, checked) => {
                             property.setHidden(!checked);
                             this.forceUpdate();
-                            this.props.onPropertiesUpdated();
+                            this.props.onPropertiesUpdated &&
+                              this.props.onPropertiesUpdated();
                           }}
                           checkedIcon={<Visibility />}
                           uncheckedIcon={<VisibilityOff />}
@@ -241,7 +243,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               onChange={(e, i, value: string) => {
                                 property.setType(value);
                                 this.forceUpdate();
-                                this.props.onPropertiesUpdated();
+                                this.props.onPropertiesUpdated &&
+                                  this.props.onPropertiesUpdated();
                               }}
                               fullWidth
                             >
@@ -280,7 +283,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                 onChange={newValue => {
                                   property.setValue(newValue);
                                   this.forceUpdate();
-                                  this.props.onPropertiesUpdated();
+                                  this.props.onPropertiesUpdated &&
+                                    this.props.onPropertiesUpdated();
                                 }}
                                 fullWidth
                               />
@@ -296,7 +300,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                 onChange={(e, i, value) => {
                                   property.setValue(value);
                                   this.forceUpdate();
-                                  this.props.onPropertiesUpdated();
+                                  this.props.onPropertiesUpdated &&
+                                    this.props.onPropertiesUpdated();
                                 }}
                                 fullWidth
                               >
@@ -317,7 +322,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                 onChange={(e, i, value) => {
                                   property.setValue(value);
                                   this.forceUpdate();
-                                  this.props.onPropertiesUpdated();
+                                  this.props.onPropertiesUpdated &&
+                                    this.props.onPropertiesUpdated();
                                 }}
                                 fullWidth
                               >
@@ -348,7 +354,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               onChange={color => {
                                 property.setValue(color);
                                 this.forceUpdate();
-                                this.props.onPropertiesUpdated();
+                                this.props.onPropertiesUpdated &&
+                                  this.props.onPropertiesUpdated();
                               }}
                             />
                           )}
@@ -375,7 +382,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               onChange={text => {
                                 property.setGroup(text);
                                 this.forceUpdate();
-                                this.props.onPropertiesUpdated();
+                                this.props.onPropertiesUpdated &&
+                                  this.props.onPropertiesUpdated();
                               }}
                               dataSource={this._getPropertyGroupNames().map(
                                 name => ({

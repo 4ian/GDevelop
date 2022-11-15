@@ -95,7 +95,7 @@ export const AssetStore = ({ project }: Props) => {
   const hasAppliedSavedScrollPosition = React.useRef<boolean>(false);
   // The saved scroll position must not be applied after users have scrolled.
   const hasScrolled = React.useRef<boolean>(false);
-  const needScrollUpdate = React.useCallback(() => {
+  const setScrollUpdateIsNeeded = React.useCallback(() => {
     hasAppliedSavedScrollPosition.current = false;
     hasScrolled.current = false;
   }, []);
@@ -258,7 +258,7 @@ export const AssetStore = ({ project }: Props) => {
                   key="back-discover"
                   tooltip={t`Back to discover`}
                   onClick={() => {
-                    needScrollUpdate();
+                    setScrollUpdateIsNeeded();
                     navigationState.openHome();
                     clearAllFilters(assetFiltersState);
                     setIsFiltersPanelOpen(false);
@@ -302,7 +302,7 @@ export const AssetStore = ({ project }: Props) => {
                           label={<Trans>Back</Trans>}
                           primary={false}
                           onClick={() => {
-                            needScrollUpdate();
+                            setScrollUpdateIsNeeded();
                             navigationState.backToPreviousPage();
                             if (navigationState.getCurrentPage().isOnHomePage) {
                               clearAllFilters(assetFiltersState);

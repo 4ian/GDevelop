@@ -5,6 +5,7 @@
     "OpenPropertiesManager": "Scene",
     "SwitchToEvents1": "EventsSheet",
     "SwitchToEvents2": "EventsSheet",
+    "SwitchToEvents3": "EventsSheet",
     "SwitchToScene1": "Scene",
     "SwitchToScene2": "Scene"
   },
@@ -1644,7 +1645,7 @@
       "tooltip": {
         "description": {
           "messageByLocale": {
-            "en": "Add a condition"
+            "en": "Add a condition."
           }
         }
       }
@@ -2013,7 +2014,7 @@
       "tooltip": {
         "description": {
           "messageByLocale": {
-            "en": "Add a condition"
+            "en": "Add a condition."
           }
         }
       }
@@ -2646,6 +2647,46 @@
           }
         },
         "placement": "left"
+      }
+    },
+    {
+      "elementToHighlightId": "editorTab:startScene:EventsSheet",
+      "nextStepTrigger": {
+        "presenceOfElement": "#events-editor[data-active]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's interact with those titles."
+          }
+        }
+      }
+    },
+    {
+      "id": "SwitchToEvents3",
+      "elementToHighlightId": "#events-editor[data-active] #add-event-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#events-editor[data-active] #add-condition-button-empty"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's create a new event!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#events-editor[data-active] #add-condition-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add a condition."
+          }
+        }
       }
     }
   ]

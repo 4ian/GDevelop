@@ -280,7 +280,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                 onChange={newValue => {
                                   property.setValue(newValue);
                                   this.forceUpdate();
-                                  this.props.onPropertiesUpdated();
+                                  this.props.onPropertiesUpdated &&
+                                    this.props.onPropertiesUpdated();
                                 }}
                                 fullWidth
                               />
@@ -296,7 +297,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                 onChange={(e, i, value) => {
                                   property.setValue(value);
                                   this.forceUpdate();
-                                  this.props.onPropertiesUpdated();
+                                  this.props.onPropertiesUpdated &&
+                                    this.props.onPropertiesUpdated();
                                 }}
                                 fullWidth
                               >
@@ -317,7 +319,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                 onChange={(e, i, value) => {
                                   property.setValue(value);
                                   this.forceUpdate();
-                                  this.props.onPropertiesUpdated();
+                                  this.props.onPropertiesUpdated &&
+                                    this.props.onPropertiesUpdated();
                                 }}
                                 fullWidth
                               >
@@ -348,7 +351,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               onChange={color => {
                                 property.setValue(color);
                                 this.forceUpdate();
-                                this.props.onPropertiesUpdated();
+                                this.props.onPropertiesUpdated &&
+                                  this.props.onPropertiesUpdated();
                               }}
                             />
                           )}
@@ -375,7 +379,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               onChange={text => {
                                 property.setGroup(text);
                                 this.forceUpdate();
-                                this.props.onPropertiesUpdated();
+                                this.props.onPropertiesUpdated &&
+                                  this.props.onPropertiesUpdated();
                               }}
                               dataSource={this._getPropertyGroupNames().map(
                                 name => ({

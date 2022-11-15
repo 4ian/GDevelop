@@ -83,6 +83,7 @@ type Props = {|
   assetShortHeader: AssetShortHeader,
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
   onScroll?: number => void,
+  onAssetLoaded?: () => void,
 |};
 
 const getObjectAssetResourcesByName = (
@@ -109,6 +110,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
       assetShortHeader,
       onOpenDetails,
       onScroll,
+      onAssetLoaded,
     }: Props,
     ref
   ) => {
@@ -177,9 +179,16 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
             console.error('Error while loading asset:', error);
             setError(error);
           }
+          onAssetLoaded && onAssetLoaded();
         })();
       },
-      [assetShortHeader, environment, isAssetPrivate, fetchPrivateAsset]
+      [
+        onAssetLoaded,
+        isAssetPrivate,
+        fetchPrivateAsset,
+        assetShortHeader,
+        environment,
+      ]
     );
 
     const isImageResourceSmooth = React.useMemo(

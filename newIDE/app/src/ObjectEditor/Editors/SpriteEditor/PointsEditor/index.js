@@ -32,6 +32,7 @@ const styles = {
   container: {
     display: 'flex',
     overflow: 'hidden', // Ensure large images are not overflowing the other panel.
+    flexDirection: 'column', // Ensure the panel provides a scroll bar if needed.
   },
 };
 
@@ -196,7 +197,7 @@ const PointsEditor = ({
       noTitleBar: true,
       renderEditor: () => (
         <Paper background="medium" style={styles.container} square>
-          <Column noMargin expand>
+          <Column noMargin expand useFullHeight>
             <ImagePreview
               resourceName={resourceName}
               imageResourceSource={resourcesLoader.getResourceFullUrl(

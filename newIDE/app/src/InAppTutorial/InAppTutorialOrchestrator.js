@@ -216,31 +216,39 @@ const gatherProjectDataOnMultipleSteps = ({
     const { mapProjectData } = flow[index];
 
     if (mapProjectData) {
-      Object.entries(mapProjectData).forEach(([key, dataAccessor]) => {
-        if (dataAccessor === 'lastProjectSceneName') {
-          if (!project) return;
-          if (project.getLayoutsCount() === 0) {
-            throw new Error(
-              `No layout was found in project after step ${index} of flow`
-            );
+      Object.entries(mapProjectData).forEach(
+        // $FlowFixMe - Object.entries does not keep value type
+        ([key, dataAccessor]: [string, string]) => {
+          if (dataAccessor === 'projectLastSceneName') {
+            if (!project) return;
+            if (project.getLayoutsCount() === 0) {
+              throw new Error(
+                `No layout was found in project after step ${index} of flow`
+              );
+            }
+            newData[key] = project
+              .getLayoutAt(project.getLayoutsCount() - 1)
+              .getName();
+          } else if (dataAccessor.startsWith('sceneLastObjectName')) {
+            if (!project || project.getLayoutsCount() === 0) return;
+            const layoutKey = dataAccessor.split(':')[1];
+            const layoutName = layoutKey ? data[layoutKey] : undefined;
+            const layout =
+              layoutName && project.hasLayoutNamed(layoutName)
+                ? project.getLayout(layoutName)
+                : project.getLayoutAt(0);
+            const layoutObjectsCount = layout.getObjectsCount();
+            if (layoutObjectsCount === 0) {
+              throw new Error(
+                `No object was found in layout after step ${index} of flow`
+              );
+            }
+            newData[key] = layout
+              .getObjectAt(layout.getObjectsCount() - 1)
+              .getName();
           }
-          newData[key] = project
-            .getLayoutAt(project.getLayoutsCount() - 1)
-            .getName();
-        } else if (dataAccessor === 'lastProjectObjectName') {
-          if (!project || project.getLayoutsCount() === 0) return;
-          const layout = project.getLayoutAt(0);
-          const layoutObjectsCount = layout.getObjectsCount();
-          if (layoutObjectsCount === 0) {
-            throw new Error(
-              `No object was found in layout after step ${index} of flow`
-            );
-          }
-          newData[key] = layout
-            .getObjectAt(layout.getObjectsCount() - 1)
-            .getName();
         }
-      });
+      );
     }
   }
   return newData;
@@ -289,7 +297,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
   const [
     objectSceneInstancesToWatch,
     setObjectSceneInstancesToWatch,
-  ] = React.useState<?string>(null);
+  ] = React.useState<?{ sceneName: ?string, objectName: string }>(null);
   const domObserverRef = React.useRef<?MutationObserver>(null);
   const [
     shouldWatchProjectChanges,
@@ -526,10 +534,14 @@ const InAppTutorialOrchestrator = React.forwardRef<
         }
         setElementWithValueToWatch(elementToHighlightId);
       } else if (nextStepTrigger && nextStepTrigger.instanceAddedOnScene) {
-        const objectKey = nextStepTrigger.instanceAddedOnScene;
+        const [
+          objectKey,
+          sceneKey,
+        ] = nextStepTrigger.instanceAddedOnScene.split(':');
         const objectName = data[objectKey];
         if (!objectName) return;
-        setObjectSceneInstancesToWatch(objectName);
+        const sceneName = sceneKey ? data[sceneKey] : undefined;
+        setObjectSceneInstancesToWatch({ objectName, sceneName });
       }
     },
     [currentStep, data]
@@ -574,9 +586,13 @@ const InAppTutorialOrchestrator = React.forwardRef<
     () => {
       if (!objectSceneInstancesToWatch) return;
       if (!project || project.getLayoutsCount() === 0) return;
-      const layout = project.getLayoutAt(0);
+      const { objectName, sceneName: layoutName } = objectSceneInstancesToWatch;
+      const layout =
+        layoutName && project.hasLayoutNamed(layoutName)
+          ? project.getLayout(layoutName)
+          : project.getLayoutAt(0);
       const instances = layout.getInitialInstances();
-      if (instances.hasInstancesOfObject(objectSceneInstancesToWatch)) {
+      if (instances.hasInstancesOfObject(objectName)) {
         goToNextStep();
       }
     },

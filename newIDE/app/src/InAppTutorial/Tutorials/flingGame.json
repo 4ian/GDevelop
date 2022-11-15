@@ -80,7 +80,7 @@
         "placement": "right"
       },
       "mapProjectData": {
-        "playScene": "lastProjectSceneName"
+        "playScene": "projectLastSceneName"
       }
     },
     {

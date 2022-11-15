@@ -229,7 +229,7 @@ const gatherProjectDataOnMultipleSteps = ({
             newData[key] = project
               .getLayoutAt(project.getLayoutsCount() - 1)
               .getName();
-          } else if (dataAccessor.startsWith('sceneLastProjectName')) {
+          } else if (dataAccessor.startsWith('sceneLastObjectName')) {
             if (!project || project.getLayoutsCount() === 0) return;
             const layoutKey = dataAccessor.split(':')[1];
             const layoutName = layoutKey ? data[layoutKey] : undefined;
@@ -297,7 +297,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
   const [
     objectSceneInstancesToWatch,
     setObjectSceneInstancesToWatch,
-  ] = React.useState<?string>(null);
+  ] = React.useState<?{ sceneName: ?string, objectName: string }>(null);
   const domObserverRef = React.useRef<?MutationObserver>(null);
   const [
     shouldWatchProjectChanges,
@@ -534,10 +534,14 @@ const InAppTutorialOrchestrator = React.forwardRef<
         }
         setElementWithValueToWatch(elementToHighlightId);
       } else if (nextStepTrigger && nextStepTrigger.instanceAddedOnScene) {
-        const objectKey = nextStepTrigger.instanceAddedOnScene;
+        const [
+          objectKey,
+          sceneKey,
+        ] = nextStepTrigger.instanceAddedOnScene.split(':');
         const objectName = data[objectKey];
         if (!objectName) return;
-        setObjectSceneInstancesToWatch(objectName);
+        const sceneName = sceneKey ? data[sceneKey] : undefined;
+        setObjectSceneInstancesToWatch({ objectName, sceneName });
       }
     },
     [currentStep, data]
@@ -582,9 +586,13 @@ const InAppTutorialOrchestrator = React.forwardRef<
     () => {
       if (!objectSceneInstancesToWatch) return;
       if (!project || project.getLayoutsCount() === 0) return;
-      const layout = project.getLayoutAt(0);
+      const { objectName, sceneName: layoutName } = objectSceneInstancesToWatch;
+      const layout =
+        layoutName && project.hasLayoutNamed(layoutName)
+          ? project.getLayout(layoutName)
+          : project.getLayoutAt(0);
       const instances = layout.getInitialInstances();
-      if (instances.hasInstancesOfObject(objectSceneInstancesToWatch)) {
+      if (instances.hasInstancesOfObject(objectName)) {
         goToNextStep();
       }
     },

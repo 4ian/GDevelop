@@ -117,7 +117,7 @@ const interpolateElementId = (
   ) {
     const splittedElementId = elementId.split(':');
     const objectName = splittedElementId[1];
-    return `#objects-list div[data-object-name="${data[objectName]}"]`;
+    return `#scene-editor[data-active] #objects-list div[data-object-name="${data[objectName]}"]`;
   } else if (
     elementId.startsWith(
       selectorInterpolationProjectDataAccessors.objectInObjectOrResourceSelector

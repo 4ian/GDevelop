@@ -1208,7 +1208,7 @@
         "standalone": true,
         "description": {
           "messageByLocale": {
-            "en": "Drag to expand the size of the object until it stretches over your entire game area."
+            "en": "Drag to expand the size of $(background) until it stretches over your entire game area."
           }
         },
         "image": {

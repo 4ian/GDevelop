@@ -342,7 +342,7 @@ const inAppTutorial: InAppTutorial = {
     {
       id: 'ClickOnNewEvent',
       elementToHighlightId: '#add-event-button',
-      nextStepTrigger: { presenceOfElement: '#add-condition-button' },
+      nextStepTrigger: { presenceOfElement: '#add-condition-button-empty' },
       tooltip: {
         title: { messageDescriptor: t`Let’s add an **event**!` },
         description: {
@@ -353,7 +353,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'ClickOnNewCondition',
-      elementToHighlightId: '#add-condition-button',
+      elementToHighlightId: '#add-condition-button-empty',
       nextStepTrigger: { presenceOfElement: '#instruction-editor-dialog' },
       tooltip: {
         description: {
@@ -412,7 +412,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'ClickOnNewAction',
-      elementToHighlightId: '#add-action-button',
+      elementToHighlightId: '#add-action-button-empty',
       nextStepTrigger: { presenceOfElement: '#instruction-editor-dialog' },
       tooltip: {
         description: {

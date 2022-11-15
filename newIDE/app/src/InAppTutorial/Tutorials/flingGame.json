@@ -2688,6 +2688,117 @@
           }
         }
       }
+    },
+    {
+      "elementToHighlightId": "objectInObjectOrResourceSelector:startText",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-SourisSurObjet"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select $(startText)."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-SourisSurObjet",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the cursor condition."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, the condition is all set."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#events-editor[data-active] #add-condition-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add another condition."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-MouseButtonReleased"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Type “Mouse”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-MouseButtonReleased",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select “Mouse button released”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container select",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select “left (primary)”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, the condition is all set."
+          }
+        },
+        "placement": "top"
+      }
     }
   ]
 }

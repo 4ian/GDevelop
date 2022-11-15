@@ -161,17 +161,22 @@ const containsProjectDataToDisplay = (text?: TranslatedText): boolean => {
 };
 
 const isDomBasedTriggerComplete = (
-  trigger?: ?InAppTutorialFlowStepTrigger
+  trigger?: ?InAppTutorialFlowStepTrigger,
+  data: { [key: string]: string }
 ): boolean => {
   if (!trigger) return false;
   if (
     trigger.presenceOfElement &&
-    document.querySelector(trigger.presenceOfElement)
+    document.querySelector(
+      interpolateElementId(trigger.presenceOfElement, data)
+    )
   ) {
     return true;
   } else if (
     trigger.absenceOfElement &&
-    !document.querySelector(trigger.absenceOfElement)
+    !document.querySelector(
+      interpolateElementId(trigger.absenceOfElement, data)
+    )
   ) {
     return true;
   }
@@ -325,14 +330,16 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
       // Check if we can go directly to next mandatory (not-skippable) step.
       while (flow[nextStepIndex].skippable && nextStepIndex < stepCount - 1) {
-        if (isDomBasedTriggerComplete(flow[nextStepIndex].nextStepTrigger))
+        if (
+          isDomBasedTriggerComplete(flow[nextStepIndex].nextStepTrigger, data)
+        )
           nextStepIndex += 1;
         else break;
       }
 
       changeStep(nextStepIndex);
     },
-    [flow, changeStep, stepCount]
+    [flow, changeStep, stepCount, data]
   );
 
   const computeProgress = React.useCallback(
@@ -366,7 +373,8 @@ const InAppTutorialOrchestrator = React.forwardRef<
         stepIndex--
       ) {
         const isThisStepAlreadyDone = isDomBasedTriggerComplete(
-          flow[stepIndex].nextStepTrigger
+          flow[stepIndex].nextStepTrigger,
+          data
         );
         if (isThisStepAlreadyDone) {
           shouldGoToStepAtIndex = stepIndex + 1;
@@ -382,7 +390,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
         for (let shortcutStep of shortcuts) {
           // Find the first shortcut in the list that can be triggered.
           // TODO: Add support for not-dom based triggers
-          if (isDomBasedTriggerComplete(shortcutStep.trigger)) {
+          if (isDomBasedTriggerComplete(shortcutStep.trigger, data)) {
             shouldGoToStepAtIndex = flow.findIndex(
               step => step.id === shortcutStep.stepId
             );

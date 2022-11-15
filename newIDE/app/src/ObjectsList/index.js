@@ -785,6 +785,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     }
                     getItemData={(objectWithContext, index) => ({
                       objectName: objectWithContext.object.getName(),
+                      global: String(objectWithContext.global),
                     })}
                     isItemBold={isObjectWithContextGlobal}
                     onEditItem={objectWithContext =>

@@ -139,10 +139,13 @@ export const onSaveProject = (
   });
 };
 
-export const onChooseSaveProjectAsLocation = async (
+export const onChooseSaveProjectAsLocation = async ({
+  project,
+  fileMetadata,
+}: {
   project: gdProject,
-  fileMetadata: ?FileMetadata // This is the current location.
-): Promise<{|
+  fileMetadata: ?FileMetadata, // This is the current location.
+}): Promise<{|
   fileMetadata: ?FileMetadata, // This is the newly chosen location (or null if cancelled).
 |}> => {
   const defaultPath = fileMetadata ? fileMetadata.fileIdentifier : '';

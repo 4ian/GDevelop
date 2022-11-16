@@ -580,6 +580,7 @@ export const LeaderboardAdmin = ({
       text: isEditingName ? (
         <Line alignItems="center" expand noMargin>
           <TextField
+            id="edit-name-field"
             ref={newNameTextFieldRef}
             margin="none"
             style={styles.leaderboardNameTextField}
@@ -635,6 +636,7 @@ export const LeaderboardAdmin = ({
           tooltip={isEditingName ? t`Save` : t`Rename`}
           disabled={isRequestPending}
           edge="end"
+          id={isEditingName ? 'save-name-button' : 'edit-name-button'}
         >
           {isEditingName ? (
             isRequestPending ? (

@@ -114,6 +114,7 @@ const CreateAccountDialog = ({
 
   return (
     <Dialog
+      id="create-account-dialog"
       title={<Trans>Create a new GDevelop account</Trans>}
       actions={[
         <FlatButton
@@ -125,6 +126,7 @@ const CreateAccountDialog = ({
         />,
         <LeftLoader isLoading={createAccountInProgress} key="create-account">
           <DialogPrimaryButton
+            id="create-account-button"
             label={<Trans>Create my account</Trans>}
             primary
             disabled={!canCreateAccount}

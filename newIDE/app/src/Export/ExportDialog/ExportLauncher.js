@@ -396,6 +396,7 @@ export default class ExportLauncher extends Component<Props, State> {
             <RaisedButton
               label={exportPipeline.renderLaunchButtonLabel()}
               primary
+              id={`launch-export-${exportPipeline.name}-button`}
               onClick={this.launchWholeExport}
               disabled={!canLaunchBuild(authenticatedUser)}
             />

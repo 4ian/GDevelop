@@ -152,6 +152,10 @@ const Instruction = (props: Props) => {
         className={classNames({
           [disabledText]: disabled,
         })}
+        data-instruction={instruction.getType()}
+        data-instruction-inverted={
+          instruction.isInverted() ? 'true' : undefined
+        }
       >
         {mapFor(0, formattedTexts.size(), i => {
           const formatting = formattedTexts.getTextFormatting(i);

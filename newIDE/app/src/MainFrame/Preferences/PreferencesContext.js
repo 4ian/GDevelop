@@ -206,6 +206,17 @@ export type PreferencesValues = {|
   showCommunityExtensions: boolean,
   showGetStartedSection: boolean,
   showEventBasedObjectsEditor: boolean,
+  inAppTutorialsProgress: {
+    [tutorialId: string]: {
+      [userId: string]: {|
+        step: number,
+        /** Rounded progress in percentage */
+        progress: number,
+        fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
+        projectData: {| [key: string]: string |},
+      |},
+    },
+  },
 |};
 
 /**
@@ -269,6 +280,23 @@ export type Preferences = {|
   setShowGetStartedSection: (enabled: boolean) => void,
   setShowEventBasedObjectsEditor: (enabled: boolean) => void,
   getShowEventBasedObjectsEditor: () => boolean,
+  saveTutorialProgress: ({|
+    tutorialId: string,
+    userId: ?string,
+    step: number,
+    progress: number,
+    fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
+    projectData: {| [key: string]: string |},
+  |}) => void,
+  getTutorialProgress: ({|
+    tutorialId: string,
+    userId: ?string,
+  |}) => ?{|
+    step: number,
+    progress: number,
+    fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
+    projectData: {| [key: string]: string |},
+  |},
 |};
 
 export const initialPreferences = {
@@ -308,6 +336,7 @@ export const initialPreferences = {
     showCommunityExtensions: false,
     showGetStartedSection: true,
     showEventBasedObjectsEditor: false,
+    inAppTutorialsProgress: {},
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -337,12 +366,8 @@ export const initialPreferences = {
     node: ?EditorMosaicNode
   ) => {},
   getRecentProjectFiles: () => [],
-  insertRecentProjectFile: (
-    fileMetadata: FileMetadataAndStorageProviderName
-  ) => {},
-  removeRecentProjectFile: (
-    fileMetadata: FileMetadataAndStorageProviderName
-  ) => {},
+  insertRecentProjectFile: () => {},
+  removeRecentProjectFile: () => {},
   getAutoOpenMostRecentProject: () => true,
   setAutoOpenMostRecentProject: () => {},
   hadProjectOpenedDuringLastSession: () => false,
@@ -361,6 +386,8 @@ export const initialPreferences = {
   setShowGetStartedSection: (enabled: boolean) => {},
   setShowEventBasedObjectsEditor: (enabled: boolean) => {},
   getShowEventBasedObjectsEditor: () => false,
+  saveTutorialProgress: () => {},
+  getTutorialProgress: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

@@ -3236,7 +3236,7 @@
       "tooltip": {
         "description": {
           "messageByLocale": {
-            "en": "Copy this line and paste it here: \"Milliseconds: \" + ToString(round(10*(TimerElapsedTime(\"Score\"))))"
+            "en": "Copy this line and paste it here: `\"Milliseconds: \" + ToString(round(10*(TimerElapsedTime(\"Score\"))))`."
           }
         }
       },

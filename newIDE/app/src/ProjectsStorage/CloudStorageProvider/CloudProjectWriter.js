@@ -118,14 +118,23 @@ export const getWriteErrorMessage = (
   return t`An error occurred when saving the project, please verify your internet connection or try again later.`;
 };
 
-export const generateOnChooseSaveProjectAsLocation = (
+export const generateOnChooseSaveProjectAsLocation = ({
+  authenticatedUser,
+  setDialog,
+  closeDialog,
+}: {
   authenticatedUser: AuthenticatedUser,
   setDialog: (() => React.Node) => void,
-  closeDialog: () => void
-) => async (
+  closeDialog: () => void,
+}) => async ({
+  project,
+  fileMetadata,
+  onLocationSelected,
+}: {
   project: gdProject,
-  fileMetadata: ?FileMetadata
-): Promise<{|
+  fileMetadata: ?FileMetadata,
+  onLocationSelected: () => void,
+}): Promise<{|
   fileMetadata: ?FileMetadata,
 |}> => {
   if (!authenticatedUser.authenticated) {
@@ -149,6 +158,8 @@ export const generateOnChooseSaveProjectAsLocation = (
   });
 
   if (!name) return { fileMetadata: null }; // Save was cancelled.
+
+  if (onLocationSelected) onLocationSelected();
 
   const cloudProject = await createCloudProject(authenticatedUser, {
     name,

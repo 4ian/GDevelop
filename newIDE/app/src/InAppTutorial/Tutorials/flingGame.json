@@ -3330,6 +3330,61 @@
         }
       },
       "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#leaderboard-admin #edit-name-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#edit-name-field"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's change its name."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#leaderboard-admin #edit-name-field",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Type “Score”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#leaderboard-admin #save-name-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#leaderboard-admin #save-name-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Save changes when you're done."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#leaderboard-admin-dialog #close-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#leaderboard-admin-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Our leaderboard is ready."
+          }
+        }
+      }
     }
   ]
 }

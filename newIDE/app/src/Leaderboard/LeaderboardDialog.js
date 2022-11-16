@@ -24,6 +24,7 @@ const LeaderboardDialog = ({
   return (
     <Dialog
       title={<Trans>Leaderboards</Trans>}
+      id="leaderboard-admin-dialog"
       actions={[
         <FlatButton
           label={<Trans>Close</Trans>}

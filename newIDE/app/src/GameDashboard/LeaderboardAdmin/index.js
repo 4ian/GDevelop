@@ -564,6 +564,7 @@ export const LeaderboardAdmin = ({
           onAction={() => {
             onCreateLeaderboard();
           }}
+          actionButtonId="add-new-leaderboard-button"
           isLoading={isRequestPending}
         />
       </Line>
@@ -888,7 +889,12 @@ export const LeaderboardAdmin = ({
                 limits={limits}
               />
             )}
-            <ResponsiveLineStackLayout noMargin expand noColumnMargin>
+            <ResponsiveLineStackLayout
+              noMargin
+              expand
+              noColumnMargin
+              id="leaderboard-admin"
+            >
               <div style={styles.leftColumn}>
                 <Paper
                   elevation={3}

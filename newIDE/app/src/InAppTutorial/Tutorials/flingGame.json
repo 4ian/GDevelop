@@ -3256,6 +3256,80 @@
         },
         "placement": "top"
       }
+    },
+    {
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "standalone": true,
+        "title": {
+          "messageByLocale": {
+            "en": "Now we will display the other players scores"
+          }
+        },
+        "description": {
+          "messageByLocale": {
+            "en": "In the event where $(target) gets deleted, click on “Add action”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-Leaderboards--DisplayLeaderboard"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “leaderboard”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-Leaderboards--DisplayLeaderboard",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the **Display leaderboard** action."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#open-leaderboard-admin-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#leaderboard-admin-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the **Leaderboard admin**."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-new-leaderboard-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#leaderboard-admin"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Create a leaderboard."
+          }
+        }
+      },
+      "isOnClosableDialog": true
     }
   ]
 }

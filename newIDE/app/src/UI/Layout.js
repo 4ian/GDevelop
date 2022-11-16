@@ -77,6 +77,7 @@ export const TextFieldWithButtonLayout = ({
 };
 
 type LineStackLayoutProps = {|
+  id?: string,
   alignItems?: string,
   justifyContent?: string,
   expand?: boolean,
@@ -87,6 +88,7 @@ type LineStackLayoutProps = {|
 |};
 
 export const LineStackLayout = ({
+  id,
   alignItems,
   justifyContent,
   expand,
@@ -98,6 +100,7 @@ export const LineStackLayout = ({
   let isFirstChild = true;
   return (
     <Line
+      id={id}
       alignItems={alignItems}
       justifyContent={justifyContent}
       expand={expand}
@@ -122,6 +125,7 @@ export const LineStackLayout = ({
 };
 
 type ResponsiveLineStackLayoutProps = {|
+  id?: string,
   alignItems?: string,
   justifyContent?: string,
   expand?: boolean,
@@ -136,6 +140,7 @@ type ResponsiveLineStackLayoutProps = {|
 |};
 
 export const ResponsiveLineStackLayout = ({
+  id,
   alignItems,
   justifyContent,
   expand,
@@ -149,6 +154,7 @@ export const ResponsiveLineStackLayout = ({
 
   return (width || windowWidth) === 'small' ? (
     <ColumnStackLayout
+      id={id}
       noMargin={noMargin || noColumnMargin}
       expand
       useLargeSpacer={useLargeSpacer}
@@ -157,6 +163,7 @@ export const ResponsiveLineStackLayout = ({
     </ColumnStackLayout>
   ) : (
     <LineStackLayout
+      id={id}
       alignItems={alignItems}
       justifyContent={justifyContent}
       expand={expand}
@@ -169,6 +176,7 @@ export const ResponsiveLineStackLayout = ({
 };
 
 type ColumnStackLayoutProps = {|
+  id?: string,
   alignItems?: string,
   justifyContent?: string,
   expand?: boolean,
@@ -180,6 +188,7 @@ type ColumnStackLayoutProps = {|
 |};
 
 export const ColumnStackLayout = ({
+  id,
   alignItems,
   justifyContent,
   expand,
@@ -192,6 +201,7 @@ export const ColumnStackLayout = ({
   let isFirstChild = true;
   return (
     <Column
+      id={id}
       alignItems={alignItems}
       justifyContent={justifyContent}
       expand={expand}

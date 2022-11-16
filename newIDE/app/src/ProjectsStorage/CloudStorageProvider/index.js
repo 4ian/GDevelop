@@ -53,11 +53,11 @@ export default ({
       authenticatedUser
     ),
     onSaveProject: generateOnSaveProject(authenticatedUser),
-    onChooseSaveProjectAsLocation: generateOnChooseSaveProjectAsLocation(
+    onChooseSaveProjectAsLocation: generateOnChooseSaveProjectAsLocation({
       authenticatedUser,
       setDialog,
-      closeDialog
-    ),
+      closeDialog,
+    }),
     onSaveProjectAs: generateOnSaveProjectAs(
       authenticatedUser,
       setDialog,

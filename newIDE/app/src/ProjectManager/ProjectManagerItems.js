@@ -28,6 +28,7 @@ const styles = {
 };
 
 type ProjectStructureItemProps = {|
+  id?: string,
   autoGenerateNestedIndicator?: boolean,
   initiallyOpen?: boolean,
   leftIcon?: React$Element<any>,
@@ -40,6 +41,7 @@ type ProjectStructureItemProps = {|
 |};
 
 export const ProjectStructureItem = ({
+  id,
   error,
   leftIcon,
   onRefresh,
@@ -53,6 +55,7 @@ export const ProjectStructureItem = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <ListItem
+      id={id}
       open={open}
       autoGenerateNestedIndicator={autoGenerateNestedIndicator}
       initiallyOpen={initiallyOpen}
@@ -76,6 +79,7 @@ export const ProjectStructureItem = ({
 };
 
 type ItemProps = {|
+  id?: string,
   primaryText: string,
   textEndAdornment?: React.Node,
   editingName: boolean,
@@ -100,6 +104,7 @@ type ItemProps = {|
 |};
 
 export const Item = ({
+  id,
   primaryText,
   textEndAdornment,
   editingName,
@@ -174,6 +179,7 @@ export const Item = ({
     <I18n>
       {({ i18n }) => (
         <ListItem
+          id={id}
           style={{
             borderBottom: `1px solid ${gdevelopTheme.listItem.separatorColor}`,
             ...style,

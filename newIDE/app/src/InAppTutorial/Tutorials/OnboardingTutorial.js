@@ -72,7 +72,7 @@ const inAppTutorial: InAppTutorial = {
       id: 'ValidateProjectCreation',
       elementToHighlightId: '#create-project-button',
       nextStepTrigger: {
-        presenceOfElement: '[id^=tab-layout]:not([id^=tab-layout-events])',
+        presenceOfElement: '[id^=tab-layout]',
       },
       tooltip: {
         description: { messageDescriptor: t`Let's go!` },
@@ -147,7 +147,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'DragObjectToScene',
-      elementToHighlightId: '#object-item-0',
+      elementToHighlightId: 'objectInObjectsList:firstObject',
       nextStepTrigger: { instanceAddedOnScene: 'firstObject' },
       tooltip: {
         description: {
@@ -158,7 +158,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'OpenBehaviors',
-      elementToHighlightId: '#object-item-0',
+      elementToHighlightId: 'objectInObjectsList:firstObject',
       nextStepTrigger: { presenceOfElement: '#object-editor-dialog' },
       tooltip: {
         title: { messageDescriptor: t`Let's make our character move! 🛹` },
@@ -242,7 +242,7 @@ const inAppTutorial: InAppTutorial = {
       id: 'WaitForUserToHavePlayed',
       elementToHighlightId: '#toolbar-preview-button',
       nextStepTrigger: {
-        clickOnTooltipButton: "I'm done",
+        clickOnTooltipButton: { messageDescriptor: t`I'm done` },
       },
       tooltip: {
         description: {
@@ -319,7 +319,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'DragObjectToScene',
-      elementToHighlightId: '#object-item-1',
+      elementToHighlightId: 'objectInObjectsList:secondObject',
       nextStepTrigger: { instanceAddedOnScene: 'secondObject' },
       tooltip: {
         description: {
@@ -330,7 +330,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'SwitchToEventsSheet',
-      elementToHighlightId: '[id^=tab-layout-events]',
+      elementToHighlightId: 'editorTab::EventsSheet',
       nextStepTrigger: { presenceOfElement: '#add-event-button' },
       tooltip: {
         description: {
@@ -342,7 +342,7 @@ const inAppTutorial: InAppTutorial = {
     {
       id: 'ClickOnNewEvent',
       elementToHighlightId: '#add-event-button',
-      nextStepTrigger: { presenceOfElement: '#add-condition-button' },
+      nextStepTrigger: { presenceOfElement: '#add-condition-button-empty' },
       tooltip: {
         title: { messageDescriptor: t`Let’s add an **event**!` },
         description: {
@@ -353,7 +353,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'ClickOnNewCondition',
-      elementToHighlightId: '#add-condition-button',
+      elementToHighlightId: '#add-condition-button-empty',
       nextStepTrigger: { presenceOfElement: '#instruction-editor-dialog' },
       tooltip: {
         description: {
@@ -367,7 +367,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'ChooseCharacterForCondition',
-      elementToHighlightId: '#instruction-editor-dialog #object-item-0',
+      elementToHighlightId: 'objectInObjectOrResourceSelector:firstObject',
       nextStepTrigger: { presenceOfElement: '#object-instruction-selector' },
       tooltip: {
         description: { messageDescriptor: t`Choose $(firstObject)` },
@@ -412,7 +412,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'ClickOnNewAction',
-      elementToHighlightId: '#add-action-button',
+      elementToHighlightId: '#add-action-button-empty',
       nextStepTrigger: { presenceOfElement: '#instruction-editor-dialog' },
       tooltip: {
         description: {
@@ -423,7 +423,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'ChoseCoinForAction',
-      elementToHighlightId: '#instruction-editor-dialog #object-item-1',
+      elementToHighlightId: 'objectInObjectOrResourceSelector:secondObject',
       nextStepTrigger: { presenceOfElement: '#object-instruction-selector' },
       tooltip: {
         description: { messageDescriptor: t`Choose $(secondObject)` },
@@ -467,7 +467,7 @@ const inAppTutorial: InAppTutorial = {
       id: 'WaitForUserToHavePlayedWithCoinCollection',
       elementToHighlightId: '#toolbar-preview-button',
       nextStepTrigger: {
-        clickOnTooltipButton: "I'm done",
+        clickOnTooltipButton: { messageDescriptor: t`I'm done` },
       },
       tooltip: {
         description: {

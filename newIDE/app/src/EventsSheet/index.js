@@ -1634,6 +1634,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   render() {
     const {
+      isActive,
       project,
       scope,
       events,
@@ -1674,6 +1675,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               goToNextSearchResult,
             }) => (
               <div
+                id="events-editor"
+                data-active={isActive ? 'true' : undefined}
                 className="gd-events-sheet"
                 style={styles.container}
                 onKeyDown={this._keyboardShortcuts.onKeyDown}

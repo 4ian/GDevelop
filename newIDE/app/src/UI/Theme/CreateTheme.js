@@ -439,7 +439,19 @@ export function createGdevelopTheme({
           styles['ThemeSurfaceAlternateCanvasLightBackgroundColor'],
       },
       searchBar: {
-        backgroundColor: styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
+        backgroundColor: {
+          default: styles['ThemeSearchDefaultBackgroundColor'],
+          disabled: styles['ThemeSearchDisabledBackgroundColor'],
+        },
+        textColor: {
+          default: styles['ThemeSearchDefaultTextColor'],
+          typed: styles['ThemeSearchTypedTextColor'],
+          disabled: styles['ThemeSearchDisabledTextColor'],
+        },
+        borderColor: {
+          selected: styles['ThemeSearchSelectedBorderColor'],
+          typed: styles['ThemeSearchTypedBorderColor'],
+        },
       },
       listItem: {
         groupBackgroundColor: styles['ThemeSurfaceWindowBackgroundColor'],

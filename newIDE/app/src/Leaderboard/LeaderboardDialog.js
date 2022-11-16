@@ -27,6 +27,7 @@ const LeaderboardDialog = ({
       id="leaderboard-admin-dialog"
       actions={[
         <FlatButton
+          id="close-button"
           label={<Trans>Close</Trans>}
           disabled={isLoading}
           onClick={onClose}

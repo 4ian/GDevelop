@@ -9,9 +9,8 @@ import {
   Collapse,
   Typography,
   TextField as MuiTextField,
+  Paper,
 } from '@material-ui/core';
-import Close from '@material-ui/icons/Close';
-import Search from '@material-ui/icons/Search';
 import FilterList from '@material-ui/icons/FilterList';
 import Autocomplete, {
   createFilterOptions,
@@ -24,7 +23,10 @@ import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 import { Column, Line } from './Grid';
 import TagChips from './TagChips';
 import { I18n } from '@lingui/react';
-import Paper from './Paper';
+import Search from './CustomSvgIcons/Search';
+import Cross from './CustomSvgIcons/Cross';
+import GDevelopThemeContext from './Theme/ThemeContext';
+import { type GDevelopTheme } from './Theme';
 
 type TagsHandler = {|
   remove: string => void,
@@ -56,59 +58,74 @@ type Props = {|
   helpPagePath?: ?string,
 |};
 
-const getStyles = (value: ?string, disabled?: boolean) => {
-  const nonEmpty = !!value && value.length > 0;
-
-  return {
-    root: {
-      height: 30,
-      display: 'flex',
-      flex: 1,
-      justifyContent: 'space-between',
+const getStyles = ({
+  nonEmpty,
+  disabled,
+  theme,
+  aspect,
+  focused,
+}: {
+  nonEmpty: boolean,
+  disabled: boolean,
+  theme: GDevelopTheme,
+  aspect?: 'integrated-search-bar',
+  focused: boolean,
+}) => ({
+  root: {
+    height: 30,
+    display: 'flex',
+    flex: 1,
+    justifyContent: 'space-between',
+    backgroundColor: disabled
+      ? theme.searchBar.backgroundColor.disabled
+      : theme.searchBar.backgroundColor.default,
+    borderRadius: aspect === 'integrated-search-bar' ? 0 : 4,
+  },
+  iconButtonClose: {
+    style: {
+      opacity: !disabled ? 0.54 : 0.38,
+      transform: nonEmpty ? 'scale(1, 1)' : 'scale(0, 0)',
+      transition: 'transform 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
     },
-    iconButtonClose: {
-      style: {
-        opacity: !disabled ? 0.54 : 0.38,
-        transform: nonEmpty ? 'scale(1, 1)' : 'scale(0, 0)',
-        transition: 'transform 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-      },
-      iconStyle: {
-        opacity: nonEmpty ? 1 : 0,
-        transition: 'opacity 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-      },
+    iconStyle: {
+      opacity: nonEmpty ? 1 : 0,
+      transition: 'opacity 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
     },
-    iconButtonSearch: {
-      style: {
-        opacity: !disabled ? 0.54 : 0.38,
-        transform: nonEmpty ? 'scale(0, 0)' : 'scale(1, 1)',
-        transition: 'transform 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-        marginRight: -30,
-      },
-      iconStyle: {
-        opacity: nonEmpty ? 0 : 1,
-        transition: 'opacity 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-      },
+  },
+  iconButtonSearch: {
+    container: {
+      padding: '5px 10px',
     },
-    iconButtonFilter: {
-      style: {
-        opacity: !disabled ? 0.54 : 0.38,
-      },
+    iconStyle: {
+      fontSize: 18,
+      opacity: focused ? 1 : 0.5,
+      transition: 'opacity 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
     },
-    iconButtonHelp: {
-      style: {
-        opacity: !disabled ? 0.54 : 0.38,
-      },
+  },
+  iconButtonFilter: {
+    style: {
+      opacity: !disabled ? 0.54 : 0.38,
     },
-    input: {
-      width: '100%',
+  },
+  iconButtonHelp: {
+    style: {
+      opacity: !disabled ? 0.54 : 0.38,
     },
-    searchContainer: {
-      position: 'relative',
-      margin: 'auto 8px',
-      width: '100%',
-    },
-  };
-};
+  },
+  inputStyle: {
+    padding: 0,
+    color: disabled
+      ? theme.searchBar.textColor.disabled
+      : nonEmpty && focused
+      ? theme.searchBar.textColor.focused
+      : theme.searchBar.textColor.default,
+  },
+  searchContainer: {
+    position: 'relative',
+    margin: 'auto 4px',
+    width: '100%',
+  },
+});
 
 const useAutocompleteStyles = makeStyles(
   ({
@@ -123,6 +140,23 @@ const useAutocompleteStyles = makeStyles(
     groupLabel: { color: `${primary}${primary.length > 4 ? '88' : '8'}` },
   })
 );
+
+// We override the style of paper for the border, as we need access
+// to the hover/focus status of the paper to change the border color.
+const usePaperStyles = ({ theme, disabled, nonEmpty, focused }) =>
+  makeStyles({
+    root: {
+      border: `1px solid ${
+        focused ? theme.searchBar.borderColor.focused : 'transparent'
+      }`,
+      '&:hover': {
+        border:
+          !focused &&
+          !disabled &&
+          `1px solid ${theme.searchBar.borderColor.hovered}`,
+      },
+    },
+  })();
 
 export type SearchBarInterface = {|
   focus: () => void,
@@ -169,6 +203,10 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       }
     };
 
+    const [isInputFocused, setIsInputFocused] = React.useState(false);
+
+    const GDevelopTheme = React.useContext(GDevelopThemeContext);
+
     // This variable represents the content of the input (text field)
     const [value, setValue] = React.useState<string>(parentValue);
     // This variable represents the value of the autocomplete, used to
@@ -180,8 +218,21 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
 
     const textField = React.useRef<?TextField>(null);
 
-    const styles = getStyles(value, disabled);
+    const nonEmpty = !!value && value.length > 0;
+    const styles = getStyles({
+      nonEmpty,
+      disabled: !!disabled,
+      theme: GDevelopTheme,
+      aspect,
+      focused: isInputFocused,
+    });
     const autocompleteStyles = useAutocompleteStyles();
+    const paperStyles = usePaperStyles({
+      theme: GDevelopTheme,
+      disabled: !!disabled,
+      nonEmpty,
+      focused: isInputFocused,
+    });
 
     const changeValue = React.useCallback(
       newValue => {
@@ -225,9 +276,14 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     });
 
     const handleBlur = () => {
+      setIsInputFocused(false);
       if (!value || value.trim() === '') {
         changeValue('');
       }
+    };
+
+    const handleFocus = () => {
+      setIsInputFocused(true);
     };
 
     const handleInput = (e: {| target: {| value: string |} |}) => {
@@ -287,11 +343,10 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
         {({ i18n }) => (
           <Column noMargin>
             <Line noMargin>
-              <Paper
-                style={styles.root}
-                square={aspect === 'integrated-search-bar'}
-                background="light"
-              >
+              <Paper classes={paperStyles} style={styles.root}>
+                <div style={styles.iconButtonSearch.container}>
+                  <Search style={styles.iconButtonSearch.iconStyle} />
+                </div>
                 <div style={styles.searchContainer}>
                   {tags ? (
                     <Autocomplete
@@ -309,6 +364,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                       onInputChange={handleAutocompleteInputChange}
                       onKeyPress={handleKeyPressed}
                       onBlur={handleBlur}
+                      onFocus={handleFocus}
                       renderOption={option => <Typography>{option}</Typography>}
                       renderInput={params => (
                         <MuiTextField
@@ -320,6 +376,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                             disableUnderline: true,
                             endAdornment: null,
                             placeholder: i18n._(placeholder || t`Search`),
+                            style: styles.inputStyle,
                           }}
                         />
                       )}
@@ -334,10 +391,11 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                       onChange={handleInput}
                       onKeyUp={handleKeyPressed}
                       fullWidth
-                      style={styles.input}
                       underlineShow={false}
                       disabled={disabled}
                       ref={textField}
+                      inputStyle={styles.inputStyle}
+                      onFocus={handleFocus}
                     />
                   )}
                 </div>
@@ -364,19 +422,12 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                   />
                 )}
                 <IconButton
-                  style={styles.iconButtonSearch.style}
-                  disabled={disabled}
-                  size="small"
-                >
-                  <Search style={styles.iconButtonSearch.iconStyle} />
-                </IconButton>
-                <IconButton
                   onClick={handleCancel}
                   style={styles.iconButtonClose.style}
                   disabled={disabled}
                   size="small"
                 >
-                  <Close style={styles.iconButtonClose.iconStyle} />
+                  <Cross style={styles.iconButtonClose.iconStyle} />
                 </IconButton>
               </Paper>
             </Line>

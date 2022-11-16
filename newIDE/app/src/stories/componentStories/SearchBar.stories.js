@@ -1,36 +1,90 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 import SearchBar from '../../UI/SearchBar';
 import { useFilters } from '../../UI/Search/FiltersChooser';
+import { ColumnStackLayout } from '../../UI/Layout';
 
 export default {
   title: 'UI Building Blocks/SearchBar',
   component: SearchBar,
-  decorators: [muiDecorator],
+  decorators: [muiDecorator, paperDecorator],
 };
 
-export const Vanilla = () => {
+const Vanilla = () => {
   const [value, setValue] = React.useState<string>('');
   return (
     <SearchBar
       value={value}
-      onChange={action('change')}
+      onChange={setValue}
       onRequestSearch={action('request search')}
     />
   );
 };
-export const WithMenu = () => {
+
+const WithPlaceholder = () => {
   const [value, setValue] = React.useState<string>('');
   return (
     <SearchBar
       value={value}
-      onChange={action('change')}
+      onChange={setValue}
       onRequestSearch={action('request search')}
+      placeholder="Search with placeholder"
+    />
+  );
+};
+
+const Disabled = () => {
+  const [value, setValue] = React.useState<string>(
+    'something typed in disabled field'
+  );
+  return (
+    <SearchBar
+      value={value}
+      onChange={setValue}
+      onRequestSearch={action('request search')}
+      disabled
+    />
+  );
+};
+
+const Integrated = () => {
+  const [value, setValue] = React.useState<string>('');
+  return (
+    <SearchBar
+      value={value}
+      onChange={setValue}
+      onRequestSearch={action('request search')}
+      aspect="integrated-search-bar"
+      placeholder="Search integrated"
+    />
+  );
+};
+
+const WithHelpIcon = () => {
+  const [value, setValue] = React.useState<string>('');
+  return (
+    <SearchBar
+      value={value}
+      onChange={setValue}
+      onRequestSearch={action('request search')}
+      helpPagePath="https://gdevelop.io"
+      placeholder="Search with help icon"
+    />
+  );
+};
+
+const WithMenu = () => {
+  const [value, setValue] = React.useState<string>('');
+  return (
+    <SearchBar
+      value={value}
+      onChange={setValue}
+      onRequestSearch={action('request search')}
+      placeholder="Search with menu"
       buildMenuTemplate={() => [
         {
           type: 'checkbox',
@@ -55,15 +109,15 @@ export const WithMenu = () => {
   );
 };
 
-export const WithTags = () => {
+const WithTags = () => {
   const [value, setValue] = React.useState<string>('');
-  const [chosenTags, setChosenTags] = React.useState<Set<string>>(new Set());
   const filtersState = useFilters();
   return (
     <SearchBar
       value={value}
-      onChange={action('change')}
+      onChange={setValue}
       onRequestSearch={action('request search')}
+      placeholder="Search with tags"
       tagsHandler={{
         add: filtersState.addFilter,
         remove: filtersState.removeFilter,
@@ -73,3 +127,15 @@ export const WithTags = () => {
     />
   );
 };
+
+export const AllOptions = () => (
+  <ColumnStackLayout>
+    <Vanilla />
+    <WithPlaceholder />
+    <Disabled />
+    <Integrated />
+    <WithHelpIcon />
+    <WithMenu />
+    <WithTags />
+  </ColumnStackLayout>
+);

@@ -6,8 +6,10 @@
     "SwitchToEvents1": "EventsSheet",
     "SwitchToEvents2": "EventsSheet",
     "SwitchToEvents3": "EventsSheet",
+    "SwitchToEvents4": "EventsSheet",
     "SwitchToScene1": "Scene",
-    "SwitchToScene2": "Scene"
+    "SwitchToScene2": "Scene",
+    "ClickOnNewObjectButtonForScore": "Scene"
   },
   "endDialog": {
     "content": [
@@ -1426,7 +1428,7 @@
         "placement": "left",
         "description": {
           "messageByLocale": {
-            "en": "Now let's create a title!"
+            "en": "Now let's create a winning message!"
           }
         }
       }
@@ -2865,6 +2867,391 @@
         "description": {
           "messageByLocale": {
             "en": "Alright, the action is all set."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "editorTab:playScene:Scene",
+      "nextStepTrigger": {
+        "presenceOfElement": "[id^=tab-layout]:not([id^=tab-layout-events])[data-active]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's get back to the scene to add a score."
+          }
+        }
+      }
+    },
+    {
+      "id": "ClickOnNewObjectButtonForScore",
+      "elementToHighlightId": "#scene-editor[data-active=true] #add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Let's create a text that will display the player score."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#new-object-from-scratch-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-category-TextObject--Text"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's create a text from scratch."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-category-TextObject--Text",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-name"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **Text** object"
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-name",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the object name to “Score”."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#text-object-font-size",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the font size to **50**."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#text-object-initial-text",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the initial text to display “Milliseconds: 0”."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done."
+          }
+        }
+      },
+      "mapProjectData": {
+        "scoreText": "sceneLastObjectName:playScene"
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:scoreText",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "scoreText"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Drag $(scoreText) into the top left corner of the screen."
+          }
+        },
+        "placement": "left"
+      }
+    },
+    {
+      "elementToHighlightId": "editorTab:playScene:EventsSheet",
+      "nextStepTrigger": {
+        "presenceOfElement": "[id^=tab-layout-events][data-active]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's change the score dynamically."
+          }
+        }
+      }
+    },
+    {
+      "id": "SwitchToEvents4",
+      "elementToHighlightId": "#toolbar-add-event-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-condition-button-empty"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We will create a timer that will start when the scene starts."
+          }
+        }
+      },
+      "skippable": true
+    },
+    {
+      "elementToHighlightId": "#add-condition-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add a condition."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-DepartScene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “Scene”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-DepartScene",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the **At the beginning of the scene** condition."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's create the timer now."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#add-action-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Create an action."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-ResetTimer"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “Scene timer”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-ResetTimer",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the **Start (or reset) a scene timer** action."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container textarea",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Type “Score” (in quotations)."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "placement": "top"
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#toolbar-add-event-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-condition-button-empty"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's display the score."
+          }
+        }
+      },
+      "skippable": true
+    },
+    {
+      "elementToHighlightId": "#add-action-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's make the score dynamic."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectOrResourceSelector:scoreText",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-TextObject--String"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select $(scoreText)."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-TextObject--String",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We will change the text."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container select",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select “= (set to)”."
+          }
+        }
+      },
+      "placement": "left",
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container textarea",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Copy this line and paste it here: \"Milliseconds: \" + ToString(round(10*(TimerElapsedTime(\"Score\"))))"
+          }
+        }
+      },
+      "placement": "left",
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're all set."
           }
         },
         "placement": "top"

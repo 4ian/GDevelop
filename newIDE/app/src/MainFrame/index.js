@@ -1,5 +1,4 @@
 // @flow
-import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import './MainFrame.css';
@@ -78,7 +77,7 @@ import ChangelogDialogContainer from './Changelog/ChangelogDialogContainer';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { getNotNullTranslationFunction } from '../Utils/i18n/getTranslationFunction';
 import { type I18n } from '@lingui/core';
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
@@ -161,6 +160,8 @@ const styles = {
   },
 };
 
+const defaultSnackbarAutoHideDuration = 3000;
+
 const findStorageProviderFor = (
   i18n: I18n,
   storageProviders: Array<StorageProvider>,
@@ -207,6 +208,7 @@ export type State = {|
   editorTabs: EditorTabsState,
   snackMessage: string,
   snackMessageOpen: boolean,
+  snackDuration: ?number,
   updateStatus: ElectronUpdateStatus,
   openFromStorageProviderDialogOpen: boolean,
   saveToStorageProviderDialogOpen: boolean,
@@ -271,6 +273,7 @@ const MainFrame = (props: Props) => {
       editorTabs: getEditorTabsInitialState(),
       snackMessage: '',
       snackMessageOpen: false,
+      snackDuration: defaultSnackbarAutoHideDuration,
       updateStatus: { message: '', status: 'unknown' },
       openFromStorageProviderDialogOpen: false,
       saveToStorageProviderDialogOpen: false,
@@ -535,24 +538,38 @@ const MainFrame = (props: Props) => {
     openProfileDialog(true);
   };
 
-  const _showSnackMessage = React.useCallback(
-    (snackMessage: string) => {
-      setState(state => ({
-        ...state,
-        snackMessage,
-        snackMessageOpen: true,
-      }));
-    },
-    [setState]
-  );
   const _closeSnackMessage = React.useCallback(
     () => {
       setState(state => ({
         ...state,
         snackMessageOpen: false,
+        snackDuration: defaultSnackbarAutoHideDuration, // Reset to default when closing the snackbar.
       }));
     },
     [setState]
+  );
+
+  const _showSnackMessage = React.useCallback(
+    (snackMessage: string, autoHideDuration?: number | null) => {
+      setState(state => ({
+        ...state,
+        snackMessage,
+        snackMessageOpen: true,
+        snackDuration:
+          autoHideDuration !== undefined
+            ? autoHideDuration // Allow setting null, for infinite duration.
+            : defaultSnackbarAutoHideDuration,
+      }));
+    },
+    [setState]
+  );
+
+  const _replaceSnackMessage = React.useCallback(
+    (snackMessage: string, autoHideDuration?: number | null) => {
+      _closeSnackMessage();
+      setTimeout(() => _showSnackMessage(snackMessage, autoHideDuration), 200);
+    },
+    [_closeSnackMessage, _showSnackMessage]
   );
 
   const openInitialFileMetadata = async () => {
@@ -1882,10 +1899,12 @@ const MainFrame = (props: Props) => {
       try {
         let newFileMetadata: ?FileMetadata = null;
         if (onChooseSaveProjectAsLocation) {
-          const { fileMetadata } = await onChooseSaveProjectAsLocation(
-            currentProject,
-            currentFileMetadata
-          );
+          const { fileMetadata } = await onChooseSaveProjectAsLocation({
+            project: currentProject,
+            fileMetadata: currentFileMetadata,
+            onLocationSelected: () =>
+              _showSnackMessage(i18n._(t`Creating project...`), null),
+          });
           if (!fileMetadata) {
             return; // Save as was cancelled.
           }
@@ -1896,7 +1915,8 @@ const MainFrame = (props: Props) => {
           currentProject,
           newFileMetadata,
           {
-            onStartSaving: () => _showSnackMessage(i18n._(t`Saving...`)),
+            onStartSaving: () =>
+              _replaceSnackMessage(i18n._(t`Saving...`), null),
             onMoveResources: async () => {
               if (newFileMetadata && currentFileMetadata)
                 await ensureResourcesAreMoved({
@@ -1916,7 +1936,7 @@ const MainFrame = (props: Props) => {
         if (!wasSaved) return; // Save was cancelled, don't do anything.
 
         if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
-        _showSnackMessage(i18n._(t`Project properly saved`));
+        _replaceSnackMessage(i18n._(t`Project properly saved`));
 
         if (!newFileMetadata) {
           // Some storage provider like "DownloadFile" don't have file metadata, because
@@ -1944,6 +1964,8 @@ const MainFrame = (props: Props) => {
           }));
         }
       } catch (rawError) {
+        // If any error happens, ensure we hide the snackbars.
+        _closeSnackMessage();
         const errorMessage = getWriteErrorMessage
           ? getWriteErrorMessage(rawError)
           : t`An error occurred when saving the project. Please try again later.`;
@@ -1967,6 +1989,8 @@ const MainFrame = (props: Props) => {
       setState,
       state.editorTabs,
       _showSnackMessage,
+      _replaceSnackMessage,
+      _closeSnackMessage,
       getStorageProvider,
       preferences,
       updateWindowTitle,
@@ -2014,7 +2038,7 @@ const MainFrame = (props: Props) => {
       }
 
       saveUiSettings(state.editorTabs);
-      _showSnackMessage(i18n._(t`Saving...`));
+      _showSnackMessage(i18n._(t`Saving...`), null);
 
       // Protect against concurrent saves, which can trigger issues with the
       // file system.
@@ -2060,7 +2084,7 @@ const MainFrame = (props: Props) => {
           }
 
           if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
-          _showSnackMessage(i18n._(t`Project properly saved`));
+          _replaceSnackMessage(i18n._(t`Project properly saved`));
         }
       } catch (rawError) {
         showErrorBox({
@@ -2080,6 +2104,7 @@ const MainFrame = (props: Props) => {
       currentFileMetadata,
       getStorageProviderOperations,
       _showSnackMessage,
+      _replaceSnackMessage,
       i18n,
       unsavedChanges,
       saveProjectAs,
@@ -2715,7 +2740,7 @@ const MainFrame = (props: Props) => {
       />
       <Snackbar
         open={state.snackMessageOpen}
-        autoHideDuration={3000}
+        autoHideDuration={state.snackDuration}
         onClose={_closeSnackMessage}
         ContentProps={{
           'aria-describedby': 'snackbar-message',

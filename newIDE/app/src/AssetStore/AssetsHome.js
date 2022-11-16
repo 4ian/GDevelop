@@ -14,7 +14,7 @@ import type {
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { Line, Column } from '../UI/Grid';
-import ScrollView from '../UI/ScrollView';
+import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Paper from '../UI/Paper';
@@ -172,70 +172,93 @@ const PrivateAssetPackTile = ({
   );
 };
 
+export type AssetsHomeInterface = {|
+  scrollToPosition: (y: number) => void,
+|};
+
 type Props = {|
   publicAssetPacks: PublicAssetPacks,
   privateAssetPacksListingData: Array<PrivateAssetPackListingData>,
   assetPackRandomOrdering: Array<number>,
   onPublicAssetPackSelection: PublicAssetPack => void,
   onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
+  onScroll?: number => void,
 |};
 
-export const AssetsHome = ({
-  publicAssetPacks: { starterPacks },
-  privateAssetPacksListingData,
-  assetPackRandomOrdering,
-  onPublicAssetPackSelection,
-  onPrivateAssetPackSelection,
-}: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
+export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
+  (
+    {
+      publicAssetPacks: { starterPacks },
+      privateAssetPacksListingData,
+      assetPackRandomOrdering,
+      onPublicAssetPackSelection,
+      onPrivateAssetPackSelection,
+      onScroll,
+    }: Props,
+    ref
+  ) => {
+    const windowWidth = useResponsiveWindowWidth();
+    const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
 
-  const starterPacksTiles = starterPacks.map(assetPack => (
-    <PublicAssetPackTile
-      assetPack={assetPack}
-      onSelect={() => onPublicAssetPackSelection(assetPack)}
-      key={assetPack.tag}
-    />
-  ));
+    const scrollView = React.useRef<?ScrollViewInterface>(null);
+    React.useImperativeHandle(ref, () => ({
+      scrollToPosition: (y: number) => {
+        const scrollViewElement = scrollView.current;
+        if (!scrollViewElement) return;
 
-  const privateAssetPacksTiles = privateAssetPacksListingData.map(
-    assetPackListingData => (
-      <PrivateAssetPackTile
-        assetPackListingData={assetPackListingData}
-        onSelect={() => {
-          onPrivateAssetPackSelection(assetPackListingData);
-        }}
-        owned={
-          !!receivedAssetPacks &&
-          !!receivedAssetPacks.find(pack => pack.id === assetPackListingData.id)
-        }
-        key={assetPackListingData.id}
+        scrollViewElement.scrollToPosition(y);
+      },
+    }));
+
+    const starterPacksTiles = starterPacks.map(assetPack => (
+      <PublicAssetPackTile
+        assetPack={assetPack}
+        onSelect={() => onPublicAssetPackSelection(assetPack)}
+        key={assetPack.tag}
       />
-    )
-  );
+    ));
 
-  const allTiles = starterPacksTiles
-    .concat(privateAssetPacksTiles)
-    .map((tile, index) => ({ pos: assetPackRandomOrdering[index], tile }))
-    .sort((a, b) => a.pos - b.pos)
-    .map(sortObject => sortObject.tile);
+    const privateAssetPacksTiles = privateAssetPacksListingData.map(
+      assetPackListingData => (
+        <PrivateAssetPackTile
+          assetPackListingData={assetPackListingData}
+          onSelect={() => {
+            onPrivateAssetPackSelection(assetPackListingData);
+          }}
+          owned={
+            !!receivedAssetPacks &&
+            !!receivedAssetPacks.find(
+              pack => pack.id === assetPackListingData.id
+            )
+          }
+          key={assetPackListingData.id}
+        />
+      )
+    );
 
-  return (
-    <ScrollView>
-      <GridList
-        cols={
-          windowWidth === 'small'
-            ? columnsForSmallWindow
-            : windowWidth === 'medium'
-            ? columnsForMediumWindow
-            : columns
-        }
-        style={styles.grid}
-        cellHeight="auto"
-        spacing={cellSpacing}
-      >
-        {allTiles}
-      </GridList>
-    </ScrollView>
-  );
-};
+    const allTiles = starterPacksTiles
+      .concat(privateAssetPacksTiles)
+      .map((tile, index) => ({ pos: assetPackRandomOrdering[index], tile }))
+      .sort((a, b) => a.pos - b.pos)
+      .map(sortObject => sortObject.tile);
+
+    return (
+      <ScrollView ref={scrollView} onScroll={onScroll}>
+        <GridList
+          cols={
+            windowWidth === 'small'
+              ? columnsForSmallWindow
+              : windowWidth === 'medium'
+              ? columnsForMediumWindow
+              : columns
+          }
+          style={styles.grid}
+          cellHeight="auto"
+          spacing={cellSpacing}
+        >
+          {allTiles}
+        </GridList>
+      </ScrollView>
+    );
+  }
+);

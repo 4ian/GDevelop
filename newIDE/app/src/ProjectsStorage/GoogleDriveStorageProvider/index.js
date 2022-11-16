@@ -388,10 +388,13 @@ export default ({
             fileMetadata: newFileMetadata,
           }));
       },
-      onChooseSaveProjectAsLocation: (
+      onChooseSaveProjectAsLocation: ({
+        project,
+        fileMetadata,
+      }: {
         project: gdProject,
-        fileMetadata: ?FileMetadata
-      ) => {
+        fileMetadata: ?FileMetadata,
+      }) => {
         return new Promise(resolve => {
           setDialog(() => (
             <GoogleDriveSaveAsDialog

@@ -167,13 +167,13 @@
           "comment": "Palette/Grey/30"
         }
       },
-      "selected": {
+      "hovered": {
         "border-color": {
           "value": "#7F7F85",
           "comment": "Palette/Grey/50"
         }
       },
-      "typed": {
+      "focused": {
         "text-color": {
           "value": "#FAFAFA",
           "comment": "Palette/Grey/00"

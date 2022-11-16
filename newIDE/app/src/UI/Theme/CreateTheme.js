@@ -445,12 +445,12 @@ export function createGdevelopTheme({
         },
         textColor: {
           default: styles['ThemeSearchDefaultTextColor'],
-          typed: styles['ThemeSearchTypedTextColor'],
+          focused: styles['ThemeSearchFocusedTextColor'],
           disabled: styles['ThemeSearchDisabledTextColor'],
         },
         borderColor: {
-          selected: styles['ThemeSearchSelectedBorderColor'],
-          typed: styles['ThemeSearchTypedBorderColor'],
+          hovered: styles['ThemeSearchHoveredBorderColor'],
+          focused: styles['ThemeSearchFocusedBorderColor'],
         },
       },
       listItem: {

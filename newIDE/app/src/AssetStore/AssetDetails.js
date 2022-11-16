@@ -133,13 +133,6 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
       PrivateAssetsAuthorizationContext
     );
 
-    const similarAssetFilters = React.useMemo(
-      () => [new SimilarAssetStoreSearchFilter(assetShortHeader)],
-      [assetShortHeader]
-    );
-    const searchResults = useSearchItem('', null, null, similarAssetFilters);
-    const truncatedSearchResults = searchResults && searchResults.slice(0, 60);
-
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
       scrollToPosition: (y: number) => {
@@ -232,6 +225,13 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
       asset && direction
         ? direction.sprites.map(sprite => assetResources[sprite.image])
         : null;
+
+    const similarAssetFilters = React.useMemo(
+      () => [new SimilarAssetStoreSearchFilter(assetShortHeader)],
+      [assetShortHeader]
+    );
+    const searchResults = useSearchItem('', null, null, similarAssetFilters);
+    const truncatedSearchResults = searchResults && searchResults.slice(0, 60);
 
     return (
       <ScrollView

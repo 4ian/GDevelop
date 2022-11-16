@@ -138,7 +138,7 @@ export const AssetStore = ({ project }: Props) => {
         hasAppliedSavedScrollPosition.current
       ) {
         navigationState.getCurrentPage().scrollPosition = y;
-        // The scroll position is right, we can continue to save it.
+        // The scroll position must continue to be saved.
         hasAppliedSavedScrollPosition.current = true;
       }
     },

@@ -45,6 +45,8 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
           </Text>
           <ButtonGroup>
             <Button
+              id="yes-button"
+              data-effective={effectiveValue === 'yes' ? 'true' : undefined}
               variant={effectiveValue === 'yes' ? 'contained' : 'outlined'}
               color={effectiveValue === 'yes' ? 'secondary' : 'default'}
               onClick={() => this.props.onChange('yes')}
@@ -53,6 +55,8 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
               <Trans>Yes</Trans>
             </Button>
             <Button
+              id="no-button"
+              data-effective={effectiveValue !== 'yes' ? 'true' : undefined}
               variant={effectiveValue !== 'yes' ? 'contained' : 'outlined'}
               color={effectiveValue !== 'yes' ? 'secondary' : 'default'}
               onClick={() => this.props.onChange('no')}

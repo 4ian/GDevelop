@@ -64,6 +64,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           getValue: (instance: gdInitialInstance) => instance.getX(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
             instance.setX(newValue),
+          roundValue: true,
         },
         {
           name: this.props.i18n._(t`Y`),
@@ -71,6 +72,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           getValue: (instance: gdInitialInstance) => instance.getY(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
             instance.setY(newValue),
+          roundValue: true,
         },
       ],
     },
@@ -80,6 +82,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       getValue: (instance: gdInitialInstance) => instance.getAngle(),
       setValue: (instance: gdInitialInstance, newValue: number) =>
         instance.setAngle(newValue),
+      roundValue: true,
     },
     {
       name: this.props.i18n._(t`Lock position/angle in the editor`),

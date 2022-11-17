@@ -57,7 +57,7 @@
     {
       "elementToHighlightId": "#create-project-button",
       "nextStepTrigger": {
-        "presenceOfElement": "[id^=tab-layout]:not([id^=tab-layout-events])"
+        "presenceOfElement": "[id^=tab-layout]"
       },
       "tooltip": {
         "description": {
@@ -1837,7 +1837,7 @@
     {
       "elementToHighlightId": "editorTab:playScene:Scene",
       "nextStepTrigger": {
-        "presenceOfElement": "[id^=tab-layout]:not([id^=tab-layout-events])[data-active]"
+        "editorIsActive": "playScene:Scene"
       },
       "tooltip": {
         "description": {
@@ -2150,7 +2150,7 @@
     {
       "elementToHighlightId": "editorTab:playScene:Scene",
       "nextStepTrigger": {
-        "presenceOfElement": "[id^=tab-layout]:not([id^=tab-layout-events])[data-active]"
+        "editorIsActive": "playScene:Scene"
       },
       "tooltip": {
         "description": {
@@ -2875,7 +2875,7 @@
     {
       "elementToHighlightId": "editorTab:playScene:Scene",
       "nextStepTrigger": {
-        "presenceOfElement": "[id^=tab-layout]:not([id^=tab-layout-events])[data-active]"
+        "editorIsActive": "playScene:Scene"
       },
       "tooltip": {
         "description": {
@@ -3008,7 +3008,7 @@
     {
       "elementToHighlightId": "editorTab:playScene:EventsSheet",
       "nextStepTrigger": {
-        "presenceOfElement": "[id^=tab-layout-events][data-active]"
+        "editorIsActive": "playScene:EventsSheet"
       },
       "tooltip": {
         "description": {

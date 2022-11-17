@@ -6,6 +6,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import WarningIcon from '@material-ui/icons/Warning';
 
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { IconContainer } from '../UI/IconContainer';
 import { ListItem } from '../UI/List';
 import TextField, {
@@ -80,6 +81,7 @@ export const ProjectStructureItem = ({
 
 type ItemProps = {|
   id?: string,
+  data?: HTMLDataset,
   primaryText: string,
   textEndAdornment?: React.Node,
   editingName: boolean,
@@ -105,6 +107,7 @@ type ItemProps = {|
 
 export const Item = ({
   id,
+  data,
   primaryText,
   textEndAdornment,
   editingName,
@@ -180,6 +183,7 @@ export const Item = ({
       {({ i18n }) => (
         <ListItem
           id={id}
+          data={data}
           style={{
             borderBottom: `1px solid ${gdevelopTheme.listItem.separatorColor}`,
             ...style,

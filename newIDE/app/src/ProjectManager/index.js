@@ -749,6 +749,11 @@ export default class ProjectManager extends React.Component<Props, State> {
                         <Item
                           id={`scene-item-${i}`}
                           key={i}
+                          data={{
+                            scene: name,
+                            default:
+                              name === firstLayoutName ? 'true' : undefined,
+                          }}
                           primaryText={name}
                           textEndAdornment={
                             name === firstLayoutName ? (

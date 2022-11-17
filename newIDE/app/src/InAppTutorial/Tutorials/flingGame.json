@@ -2856,10 +2856,10 @@
           "messageByLocale": {
             "en": "Select “$(playScene)”."
           }
-        }
+        },
+        "placement": "top"
       },
-      "isOnClosableDialog": true,
-      "placement": "top"
+      "isOnClosableDialog": true
     },
     {
       "elementToHighlightId": "#instruction-editor-dialog #ok-button",
@@ -3993,6 +3993,105 @@
         },
         "placement": "top"
       }
+    },
+    {
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "standalone": true,
+        "description": {
+          "messageByLocale": {
+            "en": "Let's change the scene to the leaderboard one (so that the play scene is closed).\n\nIn the event where $(target) gets deleted, click on “Add action”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-Scene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Type “Scene”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-Scene",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select “Change the scene”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container #scene-name",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select “$(leaderboardScene)”."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, the action is all set."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#main-toolbar-project-manager-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the **Project Manager**."
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "sceneInProjectManager:startScene",
+      "nextStepTrigger": {
+        "presenceOfElement": "[id^=\"scene-item\"][data-default=\"true\"]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Right-click on the start scene and select **Set as start scene**."
+          }
+        },
+        "placement": "right"
+      },
+      "isOnClosableDialog": true
     }
   ]
 }

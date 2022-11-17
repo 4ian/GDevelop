@@ -330,8 +330,8 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'SwitchToEventsSheet',
-      elementToHighlightId: '[id^=tab-layout-events]',
-      nextStepTrigger: { presenceOfElement: '#add-event-button' },
+      elementToHighlightId: 'editorTab::EventsSheet',
+      nextStepTrigger: { editorIsActive: ':EventsSheet' },
       tooltip: {
         description: {
           messageDescriptor: t`Now let's make $(firstObject) collect the $(secondObject)! Go to the **events** tab of the **scene**.`,

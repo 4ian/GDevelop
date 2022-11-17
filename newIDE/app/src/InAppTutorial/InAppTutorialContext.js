@@ -28,6 +28,7 @@ type InAppTutorialFlowStepDOMChangeTrigger =
 
 export type InAppTutorialFlowStepTrigger =
   | InAppTutorialFlowStepDOMChangeTrigger
+  | {| editorIsActive: string |}
   | {| valueHasChanged: true |}
   | {| instanceAddedOnScene: string |}
   | {| previewLaunched: true |}
@@ -51,7 +52,7 @@ export type InAppTutorialFlowStep = {|
     trigger: InAppTutorialFlowStepDOMChangeTrigger,
   |}>,
   mapProjectData?: {
-    [key: string]: 'lastProjectObjectName' | 'lastProjectSceneName',
+    [key: string]: 'projectLastSceneName' | string, // lastSceneObjectName:sceneName
   },
   tooltip?: InAppTutorialTooltip,
   skippable?: true,

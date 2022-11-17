@@ -94,6 +94,19 @@ const translateAndInterpolateText = ({
   return interpolateText(translatedText, data, project);
 };
 
+const interpolateEditorTabActiveTrigger = (
+  trigger: string,
+  data: { [key: string]: string }
+): {| presenceOfElement: string |} => {
+  const [sceneKey, editorType] = trigger.split(':');
+  const sceneNameFilter = sceneKey ? `[data-scene="${data[sceneKey]}"]` : '';
+  return {
+    presenceOfElement: `button[id^="tab"][active="true"][data-type="${
+      editorType === 'Scene' ? 'layout' : 'layout-events'
+    }"]${sceneNameFilter}`,
+  };
+};
+
 const interpolateElementId = (
   elementId: string,
   data: { [key: string]: string }
@@ -102,11 +115,9 @@ const interpolateElementId = (
     elementId.startsWith(selectorInterpolationProjectDataAccessors.editorTab)
   ) {
     const splittedElementId = elementId.split(':');
-    const sceneName = splittedElementId[1];
+    const sceneKey = splittedElementId[1];
     const editorType = splittedElementId[2];
-    const sceneNameFilter = sceneName
-      ? `[data-scene="${data[sceneName]}"]`
-      : '';
+    const sceneNameFilter = sceneKey ? `[data-scene="${data[sceneKey]}"]` : '';
     return `button[id^="tab"][data-type="${
       editorType === 'Scene' ? 'layout' : 'layout-events'
     }]${sceneNameFilter}`;
@@ -116,8 +127,10 @@ const interpolateElementId = (
     )
   ) {
     const splittedElementId = elementId.split(':');
-    const objectName = splittedElementId[1];
-    return `#objects-list div[data-object-name="${data[objectName]}"]`;
+    const objectKey = splittedElementId[1];
+    return `#scene-editor[data-active] #objects-list div[data-object-name="${
+      data[objectKey]
+    }"]`;
   } else if (
     elementId.startsWith(
       selectorInterpolationProjectDataAccessors.objectInObjectOrResourceSelector
@@ -636,18 +649,25 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
     let formattedStepTrigger;
     const stepTrigger = currentStep.nextStepTrigger;
-    if (stepTrigger && stepTrigger.clickOnTooltipButton) {
-      const formattedButtonLabel = translateAndInterpolateText({
-        text: stepTrigger.clickOnTooltipButton,
-        data,
-        i18n,
-        project,
-      });
-      formattedStepTrigger = formattedButtonLabel
-        ? {
-            clickOnTooltipButton: formattedButtonLabel,
-          }
-        : undefined;
+    if (stepTrigger) {
+      if (stepTrigger.clickOnTooltipButton) {
+        const formattedButtonLabel = translateAndInterpolateText({
+          text: stepTrigger.clickOnTooltipButton,
+          data,
+          i18n,
+          project,
+        });
+        formattedStepTrigger = formattedButtonLabel
+          ? {
+              clickOnTooltipButton: formattedButtonLabel,
+            }
+          : undefined;
+      } else if (stepTrigger.editorIsActive) {
+        formattedStepTrigger = interpolateEditorTabActiveTrigger(
+          stepTrigger.editorIsActive,
+          data
+        );
+      }
     }
     const formattedStep: InAppTutorialFlowFormattedStep = {
       ...currentStep,

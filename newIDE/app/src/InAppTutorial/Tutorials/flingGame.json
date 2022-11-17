@@ -8,8 +8,10 @@
     "SwitchToEvents3": "EventsSheet",
     "SwitchToEvents4": "EventsSheet",
     "SwitchToEvents5": "EventsSheet",
+    "SwitchToEvents6": "EventsSheet",
     "SwitchToScene1": "Scene",
     "SwitchToScene2": "Scene",
+    "openLeaderboardScene": "Scene",
     "ClickOnNewObjectButtonForScore": "Scene"
   },
   "endDialog": {
@@ -2852,7 +2854,7 @@
       "tooltip": {
         "description": {
           "messageByLocale": {
-            "en": "Select “$(startScene)”."
+            "en": "Select “$(playScene)”."
           }
         }
       },
@@ -3415,8 +3417,21 @@
           }
         }
       },
-      "isOnClosableDialog": true,
-      "skippable": true
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container #yes-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container #yes-button[data-effective=\"true\"]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We'll use the built-in loader."
+          }
+        }
+      },
+      "isOnClosableDialog": true
     },
     {
       "elementToHighlightId": "#instruction-editor-dialog #ok-button",
@@ -3510,6 +3525,274 @@
         "description": {
           "messageByLocale": {
             "en": "We're done."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#add-action-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's choose an action."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-PlayerAuthentication--DisplayAuthenticationBanner"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “Authentication”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-PlayerAuthentication--DisplayAuthenticationBanner",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **Display authentication banner**."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, now players will be asked to login."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#main-toolbar-project-manager-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings"
+      },
+      "tooltip": {
+        "title": {
+          "messageByLocale": {
+            "en": "Now let's create a new scene that will be used to display the leaderboard."
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "#project-manager #add-new-scene-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#scene-item-2"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click here."
+          }
+        },
+        "placement": "right"
+      },
+      "mapProjectData": {
+        "leaderboardScene": "projectLastSceneName"
+      }
+    },
+    {
+      "elementToHighlightId": "#project-manager #scene-item-2",
+      "nextStepTrigger": {
+        "presenceOfElement": "editorTab:leaderboardScene:EventsSheet"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Right click on the new scene and change its name to “Leaderboard”.\n\nOnce you're done, click on the item to open the new scene."
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "id": "openLeaderboardScene",
+      "elementToHighlightId": "editorTab:leaderboardScene:EventsSheet",
+      "nextStepTrigger": {
+        "editorIsActive": "leaderboardScene:EventsSheet"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Go to the events."
+          }
+        }
+      }
+    },
+    {
+      "id": "SwitchToEvents6",
+      "elementToHighlightId": "#add-event-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-condition-button-empty"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's add an event that makes sure the player comes back to the start screen after closing the leaderboard."
+          }
+        }
+      }
+    },
+
+    {
+      "elementToHighlightId": "#add-condition-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click here."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-Leaderboards--IsLeaderboardViewLoaded"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “Leaderboard”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-Leaderboards--IsLeaderboardViewLoaded",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the **Leaderboard display has loaded** condition."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "span[data-instruction=\"Leaderboards::IsLeaderboardViewLoaded\"]",
+      "nextStepTrigger": {
+        "presenceOfElement": "span[data-instruction=\"Leaderboards::IsLeaderboardViewLoaded\"][data-instruction-inverted=true]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Right-click on the condition and select **Invert Condition**."
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
+      "elementToHighlightId": "#add-action-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's add the action to come back to the start screen."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-Scene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Type “Scene”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-Scene",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select “Change the scene”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container #scene-name",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select “$(startScene)”."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "placement": "top"
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, the action is all set."
           }
         },
         "placement": "top"

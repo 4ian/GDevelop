@@ -28,6 +28,7 @@ const textInterpolationProjectDataAccessors = {
 };
 const selectorInterpolationProjectDataAccessors = {
   objectInObjectsList: 'objectInObjectsList:',
+  sceneInProjectManager: 'sceneInProjectManager:',
   objectInObjectOrResourceSelector: 'objectInObjectOrResourceSelector:',
   editorTab: 'editorTab:',
 };
@@ -142,6 +143,16 @@ const interpolateElementId = (
     const objectKey = splittedElementId[1];
     return `#scene-editor[data-active] #objects-list div[data-object-name="${
       data[objectKey]
+    }"]`;
+  } else if (
+    elementId.startsWith(
+      selectorInterpolationProjectDataAccessors.sceneInProjectManager
+    )
+  ) {
+    const splittedElementId = elementId.split(':');
+    const sceneKey = splittedElementId[1];
+    return `#project-manager [id^="scene-item"][data-scene="${
+      data[sceneKey]
     }"]`;
   } else if (
     elementId.startsWith(

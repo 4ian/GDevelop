@@ -37,6 +37,7 @@ export default class ExpressionSelector extends Component<Props, {||}> {
     const { expressionType, scope, ...otherProps } = this.props;
     return (
       <InstructionOrExpressionSelector
+        id="expression-selector"
         style={style}
         instructionsInfo={this.instructionsInfo}
         instructionsInfoTree={this.instructionsInfoTree}

@@ -17,6 +17,7 @@ import Checkbox from '../../../UI/Checkbox';
 import { GridList, GridListTile } from '@material-ui/core';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import InAppTutorialContext from '../../../InAppTutorial/InAppTutorialContext';
+import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 
 const getColumnsFromWidth = (width: WidthType) => {
   switch (width) {
@@ -81,8 +82,11 @@ const GetStartedSection = ({
   showGetStartedSection,
   setShowGetStartedSection,
 }: Props) => {
+  const { inAppTutorialShortHeaders } = React.useContext(InAppTutorialContext);
   const windowWidth = useResponsiveWindowWidth();
-  const { isInAppTutorialRunning } = React.useContext(InAppTutorialContext);
+  const { currentlyRunningInAppTutorial } = React.useContext(
+    InAppTutorialContext
+  );
   const shouldShowOnboardingButton = !isMobile() && windowWidth !== 'small';
   const items: {
     key: string,
@@ -146,27 +150,31 @@ const GetStartedSection = ({
                   onOpenOnboardingDialog();
                 }}
                 size="banner"
-                disabled={isInAppTutorialRunning}
+                disabled={!!currentlyRunningInAppTutorial}
               >
-                <ResponsiveLineStackLayout noMargin expand>
-                  <img
-                    alt="tour"
-                    src="res/homepage/step-by-step.gif"
-                    style={styles.bannerImage}
-                  />
-                  <div style={styles.cardTextContainer}>
-                    <Text size="block-title">
-                      <Trans>Take the tour</Trans>
-                    </Text>
-                    <Text size="body" color="secondary">
-                      <span style={styles.icon}>🕐</span>
-                      <Trans>5 minutes</Trans>
-                    </Text>
-                    <Text size="body">
-                      <Trans>Learn the fundamentals of the editor</Trans>
-                    </Text>
-                  </div>
-                </ResponsiveLineStackLayout>
+                {inAppTutorialShortHeaders === null ? (
+                  <PlaceholderLoader />
+                ) : (
+                  <ResponsiveLineStackLayout noMargin expand>
+                    <img
+                      alt="tour"
+                      src="res/homepage/step-by-step.gif"
+                      style={styles.bannerImage}
+                    />
+                    <div style={styles.cardTextContainer}>
+                      <Text size="block-title">
+                        <Trans>Take the tour</Trans>
+                      </Text>
+                      <Text size="body" color="secondary">
+                        <span style={styles.icon}>🕐</span>
+                        <Trans>5 minutes</Trans>
+                      </Text>
+                      <Text size="body">
+                        <Trans>Learn the fundamentals of the editor</Trans>
+                      </Text>
+                    </div>
+                  </ResponsiveLineStackLayout>
+                )}
               </CardWidget>
             </div>
           </Line>

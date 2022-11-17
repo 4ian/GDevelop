@@ -99,6 +99,14 @@ const interpolateEditorTabActiveTrigger = (
   data: { [key: string]: string }
 ): {| presenceOfElement: string |} => {
   const [sceneKey, editorType] = trigger.split(':');
+  if (!editorType) {
+    throw new Error(`There might be missing a ":" in the trigger ${trigger}`);
+  }
+  if (editorType === 'Home') {
+    return {
+      presenceOfElement: `button[id="tab-start-page-button"][active="true"]`,
+    };
+  }
   const sceneNameFilter = sceneKey ? `[data-scene="${data[sceneKey]}"]` : '';
   return {
     presenceOfElement: `button[id^="tab"][active="true"][data-type="${
@@ -117,6 +125,14 @@ const interpolateElementId = (
     const splittedElementId = elementId.split(':');
     const sceneKey = splittedElementId[1];
     const editorType = splittedElementId[2];
+    if (!editorType) {
+      throw new Error(
+        `There might be missing a ":" in the element id ${elementId}`
+      );
+    }
+    if (editorType === 'Home') {
+      return 'button[id="tab-start-page-button"]';
+    }
     const sceneNameFilter = sceneKey ? `[data-scene="${data[sceneKey]}"]` : '';
     return `button[id^="tab"][data-type="${
       editorType === 'Scene' ? 'layout' : 'layout-events'

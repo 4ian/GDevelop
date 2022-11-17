@@ -665,6 +665,13 @@ export default class ExpressionField extends React.Component<Props, State> {
                 })}
               {!this.props.isInline && (
                 <RaisedButton
+                  id={
+                    expressionType === 'string'
+                      ? 'open-string-expression-popover-button'
+                      : expressionType === 'number'
+                      ? 'open-number-expression-popover-button'
+                      : 'open-expression-popover-button'
+                  }
                   icon={<Functions />}
                   label={
                     expressionType === 'string'

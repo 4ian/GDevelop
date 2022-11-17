@@ -97,22 +97,18 @@ const translateAndInterpolateText = ({
 const interpolateEditorTabActiveTrigger = (
   trigger: string,
   data: { [key: string]: string }
-): {| presenceOfElement: string |} => {
+): string => {
   const [sceneKey, editorType] = trigger.split(':');
   if (!editorType) {
     throw new Error(`There might be missing a ":" in the trigger ${trigger}`);
   }
   if (editorType === 'Home') {
-    return {
-      presenceOfElement: `button[id="tab-start-page-button"][active="true"]`,
-    };
+    return `button[id="tab-start-page-button"][data-active="true"]`;
   }
   const sceneNameFilter = sceneKey ? `[data-scene="${data[sceneKey]}"]` : '';
-  return {
-    presenceOfElement: `button[id^="tab"][active="true"][data-type="${
-      editorType === 'Scene' ? 'layout' : 'layout-events'
-    }"]${sceneNameFilter}`,
-  };
+  return `button[id^="tab"][data-active="true"][data-type="${
+    editorType === 'Scene' ? 'layout' : 'layout-events'
+  }"]${sceneNameFilter}`;
 };
 
 const interpolateElementId = (
@@ -205,6 +201,13 @@ const isDomBasedTriggerComplete = (
     trigger.absenceOfElement &&
     !document.querySelector(
       interpolateElementId(trigger.absenceOfElement, data)
+    )
+  ) {
+    return true;
+  } else if (
+    trigger.editorIsActive &&
+    document.querySelector(
+      interpolateEditorTabActiveTrigger(trigger.editorIsActive, data)
     )
   ) {
     return true;
@@ -678,11 +681,6 @@ const InAppTutorialOrchestrator = React.forwardRef<
               clickOnTooltipButton: formattedButtonLabel,
             }
           : undefined;
-      } else if (stepTrigger.editorIsActive) {
-        formattedStepTrigger = interpolateEditorTabActiveTrigger(
-          stepTrigger.editorIsActive,
-          data
-        );
       }
     }
     const formattedStep: InAppTutorialFlowFormattedStep = {

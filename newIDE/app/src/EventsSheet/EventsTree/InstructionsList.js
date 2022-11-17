@@ -41,6 +41,7 @@ type Props = {
   onParameterClick: ParameterContext => void,
   selection: any,
   addButtonLabel?: React.Node,
+  addButtonId?: string,
   className?: string,
   style?: Object,
   disabled: boolean,
@@ -58,6 +59,7 @@ const DropTarget = makeDropTarget<{
 }>(reactDndInstructionType);
 
 export default function InstructionsList({
+  addButtonId,
   addButtonLabel,
   areConditions,
   className,
@@ -220,7 +222,7 @@ export default function InstructionsList({
                 }}
                 {...longTouchForContextMenuProps}
                 ref={addButton}
-                id={`${
+                id={addButtonId || `${
                   areConditions ? 'add-condition-button' : 'add-action-button'
                 }${instructions.length === 0 ? '-empty' : ''}`}
               >

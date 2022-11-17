@@ -425,6 +425,7 @@ const Instruction = (props: Props) => {
                 }
                 onParameterClick={props.onSubParameterClick}
                 addButtonLabel={<Trans>Add a sub-condition</Trans>}
+                addButtonId="add-sub-condition-button"
                 disabled={props.disabled}
                 renderObjectThumbnail={props.renderObjectThumbnail}
                 screenType={props.screenType}

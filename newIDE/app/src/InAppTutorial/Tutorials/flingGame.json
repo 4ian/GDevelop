@@ -3384,6 +3384,51 @@
             "en": "Our leaderboard is ready."
           }
         }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#open-leaderboard-admin-button + button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container select"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the option **Select the leaderboard from a list**."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "skippable": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container select",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the leaderboard named “Score”."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "skippable": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now the leaderboard should be displayed when $(projectile) reaches $(target)."
+          }
+        },
+        "placement": "top"
       }
     }
   ]

@@ -17,40 +17,31 @@ const UnsavedChangesContext = React.createContext<UnsavedChanges>(initialState);
 
 export default UnsavedChangesContext;
 
-type State = {|
-  hasUnsavedChanges: boolean,
-|};
-
 type Props = {|
   children?: React.Node,
 |};
 
-export class UnsavedChangesContextProvider extends React.Component<
-  Props,
-  State
-> {
-  state = { hasUnsavedChanges: false };
-  triggerUnsavedChanges = (): void => {
-    if (!this.state.hasUnsavedChanges)
-      this.setState({ hasUnsavedChanges: true });
+export const UnsavedChangesContextProvider = (props: Props) => {
+  const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState<boolean>(
+    false
+  );
+  const triggerUnsavedChanges = (): void => {
+    if (!hasUnsavedChanges) setHasUnsavedChanges(true);
   };
 
-  sealUnsavedChanges = (): void => {
-    if (this.state.hasUnsavedChanges)
-      this.setState({ hasUnsavedChanges: false });
+  const sealUnsavedChanges = (): void => {
+    if (hasUnsavedChanges) setHasUnsavedChanges(false);
   };
 
-  render() {
-    const unsavedChanges: UnsavedChanges = {
-      ...this.state,
-      triggerUnsavedChanges: this.triggerUnsavedChanges,
-      sealUnsavedChanges: this.sealUnsavedChanges,
-    };
-
-    return (
-      <UnsavedChangesContext.Provider value={unsavedChanges}>
-        {this.props.children}
-      </UnsavedChangesContext.Provider>
-    );
-  }
-}
+  return (
+    <UnsavedChangesContext.Provider
+      value={{
+        hasUnsavedChanges,
+        triggerUnsavedChanges: triggerUnsavedChanges,
+        sealUnsavedChanges: sealUnsavedChanges,
+      }}
+    >
+      {props.children}
+    </UnsavedChangesContext.Provider>
+  );
+};

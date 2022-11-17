@@ -9,6 +9,7 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { Spacer } from './Grid';
 
 type Props = {|
+  id?: string,
   label?: React.Node,
   primary?: boolean,
   disabled?: boolean,
@@ -40,7 +41,15 @@ const styles = {
  * when the dropdown arrow is clicked.
  */
 const RaisedButtonWithSplitMenu = (props: Props) => {
-  const { buildMenuTemplate, onClick, label, primary, icon, disabled } = props;
+  const {
+    id,
+    buildMenuTemplate,
+    onClick,
+    label,
+    primary,
+    icon,
+    disabled,
+  } = props;
 
   // In theory, focus ripple is only shown after a keyboard interaction
   // (see https://github.com/mui-org/material-ui/issues/12067). However, as
@@ -58,6 +67,7 @@ const RaisedButtonWithSplitMenu = (props: Props) => {
       style={props.style}
     >
       <Button
+        id={id}
         focusRipple={focusRipple}
         onClick={onClick}
         style={styles.mainButton}

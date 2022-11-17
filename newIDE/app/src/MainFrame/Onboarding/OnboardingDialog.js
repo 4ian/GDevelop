@@ -37,7 +37,8 @@ const OnboardingDialog = ({ open, onClose, onStartOnboarding }: Props) => {
     if (!projectIsClosed) {
       return;
     }
-    startTutorial('onboarding');
+    // TODO: For test purposes on beta
+    startTutorial('flingGamePart1');
     onClose();
   };
 

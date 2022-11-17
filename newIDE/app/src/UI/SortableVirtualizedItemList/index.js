@@ -9,6 +9,7 @@ import DropIndicator from './DropIndicator';
 import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer';
 import { ScreenTypeMeasurer } from '../Reponsive/ScreenTypeMeasurer';
 import type { WidthType } from '../Reponsive/ResponsiveWindowMeasurer';
+import { type HTMLDataset } from '../../Utils/HTMLDataset';
 
 type Props<Item> = {|
   height: number,
@@ -23,6 +24,7 @@ type Props<Item> = {|
   getItemName: Item => string,
   getItemThumbnail?: Item => string,
   getItemId?: (Item, index: number) => string,
+  getItemData?: (Item, index: number) => HTMLDataset,
   isItemBold?: Item => boolean,
   onItemSelected: (?Item) => void,
   onEditItem?: Item => void,
@@ -62,6 +64,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       renamedItem,
       getItemName,
       getItemId,
+      getItemData,
       renderItemLabel,
       scaleUpItemIconWhenSelected,
     } = this.props;
@@ -74,6 +77,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
         item={item}
         itemName={itemName}
         id={getItemId ? getItemId(item, index) : undefined}
+        data={getItemData ? getItemData(item, index) : undefined}
         renderItemLabel={
           renderItemLabel ? () => renderItemLabel(item) : undefined
         }

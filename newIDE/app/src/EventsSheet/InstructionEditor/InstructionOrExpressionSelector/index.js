@@ -177,6 +177,12 @@ export default class InstructionOrExpressionSelector<
                   }) =>
                     renderInstructionOrExpressionListItem({
                       instructionOrExpressionMetadata: enumeratedInstructionOrExpressionMetadata,
+                      id:
+                        'instruction-or-expression-' +
+                        enumeratedInstructionOrExpressionMetadata.type.replace(
+                          /:/g,
+                          '-'
+                        ),
                       iconSize: iconSize,
                       onClick: () =>
                         onChoose(

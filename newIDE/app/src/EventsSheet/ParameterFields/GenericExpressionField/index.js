@@ -552,6 +552,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                   highlights={this.state.errorHighlights}
                 />
                 <SemiControlledTextField
+                  id={this.props.id}
                   margin={this.props.isInline ? 'none' : 'dense'}
                   value={value}
                   floatingLabelText={description}
@@ -664,6 +665,13 @@ export default class ExpressionField extends React.Component<Props, State> {
                 })}
               {!this.props.isInline && (
                 <RaisedButton
+                  id={
+                    expressionType === 'string'
+                      ? 'open-string-expression-popover-button'
+                      : expressionType === 'number'
+                      ? 'open-number-expression-popover-button'
+                      : 'open-expression-popover-button'
+                  }
                   icon={<Functions />}
                   label={
                     expressionType === 'string'

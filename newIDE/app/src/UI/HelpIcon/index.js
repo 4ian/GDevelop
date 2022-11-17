@@ -20,6 +20,7 @@ type PropsType = {|
     marginLeft?: number,
     marginTop?: number,
     marginBottom?: number,
+    visibility?: 'visible' | 'hidden',
   |},
   size?: 'small',
 |};

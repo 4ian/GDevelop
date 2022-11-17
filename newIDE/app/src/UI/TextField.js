@@ -251,7 +251,6 @@ export default class TextField extends React.Component<Props, {||}> {
               style: {
                 fontSize: props.style ? props.style.fontSize : undefined,
                 fontStyle: props.style ? props.style.fontStyle : undefined,
-                ...props.inputStyle,
               },
               readOnly: props.readOnly,
               inputProps: {
@@ -265,6 +264,7 @@ export default class TextField extends React.Component<Props, {||}> {
                 max: props.max,
                 min: props.min,
                 step: props.step,
+                style: props.inputStyle,
               },
               // Input adornment:
               endAdornment: props.endAdornment ? (

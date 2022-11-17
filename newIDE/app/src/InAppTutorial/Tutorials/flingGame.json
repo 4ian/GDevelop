@@ -3268,7 +3268,7 @@
         "standalone": true,
         "title": {
           "messageByLocale": {
-            "en": "Now we will display the other players scores"
+            "en": "Now we will display the other players scores."
           }
         },
         "description": {
@@ -3431,7 +3431,8 @@
           }
         }
       },
-      "isOnClosableDialog": true
+      "isOnClosableDialog": true,
+      "skippable": true
     },
     {
       "elementToHighlightId": "#instruction-editor-dialog #ok-button",
@@ -3658,7 +3659,6 @@
         }
       }
     },
-
     {
       "elementToHighlightId": "#add-condition-button-empty",
       "nextStepTrigger": {
@@ -3793,6 +3793,202 @@
         "description": {
           "messageByLocale": {
             "en": "Alright, the action is all set."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "editorTab:playScene:EventsSheet",
+      "nextStepTrigger": {
+        "editorIsActive": "playScene:EventsSheet"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's save the score of the player."
+          }
+        }
+      }
+    },
+    {
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "standalone": true,
+        "description": {
+          "messageByLocale": {
+            "en": "In the event where $(target) gets deleted, click on “Add action”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-Leaderboards--SavePlayerScore"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “leaderboard”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-Leaderboards--SavePlayerScore",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the **Save player score** action."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container select",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the leaderboard named “Score”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container #open-number-expression-popover-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#expression-selector"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click on the expression builder."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#expression-selector input",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-or-expression-TimerElapsedTime"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “Timer”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-or-expression-TimerElapsedTime",
+      "nextStepTrigger": {
+        "presenceOfElement": "#expression-parameters-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **Scene timer value**."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#expression-parameters-editor-dialog textarea",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select timer “Score”."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#expression-parameters-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#expression-parameters-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "This parameter is all set."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container #open-string-expression-popover-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#expression-selector"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click on the expression builder."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#expression-selector input",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-or-expression-PlayerAuthentication--Username"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “Username”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-or-expression-PlayerAuthentication--Username",
+      "nextStepTrigger": {
+        "absenceOfElement": "#expression-selector"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **Username**."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "The action is ready."
           }
         },
         "placement": "top"

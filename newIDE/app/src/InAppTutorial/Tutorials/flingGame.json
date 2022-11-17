@@ -7,6 +7,7 @@
     "SwitchToEvents2": "EventsSheet",
     "SwitchToEvents3": "EventsSheet",
     "SwitchToEvents4": "EventsSheet",
+    "SwitchToEvents5": "EventsSheet",
     "SwitchToScene1": "Scene",
     "SwitchToScene2": "Scene",
     "ClickOnNewObjectButtonForScore": "Scene"
@@ -3426,6 +3427,89 @@
         "description": {
           "messageByLocale": {
             "en": "Now the leaderboard should be displayed when $(projectile) reaches $(target)."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "editorTab:startScene:EventsSheet",
+      "nextStepTrigger": {
+        "editorIsActive": "startScene:EventsSheet"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now we will ask the player to authenticate at game opening."
+          }
+        }
+      }
+    },
+    {
+      "id": "SwitchToEvents5",
+      "elementToHighlightId": "#toolbar-add-event-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-condition-button-empty"
+      },
+      "isTriggerFlickering": true,
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's create an event!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#add-condition-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add a condition."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-DepartScene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “Scene”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-DepartScene",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the **At the beginning of the scene** condition."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done."
           }
         },
         "placement": "top"

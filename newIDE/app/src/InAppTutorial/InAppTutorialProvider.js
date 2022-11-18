@@ -15,7 +15,7 @@ type Props = {| children: React.Node |};
 
 const InAppTutorialProvider = (props: Props) => {
   const flingTutorial = require('./Tutorials/flingGame.json');
-  const [tutorial, setTutorial] = React.useState<InAppTutorial | null>(flingTutorial);
+  const [tutorial, setTutorial] = React.useState<InAppTutorial | null>(null);
   const [
     inAppTutorialShortHeaders,
     setInAppTutorialShortHeaders,
@@ -25,6 +25,13 @@ const InAppTutorialProvider = (props: Props) => {
     if (tutorialId === onboardingTutorial.id) {
       setTutorial(onboardingTutorial);
       setCurrentlyRunningInAppTutorial(tutorialId);
+      return;
+    }
+
+    // TODO: To remove
+    if (tutorialId === flingTutorial.id) {
+      setTutorial(flingTutorial);
+      setCurrentlyRunningInAppTutorial(flingTutorial.id);
       return;
     }
 

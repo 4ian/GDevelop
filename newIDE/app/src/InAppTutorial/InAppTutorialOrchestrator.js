@@ -123,6 +123,23 @@ const interpolateEditorTabActiveTrigger = (
   }"]${sceneNameFilter}`;
 };
 
+export const getEditorTabSelector = ({
+  editor,
+  sceneName,
+}: {|
+  editor: EditorIdentifier,
+  sceneName?: string,
+|}): string => {
+  if (editor === 'Home') {
+    return 'button[id="tab-start-page-button"]';
+  }
+  const sceneNameFilter = sceneName ? `[data-scene="${sceneName}"]` : '';
+
+  return `button[id^="tab"][data-type="${
+    editor === 'Scene' ? 'layout' : 'layout-events'
+  }"]${sceneNameFilter}`;
+};
+
 const interpolateElementId = (
   elementId: string,
   data: { [key: string]: string }
@@ -132,19 +149,17 @@ const interpolateElementId = (
   ) {
     const splittedElementId = elementId.split(':');
     const sceneKey = splittedElementId[1];
-    const editorType = splittedElementId[2];
+    // $FlowFixMe - We're confident the data is reliable
+    const editorType: EditorIdentifier = splittedElementId[2];
     if (!editorType) {
       throw new Error(
         `There might be missing a ":" in the element id ${elementId}`
       );
     }
-    if (editorType === 'Home') {
-      return 'button[id="tab-start-page-button"]';
-    }
-    const sceneNameFilter = sceneKey ? `[data-scene="${data[sceneKey]}"]` : '';
-    return `button[id^="tab"][data-type="${
-      editorType === 'Scene' ? 'layout' : 'layout-events'
-    }]${sceneNameFilter}`;
+    return getEditorTabSelector({
+      editor: editorType,
+      sceneName: data[sceneKey],
+    });
   } else if (
     elementId.startsWith(
       selectorInterpolationProjectDataAccessors.objectInObjectsList

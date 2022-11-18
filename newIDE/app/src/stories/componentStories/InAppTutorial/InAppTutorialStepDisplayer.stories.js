@@ -19,7 +19,23 @@ export const WrongEditorInfo = () => {
       <InAppTutorialStepDisplayer
         progress={28}
         step={{ elementToHighlightId: '#step-text' }}
-        expectedEditor="Scene"
+        expectedEditor={{ editor: 'Scene' }}
+        goToFallbackStep={() => {}}
+        endTutorial={() => action('end tutorial')()}
+        goToNextStep={() => action('go to next step')()}
+      />
+    </>
+  );
+};
+
+export const WrongEditorInfoWithSceneName = () => {
+  return (
+    <>
+      <div id="step-text">Test text</div>
+      <InAppTutorialStepDisplayer
+        progress={28}
+        step={{ elementToHighlightId: '#step-text' }}
+        expectedEditor={{ editor: 'Scene', scene: 'Homescreen' }}
         goToFallbackStep={() => {}}
         endTutorial={() => action('end tutorial')()}
         goToNextStep={() => action('go to next step')()}

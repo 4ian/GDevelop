@@ -95,6 +95,17 @@ const translateAndInterpolateText = ({
   return interpolateText(translatedText, data, project);
 };
 
+const interpolateExpectedEditor = (
+  expectedEditor: {| editor: EditorIdentifier, scene?: string |} | null,
+  data: { [key: string]: string }
+): {| editor: EditorIdentifier, scene?: string |} | null => {
+  if (!expectedEditor) return null;
+  return {
+    ...expectedEditor,
+    scene: expectedEditor.scene ? data[expectedEditor.scene] : undefined,
+  };
+};
+
 const interpolateEditorTabActiveTrigger = (
   trigger: string,
   data: { [key: string]: string }
@@ -302,6 +313,7 @@ type Props = {|
   endTutorial: () => void,
   project: ?gdProject,
   currentEditor: EditorIdentifier | null,
+  currentSceneName: string | null,
 |};
 
 export type InAppTutorialOrchestratorInterface = {|
@@ -317,448 +329,459 @@ export type InAppTutorialOrchestratorInterface = {|
 const InAppTutorialOrchestrator = React.forwardRef<
   Props,
   InAppTutorialOrchestratorInterface
->(({ tutorial, endTutorial, project, currentEditor }, ref) => {
-  const forceUpdate = useForceUpdate();
-  const [wrongEditorInfoOpen, setWrongEditorInfoOpen] = React.useState<boolean>(
-    false
-  );
-  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
-  const [data, setData] = React.useState<{| [key: string]: string |}>({});
-  const [displayEndDialog, setDisplayEndDialog] = React.useState<boolean>(
-    false
-  );
-  const currentStepFallbackStepIndex = React.useRef<number>(0);
-  const [
-    expectedEditor,
-    setExpectedEditor,
-  ] = React.useState<EditorIdentifier | null>(null);
-  const [expectedSceneKey, setExpectedSceneKey] = React.useState<string | null>(
-    null
-  );
-  const [
-    elementWithValueToWatch,
-    setElementWithValueToWatch,
-  ] = React.useState<?string>(null);
-  const InputInitialValueRef = React.useRef<?string>(null);
-  const [
-    objectSceneInstancesToWatch,
-    setObjectSceneInstancesToWatch,
-  ] = React.useState<?{ sceneName: ?string, objectName: string }>(null);
-  const domObserverRef = React.useRef<?MutationObserver>(null);
-  const [
-    shouldWatchProjectChanges,
-    setShouldWatchProjectChanges,
-  ] = React.useState<boolean>(false);
+>(
+  (
+    { tutorial, endTutorial, project, currentEditor, currentSceneName },
+    ref
+  ) => {
+    const forceUpdate = useForceUpdate();
+    const [
+      wrongEditorInfoOpen,
+      setWrongEditorInfoOpen,
+    ] = React.useState<boolean>(false);
+    const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
+    const [data, setData] = React.useState<{| [key: string]: string |}>({});
+    const [displayEndDialog, setDisplayEndDialog] = React.useState<boolean>(
+      false
+    );
+    const currentStepFallbackStepIndex = React.useRef<number>(0);
+    const [expectedEditor, setExpectedEditor] = React.useState<{|
+      editor: EditorIdentifier,
+      scene?: string,
+    |} | null>(null);
+    const [
+      elementWithValueToWatch,
+      setElementWithValueToWatch,
+    ] = React.useState<?string>(null);
+    const InputInitialValueRef = React.useRef<?string>(null);
+    const [
+      objectSceneInstancesToWatch,
+      setObjectSceneInstancesToWatch,
+    ] = React.useState<?{ sceneName: ?string, objectName: string }>(null);
+    const domObserverRef = React.useRef<?MutationObserver>(null);
+    const [
+      shouldWatchProjectChanges,
+      setShouldWatchProjectChanges,
+    ] = React.useState<boolean>(false);
 
-  const { flow, endDialog, editorSwitches, id: tutorialId } = tutorial;
-  const stepCount = flow.length;
-  const currentStep = flow[currentStepIndex];
+    const { flow, endDialog, editorSwitches, id: tutorialId } = tutorial;
+    const stepCount = flow.length;
+    const currentStep = flow[currentStepIndex];
 
-  const changeStep = React.useCallback(
-    (stepIndex: number) => {
-      setCurrentStepIndex(stepIndex);
-      sendInAppTutorialProgress({
-        tutorialId: tutorialId,
-        step: stepIndex,
-        isCompleted: stepIndex >= stepCount - 1,
-      });
-    },
-    [tutorialId, stepCount]
-  );
+    const changeStep = React.useCallback(
+      (stepIndex: number) => {
+        setCurrentStepIndex(stepIndex);
+        sendInAppTutorialProgress({
+          tutorialId: tutorialId,
+          step: stepIndex,
+          isCompleted: stepIndex >= stepCount - 1,
+        });
+      },
+      [tutorialId, stepCount]
+    );
 
-  // Reset current step index on tutorial change.
-  React.useEffect(
-    () => {
-      changeStep(0);
-      currentStepFallbackStepIndex.current = 0;
-    },
-    [tutorial, changeStep]
-  );
+    // Reset current step index on tutorial change.
+    React.useEffect(
+      () => {
+        changeStep(0);
+        currentStepFallbackStepIndex.current = 0;
+      },
+      [tutorial, changeStep]
+    );
 
-  const goToStep = React.useCallback(
-    (stepIndex: number) => {
-      if (stepIndex >= stepCount) {
-        setDisplayEndDialog(true);
-        return;
-      }
-
-      let nextStepIndex = stepIndex;
-
-      // Check if we can go directly to next mandatory (not-skippable) step.
-      while (flow[nextStepIndex].skippable && nextStepIndex < stepCount - 1) {
-        if (
-          isDomBasedTriggerComplete(flow[nextStepIndex].nextStepTrigger, data)
-        )
-          nextStepIndex += 1;
-        else break;
-      }
-
-      changeStep(nextStepIndex);
-    },
-    [flow, changeStep, stepCount, data]
-  );
-
-  const computeProgress = React.useCallback(
-    () => Math.round((currentStepIndex / tutorial.flow.length) * 100),
-    [currentStepIndex, tutorial.flow]
-  );
-
-  const getProgress = () => {
-    return {
-      step: currentStepIndex,
-      progress: computeProgress(),
-      projectData: data,
-    };
-  };
-
-  const watchDomForNextStepTrigger = React.useCallback(
-    () => {
-      // Find the next mandatory (not-skippable) step (It can be the current step).
-      let indexOfNextMandatoryStep = currentStepIndex;
-      while (flow[indexOfNextMandatoryStep].skippable) {
-        indexOfNextMandatoryStep += 1;
-      }
-
-      let shouldGoToStepAtIndex: number | null = null;
-      // Browse skippable steps in reverse orders to directly go to the
-      // furthest step if possible.
-      // TODO: Add support for not-dom based triggers
-      for (
-        let stepIndex = indexOfNextMandatoryStep;
-        stepIndex >= currentStepIndex;
-        stepIndex--
-      ) {
-        const isThisStepAlreadyDone = isDomBasedTriggerComplete(
-          flow[stepIndex].nextStepTrigger,
-          data
-        );
-        if (isThisStepAlreadyDone) {
-          shouldGoToStepAtIndex = stepIndex + 1;
-          break;
+    const goToStep = React.useCallback(
+      (stepIndex: number) => {
+        if (stepIndex >= stepCount) {
+          setDisplayEndDialog(true);
+          return;
         }
-      }
-      if (shouldGoToStepAtIndex === null) {
-        // No trigger has been detected for the next mandatory step or the in-between
-        // skippable steps.
-        // Let's now check that, if there's a shortcut, it may have been triggered.
-        const { shortcuts } = flow[currentStepIndex];
-        if (!shortcuts) return;
-        for (let shortcutStep of shortcuts) {
-          // Find the first shortcut in the list that can be triggered.
-          // TODO: Add support for not-dom based triggers
-          if (isDomBasedTriggerComplete(shortcutStep.trigger, data)) {
-            shouldGoToStepAtIndex = flow.findIndex(
-              step => step.id === shortcutStep.stepId
-            );
-            if (shouldGoToStepAtIndex < 0) {
-              console.warn(
-                `Step with id ${
-                  shortcutStep.stepId
-                } could not be found. Shortcut not taken.`
-              );
-              return;
-            }
+
+        let nextStepIndex = stepIndex;
+
+        // Check if we can go directly to next mandatory (not-skippable) step.
+        while (flow[nextStepIndex].skippable && nextStepIndex < stepCount - 1) {
+          if (
+            isDomBasedTriggerComplete(flow[nextStepIndex].nextStepTrigger, data)
+          )
+            nextStepIndex += 1;
+          else break;
+        }
+
+        changeStep(nextStepIndex);
+      },
+      [flow, changeStep, stepCount, data]
+    );
+
+    const computeProgress = React.useCallback(
+      () => Math.round((currentStepIndex / tutorial.flow.length) * 100),
+      [currentStepIndex, tutorial.flow]
+    );
+
+    const getProgress = () => {
+      return {
+        step: currentStepIndex,
+        progress: computeProgress(),
+        projectData: data,
+      };
+    };
+
+    const watchDomForNextStepTrigger = React.useCallback(
+      () => {
+        // Find the next mandatory (not-skippable) step (It can be the current step).
+        let indexOfNextMandatoryStep = currentStepIndex;
+        while (flow[indexOfNextMandatoryStep].skippable) {
+          indexOfNextMandatoryStep += 1;
+        }
+
+        let shouldGoToStepAtIndex: number | null = null;
+        // Browse skippable steps in reverse orders to directly go to the
+        // furthest step if possible.
+        // TODO: Add support for not-dom based triggers
+        for (
+          let stepIndex = indexOfNextMandatoryStep;
+          stepIndex >= currentStepIndex;
+          stepIndex--
+        ) {
+          const isThisStepAlreadyDone = isDomBasedTriggerComplete(
+            flow[stepIndex].nextStepTrigger,
+            data
+          );
+          if (isThisStepAlreadyDone) {
+            shouldGoToStepAtIndex = stepIndex + 1;
             break;
           }
         }
-        if (shouldGoToStepAtIndex == null) return;
-      }
-
-      // If a change of step is going to happen, first record the data for
-      // all the steps that are about to be closed.
-      const newData = gatherProjectDataOnMultipleSteps({
-        flow,
-        startIndex: currentStepIndex,
-        endIndex: shouldGoToStepAtIndex - 1,
-        data,
-        project,
-      });
-      setData(newData);
-
-      goToStep(shouldGoToStepAtIndex);
-    },
-    [currentStepIndex, project, goToStep, data, flow]
-  );
-
-  const handleDomMutation = useDebounce(watchDomForNextStepTrigger, 200);
-
-  const goToNextStep = React.useCallback(
-    () => {
-      goToStep(currentStepIndex + 1);
-    },
-    [currentStepIndex, goToStep]
-  );
-
-  const changeData = (oldName: string, newName: string) => {
-    let foundKey: string | null = null;
-    Object.entries(data).forEach(([key, value]) => {
-      if (value === oldName) {
-        foundKey = key;
-        return;
-      }
-    });
-    if (foundKey) {
-      data[foundKey] = newName;
-    }
-  };
-
-  React.useImperativeHandle(ref, () => ({
-    onPreviewLaunch,
-    getProgress,
-    changeData,
-  }));
-
-  const onPreviewLaunch = React.useCallback(
-    () => {
-      if (!currentStep) return;
-      const { nextStepTrigger } = currentStep;
-      if (nextStepTrigger && nextStepTrigger.previewLaunched) {
-        goToNextStep();
-      }
-    },
-    [goToNextStep, currentStep]
-  );
-
-  // Set up mutation observer to be able to detect any change in the dom.
-  React.useEffect(
-    () => {
-      const appContainer = document.querySelector('body'); // We could have only watch the React root node but Material UI created dialog out of this node.
-      if (!appContainer) return;
-      const observer = new MutationObserver(handleDomMutation);
-      observer.observe(appContainer, {
-        childList: true,
-        attributes: false,
-        subtree: true,
-        characterData: true,
-      });
-      domObserverRef.current = observer;
-      return () => {
-        if (domObserverRef.current) {
-          domObserverRef.current.disconnect();
-          domObserverRef.current = null;
+        if (shouldGoToStepAtIndex === null) {
+          // No trigger has been detected for the next mandatory step or the in-between
+          // skippable steps.
+          // Let's now check that, if there's a shortcut, it may have been triggered.
+          const { shortcuts } = flow[currentStepIndex];
+          if (!shortcuts) return;
+          for (let shortcutStep of shortcuts) {
+            // Find the first shortcut in the list that can be triggered.
+            // TODO: Add support for not-dom based triggers
+            if (isDomBasedTriggerComplete(shortcutStep.trigger, data)) {
+              shouldGoToStepAtIndex = flow.findIndex(
+                step => step.id === shortcutStep.stepId
+              );
+              if (shouldGoToStepAtIndex < 0) {
+                console.warn(
+                  `Step with id ${
+                    shortcutStep.stepId
+                  } could not be found. Shortcut not taken.`
+                );
+                return;
+              }
+              break;
+            }
+          }
+          if (shouldGoToStepAtIndex == null) return;
         }
-      };
-    },
-    [handleDomMutation]
-  );
 
-  React.useEffect(
-    () => {
-      if (!currentStep) return;
-      const { id, isOnClosableDialog } = currentStep;
-      // Set expected editor on each step change
-      if (id && editorSwitches.hasOwnProperty(id)) {
-        const editorSwitch = editorSwitches[id];
-        setExpectedEditor(editorSwitch.editor);
-        if (editorSwitch.scene) setExpectedSceneKey(editorSwitch.scene);
-      }
-      // Set fallback step index to the new step index if it is not on a closable dialog.
-      if (!isOnClosableDialog) {
-        currentStepFallbackStepIndex.current = currentStepIndex;
-      }
-      // At each step start, reset change watching logics.
-      setElementWithValueToWatch(null);
-      setObjectSceneInstancesToWatch(null);
-      setShouldWatchProjectChanges(false);
-      // If index out of bounds, display end dialog.
-      if (currentStepIndex >= stepCount) {
-        setDisplayEndDialog(true);
-      }
-    },
-    [currentStep, currentStepIndex, stepCount, editorSwitches]
-  );
+        // If a change of step is going to happen, first record the data for
+        // all the steps that are about to be closed.
+        const newData = gatherProjectDataOnMultipleSteps({
+          flow,
+          startIndex: currentStepIndex,
+          endIndex: shouldGoToStepAtIndex - 1,
+          data,
+          project,
+        });
+        setData(newData);
 
-  // Set up watchers if the next step trigger is not dom-based.
-  React.useEffect(
-    () => {
-      if (!currentStep) return;
-      const { nextStepTrigger, elementToHighlightId } = currentStep;
-      if (nextStepTrigger && nextStepTrigger.valueHasChanged) {
-        if (!elementToHighlightId) return;
-        const elementToWatch = document.querySelector(elementToHighlightId);
+        goToStep(shouldGoToStepAtIndex);
+      },
+      [currentStepIndex, project, goToStep, data, flow]
+    );
 
-        if (elementToWatch) {
-          InputInitialValueRef.current = getInputValue(elementToWatch);
+    const handleDomMutation = useDebounce(watchDomForNextStepTrigger, 200);
+
+    const goToNextStep = React.useCallback(
+      () => {
+        goToStep(currentStepIndex + 1);
+      },
+      [currentStepIndex, goToStep]
+    );
+
+    const changeData = (oldName: string, newName: string) => {
+      let foundKey: string | null = null;
+      Object.entries(data).forEach(([key, value]) => {
+        if (value === oldName) {
+          foundKey = key;
+          return;
         }
-        setElementWithValueToWatch(elementToHighlightId);
-      } else if (nextStepTrigger && nextStepTrigger.instanceAddedOnScene) {
-        const [
-          objectKey,
-          sceneKey,
-        ] = nextStepTrigger.instanceAddedOnScene.split(':');
-        const objectName = data[objectKey];
-        if (!objectName) return;
-        const sceneName = sceneKey ? data[sceneKey] : undefined;
-        setObjectSceneInstancesToWatch({ objectName, sceneName });
-      }
-    },
-    [currentStep, data]
-  );
-
-  // Detect in tooltip texts if project changes should be watched
-  React.useEffect(
-    () => {
-      if (!currentStep) return;
-      const { tooltip } = currentStep;
-      if (!tooltip) return;
-      if (
-        [tooltip.description, tooltip.title].some(translatedText =>
-          containsProjectDataToDisplay(translatedText)
-        )
-      ) {
-        setShouldWatchProjectChanges(true);
-      }
-    },
-    [currentStep]
-  );
-
-  const watchInputChanges = React.useCallback(
-    () => {
-      if (!elementWithValueToWatch) return;
-      const elementToWatch = document.querySelector(elementWithValueToWatch);
-
-      if (
-        elementToWatch &&
-        // Flow errors on missing value prop in generic type HTMLElement but this
-        // line cannot break.
-        // $FlowFixMe
-        getInputValue(elementToWatch) !== InputInitialValueRef.current
-      ) {
-        goToNextStep();
-      }
-    },
-    [goToNextStep, elementWithValueToWatch]
-  );
-
-  const watchSceneInstanceChanges = React.useCallback(
-    () => {
-      if (!objectSceneInstancesToWatch) return;
-      if (!project || project.getLayoutsCount() === 0) return;
-      const { objectName, sceneName: layoutName } = objectSceneInstancesToWatch;
-      const layout =
-        layoutName && project.hasLayoutNamed(layoutName)
-          ? project.getLayout(layoutName)
-          : project.getLayoutAt(0);
-      const instances = layout.getInitialInstances();
-      if (instances.hasInstancesOfObject(objectName)) {
-        goToNextStep();
-      }
-    },
-    [project, goToNextStep, objectSceneInstancesToWatch]
-  );
-
-  useInterval(forceUpdate, shouldWatchProjectChanges ? 500 : null);
-  useInterval(watchInputChanges, elementWithValueToWatch ? 1000 : null);
-  useInterval(
-    watchSceneInstanceChanges,
-    objectSceneInstancesToWatch ? 500 : null
-  );
-  useInterval(
-    watchDomForNextStepTrigger,
-    currentStep && currentStep.isTriggerFlickering ? 500 : null
-  );
-
-  const renderStepDisplayer = (i18n: I18nType) => {
-    if (!currentStep) return null;
-    const stepTooltip = currentStep.tooltip;
-    let formattedTooltip;
-    if (stepTooltip) {
-      const title = translateAndInterpolateText({
-        text: stepTooltip.title,
-        data,
-        i18n,
-        project,
       });
-      const description = translateAndInterpolateText({
-        text: stepTooltip.description,
-        data,
-        i18n,
-        project,
-      });
-      formattedTooltip = {
-        ...stepTooltip,
-        title,
-        description,
-      };
-    }
+      if (foundKey) {
+        data[foundKey] = newName;
+      }
+    };
 
-    let formattedStepTrigger;
-    const stepTrigger = currentStep.nextStepTrigger;
-    if (stepTrigger) {
-      if (stepTrigger.clickOnTooltipButton) {
-        const formattedButtonLabel = translateAndInterpolateText({
-          text: stepTrigger.clickOnTooltipButton,
+    React.useImperativeHandle(ref, () => ({
+      onPreviewLaunch,
+      getProgress,
+      changeData,
+    }));
+
+    const onPreviewLaunch = React.useCallback(
+      () => {
+        if (!currentStep) return;
+        const { nextStepTrigger } = currentStep;
+        if (nextStepTrigger && nextStepTrigger.previewLaunched) {
+          goToNextStep();
+        }
+      },
+      [goToNextStep, currentStep]
+    );
+
+    // Set up mutation observer to be able to detect any change in the dom.
+    React.useEffect(
+      () => {
+        const appContainer = document.querySelector('body'); // We could have only watch the React root node but Material UI created dialog out of this node.
+        if (!appContainer) return;
+        const observer = new MutationObserver(handleDomMutation);
+        observer.observe(appContainer, {
+          childList: true,
+          attributes: false,
+          subtree: true,
+          characterData: true,
+        });
+        domObserverRef.current = observer;
+        return () => {
+          if (domObserverRef.current) {
+            domObserverRef.current.disconnect();
+            domObserverRef.current = null;
+          }
+        };
+      },
+      [handleDomMutation]
+    );
+
+    React.useEffect(
+      () => {
+        if (!currentStep) return;
+        const { id, isOnClosableDialog } = currentStep;
+        // Set expected editor on each step change
+        if (id && editorSwitches.hasOwnProperty(id)) {
+          setExpectedEditor(editorSwitches[id]);
+        }
+        // Set fallback step index to the new step index if it is not on a closable dialog.
+        if (!isOnClosableDialog) {
+          currentStepFallbackStepIndex.current = currentStepIndex;
+        }
+        // At each step start, reset change watching logics.
+        setElementWithValueToWatch(null);
+        setObjectSceneInstancesToWatch(null);
+        setShouldWatchProjectChanges(false);
+        // If index out of bounds, display end dialog.
+        if (currentStepIndex >= stepCount) {
+          setDisplayEndDialog(true);
+        }
+      },
+      [currentStep, currentStepIndex, stepCount, editorSwitches]
+    );
+
+    // Set up watchers if the next step trigger is not dom-based.
+    React.useEffect(
+      () => {
+        if (!currentStep) return;
+        const { nextStepTrigger, elementToHighlightId } = currentStep;
+        if (nextStepTrigger && nextStepTrigger.valueHasChanged) {
+          if (!elementToHighlightId) return;
+          const elementToWatch = document.querySelector(elementToHighlightId);
+
+          if (elementToWatch) {
+            InputInitialValueRef.current = getInputValue(elementToWatch);
+          }
+          setElementWithValueToWatch(elementToHighlightId);
+        } else if (nextStepTrigger && nextStepTrigger.instanceAddedOnScene) {
+          const [
+            objectKey,
+            sceneKey,
+          ] = nextStepTrigger.instanceAddedOnScene.split(':');
+          const objectName = data[objectKey];
+          if (!objectName) return;
+          const sceneName = sceneKey ? data[sceneKey] : undefined;
+          setObjectSceneInstancesToWatch({ objectName, sceneName });
+        }
+      },
+      [currentStep, data]
+    );
+
+    // Detect in tooltip texts if project changes should be watched
+    React.useEffect(
+      () => {
+        if (!currentStep) return;
+        const { tooltip } = currentStep;
+        if (!tooltip) return;
+        if (
+          [tooltip.description, tooltip.title].some(translatedText =>
+            containsProjectDataToDisplay(translatedText)
+          )
+        ) {
+          setShouldWatchProjectChanges(true);
+        }
+      },
+      [currentStep]
+    );
+
+    const watchInputChanges = React.useCallback(
+      () => {
+        if (!elementWithValueToWatch) return;
+        const elementToWatch = document.querySelector(elementWithValueToWatch);
+
+        if (
+          elementToWatch &&
+          // Flow errors on missing value prop in generic type HTMLElement but this
+          // line cannot break.
+          // $FlowFixMe
+          getInputValue(elementToWatch) !== InputInitialValueRef.current
+        ) {
+          goToNextStep();
+        }
+      },
+      [goToNextStep, elementWithValueToWatch]
+    );
+
+    const watchSceneInstanceChanges = React.useCallback(
+      () => {
+        if (!objectSceneInstancesToWatch) return;
+        if (!project || project.getLayoutsCount() === 0) return;
+        const {
+          objectName,
+          sceneName: layoutName,
+        } = objectSceneInstancesToWatch;
+        const layout =
+          layoutName && project.hasLayoutNamed(layoutName)
+            ? project.getLayout(layoutName)
+            : project.getLayoutAt(0);
+        const instances = layout.getInitialInstances();
+        if (instances.hasInstancesOfObject(objectName)) {
+          goToNextStep();
+        }
+      },
+      [project, goToNextStep, objectSceneInstancesToWatch]
+    );
+
+    useInterval(forceUpdate, shouldWatchProjectChanges ? 500 : null);
+    useInterval(watchInputChanges, elementWithValueToWatch ? 1000 : null);
+    useInterval(
+      watchSceneInstanceChanges,
+      objectSceneInstancesToWatch ? 500 : null
+    );
+    useInterval(
+      watchDomForNextStepTrigger,
+      currentStep && currentStep.isTriggerFlickering ? 500 : null
+    );
+
+    const renderStepDisplayer = (i18n: I18nType) => {
+      if (!currentStep) return null;
+      const stepTooltip = currentStep.tooltip;
+      let formattedTooltip;
+      if (stepTooltip) {
+        const title = translateAndInterpolateText({
+          text: stepTooltip.title,
           data,
           i18n,
           project,
         });
-        formattedStepTrigger = formattedButtonLabel
-          ? {
-              clickOnTooltipButton: formattedButtonLabel,
-            }
-          : undefined;
+        const description = translateAndInterpolateText({
+          text: stepTooltip.description,
+          data,
+          i18n,
+          project,
+        });
+        formattedTooltip = {
+          ...stepTooltip,
+          title,
+          description,
+        };
       }
-    }
-    const formattedStep: InAppTutorialFlowFormattedStep = {
-      ...currentStep,
-      tooltip: formattedTooltip,
-      nextStepTrigger: formattedStepTrigger,
-    };
-    if (currentStep.elementToHighlightId) {
-      formattedStep.elementToHighlightId = interpolateElementId(
-        currentStep.elementToHighlightId,
-        data
+
+      let formattedStepTrigger;
+      const stepTrigger = currentStep.nextStepTrigger;
+      if (stepTrigger) {
+        if (stepTrigger.clickOnTooltipButton) {
+          const formattedButtonLabel = translateAndInterpolateText({
+            text: stepTrigger.clickOnTooltipButton,
+            data,
+            i18n,
+            project,
+          });
+          formattedStepTrigger = formattedButtonLabel
+            ? {
+                clickOnTooltipButton: formattedButtonLabel,
+              }
+            : undefined;
+        }
+      }
+      const formattedStep: InAppTutorialFlowFormattedStep = {
+        ...currentStep,
+        tooltip: formattedTooltip,
+        nextStepTrigger: formattedStepTrigger,
+      };
+      if (currentStep.elementToHighlightId) {
+        formattedStep.elementToHighlightId = interpolateElementId(
+          currentStep.elementToHighlightId,
+          data
+        );
+      }
+
+      return (
+        <InAppTutorialStepDisplayer
+          step={formattedStep}
+          expectedEditor={
+            wrongEditorInfoOpen
+              ? interpolateExpectedEditor(expectedEditor, data)
+              : null
+          }
+          goToFallbackStep={() => {
+            changeStep(currentStepFallbackStepIndex.current);
+          }}
+          endTutorial={endTutorial}
+          progress={computeProgress()}
+          goToNextStep={goToNextStep}
+        />
       );
-    }
+    };
+
+    const checkIfWrongEditor = useDebounce(
+      () => {
+        setWrongEditorInfoOpen(
+          !!expectedEditor &&
+            (expectedEditor.editor !== currentEditor ||
+              (!!expectedEditor.scene &&
+                data[expectedEditor.scene] !== currentSceneName))
+        );
+      },
+      wrongEditorInfoOpen ? 0 : 1000
+    );
+
+    React.useEffect(
+      () => {
+        checkIfWrongEditor();
+      },
+      [checkIfWrongEditor, currentEditor, currentSceneName]
+    );
 
     return (
-      <InAppTutorialStepDisplayer
-        step={formattedStep}
-        expectedEditor={wrongEditorInfoOpen ? expectedEditor : null}
-        goToFallbackStep={() => {
-          changeStep(currentStepFallbackStepIndex.current);
-        }}
-        endTutorial={endTutorial}
-        progress={computeProgress()}
-        goToNextStep={goToNextStep}
-      />
+      <I18n>
+        {({ i18n }) => (
+          <>
+            {renderStepDisplayer(i18n)}
+            {displayEndDialog && (
+              <InAppTutorialEndDialog
+                endDialog={endDialog}
+                onClose={() => {
+                  setDisplayEndDialog(false);
+                  endTutorial();
+                }}
+              />
+            )}
+          </>
+        )}
+      </I18n>
     );
-  };
-
-  const checkIfWrongEditor = useDebounce(
-    () => {
-      setWrongEditorInfoOpen(
-        !!expectedEditor && expectedEditor !== currentEditor
-      );
-    },
-    wrongEditorInfoOpen ? 0 : 1000
-  );
-
-  React.useEffect(
-    () => {
-      checkIfWrongEditor();
-    },
-    [checkIfWrongEditor, currentEditor]
-  );
-
-  return (
-    <I18n>
-      {({ i18n }) => (
-        <>
-          {renderStepDisplayer(i18n)}
-          {displayEndDialog && (
-            <InAppTutorialEndDialog
-              endDialog={endDialog}
-              onClose={() => {
-                setDisplayEndDialog(false);
-                endTutorial();
-              }}
-            />
-          )}
-        </>
-      )}
-    </I18n>
-  );
-});
+  }
+);
 
 export default InAppTutorialOrchestrator;

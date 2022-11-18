@@ -65,7 +65,14 @@ export type InAppTutorialFlowFormattedStep = {|
   nextStepTrigger?: InAppTutorialFlowStepFormattedTrigger,
 |};
 
-export type EditorIdentifier = 'Scene' | 'EventsSheet' | 'Home';
+export type EditorIdentifier =
+  | 'Scene'
+  | 'EventsSheet'
+  | 'Home'
+  | 'ExternalEvents'
+  | 'ExternalLayout'
+  | 'Extension'
+  | 'Resources';
 
 export type InAppTutorialEndDialog = {|
   content: Array<

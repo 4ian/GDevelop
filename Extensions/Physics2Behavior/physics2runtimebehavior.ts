@@ -825,7 +825,7 @@ namespace gdjs {
     }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
-      // Step the world if not done this frame yet
+      // Step the world if not done this frame yet.
       // Don't step at the first frame to allow events to handle overlapping objects.
       if (
         !this._sharedData.stepped &&

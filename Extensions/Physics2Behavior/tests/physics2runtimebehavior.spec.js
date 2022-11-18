@@ -1,4 +1,4 @@
-describe.only('Physics2RuntimeBehavior', () => {
+describe('Physics2RuntimeBehavior', () => {
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
   beforeEach(async function () {

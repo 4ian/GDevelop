@@ -1,7 +1,6 @@
 // @flow
 import React from 'react';
 import Chip from '../UI/Chip';
-import randomColor from 'randomcolor';
 import { type Tags, removeTag } from '../Utils/TagsHelper';
 
 const styles = {
@@ -15,13 +14,6 @@ const styles = {
     marginRight: 4,
     marginBottom: 4,
   },
-};
-
-const getChipColor = (tag: string) => {
-  return randomColor({
-    seed: tag,
-    luminosity: 'light',
-  });
 };
 
 type Props = {|
@@ -55,8 +47,7 @@ const TagChips = ({ tags, onChange, onRemove }: Props) => {
       const isFocused = !!focusedTag && focusedTag === tag;
       return {
         ...styles.chip,
-        backgroundColor: isFocused ? getChipColor(tag) : undefined,
-        color: isFocused ? 'black' : undefined,
+        filter: isFocused ? 'brightness(1.2)' : undefined,
       };
     },
     [focusedTag]

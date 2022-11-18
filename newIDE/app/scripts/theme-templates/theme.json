@@ -31,6 +31,52 @@
         "background-color": {
           "value": "#494949"
         }
+      },
+      "alternate-canvas-light": {
+        "background-color": {
+          "value": "#606066"
+        }
+      }
+    },
+    "dialog": {
+      "background-color": {
+        "value": "#25252E"
+      },
+      "separator": {
+        "color": {
+          "value": "#494952"
+        }
+      }
+    },
+    "search-bar": {
+      "default": {
+        "background-color": {
+          "value": "#494952"
+        },
+        "text-color": {
+          "value": "#C5C5C9"
+        }
+      },
+      "hovered": {
+        "border-color": {
+          "value": "#7F7F85"
+        }
+      },
+      "focused": {
+        "text-color": {
+          "value": "#FAFAFA"
+        },
+        "border-color": {
+          "value": "#F6F2FF"
+        }
+      },
+      "disabled": {
+        "background-color": {
+          "value": "#32323B"
+        },
+        "text-color": {
+          "value": "#494952"
+        }
       }
     },
     "selection": {

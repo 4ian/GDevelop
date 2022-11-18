@@ -89,6 +89,7 @@ const getWrongEditorTooltip = (
     description: i18n._(
       t`Go back to ${translatedExpectedEditor}${sceneMention} to keep creating your game.`
     ),
+    standalone: true,
   };
 };
 

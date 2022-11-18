@@ -32,6 +32,7 @@ import UnsavedChangesContext, {
 import { Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import { roundTo } from '../Utils/Mathematics';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -53,6 +54,7 @@ export type PrimitiveValueField =
       valueType: 'number',
       getValue: Instance => number,
       setValue: (instance: Instance, newValue: number) => void,
+      roundDecimals?: number,
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -122,7 +124,7 @@ export type Field =
       name: string,
       type: 'row' | 'column',
       title?: ?string,
-      children: Array<Object>,
+      children: Array<Field>,
     |};
 
 // The schema is the tree of all fields.
@@ -180,11 +182,17 @@ const getDisabled = (instances: Instances, field: ValueField): boolean => {
  * If there is no instances, returns the default value.
  * If the field does not have a `getValue` method, returns `null`.
  */
-const getFieldValue = (
+const getFieldValue = ({
+  instances,
+  field,
+  defaultValue,
+  roundDecimals,
+}: {
   instances: Instances,
   field: ValueField | ActionButton | SectionTitle,
-  defaultValue?: any
-): any => {
+  defaultValue?: any,
+  roundDecimals?: number,
+}): any => {
   if (!instances[0]) {
     console.log(
       'getFieldValue was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
@@ -203,7 +211,9 @@ const getFieldValue = (
     }
   }
 
-  return value;
+  return typeof value === 'number' && roundDecimals
+    ? roundTo(value, roundDecimals)
+    : value;
 };
 
 const getFieldLabel = (instances: Instances, field: ValueField): any => {
@@ -290,7 +300,7 @@ const PropertiesEditor = ({
               )
             }
             key={field.name}
-            checked={getFieldValue(instances, field)}
+            checked={getFieldValue({ instances, field })}
             onCheck={(event, newValue) => {
               instances.forEach(i => setValue(i, !!newValue));
               _onInstancesModified(instances);
@@ -299,17 +309,21 @@ const PropertiesEditor = ({
           />
         );
       } else if (field.valueType === 'number') {
-        const { setValue } = field;
+        const { setValue, roundDecimals } = field;
         return (
           <SemiControlledTextField
-            value={getFieldValue(instances, field)}
+            value={getFieldValue({ instances, field, roundDecimals })}
             key={field.name}
             id={field.name}
             floatingLabelText={getFieldLabel(instances, field)}
             floatingLabelFixed
             helperMarkdownText={getFieldDescription(field)}
             onChange={newValue => {
-              instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
+              let cleanedValue = parseFloat(newValue) || 0;
+              cleanedValue = roundDecimals
+                ? roundTo(cleanedValue, roundDecimals)
+                : cleanedValue;
+              instances.forEach(i => setValue(i, cleanedValue));
               _onInstancesModified(instances);
             }}
             type="number"
@@ -327,7 +341,7 @@ const PropertiesEditor = ({
             helperMarkdownText={getFieldDescription(field)}
             disableAlpha
             fullWidth
-            color={getFieldValue(instances, field)}
+            color={getFieldValue({ instances, field })}
             onChange={color => {
               const rgbString =
                 color.length === 0 ? '' : rgbOrHexToRGBString(color);
@@ -346,7 +360,7 @@ const PropertiesEditor = ({
               instances.forEach(i => setValue(i, text || ''));
               _onInstancesModified(instances);
             }}
-            value={getFieldValue(instances, field)}
+            value={getFieldValue({ instances, field })}
             floatingLabelText={getFieldLabel(instances, field)}
             floatingLabelFixed
             helperMarkdownText={getFieldDescription(field)}
@@ -361,7 +375,11 @@ const PropertiesEditor = ({
             key={field.name}
             renderTextField={() => (
               <SemiControlledTextField
-                value={getFieldValue(instances, field, '(Multiple values)')}
+                value={getFieldValue({
+                  instances,
+                  field,
+                  defaultValue: '(Multiple values)',
+                })}
                 id={field.name}
                 floatingLabelText={getFieldLabel(instances, field)}
                 floatingLabelFixed
@@ -412,7 +430,7 @@ const PropertiesEditor = ({
         const { setValue } = field;
         return (
           <SelectField
-            value={getFieldValue(instances, field)}
+            value={getFieldValue({ instances, field })}
             key={field.name}
             floatingLabelText={getFieldLabel(instances, field)}
             helperMarkdownText={getFieldDescription(field)}
@@ -430,7 +448,11 @@ const PropertiesEditor = ({
         const { setValue } = field;
         return (
           <SelectField
-            value={getFieldValue(instances, field, '(Multiple values)')}
+            value={getFieldValue({
+              instances,
+              field,
+              defaultValue: '(Multiple values)',
+            })}
             key={field.name}
             floatingLabelText={getFieldLabel(instances, field)}
             helperMarkdownText={getFieldDescription(field)}
@@ -455,8 +477,11 @@ const PropertiesEditor = ({
       if (field.disabled === 'onValuesDifferent') {
         const DIFFERENT_VALUES = 'DIFFERENT_VALUES';
         disabled =
-          getFieldValue(instances, field, DIFFERENT_VALUES) ===
-          DIFFERENT_VALUES;
+          getFieldValue({
+            instances,
+            field,
+            defaultValue: DIFFERENT_VALUES,
+          }) === DIFFERENT_VALUES;
       }
       return (
         <RaisedButton
@@ -499,11 +524,11 @@ const PropertiesEditor = ({
         resourcesLoader={ResourcesLoader}
         resourceKind={field.resourceKind}
         fullWidth
-        initialResourceName={getFieldValue(
+        initialResourceName={getFieldValue({
           instances,
           field,
-          '(Multiple values)' //TODO
-        )}
+          defaultValue: '(Multiple values)', //TODO
+        })}
         onChange={newValue => {
           instances.forEach(i => setValue(i, newValue));
           _onInstancesModified(instances);
@@ -532,11 +557,11 @@ const PropertiesEditor = ({
       let additionalText = null;
 
       if (getValue) {
-        let selectedInstancesValue = getFieldValue(
+        let selectedInstancesValue = getFieldValue({
           instances,
           field,
-          field.defaultValue || 'Multiple Values'
-        );
+          defaultValue: field.defaultValue || 'Multiple Values',
+        });
         if (!!selectedInstancesValue) additionalText = selectedInstancesValue;
       }
 

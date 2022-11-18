@@ -67,28 +67,33 @@ const isThereAnOpenDialogInTheFollowingSiblings = (
 
 const getWrongEditorTooltip = (
   i18n: I18nType,
-  expectedEditor: EditorIdentifier | null
+  expectedEditor: {| editor: EditorIdentifier, scene?: string |} | null
 ): InAppTutorialFormattedTooltip | null => {
   if (!expectedEditor) return null;
+  // TODO: handle external event, external layout, resources and extension editors
   const translatedExpectedEditor =
-    expectedEditor === 'Scene'
+    expectedEditor.editor === 'Scene'
       ? i18n._(t`the scene editor`)
-      : expectedEditor === 'Home'
+      : expectedEditor.editor === 'Home'
       ? i18n._(t`the home page`)
       : i18n._(t`the events sheet`);
+
+  const sceneMention = expectedEditor.scene
+    ? ` for scene "${expectedEditor.scene}"`
+    : '';
 
   return {
     title: i18n._(t`You're leaving the game tutorial`),
     placement: 'top',
     description: i18n._(
-      t`Go back to ${translatedExpectedEditor} to keep creating your game.`
+      t`Go back to ${translatedExpectedEditor}${sceneMention} to keep creating your game.`
     ),
   };
 };
 
 type Props = {|
   step: InAppTutorialFlowFormattedStep,
-  expectedEditor: EditorIdentifier | null,
+  expectedEditor: {| editor: EditorIdentifier, scene?: string |} | null,
   goToFallbackStep: () => void,
   endTutorial: () => void,
   progress: number,

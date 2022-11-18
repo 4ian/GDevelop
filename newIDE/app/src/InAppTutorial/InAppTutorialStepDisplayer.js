@@ -13,6 +13,7 @@ import {
 import InAppTutorialElementHighlighter from './InAppTutorialElementHighlighter';
 import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
 import { isElementADialog } from '../UI/MaterialUISpecificUtil';
+import { getEditorTabSelector } from './InAppTutorialOrchestrator';
 
 const styles = {
   avatarContainer: {
@@ -189,11 +190,23 @@ function InAppTutorialStepDisplayer({
   const renderHighlighter = () => {
     if (
       // hide highlighter if
-      expectedEditor || // the user is on the wrong editor
       !elementToHighlight || // there's no element to highlight
       hideBehindOtherDialog // the element to highlight is on a dialog hidden behind another one
-    )
+    ) {
       return null;
+    }
+    if (expectedEditor) {
+      const tabToHighlight = document.querySelector(
+        getEditorTabSelector({
+          editor: expectedEditor.editor,
+          sceneName: expectedEditor.scene,
+        })
+      );
+      if (tabToHighlight) {
+        return <InAppTutorialElementHighlighter element={tabToHighlight} />;
+      }
+      return null;
+    }
     return <InAppTutorialElementHighlighter element={elementToHighlight} />;
   };
 

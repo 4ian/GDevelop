@@ -12,9 +12,6 @@ type Props = {|
 |};
 
 const changesBeforeShowingWarning = 3;
-// If the user is editing the object for more than 10 seconds, reduce the number of changes to show the warning.
-const timeoutBeforeShowingFasterWarning = 10000;
-const changesBeforeShowingWarningAfterTimeout = 1;
 
 /**
  * Custom hook serializing the object and allowing to restore back
@@ -28,7 +25,6 @@ export const useSerializableObjectCancelableEditor = ({
 }: Props) => {
   const serializedElementRef = React.useRef(null);
   const numberOfChangesRef = React.useRef(0);
-  const startTimeRef = React.useRef(Date.now());
   const { showConfirmation } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
   const backdropClickBehavior = preferences.values.backdropClickBehavior;
@@ -71,16 +67,10 @@ export const useSerializableObjectCancelableEditor = ({
 
       // We show a warning if:
       // - the user has not set the backdrop click behavior to "cancel", as we assume they know what they are doing
-      // and if one of those conditions is met:
-      // - the user has made a significant number of changes
-      // - the user has been editing for a significant amount of time
+      // and if the user has made a significant number of changes
       const shouldShowWarning =
         !hasCancelBackdropPreference &&
-        (numberOfChangesRef.current >= changesBeforeShowingWarning ||
-          (numberOfChangesRef.current >=
-            changesBeforeShowingWarningAfterTimeout &&
-            Date.now() - startTimeRef.current >
-              timeoutBeforeShowingFasterWarning));
+        numberOfChangesRef.current >= changesBeforeShowingWarning;
 
       if (shouldShowWarning) {
         const answer = await showConfirmation({

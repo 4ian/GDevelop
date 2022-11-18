@@ -5,7 +5,7 @@ import Text from '../../../../UI/Text';
 import Window from '../../../../Utils/Window';
 import { Trans } from '@lingui/macro';
 import PublishIcon from '@material-ui/icons/Publish';
-import { LineStackLayout } from '../../../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import { type HomeTab } from '../HomePageMenu';
 import {
   type TutorialCategory,
@@ -68,12 +68,10 @@ const styles = {
     textAlign: 'center',
     maxWidth: (SMALL_WIDGET_SIZE + 2 * 5) * HELP_ITEMS_MAX_COLUMNS, // Avoid tiles taking too much space on large screens.
   },
-  gridListTile: {
-    display: 'flex',
-    justifyContent: 'flex-start',
-  },
   helpItem: {
     padding: 10,
+    flex: 1,
+    display: 'flex',
   },
 };
 
@@ -166,22 +164,21 @@ const MainPage = ({
             {helpItems.map((helpItem, index) => (
               <GridListTile
                 key={index}
-                style={styles.gridListTile}
                 classes={{ tile: classes.tile }}
               >
                 <CardWidget
                   onClick={helpItem.action}
                   key={index}
-                  size="small"
+                  size="large"
                   disabled={helpItem.disabled}
                 >
                   <div style={styles.helpItem}>
-                    <Column alignItems="center">
-                      <Text size="block-title">{helpItem.title}</Text>
-                      <Text size="body" color="secondary">
+                    <ColumnStackLayout expand justifyContent="center" useFullHeight>
+                      <Text noMargin size="block-title">{helpItem.title}</Text>
+                      <Text noMargin size="body" color="secondary">
                         {helpItem.description}
                       </Text>
-                    </Column>
+                    </ColumnStackLayout>
                   </div>
                 </CardWidget>
               </GridListTile>

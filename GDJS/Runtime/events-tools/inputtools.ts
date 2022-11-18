@@ -486,6 +486,12 @@ namespace gdjs {
           .getInputManager()
           .touchSimulateMouse(enable);
       };
+
+      export const isAnyTouchPressed = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ) {
+        instanceContainer.getGame().getInputManager()._touches.firstKey() !== null;
+      };
     }
   }
 }

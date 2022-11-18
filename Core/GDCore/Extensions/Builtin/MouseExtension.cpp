@@ -300,6 +300,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
 
   extension
       .AddCondition(
+          "IsAnyTouchPressed",
+          _("Any touch pressed"),
+          _("Check if any touch is pressed."),
+          _("At least one touch is pressed"),
+          _("Multitouch"),
+          "res/conditions/touch24.png",
+          "res/conditions/touch.png")
+      .AddCodeOnlyParameter("currentScene", "");
+
+  extension
+      .AddCondition(
           "PopStartedTouch",
           _("A new touch has started"),
           _("Check if a touch has started. The touch identifier can be "

@@ -826,7 +826,11 @@ namespace gdjs {
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       // Step the world if not done this frame yet
-      if (!this._sharedData.stepped) {
+      // Don't step at the first frame to allow events to handle overlapping objects.
+      if (
+        !this._sharedData.stepped &&
+        !instanceContainer.getScene().getTimeManager().isFirstFrame()
+      ) {
         // Reset started and ended contacts array for all physics instances.
         this._sharedData.resetStartedAndEndedCollisions();
         this._sharedData.updateBodiesFromObjects();

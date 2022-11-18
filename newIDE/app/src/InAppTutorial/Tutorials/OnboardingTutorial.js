@@ -6,9 +6,9 @@ import { type InAppTutorial } from '../InAppTutorialContext';
 const inAppTutorial: InAppTutorial = {
   id: 'onboarding',
   editorSwitches: {
-    GoToBuildSection: 'Home',
-    ClickOnNewObjectButtonForCharacter: 'Scene',
-    ClickOnNewEvent: 'EventsSheet',
+    GoToBuildSection: { editor: 'Home' },
+    ClickOnNewObjectButtonForCharacter: { editor: 'Scene' },
+    ClickOnNewEvent: { editor: 'EventsSheet' },
   },
   endDialog: {
     content: [

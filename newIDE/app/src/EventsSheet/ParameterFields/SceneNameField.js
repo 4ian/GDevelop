@@ -25,6 +25,7 @@ export default class SceneNameField extends Component<
 
     return (
       <GenericExpressionField
+        id="scene-name"
         expressionType="string"
         onGetAdditionalAutocompletions={expression =>
           layoutNames.filter(

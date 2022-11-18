@@ -1,34 +1,33 @@
 // @flow
 import * as React from 'react';
-import { Line, Column } from '../../../UI/Grid';
-import Text from '../../../UI/Text';
 import { Trans } from '@lingui/macro';
-import { type HomeTab } from './HomePageMenu';
+import GridList from '@material-ui/core/GridList';
+import GridListTile from '@material-ui/core/GridListTile';
+import Paper from '@material-ui/core/Paper';
 import { isMobile } from '../../../Utils/Platform';
 import { sendOnboardingManuallyOpened } from '../../../Utils/Analytics/EventSender';
 import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
-import SectionContainer, { SectionRow } from './SectionContainer';
 import {
   useResponsiveWindowWidth,
   type WidthType,
 } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import { CardWidget, LARGE_WIDGET_SIZE } from './CardWidget';
 import Checkbox from '../../../UI/Checkbox';
-import { GridList, GridListTile } from '@material-ui/core';
-import { ResponsiveLineStackLayout } from '../../../UI/Layout';
+import { Line, Column, LargeSpacer } from '../../../UI/Grid';
+import Text from '../../../UI/Text';
+import {
+  ColumnStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../../UI/Layout';
 import InAppTutorialContext from '../../../InAppTutorial/InAppTutorialContext';
+import PlaceholderLoader from '../../../UI/PlaceholderLoader';
+import Window from '../../../Utils/Window';
 
-const getColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
-    case 'small':
-      return 1;
-    case 'medium':
-      return 2;
-    case 'large':
-    default:
-      return 3;
-  }
-};
+import { type HomeTab } from './HomePageMenu';
+import SectionContainer, { SectionRow } from './SectionContainer';
+import { CardWidget, LARGE_WIDGET_SIZE } from './CardWidget';
+
+const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
+
 const MAX_COLUMNS = getColumnsFromWidth('large');
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const ITEMS_SPACING = 5;
@@ -38,11 +37,11 @@ const styles = {
     // Avoid tiles taking too much space on large screens.
     maxWidth: MAX_SECTION_WIDTH,
     overflow: 'hidden',
+    width: '100%',
   },
-  gridListTile: { display: 'flex', justifyContent: 'flex-start' },
   cardTextContainer: {
-    textAlign: 'left',
-    padding: 10,
+    flex: 1,
+    display: 'flex',
   },
   cardImage: {
     width: '100%',
@@ -81,46 +80,39 @@ const GetStartedSection = ({
   showGetStartedSection,
   setShowGetStartedSection,
 }: Props) => {
+  const { inAppTutorialShortHeaders } = React.useContext(InAppTutorialContext);
   const windowWidth = useResponsiveWindowWidth();
-  const { isInAppTutorialRunning } = React.useContext(InAppTutorialContext);
+  const { currentlyRunningInAppTutorial } = React.useContext(
+    InAppTutorialContext
+  );
   const shouldShowOnboardingButton = !isMobile() && windowWidth !== 'small';
   const items: {
     key: string,
     title: React.Node,
-    subText?: React.Node,
     description: React.Node,
     action: () => void,
-    imagePath: string,
     disabled?: boolean,
   }[] = [
     {
       key: 'tutorial',
-      title: <Trans>GDevelop tutorials</Trans>,
-      subText: (
-        <>
-          <span style={styles.icon}>🕐</span>
-          <Trans>30 min to 1h</Trans>
-        </>
+      title: <Trans>Learn Section</Trans>,
+      description: (
+        <Trans>Find all the learning content related to GDevelop.</Trans>
       ),
-      description: <Trans>Learn the basics of game development</Trans>,
       action: () => onTabChange('learn'),
-      imagePath: 'res/homepage/get-started.png',
     },
     {
       key: 'build',
-      title: <Trans>Start building directly</Trans>,
-      subText: '🌶🌶🌶',
-      description: <Trans>For people who like to try on their own</Trans>,
-      action: onCreateProject,
-      imagePath: 'res/homepage/start-building.png',
+      title: <Trans>“How do I” forum</Trans>,
+      description: <Trans>Ask your questions.</Trans>,
+      action: () => Window.openExternalURL('https://forum.gdevelop.io/'),
     },
     {
       key: 'games',
-      title: <Trans>Explore games made by others</Trans>,
-      subText: '🎮',
+      title: <Trans>Wiki documentation</Trans>,
       description: <Trans>Get inspired and have fun</Trans>,
-      action: () => onTabChange('play'),
-      imagePath: 'res/homepage/explore-games.png',
+      action: () =>
+        Window.openExternalURL('https://wiki.gdevelop.io/gdevelop5'),
     },
   ];
 
@@ -146,37 +138,47 @@ const GetStartedSection = ({
                   onOpenOnboardingDialog();
                 }}
                 size="banner"
-                disabled={isInAppTutorialRunning}
+                disabled={!!currentlyRunningInAppTutorial}
               >
-                <ResponsiveLineStackLayout noMargin expand>
-                  <img
-                    alt="tour"
-                    src="res/homepage/step-by-step.gif"
-                    style={styles.bannerImage}
-                  />
-                  <div style={styles.cardTextContainer}>
-                    <Text size="block-title">
-                      <Trans>Take the tour</Trans>
-                    </Text>
-                    <Text size="body" color="secondary">
-                      <span style={styles.icon}>🕐</span>
-                      <Trans>5 minutes</Trans>
-                    </Text>
-                    <Text size="body">
-                      <Trans>Learn the fundamentals of the editor</Trans>
-                    </Text>
-                  </div>
-                </ResponsiveLineStackLayout>
+                {inAppTutorialShortHeaders === null ? (
+                  <PlaceholderLoader />
+                ) : (
+                  <ResponsiveLineStackLayout noMargin expand>
+                    <img
+                      alt="tour"
+                      src="res/homepage/step-by-step.gif"
+                      style={styles.bannerImage}
+                    />
+                    <div style={styles.cardTextContainer}>
+                      <Column noMargin expand>
+                        <Text size="block-title">
+                          <Trans>Take the tour</Trans>
+                        </Text>
+                        <Text size="body" color="secondary">
+                          <span style={styles.icon}>🕐</span>
+                          <Trans>5 minutes</Trans>
+                        </Text>
+                        <Text size="body">
+                          <Trans>Learn the fundamentals of the editor</Trans>
+                        </Text>
+                      </Column>
+                    </div>
+                  </ResponsiveLineStackLayout>
+                )}
               </CardWidget>
             </div>
           </Line>
         )}
       </SectionRow>
       <SectionRow>
-        <Text size="title">
-          <Trans>New to GDevelop?</Trans>
+        <Text size="title" noMargin>
+          <Trans>Want to explore further?</Trans>
         </Text>
-        <Line noMargin>
+        <Text size="body" noMargin>
+          <Trans>Articles, wiki and much more.</Trans>
+        </Text>
+        <LargeSpacer />
+        <Line noMargin expand>
           <GridList
             cols={getColumnsFromWidth(windowWidth)}
             style={styles.grid}
@@ -184,29 +186,32 @@ const GetStartedSection = ({
             spacing={ITEMS_SPACING * 2}
           >
             {items.map((item, index) => (
-              <GridListTile key={index} style={styles.gridListTile}>
+              <GridListTile key={index}>
                 <CardWidget
                   onClick={item.action}
                   key={index}
                   size="large"
                   disabled={item.disabled}
                 >
-                  <Column noMargin expand>
-                    <img
-                      alt={item.key}
-                      src={item.imagePath}
-                      style={styles.cardImage}
-                    />
-                    <div style={styles.cardTextContainer}>
-                      <Text size="block-title">{item.title}</Text>
-                      {item.subText && (
-                        <Text size="body" color="secondary">
-                          {item.subText}
-                        </Text>
-                      )}
-                      <Text size="body">{item.description}</Text>
-                    </div>
-                  </Column>
+                  <Paper
+                    style={{
+                      ...styles.cardTextContainer,
+                      padding: windowWidth === 'small' ? 10 : 20,
+                    }}
+                  >
+                    <ColumnStackLayout
+                      expand
+                      justifyContent="center"
+                      useFullHeight
+                    >
+                      <Text size="block-title" noMargin>
+                        {item.title}
+                      </Text>
+                      <Text size="body" color="secondary" noMargin>
+                        {item.description}
+                      </Text>
+                    </ColumnStackLayout>
+                  </Paper>
                 </CardWidget>
               </GridListTile>
             ))}

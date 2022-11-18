@@ -15,6 +15,9 @@ const useInAppTutorialOrchestrator = ({ editorTabs }: Props) => {
     currentEditor,
     setCurrentEditor,
   ] = React.useState<EditorIdentifier | null>(null);
+  const [currentSceneName, setCurrentSceneName] = React.useState<string | null>(
+    null
+  );
 
   React.useEffect(
     () => {
@@ -27,15 +30,26 @@ const useInAppTutorialOrchestrator = ({ editorTabs }: Props) => {
         ? 'Home'
         : currentTab.key.startsWith('layout event')
         ? 'EventsSheet'
+        : currentTab.key.startsWith('external events')
+        ? 'ExternalEvents'
+        : currentTab.key.startsWith('external layout')
+        ? 'ExternalLayout'
+        : currentTab.key.startsWith('events functions extension')
+        ? 'Extension'
+        : currentTab.key.startsWith('resources')
+        ? 'Resources'
         : 'Scene';
       setCurrentEditor(editorIdentifier);
+      if (currentTab.key.startsWith('layout') && currentTab.projectItemName) {
+        setCurrentSceneName(currentTab.projectItemName);
+      }
     },
     [editorTabs]
   );
 
   return {
     InAppTutorialOrchestrator,
-    orchestratorProps: { currentEditor },
+    orchestratorProps: { currentEditor, currentSceneName },
   };
 };
 

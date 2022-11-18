@@ -490,7 +490,8 @@ namespace gdjs {
       export const isAnyTouchPressed = function (
         instanceContainer: gdjs.RuntimeInstanceContainer
       ) {
-        instanceContainer.getGame().getInputManager()._touches.firstKey() !== null;
+        instanceContainer.getGame().getInputManager()._touches.firstKey() !==
+          null;
       };
     }
   }

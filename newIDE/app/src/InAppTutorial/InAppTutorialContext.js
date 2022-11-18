@@ -77,7 +77,7 @@ export type InAppTutorial = {|
   id: string,
   flow: Array<InAppTutorialFlowStep>,
   editorSwitches: {
-    [stepId: string]: EditorIdentifier,
+    [stepId: string]: {| editor: EditorIdentifier, scene?: string |},
   },
   endDialog: InAppTutorialEndDialog,
 |};

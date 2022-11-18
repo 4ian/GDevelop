@@ -1,18 +1,53 @@
 {
   "id": "flingGame",
   "editorSwitches": {
-    "GoToBuildSection": "Home",
-    "OpenPropertiesManager": "Scene",
-    "SwitchToEvents1": "EventsSheet",
-    "SwitchToEvents2": "EventsSheet",
-    "SwitchToEvents3": "EventsSheet",
-    "SwitchToEvents4": "EventsSheet",
-    "SwitchToEvents5": "EventsSheet",
-    "SwitchToEvents6": "EventsSheet",
-    "SwitchToScene1": "Scene",
-    "SwitchToScene2": "Scene",
-    "openLeaderboardScene": "Scene",
-    "ClickOnNewObjectButtonForScore": "Scene"
+    "GoToBuildSection": {
+      "editor": "Home"
+    },
+    "OpenPropertiesManager": {
+      "editor": "Scene",
+      "scene": "playScene"
+    },
+    "SwitchToEvents1": {
+      "editor": "EventsSheet",
+      "scene": "playScene"
+    },
+    "SwitchToEvents2": {
+      "editor": "EventsSheet",
+      "scene": "playScene"
+    },
+    "SwitchToEvents3": {
+      "editor": "EventsSheet",
+      "scene": "startScene"
+    },
+    "SwitchToEvents4": {
+      "editor": "EventsSheet",
+      "scene": "playScene"
+    },
+    "SwitchToEvents5": {
+      "editor": "EventsSheet",
+      "scene": "startScene"
+    },
+    "SwitchToEvents6": {
+      "editor": "EventsSheet",
+      "scene": "leaderboardScene"
+    },
+    "SwitchToScene1": {
+      "editor": "Scene",
+      "scene": "playScene"
+    },
+    "SwitchToScene2": {
+      "editor": "Scene",
+      "scene": "playScene"
+    },
+    "openLeaderboardScene": {
+      "editor": "Scene",
+      "scene": "leaderboardScene"
+    },
+    "ClickOnNewObjectButtonForScore": {
+      "editor": "Scene",
+      "scene": "playScene"
+    }
   },
   "endDialog": {
     "content": [

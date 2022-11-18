@@ -332,6 +332,9 @@ const InAppTutorialOrchestrator = React.forwardRef<
     expectedEditor,
     setExpectedEditor,
   ] = React.useState<EditorIdentifier | null>(null);
+  const [expectedSceneKey, setExpectedSceneKey] = React.useState<string | null>(
+    null
+  );
   const [
     elementWithValueToWatch,
     setElementWithValueToWatch,
@@ -545,7 +548,9 @@ const InAppTutorialOrchestrator = React.forwardRef<
       const { id, isOnClosableDialog } = currentStep;
       // Set expected editor on each step change
       if (id && editorSwitches.hasOwnProperty(id)) {
-        setExpectedEditor(editorSwitches[id]);
+        const editorSwitch = editorSwitches[id];
+        setExpectedEditor(editorSwitch.editor);
+        if (editorSwitch.scene) setExpectedSceneKey(editorSwitch.scene);
       }
       // Set fallback step index to the new step index if it is not on a closable dialog.
       if (!isOnClosableDialog) {

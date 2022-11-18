@@ -15,7 +15,7 @@ import {
 import HelpButton from '../UI/HelpButton';
 import { Column, Line } from '../UI/Grid';
 import { Tabs } from '../UI/Tabs';
-import { AssetStore } from '.';
+import { AssetStore, type AssetStoreInterface } from '.';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -302,6 +302,15 @@ export default function NewObjectDialog({
       undefined
     );
 
+  const assetStore = React.useRef<?AssetStoreInterface>(null);
+  const handleClose = React.useCallback(
+    () => {
+      assetStore.current && assetStore.current.onClose();
+      onClose();
+    },
+    [onClose]
+  );
+
   return (
     <>
       <Dialog
@@ -312,12 +321,12 @@ export default function NewObjectDialog({
             key="close"
             label={<Trans>Close</Trans>}
             primary={false}
-            onClick={onClose}
+            onClick={handleClose}
             id="close-button"
           />,
           mainAction,
         ]}
-        onRequestClose={onClose}
+        onRequestClose={handleClose}
         onApply={
           openedAssetPack
             ? () => setIsAssetPackDialogInstallOpen(true)
@@ -350,7 +359,9 @@ export default function NewObjectDialog({
           />
         }
       >
-        {currentTab === 'asset-store' && <AssetStore project={project} />}
+        {currentTab === 'asset-store' && (
+          <AssetStore ref={assetStore} project={project} />
+        )}
         {currentTab === 'new-object' && (
           <ScrollView>
             {DismissableTutorialMessage && (

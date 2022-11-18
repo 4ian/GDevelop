@@ -141,6 +141,42 @@
         }
       }
     },
+    "search-bar": {
+      "default": {
+        "background-color": {
+          "value": "#FFFFFF"
+        },
+        "text-color": {
+          "value": "#7F7F85",
+          "comment": "Palette/Grey/50"
+        }
+      },
+      "hovered": {
+        "border-color": {
+          "value": "#7F7F85",
+          "comment": "Palette/Grey/50"
+        }
+      },
+      "focused": {
+        "text-color": {
+          "value": "#1D1D26",
+          "comment": "Palette/Grey/100"
+        },
+        "border-color": {
+          "value": "#1D1D26",
+          "comment": "Palette/Purple/30"
+        }
+      },
+      "disabled": {
+        "background-color": {
+          "value": "#F6F6F6"
+        },
+        "text-color": {
+          "value": "#C5C5C9",
+          "comment": "Palette/Grey/30"
+        }
+      }
+    },
     "selection": {
       "background-color": {
         "value": "#ECE5FF",

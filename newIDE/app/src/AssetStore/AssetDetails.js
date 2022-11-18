@@ -82,7 +82,6 @@ type Props = {|
   onTagSelection: (tag: string) => void,
   assetShortHeader: AssetShortHeader,
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
-  onScroll?: number => void,
   onAssetLoaded?: () => void,
 |};
 
@@ -99,6 +98,7 @@ const getObjectAssetResourcesByName = (
 };
 
 export type AssetDetailsInterface = {|
+  getScrollPosition: () => number,
   scrollToPosition: (y: number) => void,
 |};
 
@@ -109,7 +109,6 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
       onTagSelection,
       assetShortHeader,
       onOpenDetails,
-      onScroll,
       onAssetLoaded,
     }: Props,
     ref
@@ -135,6 +134,15 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
 
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
+      /**
+       * Return the scroll position.
+       */
+      getScrollPosition: () => {
+        const scrollViewElement = scrollView.current;
+        if (!scrollViewElement) return 0;
+
+        return scrollViewElement.getScrollPosition();
+      },
       scrollToPosition: (y: number) => {
         const scrollViewElement = scrollView.current;
         if (!scrollViewElement) return;
@@ -234,11 +242,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
     const truncatedSearchResults = searchResults && searchResults.slice(0, 60);
 
     return (
-      <ScrollView
-        ref={scrollView}
-        style={styles.scrollView}
-        onScroll={onScroll}
-      >
+      <ScrollView ref={scrollView} style={styles.scrollView}>
         <Column expand noMargin>
           <Line justifyContent="space-between" noMargin>
             <Column>

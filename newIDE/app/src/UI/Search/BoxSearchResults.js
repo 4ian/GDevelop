@@ -17,7 +17,6 @@ type Props<SearchItem> = {|
   // so make sure to limit the number of items to a reasonable number for performance.
   noScroll?: boolean,
   noResultPlaceholder?: React.Node,
-  onScroll?: number => void,
 |};
 
 const styles = {
@@ -26,6 +25,7 @@ const styles = {
 };
 
 export type BoxSearchResultsInterface = {|
+  getScrollPosition: () => number,
   scrollToPosition: (y: number) => void,
 |};
 
@@ -43,12 +43,26 @@ export const BoxSearchResults = React.forwardRef<
       baseSize,
       noResultPlaceholder,
       noScroll,
-      onScroll,
     }: Props<SearchItem>,
     ref
   ) => {
     const grid = React.useRef<?Grid>(null);
     React.useImperativeHandle(ref, () => ({
+      /**
+       * Return the scroll position.
+       */
+      getScrollPosition: () => {
+        const scrollViewElement = grid.current;
+        if (!scrollViewElement) return 0;
+
+        // TODO Find a clean way to get the scroll position.
+        // Using the internal state of a component is hacky.
+        // Grid probably doesn't expose the scroll position
+        // because it became irrelevant when the dimensions change.
+        // Though, it's easier to use it and the chance that the Grid is
+        // resized is low.
+        return scrollViewElement.state.scrollTop;
+      },
       scrollToPosition: (y: number) => {
         const scrollViewElement = grid.current;
         if (!scrollViewElement) return;
@@ -56,11 +70,6 @@ export const BoxSearchResults = React.forwardRef<
         scrollViewElement.scrollToPosition({ scrollLeft: 0, scrollTop: y });
       },
     }));
-
-    const handleScroll = React.useCallback(
-      (event: ScrollParams) => onScroll && onScroll(event.scrollTop),
-      [onScroll]
-    );
 
     if (!searchItems) {
       if (!error) return <PlaceholderLoader />;
@@ -132,7 +141,6 @@ export const BoxSearchResults = React.forwardRef<
                   rowCount={rowCount}
                   cellRenderer={cellRenderer}
                   style={styles.grid}
-                  onScroll={handleScroll}
                 />
               );
             }}

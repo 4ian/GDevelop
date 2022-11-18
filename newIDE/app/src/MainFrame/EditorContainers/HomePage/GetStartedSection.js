@@ -14,7 +14,10 @@ import {
 import Checkbox from '../../../UI/Checkbox';
 import { Line, Column, LargeSpacer } from '../../../UI/Grid';
 import Text from '../../../UI/Text';
-import { ResponsiveLineStackLayout } from '../../../UI/Layout';
+import {
+  ColumnStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../../UI/Layout';
 import InAppTutorialContext from '../../../InAppTutorial/InAppTutorialContext';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 import Window from '../../../Utils/Window';
@@ -37,7 +40,6 @@ const styles = {
     width: '100%',
   },
   cardTextContainer: {
-    padding: 20,
     flex: 1,
     display: 'flex',
   },
@@ -191,15 +193,24 @@ const GetStartedSection = ({
                   size="large"
                   disabled={item.disabled}
                 >
-                  <Paper style={styles.cardTextContainer}>
-                    <Column expand justifyContent="center" useFullHeight>
+                  <Paper
+                    style={{
+                      ...styles.cardTextContainer,
+                      padding: windowWidth === 'small' ? 10 : 20,
+                    }}
+                  >
+                    <ColumnStackLayout
+                      expand
+                      justifyContent="center"
+                      useFullHeight
+                    >
                       <Text size="block-title" noMargin>
                         {item.title}
                       </Text>
                       <Text size="body" color="secondary" noMargin>
                         {item.description}
                       </Text>
-                    </Column>
+                    </ColumnStackLayout>
                   </Paper>
                 </CardWidget>
               </GridListTile>

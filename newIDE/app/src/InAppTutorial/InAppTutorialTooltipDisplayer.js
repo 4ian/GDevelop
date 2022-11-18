@@ -326,9 +326,7 @@ const InAppTutorialTooltipDisplayer = ({
                 <Column noMargin>
                   <TooltipHeader
                     paletteType={paletteType}
-                    // Display the hide button only if standalone because the only
-                    // way to show it back is to click on the avatar (through
-                    // ref handle method).
+                    // Display the hide button when standalone only
                     displayFoldButton={!!tooltip.standalone}
                     progress={progress}
                     tooltipContent={

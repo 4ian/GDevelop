@@ -54,20 +54,24 @@ export const ImageWithMultipleExternalEditors = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={() => Promise.reject('Unimplemented')}
-    resourceExternalEditors={[
-      ...fakeResourceExternalEditors,
-      {
-        name: 'fake-image-editor-2',
-        createDisplayName: 'Create with Super Image Editor 2',
-        editDisplayName: 'Edit with Super Image Editor 2',
-        kind: 'image',
-        edit: options => {
-          console.log('Open the image editor with these options:', options);
+    resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: [
+        ...fakeResourceExternalEditors,
+        {
+          name: 'fake-image-editor-2',
+          createDisplayName: 'Create with Super Image Editor 2',
+          editDisplayName: 'Edit with Super Image Editor 2',
+          kind: 'image',
+          edit: options => {
+            console.log('Open the image editor with these options:', options);
+          },
         },
-      },
-    ]}
+      ],
+    }}
     initialResourceName=""
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}
@@ -78,9 +82,13 @@ export const NotExisting = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={action('onChooseResource')}
-    resourceExternalEditors={fakeResourceExternalEditors}
+    resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
     initialResourceName="resource-that-does-not-exists-in-the-project"
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}

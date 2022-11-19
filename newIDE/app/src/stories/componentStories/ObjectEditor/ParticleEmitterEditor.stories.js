@@ -11,6 +11,7 @@ import paperDecorator from '../../PaperDecorator';
 import ParticleEmitterEditor from '../../../ObjectEditor/Editors/ParticleEmitterEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'ObjectEditor/ParticleEmitterEditor',
@@ -23,9 +24,13 @@ export const Default = () => (
     <ParticleEmitterEditor
       objectConfiguration={testProject.particleEmitterConfiguration}
       project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={source => action('Choose resource from source', source)}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       onSizeUpdated={() => {}}
       objectName="FakeObjectName"
     />

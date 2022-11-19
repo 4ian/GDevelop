@@ -4,7 +4,6 @@ import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import EventsBasedObjectEditor from './index';
 import HelpButton from '../UI/HelpButton';
-import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 import { Tabs } from '../UI/Tabs';
 import EventsBasedObjectPropertiesEditor from './EventsBasedObjectPropertiesEditor';
 import EventBasedObjectChildrenEditor from './EventBasedObjectChildrenEditor';
@@ -14,7 +13,6 @@ type TabName = 'configuration' | 'properties' | 'children';
 type Props = {|
   onApply: () => void,
   project: gdProject,
-  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
   globalObjectsContainer: gdObjectsContainer,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
@@ -24,7 +22,6 @@ type Props = {|
 export default function EventsBasedObjectEditorDialog({
   onApply,
   project,
-  onFetchNewlyAddedResources,
   globalObjectsContainer,
   eventsFunctionsExtension,
   eventsBasedObject,
@@ -85,7 +82,6 @@ export default function EventsBasedObjectEditorDialog({
       {currentTab === 'children' && (
         <EventBasedObjectChildrenEditor
           project={project}
-          onFetchNewlyAddedResources={onFetchNewlyAddedResources}
           globalObjectsContainer={globalObjectsContainer}
           eventsFunctionsExtension={eventsFunctionsExtension}
           eventsBasedObject={eventsBasedObject}

@@ -24,7 +24,6 @@ import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
 import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
 import { IconContainer } from '../UI/IconContainer';
 import { getBehaviorTutorialIds } from '../Utils/GDevelopServices/Tutorial';
-import ScrollView from '../UI/ScrollView';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 
 const gd: libGDevelop = global.gd;
@@ -38,12 +37,6 @@ type Props = {|
   onOpenMoreSettings?: ?() => void,
   onEditVariables: () => void,
   resourceManagementProps: ResourceManagementProps,
-|};
-
-type State = {|
-  windowTitle: string,
-  shouldStopSoundsOnStartup: boolean,
-  backgroundColor: ?RGBColor,
 |};
 
 const ScenePropertiesDialog = ({

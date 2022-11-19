@@ -60,11 +60,13 @@ export const WithObjectEditor = () => {
             project={testProject.project}
             eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
             setToolbar={() => {}}
-            resourceSources={[]}
-            onChooseResource={source =>
-              action('Choose resource from source', source)
-            }
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              getStorageProvider: () => emptyStorageProvider,
+              onFetchNewlyAddedResources: async () => {},
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
             openInstructionOrExpression={action(
               'open instruction or expression'
             )}

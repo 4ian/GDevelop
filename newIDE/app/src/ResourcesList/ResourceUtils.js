@@ -109,16 +109,6 @@ export const copyAllToProjectFolder = (
   );
 };
 
-const isURL = (filename: string) => {
-  return (
-    filename.startsWith('http://') ||
-    filename.startsWith('https://') ||
-    filename.startsWith('ftp://') ||
-    filename.startsWith('blob:') ||
-    filename.startsWith('data:')
-  );
-};
-
 export const getResourceFilePathStatus = (
   project: gdProject,
   resourceName: string

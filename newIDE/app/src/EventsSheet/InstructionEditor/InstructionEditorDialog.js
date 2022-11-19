@@ -98,9 +98,7 @@ export default function NewInstructionEditorDialog({
   isNewInstruction,
   scope,
   onSubmit,
-  resourceSources,
-  onChooseResource,
-  resourceExternalEditors,
+  resourceManagementProps,
   openInstructionOrExpression,
 }: Props) {
   const forceUpdate = useForceUpdate();
@@ -265,9 +263,7 @@ export default function NewInstructionEditorDialog({
       objectName={chosenObjectName}
       isCondition={isCondition}
       instruction={instruction}
-      resourceSources={resourceSources}
-      onChooseResource={onChooseResource}
-      resourceExternalEditors={resourceExternalEditors}
+      resourceManagementProps={resourceManagementProps}
       openInstructionOrExpression={openInstructionOrExpression}
       ref={instructionParametersEditor}
       focusOnMount={!!instructionType}

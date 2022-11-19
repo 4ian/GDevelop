@@ -39,7 +39,7 @@ type Props = {|
   extension: gdEventsFunctionsExtension,
   eventsBasedBehavior: gdEventsBasedBehavior,
   properties: gdNamedPropertyDescriptorsList,
-  allowRequiredBehavior?: boolean,
+  isSceneProperties?: boolean,
   onPropertiesUpdated?: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
   behaviorObjectType?: string,
@@ -100,17 +100,6 @@ const uncapitalizeFirstLetter = (text: string): string => {
   return text.charAt(0).toLowerCase() + text.slice(1);
 };
 
-const functionIsExpressionAndAction = (
-  getterFunction: gdEventsFunction
-): boolean => {
-  return (
-    getterFunction.getFunctionType() ===
-      gd.EventsFunction.ExpressionAndCondition ||
-    getterFunction.getFunctionType() ===
-      gd.EventsFunction.StringExpressionAndCondition
-  );
-};
-
 const propertyIsNumber = (property: gdNamedPropertyDescriptor) => {
   const type = property.getType();
   return type === 'Number';
@@ -165,9 +154,8 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
     return (
       !functionsContainer.hasEventsFunctionNamed(setterName) &&
       (!functionsContainer.hasEventsFunctionNamed(getterName) ||
-        functionIsExpressionAndAction(
-          functionsContainer.getEventsFunction(getterName)
-        ))
+        functionsContainer.getEventsFunction(getterName).getFunctionType() ===
+          gd.EventsFunction.ExpressionAndCondition)
     );
   };
 
@@ -216,7 +204,10 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
       action.setParametersCount(1);
       action.setParameter(
         0,
-        'Object.Behavior::Property' + property.getName() + '()'
+        'Object.Behavior::' +
+          (this.props.isSceneProperties ? 'SharedProperty' : 'Property') +
+          property.getName() +
+          '()'
       );
       event.getActions().insert(action, 0);
     }
@@ -238,7 +229,9 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
         extension.getName() +
           '::' +
           eventsBasedBehavior.getName() +
-          '::SetProperty' +
+          (this.props.isSceneProperties
+            ? '::SetSharedProperty'
+            : '::SetProperty') +
           property.getName()
       );
       action.setParametersCount(4);
@@ -362,9 +355,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                         {
                           label: i18n._(t`Generate functions`),
                           click: () =>
-                            this._generateGetterAndSetter(
-                              property.getName()
-                            ),
+                            this._generateGetterAndSetter(property.getName()),
                           disabled: this._canGenerateGetterAndSetter(
                             property.getName()
                           ),
@@ -409,7 +400,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             value="Color"
                             primaryText={t`Color (text)`}
                           />
-                          {this.props.allowRequiredBehavior && (
+                          {this.props.isSceneProperties && (
                             <SelectOption
                               value="Behavior"
                               primaryText={t`Required behavior`}

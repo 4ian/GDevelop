@@ -14,11 +14,7 @@ import {
 } from '../Utils/ColorTransformer';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import Text from '../UI/Text';
@@ -30,9 +26,7 @@ type Props = {|
 
   // For resources:
   project: gdProject,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
 |};
 
 export const LoadingScreenEditor = ({
@@ -40,9 +34,7 @@ export const LoadingScreenEditor = ({
   onLoadingScreenUpdated,
   onChangeSubscription,
   project,
-  resourceSources,
-  onChooseResource,
-  resourceExternalEditors,
+  resourceManagementProps,
 }: Props) => {
   const subscriptionChecker = React.useRef<?SubscriptionChecker>(null);
   const forceUpdate = useForceUpdate();
@@ -63,9 +55,7 @@ export const LoadingScreenEditor = ({
             <ResourceSelectorWithThumbnail
               floatingLabelText={<Trans>Background image</Trans>}
               project={project}
-              resourceSources={resourceSources}
-              onChooseResource={onChooseResource}
-              resourceExternalEditors={resourceExternalEditors}
+              resourceManagementProps={resourceManagementProps}
               resourceKind="image"
               resourceName={loadingScreen.getBackgroundImageResourceName()}
               onChange={newResourceName => {

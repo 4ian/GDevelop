@@ -32,9 +32,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
     const {
       objectConfiguration,
       project,
-      resourceSources,
-      onChooseResource,
-      resourceExternalEditors,
+      resourceManagementProps,
     } = this.props;
     const textObjectConfiguration = gd.asTextObjectConfiguration(
       objectConfiguration
@@ -104,9 +102,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
           <ResourceSelector
             margin="none"
             project={project}
-            resourceSources={resourceSources}
-            onChooseResource={onChooseResource}
-            resourceExternalEditors={resourceExternalEditors}
+            resourceManagementProps={resourceManagementProps}
             resourcesLoader={ResourcesLoader}
             resourceKind="font"
             fullWidth

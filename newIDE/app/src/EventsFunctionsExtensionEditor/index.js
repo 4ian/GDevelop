@@ -19,11 +19,7 @@ import OptionsEditorDialog from './OptionsEditorDialog';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import EventsBasedBehaviorEditorDialog from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog';
 import EventsBasedObjectEditorDialog from '../EventsBasedObjectEditor/EventsBasedObjectEditorDialog';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
 import ObjectMethodSelectorDialog from './ObjectMethodSelectorDialog';
 import ExtensionFunctionSelectorDialog from './ExtensionFunctionSelectorDialog';
@@ -46,17 +42,13 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { ParametersIndexOffsets } from '../EventsFunctionsExtensionsLoader';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
-import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   setToolbar: (?React.Node) => void,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
-  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
+  resourceManagementProps: ResourceManagementProps,
   openInstructionOrExpression: (
     extension: gdPlatformExtension,
     type: string
@@ -1132,9 +1124,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 events={selectedEventsFunction.getEvents()}
                 onOpenExternalEvents={() => {}}
                 onOpenLayout={() => {}}
-                resourceSources={this.props.resourceSources}
-                onChooseResource={this.props.onChooseResource}
-                resourceExternalEditors={this.props.resourceExternalEditors}
+                resourceManagementProps={this.props.resourceManagementProps}
                 openInstructionOrExpression={
                   this.props.openInstructionOrExpression
                 }
@@ -1540,7 +1530,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         {editedEventsBasedObject && this._globalObjectsContainer && (
           <EventsBasedObjectEditorDialog
             project={project}
-            onFetchNewlyAddedResources={this.props.onFetchNewlyAddedResources}
             globalObjectsContainer={this._globalObjectsContainer}
             eventsFunctionsExtension={eventsFunctionsExtension}
             eventsBasedObject={editedEventsBasedObject}

@@ -292,9 +292,7 @@ const Physics2Editor = (props: Props) => {
             </Trans>
           }
           project={props.project}
-          resourceSources={props.resourceSources}
-          onChooseResource={props.onChooseResource}
-          resourceExternalEditors={props.resourceExternalEditors}
+          resourceManagementProps={props.resourceManagementProps}
           resourcesLoader={resourcesLoader}
           resourceKind={'image'}
           initialResourceName={''}

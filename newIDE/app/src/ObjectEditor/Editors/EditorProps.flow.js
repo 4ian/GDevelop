@@ -1,9 +1,5 @@
 // @flow
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 
 /**
@@ -12,9 +8,7 @@ import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 export type EditorProps = {|
   objectConfiguration: gdObjectConfiguration,
   project: gdProject,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   onSizeUpdated: () => void,
   onObjectUpdated?: () => void,
   objectName: string,

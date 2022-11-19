@@ -8,6 +8,8 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import muiDecorator from '../../ThemeDecorator';
 import ScenePropertiesDialog from '../../../SceneEditor/ScenePropertiesDialog';
+import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'LayoutEditor/ScenePropertiesDialog',
@@ -23,9 +25,13 @@ export const Default = () => (
     onClose={() => action('Close the dialog')}
     onApply={() => action('Apply changes')}
     onEditVariables={() => action('Edit variables')}
-    resourceSources={[]}
-    resourceExternalEditors={[]}
-    onChooseResource={() => action('Choose a resource')}
+    resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
   />
 );
 
@@ -38,8 +44,12 @@ export const MoreSettings = () => (
     onApply={() => action('Apply changes')}
     onEditVariables={() => action('Edit variables')}
     onOpenMoreSettings={() => action('Open more settings')}
-    resourceSources={[]}
-    resourceExternalEditors={[]}
-    onChooseResource={() => action('Choose a resource')}
+    resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
   />
 );

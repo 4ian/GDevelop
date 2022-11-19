@@ -1,7 +1,6 @@
 // @flow
 
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -11,6 +10,7 @@ import paperDecorator from '../../PaperDecorator';
 import PanelSpriteEditor from '../../../ObjectEditor/Editors/PanelSpriteEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'ObjectEditor/PanelSpriteEditor',
@@ -25,9 +25,13 @@ export const Default = () => (
     <PanelSpriteEditor
       objectConfiguration={testProject.panelSpriteObject.getConfiguration()}
       project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={source => action('Choose resource from source', source)}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
       onSizeUpdated={() => {}}
       objectName="FakeObjectName"
     />

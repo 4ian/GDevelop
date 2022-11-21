@@ -14,6 +14,7 @@ import {
   onSaveProjectAs,
   onAutoSaveProject,
   getWriteErrorMessage,
+  onRenderNewProjectSaveAsLocationChooser,
 } from './LocalProjectWriter';
 import {
   type AppArguments,
@@ -38,6 +39,7 @@ export default ({
       fileIdentifier: appArguments[POSITIONAL_ARGUMENTS_KEY][0],
     };
   },
+  onRenderNewProjectSaveAsLocationChooser: onRenderNewProjectSaveAsLocationChooser,
   createOperations: () => ({
     onOpenWithPicker,
     onOpen,

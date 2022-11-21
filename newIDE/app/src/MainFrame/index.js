@@ -83,19 +83,19 @@ import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
-import {
-  type CreateProjectDialogProps,
-  type ProjectCreationSettings,
+import CreateProjectDialog, {
+  type NewProjectSetup,
 } from '../ProjectCreation/CreateProjectDialog';
 import {
-  type OnCreateFromExampleShortHeaderFunction,
-  type OnCreateBlankFunction,
+  createNewProjectFromExampleShortHeader,
+  createNewProject,
 } from '../ProjectCreation/CreateProjectDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
   type StorageProvider,
   type StorageProviderOperations,
   type FileMetadata,
+  type SaveAsLocation,
   type FileMetadataAndStorageProviderName,
 } from '../ProjectsStorage';
 import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStorageProviderDialog';
@@ -137,7 +137,7 @@ import LeaderboardProvider from '../Leaderboard/LeaderboardProvider';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 import { useLeaderboardReplacer } from '../Leaderboard/useLeaderboardReplacer';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import ProjectPreCreationDialog from '../ProjectCreation/ProjectPreCreationDialog';
+import NewProjectSetupDialog from '../ProjectCreation/NewProjectSetupDialog';
 import {
   useResourceMover,
   type ResourceMover,
@@ -253,9 +253,6 @@ export type Props = {
   resourceExternalEditors: Array<ResourceExternalEditor>,
   requestUpdate?: () => void,
   renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
-  renderCreateDialog?: CreateProjectDialogProps => React.Node,
-  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
-  onCreateBlank: OnCreateBlankFunction,
   renderGDJSDevelopmentWatcher?: ?() => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
@@ -333,8 +330,8 @@ const MainFrame = (props: Props) => {
     openSubscriptionDialog,
   ] = React.useState<boolean>(false);
   const [
-    projectPreCreationDialogOpen,
-    setProjectPreCreationDialogOpen,
+    newProjectSetupDialogOpen,
+    setNewProjectSetupDialogOpen,
   ] = React.useState<boolean>(false);
   const [
     selectedExampleShortHeader,
@@ -410,9 +407,6 @@ const MainFrame = (props: Props) => {
   } = state;
   const {
     renderExportDialog,
-    renderCreateDialog,
-    onCreateFromExampleShortHeader,
-    onCreateBlank,
     resourceSources,
     renderPreviewLauncher,
     resourceExternalEditors,
@@ -1898,28 +1892,26 @@ const MainFrame = (props: Props) => {
       const storageProviderInternalName = newStorageProvider.internalName;
 
       try {
-        let newFileMetadata: ?FileMetadata = null;
+        let newSaveAsLocation: ?SaveAsLocation = null;
         if (onChooseSaveProjectAsLocation) {
-          const { fileMetadata } = await onChooseSaveProjectAsLocation({
+          const { saveAsLocation } = await onChooseSaveProjectAsLocation({
             project: currentProject,
             fileMetadata: currentFileMetadata,
-            onLocationSelected: () =>
-              _showSnackMessage(i18n._(t`Creating project...`), null),
           });
-          if (!fileMetadata) {
+          if (!saveAsLocation) {
             return; // Save as was cancelled.
           }
-          newFileMetadata = fileMetadata;
+          newSaveAsLocation = saveAsLocation;
         }
 
-        const { wasSaved } = await onSaveProjectAs(
+        const { wasSaved, fileMetadata } = await onSaveProjectAs(
           currentProject,
-          newFileMetadata,
+          newSaveAsLocation,
           {
             onStartSaving: () =>
               _replaceSnackMessage(i18n._(t`Saving...`), null),
-            onMoveResources: async () => {
-              if (newFileMetadata && currentFileMetadata)
+            onMoveResources: async ({ newFileMetadata }) => {
+              if (currentFileMetadata)
                 await ensureResourcesAreMoved({
                   project: currentProject,
                   newFileMetadata,
@@ -1939,7 +1931,7 @@ const MainFrame = (props: Props) => {
         if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
         _replaceSnackMessage(i18n._(t`Project properly saved`));
 
-        if (!newFileMetadata) {
+        if (!fileMetadata) {
           // Some storage provider like "DownloadFile" don't have file metadata, because
           // it's more like an "export".
           return;
@@ -1947,9 +1939,9 @@ const MainFrame = (props: Props) => {
 
         // Save was done on a new file/location, so save it in the
         // recent projects and in the state.
-        const enrichedFileMetadata = newFileMetadata.name
-          ? newFileMetadata
-          : { ...newFileMetadata, name: projectName };
+        const enrichedFileMetadata = fileMetadata.name
+          ? fileMetadata
+          : { ...fileMetadata, name: projectName };
         preferences.insertRecentProjectFile({
           fileMetadata: enrichedFileMetadata,
           storageProviderName: storageProviderInternalName,
@@ -1989,7 +1981,6 @@ const MainFrame = (props: Props) => {
       unsavedChanges,
       setState,
       state.editorTabs,
-      _showSnackMessage,
       _replaceSnackMessage,
       _closeSnackMessage,
       getStorageProvider,
@@ -2267,27 +2258,20 @@ const MainFrame = (props: Props) => {
 
   const createProject = async (
     i18n: I18n,
-    settings: ProjectCreationSettings
+    newProjectSetup: NewProjectSetup
   ) => {
     setIsProjectOpening(true);
 
     try {
-      const createProjectSetup = selectedExampleShortHeader
-        ? await onCreateFromExampleShortHeader({
+      const source = selectedExampleShortHeader
+        ? await createNewProjectFromExampleShortHeader({
             i18n,
             exampleShortHeader: selectedExampleShortHeader,
-            settings,
           })
-        : await onCreateBlank({
-            i18n,
-            settings,
-          });
+        : await createNewProject();
 
-      if (!createProjectSetup) return; // New project creation aborted.
+      if (!source) return; // New project creation aborted.
 
-      const { source, destination } = createProjectSetup;
-
-      setProjectPreCreationDialogOpen(false);
       setSelectedExampleShortHeader(null);
       await setState(state => ({ ...state, createDialogOpen: false }));
 
@@ -2321,73 +2305,85 @@ const MainFrame = (props: Props) => {
       currentProject.setAuthor('');
       if (selectedExampleShortHeader)
         currentProject.setTemplateSlug(selectedExampleShortHeader.slug);
-      if (source.projectName) currentProject.setName(source.projectName);
+      if (newProjectSetup.projectName)
+        currentProject.setName(newProjectSetup.projectName);
 
       const destinationStorageProviderOperations = getStorageProviderOperations(
-        destination.storageProvider
+        newProjectSetup.storageProvider
       );
 
       const { onSaveProjectAs } = destinationStorageProviderOperations;
 
       if (onSaveProjectAs) {
-        try {
-          const { wasSaved } = await onSaveProjectAs(
-            currentProject,
-            destination.fileMetadata,
-            {
-              onStartSaving: () => {
-                console.log('Start saving as the new project...');
-              },
-              onMoveResources: async () => {
-                if (
-                  !sourceStorageProvider ||
-                  !sourceStorageProviderOperations ||
-                  !source.fileMetadata ||
-                  !destination.fileMetadata
-                ) {
-                  console.log(
-                    'No storage provider set or no previous/destination FileMetadata (probably creating a blank project) - skipping resources copy.'
-                  );
-                  return;
-                }
+        const { wasSaved, fileMetadata } = await onSaveProjectAs(
+          currentProject,
+          newProjectSetup.saveAsLocation,
+          {
+            onStartSaving: () => {
+              console.log('Start saving as the new project...');
+            },
+            onMoveResources: async ({ newFileMetadata }) => {
+              if (
+                !sourceStorageProvider ||
+                !sourceStorageProviderOperations ||
+                !source.fileMetadata
+              ) {
+                console.log(
+                  'No storage provider set or no previous FileMetadata (probably creating a blank project) - skipping resources copy.'
+                );
+                return;
+              }
 
-                await ensureResourcesAreMoved({
-                  project: currentProject,
-                  newFileMetadata: destination.fileMetadata,
-                  newStorageProvider: destination.storageProvider,
-                  newStorageProviderOperations: destinationStorageProviderOperations,
-                  oldFileMetadata: source.fileMetadata,
-                  oldStorageProvider: sourceStorageProvider,
-                  oldStorageProviderOperations: sourceStorageProviderOperations,
-                  authenticatedUser,
-                });
-              },
-            }
-          );
-
-          if (wasSaved) {
-            setState(state => ({
-              ...state,
-              currentFileMetadata: destination.fileMetadata,
-            }));
-            if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
-            if (destination.storageProvider.internalName === 'LocalFile') {
-              preferences.setHasProjectOpened(true);
-            }
+              await ensureResourcesAreMoved({
+                project: currentProject,
+                newFileMetadata,
+                newStorageProvider: newProjectSetup.storageProvider,
+                newStorageProviderOperations: destinationStorageProviderOperations,
+                oldFileMetadata: source.fileMetadata,
+                oldStorageProvider: sourceStorageProvider,
+                oldStorageProviderOperations: sourceStorageProviderOperations,
+                authenticatedUser,
+              });
+            },
           }
-        } catch (rawError) {
-          // Do not prevent creating the project.
-          console.error("Couldn't save the project after creation.", rawError);
+        );
+
+        if (wasSaved) {
+          setState(state => ({
+            ...state,
+            currentFileMetadata: fileMetadata,
+          }));
+          if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
+          if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
+            preferences.setHasProjectOpened(true);
+          }
         }
       }
 
+      // We were able to load and then save the project. We can now close the dialog,
+      // open the project editors and check if leaderboards must be replaced.
+      setNewProjectSetupDialogOpen(false);
       findLeaderboardsToReplace(currentProject, oldProjectId);
       openSceneOrProjectManager({
         currentProject: currentProject,
         editorTabs: editorTabs,
       });
+    } catch (rawError) {
+      const { getWriteErrorMessage } = getStorageProviderOperations();
+      const errorMessage = getWriteErrorMessage
+        ? getWriteErrorMessage(rawError)
+        : t`An error occurred when opening or saving the project. Try again later or choose another location to save the project to.`;
+
+      showErrorBox({
+        message: i18n._(errorMessage),
+        rawError,
+        errorId: 'project-creation-save-as-error',
+      });
     } finally {
+      // Stop the loading when we're successful or have failed.
       setIsProjectOpening(false);
+      setIsLoadingProject(false);
+      setLoaderModalProgress(null, null);
     }
   };
 
@@ -2451,7 +2447,7 @@ const MainFrame = (props: Props) => {
     onLaunchDebugPreview: launchDebuggerAndPreview,
     onLaunchNetworkPreview: launchNetworkPreview,
     onOpenHomePage: openHomePage,
-    onCreateBlank: () => setProjectPreCreationDialogOpen(true),
+    onCreateBlank: () => setNewProjectSetupDialogOpen(true),
     onOpenProject: () => openOpenFromStorageProviderDialog(),
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
@@ -2527,7 +2523,7 @@ const MainFrame = (props: Props) => {
           onCloseApp: closeApp,
           onExportProject: () => openExportDialog(true),
           onCreateProject: () => openCreateProjectDialog(true, null),
-          onCreateBlank: () => setProjectPreCreationDialogOpen(true),
+          onCreateBlank: () => setNewProjectSetupDialogOpen(true),
           onOpenProjectManager: () => openProjectManager(true),
           onOpenHomePage: openHomePage,
           onOpenDebugger: openDebugger,
@@ -2698,9 +2694,9 @@ const MainFrame = (props: Props) => {
                     canInstallPrivateAsset,
                     onChooseProject: () => openOpenFromStorageProviderDialog(),
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
-                    onOpenProjectPreCreationDialog: exampleShortHeader => {
+                    onOpenNewProjectSetupDialog: exampleShortHeader => {
                       setSelectedExampleShortHeader(exampleShortHeader);
-                      setProjectPreCreationDialogOpen(true);
+                      setNewProjectSetupDialogOpen(true);
                     },
                     onOpenProjectManager: () => openProjectManager(true),
                     onCloseProject: () => askToCloseProject(),
@@ -2772,18 +2768,18 @@ const MainFrame = (props: Props) => {
           project: state.currentProject,
           onSaveProject: saveProject,
         })}
-      {!!renderCreateDialog &&
-        state.createDialogOpen &&
-        renderCreateDialog({
-          open: state.createDialogOpen,
-          onClose: closeCreateDialog,
-          initialExampleShortHeader: state.initialExampleShortHeader,
-          onOpenProjectPreCreationDialog: exampleShortHeader => {
+      {state.createDialogOpen && (
+        <CreateProjectDialog
+          open
+          onClose={closeCreateDialog /*TODO */}
+          initialExampleShortHeader={state.initialExampleShortHeader}
+          isProjectOpening={isProjectOpening}
+          onChoose={exampleShortHeader => {
             setSelectedExampleShortHeader(exampleShortHeader);
-            setProjectPreCreationDialogOpen(true);
-          },
-          isProjectOpening: isProjectOpening,
-        })}
+            setNewProjectSetupDialogOpen(true);
+          }}
+        />
+      )}
       {!!introDialog &&
         introDialogOpen &&
         React.cloneElement(introDialog, {
@@ -2848,12 +2844,14 @@ const MainFrame = (props: Props) => {
           open
         />
       )}
-      {projectPreCreationDialogOpen && (
-        <ProjectPreCreationDialog
-          open
+      {newProjectSetupDialogOpen && (
+        <NewProjectSetupDialog
+          onChangeSubscription={() => openSubscriptionDialog(true)}
+          authenticatedUser={authenticatedUser}
           isOpening={isProjectOpening}
-          onClose={() => setProjectPreCreationDialogOpen(false)}
-          onCreate={projectName => createProject(i18n, projectName)}
+          onClose={() => setNewProjectSetupDialogOpen(false)}
+          onCreate={projectSettings => createProject(i18n, projectSettings)}
+          storageProviders={props.storageProviders}
           sourceExampleName={
             selectedExampleShortHeader
               ? selectedExampleShortHeader.name

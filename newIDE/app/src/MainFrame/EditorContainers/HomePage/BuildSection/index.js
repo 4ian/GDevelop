@@ -33,7 +33,10 @@ import CircularProgress from '../../../../UI/CircularProgress';
 import { type MenuItemTemplate } from '../../../../UI/Menu/Menu.flow';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
-import { MaxProjectCountAlertMessage } from './MaxProjectCountAlertMessage';
+import {
+  checkIfHasTooManyCloudProjects,
+  MaxProjectCountAlertMessage,
+} from './MaxProjectCountAlertMessage';
 import optionalRequire from '../../../../Utils/OptionalRequire';
 import { showErrorBox } from '../../../../UI/Messages/MessageBox';
 import { getRelativeOrAbsoluteDisplayDate } from '../../../../Utils/DateDisplay';
@@ -76,7 +79,7 @@ type Props = {|
   canOpen: boolean,
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onOpenProjectPreCreationDialog: (?ExampleShortHeader) => void,
+  onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
   onShowAllExamples: () => void,
   onSelectExample: (exampleShortHeader: ExampleShortHeader) => void,
   onChangeSubscription: () => void,
@@ -124,7 +127,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       project,
       canOpen,
       onChooseProject,
-      onOpenProjectPreCreationDialog,
+      onOpenNewProjectSetupDialog,
       onShowAllExamples,
       onSelectExample,
       onOpenRecentFile,
@@ -159,8 +162,6 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       file => file.fileMetadata
     );
 
-    let hasTooManyCloudProjects = false;
-
     // Show cloud projects on the web app only.
     if (supportsCloudProjects && cloudProjects) {
       projectFiles = projectFiles.concat(
@@ -179,11 +180,10 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
           })
           .filter(Boolean)
       );
-      hasTooManyCloudProjects = limits
-        ? cloudProjects.filter(cloudProject => !cloudProject.deletedAt)
-            .length >= limits.capabilities.cloudProjects.maximumCount
-        : false;
     }
+    const hasTooManyCloudProjects = checkIfHasTooManyCloudProjects(
+      authenticatedUser
+    );
 
     projectFiles.sort((a, b) => {
       if (!a.fileMetadata.lastModifiedDate) return 1;
@@ -340,7 +340,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                         primary
                         label={<Trans>Create a project</Trans>}
                         onClick={() =>
-                          onOpenProjectPreCreationDialog(
+                          onOpenNewProjectSetupDialog(
                             /*exampleShortHeader=*/ null
                           )
                         }

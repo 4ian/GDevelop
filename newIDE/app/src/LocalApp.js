@@ -3,7 +3,6 @@ import React from 'react';
 import MainFrame from './MainFrame';
 import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
-import CreateProjectDialog from './ProjectCreation/CreateProjectDialog';
 import Authentication from './Utils/GDevelopServices/Authentication';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 
@@ -27,10 +26,6 @@ import LocalEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoad
 import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import LocalFileStorageProvider from './ProjectsStorage/LocalFileStorageProvider';
 import { LocalGDJSDevelopmentWatcher } from './GameEngineFinder/LocalGDJSDevelopmentWatcher';
-import {
-  onCreateFromExampleShortHeader,
-  onCreateBlank,
-} from './ProjectCreation/services/LocalCreation';
 import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
 import UrlStorageProvider from './ProjectsStorage/UrlStorageProvider';
 import LocalResourceMover from './ProjectsStorage/ResourceMover/LocalResourceMover';
@@ -90,22 +85,9 @@ export const create = (authentication: Authentication) => {
                   onlineWebExporter={localOnlineWebExporter}
                 />
               )}
-              renderCreateDialog={props => (
-                <CreateProjectDialog
-                  open={props.open}
-                  onClose={props.onClose}
-                  initialExampleShortHeader={props.initialExampleShortHeader}
-                  isProjectOpening={props.isProjectOpening}
-                  onOpenProjectPreCreationDialog={
-                    props.onOpenProjectPreCreationDialog
-                  }
-                />
-              )}
               renderGDJSDevelopmentWatcher={
                 isDev ? () => <LocalGDJSDevelopmentWatcher /> : null
               }
-              onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
-              onCreateBlank={onCreateBlank}
               storageProviders={storageProviders}
               resourceMover={LocalResourceMover}
               resourceFetcher={LocalResourceFetcher}

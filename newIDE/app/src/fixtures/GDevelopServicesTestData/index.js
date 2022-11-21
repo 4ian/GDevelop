@@ -58,6 +58,69 @@ export const cloudProjectsForIndieUser: Array<CloudProjectWithUserAccessInfo> = 
   },
 ];
 
+const tenCloudProjects: Array<CloudProjectWithUserAccessInfo> = [
+  {
+    id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372141',
+    name: 'Worms 2D 1',
+    createdAt: '2022-02-05T00:36:53.972Z',
+    lastModifiedAt: '2022-02-07T00:36:53.972Z',
+  },
+  {
+    id: 'fb4d878a-1935-4916-b681-f9235475d352',
+    name: 'Crash Bandicoot 2',
+    createdAt: '2020-01-24T00:36:53.972Z',
+    lastModifiedAt: '2020-02-06T00:36:53.972Z',
+  },
+  {
+    id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372143',
+    name: 'Worms 2D 3',
+    createdAt: '2022-02-05T00:36:53.972Z',
+    lastModifiedAt: '2022-02-07T00:36:53.972Z',
+  },
+  {
+    id: 'fb4d878a-1935-4916-b681-f9235475d354',
+    name: 'Crash Bandicoot 4',
+    createdAt: '2020-01-24T00:36:53.972Z',
+    lastModifiedAt: '2020-02-06T00:36:53.972Z',
+  },
+  {
+    id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372145',
+    name: 'Worms 2D 5',
+    createdAt: '2022-02-05T00:36:53.972Z',
+    lastModifiedAt: '2022-02-07T00:36:53.972Z',
+  },
+  {
+    id: 'fb4d878a-1935-4916-b681-f9235475d356',
+    name: 'Crash Bandicoot 6',
+    createdAt: '2020-01-24T00:36:53.972Z',
+    lastModifiedAt: '2020-02-06T00:36:53.972Z',
+  },
+  {
+    id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372147',
+    name: 'Worms 2D 7',
+    createdAt: '2022-02-05T00:36:53.972Z',
+    lastModifiedAt: '2022-02-07T00:36:53.972Z',
+  },
+  {
+    id: 'fb4d878a-1935-4916-b681-f9235475d358',
+    name: 'Crash Bandicoot 8',
+    createdAt: '2020-01-24T00:36:53.972Z',
+    lastModifiedAt: '2020-02-06T00:36:53.972Z',
+  },
+  {
+    id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372149',
+    name: 'Worms 2D 9',
+    createdAt: '2022-02-05T00:36:53.972Z',
+    lastModifiedAt: '2022-02-07T00:36:53.972Z',
+  },
+  {
+    id: 'fb4d878a-1935-4916-b681-f9235475d350',
+    name: 'Crash Bandicoot 10',
+    createdAt: '2020-01-24T00:36:53.972Z',
+    lastModifiedAt: '2020-02-06T00:36:53.972Z',
+  },
+];
+
 export const indieUserProfile: Profile = {
   id: 'indie-user',
   email: 'indie-user@example.com',
@@ -171,7 +234,7 @@ export const limitsReached: Limits = {
     },
     cloudProjects: {
       maximumCount: 10,
-      canMaximumCountBeIncreased: false,
+      canMaximumCountBeIncreased: true,
     },
     leaderboards: {
       maximumCountPerGame: 3,
@@ -234,7 +297,7 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   profile: indieUserProfile,
   loginState: 'done',
   badges: null,
-  cloudProjects: cloudProjectsForIndieUser,
+  cloudProjects: tenCloudProjects,
   firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
@@ -244,6 +307,46 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   onLogout: async () => {},
   onLogin: () => {},
   onForgotPassword: async () => {},
+  onEdit: () => {},
+  onChangeEmail: () => {},
+  onCreateAccount: () => {},
+  onBadgesChanged: async () => {},
+  onCloudProjectsChanged: async () => {},
+  onRefreshUserProfile: async () => {
+    console.info('This should refresh the user profile');
+  },
+  onSubscriptionUpdated: async () => {
+    console.info('This should refresh the subscriptions');
+  },
+  onPurchaseSuccessful: async () => {
+    console.info('This should refresh the assets');
+  },
+  onRefreshFirebaseProfile: async () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: async () => {
+    console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
+};
+
+export const fakeNoSubscriptionAndTooManyCloudProjectsAuthenticatedUser: AuthenticatedUser = {
+  authenticated: true,
+  profile: indieUserProfile,
+  loginState: 'done',
+  badges: null,
+  cloudProjects: tenCloudProjects,
+  firebaseUser: indieFirebaseUser,
+  subscription: noSubscription,
+  usages: usagesForIndieUser,
+  limits: limitsReached,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
+  onLogout: () => {},
+  onLogin: () => {},
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},

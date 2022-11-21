@@ -86,7 +86,7 @@ export type RenderEditorContainerProps = {|
   canInstallPrivateAsset: () => boolean,
 
   // Project creation
-  onOpenProjectPreCreationDialog: (?ExampleShortHeader) => void,
+  onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

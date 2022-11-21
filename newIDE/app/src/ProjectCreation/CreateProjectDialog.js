@@ -1,4 +1,5 @@
 // @flow
+import { t } from '@lingui/macro';
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
@@ -6,53 +7,90 @@ import * as React from 'react';
 import { ExampleStore } from '../AssetStore/ExampleStore';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
-import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
-import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
+import {
+  type StorageProvider,
+  type FileMetadata,
+  type SaveAsLocation,
+} from '../ProjectsStorage';
+import {
+  getExample,
+  type ExampleShortHeader,
+} from '../Utils/GDevelopServices/Example';
+import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
+import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
+import { showErrorBox } from '../UI/Messages/MessageBox';
+const gd: libGDevelop = global.gd;
 
 export type CreateProjectDialogProps = {|
   open: boolean,
   onClose: () => void,
   initialExampleShortHeader: ?ExampleShortHeader,
-  onOpenProjectPreCreationDialog: (
-    assetShortHeader: ?ExampleShortHeader
-  ) => void,
+  onChoose: (exampleShortHeader: ?ExampleShortHeader) => void,
   isProjectOpening: boolean,
 |};
 
-export type ProjectCreationSettings = {|
+export type NewProjectSetup = {|
   projectName: string,
-  outputPath?: string,
+  storageProvider: StorageProvider,
+  saveAsLocation: ?SaveAsLocation,
 |};
 
-export type CreateProjectSetup = {|
-  source: {|
-    project: ?gdProject,
-    projectName: string,
-    storageProvider: ?StorageProvider,
-    fileMetadata: ?FileMetadata,
-  |},
-  destination: {|
-    storageProvider: StorageProvider,
-    fileMetadata: ?FileMetadata,
-  |},
+export type NewProjectSource = {|
+  project: ?gdProject,
+  storageProvider: ?StorageProvider,
+  fileMetadata: ?FileMetadata,
 |};
 
-export type OnCreateBlankFunction = ({|
-  i18n: I18nType,
-  settings: ProjectCreationSettings,
-|}) => Promise<?CreateProjectSetup>;
+export const createNewProject = async (): Promise<?NewProjectSource> => {
+  const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
 
-export type OnCreateFromExampleShortHeaderFunction = ({|
+  sendNewGameCreated({ exampleUrl: '', exampleSlug: '' });
+  return {
+    project,
+    storageProvider: null,
+    fileMetadata: null,
+  };
+};
+
+export const createNewProjectFromExampleShortHeader = async ({
+  i18n,
+  exampleShortHeader,
+}: {|
   i18n: I18nType,
   exampleShortHeader: ExampleShortHeader,
-  settings: ProjectCreationSettings,
-|}) => Promise<?CreateProjectSetup>;
+|}): Promise<?NewProjectSource> => {
+  try {
+    const example = await getExample(exampleShortHeader);
+
+    sendNewGameCreated({
+      exampleUrl: example.projectFileUrl,
+      exampleSlug: exampleShortHeader.slug,
+    });
+    return {
+      project: null,
+      storageProvider: UrlStorageProvider,
+      fileMetadata: {
+        fileIdentifier: example.projectFileUrl,
+      },
+    };
+  } catch (error) {
+    showErrorBox({
+      message:
+        i18n._(t`Unable to fetch the example.`) +
+        ' ' +
+        i18n._(t`Verify your internet connection or try again later.`),
+      rawError: error,
+      errorId: 'local-example-load-error',
+    });
+    return;
+  }
+};
 
 const CreateProjectDialog = ({
   open,
   onClose,
   initialExampleShortHeader,
-  onOpenProjectPreCreationDialog,
+  onChoose,
   isProjectOpening,
 }: CreateProjectDialogProps) => {
   const actions = React.useMemo(
@@ -68,12 +106,10 @@ const CreateProjectDialog = ({
         id="create-blank-project-button"
         label={<Trans>Create a blank project</Trans>}
         primary
-        onClick={() =>
-          onOpenProjectPreCreationDialog(/*exampleShortHeader*/ null)
-        }
+        onClick={() => onChoose(/*exampleShortHeader*/ null)}
       />,
     ],
-    [onClose, onOpenProjectPreCreationDialog]
+    [onClose, onChoose]
   );
 
   if (!open) return null;
@@ -86,7 +122,7 @@ const CreateProjectDialog = ({
           actions={actions}
           onRequestClose={onClose}
           onApply={() => {
-            onOpenProjectPreCreationDialog(/*exampleShortHeader*/ null);
+            onChoose(/*exampleShortHeader*/ null);
           }}
           open={open}
           fullHeight
@@ -96,7 +132,7 @@ const CreateProjectDialog = ({
             focusOnMount
             isOpening={isProjectOpening}
             onOpen={async (exampleShortHeader: ExampleShortHeader) => {
-              onOpenProjectPreCreationDialog(exampleShortHeader);
+              onChoose(exampleShortHeader);
             }}
             initialExampleShortHeader={initialExampleShortHeader}
           />

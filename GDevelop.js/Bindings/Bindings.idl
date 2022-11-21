@@ -2158,6 +2158,10 @@ interface WholeProjectRefactorer {
     boolean STATIC_FixInvalidRequiredBehaviorProperties([Ref] Project project);
 };
 
+interface PropertyFunctionGenerator {
+    void STATIC_GenerateGetterAndSetter([Ref] EventsFunctionsExtension extension, [Ref] EventsBasedBehavior eventsBasedBehavior, [Const] DOMString propertyName);
+};
+
 interface UsedExtensionsFinder {
   [Value] SetString STATIC_ScanProject([Ref] Project project);
 };

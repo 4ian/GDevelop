@@ -1139,6 +1139,33 @@
       }
     },
     {
+      "isCheckpoint": true,
+      "dialog": {
+        "content": [
+          {
+            "messageByLocale": {
+              "en": "## Congratulations"
+            }
+          },
+          {
+            "messageByLocale": {
+              "en": "You just finished the first part of the fling game tutorial."
+            }
+          },
+          {
+            "messageByLocale": {
+              "en": "We built together the foundations for a fling game."
+            }
+          },
+          {
+            "messageByLocale": {
+              "en": "Start the next part to improve your game visually."
+            }
+          }
+        ]
+      }
+    },
+    {
       "id": "ClickOnNewObjectButtonForBackground",
       "elementToHighlightId": "#add-new-object-button",
       "nextStepTrigger": {
@@ -2369,6 +2396,33 @@
         "placement": "top"
       },
       "isOnClosableDialog": true
+    },
+    {
+      "isCheckpoint": true,
+      "dialog": {
+        "content": [
+          {
+            "messageByLocale": {
+              "en": "## Congratulations"
+            }
+          },
+          {
+            "messageByLocale": {
+              "en": "You just finished the second part of the fling game tutorial."
+            }
+          },
+          {
+            "messageByLocale": {
+              "en": "We improved your game visually and even published it so that anyone can play with it!"
+            }
+          },
+          {
+            "messageByLocale": {
+              "en": "Start the next part that will show you how to have your players compare themselves thanks to leaderboards."
+            }
+          }
+        ]
+      }
     },
     {
       "elementToHighlightId": "objectInObjectsList:background",

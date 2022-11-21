@@ -104,7 +104,10 @@
           }
         }
       },
-      "isOnClosableDialog": true
+      "isOnClosableDialog": true,
+      "mapProjectData": {
+        "playScene": "projectLastSceneName"
+      }
     },
     {
       "id": "OpenPropertiesManager",
@@ -119,9 +122,6 @@
           }
         },
         "placement": "right"
-      },
-      "mapProjectData": {
-        "playScene": "projectLastSceneName"
       }
     },
     {

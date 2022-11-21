@@ -284,7 +284,7 @@ export type Preferences = {|
     tutorialId: string,
     userId: ?string,
     step: number,
-    progress: number,
+    progress: Array<number>,
     fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
     projectData: {| [key: string]: string |},
   |}) => void,
@@ -293,7 +293,7 @@ export type Preferences = {|
     userId: ?string,
   |}) => ?{|
     step: number,
-    progress: number,
+    progress: Array<number>,
     fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
     projectData: {| [key: string]: string |},
   |},

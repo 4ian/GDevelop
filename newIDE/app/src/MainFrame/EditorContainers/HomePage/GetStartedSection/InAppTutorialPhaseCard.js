@@ -16,11 +16,22 @@ import { Column, Line } from '../../../../UI/Grid';
 import LinearProgress from '../../../../UI/LinearProgress';
 import Chip from '../../../../UI/Chip';
 import { Trans } from '@lingui/macro';
+import Lock from '../../../../UI/CustomSvgIcons/Lock';
+import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
 
 const styles = {
   cardTextContainer: {
     flex: 1,
     display: 'flex',
+    padding: '10px 10px 20px 10px',
+  },
+  image: { height: 130, width: 130 },
+  lockerImage: { height: 80, width: 80 },
+  imageContainer: {
+    height: 130,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 };
 
@@ -32,6 +43,7 @@ type Props = {|
   durationInMinutes: number,
   keyPoints: Array<MessageDescriptor>,
   onClick: () => void,
+  renderImage: (props: any) => React.Node,
 |};
 
 const InAppTutorialPhaseCard = ({
@@ -42,87 +54,108 @@ const InAppTutorialPhaseCard = ({
   durationInMinutes,
   keyPoints,
   onClick,
+  renderImage,
 }: Props) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <I18n>
       {({ i18n }) => (
-        <CardWidget onClick={onClick} size="large" disabled={locked}>
-          <Paper
-            style={{
-              ...styles.cardTextContainer,
-              padding: "20px 10px",
-            }}
-            background="dark"
-          >
-            <ColumnStackLayout expand justifyContent="center" useFullHeight>
-              {progress && progress > 0 ? (
-                <LineStackLayout alignItems="center" noMargin>
-                  <Text displayInlineAsSpan noMargin size="body2">
-                    {progress}%
-                  </Text>
-                  <LinearProgress value={progress} variant="determinate" />
-                </LineStackLayout>
+        <CardWidget
+          onClick={onClick}
+          size="large"
+          disabled={locked}
+          shadowed={locked}
+        >
+          <Column noMargin>
+            <div
+              style={{
+                ...styles.imageContainer,
+                backgroundColor: locked
+                  ? gdevelopTheme.paper.backgroundColor.light
+                  : '#7046EC',
+              }}
+            >
+              {locked ? (
+                <Lock style={styles.lockerImage} />
               ) : (
-                <Line noMargin justifyContent="center">
-                  <Chip
-                    size="small"
-                    label={<Trans>{durationInMinutes} minutes</Trans>}
-                  />
-                </Line>
+                renderImage({ style: styles.image })
               )}
-              <Text size="block-title" noMargin>
-                {i18n._(title)}
-              </Text>
-              <Text size="body" color="secondary" noMargin>
-                {i18n._(description)}
-              </Text>
-              <Divider />
-              <ResponsiveLineStackLayout noColumnMargin noMargin>
-                <Column
-                  noMargin
-                  alignItems="flex-start"
-                  justifyContent="flex-start"
-                  expand
-                >
-                  <ul style={{ paddingInlineStart: 12, textAlign: 'left' }}>
-                    {keyPoints.map((keyPoint, index) =>
-                      index % 2 === 0 ? (
-                        <Text
-                          size="body2"
-                          color="secondary"
-                          noMargin
-                          displayAsListItem
-                        >
-                          {i18n._(keyPoint)}
-                        </Text>
-                      ) : null
-                    )}
-                  </ul>
-                </Column>
-                <Column
-                  noMargin
-                  alignItems="flex-start"
-                  justifyContent="flex-start"
-                  expand
-                >
-                  <ul style={{ paddingInlineStart: 12, textAlign: 'left' }}>
-                    {keyPoints.map((keyPoint, index) =>
-                      index % 2 === 1 ? (
-                        <Text
-                          size="body2"
-                          color="secondary"
-                          noMargin
-                          displayAsListItem
-                        >
-                          {i18n._(keyPoint)}
-                        </Text>
-                      ) : null
-                    )}
-                  </ul>
-                </Column>
-              </ResponsiveLineStackLayout>
-            </ColumnStackLayout>
-          </Paper>
+            </div>
+            <Paper square style={styles.cardTextContainer} background="dark">
+              <ColumnStackLayout
+                expand
+                justifyContent="flex-start"
+                useFullHeight
+              >
+                {progress && progress > 0 ? (
+                  <LineStackLayout alignItems="center" noMargin>
+                    <Text displayInlineAsSpan noMargin size="body2">
+                      {progress}%
+                    </Text>
+                    <LinearProgress value={progress} variant="determinate" />
+                  </LineStackLayout>
+                ) : (
+                  <Line noMargin justifyContent="center">
+                    <Chip
+                      size="small"
+                      label={<Trans>{durationInMinutes} minutes</Trans>}
+                    />
+                  </Line>
+                )}
+                <Text size="block-title" noMargin>
+                  {i18n._(title)}
+                </Text>
+                <Text size="body" color="secondary" noMargin>
+                  {i18n._(description)}
+                </Text>
+                <Divider />
+                <ResponsiveLineStackLayout noColumnMargin noMargin>
+                  <Column
+                    noMargin
+                    alignItems="flex-start"
+                    justifyContent="flex-start"
+                    expand
+                  >
+                    <ul style={{ paddingInlineStart: 12, textAlign: 'left' }}>
+                      {keyPoints.map((keyPoint, index) =>
+                        index % 2 === 0 ? (
+                          <Text
+                            size="body2"
+                            color="secondary"
+                            noMargin
+                            displayAsListItem
+                          >
+                            {i18n._(keyPoint)}
+                          </Text>
+                        ) : null
+                      )}
+                    </ul>
+                  </Column>
+                  <Column
+                    noMargin
+                    alignItems="flex-start"
+                    justifyContent="flex-start"
+                    expand
+                  >
+                    <ul style={{ paddingInlineStart: 12, textAlign: 'left' }}>
+                      {keyPoints.map((keyPoint, index) =>
+                        index % 2 === 1 ? (
+                          <Text
+                            size="body2"
+                            color="secondary"
+                            noMargin
+                            displayAsListItem
+                          >
+                            {i18n._(keyPoint)}
+                          </Text>
+                        ) : null
+                      )}
+                    </ul>
+                  </Column>
+                </ResponsiveLineStackLayout>
+              </ColumnStackLayout>
+            </Paper>
+          </Column>
         </CardWidget>
       )}
     </I18n>

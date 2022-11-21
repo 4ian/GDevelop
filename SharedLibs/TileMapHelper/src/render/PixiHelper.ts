@@ -58,6 +58,7 @@ export namespace PixiTileMapHelper {
     textureCache: TileTextureCache,
     displayMode: "index" | "visible" | "all",
     layerIndex: number,
+    levelIndex: number
   ): void {
     // The extension doesn't handle the Pixi sub-namespace very well.
     const pixiTileMap = untypedPixiTileMap as PIXI.tilemap.CompositeTilemap;

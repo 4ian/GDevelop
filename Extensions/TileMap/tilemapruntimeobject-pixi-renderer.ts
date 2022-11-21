@@ -56,7 +56,8 @@ namespace gdjs {
         tileMap,
         textureCache,
         this._object._displayMode,
-        this._object._layerIndex
+        this._object._layerIndex,
+        this._object._levelIndex
       );
     }
 

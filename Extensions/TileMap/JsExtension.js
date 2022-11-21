@@ -54,6 +54,10 @@ const defineTileMap = function (
       objectContent.layerIndex = parseFloat(newValue);
       return true;
     }
+    if (propertyName === 'levelIndex') {
+      objectContent.levelIndex = parseFloat(newValue);
+      return true;
+    }
     if (propertyName === 'animationSpeedScale') {
       objectContent.animationSpeedScale = parseFloat(newValue);
       return true;
@@ -124,6 +128,16 @@ const defineTileMap = function (
         .setGroup(_('Appearance'))
     );
     objectProperties.set(
+      'levelIndex',
+      new gd.PropertyDescriptor((objectContent.levelIndex || 0).toString())
+        .setType('number')
+        .setLabel(_('Level index to display'))
+        .setDescription(
+          _('Select which level to render via its index (LDtk)')
+        )
+        .setGroup(_('Appearance'))
+    );
+    objectProperties.set(
       'animationSpeedScale',
       new gd.PropertyDescriptor(objectContent.animationSpeedScale.toString())
         .setType('number')
@@ -147,6 +161,7 @@ const defineTileMap = function (
       tilemapAtlasImage: '',
       displayMode: 'visible',
       layerIndex: 0,
+      levelIndex: 0,
       animationSpeedScale: 1,
       animationFps: 4,
     })
@@ -342,6 +357,49 @@ const defineTileMap = function (
     .addParameter('object', _('Tile map'), 'TileMap', false)
     .getCodeExtraInformation()
     .setFunctionName('getLayerIndex');
+
+  object
+    .addCondition(
+      'LevelIndex',
+      _('Level index'),
+      _('Compare the value of the level index.'),
+      _('the level index'),
+      '',
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardRelationalOperatorParameters('number')
+    .getCodeExtraInformation()
+    .setFunctionName('getLevelndex');
+
+  object
+    .addAction(
+      'SetLevelIndex',
+      _('Level index'),
+      _('Set the level index of the Tilemap.'),
+      _('the level index'),
+      '',
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardOperatorParameters('number')
+    .getCodeExtraInformation()
+    .setFunctionName('setLevelIndex')
+    .setGetter('getLevelIndex');
+
+  object
+    .addExpression(
+      'LevelIndex',
+      _('Level index'),
+      _('Get the level index being displayed'),
+      '',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .getCodeExtraInformation()
+    .setFunctionName('getLevelIndex');
 
   object
     .addCondition(
@@ -850,6 +908,7 @@ module.exports = {
     gd /*: libGDevelop */
   ) {
     const extension = new gd.PlatformExtension();
+
     extension
       .setExtensionInformation(
         'TileMap',
@@ -860,11 +919,13 @@ module.exports = {
       )
       .setCategory('Advanced')
       .setExtensionHelpPath('/objects/tilemap');
-      extension.addInstructionOrExpressionGroupMetadata(_("Tilemap"))
-          .setIcon("JsPlatform/Extensions/tile_map.svg");
 
-      defineTileMap(extension, _, gd);
-      defineCollisionMask(extension, _, gd);
+    extension
+      .addInstructionOrExpressionGroupMetadata(_("Tilemap"))
+      .setIcon("JsPlatform/Extensions/tile_map.svg");
+
+    defineTileMap(extension, _, gd);
+    defineCollisionMask(extension, _, gd);
 
     return extension;
   },
@@ -1039,6 +1100,13 @@ module.exports = {
           .getValue(),
         10
       );
+      const levelIndex = parseInt(
+        this._associatedObjectConfiguration
+          .getProperties(this.project)
+          .get('levelIndex')
+          .getValue(),
+        10
+      );
       const displayMode = this._associatedObjectConfiguration
         .getProperties(this.project)
         .get('displayMode')
@@ -1081,7 +1149,8 @@ module.exports = {
                 tileMap,
                 textureCache,
                 displayMode,
-                layerIndex
+                layerIndex,
+                levelIndex
               );
             }
           );

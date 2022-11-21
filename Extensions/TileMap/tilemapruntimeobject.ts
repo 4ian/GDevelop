@@ -13,6 +13,7 @@ namespace gdjs {
     _tilemapAtlasImage: string;
     _displayMode: string;
     _layerIndex: integer;
+    _levelIndex: integer;
     _animationSpeedScale: number;
     _animationFps: number;
     _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
@@ -26,6 +27,7 @@ namespace gdjs {
       this._tilemapAtlasImage = objectData.content.tilemapAtlasImage;
       this._displayMode = objectData.content.displayMode;
       this._layerIndex = objectData.content.layerIndex;
+      this._levelIndex = objectData.content.levelIndex;
       this._animationSpeedScale = objectData.content.animationSpeedScale;
       this._animationFps = objectData.content.animationFps;
       this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
@@ -82,6 +84,11 @@ namespace gdjs {
         oldObjectData.content.layerIndex !== newObjectData.content.layerIndex
       ) {
         this.setLayerIndex(newObjectData.content.layerIndex);
+      }
+      if (
+        oldObjectData.content.levelIndex !== newObjectData.content.levelIndex
+      ) {
+        this.setLevelIndex(newObjectData.content.levelIndex);
       }
       if (
         oldObjectData.content.animationSpeedScale !==
@@ -201,6 +208,15 @@ namespace gdjs {
 
     getLayerIndex(): integer {
       return this._layerIndex;
+    }
+    
+    setLevelIndex(levelIndex): void {
+      this._levelIndex = levelIndex;
+      this._updateTileMap();
+    }
+
+    getLevelIndex() {
+      return this._levelIndex;
     }
 
     setAnimationSpeedScale(animationSpeedScale): void {

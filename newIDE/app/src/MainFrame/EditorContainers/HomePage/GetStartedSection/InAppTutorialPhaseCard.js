@@ -33,6 +33,11 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
   },
+  keyPointsList: {
+    paddingInlineStart: 12,
+    textAlign: 'left',
+    overflowWrap: 'anywhere',
+  },
 };
 
 type Props = {|
@@ -120,7 +125,7 @@ const InAppTutorialPhaseCard = ({
                     justifyContent="flex-start"
                     expand
                   >
-                    <ul style={{ paddingInlineStart: 12, textAlign: 'left' }}>
+                    <ul style={styles.keyPointsList}>
                       {keyPoints.map((keyPoint, index) =>
                         index % 2 === 0 ? (
                           <Text
@@ -141,7 +146,7 @@ const InAppTutorialPhaseCard = ({
                     justifyContent="flex-start"
                     expand
                   >
-                    <ul style={{ paddingInlineStart: 12, textAlign: 'left' }}>
+                    <ul style={styles.keyPointsList}>
                       {keyPoints.map((keyPoint, index) =>
                         index % 2 === 1 ? (
                           <Text

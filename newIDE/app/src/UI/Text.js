@@ -32,6 +32,8 @@ type Props = {|
   allowBrowserAutoTranslate?: boolean,
   /** By default the text is a paragraph (`p`). It can be shown inline  */
   displayInlineAsSpan?: boolean,
+  /** To use list item */
+  displayAsListItem?: boolean,
   /** A limited set of styling is supported. */
   style?: {|
     // Margins
@@ -105,6 +107,7 @@ const Text = React.forwardRef<Props, Interface>(
       allowSelection,
       allowBrowserAutoTranslate = true,
       displayInlineAsSpan,
+      displayAsListItem,
       ...otherProps // Used by possible parent element (such as Tooltip) to pass down props.
     },
     ref
@@ -114,10 +117,16 @@ const Text = React.forwardRef<Props, Interface>(
       ref={ref}
       translate={allowBrowserAutoTranslate ? 'yes' : 'no'}
       color={getTextColorFromColor(color)}
-      component={displayInlineAsSpan ? 'span' : undefined}
+      component={
+        displayInlineAsSpan ? 'span' : displayAsListItem ? 'li' : undefined
+      }
       style={{
         ...style,
-        display: displayInlineAsSpan ? 'inline-block' : undefined,
+        display: displayInlineAsSpan
+          ? 'inline-block'
+          : displayAsListItem
+          ? 'list-item'
+          : undefined,
         flexShrink: noShrink ? 0 : undefined,
         marginTop: noMargin ? 0 : 6,
         marginBottom: noMargin ? 0 : 6,

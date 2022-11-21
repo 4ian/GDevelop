@@ -64,6 +64,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           getValue: (instance: gdInitialInstance) => instance.getX(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
             instance.setX(newValue),
+          truncDecimals: 0,
         },
         {
           name: this.props.i18n._(t`Y`),
@@ -71,6 +72,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           getValue: (instance: gdInitialInstance) => instance.getY(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
             instance.setY(newValue),
+          truncDecimals: 0,
         },
       ],
     },
@@ -80,6 +82,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       getValue: (instance: gdInitialInstance) => instance.getAngle(),
       setValue: (instance: gdInitialInstance, newValue: number) =>
         instance.setAngle(newValue),
+      truncDecimals: 0,
     },
     {
       name: this.props.i18n._(t`Lock position/angle in the editor`),
@@ -130,6 +133,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           getValue: (instance: gdInitialInstance) => instance.getCustomWidth(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
             instance.setCustomWidth(Math.max(newValue, 0)),
+          truncDecimals: 0,
         },
         {
           name: this.props.i18n._(t`Height`),
@@ -137,6 +141,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           getValue: (instance: gdInitialInstance) => instance.getCustomHeight(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
             instance.setCustomHeight(Math.max(newValue, 0)),
+          truncDecimals: 0,
         },
       ],
     },

@@ -13,7 +13,7 @@ import Text from '../../../../UI/Text';
 import { type MessageDescriptor } from '../../../../Utils/i18n/MessageDescriptor.flow';
 import { CardWidget } from '../CardWidget';
 import { Column, Line } from '../../../../UI/Grid';
-import LinearProgress from '../../../../UI/LinearProgress';
+import ColoredLinearProgress from '../../../../UI/ColoredLinearProgress';
 import Chip from '../../../../UI/Chip';
 import { Trans } from '@lingui/macro';
 import Lock from '../../../../UI/CustomSvgIcons/Lock';
@@ -96,7 +96,7 @@ const InAppTutorialPhaseCard = ({
                     <Text displayInlineAsSpan noMargin size="body2">
                       {progress}%
                     </Text>
-                    <LinearProgress value={progress} variant="determinate" />
+                    <ColoredLinearProgress value={progress} />
                   </LineStackLayout>
                 ) : (
                   <Line noMargin justifyContent="center">

@@ -458,6 +458,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
       (): Array<number> => {
         if (!endIndicesPerPhase) return [0];
         const startIndicesPerPhase = getPhasesStartIndices(endIndicesPerPhase);
+
         return endIndicesPerPhase.map((endIndex, i) => {
           if (currentStepIndex >= endIndex) {
             return 100;
@@ -467,7 +468,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
             return 0;
           }
           return Math.floor(
-            (currentStepIndex - startIndex) / (endIndex - startIndex)
+            ((currentStepIndex - startIndex) / (endIndex - startIndex)) * 100
           );
         });
       },

@@ -68,7 +68,7 @@ namespace gdjs {
         callback: (tileMap: TileMapHelper.EditableTileMap | null) => void
       ): void {
         this._manager.getOrLoadTileMap(
-          this._loadTiledMap.bind(this),
+          this._loadTileMap.bind(this),
           tileMapJsonResourceName,
           tileSetJsonResourceName,
           pako,
@@ -91,7 +91,7 @@ namespace gdjs {
         callback: (textureCache: TileMapHelper.TileTextureCache | null) => void
       ): void {
         this._manager.getOrLoadTextureCache(
-          this._loadTiledMap.bind(this),
+          this._loadTileMap.bind(this),
           getTexture,
           atlasImageResourceName,
           tileMapJsonResourceName,
@@ -104,10 +104,10 @@ namespace gdjs {
        * Parse both JSON and set the content of the tile set in the right
        * attribute in the tile map to merge both parsed data.
        */
-      private _loadTiledMap(
+      private _loadTileMap(
         tileMapJsonResourceName: string,
         tileSetJsonResourceName: string,
-        callback: (tiledMap: TileMapHelper.TiledMap | null) => void
+        callback: (tileMap: TileMapHelper.TileMap | null) => void
       ): void {
         this._instanceContainer
           .getGame()
@@ -121,7 +121,11 @@ namespace gdjs {
               callback(null);
               return;
             }
-            const tiledMap = tileMapJsonData as TileMapHelper.TiledMap;
+            const tileMap = TileMapHelper.TileMapManager.identify(tileMapJsonData);
+            if(!tileMap) {
+              callback(null);
+              return;
+            }
             if (tileSetJsonResourceName) {
               this._instanceContainer
                 .getGame()
@@ -135,13 +139,14 @@ namespace gdjs {
                     callback(null);
                     return;
                   }
-                  const tileSet = tileSetJsonData as TileMapHelper.TiledTileset;
+                  const tiledMap = tileMap.data as TileMapHelper.TiledTileMap;
+                  const tileSet = tileSetJsonData as TileMapHelper.TiledTileSet;
                   tileSet.firstgid = tiledMap.tilesets[0].firstgid;
                   tiledMap.tilesets = [tileSet];
-                  callback(tiledMap);
+                  callback(tileMap);
                 });
             } else {
-              callback(tiledMap);
+              callback(tileMap);
             }
           });
       }

@@ -1,0 +1,1 @@
+{"version":3,"file":"Loader.d.ts","sourceRoot":"","sources":["../../../src/datatypes/tiled/Loader.ts"],"names":[],"mappings":"AACA,OAAO,EACL,eAAe,EAGhB,MAAM,mBAAmB,CAAC;AAC3B,OAAO,EAAE,YAAY,EAAE,MAAM,UAAU,CAAC;AAOxC;;GAEG;AACH,yBAAiB,kBAAkB,CAAC;IAClC,SAAgB,IAAI,CAAC,IAAI,EAAE,GAAG,EAAE,OAAO,EAAE,YAAY,GAAG,eAAe,GAAG,IAAI,CAwK7E;CACF"}

@@ -3,26 +3,16 @@
  * @module TileMapHelper
  */
 
-import { TiledMap, TiledTileset } from "./tiled/TiledFormat";
-import {
+export { TiledTileMap, TiledTileSet } from "./datatypes/tiled/Format";
+export {
   EditableTileMap,
   EditableTileMapLayer,
   TileDefinition,
-} from "./model/TileMapModel";
+} from "./model/Model";
 
-import { TileMapManager } from "./render/TileMapManager";
-import { TileTextureCache } from "./render/TileTextureCache";
-import { PixiTileMapHelper } from "./render/TileMapPixiHelper";
+export { TileMapManager } from "./render/Manager";
+export { TileTextureCache } from "./render/TextureCache";
+export { PixiTileMapHelper } from "./render/PixiHelper";
 
+export * from "./datatypes/Format";
 export * from "./model/CommonTypes";
-
-export { EditableTileMap };
-export { EditableTileMapLayer };
-export { TileDefinition };
-
-export { TiledMap };
-export { TiledTileset };
-
-export { TileMapManager };
-export { TileTextureCache };
-export { PixiTileMapHelper };

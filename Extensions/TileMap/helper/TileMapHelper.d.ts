@@ -1,23 +1,27 @@
 import {
   EditableTileMap,
   EditableTileMapLayer,
+  PixiTileMapHelper,
   TileDefinition,
-  TiledMap,
-  TiledTileset,
+  TileMap,
   TileMapManager,
   TileTextureCache,
-  PixiTileMapHelper,
+  TiledTileMap,
+  TiledTileSet,
 } from './dts/index';
 
 declare global {
   namespace TileMapHelper {
-    export { EditableTileMap };
-    export { EditableTileMapLayer };
-    export { TileDefinition };
-    export { TiledMap };
-    export { TiledTileset };
-    export { TileMapManager };
-    export { TileTextureCache };
-    export { PixiTileMapHelper };
+    export {
+      EditableTileMap,
+      EditableTileMapLayer,
+      PixiTileMapHelper,
+      TileDefinition,
+      TileMap,
+      TileMapManager,
+      TileTextureCache,
+      TiledTileMap,
+      TiledTileSet,
+    };
   }
 }

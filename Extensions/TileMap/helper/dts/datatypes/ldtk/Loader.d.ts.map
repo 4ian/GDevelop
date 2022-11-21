@@ -1,0 +1,1 @@
+{"version":3,"file":"Loader.d.ts","sourceRoot":"","sources":["../../../src/datatypes/ldtk/Loader.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,eAAe,EAAE,MAAM,mBAAmB,CAAC;AACpD,OAAO,EAAE,WAAW,EAAE,MAAM,UAAU,CAAC;AAEvC,yBAAiB,iBAAiB,CAAC;IACjC,SAAgB,IAAI,CAAC,IAAI,EAAE,GAAG,EAAE,OAAO,EAAE,WAAW,GAAG,eAAe,GAAG,IAAI,CAE5E;CACF"}

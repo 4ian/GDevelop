@@ -162,84 +162,89 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
   // TODO Move the implementation to Core
   _generateGetterAndSetter = (name: string) => {
     const { project, extension, eventsBasedBehavior } = this.props;
-    const properties = eventsBasedBehavior.getPropertyDescriptors();
-    const property = properties.get(name);
+    const property = this.props.properties.get(name);
     const functionsContainer = eventsBasedBehavior.getEventsFunctions();
-    const getterName = capitalizeFirstLetter(property.getName());
-    const setterName = 'Set' + getterName;
-    const propertyType = propertyIsNumber(property) ? 'Number' : 'String';
-    if (!functionsContainer.hasEventsFunctionNamed(getterName)) {
-      const getter = functionsContainer.insertNewEventsFunction(
-        getterName,
-        functionsContainer.getEventsFunctionsCount()
-      );
-      getter.setFunctionType(gd.EventsFunction.ExpressionAndCondition);
-      getter
-        .getExpressionType()
-        .setName(convertPropertyTypeToValueType(property.getType()))
-        .setExtraInfo(getStringifiedExtraInfo(property));
-      getter.setFullName(property.getLabel());
-      getter.setGroup(
-        eventsBasedBehavior.getFullName() ||
-          eventsBasedBehavior.getName() +
+    const capitalizedName = capitalizeFirstLetter(property.getName());
+    const setterName = 'Set' + capitalizedName;
+    if (property.getType() === 'Boolean') {
+      const getterName = 'Is' + capitalizedName;
+    } else {
+      const getterName = capitalizedName;
+      const propertyType = propertyIsNumber(property) ? 'Number' : 'String';
+      if (!functionsContainer.hasEventsFunctionNamed(getterName)) {
+        const getter = functionsContainer.insertNewEventsFunction(
+          getterName,
+          functionsContainer.getEventsFunctionsCount()
+        );
+        getter.setFunctionType(gd.EventsFunction.ExpressionAndCondition);
+        getter
+          .getExpressionType()
+          .setName(convertPropertyTypeToValueType(property.getType()))
+          .setExtraInfo(getStringifiedExtraInfo(property));
+        getter.setFullName(property.getLabel());
+        getter.setGroup(
+          (eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName()) +
             ' ' +
             uncapitalizeFirstLetter(property.getGroup()) +
             ' configuration'
-      );
-      getter.setDescription(
-        'the ' +
-          uncapitalizeFirstLetter(property.getLabel()) +
-          ' of the object.' +
-          (property.getDescription() ? ' ' + property.getDescription() : '')
-      );
-      getter.setSentence('the ' + uncapitalizeFirstLetter(property.getLabel()));
+        );
+        getter.setDescription(
+          'the ' +
+            uncapitalizeFirstLetter(property.getLabel()) +
+            ' of the object.' +
+            (property.getDescription() ? ' ' + property.getDescription() : '')
+        );
+        getter.setSentence(
+          'the ' + uncapitalizeFirstLetter(property.getLabel())
+        );
 
-      const event = gd.asStandardEvent(
-        getter
-          .getEvents()
-          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0)
-      );
-      const action = new gd.Instruction();
-      action.setType('SetReturn' + propertyType);
-      action.setParametersCount(1);
-      action.setParameter(
-        0,
-        'Object.Behavior::' +
-          (this.props.isSceneProperties ? 'SharedProperty' : 'Property') +
-          property.getName() +
-          '()'
-      );
-      event.getActions().insert(action, 0);
-    }
-    if (!functionsContainer.hasEventsFunctionNamed(setterName)) {
-      const setter = functionsContainer.insertNewEventsFunction(
-        setterName,
-        functionsContainer.getEventsFunctionsCount()
-      );
-      setter.setFunctionType(gd.EventsFunction.ActionWithOperator);
-      setter.setGetterName(getterName);
+        const event = gd.asStandardEvent(
+          getter
+            .getEvents()
+            .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0)
+        );
+        const action = new gd.Instruction();
+        action.setType('SetReturn' + propertyType);
+        action.setParametersCount(1);
+        action.setParameter(
+          0,
+          'Object.Behavior::' +
+            (this.props.isSceneProperties ? 'SharedProperty' : 'Property') +
+            property.getName() +
+            '()'
+        );
+        event.getActions().insert(action, 0);
+      }
+      if (!functionsContainer.hasEventsFunctionNamed(setterName)) {
+        const setter = functionsContainer.insertNewEventsFunction(
+          setterName,
+          functionsContainer.getEventsFunctionsCount()
+        );
+        setter.setFunctionType(gd.EventsFunction.ActionWithOperator);
+        setter.setGetterName(getterName);
 
-      const event = gd.asStandardEvent(
-        setter
-          .getEvents()
-          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0)
-      );
-      const action = new gd.Instruction();
-      action.setType(
-        extension.getName() +
-          '::' +
-          eventsBasedBehavior.getName() +
-          (this.props.isSceneProperties
-            ? '::SetSharedProperty'
-            : '::SetProperty') +
-          property.getName()
-      );
-      action.setParametersCount(4);
-      action.setParameter(0, 'Object');
-      action.setParameter(1, 'Behavior');
-      action.setParameter(2, '=');
-      action.setParameter(3, 'GetArgumentAs' + propertyType + '("Value")');
-      event.getActions().insert(action, 0);
+        const event = gd.asStandardEvent(
+          setter
+            .getEvents()
+            .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0)
+        );
+        const action = new gd.Instruction();
+        action.setType(
+          extension.getName() +
+            '::' +
+            eventsBasedBehavior.getName() +
+            (this.props.isSceneProperties
+              ? '::SetSharedProperty'
+              : '::SetProperty') +
+            property.getName()
+        );
+        action.setParametersCount(4);
+        action.setParameter(0, 'Object');
+        action.setParameter(1, 'Behavior');
+        action.setParameter(2, '=');
+        action.setParameter(3, 'GetArgumentAs' + propertyType + '("Value")');
+        event.getActions().insert(action, 0);
+      }
     }
   };
 

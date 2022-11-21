@@ -81,7 +81,7 @@ export default function EventsBasedBehaviorEditorDialog({
       {currentTab === 'behavior-properties' && (
         <EventsBasedBehaviorPropertiesEditor
           project={project}
-          extension={this.props.eventsFunctionsExtension}
+          extension={eventsFunctionsExtension}
           eventsBasedBehavior={eventsBasedBehavior}
           properties={eventsBasedBehavior.getPropertyDescriptors()}
           onRenameProperty={onRenameProperty}
@@ -92,7 +92,7 @@ export default function EventsBasedBehaviorEditorDialog({
         <EventsBasedBehaviorPropertiesEditor
           isSceneProperties
           project={project}
-          extension={this.props.eventsFunctionsExtension}
+          extension={eventsFunctionsExtension}
           eventsBasedBehavior={eventsBasedBehavior}
           properties={eventsBasedBehavior.getSharedPropertyDescriptors()}
           onRenameProperty={onRenameSharedProperty}

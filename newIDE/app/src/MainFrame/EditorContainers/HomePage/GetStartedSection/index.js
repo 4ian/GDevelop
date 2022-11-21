@@ -14,9 +14,7 @@ import {
 import Checkbox from '../../../../UI/Checkbox';
 import { Line, LargeSpacer } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
-import {
-  ColumnStackLayout,
-} from '../../../../UI/Layout';
+import { ColumnStackLayout } from '../../../../UI/Layout';
 import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import Window from '../../../../Utils/Window';
@@ -25,6 +23,9 @@ import { type HomeTab } from '../HomePageMenu';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import { CardWidget, LARGE_WIDGET_SIZE } from '../CardWidget';
 import InAppTutorialPhaseCard from './InAppTutorialPhaseCard';
+import Unboxing from './Unboxing';
+import Building from './Building';
+import Podium from './Podium';
 
 const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
 
@@ -129,6 +130,7 @@ const GetStartedSection = ({
       durationInMinutes: 5,
       locked: false,
       progress: 100,
+      renderImage: (props) =>  <Unboxing {...props} />,
     },
     {
       title: t`Improve and publish your Game`,
@@ -142,6 +144,7 @@ const GetStartedSection = ({
       durationInMinutes: 10,
       locked: false,
       progress: 20,
+      renderImage: (props) =>  <Building {...props} />,
     },
     {
       title: t`Add leaderboards to your online Game`,
@@ -155,6 +158,7 @@ const GetStartedSection = ({
       durationInMinutes: 15,
       locked: true,
       progress: 0,
+      renderImage: (props) =>  <Podium {...props} />,
     },
   ];
 

@@ -29,7 +29,7 @@ type Option =
       text: string, // The text used for filtering. If empty, item is always shown.
       value: string, // The value to show on screen and to be selected
       translatableValue?: MessageDescriptor,
-      onClick?: () => void, // If defined, will be called when the item is clicked. onChange/onChoose won't be called.
+      onClick?: () => void | Promise<void>, // If defined, will be called when the item is clicked. onChange/onChoose won't be called.
       renderIcon?: ?() => React.Element<typeof ListIcon | typeof SvgIcon>,
     |};
 

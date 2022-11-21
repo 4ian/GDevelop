@@ -82,7 +82,7 @@ export default class BrowserFileSystem {
   };
 
   /**
-   * Returns all the files that should be downloaded from a URL, with the specified path prefix.
+   * Returns all the files that should be downloaded from a URL, with the specified destination path prefix.
    */
   getAllUrlFilesIn = (pathPrefix: string): Array<UrlFileDescriptor> => {
     return Object.keys(this._filesToDownload)

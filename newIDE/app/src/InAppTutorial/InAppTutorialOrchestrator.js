@@ -33,6 +33,11 @@ const selectorInterpolationProjectDataAccessors = {
   editorTab: 'editorTab:',
 };
 
+const getPhasesStartIndices = (endIndices: Array<number>): Array<number> =>
+  endIndices.map((_, i) => {
+    return i === 0 ? 0 : endIndices[i - 1] + 1;
+  });
+
 const interpolateText = (
   text: string,
   data: { [key: string]: string },
@@ -335,7 +340,7 @@ export type InAppTutorialOrchestratorInterface = {|
   onPreviewLaunch: () => void,
   getProgress: () => {|
     step: number,
-    progress: number,
+    progress: Array<number>,
     projectData: {| [key: string]: string |},
   |},
   changeData: (oldName: string, newName: string) => void,
@@ -355,6 +360,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
       setWrongEditorInfoOpen,
     ] = React.useState<boolean>(false);
     const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
+    const [
+      endIndicesPerPhase,
+      setEndIndicesPerPhase,
+    ] = React.useState<?Array<number>>(null);
     const [data, setData] = React.useState<{| [key: string]: string |}>({});
     const [displayEndDialog, setDisplayEndDialog] = React.useState<boolean>(
       false
@@ -427,9 +436,42 @@ const InAppTutorialOrchestrator = React.forwardRef<
       [flow, changeStep, stepCount, data]
     );
 
+    React.useEffect(
+      () => {
+        const indices = [];
+        for (
+          let flowStepIndex = 0;
+          flowStepIndex < tutorial.flow.length;
+          flowStepIndex++
+        ) {
+          if (tutorial.flow[flowStepIndex].isCheckpoint) {
+            indices.push(flowStepIndex);
+          }
+        }
+        indices.push(tutorial.flow.length - 1); // Last phase ends at last flow step.
+        setEndIndicesPerPhase(indices);
+      },
+      [tutorial.flow]
+    );
+
     const computeProgress = React.useCallback(
-      () => Math.round((currentStepIndex / tutorial.flow.length) * 100),
-      [currentStepIndex, tutorial.flow]
+      (): Array<number> => {
+        if (!endIndicesPerPhase) return [0];
+        const startIndicesPerPhase = getPhasesStartIndices(endIndicesPerPhase);
+        return endIndicesPerPhase.map((endIndex, i) => {
+          if (currentStepIndex >= endIndex) {
+            return 100;
+          }
+          const startIndex = startIndicesPerPhase[i];
+          if (currentStepIndex < startIndex) {
+            return 0;
+          }
+          return Math.floor(
+            (currentStepIndex - startIndex) / (endIndex - startIndex)
+          );
+        });
+      },
+      [currentStepIndex, endIndicesPerPhase]
     );
 
     const getProgress = () => {
@@ -741,6 +783,17 @@ const InAppTutorialOrchestrator = React.forwardRef<
         );
       }
 
+      let currentPhaseIndex = 0;
+      if (endIndicesPerPhase) {
+        const startIndices = getPhasesStartIndices(endIndicesPerPhase);
+        currentPhaseIndex = endIndicesPerPhase
+          .map((endIndex, i) => {
+            return (
+              currentStepIndex < endIndex && currentStepIndex >= startIndices[i]
+            );
+          })
+          .indexOf(true);
+      }
       return (
         <InAppTutorialStepDisplayer
           step={formattedStep}
@@ -753,7 +806,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
             changeStep(currentStepFallbackStepIndex.current);
           }}
           endTutorial={endTutorial}
-          progress={computeProgress()}
+          progress={computeProgress()[currentPhaseIndex]}
           goToNextStep={goToNextStep}
         />
       );

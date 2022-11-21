@@ -120,7 +120,7 @@ const GetStartedSection = ({
   const inAppTutorialCards = [
     {
       title: t`Start your game`,
-      description: t`Add your first characters to the scene and throw your first objects`,
+      description: t`Add your first characters to the scene and throw your first objects.`,
       keyPoints: [
         t`Game scene size`,
         t`Objects and characters`,
@@ -135,10 +135,10 @@ const GetStartedSection = ({
     },
     {
       title: t`Improve and publish your Game`,
-      description: t`Add personality to your game, and polish online`,
+      description: t`Add personality to your game and publish it online.`,
       keyPoints: [
         t`Game background`,
-        t`In game obstacles`,
+        t`In-game obstacles`,
         t`“You win” message`,
         t`Sharing online`,
       ],
@@ -150,7 +150,7 @@ const GetStartedSection = ({
     },
     {
       title: t`Add leaderboards to your online Game`,
-      description: t`Polish your game, and add leaderboards.`,
+      description: t`Add player logins to your game and add a leaderboard.`,
       keyPoints: [
         t`Game personalisation`,
         t`“Start” screen`,

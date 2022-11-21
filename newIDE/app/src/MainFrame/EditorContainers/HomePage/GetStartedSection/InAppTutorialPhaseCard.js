@@ -37,7 +37,10 @@ const styles = {
 
 type Props = {|
   progress?: number,
+  /** For tutorials that cannot be started yet. */
   locked: boolean,
+  /** To prevent start on click. */
+  disabled?: boolean,
   title: MessageDescriptor,
   description: MessageDescriptor,
   durationInMinutes: number,
@@ -49,6 +52,7 @@ type Props = {|
 const InAppTutorialPhaseCard = ({
   progress,
   locked,
+  disabled,
   title,
   description,
   durationInMinutes,
@@ -63,7 +67,7 @@ const InAppTutorialPhaseCard = ({
         <CardWidget
           onClick={onClick}
           size="large"
-          disabled={locked}
+          disabled={disabled || locked}
           shadowed={locked}
         >
           <Column noMargin>
@@ -71,7 +75,9 @@ const InAppTutorialPhaseCard = ({
               style={{
                 ...styles.imageContainer,
                 backgroundColor: locked
-                  ? gdevelopTheme.paper.backgroundColor.light
+                  ? gdevelopTheme.paletteType === 'dark'
+                    ? gdevelopTheme.paper.backgroundColor.light
+                    : gdevelopTheme.paper.backgroundColor.dark
                   : '#7046EC',
               }}
             >

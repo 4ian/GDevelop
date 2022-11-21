@@ -26,6 +26,8 @@ import InAppTutorialPhaseCard from './InAppTutorialPhaseCard';
 import Unboxing from './Unboxing';
 import Building from './Building';
 import Podium from './Podium';
+import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+import PreferencesContext from '../../../Preferences/PreferencesContext';
 
 const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
 
@@ -82,6 +84,8 @@ const GetStartedSection = ({
   setShowGetStartedSection,
 }: Props) => {
   const { inAppTutorialShortHeaders } = React.useContext(InAppTutorialContext);
+  const { getTutorialProgress } = React.useContext(PreferencesContext);
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const windowWidth = useResponsiveWindowWidth();
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
@@ -117,6 +121,13 @@ const GetStartedSection = ({
     },
   ];
 
+  const userProgress = getTutorialProgress({
+    tutorialId: 'flingGame',
+    userId: authenticatedUser.profile
+      ? authenticatedUser.profile.id
+      : undefined,
+  });
+
   const inAppTutorialCards = [
     {
       title: t`Start your game`,
@@ -129,9 +140,10 @@ const GetStartedSection = ({
       ],
       durationInMinutes: 5,
       locked: false,
-      disabled: true,
-      progress: 100,
-      renderImage: (props) =>  <Unboxing {...props} />,
+      disabled: !!currentlyRunningInAppTutorial,
+      progress:
+        userProgress && userProgress.progress ? userProgress.progress[0] : 0,
+      renderImage: props => <Unboxing {...props} />,
     },
     {
       title: t`Improve and publish your Game`,
@@ -143,10 +155,14 @@ const GetStartedSection = ({
         t`Sharing online`,
       ],
       durationInMinutes: 10,
-      locked: false,
-      disabled: true,
-      progress: 20,
-      renderImage: (props) =>  <Building {...props} />,
+      locked:
+        userProgress && userProgress.progress
+          ? userProgress.progress[0] !== 100
+          : true,
+      disabled: !!currentlyRunningInAppTutorial,
+      progress:
+        userProgress && userProgress.progress ? userProgress.progress[1] : 0,
+      renderImage: props => <Building {...props} />,
     },
     {
       title: t`Add leaderboards to your online Game`,
@@ -158,10 +174,14 @@ const GetStartedSection = ({
         t`Leaderboards`,
       ],
       durationInMinutes: 15,
-      locked: true,
-      disabled: true,
-      progress: 0,
-      renderImage: (props) =>  <Podium {...props} />,
+      locked:
+        userProgress && userProgress.progress
+          ? userProgress.progress[1] !== 100
+          : true,
+      disabled: !!currentlyRunningInAppTutorial,
+      progress:
+        userProgress && userProgress.progress ? userProgress.progress[2] : 0,
+      renderImage: props => <Podium {...props} />,
     },
   ];
 

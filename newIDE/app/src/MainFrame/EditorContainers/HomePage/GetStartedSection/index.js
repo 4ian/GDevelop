@@ -1,30 +1,30 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import Paper from '@material-ui/core/Paper';
-import { isMobile } from '../../../Utils/Platform';
-import { sendOnboardingManuallyOpened } from '../../../Utils/Analytics/EventSender';
-import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
+import { isMobile } from '../../../../Utils/Platform';
+import { sendOnboardingManuallyOpened } from '../../../../Utils/Analytics/EventSender';
+import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import {
   useResponsiveWindowWidth,
   type WidthType,
-} from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import Checkbox from '../../../UI/Checkbox';
-import { Line, Column, LargeSpacer } from '../../../UI/Grid';
-import Text from '../../../UI/Text';
+} from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import Checkbox from '../../../../UI/Checkbox';
+import { Line, LargeSpacer } from '../../../../UI/Grid';
+import Text from '../../../../UI/Text';
 import {
   ColumnStackLayout,
-  ResponsiveLineStackLayout,
-} from '../../../UI/Layout';
-import InAppTutorialContext from '../../../InAppTutorial/InAppTutorialContext';
-import PlaceholderLoader from '../../../UI/PlaceholderLoader';
-import Window from '../../../Utils/Window';
+} from '../../../../UI/Layout';
+import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
+import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
+import Window from '../../../../Utils/Window';
 
-import { type HomeTab } from './HomePageMenu';
-import SectionContainer, { SectionRow } from './SectionContainer';
-import { CardWidget, LARGE_WIDGET_SIZE } from './CardWidget';
+import { type HomeTab } from '../HomePageMenu';
+import SectionContainer, { SectionRow } from '../SectionContainer';
+import { CardWidget, LARGE_WIDGET_SIZE } from '../CardWidget';
+import InAppTutorialPhaseCard from './InAppTutorialPhaseCard';
 
 const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
 
@@ -116,6 +116,48 @@ const GetStartedSection = ({
     },
   ];
 
+  const inAppTutorialCards = [
+    {
+      title: t`Start your game`,
+      description: t`Add your first characters to the scene and throw your first objects`,
+      keyPoints: [
+        t`Game scene size`,
+        t`Objects and characters`,
+        t`Game Scenes`,
+        t`Throwing physics`,
+      ],
+      durationInMinutes: 5,
+      locked: false,
+      progress: 100,
+    },
+    {
+      title: t`Improve and publish your Game`,
+      description: t`Add personality to your game, and polish online`,
+      keyPoints: [
+        t`Game background`,
+        t`In game obstacles`,
+        t`“You win” message`,
+        t`Sharing online`,
+      ],
+      durationInMinutes: 10,
+      locked: false,
+      progress: 20,
+    },
+    {
+      title: t`Add leaderboards to your online Game`,
+      description: t`Polish your game, and add leaderboards.`,
+      keyPoints: [
+        t`Game personalisation`,
+        t`“Start” screen`,
+        t`Timers`,
+        t`Leaderboards`,
+      ],
+      durationInMinutes: 15,
+      locked: true,
+      progress: 0,
+    },
+  ];
+
   return (
     <SectionContainer
       title={<Trans>Get started!</Trans>}
@@ -132,40 +174,25 @@ const GetStartedSection = ({
         {shouldShowOnboardingButton && (
           <Line>
             <div style={styles.bannerContainer}>
-              <CardWidget
-                onClick={() => {
-                  sendOnboardingManuallyOpened();
-                  onOpenOnboardingDialog();
-                }}
-                size="banner"
-                disabled={!!currentlyRunningInAppTutorial}
-              >
-                {inAppTutorialShortHeaders === null ? (
-                  <PlaceholderLoader />
-                ) : (
-                  <ResponsiveLineStackLayout noMargin expand>
-                    <img
-                      alt="tour"
-                      src="res/homepage/step-by-step.gif"
-                      style={styles.bannerImage}
-                    />
-                    <div style={styles.cardTextContainer}>
-                      <Column noMargin expand>
-                        <Text size="block-title">
-                          <Trans>Take the tour</Trans>
-                        </Text>
-                        <Text size="body" color="secondary">
-                          <span style={styles.icon}>🕐</span>
-                          <Trans>5 minutes</Trans>
-                        </Text>
-                        <Text size="body">
-                          <Trans>Learn the fundamentals of the editor</Trans>
-                        </Text>
-                      </Column>
-                    </div>
-                  </ResponsiveLineStackLayout>
-                )}
-              </CardWidget>
+              {inAppTutorialShortHeaders === null ? (
+                <PlaceholderLoader />
+              ) : (
+                <GridList
+                  cols={getColumnsFromWidth(windowWidth)}
+                  style={styles.grid}
+                  cellHeight="auto"
+                  spacing={ITEMS_SPACING * 2}
+                >
+                  {inAppTutorialCards.map(item => (
+                    <GridListTile>
+                      <InAppTutorialPhaseCard
+                        {...item}
+                        onClick={() => console.log('click')}
+                      />
+                    </GridListTile>
+                  ))}
+                </GridList>
+              )}
             </div>
           </Line>
         )}
@@ -174,7 +201,7 @@ const GetStartedSection = ({
         <Text size="title" noMargin>
           <Trans>Want to explore further?</Trans>
         </Text>
-        <Text size="body" noMargin>
+        <Text size="body" color="secondary" noMargin>
           <Trans>Articles, wiki and much more.</Trans>
         </Text>
         <LargeSpacer />
@@ -204,7 +231,7 @@ const GetStartedSection = ({
                       justifyContent="center"
                       useFullHeight
                     >
-                      <Text size="block-title" noMargin>
+                      <Text size="sub-title" noMargin>
                         {item.title}
                       </Text>
                       <Text size="body" color="secondary" noMargin>

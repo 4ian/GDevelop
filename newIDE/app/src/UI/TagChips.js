@@ -24,23 +24,7 @@ type Props = {|
 
 const TagChips = ({ tags, onChange, onRemove }: Props) => {
   const [focusedTag, setFocusedTag] = React.useState<?string>(null);
-  const [removedTagIndex, setRemovedTagIndex] = React.useState<number | null>(
-    null
-  );
-
-  // Unsure about this warning, might be worth fixing/improving.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const tagRefs = [];
-  React.useEffect(
-    () => {
-      if (removedTagIndex !== null) {
-        const tagToFocus = tagRefs[Math.min(removedTagIndex, tags.length - 1)];
-        tagToFocus.current && tagToFocus.current.focus();
-        setRemovedTagIndex(null);
-      }
-    },
-    [tags, removedTagIndex, tagRefs]
-  );
+  const tagsRefs = React.useRef([]);
 
   const getChipStyle = React.useCallback(
     (tag: string) => {
@@ -54,9 +38,17 @@ const TagChips = ({ tags, onChange, onRemove }: Props) => {
   );
 
   const handleDeleteTag = (tag: string) => event => {
+    const deletedTagIndex = tags.indexOf(tag);
+    tagsRefs.current.splice(deletedTagIndex, 1);
     if (event.nativeEvent instanceof KeyboardEvent) {
-      const tagIndex = tags.indexOf(tag);
-      setRemovedTagIndex(tagIndex);
+      const newIndexToFocus = Math.min(
+        tagsRefs.current.length - 1,
+        deletedTagIndex
+      );
+      const newTagToFocus = tagsRefs.current[newIndexToFocus];
+      if (newTagToFocus && newTagToFocus.current) {
+        newTagToFocus.current.focus();
+      }
     }
     if (onChange) onChange(removeTag(tags, tag));
     else if (onRemove) onRemove(tag);
@@ -66,9 +58,9 @@ const TagChips = ({ tags, onChange, onRemove }: Props) => {
 
   return (
     <div style={styles.chipContainer}>
-      {tags.map(tag => {
+      {tags.map((tag, index) => {
         const newRef = React.createRef();
-        tagRefs.push(newRef);
+        tagsRefs.current[index] = newRef;
         return (
           <Chip
             key={tag}

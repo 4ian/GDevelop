@@ -73,7 +73,7 @@ const getStyles = ({
   focused: boolean,
   hasHelpPage: boolean,
 }) => {
-  const iconOpacity = !disabled ? 0.54 : 0.38;
+  const iconOpacity = !disabled ? 1 : 0.38;
   const iconSize = 30;
   return {
     root: {
@@ -284,6 +284,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
 
     const handleCancel = () => {
       changeValue('');
+      focus();
     };
 
     const handleKeyPressed = (event: SyntheticKeyboardEvent<>) => {
@@ -435,7 +436,13 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
               <Collapse in={tagsHandler.chosenTags.size > 0}>
                 <TagChips
                   tags={Array.from(tagsHandler.chosenTags)}
-                  onRemove={tag => tagsHandler.remove(tag)}
+                  onRemove={tag => {
+                    if (tagsHandler.chosenTags.size === 1) {
+                      // If the last tag is removed, focus the search bar.
+                      focus();
+                    }
+                    tagsHandler.remove(tag);
+                  }}
                 />
               </Collapse>
             )}

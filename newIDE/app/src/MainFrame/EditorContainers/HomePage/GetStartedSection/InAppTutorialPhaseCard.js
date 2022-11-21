@@ -75,9 +75,7 @@ const InAppTutorialPhaseCard = ({
               style={{
                 ...styles.imageContainer,
                 backgroundColor: locked
-                  ? gdevelopTheme.paletteType === 'dark'
-                    ? gdevelopTheme.paper.backgroundColor.light
-                    : gdevelopTheme.paper.backgroundColor.dark
+                  ? gdevelopTheme.paper.backgroundColor.light
                   : '#7046EC',
               }}
             >

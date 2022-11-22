@@ -126,9 +126,15 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
     const { eventsBasedBehavior } = this.props;
     const properties = eventsBasedBehavior.getPropertyDescriptors();
     const property = properties.get(name);
-    
+
     const type = property.getType();
-    if (type !== 'Boolean' && type !== 'Number' && type !== 'String' && type !== 'Choice' && type !== 'Color') {
+    if (
+      type !== 'Boolean' &&
+      type !== 'Number' &&
+      type !== 'String' &&
+      type !== 'Choice' &&
+      type !== 'Color'
+    ) {
       return false;
     }
 
@@ -255,9 +261,13 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                         {
                           label: i18n._(t`Generate functions`),
                           click: () =>
-                          gd.PropertyFunctionGenerator.generateGetterAndSetter(this.props.extension,
-                                                         this.props.eventsBasedBehavior,
-                                                         property.getName()),
+                            gd.PropertyFunctionGenerator.generateGetterAndSetter(
+                              this.props.project,
+                              this.props.extension,
+                              this.props.eventsBasedBehavior,
+                              property,
+                              this.props.isSceneProperties
+                            ),
                           disabled: !this._canGenerateGetterAndSetter(
                             property.getName()
                           ),

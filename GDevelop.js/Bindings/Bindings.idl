@@ -2159,7 +2159,7 @@ interface WholeProjectRefactorer {
 };
 
 interface PropertyFunctionGenerator {
-    void STATIC_GenerateGetterAndSetter([Ref] EventsFunctionsExtension extension, [Ref] EventsBasedBehavior eventsBasedBehavior, [Const] DOMString propertyName);
+    void STATIC_GenerateGetterAndSetter([Ref] Project project, [Ref] EventsFunctionsExtension extension, [Ref] EventsBasedBehavior eventsBasedBehavior, [Const, Ref] NamedPropertyDescriptor property, boolean isSceneProperties);
 };
 
 interface UsedExtensionsFinder {

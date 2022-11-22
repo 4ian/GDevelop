@@ -4,23 +4,24 @@
  * reserved. This project is released under the MIT License.
  */
 #include "PropertyFunctionGenerator.h"
+
 #include "GDCore/Events/Builtin/StandardEvent.h"
+#include "GDCore/Events/Event.h"
 #include "GDCore/Extensions/Metadata/ValueTypeMetadata.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/String.h"
+
 
 namespace gd {
 
 void PropertyFunctionGenerator::GenerateGetterAndSetter(
-    gd::EventsFunctionsExtension &extension,
+    gd::Project &project, gd::EventsFunctionsExtension &extension,
     gd::EventsBasedBehavior &eventsBasedBehavior,
-    const gd::String &propertyName) {
-  bool isSceneProperties = false;
-
-  auto &property =
-      eventsBasedBehavior.GetPropertyDescriptors().Get(propertyName);
+    const gd::NamedPropertyDescriptor &property, bool isSceneProperties) {
+  auto &propertyName = property.GetName();
   auto &functionsContainer = eventsBasedBehavior.GetEventsFunctions();
   gd::String capitalizedName = CapitalizeFirstLetter(property.GetName());
   gd::String setterName = "Set" + capitalizedName;
@@ -79,7 +80,9 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
           .SetSentence("the " + UnCapitalizeFirstLetter(property.GetLabel()));
     }
 
-    gd::StandardEvent event;
+    auto &event =
+        dynamic_cast<gd::StandardEvent &>(getter.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard", 0));
     if (property.GetType() == "Boolean") {
       gd::Instruction condition;
       condition.SetType(getterType);
@@ -103,7 +106,6 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
                                  property.GetName() + "()");
       event.GetActions().Insert(action, 0);
     }
-    getter.GetEvents().InsertEvent(event);
   }
 
   if (!functionsContainer.HasEventsFunctionNamed(setterName)) {
@@ -131,7 +133,9 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
 
     if (property.GetType() == "Boolean") {
       {
-        gd::StandardEvent event;
+        auto &event =
+            dynamic_cast<gd::StandardEvent &>(setter.GetEvents().InsertNewEvent(
+                project, "BuiltinCommonInstructions::Standard", 0));
 
         gd::Instruction condition;
         condition.SetType("GetArgumentAsBoolean");
@@ -146,11 +150,11 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
         action.SetParameter(1, "Behavior");
         action.SetParameter(2, "yes");
         event.GetActions().Insert(action, 0);
-
-        setter.GetEvents().InsertEvent(event);
       }
       {
-        gd::StandardEvent event;
+        auto &event =
+            dynamic_cast<gd::StandardEvent &>(setter.GetEvents().InsertNewEvent(
+                project, "BuiltinCommonInstructions::Standard", 0));
 
         gd::Instruction condition;
         condition.SetType("GetArgumentAsBoolean");
@@ -166,11 +170,11 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
         action.SetParameter(1, "Behavior");
         action.SetParameter(2, "no");
         event.GetActions().Insert(action, 0);
-
-        setter.GetEvents().InsertEvent(event);
       }
     } else {
-      gd::StandardEvent event;
+      auto &event =
+          dynamic_cast<gd::StandardEvent &>(setter.GetEvents().InsertNewEvent(
+              project, "BuiltinCommonInstructions::Standard", 0));
 
       gd::Instruction action;
       action.SetType(setterType);
@@ -180,8 +184,6 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
       action.SetParameter(2, "=");
       action.SetParameter(3, "GetArgumentAs" + numberOrString + "(\"Value\")");
       event.GetActions().Insert(action, 0);
-
-      setter.GetEvents().InsertEvent(event);
     }
   }
 }
@@ -193,11 +195,11 @@ gd::String PropertyFunctionGenerator::GetStringifiedExtraInfo(
     arrayString += "[";
     bool isFirst = true;
     for (const gd::String &choice : property.GetExtraInfo()) {
-      if (isFirst) {
+      if (!isFirst) {
         arrayString += ",";
-        isFirst = false;
       }
-      arrayString += choice;
+      isFirst = false;
+      arrayString += "\"" + choice + "\"";
     }
     arrayString += "]";
     return arrayString;
@@ -207,14 +209,18 @@ gd::String PropertyFunctionGenerator::GetStringifiedExtraInfo(
 
 gd::String
 PropertyFunctionGenerator::CapitalizeFirstLetter(const gd::String &string) {
-  return string.substr(0, 1).UpperCase() +
-         string.substr(1, string.length() - 1);
+  if (string.empty()) {
+    return string;
+  }
+  return string.substr(0, 1).UpperCase() + string.substr(1);
 }
 
 gd::String
 PropertyFunctionGenerator::UnCapitalizeFirstLetter(const gd::String &string) {
-  return string.substr(0, 1).LowerCase() +
-         string.substr(1, string.length() - 1);
+  if (string.empty()) {
+    return string;
+  }
+  return string.substr(0, 1).LowerCase() + string.substr(1);
 }
 
 } // namespace gd

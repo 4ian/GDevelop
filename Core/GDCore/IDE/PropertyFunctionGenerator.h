@@ -12,6 +12,7 @@ class Project;
 class EventsFunctionsExtension;
 class EventsBasedBehavior;
 class PropertyDescriptor;
+class NamedPropertyDescriptor;
 } // namespace gd
 
 namespace gd {
@@ -25,9 +26,11 @@ public:
    * \brief Generate a getter and a setter for the given property.
    */
   static void
-  GenerateGetterAndSetter(gd::EventsFunctionsExtension &extension,
+  GenerateGetterAndSetter(gd::Project &project,
+                          gd::EventsFunctionsExtension &extension,
                           gd::EventsBasedBehavior &eventsBasedBehavior,
-                          const gd::String &propertyName);
+                          const gd::NamedPropertyDescriptor &property,
+                          bool isSceneProperties);
 
   ~PropertyFunctionGenerator();
 

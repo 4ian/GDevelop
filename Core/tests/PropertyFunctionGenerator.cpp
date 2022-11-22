@@ -458,4 +458,36 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
     REQUIRE(!gd::PropertyFunctionGenerator::CanGenerateGetterAndSetter(
         behavior, property));
   }
+
+  SECTION("Can generate functions when only the property name is filled") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &extension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &behavior = CreateBehavior(extension);
+
+    auto &property =
+        behavior.GetPropertyDescriptors().InsertNew("MovementAngle", 0);
+    property.SetType("Number");
+
+    gd::PropertyFunctionGenerator::GenerateGetterAndSetter(
+        project, extension, behavior, property, false);
+
+    REQUIRE(
+        behavior.GetEventsFunctions().HasEventsFunctionNamed("MovementAngle"));
+    REQUIRE(behavior.GetEventsFunctions().HasEventsFunctionNamed(
+        "SetMovementAngle"));
+
+    auto &getter =
+        behavior.GetEventsFunctions().GetEventsFunction("MovementAngle");
+
+    REQUIRE(getter.GetFunctionType() ==
+            gd::EventsFunction::ExpressionAndCondition);
+    REQUIRE(getter.GetExpressionType().GetName() == "expression");
+    REQUIRE(getter.GetFullName() == "MovementAngle");
+    REQUIRE(getter.GetGroup() == "My events based behavior configuration");
+    REQUIRE(getter.GetDescription() == "the movementAngle of the object.");
+    REQUIRE(getter.GetSentence() == "the movementAngle");
+  }
 }

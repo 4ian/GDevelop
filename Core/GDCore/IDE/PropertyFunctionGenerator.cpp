@@ -29,11 +29,17 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
       (eventsBasedBehavior.GetFullName().empty()
            ? eventsBasedBehavior.GetName()
            : eventsBasedBehavior.GetFullName()) +
-      " " + UnCapitalizeFirstLetter(property.GetGroup()) + " configuration";
+      (property.GetGroup().empty()
+           ? ""
+           : " " + UnCapitalizeFirstLetter(property.GetGroup())) +
+      " configuration";
+
+  gd::String propertyLabel =
+      property.GetLabel().empty() ? property.GetName() : property.GetLabel();
 
   gd::String descriptionSubject =
       (property.GetType() == "Boolean" ? "if " : "the ") +
-      UnCapitalizeFirstLetter(property.GetLabel()) +
+      UnCapitalizeFirstLetter(propertyLabel) +
       (isSceneProperties || property.GetType() == "Boolean"
            ? "."
            : " of the object.") +
@@ -67,16 +73,15 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
     getter.GetExpressionType()
         .SetName(legacyExpressionType)
         .SetExtraInfo(GetStringifiedExtraInfo(property));
-    getter.SetFullName(property.GetLabel()).SetGroup(functionGroupName);
+    getter.SetFullName(propertyLabel).SetGroup(functionGroupName);
     if (property.GetType() == "Boolean") {
       getter.SetFunctionType(gd::EventsFunction::Condition)
           .SetDescription("Check " + descriptionSubject)
-          .SetSentence("_PARAM0_ " +
-                       UnCapitalizeFirstLetter(property.GetLabel()));
+          .SetSentence("_PARAM0_ " + UnCapitalizeFirstLetter(propertyLabel));
     } else {
       getter.SetFunctionType(gd::EventsFunction::ExpressionAndCondition)
           .SetDescription(descriptionSubject)
-          .SetSentence("the " + UnCapitalizeFirstLetter(property.GetLabel()));
+          .SetSentence("the " + UnCapitalizeFirstLetter(propertyLabel));
     }
 
     auto &event =
@@ -112,11 +117,10 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
         setterName, functionsContainer.GetEventsFunctionsCount());
     if (property.GetType() == "Boolean") {
       setter.SetFunctionType(gd::EventsFunction::Action)
-          .SetFullName(property.GetLabel())
+          .SetFullName(propertyLabel)
           .SetGroup(functionGroupName)
           .SetDescription("Change " + descriptionSubject)
-          .SetSentence("_PARAM0_ " +
-                       UnCapitalizeFirstLetter(property.GetLabel()) +
+          .SetSentence("_PARAM0_ " + UnCapitalizeFirstLetter(propertyLabel) +
                        ": _PARAM2_");
       gd::ParameterMetadata parameter;
       parameter.SetType("yesorno")

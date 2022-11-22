@@ -8,7 +8,7 @@ import Fade from '@material-ui/core/Fade';
 import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
 
-import { Column } from '../UI/Grid';
+import { Column, Spacer } from '../UI/Grid';
 import { getDisplayZIndexForHighlighter } from './HTMLUtils';
 import { type InAppTutorialFormattedTooltip } from './InAppTutorialContext';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
@@ -158,7 +158,10 @@ const TooltipBody = ({
         />
       )}
       {buttonLabel && (
-        <RaisedButton primary label={buttonLabel} onClick={goToNextStep} />
+        <>
+          {tooltip.image ? <Spacer /> : null}
+          <RaisedButton primary label={buttonLabel} onClick={goToNextStep} />
+        </>
       )}
     </>
   );

@@ -8,7 +8,6 @@ import {
   LineStackLayout,
   ResponsiveLineStackLayout,
 } from '../../../../UI/Layout';
-import Paper from '../../../../UI/Paper';
 import Text from '../../../../UI/Text';
 import { type MessageDescriptor } from '../../../../Utils/i18n/MessageDescriptor.flow';
 import { CardWidget } from '../CardWidget';
@@ -90,7 +89,7 @@ const InAppTutorialPhaseCard = ({
                 renderImage({ style: styles.image })
               )}
             </div>
-            <Paper square style={styles.cardTextContainer} background="dark">
+            <div style={styles.cardTextContainer}>
               <ColumnStackLayout
                 expand
                 justifyContent="flex-start"
@@ -163,7 +162,7 @@ const InAppTutorialPhaseCard = ({
                   </Column>
                 </ResponsiveLineStackLayout>
               </ColumnStackLayout>
-            </Paper>
+            </div>
           </Column>
         </CardWidget>
       )}

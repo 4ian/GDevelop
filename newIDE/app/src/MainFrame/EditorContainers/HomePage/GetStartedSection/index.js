@@ -3,7 +3,6 @@ import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
-import Paper from '@material-ui/core/Paper';
 import { isMobile } from '../../../../Utils/Platform';
 import { sendOnboardingManuallyOpened } from '../../../../Utils/Analytics/EventSender';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
@@ -264,7 +263,7 @@ const GetStartedSection = ({
                   size="large"
                   disabled={item.disabled}
                 >
-                  <Paper
+                  <div
                     style={{
                       ...styles.cardTextContainer,
                       padding: windowWidth === 'small' ? 10 : 20,
@@ -282,7 +281,7 @@ const GetStartedSection = ({
                         {item.description}
                       </Text>
                     </ColumnStackLayout>
-                  </Paper>
+                  </div>
                 </CardWidget>
               </GridListTile>
             ))}

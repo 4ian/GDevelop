@@ -391,7 +391,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
       elementWithValueToWatch,
       setElementWithValueToWatch,
     ] = React.useState<?string>(null);
-    const InputInitialValueRef = React.useRef<?string>(null);
+    const inputInitialValueRef = React.useRef<?string>(null);
     const [
       objectSceneInstancesToWatch,
       setObjectSceneInstancesToWatch,
@@ -662,7 +662,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
           const elementToWatch = document.querySelector(elementToHighlightId);
 
           if (elementToWatch) {
-            InputInitialValueRef.current = getInputValue(elementToWatch);
+            inputInitialValueRef.current = getInputValue(elementToWatch);
           }
           setElementWithValueToWatch(elementToHighlightId);
         } else if (nextStepTrigger && nextStepTrigger.instanceAddedOnScene) {
@@ -706,7 +706,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
           // Flow errors on missing value prop in generic type HTMLElement but this
           // line cannot break.
           // $FlowFixMe
-          getInputValue(elementToWatch) !== InputInitialValueRef.current
+          getInputValue(elementToWatch) !== inputInitialValueRef.current
         ) {
           goToNextStep();
         }

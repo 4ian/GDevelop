@@ -32,8 +32,10 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
+  extension: gdEventsFunctionsExtension,
+  eventsBasedBehavior: gdEventsBasedBehavior,
   properties: gdNamedPropertyDescriptorsList,
-  allowRequiredBehavior?: boolean,
+  isSceneProperties?: boolean,
   onPropertiesUpdated?: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
   behaviorObjectType?: string,
@@ -225,6 +227,21 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                           click: () => this._moveProperty(i, i + 1),
                           enabled: i + 1 < properties.getCount(),
                         },
+                        {
+                          label: i18n._(t`Generate functions`),
+                          click: () =>
+                            gd.PropertyFunctionGenerator.generateGetterAndSetter(
+                              this.props.project,
+                              this.props.extension,
+                              this.props.eventsBasedBehavior,
+                              property,
+                              !!this.props.isSceneProperties
+                            ),
+                          enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
+                            this.props.eventsBasedBehavior,
+                            property
+                          ),
+                        },
                       ]}
                     />
                   </MiniToolbar>
@@ -265,7 +282,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             value="Color"
                             primaryText={t`Color (text)`}
                           />
-                          {this.props.allowRequiredBehavior && (
+                          {!this.props.isSceneProperties && (
                             <SelectOption
                               value="Behavior"
                               primaryText={t`Required behavior`}

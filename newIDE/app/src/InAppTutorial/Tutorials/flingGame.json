@@ -1,0 +1,4200 @@
+{
+  "id": "flingGame",
+  "editorSwitches": {
+    "GoToBuildSection": {
+      "editor": "Home"
+    },
+    "OpenPropertiesManager": {
+      "editor": "Scene",
+      "scene": "playScene"
+    },
+    "SwitchToEvents1": {
+      "editor": "EventsSheet",
+      "scene": "playScene"
+    },
+    "SwitchToEvents2": {
+      "editor": "EventsSheet",
+      "scene": "playScene"
+    },
+    "SwitchToEvents3": {
+      "editor": "EventsSheet",
+      "scene": "startScene"
+    },
+    "SwitchToEvents4": {
+      "editor": "EventsSheet",
+      "scene": "playScene"
+    },
+    "SwitchToEvents5": {
+      "editor": "EventsSheet",
+      "scene": "startScene"
+    },
+    "SwitchToEvents6": {
+      "editor": "EventsSheet",
+      "scene": "leaderboardScene"
+    },
+    "SwitchToScene1": {
+      "editor": "Scene",
+      "scene": "playScene"
+    },
+    "SwitchToScene2": {
+      "editor": "Scene",
+      "scene": "playScene"
+    },
+    "openLeaderboardScene": {
+      "editor": "Scene",
+      "scene": "leaderboardScene"
+    },
+    "ClickOnNewObjectButtonForScore": {
+      "editor": "Scene",
+      "scene": "playScene"
+    }
+  },
+  "endDialog": {
+    "content": [
+      {
+        "messageByLocale": {
+          "en": "## Congratulations"
+        }
+      },
+      {
+        "messageByLocale": {
+          "en": "You just finished the first part of the fling game tutorial."
+        }
+      }
+    ]
+  },
+  "flow": [
+    {
+      "id": "GoToBuildSection",
+      "elementToHighlightId": "#home-build-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#home-create-project-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Head over to the **Build section**"
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "#home-create-project-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#create-project-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's create a new project for this tutorial!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#create-project-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "[id^=tab-layout]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's go!"
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "mapProjectData": {
+        "playScene": "projectLastSceneName"
+      }
+    },
+    {
+      "id": "OpenPropertiesManager",
+      "elementToHighlightId": "#main-toolbar-project-manager-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the **Project Manager**"
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings",
+      "nextStepTrigger": {
+        "presenceOfElement": "#project-manager-tab-game-properties"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the **Game Settings** tab."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#project-manager-tab-game-properties",
+      "nextStepTrigger": {
+        "presenceOfElement": "#project-properties-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the game properties."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#game-resolution-width",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the width to **1280** pixels."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#game-resolution-height",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the height to **720** pixels."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#game-resolution-resize-mode",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Set this to **no changes to the game size**."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#project-properties-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#project-properties-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done."
+          }
+        }
+      }
+    },
+    {
+      "id": "ClickOnNewObjectButtonForBorder",
+      "elementToHighlightId": "#add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "First, let's find a border for our ring."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#asset-store-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#asset-store"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's choose an object from the asset store"
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#asset-store-search-bar",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "title": {
+          "messageByLocale": {
+            "en": "We're looking for a tiled sprite that we can resize easily"
+          }
+        },
+        "description": {
+          "messageByLocale": {
+            "en": "Tip: search for “tiled sprite”."
+          }
+        }
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "id": "WaitForUserForBorder",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-asset-button"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-asset-button",
+      "isTriggerFlickering": true,
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-item-0"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add this asset to your project."
+          }
+        }
+      },
+      "mapProjectData": {
+        "border": "lastProjectObjectName"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "id": "CloseAssetStoreForBorder",
+      "elementToHighlightId": "#new-object-dialog #close-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's add the $(border) to our game!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:border",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "border"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Drag $(border) from the menu to the canvas."
+          }
+        },
+        "placement": "left"
+      }
+    },
+    {
+      "nextStepTrigger": {
+        "clickOnTooltipButton": {
+          "messageByLocale": {
+            "en": "I'm done"
+          }
+        }
+      },
+      "tooltip": {
+        "standalone": true,
+        "description": {
+          "messageByLocale": {
+            "en": "Place and resize at least 4 instances of $(border) to create a closed frame around your screen ($(instancesCount:border)/4)."
+          }
+        },
+        "placement": "top",
+        "image": {
+          "dataUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSI1Mi45MzEgMzAuMDE2IDE0MC4yNzkgOTUuMTY4IiB3aWR0aD0iMTQwLjI3OSIgaGVpZ2h0PSI5NS4xNjgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHJlY3QgeD0iNTIuOTMxIiB5PSIzMC4wMTYiIHdpZHRoPSIxNDAuMjc5IiBoZWlnaHQ9Ijk1LjE2OCIgc3R5bGU9InN0cm9rZTogcmdiKDAsIDAsIDApOyBmaWxsOiBub25lOyBzdHJva2Utd2lkdGg6IDJweDsiLz4KICA8cmVjdCB4PSI1NS4wMjMiIHk9IjEwOS45NjciIHdpZHRoPSIxMzYuMTkiIGhlaWdodD0iMTIuODA3IiBzdHlsZT0iZmlsbDogcmdiKDU0LCAyMjAsIDM5KTsiLz4KICA8cmVjdCB4PSI1NS4wMjMiIHk9IjMyLjIwNSIgd2lkdGg9IjEzNi4xOSIgaGVpZ2h0PSIxMi44MDciIHN0eWxlPSJmaWxsOiByZ2IoNTQsIDIyMCwgMzkpOyIvPgogIDxyZWN0IHg9IjE3OC4yMjQiIHk9IjQ2LjIxMyIgd2lkdGg9IjEyLjg1OCIgaGVpZ2h0PSI2Mi4zMzYiIHN0eWxlPSJmaWxsOiByZ2IoNTQsIDIyMCwgMzkpOyIvPgogIDxyZWN0IHg9IjU1LjAxNCIgeT0iNDYuMjczIiB3aWR0aD0iMTIuODU4IiBoZWlnaHQ9IjYyLjMzNiIgc3R5bGU9ImZpbGw6IHJnYig1NCwgMjIwLCAzOSk7Ii8+Cjwvc3ZnPg=="
+        }
+      }
+    },
+    {
+      "id": "ClickOnNewObjectButtonForProjectile",
+      "elementToHighlightId": "#add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's find an object that we can throw."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#asset-store-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#asset-store"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's choose an object from the asset store."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#asset-store-search-bar",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select a circular sprite object that you'd like to throw (try **ball**)."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "shortcuts": [
+        {
+          "stepId": "CloseAssetStoreForProjectile",
+          "trigger": {
+            "presenceOfElement": "#object-item-1"
+          }
+        }
+      ]
+    },
+    {
+      "id": "WaitForUserForBall",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-asset-button"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-asset-button",
+      "isTriggerFlickering": true,
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-item-1"
+      },
+      "mapProjectData": {
+        "projectile": "lastProjectObjectName"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "id": "CloseAssetStoreForProjectile",
+      "elementToHighlightId": "#new-object-dialog #close-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Perfect, let's see how to throw it easily."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:projectile",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "projectile"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add 3 instances of $(projectile) inside the frame."
+          }
+        }
+      }
+    },
+    {
+      "id": "ClickOnNewObjectButtonForTarget",
+      "elementToHighlightId": "#add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's find a target to aim."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#asset-store-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#asset-store"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's choose an object from the asset store."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#asset-store-search-bar",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select an object that you would like to use as a target to throw $(projectile) at."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "shortcuts": [
+        {
+          "stepId": "CloseAssetStoreForTarget",
+          "trigger": {
+            "presenceOfElement": "#object-item-2"
+          }
+        }
+      ]
+    },
+    {
+      "id": "WaitForUserForTarget",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-asset-button"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-asset-button",
+      "isTriggerFlickering": true,
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-item-2"
+      },
+      "mapProjectData": {
+        "target": "lastProjectObjectName"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "id": "CloseAssetStoreForTarget",
+      "elementToHighlightId": "#new-object-dialog #close-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Perfect, let's add it to the scene."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:target",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "target"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add $(target) inside the frame."
+          }
+        }
+      }
+    },
+    {
+      "id": "ClickOnNewObjectButtonForBlock",
+      "elementToHighlightId": "#add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Finally let's find something to protect $(target)."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#asset-store-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#asset-store"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's choose an object from the asset store."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#asset-store-search-bar",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select a **block** object you would like to use as an obstacle for your $(projectile)."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "shortcuts": [
+        {
+          "stepId": "CloseAssetStoreForBlock",
+          "trigger": {
+            "presenceOfElement": "#object-item-3"
+          }
+        }
+      ]
+    },
+    {
+      "id": "WaitForUserForBlock",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-asset-button"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-asset-button",
+      "isTriggerFlickering": true,
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-item-3"
+      },
+      "mapProjectData": {
+        "block": "lastProjectObjectName"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "id": "CloseAssetStoreForBlock",
+      "elementToHighlightId": "#new-object-dialog #close-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Perfect, let's add it to the scene."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:block",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "block"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add multiple $(block)s inside the frame."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:border",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "title": {
+          "messageByLocale": {
+            "en": "Let's add some sense of physics now."
+          }
+        },
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Right click on $(border) and select “Edit behaviors”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#behaviors-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-behavior-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "See the behaviors of the object here."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-behavior-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-item-Physics2--Physics2Behavior"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Add a new behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#behavior-item-Physics2--Physics2Behavior",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-parameters-Physics2"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Select the Physics behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#physics2-parameter-body-type",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **static**."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We'll see later how to use the other parameters. We're good now."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:projectile",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Now right click on $(projectile) and select “Edit behaviors”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#behaviors-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-behavior-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "See the behaviors of the object here."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-behavior-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-item-Physics2--Physics2Behavior"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Add a new behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#behavior-item-Physics2--Physics2Behavior",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-parameters-Physics2"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Select the Physics behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#physics2-parameter-shape",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select Circle."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#physics2-parameter-density",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the density to 5."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#physics2-parameter-angular-damping",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the angular damping to 15."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're good."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:target",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Now right click on $(target) and select “Edit behaviors”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#behaviors-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-behavior-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "See the behaviors of the object here."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-behavior-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-item-Physics2--Physics2Behavior"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#behavior-item-Physics2--Physics2Behavior",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-parameters-Physics2"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Select the Physics behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "No need to change anything."
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:block",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Now right click on $(block) and select “Edit behaviors”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#behaviors-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-behavior-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "See the behaviors of the object here."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-behavior-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-item-Physics2--Physics2Behavior"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#behavior-item-Physics2--Physics2Behavior",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-parameters-Physics2"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Select the Physics behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      }
+    },
+    {
+      "id": "OpenPropertiesManagerForExtension",
+      "elementToHighlightId": "#main-toolbar-project-manager-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-extensions"
+      },
+      "tooltip": {
+        "title": {
+          "messageByLocale": {
+            "en": "Now we'll make it possible to drag the $(projectile)."
+          }
+        },
+        "description": {
+          "messageByLocale": {
+            "en": "For this, we will install an **extension**.\n\nOpen the **Project Manager**"
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-extensions",
+      "nextStepTrigger": {
+        "presenceOfElement": "#project-manager-extension-search-or-create"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the **Extensions** tab."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#project-manager-extension-search-or-create",
+      "nextStepTrigger": {
+        "presenceOfElement": "#extension-search-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the extension store"
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#extension-search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#extension-list-item-DraggablePhysics"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for the **draggable** extension (for physics objects)."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "skippable": true
+    },
+    {
+      "elementToHighlightId": "#extension-list-item-DraggablePhysics",
+      "nextStepTrigger": {
+        "presenceOfElement": "#extension-install-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click on the extension."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#extension-install-dialog #install-extension-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#extension-install-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Install the extension."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#extension-search-dialog #close-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#extension-search-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Close the store."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:projectile",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Now right click on $(projectile) and select “Edit behaviors”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#behaviors-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-behavior-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "See the behaviors of the object here."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-behavior-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-item-DraggablePhysics--DraggablePhysics"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Add a new behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#behavior-item-DraggablePhysics--DraggablePhysics",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-parameters-DraggablePhysics"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Select the Draggable behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "That's it!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "That's it!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#toolbar-preview-button",
+      "nextStepTrigger": {
+        "previewLaunched": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click on the **Preview** button to see how you can click and drag your $(projectile) around the scene!"
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
+      "isCheckpoint": true,
+      "dialog": {
+        "content": [
+          {
+            "messageByLocale": {
+              "en": "## Congratulations"
+            }
+          },
+          {
+            "messageByLocale": {
+              "en": "You just finished the first part of the fling game tutorial."
+            }
+          },
+          {
+            "messageByLocale": {
+              "en": "We built together the foundations for a fling game."
+            }
+          },
+          {
+            "messageByLocale": {
+              "en": "Start the next part to improve your game visually."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ClickOnNewObjectButtonForBackground",
+      "elementToHighlightId": "#add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Let's find a background for our game."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#asset-store-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#asset-store"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's choose an object from the asset store."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#asset-store-search-bar",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Type “background”."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "shortcuts": [
+        {
+          "stepId": "CloseAssetStoreForBackground",
+          "trigger": {
+            "presenceOfElement": "#object-item-4"
+          }
+        }
+      ]
+    },
+    {
+      "id": "WaitForUserForBackground",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-asset-button"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-asset-button",
+      "isTriggerFlickering": true,
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-item-4"
+      },
+      "mapProjectData": {
+        "background": "lastProjectObjectName"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "id": "CloseAssetStoreForBackground",
+      "elementToHighlightId": "#new-object-dialog #close-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Perfect, let's use it in our scene."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:background",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "background"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Drag $(background) from the menu to the canvas."
+          }
+        },
+        "placement": "left"
+      }
+    },
+    {
+      "nextStepTrigger": {
+        "clickOnTooltipButton": {
+          "messageByLocale": {
+            "en": "I'm done"
+          }
+        }
+      },
+      "tooltip": {
+        "standalone": true,
+        "description": {
+          "messageByLocale": {
+            "en": "Drag to expand the size of $(background) until it stretches over your entire game area."
+          }
+        },
+        "image": {
+          "dataUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSI1Mi45MzEgMzAuMDE2IDE0MC4yNzkgOTUuMTY4IiB3aWR0aD0iMTQwLjI3OSIgaGVpZ2h0PSI5NS4xNjgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSIxMjMuMDcxIiB5MT0iMzAuMDE2IiB4Mj0iMTIzLjA3MSIgeTI9IjEyNS4xODQiIGlkPSJncmFkaWVudC0wIiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KDAuOTYyNTc4LCAwLCAwLCAwLjk2MjU3OCwgNC42MDU1NTksIDEuMTIzMjU4KSIgc3ByZWFkTWV0aG9kPSJwYWQiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0eWxlPSJzdG9wLWNvbG9yOiByZ2IoMCwgMjA4LCAyNTUpOyIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0eWxlPSJzdG9wLWNvbG9yOiByZ2IoMTY0LCAyMzcsIDI1NSk7Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB4PSI1Mi45MzEiIHk9IjMwLjAxNiIgd2lkdGg9IjE0MC4yNzkiIGhlaWdodD0iOTUuMTY4IiBzdHlsZT0ic3Ryb2tlLXdpZHRoOiAycHg7IGZpbGw6IHVybCgjZ3JhZGllbnQtMCk7IGZpbGwtb3BhY2l0eTogMTsgZmlsbC1ydWxlOiBub256ZXJvOyIvPgogIDxwYXRoIHN0eWxlPSJmaWxsOiByZ2IoMTY1LCAxNTgsIDg1KTsiIGQ9Ik0gNTIuNzY3IDEyNS4xNjkgTCA1Mi44MSAxMTIuNDMgTCAxMTQuNjM3IDExMC44NDggTCAxNDYuNDIgOTEuNDUgTCAxNTguOTU5IDgxLjkyNCBMIDE2Ny41MTUgNzEuMTg0IEwgMTc3Ljc4OCA2MS40MTEgTCAxODMuMzYgNTYuNjU4IEwgMTkzLjI3OSA2NS42OTcgTCAxOTMuMTg2IDEyNS4yOTMgTCA1Mi43NjcgMTI1LjE2OSBaIi8+CiAgPHJlY3QgeD0iNTUuMDIzIiB5PSIzMi4yMDUiIHdpZHRoPSIxMzYuMTkiIGhlaWdodD0iMTIuODA3IiBzdHlsZT0iZmlsbDogcmdiKDU0LCAyMjAsIDM5KTsgb3BhY2l0eTogMC40MzsiLz4KICA8cmVjdCB4PSI1NS4wMTQiIHk9IjQ2LjI3MyIgd2lkdGg9IjEyLjg1OCIgaGVpZ2h0PSI2Mi4zMzYiIHN0eWxlPSJmaWxsOiByZ2IoNTQsIDIyMCwgMzkpOyBvcGFjaXR5OiAwLjQzOyIvPgogIDxwb2x5Z29uIHN0eWxlPSJmaWxsOiByZ2IoNywgMTE1LCAzMCk7IiBwb2ludHM9IjcyLjYxIDEwOS44MDggODUuNTc2IDEwMS44MyA3NC4xNDEgMTAxLjAxNSA4NC44NTIgOTAuNTIgNzcuMjUgODkuNjY3IDg2LjY5NCA4MS42MzcgODEuNjI5IDgwLjkxOCA5MC40MzcgNjcuOTI1IDk1LjcyNiA4MS41NzIgOTEuNTA2IDgxLjg1IDk3LjAzMSA5MS45MDggOTIuMTY0IDkxLjY2OCAxMDAuNTc4IDEwMS44NTQgOTMuMjM2IDEwMS41NTQgMTA1LjUxOCAxMTMuNDk2Ii8+CiAgPHBvbHlnb24gc3R5bGU9ImZpbGw6IHJnYig3LCAxMTUsIDMwKTsiIHBvaW50cz0iOTYuMTUzIDc1LjYwNyAxMDcuMzM5IDgzLjc5NyA5Ny42NjkgODQuNSAxMDYuODI5IDkzLjE1MyAxMDAuNjAxIDkzLjM2OSAxMDcuMTg5IDEwMC43MDcgMTA0LjA3IDEwMC45NzUgMTEwLjU4NyAxMTIuNzY1IDExNy4yODggOTkuNTY0IDExMy42MDMgMTAwLjI2IDExNy41MzUgOTEuMzk3IDExMi45MTIgOTMuMTc0IDExOS43NzEgODQuNzE5IDExMy44MTcgODQuMDM1IDEyMS4xNzEgNzQuMzE3IiB0cmFuc2Zvcm09Im1hdHJpeCgtMSwgMCwgMCwgLTEsIDIyMC41NzgwMDMsIDE4Ni43NzgpIi8+CiAgPHJlY3QgeD0iNTUuMDIzIiB5PSIxMDkuOTY3IiB3aWR0aD0iMTM2LjE5IiBoZWlnaHQ9IjEyLjgwNyIgc3R5bGU9ImZpbGw6IHJnYig1NCwgMjIwLCAzOSk7IG9wYWNpdHk6IDAuNDM7Ii8+CiAgPHBhdGggc3R5bGU9ImZpbGw6IHJnYigyNTUsIDI1NSwgMjU1KTsiIGQ9Ik0gMTc1LjIyNiA3OS42MTMgTCAxNjIuODQ2IDc2LjkyOCBMIDE2Ny41MTUgNzEuMTg0IEwgMTc3Ljc4OCA2MS40MTEgTCAxODMuMzYgNTYuNjU4IEwgMTkzLjI3OSA2NS42OTcgTCAxOTMuMTg2IDc2LjMzOSBaIi8+CiAgPHJlY3QgeD0iMTc4LjIyNCIgeT0iNDYuMjEzIiB3aWR0aD0iMTIuODU4IiBoZWlnaHQ9IjYyLjMzNiIgc3R5bGU9ImZpbGw6IHJnYig1NCwgMjIwLCAzOSk7IG9wYWNpdHk6IDAuNDM7Ii8+CiAgPHJlY3QgeD0iNTIuOTUiIHk9IjI5Ljk4NCIgd2lkdGg9IjE0MC4yNzkiIGhlaWdodD0iOTUuMTY4IiBzdHlsZT0ic3Ryb2tlOiByZ2IoMCwgMCwgMCk7IGZpbGw6IG5vbmU7IHN0cm9rZS13aWR0aDogMnB4OyIvPgo8L3N2Zz4="
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instance-properties-editor [id=\"Z Order\"]",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Make sure that $(background) is selected and change this value to **-1**."
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "id": "ClickOnNewObjectButtonForObstacle",
+      "elementToHighlightId": "#add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Let's add some protection for $(target)."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#asset-store-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#asset-store"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's choose an object from the asset store."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#asset-store-search-bar",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for **block**."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "shortcuts": [
+        {
+          "stepId": "CloseAssetStoreForObstacle",
+          "trigger": {
+            "presenceOfElement": "#object-item-5"
+          }
+        }
+      ]
+    },
+    {
+      "id": "WaitForUserForObstacle",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-asset-button"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-asset-button",
+      "isTriggerFlickering": true,
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-item-5"
+      },
+      "mapProjectData": {
+        "obstacle": "lastProjectObjectName"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "id": "CloseAssetStoreForObstacle",
+      "elementToHighlightId": "#new-object-dialog #close-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Perfect, let's add them to the scene."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:obstacle",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "title": {
+          "messageByLocale": {
+            "en": "Let's make them static so that they act as a wall."
+          }
+        },
+        "description": {
+          "messageByLocale": {
+            "en": "Right click on $(obstacle) and select “Edit behaviors”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#behaviors-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-behavior-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "See the behaviors of the object here."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-behavior-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-item-Physics2--Physics2Behavior"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Add a new behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#behavior-item-Physics2--Physics2Behavior",
+      "nextStepTrigger": {
+        "presenceOfElement": "#behavior-parameters-Physics2"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": "Select the Physics behavior."
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#physics2-parameter-body-type",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **static**."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're good."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:obstacle",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "obstacle"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add a few $(obstacle) to the scene to protect $(target)."
+          }
+        }
+      }
+    },
+    {
+      "id": "ClickOnNewObjectButtonForWinning",
+      "elementToHighlightId": "#add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's create a winning message!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#new-object-from-scratch-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-category-TextObject--Text"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "This time, we'll create a text from scratch."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-category-TextObject--Text",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-name"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **Text** object"
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-name",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the object name to “YouWin”."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#text-object-font-size",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the font size to **200**."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#text-object-initial-text",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the text to “You Win!”"
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done."
+          }
+        }
+      },
+      "mapProjectData": {
+        "youWinText": "lastProjectObjectName"
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:youWinText",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "youWinText"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Drag $(youWinText) into the scene, and center it as well as possible."
+          }
+        },
+        "placement": "left"
+      }
+    },
+    {
+      "elementToHighlightId": "#toolbar-open-layers-panel-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-layer-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the layers panel."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true
+    },
+    {
+      "elementToHighlightId": "#add-layer-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#layer-1"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add a new layer."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#layer-1 #layer-name",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the name to **WinLayer**."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#layer-1 #layer-visibility",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Hide the layer."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "nextStepTrigger": {
+        "clickOnTooltipButton": {
+          "messageByLocale": {
+            "en": "I'm done"
+          }
+        }
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now select the $(youWinText) instance on the scene and change its layer using the properties panel.\n\nIt should have disappeared!"
+          }
+        },
+        "standalone": true
+      }
+    },
+    {
+      "elementToHighlightId": "editorTab:playScene:EventsSheet",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-event-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We are now going to add some logic to our game."
+          }
+        }
+      }
+    },
+    {
+      "id": "SwitchToEvents1",
+      "elementToHighlightId": "#add-event-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-condition-button-empty"
+      },
+      "tooltip": {
+        "title": {
+          "messageByLocale": {
+            "en": "Let's add our first event!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#add-condition-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add a condition."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectOrResourceSelector:projectile",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-Physics2--Collision"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select $(projectile)."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-Physics2--Collision",
+      "nextStepTrigger": {
+        "presenceOfElement": "#parameter-2-object-selector"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the collision condition."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#parameter-2-object-selector",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select $(target)."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, the condition is all set."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#add-action-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's add an action now."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectOrResourceSelector:target",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-Delete"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select $(target)."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-Delete",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We will make $(target) disappear on collision."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, $(target) will now disappear when $(projectile) hits it."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#add-action-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's add another action that will be executed for the same condition."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-ShowLayer"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “layer”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-ShowLayer",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the **Show a layer** action."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#parameter-1-layer-field",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the layer you created."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, now the title should appear when the player hits $(target) with $(projectile)."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "editorTab:playScene:Scene",
+      "nextStepTrigger": {
+        "editorIsActive": "playScene:Scene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's get back to the scene to create some constraints for the player."
+          }
+        }
+      }
+    },
+    {
+      "id": "SwitchToScene1",
+      "elementToHighlightId": "#add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "We'll define an area where the player can grab $(projectile). Outside of this area, the $(projectile)s will be free."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#asset-store-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#asset-store"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's choose an object from the asset store"
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#asset-store-search-bar",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Type **background**."
+          }
+        }
+      },
+      "shortcuts": [
+        {
+          "stepId": "CloseAssetStoreForGrabArea",
+          "trigger": {
+            "presenceOfElement": "#object-item-7"
+          }
+        }
+      ],
+      "isOnClosableDialog": true
+    },
+    {
+      "id": "WaitForUserForGrabArea",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-asset-button"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-asset-button",
+      "isTriggerFlickering": true,
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-item-7"
+      },
+      "mapProjectData": {
+        "grabArea": "lastProjectObjectName"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "id": "CloseAssetStoreForGrabArea",
+      "elementToHighlightId": "#new-object-dialog #close-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's use it now!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:grabArea",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "grabArea"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Drag $(grabArea) from the menu to the canvas."
+          }
+        },
+        "placement": "left"
+      }
+    },
+    {
+      "nextStepTrigger": {
+        "clickOnTooltipButton": {
+          "messageByLocale": {
+            "en": "I'm done"
+          }
+        }
+      },
+      "tooltip": {
+        "standalone": true,
+        "description": {
+          "messageByLocale": {
+            "en": "Drag and resize $(grabArea) until it covers the lower left side of the game screen."
+          }
+        },
+        "image": {
+          "dataUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSI1Mi45MzEgMzAuMDE2IDE0MC4yNzkgOTUuMTY4IiB3aWR0aD0iMTQwLjI3OSIgaGVpZ2h0PSI5NS4xNjgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSIxMjMuMDcxIiB5MT0iMzAuMDE2IiB4Mj0iMTIzLjA3MSIgeTI9IjEyNS4xODQiIGlkPSJncmFkaWVudC0wIiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KDAuOTYyNTc4LCAwLCAwLCAwLjk2MjU3OCwgNC42MDU1NTksIDEuMTIzMjU4KSIgc3ByZWFkTWV0aG9kPSJwYWQiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0eWxlPSJzdG9wLWNvbG9yOiByZ2IoMCwgMjA4LCAyNTUpOyIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0eWxlPSJzdG9wLWNvbG9yOiByZ2IoMTY0LCAyMzcsIDI1NSk7Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB4PSI1Mi45MzEiIHk9IjMwLjAxNiIgd2lkdGg9IjE0MC4yNzkiIGhlaWdodD0iOTUuMTY4IiBzdHlsZT0ic3Ryb2tlLXdpZHRoOiAycHg7IGZpbGw6IHVybCgjZ3JhZGllbnQtMCk7IGZpbGwtb3BhY2l0eTogMTsgZmlsbC1ydWxlOiBub256ZXJvOyIvPgogIDxwYXRoIHN0eWxlPSJmaWxsOiByZ2IoMTY1LCAxNTgsIDg1KTsiIGQ9Ik0gNTIuNzY3IDEyNS4xNjkgTCA1Mi44MSAxMTIuNDMgTCAxMTQuNjM3IDExMC44NDggTCAxNDYuNDIgOTEuNDUgTCAxNTguOTU5IDgxLjkyNCBMIDE2Ny41MTUgNzEuMTg0IEwgMTc3Ljc4OCA2MS40MTEgTCAxODMuMzYgNTYuNjU4IEwgMTkzLjI3OSA2NS42OTcgTCAxOTMuMTg2IDEyNS4yOTMgTCA1Mi43NjcgMTI1LjE2OSBaIi8+CiAgPHJlY3QgeD0iNTUuMDIzIiB5PSIzMi4yMDUiIHdpZHRoPSIxMzYuMTkiIGhlaWdodD0iMTIuODA3IiBzdHlsZT0iZmlsbDogcmdiKDU0LCAyMjAsIDM5KTsgb3BhY2l0eTogMC40MzsiLz4KICA8cmVjdCB4PSI1NS4wMTQiIHk9IjQ2LjI3MyIgd2lkdGg9IjEyLjg1OCIgaGVpZ2h0PSI2Mi4zMzYiIHN0eWxlPSJmaWxsOiByZ2IoNTQsIDIyMCwgMzkpOyBvcGFjaXR5OiAwLjQzOyIvPgogIDxwb2x5Z29uIHN0eWxlPSJmaWxsOiByZ2IoNywgMTE1LCAzMCk7IiBwb2ludHM9IjcyLjYxIDEwOS44MDggODUuNTc2IDEwMS44MyA3NC4xNDEgMTAxLjAxNSA4NC44NTIgOTAuNTIgNzcuMjUgODkuNjY3IDg2LjY5NCA4MS42MzcgODEuNjI5IDgwLjkxOCA5MC40MzcgNjcuOTI1IDk1LjcyNiA4MS41NzIgOTEuNTA2IDgxLjg1IDk3LjAzMSA5MS45MDggOTIuMTY0IDkxLjY2OCAxMDAuNTc4IDEwMS44NTQgOTMuMjM2IDEwMS41NTQgMTA1LjUxOCAxMTMuNDk2Ii8+CiAgPHBvbHlnb24gc3R5bGU9ImZpbGw6IHJnYig3LCAxMTUsIDMwKTsiIHBvaW50cz0iOTYuMTUzIDc1LjYwNyAxMDcuMzM5IDgzLjc5NyA5Ny42NjkgODQuNSAxMDYuODI5IDkzLjE1MyAxMDAuNjAxIDkzLjM2OSAxMDcuMTg5IDEwMC43MDcgMTA0LjA3IDEwMC45NzUgMTEwLjU4NyAxMTIuNzY1IDExNy4yODggOTkuNTY0IDExMy42MDMgMTAwLjI2IDExNy41MzUgOTEuMzk3IDExMi45MTIgOTMuMTc0IDExOS43NzEgODQuNzE5IDExMy44MTcgODQuMDM1IDEyMS4xNzEgNzQuMzE3IiB0cmFuc2Zvcm09Im1hdHJpeCgtMSwgMCwgMCwgLTEsIDIyMC41NzgwMDMsIDE4Ni43NzgpIi8+CiAgPHJlY3QgeD0iNTUuMDIzIiB5PSIxMDkuOTY3IiB3aWR0aD0iMTM2LjE5IiBoZWlnaHQ9IjEyLjgwNyIgc3R5bGU9ImZpbGw6IHJnYig1NCwgMjIwLCAzOSk7IG9wYWNpdHk6IDAuNDM7Ii8+CiAgPHBhdGggc3R5bGU9ImZpbGw6IHJnYigyNTUsIDI1NSwgMjU1KTsiIGQ9Ik0gMTc1LjIyNiA3OS42MTMgTCAxNjIuODQ2IDc2LjkyOCBMIDE2Ny41MTUgNzEuMTg0IEwgMTc3Ljc4OCA2MS40MTEgTCAxODMuMzYgNTYuNjU4IEwgMTkzLjI3OSA2NS42OTcgTCAxOTMuMTg2IDc2LjMzOSBaIi8+CiAgPHJlY3QgeD0iMTc4LjIyNCIgeT0iNDYuMjEzIiB3aWR0aD0iMTIuODU4IiBoZWlnaHQ9IjYyLjMzNiIgc3R5bGU9ImZpbGw6IHJnYig1NCwgMjIwLCAzOSk7IG9wYWNpdHk6IDAuNDM7Ii8+CiAgPHJlY3QgeD0iNTIuOTUiIHk9IjI5Ljk4NCIgd2lkdGg9IjE0MC4yNzkiIGhlaWdodD0iOTUuMTY4IiBzdHlsZT0ic3Ryb2tlOiByZ2IoMCwgMCwgMCk7IGZpbGw6IG5vbmU7IHN0cm9rZS13aWR0aDogMnB4OyIvPgogIDxyZWN0IHg9IjY4Ljc5IiB5PSI3OC43MSIgd2lkdGg9IjQ4LjI3IiBoZWlnaHQ9IjMwLjc1NSIgc3R5bGU9ImZpbGw6IHJnYmEoMjU1LCA1NiwgMjQ1LCAwLjg2KTsiLz4KPC9zdmc+"
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instance-properties-editor [id=\"Z Order\"]",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Make sure that $(background) is selected and change this value to **0**."
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "editorTab:playScene:EventsSheet",
+      "nextStepTrigger": {
+        "presenceOfElement": "#toolbar-add-event-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's deactivate the draggable behavior when outside of the $(grabArea)."
+          }
+        }
+      }
+    },
+    {
+      "id": "SwitchToEvents2",
+      "elementToHighlightId": "#toolbar-add-event-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-condition-button-empty"
+      },
+      "isTriggerFlickering": true,
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's create a new event!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#add-condition-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add a condition."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectOrResourceSelector:projectile",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-CollisionNP"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select $(projectile)."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-CollisionNP",
+      "nextStepTrigger": {
+        "presenceOfElement": "#parameter-1-object-selector"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the collision condition."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#parameter-1-object-selector",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select $(grabArea)."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, the condition is all set."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "[data-instruction=CollisionNP]",
+      "nextStepTrigger": {
+        "presenceOfElement": "[data-instruction=CollisionNP][data-instruction-inverted=true]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Right click on this newly created condition and select “Invert condition”."
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "#add-action-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add an action"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectOrResourceSelector:projectile",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-DraggablePhysics--DraggablePhysics--ReleaseDrag"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select $(projectile)."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-DraggablePhysics--DraggablePhysics--ReleaseDrag",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the action that releases the $(projectile) from the player drag."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're good."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "editorTab:playScene:Scene",
+      "nextStepTrigger": {
+        "editorIsActive": "playScene:Scene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's get back to the scene to place the $(projectile)s correctly."
+          }
+        }
+      }
+    },
+    {
+      "id": "SwitchToScene2",
+      "nextStepTrigger": {
+        "clickOnTooltipButton": {
+          "messageByLocale": {
+            "en": "I'm done"
+          }
+        }
+      },
+      "tooltip": {
+        "standalone": true,
+        "placement": "top",
+        "title": {
+          "messageByLocale": {
+            "en": "Rearrange $(projectile)s."
+          }
+        },
+        "description": {
+          "messageByLocale": {
+            "en": "Drag all instances of $(projectile) within the boundaries of $(background)."
+          }
+        }
+      }
+    },
+    {
+      "nextStepTrigger": {
+        "clickOnTooltipButton": {
+          "messageByLocale": {
+            "en": "I'm done"
+          }
+        }
+      },
+      "tooltip": {
+        "standalone": true,
+        "placement": "top",
+        "title": {
+          "messageByLocale": {
+            "en": "Set up $(target) protection."
+          }
+        },
+        "description": {
+          "messageByLocale": {
+            "en": "Arrange both $(block) and $(obstacle) in a way to protect $(target)."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#toolbar-preview-button",
+      "nextStepTrigger": {
+        "previewLaunched": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "**Preview** the game and make sure it's winnable."
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
+      "elementToHighlightId": "#toolbar-publish-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#export-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Once you're ready, we'll generate a link to share it."
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
+      "elementToHighlightId": "#export-dialog #create-account-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#create-account-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "First, you need to create an account."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true,
+      "shortcuts": [
+        {
+          "stepId": "ClickOnGenerateLink",
+          "trigger": {
+            "presenceOfElement": "[id$=online-web-button][id^=launch-export]"
+          }
+        },
+        {
+          "stepId": "Login",
+          "trigger": {
+            "presenceOfElement": "#login-dialog"
+          }
+        }
+      ]
+    },
+    {
+      "elementToHighlightId": "#create-account-dialog #create-account-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#create-account-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Fill in the form and then click here."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "id": "Login",
+      "elementToHighlightId": "#login-dialog #login-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#login-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "After filling your info, click here."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "id": "ClickOnGenerateLink",
+      "elementToHighlightId": "[id$=online-web-button][id^=launch-export]",
+      "nextStepTrigger": {
+        "presenceOfElement": "[id$=online-web-button][id^=launch-export][disabled]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click here to publish your game."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "nextStepTrigger": {
+        "presenceOfElement": "#open-online-export-button"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#open-online-export-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#share-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click here to open your game in your browser. Remember to share the link so that others can play your game!\n\nOnce you're done, close this dialog."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "isCheckpoint": true,
+      "dialog": {
+        "content": [
+          {
+            "messageByLocale": {
+              "en": "## Congratulations"
+            }
+          },
+          {
+            "messageByLocale": {
+              "en": "You just finished the second part of the fling game tutorial."
+            }
+          },
+          {
+            "messageByLocale": {
+              "en": "We improved your game visually and even published it so that anyone can play with it!"
+            }
+          },
+          {
+            "messageByLocale": {
+              "en": "Start the next part that will show you how to have your players compare themselves thanks to leaderboards."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:background",
+      "nextStepTrigger": {
+        "presenceOfElement": "#objects-list [id^=object-item][data-global=true]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Right click on your $(background), and click “set as global object”."
+          }
+        },
+        "placement": "left"
+      }
+    },
+    {
+      "elementToHighlightId": "#main-toolbar-project-manager-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings"
+      },
+      "tooltip": {
+        "title": {
+          "messageByLocale": {
+            "en": "Now let's create a new scene for our start screen."
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "#project-manager #add-new-scene-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#scene-item-1"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click here."
+          }
+        },
+        "placement": "right"
+      },
+      "mapProjectData": {
+        "startScene": "projectLastSceneName"
+      }
+    },
+    {
+      "elementToHighlightId": "#project-manager #scene-item-1",
+      "nextStepTrigger": {
+        "presenceOfElement": "editorTab:startScene:Scene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Right click on the new scene and change its name to “StartScreen”.\n\nOnce you're done, click on the item to open the new scene."
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:background",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "background:startScene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Drag $(background) into the scene."
+          }
+        },
+        "placement": "left"
+      }
+    },
+    {
+      "nextStepTrigger": {
+        "clickOnTooltipButton": {
+          "messageByLocale": {
+            "en": "I'm done"
+          }
+        }
+      },
+      "tooltip": {
+        "standalone": true,
+        "description": {
+          "messageByLocale": {
+            "en": "Drag to expand the size $(background) until it stretches over your entire game area."
+          }
+        },
+        "image": {
+          "dataUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSI1Mi45MzEgMzAuMDE2IDE0MC4yNzkgOTUuMTY4IiB3aWR0aD0iMTQwLjI3OSIgaGVpZ2h0PSI5NS4xNjgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSIxMjMuMDcxIiB5MT0iMzAuMDE2IiB4Mj0iMTIzLjA3MSIgeTI9IjEyNS4xODQiIGlkPSJncmFkaWVudC0wIiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KDAuOTYyNTc4LCAwLCAwLCAwLjk2MjU3OCwgNC42MDU1NTksIDEuMTIzMjU4KSIgc3ByZWFkTWV0aG9kPSJwYWQiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0eWxlPSJzdG9wLWNvbG9yOiByZ2IoMCwgMjA4LCAyNTUpOyIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0eWxlPSJzdG9wLWNvbG9yOiByZ2IoMTY0LCAyMzcsIDI1NSk7Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB4PSI1Mi45MzEiIHk9IjMwLjAxNiIgd2lkdGg9IjE0MC4yNzkiIGhlaWdodD0iOTUuMTY4IiBzdHlsZT0ic3Ryb2tlLXdpZHRoOiAycHg7IGZpbGw6IHVybCgjZ3JhZGllbnQtMCk7IGZpbGwtb3BhY2l0eTogMTsgZmlsbC1ydWxlOiBub256ZXJvOyIvPgogIDxwYXRoIHN0eWxlPSJmaWxsOiByZ2IoMTY1LCAxNTgsIDg1KTsiIGQ9Ik0gNTIuNzY3IDEyNS4xNjkgTCA1Mi44MSAxMTIuNDMgTCAxMTQuNjM3IDExMC44NDggTCAxNDYuNDIgOTEuNDUgTCAxNTguOTU5IDgxLjkyNCBMIDE2Ny41MTUgNzEuMTg0IEwgMTc3Ljc4OCA2MS40MTEgTCAxODMuMzYgNTYuNjU4IEwgMTkzLjI3OSA2NS42OTcgTCAxOTMuMTg2IDEyNS4yOTMgTCA1Mi43NjcgMTI1LjE2OSBaIi8+CiAgPHBvbHlnb24gc3R5bGU9ImZpbGw6IHJnYig3LCAxMTUsIDMwKTsiIHBvaW50cz0iNzIuNjEgMTA5LjgwOCA4NS41NzYgMTAxLjgzIDc0LjE0MSAxMDEuMDE1IDg0Ljg1MiA5MC41MiA3Ny4yNSA4OS42NjcgODYuNjk0IDgxLjYzNyA4MS42MjkgODAuOTE4IDkwLjQzNyA2Ny45MjUgOTUuNzI2IDgxLjU3MiA5MS41MDYgODEuODUgOTcuMDMxIDkxLjkwOCA5Mi4xNjQgOTEuNjY4IDEwMC41NzggMTAxLjg1NCA5My4yMzYgMTAxLjU1NCAxMDUuNTE4IDExMy40OTYiLz4KICA8cG9seWdvbiBzdHlsZT0iZmlsbDogcmdiKDcsIDExNSwgMzApOyIgcG9pbnRzPSI5Ni4xNTMgNzUuNjA3IDEwNy4zMzkgODMuNzk3IDk3LjY2OSA4NC41IDEwNi44MjkgOTMuMTUzIDEwMC42MDEgOTMuMzY5IDEwNy4xODkgMTAwLjcwNyAxMDQuMDcgMTAwLjk3NSAxMTAuNTg3IDExMi43NjUgMTE3LjI4OCA5OS41NjQgMTEzLjYwMyAxMDAuMjYgMTE3LjUzNSA5MS4zOTcgMTEyLjkxMiA5My4xNzQgMTE5Ljc3MSA4NC43MTkgMTEzLjgxNyA4NC4wMzUgMTIxLjE3MSA3NC4zMTciIHRyYW5zZm9ybT0ibWF0cml4KC0xLCAwLCAwLCAtMSwgMjIwLjU3ODAwMywgMTg2Ljc3OCkiLz4KICA8cGF0aCBzdHlsZT0iZmlsbDogcmdiKDI1NSwgMjU1LCAyNTUpOyIgZD0iTSAxNzUuMjI2IDc5LjYxMyBMIDE2Mi44NDYgNzYuOTI4IEwgMTY3LjUxNSA3MS4xODQgTCAxNzcuNzg4IDYxLjQxMSBMIDE4My4zNiA1Ni42NTggTCAxOTMuMjc5IDY1LjY5NyBMIDE5My4xODYgNzYuMzM5IFoiLz4KICA8cmVjdCB4PSI1Mi45NSIgeT0iMjkuOTg0IiB3aWR0aD0iMTQwLjI3OSIgaGVpZ2h0PSI5NS4xNjgiIHN0eWxlPSJzdHJva2U6IHJnYigwLCAwLCAwKTsgZmlsbDogbm9uZTsgc3Ryb2tlLXdpZHRoOiAycHg7Ii8+Cjwvc3ZnPg=="
+        }
+      }
+    },
+    {
+      "id": "ClickOnNewObjectButtonForStartScreenTitle",
+      "elementToHighlightId": "#scene-editor[data-active=true] #add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's create a title!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#new-object-from-scratch-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-category-TextObject--Text"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "This time, we'll create a text from scratch."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-category-TextObject--Text",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-name"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **Text** object"
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-name",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the object name to “Title”."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#text-object-font-size",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the font size to **200**."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#text-object-initial-text",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the initial text to display whatever you want the title of your game to be."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done."
+          }
+        }
+      },
+      "mapProjectData": {
+        "title": "sceneLastObjectName:startScene"
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:title",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "title:startScene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Drag $(title) into the scene where you'd like your title to be."
+          }
+        },
+        "placement": "left"
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:title",
+      "nextStepTrigger": {
+        "presenceOfElement": "#scene-editor[data-active=true] #object-item-2"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Right-click on $(title) and select “Duplicate”."
+          }
+        },
+        "placement": "left"
+      },
+      "mapProjectData": {
+        "startText": "sceneLastObjectName:startScene"
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:startText",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Double click on $(startText)."
+          }
+        },
+        "placement": "left"
+      }
+    },
+    {
+      "elementToHighlightId": "#object-name",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the object name to “Start”."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#text-object-font-size",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the font size to **50**."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#text-object-initial-text",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the initial text to “Start Game”."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done."
+          }
+        }
+      },
+      "mapProjectData": {
+        "startText": "sceneLastObjectName:startScene"
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:startText",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "startText:startScene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Drag $(startText) into the scene where you'd like the start button to be."
+          }
+        },
+        "placement": "left"
+      }
+    },
+    {
+      "elementToHighlightId": "editorTab:startScene:EventsSheet",
+      "nextStepTrigger": {
+        "presenceOfElement": "#events-editor[data-active]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's interact with those titles."
+          }
+        }
+      }
+    },
+    {
+      "id": "SwitchToEvents3",
+      "elementToHighlightId": "#events-editor[data-active] #add-event-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#events-editor[data-active] #add-condition-button-empty"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's create a new event!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#events-editor[data-active] #add-condition-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add a condition."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectOrResourceSelector:startText",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-SourisSurObjet"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select $(startText)."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-SourisSurObjet",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the cursor condition."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, the condition is all set."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#events-editor[data-active] #add-condition-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add another condition."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-MouseButtonReleased"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Type “Mouse”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-MouseButtonReleased",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select “Mouse button released”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container select",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select “left (primary)”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, the condition is all set."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#add-action-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's add an action now."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-Scene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Type “Scene”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-Scene",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select “Change the scene”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container #scene-name",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select “$(playScene)”."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, the action is all set."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "editorTab:playScene:Scene",
+      "nextStepTrigger": {
+        "editorIsActive": "playScene:Scene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's get back to the scene to add a score."
+          }
+        }
+      }
+    },
+    {
+      "id": "ClickOnNewObjectButtonForScore",
+      "elementToHighlightId": "#scene-editor[data-active=true] #add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Let's create a text that will display the player score."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#new-object-from-scratch-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-category-TextObject--Text"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's create a text from scratch."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-category-TextObject--Text",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-name"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **Text** object"
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-name",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the object name to “Score”."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#text-object-font-size",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the font size to **50**."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#text-object-initial-text",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the initial text to display “Milliseconds: 0”."
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done."
+          }
+        }
+      },
+      "mapProjectData": {
+        "scoreText": "sceneLastObjectName:playScene"
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:scoreText",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "scoreText"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Drag $(scoreText) into the top left corner of the screen."
+          }
+        },
+        "placement": "left"
+      }
+    },
+    {
+      "elementToHighlightId": "editorTab:playScene:EventsSheet",
+      "nextStepTrigger": {
+        "editorIsActive": "playScene:EventsSheet"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's change the score dynamically."
+          }
+        }
+      }
+    },
+    {
+      "id": "SwitchToEvents4",
+      "elementToHighlightId": "#toolbar-add-event-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-condition-button-empty"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We will create a timer that will start when the scene starts."
+          }
+        }
+      },
+      "skippable": true
+    },
+    {
+      "elementToHighlightId": "#add-condition-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add a condition."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-DepartScene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “Scene”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-DepartScene",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the **At the beginning of the scene** condition."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's create the timer now."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#add-action-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Create an action."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-ResetTimer"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “Scene timer”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-ResetTimer",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the **Start (or reset) a scene timer** action."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container textarea",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Type “Score” (in quotations)."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "placement": "top"
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#toolbar-add-event-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-condition-button-empty"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's display the score."
+          }
+        }
+      },
+      "skippable": true
+    },
+    {
+      "elementToHighlightId": "#add-action-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's make the score dynamic."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectOrResourceSelector:scoreText",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-TextObject--String"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select $(scoreText)."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-TextObject--String",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We will change the text."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container select",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select “= (set to)”."
+          }
+        }
+      },
+      "placement": "left",
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container textarea",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Copy this line and paste it here: `\"Milliseconds: \" + ToString(round(10*(TimerElapsedTime(\"Score\"))))`."
+          }
+        }
+      },
+      "placement": "left",
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're all set."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "standalone": true,
+        "title": {
+          "messageByLocale": {
+            "en": "Now we will display the other players scores."
+          }
+        },
+        "description": {
+          "messageByLocale": {
+            "en": "In the event where $(target) gets deleted, click on “Add action”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-Leaderboards--DisplayLeaderboard"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “leaderboard”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-Leaderboards--DisplayLeaderboard",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the **Display leaderboard** action."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#open-leaderboard-admin-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#leaderboard-admin-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the **Leaderboard admin**."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#add-new-leaderboard-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#leaderboard-admin"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Create a leaderboard."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#leaderboard-admin #edit-name-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#edit-name-field"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's change its name."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#leaderboard-admin #edit-name-field",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Type “Score”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#leaderboard-admin #save-name-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#leaderboard-admin #save-name-button"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Save changes when you're done."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#leaderboard-admin-dialog #close-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#leaderboard-admin-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Our leaderboard is ready."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#open-leaderboard-admin-button + button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container select"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the option **Select the leaderboard from a list**."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "skippable": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container select",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the leaderboard named “Score”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container #yes-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container #yes-button[data-effective=\"true\"]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We'll use the built-in loader."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "skippable": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now the leaderboard should be displayed when $(projectile) reaches $(target)."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "editorTab:startScene:EventsSheet",
+      "nextStepTrigger": {
+        "editorIsActive": "startScene:EventsSheet"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now we will ask the player to authenticate at game opening."
+          }
+        }
+      }
+    },
+    {
+      "id": "SwitchToEvents5",
+      "elementToHighlightId": "#toolbar-add-event-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-condition-button-empty"
+      },
+      "isTriggerFlickering": true,
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's create an event!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#add-condition-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Add a condition."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-DepartScene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “Scene”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-DepartScene",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the **At the beginning of the scene** condition."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#add-action-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's choose an action."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-PlayerAuthentication--DisplayAuthenticationBanner"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “Authentication”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-PlayerAuthentication--DisplayAuthenticationBanner",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **Display authentication banner**."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, now players will be asked to login."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#main-toolbar-project-manager-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings"
+      },
+      "tooltip": {
+        "title": {
+          "messageByLocale": {
+            "en": "Now let's create a new scene that will be used to display the leaderboard."
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "#project-manager #add-new-scene-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#scene-item-2"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click here."
+          }
+        },
+        "placement": "right"
+      },
+      "mapProjectData": {
+        "leaderboardScene": "projectLastSceneName"
+      }
+    },
+    {
+      "elementToHighlightId": "#project-manager #scene-item-2",
+      "nextStepTrigger": {
+        "presenceOfElement": "editorTab:leaderboardScene:EventsSheet"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Right click on the new scene and change its name to “Leaderboard”.\n\nOnce you're done, click on the item to open the new scene."
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "id": "openLeaderboardScene",
+      "elementToHighlightId": "editorTab:leaderboardScene:EventsSheet",
+      "nextStepTrigger": {
+        "editorIsActive": "leaderboardScene:EventsSheet"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Go to the events."
+          }
+        }
+      }
+    },
+    {
+      "id": "SwitchToEvents6",
+      "elementToHighlightId": "#add-event-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#add-condition-button-empty"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's add an event that makes sure the player comes back to the start screen after closing the leaderboard."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#add-condition-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click here."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-Leaderboards--IsLeaderboardViewLoaded"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “Leaderboard”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-Leaderboards--IsLeaderboardViewLoaded",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the **Leaderboard display has loaded** condition."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "span[data-instruction=\"Leaderboards::IsLeaderboardViewLoaded\"]",
+      "nextStepTrigger": {
+        "presenceOfElement": "span[data-instruction=\"Leaderboards::IsLeaderboardViewLoaded\"][data-instruction-inverted=true]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Right-click on the condition and select **Invert Condition**."
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
+      "elementToHighlightId": "#add-action-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's add the action to come back to the start screen."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-Scene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Type “Scene”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-Scene",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select “Change the scene”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container #scene-name",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select “$(startScene)”."
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "placement": "top"
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, the action is all set."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "editorTab:playScene:EventsSheet",
+      "nextStepTrigger": {
+        "editorIsActive": "playScene:EventsSheet"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's save the score of the player."
+          }
+        }
+      }
+    },
+    {
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "standalone": true,
+        "description": {
+          "messageByLocale": {
+            "en": "In the event where $(target) gets deleted, click on “Add action”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-Leaderboards--SavePlayerScore"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “leaderboard”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-Leaderboards--SavePlayerScore",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the **Save player score** action."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container select",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the leaderboard named “Score”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container #open-number-expression-popover-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#expression-selector"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click on the expression builder."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#expression-selector input",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-or-expression-TimerElapsedTime"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “Timer”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-or-expression-TimerElapsedTime",
+      "nextStepTrigger": {
+        "presenceOfElement": "#expression-parameters-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **Scene timer value**."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#expression-parameters-editor-dialog textarea",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select timer “Score”."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#expression-parameters-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#expression-parameters-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "This parameter is all set."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container #open-string-expression-popover-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#expression-selector"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click on the expression builder."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#expression-selector input",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-or-expression-PlayerAuthentication--Username"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for “Username”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-or-expression-PlayerAuthentication--Username",
+      "nextStepTrigger": {
+        "absenceOfElement": "#expression-selector"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **Username**."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "The action is ready."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "standalone": true,
+        "description": {
+          "messageByLocale": {
+            "en": "Let's change the scene to the leaderboard one (so that the play scene is closed).\n\nIn the event where $(target) gets deleted, click on “Add action”."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-Scene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Type “Scene”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-Scene",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select “Change the scene”."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container #scene-name",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select “$(leaderboardScene)”."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, the action is all set."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#main-toolbar-project-manager-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the **Project Manager**."
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "sceneInProjectManager:startScene",
+      "nextStepTrigger": {
+        "presenceOfElement": "[id^=\"scene-item\"][data-default=\"true\"]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Right-click on the start scene and select **Set as start scene**."
+          }
+        },
+        "placement": "right"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#toolbar-preview-button",
+      "nextStepTrigger": {
+        "previewLaunched": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click on the **Preview** button."
+          }
+        },
+        "placement": "bottom"
+      }
+    }
+  ]
+}

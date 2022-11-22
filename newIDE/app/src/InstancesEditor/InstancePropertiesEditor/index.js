@@ -174,7 +174,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           .map((instance: gdInitialInstance) => '' + instance.ptr)
           .join(';')}
       >
-        <Column expand noMargin>
+        <Column expand noMargin id="instance-properties-editor">
           <Column>
             <PropertiesEditor
               unsavedChanges={this.props.unsavedChanges}

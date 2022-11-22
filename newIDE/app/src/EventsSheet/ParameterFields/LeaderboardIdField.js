@@ -171,6 +171,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               }
               renderButton={style => (
                 <RaisedButtonWithSplitMenu
+                  id="open-leaderboard-admin-button"
                   icon={<OpenInNew />}
                   style={style}
                   primary

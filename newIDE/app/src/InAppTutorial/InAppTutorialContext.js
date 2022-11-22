@@ -92,9 +92,13 @@ export type InAppTutorial = {|
 
 export type InAppTutorialState = {|
   currentlyRunningInAppTutorial: InAppTutorial | null,
-  startTutorial: (id: string) => Promise<void>,
+  startTutorial: ({|
+    tutorialId: string,
+    initialStepIndex: ?number,
+  |}) => Promise<void>,
   endTutorial: () => void,
   inAppTutorialShortHeaders: ?Array<InAppTutorialShortHeader>,
+  startStepIndex: number,
 |};
 
 export const initialInAppTutorialState: InAppTutorialState = {
@@ -102,6 +106,7 @@ export const initialInAppTutorialState: InAppTutorialState = {
   startTutorial: async () => {},
   endTutorial: () => {},
   inAppTutorialShortHeaders: null,
+  startStepIndex: 0,
 };
 
 const InAppTutorialContext = React.createContext<InAppTutorialState>(

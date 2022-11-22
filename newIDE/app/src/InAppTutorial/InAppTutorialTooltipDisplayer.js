@@ -167,7 +167,8 @@ const TooltipBody = ({
 type TooltipHeaderProps = {|
   paletteType: 'dark' | 'light',
   progress: number,
-  displayFoldButton: boolean,
+  showFoldButton: boolean,
+  showQuitButton: boolean,
   onClickFoldButton: () => void,
   tooltipContent?: string,
   endTutorial: () => void,
@@ -176,7 +177,8 @@ type TooltipHeaderProps = {|
 const TooltipHeader = ({
   paletteType,
   progress,
-  displayFoldButton,
+  showFoldButton,
+  showQuitButton,
   onClickFoldButton,
   tooltipContent,
   endTutorial,
@@ -203,9 +205,10 @@ const TooltipHeader = ({
         {progress}%
       </Typography>
       <LineStackLayout noMargin alignItems="center" overflow="hidden">
-        {tooltipContent ? null : (
-          // When the tooltip is folded, the tooltip content is not null and we
-          // hide the quit button
+        {tooltipContent || !showQuitButton ? null : (
+          // We hide the quit button:
+          // - When the tooltip is folded, the tooltip content should not be null;
+          // - When requested.
           <ButtonBase disableRipple onClick={endTutorial}>
             <div
               style={{
@@ -229,7 +232,7 @@ const TooltipHeader = ({
             {tooltipContent}
           </Typography>
         )}
-        {displayFoldButton ? (
+        {showFoldButton ? (
           <ButtonBase disableRipple onClick={onClickFoldButton}>
             <span
               style={{
@@ -249,6 +252,7 @@ const TooltipHeader = ({
 type Props = {|
   anchorElement: HTMLElement,
   tooltip: InAppTutorialFormattedTooltip,
+  showQuitButton: boolean,
   buttonLabel?: string,
   progress: number,
   endTutorial: () => void,
@@ -258,6 +262,7 @@ type Props = {|
 const InAppTutorialTooltipDisplayer = ({
   anchorElement,
   tooltip,
+  showQuitButton,
   buttonLabel,
   progress,
   endTutorial,
@@ -327,7 +332,8 @@ const InAppTutorialTooltipDisplayer = ({
                   <TooltipHeader
                     paletteType={paletteType}
                     // Display the hide button when standalone only
-                    displayFoldButton={!!tooltip.standalone}
+                    showFoldButton={!!tooltip.standalone}
+                    showQuitButton={showQuitButton}
                     progress={progress}
                     tooltipContent={
                       folded ? tooltip.title || tooltip.description : undefined

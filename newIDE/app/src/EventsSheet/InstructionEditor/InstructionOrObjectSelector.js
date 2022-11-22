@@ -361,6 +361,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       <I18n key="tags">
         {({ i18n }) => (
           <div
+            id="instruction-or-object-selector"
             style={{
               // Important for the component to not take the full height in a dialog,
               // allowing to let the scrollview do its job.

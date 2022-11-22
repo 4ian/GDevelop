@@ -17,6 +17,10 @@ import { useDebounce } from '../Utils/UseDebounce';
 import axios from 'axios';
 import AlertMessage from '../UI/AlertMessage';
 import { FileToCloudProjectResourceUploader } from './FileToCloudProjectResourceUploader';
+import {
+  extractFilenameWithExtensionFromPublicAssetResourceUrl,
+  isPublicAssetResourceUrl,
+} from '../Utils/GDevelopServices/Asset';
 
 type ResourceStoreChooserProps = {
   options: ChooseResourceOptions,
@@ -35,7 +39,12 @@ const ResourceStoreChooser = ({
         const chosenResourceUrl = resource.url;
         const newResource = createNewResource();
         newResource.setFile(chosenResourceUrl);
-        newResource.setName(path.basename(chosenResourceUrl));
+        const resourceCleanedName = isPublicAssetResourceUrl(chosenResourceUrl)
+          ? extractFilenameWithExtensionFromPublicAssetResourceUrl(
+              chosenResourceUrl
+            )
+          : path.basename(chosenResourceUrl);
+        newResource.setName(resourceCleanedName);
         newResource.setOrigin('gdevelop-asset-store', chosenResourceUrl);
 
         onChooseResources([newResource]);

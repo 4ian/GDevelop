@@ -1861,6 +1861,7 @@ const MainFrame = (props: Props) => {
       unsavedChanges,
       getStorageProvider,
       setHasProjectOpened,
+      openAllScenes,
     ]
   );
 
@@ -2266,14 +2267,40 @@ const MainFrame = (props: Props) => {
     async (scenario: 'resume' | 'startOver') => {
       if (!selectedInAppTutorialInfo) return;
       const { progress, tutorialId } = selectedInAppTutorialInfo;
-      const projectIsClosed = await askToCloseProject();
-      if (!projectIsClosed) {
-        return;
-      }
       if (progress && scenario === 'resume') {
-        openFromFileMetadataWithStorageProvider(
-          progress.fileMetadataAndStorageProviderName
-        );
+        if (currentProject) {
+          // If there's a project opened, check if this is the one we should open
+          // for the stored tutorial progress.
+          if (
+            currentFileMetadata &&
+            currentFileMetadata.fileIdentifier !==
+              progress.fileMetadataAndStorageProviderName.fileMetadata
+                .fileIdentifier
+          ) {
+            const projectIsClosed = await askToCloseProject();
+            if (!projectIsClosed) {
+              return;
+            }
+            openFromFileMetadataWithStorageProvider(
+              progress.fileMetadataAndStorageProviderName,
+              { openAllScenes: true }
+            );
+          } else {
+            // If the current project is the same stored for the tutorial,
+            // open all scenes.
+            openAllScenes({ currentProject, editorTabs: state.editorTabs });
+          }
+        } else {
+          openFromFileMetadataWithStorageProvider(
+            progress.fileMetadataAndStorageProviderName,
+            { openAllScenes: true }
+          );
+        }
+      } else {
+        const projectIsClosed = await askToCloseProject();
+        if (!projectIsClosed) {
+          return;
+        }
       }
       await startTutorial({
         tutorialId: tutorialId,
@@ -2288,6 +2315,10 @@ const MainFrame = (props: Props) => {
       startTutorial,
       selectedInAppTutorialInfo,
       openFromFileMetadataWithStorageProvider,
+      state.editorTabs,
+      currentProject,
+      currentFileMetadata,
+      openAllScenes,
     ]
   );
 

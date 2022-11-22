@@ -12,6 +12,7 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Events/Builtin/StandardEvent.h"
 #include "catch.hpp"
 
 // TODO Remove these 2 classes and write the test with events based behaviors.
@@ -93,6 +94,13 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                                    gd::Platform& platform) {
   // Don't show extension loading logs for tests (too verbose).
   platform.EnableExtensionLoadingLogs(false);
+
+  // Required for tests on event generation.
+  std::shared_ptr<gd::PlatformExtension> commonInstructionsExtension =
+      std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
+  commonInstructionsExtension->SetExtensionInformation(
+      "BuiltinCommonInstructions", "instruction extension", "", "", "");
+  commonInstructionsExtension->AddEvent("Standard", "Standard event", "", "", "", std::make_shared<gd::StandardEvent>());
 
   std::shared_ptr<gd::PlatformExtension> baseObjectExtension =
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
@@ -373,6 +381,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                        .AddUnsupportedBaseObjectCapability("effect");
   }
 
+  platform.AddExtension(commonInstructionsExtension);
   platform.AddExtension(baseObjectExtension);
   platform.AddExtension(extension);
   project.AddPlatform(platform);

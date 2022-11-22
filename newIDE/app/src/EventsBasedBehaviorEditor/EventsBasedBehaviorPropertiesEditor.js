@@ -237,7 +237,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                               property,
                               !!this.props.isSceneProperties
                             ),
-                          disabled: !gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
+                          enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
                             this.props.eventsBasedBehavior,
                             property
                           ),

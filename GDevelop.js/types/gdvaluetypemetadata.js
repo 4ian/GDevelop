@@ -18,6 +18,7 @@ declare class gdValueTypeMetadata {
   static isTypeBehavior(parameterType: string): boolean;
   static isTypeExpression(type: string, parameterType: string): boolean;
   static getPrimitiveValueType(parameterType: string): string;
+  static convertPropertyTypeToValueType(propertyType: string): string;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   delete(): void;

@@ -1367,6 +1367,7 @@ interface ValueTypeMetadata {
     boolean STATIC_IsTypeBehavior([Const] DOMString parameterType);
     boolean STATIC_IsTypeExpression([Const] DOMString type, [Const] DOMString parameterType);
     [Const, Ref] DOMString STATIC_GetPrimitiveValueType([Const] DOMString parameterType);
+    [Const, Ref] DOMString STATIC_ConvertPropertyTypeToValueType([Const] DOMString propertyType);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);

@@ -239,7 +239,8 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             ),
                           disabled: !gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
                             this.props.eventsBasedBehavior,
-                            property),
+                            property
+                          ),
                         },
                       ]}
                     />

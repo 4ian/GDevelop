@@ -699,25 +699,7 @@ type gdInstructionOrExpressionMetadata =
   | gdExpressionMetadata
   | gdMultipleInstructionMetadata;
 
-export const convertPropertyTypeToValueType = (
-  propertyType: string
-): string => {
-  switch (propertyType) {
-    case 'Number':
-      return 'number';
-    case 'Boolean':
-      return 'boolean';
-    case 'Color':
-      return 'color';
-    case 'Choice':
-      return 'stringWithSelector';
-    case 'String':
-    default:
-      return 'string';
-  }
-};
-
-export const getStringifiedExtraInfo = (property: gdPropertyDescriptor) => {
+const getStringifiedExtraInfo = (property: gdPropertyDescriptor) => {
   return property.getType() === 'Choice'
     ? JSON.stringify(property.getExtraInfo().toJSArray())
     : '';
@@ -780,7 +762,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
 
     addObjectAndBehaviorParameters(
       behaviorMetadata.addExpressionAndConditionAndAction(
-        convertPropertyTypeToValueType(propertyType),
+        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
         gd.EventsBasedBehavior.getPropertyExpressionName(propertyName),
         propertyLabel,
         i18n._(t`the value of ${propertyLabel}`),
@@ -790,7 +772,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
       )
     )
       .useStandardParameters(
-        convertPropertyTypeToValueType(propertyType),
+        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
         getStringifiedExtraInfo(property)
       )
       .setFunctionName(
@@ -810,7 +792,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
 
     addObjectAndBehaviorParameters(
       behaviorMetadata.addExpressionAndConditionAndAction(
-        convertPropertyTypeToValueType(propertyType),
+        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
         gd.EventsBasedBehavior.getSharedPropertyExpressionName(propertyName),
         propertyLabel,
         i18n._(t`the value of ${propertyLabel}`),
@@ -820,7 +802,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
       )
     )
       .useStandardParameters(
-        convertPropertyTypeToValueType(propertyType),
+        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
         getStringifiedExtraInfo(property)
       )
       .setFunctionName(
@@ -875,7 +857,7 @@ export const declareObjectPropertiesInstructionAndExpressions = (
 
     addObjectParameter(
       objectMetadata.addExpressionAndConditionAndAction(
-        convertPropertyTypeToValueType(propertyType),
+        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
         gd.EventsBasedObject.getPropertyExpressionName(propertyName),
         propertyLabel,
         i18n._(t`the value of ${propertyLabel}`),
@@ -885,7 +867,7 @@ export const declareObjectPropertiesInstructionAndExpressions = (
       )
     )
       .useStandardParameters(
-        convertPropertyTypeToValueType(propertyType),
+        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
         getStringifiedExtraInfo(property)
       )
       .setFunctionName(

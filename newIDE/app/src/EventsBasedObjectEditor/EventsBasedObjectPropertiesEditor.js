@@ -362,9 +362,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                           <ResponsiveLineStackLayout noMargin>
                             <SemiControlledTextField
                               commitOnBlur
-                              floatingLabelText={
-                                <Trans>Label, shown in the editor</Trans>
-                              }
+                              floatingLabelText={<Trans>Short label</Trans>}
                               translatableHintText={t`Make the purpose of the property easy to understand`}
                               floatingLabelFixed
                               value={property.getLabel()}

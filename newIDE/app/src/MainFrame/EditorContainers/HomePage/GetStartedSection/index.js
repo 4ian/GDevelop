@@ -139,8 +139,13 @@ const GetStartedSection = ({
         t`Throwing physics`,
       ],
       durationInMinutes: 5,
-      locked: false,
-      disabled: !!currentlyRunningInAppTutorial,
+      locked: false, // First phase is never locked
+      // Phase is disabled if complete or if there's a running tutorial
+      disabled:
+        !!currentlyRunningInAppTutorial ||
+        (!!userProgress &&
+          !!userProgress.progress &&
+          userProgress.progress[0] === 100),
       progress:
         userProgress && userProgress.progress ? userProgress.progress[0] : 0,
       renderImage: props => <Unboxing {...props} />,
@@ -155,11 +160,17 @@ const GetStartedSection = ({
         t`Sharing online`,
       ],
       durationInMinutes: 10,
+      // Second phase is locked if first phase is not complete
       locked:
         userProgress && userProgress.progress
           ? userProgress.progress[0] !== 100
           : true,
-      disabled: !!currentlyRunningInAppTutorial,
+      // Phase is disabled if complete or if there's a running tutorial
+      disabled:
+        !!currentlyRunningInAppTutorial ||
+        (!!userProgress &&
+          !!userProgress.progress &&
+          userProgress.progress[1] === 100),
       progress:
         userProgress && userProgress.progress ? userProgress.progress[1] : 0,
       renderImage: props => <Building {...props} />,
@@ -174,11 +185,17 @@ const GetStartedSection = ({
         t`Leaderboards`,
       ],
       durationInMinutes: 15,
+      // Second phase is locked if first phase is not complete
       locked:
         userProgress && userProgress.progress
           ? userProgress.progress[1] !== 100
           : true,
-      disabled: !!currentlyRunningInAppTutorial,
+      // Phase is disabled if complete or if there's a running tutorial
+      disabled:
+        !!currentlyRunningInAppTutorial ||
+        (!!userProgress &&
+          !!userProgress.progress &&
+          userProgress.progress[2] === 100),
       progress:
         userProgress && userProgress.progress ? userProgress.progress[2] : 0,
       renderImage: props => <Podium {...props} />,

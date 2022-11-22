@@ -1,4 +1,12 @@
 import { PolygonVertices, integer, float } from "./CommonTypes";
+export type EditableTile = {
+    tileId: integer;
+    alpha: float;
+    rotate: integer;
+    flippedHorizontally: boolean;
+    flippedVertically: boolean;
+    flippedDiagonally: boolean;
+};
 /**
  * A tile map model.
  *
@@ -133,11 +141,11 @@ export declare class EditableObjectLayer extends AbstractEditableLayer {
 /**
  * A tile that is placed with pixel coordinates.
  */
-export declare class TileObject {
+export type TileObject = {
     /**
      * The tile identifier in the tile set.
      */
-    private tileId;
+    readonly tileId: integer;
     /**
      * The coordinate of the tile left side.
      */
@@ -147,31 +155,10 @@ export declare class TileObject {
      */
     readonly y: float;
     /**
-     * @param x The coordinate of the tile left side.
-     * @param y The coordinate of the tile top side.
-     * @param tileId The tile identifier in the tile set.
+     * the Pixi's rotate
      */
-    constructor(x: float, y: float, tileId: integer);
-    /**
-     * @return The tile identifier in the tile set.
-     */
-    getTileId(): integer;
-    setFlippedHorizontally(flippedHorizontally: boolean): void;
-    setFlippedVertically(flippedVertically: boolean): void;
-    setFlippedDiagonally(flippedDiagonally: boolean): void;
-    /**
-     * @returns true if the tile is flipped horizontally.
-     */
-    isFlippedHorizontally(): boolean;
-    /**
-     * @returns true if the tile is flipped vertically.
-     */
-    isFlippedVertically(): boolean;
-    /**
-     * @returns true if the tile is flipped diagonally.
-     */
-    isFlippedDiagonally(): boolean;
-}
+    readonly rotate: integer;
+};
 /**
  * A tile map layer with tile organized in grid.
  */
@@ -185,56 +172,9 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
     /**
      * @param x The layer column.
      * @param y The layer row.
-     * @param tileId The tile identifier in the tile set.
+     * @param tile The tile.
      */
-    setTile(x: integer, y: integer, tileId: integer): void;
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     */
-    removeTile(x: integer, y: integer): void;
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param flippedHorizontally true if the tile is flipped horizontally.
-     */
-    setFlippedHorizontally(x: integer, y: integer, flippedHorizontally: boolean): void;
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param flippedVertically true if the tile is flipped vertically.
-     */
-    setFlippedVertically(x: integer, y: integer, flippedVertically: boolean): void;
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param flippedDiagonally true if the tile is flipped diagonally.
-     */
-    setFlippedDiagonally(x: integer, y: integer, flippedDiagonally: boolean): void;
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @returns true if the tile is flipped horizontally.
-     */
-    isFlippedHorizontally(x: integer, y: integer): boolean;
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @returns true if the tile is flipped vertically.
-     */
-    isFlippedVertically(x: integer, y: integer): boolean;
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @returns true if the tile is flipped diagonally.
-     */
-    isFlippedDiagonally(x: integer, y: integer): boolean;
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @returns The tile identifier from the tile set.
-     */
-    get(x: integer, y: integer): integer | undefined;
+    addTile(x: integer, y: integer, tile: EditableTile): void;
     /**
      * The number of tile columns in the layer.
      */
@@ -244,13 +184,30 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
      */
     getDimensionY(): integer;
     /**
+     * @returns The layer height in pixels.
+     */
+    getHeight(): integer;
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @returns The tile identifier from the tile set.
+     */
+    getTile(x: integer, y: integer): EditableTile[] | undefined;
+    /**
      * @returns The layer width in pixels.
      */
     getWidth(): integer;
     /**
-     * @returns The layer height in pixels.
+     * @param x The layer column.
+     * @param y The layer row.
      */
-    getHeight(): integer;
+    removeTile(x: integer, y: integer): void;
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param tile The tile.
+     */
+    setTile(x: integer, y: integer, tile: EditableTile): void;
 }
 /**
  * A tile definition from the tile set.

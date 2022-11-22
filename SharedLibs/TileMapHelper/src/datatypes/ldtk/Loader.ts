@@ -1,7 +1,7 @@
 import { integer } from "../../model/CommonTypes";
 import { EditableTileMap, TileDefinition } from "../../model/Model";
 import { LDtkTileMap } from "./Format";
-import { getUniqueId } from "./LoaderHelper";
+import { getLDtkTileId, getPixiRotateFromLDtk } from "./LoaderHelper";
 
 export namespace LDtkTileMapLoader {
   export function load(pako: any, tileMap: LDtkTileMap): EditableTileMap | null {
@@ -12,6 +12,9 @@ export namespace LDtkTileMapLoader {
     }
     
     const tileSet = new Map<integer, TileDefinition>();
+    let gridSize = 0;
+    let dimX = 0;
+    let dimY = 0;
     
     for(let iLayer = level.layerInstances.length - 1; iLayer >= 0; --iLayer) {
       const layer = level.layerInstances[iLayer];
@@ -23,7 +26,7 @@ export namespace LDtkTileMapLoader {
           continue;
         }
         
-        const tileId = getUniqueId(tilesetId, tile.t);
+        const tileId = getLDtkTileId(tilesetId, tile.t);
         if(tileSet.has(tileId)) {
           tileCache[tile.t] = true;
           continue;
@@ -34,18 +37,25 @@ export namespace LDtkTileMapLoader {
         tileCache[tile.t] = true;
         tileSet.set(tileId, tileDef);
       }
+      
+      if(gridSize === 0 && layer.__type === "IntGrid") {
+        gridSize = layer.__gridSize;
+        dimX = layer.__cWid;
+        dimY = layer.__cHei;
+      }
     }
     
     const editableTileMap = new EditableTileMap(
-      8,
-      8,
-      37,
-      22,
+      gridSize,
+      gridSize,
+      dimX,
+      dimY,
       tileSet,
     );
     
     for(let iLayer = level.layerInstances.length - 1; iLayer >= 0; --iLayer) {
       const layer = level.layerInstances[iLayer];
+      const alpha = layer.__opacity;
       const gridSize = layer.__gridSize;
       const tilesetId = layer.__tilesetDefUid;
       
@@ -55,22 +65,16 @@ export namespace LDtkTileMapLoader {
       for(const tile of [...layer.autoLayerTiles, ...layer.gridTiles]) {
         const x = tile.px[0] / gridSize;
         const y = tile.px[1] / gridSize;
-        const tileId = getUniqueId(tilesetId, tile.t);
+        const tileId = getLDtkTileId(tilesetId, tile.t);
         
-        editableTileLayer.setTile(x, y, tileId);
-        
-        if(tile.f === 0) {
-          // do nothing
-        }
-        else if(tile.f === 1) {
-          editableTileLayer.setFlippedHorizontally(x, y, true);
-        }
-        else if(tile.f === 2) {
-          editableTileLayer.setFlippedVertically(x, y, true);
-        }
-        else if(tile.f === 3) {
-          editableTileLayer.setFlippedDiagonally(x, y, true);
-        }
+        editableTileLayer.addTile(x, y, {
+          tileId,
+          alpha,
+          rotate: getPixiRotateFromLDtk(tile.f),
+          flippedDiagonally: tile.f === 3,
+          flippedHorizontally: tile.f === 1,
+          flippedVertically: tile.f === 2,
+        });
       }
     }
     

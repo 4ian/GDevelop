@@ -1,6 +1,6 @@
 import { TileTextureCache } from "../../render/TextureCache";
 import { LDtkTileMap, LDtkTilesetDef } from "./Format";
-import { getUniqueId } from "./LoaderHelper";
+import { getLDtkTileId } from "./LoaderHelper";
 import PIXI = GlobalPIXIModule.PIXI;
 
 type Texture = PIXI.BaseTexture<PIXI.Resource>;
@@ -20,7 +20,7 @@ function getAtlasTexture(atlasTextures: Record<number, Texture | null>, tilesetC
     // @ts-ignore
     if(texture.baseTexture?.cacheId === "res/error48.png") {
       console.error(
-        `The an atlas texture "${tileset.relPath}" can't be loaded`
+        `The atlas texture "${tileset.relPath}" can't be loaded`
       );
       
       texture = null;
@@ -68,7 +68,15 @@ export namespace PixiLDtkHelper {
     
     for(let iLayer = level.layerInstances.length - 1; iLayer >= 0; --iLayer) {
       const layer = level.layerInstances[iLayer];
+      if(layer.__type === "Entities") {
+        continue;
+      }
+      
       const tilesetId = layer.__tilesetDefUid;
+      if(typeof tilesetId !== "number") {
+        continue;
+      }
+      
       const tileset = tilesetCache[tilesetId];
       
       const atlasTexture = getAtlasTexture(atlasTextures, tilesetCache, getTexture, tilesetId);
@@ -84,7 +92,7 @@ export namespace PixiLDtkHelper {
           continue;
         }
         
-        const tileId = getUniqueId(tilesetId, tile.t);
+        const tileId = getLDtkTileId(tilesetId, tile.t);
         if(worldTileCache[tileId]) {
           setTileCache[tile.t] = true;
           continue;
@@ -96,7 +104,7 @@ export namespace PixiLDtkHelper {
 
           const texture = new PIXI.Texture(atlasTexture, rect);
 
-          textureCache.setTexture(tileId, false, false, false, texture);
+          textureCache.setTexture(tileId, texture);
         } catch (error) {
           console.error(
             'An error occurred while creating a PIXI.Texture to be used in a TileMap:',

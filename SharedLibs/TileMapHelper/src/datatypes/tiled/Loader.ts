@@ -1,15 +1,7 @@
 import { integer, PolygonVertices } from "../../model/CommonTypes";
-import {
-  EditableTileMap,
-  TileDefinition,
-  TileObject,
-} from "../../model/Model";
+import { EditableTileMap, TileDefinition } from "../../model/Model";
 import { TiledTileMap } from "./Format";
-import {
-  extractTileUidFlippedStates,
-  decodeBase64LayerData,
-  getTileIdFromTiledGUI,
-} from "./LoaderHelper";
+import { decodeBase64LayerData, decodeTiledGUI, getTileIdFromTiledGUI } from "./LoaderHelper";
 
 /**
  * It creates a {@link EditableTileMap} from a Tiled JSON.
@@ -120,16 +112,15 @@ export namespace TiledTileMapLoader {
             // make objects visible individually.
             continue;
           }
-          const tileGid = extractTileUidFlippedStates(tiledObject.gid);
-          const object = new TileObject(
-            tiledObject.x,
-            tiledObject.y,
-            tileGid.id
-          );
-          objectLayer.add(object);
-          object.setFlippedHorizontally(tileGid.flippedHorizontally);
-          object.setFlippedVertically(tileGid.flippedVertically);
-          object.setFlippedDiagonally(tileGid.flippedDiagonally);
+          const tile = decodeTiledGUI(tiledObject.gid);
+          if (tile) {
+            const object = {
+              ...tile,
+              x: tiledObject.x,
+              y: tiledObject.y,
+            };
+            objectLayer.add(object);
+          }
         }
       } else if (tiledLayer.type === "tilelayer") {
         let tileSlotIndex = 0;
@@ -152,28 +143,10 @@ export namespace TiledTileMapLoader {
 
           for (let y = 0; y < tiledLayer.height; y++) {
             for (let x = 0; x < tiledLayer.width; x++) {
-              // The "globalTileUid" is the tile UID with encoded
-              // bits about the flipping/rotation of the tile.
-              const globalTileUid = layerData[tileSlotIndex];
-              // Extract the tile UID and the texture.
-              const tileUid = extractTileUidFlippedStates(globalTileUid);
-              if (tileUid.id !== undefined) {
-                collisionTileLayer.setTile(x, y, tileUid.id);
-                collisionTileLayer.setFlippedHorizontally(
-                  x,
-                  y,
-                  tileUid.flippedHorizontally
-                );
-                collisionTileLayer.setFlippedVertically(
-                  x,
-                  y,
-                  tileUid.flippedVertically
-                );
-                collisionTileLayer.setFlippedDiagonally(
-                  x,
-                  y,
-                  tileUid.flippedDiagonally
-                );
+              // Encoded bits about the flipping/rotation of the tile.
+              const tile = decodeTiledGUI(layerData[tileSlotIndex]);
+              if (tile) {
+                collisionTileLayer.setTile(x, y, tile)
               }
               tileSlotIndex += 1;
             }

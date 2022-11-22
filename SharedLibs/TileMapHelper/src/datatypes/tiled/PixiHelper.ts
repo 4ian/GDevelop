@@ -97,7 +97,7 @@ export namespace PixiTiledHelper {
         const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);
         const texture = new PIXI.Texture(atlasTexture!, rect);
 
-        textureCache.setTexture(tileId, false, false, false, texture);
+        textureCache.setTexture(tileId, texture);
       } catch (error) {
         console.error(
           "An error occurred while creating a PIXI.Texture to be used in a TileMap:",

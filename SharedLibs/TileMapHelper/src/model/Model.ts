@@ -1,5 +1,16 @@
 import { PolygonVertices, integer, float } from "./CommonTypes";
 
+export type EditableTile = {
+  tileId: integer;
+  alpha: float;
+  // PIXI Rotate
+  rotate: integer;
+  // Flags use by collision mask
+  flippedHorizontally: boolean;
+  flippedVertically: boolean;
+  flippedDiagonally: boolean;
+}
+
 /**
  * A tile map model.
  *
@@ -155,11 +166,11 @@ export class EditableTileMap {
       if (!tileLayer) {
         continue;
       }
-      const tileId = tileLayer.get(indexX, indexY);
-      if (tileId === undefined) {
+      const tiles = tileLayer.getTile(indexX, indexY);
+      if (tiles === undefined) {
         return false;
       }
-      const tileDefinition = this._tileSet.get(tileId);
+      const tileDefinition = this._tileSet.get(tiles[0].tileId);
       if (tileDefinition!.hasTag(tag)) {
         return true;
       }
@@ -226,11 +237,11 @@ export class EditableObjectLayer extends AbstractEditableLayer {
 /**
  * A tile that is placed with pixel coordinates.
  */
-export class TileObject {
+export type TileObject = {
   /**
    * The tile identifier in the tile set.
    */
-  private tileId: integer;
+  readonly tileId: integer;
   /**
    * The coordinate of the tile left side.
    */
@@ -239,136 +250,17 @@ export class TileObject {
    * The coordinate of the tile top side.
    */
   readonly y: float;
-
   /**
-   * @param x The coordinate of the tile left side.
-   * @param y The coordinate of the tile top side.
-   * @param tileId The tile identifier in the tile set.
+   * the Pixi's rotate
    */
-  constructor(x: float, y: float, tileId: integer) {
-    this.tileId = tileId;
-    this.x = x;
-    this.y = y;
-  }
-
-  /**
-   * @return The tile identifier in the tile set.
-   */
-  getTileId(): integer {
-    return FlippingHelper.getTileId(this.tileId);
-  }
-
-  setFlippedHorizontally(flippedHorizontally: boolean): void {
-    this.tileId = FlippingHelper.setFlippedHorizontally(
-      this.tileId,
-      flippedHorizontally
-    );
-  }
-
-  setFlippedVertically(flippedVertically: boolean): void {
-    this.tileId = FlippingHelper.setFlippedVertically(
-      this.tileId,
-      flippedVertically
-    );
-  }
-
-  setFlippedDiagonally(flippedDiagonally: boolean): void {
-    this.tileId = FlippingHelper.setFlippedDiagonally(
-      this.tileId,
-      flippedDiagonally
-    );
-  }
-
-  /**
-   * @returns true if the tile is flipped horizontally.
-   */
-  isFlippedHorizontally(): boolean {
-    return FlippingHelper.isFlippedHorizontally(this.tileId);
-  }
-
-  /**
-   * @returns true if the tile is flipped vertically.
-   */
-  isFlippedVertically(): boolean {
-    return FlippingHelper.isFlippedVertically(this.tileId);
-  }
-
-  /**
-   * @returns true if the tile is flipped diagonally.
-   */
-  isFlippedDiagonally(): boolean {
-    return FlippingHelper.isFlippedDiagonally(this.tileId);
-  }
-}
-
-/**
- * Tile identifiers making to access flipping flags.
- */
-class FlippingHelper {
-  static readonly flippedHorizontallyFlag = 0x80000000;
-  static readonly flippedVerticallyFlag = 0x40000000;
-  static readonly flippedDiagonallyFlag = 0x20000000;
-  static readonly tileIdMask = ~(
-    FlippingHelper.flippedHorizontallyFlag |
-    FlippingHelper.flippedVerticallyFlag |
-    FlippingHelper.flippedDiagonallyFlag
-  );
-
-  static getTileId(tileId: integer): integer {
-    return tileId & FlippingHelper.tileIdMask;
-  }
-
-  static setFlippedHorizontally(
-    tileId: integer,
-    flippedHorizontally: boolean
-  ): integer {
-    tileId &= ~FlippingHelper.flippedHorizontallyFlag;
-    if (flippedHorizontally) {
-      tileId |= FlippingHelper.flippedHorizontallyFlag;
-    }
-    return tileId;
-  }
-
-  static setFlippedVertically(
-    tileId: integer,
-    flippedVertically: boolean
-  ): integer {
-    tileId &= ~FlippingHelper.flippedVerticallyFlag;
-    if (flippedVertically) {
-      tileId |= FlippingHelper.flippedVerticallyFlag;
-    }
-    return tileId;
-  }
-
-  static setFlippedDiagonally(
-    tileId: integer,
-    flippedDiagonally: boolean
-  ): integer {
-    tileId &= ~FlippingHelper.flippedDiagonallyFlag;
-    if (flippedDiagonally) {
-      tileId |= FlippingHelper.flippedDiagonallyFlag;
-    }
-    return tileId;
-  }
-
-  static isFlippedHorizontally(tileId: integer): boolean {
-    return (tileId & FlippingHelper.flippedHorizontallyFlag) !== 0;
-  }
-
-  static isFlippedVertically(tileId: integer): boolean {
-    return (tileId & FlippingHelper.flippedVerticallyFlag) !== 0;
-  }
-
-  static isFlippedDiagonally(tileId: integer): boolean {
-    return (tileId & FlippingHelper.flippedDiagonallyFlag) !== 0;
-  }
+  readonly rotate: integer;
 }
 
 /**
  * A tile map layer with tile organized in grid.
  */
 export class EditableTileMapLayer extends AbstractEditableLayer {
-  private readonly _tiles: Array<Int32Array>;
+  private readonly _tiles: (EditableTile[] | undefined)[][];
 
   /**
    * @param tileMap The layer tile map.
@@ -379,136 +271,29 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     this._tiles = [];
     this._tiles.length = this.tileMap.getDimensionY();
     for (let index = 0; index < this._tiles.length; index++) {
-      this._tiles[index] = new Int32Array(this.tileMap.getDimensionX());
+      this._tiles[index] = new Array(this.tileMap.getDimensionX());
     }
   }
 
   /**
    * @param x The layer column.
    * @param y The layer row.
-   * @param tileId The tile identifier in the tile set.
+   * @param tile The tile.
    */
-  setTile(x: integer, y: integer, tileId: integer): void {
-    const definition = this.tileMap.getTileDefinition(tileId);
+  addTile(x: integer, y: integer, tile: EditableTile): void {
+    const definition = this.tileMap.getTileDefinition(tile.tileId);
     if (!definition) {
-      console.error(`Invalid tile definition index: ${tileId}`);
+      console.error(`Invalid tile definition index: ${tile.tileId}`);
       return;
     }
-    // +1 because 0 mean null
-    this._tiles[y][x] = tileId + 1;
-  }
-
-  /**
-   * @param x The layer column.
-   * @param y The layer row.
-   */
-  removeTile(x: integer, y: integer): void {
-    // 0 mean null
-    this._tiles[y][x] = 0;
-  }
-
-  /**
-   * @param x The layer column.
-   * @param y The layer row.
-   * @param flippedHorizontally true if the tile is flipped horizontally.
-   */
-  setFlippedHorizontally(
-    x: integer,
-    y: integer,
-    flippedHorizontally: boolean
-  ): void {
-    const tileId = this._tiles[y][x];
-    if (tileId === 0) {
-      return;
+    if(this._tiles[y][x]) {
+      this._tiles[y][x].push(tile)
     }
-    this._tiles[y][x] = FlippingHelper.setFlippedHorizontally(
-      tileId,
-      flippedHorizontally
-    );
-  }
-
-  /**
-   * @param x The layer column.
-   * @param y The layer row.
-   * @param flippedVertically true if the tile is flipped vertically.
-   */
-  setFlippedVertically(
-    x: integer,
-    y: integer,
-    flippedVertically: boolean
-  ): void {
-    const tileId = this._tiles[y][x];
-    if (tileId === 0) {
-      return;
+    else {
+      this._tiles[y][x] = [tile];
     }
-    this._tiles[y][x] = FlippingHelper.setFlippedVertically(
-      tileId,
-      flippedVertically
-    );
   }
-
-  /**
-   * @param x The layer column.
-   * @param y The layer row.
-   * @param flippedDiagonally true if the tile is flipped diagonally.
-   */
-  setFlippedDiagonally(
-    x: integer,
-    y: integer,
-    flippedDiagonally: boolean
-  ): void {
-    const tileId = this._tiles[y][x];
-    if (tileId === 0) {
-      return;
-    }
-    this._tiles[y][x] = FlippingHelper.setFlippedDiagonally(
-      tileId,
-      flippedDiagonally
-    );
-  }
-
-  /**
-   * @param x The layer column.
-   * @param y The layer row.
-   * @returns true if the tile is flipped horizontally.
-   */
-  isFlippedHorizontally(x: integer, y: integer): boolean {
-    return FlippingHelper.isFlippedHorizontally(this._tiles[y][x]);
-  }
-
-  /**
-   * @param x The layer column.
-   * @param y The layer row.
-   * @returns true if the tile is flipped vertically.
-   */
-  isFlippedVertically(x: integer, y: integer): boolean {
-    return FlippingHelper.isFlippedVertically(this._tiles[y][x]);
-  }
-
-  /**
-   * @param x The layer column.
-   * @param y The layer row.
-   * @returns true if the tile is flipped diagonally.
-   */
-  isFlippedDiagonally(x: integer, y: integer): boolean {
-    return FlippingHelper.isFlippedDiagonally(this._tiles[y][x]);
-  }
-
-  /**
-   * @param x The layer column.
-   * @param y The layer row.
-   * @returns The tile identifier from the tile set.
-   */
-  get(x: integer, y: integer): integer | undefined {
-    const row = this._tiles[y];
-    if (!row || row[x] === 0) {
-      return undefined;
-    }
-    // -1 because 0 is keep for null.
-    const tileId = FlippingHelper.getTileId(row[x] - 1);
-    return tileId;
-  }
-
+  
   /**
    * The number of tile columns in the layer.
    */
@@ -524,6 +309,26 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   }
 
   /**
+   * @returns The layer height in pixels.
+   */
+  getHeight(): integer {
+    return this.tileMap.getHeight();
+  }
+
+  /**
+   * @param x The layer column.
+   * @param y The layer row.
+   * @returns The tile identifier from the tile set.
+   */
+  getTile(x: integer, y: integer): EditableTile[] | undefined {
+    const row = this._tiles[y];
+    if(!row) {
+      return;
+    }
+    return row[x];
+  }
+
+  /**
    * @returns The layer width in pixels.
    */
   getWidth(): integer {
@@ -531,10 +336,25 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   }
 
   /**
-   * @returns The layer height in pixels.
+   * @param x The layer column.
+   * @param y The layer row.
    */
-  getHeight(): integer {
-    return this.tileMap.getHeight();
+  removeTile(x: integer, y: integer): void {
+    this._tiles[y][x] = undefined;
+  }
+
+  /**
+   * @param x The layer column.
+   * @param y The layer row.
+   * @param tile The tile.
+   */
+  setTile(x: integer, y: integer, tile: EditableTile): void {
+    const definition = this.tileMap.getTileDefinition(tile.tileId);
+    if (!definition) {
+      console.error(`Invalid tile definition index: ${tile.tileId}`);
+      return;
+    }
+    this._tiles[y][x] = [tile];
   }
 }
 

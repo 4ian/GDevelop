@@ -331,6 +331,7 @@ const gatherProjectDataOnMultipleSteps = ({
 type Props = {|
   tutorial: InAppTutorial,
   startStepIndex: number,
+  startProjectData: { [key: string]: string },
   endTutorial: () => void,
   project: ?gdProject,
   currentEditor: EditorIdentifier | null,
@@ -359,6 +360,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
       currentEditor,
       currentSceneName,
       startStepIndex,
+      startProjectData,
     },
     ref
   ) => {
@@ -374,7 +376,9 @@ const InAppTutorialOrchestrator = React.forwardRef<
       endIndicesPerPhase,
       setEndIndicesPerPhase,
     ] = React.useState<?Array<number>>(null);
-    const [data, setData] = React.useState<{| [key: string]: string |}>({});
+    const [data, setData] = React.useState<{| [key: string]: string |}>(
+      startProjectData
+    );
     const [displayEndDialog, setDisplayEndDialog] = React.useState<boolean>(
       false
     );

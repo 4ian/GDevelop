@@ -14,6 +14,7 @@ import InAppTutorialElementHighlighter from './InAppTutorialElementHighlighter';
 import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
 import { isElementADialog } from '../UI/MaterialUISpecificUtil';
 import { getEditorTabSelector } from './InAppTutorialOrchestrator';
+import InAppTutorialDialog from './InAppTutorialDialog';
 
 const styles = {
   avatarContainer: {
@@ -103,7 +104,13 @@ type Props = {|
 |};
 
 function InAppTutorialStepDisplayer({
-  step: { elementToHighlightId, tooltip, nextStepTrigger, isOnClosableDialog },
+  step: {
+    elementToHighlightId,
+    tooltip,
+    nextStepTrigger,
+    isOnClosableDialog,
+    dialog,
+  },
   expectedEditor,
   goToFallbackStep,
   endTutorial,
@@ -211,6 +218,14 @@ function InAppTutorialStepDisplayer({
     return <InAppTutorialElementHighlighter element={elementToHighlight} />;
   };
 
+  const renderDialog = () => {
+    if (!dialog) return null;
+
+    return (
+      <InAppTutorialDialog dialogContent={dialog} onClose={goToNextStep} />
+    );
+  };
+
   const renderTooltip = (i18n: I18nType) => {
     if (tooltip && !expectedEditor) {
       const anchorElement = tooltip.standalone
@@ -233,6 +248,7 @@ function InAppTutorialStepDisplayer({
         />
       );
     }
+
     const wrongEditorTooltip = getWrongEditorTooltip(i18n, expectedEditor);
     if (wrongEditorTooltip && assistantImage) {
       return (
@@ -273,6 +289,7 @@ function InAppTutorialStepDisplayer({
             </div>
             {renderHighlighter()}
             {renderTooltip(i18n)}
+            {renderDialog()}
           </>
         );
       }}

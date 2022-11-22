@@ -282,7 +282,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             value="Color"
                             primaryText={t`Color (text)`}
                           />
-                          {this.props.isSceneProperties && (
+                          {!this.props.isSceneProperties && (
                             <SelectOption
                               value="Behavior"
                               primaryText={t`Required behavior`}

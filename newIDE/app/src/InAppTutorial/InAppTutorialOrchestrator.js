@@ -330,6 +330,7 @@ const gatherProjectDataOnMultipleSteps = ({
 
 type Props = {|
   tutorial: InAppTutorial,
+  startStepIndex: number,
   endTutorial: () => void,
   project: ?gdProject,
   currentEditor: EditorIdentifier | null,
@@ -351,7 +352,14 @@ const InAppTutorialOrchestrator = React.forwardRef<
   InAppTutorialOrchestratorInterface
 >(
   (
-    { tutorial, endTutorial, project, currentEditor, currentSceneName },
+    {
+      tutorial,
+      endTutorial,
+      project,
+      currentEditor,
+      currentSceneName,
+      startStepIndex,
+    },
     ref
   ) => {
     const forceUpdate = useForceUpdate();
@@ -359,7 +367,9 @@ const InAppTutorialOrchestrator = React.forwardRef<
       wrongEditorInfoOpen,
       setWrongEditorInfoOpen,
     ] = React.useState<boolean>(false);
-    const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0);
+    const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(
+      startStepIndex
+    );
     const [
       endIndicesPerPhase,
       setEndIndicesPerPhase,
@@ -407,10 +417,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
     // Reset current step index on tutorial change.
     React.useEffect(
       () => {
-        changeStep(0);
-        currentStepFallbackStepIndex.current = 0;
+        changeStep(startStepIndex);
+        currentStepFallbackStepIndex.current = startStepIndex;
       },
-      [tutorial, changeStep]
+      [tutorial, changeStep, startStepIndex]
     );
 
     const goToStep = React.useCallback(

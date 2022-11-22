@@ -76,7 +76,7 @@ const styles = {
 };
 
 type Props = {|
-  onOpenOnboardingDialog: () => void,
+  onStartTutorial: () => void,
   onCreateProject: (?ExampleShortHeader) => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenHelpFinder: () => void,
@@ -85,7 +85,7 @@ type Props = {|
 |};
 
 const MainPage = ({
-  onOpenOnboardingDialog,
+  onStartTutorial,
   onCreateProject,
   onTabChange,
   onOpenHelpFinder,
@@ -112,7 +112,7 @@ const MainPage = ({
           ),
           action: () => {
             sendOnboardingManuallyOpened();
-            onOpenOnboardingDialog();
+            onStartTutorial();
           },
           disabled: !!currentlyRunningInAppTutorial,
         }

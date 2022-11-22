@@ -699,7 +699,9 @@ type gdInstructionOrExpressionMetadata =
   | gdExpressionMetadata
   | gdMultipleInstructionMetadata;
 
-const convertPropertyTypeToValueType = (propertyType: string): string => {
+export const convertPropertyTypeToValueType = (
+  propertyType: string
+): string => {
   switch (propertyType) {
     case 'Number':
       return 'number';
@@ -715,7 +717,7 @@ const convertPropertyTypeToValueType = (propertyType: string): string => {
   }
 };
 
-const getStringifiedExtraInfo = (property: gdPropertyDescriptor) => {
+export const getStringifiedExtraInfo = (property: gdPropertyDescriptor) => {
   return property.getType() === 'Choice'
     ? JSON.stringify(property.getExtraInfo().toJSArray())
     : '';

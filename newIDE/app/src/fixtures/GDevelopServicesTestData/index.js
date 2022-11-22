@@ -200,8 +200,9 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   limits: limitsForIndieUser,
   receivedAssetPacks: [],
   receivedAssetShortHeaders: [],
-  onLogout: () => {},
+  onLogout: async () => {},
   onLogin: () => {},
+  onForgotPassword: async () => {},
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
@@ -240,8 +241,9 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   limits: limitsForIndieUser,
   receivedAssetPacks: [],
   receivedAssetShortHeaders: [],
-  onLogout: () => {},
+  onLogout: async () => {},
   onLogin: () => {},
+  onForgotPassword: async () => {},
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
@@ -280,8 +282,9 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   limits: limitsForIndieUser,
   receivedAssetPacks: [],
   receivedAssetShortHeaders: [],
-  onLogout: () => {},
+  onLogout: async () => {},
   onLogin: () => {},
+  onForgotPassword: async () => {},
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
@@ -320,8 +323,57 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   limits: null,
   receivedAssetPacks: [],
   receivedAssetShortHeaders: [],
-  onLogout: () => {},
+  onLogout: async () => {},
   onLogin: () => {},
+  onForgotPassword: async () => {},
+  onEdit: () => {},
+  onChangeEmail: () => {},
+  onCreateAccount: () => {},
+  onBadgesChanged: async () => {},
+  onCloudProjectsChanged: async () => {},
+  onRefreshUserProfile: async () => {
+    console.info('This should refresh the user profile');
+  },
+  onSubscriptionUpdated: async () => {
+    console.info('This should refresh the subscriptions');
+  },
+  onPurchaseSuccessful: async () => {
+    console.info('This should refresh the assets');
+  },
+  onRefreshFirebaseProfile: async () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: async () => {
+    console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
+};
+
+export const fakeAuthenticatedUserWithBadges: AuthenticatedUser = {
+  authenticated: true,
+  profile: indieUserProfile,
+  loginState: 'done',
+  badges: [
+    {
+      seen: false,
+      unlockedAt: '123',
+      userId: indieUserProfile.id,
+      achievementId: 'badge1',
+    },
+  ],
+  cloudProjects: cloudProjectsForIndieUser,
+  firebaseUser: indieVerifiedFirebaseUser,
+  subscription: noSubscription,
+  usages: usagesForIndieUser,
+  limits: limitsForIndieUser,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
+  onLogout: async () => {},
+  onLogin: () => {},
+  onForgotPassword: async () => {},
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
@@ -360,8 +412,9 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   limits: null,
   receivedAssetPacks: [],
   receivedAssetShortHeaders: [],
-  onLogout: () => {},
+  onLogout: async () => {},
   onLogin: () => {},
+  onForgotPassword: async () => {},
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},

@@ -7,8 +7,6 @@ import FlatButton from '../../../UI/FlatButton';
 import { Line, Column } from '../../../UI/Grid';
 import { LineStackLayout } from '../../../UI/Layout';
 import UserChip from '../../../UI/User/UserChip';
-import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
-import { hasPendingNotifications } from '../../../Utils/Notification';
 import Window from '../../../Utils/Window';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import RaisedButton from '../../../UI/RaisedButton';
@@ -31,7 +29,6 @@ export const HomePageHeader = ({
   onOpenProfile,
   onOpenLanguageDialog,
 }: Props) => {
-  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const GDevelopTheme = React.useContext(GDevelopThemeContext);
   const windowWidth = useResponsiveWindowWidth();
 
@@ -73,13 +70,7 @@ export const HomePageHeader = ({
                       }
                     />
                   )}
-                  <UserChip
-                    profile={authenticatedUser.profile}
-                    onClick={onOpenProfile}
-                    displayNotificationBadge={hasPendingNotifications(
-                      authenticatedUser
-                    )}
-                  />
+                  <UserChip onOpenProfile={onOpenProfile} />
                   <TextButton
                     label={i18n.language.toUpperCase()}
                     onClick={onOpenLanguageDialog}

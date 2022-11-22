@@ -143,9 +143,16 @@ export default class EventsBasedObjectsList extends React.Component<
     const { eventsBasedObjectsList, selectedEventsBasedObject } = this.props;
     if (!selectedEventsBasedObject) return;
 
+    const originIndex = eventsBasedObjectsList.getPosition(
+      selectedEventsBasedObject
+    );
+    const destinationIndex = eventsBasedObjectsList.getPosition(
+      destinationEventsBasedObject
+    );
     eventsBasedObjectsList.move(
-      eventsBasedObjectsList.getPosition(selectedEventsBasedObject),
-      eventsBasedObjectsList.getPosition(destinationEventsBasedObject)
+      originIndex,
+      // When moving the item down, it not must be counted.
+      destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
     );
 
     this.forceUpdateList();

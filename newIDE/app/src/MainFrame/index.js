@@ -384,6 +384,7 @@ const MainFrame = (props: Props) => {
     endTutorial,
     startTutorial,
     startStepIndex,
+    startProjectData,
   } = React.useContext(InAppTutorialContext);
   const [
     selectedInAppTutorialInfo,
@@ -1752,6 +1753,26 @@ const MainFrame = (props: Props) => {
     [openLayout, i18n]
   );
 
+  const openAllScenes = React.useCallback(
+    (newState: {|
+      currentProject: ?gdProject,
+      editorTabs: EditorTabsState,
+    |}) => {
+      const { currentProject } = newState;
+      if (!currentProject) return;
+      const layoutsCount = currentProject.getLayoutsCount();
+      if (layoutsCount === 0) return;
+
+      for (let layoutIndex = 0; layoutIndex < layoutsCount; layoutIndex++) {
+        openLayout(currentProject.getLayoutAt(0).getName(), {
+          openSceneEditor: true,
+          openEventsEditor: true,
+        });
+      }
+    },
+    [openLayout]
+  );
+
   const chooseProjectWithStorageProviderPicker = React.useCallback(
     () => {
       const storageProviderOperations = getStorageProviderOperations();
@@ -1802,7 +1823,8 @@ const MainFrame = (props: Props) => {
 
   const openFromFileMetadataWithStorageProvider = React.useCallback(
     (
-      fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
+      fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
+      options: ?{ openAllScenes: boolean }
     ) => {
       if (unsavedChanges.hasUnsavedChanges) {
         const answer = Window.showConfirmDialog(
@@ -1827,10 +1849,17 @@ const MainFrame = (props: Props) => {
       openFromFileMetadata(fileMetadata)
         .then(state => {
           if (state) {
-            openSceneOrProjectManager({
-              currentProject: state.currentProject,
-              editorTabs: state.editorTabs,
-            });
+            if (options && options.openAllScenes) {
+              openAllScenes({
+                currentProject: state.currentProject,
+                editorTabs: state.editorTabs,
+              });
+            } else {
+              openSceneOrProjectManager({
+                currentProject: state.currentProject,
+                editorTabs: state.editorTabs,
+              });
+            }
             const currentStorageProvider = getStorageProvider();
             if (currentStorageProvider.internalName === 'LocalFile') {
               setHasProjectOpened(true);
@@ -2256,23 +2285,30 @@ const MainFrame = (props: Props) => {
   const startSelectedTutorial = React.useCallback(
     async (scenario: 'resume' | 'startOver') => {
       if (!selectedInAppTutorialInfo) return;
+      const { progress, tutorialId } = selectedInAppTutorialInfo;
       const projectIsClosed = await askToCloseProject();
       if (!projectIsClosed) {
         return;
       }
-      if (scenario === 'resume') {
-        // Open project and all its scenes
+      if (progress && scenario === 'resume') {
+        openFromFileMetadataWithStorageProvider(
+          progress.fileMetadataAndStorageProviderName
+        );
       }
       await startTutorial({
-        tutorialId: selectedInAppTutorialInfo.tutorialId,
-        initialStepIndex:
-          selectedInAppTutorialInfo.progress && scenario === 'resume'
-            ? selectedInAppTutorialInfo.progress.step
-            : 0,
+        tutorialId: tutorialId,
+        initialStepIndex: progress && scenario === 'resume' ? progress.step : 0,
+        initialProjectData:
+          progress && scenario === 'resume' ? progress.projectData : {},
       });
       setSelectedInAppTutorialInfo(null);
     },
-    [askToCloseProject, startTutorial, selectedInAppTutorialInfo]
+    [
+      askToCloseProject,
+      startTutorial,
+      selectedInAppTutorialInfo,
+      openFromFileMetadataWithStorageProvider,
+    ]
   );
 
   React.useEffect(
@@ -3010,6 +3046,7 @@ const MainFrame = (props: Props) => {
           ref={inAppTutorialOrchestratorRef}
           tutorial={currentlyRunningInAppTutorial}
           startStepIndex={startStepIndex}
+          startProjectData={startProjectData}
           project={currentProject}
           endTutorial={() => {
             if (!currentFileMetadata || unsavedChanges.hasUnsavedChanges) {

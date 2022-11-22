@@ -17,6 +17,9 @@ const InAppTutorialProvider = (props: Props) => {
   const flingTutorial = require('./Tutorials/flingGame.json');
   const [tutorial, setTutorial] = React.useState<InAppTutorial | null>(null);
   const [startStepIndex, setStartStepIndex] = React.useState<number>(0);
+  const [startProjectData, setStartProjectData] = React.useState<{
+    [key: string]: string,
+  }>({});
   const [
     inAppTutorialShortHeaders,
     setInAppTutorialShortHeaders,
@@ -25,12 +28,15 @@ const InAppTutorialProvider = (props: Props) => {
   const startTutorial = async ({
     tutorialId,
     initialStepIndex,
+    initialProjectData,
   }: {|
     tutorialId: string,
-    initialStepIndex: ?number,
+    initialStepIndex: number,
+    initialProjectData: { [key: string]: string },
   |}) => {
     if (tutorialId === onboardingTutorial.id) {
-      if (initialStepIndex) setStartStepIndex(initialStepIndex);
+      setStartStepIndex(initialStepIndex);
+      setStartProjectData(initialProjectData);
       setTutorial(onboardingTutorial);
       setCurrentlyRunningInAppTutorial(tutorialId);
       return;
@@ -38,7 +44,8 @@ const InAppTutorialProvider = (props: Props) => {
 
     // TODO: To remove
     if (tutorialId === flingTutorial.id) {
-      if (initialStepIndex) setStartStepIndex(initialStepIndex);
+      setStartStepIndex(initialStepIndex);
+      setStartProjectData(initialProjectData);
       setTutorial(flingTutorial);
       setCurrentlyRunningInAppTutorial(flingTutorial.id);
       return;
@@ -53,7 +60,8 @@ const InAppTutorialProvider = (props: Props) => {
     if (!inAppTutorialShortHeader) return;
 
     const inAppTutorial = await fetchInAppTutorial(inAppTutorialShortHeader);
-    if (initialStepIndex) setStartStepIndex(initialStepIndex);
+    setStartStepIndex(initialStepIndex);
+    setStartProjectData(initialProjectData);
     setTutorial(inAppTutorial);
     setCurrentlyRunningInAppTutorial(tutorialId);
   };
@@ -86,6 +94,7 @@ const InAppTutorialProvider = (props: Props) => {
         inAppTutorialShortHeaders,
         currentlyRunningInAppTutorial: tutorial,
         startTutorial,
+        startProjectData,
         endTutorial,
         startStepIndex,
       }}

@@ -4,15 +4,15 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import paperDecorator from '../../PaperDecorator';
 import muiDecorator from '../../ThemeDecorator';
-import InAppTutorialEndDialog from '../../../InAppTutorial/InAppTutorialEndDialog';
+import InAppTutorialDialog from '../../../InAppTutorial/InAppTutorialDialog';
 
 export default {
-  title: 'In-app tutorial/InAppTutorialEndDialog',
-  component: InAppTutorialEndDialog,
+  title: 'In-app tutorial/InAppTutorialDialog',
+  component: InAppTutorialDialog,
   decorators: [paperDecorator, muiDecorator],
 };
 
-const endDialog = {
+const dialogContent = {
   content: [
     {
       messageByLocale: { en: '## Congratulations' },
@@ -42,9 +42,9 @@ const endDialog = {
 
 export const Default = () => {
   return (
-    <InAppTutorialEndDialog
+    <InAppTutorialDialog
       onClose={() => action('On close dialog')()}
-      endDialog={endDialog}
+      dialogContent={dialogContent}
     />
   );
 };

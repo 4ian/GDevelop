@@ -122,11 +122,11 @@ namespace gdjs {
               return;
             }
             const tileMap = TileMapHelper.TileMapManager.identify(tileMapJsonData);
-            if(!tileMap) {
+            if (!tileMap) {
               callback(null);
               return;
             }
-            if (tileSetJsonResourceName) {
+            if (tileMap.kind === "tiled" && tileSetJsonResourceName) {
               this._instanceContainer
                 .getGame()
                 .getJsonManager()
@@ -139,8 +139,8 @@ namespace gdjs {
                     callback(null);
                     return;
                   }
-                  const tiledMap = tileMap.data as TileMapHelper.TiledTileMap;
-                  const tileSet = tileSetJsonData as TileMapHelper.TiledTileSet;
+                  const tiledMap = tileMap.data;
+                  const tileSet = tileSetJsonData as TileMapHelper.TiledTileset;
                   tileSet.firstgid = tiledMap.tilesets[0].firstgid;
                   tiledMap.tilesets = [tileSet];
                   callback(tileMap);

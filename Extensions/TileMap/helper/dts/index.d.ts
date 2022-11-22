@@ -2,7 +2,7 @@
  * @packageDocumentation
  * @module TileMapHelper
  */
-export { TiledTileMap, TiledTileSet } from "./datatypes/tiled/Format";
+export { TiledTileMap, TiledTileset } from "./datatypes/tiled/Format";
 export { EditableTileMap, EditableTileMapLayer, TileDefinition, } from "./model/Model";
 export { TileMapManager } from "./render/Manager";
 export { TileTextureCache } from "./render/TextureCache";

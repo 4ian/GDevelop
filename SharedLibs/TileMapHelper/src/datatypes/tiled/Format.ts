@@ -1,7 +1,7 @@
 import { float, integer } from "../../model/CommonTypes";
 
 /**
- * Tiled JSON format (https://www.mapeditor.org/).
+ * Tiled JSON format (https://github.com/mapeditor/tiled/blob/master/docs/reference/json-map-format.rst).
  */
 export type TiledTileMap = {
   /** Hex-formatted color (#RRGGBB or #AARRGGBB) (optional) */
@@ -49,8 +49,8 @@ export type TiledTileMap = {
   /** Map grid height */
   tileheight: integer;
 
-  /** Array of {@link TiledTileSet} */
-  tilesets: Array<TiledTileSet>;
+  /** Array of {@link TiledTileset} */
+  tilesets: Array<TiledTileset>;
 
   /** Map grid width */
   tilewidth: integer;
@@ -253,7 +253,7 @@ export type TiledText = {
   wrap: boolean;
 };
 
-export type TiledTileSet = {
+export type TiledTileset = {
   /** Hex-formatted color (#RRGGBB or #AARRGGBB) (optional) */
   backgroundcolor?: string;
 
@@ -461,7 +461,7 @@ export type TiledObjectTemplate = {
   type: string;
 
   /** External tileset used by the template (optional) */
-  tileset?: TiledTileSet;
+  tileset?: TiledTileset;
 
   /** The object instantiated by this template */
   object: Object;

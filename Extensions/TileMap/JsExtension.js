@@ -1115,20 +1115,20 @@ module.exports = {
       /** @type {TileMapHelper.TileMapManager} */
       const manager = TilemapHelper.TileMapManager.getManager(this._project);
       manager.getOrLoadTileMap(
-        this._loadTiledMapWithCallback.bind(this),
+        this._loadTileMapWithCallback.bind(this),
         tilemapJsonFile,
         tilesetJsonFile,
         pako,
         (tileMap) => {
           if (!tileMap) {
             this.onLoadingError();
-            // _loadTiledMapWithCallback already log errors
+            // _loadTileMapWithCallback already log errors
             return;
           }
 
           /** @type {TileMapHelper.TileTextureCache} */
           const textureCache = manager.getOrLoadTextureCache(
-            this._loadTiledMapWithCallback.bind(this),
+            this._loadTileMapWithCallback.bind(this),
             (textureName) =>
               this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
             tilemapAtlasImage,
@@ -1159,15 +1159,15 @@ module.exports = {
     };
 
     // GDJS doesn't use Promise to avoid allocation.
-    RenderedTileMapInstance.prototype._loadTiledMapWithCallback = function (
+    RenderedTileMapInstance.prototype._loadTileMapWithCallback = function (
       tilemapJsonFile,
       tilesetJsonFile,
       callback
     ) {
-      this._loadTiledMap(tilemapJsonFile, tilesetJsonFile).then(callback);
+      this._loadTileMap(tilemapJsonFile, tilesetJsonFile).then(callback);
     };
 
-    RenderedTileMapInstance.prototype._loadTiledMap = async function (
+    RenderedTileMapInstance.prototype._loadTileMap = async function (
       tilemapJsonFile,
       tilesetJsonFile) {
 
@@ -1178,20 +1178,25 @@ module.exports = {
           tilemapJsonFile
         );
 
-        const tilesetJsonData = tilesetJsonFile
-          ? await this._pixiResourcesLoader.getResourceJsonData(
-              this._project,
-              tilesetJsonFile
-            )
-          : null;
+        const tileMap = TilemapHelper.TileMapManager.identify(tileMapJsonData);
 
-        if (tilesetJsonData) {
-          tileMapJsonData.tilesets = [tilesetJsonData];
+        if (tileMap.kind === "tiled") {
+          const tilesetJsonData = tilesetJsonFile
+            ? await this._pixiResourcesLoader.getResourceJsonData(
+                this._project,
+                tilesetJsonFile
+              )
+            : null;
+
+          if (tilesetJsonData) {
+            tileMapJsonData.tilesets = [tilesetJsonData];
+          }
         }
-        } catch (err) {
-          console.error('Unable to load a Tilemap JSON data: ', err);
-        }
-        return tileMapJsonData;
+
+        return tileMap;
+      } catch (err) {
+        console.error('Unable to load a Tilemap JSON data: ', err);
+      }
     };
 
     /**

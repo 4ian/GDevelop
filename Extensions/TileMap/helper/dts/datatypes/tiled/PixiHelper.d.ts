@@ -5,11 +5,11 @@ export declare namespace PixiTiledHelper {
     /**
      * Split an atlas image into Pixi textures.
      *
-     * @param tiledMap A tile map exported from Tiled.
+     * @param tileMap A tile map exported from Tiled.
      * @param atlasTexture The texture containing the whole tile set.
      * @param getTexture A getter to load a texture. Used if atlasTexture is not specified.
      * @returns A textures cache.
      */
-    function parseAtlas(tiledMap: TiledTileMap, atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null, getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>): TileTextureCache | null;
+    function parseAtlas(tileMap: TiledTileMap, atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null, getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>): TileTextureCache | null;
 }
 //# sourceMappingURL=PixiHelper.d.ts.map

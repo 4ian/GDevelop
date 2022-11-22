@@ -67,6 +67,7 @@ export class TileMapManager {
     console.warn(
       "The loaded Tile Map data does not contain a 'tiledversion' or '__header__' key. Are you sure this file has been exported from Tiled (mapeditor.org) or LDtk (ldtk.io)?"
     );
+    console.log("identify: ", data);
 
     return null;
   }

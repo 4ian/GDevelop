@@ -3,7 +3,7 @@
  * @module TileMapHelper
  */
 
-export { TiledTileMap, TiledTileSet } from "./datatypes/tiled/Format";
+export { TiledTileMap, TiledTileset } from "./datatypes/tiled/Format";
 export {
   EditableTileMap,
   EditableTileMapLayer,

@@ -7,17 +7,17 @@ export namespace PixiTiledHelper {
   /**
    * Split an atlas image into Pixi textures.
    *
-   * @param tiledMap A tile map exported from Tiled.
+   * @param tileMap A tile map exported from Tiled.
    * @param atlasTexture The texture containing the whole tile set.
    * @param getTexture A getter to load a texture. Used if atlasTexture is not specified.
    * @returns A textures cache.
    */
   export function parseAtlas(
-    tiledMap: TiledTileMap,
+    tileMap: TiledTileMap,
     atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
     getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
   ): TileTextureCache | null {
-    if (!tiledMap.tiledversion) {
+    if (!tileMap.tiledversion) {
       console.warn(
         "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?"
       );
@@ -26,14 +26,14 @@ export namespace PixiTiledHelper {
     }
 
     // We only handle tileset embedded in the tilemap. Warn if it's not the case.
-    if (!tiledMap.tilesets.length || "source" in tiledMap.tilesets[0]) {
+    if (!tileMap.tilesets.length || "source" in tileMap.tilesets[0]) {
       console.warn(
         "The loaded Tiled map seems not to contain any tileset data (nothing in 'tilesets' key)."
       );
       return null;
     }
 
-    const tiledSet = tiledMap.tilesets[0];
+    const tiledSet = tileMap.tilesets[0];
     const {
       tilewidth,
       tileheight,

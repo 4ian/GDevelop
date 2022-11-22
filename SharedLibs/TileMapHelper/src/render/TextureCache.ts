@@ -83,7 +83,7 @@ export class TileTextureCache {
     }
     return rotate;
   }
-
+  
   /**
    * @return the Tiled tile global uniq identifier.
    */

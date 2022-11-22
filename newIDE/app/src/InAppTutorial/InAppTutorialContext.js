@@ -22,6 +22,12 @@ export type InAppTutorialFormattedTooltip = {|
   description?: string,
 |};
 
+export type InAppTutorialDialog = {|
+  content: Array<
+    TranslatedText | {| image: {| imageSource: string, linkHref?: string |} |}
+  >,
+|};
+
 type InAppTutorialFlowStepDOMChangeTrigger =
   | {| presenceOfElement: string |}
   | {| absenceOfElement: string |};
@@ -75,19 +81,13 @@ export type EditorIdentifier =
   | 'Extension'
   | 'Resources';
 
-export type InAppTutorialEndDialog = {|
-  content: Array<
-    TranslatedText | {| image: {| imageSource: string, linkHref?: string |} |}
-  >,
-|};
-
 export type InAppTutorial = {|
   id: string,
   flow: Array<InAppTutorialFlowStep>,
   editorSwitches: {
     [stepId: string]: {| editor: EditorIdentifier, scene?: string |},
   },
-  endDialog: InAppTutorialEndDialog,
+  endDialog: InAppTutorialDialog,
 |};
 
 export type InAppTutorialState = {|

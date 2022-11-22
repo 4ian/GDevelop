@@ -816,7 +816,8 @@ const InAppTutorialOrchestrator = React.forwardRef<
         currentPhaseIndex = endIndicesPerPhase
           .map((endIndex, i) => {
             return (
-              currentStepIndex < endIndex && currentStepIndex >= startIndices[i]
+              currentStepIndex <= endIndex &&
+              currentStepIndex >= startIndices[i]
             );
           })
           .indexOf(true);

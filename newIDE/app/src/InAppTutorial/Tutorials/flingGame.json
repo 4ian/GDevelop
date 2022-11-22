@@ -279,7 +279,7 @@
         }
       },
       "mapProjectData": {
-        "border": "lastProjectObjectName"
+        "border": "sceneLastObjectName:playScene"
       },
       "isOnClosableDialog": true
     },
@@ -399,7 +399,7 @@
         "presenceOfElement": "#object-item-1"
       },
       "mapProjectData": {
-        "projectile": "lastProjectObjectName"
+        "projectile": "sceneLastObjectName:playScene"
       },
       "isOnClosableDialog": true
     },
@@ -497,7 +497,7 @@
         "presenceOfElement": "#object-item-2"
       },
       "mapProjectData": {
-        "target": "lastProjectObjectName"
+        "target": "sceneLastObjectName:playScene"
       },
       "isOnClosableDialog": true
     },
@@ -595,7 +595,7 @@
         "presenceOfElement": "#object-item-3"
       },
       "mapProjectData": {
-        "block": "lastProjectObjectName"
+        "block": "sceneLastObjectName:playScene"
       },
       "isOnClosableDialog": true
     },
@@ -1232,7 +1232,7 @@
         "presenceOfElement": "#object-item-4"
       },
       "mapProjectData": {
-        "background": "lastProjectObjectName"
+        "background": "sceneLastObjectName:playScene"
       },
       "isOnClosableDialog": true
     },
@@ -1365,7 +1365,7 @@
         "presenceOfElement": "#object-item-5"
       },
       "mapProjectData": {
-        "obstacle": "lastProjectObjectName"
+        "obstacle": "sceneLastObjectName:playScene"
       },
       "isOnClosableDialog": true
     },
@@ -1586,7 +1586,7 @@
         }
       },
       "mapProjectData": {
-        "youWinText": "lastProjectObjectName"
+        "youWinText": "sceneLastObjectName:playScene"
       }
     },
     {
@@ -1979,7 +1979,7 @@
         "presenceOfElement": "#object-item-7"
       },
       "mapProjectData": {
-        "grabArea": "lastProjectObjectName"
+        "grabArea": "sceneLastObjectName:playScene"
       },
       "isOnClosableDialog": true
     },

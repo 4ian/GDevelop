@@ -198,7 +198,7 @@ function InAppTutorialStepDisplayer({
   const renderHighlighter = () => {
     if (
       // hide highlighter if
-      !elementToHighlight || // there's no element to highlight
+      (!elementToHighlight && !expectedEditor) || // there's no element to highlight and the user is on the right editor
       hideBehindOtherDialog // the element to highlight is on a dialog hidden behind another one
     ) {
       return null;
@@ -215,6 +215,7 @@ function InAppTutorialStepDisplayer({
       }
       return null;
     }
+    if (!elementToHighlight) return null;
     return <InAppTutorialElementHighlighter element={elementToHighlight} />;
   };
 

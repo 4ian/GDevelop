@@ -58,6 +58,7 @@ export type InAppTutorialFlowStep = {|
     // TODO: Adapt provider to make it possible to use other triggers as shortcuts
     trigger: InAppTutorialFlowStepDOMChangeTrigger,
   |}>,
+  dialog?: InAppTutorialDialog,
   mapProjectData?: {
     [key: string]: 'projectLastSceneName' | string, // lastSceneObjectName:sceneName
   },

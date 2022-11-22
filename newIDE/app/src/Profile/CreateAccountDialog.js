@@ -13,10 +13,22 @@ import {
 import { type UsernameAvailability } from '../Utils/GDevelopServices/User';
 import LeftLoader from '../UI/LeftLoader';
 import BackgroundText from '../UI/BackgroundText';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import { MarkdownText } from '../UI/MarkdownText';
 import { UsernameField, isUsernameValid } from './UsernameField';
 import Checkbox from '../UI/Checkbox';
+import HelpButton from '../UI/HelpButton';
+import Text from '../UI/Text';
+import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
+import { Column } from '../UI/Grid';
+import Link from '../UI/Link';
+
+const styles = {
+  formContainer: {
+    width: '60%',
+    marginTop: 20,
+  },
+};
 
 type Props = {|
   onClose: () => void,
@@ -102,19 +114,23 @@ const CreateAccountDialog = ({
     !isValidatingUsername &&
     (!usernameAvailability || usernameAvailability.isAvailable);
 
-  const createAccount = () => {
+  const createAccount = async () => {
     if (!canCreateAccount) return;
-    onCreateAccount({
-      email,
-      password,
-      username,
-      getNewsletterEmail,
-    });
+    try {
+      await onCreateAccount({
+        email,
+        password,
+        username,
+        getNewsletterEmail,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <Dialog
-      title={<Trans>Create a new GDevelop account</Trans>}
+      title={null}
       actions={[
         <FlatButton
           label={<Trans>Cancel</Trans>}
@@ -125,7 +141,7 @@ const CreateAccountDialog = ({
         />,
         <LeftLoader isLoading={createAccountInProgress} key="create-account">
           <DialogPrimaryButton
-            label={<Trans>Create my account</Trans>}
+            label={<Trans>Create account</Trans>}
             primary
             disabled={!canCreateAccount}
             onClick={createAccount}
@@ -133,13 +149,7 @@ const CreateAccountDialog = ({
         </LeftLoader>,
       ]}
       secondaryActions={[
-        <FlatButton
-          label={<Trans>Already have an account?</Trans>}
-          primary={false}
-          key="already-have-account"
-          onClick={onGoToLogin}
-          disabled={createAccountInProgress}
-        />,
+        <HelpButton key="help" helpPagePath={'/interface/profile'} />,
       ]}
       cannotBeDismissed={createAccountInProgress}
       onApply={createAccount}
@@ -149,54 +159,86 @@ const CreateAccountDialog = ({
       maxWidth="sm"
       open
     >
-      <ColumnStackLayout noMargin>
+      <ColumnStackLayout
+        noMargin
+        expand
+        justifyContent="center"
+        alignItems="center"
+      >
+        <GDevelopGLogo fontSize="large" />
+        <Text size="title">
+          <Trans>Sign up for free!</Trans>
+        </Text>
+        <Column noMargin alignItems="center">
+          <Text size="body2" noMargin>
+            <Trans>Welcome to GDevelop!</Trans>
+          </Text>
+          <LineStackLayout noMargin>
+            <Text size="body2" noMargin>
+              <Trans>Already a member?</Trans>
+            </Text>
+            <Link
+              href="#"
+              onClick={onGoToLogin}
+              disabled={createAccountInProgress}
+            >
+              <Text size="body2" noMargin color="inherit">
+                <Trans>Log in to your account</Trans>
+              </Text>
+            </Link>
+          </LineStackLayout>
+        </Column>
+        <div style={styles.formContainer}>
+          <ColumnStackLayout noMargin>
+            <UsernameField
+              value={username}
+              onChange={(e, value) => {
+                setUsername(value);
+              }}
+              allowEmpty
+              onAvailabilityChecked={setUsernameAvailability}
+              onAvailabilityCheckLoading={setIsValidatingUsername}
+              isValidatingUsername={isValidatingUsername}
+              disabled={createAccountInProgress}
+            />
+            <TextField
+              value={email}
+              floatingLabelText={<Trans>Email</Trans>}
+              errorText={getEmailErrorText(error)}
+              fullWidth
+              required
+              onChange={(e, value) => {
+                setEmail(value);
+              }}
+              disabled={createAccountInProgress}
+            />
+            <TextField
+              value={password}
+              floatingLabelText={<Trans>Password</Trans>}
+              errorText={getPasswordErrorText(error)}
+              type="password"
+              fullWidth
+              required
+              onChange={(e, value) => {
+                setPassword(value);
+              }}
+              disabled={createAccountInProgress}
+            />
+            <Checkbox
+              label={<Trans>I want to receive the GDevelop Newsletter</Trans>}
+              checked={getNewsletterEmail}
+              onCheck={(e, value) => {
+                setGetNewsletterEmail(value);
+              }}
+              disabled={createAccountInProgress}
+            />
+          </ColumnStackLayout>
+        </div>
         <BackgroundText>
           <MarkdownText
-            translatableSource={t`By creating an account and using GDevelop, you agree to the [Terms and Conditions](https://gdevelop.io/page/terms-and-conditions). Having an account allows you to export your game on Android or as a Desktop app and it unlocks other services for your project!`}
+            translatableSource={t`By creating an account and using GDevelop, you agree to the [Terms and Conditions](https://gdevelop.io/page/terms-and-conditions).`}
           />
         </BackgroundText>
-        <UsernameField
-          value={username}
-          onChange={(e, value) => {
-            setUsername(value);
-          }}
-          allowEmpty
-          onAvailabilityChecked={setUsernameAvailability}
-          onAvailabilityCheckLoading={setIsValidatingUsername}
-          isValidatingUsername={isValidatingUsername}
-          disabled={createAccountInProgress}
-        />
-        <TextField
-          value={email}
-          floatingLabelText={<Trans>Email</Trans>}
-          errorText={getEmailErrorText(error)}
-          fullWidth
-          required
-          onChange={(e, value) => {
-            setEmail(value);
-          }}
-          disabled={createAccountInProgress}
-        />
-        <TextField
-          value={password}
-          floatingLabelText={<Trans>Password</Trans>}
-          errorText={getPasswordErrorText(error)}
-          type="password"
-          fullWidth
-          required
-          onChange={(e, value) => {
-            setPassword(value);
-          }}
-          disabled={createAccountInProgress}
-        />
-        <Checkbox
-          label={<Trans>I want to receive the GDevelop Newsletter</Trans>}
-          checked={getNewsletterEmail}
-          onCheck={(e, value) => {
-            setGetNewsletterEmail(value);
-          }}
-          disabled={createAccountInProgress}
-        />
       </ColumnStackLayout>
     </Dialog>
   );

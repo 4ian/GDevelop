@@ -6,42 +6,43 @@ import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import UserChipComponent from '../../../UI/User/UserChip';
-import { indieUserProfile } from '../../../fixtures/GDevelopServicesTestData';
-import { type Profile } from '../../../Utils/GDevelopServices/Authentication';
+import {
+  fakeIndieAuthenticatedUser,
+  fakeNotAuthenticatedAuthenticatedUser,
+  fakeAuthenticatedUserWithBadges,
+  fakeAuthenticatedButLoadingAuthenticatedUser,
+} from '../../../fixtures/GDevelopServicesTestData';
+import AuthenticatedUserContext, {
+  type AuthenticatedUser,
+} from '../../../Profile/AuthenticatedUserContext';
 
 export default {
   title: 'User chips/UserChip',
   component: UserChipComponent,
   decorators: [paperDecorator, muiDecorator],
   argTypes: {
-    withNotifications: {
-      name: 'With notifications',
-      type: { name: 'boolean', required: true },
-      defaultValue: false,
-    },
-    profile: {
-      name: 'User profile',
+    user: {
+      name: 'User',
       control: { type: 'radio' },
-      options: ['Signed in', 'Anonymous'],
+      options: [
+        'Anonymous',
+        'Logging in',
+        'Signed in',
+        'Signed in with notifications',
+      ],
       defaultValue: 'Signed in',
       mapping: {
-        'Signed in': indieUserProfile,
-        Anonymous: null,
+        Anonymous: fakeNotAuthenticatedAuthenticatedUser,
+        'Logging in': fakeAuthenticatedButLoadingAuthenticatedUser,
+        'Signed in': fakeIndieAuthenticatedUser,
+        'Signed in with notifications': fakeAuthenticatedUserWithBadges,
       },
     },
   },
 };
 
-export const UserChip = ({
-  withNotifications,
-  profile,
-}: {|
-  withNotifications: boolean,
-  profile: ?Profile,
-|}) => (
-  <UserChipComponent
-    profile={profile}
-    onClick={() => action('click user chip')}
-    displayNotificationBadge={withNotifications}
-  />
+export const UserChip = ({ user }: {| user: AuthenticatedUser |}) => (
+  <AuthenticatedUserContext.Provider value={user}>
+    <UserChipComponent onOpenProfile={action('open profile')} />
+  </AuthenticatedUserContext.Provider>
 );

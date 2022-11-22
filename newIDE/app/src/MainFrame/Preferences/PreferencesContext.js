@@ -48,6 +48,13 @@ export type EditorMosaicName =
   | 'resources-editor'
   | 'events-functions-extension-editor';
 
+export type InAppTutorialUserProgress = {|
+  step: number,
+  progress: Array<number>,
+  fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
+  projectData: {| [key: string]: string |},
+|};
+
 export const allAlertMessages: Array<{
   key: AlertMessageIdentifier,
   label: React.Node,
@@ -283,20 +290,12 @@ export type Preferences = {|
   saveTutorialProgress: ({|
     tutorialId: string,
     userId: ?string,
-    step: number,
-    progress: Array<number>,
-    fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
-    projectData: {| [key: string]: string |},
+    ...InAppTutorialUserProgress,
   |}) => void,
   getTutorialProgress: ({|
     tutorialId: string,
     userId: ?string,
-  |}) => ?{|
-    step: number,
-    progress: Array<number>,
-    fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
-    projectData: {| [key: string]: string |},
-  |},
+  |}) => ?InAppTutorialUserProgress,
 |};
 
 export const initialPreferences = {

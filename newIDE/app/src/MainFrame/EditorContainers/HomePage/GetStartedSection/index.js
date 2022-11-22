@@ -71,7 +71,7 @@ const styles = {
 type Props = {|
   onCreateProject: (?ExampleShortHeader) => void,
   onTabChange: (tab: HomeTab) => void,
-  onOpenOnboardingDialog: () => void,
+  selectInAppTutorial: (tutorialId: string) => void,
   showGetStartedSection: boolean,
   setShowGetStartedSection: (enabled: boolean) => void,
 |};
@@ -79,7 +79,7 @@ type Props = {|
 const GetStartedSection = ({
   onCreateProject,
   onTabChange,
-  onOpenOnboardingDialog,
+  selectInAppTutorial,
   showGetStartedSection,
   setShowGetStartedSection,
 }: Props) => {
@@ -231,7 +231,7 @@ const GetStartedSection = ({
                     <GridListTile>
                       <InAppTutorialPhaseCard
                         {...item}
-                        onClick={() => console.log('click')}
+                        onClick={() => selectInAppTutorial('flingGame')}
                       />
                     </GridListTile>
                   ))}

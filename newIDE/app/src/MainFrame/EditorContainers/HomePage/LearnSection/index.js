@@ -72,14 +72,12 @@ const styles = {
 };
 
 type Props = {|
-  onOpenOnboardingDialog: () => void,
   onCreateProject: (?ExampleShortHeader) => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenHelpFinder: () => void,
 |};
 
 const LearnSection = ({
-  onOpenOnboardingDialog,
   onCreateProject,
   onTabChange,
   onOpenHelpFinder,
@@ -120,7 +118,7 @@ const LearnSection = ({
     <MainPage
       onCreateProject={onCreateProject}
       onOpenHelpFinder={onOpenHelpFinder}
-      onOpenOnboardingDialog={onOpenOnboardingDialog}
+      onStartTutorial={() => onTabChange('get-started')}
       onTabChange={onTabChange}
       onSelectCategory={setSelectedCategory}
       tutorials={tutorials}

@@ -79,7 +79,9 @@ import { getNotNullTranslationFunction } from '../Utils/i18n/getTranslationFunct
 import { type I18n } from '@lingui/core';
 import { t, Trans } from '@lingui/macro';
 import LanguageDialog from './Preferences/LanguageDialog';
-import PreferencesContext from './Preferences/PreferencesContext';
+import PreferencesContext, {
+  type InAppTutorialUserProgress,
+} from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
 import CreateProjectDialog, {
@@ -131,7 +133,7 @@ import {
   TRIVIAL_FIRST_PREVIEW,
 } from '../Utils/GDevelopServices/Badge';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import OnboardingDialog from './Onboarding/OnboardingDialog';
+import StartTutorialDialog from './InAppTutorial/StartTutorialDialog';
 import LeaderboardProvider from '../Leaderboard/LeaderboardProvider';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 import { useLeaderboardReplacer } from '../Leaderboard/useLeaderboardReplacer';
@@ -308,9 +310,6 @@ const MainFrame = (props: Props) => {
   const [languageDialogOpen, openLanguageDialog] = React.useState<boolean>(
     false
   );
-  const [onboardingDialogOpen, openOnboardingDialog] = React.useState<boolean>(
-    false
-  );
   const [helpFinderDialogOpen, openHelpFinderDialog] = React.useState<boolean>(
     false
   );
@@ -370,9 +369,19 @@ const MainFrame = (props: Props) => {
     EventsFunctionsExtensionsContext
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
-  const { currentlyRunningInAppTutorial, endTutorial } = React.useContext(
-    InAppTutorialContext
-  );
+  const {
+    currentlyRunningInAppTutorial,
+    endTutorial,
+    startTutorial,
+    startStepIndex,
+  } = React.useContext(InAppTutorialContext);
+  const [
+    selectedInAppTutorialInfo,
+    setSelectedInAppTutorialInfo,
+  ] = React.useState<null | {|
+    tutorialId: string,
+    progress: ?InAppTutorialUserProgress,
+  |}>(null);
   const {
     InAppTutorialOrchestrator,
     orchestratorProps,
@@ -2211,6 +2220,53 @@ const MainFrame = (props: Props) => {
     });
   };
 
+  const selectInAppTutorial = React.useCallback(
+    (tutorialId: string) => {
+      const userProgress = preferences.getTutorialProgress({
+        tutorialId,
+        userId: authenticatedUser.profile
+          ? authenticatedUser.profile.id
+          : undefined,
+      });
+      setSelectedInAppTutorialInfo({ tutorialId, progress: userProgress });
+    },
+    [preferences, authenticatedUser.profile]
+  );
+
+  const startSelectedTutorial = React.useCallback(
+    async (scenario: 'resume' | 'startOver') => {
+      if (!selectedInAppTutorialInfo) return;
+      const projectIsClosed = await askToCloseProject();
+      if (!projectIsClosed) {
+        return;
+      }
+      if (scenario === 'resume') {
+        // Open project and all its scenes
+      }
+      await startTutorial({
+        tutorialId: selectedInAppTutorialInfo.tutorialId,
+        initialStepIndex:
+          selectedInAppTutorialInfo.progress && scenario === 'resume'
+            ? selectedInAppTutorialInfo.progress.step
+            : 0,
+      });
+      setSelectedInAppTutorialInfo(null);
+    },
+    [askToCloseProject, startTutorial, selectedInAppTutorialInfo]
+  );
+
+  React.useEffect(
+    () => {
+      if (initialDialog === 'subscription') {
+        openSubscriptionDialog(true);
+      }
+      if (initialDialog === 'onboarding') {
+        selectInAppTutorial('flingGame');
+      }
+    },
+    [initialDialog, selectInAppTutorial]
+  );
+
   const onChangeProjectName = async (newName: string): Promise<void> => {
     if (!currentProject || !currentFileMetadata) return;
     const storageProviderOperations = getStorageProviderOperations();
@@ -2714,7 +2770,7 @@ const MainFrame = (props: Props) => {
                     onOpenLanguageDialog: () => openLanguageDialog(true),
                     onOpenPreferences: () => openPreferencesDialog(true),
                     onOpenAbout: () => openAboutDialog(true),
-                    onOpenOnboardingDialog: () => openOnboardingDialog(true),
+                    selectInAppTutorial: selectInAppTutorial,
                     onLoadEventsFunctionsExtensions: () =>
                       eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
                         currentProject
@@ -2920,12 +2976,13 @@ const MainFrame = (props: Props) => {
         hasUnsavedChanges={unsavedChanges.hasUnsavedChanges}
       />
       <ChangelogDialogContainer />
-      {onboardingDialogOpen && (
-        <OnboardingDialog
+      {selectedInAppTutorialInfo && (
+        <StartTutorialDialog
           open
-          onStartOnboarding={askToCloseProject}
+          isTutorialAlreadyStarted={!!selectedInAppTutorialInfo.progress}
+          startTutorial={startSelectedTutorial}
           onClose={() => {
-            openOnboardingDialog(false);
+            setSelectedInAppTutorialInfo(null);
           }}
         />
       )}
@@ -2946,6 +3003,7 @@ const MainFrame = (props: Props) => {
         <InAppTutorialOrchestrator
           ref={inAppTutorialOrchestratorRef}
           tutorial={currentlyRunningInAppTutorial}
+          startStepIndex={startStepIndex}
           project={currentProject}
           endTutorial={() => {
             if (!currentFileMetadata || unsavedChanges.hasUnsavedChanges) {

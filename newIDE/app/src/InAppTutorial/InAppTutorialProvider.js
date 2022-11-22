@@ -16,13 +16,21 @@ type Props = {| children: React.Node |};
 const InAppTutorialProvider = (props: Props) => {
   const flingTutorial = require('./Tutorials/flingGame.json');
   const [tutorial, setTutorial] = React.useState<InAppTutorial | null>(null);
+  const [startStepIndex, setStartStepIndex] = React.useState<number>(0);
   const [
     inAppTutorialShortHeaders,
     setInAppTutorialShortHeaders,
   ] = React.useState<?Array<InAppTutorialShortHeader>>(null);
 
-  const startTutorial = async (tutorialId: string) => {
+  const startTutorial = async ({
+    tutorialId,
+    initialStepIndex,
+  }: {|
+    tutorialId: string,
+    initialStepIndex: ?number,
+  |}) => {
     if (tutorialId === onboardingTutorial.id) {
+      if (initialStepIndex) setStartStepIndex(initialStepIndex);
       setTutorial(onboardingTutorial);
       setCurrentlyRunningInAppTutorial(tutorialId);
       return;
@@ -30,6 +38,7 @@ const InAppTutorialProvider = (props: Props) => {
 
     // TODO: To remove
     if (tutorialId === flingTutorial.id) {
+      if (initialStepIndex) setStartStepIndex(initialStepIndex);
       setTutorial(flingTutorial);
       setCurrentlyRunningInAppTutorial(flingTutorial.id);
       return;
@@ -44,6 +53,7 @@ const InAppTutorialProvider = (props: Props) => {
     if (!inAppTutorialShortHeader) return;
 
     const inAppTutorial = await fetchInAppTutorial(inAppTutorialShortHeader);
+    if (initialStepIndex) setStartStepIndex(initialStepIndex);
     setTutorial(inAppTutorial);
     setCurrentlyRunningInAppTutorial(tutorialId);
   };
@@ -77,6 +87,7 @@ const InAppTutorialProvider = (props: Props) => {
         currentlyRunningInAppTutorial: tutorial,
         startTutorial,
         endTutorial,
+        startStepIndex,
       }}
     >
       {props.children}

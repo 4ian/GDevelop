@@ -108,7 +108,9 @@ const MainPage = ({
       ? {
           title: <Trans>Guided Tour</Trans>,
           description: (
-            <Trans>Learn the fundamentals of the editor in 5 minutes</Trans>
+            <Trans>
+              Learn the fundamentals of the editor with our assisted tutorial.
+            </Trans>
           ),
           action: () => {
             sendOnboardingManuallyOpened();
@@ -162,10 +164,7 @@ const MainPage = ({
             spacing={10}
           >
             {helpItems.map((helpItem, index) => (
-              <GridListTile
-                key={index}
-                classes={{ tile: classes.tile }}
-              >
+              <GridListTile key={index} classes={{ tile: classes.tile }}>
                 <CardWidget
                   onClick={helpItem.action}
                   key={index}
@@ -173,8 +172,14 @@ const MainPage = ({
                   disabled={helpItem.disabled}
                 >
                   <div style={styles.helpItem}>
-                    <ColumnStackLayout expand justifyContent="center" useFullHeight>
-                      <Text noMargin size="block-title">{helpItem.title}</Text>
+                    <ColumnStackLayout
+                      expand
+                      justifyContent="center"
+                      useFullHeight
+                    >
+                      <Text noMargin size="block-title">
+                        {helpItem.title}
+                      </Text>
                       <Text noMargin size="body" color="secondary">
                         {helpItem.description}
                       </Text>

@@ -103,7 +103,7 @@ type Props = {|
 |};
 
 function InAppTutorialStepDisplayer({
-  step: { elementToHighlightId, tooltip, nextStepTrigger },
+  step: { elementToHighlightId, tooltip, nextStepTrigger, isOnClosableDialog },
   expectedEditor,
   goToFallbackStep,
   endTutorial,
@@ -220,6 +220,7 @@ function InAppTutorialStepDisplayer({
       return (
         <InAppTutorialTooltipDisplayer
           endTutorial={endTutorial}
+          showQuitButton={!isOnClosableDialog}
           anchorElement={anchorElement}
           tooltip={tooltip}
           progress={progress}
@@ -237,6 +238,7 @@ function InAppTutorialStepDisplayer({
       return (
         <InAppTutorialTooltipDisplayer
           endTutorial={endTutorial}
+          showQuitButton={!isOnClosableDialog}
           anchorElement={assistantImage}
           tooltip={wrongEditorTooltip}
           progress={progress}

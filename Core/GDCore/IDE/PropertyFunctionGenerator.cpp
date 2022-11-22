@@ -14,7 +14,6 @@
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/String.h"
 
-
 namespace gd {
 
 void PropertyFunctionGenerator::GenerateGetterAndSetter(
@@ -187,6 +186,22 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
     }
   }
 }
+
+bool PropertyFunctionGenerator::CanGenerateGetterAndSetter(
+    const gd::EventsBasedBehavior &eventsBasedBehavior,
+    const gd::NamedPropertyDescriptor &property) {
+  auto &type = property.GetType();
+  if (type != "Boolean" && type != "Number" && type != "String" &&
+      type != "Choice" && type != "Color") {
+    return false;
+  }
+
+  auto &functionsContainer = eventsBasedBehavior.GetEventsFunctions();
+  auto getterName = CapitalizeFirstLetter(property.GetName());
+  auto setterName = "Set" + getterName;
+  return !functionsContainer.HasEventsFunctionNamed(setterName) &&
+         !functionsContainer.HasEventsFunctionNamed(getterName);
+};
 
 gd::String PropertyFunctionGenerator::GetStringifiedExtraInfo(
     const gd::PropertyDescriptor &property) {

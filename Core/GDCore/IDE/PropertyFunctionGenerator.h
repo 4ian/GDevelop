@@ -25,12 +25,13 @@ public:
   /**
    * \brief Generate a getter and a setter for the given property.
    */
-  static void
-  GenerateGetterAndSetter(gd::Project &project,
-                          gd::EventsFunctionsExtension &extension,
-                          gd::EventsBasedBehavior &eventsBasedBehavior,
-                          const gd::NamedPropertyDescriptor &property,
-                          bool isSceneProperties);
+  static void GenerateGetterAndSetter(
+      gd::Project &project, gd::EventsFunctionsExtension &extension,
+      gd::EventsBasedBehavior &eventsBasedBehavior,
+      const gd::NamedPropertyDescriptor &property, bool isSceneProperties);
+  static bool
+  CanGenerateGetterAndSetter(const gd::EventsBasedBehavior &eventsBasedBehavior,
+                             const gd::NamedPropertyDescriptor &property);
 
   ~PropertyFunctionGenerator();
 

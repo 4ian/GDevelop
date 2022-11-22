@@ -352,4 +352,110 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
               "SetSharedPropertyMovementAngle");
     }
   }
+
+  SECTION("Allow functions generation when there is no setter") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &extension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &behavior = CreateBehavior(extension);
+
+    auto &property =
+        behavior.GetPropertyDescriptors().InsertNew("MovementAngle", 0);
+    property.SetType("Number")
+        .SetLabel("Movement angle")
+        .SetDescription("The angle of the trajectory direction.")
+        .SetGroup("Movement");
+
+    REQUIRE(gd::PropertyFunctionGenerator::CanGenerateGetterAndSetter(
+        behavior, property));
+  }
+
+  SECTION("Forbid functions generation when a getter exists") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &extension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &behavior = CreateBehavior(extension);
+
+    auto &property =
+        behavior.GetPropertyDescriptors().InsertNew("MovementAngle", 0);
+    property.SetType("Number")
+        .SetLabel("Movement angle")
+        .SetDescription("The angle of the trajectory direction.")
+        .SetGroup("Movement");
+
+    behavior.GetEventsFunctions().InsertNewEventsFunction("MovementAngle", 0);
+
+    REQUIRE(!gd::PropertyFunctionGenerator::CanGenerateGetterAndSetter(
+        behavior, property));
+  }
+
+  SECTION("Forbid functions generation when a setter exists") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &extension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &behavior = CreateBehavior(extension);
+
+    auto &property =
+        behavior.GetPropertyDescriptors().InsertNew("MovementAngle", 0);
+    property.SetType("Number")
+        .SetLabel("Movement angle")
+        .SetDescription("The angle of the trajectory direction.")
+        .SetGroup("Movement");
+
+    behavior.GetEventsFunctions().InsertNewEventsFunction("SetMovementAngle",
+                                                          0);
+
+    REQUIRE(!gd::PropertyFunctionGenerator::CanGenerateGetterAndSetter(
+        behavior, property));
+  }
+
+  SECTION("Forbid functions generation when both setter and getter exist") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &extension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &behavior = CreateBehavior(extension);
+
+    auto &property =
+        behavior.GetPropertyDescriptors().InsertNew("MovementAngle", 0);
+    property.SetType("Number")
+        .SetLabel("Movement angle")
+        .SetDescription("The angle of the trajectory direction.")
+        .SetGroup("Movement");
+
+    behavior.GetEventsFunctions().InsertNewEventsFunction("MovementAngle", 0);
+    behavior.GetEventsFunctions().InsertNewEventsFunction("SetMovementAngle",
+                                                          0);
+
+    REQUIRE(!gd::PropertyFunctionGenerator::CanGenerateGetterAndSetter(
+        behavior, property));
+  }
+
+  SECTION("Forbid functions generation for required behavior properties") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &extension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &behavior = CreateBehavior(extension);
+
+    auto &property =
+        behavior.GetPropertyDescriptors().InsertNew("MovementAngle", 0);
+    property.SetType("Behavior")
+        .SetLabel("Pathfinding behavior")
+        .SetDescription("A required behavior.")
+        .SetGroup("Movement")
+        .GetExtraInfo()
+        .push_back("PlatformBehavior::PlatformerObjectBehavior");
+
+    REQUIRE(!gd::PropertyFunctionGenerator::CanGenerateGetterAndSetter(
+        behavior, property));
+  }
 }

@@ -88,10 +88,6 @@ const getExtraInfoArray = (property: gdNamedPropertyDescriptor) => {
   return extraInfoVector.toJSArray();
 };
 
-const capitalizeFirstLetter = (text: string): string => {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-};
-
 export default class EventsBasedBehaviorPropertiesEditor extends React.Component<
   Props,
   {||}
@@ -120,33 +116,6 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
     properties.move(oldIndex, newIndex);
     this.forceUpdate();
     this.props.onPropertiesUpdated && this.props.onPropertiesUpdated();
-  };
-
-  _canGenerateGetterAndSetter = (name: string) => {
-    const { eventsBasedBehavior } = this.props;
-    const properties = eventsBasedBehavior.getPropertyDescriptors();
-    const property = properties.get(name);
-
-    const type = property.getType();
-    if (
-      type !== 'Boolean' &&
-      type !== 'Number' &&
-      type !== 'String' &&
-      type !== 'Choice' &&
-      type !== 'Color'
-    ) {
-      return false;
-    }
-
-    const functionsContainer = eventsBasedBehavior.getEventsFunctions();
-    const getterName = capitalizeFirstLetter(property.getName());
-    const setterName = 'Set' + getterName;
-    return (
-      !functionsContainer.hasEventsFunctionNamed(setterName) &&
-      (!functionsContainer.hasEventsFunctionNamed(getterName) ||
-        functionsContainer.getEventsFunction(getterName).getFunctionType() ===
-          gd.EventsFunction.ExpressionAndCondition)
-    );
   };
 
   _setChoiceExtraInfo = (property: gdNamedPropertyDescriptor) => {
@@ -268,9 +237,9 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                               property,
                               !!this.props.isSceneProperties
                             ),
-                          disabled: !this._canGenerateGetterAndSetter(
-                            property.getName()
-                          ),
+                          disabled: !gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
+                            this.props.eventsBasedBehavior,
+                            property),
                         },
                       ]}
                     />

@@ -1830,7 +1830,7 @@
       }
     },
     {
-      "elementToHighlightId": "#add-action-button-empty",
+      "elementToHighlightId": "#add-action-button",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-editor-dialog"
       },

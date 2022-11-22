@@ -12,7 +12,7 @@ import {
   type TranslatedText,
   type EditorIdentifier,
 } from './InAppTutorialContext';
-import InAppTutorialEndDialog from './InAppTutorialEndDialog';
+import InAppTutorialDialog from './InAppTutorialDialog';
 import InAppTutorialStepDisplayer from './InAppTutorialStepDisplayer';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 import { sendInAppTutorialProgress } from '../Utils/Analytics/EventSender';
@@ -865,8 +865,8 @@ const InAppTutorialOrchestrator = React.forwardRef<
           <>
             {renderStepDisplayer(i18n)}
             {displayEndDialog && (
-              <InAppTutorialEndDialog
-                endDialog={endDialog}
+              <InAppTutorialDialog
+                dialogContent={endDialog}
                 onClose={() => {
                   setDisplayEndDialog(false);
                   endTutorial();

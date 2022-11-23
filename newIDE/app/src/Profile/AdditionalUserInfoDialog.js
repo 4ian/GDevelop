@@ -36,11 +36,15 @@ const gdevelopUsageOptions = [
     label: t`Teacher`,
   },
   {
-    value: 'marketing',
+    value: 'work-marketing',
     label: t`Marketing and Advertising`,
   },
   {
-    value: 'work',
+    value: 'work-gamedev',
+    label: t`Game studio`,
+  },
+  {
+    value: 'work-other',
     label: t`Work`,
   },
   {

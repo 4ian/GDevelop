@@ -191,9 +191,9 @@ const interpolateElementId = (
     )
   ) {
     const splittedElementId = elementId.split(':');
-    const objectName = splittedElementId[1];
+    const objectKey = splittedElementId[1];
     return `#instruction-or-object-selector div[data-object-name="${
-      data[objectName]
+      data[objectKey]
     }"]`;
   }
 

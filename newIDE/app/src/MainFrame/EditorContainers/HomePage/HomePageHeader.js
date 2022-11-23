@@ -56,6 +56,7 @@ export const HomePageHeader = ({
                 {!!project && windowWidth !== 'small' && (
                   <Line noMargin>
                     <RaisedButton
+                      id="open-project-manager-button"
                       label={<Trans>Project Manager</Trans>}
                       onClick={onOpenProjectManager}
                       primary

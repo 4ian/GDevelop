@@ -5,7 +5,7 @@ import Text from '../../../../UI/Text';
 import Window from '../../../../Utils/Window';
 import { Trans } from '@lingui/macro';
 import PublishIcon from '@material-ui/icons/Publish';
-import { LineStackLayout } from '../../../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import { type HomeTab } from '../HomePageMenu';
 import {
   type TutorialCategory,
@@ -13,7 +13,6 @@ import {
 } from '../../../../Utils/GDevelopServices/Tutorial';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { isMobile } from '../../../../Utils/Platform';
-import { sendOnboardingManuallyOpened } from '../../../../Utils/Analytics/EventSender';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import FlatButton from '../../../../UI/FlatButton';
 import {
@@ -68,17 +67,15 @@ const styles = {
     textAlign: 'center',
     maxWidth: (SMALL_WIDGET_SIZE + 2 * 5) * HELP_ITEMS_MAX_COLUMNS, // Avoid tiles taking too much space on large screens.
   },
-  gridListTile: {
-    display: 'flex',
-    justifyContent: 'flex-start',
-  },
   helpItem: {
     padding: 10,
+    flex: 1,
+    display: 'flex',
   },
 };
 
 type Props = {|
-  onOpenOnboardingDialog: () => void,
+  onStartTutorial: () => void,
   onCreateProject: (?ExampleShortHeader) => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenHelpFinder: () => void,
@@ -87,7 +84,7 @@ type Props = {|
 |};
 
 const MainPage = ({
-  onOpenOnboardingDialog,
+  onStartTutorial,
   onCreateProject,
   onTabChange,
   onOpenHelpFinder,
@@ -95,7 +92,9 @@ const MainPage = ({
   tutorials,
 }: Props) => {
   const classes = useStyles();
-  const { isInAppTutorialRunning } = React.useContext(InAppTutorialContext);
+  const { currentlyRunningInAppTutorial } = React.useContext(
+    InAppTutorialContext
+  );
   const windowWidth = useResponsiveWindowWidth();
   const shouldShowOnboardingButton = !isMobile();
   const helpItems: {
@@ -108,13 +107,14 @@ const MainPage = ({
       ? {
           title: <Trans>Guided Tour</Trans>,
           description: (
-            <Trans>Learn the fundamentals of the editor in 5 minutes</Trans>
+            <Trans>
+              Learn the fundamentals of the editor with our assisted tutorial.
+            </Trans>
           ),
           action: () => {
-            sendOnboardingManuallyOpened();
-            onOpenOnboardingDialog();
+            onStartTutorial();
           },
-          disabled: isInAppTutorialRunning,
+          disabled: !!currentlyRunningInAppTutorial,
         }
       : undefined,
     {
@@ -162,24 +162,26 @@ const MainPage = ({
             spacing={10}
           >
             {helpItems.map((helpItem, index) => (
-              <GridListTile
-                key={index}
-                style={styles.gridListTile}
-                classes={{ tile: classes.tile }}
-              >
+              <GridListTile key={index} classes={{ tile: classes.tile }}>
                 <CardWidget
                   onClick={helpItem.action}
                   key={index}
-                  size="small"
+                  size="large"
                   disabled={helpItem.disabled}
                 >
                   <div style={styles.helpItem}>
-                    <Column alignItems="center">
-                      <Text size="block-title">{helpItem.title}</Text>
-                      <Text size="body" color="secondary">
+                    <ColumnStackLayout
+                      expand
+                      justifyContent="center"
+                      useFullHeight
+                    >
+                      <Text noMargin size="block-title">
+                        {helpItem.title}
+                      </Text>
+                      <Text noMargin size="body" color="secondary">
                         {helpItem.description}
                       </Text>
-                    </Column>
+                    </ColumnStackLayout>
                   </div>
                 </CardWidget>
               </GridListTile>

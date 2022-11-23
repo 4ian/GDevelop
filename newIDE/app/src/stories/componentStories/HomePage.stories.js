@@ -89,7 +89,7 @@ const WrappedHomePage = ({
               onOpenProjectManager={() => action('onOpenProjectManager')()}
               onOpenHelpFinder={() => action('onOpenHelpFinder')()}
               onOpenLanguageDialog={() => action('open language dialog')()}
-              onOpenOnboardingDialog={() => action('open onboarding dialog')()}
+              selectInAppTutorial={() => action('select in app tutorial')()}
               onOpenProjectPreCreationDialog={() =>
                 action('open precreation dialog')()
               }

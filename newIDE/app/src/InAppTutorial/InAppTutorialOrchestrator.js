@@ -422,19 +422,25 @@ const InAppTutorialOrchestrator = React.forwardRef<
     React.useEffect(
       () => {
         changeStep(startStepIndex);
-        // Start step index should not be on closable dialog.
-        currentStepFallbackStepIndex.current = startStepIndex;
+        for (let index = startStepIndex; index >= 0; index--) {
+          if (!tutorial.flow[index].isOnClosableDialog) {
+            currentStepFallbackStepIndex.current = index;
+            break;
+          }
+        }
         // Find the last editor switch to set the expected editor and scene.
+        let newExpectedEditor = { editor: 'Home' };
         for (let index = startStepIndex; index >= 0; index--) {
           if (
             tutorial.flow[index].id &&
             tutorial.editorSwitches.hasOwnProperty(tutorial.flow[index].id)
           ) {
-            setExpectedEditor(tutorial.editorSwitches[tutorial.flow[index].id]);
-            return;
+            newExpectedEditor =
+              tutorial.editorSwitches[tutorial.flow[index].id];
+            break;
           }
-          setExpectedEditor({ editor: 'Home' });
         }
+        setExpectedEditor(newExpectedEditor);
       },
       [tutorial, changeStep, startStepIndex]
     );

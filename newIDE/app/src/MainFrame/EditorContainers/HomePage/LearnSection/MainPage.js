@@ -96,14 +96,14 @@ const MainPage = ({
     InAppTutorialContext
   );
   const windowWidth = useResponsiveWindowWidth();
-  const shouldShowOnboardingButton = !isMobile();
+  const shouldShowInAppTutorialButtons = !isMobile() && windowWidth !== 'small';
   const helpItems: {
     title: React.Node,
     description: React.Node,
     action: () => void,
     disabled?: boolean,
   }[] = [
-    shouldShowOnboardingButton
+    shouldShowInAppTutorialButtons
       ? {
           title: <Trans>Guided Tour</Trans>,
           description: (
@@ -155,7 +155,7 @@ const MainPage = ({
           <GridList
             cols={getHelpItemsColumnsFromWidth(
               windowWidth,
-              shouldShowOnboardingButton
+              shouldShowInAppTutorialButtons
             )}
             style={styles.grid}
             cellHeight="auto"

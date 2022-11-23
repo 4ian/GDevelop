@@ -13,6 +13,7 @@ import ImagePreview, {
 } from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import ResourceSelector from '../../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../../ResourcesLoader';
+import { getMeasurementUnitShortLabel } from '../../../PropertiesEditor/PropertiesMapToSchema';
 import ShapePreview from './ShapePreview';
 import PolygonEditor from './PolygonEditor';
 import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
@@ -23,6 +24,7 @@ import EmptyMessage from '../../../UI/EmptyMessage';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
+import InputAdornment from '@material-ui/core/InputAdornment';
 
 type Props = BehaviorEditorProps;
 
@@ -33,16 +35,21 @@ const NumericProperty = (props: {|
   onUpdate: (newValue: string) => void,
 |}) => {
   const { properties, propertyName, step, onUpdate } = props;
-
+  const property = properties.get(propertyName);
   return (
     <SemiControlledTextField
       fullWidth
-      value={properties.get(propertyName).getValue()}
+      value={property.getValue()}
       key={propertyName}
-      floatingLabelText={properties.get(propertyName).getLabel()}
+      floatingLabelText={property.getLabel()}
       step={step}
       onChange={onUpdate}
       type="number"
+      endAdornment={
+        <InputAdornment position="end">
+          {getMeasurementUnitShortLabel(property.getMeasurementUnit())}
+        </InputAdornment>
+      }
     />
   );
 };

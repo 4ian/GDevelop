@@ -14,6 +14,7 @@ import ColorField from '../UI/ColorField';
 import { MarkdownText } from '../UI/MarkdownText';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 import FormHelperText from '@material-ui/core/FormHelperText';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import {
   type ResourceKind,
@@ -54,6 +55,7 @@ export type PrimitiveValueField =
       valueType: 'number',
       getValue: Instance => number,
       setValue: (instance: Instance, newValue: number) => void,
+      getEndAdornment?: () => string,
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -312,6 +314,11 @@ const PropertiesEditor = ({
             type="number"
             style={styles.field}
             disabled={getDisabled(instances, field)}
+            endAdornment={
+              <InputAdornment position="end">
+                {field.getEndAdornment ? field.getEndAdornment() : ''}
+              </InputAdornment>
+            }
           />
         );
       } else if (field.valueType === 'color') {

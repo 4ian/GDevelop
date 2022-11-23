@@ -25,6 +25,10 @@ export type Profile = {|
   getNewsletterEmail: boolean,
   isCreator: boolean,
   isPlayer: boolean,
+  hearFrom?: string,
+  gdevelopUsage?: string,
+  creationExperience?: string,
+  currentWork?: string,
 |};
 
 export type LoginForm = {|

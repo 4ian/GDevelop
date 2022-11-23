@@ -200,7 +200,7 @@ const AdditionalUserInfoDialog = ({
         <Column noMargin alignItems="center">
           <Text size="body2" noMargin align="center">
             <Trans>
-              Your answers will help us send you the best content about game
+              Your answers will help us personalize your experience with game
               creation. Of course, they will stay private and won't be sent to
               anyone else
             </Trans>

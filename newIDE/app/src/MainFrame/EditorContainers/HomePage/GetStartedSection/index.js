@@ -4,7 +4,6 @@ import { Trans, t } from '@lingui/macro';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import { isMobile } from '../../../../Utils/Platform';
-import { sendOnboardingManuallyOpened } from '../../../../Utils/Analytics/EventSender';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import {
   useResponsiveWindowWidth,

@@ -27,7 +27,7 @@ type Props = {|
   open: boolean,
   onClose: () => void,
   isTutorialAlreadyStarted: boolean,
-  startTutorial: (scenario: 'resume' | 'startOver') => Promise<void>,
+  startTutorial: (scenario: 'resume' | 'startOver' | 'start') => Promise<void>,
 |};
 
 const StartTutorialDialog = ({
@@ -38,6 +38,7 @@ const StartTutorialDialog = ({
 }: Props) => {
   const resumeTutorial = () => startTutorial('resume');
   const startOverTutorial = () => startTutorial('startOver');
+  const startTutorialForFirstTime = () => startTutorial('start');
 
   const actions = [
     <FlatButton
@@ -55,7 +56,9 @@ const StartTutorialDialog = ({
         )
       }
       primary
-      onClick={isTutorialAlreadyStarted ? resumeTutorial : startOverTutorial}
+      onClick={
+        isTutorialAlreadyStarted ? resumeTutorial : startTutorialForFirstTime
+      }
     />,
   ];
   const secondaryActions = isTutorialAlreadyStarted
@@ -63,7 +66,7 @@ const StartTutorialDialog = ({
         <FlatButton
           key="startOver"
           label={<Trans>Start over</Trans>}
-          onClick={() => startTutorial('startOver')}
+          onClick={startOverTutorial}
         />,
       ]
     : undefined;
@@ -75,7 +78,9 @@ const StartTutorialDialog = ({
       secondaryActions={secondaryActions}
       open={open}
       onRequestClose={onClose}
-      onApply={isTutorialAlreadyStarted ? resumeTutorial : startOverTutorial}
+      onApply={
+        isTutorialAlreadyStarted ? resumeTutorial : startTutorialForFirstTime
+      }
       maxWidth="xs"
     >
       <ColumnStackLayout noMargin>

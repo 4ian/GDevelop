@@ -288,8 +288,11 @@ export const sendTutorialOpened = (tutorialName: string) => {
   });
 };
 
-export const sendOnboardingManuallyOpened = () => {
-  recordEvent('onboarding_manually_opened');
+export const sendInAppTutorialStarted = (metadata: {|
+  tutorialId: string,
+  scenario: 'startOver' | 'resume' | 'start',
+|}) => {
+  recordEvent('in-app-tutorial-started', metadata);
 };
 
 export const sendAssetPackOpened = (options: {|

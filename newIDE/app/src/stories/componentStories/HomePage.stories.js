@@ -10,6 +10,7 @@ import { ExampleStoreStateProvider } from '../../AssetStore/ExampleStore/Example
 import { TutorialStateProvider } from '../../Tutorial/TutorialContext';
 import PreferencesContext, {
   initialPreferences,
+  type InAppTutorialUserProgress,
 } from '../../MainFrame/Preferences/PreferencesContext';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
@@ -24,6 +25,7 @@ import {
 } from '../../fixtures/GDevelopServicesTestData';
 import { GDevelopAssetApi } from '../../Utils/GDevelopServices/ApiConfigs';
 import withMock from 'storybook-addon-mock';
+import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
 const apiDataServerSideError = {
   mockData: [
@@ -60,47 +62,67 @@ const getPartiallySavedRecentProjectFiles = (count: number) =>
 const WrappedHomePage = ({
   project,
   recentProjectFiles,
+  tutorialProgress = undefined,
   user,
 }: {|
   project: ?gdProject,
   recentProjectFiles: FileMetadataAndStorageProviderName[],
   user: AuthenticatedUser,
+  tutorialProgress?: InAppTutorialUserProgress,
 |}) => (
   <FixedHeightFlexContainer height={1080}>
     <PreferencesContext.Provider
       value={{
         ...initialPreferences,
         getRecentProjectFiles: () => recentProjectFiles,
+        getTutorialProgress: () => tutorialProgress,
       }}
     >
-      <AuthenticatedUserContext.Provider value={user}>
-        <ExampleStoreStateProvider>
-          <TutorialStateProvider>
-            <HomePage
-              project={project}
-              isActive={true}
-              projectItemName={null}
-              setToolbar={() => {}}
-              canOpen={true}
-              storageProviders={[CloudStorageProvider]}
-              onChooseProject={() => action('onChooseProject')()}
-              onOpenRecentFile={() => action('onOpenRecentFile')()}
-              onCreateProject={() => action('onCreateProject')()}
-              onOpenProjectManager={() => action('onOpenProjectManager')()}
-              onOpenHelpFinder={() => action('onOpenHelpFinder')()}
-              onOpenLanguageDialog={() => action('open language dialog')()}
-              selectInAppTutorial={() => action('select in app tutorial')()}
-              onOpenProjectPreCreationDialog={() =>
-                action('open precreation dialog')()
-              }
-              onOpenProfile={() => action('open profile')()}
-              onChangeSubscription={() => action('change subscription')()}
-              onOpenPreferences={() => action('open preferences')()}
-              onOpenAbout={() => action('open about')()}
-            />
-          </TutorialStateProvider>
-        </ExampleStoreStateProvider>
-      </AuthenticatedUserContext.Provider>
+      <InAppTutorialContext.Provider
+        value={{
+          inAppTutorialShortHeaders: [
+            { id: 'flingGame', contentUrl: 'fakeUrl' },
+          ],
+          currentlyRunningInAppTutorial: null,
+          startTutorial: async () => {
+            action('start tutorial');
+          },
+          startProjectData: {},
+          endTutorial: () => {
+            action('end tutorial');
+          },
+          startStepIndex: 0,
+        }}
+      >
+        <AuthenticatedUserContext.Provider value={user}>
+          <ExampleStoreStateProvider>
+            <TutorialStateProvider>
+              <HomePage
+                project={project}
+                isActive={true}
+                projectItemName={null}
+                setToolbar={() => {}}
+                canOpen={true}
+                storageProviders={[CloudStorageProvider]}
+                onChooseProject={() => action('onChooseProject')()}
+                onOpenRecentFile={() => action('onOpenRecentFile')()}
+                onCreateProject={() => action('onCreateProject')()}
+                onOpenProjectManager={() => action('onOpenProjectManager')()}
+                onOpenHelpFinder={() => action('onOpenHelpFinder')()}
+                onOpenLanguageDialog={() => action('open language dialog')()}
+                selectInAppTutorial={() => action('select in app tutorial')()}
+                onOpenProjectPreCreationDialog={() =>
+                  action('open precreation dialog')()
+                }
+                onOpenProfile={() => action('open profile')()}
+                onChangeSubscription={() => action('change subscription')()}
+                onOpenPreferences={() => action('open preferences')()}
+                onOpenAbout={() => action('open about')()}
+              />
+            </TutorialStateProvider>
+          </ExampleStoreStateProvider>
+        </AuthenticatedUserContext.Provider>
+      </InAppTutorialContext.Provider>
     </PreferencesContext.Provider>
   </FixedHeightFlexContainer>
 );
@@ -174,6 +196,23 @@ export const NotConnected = () => (
     project={testProject.project}
     recentProjectFiles={getRecentProjectFiles(20)}
     user={initialAuthenticatedUser}
+  />
+);
+
+export const ConnectedWithInAppTutorialProgress = () => (
+  <WrappedHomePage
+    project={testProject.project}
+    recentProjectFiles={getRecentProjectFiles(20)}
+    user={fakeIndieAuthenticatedUser}
+    tutorialProgress={{
+      step: 40,
+      progress: [100, 25, 0],
+      fileMetadataAndStorageProviderName: {
+        storageProviderName: 'fakeStorageProviderName',
+        fileMetadata: { fileIdentifier: 'fileIdentifier' },
+      },
+      projectData: {},
+    }}
   />
 );
 

@@ -872,7 +872,7 @@ export default class InstancesEditor extends Component<Props> {
   zoomToInitialPosition() {
     const x = this.props.project.getGameResolutionWidth() / 2;
     const y = this.props.project.getGameResolutionHeight() / 2;
-    this.setZoomFactor(1);
+    this.setZoomFactor(0.7);
     this.scrollTo(x, y);
   }
 

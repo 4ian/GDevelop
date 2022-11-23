@@ -141,6 +141,16 @@
         }
       }
     },
+    "link": {
+      "color": {
+        "value": "#7046EC",
+        "comment": "Palette/Purple/40"
+      },
+      "hover-color": {
+        "value": "#37238F",
+        "comment": "Palette/Purple/60"
+      }
+    },
     "search-bar": {
       "default": {
         "background-color": {

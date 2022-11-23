@@ -59,6 +59,14 @@
         }
       }
     },
+    "link": {
+      "color": {
+        "value": "#81CFFF"
+      },
+      "hover-color": {
+        "value": "#61AFEF"
+      }
+    },
     "search-bar": {
       "default": {
         "background-color": {

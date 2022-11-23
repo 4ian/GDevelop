@@ -65,18 +65,22 @@ const currentWorkOptions = [
   },
 ];
 
-const noCodeExperienceOptions = [
+const creationExperienceOptions = [
   {
     value: 'never',
-    label: t`I've never used them before`,
+    label: t`I've never used a game engine before`,
   },
   {
-    value: 'some',
-    label: t`I've used some before`,
+    value: 'code-experience',
+    label: t`I've mainly created games with code (Godot, Unreal Engine, Unity, ...)`,
   },
   {
-    value: 'lot',
-    label: t`I've used them a lot`,
+    value: 'nocode-experience',
+    label: t`I have created games with no-code engines (GameMaker, Construct, Buildbox, ...)`,
+  },
+  {
+    value: 'full',
+    label: t`I have created games using both code and no-code`,
   },
 ];
 
@@ -84,6 +88,10 @@ const hearFromOptions = [
   {
     value: 'friend',
     label: t`Friend/Word of mouth`,
+  },
+  {
+    value: 'search',
+    label: t`Search engine`,
   },
   {
     value: 'social',
@@ -96,6 +104,10 @@ const hearFromOptions = [
   {
     value: 'youtube',
     label: t`Youtube`,
+  },
+  {
+    value: 'discord',
+    label: t`Discord channel`,
   },
   {
     value: 'blog',
@@ -236,7 +248,7 @@ const AdditionalUserInfoDialog = ({
               disableUnderline
               disabled={editInProgress}
             >
-              {noCodeExperienceOptions.map(experienceOption => (
+              {creationExperienceOptions.map(experienceOption => (
                 <SelectOption
                   key={experienceOption.value}
                   value={experienceOption.value}

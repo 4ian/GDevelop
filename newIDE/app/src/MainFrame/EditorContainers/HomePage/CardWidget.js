@@ -50,7 +50,13 @@ type Props = {|
   shadowed?: boolean,
 |};
 
-export const CardWidget = ({ children, onClick, size, disabled, shadowed }: Props) => {
+export const CardWidget = ({
+  children,
+  onClick,
+  size,
+  disabled,
+  shadowed,
+}: Props) => {
   const classes = useStylesForWidget();
   const windowWidth = useResponsiveWindowWidth();
 
@@ -71,7 +77,7 @@ export const CardWidget = ({ children, onClick, size, disabled, shadowed }: Prop
       style={{
         ...styles.buttonBase,
         maxWidth: widgetMaxWidth,
-        opacity: shadowed ? 0.7 : 1
+        opacity: shadowed ? 0.7 : 1,
       }}
       classes={classes}
       tabIndex={0}

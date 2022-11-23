@@ -3092,7 +3092,10 @@ const MainFrame = (props: Props) => {
           startProjectData={startProjectData}
           project={currentProject}
           endTutorial={() => {
-            if (!currentFileMetadata || unsavedChanges.hasUnsavedChanges) {
+            if (
+              currentProject &&
+              (!currentFileMetadata || unsavedChanges.hasUnsavedChanges)
+            ) {
               setQuitInAppTutorialDialogOpen(true);
             } else {
               endTutorial();

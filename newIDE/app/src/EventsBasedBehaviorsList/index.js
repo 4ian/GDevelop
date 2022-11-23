@@ -184,7 +184,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
     );
     eventsBasedBehaviorsList.move(
       originIndex,
-      // When moving the item down, it not must be counted.
+      // When moving the item down, it must not be counted.
       destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
     );
 

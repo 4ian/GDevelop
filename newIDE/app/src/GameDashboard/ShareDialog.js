@@ -87,9 +87,7 @@ const ShareDialog = ({ game, onClose }: Props) => {
       ) : (
         <Column alignItems="center">
           <Line>
-            <Line>
-              <CircularProgress />
-            </Line>
+            <CircularProgress />
           </Line>
           <Text>
             <Trans>Just a few seconds while we generate the link...</Trans>

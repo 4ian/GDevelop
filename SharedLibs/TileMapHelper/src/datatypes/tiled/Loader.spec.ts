@@ -53,7 +53,7 @@ describe("TiledTileMapLoader", function () {
       width: 4,
     };
 
-    const tileMap: EditableTileMap = TiledTileMapLoader.load(null, tiledMap);
+    const tileMap: EditableTileMap = TiledTileMapLoader.load(tiledMap, null);
 
     it("can load map dimensions", function () {
       expect(tileMap.getDimensionX()).to.be(4);
@@ -80,15 +80,15 @@ describe("TiledTileMapLoader", function () {
       expect(layer.id).to.be(1);
       expect(layer.isVisible()).to.be(true);
 
-      expect(layer.get(0, 0)).to.be(0);
-      expect(layer.get(1, 0)).to.be(undefined);
-      expect(layer.get(2, 0)).to.be(1);
-      expect(layer.get(3, 0)).to.be(undefined);
+      expect(layer.getTile(0, 0)[0].tileId).to.be(0);
+      expect(layer.getTile(1, 0)).to.be(undefined);
+      expect(layer.getTile(2, 0)[0].tileId).to.be(1);
+      expect(layer.getTile(3, 0)).to.be(undefined);
 
-      expect(layer.get(0, 1)).to.be(undefined);
-      expect(layer.get(1, 1)).to.be(0);
-      expect(layer.get(2, 1)).to.be(undefined);
-      expect(layer.get(3, 1)).to.be(1);
+      expect(layer.getTile(0, 1)).to.be(undefined);
+      expect(layer.getTile(1, 1)[0].tileId).to.be(0);
+      expect(layer.getTile(2, 1)).to.be(undefined);
+      expect(layer.getTile(3, 1)[0].tileId).to.be(1);
     });
   });
 
@@ -377,7 +377,7 @@ describe("TiledTileMapLoader", function () {
       width: 4,
     };
 
-    const tileMap: EditableTileMap = TiledTileMapLoader.load(null, tiledMap);
+    const tileMap: EditableTileMap = TiledTileMapLoader.load(tiledMap, null);
 
     it("can load map dimensions", function () {
       expect(tileMap.getDimensionX()).to.be(4);
@@ -492,18 +492,20 @@ describe("TiledTileMapLoader", function () {
       expect(layer.id).to.be(1);
       expect(layer.isVisible()).to.be(true);
 
-      expect(layer.get(0, 0)).to.be(0);
-      expect(layer.get(1, 0)).to.be(2);
-      expect(layer.get(2, 0)).to.be(3);
-      expect(layer.get(3, 0)).to.be(4);
+      expect(layer.getTile(0, 0)[0].tileId).to.be(0);
+      expect(layer.getTile(1, 0)[0].tileId).to.be(2);
+      expect(layer.getTile(2, 0)[0].tileId).to.be(3);
+      expect(layer.getTile(3, 0)[0].tileId).to.be(4);
 
-      expect(layer.get(0, 1)).to.be(2);
-      expect(layer.get(1, 1)).to.be(1);
-      expect(layer.get(2, 1)).to.be(undefined);
-      expect(layer.get(3, 1)).to.be(4);
-      expect(layer.isFlippedVertically(3, 1)).to.be(true);
-      expect(layer.isFlippedHorizontally(3, 1)).to.be(false);
-      expect(layer.isFlippedDiagonally(3, 1)).to.be(false);
+      expect(layer.getTile(0, 1)[0].tileId).to.be(2);
+      expect(layer.getTile(1, 1)[0].tileId).to.be(1);
+      expect(layer.getTile(2, 1)).to.be(undefined);
+      
+      const tile = layer.getTile(3, 1)[0];
+      expect(tile.tileId).to.be(4);
+      expect(tile.flippedVertically).to.be(true);
+      expect(tile.flippedHorizontally).to.be(false);
+      expect(tile.flippedDiagonally).to.be(false);
     });
 
     it("can detect that a point is in a tile that contains a mask with a given tag", function () {
@@ -619,7 +621,7 @@ describe("TiledTileMapLoader", function () {
       width: 4,
     };
 
-    const tileMap: EditableTileMap = TiledTileMapLoader.load(null, tiledMap);
+    const tileMap: EditableTileMap = TiledTileMapLoader.load(tiledMap, null);
 
     it("can load flipped tiles", function () {
       const layers = new Array(...tileMap.getLayers());
@@ -628,45 +630,53 @@ describe("TiledTileMapLoader", function () {
       expect(layer.id).to.be(1);
       expect(layer.isVisible()).to.be(true);
 
-      expect(layer.get(0, 0)).to.be(2);
-      expect(layer.isFlippedVertically(0, 0)).to.be(false);
-      expect(layer.isFlippedHorizontally(0, 0)).to.be(false);
-      expect(layer.isFlippedDiagonally(0, 0)).to.be(false);
+      let tile = layer.getTile(0, 0)[0];
+      expect(tile.tileId).to.be(2);
+      expect(tile.flippedVertically).to.be(false);
+      expect(tile.flippedHorizontally).to.be(false);
+      expect(tile.flippedDiagonally).to.be(false);
 
-      expect(layer.get(1, 0)).to.be(2);
-      expect(layer.isFlippedVertically(1, 0)).to.be(false);
-      expect(layer.isFlippedHorizontally(1, 0)).to.be(true);
-      expect(layer.isFlippedDiagonally(1, 0)).to.be(true);
+      tile = layer.getTile(1, 0)[0];
+      expect(tile.tileId).to.be(2);
+      expect(tile.flippedVertically).to.be(false);
+      expect(tile.flippedHorizontally).to.be(true);
+      expect(tile.flippedDiagonally).to.be(true);
 
-      expect(layer.get(1, 1)).to.be(2);
-      expect(layer.isFlippedVertically(1, 1)).to.be(true);
-      expect(layer.isFlippedHorizontally(1, 1)).to.be(true);
-      expect(layer.isFlippedDiagonally(1, 1)).to.be(false);
+      tile = layer.getTile(1, 1)[0];
+      expect(tile.tileId).to.be(2);
+      expect(tile.flippedVertically).to.be(true);
+      expect(tile.flippedHorizontally).to.be(true);
+      expect(tile.flippedDiagonally).to.be(false);
 
-      expect(layer.get(0, 1)).to.be(2);
-      expect(layer.isFlippedVertically(0, 1)).to.be(true);
-      expect(layer.isFlippedHorizontally(0, 1)).to.be(false);
-      expect(layer.isFlippedDiagonally(0, 1)).to.be(true);
+      tile = layer.getTile(0, 1)[0];
+      expect(tile.tileId).to.be(2);
+      expect(tile.flippedVertically).to.be(true);
+      expect(tile.flippedHorizontally).to.be(false);
+      expect(tile.flippedDiagonally).to.be(true);
 
-      expect(layer.get(2, 0)).to.be(2);
-      expect(layer.isFlippedVertically(2, 0)).to.be(false);
-      expect(layer.isFlippedHorizontally(2, 0)).to.be(false);
-      expect(layer.isFlippedDiagonally(2, 0)).to.be(true);
+      tile = layer.getTile(2, 0)[0];
+      expect(tile.tileId).to.be(2);
+      expect(tile.flippedVertically).to.be(false);
+      expect(tile.flippedHorizontally).to.be(false);
+      expect(tile.flippedDiagonally).to.be(true);
 
-      expect(layer.get(3, 0)).to.be(2);
-      expect(layer.isFlippedVertically(3, 0)).to.be(false);
-      expect(layer.isFlippedHorizontally(3, 0)).to.be(true);
-      expect(layer.isFlippedDiagonally(3, 0)).to.be(false);
+      tile = layer.getTile(3, 0)[0];
+      expect(tile.tileId).to.be(2);
+      expect(tile.flippedVertically).to.be(false);
+      expect(tile.flippedHorizontally).to.be(true);
+      expect(tile.flippedDiagonally).to.be(false);
 
-      expect(layer.get(3, 1)).to.be(2);
-      expect(layer.isFlippedVertically(3, 1)).to.be(true);
-      expect(layer.isFlippedHorizontally(3, 1)).to.be(true);
-      expect(layer.isFlippedDiagonally(3, 1)).to.be(true);
+      tile = layer.getTile(3, 1)[0];
+      expect(tile.tileId).to.be(2);
+      expect(tile.flippedVertically).to.be(true);
+      expect(tile.flippedHorizontally).to.be(true);
+      expect(tile.flippedDiagonally).to.be(true);
 
-      expect(layer.get(2, 1)).to.be(2);
-      expect(layer.isFlippedVertically(2, 1)).to.be(true);
-      expect(layer.isFlippedHorizontally(2, 1)).to.be(false);
-      expect(layer.isFlippedDiagonally(2, 1)).to.be(false);
+      tile = layer.getTile(2, 1)[0];
+      expect(tile.tileId).to.be(2);
+      expect(tile.flippedVertically).to.be(true);
+      expect(tile.flippedHorizontally).to.be(false);
+      expect(tile.flippedDiagonally).to.be(false);
     });
   });
 });

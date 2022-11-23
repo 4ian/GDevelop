@@ -1,6 +1,6 @@
-import { TileTextureCache } from "../../render/TextureCache";
-import { LDtkTileMap, LDtkTilesetDef } from "./Format";
-import { getLDtkTileId } from "./LoaderHelper";
+import { TileTextureCache } from "../TextureCache";
+import { LDtkTileMap, LDtkTilesetDef } from "../../datatypes/ldtk/Format";
+import { getLDtkTileId } from "../../datatypes/ldtk/LoaderHelper";
 import PIXI = GlobalPIXIModule.PIXI;
 
 type Texture = PIXI.BaseTexture<PIXI.Resource>;

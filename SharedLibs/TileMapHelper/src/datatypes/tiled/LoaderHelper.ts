@@ -64,7 +64,11 @@ export const decodeBase64LayerData = (pako: any, layer: TiledLayer) => {
   }
 };
 
-export function decodeTiledGUI(data: integer): EditableTile {
+export function decodeTiledGUI(data: integer): EditableTile | null {
+  if (data === 0) {
+    return null;
+  }
+  
   const flippedHorizontally = !!(data & FLIPPED_HORIZONTALLY_FLAG);
   const flippedVertically = !!(data & FLIPPED_VERTICALLY_FLAG);
   const flippedDiagonally = !!(data & FLIPPED_DIAGONALLY_FLAG);

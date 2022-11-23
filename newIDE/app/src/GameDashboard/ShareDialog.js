@@ -64,6 +64,7 @@ const ShareDialog = ({ game, onClose }: Props) => {
     <Dialog
       title={<Trans>Share your game</Trans>}
       open
+      id="share-dialog"
       actions={[
         <FlatButton
           key="close"
@@ -85,7 +86,9 @@ const ShareDialog = ({ game, onClose }: Props) => {
       ) : (
         <Column alignItems="center">
           <Line>
-            <CircularProgress />
+            <Line>
+              <CircularProgress />
+            </Line>
           </Line>
         </Column>
       )}

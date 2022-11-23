@@ -361,6 +361,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       <I18n key="tags">
         {({ i18n }) => (
           <div
+            id="instruction-or-object-selector"
             style={{
               // Important for the component to not take the full height in a dialog,
               // allowing to let the scrollview do its job.
@@ -369,6 +370,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
             }}
           >
             <SearchBar
+              id="search-bar"
               value={searchText}
               onChange={searchText => {
                 const oldSearchText = this.state.searchText;
@@ -452,6 +454,9 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                                 )
                               : undefined,
                             id: 'object-item-' + index,
+                            data: {
+                              objectName: objectWithContext.object.getName(),
+                            },
                           })
                       )}
 
@@ -512,6 +517,10 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                         renderInstructionOrExpressionListItem({
                           instructionOrExpressionMetadata: instructionMetadata,
                           iconSize: iconSize,
+                          id: `instruction-item-${instructionMetadata.type.replace(
+                            /:/g,
+                            '-'
+                          )}`,
                           onClick: () =>
                             onChooseInstruction(
                               instructionMetadata.type,

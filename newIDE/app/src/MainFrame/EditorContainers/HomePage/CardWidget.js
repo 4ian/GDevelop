@@ -16,6 +16,7 @@ const styles = {
   contentWrapper: {
     height: '100%',
     width: '100%',
+    display: 'flex',
   },
 };
 
@@ -46,9 +47,10 @@ type Props = {|
   onClick: () => void,
   size: 'small' | 'large' | 'banner',
   disabled?: boolean,
+  shadowed?: boolean,
 |};
 
-export const CardWidget = ({ children, onClick, size, disabled }: Props) => {
+export const CardWidget = ({ children, onClick, size, disabled, shadowed }: Props) => {
   const classes = useStylesForWidget();
   const windowWidth = useResponsiveWindowWidth();
 
@@ -69,6 +71,7 @@ export const CardWidget = ({ children, onClick, size, disabled }: Props) => {
       style={{
         ...styles.buttonBase,
         maxWidth: widgetMaxWidth,
+        opacity: shadowed ? 0.7 : 1
       }}
       classes={classes}
       tabIndex={0}

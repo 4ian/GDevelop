@@ -176,9 +176,16 @@ export default class EventsBasedBehaviorsList extends React.Component<
     } = this.props;
     if (!selectedEventsBasedBehavior) return;
 
+    const originIndex = eventsBasedBehaviorsList.getPosition(
+      selectedEventsBasedBehavior
+    );
+    const destinationIndex = eventsBasedBehaviorsList.getPosition(
+      destinationEventsBasedBehavior
+    );
     eventsBasedBehaviorsList.move(
-      eventsBasedBehaviorsList.getPosition(selectedEventsBasedBehavior),
-      eventsBasedBehaviorsList.getPosition(destinationEventsBasedBehavior)
+      originIndex,
+      // When moving the item down, it must not be counted.
+      destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
     );
 
     this.forceUpdateList();

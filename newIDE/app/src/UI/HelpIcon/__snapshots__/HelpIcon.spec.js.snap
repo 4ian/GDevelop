@@ -18,6 +18,11 @@ exports[`HelpIcon renders the icon linking to a help page 1`] = `
   onTouchEnd={[Function]}
   onTouchMove={[Function]}
   onTouchStart={[Function]}
+  style={
+    Object {
+      "color": undefined,
+    }
+  }
   tabIndex={0}
   type="button"
 >

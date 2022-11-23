@@ -70,6 +70,7 @@ const LoginDialog = ({
     />,
     <LeftLoader isLoading={loginInProgress} key="login">
       <DialogPrimaryButton
+        id="login-button"
         label={<Trans>Login</Trans>}
         primary
         onClick={doLogin}
@@ -81,6 +82,7 @@ const LoginDialog = ({
   return (
     <Dialog
       title={null} // This dialog has a custom design to be more welcoming, the title is set in the content.
+      id="login-dialog"
       actions={actions}
       secondaryActions={[
         <HelpButton key="help" helpPagePath={'/interface/profile'} />,

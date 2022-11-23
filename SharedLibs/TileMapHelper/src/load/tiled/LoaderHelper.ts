@@ -68,11 +68,11 @@ export function decodeTiledGUI(data: integer): EditableTile | null {
   if (data === 0) {
     return null;
   }
-  
+
   const flippedHorizontally = !!(data & FLIPPED_HORIZONTALLY_FLAG);
   const flippedVertically = !!(data & FLIPPED_VERTICALLY_FLAG);
   const flippedDiagonally = !!(data & FLIPPED_DIAGONALLY_FLAG);
-  
+
   const tileId = getTileIdFromTiledGUI(
     data &
       ~(
@@ -81,15 +81,19 @@ export function decodeTiledGUI(data: integer): EditableTile | null {
         FLIPPED_DIAGONALLY_FLAG
       )
   );
-  
+
   return {
     tileId,
     alpha: 1,
-    rotate: getPixiRotate(flippedHorizontally, flippedVertically, flippedDiagonally),
+    rotate: getPixiRotate(
+      flippedHorizontally,
+      flippedVertically,
+      flippedDiagonally
+    ),
     flippedDiagonally,
     flippedHorizontally,
     flippedVertically,
-  }
+  };
 }
 
 /**
@@ -103,7 +107,11 @@ export function decodeTiledGUI(data: integer): EditableTile | null {
  * @returns the rotation "D8" number used by Pixi.
  * @see https://pixijs.io/examples/#/textures/texture-rotate.js
  */
-function getPixiRotate(flippedHorizontally: boolean, flippedVertically: boolean, flippedDiagonally: boolean): number {
+function getPixiRotate(
+  flippedHorizontally: boolean,
+  flippedVertically: boolean,
+  flippedDiagonally: boolean
+): number {
   let rotate = 0;
   if (flippedDiagonally) {
     rotate = 10;
@@ -132,6 +140,8 @@ function getPixiRotate(flippedHorizontally: boolean, flippedVertically: boolean,
  * This is why the id needs to be decremented.
  * @return the tile identifier used in {@link TilMapModel}.
  */
-export function getTileIdFromTiledGUI(tiledGUI: number | undefined): number | undefined {
+export function getTileIdFromTiledGUI(
+  tiledGUI: number | undefined
+): number | undefined {
   return tiledGUI === 0 ? undefined : tiledGUI - 1;
 }

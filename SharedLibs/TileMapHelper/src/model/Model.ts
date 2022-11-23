@@ -9,7 +9,7 @@ export type EditableTile = {
   flippedHorizontally: boolean;
   flippedVertically: boolean;
   flippedDiagonally: boolean;
-}
+};
 
 /**
  * A tile map model.
@@ -254,7 +254,7 @@ export type TileObject = {
    * the Pixi's rotate
    */
   readonly rotate: integer;
-}
+};
 
 /**
  * A tile map layer with tile organized in grid.
@@ -286,14 +286,13 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
       console.error(`Invalid tile definition index: ${tile.tileId}`);
       return;
     }
-    if(this._tiles[y][x]) {
-      this._tiles[y][x].push(tile)
-    }
-    else {
+    if (this._tiles[y][x]) {
+      this._tiles[y][x].push(tile);
+    } else {
       this._tiles[y][x] = [tile];
     }
   }
-  
+
   /**
    * The number of tile columns in the layer.
    */
@@ -322,7 +321,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    */
   getTile(x: integer, y: integer): EditableTile[] | undefined {
     const row = this._tiles[y];
-    if(!row) {
+    if (!row) {
       return;
     }
     return row[x];

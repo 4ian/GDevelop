@@ -500,7 +500,7 @@ describe("TiledTileMapLoader", function () {
       expect(layer.getTile(0, 1)[0].tileId).to.be(2);
       expect(layer.getTile(1, 1)[0].tileId).to.be(1);
       expect(layer.getTile(2, 1)).to.be(undefined);
-      
+
       const tile = layer.getTile(3, 1)[0];
       expect(tile.tileId).to.be(4);
       expect(tile.flippedVertically).to.be(true);

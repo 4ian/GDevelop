@@ -1,13 +1,20 @@
 import { integer, PolygonVertices } from "../../types/commons";
 import { EditableTileMap, TileDefinition } from "../../model/Model";
 import { TiledTileMap } from "../../types/Tiled";
-import { decodeBase64LayerData, decodeTiledGUI, getTileIdFromTiledGUI } from "./LoaderHelper";
+import {
+  decodeBase64LayerData,
+  decodeTiledGUI,
+  getTileIdFromTiledGUI,
+} from "./LoaderHelper";
 
 /**
  * It creates a {@link EditableTileMap} from a Tiled JSON.
  */
 export namespace TiledTileMapLoader {
-  export function load(tileMap: TiledTileMap, pako: any): EditableTileMap | null {
+  export function load(
+    tileMap: TiledTileMap,
+    pako: any
+  ): EditableTileMap | null {
     if (!tileMap.tiledversion) {
       console.warn(
         "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?"
@@ -146,7 +153,7 @@ export namespace TiledTileMapLoader {
               // Encoded bits about the flipping/rotation of the tile.
               const tile = decodeTiledGUI(layerData[tileSlotIndex]);
               if (tile) {
-                collisionTileLayer.setTile(x, y, tile)
+                collisionTileLayer.setTile(x, y, tile);
               }
               tileSlotIndex += 1;
             }

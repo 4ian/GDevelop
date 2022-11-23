@@ -45,9 +45,7 @@ export class TileMapManager {
    */
   static identify(data: any): TileMap | null {
     if (data.tiledversion) {
-      console.info(
-        "Detected the json file was created in Tiled"
-      );
+      console.info("Detected the json file was created in Tiled");
       return {
         kind: "tiled",
         data,
@@ -55,9 +53,7 @@ export class TileMapManager {
     }
 
     if (data.__header__ && data.__header__.app === "LDtk") {
-      console.info(
-        "Detected the json/ldtk file was created in LDtk"
-      );
+      console.info("Detected the json/ldtk file was created in LDtk");
       return {
         kind: "ldtk",
         data,
@@ -91,7 +87,12 @@ export class TileMapManager {
     pako: any,
     callback: (tileMap: EditableTileMap | null) => void
   ): void {
-    const key = tileMapJsonResourceName + "|" + tileSetJsonResourceName + "|" + levelIndex;
+    const key =
+      tileMapJsonResourceName +
+      "|" +
+      tileSetJsonResourceName +
+      "|" +
+      levelIndex;
 
     this._tileMapCache.getOrLoad(
       key,
@@ -105,7 +106,11 @@ export class TileMapManager {
               return;
             }
 
-            const editableTileMap = TileMapLoader.load(tileMap, levelIndex, pako);
+            const editableTileMap = TileMapLoader.load(
+              tileMap,
+              levelIndex,
+              pako
+            );
             callback(editableTileMap);
           }
         );
@@ -140,7 +145,7 @@ export class TileMapManager {
       "|" +
       tileSetJsonResourceName +
       "|" +
-      atlasImageResourceName + 
+      atlasImageResourceName +
       "|" +
       levelIndex;
 

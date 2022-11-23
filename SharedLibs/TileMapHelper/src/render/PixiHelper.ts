@@ -1,5 +1,9 @@
 import { integer, float } from "../types/commons";
-import { EditableObjectLayer, EditableTileMap, EditableTileMapLayer } from "../model/Model";
+import {
+  EditableObjectLayer,
+  EditableTileMap,
+  EditableTileMapLayer,
+} from "../model/Model";
 import { PixiTiledHelper } from "./tiled/PixiHelper";
 import { PixiLDtkHelper } from "./ldtk/PixiHelper";
 import { TileMap } from "../types";
@@ -22,13 +26,23 @@ export namespace PixiTileMapHelper {
     atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
     getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
   ): TileTextureCache | null {
-    if(tileMap.kind === "ldtk") {
-      return PixiLDtkHelper.parseAtlas(tileMap.data, levelIndex, atlasTexture, getTexture);
+    if (tileMap.kind === "ldtk") {
+      return PixiLDtkHelper.parseAtlas(
+        tileMap.data,
+        levelIndex,
+        atlasTexture,
+        getTexture
+      );
     }
-    if(tileMap.kind === "tiled") {
-      return PixiTiledHelper.parseAtlas(tileMap.data, levelIndex, atlasTexture, getTexture);
+    if (tileMap.kind === "tiled") {
+      return PixiTiledHelper.parseAtlas(
+        tileMap.data,
+        levelIndex,
+        atlasTexture,
+        getTexture
+      );
     }
-    
+
     console.warn(
       "The loaded Tiled map data does not contain a 'tiledversion' or '__header__' key. Are you sure this file has been exported from Tiled (mapeditor.org) or LDtk (ldtk.io)?"
     );
@@ -54,7 +68,7 @@ export namespace PixiTileMapHelper {
     tileMap: EditableTileMap,
     textureCache: TileTextureCache,
     displayMode: "index" | "visible" | "all",
-    layerIndex: number,
+    layerIndex: number
   ): void {
     // The extension doesn't handle the Pixi sub-namespace very well.
     const pixiTileMap = untypedPixiTileMap as PIXI.tilemap.CompositeTilemap;
@@ -78,7 +92,7 @@ export namespace PixiTileMapHelper {
               texture,
               object.x,
               object.y - objectLayer.tileMap.getTileHeight(),
-              { rotate: object.rotate}
+              { rotate: object.rotate }
             );
           }
         }
@@ -99,18 +113,25 @@ export namespace PixiTileMapHelper {
             if (tiles === undefined) {
               continue;
             }
-            for(const tile of tiles) {
+            for (const tile of tiles) {
               const tileTexture = textureCache.findTileTexture(tile.tileId);
               if (!tileTexture) {
                 console.warn(`Unknown tile id: ${tile.tileId} at (${x}, ${y})`);
                 continue;
               }
-              const pixiTilemapFrame = pixiTileMap.tile(tileTexture, xPos, yPos, {
-                alpha: tile.alpha,
-                rotate: tile.rotate,
-              });
+              const pixiTilemapFrame = pixiTileMap.tile(
+                tileTexture,
+                xPos,
+                yPos,
+                {
+                  alpha: tile.alpha,
+                  rotate: tile.rotate,
+                }
+              );
 
-              const tileDefinition = tileLayer.tileMap.getTileDefinition(tile.tileId);
+              const tileDefinition = tileLayer.tileMap.getTileDefinition(
+                tile.tileId
+              );
 
               // Animated tiles have a limitation:
               // they are only able to use frames arranged horizontally one next
@@ -160,7 +181,9 @@ export namespace PixiTileMapHelper {
             const yPos = tileHeight * y;
 
             const tile = tileLayer.getTile(x, y)[0];
-            const tileDefinition = tileLayer.tileMap.getTileDefinition(tile.tileId);
+            const tileDefinition = tileLayer.tileMap.getTileDefinition(
+              tile.tileId
+            );
             if (!tileDefinition) {
               continue;
             }

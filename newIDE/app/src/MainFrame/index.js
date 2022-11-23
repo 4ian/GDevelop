@@ -1459,7 +1459,7 @@ const MainFrame = (props: Props) => {
         openSceneEditor = true,
       }: { openEventsEditor: boolean, openSceneEditor: boolean } = {},
       editorTabs = state.editorTabs
-    ) => {
+    ): EditorTabsState => {
       const sceneEditorOptions = {
         label: name,
         projectItemName: name,
@@ -1490,6 +1490,7 @@ const MainFrame = (props: Props) => {
       setIsLoadingProject(false);
       setLoaderModalProgress(null, null);
       openProjectManager(false);
+      return tabsWithSceneAndEventsEditors;
     },
     [i18n, setState, state.editorTabs]
   );
@@ -1763,14 +1764,20 @@ const MainFrame = (props: Props) => {
       const layoutsCount = currentProject.getLayoutsCount();
       if (layoutsCount === 0) return;
 
+      let editorTabs = state.editorTabs;
+
       for (let layoutIndex = 0; layoutIndex < layoutsCount; layoutIndex++) {
-        openLayout(currentProject.getLayoutAt(0).getName(), {
-          openSceneEditor: true,
-          openEventsEditor: true,
-        });
+        editorTabs = openLayout(
+          currentProject.getLayoutAt(layoutIndex).getName(),
+          {
+            openSceneEditor: true,
+            openEventsEditor: true,
+          },
+          editorTabs
+        );
       }
     },
-    [openLayout]
+    [openLayout, state.editorTabs]
   );
 
   const chooseProjectWithStorageProviderPicker = React.useCallback(
@@ -2618,7 +2625,9 @@ const MainFrame = (props: Props) => {
       askToCloseProject();
     },
     onExportGame: React.useCallback(() => openExportDialog(true), []),
-    onOpenLayout: openLayout,
+    onOpenLayout: name => {
+      openLayout(name);
+    },
     onOpenExternalEvents: openExternalEvents,
     onOpenExternalLayout: openExternalLayout,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
@@ -2692,7 +2701,9 @@ const MainFrame = (props: Props) => {
             onChangeProjectName={onChangeProjectName}
             onSaveProjectProperties={onSaveProjectProperties}
             onOpenExternalEvents={openExternalEvents}
-            onOpenLayout={openLayout}
+            onOpenLayout={name => {
+              openLayout(name);
+            }}
             onOpenExternalLayout={openExternalLayout}
             onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
             onInstallExtension={onInstallExtension}
@@ -2802,18 +2813,20 @@ const MainFrame = (props: Props) => {
                     projectItemName: editorTab.projectItemName,
                     setPreviewedLayout,
                     onOpenExternalEvents: openExternalEvents,
-                    onOpenEvents: (sceneName: string) =>
+                    onOpenEvents: (sceneName: string) => {
                       openLayout(sceneName, {
                         openEventsEditor: true,
                         openSceneEditor: false,
-                      }),
+                      });
+                    },
                     previewDebuggerServer,
                     hotReloadPreviewButtonProps,
-                    onOpenLayout: name =>
+                    onOpenLayout: name => {
                       openLayout(name, {
                         openEventsEditor: true,
                         openSceneEditor: false,
-                      }),
+                      });
+                    },
                     resourceSources: props.resourceSources,
                     onChooseResource,
                     resourceExternalEditors,

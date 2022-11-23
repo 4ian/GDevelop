@@ -10,11 +10,14 @@ import ScrollView from '../UI/ScrollView';
 import Window from '../Utils/Window';
 import {
   sendAssetOpened,
+  sendAssetPackInformationOpened,
   sendAssetPackOpened,
 } from '../Utils/Analytics/EventSender';
 import {
   type AssetShortHeader,
   type PublicAssetPack,
+  type PublicAssetPacks,
+  type PrivateAssetPack,
 } from '../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import {
@@ -53,6 +56,27 @@ type Props = {|
 export type AssetStoreInterface = {|
   onClose: () => void,
 |};
+
+const identifyAssetPackKind = ({
+  privateAssetPacks,
+  publicAssetPacks,
+  assetPack,
+}: {|
+  privateAssetPacks: ?Array<PrivateAssetPackListingData>,
+  publicAssetPacks: ?PublicAssetPacks,
+  assetPack: PrivateAssetPack | PublicAssetPack | null,
+|}) => {
+  if (!assetPack) return 'unknown';
+
+  return assetPack.id &&
+    privateAssetPacks &&
+    !!privateAssetPacks.find(({ id }) => id === assetPack.id)
+    ? 'private'
+    : publicAssetPacks &&
+      publicAssetPacks.starterPacks.find(({ tag }) => tag === assetPack.tag)
+    ? 'public'
+    : 'unknown';
+};
 
 export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
   ({ project }: Props, ref) => {
@@ -156,21 +180,44 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
 
     const onOpenDetails = React.useCallback(
       (assetShortHeader: AssetShortHeader) => {
+        const assetPackName = openedAssetPack ? openedAssetPack.name : null;
+        const assetPackTag = openedAssetPack ? openedAssetPack.tag : null;
+        const assetPackId =
+          openedAssetPack && openedAssetPack.id ? openedAssetPack.id : null;
+        const assetPackKind = identifyAssetPackKind({
+          assetPack: openedAssetPack,
+          publicAssetPacks,
+          privateAssetPacks,
+        });
         sendAssetOpened({
           id: assetShortHeader.id,
           name: assetShortHeader.name,
+          assetPackName,
+          assetPackTag,
+          assetPackId,
+          assetPackKind,
         });
         saveScrollPosition();
         navigationState.openDetailPage(assetShortHeader);
       },
-      [saveScrollPosition, navigationState]
+      [
+        openedAssetPack,
+        publicAssetPacks,
+        privateAssetPacks,
+        saveScrollPosition,
+        navigationState,
+      ]
     );
 
     // When a pack is selected from the home page,
     // we set it as the chosen category and open the filters panel.
     const selectPublicAssetPack = React.useCallback(
       (assetPack: PublicAssetPack) => {
-        sendAssetPackOpened(assetPack.tag);
+        sendAssetPackOpened({
+          assetPackTag: assetPack.tag,
+          assetPackName: assetPack.name,
+          assetPackKind: 'public',
+        });
 
         if (assetPack.externalWebLink) {
           Window.openExternalURL(assetPack.externalWebLink);
@@ -188,8 +235,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     // otherwise we open the dialog to buy it.
     const selectPrivateAssetPack = React.useCallback(
       (assetPackListingData: PrivateAssetPackListingData) => {
-        sendAssetPackOpened(assetPackListingData.name);
-
         const receivedAssetPack = loadedReceivedAssetPackInStore
           ? loadedReceivedAssetPackInStore.find(
               pack => pack.id === assetPackListingData.id
@@ -198,11 +243,22 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
 
         if (!receivedAssetPack) {
           // The user has not received the pack, open the dialog to buy it.
+          sendAssetPackInformationOpened({
+            assetPackName: assetPackListingData.name,
+            assetPackId: assetPackListingData.id,
+            assetPackKind: 'private',
+          });
+
           setSelectedPrivateAssetPackListingData(assetPackListingData);
           return;
         }
 
         // The user has received the pack, open it.
+        sendAssetPackOpened({
+          assetPackName: assetPackListingData.name,
+          assetPackId: assetPackListingData.id,
+          assetPackKind: 'private',
+        });
         saveScrollPosition();
         navigationState.openPackPage(receivedAssetPack);
         setIsFiltersPanelOpen(true);

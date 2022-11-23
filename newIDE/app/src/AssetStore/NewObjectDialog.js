@@ -211,6 +211,11 @@ export default function NewObjectDialog({
           sendAssetAddedToProject({
             id: openedAssetShortHeader.id,
             name: openedAssetShortHeader.name,
+            kind: isPrivate ? 'private' : 'public',
+            assetPackName: openedAssetPack ? openedAssetPack.name : null,
+            assetPackTag: openedAssetPack ? openedAssetPack.tag : null,
+            assetPackId: openedAssetPack && openedAssetPack.id ? openedAssetPack.id : null,
+            assetPackKind: isPrivate ? 'private' : 'public',
           });
 
           installOutput.createdObjects.forEach(object => {
@@ -238,6 +243,7 @@ export default function NewObjectDialog({
       objectsContainer,
       onObjectAddedFromAsset,
       openedAssetShortHeader,
+      openedAssetPack,
       environment,
       onFetchNewlyAddedResources,
       installPrivateAsset,

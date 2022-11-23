@@ -29,43 +29,20 @@ const gdevelopUsageOptions = [
     label: t`Personal`,
   },
   {
-    value: 'work',
-    label: t`Work`,
-  },
-  {
-    value: 'education',
-    label: t`Education`,
-  },
-  {
-    value: 'promotion',
-    label: t`Promotion`,
-  },
-  {
-    value: 'other',
-    label: t`Other`,
-  },
-];
-
-const currentWorkOptions = [
-  {
     value: 'student',
     label: t`Student`,
   },
   {
-    value: 'gamedev',
-    label: t`Game development`,
-  },
-  {
-    value: 'gameart',
-    label: t`Game art`,
+    value: 'teacher',
+    label: t`Teacher`,
   },
   {
     value: 'marketing',
     label: t`Marketing and Advertising`,
   },
   {
-    value: 'education',
-    label: t`Education`,
+    value: 'work',
+    label: t`Work`,
   },
   {
     value: 'other',
@@ -80,15 +57,15 @@ const creationExperienceOptions = [
   },
   {
     value: 'code-experience',
-    label: t`I've mainly created games with code (Godot, Unreal Engine, Unity, ...)`,
+    label: t`I've created games with code before`,
   },
   {
     value: 'nocode-experience',
-    label: t`I have created games with no-code engines (GameMaker, Construct, Buildbox, ...)`,
+    label: t`I've created games with no-code engines before`,
   },
   {
     value: 'code-and-nocode-experience',
-    label: t`I have created games using both code and no-code engines.`,
+    label: t`I've created games with both code and no-code engines before`,
   },
 ];
 
@@ -127,6 +104,21 @@ const hearFromOptions = [
   },
 ];
 
+const selectFields = {
+  usage: {
+    title: <Trans>What are you using GDevelop for?</Trans>,
+    options: gdevelopUsageOptions,
+  },
+  creationExperience: {
+    title: <Trans>Have you used other game engines?</Trans>,
+    options: creationExperienceOptions,
+  },
+  hearFrom: {
+    title: <Trans>How did you hear about GDevelop?</Trans>,
+    options: hearFromOptions,
+  },
+};
+
 type Props = {|
   onClose: () => void,
   onSaveAdditionalUserInfo: (form: AdditionalUserInfoForm) => Promise<void>,
@@ -141,7 +133,6 @@ const AdditionalUserInfoDialog = ({
   const windowWidth = useResponsiveWindowWidth();
   const styles = getStyles({ windowWidth });
   const [gdevelopUsage, setGdevelopUsage] = React.useState<string>('');
-  const [currentWork, setCurrentWork] = React.useState<string>('');
   const [creationExperience, setCreationExperience] = React.useState<string>(
     ''
   );
@@ -152,10 +143,16 @@ const AdditionalUserInfoDialog = ({
 
     onSaveAdditionalUserInfo({
       gdevelopUsage,
-      currentWork,
       creationExperience,
       hearFrom,
     });
+  };
+
+  const selectFieldCommonProps = {
+    translatableHintText: t`Select one`,
+    fullWidth: true,
+    disabled: updateInProgress,
+    disableUnderline: true,
   };
 
   return (
@@ -202,27 +199,23 @@ const AdditionalUserInfoDialog = ({
         <Column noMargin alignItems="center">
           <Text size="body2" noMargin align="center">
             <Trans>
-              Your answers will help us personalize your experience with game
-              creation. Of course, they will stay private and won't be sent to
-              anyone else
+              Your answers will help us better understand our users and make the
+              engine better for them. Of course, your answers will stay private
+              and won't be sent to anyone else
             </Trans>
           </Text>
         </Column>
         <div style={styles.formContainer}>
           <ColumnStackLayout noMargin>
             <SelectField
-              floatingLabelText={
-                <Trans>What would you use GDevelop for?</Trans>
-              }
-              translatableHintText={t`Select one`}
+              floatingLabelText={selectFields.usage.title}
               value={gdevelopUsage}
               onChange={(e, i, newUsage: string) => {
                 setGdevelopUsage(newUsage);
               }}
-              fullWidth
-              disabled={updateInProgress}
+              {...selectFieldCommonProps}
             >
-              {gdevelopUsageOptions.map(usageOption => (
+              {selectFields.usage.options.map(usageOption => (
                 <SelectOption
                   key={usageOption.value}
                   value={usageOption.value}
@@ -231,38 +224,14 @@ const AdditionalUserInfoDialog = ({
               ))}
             </SelectField>
             <SelectField
-              floatingLabelText={<Trans>What kind of work do you do?</Trans>}
-              translatableHintText={t`Select one`}
-              value={currentWork}
-              onChange={(e, i, newWork: string) => {
-                setCurrentWork(newWork);
-              }}
-              fullWidth
-              disableUnderline
-              disabled={updateInProgress}
-            >
-              {currentWorkOptions.map(workOption => (
-                <SelectOption
-                  key={workOption.value}
-                  value={workOption.value}
-                  primaryText={workOption.label}
-                />
-              ))}
-            </SelectField>
-            <SelectField
-              floatingLabelText={
-                <Trans>Have you used other game creation engines?</Trans>
-              }
-              translatableHintText={t`Select one`}
+              floatingLabelText={selectFields.creationExperience.title}
               value={creationExperience}
               onChange={(e, i, newCreationExpersience: string) => {
                 setCreationExperience(newCreationExpersience);
               }}
-              fullWidth
-              disableUnderline
-              disabled={updateInProgress}
+              {...selectFieldCommonProps}
             >
-              {creationExperienceOptions.map(experienceOption => (
+              {selectFields.creationExperience.options.map(experienceOption => (
                 <SelectOption
                   key={experienceOption.value}
                   value={experienceOption.value}
@@ -271,19 +240,14 @@ const AdditionalUserInfoDialog = ({
               ))}
             </SelectField>
             <SelectField
-              floatingLabelText={
-                <Trans>How did you hear about GDevelop?</Trans>
-              }
-              translatableHintText={t`Select one`}
+              floatingLabelText={selectFields.hearFrom.title}
               value={hearFrom}
               onChange={(e, i, newHearFrom: string) => {
                 setHearFrom(newHearFrom);
               }}
-              fullWidth
-              disableUnderline
-              disabled={updateInProgress}
+              {...selectFieldCommonProps}
             >
-              {hearFromOptions.map(hearFromOption => (
+              {selectFields.hearFrom.options.map(hearFromOption => (
                 <SelectOption
                   key={hearFromOption.value}
                   value={hearFromOption.value}

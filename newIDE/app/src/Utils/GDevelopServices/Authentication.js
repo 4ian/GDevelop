@@ -28,7 +28,6 @@ export type Profile = {|
   hearFrom?: string,
   gdevelopUsage?: string,
   creationExperience?: string,
-  currentWork?: string,
 |};
 
 export type LoginForm = {|
@@ -50,7 +49,6 @@ export type RegisterForm = {|
 export type AdditionalUserInfoForm = {|
   hearFrom?: string,
   creationExperience?: string,
-  currentWork?: string,
   gdevelopUsage?: string,
 |};
 
@@ -299,7 +297,6 @@ export default class Authentication {
       hearFrom,
       gdevelopUsage,
       creationExperience,
-      currentWork,
     }: {
       username?: string,
       description?: string,
@@ -310,7 +307,6 @@ export default class Authentication {
       hearFrom?: string,
       gdevelopUsage?: string,
       creationExperience?: string,
-      currentWork?: string,
     }
   ) => {
     const { currentUser } = this.auth;
@@ -331,7 +327,6 @@ export default class Authentication {
             hearFrom,
             gdevelopUsage,
             creationExperience,
-            currentWork,
           },
           {
             params: {

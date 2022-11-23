@@ -353,8 +353,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       !this._hasNotifiedUserAboutAdditionalInfo &&
       !userProfile.hearFrom &&
       !userProfile.gdevelopUsage &&
-      !userProfile.creationExperience &&
-      !userProfile.currentWork
+      !userProfile.creationExperience
     ) {
       setTimeout(() => this.openAdditionalUserInfoDialog(true), 1000);
     }
@@ -633,7 +632,6 @@ export default class AuthenticatedUserProvider extends React.Component<
         authentication.getAuthorizationHeader,
         {
           hearFrom: form.hearFrom,
-          currentWork: form.currentWork,
           gdevelopUsage: form.gdevelopUsage,
           creationExperience: form.creationExperience,
         }

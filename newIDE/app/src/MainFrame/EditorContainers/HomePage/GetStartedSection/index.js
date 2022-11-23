@@ -13,7 +13,10 @@ import {
 import Checkbox from '../../../../UI/Checkbox';
 import { Line, LargeSpacer } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
-import { ColumnStackLayout } from '../../../../UI/Layout';
+import {
+  ColumnStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../../../UI/Layout';
 import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import Window from '../../../../Utils/Window';
@@ -89,7 +92,7 @@ const GetStartedSection = ({
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
   );
-  const shouldShowOnboardingButton = !isMobile() && windowWidth !== 'small';
+  const shouldShowInAppTutorialButtons = !isMobile() && windowWidth !== 'small';
   const items: {
     key: string,
     title: React.Node,
@@ -201,20 +204,30 @@ const GetStartedSection = ({
     },
   ];
 
+  const Subtitle = () => (
+    <ResponsiveLineStackLayout
+      justifyContent="space-between"
+      noColumnMargin
+      noMargin
+    >
+      <Text>
+        <Trans>Our recommended first steps for newcomers</Trans>
+      </Text>
+      <Checkbox
+        label={<Trans>Don't show this screen on next startup</Trans>}
+        checked={!showGetStartedSection}
+        onCheck={(e, checked) => setShowGetStartedSection(!checked)}
+      />
+    </ResponsiveLineStackLayout>
+  );
+
   return (
     <SectionContainer
       title={<Trans>Get started!</Trans>}
-      subtitle={<Trans>Our recommended first steps for newcomers</Trans>}
+      renderSubtitle={() => <Subtitle />}
     >
-      <SectionRow>
-        <Line>
-          <Checkbox
-            label={<Trans>Don't show this screen on next startup</Trans>}
-            checked={!showGetStartedSection}
-            onCheck={(e, checked) => setShowGetStartedSection(!checked)}
-          />
-        </Line>
-        {shouldShowOnboardingButton && (
+      {shouldShowInAppTutorialButtons && (
+        <SectionRow>
           <Line>
             <div style={styles.bannerContainer}>
               {inAppTutorialShortHeaders === null ? (
@@ -238,11 +251,15 @@ const GetStartedSection = ({
               )}
             </div>
           </Line>
-        )}
-      </SectionRow>
+        </SectionRow>
+      )}
       <SectionRow>
         <Text size="title" noMargin>
-          <Trans>Want to explore further?</Trans>
+          {shouldShowInAppTutorialButtons ? (
+            <Trans>Want to explore further?</Trans>
+          ) : (
+            <Trans>Explore GDevelop Content</Trans>
+          )}
         </Text>
         <Text size="body" color="secondary" noMargin>
           <Trans>Articles, wiki and much more.</Trans>

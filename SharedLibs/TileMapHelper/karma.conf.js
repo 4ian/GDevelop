@@ -10,8 +10,9 @@ module.exports = function (config) {
     },
     files: [
       { pattern: "node_modules/expect.js/index.js" },
-      { pattern: "./src/datatypes/**/*.ts" },
+      { pattern: "./src/load/**/*.ts" },
       { pattern: "./src/model/*.ts" },
+      { pattern: "./src/types/*.ts" },
     ],
     preprocessors: {
       "**/*.ts": 'karma-typescript',

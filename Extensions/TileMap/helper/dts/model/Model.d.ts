@@ -190,13 +190,37 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
     /**
      * @param x The layer column.
      * @param y The layer row.
-     * @returns The tile identifier from the tile set.
+     * @returns The tile.
      */
-    getTile(x: integer, y: integer): EditableTile[] | undefined;
+    getTile(x: integer, y: integer): EditableTile | undefined;
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @returns The stacked tiles.
+     */
+    getTiles(x: integer, y: integer): EditableTile[] | undefined;
     /**
      * @returns The layer width in pixels.
      */
     getWidth(): integer;
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @returns true if the tile is flipped horizontally.
+     */
+    isFlippedHorizontally(x: integer, y: integer): boolean;
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @returns true if the tile is flipped vertically.
+     */
+    isFlippedVertically(x: integer, y: integer): boolean;
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @returns true if the tile is flipped diagonally.
+     */
+    isFlippedDiagonally(x: integer, y: integer): boolean;
     /**
      * @param x The layer column.
      * @param y The layer row.

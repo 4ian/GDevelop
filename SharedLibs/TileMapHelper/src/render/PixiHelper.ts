@@ -109,7 +109,7 @@ export namespace PixiTileMapHelper {
             const xPos = tileWidth * x;
             const yPos = tileHeight * y;
 
-            const tiles = tileLayer.getTile(x, y);
+            const tiles = tileLayer.getTiles(x, y);
             if (tiles === undefined) {
               continue;
             }
@@ -180,7 +180,10 @@ export namespace PixiTileMapHelper {
             const xPos = tileWidth * x;
             const yPos = tileHeight * y;
 
-            const tile = tileLayer.getTile(x, y)[0];
+            const tile = tileLayer.getTile(x, y);
+            if (!tile) {
+              continue;
+            }
             const tileDefinition = tileLayer.tileMap.getTileDefinition(
               tile.tileId
             );

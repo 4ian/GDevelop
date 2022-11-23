@@ -166,11 +166,11 @@ export class EditableTileMap {
       if (!tileLayer) {
         continue;
       }
-      const tiles = tileLayer.getTile(indexX, indexY);
-      if (tiles === undefined) {
+      const tile = tileLayer.getTile(indexX, indexY);
+      if (!tile) {
         return false;
       }
-      const tileDefinition = this._tileSet.get(tiles[0].tileId);
+      const tileDefinition = this._tileSet.get(tile.tileId);
       if (tileDefinition!.hasTag(tag)) {
         return true;
       }
@@ -317,9 +317,22 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   /**
    * @param x The layer column.
    * @param y The layer row.
-   * @returns The tile identifier from the tile set.
+   * @returns The tile.
    */
-  getTile(x: integer, y: integer): EditableTile[] | undefined {
+  getTile(x: integer, y: integer): EditableTile | undefined {
+    const row = this._tiles[y];
+    if (!row || !row[x]) {
+      return;
+    }
+    return row[x][0];
+  }
+  
+  /**
+   * @param x The layer column.
+   * @param y The layer row.
+   * @returns The stacked tiles.
+   */
+  getTiles(x: integer, y: integer): EditableTile[] | undefined {
     const row = this._tiles[y];
     if (!row) {
       return;
@@ -332,6 +345,36 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    */
   getWidth(): integer {
     return this.tileMap.getWidth();
+  }
+
+  /**
+   * @param x The layer column.
+   * @param y The layer row.
+   * @returns true if the tile is flipped horizontally.
+   */
+  isFlippedHorizontally(x: integer, y: integer): boolean {
+    var tile = this._tiles[y][x];
+    return tile ? tile[0].flippedHorizontally : false;
+  }
+
+  /**
+   * @param x The layer column.
+   * @param y The layer row.
+   * @returns true if the tile is flipped vertically.
+   */
+  isFlippedVertically(x: integer, y: integer): boolean {
+    var tile = this._tiles[y][x];
+    return tile ? tile[0].flippedVertically : false;
+  }
+
+  /**
+   * @param x The layer column.
+   * @param y The layer row.
+   * @returns true if the tile is flipped diagonally.
+   */
+  isFlippedDiagonally(x: integer, y: integer): boolean {
+    var tile = this._tiles[y][x];
+    return tile ? tile[0].flippedDiagonally : false;
   }
 
   /**

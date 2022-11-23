@@ -4,8 +4,8 @@ import { TileTextureCache } from "./TextureCache";
 import { PixiTileMapHelper } from "./PixiHelper";
 
 import PIXI = GlobalPIXIModule.PIXI;
-import { TileMap } from "../datatypes/Format";
-import { TileMapLoader } from "../datatypes/Loader";
+import { TileMapLoader } from "../load/Loader";
+import { TileMap } from "../types";
 
 /**
  * A holder to share tile maps across the 2 extension objects.

@@ -3,7 +3,6 @@
  * @module TileMapHelper
  */
 
-export { TiledTileMap, TiledTileset } from "./datatypes/tiled/Format";
 export {
   EditableTileMap,
   EditableTileMapLayer,
@@ -14,5 +13,5 @@ export { TileMapManager } from "./render/Manager";
 export { TileTextureCache } from "./render/TextureCache";
 export { PixiTileMapHelper } from "./render/PixiHelper";
 
-export * from "./datatypes/Format";
-export * from "./model/CommonTypes";
+export * from "./types/index";
+export * from "./types/commons";

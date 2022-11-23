@@ -1,8 +1,8 @@
-import { integer, float } from "../model/CommonTypes";
+import { integer, float } from "../types/commons";
 import { EditableObjectLayer, EditableTileMap, EditableTileMapLayer } from "../model/Model";
-import { TileMap } from "../datatypes/Format";
 import { PixiTiledHelper } from "./tiled/PixiHelper";
 import { PixiLDtkHelper } from "./ldtk/PixiHelper";
+import { TileMap } from "../types";
 import { TileTextureCache } from "./TextureCache";
 
 import PIXI = GlobalPIXIModule.PIXI;

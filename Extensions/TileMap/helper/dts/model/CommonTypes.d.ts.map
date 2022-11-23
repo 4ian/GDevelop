@@ -1,1 +1,0 @@
-{"version":3,"file":"CommonTypes.d.ts","sourceRoot":"","sources":["../../src/model/CommonTypes.ts"],"names":[],"mappings":"AAAA,MAAM,CAAC,OAAO,MAAM,OAAO,GAAG,MAAM,CAAC;AACrC,MAAM,CAAC,OAAO,MAAM,KAAK,GAAG,MAAM,CAAC;AACnC,MAAM,MAAM,UAAU,GAAG,CAAC,KAAK,EAAE,KAAK,CAAC,CAAC;AAExC,MAAM,MAAM,eAAe,GAAG,UAAU,EAAE,CAAC"}

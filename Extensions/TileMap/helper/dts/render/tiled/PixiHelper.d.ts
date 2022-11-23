@@ -1,5 +1,5 @@
 import { TileTextureCache } from "../TextureCache";
-import { TiledTileMap } from "../../datatypes/tiled/Format";
+import { TiledTileMap } from "../../types/Tiled";
 import PIXI = GlobalPIXIModule.PIXI;
 export declare namespace PixiTiledHelper {
     /**

@@ -1,7 +1,7 @@
 import { EditableTileMap } from "../model/Model";
 import { TileTextureCache } from "./TextureCache";
 import PIXI = GlobalPIXIModule.PIXI;
-import { TileMap } from "../datatypes/Format";
+import { TileMap } from "../types";
 /**
  * A holder to share tile maps across the 2 extension objects.
  *

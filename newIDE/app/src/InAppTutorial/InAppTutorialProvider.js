@@ -14,7 +14,6 @@ import {
 type Props = {| children: React.Node |};
 
 const InAppTutorialProvider = (props: Props) => {
-  const flingTutorial = require('./Tutorials/flingGame.json');
   const [tutorial, setTutorial] = React.useState<InAppTutorial | null>(null);
   const [startStepIndex, setStartStepIndex] = React.useState<number>(0);
   const [startProjectData, setStartProjectData] = React.useState<{
@@ -39,15 +38,6 @@ const InAppTutorialProvider = (props: Props) => {
       setStartProjectData(initialProjectData);
       setTutorial(onboardingTutorial);
       setCurrentlyRunningInAppTutorial(tutorialId);
-      return;
-    }
-
-    // TODO: To remove
-    if (tutorialId === flingTutorial.id) {
-      setStartStepIndex(initialStepIndex);
-      setStartProjectData(initialProjectData);
-      setTutorial(flingTutorial);
-      setCurrentlyRunningInAppTutorial(flingTutorial.id);
       return;
     }
 

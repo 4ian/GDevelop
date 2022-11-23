@@ -87,10 +87,11 @@ export class TileMapManager {
     ) => void,
     tileMapJsonResourceName: string,
     tileSetJsonResourceName: string,
+    levelIndex: number,
     pako: any,
     callback: (tileMap: EditableTileMap | null) => void
   ): void {
-    const key = tileMapJsonResourceName + "|" + tileSetJsonResourceName;
+    const key = tileMapJsonResourceName + "|" + tileSetJsonResourceName + "|" + levelIndex;
 
     this._tileMapCache.getOrLoad(
       key,
@@ -104,8 +105,8 @@ export class TileMapManager {
               return;
             }
 
-            const collisionTileMap = TileMapLoader.load(pako, tileMap);
-            callback(collisionTileMap);
+            const editableTileMap = TileMapLoader.load(tileMap, levelIndex, pako);
+            callback(editableTileMap);
           }
         );
       },
@@ -131,6 +132,7 @@ export class TileMapManager {
     atlasImageResourceName: string,
     tileMapJsonResourceName: string,
     tileSetJsonResourceName: string,
+    levelIndex: number,
     callback: (textureCache: TileTextureCache | null) => void
   ): void {
     const key =
@@ -138,7 +140,9 @@ export class TileMapManager {
       "|" +
       tileSetJsonResourceName +
       "|" +
-      atlasImageResourceName;
+      atlasImageResourceName + 
+      "|" +
+      levelIndex;
 
     this._textureCacheCaches.getOrLoad(
       key,
@@ -158,6 +162,7 @@ export class TileMapManager {
               : null;
             const textureCache = PixiTileMapHelper.parseAtlas(
               tileMap,
+              levelIndex,
               atlasTexture,
               getTexture
             );

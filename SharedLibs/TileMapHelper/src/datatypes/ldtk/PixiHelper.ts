@@ -48,10 +48,10 @@ export namespace PixiLDtkHelper {
    */
   export function parseAtlas(
     tileMap: LDtkTileMap,
+    levelIndex: number,
     atlasTexture: Texture | null,
     getTexture: TextureLoader
   ): TileTextureCache | null {
-    const levelIndex = 0;
     const level = tileMap.levels[levelIndex > -1 ? levelIndex : 0];
     if (!level || !level.layerInstances) {
       return null;

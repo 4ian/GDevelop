@@ -14,6 +14,7 @@ export namespace PixiTiledHelper {
    */
   export function parseAtlas(
     tileMap: TiledTileMap,
+    levelIndex: number,
     atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
     getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
   ): TileTextureCache | null {

@@ -60,17 +60,20 @@ namespace gdjs {
       /**
        * @param tileMapJsonResourceName The resource name of the tile map.
        * @param tileSetJsonResourceName The resource name of the tile set.
+       * @param levelIndex The level of the tile map.
        * @param callback A function called when the tile map is parsed.
        */
       getOrLoadTileMap(
         tileMapJsonResourceName: string,
         tileSetJsonResourceName: string,
+        levelIndex: number,
         callback: (tileMap: TileMapHelper.EditableTileMap | null) => void
       ): void {
         this._manager.getOrLoadTileMap(
           this._loadTileMap.bind(this),
           tileMapJsonResourceName,
           tileSetJsonResourceName,
+          levelIndex,
           pako,
           callback
         );
@@ -81,6 +84,7 @@ namespace gdjs {
        * @param atlasImageResourceName The resource name of the atlas image.
        * @param tileMapJsonResourceName The resource name of the tile map.
        * @param tileSetJsonResourceName The resource name of the tile set.
+       * @param levelIndex The level of the tile map.
        * @param callback A function called when the tiles textures are split.
        */
       getOrLoadTextureCache(
@@ -88,6 +92,7 @@ namespace gdjs {
         atlasImageResourceName: string,
         tileMapJsonResourceName: string,
         tileSetJsonResourceName: string,
+        levelIndex: number,
         callback: (textureCache: TileMapHelper.TileTextureCache | null) => void
       ): void {
         this._manager.getOrLoadTextureCache(
@@ -96,6 +101,7 @@ namespace gdjs {
           atlasImageResourceName,
           tileMapJsonResourceName,
           tileSetJsonResourceName,
+          levelIndex,
           callback
         );
       }

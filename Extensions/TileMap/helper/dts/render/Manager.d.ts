@@ -31,7 +31,7 @@ export declare class TileMapManager {
      * @param pako The zlib library.
      * @param callback A function called when the tile map is parsed.
      */
-    getOrLoadTileMap(loadTileMap: (tileMapJsonResourceName: string, tileSetJsonResourceName: string, callback: (tileMap: TileMap | null) => void) => void, tileMapJsonResourceName: string, tileSetJsonResourceName: string, pako: any, callback: (tileMap: EditableTileMap | null) => void): void;
+    getOrLoadTileMap(loadTileMap: (tileMapJsonResourceName: string, tileSetJsonResourceName: string, callback: (tileMap: TileMap | null) => void) => void, tileMapJsonResourceName: string, tileSetJsonResourceName: string, levelIndex: number, pako: any, callback: (tileMap: EditableTileMap | null) => void): void;
     /**
      * @param loadTileMap The method that loads the Tiled JSON file in memory.
      * @param getTexture The method that loads the atlas image file in memory.
@@ -40,6 +40,6 @@ export declare class TileMapManager {
      * @param tileSetJsonResourceName The resource name of the tile set.
      * @param callback A function called when the tiles textures are split.
      */
-    getOrLoadTextureCache(loadTileMap: (tileMapJsonResourceName: string, tileSetJsonResourceName: string, callback: (tileMap: TileMap | null) => void) => void, getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>, atlasImageResourceName: string, tileMapJsonResourceName: string, tileSetJsonResourceName: string, callback: (textureCache: TileTextureCache | null) => void): void;
+    getOrLoadTextureCache(loadTileMap: (tileMapJsonResourceName: string, tileSetJsonResourceName: string, callback: (tileMap: TileMap | null) => void) => void, getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>, atlasImageResourceName: string, tileMapJsonResourceName: string, tileSetJsonResourceName: string, levelIndex: number, callback: (textureCache: TileTextureCache | null) => void): void;
 }
 //# sourceMappingURL=Manager.d.ts.map

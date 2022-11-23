@@ -7,7 +7,7 @@ import { decodeBase64LayerData, decodeTiledGUI, getTileIdFromTiledGUI } from "./
  * It creates a {@link EditableTileMap} from a Tiled JSON.
  */
 export namespace TiledTileMapLoader {
-  export function load(pako: any, tileMap: TiledTileMap): EditableTileMap | null {
+  export function load(tileMap: TiledTileMap, pako: any): EditableTileMap | null {
     if (!tileMap.tiledversion) {
       console.warn(
         "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?"

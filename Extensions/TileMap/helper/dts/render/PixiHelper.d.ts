@@ -12,7 +12,7 @@ export declare namespace PixiTileMapHelper {
      * @param getTexture A getter to load a texture. Used if atlasTexture is not specified.
      * @returns A textures cache.
      */
-    function parseAtlas(tileMap: TileMap, atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null, getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>): TileTextureCache | null;
+    function parseAtlas(tileMap: TileMap, levelIndex: number, atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null, getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>): TileTextureCache | null;
     /**
      * Re-renders the tile map whenever its rendering settings have been changed
      *
@@ -26,7 +26,7 @@ export declare namespace PixiTileMapHelper {
      * @param layerIndex If `displayMode` is set to `index`, the layer index to be
      * displayed.
      */
-    function updatePixiTileMap(untypedPixiTileMap: any, tileMap: EditableTileMap, textureCache: TileTextureCache, displayMode: "index" | "visible" | "all", layerIndex: number, levelIndex: number): void;
+    function updatePixiTileMap(untypedPixiTileMap: any, tileMap: EditableTileMap, textureCache: TileTextureCache, displayMode: "index" | "visible" | "all", layerIndex: number): void;
     /**
      * Re-renders the collision mask
      */

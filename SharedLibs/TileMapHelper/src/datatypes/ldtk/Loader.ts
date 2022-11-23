@@ -4,8 +4,7 @@ import { LDtkTileMap } from "./Format";
 import { getLDtkTileId, getPixiRotateFromLDtk } from "./LoaderHelper";
 
 export namespace LDtkTileMapLoader {
-  export function load(pako: any, tileMap: LDtkTileMap): EditableTileMap | null {
-    const levelIndex = 0;
+  export function load(tileMap: LDtkTileMap, levelIndex: number): EditableTileMap | null {
     const level = tileMap.levels[levelIndex > -1 ? levelIndex : 0];
     if (!level || !level.layerInstances) {
       return null;
@@ -63,8 +62,8 @@ export namespace LDtkTileMapLoader {
       editableTileLayer.setVisible(layer.visible);
       
       for(const tile of [...layer.autoLayerTiles, ...layer.gridTiles]) {
-        const x = tile.px[0] / gridSize;
-        const y = tile.px[1] / gridSize;
+        const x = Math.floor(tile.px[0] / gridSize);
+        const y = Math.floor(tile.px[1] / gridSize);
         const tileId = getLDtkTileId(tilesetId, tile.t);
         
         editableTileLayer.addTile(x, y, {

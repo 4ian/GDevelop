@@ -12,7 +12,7 @@ export declare namespace PixiLDtkHelper {
      * @param getTexture A getter to load a texture. Used if atlasTexture is not specified.
      * @returns A textures cache.
      */
-    function parseAtlas(tileMap: LDtkTileMap, atlasTexture: Texture | null, getTexture: TextureLoader): TileTextureCache | null;
+    function parseAtlas(tileMap: LDtkTileMap, levelIndex: number, atlasTexture: Texture | null, getTexture: TextureLoader): TileTextureCache | null;
 }
 export {};
 //# sourceMappingURL=PixiHelper.d.ts.map

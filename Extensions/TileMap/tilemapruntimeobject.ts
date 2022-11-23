@@ -123,6 +123,7 @@ namespace gdjs {
       this._tileMapManager.getOrLoadTileMap(
         this._tilemapJsonFile,
         this._tilesetJsonFile,
+        this._levelIndex,
         (tileMap: TileMapHelper.EditableTileMap | null) => {
           if (!tileMap) {
             // getOrLoadTileMap already warn.
@@ -139,6 +140,7 @@ namespace gdjs {
             this._tilemapAtlasImage,
             this._tilemapJsonFile,
             this._tilesetJsonFile,
+            this._levelIndex,
             (textureCache: TileMapHelper.TileTextureCache | null) => {
               if (!textureCache) {
                 // getOrLoadTextureCache already log warns and errors.

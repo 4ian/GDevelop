@@ -4,12 +4,12 @@ import { TiledTileMapLoader } from "./tiled/Loader";
 import { LDtkTileMapLoader } from "./ldtk/Loader";
 
 export namespace TileMapLoader {
-  export function load(pako: any, tileMap: TileMap): EditableTileMap | null {
+  export function load(tileMap: TileMap, levelIndex: number, pako: any): EditableTileMap | null {
     if(tileMap.kind === "ldtk") {
-      return LDtkTileMapLoader.load(pako, tileMap.data);
+      return LDtkTileMapLoader.load(tileMap.data, levelIndex);
     }
     if(tileMap.kind === "tiled") {
-      return TiledTileMapLoader.load(pako, tileMap.data);
+      return TiledTileMapLoader.load(tileMap.data, pako);
     }
     
     console.warn(

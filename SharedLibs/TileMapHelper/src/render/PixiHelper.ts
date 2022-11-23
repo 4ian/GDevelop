@@ -18,14 +18,15 @@ export namespace PixiTileMapHelper {
    */
   export function parseAtlas(
     tileMap: TileMap,
+    levelIndex: number,
     atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
     getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
   ): TileTextureCache | null {
     if(tileMap.kind === "ldtk") {
-      return PixiLDtkHelper.parseAtlas(tileMap.data, atlasTexture, getTexture);
+      return PixiLDtkHelper.parseAtlas(tileMap.data, levelIndex, atlasTexture, getTexture);
     }
     if(tileMap.kind === "tiled") {
-      return PixiTiledHelper.parseAtlas(tileMap.data, atlasTexture, getTexture);
+      return PixiTiledHelper.parseAtlas(tileMap.data, levelIndex, atlasTexture, getTexture);
     }
     
     console.warn(
@@ -54,7 +55,6 @@ export namespace PixiTileMapHelper {
     textureCache: TileTextureCache,
     displayMode: "index" | "visible" | "all",
     layerIndex: number,
-    levelIndex: number
   ): void {
     // The extension doesn't handle the Pixi sub-namespace very well.
     const pixiTileMap = untypedPixiTileMap as PIXI.tilemap.CompositeTilemap;

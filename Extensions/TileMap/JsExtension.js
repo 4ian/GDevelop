@@ -1118,6 +1118,7 @@ module.exports = {
         this._loadTileMapWithCallback.bind(this),
         tilemapJsonFile,
         tilesetJsonFile,
+        levelIndex,
         pako,
         (tileMap) => {
           if (!tileMap) {
@@ -1134,6 +1135,7 @@ module.exports = {
             tilemapAtlasImage,
             tilemapJsonFile,
             tilesetJsonFile,
+            levelIndex,
             (textureCache) => {
               if (!textureCache) {
                 this.onLoadingError();
@@ -1149,8 +1151,7 @@ module.exports = {
                 tileMap,
                 textureCache,
                 displayMode,
-                layerIndex,
-                levelIndex
+                layerIndex
               );
             }
           );
@@ -1257,7 +1258,7 @@ module.exports = {
      * @class RenderedTileMapInstance
      * @constructor
      */
-     function RenderedCollisionMaskInstance(
+    function RenderedCollisionMaskInstance(
       project,
       layout,
       instance,
@@ -1323,7 +1324,7 @@ module.exports = {
     /**
      * Return the path to the thumbnail of the specified object.
      */
-     RenderedCollisionMaskInstance.getThumbnail = function (
+    RenderedCollisionMaskInstance.getThumbnail = function (
       project,
       resourcesLoader,
       objectConfiguration
@@ -1334,45 +1335,45 @@ module.exports = {
     /**
      * This is used to reload the Tilemap
      */
-     RenderedCollisionMaskInstance.prototype.updateTileMap = function () {
+    RenderedCollisionMaskInstance.prototype.updateTileMap = function () {
       // Get the tileset resource to use
       const tilemapAtlasImage = this._associatedObjectConfiguration
-      .getProperties(this.project)
-      .get('tilemapAtlasImage')
-      .getValue();
-    const tilemapJsonFile = this._associatedObjectConfiguration
-      .getProperties(this.project)
-      .get('tilemapJsonFile')
-      .getValue();
-    const tilesetJsonFile = this._associatedObjectConfiguration
-      .getProperties(this.project)
-      .get('tilesetJsonFile')
-      .getValue();
-    const collisionMaskTag = this._associatedObjectConfiguration
-      .getProperties(this.project)
-      .get('collisionMaskTag')
-      .getValue();
-    const outlineColor = objectsRenderingService.rgbOrHexToHexNumber(
-      this._associatedObjectConfiguration
         .getProperties(this.project)
-        .get('outlineColor')
-        .getValue()
-    );
-    const fillColor = objectsRenderingService.rgbOrHexToHexNumber(
-      this._associatedObjectConfiguration
+        .get('tilemapAtlasImage')
+        .getValue();
+      const tilemapJsonFile = this._associatedObjectConfiguration
         .getProperties(this.project)
-        .get('fillColor')
-        .getValue()
-    );
-    const outlineOpacity = this._associatedObjectConfiguration
-      .getProperties(this.project)
-      .get('outlineOpacity')
-      .getValue() / 255;
-    const fillOpacity = this._associatedObjectConfiguration
-      .getProperties(this.project)
-      .get('fillOpacity')
-      .getValue() / 255;
-    const outlineSize = 1;
+        .get('tilemapJsonFile')
+        .getValue();
+      const tilesetJsonFile = this._associatedObjectConfiguration
+        .getProperties(this.project)
+        .get('tilesetJsonFile')
+        .getValue();
+      const collisionMaskTag = this._associatedObjectConfiguration
+        .getProperties(this.project)
+        .get('collisionMaskTag')
+        .getValue();
+      const outlineColor = objectsRenderingService.rgbOrHexToHexNumber(
+        this._associatedObjectConfiguration
+          .getProperties(this.project)
+          .get('outlineColor')
+          .getValue()
+      );
+      const fillColor = objectsRenderingService.rgbOrHexToHexNumber(
+        this._associatedObjectConfiguration
+          .getProperties(this.project)
+          .get('fillColor')
+          .getValue()
+      );
+      const outlineOpacity = this._associatedObjectConfiguration
+        .getProperties(this.project)
+        .get('outlineOpacity')
+        .getValue() / 255;
+      const fillOpacity = this._associatedObjectConfiguration
+        .getProperties(this.project)
+        .get('fillOpacity')
+        .getValue() / 255;
+      const outlineSize = 1;
 
       /** @type {TileMapHelper.TileMapManager} */
       const manager = TilemapHelper.TileMapManager.getManager(this._project);
@@ -1380,6 +1381,7 @@ module.exports = {
         this._loadTiledMapWithCallback.bind(this),
         tilemapJsonFile,
         tilesetJsonFile,
+        0, // leveIndex
         pako,
         (tileMap) => {
           if (!tileMap) {
@@ -1409,6 +1411,7 @@ module.exports = {
           //   tilemapAtlasImage,
           //   tilemapJsonFile,
           //   tilesetJsonFile,
+          //   levelIndex,
           //   (textureCache) => {
           //     if (!textureCache) {
           //       return;
@@ -1469,7 +1472,7 @@ module.exports = {
     /**
      * This is called to update the PIXI object on the scene editor
      */
-     RenderedCollisionMaskInstance.prototype.update = function () {
+    RenderedCollisionMaskInstance.prototype.update = function () {
       if (this._instance.hasCustomSize()) {
         this._pixiObject.scale.x = this._instance.getCustomWidth() / this.width;
         this._pixiObject.scale.y = this._instance.getCustomHeight() / this.height;
@@ -1501,14 +1504,14 @@ module.exports = {
     /**
      * Return the width of the instance, when it's not resized.
      */
-     RenderedCollisionMaskInstance.prototype.getDefaultWidth = function () {
+    RenderedCollisionMaskInstance.prototype.getDefaultWidth = function () {
       return this.width;
     };
 
     /**
      * Return the height of the instance, when it's not resized.
      */
-     RenderedCollisionMaskInstance.prototype.getDefaultHeight = function () {
+    RenderedCollisionMaskInstance.prototype.getDefaultHeight = function () {
       return this.height;
     };
 

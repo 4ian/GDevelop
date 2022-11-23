@@ -50,10 +50,17 @@ export type EditorMosaicName =
 
 export type InAppTutorialUserProgress = {|
   step: number,
+  /** Rounded progress in percentage */
   progress: Array<number>,
   fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
   projectData: {| [key: string]: string |},
 |};
+
+export type InAppTutorialProgressDatabase = {
+  [tutorialId: string]: {
+    [userId: string]: InAppTutorialUserProgress,
+  },
+};
 
 export const allAlertMessages: Array<{
   key: AlertMessageIdentifier,
@@ -213,17 +220,7 @@ export type PreferencesValues = {|
   showCommunityExtensions: boolean,
   showGetStartedSection: boolean,
   showEventBasedObjectsEditor: boolean,
-  inAppTutorialsProgress: {
-    [tutorialId: string]: {
-      [userId: string]: {|
-        step: number,
-        /** Rounded progress in percentage */
-        progress: number,
-        fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
-        projectData: {| [key: string]: string |},
-      |},
-    },
-  },
+  inAppTutorialsProgress: InAppTutorialProgressDatabase,
 |};
 
 /**

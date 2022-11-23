@@ -756,7 +756,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           tags={selectedObjectTags}
           onChange={onChangeSelectedObjectTags}
         />
-        <div style={styles.listContainer}>
+        <div style={styles.listContainer} id="objects-list">
           <AutoSizer>
             {({ height, width }) => (
               <I18n>

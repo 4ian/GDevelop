@@ -88,7 +88,7 @@ const creationExperienceOptions = [
   },
   {
     value: 'code-and-nocode-experience',
-    label: t`I have created games using both code and no-code`,
+    label: t`I have created games using both code and no-code engines.`,
   },
 ];
 
@@ -142,7 +142,9 @@ const AdditionalUserInfoDialog = ({
   const styles = getStyles({ windowWidth });
   const [gdevelopUsage, setGdevelopUsage] = React.useState<string>('');
   const [currentWork, setCurrentWork] = React.useState<string>('');
-  const [noCodeExperience, setNoCodeExperience] = React.useState<string>('');
+  const [creationExperience, setCreationExperience] = React.useState<string>(
+    ''
+  );
   const [hearFrom, setHearFrom] = React.useState<string>('');
 
   const doSendAdditionalInfos = () => {
@@ -151,7 +153,7 @@ const AdditionalUserInfoDialog = ({
     onSaveAdditionalUserInfo({
       gdevelopUsage,
       currentWork,
-      noCodeExperience,
+      creationExperience,
       hearFrom,
     });
   };
@@ -200,7 +202,7 @@ const AdditionalUserInfoDialog = ({
         <Column noMargin alignItems="center">
           <Text size="body2" noMargin align="center">
             <Trans>
-              Your answers will help us send you the best content about game
+              Your answers will help us personalize your experience with game
               creation. Of course, they will stay private and won't be sent to
               anyone else
             </Trans>
@@ -249,12 +251,12 @@ const AdditionalUserInfoDialog = ({
             </SelectField>
             <SelectField
               floatingLabelText={
-                <Trans>Have you used other no-code engines?</Trans>
+                <Trans>Have you used other game creation engines?</Trans>
               }
               translatableHintText={t`Select one`}
-              value={noCodeExperience}
-              onChange={(e, i, newEnginesUsage: string) => {
-                setNoCodeExperience(newEnginesUsage);
+              value={creationExperience}
+              onChange={(e, i, newCreationExpersience: string) => {
+                setCreationExperience(newCreationExpersience);
               }}
               fullWidth
               disableUnderline

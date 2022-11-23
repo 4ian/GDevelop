@@ -85,6 +85,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     userSnackbarMessage: null,
   };
   _automaticallyUpdateUserProfile = true;
+  _hasNotifiedUserAboutAdditionalInfo = false;
 
   componentDidMount() {
     this._resetAuthenticatedUser();
@@ -154,6 +155,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           this.props.authentication.getAuthorizationHeader(),
       },
     }));
+    this._hasNotifiedUserAboutAdditionalInfo = false;
   }
 
   _reloadFirebaseProfile = async (): Promise<?FirebaseUser> => {
@@ -343,6 +345,20 @@ export default class AuthenticatedUserProvider extends React.Component<
       }
     }
 
+    // If the user has not filled their additional information, show
+    // the dialog to fill it.
+    // use a state value to show the dialog only once.
+    if (
+      userProfile &&
+      !this._hasNotifiedUserAboutAdditionalInfo &&
+      !userProfile.hearFrom &&
+      !userProfile.gdevelopUsage &&
+      !userProfile.creationExperience &&
+      !userProfile.currentWork
+    ) {
+      setTimeout(() => this.openAdditionalUserInfoDialog(true), 1000);
+    }
+
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...authenticatedUser,
@@ -507,9 +523,8 @@ export default class AuthenticatedUserProvider extends React.Component<
       await authentication.login(form);
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openLoginDialog(false);
-      const username = this.state.authenticatedUser.profile
-        ? this.state.authenticatedUser.profile.username
-        : null;
+      const profile = this.state.authenticatedUser.profile;
+      const username = profile ? profile.username : null;
       this.showUserSnackbar({
         message: username ? (
           <Trans>👋 Good to see you {username}!</Trans>
@@ -585,8 +600,17 @@ export default class AuthenticatedUserProvider extends React.Component<
       }
 
       await this._fetchUserProfileWithoutThrowingErrors();
-      this.openAdditionalUserInfoDialog(true);
+      this.openCreateAccountDialog(false);
       sendSignupDone(form.email);
+      const profile = this.state.authenticatedUser.profile;
+      const username = profile ? profile.username : null;
+      this.showUserSnackbar({
+        message: username ? (
+          <Trans>👋 Welcome to GDevelop {username}!</Trans>
+        ) : (
+          <Trans>👋 Welcome to GDevelop!</Trans>
+        ),
+      });
     } catch (authError) {
       this.setState({ authError });
     }
@@ -611,7 +635,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           hearFrom: form.hearFrom,
           currentWork: form.currentWork,
           gdevelopUsage: form.gdevelopUsage,
-          noCodeExperience: form.noCodeExperience,
+          creationExperience: form.creationExperience,
         }
       );
       await this._fetchUserProfileWithoutThrowingErrors();
@@ -621,35 +645,14 @@ export default class AuthenticatedUserProvider extends React.Component<
     } finally {
       // Close anyway.
       this.openAdditionalUserInfoDialog(false);
-      const username = this.state.authenticatedUser.profile
-        ? this.state.authenticatedUser.profile.username
-        : null;
       this.showUserSnackbar({
-        message: username ? (
-          <Trans>👋 Welcome to GDevelop {username}!</Trans>
-        ) : (
-          <Trans>👋 Welcome to GDevelop!</Trans>
-        ),
+        message: <Trans>Thank you!</Trans>,
       });
     }
     this.setState({
       editInProgress: false,
     });
     this._automaticallyUpdateUserProfile = true;
-  };
-
-  _onCloseAdditionalUserInfoDialog = () => {
-    const username = this.state.authenticatedUser.profile
-      ? this.state.authenticatedUser.profile.username
-      : null;
-    this.openAdditionalUserInfoDialog(false);
-    this.showUserSnackbar({
-      message: username ? (
-        <Trans>👋 Welcome to GDevelop {username}!</Trans>
-      ) : (
-        <Trans>👋 Welcome to GDevelop!</Trans>
-      ),
-    });
   };
 
   _doForgotPassword = async (form: ForgotPasswordForm) => {
@@ -742,6 +745,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   };
 
   openAdditionalUserInfoDialog = (open: boolean = true) => {
+    this._hasNotifiedUserAboutAdditionalInfo = true;
     this.setState({
       additionalUserInfoDialogOpen: open,
       createAccountDialogOpen: false,
@@ -830,7 +834,7 @@ export default class AuthenticatedUserProvider extends React.Component<
             )}
             {this.state.additionalUserInfoDialogOpen && (
               <AdditionalUserInfoDialog
-                onClose={this._onCloseAdditionalUserInfoDialog}
+                onClose={() => this.openAdditionalUserInfoDialog(false)}
                 onSaveAdditionalUserInfo={form =>
                   this._doSaveAdditionalUserInfo(form)
                 }

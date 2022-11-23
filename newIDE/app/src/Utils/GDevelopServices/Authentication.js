@@ -25,6 +25,10 @@ export type Profile = {|
   getNewsletterEmail: boolean,
   isCreator: boolean,
   isPlayer: boolean,
+  hearFrom?: string,
+  gdevelopUsage?: string,
+  creationExperience?: string,
+  currentWork?: string,
 |};
 
 export type LoginForm = {|
@@ -45,7 +49,7 @@ export type RegisterForm = {|
 
 export type AdditionalUserInfoForm = {|
   hearFrom?: string,
-  noCodeExperience?: string,
+  creationExperience?: string,
   currentWork?: string,
   gdevelopUsage?: string,
 |};
@@ -294,7 +298,7 @@ export default class Authentication {
       isCreator,
       hearFrom,
       gdevelopUsage,
-      noCodeExperience,
+      creationExperience,
       currentWork,
     }: {
       username?: string,
@@ -305,7 +309,7 @@ export default class Authentication {
       isCreator?: boolean,
       hearFrom?: string,
       gdevelopUsage?: string,
-      noCodeExperience?: string,
+      creationExperience?: string,
       currentWork?: string,
     }
   ) => {
@@ -326,7 +330,7 @@ export default class Authentication {
             isCreator,
             hearFrom,
             gdevelopUsage,
-            noCodeExperience,
+            creationExperience,
             currentWork,
           },
           {

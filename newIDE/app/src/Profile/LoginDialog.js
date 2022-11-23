@@ -80,7 +80,7 @@ const LoginDialog = ({
 
   return (
     <Dialog
-      title={null}
+      title={null} // This dialog has a custom design to be more welcoming, the title is set in the content.
       actions={actions}
       secondaryActions={[
         <HelpButton key="help" helpPagePath={'/interface/profile'} />,

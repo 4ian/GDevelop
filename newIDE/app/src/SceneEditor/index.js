@@ -1498,7 +1498,11 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
     };
     return (
-      <div style={styles.container} id="scene-editor" data-active={isActive}>
+      <div
+        style={styles.container}
+        id="scene-editor"
+        data-active={isActive ? 'true' : undefined}
+      >
         <UseSceneEditorCommands
           project={project}
           layout={layout}

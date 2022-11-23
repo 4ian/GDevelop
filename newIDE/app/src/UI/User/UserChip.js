@@ -40,7 +40,7 @@ const UserChip = ({ onOpenProfile }: Props) => {
   const displayNotificationBadge = hasPendingNotifications(authenticatedUser);
   const classes = useStyles();
   return loginState === 'loggingIn' ? (
-    <CircularProgress size={20} />
+    <CircularProgress size={25} />
   ) : profile ? (
     <DotBadge
       overlap="circle"

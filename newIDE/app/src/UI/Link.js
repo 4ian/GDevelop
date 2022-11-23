@@ -28,11 +28,11 @@ const useLinkStyles = (theme: GDevelopTheme, disabled: boolean) =>
   })();
 
 const Link = (props: Props) => {
-  const GDevelopTheme = React.useContext(GDevelopThemeContext);
-  const linkStyles = useLinkStyles(GDevelopTheme, !!props.disabled);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const linkStyles = useLinkStyles(gdevelopTheme, !!props.disabled);
   const onClick = (event: MouseEvent) => {
+    event.preventDefault(); // Avoid triggering the href.
     if (!props.disabled) {
-      event.preventDefault();
       props.onClick();
     }
   };

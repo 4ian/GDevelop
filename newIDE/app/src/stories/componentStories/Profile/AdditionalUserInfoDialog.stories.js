@@ -14,7 +14,7 @@ export const Default = () => (
   <AdditionalUserInfoDialog
     onClose={() => {}}
     onSaveAdditionalUserInfo={async () => {}}
-    editInProgress={false}
+    updateInProgress={false}
   />
 );
 
@@ -22,6 +22,6 @@ export const Loading = () => (
   <AdditionalUserInfoDialog
     onClose={() => {}}
     onSaveAdditionalUserInfo={async () => {}}
-    editInProgress
+    updateInProgress
   />
 );

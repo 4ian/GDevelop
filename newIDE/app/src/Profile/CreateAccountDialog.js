@@ -22,13 +22,14 @@ import Text from '../UI/Text';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import { Column } from '../UI/Grid';
 import Link from '../UI/Link';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
-const styles = {
+const getStyles = ({ windowWidth }) => ({
   formContainer: {
-    width: '60%',
+    width: windowWidth === 'small' ? '95%' : '60%',
     marginTop: 20,
   },
-};
+});
 
 type Props = {|
   onClose: () => void,
@@ -93,6 +94,8 @@ const CreateAccountDialog = ({
   createAccountInProgress,
   error,
 }: Props) => {
+  const windowWidth = useResponsiveWindowWidth();
+  const styles = getStyles({ windowWidth });
   const [email, setEmail] = React.useState<string>('');
   const [password, setPassword] = React.useState<string>('');
   const [username, setUsername] = React.useState<string>('');
@@ -130,7 +133,7 @@ const CreateAccountDialog = ({
 
   return (
     <Dialog
-      title={null}
+      title={null} // This dialog has a custom design to be more welcoming, the title is set in the content.
       actions={[
         <FlatButton
           label={<Trans>Cancel</Trans>}
@@ -166,15 +169,15 @@ const CreateAccountDialog = ({
         alignItems="center"
       >
         <GDevelopGLogo fontSize="large" />
-        <Text size="title">
+        <Text size="title" align="center">
           <Trans>Sign up for free!</Trans>
         </Text>
         <Column noMargin alignItems="center">
-          <Text size="body2" noMargin>
+          <Text size="body2" noMargin align="center">
             <Trans>Welcome to GDevelop!</Trans>
           </Text>
           <LineStackLayout noMargin>
-            <Text size="body2" noMargin>
+            <Text size="body2" noMargin align="center">
               <Trans>Already a member?</Trans>
             </Text>
             <Link

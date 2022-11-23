@@ -19,9 +19,11 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
   const [email, setEmail] = React.useState('');
   const [resetDone, setResetDone] = React.useState(false);
   const [resetInProgress, setResetInProgress] = React.useState(false);
+  const emailRegex = /^(.+)@(.+)$/;
+  const isEmailValid = emailRegex.test(email);
 
   const doResetPassword = async () => {
-    if (resetInProgress || !email) return;
+    if (resetInProgress || !email || !isEmailValid) return;
     setResetInProgress(true);
 
     await onForgotPassword({
@@ -49,7 +51,7 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
               label={<Trans>Reset password</Trans>}
               primary
               onClick={doResetPassword}
-              disabled={resetInProgress}
+              disabled={resetInProgress || !isEmailValid}
             />
           </LeftLoader>
         ) : null,

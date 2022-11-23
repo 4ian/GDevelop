@@ -38,7 +38,7 @@ import {
 } from '../Utils/GDevelopServices/Asset';
 import AdditionalUserInfoDialog from './AdditionalUserInfoDialog';
 import { Trans } from '@lingui/macro';
-import { Snackbar } from '@material-ui/core';
+import Snackbar from '@material-ui/core/Snackbar';
 
 type Props = {|
   authentication: Authentication,
@@ -638,6 +638,20 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = true;
   };
 
+  _onCloseAdditionalUserInfoDialog = () => {
+    const username = this.state.authenticatedUser.profile
+      ? this.state.authenticatedUser.profile.username
+      : null;
+    this.openAdditionalUserInfoDialog(false);
+    this.showUserSnackbar({
+      message: username ? (
+        <Trans>👋 Welcome to GDevelop {username}!</Trans>
+      ) : (
+        <Trans>👋 Welcome to GDevelop!</Trans>
+      ),
+    });
+  };
+
   _doForgotPassword = async (form: ForgotPasswordForm) => {
     const { authentication } = this.props;
     if (!authentication) return;
@@ -816,16 +830,11 @@ export default class AuthenticatedUserProvider extends React.Component<
             )}
             {this.state.additionalUserInfoDialogOpen && (
               <AdditionalUserInfoDialog
-                onClose={() => {
-                  this.openAdditionalUserInfoDialog(false);
-                  this.showUserSnackbar({
-                    message: <Trans>👋 Welcome to GDevelop!</Trans>,
-                  });
-                }}
+                onClose={this._onCloseAdditionalUserInfoDialog}
                 onSaveAdditionalUserInfo={form =>
                   this._doSaveAdditionalUserInfo(form)
                 }
-                editInProgress={this.state.editInProgress}
+                updateInProgress={this.state.editInProgress}
               />
             )}
             {this.state.emailVerificationPendingDialogOpen && (

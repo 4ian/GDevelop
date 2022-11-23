@@ -14,6 +14,14 @@ import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import { Column } from '../UI/Grid';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+
+const getStyles = ({ windowWidth }) => ({
+  formContainer: {
+    width: windowWidth === 'small' ? '95%' : '60%',
+    marginTop: 20,
+  },
+});
 
 const gdevelopUsageOptions = [
   {
@@ -67,7 +75,7 @@ const currentWorkOptions = [
 
 const creationExperienceOptions = [
   {
-    value: 'never',
+    value: 'no-experience',
     label: t`I've never used a game engine before`,
   },
   {
@@ -79,7 +87,7 @@ const creationExperienceOptions = [
     label: t`I have created games with no-code engines (GameMaker, Construct, Buildbox, ...)`,
   },
   {
-    value: 'full',
+    value: 'code-and-nocode-experience',
     label: t`I have created games using both code and no-code`,
   },
 ];
@@ -98,16 +106,16 @@ const hearFromOptions = [
     label: t`Social media`,
   },
   {
-    value: 'work/school',
-    label: t`Work/School`,
+    value: 'work',
+    label: t`Work`,
+  },
+  {
+    value: 'school',
+    label: t`School`,
   },
   {
     value: 'youtube',
     label: t`Youtube`,
-  },
-  {
-    value: 'discord',
-    label: t`Discord channel`,
   },
   {
     value: 'blog',
@@ -122,21 +130,23 @@ const hearFromOptions = [
 type Props = {|
   onClose: () => void,
   onSaveAdditionalUserInfo: (form: AdditionalUserInfoForm) => Promise<void>,
-  editInProgress: boolean,
+  updateInProgress: boolean,
 |};
 
 const AdditionalUserInfoDialog = ({
   onClose,
   onSaveAdditionalUserInfo,
-  editInProgress,
+  updateInProgress,
 }: Props) => {
+  const windowWidth = useResponsiveWindowWidth();
+  const styles = getStyles({ windowWidth });
   const [gdevelopUsage, setGdevelopUsage] = React.useState<string>('');
   const [currentWork, setCurrentWork] = React.useState<string>('');
   const [noCodeExperience, setNoCodeExperience] = React.useState<string>('');
   const [hearFrom, setHearFrom] = React.useState<string>('');
 
   const doSendAdditionalInfos = () => {
-    if (editInProgress) return;
+    if (updateInProgress) return;
 
     onSaveAdditionalUserInfo({
       gdevelopUsage,
@@ -148,31 +158,31 @@ const AdditionalUserInfoDialog = ({
 
   return (
     <Dialog
-      title={null}
+      title={null} // This dialog has a custom design to be more welcoming, the title is set in the content.
       actions={[
         <FlatButton
           label={<Trans>Skip</Trans>}
           key="skip"
           primary={false}
           onClick={onClose}
-          disabled={editInProgress}
+          disabled={updateInProgress}
         />,
-        <LeftLoader isLoading={editInProgress} key="submit-infos">
+        <LeftLoader isLoading={updateInProgress} key="submit-infos">
           <DialogPrimaryButton
             label={<Trans>Submit</Trans>}
             primary
             onClick={doSendAdditionalInfos}
-            disabled={editInProgress}
+            disabled={updateInProgress}
           />
         </LeftLoader>,
       ]}
       secondaryActions={[
         <HelpButton key="help" helpPagePath={'/interface/profile'} />,
       ]}
-      cannotBeDismissed={editInProgress}
+      cannotBeDismissed={updateInProgress}
       onApply={doSendAdditionalInfos}
       onRequestClose={() => {
-        if (!editInProgress) onClose();
+        if (!updateInProgress) onClose();
       }}
       maxWidth="sm"
       open
@@ -184,17 +194,19 @@ const AdditionalUserInfoDialog = ({
         alignItems="center"
       >
         <GDevelopGLogo fontSize="large" />
-        <Text size="title">
+        <Text size="title" align="center">
           <Trans>Tell us about yourself</Trans>
         </Text>
         <Column noMargin alignItems="center">
-          <Text size="body2" noMargin>
+          <Text size="body2" noMargin align="center">
             <Trans>
-              These questions will help you personalize your experience
+              Your answers will help us send you the best content about game
+              creation. Of course, they will stay private and won't be sent to
+              anyone else
             </Trans>
           </Text>
         </Column>
-        <div style={{ width: '60%', marginTop: 20 }}>
+        <div style={styles.formContainer}>
           <ColumnStackLayout noMargin>
             <SelectField
               floatingLabelText={
@@ -206,7 +218,7 @@ const AdditionalUserInfoDialog = ({
                 setGdevelopUsage(newUsage);
               }}
               fullWidth
-              disabled={editInProgress}
+              disabled={updateInProgress}
             >
               {gdevelopUsageOptions.map(usageOption => (
                 <SelectOption
@@ -225,7 +237,7 @@ const AdditionalUserInfoDialog = ({
               }}
               fullWidth
               disableUnderline
-              disabled={editInProgress}
+              disabled={updateInProgress}
             >
               {currentWorkOptions.map(workOption => (
                 <SelectOption
@@ -246,7 +258,7 @@ const AdditionalUserInfoDialog = ({
               }}
               fullWidth
               disableUnderline
-              disabled={editInProgress}
+              disabled={updateInProgress}
             >
               {creationExperienceOptions.map(experienceOption => (
                 <SelectOption
@@ -267,7 +279,7 @@ const AdditionalUserInfoDialog = ({
               }}
               fullWidth
               disableUnderline
-              disabled={editInProgress}
+              disabled={updateInProgress}
             >
               {hearFromOptions.map(hearFromOption => (
                 <SelectOption

@@ -15,9 +15,6 @@ const defaultProps = {
   onForgotPassword: async () => {},
   onLogin: async () => {},
   onGoToCreateAccount: () => {},
-  onCloseResetPasswordDialog: () => {},
-  resetPasswordDialogOpen: false,
-  forgotPasswordInProgress: false,
   loginInProgress: false,
   error: null,
 };
@@ -44,12 +41,4 @@ export const InvalidEmailErrorFromBackend = () => (
 
 export const Submitting = () => (
   <LoginDialog {...defaultProps} loginInProgress />
-);
-
-export const WithResetDialogOpen = () => (
-  <LoginDialog {...defaultProps} resetPasswordDialogOpen />
-);
-
-export const WithForgotPasswordInProgress = () => (
-  <LoginDialog {...defaultProps} forgotPasswordInProgress />
 );

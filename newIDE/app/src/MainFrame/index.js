@@ -146,6 +146,7 @@ import {
   type ResourceFetcher,
 } from '../ProjectsStorage/ResourceFetcher';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
+import { type GamesDetailsTab } from '../GameDashboard/GameDetailsDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -232,8 +233,10 @@ type LaunchPreviewOptions = {
   fullLoadingScreen?: boolean,
 };
 
-export type Props = {
+export type Props = {|
   initialDialog?: string,
+  initialGameId?: string,
+  initialGameTab?: string,
   introDialog?: React.Element<*>,
   renderMainMenu?: MainMenuProps => React.Node,
   renderPreviewLauncher?: (
@@ -259,7 +262,7 @@ export type Props = {
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
   i18n: I18n,
-};
+|};
 
 const MainFrame = (props: Props) => {
   const [state, setState]: [
@@ -319,6 +322,14 @@ const MainFrame = (props: Props) => {
     openPlatformSpecificAssetsDialog,
   ] = React.useState<boolean>(false);
   const [aboutDialogOpen, openAboutDialog] = React.useState<boolean>(false);
+  const [
+    gamesDashboardInitialGameId,
+    setGamesDashboardInitialGameId,
+  ] = React.useState<?string>(null);
+  const [
+    gamesDashboardInitialTab,
+    setGamesDashboardInitialTab,
+  ] = React.useState<?GamesDetailsTab>(null);
   const [profileDialogInitialTab, setProfileDialogInitialTab] = React.useState<
     'profile' | 'games-dashboard'
   >('profile');
@@ -420,6 +431,8 @@ const MainFrame = (props: Props) => {
     getStorageProviderOperations,
     getStorageProvider,
     initialDialog,
+    initialGameId,
+    initialGameTab,
     initialFileMetadataToOpen,
     introDialog,
     i18n,
@@ -521,14 +534,29 @@ const MainFrame = (props: Props) => {
 
   React.useEffect(
     () => {
-      if (initialDialog === 'subscription') {
-        openSubscriptionDialog(true);
-      }
-      if (initialDialog === 'onboarding') {
-        openOnboardingDialog(true);
+      console.log(initialDialog, initialGameId);
+      switch (initialDialog) {
+        case 'subscription':
+          openSubscriptionDialog(true);
+          break;
+        case 'onboarding':
+          openOnboardingDialog(true);
+          break;
+        case 'games-dashboard':
+          setProfileDialogInitialTab('games-dashboard');
+          if (initialGameId) {
+            setGamesDashboardInitialGameId(initialGameId);
+          }
+          if (initialGameTab) {
+            setGamesDashboardInitialTab('feedback');
+          }
+          openProfileDialog(true);
+          break;
+        default:
+          break;
       }
     },
-    [initialDialog]
+    [initialDialog, initialGameId, initialGameTab]
   );
 
   const openProfileDialogWithTab = (
@@ -2826,6 +2854,8 @@ const MainFrame = (props: Props) => {
           open
           onClose={() => openProfileDialog(false)}
           onChangeSubscription={() => openSubscriptionDialog(true)}
+          gamesDashboardInitialGameId={gamesDashboardInitialGameId}
+          gamesDashboardInitialTab={gamesDashboardInitialTab}
         />
       )}
       {subscriptionDialogOpen && (

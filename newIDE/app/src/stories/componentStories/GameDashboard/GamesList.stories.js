@@ -35,7 +35,7 @@ export const WithoutAProjectOpened = () => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-      <GamesList project={null} />
+      <GamesList project={null} initialGameId={null} initialTab={null} />
     </AuthenticatedUserContext.Provider>
   );
 };
@@ -53,7 +53,7 @@ export const WithoutAProjectOpenedLongLoading = () => {
 
   return (
     <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-      <GamesList project={null} />
+      <GamesList project={null} initialGameId={null} initialTab={null} />
     </AuthenticatedUserContext.Provider>
   );
 };
@@ -70,7 +70,7 @@ export const WithAnError = () => {
     });
   return (
     <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-      <GamesList project={null} />
+      <GamesList project={null} initialGameId={null} initialTab={null} />
     </AuthenticatedUserContext.Provider>
   );
 };

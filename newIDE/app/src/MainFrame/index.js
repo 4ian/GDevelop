@@ -135,7 +135,10 @@ import {
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import StartTutorialDialog from './InAppTutorial/StartTutorialDialog';
 import LeaderboardProvider from '../Leaderboard/LeaderboardProvider';
-import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
+import {
+  sendInAppTutorialStarted,
+  sendEventsExtractedAsFunction,
+} from '../Utils/Analytics/EventSender';
 import { useLeaderboardReplacer } from '../Leaderboard/useLeaderboardReplacer';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import ProjectPreCreationDialog from '../ProjectCreation/ProjectPreCreationDialog';
@@ -2291,7 +2294,7 @@ const MainFrame = (props: Props) => {
   );
 
   const startSelectedTutorial = React.useCallback(
-    async (scenario: 'resume' | 'startOver') => {
+    async (scenario: 'resume' | 'startOver' | 'start') => {
       if (!selectedInAppTutorialInfo) return;
       const { progress, tutorialId } = selectedInAppTutorialInfo;
       if (progress && scenario === 'resume') {
@@ -2329,12 +2332,14 @@ const MainFrame = (props: Props) => {
           return;
         }
       }
+
       await startTutorial({
-        tutorialId: tutorialId,
+        tutorialId,
         initialStepIndex: progress && scenario === 'resume' ? progress.step : 0,
         initialProjectData:
           progress && scenario === 'resume' ? progress.projectData : {},
       });
+      sendInAppTutorialStarted({ tutorialId, scenario });
       setSelectedInAppTutorialInfo(null);
     },
     [

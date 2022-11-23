@@ -131,6 +131,7 @@ const GetStartedSection = ({
 
   const inAppTutorialCards = [
     {
+      key: 'create',
       title: t`Start your game`,
       description: t`Add your first characters to the scene and throw your first objects.`,
       keyPoints: [
@@ -152,6 +153,7 @@ const GetStartedSection = ({
       renderImage: props => <Unboxing {...props} />,
     },
     {
+      key: 'publish',
       title: t`Improve and publish your Game`,
       description: t`Add personality to your game and publish it online.`,
       keyPoints: [
@@ -177,6 +179,7 @@ const GetStartedSection = ({
       renderImage: props => <Building {...props} />,
     },
     {
+      key: 'leaderboards',
       title: t`Add leaderboards to your online Game`,
       description: t`Add player logins to your game and add a leaderboard.`,
       keyPoints: [
@@ -246,7 +249,7 @@ const GetStartedSection = ({
                   spacing={ITEMS_SPACING * 2}
                 >
                   {inAppTutorialCards.map(item => (
-                    <GridListTile>
+                    <GridListTile key={item.key}>
                       <InAppTutorialPhaseCard
                         {...item}
                         onClick={() => selectInAppTutorial('flingGame')}

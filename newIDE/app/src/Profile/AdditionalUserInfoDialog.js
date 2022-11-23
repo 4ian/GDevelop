@@ -8,7 +8,6 @@ import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { type AdditionalUserInfoForm } from '../Utils/GDevelopServices/Authentication';
 import LeftLoader from '../UI/LeftLoader';
 import { ColumnStackLayout } from '../UI/Layout';
-import HelpButton from '../UI/HelpButton';
 import Text from '../UI/Text';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import { Column } from '../UI/Grid';
@@ -37,11 +36,15 @@ const gdevelopUsageOptions = [
     label: t`Teacher`,
   },
   {
-    value: 'marketing',
+    value: 'work-marketing',
     label: t`Marketing and Advertising`,
   },
   {
-    value: 'work',
+    value: 'work-gamedev',
+    label: t`Game studio`,
+  },
+  {
+    value: 'work-other',
     label: t`Work`,
   },
   {
@@ -174,9 +177,6 @@ const AdditionalUserInfoDialog = ({
             disabled={updateInProgress}
           />
         </LeftLoader>,
-      ]}
-      secondaryActions={[
-        <HelpButton key="help" helpPagePath={'/interface/profile'} />,
       ]}
       cannotBeDismissed={updateInProgress}
       onApply={doSendAdditionalInfos}

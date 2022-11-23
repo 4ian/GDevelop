@@ -13,7 +13,6 @@ import {
 } from '../../../../Utils/GDevelopServices/Tutorial';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { isMobile } from '../../../../Utils/Platform';
-import { sendOnboardingManuallyOpened } from '../../../../Utils/Analytics/EventSender';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import FlatButton from '../../../../UI/FlatButton';
 import {
@@ -113,7 +112,6 @@ const MainPage = ({
             </Trans>
           ),
           action: () => {
-            sendOnboardingManuallyOpened();
             onStartTutorial();
           },
           disabled: !!currentlyRunningInAppTutorial,

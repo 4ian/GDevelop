@@ -206,6 +206,7 @@ const GetStartedSection = ({
   const Subtitle = () => (
     <ResponsiveLineStackLayout
       justifyContent="space-between"
+      alignItems="center"
       noColumnMargin
       noMargin
     >

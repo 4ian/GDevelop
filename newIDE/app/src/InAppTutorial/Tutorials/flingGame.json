@@ -32,6 +32,10 @@
       "editor": "EventsSheet",
       "scene": "leaderboardScene"
     },
+    "SwitchToEvents7": {
+      "editor": "EventsSheet",
+      "scene": "playScene"
+    },
     "CreateNewScene": {
       "editor": "Scene",
       "scene": "startScene"
@@ -1696,7 +1700,7 @@
     },
     {
       "id": "SwitchToEvents1",
-      "elementToHighlightId": "#add-event-button",
+      "elementToHighlightId": "[data-active=\"true\"] #add-event-button",
       "nextStepTrigger": {
         "presenceOfElement": "#add-condition-button-empty"
       },
@@ -1709,7 +1713,7 @@
       }
     },
     {
-      "elementToHighlightId": "#add-condition-button-empty",
+      "elementToHighlightId": "[data-active=\"true\"]  #add-condition-button-empty",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-editor-dialog"
       },
@@ -1779,7 +1783,7 @@
       }
     },
     {
-      "elementToHighlightId": "#add-action-button-empty",
+      "elementToHighlightId": "[data-active=\"true\"] #add-action-button-empty",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-editor-dialog"
       },
@@ -2078,7 +2082,7 @@
       }
     },
     {
-      "elementToHighlightId": "#add-condition-button-empty",
+      "elementToHighlightId": "[data-active=\"true\"]  #add-condition-button-empty",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-editor-dialog"
       },
@@ -2162,7 +2166,7 @@
       }
     },
     {
-      "elementToHighlightId": "#add-action-button-empty",
+      "elementToHighlightId": "[data-active=\"true\"] #add-action-button-empty",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-editor-dialog"
       },
@@ -2881,7 +2885,8 @@
           "messageByLocale": {
             "en": "Select “left (primary)”."
           }
-        }
+        },
+        "placement": "top"
       },
       "isOnClosableDialog": true
     },
@@ -2900,7 +2905,7 @@
       }
     },
     {
-      "elementToHighlightId": "#add-action-button-empty",
+      "elementToHighlightId": "[data-active=\"true\"] #add-action-button-empty",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-editor-dialog"
       },
@@ -3131,7 +3136,7 @@
       "skippable": true
     },
     {
-      "elementToHighlightId": "#add-condition-button-empty",
+      "elementToHighlightId": "[data-active=\"true\"]  #add-condition-button-empty",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-editor-dialog"
       },
@@ -3186,7 +3191,7 @@
       }
     },
     {
-      "elementToHighlightId": "#add-action-button-empty",
+      "elementToHighlightId": "[data-active=\"true\"] #add-action-button-empty",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-editor-dialog"
       },
@@ -3270,7 +3275,7 @@
       "skippable": true
     },
     {
-      "elementToHighlightId": "#add-action-button-empty",
+      "elementToHighlightId": "[data-active=\"true\"] #add-action-button-empty",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-editor-dialog"
       },
@@ -3571,7 +3576,7 @@
       }
     },
     {
-      "elementToHighlightId": "#add-condition-button-empty",
+      "elementToHighlightId": "[data-active=\"true\"]  #add-condition-button-empty",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-editor-dialog"
       },
@@ -3626,7 +3631,7 @@
       }
     },
     {
-      "elementToHighlightId": "#add-action-button-empty",
+      "elementToHighlightId": "[data-active=\"true\"] #add-action-button-empty",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-editor-dialog"
       },
@@ -3741,7 +3746,7 @@
     },
     {
       "id": "SwitchToEvents6",
-      "elementToHighlightId": "#add-event-button",
+      "elementToHighlightId": "[data-active=\"true\"] #add-event-button",
       "nextStepTrigger": {
         "presenceOfElement": "#add-condition-button-empty"
       },
@@ -3754,7 +3759,7 @@
       }
     },
     {
-      "elementToHighlightId": "#add-condition-button-empty",
+      "elementToHighlightId": "[data-active=\"true\"]  #add-condition-button-empty",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-editor-dialog"
       },
@@ -3823,7 +3828,7 @@
       }
     },
     {
-      "elementToHighlightId": "#add-action-button-empty",
+      "elementToHighlightId": "[data-active=\"true\"] #add-action-button-empty",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-editor-dialog"
       },
@@ -3873,7 +3878,8 @@
           "messageByLocale": {
             "en": "Select “$(startScene)”."
           }
-        }
+        },
+        "placement": "top"
       },
       "isOnClosableDialog": true,
       "placement": "top"
@@ -3906,6 +3912,7 @@
       }
     },
     {
+      "id": "SwitchToEvents7",
       "nextStepTrigger": {
         "presenceOfElement": "#instruction-editor-dialog"
       },

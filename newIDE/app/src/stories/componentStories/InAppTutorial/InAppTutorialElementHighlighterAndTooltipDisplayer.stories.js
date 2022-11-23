@@ -37,13 +37,20 @@ const elementIdToTooltip = {
     placement: 'right',
   },
   '#input': {
-    description: 'Description only',
+    description: 'Description only (without quit button)',
     placement: 'left',
   },
   'element-in-list': {
     description:
       'It should disappear when element not visible, and an **arrow** should appear to show the direction where to scroll.',
   },
+};
+
+const elementIdToShowQuitButton = {
+  '#add-parameter-button': true,
+  '#add-event-primary-button': true,
+  '#input': false,
+  'element-in-list': true,
 };
 
 export const Default = () => {
@@ -162,6 +169,10 @@ export const Default = () => {
           <InAppTutorialTooltipDisplayer
             anchorElement={elementToHighlight}
             tooltip={elementIdToTooltip[elementToHighlightId]}
+            showQuitButton={elementIdToShowQuitButton[elementToHighlightId]}
+            progress={28}
+            endTutorial={() => action('end tutorial')()}
+            goToNextStep={() => action('go to next step')()}
           />
         </>
       )}

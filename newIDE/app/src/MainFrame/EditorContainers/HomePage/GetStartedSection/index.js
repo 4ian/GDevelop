@@ -210,8 +210,8 @@ const GetStartedSection = ({
       noColumnMargin
       noMargin
     >
-      <Text>
-        <Trans>Our recommended first steps for newcomers</Trans>
+      <Text noMargin>
+        <Trans>Learn the basics of GDevelop and publish a first game.</Trans>
       </Text>
       <Checkbox
         label={<Trans>Don't show this screen on next startup</Trans>}
@@ -223,7 +223,13 @@ const GetStartedSection = ({
 
   return (
     <SectionContainer
-      title={<Trans>Get started!</Trans>}
+      title={
+        shouldShowInAppTutorialButtons ? (
+          <Trans>Create and Publish a Fling Game</Trans>
+        ) : (
+          <Trans>Get Started!</Trans>
+        )
+      }
       renderSubtitle={() => <Subtitle />}
     >
       {shouldShowInAppTutorialButtons && (

@@ -15,6 +15,8 @@ declare class gdPropertyDescriptor {
   setExtraInfo(info: gdVectorString): gdPropertyDescriptor;
   getExtraInfo(): gdVectorString;
   setHidden(enable: boolean): gdPropertyDescriptor;
+  getMeasurementUnit(): gdMeasurementUnit;
+  setMeasurementUnit(measurementUnit: gdMeasurementUnit): gdPropertyDescriptor;
   isHidden(): boolean;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;

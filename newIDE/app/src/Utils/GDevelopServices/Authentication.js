@@ -25,6 +25,10 @@ export type Profile = {|
   getNewsletterEmail: boolean,
   isCreator: boolean,
   isPlayer: boolean,
+  hearFrom?: string,
+  gdevelopUsage?: string,
+  creationExperience?: string,
+  currentWork?: string,
 |};
 
 export type LoginForm = {|
@@ -32,11 +36,22 @@ export type LoginForm = {|
   password: string,
 |};
 
+export type ForgotPasswordForm = {|
+  email: string,
+|};
+
 export type RegisterForm = {|
   email: string,
   password: string,
   username: string,
   getNewsletterEmail: boolean,
+|};
+
+export type AdditionalUserInfoForm = {|
+  hearFrom?: string,
+  noCodeExperience?: string,
+  currentWork?: string,
+  gdevelopUsage?: string,
 |};
 
 export type EditForm = {|
@@ -169,7 +184,7 @@ export default class Authentication {
       });
   };
 
-  forgotPassword = (form: LoginForm): Promise<void> => {
+  forgotPassword = (form: ForgotPasswordForm): Promise<void> => {
     return sendPasswordResetEmail(this.auth, form.email);
   };
 
@@ -281,6 +296,10 @@ export default class Authentication {
       getNewsletterEmail,
       appLanguage,
       isCreator,
+      hearFrom,
+      gdevelopUsage,
+      noCodeExperience,
+      currentWork,
     }: {
       username?: string,
       description?: string,
@@ -288,6 +307,10 @@ export default class Authentication {
       getNewsletterEmail?: boolean,
       appLanguage?: string,
       isCreator?: boolean,
+      hearFrom?: string,
+      gdevelopUsage?: string,
+      noCodeExperience?: string,
+      currentWork?: string,
     }
   ) => {
     const { currentUser } = this.auth;
@@ -305,6 +328,10 @@ export default class Authentication {
             getNewsletterEmail,
             appLanguage,
             isCreator,
+            hearFrom,
+            gdevelopUsage,
+            noCodeExperience,
+            currentWork,
           },
           {
             params: {
@@ -354,15 +381,14 @@ export default class Authentication {
     return this.auth.currentUser || null;
   };
 
-  logout = () => {
-    signOut(this.auth)
-      .then(() => {
-        console.log('Logout successful.');
-      })
-      .catch(error => {
-        console.error('An error happened during logout.', error);
-        throw error;
-      });
+  logout = async () => {
+    try {
+      await signOut(this.auth);
+      console.log('Logout successful.');
+    } catch (error) {
+      console.error('An error happened during logout.', error);
+      throw error;
+    }
   };
 
   getAuthorizationHeader = async (): Promise<string> => {

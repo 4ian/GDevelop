@@ -14313,11 +14313,6 @@
   dependencies:
     "safe-buffer" "^5.1.0"
 
-"randomcolor@^0.5.3":
-  "integrity" "sha512-nYd4nmTuuwMFzHL6W+UWR5fNERGZeVauho8mrJDUSXdNDbao4rbrUwhuLgKC/j8VCS5+34Ria8CsTDuBjrIrQA=="
-  "resolved" "https://registry.npmjs.org/randomcolor/-/randomcolor-0.5.4.tgz"
-  "version" "0.5.4"
-
 "randomfill@^1.0.3":
   "integrity" "sha512-87lcbR8+MhcWcUiQ+9e+Rwx8MyR2P7qnt15ynUlbm3TU/fjbgz4GsvfSUDTemtCCtVCqb4ZcEFlyPNTh9bBTLw=="
   "resolved" "https://registry.npmjs.org/randomfill/-/randomfill-1.0.4.tgz"

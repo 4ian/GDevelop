@@ -211,13 +211,16 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     const { eventsFunctionsContainer, selectedEventsFunction } = this.props;
     if (!selectedEventsFunction) return;
 
+    const originIndex = eventsFunctionsContainer.getEventsFunctionPosition(
+      selectedEventsFunction
+    );
+    const destinationIndex = eventsFunctionsContainer.getEventsFunctionPosition(
+      destinationEventsFunction
+    );
     eventsFunctionsContainer.moveEventsFunction(
-      eventsFunctionsContainer.getEventsFunctionPosition(
-        selectedEventsFunction
-      ),
-      eventsFunctionsContainer.getEventsFunctionPosition(
-        destinationEventsFunction
-      )
+      originIndex,
+      // When moving the item down, it must not be counted.
+      destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
     );
 
     this.forceUpdateList();

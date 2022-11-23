@@ -19,6 +19,7 @@ import {
 import AlertMessage from '../UI/AlertMessage';
 import ShareButton from '../UI/ShareDialog/ShareButton';
 import CircularProgress from '../UI/CircularProgress';
+import Text from '../UI/Text';
 
 type Props = {| game: Game, onClose: () => void |};
 
@@ -87,6 +88,9 @@ const ShareDialog = ({ game, onClose }: Props) => {
           <Line>
             <CircularProgress />
           </Line>
+          <Text>
+            <Trans>Just a few seconds while we generate the link...</Trans>
+          </Text>
         </Column>
       )}
 

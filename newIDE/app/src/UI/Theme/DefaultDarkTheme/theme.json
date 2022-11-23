@@ -3,15 +3,15 @@
     "primary": {
       "dark": {
         "value": "#37238F",
-        "comment": "Palette/Purple/50"
+        "comment": "Palette/Purple/60"
       },
       "color": {
         "value": "#4F28CD",
-        "comment": "Palette/Purple/40"
+        "comment": "Palette/Purple/50"
       },
       "light": {
         "value": "#7046EC",
-        "comment": "Palette/Purple/30"
+        "comment": "Palette/Purple/40"
       },
       "text-contrast-color": {
         "value": "#FAFAFA",
@@ -21,11 +21,11 @@
     "secondary": {
       "dark": {
         "value": "#DDD1FF",
-        "comment": "Palette/Purple/20"
+        "comment": "Palette/Purple/10"
       },
       "color": {
         "value": "#EAE3FF",
-        "comment": "Palette/Purple/10"
+        "comment": "Palette/Purple/05"
       },
       "light": {
         "value": "#F6F2FF",
@@ -151,6 +151,54 @@
       },
       "separator": {
         "color": {
+          "value": "#494952",
+          "comment": "Palette/Grey/70"
+        }
+      }
+    },
+    "link": {
+      "color": {
+        "value": "#DDD1FF",
+        "comment": "Palette/Purple/10"
+      },
+      "hover-color": {
+        "value": "#C9B6FC",
+        "comment": "Palette/Purple/20"
+      }
+    },
+    "search-bar": {
+      "default": {
+        "background-color": {
+          "value": "#494952",
+          "comment": "Palette/Grey/70"
+        },
+        "text-color": {
+          "value": "#C5C5C9",
+          "comment": "Palette/Grey/30"
+        }
+      },
+      "hovered": {
+        "border-color": {
+          "value": "#7F7F85",
+          "comment": "Palette/Grey/50"
+        }
+      },
+      "focused": {
+        "text-color": {
+          "value": "#FAFAFA",
+          "comment": "Palette/Grey/00"
+        },
+        "border-color": {
+          "value": "#F6F2FF",
+          "comment": "Palette/Purple/00"
+        }
+      },
+      "disabled": {
+        "background-color": {
+          "value": "#32323B",
+          "comment": "Palette/Grey/80"
+        },
+        "text-color": {
           "value": "#494952",
           "comment": "Palette/Grey/70"
         }

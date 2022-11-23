@@ -160,13 +160,7 @@ export default class InstructionOrExpressionSelector<
           helpPagePath={helpPagePath}
           ref={searchBar => (this._searchBar = searchBar)}
         />
-        <ScrollView
-          autoHideScrollbar
-          ref={
-            // $FlowFixMe - improper typing of ScrollView?
-            this._scrollView
-          }
-        >
+        <ScrollView autoHideScrollbar ref={this._scrollView}>
           {hasResults && (
             <List>
               {searchText ? (

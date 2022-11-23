@@ -32,6 +32,10 @@
       "editor": "EventsSheet",
       "scene": "leaderboardScene"
     },
+    "CreateNewScene": {
+      "editor": "Scene",
+      "scene": "startScene"
+    },
     "SwitchToScene1": {
       "editor": "Scene",
       "scene": "playScene"
@@ -2484,6 +2488,7 @@
       }
     },
     {
+      "id": "CreateNewScene",
       "elementToHighlightId": "objectInObjectsList:background",
       "nextStepTrigger": {
         "instanceAddedOnScene": "background:startScene"

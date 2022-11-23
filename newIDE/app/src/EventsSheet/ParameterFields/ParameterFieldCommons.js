@@ -33,6 +33,9 @@ type CommonProps = {|
 
   // Pass the ParameterRenderingService to allow to render nested parameters
   parameterRenderingService?: ParameterRenderingServiceType,
+
+  // Other
+  id?: string,
 |};
 
 export type ExpressionParameters = {|

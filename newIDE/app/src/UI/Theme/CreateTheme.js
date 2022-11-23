@@ -476,7 +476,7 @@ export function createGdevelopTheme({
       },
       paper: {
         backgroundColor: {
-          dark: styles['ThemeSurfaceCanvasWindowBackgroundColor'],
+          dark: styles['ThemeSurfaceCanvasBackgroundColor'],
           medium: styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
           light: styles['ThemeSurfaceAlternateCanvasLightBackgroundColor'],
         },

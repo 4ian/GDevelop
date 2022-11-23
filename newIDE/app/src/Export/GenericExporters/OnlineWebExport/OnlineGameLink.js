@@ -345,6 +345,9 @@ const OnlineGameLink = ({
                   <Line>
                     <CircularProgress />
                   </Line>
+                  <Text>
+                    <Trans>Loading your link...</Trans>
+                  </Text>
                 </Column>
               )}
               <InfoBar

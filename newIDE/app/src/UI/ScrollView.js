@@ -9,6 +9,7 @@ const styles = {
 };
 
 type Props = {|
+  id?: string,
   children: React.Node,
   /**
    * If true, scrollbar won't be shown if the content is not clipped.
@@ -26,7 +27,7 @@ export type ScrollViewInterface = {|
 |};
 
 export default React.forwardRef<Props, ScrollViewInterface>(
-  ({ children, autoHideScrollbar, style, onScroll }: Props, ref) => {
+  ({ children, autoHideScrollbar, style, id, onScroll }: Props, ref) => {
     const scrollView = React.useRef((null: ?HTMLDivElement));
     React.useImperativeHandle(ref, () => ({
       /**
@@ -104,6 +105,7 @@ export default React.forwardRef<Props, ScrollViewInterface>(
         }}
         onScroll={handleScroll}
         ref={scrollView}
+        id={id}
       >
         {children}
       </div>

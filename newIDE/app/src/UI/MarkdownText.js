@@ -21,6 +21,7 @@ const makeMarkdownCustomComponents = (
     ) : (
       props.children
     ),
+  code: props => <code style={{ userSelect: 'all' }}>{props.children}</code>,
   // Add paragraphs only if we explictly opt in.
   p: props =>
     isStandaloneText || allowParagraphs ? (

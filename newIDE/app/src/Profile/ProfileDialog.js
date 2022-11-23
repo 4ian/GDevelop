@@ -6,7 +6,6 @@ import FlatButton from '../UI/FlatButton';
 import { Tabs } from '../UI/Tabs';
 import Dialog from '../UI/Dialog';
 import { Column, Line } from '../UI/Grid';
-import CreateProfile from './CreateProfile';
 import AuthenticatedUserProfileDetails from './AuthenticatedUserProfileDetails';
 import HelpButton from '../UI/HelpButton';
 import SubscriptionDetails from './SubscriptionDetails';
@@ -17,6 +16,7 @@ import { ColumnStackLayout } from '../UI/Layout';
 import { getRedirectToSubscriptionPortalUrl } from '../Utils/GDevelopServices/Usage';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import CreateProfile from './CreateProfile';
 
 type Props = {|
   currentProject: ?gdProject,
@@ -76,9 +76,20 @@ const ProfileDialog = ({
     [authenticatedUser.onRefreshUserProfile, open] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
+  const onLogout = React.useCallback(
+    async () => {
+      await authenticatedUser.onLogout();
+      onClose();
+    },
+    [authenticatedUser, onClose]
+  );
+
+  const isConnected =
+    authenticatedUser.authenticated && authenticatedUser.profile;
+
   return (
     <Dialog
-      title={<Trans>My profile</Trans>}
+      title={isConnected ? <Trans>My profile</Trans> : null}
       actions={[
         <FlatButton
           label={<Trans>Close</Trans>}
@@ -96,34 +107,37 @@ const ProfileDialog = ({
               : '/interface/profile'
           }
         />,
-        authenticatedUser.authenticated && authenticatedUser.profile && (
+        isConnected && (
           <FlatButton
             label={<Trans>Logout</Trans>}
             key="logout"
-            onClick={authenticatedUser.onLogout}
+            onClick={onLogout}
             disabled={isUserLoading}
           />
         ),
       ]}
       onRequestClose={onClose}
       open={open}
-      fullHeight
+      fullHeight={!!isConnected}
+      maxWidth={isConnected ? 'md' : 'sm'}
       flexColumnBody
       fixedContent={
-        <Tabs
-          value={currentTab}
-          onChange={setCurrentTab}
-          options={[
-            {
-              value: 'profile',
-              label: <Trans>My Profile</Trans>,
-            },
-            {
-              value: 'games-dashboard',
-              label: <Trans>Games Dashboard</Trans>,
-            },
-          ]}
-        />
+        isConnected ? (
+          <Tabs
+            value={currentTab}
+            onChange={setCurrentTab}
+            options={[
+              {
+                value: 'profile',
+                label: <Trans>My Profile</Trans>,
+              },
+              {
+                value: 'games-dashboard',
+                label: <Trans>Games Dashboard</Trans>,
+              },
+            ]}
+          />
+        ) : null
       }
     >
       {authenticatedUser.authenticated && authenticatedUser.profile ? (

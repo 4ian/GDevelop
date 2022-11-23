@@ -120,6 +120,7 @@ const EditProfileDialog = ({
           onAvailabilityChecked={setUsernameAvailability}
           onAvailabilityCheckLoading={setIsValidatingUsername}
           isValidatingUsername={isValidatingUsername}
+          disabled={updateProfileInProgress}
         />
         <TextField
           value={description}
@@ -132,6 +133,7 @@ const EditProfileDialog = ({
           onChange={(e, value) => {
             setDescription(value);
           }}
+          disabled={updateProfileInProgress}
         />
         <Checkbox
           label={<Trans>I want to receive the GDevelop Newsletter</Trans>}
@@ -139,6 +141,7 @@ const EditProfileDialog = ({
           onCheck={(e, value) => {
             setGetNewsletterEmail(value);
           }}
+          disabled={updateProfileInProgress}
         />
         <Checkbox
           label={<Trans>I want to receive weekly stats about my games</Trans>}
@@ -146,6 +149,7 @@ const EditProfileDialog = ({
           onCheck={(e, value) => {
             setGetGameStatsEmail(value);
           }}
+          disabled={updateProfileInProgress}
         />
       </ColumnStackLayout>
     </Dialog>

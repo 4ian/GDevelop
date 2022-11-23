@@ -403,6 +403,12 @@ export function createGdevelopTheme({
         backgroundColor: styles['ThemeDialogBackgroundColor'],
         separator: styles['ThemeDialogSeparatorColor'],
       },
+      link: {
+        color: {
+          default: styles['ThemeLinkColor'],
+          hover: styles['ThemeLinkHoverColor'],
+        },
+      },
       tabs: {
         indicator: {
           backgroundColor: styles['ThemeTabsIndicatorColor'],

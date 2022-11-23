@@ -51,9 +51,11 @@ const ExpressionParametersEditorDialog = ({
   return (
     <Dialog
       title={<Trans>Enter the expression parameters</Trans>}
+      id="expression-parameters-editor-dialog"
       open
       actions={[
         <DialogPrimaryButton
+          id="apply-button"
           key="apply"
           label={<Trans>Apply</Trans>}
           primary

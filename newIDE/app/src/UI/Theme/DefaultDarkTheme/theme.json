@@ -3,15 +3,15 @@
     "primary": {
       "dark": {
         "value": "#37238F",
-        "comment": "Palette/Purple/50"
+        "comment": "Palette/Purple/60"
       },
       "color": {
         "value": "#4F28CD",
-        "comment": "Palette/Purple/40"
+        "comment": "Palette/Purple/50"
       },
       "light": {
         "value": "#7046EC",
-        "comment": "Palette/Purple/30"
+        "comment": "Palette/Purple/40"
       },
       "text-contrast-color": {
         "value": "#FAFAFA",
@@ -21,11 +21,11 @@
     "secondary": {
       "dark": {
         "value": "#DDD1FF",
-        "comment": "Palette/Purple/20"
+        "comment": "Palette/Purple/10"
       },
       "color": {
         "value": "#EAE3FF",
-        "comment": "Palette/Purple/10"
+        "comment": "Palette/Purple/05"
       },
       "light": {
         "value": "#F6F2FF",
@@ -154,6 +154,16 @@
           "value": "#494952",
           "comment": "Palette/Grey/70"
         }
+      }
+    },
+    "link": {
+      "color": {
+        "value": "#DDD1FF",
+        "comment": "Palette/Purple/10"
+      },
+      "hover-color": {
+        "value": "#C9B6FC",
+        "comment": "Palette/Purple/20"
       }
     },
     "search-bar": {

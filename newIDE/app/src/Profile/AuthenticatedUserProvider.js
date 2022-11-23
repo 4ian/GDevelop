@@ -13,10 +13,11 @@ import Authentication, {
   type EditForm,
   type ChangeEmailForm,
   type AuthError,
+  type ForgotPasswordForm,
+  type AdditionalUserInfoForm,
 } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
 import LoginDialog from './LoginDialog';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import { sendSignupDone } from '../Utils/Analytics/EventSender';
 import AuthenticatedUserContext, {
   initialAuthenticatedUser,
@@ -35,6 +36,9 @@ import {
   listReceivedAssetShortHeaders,
   listReceivedAssetPacks,
 } from '../Utils/GDevelopServices/Asset';
+import AdditionalUserInfoDialog from './AdditionalUserInfoDialog';
+import { Trans } from '@lingui/macro';
+import Snackbar from '@material-ui/core/Snackbar';
 
 type Props = {|
   authentication: Authentication,
@@ -49,12 +53,14 @@ type State = {|
   createAccountInProgress: boolean,
   editProfileDialogOpen: boolean,
   editInProgress: boolean,
+  additionalUserInfoDialogOpen: boolean,
   authError: ?AuthError,
   resetPasswordDialogOpen: boolean,
   emailVerificationPendingDialogOpen: boolean,
   forgotPasswordInProgress: boolean,
   changeEmailDialogOpen: boolean,
   changeEmailInProgress: boolean,
+  userSnackbarMessage: ?React.Node,
 |};
 
 export default class AuthenticatedUserProvider extends React.Component<
@@ -69,12 +75,14 @@ export default class AuthenticatedUserProvider extends React.Component<
     createAccountInProgress: false,
     editProfileDialogOpen: false,
     editInProgress: false,
+    additionalUserInfoDialogOpen: false,
     authError: null,
     resetPasswordDialogOpen: false,
     emailVerificationPendingDialogOpen: false,
     forgotPasswordInProgress: false,
     changeEmailDialogOpen: false,
     changeEmailInProgress: false,
+    userSnackbarMessage: null,
   };
   _automaticallyUpdateUserProfile = true;
 
@@ -475,10 +483,15 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
-  _doLogout = () => {
-    if (this.props.authentication) this.props.authentication.logout();
+  _doLogout = async () => {
+    if (this.props.authentication) {
+      await this.props.authentication.logout();
+    }
     this._resetAuthenticatedUser();
     clearCloudProjectCookies();
+    this.showUserSnackbar({
+      message: <Trans>You're now logged out</Trans>,
+    });
   };
 
   _doLogin = async (form: LoginForm) => {
@@ -494,6 +507,16 @@ export default class AuthenticatedUserProvider extends React.Component<
       await authentication.login(form);
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openLoginDialog(false);
+      const username = this.state.authenticatedUser.profile
+        ? this.state.authenticatedUser.profile.username
+        : null;
+      this.showUserSnackbar({
+        message: username ? (
+          <Trans>👋 Good to see you {username}!</Trans>
+        ) : (
+          <Trans>👋 Good to see you!</Trans>
+        ),
+      });
     } catch (authError) {
       this.setState({ authError });
     }
@@ -562,7 +585,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       }
 
       await this._fetchUserProfileWithoutThrowingErrors();
-      this.openLoginDialog(false);
+      this.openAdditionalUserInfoDialog(true);
       sendSignupDone(form.email);
     } catch (authError) {
       this.setState({ authError });
@@ -573,26 +596,72 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = true;
   };
 
-  _doForgotPassword = async (form: LoginForm) => {
+  _doSaveAdditionalUserInfo = async (form: AdditionalUserInfoForm) => {
     const { authentication } = this.props;
     if (!authentication) return;
 
     this.setState({
-      forgotPasswordInProgress: true,
-      authError: null,
+      editInProgress: true,
     });
+    this._automaticallyUpdateUserProfile = false;
     try {
-      await authentication.forgotPassword(form);
-      this.openResetPassword(true);
-    } catch (authError) {
-      this.setState({ authError });
-      showWarningBox(
-        "Unable to send you an email to reset your password. Please double-check that the email address that you've entered is valid."
+      await authentication.editUserProfile(
+        authentication.getAuthorizationHeader,
+        {
+          hearFrom: form.hearFrom,
+          currentWork: form.currentWork,
+          gdevelopUsage: form.gdevelopUsage,
+          noCodeExperience: form.noCodeExperience,
+        }
       );
+      await this._fetchUserProfileWithoutThrowingErrors();
+    } catch (authError) {
+      // Do not throw error, as this is a best effort call.
+      console.error('Error while saving additional user info:', authError);
+    } finally {
+      // Close anyway.
+      this.openAdditionalUserInfoDialog(false);
+      const username = this.state.authenticatedUser.profile
+        ? this.state.authenticatedUser.profile.username
+        : null;
+      this.showUserSnackbar({
+        message: username ? (
+          <Trans>👋 Welcome to GDevelop {username}!</Trans>
+        ) : (
+          <Trans>👋 Welcome to GDevelop!</Trans>
+        ),
+      });
     }
     this.setState({
-      forgotPasswordInProgress: false,
+      editInProgress: false,
     });
+    this._automaticallyUpdateUserProfile = true;
+  };
+
+  _onCloseAdditionalUserInfoDialog = () => {
+    const username = this.state.authenticatedUser.profile
+      ? this.state.authenticatedUser.profile.username
+      : null;
+    this.openAdditionalUserInfoDialog(false);
+    this.showUserSnackbar({
+      message: username ? (
+        <Trans>👋 Welcome to GDevelop {username}!</Trans>
+      ) : (
+        <Trans>👋 Welcome to GDevelop!</Trans>
+      ),
+    });
+  };
+
+  _doForgotPassword = async (form: ForgotPasswordForm) => {
+    const { authentication } = this.props;
+    if (!authentication) return;
+
+    try {
+      await authentication.forgotPassword(form);
+    } catch (authError) {
+      // Do not throw error if the email is not found, as we don't want to
+      // give information to the user about which email is registered.
+    }
   };
 
   _doSendEmailVerification = async () => {
@@ -672,6 +741,20 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
+  openAdditionalUserInfoDialog = (open: boolean = true) => {
+    this.setState({
+      additionalUserInfoDialogOpen: open,
+      createAccountDialogOpen: false,
+      loginDialogOpen: false,
+    });
+  };
+
+  showUserSnackbar = ({ message }: { message: ?React.Node }) => {
+    this.setState({
+      userSnackbarMessage: message,
+    });
+  };
+
   openEditProfileDialog = (open: boolean = true) => {
     this.setState({
       editProfileDialogOpen: open,
@@ -712,9 +795,6 @@ export default class AuthenticatedUserProvider extends React.Component<
                 loginInProgress={this.state.loginInProgress}
                 error={this.state.authError}
                 onForgotPassword={this._doForgotPassword}
-                resetPasswordDialogOpen={this.state.resetPasswordDialogOpen}
-                onCloseResetPasswordDialog={() => this.openResetPassword(false)}
-                forgotPasswordInProgress={this.state.forgotPasswordInProgress}
               />
             )}
             {this.state.authenticatedUser.profile &&
@@ -748,6 +828,15 @@ export default class AuthenticatedUserProvider extends React.Component<
                 error={this.state.authError}
               />
             )}
+            {this.state.additionalUserInfoDialogOpen && (
+              <AdditionalUserInfoDialog
+                onClose={this._onCloseAdditionalUserInfoDialog}
+                onSaveAdditionalUserInfo={form =>
+                  this._doSaveAdditionalUserInfo(form)
+                }
+                updateInProgress={this.state.editInProgress}
+              />
+            )}
             {this.state.emailVerificationPendingDialogOpen && (
               <EmailVerificationPendingDialog
                 authenticatedUser={this.state.authenticatedUser}
@@ -761,6 +850,19 @@ export default class AuthenticatedUserProvider extends React.Component<
                 }}
               />
             )}
+            <Snackbar
+              open={!!this.state.userSnackbarMessage}
+              autoHideDuration={3000}
+              onClose={() => this.showUserSnackbar({ message: null })}
+              ContentProps={{
+                'aria-describedby': 'snackbar-message',
+              }}
+              message={
+                <span id="snackbar-message">
+                  {this.state.userSnackbarMessage}
+                </span>
+              }
+            />
           </React.Fragment>
         )}
       </PreferencesContext.Consumer>

@@ -34,6 +34,8 @@ const useStylesForWidget = makeStyles(theme =>
       },
       '&:disabled': {
         backgroundColor: theme.palette.action.disabled,
+        border: `1px solid ${theme.palette.text.secondary}`,
+        borderBottom: `6px solid ${theme.palette.text.secondary}`,
       },
     },
   })
@@ -47,16 +49,9 @@ type Props = {|
   onClick: () => void,
   size: 'small' | 'large' | 'banner',
   disabled?: boolean,
-  shadowed?: boolean,
 |};
 
-export const CardWidget = ({
-  children,
-  onClick,
-  size,
-  disabled,
-  shadowed,
-}: Props) => {
+export const CardWidget = ({ children, onClick, size, disabled }: Props) => {
   const classes = useStylesForWidget();
   const windowWidth = useResponsiveWindowWidth();
 
@@ -77,7 +72,6 @@ export const CardWidget = ({
       style={{
         ...styles.buttonBase,
         maxWidth: widgetMaxWidth,
-        opacity: shadowed ? 0.7 : 1,
       }}
       classes={classes}
       tabIndex={0}

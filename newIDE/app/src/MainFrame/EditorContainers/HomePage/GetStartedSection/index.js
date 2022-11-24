@@ -321,6 +321,7 @@ const GetStartedSection = ({
                   key={index}
                   size="large"
                   disabled={item.disabled}
+                  useDefaultDisabledStyle
                 >
                   <div
                     style={{

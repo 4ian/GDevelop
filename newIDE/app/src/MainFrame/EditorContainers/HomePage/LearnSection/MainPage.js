@@ -168,6 +168,7 @@ const MainPage = ({
                   key={index}
                   size="large"
                   disabled={helpItem.disabled}
+                  useDefaultDisabledStyle
                 >
                   <div style={styles.helpItem}>
                     <ColumnStackLayout

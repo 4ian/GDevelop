@@ -211,10 +211,10 @@ export default function NewObjectDialog({
           sendAssetAddedToProject({
             id: openedAssetShortHeader.id,
             name: openedAssetShortHeader.name,
-            kind: isPrivate ? 'private' : 'public',
             assetPackName: openedAssetPack ? openedAssetPack.name : null,
             assetPackTag: openedAssetPack ? openedAssetPack.tag : null,
-            assetPackId: openedAssetPack && openedAssetPack.id ? openedAssetPack.id : null,
+            assetPackId:
+              openedAssetPack && openedAssetPack.id ? openedAssetPack.id : null,
             assetPackKind: isPrivate ? 'private' : 'public',
           });
 

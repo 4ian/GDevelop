@@ -291,8 +291,8 @@ export const sendOnboardingManuallyOpened = () => {
 
 export const sendAssetPackOpened = (options: {|
   assetPackName: string,
-  assetPackTag?: string,
-  assetPackId?: string,
+  assetPackTag: string | null,
+  assetPackId: string | null,
   assetPackKind: 'public' | 'private' | 'unknown',
 |}) => {
   recordEvent('asset_pack_opened', options);
@@ -380,7 +380,6 @@ export const sendAssetOpened = (options: {|
 export const sendAssetAddedToProject = (options: {|
   id: string,
   name: string,
-  kind: 'public' | 'private' | 'unknown',
   assetPackName: string | null,
   assetPackTag: string | null,
   assetPackId: string | null,

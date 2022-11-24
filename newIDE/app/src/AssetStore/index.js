@@ -68,6 +68,10 @@ const identifyAssetPackKind = ({
 |}) => {
   if (!assetPack) return 'unknown';
 
+  // We could simplify this if the asset packs have a "kind" or "type" in the future.
+  // For now, we check their presence in the lists to ensure adding fields in the backend
+  // won't break this detection in the future (for example, if public asset packs get an `id`,
+  // this won't break).
   return assetPack.id &&
     privateAssetPacks &&
     !!privateAssetPacks.find(({ id }) => id === assetPack.id)
@@ -215,6 +219,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       (assetPack: PublicAssetPack) => {
         sendAssetPackOpened({
           assetPackTag: assetPack.tag,
+          assetPackId: null,
           assetPackName: assetPack.name,
           assetPackKind: 'public',
         });
@@ -257,6 +262,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         sendAssetPackOpened({
           assetPackName: assetPackListingData.name,
           assetPackId: assetPackListingData.id,
+          assetPackTag: null,
           assetPackKind: 'private',
         });
         saveScrollPosition();

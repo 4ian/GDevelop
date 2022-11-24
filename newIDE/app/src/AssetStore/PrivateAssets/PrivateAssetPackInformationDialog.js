@@ -113,10 +113,14 @@ const PrivateAssetPackDialog = ({
 
   const onClickBuy = () => {
     if (!assetPack) return;
-    const assetPackId = assetPack.id;
     try {
       onOpenPurchaseDialog();
-      sendAssetPackBuyClicked(assetPackId);
+      sendAssetPackBuyClicked({
+        assetPackId: assetPack.id,
+        assetPackName: assetPack.name,
+        assetPackTag: assetPack.tag,
+        assetPackKind: 'private',
+      });
     } catch (e) {
       console.warn('Unable to send event', e);
     }

@@ -289,16 +289,30 @@ export const sendOnboardingManuallyOpened = () => {
   recordEvent('onboarding_manually_opened');
 };
 
-export const sendAssetPackOpened = (assetPackTag: string) => {
-  recordEvent('asset_pack_opened', {
-    assetPackTag,
-  });
+export const sendAssetPackOpened = (options: {|
+  assetPackName: string,
+  assetPackTag: string | null,
+  assetPackId: string | null,
+  assetPackKind: 'public' | 'private' | 'unknown',
+|}) => {
+  recordEvent('asset_pack_opened', options);
 };
 
-export const sendAssetPackBuyClicked = (id: string) => {
-  recordEvent('asset_pack_buy_clicked', {
-    id,
-  });
+export const sendAssetPackBuyClicked = (options: {|
+  assetPackId: string,
+  assetPackName: string,
+  assetPackTag: string,
+  assetPackKind: 'public' | 'private' | 'unknown',
+|}) => {
+  recordEvent('asset_pack_buy_clicked', options);
+};
+
+export const sendAssetPackInformationOpened = (options: {|
+  assetPackId: string,
+  assetPackName: string,
+  assetPackKind: 'public' | 'private' | 'unknown',
+|}) => {
+  recordEvent('asset_pack_information_opened', options);
 };
 
 export const sendHelpFinderOpened = () => {
@@ -352,24 +366,26 @@ export const sendSubscriptionDialogShown = () => {
   recordEvent('subscription-dialog-shown', {});
 };
 
-export const sendAssetOpened = ({
-  id,
-  name,
-}: {|
+export const sendAssetOpened = (options: {|
   id: string,
   name: string,
+  assetPackName: string | null,
+  assetPackTag: string | null,
+  assetPackId: string | null,
+  assetPackKind: 'public' | 'private' | 'unknown',
 |}) => {
-  recordEvent('asset-opened', { id, name });
+  recordEvent('asset-opened', options);
 };
 
-export const sendAssetAddedToProject = ({
-  id,
-  name,
-}: {|
+export const sendAssetAddedToProject = (options: {|
   id: string,
   name: string,
+  assetPackName: string | null,
+  assetPackTag: string | null,
+  assetPackId: string | null,
+  assetPackKind: 'public' | 'private' | 'unknown',
 |}) => {
-  recordEvent('asset-added-to-project', { id, name });
+  recordEvent('asset-added-to-project', options);
 };
 
 export const sendExtensionDetailsOpened = (name: string) => {

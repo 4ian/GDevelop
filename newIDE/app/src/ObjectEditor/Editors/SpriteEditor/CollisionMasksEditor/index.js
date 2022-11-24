@@ -26,13 +26,17 @@ import EditorMosaic, {
 } from '../../../../UI/EditorMosaic';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Paper from '../../../../UI/Paper';
+import ScrollView from '../../../../UI/ScrollView';
 const gd: libGDevelop = global.gd;
 
 const styles = {
-  container: {
+  leftContainer: {
     display: 'flex',
     overflow: 'hidden', // Ensure large images are not overflowing the other panel.
     flexDirection: 'column', // Ensure the panel provides a scroll bar if needed.
+  },
+  rightContainer: {
+    display: 'flex',
   },
 };
 
@@ -219,7 +223,7 @@ const CollisionMasksEditor = ({
       type: 'primary',
       noTitleBar: true,
       renderEditor: () => (
-        <Paper background="medium" style={styles.container} square>
+        <Paper background="medium" style={styles.leftContainer} square>
           <Column expand noMargin useFullHeight>
             <ImagePreview
               resourceName={resourceName}
@@ -256,7 +260,7 @@ const CollisionMasksEditor = ({
       type: 'secondary',
       noTitleBar: true,
       renderEditor: () => (
-        <Paper background="medium" style={styles.container} square>
+        <Paper background="medium" style={styles.rightContainer} square>
           <Column expand noMargin>
             <Line>
               <Column expand>
@@ -286,44 +290,48 @@ const CollisionMasksEditor = ({
                 />
               </Column>
             </Line>
-            {!!sprite && !sprite.isCollisionMaskAutomatic() && (
-              <React.Fragment>
-                <PolygonsList
-                  polygons={sprite.getCustomCollisionMask()}
-                  onPolygonsUpdated={updateCollisionMasks}
-                  restoreCollisionMask={() => onSetCollisionMaskAutomatic(true)}
-                  onHoverVertice={setHighlightedVerticePtr}
-                  onClickVertice={setSelectedVerticePtr}
-                  selectedVerticePtr={selectedVerticePtr}
-                  spriteWidth={spriteWidth}
-                  spriteHeight={spriteHeight}
-                />
-              </React.Fragment>
-            )}
-            {!!sprite && sprite.isCollisionMaskAutomatic() && (
-              <React.Fragment>
+            <ScrollView>
+              {!!sprite && !sprite.isCollisionMaskAutomatic() && (
+                <React.Fragment>
+                  <PolygonsList
+                    polygons={sprite.getCustomCollisionMask()}
+                    onPolygonsUpdated={updateCollisionMasks}
+                    restoreCollisionMask={() =>
+                      onSetCollisionMaskAutomatic(true)
+                    }
+                    onHoverVertice={setHighlightedVerticePtr}
+                    onClickVertice={setSelectedVerticePtr}
+                    selectedVerticePtr={selectedVerticePtr}
+                    spriteWidth={spriteWidth}
+                    spriteHeight={spriteHeight}
+                  />
+                </React.Fragment>
+              )}
+              {!!sprite && sprite.isCollisionMaskAutomatic() && (
+                <React.Fragment>
+                  <EmptyMessage>
+                    <Trans>
+                      This sprite uses the default collision mask, a rectangle
+                      that is as large as the sprite.
+                    </Trans>
+                  </EmptyMessage>
+                  <Line justifyContent="center">
+                    <FlatButton
+                      label={<Trans>Use a custom collision mask</Trans>}
+                      primary={false}
+                      onClick={() => onSetCollisionMaskAutomatic(false)}
+                    />
+                  </Line>
+                </React.Fragment>
+              )}
+              {!sprite && (
                 <EmptyMessage>
                   <Trans>
-                    This sprite uses the default collision mask, a rectangle
-                    that is as large as the sprite.
+                    Choose an animation and frame to edit the collision masks
                   </Trans>
                 </EmptyMessage>
-                <Line justifyContent="center">
-                  <FlatButton
-                    label={<Trans>Use a custom collision mask</Trans>}
-                    primary={false}
-                    onClick={() => onSetCollisionMaskAutomatic(false)}
-                  />
-                </Line>
-              </React.Fragment>
-            )}
-            {!sprite && (
-              <EmptyMessage>
-                <Trans>
-                  Choose an animation and frame to edit the collision masks
-                </Trans>
-              </EmptyMessage>
-            )}
+              )}
+            </ScrollView>
           </Column>
         </Paper>
       ),

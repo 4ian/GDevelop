@@ -136,7 +136,8 @@ private:
         MeasurementUnitElement(gd::MeasurementBaseUnit::pixel, 1));
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::second, -1));
-    return MeasurementUnit(elements, "PixelSpeed", _("Speed"), _("How much distance is covered per second."));
+    return MeasurementUnit(elements, "PixelSpeed", _("Speed"),
+                           _("How much distance is covered per second."));
   }
 
   static gd::MeasurementUnit CreatePixelAcceleration() {
@@ -145,7 +146,8 @@ private:
         MeasurementUnitElement(gd::MeasurementBaseUnit::pixel, 1));
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::second, -2));
-    return MeasurementUnit(elements, "PixelAcceleration", _("Acceleration"), _("How much speed is gain (or lost) per second."));
+    return MeasurementUnit(elements, "PixelAcceleration", _("Acceleration"),
+                           _("How much speed is gained (or lost) per second."));
   }
 
   static gd::MeasurementUnit CreateNewton() {
@@ -166,7 +168,8 @@ private:
         MeasurementUnitElement(gd::MeasurementBaseUnit::degreeAngle, 1));
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::second, -1));
-    return MeasurementUnit(elements, "AngularSpeed", _("Angular speed"), _("How much angle is covered per second."));
+    return MeasurementUnit(elements, "AngularSpeed", _("Angular speed"),
+                           _("How much angle is covered per second."));
   }
 
   gd::String name;                                  ///< The unit name.

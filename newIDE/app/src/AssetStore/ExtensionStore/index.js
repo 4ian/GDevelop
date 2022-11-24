@@ -119,6 +119,7 @@ export const ExtensionStore = ({
                 </SearchBarSelectField>
                 <Column expand noMargin>
                   <SearchBar
+                    id="extension-search-bar"
                     value={searchText}
                     onChange={setSearchText}
                     onRequestSearch={() => {}}
@@ -155,6 +156,7 @@ export const ExtensionStore = ({
               getSearchItemUniqueId={getExtensionName}
               renderSearchItem={(extensionShortHeader, onHeightComputed) => (
                 <ExtensionListItem
+                  id={`extension-list-item-${extensionShortHeader.name}`}
                   key={extensionShortHeader.name}
                   project={project}
                   onHeightComputed={onHeightComputed}

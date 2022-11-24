@@ -37,6 +37,7 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
       : null;
     const effectiveValue = getParameterValueOrDefault(value, parameterMetadata);
 
+    const isYes = effectiveValue === 'yes';
     return (
       <Column noMargin>
         <Line alignItems="center" justifyContent="space-between">
@@ -45,16 +46,20 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
           </Text>
           <ButtonGroup>
             <Button
-              variant={effectiveValue === 'yes' ? 'contained' : 'outlined'}
-              color={effectiveValue === 'yes' ? 'secondary' : 'default'}
+              id="yes-button"
+              data-effective={isYes ? 'true' : undefined}
+              variant={isYes ? 'contained' : 'outlined'}
+              color={isYes ? 'secondary' : 'default'}
               onClick={() => this.props.onChange('yes')}
               ref={this._yesButton}
             >
               <Trans>Yes</Trans>
             </Button>
             <Button
-              variant={effectiveValue !== 'yes' ? 'contained' : 'outlined'}
-              color={effectiveValue !== 'yes' ? 'secondary' : 'default'}
+              id="no-button"
+              data-effective={!isYes ? 'true' : undefined}
+              variant={!isYes ? 'contained' : 'outlined'}
+              color={!isYes ? 'secondary' : 'default'}
               onClick={() => this.props.onChange('no')}
             >
               <Trans>No</Trans>

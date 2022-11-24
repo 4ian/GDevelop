@@ -45,9 +45,11 @@ const isDev = Window.isDev();
 const ObjectListItem = ({
   objectMetadata,
   onClick,
+  id,
 }: {|
   objectMetadata: EnumeratedObjectMetadata,
   onClick: () => void,
+  id?: string,
 |}) => {
   if (objectMetadata.name === '') {
     // Base object is an "abstract" object
@@ -56,6 +58,7 @@ const ObjectListItem = ({
 
   return (
     <ListItem
+      id={id}
       leftIcon={
         <ListIcon
           src={objectMetadata.iconFilename}
@@ -385,6 +388,10 @@ export default function NewObjectDialog({
                       <ObjectListItem
                         key={objectMetadata.name}
                         objectMetadata={objectMetadata}
+                        id={`object-category-${objectMetadata.name}`.replace(
+                          /:/g,
+                          '-'
+                        )}
                         onClick={() => {
                           sendNewObjectCreated(objectMetadata.name);
                           onCreateNewObject(objectMetadata.name);

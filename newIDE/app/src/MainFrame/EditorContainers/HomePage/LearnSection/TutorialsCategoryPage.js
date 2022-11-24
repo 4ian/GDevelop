@@ -35,7 +35,7 @@ const TutorialsCategoryPage = ({ category, tutorials, onBack }: Props) => {
   return (
     <SectionContainer
       title={texts.title}
-      subtitle={texts.description}
+      subtitleText={texts.description}
       backAction={onBack}
     >
       <SectionRow>

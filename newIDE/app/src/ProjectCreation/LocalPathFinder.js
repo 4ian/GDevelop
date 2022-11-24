@@ -19,7 +19,10 @@ const findEmptyPath = (basePath: string) => {
   return path.join(basePath, folderName);
 };
 
-export const findEmptyPathInDefaultFolder = (electronApp: any): string => {
+/**
+ * Returns the default workspace folder from the Documents folder or the Home folder
+ */
+export const findDefaultFolder = (electronApp: any): string => {
   let documentsPath = '';
   try {
     documentsPath = electronApp.getPath('documents');
@@ -27,5 +30,19 @@ export const findEmptyPathInDefaultFolder = (electronApp: any): string => {
     // A user may not have the Documents folder defined on Windows.
     documentsPath = electronApp.getPath('home');
   }
-  return findEmptyPath(path.join(documentsPath, 'GDevelop projects'));
+  return path.join(documentsPath, 'GDevelop projects');
+};
+
+/**
+ * Returns the current workspace with a generated project name
+ */
+export const findEmptyPathInWorkspaceFolder = (
+  electronApp: any,
+  workspaceFolder: string | null
+): string => {
+  const folder =
+    workspaceFolder === null || workspaceFolder === undefined
+      ? findDefaultFolder(electronApp)
+      : workspaceFolder;
+  return findEmptyPath(folder);
 };

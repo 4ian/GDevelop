@@ -33,6 +33,7 @@ import { Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
+import Tooltip from '@material-ui/core/Tooltip';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -55,7 +56,11 @@ export type PrimitiveValueField =
       valueType: 'number',
       getValue: Instance => number,
       setValue: (instance: Instance, newValue: number) => void,
-      getEndAdornment?: () => string,
+      endAdornment?: {|
+        label: string,
+        descriptionTitle: string,
+        description: string,
+      |},
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -315,9 +320,24 @@ const PropertiesEditor = ({
             style={styles.field}
             disabled={getDisabled(instances, field)}
             endAdornment={
-              <InputAdornment position="end">
-                {field.getEndAdornment ? field.getEndAdornment() : ''}
-              </InputAdornment>
+              <Tooltip
+                title={
+                  <React.Fragment>
+                    <Text size="block-title">
+                      {field.endAdornment
+                        ? field.endAdornment.descriptionTitle
+                        : ''}
+                    </Text>
+                    <Text size="body">
+                      {field.endAdornment ? field.endAdornment.description : ''}
+                    </Text>
+                  </React.Fragment>
+                }
+              >
+                <InputAdornment position="end">
+                  {field.endAdornment ? field.endAdornment.label : ''}
+                </InputAdornment>
+              </Tooltip>
             }
           />
         );

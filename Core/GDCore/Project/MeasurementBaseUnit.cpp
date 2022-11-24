@@ -6,6 +6,7 @@
 #include "MeasurementBaseUnit.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/Localization.h"
 #include <vector>
 
 namespace gd {
@@ -13,14 +14,14 @@ namespace gd {
 MeasurementBaseUnit::~MeasurementBaseUnit() {}
 
 const gd::MeasurementBaseUnit MeasurementBaseUnit::degreeAngle =
-    MeasurementBaseUnit("degree", "deg", "");
+    MeasurementBaseUnit("degree", _("degree"), "deg", "");
 const gd::MeasurementBaseUnit MeasurementBaseUnit::pixel =
-    MeasurementBaseUnit("pixel", "px", "distance");
+    MeasurementBaseUnit("pixel", _("pixel"), "px", "distance");
 const gd::MeasurementBaseUnit MeasurementBaseUnit::meter =
-    MeasurementBaseUnit("meter", "m", "distance");
+    MeasurementBaseUnit("meter", _("meter"), "m", "distance");
 const gd::MeasurementBaseUnit MeasurementBaseUnit::second =
-    MeasurementBaseUnit("second", "s", "time");
+    MeasurementBaseUnit("second", _("second"), "s", "time");
 const gd::MeasurementBaseUnit MeasurementBaseUnit::kilogram =
-    MeasurementBaseUnit("kilogram", "Kg", "mass");
+    MeasurementBaseUnit("kilogram", _("kilogram"), "Kg", "mass");
 
 } // namespace gd

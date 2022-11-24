@@ -51,10 +51,13 @@ const propertiesMapToSchema = (
       );
     };
     const getDescription = () => propertyDescription;
-    const measurementUnitName = getMeasurementUnitShortLabel(
-      property.getMeasurementUnit()
-    );
-    const getEndAdornment = () => measurementUnitName;
+    const measurementUnit = property.getMeasurementUnit();
+    const measurementUnitName = getMeasurementUnitShortLabel(measurementUnit);
+    const endAdornment = {
+      label: measurementUnitName,
+      descriptionTitle: measurementUnit.getLabel(),
+      description: getMeasurementUnitDescription(measurementUnit),
+    };
 
     if (property.isHidden()) return null;
 
@@ -76,7 +79,7 @@ const propertiesMapToSchema = (
         },
         getLabel,
         getDescription,
-        getEndAdornment,
+        endAdornment,
       });
       return null;
     } else if (valueType === 'string' || valueType === '') {
@@ -263,6 +266,25 @@ export const getMeasurementUnitShortLabel = (
       (showPower ? exponents[absPower] : '')
     );
   }).join(' · ');
+};
+
+export const getMeasurementUnitDescription = (
+  measurementUnit: gdMeasurementUnit
+): string => {
+  return (
+    measurementUnit.getDescription() +
+    '\n' +
+    mapFor(0, measurementUnit.getElementsCount(), i => {
+      const baseUnit = measurementUnit.getElementBaseUnit(i);
+      const power = measurementUnit.getElementPower(i);
+      const absPower = Math.abs(power);
+      const signedUnit = (power < 0 ? 'per ' : '') + baseUnit.getLabel();
+      const poweredUnit =
+        signedUnit +
+        (absPower > 1 ? ' ' + signedUnit.repeat(absPower - 1) : '');
+      return poweredUnit;
+    }).join(' ')
+  );
 };
 
 export default propertiesMapToSchema;

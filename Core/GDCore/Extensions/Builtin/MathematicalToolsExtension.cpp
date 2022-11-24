@@ -492,6 +492,16 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
                      "",
                      "res/mathfunction.png")
       .SetHelpPath("/all-features/expressions");
+
+  extension
+      .AddExpression("lerp_angle",
+                     _("Lerp (Linear interpolation) between two angles"),
+                     _("Linearly interpolates between two angles (in degrees) by taking the shortest direction."),
+                     "",
+                     "res/mathfunction.png")
+      .AddParameter("expression", _("Starting angle, in degrees"))
+      .AddParameter("expression", _("Destination angle, in degrees"))
+      .AddParameter("expression", _("Interpolation value between 0 and 1."));
 }
 
 }  // namespace gd

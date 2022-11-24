@@ -23,7 +23,7 @@ namespace gd {
  */
 class GD_CORE_API MeasurementUnit {
 public:
-  MeasurementUnit(const std::vector<gd::MeasurementUnitElement> elements_,
+  MeasurementUnit(const std::vector<gd::MeasurementUnitElement> &elements_,
                   gd::String name_, gd::String label_,
                   gd::String description_ = "")
       : elements(elements_), name(name_), label(label_),

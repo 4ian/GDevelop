@@ -32,13 +32,13 @@ public:
   const gd::MeasurementBaseUnit &GetBaseUnit() const { return baseUnit; }
 
   /**
-   * \brief Return the base unit.
+   * \brief Return the power on the base unit.
    */
   int GetPower() const { return power; }
 
 private:
-  gd::MeasurementBaseUnit baseUnit; ///<
-  int power;                        ///<
+  gd::MeasurementBaseUnit baseUnit; ///< The base unit.
+  int power;                        ///< The power on the base unit.
 };
 
 } // namespace gd

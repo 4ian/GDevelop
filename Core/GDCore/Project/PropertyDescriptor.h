@@ -110,7 +110,7 @@ class GD_CORE_API PropertyDescriptor {
    * \brief Change the group where this property is displayed to the user, if any.
    */
   PropertyDescriptor& SetMeasurementUnit(const gd::MeasurementUnit &measurementUnit_) {
-    measurementUnit = gd::MeasurementUnit(measurementUnit_);
+    measurementUnit = measurementUnit_;
     return *this;
   }
 

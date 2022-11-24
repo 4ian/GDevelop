@@ -14,6 +14,7 @@ import { CardWidget } from '../CardWidget';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
 import ColoredLinearProgress from '../../../../UI/ColoredLinearProgress';
 import Chip from '../../../../UI/Chip';
+import Paper from '../../../../UI/Paper';
 import { Trans } from '@lingui/macro';
 import Lock from '../../../../UI/CustomSvgIcons/Lock';
 import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
@@ -56,6 +57,8 @@ type Props = {|
   renderImage: (props: any) => React.Node,
 |};
 
+const getTextStyle = disabled => (disabled ? { opacity: 0.4 } : undefined);
+
 const InAppTutorialPhaseCard = ({
   progress,
   locked,
@@ -69,14 +72,14 @@ const InAppTutorialPhaseCard = ({
   renderImage,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const shouldTextBeDisabled = disabled || locked;
   return (
     <I18n>
       {({ i18n }) => (
         <CardWidget
           onClick={onClick}
           size={size}
-          disabled={disabled || locked}
-          shadowed={locked}
+          disabled={shouldTextBeDisabled}
         >
           <Column noMargin alignItems="center" expand>
             <div
@@ -84,20 +87,28 @@ const InAppTutorialPhaseCard = ({
                 ...styles.imageContainer,
                 backgroundColor: locked
                   ? gdevelopTheme.paper.backgroundColor.light
+                  : disabled
+                  ? gdevelopTheme.palette.type === 'dark'
+                    ? '#4F28CD'
+                    : '#9979F1'
                   : '#7046EC',
               }}
             >
               {locked ? (
                 <Lock style={styles.lockerImage} />
               ) : (
-                renderImage({ style: styles.image })
+                renderImage({
+                  style: { ...styles.image, opacity: disabled ? 0.6 : 1 },
+                })
               )}
             </div>
-            <div
+            <Paper
               style={{
                 ...styles.cardTextContainer,
                 maxWidth: size === 'banner' ? '40%' : undefined,
               }}
+              background="dark"
+              square
             >
               <ColumnStackLayout
                 expand
@@ -121,63 +132,73 @@ const InAppTutorialPhaseCard = ({
                 ) : (
                   <Spacer />
                 )}
-                <Text size="block-title" noMargin>
+                <Text
+                  size="block-title"
+                  noMargin
+                  style={getTextStyle(shouldTextBeDisabled)}
+                  color="primary"
+                >
                   {i18n._(title)}
                 </Text>
-                <Text size="body" color="secondary" noMargin>
+                <Text
+                  size="body"
+                  noMargin
+                  style={getTextStyle(shouldTextBeDisabled)}
+                  color="secondary"
+                >
                   {i18n._(description)}
                 </Text>
+                {keyPoints && <Divider />}
                 {keyPoints && (
-                  <>
-                    <Divider />
-                    <ResponsiveLineStackLayout noColumnMargin noMargin>
-                      <Column
-                        noMargin
-                        alignItems="flex-start"
-                        justifyContent="flex-start"
-                        expand
-                      >
-                        <ul style={styles.keyPointsList}>
-                          {keyPoints.map((keyPoint, index) =>
-                            index % 2 === 0 ? (
-                              <Text
-                                size="body2"
-                                color="secondary"
-                                noMargin
-                                displayAsListItem
-                              >
-                                {i18n._(keyPoint)}
-                              </Text>
-                            ) : null
-                          )}
-                        </ul>
-                      </Column>
-                      <Column
-                        noMargin
-                        alignItems="flex-start"
-                        justifyContent="flex-start"
-                        expand
-                      >
-                        <ul style={styles.keyPointsList}>
-                          {keyPoints.map((keyPoint, index) =>
-                            index % 2 === 1 ? (
-                              <Text
-                                size="body2"
-                                color="secondary"
-                                noMargin
-                                displayAsListItem
-                              >
-                                {i18n._(keyPoint)}
-                              </Text>
-                            ) : null
-                          )}
-                        </ul>
-                      </Column>
-                    </ResponsiveLineStackLayout>
-                  </>
+                  <ResponsiveLineStackLayout noColumnMargin noMargin>
+                    <Column
+                      noMargin
+                      alignItems="flex-start"
+                      justifyContent="flex-start"
+                      expand
+                    >
+                      <ul style={styles.keyPointsList}>
+                        {keyPoints.map((keyPoint, index) =>
+                          index % 2 === 0 ? (
+                            <Text
+                              size="body2"
+                              noMargin
+                              style={getTextStyle(shouldTextBeDisabled)}
+                              color="secondary"
+                              displayAsListItem
+                            >
+                              {i18n._(keyPoint)}
+                            </Text>
+                          ) : null
+                        )}
+                      </ul>
+                    </Column>
+                    <Column
+                      noMargin
+                      alignItems="flex-start"
+                      justifyContent="flex-start"
+                      expand
+                    >
+                      <ul style={styles.keyPointsList}>
+                        {keyPoints.map((keyPoint, index) =>
+                          index % 2 === 1 ? (
+                            <Text
+                              size="body2"
+                              noMargin
+                              style={getTextStyle(shouldTextBeDisabled)}
+                              color="secondary"
+                              displayAsListItem
+                            >
+                              {i18n._(keyPoint)}
+                            </Text>
+                          ) : null
+                        )}
+                      </ul>
+                    </Column>
+                  </ResponsiveLineStackLayout>
                 )}
               </ColumnStackLayout>
-            </div>
+            </Paper>
           </Column>
         </CardWidget>
       )}

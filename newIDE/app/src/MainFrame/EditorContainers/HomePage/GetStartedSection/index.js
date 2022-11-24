@@ -30,6 +30,7 @@ import Podium from './Podium';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../../../../InAppTutorial/InAppTutorialProvider';
+import PlaceholderError from '../../../../UI/PlaceholderError';
 
 const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
 
@@ -85,7 +86,11 @@ const GetStartedSection = ({
   showGetStartedSection,
   setShowGetStartedSection,
 }: Props) => {
-  const { inAppTutorialShortHeaders } = React.useContext(InAppTutorialContext);
+  const {
+    inAppTutorialShortHeaders,
+    inAppTutorialsFetchingError,
+    fetchInAppTutorials,
+  } = React.useContext(InAppTutorialContext);
   const { getTutorialProgress } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const windowWidth = useResponsiveWindowWidth();
@@ -246,7 +251,16 @@ const GetStartedSection = ({
         <SectionRow>
           <Line>
             <div style={styles.bannerContainer}>
-              {inAppTutorialShortHeaders === null ? (
+              {inAppTutorialsFetchingError ? (
+                <PlaceholderError onRetry={fetchInAppTutorials}>
+                  <Trans>
+                    An error occurred when downloading the tutorials.
+                  </Trans>{' '}
+                  <Trans>
+                    Please check your internet connection or try again later.
+                  </Trans>
+                </PlaceholderError>
+              ) : inAppTutorialShortHeaders === null ? (
                 <PlaceholderLoader />
               ) : (
                 <GridList

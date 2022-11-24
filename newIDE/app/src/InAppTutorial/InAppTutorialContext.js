@@ -102,6 +102,8 @@ export type InAppTutorialState = {|
   inAppTutorialShortHeaders: ?Array<InAppTutorialShortHeader>,
   startStepIndex: number,
   startProjectData: { [key: string]: string },
+  inAppTutorialsFetchingError: string | null,
+  fetchInAppTutorials: () => Promise<void>,
 |};
 
 export const initialInAppTutorialState: InAppTutorialState = {
@@ -111,6 +113,8 @@ export const initialInAppTutorialState: InAppTutorialState = {
   inAppTutorialShortHeaders: null,
   startStepIndex: 0,
   startProjectData: {},
+  inAppTutorialsFetchingError: null,
+  fetchInAppTutorials: async () => {},
 };
 
 const InAppTutorialContext = React.createContext<InAppTutorialState>(

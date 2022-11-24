@@ -17,6 +17,7 @@ export const FLING_GAME_IN_APP_TUTORIAL_ID = 'flingGame';
 
 const InAppTutorialProvider = (props: Props) => {
   const [tutorial, setTutorial] = React.useState<InAppTutorial | null>(null);
+  const [fetchingError, setFetchingError] = React.useState<string | null>(null);
   const [startStepIndex, setStartStepIndex] = React.useState<number>(0);
   const [startProjectData, setStartProjectData] = React.useState<{
     [key: string]: string,
@@ -64,8 +65,14 @@ const InAppTutorialProvider = (props: Props) => {
   };
 
   const loadInAppTutorials = React.useCallback(async () => {
-    const fetchedInAppTutorialShortHeaders = await fetchInAppTutorialShortHeaders();
-    setInAppTutorialShortHeaders(fetchedInAppTutorialShortHeaders);
+    setFetchingError(null);
+    try {
+      const fetchedInAppTutorialShortHeaders = await fetchInAppTutorialShortHeaders();
+      setInAppTutorialShortHeaders(fetchedInAppTutorialShortHeaders);
+    } catch (error) {
+      console.error('An error occurred when fetching in app tutorials:', error);
+      setFetchingError('fetching-error');
+    }
   }, []);
 
   // Preload the in-app tutorial short headers when the app loads.
@@ -89,6 +96,8 @@ const InAppTutorialProvider = (props: Props) => {
         startProjectData,
         endTutorial,
         startStepIndex,
+        inAppTutorialsFetchingError: fetchingError,
+        fetchInAppTutorials: loadInAppTutorials,
       }}
     >
       {props.children}

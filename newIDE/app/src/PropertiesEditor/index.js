@@ -58,7 +58,6 @@ export type PrimitiveValueField =
       setValue: (instance: Instance, newValue: number) => void,
       endAdornment?: {|
         label: string,
-        descriptionTitle: string,
         description: string,
       |},
       ...ValueFieldCommonProperties,
@@ -322,16 +321,13 @@ const PropertiesEditor = ({
             endAdornment={
               <Tooltip
                 title={
-                  <React.Fragment>
-                    <Text size="block-title">
-                      {field.endAdornment
-                        ? field.endAdornment.descriptionTitle
-                        : ''}
-                    </Text>
-                    <Text size="body">
-                      {field.endAdornment ? field.endAdornment.description : ''}
-                    </Text>
-                  </React.Fragment>
+                  <MarkdownText
+                    size="body"
+                    source={
+                      field.endAdornment ? field.endAdornment.description : ''
+                    }
+                    isStandaloneText
+                  />
                 }
               >
                 <InputAdornment position="end">

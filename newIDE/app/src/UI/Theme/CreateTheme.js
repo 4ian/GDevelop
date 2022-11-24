@@ -391,6 +391,12 @@ export function createGdevelopTheme({
           backgroundColor: styles['ThemeTextHighlightedBackgroundColor'],
         },
       },
+      linearProgress: {
+        color: {
+          complete: styles['ThemeLinearProgressColorComplete'],
+          incomplete: styles['ThemeLinearProgressColorIncomplete'],
+        },
+      },
       home: {
         header: {
           backgroundColor: styles['ThemeHomeHeaderBackgroundColor'],

@@ -28,8 +28,8 @@ function ColoredLinearProgress(props: Props) {
       borderRadius: 5,
       backgroundColor:
         props.value === 100
-          ? '#16CF89' // Green/50
-          : '#FFA929', // Yellow/50,
+          ? gdevelopTheme.linearProgress.color.complete
+          : gdevelopTheme.linearProgress.color.incomplete,
     },
   })();
 

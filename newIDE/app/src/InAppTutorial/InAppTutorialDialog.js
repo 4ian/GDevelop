@@ -5,20 +5,20 @@ import React from 'react';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { MarkdownText } from '../UI/MarkdownText';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
-import { type InAppTutorialEndDialog as InAppTutorialEndDialogType } from './InAppTutorialContext';
+import { type InAppTutorialDialog as InAppTutorialDialogType } from './InAppTutorialContext';
 import Window from '../Utils/Window';
 import Link from '../UI/Link';
 import { ColumnStackLayout } from '../UI/Layout';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 
 type Props = {|
-  endDialog: InAppTutorialEndDialogType,
+  dialogContent: InAppTutorialDialogType,
   onClose: () => void,
 |};
 
 const styles = { imageLink: { cursor: 'pointer', maxWidth: 350 } };
 
-function InAppTutorialEndDialog({ endDialog, onClose }: Props) {
+function InAppTutorialDialog({ dialogContent, onClose }: Props) {
   return (
     <I18n>
       {({ i18n }) => (
@@ -40,7 +40,7 @@ function InAppTutorialEndDialog({ endDialog, onClose }: Props) {
           cannotBeDismissed
         >
           <ColumnStackLayout noMargin>
-            {endDialog.content.map(item => {
+            {dialogContent.content.map(item => {
               if (item.messageDescriptor) {
                 return (
                   <MarkdownText
@@ -91,4 +91,4 @@ function InAppTutorialEndDialog({ endDialog, onClose }: Props) {
   );
 }
 
-export default InAppTutorialEndDialog;
+export default InAppTutorialDialog;

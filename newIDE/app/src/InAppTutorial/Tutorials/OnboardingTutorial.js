@@ -6,9 +6,9 @@ import { type InAppTutorial } from '../InAppTutorialContext';
 const inAppTutorial: InAppTutorial = {
   id: 'onboarding',
   editorSwitches: {
-    GoToBuildSection: 'Home',
-    ClickOnNewObjectButtonForCharacter: 'Scene',
-    ClickOnNewEvent: 'EventsSheet',
+    GoToBuildSection: { editor: 'Home' },
+    ClickOnNewObjectButtonForCharacter: { editor: 'Scene' },
+    ClickOnNewEvent: { editor: 'EventsSheet' },
   },
   endDialog: {
     content: [
@@ -242,7 +242,7 @@ const inAppTutorial: InAppTutorial = {
       id: 'WaitForUserToHavePlayed',
       elementToHighlightId: '#toolbar-preview-button',
       nextStepTrigger: {
-        clickOnTooltipButton: "I'm done",
+        clickOnTooltipButton: { messageDescriptor: t`I'm done` },
       },
       tooltip: {
         description: {
@@ -330,8 +330,8 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'SwitchToEventsSheet',
-      elementToHighlightId: '[id^=tab-layout-events]',
-      nextStepTrigger: { presenceOfElement: '#add-event-button' },
+      elementToHighlightId: 'editorTab::EventsSheet',
+      nextStepTrigger: { editorIsActive: ':EventsSheet' },
       tooltip: {
         description: {
           messageDescriptor: t`Now let's make $(firstObject) collect the $(secondObject)! Go to the **events** tab of the **scene**.`,
@@ -342,7 +342,7 @@ const inAppTutorial: InAppTutorial = {
     {
       id: 'ClickOnNewEvent',
       elementToHighlightId: '#add-event-button',
-      nextStepTrigger: { presenceOfElement: '#add-condition-button' },
+      nextStepTrigger: { presenceOfElement: '#add-condition-button-empty' },
       tooltip: {
         title: { messageDescriptor: t`Let’s add an **event**!` },
         description: {
@@ -353,7 +353,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'ClickOnNewCondition',
-      elementToHighlightId: '#add-condition-button',
+      elementToHighlightId: '#add-condition-button-empty',
       nextStepTrigger: { presenceOfElement: '#instruction-editor-dialog' },
       tooltip: {
         description: {
@@ -412,7 +412,7 @@ const inAppTutorial: InAppTutorial = {
     },
     {
       id: 'ClickOnNewAction',
-      elementToHighlightId: '#add-action-button',
+      elementToHighlightId: '#add-action-button-empty',
       nextStepTrigger: { presenceOfElement: '#instruction-editor-dialog' },
       tooltip: {
         description: {
@@ -467,7 +467,7 @@ const inAppTutorial: InAppTutorial = {
       id: 'WaitForUserToHavePlayedWithCoinCollection',
       elementToHighlightId: '#toolbar-preview-button',
       nextStepTrigger: {
-        clickOnTooltipButton: "I'm done",
+        clickOnTooltipButton: { messageDescriptor: t`I'm done` },
       },
       tooltip: {
         description: {

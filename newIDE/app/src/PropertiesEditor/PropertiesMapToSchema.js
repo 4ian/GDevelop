@@ -55,7 +55,6 @@ const propertiesMapToSchema = (
     const measurementUnitName = getMeasurementUnitShortLabel(measurementUnit);
     const endAdornment = {
       label: measurementUnitName,
-      descriptionTitle: measurementUnit.getLabel(),
       description: getMeasurementUnitDescription(measurementUnit),
     };
 
@@ -272,8 +271,11 @@ export const getMeasurementUnitDescription = (
   measurementUnit: gdMeasurementUnit
 ): string => {
   return (
-    measurementUnit.getDescription() +
+    '### ' +
+    measurementUnit.getLabel() +
     '\n' +
+    measurementUnit.getDescription() +
+    '\n\n_in ' +
     mapFor(0, measurementUnit.getElementsCount(), i => {
       const baseUnit = measurementUnit.getElementBaseUnit(i);
       const power = measurementUnit.getElementPower(i);
@@ -283,7 +285,8 @@ export const getMeasurementUnitDescription = (
         signedUnit +
         (absPower > 1 ? ' ' + signedUnit.repeat(absPower - 1) : '');
       return poweredUnit;
-    }).join(' ')
+    }).join(' ') +
+    '_'
   );
 };
 

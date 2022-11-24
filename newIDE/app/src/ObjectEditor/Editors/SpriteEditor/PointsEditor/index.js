@@ -29,10 +29,13 @@ import Paper from '../../../../UI/Paper';
 const gd: libGDevelop = global.gd;
 
 const styles = {
-  container: {
+  leftContainer: {
     display: 'flex',
     overflow: 'hidden', // Ensure large images are not overflowing the other panel.
     flexDirection: 'column', // Ensure the panel provides a scroll bar if needed.
+  },
+  rightContainer: {
+    display: 'flex',
   },
 };
 
@@ -196,7 +199,7 @@ const PointsEditor = ({
       type: 'primary',
       noTitleBar: true,
       renderEditor: () => (
-        <Paper background="medium" style={styles.container} square>
+        <Paper background="medium" style={styles.leftContainer} square>
           <Column noMargin expand useFullHeight>
             <ImagePreview
               resourceName={resourceName}
@@ -231,34 +234,34 @@ const PointsEditor = ({
       type: 'secondary',
       noTitleBar: true,
       renderEditor: () => (
-        <Paper background="medium" style={styles.container} square>
+        <Paper background="medium" style={styles.rightContainer} square>
           <Column noMargin expand>
+            <Line>
+              <Column expand>
+                <SpriteSelector
+                  spriteConfiguration={spriteConfiguration}
+                  animationIndex={animationIndex}
+                  directionIndex={directionIndex}
+                  spriteIndex={spriteIndex}
+                  chooseAnimation={chooseAnimation}
+                  chooseDirection={chooseDirection}
+                  chooseSprite={chooseSprite}
+                  sameForAllAnimations={samePointsForAnimations}
+                  sameForAllSprites={samePointsForSprites}
+                  setSameForAllAnimations={setSamePointsForAllAnimations}
+                  setSameForAllSprites={setSamePointsForAllSprites}
+                  setSameForAllAnimationsLabel={
+                    <Trans>Share same points for all animations</Trans>
+                  }
+                  setSameForAllSpritesLabel={
+                    <Trans>
+                      Share same points for all sprites of this animation
+                    </Trans>
+                  }
+                />
+              </Column>
+            </Line>
             <ScrollView>
-              <Line>
-                <Column expand>
-                  <SpriteSelector
-                    spriteConfiguration={spriteConfiguration}
-                    animationIndex={animationIndex}
-                    directionIndex={directionIndex}
-                    spriteIndex={spriteIndex}
-                    chooseAnimation={chooseAnimation}
-                    chooseDirection={chooseDirection}
-                    chooseSprite={chooseSprite}
-                    sameForAllAnimations={samePointsForAnimations}
-                    sameForAllSprites={samePointsForSprites}
-                    setSameForAllAnimations={setSamePointsForAllAnimations}
-                    setSameForAllSprites={setSamePointsForAllSprites}
-                    setSameForAllAnimationsLabel={
-                      <Trans>Share same points for all animations</Trans>
-                    }
-                    setSameForAllSpritesLabel={
-                      <Trans>
-                        Share same points for all sprites of this animation
-                      </Trans>
-                    }
-                  />
-                </Column>
-              </Line>
               {!!sprite && (
                 <PointsList
                   pointsContainer={sprite}

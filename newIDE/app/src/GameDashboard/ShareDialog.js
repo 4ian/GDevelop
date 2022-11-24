@@ -65,7 +65,7 @@ const ShareDialog = ({ game, onClose }: Props) => {
     <Dialog
       title={<Trans>Share your game</Trans>}
       open
-      id="share-dialog"
+      id="game-card-share-dialog"
       actions={[
         <FlatButton
           key="close"

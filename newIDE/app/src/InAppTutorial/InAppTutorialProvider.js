@@ -13,6 +13,8 @@ import {
 
 type Props = {| children: React.Node |};
 
+export const FLING_GAME_IN_APP_TUTORIAL_ID = 'flingGame';
+
 const InAppTutorialProvider = (props: Props) => {
   const [tutorial, setTutorial] = React.useState<InAppTutorial | null>(null);
   const [startStepIndex, setStartStepIndex] = React.useState<number>(0);

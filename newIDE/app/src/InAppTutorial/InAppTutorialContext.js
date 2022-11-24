@@ -60,7 +60,7 @@ export type InAppTutorialFlowStep = {|
   |}>,
   dialog?: InAppTutorialDialog,
   mapProjectData?: {
-    [key: string]: 'projectLastSceneName' | string, // lastSceneObjectName:sceneName
+    [key: string]: 'projectLastSceneName' | string, // string represents accessors with parameters such as lastSceneObjectName:{sceneName}
   },
   tooltip?: InAppTutorialTooltip,
   skippable?: true,

@@ -18,7 +18,7 @@ export const isElementADialog = (
   if (options && options.isVisible) {
     return !element.getAttribute('aria-hidden');
   }
-  return true;
+  return false;
 };
 
 /**

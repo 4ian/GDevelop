@@ -29,6 +29,7 @@ import Building from './Building';
 import Podium from './Podium';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
+import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../../../../InAppTutorial/InAppTutorialProvider';
 
 const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
 
@@ -116,14 +117,14 @@ const GetStartedSection = ({
     {
       key: 'games',
       title: <Trans>Wiki documentation</Trans>,
-      description: <Trans>Get inspired and have fun</Trans>,
+      description: <Trans>Get inspired and have fun.</Trans>,
       action: () =>
         Window.openExternalURL('https://wiki.gdevelop.io/gdevelop5'),
     },
   ];
 
   const userProgress = getTutorialProgress({
-    tutorialId: 'flingGame',
+    tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
     userId: authenticatedUser.profile
       ? authenticatedUser.profile.id
       : undefined,
@@ -271,7 +272,9 @@ const GetStartedSection = ({
                             <Podium {...props} />
                           </Line>
                         )}
-                        onClick={() => selectInAppTutorial('flingGame')}
+                        onClick={() =>
+                          selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID)
+                        }
                       />
                     </GridListTile>
                   ) : (
@@ -279,7 +282,9 @@ const GetStartedSection = ({
                       <GridListTile key={item.key}>
                         <InAppTutorialPhaseCard
                           {...item}
-                          onClick={() => selectInAppTutorial('flingGame')}
+                          onClick={() =>
+                            selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID)
+                          }
                         />
                       </GridListTile>
                     ))

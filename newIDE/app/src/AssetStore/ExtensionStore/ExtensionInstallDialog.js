@@ -111,7 +111,7 @@ const ExtensionInstallDialog = ({
   return (
     <Dialog
       title={extensionShortHeader.fullName}
-      id="extension-install-dialog"
+      id="install-extension-dialog"
       actions={[
         <FlatButton
           key="close"

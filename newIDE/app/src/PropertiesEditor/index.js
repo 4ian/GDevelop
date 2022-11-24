@@ -13,6 +13,7 @@ import ColorField from '../UI/ColorField';
 import { MarkdownText } from '../UI/MarkdownText';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 import FormHelperText from '@material-ui/core/FormHelperText';
+import InputAdornment from '@material-ui/core/InputAdornment';
 
 import {
   type ResourceKind,
@@ -32,6 +33,7 @@ import UnsavedChangesContext, {
 import { Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import Tooltip from '@material-ui/core/Tooltip';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -53,6 +55,11 @@ export type PrimitiveValueField =
       valueType: 'number',
       getValue: Instance => number,
       setValue: (instance: Instance, newValue: number) => void,
+      endAdornment?: {|
+        label: string,
+        descriptionTitle: string,
+        description: string,
+      |},
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -315,6 +322,26 @@ const PropertiesEditor = ({
             type="number"
             style={styles.field}
             disabled={getDisabled(instances, field)}
+            endAdornment={
+              <Tooltip
+                title={
+                  <React.Fragment>
+                    <Text size="block-title">
+                      {field.endAdornment
+                        ? field.endAdornment.descriptionTitle
+                        : ''}
+                    </Text>
+                    <Text size="body">
+                      {field.endAdornment ? field.endAdornment.description : ''}
+                    </Text>
+                  </React.Fragment>
+                }
+              >
+                <InputAdornment position="end">
+                  {field.endAdornment ? field.endAdornment.label : ''}
+                </InputAdornment>
+              </Tooltip>
+            }
           />
         );
       } else if (field.valueType === 'color') {

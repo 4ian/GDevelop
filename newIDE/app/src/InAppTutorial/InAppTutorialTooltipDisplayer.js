@@ -55,6 +55,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
   },
+  iconButtonContainerWithPadding: { paddingRight: 5 },
   headerText: { fontSize: 12 },
   headerContentPreview: { color: themeColors.grey100 },
 };
@@ -216,8 +217,8 @@ const TooltipHeader = ({
             <div
               style={{
                 ...styles.iconButtonContainer,
+                ...styles.iconButtonContainerWithPadding,
                 ...iconButtonContainerColors,
-                paddingRight: 5,
               }}
             >
               <Cross />

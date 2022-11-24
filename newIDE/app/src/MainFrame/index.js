@@ -154,6 +154,7 @@ import QuitInAppTutorialDialog from '../InAppTutorial/QuitInAppTutorialDialog';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import { type InAppTutorialOrchestratorInterface } from '../InAppTutorial/InAppTutorialOrchestrator';
 import useInAppTutorialOrchestrator from '../InAppTutorial/useInAppTutorialOrchestrator';
+import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../InAppTutorial/InAppTutorialProvider';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -2361,7 +2362,7 @@ const MainFrame = (props: Props) => {
         openSubscriptionDialog(true);
       }
       if (initialDialog === 'onboarding') {
-        selectInAppTutorial('flingGame');
+        selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID);
       }
     },
     [initialDialog, selectInAppTutorial]

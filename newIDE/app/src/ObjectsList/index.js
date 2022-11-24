@@ -781,11 +781,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     getItemName={getObjectWithContextName}
                     getItemThumbnail={getObjectThumbnail}
                     getItemId={(objectWithContext, index) =>
-                      'object-item-' + index
+                      `object-item-${index}`
                     }
                     getItemData={(objectWithContext, index) => ({
                       objectName: objectWithContext.object.getName(),
-                      global: String(objectWithContext.global),
+                      global: objectWithContext.global.toString(),
                     })}
                     isItemBold={isObjectWithContextGlobal}
                     onEditItem={objectWithContext =>

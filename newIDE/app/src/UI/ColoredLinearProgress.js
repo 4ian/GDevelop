@@ -5,6 +5,10 @@ import MuiLinearProgress from '@material-ui/core/LinearProgress';
 import { makeStyles } from '@material-ui/core';
 import GDevelopThemeContext from './Theme/ThemeContext';
 
+const styles = {
+  linearProgress: { flex: 1 },
+};
+
 type Props = {|
   expand?: boolean,
   value?: ?number,
@@ -32,7 +36,7 @@ function ColoredLinearProgress(props: Props) {
   return (
     <MuiLinearProgress
       classes={classes}
-      style={{ flex: 1 }}
+      style={styles.linearProgress}
       variant="determinate"
       value={props.value}
     />

@@ -892,7 +892,7 @@ export const LeaderboardAdmin = ({
               noMargin
               expand
               noColumnMargin
-              id="leaderboard-admin"
+              id="leaderboard-administration-panel"
             >
               <div style={styles.leftColumn}>
                 <Paper

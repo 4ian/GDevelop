@@ -13,7 +13,10 @@ import ImagePreview, {
 } from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import ResourceSelector from '../../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../../ResourcesLoader';
-import { getMeasurementUnitShortLabel } from '../../../PropertiesEditor/PropertiesMapToSchema';
+import {
+  getMeasurementUnitShortLabel,
+  getMeasurementUnitDescription,
+} from '../../../PropertiesEditor/PropertiesMapToSchema';
 import ShapePreview from './ShapePreview';
 import PolygonEditor from './PolygonEditor';
 import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
@@ -25,6 +28,8 @@ import useForceUpdate from '../../../Utils/UseForceUpdate';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import Tooltip from '@material-ui/core/Tooltip';
+import { MarkdownText } from '../../../UI/MarkdownText';
 
 type Props = BehaviorEditorProps;
 
@@ -36,6 +41,7 @@ const NumericProperty = (props: {|
 |}) => {
   const { properties, propertyName, step, onUpdate } = props;
   const property = properties.get(propertyName);
+  const measurementUnit = property.getMeasurementUnit();
   return (
     <SemiControlledTextField
       fullWidth
@@ -45,12 +51,27 @@ const NumericProperty = (props: {|
       step={step}
       onChange={onUpdate}
       type="number"
-      endAdornment={
-        <InputAdornment position="end">
-          {getMeasurementUnitShortLabel(property.getMeasurementUnit())}
-        </InputAdornment>
-      }
+      endAdornment={<UnitAdornment property={property} />}
     />
+  );
+};
+
+const UnitAdornment = (props: {| property: gdNamedPropertyDescriptor |}) => {
+  const { property } = props;
+  const measurementUnit = property.getMeasurementUnit();
+  return (
+    <Tooltip
+      title={
+        <MarkdownText
+          source={getMeasurementUnitDescription(measurementUnit)}
+          isStandaloneText
+        />
+      }
+    >
+      <InputAdornment position="end">
+        {getMeasurementUnitShortLabel(measurementUnit)}
+      </InputAdornment>
+    </Tooltip>
   );
 };
 
@@ -222,6 +243,13 @@ const Physics2Editor = (props: Props) => {
               forceUpdate();
             }}
             type="number"
+            endAdornment={
+              <UnitAdornment
+                property={properties.get(
+                  shape === 'Polygon' ? 'PolygonOriginX' : 'shapeDimensionA'
+                )}
+              />
+            }
           />
         )}
         {shape !== 'Polygon' && shape !== 'Circle' && (
@@ -241,6 +269,13 @@ const Physics2Editor = (props: Props) => {
               forceUpdate();
             }}
             type="number"
+            endAdornment={
+              <UnitAdornment
+                property={properties.get(
+                  shape === 'Polygon' ? 'PolygonOriginY' : 'shapeDimensionB'
+                )}
+              />
+            }
           />
         )}
         {shape === 'Polygon' && (

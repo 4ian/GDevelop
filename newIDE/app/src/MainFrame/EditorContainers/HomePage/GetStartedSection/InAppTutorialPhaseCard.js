@@ -14,7 +14,6 @@ import { CardWidget } from '../CardWidget';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
 import ColoredLinearProgress from '../../../../UI/ColoredLinearProgress';
 import Chip from '../../../../UI/Chip';
-import Paper from '../../../../UI/Paper';
 import { Trans } from '@lingui/macro';
 import Lock from '../../../../UI/CustomSvgIcons/Lock';
 import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
@@ -102,13 +101,11 @@ const InAppTutorialPhaseCard = ({
                 })
               )}
             </div>
-            <Paper
+            <div
               style={{
                 ...styles.cardTextContainer,
                 maxWidth: size === 'banner' ? '40%' : undefined,
               }}
-              background="dark"
-              square
             >
               <ColumnStackLayout
                 expand
@@ -198,7 +195,7 @@ const InAppTutorialPhaseCard = ({
                   </ResponsiveLineStackLayout>
                 )}
               </ColumnStackLayout>
-            </Paper>
+            </div>
           </Column>
         </CardWidget>
       )}

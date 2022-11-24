@@ -304,7 +304,7 @@ export const GameDetailsDialog = ({
           title={<Trans>{game.gameName} Dashboard</Trans>}
           open
           flexColumnBody
-          fullHeight={currentTab === 'leaderboards'}
+          fullHeight
           maxWidth="lg"
           actions={[
             <FlatButton

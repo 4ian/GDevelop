@@ -51,6 +51,10 @@ const propertiesMapToSchema = (
       );
     };
     const getDescription = () => propertyDescription;
+    const measurementUnitName = getMeasurementUnitShortLabel(
+      property.getMeasurementUnit()
+    );
+    const getEndAdornment = () => measurementUnitName;
 
     if (property.isHidden()) return null;
 
@@ -72,6 +76,7 @@ const propertiesMapToSchema = (
         },
         getLabel,
         getDescription,
+        getEndAdornment,
       });
       return null;
     } else if (valueType === 'string' || valueType === '') {
@@ -240,6 +245,24 @@ const propertiesMapToSchema = (
     // The group actually always exists here.
     children: fieldsByGroups.get(groupName) || [],
   }));
+};
+
+const exponents = ['⁰', '¹', '²', '³', '⁴', '⁵'];
+
+export const getMeasurementUnitShortLabel = (
+  measurementUnit: gdMeasurementUnit
+): string => {
+  return mapFor(0, measurementUnit.getElementsCount(), i => {
+    const baseUnit = measurementUnit.getElementBaseUnit(i);
+    const power = measurementUnit.getElementPower(i);
+    const absPower = Math.abs(power);
+    const showPower = power < 0 || (absPower > 1 && absPower < 6);
+    return (
+      baseUnit.getSymbol() +
+      (power < 0 ? '⁻' : '') +
+      (showPower ? exponents[absPower] : '')
+    );
+  }).join(' · ');
 };
 
 export default propertiesMapToSchema;

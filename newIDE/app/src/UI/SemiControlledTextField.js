@@ -51,6 +51,7 @@ type Props = {|
   rows?: number,
   rowsMax?: number,
   autoFocus?: boolean,
+  endAdornment?: React.Node,
 |};
 
 /**

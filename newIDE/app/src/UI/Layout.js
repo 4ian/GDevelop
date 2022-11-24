@@ -84,7 +84,7 @@ type LineStackLayoutProps = {|
   noMargin?: boolean,
   children: React.Node,
   useLargeSpacer?: boolean,
-  overflow?: string,
+  overflow?: 'hidden', // allows children Text components to use text ellipsis when they are too long
 |};
 
 export const LineStackLayout = ({

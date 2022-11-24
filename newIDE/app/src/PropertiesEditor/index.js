@@ -322,7 +322,6 @@ const PropertiesEditor = ({
               <Tooltip
                 title={
                   <MarkdownText
-                    size="body"
                     source={
                       field.endAdornment ? field.endAdornment.description : ''
                     }

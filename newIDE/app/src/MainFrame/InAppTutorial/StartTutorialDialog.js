@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
@@ -14,18 +14,10 @@ const styles = {
   },
 };
 
-const dialogContent = `
-GDevelop provides tutorials to discover the app or to explore some features.
+const dialogContent = t`GDevelop provides tutorials to discover the app or to explore some features.${'\n'}${'\n'}You can stop the tutorial at any moment and come back later to complete it!`;
 
-You can stop the tutorial at any moment and come back later to complete it!
-`;
-
-const dialogContentForAlreadyStartedTutorials = `
-You have the choice to start the tutorial over or to resume the one you already started.
-`;
-const dialogContentForCompletedTutorials = `
-You already finished this tutorial but you can start it over.
-`;
+const dialogContentForAlreadyStartedTutorials = t`You have the choice to start the tutorial over or to resume the one you already started.`;
+const dialogContentForCompletedTutorials = t`You already finished this tutorial but you can start it over.`;
 
 type Props = {|
   open: boolean,
@@ -107,9 +99,12 @@ const StartTutorialDialog = ({
           </div>
         </Line>
         <Column noMargin>
-          <MarkdownText source={dialogContent} allowParagraphs />
+          <MarkdownText translatableSource={dialogContent} allowParagraphs />
           {complementaryText && (
-            <MarkdownText source={complementaryText} allowParagraphs />
+            <MarkdownText
+              translatableSource={complementaryText}
+              allowParagraphs
+            />
           )}
         </Column>
       </ColumnStackLayout>

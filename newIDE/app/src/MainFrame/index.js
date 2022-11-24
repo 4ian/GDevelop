@@ -384,7 +384,7 @@ const MainFrame = (props: Props) => {
     setSelectedInAppTutorialInfo,
   ] = React.useState<null | {|
     tutorialId: string,
-    progress: ?InAppTutorialUserProgress,
+    userProgress: ?InAppTutorialUserProgress,
   |}>(null);
   const {
     InAppTutorialOrchestrator,
@@ -2268,7 +2268,7 @@ const MainFrame = (props: Props) => {
           ? authenticatedUser.profile.id
           : undefined,
       });
-      setSelectedInAppTutorialInfo({ tutorialId, progress: userProgress });
+      setSelectedInAppTutorialInfo({ tutorialId, userProgress });
     },
     [preferences, authenticatedUser.profile]
   );
@@ -2276,15 +2276,15 @@ const MainFrame = (props: Props) => {
   const startSelectedTutorial = React.useCallback(
     async (scenario: 'resume' | 'startOver' | 'start') => {
       if (!selectedInAppTutorialInfo) return;
-      const { progress, tutorialId } = selectedInAppTutorialInfo;
-      if (progress && scenario === 'resume') {
+      const { userProgress, tutorialId } = selectedInAppTutorialInfo;
+      if (userProgress && scenario === 'resume') {
         if (currentProject) {
           // If there's a project opened, check if this is the one we should open
-          // for the stored tutorial progress.
+          // for the stored tutorial userProgress.
           if (
             currentFileMetadata &&
             currentFileMetadata.fileIdentifier !==
-              progress.fileMetadataAndStorageProviderName.fileMetadata
+              userProgress.fileMetadataAndStorageProviderName.fileMetadata
                 .fileIdentifier
           ) {
             const projectIsClosed = await askToCloseProject();
@@ -2292,7 +2292,7 @@ const MainFrame = (props: Props) => {
               return;
             }
             openFromFileMetadataWithStorageProvider(
-              progress.fileMetadataAndStorageProviderName,
+              userProgress.fileMetadataAndStorageProviderName,
               { openAllScenes: true }
             );
           } else {
@@ -2302,7 +2302,7 @@ const MainFrame = (props: Props) => {
           }
         } else {
           openFromFileMetadataWithStorageProvider(
-            progress.fileMetadataAndStorageProviderName,
+            userProgress.fileMetadataAndStorageProviderName,
             { openAllScenes: true }
           );
         }
@@ -2315,9 +2315,10 @@ const MainFrame = (props: Props) => {
 
       await startTutorial({
         tutorialId,
-        initialStepIndex: progress && scenario === 'resume' ? progress.step : 0,
+        initialStepIndex:
+          userProgress && scenario === 'resume' ? userProgress.step : 0,
         initialProjectData:
-          progress && scenario === 'resume' ? progress.projectData : {},
+          userProgress && scenario === 'resume' ? userProgress.projectData : {},
       });
       sendInAppTutorialStarted({ tutorialId, scenario });
       setSelectedInAppTutorialInfo(null);
@@ -3064,7 +3065,15 @@ const MainFrame = (props: Props) => {
       {selectedInAppTutorialInfo && (
         <StartTutorialDialog
           open
-          isTutorialAlreadyStarted={!!selectedInAppTutorialInfo.progress}
+          tutorialCompletionStatus={
+            !selectedInAppTutorialInfo.userProgress
+              ? 'notStarted'
+              : selectedInAppTutorialInfo.userProgress.progress.every(
+                  item => item === 100
+                )
+              ? 'complete'
+              : 'started'
+          }
           startTutorial={startSelectedTutorial}
           onClose={() => {
             setSelectedInAppTutorialInfo(null);

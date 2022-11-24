@@ -21,5 +21,6 @@ gd::MeasurementUnit MeasurementUnit::pixelSpeed = CreatePixelSpeed();
 gd::MeasurementUnit MeasurementUnit::pixelAcceleration =
     CreatePixelAcceleration();
 gd::MeasurementUnit MeasurementUnit::newton = CreateNewton();
+gd::MeasurementUnit MeasurementUnit::angularSpeed = CreateAngularSpeed();
 
 } // namespace gd

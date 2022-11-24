@@ -19,26 +19,44 @@ GDevelop provides tutorials to discover the app or to explore some features.
 
 You can stop the tutorial at any moment and come back later to complete it!
 `;
+
 const dialogContentForAlreadyStartedTutorials = `
 You have the choice to start the tutorial over or to resume the one you already started.
+`;
+const dialogContentForCompletedTutorials = `
+You already finished this tutorial but you can start it over.
 `;
 
 type Props = {|
   open: boolean,
   onClose: () => void,
-  isTutorialAlreadyStarted: boolean,
+  tutorialCompletionStatus: 'notStarted' | 'started' | 'complete',
   startTutorial: (scenario: 'resume' | 'startOver' | 'start') => Promise<void>,
 |};
 
 const StartTutorialDialog = ({
   open,
   onClose,
-  isTutorialAlreadyStarted,
+  tutorialCompletionStatus,
   startTutorial,
 }: Props) => {
   const resumeTutorial = () => startTutorial('resume');
   const startOverTutorial = () => startTutorial('startOver');
   const startTutorialForFirstTime = () => startTutorial('start');
+
+  const onApply =
+    tutorialCompletionStatus === 'complete'
+      ? startOverTutorial
+      : tutorialCompletionStatus === 'started'
+      ? resumeTutorial
+      : startTutorialForFirstTime;
+
+  const complementaryText =
+    tutorialCompletionStatus === 'complete'
+      ? dialogContentForCompletedTutorials
+      : tutorialCompletionStatus === 'started'
+      ? dialogContentForAlreadyStartedTutorials
+      : null;
 
   const actions = [
     <FlatButton
@@ -49,27 +67,28 @@ const StartTutorialDialog = ({
     <DialogPrimaryButton
       key="start"
       label={
-        isTutorialAlreadyStarted ? (
+        tutorialCompletionStatus === 'complete' ? (
+          <Trans>Restart tutorial</Trans>
+        ) : tutorialCompletionStatus === 'started' ? (
           <Trans>Resume tutorial</Trans>
         ) : (
           <Trans>Let's go!</Trans>
         )
       }
       primary
-      onClick={
-        isTutorialAlreadyStarted ? resumeTutorial : startTutorialForFirstTime
-      }
+      onClick={onApply}
     />,
   ];
-  const secondaryActions = isTutorialAlreadyStarted
-    ? [
-        <FlatButton
-          key="startOver"
-          label={<Trans>Start over</Trans>}
-          onClick={startOverTutorial}
-        />,
-      ]
-    : undefined;
+  const secondaryActions =
+    tutorialCompletionStatus === 'started'
+      ? [
+          <FlatButton
+            key="startOver"
+            label={<Trans>Start over</Trans>}
+            onClick={startOverTutorial}
+          />,
+        ]
+      : undefined;
 
   return (
     <Dialog
@@ -78,9 +97,7 @@ const StartTutorialDialog = ({
       secondaryActions={secondaryActions}
       open={open}
       onRequestClose={onClose}
-      onApply={
-        isTutorialAlreadyStarted ? resumeTutorial : startTutorialForFirstTime
-      }
+      onApply={onApply}
       maxWidth="xs"
     >
       <ColumnStackLayout noMargin>
@@ -91,11 +108,8 @@ const StartTutorialDialog = ({
         </Line>
         <Column noMargin>
           <MarkdownText source={dialogContent} allowParagraphs />
-          {isTutorialAlreadyStarted && (
-            <MarkdownText
-              source={dialogContentForAlreadyStartedTutorials}
-              allowParagraphs
-            />
+          {complementaryText && (
+            <MarkdownText source={complementaryText} allowParagraphs />
           )}
         </Column>
       </ColumnStackLayout>

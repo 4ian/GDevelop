@@ -63,12 +63,14 @@ const WrappedHomePage = ({
   project,
   recentProjectFiles,
   tutorialProgress = undefined,
+  inAppTutorialsFetchingError = null,
   user,
 }: {|
   project: ?gdProject,
   recentProjectFiles: FileMetadataAndStorageProviderName[],
-  user: AuthenticatedUser,
   tutorialProgress?: InAppTutorialUserProgress,
+  inAppTutorialsFetchingError?: string | null,
+  user: AuthenticatedUser,
 |}) => (
   <FixedHeightFlexContainer height={1080}>
     <PreferencesContext.Provider
@@ -92,6 +94,10 @@ const WrappedHomePage = ({
             action('end tutorial');
           },
           startStepIndex: 0,
+          inAppTutorialsFetchingError,
+          fetchInAppTutorials: async () => {
+            action('fetch tutorials')();
+          },
         }}
       >
         <AuthenticatedUserContext.Provider value={user}>
@@ -212,6 +218,15 @@ export const ConnectedWithInAppTutorialProgress = () => (
       },
       projectData: {},
     }}
+  />
+);
+export const ConnectedWithInAppTutorialLoadingError = () => (
+  <WrappedHomePage
+    project={testProject.project}
+    recentProjectFiles={getRecentProjectFiles(20)}
+    user={fakeIndieAuthenticatedUser}
+    tutorialProgress={undefined}
+    inAppTutorialsFetchingError="fetching-error"
   />
 );
 

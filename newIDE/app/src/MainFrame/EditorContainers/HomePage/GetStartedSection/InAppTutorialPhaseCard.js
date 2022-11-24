@@ -11,7 +11,7 @@ import {
 import Text from '../../../../UI/Text';
 import { type MessageDescriptor } from '../../../../Utils/i18n/MessageDescriptor.flow';
 import { CardWidget } from '../CardWidget';
-import { Column, Line } from '../../../../UI/Grid';
+import { Column, Line, Spacer } from '../../../../UI/Grid';
 import ColoredLinearProgress from '../../../../UI/ColoredLinearProgress';
 import Chip from '../../../../UI/Chip';
 import { Trans } from '@lingui/macro';
@@ -22,11 +22,13 @@ const styles = {
   cardTextContainer: {
     flex: 1,
     display: 'flex',
+    justifyContent: 'center',
     padding: '10px 10px 20px 10px',
   },
   image: { height: 130, width: 130 },
   lockerImage: { height: 80, width: 80 },
   imageContainer: {
+    width: '100%',
     height: 130,
     display: 'flex',
     justifyContent: 'center',
@@ -42,13 +44,14 @@ const styles = {
 type Props = {|
   progress?: number,
   /** For tutorials that cannot be started yet. */
-  locked: boolean,
+  locked?: boolean,
+  size?: 'large' | 'banner',
   /** To prevent start on click. */
   disabled?: boolean,
   title: MessageDescriptor,
   description: MessageDescriptor,
-  durationInMinutes: number,
-  keyPoints: Array<MessageDescriptor>,
+  durationInMinutes?: number,
+  keyPoints?: Array<MessageDescriptor>,
   onClick: () => void,
   renderImage: (props: any) => React.Node,
 |};
@@ -56,6 +59,7 @@ type Props = {|
 const InAppTutorialPhaseCard = ({
   progress,
   locked,
+  size = 'large',
   disabled,
   title,
   description,
@@ -70,11 +74,11 @@ const InAppTutorialPhaseCard = ({
       {({ i18n }) => (
         <CardWidget
           onClick={onClick}
-          size="large"
+          size={size}
           disabled={disabled || locked}
           shadowed={locked}
         >
-          <Column noMargin>
+          <Column noMargin alignItems="center" expand>
             <div
               style={{
                 ...styles.imageContainer,
@@ -89,7 +93,12 @@ const InAppTutorialPhaseCard = ({
                 renderImage({ style: styles.image })
               )}
             </div>
-            <div style={styles.cardTextContainer}>
+            <div
+              style={{
+                ...styles.cardTextContainer,
+                maxWidth: size === 'banner' ? '40%' : undefined,
+              }}
+            >
               <ColumnStackLayout
                 expand
                 justifyContent="flex-start"
@@ -102,13 +111,15 @@ const InAppTutorialPhaseCard = ({
                     </Text>
                     <ColoredLinearProgress value={progress} />
                   </LineStackLayout>
-                ) : (
+                ) : durationInMinutes ? (
                   <Line noMargin justifyContent="center">
                     <Chip
                       size="small"
                       label={<Trans>{durationInMinutes} minutes</Trans>}
                     />
                   </Line>
+                ) : (
+                  <Spacer />
                 )}
                 <Text size="block-title" noMargin>
                   {i18n._(title)}
@@ -116,51 +127,55 @@ const InAppTutorialPhaseCard = ({
                 <Text size="body" color="secondary" noMargin>
                   {i18n._(description)}
                 </Text>
-                <Divider />
-                <ResponsiveLineStackLayout noColumnMargin noMargin>
-                  <Column
-                    noMargin
-                    alignItems="flex-start"
-                    justifyContent="flex-start"
-                    expand
-                  >
-                    <ul style={styles.keyPointsList}>
-                      {keyPoints.map((keyPoint, index) =>
-                        index % 2 === 0 ? (
-                          <Text
-                            size="body2"
-                            color="secondary"
-                            noMargin
-                            displayAsListItem
-                          >
-                            {i18n._(keyPoint)}
-                          </Text>
-                        ) : null
-                      )}
-                    </ul>
-                  </Column>
-                  <Column
-                    noMargin
-                    alignItems="flex-start"
-                    justifyContent="flex-start"
-                    expand
-                  >
-                    <ul style={styles.keyPointsList}>
-                      {keyPoints.map((keyPoint, index) =>
-                        index % 2 === 1 ? (
-                          <Text
-                            size="body2"
-                            color="secondary"
-                            noMargin
-                            displayAsListItem
-                          >
-                            {i18n._(keyPoint)}
-                          </Text>
-                        ) : null
-                      )}
-                    </ul>
-                  </Column>
-                </ResponsiveLineStackLayout>
+                {keyPoints && (
+                  <>
+                    <Divider />
+                    <ResponsiveLineStackLayout noColumnMargin noMargin>
+                      <Column
+                        noMargin
+                        alignItems="flex-start"
+                        justifyContent="flex-start"
+                        expand
+                      >
+                        <ul style={styles.keyPointsList}>
+                          {keyPoints.map((keyPoint, index) =>
+                            index % 2 === 0 ? (
+                              <Text
+                                size="body2"
+                                color="secondary"
+                                noMargin
+                                displayAsListItem
+                              >
+                                {i18n._(keyPoint)}
+                              </Text>
+                            ) : null
+                          )}
+                        </ul>
+                      </Column>
+                      <Column
+                        noMargin
+                        alignItems="flex-start"
+                        justifyContent="flex-start"
+                        expand
+                      >
+                        <ul style={styles.keyPointsList}>
+                          {keyPoints.map((keyPoint, index) =>
+                            index % 2 === 1 ? (
+                              <Text
+                                size="body2"
+                                color="secondary"
+                                noMargin
+                                displayAsListItem
+                              >
+                                {i18n._(keyPoint)}
+                              </Text>
+                            ) : null
+                          )}
+                        </ul>
+                      </Column>
+                    </ResponsiveLineStackLayout>
+                  </>
+                )}
               </ColumnStackLayout>
             </div>
           </Column>

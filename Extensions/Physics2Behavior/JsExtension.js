@@ -200,6 +200,7 @@ module.exports = {
             .toString(10)
         )
         .setType('Number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setLabel('Shape Dimension A');
       behaviorProperties
         .getOrCreate('shapeDimensionB')
@@ -210,6 +211,7 @@ module.exports = {
             .toString(10)
         )
         .setType('Number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setLabel('Shape Dimension B');
       behaviorProperties
         .getOrCreate('shapeOffsetX')
@@ -217,6 +219,7 @@ module.exports = {
           behaviorContent.getChild('shapeOffsetX').getDoubleValue().toString(10)
         )
         .setType('Number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setLabel('Shape Offset X');
       behaviorProperties
         .getOrCreate('shapeOffsetY')
@@ -224,6 +227,7 @@ module.exports = {
           behaviorContent.getChild('shapeOffsetY').getDoubleValue().toString(10)
         )
         .setType('Number')
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setLabel('Shape Offset Y');
       behaviorProperties
         .getOrCreate('polygonOrigin')
@@ -373,13 +377,15 @@ module.exports = {
         .setValue(
           sharedContent.getChild('gravityX').getDoubleValue().toString(10)
         )
-        .setType('Number');
+        .setType('Number')
+        .setMeasurementUnit(gd.MeasurementUnit.getNewton());
       sharedProperties
         .getOrCreate('gravityY')
         .setValue(
           sharedContent.getChild('gravityY').getDoubleValue().toString(10)
         )
-        .setType('Number');
+        .setType('Number')
+        .setMeasurementUnit(gd.MeasurementUnit.getNewton());
       sharedProperties
         .getOrCreate('scaleX')
         .setValue(

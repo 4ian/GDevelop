@@ -40,6 +40,7 @@ type Props = {|
   disabled?: boolean,
   stopPropagationOnClick?: boolean,
 
+  id?: string,
   style?: {
     flex?: 1,
     width?: 'auto',
@@ -102,6 +103,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
       <I18n>
         {({ i18n }) => (
           <TextField
+            id={props.id}
             select
             color="secondary"
             {...computeTextFieldStyleProps(props)}

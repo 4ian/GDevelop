@@ -25,6 +25,7 @@ DestroyOutsideBehavior::GetProperties(
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("extraBorder", 0)))
       .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
       .SetLabel(_("Margin before deleting the object, in pixels"));
 
   return properties;

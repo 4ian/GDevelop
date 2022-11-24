@@ -86,6 +86,8 @@ public:
     return pixelAcceleration;
   }
 
+  static gd::MeasurementUnit &GetAngularSpeed() { return angularSpeed; }
+
   static gd::MeasurementUnit &GetNewton() { return newton; }
 
 private:
@@ -97,6 +99,7 @@ private:
   static gd::MeasurementUnit pixelSpeed;
   static gd::MeasurementUnit pixelAcceleration;
   static gd::MeasurementUnit newton;
+  static gd::MeasurementUnit angularSpeed;
 
   static gd::MeasurementUnit CreateUnknown() {
     return MeasurementUnit("Unknown", _("Unknown"));
@@ -133,7 +136,7 @@ private:
         MeasurementUnitElement(gd::MeasurementBaseUnit::pixel, 1));
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::second, -1));
-    return MeasurementUnit(elements, "PixelSpeed", _("Speed"), _("How much distance is cover per second."));
+    return MeasurementUnit(elements, "PixelSpeed", _("Speed"), _("How much distance is covered per second."));
   }
 
   static gd::MeasurementUnit CreatePixelAcceleration() {
@@ -155,6 +158,15 @@ private:
         MeasurementUnitElement(gd::MeasurementBaseUnit::second, -2));
     return MeasurementUnit(elements, "Newton", _("Force (in Newton)"),
                            _("A unit to measure forces."));
+  }
+
+  static gd::MeasurementUnit CreateAngularSpeed() {
+    std::vector<gd::MeasurementUnitElement> elements;
+    elements.push_back(
+        MeasurementUnitElement(gd::MeasurementBaseUnit::degreeAngle, 1));
+    elements.push_back(
+        MeasurementUnitElement(gd::MeasurementBaseUnit::second, -1));
+    return MeasurementUnit(elements, "AngularSpeed", _("Angular speed"), _("How much angle is covered per second."));
   }
 
   gd::String name;                                  ///< The unit name.

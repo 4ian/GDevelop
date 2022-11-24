@@ -216,6 +216,23 @@ export const ConnectedWithInAppTutorialProgress = () => (
   />
 );
 
+export const ConnectedWithInAppTutorialCompleted = () => (
+  <WrappedHomePage
+    project={testProject.project}
+    recentProjectFiles={getRecentProjectFiles(20)}
+    user={fakeIndieAuthenticatedUser}
+    tutorialProgress={{
+      step: 40,
+      progress: [100, 100, 100],
+      fileMetadataAndStorageProviderName: {
+        storageProviderName: 'fakeStorageProviderName',
+        fileMetadata: { fileIdentifier: 'fileIdentifier' },
+      },
+      projectData: {},
+    }}
+  />
+);
+
 export const NetworkError = () => (
   <WrappedHomePage
     project={testProject.project}

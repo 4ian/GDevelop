@@ -2,6 +2,7 @@
 declare class gdMeasurementUnit {
   constructor(name: string, label: string, description: string): void;
   getName(): string;
+  getLabel(): string;
   getDescription(): string;
   getElementsCount(): number;
   getElementPower(elementIndex: number): number;

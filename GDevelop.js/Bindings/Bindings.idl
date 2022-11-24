@@ -832,6 +832,7 @@ interface MeasurementUnit {
   void MeasurementUnit(DOMString name, DOMString label, DOMString description);
 
   [Const, Ref] DOMString GetName();
+  [Const, Ref] DOMString GetLabel();
   [Const, Ref] DOMString GetDescription();
   
   long GetElementsCount();
@@ -850,9 +851,10 @@ interface MeasurementUnit {
 };
 
 interface MeasurementBaseUnit {
-  void MeasurementBaseUnit(DOMString name, DOMString symbol, DOMString quantity);
+  void MeasurementBaseUnit(DOMString name, DOMString label, DOMString symbol, DOMString quantity);
 
   [Const, Ref] DOMString GetName();
+  [Const, Ref] DOMString GetLabel();
   [Const, Ref] DOMString GetSymbol();
   [Const, Ref] DOMString GetQuantity();
 };

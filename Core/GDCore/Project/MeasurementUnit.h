@@ -41,6 +41,11 @@ public:
   const gd::String &GetName() const { return name; }
 
   /**
+   * \brief Return the unit label.
+   */
+  const gd::String &GetLabel() const { return label; }
+
+  /**
    * \brief Return the unit description.
    */
   const gd::String &GetDescription() const { return description; }
@@ -105,21 +110,21 @@ private:
     std::vector<gd::MeasurementUnitElement> elements;
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::degreeAngle, 1));
-    return MeasurementUnit(elements, "DegreeAngle", _("Degree"));
+    return MeasurementUnit(elements, "DegreeAngle", _("Angle"));
   }
 
   static gd::MeasurementUnit CreateSecond() {
     std::vector<gd::MeasurementUnitElement> elements;
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::second, 1));
-    return MeasurementUnit(elements, "Second", _("Second"));
+    return MeasurementUnit(elements, "Second", _("Duration"));
   }
 
   static gd::MeasurementUnit CreatePixel() {
     std::vector<gd::MeasurementUnitElement> elements;
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::pixel, 1));
-    return MeasurementUnit(elements, "Pixel", _("Pixel"));
+    return MeasurementUnit(elements, "Pixel", _("Distance"));
   }
 
   static gd::MeasurementUnit CreatePixelSpeed() {
@@ -128,7 +133,7 @@ private:
         MeasurementUnitElement(gd::MeasurementBaseUnit::pixel, 1));
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::second, -1));
-    return MeasurementUnit(elements, "PixelSpeed", _("Speed"));
+    return MeasurementUnit(elements, "PixelSpeed", _("Speed"), _("How much distance is cover per second."));
   }
 
   static gd::MeasurementUnit CreatePixelAcceleration() {
@@ -137,7 +142,7 @@ private:
         MeasurementUnitElement(gd::MeasurementBaseUnit::pixel, 1));
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::second, -2));
-    return MeasurementUnit(elements, "PixelAcceleration", _("Acceleration"));
+    return MeasurementUnit(elements, "PixelAcceleration", _("Acceleration"), _("How much speed is gain (or lost) per second."));
   }
 
   static gd::MeasurementUnit CreateNewton() {
@@ -148,7 +153,7 @@ private:
         MeasurementUnitElement(gd::MeasurementBaseUnit::kilogram, 1));
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::second, -2));
-    return MeasurementUnit(elements, "Newton", _("Newton"),
+    return MeasurementUnit(elements, "Newton", _("Force (in Newton)"),
                            _("A unit to measure forces."));
   }
 

@@ -11,7 +11,7 @@ import TextField from '../UI/TextField';
 
 import generateName from '../Utils/ProjectNameGenerator';
 import optionalRequire from '../Utils/OptionalRequire';
-import { findEmptyPathInDefaultFolder } from './LocalPathFinder';
+import { findEmptyPathInWorkspaceFolder } from './LocalPathFinder';
 import { type ProjectCreationSettings } from './CreateProjectDialog';
 import IconButton from '../UI/IconButton';
 
@@ -24,6 +24,7 @@ type Props = {|
   onClose: () => void,
   onCreate: ProjectCreationSettings => Promise<void>,
   sourceExampleName?: string,
+  preferences?: any,
 |};
 
 const generateProjectName = (sourceExampleName: ?string) =>
@@ -37,7 +38,13 @@ const ProjectPreCreationDialog = ({
   onClose,
   onCreate,
   sourceExampleName,
+  preferences,
 }: Props): React.Node => {
+  // Default Workspace to store projects
+  const defaultWorkspace =
+    preferences && preferences.values
+      ? preferences.values.defaultWorkspace
+      : null;
   const [projectNameError, setProjectNameError] = React.useState<?React.Node>(
     null
   );
@@ -45,7 +52,7 @@ const ProjectPreCreationDialog = ({
     generateProjectName(sourceExampleName)
   );
   const [outputPath, setOutputPath] = React.useState<string>(() =>
-    app ? findEmptyPathInDefaultFolder(app) : ''
+    app ? findEmptyPathInWorkspaceFolder(app, defaultWorkspace) : ''
   );
 
   const onValidate = React.useCallback(

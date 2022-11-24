@@ -224,6 +224,12 @@ const GetStartedSection = ({
     </ResponsiveLineStackLayout>
   );
 
+  const isTutorialComplete =
+    userProgress &&
+    typeof userProgress.progress === 'object' &&
+    userProgress.progress.every &&
+    userProgress.progress.every(item => item === 100);
+
   return (
     <SectionContainer
       title={
@@ -243,19 +249,41 @@ const GetStartedSection = ({
                 <PlaceholderLoader />
               ) : (
                 <GridList
-                  cols={getColumnsFromWidth(windowWidth)}
+                  cols={
+                    isTutorialComplete ? 1 : getColumnsFromWidth(windowWidth)
+                  }
                   style={styles.grid}
                   cellHeight="auto"
                   spacing={ITEMS_SPACING * 2}
                 >
-                  {inAppTutorialCards.map(item => (
-                    <GridListTile key={item.key}>
+                  {isTutorialComplete ? (
+                    <GridListTile>
                       <InAppTutorialPhaseCard
-                        {...item}
+                        title={t`Congratulations! You've finished this tutorial!`}
+                        description={t`Find your finished game on the “Build” section. Or restart the tutorial by clicking on the card.`}
+                        size="banner"
+                        locked={false}
+                        disabled={false}
+                        renderImage={props => (
+                          <Line justifyContent="space-around" expand>
+                            <Unboxing {...props} />
+                            <Building {...props} />
+                            <Podium {...props} />
+                          </Line>
+                        )}
                         onClick={() => selectInAppTutorial('flingGame')}
                       />
                     </GridListTile>
-                  ))}
+                  ) : (
+                    inAppTutorialCards.map(item => (
+                      <GridListTile key={item.key}>
+                        <InAppTutorialPhaseCard
+                          {...item}
+                          onClick={() => selectInAppTutorial('flingGame')}
+                        />
+                      </GridListTile>
+                    ))
+                  )}
                 </GridList>
               )}
             </div>

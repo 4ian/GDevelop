@@ -235,7 +235,11 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     userId: ?string,
   |}) {
     const userIdKey: string = userId || 'anonymous';
-    return this.state.values.inAppTutorialsProgress[tutorialId][userIdKey];
+    const tutorialProgresses = this.state.values.inAppTutorialsProgress[
+      tutorialId
+    ];
+    if (!tutorialProgresses) return undefined;
+    return tutorialProgresses[userIdKey];
   }
 
   _setUseUndefinedVariablesInAutocompletion(

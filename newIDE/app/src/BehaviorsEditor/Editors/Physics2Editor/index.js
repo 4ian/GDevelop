@@ -41,7 +41,6 @@ const NumericProperty = (props: {|
 |}) => {
   const { properties, propertyName, step, onUpdate } = props;
   const property = properties.get(propertyName);
-  const measurementUnit = property.getMeasurementUnit();
   return (
     <SemiControlledTextField
       fullWidth
@@ -56,7 +55,7 @@ const NumericProperty = (props: {|
   );
 };
 
-const UnitAdornment = (props: {| property: gdNamedPropertyDescriptor |}) => {
+const UnitAdornment = (props: {| property: gdPropertyDescriptor |}) => {
   const { property } = props;
   const measurementUnit = property.getMeasurementUnit();
   return (

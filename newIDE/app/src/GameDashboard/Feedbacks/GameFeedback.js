@@ -3,7 +3,7 @@ import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
-import { Column, Line, Spacer } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import Text from '../../UI/Text';
@@ -13,7 +13,6 @@ import {
   ResponsiveLineStackLayout,
 } from '../../UI/Layout';
 import PlaceholderError from '../../UI/PlaceholderError';
-import Checkbox from '../../UI/Checkbox';
 
 import FeedbackCard from './FeedbackCard';
 
@@ -21,16 +20,28 @@ import {
   shortenUuidForDisplay,
   listComments,
   type Comment,
+  updateComment,
 } from '../../Utils/GDevelopServices/Play';
 import { type Game } from '../../Utils/GDevelopServices/Game';
 import { getBuilds, type Build } from '../../Utils/GDevelopServices/Build';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
+import IconButton from '../../UI/IconButton';
+import BackgroundText from '../../UI/BackgroundText';
+import FeedbackAverageCard from './FeedbackAverageCard';
+import Options from '../../UI/CustomSvgIcons/Options';
+import ContextMenu, {
+  type ContextMenuInterface,
+} from '../../UI/Menu/ContextMenu';
+import { type MenuItemTemplate } from '../../UI/Menu/Menu.flow';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
+import CircularProgress from '../../UI/CircularProgress';
+import FlatButton from '../../UI/FlatButton';
 
 const styles = {
   // Make select field width not dependent on build names (name is truncated).
-  selectFieldContainer: { minWidth: 300 },
+  selectFieldContainer: { minWidth: 200, maxWidth: 350, width: '100%' },
 };
 
 type Props = {|
@@ -113,6 +124,8 @@ const getDisplayedFeedbacks = (
 };
 
 const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
+  const contextMenu = React.useRef<?ContextMenuInterface>(null);
+  const { getAuthorizationHeader, profile } = authenticatedUser;
   const [showProcessed, setShowProcessed] = React.useState(false);
   const [sortByDate, setSortByDate] = React.useState(true);
   const [feedbacks, setFeedbacks] = React.useState<?Array<Comment>>(null);
@@ -121,6 +134,9 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
   }>(null);
   const [filter, setFilter] = React.useState<string>('');
   const [isErrored, setIsErrored] = React.useState(false);
+  const [isMarkingAllAsProcessed, setIsMarkingAllAsProcessed] = React.useState(
+    false
+  );
 
   const displayedFeedbacks = getDisplayedFeedbacks(
     i18n,
@@ -129,6 +145,13 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
     sortByDate,
     filter
   );
+
+  const displayedFeedbacksArray: Comment[] = displayedFeedbacks
+    ? // $FlowFixMe - Flow doesn't understand that we're flattening the array.
+      Object.values(displayedFeedbacks)
+        .filter(Boolean)
+        .flat()
+    : [];
 
   const getBuildNameOption = (buildId: string) => {
     const shortenedUuid = shortenUuidForDisplay(buildId);
@@ -222,119 +245,221 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
     [loadFeedbacksAndBuilds]
   );
 
+  const openOptionsContextMenu = (event: MouseEvent) => {
+    if (contextMenu.current) {
+      contextMenu.current.open(event.clientX, event.clientY);
+    }
+  };
+
+  const markAllCommentsAsProcessed = async (i18n: I18nType) => {
+    if (!profile || isMarkingAllAsProcessed) return;
+    try {
+      setIsMarkingAllAsProcessed(true);
+      await Promise.all(
+        displayedFeedbacksArray
+          .filter(comment => !comment.processedAt)
+          .map(comment =>
+            updateComment(getAuthorizationHeader, profile.id, {
+              gameId: comment.gameId,
+              commentId: comment.id,
+              processed: true,
+            })
+          )
+      );
+      // Reload the feedbacks
+      loadFeedbacksAndBuilds();
+    } catch (error) {
+      console.error(`Unable to update one of the comments: `, error);
+      showErrorBox({
+        message:
+          i18n._(t`Unable to mark one of the feedback as read.`) +
+          ' ' +
+          i18n._(t`Verify your internet connection or try again later.`),
+        rawError: error,
+        errorId: 'all-feedback-card-set-processed-error',
+      });
+    } finally {
+      setIsMarkingAllAsProcessed(false);
+    }
+  };
+
+  const buildOptionsContextMenu = (i18n: I18nType): Array<MenuItemTemplate> => [
+    {
+      label: i18n._(t`Sort by most recent`),
+      click: () => setSortByDate(!sortByDate),
+      checked: sortByDate,
+      type: 'checkbox',
+    },
+    {
+      label: i18n._(t`Show unread feedback only`),
+      click: () => setShowProcessed(!showProcessed),
+      checked: showProcessed,
+      type: 'checkbox',
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Mark all as solved`),
+      click: () => markAllCommentsAsProcessed(i18n),
+    },
+  ];
+
   return (
-    <Column noMargin expand>
-      <Line>
-        {!authenticatedUser.authenticated && (
-          <EmptyMessage>
-            <Trans>You need to login first to see your game feedbacks.</Trans>
-          </EmptyMessage>
-        )}
-        {authenticatedUser.authenticated &&
-          !displayedFeedbacks &&
-          !isErrored && <PlaceholderLoader />}
-        {authenticatedUser.authenticated && isErrored && (
-          <PlaceholderError onRetry={() => loadFeedbacksAndBuilds()}>
-            <Trans>
-              An error occured while retrieving feedbacks for this game.
-            </Trans>
-          </PlaceholderError>
-        )}
-        {authenticatedUser.authenticated && displayedFeedbacks && (
-          <Column expand noMargin>
-            <ResponsiveLineStackLayout justifyContent="space-between">
-              <Column justifyContent="center">
-                <LineStackLayout noMargin alignItems="center">
-                  <Checkbox
-                    checked={sortByDate}
-                    onCheck={(_event, checked) => {
-                      setSortByDate(checked);
-                    }}
-                    label={<Trans>Sort by most recent</Trans>}
-                  />
-                  <Spacer />
-                  <Checkbox
-                    checked={showProcessed}
-                    onCheck={(_event, checked) => {
-                      setShowProcessed(checked);
-                    }}
-                    label={<Trans>Show unread feedback only</Trans>}
-                  />
-                </LineStackLayout>
-              </Column>
-              {buildsByIds && (
-                <Column>
-                  <div style={styles.selectFieldContainer}>
-                    <SelectField
-                      fullWidth
-                      floatingLabelText={<Trans>Show</Trans>}
-                      value={filter}
-                      onChange={(e, i, value) => {
-                        setFilter(value);
-                      }}
-                    >
-                      <SelectOption
-                        key={'all'}
-                        value={''}
-                        primaryText={t`All builds`}
-                      />
-                      <SelectOption
-                        key={'game-only'}
-                        value={'game-only'}
-                        primaryText={t`On game page only`}
-                      />
-                      {Object.keys(buildsByIds).map(buildId => {
-                        return (
-                          <SelectOption
-                            key={buildId}
-                            value={buildId}
-                            primaryText={getBuildNameOption(buildId)}
-                          />
-                        );
-                      })}
-                    </SelectField>
-                  </div>
+    <>
+      <Column noMargin expand>
+        <Line>
+          {!authenticatedUser.authenticated && (
+            <EmptyMessage>
+              <Trans>You need to login first to see your game feedbacks.</Trans>
+            </EmptyMessage>
+          )}
+          {authenticatedUser.authenticated &&
+            !displayedFeedbacks &&
+            !isErrored && <PlaceholderLoader />}
+          {authenticatedUser.authenticated && isErrored && (
+            <PlaceholderError onRetry={loadFeedbacksAndBuilds}>
+              <Trans>
+                An error occured while retrieving feedbacks for this game.
+              </Trans>
+            </PlaceholderError>
+          )}
+          {authenticatedUser.authenticated && displayedFeedbacks && (
+            <Column expand noMargin>
+              <ResponsiveLineStackLayout justifyContent="space-between">
+                <Column justifyContent="center">
+                  <LineStackLayout noMargin alignItems="center">
+                    <BackgroundText>
+                      <Trans>
+                        This is all the feedback received on {game.gameName}{' '}
+                        coming from Liluo.
+                      </Trans>
+                    </BackgroundText>
+                  </LineStackLayout>
                 </Column>
-              )}
-            </ResponsiveLineStackLayout>
-            {Object.keys(displayedFeedbacks).length === 0 && (
-              <EmptyMessage>
-                {showProcessed ? (
-                  <Trans>
-                    You don't have any unread feedback for this game.
-                  </Trans>
-                ) : (
-                  <Trans>You don't have any feedback for this game.</Trans>
+                {buildsByIds && (
+                  <Column>
+                    <Line>
+                      <div style={styles.selectFieldContainer}>
+                        <SelectField
+                          fullWidth
+                          floatingLabelText={<Trans>Show</Trans>}
+                          value={filter}
+                          onChange={(e, i, value) => {
+                            setFilter(value);
+                          }}
+                        >
+                          <SelectOption
+                            key={'all'}
+                            value={''}
+                            primaryText={t`All builds`}
+                          />
+                          <SelectOption
+                            key={'game-only'}
+                            value={'game-only'}
+                            primaryText={t`On game page only`}
+                          />
+                          {Object.keys(buildsByIds).map(buildId => {
+                            return (
+                              <SelectOption
+                                key={buildId}
+                                value={buildId}
+                                primaryText={getBuildNameOption(buildId)}
+                              />
+                            );
+                          })}
+                        </SelectField>
+                      </div>
+                    </Line>
+                  </Column>
                 )}
-              </EmptyMessage>
-            )}
-            {Object.keys(displayedFeedbacks).length !== 0 && (
+              </ResponsiveLineStackLayout>
               <ColumnStackLayout expand noMargin>
-                {Object.keys(displayedFeedbacks).map(key => (
-                  <ColumnStackLayout key={key}>
-                    <Spacer />
-                    <Text>{sortByDate ? key : getBuildNameTitle(key)}</Text>
-                    {displayedFeedbacks[key].map(
-                      (comment: Comment, index: number) => (
-                        <FeedbackCard
-                          key={comment.id}
-                          comment={comment}
-                          buildProperties={getBuildPropertiesForComment(
-                            comment
-                          )}
-                          authenticatedUser={authenticatedUser}
-                          onCommentUpdated={onCommentUpdated}
-                        />
-                      )
-                    )}
-                  </ColumnStackLayout>
-                ))}
+                {!!feedbacks && feedbacks.length && (
+                  <FeedbackAverageCard feedbacks={feedbacks} />
+                )}
               </ColumnStackLayout>
-            )}
-          </Column>
-        )}
-      </Line>
-    </Column>
+              {displayedFeedbacksArray.length === 0 && (
+                <>
+                  {showProcessed ? (
+                    <LineStackLayout
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <Text>
+                        <Trans>
+                          You don't have any unread feedback for this game.
+                        </Trans>
+                      </Text>
+                      <FlatButton
+                        onClick={() => setShowProcessed(false)}
+                        label={<Trans>Show all feedbacks</Trans>}
+                      />
+                    </LineStackLayout>
+                  ) : (
+                    <Trans>You don't have any feedback for this game.</Trans>
+                  )}
+                </>
+              )}
+              {displayedFeedbacksArray.length !== 0 && (
+                <ColumnStackLayout expand noMargin>
+                  {Object.keys(displayedFeedbacks).map((key, index) => {
+                    const title = sortByDate ? key : getBuildNameTitle(key);
+                    return (
+                      <ColumnStackLayout key={key} noMargin>
+                        <Line
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
+                          <Column>
+                            <Text size="block-title">
+                              {title}
+                              {title ? ' - ' : ' '}
+                              <Trans>
+                                {displayedFeedbacks[key].length} feedback cards
+                              </Trans>
+                            </Text>
+                          </Column>
+                          {index === 0 && (
+                            <Column justifyContent="center">
+                              <IconButton
+                                disabled={isMarkingAllAsProcessed}
+                                onClick={event => openOptionsContextMenu(event)}
+                              >
+                                {!isMarkingAllAsProcessed ? (
+                                  <Options fontSize="small" />
+                                ) : (
+                                  <CircularProgress size={20} />
+                                )}
+                              </IconButton>
+                            </Column>
+                          )}
+                        </Line>
+                        {displayedFeedbacks[key].map(
+                          (comment: Comment, index: number) => (
+                            <FeedbackCard
+                              key={comment.id}
+                              comment={comment}
+                              buildProperties={getBuildPropertiesForComment(
+                                comment
+                              )}
+                              authenticatedUser={authenticatedUser}
+                              onCommentUpdated={onCommentUpdated}
+                            />
+                          )
+                        )}
+                      </ColumnStackLayout>
+                    );
+                  })}
+                </ColumnStackLayout>
+              )}
+            </Column>
+          )}
+        </Line>
+      </Column>
+      <ContextMenu
+        ref={contextMenu}
+        buildMenuTemplate={buildOptionsContextMenu}
+      />
+    </>
   );
 };
 

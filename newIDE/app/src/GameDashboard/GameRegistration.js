@@ -24,7 +24,7 @@ type Props = {|
   hideIfRegistered?: boolean,
   hideIfSubscribed?: boolean,
   hideLoader?: boolean,
-  onGameRegistered?: () => void,
+  onGameRegistered?: () => void | Promise<void>,
 |};
 
 type DetailsTab = 'details' | 'analytics';

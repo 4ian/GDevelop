@@ -1,29 +1,31 @@
 // @flow
 import * as React from 'react';
-import { Column, Line } from '../UI/Grid';
-import { type Subscription } from '../Utils/GDevelopServices/Usage';
-import PlaceholderLoader from '../UI/PlaceholderLoader';
-import RaisedButton from '../UI/RaisedButton';
+import { Column, Line } from '../../UI/Grid';
+import { type Subscription } from '../../Utils/GDevelopServices/Usage';
+import PlaceholderLoader from '../../UI/PlaceholderLoader';
+import RaisedButton from '../../UI/RaisedButton';
 import { Trans } from '@lingui/macro';
-import Text from '../UI/Text';
-import LeftLoader from '../UI/LeftLoader';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
-import FlatButton from '../UI/FlatButton';
+import Text from '../../UI/Text';
+import LeftLoader from '../../UI/LeftLoader';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import FlatButton from '../../UI/FlatButton';
+import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
 
 type Props = {
   subscription: ?Subscription,
-  onChangeSubscription: () => void,
   onManageSubscription: () => void | Promise<void>,
   isManageSubscriptionLoading: boolean,
 };
 
 const SubscriptionDetails = ({
   subscription,
-  onChangeSubscription,
   isManageSubscriptionLoading,
   onManageSubscription,
-}: Props) =>
-  subscription ? (
+}: Props) => {
+  const { openSubscriptionDialog } = React.useContext(
+    SubscriptionSuggestionContext
+  );
+  return subscription ? (
     <Column>
       <Line alignItems="center">
         <Text size="block-title">My online services subscriptions</Text>
@@ -50,7 +52,7 @@ const SubscriptionDetails = ({
             <RaisedButton
               label={<Trans>Upgrade or cancel</Trans>}
               primary
-              onClick={onChangeSubscription}
+              onClick={() => openSubscriptionDialog({ reason: 'Consult ' })}
             />
           </ResponsiveLineStackLayout>
         </>
@@ -69,7 +71,7 @@ const SubscriptionDetails = ({
             <RaisedButton
               label={<Trans>Choose a subscription</Trans>}
               primary
-              onClick={onChangeSubscription}
+              onClick={() => openSubscriptionDialog({ reason: 'Consult ' })}
             />
           </Line>
         </>
@@ -78,5 +80,6 @@ const SubscriptionDetails = ({
   ) : (
     <PlaceholderLoader />
   );
+};
 
 export default SubscriptionDetails;

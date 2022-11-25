@@ -57,7 +57,7 @@ type Props = {|
 |};
 
 /**
- * A generic UI to launch, monitor the progres and get the result
+ * A generic UI to launch, monitor the progress and get the result
  * of an export.
  */
 export default class ExportLauncher extends Component<Props, State> {

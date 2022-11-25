@@ -10,11 +10,12 @@ import {
 } from '../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Text from '../UI/Text';
+import { SubscriptionSuggestionContext } from './Subscription/SubscriptionSuggestionContext';
 
 type Props = {|
   subscription: ?Subscription,
   currentUsage: ?CurrentUsage,
-  onChangeSubscription: Function,
+  onChangeSubscription: () => void,
 |};
 
 const CurrentUsageDisplayer = ({
@@ -22,6 +23,9 @@ const CurrentUsageDisplayer = ({
   currentUsage,
   onChangeSubscription,
 }: Props) => {
+  const { openSubscriptionDialog } = React.useContext(
+    SubscriptionSuggestionContext
+  );
   if (!currentUsage) return <PlaceholderLoader />;
   const hasSubscription = subscription && !!subscription.planId;
   const noSubscription = subscription && !subscription.planId;
@@ -46,7 +50,10 @@ const CurrentUsageDisplayer = ({
         <Line justifyContent="center" alignItems="center">
           <RaisedButton
             label={<Trans>Upgrade my account</Trans>}
-            onClick={onChangeSubscription}
+            onClick={() => {
+              onChangeSubscription();
+              openSubscriptionDialog({ reason: 'Build limit reached' });
+            }}
             primary
           />
         </Line>
@@ -62,7 +69,10 @@ const CurrentUsageDisplayer = ({
         <Line justifyContent="center" alignItems="center">
           <RaisedButton
             label={<Trans>Get a subscription</Trans>}
-            onClick={onChangeSubscription}
+            onClick={() => {
+              onChangeSubscription();
+              openSubscriptionDialog({ reason: 'Build limit reached' });
+            }}
             primary
           />
         </Line>

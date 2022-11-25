@@ -11,7 +11,7 @@ import assignIn from 'lodash/assignIn';
 import { type PreviewOptions } from '../../PreviewLauncher.flow';
 import SubscriptionChecker, {
   type SubscriptionCheckerInterface,
-} from '../../../Profile/SubscriptionChecker';
+} from '../../../Profile/Subscription/SubscriptionChecker';
 import {
   getDebuggerServerAddress,
   localPreviewDebuggerServer,
@@ -25,7 +25,6 @@ const gd: libGDevelop = global.gd;
 type Props = {|
   getIncludeFileHashs: () => { [string]: number },
   onExport?: () => void,
-  onChangeSubscription?: () => void,
 |};
 
 type State = {|
@@ -292,11 +291,9 @@ export default class LocalPreviewLauncher extends React.Component<
           ref={subscriptionChecker =>
             (this._networkPreviewSubscriptionChecker = subscriptionChecker)
           }
-          onChangeSubscription={() => {
-            this.setState({ networkPreviewDialogOpen: false });
-            if (this.props.onChangeSubscription)
-              this.props.onChangeSubscription();
-          }}
+          onChangeSubscription={() =>
+            this.setState({ networkPreviewDialogOpen: false })
+          }
           id="Preview over wifi"
           title={<Trans>Preview over wifi</Trans>}
           mode="try"
@@ -305,10 +302,6 @@ export default class LocalPreviewLauncher extends React.Component<
           ref={subscriptionChecker =>
             (this._hotReloadSubscriptionChecker = subscriptionChecker)
           }
-          onChangeSubscription={() => {
-            if (this.props.onChangeSubscription)
-              this.props.onChangeSubscription();
-          }}
           id="Hot reloading"
           title={
             <Trans>Live preview (apply changes to the running preview)</Trans>

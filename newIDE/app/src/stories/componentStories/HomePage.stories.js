@@ -94,7 +94,6 @@ const WrappedHomePage = ({
                 action('open precreation dialog')()
               }
               onOpenProfile={() => action('open profile')()}
-              onChangeSubscription={() => action('change subscription')()}
               onOpenPreferences={() => action('open preferences')()}
               onOpenAbout={() => action('open about')()}
             />

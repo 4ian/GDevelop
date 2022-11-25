@@ -362,8 +362,11 @@ export const sendSubscriptionCheckDismiss = () => {
   recordEvent('subscription-check-dialog-dismiss');
 };
 
-export const sendSubscriptionDialogShown = () => {
-  recordEvent('subscription-dialog-shown', {});
+export const sendSubscriptionDialogShown = (metadata: {|
+  reason: string,
+  preStep?: 'subscriptionChecker',
+|}) => {
+  recordEvent('subscription-dialog-shown', metadata);
 };
 
 export const sendAssetOpened = (options: {|

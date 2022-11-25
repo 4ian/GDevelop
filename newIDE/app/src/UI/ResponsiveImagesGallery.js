@@ -82,8 +82,7 @@ const ResponsiveImagesGallery = ({
     () =>
       makeStyles({
         'spacing-xs-1': {
-          marginLeft: 0,
-          marginRight: 0,
+          margin: 0, // Prevent grid to apply negative margin, creating unwanted scroll bars.
           // Remove padding for first and last element to keep images aligned on component max width
           '& > .MuiGrid-item:first-child': {
             paddingLeft: mobileExtremeItemsPadding,

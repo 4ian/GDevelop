@@ -148,6 +148,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     getShowEventBasedObjectsEditor: this._getShowEventBasedObjectsEditor.bind(
       this
     ),
+    setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this),
   };
 
   componentDidMount() {
@@ -701,6 +702,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           isAlwaysOnTopInPreview: enabled,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setNewProjectsDefaultFolder(newProjectsDefaultFolder: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          newProjectsDefaultFolder,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

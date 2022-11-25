@@ -11,9 +11,10 @@ import TextField from '../UI/TextField';
 
 import generateName from '../Utils/ProjectNameGenerator';
 import optionalRequire from '../Utils/OptionalRequire';
-import { findEmptyPathInDefaultFolder } from './LocalPathFinder';
+import { findEmptyPathInWorkspaceFolder } from './LocalPathFinder';
 import { type ProjectCreationSettings } from './CreateProjectDialog';
 import IconButton from '../UI/IconButton';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
@@ -38,6 +39,8 @@ const ProjectPreCreationDialog = ({
   onCreate,
   sourceExampleName,
 }: Props): React.Node => {
+  const { values } = React.useContext(PreferencesContext);
+  const newProjectsDefaultFolder = values.newProjectsDefaultFolder || null;
   const [projectNameError, setProjectNameError] = React.useState<?React.Node>(
     null
   );
@@ -45,7 +48,7 @@ const ProjectPreCreationDialog = ({
     generateProjectName(sourceExampleName)
   );
   const [outputPath, setOutputPath] = React.useState<string>(() =>
-    app ? findEmptyPathInDefaultFolder(app) : ''
+    app ? findEmptyPathInWorkspaceFolder(app, newProjectsDefaultFolder) : ''
   );
 
   const onValidate = React.useCallback(

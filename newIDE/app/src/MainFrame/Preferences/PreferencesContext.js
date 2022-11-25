@@ -7,7 +7,11 @@ import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
 import optionalRequire from '../../Utils/OptionalRequire';
+import { findDefaultFolder } from '../../ProjectCreation/LocalPathFinder';
+
 const electron = optionalRequire('electron');
+const remote = optionalRequire('@electron/remote');
+const app = remote ? remote.app : null;
 
 export type AlertMessageIdentifier =
   | 'default-additional-work'
@@ -206,6 +210,7 @@ export type PreferencesValues = {|
   showCommunityExtensions: boolean,
   showGetStartedSection: boolean,
   showEventBasedObjectsEditor: boolean,
+  newProjectsDefaultFolder: string,
 |};
 
 /**
@@ -269,6 +274,7 @@ export type Preferences = {|
   setShowGetStartedSection: (enabled: boolean) => void,
   setShowEventBasedObjectsEditor: (enabled: boolean) => void,
   getShowEventBasedObjectsEditor: () => boolean,
+  setNewProjectsDefaultFolder: (newProjectsDefaultFolder: string) => void,
 |};
 
 export const initialPreferences = {
@@ -308,6 +314,7 @@ export const initialPreferences = {
     showCommunityExtensions: false,
     showGetStartedSection: true,
     showEventBasedObjectsEditor: false,
+    newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -361,6 +368,7 @@ export const initialPreferences = {
   setShowGetStartedSection: (enabled: boolean) => {},
   setShowEventBasedObjectsEditor: (enabled: boolean) => {},
   getShowEventBasedObjectsEditor: () => false,
+  setNewProjectsDefaultFolder: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

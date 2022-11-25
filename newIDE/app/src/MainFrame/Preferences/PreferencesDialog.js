@@ -5,6 +5,7 @@ import { type I18n } from '@lingui/core';
 import React from 'react';
 import SelectField from '../../UI/SelectField';
 import FlatButton from '../../UI/FlatButton';
+import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import SelectOption from '../../UI/SelectOption';
 import Toggle from '../../UI/Toggle';
 import Dialog from '../../UI/Dialog';
@@ -60,6 +61,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
     setShowEventBasedObjectsEditor,
+    setNewProjectsDefaultFolder,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -83,6 +85,9 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
           options={[
             { value: 'preferences', label: <Trans>Preferences</Trans> },
             { value: 'shortcuts', label: <Trans>Keyboard Shortcuts</Trans> },
+            ...(electron
+              ? [{ value: 'folders', label: <Trans>Folders</Trans> }]
+              : []),
           ]}
           // Enforce scroll on small screen, because the tabs have long names.
           variant={windowWidth === 'small' ? 'scrollable' : undefined}
@@ -388,6 +393,16 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             />
           </Column>
         </Line>
+      )}
+      {electron && currentTab === 'folders' && (
+        <ColumnStackLayout noMargin>
+          <LocalFolderPicker
+            fullWidth
+            value={values.newProjectsDefaultFolder}
+            onChange={setNewProjectsDefaultFolder}
+            type="default-workspace"
+          />
+        </ColumnStackLayout>
       )}
     </Dialog>
   );

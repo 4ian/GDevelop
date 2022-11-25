@@ -270,6 +270,7 @@ export const getMeasurementUnitShortLabel = (
 export const getMeasurementUnitDescription = (
   measurementUnit: gdMeasurementUnit
 ): string => {
+  let wasNegativePower = false;
   return (
     '### ' +
     measurementUnit.getLabel() +
@@ -281,11 +282,15 @@ export const getMeasurementUnitDescription = (
       const power = measurementUnit.getElementPower(i);
       const absPower = Math.abs(power);
       const signedUnit = (power < 0 ? 'per ' : '') + baseUnit.getLabel();
+      const separator = power < 0 ? ', ' : ' ';
+      const firstSeparator = i === 0 ? '' : wasNegativePower ? separator : ' ';
       const poweredUnit =
+        firstSeparator +
         signedUnit +
-        (absPower > 1 ? ' ' + signedUnit.repeat(absPower - 1) : '');
+        (absPower > 1 ? (separator + signedUnit).repeat(absPower - 1) : '');
+      wasNegativePower = power < 0;
       return poweredUnit;
-    }).join(' ') +
+    }).join('') +
     '_'
   );
 };

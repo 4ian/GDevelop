@@ -834,6 +834,7 @@ interface MeasurementUnit {
   [Const, Ref] DOMString GetName();
   [Const, Ref] DOMString GetLabel();
   [Const, Ref] DOMString GetDescription();
+  [Const, Ref] DOMString GetElementsWithWords();
   
   long GetElementsCount();
   long GetElementPower(long elementIndex);

@@ -25,13 +25,14 @@ class GD_CORE_API MeasurementUnit {
 public:
   MeasurementUnit(const std::vector<gd::MeasurementUnitElement> &elements_,
                   gd::String name_, gd::String label_,
-                  gd::String description_ = "")
+                  gd::String elementsWithWords_, gd::String description_ = "")
       : elements(elements_), name(name_), label(label_),
-        description(description_) {}
+        description(description_), elementsWithWords(elementsWithWords_) {}
 
   MeasurementUnit(gd::String name_, gd::String label_,
-                  gd::String description_ = "")
-      : name(name_), label(label_), description(description_) {}
+                  gd::String elementsWithWords_, gd::String description_ = "")
+      : name(name_), label(label_), description(description_),
+        elementsWithWords(elementsWithWords_) {}
 
   virtual ~MeasurementUnit();
 
@@ -49,6 +50,11 @@ public:
    * \brief Return the unit description.
    */
   const gd::String &GetDescription() const { return description; }
+
+  /**
+   * \brief Return the unit description.
+   */
+  const gd::String &GetElementsWithWords() const { return elementsWithWords; }
 
   /**
    * \brief Return the unit elements.
@@ -102,32 +108,32 @@ private:
   static gd::MeasurementUnit angularSpeed;
 
   static gd::MeasurementUnit CreateUndefined() {
-    return MeasurementUnit("Undefined", _("Undefined"));
+    return MeasurementUnit("Undefined", _("Undefined"), "");
   }
 
   static gd::MeasurementUnit CreateDimensionless() {
-    return MeasurementUnit("Dimensionless", _("Dimensionless"));
+    return MeasurementUnit("Dimensionless", _("Dimensionless"), "");
   }
 
   static gd::MeasurementUnit CreateDegreeAngle() {
     std::vector<gd::MeasurementUnitElement> elements;
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::degreeAngle, 1));
-    return MeasurementUnit(elements, "DegreeAngle", _("Angle"));
+    return MeasurementUnit(elements, "DegreeAngle", _("Angle"), _("degree"));
   }
 
   static gd::MeasurementUnit CreateSecond() {
     std::vector<gd::MeasurementUnitElement> elements;
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::second, 1));
-    return MeasurementUnit(elements, "Second", _("Duration"));
+    return MeasurementUnit(elements, "Second", _("Duration"), _("second"));
   }
 
   static gd::MeasurementUnit CreatePixel() {
     std::vector<gd::MeasurementUnitElement> elements;
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::pixel, 1));
-    return MeasurementUnit(elements, "Pixel", _("Distance"));
+    return MeasurementUnit(elements, "Pixel", _("Distance"), _("pixel"));
   }
 
   static gd::MeasurementUnit CreatePixelSpeed() {
@@ -137,6 +143,7 @@ private:
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::second, -1));
     return MeasurementUnit(elements, "PixelSpeed", _("Speed"),
+                           _("pixel per second"),
                            _("How much distance is covered per second."));
   }
 
@@ -147,6 +154,7 @@ private:
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::second, -2));
     return MeasurementUnit(elements, "PixelAcceleration", _("Acceleration"),
+                           _("pixel per second, per second"),
                            _("How much speed is gained (or lost) per second."));
   }
 
@@ -158,8 +166,10 @@ private:
         MeasurementUnitElement(gd::MeasurementBaseUnit::kilogram, 1));
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::second, -2));
-    return MeasurementUnit(elements, "Newton", _("Force (in Newton)"),
-                           _("A unit to measure forces."));
+    return MeasurementUnit(
+        elements, "Newton",
+        _("Force (in Newton)"), _("meter kilogram per second, per second"),
+        _("A unit to measure forces."));
   }
 
   static gd::MeasurementUnit CreateAngularSpeed() {
@@ -169,12 +179,14 @@ private:
     elements.push_back(
         MeasurementUnitElement(gd::MeasurementBaseUnit::second, -1));
     return MeasurementUnit(elements, "AngularSpeed", _("Angular speed"),
+                           _("degree per second"),
                            _("How much angle is covered per second."));
   }
 
-  gd::String name;                                  ///< The unit name.
-  gd::String label;                                 ///< The unit label.
-  gd::String description;                           ///< The unit description.
+  gd::String name;              ///< The unit name.
+  gd::String label;             ///< The unit label.
+  gd::String description;       ///< The unit description.
+  gd::String elementsWithWords; ///< The unit elements put in words.
   std::vector<gd::MeasurementUnitElement> elements; ///< The unit elements.
 };
 

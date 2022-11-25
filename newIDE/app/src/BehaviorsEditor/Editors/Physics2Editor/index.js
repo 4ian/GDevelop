@@ -13,10 +13,8 @@ import ImagePreview, {
 } from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import ResourceSelector from '../../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../../ResourcesLoader';
-import {
-  getMeasurementUnitShortLabel,
-  getMeasurementUnitDescription,
-} from '../../../PropertiesEditor/PropertiesMapToSchema';
+import { getMeasurementUnitShortLabel } from '../../../PropertiesEditor/PropertiesMapToSchema';
+import MeasurementUnitDocumentation from '../../../PropertiesEditor/MeasurementUnitDocumentation';
 import ShapePreview from './ShapePreview';
 import PolygonEditor from './PolygonEditor';
 import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
@@ -29,7 +27,6 @@ import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Tooltip from '@material-ui/core/Tooltip';
-import { MarkdownText } from '../../../UI/MarkdownText';
 
 type Props = BehaviorEditorProps;
 
@@ -61,9 +58,10 @@ const UnitAdornment = (props: {| property: gdPropertyDescriptor |}) => {
   return (
     <Tooltip
       title={
-        <MarkdownText
-          source={getMeasurementUnitDescription(measurementUnit)}
-          isStandaloneText
+        <MeasurementUnitDocumentation
+          label={measurementUnit.getLabel()}
+          description={measurementUnit.getDescription()}
+          elementsWithWords={measurementUnit.getElementsWithWords()}
         />
       }
     >

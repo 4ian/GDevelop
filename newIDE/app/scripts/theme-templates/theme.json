@@ -223,6 +223,50 @@
           "value": "{theme.surface.canvas.background-color.value}"
         }
       }
+    },
+    "home": {
+      "header": {
+        "background-color": {
+          "value": "{theme.surface.canvas.background-color.value}"
+        }
+      },
+      "separator": {
+        "color": {
+          "value": "#32323B"
+        }
+      }
+    },
+    "linear-progress": {
+      "color": {
+        "complete": {
+          "value": "#16CF89"
+        },
+        "incomplete": {
+          "value": "#FFA929"
+        }
+      }
+    },
+    "tabs": {
+      "text-color": {
+        "value": "#7F7F85"
+      },
+      "background-color": {
+        "value": "#002731"
+      },
+      "indicator-color": {
+        "value": "#A6A6AB"
+      },
+      "separator-color": {
+        "value": "#606066"
+      },
+      "selected": {
+        "text-color": {
+          "value": "#FAFAFA"
+        },
+        "background-color": {
+          "value": "#494952"
+        }
+      }
     }
   },
   "input": {

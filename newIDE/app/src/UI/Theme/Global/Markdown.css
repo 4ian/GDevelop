@@ -42,3 +42,8 @@
 .gd-markdown img {
   max-width: 100%;
 }
+
+.gd-markdown p {
+  margin-block-start: 10px;
+  margin-block-end: 10px;
+}

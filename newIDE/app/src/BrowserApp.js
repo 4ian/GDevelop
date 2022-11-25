@@ -71,7 +71,7 @@ export const create = (authentication: Authentication) => {
               )}
               initialDialog={appArguments['initial-dialog']}
               initialGameId={appArguments['game-id']}
-              initialGameTab={appArguments['game-tab']}
+              initialGameDashboardTab={appArguments['game-dashboard-tab']}
               renderExportDialog={props => (
                 <ExportDialog
                   project={props.project}

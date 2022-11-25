@@ -16,7 +16,7 @@ import {
   getCategoryName,
 } from '../Utils/GDevelopServices/Game';
 import Dialog from '../UI/Dialog';
-import { Tabs } from '../UI/Tabs';
+import { Tabs, type TabOptions } from '../UI/Tabs';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
@@ -46,17 +46,45 @@ import { GameAnalyticsPanel } from './GameAnalyticsPanel';
 import GameFeedback from './Feedbacks/GameFeedback';
 import { GameMonetization } from './Monetization/GameMonetization';
 
-export type GamesDetailsTab =
+export type GameDetailsTab =
   | 'details'
   | 'builds'
   | 'feedback'
   | 'analytics'
-  | 'leaderboards';
+  | 'leaderboards'
+  | 'monetization';
+
+export const gameDetailsTabs: TabOptions<GameDetailsTab> = [
+  {
+    value: 'details',
+    label: <Trans>Details</Trans>,
+  },
+  {
+    value: 'builds',
+    label: <Trans>Builds</Trans>,
+  },
+  {
+    value: 'feedback',
+    label: <Trans>Feedback</Trans>,
+  },
+  {
+    value: 'analytics',
+    label: <Trans>Analytics</Trans>,
+  },
+  {
+    value: 'leaderboards',
+    label: <Trans>Leaderboards</Trans>,
+  },
+  {
+    value: 'monetization',
+    label: <Trans>Monetization</Trans>,
+  },
+];
 
 type Props = {|
   game: Game,
   project: ?gdProject,
-  initialTab: GamesDetailsTab,
+  initialTab: GameDetailsTab,
   onClose: () => void,
   onGameUpdated: (updatedGame: Game) => void,
   onGameDeleted: () => void,
@@ -73,7 +101,9 @@ export const GameDetailsDialog = ({
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
-  const [currentTab, setCurrentTab] = React.useState(initialTab);
+  const [currentTab, setCurrentTab] = React.useState<GameDetailsTab>(
+    initialTab
+  );
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [
     gameUnregisterErrorText,
@@ -330,32 +360,7 @@ export const GameDetailsDialog = ({
             <Tabs
               value={currentTab}
               onChange={setCurrentTab}
-              options={[
-                {
-                  value: 'details',
-                  label: <Trans>Details</Trans>,
-                },
-                {
-                  value: 'builds',
-                  label: <Trans>Builds</Trans>,
-                },
-                {
-                  value: 'feedback',
-                  label: <Trans>Feedback</Trans>,
-                },
-                {
-                  value: 'analytics',
-                  label: <Trans>Analytics</Trans>,
-                },
-                {
-                  value: 'leaderboards',
-                  label: <Trans>Leaderboards</Trans>,
-                },
-                {
-                  value: 'monetization',
-                  label: <Trans>Monetization</Trans>,
-                },
-              ]}
+              options={gameDetailsTabs}
             />
           }
         >

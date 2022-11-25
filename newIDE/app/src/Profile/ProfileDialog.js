@@ -17,16 +17,18 @@ import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import CreateProfile from './CreateProfile';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import { type GamesDetailsTab } from '../GameDashboard/GameDetailsDialog';
+import { type GameDetailsTab } from '../GameDashboard/GameDetailsDialog';
+
+export type ProfileTab = 'profile' | 'games-dashboard';
 
 type Props = {|
   currentProject: ?gdProject,
   open: boolean,
   onClose: () => void,
   onChangeSubscription: () => void,
-  initialTab: 'profile' | 'games-dashboard',
+  initialTab: ProfileTab,
   gamesDashboardInitialGameId: ?string,
-  gamesDashboardInitialTab: ?GamesDetailsTab,
+  gamesDashboardInitialTab: ?GameDetailsTab,
 |};
 
 const ProfileDialog = ({
@@ -38,7 +40,7 @@ const ProfileDialog = ({
   gamesDashboardInitialGameId,
   gamesDashboardInitialTab,
 }: Props) => {
-  const [currentTab, setCurrentTab] = React.useState<string>(initialTab);
+  const [currentTab, setCurrentTab] = React.useState<ProfileTab>(initialTab);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const isUserLoading = authenticatedUser.loginState !== 'done';
 

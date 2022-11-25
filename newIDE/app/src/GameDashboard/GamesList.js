@@ -8,13 +8,13 @@ import { type Game, getGames } from '../Utils/GDevelopServices/Game';
 import { GameCard } from './GameCard';
 import { ColumnStackLayout } from '../UI/Layout';
 import { GameRegistration } from './GameRegistration';
-import { GameDetailsDialog, type GamesDetailsTab } from './GameDetailsDialog';
+import { GameDetailsDialog, type GameDetailsTab } from './GameDetailsDialog';
 import Window from '../Utils/Window';
 
 type Props = {|
   project: ?gdProject,
   initialGameId: ?string,
-  initialTab: ?GamesDetailsTab,
+  initialTab: ?GameDetailsTab,
 |};
 
 export const GamesList = ({ project, initialGameId, initialTab }: Props) => {
@@ -29,7 +29,7 @@ export const GamesList = ({ project, initialGameId, initialTab }: Props) => {
   const [
     openedGameInitialTab,
     setOpenedGameInitialTab,
-  ] = React.useState<GamesDetailsTab>(initialTab || 'details');
+  ] = React.useState<GameDetailsTab>(initialTab || 'details');
 
   const loadGames = React.useCallback(
     async () => {
@@ -106,7 +106,7 @@ export const GamesList = ({ project, initialGameId, initialTab }: Props) => {
           key={game.id}
           isCurrentGame={!!projectUuid && game.id === projectUuid}
           game={game}
-          onOpenGameManager={(tab: GamesDetailsTab) => {
+          onOpenGameManager={(tab: GameDetailsTab) => {
             setOpenedGameInitialTab(tab);
             setOpenedGame(game);
           }}

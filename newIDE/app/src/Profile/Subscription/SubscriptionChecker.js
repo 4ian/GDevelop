@@ -111,8 +111,7 @@ const SubscriptionChecker = React.forwardRef<
           ) : (
             <Text>
               <Trans>
-                To use this feature, we ask you to get a subscription to
-                GDevelop.
+                To use this feature, you need a GDevelop subscription.
               </Trans>
             </Text>
           )}
@@ -121,9 +120,8 @@ const SubscriptionChecker = React.forwardRef<
           <Star style={styles.icon} />
           <Text style={styles.iconText}>
             <Trans>
-              Get a subscription to gain more one-click exports, remove the
-              GDevelop splashscreen and this message asking you to get a
-              subscription.
+              Get a subscription to gain more one-click exports, cloud projects,
+              leaderboards and remove the GDevelop splashscreen.
             </Trans>
           </Text>
         </Line>

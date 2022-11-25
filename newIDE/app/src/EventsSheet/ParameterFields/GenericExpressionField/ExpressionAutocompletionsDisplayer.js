@@ -226,6 +226,22 @@ const DisplayedBehaviorAutocompletion = React.forwardRef(
   }
 );
 
+const isParameterVisible = (
+  expressionMetadata: gdExpressionMetadata,
+  parameterIndex: number
+): boolean => {
+  const parameter = expressionMetadata.getParameter(parameterIndex);
+  return (
+    !parameter.isCodeOnly() &&
+    // This filters parameters that are implicit because of the context
+    // (MyObject.MyBehavior::).
+    // Free functions have an instanceContainer as first parameter,
+    // their first object parameter are kept.
+    (parameterIndex !== 0 || parameter.getType() !== 'object') &&
+    (parameterIndex !== 1 || parameter.getType() !== 'behavior')
+  );
+};
+
 type ExpressionDocumentationProps = {|
   expressionMetadata: gdExpressionMetadata,
   i18n: I18nType,
@@ -244,13 +260,8 @@ const ExpressionDocumentation = ({
       </Text>
       {mapVector(
         expressionMetadata.getParameters(),
-        (parameter, index) =>
-          !parameter.isCodeOnly() &&
-          // This filters parameters that are implicit because of the context.
-          // Free functions have an instanceContainer as first parameter,
-          // their first object parameter are kept.
-          (index !== 0 || parameter.getType() !== 'object') &&
-          (index !== 1 || parameter.getType() !== 'behavior') && (
+        (parameter, parameterIndex) =>
+          isParameterVisible(expressionMetadata, parameterIndex) && (
             <Text style={defaultTextStyle} size="body2">
               {i18n._(
                 parameterRenderingService.getUserFriendlyTypeName(

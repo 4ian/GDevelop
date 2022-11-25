@@ -56,9 +56,9 @@ export type PrimitiveValueField =
       valueType: 'number',
       getValue: Instance => number,
       setValue: (instance: Instance, newValue: number) => void,
-      endAdornment?: {|
+      getEndAdornment?: Instance => {|
         label: string,
-        description: string,
+        tooltipContent: React.Node,
       |},
       ...ValueFieldCommonProperties,
     |}
@@ -302,7 +302,8 @@ const PropertiesEditor = ({
           />
         );
       } else if (field.valueType === 'number') {
-        const { setValue } = field;
+        const { setValue, getEndAdornment } = field;
+        const endAdornment = getEndAdornment && getEndAdornment(instances[0]);
         return (
           <SemiControlledTextField
             value={getFieldValue(instances, field)}
@@ -319,20 +320,13 @@ const PropertiesEditor = ({
             style={styles.field}
             disabled={getDisabled(instances, field)}
             endAdornment={
-              <Tooltip
-                title={
-                  <MarkdownText
-                    source={
-                      field.endAdornment ? field.endAdornment.description : ''
-                    }
-                    isStandaloneText
-                  />
-                }
-              >
-                <InputAdornment position="end">
-                  {field.endAdornment ? field.endAdornment.label : ''}
-                </InputAdornment>
-              </Tooltip>
+              endAdornment && (
+                <Tooltip title={endAdornment.tooltipContent}>
+                  <InputAdornment position="end">
+                    {endAdornment.label}
+                  </InputAdornment>
+                </Tooltip>
+              )
             }
           />
         );

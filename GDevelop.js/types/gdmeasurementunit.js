@@ -4,6 +4,7 @@ declare class gdMeasurementUnit {
   getName(): string;
   getLabel(): string;
   getDescription(): string;
+  getElementsWithWords(): string;
   getElementsCount(): number;
   getElementPower(elementIndex: number): number;
   getElementBaseUnit(elementIndex: number): gdMeasurementBaseUnit;

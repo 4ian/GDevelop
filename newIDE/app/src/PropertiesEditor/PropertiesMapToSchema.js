@@ -3,6 +3,8 @@ import { mapFor } from '../Utils/MapFor';
 import { type Schema, type Instance } from '.';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import { type Field } from '.';
+import MeasurementUnitDocumentation from './MeasurementUnitDocumentation';
+import * as React from 'react';
 
 /**
  * Transform a MapStringPropertyDescriptor to a schema that can be used in PropertiesEditor.
@@ -51,11 +53,19 @@ const propertiesMapToSchema = (
       );
     };
     const getDescription = () => propertyDescription;
-    const measurementUnit = property.getMeasurementUnit();
-    const measurementUnitName = getMeasurementUnitShortLabel(measurementUnit);
-    const endAdornment = {
-      label: measurementUnitName,
-      description: getMeasurementUnitDescription(measurementUnit),
+    const getEndAdornment = (instance: Instance) => {
+      const property = getProperties(instance).get(name);
+      const measurementUnit = property.getMeasurementUnit();
+      return {
+        label: getMeasurementUnitShortLabel(measurementUnit),
+        tooltipContent: (
+          <MeasurementUnitDocumentation
+            label={measurementUnit.getLabel()}
+            description={measurementUnit.getDescription()}
+            elementsWithWords={measurementUnit.getElementsWithWords()}
+          />
+        ),
+      };
     };
 
     if (property.isHidden()) return null;
@@ -78,7 +88,7 @@ const propertiesMapToSchema = (
         },
         getLabel,
         getDescription,
-        endAdornment,
+        getEndAdornment,
       });
       return null;
     } else if (valueType === 'string' || valueType === '') {
@@ -265,34 +275,6 @@ export const getMeasurementUnitShortLabel = (
       (showPower ? exponents[absPower] : '')
     );
   }).join(' · ');
-};
-
-export const getMeasurementUnitDescription = (
-  measurementUnit: gdMeasurementUnit
-): string => {
-  let wasNegativePower = false;
-  return (
-    '### ' +
-    measurementUnit.getLabel() +
-    '\n' +
-    measurementUnit.getDescription() +
-    '\n\n_in ' +
-    mapFor(0, measurementUnit.getElementsCount(), i => {
-      const baseUnit = measurementUnit.getElementBaseUnit(i);
-      const power = measurementUnit.getElementPower(i);
-      const absPower = Math.abs(power);
-      const signedUnit = (power < 0 ? 'per ' : '') + baseUnit.getLabel();
-      const separator = power < 0 ? ', ' : ' ';
-      const firstSeparator = i === 0 ? '' : wasNegativePower ? separator : ' ';
-      const poweredUnit =
-        firstSeparator +
-        signedUnit +
-        (absPower > 1 ? (separator + signedUnit).repeat(absPower - 1) : '');
-      wasNegativePower = power < 0;
-      return poweredUnit;
-    }).join('') +
-    '_'
-  );
 };
 
 export default propertiesMapToSchema;

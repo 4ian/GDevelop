@@ -165,7 +165,6 @@ const PrivateAssetPackDialog = ({
             ]}
             onApply={onClickBuy}
             flexColumnBody
-            fullHeight
           >
             {errorText ? (
               <Line alignItems="center" justifyContent="center" expand>

@@ -27,7 +27,6 @@ type State = {|
 type Props = {|
   getIncludeFileHashs: () => { [string]: number },
   onExport?: () => void,
-  onChangeSubscription?: () => void,
 |};
 
 let nextPreviewWindowId = 0;

@@ -51,7 +51,6 @@ import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainer
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import ErrorBoundary from '../UI/ErrorBoundary';
-import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
   type PreviewLauncherInterface,
@@ -328,10 +327,6 @@ const MainFrame = (props: Props) => {
     openPreferencesDialog,
   ] = React.useState<boolean>(false);
   const [
-    subscriptionDialogOpen,
-    openSubscriptionDialog,
-  ] = React.useState<boolean>(false);
-  const [
     projectPreCreationDialogOpen,
     setProjectPreCreationDialogOpen,
   ] = React.useState<boolean>(false);
@@ -533,7 +528,6 @@ const MainFrame = (props: Props) => {
       initialGamesDashboardTab,
     },
     actions: {
-      openSubscriptionDialog,
       openOnboardingDialog,
       openProfileDialog,
     },
@@ -2578,7 +2572,6 @@ const MainFrame = (props: Props) => {
             onOpenPlatformSpecificAssets={() =>
               openPlatformSpecificAssetsDialog(true)
             }
-            onChangeSubscription={() => openSubscriptionDialog(true)}
             eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
             onReloadEventsFunctionsExtensions={() => {
               // Check if load is sufficient
@@ -2656,7 +2649,6 @@ const MainFrame = (props: Props) => {
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar =>
                       setEditorToolbar(editorToolbar, isCurrentTab),
-                    onChangeSubscription: () => openSubscriptionDialog(true),
                     projectItemName: editorTab.projectItemName,
                     setPreviewedLayout,
                     onOpenExternalEvents: openExternalEvents,
@@ -2754,7 +2746,6 @@ const MainFrame = (props: Props) => {
           onClose: () => openExportDialog(false),
           onChangeSubscription: () => {
             openExportDialog(false);
-            openSubscriptionDialog(true);
           },
           project: state.currentProject,
           onSaveProject: saveProject,
@@ -2794,7 +2785,6 @@ const MainFrame = (props: Props) => {
             getIncludeFileHashs:
               eventsFunctionsExtensionsContext.getIncludeFileHashs,
             onExport: () => openExportDialog(true),
-            onChangeSubscription: () => openSubscriptionDialog(true),
           },
           (previewLauncher: ?PreviewLauncherInterface) => {
             _previewLauncher.current = previewLauncher;
@@ -2826,17 +2816,8 @@ const MainFrame = (props: Props) => {
           initialTab={profileDialogInitialTab}
           open
           onClose={() => openProfileDialog(false)}
-          onChangeSubscription={() => openSubscriptionDialog(true)}
           gamesDashboardInitialGameId={gamesDashboardInitialGameId}
           gamesDashboardInitialTab={gamesDashboardInitialTab}
-        />
-      )}
-      {subscriptionDialogOpen && (
-        <SubscriptionDialog
-          onClose={() => {
-            openSubscriptionDialog(false);
-          }}
-          open
         />
       )}
       {projectPreCreationDialogOpen && (

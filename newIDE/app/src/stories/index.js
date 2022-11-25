@@ -150,6 +150,7 @@ import {
   ExamplesAccordion,
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
+import subscriptionSuggestionDecorator from './SubscriptionSuggestionDecorator';
 
 configureActions({
   depth: 2,
@@ -2628,6 +2629,7 @@ storiesOf('Profile/CreateProfile', module)
   ));
 
 storiesOf('CurrentUsageDisplayer', module)
+  .addDecorator(subscriptionSuggestionDecorator)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
@@ -2671,6 +2673,7 @@ storiesOf('AuthenticatedUserProfileDetails', module)
   ));
 
 storiesOf('SubscriptionDetails', module)
+  .addDecorator(subscriptionSuggestionDecorator)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (

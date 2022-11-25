@@ -156,7 +156,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   objectAnimationName: t`Object animation name`,
   functionParameterName: t`Parameter name`,
   externalLayoutName: t`Name of the external layout`,
-  identifier: t`Name of the identifier`,
+  identifier: t`Identifier`,
 };
 
 const ParameterRenderingService = {

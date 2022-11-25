@@ -14,6 +14,7 @@ import { type EnumeratedInstructionOrExpressionMetadata } from '../../../Instruc
 import { Column, Line, Spacer } from '../../../UI/Grid';
 import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
 import Paper from '../../../UI/Paper';
+import { mapVector } from '../../../Utils/MapFor';
 
 const defaultTextStyle = {
   // Break words if they are too long to fit on a single line.
@@ -225,6 +226,46 @@ const DisplayedBehaviorAutocompletion = React.forwardRef(
   }
 );
 
+type ExpressionDocumentationProps = {|
+  expressionMetadata: gdExpressionMetadata,
+  i18n: I18nType,
+  parameterRenderingService: ParameterRenderingServiceType,
+|};
+
+const ExpressionDocumentation = ({
+  expressionMetadata,
+  i18n,
+  parameterRenderingService,
+}: ExpressionDocumentationProps) => {
+  return (
+    <Column noMargin>
+      <Text style={defaultTextStyle} size="body2">
+        {expressionMetadata.getDescription()}
+      </Text>
+      {mapVector(
+        expressionMetadata.getParameters(),
+        (parameter, index) =>
+          !parameter.isCodeOnly() &&
+          // This filters parameters that are implicit because of the context.
+          // Free functions have an instanceContainer as first parameter,
+          // their first object parameter are kept.
+          (index !== 0 || parameter.getType() !== 'object') &&
+          (index !== 1 || parameter.getType() !== 'behavior') && (
+            <Text style={defaultTextStyle} size="body2">
+              {i18n._(
+                parameterRenderingService.getUserFriendlyTypeName(
+                  parameter.getType()
+                )
+              ) +
+                ' － ' +
+                parameter.getDescription()}
+            </Text>
+          )
+      )}
+    </Column>
+  );
+};
+
 type Props = {|
   project: ?gdProject,
   expressionAutocompletions: Array<ExpressionAutocompletion>,
@@ -379,11 +420,14 @@ export default function ExpressionAutocompletionsDisplayer({
                 <ScrollView autoHideScrollbar>
                   <Column>
                     <Line noMargin expand alignItems="center">
-                      <Text style={defaultTextStyle} size="body2">
-                        {expressionAutocompletions[
-                          selectedCompletionIndex
-                        ].enumeratedExpressionMetadata.metadata.getDescription()}
-                      </Text>
+                      <ExpressionDocumentation
+                        expressionMetadata={
+                          expressionAutocompletions[selectedCompletionIndex]
+                            .enumeratedExpressionMetadata.metadata
+                        }
+                        i18n={i18n}
+                        parameterRenderingService={parameterRenderingService}
+                      />
                     </Line>
                   </Column>
                 </ScrollView>

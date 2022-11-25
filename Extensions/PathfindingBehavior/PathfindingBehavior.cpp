@@ -29,7 +29,7 @@ void PathfindingBehavior::InitializeContent(
 
 #if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
-    const gd::SerializerElement& behaviorContent) const {
+    const gd::SerializerElement &behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
   properties[_("Allows diagonals")]
@@ -37,28 +37,61 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
                                                                    : "false")
       .SetGroup(_("Path smoothing"))
       .SetType("Boolean");
-  properties[_("Acceleration")].SetValue(
+  properties[_("Acceleration")]
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelAcceleration()).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
-  properties[_("Max. speed")].SetValue(
+  properties[_("Max. speed")]
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelSpeed()).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
-  properties[_("Rotate speed")].SetGroup(_("Rotation")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("angularMaxSpeed")));
-  properties[_("Rotate object")].SetGroup(_("Rotation"))
+  properties[_("Rotation speed")]
+      .SetGroup(_("Rotation"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetAngularSpeed())
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("angularMaxSpeed")));
+  properties[_("Rotate object")]
+      .SetGroup(_("Rotation"))
       .SetValue(behaviorContent.GetBoolAttribute("rotateObject") ? "true"
                                                                  : "false")
       .SetType("Boolean");
-  properties[_("Angle offset")].SetGroup(_("Rotation")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("angleOffset")));
-  properties[_("Virtual cell width")].SetGroup(_("Virtual Grid")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("cellWidth", 0)));
-  properties[_("Virtual cell height")].SetGroup(_("Virtual Grid")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("cellHeight", 0)));
-  properties[_("Virtual grid X offset")].SetGroup(_("Virtual Grid")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("gridOffsetX", 0)));
-  properties[_("Virtual grid Y offset")].SetGroup(_("Virtual Grid")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("gridOffsetY", 0)));
-  properties[_("Extra border size")].SetGroup(_("Collision")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("extraBorder")));
+  properties[_("Angle offset")]
+      .SetGroup(_("Rotation"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("angleOffset")));
+  properties[_("Virtual cell width")]
+      .SetGroup(_("Virtual Grid"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("cellWidth", 0)));
+  properties[_("Virtual cell height")]
+      .SetGroup(_("Virtual Grid"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("cellHeight", 0)));
+  properties[_("Virtual grid X offset")]
+      .SetGroup(_("Virtual Grid"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("gridOffsetX", 0)));
+  properties[_("Virtual grid Y offset")]
+      .SetGroup(_("Virtual Grid"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("gridOffsetY", 0)));
+  properties[_("Extra border size")]
+      .SetGroup(_("Collision"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("extraBorder")));
   properties[_("Smoothing max cell gap")]
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("smoothingMaxCellGap")))
@@ -91,7 +124,7 @@ bool PathfindingBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
     behaviorContent.SetAttribute("acceleration", value.To<float>());
   else if (name == _("Max. speed"))
     behaviorContent.SetAttribute("maxSpeed", value.To<float>());
-  else if (name == _("Rotate speed"))
+  else if (name == _("Rotation speed"))
     behaviorContent.SetAttribute("angularMaxSpeed", value.To<float>());
   else if (name == _("Angle offset"))
     behaviorContent.SetAttribute("angleOffset", value.To<float>());

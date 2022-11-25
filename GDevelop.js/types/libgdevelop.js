@@ -84,6 +84,8 @@ declare class libGDevelop {
   EffectsContainer: Class<gdEffectsContainer>;
   Layer: Class<gdLayer>;
   PropertyDescriptor: Class<gdPropertyDescriptor>;
+  MeasurementUnit: Class<gdMeasurementUnit>;
+  MeasurementBaseUnit: Class<gdMeasurementBaseUnit>;
   NamedPropertyDescriptor: Class<gdNamedPropertyDescriptor>;
   MapStringPropertyDescriptor: Class<gdMapStringPropertyDescriptor>;
   MapStringSerializerValue: Class<gdMapStringSerializerValue>;

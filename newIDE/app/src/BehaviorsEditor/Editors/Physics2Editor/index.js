@@ -13,6 +13,10 @@ import ImagePreview, {
 } from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import ResourceSelector from '../../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../../ResourcesLoader';
+import {
+  getMeasurementUnitShortLabel,
+  getMeasurementUnitDescription,
+} from '../../../PropertiesEditor/PropertiesMapToSchema';
 import ShapePreview from './ShapePreview';
 import PolygonEditor from './PolygonEditor';
 import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
@@ -23,6 +27,9 @@ import EmptyMessage from '../../../UI/EmptyMessage';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import Tooltip from '@material-ui/core/Tooltip';
+import { MarkdownText } from '../../../UI/MarkdownText';
 
 type Props = BehaviorEditorProps;
 
@@ -33,17 +40,37 @@ const NumericProperty = (props: {|
   onUpdate: (newValue: string) => void,
 |}) => {
   const { properties, propertyName, step, onUpdate } = props;
-
+  const property = properties.get(propertyName);
   return (
     <SemiControlledTextField
       fullWidth
-      value={properties.get(propertyName).getValue()}
+      value={property.getValue()}
       key={propertyName}
-      floatingLabelText={properties.get(propertyName).getLabel()}
+      floatingLabelText={property.getLabel()}
       step={step}
       onChange={onUpdate}
       type="number"
+      endAdornment={<UnitAdornment property={property} />}
     />
+  );
+};
+
+const UnitAdornment = (props: {| property: gdPropertyDescriptor |}) => {
+  const { property } = props;
+  const measurementUnit = property.getMeasurementUnit();
+  return (
+    <Tooltip
+      title={
+        <MarkdownText
+          source={getMeasurementUnitDescription(measurementUnit)}
+          isStandaloneText
+        />
+      }
+    >
+      <InputAdornment position="end">
+        {getMeasurementUnitShortLabel(measurementUnit)}
+      </InputAdornment>
+    </Tooltip>
   );
 };
 
@@ -195,9 +222,7 @@ const Physics2Editor = (props: Props) => {
         {shape !== 'Polygon' && (
           <SemiControlledTextField
             fullWidth
-            value={properties
-              .get(shape === 'Polygon' ? 'PolygonOriginX' : 'shapeDimensionA')
-              .getValue()}
+            value={properties.get('shapeDimensionA').getValue()}
             key={'shapeDimensionA'}
             floatingLabelText={
               shape === 'Circle'
@@ -208,32 +233,30 @@ const Physics2Editor = (props: Props) => {
             }
             min={0}
             onChange={newValue => {
-              behavior.updateProperty(
-                shape === 'Polygon' ? 'PolygonOriginX' : 'shapeDimensionA',
-                newValue
-              );
+              behavior.updateProperty('shapeDimensionA', newValue);
               forceUpdate();
             }}
             type="number"
+            endAdornment={
+              <UnitAdornment property={properties.get('shapeDimensionA')} />
+            }
           />
         )}
         {shape !== 'Polygon' && shape !== 'Circle' && (
           <SemiControlledTextField
             fullWidth
-            value={properties
-              .get(shape === 'Polygon' ? 'PolygonOriginY' : 'shapeDimensionB')
-              .getValue()}
+            value={properties.get('shapeDimensionB').getValue()}
             key={'shapeDimensionB'}
             floatingLabelText={shape === 'Edge' ? 'Angle' : 'Height'}
             min={shape === 'Edge' ? undefined : 0}
             onChange={newValue => {
-              behavior.updateProperty(
-                shape === 'Polygon' ? 'PolygonOriginY' : 'shapeDimensionB',
-                newValue
-              );
+              behavior.updateProperty('shapeDimensionB', newValue);
               forceUpdate();
             }}
             type="number"
+            endAdornment={
+              <UnitAdornment property={properties.get('shapeDimensionB')} />
+            }
           />
         )}
         {shape === 'Polygon' && (

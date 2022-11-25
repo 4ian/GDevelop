@@ -8,6 +8,8 @@
 #include <vector>
 
 #include "GDCore/String.h"
+#include "GDCore/Project/MeasurementUnit.h"
+
 namespace gd {
 class SerializerElement;
 }
@@ -28,12 +30,12 @@ class GD_CORE_API PropertyDescriptor {
    * \param propertyValue The value of the property.
    */
   PropertyDescriptor(gd::String propertyValue)
-      : currentValue(propertyValue), type("string"), label(""), hidden(false) {}
+      : currentValue(propertyValue), type("string"), label(""), hidden(false), measurementUnit(gd::MeasurementUnit::GetUndefined()) {}
 
   /**
    * \brief Empty constructor creating an empty property to be displayed.
    */
-  PropertyDescriptor() : hidden(false){};
+  PropertyDescriptor() : hidden(false), measurementUnit(gd::MeasurementUnit::GetUndefined()) {};
 
   /**
    * \brief Destructor
@@ -103,12 +105,21 @@ class GD_CORE_API PropertyDescriptor {
     extraInformation.push_back(info);
     return *this;
   }
+  
+  /**
+   * \brief Change the group where this property is displayed to the user, if any.
+   */
+  PropertyDescriptor& SetMeasurementUnit(const gd::MeasurementUnit &measurementUnit_) {
+    measurementUnit = measurementUnit_;
+    return *this;
+  }
 
   const gd::String& GetValue() const { return currentValue; }
   const gd::String& GetType() const { return type; }
   const gd::String& GetLabel() const { return label; }
   const gd::String& GetDescription() const { return description; }
   const gd::String& GetGroup() const { return group; }
+  const gd::MeasurementUnit& GetMeasurementUnit() const { return measurementUnit; }
 
   const std::vector<gd::String>& GetExtraInfo() const {
     return extraInformation;
@@ -168,6 +179,7 @@ class GD_CORE_API PropertyDescriptor {
                          ///< choices, if a property is a displayed as a combo
                          ///< box.
   bool hidden;
+  gd::MeasurementUnit measurementUnit; //< The unit of measurement of the property vale.
 };
 
 }  // namespace gd

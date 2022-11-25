@@ -818,12 +818,46 @@ interface PropertyDescriptor {
     [Ref] PropertyDescriptor SetExtraInfo([Const, Ref] VectorString info);
     [Ref] VectorString GetExtraInfo();
     [Ref] PropertyDescriptor SetHidden(boolean enable);
+    [Const, Ref] MeasurementUnit GetMeasurementUnit();
+    [Ref] PropertyDescriptor SetMeasurementUnit([Const, Ref] MeasurementUnit measurementUnit);
     boolean IsHidden();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
     void SerializeValuesTo([Ref] SerializerElement element);
     void UnserializeValuesFrom([Const, Ref] SerializerElement element);
+};
+
+interface MeasurementUnit {
+  void MeasurementUnit(DOMString name, DOMString label, DOMString description);
+
+  [Const, Ref] DOMString GetName();
+  [Const, Ref] DOMString GetLabel();
+  [Const, Ref] DOMString GetDescription();
+  [Const, Ref] DOMString GetElementsWithWords();
+  
+  long GetElementsCount();
+  long GetElementPower(long elementIndex);
+  [Const, Ref] MeasurementBaseUnit GetElementBaseUnit(long elementIndex);
+
+  boolean IsUndefined();
+
+  [Ref] MeasurementUnit STATIC_GetDimensionless();
+  [Ref] MeasurementUnit STATIC_GetDegreeAngle();
+  [Ref] MeasurementUnit STATIC_GetSecond();
+  [Ref] MeasurementUnit STATIC_GetPixel();
+  [Ref] MeasurementUnit STATIC_GetPixelSpeed();
+  [Ref] MeasurementUnit STATIC_GetPixelAcceleration();
+  [Ref] MeasurementUnit STATIC_GetNewton();
+};
+
+interface MeasurementBaseUnit {
+  void MeasurementBaseUnit(DOMString name, DOMString label, DOMString symbol, DOMString quantity);
+
+  [Const, Ref] DOMString GetName();
+  [Const, Ref] DOMString GetLabel();
+  [Const, Ref] DOMString GetSymbol();
+  [Const, Ref] DOMString GetQuantity();
 };
 
 interface NamedPropertyDescriptor {

@@ -5,6 +5,7 @@ import {
   gameDetailsTabs,
 } from '../GameDashboard/GameDetailsDialog';
 import { type ProfileTab } from '../Profile/ProfileDialog';
+import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 
 type Props = {|
   parameters: {|
@@ -13,7 +14,6 @@ type Props = {|
     initialGamesDashboardTab?: string,
   |},
   actions: {|
-    openSubscriptionDialog: boolean => void,
     openOnboardingDialog: boolean => void,
     openProfileDialog: boolean => void,
   |},
@@ -36,6 +36,9 @@ export const useOpenInitialDialog = ({ parameters, actions }: Props) => {
     gamesDashboardInitialTab,
     setGamesDashboardInitialTab,
   ] = React.useState<GameDetailsTab>('details');
+  const { openSubscriptionDialog } = React.useContext(
+    SubscriptionSuggestionContext
+  );
 
   const openProfileDialogWithTab = (profileDialogInitialTab: ProfileTab) => {
     setProfileDialogInitialTab(profileDialogInitialTab);
@@ -62,7 +65,7 @@ export const useOpenInitialDialog = ({ parameters, actions }: Props) => {
     () => {
       switch (parameters.initialDialog) {
         case 'subscription':
-          actions.openSubscriptionDialog(true);
+          openSubscriptionDialog({ reason: 'Landing dialog at opening' });
           break;
         case 'onboarding':
           actions.openOnboardingDialog(true);
@@ -77,7 +80,7 @@ export const useOpenInitialDialog = ({ parameters, actions }: Props) => {
           break;
       }
     },
-    [parameters, actions, openGameDashboard]
+    [parameters, actions, openGameDashboard, openSubscriptionDialog]
   );
 
   return {

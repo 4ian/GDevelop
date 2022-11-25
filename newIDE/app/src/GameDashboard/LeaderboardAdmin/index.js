@@ -67,7 +67,7 @@ import { type LeaderboardSortOption } from '../../Utils/GDevelopServices/Play';
 import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
 import Toggle from '../../UI/Toggle';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import SubscriptionDialog from '../../Profile/SubscriptionDialog';
+import { SubscriptionSuggestionContext } from '../../Profile/Subscription/SubscriptionSuggestionContext';
 import MaxLeaderboardCountAlertMessage from './MaxLeaderboardCountAlertMessage';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import Paper from '../../UI/Paper';
@@ -201,10 +201,6 @@ export const LeaderboardAdmin = ({
     displayMaxLeaderboardCountReachedWarning,
     setDisplayMaxLeaderboardCountReachedWarning,
   ] = React.useState<boolean>(false);
-  const [
-    subscriptionDialogOpen,
-    setSubscriptionDialogOpen,
-  ] = React.useState<boolean>(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { limits } = authenticatedUser;
 
@@ -240,6 +236,9 @@ export const LeaderboardAdmin = ({
     fetchLeaderboardEntries,
     browsing: { entries, goToNextPage, goToPreviousPage, goToFirstPage },
   } = React.useContext(LeaderboardContext);
+  const { openSubscriptionDialog } = React.useContext(
+    SubscriptionSuggestionContext
+  );
 
   const setIsLoading = React.useCallback(
     (yesOrNo: boolean) => {
@@ -878,7 +877,11 @@ export const LeaderboardAdmin = ({
           <Column noMargin expand>
             {displayMaxLeaderboardCountReachedWarning && limits && (
               <MaxLeaderboardCountAlertMessage
-                onUpgrade={() => setSubscriptionDialogOpen(true)}
+                onUpgrade={() =>
+                  openSubscriptionDialog({
+                    reason: 'Leaderboard count per game limit reached',
+                  })
+                }
                 onClose={() =>
                   setDisplayMaxLeaderboardCountReachedWarning(false)
                 }
@@ -1110,12 +1113,6 @@ export const LeaderboardAdmin = ({
               extremeAllowedScore={currentLeaderboard.extremeAllowedScore}
             />
           ) : null}
-          {subscriptionDialogOpen && (
-            <SubscriptionDialog
-              open
-              onClose={() => setSubscriptionDialogOpen(false)}
-            />
-          )}
         </>
       )}
     </I18n>

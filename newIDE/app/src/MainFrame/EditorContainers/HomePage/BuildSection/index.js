@@ -39,6 +39,7 @@ import { showErrorBox } from '../../../../UI/Messages/MessageBox';
 import { getRelativeOrAbsoluteDisplayDate } from '../../../../Utils/DateDisplay';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import { ExampleStoreContext } from '../../../../AssetStore/ExampleStore/ExampleStoreContext';
+import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
@@ -80,7 +81,6 @@ type Props = {|
   onOpenProjectPreCreationDialog: (?ExampleShortHeader) => void,
   onShowAllExamples: () => void,
   onSelectExample: (exampleShortHeader: ExampleShortHeader) => void,
-  onChangeSubscription: () => void,
   storageProviders: Array<StorageProvider>,
 |};
 
@@ -129,7 +129,6 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       onShowAllExamples,
       onSelectExample,
       onOpenRecentFile,
-      onChangeSubscription,
       storageProviders,
     },
     ref
@@ -139,6 +138,9 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     );
     const { allExamples } = React.useContext(ExampleStoreContext);
     const authenticatedUser = React.useContext(AuthenticatedUserContext);
+    const { openSubscriptionDialog } = React.useContext(
+      SubscriptionSuggestionContext
+    );
     const { cloudProjects, limits } = authenticatedUser;
     const contextMenu = React.useRef<?ContextMenuInterface>(null);
     const { showDeleteConfirmation } = useAlertDialog();
@@ -296,7 +298,11 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                     <Column expand>
                       <MaxProjectCountAlertMessage
                         limits={limits}
-                        onUpgrade={onChangeSubscription}
+                        onUpgrade={() =>
+                          openSubscriptionDialog({
+                            reason: 'Cloud Project limit reached',
+                          })
+                        }
                       />
                     </Column>
                   </Line>

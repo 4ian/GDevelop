@@ -86,9 +86,7 @@ export const GamesList = (props: Props) => {
         project={props.project}
         hideIfRegistered
         hideLoader
-        onGameRegistered={() => {
-          loadGames();
-        }}
+        onGameRegistered={loadGames}
       />
       {displayedGames.map(game => (
         <GameCard

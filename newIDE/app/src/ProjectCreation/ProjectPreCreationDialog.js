@@ -14,6 +14,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 import { findEmptyPathInWorkspaceFolder } from './LocalPathFinder';
 import { type ProjectCreationSettings } from './CreateProjectDialog';
 import IconButton from '../UI/IconButton';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
@@ -24,7 +25,6 @@ type Props = {|
   onClose: () => void,
   onCreate: ProjectCreationSettings => Promise<void>,
   sourceExampleName?: string,
-  preferences?: any,
 |};
 
 const generateProjectName = (sourceExampleName: ?string) =>
@@ -38,13 +38,9 @@ const ProjectPreCreationDialog = ({
   onClose,
   onCreate,
   sourceExampleName,
-  preferences,
 }: Props): React.Node => {
-  // Default Workspace to store projects
-  const defaultWorkspace =
-    preferences && preferences.values
-      ? preferences.values.defaultWorkspace
-      : null;
+  const { values } = React.useContext(PreferencesContext);
+  const newProjectsDefaultFolder = values.newProjectsDefaultFolder || null;
   const [projectNameError, setProjectNameError] = React.useState<?React.Node>(
     null
   );
@@ -52,7 +48,7 @@ const ProjectPreCreationDialog = ({
     generateProjectName(sourceExampleName)
   );
   const [outputPath, setOutputPath] = React.useState<string>(() =>
-    app ? findEmptyPathInWorkspaceFolder(app, defaultWorkspace) : ''
+    app ? findEmptyPathInWorkspaceFolder(app, newProjectsDefaultFolder) : ''
   );
 
   const onValidate = React.useCallback(

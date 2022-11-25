@@ -38,11 +38,9 @@ export const findDefaultFolder = (electronApp: any): string => {
  */
 export const findEmptyPathInWorkspaceFolder = (
   electronApp: any,
-  workspaceFolder: string | null
+  defaultFolder: string | null
 ): string => {
   const folder =
-    workspaceFolder === null || workspaceFolder === undefined
-      ? findDefaultFolder(electronApp)
-      : workspaceFolder;
+    defaultFolder === null ? findDefaultFolder(electronApp) : defaultFolder;
   return findEmptyPath(folder);
 };

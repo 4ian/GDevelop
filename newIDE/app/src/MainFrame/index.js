@@ -2847,7 +2847,6 @@ const MainFrame = (props: Props) => {
               ? selectedExampleShortHeader.name
               : undefined
           }
-          preferences={preferences}
         />
       )}
       {preferencesDialogOpen && (

@@ -210,7 +210,7 @@ export type PreferencesValues = {|
   showCommunityExtensions: boolean,
   showGetStartedSection: boolean,
   showEventBasedObjectsEditor: boolean,
-  defaultWorkspace: string,
+  newProjectsDefaultFolder: string,
 |};
 
 /**
@@ -274,7 +274,7 @@ export type Preferences = {|
   setShowGetStartedSection: (enabled: boolean) => void,
   setShowEventBasedObjectsEditor: (enabled: boolean) => void,
   getShowEventBasedObjectsEditor: () => boolean,
-  setDefaultWorkspace: (defaultWorkspace: string) => void,
+  setNewProjectsDefaultFolder: (newProjectsDefaultFolder: string) => void,
 |};
 
 export const initialPreferences = {
@@ -314,7 +314,7 @@ export const initialPreferences = {
     showCommunityExtensions: false,
     showGetStartedSection: true,
     showEventBasedObjectsEditor: false,
-    defaultWorkspace: app ? findDefaultFolder(app) : '',
+    newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -368,7 +368,7 @@ export const initialPreferences = {
   setShowGetStartedSection: (enabled: boolean) => {},
   setShowEventBasedObjectsEditor: (enabled: boolean) => {},
   getShowEventBasedObjectsEditor: () => false,
-  setDefaultWorkspace: () => {},
+  setNewProjectsDefaultFolder: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

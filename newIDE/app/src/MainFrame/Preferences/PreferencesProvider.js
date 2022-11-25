@@ -148,7 +148,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     getShowEventBasedObjectsEditor: this._getShowEventBasedObjectsEditor.bind(
       this
     ),
-    setDefaultWorkspace: this._setDefaultWorkspace.bind(this),
+    setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this),
   };
 
   componentDidMount() {
@@ -708,12 +708,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setDefaultWorkspace(defaultWorkspace: string) {
+  _setNewProjectsDefaultFolder(newProjectsDefaultFolder: string) {
     this.setState(
       state => ({
         values: {
           ...state.values,
-          defaultWorkspace,
+          newProjectsDefaultFolder,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

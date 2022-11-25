@@ -23,6 +23,7 @@ import LeftLoader from '../../UI/LeftLoader';
 import {
   sendSubscriptionDialogShown,
   sendChoosePlanClicked,
+  type SubscriptionDialogDisplayReason,
 } from '../../Utils/Analytics/EventSender';
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
 import Window from '../../Utils/Window';
@@ -64,7 +65,10 @@ const cancelAndChangeConfirmationTexts = {
 type Props = {|
   open: boolean,
   onClose: Function,
-  analyticsMetadata: {| reason: string, preStep?: 'subscriptionChecker' |},
+  analyticsMetadata: {|
+    reason: SubscriptionDialogDisplayReason,
+    preStep?: 'subscriptionChecker',
+  |},
 |};
 
 export default function SubscriptionDialog({

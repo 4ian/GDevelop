@@ -21,7 +21,11 @@ export type SubscriptionCheckerInterface = {|
 
 type Props = {|
   title: React.Node,
-  id: string,
+  id:
+    | 'Disable GDevelop splash at startup'
+    | 'Debugger'
+    | 'Hot reloading'
+    | 'Preview over wifi',
   onChangeSubscription?: () => Promise<void> | void,
   mode: 'try' | 'mandatory',
 |};

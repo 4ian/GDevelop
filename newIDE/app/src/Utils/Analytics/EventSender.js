@@ -362,8 +362,19 @@ export const sendSubscriptionCheckDismiss = () => {
   recordEvent('subscription-check-dialog-dismiss');
 };
 
+export type SubscriptionDialogDisplayReason =
+  | 'Disable GDevelop splash at startup'
+  | 'Debugger'
+  | 'Hot reloading'
+  | 'Preview over wifi'
+  | 'Landing dialog at opening'
+  | 'Leaderboard count per game limit reached'
+  | 'Cloud Project limit reached'
+  | 'Consult profile'
+  | 'Build limit reached';
+
 export const sendSubscriptionDialogShown = (metadata: {|
-  reason: string,
+  reason: SubscriptionDialogDisplayReason,
   preStep?: 'subscriptionChecker',
 |}) => {
   recordEvent('subscription-dialog-shown', metadata);

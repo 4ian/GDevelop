@@ -222,9 +222,7 @@ const Physics2Editor = (props: Props) => {
         {shape !== 'Polygon' && (
           <SemiControlledTextField
             fullWidth
-            value={properties
-              .get(shape === 'Polygon' ? 'PolygonOriginX' : 'shapeDimensionA')
-              .getValue()}
+            value={properties.get('shapeDimensionA').getValue()}
             key={'shapeDimensionA'}
             floatingLabelText={
               shape === 'Circle'
@@ -235,45 +233,29 @@ const Physics2Editor = (props: Props) => {
             }
             min={0}
             onChange={newValue => {
-              behavior.updateProperty(
-                shape === 'Polygon' ? 'PolygonOriginX' : 'shapeDimensionA',
-                newValue
-              );
+              behavior.updateProperty('shapeDimensionA', newValue);
               forceUpdate();
             }}
             type="number"
             endAdornment={
-              <UnitAdornment
-                property={properties.get(
-                  shape === 'Polygon' ? 'PolygonOriginX' : 'shapeDimensionA'
-                )}
-              />
+              <UnitAdornment property={properties.get('shapeDimensionA')} />
             }
           />
         )}
         {shape !== 'Polygon' && shape !== 'Circle' && (
           <SemiControlledTextField
             fullWidth
-            value={properties
-              .get(shape === 'Polygon' ? 'PolygonOriginY' : 'shapeDimensionB')
-              .getValue()}
+            value={properties.get('shapeDimensionB').getValue()}
             key={'shapeDimensionB'}
             floatingLabelText={shape === 'Edge' ? 'Angle' : 'Height'}
             min={shape === 'Edge' ? undefined : 0}
             onChange={newValue => {
-              behavior.updateProperty(
-                shape === 'Polygon' ? 'PolygonOriginY' : 'shapeDimensionB',
-                newValue
-              );
+              behavior.updateProperty('shapeDimensionB', newValue);
               forceUpdate();
             }}
             type="number"
             endAdornment={
-              <UnitAdornment
-                property={properties.get(
-                  shape === 'Polygon' ? 'PolygonOriginY' : 'shapeDimensionB'
-                )}
-              />
+              <UnitAdornment property={properties.get('shapeDimensionB')} />
             }
           />
         )}

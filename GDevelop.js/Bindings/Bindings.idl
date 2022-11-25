@@ -839,7 +839,7 @@ interface MeasurementUnit {
   long GetElementPower(long elementIndex);
   [Const, Ref] MeasurementBaseUnit GetElementBaseUnit(long elementIndex);
 
-  boolean IsUnknown();
+  boolean IsUndefined();
 
   [Ref] MeasurementUnit STATIC_GetDimensionless();
   [Ref] MeasurementUnit STATIC_GetDegreeAngle();

@@ -12,7 +12,7 @@ namespace gd {
 
 MeasurementUnit::~MeasurementUnit() {}
 
-gd::MeasurementUnit MeasurementUnit::unknown = CreateUnknown();
+gd::MeasurementUnit MeasurementUnit::undefined = CreateUndefined();
 gd::MeasurementUnit MeasurementUnit::dimensionless = CreateDimensionless();
 gd::MeasurementUnit MeasurementUnit::degreeAngle = CreateDegreeAngle();
 gd::MeasurementUnit MeasurementUnit::second = CreateSecond();

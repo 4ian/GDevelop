@@ -7,7 +7,7 @@ declare class gdMeasurementUnit {
   getElementsCount(): number;
   getElementPower(elementIndex: number): number;
   getElementBaseUnit(elementIndex: number): gdMeasurementBaseUnit;
-  isUnknown(): boolean;
+  isUndefined(): boolean;
   static getDimensionless(): gdMeasurementUnit;
   static getDegreeAngle(): gdMeasurementUnit;
   static getSecond(): gdMeasurementUnit;

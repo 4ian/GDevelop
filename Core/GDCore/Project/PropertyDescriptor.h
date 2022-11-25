@@ -30,12 +30,12 @@ class GD_CORE_API PropertyDescriptor {
    * \param propertyValue The value of the property.
    */
   PropertyDescriptor(gd::String propertyValue)
-      : currentValue(propertyValue), type("string"), label(""), hidden(false), measurementUnit(gd::MeasurementUnit::GetUnknown()) {}
+      : currentValue(propertyValue), type("string"), label(""), hidden(false), measurementUnit(gd::MeasurementUnit::GetUndefined()) {}
 
   /**
    * \brief Empty constructor creating an empty property to be displayed.
    */
-  PropertyDescriptor() : hidden(false), measurementUnit(gd::MeasurementUnit::GetUnknown()) {};
+  PropertyDescriptor() : hidden(false), measurementUnit(gd::MeasurementUnit::GetUndefined()) {};
 
   /**
    * \brief Destructor

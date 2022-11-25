@@ -19,7 +19,7 @@ class MeasurementBaseUnit;
 namespace gd {
 
 /**
- * \brief An unit of measurement.
+ * \brief A unit of measurement.
  */
 class GD_CORE_API MeasurementUnit {
 public:
@@ -68,9 +68,9 @@ public:
     return elements.at(elementIndex).GetBaseUnit();
   }
 
-  bool IsUnknown() const { return this == &gd::MeasurementUnit::unknown; }
+  bool IsUndefined() const { return this == &gd::MeasurementUnit::undefined; }
 
-  static gd::MeasurementUnit &GetUnknown() { return unknown; }
+  static gd::MeasurementUnit &GetUndefined() { return undefined; }
 
   static gd::MeasurementUnit &GetDimensionless() { return dimensionless; }
 
@@ -91,7 +91,7 @@ public:
   static gd::MeasurementUnit &GetNewton() { return newton; }
 
 private:
-  static gd::MeasurementUnit unknown;
+  static gd::MeasurementUnit undefined;
   static gd::MeasurementUnit dimensionless;
   static gd::MeasurementUnit degreeAngle;
   static gd::MeasurementUnit second;
@@ -101,8 +101,8 @@ private:
   static gd::MeasurementUnit newton;
   static gd::MeasurementUnit angularSpeed;
 
-  static gd::MeasurementUnit CreateUnknown() {
-    return MeasurementUnit("Unknown", _("Unknown"));
+  static gd::MeasurementUnit CreateUndefined() {
+    return MeasurementUnit("Undefined", _("Undefined"));
   }
 
   static gd::MeasurementUnit CreateDimensionless() {

@@ -102,7 +102,6 @@ type Props = {|
   onOpenGamesDashboard: () => void,
   onOpenResources: () => void,
   onOpenPlatformSpecificAssets: () => void,
-  onChangeSubscription: () => void,
   eventsFunctionsExtensionsError: ?Error,
   onReloadEventsFunctionsExtensions: () => void,
   freezeUpdate: boolean,
@@ -1114,7 +1113,6 @@ export default class ProjectManager extends React.Component<Props, State> {
                 }
                 onApply={this.props.onSaveProjectProperties}
                 onPropertiesApplied={this._onProjectPropertiesApplied}
-                onChangeSubscription={this.props.onChangeSubscription}
                 resourceSources={this.props.resourceSources}
                 onChooseResource={this.props.onChooseResource}
                 resourceExternalEditors={this.props.resourceExternalEditors}

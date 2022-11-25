@@ -3,7 +3,7 @@ import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import SubscriptionChecker, {
   type SubscriptionCheckerInterface,
-} from '../Profile/SubscriptionChecker';
+} from '../Profile/Subscription/SubscriptionChecker';
 import Checkbox from '../UI/Checkbox';
 import ColorField from '../UI/ColorField';
 import { I18n } from '@lingui/react';
@@ -28,7 +28,7 @@ import Text from '../UI/Text';
 type Props = {|
   loadingScreen: gdLoadingScreen,
   onLoadingScreenUpdated: () => void,
-  onChangeSubscription: () => void,
+  onChangeSubscription: () => Promise<void> | void,
 
   // For resources:
   project: gdProject,

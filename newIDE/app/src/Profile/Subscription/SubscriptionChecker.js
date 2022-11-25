@@ -2,17 +2,18 @@
 
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import FlatButton from '../UI/FlatButton';
-import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
+import FlatButton from '../../UI/FlatButton';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import Star from '@material-ui/icons/Star';
 import Favorite from '@material-ui/icons/Favorite';
-import AuthenticatedUserContext from './AuthenticatedUserContext';
-import { Column, LargeSpacer, Line } from '../UI/Grid';
+import AuthenticatedUserContext from '../AuthenticatedUserContext';
+import { Column, LargeSpacer, Line } from '../../UI/Grid';
 import {
   sendSubscriptionCheckDialogShown,
   sendSubscriptionCheckDismiss,
-} from '../Utils/Analytics/EventSender';
-import Text from '../UI/Text';
+} from '../../Utils/Analytics/EventSender';
+import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
+import Text from '../../UI/Text';
 
 export type SubscriptionCheckerInterface = {|
   checkHasSubscription: () => boolean,
@@ -21,7 +22,7 @@ export type SubscriptionCheckerInterface = {|
 type Props = {|
   title: React.Node,
   id: string,
-  onChangeSubscription?: () => void,
+  onChangeSubscription?: () => Promise<void> | void,
   mode: 'try' | 'mandatory',
 |};
 
@@ -36,6 +37,9 @@ const SubscriptionChecker = React.forwardRef<
 >(({ mode, id, title, onChangeSubscription }, ref) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [dialogOpen, setDialogOpen] = React.useState<boolean>(false);
+  const { openSubscriptionDialog } = React.useContext(
+    SubscriptionSuggestionContext
+  );
 
   const closeDialog = () => {
     sendSubscriptionCheckDismiss();
@@ -64,17 +68,19 @@ const SubscriptionChecker = React.forwardRef<
       open={dialogOpen}
       title={mode === 'try' ? <Trans>We need your support!</Trans> : title}
       actions={[
-        onChangeSubscription && (
-          <DialogPrimaryButton
-            label={<Trans>Get a subscription or login</Trans>}
-            key="subscribe"
-            primary
-            onClick={() => {
-              setDialogOpen(false);
-              onChangeSubscription();
-            }}
-          />
-        ),
+        <DialogPrimaryButton
+          label={<Trans>Get a subscription or login</Trans>}
+          key="subscribe"
+          primary
+          onClick={() => {
+            if (onChangeSubscription) onChangeSubscription();
+            setDialogOpen(false);
+            openSubscriptionDialog({
+              reason: id,
+              preStep: 'subscriptionChecker',
+            });
+          }}
+        />,
       ]}
       secondaryActions={[
         <FlatButton

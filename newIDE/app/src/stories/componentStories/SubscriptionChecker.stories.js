@@ -13,7 +13,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import subscriptionSuggestionDecorator from '../SubscriptionSuggestionDecorator';
 
 export default {
-  title: 'SubscriptionChecker',
+  title: 'Subscription/SubscriptionChecker',
   component: SubscriptionChecker,
   decorators: [subscriptionSuggestionDecorator, paperDecorator, muiDecorator],
 };

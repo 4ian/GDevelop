@@ -2672,7 +2672,7 @@ storiesOf('AuthenticatedUserProfileDetails', module)
     />
   ));
 
-storiesOf('SubscriptionDetails', module)
+storiesOf('Subscription/SubscriptionDetails', module)
   .addDecorator(subscriptionSuggestionDecorator)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
@@ -2698,7 +2698,7 @@ storiesOf('SubscriptionDetails', module)
     />
   ));
 
-storiesOf('SubscriptionDialog', module)
+storiesOf('Subscription/SubscriptionDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('not authenticated', () => (
@@ -2744,7 +2744,7 @@ storiesOf('SubscriptionDialog', module)
     </AuthenticatedUserContext.Provider>
   ));
 
-storiesOf('SubscriptionPendingDialog', module)
+storiesOf('Subscription/SubscriptionPendingDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default (no subscription)', () => (

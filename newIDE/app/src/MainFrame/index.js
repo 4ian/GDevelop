@@ -146,6 +146,7 @@ import {
   type ResourceFetcher,
 } from '../ProjectsStorage/ResourceFetcher';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
+import { useOpenInitialDialog } from '../Utils/UseOpenInitialDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -232,8 +233,10 @@ type LaunchPreviewOptions = {
   fullLoadingScreen?: boolean,
 };
 
-export type Props = {
+export type Props = {|
   initialDialog?: string,
+  initialGameId?: string,
+  initialGamesDashboardTab?: string,
   introDialog?: React.Element<*>,
   renderMainMenu?: MainMenuProps => React.Node,
   renderPreviewLauncher?: (
@@ -259,7 +262,7 @@ export type Props = {
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
   i18n: I18n,
-};
+|};
 
 const MainFrame = (props: Props) => {
   const [state, setState]: [
@@ -319,9 +322,6 @@ const MainFrame = (props: Props) => {
     openPlatformSpecificAssetsDialog,
   ] = React.useState<boolean>(false);
   const [aboutDialogOpen, openAboutDialog] = React.useState<boolean>(false);
-  const [profileDialogInitialTab, setProfileDialogInitialTab] = React.useState<
-    'profile' | 'games-dashboard'
-  >('profile');
   const [profileDialogOpen, openProfileDialog] = React.useState<boolean>(false);
   const [
     preferencesDialogOpen,
@@ -420,6 +420,8 @@ const MainFrame = (props: Props) => {
     getStorageProviderOperations,
     getStorageProvider,
     initialDialog,
+    initialGameId,
+    initialGamesDashboardTab,
     initialFileMetadataToOpen,
     introDialog,
     i18n,
@@ -519,24 +521,23 @@ const MainFrame = (props: Props) => {
     []
   );
 
-  React.useEffect(
-    () => {
-      if (initialDialog === 'subscription') {
-        openSubscriptionDialog(true);
-      }
-      if (initialDialog === 'onboarding') {
-        openOnboardingDialog(true);
-      }
+  const {
+    openProfileDialogWithTab,
+    profileDialogInitialTab,
+    gamesDashboardInitialGameId,
+    gamesDashboardInitialTab,
+  } = useOpenInitialDialog({
+    parameters: {
+      initialDialog,
+      initialGameId,
+      initialGamesDashboardTab,
     },
-    [initialDialog]
-  );
-
-  const openProfileDialogWithTab = (
-    profileDialogInitialTab: 'profile' | 'games-dashboard'
-  ) => {
-    setProfileDialogInitialTab(profileDialogInitialTab);
-    openProfileDialog(true);
-  };
+    actions: {
+      openSubscriptionDialog,
+      openOnboardingDialog,
+      openProfileDialog,
+    },
+  });
 
   const _closeSnackMessage = React.useCallback(
     () => {
@@ -2467,11 +2468,11 @@ const MainFrame = (props: Props) => {
       : () => {},
     onOpenProfile: React.useCallback(
       () => openProfileDialogWithTab('profile'),
-      []
+      [openProfileDialogWithTab]
     ),
     onOpenGamesDashboard: React.useCallback(
       () => openProfileDialogWithTab('games-dashboard'),
-      []
+      [openProfileDialogWithTab]
     ),
   });
 
@@ -2826,6 +2827,8 @@ const MainFrame = (props: Props) => {
           open
           onClose={() => openProfileDialog(false)}
           onChangeSubscription={() => openSubscriptionDialog(true)}
+          gamesDashboardInitialGameId={gamesDashboardInitialGameId}
+          gamesDashboardInitialTab={gamesDashboardInitialTab}
         />
       )}
       {subscriptionDialogOpen && (

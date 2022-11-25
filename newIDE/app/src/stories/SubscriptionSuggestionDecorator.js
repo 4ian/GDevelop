@@ -8,9 +8,7 @@ const subscriptionSuggestionDecorator: StoryDecorator = (Story, context) => {
   return (
     <SubscriptionSuggestionContext.Provider
       value={{
-        openSubscriptionDialog: () => {
-          action('open subscription dialog')();
-        },
+        openSubscriptionDialog: action('open subscription dialog'),
       }}
     >
       <Story />

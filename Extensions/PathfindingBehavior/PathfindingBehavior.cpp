@@ -45,7 +45,7 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixelSpeed()).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
-  properties[_("Rotate speed")]
+  properties[_("Rotation speed")]
       .SetGroup(_("Rotation"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetAngularSpeed())
@@ -124,7 +124,7 @@ bool PathfindingBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
     behaviorContent.SetAttribute("acceleration", value.To<float>());
   else if (name == _("Max. speed"))
     behaviorContent.SetAttribute("maxSpeed", value.To<float>());
-  else if (name == _("Rotate speed"))
+  else if (name == _("Rotation speed"))
     behaviorContent.SetAttribute("angularMaxSpeed", value.To<float>());
   else if (name == _("Angle offset"))
     behaviorContent.SetAttribute("angleOffset", value.To<float>());

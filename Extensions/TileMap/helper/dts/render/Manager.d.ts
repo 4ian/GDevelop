@@ -21,7 +21,7 @@ export declare class TileMapManager {
     static getManager(instanceHolder: Object): TileMapManager;
     /**
      * @param data JSON data.
-     * @returns The data ecnlosed with its detected kind.
+     * @returns The data enclosed with its detected kind.
      */
     static identify(data: any): TileMap | null;
     /**

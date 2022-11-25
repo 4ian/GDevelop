@@ -11,6 +11,13 @@ import {
  * It creates a {@link EditableTileMap} from a Tiled JSON.
  */
 export namespace TiledTileMapLoader {
+  /**
+   * Create a {@link EditableTileMap} from the Tiled JSON.
+   *
+   * @param tiledMap A tile map exported from Tiled.
+   * @param pako The zlib library.
+   * @returns A {@link EditableTileMap}
+   */
   export function load(
     tileMap: TiledTileMap,
     pako: any

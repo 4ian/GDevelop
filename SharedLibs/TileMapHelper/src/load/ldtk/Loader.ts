@@ -4,6 +4,13 @@ import { getLDtkTileId, getPixiRotateFromLDtk } from "./LoaderHelper";
 import { LDtkTileMap } from "../../types/LDtk";
 
 export namespace LDtkTileMapLoader {
+  /**
+   * Create a {@link EditableTileMap} from the LDtk JSON.
+   *
+   * @param tiledMap A tile map exported from LDtk.
+   * @param levelIndex The level of the tile map to load from.
+   * @returns A {@link EditableTileMap}
+   */
   export function load(
     tileMap: LDtkTileMap,
     levelIndex: number

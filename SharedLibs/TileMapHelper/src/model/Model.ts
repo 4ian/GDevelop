@@ -326,7 +326,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     }
     return row[x][0];
   }
-  
+
   /**
    * @param x The layer column.
    * @param y The layer row.

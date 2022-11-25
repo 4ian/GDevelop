@@ -7,7 +7,7 @@ export declare namespace PixiLDtkHelper {
     /**
      * Split an atlas image into Pixi textures.
      *
-     * @param tileMap A tile map exported from Tiled.
+     * @param tileMap A tile map exported from LDtk.
      * @param atlasTexture The texture containing the whole tile set.
      * @param getTexture A getter to load a texture. Used if atlasTexture is not specified.
      * @returns A textures cache.

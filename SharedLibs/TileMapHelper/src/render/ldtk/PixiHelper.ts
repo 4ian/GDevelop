@@ -43,9 +43,10 @@ export namespace PixiLDtkHelper {
   /**
    * Split an atlas image into Pixi textures.
    *
-   * @param tileMap A tile map exported from Tiled.
+   * @param tileMap A tile map exported from LDtk.
+   * @param levelIndex The level of the tile map to load from.
    * @param atlasTexture The texture containing the whole tile set.
-   * @param getTexture A getter to load a texture. Used if atlasTexture is not specified.
+   * @param getTexture A getter to load a texture.
    * @returns A textures cache.
    */
   export function parseAtlas(
@@ -65,7 +66,9 @@ export namespace PixiLDtkHelper {
     }
 
     const textureCache = new TileTextureCache();
-    const worldTileCache: Record<number, boolean> = {};
+    // List the tiles that have been loaded to Pixi by all the layers of the level.
+    // The keys are a composition (getLDtkTileId) between the tileset's id and the tile's id.
+    const levelTileCache: Record<number, boolean> = {};
     const atlasTextures: Record<number, Texture | null> = {};
 
     for (let iLayer = level.layerInstances.length - 1; iLayer >= 0; --iLayer) {
@@ -91,17 +94,19 @@ export namespace PixiLDtkHelper {
         continue;
       }
 
-      const setTileCache: Record<number, boolean> = {};
+      // List the tiles that have been loaded to Pixi by the current layer.
+      // Since layer can only have tiles from 1 tileset, the keys are only the tile's id.
+      const layerTileCache: Record<number, boolean> = {};
       const gridSize = tileset.tileGridSize;
 
       for (const tile of [...layer.autoLayerTiles, ...layer.gridTiles]) {
-        if (setTileCache[tile.t]) {
+        if (layerTileCache[tile.t]) {
           continue;
         }
 
         const tileId = getLDtkTileId(tilesetId, tile.t);
-        if (worldTileCache[tileId]) {
-          setTileCache[tile.t] = true;
+        if (levelTileCache[tileId]) {
+          layerTileCache[tile.t] = true;
           continue;
         }
 
@@ -119,8 +124,8 @@ export namespace PixiLDtkHelper {
           );
         }
 
-        setTileCache[tile.t] = true;
-        worldTileCache[tileId] = true;
+        layerTileCache[tile.t] = true;
+        levelTileCache[tileId] = true;
       }
     }
 

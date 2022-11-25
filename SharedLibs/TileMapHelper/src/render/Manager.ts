@@ -41,7 +41,7 @@ export class TileMapManager {
 
   /**
    * @param data JSON data.
-   * @returns The data ecnlosed with its detected kind.
+   * @returns The data enclosed with its detected kind.
    */
   static identify(data: any): TileMap | null {
     if (data.tiledversion) {
@@ -63,7 +63,7 @@ export class TileMapManager {
     console.warn(
       "The loaded Tile Map data does not contain a 'tiledversion' or '__header__' key. Are you sure this file has been exported from Tiled (mapeditor.org) or LDtk (ldtk.io)?"
     );
-    console.log("identify: ", data);
+    console.log("The data that failed Tile Map identification is: ", data);
 
     return null;
   }
@@ -72,6 +72,7 @@ export class TileMapManager {
    * @param loadTileMap The method that loads the Tiled JSON file in memory.
    * @param tileMapJsonResourceName The resource name of the tile map.
    * @param tileSetJsonResourceName The resource name of the tile set.
+   * @param levelIndex The level of the tile map to load from.
    * @param pako The zlib library.
    * @param callback A function called when the tile map is parsed.
    */
@@ -125,6 +126,7 @@ export class TileMapManager {
    * @param atlasImageResourceName The resource name of the atlas image.
    * @param tileMapJsonResourceName The resource name of the tile map.
    * @param tileSetJsonResourceName The resource name of the tile set.
+   * @param levelIndex The level of the tile map to load from.
    * @param callback A function called when the tiles textures are split.
    */
   getOrLoadTextureCache(

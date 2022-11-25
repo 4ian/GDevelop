@@ -16,7 +16,7 @@ export declare namespace PixiTileMapHelper {
     /**
      * Re-renders the tile map whenever its rendering settings have been changed
      *
-     * @param pixiTileMap the tile map renderer
+     * @param untypedPixiTileMap the tile map renderer
      * @param tileMap the tile map model
      * @param textureCache the tile set textures
      * @param displayMode What to display:

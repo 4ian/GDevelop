@@ -16,7 +16,7 @@ export const Default = () => {
   return (
     <StartTutorialDialog
       open
-      isTutorialAlreadyStarted={false}
+      tutorialCompletionStatus={'notStarted'}
       startTutorial={action('Start tutorial')}
       onClose={() => action('On close dialog')()}
     />
@@ -27,7 +27,17 @@ export const WithTutorialAlreadyStarted = () => {
   return (
     <StartTutorialDialog
       open
-      isTutorialAlreadyStarted={true}
+      tutorialCompletionStatus={'started'}
+      startTutorial={action('Start tutorial')}
+      onClose={() => action('On close dialog')()}
+    />
+  );
+};
+export const WithTutorialCompleted = () => {
+  return (
+    <StartTutorialDialog
+      open
+      tutorialCompletionStatus={'complete'}
       startTutorial={action('Start tutorial')}
       onClose={() => action('On close dialog')()}
     />

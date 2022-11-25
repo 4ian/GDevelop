@@ -45,7 +45,6 @@ type Props = {|
   onClose: () => void,
   onApply: (options: { newName?: string }) => Promise<boolean>,
   onPropertiesApplied: (options: { newName?: string }) => void,
-  onChangeSubscription: () => void,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
 
   // For resources:
@@ -678,10 +677,7 @@ function ProjectPropertiesDialog(props: Props) {
               <LoadingScreenEditor
                 loadingScreen={project.getLoadingScreen()}
                 onLoadingScreenUpdated={notifyOfLoadingScreenChange}
-                onChangeSubscription={() => {
-                  onCancelChanges();
-                  props.onChangeSubscription();
-                }}
+                onChangeSubscription={onCancelChanges}
                 project={project}
                 resourceSources={props.resourceSources}
                 onChooseResource={props.onChooseResource}

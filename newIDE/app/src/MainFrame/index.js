@@ -51,7 +51,6 @@ import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainer
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import ErrorBoundary from '../UI/ErrorBoundary';
-import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
   type PreviewLauncherInterface,
@@ -146,6 +145,7 @@ import {
   type ResourceFetcher,
 } from '../ProjectsStorage/ResourceFetcher';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
+import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -328,10 +328,6 @@ const MainFrame = (props: Props) => {
     openPreferencesDialog,
   ] = React.useState<boolean>(false);
   const [
-    subscriptionDialogOpen,
-    openSubscriptionDialog,
-  ] = React.useState<boolean>(false);
-  const [
     projectPreCreationDialogOpen,
     setProjectPreCreationDialogOpen,
   ] = React.useState<boolean>(false);
@@ -378,6 +374,9 @@ const MainFrame = (props: Props) => {
     setCurrentEditor,
     onPreviewLaunch,
   } = React.useContext(InAppTutorialContext);
+  const { openSubscriptionDialog } = React.useContext(
+    SubscriptionSuggestionContext
+  );
   const [
     fileMetadataOpeningProgress,
     setFileMetadataOpeningProgress,
@@ -522,13 +521,13 @@ const MainFrame = (props: Props) => {
   React.useEffect(
     () => {
       if (initialDialog === 'subscription') {
-        openSubscriptionDialog(true);
+        openSubscriptionDialog({ reason: 'Landing dialog at opening' });
       }
       if (initialDialog === 'onboarding') {
         openOnboardingDialog(true);
       }
     },
-    [initialDialog]
+    [initialDialog, openSubscriptionDialog]
   );
 
   const openProfileDialogWithTab = (
@@ -2577,7 +2576,6 @@ const MainFrame = (props: Props) => {
             onOpenPlatformSpecificAssets={() =>
               openPlatformSpecificAssetsDialog(true)
             }
-            onChangeSubscription={() => openSubscriptionDialog(true)}
             eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
             onReloadEventsFunctionsExtensions={() => {
               // Check if load is sufficient
@@ -2655,7 +2653,6 @@ const MainFrame = (props: Props) => {
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar =>
                       setEditorToolbar(editorToolbar, isCurrentTab),
-                    onChangeSubscription: () => openSubscriptionDialog(true),
                     projectItemName: editorTab.projectItemName,
                     setPreviewedLayout,
                     onOpenExternalEvents: openExternalEvents,
@@ -2753,7 +2750,6 @@ const MainFrame = (props: Props) => {
           onClose: () => openExportDialog(false),
           onChangeSubscription: () => {
             openExportDialog(false);
-            openSubscriptionDialog(true);
           },
           project: state.currentProject,
           onSaveProject: saveProject,
@@ -2793,7 +2789,6 @@ const MainFrame = (props: Props) => {
             getIncludeFileHashs:
               eventsFunctionsExtensionsContext.getIncludeFileHashs,
             onExport: () => openExportDialog(true),
-            onChangeSubscription: () => openSubscriptionDialog(true),
           },
           (previewLauncher: ?PreviewLauncherInterface) => {
             _previewLauncher.current = previewLauncher;
@@ -2825,15 +2820,6 @@ const MainFrame = (props: Props) => {
           initialTab={profileDialogInitialTab}
           open
           onClose={() => openProfileDialog(false)}
-          onChangeSubscription={() => openSubscriptionDialog(true)}
-        />
-      )}
-      {subscriptionDialogOpen && (
-        <SubscriptionDialog
-          onClose={() => {
-            openSubscriptionDialog(false);
-          }}
-          open
         />
       )}
       {projectPreCreationDialogOpen && (

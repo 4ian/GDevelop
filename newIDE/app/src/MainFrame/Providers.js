@@ -31,10 +31,11 @@ import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/Resource
 import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { TutorialStateProvider } from '../Tutorial/TutorialContext';
-import ConfirmProvider from '../UI/Alert/AlertProvider';
+import AlertProvider from '../UI/Alert/AlertProvider';
 import { AnnouncementsFeedStateProvider } from '../AnnouncementsFeed/AnnouncementsFeedContext';
 import PrivateAssetsAuthorizationProvider from '../AssetStore/PrivateAssets/PrivateAssetsAuthorizationProvider';
 import InAppTutorialProvider from '../InAppTutorial/InAppTutorialProvider';
+import { SubscriptionSuggestionProvider } from '../Profile/Subscription/SubscriptionSuggestionContext';
 
 // Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
 const jss = create({
@@ -99,27 +100,29 @@ export default class Providers extends React.Component<Props, {||}> {
                                       eventsFunctionsExtensionOpener
                                     }
                                   >
-                                    <ConfirmProvider>
-                                      <CommandsContextProvider>
-                                        <InAppTutorialProvider>
-                                          <AssetStoreStateProvider>
-                                            <ResourceStoreStateProvider>
-                                              <ExampleStoreStateProvider>
-                                                <ExtensionStoreStateProvider>
-                                                  <TutorialStateProvider>
-                                                    <AnnouncementsFeedStateProvider>
-                                                      <PrivateAssetsAuthorizationProvider>
-                                                        {children({ i18n })}
-                                                      </PrivateAssetsAuthorizationProvider>
-                                                    </AnnouncementsFeedStateProvider>
-                                                  </TutorialStateProvider>
-                                                </ExtensionStoreStateProvider>
-                                              </ExampleStoreStateProvider>
-                                            </ResourceStoreStateProvider>
-                                          </AssetStoreStateProvider>
-                                        </InAppTutorialProvider>
-                                      </CommandsContextProvider>
-                                    </ConfirmProvider>
+                                    <AlertProvider>
+                                      <SubscriptionSuggestionProvider>
+                                        <CommandsContextProvider>
+                                          <InAppTutorialProvider>
+                                            <AssetStoreStateProvider>
+                                              <ResourceStoreStateProvider>
+                                                <ExampleStoreStateProvider>
+                                                  <ExtensionStoreStateProvider>
+                                                    <TutorialStateProvider>
+                                                      <AnnouncementsFeedStateProvider>
+                                                        <PrivateAssetsAuthorizationProvider>
+                                                          {children({ i18n })}
+                                                        </PrivateAssetsAuthorizationProvider>
+                                                      </AnnouncementsFeedStateProvider>
+                                                    </TutorialStateProvider>
+                                                  </ExtensionStoreStateProvider>
+                                                </ExampleStoreStateProvider>
+                                              </ResourceStoreStateProvider>
+                                            </AssetStoreStateProvider>
+                                          </InAppTutorialProvider>
+                                        </CommandsContextProvider>
+                                      </SubscriptionSuggestionProvider>
+                                    </AlertProvider>
                                   </EventsFunctionsExtensionsProvider>
                                 )}
                               </I18n>

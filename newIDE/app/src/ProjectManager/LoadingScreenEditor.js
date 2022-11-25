@@ -130,7 +130,7 @@ export const LoadingScreenEditor = ({
               if (!checked) {
                 if (
                   subscriptionChecker.current &&
-                  !subscriptionChecker.current.checkHasSubscription()
+                  !subscriptionChecker.current.checkUserHasSubscription()
                 )
                   return;
               }

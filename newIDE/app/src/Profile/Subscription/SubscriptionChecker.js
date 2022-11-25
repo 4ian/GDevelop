@@ -16,7 +16,7 @@ import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
 import Text from '../../UI/Text';
 
 export type SubscriptionCheckerInterface = {|
-  checkHasSubscription: () => boolean,
+  checkUserHasSubscription: () => boolean,
 |};
 
 type Props = {|
@@ -50,7 +50,7 @@ const SubscriptionChecker = React.forwardRef<
     setDialogOpen(false);
   };
 
-  const checkHasSubscription = () => {
+  const checkUserHasSubscription = () => {
     if (authenticatedUser.subscription) {
       const hasPlan = !!authenticatedUser.subscription.planId;
       if (hasPlan) {
@@ -65,7 +65,7 @@ const SubscriptionChecker = React.forwardRef<
     return false;
   };
 
-  React.useImperativeHandle(ref, () => ({ checkHasSubscription }));
+  React.useImperativeHandle(ref, () => ({ checkUserHasSubscription }));
 
   return (
     <Dialog

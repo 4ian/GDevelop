@@ -253,7 +253,7 @@ export default class LocalPreviewLauncher extends React.Component<
                 this.state.hotReloadsCount % 16 === 0 &&
                 this._hotReloadSubscriptionChecker
               ) {
-                this._hotReloadSubscriptionChecker.checkHasSubscription();
+                this._hotReloadSubscriptionChecker.checkUserHasSubscription();
               }
               this.setState(state => ({
                 hotReloadsCount: state.hotReloadsCount + 1,
@@ -274,7 +274,7 @@ export default class LocalPreviewLauncher extends React.Component<
   _checkSubscriptionForNetworkPreview = () => {
     if (!this._networkPreviewSubscriptionChecker) return true;
 
-    return this._networkPreviewSubscriptionChecker.checkHasSubscription();
+    return this._networkPreviewSubscriptionChecker.checkUserHasSubscription();
   };
 
   render() {

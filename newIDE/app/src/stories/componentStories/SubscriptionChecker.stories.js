@@ -23,7 +23,7 @@ export const TryMode = () => {
 
   const onClick = () => {
     if (checkerRef.current) {
-      checkerRef.current.checkHasSubscription();
+      checkerRef.current.checkUserHasSubscription();
     }
   };
   return (
@@ -46,7 +46,7 @@ export const MandatoryMode = () => {
 
   const onClick = () => {
     if (checkerRef.current) {
-      checkerRef.current.checkHasSubscription();
+      checkerRef.current.checkUserHasSubscription();
     }
   };
   return (

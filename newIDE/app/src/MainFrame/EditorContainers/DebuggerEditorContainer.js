@@ -50,20 +50,20 @@ export class DebuggerEditorContainer extends React.Component<
 
   // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
   UNSAFE_componentWillReceiveProps() {
-    this._checkHasSubscription();
+    this._checkUserHasSubscription();
   }
 
   componentDidMount() {
-    this._checkHasSubscription();
+    this._checkUserHasSubscription();
   }
 
-  _checkHasSubscription() {
+  _checkUserHasSubscription() {
     if (
       this._subscriptionChecker &&
       this.props.isActive &&
       !this.state.subscriptionChecked
     ) {
-      this._subscriptionChecker.checkHasSubscription();
+      this._subscriptionChecker.checkUserHasSubscription();
       this.setState({
         subscriptionChecked: true,
       });

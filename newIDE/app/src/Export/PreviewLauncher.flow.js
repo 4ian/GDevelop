@@ -13,29 +13,11 @@ export type PreviewOptions = {|
   getIsAlwaysOnTopInPreview: () => boolean,
 |};
 
-/** The functions that PreviewLauncher must expose on their class */
-export type PreviewLauncherInterface = {
-  launchPreview: (previewOptions: PreviewOptions) => Promise<any>,
-  canDoNetworkPreview: () => boolean,
-  canDoHotReload: () => boolean,
-  +getPreviewDebuggerServer: () => ?PreviewDebuggerServer,
-};
-
 /** The props that PreviewLauncher must support */
 export type PreviewLauncherProps = {|
   getIncludeFileHashs: () => { [string]: number },
   onExport: () => void,
-  onChangeSubscription: () => void,
 |};
-
-/**
- * A PreviewLaunchComponent supports the props and has at least the functions exposed in PreviewLauncherInterface.
- * This is important as MainFrame is keeping ref to it to launch previews.
- */
-export type PreviewLauncherComponent = React.AbstractComponent<
-  PreviewLauncherProps,
-  PreviewLauncherInterface
->;
 
 /** Each game connected to the debugger server is identified by a unique number. */
 export type DebuggerId = number;
@@ -75,3 +57,20 @@ export type HotReloaderLog = {|
   kind: 'fatal' | 'error' | 'warning' | 'info',
   message: string,
 |};
+
+/** The functions that PreviewLauncher must expose on their class */
+export type PreviewLauncherInterface = {
+  launchPreview: (previewOptions: PreviewOptions) => Promise<any>,
+  canDoNetworkPreview: () => boolean,
+  canDoHotReload: () => boolean,
+  +getPreviewDebuggerServer: () => ?PreviewDebuggerServer,
+};
+
+/**
+ * A PreviewLaunchComponent supports the props and has at least the functions exposed in PreviewLauncherInterface.
+ * This is important as MainFrame is keeping ref to it to launch previews.
+ */
+export type PreviewLauncherComponent = React.AbstractComponent<
+  PreviewLauncherProps,
+  PreviewLauncherInterface
+>;

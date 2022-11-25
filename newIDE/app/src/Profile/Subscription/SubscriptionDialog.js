@@ -1,38 +1,38 @@
 // @flow
-import { t } from '@lingui/macro';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import Card from '../UI/Card';
-import FlatButton from '../UI/FlatButton';
-import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
-import AuthenticatedUserContext from './AuthenticatedUserContext';
-import { Column, Line } from '../UI/Grid';
+import Card from '../../UI/Card';
+import FlatButton from '../../UI/FlatButton';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
+import AuthenticatedUserContext from '../AuthenticatedUserContext';
+import { Column, Line } from '../../UI/Grid';
 import {
   getSubscriptionPlans,
   type PlanDetails,
   changeUserSubscription,
   getRedirectToCheckoutUrl,
   canSeamlesslyChangeSubscription,
-} from '../Utils/GDevelopServices/Usage';
-import RaisedButton from '../UI/RaisedButton';
+} from '../../Utils/GDevelopServices/Usage';
+import RaisedButton from '../../UI/RaisedButton';
 import CheckCircle from '@material-ui/icons/CheckCircle';
-import EmptyMessage from '../UI/EmptyMessage';
-import { showMessageBox, showErrorBox } from '../UI/Messages/MessageBox';
-import LeftLoader from '../UI/LeftLoader';
+import EmptyMessage from '../../UI/EmptyMessage';
+import { showMessageBox, showErrorBox } from '../../UI/Messages/MessageBox';
+import LeftLoader from '../../UI/LeftLoader';
 import {
   sendSubscriptionDialogShown,
   sendChoosePlanClicked,
-} from '../Utils/Analytics/EventSender';
+  type SubscriptionDialogDisplayReason,
+} from '../../Utils/Analytics/EventSender';
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
-import Window from '../Utils/Window';
-import Text from '../UI/Text';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
-import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
-import RedemptionCodeIcon from '../UI/CustomSvgIcons/RedemptionCode';
-import useAlertDialog from '../UI/Alert/useAlertDialog';
-import RedeemCodeDialog from './RedeemCodeDialog';
+import Window from '../../Utils/Window';
+import Text from '../../UI/Text';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
+import RedemptionCodeIcon from '../../UI/CustomSvgIcons/RedemptionCode';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import RedeemCodeDialog from '../RedeemCodeDialog';
 
 const styles = {
   descriptionText: {
@@ -65,9 +65,17 @@ const cancelAndChangeConfirmationTexts = {
 type Props = {|
   open: boolean,
   onClose: Function,
+  analyticsMetadata: {|
+    reason: SubscriptionDialogDisplayReason,
+    preStep?: 'subscriptionChecker',
+  |},
 |};
 
-export default function SubscriptionDialog({ open, onClose }: Props) {
+export default function SubscriptionDialog({
+  open,
+  onClose,
+  analyticsMetadata,
+}: Props) {
   const [isChangingSubscription, setIsChangingSubscription] = React.useState(
     false
   );
@@ -83,10 +91,10 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
   React.useEffect(
     () => {
       if (open) {
-        sendSubscriptionDialogShown();
+        sendSubscriptionDialogShown(analyticsMetadata);
       }
     },
-    [open]
+    [open, analyticsMetadata]
   );
 
   const choosePlan = async (i18n: I18nType, plan: PlanDetails) => {

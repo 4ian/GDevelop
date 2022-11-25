@@ -38,7 +38,6 @@ import ExternalPropertiesDialog from '../MainFrame/EditorContainers/ExternalProp
 import muiDecorator from './ThemeDecorator';
 import paperDecorator from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
-import RefGetter from './RefGetter';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/ParameterRenderingService';
@@ -66,10 +65,9 @@ import {
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
 import consoleTestData from '../fixtures/ConsoleTestData';
-import SubscriptionDetails from '../Profile/SubscriptionDetails';
-import SubscriptionDialog from '../Profile/SubscriptionDialog';
+import SubscriptionDetails from '../Profile/Subscription/SubscriptionDetails';
+import SubscriptionDialog from '../Profile/Subscription/SubscriptionDialog';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
 import DebuggerContent from '../Debugger/DebuggerContent';
 import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
 import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
@@ -96,7 +94,7 @@ import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/Instru
 import InstructionEditorDialog from '../EventsSheet/InstructionEditor/InstructionEditorDialog';
 import InstructionEditorMenu from '../EventsSheet/InstructionEditor/InstructionEditorMenu';
 import { PopoverButton } from './PopoverButton';
-import SubscriptionPendingDialog from '../Profile/SubscriptionPendingDialog';
+import SubscriptionPendingDialog from '../Profile/Subscription/SubscriptionPendingDialog';
 import EmailVerificationPendingDialog from '../Profile/EmailVerificationPendingDialog';
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
@@ -2636,21 +2634,21 @@ storiesOf('CurrentUsageDisplayer', module)
     <CurrentUsageDisplayer
       subscription={subscriptionForIndieUser}
       currentUsage={limitsForIndieUser.limits['cordova-build']}
-      onChangeSubscription={action('change subscription')}
+      onChangeSubscription={action('on change subscription callback')}
     />
   ))
   .add('limit reached', () => (
     <CurrentUsageDisplayer
       subscription={subscriptionForIndieUser}
       currentUsage={limitsReached.limits['cordova-build']}
-      onChangeSubscription={action('change subscription')}
+      onChangeSubscription={action('on change subscription callback')}
     />
   ))
   .add('limit reached without subscription', () => (
     <CurrentUsageDisplayer
       subscription={noSubscription}
       currentUsage={limitsReached.limits['cordova-build']}
-      onChangeSubscription={action('change subscription')}
+      onChangeSubscription={action('on change subscription callback')}
     />
   ));
 
@@ -2678,7 +2676,6 @@ storiesOf('SubscriptionDetails', module)
   .add('default', () => (
     <SubscriptionDetails
       subscription={subscriptionForIndieUser}
-      onChangeSubscription={action('change subscription')}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
     />
@@ -2686,7 +2683,6 @@ storiesOf('SubscriptionDetails', module)
   .add('no subscription', () => (
     <SubscriptionDetails
       subscription={noSubscription}
-      onChangeSubscription={action('change subscription')}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
     />
@@ -2694,7 +2690,6 @@ storiesOf('SubscriptionDetails', module)
   .add('loading manage subscription', () => (
     <SubscriptionDetails
       subscription={subscriptionForIndieUser}
-      onChangeSubscription={action('change subscription')}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={true}
     />
@@ -2707,26 +2702,42 @@ storiesOf('SubscriptionDialog', module)
     <AuthenticatedUserContext.Provider
       value={fakeNotAuthenticatedAuthenticatedUser}
     >
-      <SubscriptionDialog open onClose={action('on close')} />
+      <SubscriptionDialog
+        open
+        onClose={action('on close')}
+        analyticsMetadata={{ reason: 'Debugger' }}
+      />
     </AuthenticatedUserContext.Provider>
   ))
   .add('authenticated but loading', () => (
     <AuthenticatedUserContext.Provider
       value={fakeAuthenticatedButLoadingAuthenticatedUser}
     >
-      <SubscriptionDialog open onClose={action('on close')} />
+      <SubscriptionDialog
+        open
+        onClose={action('on close')}
+        analyticsMetadata={{ reason: 'Debugger' }}
+      />
     </AuthenticatedUserContext.Provider>
   ))
   .add('authenticated user with subscription', () => (
     <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-      <SubscriptionDialog open onClose={action('on close')} />
+      <SubscriptionDialog
+        open
+        onClose={action('on close')}
+        analyticsMetadata={{ reason: 'Debugger' }}
+      />
     </AuthenticatedUserContext.Provider>
   ))
   .add('authenticated user with no subscription', () => (
     <AuthenticatedUserContext.Provider
       value={fakeNoSubscriptionAuthenticatedUser}
     >
-      <SubscriptionDialog open onClose={action('on close')} />
+      <SubscriptionDialog
+        open
+        onClose={action('on close')}
+        analyticsMetadata={{ reason: 'Debugger' }}
+      />
     </AuthenticatedUserContext.Provider>
   ));
 
@@ -2845,31 +2856,6 @@ storiesOf('BrowserPreviewErrorDialog', module)
     />
   ));
 
-storiesOf('SubscriptionCheckDialog', module)
-  .addDecorator(muiDecorator)
-  .add('default (try mode)', () => (
-    <RefGetter onRef={ref => ref.checkHasSubscription()}>
-      <SubscriptionCheckDialog
-        title="Preview over wifi"
-        id="Preview over wifi"
-        authenticatedUser={fakeNoSubscriptionAuthenticatedUser}
-        onChangeSubscription={action('change subscription')}
-        mode="try"
-      />
-    </RefGetter>
-  ))
-  .add('default (mandatory mode)', () => (
-    <RefGetter onRef={ref => ref.checkHasSubscription()}>
-      <SubscriptionCheckDialog
-        title="Preview over wifi"
-        id="Preview over wifi"
-        authenticatedUser={fakeNoSubscriptionAuthenticatedUser}
-        onChangeSubscription={action('change subscription')}
-        mode="mandatory"
-      />
-    </RefGetter>
-  ));
-
 storiesOf('ProjectManager', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
@@ -2901,7 +2887,6 @@ storiesOf('ProjectManager', module)
       onOpenGamesDashboard={action('onOpenGamesDashboard')}
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
-      onChangeSubscription={action('onChangeSubscription')}
       eventsFunctionsExtensionsError={null}
       onReloadEventsFunctionsExtensions={action(
         'onReloadEventsFunctionsExtensions'
@@ -2942,7 +2927,6 @@ storiesOf('ProjectManager', module)
       onOpenGamesDashboard={action('onOpenGamesDashboard')}
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
-      onChangeSubscription={action('onChangeSubscription')}
       eventsFunctionsExtensionsError={
         new Error('Fake error during code generation')
       }
@@ -3121,7 +3105,6 @@ storiesOf('ProjectPropertiesDialog', module)
       onClose={action('onClose')}
       onApply={async () => true}
       onPropertiesApplied={action('onPropertiesApplied')}
-      onChangeSubscription={action('onChangeSubscription')}
       resourceSources={[]}
       onChooseResource={() => Promise.reject('unimplemented')}
       resourceExternalEditors={fakeResourceExternalEditors}

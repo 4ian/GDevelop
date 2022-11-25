@@ -8,7 +8,7 @@ import Dialog from '../UI/Dialog';
 import { Column, Line } from '../UI/Grid';
 import AuthenticatedUserProfileDetails from './AuthenticatedUserProfileDetails';
 import HelpButton from '../UI/HelpButton';
-import SubscriptionDetails from './SubscriptionDetails';
+import SubscriptionDetails from './Subscription/SubscriptionDetails';
 import ContributionsDetails from './ContributionsDetails';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
 import { GamesList } from '../GameDashboard/GamesList';
@@ -22,7 +22,6 @@ type Props = {|
   currentProject: ?gdProject,
   open: boolean,
   onClose: () => void,
-  onChangeSubscription: () => void,
   initialTab: 'profile' | 'games-dashboard',
 |};
 
@@ -30,7 +29,6 @@ const ProfileDialog = ({
   currentProject,
   open,
   onClose,
-  onChangeSubscription,
   initialTab,
 }: Props) => {
   const [currentTab, setCurrentTab] = React.useState<string>(initialTab);
@@ -152,7 +150,6 @@ const ProfileDialog = ({
                 />
                 <SubscriptionDetails
                   subscription={authenticatedUser.subscription}
-                  onChangeSubscription={onChangeSubscription}
                   onManageSubscription={onManageSubscription}
                   isManageSubscriptionLoading={isManageSubscriptionLoading}
                 />

@@ -280,9 +280,6 @@ const MainFrame = (props: Props) => {
       initialExampleShortHeader: null,
     }: State)
   );
-  const [customWindowTitle, setCustomWindowTitle] = React.useState<?string>(
-    null
-  );
   const toolbar = React.useRef<?ToolbarInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
@@ -594,30 +591,11 @@ const MainFrame = (props: Props) => {
     [state.editorTabs]
   );
 
-  const updateWindowTitle = React.useCallback(
-    () => {
-      const storageProvider = getStorageProvider();
-      if (storageProvider.internalName === 'Cloud' && !!currentProject) {
-        setCustomWindowTitle(currentProject.getName());
-      } else {
-        setCustomWindowTitle(null);
-      }
-    },
-    [currentProject, getStorageProvider]
-  );
-
   React.useEffect(
     () => {
       updateToolbar();
     },
     [updateToolbar]
-  );
-
-  React.useEffect(
-    () => {
-      updateWindowTitle();
-    },
-    [updateWindowTitle]
   );
 
   const _languageDidChange = () => {
@@ -1947,6 +1925,9 @@ const MainFrame = (props: Props) => {
           storageProviderName: storageProviderInternalName,
         });
 
+        // Ensure resources are re-loaded from their new location.
+        ResourcesLoader.burstAllUrlsCache();
+
         if (isCurrentProjectStale(currentProjectRef, currentProject)) {
           // We do not want to change the current file metadata if the
           // project has changed since the beginning of the save, which
@@ -1969,7 +1950,6 @@ const MainFrame = (props: Props) => {
         });
       } finally {
         setIsSavingProject(false);
-        updateWindowTitle();
       }
     },
     [
@@ -1985,7 +1965,6 @@ const MainFrame = (props: Props) => {
       _closeSnackMessage,
       getStorageProvider,
       preferences,
-      updateWindowTitle,
       ensureResourcesAreMoved,
       authenticatedUser,
     ]
@@ -2196,7 +2175,6 @@ const MainFrame = (props: Props) => {
         { name: newName }
       );
       if (wasSaved && unsavedChanges) unsavedChanges.sealUnsavedChanges();
-      updateWindowTitle();
     }
     await setState(state => ({
       ...state,
@@ -2537,8 +2515,10 @@ const MainFrame = (props: Props) => {
           recentProjectFiles: preferences.getRecentProjectFiles(),
         })}
       <ProjectTitlebar
+        projectName={currentProject ? currentProject.getName() : null}
         fileMetadata={currentFileMetadata}
-        customTitle={customWindowTitle}
+        storageProvider={getStorageProvider()}
+        i18n={i18n}
       />
       <Drawer
         open={projectManagerOpen}

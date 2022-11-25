@@ -113,20 +113,33 @@ export const getResourceFilePathStatus = (
   project: gdProject,
   resourceName: string
 ) => {
+  if (!project.getResourcesManager().hasResource(resourceName)) return '';
   if (!fs) return '';
-  const resourcePath = getLocalResourceFullPath(project, resourceName);
-  if (isURL(resourcePath)) return '';
 
-  const normalizedResourcePath = path.normalize(resourcePath);
+  const resourcePath = project
+    .getResourcesManager()
+    .getResource(resourceName)
+    .getFile();
+  if (isURL(resourcePath)) {
+    // This is a URL resource: don't do any check.
+    return '';
+  } else {
+    // This is a local resource. Check the file exists.
+    const normalizedResourcePath = path.resolve(
+      path.dirname(project.getProjectFile()),
+      resourcePath
+    );
 
-  // The resource path doesn't exist
-  if (!fs.existsSync(normalizedResourcePath)) return 'error';
+    // The resource path doesn't exist
+    if (!fs.existsSync(normalizedResourcePath)) return 'error';
 
-  // The resource path is outside of the project folder
-  if (!isPathInProjectFolder(project, normalizedResourcePath)) return 'warning';
+    // The resource path is outside of the project folder
+    if (!isPathInProjectFolder(project, normalizedResourcePath))
+      return 'warning';
 
-  // The resource path seems ok
-  return '';
+    // The resource path seems ok
+    return '';
+  }
 };
 
 export const applyResourceDefaults = (

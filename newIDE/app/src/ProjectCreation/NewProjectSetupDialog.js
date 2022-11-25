@@ -22,6 +22,8 @@ import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
 } from '../MainFrame/EditorContainers/HomePage/BuildSection/MaxProjectCountAlertMessage';
+import optionalRequire from '../Utils/OptionalRequire';
+const electron = optionalRequire('electron');
 
 type Props = {|
   isOpening?: boolean,
@@ -58,17 +60,17 @@ const NewProjectSetupDialog = ({
   );
   const [storageProvider, setStorageProvider] = React.useState<StorageProvider>(
     () => {
-      const localFileStorageProvider = storageProviders.find(
-        ({ internalName }) => internalName === 'LocalFile'
-      );
-      if (localFileStorageProvider) return localFileStorageProvider;
-
       if (authenticatedUser.authenticated) {
         const cloudStorageProvider = storageProviders.find(
           ({ internalName }) => internalName === 'Cloud'
         );
         if (cloudStorageProvider) return cloudStorageProvider;
       }
+
+      const localFileStorageProvider = storageProviders.find(
+        ({ internalName }) => internalName === 'LocalFile'
+      );
+      if (localFileStorageProvider) return localFileStorageProvider;
 
       return emptyStorageProvider;
     }
@@ -195,10 +197,15 @@ const NewProjectSetupDialog = ({
                 disabled={storageProvider.disabled}
               />
             ))}
-          <SelectOption
-            value={emptyStorageProvider.internalName}
-            primaryText={t`Don't save this project now`}
-          />
+          {!electron && (
+            // Only show the ability to start a project without saving on the web-app.
+            // On the local app, prefer to always have something saved so that the user is not blocked
+            // when they want to add their own resources or use external editors.
+            <SelectOption
+              value={emptyStorageProvider.internalName}
+              primaryText={t`Don't save this project now`}
+            />
+          )}
         </SelectField>
         {needUserAuthentication && (
           <Paper background="dark">

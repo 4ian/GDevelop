@@ -58,7 +58,11 @@ export type HotReloaderLog = {|
   message: string,
 |};
 
-/** The functions that PreviewLauncher must expose on their class */
+/**
+ * The functions that PreviewLauncher must expose on their class.
+ * TODO: Use strict typing when the components that implement this interface
+ * are functional component with strict interfaces.
+ */
 export type PreviewLauncherInterface = {
   launchPreview: (previewOptions: PreviewOptions) => Promise<any>,
   canDoNetworkPreview: () => boolean,

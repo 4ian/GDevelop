@@ -37,7 +37,7 @@ import ContextMenu, {
 import { type MenuItemTemplate } from '../../UI/Menu/Menu.flow';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import CircularProgress from '../../UI/CircularProgress';
-import RaisedButton from '../../UI/RaisedButton';
+import FlatButton from '../../UI/FlatButton';
 
 const styles = {
   // Make select field width not dependent on build names (name is truncated).
@@ -378,13 +378,18 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                 )}
               </ColumnStackLayout>
               {displayedFeedbacksArray.length === 0 && (
-                <EmptyMessage>
+                <>
                   {showProcessed ? (
-                    <LineStackLayout alignItems="center">
-                      <Trans>
-                        You don't have any unread feedback for this game.
-                      </Trans>
-                      <RaisedButton
+                    <LineStackLayout
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <Text>
+                        <Trans>
+                          You don't have any unread feedback for this game.
+                        </Trans>
+                      </Text>
+                      <FlatButton
                         onClick={() => setShowProcessed(false)}
                         label={<Trans>Show all feedbacks</Trans>}
                       />
@@ -392,7 +397,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                   ) : (
                     <Trans>You don't have any feedback for this game.</Trans>
                   )}
-                </EmptyMessage>
+                </>
               )}
               {displayedFeedbacksArray.length !== 0 && (
                 <ColumnStackLayout expand noMargin>

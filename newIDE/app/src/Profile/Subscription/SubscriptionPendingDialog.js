@@ -2,15 +2,15 @@
 import { Trans } from '@lingui/macro';
 
 import React from 'react';
-import FlatButton from '../UI/FlatButton';
-import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
-import { type AuthenticatedUser } from './AuthenticatedUserContext';
-import { Column, Line, Spacer } from '../UI/Grid';
-import BackgroundText from '../UI/BackgroundText';
+import FlatButton from '../../UI/FlatButton';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
+import { type AuthenticatedUser } from '../AuthenticatedUserContext';
+import { Column, Line, Spacer } from '../../UI/Grid';
+import BackgroundText from '../../UI/BackgroundText';
 import VerifiedUser from '@material-ui/icons/VerifiedUser';
-import Text from '../UI/Text';
-import { useInterval } from '../Utils/UseInterval';
-import CircularProgress from '../UI/CircularProgress';
+import Text from '../../UI/Text';
+import { useInterval } from '../../Utils/UseInterval';
+import CircularProgress from '../../UI/CircularProgress';
 
 type Props = {|
   onClose: Function,

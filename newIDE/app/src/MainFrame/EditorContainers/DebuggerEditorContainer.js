@@ -7,7 +7,9 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
-import SubscriptionChecker from '../../Profile/SubscriptionChecker';
+import SubscriptionChecker, {
+  type SubscriptionCheckerInterface,
+} from '../../Profile/Subscription/SubscriptionChecker';
 
 type State = {|
   subscriptionChecked: boolean,
@@ -18,7 +20,7 @@ export class DebuggerEditorContainer extends React.Component<
   State
 > {
   editor: ?Debugger;
-  _subscriptionChecker: ?SubscriptionChecker;
+  _subscriptionChecker: ?SubscriptionCheckerInterface;
   state = {
     subscriptionChecked: false,
   };
@@ -84,10 +86,6 @@ export class DebuggerEditorContainer extends React.Component<
           ref={subscriptionChecker =>
             (this._subscriptionChecker = subscriptionChecker)
           }
-          onChangeSubscription={() => {
-            if (this.props.onChangeSubscription)
-              this.props.onChangeSubscription();
-          }}
           id="Debugger"
           title={<Trans>Debugger</Trans>}
           mode="try"

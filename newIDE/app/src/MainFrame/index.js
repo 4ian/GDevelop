@@ -236,7 +236,7 @@ type LaunchPreviewOptions = {
 export type Props = {|
   initialDialog?: string,
   initialGameId?: string,
-  initialGameDashboardTab?: string,
+  initialGamesDashboardTab?: string,
   introDialog?: React.Element<*>,
   renderMainMenu?: MainMenuProps => React.Node,
   renderPreviewLauncher?: (
@@ -421,7 +421,7 @@ const MainFrame = (props: Props) => {
     getStorageProvider,
     initialDialog,
     initialGameId,
-    initialGameDashboardTab,
+    initialGamesDashboardTab,
     initialFileMetadataToOpen,
     introDialog,
     i18n,
@@ -530,7 +530,7 @@ const MainFrame = (props: Props) => {
     parameters: {
       initialDialog,
       initialGameId,
-      initialGameDashboardTab,
+      initialGamesDashboardTab,
     },
     actions: {
       openSubscriptionDialog,

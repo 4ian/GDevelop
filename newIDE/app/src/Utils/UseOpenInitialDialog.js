@@ -7,16 +7,16 @@ import {
 import { type ProfileTab } from '../Profile/ProfileDialog';
 
 type Props = {|
-  parameters: {
+  parameters: {|
     initialDialog?: string,
     initialGameId?: string,
-    initialGameDashboardTab?: string,
-  },
-  actions: {
+    initialGamesDashboardTab?: string,
+  |},
+  actions: {|
     openSubscriptionDialog: boolean => void,
     openOnboardingDialog: boolean => void,
     openProfileDialog: boolean => void,
-  },
+  |},
 |};
 
 /**
@@ -70,7 +70,7 @@ export const useOpenInitialDialog = ({ parameters, actions }: Props) => {
         case 'games-dashboard':
           openGameDashboard({
             gameId: parameters.initialGameId,
-            tab: parameters.initialGameDashboardTab,
+            tab: parameters.initialGamesDashboardTab,
           });
           break;
         default:

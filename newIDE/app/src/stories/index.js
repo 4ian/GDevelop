@@ -2705,7 +2705,7 @@ storiesOf('SubscriptionDialog', module)
       <SubscriptionDialog
         open
         onClose={action('on close')}
-        analyticsMetadata={{ reason: 'storybook-test' }}
+        analyticsMetadata={{ reason: 'Debugger' }}
       />
     </AuthenticatedUserContext.Provider>
   ))
@@ -2716,7 +2716,7 @@ storiesOf('SubscriptionDialog', module)
       <SubscriptionDialog
         open
         onClose={action('on close')}
-        analyticsMetadata={{ reason: 'storybook-test' }}
+        analyticsMetadata={{ reason: 'Debugger' }}
       />
     </AuthenticatedUserContext.Provider>
   ))
@@ -2725,7 +2725,7 @@ storiesOf('SubscriptionDialog', module)
       <SubscriptionDialog
         open
         onClose={action('on close')}
-        analyticsMetadata={{ reason: 'storybook-test' }}
+        analyticsMetadata={{ reason: 'Debugger' }}
       />
     </AuthenticatedUserContext.Provider>
   ))
@@ -2736,7 +2736,7 @@ storiesOf('SubscriptionDialog', module)
       <SubscriptionDialog
         open
         onClose={action('on close')}
-        analyticsMetadata={{ reason: 'storybook-test' }}
+        analyticsMetadata={{ reason: 'Debugger' }}
       />
     </AuthenticatedUserContext.Provider>
   ));

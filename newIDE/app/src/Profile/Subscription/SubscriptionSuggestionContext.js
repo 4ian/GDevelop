@@ -1,10 +1,11 @@
 // @flow
 import * as React from 'react';
 import SubscriptionDialog from './SubscriptionDialog';
+import { type SubscriptionDialogDisplayReason } from '../../Utils/Analytics/EventSender';
 
 type SubscriptionSuggestionState = {|
   openSubscriptionDialog: ({|
-    reason: string,
+    reason: SubscriptionDialogDisplayReason,
     preStep?: 'subscriptionChecker',
   |}) => void,
 |};
@@ -23,7 +24,7 @@ export const SubscriptionSuggestionProvider = ({
   children,
 }: SubscriptionSuggestionProviderProps) => {
   const [analyticsMetadata, setAnalyticsMetadata] = React.useState<?{|
-    reason: string,
+    reason: SubscriptionDialogDisplayReason,
     preStep?: 'subscriptionChecker',
   |}>(null);
 

@@ -52,7 +52,7 @@ const SubscriptionDetails = ({
             <RaisedButton
               label={<Trans>Upgrade or cancel</Trans>}
               primary
-              onClick={() => openSubscriptionDialog({ reason: 'Consult ' })}
+              onClick={() => openSubscriptionDialog({ reason: 'Consult profile' })}
             />
           </ResponsiveLineStackLayout>
         </>
@@ -71,7 +71,7 @@ const SubscriptionDetails = ({
             <RaisedButton
               label={<Trans>Choose a subscription</Trans>}
               primary
-              onClick={() => openSubscriptionDialog({ reason: 'Consult ' })}
+              onClick={() => openSubscriptionDialog({ reason: 'Consult profile' })}
             />
           </Line>
         </>

@@ -10,11 +10,12 @@ import SubscriptionChecker, {
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { fakeNotAuthenticatedAuthenticatedUser } from '../../fixtures/GDevelopServicesTestData';
 import RaisedButton from '../../UI/RaisedButton';
+import subscriptionSuggestionDecorator from '../SubscriptionSuggestionDecorator';
 
 export default {
   title: 'SubscriptionChecker',
   component: SubscriptionChecker,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [subscriptionSuggestionDecorator, paperDecorator, muiDecorator],
 };
 
 export const TryMode = () => {

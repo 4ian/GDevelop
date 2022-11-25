@@ -51,6 +51,12 @@ const propertiesMapToSchema = (
       );
     };
     const getDescription = () => propertyDescription;
+    const measurementUnit = property.getMeasurementUnit();
+    const measurementUnitName = getMeasurementUnitShortLabel(measurementUnit);
+    const endAdornment = {
+      label: measurementUnitName,
+      description: getMeasurementUnitDescription(measurementUnit),
+    };
 
     if (property.isHidden()) return null;
 
@@ -72,6 +78,7 @@ const propertiesMapToSchema = (
         },
         getLabel,
         getDescription,
+        endAdornment,
       });
       return null;
     } else if (valueType === 'string' || valueType === '') {
@@ -240,6 +247,52 @@ const propertiesMapToSchema = (
     // The group actually always exists here.
     children: fieldsByGroups.get(groupName) || [],
   }));
+};
+
+const exponents = ['⁰', '¹', '²', '³', '⁴', '⁵'];
+
+export const getMeasurementUnitShortLabel = (
+  measurementUnit: gdMeasurementUnit
+): string => {
+  return mapFor(0, measurementUnit.getElementsCount(), i => {
+    const baseUnit = measurementUnit.getElementBaseUnit(i);
+    const power = measurementUnit.getElementPower(i);
+    const absPower = Math.abs(power);
+    const showPower = power < 0 || (absPower > 1 && absPower < 6);
+    return (
+      baseUnit.getSymbol() +
+      (power < 0 ? '⁻' : '') +
+      (showPower ? exponents[absPower] : '')
+    );
+  }).join(' · ');
+};
+
+export const getMeasurementUnitDescription = (
+  measurementUnit: gdMeasurementUnit
+): string => {
+  let wasNegativePower = false;
+  return (
+    '### ' +
+    measurementUnit.getLabel() +
+    '\n' +
+    measurementUnit.getDescription() +
+    '\n\n_in ' +
+    mapFor(0, measurementUnit.getElementsCount(), i => {
+      const baseUnit = measurementUnit.getElementBaseUnit(i);
+      const power = measurementUnit.getElementPower(i);
+      const absPower = Math.abs(power);
+      const signedUnit = (power < 0 ? 'per ' : '') + baseUnit.getLabel();
+      const separator = power < 0 ? ', ' : ' ';
+      const firstSeparator = i === 0 ? '' : wasNegativePower ? separator : ' ';
+      const poweredUnit =
+        firstSeparator +
+        signedUnit +
+        (absPower > 1 ? (separator + signedUnit).repeat(absPower - 1) : '');
+      wasNegativePower = power < 0;
+      return poweredUnit;
+    }).join('') +
+    '_'
+  );
 };
 
 export default propertiesMapToSchema;

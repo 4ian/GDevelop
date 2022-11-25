@@ -9,7 +9,9 @@ import { findGDJS } from '../../../GameEngineFinder/LocalGDJSFinder';
 import LocalNetworkPreviewDialog from './LocalNetworkPreviewDialog';
 import assignIn from 'lodash/assignIn';
 import { type PreviewOptions } from '../../PreviewLauncher.flow';
-import SubscriptionChecker from '../../../Profile/SubscriptionChecker';
+import SubscriptionChecker, {
+  type SubscriptionCheckerInterface,
+} from '../../../Profile/SubscriptionChecker';
 import {
   getDebuggerServerAddress,
   localPreviewDebuggerServer,
@@ -62,8 +64,8 @@ export default class LocalPreviewLauncher extends React.Component<
     hideMenuBar: true,
     alwaysOnTop: true,
   };
-  _networkPreviewSubscriptionChecker: ?SubscriptionChecker = null;
-  _hotReloadSubscriptionChecker: ?SubscriptionChecker = null;
+  _networkPreviewSubscriptionChecker: ?SubscriptionCheckerInterface = null;
+  _hotReloadSubscriptionChecker: ?SubscriptionCheckerInterface = null;
 
   _openPreviewBrowserWindow = () => {
     const { previewGamePath, previewBrowserWindowOptions } = this.state;

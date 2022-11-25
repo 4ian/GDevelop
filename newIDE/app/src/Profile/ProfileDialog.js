@@ -12,18 +12,23 @@ import SubscriptionDetails from './SubscriptionDetails';
 import ContributionsDetails from './ContributionsDetails';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
 import { GamesList } from '../GameDashboard/GamesList';
-import { ColumnStackLayout } from '../UI/Layout';
 import { getRedirectToSubscriptionPortalUrl } from '../Utils/GDevelopServices/Usage';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import CreateProfile from './CreateProfile';
+import PlaceholderLoader from '../UI/PlaceholderLoader';
+import { type GameDetailsTab } from '../GameDashboard/GameDetailsDialog';
+
+export type ProfileTab = 'profile' | 'games-dashboard';
 
 type Props = {|
   currentProject: ?gdProject,
   open: boolean,
   onClose: () => void,
   onChangeSubscription: () => void,
-  initialTab: 'profile' | 'games-dashboard',
+  initialTab: ProfileTab,
+  gamesDashboardInitialGameId: ?string,
+  gamesDashboardInitialTab: ?GameDetailsTab,
 |};
 
 const ProfileDialog = ({
@@ -32,8 +37,10 @@ const ProfileDialog = ({
   onClose,
   onChangeSubscription,
   initialTab,
+  gamesDashboardInitialGameId,
+  gamesDashboardInitialTab,
 }: Props) => {
-  const [currentTab, setCurrentTab] = React.useState<string>(initialTab);
+  const [currentTab, setCurrentTab] = React.useState<ProfileTab>(initialTab);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const isUserLoading = authenticatedUser.loginState !== 'done';
 
@@ -140,7 +147,9 @@ const ProfileDialog = ({
         ) : null
       }
     >
-      {authenticatedUser.authenticated && authenticatedUser.profile ? (
+      {authenticatedUser.loginState === 'loggingIn' ? (
+        <PlaceholderLoader />
+      ) : authenticatedUser.authenticated && authenticatedUser.profile ? (
         <>
           {currentTab === 'profile' && (
             <Line>
@@ -161,11 +170,11 @@ const ProfileDialog = ({
             </Line>
           )}
           {currentTab === 'games-dashboard' && (
-            <Line>
-              <ColumnStackLayout expand noOverflowParent noMargin>
-                <GamesList project={currentProject} />
-              </ColumnStackLayout>
-            </Line>
+            <GamesList
+              project={currentProject}
+              initialGameId={gamesDashboardInitialGameId}
+              initialTab={gamesDashboardInitialTab}
+            />
           )}
         </>
       ) : (

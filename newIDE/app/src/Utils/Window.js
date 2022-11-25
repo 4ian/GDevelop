@@ -153,6 +153,17 @@ export default class Window {
     return argumentsObject;
   }
 
+  /**
+   * On web, removes any query params from the URL.
+   */
+  static removeArguments() {
+    if (remote) return;
+
+    const url = new URL(window.location.href);
+    url.search = '';
+    window.history.replaceState({}, document.title, url.toString());
+  }
+
   static showMessageBox(
     message: string,
     type?: 'none' | 'info' | 'error' | 'question' | 'warning'

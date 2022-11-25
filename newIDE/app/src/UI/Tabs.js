@@ -54,17 +54,19 @@ function Tab<TabName>(props: TabProps<TabName>) {
   return <MUITab classes={classes} {...props} />;
 }
 
+export type TabOptions<TabName> = Array<{|
+  label: React.Node,
+  value: TabName,
+  id?: string,
+  disabled?: boolean,
+|}>;
+
 // We support a subset of the props supported by Material-UI v0.x Tabs
 // They should be self descriptive - refer to Material UI docs otherwise.
 type TabsProps<TabName> = {|
   value?: TabName,
   onChange: TabName => void,
-  options: Array<{|
-    label: React.Node,
-    value: TabName,
-    id?: string,
-    disabled?: boolean,
-  |}>,
+  options: TabOptions<TabName>,
   variant?: 'scrollable', // Allow overriding the scrollable variant for specific cases.
 |};
 

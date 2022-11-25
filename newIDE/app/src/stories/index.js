@@ -69,7 +69,6 @@ import consoleTestData from '../fixtures/ConsoleTestData';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
 import DebuggerContent from '../Debugger/DebuggerContent';
 import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
 import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
@@ -2843,31 +2842,6 @@ storiesOf('BrowserPreviewErrorDialog', module)
       }
       onClose={action('on close')}
     />
-  ));
-
-storiesOf('SubscriptionCheckDialog', module)
-  .addDecorator(muiDecorator)
-  .add('default (try mode)', () => (
-    <RefGetter onRef={ref => ref.checkHasSubscription()}>
-      <SubscriptionCheckDialog
-        title="Preview over wifi"
-        id="Preview over wifi"
-        authenticatedUser={fakeNoSubscriptionAuthenticatedUser}
-        onChangeSubscription={action('change subscription')}
-        mode="try"
-      />
-    </RefGetter>
-  ))
-  .add('default (mandatory mode)', () => (
-    <RefGetter onRef={ref => ref.checkHasSubscription()}>
-      <SubscriptionCheckDialog
-        title="Preview over wifi"
-        id="Preview over wifi"
-        authenticatedUser={fakeNoSubscriptionAuthenticatedUser}
-        onChangeSubscription={action('change subscription')}
-        mode="mandatory"
-      />
-    </RefGetter>
   ));
 
 storiesOf('ProjectManager', module)

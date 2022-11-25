@@ -1,7 +1,9 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
-import SubscriptionChecker from '../Profile/SubscriptionChecker';
+import SubscriptionChecker, {
+  type SubscriptionCheckerInterface,
+} from '../Profile/SubscriptionChecker';
 import Checkbox from '../UI/Checkbox';
 import ColorField from '../UI/ColorField';
 import { I18n } from '@lingui/react';
@@ -44,7 +46,7 @@ export const LoadingScreenEditor = ({
   onChooseResource,
   resourceExternalEditors,
 }: Props) => {
-  const subscriptionChecker = React.useRef<?SubscriptionChecker>(null);
+  const subscriptionChecker = React.useRef<?SubscriptionCheckerInterface>(null);
   const forceUpdate = useForceUpdate();
 
   const onUpdate = () => {

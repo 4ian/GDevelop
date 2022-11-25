@@ -8,6 +8,7 @@ import ResourceSelector from '../../../ResourcesList/ResourceSelector';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
 import ResourcesLoader from '../../../ResourcesLoader';
 import ResourceSelectorWithThumbnail from '../../../ResourcesList/ResourceSelectorWithThumbnail';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'ResourcesList/ResourceSelector',
@@ -19,9 +20,13 @@ export const ImageNotSelected = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={() => Promise.reject('Unimplemented')}
-    resourceExternalEditors={fakeResourceExternalEditors}
+    resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
     initialResourceName=""
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}
@@ -32,9 +37,13 @@ export const ImageSelected = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={() => Promise.reject('Unimplemented')}
-    resourceExternalEditors={fakeResourceExternalEditors}
+    resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
     initialResourceName="icon128.png"
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}
@@ -45,20 +54,24 @@ export const ImageWithMultipleExternalEditors = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={() => Promise.reject('Unimplemented')}
-    resourceExternalEditors={[
-      ...fakeResourceExternalEditors,
-      {
-        name: 'fake-image-editor-2',
-        createDisplayName: 'Create with Super Image Editor 2',
-        editDisplayName: 'Edit with Super Image Editor 2',
-        kind: 'image',
-        edit: options => {
-          console.log('Open the image editor with these options:', options);
+    resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: [
+        ...fakeResourceExternalEditors,
+        {
+          name: 'fake-image-editor-2',
+          createDisplayName: 'Create with Super Image Editor 2',
+          editDisplayName: 'Edit with Super Image Editor 2',
+          kind: 'image',
+          edit: options => {
+            console.log('Open the image editor with these options:', options);
+          },
         },
-      },
-    ]}
+      ],
+    }}
     initialResourceName=""
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}
@@ -69,9 +82,13 @@ export const NotExisting = () => (
   <ResourceSelector
     resourceKind="image"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={action('onChooseResource')}
-    resourceExternalEditors={fakeResourceExternalEditors}
+    resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
     initialResourceName="resource-that-does-not-exists-in-the-project"
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}
@@ -83,9 +100,13 @@ export const ImageNoMargin = () => (
     margin="none"
     resourceKind="image"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={() => Promise.reject('Unimplemented')}
-    resourceExternalEditors={fakeResourceExternalEditors}
+    resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
     initialResourceName="icon128.png"
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}
@@ -96,9 +117,13 @@ export const ImageWithThumbnail = () => (
   <ResourceSelectorWithThumbnail
     resourceKind="image"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={() => Promise.reject('Unimplemented')}
-    resourceExternalEditors={fakeResourceExternalEditors}
+    resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
     resourceName="icon128.png"
     onChange={action('on change')}
   />
@@ -108,9 +133,13 @@ export const Audio = () => (
   <ResourceSelector
     resourceKind="audio"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={() => Promise.reject('Unimplemented')}
-    resourceExternalEditors={fakeResourceExternalEditors}
+    resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
     initialResourceName="fake-audio1.mp3"
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}
@@ -122,9 +151,13 @@ export const FontWithResetButton = () => (
     canBeReset
     resourceKind="font"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={() => Promise.reject('Unimplemented')}
-    resourceExternalEditors={fakeResourceExternalEditors}
+    resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
     initialResourceName="font.otf"
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}
@@ -137,9 +170,13 @@ export const FontNoMarginWithResetButton = () => (
     margin="none"
     resourceKind="font"
     project={testProject.project}
-    resourceSources={[]}
-    onChooseResource={() => Promise.reject('Unimplemented')}
-    resourceExternalEditors={fakeResourceExternalEditors}
+    resourceManagementProps={{
+      getStorageProvider: () => emptyStorageProvider,
+      onFetchNewlyAddedResources: async () => {},
+      resourceSources: [],
+      onChooseResource: () => Promise.reject('Unimplemented'),
+      resourceExternalEditors: fakeResourceExternalEditors,
+    }}
     initialResourceName="font.otf"
     onChange={action('on change')}
     resourcesLoader={ResourcesLoader}

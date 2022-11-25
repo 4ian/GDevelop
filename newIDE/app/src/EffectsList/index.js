@@ -26,11 +26,7 @@ import {
   type EnumeratedEffectMetadata,
   setEffectDefaultParameters,
 } from './EnumerateEffects';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import ScrollView from '../UI/ScrollView';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import {
@@ -62,9 +58,7 @@ const styles = {
 
 type Props = {|
   project: gdProject,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   effectsContainer: gdEffectsContainer,
   onEffectsUpdated: () => void,
   target: 'object' | 'layer',
@@ -376,14 +370,8 @@ export default function EffectsList(props: Props) {
                                                 effectMetadata.parametersSchema
                                               }
                                               project={props.project}
-                                              resourceSources={
-                                                props.resourceSources
-                                              }
-                                              onChooseResource={
-                                                props.onChooseResource
-                                              }
-                                              resourceExternalEditors={
-                                                props.resourceExternalEditors
+                                              resourceManagementProps={
+                                                props.resourceManagementProps
                                               }
                                               renderExtraDescriptionText={
                                                 showEffectParameterNames

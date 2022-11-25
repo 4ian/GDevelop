@@ -50,7 +50,7 @@ export const GenericRetryableProcessWithProgressDialog = ({
 
   return (
     <Dialog
-      title={null} // Specific loading dialog where we don't want a title.
+      title={<Trans>Importing project resources</Trans>}
       actions={[
         onAbandon ? (
           <FlatButton
@@ -73,56 +73,55 @@ export const GenericRetryableProcessWithProgressDialog = ({
       open
       maxWidth="sm"
     >
-      <Line>
-        <ColumnStackLayout expand>
-          <Text>
-            {hasErrors ? (
-              <Trans>
-                There were errors when importing resources for the project. You
-                can retry (recommended) or continue despite the errors. In this
-                case, the project will be missing some resources.
-              </Trans>
-            ) : (
-              <Trans>Resources needed for the project are imported...</Trans>
-            )}
-          </Text>
-          <Line noMargin expand>
-            <LinearProgress variant="determinate" value={progress} />
-          </Line>
+      <ColumnStackLayout noMargin expand>
+        <Text>
           {hasErrors ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHeaderColumn>Resource name</TableHeaderColumn>
-                  <TableHeaderColumn>Error</TableHeaderColumn>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {result
-                  ? result.erroredResources.map(({ resourceName, error }) => (
-                      <TableRow key={resourceName}>
-                        <TableRowColumn style={styles.tableCell}>
-                          {resourceName}
-                        </TableRowColumn>
-                        <TableRowColumn style={styles.tableCell}>
-                          {error.toString()}
-                        </TableRowColumn>
-                      </TableRow>
-                    ))
-                  : null}
-                {genericError ? (
-                  <TableRow>
-                    <TableRowColumn style={styles.tableCell}>-</TableRowColumn>
-                    <TableRowColumn style={styles.tableCell}>
-                      {genericError.toString()}
-                    </TableRowColumn>
-                  </TableRow>
-                ) : null}
-              </TableBody>
-            </Table>
+            <Trans>
+              There were errors when importing resources for the project. You
+              can retry (recommended) or continue despite the errors. In this
+              case, the project will be missing some resources.
+            </Trans>
           ) : null}
-        </ColumnStackLayout>
-      </Line>
+        </Text>
+        <Line noMargin expand>
+          <LinearProgress
+            variant={progress > 0 ? 'determinate' : 'indeterminate'}
+            value={progress}
+          />
+        </Line>
+        {hasErrors ? (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHeaderColumn>Resource name</TableHeaderColumn>
+                <TableHeaderColumn>Error</TableHeaderColumn>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {result
+                ? result.erroredResources.map(({ resourceName, error }) => (
+                    <TableRow key={resourceName}>
+                      <TableRowColumn style={styles.tableCell}>
+                        {resourceName}
+                      </TableRowColumn>
+                      <TableRowColumn style={styles.tableCell}>
+                        {error.toString()}
+                      </TableRowColumn>
+                    </TableRow>
+                  ))
+                : null}
+              {genericError ? (
+                <TableRow>
+                  <TableRowColumn style={styles.tableCell}>-</TableRowColumn>
+                  <TableRowColumn style={styles.tableCell}>
+                    {genericError.toString()}
+                  </TableRowColumn>
+                </TableRow>
+              ) : null}
+            </TableBody>
+          </Table>
+        ) : null}
+      </ColumnStackLayout>
     </Dialog>
   );
 };
@@ -172,10 +171,12 @@ export const useGenericRetryableProcessWithProgress = <DoProcessOptions>({
       setResult(null);
       setGenericError(null);
 
+      // This will display the dialog:
+      setIsFetching(true);
+
       let newResult = null;
       try {
         newResult = await onDoProcess(options, (count, total) => {
-          setIsFetching(true); // Only display the dialog if some progress happened.
           setProgress((count / total) * 100);
         });
 

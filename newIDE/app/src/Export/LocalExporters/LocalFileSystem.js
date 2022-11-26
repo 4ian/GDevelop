@@ -1,6 +1,7 @@
 // @flow
 import optionalRequire from '../../Utils/OptionalRequire';
 import { getUID } from '../../Utils/LocalUserInfo';
+import { isURL } from '../../ResourcesList/ResourceUtils';
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
 const os = optionalRequire('os');
@@ -11,16 +12,6 @@ export type UrlFileDescriptor = {|
   filePath: string,
   url: string,
 |};
-
-const isURL = (filename: string) => {
-  return (
-    filename.startsWith('http://') ||
-    filename.startsWith('https://') ||
-    filename.startsWith('ftp://') ||
-    filename.startsWith('blob:') ||
-    filename.startsWith('data:')
-  );
-};
 
 // For some reason, `path.posix` is undefined when packaged
 // with webpack, so we're using `path` directly. As it's for the web-app,
@@ -38,6 +29,7 @@ const pathPosix = path.posix || path;
 class LocalFileSystem {
   /**
    * True if URLs should be downloaded (useful for an export, but not for a preview).
+   * @private
    */
   _downloadUrlsToLocalFiles: boolean;
 

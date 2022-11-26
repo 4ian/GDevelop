@@ -10,19 +10,14 @@ import { moveUrlResourcesToLocalFiles } from '../LocalFileStorageProvider/LocalF
 import UrlStorageProvider from '../UrlStorageProvider';
 import CloudStorageProvider from '../CloudStorageProvider';
 import { fetchRelativeResourcesToFullUrls } from '../UrlStorageProvider/UrlResourceFetcher';
-
-const fetchNothing: FetchAllProjectResourcesFunction = async () => {
-  return {
-    erroredResources: [],
-  };
-};
+import { moveUrlResourcesToCloudFilesIfPrivate } from '../CloudStorageProvider/CloudResourceFetcher';
 
 const fetchers: {
   [string]: FetchAllProjectResourcesFunction,
 } = {
-  // The cloud storage has nothing to fetch, all resources are supposed
-  // to be public URLs or URLs on GDevelop Cloud, accessed with a cookie.
-  [CloudStorageProvider.internalName]: fetchNothing,
+  // The Cloud file storage provider fetches the resources that are
+  // private URLs by downloading them and reuploading them to the cloud.
+  [CloudStorageProvider.internalName]: moveUrlResourcesToCloudFilesIfPrivate,
   // The local file storage provider fetches the resources that are URLs
   // by downloading them locally.
   [LocalFileStorageProvider.internalName]: moveUrlResourcesToLocalFiles,

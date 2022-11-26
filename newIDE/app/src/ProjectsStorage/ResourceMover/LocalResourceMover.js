@@ -20,6 +20,7 @@ import {
 } from '../../Utils/GDevelopServices/Project';
 import { processByChunk } from '../../Utils/ProcessByChunk';
 import { readLocalFileToFile } from '../../Utils/LocalFileUploader';
+import { isURL, isBlobURL } from '../../ResourcesList/ResourceUtils';
 const path = optionalRequire('path');
 
 const gd: libGDevelop = global.gd;
@@ -28,20 +29,6 @@ const moveNothing = async () => {
   return {
     erroredResources: [],
   };
-};
-
-const isURL = (filename: string) => {
-  return (
-    filename.startsWith('http://') ||
-    filename.startsWith('https://') ||
-    filename.startsWith('ftp://') ||
-    filename.startsWith('blob:') ||
-    filename.startsWith('data:')
-  );
-};
-
-const isBlobURL = (filename: string) => {
-  return filename.startsWith('blob:');
 };
 
 type ResourceAndFile = {|
@@ -112,11 +99,12 @@ export const moveAllLocalResourcesToCloudResources = async ({
         projectPath,
         resource.getFile()
       );
+      const file = await readLocalFileToFile(resourceAbsolutePath);
 
       try {
         return {
           resource,
-          file: await readLocalFileToFile(resourceAbsolutePath),
+          file,
         };
       } catch (error) {
         result.erroredResources.push({
@@ -230,7 +218,7 @@ const movers: {
 
   // Moving to GDevelop "Cloud" storage:
 
-  //TODO
+  // From a local project to a Cloud project, all resources are uploaded.
   [`${LocalFileStorageProvider.internalName}=>${
     CloudStorageProvider.internalName
   }`]: moveAllLocalResourcesToCloudResources,

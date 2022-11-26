@@ -292,7 +292,7 @@ describe('LocalResourceMover', () => {
       ])
     );
 
-    // Check no error is reported.
+    // Check the error is reported.
     expect(fetchedResources.erroredResources).toHaveLength(1);
     expect(fetchedResources.erroredResources[0].resourceName).toBe(
       'MySecondLocalResource'

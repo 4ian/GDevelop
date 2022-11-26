@@ -1,6 +1,8 @@
 // @flow
+import { t } from '@lingui/macro';
+import * as React from 'react';
 import { serializeToJSObject, serializeToJSON } from '../../Utils/Serializer';
-import { type FileMetadata } from '../index';
+import { type FileMetadata, type SaveAsLocation } from '../index';
 import optionalRequire from '../../Utils/OptionalRequire';
 import {
   split,
@@ -8,12 +10,14 @@ import {
   getSlugifiedUniqueNameFromProperty,
 } from '../../Utils/ObjectSplitter';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
-import { t } from '@lingui/macro';
+import LocalFolderPicker from '../../UI/LocalFolderPicker';
+import { findEmptyPathInDefaultFolder } from './LocalPathFinder';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
+const app = remote ? remote.app : null;
 
 const checkFileContent = (filePath: string, expectedContent: string) => {
   const time = performance.now();
@@ -142,13 +146,11 @@ export const onSaveProject = (
 export const onChooseSaveProjectAsLocation = async ({
   project,
   fileMetadata,
-  onLocationSelected,
 }: {|
   project: gdProject,
   fileMetadata: ?FileMetadata, // This is the current location.
-  onLocationSelected: () => void,
 |}): Promise<{|
-  fileMetadata: ?FileMetadata, // This is the newly chosen location (or null if cancelled).
+  saveAsLocation: ?SaveAsLocation, // This is the newly chosen location (or null if cancelled).
 |}> => {
   const defaultPath = fileMetadata ? fileMetadata.fileIdentifier : '';
   const browserWindow = remote.getCurrentWindow();
@@ -162,11 +164,11 @@ export const onChooseSaveProjectAsLocation = async ({
   }
   const filePath = dialog.showSaveDialogSync(browserWindow, saveDialogOptions);
   if (!filePath) {
-    return { fileMetadata: null };
+    return { saveAsLocation: null };
   }
 
   return {
-    fileMetadata: {
+    saveAsLocation: {
       fileIdentifier: filePath,
     },
   };
@@ -174,27 +176,37 @@ export const onChooseSaveProjectAsLocation = async ({
 
 export const onSaveProjectAs = async (
   project: gdProject,
-  fileMetadata: ?FileMetadata,
+  saveAsLocation: ?SaveAsLocation,
   options: {|
     onStartSaving: () => void,
-    onMoveResources: () => Promise<void>,
+    onMoveResources: ({|
+      newFileMetadata: FileMetadata,
+    |}) => Promise<void>,
   |}
 ): Promise<{|
   wasSaved: boolean,
+  fileMetadata: ?FileMetadata,
 |}> => {
-  if (!fileMetadata)
+  if (!saveAsLocation)
     throw new Error('A location was not chosen before saving as.');
+  const filePath = saveAsLocation.fileIdentifier;
+  if (!filePath)
+    throw new Error('A file path was not chosen before saving as.');
 
-  if (options && options.onStartSaving) options.onStartSaving();
-  await options.onMoveResources();
+  options.onStartSaving();
+  const newFileMetadata = { fileIdentifier: filePath };
 
-  const filePath = fileMetadata.fileIdentifier;
+  // Move (copy or download, etc...) the resources first.
+  await options.onMoveResources({ newFileMetadata });
+
+  // Save the project when resources have been copied.
   const projectPath = path.dirname(filePath);
   project.setProjectFile(filePath);
 
   await writeProjectFiles(project, filePath, projectPath);
   return {
     wasSaved: true,
+    fileMetadata: newFileMetadata,
   };
 };
 
@@ -213,3 +225,35 @@ export const onAutoSaveProject = (
 
 export const getWriteErrorMessage = (error: Error): MessageDescriptor =>
   t`An error occurred when saving the project. Please try again by choosing another location.`;
+
+export const onRenderNewProjectSaveAsLocationChooser = ({
+  saveAsLocation,
+  setSaveAsLocation,
+}: {
+  saveAsLocation: ?SaveAsLocation,
+  setSaveAsLocation: (?SaveAsLocation) => void,
+}) => {
+  const outputPath = saveAsLocation
+    ? path.dirname(saveAsLocation.fileIdentifier)
+    : app
+    ? findEmptyPathInDefaultFolder(app)
+    : '';
+  if (!saveAsLocation) {
+    setSaveAsLocation({
+      fileIdentifier: path.join(outputPath, 'game.json'),
+    });
+  }
+
+  return (
+    <LocalFolderPicker
+      fullWidth
+      value={outputPath}
+      onChange={newOutputPath =>
+        setSaveAsLocation({
+          fileIdentifier: path.join(newOutputPath, 'game.json'),
+        })
+      }
+      type="create-game"
+    />
+  );
+};

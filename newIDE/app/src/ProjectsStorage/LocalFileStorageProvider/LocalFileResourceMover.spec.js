@@ -169,7 +169,7 @@ describe('LocalResourceMover', () => {
     const options = makeMoveAllProjectResourcesOptions(project);
     const fetchedResources = await moveUrlResourcesToLocalFiles(options);
 
-    // Verify that download was done.
+    // Verify that download was done (including a failure that was retried).
     expect(
       optionalRequire.mockElectron.ipcRenderer.invoke
     ).toHaveBeenCalledTimes(4);

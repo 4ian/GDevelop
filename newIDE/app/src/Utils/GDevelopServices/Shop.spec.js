@@ -2,7 +2,7 @@
 import { extractFilenameWithExtensionFromProductAuthorizedUrl } from './Shop';
 
 describe('Shop service', () => {
-  describe('extractFilenameAndExtensionFromProductAuthorizedUrl', () => {
+  describe('extractFilenameFromProductAuthorizedUrl', () => {
     it('works if file has an extension', () => {
       expect(
         extractFilenameWithExtensionFromProductAuthorizedUrl(

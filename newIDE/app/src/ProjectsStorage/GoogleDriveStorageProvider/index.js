@@ -1,7 +1,11 @@
 // @flow
 import { t } from '@lingui/macro';
 import * as React from 'react';
-import { type StorageProvider, type FileMetadata } from '../index';
+import {
+  type StorageProvider,
+  type FileMetadata,
+  type SaveAsLocation,
+} from '../index';
 import { serializeToJSON } from '../../Utils/Serializer';
 import GoogleDrive from '../../UI/CustomSvgIcons/GoogleDrive';
 import GoogleDriveSaveAsDialog from './GoogleDriveSaveAsDialog';
@@ -391,11 +395,9 @@ export default ({
       onChooseSaveProjectAsLocation: ({
         project,
         fileMetadata,
-        onLocationSelected,
       }: {|
         project: gdProject,
         fileMetadata: ?FileMetadata,
-        onLocationSelected: () => void,
       |}) => {
         return new Promise(resolve => {
           setDialog(() => (
@@ -403,7 +405,7 @@ export default ({
               onShowFilePicker={showFilePicker}
               onCancel={() => {
                 closeDialog();
-                resolve({ fileMetadata: null });
+                resolve({ saveAsLocation: null });
               }}
               onSave={async ({ selectedFileOrFolder, newFileName }) => {
                 await authenticate();
@@ -413,13 +415,13 @@ export default ({
                     newFileName
                   );
                   resolve({
-                    fileMetadata: {
+                    saveAsLocation: {
                       fileIdentifier: newFileId,
                     },
                   });
                 } else {
                   resolve({
-                    fileMetadata: {
+                    saveAsLocation: {
                       fileIdentifier: selectedFileOrFolder.id,
                     },
                   });
@@ -431,22 +433,27 @@ export default ({
       },
       onSaveProjectAs: async (
         project: gdProject,
-        fileMetadata: ?FileMetadata,
+        saveAsLocation: ?SaveAsLocation,
         options
       ) => {
-        if (!fileMetadata)
+        if (!saveAsLocation)
           throw new Error('A location was not chosen before saving as.');
+        const { fileIdentifier } = saveAsLocation;
+        if (!fileIdentifier)
+          throw new Error('A file was not chosen before saving as.');
 
         const content = serializeToJSON(project);
-        if (options && options.onStartSaving) options.onStartSaving();
+        options.onStartSaving();
 
         const googleUser = await authenticate();
-        await options.onMoveResources();
-        await patchJsonFile(fileMetadata.fileIdentifier, googleUser, content);
+        const newFileMetadata = { fileIdentifier };
+        await options.onMoveResources({ newFileMetadata });
+        await patchJsonFile(fileIdentifier, googleUser, content);
 
         closeDialog();
         return {
           wasSaved: true,
+          fileMetadata: newFileMetadata,
         };
       },
       getOpenErrorMessage: (error: Error): MessageDescriptor => {

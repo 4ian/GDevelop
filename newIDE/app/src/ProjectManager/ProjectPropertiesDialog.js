@@ -27,11 +27,7 @@ import AlertMessage from '../UI/AlertMessage';
 import { GameRegistration } from '../GameDashboard/GameRegistration';
 import { Tabs } from '../UI/Tabs';
 import { LoadingScreenEditor } from './LoadingScreenEditor';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import {
   type HotReloadPreviewButtonProps,
   NewPreviewIcon,
@@ -48,9 +44,7 @@ type Props = {|
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
 
   // For resources:
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
 |};
 
 type ProjectProperties = {|
@@ -679,9 +673,7 @@ function ProjectPropertiesDialog(props: Props) {
                 onLoadingScreenUpdated={notifyOfLoadingScreenChange}
                 onChangeSubscription={onCancelChanges}
                 project={project}
-                resourceSources={props.resourceSources}
-                onChooseResource={props.onChooseResource}
-                resourceExternalEditors={props.resourceExternalEditors}
+                resourceManagementProps={props.resourceManagementProps}
               />
             )}
           </Dialog>

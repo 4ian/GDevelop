@@ -18,6 +18,7 @@ import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../GDevelopJsInitializerDecorator';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
+import { emptyStorageProvider } from '../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'UI Building Blocks/ClosableTabs',
@@ -264,9 +265,13 @@ export const WithObjectsList = () => (
                   project={testProject.project}
                   objectsContainer={testProject.testLayout}
                   layout={testProject.testLayout}
-                  resourceSources={[]}
-                  onChooseResource={() => Promise.reject('unimplemented')}
-                  resourceExternalEditors={fakeResourceExternalEditors}
+                  resourceManagementProps={{
+                    getStorageProvider: () => emptyStorageProvider,
+                    onFetchNewlyAddedResources: async () => {},
+                    resourceSources: [],
+                    onChooseResource: () => Promise.reject('Unimplemented'),
+                    resourceExternalEditors: fakeResourceExternalEditors,
+                  }}
                   onEditObject={action('On edit object')}
                   onExportObject={action('On export object')}
                   onAddObjectInstance={action('On add instance to the scene')}
@@ -280,9 +285,6 @@ export const WithObjectsList = () => (
                   onObjectCreated={() => {}}
                   onObjectSelected={() => {}}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-                  onFetchNewlyAddedResources={action(
-                    'onFetchNewlyAddedResources'
-                  )}
                   canInstallPrivateAsset={() => false}
                 />
               </TabContentContainer>

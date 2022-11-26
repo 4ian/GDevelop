@@ -18,8 +18,8 @@ import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import LinearProgress from '../UI/LinearProgress';
 import { AssetStoreContext } from './AssetStoreContext';
-import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 
 type Props = {|
   assetPack: PublicAssetPack | PrivateAssetPack,
@@ -30,7 +30,7 @@ type Props = {|
   project: gdProject,
   objectsContainer: gdObjectsContainer,
   onObjectAddedFromAsset: (object: gdObject) => void,
-  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
+  resourceManagementProps: ResourceManagementProps,
 |};
 
 const AssetPackInstallDialog = ({
@@ -42,7 +42,7 @@ const AssetPackInstallDialog = ({
   project,
   objectsContainer,
   onObjectAddedFromAsset,
-  onFetchNewlyAddedResources,
+  resourceManagementProps,
 }: Props) => {
   const missingAssetShortHeaders = assetShortHeaders.filter(
     assetShortHeader => !addedAssetIds.includes(assetShortHeader.id)
@@ -103,7 +103,7 @@ const AssetPackInstallDialog = ({
           });
         });
 
-        await onFetchNewlyAddedResources();
+        await resourceManagementProps.onFetchNewlyAddedResources();
 
         setAreAssetsBeingInstalled(false);
         onAssetsAdded();
@@ -125,8 +125,8 @@ const AssetPackInstallDialog = ({
       onObjectAddedFromAsset,
       onAssetsAdded,
       environment,
-      onFetchNewlyAddedResources,
       installPrivateAsset,
+      resourceManagementProps,
     ]
   );
 

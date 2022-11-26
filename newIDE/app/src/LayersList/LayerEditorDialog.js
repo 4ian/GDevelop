@@ -14,11 +14,7 @@ import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObje
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
@@ -30,9 +26,7 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   layer: gdLayer,
   initialInstances: gdInitialInstancesContainer,
 
@@ -227,9 +221,7 @@ const LayerEditorDialog = (props: Props) => {
         <EffectsList
           target="layer"
           project={props.project}
-          resourceSources={props.resourceSources}
-          onChooseResource={props.onChooseResource}
-          resourceExternalEditors={props.resourceExternalEditors}
+          resourceManagementProps={props.resourceManagementProps}
           effectsContainer={layer.getEffects()}
           onEffectsUpdated={() => {
             forceUpdate(); /*Force update to ensure dialog is properly positioned*/

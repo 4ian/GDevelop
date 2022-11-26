@@ -22,9 +22,7 @@ const ObjectPropertiesEditor = (props: Props) => {
   const {
     objectConfiguration,
     project,
-    resourceSources,
-    onChooseResource,
-    resourceExternalEditors,
+    resourceManagementProps,
     unsavedChanges,
   } = props;
 
@@ -79,9 +77,7 @@ const ObjectPropertiesEditor = (props: Props) => {
                 schema={propertiesSchema}
                 instances={[objectConfigurationAsGd]}
                 project={project}
-                resourceSources={resourceSources}
-                onChooseResource={onChooseResource}
-                resourceExternalEditors={resourceExternalEditors}
+                resourceManagementProps={resourceManagementProps}
               />
             </React.Fragment>
           ) : (

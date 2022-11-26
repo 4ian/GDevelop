@@ -2,7 +2,11 @@
 import { t } from '@lingui/macro';
 import * as React from 'react';
 import Cloud from '../../UI/CustomSvgIcons/Cloud';
-import { type StorageProvider, type FileMetadata } from '../index';
+import {
+  type StorageProvider,
+  type FileMetadata,
+  type SaveAsLocation,
+} from '../index';
 
 /**
  * A storage that is announcing the upcoming Cloud storage on the desktop app.
@@ -12,6 +16,7 @@ const FakeCloudStorageProvider = ({
   name: t`GDevelop cloud storage (coming soon)`,
   disabled: true,
   renderIcon: props => <Cloud fontSize={props.size} />,
+  onRenderNewProjectSaveAsLocationChooser: () => null,
   createOperations: () => {
     return {
       doesInitialOpenRequireUserInteraction: true,
@@ -28,7 +33,10 @@ const FakeCloudStorageProvider = ({
       onSaveProject: (project: gdProject, fileMetadata: FileMetadata) => {
         return Promise.reject(new Error('Unimplemented'));
       },
-      onSaveProjectAs: (project: gdProject, fileMetadata: ?FileMetadata) => {
+      onSaveProjectAs: (
+        project: gdProject,
+        saveAsLocation: ?SaveAsLocation
+      ) => {
         return Promise.reject(new Error('Unimplemented'));
       },
     };

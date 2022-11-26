@@ -273,6 +273,8 @@ export default class ExportLauncher extends Component<Props, State> {
         preparedExporter
       );
       setStep('resources-download');
+      // TODO: use a GenericRetryableProcessWithProgressDialog to show errors
+      // and allow to try again?
       const resourcesDownloadOutput = await exportPipeline.launchResourcesDownload(
         exportPipelineContext,
         exportOutput

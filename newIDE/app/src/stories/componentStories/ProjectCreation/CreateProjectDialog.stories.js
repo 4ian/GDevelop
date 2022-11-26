@@ -19,7 +19,7 @@ export const Default = () => (
       onClose={action('onClose')}
       initialExampleShortHeader={null}
       isProjectOpening={false}
-      onOpenProjectPreCreationDialog={action('onOpenProjectPreCreationDialog')}
+      onChoose={action('onChoose')}
     />
   </ExampleStoreStateProvider>
 );

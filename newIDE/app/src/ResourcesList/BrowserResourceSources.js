@@ -180,6 +180,9 @@ export const UrlChooser = ({
 };
 
 const browserResourceSources: Array<ResourceSource> = [
+  // Have the "asset store" source before the "file(s) from your device" source,
+  // for cloud projects, so that the asset store is opened by default when clicking
+  // on a button without opening a menu showing all sources.
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
     name: `resource-store-${kind}`,
     displayName: t`Choose from asset store`,

@@ -29,11 +29,7 @@ import {
   duplicateSpritesInAnimation,
 } from './Utils/SpriteObjectHelper';
 import { type EditorProps } from '../EditorProps.flow';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../../../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
 import { Column } from '../../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import ScrollView from '../../../UI/ScrollView';
@@ -48,9 +44,7 @@ type AnimationProps = {|
   animation: gdAnimation,
   id: number,
   project: gdProject,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   onRemove: () => void,
   resourcesLoader: typeof ResourcesLoader,
   onSpriteContextMenu: (x: number, y: number, sprite: gdSprite) => void,
@@ -72,10 +66,8 @@ class Animation extends React.Component<AnimationProps, void> {
       animation,
       id,
       project,
-      resourceSources,
       onRemove,
-      onChooseResource,
-      resourceExternalEditors,
+      resourceManagementProps,
       resourcesLoader,
       onSpriteContextMenu,
       selectedSprites,
@@ -113,9 +105,7 @@ class Animation extends React.Component<AnimationProps, void> {
               key={i}
               project={project}
               resourcesLoader={resourcesLoader}
-              resourceSources={resourceSources}
-              onChooseResource={onChooseResource}
-              resourceExternalEditors={resourceExternalEditors}
+              resourceManagementProps={resourceManagementProps}
               onSpriteContextMenu={onSpriteContextMenu}
               selectedSprites={selectedSprites}
               onSelectSprite={onSelectSprite}
@@ -144,9 +134,7 @@ const SortableAnimationsList = SortableContainer(
     onChangeAnimationName,
     project,
     resourcesLoader,
-    resourceSources,
-    onChooseResource,
-    resourceExternalEditors,
+    resourceManagementProps,
     extraBottomTools,
     onSpriteContextMenu,
     selectedSprites,
@@ -168,9 +156,7 @@ const SortableAnimationsList = SortableContainer(
               animation={animation}
               project={project}
               resourcesLoader={resourcesLoader}
-              resourceSources={resourceSources}
-              onChooseResource={onChooseResource}
-              resourceExternalEditors={resourceExternalEditors}
+              resourceManagementProps={resourceManagementProps}
               onRemove={() => onRemoveAnimation(i)}
               onChangeName={newName => onChangeAnimationName(i, newName)}
               onSpriteContextMenu={onSpriteContextMenu}
@@ -191,9 +177,7 @@ const SortableAnimationsList = SortableContainer(
 type AnimationsListContainerProps = {|
   spriteConfiguration: gdSpriteObject,
   project: gdProject,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   resourcesLoader: typeof ResourcesLoader,
   extraBottomTools: React.Node,
   onSizeUpdated: () => void,
@@ -350,9 +334,7 @@ class AnimationsListContainer extends React.Component<
               selectedSprites={this.state.selectedSprites}
               onSelectSprite={this.selectSprite}
               resourcesLoader={this.props.resourcesLoader}
-              resourceSources={this.props.resourceSources}
-              resourceExternalEditors={this.props.resourceExternalEditors}
-              onChooseResource={this.props.onChooseResource}
+              resourceManagementProps={this.props.resourceManagementProps}
               useDragHandle
               lockAxis="y"
               axis="y"
@@ -396,9 +378,7 @@ class AnimationsListContainer extends React.Component<
 export default function SpriteEditor({
   objectConfiguration,
   project,
-  resourceSources,
-  onChooseResource,
-  resourceExternalEditors,
+  resourceManagementProps,
   onSizeUpdated,
   onObjectUpdated,
   objectName,
@@ -417,9 +397,7 @@ export default function SpriteEditor({
       <AnimationsListContainer
         spriteConfiguration={spriteConfiguration}
         resourcesLoader={ResourcesLoader}
-        resourceSources={resourceSources}
-        onChooseResource={onChooseResource}
-        resourceExternalEditors={resourceExternalEditors}
+        resourceManagementProps={resourceManagementProps}
         project={project}
         objectName={objectName}
         onSizeUpdated={onSizeUpdated}

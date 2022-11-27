@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
-import { type FileMetadata } from '..';
+import { type FileMetadata, type SaveAsLocation } from '..';
 import {
   commitVersion,
   createCloudProject,
@@ -129,16 +129,14 @@ export const generateOnChooseSaveProjectAsLocation = ({
 |}) => async ({
   project,
   fileMetadata,
-  onLocationSelected,
 }: {|
   project: gdProject,
   fileMetadata: ?FileMetadata,
-  onLocationSelected: () => void,
 |}): Promise<{|
-  fileMetadata: ?FileMetadata,
+  saveAsLocation: ?SaveAsLocation,
 |}> => {
   if (!authenticatedUser.authenticated) {
-    return { fileMetadata: null };
+    return { saveAsLocation: null };
   }
 
   const name = await new Promise(resolve => {
@@ -157,19 +155,11 @@ export const generateOnChooseSaveProjectAsLocation = ({
     ));
   });
 
-  if (!name) return { fileMetadata: null }; // Save was cancelled.
-
-  if (onLocationSelected) onLocationSelected();
-
-  const cloudProject = await createCloudProject(authenticatedUser, {
-    name,
-  });
-  if (!cloudProject)
-    throw new Error('No cloud project was returned from creation api call.');
+  if (!name) return { saveAsLocation: null }; // Save was cancelled.
 
   return {
-    fileMetadata: {
-      fileIdentifier: cloudProject.id,
+    saveAsLocation: {
+      name,
     },
   };
 };
@@ -180,24 +170,39 @@ export const generateOnSaveProjectAs = (
   closeDialog: () => void
 ) => async (
   project: gdProject,
-  fileMetadata: ?FileMetadata,
+  saveAsLocation: ?SaveAsLocation,
   options: {|
     onStartSaving: () => void,
-    onMoveResources: () => Promise<void>,
+    onMoveResources: ({|
+      newFileMetadata: FileMetadata,
+    |}) => Promise<void>,
   |}
 ) => {
-  if (!fileMetadata)
+  if (!saveAsLocation)
     throw new Error('A location was not chosen before saving as.');
+  const { name } = saveAsLocation;
+  if (!name) throw new Error('A name was not chosen before saving as.');
   if (!authenticatedUser.authenticated) {
-    return { wasSaved: false };
+    return { wasSaved: false, fileMetadata: null };
   }
-  if (options && options.onStartSaving) options.onStartSaving();
+  options.onStartSaving();
 
-  // From now, save was confirmed so we create a new project. Any failure should
-  // be reported as an error.
   try {
-    await options.onMoveResources();
+    // Create a new cloud project.
+    const cloudProject = await createCloudProject(authenticatedUser, {
+      name,
+    });
+    if (!cloudProject)
+      throw new Error('No cloud project was returned from creation api call.');
 
+    const fileMetadata = {
+      fileIdentifier: cloudProject.id,
+    };
+
+    // Move the resources to the new project.
+    await options.onMoveResources({ newFileMetadata: fileMetadata });
+
+    // Commit the changes to the newly created cloud project.
     const cloudProjectId = fileMetadata.fileIdentifier;
     await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
     const newVersion = await zipProjectAndCommitVersion({
@@ -210,9 +215,28 @@ export const generateOnSaveProjectAs = (
 
     return {
       wasSaved: true,
+      fileMetadata,
     };
   } catch (error) {
     console.error('An error occurred while creating a cloud project', error);
     throw error;
   }
+};
+
+export const onRenderNewProjectSaveAsLocationChooser = ({
+  projectName,
+  saveAsLocation,
+  setSaveAsLocation,
+}: {|
+  projectName: string,
+  saveAsLocation: ?SaveAsLocation,
+  setSaveAsLocation: (?SaveAsLocation) => void,
+|}) => {
+  if (!saveAsLocation || saveAsLocation.name !== projectName) {
+    setSaveAsLocation({
+      name: projectName,
+    });
+  }
+
+  return null;
 };

@@ -3,7 +3,6 @@ import * as React from 'react';
 import MainFrame from './MainFrame';
 import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
-import CreateProjectDialog from './ProjectCreation/CreateProjectDialog';
 import Authentication from './Utils/GDevelopServices/Authentication';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 
@@ -26,10 +25,6 @@ import UrlStorageProvider from './ProjectsStorage/UrlStorageProvider';
 import GoogleDriveStorageProvider from './ProjectsStorage/GoogleDriveStorageProvider';
 import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStorageProvider';
 import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
-import {
-  onCreateFromExampleShortHeader,
-  onCreateBlank,
-} from './ProjectCreation/services/BrowserCreation';
 import BrowserResourceMover from './ProjectsStorage/ResourceMover/BrowserResourceMover';
 import BrowserResourceFetcher from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
 
@@ -84,22 +79,9 @@ export const create = (authentication: Authentication) => {
                   allExportersRequireOnline
                 />
               )}
-              renderCreateDialog={props => (
-                <CreateProjectDialog
-                  open={props.open}
-                  onClose={props.onClose}
-                  initialExampleShortHeader={props.initialExampleShortHeader}
-                  isProjectOpening={props.isProjectOpening}
-                  onOpenProjectPreCreationDialog={
-                    props.onOpenProjectPreCreationDialog
-                  }
-                />
-              )}
               storageProviders={storageProviders}
               resourceMover={BrowserResourceMover}
               resourceFetcher={BrowserResourceFetcher}
-              onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
-              onCreateBlank={onCreateBlank}
               getStorageProviderOperations={getStorageProviderOperations}
               getStorageProvider={getStorageProvider}
               resourceSources={browserResourceSources}

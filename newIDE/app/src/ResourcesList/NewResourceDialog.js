@@ -39,10 +39,17 @@ export const NewResourceDialog = ({
   onChooseResources,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
+  const storageProvider = React.useMemo(() => getStorageProvider(), [
+    getStorageProvider,
+  ]);
   const preferences = React.useContext(PreferencesContext);
-  const possibleResourceSources = resourceSources.filter(
-    ({ kind }) => kind === options.resourceKind
-  );
+  const possibleResourceSources = resourceSources
+    .filter(({ kind }) => kind === options.resourceKind)
+    .filter(
+      ({ onlyForStorageProvider }) =>
+        !onlyForStorageProvider ||
+        onlyForStorageProvider === storageProvider.internalName
+    );
   const standaloneTabResourceSources = possibleResourceSources.filter(
     ({ displayTab }) => displayTab === 'standalone'
   );

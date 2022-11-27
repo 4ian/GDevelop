@@ -3,7 +3,6 @@ import React from 'react';
 import MainFrame from './MainFrame';
 import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
-import CreateProjectDialog from './ProjectCreation/CreateProjectDialog';
 import Authentication from './Utils/GDevelopServices/Authentication';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 
@@ -27,13 +26,11 @@ import LocalEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoad
 import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import LocalFileStorageProvider from './ProjectsStorage/LocalFileStorageProvider';
 import { LocalGDJSDevelopmentWatcher } from './GameEngineFinder/LocalGDJSDevelopmentWatcher';
-import {
-  onCreateFromExampleShortHeader,
-  onCreateBlank,
-} from './ProjectCreation/services/LocalCreation';
-import FakeCloudStorageProvider from './ProjectsStorage/FakeCloudStorageProvider';
+import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
+import UrlStorageProvider from './ProjectsStorage/UrlStorageProvider';
 import LocalResourceMover from './ProjectsStorage/ResourceMover/LocalResourceMover';
 import LocalResourceFetcher from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
+import FakeCloudStorageProvider from './ProjectsStorage/FakeCloudStorageProvider';
 
 const gd: libGDevelop = global.gd;
 
@@ -42,6 +39,10 @@ export const create = (authentication: Authentication) => {
 
   const appArguments = Window.getArguments();
   const isDev = Window.isDev();
+
+  // Search "activate cloud projects" in the codebase for everything to
+  // remove once cloud projects are activated for the desktop app.
+  const supportsCloudProjects = Window.isDev();
 
   return (
     <Providers
@@ -54,10 +55,11 @@ export const create = (authentication: Authentication) => {
       {({ i18n }) => (
         <ProjectStorageProviders
           appArguments={appArguments}
-          storageProviders={
-            // Add Url provider
-            [LocalFileStorageProvider, FakeCloudStorageProvider]
-          }
+          storageProviders={[
+            LocalFileStorageProvider,
+            UrlStorageProvider,
+            supportsCloudProjects ? CloudStorageProvider : FakeCloudStorageProvider,
+          ]}
           defaultStorageProvider={LocalFileStorageProvider}
         >
           {({
@@ -83,22 +85,9 @@ export const create = (authentication: Authentication) => {
                   onlineWebExporter={localOnlineWebExporter}
                 />
               )}
-              renderCreateDialog={props => (
-                <CreateProjectDialog
-                  open={props.open}
-                  onClose={props.onClose}
-                  initialExampleShortHeader={props.initialExampleShortHeader}
-                  isProjectOpening={props.isProjectOpening}
-                  onOpenProjectPreCreationDialog={
-                    props.onOpenProjectPreCreationDialog
-                  }
-                />
-              )}
               renderGDJSDevelopmentWatcher={
                 isDev ? () => <LocalGDJSDevelopmentWatcher /> : null
               }
-              onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
-              onCreateBlank={onCreateBlank}
               storageProviders={storageProviders}
               resourceMover={LocalResourceMover}
               resourceFetcher={LocalResourceFetcher}

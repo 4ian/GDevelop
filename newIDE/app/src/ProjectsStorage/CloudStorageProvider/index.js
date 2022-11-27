@@ -8,6 +8,7 @@ import {
   generateOnChooseSaveProjectAsLocation,
   generateOnSaveProjectAs,
   getWriteErrorMessage,
+  onRenderNewProjectSaveAsLocationChooser,
 } from './CloudProjectWriter';
 import {
   type AppArguments,
@@ -47,6 +48,7 @@ export default ({
       fileIdentifier,
     };
   },
+  onRenderNewProjectSaveAsLocationChooser: onRenderNewProjectSaveAsLocationChooser,
   createOperations: ({ setDialog, closeDialog, authenticatedUser }) => ({
     onOpen: generateOnOpen(authenticatedUser),
     onEnsureCanAccessResources: generateOnEnsureCanAccessResources(

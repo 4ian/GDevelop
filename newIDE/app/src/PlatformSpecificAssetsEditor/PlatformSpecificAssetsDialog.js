@@ -2,7 +2,6 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
@@ -11,17 +10,14 @@ import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { Line } from '../UI/Grid';
 import ResourcesLoader from '../ResourcesLoader';
 import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
-import {
-  type ResourceSource,
-  type ResourceManagementProps,
-} from '../ResourcesList/ResourceSource';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { resizeImage, isResizeSupported } from './ImageResizer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import optionalRequire from '../Utils/OptionalRequire';
 import Text from '../UI/Text';
 import { ColumnStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
-import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+
 const path = optionalRequire('path');
 const gd: libGDevelop = global.gd;
 
@@ -111,11 +107,17 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
     }
   }
 
-  _generateFromFile = (resourceSource: ResourceSource) => {
+  _generateFromFile = () => {
     const { project, resourceManagementProps } = this.props;
 
-    if (!resourceSource.name.startsWith('local-file-opener')) {
-      throw new Error('Only local files are supported for generating icons.');
+    const resourceSource = resourceManagementProps.resourceSources
+      .filter(source => source.kind === 'image')
+      .filter(source => source.name.startsWith('local-file-opener'))[0];
+
+    if (!resourceSource) {
+      throw new Error(
+        'No supported resource source - only local files are supported.'
+      );
     }
 
     resourceManagementProps
@@ -319,27 +321,10 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         <ColumnStackLayout noMargin>
           <Line justifyContent="center" noMargin>
             {isResizeSupported() ? (
-              <ElementWithMenu
-                element={
-                  <RaisedButton
-                    primary
-                    label={<Trans>Generate icons from a file</Trans>}
-                    onClick={() => {
-                      /* Will be replaced by ElementWithMenu */
-                    }}
-                  />
-                }
-                buildMenuTemplate={(i18n: I18nType) =>
-                  resourceManagementProps.resourceSources
-                    .filter(source => source.kind === 'image')
-                    .filter(source =>
-                      source.name.startsWith('local-file-opener')
-                    )
-                    .map(source => ({
-                      label: i18n._(source.displayName),
-                      click: () => this._generateFromFile(source),
-                    }))
-                }
+              <RaisedButton
+                primary
+                label={<Trans>Generate icons from a file</Trans>}
+                onClick={this._generateFromFile}
               />
             ) : (
               <Text>

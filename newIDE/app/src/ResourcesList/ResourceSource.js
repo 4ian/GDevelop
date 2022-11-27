@@ -15,6 +15,7 @@ export type ResourceKind =
   | 'font'
   | 'video'
   | 'json'
+  | 'tilemap'
   | 'bitmapFont';
 
 export const allResourceKindsAndMetadata = [
@@ -47,6 +48,12 @@ export const allResourceKindsAndMetadata = [
     displayName: t`Json`,
     fileExtensions: ['json'],
     createNewResource: () => new gd.JsonResource(),
+  },
+  {
+    kind: 'tilemap',
+    displayName: t`Tile Map`,
+    fileExtensions: ['json', 'ldtk'],
+    createNewResource: () => new gd.TilemapResource(),
   },
   {
     kind: 'bitmapFont',

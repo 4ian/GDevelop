@@ -13,6 +13,7 @@ namespace gdjs {
     _tilemapAtlasImage: string;
     _displayMode: string;
     _layerIndex: integer;
+    _levelIndex: integer;
     _animationSpeedScale: number;
     _animationFps: number;
     _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
@@ -26,6 +27,7 @@ namespace gdjs {
       this._tilemapAtlasImage = objectData.content.tilemapAtlasImage;
       this._displayMode = objectData.content.displayMode;
       this._layerIndex = objectData.content.layerIndex;
+      this._levelIndex = objectData.content.levelIndex;
       this._animationSpeedScale = objectData.content.animationSpeedScale;
       this._animationFps = objectData.content.animationFps;
       this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
@@ -61,6 +63,7 @@ namespace gdjs {
       if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
         this.setOpacity(newObjectData.content.opacity);
       }
+      console.log('updateFromObjectData', newObjectData.content.tilemapJsonFile)
       if (
         oldObjectData.content.tilemapJsonFile !==
         newObjectData.content.tilemapJsonFile
@@ -82,6 +85,11 @@ namespace gdjs {
         oldObjectData.content.layerIndex !== newObjectData.content.layerIndex
       ) {
         this.setLayerIndex(newObjectData.content.layerIndex);
+      }
+      if (
+        oldObjectData.content.levelIndex !== newObjectData.content.levelIndex
+      ) {
+        this.setLevelIndex(newObjectData.content.levelIndex);
       }
       if (
         oldObjectData.content.animationSpeedScale !==
@@ -116,6 +124,7 @@ namespace gdjs {
       this._tileMapManager.getOrLoadTileMap(
         this._tilemapJsonFile,
         this._tilesetJsonFile,
+        this._levelIndex,
         (tileMap: TileMapHelper.EditableTileMap | null) => {
           if (!tileMap) {
             // getOrLoadTileMap already warn.
@@ -132,6 +141,7 @@ namespace gdjs {
             this._tilemapAtlasImage,
             this._tilemapJsonFile,
             this._tilesetJsonFile,
+            this._levelIndex,
             (textureCache: TileMapHelper.TileTextureCache | null) => {
               if (!textureCache) {
                 // getOrLoadTextureCache already log warns and errors.
@@ -145,7 +155,7 @@ namespace gdjs {
     }
 
     /**
-     * Set the Tilemap json file to display.
+     * Set the Tilemap file to display.
      */
     setTilemapJsonFile(tilemapJsonFile: string): void {
       this._tilemapJsonFile = tilemapJsonFile;
@@ -201,6 +211,15 @@ namespace gdjs {
 
     getLayerIndex(): integer {
       return this._layerIndex;
+    }
+    
+    setLevelIndex(levelIndex): void {
+      this._levelIndex = levelIndex;
+      this._updateTileMap();
+    }
+
+    getLevelIndex() {
+      return this._levelIndex;
     }
 
     setAnimationSpeedScale(animationSpeedScale): void {

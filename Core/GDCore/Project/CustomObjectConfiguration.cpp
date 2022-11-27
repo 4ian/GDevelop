@@ -148,6 +148,8 @@ void CustomObjectConfiguration::ExposeResources(
         worker.ExposeVideo(newPropertyValue);
       } else if (resourceType == "json") {
         worker.ExposeJson(newPropertyValue);
+      } else if (resourceType == "tilemap") {
+        worker.ExposeTilemap(newPropertyValue);
       } else if (resourceType == "bitmapFont") {
         worker.ExposeBitmapFont(newPropertyValue);
       }

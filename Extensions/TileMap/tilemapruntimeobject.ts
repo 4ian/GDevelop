@@ -63,6 +63,7 @@ namespace gdjs {
       if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
         this.setOpacity(newObjectData.content.opacity);
       }
+      console.log('updateFromObjectData', newObjectData.content.tilemapJsonFile)
       if (
         oldObjectData.content.tilemapJsonFile !==
         newObjectData.content.tilemapJsonFile
@@ -154,7 +155,7 @@ namespace gdjs {
     }
 
     /**
-     * Set the Tilemap json file to display.
+     * Set the Tilemap file to display.
      */
     setTilemapJsonFile(tilemapJsonFile: string): void {
       this._tilemapJsonFile = tilemapJsonFile;

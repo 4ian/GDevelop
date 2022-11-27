@@ -77,10 +77,10 @@ const defineTileMap = function (
       'tilemapJsonFile',
       new gd.PropertyDescriptor(objectContent.tilemapJsonFile)
         .setType('resource')
-        .addExtraInfo('json')
-        .setLabel(_('Tilemap JSON file'))
+        .addExtraInfo('tilemap')
+        .setLabel(_('Tilemap Tiled JSON or LDtk file'))
         .setDescription(
-          _('This is the JSON file that was saved or exported from Tiled.')
+          _('This is the JSON/LDtk file that was saved or exported from Tiled/LDtk.')
         )
         .setGroup(_('Tilemap and tileset'))
     );
@@ -194,7 +194,7 @@ const defineTileMap = function (
       'TileMap',
       _('Tilemap'),
       _(
-        'Displays a tiled-based map, made with the Tiled editor (download it separately on https://www.mapeditor.org/).'
+        'Displays a tiled-based map, made with the Tiled editor (https://www.mapeditor.org/) or the LDtk editor (https://ldtk.io/).'
       ),
       'JsPlatform/Extensions/tile_map.svg',
       objectTileMap
@@ -214,32 +214,32 @@ const defineTileMap = function (
   object
     .addCondition(
       'TilemapJsonFile',
-      _('Tilemap JSON file'),
-      _('Check the Tilemap JSON file being used.'),
-      _('The Tilemap JSON file of _PARAM0_ is _PARAM1_'),
+      _('Tilemap JSON/LDtk file'),
+      _('Check the Tilemap JSON/LDtk file being used.'),
+      _('The Tilemap JSON/LDtk file of _PARAM0_ is _PARAM1_'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
+    .addParameter('tilemapResource', _('Tilemap JSON/LDtk file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('isTilemapJsonFile');
 
   object
     .addAction(
       'SetTilemapJsonFile',
-      _('Tilemap JSON file'),
+      _('Tilemap JSON/LDtk file'),
       _(
-        'Set the JSON file containing the Tilemap data to display. This is usually the JSON file exported from Tiled.'
+        'Set the JSON/LDtk file containing the Tilemap data to display. This is usually the JSON/LDtk file from Tiled/LDtk.'
       ),
-      _('Set the Tilemap JSON file of _PARAM0_ to _PARAM1_'),
+      _('Set the Tilemap JSON/LDtk file of _PARAM0_ to _PARAM1_'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
+    .addParameter('tilemapResource', _('Tilemap JSON/LDtk file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('setTilemapJsonFile');
 
@@ -1403,32 +1403,6 @@ module.exports = {
             fillColor,
             fillOpacity
           );
-
-          // const textureCache = manager.getOrLoadTextureCache(
-          //   this._loadTiledMapWithCallback.bind(this),
-          //   (textureName) =>
-          //     this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
-          //   tilemapAtlasImage,
-          //   tilemapJsonFile,
-          //   tilesetJsonFile,
-          //   levelIndex,
-          //   (textureCache) => {
-          //     if (!textureCache) {
-          //       return;
-          //     }
-
-          //     let tileId = -1;
-          //     for (const definition of tileMap.getTileDefinitions()) {
-          //       if (definition.getTag() === collisionMaskTag) {
-          //         tileId = definition.getTag();
-          //       }
-          //     }
-          //     if (tileId >= 0) {
-          //       const texture = textureCache.findTileTexture(tileId, false, false, false);
-          //       // TODO set the thumbnail from this texture
-          //     }
-          //   }
-          // );
         }
       );
     };

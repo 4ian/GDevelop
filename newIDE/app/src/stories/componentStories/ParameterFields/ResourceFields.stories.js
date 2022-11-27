@@ -17,6 +17,7 @@ import VideoResourceField from '../../../EventsSheet/ParameterFields/VideoResour
 import BitmapFontResourceField from '../../../EventsSheet/ParameterFields/BitmapFontResourceField';
 import FontResourceField from '../../../EventsSheet/ParameterFields/FontResourceField';
 import JsonResourceField from '../../../EventsSheet/ParameterFields/JsonResourceField';
+import TilemapResourceField from '../../../EventsSheet/ParameterFields/TilemapResourceField'
 
 const gd: libGDevelop = global.gd;
 
@@ -122,6 +123,25 @@ export const AllResourceFields = () => (
         initialValue={''}
         render={(value, onChange) => (
           <JsonResourceField
+            project={testProject.project}
+            scope={{ layout: testProject.testLayout }}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            value={value}
+            onChange={onChange}
+            parameterRenderingService={ParameterRenderingService}
+            resourceSources={[]}
+            onChooseResource={() => Promise.reject('unimplemented')}
+            resourceExternalEditors={fakeResourceExternalEditors}
+          />
+        )}
+      />
+    </Line>
+    <Line expand>
+      <ValueStateHolder
+        initialValue={''}
+        render={(value, onChange) => (
+          <TilemapResourceField
             project={testProject.project}
             scope={{ layout: testProject.testLayout }}
             globalObjectsContainer={testProject.project}

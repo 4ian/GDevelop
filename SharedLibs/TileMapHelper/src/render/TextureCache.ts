@@ -9,14 +9,16 @@ import PIXI = GlobalPIXIModule.PIXI;
  * and used by {@link PixiTileMapHelper.updatePixiTileMap}.
  */
 export class TileTextureCache {
+  private readonly _images: Map<string, PIXI.Texture>;
   private readonly _textures: Map<integer, PIXI.Texture>;
 
   constructor() {
-    this._textures = new Map<integer, PIXI.Texture>();
+    this._images = new Map();
+    this._textures = new Map();
   }
 
-  setTexture(tileId: integer, texture: PIXI.Texture): void {
-    this._textures.set(tileId, texture);
+  getImage(name: string): PIXI.Texture | undefined {
+    return this._images.get(name);
   }
 
   /**
@@ -25,7 +27,15 @@ export class TileTextureCache {
    * @param tileId The tile identifier
    * @returns The texture for the given tile identifier.
    */
-  findTileTexture(tileId: integer): PIXI.Texture | undefined {
+  getTexture(tileId: integer): PIXI.Texture | undefined {
     return this._textures.get(tileId);
+  }
+
+  setImage(name: string, texture: PIXI.Texture): void {
+    this._images.set(name, texture);
+  }
+
+  setTexture(tileId: integer, texture: PIXI.Texture): void {
+    this._textures.set(tileId, texture);
   }
 }

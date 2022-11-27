@@ -20,8 +20,9 @@ export type EditableTile = {
  * This allows to support new file format with only a new parser.
  */
 export class EditableTileMap {
-  private _tileSet: Map<integer, TileDefinition>;
+  private _bgLayer: EditableBackgroundLayer | null;
   private _layers: Array<AbstractEditableLayer>;
+  private _tileSet: Map<integer, TileDefinition>;
   /**
    * The width of a tile.
    */
@@ -64,31 +65,27 @@ export class EditableTileMap {
   }
 
   /**
-   * @returns The tile map width in pixels.
+   * @param id The identifier of the new layer.
+   * @returns The new layer.
    */
-  getWidth(): integer {
-    return this.tileWidth * this.dimX;
+  addObjectLayer(id: integer): EditableObjectLayer {
+    const layer = new EditableObjectLayer(this, id);
+    this._layers.push(layer);
+    return layer;
   }
 
   /**
-   * @returns The tile map height in pixels.
+   * @param id The identifier of the new layer.
+   * @returns The new layer.
    */
-  getHeight(): integer {
-    return this.tileHeight * this.dimY;
+  addTileLayer(id: integer): EditableTileMapLayer {
+    const layer = new EditableTileMapLayer(this, id);
+    this._layers.push(layer);
+    return layer;
   }
 
-  /**
-   * @returns The tile width in pixels.
-   */
-  getTileHeight(): integer {
-    return this.tileHeight;
-  }
-
-  /**
-   * @returns The tile height in pixels.
-   */
-  getTileWidth(): integer {
-    return this.tileWidth;
+  getBackgroundLayer(): EditableBackgroundLayer {
+    return this._bgLayer;
   }
 
   /**
@@ -103,6 +100,20 @@ export class EditableTileMap {
    */
   getDimensionY(): integer {
     return this.dimY;
+  }
+
+  /**
+   * @returns The tile map height in pixels.
+   */
+  getHeight(): integer {
+    return this.tileHeight * this.dimY;
+  }
+
+  /**
+   * @returns All the layers of the tile map.
+   */
+  getLayers(): Iterable<AbstractEditableLayer> {
+    return this._layers;
   }
 
   /**
@@ -121,30 +132,24 @@ export class EditableTileMap {
   }
 
   /**
-   * @param id The identifier of the new layer.
-   * @returns The new layer.
+   * @returns The tile width in pixels.
    */
-  addTileLayer(id: integer): EditableTileMapLayer {
-    const layer = new EditableTileMapLayer(this, id);
-    this._layers.push(layer);
-    return layer;
+  getTileHeight(): integer {
+    return this.tileHeight;
   }
 
   /**
-   * @param id The identifier of the new layer.
-   * @returns The new layer.
+   * @returns The tile height in pixels.
    */
-  addObjectLayer(id: integer): EditableObjectLayer {
-    const layer = new EditableObjectLayer(this, id);
-    this._layers.push(layer);
-    return layer;
+  getTileWidth(): integer {
+    return this.tileWidth;
   }
 
   /**
-   * @returns All the layers of the tile map.
+   * @returns The tile map width in pixels.
    */
-  getLayers(): Iterable<AbstractEditableLayer> {
-    return this._layers;
+  getWidth(): integer {
+    return this.tileWidth * this.dimX;
   }
 
   /**
@@ -176,6 +181,15 @@ export class EditableTileMap {
       }
     }
     return false;
+  }
+
+  /**
+   * @param resourceName The name of the resource
+   * @returns The new layer.
+   */
+  setBackgroundLayer(resourceName: string): EditableBackgroundLayer {
+    this._bgLayer = new EditableBackgroundLayer(this, resourceName);
+    return this._bgLayer;
   }
 }
 
@@ -231,6 +245,19 @@ export class EditableObjectLayer extends AbstractEditableLayer {
 
   add(object: TileObject): void {
     this.objects.push(object);
+  }
+}
+
+export class EditableBackgroundLayer extends AbstractEditableLayer {
+  readonly resourceName: string;
+
+  /**
+   * @param tileMap  The layer tile map.
+   * @param resourceName The name of the resource
+   */
+  constructor(tileMap: EditableTileMap, resourceName: string) {
+    super(tileMap, -1);
+    this.resourceName = resourceName;
   }
 }
 

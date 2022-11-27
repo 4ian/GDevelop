@@ -16,8 +16,9 @@ export type EditableTile = {
  * This allows to support new file format with only a new parser.
  */
 export declare class EditableTileMap {
-    private _tileSet;
+    private _bgLayer;
     private _layers;
+    private _tileSet;
     /**
      * The width of a tile.
      */
@@ -43,21 +44,16 @@ export declare class EditableTileMap {
      */
     constructor(tileWidth: integer, tileHeight: integer, dimX: integer, dimY: integer, tileSet: Map<integer, TileDefinition>);
     /**
-     * @returns The tile map width in pixels.
+     * @param id The identifier of the new layer.
+     * @returns The new layer.
      */
-    getWidth(): integer;
+    addObjectLayer(id: integer): EditableObjectLayer;
     /**
-     * @returns The tile map height in pixels.
+     * @param id The identifier of the new layer.
+     * @returns The new layer.
      */
-    getHeight(): integer;
-    /**
-     * @returns The tile width in pixels.
-     */
-    getTileHeight(): integer;
-    /**
-     * @returns The tile height in pixels.
-     */
-    getTileWidth(): integer;
+    addTileLayer(id: integer): EditableTileMapLayer;
+    getBackgroundLayer(): EditableBackgroundLayer;
     /**
      * @returns The number of tile columns in the map.
      */
@@ -66,6 +62,14 @@ export declare class EditableTileMap {
      * @returns The number of tile rows in the map.
      */
     getDimensionY(): integer;
+    /**
+     * @returns The tile map height in pixels.
+     */
+    getHeight(): integer;
+    /**
+     * @returns All the layers of the tile map.
+     */
+    getLayers(): Iterable<AbstractEditableLayer>;
     /**
      * @param tileId The tile identifier
      * @returns The tile definition form the tile set.
@@ -76,19 +80,17 @@ export declare class EditableTileMap {
      */
     getTileDefinitions(): Iterable<TileDefinition>;
     /**
-     * @param id The identifier of the new layer.
-     * @returns The new layer.
+     * @returns The tile width in pixels.
      */
-    addTileLayer(id: integer): EditableTileMapLayer;
+    getTileHeight(): integer;
     /**
-     * @param id The identifier of the new layer.
-     * @returns The new layer.
+     * @returns The tile height in pixels.
      */
-    addObjectLayer(id: integer): EditableObjectLayer;
+    getTileWidth(): integer;
     /**
-     * @returns All the layers of the tile map.
+     * @returns The tile map width in pixels.
      */
-    getLayers(): Iterable<AbstractEditableLayer>;
+    getWidth(): integer;
     /**
      * Check if a point is inside a tile with a given tag.
      *
@@ -101,6 +103,11 @@ export declare class EditableTileMap {
      * @returns true when the point is inside a tile with a given tag.
      */
     pointIsInsideTile(x: float, y: float, tag: string): boolean;
+    /**
+     * @param resourceName The name of the resource
+     * @returns The new layer.
+     */
+    setBackgroundLayer(resourceName: string): EditableBackgroundLayer;
 }
 /**
  * A tile map layer.
@@ -137,6 +144,14 @@ export declare class EditableObjectLayer extends AbstractEditableLayer {
      */
     constructor(tileMap: EditableTileMap, id: integer);
     add(object: TileObject): void;
+}
+export declare class EditableBackgroundLayer extends AbstractEditableLayer {
+    readonly resourceName: string;
+    /**
+     * @param tileMap  The layer tile map.
+     * @param resourceName The name of the resource
+     */
+    constructor(tileMap: EditableTileMap, resourceName: string);
 }
 /**
  * A tile that is placed with pixel coordinates.

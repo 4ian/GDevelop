@@ -129,6 +129,14 @@ export namespace PixiLDtkHelper {
       }
     }
 
+    if (level.bgRelPath) {
+      const atlasTexture = getTexture(level.bgRelPath);
+      const rect = new PIXI.Rectangle(0, 0, level.pxWid, level.pxHei);
+      const texture = new PIXI.Texture(atlasTexture!, rect);
+
+      textureCache.setImage(level.bgRelPath, texture);
+    }
+
     return textureCache;
   }
 }

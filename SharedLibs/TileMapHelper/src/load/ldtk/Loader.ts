@@ -87,6 +87,10 @@ export namespace LDtkTileMapLoader {
       }
     }
 
+    if (level.bgRelPath) {
+      void editableTileMap.setBackgroundLayer(level.bgRelPath);
+    }
+
     return editableTileMap;
   }
 }

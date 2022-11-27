@@ -76,6 +76,12 @@ export namespace PixiTileMapHelper {
     if (!pixiTileMap) return;
     pixiTileMap.clear();
 
+    const bgLayer = tileMap.getBackgroundLayer();
+    if (bgLayer) {
+      const texture = textureCache.getImage(bgLayer.resourceName);
+      pixiTileMap.tile(texture, 0, 0);
+    }
+
     for (const layer of tileMap.getLayers()) {
       if (
         (displayMode === "index" && layerIndex !== layer.id) ||
@@ -87,7 +93,7 @@ export namespace PixiTileMapHelper {
       if (layer instanceof EditableObjectLayer) {
         const objectLayer = layer as EditableObjectLayer;
         for (const object of objectLayer.objects) {
-          const texture = textureCache.findTileTexture(object.tileId);
+          const texture = textureCache.getTexture(object.tileId);
           if (texture) {
             pixiTileMap.tile(
               texture,
@@ -115,7 +121,7 @@ export namespace PixiTileMapHelper {
               continue;
             }
             for (const tile of tiles) {
-              const tileTexture = textureCache.findTileTexture(tile.tileId);
+              const tileTexture = textureCache.getTexture(tile.tileId);
               if (!tileTexture) {
                 console.warn(`Unknown tile id: ${tile.tileId} at (${x}, ${y})`);
                 continue;

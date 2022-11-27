@@ -1,7 +1,7 @@
 // @flow
 import { t } from '@lingui/macro';
 import * as React from 'react';
-import { type StorageProvider, type FileMetadata } from '../index';
+import { type StorageProvider, type SaveAsLocation } from '../index';
 import DownloadFileSaveAsDialog from './DownloadFileSaveAsDialog';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 
@@ -17,18 +17,17 @@ export default ({
   createOperations: ({ setDialog, closeDialog }) => ({
     onSaveProjectAs: async (
       project: gdProject,
-      fileMetadata: ?FileMetadata,
+      saveAsLocation: ?SaveAsLocation, // Unused - everything is done in memory.
       options
     ) => {
-      if (options && options.onStartSaving) options.onStartSaving();
-      await options.onMoveResources();
+      options.onStartSaving();
 
       return new Promise(resolve => {
         setDialog(() => (
           <DownloadFileSaveAsDialog
             onDone={() => {
               closeDialog();
-              resolve({ wasSaved: false });
+              resolve({ wasSaved: false, fileMetadata: null });
             }}
             project={project}
           />

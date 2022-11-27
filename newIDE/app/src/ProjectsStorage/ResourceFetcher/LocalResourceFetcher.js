@@ -8,11 +8,16 @@ import {
 import LocalFileStorageProvider from '../LocalFileStorageProvider';
 import { moveUrlResourcesToLocalFiles } from '../LocalFileStorageProvider/LocalFileResourceMover';
 import UrlStorageProvider from '../UrlStorageProvider';
+import CloudStorageProvider from '../CloudStorageProvider';
 import { fetchRelativeResourcesToFullUrls } from '../UrlStorageProvider/UrlResourceFetcher';
+import { moveUrlResourcesToCloudFilesIfPrivate } from '../CloudStorageProvider/CloudResourceFetcher';
 
 const fetchers: {
   [string]: FetchAllProjectResourcesFunction,
 } = {
+  // The Cloud file storage provider fetches the resources that are
+  // private URLs by downloading them and reuploading them to the cloud.
+  [CloudStorageProvider.internalName]: moveUrlResourcesToCloudFilesIfPrivate,
   // The local file storage provider fetches the resources that are URLs
   // by downloading them locally.
   [LocalFileStorageProvider.internalName]: moveUrlResourcesToLocalFiles,

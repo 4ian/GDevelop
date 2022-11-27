@@ -33,7 +33,10 @@ import CircularProgress from '../../../../UI/CircularProgress';
 import { type MenuItemTemplate } from '../../../../UI/Menu/Menu.flow';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
-import { MaxProjectCountAlertMessage } from './MaxProjectCountAlertMessage';
+import {
+  checkIfHasTooManyCloudProjects,
+  MaxProjectCountAlertMessage,
+} from './MaxProjectCountAlertMessage';
 import optionalRequire from '../../../../Utils/OptionalRequire';
 import { showErrorBox } from '../../../../UI/Messages/MessageBox';
 import { getRelativeOrAbsoluteDisplayDate } from '../../../../Utils/DateDisplay';
@@ -46,10 +49,9 @@ import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import Add from '../../../../UI/CustomSvgIcons/Add';
 import ImageTileRow from '../../../../UI/ImageTileRow';
 import { prepareExamples } from '../../../../AssetStore/ExampleStore';
+import Window from '../../../../Utils/Window';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
-
-const isWebApp = !electron;
 
 const styles = {
   listItem: {
@@ -78,7 +80,7 @@ type Props = {|
   canOpen: boolean,
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onOpenProjectPreCreationDialog: (?ExampleShortHeader) => void,
+  onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
   onShowAllExamples: () => void,
   onSelectExample: (exampleShortHeader: ExampleShortHeader) => void,
   storageProviders: Array<StorageProvider>,
@@ -125,7 +127,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       project,
       canOpen,
       onChooseProject,
-      onOpenProjectPreCreationDialog,
+      onOpenNewProjectSetupDialog,
       onShowAllExamples,
       onSelectExample,
       onOpenRecentFile,
@@ -148,6 +150,10 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     const windowWidth = useResponsiveWindowWidth();
     const forceUpdate = useForceUpdate();
 
+    // Search "activate cloud projects" in the codebase for everything to
+    // remove once cloud projects are activated for the desktop app.
+    const supportsCloudProjects = Window.isDev();
+
     const iconClasses = useStylesForListItemIcon();
 
     React.useImperativeHandle(ref, () => ({
@@ -158,10 +164,8 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       file => file.fileMetadata
     );
 
-    let hasTooManyCloudProjects = false;
-
     // Show cloud projects on the web app only.
-    if (isWebApp && cloudProjects) {
+    if (supportsCloudProjects && cloudProjects) {
       projectFiles = projectFiles.concat(
         cloudProjects
           .map(cloudProject => {
@@ -178,11 +182,10 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
           })
           .filter(Boolean)
       );
-      hasTooManyCloudProjects = limits
-        ? cloudProjects.filter(cloudProject => !cloudProject.deletedAt)
-            .length >= limits.capabilities.cloudProjects.maximumCount
-        : false;
     }
+    const hasTooManyCloudProjects = checkIfHasTooManyCloudProjects(
+      authenticatedUser
+    );
 
     projectFiles.sort((a, b) => {
       if (!a.fileMetadata.lastModifiedDate) return 1;
@@ -264,7 +267,6 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
           {
             label: i18n._(t`Show in local folder`),
             click: () => locateProjectFile(file),
-            enabled: !isWebApp,
           },
           { type: 'separator' },
           {
@@ -293,7 +295,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
             <SectionContainer
               title={<Trans>My projects</Trans>}
               renderFooter={() =>
-                isWebApp && limits && hasTooManyCloudProjects ? (
+                limits && hasTooManyCloudProjects ? (
                   <Line>
                     <Column expand>
                       <MaxProjectCountAlertMessage
@@ -344,7 +346,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                         primary
                         label={<Trans>Create a project</Trans>}
                         onClick={() =>
-                          onOpenProjectPreCreationDialog(
+                          onOpenNewProjectSetupDialog(
                             /*exampleShortHeader=*/ null
                           )
                         }

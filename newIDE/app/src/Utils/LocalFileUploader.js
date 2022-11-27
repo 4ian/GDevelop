@@ -27,9 +27,41 @@ const readLocalFileToArrayBuffer = async (
   return arrayBuffer;
 };
 
+// See https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types.
+const extensionToMimeType = {
+  // Common audio extensions:
+  aac: 'audio/aac',
+  wav: 'audio/wav',
+  mp3: 'audio/mp3',
+  ogg: 'audio/ogg',
+
+  // Common image extensions:
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  webp: 'image/webp',
+
+  // Common font extensions:
+  ttf: 'font/ttf',
+  otf: 'font/otf',
+
+  // Common video extensions:
+  mp4: 'video/mp4',
+  webm: 'video/webm',
+
+  // Other common extensions:
+  json: 'application/json',
+  xml: 'application/xml',
+  gz: 'application/gzip',
+  js: 'application/javascript',
+};
+
 export const readLocalFileToFile = async (filePath: string): Promise<File> => {
   const arrayBuffer = await readLocalFileToArrayBuffer(filePath);
+  const extensionWithoutLeadingDot = path.extname(filePath).replace(/^\./, '');
   return new File([arrayBuffer], path.basename(filePath), {
-    type: 'image/png', // TODO: read extension and get mime type from it.
+    type:
+      extensionToMimeType[extensionWithoutLeadingDot] ||
+      'application/octet-stream',
   });
 };

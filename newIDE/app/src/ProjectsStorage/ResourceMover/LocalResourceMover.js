@@ -99,9 +99,9 @@ export const moveAllLocalResourcesToCloudResources = async ({
         projectPath,
         resource.getFile()
       );
-      const file = await readLocalFileToFile(resourceAbsolutePath);
 
       try {
+        const file = await readLocalFileToFile(resourceAbsolutePath);
         return {
           resource,
           file,

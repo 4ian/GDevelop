@@ -1,6 +1,6 @@
 // @flow
-import generateName from '../Utils/NewNameGenerator';
-import optionalRequire from '../Utils/OptionalRequire';
+import generateName from '../../Utils/NewNameGenerator';
+import optionalRequire from '../../Utils/OptionalRequire';
 const path = optionalRequire('path');
 var fs = optionalRequire('fs-extra');
 

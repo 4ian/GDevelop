@@ -5,7 +5,7 @@ import React from 'react';
 import RaisedButton from '../../UI/RaisedButton';
 import { Column, Line } from '../../UI/Grid';
 import { findGDJS } from '../../GameEngineFinder/LocalGDJSFinder';
-import localFileSystem from './LocalFileSystem';
+import LocalFileSystem, { type UrlFileDescriptor } from './LocalFileSystem';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
@@ -17,6 +17,7 @@ import {
   ExplanationHeader,
   DoneFooter,
 } from '../GenericExporters/ElectronExport';
+import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
@@ -28,9 +29,12 @@ type ExportState = {
 
 type PreparedExporter = {|
   exporter: gdjsExporter,
+  localFileSystem: LocalFileSystem,
 |};
 
-type ExportOutput = null;
+type ExportOutput = {|
+  urlFiles: Array<UrlFileDescriptor>,
+|};
 
 type ResourcesDownloadOutput = null;
 
@@ -85,6 +89,9 @@ export const localElectronExportPipeline: ExportPipeline<
       console.info('GDJS found in ', gdjsRoot);
 
       // TODO: Memory leak? Check for other exporters too.
+      const localFileSystem = new LocalFileSystem({
+        downloadUrlsToLocalFiles: true,
+      });
       const fileSystem = assignIn(
         new gd.AbstractFileSystemJS(),
         localFileSystem
@@ -93,13 +100,14 @@ export const localElectronExportPipeline: ExportPipeline<
 
       return {
         exporter,
+        localFileSystem,
       };
     });
   },
 
-  launchExport: (
+  launchExport: async (
     context: ExportPipelineContext<ExportState>,
-    { exporter }: PreparedExporter
+    { exporter, localFileSystem }: PreparedExporter
   ): Promise<ExportOutput> => {
     const exportOptions = new gd.MapStringBoolean();
     exportOptions.set('exportForElectron', true);
@@ -111,14 +119,22 @@ export const localElectronExportPipeline: ExportPipeline<
     exportOptions.delete();
     exporter.delete();
 
-    return Promise.resolve(null);
+    return {
+      urlFiles: localFileSystem.getAllUrlFilesIn(context.exportState.outputDir),
+    };
   },
 
-  launchResourcesDownload: (
+  launchResourcesDownload: async (
     context: ExportPipelineContext<ExportState>,
-    exportOutput: ExportOutput
+    { urlFiles }: ExportOutput
   ): Promise<ResourcesDownloadOutput> => {
-    return Promise.resolve(null);
+    await downloadUrlsToLocalFiles({
+      urlContainers: urlFiles,
+      onProgress: context.updateStepProgress,
+      throwIfAnyError: true,
+    });
+
+    return null;
   },
 
   launchCompression: (

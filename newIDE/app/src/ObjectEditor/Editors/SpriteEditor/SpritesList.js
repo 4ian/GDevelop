@@ -23,9 +23,7 @@ import {
 } from '../../../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
-import RaisedButton from '../../../UI/RaisedButton';
-import ElementWithMenu from '../../../UI/Menu/ElementWithMenu';
-import Window from '../../../Utils/Window';
+import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
 const gd: libGDevelop = global.gd;
 const path = require('path');
 
@@ -51,28 +49,26 @@ type AddSpriteButtonProps = {|
   resourceManagementProps: ResourceManagementProps,
 |};
 
-// Search "activate cloud projects" in the codebase for everything to
-// remove once cloud projects are activated for the desktop app.
-const supportsCloudProjects = Window.isDev();
-
 const AddSpriteButton = SortableElement(
   ({ onAdd, resourceManagementProps }: AddSpriteButtonProps) => {
+    const storageProvider = resourceManagementProps.getStorageProvider();
+    const resourceSources = resourceManagementProps.resourceSources
+      .filter(source => source.kind === 'image')
+      .filter(
+        ({ onlyForStorageProvider }) =>
+          !onlyForStorageProvider ||
+          onlyForStorageProvider === storageProvider.internalName
+      );
+
     return (
       <div style={thumbnailContainerStyle}>
-        <ElementWithMenu
-          exceptionallyDontShowMenuAndFakeClickOnFirstElement={
-            !supportsCloudProjects
-          }
-          element={
-            <RaisedButton
-              onClick={() => {
-                /* Will be replaced by ElementWithMenu. */
-              }}
-              label={<Trans>Add a sprite</Trans>}
-              icon={<Add />}
-              primary
-            />
-          }
+        <RaisedButtonWithSplitMenu
+          onClick={() => {
+            onAdd(resourceSources[0]);
+          }}
+          label={<Trans>Add a sprite</Trans>}
+          icon={<Add />}
+          primary
           buildMenuTemplate={(i18n: I18nType) => {
             const storageProvider = resourceManagementProps.getStorageProvider();
             return resourceManagementProps.resourceSources

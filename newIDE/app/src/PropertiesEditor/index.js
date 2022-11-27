@@ -31,7 +31,7 @@ import UnsavedChangesContext, {
 import { Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -45,6 +45,7 @@ export type ValueFieldCommonProperties = {|
   getExtraDescription?: Instance => string,
   disabled?: boolean | ((instances: Array<gdInitialInstance>) => boolean),
   onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
+  onEditButtonClick?: () => void,
 |};
 
 // "Primitive" value fields are "simple" fields.
@@ -351,7 +352,11 @@ const PropertiesEditor = ({
           />
         );
       } else {
-        const { onEditButtonBuildMenuTemplate, setValue } = field;
+        const {
+          onEditButtonBuildMenuTemplate,
+          onEditButtonClick,
+          setValue,
+        } = field;
         return (
           <TextFieldWithButtonLayout
             key={field.name}
@@ -371,20 +376,23 @@ const PropertiesEditor = ({
               />
             )}
             renderButton={style =>
-              onEditButtonBuildMenuTemplate ? (
-                <ElementWithMenu
-                  element={
-                    <RaisedButton
-                      style={style}
-                      primary
-                      disabled={instances.length !== 1}
-                      icon={<Edit />}
-                      label={<Trans>Edit</Trans>}
-                      onClick={() => {
-                        /* Will be replaced by ElementWithMenu */
-                      }}
-                    />
-                  }
+              onEditButtonClick && !onEditButtonBuildMenuTemplate ? (
+                <RaisedButton
+                  style={style}
+                  primary
+                  disabled={instances.length !== 1}
+                  icon={<Edit />}
+                  label={<Trans>Edit</Trans>}
+                  onClick={onEditButtonClick}
+                />
+              ) : onEditButtonBuildMenuTemplate ? (
+                <RaisedButtonWithSplitMenu
+                  style={style}
+                  primary
+                  disabled={instances.length !== 1}
+                  icon={<Edit />}
+                  label={<Trans>Edit</Trans>}
+                  onClick={onEditButtonClick}
                   buildMenuTemplate={onEditButtonBuildMenuTemplate}
                 />
               ) : null

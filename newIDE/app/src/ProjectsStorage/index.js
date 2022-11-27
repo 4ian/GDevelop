@@ -15,6 +15,26 @@ export type FileMetadata = {|
   name?: string,
 |};
 
+/**
+ * The data containing the file/url/name of a new location to be saved
+ * by a storage provider.
+ */
+export type SaveAsLocation = {|
+  /**
+   * The file id, path or local path according to the provider. Might be null if not known
+   * or unused (for example, a cloud project uses only a name to identify a new project).
+   */
+  fileIdentifier?: string,
+  /**
+   * The name of the file. Might be null if unused
+   * (for example, a local file path is stored only in `fileIdentifier`).
+   */
+  name?: string,
+
+  // New fields can be added if a storage provider needs other things to identify
+  // a new location where to save a project to.
+|};
+
 export type FileMetadataAndStorageProviderName = {
   fileMetadata: FileMetadata,
   storageProviderName: string,
@@ -55,19 +75,22 @@ export type StorageProviderOperations = {|
   onChooseSaveProjectAsLocation?: ({|
     project: gdProject,
     fileMetadata: ?FileMetadata, // This is the current location.
-    onLocationSelected: () => void,
   |}) => Promise<{|
-    fileMetadata: ?FileMetadata, // This is the newly chosen location (or null if cancelled).
+    saveAsLocation: ?SaveAsLocation, // This is the newly chosen location (or null if cancelled).
   |}>,
   onSaveProjectAs?: (
     project: gdProject,
-    fileMetadata: ?FileMetadata,
+    saveAsLocation: ?SaveAsLocation, // This is the new location to save to.
     options: {|
       onStartSaving: () => void,
-      onMoveResources: () => Promise<void>,
+      onMoveResources: ({|
+        newFileMetadata: FileMetadata,
+      |}) => Promise<void>,
     |}
   ) => Promise<{|
     wasSaved: boolean,
+    /** This is the location where the project was saved, or null if not persisted. */
+    fileMetadata: ?FileMetadata,
   |}>,
 
   // Project properties saving:
@@ -101,6 +124,11 @@ export type StorageProvider = {|
   disabled?: boolean,
   renderIcon?: ({| size?: 'small' | 'medium' |}) => React.Node,
   getFileMetadataFromAppArguments?: AppArguments => ?FileMetadata,
+  onRenderNewProjectSaveAsLocationChooser?: (props: {|
+    projectName: string,
+    saveAsLocation: ?SaveAsLocation,
+    setSaveAsLocation: (?SaveAsLocation) => void,
+  |}) => React.Node,
   createOperations: ({
     /** Open a dialog (a render function) */
     setDialog: (() => React.Node) => void,

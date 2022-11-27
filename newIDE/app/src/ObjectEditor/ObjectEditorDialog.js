@@ -12,11 +12,7 @@ import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObje
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { Column, Line } from '../UI/Grid';
 import { type EditorProps } from './Editors/EditorProps.flow';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import HotReloadPreviewButton, {
@@ -49,9 +45,7 @@ type Props = {|
   // Passed down to object editors:
   project: gdProject,
   onComputeAllVariableNames: () => Array<string>,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   unsavedChanges?: UnsavedChanges,
   onUpdateBehaviorsSharedData: () => void,
   initialTab: ?ObjectEditorTab,
@@ -212,9 +206,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           <EditorComponent
             objectConfiguration={props.object.getConfiguration()}
             project={props.project}
-            resourceSources={props.resourceSources}
-            onChooseResource={props.onChooseResource}
-            resourceExternalEditors={props.resourceExternalEditors}
+            resourceManagementProps={props.resourceManagementProps}
             onSizeUpdated={
               forceUpdate /*Force update to ensure dialog is properly positionned*/
             }
@@ -228,9 +220,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           object={props.object}
           project={props.project}
           eventsFunctionsExtension={props.eventsFunctionsExtension}
-          resourceSources={props.resourceSources}
-          onChooseResource={props.onChooseResource}
-          resourceExternalEditors={props.resourceExternalEditors}
+          resourceManagementProps={props.resourceManagementProps}
           onSizeUpdated={
             forceUpdate /*Force update to ensure dialog is properly positionned*/
           }
@@ -269,9 +259,7 @@ const InnerDialog = (props: InnerDialogProps) => {
         <EffectsList
           target="object"
           project={props.project}
-          resourceSources={props.resourceSources}
-          onChooseResource={props.onChooseResource}
-          resourceExternalEditors={props.resourceExternalEditors}
+          resourceManagementProps={props.resourceManagementProps}
           effectsContainer={props.object.getEffects()}
           onEffectsUpdated={() => {
             forceUpdate(); /*Force update to ensure dialog is properly positionned*/

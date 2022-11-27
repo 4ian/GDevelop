@@ -47,7 +47,7 @@ type Props = {|
   onOpenAbout: () => void,
 
   // Project creation
-  onOpenProjectPreCreationDialog: (?ExampleShortHeader) => void,
+  onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
 |};
 
 type HomePageEditorInterface = {|
@@ -64,7 +64,7 @@ export const HomePage = React.memo<Props>(
         canOpen,
         onChooseProject,
         onOpenRecentFile,
-        onOpenProjectPreCreationDialog,
+        onOpenNewProjectSetupDialog,
         onCreateProject,
         onOpenProjectManager,
         onOpenHelpFinder,
@@ -184,8 +184,8 @@ export const HomePage = React.memo<Props>(
                         project={project}
                         canOpen={canOpen}
                         onChooseProject={onChooseProject}
-                        onOpenProjectPreCreationDialog={
-                          onOpenProjectPreCreationDialog
+                        onOpenNewProjectSetupDialog={
+                          onOpenNewProjectSetupDialog
                         }
                         onShowAllExamples={() =>
                           onCreateProject(/*exampleShortHeader=*/ null)
@@ -236,7 +236,7 @@ export const renderHomePageContainer = (
     onChooseProject={props.onChooseProject}
     onOpenRecentFile={props.onOpenRecentFile}
     onCreateProject={props.onCreateProject}
-    onOpenProjectPreCreationDialog={props.onOpenProjectPreCreationDialog}
+    onOpenNewProjectSetupDialog={props.onOpenNewProjectSetupDialog}
     onOpenProjectManager={props.onOpenProjectManager}
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}

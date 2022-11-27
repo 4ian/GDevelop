@@ -13,7 +13,17 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-export const Default = () => (
+export const Starting = () => (
+  <GenericRetryableProcessWithProgressDialog
+    progress={0}
+    result={null}
+    onAbandon={null}
+    onRetry={null}
+    genericError={null}
+  />
+);
+
+export const InProgress = () => (
   <GenericRetryableProcessWithProgressDialog
     progress={40}
     result={null}

@@ -30,7 +30,12 @@ const styles = {
       '0.8s ease-in-out 0s infinite alternate none running vertical-translate',
   },
   scrollDirectionArrow: {
-    color: highlighterPrimaryColor,
+    color: '#1D1D26',
+    display: 'flex',
+    backgroundColor: highlighterPrimaryColor,
+    boxShadow: `0 0 12px 2px ${highlighterPrimaryColor}`,
+    padding: 2,
+    borderRadius: 3,
   },
 };
 
@@ -114,9 +119,9 @@ function InAppTutorialElementHighlighter({ element }: Props) {
             ...styles.scrollIndicator,
             top:
               scrollDirection === 'top'
-                ? scrollParentRectangle.top
+                ? scrollParentRectangle.top + 15
                 : scrollParentRectangle.bottom - 50,
-            left: scrollParentRectangle.right - 80,
+            left: scrollParentRectangle.right - 100,
           }}
         >
           <div style={styles.scrollDirectionArrow}>

@@ -262,7 +262,7 @@ const ExpressionDocumentation = ({
         expressionMetadata.getParameters(),
         (parameter, parameterIndex) =>
           isParameterVisible(expressionMetadata, parameterIndex) && (
-            <Text style={defaultTextStyle} size="body2">
+            <Text style={defaultTextStyle} size="body2" key={parameterIndex}>
               <i>
                 {i18n._(
                   parameterRenderingService.getUserFriendlyTypeName(

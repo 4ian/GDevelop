@@ -14,6 +14,7 @@ import { Column } from '../UI/Grid';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 
 const getStyles = ({ windowWidth }) => ({
   formContainer: {
@@ -136,6 +137,9 @@ const AdditionalUserInfoDialog = ({
   const windowWidth = useResponsiveWindowWidth();
   const styles = getStyles({ windowWidth });
   const [gdevelopUsage, setGdevelopUsage] = React.useState<string>('');
+  const { currentlyRunningInAppTutorial } = React.useContext(
+    InAppTutorialContext
+  );
   const [creationExperience, setCreationExperience] = React.useState<string>(
     ''
   );
@@ -157,6 +161,15 @@ const AdditionalUserInfoDialog = ({
     disabled: updateInProgress,
     disableUnderline: true,
   };
+
+  if (currentlyRunningInAppTutorial) {
+    // TODO: Do not display dialog to not distract/force user to provide more info
+    // that they would do otherwise. The dialog should not be opened but this requires
+    // to refactor AuthenticatedUserProvider to be a functional component in order to
+    // use InAppTutorialContext.
+    onClose();
+    return null;
+  }
 
   return (
     <Dialog

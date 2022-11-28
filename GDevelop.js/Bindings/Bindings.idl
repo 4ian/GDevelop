@@ -937,6 +937,11 @@ interface JsonResource {
 };
 JsonResource implements Resource;
 
+interface TilemapResource {
+    void TilemapResource();
+};
+TilemapResource implements Resource;
+
 interface InitialInstance {
     void InitialInstance();
 

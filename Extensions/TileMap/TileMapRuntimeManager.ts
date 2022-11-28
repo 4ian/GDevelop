@@ -60,17 +60,20 @@ namespace gdjs {
       /**
        * @param tileMapJsonResourceName The resource name of the tile map.
        * @param tileSetJsonResourceName The resource name of the tile set.
+       * @param levelIndex The level of the tile map.
        * @param callback A function called when the tile map is parsed.
        */
       getOrLoadTileMap(
         tileMapJsonResourceName: string,
         tileSetJsonResourceName: string,
+        levelIndex: number,
         callback: (tileMap: TileMapHelper.EditableTileMap | null) => void
       ): void {
         this._manager.getOrLoadTileMap(
-          this._loadTiledMap.bind(this),
+          this._loadTileMap.bind(this),
           tileMapJsonResourceName,
           tileSetJsonResourceName,
+          levelIndex,
           pako,
           callback
         );
@@ -81,6 +84,7 @@ namespace gdjs {
        * @param atlasImageResourceName The resource name of the atlas image.
        * @param tileMapJsonResourceName The resource name of the tile map.
        * @param tileSetJsonResourceName The resource name of the tile set.
+       * @param levelIndex The level of the tile map.
        * @param callback A function called when the tiles textures are split.
        */
       getOrLoadTextureCache(
@@ -88,14 +92,16 @@ namespace gdjs {
         atlasImageResourceName: string,
         tileMapJsonResourceName: string,
         tileSetJsonResourceName: string,
+        levelIndex: number,
         callback: (textureCache: TileMapHelper.TileTextureCache | null) => void
       ): void {
         this._manager.getOrLoadTextureCache(
-          this._loadTiledMap.bind(this),
+          this._loadTileMap.bind(this),
           getTexture,
           atlasImageResourceName,
           tileMapJsonResourceName,
           tileSetJsonResourceName,
+          levelIndex,
           callback
         );
       }
@@ -104,10 +110,10 @@ namespace gdjs {
        * Parse both JSON and set the content of the tile set in the right
        * attribute in the tile map to merge both parsed data.
        */
-      private _loadTiledMap(
+      private _loadTileMap(
         tileMapJsonResourceName: string,
         tileSetJsonResourceName: string,
-        callback: (tiledMap: TileMapHelper.TiledMap | null) => void
+        callback: (tileMap: TileMapHelper.TileMap | null) => void
       ): void {
         this._instanceContainer
           .getGame()
@@ -121,8 +127,12 @@ namespace gdjs {
               callback(null);
               return;
             }
-            const tiledMap = tileMapJsonData as TileMapHelper.TiledMap;
-            if (tileSetJsonResourceName) {
+            const tileMap = TileMapHelper.TileMapManager.identify(tileMapJsonData);
+            if (!tileMap) {
+              callback(null);
+              return;
+            }
+            if (tileMap.kind === "tiled" && tileSetJsonResourceName) {
               this._instanceContainer
                 .getGame()
                 .getJsonManager()
@@ -135,13 +145,14 @@ namespace gdjs {
                     callback(null);
                     return;
                   }
+                  const tiledMap = tileMap.data;
                   const tileSet = tileSetJsonData as TileMapHelper.TiledTileset;
                   tileSet.firstgid = tiledMap.tilesets[0].firstgid;
                   tiledMap.tilesets = [tileSet];
-                  callback(tiledMap);
+                  callback(tileMap);
                 });
             } else {
-              callback(tiledMap);
+              callback(tileMap);
             }
           });
       }

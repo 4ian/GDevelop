@@ -48,6 +48,7 @@
 #include <GDCore/IDE/Project/ResourcesInUseHelper.h>
 #include <GDCore/IDE/Project/ResourcesMergingHelper.h>
 #include <GDCore/IDE/Project/ResourcesRenamer.h>
+#include <GDCore/IDE/PropertyFunctionGenerator.h>
 #include <GDCore/IDE/WholeProjectRefactorer.h>
 #include <GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h>
 #include <GDCore/Project/Behavior.h>
@@ -516,6 +517,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_IsTypeExpression IsTypeExpression
 #define STATIC_GetExpressionValueType GetExpressionValueType
 #define STATIC_GetPrimitiveValueType GetPrimitiveValueType
+#define STATIC_ConvertPropertyTypeToValueType ConvertPropertyTypeToValueType
 #define STATIC_Get Get
 #define STATIC_GetAllUseless GetAllUseless
 #define STATIC_RemoveAllUseless RemoveAllUseless
@@ -595,6 +597,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   GetBehaviorsWithType
 #define STATIC_FixInvalidRequiredBehaviorProperties \
   FixInvalidRequiredBehaviorProperties
+#define STATIC_GenerateGetterAndSetter GenerateGetterAndSetter
+#define STATIC_CanGenerateGetterAndSetter CanGenerateGetterAndSetter
 #define STATIC_CreateRectangle CreateRectangle
 #define STATIC_SanityCheckBehaviorProperty SanityCheckBehaviorProperty
 #define STATIC_SanityCheckObjectProperty SanityCheckObjectProperty

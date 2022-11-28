@@ -82,28 +82,28 @@ export default class Providers extends React.Component<Props, {||}> {
                     <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>
                       <StylesProvider jss={jss}>
                         <ThemeProvider theme={theme.muiTheme}>
-                          <AuthenticatedUserProvider
-                            authentication={authentication}
-                          >
-                            <PublicProfileProvider>
-                              <I18n update>
-                                {({ i18n }) => (
-                                  <EventsFunctionsExtensionsProvider
-                                    i18n={i18n}
-                                    makeEventsFunctionCodeWriter={
-                                      makeEventsFunctionCodeWriter
-                                    }
-                                    eventsFunctionsExtensionWriter={
-                                      eventsFunctionsExtensionWriter
-                                    }
-                                    eventsFunctionsExtensionOpener={
-                                      eventsFunctionsExtensionOpener
-                                    }
-                                  >
-                                    <AlertProvider>
-                                      <SubscriptionSuggestionProvider>
-                                        <CommandsContextProvider>
-                                          <InAppTutorialProvider>
+                          <InAppTutorialProvider>
+                            <AuthenticatedUserProvider
+                              authentication={authentication}
+                            >
+                              <PublicProfileProvider>
+                                <I18n update>
+                                  {({ i18n }) => (
+                                    <EventsFunctionsExtensionsProvider
+                                      i18n={i18n}
+                                      makeEventsFunctionCodeWriter={
+                                        makeEventsFunctionCodeWriter
+                                      }
+                                      eventsFunctionsExtensionWriter={
+                                        eventsFunctionsExtensionWriter
+                                      }
+                                      eventsFunctionsExtensionOpener={
+                                        eventsFunctionsExtensionOpener
+                                      }
+                                    >
+                                      <AlertProvider>
+                                        <SubscriptionSuggestionProvider>
+                                          <CommandsContextProvider>
                                             <AssetStoreStateProvider>
                                               <ResourceStoreStateProvider>
                                                 <ExampleStoreStateProvider>
@@ -119,15 +119,15 @@ export default class Providers extends React.Component<Props, {||}> {
                                                 </ExampleStoreStateProvider>
                                               </ResourceStoreStateProvider>
                                             </AssetStoreStateProvider>
-                                          </InAppTutorialProvider>
-                                        </CommandsContextProvider>
-                                      </SubscriptionSuggestionProvider>
-                                    </AlertProvider>
-                                  </EventsFunctionsExtensionsProvider>
-                                )}
-                              </I18n>
-                            </PublicProfileProvider>
-                          </AuthenticatedUserProvider>
+                                          </CommandsContextProvider>
+                                        </SubscriptionSuggestionProvider>
+                                      </AlertProvider>
+                                    </EventsFunctionsExtensionsProvider>
+                                  )}
+                                </I18n>
+                              </PublicProfileProvider>
+                            </AuthenticatedUserProvider>
+                          </InAppTutorialProvider>
                         </ThemeProvider>
                       </StylesProvider>
                     </GDevelopThemeContext.Provider>

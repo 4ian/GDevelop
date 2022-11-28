@@ -9,7 +9,6 @@ import { GameCard } from './GameCard';
 import { ColumnStackLayout } from '../UI/Layout';
 import { GameRegistration } from './GameRegistration';
 import { GameDetailsDialog, type GameDetailsTab } from './GameDetailsDialog';
-import Window from '../Utils/Window';
 
 type Props = {|
   project: ?gdProject,
@@ -44,9 +43,6 @@ export const GamesList = ({ project, initialGameId, initialTab }: Props) => {
           const game = games.find(game => game.id === initialGameId);
           if (game) {
             setOpenedGame(game);
-            // Ensure any arguments are removed from the URL to prevent
-            // triggering a reopen of the game on the next dashboard opening.
-            Window.removeArguments();
           }
         }
       } catch (error) {

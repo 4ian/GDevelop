@@ -14,15 +14,11 @@ const styles = {
   },
 };
 
-const dialogContent = t`GDevelop provides tutorials to discover the app or to explore some features.${'\n'}${'\n'}You can stop the tutorial at any moment and come back later to complete it!`;
-
-const dialogContentForAlreadyStartedTutorials = t`You have the choice to start the tutorial over or to resume the one you already started.`;
-const dialogContentForCompletedTutorials = t`You already finished this tutorial but you can start it over.`;
-
 type Props = {|
   open: boolean,
   onClose: () => void,
   tutorialCompletionStatus: 'notStarted' | 'started' | 'complete',
+  isProjectOpened?: boolean,
   startTutorial: (scenario: 'resume' | 'startOver' | 'start') => Promise<void>,
 |};
 
@@ -30,66 +26,92 @@ const StartTutorialDialog = ({
   open,
   onClose,
   tutorialCompletionStatus,
+  isProjectOpened,
   startTutorial,
 }: Props) => {
   const resumeTutorial = () => startTutorial('resume');
   const startOverTutorial = () => startTutorial('startOver');
   const startTutorialForFirstTime = () => startTutorial('start');
 
-  const onApply =
-    tutorialCompletionStatus === 'complete'
-      ? startOverTutorial
-      : tutorialCompletionStatus === 'started'
-      ? resumeTutorial
-      : startTutorialForFirstTime;
+  const dialogContentByCompletionStatus = {
+    notStarted: {
+      title: <Trans>Let's make a Fling Game</Trans>,
+      content: t`You're about to start the first chapter of our in-app tutorial.${'\n'}${'\n'}GDevelop will save your progress so you can take a break when you need it.${'\n'}${'\n'}Are you ready to start?`,
+      primaryAction: {
+        label: <Trans>Yes</Trans>,
+        onClick: startTutorialForFirstTime,
+      },
+      secondaryAction: { label: <Trans>No</Trans>, onClick: onClose },
+      tertiaryAction: null,
+    },
+    started: {
+      title: <Trans>Welcome back!</Trans>,
+      content: t`Let's finish your Fling Game, shall we?`,
+      primaryAction: {
+        label: <Trans>Let's go</Trans>,
+        onClick: resumeTutorial,
+      },
+      secondaryAction: {
+        label: isProjectOpened ? (
+          <Trans>No, close project</Trans>
+        ) : (
+          <Trans>No</Trans>
+        ),
+        onClick: onClose,
+      },
+      tertiaryAction: {
+        label: <Trans>Restart tutorial</Trans>,
+        onClick: startOverTutorial,
+      },
+    },
+    complete: {
+      title: <Trans>Restart the Tutorial</Trans>,
+      content: t`You're about to restart our in-app 3-chapter tutorial.${'\n'}${'\n'}GDevelop will save your progress, so you can take a break if you need.`,
+      primaryAction: { label: <Trans>Yes</Trans>, onClick: startOverTutorial },
+      secondaryAction: { label: <Trans>No</Trans>, onClick: onClose },
+      tertiaryAction: null,
+    },
+  };
 
-  const complementaryText =
-    tutorialCompletionStatus === 'complete'
-      ? dialogContentForCompletedTutorials
-      : tutorialCompletionStatus === 'started'
-      ? dialogContentForAlreadyStartedTutorials
-      : null;
+  const {
+    title,
+    content,
+    primaryAction,
+    secondaryAction,
+    tertiaryAction,
+  } = dialogContentByCompletionStatus[tutorialCompletionStatus];
 
   const actions = [
     <FlatButton
       key="close"
-      label={<Trans>No thanks, I'm good</Trans>}
-      onClick={onClose}
+      label={secondaryAction.label}
+      onClick={secondaryAction.onClick}
     />,
     <DialogPrimaryButton
       key="start"
-      label={
-        tutorialCompletionStatus === 'complete' ? (
-          <Trans>Restart tutorial</Trans>
-        ) : tutorialCompletionStatus === 'started' ? (
-          <Trans>Resume tutorial</Trans>
-        ) : (
-          <Trans>Let's go!</Trans>
-        )
-      }
+      label={primaryAction.label}
       primary
-      onClick={onApply}
+      onClick={primaryAction.onClick}
     />,
   ];
-  const secondaryActions =
-    tutorialCompletionStatus === 'started'
-      ? [
-          <FlatButton
-            key="startOver"
-            label={<Trans>Start over</Trans>}
-            onClick={startOverTutorial}
-          />,
-        ]
-      : undefined;
+  const secondaryActions = tertiaryAction
+    ? [
+        <FlatButton
+          key="other"
+          label={tertiaryAction.label}
+          onClick={tertiaryAction.onClick}
+        />,
+      ]
+    : undefined;
 
   return (
     <Dialog
-      title={<Trans>Take a quick tour?</Trans>}
+      title={title}
       actions={actions}
       secondaryActions={secondaryActions}
       open={open}
       onRequestClose={onClose}
-      onApply={onApply}
+      onApply={primaryAction.onClick}
       maxWidth="xs"
     >
       <ColumnStackLayout noMargin>
@@ -99,13 +121,7 @@ const StartTutorialDialog = ({
           </div>
         </Line>
         <Column noMargin>
-          <MarkdownText translatableSource={dialogContent} allowParagraphs />
-          {complementaryText && (
-            <MarkdownText
-              translatableSource={complementaryText}
-              allowParagraphs
-            />
-          )}
+          <MarkdownText translatableSource={content} allowParagraphs />
         </Column>
       </ColumnStackLayout>
     </Dialog>

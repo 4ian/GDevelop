@@ -25,7 +25,7 @@ const QuitInAppTutorialDialog = (props: Props) => {
     <Dialog
       open
       maxWidth="sm"
-      title="Quit tutorial"
+      title={<Trans>Quit tutorial</Trans>}
       onRequestClose={props.onClose}
       onApply={() => {
         if (props.canEndTutorial) {

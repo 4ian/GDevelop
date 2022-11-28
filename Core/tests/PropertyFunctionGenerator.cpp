@@ -188,14 +188,6 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(getter.GetSentence() == "_PARAM0_ rotate object");
       // Object and behavior parameters are added automatically.
       REQUIRE(getter.GetParameters().size() == 0);
-      // auto &objectParameter = getter.GetParameters().at(0);
-      // REQUIRE(objectParameter.GetName() == "Object");
-      // REQUIRE(objectParameter.GetType() == "object");
-      // auto &behaviorParameter = getter.GetParameters().at(1);
-      // REQUIRE(behaviorParameter.GetName() == "Behavior");
-      // REQUIRE(behaviorParameter.GetType() == "behavior");
-      // REQUIRE(behaviorParameter.GetExtraInfo() ==
-      //         "MyEventsExtension::MovementAngle");
 
       REQUIRE(getter.GetEvents().GetEventsCount() == 1);
       REQUIRE(getter.GetEvents().GetEvent(0).GetType() ==
@@ -232,14 +224,6 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setter.GetSentence() == "_PARAM0_ rotate object: _PARAM2_");
       // Object and behavior parameters are added automatically.
       REQUIRE(setter.GetParameters().size() == 1);
-      // auto &objectParameter = setter.GetParameters().at(0);
-      // REQUIRE(objectParameter.GetName() == "Object");
-      // REQUIRE(objectParameter.GetType() == "object");
-      // auto &behaviorParameter = setter.GetParameters().at(1);
-      // REQUIRE(behaviorParameter.GetName() == "Behavior");
-      // REQUIRE(behaviorParameter.GetType() == "behavior");
-      // REQUIRE(behaviorParameter.GetExtraInfo() ==
-      //         "MyEventsExtension::MovementAngle");
       auto &valueParameter = setter.GetParameters().at(0);
       REQUIRE(valueParameter.GetName() == "Value");
       REQUIRE(valueParameter.GetType() == "yesorno");

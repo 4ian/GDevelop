@@ -113,6 +113,7 @@ const StartInAppTutorialDialog = ({
       onRequestClose={onClose}
       onApply={primaryAction.onClick}
       maxWidth="xs"
+      cannotBeDismissed
     >
       <ColumnStackLayout noMargin>
         <Line alignItems="center" justifyContent="center" noMargin>

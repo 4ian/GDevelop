@@ -28,6 +28,7 @@ type Props = {|
   initialTab: ProfileTab,
   gamesDashboardInitialGameId: ?string,
   gamesDashboardInitialTab: ?GameDetailsTab,
+  onGameDetailsDialogClose: () => void,
 |};
 
 const ProfileDialog = ({
@@ -37,6 +38,7 @@ const ProfileDialog = ({
   initialTab,
   gamesDashboardInitialGameId,
   gamesDashboardInitialTab,
+  onGameDetailsDialogClose,
 }: Props) => {
   const [currentTab, setCurrentTab] = React.useState<ProfileTab>(initialTab);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
@@ -171,6 +173,7 @@ const ProfileDialog = ({
               project={currentProject}
               initialGameId={gamesDashboardInitialGameId}
               initialTab={gamesDashboardInitialTab}
+              onGameDetailsDialogClose={onGameDetailsDialogClose}
             />
           )}
         </>

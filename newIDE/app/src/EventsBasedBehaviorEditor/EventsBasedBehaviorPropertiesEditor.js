@@ -228,7 +228,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                           enabled: i + 1 < properties.getCount(),
                         },
                         {
-                          label: i18n._(t`Generate functions`),
+                          label: i18n._(t`Generate expression and action`),
                           click: () =>
                             gd.PropertyFunctionGenerator.generateGetterAndSetter(
                               this.props.project,

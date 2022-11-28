@@ -3132,6 +3132,7 @@ const MainFrame = (props: Props) => {
         <QuitInAppTutorialDialog
           onSaveProject={saveProject}
           onClose={() => setQuitInAppTutorialDialogOpen(false)}
+          isSavingProject={isSavingProject}
           canEndTutorial={
             !!currentFileMetadata && !unsavedChanges.hasUnsavedChanges
           }

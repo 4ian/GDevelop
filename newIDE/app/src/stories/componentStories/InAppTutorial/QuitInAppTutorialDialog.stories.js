@@ -14,14 +14,18 @@ export default {
 };
 
 export const Default = () => {
+  const [isSaving, setIsSaving] = React.useState<boolean>(false);
   const [canEndTutorial, setCanEndTutorial] = React.useState<boolean>(false);
   return (
     <QuitInAppTutorialDialog
       canEndTutorial={canEndTutorial}
       onSaveProject={async () => {
-        await delay(500);
+        setIsSaving(true);
+        await delay(1500);
         setCanEndTutorial(true);
+        setIsSaving(false);
       }}
+      isSavingProject={isSaving}
       onClose={() => action('on close')()}
       endTutorial={() => action('end tutorial')()}
     />

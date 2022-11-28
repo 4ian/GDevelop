@@ -4,8 +4,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
-import { Line } from '../UI/Grid';
-import RaisedButton from '../UI/RaisedButton';
+import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';
 
 type Props = {|
@@ -13,25 +12,67 @@ type Props = {|
   canEndTutorial: boolean,
   endTutorial: () => void,
   onClose: () => void,
+  isSavingProject: boolean,
 |};
 
-const QuitInAppTutorialDialog = (props: Props) => {
+const QuitInAppTutorialDialog = ({
+  onSaveProject,
+  canEndTutorial,
+  endTutorial,
+  onClose,
+  isSavingProject,
+}: Props) => {
+  const [hasUserInteracted, setHasUserInteracted] = React.useState<boolean>(
+    false
+  );
+  const [title, setTitle] = React.useState<React.Node>(
+    <Trans>Quit tutorial</Trans>
+  );
+
+  React.useEffect(
+    () => {
+      if (hasUserInteracted) {
+        if (isSavingProject) {
+          setTitle(<Trans>Saving project</Trans>);
+        } else if (canEndTutorial) {
+          setTitle(<Trans>Project saved</Trans>);
+        }
+      }
+    },
+    [isSavingProject, canEndTutorial, hasUserInteracted]
+  );
+
   const quitTutorial = () => {
-    props.endTutorial();
-    props.onClose();
+    endTutorial();
+    onClose();
   };
+
+  const saveOrExitTutorial = () => {
+    setHasUserInteracted(true);
+    if (canEndTutorial) {
+      quitTutorial();
+    } else {
+      onSaveProject();
+    }
+  };
+
+  const primaryActionLabel = isSavingProject ? (
+    <Trans>Saving...</Trans>
+  ) : canEndTutorial ? (
+    <Trans>Close Project</Trans>
+  ) : (
+    <Trans>Save Project</Trans>
+  );
 
   return (
     <Dialog
       open
       maxWidth="sm"
-      title={<Trans>Quit tutorial</Trans>}
-      onRequestClose={props.onClose}
-      onApply={() => {
-        if (props.canEndTutorial) {
-          props.endTutorial();
-        }
+      title={title}
+      onRequestClose={() => {
+        if (!isSavingProject) onClose();
       }}
+      onApply={saveOrExitTutorial}
       secondaryActions={[
         <FlatButton
           key="exit"
@@ -42,16 +83,17 @@ const QuitInAppTutorialDialog = (props: Props) => {
       actions={[
         <FlatButton
           key="cancel"
-          onClick={props.onClose}
+          onClick={onClose}
           label={<Trans>Cancel</Trans>}
         />,
-        <DialogPrimaryButton
-          primary
-          disabled={!props.canEndTutorial}
-          label={<Trans>Exit</Trans>}
-          key="save-and-exit"
-          onClick={quitTutorial}
-        />,
+        <LeftLoader isLoading={isSavingProject} key="save-and-exit">
+          <DialogPrimaryButton
+            primary
+            label={primaryActionLabel}
+            disabled={isSavingProject}
+            onClick={saveOrExitTutorial}
+          />
+        </LeftLoader>,
       ]}
       flexColumnBody
     >
@@ -64,14 +106,6 @@ const QuitInAppTutorialDialog = (props: Props) => {
           to do?
         </Trans>
       </Text>
-      <Line justifyContent="center">
-        <RaisedButton
-          primary
-          label={<Trans>Save project</Trans>}
-          disabled={props.canEndTutorial}
-          onClick={props.onSaveProject}
-        />
-      </Line>
     </Dialog>
   );
 };

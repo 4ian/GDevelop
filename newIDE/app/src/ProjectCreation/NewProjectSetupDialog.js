@@ -130,13 +130,12 @@ const NewProjectSetupDialog = ({
           label={<Trans>Cancel</Trans>}
           onClick={onClose}
         />,
-        <LeftLoader isLoading={isOpening}>
+        <LeftLoader isLoading={isOpening} key="create">
           <DialogPrimaryButton
             primary
             disabled={
               isOpening || needUserAuthentication || hasTooManyCloudProjects
             }
-            key="create"
             label={<Trans>Create project</Trans>}
             onClick={onValidate}
             id="create-project-button"
@@ -165,6 +164,7 @@ const NewProjectSetupDialog = ({
               <Refresh />
             </IconButton>
           }
+          ref={field => field && field.focus()} // Focus the name field when the dialog is opened.
         />
         <SelectField
           fullWidth

@@ -8,6 +8,7 @@
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Extensions/Metadata/ValueTypeMetadata.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/Project.h"
@@ -45,16 +46,23 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
            : " of the object.") +
       (property.GetDescription().empty() ? ""
                                          : " " + property.GetDescription()) +
-      (isSharedProperties ? " While an object is needed, this will apply to all "
-                           "objects using the behavior."
-                         : "");
+      (isSharedProperties
+           ? " While an object is needed, this will apply to all "
+             "objects using the behavior."
+           : "");
 
-  gd::String behaviorNamespace =
-      extension.GetName() + "::" + eventsBasedBehavior.GetName() + "::";
+  gd::String behaviorFullType = gd::PlatformExtension::GetBehaviorFullType(
+      extension.GetName(), eventsBasedBehavior.GetName());
   gd::String propertyGetterName =
       (isSharedProperties ? "SharedProperty" : "Property") + property.GetName();
-  gd::String getterType = behaviorNamespace + propertyGetterName;
-  gd::String setterType = behaviorNamespace + "Set" + propertyGetterName;
+  gd::String getterType =
+      gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
+          extension.GetName(), eventsBasedBehavior.GetName(),
+          propertyGetterName);
+  gd::String setterType =
+      gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
+          extension.GetName(), eventsBasedBehavior.GetName(),
+          "Set" + propertyGetterName);
 
   gd::String getterName = capitalizedName;
   gd::String numberOrString =
@@ -122,13 +130,25 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
           .SetDescription("Change " + descriptionSubject)
           .SetSentence("_PARAM0_ " + UnCapitalizeFirstLetter(propertyLabel) +
                        ": _PARAM2_");
-      gd::ParameterMetadata parameter;
-      parameter.SetType("yesorno")
+      gd::ParameterMetadata objectParameter;
+      objectParameter.SetType("object")
+          .SetName("Object")
+          .SetDescription("Object")
+          .SetExtraInfo(eventsBasedBehavior.GetObjectType());
+      gd::ParameterMetadata behaviorParameter;
+      behaviorParameter.SetType("behavior")
+          .SetName("Behavior")
+          .SetDescription("Behavior")
+          .SetExtraInfo(behaviorFullType);
+      gd::ParameterMetadata valueParameter;
+      valueParameter.SetType("yesorno")
           .SetName("Value")
           .SetDescription(capitalizedName)
           .SetOptional(true)
           .SetDefaultValue("yes");
-      setter.GetParameters().push_back(parameter);
+      setter.GetParameters().push_back(objectParameter);
+      setter.GetParameters().push_back(behaviorParameter);
+      setter.GetParameters().push_back(valueParameter);
     } else {
       setter.SetFunctionType(gd::EventsFunction::ActionWithOperator);
       setter.SetGetterName(getterName);

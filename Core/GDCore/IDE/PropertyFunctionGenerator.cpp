@@ -19,7 +19,7 @@ namespace gd {
 void PropertyFunctionGenerator::GenerateGetterAndSetter(
     gd::Project &project, gd::EventsFunctionsExtension &extension,
     gd::EventsBasedBehavior &eventsBasedBehavior,
-    const gd::NamedPropertyDescriptor &property, bool isSceneProperties) {
+    const gd::NamedPropertyDescriptor &property, bool isSharedProperties) {
   auto &propertyName = property.GetName();
   auto &functionsContainer = eventsBasedBehavior.GetEventsFunctions();
   gd::String capitalizedName = CapitalizeFirstLetter(property.GetName());
@@ -40,19 +40,19 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
   gd::String descriptionSubject =
       (property.GetType() == "Boolean" ? "if " : "the ") +
       UnCapitalizeFirstLetter(propertyLabel) +
-      (isSceneProperties || property.GetType() == "Boolean"
+      (isSharedProperties || property.GetType() == "Boolean"
            ? "."
            : " of the object.") +
       (property.GetDescription().empty() ? ""
                                          : " " + property.GetDescription()) +
-      (isSceneProperties ? " While an object is needed, this will apply to all "
+      (isSharedProperties ? " While an object is needed, this will apply to all "
                            "objects using the behavior."
                          : "");
 
   gd::String behaviorNamespace =
       extension.GetName() + "::" + eventsBasedBehavior.GetName() + "::";
   gd::String propertyGetterName =
-      (isSceneProperties ? "SharedProperty" : "Property") + property.GetName();
+      (isSharedProperties ? "SharedProperty" : "Property") + property.GetName();
   gd::String getterType = behaviorNamespace + propertyGetterName;
   gd::String setterType = behaviorNamespace + "Set" + propertyGetterName;
 
@@ -105,7 +105,7 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
       action.SetType("SetReturn" + numberOrString);
       action.SetParametersCount(1);
       gd::String propertyPrefix =
-          (isSceneProperties ? "SharedProperty" : "Property");
+          (isSharedProperties ? "SharedProperty" : "Property");
       action.SetParameter(0, "Object.Behavior::" + propertyPrefix +
                                  property.GetName() + "()");
       event.GetActions().Insert(action, 0);

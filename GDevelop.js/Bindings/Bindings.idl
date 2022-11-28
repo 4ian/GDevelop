@@ -2160,7 +2160,7 @@ interface WholeProjectRefactorer {
 };
 
 interface PropertyFunctionGenerator {
-    void STATIC_GenerateGetterAndSetter([Ref] Project project, [Ref] EventsFunctionsExtension extension, [Ref] EventsBasedBehavior eventsBasedBehavior, [Const, Ref] NamedPropertyDescriptor property, boolean isSceneProperties);
+    void STATIC_GenerateGetterAndSetter([Ref] Project project, [Ref] EventsFunctionsExtension extension, [Ref] EventsBasedBehavior eventsBasedBehavior, [Const, Ref] NamedPropertyDescriptor property, boolean isSharedProperties);
     boolean STATIC_CanGenerateGetterAndSetter([Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const, Ref] NamedPropertyDescriptor property);
 };
 

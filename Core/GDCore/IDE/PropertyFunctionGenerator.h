@@ -28,7 +28,7 @@ public:
   static void GenerateGetterAndSetter(
       gd::Project &project, gd::EventsFunctionsExtension &extension,
       gd::EventsBasedBehavior &eventsBasedBehavior,
-      const gd::NamedPropertyDescriptor &property, bool isSceneProperties);
+      const gd::NamedPropertyDescriptor &property, bool isSharedProperties);
   static bool
   CanGenerateGetterAndSetter(const gd::EventsBasedBehavior &eventsBasedBehavior,
                              const gd::NamedPropertyDescriptor &property);

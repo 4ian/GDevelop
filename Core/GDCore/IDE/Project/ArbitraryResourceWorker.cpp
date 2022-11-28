@@ -35,6 +35,11 @@ void ArbitraryResourceWorker::ExposeJson(gd::String& jsonName){
     // do.
 };
 
+void ArbitraryResourceWorker::ExposeTilemap(gd::String& tilemapName){
+    // Nothing to do by default - each child class can define here the action to
+    // do.
+};
+
 void ArbitraryResourceWorker::ExposeVideo(gd::String& videoName){
     // Nothing to do by default - each child class can define here the action to
     // do.
@@ -153,6 +158,10 @@ class ResourceWorkerInEventsWorker : public ArbitraryEventsWorker {
           } else if (parameterMetadata.GetType() == "jsonResource") {
             gd::String updatedParameterValue = parameterValue;
             worker.ExposeJson(updatedParameterValue);
+            instruction.SetParameter(parameterIndex, updatedParameterValue);
+          } else if (parameterMetadata.GetType() == "tilemapResource") {
+            gd::String updatedParameterValue = parameterValue;
+            worker.ExposeTilemap(updatedParameterValue);
             instruction.SetParameter(parameterIndex, updatedParameterValue);
           }
         });

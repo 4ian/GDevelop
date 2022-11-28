@@ -60,8 +60,8 @@ const QuitInAppTutorialDialog = (props: Props) => {
       </Text>
       <Text>
         <Trans>
-          Save your project and resume the tutorial with that very project
-          later!
+          You can save your project to come back to it later. What do you want
+          to do?
         </Trans>
       </Text>
       <Line justifyContent="center">

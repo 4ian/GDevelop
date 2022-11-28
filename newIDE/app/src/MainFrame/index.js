@@ -693,6 +693,9 @@ const MainFrame = (props: Props) => {
           currentProject
         );
         currentProject.delete();
+        if (unsavedChanges.hasUnsavedChanges) {
+          unsavedChanges.sealUnsavedChanges();
+        }
 
         return {
           ...state,
@@ -707,6 +710,7 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
       setState,
+      unsavedChanges,
     ]
   );
 
@@ -2261,6 +2265,15 @@ const MainFrame = (props: Props) => {
     });
   };
 
+  const doEndTutorial = React.useCallback(
+    () => {
+      closeProject().then(() => {
+        endTutorial();
+      });
+    },
+    [endTutorial, closeProject]
+  );
+
   const selectInAppTutorial = React.useCallback(
     (tutorialId: string) => {
       const userProgress = preferences.getTutorialProgress({
@@ -3108,7 +3121,7 @@ const MainFrame = (props: Props) => {
             ) {
               setQuitInAppTutorialDialogOpen(true);
             } else {
-              endTutorial();
+              doEndTutorial();
             }
           }}
           {...orchestratorProps}
@@ -3121,7 +3134,7 @@ const MainFrame = (props: Props) => {
           canEndTutorial={
             !!currentFileMetadata && !unsavedChanges.hasUnsavedChanges
           }
-          endTutorial={endTutorial}
+          endTutorial={doEndTutorial}
         />
       )}
     </div>

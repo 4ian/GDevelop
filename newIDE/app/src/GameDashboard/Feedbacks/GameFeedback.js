@@ -395,7 +395,9 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                       />
                     </LineStackLayout>
                   ) : (
-                    <Trans>You don't have any feedback for this game.</Trans>
+                    <Text>
+                      <Trans>You don't have any feedback for this game.</Trans>
+                    </Text>
                   )}
                 </>
               )}

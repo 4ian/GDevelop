@@ -76,9 +76,9 @@ export namespace PixiTileMapHelper {
     if (!pixiTileMap) return;
     pixiTileMap.clear();
 
-    const bgLayer = tileMap.getBackgroundLayer();
-    if (bgLayer) {
-      const texture = textureCache.getImage(bgLayer.resourceName);
+    const bgResourceName = tileMap.getBackgroundResourceName();
+    if (bgResourceName) {
+      const texture = textureCache.getImage(bgResourceName);
       pixiTileMap.tile(texture, 0, 0);
     }
 
@@ -110,6 +110,7 @@ export namespace PixiTileMapHelper {
         const tileHeight = tileLayer.tileMap.getTileHeight();
         const dimensionX = tileLayer.tileMap.getDimensionX();
         const dimensionY = tileLayer.tileMap.getDimensionY();
+        const alpha = tileLayer.getAlpha();
 
         for (let y = 0; y < dimensionY; y++) {
           for (let x = 0; x < dimensionX; x++) {
@@ -130,7 +131,7 @@ export namespace PixiTileMapHelper {
                 xPos,
                 yPos,
                 {
-                  alpha: tile.alpha,
+                  alpha,
                   rotate: tile.rotate,
                 }
               );

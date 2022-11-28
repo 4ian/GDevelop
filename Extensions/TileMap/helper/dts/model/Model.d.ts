@@ -16,7 +16,7 @@ export type EditableTile = {
  * This allows to support new file format with only a new parser.
  */
 export declare class EditableTileMap {
-    private _bgLayer;
+    private _backgroundResourceName?;
     private _layers;
     private _tileSet;
     /**
@@ -53,7 +53,10 @@ export declare class EditableTileMap {
      * @returns The new layer.
      */
     addTileLayer(id: integer): EditableTileMapLayer;
-    getBackgroundLayer(): EditableBackgroundLayer;
+    /**
+     * @returns The resource name of the background
+     */
+    getBackgroundResourceName(): string;
     /**
      * @returns The number of tile columns in the map.
      */
@@ -105,9 +108,8 @@ export declare class EditableTileMap {
     pointIsInsideTile(x: float, y: float, tag: string): boolean;
     /**
      * @param resourceName The name of the resource
-     * @returns The new layer.
      */
-    setBackgroundLayer(resourceName: string): EditableBackgroundLayer;
+    setBackgroundResourceName(resourceName: string): void;
 }
 /**
  * A tile map layer.
@@ -145,14 +147,6 @@ export declare class EditableObjectLayer extends AbstractEditableLayer {
     constructor(tileMap: EditableTileMap, id: integer);
     add(object: TileObject): void;
 }
-export declare class EditableBackgroundLayer extends AbstractEditableLayer {
-    readonly resourceName: string;
-    /**
-     * @param tileMap  The layer tile map.
-     * @param resourceName The name of the resource
-     */
-    constructor(tileMap: EditableTileMap, resourceName: string);
-}
 /**
  * A tile that is placed with pixel coordinates.
  */
@@ -179,6 +173,7 @@ export type TileObject = {
  */
 export declare class EditableTileMapLayer extends AbstractEditableLayer {
     private readonly _tiles;
+    private _alpha;
     /**
      * @param tileMap The layer tile map.
      * @param id The layer identifier.
@@ -190,6 +185,10 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
      * @param tile The tile.
      */
     addTile(x: integer, y: integer, tile: EditableTile): void;
+    /**
+     * The opacity (between 0-1) of the layer
+     */
+    getAlpha(): float;
     /**
      * The number of tile columns in the layer.
      */
@@ -241,6 +240,10 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
      * @param y The layer row.
      */
     removeTile(x: integer, y: integer): void;
+    /**
+     * @param alpha The opacity between 0-1
+     */
+    setAlpha(alpha: float): void;
     /**
      * @param x The layer column.
      * @param y The layer row.

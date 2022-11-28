@@ -20,7 +20,7 @@ export type EditableTile = {
  * This allows to support new file format with only a new parser.
  */
 export class EditableTileMap {
-  private _bgLayer: EditableBackgroundLayer | null;
+  private _backgroundResourceName?: string;
   private _layers: Array<AbstractEditableLayer>;
   private _tileSet: Map<integer, TileDefinition>;
   /**
@@ -84,8 +84,11 @@ export class EditableTileMap {
     return layer;
   }
 
-  getBackgroundLayer(): EditableBackgroundLayer {
-    return this._bgLayer;
+  /**
+   * @returns The resource name of the background
+   */
+  getBackgroundResourceName(): string {
+    return this._backgroundResourceName;
   }
 
   /**
@@ -185,11 +188,9 @@ export class EditableTileMap {
 
   /**
    * @param resourceName The name of the resource
-   * @returns The new layer.
    */
-  setBackgroundLayer(resourceName: string): EditableBackgroundLayer {
-    this._bgLayer = new EditableBackgroundLayer(this, resourceName);
-    return this._bgLayer;
+  setBackgroundResourceName(resourceName: string): void {
+    this._backgroundResourceName = resourceName;
   }
 }
 
@@ -248,19 +249,6 @@ export class EditableObjectLayer extends AbstractEditableLayer {
   }
 }
 
-export class EditableBackgroundLayer extends AbstractEditableLayer {
-  readonly resourceName: string;
-
-  /**
-   * @param tileMap  The layer tile map.
-   * @param resourceName The name of the resource
-   */
-  constructor(tileMap: EditableTileMap, resourceName: string) {
-    super(tileMap, -1);
-    this.resourceName = resourceName;
-  }
-}
-
 /**
  * A tile that is placed with pixel coordinates.
  */
@@ -288,6 +276,7 @@ export type TileObject = {
  */
 export class EditableTileMapLayer extends AbstractEditableLayer {
   private readonly _tiles: (EditableTile[] | undefined)[][];
+  private _alpha: float;
 
   /**
    * @param tileMap The layer tile map.
@@ -300,6 +289,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     for (let index = 0; index < this._tiles.length; index++) {
       this._tiles[index] = new Array(this.tileMap.getDimensionX());
     }
+    this._alpha = 1;
   }
 
   /**
@@ -318,6 +308,13 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     } else {
       this._tiles[y][x] = [tile];
     }
+  }
+
+  /**
+   * The opacity (between 0-1) of the layer
+   */
+  getAlpha(): float {
+    return this._alpha;
   }
 
   /**
@@ -410,6 +407,13 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    */
   removeTile(x: integer, y: integer): void {
     this._tiles[y][x] = undefined;
+  }
+
+  /**
+   * @param alpha The opacity between 0-1
+   */
+  setAlpha(alpha: float) {
+    this._alpha = alpha;
   }
 
   /**

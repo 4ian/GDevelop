@@ -627,6 +627,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         showAdditionalWorkInfoBar: true,
       });
     }
+    if (this.props.unsavedChanges)
+      this.props.unsavedChanges.triggerUnsavedChanges();
 
     this._addInstanceForNewObject(object.getName());
   };

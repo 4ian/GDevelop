@@ -14,9 +14,15 @@ type Props = {|
   project: ?gdProject,
   initialGameId: ?string,
   initialTab: ?GameDetailsTab,
+  onGameDetailsDialogClose: () => void,
 |};
 
-export const GamesList = ({ project, initialGameId, initialTab }: Props) => {
+export const GamesList = ({
+  project,
+  initialGameId,
+  initialTab,
+  onGameDetailsDialogClose,
+}: Props) => {
   const [error, setError] = React.useState<?Error>(null);
   const [games, setGames] = React.useState<?Array<Game>>(null);
   const {
@@ -118,6 +124,7 @@ export const GamesList = ({ project, initialGameId, initialTab }: Props) => {
           initialTab={openedGameInitialTab}
           onClose={() => {
             setOpenedGame(null);
+            onGameDetailsDialogClose();
           }}
           onGameUpdated={updatedGame => {
             setGames(

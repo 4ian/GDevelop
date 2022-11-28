@@ -64,11 +64,11 @@ export namespace LDtkTileMapLoader {
 
     for (let iLayer = level.layerInstances.length - 1; iLayer >= 0; --iLayer) {
       const layer = level.layerInstances[iLayer];
-      const alpha = layer.__opacity;
       const gridSize = layer.__gridSize;
       const tilesetId = layer.__tilesetDefUid;
 
       const editableTileLayer = editableTileMap.addTileLayer(iLayer);
+      editableTileLayer.setAlpha(layer.__opacity);
       editableTileLayer.setVisible(layer.visible);
 
       for (const tile of [...layer.autoLayerTiles, ...layer.gridTiles]) {
@@ -78,7 +78,6 @@ export namespace LDtkTileMapLoader {
 
         editableTileLayer.addTile(x, y, {
           tileId,
-          alpha,
           rotate: getPixiRotateFromLDtk(tile.f),
           flippedDiagonally: tile.f === 3,
           flippedHorizontally: tile.f === 1,

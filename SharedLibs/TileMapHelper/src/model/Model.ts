@@ -2,7 +2,6 @@ import { PolygonVertices, integer, float } from "../types/commons";
 
 export type EditableTile = {
   tileId: integer;
-  alpha: float;
   // PIXI Rotate
   rotate: integer;
   // Flags use by collision mask

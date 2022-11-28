@@ -1,7 +1,6 @@
 import { PolygonVertices, integer, float } from "../types/commons";
 export type EditableTile = {
     tileId: integer;
-    alpha: float;
     rotate: integer;
     flippedHorizontally: boolean;
     flippedVertically: boolean;

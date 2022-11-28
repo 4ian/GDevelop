@@ -84,7 +84,6 @@ export function decodeTiledGUI(data: integer): EditableTile | null {
 
   return {
     tileId,
-    alpha: 1,
     rotate: getPixiRotate(
       flippedHorizontally,
       flippedVertically,

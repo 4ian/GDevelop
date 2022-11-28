@@ -257,6 +257,18 @@
         }
       }
     },
+    "linear-progress": {
+      "color": {
+        "complete": {
+          "value": "#16CF89",
+          "comment": "Palette/Green/50"
+        },
+        "incomplete": {
+          "value": "#FFA929",
+          "comment": "Palette/Yellow/50"
+        }
+      }
+    },
     "tabs": {
       "text-color": {
         "value": "#7F7F85",

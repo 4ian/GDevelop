@@ -43,6 +43,7 @@ const CreateProfile = ({
         <LargeSpacer />
         <ResponsiveLineStackLayout justifyContent="center" noMargin>
           <RaisedButton
+            id="create-account-button"
             label={<Trans>Create my account</Trans>}
             onClick={onCreateAccount}
             primary

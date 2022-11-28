@@ -2,75 +2,105 @@
 import * as React from 'react';
 import InAppTutorialContext, {
   type InAppTutorial,
-  type EditorIdentifier,
 } from './InAppTutorialContext';
-import InAppTutorialOrchestrator, {
-  type InAppTutorialOrchestratorInterface,
-} from './InAppTutorialOrchestrator';
 import onboardingTutorial from './Tutorials/OnboardingTutorial';
+import { setCurrentlyRunningInAppTutorial } from '../Utils/Analytics/EventSender';
+import {
+  fetchInAppTutorial,
+  fetchInAppTutorialShortHeaders,
+  type InAppTutorialShortHeader,
+} from '../Utils/GDevelopServices/InAppTutorial';
 
 type Props = {| children: React.Node |};
 
-export let currentlyRunningInAppTutorial = false;
+export const FLING_GAME_IN_APP_TUTORIAL_ID = 'flingGame';
 
 const InAppTutorialProvider = (props: Props) => {
+  const [tutorial, setTutorial] = React.useState<InAppTutorial | null>(null);
+  const [fetchingError, setFetchingError] = React.useState<string | null>(null);
+  const [startStepIndex, setStartStepIndex] = React.useState<number>(0);
+  const [startProjectData, setStartProjectData] = React.useState<{
+    [key: string]: string,
+  }>({});
   const [
-    isInAppTutorialRunning,
-    setIsInAppTutorialRunning,
-  ] = React.useState<boolean>(false);
-  const [tutorial, setTutorial] = React.useState<?InAppTutorial>(null);
-  const [project, setProject] = React.useState<?gdProject>(null);
-  const [
-    currentEditor,
-    setCurrentEditor,
-  ] = React.useState<EditorIdentifier | null>(null);
-  const orchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
-    null
-  );
+    inAppTutorialShortHeaders,
+    setInAppTutorialShortHeaders,
+  ] = React.useState<?Array<InAppTutorialShortHeader>>(null);
 
-  const startTutorial = (tutorialId: string) => {
+  const startTutorial = async ({
+    tutorialId,
+    initialStepIndex,
+    initialProjectData,
+  }: {|
+    tutorialId: string,
+    initialStepIndex: number,
+    initialProjectData: { [key: string]: string },
+  |}) => {
     if (tutorialId === onboardingTutorial.id) {
+      setStartStepIndex(initialStepIndex);
+      setStartProjectData(initialProjectData);
       setTutorial(onboardingTutorial);
-      currentlyRunningInAppTutorial = tutorialId;
-      setIsInAppTutorialRunning(true);
+      setCurrentlyRunningInAppTutorial(tutorialId);
+      return;
     }
-  };
 
-  const onPreviewLaunch = () => {
-    if (orchestratorRef.current) orchestratorRef.current.onPreviewLaunch();
-  };
+    if (!inAppTutorialShortHeaders) return;
 
-  const goToNextStep = () => {
-    if (orchestratorRef.current) orchestratorRef.current.goToNextStep();
+    const inAppTutorialShortHeader = inAppTutorialShortHeaders.find(
+      shortHeader => shortHeader.id === tutorialId
+    );
+
+    if (!inAppTutorialShortHeader) return;
+
+    const inAppTutorial = await fetchInAppTutorial(inAppTutorialShortHeader);
+    setStartStepIndex(initialStepIndex);
+    setStartProjectData(initialProjectData);
+    setTutorial(inAppTutorial);
+    setCurrentlyRunningInAppTutorial(tutorialId);
   };
 
   const endTutorial = () => {
-    currentlyRunningInAppTutorial = null;
-    setIsInAppTutorialRunning(false);
+    setTutorial(null);
+    setCurrentlyRunningInAppTutorial(null);
   };
+
+  const loadInAppTutorials = React.useCallback(async () => {
+    setFetchingError(null);
+    try {
+      const fetchedInAppTutorialShortHeaders = await fetchInAppTutorialShortHeaders();
+      setInAppTutorialShortHeaders(fetchedInAppTutorialShortHeaders);
+    } catch (error) {
+      console.error('An error occurred when fetching in app tutorials:', error);
+      setFetchingError('fetching-error');
+    }
+  }, []);
+
+  // Preload the in-app tutorial short headers when the app loads.
+  React.useEffect(
+    () => {
+      const timeoutId = setTimeout(() => {
+        console.info('Pre-fetching in-app tutorials...');
+        loadInAppTutorials();
+      }, 1000);
+      return () => clearTimeout(timeoutId);
+    },
+    [loadInAppTutorials]
+  );
 
   return (
     <InAppTutorialContext.Provider
       value={{
-        flow: null,
-        setProject,
-        setCurrentEditor,
-        goToNextStep,
-        onPreviewLaunch,
-        isInAppTutorialRunning,
+        inAppTutorialShortHeaders,
+        currentlyRunningInAppTutorial: tutorial,
         startTutorial,
+        startProjectData,
+        endTutorial,
+        startStepIndex,
+        inAppTutorialsFetchingError: fetchingError,
+        fetchInAppTutorials: loadInAppTutorials,
       }}
     >
       {props.children}
-      {tutorial && isInAppTutorialRunning && (
-        <InAppTutorialOrchestrator
-          ref={orchestratorRef}
-          tutorial={tutorial}
-          endTutorial={endTutorial}
-          project={project}
-          currentEditor={currentEditor}
-        />
-      )}
     </InAppTutorialContext.Provider>
   );
 };

@@ -131,13 +131,11 @@ namespace gdjs {
             return;
           }
           this._tileMapManager.getOrLoadTextureCache(
-            (textureName) =>
-              (this.getInstanceContainer()
-                .getGame()
-                .getImageManager()
-                .getPIXITexture(textureName) as unknown) as PIXI.BaseTexture<
-                PIXI.Resource
-              >,
+            (textureName) => {
+              const game = this.getInstanceContainer().getGame();
+              const mappedName = game.resolveEmbeddedResource(this._tilemapJsonFile, textureName);
+              return (game.getImageManager().getPIXITexture(mappedName) as unknown) as PIXI.BaseTexture<PIXI.Resource>;
+            },
             this._tilemapAtlasImage,
             this._tilemapJsonFile,
             this._tilesetJsonFile,

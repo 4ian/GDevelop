@@ -123,7 +123,6 @@ export namespace PixiTileMapHelper {
             for (const tile of tiles) {
               const tileTexture = textureCache.getTexture(tile.tileId);
               if (!tileTexture) {
-                console.warn(`Unknown tile id: ${tile.tileId} at (${x}, ${y})`);
                 continue;
               }
               const pixiTilemapFrame = pixiTileMap.tile(

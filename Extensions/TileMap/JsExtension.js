@@ -1112,6 +1112,10 @@ module.exports = {
         .get('displayMode')
         .getValue();
 
+      const tilemapResource = this._project.getResourcesManager().getResource(tilemapJsonFile);
+      const metadata = tilemapResource.getMetadata() ? JSON.parse(tilemapResource.getMetadata()) : {};
+      const mapping = metadata.embeddedResourcesMapping || {};
+
       /** @type {TileMapHelper.TileMapManager} */
       const manager = TilemapHelper.TileMapManager.getManager(this._project);
       manager.getOrLoadTileMap(
@@ -1131,7 +1135,7 @@ module.exports = {
           const textureCache = manager.getOrLoadTextureCache(
             this._loadTileMapWithCallback.bind(this),
             (textureName) =>
-              this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
+              this._pixiResourcesLoader.getPIXITexture(this._project, mapping[textureName] || textureName),
             tilemapAtlasImage,
             tilemapJsonFile,
             tilesetJsonFile,

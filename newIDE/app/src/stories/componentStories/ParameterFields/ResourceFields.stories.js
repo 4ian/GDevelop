@@ -17,7 +17,7 @@ import VideoResourceField from '../../../EventsSheet/ParameterFields/VideoResour
 import BitmapFontResourceField from '../../../EventsSheet/ParameterFields/BitmapFontResourceField';
 import FontResourceField from '../../../EventsSheet/ParameterFields/FontResourceField';
 import JsonResourceField from '../../../EventsSheet/ParameterFields/JsonResourceField';
-import TilemapResourceField from '../../../EventsSheet/ParameterFields/TilemapResourceField'
+import TilemapResourceField from '../../../EventsSheet/ParameterFields/TilemapResourceField';
 
 const gd: libGDevelop = global.gd;
 

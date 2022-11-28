@@ -200,6 +200,7 @@ const InnerDialog = (props: InnerDialogProps) => {
                     notifyOfChange();
                   }
                 }}
+                ref={field => field && field.focus()} // Focus the name when the dialog is opened.
               />
             </Column>
           </Line>

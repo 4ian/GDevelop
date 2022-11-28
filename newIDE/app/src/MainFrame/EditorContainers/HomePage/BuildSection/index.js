@@ -152,7 +152,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
 
     // Search "activate cloud projects" in the codebase for everything to
     // remove once cloud projects are activated for the desktop app.
-    const supportsCloudProjects = Window.isDev();
+    const supportsCloudProjects = !electron || Window.isDev();
 
     const iconClasses = useStylesForListItemIcon();
 

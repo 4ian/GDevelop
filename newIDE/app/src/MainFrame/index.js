@@ -133,7 +133,7 @@ import {
   TRIVIAL_FIRST_PREVIEW,
 } from '../Utils/GDevelopServices/Badge';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import StartTutorialDialog from './InAppTutorial/StartTutorialDialog';
+import StartInAppTutorialDialog from './InAppTutorial/StartInAppTutorialDialog';
 import LeaderboardProvider from '../Leaderboard/LeaderboardProvider';
 import {
   sendInAppTutorialStarted,
@@ -3077,7 +3077,7 @@ const MainFrame = (props: Props) => {
       />
       <ChangelogDialogContainer />
       {selectedInAppTutorialInfo && (
-        <StartTutorialDialog
+        <StartInAppTutorialDialog
           open
           tutorialCompletionStatus={
             !selectedInAppTutorialInfo.userProgress

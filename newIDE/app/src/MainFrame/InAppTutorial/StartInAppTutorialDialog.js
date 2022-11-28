@@ -22,7 +22,7 @@ type Props = {|
   startTutorial: (scenario: 'resume' | 'startOver' | 'start') => Promise<void>,
 |};
 
-const StartTutorialDialog = ({
+const StartInAppTutorialDialog = ({
   open,
   onClose,
   tutorialCompletionStatus,
@@ -128,4 +128,4 @@ const StartTutorialDialog = ({
   );
 };
 
-export default StartTutorialDialog;
+export default StartInAppTutorialDialog;

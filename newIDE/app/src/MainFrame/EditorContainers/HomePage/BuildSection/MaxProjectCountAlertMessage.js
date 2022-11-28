@@ -9,6 +9,8 @@ import { Line, Column } from '../../../../UI/Grid';
 import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
 import { type AuthenticatedUser } from '../../../../Profile/AuthenticatedUserContext';
 import Window from '../../../../Utils/Window';
+import optionalRequire from '../../../../Utils/OptionalRequire';
+const electron = optionalRequire('electron');
 
 type Props = {|
   onUpgrade: () => void,
@@ -17,7 +19,7 @@ type Props = {|
 
 // Search "activate cloud projects" in the codebase for everything to
 // remove once cloud projects are activated for the desktop app.
-const supportsCloudProjects = Window.isDev();
+const supportsCloudProjects = !electron || Window.isDev();
 
 export const checkIfHasTooManyCloudProjects = (
   authenticatedUser: AuthenticatedUser

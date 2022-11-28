@@ -23,14 +23,9 @@ const ImageResourceField = React.forwardRef<
     focus,
   }));
 
-  if (
-    !props.resourceSources ||
-    !props.onChooseResource ||
-    !props.resourceExternalEditors ||
-    !props.project
-  ) {
+  if (!props.resourceManagementProps || !props.project) {
     console.error(
-      'Missing project, resourceSources, onChooseResource or resourceExternalEditors for ImageResourceField'
+      'Missing project or resourceManagementProps for ImageResourceField'
     );
     return null;
   }
@@ -39,9 +34,7 @@ const ImageResourceField = React.forwardRef<
     <ResourceSelector
       margin={props.isInline ? 'none' : 'dense'}
       project={props.project}
-      resourceSources={props.resourceSources}
-      onChooseResource={props.onChooseResource}
-      resourceExternalEditors={props.resourceExternalEditors}
+      resourceManagementProps={props.resourceManagementProps}
       resourcesLoader={ResourcesLoader}
       resourceKind="image"
       fullWidth

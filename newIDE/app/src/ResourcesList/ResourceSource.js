@@ -5,6 +5,8 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { t } from '@lingui/macro';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { listTileMapEmbeddedFiles } from './EmbeddedResourceSources';
+import { type ResourceExternalEditor } from './ResourceExternalEditor.flow';
+import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 
 const gd: libGDevelop = global.gd;
 
@@ -103,6 +105,7 @@ export type ResourceSource = {
   name: string,
   displayName: MessageDescriptor,
   displayTab: 'standalone' | 'import' | 'import-advanced',
+  onlyForStorageProvider?: ?string,
   kind: ResourceKind,
   selectResourcesHeadless?: ?(
     ChooseResourceProps
@@ -113,3 +116,11 @@ export type ResourceSource = {
 export type ChooseResourceFunction = (
   options: ChooseResourceOptions
 ) => Promise<Array<gdResource>>;
+
+export type ResourceManagementProps = {|
+  resourceSources: Array<ResourceSource>,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
+  onChooseResource: ChooseResourceFunction,
+  getStorageProvider: () => StorageProvider,
+  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
+|};

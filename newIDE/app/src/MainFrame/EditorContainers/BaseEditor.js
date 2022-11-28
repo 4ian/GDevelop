@@ -1,17 +1,12 @@
 // @flow
 import * as React from 'react';
 import { type UnsavedChanges } from '../UnsavedChangesContext';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource';
+import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import type { StorageProvider } from '../../ProjectsStorage';
 import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
-import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
-import { type OnFetchNewlyAddedResourcesFunction } from '../../ProjectsStorage/ResourceFetcher';
 
 export type EditorContainerExtraProps = {|
   // Events function extension editor
@@ -32,10 +27,7 @@ export type RenderEditorContainerProps = {|
   extraEditorProps: ?EditorContainerExtraProps,
 
   // Resources:
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
-  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
+  resourceManagementProps: ResourceManagementProps,
 
   unsavedChanges: ?UnsavedChanges,
 
@@ -79,7 +71,6 @@ export type RenderEditorContainerProps = {|
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   onOpenOnboardingDialog: () => void,
-  onChangeSubscription: () => void,
   onOpenProfile: () => void,
   onOpenPreferences: () => void,
   onOpenAbout: () => void,
@@ -94,7 +85,7 @@ export type RenderEditorContainerProps = {|
   canInstallPrivateAsset: () => boolean,
 
   // Project creation
-  onOpenProjectPreCreationDialog: (?ExampleShortHeader) => void,
+  onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

@@ -50,8 +50,7 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
         setToolbar={this.props.setToolbar}
         onDeleteResource={this.props.onDeleteResource}
         onRenameResource={this.props.onRenameResource}
-        resourceSources={this.props.resourceSources}
-        onChooseResource={this.props.onChooseResource}
+        resourceManagementProps={this.props.resourceManagementProps}
         ref={editor => (this.editor = editor)}
         project={project}
       />

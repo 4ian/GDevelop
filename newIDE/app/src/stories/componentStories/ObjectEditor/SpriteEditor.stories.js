@@ -1,7 +1,6 @@
 // @flow
 
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -12,6 +11,7 @@ import SpriteEditor from '../../../ObjectEditor/Editors/SpriteEditor';
 import CollisionMasksEditor from '../../../ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import ResourcesLoader from '../../../ResourcesLoader';
@@ -29,11 +29,13 @@ export const Default = () => (
       <SpriteEditor
         objectConfiguration={testProject.spriteObjectConfiguration}
         project={testProject.project}
-        resourceSources={[]}
-        onChooseResource={source =>
-          action('Choose resource from source', source)
-        }
-        resourceExternalEditors={fakeResourceExternalEditors}
+        resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
+          onFetchNewlyAddedResources: async () => {},
+          resourceSources: [],
+          onChooseResource: () => Promise.reject('Unimplemented'),
+          resourceExternalEditors: fakeResourceExternalEditors,
+        }}
         onSizeUpdated={() => {}}
         objectName="FakeObjectName"
       />

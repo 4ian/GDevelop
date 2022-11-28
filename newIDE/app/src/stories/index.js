@@ -38,7 +38,6 @@ import ExternalPropertiesDialog from '../MainFrame/EditorContainers/ExternalProp
 import muiDecorator from './ThemeDecorator';
 import paperDecorator from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
-import RefGetter from './RefGetter';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/ParameterRenderingService';
@@ -66,10 +65,9 @@ import {
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
 import consoleTestData from '../fixtures/ConsoleTestData';
-import SubscriptionDetails from '../Profile/SubscriptionDetails';
-import SubscriptionDialog from '../Profile/SubscriptionDialog';
+import SubscriptionDetails from '../Profile/Subscription/SubscriptionDetails';
+import SubscriptionDialog from '../Profile/Subscription/SubscriptionDialog';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
 import DebuggerContent from '../Debugger/DebuggerContent';
 import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
 import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
@@ -96,7 +94,7 @@ import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/Instru
 import InstructionEditorDialog from '../EventsSheet/InstructionEditor/InstructionEditorDialog';
 import InstructionEditorMenu from '../EventsSheet/InstructionEditor/InstructionEditorMenu';
 import { PopoverButton } from './PopoverButton';
-import SubscriptionPendingDialog from '../Profile/SubscriptionPendingDialog';
+import SubscriptionPendingDialog from '../Profile/Subscription/SubscriptionPendingDialog';
 import EmailVerificationPendingDialog from '../Profile/EmailVerificationPendingDialog';
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
@@ -152,6 +150,8 @@ import {
   ExamplesAccordion,
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
+import subscriptionSuggestionDecorator from './SubscriptionSuggestionDecorator';
+import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 
 configureActions({
   depth: 2,
@@ -1433,7 +1433,22 @@ storiesOf('PropertiesEditor', module)
           disabled: true,
           getValue: instance => 'Disabled field',
           setValue: (instance, newValue) => {},
-          onEditButtonClick: instance => action('edit button clicked'),
+        },
+        {
+          name: 'Some field with edit buttons',
+          valueType: 'string',
+          getValue: instance => 'Click to test',
+          setValue: (instance, newValue) => {},
+          onEditButtonBuildMenuTemplate: () => [
+            {
+              label: 'Option 1',
+              click: action('Option 1'),
+            },
+            {
+              label: 'Option 2',
+              click: action('Option 2'),
+            },
+          ],
         },
         {
           name: 'Position',
@@ -1484,9 +1499,24 @@ storiesOf('PropertiesEditor', module)
           disabled: true,
           getValue: instance => 'Disabled field',
           setValue: (instance, newValue) => {},
-          onEditButtonClick: instance => action('edit button clicked'),
           getDescription: () =>
             'This is a description. It can be fairly long and even have some *Markdown*, including [links](http://example.com).',
+        },
+        {
+          name: 'Some field with edit buttons',
+          valueType: 'string',
+          getValue: instance => 'Click to test',
+          setValue: (instance, newValue) => {},
+          onEditButtonBuildMenuTemplate: () => [
+            {
+              label: 'Option 1',
+              click: action('Option 1'),
+            },
+            {
+              label: 'Option 2',
+              click: action('Option 2'),
+            },
+          ],
         },
         {
           name: 'Position',
@@ -2419,12 +2449,16 @@ storiesOf('InstructionEditorDialog', module)
       isCondition
       isNewInstruction={false}
       instruction={testProject.testInstruction}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceExternalEditors: fakeResourceExternalEditors,
+        onChooseResource: () => {
+          action('onChooseResource');
+          return Promise.reject();
+        },
+        resourceSources: [],
       }}
-      resourceSources={[]}
       openInstructionOrExpression={action('open instruction or expression')}
       onCancel={action('cancel')}
       onSubmit={action('submit')}
@@ -2442,12 +2476,16 @@ storiesOf('InstructionEditorDialog', module)
       isCondition
       isNewInstruction={false}
       instruction={testProject.testInstruction}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceExternalEditors: fakeResourceExternalEditors,
+        onChooseResource: () => {
+          action('onChooseResource');
+          return Promise.reject();
+        },
+        resourceSources: [],
       }}
-      resourceSources={[]}
       openInstructionOrExpression={action('open instruction or expression')}
       onCancel={action('cancel')}
       onSubmit={action('submit')}
@@ -2472,12 +2510,16 @@ storiesOf('InstructionEditorDialog', module)
         isCondition
         isNewInstruction={true}
         instruction={testProject.testInstruction}
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onChooseResource={() => {
-          action('onChooseResource');
-          return Promise.reject();
+        resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
+          onFetchNewlyAddedResources: async () => {},
+          resourceExternalEditors: fakeResourceExternalEditors,
+          onChooseResource: () => {
+            action('onChooseResource');
+            return Promise.reject();
+          },
+          resourceSources: [],
         }}
-        resourceSources={[]}
         openInstructionOrExpression={action('open instruction or expression')}
         onCancel={action('cancel')}
         onSubmit={action('submit')}
@@ -2509,12 +2551,13 @@ storiesOf('InstructionEditorMenu', module)
             isCondition
             isNewInstruction={false}
             instruction={testProject.testInstruction}
-            resourceExternalEditors={fakeResourceExternalEditors}
-            onChooseResource={() => {
-              action('onChooseResource');
-              return Promise.reject();
+            resourceManagementProps={{
+              getStorageProvider: () => emptyStorageProvider,
+              onFetchNewlyAddedResources: async () => {},
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
             }}
-            resourceSources={[]}
             openInstructionOrExpression={action(
               'open instruction or expression'
             )}
@@ -2630,27 +2673,28 @@ storiesOf('Profile/CreateProfile', module)
   ));
 
 storiesOf('CurrentUsageDisplayer', module)
+  .addDecorator(subscriptionSuggestionDecorator)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <CurrentUsageDisplayer
       subscription={subscriptionForIndieUser}
       currentUsage={limitsForIndieUser.limits['cordova-build']}
-      onChangeSubscription={action('change subscription')}
+      onChangeSubscription={action('on change subscription callback')}
     />
   ))
   .add('limit reached', () => (
     <CurrentUsageDisplayer
       subscription={subscriptionForIndieUser}
       currentUsage={limitsReached.limits['cordova-build']}
-      onChangeSubscription={action('change subscription')}
+      onChangeSubscription={action('on change subscription callback')}
     />
   ))
   .add('limit reached without subscription', () => (
     <CurrentUsageDisplayer
       subscription={noSubscription}
       currentUsage={limitsReached.limits['cordova-build']}
-      onChangeSubscription={action('change subscription')}
+      onChangeSubscription={action('on change subscription callback')}
     />
   ));
 
@@ -2672,13 +2716,13 @@ storiesOf('AuthenticatedUserProfileDetails', module)
     />
   ));
 
-storiesOf('SubscriptionDetails', module)
+storiesOf('Subscription/SubscriptionDetails', module)
+  .addDecorator(subscriptionSuggestionDecorator)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <SubscriptionDetails
       subscription={subscriptionForIndieUser}
-      onChangeSubscription={action('change subscription')}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
     />
@@ -2686,7 +2730,6 @@ storiesOf('SubscriptionDetails', module)
   .add('no subscription', () => (
     <SubscriptionDetails
       subscription={noSubscription}
-      onChangeSubscription={action('change subscription')}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
     />
@@ -2694,43 +2737,58 @@ storiesOf('SubscriptionDetails', module)
   .add('loading manage subscription', () => (
     <SubscriptionDetails
       subscription={subscriptionForIndieUser}
-      onChangeSubscription={action('change subscription')}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={true}
     />
   ));
 
-storiesOf('SubscriptionDialog', module)
+storiesOf('Subscription/SubscriptionDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('not authenticated', () => (
     <AuthenticatedUserContext.Provider
       value={fakeNotAuthenticatedAuthenticatedUser}
     >
-      <SubscriptionDialog open onClose={action('on close')} />
+      <SubscriptionDialog
+        open
+        onClose={action('on close')}
+        analyticsMetadata={{ reason: 'Debugger' }}
+      />
     </AuthenticatedUserContext.Provider>
   ))
   .add('authenticated but loading', () => (
     <AuthenticatedUserContext.Provider
       value={fakeAuthenticatedButLoadingAuthenticatedUser}
     >
-      <SubscriptionDialog open onClose={action('on close')} />
+      <SubscriptionDialog
+        open
+        onClose={action('on close')}
+        analyticsMetadata={{ reason: 'Debugger' }}
+      />
     </AuthenticatedUserContext.Provider>
   ))
   .add('authenticated user with subscription', () => (
     <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-      <SubscriptionDialog open onClose={action('on close')} />
+      <SubscriptionDialog
+        open
+        onClose={action('on close')}
+        analyticsMetadata={{ reason: 'Debugger' }}
+      />
     </AuthenticatedUserContext.Provider>
   ))
   .add('authenticated user with no subscription', () => (
     <AuthenticatedUserContext.Provider
       value={fakeNoSubscriptionAuthenticatedUser}
     >
-      <SubscriptionDialog open onClose={action('on close')} />
+      <SubscriptionDialog
+        open
+        onClose={action('on close')}
+        analyticsMetadata={{ reason: 'Debugger' }}
+      />
     </AuthenticatedUserContext.Provider>
   ));
 
-storiesOf('SubscriptionPendingDialog', module)
+storiesOf('Subscription/SubscriptionPendingDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default (no subscription)', () => (
@@ -2845,31 +2903,6 @@ storiesOf('BrowserPreviewErrorDialog', module)
     />
   ));
 
-storiesOf('SubscriptionCheckDialog', module)
-  .addDecorator(muiDecorator)
-  .add('default (try mode)', () => (
-    <RefGetter onRef={ref => ref.checkHasSubscription()}>
-      <SubscriptionCheckDialog
-        title="Preview over wifi"
-        id="Preview over wifi"
-        authenticatedUser={fakeNoSubscriptionAuthenticatedUser}
-        onChangeSubscription={action('change subscription')}
-        mode="try"
-      />
-    </RefGetter>
-  ))
-  .add('default (mandatory mode)', () => (
-    <RefGetter onRef={ref => ref.checkHasSubscription()}>
-      <SubscriptionCheckDialog
-        title="Preview over wifi"
-        id="Preview over wifi"
-        authenticatedUser={fakeNoSubscriptionAuthenticatedUser}
-        onChangeSubscription={action('change subscription')}
-        mode="mandatory"
-      />
-    </RefGetter>
-  ));
-
 storiesOf('ProjectManager', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
@@ -2901,16 +2934,19 @@ storiesOf('ProjectManager', module)
       onOpenGamesDashboard={action('onOpenGamesDashboard')}
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
-      onChangeSubscription={action('onChangeSubscription')}
       eventsFunctionsExtensionsError={null}
       onReloadEventsFunctionsExtensions={action(
         'onReloadEventsFunctionsExtensions'
       )}
       freezeUpdate={false}
       hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
     />
   ))
   .add('Error in functions', () => (
@@ -2942,7 +2978,6 @@ storiesOf('ProjectManager', module)
       onOpenGamesDashboard={action('onOpenGamesDashboard')}
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
-      onChangeSubscription={action('onChangeSubscription')}
       eventsFunctionsExtensionsError={
         new Error('Fake error during code generation')
       }
@@ -2951,9 +2986,13 @@ storiesOf('ProjectManager', module)
       )}
       freezeUpdate={false}
       hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
     />
   ));
 
@@ -3121,10 +3160,13 @@ storiesOf('ProjectPropertiesDialog', module)
       onClose={action('onClose')}
       onApply={async () => true}
       onPropertiesApplied={action('onPropertiesApplied')}
-      onChangeSubscription={action('onChangeSubscription')}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
     />
   ));
 
@@ -3137,9 +3179,13 @@ storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
       onLoadingScreenUpdated={action('onLoadingscreenUpdated')}
       onChangeSubscription={action('onChangeSubscription')}
       project={testProject.project}
-      resourceSources={[]}
-      onChooseResource={() => Promise.reject('unimplemented')}
-      resourceExternalEditors={fakeResourceExternalEditors}
+      resourceManagementProps={{
+        getStorageProvider: () => emptyStorageProvider,
+        onFetchNewlyAddedResources: async () => {},
+        resourceSources: [],
+        onChooseResource: () => Promise.reject('Unimplemented'),
+        resourceExternalEditors: fakeResourceExternalEditors,
+      }}
     />
   ));
 

@@ -47,11 +47,7 @@ import ProjectManagerCommands from './ProjectManagerCommands';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import InstalledExtensionDetails from './InstalledExtensionDetails';
 import {
   Item,
@@ -102,7 +98,6 @@ type Props = {|
   onOpenGamesDashboard: () => void,
   onOpenResources: () => void,
   onOpenPlatformSpecificAssets: () => void,
-  onChangeSubscription: () => void,
   eventsFunctionsExtensionsError: ?Error,
   onReloadEventsFunctionsExtensions: () => void,
   freezeUpdate: boolean,
@@ -111,9 +106,7 @@ type Props = {|
   onInstallExtension: ExtensionShortHeader => void,
 
   // For resources:
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
 |};
 
 type State = {|
@@ -649,9 +642,6 @@ export default class ProjectManager extends React.Component<Props, State> {
       eventsFunctionsExtensionsError,
       onReloadEventsFunctionsExtensions,
       onInstallExtension,
-      resourceSources,
-      onChooseResource,
-      resourceExternalEditors,
     } = this.props;
     const {
       renamedItemKind,
@@ -1114,10 +1104,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 }
                 onApply={this.props.onSaveProjectProperties}
                 onPropertiesApplied={this._onProjectPropertiesApplied}
-                onChangeSubscription={this.props.onChangeSubscription}
-                resourceSources={this.props.resourceSources}
-                onChooseResource={this.props.onChooseResource}
-                resourceExternalEditors={this.props.resourceExternalEditors}
+                resourceManagementProps={this.props.resourceManagementProps}
                 hotReloadPreviewButtonProps={
                   this.props.hotReloadPreviewButtonProps
                 }
@@ -1140,9 +1127,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                   );
                   this._onOpenLayoutProperties(null);
                 }}
-                resourceSources={resourceSources}
-                resourceExternalEditors={resourceExternalEditors}
-                onChooseResource={onChooseResource}
+                resourceManagementProps={this.props.resourceManagementProps}
               />
             )}
             {!!this.state.editedVariablesLayout && (

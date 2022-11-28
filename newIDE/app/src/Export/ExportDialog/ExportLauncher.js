@@ -57,7 +57,7 @@ type Props = {|
 |};
 
 /**
- * A generic UI to launch, monitor the progres and get the result
+ * A generic UI to launch, monitor the progress and get the result
  * of an export.
  */
 export default class ExportLauncher extends Component<Props, State> {
@@ -273,6 +273,8 @@ export default class ExportLauncher extends Component<Props, State> {
         preparedExporter
       );
       setStep('resources-download');
+      // TODO: use a GenericRetryableProcessWithProgressDialog to show errors
+      // and allow to try again?
       const resourcesDownloadOutput = await exportPipeline.launchResourcesDownload(
         exportPipelineContext,
         exportOutput

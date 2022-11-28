@@ -90,11 +90,10 @@ const WrappedHomePage = ({
               onOpenHelpFinder={() => action('onOpenHelpFinder')()}
               onOpenLanguageDialog={() => action('open language dialog')()}
               onOpenOnboardingDialog={() => action('open onboarding dialog')()}
-              onOpenProjectPreCreationDialog={() =>
-                action('open precreation dialog')()
+              onOpenNewProjectSetupDialog={() =>
+                action('onOpenNewProjectSetupDialog')()
               }
               onOpenProfile={() => action('open profile')()}
-              onChangeSubscription={() => action('change subscription')()}
               onOpenPreferences={() => action('open preferences')()}
               onOpenAbout={() => action('open about')()}
             />

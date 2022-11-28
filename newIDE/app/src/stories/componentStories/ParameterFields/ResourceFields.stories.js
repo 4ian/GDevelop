@@ -9,6 +9,7 @@ import ValueStateHolder from '../../ValueStateHolder';
 
 import ParameterRenderingService from '../../../EventsSheet/ParameterRenderingService';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 import { Column, Line } from '../../../UI/Grid';
 
 import AudioResourceField from '../../../EventsSheet/ParameterFields/AudioResourceField';
@@ -35,9 +36,13 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              getStorageProvider: () => emptyStorageProvider,
+              onFetchNewlyAddedResources: async () => {},
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />
@@ -54,9 +59,13 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              getStorageProvider: () => emptyStorageProvider,
+              onFetchNewlyAddedResources: async () => {},
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />
@@ -73,9 +82,13 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              getStorageProvider: () => emptyStorageProvider,
+              onFetchNewlyAddedResources: async () => {},
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />
@@ -92,9 +105,13 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              getStorageProvider: () => emptyStorageProvider,
+              onFetchNewlyAddedResources: async () => {},
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />
@@ -111,9 +128,13 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              getStorageProvider: () => emptyStorageProvider,
+              onFetchNewlyAddedResources: async () => {},
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />
@@ -130,9 +151,13 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              getStorageProvider: () => emptyStorageProvider,
+              onFetchNewlyAddedResources: async () => {},
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />

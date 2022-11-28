@@ -29,7 +29,7 @@ import {
   type Game,
 } from '../Utils/GDevelopServices/Game';
 import Window from '../Utils/Window';
-import { type GamesDetailsTab } from './GameDetailsDialog';
+import { type GameDetailsTab } from './GameDetailsDialog';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import BackgroundText from '../UI/BackgroundText';
 import Card from '../UI/Card';
@@ -37,7 +37,7 @@ import Card from '../UI/Card';
 type Props = {|
   game: Game,
   isCurrentGame: boolean,
-  onOpenGameManager: (tab: GamesDetailsTab) => void,
+  onOpenGameManager: (tab: GameDetailsTab) => void,
   onUpdateGame: () => Promise<void>,
 |};
 

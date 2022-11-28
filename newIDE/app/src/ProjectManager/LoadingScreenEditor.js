@@ -1,7 +1,9 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
-import SubscriptionChecker from '../Profile/SubscriptionChecker';
+import SubscriptionChecker, {
+  type SubscriptionCheckerInterface,
+} from '../Profile/Subscription/SubscriptionChecker';
 import Checkbox from '../UI/Checkbox';
 import ColorField from '../UI/ColorField';
 import { I18n } from '@lingui/react';
@@ -14,11 +16,7 @@ import {
 } from '../Utils/ColorTransformer';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import Text from '../UI/Text';
@@ -26,13 +24,11 @@ import Text from '../UI/Text';
 type Props = {|
   loadingScreen: gdLoadingScreen,
   onLoadingScreenUpdated: () => void,
-  onChangeSubscription: () => void,
+  onChangeSubscription: () => Promise<void> | void,
 
   // For resources:
   project: gdProject,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
 |};
 
 export const LoadingScreenEditor = ({
@@ -40,11 +36,9 @@ export const LoadingScreenEditor = ({
   onLoadingScreenUpdated,
   onChangeSubscription,
   project,
-  resourceSources,
-  onChooseResource,
-  resourceExternalEditors,
+  resourceManagementProps,
 }: Props) => {
-  const subscriptionChecker = React.useRef<?SubscriptionChecker>(null);
+  const subscriptionChecker = React.useRef<?SubscriptionCheckerInterface>(null);
   const forceUpdate = useForceUpdate();
 
   const onUpdate = () => {
@@ -63,9 +57,7 @@ export const LoadingScreenEditor = ({
             <ResourceSelectorWithThumbnail
               floatingLabelText={<Trans>Background image</Trans>}
               project={project}
-              resourceSources={resourceSources}
-              onChooseResource={onChooseResource}
-              resourceExternalEditors={resourceExternalEditors}
+              resourceManagementProps={resourceManagementProps}
               resourceKind="image"
               resourceName={loadingScreen.getBackgroundImageResourceName()}
               onChange={newResourceName => {
@@ -128,7 +120,7 @@ export const LoadingScreenEditor = ({
               if (!checked) {
                 if (
                   subscriptionChecker.current &&
-                  !subscriptionChecker.current.checkHasSubscription()
+                  !subscriptionChecker.current.checkUserHasSubscription()
                 )
                   return;
               }

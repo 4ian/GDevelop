@@ -43,12 +43,11 @@ type Props = {|
   onOpenLanguageDialog: () => void,
   onOpenProfile: () => void,
   onOpenOnboardingDialog: () => void,
-  onChangeSubscription: () => void,
   onOpenPreferences: () => void,
   onOpenAbout: () => void,
 
   // Project creation
-  onOpenProjectPreCreationDialog: (?ExampleShortHeader) => void,
+  onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
 |};
 
 type HomePageEditorInterface = {|
@@ -65,7 +64,7 @@ export const HomePage = React.memo<Props>(
         canOpen,
         onChooseProject,
         onOpenRecentFile,
-        onOpenProjectPreCreationDialog,
+        onOpenNewProjectSetupDialog,
         onCreateProject,
         onOpenProjectManager,
         onOpenHelpFinder,
@@ -73,7 +72,6 @@ export const HomePage = React.memo<Props>(
         onOpenProfile,
         setToolbar,
         onOpenOnboardingDialog,
-        onChangeSubscription,
         onOpenPreferences,
         onOpenAbout,
         isActive,
@@ -186,8 +184,8 @@ export const HomePage = React.memo<Props>(
                         project={project}
                         canOpen={canOpen}
                         onChooseProject={onChooseProject}
-                        onOpenProjectPreCreationDialog={
-                          onOpenProjectPreCreationDialog
+                        onOpenNewProjectSetupDialog={
+                          onOpenNewProjectSetupDialog
                         }
                         onShowAllExamples={() =>
                           onCreateProject(/*exampleShortHeader=*/ null)
@@ -196,7 +194,6 @@ export const HomePage = React.memo<Props>(
                           onCreateProject(exampleShortHeader)
                         }
                         onOpenRecentFile={onOpenRecentFile}
-                        onChangeSubscription={onChangeSubscription}
                         storageProviders={storageProviders}
                       />
                     )}
@@ -239,13 +236,12 @@ export const renderHomePageContainer = (
     onChooseProject={props.onChooseProject}
     onOpenRecentFile={props.onOpenRecentFile}
     onCreateProject={props.onCreateProject}
-    onOpenProjectPreCreationDialog={props.onOpenProjectPreCreationDialog}
+    onOpenNewProjectSetupDialog={props.onOpenNewProjectSetupDialog}
     onOpenProjectManager={props.onOpenProjectManager}
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
     onOpenOnboardingDialog={props.onOpenOnboardingDialog}
-    onChangeSubscription={props.onChangeSubscription}
     onOpenPreferences={props.onOpenPreferences}
     onOpenAbout={props.onOpenAbout}
     storageProviders={

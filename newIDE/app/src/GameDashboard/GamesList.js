@@ -8,13 +8,21 @@ import { type Game, getGames } from '../Utils/GDevelopServices/Game';
 import { GameCard } from './GameCard';
 import { ColumnStackLayout } from '../UI/Layout';
 import { GameRegistration } from './GameRegistration';
-import { GameDetailsDialog, type GamesDetailsTab } from './GameDetailsDialog';
+import { GameDetailsDialog, type GameDetailsTab } from './GameDetailsDialog';
 
 type Props = {|
   project: ?gdProject,
+  initialGameId: ?string,
+  initialTab: ?GameDetailsTab,
+  onGameDetailsDialogClose: () => void,
 |};
 
-export const GamesList = (props: Props) => {
+export const GamesList = ({
+  project,
+  initialGameId,
+  initialTab,
+  onGameDetailsDialogClose,
+}: Props) => {
   const [error, setError] = React.useState<?Error>(null);
   const [games, setGames] = React.useState<?Array<Game>>(null);
   const {
@@ -26,7 +34,7 @@ export const GamesList = (props: Props) => {
   const [
     openedGameInitialTab,
     setOpenedGameInitialTab,
-  ] = React.useState<GamesDetailsTab>('details');
+  ] = React.useState<GameDetailsTab>(initialTab || 'details');
 
   const loadGames = React.useCallback(
     async () => {
@@ -36,12 +44,19 @@ export const GamesList = (props: Props) => {
         setError(null);
         const games = await getGames(getAuthorizationHeader, firebaseUser.uid);
         setGames(games);
+        // If a game id was passed, open it.
+        if (initialGameId) {
+          const game = games.find(game => game.id === initialGameId);
+          if (game) {
+            setOpenedGame(game);
+          }
+        }
       } catch (error) {
         console.error('Error while loading user games.', error);
         setError(error);
       }
     },
-    [authenticated, firebaseUser, getAuthorizationHeader]
+    [authenticated, firebaseUser, getAuthorizationHeader, initialGameId]
   );
 
   React.useEffect(
@@ -73,7 +88,7 @@ export const GamesList = (props: Props) => {
     return <PlaceholderLoader />;
   }
 
-  const projectUuid = props.project ? props.project.getProjectUuid() : null;
+  const projectUuid = project ? project.getProjectUuid() : null;
   const thisGame = games.find(game => !!projectUuid && game.id === projectUuid);
   const displayedGames = [
     thisGame,
@@ -83,19 +98,17 @@ export const GamesList = (props: Props) => {
   return (
     <ColumnStackLayout noMargin>
       <GameRegistration
-        project={props.project}
+        project={project}
         hideIfRegistered
         hideLoader
-        onGameRegistered={() => {
-          loadGames();
-        }}
+        onGameRegistered={loadGames}
       />
       {displayedGames.map(game => (
         <GameCard
           key={game.id}
           isCurrentGame={!!projectUuid && game.id === projectUuid}
           game={game}
-          onOpenGameManager={(tab: GamesDetailsTab) => {
+          onOpenGameManager={(tab: GameDetailsTab) => {
             setOpenedGameInitialTab(tab);
             setOpenedGame(game);
           }}
@@ -106,13 +119,12 @@ export const GamesList = (props: Props) => {
         <GameDetailsDialog
           game={openedGame}
           project={
-            !!projectUuid && openedGame.id === projectUuid
-              ? props.project
-              : null
+            !!projectUuid && openedGame.id === projectUuid ? project : null
           }
           initialTab={openedGameInitialTab}
           onClose={() => {
             setOpenedGame(null);
+            onGameDetailsDialogClose();
           }}
           onGameUpdated={updatedGame => {
             setGames(

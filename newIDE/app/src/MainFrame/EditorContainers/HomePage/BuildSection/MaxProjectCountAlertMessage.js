@@ -7,11 +7,33 @@ import RaisedButton from '../../../../UI/RaisedButton';
 import AlertMessage from '../../../../UI/AlertMessage';
 import { Line, Column } from '../../../../UI/Grid';
 import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
+import { type AuthenticatedUser } from '../../../../Profile/AuthenticatedUserContext';
+import Window from '../../../../Utils/Window';
+import optionalRequire from '../../../../Utils/OptionalRequire';
+const electron = optionalRequire('electron');
 
 type Props = {|
   onUpgrade: () => void,
   limits: Limits,
 |};
+
+// Search "activate cloud projects" in the codebase for everything to
+// remove once cloud projects are activated for the desktop app.
+const supportsCloudProjects = !electron || Window.isDev();
+
+export const checkIfHasTooManyCloudProjects = (
+  authenticatedUser: AuthenticatedUser
+) => {
+  if (!authenticatedUser.authenticated) return false;
+  if (!supportsCloudProjects) return false;
+
+  const { limits, cloudProjects } = authenticatedUser;
+
+  return limits && cloudProjects
+    ? cloudProjects.filter(cloudProject => !cloudProject.deletedAt).length >=
+        limits.capabilities.cloudProjects.maximumCount
+    : false;
+};
 
 export const MaxProjectCountAlertMessage = ({ onUpgrade, limits }: Props) => {
   const {
@@ -20,8 +42,8 @@ export const MaxProjectCountAlertMessage = ({ onUpgrade, limits }: Props) => {
   } = limits.capabilities.cloudProjects;
 
   return (
-    <Line>
-      <Column expand>
+    <Line noMargin>
+      <Column noMargin expand>
         <AlertMessage
           kind="warning"
           renderRightButton={

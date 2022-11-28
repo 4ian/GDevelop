@@ -45,7 +45,7 @@ type Props = {|
   onCommentUpdated: (comment: Comment) => void,
 |};
 
-const getRatings = (ratings: ?GameRatings) => {
+export const getRatings = (ratings: ?GameRatings) => {
   if (!ratings) return null;
   if (ratings.version === 1) {
     return [
@@ -102,7 +102,6 @@ const FeedbackCard = ({
         rawError: error,
         errorId: 'feedback-card-set-processed-error',
       });
-      throw new Error();
     }
   };
 

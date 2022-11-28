@@ -549,7 +549,9 @@ const MainFrame = (props: Props) => {
       initialGamesDashboardTab,
     },
     actions: {
-      openOnboardingDialog,
+      openOnboardingDialog: () => {
+        selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID);
+      },
       openProfileDialog,
     },
   });
@@ -2347,18 +2349,6 @@ const MainFrame = (props: Props) => {
       currentFileMetadata,
       openAllScenes,
     ]
-  );
-
-  React.useEffect(
-    () => {
-      if (initialDialog === 'subscription') {
-        openSubscriptionDialog(true);
-      }
-      if (initialDialog === 'onboarding') {
-        selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID);
-      }
-    },
-    [initialDialog, selectInAppTutorial]
   );
 
   const onChangeProjectName = async (newName: string): Promise<void> => {

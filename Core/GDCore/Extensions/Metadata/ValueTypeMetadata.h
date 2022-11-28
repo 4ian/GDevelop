@@ -192,6 +192,11 @@ class GD_CORE_API ValueTypeMetadata {
   static const gd::String numberType;
   static const gd::String stringType;
 
+  /**
+   * \brief Return the ValueType name from the property type.
+   */
+  static const gd::String &ConvertPropertyTypeToValueType(const gd::String &propertyType);
+
   /** \name Serialization
    */
   ///@{
@@ -212,6 +217,12 @@ class GD_CORE_API ValueTypeMetadata {
   bool optional;                        ///< True if the parameter is optional
   gd::String defaultValue;     ///< Used as a default value in editor or if an
                                ///< optional parameter is empty.
+
+  static const gd::String numberValueType;
+  static const gd::String booleanValueType;
+  static const gd::String colorValueType;
+  static const gd::String choiceValueType;
+  static const gd::String stringValueType;
 };
 
 }  // namespace gd

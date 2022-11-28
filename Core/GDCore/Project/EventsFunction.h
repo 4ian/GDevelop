@@ -145,6 +145,11 @@ class GD_CORE_API EventsFunction {
    */
   const gd::ValueTypeMetadata& GetExpressionType() const { return expressionType; }
 
+  /**
+   * \brief Get the type of the expression
+   */
+  gd::ValueTypeMetadata& GetExpressionType() { return expressionType; }
+
   enum FunctionType {
       Action,
       Condition,

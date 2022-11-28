@@ -193,7 +193,8 @@ class GD_CORE_API ValueTypeMetadata {
   static const gd::String stringType;
 
   /**
-   * \brief Return the ValueType name from the property type.
+   * \brief Return the ValueTypeMetadata name for a property type.
+   * \see gd::PropertyDescriptor
    */
   static const gd::String &ConvertPropertyTypeToValueType(const gd::String &propertyType);
 

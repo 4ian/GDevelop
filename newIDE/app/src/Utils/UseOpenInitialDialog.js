@@ -28,10 +28,6 @@ export const useOpenInitialDialog = ({ parameters, actions }: Props) => {
   // Put the initial info in a ref, so that we con change its value
   // and not rely on what stays in the parameters + prevent re-rendering.
   const initialDialogRef = React.useRef<?string>(parameters.initialDialog);
-  const initialGameIdRef = React.useRef<?string>(parameters.initialGameId);
-  const initialGamesDashboardTabRef = React.useRef<?string>(
-    parameters.initialGamesDashboardTab
-  );
   const [
     profileDialogInitialTab,
     setProfileDialogInitialTab,
@@ -69,30 +65,28 @@ export const useOpenInitialDialog = ({ parameters, actions }: Props) => {
     [actions]
   );
 
+  const cleanupAfterDialogOpened = () => {
+    Window.removeArguments(); // Remove the arguments from the URL for cleanup.
+    initialDialogRef.current = null; // Reset the initial dialog, to avoid opening it again.
+  };
+
   React.useEffect(
     () => {
       switch (initialDialogRef.current) {
         case 'subscription':
           openSubscriptionDialog({ reason: 'Landing dialog at opening' });
-          Window.removeArguments(); // Remove the arguments from the URL for cleanup.
-          initialDialogRef.current = null; // Reset the initial dialog, to avoid opening it again.
+          cleanupAfterDialogOpened();
           break;
         case 'onboarding':
           actions.openOnboardingDialog(true);
-          Window.removeArguments(); // Remove the arguments from the URL for cleanup.
-          initialDialogRef.current = null; // Reset the initial dialog, to avoid opening it again.
+          cleanupAfterDialogOpened();
           break;
         case 'games-dashboard':
           openGameDashboard({
-            gameId: initialGameIdRef.current,
-            tab: initialGamesDashboardTabRef.current,
+            gameId: parameters.initialGameId,
+            tab: parameters.initialGamesDashboardTab,
           });
-          // Ensure any arguments are removed from the URL to prevent
-          // triggering a reopen of the game on the next dashboard opening.
-          Window.removeArguments(); // Remove the arguments from the URL for cleanup.
-          initialDialogRef.current = null; // Reset the initial dialog and parameters, to avoid opening it again.
-          initialGameIdRef.current = null;
-          initialGamesDashboardTabRef.current = null;
+          cleanupAfterDialogOpened();
           break;
         default:
           break;
@@ -105,6 +99,8 @@ export const useOpenInitialDialog = ({ parameters, actions }: Props) => {
     profileDialogInitialTab,
     openProfileDialogWithTab,
     gamesDashboardInitialGameId,
+    setGamesDashboardInitialGameId,
     gamesDashboardInitialTab,
+    setGamesDashboardInitialTab,
   };
 };

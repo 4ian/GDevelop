@@ -512,7 +512,9 @@ const MainFrame = (props: Props) => {
     openProfileDialogWithTab,
     profileDialogInitialTab,
     gamesDashboardInitialGameId,
+    setGamesDashboardInitialGameId,
     gamesDashboardInitialTab,
+    setGamesDashboardInitialTab,
   } = useOpenInitialDialog({
     parameters: {
       initialDialog,
@@ -2803,9 +2805,16 @@ const MainFrame = (props: Props) => {
           currentProject={currentProject}
           initialTab={profileDialogInitialTab}
           open
-          onClose={() => openProfileDialog(false)}
+          onClose={() => {
+            openProfileDialog(false);
+          }}
           gamesDashboardInitialGameId={gamesDashboardInitialGameId}
           gamesDashboardInitialTab={gamesDashboardInitialTab}
+          onGameDetailsDialogClose={() => {
+            // On dialog close, reset any initial props.
+            setGamesDashboardInitialGameId(null);
+            setGamesDashboardInitialTab('details');
+          }}
         />
       )}
       {newProjectSetupDialogOpen && (

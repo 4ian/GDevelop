@@ -872,8 +872,9 @@ const InAppTutorialOrchestrator = React.forwardRef<
             {renderStepDisplayer(i18n)}
             {displayEndDialog && (
               <InAppTutorialDialog
+                isLastStep
                 dialogContent={endDialog}
-                onClose={() => {
+                endTutorial={() => {
                   setDisplayEndDialog(false);
                   endTutorial();
                 }}

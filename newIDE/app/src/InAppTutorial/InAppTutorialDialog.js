@@ -10,37 +10,70 @@ import Window from '../Utils/Window';
 import Link from '../UI/Link';
 import { ColumnStackLayout } from '../UI/Layout';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
+import FlatButton from '../UI/FlatButton';
+import { Line } from '../UI/Grid';
 
 type Props = {|
   dialogContent: InAppTutorialDialogType,
-  onClose: () => void,
+  endTutorial: () => void,
+  goToNextStep?: () => void,
+  isLastStep?: boolean,
 |};
 
-const styles = { imageLink: { cursor: 'pointer', maxWidth: 350 } };
+const styles = {
+  image: { maxWidth: 350 },
+  imageLink: { cursor: 'pointer', maxWidth: 350 },
+};
 
-function InAppTutorialDialog({ dialogContent, onClose }: Props) {
+function InAppTutorialDialog({
+  dialogContent,
+  endTutorial,
+  goToNextStep,
+  isLastStep,
+}: Props) {
+  const onApply = () => {
+    if (isLastStep) {
+      endTutorial();
+    } else if (goToNextStep) {
+      goToNextStep();
+    }
+  };
+
+  const actions = isLastStep
+    ? [
+        <DialogPrimaryButton
+          key="close"
+          onClick={onApply}
+          label={<Trans>Close</Trans>}
+        />,
+      ]
+    : [
+        <FlatButton
+          key="leave"
+          label={<Trans>Leave the tutorial</Trans>}
+          onClick={endTutorial}
+        />,
+        <DialogPrimaryButton
+          key="next"
+          onClick={onApply}
+          label={<Trans>Start next chapter</Trans>}
+        />,
+      ];
+
   return (
     <I18n>
       {({ i18n }) => (
         <Dialog
           title={null} // Specific end dialog where the title is handled by the content.
-          onApply={onClose}
+          onApply={onApply}
           open
-          actions={[
-            <DialogPrimaryButton
-              key="ok"
-              onClick={onClose}
-              label={<Trans>Close</Trans>}
-            />,
-          ]}
+          actions={actions}
           maxWidth="sm"
           flexColumnBody
-          flexBody
-          fullHeight
           cannotBeDismissed
         >
           <ColumnStackLayout noMargin>
-            {dialogContent.content.map(item => {
+            {dialogContent.content.map((item, index) => {
               if (item.messageDescriptor) {
                 return (
                   <MarkdownText
@@ -62,24 +95,29 @@ function InAppTutorialDialog({ dialogContent, onClose }: Props) {
                 const { linkHref, imageSource } = item.image;
                 if (linkHref) {
                   return (
-                    <Link
-                      key={linkHref}
-                      href={linkHref}
-                      onClick={() => Window.openExternalURL(linkHref)}
-                    >
+                    <Line justifyContent="center" key={`image-${index}`}>
+                      <Link
+                        href={linkHref}
+                        onClick={() => Window.openExternalURL(linkHref)}
+                      >
+                        <CorsAwareImage
+                          style={styles.imageLink}
+                          src={imageSource}
+                          alt="End of tutorial dialog image"
+                        />
+                      </Link>
+                    </Line>
+                  );
+                } else {
+                  return (
+                    <Line justifyContent="center" key={`image-${index}`}>
                       <CorsAwareImage
-                        style={styles.imageLink}
+                        style={styles.image}
                         src={imageSource}
                         alt="End of tutorial dialog image"
                       />
-                    </Link>
+                    </Line>
                   );
-                } else {
-                  <CorsAwareImage
-                    style={styles.imageLink}
-                    src={imageSource}
-                    alt="End of tutorial dialog image"
-                  />;
                 }
               }
               return null;

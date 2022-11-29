@@ -12,9 +12,14 @@ import { ResourceStore } from '../AssetStore/ResourceStore';
 import { isPathInProjectFolder, copyAllToProjectFolder } from './ResourceUtils';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
+import {
+  copyEmbeddedToProjectFolder,
+  mapEmbeddedFiles,
+} from './EmbeddedResourceSources';
 import { Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
 import { FileToCloudProjectResourceUploader } from './FileToCloudProjectResourceUploader';
+
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
 const path = optionalRequire('path');
@@ -54,7 +59,13 @@ const localResourceSources: Array<ResourceSource> = [
   // Have the local resource sources first, so they are used by default/shown first when
   // the project is saved locally.
   ...allResourceKindsAndMetadata.map(
-    ({ kind, displayName, fileExtensions, createNewResource }) => {
+    ({
+      kind,
+      displayName,
+      fileExtensions,
+      createNewResource,
+      listEmbeddedFiles,
+    }) => {
       const selectLocalFileResources = async ({
         i18n,
         getLastUsedPath,
@@ -85,11 +96,27 @@ const localResourceSources: Array<ResourceSource> = [
         const lastUsedPath = path.parse(filePaths[0]).dir;
         setLastUsedPath(project, kind, lastUsedPath);
 
-        const outsideProjectFolderPaths = filePaths.filter(
+        let outside = filePaths.some(
           path => !isPathInProjectFolder(project, path)
         );
 
-        if (outsideProjectFolderPaths.length) {
+        const embeddedFiles = new Map();
+        if (listEmbeddedFiles) {
+          for (const filePath of filePaths) {
+            const result = await listEmbeddedFiles(project, filePath);
+
+            if (result) {
+              embeddedFiles.set(filePath, result);
+
+              outside = outside || result.outside;
+            }
+          }
+        }
+        const hasEmbeddedFiles = embeddedFiles.size > 0;
+
+        const newToOldFilePaths = new Map();
+
+        if (outside) {
           const answer = Window.showConfirmDialog(
             i18n._(
               t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
@@ -97,15 +124,48 @@ const localResourceSources: Array<ResourceSource> = [
           );
 
           if (answer) {
-            filePaths = await copyAllToProjectFolder(project, filePaths);
+            filePaths = await copyAllToProjectFolder(
+              project,
+              filePaths,
+              newToOldFilePaths
+            );
+
+            if (hasEmbeddedFiles) {
+              await copyEmbeddedToProjectFolder(project, embeddedFiles);
+            }
+          }
+
+          if (hasEmbeddedFiles) {
+            mapEmbeddedFiles(project, embeddedFiles);
           }
         }
 
         return filePaths.map(filePath => {
           const newResource = createNewResource();
-          const projectPath = path.dirname(project.getProjectFile());
           newResource.setFile(path.relative(projectPath, filePath));
           newResource.setName(path.relative(projectPath, filePath));
+
+          if (hasEmbeddedFiles) {
+            let mapping;
+
+            if (newToOldFilePaths.has(filePath)) {
+              const oldFilePath = newToOldFilePaths.get(filePath);
+
+              if (embeddedFiles.has(oldFilePath)) {
+                mapping = embeddedFiles.get(oldFilePath).mapping;
+              }
+            } else if (embeddedFiles.has(filePath)) {
+              mapping = embeddedFiles.get(filePath).mapping;
+            }
+
+            if (mapping) {
+              newResource.setMetadata(
+                JSON.stringify({
+                  embeddedResourcesMapping: mapping,
+                })
+              );
+            }
+          }
 
           return newResource;
         });

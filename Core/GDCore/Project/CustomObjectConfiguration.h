@@ -68,7 +68,8 @@ class CustomObjectConfiguration : public gd::ObjectConfiguration {
                                      gd::Project& project,
                                      gd::Layout& scene) override;
 
-  void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
+  void ExposeResources(gd::ArbitraryResourceWorker& worker,
+                       gd::ResourcesManager* resourcesManager) override;
 
   gd::ObjectConfiguration &GetChildObjectConfiguration(const gd::String& objectName);
 

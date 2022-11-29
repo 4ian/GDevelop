@@ -12,6 +12,7 @@
 
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EffectsContainer.h"
+#include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/MakeUnique.h"
@@ -146,7 +147,8 @@ class GD_CORE_API ObjectConfiguration {
    *
    * \see ArbitraryResourceWorker
    */
-  virtual void ExposeResources(gd::ArbitraryResourceWorker& worker) { return; };
+  virtual void ExposeResources(gd::ArbitraryResourceWorker& worker,
+                               gd::ResourcesManager* resourcesManager) { return; };
   ///@}
 
 /** \name Serialization

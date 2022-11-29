@@ -26,7 +26,8 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
   }
 
 #if defined(GD_IDE_ONLY)
-  virtual void ExposeResources(gd::ArbitraryResourceWorker& worker);
+  virtual void ExposeResources(gd::ArbitraryResourceWorker& worker,
+                               gd::ResourcesManager *resourcesManager);
 #endif
 
   /** \brief Change the text.

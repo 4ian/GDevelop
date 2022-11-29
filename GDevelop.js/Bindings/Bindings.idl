@@ -563,7 +563,7 @@ interface ObjectConfiguration {
     [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
     boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
 
-    void ExposeResources([Ref] ArbitraryResourceWorker worker);
+    void ExposeResources([Ref] ArbitraryResourceWorker worker, ResourcesManager resourcesManager);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
@@ -936,6 +936,11 @@ interface JsonResource {
     void JsonResource();
 };
 JsonResource implements Resource;
+
+interface TilemapResource {
+    void TilemapResource();
+};
+TilemapResource implements Resource;
 
 interface InitialInstance {
     void InitialInstance();

@@ -41,7 +41,8 @@ class ObjectJsImplementation : public gd::ObjectConfiguration {
     return *this;
   };
 
-  void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
+  void ExposeResources(gd::ArbitraryResourceWorker& worker,
+                       gd::ResourcesManager *resourcesManager) override;
 
  protected:
   void DoSerializeTo(SerializerElement& arg0) const override;

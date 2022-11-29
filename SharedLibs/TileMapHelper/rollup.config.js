@@ -12,11 +12,13 @@ export default [
         format: 'umd',
         file: '../../Extensions/TileMap/helper/TileMapHelper.js',
         sourcemap: true,
-        plugins: [terser({
-              format: {
-                comments: false
-              },
-            })]
+        plugins: [
+          terser({
+            format: {
+              comments: false
+            },
+          })
+        ]
       },
     ],
   	external: ['pixi.js'],

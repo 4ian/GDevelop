@@ -176,6 +176,7 @@ export const ResourceCard = ({ resource, onChoose, size }: Props) => {
         </GenericCard>
       );
     case 'json':
+    case 'tilemap':
       return (
         <GenericCard onChoose={onChoose} resource={resource} size={size}>
           <Line justifyContent="center">

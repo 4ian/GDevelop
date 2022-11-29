@@ -564,6 +564,7 @@ export const LeaderboardAdmin = ({
           onAction={() => {
             onCreateLeaderboard();
           }}
+          actionButtonId="add-new-leaderboard-button"
           isLoading={isRequestPending}
         />
       </Line>
@@ -579,6 +580,7 @@ export const LeaderboardAdmin = ({
       text: isEditingName ? (
         <Line alignItems="center" expand noMargin>
           <TextField
+            id="edit-name-field"
             ref={newNameTextFieldRef}
             margin="none"
             style={styles.leaderboardNameTextField}
@@ -634,6 +636,7 @@ export const LeaderboardAdmin = ({
           tooltip={isEditingName ? t`Save` : t`Rename`}
           disabled={isRequestPending}
           edge="end"
+          id={isEditingName ? 'save-name-button' : 'edit-name-button'}
         >
           {isEditingName ? (
             isRequestPending ? (
@@ -888,7 +891,12 @@ export const LeaderboardAdmin = ({
                 limits={limits}
               />
             )}
-            <ResponsiveLineStackLayout noMargin expand noColumnMargin>
+            <ResponsiveLineStackLayout
+              noMargin
+              expand
+              noColumnMargin
+              id="leaderboard-administration-panel"
+            >
               <div style={styles.leftColumn}>
                 <Paper
                   elevation={3}

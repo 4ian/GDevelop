@@ -123,7 +123,7 @@ export type Field =
       name: string,
       type: 'row' | 'column',
       title?: ?string,
-      children: Array<Object>,
+      children: Array<Field>,
     |};
 
 // The schema is the tree of all fields.

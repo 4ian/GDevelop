@@ -26,7 +26,7 @@ const QuitInAppTutorialDialog = ({
     false
   );
   const [title, setTitle] = React.useState<React.Node>(
-    <Trans>Quit tutorial</Trans>
+    <Trans>Leave the tutorial</Trans>
   );
 
   React.useEffect(

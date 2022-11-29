@@ -223,7 +223,11 @@ function InAppTutorialStepDisplayer({
     if (!dialog) return null;
 
     return (
-      <InAppTutorialDialog dialogContent={dialog} onClose={goToNextStep} />
+      <InAppTutorialDialog
+        dialogContent={dialog}
+        goToNextStep={goToNextStep}
+        endTutorial={endTutorial}
+      />
     );
   };
 

@@ -164,7 +164,8 @@ void ObjectJsImplementation::__destroy__() {  // Useless?
 }
 
 void ObjectJsImplementation::ExposeResources(
-    gd::ArbitraryResourceWorker& worker) {
+    gd::ArbitraryResourceWorker& worker,
+    gd::ResourcesManager* resourcesManager) {
   std::map<gd::String, gd::PropertyDescriptor> properties = GetProperties();
 
   for (auto& property : properties) {
@@ -188,6 +189,7 @@ void ObjectJsImplementation::ExposeResources(
         worker.ExposeJson(newPropertyValue);
       } else if (resourceType == "tilemap") {
         worker.ExposeTilemap(newPropertyValue);
+        worker.ExposeEmbeddeds(newPropertyValue, resourcesManager);
       } else if (resourceType == "bitmapFont") {
         worker.ExposeBitmapFont(newPropertyValue);
       }

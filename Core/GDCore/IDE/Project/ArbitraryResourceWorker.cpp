@@ -97,6 +97,47 @@ void ArbitraryResourceWorker::ExposeResources(
   }
 }
 
+void ArbitraryResourceWorker::ExposeEmbeddeds(
+    gd::String& resourceName,
+    gd::ResourcesManager* resourcesManager) {
+  if (!resourcesManager) return;
+
+  gd::Resource& resource = resourcesManager->GetResource(resourceName);
+
+  if (!resource.GetMetadata().empty()) {
+    gd::SerializerElement serializerElement = gd::Serializer::FromJSON(resource.GetMetadata());
+
+    if (serializerElement.HasChild("embeddedResourcesMapping")) {
+      const gd::SerializerElement& embeddedResourcesMappingElement = serializerElement.GetChild("embeddedResourcesMapping");
+
+      for (const auto& child : embeddedResourcesMappingElement.GetAllChildren()) {
+        const gd::String& targetResourceName = child.second->GetValue().GetString();
+
+        if (resourcesManager->HasResource(targetResourceName)) {
+          const gd::Resource& targetResource = resourcesManager->GetResource(targetResourceName);
+          const gd::String& targetResourceKind = targetResource.GetKind();
+
+          if (targetResourceKind == "audio") {
+            ExposeAudio(const_cast<gd::String&>(targetResource.GetName()));
+          } else if (targetResourceKind == "bitmapFont") {
+            ExposeBitmapFont(const_cast<gd::String&>(targetResource.GetName()));
+          } else if (targetResourceKind == "font") {
+            ExposeFont(const_cast<gd::String&>(targetResource.GetName()));
+          } else if (targetResourceKind == "image") {
+            ExposeImage(const_cast<gd::String&>(targetResource.GetName()));
+          } else if (targetResourceKind == "json") {
+            ExposeJson(const_cast<gd::String&>(targetResource.GetName()));
+          } else if (targetResourceKind == "tilemap") {
+            ExposeTilemap(const_cast<gd::String&>(targetResource.GetName()));
+          } else if (targetResourceKind == "video") {
+            ExposeVideo(const_cast<gd::String&>(targetResource.GetName()));
+          }
+        }
+      }
+    }
+  }
+}
+
 void ArbitraryResourceWorker::ExposeResource(gd::Resource& resource) {
   if (!resource.UseFile()) return;
 

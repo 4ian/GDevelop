@@ -68,7 +68,9 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
   element.SetAttribute("underlined", underlined);
 }
 
-void TextObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {
+void TextObject::ExposeResources(
+    gd::ArbitraryResourceWorker& worker,
+    gd::ResourcesManager *resourcesManager) {
   worker.ExposeFont(fontName);
 }
 #endif

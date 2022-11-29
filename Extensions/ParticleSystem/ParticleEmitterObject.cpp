@@ -172,7 +172,8 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
 ParticleEmitterBase::~ParticleEmitterBase() {}
 
 void ParticleEmitterObject::ExposeResources(
-    gd::ArbitraryResourceWorker& worker) {
+    gd::ArbitraryResourceWorker& worker,
+    gd::ResourcesManager *resourcesManager) {
   gd::String texture = GetParticleTexture();
   worker.ExposeImage(texture);
   SetParticleTexture(texture);

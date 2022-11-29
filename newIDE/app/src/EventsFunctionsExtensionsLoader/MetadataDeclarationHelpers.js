@@ -266,7 +266,8 @@ export const declareObjectMetadata = (
     )
     .addParameter('object', i18n._('Object'), objectType)
     .useStandardParameters('number')
-    .setFunctionName('getOpacity');
+    .setFunctionName('setOpacity')
+    .setGetter('getOpacity');
 
   return objectMetadata;
 };

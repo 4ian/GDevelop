@@ -138,13 +138,13 @@ const TooltipBody = ({
   return (
     <>
       {tooltip.title && (
-        <Typography style={styles.title} variant="subtitle" noMargin>
+        <Typography style={styles.title} variant="subtitle">
           <MarkdownText source={tooltip.title} allowParagraphs />
         </Typography>
       )}
       {tooltip.title && tooltip.description && <span style={styles.divider} />}
       {tooltip.description && (
-        <Typography style={styles.description} noMargin>
+        <Typography style={styles.description}>
           <MarkdownText source={tooltip.description} allowParagraphs />
         </Typography>
       )}

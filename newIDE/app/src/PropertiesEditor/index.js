@@ -14,6 +14,7 @@ import ColorField from '../UI/ColorField';
 import { MarkdownText } from '../UI/MarkdownText';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 import FormHelperText from '@material-ui/core/FormHelperText';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import {
   type ResourceKind,
@@ -32,6 +33,7 @@ import { Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
+import Tooltip from '@material-ui/core/Tooltip';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -54,6 +56,10 @@ export type PrimitiveValueField =
       valueType: 'number',
       getValue: Instance => number,
       setValue: (instance: Instance, newValue: number) => void,
+      getEndAdornment?: Instance => {|
+        label: string,
+        tooltipContent: React.Node,
+      |},
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -296,7 +302,8 @@ const PropertiesEditor = ({
           />
         );
       } else if (field.valueType === 'number') {
-        const { setValue } = field;
+        const { setValue, getEndAdornment } = field;
+        const endAdornment = getEndAdornment && getEndAdornment(instances[0]);
         return (
           <SemiControlledTextField
             value={getFieldValue(instances, field)}
@@ -312,6 +319,15 @@ const PropertiesEditor = ({
             type="number"
             style={styles.field}
             disabled={getDisabled(instances, field)}
+            endAdornment={
+              endAdornment && (
+                <Tooltip title={endAdornment.tooltipContent}>
+                  <InputAdornment position="end">
+                    {endAdornment.label}
+                  </InputAdornment>
+                </Tooltip>
+              )
+            }
           />
         );
       } else if (field.valueType === 'color') {

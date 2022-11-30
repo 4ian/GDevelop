@@ -42,7 +42,7 @@ type Props = {|
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   onOpenProfile: () => void,
-  onOpenOnboardingDialog: () => void,
+  selectInAppTutorial: (tutorialId: string) => void,
   onOpenPreferences: () => void,
   onOpenAbout: () => void,
 
@@ -71,7 +71,7 @@ export const HomePage = React.memo<Props>(
         onOpenLanguageDialog,
         onOpenProfile,
         setToolbar,
-        onOpenOnboardingDialog,
+        selectInAppTutorial,
         onOpenPreferences,
         onOpenAbout,
         isActive,
@@ -173,7 +173,7 @@ export const HomePage = React.memo<Props>(
                         onCreateProject={() =>
                           onCreateProject(/*exampleShortHeader=*/ null)
                         }
-                        onOpenOnboardingDialog={onOpenOnboardingDialog}
+                        selectInAppTutorial={selectInAppTutorial}
                         showGetStartedSection={showGetStartedSection}
                         setShowGetStartedSection={setShowGetStartedSection}
                       />
@@ -199,7 +199,6 @@ export const HomePage = React.memo<Props>(
                     )}
                     {activeTab === 'learn' && (
                       <LearnSection
-                        onOpenOnboardingDialog={onOpenOnboardingDialog}
                         onCreateProject={() =>
                           onCreateProject(/*exampleShortHeader=*/ null)
                         }
@@ -241,7 +240,7 @@ export const renderHomePageContainer = (
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
-    onOpenOnboardingDialog={props.onOpenOnboardingDialog}
+    selectInAppTutorial={props.selectInAppTutorial}
     onOpenPreferences={props.onOpenPreferences}
     onOpenAbout={props.onOpenAbout}
     storageProviders={

@@ -4,7 +4,10 @@ import IconButton from './IconButton';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import GDevelopThemeContext from './Theme/ThemeContext';
 
+const styles = { button: { borderRadius: 8 } };
+
 type Props = {|
+  id?: string,
   src: string,
   tooltip?: MessageDescriptor,
   acceleratorString?: string,
@@ -18,13 +21,14 @@ type Props = {|
  */
 const ToolbarIcon = React.forwardRef<Props, IconButton>(
   (
-    { src, tooltip, acceleratorString, disabled, onClick, onContextMenu },
+    { id, src, tooltip, acceleratorString, disabled, onClick, onContextMenu },
     ref
   ) => {
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
     return (
       <IconButton
+        id={id}
         onClick={onClick}
         onContextMenu={onContextMenu}
         size="small"
@@ -32,6 +36,7 @@ const ToolbarIcon = React.forwardRef<Props, IconButton>(
         tooltip={tooltip}
         acceleratorString={acceleratorString}
         ref={ref}
+        style={styles.button}
       >
         <img
           alt={tooltip}

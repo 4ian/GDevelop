@@ -602,6 +602,7 @@ const MainFrame = (props: Props) => {
     // dialog is closed after a language change. We then reload GDevelop
     // extensions so that they declare all objects/actions/condition/etc...
     // using the new language.
+    gd.MeasurementUnit.applyTranslation();
     gd.JsPlatform.get().reloadBuiltinExtensions();
     _loadExtensions().catch(() => {});
   };

@@ -139,7 +139,6 @@ const ImageTileGrid = ({
                     <div style={styles.skeletonContainer}>
                       <Skeleton
                         variant="rect"
-                        key={index}
                         width="100%"
                         height="100%"
                         style={styles.skeleton}

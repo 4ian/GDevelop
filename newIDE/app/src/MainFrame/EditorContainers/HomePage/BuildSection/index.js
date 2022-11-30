@@ -12,7 +12,7 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Text from '../../../../UI/Text';
 import TextButton from '../../../../UI/TextButton';
 import RaisedButton from '../../../../UI/RaisedButton';
-import { Line, Column, Spacer } from '../../../../UI/Grid';
+import { Line, Column, Spacer, marginsSize } from '../../../../UI/Grid';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import {
   LineStackLayout,
@@ -45,11 +45,11 @@ import { ExampleStoreContext } from '../../../../AssetStore/ExampleStore/Example
 import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import Add from '../../../../UI/CustomSvgIcons/Add';
 import ImageTileRow from '../../../../UI/ImageTileRow';
 import { prepareExamples } from '../../../../AssetStore/ExampleStore';
 import Window from '../../../../Utils/Window';
+import Skeleton from '@material-ui/lab/Skeleton';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -61,6 +61,7 @@ const styles = {
     borderRadius: 8,
     overflowWrap: 'anywhere', // Ensure everything is wrapped on small devices.
   },
+  projectSkeleton: { borderRadius: 6 },
 };
 
 const getTemplatesGridSizeFromWidth = (width: WidthType) => {
@@ -73,6 +74,18 @@ const getTemplatesGridSizeFromWidth = (width: WidthType) => {
     default:
       return 6;
   }
+};
+
+const getProjectLineHeight = (width: WidthType) => {
+  let lineHeight;
+  switch (width) {
+    case 'small':
+      lineHeight = 52;
+      break;
+    default:
+      lineHeight = 36;
+  }
+  return lineHeight - 2 * marginsSize;
 };
 
 type Props = {|
@@ -287,6 +300,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     };
 
     const isWindowWidthMediumOrLarger = windowWidth !== 'small';
+    const skeletonLineHeight = getProjectLineHeight(windowWidth);
 
     return (
       <I18n>
@@ -312,21 +326,22 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
               }
             >
               <SectionRow>
-                {!allExamples ? (
-                  <PlaceholderLoader />
-                ) : (
-                  <ImageTileRow
-                    items={prepareExamples(allExamples).map(example => ({
-                      onClick: () => onSelectExample(example),
-                      imageUrl: example.previewImageUrls[0],
-                    }))}
-                    title={<Trans>Recommended templates</Trans>}
-                    onShowAll={onShowAllExamples}
-                    showAllIcon={<Add fontSize="small" />}
-                    getColumnsFromWidth={getTemplatesGridSizeFromWidth}
-                    getLimitFromWidth={getTemplatesGridSizeFromWidth}
-                  />
-                )}
+                <ImageTileRow
+                  isLoading={!allExamples}
+                  items={
+                    allExamples
+                      ? prepareExamples(allExamples).map(example => ({
+                          onClick: () => onSelectExample(example),
+                          imageUrl: example.previewImageUrls[0],
+                        }))
+                      : []
+                  }
+                  title={<Trans>Recommended templates</Trans>}
+                  onShowAll={onShowAllExamples}
+                  showAllIcon={<Add fontSize="small" />}
+                  getColumnsFromWidth={getTemplatesGridSizeFromWidth}
+                  getLimitFromWidth={getTemplatesGridSizeFromWidth}
+                />
               </SectionRow>
               <SectionRow>
                 <LineStackLayout
@@ -374,45 +389,48 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                     </ResponsiveLineStackLayout>
                   </Column>
                 </LineStackLayout>
-                {authenticatedUser.loginState === 'loggingIn' ? (
-                  <Column
-                    useFullHeight
-                    expand
-                    noMargin
-                    justifyContent="flex-start"
-                    alignItems="center"
-                  >
-                    <CircularProgress />
-                    <Text>
-                      <Trans>Loading projects...</Trans>
-                    </Text>
-                  </Column>
-                ) : (
-                  projectFiles &&
-                  projectFiles.length > 0 && (
-                    <Line>
-                      <Column noMargin expand>
-                        {isWindowWidthMediumOrLarger && (
-                          <LineStackLayout justifyContent="space-between">
-                            <Column expand>
-                              <Text color="secondary">
-                                <Trans>File name</Trans>
-                              </Text>
-                            </Column>
-                            <Column expand>
-                              <Text color="secondary">
-                                <Trans>Location</Trans>
-                              </Text>
-                            </Column>
-                            <Column expand>
-                              <Text color="secondary">
-                                <Trans>Last edited</Trans>
-                              </Text>
-                            </Column>
-                          </LineStackLayout>
-                        )}
-                        <List>
-                          {projectFiles.map(file => {
+                <Line>
+                  <Column noMargin expand>
+                    {isWindowWidthMediumOrLarger && (
+                      <LineStackLayout justifyContent="space-between">
+                        <Column expand>
+                          <Text color="secondary">
+                            <Trans>File name</Trans>
+                          </Text>
+                        </Column>
+                        <Column expand>
+                          <Text color="secondary">
+                            <Trans>Location</Trans>
+                          </Text>
+                        </Column>
+                        <Column expand>
+                          <Text color="secondary">
+                            <Trans>Last edited</Trans>
+                          </Text>
+                        </Column>
+                      </LineStackLayout>
+                    )}
+                    <List>
+                      {authenticatedUser.loginState === 'loggingIn'
+                        ? new Array(5).fill(0).map((_, index) => (
+                            <ListItem
+                              style={styles.listItem}
+                              key={`skeleton-${index}`}
+                            >
+                              <Line expand>
+                                <Column expand>
+                                  <Skeleton
+                                    variant="rect"
+                                    height={skeletonLineHeight}
+                                    style={styles.projectSkeleton}
+                                  />
+                                </Column>
+                              </Line>
+                            </ListItem>
+                          ))
+                        : projectFiles &&
+                          projectFiles.length > 0 &&
+                          projectFiles.map(file => {
                             const storageProvider = getStorageProviderByInternalName(
                               storageProviders,
                               file.storageProviderName
@@ -542,11 +560,9 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                               </ListItem>
                             );
                           })}
-                        </List>
-                      </Column>
-                    </Line>
-                  )
-                )}
+                    </List>
+                  </Column>
+                </Line>
               </SectionRow>
             </SectionContainer>
             <ContextMenu

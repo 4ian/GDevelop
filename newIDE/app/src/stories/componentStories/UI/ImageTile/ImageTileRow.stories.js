@@ -42,6 +42,18 @@ export const Default = () => (
   />
 );
 
+export const Loading = () => (
+  <ImageTileRow
+    items={itemsWithJustImage}
+    isLoading
+    title="Recommended templates"
+    onShowAll={() => {}}
+    showAllIcon={<Add fontSize="small" />}
+    getColumnsFromWidth={getColumnsFromWidth}
+    getLimitFromWidth={getColumnsFromWidth}
+  />
+);
+
 export const WithDescription = () => (
   <ImageTileRow
     items={itemsWithJustImage}

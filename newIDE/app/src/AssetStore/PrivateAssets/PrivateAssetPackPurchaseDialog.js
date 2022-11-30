@@ -17,7 +17,6 @@ import CircularProgress from '../../UI/CircularProgress';
 import BackgroundText from '../../UI/BackgroundText';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import Mark from '../../UI/CustomSvgIcons/Mark';
-import { AssetStoreContext } from '../AssetStoreContext';
 import FlatButton from '../../UI/FlatButton';
 import { LineStackLayout } from '../../UI/Layout';
 
@@ -39,9 +38,6 @@ const PrivateAssetPackPurchaseDialog = ({
     onCreateAccount,
     receivedAssetPacks,
   } = React.useContext(AuthenticatedUserContext);
-  const { loadedReceivedAssetPackInStore } = React.useContext(
-    AssetStoreContext
-  );
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [
     isCheckingPurchasesAfterLogin,
@@ -137,8 +133,8 @@ const PrivateAssetPackPurchaseDialog = ({
   // - they just bought it, we display the success message.
   React.useEffect(
     () => {
-      if (loadedReceivedAssetPackInStore) {
-        const receivedAssetPack = loadedReceivedAssetPackInStore.find(
+      if (receivedAssetPacks) {
+        const receivedAssetPack = receivedAssetPacks.find(
           pack => pack.id === privateAssetPackListingData.id
         );
         if (receivedAssetPack) {
@@ -152,7 +148,7 @@ const PrivateAssetPackPurchaseDialog = ({
       }
     },
     [
-      loadedReceivedAssetPackInStore,
+      receivedAssetPacks,
       privateAssetPackListingData,
       isPurchasing,
       onClose,

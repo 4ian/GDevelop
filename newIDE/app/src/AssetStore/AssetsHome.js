@@ -218,11 +218,11 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       },
     }));
 
-    const starterPacksTiles = starterPacks.map(assetPack => (
+    const starterPacksTiles = starterPacks.map((assetPack, index) => (
       <PublicAssetPackTile
         assetPack={assetPack}
         onSelect={() => onPublicAssetPackSelection(assetPack)}
-        key={assetPack.tag}
+        key={`${assetPack.tag}-${index}`}
       />
     ));
 

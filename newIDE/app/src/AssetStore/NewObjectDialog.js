@@ -134,7 +134,6 @@ export default function NewObjectDialog({
   const {
     searchResults,
     navigationState,
-    fetchAssetsAndFilters,
     environment,
     setEnvironment,
   } = React.useContext(AssetStoreContext);
@@ -242,18 +241,6 @@ export default function NewObjectDialog({
       showAlert,
       resourceManagementProps,
     ]
-  );
-
-  // Load assets and filters when the dialog is opened or when the environment changes.
-  React.useEffect(
-    () => {
-      // The variable environment is always defined, this check is a hack
-      // to ensure we call fetchAssetsAndFilters every time the value changes.
-      if (environment) {
-        fetchAssetsAndFilters();
-      }
-    },
-    [fetchAssetsAndFilters, environment]
   );
 
   const mainAction =

@@ -87,7 +87,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const {
       publicAssetPacks,
       privateAssetPacks,
-      loadedReceivedAssetPackInStore,
       searchResults,
       error,
       fetchAssetsAndFilters,
@@ -117,7 +116,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       purchasingPrivateAssetPackListingData,
       setPurchasingPrivateAssetPackListingData,
     ] = React.useState<?PrivateAssetPackListingData>(null);
-    const { onPurchaseSuccessful } = React.useContext(AuthenticatedUserContext);
+    const { onPurchaseSuccessful, receivedAssetPacks } = React.useContext(
+      AuthenticatedUserContext
+    );
 
     // The saved scroll position must not be reset by a scroll event until it
     // has been applied.
@@ -240,10 +241,8 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     // otherwise we open the dialog to buy it.
     const selectPrivateAssetPack = React.useCallback(
       (assetPackListingData: PrivateAssetPackListingData) => {
-        const receivedAssetPack = loadedReceivedAssetPackInStore
-          ? loadedReceivedAssetPackInStore.find(
-              pack => pack.id === assetPackListingData.id
-            )
+        const receivedAssetPack = receivedAssetPacks
+          ? receivedAssetPacks.find(pack => pack.id === assetPackListingData.id)
           : null;
 
         if (!receivedAssetPack) {
@@ -269,7 +268,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         navigationState.openPackPage(receivedAssetPack);
         setIsFiltersPanelOpen(true);
       },
-      [loadedReceivedAssetPackInStore, saveScrollPosition, navigationState]
+      [receivedAssetPacks, saveScrollPosition, navigationState]
     );
 
     // If the user has received the pack they are currently viewing,
@@ -284,8 +283,8 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           currentPage.openedAssetPack.id &&
           currentPage.openedAssetPack.id ===
             purchasingPrivateAssetPackListingData.id;
-        if (loadedReceivedAssetPackInStore && !isOnPrivatePackPage) {
-          const receivedAssetPack = loadedReceivedAssetPackInStore.find(
+        if (receivedAssetPacks && !isOnPrivatePackPage) {
+          const receivedAssetPack = receivedAssetPacks.find(
             pack => pack.id === purchasingPrivateAssetPackListingData.id
           );
           if (receivedAssetPack) {
@@ -298,7 +297,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         }
       },
       [
-        loadedReceivedAssetPackInStore,
+        receivedAssetPacks,
         purchasingPrivateAssetPackListingData,
         navigationState,
         saveScrollPosition,
@@ -311,8 +310,8 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const selectTag = React.useCallback(
       (tag: string) => {
         const privateAssetPack =
-          loadedReceivedAssetPackInStore &&
-          loadedReceivedAssetPackInStore.find(pack => pack.tag === tag);
+          receivedAssetPacks &&
+          receivedAssetPacks.find(pack => pack.tag === tag);
         const publicAssetPack =
           publicAssetPacks &&
           publicAssetPacks.starterPacks.find(pack => pack.tag === tag);
@@ -328,7 +327,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         setIsFiltersPanelOpen(true);
       },
       [
-        loadedReceivedAssetPackInStore,
+        receivedAssetPacks,
         publicAssetPacks,
         saveScrollPosition,
         assetFiltersState,

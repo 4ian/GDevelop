@@ -23,4 +23,16 @@ gd::MeasurementUnit MeasurementUnit::pixelAcceleration =
 gd::MeasurementUnit MeasurementUnit::newton = CreateNewton();
 gd::MeasurementUnit MeasurementUnit::angularSpeed = CreateAngularSpeed();
 
+void MeasurementUnit::ApplyTranslation() {
+  undefined = CreateUndefined();
+  dimensionless = CreateDimensionless();
+  degreeAngle = CreateDegreeAngle();
+  second = CreateSecond();
+  pixel = CreatePixel();
+  pixelSpeed = CreatePixelSpeed();
+  pixelAcceleration = CreatePixelAcceleration();
+  newton = CreateNewton();
+  angularSpeed = CreateAngularSpeed();
+}
+
 } // namespace gd

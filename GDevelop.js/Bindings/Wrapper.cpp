@@ -658,6 +658,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define STATIC_ScanProject ScanProject
 
+#define STATIC_ApplyTranslation ApplyTranslation
 #define STATIC_GetDimensionless GetDimensionless
 #define STATIC_GetDegreeAngle GetDegreeAngle
 #define STATIC_GetSecond GetSecond

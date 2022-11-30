@@ -14,14 +14,14 @@ namespace gd {
 MeasurementBaseUnit::~MeasurementBaseUnit() {}
 
 const gd::MeasurementBaseUnit MeasurementBaseUnit::degreeAngle =
-    MeasurementBaseUnit("degree", _("degree"), "deg", "");
+    MeasurementBaseUnit("degree", "deg", "");
 const gd::MeasurementBaseUnit MeasurementBaseUnit::pixel =
-    MeasurementBaseUnit("pixel", _("pixel"), "px", "distance");
+    MeasurementBaseUnit("pixel", "px", "distance");
 const gd::MeasurementBaseUnit MeasurementBaseUnit::meter =
-    MeasurementBaseUnit("meter", _("meter"), "m", "distance");
+    MeasurementBaseUnit("meter", "m", "distance");
 const gd::MeasurementBaseUnit MeasurementBaseUnit::second =
-    MeasurementBaseUnit("second", _("second"), "s", "time");
+    MeasurementBaseUnit("second", "s", "time");
 const gd::MeasurementBaseUnit MeasurementBaseUnit::kilogram =
-    MeasurementBaseUnit("kilogram", _("kilogram"), "Kg", "mass");
+    MeasurementBaseUnit("kilogram", "Kg", "mass");
 
 } // namespace gd

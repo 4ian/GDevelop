@@ -9,6 +9,7 @@ declare class gdMeasurementUnit {
   getElementPower(elementIndex: number): number;
   getElementBaseUnit(elementIndex: number): gdMeasurementBaseUnit;
   isUndefined(): boolean;
+  static applyTranslation(): void;
   static getDimensionless(): gdMeasurementUnit;
   static getDegreeAngle(): gdMeasurementUnit;
   static getSecond(): gdMeasurementUnit;

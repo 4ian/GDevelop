@@ -842,6 +842,8 @@ interface MeasurementUnit {
 
   boolean IsUndefined();
 
+  void STATIC_ApplyTranslation();
+
   [Ref] MeasurementUnit STATIC_GetDimensionless();
   [Ref] MeasurementUnit STATIC_GetDegreeAngle();
   [Ref] MeasurementUnit STATIC_GetSecond();
@@ -852,10 +854,9 @@ interface MeasurementUnit {
 };
 
 interface MeasurementBaseUnit {
-  void MeasurementBaseUnit(DOMString name, DOMString label, DOMString symbol, DOMString quantity);
+  void MeasurementBaseUnit(DOMString name, DOMString symbol, DOMString quantity);
 
   [Const, Ref] DOMString GetName();
-  [Const, Ref] DOMString GetLabel();
   [Const, Ref] DOMString GetSymbol();
   [Const, Ref] DOMString GetQuantity();
 };

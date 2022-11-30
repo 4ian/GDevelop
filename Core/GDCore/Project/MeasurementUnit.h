@@ -76,6 +76,8 @@ public:
 
   bool IsUndefined() const { return this == &gd::MeasurementUnit::undefined; }
 
+  static void ApplyTranslation();
+
   static gd::MeasurementUnit &GetUndefined() { return undefined; }
 
   static gd::MeasurementUnit &GetDimensionless() { return dimensionless; }

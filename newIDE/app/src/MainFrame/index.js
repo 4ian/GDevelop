@@ -594,6 +594,7 @@ const MainFrame = (props: Props) => {
   );
 
   const _languageDidChange = () => {
+    gd.MeasurementUnit.applyTranslation();
     // A change in the language will automatically be applied
     // on all React components, as it's handled by GDI18nProvider.
     // We still have this method that will be called when the language

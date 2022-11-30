@@ -19,9 +19,9 @@ namespace gd {
  */
 class GD_CORE_API MeasurementBaseUnit {
 public:
-  MeasurementBaseUnit(gd::String name_, gd::String label_, gd::String symbol_,
+  MeasurementBaseUnit(gd::String name_, gd::String symbol_,
                       gd::String quantity_)
-      : name(name_), label(label_), symbol(symbol_), quantity(quantity_) {}
+      : name(name_), symbol(symbol_), quantity(quantity_) {}
 
   virtual ~MeasurementBaseUnit();
 
@@ -29,11 +29,6 @@ public:
    * \brief Return the unit name.
    */
   const gd::String &GetName() const { return name; }
-
-  /**
-   * \brief Return the unit label.
-   */
-  const gd::String &GetLabel() const { return label; }
 
   /**
    * \brief Return the unit symbol.
@@ -53,7 +48,6 @@ public:
 
 private:
   gd::String name;     ///< The unit name
-  gd::String label;   ///< The unit label
   gd::String symbol;   ///< The unit symbol
   gd::String quantity; ///< The physical quantity
 };

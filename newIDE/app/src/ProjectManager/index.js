@@ -75,6 +75,12 @@ const styles = {
   },
 };
 
+type ProjectItemKind =
+  | 'layout'
+  | 'external-events'
+  | 'external-layout'
+  | 'events-functions-extension';
+
 type Props = {|
   project: gdProject,
   onChangeProjectName: string => Promise<void>,
@@ -112,7 +118,7 @@ type Props = {|
 type State = {|
   editedPropertiesLayout: ?gdLayout,
   editedVariablesLayout: ?gdLayout,
-  renamedItemKind: ?string,
+  renamedItemKind: ?ProjectItemKind,
   renamedItemName: string,
   searchText: string,
   projectPropertiesDialogOpen: boolean,
@@ -199,7 +205,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     this.setState({ extensionsSearchDialogOpen: true });
   };
 
-  _onEditName = (kind: ?string, name: string) => {
+  _onEditName = (kind: ?ProjectItemKind, name: string) => {
     this.setState({
       renamedItemKind: kind,
       renamedItemName: name,
@@ -266,6 +272,9 @@ export default class ProjectManager extends React.Component<Props, State> {
     newLayout.updateBehaviorsSharedData(project);
 
     this._onProjectItemModified();
+
+    // Trigger an edit of the name, so that the user can rename the layout easily.
+    this._onEditName('layout', newName);
   };
 
   _onOpenLayoutProperties = (layout: ?gdLayout) => {
@@ -285,6 +294,9 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
     project.insertNewExternalEvents(newName, index + 1);
     this._onProjectItemModified();
+
+    // Trigger an edit of the name, so that the user can rename the external events easily.
+    this._onEditName('external-events', newName);
   };
 
   _addExternalLayout = (index: number, i18n: I18nType) => {
@@ -296,6 +308,9 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
     project.insertNewExternalLayout(newName, index + 1);
     this._onProjectItemModified();
+
+    // Trigger an edit of the name, so that the user can rename the external layout easily.
+    this._onEditName('external-layout', newName);
   };
 
   _addEventsFunctionsExtension = (index: number, i18n: I18nType) => {

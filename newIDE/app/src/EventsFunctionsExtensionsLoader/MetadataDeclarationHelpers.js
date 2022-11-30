@@ -830,17 +830,18 @@ const getStringifiedExtraInfo = (property: gdPropertyDescriptor) => {
     : '';
 };
 
-/**
- * Declare the instructions (actions/conditions) and expressions for the
- * properties of the given events based behavior.
- * This is akin to what would happen by manually declaring a JS extension
- * (see `JsExtension.js` files of extensions).
- */
-export const declareBehaviorPropertiesInstructionAndExpressions = (
+const declarePropertyInstructionAndExpression = (
   i18n: I18nType,
   extension: gdPlatformExtension,
   behaviorMetadata: gdBehaviorMetadata,
-  eventsBasedBehavior: gdEventsBasedBehavior
+  eventsBasedBehavior: gdEventsBasedBehavior,
+  property: gdNamedPropertyDescriptor,
+  propertyLabel: string,
+  expressionName: string,
+  conditionName: string,
+  actionName: string,
+  setterName: string,
+  getterName: string
 ): void => {
   const addObjectAndBehaviorParameters = <T: gdInstructionOrExpressionMetadata>(
     instructionOrExpression: T
@@ -873,6 +874,71 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     return instructionOrExpression;
   };
 
+  const propertyType = property.getType();
+  const propertyName = property.getName();
+
+  if (propertyType === 'Boolean') {
+    addObjectAndBehaviorParameters(
+      behaviorMetadata.addScopedCondition(
+        conditionName,
+        propertyLabel,
+        i18n._(t`Check the value of ${propertyLabel}`),
+        i18n._(t`Property ${propertyName} of _PARAM0_ is true`),
+        eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+        getExtensionIconUrl(extension),
+        getExtensionIconUrl(extension)
+      )
+    )
+      .getCodeExtraInformation()
+      .setFunctionName(getterName);
+
+    addObjectAndBehaviorParameters(
+      behaviorMetadata.addScopedAction(
+        actionName,
+        propertyLabel,
+        i18n._(t`Update the value of ${propertyLabel}`),
+        i18n._(t`Set property ${propertyName} of _PARAM0_ to _PARAM2_`),
+        eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+        getExtensionIconUrl(extension),
+        getExtensionIconUrl(extension)
+      )
+    )
+      .addParameter('yesorno', i18n._(t`New value to set`), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName(setterName);
+  } else {
+    addObjectAndBehaviorParameters(
+      behaviorMetadata.addExpressionAndConditionAndAction(
+        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
+        expressionName,
+        propertyLabel,
+        i18n._(t`the value of ${propertyLabel}`),
+        i18n._(t`the value of ${propertyLabel}`),
+        eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+        getExtensionIconUrl(extension)
+      )
+    )
+      .useStandardParameters(
+        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
+        getStringifiedExtraInfo(property)
+      )
+      .setFunctionName(setterName)
+      .setGetter(getterName);
+  }
+};
+
+/**
+ * Declare the instructions (actions/conditions) and expressions for the
+ * properties of the given events based behavior.
+ * This is akin to what would happen by manually declaring a JS extension
+ * (see `JsExtension.js` files of extensions).
+ */
+export const declareBehaviorPropertiesInstructionAndExpressions = (
+  i18n: I18nType,
+  extension: gdPlatformExtension,
+  behaviorMetadata: gdBehaviorMetadata,
+  eventsBasedBehavior: gdEventsBasedBehavior
+): void => {
   mapVector(eventsBasedBehavior.getPropertyDescriptors(), property => {
     const propertyType = property.getType();
     if (propertyType === 'Behavior') {
@@ -884,62 +950,71 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     const propertyLabel = i18n._(
       t`${property.getLabel() || propertyName} property`
     );
+    const expressionName = gd.EventsBasedBehavior.getPropertyExpressionName(
+      propertyName
+    );
+    const conditionName = gd.EventsBasedBehavior.getPropertyConditionName(
+      propertyName
+    );
+    const actionName = gd.EventsBasedBehavior.getPropertyActionName(
+      propertyName
+    );
+    const setterName = gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(
+      propertyName
+    );
+    const getterName = gd.BehaviorCodeGenerator.getBehaviorPropertyGetterName(
+      propertyName
+    );
 
-    addObjectAndBehaviorParameters(
-      behaviorMetadata.addExpressionAndConditionAndAction(
-        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
-        gd.EventsBasedBehavior.getPropertyExpressionName(propertyName),
-        propertyLabel,
-        i18n._(t`the value of ${propertyLabel}`),
-        i18n._(t`the value of ${propertyLabel}`),
-        eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-        getExtensionIconUrl(extension)
-      )
-    )
-      .useStandardParameters(
-        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
-        getStringifiedExtraInfo(property)
-      )
-      .setFunctionName(
-        gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(propertyName)
-      )
-      .setGetter(
-        gd.BehaviorCodeGenerator.getBehaviorPropertyGetterName(propertyName)
-      );
+    declarePropertyInstructionAndExpression(
+      i18n,
+      extension,
+      behaviorMetadata,
+      eventsBasedBehavior,
+      property,
+      propertyLabel,
+      expressionName,
+      conditionName,
+      actionName,
+      setterName,
+      getterName
+    );
   });
 
   mapVector(eventsBasedBehavior.getSharedPropertyDescriptors(), property => {
-    const propertyType = property.getType();
     const propertyName = property.getName();
     const propertyLabel = i18n._(
       t`${property.getLabel() || propertyName} shared property`
     );
+    const expressionName = gd.EventsBasedBehavior.getSharedPropertyExpressionName(
+      propertyName
+    );
+    const conditionName = gd.EventsBasedBehavior.getSharedPropertyConditionName(
+      propertyName
+    );
+    const actionName = gd.EventsBasedBehavior.getSharedPropertyActionName(
+      propertyName
+    );
+    const setterName = gd.BehaviorCodeGenerator.getBehaviorSharedPropertySetterName(
+      propertyName
+    );
+    const getterName = gd.BehaviorCodeGenerator.getBehaviorSharedPropertyGetterName(
+      propertyName
+    );
 
-    addObjectAndBehaviorParameters(
-      behaviorMetadata.addExpressionAndConditionAndAction(
-        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
-        gd.EventsBasedBehavior.getSharedPropertyExpressionName(propertyName),
-        propertyLabel,
-        i18n._(t`the value of ${propertyLabel}`),
-        i18n._(t`the value of ${propertyLabel}`),
-        eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-        getExtensionIconUrl(extension)
-      )
-    )
-      .useStandardParameters(
-        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
-        getStringifiedExtraInfo(property)
-      )
-      .setFunctionName(
-        gd.BehaviorCodeGenerator.getBehaviorSharedPropertySetterName(
-          propertyName
-        )
-      )
-      .setGetter(
-        gd.BehaviorCodeGenerator.getBehaviorSharedPropertyGetterName(
-          propertyName
-        )
-      );
+    declarePropertyInstructionAndExpression(
+      i18n,
+      extension,
+      behaviorMetadata,
+      eventsBasedBehavior,
+      property,
+      propertyLabel,
+      expressionName,
+      conditionName,
+      actionName,
+      setterName,
+      getterName
+    );
   });
 };
 

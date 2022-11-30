@@ -13,6 +13,7 @@ This project is released under the MIT License.
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/Layout.h"
+#include "GDCore/Project/MeasurementUnit.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
@@ -44,12 +45,22 @@ PlatformerObjectBehavior::GetProperties(
     const gd::SerializerElement& behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
-  properties[_("Gravity")].SetGroup(_("Jump")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("gravity")));
-  properties[_("Jump speed")].SetGroup(_("Jump")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("jumpSpeed")));
+  properties[_("Gravity")]
+      .SetGroup(_("Jump"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelAcceleration())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("gravity")));
+  properties[_("Jump speed")]
+      .SetGroup(_("Jump"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelSpeed())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("jumpSpeed")));
   properties["jumpSustainTime"]
       .SetGroup(_("Jump"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetSecond())
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("jumpSustainTime", 0)))
       .SetLabel(_("Jump sustain time"))
@@ -57,25 +68,47 @@ PlatformerObjectBehavior::GetProperties(
           _("Maximum time (in seconds) during which the jump strength is "
             "sustained if the jump key is held - allowing variable height "
             "jumps."));
-  properties[_("Max. falling speed")].SetGroup(_("Jump")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("maxFallingSpeed")));
+  properties[_("Max. falling speed")]
+      .SetGroup(_("Jump"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelSpeed())
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("maxFallingSpeed")));
   properties[_("Ladder climbing speed")]
       .SetGroup(_("Ladder"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelSpeed())
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("ladderClimbingSpeed", 150)));
-  properties[_("Acceleration")].SetGroup(_("Walk")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
-  properties[_("Deceleration")].SetGroup(_("Walk")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("deceleration")));
-  properties[_("Max. speed")].SetGroup(_("Walk")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
+  properties[_("Acceleration")]
+      .SetGroup(_("Walk"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelAcceleration())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
+  properties[_("Deceleration")]
+      .SetGroup(_("Walk"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelAcceleration())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("deceleration")));
+  properties[_("Max. speed")]
+      .SetGroup(_("Walk"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelSpeed())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
   properties[_("Default controls")]
       .SetValue(behaviorContent.GetBoolAttribute("ignoreDefaultControls")
                     ? "false"
                     : "true")
       .SetType("Boolean");
-  properties[_("Slope max. angle")].SetGroup(_("Walk")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("slopeMaxAngle")));
+  properties[_("Slope max. angle")]
+      .SetGroup(_("Walk"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("slopeMaxAngle")));
   properties[_("Can grab platform ledges")]
       .SetGroup(_("Ledge"))
       .SetValue(behaviorContent.GetBoolAttribute("canGrabPlatforms", false)
@@ -91,10 +124,14 @@ PlatformerObjectBehavior::GetProperties(
       .SetType("Boolean");
   properties[_("Grab offset on Y axis")]
       .SetGroup(_("Ledge"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
       .SetValue(
           gd::String::From(behaviorContent.GetDoubleAttribute("yGrabOffset")));
   properties[_("Grab tolerance on X axis")]
       .SetGroup(_("Ledge"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("xGrabTolerance", 10)));
   properties["useLegacyTrajectory"]

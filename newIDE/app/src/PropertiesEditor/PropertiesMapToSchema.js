@@ -3,6 +3,8 @@ import { mapFor } from '../Utils/MapFor';
 import { type Schema, type Instance } from '.';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import { type Field } from '.';
+import MeasurementUnitDocumentation from './MeasurementUnitDocumentation';
+import * as React from 'react';
 
 /**
  * Transform a MapStringPropertyDescriptor to a schema that can be used in PropertiesEditor.
@@ -51,6 +53,20 @@ const propertiesMapToSchema = (
       );
     };
     const getDescription = () => propertyDescription;
+    const getEndAdornment = (instance: Instance) => {
+      const property = getProperties(instance).get(name);
+      const measurementUnit = property.getMeasurementUnit();
+      return {
+        label: getMeasurementUnitShortLabel(measurementUnit),
+        tooltipContent: (
+          <MeasurementUnitDocumentation
+            label={measurementUnit.getLabel()}
+            description={measurementUnit.getDescription()}
+            elementsWithWords={measurementUnit.getElementsWithWords()}
+          />
+        ),
+      };
+    };
 
     if (property.isHidden()) return null;
 
@@ -72,6 +88,7 @@ const propertiesMapToSchema = (
         },
         getLabel,
         getDescription,
+        getEndAdornment,
       });
       return null;
     } else if (valueType === 'string' || valueType === '') {
@@ -240,6 +257,24 @@ const propertiesMapToSchema = (
     // The group actually always exists here.
     children: fieldsByGroups.get(groupName) || [],
   }));
+};
+
+const exponents = ['⁰', '¹', '²', '³', '⁴', '⁵'];
+
+export const getMeasurementUnitShortLabel = (
+  measurementUnit: gdMeasurementUnit
+): string => {
+  return mapFor(0, measurementUnit.getElementsCount(), i => {
+    const baseUnit = measurementUnit.getElementBaseUnit(i);
+    const power = measurementUnit.getElementPower(i);
+    const absPower = Math.abs(power);
+    const showPower = power < 0 || (absPower > 1 && absPower < 6);
+    return (
+      baseUnit.getSymbol() +
+      (power < 0 ? '⁻' : '') +
+      (showPower ? exponents[absPower] : '')
+    );
+  }).join(' · ');
 };
 
 export default propertiesMapToSchema;

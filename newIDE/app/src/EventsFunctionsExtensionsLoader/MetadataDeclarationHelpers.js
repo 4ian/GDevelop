@@ -110,7 +110,7 @@ export const declareObjectMetadata = (
   const objectType = eventsBasedObject.getName();
 
   objectMetadata
-    .addAction(
+    .addScopedAction(
       'Width',
       i18n._('Width'),
       i18n._('Change the width of an object.'),
@@ -126,8 +126,27 @@ export const declareObjectMetadata = (
     .setFunctionName('setWidth')
     .setGetter('getWidth');
 
+  // Deprecated
   objectMetadata
     .addAction(
+      'Width',
+      i18n._('Width'),
+      i18n._('Change the width of an object.'),
+      i18n._('the width'),
+      i18n._('Size'),
+      'res/actions/scaleWidth24_black.png',
+      'res/actions/scale_black.png'
+    )
+    .setHidden()
+    .addParameter('object', i18n._('Object'), objectType)
+    .useStandardOperatorParameters('number')
+    .markAsAdvanced()
+    .getCodeExtraInformation()
+    .setFunctionName('setWidth')
+    .setGetter('getWidth');
+
+  objectMetadata
+    .addScopedAction(
       'Height',
       i18n._('Height'),
       i18n._('Change the height of an object.'),
@@ -143,6 +162,43 @@ export const declareObjectMetadata = (
     .setFunctionName('setHeight')
     .setGetter('getHeight');
 
+  // Deprecated
+  objectMetadata
+    .addAction(
+      'Height',
+      i18n._('Height'),
+      i18n._('Change the height of an object.'),
+      i18n._('the height'),
+      i18n._('Size'),
+      'res/actions/scaleHeight24_black.png',
+      'res/actions/scale_black.png'
+    )
+    .setHidden()
+    .addParameter('object', i18n._('Object'), objectType)
+    .useStandardOperatorParameters('number')
+    .markAsAdvanced()
+    .getCodeExtraInformation()
+    .setFunctionName('setHeight')
+    .setGetter('getHeight');
+
+  objectMetadata
+    .addScopedAction(
+      'Scale',
+      i18n._('Scale'),
+      i18n._('Modify the scale of the specified object.'),
+      i18n._('the scale'),
+      i18n._('Size'),
+      'res/actions/scale24_black.png',
+      'res/actions/scale_black.png'
+    )
+    .addParameter('object', i18n._('Object'), objectType)
+    .useStandardOperatorParameters('number')
+    .markAsAdvanced()
+    .getCodeExtraInformation()
+    .setFunctionName('setScale')
+    .setGetter('getScale');
+
+  // Deprecated
   objectMetadata
     .addAction(
       'Scale',
@@ -153,6 +209,7 @@ export const declareObjectMetadata = (
       'res/actions/scale24_black.png',
       'res/actions/scale_black.png'
     )
+    .setHidden()
     .addParameter('object', i18n._('Object'), objectType)
     .useStandardOperatorParameters('number')
     .markAsAdvanced()
@@ -193,7 +250,7 @@ export const declareObjectMetadata = (
     .setGetter('getScaleY');
 
   objectMetadata
-    .addAction(
+    .addScopedAction(
       'FlipX',
       i18n._('Flip the object horizontally'),
       i18n._('Flip the object horizontally'),
@@ -208,8 +265,26 @@ export const declareObjectMetadata = (
     .getCodeExtraInformation()
     .setFunctionName('flipX');
 
+  // Deprecated
   objectMetadata
     .addAction(
+      'FlipX',
+      i18n._('Flip the object horizontally'),
+      i18n._('Flip the object horizontally'),
+      i18n._('Flip horizontally _PARAM0_: _PARAM1_'),
+      i18n._('Effects'),
+      'res/actions/flipX24.png',
+      'res/actions/flipX.png'
+    )
+    .setHidden()
+    .addParameter('object', i18n._('Object'), objectType)
+    .addParameter('yesorno', i18n._('Activate flipping'))
+    .markAsSimple()
+    .getCodeExtraInformation()
+    .setFunctionName('flipX');
+
+  objectMetadata
+    .addScopedAction(
       'FlipY',
       i18n._('Flip the object vertically'),
       i18n._('Flip the object vertically'),
@@ -225,7 +300,24 @@ export const declareObjectMetadata = (
     .setFunctionName('flipY');
 
   objectMetadata
-    .addCondition(
+    .addAction(
+      'FlipY',
+      i18n._('Flip the object vertically'),
+      i18n._('Flip the object vertically'),
+      i18n._('Flip vertically _PARAM0_: _PARAM1_'),
+      i18n._('Effects'),
+      'res/actions/flipY24.png',
+      'res/actions/flipY.png'
+    )
+    .setHidden()
+    .addParameter('object', i18n._('Object'), objectType)
+    .addParameter('yesorno', i18n._('Activate flipping'))
+    .markAsSimple()
+    .getCodeExtraInformation()
+    .setFunctionName('flipY');
+
+  objectMetadata
+    .addScopedCondition(
       'FlippedX',
       i18n._('Horizontally flipped'),
       i18n._('Check if the object is horizontally flipped'),
@@ -238,6 +330,37 @@ export const declareObjectMetadata = (
     .getCodeExtraInformation()
     .setFunctionName('isFlippedX');
 
+  // Deprecated
+  objectMetadata
+    .addCondition(
+      'FlippedX',
+      i18n._('Horizontally flipped'),
+      i18n._('Check if the object is horizontally flipped'),
+      i18n._('_PARAM0_ is horizontally flipped'),
+      i18n._('Effects'),
+      'res/actions/flipX24.png',
+      'res/actions/flipX.png'
+    )
+    .setHidden()
+    .addParameter('object', i18n._('Object'), objectType)
+    .getCodeExtraInformation()
+    .setFunctionName('isFlippedX');
+
+  objectMetadata
+    .addScopedCondition(
+      'FlippedY',
+      i18n._('Vertically flipped'),
+      i18n._('Check if the object is vertically flipped'),
+      i18n._('_PARAM0_ is vertically flipped'),
+      i18n._('Effects'),
+      'res/actions/flipY24.png',
+      'res/actions/flipY.png'
+    )
+    .addParameter('object', i18n._('Object'), objectType)
+    .getCodeExtraInformation()
+    .setFunctionName('isFlippedY');
+
+  // Deprecated
   objectMetadata
     .addCondition(
       'FlippedY',
@@ -248,6 +371,7 @@ export const declareObjectMetadata = (
       'res/actions/flipY24.png',
       'res/actions/flipY.png'
     )
+    .setHidden()
     .addParameter('object', i18n._('Object'), objectType)
     .getCodeExtraInformation()
     .setFunctionName('isFlippedY');

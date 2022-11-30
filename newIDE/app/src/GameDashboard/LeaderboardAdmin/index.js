@@ -1004,7 +1004,6 @@ export const LeaderboardAdmin = ({
               >
                 <Line alignItems="center" justifyContent="flex-end">
                   <Toggle
-                    size="small"
                     labelPosition="left"
                     toggled={displayOnlyBestEntry}
                     onToggle={(e, newValue) =>

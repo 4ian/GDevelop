@@ -409,6 +409,18 @@ export function createGdevelopTheme({
           hover: styles['ThemeLinkHoverColor'],
         },
       },
+      switch: {
+        trackColor: {
+          default: styles['ThemeSwitchDefaultTrackColor'],
+          toggled: styles['ThemeSwitchToggledTrackColor'],
+          disabled: styles['ThemeSwitchDisabledTrackColor'],
+        },
+        thumbColor: {
+          default: styles['ThemeSwitchDefaultThumbColor'],
+          toggled: styles['ThemeSwitchToggledThumbColor'],
+          disabled: styles['ThemeSwitchDisabledThumbColor'],
+        },
+      },
       tabs: {
         indicator: {
           backgroundColor: styles['ThemeTabsIndicatorColor'],

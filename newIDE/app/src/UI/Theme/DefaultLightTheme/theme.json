@@ -151,6 +151,38 @@
         "comment": "Palette/Purple/60"
       }
     },
+    "switch": {
+      "default": {
+        "thumb-color": {
+          "value": "#C5C5C9",
+          "comment": "Palette/Grey/30"
+        },
+        "track-color": {
+          "value": "#7F7F85",
+          "comment": "Palette/Grey/50"
+        }
+      },
+      "toggled": {
+        "thumb-color": {
+          "value": "#4F28CD",
+          "comment": "Palette/Purple/50"
+        },
+        "track-color": {
+          "value": "#9979F1",
+          "comment": "Palette/Purple/30"
+        }
+      },
+      "disabled": {
+        "thumb-color": {
+          "value": "#D9D9DE",
+          "comment": "Palette/Grey/20"
+        },
+        "track-color": {
+          "value": "#C5C5C9",
+          "comment": "Palette/Grey/30"
+        }
+      }
+    },
     "search-bar": {
       "default": {
         "background-color": {

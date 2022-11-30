@@ -841,39 +841,11 @@ const declarePropertyInstructionAndExpression = (
   conditionName: string,
   actionName: string,
   setterName: string,
-  getterName: string
-): void => {
-  const addObjectAndBehaviorParameters = <T: gdInstructionOrExpressionMetadata>(
+  getterName: string,
+  addObjectAndBehaviorParameters: <T: gdInstructionOrExpressionMetadata>(
     instructionOrExpression: T
-  ): T => {
-    // By convention, first parameter is always the object:
-    instructionOrExpression
-      .addParameter(
-        'object',
-        'Object',
-        '', // See below for adding the extra information
-        false
-      )
-      // Manually add the "extra info" without relying on addParameter
-      // as this method is prefixing the value passed with the extension namespace (this
-      // was done to ease extension declarations when dealing with object).
-      .setParameterExtraInfo(eventsBasedBehavior.getObjectType());
-
-    // By convention, second parameter is always the behavior:
-    instructionOrExpression.addParameter(
-      'behavior',
-      'Behavior',
-      eventsBasedBehavior.getName(),
-      false
-    );
-
-    // All property actions/conditions/expressions are private, meaning
-    // they can only be used from the behavior events.
-    instructionOrExpression.setPrivate();
-
-    return instructionOrExpression;
-  };
-
+  ) => T
+): void => {
   const propertyType = property.getType();
   const propertyName = property.getName();
 
@@ -939,6 +911,37 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
   behaviorMetadata: gdBehaviorMetadata,
   eventsBasedBehavior: gdEventsBasedBehavior
 ): void => {
+  const addObjectAndBehaviorParameters = <T: gdInstructionOrExpressionMetadata>(
+    instructionOrExpression: T
+  ): T => {
+    // By convention, first parameter is always the object:
+    instructionOrExpression
+      .addParameter(
+        'object',
+        'Object',
+        '', // See below for adding the extra information
+        false
+      )
+      // Manually add the "extra info" without relying on addParameter
+      // as this method is prefixing the value passed with the extension namespace (this
+      // was done to ease extension declarations when dealing with object).
+      .setParameterExtraInfo(eventsBasedBehavior.getObjectType());
+
+    // By convention, second parameter is always the behavior:
+    instructionOrExpression.addParameter(
+      'behavior',
+      'Behavior',
+      eventsBasedBehavior.getName(),
+      false
+    );
+
+    // All property actions/conditions/expressions are private, meaning
+    // they can only be used from the behavior events.
+    instructionOrExpression.setPrivate();
+
+    return instructionOrExpression;
+  };
+
   mapVector(eventsBasedBehavior.getPropertyDescriptors(), property => {
     const propertyType = property.getType();
     if (propertyType === 'Behavior') {
@@ -977,7 +980,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
       conditionName,
       actionName,
       setterName,
-      getterName
+      getterName,
+      addObjectAndBehaviorParameters
     );
   });
 
@@ -1013,7 +1017,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
       conditionName,
       actionName,
       setterName,
-      getterName
+      getterName,
+      addObjectAndBehaviorParameters
     );
   });
 };

@@ -11,7 +11,8 @@ import {
 } from './Reponsive/ResponsiveWindowMeasurer';
 import { CorsAwareImage } from './CorsAwareImage';
 import Text from './Text';
-import { Typography } from '@material-ui/core';
+import Skeleton from '@material-ui/lab/Skeleton';
+import Typography from '@material-ui/core/Typography';
 import { shortenString } from '../Utils/StringHelpers';
 
 const MAX_TILE_SIZE = 300;
@@ -58,6 +59,12 @@ const styles = {
     // the 16:9 ratio.
     aspectRatio: '16 / 9',
   },
+  skeletonTile: { padding: 8, height: 'auto' },
+  skeletonContainer: {
+    padding: 4,
+    aspectRatio: '16 / 9',
+  },
+  skeleton: { borderRadius: 8 },
 };
 
 // Styles to give the impression of pressing an element.
@@ -95,12 +102,14 @@ export type ImageTileComponent = {|
 
 type ImageTileGridProps = {|
   items: Array<ImageTileComponent>,
+  isLoading?: boolean,
   getColumnsFromWidth: (width: WidthType) => number,
   getLimitFromWidth?: (width: WidthType) => number,
 |};
 
 const ImageTileGrid = ({
   items,
+  isLoading,
   getColumnsFromWidth,
   getLimitFromWidth,
 }: ImageTileGridProps) => {
@@ -116,44 +125,61 @@ const ImageTileGrid = ({
         <GridList
           cols={getColumnsFromWidth(windowWidth)}
           style={{
+            flex: 1,
             maxWidth: (MAX_TILE_SIZE + 2 * SPACING) * MAX_COLUMNS, // Avoid tiles taking too much space on large screens.
           }}
           cellHeight="auto"
           spacing={SPACING * 2}
         >
-          {itemsToDisplay.map((item, index) => (
-            <GridListTile key={index} classes={tileClasses}>
-              <ButtonBase
-                style={styles.buttonStyle}
-                onClick={item.onClick}
-                tabIndex={0}
-                focusRipple
-              >
-                <Column noMargin>
-                  <div style={styles.imageContainer}>
-                    <CorsAwareImage
-                      style={styles.thumbnailImageWithDescription}
-                      src={item.imageUrl}
-                      alt={`thumbnail ${index}`}
-                    />
-                    {item.overlayText && (
-                      <ImageOverlay content={item.overlayText} />
-                    )}
-                  </div>
-                  {item.title && (
-                    <div style={styles.titleContainer}>
-                      <Text size="sub-title">{item.title}</Text>
+          {isLoading
+            ? new Array(getColumnsFromWidth(windowWidth))
+                .fill(0)
+                .map((_, index) => (
+                  <GridListTile key={index} style={styles.skeletonTile}>
+                    <div style={styles.skeletonContainer}>
+                      <Skeleton
+                        variant="rect"
+                        key={index}
+                        width="100%"
+                        height="100%"
+                        style={styles.skeleton}
+                      />
                     </div>
-                  )}
-                  {item.description && (
-                    <Text size="body" color="secondary">
-                      {shortenString(item.description, 120)}
-                    </Text>
-                  )}
-                </Column>
-              </ButtonBase>
-            </GridListTile>
-          ))}
+                  </GridListTile>
+                ))
+            : itemsToDisplay.map((item, index) => (
+                <GridListTile key={index} classes={tileClasses}>
+                  <ButtonBase
+                    style={styles.buttonStyle}
+                    onClick={item.onClick}
+                    tabIndex={0}
+                    focusRipple
+                  >
+                    <Column noMargin>
+                      <div style={styles.imageContainer}>
+                        <CorsAwareImage
+                          style={styles.thumbnailImageWithDescription}
+                          src={item.imageUrl}
+                          alt={`thumbnail ${index}`}
+                        />
+                        {item.overlayText && (
+                          <ImageOverlay content={item.overlayText} />
+                        )}
+                      </div>
+                      {item.title && (
+                        <div style={styles.titleContainer}>
+                          <Text size="sub-title">{item.title}</Text>
+                        </div>
+                      )}
+                      {item.description && (
+                        <Text size="body" color="secondary">
+                          {shortenString(item.description, 120)}
+                        </Text>
+                      )}
+                    </Column>
+                  </ButtonBase>
+                </GridListTile>
+              ))}
         </GridList>
       </Line>
     </div>

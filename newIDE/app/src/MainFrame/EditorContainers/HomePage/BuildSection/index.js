@@ -45,7 +45,6 @@ import { ExampleStoreContext } from '../../../../AssetStore/ExampleStore/Example
 import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import Add from '../../../../UI/CustomSvgIcons/Add';
 import ImageTileRow from '../../../../UI/ImageTileRow';
 import { prepareExamples } from '../../../../AssetStore/ExampleStore';
@@ -312,21 +311,22 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
               }
             >
               <SectionRow>
-                {!allExamples ? (
-                  <PlaceholderLoader />
-                ) : (
-                  <ImageTileRow
-                    items={prepareExamples(allExamples).map(example => ({
-                      onClick: () => onSelectExample(example),
-                      imageUrl: example.previewImageUrls[0],
-                    }))}
-                    title={<Trans>Recommended templates</Trans>}
-                    onShowAll={onShowAllExamples}
-                    showAllIcon={<Add fontSize="small" />}
-                    getColumnsFromWidth={getTemplatesGridSizeFromWidth}
-                    getLimitFromWidth={getTemplatesGridSizeFromWidth}
-                  />
-                )}
+                <ImageTileRow
+                  isLoading={!allExamples}
+                  items={
+                    allExamples
+                      ? prepareExamples(allExamples).map(example => ({
+                          onClick: () => onSelectExample(example),
+                          imageUrl: example.previewImageUrls[0],
+                        }))
+                      : []
+                  }
+                  title={<Trans>Recommended templates</Trans>}
+                  onShowAll={onShowAllExamples}
+                  showAllIcon={<Add fontSize="small" />}
+                  getColumnsFromWidth={getTemplatesGridSizeFromWidth}
+                  getLimitFromWidth={getTemplatesGridSizeFromWidth}
+                />
               </SectionRow>
               <SectionRow>
                 <LineStackLayout

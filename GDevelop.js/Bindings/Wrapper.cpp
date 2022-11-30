@@ -62,6 +62,9 @@
 #include <GDCore/Project/InitialInstance.h>
 #include <GDCore/Project/InitialInstancesContainer.h>
 #include <GDCore/Project/Layout.h>
+#include <GDCore/Project/MeasurementBaseUnit.h>
+#include <GDCore/Project/MeasurementUnitElement.h>
+#include <GDCore/Project/MeasurementUnitElement.h>
 #include <GDCore/Project/NamedPropertyDescriptor.h>
 #include <GDCore/Project/Object.h>
 #include <GDCore/Project/ObjectConfiguration.h>
@@ -658,6 +661,15 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetNodeAtPosition GetNodeAtPosition
 
 #define STATIC_ScanProject ScanProject
+
+#define STATIC_ApplyTranslation ApplyTranslation
+#define STATIC_GetDimensionless GetDimensionless
+#define STATIC_GetDegreeAngle GetDegreeAngle
+#define STATIC_GetSecond GetSecond
+#define STATIC_GetPixel GetPixel
+#define STATIC_GetPixelSpeed GetPixelSpeed
+#define STATIC_GetPixelAcceleration GetPixelAcceleration
+#define STATIC_GetNewton GetNewton
 
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout

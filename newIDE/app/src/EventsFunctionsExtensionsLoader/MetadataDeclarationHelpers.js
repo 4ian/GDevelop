@@ -853,16 +853,17 @@ const declarePropertyInstructionAndExpression = (
   ) => T
 ): void => {
   const propertyType = property.getType();
-  const propertyName = property.getName();
 
-  const uncapitalizedLabel = uncapitalizedFirstLetter(propertyLabel);
+  const uncapitalizedLabel = uncapitalizedFirstLetter(
+    property.getLabel() || property.getName()
+  );
   if (propertyType === 'Boolean') {
     addObjectAndBehaviorParameters(
       entityMetadata.addScopedCondition(
         conditionName,
         propertyLabel,
-        i18n._(t`Check the value of ${uncapitalizedLabel}`),
-        i18n._(t`Property ${propertyName} of _PARAM0_ is true`),
+        i18n._(t`Check the property value for ${uncapitalizedLabel}`),
+        i18n._(t`Property ${uncapitalizedLabel} of _PARAM0_ is true`),
         eventsBasedEntity.getFullName() || eventsBasedEntity.getName(),
         getExtensionIconUrl(extension),
         getExtensionIconUrl(extension)
@@ -875,9 +876,9 @@ const declarePropertyInstructionAndExpression = (
       entityMetadata.addScopedAction(
         actionName,
         propertyLabel,
-        i18n._(t`Update the value of ${uncapitalizedLabel}`),
+        i18n._(t`Update the property value for ${uncapitalizedLabel}`),
         i18n._(
-          t`Set property ${propertyName} of _PARAM0_ to _PARAM${valueParameterIndex}_`
+          t`Set property value for ${uncapitalizedLabel} of _PARAM0_ to _PARAM${valueParameterIndex}_`
         ),
         eventsBasedEntity.getFullName() || eventsBasedEntity.getName(),
         getExtensionIconUrl(extension),
@@ -893,8 +894,8 @@ const declarePropertyInstructionAndExpression = (
         gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
         expressionName,
         propertyLabel,
-        i18n._(t`the value of ${uncapitalizedLabel}`),
-        i18n._(t`the value of ${uncapitalizedLabel}`),
+        i18n._(t`the property value for the ${uncapitalizedLabel}`),
+        i18n._(t`the property value for the ${uncapitalizedLabel}`),
         eventsBasedEntity.getFullName() || eventsBasedEntity.getName(),
         getExtensionIconUrl(extension)
       )

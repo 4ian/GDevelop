@@ -17,7 +17,7 @@ class SerializerElement;
 namespace gd {
 
 /**
- * \brief An couple of an atomic unit of measurement and its power.
+ * \brief A couple of an atomic unit of measurement and its power.
  */
 class GD_CORE_API MeasurementUnitElement {
 public:

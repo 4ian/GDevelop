@@ -12,6 +12,13 @@ type Props = {
   justifyContent?: 'center',
 };
 
-export default ({ children, height, alignItems, justifyContent }: Props) => (
+const FixedHeightFlexContainer = ({
+  children,
+  height,
+  alignItems,
+  justifyContent,
+}: Props) => (
   <div style={{ ...style, height, alignItems, justifyContent }}>{children}</div>
 );
+
+export default FixedHeightFlexContainer;

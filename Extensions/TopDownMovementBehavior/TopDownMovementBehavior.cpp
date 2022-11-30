@@ -14,6 +14,7 @@ This project is released under the MIT License.
 #include <set>
 
 #include "GDCore/CommonTools.h"
+#include "GDCore/Project/MeasurementUnit.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/Layout.h"
@@ -45,25 +46,46 @@ TopDownMovementBehavior::GetProperties(
     const gd::SerializerElement& behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
-  properties[_("Allows diagonals")].SetGroup(_("Movement"))
+  properties[_("Allows diagonals")]
+      .SetGroup(_("Movement"))
       .SetValue(behaviorContent.GetBoolAttribute("allowDiagonals") ? "true"
                                                                    : "false")
       .SetType("Boolean");
-  properties[_("Acceleration")].SetGroup(_("Movement")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
-  properties[_("Deceleration")].SetGroup(_("Movement")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("deceleration")));
-  properties[_("Max. speed")].SetGroup(_("Movement")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
-  properties[_("Rotate speed")].SetGroup(_("Rotation")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("angularMaxSpeed")));
+  properties[_("Acceleration")]
+      .SetGroup(_("Movement"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelAcceleration())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
+  properties[_("Deceleration")]
+      .SetGroup(_("Movement"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelAcceleration())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("deceleration")));
+  properties[_("Max. speed")]
+      .SetGroup(_("Movement"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelSpeed())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
+  properties[_("Rotation speed")]
+      .SetGroup(_("Rotation"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetAngularSpeed())
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("angularMaxSpeed")));
   properties[_("Rotate object")]
       .SetGroup(_("Rotation"))
       .SetValue(behaviorContent.GetBoolAttribute("rotateObject") ? "true"
                                                                  : "false")
       .SetType("Boolean");
-  properties[_("Angle offset")].SetGroup(_("Rotation")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("angleOffset")));
+  properties[_("Angle offset")]
+      .SetGroup(_("Rotation"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("angleOffset")));
   properties[_("Default controls")]
       .SetValue(behaviorContent.GetBoolAttribute("ignoreDefaultControls")
                     ? "false"
@@ -90,12 +112,16 @@ TopDownMovementBehavior::GetProperties(
       .AddExtraInfo(_("Custom Isometry"));
   properties[_("Custom isometry angle")]
       .SetGroup(_("Viewpoint"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("customIsometryAngle")))
       .SetDescription(_("If you choose \"Custom Isometry\", this allows to "
                         "specify the angle of your isometry projection."));
   properties[_("Movement angle offset")]
       .SetGroup(_("Viewpoint"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("movementAngleOffset")))
       .SetDescription(_(
@@ -159,7 +185,7 @@ bool TopDownMovementBehavior::UpdateProperty(
     behaviorContent.SetAttribute("deceleration", value.To<float>());
   else if (name == _("Max. speed"))
     behaviorContent.SetAttribute("maxSpeed", value.To<float>());
-  else if (name == _("Rotate speed"))
+  else if (name == _("Rotation speed"))
     behaviorContent.SetAttribute("angularMaxSpeed", value.To<float>());
   else if (name == _("Angle offset"))
     behaviorContent.SetAttribute("angleOffset", value.To<float>());

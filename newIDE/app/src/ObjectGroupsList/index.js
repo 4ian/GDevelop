@@ -118,12 +118,15 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       name => objectGroups.has(name) || globalObjectGroups.has(name)
     );
 
-    objectGroups.insertNew(name, objectGroups.count());
+    const newObjectGroup = objectGroups.insertNew(name, objectGroups.count());
     this._onObjectGroupModified();
 
     if (this.props.onGroupAdded) {
       this.props.onGroupAdded();
     }
+
+    // A new group is not global by default. We focus it so the user can edit the name directly.
+    this._onEditName({ group: newObjectGroup, global: false });
   };
 
   _onDelete = (groupWithContext: GroupWithContext) => {

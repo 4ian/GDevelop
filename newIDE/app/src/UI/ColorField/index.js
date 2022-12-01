@@ -29,6 +29,7 @@ type Props = {|
   onChange: (string, ?number) => void,
   color: string,
   alpha?: number,
+  style?: Object,
 |};
 
 type State = {|
@@ -71,10 +72,14 @@ export default class ColorField extends React.Component<Props, State> {
   render() {
     return (
       <div
-        style={{
-          ...styles.container,
-          width: this.props.fullWidth ? '100%' : undefined,
-        }}
+        style={
+          this.props.style
+            ? { ...styles.container, ...this.props.style }
+            : {
+                ...styles.container,
+                width: this.props.fullWidth ? '100%' : undefined,
+              }
+        }
       >
         <TextField
           id={this.props.id}

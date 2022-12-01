@@ -339,7 +339,7 @@ const PropertiesEditor = ({
             floatingLabelText={getFieldLabel(instances, field)}
             helperMarkdownText={getFieldDescription(field)}
             disableAlpha
-            fullWidth
+            style={styles.field}
             color={getFieldValue(instances, field)}
             onChange={color => {
               const rgbString =

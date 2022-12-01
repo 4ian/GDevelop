@@ -3079,6 +3079,7 @@ const MainFrame = (props: Props) => {
               ? 'complete'
               : 'started'
           }
+          tutorialId={selectedInAppTutorialInfo.tutorialId}
           startTutorial={startSelectedTutorial}
           onClose={() => {
             setSelectedInAppTutorialInfo(null);

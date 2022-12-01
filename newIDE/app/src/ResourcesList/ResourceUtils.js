@@ -61,7 +61,8 @@ export const isPathInProjectFolder = (
 
 export const copyAllToProjectFolder = (
   project: gdProject,
-  resourcePaths: Array<string>
+  resourcePaths: Array<string>,
+  newToOldFilePaths: Map
 ): Promise<Array<string>> => {
   if (!fs || !path) {
     return Promise.resolve(resourcePaths);
@@ -72,6 +73,8 @@ export const copyAllToProjectFolder = (
   return Promise.all(
     resourcePaths.map(resourcePath => {
       if (isPathInProjectFolder(project, resourcePath)) {
+        newToOldFilePaths.set(resourcePath, resourcePath);
+
         return resourcePath;
       }
 
@@ -99,8 +102,12 @@ export const copyAllToProjectFolder = (
       return new Promise(resolve => {
         fs.copyFile(resourcePath, resourceNewPath, err => {
           if (err) {
+            newToOldFilePaths.set(resourcePath, resourcePath);
+
             return resolve(resourcePath);
           }
+
+          newToOldFilePaths.set(resourceNewPath, resourcePath);
 
           return resolve(resourceNewPath);
         });

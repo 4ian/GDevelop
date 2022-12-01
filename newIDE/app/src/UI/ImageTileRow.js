@@ -10,6 +10,7 @@ import { type WidthType } from './Reponsive/ResponsiveWindowMeasurer';
 
 type ImageTileRowProps = {|
   title: React.Node,
+  isLoading?: boolean,
   description?: React.Node,
   items: Array<ImageTileComponent>,
   onShowAll: () => void,
@@ -21,6 +22,7 @@ type ImageTileRowProps = {|
 const ImageTileRow = ({
   title,
   description,
+  isLoading,
   items,
   onShowAll,
   showAllIcon,
@@ -53,6 +55,7 @@ const ImageTileRow = ({
       )}
       <ImageTileGrid
         items={items}
+        isLoading={isLoading}
         getLimitFromWidth={getLimitFromWidth}
         getColumnsFromWidth={getColumnsFromWidth}
       />

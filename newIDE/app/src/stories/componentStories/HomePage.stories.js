@@ -20,6 +20,7 @@ import AuthenticatedUserContext, {
 import CloudStorageProvider from '../../ProjectsStorage/CloudStorageProvider';
 import {
   fakeIndieAuthenticatedUser,
+  fakeAuthenticatedButLoadingAuthenticatedUser,
   indieUserProfile,
 } from '../../fixtures/GDevelopServicesTestData';
 import { GDevelopAssetApi } from '../../Utils/GDevelopServices/ApiConfigs';
@@ -110,6 +111,13 @@ export default {
   decorators: [muiDecorator, GDevelopJsInitializerDecorator],
 };
 
+export const BuildSectionLoading = () => (
+  <WrappedHomePage
+    project={null}
+    recentProjectFiles={getRecentProjectFiles(5)}
+    user={fakeAuthenticatedButLoadingAuthenticatedUser}
+  />
+);
 export const NoProjectOpened = () => (
   <WrappedHomePage
     project={null}

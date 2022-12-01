@@ -84,7 +84,11 @@ const WrappedHomePage = ({
       <InAppTutorialContext.Provider
         value={{
           inAppTutorialShortHeaders: [
-            { id: 'flingGame', contentUrl: 'fakeUrl' },
+            {
+              id: 'flingGame',
+              contentUrl: 'fakeUrl',
+              availableLocales: ['en', 'fr-fr'],
+            },
           ],
           currentlyRunningInAppTutorial: null,
           startTutorial: async () => {

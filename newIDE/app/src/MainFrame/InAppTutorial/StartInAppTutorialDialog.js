@@ -189,7 +189,7 @@ const StartInAppTutorialDialog = ({
               </Trans>
             </Text>
             {dialogContent.availableLocalesLabels.map(([locale, label]) => (
-              <Text displayAsListItem noMargin>
+              <Text displayAsListItem noMargin key={locale}>
                 {label}
               </Text>
             ))}

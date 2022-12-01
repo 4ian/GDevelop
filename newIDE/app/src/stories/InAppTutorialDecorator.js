@@ -18,7 +18,7 @@ const inAppTutorialDecorator: StoryDecorator = (Story, context) => {
         inAppTutorialShortHeaders: [
           {
             id: 'flingGame',
-            availableLocales: ['en', 'fr-fr'],
+            availableLocales: ['en', 'fr-FR'],
             contentUrl: 'fakeContentUrl',
           },
         ],

@@ -87,7 +87,7 @@ const WrappedHomePage = ({
             {
               id: 'flingGame',
               contentUrl: 'fakeUrl',
-              availableLocales: ['en', 'fr-fr'],
+              availableLocales: ['en', 'fr-FR'],
             },
           ],
           currentlyRunningInAppTutorial: null,

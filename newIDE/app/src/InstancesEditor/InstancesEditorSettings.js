@@ -22,6 +22,8 @@ export type InstancesEditorSettings = {|
   windowMask: boolean,
 |};
 
+export const recommendedInitialZoomFactor = 0.7; // 0.7 allows to see the whole screen black rectangle at scene opening for resolution 800*600
+
 export const prepareInstancesEditorSettings = (
   object: any
 ): InstancesEditorSettings => {
@@ -38,7 +40,10 @@ export const prepareInstancesEditorSettings = (
         : rgbToHexNumber(158, 180, 255),
     gridAlpha: object.gridAlpha !== undefined ? object.gridAlpha : 0.8,
     snap: object.snap || false,
-    zoomFactor: Math.max(object.zoomFactor || 1, 0.0001),
+    zoomFactor: Math.max(
+      object.zoomFactor || recommendedInitialZoomFactor,
+      0.01
+    ),
     windowMask: object.windowMask || false,
   };
 };

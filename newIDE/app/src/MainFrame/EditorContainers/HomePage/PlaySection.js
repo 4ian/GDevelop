@@ -29,7 +29,7 @@ const PlaySection = () => {
     <SectionContainer
       title={<Trans>Play!</Trans>}
       flexBody
-      subtitle={<Trans>Explore games made by others</Trans>}
+      subtitleText={<Trans>Explore games made by others</Trans>}
     >
       <SectionRow expand>
         <iframe

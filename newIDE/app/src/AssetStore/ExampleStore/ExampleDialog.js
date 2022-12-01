@@ -18,7 +18,7 @@ import Text from '../../UI/Text';
 import AlertMessage from '../../UI/AlertMessage';
 import { getIDEVersion } from '../../Version';
 import { Column, Line } from '../../UI/Grid';
-import { Divider } from '@material-ui/core';
+import Divider from '@material-ui/core/Divider';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import { ExampleThumbnailOrIcon } from './ExampleThumbnailOrIcon';
 import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';

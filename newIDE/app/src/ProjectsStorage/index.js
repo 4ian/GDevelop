@@ -128,6 +128,7 @@ export type StorageProvider = {|
     projectName: string,
     saveAsLocation: ?SaveAsLocation,
     setSaveAsLocation: (?SaveAsLocation) => void,
+    newProjectsDefaultFolder?: string,
   |}) => React.Node,
   createOperations: ({
     /** Open a dialog (a render function) */

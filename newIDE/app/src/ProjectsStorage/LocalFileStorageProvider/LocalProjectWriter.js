@@ -11,13 +11,11 @@ import {
 } from '../../Utils/ObjectSplitter';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
-import { findEmptyPathInDefaultFolder } from './LocalPathFinder';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
-const app = remote ? remote.app : null;
 
 const checkFileContent = (filePath: string, expectedContent: string) => {
   const time = performance.now();
@@ -229,14 +227,16 @@ export const getWriteErrorMessage = (error: Error): MessageDescriptor =>
 export const onRenderNewProjectSaveAsLocationChooser = ({
   saveAsLocation,
   setSaveAsLocation,
+  newProjectsDefaultFolder,
 }: {
   saveAsLocation: ?SaveAsLocation,
   setSaveAsLocation: (?SaveAsLocation) => void,
+  newProjectsDefaultFolder?: string,
 }) => {
   const outputPath = saveAsLocation
     ? path.dirname(saveAsLocation.fileIdentifier)
-    : app
-    ? findEmptyPathInDefaultFolder(app)
+    : newProjectsDefaultFolder
+    ? newProjectsDefaultFolder
     : '';
   if (!saveAsLocation) {
     setSaveAsLocation({

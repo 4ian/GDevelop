@@ -27,7 +27,7 @@ const styles = {
 };
 
 type Props = {|
-  type: 'export' | 'create-game',
+  type: 'export' | 'create-game' | 'default-workspace',
   value: string,
   onChange: string => void,
   defaultPath?: string,
@@ -63,6 +63,12 @@ export default class LocalFolderPicker extends PureComponent<Props, {||}> {
       return {
         title: i18n._(t`Choose an export folder`),
         message: i18n._(t`Choose where to export the game`),
+      };
+    }
+    if (type === 'default-workspace') {
+      return {
+        title: i18n._(t`Choose a workspace folder`),
+        message: i18n._(t`Choose where to create your projects`),
       };
     }
     return {

@@ -12,6 +12,7 @@ import { type NewProjectSetup } from './CreateProjectDialog';
 import IconButton from '../UI/IconButton';
 import { ColumnStackLayout } from '../UI/Layout';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
+import { findEmptyPathInWorkspaceFolder } from '../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import CreateProfile from '../Profile/CreateProfile';
@@ -24,7 +25,11 @@ import {
 } from '../MainFrame/EditorContainers/HomePage/BuildSection/MaxProjectCountAlertMessage';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import optionalRequire from '../Utils/OptionalRequire';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+
 const electron = optionalRequire('electron');
+const remote = optionalRequire('@electron/remote');
+const app = remote ? remote.app : null;
 
 type Props = {|
   isOpening?: boolean,
@@ -48,6 +53,7 @@ const NewProjectSetupDialog = ({
   storageProviders,
   authenticatedUser,
 }: Props): React.Node => {
+  const { values } = React.useContext(PreferencesContext);
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
@@ -57,6 +63,9 @@ const NewProjectSetupDialog = ({
   const [projectName, setProjectName] = React.useState<string>(() =>
     generateProjectName(sourceExampleName)
   );
+  const newProjectsDefaultFolder = app
+    ? findEmptyPathInWorkspaceFolder(app, values.newProjectsDefaultFolder || '')
+    : '';
   const [saveAsLocation, setSaveAsLocation] = React.useState<?SaveAsLocation>(
     null
   );
@@ -228,6 +237,7 @@ const NewProjectSetupDialog = ({
             projectName,
             saveAsLocation,
             setSaveAsLocation,
+            newProjectsDefaultFolder,
           })}
         {limits && hasTooManyCloudProjects ? (
           <MaxProjectCountAlertMessage

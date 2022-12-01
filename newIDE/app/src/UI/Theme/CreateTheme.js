@@ -391,6 +391,12 @@ export function createGdevelopTheme({
           backgroundColor: styles['ThemeTextHighlightedBackgroundColor'],
         },
       },
+      linearProgress: {
+        color: {
+          complete: styles['ThemeLinearProgressColorComplete'],
+          incomplete: styles['ThemeLinearProgressColorIncomplete'],
+        },
+      },
       home: {
         header: {
           backgroundColor: styles['ThemeHomeHeaderBackgroundColor'],
@@ -488,7 +494,7 @@ export function createGdevelopTheme({
       },
       paper: {
         backgroundColor: {
-          dark: styles['ThemeSurfaceCanvasWindowBackgroundColor'],
+          dark: styles['ThemeSurfaceCanvasBackgroundColor'],
           medium: styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
           light: styles['ThemeSurfaceAlternateCanvasLightBackgroundColor'],
         },

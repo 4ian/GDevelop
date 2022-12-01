@@ -12,6 +12,7 @@ import {
   type RenderEditorContainerPropsWithRef,
   type EditorContainerExtraProps,
 } from '../EditorContainers/BaseEditor';
+import { type HTMLDataset } from '../../Utils/HTMLDataset';
 
 // Supported editors
 type EditorRef =
@@ -23,21 +24,25 @@ type EditorRef =
   | ResourcesEditorContainer
   | SceneEditorContainer;
 
+type TabOptions = {| data?: HTMLDataset |};
+
 export type EditorTab = {|
-  // The function to render the tab editor.
+  /** The function to render the tab editor. */
   renderEditorContainer: RenderEditorContainerPropsWithRef => React.Node,
-  // A reference to the editor.
+  /** A reference to the editor. */
   editorRef: ?EditorRef,
-  // The label shown on the tab.
+  /** The label shown on the tab. */
   label?: string,
   icon?: React.Node,
-  // The name of the layout/external layout/external events/extension.
+  /** the html dataset object to set on the tab button. */
+  tabOptions?: TabOptions,
+  /** The name of the layout/external layout/external events/extension. */
   projectItemName: ?string,
-  // A unique key for the tab.
+  /** A unique key for the tab. */
   key: string,
-  // Extra props to pass to editors
+  /** Extra props to pass to editors. */
   extraEditorProps: ?EditorContainerExtraProps,
-  // If set to false, the tab can't be closed.
+  /** If set to false, the tab can't be closed. */
   closable: boolean,
 |};
 
@@ -59,6 +64,7 @@ export const openEditorTab = (
     label,
     icon,
     projectItemName,
+    tabOptions,
     renderEditorContainer,
     key,
     extraEditorProps,
@@ -68,6 +74,7 @@ export const openEditorTab = (
     label?: string,
     icon?: React.Node,
     projectItemName: ?string,
+    tabOptions?: TabOptions,
     renderEditorContainer: (
       props: RenderEditorContainerPropsWithRef
     ) => React.Node,
@@ -92,6 +99,7 @@ export const openEditorTab = (
     label,
     icon,
     projectItemName,
+    tabOptions,
     renderEditorContainer,
     key,
     extraEditorProps,

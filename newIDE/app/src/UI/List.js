@@ -18,6 +18,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Add from '@material-ui/icons/Add';
 import Search from '@material-ui/icons/Search';
 import { type MenuItemTemplate } from './Menu/Menu.flow';
+import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 import { useLongTouch } from '../Utils/UseLongTouch';
 import { Collapse } from '@material-ui/core';
 const useDenseLists = true;
@@ -105,6 +106,7 @@ type ListItemProps = {|
   secondaryTextLines?: 1 | 2,
 
   id?: ?string,
+  data?: HTMLDataset,
 |};
 
 export type ListItemRefType = any; // Should be a material-ui ListIten
@@ -222,6 +224,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
           alignItems={props.secondaryTextLines === 2 ? 'flex-start' : undefined}
           ref={ref}
           id={props.id}
+          {...dataObjectToProps(props.data)}
         >
           {props.leftIcon && (
             <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
@@ -259,6 +262,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
             style={props.style}
             ref={ref}
             id={props.id}
+            {...dataObjectToProps(props.data)}
           >
             {props.leftIcon && (
               <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>

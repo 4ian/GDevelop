@@ -158,6 +158,7 @@ const InAppTutorialPhaseCard = ({
                         {keyPoints.map((keyPoint, index) =>
                           index % 2 === 0 ? (
                             <Text
+                              key={`key-point-${index}`}
                               size="body2"
                               noMargin
                               style={getTextStyle(shouldTextBeDisabled)}
@@ -180,6 +181,7 @@ const InAppTutorialPhaseCard = ({
                         {keyPoints.map((keyPoint, index) =>
                           index % 2 === 1 ? (
                             <Text
+                              key={`key-point-${index}`}
                               size="body2"
                               noMargin
                               style={getTextStyle(shouldTextBeDisabled)}

@@ -77,14 +77,8 @@ const getTemplatesGridSizeFromWidth = (width: WidthType) => {
 };
 
 const getProjectLineHeight = (width: WidthType) => {
-  let lineHeight;
-  switch (width) {
-    case 'small':
-      lineHeight = 52;
-      break;
-    default:
-      lineHeight = 36;
-  }
+  const lineHeight = width === 'small' ? 52 : 36;
+
   return lineHeight - 2 * marginsSize;
 };
 

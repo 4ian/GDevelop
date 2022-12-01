@@ -216,7 +216,7 @@ const propertyKeywordCouples: Array<[string, string]> = [
   ['Left', 'Right'],
   ['Up', 'Down'],
   ['Min', 'Max'],
-  ['Low', 'Heigh'],
+  ['Low', 'High'],
   ['Color', 'Opacity'],
   ['Horizontal', 'Vertical'],
   ['Acceleration', 'Deceleration'],

@@ -4,7 +4,11 @@ import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import { type InAppTutorial } from '../../InAppTutorial/InAppTutorialContext';
 
-export type InAppTutorialShortHeader = {| id: string, contentUrl: string |};
+export type InAppTutorialShortHeader = {|
+  id: string,
+  contentUrl: string,
+  availableLocales: Array<string>,
+|};
 
 export const fetchInAppTutorialShortHeaders = async (): Promise<
   Array<InAppTutorialShortHeader>

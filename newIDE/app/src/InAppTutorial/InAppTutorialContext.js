@@ -89,6 +89,7 @@ export type InAppTutorial = {|
     [stepId: string]: {| editor: EditorIdentifier, scene?: string |},
   },
   endDialog: InAppTutorialDialog,
+  availableLocales?: Array<string>,
 |};
 
 export type InAppTutorialState = {|

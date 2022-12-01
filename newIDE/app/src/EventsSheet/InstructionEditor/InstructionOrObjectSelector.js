@@ -7,7 +7,7 @@ import Fuse from 'fuse.js';
 
 import * as React from 'react';
 import Add from '@material-ui/icons/Add';
-import { Chip } from '@material-ui/core';
+import Chip from '@material-ui/core/Chip';
 import {
   createTree,
   type InstructionOrExpressionTreeNode,

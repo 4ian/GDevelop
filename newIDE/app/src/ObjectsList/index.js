@@ -756,7 +756,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           tags={selectedObjectTags}
           onChange={onChangeSelectedObjectTags}
         />
-        <div style={styles.listContainer}>
+        <div style={styles.listContainer} id="objects-list">
           <AutoSizer>
             {({ height, width }) => (
               <I18n>
@@ -769,9 +769,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     height={height}
                     getItemName={getObjectWithContextName}
                     getItemThumbnail={getObjectThumbnail}
-                    getItemId={(objectWithContext, index) => {
-                      return 'object-item-' + index;
-                    }}
+                    getItemId={(objectWithContext, index) =>
+                      `object-item-${index}`
+                    }
+                    getItemData={(objectWithContext, index) => ({
+                      objectName: objectWithContext.object.getName(),
+                      global: objectWithContext.global.toString(),
+                    })}
                     isItemBold={isObjectWithContextGlobal}
                     onEditItem={objectWithContext =>
                       onEditObject(objectWithContext.object)

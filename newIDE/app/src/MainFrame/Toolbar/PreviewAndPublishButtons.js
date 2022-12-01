@@ -209,6 +209,7 @@ export default function PreviewAndPublishButtons({
           />
         }
         label={<Trans>Publish</Trans>}
+        id={'toolbar-publish-button'}
         exceptionalTooltipForToolbar={
           <Trans>Export the game (Web, Android, iOS...)</Trans>
         }

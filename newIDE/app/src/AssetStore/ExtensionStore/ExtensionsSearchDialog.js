@@ -94,9 +94,11 @@ export default function ExtensionsSearchDialog({
       {({ i18n }) => (
         <Dialog
           title={<Trans>Search for New Extensions</Trans>}
+          id="extension-search-dialog"
           fullHeight
           actions={[
             <FlatButton
+              id="close-button"
               key="close"
               label={<Trans>Close</Trans>}
               primary

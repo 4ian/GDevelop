@@ -8,6 +8,7 @@ import { type SearchMatch } from '../../../UI/Search/UseSearchStructuredItem';
 import HighlightedText from '../../../UI/Search/HighlightedText';
 
 type Props = {|
+  id?: string,
   instructionOrExpressionMetadata: EnumeratedInstructionOrExpressionMetadata,
   iconSize: number,
   onClick: () => void,
@@ -16,6 +17,7 @@ type Props = {|
 |};
 
 export const renderInstructionOrExpressionListItem = ({
+  id,
   instructionOrExpressionMetadata,
   iconSize,
   onClick,
@@ -40,6 +42,7 @@ export const renderInstructionOrExpressionListItem = ({
 
   return (
     <ListItem
+      id={id}
       key={getInstructionListItemKey(instructionOrExpressionMetadata)}
       selected={
         selectedValue ===

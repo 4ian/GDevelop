@@ -30,7 +30,10 @@ import PinchHandler, { shouldBeHandledByPinch } from './PinchHandler';
 import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
 import LongTouchHandler from './LongTouchHandler';
-import { type InstancesEditorSettings } from './InstancesEditorSettings';
+import {
+  recommendedInitialZoomFactor,
+  type InstancesEditorSettings,
+} from './InstancesEditorSettings';
 import Rectangle from '../Utils/Rectangle';
 import { isNoDialogOpened } from '../UI/MaterialUISpecificUtil';
 const gd: libGDevelop = global.gd;
@@ -872,7 +875,7 @@ export default class InstancesEditor extends Component<Props> {
   zoomToInitialPosition() {
     const x = this.props.project.getGameResolutionWidth() / 2;
     const y = this.props.project.getGameResolutionHeight() / 2;
-    this.setZoomFactor(1);
+    this.setZoomFactor(recommendedInitialZoomFactor);
     this.scrollTo(x, y);
   }
 

@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { TutorialContext } from '../Tutorial/TutorialContext';
 import getTutorial from './getTutorial';
@@ -13,15 +14,18 @@ import TutorialMessage from './TutorialMessage';
  */
 const useDismissableTutorialMessage = (tutorialId: string) => {
   const preferences = React.useContext(PreferencesContext);
+  const { currentlyRunningInAppTutorial } = React.useContext(
+    InAppTutorialContext
+  );
   const { tutorials } = React.useContext(TutorialContext);
   const tutorial = getTutorial(preferences, tutorials, tutorialId);
 
   const DismissableTutorialMessage = React.useMemo(
     () => {
-      if (!tutorial) return null;
+      if (!tutorial || currentlyRunningInAppTutorial) return null;
       return <TutorialMessage tutorial={tutorial} />;
     },
-    [tutorial]
+    [tutorial, currentlyRunningInAppTutorial]
   );
 
   return {

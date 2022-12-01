@@ -46,6 +46,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
           </MiniToolbarText>
           <SemiControlledTextField
             commitOnBlur
+            id="text-object-font-size"
             type="number"
             margin="none"
             style={styles.sizeTextField}
@@ -122,6 +123,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
               <SemiControlledTextField
                 floatingLabelText={<Trans>Initial text to display</Trans>}
                 floatingLabelFixed
+                id="text-object-initial-text"
                 commitOnBlur
                 translatableHintText={t`Enter the text to be displayed by the object`}
                 fullWidth

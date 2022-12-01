@@ -15,6 +15,7 @@ type PropsType = {|
     transform?: string,
     transition?: string,
     opacity?: number,
+    cursor?: 'pointer',
     margin?: number,
     marginRight?: number,
     marginLeft?: number,

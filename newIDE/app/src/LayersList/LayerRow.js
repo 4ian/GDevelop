@@ -29,6 +29,7 @@ export const styles = {
 };
 
 type Props = {|
+  id: string,
   layer: gdLayer,
   nameError: React.Node,
   onBlur: string => void,
@@ -44,6 +45,7 @@ type Props = {|
 |};
 
 const LayerRow = ({
+  id,
   layer,
   nameError,
   onBlur,
@@ -88,7 +90,7 @@ const LayerRow = ({
                     }}
                   />
                 )}
-                <TreeTableRow>
+                <TreeTableRow id={id}>
                   <TreeTableCell>
                     {connectDragSource(
                       <span>
@@ -100,7 +102,7 @@ const LayerRow = ({
                     <SemiControlledTextField
                       margin="none"
                       value={isBaseLayer ? i18n._(t`Base layer`) : layerName}
-                      id={layerName}
+                      id="layer-name"
                       errorText={nameError}
                       disabled={isBaseLayer}
                       onChange={onBlur}
@@ -144,6 +146,7 @@ const LayerRow = ({
                     ) : (
                       <React.Fragment>
                         <InlineCheckbox
+                          id="layer-visibility"
                           checked={isVisible}
                           checkedIcon={<Visibility />}
                           uncheckedIcon={<VisibilityOff />}

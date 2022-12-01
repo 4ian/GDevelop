@@ -31,15 +31,18 @@ import Tooltip from '@material-ui/core/Tooltip';
 type Props = BehaviorEditorProps;
 
 const NumericProperty = (props: {|
+  id?: string,
   properties: gdMapStringPropertyDescriptor,
   propertyName: string,
   step: number,
   onUpdate: (newValue: string) => void,
 |}) => {
-  const { properties, propertyName, step, onUpdate } = props;
+  const { properties, propertyName, step, onUpdate, id } = props;
   const property = properties.get(propertyName);
+
   return (
     <SemiControlledTextField
+      id={id}
       fullWidth
       value={property.getValue()}
       key={propertyName}
@@ -124,6 +127,7 @@ const Physics2Editor = (props: Props) => {
     >
       <Line>
         <SelectField
+          id="physics2-parameter-body-type"
           key={'bodyType'}
           fullWidth
           floatingLabelText={properties.get('bodyType').getLabel()}
@@ -194,6 +198,7 @@ const Physics2Editor = (props: Props) => {
       </Line>
       <Line>
         <SelectField
+          id="physics2-parameter-shape"
           fullWidth
           floatingLabelText={properties.get('shape').getLabel()}
           value={properties.get('shape').getValue()}
@@ -435,6 +440,7 @@ const Physics2Editor = (props: Props) => {
       )}
       <ResponsiveLineStackLayout>
         <NumericProperty
+          id="physics2-parameter-density"
           properties={properties}
           propertyName={'density'}
           step={0.1}
@@ -493,6 +499,7 @@ const Physics2Editor = (props: Props) => {
           }}
         />
         <NumericProperty
+          id="physics2-parameter-angular-damping"
           properties={properties}
           propertyName={'angularDamping'}
           step={0.05}

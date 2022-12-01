@@ -39,6 +39,7 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
         <ToolbarGroup firstChild>
           {props.showProjectIcons && (
             <ToolbarIcon
+              id="main-toolbar-project-manager-button"
               onClick={props.toggleProjectManager}
               src="res/ribbon_default/projectManager32.png"
               disabled={!props.hasProject}

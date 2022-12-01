@@ -774,7 +774,9 @@ export default class ThemableEventsTree extends Component<
                   this.props.onAddInstructionContextMenu(event, ...args)
                 }
                 onOpenExternalEvents={this.props.onOpenExternalEvents}
-                onOpenLayout={this.props.onOpenLayout}
+                onOpenLayout={(name: string) => {
+                  this.props.onOpenLayout(name);
+                }}
                 disabled={
                   disabled /* Use node.disabled (not event.disabled) as it is true if a parent event is disabled*/
                 }

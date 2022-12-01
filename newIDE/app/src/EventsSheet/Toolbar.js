@@ -38,17 +38,20 @@ export class Toolbar extends PureComponent<Props> {
           <ToolbarIcon
             onClick={this.props.onAddStandardEvent}
             src="res/ribbon_default/eventadd32.png"
+            id="toolbar-add-event-button"
             tooltip={t`Add a new empty event`}
           />
           <ToolbarIcon
             onClick={this.props.onAddSubEvent}
             src="res/ribbon_default/subeventadd32.png"
             disabled={!this.props.canAddSubEvent}
+            id="toolbar-add-sub-event-button"
             tooltip={t`Add a sub-event to the selected event`}
           />
           <ToolbarIcon
             onClick={this.props.onAddCommentEvent}
             src="res/ribbon_default/commentaireadd32.png"
+            id="toolbar-add-comment-button"
             tooltip={t`Add a comment`}
           />
           <ElementWithMenu

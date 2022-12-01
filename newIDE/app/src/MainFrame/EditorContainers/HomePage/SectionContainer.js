@@ -41,7 +41,8 @@ const styles = {
 type Props = {|
   children: React.Node,
   title: React.Node,
-  subtitle?: React.Node,
+  subtitleText?: React.Node,
+  renderSubtitle?: () => React.Node,
   backAction?: () => void,
   flexBody?: boolean,
   renderFooter?: () => React.Node,
@@ -50,7 +51,8 @@ type Props = {|
 const SectionContainer = ({
   children,
   title,
-  subtitle,
+  subtitleText,
+  renderSubtitle,
   backAction,
   flexBody,
   renderFooter,
@@ -86,11 +88,12 @@ const SectionContainer = ({
                 {title}
               </Text>
             </Line>
-            {subtitle && (
+            {subtitleText && (
               <Line noMargin>
-                <Text noMargin>{subtitle}</Text>
+                <Text noMargin>{subtitleText}</Text>
               </Line>
             )}
+            {renderSubtitle && renderSubtitle()}
           </SectionRow>
           {children}
         </Column>

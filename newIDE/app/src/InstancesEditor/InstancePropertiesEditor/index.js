@@ -55,18 +55,20 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       nonFieldType: 'sectionTitle',
     },
     {
-      name: this.props.i18n._(t`Position`),
+      name: 'Position',
       type: 'row',
       children: [
         {
-          name: this.props.i18n._(t`X`),
+          name: 'X',
+          getLabel: () => this.props.i18n._(t`X`),
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getX(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
             instance.setX(newValue),
         },
         {
-          name: this.props.i18n._(t`Y`),
+          name: 'Y',
+          getLabel: () => this.props.i18n._(t`Y`),
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getY(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
@@ -75,21 +77,24 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       ],
     },
     {
-      name: this.props.i18n._(t`Angle`),
+      name: 'Angle',
+      getLabel: () => this.props.i18n._(t`Angle`),
       valueType: 'number',
       getValue: (instance: gdInitialInstance) => instance.getAngle(),
       setValue: (instance: gdInitialInstance, newValue: number) =>
         instance.setAngle(newValue),
     },
     {
-      name: this.props.i18n._(t`Lock position/angle in the editor`),
+      name: 'Lock instance position angle',
+      getLabel: () => this.props.i18n._(t`Lock position/angle in the editor`),
       valueType: 'boolean',
       getValue: (instance: gdInitialInstance) => instance.isLocked(),
       setValue: (instance: gdInitialInstance, newValue: boolean) =>
         instance.setLocked(newValue),
     },
     {
-      name: this.props.i18n._(t`Prevent selection in the canvas`),
+      name: 'Prevent instance selection',
+      getLabel: () => this.props.i18n._(t`Prevent selection in the canvas`),
       valueType: 'boolean',
       disabled: (instances: gdInitialInstance[]) => {
         return instances.some(instance => !instance.isLocked());
@@ -99,14 +104,16 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
         instance.setSealed(newValue),
     },
     {
-      name: this.props.i18n._(t`Z Order`),
+      name: 'Z Order',
+      getLabel: () => this.props.i18n._(t`Z Order`),
       valueType: 'number',
       getValue: (instance: gdInitialInstance) => instance.getZOrder(),
       setValue: (instance: gdInitialInstance, newValue: number) =>
         instance.setZOrder(newValue),
     },
     {
-      name: this.props.i18n._(t`Layer`),
+      name: 'Layer',
+      getLabel: () => this.props.i18n._(t`Layer`),
       valueType: 'string',
       getChoices: () => enumerateLayers(this.props.layout),
       getValue: (instance: gdInitialInstance) => instance.getLayer(),
@@ -114,7 +121,8 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
         instance.setLayer(newValue),
     },
     {
-      name: this.props.i18n._(t`Custom size`),
+      name: 'Custom size',
+      getLabel: () => this.props.i18n._(t`Custom size`),
       valueType: 'boolean',
       getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
       setValue: (instance: gdInitialInstance, newValue: boolean) =>
@@ -125,14 +133,16 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       type: 'row',
       children: [
         {
-          name: this.props.i18n._(t`Width`),
+          name: 'Width',
+          getLabel: () => this.props.i18n._(t`Width`),
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getCustomWidth(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
             instance.setCustomWidth(Math.max(newValue, 0)),
         },
         {
-          name: this.props.i18n._(t`Height`),
+          name: 'Height',
+          getLabel: () => this.props.i18n._(t`Height`),
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getCustomHeight(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
@@ -174,7 +184,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           .map((instance: gdInitialInstance) => '' + instance.ptr)
           .join(';')}
       >
-        <Column expand noMargin>
+        <Column expand noMargin id="instance-properties-editor">
           <Column>
             <PropertiesEditor
               unsavedChanges={this.props.unsavedChanges}

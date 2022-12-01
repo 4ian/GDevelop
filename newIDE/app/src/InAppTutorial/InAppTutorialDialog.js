@@ -54,6 +54,7 @@ function InAppTutorialDialog({
           onClick={endTutorial}
         />,
         <DialogPrimaryButton
+          primary
           key="next"
           onClick={onApply}
           label={<Trans>Start next chapter</Trans>}

@@ -283,28 +283,29 @@ const propertiesMapToSchema = (
         const firstProperty = properties.get(firstName);
         const secondProperty = properties.get(secondName);
         if (firstProperty.getGroup() === secondProperty.getGroup()) {
-          field = {
-            name: firstName + '-' + secondName,
-            type: 'row',
-            children: [
-              createField(
-                firstName,
-                firstProperty,
-                getProperties,
-                onUpdateProperty,
-                object
-              ),
-              createField(
-                secondName,
-                secondProperty,
-                getProperties,
-                onUpdateProperty,
-                object
-              ),
-            ],
-          };
-          alreadyHandledProperties.add(firstName);
-          alreadyHandledProperties.add(secondName);
+          const firstField = createField(
+            firstName,
+            firstProperty,
+            getProperties,
+            onUpdateProperty,
+            object
+          );
+          const secondField = createField(
+            secondName,
+            secondProperty,
+            getProperties,
+            onUpdateProperty,
+            object
+          );
+          if (firstField && secondField) {
+            field = {
+              name: firstName + '-' + secondName,
+              type: 'row',
+              children: [firstField, secondField],
+            };
+            alreadyHandledProperties.add(firstName);
+            alreadyHandledProperties.add(secondName);
+          }
         }
       }
     }

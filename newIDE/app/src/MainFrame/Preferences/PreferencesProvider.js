@@ -150,6 +150,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ),
     saveTutorialProgress: this._saveTutorialProgress.bind(this),
     getTutorialProgress: this._getTutorialProgress.bind(this),
+    setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this),
   };
 
   componentDidMount() {
@@ -750,6 +751,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           isAlwaysOnTopInPreview: enabled,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setNewProjectsDefaultFolder(newProjectsDefaultFolder: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          newProjectsDefaultFolder,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

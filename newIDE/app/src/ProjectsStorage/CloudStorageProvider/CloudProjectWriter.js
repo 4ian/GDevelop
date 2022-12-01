@@ -231,6 +231,7 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
   projectName: string,
   saveAsLocation: ?SaveAsLocation,
   setSaveAsLocation: (?SaveAsLocation) => void,
+  newProjectsDefaultFolder?: string,
 |}) => {
   if (!saveAsLocation || saveAsLocation.name !== projectName) {
     setSaveAsLocation({

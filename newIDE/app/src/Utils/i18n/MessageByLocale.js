@@ -66,4 +66,4 @@ export const getLanguageLabelForLocale = (locale: string): React.Node => {
     default:
       return null;
   }
-}
+};

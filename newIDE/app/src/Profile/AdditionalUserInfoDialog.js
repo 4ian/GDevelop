@@ -197,7 +197,7 @@ const AdditionalUserInfoDialog = ({
         if (!updateInProgress) onClose();
       }}
       maxWidth="sm"
-      open
+      open={!currentlyRunningInAppTutorial}
     >
       <ColumnStackLayout
         noMargin

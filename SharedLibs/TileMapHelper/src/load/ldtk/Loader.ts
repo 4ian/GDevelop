@@ -61,6 +61,8 @@ export namespace LDtkTileMapLoader {
       dimY,
       tileSet
     );
+    const composedTileMap = new Map<string, TileDefinition>();
+    let nextComposedTileId = 0xfffffff;
 
     for (let iLayer = level.layerInstances.length - 1; iLayer >= 0; --iLayer) {
       const layer = level.layerInstances[iLayer];
@@ -75,14 +77,55 @@ export namespace LDtkTileMapLoader {
         const x = Math.floor(tile.px[0] / gridSize);
         const y = Math.floor(tile.px[1] / gridSize);
         const tileId = getLDtkTileId(tilesetId, tile.t);
-
-        editableTileLayer.addTile(x, y, {
+        const rotate = getPixiRotateFromLDtk(tile.f);
+        const editableTile = {
           tileId,
-          rotate: getPixiRotateFromLDtk(tile.f),
+          rotate,
           flippedDiagonally: tile.f === 3,
           flippedHorizontally: tile.f === 1,
           flippedVertically: tile.f === 2,
-        });
+        };
+
+        const oldTile = editableTileLayer.getTile(x, y);
+        if (oldTile) {
+          const oldTileDef = tileSet.get(oldTile.tileId);
+
+          if (oldTileDef.hasStackedTiles()) {
+            const hash = `${oldTileDef.getStackedTilesHash()};${tileId},${rotate}`;
+            const tileDef = composedTileMap.get(hash);
+            if (tileDef) {
+              editableTileLayer.setTile(x, y, tileDef.getStackTile());
+            } else {
+              const tileDef = new TileDefinition(0);
+
+              tileDef.setStackedTiles(
+                nextComposedTileId,
+                ...oldTileDef.getStackedTiles(),
+                editableTile
+              );
+
+              tileSet.set(nextComposedTileId, tileDef);
+              nextComposedTileId -= 1;
+
+              composedTileMap.set(tileDef.getStackedTilesHash(), tileDef);
+
+              editableTileLayer.setTile(x, y, tileDef.getStackTile());
+            }
+          } else {
+            const tileDef = new TileDefinition(0);
+
+            tileDef.setStackedTiles(nextComposedTileId, oldTile, editableTile);
+
+            tileSet.set(nextComposedTileId, tileDef);
+            nextComposedTileId -= 1;
+
+            composedTileMap.set(tileDef.getStackedTilesHash(), tileDef);
+
+            editableTileLayer.setTile(x, y, tileDef.getStackTile());
+          }
+        } else {
+          editableTileLayer.setTile(x, y, editableTile);
+        }
       }
     }
 

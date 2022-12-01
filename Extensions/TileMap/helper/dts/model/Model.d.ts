@@ -179,12 +179,6 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
      */
     constructor(tileMap: EditableTileMap, id: integer);
     /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param tile The tile.
-     */
-    addTile(x: integer, y: integer, tile: EditableTile): void;
-    /**
      * The opacity (between 0-1) of the layer
      */
     getAlpha(): float;
@@ -206,12 +200,6 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
      * @returns The tile.
      */
     getTile(x: integer, y: integer): EditableTile | undefined;
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @returns The stacked tiles.
-     */
-    getTiles(x: integer, y: integer): EditableTile[] | undefined;
     /**
      * @returns The layer width in pixels.
      */
@@ -254,35 +242,28 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
  * A tile definition from the tile set.
  */
 export declare class TileDefinition {
+    private readonly animationLength;
+    /**
+     * A tile can be a composition of several tiles.
+     */
+    private stackedTiles;
+    private stackedTilesHash?;
+    private stackTile?;
     /**
      * There will probably be at most 4 tags on a tile.
      * An array lookup should take less time than using a Map.
      */
     private readonly taggedHitBoxes;
-    private readonly animationLength;
     /**
      * @param animationLength The number of frame in the tile animation.
      */
-    constructor(animationLength: integer);
+    constructor(animationLength?: integer);
     /**
      * Add a polygon for the collision layer
      * @param tag The tag to allow collision layer filtering.
      * @param polygon The polygon to use for collisions.
      */
-    add(tag: string, polygon: PolygonVertices): void;
-    /**
-     * This property is used by {@link TransformedCollisionTileMap}
-     * to make collision classes.
-     * @param tag  The tag to allow collision layer filtering.
-     * @returns true if this tile contains any polygon with the given tag.
-     */
-    hasTag(tag: string): boolean;
-    /**
-     * The hitboxes positioning is done by {@link TransformedCollisionTileMap}.
-     * @param tag  The tag to allow collision layer filtering.
-     * @returns The hit boxes for this tile.
-     */
-    getHitBoxes(tag: string): PolygonVertices[] | undefined;
+    addHitBox(tag: string, polygon: PolygonVertices): void;
     /**
      * Animated tiles have a limitation:
      * they are only able to use frames arranged horizontally one next
@@ -290,6 +271,40 @@ export declare class TileDefinition {
      * @returns The number of frame in the tile animation.
      */
     getAnimationLength(): integer;
+    /**
+     * The hitboxes positioning is done by {@link TransformedCollisionTileMap}.
+     * @param tag  The tag to allow collision layer filtering.
+     * @returns The hit boxes for this tile.
+     */
+    getHitBoxes(tag: string): PolygonVertices[] | undefined;
+    /**
+     * @returns The tile representing the stack of tiles.
+     */
+    getStackTile(): EditableTile;
+    /**
+     * @returns All the tiles composed in the stack.
+     */
+    getStackedTiles(): EditableTile[];
+    /**
+     * @returns The hash code representing the stack.
+     */
+    getStackedTilesHash(): string;
+    /**
+     * @returns `true` if the defintion is a stack of tiles.
+     */
+    hasStackedTiles(): boolean;
+    /**
+     * This property is used by {@link TransformedCollisionTileMap}
+     * to make collision classes.
+     * @param tag  The tag to allow collision layer filtering.
+     * @returns true if this tile contains any polygon with the given tag.
+     */
+    hasTaggedHitBox(tag: string): boolean;
+    /**
+     * @param stackTileId The `tileId` representing the stack.
+     * @param tiles All the tiles of stack.
+     */
+    setStackedTiles(stackTileId: integer, ...tiles: EditableTile[]): void;
 }
 export {};
 //# sourceMappingURL=Model.d.ts.map

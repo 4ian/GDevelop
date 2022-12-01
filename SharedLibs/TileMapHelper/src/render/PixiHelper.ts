@@ -117,15 +117,33 @@ export namespace PixiTileMapHelper {
             const xPos = tileWidth * x;
             const yPos = tileHeight * y;
 
-            const tiles = tileLayer.getTiles(x, y);
-            if (tiles === undefined) {
+            const tile = tileLayer.getTile(x, y);
+            if (!tile) {
               continue;
             }
-            for (const tile of tiles) {
+
+            const tileDefinition = tileLayer.tileMap.getTileDefinition(
+              tile.tileId
+            );
+
+            if (tileDefinition.hasStackedTiles()) {
+              for (const tile of tileDefinition.getStackedTiles()) {
+                const tileTexture = textureCache.getTexture(tile.tileId);
+                if (!tileTexture) {
+                  continue;
+                }
+
+                void pixiTileMap.tile(tileTexture, xPos, yPos, {
+                  alpha,
+                  rotate: tile.rotate,
+                });
+              }
+            } else {
               const tileTexture = textureCache.getTexture(tile.tileId);
               if (!tileTexture) {
                 continue;
               }
+
               const pixiTilemapFrame = pixiTileMap.tile(
                 tileTexture,
                 xPos,
@@ -136,14 +154,10 @@ export namespace PixiTileMapHelper {
                 }
               );
 
-              const tileDefinition = tileLayer.tileMap.getTileDefinition(
-                tile.tileId
-              );
-
               // Animated tiles have a limitation:
               // they are only able to use frames arranged horizontally one next
               // to each other on the atlas.
-              if (tileDefinition && tileDefinition.getAnimationLength() > 0) {
+              if (tileDefinition.getAnimationLength() > 0) {
                 pixiTilemapFrame.tileAnimX(
                   tileWidth,
                   tileDefinition.getAnimationLength()

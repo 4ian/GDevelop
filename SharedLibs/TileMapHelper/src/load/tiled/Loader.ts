@@ -79,7 +79,7 @@ export namespace TiledTileMapLoader {
                 ];
               }
               if (polygon) {
-                tileDefinition.add(tag, polygon);
+                tileDefinition.addHitBox(tag, polygon);
               }
             }
           } else if (tile.class && tile.class.length > 0) {
@@ -90,7 +90,7 @@ export namespace TiledTileMapLoader {
               [tileMap.tilewidth, tileMap.tileheight],
               [tileMap.tilewidth, 0],
             ];
-            tileDefinition.add(tile.class, polygon);
+            tileDefinition.addHitBox(tile.class, polygon);
           }
           definitions.set(
             getTileIdFromTiledGUI(firstGid + tile.id),

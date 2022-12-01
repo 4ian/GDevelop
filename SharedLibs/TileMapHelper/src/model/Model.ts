@@ -178,7 +178,7 @@ export class EditableTileMap {
         return false;
       }
       const tileDefinition = this._tileSet.get(tile.tileId);
-      if (tileDefinition!.hasTag(tag)) {
+      if (tileDefinition!.hasTaggedHitBox(tag)) {
         return true;
       }
     }
@@ -274,7 +274,7 @@ export type TileObject = {
  * A tile map layer with tile organized in grid.
  */
 export class EditableTileMapLayer extends AbstractEditableLayer {
-  private readonly _tiles: (EditableTile[] | undefined)[][];
+  private readonly _tiles: EditableTile[][];
   private _alpha: float;
 
   /**
@@ -289,24 +289,6 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
       this._tiles[index] = new Array(this.tileMap.getDimensionX());
     }
     this._alpha = 1;
-  }
-
-  /**
-   * @param x The layer column.
-   * @param y The layer row.
-   * @param tile The tile.
-   */
-  addTile(x: integer, y: integer, tile: EditableTile): void {
-    const definition = this.tileMap.getTileDefinition(tile.tileId);
-    if (!definition) {
-      console.error(`Invalid tile definition index: ${tile.tileId}`);
-      return;
-    }
-    if (this._tiles[y][x]) {
-      this._tiles[y][x].push(tile);
-    } else {
-      this._tiles[y][x] = [tile];
-    }
   }
 
   /**
@@ -344,23 +326,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    */
   getTile(x: integer, y: integer): EditableTile | undefined {
     const row = this._tiles[y];
-    if (!row || !row[x]) {
-      return;
-    }
-    return row[x][0];
-  }
-
-  /**
-   * @param x The layer column.
-   * @param y The layer row.
-   * @returns The stacked tiles.
-   */
-  getTiles(x: integer, y: integer): EditableTile[] | undefined {
-    const row = this._tiles[y];
-    if (!row) {
-      return;
-    }
-    return row[x];
+    return row ? row[x] : undefined;
   }
 
   /**
@@ -377,7 +343,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    */
   isFlippedHorizontally(x: integer, y: integer): boolean {
     var tile = this._tiles[y][x];
-    return tile ? tile[0].flippedHorizontally : false;
+    return tile ? tile.flippedHorizontally : false;
   }
 
   /**
@@ -387,7 +353,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    */
   isFlippedVertically(x: integer, y: integer): boolean {
     var tile = this._tiles[y][x];
-    return tile ? tile[0].flippedVertically : false;
+    return tile ? tile.flippedVertically : false;
   }
 
   /**
@@ -397,7 +363,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    */
   isFlippedDiagonally(x: integer, y: integer): boolean {
     var tile = this._tiles[y][x];
-    return tile ? tile[0].flippedDiagonally : false;
+    return tile ? tile.flippedDiagonally : false;
   }
 
   /**
@@ -426,7 +392,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
       console.error(`Invalid tile definition index: ${tile.tileId}`);
       return;
     }
-    this._tiles[y][x] = [tile];
+    this._tiles[y][x] = tile;
   }
 }
 
@@ -434,6 +400,15 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
  * A tile definition from the tile set.
  */
 export class TileDefinition {
+  private readonly animationLength: integer;
+
+  /**
+   * A tile can be a composition of several tiles.
+   */
+  private stackedTiles: EditableTile[];
+  private stackedTilesHash?: string;
+  private stackTile?: EditableTile;
+
   /**
    * There will probably be at most 4 tags on a tile.
    * An array lookup should take less time than using a Map.
@@ -442,14 +417,14 @@ export class TileDefinition {
     tag: string;
     polygons: PolygonVertices[];
   }[];
-  private readonly animationLength: integer;
 
   /**
    * @param animationLength The number of frame in the tile animation.
    */
-  constructor(animationLength: integer) {
+  constructor(animationLength?: integer) {
+    this.animationLength = animationLength ?? 0;
+    this.stackedTiles = [];
     this.taggedHitBoxes = [];
-    this.animationLength = animationLength;
   }
 
   /**
@@ -457,7 +432,7 @@ export class TileDefinition {
    * @param tag The tag to allow collision layer filtering.
    * @param polygon The polygon to use for collisions.
    */
-  add(tag: string, polygon: PolygonVertices): void {
+  addHitBox(tag: string, polygon: PolygonVertices): void {
     let taggedHitBox = this.taggedHitBoxes.find((hitbox) => hitbox.tag === tag);
     if (!taggedHitBox) {
       taggedHitBox = { tag, polygons: [] };
@@ -467,13 +442,13 @@ export class TileDefinition {
   }
 
   /**
-   * This property is used by {@link TransformedCollisionTileMap}
-   * to make collision classes.
-   * @param tag  The tag to allow collision layer filtering.
-   * @returns true if this tile contains any polygon with the given tag.
+   * Animated tiles have a limitation:
+   * they are only able to use frames arranged horizontally one next
+   * to each other on the atlas.
+   * @returns The number of frame in the tile animation.
    */
-  hasTag(tag: string): boolean {
-    return this.taggedHitBoxes.some((hitbox) => hitbox.tag === tag);
+  getAnimationLength(): integer {
+    return this.animationLength;
   }
 
   /**
@@ -489,12 +464,58 @@ export class TileDefinition {
   }
 
   /**
-   * Animated tiles have a limitation:
-   * they are only able to use frames arranged horizontally one next
-   * to each other on the atlas.
-   * @returns The number of frame in the tile animation.
+   * @returns The tile representing the stack of tiles.
    */
-  getAnimationLength(): integer {
-    return this.animationLength;
+  getStackTile(): EditableTile {
+    return this.stackTile!;
+  }
+
+  /**
+   * @returns All the tiles composed in the stack.
+   */
+  getStackedTiles(): EditableTile[] {
+    return this.stackedTiles;
+  }
+
+  /**
+   * @returns The hash code representing the stack.
+   */
+  getStackedTilesHash(): string {
+    return this.stackedTilesHash!;
+  }
+
+  /**
+   * @returns `true` if the defintion is a stack of tiles.
+   */
+  hasStackedTiles(): boolean {
+    return this.stackedTiles.length > 0;
+  }
+
+  /**
+   * This property is used by {@link TransformedCollisionTileMap}
+   * to make collision classes.
+   * @param tag  The tag to allow collision layer filtering.
+   * @returns true if this tile contains any polygon with the given tag.
+   */
+  hasTaggedHitBox(tag: string): boolean {
+    return this.taggedHitBoxes.some((hitbox) => hitbox.tag === tag);
+  }
+
+  /**
+   * @param stackTileId The `tileId` representing the stack.
+   * @param tiles All the tiles of stack.
+   */
+  setStackedTiles(stackTileId: integer, ...tiles: EditableTile[]): void {
+    this.stackedTiles = tiles;
+    this.stackTile = {
+      tileId: stackTileId,
+      rotate: 0,
+      flippedDiagonally: false,
+      flippedHorizontally: false,
+      flippedVertically: false,
+    };
+    this.stackedTilesHash = tiles
+      .map(({ tileId, rotate }) => `${tileId},${rotate}`)
+      .join(";");
   }
 }

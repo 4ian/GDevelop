@@ -391,8 +391,8 @@ describe("TiledTileMapLoader", function () {
     it("can load a tile set with a rectangle collision mask", function () {
       const tileDefinition = tileMap.getTileDefinition(0);
       expect(tileDefinition).to.be.ok();
-      expect(tileDefinition.hasTag("obstacle")).to.be(true);
-      expect(tileDefinition.hasTag("lava")).to.be(false);
+      expect(tileDefinition.hasTaggedHitBox("obstacle")).to.be(true);
+      expect(tileDefinition.hasTaggedHitBox("lava")).to.be(false);
       expect(tileDefinition.getHitBoxes("obstacle")).to.be.eql([
         [
           [0, 0],
@@ -406,16 +406,16 @@ describe("TiledTileMapLoader", function () {
     it("can load a tile set with an empty collision mask", function () {
       const tileDefinition = tileMap.getTileDefinition(1);
       expect(tileDefinition).to.be.ok();
-      expect(tileDefinition.hasTag("obstacle")).to.be(false);
-      expect(tileDefinition.hasTag("lava")).to.be(false);
+      expect(tileDefinition.hasTaggedHitBox("obstacle")).to.be(false);
+      expect(tileDefinition.hasTaggedHitBox("lava")).to.be(false);
     });
 
     it("can load a tile set with a polygon collision mask", function () {
       {
         const tileDefinition = tileMap.getTileDefinition(2);
         expect(tileDefinition).to.be.ok();
-        expect(tileDefinition.hasTag("obstacle")).to.be(true);
-        expect(tileDefinition.hasTag("lava")).to.be(false);
+        expect(tileDefinition.hasTaggedHitBox("obstacle")).to.be(true);
+        expect(tileDefinition.hasTaggedHitBox("lava")).to.be(false);
         expect(tileDefinition.getHitBoxes("obstacle")).to.be.eql([
           [
             [0, 8],
@@ -429,8 +429,8 @@ describe("TiledTileMapLoader", function () {
     it("can load a tile set with a 2 polygons collision mask", function () {
       const tileDefinition = tileMap.getTileDefinition(3);
       expect(tileDefinition).to.be.ok();
-      expect(tileDefinition.hasTag("obstacle")).to.be(true);
-      expect(tileDefinition.hasTag("lava")).to.be(false);
+      expect(tileDefinition.hasTaggedHitBox("obstacle")).to.be(true);
+      expect(tileDefinition.hasTaggedHitBox("lava")).to.be(false);
       expect(tileDefinition.getHitBoxes("obstacle")).to.be.eql([
         [
           [0, 0],
@@ -448,8 +448,8 @@ describe("TiledTileMapLoader", function () {
     it("can load a tile set with several collision mask filter tags", function () {
       const tileDefinition = tileMap.getTileDefinition(4);
       expect(tileDefinition).to.be.ok();
-      expect(tileDefinition.hasTag("obstacle")).to.be(true);
-      expect(tileDefinition.hasTag("lava")).to.be(true);
+      expect(tileDefinition.hasTaggedHitBox("obstacle")).to.be(true);
+      expect(tileDefinition.hasTaggedHitBox("lava")).to.be(true);
       expect(tileDefinition.getHitBoxes("obstacle")).to.be.eql([
         [
           [0, 0],
@@ -469,8 +469,8 @@ describe("TiledTileMapLoader", function () {
     it("can load a tile set with only the other filter tag", function () {
       const tileDefinition = tileMap.getTileDefinition(5);
       expect(tileDefinition).to.be.ok();
-      expect(tileDefinition.hasTag("obstacle")).to.be(false);
-      expect(tileDefinition.hasTag("lava")).to.be(true);
+      expect(tileDefinition.hasTaggedHitBox("obstacle")).to.be(false);
+      expect(tileDefinition.hasTaggedHitBox("lava")).to.be(true);
       expect(tileDefinition.getHitBoxes("lava")).to.be.eql([
         [
           [0, 0],

@@ -289,7 +289,6 @@ void SerializerElement::Init(const gd::SerializerElement& other) {
   deprecatedArrayOf = other.deprecatedArrayOf;
 }
 
-// TODO Remove shouldAlwayUseSetString in a release that follows the 150.
 void SerializerElement::SetMultilineStringValue(const gd::String& value) {
   if (value.find('\n') == gd::String::npos) {
     SetStringValue(value);

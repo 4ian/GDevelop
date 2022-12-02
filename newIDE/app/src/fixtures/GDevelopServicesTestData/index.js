@@ -183,7 +183,7 @@ export const limitsForNoSubscriptionUser: Limits = {
     leaderboards: {
       maximumCountPerGame: 3,
       canMaximumCountPerGameBeIncreased: true,
-      canCustomizeTheme: false,
+      themeCustomizationCapabilities: 'NONE',
     },
   },
   limits: {
@@ -212,7 +212,7 @@ export const limitsForIndieUser: Limits = {
     leaderboards: {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
-      canCustomizeTheme: true,
+      themeCustomizationCapabilities: 'BASIC',
     },
   },
   limits: {
@@ -241,7 +241,7 @@ export const limitsForProUser: Limits = {
     leaderboards: {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
-      canCustomizeTheme: true,
+      themeCustomizationCapabilities: 'FULL',
     },
   },
   limits: {
@@ -270,7 +270,7 @@ export const limitsReached: Limits = {
     leaderboards: {
       maximumCountPerGame: 3,
       canMaximumCountPerGameBeIncreased: true,
-      canCustomizeTheme: false,
+      themeCustomizationCapabilities: 'BASIC',
     },
   },
   limits: {

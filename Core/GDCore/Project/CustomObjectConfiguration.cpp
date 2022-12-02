@@ -126,7 +126,8 @@ void CustomObjectConfiguration::DoUnserializeFrom(Project& project,
 }
 
 void CustomObjectConfiguration::ExposeResources(
-    gd::ArbitraryResourceWorker& worker) {
+    gd::ArbitraryResourceWorker& worker,
+    gd::ResourcesManager* resourcesManager) {
   std::map<gd::String, gd::PropertyDescriptor> properties = GetProperties();
 
   for (auto& property : properties) {
@@ -148,6 +149,8 @@ void CustomObjectConfiguration::ExposeResources(
         worker.ExposeVideo(newPropertyValue);
       } else if (resourceType == "json") {
         worker.ExposeJson(newPropertyValue);
+      } else if (resourceType == "tilemap") {
+        worker.ExposeTilemap(newPropertyValue);
       } else if (resourceType == "bitmapFont") {
         worker.ExposeBitmapFont(newPropertyValue);
       }
@@ -166,6 +169,6 @@ void CustomObjectConfiguration::ExposeResources(
 
   for (auto& childObject : eventsBasedObject.GetObjects()) {
     auto &configuration = GetChildObjectConfiguration(childObject->GetName());
-    configuration.ExposeResources(worker);
+    configuration.ExposeResources(worker, resourcesManager);
   }
 }

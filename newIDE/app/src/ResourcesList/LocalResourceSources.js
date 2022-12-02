@@ -150,12 +150,17 @@ const localResourceSources: Array<ResourceSource> = [
 
             if (newToOldFilePaths.has(filePath)) {
               const oldFilePath = newToOldFilePaths.get(filePath);
+              const embeddedFile = embeddedFiles.get(oldFilePath);
 
-              if (embeddedFiles.has(oldFilePath)) {
-                mapping = embeddedFiles.get(oldFilePath).mapping;
+              if (embeddedFile) {
+                mapping = embeddedFile.mapping;
               }
-            } else if (embeddedFiles.has(filePath)) {
-              mapping = embeddedFiles.get(filePath).mapping;
+            } else {
+              const embeddedFile = embeddedFiles.get(filePath)
+
+              if (embeddedFile) {
+                mapping = embeddedFile.mapping;
+              }
             }
 
             if (mapping) {

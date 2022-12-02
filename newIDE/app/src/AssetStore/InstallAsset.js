@@ -146,6 +146,7 @@ export const addAssetToProject = async ({
   const objectNewNames = {};
   const resourceNewNames = {};
   const createdObjects: Array<gdObject> = [];
+  const resourcesManager: gdResourcesManager = project.getResourcesManager();
 
   asset.objectAssets.forEach(objectAsset => {
     objectAsset.resources.forEach(serializedResource => {});
@@ -192,7 +193,7 @@ export const addAssetToProject = async ({
     const renamedResourcesMap = toNewGdMapStringString(resourceNewNames);
     const resourcesRenamer = new gd.ResourcesRenamer(renamedResourcesMap);
     renamedResourcesMap.delete();
-    object.getConfiguration().exposeResources(resourcesRenamer);
+    object.getConfiguration().exposeResources(resourcesRenamer, resourcesManager);
     resourcesRenamer.delete();
 
     createdObjects.push(object);

@@ -127,7 +127,7 @@ export namespace TiledTileMapLoader {
             continue;
           }
           const tile = decodeTiledGUI(tiledObject.gid);
-          if (tile) {
+          if (tile.tileId !== undefined) {
             const object = {
               ...tile,
               x: tiledObject.x,
@@ -159,7 +159,7 @@ export namespace TiledTileMapLoader {
             for (let x = 0; x < tiledLayer.width; x++) {
               // Encoded bits about the flipping/rotation of the tile.
               const tile = decodeTiledGUI(layerData[tileSlotIndex]);
-              if (tile) {
+              if (tile.tileId !== undefined) {
                 collisionTileLayer.setTile(x, y, tile);
               }
               tileSlotIndex += 1;

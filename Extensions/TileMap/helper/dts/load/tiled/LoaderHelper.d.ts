@@ -10,7 +10,7 @@ import { TiledLayer } from "../../types/Tiled";
  * @returns The decoded layer data.
  */
 export declare const decodeBase64LayerData: (pako: any, layer: TiledLayer) => number[];
-export declare function decodeTiledGUI(data: integer): EditableTile | null;
+export declare function decodeTiledGUI(data: integer): EditableTile;
 /**
  * Tiled use 0 as null, we do too but it's black boxed.
  * This is why the id needs to be decremented.

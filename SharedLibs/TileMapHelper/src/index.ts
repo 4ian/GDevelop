@@ -15,3 +15,4 @@ export { PixiTileMapHelper } from "./render/PixiHelper";
 
 export * from "./types/index";
 export * from "./types/commons";
+export { TiledTileset } from "./types/Tiled";

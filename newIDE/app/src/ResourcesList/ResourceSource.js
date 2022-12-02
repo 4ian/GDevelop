@@ -27,30 +27,35 @@ export const allResourceKindsAndMetadata = [
     displayName: t`Audio`,
     fileExtensions: ['aac', 'wav', 'mp3', 'ogg'],
     createNewResource: () => new gd.AudioResource(),
+    listEmbeddedFiles: null,
   },
   {
     kind: 'image',
     displayName: t`Image`,
     fileExtensions: ['png', 'jpg', 'jpeg', 'webp'],
     createNewResource: () => new gd.ImageResource(),
+    listEmbeddedFiles: null,
   },
   {
     kind: 'font',
     displayName: t`Font`,
     fileExtensions: ['ttf', 'otf'],
     createNewResource: () => new gd.FontResource(),
+    listEmbeddedFiles: null,
   },
   {
     kind: 'video',
     displayName: t`Video`,
     fileExtensions: ['mp4', 'webm'],
     createNewResource: () => new gd.VideoResource(),
+    listEmbeddedFiles: null,
   },
   {
     kind: 'json',
     displayName: t`Json`,
     fileExtensions: ['json'],
     createNewResource: () => new gd.JsonResource(),
+    listEmbeddedFiles: null,
   },
   {
     kind: 'tilemap',
@@ -64,6 +69,7 @@ export const allResourceKindsAndMetadata = [
     displayName: t`Bitmap Font`,
     fileExtensions: ['fnt', 'xml'],
     createNewResource: () => new gd.BitmapFontResource(),
+    listEmbeddedFiles: null,
   },
 ];
 
@@ -72,7 +78,7 @@ for (const { kind, createNewResource } of allResourceKindsAndMetadata) {
   constructors[kind] = createNewResource;
 }
 
-export function createNewResource(kind) {
+export function createNewResource(kind: string) {
   return constructors[kind] ? constructors[kind]() : null;
 }
 

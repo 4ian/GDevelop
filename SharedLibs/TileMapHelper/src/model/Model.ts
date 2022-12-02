@@ -177,8 +177,8 @@ export class EditableTileMap {
       if (!tile) {
         return false;
       }
-      const tileDefinition = this._tileSet.get(tile.tileId);
-      if (tileDefinition!.hasTaggedHitBox(tag)) {
+      const tileDefinition = this._tileSet.get(tile.tileId)!;
+      if (tileDefinition.hasTaggedHitBox(tag)) {
         return true;
       }
     }

@@ -580,7 +580,7 @@ namespace gdjs {
               if (!definition) {
                 continue;
               }
-              if (definition.hasTag(this.tag)) {
+              if (definition.hasTaggedHitBox(this.tag)) {
                 polygonItr = tile.getHitboxes()[Symbol.iterator]();
                 listNext = polygonItr.next();
               }
@@ -660,7 +660,7 @@ namespace gdjs {
        * @returns The tile definition from the tile set.
        */
       getDefinition(): TileMapHelper.TileDefinition {
-        const tile = this.layer._source.getTile(this.x, this.y)
+        const tile = this.layer._source.getTile(this.x, this.y);
         return this.layer.tileMap.getTileDefinition(tile ? tile.tileId : 0)!;
       }
 

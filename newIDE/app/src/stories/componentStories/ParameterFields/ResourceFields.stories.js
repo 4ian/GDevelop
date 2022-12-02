@@ -174,9 +174,13 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceSources={[]}
-            onChooseResource={() => Promise.reject('unimplemented')}
-            resourceExternalEditors={fakeResourceExternalEditors}
+            resourceManagementProps={{
+              getStorageProvider: () => emptyStorageProvider,
+              onFetchNewlyAddedResources: async () => {},
+              resourceSources: [],
+              onChooseResource: () => Promise.reject('Unimplemented'),
+              resourceExternalEditors: fakeResourceExternalEditors,
+            }}
           />
         )}
       />

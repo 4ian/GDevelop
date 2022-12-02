@@ -45,96 +45,109 @@ PlatformerObjectBehavior::GetProperties(
     const gd::SerializerElement& behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
-  properties[_("Gravity")]
+  properties["Gravity"]
+      .SetLabel(_("Gravity"))
       .SetGroup(_("Jump"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixelAcceleration())
       .SetValue(
           gd::String::From(behaviorContent.GetDoubleAttribute("gravity")));
-  properties[_("Jump speed")]
+  properties["JumpSpeed"]
+      .SetLabel(_("Jump speed"))
       .SetGroup(_("Jump"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixelSpeed())
       .SetValue(
           gd::String::From(behaviorContent.GetDoubleAttribute("jumpSpeed")));
-  properties["jumpSustainTime"]
+  properties["JumpSustainTime"]
+      .SetLabel(_("Jump sustain time"))
       .SetGroup(_("Jump"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetSecond())
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("jumpSustainTime", 0)))
-      .SetLabel(_("Jump sustain time"))
       .SetDescription(
           _("Maximum time (in seconds) during which the jump strength is "
             "sustained if the jump key is held - allowing variable height "
             "jumps."));
-  properties[_("Max. falling speed")]
+  properties["MaxFallingSpeed"]
+      .SetLabel(_("Max. falling speed"))
       .SetGroup(_("Jump"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixelSpeed())
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("maxFallingSpeed")));
-  properties[_("Ladder climbing speed")]
+  properties["LadderClimbingSpeed"]
+      .SetLabel(_("Ladder climbing speed"))
       .SetGroup(_("Ladder"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixelSpeed())
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("ladderClimbingSpeed", 150)));
-  properties[_("Acceleration")]
+  properties["Acceleration"]
+      .SetLabel(_("Acceleration"))
       .SetGroup(_("Walk"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixelAcceleration())
       .SetValue(
           gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
-  properties[_("Deceleration")]
+  properties["Deceleration"]
+      .SetLabel(_("Deceleration"))
       .SetGroup(_("Walk"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixelAcceleration())
       .SetValue(
           gd::String::From(behaviorContent.GetDoubleAttribute("deceleration")));
-  properties[_("Max. speed")]
+  properties["MaxSpeed"]
+      .SetLabel(_("Max. speed"))
       .SetGroup(_("Walk"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixelSpeed())
       .SetValue(
           gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
-  properties[_("Default controls")]
+  properties["IgnoreDefaultControls"]
+      .SetLabel(_("Default controls"))
       .SetValue(behaviorContent.GetBoolAttribute("ignoreDefaultControls")
                     ? "false"
                     : "true")
       .SetType("Boolean");
-  properties[_("Slope max. angle")]
+  properties["SlopeMaxAngle"]
+      .SetLabel(_("Slope max. angle"))
       .SetGroup(_("Walk"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("slopeMaxAngle")));
-  properties[_("Can grab platform ledges")]
+  properties["CanGrabPlatforms"]
+      .SetLabel(_("Can grab platform ledges"))
       .SetGroup(_("Ledge"))
       .SetValue(behaviorContent.GetBoolAttribute("canGrabPlatforms", false)
                     ? "true"
                     : "false")
       .SetType("Boolean");
-  properties[_("Automatically grab platform ledges without having to move "
-               "horizontally")]
+  properties["CanGrabWithoutMoving"]
+      .SetLabel(_("Automatically grab platform ledges without having to move "
+                  "horizontally"))
       .SetGroup(_("Ledge"))
       .SetValue(behaviorContent.GetBoolAttribute("canGrabWithoutMoving", false)
                     ? "true"
                     : "false")
       .SetType("Boolean");
-  properties[_("Grab offset on Y axis")]
+  properties["YGrabOffset"]
+      .SetLabel(_("Grab offset on Y axis"))
       .SetGroup(_("Ledge"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
       .SetValue(
           gd::String::From(behaviorContent.GetDoubleAttribute("yGrabOffset")));
-  properties[_("Grab tolerance on X axis")]
+  properties["XGrabTolerance"]
+      .SetLabel(_("Grab tolerance on X axis"))
       .SetGroup(_("Ledge"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("xGrabTolerance", 10)));
-  properties["useLegacyTrajectory"]
+  properties["UseLegacyTrajectory"]
       .SetLabel(_("Use frame rate dependent trajectories (deprecated, it's "
                   "recommended to leave this unchecked)"))
       .SetGroup(_("Deprecated options (advanced)"))
@@ -142,7 +155,8 @@ PlatformerObjectBehavior::GetProperties(
                     ? "true"
                     : "false")
       .SetType("Boolean");
-  properties[_("Can go down from jumpthru platforms")]
+  properties["CanGoDownFromJumpthru"]
+      .SetLabel(_("Can go down from jumpthru platforms"))
       .SetGroup(_("Walk"))
       .SetValue(behaviorContent.GetBoolAttribute("canGoDownFromJumpthru", false)
                     ? "true"
@@ -155,44 +169,43 @@ bool PlatformerObjectBehavior::UpdateProperty(
     gd::SerializerElement& behaviorContent,
     const gd::String& name,
     const gd::String& value) {
-  if (name == _("Default controls"))
+  if (name == "IgnoreDefaultControls")
     behaviorContent.SetAttribute("ignoreDefaultControls", (value == "0"));
-  else if (name == _("Can grab platform ledges"))
+  else if (name == "CanGrabPlatforms")
     behaviorContent.SetAttribute("canGrabPlatforms", (value == "1"));
-  else if (name == _("Automatically grab platform ledges without having to "
-                     "move horizontally"))
+  else if (name == "CanGrabWithoutMoving")
     behaviorContent.SetAttribute("canGrabWithoutMoving", (value == "1"));
-  else if (name == "useLegacyTrajectory")
+  else if (name == "UseLegacyTrajectory")
     behaviorContent.SetAttribute("useLegacyTrajectory", (value == "1"));
-  else if (name == _("Can go down from jumpthru platforms"))
+  else if (name == "CanGoDownFromJumpthru")
     behaviorContent.SetAttribute("canGoDownFromJumpthru", (value == "1"));
-  else if (name == _("Grab offset on Y axis"))
+  else if (name == "YGrabOffset")
     behaviorContent.SetAttribute("yGrabOffset", value.To<double>());
   else {
     if (value.To<double>() < 0) return false;
 
-    if (name == _("Gravity"))
+    if (name == "Gravity")
       behaviorContent.SetAttribute("gravity", value.To<double>());
-    else if (name == _("Max. falling speed"))
+    else if (name == "MaxFallingSpeed")
       behaviorContent.SetAttribute("maxFallingSpeed", value.To<double>());
-    else if (name == _("Ladder climbing speed"))
+    else if (name == "LadderClimbingSpeed")
       behaviorContent.SetAttribute("ladderClimbingSpeed", value.To<double>());
-    else if (name == _("Acceleration"))
+    else if (name == "Acceleration")
       behaviorContent.SetAttribute("acceleration", value.To<double>());
-    else if (name == _("Deceleration"))
+    else if (name == "Deceleration")
       behaviorContent.SetAttribute("deceleration", value.To<double>());
-    else if (name == _("Max. speed"))
+    else if (name == "MaxSpeed")
       behaviorContent.SetAttribute("maxSpeed", value.To<double>());
-    else if (name == _("Jump speed"))
+    else if (name == "JumpSpeed")
       behaviorContent.SetAttribute("jumpSpeed", value.To<double>());
-    else if (name == "jumpSustainTime")
+    else if (name == "JumpSustainTime")
       behaviorContent.SetAttribute("jumpSustainTime", value.To<double>());
-    else if (name == _("Slope max. angle")) {
+    else if (name == "SlopeMaxAngle") {
       double newMaxAngle = value.To<double>();
       if (newMaxAngle < 0 || newMaxAngle >= 90) return false;
 
       behaviorContent.SetAttribute("slopeMaxAngle", newMaxAngle);
-    } else if (name == _("Grab tolerance on X axis"))
+    } else if (name == "XGrabTolerance")
       behaviorContent.SetAttribute("xGrabTolerance", value.To<double>());
     else
       return false;

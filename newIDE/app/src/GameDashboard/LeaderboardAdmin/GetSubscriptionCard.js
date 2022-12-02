@@ -46,7 +46,7 @@ const GetSubscriptionCard = () => {
             href="#"
             onClick={() => {
               openSubscriptionDialog({
-                reason: 'Leaderboard count per game limit reached',
+                reason: 'Leaderboard customization',
               });
             }}
           >

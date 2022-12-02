@@ -377,7 +377,8 @@ export type SubscriptionDialogDisplayReason =
   | 'Leaderboard count per game limit reached'
   | 'Cloud Project limit reached'
   | 'Consult profile'
-  | 'Build limit reached';
+  | 'Build limit reached'
+  | 'Leaderboard customization';
 
 export const sendSubscriptionDialogShown = (metadata: {|
   reason: SubscriptionDialogDisplayReason,

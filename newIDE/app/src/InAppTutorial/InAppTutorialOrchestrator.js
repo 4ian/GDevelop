@@ -332,7 +332,7 @@ type Props = {|
   tutorial: InAppTutorial,
   startStepIndex: number,
   startProjectData: { [key: string]: string },
-  endTutorial: () => void,
+  endTutorial: (shouldCloseProject?: boolean) => void,
   project: ?gdProject,
   currentEditor: EditorIdentifier | null,
   currentSceneName: string | null,
@@ -839,7 +839,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
           goToFallbackStep={() => {
             changeStep(currentStepFallbackStepIndex.current);
           }}
-          endTutorial={endTutorial}
+          endTutorial={() => endTutorial(true)}
           progress={computeProgress()[currentPhaseIndex]}
           goToNextStep={goToNextStep}
         />
@@ -876,7 +876,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
                 dialogContent={endDialog}
                 endTutorial={() => {
                   setDisplayEndDialog(false);
-                  endTutorial();
+                  endTutorial(false);
                 }}
               />
             )}

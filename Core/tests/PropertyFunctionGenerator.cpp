@@ -222,9 +222,18 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
               "Change if rotate object. The rotation follows movements done by "
               "this behavior only.");
       REQUIRE(setter.GetSentence() == "_PARAM0_ rotate object: _PARAM2_");
-      // Object and behavior parameters are added automatically.
-      REQUIRE(setter.GetParameters().size() == 1);
-      auto &valueParameter = setter.GetParameters().at(0);
+      // To generate the value parameter, object and behavior parameters has to
+      // be declared too.
+      REQUIRE(setter.GetParameters().size() == 3);
+      auto &objectParameter = setter.GetParameters().at(0);
+      REQUIRE(objectParameter.GetName() == "Object");
+      REQUIRE(objectParameter.GetType() == "object");
+      auto &behaviorParameter = setter.GetParameters().at(1);
+      REQUIRE(behaviorParameter.GetName() == "Behavior");
+      REQUIRE(behaviorParameter.GetType() == "behavior");
+      REQUIRE(behaviorParameter.GetExtraInfo() ==
+              "MyEventsExtension::MyEventsBasedBehavior");
+      auto &valueParameter = setter.GetParameters().at(2);
       REQUIRE(valueParameter.GetName() == "Value");
       REQUIRE(valueParameter.GetType() == "yesorno");
 

@@ -620,7 +620,26 @@ class GD_CORE_API PlatformExtension {
    */
   static gd::String GetNamespaceSeparator() { return "::"; }
 
- private:
+  static gd::String GetEventsFunctionFullType(const gd::String &extensionName,
+                                              const gd::String &functionName);
+
+  static gd::String
+  GetBehaviorEventsFunctionFullType(const gd::String &extensionName,
+                                    const gd::String &behaviorName,
+                                    const gd::String &functionName);
+
+  static gd::String GetBehaviorFullType(const gd::String &extensionName,
+                                        const gd::String &behaviorName);
+
+  static gd::String
+  GetObjectEventsFunctionFullType(const gd::String &extensionName,
+                                  const gd::String &objectName,
+                                  const gd::String &functionName);
+
+  static gd::String GetObjectFullType(const gd::String &extensionName,
+                                      const gd::String &objectName);
+
+private:
   /**
    * Set the namespace (the string all actions/conditions/expressions start
    * with).

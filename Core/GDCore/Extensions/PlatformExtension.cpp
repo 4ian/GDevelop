@@ -24,14 +24,12 @@
 
 namespace gd {
 
-#if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::InstructionMetadata>
     PlatformExtension::badConditionsMetadata;
 std::map<gd::String, gd::InstructionMetadata>
     PlatformExtension::badActionsMetadata;
 std::map<gd::String, gd::ExpressionMetadata>
     PlatformExtension::badExpressionsMetadata;
-#endif
 
 gd::InstructionMetadata& PlatformExtension::AddCondition(
     const gd::String& name,
@@ -41,7 +39,6 @@ gd::InstructionMetadata& PlatformExtension::AddCondition(
     const gd::String& group,
     const gd::String& icon,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace = GetNameSpace() + name;
   conditionsInfos[nameWithNamespace] = InstructionMetadata(GetNameSpace(),
                                                            nameWithNamespace,
@@ -53,7 +50,6 @@ gd::InstructionMetadata& PlatformExtension::AddCondition(
                                                            smallicon)
                                            .SetHelpPath(GetHelpPath());
   return conditionsInfos[nameWithNamespace];
-#endif
 }
 
 gd::InstructionMetadata& PlatformExtension::AddAction(
@@ -64,7 +60,6 @@ gd::InstructionMetadata& PlatformExtension::AddAction(
     const gd::String& group,
     const gd::String& icon,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace = GetNameSpace() + name;
   actionsInfos[nameWithNamespace] = InstructionMetadata(GetNameSpace(),
                                                         nameWithNamespace,
@@ -76,7 +71,6 @@ gd::InstructionMetadata& PlatformExtension::AddAction(
                                                         smallicon)
                                         .SetHelpPath(GetHelpPath());
   return actionsInfos[nameWithNamespace];
-#endif
 }
 
 gd::ExpressionMetadata& PlatformExtension::AddExpression(
@@ -85,7 +79,6 @@ gd::ExpressionMetadata& PlatformExtension::AddExpression(
     const gd::String& description,
     const gd::String& group,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace = GetNameSpace() + name;
   expressionsInfos[nameWithNamespace] = ExpressionMetadata("number",
                                                            GetNameSpace(),
@@ -96,7 +89,6 @@ gd::ExpressionMetadata& PlatformExtension::AddExpression(
                                                            smallicon)
                                             .SetHelpPath(GetHelpPath());
   return expressionsInfos[nameWithNamespace];
-#endif
 }
 
 gd::ExpressionMetadata& PlatformExtension::AddStrExpression(
@@ -105,7 +97,6 @@ gd::ExpressionMetadata& PlatformExtension::AddStrExpression(
     const gd::String& description,
     const gd::String& group,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace = GetNameSpace() + name;
   strExpressionsInfos[nameWithNamespace] = ExpressionMetadata("string",
                                                               GetNameSpace(),
@@ -116,7 +107,6 @@ gd::ExpressionMetadata& PlatformExtension::AddStrExpression(
                                                               smallicon)
                                                .SetHelpPath(GetHelpPath());
   return strExpressionsInfos[nameWithNamespace];
-#endif
 }
 
 gd::MultipleInstructionMetadata PlatformExtension::AddExpressionAndCondition(
@@ -220,12 +210,10 @@ PlatformExtension::AddExpressionAndConditionAndAction(
       expression, condition, action);
 }
 
-#if defined(GD_IDE_ONLY)
 gd::DependencyMetadata& PlatformExtension::AddDependency() {
   extensionDependenciesMetadata.push_back(DependencyMetadata());
   return extensionDependenciesMetadata.back();
 }
-#endif
 
 gd::ObjectMetadata& PlatformExtension::AddObject(
     const gd::String& name,
@@ -317,7 +305,6 @@ gd::EventMetadata& PlatformExtension::AddEvent(
     const gd::String& group_,
     const gd::String& smallicon_,
     std::shared_ptr<gd::BaseEvent> instance_) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace = GetNameSpace() + name_;
   eventsInfos[nameWithNamespace] = gd::EventMetadata(nameWithNamespace,
                                                      fullname_,
@@ -326,7 +313,6 @@ gd::EventMetadata& PlatformExtension::AddEvent(
                                                      smallicon_,
                                                      instance_);
   return eventsInfos[nameWithNamespace];
-#endif
 }
 
 PlatformExtension& PlatformExtension::SetExtensionInformation(
@@ -405,8 +391,6 @@ std::vector<gd::String> PlatformExtension::GetBehaviorsTypes() const {
 
   return behaviors;
 }
-
-#if defined(GD_IDE_ONLY)
 
 gd::InstructionMetadata& PlatformExtension::AddDuplicatedAction(
     const gd::String& newActionName, const gd::String& copiedActionName) {
@@ -586,7 +570,6 @@ gd::BaseEventSPtr PlatformExtension::CreateEvent(
 
   return std::shared_ptr<gd::BaseEvent>();
 }
-#endif
 
 CreateFunPtr PlatformExtension::GetObjectCreationFunctionPtr(
     const gd::String& objectType) const {
@@ -665,7 +648,6 @@ bool PlatformExtension::IsBuiltin() const {
          builtinExtensions.end();
 }
 
-#if defined(GD_IDE_ONLY)
 void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
   for (std::map<gd::String, gd::InstructionMetadata>::iterator it =
            GetAllActions().begin();
@@ -810,7 +792,40 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
       ++it;
   }
 }
-#endif
+
+gd::String
+PlatformExtension::GetEventsFunctionFullType(const gd::String &extensionName,
+                                             const gd::String &functionName) {
+  const auto &separator = GetNamespaceSeparator();
+  return extensionName + separator + functionName;
+}
+
+gd::String PlatformExtension::GetBehaviorEventsFunctionFullType(
+    const gd::String &extensionName, const gd::String &behaviorName,
+    const gd::String &functionName) {
+  const auto &separator = GetNamespaceSeparator();
+  return extensionName + separator + behaviorName + separator + functionName;
+}
+
+gd::String
+PlatformExtension::GetBehaviorFullType(const gd::String &extensionName,
+                                       const gd::String &behaviorName) {
+  const auto &separator = GetNamespaceSeparator();
+  return extensionName + separator + behaviorName;
+}
+
+gd::String PlatformExtension::GetObjectEventsFunctionFullType(
+    const gd::String &extensionName, const gd::String &objectName,
+    const gd::String &functionName) {
+  const auto &separator = GetNamespaceSeparator();
+  return extensionName + separator + objectName + separator + functionName;
+}
+
+gd::String PlatformExtension::GetObjectFullType(const gd::String &extensionName,
+                                                const gd::String &objectName) {
+  const auto &separator = GetNamespaceSeparator();
+  return extensionName + separator + objectName;
+}
 
 PlatformExtension::PlatformExtension()
     : deprecated(false), category(_("General")) {}

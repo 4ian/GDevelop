@@ -375,7 +375,7 @@ const MainFrame = (props: Props) => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const {
     currentlyRunningInAppTutorial,
-    endTutorial,
+    endTutorial: doEndTutorial,
     startTutorial,
     startStepIndex,
     startProjectData,
@@ -2268,13 +2268,17 @@ const MainFrame = (props: Props) => {
     });
   };
 
-  const doEndTutorial = React.useCallback(
-    () => {
-      closeProject().then(() => {
-        endTutorial();
-      });
+  const endTutorial = React.useCallback(
+    (shouldCloseProject?: boolean) => {
+      if (shouldCloseProject) {
+        closeProject().then(() => {
+          doEndTutorial();
+        });
+      } else {
+        doEndTutorial();
+      }
     },
-    [endTutorial, closeProject]
+    [doEndTutorial, closeProject]
   );
 
   const selectInAppTutorial = React.useCallback(
@@ -3106,14 +3110,14 @@ const MainFrame = (props: Props) => {
           startStepIndex={startStepIndex}
           startProjectData={startProjectData}
           project={currentProject}
-          endTutorial={() => {
+          endTutorial={(shouldCloseProject?: boolean) => {
             if (
               currentProject &&
               (!currentFileMetadata || unsavedChanges.hasUnsavedChanges)
             ) {
               setQuitInAppTutorialDialogOpen(true);
             } else {
-              doEndTutorial();
+              endTutorial(shouldCloseProject);
             }
           }}
           {...orchestratorProps}
@@ -3127,7 +3131,7 @@ const MainFrame = (props: Props) => {
           canEndTutorial={
             !!currentFileMetadata && !unsavedChanges.hasUnsavedChanges
           }
-          endTutorial={doEndTutorial}
+          endTutorial={() => endTutorial(true)}
         />
       )}
     </div>

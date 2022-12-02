@@ -155,7 +155,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  "",
                  "res/timer_black.svg",
                  "res/timer_black.svg")
-      .AddParameter("expression", "Time to wait in seconds")
+      .AddParameter("expression", _("Time to wait in seconds"))
       .SetHelpPath("/all-features/timers-and-time/wait-action");
 
   extension

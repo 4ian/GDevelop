@@ -7,7 +7,11 @@ import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
 import optionalRequire from '../../Utils/OptionalRequire';
+import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
+
 const electron = optionalRequire('electron');
+const remote = optionalRequire('@electron/remote');
+const app = remote ? remote.app : null;
 
 export type AlertMessageIdentifier =
   | 'default-additional-work'
@@ -221,6 +225,7 @@ export type PreferencesValues = {|
   showGetStartedSection: boolean,
   showEventBasedObjectsEditor: boolean,
   inAppTutorialsProgress: InAppTutorialProgressDatabase,
+  newProjectsDefaultFolder: string,
 |};
 
 /**
@@ -293,6 +298,7 @@ export type Preferences = {|
     tutorialId: string,
     userId: ?string,
   |}) => ?InAppTutorialUserProgress,
+  setNewProjectsDefaultFolder: (newProjectsDefaultFolder: string) => void,
 |};
 
 export const initialPreferences = {
@@ -333,6 +339,7 @@ export const initialPreferences = {
     showGetStartedSection: true,
     showEventBasedObjectsEditor: false,
     inAppTutorialsProgress: {},
+    newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -384,6 +391,7 @@ export const initialPreferences = {
   getShowEventBasedObjectsEditor: () => false,
   saveTutorialProgress: () => {},
   getTutorialProgress: () => {},
+  setNewProjectsDefaultFolder: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

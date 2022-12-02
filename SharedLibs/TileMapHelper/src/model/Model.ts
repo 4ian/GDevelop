@@ -369,7 +369,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   /**
    * @param x The layer column.
    * @param y The layer row.
-   * @returns The tile's GID (id + rotation bits).
+   * @returns The tile's GID (id + flipping bits).
    */
   getTileGID(x: integer, y: integer): integer | undefined {
     const row = this._tiles[y];
@@ -434,7 +434,8 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    * @param y The layer row.
    */
   removeTile(x: integer, y: integer): void {
-    this._tiles[y][x] = undefined;
+    // 0 mean null
+    this._tiles[y][x] = 0;
   }
 
   /**

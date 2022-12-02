@@ -217,7 +217,7 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
   /**
    * @param x The layer column.
    * @param y The layer row.
-   * @returns The tile's GID (id + rotation bits).
+   * @returns The tile's GID (id + flipping bits).
    */
   getTileGID(x: integer, y: integer): integer | undefined;
   /**

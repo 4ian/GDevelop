@@ -61,6 +61,7 @@ import LeaderboardIdField, {
   renderInlineLeaderboardIdField,
 } from './ParameterFields/LeaderboardIdField';
 import { IdentifierField } from './ParameterFields/IdentifierField';
+import TilemapResourceField from './ParameterFields/TilemapResourceField';
 
 const gd: libGDevelop = global.gd;
 
@@ -105,6 +106,7 @@ const components = {
   externalLayoutName: ExternalLayoutNameField,
   leaderboardId: LeaderboardIdField,
   identifier: IdentifierField,
+  tilemapResource: TilemapResourceField,
 };
 const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   default: renderInlineDefaultField,
@@ -145,6 +147,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   bitmapFontResource: t`Bitmap font resource`,
   fontResource: t`Font resource`,
   jsonResource: t`JSON resource`,
+  tilemapResource: t`Tile map resource`,
   color: t`Color`,
   forceMultiplier: t`Instant or permanent force`,
   sceneName: t`Scene name`,

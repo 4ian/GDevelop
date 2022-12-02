@@ -121,7 +121,9 @@ bool SpriteObject::UpdateProperty(const gd::String& name,
   return true;
 }
 
-void SpriteObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {
+void SpriteObject::ExposeResources(
+    gd::ArbitraryResourceWorker& worker,
+    gd::ResourcesManager* resourcesManager) {
   for (std::size_t j = 0; j < GetAnimationsCount(); j++) {
     for (std::size_t k = 0; k < GetAnimation(j).GetDirectionsCount(); k++) {
       for (std::size_t l = 0;

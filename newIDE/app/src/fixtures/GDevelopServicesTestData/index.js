@@ -167,6 +167,35 @@ export const noSubscription: Subscription = {
   userId: 'no-subscription-user',
 };
 
+export const limitsForNoSubscriptionUser: Limits = {
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: false,
+      retention: false,
+      sessionsTimeStats: false,
+      platforms: false,
+    },
+    cloudProjects: {
+      maximumCount: 10,
+      canMaximumCountBeIncreased: true,
+    },
+    leaderboards: {
+      maximumCountPerGame: 3,
+      canMaximumCountPerGameBeIncreased: true,
+      canCustomizeTheme: false,
+    },
+  },
+  limits: {
+    'cordova-build': {
+      current: 0,
+      max: 2,
+      limitReached: false,
+    },
+  },
+  message: undefined,
+};
+
 export const limitsForIndieUser: Limits = {
   capabilities: {
     analytics: {
@@ -183,6 +212,7 @@ export const limitsForIndieUser: Limits = {
     leaderboards: {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
+      canCustomizeTheme: true,
     },
   },
   limits: {
@@ -211,6 +241,7 @@ export const limitsForProUser: Limits = {
     leaderboards: {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
+      canCustomizeTheme: true,
     },
   },
   limits: {
@@ -239,6 +270,7 @@ export const limitsReached: Limits = {
     leaderboards: {
       maximumCountPerGame: 3,
       canMaximumCountPerGameBeIncreased: true,
+      canCustomizeTheme: false,
     },
   },
   limits: {
@@ -301,7 +333,7 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
-  limits: limitsForIndieUser,
+  limits: limitsForNoSubscriptionUser,
   receivedAssetPacks: [],
   receivedAssetShortHeaders: [],
   onLogout: async () => {},
@@ -383,7 +415,7 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   firebaseUser: indieVerifiedFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
-  limits: limitsForIndieUser,
+  limits: limitsForNoSubscriptionUser,
   receivedAssetPacks: [],
   receivedAssetShortHeaders: [],
   onLogout: async () => {},
@@ -472,7 +504,7 @@ export const fakeAuthenticatedUserWithBadges: AuthenticatedUser = {
   firebaseUser: indieVerifiedFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
-  limits: limitsForIndieUser,
+  limits: limitsForNoSubscriptionUser,
   receivedAssetPacks: [],
   receivedAssetShortHeaders: [],
   onLogout: async () => {},

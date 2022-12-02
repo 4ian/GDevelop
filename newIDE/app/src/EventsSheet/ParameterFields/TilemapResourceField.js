@@ -17,7 +17,7 @@ export default class TilemapResourceField extends Component<
   }
 
   render() {
-   if (!this.props.resourceManagementProps || !this.props.project) {
+    if (!this.props.resourceManagementProps || !this.props.project) {
       console.error(
         'Missing project or resourceManagementProps for TilemapResourceField'
       );

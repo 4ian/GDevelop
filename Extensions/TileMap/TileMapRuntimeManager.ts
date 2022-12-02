@@ -127,12 +127,14 @@ namespace gdjs {
               callback(null);
               return;
             }
-            const tileMap = TileMapHelper.TileMapManager.identify(tileMapJsonData);
+            const tileMap = TileMapHelper.TileMapManager.identify(
+              tileMapJsonData
+            );
             if (!tileMap) {
               callback(null);
               return;
             }
-            if (tileMap.kind === "tiled" && tileSetJsonResourceName) {
+            if (tileMap.kind === 'tiled' && tileSetJsonResourceName) {
               this._instanceContainer
                 .getGame()
                 .getJsonManager()

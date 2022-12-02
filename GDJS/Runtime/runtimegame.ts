@@ -89,7 +89,7 @@ namespace gdjs {
     //Allow to specify an external layout to insert in the first scene:
     _injectExternalLayout: any;
     _options: RuntimeGameOptions;
-    
+
     //The mappings for embedded resources
     _embeddedResourcesMappings: Map<string, Record<string, string>>;
 
@@ -145,12 +145,15 @@ namespace gdjs {
       this._isPreview = this._options.isPreview || false;
       this._sessionId = null;
       this._playerId = null;
-      
+
       this._embeddedResourcesMappings = new Map();
-      for(const resource of this._data.resources.resources) {
-        if(resource.metadata) {
+      for (const resource of this._data.resources.resources) {
+        if (resource.metadata) {
           const metadata = JSON.parse(resource.metadata);
-          this._embeddedResourcesMappings.set(resource.name, metadata.embeddedResourcesMapping || {});
+          this._embeddedResourcesMappings.set(
+            resource.name,
+            metadata.embeddedResourcesMapping || {}
+          );
         }
       }
 
@@ -960,14 +963,19 @@ namespace gdjs {
     }
 
     /**
-     * Resolves the name of an embedded resource. 
+     * Resolves the name of an embedded resource.
      * @param mainResourceName The name of the resource containing the embedded resource.
      * @param embeddedResourceName The name of the embedded resource.
      * @return The resource name.
      */
-    resolveEmbeddedResource(mainResourceName: string, embeddedResourceName: string): string {
+    resolveEmbeddedResource(
+      mainResourceName: string,
+      embeddedResourceName: string
+    ): string {
       const mapping = this._embeddedResourcesMappings.get(mainResourceName);
-      return mapping && mapping[embeddedResourceName] ?  mapping[embeddedResourceName] : embeddedResourceName;
+      return mapping && mapping[embeddedResourceName]
+        ? mapping[embeddedResourceName]
+        : embeddedResourceName;
     }
   }
 }

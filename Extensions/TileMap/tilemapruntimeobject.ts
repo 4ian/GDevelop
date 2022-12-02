@@ -63,7 +63,6 @@ namespace gdjs {
       if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
         this.setOpacity(newObjectData.content.opacity);
       }
-      console.log('updateFromObjectData', newObjectData.content.tilemapJsonFile)
       if (
         oldObjectData.content.tilemapJsonFile !==
         newObjectData.content.tilemapJsonFile
@@ -133,8 +132,15 @@ namespace gdjs {
           this._tileMapManager.getOrLoadTextureCache(
             (textureName) => {
               const game = this.getInstanceContainer().getGame();
-              const mappedName = game.resolveEmbeddedResource(this._tilemapJsonFile, textureName);
-              return (game.getImageManager().getPIXITexture(mappedName) as unknown) as PIXI.BaseTexture<PIXI.Resource>;
+              const mappedName = game.resolveEmbeddedResource(
+                this._tilemapJsonFile,
+                textureName
+              );
+              return (game
+                .getImageManager()
+                .getPIXITexture(mappedName) as unknown) as PIXI.BaseTexture<
+                PIXI.Resource
+              >;
             },
             this._tilemapAtlasImage,
             this._tilemapJsonFile,
@@ -210,7 +216,7 @@ namespace gdjs {
     getLayerIndex(): integer {
       return this._layerIndex;
     }
-    
+
     setLevelIndex(levelIndex): void {
       this._levelIndex = levelIndex;
       this._updateTileMap();

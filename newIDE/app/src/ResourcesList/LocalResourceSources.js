@@ -156,7 +156,7 @@ const localResourceSources: Array<ResourceSource> = [
                 mapping = embeddedFile.mapping;
               }
             } else {
-              const embeddedFile = embeddedFiles.get(filePath)
+              const embeddedFile = embeddedFiles.get(filePath);
 
               if (embeddedFile) {
                 mapping = embeddedFile.mapping;

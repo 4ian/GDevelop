@@ -80,7 +80,7 @@ TopDownMovementBehavior::GetProperties(
       .SetMeasurementUnit(gd::MeasurementUnit::GetAngularSpeed())
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("angularMaxSpeed")));
-  properties["rotateObject"]
+  properties["RotateObject"]
       .SetLabel(_("Rotate object"))
       .SetGroup(_("Rotation"))
       .SetValue(behaviorContent.GetBoolAttribute("rotateObject") ? "true"
@@ -146,7 +146,7 @@ bool TopDownMovementBehavior::UpdateProperty(
     gd::SerializerElement& behaviorContent,
     const gd::String& name,
     const gd::String& value) {
-  if (name == "ignoreDefaultControls") {
+  if (name == "IgnoreDefaultControls") {
     behaviorContent.SetAttribute("ignoreDefaultControls", (value == "0"));
     return true;
   }

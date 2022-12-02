@@ -54,13 +54,14 @@ const PasswordPromptDialog = (props: {
     ]}
   >
     <TextField
+      fullWidth
+      autoFocus
       value={props.passwordValue}
       floatingLabelText={<Trans>Password</Trans>}
       type="password"
       onChange={(e, value) => {
         props.setPasswordValue(value);
       }}
-      fullWidth
     />
   </Dialog>
 );
@@ -102,19 +103,32 @@ const PrivateAssetPackPurchaseDialog = ({
       });
       Window.openExternalURL(checkoutUrl);
     } catch (error) {
-      console.error('Unable to get the checkout URL', error);
+      if (
+        error.response &&
+        error.response.status === 403 &&
+        error.response.data.code === 'auth/wrong-password'
+      ) {
+        showErrorBox({
+          message: 'Operation not allowed',
+          rawError: error,
+          errorId: 'asset-pack-purchase-not-authorized',
+        });
+      } else {
+        console.error('Unable to get the checkout URL', error);
+        showErrorBox({
+          message: `Unable to get the checkout URL. Please try again later.`,
+          rawError: error,
+          errorId: 'asset-pack-checkout-error',
+        });
+      }
       setIsPurchasing(false);
-      showErrorBox({
-        message: `Unable to get the checkout URL. Please try again later.`,
-        rawError: error,
-        errorId: 'asset-pack-checkout-error',
-      });
     } finally {
       setPassword('');
     }
   };
 
   const onWillPurchase = () => {
+    // Password is required in dev environment only so that one cannot freely purchase asset packs.
     if (Window.isDev()) setDisplayPasswordPrompt(true);
     else onStartPurchase();
   };

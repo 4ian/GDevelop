@@ -1,13 +1,14 @@
 import { integer } from "../../types/commons";
 import { EditableTileMap, TileDefinition } from "../../model/Model";
-import { getLDtkTileId, getPixiRotateFromLDtk } from "./LoaderHelper";
+import { getLDtkTileId } from "./LoaderHelper";
 import { LDtkTileMap } from "../../types/LDtk";
+import { getTileGID } from "../../model/GID";
 
 export namespace LDtkTileMapLoader {
   /**
    * Create a {@link EditableTileMap} from the LDtk JSON.
    *
-   * @param tiledMap A tile map exported from LDtk.
+   * @param tileMap A tile map exported from LDtk.
    * @param levelIndex The level of the tile map to load from.
    * @returns A {@link EditableTileMap}
    */
@@ -77,31 +78,41 @@ export namespace LDtkTileMapLoader {
         const x = Math.floor(tile.px[0] / gridSize);
         const y = Math.floor(tile.px[1] / gridSize);
         const tileId = getLDtkTileId(tilesetId, tile.t);
-        const rotate = getPixiRotateFromLDtk(tile.f);
-        const editableTile = {
-          tileId,
-          rotate,
-          flippedDiagonally: tile.f === 3,
-          flippedHorizontally: tile.f === 1,
-          flippedVertically: tile.f === 2,
-        };
 
-        const oldTile = editableTileLayer.getTile(x, y);
-        if (oldTile) {
-          const oldTileDef = tileSet.get(oldTile.tileId);
+        const oldTileId = editableTileLayer.getTileId(x, y);
+        if (oldTileId === undefined) {
+          editableTileLayer.setTile(x, y, tileId);
+          editableTileLayer.setFlippedHorizontally(
+            x,
+            y,
+            tile.f === 1 || tile.f === 3
+          );
+          editableTileLayer.setFlippedVertically(
+            x,
+            y,
+            tile.f === 2 || tile.f === 3
+          );
+        } else {
+          const tileGID = getTileGID(
+            tileId,
+            tile.f === 1 || tile.f === 3,
+            tile.f === 2 || tile.f === 3,
+            false
+          );
+          const oldTileDef = tileSet.get(oldTileId);
 
-          if (oldTileDef.hasStackedTiles()) {
-            const hash = `${oldTileDef.getStackedTilesHash()};${tileId},${rotate}`;
+          if (oldTileDef?.hasStackedTiles()) {
+            const hash = `${oldTileDef.getStackedTilesHash()};${tileGID}`;
             const tileDef = composedTileMap.get(hash);
             if (tileDef) {
-              editableTileLayer.setTile(x, y, tileDef.getStackTile());
+              editableTileLayer.setTile(x, y, tileDef.getStackTileId());
             } else {
               const tileDef = new TileDefinition(0);
 
               tileDef.setStackedTiles(
                 nextComposedTileId,
                 ...oldTileDef.getStackedTiles(),
-                editableTile
+                tileGID
               );
 
               tileSet.set(nextComposedTileId, tileDef);
@@ -109,22 +120,21 @@ export namespace LDtkTileMapLoader {
 
               composedTileMap.set(tileDef.getStackedTilesHash(), tileDef);
 
-              editableTileLayer.setTile(x, y, tileDef.getStackTile());
+              editableTileLayer.setTile(x, y, tileDef.getStackTileId());
             }
           } else {
+            const oldTileGID = editableTileLayer.getTileGID(x, y)!;
             const tileDef = new TileDefinition(0);
 
-            tileDef.setStackedTiles(nextComposedTileId, oldTile, editableTile);
+            tileDef.setStackedTiles(nextComposedTileId, oldTileGID, tileGID);
 
             tileSet.set(nextComposedTileId, tileDef);
             nextComposedTileId -= 1;
 
             composedTileMap.set(tileDef.getStackedTilesHash(), tileDef);
 
-            editableTileLayer.setTile(x, y, tileDef.getStackTile());
+            editableTileLayer.setTile(x, y, tileDef.getStackTileId());
           }
-        } else {
-          editableTileLayer.setTile(x, y, editableTile);
         }
       }
     }

@@ -6,6 +6,7 @@ import {
   TileMap,
   TileMapManager,
   TileTextureCache,
+  TiledTileset,
 } from './dts/index';
 
 declare global {
@@ -18,6 +19,7 @@ declare global {
       TileMap,
       TileMapManager,
       TileTextureCache,
+      TiledTileset,
     };
   }
 }

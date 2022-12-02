@@ -1,10 +1,10 @@
+import {
+  FLIPPED_DIAGONALLY_FLAG,
+  FLIPPED_HORIZONTALLY_FLAG,
+  FLIPPED_VERTICALLY_FLAG,
+} from "../../model/GID";
 import { integer } from "../../types/commons";
-import { EditableTile } from "../../model/Model";
 import { TiledLayer } from "../../types/Tiled";
-
-const FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
-const FLIPPED_VERTICALLY_FLAG = 0x40000000;
-const FLIPPED_DIAGONALLY_FLAG = 0x20000000;
 
 /**
  * Decodes a layer data, which can sometimes be store as a compressed base64 string
@@ -64,13 +64,26 @@ export const decodeBase64LayerData = (pako: any, layer: TiledLayer) => {
   }
 };
 
-export function decodeTiledGUI(data: integer): EditableTile {
-  const flippedHorizontally = !!(data & FLIPPED_HORIZONTALLY_FLAG);
-  const flippedVertically = !!(data & FLIPPED_VERTICALLY_FLAG);
-  const flippedDiagonally = !!(data & FLIPPED_DIAGONALLY_FLAG);
+export type TiledGID = {
+  id: integer;
+  flippedHorizontally: boolean;
+  flippedVertically: boolean;
+  flippedDiagonally: boolean;
+};
 
-  const tileId = getTileIdFromTiledGUI(
-    data &
+/**
+ * Extract information about the rotation of a tile from the tile id.
+ * @param globalTileUid The Tiled tile global uniq identifier.
+ * @returns The tile identifier and orientation.
+ */
+export const extractTileUidFlippedStates = (
+  globalTileUid: integer
+): TiledGID => {
+  const flippedHorizontally = globalTileUid & FLIPPED_HORIZONTALLY_FLAG;
+  const flippedVertically = globalTileUid & FLIPPED_VERTICALLY_FLAG;
+  const flippedDiagonally = globalTileUid & FLIPPED_DIAGONALLY_FLAG;
+  const tileUid = getTileIdFromTiledGUI(
+    globalTileUid &
       ~(
         FLIPPED_HORIZONTALLY_FLAG |
         FLIPPED_VERTICALLY_FLAG |
@@ -79,61 +92,17 @@ export function decodeTiledGUI(data: integer): EditableTile {
   );
 
   return {
-    tileId,
-    rotate: getPixiRotate(
-      flippedHorizontally,
-      flippedVertically,
-      flippedDiagonally
-    ),
-    flippedDiagonally,
-    flippedHorizontally,
-    flippedVertically,
+    id: tileUid,
+    flippedHorizontally: !!flippedHorizontally,
+    flippedVertically: !!flippedVertically,
+    flippedDiagonally: !!flippedDiagonally,
   };
-}
-
-/**
- * Return the texture to use for the tile with the specified uid, which can contains
- * information about rotation in bits 32, 31 and 30
- * (see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/).
- *
- * @param flippedHorizontally true if the tile is flipped horizontally.
- * @param flippedVertically true if the tile is flipped vertically.
- * @param flippedDiagonally true if the tile is flipped diagonally.
- * @returns the rotation "D8" number used by Pixi.
- * @see https://pixijs.io/examples/#/textures/texture-rotate.js
- */
-function getPixiRotate(
-  flippedHorizontally: boolean,
-  flippedVertically: boolean,
-  flippedDiagonally: boolean
-): number {
-  let rotate = 0;
-  if (flippedDiagonally) {
-    rotate = 10;
-    if (!flippedHorizontally && flippedVertically) {
-      rotate = 2;
-    } else if (flippedHorizontally && !flippedVertically) {
-      rotate = 6;
-    } else if (flippedHorizontally && flippedVertically) {
-      rotate = 14;
-    }
-  } else {
-    rotate = 0;
-    if (!flippedHorizontally && flippedVertically) {
-      rotate = 8;
-    } else if (flippedHorizontally && !flippedVertically) {
-      rotate = 12;
-    } else if (flippedHorizontally && flippedVertically) {
-      rotate = 4;
-    }
-  }
-  return rotate;
-}
+};
 
 /**
  * Tiled use 0 as null, we do too but it's black boxed.
  * This is why the id needs to be decremented.
- * @return the tile identifier used in {@link TilMapModel}.
+ * @return the tile identifier.
  */
 export function getTileIdFromTiledGUI(
   tiledGUI: number | undefined

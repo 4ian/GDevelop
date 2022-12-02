@@ -1,15 +1,8 @@
 import { PolygonVertices, integer, float } from "../types/commons";
-export type EditableTile = {
-    tileId: integer;
-    rotate: integer;
-    flippedHorizontally: boolean;
-    flippedVertically: boolean;
-    flippedDiagonally: boolean;
-};
 /**
  * A tile map model.
  *
- * Tile map files are parsed into this model by {@link TiledTileMapLoader}.
+ * Tile map files are parsed into this model by {@link TiledTileMapLoader} or {@link LDtkTileMapLoader}.
  * This model is used for rending ({@link TileMapRuntimeObjectPixiRenderer})
  * and hitboxes handling ({@link TransformedCollisionTileMap}).
  * This allows to support new file format with only a new parser.
@@ -149,11 +142,11 @@ export declare class EditableObjectLayer extends AbstractEditableLayer {
 /**
  * A tile that is placed with pixel coordinates.
  */
-export type TileObject = {
+export declare class TileObject {
     /**
      * The tile identifier in the tile set.
      */
-    readonly tileId: integer;
+    private tileId;
     /**
      * The coordinate of the tile left side.
      */
@@ -163,10 +156,31 @@ export type TileObject = {
      */
     readonly y: float;
     /**
-     * the Pixi's rotate
+     * @param x The coordinate of the tile left side.
+     * @param y The coordinate of the tile top side.
+     * @param tileId The tile identifier in the tile set.
      */
-    readonly rotate: integer;
-};
+    constructor(x: float, y: float, tileId: integer);
+    /**
+     * @return The tile identifier in the tile set.
+     */
+    getTileId(): integer;
+    setFlippedHorizontally(flippedHorizontally: boolean): void;
+    setFlippedVertically(flippedVertically: boolean): void;
+    setFlippedDiagonally(flippedDiagonally: boolean): void;
+    /**
+     * @returns true if the tile is flipped horizontally.
+     */
+    isFlippedHorizontally(): boolean;
+    /**
+     * @returns true if the tile is flipped vertically.
+     */
+    isFlippedVertically(): boolean;
+    /**
+     * @returns true if the tile is flipped diagonally.
+     */
+    isFlippedDiagonally(): boolean;
+}
 /**
  * A tile map layer with tile organized in grid.
  */
@@ -197,13 +211,25 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
     /**
      * @param x The layer column.
      * @param y The layer row.
-     * @returns The tile.
+     * @returns The tile's GID (id + rotation bits).
      */
-    getTile(x: integer, y: integer): EditableTile | undefined;
+    getTileGID(x: integer, y: integer): integer | undefined;
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @returns The tile's id.
+     */
+    getTileId(x: integer, y: integer): integer | undefined;
     /**
      * @returns The layer width in pixels.
      */
     getWidth(): integer;
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @returns true if the tile is flipped diagonally.
+     */
+    isFlippedDiagonally(x: integer, y: integer): boolean;
     /**
      * @param x The layer column.
      * @param y The layer row.
@@ -219,12 +245,6 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
     /**
      * @param x The layer column.
      * @param y The layer row.
-     * @returns true if the tile is flipped diagonally.
-     */
-    isFlippedDiagonally(x: integer, y: integer): boolean;
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
      */
     removeTile(x: integer, y: integer): void;
     /**
@@ -234,9 +254,27 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
     /**
      * @param x The layer column.
      * @param y The layer row.
-     * @param tile The tile.
+     * @param flippedHorizontally true if the tile is flipped horizontally.
      */
-    setTile(x: integer, y: integer, tile: EditableTile): void;
+    setFlippedHorizontally(x: integer, y: integer, flippedHorizontally: boolean): void;
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param flippedVertically true if the tile is flipped vertically.
+     */
+    setFlippedVertically(x: integer, y: integer, flippedVertically: boolean): void;
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param flippedDiagonally true if the tile is flipped diagonally.
+     */
+    setFlippedDiagonally(x: integer, y: integer, flippedDiagonally: boolean): void;
+    /**
+     * @param x The layer column.
+     * @param y The layer row.
+     * @param tileId The tile.
+     */
+    setTile(x: integer, y: integer, tileId: integer): void;
 }
 /**
  * A tile definition from the tile set.
@@ -248,7 +286,7 @@ export declare class TileDefinition {
      */
     private stackedTiles;
     private stackedTilesHash?;
-    private stackTile?;
+    private stackTileId?;
     /**
      * There will probably be at most 4 tags on a tile.
      * An array lookup should take less time than using a Map.
@@ -280,11 +318,11 @@ export declare class TileDefinition {
     /**
      * @returns The tile representing the stack of tiles.
      */
-    getStackTile(): EditableTile;
+    getStackTileId(): integer;
     /**
      * @returns All the tiles composed in the stack.
      */
-    getStackedTiles(): EditableTile[];
+    getStackedTiles(): integer[];
     /**
      * @returns The hash code representing the stack.
      */
@@ -304,7 +342,7 @@ export declare class TileDefinition {
      * @param stackTileId The `tileId` representing the stack.
      * @param tiles All the tiles of stack.
      */
-    setStackedTiles(stackTileId: integer, ...tiles: EditableTile[]): void;
+    setStackedTiles(stackTileId: integer, ...tiles: integer[]): void;
 }
 export {};
 //# sourceMappingURL=Model.d.ts.map

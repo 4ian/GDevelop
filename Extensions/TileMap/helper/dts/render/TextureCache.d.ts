@@ -7,6 +7,9 @@ import PIXI = GlobalPIXIModule.PIXI;
  * and used by {@link PixiTileMapHelper.updatePixiTileMap}.
  */
 export declare class TileTextureCache {
+    private static readonly flippedHorizontallyFlag;
+    private static readonly flippedVerticallyFlag;
+    private static readonly flippedDiagonallyFlag;
     private readonly _images;
     private readonly _textures;
     constructor();

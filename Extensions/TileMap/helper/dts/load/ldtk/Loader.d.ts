@@ -4,7 +4,7 @@ export declare namespace LDtkTileMapLoader {
     /**
      * Create a {@link EditableTileMap} from the LDtk JSON.
      *
-     * @param tiledMap A tile map exported from LDtk.
+     * @param tileMap A tile map exported from LDtk.
      * @param levelIndex The level of the tile map to load from.
      * @returns A {@link EditableTileMap}
      */

@@ -8,6 +8,7 @@ import { PixiTiledHelper } from "./tiled/PixiHelper";
 import { PixiLDtkHelper } from "./ldtk/PixiHelper";
 import { TileMap } from "../types";
 import { TileTextureCache } from "./TextureCache";
+import { FlippingHelper, getPixiRotate } from "../model/GID";
 
 import PIXI = GlobalPIXIModule.PIXI;
 
@@ -92,14 +93,19 @@ export namespace PixiTileMapHelper {
 
       if (layer instanceof EditableObjectLayer) {
         const objectLayer = layer as EditableObjectLayer;
+
         for (const object of objectLayer.objects) {
-          const texture = textureCache.getTexture(object.tileId);
+          const tileGID = object.getTileId();
+          const texture = textureCache.getTexture(tileGID);
+
           if (texture) {
+            const rotate = getPixiRotate(tileGID);
+
             pixiTileMap.tile(
               texture,
               object.x,
               object.y - objectLayer.tileMap.getTileHeight(),
-              { rotate: object.rotate }
+              { rotate }
             );
           }
         }
@@ -117,40 +123,43 @@ export namespace PixiTileMapHelper {
             const xPos = tileWidth * x;
             const yPos = tileHeight * y;
 
-            const tile = tileLayer.getTile(x, y);
-            if (!tile) {
+            const tileGID = tileLayer.getTileGID(x, y);
+            if (tileGID === undefined) {
               continue;
             }
+            const tileId = FlippingHelper.getTileId(tileGID);
 
-            const tileDefinition = tileLayer.tileMap.getTileDefinition(
-              tile.tileId
-            );
+            const tileDefinition = tileLayer.tileMap.getTileDefinition(tileId);
 
             if (tileDefinition.hasStackedTiles()) {
-              for (const tile of tileDefinition.getStackedTiles()) {
-                const tileTexture = textureCache.getTexture(tile.tileId);
+              for (const tileGID of tileDefinition.getStackedTiles()) {
+                const tileId = FlippingHelper.getTileId(tileGID);
+                const tileTexture = textureCache.getTexture(tileId);
                 if (!tileTexture) {
                   continue;
                 }
 
+                const rotate = getPixiRotate(tileGID);
+
                 void pixiTileMap.tile(tileTexture, xPos, yPos, {
                   alpha,
-                  rotate: tile.rotate,
+                  rotate,
                 });
               }
             } else {
-              const tileTexture = textureCache.getTexture(tile.tileId);
+              const tileTexture = textureCache.getTexture(tileId);
               if (!tileTexture) {
+                console.warn(`Unknown tile id: ${tileId} at (${x}, ${y})`);
                 continue;
               }
-
+              const rotate = getPixiRotate(tileGID);
               const pixiTilemapFrame = pixiTileMap.tile(
                 tileTexture,
                 xPos,
                 yPos,
                 {
                   alpha,
-                  rotate: tile.rotate,
+                  rotate,
                 }
               );
 
@@ -201,13 +210,11 @@ export namespace PixiTileMapHelper {
             const xPos = tileWidth * x;
             const yPos = tileHeight * y;
 
-            const tile = tileLayer.getTile(x, y);
-            if (!tile) {
-              continue;
-            }
-            const tileDefinition = tileLayer.tileMap.getTileDefinition(
-              tile.tileId
-            );
+            const tileId = tileLayer.getTileId(x, y)!;
+            const isFlippedHorizontally = tileLayer.isFlippedHorizontally(x, y);
+            const isFlippedVertically = tileLayer.isFlippedVertically(x, y);
+            const isFlippedDiagonally = tileLayer.isFlippedDiagonally(x, y);
+            const tileDefinition = tileLayer.tileMap.getTileDefinition(tileId);
             if (!tileDefinition) {
               continue;
             }
@@ -224,15 +231,15 @@ export namespace PixiTileMapHelper {
                 let vertexY = vertices[index][1];
                 // It's important to do the diagonal flipping first,
                 // because the other flipping "move" the origin.
-                if (tile.flippedDiagonally) {
+                if (isFlippedDiagonally) {
                   const swap = vertexX;
                   vertexX = vertexY;
                   vertexY = swap;
                 }
-                if (tile.flippedHorizontally) {
+                if (isFlippedHorizontally) {
                   vertexX = tileWidth - vertexX;
                 }
-                if (tile.flippedVertically) {
+                if (isFlippedVertically) {
                   vertexY = tileHeight - vertexY;
                 }
                 if (index === 0) {

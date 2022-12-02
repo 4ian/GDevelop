@@ -660,8 +660,9 @@ namespace gdjs {
        * @returns The tile definition from the tile set.
        */
       getDefinition(): TileMapHelper.TileDefinition {
-        const tile = this.layer._source.getTile(this.x, this.y);
-        return this.layer.tileMap.getTileDefinition(tile ? tile.tileId : 0)!;
+        return this.layer.tileMap.getTileDefinition(
+          this.layer._source.getTileId(this.x, this.y)!
+        )!;
       }
 
       private _isHitboxesUpToDate() {

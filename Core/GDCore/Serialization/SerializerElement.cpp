@@ -290,8 +290,8 @@ void SerializerElement::Init(const gd::SerializerElement& other) {
 }
 
 // TODO Remove shouldAlwayUseSetString in a release that follows the 150.
-void SerializerElement::SetMultilineStringValue(const gd::String& value, bool shouldAlwayUseSetString) {
-  if (shouldAlwayUseSetString || value.find('\n') == gd::String::npos) {
+void SerializerElement::SetMultilineStringValue(const gd::String& value) {
+  if (value.find('\n') == gd::String::npos) {
     SetStringValue(value);
     return;
   }

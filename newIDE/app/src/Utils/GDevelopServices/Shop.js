@@ -116,7 +116,7 @@ export const getStripeCheckoutUrl = async (
     stripePriceId,
     userId,
     customerEmail,
-    password
+    password,
   }: {|
     stripePriceId: string,
     userId: string,

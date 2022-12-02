@@ -19,12 +19,52 @@ import { showErrorBox } from '../../UI/Messages/MessageBox';
 import Mark from '../../UI/CustomSvgIcons/Mark';
 import FlatButton from '../../UI/FlatButton';
 import { LineStackLayout } from '../../UI/Layout';
+import TextField from '../../UI/TextField';
 
 type Props = {|
   privateAssetPackListingData: PrivateAssetPackListingData,
   onSuccessfulPurchase: () => Promise<void>,
   onClose: () => void,
 |};
+
+const PasswordPromptDialog = (props: {
+  passwordValue: string,
+  setPasswordValue: (newValue: string) => void,
+  onClose: () => void,
+  onApply: () => Promise<void>,
+}) => (
+  <Dialog
+    open
+    maxWidth="xs"
+    title={<Trans>Asset store password</Trans>}
+    onApply={props.onApply}
+    onRequestClose={props.onClose}
+    actions={[
+      <FlatButton
+        key="cancel"
+        label={<Trans>Close</Trans>}
+        onClick={props.onClose}
+      />,
+      <DialogPrimaryButton
+        key="continue"
+        primary
+        label={<Trans>Continue</Trans>}
+        onClick={props.onApply}
+      />,
+    ]}
+  >
+    <TextField
+      fullWidth
+      autoFocus
+      value={props.passwordValue}
+      floatingLabelText={<Trans>Password</Trans>}
+      type="password"
+      onChange={(e, value) => {
+        props.setPasswordValue(value);
+      }}
+    />
+  </Dialog>
+);
 
 const PrivateAssetPackPurchaseDialog = ({
   privateAssetPackListingData,
@@ -44,25 +84,53 @@ const PrivateAssetPackPurchaseDialog = ({
     setIsCheckingPurchasesAfterLogin,
   ] = React.useState(!receivedAssetPacks);
   const [purchaseSuccessful, setPurchaseSuccessful] = React.useState(false);
+  const [
+    displayPasswordPrompt,
+    setDisplayPasswordPrompt,
+  ] = React.useState<boolean>(false);
+  const [password, setPassword] = React.useState<string>('');
+
   const onStartPurchase = async () => {
     if (!profile) return;
+    setDisplayPasswordPrompt(false);
     try {
       setIsPurchasing(true);
       const checkoutUrl = await getStripeCheckoutUrl(getAuthorizationHeader, {
         stripePriceId: privateAssetPackListingData.prices[0].stripePriceId,
         userId: profile.id,
         customerEmail: profile.email,
+        ...(password ? { password } : undefined),
       });
       Window.openExternalURL(checkoutUrl);
     } catch (error) {
-      console.error('Unable to get the checkout URL', error);
+      if (
+        error.response &&
+        error.response.status === 403 &&
+        error.response.data.code === 'auth/wrong-password'
+      ) {
+        showErrorBox({
+          message: 'Operation not allowed',
+          rawError: error,
+          errorId: 'asset-pack-purchase-not-authorized',
+        });
+      } else {
+        console.error('Unable to get the checkout URL', error);
+        showErrorBox({
+          message: `Unable to get the checkout URL. Please try again later.`,
+          rawError: error,
+          errorId: 'asset-pack-checkout-error',
+        });
+      }
       setIsPurchasing(false);
-      showErrorBox({
-        message: `Unable to get the checkout URL. Please try again later.`,
-        rawError: error,
-        errorId: 'asset-pack-checkout-error',
-      });
+    } finally {
+      setPassword('');
     }
+  };
+
+  const onWillPurchase = () => {
+    // Password is required in dev environment only so that one cannot freely purchase asset packs.
+    if (Window.isDev()) setDisplayPasswordPrompt(true);
+    else onStartPurchase();
   };
 
   const checkUserPurchases = React.useCallback(
@@ -253,28 +321,38 @@ const PrivateAssetPackPurchaseDialog = ({
         key="continue"
         primary
         label={<Trans>Continue</Trans>}
-        onClick={onStartPurchase}
+        onClick={onWillPurchase}
       />
     ) : null,
   ];
 
   return (
-    <Dialog
-      title={<Trans>{privateAssetPackListingData.name}</Trans>}
-      maxWidth="sm"
-      open
-      onRequestClose={onClose}
-      actions={dialogActions}
-      onApply={purchaseSuccessful ? onClose : onStartPurchase}
-      cannotBeDismissed // Prevent the user from continuing by clicking outside.
-      flexColumnBody
-    >
-      <LineStackLayout justifyContent="center" alignItems="center">
-        {purchaseSuccessful && <Mark />}
-        <Text size="sub-title">{dialogContents.subtitle}</Text>
-      </LineStackLayout>
-      {dialogContents.content}
-    </Dialog>
+    <>
+      <Dialog
+        title={<Trans>{privateAssetPackListingData.name}</Trans>}
+        maxWidth="sm"
+        open
+        onRequestClose={onClose}
+        actions={dialogActions}
+        onApply={purchaseSuccessful ? onClose : onWillPurchase}
+        cannotBeDismissed // Prevent the user from continuing by clicking outside.
+        flexColumnBody
+      >
+        <LineStackLayout justifyContent="center" alignItems="center">
+          {purchaseSuccessful && <Mark />}
+          <Text size="sub-title">{dialogContents.subtitle}</Text>
+        </LineStackLayout>
+        {dialogContents.content}
+      </Dialog>
+      {displayPasswordPrompt && (
+        <PasswordPromptDialog
+          onApply={onStartPurchase}
+          onClose={() => setDisplayPasswordPrompt(false)}
+          passwordValue={password}
+          setPasswordValue={setPassword}
+        />
+      )}
+    </>
   );
 };
 

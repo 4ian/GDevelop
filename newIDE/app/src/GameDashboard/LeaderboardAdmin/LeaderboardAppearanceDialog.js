@@ -27,6 +27,7 @@ import HelpButton from '../../UI/HelpButton';
 import ColorField from '../../UI/ColorField';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import GetSubscriptionCard from './GetSubscriptionCard';
+import LeaderboardPlaygroundCard from './LeaderboardPlaygroundCard';
 
 const unitToAbbreviation = {
   hour: 'HH',
@@ -287,22 +288,6 @@ function LeaderboardAppearanceDialog({
                 disabled={!canCustomizeTheme}
               />
             </ResponsiveLineStackLayout>
-            {!canCustomizeTheme && <GetSubscriptionCard />}
-            <Spacer />
-            <Text size="sub-title" noMargin>
-              <Trans>Score column settings</Trans>
-            </Text>
-            <TextField
-              fullWidth
-              floatingLabelText={<Trans>Column title</Trans>}
-              maxLength={20}
-              errorText={scoreTitleError}
-              value={scoreTitle}
-              onChange={(e, newTitle) => {
-                if (!!scoreTitleError && !!newTitle) setScoreTitleError(null);
-                setScoreTitle(newTitle);
-              }}
-            />
             <ResponsiveLineStackLayout noMargin>
               <ColorField
                 floatingLabelText={<Trans>Highlight background color</Trans>}
@@ -321,7 +306,26 @@ function LeaderboardAppearanceDialog({
                 disabled={!canCustomizeTheme}
               />
             </ResponsiveLineStackLayout>
-            {!canCustomizeTheme && <GetSubscriptionCard />}
+            {canCustomizeTheme ? (
+              <LeaderboardPlaygroundCard />
+            ) : (
+              <GetSubscriptionCard />
+            )}
+            <Spacer />
+            <Text size="sub-title" noMargin>
+              <Trans>Score column settings</Trans>
+            </Text>
+            <TextField
+              fullWidth
+              floatingLabelText={<Trans>Column title</Trans>}
+              maxLength={20}
+              errorText={scoreTitleError}
+              value={scoreTitle}
+              onChange={(e, newTitle) => {
+                if (!!scoreTitleError && !!newTitle) setScoreTitleError(null);
+                setScoreTitle(newTitle);
+              }}
+            />
             <SelectField
               fullWidth
               value={scoreType}

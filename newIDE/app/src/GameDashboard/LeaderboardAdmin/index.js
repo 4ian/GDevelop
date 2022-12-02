@@ -277,7 +277,7 @@ export const LeaderboardAdmin = ({
   const onListLeaderboards = React.useCallback(
     () => {
       const fetchAndHandleError = async () => {
-        setIsLoading(true);
+        setIsRequestPending(true); // We only set the local loading state here to avoid blocking the dialog buttons on first load.
         setApiError(null);
         try {
           await listLeaderboards();
@@ -297,12 +297,12 @@ export const LeaderboardAdmin = ({
             ),
           });
         } finally {
-          setIsLoading(false);
+          setIsRequestPending(false);
         }
       };
       fetchAndHandleError();
     },
-    [setIsLoading, listLeaderboards]
+    [listLeaderboards]
   );
 
   const onFetchLeaderboardEntries = async () => {

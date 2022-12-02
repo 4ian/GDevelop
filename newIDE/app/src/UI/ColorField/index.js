@@ -84,10 +84,10 @@ const ColorField = ({
         fullWidth={disableAlpha}
         style={!disableAlpha ? { width: '70%' } : undefined}
         floatingLabelText={floatingLabelText}
-        floatingLabelFixed
+        floatingLabelFixed={!disabled}
         helperMarkdownText={helperMarkdownText}
         type="text"
-        translatableHintText={t`R;G;B, like 100;200;180`}
+        translatableHintText={disabled ? null : t`R;G;B, like 100;200;180`}
         value={colorValue}
         onChange={event => handleChange(event.target.value, alphaValue)}
         onBlur={handleBlur}

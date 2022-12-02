@@ -96,7 +96,10 @@ function LeaderboardAppearanceDialog({
   const canCustomizeTheme =
     !!limits &&
     !!limits.capabilities.leaderboards &&
-    limits.capabilities.leaderboards.themeCustomizationCapabilities !== 'NONE';
+    (limits.capabilities.leaderboards.themeCustomizationCapabilities ===
+      'BASIC' ||
+      limits.capabilities.leaderboards.themeCustomizationCapabilities ===
+        'FULL');
   const [scoreTitleError, setScoreTitleError] = React.useState<?string>(null);
   const [
     defaultDisplayedEntriesNumber,

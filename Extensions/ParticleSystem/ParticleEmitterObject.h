@@ -220,7 +220,8 @@ class GD_EXTENSION_API ParticleEmitterObject : public gd::ObjectConfiguration,
     return gd::make_unique<ParticleEmitterObject>(*this);
   }
 
-  virtual void ExposeResources(gd::ArbitraryResourceWorker& worker);
+  virtual void ExposeResources(gd::ArbitraryResourceWorker& worker,
+                               gd::ResourcesManager *resourcesManager);
 
  private:
   virtual void DoUnserializeFrom(gd::Project& project,

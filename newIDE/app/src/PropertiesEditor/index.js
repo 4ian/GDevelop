@@ -29,7 +29,7 @@ import RaisedButton from '../UI/RaisedButton';
 import UnsavedChangesContext, {
   type UnsavedChanges,
 } from '../MainFrame/UnsavedChangesContext';
-import { Line, Spacer } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
@@ -333,21 +333,23 @@ const PropertiesEditor = ({
       } else if (field.valueType === 'color') {
         const { setValue } = field;
         return (
-          <ColorField
-            key={field.name}
-            id={field.name}
-            floatingLabelText={getFieldLabel(instances, field)}
-            helperMarkdownText={getFieldDescription(field)}
-            disableAlpha
-            style={styles.field}
-            color={getFieldValue(instances, field)}
-            onChange={color => {
-              const rgbString =
-                color.length === 0 ? '' : rgbOrHexToRGBString(color);
-              instances.forEach(i => setValue(i, rgbString));
-              _onInstancesModified(instances);
-            }}
-          />
+          <Column expand noMargin>
+            <ColorField
+              key={field.name}
+              id={field.name}
+              floatingLabelText={getFieldLabel(instances, field)}
+              helperMarkdownText={getFieldDescription(field)}
+              disableAlpha
+              fullWidth
+              color={getFieldValue(instances, field)}
+              onChange={color => {
+                const rgbString =
+                  color.length === 0 ? '' : rgbOrHexToRGBString(color);
+                instances.forEach(i => setValue(i, rgbString));
+                _onInstancesModified(instances);
+              }}
+            />
+          </Column>
         );
       } else if (field.valueType === 'textarea') {
         const { setValue } = field;

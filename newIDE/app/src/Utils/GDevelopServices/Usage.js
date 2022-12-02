@@ -55,6 +55,7 @@ export type Capabilities = {
   leaderboards?: {
     maximumCountPerGame: number,
     canMaximumCountPerGameBeIncreased: boolean,
+    themeCustomizationCapabilities: 'NONE' | 'BASIC' | 'FULL',
   },
 };
 

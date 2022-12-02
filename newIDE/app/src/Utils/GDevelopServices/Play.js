@@ -34,10 +34,18 @@ export type LeaderboardScoreFormatting =
   | LeaderboardScoreFormattingCustom
   | LeaderboardScoreFormattingTime;
 
+export interface LeaderboardTheme {
+  backgroundColor: string;
+  textColor: string;
+  highlightBackgroundColor: string;
+  highlightTextColor: string;
+}
+
 export type LeaderboardCustomizationSettings = {|
   defaultDisplayedEntriesNumber?: number,
   scoreTitle: string,
   scoreFormatting: LeaderboardScoreFormatting,
+  theme?: LeaderboardTheme,
 |};
 
 export type Leaderboard = {|

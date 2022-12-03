@@ -55,7 +55,7 @@ export const allResourceKindsAndMetadata = [
     displayName: t`Json`,
     fileExtensions: ['json'],
     createNewResource: () => new gd.JsonResource(),
-    listEmbeddedFiles: null,
+    listEmbeddedFiles: listTileMapEmbeddedFiles,
   },
   {
     kind: 'tilemap',

@@ -9,6 +9,7 @@ import {
   shouldFocusNextField,
   shouldFocusPreviousField,
   shouldSubmit,
+  shouldValidate,
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 
 const styles = {
@@ -92,6 +93,13 @@ export default function InlinePopover(props: Props) {
           if (shouldCloseOrCancel(event)) {
             props.onRequestClose();
           } else if (shouldSubmit(event)) {
+            props.onApply();
+          } else if (shouldValidate(event)) {
+            // Stop propagation to avoid immediately re-opening the inline popover (as the key down
+            // would be detected by the parameter of the instruction).
+            event.stopPropagation();
+            event.preventDefault();
+
             props.onApply();
           }
 

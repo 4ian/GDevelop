@@ -61,6 +61,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
       project,
       eventsBasedObject,
       globalObjectsContainer,
+      // $FlowFixMe gdObjectsContainer should be a member of gdEventsBasedObject instead of a base class.
       eventsBasedObject,
       object.getName(),
       /* isObjectGroup=*/ false,
@@ -208,6 +209,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   ObjectsRenderingService
                 )}
                 project={project}
+                // $FlowFixMe gdObjectsContainer should be a member of gdEventsBasedObject instead of a base class.
                 objectsContainer={eventsBasedObject}
                 layout={null}
                 // TODO EBO Allow to use project resources as place holders

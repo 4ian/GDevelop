@@ -10,6 +10,7 @@
 #include "GDCore/Extensions/Metadata/ValueTypeMetadata.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertyDescriptor.h"
@@ -17,19 +18,37 @@
 
 namespace gd {
 
-void PropertyFunctionGenerator::GenerateGetterAndSetter(
+void PropertyFunctionGenerator::GenerateBehaviorGetterAndSetter(
     gd::Project &project, gd::EventsFunctionsExtension &extension,
     gd::EventsBasedBehavior &eventsBasedBehavior,
     const gd::NamedPropertyDescriptor &property, bool isSharedProperties) {
+  GenerateGetterAndSetter(project, extension, eventsBasedBehavior, property,
+                          eventsBasedBehavior.GetObjectType(), true,
+                          isSharedProperties);
+}
+
+void PropertyFunctionGenerator::GenerateObjectGetterAndSetter(
+    gd::Project &project, gd::EventsFunctionsExtension &extension,
+    gd::EventsBasedObject &eventsBasedObject,
+    const gd::NamedPropertyDescriptor &property) {
+  GenerateGetterAndSetter(project, extension, eventsBasedObject, property, "",
+                          false, false);
+}
+
+void PropertyFunctionGenerator::GenerateGetterAndSetter(
+    gd::Project &project, gd::EventsFunctionsExtension &extension,
+    gd::AbstractEventsBasedEntity &eventsBasedEntity,
+    const gd::NamedPropertyDescriptor &property, const gd::String &objectType,
+    bool isBehavior, bool isSharedProperties) {
   auto &propertyName = property.GetName();
-  auto &functionsContainer = eventsBasedBehavior.GetEventsFunctions();
+  auto &functionsContainer = eventsBasedEntity.GetEventsFunctions();
   gd::String capitalizedName = CapitalizeFirstLetter(property.GetName());
   gd::String setterName = "Set" + capitalizedName;
 
   gd::String functionGroupName =
-      (eventsBasedBehavior.GetFullName().empty()
-           ? eventsBasedBehavior.GetName()
-           : eventsBasedBehavior.GetFullName()) +
+      (eventsBasedEntity.GetFullName().empty()
+           ? eventsBasedEntity.GetName()
+           : eventsBasedEntity.GetFullName()) +
       (property.GetGroup().empty()
            ? ""
            : " " + UnCapitalizeFirstLetter(property.GetGroup())) +
@@ -51,17 +70,14 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
              "objects using the behavior."
            : "");
 
-  gd::String behaviorFullType = gd::PlatformExtension::GetBehaviorFullType(
-      extension.GetName(), eventsBasedBehavior.GetName());
   gd::String propertyGetterName =
       (isSharedProperties ? "SharedProperty" : "Property") + property.GetName();
   gd::String getterType =
       gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-          extension.GetName(), eventsBasedBehavior.GetName(),
-          propertyGetterName);
+          extension.GetName(), eventsBasedEntity.GetName(), propertyGetterName);
   gd::String setterType =
       gd::PlatformExtension::GetBehaviorEventsFunctionFullType(
-          extension.GetName(), eventsBasedBehavior.GetName(),
+          extension.GetName(), eventsBasedEntity.GetName(),
           "Set" + propertyGetterName);
 
   gd::String getterName = capitalizedName;
@@ -98,9 +114,11 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
     if (property.GetType() == "Boolean") {
       gd::Instruction condition;
       condition.SetType(getterType);
-      condition.SetParametersCount(2);
+      condition.SetParametersCount(isBehavior ? 2 : 1);
       condition.SetParameter(0, "Object");
-      condition.SetParameter(1, "Behavior");
+      if (isBehavior) {
+        condition.SetParameter(1, "Behavior");
+      }
       event.GetConditions().Insert(condition, 0);
 
       gd::Instruction action;
@@ -112,10 +130,11 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
       gd::Instruction action;
       action.SetType("SetReturn" + numberOrString);
       action.SetParametersCount(1);
+      gd::String receiver = isBehavior ? "Object.Behavior::" : "Object.";
       gd::String propertyPrefix =
           (isSharedProperties ? "SharedProperty" : "Property");
-      action.SetParameter(0, "Object.Behavior::" + propertyPrefix +
-                                 property.GetName() + "()");
+      action.SetParameter(0, receiver + propertyPrefix + property.GetName() +
+                                 "()");
       event.GetActions().Insert(action, 0);
     }
   }
@@ -134,20 +153,30 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
       objectParameter.SetType("object")
           .SetName("Object")
           .SetDescription("Object")
-          .SetExtraInfo(eventsBasedBehavior.GetObjectType());
-      gd::ParameterMetadata behaviorParameter;
-      behaviorParameter.SetType("behavior")
-          .SetName("Behavior")
-          .SetDescription("Behavior")
-          .SetExtraInfo(behaviorFullType);
+          .SetExtraInfo(objectType);
+      if (!isBehavior) {
+        gd::String objectFullType = gd::PlatformExtension::GetObjectFullType(
+            extension.GetName(), eventsBasedEntity.GetName());
+        objectParameter.SetExtraInfo(objectFullType);
+      }
+      setter.GetParameters().push_back(objectParameter);
+      if (isBehavior) {
+        gd::ParameterMetadata behaviorParameter;
+        gd::String behaviorFullType =
+            gd::PlatformExtension::GetBehaviorFullType(
+                extension.GetName(), eventsBasedEntity.GetName());
+        behaviorParameter.SetType("behavior")
+            .SetName("Behavior")
+            .SetDescription("Behavior")
+            .SetExtraInfo(behaviorFullType);
+        setter.GetParameters().push_back(behaviorParameter);
+      }
       gd::ParameterMetadata valueParameter;
       valueParameter.SetType("yesorno")
           .SetName("Value")
           .SetDescription(capitalizedName)
           .SetOptional(true)
           .SetDefaultValue("yes");
-      setter.GetParameters().push_back(objectParameter);
-      setter.GetParameters().push_back(behaviorParameter);
       setter.GetParameters().push_back(valueParameter);
     } else {
       setter.SetFunctionType(gd::EventsFunction::ActionWithOperator);
@@ -168,10 +197,14 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
 
         gd::Instruction action;
         action.SetType(setterType);
-        action.SetParametersCount(3);
+        action.SetParametersCount(isBehavior ? 3 : 2);
         action.SetParameter(0, "Object");
-        action.SetParameter(1, "Behavior");
-        action.SetParameter(2, "yes");
+        if (isBehavior) {
+          action.SetParameter(1, "Behavior");
+          action.SetParameter(2, "yes");
+        } else {
+          action.SetParameter(1, "yes");
+        }
         event.GetActions().Insert(action, 0);
       }
       {
@@ -188,10 +221,14 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
 
         gd::Instruction action;
         action.SetType(setterType);
-        action.SetParametersCount(3);
+        action.SetParametersCount(isBehavior ? 3 : 2);
         action.SetParameter(0, "Object");
-        action.SetParameter(1, "Behavior");
-        action.SetParameter(2, "no");
+        if (isBehavior) {
+          action.SetParameter(1, "Behavior");
+          action.SetParameter(2, "no");
+        } else {
+          action.SetParameter(1, "no");
+        }
         event.GetActions().Insert(action, 0);
       }
     } else {
@@ -201,18 +238,25 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
 
       gd::Instruction action;
       action.SetType(setterType);
-      action.SetParametersCount(4);
+      action.SetParametersCount(isBehavior ? 4 : 3);
       action.SetParameter(0, "Object");
-      action.SetParameter(1, "Behavior");
-      action.SetParameter(2, "=");
-      action.SetParameter(3, "GetArgumentAs" + numberOrString + "(\"Value\")");
+      gd::String parameterGetterCall =
+          "GetArgumentAs" + numberOrString + "(\"Value\")";
+      if (isBehavior) {
+        action.SetParameter(1, "Behavior");
+        action.SetParameter(2, "=");
+        action.SetParameter(3, parameterGetterCall);
+      } else {
+        action.SetParameter(1, "=");
+        action.SetParameter(2, parameterGetterCall);
+      }
       event.GetActions().Insert(action, 0);
     }
   }
 }
 
 bool PropertyFunctionGenerator::CanGenerateGetterAndSetter(
-    const gd::EventsBasedBehavior &eventsBasedBehavior,
+    const gd::AbstractEventsBasedEntity &eventsBasedEntity,
     const gd::NamedPropertyDescriptor &property) {
   auto &type = property.GetType();
   if (type != "Boolean" && type != "Number" && type != "String" &&
@@ -220,7 +264,7 @@ bool PropertyFunctionGenerator::CanGenerateGetterAndSetter(
     return false;
   }
 
-  auto &functionsContainer = eventsBasedBehavior.GetEventsFunctions();
+  auto &functionsContainer = eventsBasedEntity.GetEventsFunctions();
   auto getterName = CapitalizeFirstLetter(property.GetName());
   auto setterName = "Set" + getterName;
   return !functionsContainer.HasEventsFunctionNamed(setterName) &&

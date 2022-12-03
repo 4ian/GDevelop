@@ -37,7 +37,9 @@ void TiledSpriteObject::DoSerializeTo(gd::SerializerElement& element) const {
   element.SetAttribute("height", height);
 }
 
-void TiledSpriteObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {
+void TiledSpriteObject::ExposeResources(
+    gd::ArbitraryResourceWorker& worker,
+    gd::ResourcesManager *resourcesManager) {
   worker.ExposeImage(textureName);
 }
 #endif

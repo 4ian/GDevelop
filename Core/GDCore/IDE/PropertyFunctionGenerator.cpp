@@ -148,7 +148,7 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
           .SetGroup(functionGroupName)
           .SetDescription("Change " + descriptionSubject)
           .SetSentence("_PARAM0_ " + UnCapitalizeFirstLetter(propertyLabel) +
-                       ": _PARAM2_");
+                       (isBehavior ? ": _PARAM2_" : ": _PARAM1_"));
       gd::ParameterMetadata objectParameter;
       objectParameter.SetType("object")
           .SetName("Object")

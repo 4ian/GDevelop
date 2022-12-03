@@ -479,7 +479,7 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setter.GetDescription() ==
               "Change if rotate object. The rotation follows movements done by "
               "this object.");
-      REQUIRE(setter.GetSentence() == "_PARAM0_ rotate object: _PARAM2_");
+      REQUIRE(setter.GetSentence() == "_PARAM0_ rotate object: _PARAM1_");
       // To generate the value parameter, the object parameter has to
       // be declared too.
       REQUIRE(setter.GetParameters().size() == 2);

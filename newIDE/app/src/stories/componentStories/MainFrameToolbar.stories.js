@@ -25,33 +25,16 @@ const fakeEditorToolbar = (
       justifyContent: 'flex-end',
     }}
   >
-    <IconButton
-      size="small"
-      tooltip={'Test tooltip'}
-      color="default"
-    >
+    <IconButton size="small" tooltip={'Test tooltip'} color="default">
       <DebugIcon />
     </IconButton>
-    <IconButton
-      size="small"
-      tooltip={'Test tooltip'}
-      color="default"
-    >
+    <IconButton size="small" tooltip={'Test tooltip'} color="default">
       <DebugIcon />
     </IconButton>
-    <IconButton
-      size="small"
-      tooltip={'Test tooltip'}
-      disabled
-      color="default"
-    >
+    <IconButton size="small" tooltip={'Test tooltip'} disabled color="default">
       <DebugIcon />
     </IconButton>
-    <IconButton
-      size="small"
-      tooltip={'Test tooltip'}
-      color="default"
-    >
+    <IconButton size="small" tooltip={'Test tooltip'} color="default">
       <DebugIcon />
     </IconButton>
   </span>

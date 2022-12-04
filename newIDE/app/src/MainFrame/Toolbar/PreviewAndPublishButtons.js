@@ -6,7 +6,6 @@ import IconButton from '../../UI/IconButton';
 import TextButton from '../../UI/TextButton';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import { type PreviewState } from '../PreviewState';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import PreviewIcon from '../../UI/CustomSvgIcons/Preview';
 import PublishIcon from '../../UI/CustomSvgIcons/Publish';
 import DebugIcon from '../../UI/CustomSvgIcons/Debug';

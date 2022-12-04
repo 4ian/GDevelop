@@ -230,7 +230,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                         {
                           label: i18n._(t`Generate expression and action`),
                           click: () =>
-                            gd.PropertyFunctionGenerator.generateGetterAndSetter(
+                            gd.PropertyFunctionGenerator.generateBehaviorGetterAndSetter(
                               this.props.project,
                               this.props.extension,
                               this.props.eventsBasedBehavior,

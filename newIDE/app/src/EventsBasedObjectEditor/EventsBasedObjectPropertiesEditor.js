@@ -30,6 +30,7 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
+  extension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
   onPropertiesUpdated?: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
@@ -230,6 +231,20 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               label: i18n._(t`Move down`),
                               click: () => this._moveProperty(i, i + 1),
                               enabled: i + 1 < properties.getCount(),
+                            },
+                            {
+                              label: i18n._(t`Generate expression and action`),
+                              click: () =>
+                                gd.PropertyFunctionGenerator.generateObjectGetterAndSetter(
+                                  this.props.project,
+                                  this.props.extension,
+                                  this.props.eventsBasedObject,
+                                  property
+                                ),
+                              enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
+                                this.props.eventsBasedObject,
+                                property
+                              ),
                             },
                           ]}
                         />

@@ -75,6 +75,7 @@ export default function EventsBasedObjectEditorDialog({
       {currentTab === 'properties' && (
         <EventsBasedObjectPropertiesEditor
           project={project}
+          extension={eventsFunctionsExtension}
           eventsBasedObject={eventsBasedObject}
           onRenameProperty={onRenameProperty}
         />

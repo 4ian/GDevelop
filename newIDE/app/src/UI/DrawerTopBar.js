@@ -8,6 +8,7 @@ import Close from '@material-ui/icons/Close';
 import Tooltip from '@material-ui/core/Tooltip';
 import { tooltipEnterDelay } from './Tooltip';
 import optionalRequire from '../Utils/OptionalRequire';
+import { isMacLike } from '../Utils/Platform';
 const electron = optionalRequire('electron');
 
 const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
@@ -48,9 +49,11 @@ const styles = {
 };
 
 const DrawerTopBar = (props: Props) => {
+  const isMacos = !!electron && isMacLike();
+
   return (
     <>
-      {!!electron && <DialogTitleBar />}
+      {isMacos && <DialogTitleBar />}
       <AppBar
         position="static"
         style={styles.appBar}

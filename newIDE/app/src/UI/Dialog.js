@@ -23,11 +23,11 @@ const electron = optionalRequire('electron');
 
 const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 
-const DialogTitleBar = () => {
+const DialogTitleBar = ({ backgroundColor }: {| backgroundColor: string |}) => {
   return (
     <div
       className={DRAGGABLE_PART_CLASS_NAME}
-      style={{ height: 29, /* TODO */ flexShrink: 0 }}
+      style={{ height: 35, backgroundColor, /* TODO */ flexShrink: 0 }}
     />
   );
 };
@@ -302,8 +302,12 @@ const Dialog = ({
       disableBackdropClick={false}
       onKeyDown={handleKeyDown}
     >
+      {isFullScreen && !!electron && (
+        <DialogTitleBar
+          backgroundColor={gdevelopTheme.titlebar.backgroundColor}
+        />
+      )}
       <div style={dialogContainerStyle}>
-        {isFullScreen && !!electron && <DialogTitleBar />}
         {title && (
           <div style={styles.titleContainer}>
             <Line noMargin justifyContent="space-between">

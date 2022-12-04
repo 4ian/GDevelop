@@ -114,27 +114,24 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
     if (property.GetType() == "Boolean") {
       gd::Instruction condition;
       condition.SetType(getterType);
-      condition.SetParametersCount(isBehavior ? 2 : 1);
-      condition.SetParameter(0, "Object");
+      condition.AddParameter("Object");
       if (isBehavior) {
-        condition.SetParameter(1, "Behavior");
+        condition.AddParameter("Behavior");
       }
       event.GetConditions().Insert(condition, 0);
 
       gd::Instruction action;
       action.SetType("SetReturnBoolean");
-      action.SetParametersCount(1);
-      action.SetParameter(0, "True");
+      action.AddParameter("True");
       event.GetActions().Insert(action, 0);
     } else {
       gd::Instruction action;
       action.SetType("SetReturn" + numberOrString);
-      action.SetParametersCount(1);
       gd::String receiver = isBehavior ? "Object.Behavior::" : "Object.";
       gd::String propertyPrefix =
           (isSharedProperties ? "SharedProperty" : "Property");
-      action.SetParameter(0, receiver + propertyPrefix + property.GetName() +
-                                 "()");
+      action.AddParameter(receiver + propertyPrefix + property.GetName() +
+                          "()");
       event.GetActions().Insert(action, 0);
     }
   }
@@ -191,19 +188,17 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
 
         gd::Instruction condition;
         condition.SetType("GetArgumentAsBoolean");
-        condition.SetParametersCount(1);
-        condition.SetParameter(0, "\"Value\"");
+        condition.AddParameter("\"Value\"");
         event.GetConditions().Insert(condition, 0);
 
         gd::Instruction action;
         action.SetType(setterType);
-        action.SetParametersCount(isBehavior ? 3 : 2);
-        action.SetParameter(0, "Object");
+        action.AddParameter("Object");
         if (isBehavior) {
-          action.SetParameter(1, "Behavior");
-          action.SetParameter(2, "yes");
+          action.AddParameter("Behavior");
+          action.AddParameter("yes");
         } else {
-          action.SetParameter(1, "yes");
+          action.AddParameter("yes");
         }
         event.GetActions().Insert(action, 0);
       }
@@ -214,20 +209,18 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
 
         gd::Instruction condition;
         condition.SetType("GetArgumentAsBoolean");
-        condition.SetParametersCount(1);
-        condition.SetParameter(0, "\"Value\"");
+        condition.AddParameter("\"Value\"");
         condition.SetInverted(true);
         event.GetConditions().Insert(condition, 0);
 
         gd::Instruction action;
         action.SetType(setterType);
-        action.SetParametersCount(isBehavior ? 3 : 2);
-        action.SetParameter(0, "Object");
+        action.AddParameter("Object");
         if (isBehavior) {
-          action.SetParameter(1, "Behavior");
-          action.SetParameter(2, "no");
+          action.AddParameter("Behavior");
+          action.AddParameter("no");
         } else {
-          action.SetParameter(1, "no");
+          action.AddParameter("no");
         }
         event.GetActions().Insert(action, 0);
       }
@@ -238,17 +231,16 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
 
       gd::Instruction action;
       action.SetType(setterType);
-      action.SetParametersCount(isBehavior ? 4 : 3);
-      action.SetParameter(0, "Object");
+      action.AddParameter("Object");
       gd::String parameterGetterCall =
           "GetArgumentAs" + numberOrString + "(\"Value\")";
       if (isBehavior) {
-        action.SetParameter(1, "Behavior");
-        action.SetParameter(2, "=");
-        action.SetParameter(3, parameterGetterCall);
+        action.AddParameter("Behavior");
+        action.AddParameter("=");
+        action.AddParameter(parameterGetterCall);
       } else {
-        action.SetParameter(1, "=");
-        action.SetParameter(2, parameterGetterCall);
+        action.AddParameter("=");
+        action.AddParameter(parameterGetterCall);
       }
       event.GetActions().Insert(action, 0);
     }

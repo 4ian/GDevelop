@@ -10,9 +10,7 @@ import SearchBar, {
   useShouldAutofocusSearchbar,
   type SearchBarInterface,
 } from '../../../UI/SearchBar';
-import {
-  type EnumeratedInstructionOrExpressionMetadata,
-} from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import {
   type TreeNode,
   findInTree,
@@ -23,7 +21,10 @@ import EmptyMessage from '../../../UI/EmptyMessage';
 import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
 import { Line } from '../../../UI/Grid';
 import RaisedButton from '../../../UI/RaisedButton';
-import { getInstructionListItemValue, getInstructionOrExpressionIdentifier } from '../SelectorListItems/Keys';
+import {
+  getInstructionListItemValue,
+  getInstructionOrExpressionIdentifier,
+} from '../SelectorListItems/Keys';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import {
   tuneMatches,

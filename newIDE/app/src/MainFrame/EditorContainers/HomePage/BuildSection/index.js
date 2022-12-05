@@ -50,6 +50,8 @@ import ImageTileRow from '../../../../UI/ImageTileRow';
 import { prepareExamples } from '../../../../AssetStore/ExampleStore';
 import Window from '../../../../Utils/Window';
 import Skeleton from '@material-ui/lab/Skeleton';
+import BackgroundText from '../../../../UI/BackgroundText';
+import Paper from '../../../../UI/Paper';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -62,6 +64,7 @@ const styles = {
     overflowWrap: 'anywhere', // Ensure everything is wrapped on small devices.
   },
   projectSkeleton: { borderRadius: 6 },
+  noProjectsContainer: { padding: 10 },
 };
 
 const getTemplatesGridSizeFromWidth = (width: WidthType) => {
@@ -405,155 +408,172 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                       </LineStackLayout>
                     )}
                     <List>
-                      {authenticatedUser.loginState === 'loggingIn'
-                        ? new Array(5).fill(0).map((_, index) => (
+                      {authenticatedUser.loginState === 'loggingIn' ? (
+                        new Array(5).fill(0).map((_, index) => (
+                          <ListItem
+                            style={styles.listItem}
+                            key={`skeleton-${index}`}
+                          >
+                            <Line expand>
+                              <Column expand>
+                                <Skeleton
+                                  variant="rect"
+                                  height={skeletonLineHeight}
+                                  style={styles.projectSkeleton}
+                                />
+                              </Column>
+                            </Line>
+                          </ListItem>
+                        ))
+                      ) : projectFiles && projectFiles.length > 0 ? (
+                        projectFiles.map(file => {
+                          const storageProvider = getStorageProviderByInternalName(
+                            storageProviders,
+                            file.storageProviderName
+                          );
+                          return (
                             <ListItem
+                              button
+                              key={file.fileMetadata.fileIdentifier}
+                              onClick={() => {
+                                onOpenRecentFile(file);
+                              }}
                               style={styles.listItem}
-                              key={`skeleton-${index}`}
+                              onContextMenu={event =>
+                                openContextMenu(event, file)
+                              }
                             >
-                              <Line expand>
-                                <Column expand>
-                                  <Skeleton
-                                    variant="rect"
-                                    height={skeletonLineHeight}
-                                    style={styles.projectSkeleton}
-                                  />
-                                </Column>
-                              </Line>
-                            </ListItem>
-                          ))
-                        : projectFiles &&
-                          projectFiles.length > 0 &&
-                          projectFiles.map(file => {
-                            const storageProvider = getStorageProviderByInternalName(
-                              storageProviders,
-                              file.storageProviderName
-                            );
-                            return (
-                              <ListItem
-                                button
-                                key={file.fileMetadata.fileIdentifier}
-                                onClick={() => {
-                                  onOpenRecentFile(file);
-                                }}
-                                style={styles.listItem}
-                                onContextMenu={event =>
-                                  openContextMenu(event, file)
-                                }
-                              >
-                                <>
-                                  {storageProvider &&
-                                    storageProvider.renderIcon &&
-                                    !isWindowWidthMediumOrLarger && (
-                                      <ListItemAvatar
-                                        classes={iconClasses}
-                                        style={{
-                                          marginTop: 8,
-                                          alignSelf: 'flex-start',
-                                        }}
-                                      >
-                                        {storageProvider.renderIcon({
-                                          size: 'small',
-                                        })}
-                                      </ListItemAvatar>
-                                    )}
-                                  {isWindowWidthMediumOrLarger ? (
-                                    <LineStackLayout
-                                      justifyContent="flex-start"
-                                      expand
+                              <>
+                                {storageProvider &&
+                                  storageProvider.renderIcon &&
+                                  !isWindowWidthMediumOrLarger && (
+                                    <ListItemAvatar
+                                      classes={iconClasses}
+                                      style={{
+                                        marginTop: 8,
+                                        alignSelf: 'flex-start',
+                                      }}
                                     >
-                                      <Column expand>
-                                        <Line noMargin alignItems="center">
-                                          {storageProvider &&
-                                            storageProvider.renderIcon && (
-                                              <>
-                                                {storageProvider.renderIcon({
-                                                  size: 'small',
-                                                })}
-                                                <Spacer />
-                                              </>
-                                            )}
-                                          <Text noMargin>
-                                            {file.fileMetadata.name || (
-                                              <PrettyBreakablePath
-                                                path={
-                                                  file.fileMetadata
-                                                    .fileIdentifier
-                                                }
-                                              />
-                                            )}
-                                          </Text>
-
-                                          {pendingProject ===
-                                            file.fileMetadata
-                                              .fileIdentifier && (
+                                      {storageProvider.renderIcon({
+                                        size: 'small',
+                                      })}
+                                    </ListItemAvatar>
+                                  )}
+                                {isWindowWidthMediumOrLarger ? (
+                                  <LineStackLayout
+                                    justifyContent="flex-start"
+                                    expand
+                                  >
+                                    <Column expand>
+                                      <Line noMargin alignItems="center">
+                                        {storageProvider &&
+                                          storageProvider.renderIcon && (
                                             <>
+                                              {storageProvider.renderIcon({
+                                                size: 'small',
+                                              })}
                                               <Spacer />
-                                              <CircularProgress size={16} />
                                             </>
                                           )}
-                                        </Line>
-                                      </Column>
-                                      <Column expand>
                                         <Text noMargin>
-                                          {storageProvider
-                                            ? i18n._(storageProvider.name)
-                                            : ''}
+                                          {file.fileMetadata.name || (
+                                            <PrettyBreakablePath
+                                              path={
+                                                file.fileMetadata.fileIdentifier
+                                              }
+                                            />
+                                          )}
                                         </Text>
-                                      </Column>
-                                      <Column expand>
-                                        {file.fileMetadata.lastModifiedDate && (
-                                          <Text noMargin>
-                                            {getRelativeOrAbsoluteDisplayDate(
-                                              i18n,
-                                              file.fileMetadata.lastModifiedDate
-                                            )}
-                                          </Text>
-                                        )}
-                                      </Column>
-                                    </LineStackLayout>
-                                  ) : (
-                                    <Column expand>
-                                      <Line
-                                        noMargin
-                                        alignItems="center"
-                                        justifyContent="space-between"
-                                      >
-                                        <ListItemText
-                                          primary={
-                                            file.fileMetadata.name || (
-                                              <PrettyBreakablePath
-                                                path={
-                                                  file.fileMetadata
-                                                    .fileIdentifier
-                                                }
-                                              />
-                                            )
-                                          }
-                                          secondary={
-                                            file.fileMetadata.lastModifiedDate
-                                              ? getRelativeOrAbsoluteDisplayDate(
-                                                  i18n,
-                                                  file.fileMetadata
-                                                    .lastModifiedDate
-                                                )
-                                              : undefined
-                                          }
-                                          onContextMenu={event =>
-                                            openContextMenu(event, file)
-                                          }
-                                        />
+
                                         {pendingProject ===
                                           file.fileMetadata.fileIdentifier && (
-                                          <CircularProgress size={24} />
+                                          <>
+                                            <Spacer />
+                                            <CircularProgress size={16} />
+                                          </>
                                         )}
                                       </Line>
                                     </Column>
-                                  )}
-                                </>
-                              </ListItem>
-                            );
-                          })}
+                                    <Column expand>
+                                      <Text noMargin>
+                                        {storageProvider
+                                          ? i18n._(storageProvider.name)
+                                          : ''}
+                                      </Text>
+                                    </Column>
+                                    <Column expand>
+                                      {file.fileMetadata.lastModifiedDate && (
+                                        <Text noMargin>
+                                          {getRelativeOrAbsoluteDisplayDate(
+                                            i18n,
+                                            file.fileMetadata.lastModifiedDate
+                                          )}
+                                        </Text>
+                                      )}
+                                    </Column>
+                                  </LineStackLayout>
+                                ) : (
+                                  <Column expand>
+                                    <Line
+                                      noMargin
+                                      alignItems="center"
+                                      justifyContent="space-between"
+                                    >
+                                      <ListItemText
+                                        primary={
+                                          file.fileMetadata.name || (
+                                            <PrettyBreakablePath
+                                              path={
+                                                file.fileMetadata.fileIdentifier
+                                              }
+                                            />
+                                          )
+                                        }
+                                        secondary={
+                                          file.fileMetadata.lastModifiedDate
+                                            ? getRelativeOrAbsoluteDisplayDate(
+                                                i18n,
+                                                file.fileMetadata
+                                                  .lastModifiedDate
+                                              )
+                                            : undefined
+                                        }
+                                        onContextMenu={event =>
+                                          openContextMenu(event, file)
+                                        }
+                                      />
+                                      {pendingProject ===
+                                        file.fileMetadata.fileIdentifier && (
+                                        <CircularProgress size={24} />
+                                      )}
+                                    </Line>
+                                  </Column>
+                                )}
+                              </>
+                            </ListItem>
+                          );
+                        })
+                      ) : (
+                        <ListItem style={styles.listItem}>
+                          <Column expand>
+                            <Paper
+                              variant="outlined"
+                              background="dark"
+                              style={styles.noProjectsContainer}
+                            >
+                              <BackgroundText>
+                                <Trans>No projects yet.</Trans>
+                              </BackgroundText>
+                              <BackgroundText>
+                                <Trans>
+                                  Create your first project using one of our
+                                  templates or start from scratch.
+                                </Trans>
+                              </BackgroundText>
+                            </Paper>
+                          </Column>
+                        </ListItem>
+                      )}
                     </List>
                   </Column>
                 </Line>

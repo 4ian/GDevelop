@@ -29,6 +29,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import { sendAssetPackBuyClicked } from '../../Utils/Analytics/EventSender';
 import { MarkdownText } from '../../UI/MarkdownText';
 import Paper from '../../UI/Paper';
+import Window from '../../Utils/Window';
 
 const sortedContentType = [
   'sprite',
@@ -278,6 +279,21 @@ const PrivateAssetPackDialog = ({
                                 <Trans>Redistribution &amp; reselling</Trans>
                               </Text>
                             </LineStackLayout>
+                            <Line noMargin>
+                              <Text>
+                                <Trans>See details</Trans>{' '}
+                                <Link
+                                  onClick={() =>
+                                    Window.openExternalURL(
+                                      'https://gdevelop.io/page/asset-store-license-agreement'
+                                    )
+                                  }
+                                  href="https://gdevelop.io/page/asset-store-license-agreement"
+                                >
+                                  <Trans>here</Trans>
+                                </Link>
+                              </Text>
+                            </Line>
                           </Column>
                         </ResponsiveLineStackLayout>
                       </Column>

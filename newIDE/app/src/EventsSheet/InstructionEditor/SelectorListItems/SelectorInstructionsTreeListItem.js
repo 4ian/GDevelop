@@ -60,7 +60,13 @@ export const renderInstructionOrExpressionTree = <
             key={value}
             primaryText={key}
             selected={selected}
-            id={getInstructionOrExpressionIdentifier(instructionInformation)}
+            id={
+              // TODO: This id is used by in app tutorials. When in app tutorials
+              // are linked to GDevelop versions, change this id to be more accurate
+              // using getInstructionOrExpressionIdentifier
+              'instruction-item-' +
+              instructionInformation.type.replace(/:/g, '-')
+            }
             leftIcon={
               <ListIcon
                 iconSize={iconSize}

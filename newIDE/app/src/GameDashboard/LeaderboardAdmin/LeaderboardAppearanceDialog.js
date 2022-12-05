@@ -323,8 +323,11 @@ function LeaderboardAppearanceDialog({
                 disabled={!canUserCustomizeTheme || isLoading}
               />
             </ResponsiveLineStackLayout>
-            <LeaderboardPlaygroundCard />
-            {!canUserCustomizeTheme && <GetSubscriptionCard />}
+            {!canUserCustomizeTheme ? (
+              <GetSubscriptionCard />
+            ) : (
+              <LeaderboardPlaygroundCard />
+            )}
             <Spacer />
             <Text size="sub-title" noMargin>
               <Trans>Score column settings</Trans>

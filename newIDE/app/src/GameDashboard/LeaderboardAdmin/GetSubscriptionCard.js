@@ -3,11 +3,12 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 
 import Text from '../../UI/Text';
-import { Column } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import { LineStackLayout } from '../../UI/Layout';
 import Link from '../../UI/Link';
 import { SubscriptionSuggestionContext } from '../../Profile/Subscription/SubscriptionSuggestionContext';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import Window from '../../Utils/Window';
 
 const styles = {
   subscriptionContainer: {
@@ -35,12 +36,28 @@ const GetSubscriptionCard = () => {
   return (
     <div style={subscriptionContainerStyle}>
       <img src="res/diamond.svg" style={styles.diamondIcon} alt="diamond" />
-      <LineStackLayout noMargin alignItems="center">
-        <Text>
-          <Trans>
-            Get a silver or gold subscription to unlock color customization.
-          </Trans>
-        </Text>
+      <LineStackLayout alignItems="center">
+        <Column noMargin>
+          <Text>
+            <Trans>
+              Get a silver or gold subscription to unlock color customization.
+            </Trans>
+          </Text>
+          <Line noMargin>
+            <Link
+              href="https://liluo.io/playground/test-leaderboard"
+              onClick={() =>
+                Window.openExternalURL(
+                  'https://liluo.io/playground/test-leaderboard'
+                )
+              }
+            >
+              <Text noMargin color="inherit">
+                <Trans>Test it out!</Trans>
+              </Text>
+            </Link>
+          </Line>
+        </Column>
         <Column>
           <Link
             href="#"

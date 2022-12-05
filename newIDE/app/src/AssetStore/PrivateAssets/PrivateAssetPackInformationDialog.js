@@ -281,7 +281,6 @@ const PrivateAssetPackDialog = ({
                             </LineStackLayout>
                             <Line noMargin>
                               <Text>
-                                <Trans>See details</Trans>{' '}
                                 <Link
                                   onClick={() =>
                                     Window.openExternalURL(
@@ -290,7 +289,7 @@ const PrivateAssetPackDialog = ({
                                   }
                                   href="https://gdevelop.io/page/asset-store-license-agreement"
                                 >
-                                  <Trans>here</Trans>
+                                  <Trans>See details here</Trans>
                                 </Link>
                               </Text>
                             </Line>

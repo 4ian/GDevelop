@@ -87,7 +87,7 @@ const getInitialTab = (
  * A responsive instruction editor in a dialog, showing InstructionParametersEditor
  * at the end.
  */
-export default function NewInstructionEditorDialog({
+export default function InstructionEditorDialog({
   project,
   globalObjectsContainer,
   objectsContainer,

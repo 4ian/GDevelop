@@ -6,7 +6,11 @@ import { type InstructionOrExpressionTreeNode } from '../../../InstructionOrExpr
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import Subheader from '../../../UI/Subheader';
 import flatten from 'lodash/flatten';
-import { getSubheaderListItemKey, getInstructionListItemValue } from './Keys';
+import {
+  getSubheaderListItemKey,
+  getInstructionListItemValue,
+  getInstructionOrExpressionIdentifier,
+} from './Keys';
 
 type Props<T> = {|
   instructionTreeNode: InstructionOrExpressionTreeNode,
@@ -56,10 +60,7 @@ export const renderInstructionOrExpressionTree = <
             key={value}
             primaryText={key}
             selected={selected}
-            id={
-              'instruction-item-' +
-              instructionInformation.type.replace(/:/g, '-')
-            }
+            id={getInstructionOrExpressionIdentifier(instructionInformation)}
             leftIcon={
               <ListIcon
                 iconSize={iconSize}

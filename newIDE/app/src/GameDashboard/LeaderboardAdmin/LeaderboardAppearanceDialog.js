@@ -6,17 +6,19 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import Text from '../../UI/Text';
 import TextField from '../../UI/TextField';
 
 import {
+  canUserCustomizeLeaderboardTheme,
+  getRGBLeaderboardTheme,
   type LeaderboardCustomizationSettings,
   type LeaderboardScoreFormattingTimeUnit,
 } from '../../Utils/GDevelopServices/Play';
-import { Column, Line, Spacer } from '../../UI/Grid';
+import { Spacer } from '../../UI/Grid';
 import {
   formatScore,
   orderedTimeUnits,
@@ -24,6 +26,11 @@ import {
 } from '../../Leaderboard/LeaderboardScoreFormatter';
 import AlertMessage from '../../UI/AlertMessage';
 import HelpButton from '../../UI/HelpButton';
+import ColorField from '../../UI/ColorField';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import GetSubscriptionCard from './GetSubscriptionCard';
+import LeaderboardPlaygroundCard from './LeaderboardPlaygroundCard';
+import { rgbStringToHexString } from '../../Utils/ColorTransformer';
 
 const unitToAbbreviation = {
   hour: 'HH',
@@ -89,6 +96,13 @@ function LeaderboardAppearanceDialog({
   leaderboardCustomizationSettings,
 }: Props) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const canUserCustomizeTheme = canUserCustomizeLeaderboardTheme(
+    authenticatedUser
+  );
+  const rgbLeaderboardTheme = getRGBLeaderboardTheme(
+    leaderboardCustomizationSettings
+  );
   const [scoreTitleError, setScoreTitleError] = React.useState<?string>(null);
   const [
     defaultDisplayedEntriesNumber,
@@ -97,6 +111,19 @@ function LeaderboardAppearanceDialog({
     (leaderboardCustomizationSettings &&
       leaderboardCustomizationSettings.defaultDisplayedEntriesNumber) ||
       20
+  );
+  const [backgroundColor, setBackgroundColor] = React.useState<string>(
+    rgbLeaderboardTheme.backgroundColor
+  );
+  const [textColor, setTextColor] = React.useState<string>(
+    rgbLeaderboardTheme.textColor
+  );
+  const [
+    highlightBackgroundColor,
+    setHighlightBackgroundColor,
+  ] = React.useState<string>(rgbLeaderboardTheme.highlightBackgroundColor);
+  const [highlightTextColor, setHighlightTextColor] = React.useState<string>(
+    rgbLeaderboardTheme.highlightTextColor
   );
   const [
     defaultDisplayedEntriesNumberError,
@@ -169,7 +196,7 @@ function LeaderboardAppearanceDialog({
       return;
     }
     setIsLoading(true);
-    const customizationSettings = {
+    const customizationSettings: LeaderboardCustomizationSettings = {
       defaultDisplayedEntriesNumber,
       scoreTitle,
       scoreFormatting:
@@ -181,6 +208,16 @@ function LeaderboardAppearanceDialog({
               precision,
             }
           : { type: scoreType, ...unitSelectOptions[timeUnits] },
+      theme: canUserCustomizeTheme
+        ? {
+            backgroundColor: rgbStringToHexString(backgroundColor),
+            textColor: rgbStringToHexString(textColor),
+            highlightBackgroundColor: rgbStringToHexString(
+              highlightBackgroundColor
+            ),
+            highlightTextColor: rgbStringToHexString(highlightTextColor),
+          }
+        : undefined,
     };
     await onSave(customizationSettings);
   };
@@ -220,10 +257,10 @@ function LeaderboardAppearanceDialog({
             onSaveSettings(i18n);
           }}
         >
-          <Text size="block-title">
-            <Trans>Table settings</Trans>
-          </Text>
-          <Line>
+          <ColumnStackLayout noMargin>
+            <Text size="sub-title" noMargin>
+              <Trans>Table settings</Trans>
+            </Text>
             <TextField
               fullWidth
               type="number"
@@ -248,12 +285,53 @@ function LeaderboardAppearanceDialog({
                   )
                 );
               }}
+              disabled={isLoading}
             />
-          </Line>
-          <Text size="block-title">
-            <Trans>Score column settings</Trans>
-          </Text>
-          <Line>
+            <ResponsiveLineStackLayout noMargin>
+              <ColorField
+                floatingLabelText={<Trans>Background color</Trans>}
+                disableAlpha
+                fullWidth
+                color={backgroundColor}
+                onChange={setBackgroundColor}
+                disabled={!canUserCustomizeTheme || isLoading}
+              />
+              <ColorField
+                floatingLabelText={<Trans>Text color</Trans>}
+                disableAlpha
+                fullWidth
+                color={textColor}
+                onChange={setTextColor}
+                disabled={!canUserCustomizeTheme || isLoading}
+              />
+            </ResponsiveLineStackLayout>
+            <ResponsiveLineStackLayout noMargin>
+              <ColorField
+                floatingLabelText={<Trans>Highlight background color</Trans>}
+                disableAlpha
+                fullWidth
+                color={highlightBackgroundColor}
+                onChange={setHighlightBackgroundColor}
+                disabled={!canUserCustomizeTheme || isLoading}
+              />
+              <ColorField
+                floatingLabelText={<Trans>Highlight text color</Trans>}
+                disableAlpha
+                fullWidth
+                color={highlightTextColor}
+                onChange={setHighlightTextColor}
+                disabled={!canUserCustomizeTheme || isLoading}
+              />
+            </ResponsiveLineStackLayout>
+            {!canUserCustomizeTheme ? (
+              <GetSubscriptionCard />
+            ) : (
+              <LeaderboardPlaygroundCard />
+            )}
+            <Spacer />
+            <Text size="sub-title" noMargin>
+              <Trans>Score column settings</Trans>
+            </Text>
             <TextField
               fullWidth
               floatingLabelText={<Trans>Column title</Trans>}
@@ -264,179 +342,157 @@ function LeaderboardAppearanceDialog({
                 if (!!scoreTitleError && !!newTitle) setScoreTitleError(null);
                 setScoreTitle(newTitle);
               }}
+              disabled={isLoading}
             />
-          </Line>
-          <Column noMargin>
-            <Line>
-              <SelectField
-                fullWidth
-                value={scoreType}
-                floatingLabelText={<Trans>Score display</Trans>}
-                onChange={(e, i, newValue) =>
-                  // $FlowIgnore
-                  setScoreType(newValue)
-                }
-              >
-                <SelectOption
-                  key={'custom'}
-                  value={'custom'}
-                  primaryText={t`Custom display`}
-                />
-                <SelectOption
-                  key={'time'}
-                  value={'time'}
-                  primaryText={t`Display as time`}
-                />
-              </SelectField>
-            </Line>
-            <Column>
-              <Line noMargin>
-                <Text size="body2">
-                  <Trans>Settings</Trans>
-                </Text>
-              </Line>
-              {scoreType === 'custom' ? (
-                <>
-                  <ResponsiveLineStackLayout noColumnMargin>
-                    <Column expand noMargin>
-                      <TextField
-                        fullWidth
-                        floatingLabelFixed
-                        floatingLabelText={<Trans>Prefix</Trans>}
-                        maxLength={10}
-                        value={prefix}
-                        translatableHintText={t`Ex: $`}
-                        onChange={(e, newValue) => {
-                          setPrefix(newValue);
-                        }}
-                      />
-                    </Column>
-                    <Column expand noMargin>
-                      <TextField
-                        fullWidth
-                        floatingLabelFixed
-                        floatingLabelText={<Trans>Suffix</Trans>}
-                        maxLength={10}
-                        value={suffix}
-                        translatableHintText={t`Ex: coins`}
-                        onChange={(e, newValue) => {
-                          setSuffix(newValue);
-                        }}
-                      />
-                    </Column>
-                  </ResponsiveLineStackLayout>
-                  <Spacer />
-                  <ResponsiveLineStackLayout noColumnMargin noMargin>
-                    <Column expand noMargin>
-                      <TextField
-                        fullWidth
-                        type="number"
-                        floatingLabelText={
-                          <Trans>Round to X decimal point</Trans>
-                        }
-                        errorText={precisionError}
-                        value={isNaN(precision) ? '' : precision}
-                        min={precisionMinValue}
-                        max={precisionMaxValue}
-                        onChange={(e, newValue) => {
-                          if (!!precisionError && !!newValue) {
-                            setPrecisionError(null);
-                          }
-                          setPrecision(
-                            Math.max(
-                              precisionMinValue,
-                              Math.min(precisionMaxValue, parseFloat(newValue))
-                            )
-                          );
-                        }}
-                      />
-                    </Column>
-                    <Column expand noMargin />
-                  </ResponsiveLineStackLayout>
-                </>
-              ) : (
-                <>
-                  <Line noMargin>
-                    <SelectField
-                      fullWidth
-                      value={timeUnits}
-                      floatingLabelText={<Trans>Time format</Trans>}
-                      onChange={(e, i, newValue) =>
-                        // $FlowIgnore
-                        setTimeUnits(newValue)
-                      }
-                    >
-                      {Object.keys(unitSelectOptions).map(option => (
-                        <SelectOption
-                          key={option}
-                          value={option}
-                          primaryText={option}
-                        />
-                      ))}
-                    </SelectField>
-                  </Line>
-                  <Line>
-                    <AlertMessage kind="info">
-                      <Trans>
-                        To use this formatting, you must send a score expressed
-                        in seconds
-                      </Trans>
-                    </AlertMessage>
-                  </Line>
-                </>
-              )}
-              <Spacer />
-              <Line noMargin>
-                <Text size="body2">
-                  <Trans>Preview</Trans>
-                </Text>
-              </Line>
-              <ResponsiveLineStackLayout noColumnMargin>
+            <SelectField
+              fullWidth
+              value={scoreType}
+              floatingLabelText={<Trans>Score display</Trans>}
+              onChange={(e, i, newValue) =>
+                // $FlowIgnore
+                setScoreType(newValue)
+              }
+              disabled={isLoading}
+            >
+              <SelectOption
+                key={'custom'}
+                value={'custom'}
+                primaryText={t`Custom display`}
+              />
+              <SelectOption
+                key={'time'}
+                value={'time'}
+                primaryText={t`Display as time`}
+              />
+            </SelectField>
+            <Spacer />
+            <Text size="sub-title" noMargin>
+              <Trans>Settings</Trans>
+            </Text>
+            {scoreType === 'custom' ? (
+              <ColumnStackLayout noMargin>
+                <ResponsiveLineStackLayout noMargin>
+                  <TextField
+                    fullWidth
+                    floatingLabelFixed
+                    floatingLabelText={<Trans>Prefix</Trans>}
+                    maxLength={10}
+                    value={prefix}
+                    translatableHintText={t`Ex: $`}
+                    onChange={(e, newValue) => {
+                      setPrefix(newValue);
+                    }}
+                    disabled={isLoading}
+                  />
+                  <TextField
+                    fullWidth
+                    floatingLabelFixed
+                    floatingLabelText={<Trans>Suffix</Trans>}
+                    maxLength={10}
+                    value={suffix}
+                    translatableHintText={t`Ex: coins`}
+                    onChange={(e, newValue) => {
+                      setSuffix(newValue);
+                    }}
+                    disabled={isLoading}
+                  />
+                </ResponsiveLineStackLayout>
                 <TextField
                   fullWidth
-                  floatingLabelText={
-                    scoreType === 'custom' ? (
-                      <Trans>Test value</Trans>
-                    ) : (
-                      <Trans>Test value (in second)</Trans>
-                    )
-                  }
-                  max={scorePreviewMaxValue}
-                  min={0}
                   type="number"
-                  value={isNaN(scorePreview) ? '' : scorePreview}
-                  onChange={(e, value) =>
-                    setScorePreview(
+                  floatingLabelText={<Trans>Round to X decimal point</Trans>}
+                  errorText={precisionError}
+                  value={isNaN(precision) ? '' : precision}
+                  min={precisionMinValue}
+                  max={precisionMaxValue}
+                  onChange={(e, newValue) => {
+                    if (!!precisionError && !!newValue) {
+                      setPrecisionError(null);
+                    }
+                    setPrecision(
                       Math.max(
-                        0,
-                        Math.min(scorePreviewMaxValue, parseFloat(value))
+                        precisionMinValue,
+                        Math.min(precisionMaxValue, parseFloat(newValue))
                       )
-                    )
-                  }
+                    );
+                  }}
+                  disabled={isLoading}
                 />
-
-                <TextField
-                  disabled
+              </ColumnStackLayout>
+            ) : (
+              <ColumnStackLayout noMargin>
+                <SelectField
                   fullWidth
-                  floatingLabelText={<Trans>Displayed score</Trans>}
-                  value={formatScore(
-                    scorePreview || 0,
-                    scoreType === 'time'
-                      ? {
-                          type: scoreType,
-                          ...unitSelectOptions[timeUnits],
-                        }
-                      : {
-                          type: scoreType,
-                          prefix,
-                          suffix,
-                          precision: precision || 0,
-                        }
-                  )}
-                />
-              </ResponsiveLineStackLayout>
-            </Column>
-          </Column>
+                  value={timeUnits}
+                  floatingLabelText={<Trans>Time format</Trans>}
+                  onChange={(e, i, newValue) => setTimeUnits(newValue)}
+                  disabled={isLoading}
+                >
+                  {Object.keys(unitSelectOptions).map(option => (
+                    <SelectOption
+                      key={option}
+                      value={option}
+                      primaryText={option}
+                    />
+                  ))}
+                </SelectField>
+                <AlertMessage kind="info">
+                  <Trans>
+                    To use this formatting, you must send a score expressed in
+                    seconds
+                  </Trans>
+                </AlertMessage>
+              </ColumnStackLayout>
+            )}
+            <Spacer />
+            <Text size="sub-title" noMargin>
+              <Trans>Preview</Trans>
+            </Text>
+            <ResponsiveLineStackLayout noMargin>
+              <TextField
+                fullWidth
+                floatingLabelText={
+                  scoreType === 'custom' ? (
+                    <Trans>Test value</Trans>
+                  ) : (
+                    <Trans>Test value (in second)</Trans>
+                  )
+                }
+                max={scorePreviewMaxValue}
+                min={0}
+                type="number"
+                value={isNaN(scorePreview) ? '' : scorePreview}
+                onChange={(e, value) =>
+                  setScorePreview(
+                    Math.max(
+                      0,
+                      Math.min(scorePreviewMaxValue, parseFloat(value))
+                    )
+                  )
+                }
+                disabled={isLoading}
+              />
+              <TextField
+                disabled
+                fullWidth
+                floatingLabelText={<Trans>Displayed score</Trans>}
+                value={formatScore(
+                  scorePreview || 0,
+                  scoreType === 'time'
+                    ? {
+                        type: scoreType,
+                        ...unitSelectOptions[timeUnits],
+                      }
+                    : {
+                        type: scoreType,
+                        prefix,
+                        suffix,
+                        precision: precision || 0,
+                      }
+                )}
+              />
+            </ResponsiveLineStackLayout>
+          </ColumnStackLayout>
         </Dialog>
       )}
     </I18n>

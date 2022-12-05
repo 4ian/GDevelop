@@ -187,6 +187,7 @@ void ObjectJsImplementation::ExposeResources(
         worker.ExposeVideo(newPropertyValue);
       } else if (resourceType == "json") {
         worker.ExposeJson(newPropertyValue);
+        worker.ExposeEmbeddeds(newPropertyValue, resourcesManager);
       } else if (resourceType == "tilemap") {
         worker.ExposeTilemap(newPropertyValue);
         worker.ExposeEmbeddeds(newPropertyValue, resourcesManager);

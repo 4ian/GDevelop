@@ -38,6 +38,15 @@ export const rgbStringToHexNumber = (rgbString: string) => {
 };
 
 /**
+ * Convert a RGB string ("rr;gg;bb") to a Hex string (#000000).
+ */
+export const rgbStringToHexString = (rgbString: string) => {
+  const rgbColor = rgbStringAndAlphaToRGBColor(rgbString);
+  if (!rgbColor) return '#000000';
+  return rgbColorToHex(rgbColor.r, rgbColor.g, rgbColor.b);
+};
+
+/**
  * Convert a RGB string ("rrr;ggg;bbb") or a Hex string ("#112244") to a Hex number.
  */
 export const rgbOrHexToHexNumber = (value: string): number => {

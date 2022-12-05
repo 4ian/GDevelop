@@ -19,10 +19,7 @@ type Props = {|
   onChange?: ColorChangeHandler,
   onChangeComplete?: ColorChangeHandler,
   disableAlpha?: boolean,
-|};
-
-type State = {|
-  displayColorPicker: boolean,
+  disabled?: boolean,
 |};
 
 const styles = {
@@ -41,6 +38,10 @@ const styles = {
     display: 'inline-block',
     cursor: 'pointer',
   },
+  disabled: {
+    opacity: 0.2,
+    cursor: 'default',
+  },
   popover: {
     // Ensure the popover is above everything (modal, dialog, snackbar, tooltips, etc).
     // There will be only one ColorPicker opened at a time, so it's fair to put the
@@ -49,67 +50,73 @@ const styles = {
   },
 };
 
-class ColorPicker extends React.Component<Props, State> {
-  _swatch = React.createRef<HTMLDivElement>();
-  state = {
-    displayColorPicker: false,
+const ColorPicker = ({
+  color,
+  style,
+  onChange,
+  onChangeComplete,
+  disableAlpha,
+  disabled,
+}: Props) => {
+  const swatchRef = React.useRef<?HTMLDivElement>(null);
+  const [displayColorPicker, setDisplayColorPicker] = React.useState(false);
+
+  const handleClick = () => {
+    if (disabled) return;
+    setDisplayColorPicker(!displayColorPicker);
   };
 
-  open = () => {
-    this.setState({ displayColorPicker: true });
+  const handleClose = () => {
+    setDisplayColorPicker(false);
   };
 
-  handleClick = () => {
-    this.setState({ displayColorPicker: !this.state.displayColorPicker });
-  };
+  const displayedColor = color
+    ? color
+    : {
+        r: 200,
+        g: 200,
+        b: 200,
+        a: 1,
+      };
 
-  handleClose = () => {
-    this.setState({ displayColorPicker: false });
-  };
-
-  render() {
-    const { style, color, ...otherProps } = this.props;
-
-    const displayedColor = color
-      ? color
-      : {
-          r: 200,
-          g: 200,
-          b: 200,
-          a: 1,
-        };
-
-    return (
-      <div style={style}>
+  return (
+    <div style={style}>
+      <div
+        style={{
+          ...styles.swatch,
+          ...(disabled ? styles.disabled : {}),
+        }}
+        onClick={handleClick}
+        ref={swatchRef}
+      >
         <div
-          style={styles.swatch}
-          onClick={this.handleClick}
-          ref={this._swatch}
+          style={{
+            ...styles.color,
+            background: `rgba(${displayedColor.r}, ${displayedColor.g}, ${
+              displayedColor.b
+            }, ${displayedColor.a || 1})`,
+          }}
         >
-          <div
-            style={{
-              ...styles.color,
-              background: `rgba(${displayedColor.r}, ${displayedColor.g}, ${
-                displayedColor.b
-              }, ${displayedColor.a || 1})`,
-            }}
-          >
-            {color ? null : '?'}
-          </div>
+          {color ? null : '?'}
         </div>
-        {this.state.displayColorPicker && this._swatch.current ? (
-          <Popover
-            open
-            onClose={this.handleClose}
-            anchorEl={this._swatch.current}
-            style={styles.popover}
-          >
-            <SketchPicker color={displayedColor} {...otherProps} />
-          </Popover>
-        ) : null}
       </div>
-    );
-  }
-}
+      {displayColorPicker && swatchRef.current ? (
+        <Popover
+          open
+          onClose={handleClose}
+          anchorEl={swatchRef.current}
+          style={styles.popover}
+        >
+          <SketchPicker
+            color={displayedColor}
+            onChange={onChange}
+            onChangeComplete={onChangeComplete}
+            disableAlpha={disableAlpha}
+          />
+        </Popover>
+      ) : null}
+    </div>
+  );
+};
 
 export default ColorPicker;

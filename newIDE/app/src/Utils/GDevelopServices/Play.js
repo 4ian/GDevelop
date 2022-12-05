@@ -3,6 +3,7 @@ import axios from 'axios';
 import { GDevelopPlayApi } from './ApiConfigs';
 
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+import { rgbOrHexToRGBString } from '../ColorTransformer';
 
 export type LeaderboardSortOption = 'ASC' | 'DESC';
 export type LeaderboardVisibilityOption = 'HIDDEN' | 'PUBLIC';
@@ -34,10 +35,18 @@ export type LeaderboardScoreFormatting =
   | LeaderboardScoreFormattingCustom
   | LeaderboardScoreFormattingTime;
 
+export interface LeaderboardTheme {
+  backgroundColor: string;
+  textColor: string;
+  highlightBackgroundColor: string;
+  highlightTextColor: string;
+}
+
 export type LeaderboardCustomizationSettings = {|
   defaultDisplayedEntriesNumber?: number,
   scoreTitle: string,
   scoreFormatting: LeaderboardScoreFormatting,
+  theme?: LeaderboardTheme,
 |};
 
 export type Leaderboard = {|
@@ -401,4 +410,55 @@ export const updateComment = async (
       )
     )
     .then(response => response.data);
+};
+
+export const canUserCustomizeLeaderboardTheme = (
+  authenticatedUser: AuthenticatedUser
+): boolean => {
+  const { limits } = authenticatedUser;
+  return (
+    !!limits &&
+    !!limits.capabilities.leaderboards &&
+    (limits.capabilities.leaderboards.themeCustomizationCapabilities ===
+      'BASIC' ||
+      limits.capabilities.leaderboards.themeCustomizationCapabilities ===
+        'FULL')
+  );
+};
+
+export const getRGBLeaderboardTheme = (
+  leaderboardCustomizationSettings: ?LeaderboardCustomizationSettings
+): LeaderboardTheme => {
+  const defaultBackgroundColor = '#d0d1ff';
+  const defaultTextColor = '#000000';
+  const defaultHighlightBackgroundColor = '#5763dd';
+  const defaultHighlightTextColor = '#ffffff';
+
+  const hexLeaderboardTheme =
+    leaderboardCustomizationSettings && leaderboardCustomizationSettings.theme
+      ? {
+          backgroundColor:
+            leaderboardCustomizationSettings.theme.backgroundColor,
+          textColor: leaderboardCustomizationSettings.theme.textColor,
+          highlightBackgroundColor:
+            leaderboardCustomizationSettings.theme.highlightBackgroundColor,
+          highlightTextColor:
+            leaderboardCustomizationSettings.theme.highlightTextColor,
+        }
+      : {
+          backgroundColor: defaultBackgroundColor,
+          textColor: defaultTextColor,
+          highlightBackgroundColor: defaultHighlightBackgroundColor,
+          highlightTextColor: defaultHighlightTextColor,
+        };
+  return {
+    backgroundColor: rgbOrHexToRGBString(hexLeaderboardTheme.backgroundColor),
+    textColor: rgbOrHexToRGBString(hexLeaderboardTheme.textColor),
+    highlightBackgroundColor: rgbOrHexToRGBString(
+      hexLeaderboardTheme.highlightBackgroundColor
+    ),
+    highlightTextColor: rgbOrHexToRGBString(
+      hexLeaderboardTheme.highlightTextColor
+    ),
+  };
 };

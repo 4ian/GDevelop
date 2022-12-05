@@ -9,21 +9,17 @@ import { LineStackLayout } from '../../../UI/Layout';
 import UserChip from '../../../UI/User/UserChip';
 import Window from '../../../Utils/Window';
 import optionalRequire from '../../../Utils/OptionalRequire';
-import RaisedButton from '../../../UI/RaisedButton';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import TextButton from '../../../UI/TextButton';
-import ProjectManagerIcon from '../../../UI/CustomSvgIcons/ProjectManager';
 const electron = optionalRequire('electron');
 
 type Props = {|
-  project: ?gdProject,
   onOpenProjectManager: () => void,
   onOpenProfile: () => void,
   onOpenLanguageDialog: () => void,
 |};
 
 export const HomePageHeader = ({
-  project,
   onOpenProjectManager,
   onOpenProfile,
   onOpenLanguageDialog,
@@ -34,22 +30,11 @@ export const HomePageHeader = ({
     <I18n>
       {({ i18n }) => (
         <LineStackLayout
-          justifyContent="space-between"
+          justifyContent="end"
           alignItems="center"
           noMargin
           expand
         >
-          {!!project ? (
-            <RaisedButton
-              id="open-project-manager-button"
-              label={<Trans>Project Manager</Trans>}
-              onClick={onOpenProjectManager}
-              icon={<ProjectManagerIcon />}
-              primary
-            />
-          ) : (
-            <div />
-          )}
           <Column>
             <LineStackLayout noMargin alignItems="center">
               {!electron && windowWidth !== 'small' && (

@@ -104,10 +104,15 @@ import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProvide
 import { useOpenConfirmDialog } from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
 import UnsavedChangesContext from './UnsavedChangesContext';
-import { type MainMenuProps } from './MainMenu.flow';
+import {
+  type BuildMainMenuProps,
+  type MainMenuCallbacks,
+  buildMainMenuDeclarativeTemplate,
+  adaptFromDeclarativeTemplate,
+} from './MainMenu';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
-import { useKeyboardShortcuts } from '../KeyboardShortcuts';
+import { useKeyboardShortcuts, useShortcutMap } from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
 import CommandPalette, {
   type CommandPaletteInterface,
@@ -248,7 +253,7 @@ export type Props = {|
   initialGameId?: string,
   initialGamesDashboardTab?: string,
   introDialog?: React.Element<*>,
-  renderMainMenu?: MainMenuProps => React.Node,
+  renderMainMenu?: (BuildMainMenuProps, MainMenuCallbacks) => React.Node,
   renderPreviewLauncher?: (
     props: PreviewLauncherProps,
     ref: (previewLauncher: ?PreviewLauncherInterface) => void
@@ -609,7 +614,7 @@ const MainFrame = (props: Props) => {
     (newEditorTabs = state.editorTabs) => {
       const editorTab = getCurrentTab(newEditorTabs);
       if (!editorTab || !editorTab.editorRef) {
-        setEditorToolbar(null, { showProjectButtons: false });
+        setEditorToolbar(null);
         return;
       }
 
@@ -957,14 +962,10 @@ const MainFrame = (props: Props) => {
     [openProjectManager]
   );
 
-  const setEditorToolbar = (
-    editorToolbar: any,
-    options: {| showProjectButtons: boolean |},
-    isCurrentTab = true
-  ) => {
+  const setEditorToolbar = (editorToolbar: any, isCurrentTab = true) => {
     if (!toolbar.current || !isCurrentTab) return;
 
-    toolbar.current.setEditorToolbar(editorToolbar, options);
+    toolbar.current.setEditorToolbar(editorToolbar);
   };
 
   const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
@@ -2585,21 +2586,6 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const simulateUpdateDownloaded = () =>
-    setElectronUpdateStatus({
-      status: 'update-downloaded',
-      message: 'update-downloaded',
-      info: {
-        releaseName: 'Fake update',
-      },
-    });
-
-  const simulateUpdateAvailable = () =>
-    setElectronUpdateStatus({
-      status: 'update-available',
-      message: 'Update available',
-    });
-
   useKeyboardShortcuts(
     commandPaletteRef.current
       ? commandPaletteRef.current.launchCommand
@@ -2668,33 +2654,43 @@ const MainFrame = (props: Props) => {
 
   const showLoader = isLoadingProject || previewLoading;
 
+  // TODO: do something to ensure stability?
+  const shortcutMap = useShortcutMap();
+  const buildMainMenuProps = {
+    i18n: i18n,
+    project: state.currentProject,
+    recentProjectFiles: preferences.getRecentProjectFiles(),
+    shortcutMap,
+    isApplicationTopLevelMenu: false,
+  };
+  const mainMenuCallbacks = {
+    onChooseProject: () => openOpenFromStorageProviderDialog(),
+    onOpenRecentFile: openFromFileMetadataWithStorageProvider,
+    onSaveProject: saveProject,
+    onSaveProjectAs: saveProjectAs,
+    onCloseProject: askToCloseProject,
+    onCloseApp: closeApp,
+    onExportProject: () => openExportDialog(true),
+    onCreateProject: () => openCreateProjectDialog(true, null),
+    onCreateBlank: () => setNewProjectSetupDialogOpen(true),
+    onOpenProjectManager: () => openProjectManager(true),
+    onOpenHomePage: openHomePage,
+    onOpenDebugger: openDebugger,
+    onOpenAbout: () => openAboutDialog(true),
+    onOpenPreferences: () => openPreferencesDialog(true),
+    onOpenLanguage: () => openLanguageDialog(true),
+    onOpenProfile: () => openProfileDialogWithTab('profile'),
+    onOpenGamesDashboard: () => openProfileDialogWithTab('games-dashboard'),
+    setElectronUpdateStatus: setElectronUpdateStatus,
+  };
+
   return (
     <div className="main-frame">
       {!!renderMainMenu &&
-        renderMainMenu({
-          i18n: i18n,
-          project: state.currentProject,
-          onChooseProject: () => openOpenFromStorageProviderDialog(),
-          onOpenRecentFile: openFromFileMetadataWithStorageProvider,
-          onSaveProject: saveProject,
-          onSaveProjectAs: saveProjectAs,
-          onCloseProject: askToCloseProject,
-          onCloseApp: closeApp,
-          onExportProject: () => openExportDialog(true),
-          onCreateProject: () => openCreateProjectDialog(true, null),
-          onCreateBlank: () => setNewProjectSetupDialogOpen(true),
-          onOpenProjectManager: () => openProjectManager(true),
-          onOpenHomePage: openHomePage,
-          onOpenDebugger: openDebugger,
-          onOpenAbout: () => openAboutDialog(true),
-          onOpenPreferences: () => openPreferencesDialog(true),
-          onOpenLanguage: () => openLanguageDialog(true),
-          onOpenProfile: () => openProfileDialogWithTab('profile'),
-          onOpenGamesDashboard: () =>
-            openProfileDialogWithTab('games-dashboard'),
-          setElectronUpdateStatus: setElectronUpdateStatus,
-          recentProjectFiles: preferences.getRecentProjectFiles(),
-        })}
+        renderMainMenu(
+          { ...buildMainMenuProps, isApplicationTopLevelMenu: true },
+          mainMenuCallbacks
+        )}
       <ProjectTitlebar
         projectName={currentProject ? currentProject.getName() : null}
         fileMetadata={currentFileMetadata}
@@ -2738,15 +2734,6 @@ const MainFrame = (props: Props) => {
             onRenameExternalLayout={renameExternalLayout}
             onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
             onRenameExternalEvents={renameExternalEvents}
-            onSaveProject={saveProject}
-            onSaveProjectAs={saveProjectAs}
-            onCloseProject={() => {
-              askToCloseProject();
-            }}
-            onExportProject={() => openExportDialog(true)}
-            onOpenGamesDashboard={() =>
-              openProfileDialogWithTab('games-dashboard')
-            }
             onOpenResources={() => {
               openResources();
               openProjectManager(false);
@@ -2773,7 +2760,14 @@ const MainFrame = (props: Props) => {
           </EmptyMessage>
         )}
       </Drawer>
-      <TabsTitlebar>
+      <TabsTitlebar
+        onBuildMenuTemplate={() =>
+          adaptFromDeclarativeTemplate(
+            buildMainMenuDeclarativeTemplate(buildMainMenuProps),
+            mainMenuCallbacks
+          )
+        }
+      >
         <DraggableEditorTabs
           hideLabels={false}
           editorTabs={state.editorTabs}
@@ -2791,12 +2785,15 @@ const MainFrame = (props: Props) => {
       </TabsTitlebar>
       <Toolbar
         ref={toolbar}
-        hasProject={!!currentProject}
+        showProjectButtons={
+          !['start page', 'debugger', null].includes(
+            getCurrentTab(state.editorTabs)
+              ? getCurrentTab(state.editorTabs).key
+              : null
+          )
+        }
         toggleProjectManager={toggleProjectManager}
         exportProject={() => openExportDialog(true)}
-        requestUpdate={props.requestUpdate}
-        simulateUpdateDownloaded={simulateUpdateDownloaded}
-        simulateUpdateAvailable={simulateUpdateAvailable}
         onOpenDebugger={launchDebuggerAndPreview}
         hasPreviewsRunning={hasPreviewsRunning}
         onPreviewWithoutHotReload={launchNewPreview}
@@ -2829,11 +2826,7 @@ const MainFrame = (props: Props) => {
                     project: currentProject,
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar =>
-                      setEditorToolbar(
-                        editorToolbar,
-                        { showProjectButtons: id !== 0 /* TODO */ },
-                        isCurrentTab
-                      ),
+                      setEditorToolbar(editorToolbar, isCurrentTab),
                     projectItemName: editorTab.projectItemName,
                     setPreviewedLayout,
                     onOpenExternalEvents: openExternalEvents,

@@ -9,25 +9,15 @@ import ProjectManagerIcon from '../../UI/CustomSvgIcons/ProjectManager';
 import IconButton from '../../UI/IconButton';
 
 export type MainFrameToolbarProps = {|
-  hasProject: boolean,
+  showProjectButtons: boolean,
   toggleProjectManager: () => void,
   exportProject: () => void,
-
-  // TODO: remove
-  simulateUpdateDownloaded: ?() => void,
-  simulateUpdateAvailable: ?() => void,
-  requestUpdate: ?() => void,
 
   ...PreviewAndPublishButtonsProps,
 |};
 
 export type ToolbarInterface = {|
-  setEditorToolbar: (
-    React.Node | null,
-    options: {|
-      showProjectButtons: boolean,
-    |}
-  ) => void,
+  setEditorToolbar: (React.Node | null) => void,
 |};
 
 export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
@@ -36,16 +26,9 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
       editorToolbarNode,
       setEditorToolbarNode,
     ] = React.useState<React.Node | null>(null);
-    const [showProjectButtons, setShowProjectButtons] = React.useState<boolean>(
-      false
-    );
     const setEditorToolbar = React.useCallback(
-      (
-        editorToolbarNode: React.Node | null,
-        options: {| showProjectButtons: boolean |}
-      ) => {
+      (editorToolbarNode: React.Node | null) => {
         setEditorToolbarNode(editorToolbarNode);
-        setShowProjectButtons(options.showProjectButtons);
       },
       []
     );
@@ -55,7 +38,7 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
 
     return (
       <Toolbar>
-        {showProjectButtons ? (
+        {props.showProjectButtons ? (
           <>
             <ToolbarGroup firstChild>
               <IconButton
@@ -105,7 +88,6 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
                 previewState={props.previewState}
                 hasPreviewsRunning={props.hasPreviewsRunning}
                 exportProject={props.exportProject}
-                hasProject={props.hasProject}
               />
             </ToolbarGroup>
           </>

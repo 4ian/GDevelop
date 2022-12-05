@@ -17,7 +17,7 @@ const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 const DialogTitleBar = () => (
   <div
     className={DRAGGABLE_PART_CLASS_NAME}
-    style={{ height: 29, /* TODO */ flexShrink: 0 }}
+    style={{ height: 35, /* TODO */ flexShrink: 0 }}
   />
 );
 

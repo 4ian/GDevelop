@@ -13,7 +13,7 @@ const log = require('electron-log');
 const { uploadLocalFile } = require('./LocalFileUploader');
 const { serveFolder, stopServer } = require('./ServeFolder');
 const { startDebuggerServer, sendMessage } = require('./DebuggerServer');
-const { buildMainMenuFor, buildPlaceholderMainMenu } = require('./MainMenu');
+const { buildElectronMenuFromDeclarativeTemplate, buildPlaceholderMainMenu } = require('./MainMenu');
 const { loadModalWindow } = require('./ModalWindow');
 const { load, registerGdideProtocol } = require('./Utils/UrlLoader');
 const throttle = require('lodash.throttle');
@@ -145,7 +145,7 @@ app.on('ready', function() {
   });
 
   ipcMain.on('set-main-menu', (event, mainMenuTemplate) => {
-    Menu.setApplicationMenu(buildMainMenuFor(mainWindow, mainMenuTemplate));
+    Menu.setApplicationMenu(buildElectronMenuFromDeclarativeTemplate(mainWindow, mainMenuTemplate));
   });
 
   //Prevent any navigation inside the main window.

@@ -228,11 +228,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .AddParameter(
           "stringWithSelector",
           _("Hour: hour - Minutes: min - Seconds: sec - Day of month: "
-            "mday - Months since January: mon - Year since 1900: year - Days "
-            "since Sunday: wday - Days since Jan 1st: yday - Timestamp (ms): "
-            "timestamp\""),
-          "[\"hour\", \"min\", \"sec\", \"mon\", \"year\", \"wday\", \"mday\", "
-          "\"yday\", \"timestamp\"]");
+            "mday - Months since January: mon - Year: fullyear - Year since "
+            "1900: year - Days since Sunday: wday - Days since Jan 1st: yday - "
+            "Timestamp (ms): timestamp\""),
+          "[\"hour\", \"min\", \"sec\", \"mon\", \"year\", \"fullyear\", "
+          "\"wday\", \"mday\", \"yday\", \"timestamp\"]");
 }
 
 }  // namespace gd

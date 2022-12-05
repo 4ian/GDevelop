@@ -13,6 +13,8 @@ import Text from '../../UI/Text';
 import TextField from '../../UI/TextField';
 
 import {
+  canUserCustomizeLeaderboardTheme,
+  getRGBLeaderboardTheme,
   type LeaderboardCustomizationSettings,
   type LeaderboardScoreFormattingTimeUnit,
 } from '../../Utils/GDevelopServices/Play';
@@ -28,6 +30,7 @@ import ColorField from '../../UI/ColorField';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import GetSubscriptionCard from './GetSubscriptionCard';
 import LeaderboardPlaygroundCard from './LeaderboardPlaygroundCard';
+import { rgbStringToHexString } from '../../Utils/ColorTransformer';
 
 const unitToAbbreviation = {
   hour: 'HH',
@@ -93,14 +96,13 @@ function LeaderboardAppearanceDialog({
   leaderboardCustomizationSettings,
 }: Props) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const { limits } = React.useContext(AuthenticatedUserContext);
-  const canCustomizeTheme =
-    !!limits &&
-    !!limits.capabilities.leaderboards &&
-    (limits.capabilities.leaderboards.themeCustomizationCapabilities ===
-      'BASIC' ||
-      limits.capabilities.leaderboards.themeCustomizationCapabilities ===
-        'FULL');
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const canUserCustomizeTheme = canUserCustomizeLeaderboardTheme(
+    authenticatedUser
+  );
+  const rgbLeaderboardTheme = getRGBLeaderboardTheme(
+    leaderboardCustomizationSettings
+  );
   const [scoreTitleError, setScoreTitleError] = React.useState<?string>(null);
   const [
     defaultDisplayedEntriesNumber,
@@ -110,14 +112,18 @@ function LeaderboardAppearanceDialog({
       leaderboardCustomizationSettings.defaultDisplayedEntriesNumber) ||
       20
   );
-  const [backgroundColor, setBackgroundColor] = React.useState<string>('');
-  const [textColor, setTextColor] = React.useState<string>('');
+  const [backgroundColor, setBackgroundColor] = React.useState<string>(
+    rgbLeaderboardTheme.backgroundColor
+  );
+  const [textColor, setTextColor] = React.useState<string>(
+    rgbLeaderboardTheme.textColor
+  );
   const [
     highlightBackgroundColor,
     setHighlightBackgroundColor,
-  ] = React.useState<string>('');
+  ] = React.useState<string>(rgbLeaderboardTheme.highlightBackgroundColor);
   const [highlightTextColor, setHighlightTextColor] = React.useState<string>(
-    ''
+    rgbLeaderboardTheme.highlightTextColor
   );
   const [
     defaultDisplayedEntriesNumberError,
@@ -190,7 +196,7 @@ function LeaderboardAppearanceDialog({
       return;
     }
     setIsLoading(true);
-    const customizationSettings = {
+    const customizationSettings: LeaderboardCustomizationSettings = {
       defaultDisplayedEntriesNumber,
       scoreTitle,
       scoreFormatting:
@@ -202,6 +208,16 @@ function LeaderboardAppearanceDialog({
               precision,
             }
           : { type: scoreType, ...unitSelectOptions[timeUnits] },
+      theme: canUserCustomizeTheme
+        ? {
+            backgroundColor: rgbStringToHexString(backgroundColor),
+            textColor: rgbStringToHexString(textColor),
+            highlightBackgroundColor: rgbStringToHexString(
+              highlightBackgroundColor
+            ),
+            highlightTextColor: rgbStringToHexString(highlightTextColor),
+          }
+        : undefined,
     };
     await onSave(customizationSettings);
   };
@@ -269,6 +285,7 @@ function LeaderboardAppearanceDialog({
                   )
                 );
               }}
+              disabled={isLoading}
             />
             <ResponsiveLineStackLayout noMargin>
               <ColorField
@@ -277,7 +294,7 @@ function LeaderboardAppearanceDialog({
                 fullWidth
                 color={backgroundColor}
                 onChange={setBackgroundColor}
-                disabled={!canCustomizeTheme}
+                disabled={!canUserCustomizeTheme || isLoading}
               />
               <ColorField
                 floatingLabelText={<Trans>Text color</Trans>}
@@ -285,7 +302,7 @@ function LeaderboardAppearanceDialog({
                 fullWidth
                 color={textColor}
                 onChange={setTextColor}
-                disabled={!canCustomizeTheme}
+                disabled={!canUserCustomizeTheme || isLoading}
               />
             </ResponsiveLineStackLayout>
             <ResponsiveLineStackLayout noMargin>
@@ -295,7 +312,7 @@ function LeaderboardAppearanceDialog({
                 fullWidth
                 color={highlightBackgroundColor}
                 onChange={setHighlightBackgroundColor}
-                disabled={!canCustomizeTheme}
+                disabled={!canUserCustomizeTheme || isLoading}
               />
               <ColorField
                 floatingLabelText={<Trans>Highlight text color</Trans>}
@@ -303,14 +320,11 @@ function LeaderboardAppearanceDialog({
                 fullWidth
                 color={highlightTextColor}
                 onChange={setHighlightTextColor}
-                disabled={!canCustomizeTheme}
+                disabled={!canUserCustomizeTheme || isLoading}
               />
             </ResponsiveLineStackLayout>
-            {canCustomizeTheme ? (
-              <LeaderboardPlaygroundCard />
-            ) : (
-              <GetSubscriptionCard />
-            )}
+            <LeaderboardPlaygroundCard />
+            {!canUserCustomizeTheme && <GetSubscriptionCard />}
             <Spacer />
             <Text size="sub-title" noMargin>
               <Trans>Score column settings</Trans>
@@ -325,6 +339,7 @@ function LeaderboardAppearanceDialog({
                 if (!!scoreTitleError && !!newTitle) setScoreTitleError(null);
                 setScoreTitle(newTitle);
               }}
+              disabled={isLoading}
             />
             <SelectField
               fullWidth
@@ -334,6 +349,7 @@ function LeaderboardAppearanceDialog({
                 // $FlowIgnore
                 setScoreType(newValue)
               }
+              disabled={isLoading}
             >
               <SelectOption
                 key={'custom'}
@@ -363,6 +379,7 @@ function LeaderboardAppearanceDialog({
                     onChange={(e, newValue) => {
                       setPrefix(newValue);
                     }}
+                    disabled={isLoading}
                   />
                   <TextField
                     fullWidth
@@ -374,6 +391,7 @@ function LeaderboardAppearanceDialog({
                     onChange={(e, newValue) => {
                       setSuffix(newValue);
                     }}
+                    disabled={isLoading}
                   />
                 </ResponsiveLineStackLayout>
                 <TextField
@@ -395,6 +413,7 @@ function LeaderboardAppearanceDialog({
                       )
                     );
                   }}
+                  disabled={isLoading}
                 />
               </ColumnStackLayout>
             ) : (
@@ -404,6 +423,7 @@ function LeaderboardAppearanceDialog({
                   value={timeUnits}
                   floatingLabelText={<Trans>Time format</Trans>}
                   onChange={(e, i, newValue) => setTimeUnits(newValue)}
+                  disabled={isLoading}
                 >
                   {Object.keys(unitSelectOptions).map(option => (
                     <SelectOption
@@ -447,6 +467,7 @@ function LeaderboardAppearanceDialog({
                     )
                   )
                 }
+                disabled={isLoading}
               />
               <TextField
                 disabled

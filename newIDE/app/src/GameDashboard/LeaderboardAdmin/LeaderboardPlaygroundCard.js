@@ -10,7 +10,12 @@ import Window from '../../Utils/Window';
 
 const LeaderboardPlaygroundCard = () => {
   return (
-    <LineStackLayout expand noMargin alignItems="center">
+    <LineStackLayout
+      expand
+      noMargin
+      alignItems="center"
+      justifyContent="space-around"
+    >
       <Column>
         <Text>
           <Trans>

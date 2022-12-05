@@ -41,12 +41,10 @@ const fakeEditorToolbar = (
 );
 
 const defaultProps: MainFrameToolbarProps = {
-  hasProject: false,
+  showProjectButtons: true,
   toggleProjectManager: () => {},
-  requestUpdate: () => {},
-  simulateUpdateDownloaded: () => {},
-  simulateUpdateAvailable: () => {},
   exportProject: () => {},
+
   onPreviewWithoutHotReload: () => {},
   onOpenDebugger: () => {},
   onNetworkPreview: () => {},
@@ -64,13 +62,50 @@ const defaultProps: MainFrameToolbarProps = {
   },
 };
 
-export const NoProjectLoaded = () => <MainFrameToolbar {...defaultProps} />;
+export const NoProjectOpen = () => (
+  <MainFrameToolbar {...defaultProps} showProjectButtons={false} />
+);
+
+export const NoProjectOpenWithFakeButtons = () => {
+  const toolbar = React.useRef<?ToolbarInterface>(null);
+  React.useEffect(
+    () => {
+      if (toolbar.current) {
+        toolbar.current.setEditorToolbar(fakeEditorToolbar);
+      }
+    },
+    [toolbar]
+  );
+  return (
+    <MainFrameToolbar
+      {...defaultProps}
+      showProjectButtons={false}
+      ref={toolbar}
+    />
+  );
+};
+
+export const ProjectOpen = () => {
+  return <MainFrameToolbar {...defaultProps} isPreviewEnabled />;
+};
+
+export const ProjectOpenPreviewDisabled = () => (
+  <MainFrameToolbar
+    {...defaultProps}
+    previewState={{
+      isPreviewOverriden: false,
+      overridenPreviewExternalLayoutName: null,
+      overridenPreviewLayoutName: null,
+      previewExternalLayoutName: null,
+      previewLayoutName: 'testLayout',
+    }}
+  />
+);
 
 export const ProjectOpenOnScene = () => (
   <MainFrameToolbar
     {...defaultProps}
     isPreviewEnabled
-    hasProject
     previewState={{
       isPreviewOverriden: false,
       overridenPreviewExternalLayoutName: null,
@@ -85,7 +120,6 @@ export const ProjectOpenOnExternalLayout = () => (
   <MainFrameToolbar
     {...defaultProps}
     isPreviewEnabled
-    hasProject
     previewState={{
       isPreviewOverriden: false,
       overridenPreviewExternalLayoutName: null,
@@ -96,11 +130,10 @@ export const ProjectOpenOnExternalLayout = () => (
   />
 );
 
-export const PreviewOverridenOnScene = () => (
+export const ProjectOpenPreviewOverridenOnScene = () => (
   <MainFrameToolbar
     {...defaultProps}
     isPreviewEnabled
-    hasProject
     previewState={{
       isPreviewOverriden: true,
       overridenPreviewExternalLayoutName: null,
@@ -111,11 +144,10 @@ export const PreviewOverridenOnScene = () => (
   />
 );
 
-export const PreviewOverridenOnExternalLayout = () => (
+export const ProjectOpenPreviewOverridenOnExternalLayout = () => (
   <MainFrameToolbar
     {...defaultProps}
     isPreviewEnabled
-    hasProject
     previewState={{
       isPreviewOverriden: true,
       overridenPreviewExternalLayoutName: 'testExternalLayout',
@@ -126,48 +158,21 @@ export const PreviewOverridenOnExternalLayout = () => (
   />
 );
 
-export const ProjectOpenWithOtherToolbar = () => {
+export const ProjectOpenWithFakeButtons = () => {
   const toolbar = React.useRef<?ToolbarInterface>(null);
   React.useEffect(
     () => {
       if (toolbar.current) {
-        toolbar.current.setEditorToolbar(fakeEditorToolbar, {
-          showProjectButtons: true,
-        });
+        toolbar.current.setEditorToolbar(fakeEditorToolbar);
       }
     },
     [toolbar]
   );
-
-  return (
-    <MainFrameToolbar
-      {...defaultProps}
-      ref={toolbar}
-      isPreviewEnabled
-      hasProject
-    />
-  );
+  return <MainFrameToolbar {...defaultProps} ref={toolbar} isPreviewEnabled />;
 };
-export const PreviewRunning = () => {
-  const toolbar = React.useRef<?ToolbarInterface>(null);
-  React.useEffect(
-    () => {
-      if (toolbar.current) {
-        toolbar.current.setEditorToolbar(fakeEditorToolbar, {
-          showProjectButtons: true,
-        });
-      }
-    },
-    [toolbar]
-  );
 
+export const ProjectOpenPreviewRunning = () => {
   return (
-    <MainFrameToolbar
-      {...defaultProps}
-      ref={toolbar}
-      isPreviewEnabled
-      hasProject
-      hasPreviewsRunning
-    />
+    <MainFrameToolbar {...defaultProps} isPreviewEnabled hasPreviewsRunning />
   );
 };

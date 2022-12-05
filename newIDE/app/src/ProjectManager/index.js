@@ -12,7 +12,6 @@ import SearchBar, {
 } from '../UI/SearchBar';
 import ListIcon from '../UI/ListIcon';
 import { AddListItem, SearchListItem } from '../UI/ListCommonItem';
-import Window from '../Utils/Window';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
 import {
@@ -30,15 +29,10 @@ import {
 } from '../Utils/Serializer';
 import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import Flag from '@material-ui/icons/Flag';
-import Close from '@material-ui/icons/Close';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
 import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
-import Save from '@material-ui/icons/Save';
 import VariableTree from '../UI/CustomSvgIcons/VariableTree';
 import ArtTrack from '@material-ui/icons/ArtTrack';
-import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
-import FileCopy from '@material-ui/icons/FileCopy';
-import TimelineIcon from '@material-ui/icons/Timeline';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
@@ -99,11 +93,6 @@ type Props = {|
   onOpenExternalEvents: string => void,
   onOpenExternalLayout: string => void,
   onOpenEventsFunctionsExtension: string => void,
-  onSaveProject: () => Promise<void>,
-  onSaveProjectAs: () => void,
-  onCloseProject: () => void,
-  onExportProject: () => void,
-  onOpenGamesDashboard: () => void,
   onOpenResources: () => void,
   onOpenPlatformSpecificAssets: () => void,
   eventsFunctionsExtensionsError: ?Error,
@@ -583,47 +572,6 @@ export default class ProjectManager extends React.Component<Props, State> {
     this.setState({ projectPropertiesDialogOpen: false });
   };
 
-  _renderMenu() {
-    // If there is already a main menu (as the native one made with
-    // Electron), don't show it in the Project Manager.
-    if (Window.hasMainMenu()) return null;
-
-    return (
-      <React.Fragment>
-        <ListItem
-          key="save"
-          primaryText={<Trans>Save</Trans>}
-          leftIcon={<Save />}
-          onClick={() => this.props.onSaveProject()}
-        />
-        <ListItem
-          key="save-as"
-          primaryText={<Trans>Save as...</Trans>}
-          leftIcon={<FileCopy />}
-          onClick={() => this.props.onSaveProjectAs()}
-        />
-        <ListItem
-          key="export"
-          primaryText={<Trans>Export</Trans>}
-          leftIcon={<AddToHomeScreen />}
-          onClick={() => this.props.onExportProject()}
-        />
-        <ListItem
-          key="close"
-          primaryText={<Trans>Close</Trans>}
-          leftIcon={<Close />}
-          onClick={() => this.props.onCloseProject()}
-        />
-        <ListItem
-          key="games-dashboard"
-          primaryText={<Trans>Published Games Dashboard</Trans>}
-          leftIcon={<TimelineIcon />}
-          onClick={() => this.props.onOpenGamesDashboard()}
-        />
-      </React.Fragment>
-    );
-  }
-
   _onSearchChange = (text: string) =>
     this.setState({
       searchText: text,
@@ -688,7 +636,6 @@ export default class ProjectManager extends React.Component<Props, State> {
               onOpenSearchExtensionDialog={this._openSearchExtensionDialog}
             />
             <List style={styles.list}>
-              {this._renderMenu()}
               <ProjectStructureItem
                 id={getTabId('game-settings')}
                 primaryText={<Trans>Game settings</Trans>}

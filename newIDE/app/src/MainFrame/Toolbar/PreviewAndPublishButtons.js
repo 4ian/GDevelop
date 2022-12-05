@@ -25,7 +25,6 @@ export type PreviewAndPublishButtonsProps = {|
   hasPreviewsRunning: boolean,
   previewState: PreviewState,
   exportProject: () => void,
-  hasProject: boolean,
 |};
 
 export default function PreviewAndPublishButtons({
@@ -39,7 +38,6 @@ export default function PreviewAndPublishButtons({
   previewState,
   setPreviewOverride,
   exportProject,
-  hasProject,
 }: PreviewAndPublishButtonsProps) {
   const debugBuildMenuTemplate = React.useCallback(
     (i18n: I18nType) => [
@@ -180,7 +178,6 @@ export default function PreviewAndPublishButtons({
       />
       <TextButton
         onClick={exportProject}
-        disabled={!hasProject}
         icon={<PublishIcon />}
         label={<Trans>Publish</Trans>}
         id={'toolbar-publish-button'}

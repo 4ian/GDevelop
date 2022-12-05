@@ -6,7 +6,11 @@ import { type InstructionOrExpressionTreeNode } from '../../../InstructionOrExpr
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import Subheader from '../../../UI/Subheader';
 import flatten from 'lodash/flatten';
-import { getSubheaderListItemKey, getInstructionListItemValue } from './Keys';
+import {
+  getSubheaderListItemKey,
+  getInstructionListItemValue,
+  getInstructionOrExpressionIdentifier,
+} from './Keys';
 
 type Props<T> = {|
   instructionTreeNode: InstructionOrExpressionTreeNode,
@@ -57,6 +61,9 @@ export const renderInstructionOrExpressionTree = <
             primaryText={key}
             selected={selected}
             id={
+              // TODO: This id is used by in app tutorials. When in app tutorials
+              // are linked to GDevelop versions, change this id to be more accurate
+              // using getInstructionOrExpressionIdentifier
               'instruction-item-' +
               instructionInformation.type.replace(/:/g, '-')
             }

@@ -24,6 +24,7 @@ const defaultProps = {
     getNewsletterEmail: true,
     isCreator: true,
     isPlayer: false,
+    donateLink: 'https://www.gdevelop-app.com',
   },
 };
 export const Default = () => <EditProfileDialog {...defaultProps} />;

@@ -11,6 +11,8 @@ import {
 import { getElectronAccelerator } from '../KeyboardShortcuts';
 import { isMacLike } from '../Utils/Platform';
 import Window from '../Utils/Window';
+import optionalRequire from '../Utils/OptionalRequire';
+const electron = optionalRequire('electron');
 
 export type BuildMainMenuProps = {|
   i18n: I18nType,
@@ -182,17 +184,25 @@ export const buildMainMenuDeclarativeTemplate = ({
               label: i18n._(t`Language`),
               onClickSendEvent: 'main-menu-open-language',
             },
-            { type: 'separator' },
-            {
-              label: i18n._(t`Exit GDevelop`),
-              accelerator: getElectronAccelerator(shortcutMap['QUIT_APP']),
-              onClickSendEvent: 'main-menu-close-app',
-            },
+            // Leaving the app can only be done on the desktop app.
+            ...(!!electron
+              ? [
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Exit GDevelop`),
+                    accelerator: getElectronAccelerator(
+                      shortcutMap['QUIT_APP']
+                    ),
+                    onClickSendEvent: 'main-menu-close-app',
+                  },
+                ]
+              : []),
           ]
         : []),
     ],
   };
 
+  // The window is only useful on the desktop app. It will be skipped on the web-app.
   const editTemplate: MenuDeclarativeItemTemplate = {
     label: i18n._(t`Edit`),
     submenu: [
@@ -228,19 +238,29 @@ export const buildMainMenuDeclarativeTemplate = ({
         onClickSendEvent: 'main-menu-open-debugger',
         enabled: !!project,
       },
-      { type: 'separator' },
-      { label: i18n._(t`Toggle Developer Tools`), role: 'toggledevtools' },
-      { type: 'separator' },
-      { label: i18n._(t`Toggle Fullscreen`), role: 'togglefullscreen' },
+      // Some Electron specific menu items, not shown in the web-app.
+      ...(!!electron
+        ? [
+            { type: 'separator' },
+            {
+              label: i18n._(t`Toggle Developer Tools`),
+              role: 'toggledevtools',
+            },
+            { type: 'separator' },
+            { label: i18n._(t`Toggle Fullscreen`), role: 'togglefullscreen' },
+          ]
+        : []),
     ],
   };
 
+  // The window is only useful on the desktop app. It will be skipped on the web-app.
   const windowTemplate: MenuDeclarativeItemTemplate = {
     label: i18n._(t`Window`),
     role: 'window',
     submenu: [{ label: i18n._(t`Minimize`), role: 'minimize' }],
   };
 
+  // The help menu is mostly a collection of links.
   const helpTemplate: MenuDeclarativeItemTemplate = {
     label: i18n._(t`Help`),
     role: 'help',
@@ -318,14 +338,17 @@ export const buildMainMenuDeclarativeTemplate = ({
     ],
   };
 
+  // Structure of the menu. Some electron specific menus are not even shown
+  // on the web-app, because they would not work and make sense at all.
   const template: Array<MenuDeclarativeItemTemplate> = [
     fileTemplate,
-    editTemplate,
+    ...(!!electron ? [editTemplate] : []),
     viewTemplate,
-    windowTemplate,
+    ...(!!electron ? [windowTemplate] : []),
     helpTemplate,
   ];
 
+  // macOS has a menu with the name of the app.
   if (isMacLike() && isApplicationTopLevelMenu) {
     template.unshift({
       label: i18n._(t`GDevelop 5`),
@@ -389,17 +412,21 @@ export const adaptFromDeclarativeTemplate = (
 ): Array<MenuItemTemplate> => {
   const adaptMenuDeclarativeItemTemplate = (
     menuTemplate: Array<MenuDeclarativeItemTemplate>
-  ) =>
+  ): Array<MenuItemTemplate> =>
     menuTemplate.map((menuItemTemplate: MenuDeclarativeItemTemplate) => {
       const {
+        // $FlowFixMe - property can be undefined.
         onClickSendEvent,
+        // $FlowFixMe - property can be undefined.
         onClickOpenLink,
+        // $FlowFixMe - property can be undefined.
         eventArgs,
         ...menuItemTemplateRest
       } = menuItemTemplate;
 
       const hasOnClick = onClickSendEvent || onClickOpenLink;
 
+      // $FlowFixMe - we're putting both a click and a submenu, so not strictly following the schema.
       return {
         ...menuItemTemplateRest,
         click: hasOnClick

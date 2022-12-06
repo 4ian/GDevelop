@@ -111,12 +111,14 @@
     "surface": {
       "titlebar": {
         "background-color": {
-          "value": "#222222"
+          "value": "#D9D9DE",
+          "comment": "Palette/Grey/20"
         }
       },
       "toolbar": {
         "background-color": {
-          "value": "#f7f7f7"
+          "value": "#FAFAFA",
+          "comment": "Palette/Grey/00"
         }
       },
       "window": {
@@ -301,20 +303,22 @@
     "closable-tabs": {
       "default": {
         "background-color": {
-          "value": "#1D1D26",
-          "comment": "Palette/Grey/100"
+          "value": "#A6A6AB",
+          "comment": "Palette/Grey/40"
         },
         "color": {
-          "value": "#7F7F85",
-          "comment": "Palette/Grey/50"
+          "value": "#1D1D26",
+          "comment": "Palette/Grey/100"
         }
       },
       "selected": {
         "background-color": {
-          "value": "#f7f7f7"
+          "value": "#FAFAFA",
+          "comment": "Palette/Grey/00"
         },
         "color": {
-          "value": "#000000"
+          "value": "#1D1D26",
+          "comment": "Palette/Grey/100"
         }
       }
     },

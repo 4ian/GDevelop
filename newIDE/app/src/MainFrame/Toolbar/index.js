@@ -50,31 +50,6 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               >
                 <ProjectManagerIcon />
               </IconButton>
-
-              {/* {isDev && <ToolbarSeparator />}
-              {isDev && (
-                <ElementWithMenu
-                  element={<ToolbarIcon src="res/ribbon_default/bug32.png" />}
-                  buildMenuTemplate={() => [
-                    {
-                      label: 'Simulate update downloaded',
-                      disabled: !props.simulateUpdateDownloaded,
-                      click: () => {
-                        props.simulateUpdateDownloaded &&
-                          props.simulateUpdateDownloaded();
-                      },
-                    },
-                    {
-                      label: 'Simulate update available',
-                      disabled: !props.simulateUpdateAvailable,
-                      click: () => {
-                        props.simulateUpdateAvailable &&
-                          props.simulateUpdateAvailable();
-                      },
-                    },
-                  ]}
-                />
-              )} */}
             </ToolbarGroup>
             <ToolbarGroup>
               <PreviewAndPublishButtons

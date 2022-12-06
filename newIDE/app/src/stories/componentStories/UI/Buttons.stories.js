@@ -22,7 +22,6 @@ import TextButton from '../../../UI/TextButton';
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
 import RaisedButtonWithMenu from '../../../UI/RaisedButtonWithMenu';
 import ElementWithMenu from '../../../UI/Menu/ElementWithMenu';
-import ToolbarIcon from '../../../UI/ToolbarIcon';
 import MiniToolbar, { MiniToolbarText } from '../../../UI/MiniToolbar';
 import IconButton from '../../../UI/IconButton';
 import { Column, Line } from '../../../UI/Grid';
@@ -167,15 +166,6 @@ export const Default = () => (
       <Text size="block-title">Icons with menu:</Text>
     </LineStackLayout>
     <LineStackLayout noMargin>
-      <ElementWithMenu
-        element={
-          <ToolbarIcon
-            src="res/ribbon_default/bug32.png"
-            tooltip={'ToolbarIcon with menu'}
-          />
-        }
-        buildMenuTemplate={buildFakeMenuTemplate}
-      />
       <ElementWithMenu
         element={
           <IconButton>

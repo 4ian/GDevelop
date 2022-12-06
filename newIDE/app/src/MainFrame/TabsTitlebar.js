@@ -51,6 +51,7 @@ export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
             size="small"
             id="gdevelop-main-menu"
             style={styles.menuIcon}
+            color="default"
           >
             <MenuIcon />
           </IconButton>

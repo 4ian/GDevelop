@@ -24,7 +24,7 @@ export const Toolbar = React.memo<ToolbarProps>(
           display: 'flex',
           overflowX: 'auto',
           overflowY: 'hidden',
-          height: 32,
+          height: 40,
           paddingLeft: 8,
           paddingRight: 8,
         }}

@@ -4,11 +4,22 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
-import ToolbarIcon from '../UI/ToolbarIcon';
+import IconButton from '../UI/IconButton';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import ToolbarCommands from './ToolbarCommands';
 import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import ObjectIcon from '../UI/CustomSvgIcons/Object';
+import ObjectGroupIcon from '../UI/CustomSvgIcons/ObjectGroup';
+import PropertiesPanelIcon from '../UI/CustomSvgIcons/PropertiesPanel';
+import InstancesListIcon from '../UI/CustomSvgIcons/InstancesList';
+import LayersIcon from '../UI/CustomSvgIcons/Layers';
+import UndoIcon from '../UI/CustomSvgIcons/Undo';
+import RedoIcon from '../UI/CustomSvgIcons/Redo';
+import TrashIcon from '../UI/CustomSvgIcons/Trash';
+import GridIcon from '../UI/CustomSvgIcons/Grid';
+import ZoomInIcon from '../UI/CustomSvgIcons/ZoomIn';
+import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 
 type Props = {|
   openObjectsList: () => void,
@@ -54,63 +65,57 @@ const Toolbar = (props: Props) => {
         }
       />
       <ToolbarGroup lastChild>
-        <ToolbarIcon
+        <IconButton
+          size="small"
+          color="default"
           id="toolbar-open-objects-panel-button"
           onClick={props.openObjectsList}
-          src="res/ribbon_default/objects64.png"
           tooltip={t`Open Objects Panel`}
-        />
-        <ToolbarIcon
+        >
+          <ObjectIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
           id="toolbar-open-object-groups-panel-button"
           onClick={props.openObjectGroupsList}
-          src={'res/ribbon_default/objectsgroups64.png'}
           tooltip={t`Open Object Groups Panel`}
-        />
-        <ToolbarIcon
+        >
+          <ObjectGroupIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
           id="toolbar-open-properties-panel-button"
           onClick={props.openProperties}
-          src="res/ribbon_default/editprop32.png"
           tooltip={t`Open Properties Panel`}
-        />
-        <ToolbarIcon
+        >
+          <PropertiesPanelIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
           id="toolbar-open-instances-list-panel-button"
           onClick={props.toggleInstancesList}
-          src="res/ribbon_default/ObjectsPositionsList32.png"
           tooltip={t`Open Instances List Panel`}
-        />
-        <ToolbarIcon
+        >
+          <InstancesListIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
           id="toolbar-open-layers-panel-button"
           onClick={props.toggleLayersList}
-          src="res/ribbon_default/layers32.png"
           tooltip={t`Open Layers Panel`}
-        />
-        <ToolbarSeparator />
-        <ToolbarIcon
-          onClick={props.undo}
-          src="res/ribbon_default/undo32.png"
-          disabled={!props.canUndo}
-          tooltip={t`Undo the last changes`}
-        />
-        <ToolbarIcon
-          onClick={props.redo}
-          src="res/ribbon_default/redo32.png"
-          disabled={!props.canRedo}
-          tooltip={t`Redo the last changes`}
-        />
-        <ToolbarSeparator />
-        <ToolbarIcon
-          onClick={props.deleteSelection}
-          src="res/ribbon_default/deleteselected32.png"
-          disabled={!props.instancesSelection.getSelectedInstances().length}
-          tooltip={t`Delete the selected instances from the scene`}
-        />
-        <ToolbarSeparator />
+        >
+          <LayersIcon />
+        </IconButton>
         <ElementWithMenu
           element={
-            <ToolbarIcon
-              src="res/ribbon_default/grid32.png"
-              tooltip={t`Toggle/edit grid`}
-            />
+            <IconButton size="small"
+            color="default" tooltip={t`Toggle/edit grid`}>
+              <GridIcon />
+            </IconButton>
           }
           buildMenuTemplate={(i18n: I18nType) => [
             {
@@ -132,12 +137,31 @@ const Toolbar = (props: Props) => {
             },
           ]}
         />
+        <ToolbarSeparator />
+        <IconButton
+          size="small"
+          color="default"
+          onClick={props.undo}
+          disabled={!props.canUndo}
+          tooltip={t`Undo the last changes`}
+        >
+          <UndoIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
+          onClick={props.redo}
+          disabled={!props.canRedo}
+          tooltip={t`Redo the last changes`}
+        >
+          <RedoIcon />
+        </IconButton>
         <ElementWithMenu
           element={
-            <ToolbarIcon
-              src="res/ribbon_default/zoom32.png"
-              tooltip={t`Change editor zoom`}
-            />
+            <IconButton size="small"
+            color="default" tooltip={t`Change editor zoom`}>
+              <ZoomInIcon />
+            </IconButton>
           }
           buildMenuTemplate={(i18n: I18nType) => [
             ...props.getContextMenuZoomItems(i18n),
@@ -152,13 +176,25 @@ const Toolbar = (props: Props) => {
             { label: '400%', click: () => props.setZoomFactor(4.0) },
           ]}
         />
+        <IconButton
+          size="small"
+          color="default"
+          onClick={props.deleteSelection}
+          disabled={!props.instancesSelection.getSelectedInstances().length}
+          tooltip={t`Delete the selected instances from the scene`}
+        >
+          <TrashIcon />
+        </IconButton>
         {props.onOpenSettings && <ToolbarSeparator />}
         {props.onOpenSettings && (
-          <ToolbarIcon
+          <IconButton
+            size="small"
+            color="default"
             onClick={props.onOpenSettings}
-            src="res/ribbon_default/pref32.png"
             tooltip={t`Open settings`}
-          />
+          >
+            <EditSceneIcon />
+          </IconButton>
         )}
       </ToolbarGroup>
     </>

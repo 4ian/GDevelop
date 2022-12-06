@@ -2,11 +2,14 @@
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
+import { LineStackLayout } from '../../UI/Layout';
 import IconButton from '../../UI/IconButton';
-import TextButton from '../../UI/TextButton';
+import FlatButton from '../../UI/FlatButton';
+import RaisedButton from '../../UI/RaisedButton';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import { type PreviewState } from '../PreviewState';
 import PreviewIcon from '../../UI/CustomSvgIcons/Preview';
+import UpdateIcon from '../../UI/CustomSvgIcons/Update';
 import PublishIcon from '../../UI/CustomSvgIcons/Publish';
 import DebugIcon from '../../UI/CustomSvgIcons/Debug';
 
@@ -125,7 +128,7 @@ export default function PreviewAndPublishButtons({
   };
 
   return (
-    <React.Fragment>
+    <LineStackLayout noMargin>
       <ElementWithMenu
         element={
           <IconButton
@@ -141,10 +144,11 @@ export default function PreviewAndPublishButtons({
       />
       <ElementWithMenu
         element={
-          <TextButton
+          <FlatButton
+            primary
             onClick={onClickPreview}
             disabled={!isPreviewEnabled}
-            icon={<PreviewIcon />}
+            leftIcon={hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />}
             label={
               hasPreviewsRunning ? (
                 <Trans>Update</Trans>
@@ -176,7 +180,8 @@ export default function PreviewAndPublishButtons({
         openMenuWithSecondaryClick
         buildMenuTemplate={previewBuildMenuTemplate}
       />
-      <TextButton
+      <RaisedButton
+        primary
         onClick={exportProject}
         icon={<PublishIcon />}
         label={<Trans>Publish</Trans>}
@@ -185,6 +190,6 @@ export default function PreviewAndPublishButtons({
           <Trans>Export the game (Web, Android, iOS...)</Trans>
         }
       />
-    </React.Fragment>
+    </LineStackLayout>
   );
 }

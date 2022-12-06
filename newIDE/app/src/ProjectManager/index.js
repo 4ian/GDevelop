@@ -646,7 +646,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     src="res/ribbon_default/projectManager32.png"
                   />
                 }
-                initiallyOpen={false}
+                initiallyOpen
                 autoGenerateNestedIndicator={true}
                 indentNestedItems
                 renderNestedItems={() => [
@@ -690,7 +690,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     src="res/ribbon_default/sceneadd32.png"
                   />
                 }
-                initiallyOpen={true}
+                initiallyOpen
                 open={forceOpen}
                 autoGenerateNestedIndicator={!forceOpen}
                 renderNestedItems={() =>
@@ -784,7 +784,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     src="res/ribbon_default/externalevents32.png"
                   />
                 }
-                initiallyOpen={false}
+                initiallyOpen
                 open={forceOpen}
                 autoGenerateNestedIndicator={!forceOpen}
                 renderNestedItems={() =>
@@ -861,7 +861,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     src="res/ribbon_default/externallayout32.png"
                   />
                 }
-                initiallyOpen={false}
+                initiallyOpen
                 open={forceOpen}
                 autoGenerateNestedIndicator={!forceOpen}
                 renderNestedItems={() =>
@@ -940,7 +940,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     src="res/ribbon_default/function32.png"
                   />
                 }
-                initiallyOpen={false}
+                initiallyOpen
                 open={forceOpen}
                 autoGenerateNestedIndicator={
                   !forceOpen && !eventsFunctionsExtensionsError

@@ -387,9 +387,6 @@ export function createGdevelopTheme({
           primary: styles['ThemeTextDefaultColor'],
           secondary: styles['ThemeTextSecondaryColor'],
         },
-        highlighted: {
-          backgroundColor: styles['ThemeTextHighlightedBackgroundColor'],
-        },
       },
       linearProgress: {
         color: {

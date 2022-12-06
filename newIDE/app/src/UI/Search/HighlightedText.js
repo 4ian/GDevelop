@@ -1,13 +1,15 @@
 // @flow
 import * as React from 'react';
-import GDevelopThemeContext from '../Theme/ThemeContext';
+
+const styles = {
+  highlightedText: { textDecoration: 'underline' },
+};
 
 const highlightText = (
   text: string,
   matchCoordinates: number[],
   start: number,
-  end: ?number,
-  styleToApply: { backgroundColor?: string, color?: string }
+  end: ?number
 ): React.Node[] => {
   const highlightTextStart = matchCoordinates[0];
   const highlightTextEnd = matchCoordinates[1] + 1;
@@ -24,7 +26,10 @@ const highlightText = (
 
   return [
     beforeText,
-    <span key={`${highlightedText}${highlightTextStart}`} style={styleToApply}>
+    <span
+      key={`${highlightedText}${highlightTextStart}`}
+      style={styles.highlightedText}
+    >
       {highlightedText}
     </span>,
     afterText,
@@ -38,8 +43,6 @@ const HighlightedText = ({
   text: string,
   matchesCoordinates: number[][],
 |}): React.Node[] => {
-  const theme = React.useContext(GDevelopThemeContext);
-
   if (matchesCoordinates.length === 0) return [text];
 
   const returnText = [];
@@ -54,8 +57,7 @@ const HighlightedText = ({
         text,
         matchesCoordinates[i],
         startIndex,
-        startIndexOfNextMatch,
-        theme.text.highlighted
+        startIndexOfNextMatch
       )
     );
   }

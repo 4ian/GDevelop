@@ -78,15 +78,16 @@ const ProfileDetails = ({
               </Text>
             </Line>
             {profile.id && (
-              <LineStackLayout>
-                {!!donateLink && (
-                  <RaisedButton
-                    label={<Trans>Buy me a coffee</Trans>}
-                    primary
-                    onClick={() => Window.openExternalURL(donateLink)}
-                    icon={<Coffee />}
-                  />
-                )}
+              <LineStackLayout justifyContent="space-between">
+                {!isAuthenticatedUserProfile && // Only show on Public Profile.
+                  !!donateLink && (
+                    <RaisedButton
+                      label={<Trans>Buy me a coffee</Trans>}
+                      primary
+                      onClick={() => Window.openExternalURL(donateLink)}
+                      icon={<Coffee />}
+                    />
+                  )}
                 <FlatButton
                   label={<Trans>Access public profile</Trans>}
                   onClick={() =>
@@ -144,7 +145,7 @@ const ProfileDetails = ({
           )}
           {isAuthenticatedUserProfile && (
             <ResponsiveLineStackLayout justifyContent="flex-end" noMargin>
-              <RaisedButton
+              <FlatButton
                 label={<Trans>Change my email</Trans>}
                 onClick={onChangeEmail}
               />

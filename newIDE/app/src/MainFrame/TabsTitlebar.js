@@ -21,7 +21,7 @@ const styles = {
   container: { display: 'flex', flexShrink: 0, alignItems: 'end' },
   leftSideArea: { alignSelf: 'stretch' },
   rightSideArea: { alignSelf: 'stretch', flex: 1 },
-  menuIcon: { marginRight: 4 },
+  menuIcon: { marginLeft: 4, marginRight: 4 },
 };
 
 export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
@@ -34,16 +34,29 @@ export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
     [backgroundColor]
   );
 
-  const isMacos = !!electron && isMacLike();
-  const isWindowsOrLinux = !!electron && !isMacLike();
+  const isDesktopMacos = !!electron && isMacLike();
+  const isDesktopWindowsOrLinux = !!electron && !isMacLike();
+
+  // macOS displays the "traffic lights" on the left.
+  let leftSideOffset = isDesktopMacos ? 76 : 0;
+  // Windows and Linux have their "window controls" on the right
+  let rightSideOffset = isDesktopWindowsOrLinux ? 150 : 0;
+
+  // An installed PWA can have window controls displayed as overlay,
+  // which we measure here to set the offsets.
+  if ('windowControlsOverlay' in navigator) {
+    // $FlowFixMe - this API is not handled by Flow.
+    const { x, width } = navigator.windowControlsOverlay.getTitlebarAreaRect();
+    leftSideOffset = x;
+    rightSideOffset = window.innerWidth - x - width;
+  }
 
   return (
     <div style={{ ...styles.container, backgroundColor }}>
       <div
         style={{
           ...styles.leftSideArea,
-          // macOS displays the "traffic lights" on the left.
-          width: isMacos ? 76 : 4,
+          width: leftSideOffset,
         }}
         className={DRAGGABLE_PART_CLASS_NAME}
       />
@@ -64,8 +77,7 @@ export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
       <div
         style={{
           ...styles.rightSideArea,
-          // Windows and Linux have their "window controls" on the right
-          minWidth: isWindowsOrLinux ? 150 : 0,
+          minWidth: rightSideOffset,
         }}
         className={DRAGGABLE_PART_CLASS_NAME}
       />

@@ -112,8 +112,11 @@ const Toolbar = (props: Props) => {
         </IconButton>
         <ElementWithMenu
           element={
-            <IconButton size="small"
-            color="default" tooltip={t`Toggle/edit grid`}>
+            <IconButton
+              size="small"
+              color="default"
+              tooltip={t`Toggle/edit grid`}
+            >
               <GridIcon />
             </IconButton>
           }
@@ -158,8 +161,11 @@ const Toolbar = (props: Props) => {
         </IconButton>
         <ElementWithMenu
           element={
-            <IconButton size="small"
-            color="default" tooltip={t`Change editor zoom`}>
+            <IconButton
+              size="small"
+              color="default"
+              tooltip={t`Change editor zoom`}
+            >
               <ZoomInIcon />
             </IconButton>
           }

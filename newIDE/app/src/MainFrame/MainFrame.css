@@ -30,6 +30,11 @@ html {
   animation: fade-in 0.5s;
 }
 
+.title-bar-draggable-part {
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+
 /* A container adding padding to fit on the screen, useful for dialogs on non square screens ("notch"). */
 .safe-area-aware-container {
   padding-top: env(safe-area-inset-top);

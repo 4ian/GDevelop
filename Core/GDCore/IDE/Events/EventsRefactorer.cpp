@@ -773,15 +773,18 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
   const gd::String& ignored_characters =
       EventsRefactorer::searchIgnoredCharacters;
 
-  search.replace_if(
-      search.begin(),
-      search.end(),
-      [ignored_characters](const char& c) {
-        return ignored_characters.find(c) != gd::String::npos;
-      },
-      "");
-  search = search.LeftTrim().RightTrim();
-  search.RemoveConsecutiveOccurrences(search.begin(), search.end(), ' ');
+  if (inEventSentences) {
+    // Remove ignored characters only when searching in event sentences.
+    search.replace_if(
+        search.begin(),
+        search.end(),
+        [ignored_characters](const char& c) {
+          return ignored_characters.find(c) != gd::String::npos;
+        },
+        "");
+    search = search.LeftTrim().RightTrim();
+    search.RemoveConsecutiveOccurrences(search.begin(), search.end(), ' ');
+  }
 
   for (std::size_t i = 0; i < events.size(); ++i) {
     bool eventAddedInResults = false;

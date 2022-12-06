@@ -4,7 +4,7 @@ import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
 import Background from '../UI/Background';
 import TextField from '../UI/TextField';
-import { Column, Line, Spacer } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import IconButton from '../UI/IconButton';

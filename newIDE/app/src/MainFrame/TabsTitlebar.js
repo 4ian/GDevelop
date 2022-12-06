@@ -19,7 +19,8 @@ const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
 
 const styles = {
   container: { display: 'flex', flexShrink: 0, alignItems: 'end' },
-  rightSide: { flex: 1 },
+  leftSideArea: { alignSelf: 'stretch' },
+  rightSideArea: { alignSelf: 'stretch', flex: 1 },
   menuIcon: { marginRight: 4 },
 };
 
@@ -40,6 +41,7 @@ export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
     <div style={{ ...styles.container, backgroundColor }}>
       <div
         style={{
+          ...styles.leftSideArea,
           // macOS displays the "traffic lights" on the left.
           width: isMacos ? 76 : 4,
         }}
@@ -61,7 +63,7 @@ export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
       {children}
       <div
         style={{
-          ...styles.rightSide,
+          ...styles.rightSideArea,
           // Windows and Linux have their "window controls" on the right
           minWidth: isWindowsOrLinux ? 150 : 0,
         }}

@@ -334,6 +334,10 @@
         "color": {
           "value": "#FAFAFA",
           "comment": "Palette/Grey/00"
+        },
+        "borderColor": {
+          "value": "#7F7F85",
+          "comment": "Palette/Grey/50"
         }
       }
     },

@@ -174,6 +174,11 @@ export function ClosableTab({
           marginRight: 2,
           borderTopRightRadius: 8,
           borderTopLeftRadius: 8,
+          border: '1px solid black',
+          borderColor: active
+            ? gdevelopTheme.closableTabs.selectedBorderColor
+            : gdevelopTheme.closableTabs.backgroundColor,
+          borderBottom: 'none',
           backgroundColor: !active
             ? gdevelopTheme.closableTabs.backgroundColor
             : gdevelopTheme.closableTabs.selectedBackgroundColor,

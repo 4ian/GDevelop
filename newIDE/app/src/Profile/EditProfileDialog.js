@@ -40,7 +40,7 @@ export const getUsernameErrorText = (error: ?AuthError) => {
   return undefined;
 };
 
-const simpleUrlRegex = /^https?:\/\/[^ ]+$/;
+const simpleUrlRegex = /^https:\/\/[^ ]+$/;
 const donateLinkFormattingErrorMessage = (
   <Trans>Please enter a valid URL, starting with https://</Trans>
 );

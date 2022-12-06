@@ -28,7 +28,7 @@ export type Profile = {|
   hearFrom?: string,
   gdevelopUsage?: string,
   creationExperience?: string,
-  donateLink?: string,
+  donateLink: ?string,
 |};
 
 export type LoginForm = {|

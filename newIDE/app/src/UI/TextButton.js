@@ -25,6 +25,7 @@ type Props = {|
   |},
   target?: '_blank',
   id?: ?string,
+
   // Tooltips aren't really suited for TextButtons UX-wise, but we can use them for
   // accessibility purpose for the Toolbar.
   exceptionalTooltipForToolbar?: React.Node,

@@ -23,16 +23,6 @@
         }
       },
       "canvas": {
-        "events": {
-          "highlighted": {
-            "background-color": {
-              "value": "#5b4c31"
-            },
-            "color": {
-              "value": "#E5C07B"
-            }
-          }
-        },
         "background-color": {
           "value": "#282C34"
         }
@@ -162,11 +152,6 @@
       "contrast": {
         "color": {
           "value": "#D6DEEC"
-        }
-      },
-      "highlighted": {
-        "background-color": {
-          "value": "rgb(214, 222, 236, 0.3)"
         }
       }
     },

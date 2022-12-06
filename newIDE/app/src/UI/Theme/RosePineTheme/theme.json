@@ -153,11 +153,6 @@
         "color": {
           "value": "#908caa"
         }
-      },
-      "highlighted": {
-        "background-color": {
-          "value": "rgba(255, 255, 255, 0.3)"
-        }
       }
     },
     "message": {

@@ -4,7 +4,7 @@ import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
 import Background from '../UI/Background';
 import TextField from '../UI/TextField';
-import { Column, Line, Spacer } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import IconButton from '../UI/IconButton';
@@ -16,7 +16,11 @@ import {
   type ReplaceInEventsInputs,
 } from './EventsSearcher';
 import RaisedButton from '../UI/RaisedButton';
-import { ColumnStackLayout } from '../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../UI/Layout';
 import {
   shouldBrowsePrevious,
   shouldCloseOrCancel,
@@ -162,9 +166,9 @@ const SearchPanel = (
 
   return (
     <Background noFullHeight noExpand>
-      <Column>
+      <Column noMargin>
         <Line>
-          <Column expand>
+          <Column expand noOverflowParent>
             <Tabs
               value={currentTab}
               onChange={setCurrentTab}
@@ -185,7 +189,7 @@ const SearchPanel = (
         </Line>
         <Line noMargin>
           <ColumnStackLayout expand>
-            <Line alignItems="baseline" noMargin>
+            <LineStackLayout alignItems="baseline" noMargin>
               <TextField
                 ref={searchTextField}
                 type="search"
@@ -217,7 +221,6 @@ const SearchPanel = (
                 value={searchText}
                 fullWidth
               />
-              <Spacer />
               <RaisedButton
                 disabled={shouldDisableSearch}
                 primary
@@ -230,9 +233,9 @@ const SearchPanel = (
                   }
                 }}
               />
-            </Line>
+            </LineStackLayout>
             {isSearchAndReplaceTab() && (
-              <Line alignItems="baseline" noMargin>
+              <LineStackLayout alignItems="baseline" noMargin>
                 <TextField
                   type="search"
                   margin="dense"
@@ -253,56 +256,64 @@ const SearchPanel = (
                   value={replaceText}
                   fullWidth
                 />
-                <Spacer />
                 <RaisedButton
                   disabled={shouldDisableReplace}
                   label={<Trans>Replace</Trans>}
                   onClick={launchReplace}
                 />
-              </Line>
+              </LineStackLayout>
             )}
-            <Line noMargin alignItems="center" justifyContent="space-between">
-              <Line noMargin alignItems="center">
-                <InlineCheckbox
-                  label={<Trans>Case insensitive</Trans>}
-                  checked={!matchCase}
-                  onCheck={(e, checked) => {
-                    setMatchCase(!checked);
-                  }}
-                />
-                <Text>
-                  <Trans>Search in:</Trans>
-                </Text>
-                <Spacer />
-                <InlineCheckbox
-                  label={<Trans>Conditions</Trans>}
-                  checked={searchInConditions}
-                  onCheck={(e, checked) => {
-                    setSearchInConditions(checked);
-                  }}
-                />
-                <InlineCheckbox
-                  label={<Trans>Actions</Trans>}
-                  checked={searchInActions}
-                  onCheck={(e, checked) => {
-                    setSearchInActions(checked);
-                  }}
-                />
-                <InlineCheckbox
-                  label={<Trans>Texts</Trans>}
-                  checked={searchInEventStrings}
-                  onCheck={(e, checked) => {
-                    setSearchInEventStrings(checked);
-                  }}
-                />
-                {/* <InlineCheckbox //TODO: Implement search/replace in selection
+            <ResponsiveLineStackLayout
+              noMargin
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <ResponsiveLineStackLayout noMargin alignItems="center">
+                <LineStackLayout noMargin alignItems="center">
+                  <InlineCheckbox
+                    label={<Trans>Case insensitive</Trans>}
+                    checked={!matchCase}
+                    onCheck={(e, checked) => {
+                      setMatchCase(!checked);
+                    }}
+                  />
+                  {windowWidth !== 'small' && (
+                    <Text>
+                      <Trans>Search in:</Trans>
+                    </Text>
+                  )}
+                  <InlineCheckbox
+                    label={<Trans>Conditions</Trans>}
+                    checked={searchInConditions}
+                    onCheck={(e, checked) => {
+                      setSearchInConditions(checked);
+                    }}
+                  />
+                </LineStackLayout>
+                <Line noMargin alignItems="center">
+                  <InlineCheckbox
+                    label={<Trans>Actions</Trans>}
+                    checked={searchInActions}
+                    onCheck={(e, checked) => {
+                      setSearchInActions(checked);
+                    }}
+                  />
+                  <InlineCheckbox
+                    label={<Trans>Texts</Trans>}
+                    checked={searchInEventStrings}
+                    onCheck={(e, checked) => {
+                      setSearchInEventStrings(checked);
+                    }}
+                  />
+                  {/* <InlineCheckbox //TODO: Implement search/replace in selection
                 label={<Trans>Replace in selection</Trans>}
                 checked={searchInSelection}
                 onCheck={(e, checked) =>
                   this.setState({ searchInSelection: checked })}
               /> */}
-              </Line>
-              <Line noMargin alignItems="center">
+                </Line>
+              </ResponsiveLineStackLayout>
+              <Line noMargin alignItems="center" justifyContent="flex-end">
                 <Text>
                   {resultsCount === null || resultsCount === undefined ? (
                     ''
@@ -342,7 +353,7 @@ const SearchPanel = (
                   }}
                 />
               </Line>
-            </Line>
+            </ResponsiveLineStackLayout>
           </ColumnStackLayout>
         </Line>
       </Column>

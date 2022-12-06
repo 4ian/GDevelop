@@ -6,9 +6,8 @@ import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import ThemeContext from '../UI/Theme/ThemeContext';
 import optionalRequire from '../Utils/OptionalRequire';
 import { isMacLike } from '../Utils/Platform';
-import Window from '../Utils/Window';
+import Window, { useWindowControlsOverlayWatcher } from '../Utils/Window';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
-import debounce from 'lodash/debounce';
 import useForceUpdate from '../Utils/UseForceUpdate';
 const electron = optionalRequire('electron');
 
@@ -40,35 +39,10 @@ export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
     [backgroundColor]
   );
 
-  // $FlowFixMe - this API is not handled by Flow.
-  const { windowControlsOverlay } = navigator;
-
   // An installed PWA can have window controls displayed as overlay. If supported,
   // we set up a listener to detect any change and force a refresh that will read
   // the latest size of the controls.
-  React.useEffect(
-    () => {
-      let listenerCallback = null;
-      if (windowControlsOverlay) {
-        listenerCallback = debounce(() => {
-          forceUpdate();
-        }, 250);
-        windowControlsOverlay.addEventListener(
-          'geometrychange',
-          listenerCallback
-        );
-      }
-      return () => {
-        if (listenerCallback) {
-          windowControlsOverlay.removeEventListener(
-            'geometrychange',
-            listenerCallback
-          );
-        }
-      };
-    },
-    [forceUpdate, windowControlsOverlay]
-  );
+  useWindowControlsOverlayWatcher({ onChanged: forceUpdate });
 
   // macOS displays the "traffic lights" on the left.
   const isDesktopMacos = !!electron && isMacLike();
@@ -80,6 +54,8 @@ export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
 
   // An installed PWA can have window controls displayed as overlay,
   // which we measure here to set the offsets.
+  // $FlowFixMe - this API is not handled by Flow.
+  const { windowControlsOverlay } = navigator;
   if (windowControlsOverlay) {
     if (windowControlsOverlay.visible) {
       const { x, width } = windowControlsOverlay.getTitlebarAreaRect();

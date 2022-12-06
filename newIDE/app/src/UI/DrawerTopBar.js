@@ -7,19 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import Close from '@material-ui/icons/Close';
 import Tooltip from '@material-ui/core/Tooltip';
 import { tooltipEnterDelay } from './Tooltip';
-import optionalRequire from '../Utils/OptionalRequire';
-import { isMacLike } from '../Utils/Platform';
-const electron = optionalRequire('electron');
-
-const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
-
-// TODO: Factor
-const DialogTitleBar = () => (
-  <div
-    className={DRAGGABLE_PART_CLASS_NAME}
-    style={{ height: 35, /* TODO */ flexShrink: 0 }}
-  />
-);
+import { DialogTitleBar } from '../UI/Dialog';
 
 const appBarHeight = 32;
 
@@ -49,11 +37,9 @@ const styles = {
 };
 
 const DrawerTopBar = (props: Props) => {
-  const isMacos = !!electron && isMacLike();
-
   return (
     <>
-      {isMacos && <DialogTitleBar />}
+      <DialogTitleBar backgroundColor="transparent" />
       <AppBar
         position="static"
         style={styles.appBar}

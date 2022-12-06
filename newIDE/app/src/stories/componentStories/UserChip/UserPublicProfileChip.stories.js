@@ -14,6 +14,11 @@ export default {
 
 export const UserPublicProfileChip = () => (
   <UserPublicProfileChipComponent
-    user={{ id: '123', username: 'username', description: 'something' }}
+    user={{
+      id: '123',
+      username: 'username',
+      description: 'something',
+      donateLink: 'https://myurl.com',
+    }}
   />
 );

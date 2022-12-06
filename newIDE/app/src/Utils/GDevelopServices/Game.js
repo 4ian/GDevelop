@@ -25,6 +25,7 @@ export type PublicGame = {
   userSlug?: string,
   gameSlug?: string,
   discoverable?: boolean,
+  donateLink: ?string,
 };
 
 export type Game = {

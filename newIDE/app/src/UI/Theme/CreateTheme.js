@@ -1,9 +1,9 @@
 // @flow
 import { darken, lighten } from '@material-ui/core/styles';
 
-export const closeableTabSizeOverrides = {
+const closeableTabSizeOverrides = {
   width: 200,
-  height: 29,
+  height: 30,
   closeButtonWidth: 24,
 };
 
@@ -451,6 +451,7 @@ export function createGdevelopTheme({
         selectedBackgroundColor:
           styles['ThemeClosableTabsSelectedBackgroundColor'],
         selectedTextColor: styles['ThemeClosableTabsSelectedColor'],
+        selectedBorderColor: styles['ThemeClosableTabsSelectedBorderColor'],
         ...closeableTabSizeOverrides,
       },
       imageThumbnail: {

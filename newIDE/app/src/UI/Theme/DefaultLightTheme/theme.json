@@ -319,6 +319,10 @@
         "color": {
           "value": "#1D1D26",
           "comment": "Palette/Grey/100"
+        },
+        "borderColor": {
+          "value": "#1D1D26",
+          "comment": "Palette/Grey/100"
         }
       }
     },

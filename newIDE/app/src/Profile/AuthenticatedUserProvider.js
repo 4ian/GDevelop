@@ -558,6 +558,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           getGameStatsEmail: form.getGameStatsEmail,
           getNewsletterEmail: form.getNewsletterEmail,
           appLanguage: preferences.language,
+          donateLink: form.donateLink,
         }
       );
       await this._fetchUserProfileWithoutThrowingErrors();

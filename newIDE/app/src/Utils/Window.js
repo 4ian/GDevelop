@@ -42,7 +42,7 @@ export const useWindowControlsOverlayWatcher = ({
       if (windowControlsOverlay) {
         listenerCallback = debounce(() => {
           onChanged();
-        }, 250);
+        }, 50);
         windowControlsOverlay.addEventListener(
           'geometrychange',
           listenerCallback

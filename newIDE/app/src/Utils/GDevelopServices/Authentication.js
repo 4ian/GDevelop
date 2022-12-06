@@ -28,6 +28,7 @@ export type Profile = {|
   hearFrom?: string,
   gdevelopUsage?: string,
   creationExperience?: string,
+  donateLink?: string,
 |};
 
 export type LoginForm = {|
@@ -55,6 +56,7 @@ export type AdditionalUserInfoForm = {|
 export type EditForm = {|
   username: string,
   description: string,
+  donateLink: string,
   getGameStatsEmail: boolean,
   getNewsletterEmail: boolean,
 |};
@@ -297,6 +299,7 @@ export default class Authentication {
       hearFrom,
       gdevelopUsage,
       creationExperience,
+      donateLink,
     }: {
       username?: string,
       description?: string,
@@ -307,6 +310,7 @@ export default class Authentication {
       hearFrom?: string,
       gdevelopUsage?: string,
       creationExperience?: string,
+      donateLink?: string,
     }
   ) => {
     const { currentUser } = this.auth;
@@ -327,6 +331,7 @@ export default class Authentication {
             hearFrom,
             gdevelopUsage,
             creationExperience,
+            donateLink,
           },
           {
             params: {

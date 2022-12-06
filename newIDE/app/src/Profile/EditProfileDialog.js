@@ -2,6 +2,7 @@
 import { Trans, t } from '@lingui/macro';
 
 import React from 'react';
+import { I18n } from '@lingui/react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import {
@@ -39,6 +40,11 @@ export const getUsernameErrorText = (error: ?AuthError) => {
   return undefined;
 };
 
+const simpleUrlRegex = /^https?:\/\/[^ ]+$/;
+const donateLinkFormattingErrorMessage = (
+  <Trans>Please enter a valid URL, starting with https://</Trans>
+);
+
 const EditProfileDialog = ({
   profile,
   onClose,
@@ -50,6 +56,7 @@ const EditProfileDialog = ({
   const [description, setDescription] = React.useState(
     profile.description || ''
   );
+  const [donateLink, setDonateLink] = React.useState(profile.donateLink || '');
   const [getGameStatsEmail, setGetGameStatsEmail] = React.useState(
     !!profile.getGameStatsEmail
   );
@@ -71,6 +78,11 @@ const EditProfileDialog = ({
     !isValidatingUsername &&
     (!usernameAvailability || usernameAvailability.isAvailable);
 
+  const donateLinkFormattingError =
+    !!donateLink && !simpleUrlRegex.test(donateLink)
+      ? donateLinkFormattingErrorMessage
+      : undefined;
+
   const edit = () => {
     if (!canEdit) return;
     onEdit({
@@ -78,6 +90,7 @@ const EditProfileDialog = ({
       description,
       getGameStatsEmail,
       getNewsletterEmail,
+      donateLink,
     });
   };
 
@@ -100,59 +113,81 @@ const EditProfileDialog = ({
   ];
 
   return (
-    <Dialog
-      title={<Trans>Edit your GDevelop profile</Trans>}
-      actions={actions}
-      maxWidth="sm"
-      cannotBeDismissed={updateProfileInProgress}
-      onRequestClose={onClose}
-      onApply={edit}
-      open
-    >
-      <ColumnStackLayout noMargin>
-        <UsernameField
-          initialUsername={profile.username}
-          value={username}
-          onChange={(e, value) => {
-            setUsername(value);
-          }}
-          errorText={getUsernameErrorText(error)}
-          onAvailabilityChecked={setUsernameAvailability}
-          onAvailabilityCheckLoading={setIsValidatingUsername}
-          isValidatingUsername={isValidatingUsername}
-          disabled={updateProfileInProgress}
-        />
-        <TextField
-          value={description}
-          floatingLabelText={<Trans>Bio</Trans>}
-          fullWidth
-          multiline
-          rows={3}
-          rowsMax={5}
-          translatableHintText={t`What are you using GDevelop for?`}
-          onChange={(e, value) => {
-            setDescription(value);
-          }}
-          disabled={updateProfileInProgress}
-        />
-        <Checkbox
-          label={<Trans>I want to receive the GDevelop Newsletter</Trans>}
-          checked={getNewsletterEmail}
-          onCheck={(e, value) => {
-            setGetNewsletterEmail(value);
-          }}
-          disabled={updateProfileInProgress}
-        />
-        <Checkbox
-          label={<Trans>I want to receive weekly stats about my games</Trans>}
-          checked={getGameStatsEmail}
-          onCheck={(e, value) => {
-            setGetGameStatsEmail(value);
-          }}
-          disabled={updateProfileInProgress}
-        />
-      </ColumnStackLayout>
-    </Dialog>
+    <I18n>
+      {({ i18n }) => (
+        <Dialog
+          title={<Trans>Edit your GDevelop profile</Trans>}
+          actions={actions}
+          maxWidth="sm"
+          cannotBeDismissed={updateProfileInProgress}
+          onRequestClose={onClose}
+          onApply={edit}
+          open
+        >
+          <ColumnStackLayout noMargin>
+            <UsernameField
+              initialUsername={profile.username}
+              value={username}
+              onChange={(e, value) => {
+                setUsername(value);
+              }}
+              errorText={getUsernameErrorText(error)}
+              onAvailabilityChecked={setUsernameAvailability}
+              onAvailabilityCheckLoading={setIsValidatingUsername}
+              isValidatingUsername={isValidatingUsername}
+              disabled={updateProfileInProgress}
+            />
+            <TextField
+              value={description}
+              floatingLabelText={<Trans>Bio</Trans>}
+              fullWidth
+              multiline
+              rows={3}
+              rowsMax={5}
+              translatableHintText={t`What are you using GDevelop for?`}
+              onChange={(e, value) => {
+                setDescription(value);
+              }}
+              disabled={updateProfileInProgress}
+              floatingLabelFixed
+            />
+            <TextField
+              value={donateLink}
+              floatingLabelText={<Trans>Donate link</Trans>}
+              fullWidth
+              translatableHintText={t`Do you have a Patreon? Ko-fi? Paypal?`}
+              onChange={(e, value) => {
+                setDonateLink(value);
+              }}
+              disabled={updateProfileInProgress}
+              floatingLabelFixed
+              helperMarkdownText={i18n._(
+                t`Add a link to your donation page. It will be displayed on your Liluo.io profile and game pages.`
+              )}
+              errorText={donateLinkFormattingError}
+            />
+            <Checkbox
+              label={<Trans>I want to receive the GDevelop Newsletter</Trans>}
+              checked={getNewsletterEmail}
+              onCheck={(e, value) => {
+                setGetNewsletterEmail(value);
+              }}
+              disabled={updateProfileInProgress}
+            />
+            <Checkbox
+              label={
+                <Trans>I want to receive weekly stats about my games</Trans>
+              }
+              checked={getGameStatsEmail}
+              onCheck={(e, value) => {
+                setGetGameStatsEmail(value);
+              }}
+              disabled={updateProfileInProgress}
+            />
+          </ColumnStackLayout>
+        </Dialog>
+      )}
+    </I18n>
   );
 };
 

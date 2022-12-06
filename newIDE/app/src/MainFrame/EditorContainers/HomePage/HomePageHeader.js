@@ -30,7 +30,7 @@ export const HomePageHeader = ({
     <I18n>
       {({ i18n }) => (
         <LineStackLayout
-          justifyContent="end"
+          justifyContent="flex-end"
           alignItems="center"
           noMargin
           expand

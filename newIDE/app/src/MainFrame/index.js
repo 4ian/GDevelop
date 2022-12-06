@@ -1302,7 +1302,9 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
 
       const storageProviderOperations = getStorageProviderOperations();
+      const hasUnsavedChanges = unsavedChanges.hasUnsavedChanges;
       if (
+        hasUnsavedChanges && // Only create an autosave if there are unsaved changes.
         preferences.values.autosaveOnPreview &&
         storageProviderOperations.onAutoSaveProject &&
         currentFileMetadata
@@ -1329,6 +1331,7 @@ const MainFrame = (props: Props) => {
       currentFileMetadata,
       getStorageProviderOperations,
       preferences.values.autosaveOnPreview,
+      unsavedChanges.hasUnsavedChanges,
     ]
   );
 

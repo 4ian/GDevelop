@@ -166,9 +166,9 @@ const SearchPanel = (
 
   return (
     <Background noFullHeight noExpand>
-      <Column>
+      <Column noMargin>
         <Line>
-          <Column expand>
+          <Column expand noOverflowParent>
             <Tabs
               value={currentTab}
               onChange={setCurrentTab}

@@ -20,6 +20,13 @@ const useStyles = makeStyles({
   },
 });
 
+// Make dialog paper border radius match the autocomplete one.
+const useStylesForPaper = makeStyles({
+  rounded: {
+    borderRadius: 4,
+  },
+});
+
 export type CommandPaletteInterface = {|
   open: (open?: boolean) => void,
   launchCommand: (commandName: CommandName) => void,
@@ -30,6 +37,7 @@ type PaletteMode = 'closed' | 'command' | 'option';
 const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
   (props, ref) => {
     const classes = useStyles();
+    const paperClasses = useStylesForPaper();
     const commandManager = React.useContext(CommandsContext);
     const [mode, setMode] = React.useState<PaletteMode>('closed');
     const [
@@ -97,6 +105,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
             maxWidth="sm"
             classes={classes}
             transitionDuration={0}
+            PaperProps={{ classes: paperClasses }}
           >
             {mode === 'command' && (
               // Command picker

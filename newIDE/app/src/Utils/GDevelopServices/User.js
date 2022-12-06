@@ -8,6 +8,7 @@ export type UserPublicProfile = {|
   id: string,
   username: ?string,
   description: ?string,
+  donateLink: ?string,
 |};
 
 export type UserPublicProfileByIds = {|

@@ -22,6 +22,7 @@ type DisplayedProfile = {
   id: string,
   +email?: string,
   description: ?string,
+  donateLink: ?string,
   username: ?string,
 };
 
@@ -91,7 +92,7 @@ const ProfileDetails = ({
                 readOnly
                 fullWidth
                 floatingLabelText={<Trans>Email</Trans>}
-                floatingLabelFixed={true}
+                floatingLabelFixed
               />
             </Line>
           )}
@@ -102,7 +103,7 @@ const ProfileDetails = ({
               fullWidth
               multiline
               floatingLabelText={<Trans>Bio</Trans>}
-              floatingLabelFixed={true}
+              floatingLabelFixed
               translatableHintText={
                 isAuthenticatedUserProfile
                   ? t`No bio defined. Edit your profile to tell us what you are using GDevelop for!`
@@ -112,6 +113,18 @@ const ProfileDetails = ({
               rowsMax={5}
             />
           </Line>
+          {isAuthenticatedUserProfile && (
+            <Line noMargin>
+              <TextField
+                value={profile.donateLink || ''}
+                readOnly
+                fullWidth
+                floatingLabelText={<Trans>Donate link</Trans>}
+                floatingLabelFixed
+                translatableHintText={t`No link defined.`}
+              />
+            </Line>
+          )}
           {isAuthenticatedUserProfile && (
             <ResponsiveLineStackLayout justifyContent="flex-end" noMargin>
               <RaisedButton

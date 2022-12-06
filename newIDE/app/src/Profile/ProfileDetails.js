@@ -5,7 +5,11 @@ import * as React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import { Line, Spacer } from '../UI/Grid';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../UI/Layout';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { getGravatarUrl } from '../UI/GravatarUrl';
 import Text from '../UI/Text';
@@ -17,6 +21,8 @@ import UserAchievements from './Achievement/UserAchievements';
 import { type Badge } from '../Utils/GDevelopServices/Badge';
 import Window from '../Utils/Window';
 import { GDevelopGamesPlatform } from '../Utils/GDevelopServices/ApiConfigs';
+import FlatButton from '../UI/FlatButton';
+import Coffee from '../UI/CustomSvgIcons/Coffee';
 
 type DisplayedProfile = {
   id: string,
@@ -45,6 +51,7 @@ const ProfileDetails = ({
   onEditProfile,
   badges,
 }: Props) => {
+  const donateLink = profile ? profile.donateLink : null;
   return profile ? (
     <I18n>
       {({ i18n }) => (
@@ -54,7 +61,7 @@ const ProfileDetails = ({
             justifyContent="space-between"
             noMargin
           >
-            <Line>
+            <Line noMargin alignItems="center">
               <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
               <Spacer />
               <Text
@@ -71,18 +78,28 @@ const ProfileDetails = ({
               </Text>
             </Line>
             {profile.id && (
-              <RaisedButton
-                label={i18n._(t`Access public profile`)}
-                onClick={() =>
-                  Window.openExternalURL(
-                    GDevelopGamesPlatform.getUserPublicProfileUrl(
-                      profile.id,
-                      profile.username
+              <LineStackLayout>
+                {!!donateLink && (
+                  <RaisedButton
+                    label={<Trans>Buy me a coffee</Trans>}
+                    primary
+                    onClick={() => Window.openExternalURL(donateLink)}
+                    icon={<Coffee />}
+                  />
+                )}
+                <FlatButton
+                  label={<Trans>Access public profile</Trans>}
+                  onClick={() =>
+                    Window.openExternalURL(
+                      GDevelopGamesPlatform.getUserPublicProfileUrl(
+                        profile.id,
+                        profile.username
+                      )
                     )
-                  )
-                }
-                icon={<OpenInNew />}
-              />
+                  }
+                  leftIcon={<OpenInNew />}
+                />
+              </LineStackLayout>
             )}
           </ResponsiveLineStackLayout>
           {isAuthenticatedUserProfile && profile.email && (

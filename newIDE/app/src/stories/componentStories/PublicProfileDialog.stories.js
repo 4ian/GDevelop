@@ -23,10 +23,6 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-type ArgsTypes = {|
-  profile: Profile,
-|};
-
 const badges = [
   {
     achievementId: 'trivial_first-event',
@@ -76,13 +72,13 @@ const apiDataEmptyUser = {
   ],
 };
 
-export const FullProfile = (args: ArgsTypes) => (
+export const FullProfile = () => (
   <PublicProfileDialog userId="user-id" onClose={() => {}} />
 );
 FullProfile.decorators = [withMock];
 FullProfile.parameters = apiDataFullUser;
 
-export const EmptyProfile = (args: ArgsTypes) => (
+export const EmptyProfile = () => (
   <PublicProfileDialog userId="user-id" onClose={() => {}} />
 );
 EmptyProfile.decorators = [withMock];

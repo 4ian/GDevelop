@@ -29,7 +29,6 @@ type Props = {|
 
 /**
  * An icon that can be used as the leftIcon of a ListItem.
- * See also ToolbarIcon.
  */
 function ListIcon(props: Props) {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

@@ -58,7 +58,9 @@ export const create = (authentication: Authentication) => {
           storageProviders={[
             LocalFileStorageProvider,
             UrlStorageProvider,
-            supportsCloudProjects ? CloudStorageProvider : FakeCloudStorageProvider,
+            supportsCloudProjects
+              ? CloudStorageProvider
+              : FakeCloudStorageProvider,
           ]}
           defaultStorageProvider={LocalFileStorageProvider}
         >
@@ -70,7 +72,9 @@ export const create = (authentication: Authentication) => {
           }) => (
             <MainFrame
               i18n={i18n}
-              renderMainMenu={props => <ElectronMainMenu {...props} />}
+              renderMainMenu={(props, callbacks) => (
+                <ElectronMainMenu props={props} callbacks={callbacks} />
+              )}
               renderPreviewLauncher={(props, ref) => (
                 <LocalPreviewLauncher {...props} ref={ref} />
               )}

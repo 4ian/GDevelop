@@ -130,6 +130,7 @@ export const indieUserProfile: Profile = {
   getNewsletterEmail: true,
   isCreator: true,
   isPlayer: false,
+  donateLink: 'https://www.paypal.me/indie-user',
 };
 
 export const usagesForIndieUser: Usages = [

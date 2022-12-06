@@ -46,26 +46,29 @@ export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
   // An installed PWA can have window controls displayed as overlay. If supported,
   // we set up a listener to detect any change and force a refresh that will read
   // the latest size of the controls.
-  React.useEffect(() => {
-    let listenerCallback = null;
-    if (windowControlsOverlay) {
-      listenerCallback = debounce(() => {
-        forceUpdate();
-      }, 250);
-      windowControlsOverlay.addEventListener(
-        'geometrychange',
-        listenerCallback
-      );
-    }
-    return () => {
-      if (listenerCallback) {
-        windowControlsOverlay.removeEventListener(
+  React.useEffect(
+    () => {
+      let listenerCallback = null;
+      if (windowControlsOverlay) {
+        listenerCallback = debounce(() => {
+          forceUpdate();
+        }, 250);
+        windowControlsOverlay.addEventListener(
           'geometrychange',
           listenerCallback
         );
       }
-    };
-  }, [forceUpdate, windowControlsOverlay]);
+      return () => {
+        if (listenerCallback) {
+          windowControlsOverlay.removeEventListener(
+            'geometrychange',
+            listenerCallback
+          );
+        }
+      };
+    },
+    [forceUpdate, windowControlsOverlay]
+  );
 
   // macOS displays the "traffic lights" on the left.
   const isDesktopMacos = !!electron && isMacLike();

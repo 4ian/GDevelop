@@ -20,11 +20,13 @@ export const Toolbar = React.memo<ToolbarProps>(
         className="almost-invisible-scrollbar"
         style={{
           backgroundColor: gdevelopTheme.toolbar.backgroundColor,
-          padding: 3,
           flexShrink: 0,
           display: 'flex',
           overflowX: 'auto',
           overflowY: 'hidden',
+          height: 40,
+          paddingLeft: 8,
+          paddingRight: 8,
         }}
       >
         {children}

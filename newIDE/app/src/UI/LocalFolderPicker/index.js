@@ -46,6 +46,10 @@ const LocalFolderPicker = ({
   defaultPath,
   fullWidth,
 }: Props) => {
+  // Use an internal state to avoid validating the value when the user
+  // is typing in the text field. This allows typing a "/" without the
+  // formatting kicking in.
+  const [textValue, setTextValue] = React.useState(value);
   const onChooseFolder = async ({ title, message }: TitleAndMessage) => {
     if (!dialog || !electron) return;
 
@@ -59,6 +63,10 @@ const LocalFolderPicker = ({
 
     if (!filePaths || !filePaths.length) return;
     onChange(filePaths[0]);
+  };
+
+  const onBlur = () => {
+    onChange(textValue);
   };
 
   const getTitleAndMessage = (i18n: I18nType): TitleAndMessage => {
@@ -96,8 +104,9 @@ const LocalFolderPicker = ({
               style={styles.textField}
               type="text"
               hintText={titleAndMessage.title}
-              value={value}
-              onChange={(event, value) => onChange(value)}
+              value={textValue}
+              onChange={(event, value) => setTextValue(value)}
+              onBlur={onBlur}
             />
             <FlatButton
               label={<Trans>Choose folder</Trans>}

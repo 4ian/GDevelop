@@ -367,6 +367,7 @@ export const LeaderboardAdmin = ({
     const answer = await showConfirmation({
       title: t`Reset leaderboard ${currentLeaderboard.name}`,
       message: t`All current entries will be deleted, are you sure you want to reset this leaderboard? This can't be undone.`,
+      confirmText: t`Reset leaderboard`,
     });
     if (!answer) return;
 
@@ -401,7 +402,8 @@ export const LeaderboardAdmin = ({
     const answer = await showDeleteConfirmation({
       title: t`Delete leaderboard ${currentLeaderboard.name}`,
       message: t`Are you sure you want to delete this leaderboard and all of its entries? This can't be undone.`,
-      confirmText: currentLeaderboard.name,
+      confirmText: t`Delete Leaderboard`,
+      confirmHintText: currentLeaderboard.name,
       fieldMessage: t`Type the name of the leaderboard:`,
     });
     if (!answer) return;
@@ -434,6 +436,7 @@ export const LeaderboardAdmin = ({
     const answer = await showConfirmation({
       title: t`Delete score ${entry.score} from ${entry.playerName}`,
       message: t`Are you sure you want to delete this entry? This can't be undone.`,
+      confirmText: t`Delete Entry`,
     });
     if (!answer) return;
 

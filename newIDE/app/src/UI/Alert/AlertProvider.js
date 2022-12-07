@@ -76,6 +76,7 @@ function ConfirmProvider({ children }: Props) {
             setAlertDialogOpen(false);
             alertDialogConfig.callback();
           }}
+          dismissText={alertDialogConfig.dismissText}
           title={alertDialogConfig.title}
           message={alertDialogConfig.message}
         />
@@ -87,10 +88,12 @@ function ConfirmProvider({ children }: Props) {
             setConfirmDialogOpen(false);
             confirmDialogConfig.callback(true);
           }}
+          confirmText={confirmDialogConfig.confirmText}
           onDismiss={() => {
             setConfirmDialogOpen(false);
             confirmDialogConfig.callback(false);
           }}
+          dismissText={confirmDialogConfig.dismissText}
           title={confirmDialogConfig.title}
           message={confirmDialogConfig.message}
         />
@@ -102,14 +105,16 @@ function ConfirmProvider({ children }: Props) {
             setConfirmDeleteDialogOpen(false);
             confirmDeleteDialogConfig.callback(true);
           }}
+          confirmText={confirmDeleteDialogConfig.confirmText}
           onDismiss={() => {
             setConfirmDeleteDialogOpen(false);
             confirmDeleteDialogConfig.callback(false);
           }}
+          dismissText={confirmDeleteDialogConfig.dismissText}
           title={confirmDeleteDialogConfig.title}
           message={confirmDeleteDialogConfig.message}
           fieldMessage={confirmDeleteDialogConfig.fieldMessage}
-          confirmText={confirmDeleteDialogConfig.confirmText}
+          confirmHintText={confirmDeleteDialogConfig.confirmHintText}
         />
       )}
     </AlertContext.Provider>

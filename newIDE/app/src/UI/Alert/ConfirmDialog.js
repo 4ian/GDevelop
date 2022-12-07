@@ -14,6 +14,8 @@ type Props = {|
   message: MessageDescriptor,
   onConfirm: () => void,
   onDismiss: () => void,
+  confirmText?: MessageDescriptor,
+  dismissText?: MessageDescriptor,
   // TODO: Add notion of level (info, warning, error)
   // level: string,
 |};
@@ -29,12 +31,24 @@ function ConfirmDialog(props: Props) {
             <FlatButton
               key="dismiss"
               keyboardFocused
-              label={<Trans>Cancel</Trans>}
+              label={
+                props.dismissText ? (
+                  i18n._(props.dismissText)
+                ) : (
+                  <Trans>Cancel</Trans>
+                )
+              }
               onClick={props.onDismiss}
             />,
             <DialogPrimaryButton
               key="confirm"
-              label={<Trans>Confirm</Trans>}
+              label={
+                props.confirmText ? (
+                  i18n._(props.confirmText)
+                ) : (
+                  <Trans>Confirm</Trans>
+                )
+              }
               onClick={props.onConfirm}
               primary
             />,

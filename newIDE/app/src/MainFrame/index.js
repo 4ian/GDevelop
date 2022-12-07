@@ -855,6 +855,8 @@ const MainFrame = (props: Props) => {
         const answer = await showConfirmation({
           title: t`Autosave detected!`,
           message: t`An autosave file (backup made automatically by GDevelop) that is newer than the project file exists. Would you like to load it instead?`,
+          confirmText: t`Load autosave`,
+          dismissText: t`Load project`,
         });
 
         if (!answer) return fileMetadata;
@@ -872,6 +874,7 @@ const MainFrame = (props: Props) => {
         const answer = await showConfirmation({
           title: t`Your project is malformed`,
           message: t`The project file appears to be malformed, but an autosave file exists (backup made automatically by GDevelop). Would you like to try to load it instead?`,
+          confirmText: t`Load autosave`,
         });
         if (!answer) return null;
         return onGetAutoSave(fileMetadata);
@@ -2386,6 +2389,7 @@ const MainFrame = (props: Props) => {
       return showConfirmation({
         title: t`Project name changed`,
         message: t`Your project name has changed, this will also save the whole project, continue?`,
+        confirmText: t`Save and continue`,
       });
     }
     return true;

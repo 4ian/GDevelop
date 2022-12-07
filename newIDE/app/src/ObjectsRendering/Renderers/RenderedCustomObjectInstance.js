@@ -137,7 +137,9 @@ class ChildInstance {
 }
 
 type AxeLayout = {
-  anchor: 'Min' | 'Center' | 'Max' | 'Fill',
+  anchorOrigin?: number,
+  anchorTarget?: number,
+  anchorTargetObject?: string,
   minSideAbsoluteMargin?: number,
   maxSideAbsoluteMargin?: number,
   minSideProportionalMargin?: number,
@@ -154,7 +156,30 @@ const layoutFields = [
   'TopPadding',
   'RightPadding',
   'BottomPadding',
+  'HorizontalAnchorOrigin',
+  'HorizontalAnchorTarget',
+  'VerticalAnchorOrigin',
+  'BarVerticalAnchorTarget',
 ];
+
+const getHorizontalAnchorValue = (anchorName: string) => {
+  return anchorName === 'Left'
+    ? 0
+    : anchorName === 'Right'
+    ? 1
+    : anchorName === 'Center'
+    ? 0.5
+    : null;
+};
+const getVerticalAnchorValue = (anchorName: string) => {
+  return anchorName === 'Top'
+    ? 0
+    : anchorName === 'Bottom'
+    ? 1
+    : anchorName === 'Center'
+    ? 0.5
+    : null;
+};
 
 const getLayouts = (
   eventBasedObject: gdEventsBasedObject,
@@ -177,27 +202,60 @@ const getLayouts = (
     }
 
     const name = property.getName();
-    const propertyValue =
-      Number.parseFloat(instanceProperties.get(name).getValue()) || 0;
+    const propertyValueString = instanceProperties.get(name).getValue();
+    const propertyValueNumber = Number.parseFloat(propertyValueString) || 0;
     const layoutField = layoutFields.find(field => name.includes(field));
+
+    let targetObjectName = '';
+    let anchorTarget = null;
+    if (
+      layoutField === 'HorizontalAnchorOrigin' ||
+      layoutField === 'VerticalAnchorOrigin'
+    ) {
+      const targetPropertyName = name.replace('AnchorOrigin', 'AnchorTarget');
+      const targetProperty = properties.get(targetPropertyName);
+      targetObjectName =
+        targetProperty.getExtraInfo().size() > 0
+          ? targetProperty.getExtraInfo().at(0)
+          : '';
+      const anchorTargetName = instanceProperties.get(name).getValue();
+      if (layoutField === 'HorizontalAnchorOrigin') {
+        anchorTarget = getHorizontalAnchorValue(anchorTargetName);
+      } else {
+        anchorTarget = getVerticalAnchorValue(anchorTargetName);
+      }
+    }
+
     for (let childIndex = 0; childIndex < childNames.size(); childIndex++) {
       const childName = childNames.at(childIndex);
       let layout = layouts.get(childName);
       if (!layout) {
         layout = {
-          horizontalLayout: { anchor: 'Fill' },
-          verticalLayout: { anchor: 'Fill' },
+          horizontalLayout: {},
+          verticalLayout: {},
         };
         layouts.set(childName, layout);
       }
       if (layoutField === 'LeftPadding') {
-        layout.horizontalLayout.minSideAbsoluteMargin = propertyValue;
+        layout.horizontalLayout.minSideAbsoluteMargin = propertyValueNumber;
       } else if (layoutField === 'RightPadding') {
-        layout.horizontalLayout.maxSideAbsoluteMargin = propertyValue;
+        layout.horizontalLayout.maxSideAbsoluteMargin = propertyValueNumber;
       } else if (layoutField === 'TopPadding') {
-        layout.verticalLayout.minSideAbsoluteMargin = propertyValue;
+        layout.verticalLayout.minSideAbsoluteMargin = propertyValueNumber;
       } else if (layoutField === 'BottomPadding') {
-        layout.verticalLayout.maxSideAbsoluteMargin = propertyValue;
+        layout.verticalLayout.maxSideAbsoluteMargin = propertyValueNumber;
+      } else if (layoutField === 'HorizontalAnchorOrigin') {
+        layout.horizontalLayout.anchorOrigin = getHorizontalAnchorValue(
+          propertyValueString
+        );
+        layout.horizontalLayout.anchorTarget = anchorTarget;
+        layout.horizontalLayout.anchorTargetObject = targetObjectName;
+      } else if (layoutField === 'VerticalAnchorOrigin') {
+        layout.verticalLayout.anchorOrigin = getVerticalAnchorValue(
+          propertyValueString
+        );
+        layout.verticalLayout.anchorTarget = anchorTarget;
+        layout.verticalLayout.anchorTargetObject = targetObjectName;
       }
     }
   }
@@ -266,8 +324,8 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
         this.childrenInstances.push(childInstance);
         this.childrenLayouts.push(
           layouts.get(childObject.getName()) || {
-            horizontalLayout: { anchor: 'Fill' },
-            verticalLayout: { anchor: 'Fill' },
+            horizontalLayout: {},
+            verticalLayout: {},
           }
         );
         const renderer = ObjectsRenderingService.createNewInstanceRenderer(
@@ -352,10 +410,8 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
       const childInstance = this.childrenInstances[index];
       const childLayout = this.childrenLayouts[index];
 
-      childInstance.x = 0;
-      childInstance.y = 0;
-      childInstance.setCustomWidth(width);
-      childInstance.setCustomHeight(height);
+      childInstance.setCustomWidth(renderedInstance.getDefaultWidth());
+      childInstance.setCustomHeight(renderedInstance.getDefaultHeight());
 
       const childMinX =
         childLayout.horizontalLayout.minSideAbsoluteMargin ||
@@ -372,17 +428,27 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
         height -
         (childLayout.verticalLayout.maxSideAbsoluteMargin ||
           (childLayout.verticalLayout.maxSideProportionalMargin || 0) * height);
-      if (childLayout.horizontalLayout.anchor === 'Fill') {
+      if (!childLayout.horizontalLayout.anchorOrigin) {
         childInstance.x = childMinX;
         childInstance.setCustomWidth(childMaxX - childMinX);
       } else {
-        // TODO
+        const anchorOrigin = childLayout.horizontalLayout.anchorOrigin;
+        const anchorTarget = childLayout.horizontalLayout.anchorTarget;
+        // TODO Use anchorTargetObject instead of defaulting on the background
+        childInstance.x =
+          anchorTarget * width -
+          anchorOrigin * renderedInstance.getDefaultWidth();
       }
-      if (childLayout.verticalLayout.anchor === 'Fill') {
+      if (!childLayout.verticalLayout.anchorOrigin) {
         childInstance.y = childMinY;
         childInstance.setCustomHeight(childMaxY - childMinY);
       } else {
-        // TODO
+        const anchorOrigin = childLayout.verticalLayout.anchorOrigin;
+        const anchorTarget = childLayout.verticalLayout.anchorTarget;
+        // TODO Use anchorTargetObject instead of defaulting on the background
+        childInstance.y =
+          anchorTarget * height -
+          anchorOrigin * renderedInstance.getDefaultHeight();
       }
       renderedInstance.update();
 
@@ -393,12 +459,12 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
       // This ensure objects are centered if their dimensions changed from the
       // custom ones (preferred ones).
       // For instance, text object dimensions change according to how the text is wrapped.
-      if (childLayout.horizontalLayout.anchor === 'Fill') {
+      if (!childLayout.horizontalLayout.anchorOrigin) {
         childInstance.x =
           (width - renderedInstance._pixiObject.width) / 2 +
           (childMinX + childMaxX - width) / 2;
       }
-      if (childLayout.verticalLayout.anchor === 'Fill') {
+      if (!childLayout.verticalLayout.anchorOrigin) {
         childInstance.y =
           (height - renderedInstance._pixiObject.height) / 2 +
           (childMinY + childMaxY - height) / 2;

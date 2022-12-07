@@ -18,6 +18,7 @@ import muiZIndex from '@material-ui/core/styles/zIndex';
 import {
   shouldCloseOrCancel,
   shouldSubmit,
+  shouldValidate,
 } from './KeyboardShortcuts/InteractionKeys';
 import { textEllipsisStyle } from './TextEllipsis';
 
@@ -223,6 +224,11 @@ const getDefaultStylingProps = (params: Object, props: Props): Object => {
 
           if (props.onApply) props.onApply();
           else if (props.onRequestClose) props.onRequestClose();
+        } else if (shouldValidate(event)) {
+          // Make sure the current value is reported to the parent.
+          // Otherwise a parent like an InlineParameterEditor would close when detecting
+          // the validation (Enter key pressed) without having the latest value.
+          props.onChange(event.currentTarget.value);
         }
       },
     },

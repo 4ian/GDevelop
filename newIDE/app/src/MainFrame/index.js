@@ -2684,7 +2684,11 @@ const MainFrame = (props: Props) => {
   };
 
   return (
-    <div className="main-frame">
+    <div
+      className={
+        'main-frame' /* The root styling, done in CSS to read some CSS variables. */
+      }
+    >
       {!!renderMainMenu &&
         renderMainMenu(
           { ...buildMainMenuProps, isApplicationTopLevelMenu: true },

@@ -85,7 +85,6 @@ const ElectronMainMenu = ({
     [i18n, language, project, recentProjectFiles, shortcutMap]
   );
 
-  // TODO: move this? And ensure stability.
   const { onOpenRecentFile } = callbacks;
   useCommandWithOptions('OPEN_RECENT_PROJECT', true, {
     generateOptions: React.useCallback(

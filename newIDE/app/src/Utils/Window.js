@@ -4,6 +4,7 @@ import optionalRequire from './OptionalRequire';
 import URLSearchParams from 'url-search-params';
 import { isWindows } from './Platform';
 import debounce from 'lodash/debounce';
+import { hexToRGBColor, isLightRgbColor } from './ColorTransformer';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const shell = electron ? electron.shell : null;
@@ -90,13 +91,17 @@ export default class Window {
     }
 
     if (ipcRenderer) {
+      // Update the window controls colors on Windows.
       ipcRenderer.invoke('titlebar-set-overlay-options', {
         color: newColor,
-        symbolColor: '#ffffff',
+        symbolColor: isLightRgbColor(hexToRGBColor(newColor))
+          ? '#000000'
+          : '#ffffff',
       });
       currentTitleBarColor = newColor;
     }
 
+    // Update the PWA titlebar/controls color (if it's an installed PWA).
     const metaElement = document.querySelector('meta[name="theme-color"]');
     if (metaElement) {
       metaElement.setAttribute('content', newColor);

@@ -22,7 +22,7 @@ import {
 import { textEllipsisStyle } from './TextEllipsis';
 import Paper from './Paper';
 
-const AutocompletePaperComponent = props => (
+export const AutocompletePaperComponent = (props: any) => (
   // Use light background so that it's in contrast with background that
   // is either dark or medium (in dialogs).
   <Paper {...props} background="light" />
@@ -72,7 +72,7 @@ export type SemiControlledAutoCompleteInterface = {|
   forceInputValueTo: (newValue: string) => void,
 |};
 
-const styles = {
+export const autocompleteStyles = {
   container: {
     position: 'relative',
     width: '100%',
@@ -117,7 +117,7 @@ const makeRenderItem = (i18n: I18nType) => (
         divider
         disableGutters
         component={'div'}
-        style={styles.listItem}
+        style={autocompleteStyles.listItem}
       />
     );
   }
@@ -126,10 +126,10 @@ const makeRenderItem = (i18n: I18nType) => (
     ? i18n._(option.translatableValue)
     : option.value;
   return (
-    <ListItem dense={true} component={'div'} style={styles.listItem}>
+    <ListItem dense={true} component={'div'} style={autocompleteStyles.listItem}>
       {option.renderIcon && <ListItemIcon>{option.renderIcon()}</ListItemIcon>}
       <ListItemText
-        style={styles.listItemText}
+        style={autocompleteStyles.listItemText}
         primary={
           <div title={value} style={textEllipsisStyle}>
             {value}
@@ -294,7 +294,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
             open={isMenuOpen}
             style={{
               ...props.style,
-              ...styles.container,
+              ...autocompleteStyles.container,
             }}
             inputValue={currentInputValue}
             value={currentInputValue}

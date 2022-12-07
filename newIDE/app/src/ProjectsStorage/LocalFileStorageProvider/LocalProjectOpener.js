@@ -65,7 +65,7 @@ export const onOpen = (
   });
 };
 
-export const hasAutoSave = (
+export const hasAutoSave = async (
   fileMetadata: FileMetadata,
   compareLastModified: boolean
 ): Promise<boolean> => {
@@ -73,21 +73,21 @@ export const hasAutoSave = (
   const autoSavePath = filePath + '.autosave';
   if (fs.existsSync(autoSavePath)) {
     if (!compareLastModified) {
-      return Promise.resolve(true);
+      return true;
     }
     try {
       const autoSavedTime = fs.statSync(autoSavePath).mtime.getTime();
       const saveTime = fs.statSync(filePath).mtime.getTime();
       if (autoSavedTime > saveTime) {
-        return Promise.resolve(true);
+        return true;
       }
     } catch (err) {
       console.error('Unable to compare *.autosave to project', err);
-      return Promise.resolve(false);
+      return false;
     }
-    return Promise.resolve(false);
+    return false;
   }
-  return Promise.resolve(false);
+  return false;
 };
 
 export const onGetAutoSave = (fileMetadata: FileMetadata) => {

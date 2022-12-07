@@ -853,10 +853,10 @@ const MainFrame = (props: Props) => {
         if (!canOpenAutosave) return fileMetadata;
 
         const answer = await showConfirmation({
-          title: t`Autosave detected!`,
-          message: t`An autosave file (backup made automatically by GDevelop) that is newer than the project file exists. Would you like to load it instead?`,
-          confirmText: t`Load autosave`,
-          dismissText: t`Load project`,
+          title: t`This project has an auto-saved version`,
+          message: t`GDevelop automatically saved a newer version of this project. This new version might differ from the one that you manually saved. Which version would you like to open?`,
+          dismissText: t`My manual save`,
+          confirmText: t`GDevelop auto-save`,
         });
 
         if (!answer) return fileMetadata;

@@ -872,8 +872,8 @@ const MainFrame = (props: Props) => {
         if (!canOpenAutosave) return null;
 
         const answer = await showConfirmation({
-          title: t`Your project is malformed`,
-          message: t`The project file appears to be malformed, but an autosave file exists (backup made automatically by GDevelop). Would you like to try to load it instead?`,
+          title: t`Your project is corrupted`,
+          message: t`The project file appears to be corrupted, but an autosave file exists (backup made automatically by GDevelop). Would you like to try to load it instead?`,
           confirmText: t`Load autosave`,
         });
         if (!answer) return null;

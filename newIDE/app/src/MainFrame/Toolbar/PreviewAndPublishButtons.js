@@ -3,7 +3,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { LineStackLayout } from '../../UI/Layout';
-import IconButton from '../../UI/IconButton';
 import FlatButton from '../../UI/FlatButton';
 import RaisedButton from '../../UI/RaisedButton';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
@@ -11,7 +10,6 @@ import { type PreviewState } from '../PreviewState';
 import PreviewIcon from '../../UI/CustomSvgIcons/Preview';
 import UpdateIcon from '../../UI/CustomSvgIcons/Update';
 import PublishIcon from '../../UI/CustomSvgIcons/Publish';
-import DebugIcon from '../../UI/CustomSvgIcons/Debug';
 
 export type PreviewAndPublishButtonsProps = {|
   onPreviewWithoutHotReload: () => void,
@@ -42,23 +40,17 @@ export default function PreviewAndPublishButtons({
   setPreviewOverride,
   exportProject,
 }: PreviewAndPublishButtonsProps) {
-  const debugBuildMenuTemplate = React.useCallback(
+  const previewBuildMenuTemplate = React.useCallback(
     (i18n: I18nType) => [
       {
         label: i18n._(t`Start Network Preview (Preview over WiFi/LAN)`),
         click: onNetworkPreview,
         enabled: canDoNetworkPreview,
       },
-      { type: 'separator' },
       {
-        label: i18n._(t`Start Preview with Debugger and Performance Profiler`),
+        label: i18n._(t`Start Preview and Debugger`),
         click: onOpenDebugger,
       },
-    ],
-    [onNetworkPreview, onOpenDebugger, canDoNetworkPreview]
-  );
-  const previewBuildMenuTemplate = React.useCallback(
-    (i18n: I18nType) => [
       {
         label: i18n._(t`Launch another preview in a new window`),
         click: onPreviewWithoutHotReload,
@@ -119,6 +111,9 @@ export default function PreviewAndPublishButtons({
       hasPreviewsRunning,
       setPreviewOverride,
       previewState,
+      onNetworkPreview,
+      onOpenDebugger,
+      canDoNetworkPreview,
     ]
   );
 
@@ -129,19 +124,6 @@ export default function PreviewAndPublishButtons({
 
   return (
     <LineStackLayout noMargin>
-      <ElementWithMenu
-        element={
-          <IconButton
-            size="small"
-            disabled={!isPreviewEnabled}
-            tooltip={t`Advanced preview options (debugger, network preview...)`}
-            color="default"
-          >
-            <DebugIcon />
-          </IconButton>
-        }
-        buildMenuTemplate={debugBuildMenuTemplate}
-      />
       <ElementWithMenu
         element={
           <FlatButton

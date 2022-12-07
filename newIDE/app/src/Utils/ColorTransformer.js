@@ -213,3 +213,11 @@ export const rgbToHsl = (r: number, g: number, b: number): number[] => {
 
   return [h, s, l];
 };
+
+/**
+ * Return true if the specified color is mostly light (and so a dark text/shape
+ * should be displayed on it for being readable).
+ */
+export const isLightRgbColor = (rgbColor: RGBColor) => {
+  return rgbColor.r * 0.299 + rgbColor.g * 0.587 + rgbColor.b * 0.114 > 186;
+};

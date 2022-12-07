@@ -10,9 +10,7 @@ import SearchBar, {
   useShouldAutofocusSearchbar,
   type SearchBarInterface,
 } from '../UI/SearchBar';
-import ListIcon from '../UI/ListIcon';
 import { AddListItem, SearchListItem } from '../UI/ListCommonItem';
-import Window from '../Utils/Window';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
 import {
@@ -30,15 +28,10 @@ import {
 } from '../Utils/Serializer';
 import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import Flag from '@material-ui/icons/Flag';
-import Close from '@material-ui/icons/Close';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
 import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
-import Save from '@material-ui/icons/Save';
 import VariableTree from '../UI/CustomSvgIcons/VariableTree';
 import ArtTrack from '@material-ui/icons/ArtTrack';
-import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
-import FileCopy from '@material-ui/icons/FileCopy';
-import TimelineIcon from '@material-ui/icons/Timeline';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
@@ -54,7 +47,10 @@ import {
   ProjectStructureItem,
   EventFunctionExtensionItem,
 } from './ProjectManagerItems';
-import { Tooltip } from '@material-ui/core';
+import Tooltip from '@material-ui/core/Tooltip';
+import SceneIcon from '../UI/CustomSvgIcons/Scene';
+import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
+import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -99,11 +95,6 @@ type Props = {|
   onOpenExternalEvents: string => void,
   onOpenExternalLayout: string => void,
   onOpenEventsFunctionsExtension: string => void,
-  onSaveProject: () => Promise<void>,
-  onSaveProjectAs: () => void,
-  onCloseProject: () => void,
-  onExportProject: () => void,
-  onOpenGamesDashboard: () => void,
   onOpenResources: () => void,
   onOpenPlatformSpecificAssets: () => void,
   eventsFunctionsExtensionsError: ?Error,
@@ -583,47 +574,6 @@ export default class ProjectManager extends React.Component<Props, State> {
     this.setState({ projectPropertiesDialogOpen: false });
   };
 
-  _renderMenu() {
-    // If there is already a main menu (as the native one made with
-    // Electron), don't show it in the Project Manager.
-    if (Window.hasMainMenu()) return null;
-
-    return (
-      <React.Fragment>
-        <ListItem
-          key="save"
-          primaryText={<Trans>Save</Trans>}
-          leftIcon={<Save />}
-          onClick={() => this.props.onSaveProject()}
-        />
-        <ListItem
-          key="save-as"
-          primaryText={<Trans>Save as...</Trans>}
-          leftIcon={<FileCopy />}
-          onClick={() => this.props.onSaveProjectAs()}
-        />
-        <ListItem
-          key="export"
-          primaryText={<Trans>Export</Trans>}
-          leftIcon={<AddToHomeScreen />}
-          onClick={() => this.props.onExportProject()}
-        />
-        <ListItem
-          key="close"
-          primaryText={<Trans>Close</Trans>}
-          leftIcon={<Close />}
-          onClick={() => this.props.onCloseProject()}
-        />
-        <ListItem
-          key="games-dashboard"
-          primaryText={<Trans>Published Games Dashboard</Trans>}
-          leftIcon={<TimelineIcon />}
-          onClick={() => this.props.onOpenGamesDashboard()}
-        />
-      </React.Fragment>
-    );
-  }
-
   _onSearchChange = (text: string) =>
     this.setState({
       searchText: text,
@@ -688,20 +638,11 @@ export default class ProjectManager extends React.Component<Props, State> {
               onOpenSearchExtensionDialog={this._openSearchExtensionDialog}
             />
             <List style={styles.list}>
-              {this._renderMenu()}
               <ProjectStructureItem
                 id={getTabId('game-settings')}
                 primaryText={<Trans>Game settings</Trans>}
-                leftIcon={
-                  <ListIcon
-                    iconSize={24}
-                    isGDevelopIcon
-                    src="res/ribbon_default/projectManager32.png"
-                  />
-                }
-                initiallyOpen={false}
+                initiallyOpen
                 autoGenerateNestedIndicator={true}
-                indentNestedItems
                 renderNestedItems={() => [
                   <ListItem
                     id={getTabId('game-properties')}
@@ -736,14 +677,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               <ProjectStructureItem
                 id={getTabId('scenes')}
                 primaryText={<Trans>Scenes</Trans>}
-                leftIcon={
-                  <ListIcon
-                    iconSize={24}
-                    isGDevelopIcon
-                    src="res/ribbon_default/sceneadd32.png"
-                  />
-                }
-                initiallyOpen={true}
+                initiallyOpen
                 open={forceOpen}
                 autoGenerateNestedIndicator={!forceOpen}
                 renderNestedItems={() =>
@@ -759,6 +693,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                             default:
                               name === firstLayoutName ? 'true' : undefined,
                           }}
+                          leftIcon={<SceneIcon />}
                           primaryText={name}
                           textEndAdornment={
                             name === firstLayoutName ? (
@@ -822,7 +757,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                         onClick={() =>
                           this._addLayout(project.getLayoutsCount(), i18n)
                         }
-                        primaryText={<Trans>Click to add a scene</Trans>}
+                        primaryText={<Trans>Add scene</Trans>}
                       />
                     )
                 }
@@ -830,14 +765,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               <ProjectStructureItem
                 id={getTabId('external-events')}
                 primaryText={<Trans>External events</Trans>}
-                leftIcon={
-                  <ListIcon
-                    iconSize={24}
-                    isGDevelopIcon
-                    src="res/ribbon_default/externalevents32.png"
-                  />
-                }
-                initiallyOpen={false}
+                initiallyOpen
                 open={forceOpen}
                 autoGenerateNestedIndicator={!forceOpen}
                 renderNestedItems={() =>
@@ -850,6 +778,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                       return (
                         <Item
                           key={i}
+                          leftIcon={<ExternalEventsIcon />}
                           primaryText={name}
                           editingName={
                             renamedItemKind === 'external-events' &&
@@ -891,9 +820,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     .concat(
                       <AddListItem
                         key={'add-external-events'}
-                        primaryText={
-                          <Trans>Click to add external events</Trans>
-                        }
+                        primaryText={<Trans>Add external events</Trans>}
                         onClick={() =>
                           this._addExternalEvents(
                             project.getExternalEventsCount(),
@@ -907,14 +834,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               <ProjectStructureItem
                 id={getTabId('external-layouts')}
                 primaryText={<Trans>External layouts</Trans>}
-                leftIcon={
-                  <ListIcon
-                    iconSize={24}
-                    isGDevelopIcon
-                    src="res/ribbon_default/externallayout32.png"
-                  />
-                }
-                initiallyOpen={false}
+                initiallyOpen
                 open={forceOpen}
                 autoGenerateNestedIndicator={!forceOpen}
                 renderNestedItems={() =>
@@ -927,6 +847,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                       return (
                         <Item
                           key={i}
+                          leftIcon={<ExternalLayoutIcon />}
                           primaryText={name}
                           editingName={
                             renamedItemKind === 'external-layout' &&
@@ -968,9 +889,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     .concat(
                       <AddListItem
                         key={'add-external-layout'}
-                        primaryText={
-                          <Trans>Click to add an external layout</Trans>
-                        }
+                        primaryText={<Trans>Add external layout</Trans>}
                         onClick={() =>
                           this._addExternalLayout(
                             project.getExternalLayoutsCount(),
@@ -986,14 +905,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 primaryText={<Trans>Extensions</Trans>}
                 error={eventsFunctionsExtensionsError}
                 onRefresh={onReloadEventsFunctionsExtensions}
-                leftIcon={
-                  <ListIcon
-                    iconSize={24}
-                    isGDevelopIcon
-                    src="res/ribbon_default/function32.png"
-                  />
-                }
-                initiallyOpen={false}
+                initiallyOpen
                 open={forceOpen}
                 autoGenerateNestedIndicator={
                   !forceOpen && !eventsFunctionsExtensionsError

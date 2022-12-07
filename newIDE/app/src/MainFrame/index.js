@@ -825,7 +825,7 @@ const MainFrame = (props: Props) => {
   };
 
   const openFromFileMetadata = React.useCallback(
-    (fileMetadata: FileMetadata): Promise<?State> => {
+    async (fileMetadata: FileMetadata): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
 
       const {
@@ -841,107 +841,112 @@ const MainFrame = (props: Props) => {
           fileMetadata,
           storageProviderOperations
         );
-        return Promise.resolve();
+        return;
       }
 
-      const checkForAutosave = (): Promise<FileMetadata> => {
+      const checkForAutosave = async (): Promise<FileMetadata> => {
         if (!hasAutoSave || !onGetAutoSave) {
-          return Promise.resolve(fileMetadata);
+          return fileMetadata;
         }
 
-        return hasAutoSave(fileMetadata, true).then(canOpenAutosave => {
-          if (!canOpenAutosave) return fileMetadata;
+        const canOpenAutosave = await hasAutoSave(fileMetadata, true);
+        if (!canOpenAutosave) return fileMetadata;
 
-          const answer = Window.showConfirmDialog(
-            i18n._(
-              t`An autosave file (backup made automatically by GDevelop) that is newer than the project file exists. Would you like to load it instead?`
-            )
-          );
-          if (!answer) return fileMetadata;
-
-          return onGetAutoSave(fileMetadata);
+        const answer = await showConfirmation({
+          title: t`This project has an auto-saved version`,
+          message: t`GDevelop automatically saved a newer version of this project. This new version might differ from the one that you manually saved. Which version would you like to open?`,
+          dismissText: t`My manual save`,
+          confirmText: t`GDevelop auto-save`,
         });
+
+        if (!answer) return fileMetadata;
+        return onGetAutoSave(fileMetadata);
       };
 
-      const checkForAutosaveAfterFailure = (): Promise<?FileMetadata> => {
+      const checkForAutosaveAfterFailure = async (): Promise<?FileMetadata> => {
         if (!hasAutoSave || !onGetAutoSave) {
-          return Promise.resolve(null);
+          return null;
         }
 
-        return hasAutoSave(fileMetadata, false).then(canOpenAutosave => {
-          if (!canOpenAutosave) return null;
+        const canOpenAutosave = await hasAutoSave(fileMetadata, false);
+        if (!canOpenAutosave) return null;
 
-          const answer = Window.showConfirmDialog(
-            i18n._(
-              t`The project file appears to be malformed, but an autosave file exists (backup made automatically by GDevelop). Would you like to try to load it instead?`
-            )
-          );
-          if (!answer) return null;
-
-          return onGetAutoSave(fileMetadata);
+        const answer = await showConfirmation({
+          title: t`This project cannot be opened`,
+          message: t`The project file appears to be corrupted, but an autosave file exists (backup made automatically by GDevelop). Would you like to try to load it instead?`,
+          confirmText: t`Load autosave`,
         });
+        if (!answer) return null;
+        return onGetAutoSave(fileMetadata);
       };
 
       setIsLoadingProject(true);
 
       // Try to find an autosave (and ask user if found)
-      return delay(150)
-        .then(() => checkForAutosave())
-        .then(fileMetadata => onOpen(fileMetadata, setLoaderModalProgress))
-        .catch(err => {
+      try {
+        await delay(150);
+        const autoSavefileMetadata = await checkForAutosave();
+        let content;
+        try {
+          const result = await onOpen(
+            autoSavefileMetadata,
+            setLoaderModalProgress
+          );
+          content = result.content;
+        } catch (error) {
           // onOpen failed, tried to find again an autosave
-          return checkForAutosaveAfterFailure().then(fileMetadata => {
-            if (fileMetadata) {
-              return onOpen(fileMetadata);
-            }
-
-            throw err;
-          });
-        })
-        .then(({ content }) => {
-          if (!verifyProjectContent(i18n, content)) {
-            // The content is not recognized and the user was warned. Abort the opening.
-            setIsLoadingProject(false);
-            setLoaderModalProgress(null, null);
-            return;
+          const autoSaveAfterFailurefileMetadata = await checkForAutosaveAfterFailure();
+          if (autoSaveAfterFailurefileMetadata) {
+            const result = await onOpen(autoSaveAfterFailurefileMetadata);
+            content = result.content;
           }
+        }
+        if (!verifyProjectContent(i18n, content)) {
+          // The content is not recognized and the user was warned. Abort the opening.
+          setIsLoadingProject(false);
+          setLoaderModalProgress(null, null);
+          return;
+        }
 
-          const serializedProject = gd.Serializer.fromJSObject(content);
-          return loadFromSerializedProject(
+        const serializedProject = gd.Serializer.fromJSObject(content);
+
+        try {
+          const state = loadFromSerializedProject(
             serializedProject,
             // Note that fileMetadata is the original, unchanged one, even if we're loading
             // an autosave. If we're for some reason loading an autosave, we still consider
             // that we're opening the file that was originally requested by the user.
             fileMetadata
-          ).then(
-            state => {
-              serializedProject.delete();
-              return Promise.resolve(state);
-            },
-            err => {
-              serializedProject.delete();
-              throw err;
-            }
           );
-        })
-        .catch(error => {
-          const errorMessage = getOpenErrorMessage
-            ? getOpenErrorMessage(error)
-            : t`Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`;
-          showErrorBox({
-            message: [
-              i18n._(t`Unable to open the project.`),
-              i18n._(errorMessage),
-            ].join('\n'),
-            errorId: 'project-open-error',
-            rawError: error,
-          });
-          setIsLoadingProject(false);
-          setLoaderModalProgress(null, null);
-          return Promise.reject(error);
+          serializedProject.delete();
+          return Promise.resolve(state);
+        } catch (err) {
+          serializedProject.delete();
+          throw err;
+        }
+      } catch (error) {
+        const errorMessage = getOpenErrorMessage
+          ? getOpenErrorMessage(error)
+          : t`Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`;
+        showErrorBox({
+          message: [
+            i18n._(t`Unable to open the project.`),
+            i18n._(errorMessage),
+          ].join('\n'),
+          errorId: 'project-open-error',
+          rawError: error,
         });
+        setIsLoadingProject(false);
+        setLoaderModalProgress(null, null);
+        throw error;
+      }
     },
-    [i18n, getStorageProviderOperations, loadFromSerializedProject]
+    [
+      i18n,
+      getStorageProviderOperations,
+      loadFromSerializedProject,
+      showConfirmation,
+    ]
   );
 
   const closeApp = React.useCallback((): void => {
@@ -1302,7 +1307,9 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
 
       const storageProviderOperations = getStorageProviderOperations();
+      const hasUnsavedChanges = unsavedChanges.hasUnsavedChanges;
       if (
+        hasUnsavedChanges && // Only create an autosave if there are unsaved changes.
         preferences.values.autosaveOnPreview &&
         storageProviderOperations.onAutoSaveProject &&
         currentFileMetadata
@@ -1329,6 +1336,7 @@ const MainFrame = (props: Props) => {
       currentFileMetadata,
       getStorageProviderOperations,
       preferences.values.autosaveOnPreview,
+      unsavedChanges.hasUnsavedChanges,
     ]
   );
 
@@ -2381,6 +2389,7 @@ const MainFrame = (props: Props) => {
       return showConfirmation({
         title: t`Project name changed`,
         message: t`Your project name has changed, this will also save the whole project, continue?`,
+        confirmText: t`Save and continue`,
       });
     }
     return true;

@@ -18,6 +18,7 @@ import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import Text from '../UI/Text';
 
 const styles = {
   noIndentNestedList: {
@@ -32,7 +33,6 @@ type ProjectStructureItemProps = {|
   id?: string,
   autoGenerateNestedIndicator?: boolean,
   initiallyOpen?: boolean,
-  leftIcon?: React$Element<any>,
   indentNestedItems?: boolean,
   renderNestedItems: () => Array<React$Element<any> | null>,
   primaryText: React.Node,
@@ -44,7 +44,6 @@ type ProjectStructureItemProps = {|
 export const ProjectStructureItem = ({
   id,
   error,
-  leftIcon,
   onRefresh,
   indentNestedItems,
   autoGenerateNestedIndicator,
@@ -60,17 +59,20 @@ export const ProjectStructureItem = ({
       open={open}
       autoGenerateNestedIndicator={autoGenerateNestedIndicator}
       initiallyOpen={initiallyOpen}
-      primaryText={primaryText}
+      primaryText={
+        <Text size="sub-title" noMargin>
+          {primaryText}
+        </Text>
+      }
       renderNestedItems={renderNestedItems}
       onReload={onRefresh}
       style={{
         backgroundColor: gdevelopTheme.listItem.groupBackgroundColor,
-        borderBottom: `1px solid ${gdevelopTheme.listItem.separatorColor}`,
       }}
       nestedListStyle={
         indentNestedItems ? undefined : styles.noIndentNestedList
       }
-      leftIcon={error ? <WarningIcon /> : leftIcon}
+      leftIcon={error ? <WarningIcon /> : undefined}
       displayReloadButton={!!error}
       reloadButtonTooltip={
         <Trans>An error has occured in functions. Click to reload them.</Trans>

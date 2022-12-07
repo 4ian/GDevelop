@@ -17,6 +17,16 @@
       }
     },
     "surface": {
+      "titlebar": {
+        "background-color": {
+          "value": "#2E3440"
+        }
+      },
+      "toolbar": {
+        "background-color": {
+          "value": "#3B4252"
+        }
+      },
       "window": {
         "background-color": {
           "value": "#2E3440"
@@ -190,18 +200,23 @@
     "closable-tabs": {
       "default": {
         "background-color": {
-          "value": "#343A46"
+          "value": "#434C5E"
         },
         "color": {
-          "value": "#ECEFF4"
+          "value": "#C5C5C9",
+          "comment": "Palette/Grey/30"
         }
       },
       "selected": {
         "background-color": {
-          "value": "{theme.primary.color.value}"
+          "value": "#3B4252"
         },
         "color": {
-          "value": "#2E3440"
+          "value": "#FAFAFA",
+          "comment": "Palette/Grey/00"
+        },
+        "borderColor": {
+          "value": "{theme.primary.color.value}"
         }
       }
     },

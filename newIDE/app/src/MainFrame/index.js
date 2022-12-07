@@ -104,10 +104,15 @@ import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProvide
 import { useOpenConfirmDialog } from '../ProjectsStorage/OpenConfirmDialog';
 import verifyProjectContent from '../ProjectsStorage/ProjectContentChecker';
 import UnsavedChangesContext from './UnsavedChangesContext';
-import { type MainMenuProps } from './MainMenu.flow';
+import {
+  type BuildMainMenuProps,
+  type MainMenuCallbacks,
+  buildMainMenuDeclarativeTemplate,
+  adaptFromDeclarativeTemplate,
+} from './MainMenu';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
-import { useKeyboardShortcuts } from '../KeyboardShortcuts';
+import { useKeyboardShortcuts, useShortcutMap } from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
 import CommandPalette, {
   type CommandPaletteInterface,
@@ -156,6 +161,7 @@ import { useOpenInitialDialog } from '../Utils/UseOpenInitialDialog';
 import { type InAppTutorialOrchestratorInterface } from '../InAppTutorial/InAppTutorialOrchestrator';
 import useInAppTutorialOrchestrator from '../InAppTutorial/useInAppTutorialOrchestrator';
 import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../InAppTutorial/InAppTutorialProvider';
+import TabsTitlebar from './TabsTitlebar';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -247,7 +253,7 @@ export type Props = {|
   initialGameId?: string,
   initialGamesDashboardTab?: string,
   introDialog?: React.Element<*>,
-  renderMainMenu?: MainMenuProps => React.Node,
+  renderMainMenu?: (BuildMainMenuProps, MainMenuCallbacks) => React.Node,
   renderPreviewLauncher?: (
     props: PreviewLauncherProps,
     ref: (previewLauncher: ?PreviewLauncherInterface) => void
@@ -2580,21 +2586,6 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const simulateUpdateDownloaded = () =>
-    setElectronUpdateStatus({
-      status: 'update-downloaded',
-      message: 'update-downloaded',
-      info: {
-        releaseName: 'Fake update',
-      },
-    });
-
-  const simulateUpdateAvailable = () =>
-    setElectronUpdateStatus({
-      status: 'update-available',
-      message: 'Update available',
-    });
-
   useKeyboardShortcuts(
     commandPaletteRef.current
       ? commandPaletteRef.current.launchCommand
@@ -2663,33 +2654,42 @@ const MainFrame = (props: Props) => {
 
   const showLoader = isLoadingProject || previewLoading;
 
+  const shortcutMap = useShortcutMap();
+  const buildMainMenuProps = {
+    i18n: i18n,
+    project: state.currentProject,
+    recentProjectFiles: preferences.getRecentProjectFiles(),
+    shortcutMap,
+    isApplicationTopLevelMenu: false,
+  };
+  const mainMenuCallbacks = {
+    onChooseProject: () => openOpenFromStorageProviderDialog(),
+    onOpenRecentFile: openFromFileMetadataWithStorageProvider,
+    onSaveProject: saveProject,
+    onSaveProjectAs: saveProjectAs,
+    onCloseProject: askToCloseProject,
+    onCloseApp: closeApp,
+    onExportProject: () => openExportDialog(true),
+    onCreateProject: () => openCreateProjectDialog(true, null),
+    onCreateBlank: () => setNewProjectSetupDialogOpen(true),
+    onOpenProjectManager: () => openProjectManager(true),
+    onOpenHomePage: openHomePage,
+    onOpenDebugger: openDebugger,
+    onOpenAbout: () => openAboutDialog(true),
+    onOpenPreferences: () => openPreferencesDialog(true),
+    onOpenLanguage: () => openLanguageDialog(true),
+    onOpenProfile: () => openProfileDialogWithTab('profile'),
+    onOpenGamesDashboard: () => openProfileDialogWithTab('games-dashboard'),
+    setElectronUpdateStatus: setElectronUpdateStatus,
+  };
+
   return (
     <div className="main-frame">
       {!!renderMainMenu &&
-        renderMainMenu({
-          i18n: i18n,
-          project: state.currentProject,
-          onChooseProject: () => openOpenFromStorageProviderDialog(),
-          onOpenRecentFile: openFromFileMetadataWithStorageProvider,
-          onSaveProject: saveProject,
-          onSaveProjectAs: saveProjectAs,
-          onCloseProject: askToCloseProject,
-          onCloseApp: closeApp,
-          onExportProject: () => openExportDialog(true),
-          onCreateProject: () => openCreateProjectDialog(true, null),
-          onCreateBlank: () => setNewProjectSetupDialogOpen(true),
-          onOpenProjectManager: () => openProjectManager(true),
-          onOpenHomePage: openHomePage,
-          onOpenDebugger: openDebugger,
-          onOpenAbout: () => openAboutDialog(true),
-          onOpenPreferences: () => openPreferencesDialog(true),
-          onOpenLanguage: () => openLanguageDialog(true),
-          onOpenProfile: () => openProfileDialogWithTab('profile'),
-          onOpenGamesDashboard: () =>
-            openProfileDialogWithTab('games-dashboard'),
-          setElectronUpdateStatus: setElectronUpdateStatus,
-          recentProjectFiles: preferences.getRecentProjectFiles(),
-        })}
+        renderMainMenu(
+          { ...buildMainMenuProps, isApplicationTopLevelMenu: true },
+          mainMenuCallbacks
+        )}
       <ProjectTitlebar
         projectName={currentProject ? currentProject.getName() : null}
         fileMetadata={currentFileMetadata}
@@ -2711,7 +2711,6 @@ const MainFrame = (props: Props) => {
           title={
             state.currentProject ? state.currentProject.getName() : 'No project'
           }
-          displayRightCloseButton
           onClose={toggleProjectManager}
         />
         {currentProject && (
@@ -2734,15 +2733,6 @@ const MainFrame = (props: Props) => {
             onRenameExternalLayout={renameExternalLayout}
             onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
             onRenameExternalEvents={renameExternalEvents}
-            onSaveProject={saveProject}
-            onSaveProjectAs={saveProjectAs}
-            onCloseProject={() => {
-              askToCloseProject();
-            }}
-            onExportProject={() => openExportDialog(true)}
-            onOpenGamesDashboard={() =>
-              openProfileDialogWithTab('games-dashboard')
-            }
             onOpenResources={() => {
               openResources();
               openProjectManager(false);
@@ -2769,15 +2759,40 @@ const MainFrame = (props: Props) => {
           </EmptyMessage>
         )}
       </Drawer>
+      <TabsTitlebar
+        onBuildMenuTemplate={() =>
+          adaptFromDeclarativeTemplate(
+            buildMainMenuDeclarativeTemplate(buildMainMenuProps),
+            mainMenuCallbacks
+          )
+        }
+      >
+        <DraggableEditorTabs
+          hideLabels={false}
+          editorTabs={state.editorTabs}
+          onClickTab={(id: number) => _onChangeEditorTab(id)}
+          onCloseTab={(editorTab: EditorTab) => _onCloseEditorTab(editorTab)}
+          onCloseOtherTabs={(editorTab: EditorTab) =>
+            _onCloseOtherEditorTabs(editorTab)
+          }
+          onCloseAll={_onCloseAllEditorTabs}
+          onTabActivated={(editorTab: EditorTab) =>
+            _onEditorTabActivated(editorTab)
+          }
+          onDropTab={onDropEditorTab}
+        />
+      </TabsTitlebar>
       <Toolbar
         ref={toolbar}
-        showProjectIcons
-        hasProject={!!currentProject}
+        showProjectButtons={
+          !['start page', 'debugger', null].includes(
+            getCurrentTab(state.editorTabs)
+              ? getCurrentTab(state.editorTabs).key
+              : null
+          )
+        }
         toggleProjectManager={toggleProjectManager}
         exportProject={() => openExportDialog(true)}
-        requestUpdate={props.requestUpdate}
-        simulateUpdateDownloaded={simulateUpdateDownloaded}
-        simulateUpdateAvailable={simulateUpdateAvailable}
         onOpenDebugger={launchDebuggerAndPreview}
         hasPreviewsRunning={hasPreviewsRunning}
         onPreviewWithoutHotReload={launchNewPreview}
@@ -2792,20 +2807,6 @@ const MainFrame = (props: Props) => {
           !!currentProject && currentProject.getLayoutsCount() > 0
         }
         previewState={previewState}
-      />
-      <DraggableEditorTabs
-        hideLabels={false}
-        editorTabs={state.editorTabs}
-        onClickTab={(id: number) => _onChangeEditorTab(id)}
-        onCloseTab={(editorTab: EditorTab) => _onCloseEditorTab(editorTab)}
-        onCloseOtherTabs={(editorTab: EditorTab) =>
-          _onCloseOtherEditorTabs(editorTab)
-        }
-        onCloseAll={_onCloseAllEditorTabs}
-        onTabActivated={(editorTab: EditorTab) =>
-          _onEditorTabActivated(editorTab)
-        }
-        onDropTab={onDropEditorTab}
       />
       <LeaderboardProvider
         gameId={

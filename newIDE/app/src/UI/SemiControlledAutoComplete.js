@@ -20,6 +20,13 @@ import {
   shouldSubmit,
 } from './KeyboardShortcuts/InteractionKeys';
 import { textEllipsisStyle } from './TextEllipsis';
+import Paper from './Paper';
+
+const AutocompletePaperComponent = props => (
+  // Use light background so that it's in contrast with background that
+  // is either dark or medium (in dialogs).
+  <Paper {...props} background="light" />
+);
 
 type Option =
   | {|
@@ -292,6 +299,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
             inputValue={currentInputValue}
             value={currentInputValue}
             onInputChange={handleInputChange}
+            PaperComponent={AutocompletePaperComponent}
             options={props.dataSource}
             renderOption={makeRenderItem(i18n)}
             getOptionDisabled={isOptionDisabled}

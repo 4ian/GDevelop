@@ -1,8 +1,11 @@
 // @flow
 import { t } from '@lingui/macro';
+import { IconButton } from '@material-ui/core';
 import React, { PureComponent } from 'react';
+import FolderIcon from '../UI/CustomSvgIcons/Folder';
+import TrashIcon from '../UI/CustomSvgIcons/Trash';
+import PropertiesPanelIcon from '../UI/CustomSvgIcons/PropertiesPanel';
 import { ToolbarGroup } from '../UI/Toolbar';
-import ToolbarIcon from '../UI/ToolbarIcon';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 
 type Props = {|
@@ -20,24 +23,32 @@ export class Toolbar extends PureComponent<Props, State> {
 
     return (
       <ToolbarGroup lastChild>
-        <ToolbarIcon
+        <IconButton
+          size="small"
+          color="default"
           onClick={this.props.onOpenProjectFolder}
-          src="res/ribbon_default/open32.png"
           tooltip={t`Open the project folder`}
-        />
+        >
+          <FolderIcon />
+        </IconButton>
         <ToolbarSeparator />
-        <ToolbarIcon
+        <IconButton
+          size="small"
+          color="default"
           onClick={this.props.onOpenProperties}
-          src="res/ribbon_default/editprop32.png"
           tooltip={t`Open the properties panel`}
-        />
-        <ToolbarSeparator />
-        <ToolbarIcon
+        >
+          <PropertiesPanelIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
           onClick={this.props.onDeleteSelection}
-          src="res/ribbon_default/deleteselected32.png"
           disabled={!canDelete}
           tooltip={t`Delete the selected resource`}
-        />
+        >
+          <TrashIcon />
+        </IconButton>
       </ToolbarGroup>
     );
   }

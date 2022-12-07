@@ -30,6 +30,7 @@ html {
   animation: fade-in 0.5s;
 }
 
+/* The part of the window which can be drag'n'dropped on desktop (Electron and installed PWA). */
 .title-bar-draggable-part {
   -webkit-app-region: drag;
   app-region: drag;

@@ -76,6 +76,7 @@ function ConfirmProvider({ children }: Props) {
             setAlertDialogOpen(false);
             alertDialogConfig.callback();
           }}
+          dismissButtonLabel={alertDialogConfig.dismissButtonLabel}
           title={alertDialogConfig.title}
           message={alertDialogConfig.message}
         />
@@ -87,10 +88,12 @@ function ConfirmProvider({ children }: Props) {
             setConfirmDialogOpen(false);
             confirmDialogConfig.callback(true);
           }}
+          confirmButtonLabel={confirmDialogConfig.confirmButtonLabel}
           onDismiss={() => {
             setConfirmDialogOpen(false);
             confirmDialogConfig.callback(false);
           }}
+          dismissButtonLabel={confirmDialogConfig.dismissButtonLabel}
           title={confirmDialogConfig.title}
           message={confirmDialogConfig.message}
         />
@@ -102,10 +105,12 @@ function ConfirmProvider({ children }: Props) {
             setConfirmDeleteDialogOpen(false);
             confirmDeleteDialogConfig.callback(true);
           }}
+          confirmButtonLabel={confirmDeleteDialogConfig.confirmButtonLabel}
           onDismiss={() => {
             setConfirmDeleteDialogOpen(false);
             confirmDeleteDialogConfig.callback(false);
           }}
+          dismissButtonLabel={confirmDeleteDialogConfig.dismissButtonLabel}
           title={confirmDeleteDialogConfig.title}
           message={confirmDeleteDialogConfig.message}
           fieldMessage={confirmDeleteDialogConfig.fieldMessage}

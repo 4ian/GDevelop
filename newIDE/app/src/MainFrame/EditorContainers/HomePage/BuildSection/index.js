@@ -225,6 +225,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
         message: t`You’re about to permanently delete your project ${projectName}. You will no longer be able to access it.`,
         fieldMessage: t`Type your project name to delete it:`,
         confirmText: projectName,
+        confirmButtonLabel: t`Delete project`,
       });
       if (!deleteAnswer) return;
 

@@ -76,6 +76,8 @@ export const useSerializableObjectCancelableEditor = ({
         const answer = await showConfirmation({
           title: t`Cancel your changes?`,
           message: t`All your changes will be lost. Are you sure you want to cancel?`,
+          confirmButtonLabel: t`Cancel`,
+          dismissButtonLabel: t`Continue editing`,
         });
         if (answer) continueCanceling = true;
       } else {

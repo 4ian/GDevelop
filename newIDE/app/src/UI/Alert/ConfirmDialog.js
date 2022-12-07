@@ -36,6 +36,7 @@ function ConfirmDialog(props: Props) {
               key="confirm"
               label={<Trans>Confirm</Trans>}
               onClick={props.onConfirm}
+              primary
             />,
           ]}
           maxWidth="xs"

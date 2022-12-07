@@ -409,6 +409,30 @@ namespace gdjs {
     }
 
     /**
+     * Callback called when the game is paused.
+     */
+    sendGamePaused(): void {
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'game.paused',
+          payload: null,
+        })
+      );
+    }
+
+    /**
+     * Callback called when the game is resumed.
+     */
+    sendGameResumed(): void {
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'game.resumed',
+          payload: null,
+        })
+      );
+    }
+
+    /**
      * Send profiling results.
      * @param framesAverageMeasures The measures made for each frames.
      * @param stats Other measures done during the profiler run.

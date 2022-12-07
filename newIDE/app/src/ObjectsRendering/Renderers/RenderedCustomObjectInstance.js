@@ -136,12 +136,82 @@ class ChildInstance {
   unserializeFrom(element: gdSerializerElement) {}
 }
 
+type AxeLayout = {
+  anchor: 'Min' | 'Center' | 'Max' | 'Fill',
+  minSideAbsoluteMargin?: number,
+  maxSideAbsoluteMargin?: number,
+  minSideProportionalMargin?: number,
+  maxSideProportionalMargin?: number,
+};
+
+type ChildLayout = {
+  horizontalLayout: AxeLayout,
+  verticalLayout: AxeLayout,
+};
+
+const layoutFields = [
+  'LeftPadding',
+  'TopPadding',
+  'RightPadding',
+  'BottomPadding',
+];
+
+const getLayouts = (
+  eventBasedObject: gdEventsBasedObject,
+  customObjectConfiguration: gdCustomObjectConfiguration
+): Map<string, ChildLayout> => {
+  const layouts: Map<string, ChildLayout> = new Map<string, ChildLayout>();
+  const properties = eventBasedObject.getPropertyDescriptors();
+  const instanceProperties = customObjectConfiguration.getProperties();
+
+  for (
+    let propertyIndex = 0;
+    propertyIndex < properties.getCount();
+    propertyIndex++
+  ) {
+    const property = properties.getAt(propertyIndex);
+
+    const childNames = property.getExtraInfo();
+    if (!childNames) {
+      continue;
+    }
+
+    const name = property.getName();
+    const propertyValue =
+      Number.parseFloat(instanceProperties.get(name).getValue()) || 0;
+    const layoutField = layoutFields.find(field => name.includes(field));
+    for (let childIndex = 0; childIndex < childNames.size(); childIndex++) {
+      const childName = childNames.at(childIndex);
+      let layout = layouts.get(childName);
+      if (!layout) {
+        layout = {
+          horizontalLayout: { anchor: 'Fill' },
+          verticalLayout: { anchor: 'Fill' },
+        };
+        layouts.set(childName, layout);
+      }
+      if (layoutField === 'LeftPadding') {
+        layout.horizontalLayout.minSideAbsoluteMargin = propertyValue;
+      } else if (layoutField === 'RightPadding') {
+        layout.horizontalLayout.maxSideAbsoluteMargin = propertyValue;
+      } else if (layoutField === 'TopPadding') {
+        layout.verticalLayout.minSideAbsoluteMargin = propertyValue;
+      } else if (layoutField === 'BottomPadding') {
+        layout.verticalLayout.maxSideAbsoluteMargin = propertyValue;
+      }
+    }
+  }
+
+  return layouts;
+};
+
 /**
  * Renderer for gd.CustomObject (the class is not exposed to newIDE)
  */
 export default class RenderedCustomObjectInstance extends RenderedInstance {
   childrenInstances: ChildInstance[];
   childrenRenderedInstances: RenderedInstance[];
+  childrenLayouts: ChildLayout[];
 
   constructor(
     project: gdProject,
@@ -175,29 +245,46 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
       : null;
 
     this.childrenInstances = [];
-    this.childrenRenderedInstances = eventBasedObject
-      ? mapReverseFor(0, eventBasedObject.getObjectsCount(), i => {
-          const childObject = eventBasedObject.getObjectAt(i);
-          const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
-            childObject.getName()
-          );
-          const childInstance = new ChildInstance();
-          this.childrenInstances.push(childInstance);
-          const renderer = ObjectsRenderingService.createNewInstanceRenderer(
-            project,
-            layout,
-            // $FlowFixMe Use real object instances.
-            childInstance,
-            childObjectConfiguration,
-            this._pixiObject
-          );
-          if (renderer instanceof RenderedTextInstance) {
-            // TODO EBO Remove this line when an alignment property is added to the text object.
-            renderer._pixiObject.style.align = 'center';
+    this.childrenLayouts = [];
+    this.childrenRenderedInstances = [];
+
+    if (!eventBasedObject) {
+      return;
+    }
+
+    const layouts = getLayouts(eventBasedObject, customObjectConfiguration);
+
+    this.childrenRenderedInstances = mapReverseFor(
+      0,
+      eventBasedObject.getObjectsCount(),
+      i => {
+        const childObject = eventBasedObject.getObjectAt(i);
+        const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
+          childObject.getName()
+        );
+        const childInstance = new ChildInstance();
+        this.childrenInstances.push(childInstance);
+        this.childrenLayouts.push(
+          layouts.get(childObject.getName()) || {
+            horizontalLayout: { anchor: 'Fill' },
+            verticalLayout: { anchor: 'Fill' },
           }
-          return renderer;
-        })
-      : [];
+        );
+        const renderer = ObjectsRenderingService.createNewInstanceRenderer(
+          project,
+          layout,
+          // $FlowFixMe Use real object instances.
+          childInstance,
+          childObjectConfiguration,
+          this._pixiObject
+        );
+        if (renderer instanceof RenderedTextInstance) {
+          // TODO EBO Remove this line when an alignment property is added to the text object.
+          renderer._pixiObject.style.align = 'center';
+        }
+        return renderer;
+      }
+    );
   }
 
   /**
@@ -263,11 +350,40 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
     ) {
       const renderedInstance = this.childrenRenderedInstances[index];
       const childInstance = this.childrenInstances[index];
+      const childLayout = this.childrenLayouts[index];
 
       childInstance.x = 0;
       childInstance.y = 0;
       childInstance.setCustomWidth(width);
       childInstance.setCustomHeight(height);
+
+      const childMinX =
+        childLayout.horizontalLayout.minSideAbsoluteMargin ||
+        (childLayout.horizontalLayout.minSideProportionalMargin || 0) * width;
+      const childMaxX =
+        width -
+        (childLayout.horizontalLayout.maxSideAbsoluteMargin ||
+          (childLayout.horizontalLayout.maxSideProportionalMargin || 0) *
+            width);
+      const childMinY =
+        childLayout.verticalLayout.minSideAbsoluteMargin ||
+        (childLayout.verticalLayout.minSideProportionalMargin || 0) * height;
+      const childMaxY =
+        height -
+        (childLayout.verticalLayout.maxSideAbsoluteMargin ||
+          (childLayout.verticalLayout.maxSideProportionalMargin || 0) * height);
+      if (childLayout.horizontalLayout.anchor === 'Fill') {
+        childInstance.x = childMinX;
+        childInstance.setCustomWidth(childMaxX - childMinX);
+      } else {
+        // TODO
+      }
+      if (childLayout.verticalLayout.anchor === 'Fill') {
+        childInstance.y = childMinY;
+        childInstance.setCustomHeight(childMaxY - childMinY);
+      } else {
+        // TODO
+      }
       renderedInstance.update();
 
       if (renderedInstance instanceof RenderedTextInstance) {
@@ -277,8 +393,16 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
       // This ensure objects are centered if their dimensions changed from the
       // custom ones (preferred ones).
       // For instance, text object dimensions change according to how the text is wrapped.
-      childInstance.x = (width - renderedInstance._pixiObject.width) / 2;
-      childInstance.y = (height - renderedInstance._pixiObject.height) / 2;
+      if (childLayout.horizontalLayout.anchor === 'Fill') {
+        childInstance.x =
+          (width - renderedInstance._pixiObject.width) / 2 +
+          (childMinX + childMaxX - width) / 2;
+      }
+      if (childLayout.verticalLayout.anchor === 'Fill') {
+        childInstance.y =
+          (height - renderedInstance._pixiObject.height) / 2 +
+          (childMinY + childMaxY - height) / 2;
+      }
       renderedInstance.update();
     }
 
@@ -298,18 +422,10 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
   }
 
   getDefaultWidth() {
-    let widthMax = 0;
-    for (const instance of this.childrenRenderedInstances) {
-      widthMax = Math.max(widthMax, instance.getDefaultWidth());
-    }
-    return widthMax;
+    return this.childrenRenderedInstances[0].getDefaultWidth();
   }
 
   getDefaultHeight() {
-    let heightMax = 0;
-    for (const instance of this.childrenRenderedInstances) {
-      heightMax = Math.max(heightMax, instance.getDefaultHeight());
-    }
-    return heightMax;
+    return this.childrenRenderedInstances[0].getDefaultHeight();
   }
 }

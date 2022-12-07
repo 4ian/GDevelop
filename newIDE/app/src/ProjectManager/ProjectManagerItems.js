@@ -64,7 +64,6 @@ export const ProjectStructureItem = ({
       onReload={onRefresh}
       style={{
         backgroundColor: gdevelopTheme.listItem.groupBackgroundColor,
-        borderBottom: `1px solid ${gdevelopTheme.listItem.separatorColor}`,
       }}
       nestedListStyle={
         indentNestedItems ? undefined : styles.noIndentNestedList

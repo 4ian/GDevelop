@@ -48,7 +48,9 @@ import {
   EventFunctionExtensionItem,
 } from './ProjectManagerItems';
 import Tooltip from '@material-ui/core/Tooltip';
-import EditScene from '../UI/CustomSvgIcons/EditScene';
+import SceneIcon from '../UI/CustomSvgIcons/Scene';
+import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
+import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -641,7 +643,6 @@ export default class ProjectManager extends React.Component<Props, State> {
                 primaryText={<Trans>Game settings</Trans>}
                 initiallyOpen
                 autoGenerateNestedIndicator={true}
-                indentNestedItems
                 renderNestedItems={() => [
                   <ListItem
                     id={getTabId('game-properties')}
@@ -692,7 +693,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                             default:
                               name === firstLayoutName ? 'true' : undefined,
                           }}
-                          leftIcon={<EditScene />}
+                          leftIcon={<SceneIcon />}
                           primaryText={name}
                           textEndAdornment={
                             name === firstLayoutName ? (
@@ -756,7 +757,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                         onClick={() =>
                           this._addLayout(project.getLayoutsCount(), i18n)
                         }
-                        primaryText={<Trans>Click to add a scene</Trans>}
+                        primaryText={<Trans>Add scene</Trans>}
                       />
                     )
                 }
@@ -777,6 +778,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                       return (
                         <Item
                           key={i}
+                          leftIcon={<ExternalEventsIcon />}
                           primaryText={name}
                           editingName={
                             renamedItemKind === 'external-events' &&
@@ -819,7 +821,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                       <AddListItem
                         key={'add-external-events'}
                         primaryText={
-                          <Trans>Click to add external events</Trans>
+                          <Trans>Add external events</Trans>
                         }
                         onClick={() =>
                           this._addExternalEvents(
@@ -847,6 +849,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                       return (
                         <Item
                           key={i}
+                          leftIcon={<ExternalLayoutIcon />}
                           primaryText={name}
                           editingName={
                             renamedItemKind === 'external-layout' &&
@@ -889,7 +892,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                       <AddListItem
                         key={'add-external-layout'}
                         primaryText={
-                          <Trans>Click to add an external layout</Trans>
+                          <Trans>Add external layout</Trans>
                         }
                         onClick={() =>
                           this._addExternalLayout(

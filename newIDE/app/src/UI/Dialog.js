@@ -18,6 +18,42 @@ import Cross from './CustomSvgIcons/Cross';
 import IconButton from './IconButton';
 import { Line } from './Grid';
 import GDevelopThemeContext from './Theme/ThemeContext';
+import optionalRequire from '../Utils/OptionalRequire';
+import useForceUpdate from '../Utils/UseForceUpdate';
+import { useWindowControlsOverlayWatcher } from '../Utils/Window';
+const electron = optionalRequire('electron');
+
+const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
+
+export const DialogTitleBar = ({
+  backgroundColor,
+}: {|
+  backgroundColor: string,
+|}) => {
+  // An installed PWA can have window controls displayed as overlay. If supported,
+  // we set up a listener to detect any change and force a refresh that will read
+  // the latest size of the controls.
+  const forceUpdate = useForceUpdate();
+  useWindowControlsOverlayWatcher({ onChanged: forceUpdate });
+
+  // $FlowFixMe - this API is not handled by Flow.
+  const { windowControlsOverlay } = navigator;
+
+  if (!!electron || (windowControlsOverlay && windowControlsOverlay.visible)) {
+    // We're on the desktop app, or in an installed PWA with window controls displayed
+    // as overlay: we need to display a spacing at the top of the dialog.
+    return (
+      <div
+        className={DRAGGABLE_PART_CLASS_NAME}
+        style={{ height: 38, backgroundColor, flexShrink: 0 }}
+      />
+    );
+  }
+
+  // Not on the desktop app, and not in an installed PWA with window controls displayed
+  // as overlay: no need to display a spacing.
+  return null;
+};
 
 // Default.
 const dialogPaddingX = 24;
@@ -182,6 +218,7 @@ const Dialog = ({
   const hasActions =
     (actions && actions.filter(Boolean).length > 0) ||
     (secondaryActions && secondaryActions.filter(Boolean).length > 0);
+  const isFullScreen = size === 'small' && !noMobileFullScreen;
 
   const classesForDangerousDialog = useDangerousStylesForDialog();
   const classesForDialogContent = useStylesForDialogContent();
@@ -222,10 +259,9 @@ const Dialog = ({
   const dialogContainerStyle = {
     ...styles.dialogContainer,
     // Ensure we don't spread an object here, to avoid a styling bug when resizing.
-    margin:
-      size === 'small'
-        ? dialogSmallPadding
-        : `${dialogTitlePadding}px ${dialogPaddingX}px ${dialogActionPadding}px ${dialogPaddingX}px`,
+    margin: isFullScreen
+      ? dialogSmallPadding
+      : `${dialogTitlePadding}px ${dialogPaddingX}px ${dialogActionPadding}px ${dialogPaddingX}px`,
   };
 
   const onCloseDialog = React.useCallback(
@@ -274,9 +310,9 @@ const Dialog = ({
       open={open}
       onClose={onCloseDialog}
       fullWidth
-      fullScreen={size === 'small' && !noMobileFullScreen}
+      fullScreen={isFullScreen}
       className={classNames({
-        'safe-area-aware-container': size === 'small',
+        'safe-area-aware-container': isFullScreen,
       })}
       PaperProps={{
         id,
@@ -289,6 +325,11 @@ const Dialog = ({
       disableBackdropClick={false}
       onKeyDown={handleKeyDown}
     >
+      {isFullScreen && (
+        <DialogTitleBar
+          backgroundColor={gdevelopTheme.titlebar.backgroundColor}
+        />
+      )}
       <div style={dialogContainerStyle}>
         {title && (
           <div style={styles.titleContainer}>

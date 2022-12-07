@@ -30,6 +30,7 @@ export const Default = () => {
     const answer = await showConfirmation({
       title: t`You are about to delete an object`,
       message: t`Do you want to continue?`,
+      confirmButtonLabel: t`Delete object`,
     });
     if (answer) action('Confirmed')();
     else action('Dismissed')();
@@ -41,6 +42,7 @@ export const Default = () => {
       message: t`You’re about to permanently delete your GDevelop account username@mail.com. You will no longer be able to log into the app with this email address.`,
       fieldMessage: t`Type your email address to delete your account:`,
       confirmText: 'username@mail.com',
+      confirmButtonLabel: t`Delete my account`,
     });
     if (answer) action('Delete Confirmed')();
     else action('Delete Dismissed')();

@@ -1,10 +1,11 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 
 // Alert
 export type ShowAlertDialogOptions = {|
   title: MessageDescriptor,
+  dismissButtonLabel?: MessageDescriptor,
   message: MessageDescriptor,
 |};
 export type ShowAlertDialogOptionsWithCallback = {|
@@ -15,6 +16,8 @@ export type ShowAlertDialogOptionsWithCallback = {|
 // Confirm
 export type ShowConfirmDialogOptions = {|
   title: MessageDescriptor,
+  confirmButtonLabel?: MessageDescriptor,
+  dismissButtonLabel?: MessageDescriptor,
   message: MessageDescriptor,
 |};
 export type ShowConfirmDialogOptionsWithCallback = {|
@@ -25,6 +28,8 @@ export type ShowConfirmDialogOptionsWithCallback = {|
 // Confirm Delete
 export type ShowConfirmDeleteDialogOptions = {|
   title: MessageDescriptor,
+  confirmButtonLabel?: MessageDescriptor,
+  dismissButtonLabel?: MessageDescriptor,
   message: MessageDescriptor,
   fieldMessage: MessageDescriptor,
   confirmText: string,

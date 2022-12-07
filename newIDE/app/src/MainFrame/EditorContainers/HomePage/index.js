@@ -123,17 +123,27 @@ export const HomePage = React.memo<Props>(
         [isActive]
       );
 
-      const getProject = () => {
+      const getProject = React.useCallback(() => {
         return undefined;
-      };
+      }, []);
 
-      const updateToolbar = () => {
-        if (setToolbar) setToolbar(null);
-      };
+      const updateToolbar = React.useCallback(
+        () => {
+          if (setToolbar)
+            setToolbar(
+              <HomePageHeader
+                onOpenLanguageDialog={onOpenLanguageDialog}
+                onOpenProfile={onOpenProfile}
+                onOpenProjectManager={onOpenProjectManager}
+              />
+            );
+        },
+        [setToolbar, onOpenLanguageDialog, onOpenProfile, onOpenProjectManager]
+      );
 
-      const forceUpdateEditor = () => {
+      const forceUpdateEditor = React.useCallback(() => {
         // No updates to be done
-      };
+      }, []);
 
       React.useImperativeHandle(ref, () => ({
         getProject,
@@ -150,12 +160,6 @@ export const HomePage = React.memo<Props>(
           {({ i18n }) => (
             <>
               <Column expand noMargin>
-                <HomePageHeader
-                  project={project}
-                  onOpenLanguageDialog={onOpenLanguageDialog}
-                  onOpenProfile={onOpenProfile}
-                  onOpenProjectManager={onOpenProjectManager}
-                />
                 <Line expand noMargin useFullHeight>
                   <HomePageMenu
                     activeTab={activeTab}

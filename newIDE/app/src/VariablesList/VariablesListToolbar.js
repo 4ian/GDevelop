@@ -90,7 +90,6 @@ const VariablesListToolbar = (props: Props) => {
             ({ key, Icon, label, tooltip, onClick, disabled }, index) => (
               <React.Fragment key={key}>
                 {index > 0 ? <Spacer /> : null}
-                {/* TODO: Group undo/redo + only icons */}
                 {props.isNarrow ? (
                   <IconButton
                     key={key}

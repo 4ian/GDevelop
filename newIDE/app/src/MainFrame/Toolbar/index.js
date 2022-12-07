@@ -22,16 +22,7 @@ export type ToolbarInterface = {|
 
 export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
   function MainframeToolbar(props: MainFrameToolbarProps, ref) {
-    const [
-      editorToolbarNode,
-      setEditorToolbarNode,
-    ] = React.useState<React.Node | null>(null);
-    const setEditorToolbar = React.useCallback(
-      (editorToolbarNode: React.Node | null) => {
-        setEditorToolbarNode(editorToolbarNode);
-      },
-      []
-    );
+    const [editorToolbar, setEditorToolbar] = React.useState<?React.Node>(null);
     React.useImperativeHandle(ref, () => ({
       setEditorToolbar,
     }));
@@ -67,7 +58,7 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
             </ToolbarGroup>
           </>
         ) : null}
-        {editorToolbarNode || <ToolbarGroup />}
+        {editorToolbar || <ToolbarGroup />}
       </Toolbar>
     );
   }

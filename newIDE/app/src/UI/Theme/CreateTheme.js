@@ -445,7 +445,6 @@ export function createGdevelopTheme({
       },
       closableTabs: {
         fontFamily: styles['GdevelopModernFontFamily'],
-        containerBackgroundColor: styles['ThemeSurfaceCanvasBackgroundColor'], // TODO?
         backgroundColor: styles['ThemeClosableTabsDefaultBackgroundColor'],
         textColor: styles['ThemeClosableTabsDefaultColor'],
         selectedBackgroundColor:

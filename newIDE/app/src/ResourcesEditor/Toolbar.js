@@ -1,12 +1,12 @@
 // @flow
 import { t } from '@lingui/macro';
-import { IconButton } from '@material-ui/core';
 import React, { PureComponent } from 'react';
 import FolderIcon from '../UI/CustomSvgIcons/Folder';
 import TrashIcon from '../UI/CustomSvgIcons/Trash';
 import PropertiesPanelIcon from '../UI/CustomSvgIcons/PropertiesPanel';
 import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
+import IconButton from '../UI/IconButton';
 
 type Props = {|
   onOpenProjectFolder: () => void,

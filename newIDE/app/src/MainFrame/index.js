@@ -2654,7 +2654,6 @@ const MainFrame = (props: Props) => {
 
   const showLoader = isLoadingProject || previewLoading;
 
-  // TODO: do something to ensure stability?
   const shortcutMap = useShortcutMap();
   const buildMainMenuProps = {
     i18n: i18n,

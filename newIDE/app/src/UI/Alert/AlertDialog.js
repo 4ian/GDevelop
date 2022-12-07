@@ -13,6 +13,7 @@ type Props = {|
   title: MessageDescriptor,
   message: MessageDescriptor,
   onDismiss: () => void,
+  dismissText?: MessageDescriptor,
 |};
 
 function AlertDialog(props: Props) {
@@ -27,7 +28,13 @@ function AlertDialog(props: Props) {
             <FlatButton
               key="dismiss"
               keyboardFocused
-              label={<Trans>OK</Trans>}
+              label={
+                props.dismissText ? (
+                  i18n._(props.dismissText)
+                ) : (
+                  <Trans>OK</Trans>
+                )
+              }
               onClick={props.onDismiss}
             />,
           ]}

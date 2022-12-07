@@ -1,12 +1,14 @@
 // @flow
-
+import * as React from 'react';
 import optionalRequire from './OptionalRequire';
 import URLSearchParams from 'url-search-params';
 import { isWindows } from './Platform';
+import debounce from 'lodash/debounce';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const shell = electron ? electron.shell : null;
 const dialog = remote ? remote.dialog : null;
+const ipcRenderer = electron ? electron.ipcRenderer : null;
 
 export type AppArguments = { [string]: any };
 type YesNoCancelDialogChoice = 'yes' | 'no' | 'cancel';
@@ -18,6 +20,46 @@ type YesNoCancelDialogChoice = 'yes' | 'no' | 'cancel';
 export const POSITIONAL_ARGUMENTS_KEY = '_';
 
 let currentTitleBarColor: ?string = null;
+
+/**
+ * Listen to the changes to the window controls provided by the operating system:
+ *
+ * - An installed PWA can have window controls displayed as overlay. If supported,
+ * we set up a listener to detect any change and notify the caller.
+ * - On Electron, the window controls are always integrated in the app - so this does nothing.
+ */
+export const useWindowControlsOverlayWatcher = ({
+  onChanged,
+}: {|
+  onChanged: () => void,
+|}) => {
+  // $FlowFixMe - this API is not handled by Flow.
+  const { windowControlsOverlay } = navigator;
+
+  React.useEffect(
+    () => {
+      let listenerCallback = null;
+      if (windowControlsOverlay) {
+        listenerCallback = debounce(() => {
+          onChanged();
+        }, 50);
+        windowControlsOverlay.addEventListener(
+          'geometrychange',
+          listenerCallback
+        );
+      }
+      return () => {
+        if (listenerCallback) {
+          windowControlsOverlay.removeEventListener(
+            'geometrychange',
+            listenerCallback
+          );
+        }
+      };
+    },
+    [onChanged, windowControlsOverlay]
+  );
+};
 
 /**
  * Various utilities related to the app window management.
@@ -42,14 +84,17 @@ export default class Window {
   }
 
   static setTitleBarColor(newColor: string) {
-    if (electron) {
-      // Nothing to do, the title bar is using the system window management.
-      return;
-    }
-
     if (currentTitleBarColor === newColor) {
       // Avoid potentially expensive DOM query/modification if no changes needed.
       return;
+    }
+
+    if (ipcRenderer) {
+      ipcRenderer.invoke('titlebar-set-overlay-options', {
+        color: newColor,
+        symbolColor: '#ffffff',
+      });
+      currentTitleBarColor = newColor;
     }
 
     const metaElement = document.querySelector('meta[name="theme-color"]');

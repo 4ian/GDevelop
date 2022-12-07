@@ -12,7 +12,6 @@ import RaisedButton from '../UI/RaisedButton';
 import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
-import MoreVert from '@material-ui/icons/MoreVert';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import MiniToolbar from '../UI/MiniToolbar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
@@ -27,6 +26,7 @@ import ColorField from '../UI/ColorField';
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import ScrollView from '../UI/ScrollView';
+import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 
 const gd: libGDevelop = global.gd;
 
@@ -208,7 +208,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                     <ElementWithMenu
                       element={
                         <IconButton>
-                          <MoreVert />
+                          <ThreeDotsMenu />
                         </IconButton>
                       }
                       buildMenuTemplate={(i18n: I18nType) => [

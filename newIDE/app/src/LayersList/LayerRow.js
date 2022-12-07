@@ -13,12 +13,12 @@ import Delete from '@material-ui/icons/Delete';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import DragHandle from '../UI/DragHandle';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
-import MoreVert from '@material-ui/icons/MoreVert';
 import EmojiObjectsIcon from '@material-ui/icons/EmojiObjects';
 import EditIcon from '@material-ui/icons/Edit';
 import Badge from '../UI/Badge';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('layers-list');
 
@@ -115,7 +115,7 @@ const LayerRow = ({
                       <ElementWithMenu
                         element={
                           <IconButton size="small">
-                            <MoreVert />
+                            <ThreeDotsMenu />
                           </IconButton>
                         }
                         buildMenuTemplate={(i18n: I18nType) => [

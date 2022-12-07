@@ -7,7 +7,6 @@ import { differenceInCalendarDays, format } from 'date-fns';
 
 import PhoneIphone from '@material-ui/icons/PhoneIphone';
 import LaptopMac from '@material-ui/icons/LaptopMac';
-import MoreVert from '@material-ui/icons/MoreVert';
 
 import { Line, LargeSpacer, Spacer, Column } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
@@ -38,6 +37,7 @@ import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import Window from '../../Utils/Window';
 import CircularProgress from '../../UI/CircularProgress';
+import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
 
 const styles = {
   icon: {
@@ -215,7 +215,7 @@ export const BuildCard = ({
               <ElementWithMenu
                 element={
                   <IconButton size="small" disabled={gameUpdating}>
-                    <MoreVert />
+                    <ThreeDotsMenu />
                   </IconButton>
                 }
                 buildMenuTemplate={(i18n: I18nType) => [

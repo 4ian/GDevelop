@@ -3,7 +3,6 @@ import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import MoreVert from '@material-ui/icons/MoreVert';
 import Add from '@material-ui/icons/Add';
 
 import { Column, Line, Spacer } from '../UI/Grid';
@@ -40,6 +39,7 @@ import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('effects-list');
 
@@ -325,7 +325,7 @@ export default function EffectsList(props: Props) {
                                     <ElementWithMenu
                                       element={
                                         <IconButton size="small">
-                                          <MoreVert />
+                                          <ThreeDotsMenu />
                                         </IconButton>
                                       }
                                       buildMenuTemplate={(i18n: I18nType) => [

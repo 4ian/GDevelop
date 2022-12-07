@@ -65,7 +65,7 @@ export const onOpen = (
   });
 };
 
-export const hasAutoSave = (
+export const hasAutoSave = async (
   fileMetadata: FileMetadata,
   compareLastModified: boolean
 ): Promise<boolean> => {
@@ -73,21 +73,25 @@ export const hasAutoSave = (
   const autoSavePath = filePath + '.autosave';
   if (fs.existsSync(autoSavePath)) {
     if (!compareLastModified) {
-      return Promise.resolve(true);
+      return true;
     }
     try {
       const autoSavedTime = fs.statSync(autoSavePath).mtime.getTime();
       const saveTime = fs.statSync(filePath).mtime.getTime();
-      if (autoSavedTime > saveTime) {
-        return Promise.resolve(true);
+      // When comparing the last modified time, add a 5 seconds margin to avoid
+      // showing the warning if the user has just saved the project, or if the
+      // project has been decompressed from a zip file, causing the last modified
+      // time to be the time of decompression.
+      if (autoSavedTime > saveTime + 5000) {
+        return true;
       }
     } catch (err) {
       console.error('Unable to compare *.autosave to project', err);
-      return Promise.resolve(false);
+      return false;
     }
-    return Promise.resolve(false);
+    return false;
   }
-  return Promise.resolve(false);
+  return false;
 };
 
 export const onGetAutoSave = (fileMetadata: FileMetadata) => {

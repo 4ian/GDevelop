@@ -78,7 +78,11 @@ export const hasAutoSave = async (
     try {
       const autoSavedTime = fs.statSync(autoSavePath).mtime.getTime();
       const saveTime = fs.statSync(filePath).mtime.getTime();
-      if (autoSavedTime > saveTime) {
+      // When comparing the last modified time, add a 5 seconds margin to avoid
+      // showing the warning if the user has just saved the project, or if the
+      // project has been decompressed from a zip file, causing the last modified
+      // time to be the time of decompression.
+      if (autoSavedTime > saveTime + 5000) {
         return true;
       }
     } catch (err) {

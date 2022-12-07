@@ -820,9 +820,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     .concat(
                       <AddListItem
                         key={'add-external-events'}
-                        primaryText={
-                          <Trans>Add external events</Trans>
-                        }
+                        primaryText={<Trans>Add external events</Trans>}
                         onClick={() =>
                           this._addExternalEvents(
                             project.getExternalEventsCount(),
@@ -891,9 +889,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     .concat(
                       <AddListItem
                         key={'add-external-layout'}
-                        primaryText={
-                          <Trans>Add external layout</Trans>
-                        }
+                        primaryText={<Trans>Add external layout</Trans>}
                         onClick={() =>
                           this._addExternalLayout(
                             project.getExternalLayoutsCount(),

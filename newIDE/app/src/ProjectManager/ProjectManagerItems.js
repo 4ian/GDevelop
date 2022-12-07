@@ -59,7 +59,11 @@ export const ProjectStructureItem = ({
       open={open}
       autoGenerateNestedIndicator={autoGenerateNestedIndicator}
       initiallyOpen={initiallyOpen}
-      primaryText={<Text size="sub-title" noMargin>{primaryText}</Text>}
+      primaryText={
+        <Text size="sub-title" noMargin>
+          {primaryText}
+        </Text>
+      }
       renderNestedItems={renderNestedItems}
       onReload={onRefresh}
       style={{

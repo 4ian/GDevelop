@@ -52,20 +52,20 @@ const styles = {
 const cancelConfirmationTexts = {
   title: t`Cancel your subscription`,
   message: t`Are you sure you want to cancel your subscription?`,
-  confirmText: t`Cancel my subscription`,
-  dismissText: t`Go back`,
+  confirmButtonLabel: t`Cancel my subscription`,
+  dismissButtonLabel: t`Go back`,
 };
 const seamlesslyChangeConfirmationTexts = {
   title: t`Update your subscription`,
   message: t`Are you sure you want to subscribe to this new plan? Your next payment will be pro-rated.`,
-  confirmText: t`Update my subscription`,
-  dismissText: t`Go back`,
+  confirmButtonLabel: t`Update my subscription`,
+  dismissButtonLabel: t`Go back`,
 };
 const cancelAndChangeConfirmationTexts = {
   title: t`Cancel then get a new subscription`,
   message: t`To get a new subscription, we need to cancel your existing one before you can pay for the new one. The change will be immediate but your payment will NOT be pro-rated (you will have to pay as for a new subscription).`,
-  confirmText: t`Cancel my subscription`,
-  dismissText: t`Go back`,
+  confirmButtonLabel: t`Cancel my subscription`,
+  dismissButtonLabel: t`Go back`,
 };
 
 type Props = {|

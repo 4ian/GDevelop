@@ -15,11 +15,11 @@ type Props = {|
   title: MessageDescriptor,
   message: MessageDescriptor,
   fieldMessage: MessageDescriptor,
-  confirmHintText: string,
+  confirmText: string,
   onConfirm: () => void,
   onDismiss: () => void,
-  confirmText?: MessageDescriptor,
-  dismissText?: MessageDescriptor,
+  confirmButtonLabel?: MessageDescriptor,
+  dismissButtonLabel?: MessageDescriptor,
 |};
 
 function ConfirmDeleteDialog(props: Props) {
@@ -47,8 +47,8 @@ function ConfirmDeleteDialog(props: Props) {
             <FlatButton
               key="cancel"
               label={
-                props.dismissText ? (
-                  i18n._(props.dismissText)
+                props.dismissButtonLabel ? (
+                  i18n._(props.dismissButtonLabel)
                 ) : (
                   <Trans>Cancel</Trans>
                 )
@@ -59,8 +59,8 @@ function ConfirmDeleteDialog(props: Props) {
             <DialogPrimaryButton
               key="confirm"
               label={
-                props.confirmText ? (
-                  i18n._(props.confirmText)
+                props.confirmButtonLabel ? (
+                  i18n._(props.confirmButtonLabel)
                 ) : (
                   <Trans>Confirm</Trans>
                 )
@@ -80,7 +80,7 @@ function ConfirmDeleteDialog(props: Props) {
             floatingLabelText={i18n._(props.fieldMessage)}
             value={textInput}
             onChange={(e, text) => setTextInput(text)}
-            hintText={props.confirmHintText}
+            hintText={props.confirmText}
           />
         </Dialog>
       )}

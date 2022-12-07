@@ -855,8 +855,8 @@ const MainFrame = (props: Props) => {
         const answer = await showConfirmation({
           title: t`This project has an auto-saved version`,
           message: t`GDevelop automatically saved a newer version of this project. This new version might differ from the one that you manually saved. Which version would you like to open?`,
-          dismissText: t`My manual save`,
-          confirmText: t`GDevelop auto-save`,
+          dismissButtonLabel: t`My manual save`,
+          confirmButtonLabel: t`GDevelop auto-save`,
         });
 
         if (!answer) return fileMetadata;
@@ -874,7 +874,7 @@ const MainFrame = (props: Props) => {
         const answer = await showConfirmation({
           title: t`This project cannot be opened`,
           message: t`The project file appears to be corrupted, but an autosave file exists (backup made automatically by GDevelop). Would you like to try to load it instead?`,
-          confirmText: t`Load autosave`,
+          confirmButtonLabel: t`Load autosave`,
         });
         if (!answer) return null;
         return onGetAutoSave(fileMetadata);
@@ -919,7 +919,7 @@ const MainFrame = (props: Props) => {
             fileMetadata
           );
           serializedProject.delete();
-          return Promise.resolve(state);
+          return state;
         } catch (err) {
           serializedProject.delete();
           throw err;
@@ -2389,7 +2389,7 @@ const MainFrame = (props: Props) => {
       return showConfirmation({
         title: t`Project name changed`,
         message: t`Your project name has changed, this will also save the whole project, continue?`,
-        confirmText: t`Save and continue`,
+        confirmButtonLabel: t`Save and continue`,
       });
     }
     return true;

@@ -4,10 +4,10 @@ import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
-import React, { PureComponent } from 'react';
+import * as React from 'react';
 import TextField from '../TextField';
-import RaisedButton from '../RaisedButton';
 import optionalRequire from '../../Utils/OptionalRequire';
+import FlatButton from '../FlatButton';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
@@ -39,26 +39,29 @@ type TitleAndMessage = {|
   message: string,
 |};
 
-export default class LocalFolderPicker extends PureComponent<Props, {||}> {
-  _onChooseFolder = ({ title, message }: TitleAndMessage) => {
+const LocalFolderPicker = ({
+  type,
+  value,
+  onChange,
+  defaultPath,
+  fullWidth,
+}: Props) => {
+  const onChooseFolder = async ({ title, message }: TitleAndMessage) => {
     if (!dialog || !electron) return;
 
     const browserWindow = remote.getCurrentWindow();
-    dialog
-      .showOpenDialog(browserWindow, {
-        title,
-        properties: ['openDirectory', 'createDirectory'],
-        message,
-        defaultPath: this.props.defaultPath,
-      })
-      .then(({ filePaths }) => {
-        if (!filePaths || !filePaths.length) return;
-        this.props.onChange(filePaths[0]);
-      });
+    const { filePaths } = await dialog.showOpenDialog(browserWindow, {
+      title,
+      properties: ['openDirectory', 'createDirectory'],
+      message,
+      defaultPath: defaultPath,
+    });
+
+    if (!filePaths || !filePaths.length) return;
+    onChange(filePaths[0]);
   };
 
-  _getTitleAndMessage = (i18n: I18nType): TitleAndMessage => {
-    const { type } = this.props;
+  const getTitleAndMessage = (i18n: I18nType): TitleAndMessage => {
     if (type === 'export') {
       return {
         title: i18n._(t`Choose an export folder`),
@@ -77,36 +80,35 @@ export default class LocalFolderPicker extends PureComponent<Props, {||}> {
     };
   };
 
-  render() {
-    return (
-      <I18n>
-        {({ i18n }) => {
-          const titleAndMessage = this._getTitleAndMessage(i18n);
-          return (
-            <div
-              style={{
-                ...styles.container,
-                width: this.props.fullWidth ? '100%' : undefined,
-              }}
-            >
-              <TextField
-                margin="dense"
-                style={styles.textField}
-                type="text"
-                hintText={titleAndMessage.title}
-                value={this.props.value}
-                onChange={(event, value) => this.props.onChange(value)}
-              />
-              <RaisedButton
-                label={<Trans>Choose folder</Trans>}
-                primary={false}
-                style={styles.button}
-                onClick={() => this._onChooseFolder(titleAndMessage)}
-              />
-            </div>
-          );
-        }}
-      </I18n>
-    );
-  }
-}
+  return (
+    <I18n>
+      {({ i18n }) => {
+        const titleAndMessage = getTitleAndMessage(i18n);
+        return (
+          <div
+            style={{
+              ...styles.container,
+              width: fullWidth ? '100%' : undefined,
+            }}
+          >
+            <TextField
+              margin="dense"
+              style={styles.textField}
+              type="text"
+              hintText={titleAndMessage.title}
+              value={value}
+              onChange={(event, value) => onChange(value)}
+            />
+            <FlatButton
+              label={<Trans>Choose folder</Trans>}
+              style={styles.button}
+              onClick={() => onChooseFolder(titleAndMessage)}
+            />
+          </div>
+        );
+      }}
+    </I18n>
+  );
+};
+
+export default LocalFolderPicker;

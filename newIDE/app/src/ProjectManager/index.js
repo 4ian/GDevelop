@@ -10,7 +10,6 @@ import SearchBar, {
   useShouldAutofocusSearchbar,
   type SearchBarInterface,
 } from '../UI/SearchBar';
-import ListIcon from '../UI/ListIcon';
 import { AddListItem, SearchListItem } from '../UI/ListCommonItem';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
@@ -48,7 +47,8 @@ import {
   ProjectStructureItem,
   EventFunctionExtensionItem,
 } from './ProjectManagerItems';
-import { Tooltip } from '@material-ui/core';
+import Tooltip from '@material-ui/core/Tooltip';
+import EditScene from '../UI/CustomSvgIcons/EditScene';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -639,13 +639,6 @@ export default class ProjectManager extends React.Component<Props, State> {
               <ProjectStructureItem
                 id={getTabId('game-settings')}
                 primaryText={<Trans>Game settings</Trans>}
-                leftIcon={
-                  <ListIcon
-                    iconSize={24}
-                    isGDevelopIcon
-                    src="res/ribbon_default/projectManager32.png"
-                  />
-                }
                 initiallyOpen
                 autoGenerateNestedIndicator={true}
                 indentNestedItems
@@ -683,13 +676,6 @@ export default class ProjectManager extends React.Component<Props, State> {
               <ProjectStructureItem
                 id={getTabId('scenes')}
                 primaryText={<Trans>Scenes</Trans>}
-                leftIcon={
-                  <ListIcon
-                    iconSize={24}
-                    isGDevelopIcon
-                    src="res/ribbon_default/sceneadd32.png"
-                  />
-                }
                 initiallyOpen
                 open={forceOpen}
                 autoGenerateNestedIndicator={!forceOpen}
@@ -706,6 +692,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                             default:
                               name === firstLayoutName ? 'true' : undefined,
                           }}
+                          leftIcon={<EditScene />}
                           primaryText={name}
                           textEndAdornment={
                             name === firstLayoutName ? (
@@ -777,13 +764,6 @@ export default class ProjectManager extends React.Component<Props, State> {
               <ProjectStructureItem
                 id={getTabId('external-events')}
                 primaryText={<Trans>External events</Trans>}
-                leftIcon={
-                  <ListIcon
-                    iconSize={24}
-                    isGDevelopIcon
-                    src="res/ribbon_default/externalevents32.png"
-                  />
-                }
                 initiallyOpen
                 open={forceOpen}
                 autoGenerateNestedIndicator={!forceOpen}
@@ -854,13 +834,6 @@ export default class ProjectManager extends React.Component<Props, State> {
               <ProjectStructureItem
                 id={getTabId('external-layouts')}
                 primaryText={<Trans>External layouts</Trans>}
-                leftIcon={
-                  <ListIcon
-                    iconSize={24}
-                    isGDevelopIcon
-                    src="res/ribbon_default/externallayout32.png"
-                  />
-                }
                 initiallyOpen
                 open={forceOpen}
                 autoGenerateNestedIndicator={!forceOpen}
@@ -933,13 +906,6 @@ export default class ProjectManager extends React.Component<Props, State> {
                 primaryText={<Trans>Extensions</Trans>}
                 error={eventsFunctionsExtensionsError}
                 onRefresh={onReloadEventsFunctionsExtensions}
-                leftIcon={
-                  <ListIcon
-                    iconSize={24}
-                    isGDevelopIcon
-                    src="res/ribbon_default/function32.png"
-                  />
-                }
                 initiallyOpen
                 open={forceOpen}
                 autoGenerateNestedIndicator={

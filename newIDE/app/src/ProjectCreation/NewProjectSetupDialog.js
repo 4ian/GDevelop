@@ -50,9 +50,7 @@ const generateProjectName = (sourceExampleName: ?string) =>
 type ResolutionOption =
   | 'mobilePortrait'
   | 'mobileLandscape'
-  | 'desktopSD'
   | 'desktopHD'
-  | 'retro';
 
 const resolutionOptions: {
   [key: ResolutionOption]: {|
@@ -78,12 +76,6 @@ const resolutionOptions: {
     label: t`Desktop Full HD - 1920x1080`,
     width: 1920,
     height: 1080,
-    orientation: 'default',
-  },
-  retro: {
-    label: t`Retro - 640x480`,
-    width: 640,
-    height: 480,
     orientation: 'default',
   },
 };
@@ -309,9 +301,6 @@ const NewProjectSetupDialog = ({
           floatingLabelText={<Trans>Resolution preset</Trans>}
           value={resolutionOption}
           onChange={(e, i, newValue: string) => {
-            if (newValue === 'retro') {
-              setOptimizeForPixelArt(true);
-            }
             // $FlowExpectedError - new value can only be option values.
             setResolutionOption(newValue);
           }}

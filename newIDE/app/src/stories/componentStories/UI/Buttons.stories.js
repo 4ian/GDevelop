@@ -20,6 +20,7 @@ import RaisedButton from '../../../UI/RaisedButton';
 import FlatButton from '../../../UI/FlatButton';
 import TextButton from '../../../UI/TextButton';
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
+import FlatButtonWithSplitMenu from '../../../UI/FlatButtonWithSplitMenu';
 import RaisedButtonWithMenu from '../../../UI/RaisedButtonWithMenu';
 import ElementWithMenu from '../../../UI/Menu/ElementWithMenu';
 import MiniToolbar, { MiniToolbarText } from '../../../UI/MiniToolbar';
@@ -114,23 +115,29 @@ export const Default = () => (
         onClick={action('onClick')()}
       />
       <RaisedButtonWithSplitMenu
-        label="Button with split menu"
-        onClick={action('onClick')()}
-        buildMenuTemplate={buildFakeMenuTemplate}
-      />
-      <RaisedButtonWithSplitMenu
-        label="Primary button with split menu"
+        label="Raised button with split menu"
         primary
         onClick={action('onClick')()}
         buildMenuTemplate={buildFakeMenuTemplate}
       />
-      <RaisedButtonWithSplitMenu
+      <FlatButtonWithSplitMenu
+        label="Flat primary button"
+        primary
+        onClick={action('onClick')()}
+        buildMenuTemplate={buildFakeMenuTemplate}
+      />
+      <FlatButtonWithSplitMenu
+        label="Flat non primary button"
+        onClick={action('onClick')()}
+        buildMenuTemplate={buildFakeMenuTemplate}
+      />
+      <FlatButtonWithSplitMenu
         label="... and with icon"
         icon={<Brush />}
         onClick={action('onClick')()}
         buildMenuTemplate={buildFakeMenuTemplate}
       />
-      <RaisedButtonWithSplitMenu
+      <FlatButtonWithSplitMenu
         label="... and disabled"
         icon={<Brush />}
         disabled

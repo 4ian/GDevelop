@@ -3,8 +3,6 @@ import * as React from 'react';
 import Button from '@material-ui/core/Button';
 import { type ButtonInterface } from './Button';
 import { Spacer } from './Grid';
-import Tooltip from '@material-ui/core/Tooltip';
-import { tooltipEnterDelay } from './Tooltip';
 
 // We support a subset of the props supported by Material-UI v0.x FlatButton
 // They should be self descriptive - refer to Material UI docs otherwise.
@@ -27,10 +25,6 @@ type Props = {|
   |},
   target?: '_blank',
   id?: ?string,
-
-  // Tooltips aren't really suited for TextButtons UX-wise, but we can use them for
-  // accessibility purpose for the Toolbar.
-  exceptionalTooltipForToolbar?: React.Node,
 |};
 
 /**
@@ -44,7 +38,6 @@ const FlatButton = React.forwardRef<Props, ButtonInterface>(
       leftIcon,
       rightIcon,
       keyboardFocused,
-      exceptionalTooltipForToolbar,
       disabled,
       id,
       ...otherProps
@@ -57,7 +50,7 @@ const FlatButton = React.forwardRef<Props, ButtonInterface>(
     // always visible to be sure we're getting focusing right.
     const focusRipple = true;
 
-    const button = (
+    return (
       <Button
         variant="outlined"
         size="small"
@@ -75,18 +68,6 @@ const FlatButton = React.forwardRef<Props, ButtonInterface>(
         {rightIcon && <Spacer />}
         {rightIcon}
       </Button>
-    );
-
-    return exceptionalTooltipForToolbar && !disabled ? (
-      <Tooltip
-        title={exceptionalTooltipForToolbar}
-        placement="bottom"
-        enterDelay={tooltipEnterDelay}
-      >
-        {button}
-      </Tooltip>
-    ) : (
-      button
     );
   }
 );

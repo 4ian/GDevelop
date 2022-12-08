@@ -18,7 +18,7 @@ import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEd
 import ResourcesLoader from '../ResourcesLoader';
 import { applyResourceDefaults } from './ResourceUtils';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
+import FlatButtonWithSplitMenu from '../UI/FlatButtonWithSplitMenu';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import IconButton from '../UI/IconButton';
 import RaisedButton from '../UI/RaisedButton';
@@ -337,7 +337,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
               />
             )}
             {externalEditors.length > 1 ? (
-              <RaisedButtonWithSplitMenu
+              <FlatButtonWithSplitMenu
                 icon={<Brush fontSize="small" />}
                 label={i18n._(
                   this.state.resourceName

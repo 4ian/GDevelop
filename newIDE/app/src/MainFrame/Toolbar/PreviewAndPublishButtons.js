@@ -3,13 +3,12 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { LineStackLayout } from '../../UI/Layout';
-import FlatButton from '../../UI/FlatButton';
 import RaisedButton from '../../UI/RaisedButton';
-import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import { type PreviewState } from '../PreviewState';
 import PreviewIcon from '../../UI/CustomSvgIcons/Preview';
 import UpdateIcon from '../../UI/CustomSvgIcons/Update';
 import PublishIcon from '../../UI/CustomSvgIcons/Publish';
+import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 
 export type PreviewAndPublishButtonsProps = {|
   onPreviewWithoutHotReload: () => void,
@@ -117,49 +116,17 @@ export default function PreviewAndPublishButtons({
     ]
   );
 
-  const onClickPreview = event => {
-    if (event.target) event.target.blur();
-    onHotReloadPreview();
-  };
-
   return (
     <LineStackLayout noMargin>
-      <ElementWithMenu
-        element={
-          <FlatButton
-            primary
-            onClick={onClickPreview}
-            disabled={!isPreviewEnabled}
-            leftIcon={hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />}
-            label={
-              hasPreviewsRunning ? (
-                <Trans>Update</Trans>
-              ) : (
-                <Trans>Preview</Trans>
-              )
-            }
-            id={'toolbar-preview-button'}
-            exceptionalTooltipForToolbar={
-              hasPreviewsRunning ? (
-                <Trans>
-                  Apply changes to the running preview, right click for more
-                </Trans>
-              ) : previewState.isPreviewOverriden ? (
-                <Trans>Preview is overridden, right click for more</Trans>
-              ) : previewState.previewExternalLayoutName ? (
-                <Trans>
-                  Launch a preview of the external layout inside the scene,
-                  right click for more
-                </Trans>
-              ) : (
-                <Trans>
-                  Launch a preview of the scene, right click for more
-                </Trans>
-              )
-            }
-          />
+      <FlatButtonWithSplitMenu
+        primary
+        onClick={onHotReloadPreview}
+        disabled={!isPreviewEnabled}
+        icon={hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />}
+        label={
+          hasPreviewsRunning ? <Trans>Update</Trans> : <Trans>Preview</Trans>
         }
-        openMenuWithSecondaryClick
+        id={'toolbar-preview-button'}
         buildMenuTemplate={previewBuildMenuTemplate}
       />
       <RaisedButton
@@ -168,9 +135,6 @@ export default function PreviewAndPublishButtons({
         icon={<PublishIcon />}
         label={<Trans>Publish</Trans>}
         id={'toolbar-publish-button'}
-        exceptionalTooltipForToolbar={
-          <Trans>Export the game (Web, Android, iOS...)</Trans>
-        }
       />
     </LineStackLayout>
   );

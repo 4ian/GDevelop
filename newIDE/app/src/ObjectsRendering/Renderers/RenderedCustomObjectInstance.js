@@ -202,12 +202,15 @@ const getLayouts = (
     }
 
     const name = property.getName();
+    const isNumber = property.getType() === 'Number';
     const propertyValueString = instanceProperties.get(name).getValue();
-    const propertyValueNumber = Number.parseFloat(propertyValueString) || 0;
+    const propertyValueNumber = isNumber
+      ? Number.parseFloat(propertyValueString) || 0
+      : 0;
     const layoutField = layoutFields.find(field => name.includes(field));
 
     let targetObjectName = '';
-    let anchorTarget = null;
+    let anchorTarget: ?number = null;
     if (
       layoutField === 'HorizontalAnchorOrigin' ||
       layoutField === 'VerticalAnchorOrigin'
@@ -218,11 +221,21 @@ const getLayouts = (
         targetProperty.getExtraInfo().size() > 0
           ? targetProperty.getExtraInfo().at(0)
           : '';
-      const anchorTargetName = instanceProperties.get(name).getValue();
+      const anchorTargetStringValue = instanceProperties
+        .get(targetPropertyName)
+        .getValue();
+      const targetIsNumber = targetProperty.getType() === 'Number';
+      const anchorTargetValueNumber = isNumber
+        ? Number.parseFloat(anchorTargetStringValue) || 0
+        : 0;
       if (layoutField === 'HorizontalAnchorOrigin') {
-        anchorTarget = getHorizontalAnchorValue(anchorTargetName);
+        anchorTarget = targetIsNumber
+          ? anchorTargetValueNumber
+          : getHorizontalAnchorValue(anchorTargetStringValue);
       } else {
-        anchorTarget = getVerticalAnchorValue(anchorTargetName);
+        anchorTarget = targetIsNumber
+          ? anchorTargetValueNumber
+          : getVerticalAnchorValue(anchorTargetStringValue);
       }
     }
 
@@ -245,16 +258,26 @@ const getLayouts = (
       } else if (layoutField === 'BottomPadding') {
         layout.verticalLayout.maxSideAbsoluteMargin = propertyValueNumber;
       } else if (layoutField === 'HorizontalAnchorOrigin') {
-        layout.horizontalLayout.anchorOrigin = getHorizontalAnchorValue(
-          propertyValueString
-        );
-        layout.horizontalLayout.anchorTarget = anchorTarget;
+        const anchorOrigin = isNumber
+          ? propertyValueNumber
+          : getHorizontalAnchorValue(propertyValueString);
+        if (anchorOrigin !== null) {
+          layout.horizontalLayout.anchorOrigin = anchorOrigin;
+        }
+        if (anchorTarget !== null) {
+          layout.horizontalLayout.anchorTarget = anchorTarget;
+        }
         layout.horizontalLayout.anchorTargetObject = targetObjectName;
       } else if (layoutField === 'VerticalAnchorOrigin') {
-        layout.verticalLayout.anchorOrigin = getVerticalAnchorValue(
-          propertyValueString
-        );
-        layout.verticalLayout.anchorTarget = anchorTarget;
+        const anchorOrigin = isNumber
+          ? propertyValueNumber
+          : getVerticalAnchorValue(propertyValueString);
+        if (anchorOrigin !== null) {
+          layout.verticalLayout.anchorOrigin = anchorOrigin;
+        }
+        if (anchorTarget !== null) {
+          layout.verticalLayout.anchorTarget = anchorTarget;
+        }
         layout.verticalLayout.anchorTargetObject = targetObjectName;
       }
     }
@@ -428,23 +451,23 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
         height -
         (childLayout.verticalLayout.maxSideAbsoluteMargin ||
           (childLayout.verticalLayout.maxSideProportionalMargin || 0) * height);
-      if (!childLayout.horizontalLayout.anchorOrigin) {
+      if (childLayout.horizontalLayout.anchorOrigin == null) {
         childInstance.x = childMinX;
         childInstance.setCustomWidth(childMaxX - childMinX);
       } else {
-        const anchorOrigin = childLayout.horizontalLayout.anchorOrigin;
-        const anchorTarget = childLayout.horizontalLayout.anchorTarget;
+        const anchorOrigin = childLayout.horizontalLayout.anchorOrigin || 0;
+        const anchorTarget = childLayout.horizontalLayout.anchorTarget || 0;
         // TODO Use anchorTargetObject instead of defaulting on the background
         childInstance.x =
           anchorTarget * width -
           anchorOrigin * renderedInstance.getDefaultWidth();
       }
-      if (!childLayout.verticalLayout.anchorOrigin) {
+      if (childLayout.verticalLayout.anchorOrigin == null) {
         childInstance.y = childMinY;
         childInstance.setCustomHeight(childMaxY - childMinY);
       } else {
-        const anchorOrigin = childLayout.verticalLayout.anchorOrigin;
-        const anchorTarget = childLayout.verticalLayout.anchorTarget;
+        const anchorOrigin = childLayout.verticalLayout.anchorOrigin || 0;
+        const anchorTarget = childLayout.verticalLayout.anchorTarget || 0;
         // TODO Use anchorTargetObject instead of defaulting on the background
         childInstance.y =
           anchorTarget * height -
@@ -459,12 +482,12 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
       // This ensure objects are centered if their dimensions changed from the
       // custom ones (preferred ones).
       // For instance, text object dimensions change according to how the text is wrapped.
-      if (!childLayout.horizontalLayout.anchorOrigin) {
+      if (childLayout.horizontalLayout.anchorOrigin == null) {
         childInstance.x =
           (width - renderedInstance._pixiObject.width) / 2 +
           (childMinX + childMaxX - width) / 2;
       }
-      if (!childLayout.verticalLayout.anchorOrigin) {
+      if (childLayout.verticalLayout.anchorOrigin == null) {
         childInstance.y =
           (height - renderedInstance._pixiObject.height) / 2 +
           (childMinY + childMaxY - height) / 2;

@@ -15,7 +15,6 @@
 const shell = require('shelljs');
 const child = require('child_process');
 const { default: axios } = require('axios');
-const path = require('path');
 const args = require('minimist')(process.argv.slice(2));
 
 if (!args['extensionsGitPath']) {
@@ -111,12 +110,12 @@ const enrichCommits = rawCommits => {
         const shouldHide =
           lowerCaseMessage.includes("don't mention in changelog") ||
           lowerCaseMessage.includes("don't mention in the changelog") ||
-          lowerCaseMessage.includes("do not mention in changelog") ||
-          lowerCaseMessage.includes("do not mention in the changelog") ||
+          lowerCaseMessage.includes('do not mention in changelog') ||
+          lowerCaseMessage.includes('do not mention in the changelog') ||
           lowerCaseMessage.includes("don't show in changelog") ||
           lowerCaseMessage.includes("don't show in the changelog") ||
-          lowerCaseMessage.includes("do not show in changelog") ||
-          lowerCaseMessage.includes("do not show in the changelog") ||
+          lowerCaseMessage.includes('do not show in changelog') ||
+          lowerCaseMessage.includes('do not show in the changelog') ||
           lowerCaseMessage.startsWith('update translations') ||
           lowerCaseMessage === 'prettier' ||
           lowerCaseMessage === 'update jsextension.js' ||
@@ -237,7 +236,10 @@ const findAuthorNicknameInCommits = async commits => {
  */
 const formatCommitMessage = ({ commit, includeAuthor }) => {
   const author =
-    includeAuthor && !(['4ian', 'AlexandreSi', 'ClementPasteau'].includes(commit.authorNickname))
+    includeAuthor &&
+    !['4ian', 'AlexandreSi', 'ClementPasteau, D8H'].includes(
+      commit.authorNickname
+    )
       ? `(Thanks ${
           commit.authorNickname
             ? '@' + commit.authorNickname

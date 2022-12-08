@@ -126,7 +126,11 @@ const makeRenderItem = (i18n: I18nType) => (
     ? i18n._(option.translatableValue)
     : option.value;
   return (
-    <ListItem dense={true} component={'div'} style={autocompleteStyles.listItem}>
+    <ListItem
+      dense={true}
+      component={'div'}
+      style={autocompleteStyles.listItem}
+    >
       {option.renderIcon && <ListItemIcon>{option.renderIcon()}</ListItemIcon>}
       <ListItemText
         style={autocompleteStyles.listItemText}

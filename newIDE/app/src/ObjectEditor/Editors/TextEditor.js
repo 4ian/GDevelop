@@ -11,6 +11,9 @@ import ResourceSelector from '../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../ResourcesLoader';
 import { type EditorProps } from './EditorProps.flow';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Button from '@material-ui/core/Button';
+
 const gd = global.gd;
 
 const toolbarItemStyle = {
@@ -37,6 +40,8 @@ export default class TextEditor extends React.Component<EditorProps, void> {
     const textObjectConfiguration = gd.asTextObjectConfiguration(
       objectConfiguration
     );
+
+    const textAlignment = textObjectConfiguration.getTextAlignment();
 
     return (
       <Column noMargin>
@@ -97,6 +102,39 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             }}
             style={styles.checkbox}
           />
+          <ButtonGroup>
+            <Button
+              variant={textAlignment === 'left' ? 'contained' : 'outlined'}
+              color={textAlignment === 'left' ? 'secondary' : 'default'}
+              onClick={() => {
+                textObjectConfiguration.setTextAlignment('left');
+                this.forceUpdate();
+              }}
+              ref={this._trueButton}
+            >
+              <Trans>Left</Trans>
+            </Button>
+            <Button
+              variant={textAlignment === 'center' ? 'contained' : 'outlined'}
+              color={textAlignment === 'center' ? 'secondary' : 'default'}
+              onClick={() => {
+                textObjectConfiguration.setTextAlignment('center');
+                this.forceUpdate();
+              }}
+            >
+              <Trans>Center</Trans>
+            </Button>
+            <Button
+              variant={textAlignment === 'right' ? 'contained' : 'outlined'}
+              color={textAlignment === 'right' ? 'secondary' : 'default'}
+              onClick={() => {
+                textObjectConfiguration.setTextAlignment('right');
+                this.forceUpdate();
+              }}
+            >
+              <Trans>Right</Trans>
+            </Button>
+          </ButtonGroup>
           <MiniToolbarText>
             <Trans>Font:</Trans>
           </MiniToolbarText>

@@ -17,6 +17,8 @@ declare class gdTextObject extends gdObjectConfiguration {
   getColorR(): number;
   getColorG(): number;
   getColorB(): number;
+  setTextAlignment(textAlignment: string): void;
+  getTextAlignment(): string;
   delete(): void;
   ptr: number;
 };

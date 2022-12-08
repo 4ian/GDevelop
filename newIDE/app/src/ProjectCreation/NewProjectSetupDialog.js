@@ -109,7 +109,7 @@ const NewProjectSetupDialog = ({
   const [
     resolutionOption,
     setResolutionOption,
-  ] = React.useState<ResolutionOption>('desktopHD');
+  ] = React.useState<ResolutionOption>('mobileLandscape');
   const [optimizeForPixelArt, setOptimizeForPixelArt] = React.useState<boolean>(
     false
   );

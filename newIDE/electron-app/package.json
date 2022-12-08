@@ -23,8 +23,8 @@
     "appId": "com.gdevelop-app.ide",
     "extraResources": [
       {
-        "from": "../app/resources/examples",
-        "to": "examples"
+        "from": "../app/resources/in-app-tutorials",
+        "to": "in-app-tutorials"
       },
       {
         "from": "../app/resources/GDJS",
@@ -36,25 +36,29 @@
       }
     ],
     "linux": {
-      "target": [{
-        "target": "AppImage",
-        "arch": [
-          "x64",
-          "arm64"
-        ]
-      }, {
-        "target": "zip",
-        "arch": [
-          "x64",
-          "arm64"
-        ]
-      }, {
-        "target": "deb",
-        "arch": [
-          "x64",
-          "arm64"
-        ]
-      }]
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
     },
     "mac": {
       "category": "public.app-category.developer-tools",

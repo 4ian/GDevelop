@@ -1,25 +1,29 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import TranslateIcon from '@material-ui/icons/Translate';
 import FlatButton from '../../../UI/FlatButton';
 import { Column } from '../../../UI/Grid';
 import { LineStackLayout } from '../../../UI/Layout';
 import UserChip from '../../../UI/User/UserChip';
+import ProjectManager from '../../../UI/CustomSvgIcons/ProjectManager';
 import Window from '../../../Utils/Window';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import TextButton from '../../../UI/TextButton';
+import IconButton from '../../../UI/IconButton';
 const electron = optionalRequire('electron');
 
 type Props = {|
+  hasProject: boolean,
   onOpenProjectManager: () => void,
   onOpenProfile: () => void,
   onOpenLanguageDialog: () => void,
 |};
 
 export const HomePageHeader = ({
+  hasProject,
   onOpenProjectManager,
   onOpenProfile,
   onOpenLanguageDialog,
@@ -30,11 +34,21 @@ export const HomePageHeader = ({
     <I18n>
       {({ i18n }) => (
         <LineStackLayout
-          justifyContent="flex-end"
+          justifyContent="space-between"
           alignItems="center"
           noMargin
           expand
         >
+          <IconButton
+            size="small"
+            id="main-toolbar-project-manager-button"
+            onClick={onOpenProjectManager}
+            tooltip={t`Project Manager`}
+            color="default"
+            disabled={!hasProject}
+          >
+            <ProjectManager />
+          </IconButton>
           <Column>
             <LineStackLayout noMargin alignItems="center">
               {!electron && windowWidth !== 'small' && (

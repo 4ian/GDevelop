@@ -132,13 +132,20 @@ export const HomePage = React.memo<Props>(
           if (setToolbar)
             setToolbar(
               <HomePageHeader
+                hasProject={!!project}
                 onOpenLanguageDialog={onOpenLanguageDialog}
                 onOpenProfile={onOpenProfile}
                 onOpenProjectManager={onOpenProjectManager}
               />
             );
         },
-        [setToolbar, onOpenLanguageDialog, onOpenProfile, onOpenProjectManager]
+        [
+          setToolbar,
+          onOpenLanguageDialog,
+          onOpenProfile,
+          onOpenProjectManager,
+          project,
+        ]
       );
 
       const forceUpdateEditor = React.useCallback(() => {

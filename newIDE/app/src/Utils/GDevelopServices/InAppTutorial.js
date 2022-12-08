@@ -50,10 +50,11 @@ const fetchVersionnedLocalFileIfDesktop = async (
 export const fetchInAppTutorialShortHeaders = async (): Promise<
   Array<InAppTutorialShortHeader>
 > => {
-  const localData = await fetchVersionnedLocalFileIfDesktop(
+  const inAppTutorialShortHeadersStoredLocally = await fetchVersionnedLocalFileIfDesktop(
     'in-app-tutorial-short-header'
   );
-  if (localData) return localData;
+  if (inAppTutorialShortHeadersStoredLocally)
+    return inAppTutorialShortHeadersStoredLocally;
 
   const response = await axios.get(
     `${GDevelopAssetApi.baseUrl}/in-app-tutorial-short-header`
@@ -64,8 +65,10 @@ export const fetchInAppTutorialShortHeaders = async (): Promise<
 export const fetchInAppTutorial = async (
   shortHeader: InAppTutorialShortHeader
 ): Promise<InAppTutorial> => {
-  const localData = await fetchVersionnedLocalFileIfDesktop(shortHeader.id);
-  if (localData) return localData;
+  const inAppTutorialStoredLocally = await fetchVersionnedLocalFileIfDesktop(
+    shortHeader.id
+  );
+  if (inAppTutorialStoredLocally) return inAppTutorialStoredLocally;
 
   const response = await axios.get(shortHeader.contentUrl);
   return response.data;

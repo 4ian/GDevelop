@@ -2491,6 +2491,15 @@ const MainFrame = (props: Props) => {
         currentProject.setTemplateSlug(selectedExampleShortHeader.slug);
       if (newProjectSetup.projectName)
         currentProject.setName(newProjectSetup.projectName);
+      currentProject.setGameResolutionSize(
+        newProjectSetup.width,
+        newProjectSetup.height
+      );
+      currentProject.setOrientation(newProjectSetup.orientation);
+      if (newProjectSetup.optimizeForPixelArt) {
+        currentProject.setPixelsRounding(true);
+        currentProject.setScaleMode('nearest');
+      }
 
       const destinationStorageProviderOperations = getStorageProviderOperations(
         newProjectSetup.storageProvider

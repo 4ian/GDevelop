@@ -63,6 +63,7 @@ export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
       rightSideOffset = window.innerWidth - x - width;
     }
   }
+  const rightSideAdditionalOffsetToGiveSpaceToDrag = 30;
 
   return (
     <div style={{ ...styles.container, backgroundColor }}>
@@ -90,7 +91,8 @@ export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
       <div
         style={{
           ...styles.rightSideArea,
-          minWidth: rightSideOffset,
+          minWidth:
+            rightSideOffset + rightSideAdditionalOffsetToGiveSpaceToDrag,
         }}
         className={DRAGGABLE_PART_CLASS_NAME}
       />

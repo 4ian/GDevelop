@@ -112,9 +112,6 @@ export const installResource = (
   let newResource = null;
   if (serializedResource.kind === 'image') {
     newResource = new gd.ImageResource();
-    newResource.setSmooth(
-      project.getScaleMode() !== 'nearest' && !isPixelArt(asset)
-    );
   } else if (serializedResource.kind === 'audio') {
     newResource = new gd.AudioResource();
   } else if (serializedResource.kind === 'font') {
@@ -130,6 +127,13 @@ export const installResource = (
   }
 
   unserializeFromJSObject(newResource, serializedResource);
+
+  if (newResource.getKind() === 'image') {
+    // $FlowExpectedError[prop-missing] - We know the resource is an ImageResource and has the setSmooth method.
+    newResource.setSmooth(
+      project.getScaleMode() !== 'nearest' && !isPixelArt(asset)
+    );
+  }
 
   const newName = newNameGenerator(originalResourceName, name =>
     resourcesManager.hasResource(name)

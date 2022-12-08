@@ -282,6 +282,27 @@ const NewProjectSetupDialog = ({
             />
           )}
         </SelectField>
+        {needUserAuthentication && (
+          <Paper background="dark" variant="outlined">
+            <Line justifyContent="center">
+              <CreateProfile
+                onLogin={authenticatedUser.onLogin}
+                onCreateAccount={authenticatedUser.onCreateAccount}
+                message={
+                  <Trans>Create an account to store your project online.</Trans>
+                }
+              />
+            </Line>
+          </Paper>
+        )}
+        {!needUserAuthentication &&
+          storageProvider.onRenderNewProjectSaveAsLocationChooser &&
+          storageProvider.onRenderNewProjectSaveAsLocationChooser({
+            projectName,
+            saveAsLocation,
+            setSaveAsLocation,
+            newProjectsDefaultFolder,
+          })}
         <SelectField
           fullWidth
           disabled={isOpening}
@@ -308,27 +329,6 @@ const NewProjectSetupDialog = ({
           }}
           disabled={isOpening}
         />
-        {needUserAuthentication && (
-          <Paper background="dark">
-            <Line justifyContent="center">
-              <CreateProfile
-                onLogin={authenticatedUser.onLogin}
-                onCreateAccount={authenticatedUser.onCreateAccount}
-                message={
-                  <Trans>Create an account to store your project online.</Trans>
-                }
-              />
-            </Line>
-          </Paper>
-        )}
-        {!needUserAuthentication &&
-          storageProvider.onRenderNewProjectSaveAsLocationChooser &&
-          storageProvider.onRenderNewProjectSaveAsLocationChooser({
-            projectName,
-            saveAsLocation,
-            setSaveAsLocation,
-            newProjectsDefaultFolder,
-          })}
         {limits && hasTooManyCloudProjects ? (
           <MaxProjectCountAlertMessage
             limits={limits}

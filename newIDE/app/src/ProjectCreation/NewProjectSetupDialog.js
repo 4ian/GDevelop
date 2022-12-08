@@ -169,6 +169,7 @@ const NewProjectSetupDialog = ({
               onClick={() =>
                 setProjectName(generateProjectName(sourceExampleName))
               }
+              tooltip={t`Generate random name`}
             >
               <Refresh />
             </IconButton>

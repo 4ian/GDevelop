@@ -1,4 +1,5 @@
-import React, { useState, useRef, useCallback } from 'react';
+// @flow
+import * as React from 'react';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
@@ -8,18 +9,73 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Divider from '@material-ui/core/Divider';
 import Fade from '@material-ui/core/Fade';
+import makeStyles from '@material-ui/styles/makeStyles';
+import { adaptAcceleratorString } from '../AcceleratorString';
+import { type MenuItemTemplate } from './Menu.flow';
+
+const useStyles = makeStyles({
+  popOverRoot: {
+    // Put a `pointer-events: none` on the root of the "popover" which is showing
+    // submenus as only the menu is supposed to receive clicks.
+    pointerEvents: 'none',
+  },
+});
 
 const styles = {
-  menuItemWithSubMenu: { justifyContent: 'space-between' },
   divider: { marginLeft: 16, marginRight: 16 },
+  labelWithAccelerator: {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+  accelerator: { opacity: 0.65, marginLeft: 16 },
+  menuItemWithSubMenu: { height: 32, justifyContent: 'space-between' },
+  menuItem: {
+    // Force every menu item to have the same height, even if it's a submenu
+    // or if it has an icon.
+    height: 32,
+  },
 };
 
 const SubMenuItem = ({ item, buildFromTemplate }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const anchorElement = useRef(null);
-  const setAnchorElement = useCallback(element => {
-    anchorElement.current = element;
-  }, []);
+  const popoverStyles = useStyles();
+  const currentlyHovering = React.useRef(false);
+  const [anchorElement, setAnchorElement] = React.useState(null);
+
+  const handleOpen = event => {
+    // $FlowFixMe - even if not defined, not a problem.
+    if (item.enabled === false) {
+      return;
+    }
+
+    if (!anchorElement) {
+      setAnchorElement(event.currentTarget);
+    }
+  };
+
+  function handleHover() {
+    // When we hover the menu item or the submenu, we remember it
+    // so it's not closed.
+    currentlyHovering.current = true;
+  }
+
+  function handleClose() {
+    setAnchorElement(null);
+  }
+
+  function handleLeave() {
+    // Unless overwrote in the meantime, we consider that
+    // we're not hovering the menu anymore...
+    currentlyHovering.current = false;
+
+    // ...But give 75ms to the user before closing the menu,
+    // if it the menu or the item was not hovered again in the meantime.
+    setTimeout(() => {
+      if (!currentlyHovering.current) {
+        handleClose();
+      }
+    }, 75);
+  }
 
   return (
     <React.Fragment>
@@ -27,27 +83,39 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
         dense
         style={styles.menuItemWithSubMenu}
         key={item.label}
-        disabled={item.enabled === false}
-        onClick={event => {
-          if (item.enabled === false) {
-            return;
-          }
-
-          if (!anchorElement.current) {
-            setAnchorElement(event.currentTarget);
-          }
-
-          setMenuOpen(!menuOpen);
-        }}
+        disabled={
+          // $FlowFixMe - even if not defined, not a problem.
+          item.enabled === false
+        }
+        onClick={handleOpen}
+        onPointerOver={handleOpen}
+        onPointerLeave={handleLeave}
       >
         {item.label}
-        <ArrowRightIcon ref={anchorElement} />
+        <ArrowRightIcon />
       </MenuItem>
       <Menu
-        open={menuOpen}
-        anchorEl={anchorElement.current}
-        onClose={() => setMenuOpen(false)}
+        open={!!anchorElement}
+        anchorEl={anchorElement}
+        onClose={handleClose}
         TransitionComponent={Fade}
+        MenuListProps={{
+          onPointerEnter: handleHover,
+          onPointerLeave: handleLeave,
+
+          // Only the menu, when shown, can receive clicks
+          // (not the background, see `popoverStyles.popOverRoot`).
+          style: { pointerEvents: 'auto' },
+        }}
+        getContentAnchorEl={
+          // Counterintuitive, but necessary
+          // as per https://github.com/mui/material-ui/issues/7961#issuecomment-326116559.
+          null
+        }
+        anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+        PopoverClasses={{
+          root: popoverStyles.popOverRoot,
+        }}
       >
         {buildFromTemplate(item.submenu)}
       </Menu>
@@ -70,19 +138,20 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
  *  - submenu
  */
 export default class MaterialUIMenuImplementation {
-  constructor({ onClose }) {
+  _onClose: () => void;
+  constructor({ onClose }: {| onClose: () => void |}) {
     this._onClose = onClose;
   }
 
-  buildFromTemplate(template) {
+  buildFromTemplate(template: Array<MenuItemTemplate>) {
     return template
       .map((item, id) => {
         if (item.visible === false) return null;
 
         // Accelerator is not implemented for Material-UI menus
-        // const accelerator = item.accelerator
-        //   ? adaptAcceleratorString(item.accelerator)
-        //   : undefined;
+        const accelerator = item.accelerator
+          ? adaptAcceleratorString(item.accelerator)
+          : undefined;
 
         if (item.type === 'separator') {
           return <Divider key={'separator' + id} style={styles.divider} />;
@@ -91,8 +160,14 @@ export default class MaterialUIMenuImplementation {
             <MenuItem
               dense
               key={'checkbox' + item.label}
-              checked={item.checked}
-              disabled={item.enabled === false}
+              checked={
+                // $FlowFixMe - existence should be inferred by Flow.
+                item.checked
+              }
+              disabled={
+                // $FlowFixMe - existence should be inferred by Flow.
+                item.enabled === false
+              }
               onClick={() => {
                 if (item.enabled === false) {
                   return;
@@ -103,6 +178,7 @@ export default class MaterialUIMenuImplementation {
                 }
                 this._onClose();
               }}
+              style={styles.menuItem}
             >
               <ListItemIcon>
                 {item.checked ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
@@ -134,8 +210,16 @@ export default class MaterialUIMenuImplementation {
                   this._onClose();
                 }
               }}
+              style={styles.menuItem}
             >
-              {item.label}
+              {!accelerator ? (
+                item.label
+              ) : (
+                <div style={styles.labelWithAccelerator}>
+                  <span>{item.label}</span>
+                  <span style={styles.accelerator}>{accelerator}</span>
+                </div>
+              )}
             </MenuItem>
           );
         }

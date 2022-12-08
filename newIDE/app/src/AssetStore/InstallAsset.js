@@ -112,6 +112,14 @@ export const installResource = (
   let newResource = null;
   if (serializedResource.kind === 'image') {
     newResource = new gd.ImageResource();
+  } else if (serializedResource.kind === 'audio') {
+    newResource = new gd.AudioResource();
+  } else if (serializedResource.kind === 'font') {
+    newResource = new gd.FontResource();
+  } else if (serializedResource.kind === 'video') {
+    newResource = new gd.VideoResource();
+  } else if (serializedResource.kind === 'json') {
+    newResource = new gd.JsonResource();
   } else {
     throw new Error(
       `Resource of kind "${serializedResource.kind}" is not supported.`
@@ -120,13 +128,17 @@ export const installResource = (
 
   unserializeFromJSObject(newResource, serializedResource);
 
+  if (newResource.getKind() === 'image') {
+    // $FlowExpectedError[prop-missing] - We know the resource is an ImageResource and has the setSmooth method.
+    newResource.setSmooth(
+      project.getScaleMode() !== 'nearest' && !isPixelArt(asset)
+    );
+  }
+
   const newName = newNameGenerator(originalResourceName, name =>
     resourcesManager.hasResource(name)
   );
   newResource.setName(newName);
-  newResource.setSmooth(
-    project.getScaleMode() !== 'nearest' && !isPixelArt(asset)
-  );
   newResource.setOrigin(resourceOriginCleanedName, resourceOriginIdentifier);
   resourcesManager.addResource(newResource);
   newResource.delete();
@@ -146,10 +158,6 @@ export const addAssetToProject = async ({
   const objectNewNames = {};
   const resourceNewNames = {};
   const createdObjects: Array<gdObject> = [];
-
-  asset.objectAssets.forEach(objectAsset => {
-    objectAsset.resources.forEach(serializedResource => {});
-  });
 
   // Create objects (and their behaviors)
   asset.objectAssets.forEach(objectAsset => {

@@ -4,6 +4,7 @@ import Refresh from '@material-ui/icons/Refresh';
 import * as React from 'react';
 import { type StorageProvider, type SaveAsLocation } from '../ProjectsStorage';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import FlatButton from '../UI/FlatButton';
 import TextField from '../UI/TextField';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
@@ -26,6 +27,7 @@ import {
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import optionalRequire from '../Utils/OptionalRequire';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import Checkbox from '../UI/Checkbox';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -45,6 +47,39 @@ const generateProjectName = (sourceExampleName: ?string) =>
     ? `${generateName()} (${sourceExampleName})`
     : generateName();
 
+type ResolutionOption =
+  | 'mobilePortrait'
+  | 'mobileLandscape'
+  | 'desktopHD'
+
+const resolutionOptions: {
+  [key: ResolutionOption]: {|
+    label: MessageDescriptor,
+    height: number,
+    width: number,
+    orientation: 'landscape' | 'portrait' | 'default',
+  |},
+} = {
+  mobilePortrait: {
+    label: t`Mobile portrait - 720x1280`,
+    width: 720,
+    height: 1280,
+    orientation: 'portrait',
+  },
+  mobileLandscape: {
+    label: t`Mobile landscape & Desktop - 1280x720`,
+    width: 1280,
+    height: 720,
+    orientation: 'landscape',
+  },
+  desktopHD: {
+    label: t`Desktop Full HD - 1920x1080`,
+    width: 1920,
+    height: 1080,
+    orientation: 'default',
+  },
+};
+
 const NewProjectSetupDialog = ({
   isOpening,
   onClose,
@@ -62,6 +97,13 @@ const NewProjectSetupDialog = ({
   );
   const [projectName, setProjectName] = React.useState<string>(() =>
     generateProjectName(sourceExampleName)
+  );
+  const [
+    resolutionOption,
+    setResolutionOption,
+  ] = React.useState<ResolutionOption>('mobileLandscape');
+  const [optimizeForPixelArt, setOptimizeForPixelArt] = React.useState<boolean>(
+    false
   );
   const newProjectsDefaultFolder = app
     ? findEmptyPathInWorkspaceFolder(app, values.newProjectsDefaultFolder || '')
@@ -106,7 +148,18 @@ const NewProjectSetupDialog = ({
         );
         return;
       }
-      await onCreate({ projectName, storageProvider, saveAsLocation });
+      const { height, width, orientation } = resolutionOptions[
+        resolutionOption
+      ];
+      await onCreate({
+        projectName,
+        storageProvider,
+        saveAsLocation,
+        height,
+        width,
+        orientation,
+        optimizeForPixelArt,
+      });
     },
     [
       isOpening,
@@ -115,6 +168,8 @@ const NewProjectSetupDialog = ({
       projectName,
       storageProvider,
       saveAsLocation,
+      resolutionOption,
+      optimizeForPixelArt,
     ]
   );
 
@@ -169,6 +224,7 @@ const NewProjectSetupDialog = ({
               onClick={() =>
                 setProjectName(generateProjectName(sourceExampleName))
               }
+              tooltip={t`Generate random name`}
             >
               <Refresh />
             </IconButton>
@@ -219,7 +275,7 @@ const NewProjectSetupDialog = ({
           )}
         </SelectField>
         {needUserAuthentication && (
-          <Paper background="dark">
+          <Paper background="dark" variant="outlined">
             <Line justifyContent="center">
               <CreateProfile
                 onLogin={authenticatedUser.onLogin}
@@ -239,6 +295,29 @@ const NewProjectSetupDialog = ({
             setSaveAsLocation,
             newProjectsDefaultFolder,
           })}
+        <SelectField
+          fullWidth
+          disabled={isOpening}
+          floatingLabelText={<Trans>Resolution preset</Trans>}
+          value={resolutionOption}
+          onChange={(e, i, newValue: string) => {
+            // $FlowExpectedError - new value can only be option values.
+            setResolutionOption(newValue);
+          }}
+        >
+          {Object.entries(resolutionOptions).map(([id, option]) => (
+            // $FlowFixMe - Object.entries does not keep types.
+            <SelectOption key={id} value={id} primaryText={option.label} />
+          ))}
+        </SelectField>
+        <Checkbox
+          checked={optimizeForPixelArt}
+          label={<Trans>Optimize for Pixel Art</Trans>}
+          onCheck={(e, checked) => {
+            setOptimizeForPixelArt(checked);
+          }}
+          disabled={isOpening}
+        />
         {limits && hasTooManyCloudProjects ? (
           <MaxProjectCountAlertMessage
             limits={limits}

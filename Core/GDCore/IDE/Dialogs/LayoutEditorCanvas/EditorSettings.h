@@ -3,7 +3,6 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#if defined(GD_IDE_ONLY)
 #ifndef SCENECANVASSETTINGS_H
 #define SCENECANVASSETTINGS_H
 #include "GDCore/String.h"
@@ -43,4 +42,3 @@ private:
 }  // namespace gd
 
 #endif  // SCENECANVASSETTINGS_H
-#endif

@@ -147,10 +147,6 @@ export const addAssetToProject = async ({
   const resourceNewNames = {};
   const createdObjects: Array<gdObject> = [];
 
-  asset.objectAssets.forEach(objectAsset => {
-    objectAsset.resources.forEach(serializedResource => {});
-  });
-
   // Create objects (and their behaviors)
   asset.objectAssets.forEach(objectAsset => {
     const type: ?string = objectAsset.object.type;

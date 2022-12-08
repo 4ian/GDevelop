@@ -11,7 +11,7 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../UI/Grid';
-import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
+import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { getIDEVersion } from '../../Version';
 import { ExampleThumbnailOrIcon } from './ExampleThumbnailOrIcon';
 import optionalRequire from '../../Utils/OptionalRequire';
@@ -125,7 +125,7 @@ export const ExampleListItem = ({
         </ButtonBase>
         <Column noMargin justifyContent="flex-end">
           <Line noMargin justifyContent="flex-end">
-            <RaisedButtonWithSplitMenu
+            <FlatButtonWithSplitMenu
               label={<Trans>Open</Trans>}
               disabled={isOpening || !isCompatible}
               onClick={() => onOpen()}

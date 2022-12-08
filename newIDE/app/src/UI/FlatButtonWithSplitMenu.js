@@ -11,7 +11,7 @@ import { Spacer } from './Grid';
 type Props = {|
   id?: string,
   label?: React.Node,
-  primary: true, // Force making only primary raised split buttons.
+  primary?: boolean,
   disabled?: boolean,
   icon?: React.Node,
   onClick: ?() => void,
@@ -28,7 +28,7 @@ type Props = {|
 
 const shouldNeverBeCalled = () => {
   throw new Error(
-    'This RaisedButtonWithSplitMenu onClick should never be called'
+    'This FlatButtonWithSplitMenu onClick should never be called'
   );
 };
 
@@ -44,11 +44,19 @@ const styles = {
 };
 
 /**
- * A raised button based on Material-UI button, that has a menu displayed
+ * A flat button based on Material-UI button, that has a menu displayed
  * when the dropdown arrow is clicked.
  */
-const RaisedButtonWithSplitMenu = (props: Props) => {
-  const { id, buildMenuTemplate, onClick, label, icon, disabled } = props;
+const FlatButtonWithSplitMenu = (props: Props) => {
+  const {
+    id,
+    buildMenuTemplate,
+    onClick,
+    label,
+    primary,
+    icon,
+    disabled,
+  } = props;
 
   // In theory, focus ripple is only shown after a keyboard interaction
   // (see https://github.com/mui-org/material-ui/issues/12067). However, as
@@ -58,9 +66,9 @@ const RaisedButtonWithSplitMenu = (props: Props) => {
 
   return (
     <ButtonGroup
-      variant={'contained'}
+      variant={'outlined'}
       disableElevation
-      color={'primary'}
+      color={primary ? 'secondary' : 'default'}
       disabled={disabled}
       size="small"
       style={props.style}
@@ -94,4 +102,4 @@ const RaisedButtonWithSplitMenu = (props: Props) => {
   );
 };
 
-export default RaisedButtonWithSplitMenu;
+export default FlatButtonWithSplitMenu;

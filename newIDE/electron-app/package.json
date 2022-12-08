@@ -23,6 +23,10 @@
     "appId": "com.gdevelop-app.ide",
     "extraResources": [
       {
+        "from": "../app/resources/in-app-tutorials",
+        "to": "in-app-tutorials"
+      },
+      {
         "from": "../app/resources/GDJS",
         "to": "GDJS"
       },

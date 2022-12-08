@@ -9,6 +9,7 @@ import PreviewIcon from '../../UI/CustomSvgIcons/Preview';
 import UpdateIcon from '../../UI/CustomSvgIcons/Update';
 import PublishIcon from '../../UI/CustomSvgIcons/Publish';
 import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 export type PreviewAndPublishButtonsProps = {|
   onPreviewWithoutHotReload: () => void,
@@ -39,6 +40,8 @@ export default function PreviewAndPublishButtons({
   setPreviewOverride,
   exportProject,
 }: PreviewAndPublishButtonsProps) {
+  const windowWidth = useResponsiveWindowWidth();
+
   const previewBuildMenuTemplate = React.useCallback(
     (i18n: I18nType) => [
       {
@@ -124,7 +127,13 @@ export default function PreviewAndPublishButtons({
         disabled={!isPreviewEnabled}
         icon={hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />}
         label={
-          hasPreviewsRunning ? <Trans>Update</Trans> : <Trans>Preview</Trans>
+          windowWidth !== 'small' ? (
+            hasPreviewsRunning ? (
+              <Trans>Update</Trans>
+            ) : (
+              <Trans>Preview</Trans>
+            )
+          ) : null
         }
         id={'toolbar-preview-button'}
         buildMenuTemplate={previewBuildMenuTemplate}
@@ -133,7 +142,7 @@ export default function PreviewAndPublishButtons({
         primary
         onClick={exportProject}
         icon={<PublishIcon />}
-        label={<Trans>Publish</Trans>}
+        label={windowWidth !== 'small' ? <Trans>Publish</Trans> : null}
         id={'toolbar-publish-button'}
       />
     </LineStackLayout>

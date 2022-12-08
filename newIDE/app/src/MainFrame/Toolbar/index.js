@@ -7,6 +7,7 @@ import PreviewAndPublishButtons, {
 } from './PreviewAndPublishButtons';
 import ProjectManagerIcon from '../../UI/CustomSvgIcons/ProjectManager';
 import IconButton from '../../UI/IconButton';
+import { Spacer } from '../../UI/Grid';
 
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
@@ -43,6 +44,7 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               </IconButton>
             </ToolbarGroup>
             <ToolbarGroup>
+              <Spacer />
               <PreviewAndPublishButtons
                 onPreviewWithoutHotReload={props.onPreviewWithoutHotReload}
                 onOpenDebugger={props.onOpenDebugger}
@@ -55,6 +57,7 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
                 hasPreviewsRunning={props.hasPreviewsRunning}
                 exportProject={props.exportProject}
               />
+              <Spacer />
             </ToolbarGroup>
           </>
         ) : null}

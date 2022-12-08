@@ -67,6 +67,12 @@ export const Default = () => (
         primary
         onClick={action('onClick')()}
       />
+      <RaisedButton
+        icon={<CloudDownload />}
+        primary
+        onClick={action('onClick')()}
+      />
+      <RaisedButton icon={<CloudDownload />} onClick={action('onClick')()} />
     </LineStackLayout>
     <LineStackLayout noMargin>
       <FlatButton label="Flat button" onClick={action('onClick')()} />
@@ -126,6 +132,8 @@ export const Default = () => (
         onClick={action('onClick')()}
         buildMenuTemplate={buildFakeMenuTemplate}
       />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
       <FlatButtonWithSplitMenu
         label="Flat non primary button"
         onClick={action('onClick')()}
@@ -139,6 +147,19 @@ export const Default = () => (
       />
       <FlatButtonWithSplitMenu
         label="... and disabled"
+        icon={<Brush />}
+        disabled
+        onClick={action('onClick')()}
+        buildMenuTemplate={buildFakeMenuTemplate}
+      />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <FlatButtonWithSplitMenu
+        icon={<Brush />}
+        onClick={action('onClick')()}
+        buildMenuTemplate={buildFakeMenuTemplate}
+      />
+      <FlatButtonWithSplitMenu
         icon={<Brush />}
         disabled
         onClick={action('onClick')()}

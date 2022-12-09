@@ -62,6 +62,12 @@ module.exports = [
     "translationRatio": 0.24542844189209612
   },
   {
+    "languageCode": "en",
+    "languageName": "English",
+    "languageNativeName": "English",
+    "translationRatio": 0.05355493998153282
+  },
+  {
     "languageCode": "eo_UY",
     "languageName": "Esperanto",
     "languageNativeName": "Esperanto",

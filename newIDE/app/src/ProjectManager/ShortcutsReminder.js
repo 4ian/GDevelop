@@ -18,6 +18,25 @@ const styles = {
   },
 };
 
+const shortcuts = [
+  {
+    label: <Trans>Save</Trans>,
+    shortcutMapKey: 'SAVE_PROJECT',
+  },
+  {
+    label: <Trans>Save as...</Trans>,
+    shortcutMapKey: 'SAVE_PROJECT_AS',
+  },
+  {
+    label: <Trans>Export</Trans>,
+    shortcutMapKey: 'EXPORT_GAME',
+  },
+  {
+    label: <Trans>Close</Trans>,
+    shortcutMapKey: 'CLOSE_PROJECT',
+  },
+];
+
 export const ShortcutsReminder = ({
   shortcutMap,
 }: {|
@@ -35,54 +54,18 @@ export const ShortcutsReminder = ({
       </AlertMessage>
       <Spacer />
       <div style={styles.shortcutReminders}>
-        <Line noMargin justifyContent="space-between">
-          <Text size="body2" noMargin>
-            <Trans>Save</Trans>
-          </Text>
-          <Text size="body2" noMargin>
-            <Trans>
+        {shortcuts.map(({ label, shortcutMapKey }, index) => (
+          <Line noMargin justifyContent="space-between" key={index}>
+            <Text size="body2" noMargin>
+              {label}
+            </Text>
+            <Text size="body2" noMargin>
               {adaptAcceleratorString(
-                getElectronAccelerator(shortcutMap['SAVE_PROJECT'])
+                getElectronAccelerator(shortcutMap[shortcutMapKey])
               )}
-            </Trans>
-          </Text>
-        </Line>
-        <Line noMargin justifyContent="space-between">
-          <Text size="body2" noMargin>
-            <Trans>Save as...</Trans>
-          </Text>
-          <Text size="body2" noMargin>
-            <Trans>
-              {adaptAcceleratorString(
-                getElectronAccelerator(shortcutMap['SAVE_PROJECT_AS'])
-              )}
-            </Trans>
-          </Text>
-        </Line>
-        <Line noMargin justifyContent="space-between">
-          <Text size="body2" noMargin>
-            <Trans>Export</Trans>
-          </Text>
-          <Text size="body2" noMargin>
-            <Trans>
-              {adaptAcceleratorString(
-                getElectronAccelerator(shortcutMap['EXPORT_GAME'])
-              )}
-            </Trans>
-          </Text>
-        </Line>
-        <Line noMargin justifyContent="space-between">
-          <Text size="body2" noMargin>
-            <Trans>Close</Trans>
-          </Text>
-          <Text size="body2" noMargin>
-            <Trans>
-              {adaptAcceleratorString(
-                getElectronAccelerator(shortcutMap['CLOSE_PROJECT'])
-              )}
-            </Trans>
-          </Text>
-        </Line>
+            </Text>
+          </Line>
+        ))}
       </div>
       <Spacer />
     </Column>

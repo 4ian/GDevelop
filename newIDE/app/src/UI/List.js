@@ -43,6 +43,7 @@ const styles = {
     gap: 10,
     flexDirection: 'column',
   },
+  noLeftPaddingListItem: { paddingLeft: 0 },
 };
 
 type DoubleClickMouseEvent = {| button: 0 | 1 | 2 |};
@@ -204,7 +205,9 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
       return null;
     };
 
-    const noPaddingStyle = props.noPadding ? { paddingLeft: 0 } : undefined;
+    const noPaddingStyle = props.noPadding
+      ? styles.noLeftPaddingListItem
+      : undefined;
 
     const { renderNestedItems } = props;
 

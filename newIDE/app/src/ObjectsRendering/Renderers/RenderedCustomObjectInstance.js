@@ -147,11 +147,13 @@ type AxeLayout = {
 };
 
 type ChildLayout = {
+  isShown: boolean,
   horizontalLayout: AxeLayout,
   verticalLayout: AxeLayout,
 };
 
 const layoutFields = [
+  'Show',
   'LeftPadding',
   'TopPadding',
   'RightPadding',
@@ -201,12 +203,11 @@ const getLayouts = (
       continue;
     }
 
+    // The property types should never be checked because we may introduce
+    // new types to make the layout configuration easier.
     const name = property.getName();
-    const isNumber = property.getType() === 'Number';
     const propertyValueString = instanceProperties.get(name).getValue();
-    const propertyValueNumber = isNumber
-      ? Number.parseFloat(propertyValueString) || 0
-      : 0;
+    const propertyValueNumber = Number.parseFloat(propertyValueString) || 0;
     const layoutField = layoutFields.find(field => name.includes(field));
 
     let targetObjectName = '';
@@ -224,18 +225,16 @@ const getLayouts = (
       const anchorTargetStringValue = instanceProperties
         .get(targetPropertyName)
         .getValue();
-      const targetIsNumber = targetProperty.getType() === 'Number';
-      const anchorTargetValueNumber = isNumber
-        ? Number.parseFloat(anchorTargetStringValue) || 0
-        : 0;
+      const anchorTargetValueNumber =
+        Number.parseFloat(anchorTargetStringValue) || 0;
       if (layoutField === 'HorizontalAnchorOrigin') {
-        anchorTarget = targetIsNumber
-          ? anchorTargetValueNumber
-          : getHorizontalAnchorValue(anchorTargetStringValue);
+        anchorTarget =
+          getHorizontalAnchorValue(anchorTargetStringValue) ||
+          anchorTargetValueNumber;
       } else {
-        anchorTarget = targetIsNumber
-          ? anchorTargetValueNumber
-          : getVerticalAnchorValue(anchorTargetStringValue);
+        anchorTarget =
+          getVerticalAnchorValue(anchorTargetStringValue) ||
+          anchorTargetValueNumber;
       }
     }
 
@@ -244,12 +243,17 @@ const getLayouts = (
       let layout = layouts.get(childName);
       if (!layout) {
         layout = {
+          isShown: true,
           horizontalLayout: {},
           verticalLayout: {},
         };
         layouts.set(childName, layout);
       }
-      if (layoutField === 'LeftPadding') {
+      if (layoutField === 'Show') {
+        if (propertyValueString === 'false') {
+          layout.isShown = false;
+        }
+      } else if (layoutField === 'LeftPadding') {
         layout.horizontalLayout.minSideAbsoluteMargin = propertyValueNumber;
       } else if (layoutField === 'RightPadding') {
         layout.horizontalLayout.maxSideAbsoluteMargin = propertyValueNumber;
@@ -258,9 +262,8 @@ const getLayouts = (
       } else if (layoutField === 'BottomPadding') {
         layout.verticalLayout.maxSideAbsoluteMargin = propertyValueNumber;
       } else if (layoutField === 'HorizontalAnchorOrigin') {
-        const anchorOrigin = isNumber
-          ? propertyValueNumber
-          : getHorizontalAnchorValue(propertyValueString);
+        const anchorOrigin =
+          getHorizontalAnchorValue(propertyValueString) || propertyValueNumber;
         if (anchorOrigin !== null) {
           layout.horizontalLayout.anchorOrigin = anchorOrigin;
         }
@@ -269,9 +272,8 @@ const getLayouts = (
         }
         layout.horizontalLayout.anchorTargetObject = targetObjectName;
       } else if (layoutField === 'VerticalAnchorOrigin') {
-        const anchorOrigin = isNumber
-          ? propertyValueNumber
-          : getVerticalAnchorValue(propertyValueString);
+        const anchorOrigin =
+          getVerticalAnchorValue(propertyValueString) || propertyValueNumber;
         if (anchorOrigin !== null) {
           layout.verticalLayout.anchorOrigin = anchorOrigin;
         }
@@ -333,39 +335,43 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
       return;
     }
 
-    const layouts = getLayouts(eventBasedObject, customObjectConfiguration);
-
-    this.childrenRenderedInstances = mapReverseFor(
-      0,
-      eventBasedObject.getObjectsCount(),
-      i => {
-        const childObject = eventBasedObject.getObjectAt(i);
-        const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
-          childObject.getName()
-        );
-        const childInstance = new ChildInstance();
-        this.childrenInstances.push(childInstance);
-        this.childrenLayouts.push(
-          layouts.get(childObject.getName()) || {
-            horizontalLayout: {},
-            verticalLayout: {},
-          }
-        );
-        const renderer = ObjectsRenderingService.createNewInstanceRenderer(
-          project,
-          layout,
-          // $FlowFixMe Use real object instances.
-          childInstance,
-          childObjectConfiguration,
-          this._pixiObject
-        );
-        if (renderer instanceof RenderedTextInstance) {
-          // TODO EBO Remove this line when an alignment property is added to the text object.
-          renderer._pixiObject.style.align = 'center';
-        }
-        return renderer;
-      }
+    const childLayouts = getLayouts(
+      eventBasedObject,
+      customObjectConfiguration
     );
+
+    mapReverseFor(0, eventBasedObject.getObjectsCount(), i => {
+      const childObject = eventBasedObject.getObjectAt(i);
+
+      const childLayout = childLayouts.get(childObject.getName()) || {
+        isShown: true,
+        horizontalLayout: {},
+        verticalLayout: {},
+      };
+      if (!childLayout.isShown) {
+        return;
+      }
+
+      const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
+        childObject.getName()
+      );
+      const childInstance = new ChildInstance();
+      const renderer = ObjectsRenderingService.createNewInstanceRenderer(
+        project,
+        layout,
+        // $FlowFixMe Use real object instances.
+        childInstance,
+        childObjectConfiguration,
+        this._pixiObject
+      );
+      if (renderer instanceof RenderedTextInstance) {
+        // TODO EBO Remove this line when an alignment property is added to the text object.
+        renderer._pixiObject.style.align = 'center';
+      }
+      this.childrenInstances.push(childInstance);
+      this.childrenLayouts.push(childLayout);
+      this.childrenRenderedInstances.push(renderer);
+    });
   }
 
   /**

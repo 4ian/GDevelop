@@ -94,7 +94,25 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      this._text.position.x = this._object.x + this._text.width / 2;
+      if (this._object.isWrapping()) {
+        const alignmentX =
+          this._object._textAlign === 'right'
+            ? 1
+            : this._object._textAlign === 'center'
+            ? 0.5
+            : 0;
+
+        const width = this._object.getWrappingWidth();
+
+        // A vector from the custom size center to the renderer center.
+        const centerToCenterX = (width - this._text.width) * (alignmentX - 0.5);
+
+        this._text.position.x = this._object.x + width / 2;
+        this._text.anchor.x = 0.5 - centerToCenterX / this._text.width;
+      } else {
+        this._text.position.x = this._object.x + this._text.width / 2;
+        this._text.anchor.x = 0.5;
+      }
       this._text.position.y = this._object.y + this._text.height / 2;
     }
 

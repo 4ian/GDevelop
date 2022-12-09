@@ -176,6 +176,10 @@ export class ExternalLayoutEditorContainer extends React.Component<
               prepareInstancesEditorSettings(
                 serializeToJSObject(
                   externalLayout.getAssociatedEditorSettings()
+                ),
+                Math.max(
+                  project.getGameResolutionWidth(),
+                  project.getGameResolutionHeight()
                 )
               )
             }

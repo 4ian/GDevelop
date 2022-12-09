@@ -31,7 +31,7 @@ import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
 import LongTouchHandler from './LongTouchHandler';
 import {
-  recommendedInitialZoomFactor,
+  getRecommendedInitialZoomFactor,
   type InstancesEditorSettings,
 } from './InstancesEditorSettings';
 import Rectangle from '../Utils/Rectangle';
@@ -873,9 +873,13 @@ export default class InstancesEditor extends Component<Props> {
   }
 
   zoomToInitialPosition() {
-    const x = this.props.project.getGameResolutionWidth() / 2;
-    const y = this.props.project.getGameResolutionHeight() / 2;
-    this.setZoomFactor(recommendedInitialZoomFactor);
+    const width = this.props.project.getGameResolutionWidth();
+    const height = this.props.project.getGameResolutionHeight();
+    const x = width / 2;
+    const y = height / 2;
+    this.setZoomFactor(
+      getRecommendedInitialZoomFactor(Math.max(height, width))
+    );
     this.scrollTo(x, y);
   }
 

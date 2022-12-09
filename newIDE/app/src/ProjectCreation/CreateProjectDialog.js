@@ -33,6 +33,10 @@ export type NewProjectSetup = {|
   projectName: string,
   storageProvider: StorageProvider,
   saveAsLocation: ?SaveAsLocation,
+  height: number,
+  width: number,
+  orientation: 'landscape' | 'portrait' | 'default',
+  optimizeForPixelArt: boolean,
 |};
 
 export type NewProjectSource = {|

@@ -92,7 +92,11 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         initialInstances={layout.getInitialInstances()}
         getInitialInstancesEditorSettings={() =>
           prepareInstancesEditorSettings(
-            serializeToJSObject(layout.getAssociatedEditorSettings())
+            serializeToJSObject(layout.getAssociatedEditorSettings()),
+            Math.max(
+              project.getGameResolutionWidth(),
+              project.getGameResolutionHeight()
+            )
           )
         }
         onOpenEvents={this.props.onOpenEvents}

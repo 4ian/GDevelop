@@ -140,6 +140,7 @@ type AxeLayout = {
   anchorOrigin?: number,
   anchorTarget?: number,
   anchorTargetObject?: string,
+  anchorDelta?: number,
   minSideAbsoluteMargin?: number,
   maxSideAbsoluteMargin?: number,
   minSideProportionalMargin?: number,
@@ -161,7 +162,9 @@ const layoutFields = [
   'HorizontalAnchorOrigin',
   'HorizontalAnchorTarget',
   'VerticalAnchorOrigin',
-  'BarVerticalAnchorTarget',
+  'VerticalAnchorTarget',
+  'AnchorDeltaX',
+  'AnchorDeltaY',
 ];
 
 const getHorizontalAnchorValue = (anchorName: string) => {
@@ -281,6 +284,10 @@ const getLayouts = (
           layout.verticalLayout.anchorTarget = anchorTarget;
         }
         layout.verticalLayout.anchorTargetObject = targetObjectName;
+      } else if (layoutField === 'AnchorDeltaX') {
+        layout.horizontalLayout.anchorDelta = propertyValueNumber;
+      } else if (layoutField === 'AnchorDeltaY') {
+        layout.verticalLayout.anchorDelta = propertyValueNumber;
       }
     }
   }
@@ -464,7 +471,7 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
         const anchorOrigin = childLayout.horizontalLayout.anchorOrigin || 0;
         const anchorTarget = childLayout.horizontalLayout.anchorTarget || 0;
         // TODO Use anchorTargetObject instead of defaulting on the background
-        childInstance.x =
+        childInstance.x = childLayout.horizontalLayout.anchorDelta || 0 +
           anchorTarget * width -
           anchorOrigin * renderedInstance.getDefaultWidth();
       }
@@ -475,7 +482,7 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
         const anchorOrigin = childLayout.verticalLayout.anchorOrigin || 0;
         const anchorTarget = childLayout.verticalLayout.anchorTarget || 0;
         // TODO Use anchorTargetObject instead of defaulting on the background
-        childInstance.y =
+        childInstance.y = childLayout.verticalLayout.anchorDelta || 0 +
           anchorTarget * height -
           anchorOrigin * renderedInstance.getDefaultHeight();
       }

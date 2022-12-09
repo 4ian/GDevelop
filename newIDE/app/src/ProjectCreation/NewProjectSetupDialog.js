@@ -47,10 +47,7 @@ const generateProjectName = (sourceExampleName: ?string) =>
     ? `${generateName()} (${sourceExampleName})`
     : generateName();
 
-type ResolutionOption =
-  | 'mobilePortrait'
-  | 'mobileLandscape'
-  | 'desktopHD'
+type ResolutionOption = 'mobilePortrait' | 'mobileLandscape' | 'desktopHD';
 
 const resolutionOptions: {
   [key: ResolutionOption]: {|

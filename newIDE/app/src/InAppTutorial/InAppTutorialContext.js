@@ -52,6 +52,7 @@ export type InAppTutorialFlowStep = {|
   id?: string,
   isTriggerFlickering?: true,
   isCheckpoint?: true,
+  deprecated?: true,
   nextStepTrigger?: InAppTutorialFlowStepTrigger,
   shortcuts?: Array<{|
     stepId: string,

@@ -454,10 +454,16 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
         let nextStepIndex = stepIndex;
 
-        // Check if we can go directly to next mandatory (not-skippable) step.
-        while (flow[nextStepIndex].skippable && nextStepIndex < stepCount - 1) {
+        // Check if we can go directly to next mandatory (not-skippable) and not deprecated step.
+        while (nextStepIndex < stepCount - 1) {
           if (
-            isDomBasedTriggerComplete(flow[nextStepIndex].nextStepTrigger, data)
+            flow[nextStepIndex] &&
+            (flow[nextStepIndex].deprecated ||
+              (flow[nextStepIndex].skippable &&
+                isDomBasedTriggerComplete(
+                  flow[nextStepIndex].nextStepTrigger,
+                  data
+                )))
           )
             nextStepIndex += 1;
           else break;
@@ -646,6 +652,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
       [handleDomMutation]
     );
 
+    // Methods to run on each step change.
     React.useEffect(
       () => {
         if (!currentStep) return;

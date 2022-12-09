@@ -96,6 +96,7 @@ type ItemProps = {|
   canMoveDown: boolean,
   onMoveDown: () => void,
   buildExtraMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
+  isLastItem: boolean,
 |};
 
 export const Item = ({
@@ -121,6 +122,7 @@ export const Item = ({
   canMoveDown,
   onMoveDown,
   buildExtraMenuTemplate,
+  isLastItem,
 }: ItemProps) => {
   const textField = React.useRef<?TextField>(null);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -176,9 +178,15 @@ export const Item = ({
         <ListItem
           id={id}
           data={data}
-          style={{
-            borderBottom: `1px solid ${gdevelopTheme.listItem.separatorColor}`,
-          }}
+          style={
+            isLastItem
+              ? undefined
+              : {
+                  borderBottom: `1px solid ${
+                    gdevelopTheme.listItem.separatorColor
+                  }`,
+                }
+          }
           noPadding
           primaryText={label}
           leftIcon={leftIcon}
@@ -263,6 +271,7 @@ type EventFunctionExtensionItemProps = {|
   onMoveUp: () => void,
   canMoveDown: boolean,
   onMoveDown: () => void,
+  isLastItem: boolean,
 |};
 
 export const EventFunctionExtensionItem = ({
@@ -282,6 +291,7 @@ export const EventFunctionExtensionItem = ({
   onMoveUp,
   canMoveDown,
   onMoveDown,
+  isLastItem,
 }: EventFunctionExtensionItemProps) => {
   const name = eventsFunctionsExtension.getName();
   const iconUrl = eventsFunctionsExtension.getIconUrl();
@@ -318,6 +328,7 @@ export const EventFunctionExtensionItem = ({
       onMoveUp={onMoveUp}
       canMoveDown={canMoveDown}
       onMoveDown={onMoveDown}
+      isLastItem={isLastItem}
     />
   );
 };

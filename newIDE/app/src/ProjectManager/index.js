@@ -51,7 +51,6 @@ import Tooltip from '@material-ui/core/Tooltip';
 import SceneIcon from '../UI/CustomSvgIcons/Scene';
 import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
 import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
-import { ColumnStackLayout } from '../UI/Layout';
 import { type ShortcutMap } from '../KeyboardShortcuts/DefaultShortcuts';
 import { ShortcutsReminder } from './ShortcutsReminder';
 
@@ -621,6 +620,23 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     const firstLayoutName = project.getFirstLayout();
 
+    const displayedScenes = filterProjectItemsList(
+      enumerateLayouts(project),
+      searchText
+    );
+    const displayedExtensions = filterProjectItemsList(
+      enumerateEventsFunctionsExtensions(project),
+      searchText
+    );
+    const displayedExternalEvents = filterProjectItemsList(
+      enumerateExternalEvents(project),
+      searchText
+    );
+    const displayedExternalLayouts = filterProjectItemsList(
+      enumerateExternalLayouts(project),
+      searchText
+    );
+
     return (
       <I18n>
         {({ i18n }) => (
@@ -689,14 +705,12 @@ export default class ProjectManager extends React.Component<Props, State> {
                 primaryText={<Trans>Scenes</Trans>}
                 open
                 renderNestedItems={() => [
-                  ...filterProjectItemsList(
-                    enumerateLayouts(project),
-                    searchText
-                  ).map((layout: gdLayout, i: number) => {
+                  ...displayedScenes.map((layout: gdLayout, i: number) => {
                     const name = layout.getName();
                     return (
                       <Item
                         id={`scene-item-${i}`}
+                        isLastItem={i === displayedScenes.length - 1}
                         key={i}
                         data={{
                           scene: name,
@@ -782,14 +796,12 @@ export default class ProjectManager extends React.Component<Props, State> {
                 onRefresh={onReloadEventsFunctionsExtensions}
                 open
                 renderNestedItems={() => [
-                  ...filterProjectItemsList(
-                    enumerateEventsFunctionsExtensions(project),
-                    searchText
-                  ).map((eventsFunctionsExtension, i) => {
+                  ...displayedExtensions.map((eventsFunctionsExtension, i) => {
                     const name = eventsFunctionsExtension.getName();
                     return (
                       <EventFunctionExtensionItem
                         key={i}
+                        isLastItem={i === displayedExtensions.length - 1}
                         eventsFunctionsExtension={eventsFunctionsExtension}
                         isEditingName={
                           renamedItemKind === 'events-functions-extension' &&
@@ -874,14 +886,12 @@ export default class ProjectManager extends React.Component<Props, State> {
                 primaryText={<Trans>External events</Trans>}
                 open
                 renderNestedItems={() => [
-                  ...filterProjectItemsList(
-                    enumerateExternalEvents(project),
-                    searchText
-                  ).map((externalEvents, i) => {
+                  ...displayedExternalEvents.map((externalEvents, i) => {
                     const name = externalEvents.getName();
                     return (
                       <Item
                         key={i}
+                        isLastItem={i === displayedExternalEvents.length - 1}
                         leftIcon={<ExternalEventsIcon />}
                         primaryText={name}
                         editingName={
@@ -939,14 +949,12 @@ export default class ProjectManager extends React.Component<Props, State> {
                 primaryText={<Trans>External layouts</Trans>}
                 open
                 renderNestedItems={() => [
-                  ...filterProjectItemsList(
-                    enumerateExternalLayouts(project),
-                    searchText
-                  ).map((externalLayout, i) => {
+                  ...displayedExternalLayouts.map((externalLayout, i) => {
                     const name = externalLayout.getName();
                     return (
                       <Item
                         key={i}
+                        isLastItem={i === displayedExternalLayouts.length - 1}
                         leftIcon={<ExternalLayoutIcon />}
                         primaryText={name}
                         editingName={

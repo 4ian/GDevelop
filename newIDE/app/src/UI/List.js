@@ -43,6 +43,7 @@ const styles = {
     gap: 10,
     flexDirection: 'column',
   },
+  noLeftPaddingListItem: { paddingLeft: 0 },
 };
 
 type DoubleClickMouseEvent = {| button: 0 | 1 | 2 |};
@@ -92,6 +93,7 @@ type ListItemProps = {|
   nestedListStyle?: {|
     padding: 0,
   |},
+  noPadding?: boolean,
 
   style?: {|
     color?: string,
@@ -203,6 +205,10 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
       return null;
     };
 
+    const noPaddingStyle = props.noPadding
+      ? styles.noLeftPaddingListItem
+      : undefined;
+
     const { renderNestedItems } = props;
 
     if (!renderNestedItems) {
@@ -218,7 +224,11 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
           onDoubleClick={props.onDoubleClick}
           disabled={props.disabled}
           selected={props.selected}
-          style={props.style}
+          style={{
+            // $FlowFixMe - Flow is not happy about two spreads.
+            ...noPaddingStyle,
+            ...props.style,
+          }}
           onContextMenu={props.buildMenuTemplate ? openContextMenu : undefined}
           {...longTouchForContextMenuProps}
           alignItems={props.secondaryTextLines === 2 ? 'flex-start' : undefined}
@@ -259,7 +269,11 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
               }
             }}
             disabled={props.disabled}
-            style={props.style}
+            style={{
+              // $FlowFixMe - Flow is not happy about two spreads.
+              ...noPaddingStyle,
+              ...props.style,
+            }}
             ref={ref}
             id={props.id}
             {...dataObjectToProps(props.data)}

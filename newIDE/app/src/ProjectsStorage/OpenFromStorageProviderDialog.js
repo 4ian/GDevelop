@@ -5,10 +5,11 @@ import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import { type StorageProvider } from '.';
-import { List, ListItem } from '../UI/List';
+import { List } from '../UI/List';
 import optionalRequire from '../Utils/OptionalRequire';
 import BackgroundText from '../UI/BackgroundText';
 import { Column, Line } from '../UI/Grid';
+import StorageProviderListItem from './StorageProviderListItem';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -39,20 +40,14 @@ const OpenFromStorageProviderDialog = ({
           open
           maxWidth="sm"
         >
-          <List>
+          <List useGap>
             {storageProviders
               .filter(storageProvider => !storageProvider.hiddenInOpenDialog)
               .map(storageProvider => (
-                <ListItem
+                <StorageProviderListItem
                   key={storageProvider.internalName}
-                  disabled={!!storageProvider.disabled}
-                  primaryText={i18n._(storageProvider.name)}
-                  leftIcon={
-                    storageProvider.renderIcon
-                      ? storageProvider.renderIcon({})
-                      : undefined
-                  }
-                  onClick={() => onChooseProvider(storageProvider)}
+                  onChooseProvider={onChooseProvider}
+                  storageProvider={storageProvider}
                 />
               ))}
           </List>

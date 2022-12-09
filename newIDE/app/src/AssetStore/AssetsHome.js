@@ -18,6 +18,7 @@ import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Paper from '../UI/Paper';
+import { mergeArraysPerGroup } from '../Utils/Array';
 
 const columns = 3;
 const columnsForSmallWindow = 1;
@@ -218,15 +219,17 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       },
     }));
 
-    const starterPacksTiles = starterPacks.map((assetPack, index) => (
-      <PublicAssetPackTile
-        assetPack={assetPack}
-        onSelect={() => onPublicAssetPackSelection(assetPack)}
-        key={`${assetPack.tag}-${index}`}
-      />
-    ));
+    const starterPacksTiles: Array<React.Node> = starterPacks.map(
+      (assetPack, index) => (
+        <PublicAssetPackTile
+          assetPack={assetPack}
+          onSelect={() => onPublicAssetPackSelection(assetPack)}
+          key={`${assetPack.tag}-${index}`}
+        />
+      )
+    );
 
-    const privateAssetPacksTiles = privateAssetPacksListingData.map(
+    const privateAssetPacksTiles: Array<React.Node> = privateAssetPacksListingData.map(
       assetPackListingData => (
         <PrivateAssetPackTile
           assetPackListingData={assetPackListingData}
@@ -244,11 +247,15 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       )
     );
 
-    const allTiles = starterPacksTiles
-      .concat(privateAssetPacksTiles)
-      .map((tile, index) => ({ pos: assetPackRandomOrdering[index], tile }))
-      .sort((a, b) => a.pos - b.pos)
-      .map(sortObject => sortObject.tile);
+    const allTiles = mergeArraysPerGroup(
+      privateAssetPacksTiles,
+      starterPacksTiles
+        .map((tile, index) => ({ pos: assetPackRandomOrdering[index], tile }))
+        .sort((a, b) => a.pos - b.pos)
+        .map(sortObject => sortObject.tile),
+      2,
+      1
+    );
 
     return (
       <ScrollView ref={scrollView}>

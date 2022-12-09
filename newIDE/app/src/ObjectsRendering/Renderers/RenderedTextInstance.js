@@ -20,6 +20,7 @@ export default class RenderedTextInstance extends RenderedInstance {
   _colorR: number = 0;
   _colorG: number = 0;
   _colorB: number = 0;
+  _textAlignment: string = 'left';
 
   constructor(
     project: gdProject,
@@ -76,6 +77,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       textObjectConfiguration.isItalic() !== this._isItalic ||
       textObjectConfiguration.isBold() !== this._isBold ||
       textObjectConfiguration.getCharacterSize() !== this._characterSize ||
+      textObjectConfiguration.getTextAlignment() !== this._textAlignment ||
       this._instance.hasCustomSize() !== this._wrapping ||
       (this._instance.getCustomWidth() !== this._wrappingWidth &&
         this._wrapping)
@@ -83,6 +85,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       this._isItalic = textObjectConfiguration.isItalic();
       this._isBold = textObjectConfiguration.isBold();
       this._characterSize = textObjectConfiguration.getCharacterSize();
+      this._textAlignment = textObjectConfiguration.getTextAlignment();
       this._wrapping = this._instance.hasCustomSize();
       this._wrappingWidth = this._instance.getCustomWidth();
       this._styleFontDirty = true;
@@ -118,6 +121,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       this._pixiObject.style.wordWrapWidth =
         this._wrappingWidth <= 1 ? 1 : this._wrappingWidth;
       this._pixiObject.style.breakWords = true;
+      this._pixiObject.style.align = this._textAlignment;
 
       // Manually ask the PIXI object to re-render as we changed a style property
       // see http://www.html5gamedevs.com/topic/16924-change-text-style-post-render/
@@ -141,8 +145,28 @@ export default class RenderedTextInstance extends RenderedInstance {
       this._pixiObject.dirty = true;
     }
 
-    this._pixiObject.position.x =
-      this._instance.getX() + this._pixiObject.width / 2;
+    if (this._instance.hasCustomSize()) {
+      const alignmentX =
+        this._textAlignment === 'right'
+          ? 1
+          : this._textAlignment === 'center'
+          ? 0.5
+          : 0;
+
+      const width = this._instance.getCustomWidth();
+
+      // A vector from the custom size center to the renderer center.
+      const centerToCenterX =
+        (width - this._pixiObject.width) * (alignmentX - 0.5);
+
+      this._pixiObject.position.x = this._instance.getX() + width / 2;
+      this._pixiObject.anchor.x =
+        0.5 - centerToCenterX / this._pixiObject.width;
+    } else {
+      this._pixiObject.position.x =
+        this._instance.getX() + this._pixiObject.width / 2;
+      this._pixiObject.anchor.x = 0.5;
+    }
     this._pixiObject.position.y =
       this._instance.getY() + this._pixiObject.height / 2;
     this._pixiObject.rotation = RenderedInstance.toRad(

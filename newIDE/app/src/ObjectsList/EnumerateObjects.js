@@ -2,6 +2,8 @@
 import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
 import { type SelectedTags, hasStringAllTags } from '../Utils/TagsHelper';
+import { type SelectedObjectTypes, hasStringAllObjectTypes } from '../Utils/ObjectTypesHelper';
+
 const gd: libGDevelop = global.gd;
 
 export type EnumeratedObjectMetadata = {|
@@ -136,6 +138,18 @@ export const filterObjectByTags = (
   return hasStringAllTags(objectTags, selectedTags);
 };
 
+export const filterObjectByTypes = (
+  objectWithContext: ObjectWithContext,
+  selectedObjectTypes: SelectedObjectTypes,
+  project: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+): boolean => {
+  if (!selectedObjectTypes.length) return true;
+
+  const objectType = gd.getTypeOfObject(project, objectsContainer, objectWithContext.object.getName(), false);
+  return hasStringAllObjectTypes(objectType, selectedObjectTypes);
+};
+
 export const filterObjectsList = (
   list: ObjectWithContextList,
   { searchText, selectedTags, hideExactMatches }: ObjectFilteringOptions
@@ -145,6 +159,32 @@ export const filterObjectsList = (
   return list
     .filter(objectWithContext =>
       filterObjectByTags(objectWithContext, selectedTags)
+    )
+    .filter((objectWithContext: ObjectWithContext) => {
+      const objectName = objectWithContext.object.getName();
+
+      if (hideExactMatches && searchText === objectName) return undefined;
+
+      return objectName.toLowerCase().indexOf(searchText.toLowerCase()) !== -1;
+    });
+};
+
+export const filterObjectsListEnhaced = (
+  project: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+  list: ObjectWithContextList,
+  { searchText, selectedTags, selectedObjectTypes, hideExactMatches }: ObjectFilteringOptions
+): ObjectWithContextList => {
+  if (!searchText && !selectedTags.length && !selectedObjectTypes.length) return list;
+
+  return list
+    .filter(objectWithContext =>
+      filterObjectByTags(objectWithContext, selectedTags)
+    )
+    .filter(objectWithContext =>
+      filterObjectByTypes(objectWithContext, selectedObjectTypes, 
+        project,
+        objectsContainer)
     )
     .filter((objectWithContext: ObjectWithContext) => {
       const objectName = objectWithContext.object.getName();

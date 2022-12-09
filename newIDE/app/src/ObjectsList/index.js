@@ -20,7 +20,7 @@ import {
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import {
   enumerateObjects,
-  filterObjectsList,
+  filterObjectsListEnhaced,
   isSameObjectWithContext,
 } from './EnumerateObjects';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
@@ -35,6 +35,13 @@ import {
   buildTagsMenuTemplate,
   getTagsFromString,
 } from '../Utils/TagsHelper';
+import {
+  type ObjectTypes,
+  type SelectedObjectTypes,
+  getStringFromObjectTypes,
+  buildObjectTypesMenuTemplate,
+  getObjectTypesFromString,
+} from '../Utils/ObjectTypesHelper';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
@@ -118,6 +125,10 @@ type Props = {|
   getAllObjectTags: () => Tags,
   onChangeSelectedObjectTags: SelectedTags => void,
 
+  selectedObjectTypes: SelectedObjectTypes,
+  getAllObjectTypes: () => ObjectTypes,
+  onChangeSelectedObjectTypes: SelectedObjectTypes => void,
+
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onExportObject: (object: gdObject) => void,
   onObjectCreated: gdObject => void,
@@ -150,6 +161,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       selectedObjectTags,
       getAllObjectTags,
       onChangeSelectedObjectTags,
+
+      selectedObjectTypes,
+      getAllObjectTypes,
+      onChangeSelectedObjectTypes,
 
       onEditObject,
       onExportObject,
@@ -418,11 +433,14 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const lists = enumerateObjects(project, objectsContainer);
-    const displayedObjectWithContextsList = filterObjectsList(
+    const displayedObjectWithContextsList = filterObjectsListEnhaced(
+      project,
+      objectsContainer,
       lists.allObjectsList,
       {
         searchText,
         selectedTags: selectedObjectTags,
+        selectedObjectTypes,
       }
     );
     const selectedObjects = displayedObjectWithContextsList.filter(

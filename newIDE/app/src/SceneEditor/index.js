@@ -55,13 +55,19 @@ import {
   type GroupWithContext,
   enumerateObjects,
 } from '../ObjectsList/EnumerateObjects';
-import TagsButton from '../UI/EditorMosaic/TagsButton';
 import CloseButton from '../UI/EditorMosaic/CloseButton';
+import ObjectTypesButton from '../UI/EditorMosaic/ObjectTypesButton';
+import TagsButton from '../UI/EditorMosaic/TagsButton';
 import {
   type SelectedTags,
   buildTagsMenuTemplate,
   getTagsFromString,
 } from '../Utils/TagsHelper';
+import {
+  type SelectedObjectTypes,
+  buildObjectTypesMenuTemplate,
+  getObjectTypesFromString,
+} from '../Utils/ObjectTypesHelper';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import SceneVariablesDialog from './SceneVariablesDialog';
@@ -154,6 +160,7 @@ type State = {|
 
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
+  selectedObjectTypes: SelectedObjectTypes,
 |};
 
 type CopyCutPasteOptions = { useLastCursorPosition?: boolean };
@@ -212,6 +219,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
 
       selectedObjectTags: [],
+      selectedObjectTypes: [],
     };
   }
 
@@ -1290,6 +1298,30 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
+  _getAllObjectTypes = (): Array<string> => {
+    const { project, layout } = this.props;
+
+    const typesSet: Set<string> = new Set();
+    enumerateObjects(project, layout).allObjectsList.forEach(({ object }) => {
+      typesSet.add(gd.getTypeOfObject(project, layout, object.getName(), false));
+    });
+
+    return Array.from(typesSet);
+  };
+
+  _buildObjectTypesMenuTemplate = (i18n: I18nType): Array<any> => {
+    const { selectedObjectTypes } = this.state;
+
+    return buildObjectTypesMenuTemplate({
+      noObjectTypeLabel: i18n._(t`No object types - add an object first`),
+      getAllObjectTypes: this._getAllObjectTypes,
+      selectedObjectTypes: selectedObjectTypes,
+      onChange: selectedObjectTypes => {
+        this.setState({ selectedObjectTypes });
+      },
+    });
+  };
+
   render() {
     const {
       project,
@@ -1428,6 +1460,15 @@ export default class SceneEditor extends React.Component<Props, State> {
               />
             )}
           </I18n>,
+          <I18n key="object-types">
+            {({ i18n }) => (
+              <ObjectTypesButton
+                buildMenuTemplate={(i18n: I18nType) =>
+                  this._buildObjectTypesMenuTemplate(i18n)
+                }
+              />
+            )}
+          </I18n>,
           <CloseButton key="close" />,
         ],
         renderEditor: () => (
@@ -1464,6 +1505,15 @@ export default class SceneEditor extends React.Component<Props, State> {
                   })
                 }
                 getAllObjectTags={this._getAllObjectTags}
+
+                selectedObjectTypes={this.state.selectedObjectTypes}
+                onChangeSelectedObjectTypes={selectedObjectTypes =>
+                  this.setState({
+                    selectedObjectTypes,
+                  })
+                }
+                getAllObjectTypes={this._getAllObjectTypes}
+
                 ref={
                   // $FlowFixMe Make this component functional.
                   objectsList => (this._objectsList = objectsList)

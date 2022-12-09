@@ -62,7 +62,7 @@ const LocalFolderPicker = ({
     });
 
     if (!filePaths || !filePaths.length) return;
-    
+
     const filePath = filePaths[0];
     onChange(filePath);
     setTextValue(filePath);

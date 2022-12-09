@@ -110,7 +110,6 @@ export default class TextEditor extends React.Component<EditorProps, void> {
                 textObjectConfiguration.setTextAlignment('left');
                 this.forceUpdate();
               }}
-              ref={this._trueButton}
             >
               <Trans>Left</Trans>
             </Button>

@@ -101,30 +101,19 @@ namespace gdjs {
             : this._object._textAlign === 'center'
             ? 0.5
             : 0;
-        const alignmentY = 0;
 
         const width = this._object.getWrappingWidth();
-        const height = this._text.height;
-        console.log('custom width: ' + width);
-        console.log('x: ' + this._object.x);
-        console.log('alignmentX: ' + alignmentX);
 
         // A vector from the custom size center to the renderer center.
         const centerToCenterX = (width - this._text.width) * (alignmentX - 0.5);
-        const centerToCenterY =
-          (height - this._text.height) * (alignmentY - 0.5);
 
         this._text.position.x = this._object.x + width / 2;
-        this._text.position.y = this._object.y + height / 2;
         this._text.anchor.x = 0.5 - centerToCenterX / this._text.width;
-        this._text.anchor.y = 0.5 - centerToCenterY / this._text.height;
       } else {
-        console.log('default width');
         this._text.position.x = this._object.x + this._text.width / 2;
-        this._text.position.y = this._object.y + this._text.height / 2;
         this._text.anchor.x = 0.5;
-        this._text.anchor.y = 0.5;
       }
+      this._text.position.y = this._object.y + this._text.height / 2;
     }
 
     updateAngle(): void {

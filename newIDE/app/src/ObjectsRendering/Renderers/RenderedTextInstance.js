@@ -152,31 +152,23 @@ export default class RenderedTextInstance extends RenderedInstance {
           : this._textAlignment === 'center'
           ? 0.5
           : 0;
-      const alignmentY = 0;
 
       const width = this._instance.getCustomWidth();
-      const height = this._instance.getCustomHeight();
 
       // A vector from the custom size center to the renderer center.
       const centerToCenterX =
         (width - this._pixiObject.width) * (alignmentX - 0.5);
-      const centerToCenterY =
-        (height - this._pixiObject.height) * (alignmentY - 0.5);
 
       this._pixiObject.position.x = this._instance.getX() + width / 2;
-      this._pixiObject.position.y = this._instance.getY() + height / 2;
       this._pixiObject.anchor.x =
         0.5 - centerToCenterX / this._pixiObject.width;
-      this._pixiObject.anchor.y =
-        0.5 - centerToCenterY / this._pixiObject.height;
     } else {
       this._pixiObject.position.x =
         this._instance.getX() + this._pixiObject.width / 2;
-      this._pixiObject.position.y =
-        this._instance.getY() + this._pixiObject.height / 2;
       this._pixiObject.anchor.x = 0.5;
-      this._pixiObject.anchor.y = 0.5;
     }
+    this._pixiObject.position.y =
+      this._instance.getY() + this._pixiObject.height / 2;
     this._pixiObject.rotation = RenderedInstance.toRad(
       this._instance.getAngle()
     );

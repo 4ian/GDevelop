@@ -62,7 +62,10 @@ const LocalFolderPicker = ({
     });
 
     if (!filePaths || !filePaths.length) return;
-    onChange(filePaths[0]);
+
+    const filePath = filePaths[0];
+    onChange(filePath);
+    setTextValue(filePath);
   };
 
   const onBlur = () => {

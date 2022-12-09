@@ -14,7 +14,7 @@ import { adaptAcceleratorString } from '../AcceleratorString';
 import { type MenuItemTemplate } from './Menu.flow';
 
 const useStyles = makeStyles({
-  popOverRoot: {
+  backdropRootForMouse: {
     // Put a `pointer-events: none` on the root of the "popover" which is showing
     // submenus as only the menu is supposed to receive clicks.
     pointerEvents: 'none',
@@ -38,11 +38,25 @@ const styles = {
 };
 
 const SubMenuItem = ({ item, buildFromTemplate }) => {
-  const popoverStyles = useStyles();
+  // The invisible backdrop behind the submenu is either:
+  // - not clickable, when using a mouse (it's like it does not exist).
+  // - clickable, when on a touchscreen or using a pen. This is to allow closing the submenu
+  // by clicking outside it.
+  const backdropStyles = useStyles();
+  const [pointerType, setPointerType] = React.useState<?'mouse' | 'other'>(
+    null
+  );
+
+  // We track if the cursor is hovering the menu item or the submenu.
+  // If not a mouse, this is not used: all menus are opened/closed
+  // by clicking on them (`handleClick`) or outside (`handleClose` called when the backdrop is clicked).
   const currentlyHovering = React.useRef(false);
+
+  // The anchor element is the DOM element of the menu item, when the submenu is opened.
+  // When null, the submenu stays closed.
   const [anchorElement, setAnchorElement] = React.useState(null);
 
-  const handleOpen = event => {
+  const handleClick = event => {
     // $FlowFixMe - even if not defined, not a problem.
     if (item.enabled === false) {
       return;
@@ -50,6 +64,26 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
 
     if (!anchorElement) {
       setAnchorElement(event.currentTarget);
+    }
+  };
+
+  const handlePointerOver = (pointerEvent: SyntheticPointerEvent<>) => {
+    // $FlowFixMe - even if not defined, not a problem.
+    if (item.enabled === false) {
+      return;
+    }
+
+    setPointerType(pointerEvent.pointerType === 'mouse' ? 'mouse' : 'other');
+
+    // If not a mouse, do nothing: all menus are opened/closed
+    // by clicking on them (`handleClick`) or outside (`handleClose` called when the backdrop is clicked).
+    // There is no notion of the "cursor" for touch/pen leaving a menu.
+    if (pointerEvent.pointerType !== 'mouse') {
+      return;
+    }
+
+    if (!anchorElement) {
+      setAnchorElement(pointerEvent.currentTarget);
     }
   };
 
@@ -63,7 +97,14 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
     setAnchorElement(null);
   }
 
-  function handleLeave() {
+  function handleLeave(pointerEvent: SyntheticPointerEvent<>) {
+    // If not a mouse, do nothing: all menus are opened/closed
+    // by clicking on them (`handleClick`) or outside (`handleClose` called when the backdrop is clicked).
+    // There is no notion of the "cursor" for touch/pen leaving a menu.
+    if (pointerEvent.pointerType !== 'mouse') {
+      return;
+    }
+
     // Unless overwrote in the meantime, we consider that
     // we're not hovering the menu anymore...
     currentlyHovering.current = false;
@@ -87,8 +128,8 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
           // $FlowFixMe - even if not defined, not a problem.
           item.enabled === false
         }
-        onClick={handleOpen}
-        onPointerOver={handleOpen}
+        onClick={handleClick}
+        onPointerOver={handlePointerOver}
         onPointerLeave={handleLeave}
       >
         {item.label}
@@ -103,7 +144,7 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
           onPointerEnter: handleHover,
           onPointerLeave: handleLeave,
 
-          // Only the menu, when shown, can receive clicks
+          // When a mouse is used, only the menu, when shown, can receive clicks
           // (not the background, see `popoverStyles.popOverRoot`).
           style: { pointerEvents: 'auto' },
         }}
@@ -114,7 +155,14 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
         }
         anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
         PopoverClasses={{
-          root: popoverStyles.popOverRoot,
+          root:
+            pointerType === 'mouse'
+              ? // For a mouse, use a backdrop in the background that does not recognise clicks on it.
+                // The menu will be closed by the cursor leaving it or the menu item (see `handleLeave`).
+                backdropStyles.backdropRootForMouse
+              : // For a touch or a pen, use the classic backdrop which allows to close the menu when clicked
+                // outside (the backdrop will call `handleClose`).
+                undefined,
         }}
       >
         {buildFromTemplate(item.submenu)}

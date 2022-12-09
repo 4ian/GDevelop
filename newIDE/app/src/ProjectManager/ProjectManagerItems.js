@@ -33,7 +33,6 @@ type ProjectStructureItemProps = {|
   id?: string,
   autoGenerateNestedIndicator?: boolean,
   initiallyOpen?: boolean,
-  indentNestedItems?: boolean,
   renderNestedItems: () => Array<React$Element<any> | null>,
   primaryText: React.Node,
   error?: ?Error,
@@ -45,19 +44,16 @@ export const ProjectStructureItem = ({
   id,
   error,
   onRefresh,
-  indentNestedItems,
   autoGenerateNestedIndicator,
   initiallyOpen,
   open,
   primaryText,
   renderNestedItems,
 }: ProjectStructureItemProps) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <ListItem
       id={id}
       open={open}
-      autoGenerateNestedIndicator={autoGenerateNestedIndicator}
       initiallyOpen={initiallyOpen}
       primaryText={
         <Text size="sub-title" noMargin>
@@ -66,12 +62,8 @@ export const ProjectStructureItem = ({
       }
       renderNestedItems={renderNestedItems}
       onReload={onRefresh}
-      style={{
-        backgroundColor: gdevelopTheme.listItem.groupBackgroundColor,
-      }}
-      nestedListStyle={
-        indentNestedItems ? undefined : styles.noIndentNestedList
-      }
+      noPadding
+      nestedListStyle={styles.noIndentNestedList}
       leftIcon={error ? <WarningIcon /> : undefined}
       displayReloadButton={!!error}
       reloadButtonTooltip={
@@ -104,7 +96,6 @@ type ItemProps = {|
   canMoveDown: boolean,
   onMoveDown: () => void,
   buildExtraMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
-  style?: ?Object,
 |};
 
 export const Item = ({
@@ -130,7 +121,6 @@ export const Item = ({
   canMoveDown,
   onMoveDown,
   buildExtraMenuTemplate,
-  style,
 }: ItemProps) => {
   const textField = React.useRef<?TextField>(null);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -188,8 +178,8 @@ export const Item = ({
           data={data}
           style={{
             borderBottom: `1px solid ${gdevelopTheme.listItem.separatorColor}`,
-            ...style,
           }}
+          noPadding
           primaryText={label}
           leftIcon={leftIcon}
           displayMenuButton

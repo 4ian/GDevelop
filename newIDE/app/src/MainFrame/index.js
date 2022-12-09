@@ -2773,6 +2773,7 @@ const MainFrame = (props: Props) => {
             unsavedChanges={unsavedChanges}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             resourceManagementProps={resourceManagementProps}
+            shortcutMap={shortcutMap}
           />
         )}
         {!state.currentProject && (

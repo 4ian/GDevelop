@@ -53,6 +53,9 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
    */
   void SetFontName(const gd::String& resourceName) { fontName = resourceName; };
 
+  inline const gd::String& GetTextAlignment() const { return textAlignment; };
+  void SetTextAlignment(const gd::String& textAlignment_) { textAlignment = textAlignment_; };
+
   bool IsBold() const { return bold; };
   void SetBold(bool enable) { bold = enable; };
   bool IsItalic() const { return italic; };
@@ -87,6 +90,7 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
   unsigned int colorR;
   unsigned int colorG;
   unsigned int colorB;
+  gd::String textAlignment;
 };
 
 #endif  // TEXTOBJECT_H

@@ -10,7 +10,7 @@ import SearchBar, {
   useShouldAutofocusSearchbar,
   type SearchBarInterface,
 } from '../UI/SearchBar';
-import { AddListItem, SearchListItem } from '../UI/ListCommonItem';
+import { AddListItem } from '../UI/ListCommonItem';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
 import {
@@ -51,6 +51,9 @@ import Tooltip from '@material-ui/core/Tooltip';
 import SceneIcon from '../UI/CustomSvgIcons/Scene';
 import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
 import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
+import { ColumnStackLayout } from '../UI/Layout';
+import { type ShortcutMap } from '../KeyboardShortcuts/DefaultShortcuts';
+import { ShortcutsReminder } from './ShortcutsReminder';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -62,12 +65,8 @@ const styles = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    overflowY: 'hidden',
-  },
-  list: {
-    flex: 1,
     overflowY: 'scroll',
-    padding: 0,
+    padding: 16,
   },
 };
 
@@ -103,6 +102,7 @@ type Props = {|
   unsavedChanges?: UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onInstallExtension: ExtensionShortHeader => void,
+  shortcutMap: ShortcutMap,
 
   // For resources:
   resourceManagementProps: ResourceManagementProps,
@@ -609,6 +609,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       eventsFunctionsExtensionsError,
       onReloadEventsFunctionsExtensions,
       onInstallExtension,
+      shortcutMap,
     } = this.props;
     const {
       renamedItemKind,
@@ -617,8 +618,6 @@ export default class ProjectManager extends React.Component<Props, State> {
       openedExtensionShortHeader,
       openedExtensionName,
     } = this.state;
-
-    const forceOpen = searchText !== '' ? true : undefined;
 
     const firstLayoutName = project.getFirstLayout();
 
@@ -637,12 +636,19 @@ export default class ProjectManager extends React.Component<Props, State> {
               }
               onOpenSearchExtensionDialog={this._openSearchExtensionDialog}
             />
-            <List style={styles.list}>
+            <ShortcutsReminder shortcutMap={shortcutMap} />
+            <SearchBar
+              ref={searchBar => (this._searchBar = searchBar)}
+              value={searchText}
+              onRequestSearch={this._onRequestSearch}
+              onChange={this._onSearchChange}
+              placeholder={t`Search in project`}
+            />
+            <List>
               <ProjectStructureItem
                 id={getTabId('game-settings')}
                 primaryText={<Trans>Game settings</Trans>}
-                initiallyOpen
-                autoGenerateNestedIndicator={true}
+                open
                 renderNestedItems={() => [
                   <ListItem
                     id={getTabId('game-properties')}
@@ -650,6 +656,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     primaryText={<Trans>Properties</Trans>}
                     leftIcon={<SettingsApplications />}
                     onClick={this._openProjectProperties}
+                    noPadding
                   />,
                   <ListItem
                     id={getTabId('global-variables')}
@@ -657,6 +664,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     primaryText={<Trans>Global variables</Trans>}
                     leftIcon={<VariableTree />}
                     onClick={this._openProjectVariables}
+                    noPadding
                   />,
                   <ListItem
                     id={getTabId('game-icons')}
@@ -664,6 +672,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     primaryText={<Trans>Icons and thumbnail</Trans>}
                     leftIcon={<PhotoLibrary />}
                     onClick={this.props.onOpenPlatformSpecificAssets}
+                    noPadding
                   />,
                   <ListItem
                     id={getTabId('game-resources')}
@@ -671,15 +680,14 @@ export default class ProjectManager extends React.Component<Props, State> {
                     primaryText={<Trans>Resources</Trans>}
                     leftIcon={<ArtTrack />}
                     onClick={this.props.onOpenResources}
+                    noPadding
                   />,
                 ]}
               />
               <ProjectStructureItem
                 id={getTabId('scenes')}
                 primaryText={<Trans>Scenes</Trans>}
-                initiallyOpen
-                open={forceOpen}
-                autoGenerateNestedIndicator={!forceOpen}
+                open
                 renderNestedItems={() =>
                   filterProjectItemsList(enumerateLayouts(project), searchText)
                     .map((layout: gdLayout, i: number) => {
@@ -752,6 +760,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     })
                     .concat(
                       <AddListItem
+                        noMargin
                         id="add-new-scene-button"
                         key={'add-scene'}
                         onClick={() =>
@@ -763,153 +772,11 @@ export default class ProjectManager extends React.Component<Props, State> {
                 }
               />
               <ProjectStructureItem
-                id={getTabId('external-events')}
-                primaryText={<Trans>External events</Trans>}
-                initiallyOpen
-                open={forceOpen}
-                autoGenerateNestedIndicator={!forceOpen}
-                renderNestedItems={() =>
-                  filterProjectItemsList(
-                    enumerateExternalEvents(project),
-                    searchText
-                  )
-                    .map((externalEvents, i) => {
-                      const name = externalEvents.getName();
-                      return (
-                        <Item
-                          key={i}
-                          leftIcon={<ExternalEventsIcon />}
-                          primaryText={name}
-                          editingName={
-                            renamedItemKind === 'external-events' &&
-                            renamedItemName === name
-                          }
-                          onEdit={() => this.props.onOpenExternalEvents(name)}
-                          onDelete={() =>
-                            this.props.onDeleteExternalEvents(externalEvents)
-                          }
-                          addLabel={t`Add New External Events`}
-                          onAdd={() => this._addExternalEvents(i, i18n)}
-                          onRename={newName => {
-                            this.props.onRenameExternalEvents(name, newName);
-                            this._onEditName(null, '');
-                          }}
-                          onEditName={() =>
-                            this._onEditName('external-events', name)
-                          }
-                          onCopy={() =>
-                            this._copyExternalEvents(externalEvents)
-                          }
-                          onCut={() => this._cutExternalEvents(externalEvents)}
-                          onPaste={() => this._pasteExternalEvents(i)}
-                          onDuplicate={() =>
-                            this._duplicateExternalEvents(externalEvents, i)
-                          }
-                          canPaste={() =>
-                            Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)
-                          }
-                          canMoveUp={i !== 0}
-                          onMoveUp={() => this._moveUpExternalEvents(i)}
-                          canMoveDown={
-                            i !== project.getExternalEventsCount() - 1
-                          }
-                          onMoveDown={() => this._moveDownExternalEvents(i)}
-                        />
-                      );
-                    })
-                    .concat(
-                      <AddListItem
-                        key={'add-external-events'}
-                        primaryText={<Trans>Add external events</Trans>}
-                        onClick={() =>
-                          this._addExternalEvents(
-                            project.getExternalEventsCount(),
-                            i18n
-                          )
-                        }
-                      />
-                    )
-                }
-              />
-              <ProjectStructureItem
-                id={getTabId('external-layouts')}
-                primaryText={<Trans>External layouts</Trans>}
-                initiallyOpen
-                open={forceOpen}
-                autoGenerateNestedIndicator={!forceOpen}
-                renderNestedItems={() =>
-                  filterProjectItemsList(
-                    enumerateExternalLayouts(project),
-                    searchText
-                  )
-                    .map((externalLayout, i) => {
-                      const name = externalLayout.getName();
-                      return (
-                        <Item
-                          key={i}
-                          leftIcon={<ExternalLayoutIcon />}
-                          primaryText={name}
-                          editingName={
-                            renamedItemKind === 'external-layout' &&
-                            renamedItemName === name
-                          }
-                          onEdit={() => this.props.onOpenExternalLayout(name)}
-                          onDelete={() =>
-                            this.props.onDeleteExternalLayout(externalLayout)
-                          }
-                          addLabel={t`Add a New External Layout`}
-                          onAdd={() => this._addExternalLayout(i, i18n)}
-                          onRename={newName => {
-                            this.props.onRenameExternalLayout(name, newName);
-                            this._onEditName(null, '');
-                          }}
-                          onEditName={() =>
-                            this._onEditName('external-layout', name)
-                          }
-                          onCopy={() =>
-                            this._copyExternalLayout(externalLayout)
-                          }
-                          onCut={() => this._cutExternalLayout(externalLayout)}
-                          onPaste={() => this._pasteExternalLayout(i)}
-                          onDuplicate={() =>
-                            this._duplicateExternalLayout(externalLayout, i)
-                          }
-                          canPaste={() =>
-                            Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)
-                          }
-                          canMoveUp={i !== 0}
-                          onMoveUp={() => this._moveUpExternalLayout(i)}
-                          canMoveDown={
-                            i !== project.getExternalLayoutsCount() - 1
-                          }
-                          onMoveDown={() => this._moveDownExternalLayout(i)}
-                        />
-                      );
-                    })
-                    .concat(
-                      <AddListItem
-                        key={'add-external-layout'}
-                        primaryText={<Trans>Add external layout</Trans>}
-                        onClick={() =>
-                          this._addExternalLayout(
-                            project.getExternalLayoutsCount(),
-                            i18n
-                          )
-                        }
-                      />
-                    )
-                }
-              />
-              <ProjectStructureItem
                 id={getTabId('extensions')}
                 primaryText={<Trans>Extensions</Trans>}
                 error={eventsFunctionsExtensionsError}
                 onRefresh={onReloadEventsFunctionsExtensions}
-                initiallyOpen
-                open={forceOpen}
-                autoGenerateNestedIndicator={
-                  !forceOpen && !eventsFunctionsExtensionsError
-                }
+                open
                 renderNestedItems={() =>
                   filterProjectItemsList(
                     enumerateEventsFunctionsExtensions(project),
@@ -987,9 +854,11 @@ export default class ProjectManager extends React.Component<Props, State> {
                       );
                     })
                     .concat(
-                      <SearchListItem
+                      <AddListItem
+                        noMargin
                         id="project-manager-extension-search-or-create"
                         key={'extensions-search'}
+                        kind="search"
                         primaryText={
                           <Trans>Create or search for new extensions</Trans>
                         }
@@ -998,15 +867,143 @@ export default class ProjectManager extends React.Component<Props, State> {
                     )
                 }
               />
+              <ProjectStructureItem
+                id={getTabId('external-events')}
+                primaryText={<Trans>External events</Trans>}
+                open
+                renderNestedItems={() =>
+                  filterProjectItemsList(
+                    enumerateExternalEvents(project),
+                    searchText
+                  )
+                    .map((externalEvents, i) => {
+                      const name = externalEvents.getName();
+                      return (
+                        <Item
+                          key={i}
+                          leftIcon={<ExternalEventsIcon />}
+                          primaryText={name}
+                          editingName={
+                            renamedItemKind === 'external-events' &&
+                            renamedItemName === name
+                          }
+                          onEdit={() => this.props.onOpenExternalEvents(name)}
+                          onDelete={() =>
+                            this.props.onDeleteExternalEvents(externalEvents)
+                          }
+                          addLabel={t`Add New External Events`}
+                          onAdd={() => this._addExternalEvents(i, i18n)}
+                          onRename={newName => {
+                            this.props.onRenameExternalEvents(name, newName);
+                            this._onEditName(null, '');
+                          }}
+                          onEditName={() =>
+                            this._onEditName('external-events', name)
+                          }
+                          onCopy={() =>
+                            this._copyExternalEvents(externalEvents)
+                          }
+                          onCut={() => this._cutExternalEvents(externalEvents)}
+                          onPaste={() => this._pasteExternalEvents(i)}
+                          onDuplicate={() =>
+                            this._duplicateExternalEvents(externalEvents, i)
+                          }
+                          canPaste={() =>
+                            Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)
+                          }
+                          canMoveUp={i !== 0}
+                          onMoveUp={() => this._moveUpExternalEvents(i)}
+                          canMoveDown={
+                            i !== project.getExternalEventsCount() - 1
+                          }
+                          onMoveDown={() => this._moveDownExternalEvents(i)}
+                        />
+                      );
+                    })
+                    .concat(
+                      <AddListItem
+                        noMargin
+                        key={'add-external-events'}
+                        primaryText={<Trans>Add external events</Trans>}
+                        onClick={() =>
+                          this._addExternalEvents(
+                            project.getExternalEventsCount(),
+                            i18n
+                          )
+                        }
+                      />
+                    )
+                }
+              />
+              <ProjectStructureItem
+                id={getTabId('external-layouts')}
+                primaryText={<Trans>External layouts</Trans>}
+                open
+                renderNestedItems={() =>
+                  filterProjectItemsList(
+                    enumerateExternalLayouts(project),
+                    searchText
+                  )
+                    .map((externalLayout, i) => {
+                      const name = externalLayout.getName();
+                      return (
+                        <Item
+                          key={i}
+                          leftIcon={<ExternalLayoutIcon />}
+                          primaryText={name}
+                          editingName={
+                            renamedItemKind === 'external-layout' &&
+                            renamedItemName === name
+                          }
+                          onEdit={() => this.props.onOpenExternalLayout(name)}
+                          onDelete={() =>
+                            this.props.onDeleteExternalLayout(externalLayout)
+                          }
+                          addLabel={t`Add a New External Layout`}
+                          onAdd={() => this._addExternalLayout(i, i18n)}
+                          onRename={newName => {
+                            this.props.onRenameExternalLayout(name, newName);
+                            this._onEditName(null, '');
+                          }}
+                          onEditName={() =>
+                            this._onEditName('external-layout', name)
+                          }
+                          onCopy={() =>
+                            this._copyExternalLayout(externalLayout)
+                          }
+                          onCut={() => this._cutExternalLayout(externalLayout)}
+                          onPaste={() => this._pasteExternalLayout(i)}
+                          onDuplicate={() =>
+                            this._duplicateExternalLayout(externalLayout, i)
+                          }
+                          canPaste={() =>
+                            Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)
+                          }
+                          canMoveUp={i !== 0}
+                          onMoveUp={() => this._moveUpExternalLayout(i)}
+                          canMoveDown={
+                            i !== project.getExternalLayoutsCount() - 1
+                          }
+                          onMoveDown={() => this._moveDownExternalLayout(i)}
+                        />
+                      );
+                    })
+                    .concat(
+                      <AddListItem
+                        noMargin
+                        key={'add-external-layout'}
+                        primaryText={<Trans>Add external layout</Trans>}
+                        onClick={() =>
+                          this._addExternalLayout(
+                            project.getExternalLayoutsCount(),
+                            i18n
+                          )
+                        }
+                      />
+                    )
+                }
+              />
             </List>
-            <SearchBar
-              ref={searchBar => (this._searchBar = searchBar)}
-              value={searchText}
-              onRequestSearch={this._onRequestSearch}
-              onChange={this._onSearchChange}
-              placeholder={t`Search in project`}
-              aspect="integrated-search-bar"
-            />
             {this.state.projectVariablesEditorOpen && (
               <VariablesEditorDialog
                 title={<Trans>Global Variables</Trans>}

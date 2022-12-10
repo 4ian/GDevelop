@@ -282,12 +282,13 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             value="Color"
                             primaryText={t`Color (text)`}
                           />
-                          {!this.props.isSceneProperties && (
-                            <SelectOption
-                              value="Behavior"
-                              primaryText={t`Required behavior`}
-                            />
-                          )}
+                          {!this.props.isSceneProperties &&
+                            !this.props.behaviorObjectType && (
+                              <SelectOption
+                                value="Behavior"
+                                primaryText={t`Required behavior`}
+                              />
+                            )}
                         </SelectField>
                         {(property.getType() === 'String' ||
                           property.getType() === 'Number') && (
@@ -331,31 +332,30 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             />
                           </SelectField>
                         )}
-                        {property.getType() === 'Behavior' &&
-                          this.props.behaviorObjectType && (
-                            <BehaviorTypeSelector
-                              project={this.props.project}
-                              objectType={this.props.behaviorObjectType}
-                              value={
-                                property.getExtraInfo().size() === 0
-                                  ? ''
-                                  : property.getExtraInfo().at(0)
+                        {property.getType() === 'Behavior' && (
+                          <BehaviorTypeSelector
+                            project={this.props.project}
+                            objectType={this.props.behaviorObjectType}
+                            value={
+                              property.getExtraInfo().size() === 0
+                                ? ''
+                                : property.getExtraInfo().at(0)
+                            }
+                            onChange={(newValue: string) => {
+                              // Change the type of the required behavior.
+                              const extraInfo = property.getExtraInfo();
+                              if (extraInfo.size() === 0) {
+                                extraInfo.push_back(newValue);
+                              } else {
+                                extraInfo.set(0, newValue);
                               }
-                              onChange={(newValue: string) => {
-                                // Change the type of the required behavior.
-                                const extraInfo = property.getExtraInfo();
-                                if (extraInfo.size() === 0) {
-                                  extraInfo.push_back(newValue);
-                                } else {
-                                  extraInfo.set(0, newValue);
-                                }
-                                this.forceUpdate();
-                                this.props.onPropertiesUpdated &&
-                                  this.props.onPropertiesUpdated();
-                              }}
-                              disabled={false}
-                            />
-                          )}
+                              this.forceUpdate();
+                              this.props.onPropertiesUpdated &&
+                                this.props.onPropertiesUpdated();
+                            }}
+                            disabled={false}
+                          />
+                        )}
                         {property.getType() === 'Color' && (
                           <ColorField
                             floatingLabelText={<Trans>Default value</Trans>}

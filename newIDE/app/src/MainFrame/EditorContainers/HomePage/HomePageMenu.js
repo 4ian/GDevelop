@@ -13,6 +13,7 @@ import SchoolIcon from '../../../UI/CustomSvgIcons/School';
 import GoogleControllerIcon from '../../../UI/CustomSvgIcons/GoogleController';
 import WebIcon from '../../../UI/CustomSvgIcons/Web';
 import Sun from '../../../UI/CustomSvgIcons/Sun';
+import StorefrontIcon from '@material-ui/icons/Storefront'; // TODO
 import Preferences from '../../../UI/CustomSvgIcons/Preferences';
 import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
@@ -42,7 +43,30 @@ export const styles = {
   },
 };
 
-export type HomeTab = 'get-started' | 'build' | 'learn' | 'play' | 'community';
+export type HomeTab =
+  | 'get-started'
+  | 'build'
+  | 'learn'
+  | 'play'
+  | 'community'
+  | 'store';
+
+export const getInitialHomeTab = (
+  initialTab: ?string,
+  showGetStartedSection: boolean
+): HomeTab => {
+  if (
+    initialTab === 'get-started' ||
+    initialTab === 'build' ||
+    initialTab === 'learn' ||
+    initialTab === 'play' ||
+    initialTab === 'community' ||
+    initialTab === 'store'
+  )
+    return initialTab;
+
+  return showGetStartedSection ? 'get-started' : 'build';
+};
 
 const tabs: {
   label: React.Node,
@@ -61,6 +85,12 @@ const tabs: {
     tab: 'build',
     id: 'home-build-tab',
     getIcon: color => <PickAxeIcon fontSize="small" color={color} />,
+  },
+  {
+    label: <Trans>Store</Trans>,
+    tab: 'store',
+    id: 'home-store-tab',
+    getIcon: color => <StorefrontIcon fontSize="small" color={color} />,
   },
   {
     label: <Trans>Learn</Trans>,

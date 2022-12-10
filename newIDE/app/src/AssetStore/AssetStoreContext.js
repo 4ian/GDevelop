@@ -4,6 +4,8 @@ import { type Filters } from '../Utils/GDevelopServices/Filters';
 import {
   type AssetShortHeader,
   type PublicAssetPacks,
+  type PublicAssetPack,
+  type PrivateAssetPack,
   type Author,
   type License,
   type Environment,
@@ -33,6 +35,7 @@ import {
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
 import shuffle from 'lodash/shuffle';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import { getAssetPackFromUserFriendlySlug } from './AssetStoreUtils';
 
 const defaultSearchText = '';
 
@@ -74,6 +77,7 @@ type AssetStoreState = {|
     chosenFilters: ?Set<string>,
     searchFilters: Array<SearchFilter<AssetShortHeader>>
   ) => ?Array<AssetShortHeader>,
+  setInitialPackUserFriendlySlug: (initialPackUserFriendlySlug: string) => void,
 |};
 
 export const AssetStoreContext = React.createContext<AssetStoreState>({
@@ -105,7 +109,6 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     setLicenseFilter: filter => {},
   },
   navigationState: {
-    previousPages: [assetStoreHomePageState],
     getCurrentPage: () => assetStoreHomePageState,
     backToPreviousPage: () => {},
     openHome: () => {},
@@ -119,6 +122,7 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   currentPage: assetStoreHomePageState,
   useSearchItem: (searchText, chosenCategory, chosenFilters, searchFilters) =>
     null,
+  setInitialPackUserFriendlySlug: (initialPackUserFriendlySlug: string) => {},
 });
 
 type AssetStoreStateProviderProps = {|
@@ -151,7 +155,7 @@ export const AssetStoreStateProvider = ({
     publicAssetShortHeaders,
     setPublicAssetShortHeaders,
   ] = React.useState<?Array<AssetShortHeader>>(null);
-  const { receivedAssetShortHeaders } = React.useContext(
+  const { receivedAssetShortHeaders, receivedAssetPacks } = React.useContext(
     AuthenticatedUserContext
   );
   const [filters, setFilters] = React.useState<?Filters>(null);
@@ -171,6 +175,7 @@ export const AssetStoreStateProvider = ({
   const [licenses, setLicenses] = React.useState<?Array<License>>(null);
   const [environment, setEnvironment] = React.useState<Environment>('live');
   const [error, setError] = React.useState<?Error>(null);
+  const initialPackUserFriendlySlug = React.useRef<?string>(null);
 
   const [searchText, setSearchText] = React.useState(defaultSearchText);
   const navigationState = useNavigation();
@@ -292,6 +297,43 @@ export const AssetStoreStateProvider = ({
     [publicAssetShortHeaders, receivedAssetShortHeaders]
   );
 
+  // When the asset packs (public and received private packs) are loaded,
+  // open the asset pack with the slug that was asked to be initially loaded.
+  React.useEffect(
+    () => {
+      // TODO: ensure "loading" is started, to avoid flashs.
+      const userFriendlySlug = initialPackUserFriendlySlug.current;
+      if (
+        publicAssetPacks &&
+        receivedAssetPacks &&
+        privateAssetPacks &&
+        userFriendlySlug
+      ) {
+        console.log('LOADING DONE');
+        // TODO: do only once (use a ref)
+        // TODO: stop the "loading".
+
+        const assetPack = getAssetPackFromUserFriendlySlug({
+          publicAssetPacks,
+          receivedAssetPacks,
+          userFriendlySlug,
+        });
+
+        // TODO: also handle asset pack not received.
+        if (assetPack) {
+          navigationState.openPackPage(assetPack);
+          return;
+        } else {
+          // handle the displayed not received private asset
+          // navigationState.
+        }
+
+        console.log('NOTHING FOUND');
+      }
+    },
+    [publicAssetPacks, receivedAssetPacks, privateAssetPacks]
+  );
+
   React.useEffect(
     () => {
       // the callback fetchAssetsAndFilters depends on the environment,
@@ -329,6 +371,13 @@ export const AssetStoreStateProvider = ({
     chosenCategory,
     chosenFilters,
     searchFilters
+  );
+
+  const setInitialPackUserFriendlySlug = React.useCallback(
+    (newInitialPackUserFriendlySlug: string) => {
+      initialPackUserFriendlySlug.current = newInitialPackUserFriendlySlug;
+    },
+    []
   );
 
   const assetStoreState = React.useMemo(
@@ -376,6 +425,7 @@ export const AssetStoreStateProvider = ({
           chosenFilters,
           searchFilters
         ),
+      setInitialPackUserFriendlySlug,
     }),
     [
       searchResults,
@@ -400,6 +450,7 @@ export const AssetStoreStateProvider = ({
       licenseFilter,
       setLicenseFilter,
       assetShortHeadersById,
+      setInitialPackUserFriendlySlug,
     ]
   );
 

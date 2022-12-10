@@ -49,9 +49,7 @@ import PrivateAssetPackPurchaseDialog from './PrivateAssets/PrivateAssetPackPurc
 import { LineStackLayout } from '../UI/Layout';
 import Paper from '../UI/Paper';
 
-type Props = {|
-  project: gdProject,
-|};
+type Props = {||};
 
 export type AssetStoreInterface = {|
   onClose: () => void,
@@ -83,7 +81,7 @@ const identifyAssetPackKind = ({
 };
 
 export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
-  ({ project }: Props, ref) => {
+  (props: Props, ref) => {
     const {
       publicAssetPacks,
       privateAssetPacks,
@@ -550,7 +548,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                   {openedAssetShortHeader && (
                     <AssetDetails
                       ref={assetDetails}
-                      project={project}
                       onTagSelection={selectTag}
                       assetShortHeader={openedAssetShortHeader}
                       onOpenDetails={onOpenDetails}

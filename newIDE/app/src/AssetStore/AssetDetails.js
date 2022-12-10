@@ -83,7 +83,6 @@ const makeFirstLetterUppercase = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
 type Props = {|
-  project: gdProject,
   onTagSelection: (tag: string) => void,
   assetShortHeader: AssetShortHeader,
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
@@ -109,13 +108,7 @@ export type AssetDetailsInterface = {|
 
 export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
   (
-    {
-      project,
-      onTagSelection,
-      assetShortHeader,
-      onOpenDetails,
-      onAssetLoaded,
-    }: Props,
+    { onTagSelection, assetShortHeader, onOpenDetails, onAssetLoaded }: Props,
     ref
   ) => {
     const {
@@ -384,7 +377,6 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                           return resource ? resource.file : '';
                         }}
                         isImageResourceSmooth={() => isImageResourceSmooth}
-                        project={project}
                         timeBetweenFrames={direction.timeBetweenFrames}
                         isLooping // Always loop in the asset store.
                         hideCheckeredBackground

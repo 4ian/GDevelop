@@ -261,6 +261,7 @@ const InstructionParametersEditor = React.forwardRef<
                 </Column>
                 {isAnEventFunctionMetadata(instructionMetadata) && (
                   <IconButton
+                    tooltip={t`Open extension events`}
                     onClick={() => {
                       openExtension(i18n);
                     }}
@@ -269,6 +270,19 @@ const InstructionParametersEditor = React.forwardRef<
                   </IconButton>
                 )}
               </Line>
+              {isAnEventFunctionMetadata(instructionMetadata) && (
+                <Line>
+                  <DismissableAlertMessage
+                    kind={'info'}
+                    identifier={'open-instruction-events'}
+                  >
+                    <Trans>
+                      Extensions are written with events. They can be edited
+                      with the button in the top-right corner.
+                    </Trans>
+                  </DismissableAlertMessage>
+                </Line>
+              )}
               {instructionExtraInformation && (
                 <Line>
                   {instructionExtraInformation.identifier === undefined ? (

@@ -43,7 +43,8 @@ export type AlertMessageIdentifier =
   | 'command-palette-shortcut'
   | 'asset-installed-explanation'
   | 'extension-installed-explanation'
-  | 'project-should-have-unique-package-name';
+  | 'project-should-have-unique-package-name'
+  | 'open-instruction-events';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -185,6 +186,10 @@ export const allAlertMessages: Array<{
     label: (
       <Trans>Project package names should not begin with com.example</Trans>
     ),
+  },
+  {
+    key: 'open-instruction-events',
+    label: <Trans>Open instruction extension events</Trans>,
   },
 ];
 

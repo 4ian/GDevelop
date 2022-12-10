@@ -243,19 +243,6 @@ const InstructionParametersEditor = React.forwardRef<
         {({ i18n }) => (
           <ScrollView autoHideScrollbar>
             <Column expand>
-              {isAnEventFunctionMetadata(instructionMetadata) && (
-                <Line>
-                  <DismissableAlertMessage
-                    kind={'info'}
-                    identifier={'open-instruction-events'}
-                  >
-                    <Trans>
-                      Extensions are written with events. They can be edited
-                      with the button in the top-right corner.
-                    </Trans>
-                  </DismissableAlertMessage>
-                </Line>
-              )}
               <Line alignItems="flex-start">
                 <img
                   src={instructionMetadata.getIconFilename()}
@@ -283,6 +270,19 @@ const InstructionParametersEditor = React.forwardRef<
                   </IconButton>
                 )}
               </Line>
+              {isAnEventFunctionMetadata(instructionMetadata) && (
+                <Line>
+                  <DismissableAlertMessage
+                    kind={'info'}
+                    identifier={'open-instruction-events'}
+                  >
+                    <Trans>
+                      Extensions are written with events. They can be edited
+                      with the button in the top-right corner.
+                    </Trans>
+                  </DismissableAlertMessage>
+                </Line>
+              )}
               {instructionExtraInformation && (
                 <Line>
                   {instructionExtraInformation.identifier === undefined ? (

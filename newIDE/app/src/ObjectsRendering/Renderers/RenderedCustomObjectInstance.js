@@ -163,25 +163,35 @@ const layoutFields = [
   'HorizontalAnchorTarget',
   'VerticalAnchorOrigin',
   'VerticalAnchorTarget',
+  'AnchorOrigin',
+  'AnchorTarget',
   'AnchorDeltaX',
   'AnchorDeltaY',
 ];
 
 const getHorizontalAnchorValue = (anchorName: string) => {
-  return anchorName === 'Left'
+  const horizontalAnchorName = (anchorName.includes('-')
+    ? anchorName.split('-')[1]
+    : anchorName
+  ).toLowerCase();
+  return horizontalAnchorName === 'left'
     ? 0
-    : anchorName === 'Right'
+    : horizontalAnchorName === 'right'
     ? 1
-    : anchorName === 'Center'
+    : horizontalAnchorName === 'center'
     ? 0.5
     : null;
 };
 const getVerticalAnchorValue = (anchorName: string) => {
-  return anchorName === 'Top'
+  const verticalAnchorName = (anchorName.includes('-')
+    ? anchorName.split('-')[0]
+    : anchorName
+  ).toLowerCase();
+  return verticalAnchorName === 'top'
     ? 0
-    : anchorName === 'Bottom'
+    : verticalAnchorName === 'bottom'
     ? 1
-    : anchorName === 'Center'
+    : verticalAnchorName === 'center'
     ? 0.5
     : null;
 };
@@ -214,10 +224,12 @@ const getLayouts = (
     const layoutField = layoutFields.find(field => name.includes(field));
 
     let targetObjectName = '';
-    let anchorTarget: ?number = null;
+    let horizontalAnchorTarget: ?number = null;
+    let verticalAnchorTarget: ?number = null;
     if (
       layoutField === 'HorizontalAnchorOrigin' ||
-      layoutField === 'VerticalAnchorOrigin'
+      layoutField === 'VerticalAnchorOrigin' ||
+      layoutField === 'AnchorOrigin'
     ) {
       const targetPropertyName = name.replace('AnchorOrigin', 'AnchorTarget');
       const targetProperty = properties.get(targetPropertyName);
@@ -230,12 +242,19 @@ const getLayouts = (
         .getValue();
       const anchorTargetValueNumber =
         Number.parseFloat(anchorTargetStringValue) || 0;
-      if (layoutField === 'HorizontalAnchorOrigin') {
-        anchorTarget =
+      if (
+        layoutField === 'HorizontalAnchorOrigin' ||
+        layoutField === 'AnchorOrigin'
+      ) {
+        horizontalAnchorTarget =
           getHorizontalAnchorValue(anchorTargetStringValue) ||
           anchorTargetValueNumber;
-      } else {
-        anchorTarget =
+      }
+      if (
+        layoutField === 'VerticalAnchorOrigin' ||
+        layoutField === 'AnchorOrigin'
+      ) {
+        verticalAnchorTarget =
           getVerticalAnchorValue(anchorTargetStringValue) ||
           anchorTargetValueNumber;
       }
@@ -264,34 +283,43 @@ const getLayouts = (
         layout.verticalLayout.minSideAbsoluteMargin = propertyValueNumber;
       } else if (layoutField === 'BottomPadding') {
         layout.verticalLayout.maxSideAbsoluteMargin = propertyValueNumber;
-      } else if (layoutField === 'HorizontalAnchorOrigin') {
-        const anchorOrigin =
-          getHorizontalAnchorValue(propertyValueString) || propertyValueNumber;
-        if (anchorOrigin !== null) {
-          layout.horizontalLayout.anchorOrigin = anchorOrigin;
-        }
-        if (anchorTarget !== null) {
-          layout.horizontalLayout.anchorTarget = anchorTarget;
-        }
-        layout.horizontalLayout.anchorTargetObject = targetObjectName;
-      } else if (layoutField === 'VerticalAnchorOrigin') {
-        const anchorOrigin =
-          getVerticalAnchorValue(propertyValueString) || propertyValueNumber;
-        if (anchorOrigin !== null) {
-          layout.verticalLayout.anchorOrigin = anchorOrigin;
-        }
-        if (anchorTarget !== null) {
-          layout.verticalLayout.anchorTarget = anchorTarget;
-        }
-        layout.verticalLayout.anchorTargetObject = targetObjectName;
       } else if (layoutField === 'AnchorDeltaX') {
         layout.horizontalLayout.anchorDelta = propertyValueNumber;
       } else if (layoutField === 'AnchorDeltaY') {
         layout.verticalLayout.anchorDelta = propertyValueNumber;
+      } else {
+        if (
+          layoutField === 'HorizontalAnchorOrigin' ||
+          layoutField === 'AnchorOrigin'
+        ) {
+          const anchorOrigin =
+            getHorizontalAnchorValue(propertyValueString) ||
+            propertyValueNumber;
+          if (anchorOrigin !== null) {
+            layout.horizontalLayout.anchorOrigin = anchorOrigin;
+          }
+          if (horizontalAnchorTarget !== null) {
+            layout.horizontalLayout.anchorTarget = horizontalAnchorTarget;
+          }
+          layout.horizontalLayout.anchorTargetObject = targetObjectName;
+        }
+        if (
+          layoutField === 'VerticalAnchorOrigin' ||
+          layoutField === 'AnchorOrigin'
+        ) {
+          const anchorOrigin =
+            getVerticalAnchorValue(propertyValueString) || propertyValueNumber;
+          if (anchorOrigin !== null) {
+            layout.verticalLayout.anchorOrigin = anchorOrigin;
+          }
+          if (verticalAnchorTarget !== null) {
+            layout.verticalLayout.anchorTarget = verticalAnchorTarget;
+          }
+          layout.verticalLayout.anchorTargetObject = targetObjectName;
+        }
       }
     }
   }
-
   return layouts;
 };
 
@@ -471,7 +499,8 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
         const anchorOrigin = childLayout.horizontalLayout.anchorOrigin || 0;
         const anchorTarget = childLayout.horizontalLayout.anchorTarget || 0;
         // TODO Use anchorTargetObject instead of defaulting on the background
-        childInstance.x = childLayout.horizontalLayout.anchorDelta || 0 +
+        childInstance.x =
+          (childLayout.horizontalLayout.anchorDelta || 0) +
           anchorTarget * width -
           anchorOrigin * renderedInstance.getDefaultWidth();
       }
@@ -482,7 +511,8 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
         const anchorOrigin = childLayout.verticalLayout.anchorOrigin || 0;
         const anchorTarget = childLayout.verticalLayout.anchorTarget || 0;
         // TODO Use anchorTargetObject instead of defaulting on the background
-        childInstance.y = childLayout.verticalLayout.anchorDelta || 0 +
+        childInstance.y =
+          (childLayout.verticalLayout.anchorDelta || 0) +
           anchorTarget * height -
           anchorOrigin * renderedInstance.getDefaultHeight();
       }

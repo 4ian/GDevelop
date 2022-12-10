@@ -50,6 +50,9 @@
         });
     })();
 
+    // Error is swallowed as the service worker is not generated for previews.
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+
 	</script>
 </body>
 </html>

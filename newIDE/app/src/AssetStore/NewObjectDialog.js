@@ -348,7 +348,7 @@ export default function NewObjectDialog({
         }
       >
         {currentTab === 'asset-store' && (
-          <AssetStore ref={assetStore} project={project} />
+          <AssetStore ref={assetStore} />
         )}
         {currentTab === 'new-object' && (
           <ScrollView>

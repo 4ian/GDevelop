@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { AssetStoreContext } from '../AssetStore/AssetStoreContext';
 import {
   type GameDetailsTab,
   gameDetailsTabs,
@@ -13,6 +14,7 @@ type Props = {|
     initialDialog?: string,
     initialGameId?: string,
     initialGamesDashboardTab?: string,
+    initialAssetPackUserFriendlySlug?: string,
   |},
   actions: {|
     openOnboardingDialog: boolean => void,
@@ -43,6 +45,8 @@ export const useOpenInitialDialog = ({ parameters, actions }: Props) => {
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
+
+  const { setInitialPackUserFriendlySlug } = React.useContext(AssetStoreContext);
 
   const openProfileDialogWithTab = (profileDialogInitialTab: ProfileTab) => {
     setProfileDialogInitialTab(profileDialogInitialTab);
@@ -88,11 +92,18 @@ export const useOpenInitialDialog = ({ parameters, actions }: Props) => {
           });
           cleanupAfterDialogOpened();
           break;
+        case 'asset-store':
+          if (parameters.initialAssetPackUserFriendlySlug)
+            setInitialPackUserFriendlySlug(parameters.initialAssetPackUserFriendlySlug);
+          cleanupAfterDialogOpened();
+          break;
         default:
           break;
       }
     },
-    [parameters, actions, openGameDashboard, openSubscriptionDialog]
+    // Disable the warning as we want to do this only once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
 
   return {

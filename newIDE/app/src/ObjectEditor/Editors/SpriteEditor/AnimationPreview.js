@@ -41,7 +41,6 @@ type Props = {|
   resourceNames: string[],
   getImageResourceSource: (resourceName: string) => string,
   isImageResourceSmooth: (resourceName: string) => boolean,
-  project: gdProject,
   timeBetweenFrames: number,
   onChangeTimeBetweenFrames?: number => void,
   isLooping: boolean,
@@ -59,7 +58,6 @@ const AnimationPreview = ({
   resourceNames,
   getImageResourceSource,
   isImageResourceSmooth,
-  project,
   timeBetweenFrames,
   onChangeTimeBetweenFrames,
   isLooping,
@@ -245,7 +243,6 @@ const AnimationPreview = ({
             imageResourceSource={getImageResourceSource(resourceName)}
             isImageResourceSmooth={isImageResourceSmooth(resourceName)}
             initialZoom={initialZoom}
-            project={project}
             hideCheckeredBackground={hideCheckeredBackground}
             hideControls={hideControls}
             fixedHeight={fixedHeight}

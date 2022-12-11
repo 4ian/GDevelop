@@ -5,11 +5,19 @@
 export type ObjectTypes = Array<string>;
 export type SelectedObjectTypes = ObjectTypes;
 
-export const removeObjectType = (objectTypes: ObjectTypes, objectType: string): ObjectTypes => {
-  return objectTypes.filter(selectedObjectType => selectedObjectType !== objectType);
+export const removeObjectType = (
+  objectTypes: ObjectTypes,
+  objectType: string
+): ObjectTypes => {
+  return objectTypes.filter(
+    selectedObjectType => selectedObjectType !== objectType
+  );
 };
 
-export const addObjectTypes = (objectTypes: ObjectTypes, newObjectTypes: ObjectTypes): ObjectTypes => {
+export const addObjectTypes = (
+  objectTypes: ObjectTypes,
+  newObjectTypes: ObjectTypes
+): ObjectTypes => {
   return Array.from(new Set([...objectTypes, ...newObjectTypes]));
 };
 

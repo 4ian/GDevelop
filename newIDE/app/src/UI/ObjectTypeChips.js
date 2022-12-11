@@ -23,7 +23,9 @@ type Props = {|
 |};
 
 const ObjectTypeChips = ({ objectTypes, onChange, onRemove }: Props) => {
-  const [focusedObjectType, setFocusedObjectType] = React.useState<?string>(null);
+  const [focusedObjectType, setFocusedObjectType] = React.useState<?string>(
+    null
+  );
   const objectTypesRefs = React.useRef([]);
 
   const getChipStyle = React.useCallback(
@@ -68,7 +70,9 @@ const ObjectTypeChips = ({ objectTypes, onChange, onRemove }: Props) => {
             style={getChipStyle(objectType)}
             onBlur={() => setFocusedObjectType(null)}
             onFocus={() => setFocusedObjectType(objectType)}
-            onDelete={onChange || onRemove ? handleDeleteObjectType(objectType) : null}
+            onDelete={
+              onChange || onRemove ? handleDeleteObjectType(objectType) : null
+            }
             label={objectType}
             ref={newRef}
           />

@@ -1306,8 +1306,15 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const typesSet: Set<string> = new Set();
     enumerateObjects(project, layout).allObjectsList.forEach(({ object }) => {
-      const typeOfObject = gd.getTypeOfObject(project, layout, object.getName(), false);
-      const objectMetadata = allObjectMetadata.filter(e => e.name === typeOfObject)[0];
+      const typeOfObject = gd.getTypeOfObject(
+        project,
+        layout,
+        object.getName(),
+        false
+      );
+      const objectMetadata = allObjectMetadata.filter(
+        e => e.name === typeOfObject
+      )[0];
       typesSet.add(objectMetadata.fullName);
     });
 
@@ -1512,7 +1519,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                   })
                 }
                 getAllObjectTags={this._getAllObjectTags}
-
                 selectedObjectTypes={this.state.selectedObjectTypes}
                 onChangeSelectedObjectTypes={selectedObjectTypes =>
                   this.setState({
@@ -1520,7 +1526,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                   })
                 }
                 getAllObjectTypes={this._getAllObjectTypes}
-
                 ref={
                   // $FlowFixMe Make this component functional.
                   objectsList => (this._objectsList = objectsList)

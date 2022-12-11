@@ -434,6 +434,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const lists = enumerateObjects(project, objectsContainer);
     const displayedObjectWithContextsList = filterObjectsListEnhaced(
       project,
+      project,
       objectsContainer,
       lists.allObjectsList,
       {

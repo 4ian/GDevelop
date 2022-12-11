@@ -5,6 +5,7 @@ import IconButton from '../IconButton';
 import FilterList from '@material-ui/icons/FilterList';
 import ElementWithMenu from '../Menu/ElementWithMenu';
 import { type MenuItemTemplate } from '../Menu/Menu.flow';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 
 const styles = {
   container: {

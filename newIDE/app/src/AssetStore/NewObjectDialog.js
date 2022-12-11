@@ -347,9 +347,7 @@ export default function NewObjectDialog({
           />
         }
       >
-        {currentTab === 'asset-store' && (
-          <AssetStore ref={assetStore} />
-        )}
+        {currentTab === 'asset-store' && <AssetStore ref={assetStore} />}
         {currentTab === 'new-object' && (
           <ScrollView>
             {DismissableTutorialMessage && (

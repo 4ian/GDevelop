@@ -6,11 +6,13 @@ import {
   type PublicAssetPack,
   type PrivateAssetPack,
 } from '../Utils/GDevelopServices/Asset';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 
 export type AssetStorePageState = {|
   isOnHomePage: boolean,
   openedAssetPack: PublicAssetPack | PrivateAssetPack | null,
   openedAssetShortHeader: ?AssetShortHeader,
+  openedPrivateAssetPackListingData: ?PrivateAssetPackListingData,
   filtersState: FiltersState,
   ignoreTextualSearch: boolean,
   scrollPosition?: ?number,
@@ -26,6 +28,7 @@ export type NavigationState = {|
   activateTextualSearch: () => void,
   openTagPage: string => void,
   openPackPage: (PublicAssetPack | PrivateAssetPack) => void,
+  openPrivateAssetPackInformationPage: PrivateAssetPackListingData => void,
   openDetailPage: AssetShortHeader => void,
 |};
 
@@ -41,6 +44,7 @@ export const assetStoreHomePageState: AssetStorePageState = {
   isOnHomePage: true,
   openedAssetShortHeader: null,
   openedAssetPack: null,
+  openedPrivateAssetPackListingData: null,
   filtersState: noFilter,
   ignoreTextualSearch: false,
 };
@@ -49,6 +53,7 @@ const searchPageState: AssetStorePageState = {
   isOnHomePage: false,
   openedAssetShortHeader: null,
   openedAssetPack: null,
+  openedPrivateAssetPackListingData: null,
   filtersState: noFilter,
   ignoreTextualSearch: false,
 };
@@ -103,6 +108,7 @@ export const useNavigation = (): NavigationState => {
               isOnHomePage: false,
               openedAssetShortHeader: null,
               openedAssetPack: null,
+              openedPrivateAssetPackListingData: null,
               filtersState: {
                 chosenCategory: {
                   node: { name: tag, allChildrenTags: [], children: [] },
@@ -126,6 +132,7 @@ export const useNavigation = (): NavigationState => {
               isOnHomePage: false,
               openedAssetShortHeader: null,
               openedAssetPack: assetPack,
+              openedPrivateAssetPackListingData: null,
               filtersState: {
                 chosenCategory: {
                   node: {
@@ -145,6 +152,23 @@ export const useNavigation = (): NavigationState => {
           ],
         });
       },
+      openPrivateAssetPackInformationPage: (
+        assetPack: PrivateAssetPackListingData
+      ) => {
+        setHistory({
+          previousPages: [
+            ...previousPages,
+            {
+              isOnHomePage: false,
+              openedAssetShortHeader: null,
+              openedAssetPack: null,
+              openedPrivateAssetPackListingData: assetPack,
+              filtersState: noFilter,
+              ignoreTextualSearch: true,
+            },
+          ],
+        });
+      },
       openDetailPage: (assetShortHeader: AssetShortHeader) => {
         setHistory({
           previousPages: [
@@ -153,6 +177,7 @@ export const useNavigation = (): NavigationState => {
               isOnHomePage: false,
               openedAssetShortHeader: assetShortHeader,
               openedAssetPack: null,
+              openedPrivateAssetPackListingData: null,
               filtersState: noFilter,
               ignoreTextualSearch: true,
             },

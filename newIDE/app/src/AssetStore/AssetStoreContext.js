@@ -4,8 +4,6 @@ import { type Filters } from '../Utils/GDevelopServices/Filters';
 import {
   type AssetShortHeader,
   type PublicAssetPacks,
-  type PublicAssetPack,
-  type PrivateAssetPack,
   type Author,
   type License,
   type Environment,
@@ -35,7 +33,11 @@ import {
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
 import shuffle from 'lodash/shuffle';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { getAssetPackFromUserFriendlySlug } from './AssetStoreUtils';
+import {
+  getAssetPackFromUserFriendlySlug,
+  getPrivateAssetPackListingData,
+} from './AssetStoreUtils';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 const defaultSearchText = '';
 
@@ -115,9 +117,10 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     clearHistory: () => {},
     openSearchIfNeeded: () => {},
     activateTextualSearch: () => {},
-    openTagPage: string => {},
-    openPackPage: AssetPack => {},
-    openDetailPage: stAssetShortHeaderring => {},
+    openTagPage: tag => {},
+    openPackPage: assetPack => {},
+    openDetailPage: assetShortHeader => {},
+    openPrivateAssetPackInformationPage: privateAssetPackListingData => {},
   },
   currentPage: assetStoreHomePageState,
   useSearchItem: (searchText, chosenCategory, chosenFilters, searchFilters) =>
@@ -176,6 +179,8 @@ export const AssetStoreStateProvider = ({
   const [environment, setEnvironment] = React.useState<Environment>('live');
   const [error, setError] = React.useState<?Error>(null);
   const initialPackUserFriendlySlug = React.useRef<?string>(null);
+  const initialPackOpened = React.useRef<boolean>(false);
+  const { showAlert } = useAlertDialog();
 
   const [searchText, setSearchText] = React.useState(defaultSearchText);
   const navigationState = useNavigation();
@@ -301,7 +306,12 @@ export const AssetStoreStateProvider = ({
   // open the asset pack with the slug that was asked to be initially loaded.
   React.useEffect(
     () => {
-      // TODO: ensure "loading" is started, to avoid flashs.
+      if (initialPackOpened.current) {
+        // The pack was already opened, don't re-open it again even
+        // if the effect run again.
+        return;
+      }
+
       const userFriendlySlug = initialPackUserFriendlySlug.current;
       if (
         publicAssetPacks &&
@@ -309,29 +319,44 @@ export const AssetStoreStateProvider = ({
         privateAssetPacks &&
         userFriendlySlug
       ) {
-        console.log('LOADING DONE');
-        // TODO: do only once (use a ref)
-        // TODO: stop the "loading".
+        initialPackOpened.current = true;
 
+        // Try to first find a public or received asset pack.
         const assetPack = getAssetPackFromUserFriendlySlug({
           publicAssetPacks,
           receivedAssetPacks,
           userFriendlySlug,
         });
 
-        // TODO: also handle asset pack not received.
         if (assetPack) {
           navigationState.openPackPage(assetPack);
           return;
-        } else {
-          // handle the displayed not received private asset
-          // navigationState.
         }
 
-        console.log('NOTHING FOUND');
+        // Otherwise, try to open the information page of a pack not yet bought.
+        const privateAssetPack = getPrivateAssetPackListingData({
+          privateAssetPacks,
+          userFriendlySlug,
+        });
+
+        if (privateAssetPack) {
+          navigationState.openPrivateAssetPackInformationPage(privateAssetPack);
+          return;
+        }
+
+        showAlert({
+          title: `Asset pack not found`,
+          message: `The link to the asset pack you've followed seems outdated. Why not take a look at the other packs in the asset store?`,
+        });
       }
     },
-    [publicAssetPacks, receivedAssetPacks, privateAssetPacks]
+    [
+      publicAssetPacks,
+      receivedAssetPacks,
+      privateAssetPacks,
+      navigationState,
+      showAlert,
+    ]
   );
 
   React.useEffect(

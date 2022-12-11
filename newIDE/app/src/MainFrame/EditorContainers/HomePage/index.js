@@ -161,15 +161,15 @@ export const HomePage = React.memo<Props>(
         forceUpdateEditor,
       }));
 
-      const [activeTab, setActiveTab] = React.useState<HomeTab>(
-        () => getInitialHomeTab(initialTab, showGetStartedSection)
+      const [activeTab, setActiveTab] = React.useState<HomeTab>(() =>
+        getInitialHomeTab(initialTab, showGetStartedSection)
       );
 
       return (
         <I18n>
           {({ i18n }) => (
             <>
-              <Column expand noMargin>
+              <Column expand noMargin noOverflowParent>
                 <Line expand noMargin useFullHeight>
                   <HomePageMenu
                     activeTab={activeTab}
@@ -177,7 +177,7 @@ export const HomePage = React.memo<Props>(
                     onOpenPreferences={onOpenPreferences}
                     onOpenAbout={onOpenAbout}
                   />
-                  <Column noMargin expand>
+                  <Column noMargin expand noOverflowParent>
                     {activeTab !== 'community' && !!announcements && (
                       <AnnouncementsFeed canClose level="urgent" addMargins />
                     )}

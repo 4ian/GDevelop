@@ -46,7 +46,9 @@ export const useOpenInitialDialog = ({ parameters, actions }: Props) => {
     SubscriptionSuggestionContext
   );
 
-  const { setInitialPackUserFriendlySlug } = React.useContext(AssetStoreContext);
+  const { setInitialPackUserFriendlySlug } = React.useContext(
+    AssetStoreContext
+  );
 
   const openProfileDialogWithTab = (profileDialogInitialTab: ProfileTab) => {
     setProfileDialogInitialTab(profileDialogInitialTab);
@@ -94,7 +96,9 @@ export const useOpenInitialDialog = ({ parameters, actions }: Props) => {
           break;
         case 'asset-store':
           if (parameters.initialAssetPackUserFriendlySlug)
-            setInitialPackUserFriendlySlug(parameters.initialAssetPackUserFriendlySlug);
+            setInitialPackUserFriendlySlug(
+              parameters.initialAssetPackUserFriendlySlug
+            );
           cleanupAfterDialogOpened();
           break;
         default:

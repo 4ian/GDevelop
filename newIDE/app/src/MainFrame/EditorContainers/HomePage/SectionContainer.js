@@ -72,7 +72,7 @@ const SectionContainer = ({
         square
         background="dark"
       >
-        <Column expand>
+        <Column noOverflowParent expand>
           {title && (
             <SectionRow>
               {backAction && (

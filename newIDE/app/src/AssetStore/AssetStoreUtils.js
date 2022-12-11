@@ -4,6 +4,7 @@ import {
   type PrivateAssetPack,
   type PublicAssetPack,
 } from '../Utils/GDevelopServices/Asset';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 
 const slug = (incString: string): string => {
   const p = ['.', '=', '-'];
@@ -69,6 +70,24 @@ export const getAssetPackFromUserFriendlySlug = ({
     userFriendlySlug
   );
   if (publicAssetPack) return publicAssetPack;
+
+  return null;
+};
+
+export const getPrivateAssetPackListingData = ({
+  privateAssetPacks,
+  userFriendlySlug,
+}: {|
+  privateAssetPacks: Array<PrivateAssetPackListingData>,
+  userFriendlySlug: string,
+|}): ?PrivateAssetPackListingData => {
+  const privateAssetPackId = getIdFromPrivateAssetPackUserFriendlySlug(
+    userFriendlySlug
+  );
+  const privateAssetPack = privateAssetPacks.find(
+    privateAssetPack => privateAssetPackId === privateAssetPack.id
+  );
+  if (privateAssetPack) return privateAssetPack;
 
   return null;
 };

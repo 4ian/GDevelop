@@ -494,7 +494,7 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .SetHelpPath("/all-features/expressions");
 
   extension
-      .AddExpression("lerp_angle",
+      .AddExpression("lerpAngle",
                      _("Lerp (Linear interpolation) between two angles"),
                      _("Linearly interpolates between two angles (in degrees) by taking the shortest direction."),
                      "",

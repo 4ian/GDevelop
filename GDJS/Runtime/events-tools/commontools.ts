@@ -368,9 +368,6 @@ namespace gdjs {
       export const pi = function (): number {
         return Math.PI;
       };
-    }
-  }
-}
 
       /**
        * Linearly interpolates between two angles (in degrees) by taking the shortest direction.
@@ -379,10 +376,13 @@ namespace gdjs {
        * @param x The interpolation value between 0 and 1.
        * @returns Return the interpolated angle, in degrees.
        */
-       export const lerp_angle = function (
+       export const lerpAngle = function (
         angle1: number,
         angle2: number,
         x: float
       ): number {
         return angle1 + gdjs.evtTools.common.angleDifference(angle1, angle2) * x;
       };
+    }
+  }
+}

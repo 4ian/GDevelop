@@ -149,11 +149,19 @@ namespace gdjs {
       this._embeddedResourcesMappings = new Map();
       for (const resource of this._data.resources.resources) {
         if (resource.metadata) {
-          const metadata = JSON.parse(resource.metadata);
-          this._embeddedResourcesMappings.set(
-            resource.name,
-            metadata.embeddedResourcesMapping || {}
-          );
+          try {
+            const metadata = JSON.parse(resource.metadata);
+            if (metadata?.embeddedResourcesMapping) {
+              this._embeddedResourcesMappings.set(
+                resource.name,
+                metadata.embeddedResourcesMapping
+              );
+            }
+          } catch {
+            logger.error(
+              'Some metadata of resources can not be succesfully parsed.'
+            );
+          }
         }
       }
 

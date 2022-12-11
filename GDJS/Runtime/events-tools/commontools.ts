@@ -370,17 +370,17 @@ namespace gdjs {
       };
 
       /**
-       * Linearly interpolates between two angles (in degrees) by taking the shortest direction.
+       * Linearly interpolates between two angles (in degrees) by taking the shortest direction around the circle.
        * @param angle1 Starting angle, in degrees.
        * @param angle2 Destination angle, in degrees.
        * @param x The interpolation value between 0 and 1.
        * @returns Return the interpolated angle, in degrees.
        */
        export const lerpAngle = function (
-        angle1: number,
-        angle2: number,
+        angle1: float,
+        angle2: float,
         x: float
-      ): number {
+      ): float {
         return angle1 + gdjs.evtTools.common.angleDifference(angle1, angle2) * x;
       };
     }

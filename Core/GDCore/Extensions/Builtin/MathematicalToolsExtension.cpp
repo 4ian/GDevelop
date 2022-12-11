@@ -496,7 +496,7 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
   extension
       .AddExpression("lerpAngle",
                      _("Lerp (Linear interpolation) between two angles"),
-                     _("Linearly interpolates between two angles (in degrees) by taking the shortest direction."),
+                     _("Linearly interpolates between two angles (in degrees) by taking the shortest direction around the circle."),
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("Starting angle, in degrees"))

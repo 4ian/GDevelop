@@ -54,14 +54,20 @@ import {
   type ObjectWithContext,
   type GroupWithContext,
   enumerateObjects,
+  enumerateObjectTypes,
 } from '../ObjectsList/EnumerateObjects';
-import TagsButton from '../UI/EditorMosaic/TagsButton';
 import CloseButton from '../UI/EditorMosaic/CloseButton';
+import ObjectTypesButton from '../UI/EditorMosaic/ObjectTypesButton';
+import TagsButton from '../UI/EditorMosaic/TagsButton';
 import {
   type SelectedTags,
   buildTagsMenuTemplate,
   getTagsFromString,
 } from '../Utils/TagsHelper';
+import {
+  type SelectedObjectTypes,
+  buildObjectTypesMenuTemplate,
+} from '../Utils/ObjectTypesHelper';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import SceneVariablesDialog from './SceneVariablesDialog';
@@ -72,6 +78,7 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
 import { getInstancesInLayoutForObject } from '../Utils/Layout';
+import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories';
 
 const gd: libGDevelop = global.gd;
 
@@ -154,6 +161,7 @@ type State = {|
 
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
+  selectedObjectTypes: SelectedObjectTypes,
 |};
 
 type CopyCutPasteOptions = { useLastCursorPosition?: boolean };
@@ -212,6 +220,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
 
       selectedObjectTags: [],
+      selectedObjectTypes: [],
     };
   }
 
@@ -1290,6 +1299,41 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
+  _getAllObjectTypes = (): Array<string> => {
+    const { project, layout } = this.props;
+
+    const allObjectMetadata = enumerateObjectTypes(project);
+
+    const typesSet: Set<string> = new Set();
+    enumerateObjects(project, layout).allObjectsList.forEach(({ object }) => {
+      const typeOfObject = gd.getTypeOfObject(
+        project,
+        layout,
+        object.getName(),
+        false
+      );
+      const objectMetadata = allObjectMetadata.filter(
+        e => e.name === typeOfObject
+      )[0];
+      typesSet.add(objectMetadata.fullName);
+    });
+
+    return Array.from(typesSet);
+  };
+
+  _buildObjectTypesMenuTemplate = (i18n: I18nType): Array<any> => {
+    const { selectedObjectTypes } = this.state;
+
+    return buildObjectTypesMenuTemplate({
+      noObjectTypeLabel: i18n._(t`No object types - add an object first`),
+      getAllObjectTypes: this._getAllObjectTypes,
+      selectedObjectTypes: selectedObjectTypes,
+      onChange: selectedObjectTypes => {
+        this.setState({ selectedObjectTypes });
+      },
+    });
+  };
+
   render() {
     const {
       project,
@@ -1425,6 +1469,17 @@ export default class SceneEditor extends React.Component<Props, State> {
                 buildMenuTemplate={(i18n: I18nType) =>
                   this._buildObjectTagsMenuTemplate(i18n)
                 }
+                tooltip={t`Filter by tag`}
+              />
+            )}
+          </I18n>,
+          <I18n key="object-types">
+            {({ i18n }) => (
+              <ObjectTypesButton
+                buildMenuTemplate={(i18n: I18nType) =>
+                  this._buildObjectTypesMenuTemplate(i18n)
+                }
+                tooltip={t`Filter by type`}
               />
             )}
           </I18n>,
@@ -1464,6 +1519,13 @@ export default class SceneEditor extends React.Component<Props, State> {
                   })
                 }
                 getAllObjectTags={this._getAllObjectTags}
+                selectedObjectTypes={this.state.selectedObjectTypes}
+                onChangeSelectedObjectTypes={selectedObjectTypes =>
+                  this.setState({
+                    selectedObjectTypes,
+                  })
+                }
+                getAllObjectTypes={this._getAllObjectTypes}
                 ref={
                   // $FlowFixMe Make this component functional.
                   objectsList => (this._objectsList = objectsList)

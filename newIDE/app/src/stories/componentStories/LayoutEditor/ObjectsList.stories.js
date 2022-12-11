@@ -45,6 +45,9 @@ export const Default = () => (
           selectedObjectTags={[]}
           onChangeSelectedObjectTags={selectedObjectTags => {}}
           getAllObjectTags={() => []}
+          selectedObjectTypes={[]}
+          onChangeSelectedObjectTypes={selectedObjectTypes => {}}
+          getAllObjectTypes={() => []}
           canRenameObject={() => true}
           onDeleteObject={(objectWithContext, cb) => cb(true)}
           onRenameObject={(objectWithContext, newName, cb) => cb(true)}
@@ -86,6 +89,9 @@ export const WithTags = () => (
             'Looooooooooong Tag 3',
             'Unselected Tag 4',
           ]}
+          selectedObjectTypes={[]}
+          onChangeSelectedObjectTypes={selectedObjectTypes => {}}
+          getAllObjectTypes={() => []}
           canRenameObject={() => true}
           onDeleteObject={(objectWithContext, cb) => cb(true)}
           onRenameObject={(objectWithContext, newName, cb) => cb(true)}

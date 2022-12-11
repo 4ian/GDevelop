@@ -20,13 +20,14 @@ import {
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import {
   enumerateObjects,
-  filterObjectsList,
+  filterObjectsListEnhaced,
   isSameObjectWithContext,
 } from './EnumerateObjects';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { CLIPBOARD_KIND } from './ClipboardKind';
 import TagChips from '../UI/TagChips';
+import ObjectTypeChips from '../UI/ObjectTypeChips';
 import EditTagsDialog from '../UI/EditTagsDialog';
 import {
   type Tags,
@@ -35,6 +36,11 @@ import {
   buildTagsMenuTemplate,
   getTagsFromString,
 } from '../Utils/TagsHelper';
+import {
+  type ObjectTypes,
+  type SelectedObjectTypes,
+  buildObjectTypesMenuTemplate,
+} from '../Utils/ObjectTypesHelper';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
@@ -118,6 +124,10 @@ type Props = {|
   getAllObjectTags: () => Tags,
   onChangeSelectedObjectTags: SelectedTags => void,
 
+  selectedObjectTypes: SelectedObjectTypes,
+  getAllObjectTypes: () => ObjectTypes,
+  onChangeSelectedObjectTypes: SelectedObjectTypes => void,
+
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onExportObject: (object: gdObject) => void,
   onObjectCreated: gdObject => void,
@@ -150,6 +160,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       selectedObjectTags,
       getAllObjectTags,
       onChangeSelectedObjectTags,
+
+      selectedObjectTypes,
+      getAllObjectTypes,
+      onChangeSelectedObjectTypes,
 
       onEditObject,
       onExportObject,
@@ -418,11 +432,15 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const lists = enumerateObjects(project, objectsContainer);
-    const displayedObjectWithContextsList = filterObjectsList(
+    const displayedObjectWithContextsList = filterObjectsListEnhaced(
+      project,
+      project,
+      objectsContainer,
       lists.allObjectsList,
       {
         searchText,
         selectedTags: selectedObjectTags,
+        selectedObjectTypes,
       }
     );
     const selectedObjects = displayedObjectWithContextsList.filter(
@@ -755,6 +773,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         <TagChips
           tags={selectedObjectTags}
           onChange={onChangeSelectedObjectTags}
+        />
+        <ObjectTypeChips
+          objectTypes={selectedObjectTypes}
+          onChange={onChangeSelectedObjectTypes}
         />
         <div style={styles.listContainer} id="objects-list">
           <AutoSizer>

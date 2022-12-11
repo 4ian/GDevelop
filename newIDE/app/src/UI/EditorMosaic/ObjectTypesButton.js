@@ -24,7 +24,7 @@ type Props = {|
   tooltip?: MessageDescriptor,
 |};
 
-export default function TagsButton(props: Props) {
+export default function ObjectTypesButton(props: Props) {
   return (
     <ElementWithMenu
       element={

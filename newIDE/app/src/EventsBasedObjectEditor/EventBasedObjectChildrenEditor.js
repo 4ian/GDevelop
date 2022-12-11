@@ -240,6 +240,9 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 selectedObjectTags={[]}
                 onChangeSelectedObjectTags={selectedObjectTags => {}}
                 getAllObjectTags={() => []}
+                selectedObjectTypes={[]}
+                onChangeSelectedObjectTypes={selectedObjectTypes => {}}
+                getAllObjectTypes={() => []}
                 ref={
                   // $FlowFixMe Make this component functional.
                   objectsList => (this._objectsList = objectsList)

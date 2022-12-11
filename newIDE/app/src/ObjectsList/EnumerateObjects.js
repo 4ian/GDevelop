@@ -2,6 +2,8 @@
 import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
 import { type SelectedTags, hasStringAllTags } from '../Utils/TagsHelper';
+import { type SelectedObjectTypes } from '../Utils/ObjectTypesHelper';
+
 const gd: libGDevelop = global.gd;
 
 export type EnumeratedObjectMetadata = {|
@@ -126,6 +128,13 @@ export type ObjectFilteringOptions = {|
   hideExactMatches?: boolean,
 |};
 
+export type ObjectFilteringOptionsEnhaced = {|
+  searchText: string,
+  selectedTags: SelectedTags,
+  hideExactMatches?: boolean,
+  selectedObjectTypes: SelectedObjectTypes,
+|};
+
 export const filterObjectByTags = (
   objectWithContext: ObjectWithContext,
   selectedTags: SelectedTags
@@ -134,6 +143,27 @@ export const filterObjectByTags = (
 
   const objectTags = objectWithContext.object.getTags();
   return hasStringAllTags(objectTags, selectedTags);
+};
+
+export const filterObjectByTypes = (
+  objectWithContext: ObjectWithContext,
+  selectedObjectTypes: SelectedObjectTypes,
+  project: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+  allObjectMetadata: Array<EnumeratedObjectMetadata>
+): boolean => {
+  if (!selectedObjectTypes.length) return true;
+
+  const typeOfObject = gd.getTypeOfObject(
+    project,
+    objectsContainer,
+    objectWithContext.object.getName(),
+    false
+  );
+  const objectMetadata = allObjectMetadata.filter(
+    e => e.name === typeOfObject
+  )[0];
+  return selectedObjectTypes.includes(objectMetadata.fullName);
 };
 
 export const filterObjectsList = (
@@ -145,6 +175,45 @@ export const filterObjectsList = (
   return list
     .filter(objectWithContext =>
       filterObjectByTags(objectWithContext, selectedTags)
+    )
+    .filter((objectWithContext: ObjectWithContext) => {
+      const objectName = objectWithContext.object.getName();
+
+      if (hideExactMatches && searchText === objectName) return undefined;
+
+      return objectName.toLowerCase().indexOf(searchText.toLowerCase()) !== -1;
+    });
+};
+
+export const filterObjectsListEnhaced = (
+  project: gdProject,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+  list: ObjectWithContextList,
+  {
+    searchText,
+    selectedTags,
+    selectedObjectTypes,
+    hideExactMatches,
+  }: ObjectFilteringOptionsEnhaced
+): ObjectWithContextList => {
+  if (!searchText && !selectedTags.length && !selectedObjectTypes.length)
+    return list;
+
+  const allObjectMetadata = enumerateObjectTypes(project);
+
+  return list
+    .filter(objectWithContext =>
+      filterObjectByTags(objectWithContext, selectedTags)
+    )
+    .filter(objectWithContext =>
+      filterObjectByTypes(
+        objectWithContext,
+        selectedObjectTypes,
+        globalObjectsContainer,
+        objectsContainer,
+        allObjectMetadata
+      )
     )
     .filter((objectWithContext: ObjectWithContext) => {
       const objectName = objectWithContext.object.getName();

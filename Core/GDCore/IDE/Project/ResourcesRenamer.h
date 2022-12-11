@@ -49,6 +49,9 @@ class ResourcesRenamer : public gd::ArbitraryResourceWorker {
   virtual void ExposeJson(gd::String& jsonResourceName) override {
     RenameIfNeeded(jsonResourceName);
   };
+  virtual void ExposeTilemap(gd::String& tilemapResourceName) override {
+    RenameIfNeeded(tilemapResourceName);
+  };
   virtual void ExposeVideo(gd::String& videoResourceName) override {
     RenameIfNeeded(videoResourceName);
   };

@@ -1,3 +1,4 @@
+// @flow
 import optionalRequire from '../Utils/OptionalRequire';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { isPathInProjectFolder } from './ResourceUtils';
@@ -5,13 +6,31 @@ import { createNewResource } from './ResourceSource';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 
+export type EmbeddedResource = {
+  resourceKind: string,
+  resourceName?: string,
+  relPath: string,
+  fullPath: string,
+  outside: boolean,
+};
+
+export type EmbeddedResourceResult = {
+  filePath: string,
+  outside: boolean,
+  allFiles: Map<string, EmbeddedResource>,
+  mapping: { [key: string]: string },
+};
+
 /**
  * Copy the embedded resources inside the project folder
  * @param project The project
  * @param embeddedFiles The embedded files
  * @returns
  */
-export async function copyEmbeddedToProjectFolder(project, embeddedFiles) {
+export async function copyEmbeddedToProjectFolder(
+  project: gdProject,
+  embeddedFiles: Map<string, EmbeddedResourceResult>
+) {
   if (!fs || !path) {
     return;
   }
@@ -21,7 +40,7 @@ export async function copyEmbeddedToProjectFolder(project, embeddedFiles) {
 
   for (const { outside, allFiles } of embeddedFiles.values()) {
     if (outside) {
-      for (const embedded of Object.values(allFiles)) {
+      for (const embedded of allFiles.values()) {
         if (embedded.outside) {
           const resourceBasename = path.basename(embedded.fullPath);
           const fileExtension = path.extname(resourceBasename);
@@ -60,24 +79,32 @@ export async function copyEmbeddedToProjectFolder(project, embeddedFiles) {
  * @param project The project
  * @param embeddedFiles The embedded files
  */
-export function mapEmbeddedFiles(project, embeddedFiles) {
+export function mapEmbeddedFiles(
+  project: gdProject,
+  embeddedFiles: Map<string, EmbeddedResourceResult>
+) {
   const projectPath = path.dirname(project.getProjectFile());
 
   for (const { allFiles, mapping } of embeddedFiles.values()) {
-    for (let { kind, relPath, fullPath, resourceName } of Object.values(
-      allFiles
-    )) {
+    for (let {
+      resourceKind,
+      resourceName,
+      relPath,
+      fullPath,
+    } of allFiles.values()) {
       if (!resourceName) {
         resourceName = path.relative(projectPath, fullPath);
       }
 
-      const newResource = createNewResource(kind);
-      newResource.setName(resourceName);
-      newResource.setFile(resourceName);
+      const newResource = createNewResource(resourceKind);
+      if (newResource) {
+        newResource.setName(resourceName);
+        newResource.setFile(resourceName);
 
-      mapping[relPath] = resourceName;
+        mapping[relPath] = resourceName;
 
-      project.getResourcesManager().addResource(newResource);
+        project.getResourcesManager().addResource(newResource);
+      }
     }
   }
 }
@@ -88,7 +115,10 @@ export function mapEmbeddedFiles(project, embeddedFiles) {
  * @param filePath The file path of a resource
  * @returns
  */
-export async function listTileMapEmbeddedFiles(project, filePath) {
+export async function listTileMapEmbeddedFiles(
+  project: gdProject,
+  filePath: string
+): Promise<?EmbeddedResourceResult> {
   if (!fs || !path) {
     return;
   }
@@ -97,22 +127,23 @@ export async function listTileMapEmbeddedFiles(project, filePath) {
   const tileMap = JSON.parse(data);
   if (tileMap && tileMap.__header__ && tileMap.__header__.app === 'LDtk') {
     const dir = path.dirname(filePath);
-    const allFiles = {};
+    const allFiles = new Map<string, EmbeddedResource>();
     let outside = false;
 
     for (const tileset of tileMap.defs.tilesets) {
       if (tileset.relPath) {
         const relPath = tileset.relPath;
         const fullPath = path.resolve(dir, relPath);
-
-        allFiles[relPath] = {
-          kind: 'image',
+        const resource = {
+          resourceKind: 'image',
           relPath,
           fullPath,
           outside: !isPathInProjectFolder(project, fullPath),
         };
 
-        outside = outside || allFiles[relPath].outside;
+        allFiles.set(relPath, resource);
+
+        outside = outside || resource.outside;
       }
     }
 
@@ -120,15 +151,16 @@ export async function listTileMapEmbeddedFiles(project, filePath) {
       if (level.bgRelPath) {
         const relPath = level.bgRelPath;
         const fullPath = path.resolve(dir, relPath);
-
-        allFiles[level.bgRelPath] = {
-          kind: 'image',
+        const resource = {
+          resourceKind: 'image',
           relPath,
           fullPath,
           outside: !isPathInProjectFolder(project, fullPath),
         };
 
-        outside = outside || allFiles[relPath].outside;
+        allFiles.set(level.bgRelPath, resource);
+
+        outside = outside || resource.outside;
       }
     }
 

@@ -78,7 +78,7 @@ for (const { kind, createNewResource } of allResourceKindsAndMetadata) {
   constructors[kind] = createNewResource;
 }
 
-export function createNewResource(kind: string) {
+export function createNewResource(kind: string): ?gdResource {
   return constructors[kind] ? constructors[kind]() : null;
 }
 

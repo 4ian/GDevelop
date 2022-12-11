@@ -19,6 +19,7 @@ import {
 import { Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
 import { FileToCloudProjectResourceUploader } from './FileToCloudProjectResourceUploader';
+import type { EmbeddedResourceResult } from './EmbeddedResourceSources';
 
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
@@ -100,7 +101,7 @@ const localResourceSources: Array<ResourceSource> = [
           path => !isPathInProjectFolder(project, path)
         );
 
-        const embeddedFiles = new Map();
+        const embeddedFiles = new Map<string, EmbeddedResourceResult>();
         if (listEmbeddedFiles) {
           for (const filePath of filePaths) {
             const result = await listEmbeddedFiles(project, filePath);
@@ -114,7 +115,7 @@ const localResourceSources: Array<ResourceSource> = [
         }
         const hasEmbeddedFiles = embeddedFiles.size > 0;
 
-        const newToOldFilePaths = new Map();
+        const newToOldFilePaths = new Map<string, string>();
 
         if (outside) {
           const answer = Window.showConfirmDialog(
@@ -150,10 +151,12 @@ const localResourceSources: Array<ResourceSource> = [
 
             if (newToOldFilePaths.has(filePath)) {
               const oldFilePath = newToOldFilePaths.get(filePath);
-              const embeddedFile = embeddedFiles.get(oldFilePath);
+              if (oldFilePath) {
+                const embeddedFile = embeddedFiles.get(oldFilePath);
 
-              if (embeddedFile) {
-                mapping = embeddedFile.mapping;
+                if (embeddedFile) {
+                  mapping = embeddedFile.mapping;
+                }
               }
             } else {
               const embeddedFile = embeddedFiles.get(filePath);

@@ -2,7 +2,7 @@
 import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
 import { type SelectedTags, hasStringAllTags } from '../Utils/TagsHelper';
-import { type SelectedObjectTypes, hasStringAllObjectTypes } from '../Utils/ObjectTypesHelper';
+import { type SelectedObjectTypes } from '../Utils/ObjectTypesHelper';
 
 const gd: libGDevelop = global.gd;
 
@@ -143,11 +143,13 @@ export const filterObjectByTypes = (
   selectedObjectTypes: SelectedObjectTypes,
   project: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  allObjectMetadata: Array<EnumeratedObjectMetadata>
 ): boolean => {
   if (!selectedObjectTypes.length) return true;
 
-  const objectType = gd.getTypeOfObject(project, objectsContainer, objectWithContext.object.getName(), false);
-  return hasStringAllObjectTypes(objectType, selectedObjectTypes);
+  const typeOfObject = gd.getTypeOfObject(project, objectsContainer, objectWithContext.object.getName(), false);
+  const objectMetadata = allObjectMetadata.filter(e => e.name === typeOfObject)[0];
+  return selectedObjectTypes.includes(objectMetadata.fullName);
 };
 
 export const filterObjectsList = (
@@ -177,6 +179,8 @@ export const filterObjectsListEnhaced = (
 ): ObjectWithContextList => {
   if (!searchText && !selectedTags.length && !selectedObjectTypes.length) return list;
 
+  const allObjectMetadata = enumerateObjectTypes(project);
+
   return list
     .filter(objectWithContext =>
       filterObjectByTags(objectWithContext, selectedTags)
@@ -184,7 +188,8 @@ export const filterObjectsListEnhaced = (
     .filter(objectWithContext =>
       filterObjectByTypes(objectWithContext, selectedObjectTypes, 
         project,
-        objectsContainer)
+        objectsContainer,
+        allObjectMetadata)
     )
     .filter((objectWithContext: ObjectWithContext) => {
       const objectName = objectWithContext.object.getName();

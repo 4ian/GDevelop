@@ -69,17 +69,3 @@ export const buildObjectTypesMenuTemplate = ({
     }))
     .concat(footerMenuItems);
 };
-
-export const getObjectTypesFromString = (objectTypesString: string): ObjectTypes => {
-  if (objectTypesString.trim() === '') return [];
-
-  return objectTypesString.split(',').map(objectType => objectType.trim());
-};
-
-export const getStringFromObjectTypes = (objectTypes: ObjectTypes): string => {
-  return objectTypes.join(', ');
-};
-
-export const hasStringAllObjectTypes = (objectTypeStr: string, objectTypes: ObjectTypes) => {
-  return objectTypes.includes(objectTypeStr);
-};

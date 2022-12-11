@@ -20,13 +20,14 @@ const styles = {
 
 type Props = {|
   buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
+  tooltip?: MessageDescriptor,
 |};
 
 export default function ObjectTypesButton(props: Props) {
   return (
     <ElementWithMenu
       element={
-        <IconButton style={styles.container}>
+        <IconButton style={styles.container} tooltip={props.tooltip}>
           <FilterList htmlColor="inherit" style={styles.icon} />
         </IconButton>
       }

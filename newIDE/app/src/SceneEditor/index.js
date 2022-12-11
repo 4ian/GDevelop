@@ -54,6 +54,7 @@ import {
   type ObjectWithContext,
   type GroupWithContext,
   enumerateObjects,
+  enumerateObjectTypes,
 } from '../ObjectsList/EnumerateObjects';
 import CloseButton from '../UI/EditorMosaic/CloseButton';
 import ObjectTypesButton from '../UI/EditorMosaic/ObjectTypesButton';
@@ -66,7 +67,6 @@ import {
 import {
   type SelectedObjectTypes,
   buildObjectTypesMenuTemplate,
-  getObjectTypesFromString,
 } from '../Utils/ObjectTypesHelper';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
@@ -78,6 +78,7 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
 import { getInstancesInLayoutForObject } from '../Utils/Layout';
+import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories';
 
 const gd: libGDevelop = global.gd;
 
@@ -1301,9 +1302,13 @@ export default class SceneEditor extends React.Component<Props, State> {
   _getAllObjectTypes = (): Array<string> => {
     const { project, layout } = this.props;
 
+    const allObjectMetadata = enumerateObjectTypes(project);
+
     const typesSet: Set<string> = new Set();
     enumerateObjects(project, layout).allObjectsList.forEach(({ object }) => {
-      typesSet.add(gd.getTypeOfObject(project, layout, object.getName(), false));
+      const typeOfObject = gd.getTypeOfObject(project, layout, object.getName(), false);
+      const objectMetadata = allObjectMetadata.filter(e => e.name === typeOfObject)[0];
+      typesSet.add(objectMetadata.fullName);
     });
 
     return Array.from(typesSet);
@@ -1457,6 +1462,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 buildMenuTemplate={(i18n: I18nType) =>
                   this._buildObjectTagsMenuTemplate(i18n)
                 }
+                tooltip={t`Filter by tag`}
               />
             )}
           </I18n>,
@@ -1466,6 +1472,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 buildMenuTemplate={(i18n: I18nType) =>
                   this._buildObjectTypesMenuTemplate(i18n)
                 }
+                tooltip={t`Filter by type`}
               />
             )}
           </I18n>,

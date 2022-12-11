@@ -27,6 +27,7 @@ import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import { CLIPBOARD_KIND } from './ClipboardKind';
 import TagChips from '../UI/TagChips';
+import ObjectTypeChips from '../UI/ObjectTypeChips';
 import EditTagsDialog from '../UI/EditTagsDialog';
 import {
   type Tags,
@@ -38,9 +39,7 @@ import {
 import {
   type ObjectTypes,
   type SelectedObjectTypes,
-  getStringFromObjectTypes,
   buildObjectTypesMenuTemplate,
-  getObjectTypesFromString,
 } from '../Utils/ObjectTypesHelper';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
@@ -773,6 +772,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         <TagChips
           tags={selectedObjectTags}
           onChange={onChangeSelectedObjectTags}
+        />
+        <ObjectTypeChips
+          objectTypes={selectedObjectTypes}
+          onChange={onChangeSelectedObjectTypes}
         />
         <div style={styles.listContainer} id="objects-list">
           <AutoSizer>

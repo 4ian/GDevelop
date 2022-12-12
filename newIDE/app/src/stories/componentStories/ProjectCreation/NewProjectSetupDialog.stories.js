@@ -61,6 +61,7 @@ export const FromExample = () => {
   return (
     <NewProjectSetupDialog
       isFromExample
+      sourceExampleName="RPG story"
       authenticatedUser={fakeIndieAuthenticatedUser}
       storageProviders={[
         UrlStorageProvider,

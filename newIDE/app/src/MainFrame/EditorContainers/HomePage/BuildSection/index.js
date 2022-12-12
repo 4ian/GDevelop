@@ -48,7 +48,6 @@ import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasure
 import Add from '../../../../UI/CustomSvgIcons/Add';
 import ImageTileRow from '../../../../UI/ImageTileRow';
 import { prepareExamples } from '../../../../AssetStore/ExampleStore';
-import Window from '../../../../Utils/Window';
 import Skeleton from '@material-ui/lab/Skeleton';
 import BackgroundText from '../../../../UI/BackgroundText';
 import Paper from '../../../../UI/Paper';

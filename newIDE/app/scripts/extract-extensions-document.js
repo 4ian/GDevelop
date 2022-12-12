@@ -9,11 +9,11 @@ const path = require('path');
 const {
   gdevelopWikiUrlRoot,
   getHelpLink,
-  generateReadMoreLink,
   getExtensionFolderName,
   improperlyFormattedHelpPaths,
 } = require('./lib/WikiHelpLink');
 const { convertMarkdownToDokuWikiMarkdown } = require('./lib/DokuwikiHelpers');
+const shell = require('shelljs');
 
 const extensionShortHeadersUrl =
   'https://api.gdevelop-app.com/asset/extension-short-header';
@@ -97,17 +97,21 @@ const groupBy = (array, getKey) => {
     group.push(element);
   }
   return table;
-}
+};
 
-const sortKeys = (table) => {
+const sortKeys = table => {
   const sortedTable = {};
   for (const key of Object.keys(table).sort()) {
     sortedTable[key] = table[key];
   }
   return sortedTable;
-}
+};
 
-const createExtensionReferencePage = async (extension, extensionShortHeader, isCommunity) => {
+const createExtensionReferencePage = async (
+  extension,
+  extensionShortHeader,
+  isCommunity
+) => {
   const folderName = getExtensionFolderName(extension.name);
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
   const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;
@@ -124,13 +128,15 @@ const createExtensionReferencePage = async (extension, extensionShortHeader, isC
     '\n' +
     `**Authors and contributors** to this community extension: ${authorNamesWithLinks}.\n` +
     '\n' +
-    (isCommunity ? `<note important>
+    (isCommunity
+      ? `<note important>
 This is an extension made by a community member — but not reviewed
 by the GDevelop extension team. As such, we can't guarantee it
 meets all the quality standards of official extensions. In case of
 doubt, contact the author to know more about what the extension
 does or inspect its content before using it.
-</note>\n\n` : '') +
+</note>\n\n`
+      : '') +
     '---\n' +
     '\n' +
     convertMarkdownToDokuWikiMarkdown(extension.description) +
@@ -168,24 +174,31 @@ const generateExtensionSection = (extension, extensionShortHeader) => {
     (helpPageUrl !== referencePageUrl
       ? ` ([[${referencePageUrl}|reference]])`
       : '') +
-    '\n\n');
+    '\n\n'
+  );
 };
 
-const generateAllExtensionsSections = (extensionsAndExtensionShortHeaders) => {
-  let extensionSectionsContent = "";
-  const extensionsByCategory = sortKeys(groupBy(
+const generateAllExtensionsSections = extensionsAndExtensionShortHeaders => {
+  let extensionSectionsContent = '';
+  const extensionsByCategory = sortKeys(
+    groupBy(
       extensionsAndExtensionShortHeaders,
-      pair => pair.extension.category || 'General'));
+      pair => pair.extension.category || 'General'
+    )
+  );
   for (const category in extensionsByCategory) {
-      const extensions = extensionsByCategory[category];
+    const extensions = extensionsByCategory[category];
 
-      extensionSectionsContent += `### ${category}\n\n`;
-      for (const { extension, extensionShortHeader } of extensions) {
-        extensionSectionsContent += generateExtensionSection(extension, extensionShortHeader);
-      }
+    extensionSectionsContent += `### ${category}\n\n`;
+    for (const { extension, extensionShortHeader } of extensions) {
+      extensionSectionsContent += generateExtensionSection(
+        extension,
+        extensionShortHeader
+      );
+    }
   }
   return extensionSectionsContent;
-}
+};
 
 (async () => {
   try {
@@ -200,21 +213,27 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
 
 `;
 
-    const reviewedExtensionsAndExtensionShortHeaders =
-        extensionsAndExtensionShortHeaders.filter(
-          pair => pair.extensionShortHeader.tier !== 'community');
-    const communityExtensionsAndExtensionShortHeaders =
-        extensionsAndExtensionShortHeaders.filter(
-          pair => pair.extensionShortHeader.tier === 'community');
+    const reviewedExtensionsAndExtensionShortHeaders = extensionsAndExtensionShortHeaders.filter(
+      pair => pair.extensionShortHeader.tier !== 'community'
+    );
+    const communityExtensionsAndExtensionShortHeaders = extensionsAndExtensionShortHeaders.filter(
+      pair => pair.extensionShortHeader.tier === 'community'
+    );
 
     indexPageContent += '## Reviewed extensions\n\n';
     for (const {
       extension,
       extensionShortHeader,
     } of reviewedExtensionsAndExtensionShortHeaders) {
-      await createExtensionReferencePage(extension, extensionShortHeader, false);
+      await createExtensionReferencePage(
+        extension,
+        extensionShortHeader,
+        false
+      );
     }
-    indexPageContent += generateAllExtensionsSections(reviewedExtensionsAndExtensionShortHeaders);
+    indexPageContent += generateAllExtensionsSections(
+      reviewedExtensionsAndExtensionShortHeaders
+    );
 
     indexPageContent += `## Community extensions
 
@@ -231,7 +250,9 @@ does or inspect its content before using it.
     } of communityExtensionsAndExtensionShortHeaders) {
       await createExtensionReferencePage(extension, extensionShortHeader, true);
     }
-    indexPageContent += generateAllExtensionsSections(communityExtensionsAndExtensionShortHeaders);
+    indexPageContent += generateAllExtensionsSections(
+      communityExtensionsAndExtensionShortHeaders
+    );
 
     indexPageContent += `
 ## Make your own extension
@@ -250,6 +271,7 @@ Read more about this:
       console.info(`✅ Done. File generated: ${extensionsFilePath}`);
     } catch (err) {
       console.error('❌ Error while writing output', err);
+      shell.exit(1);
     }
 
     if (improperlyFormattedHelpPaths.size > 0) {
@@ -262,5 +284,6 @@ Read more about this:
     }
   } catch (err) {
     console.error('❌ Error while fetching data', err);
+    shell.exit(1);
   }
 })();

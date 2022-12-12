@@ -2871,6 +2871,8 @@ interface TextObject {
     unsigned long GetColorR();
     unsigned long GetColorG();
     unsigned long GetColorB();
+    void SetTextAlignment([Const] DOMString textAlignment);
+    [Const, Ref] DOMString GetTextAlignment();
 };
 TextObject implements ObjectConfiguration;
 

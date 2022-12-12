@@ -26,6 +26,7 @@ namespace gdjs {
     };
     /** The text of the object */
     string: string;
+    textAlignment: string;
   };
 
   export type TextObjectData = ObjectData & TextObjectDataType;
@@ -82,6 +83,7 @@ namespace gdjs {
         textObjectData.color.b,
       ];
       this._str = textObjectData.string;
+      this._textAlign = textObjectData.textAlignment;
       this._renderer = new gdjs.TextRuntimeObjectRenderer(
         this,
         instanceContainer
@@ -126,6 +128,9 @@ namespace gdjs {
       }
       if (oldObjectData.underlined !== newObjectData.underlined) {
         return false;
+      }
+      if (oldObjectData.textAlignment !== newObjectData.textAlignment) {
+        this.setTextAlignment(newObjectData.textAlignment);
       }
       return true;
     }
@@ -288,7 +293,7 @@ namespace gdjs {
      * Get width of the text.
      */
     getWidth(): float {
-      return this._renderer.getWidth();
+      return this._wrapping ? this._wrappingWidth : this._renderer.getWidth();
     }
 
     /**

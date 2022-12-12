@@ -28,11 +28,9 @@ const readJSONFile = async (filepath: string): Promise<Object> => {
   }
 };
 
-const fetchVersionedLocalFileIfDesktop = async (
-  filename: string
-): Promise<?Object> => {
-  const shouldFetchVersionedTutorials = !!remote && !Window.isDev();
-  if (!shouldFetchVersionedTutorials) return null;
+const fetchLocalFileIfDesktop = async (filename: string): Promise<?Object> => {
+  const shouldFetchTutorials = !!remote && !Window.isDev();
+  if (!shouldFetchTutorials) return null;
 
   const appPath = app ? app.getAppPath() : process.cwd();
   // If on desktop released version, find json in resources.
@@ -50,11 +48,17 @@ const fetchVersionedLocalFileIfDesktop = async (
 export const fetchInAppTutorialShortHeaders = async (): Promise<
   Array<InAppTutorialShortHeader>
 > => {
-  const inAppTutorialShortHeadersStoredLocally = await fetchVersionedLocalFileIfDesktop(
-    'in-app-tutorial-short-header'
-  );
-  if (inAppTutorialShortHeadersStoredLocally)
-    return inAppTutorialShortHeadersStoredLocally;
+  try {
+    const inAppTutorialShortHeadersStoredLocally = await fetchLocalFileIfDesktop(
+      'in-app-tutorial-short-header'
+    );
+    if (inAppTutorialShortHeadersStoredLocally)
+      return inAppTutorialShortHeadersStoredLocally;
+  } catch (error) {
+    console.warn(
+      'Could not read the short headers stored locally. Trying to fetch the API.'
+    );
+  }
 
   const response = await axios.get(
     `${GDevelopAssetApi.baseUrl}/in-app-tutorial-short-header`
@@ -65,10 +69,16 @@ export const fetchInAppTutorialShortHeaders = async (): Promise<
 export const fetchInAppTutorial = async (
   shortHeader: InAppTutorialShortHeader
 ): Promise<InAppTutorial> => {
-  const inAppTutorialStoredLocally = await fetchVersionedLocalFileIfDesktop(
-    shortHeader.id
-  );
-  if (inAppTutorialStoredLocally) return inAppTutorialStoredLocally;
+  try {
+    const inAppTutorialStoredLocally = await fetchLocalFileIfDesktop(
+      shortHeader.id
+    );
+    if (inAppTutorialStoredLocally) return inAppTutorialStoredLocally;
+  } catch (error) {
+    console.warn(
+      'Could not read the in app tutorial stored locally. Trying to fetch the API.'
+    );
+  }
 
   const response = await axios.get(shortHeader.contentUrl);
   return response.data;

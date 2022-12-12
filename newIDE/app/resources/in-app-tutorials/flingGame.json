@@ -1398,6 +1398,22 @@
       }
     },
     {
+      "elementToHighlightId": "#toolbar-open-properties-panel-button",
+      "skippable": true,
+      "nextStepTrigger": {
+        "presenceOfElement": "#instance-properties-editor"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the **instance** properties editor panel and select the instance of $(background) on the scene.",
+            "fr-FR": "Ouvrez le panneau d'édition des propriétés de **l'instance** et sélectionnez l'instance de $(background) sur la scène."
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
       "nextStepTrigger": {
         "presenceOfElement": "#instance-properties-editor [id=\"Z Order\"]"
       },
@@ -1410,22 +1426,6 @@
             "fr-FR": "Sélectionnez l'instance de $(background) sur la scène."
           }
         }
-      }
-    },
-    {
-      "elementToHighlightId": "#toolbar-open-properties-panel-button",
-      "skippable": true,
-      "nextStepTrigger": {
-        "presenceOfElement": "#instance-properties-editor"
-      },
-      "tooltip": {
-        "description": {
-          "messageByLocale": {
-            "en": "Open the **instance** properties editor panel.",
-            "fr-FR": "Ouvrez le panneau d'édition des propriétés de **l'instance**."
-          }
-        },
-        "placement": "bottom"
       }
     },
     {

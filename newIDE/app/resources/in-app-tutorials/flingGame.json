@@ -53,7 +53,10 @@
       "scene": "startScene"
     }
   },
-  "availableLocales": ["en", "fr-FR"],
+  "availableLocales": [
+    "en",
+    "fr-FR"
+  ],
   "endDialog": {
     "content": [
       {
@@ -182,6 +185,7 @@
       "nextStepTrigger": {
         "valueHasChanged": true
       },
+      "deprecated": true,
       "tooltip": {
         "description": {
           "messageByLocale": {
@@ -197,6 +201,7 @@
       "nextStepTrigger": {
         "valueHasChanged": true
       },
+      "deprecated": true,
       "tooltip": {
         "description": {
           "messageByLocale": {

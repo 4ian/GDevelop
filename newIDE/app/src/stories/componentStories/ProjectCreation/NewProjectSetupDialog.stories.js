@@ -24,6 +24,7 @@ export default {
 export const OpenAndAuthenticated = () => {
   return (
     <NewProjectSetupDialog
+      isFromExample={false}
       authenticatedUser={fakeIndieAuthenticatedUser}
       storageProviders={[
         UrlStorageProvider,
@@ -40,6 +41,7 @@ export const OpenAndAuthenticated = () => {
 export const TooManyCloudProjects = () => {
   return (
     <NewProjectSetupDialog
+      isFromExample={false}
       authenticatedUser={
         fakeNoSubscriptionAndTooManyCloudProjectsAuthenticatedUser
       }
@@ -55,9 +57,28 @@ export const TooManyCloudProjects = () => {
   );
 };
 
+export const FromExample = () => {
+  return (
+    <NewProjectSetupDialog
+      isFromExample
+      sourceExampleName="RPG story"
+      authenticatedUser={fakeIndieAuthenticatedUser}
+      storageProviders={[
+        UrlStorageProvider,
+        CloudStorageProvider,
+        GoogleDriveStorageProvider,
+        DownloadFileStorageProvider,
+      ]}
+      onClose={() => action('click on close')()}
+      onCreate={() => action('click on create')()}
+    />
+  );
+};
+
 export const OpenAndNotAuthenticated = () => {
   return (
     <NewProjectSetupDialog
+      isFromExample={false}
       authenticatedUser={fakeNotAuthenticatedAuthenticatedUser}
       storageProviders={[
         UrlStorageProvider,
@@ -74,6 +95,7 @@ export const OpenAndNotAuthenticated = () => {
 export const Opening = () => {
   return (
     <NewProjectSetupDialog
+      isFromExample={false}
       authenticatedUser={fakeIndieAuthenticatedUser}
       isOpening
       storageProviders={[

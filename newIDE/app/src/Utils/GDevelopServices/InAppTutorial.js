@@ -28,11 +28,11 @@ const readJSONFile = async (filepath: string): Promise<Object> => {
   }
 };
 
-const fetchVersionnedLocalFileIfDesktop = async (
+const fetchVersionedLocalFileIfDesktop = async (
   filename: string
 ): Promise<?Object> => {
-  const shouldFetchVersionnedTutorials = !!remote && !Window.isDev();
-  if (!shouldFetchVersionnedTutorials) return null;
+  const shouldFetchVersionedTutorials = !!remote && !Window.isDev();
+  if (!shouldFetchVersionedTutorials) return null;
 
   const appPath = app ? app.getAppPath() : process.cwd();
   // If on desktop released version, find json in resources.
@@ -50,7 +50,7 @@ const fetchVersionnedLocalFileIfDesktop = async (
 export const fetchInAppTutorialShortHeaders = async (): Promise<
   Array<InAppTutorialShortHeader>
 > => {
-  const inAppTutorialShortHeadersStoredLocally = await fetchVersionnedLocalFileIfDesktop(
+  const inAppTutorialShortHeadersStoredLocally = await fetchVersionedLocalFileIfDesktop(
     'in-app-tutorial-short-header'
   );
   if (inAppTutorialShortHeadersStoredLocally)
@@ -65,7 +65,7 @@ export const fetchInAppTutorialShortHeaders = async (): Promise<
 export const fetchInAppTutorial = async (
   shortHeader: InAppTutorialShortHeader
 ): Promise<InAppTutorial> => {
-  const inAppTutorialStoredLocally = await fetchVersionnedLocalFileIfDesktop(
+  const inAppTutorialStoredLocally = await fetchVersionedLocalFileIfDesktop(
     shortHeader.id
   );
   if (inAppTutorialStoredLocally) return inAppTutorialStoredLocally;

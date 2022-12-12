@@ -158,17 +158,13 @@ const getExtensionIncludeFiles = (
   return mapFor(0, eventsFunctionsExtension.getEventsFunctionsCount(), i => {
     const eventsFunction = eventsFunctionsExtension.getEventsFunctionAt(i);
 
-    if (isExtensionLifecycleEventsFunction(eventsFunction.getName())) {
-      const codeNamespace = getFreeFunctionCodeNamespace(
-        eventsFunction,
-        codeNamespacePrefix
-      );
-      const functionName = codeNamespace + '.func'; // TODO
+    const codeNamespace = getFreeFunctionCodeNamespace(
+      eventsFunction,
+      codeNamespacePrefix
+    );
+    const functionName = codeNamespace + '.func'; // TODO
 
-      return options.eventsFunctionCodeWriter.getIncludeFileFor(functionName);
-    }
-
-    return null;
+    return options.eventsFunctionCodeWriter.getIncludeFileFor(functionName);
   }).filter(Boolean);
 };
 

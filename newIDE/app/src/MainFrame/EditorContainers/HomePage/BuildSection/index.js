@@ -160,10 +160,6 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     const windowWidth = useResponsiveWindowWidth();
     const forceUpdate = useForceUpdate();
 
-    // Search "activate cloud projects" in the codebase for everything to
-    // remove once cloud projects are activated for the desktop app.
-    const supportsCloudProjects = !electron || Window.isDev();
-
     const iconClasses = useStylesForListItemIcon();
 
     React.useImperativeHandle(ref, () => ({
@@ -174,8 +170,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       file => file.fileMetadata
     );
 
-    // Show cloud projects on the web app only.
-    if (supportsCloudProjects && cloudProjects) {
+    if (cloudProjects) {
       projectFiles = projectFiles.concat(
         cloudProjects
           .map(cloudProject => {

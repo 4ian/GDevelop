@@ -10,6 +10,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 import BackgroundText from '../UI/BackgroundText';
 import { Column, Line } from '../UI/Grid';
 import StorageProviderListItem from './StorageProviderListItem';
+import AlertMessage from '../UI/AlertMessage';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -23,6 +24,9 @@ const OpenFromStorageProviderDialog = ({
   storageProviders,
   onChooseProvider,
 }: Props) => {
+  const isCloudStorageProviderEnabled = storageProviders.some(
+    provider => provider.internalName === 'Cloud'
+  );
   return (
     <I18n>
       {({ i18n }) => (
@@ -40,6 +44,14 @@ const OpenFromStorageProviderDialog = ({
           open
           maxWidth="sm"
         >
+          {isCloudStorageProviderEnabled && (
+            <AlertMessage kind="info">
+              <Trans>
+                You can find your cloud projects in the Build section of the
+                homepage.
+              </Trans>
+            </AlertMessage>
+          )}
           <List useGap>
             {storageProviders
               .filter(storageProvider => !storageProvider.hiddenInOpenDialog)

@@ -1,7 +1,8 @@
 // @flow
+import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
 import Refresh from '@material-ui/icons/Refresh';
-import * as React from 'react';
+import HelpOutline from '@material-ui/icons/HelpOutline';
 import { type StorageProvider, type SaveAsLocation } from '../ProjectsStorage';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
@@ -11,7 +12,7 @@ import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import generateName from '../Utils/ProjectNameGenerator';
 import { type NewProjectSetup } from './CreateProjectDialog';
 import IconButton from '../UI/IconButton';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 import { findEmptyPathInWorkspaceFolder } from '../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 import SelectField from '../UI/SelectField';
@@ -40,6 +41,7 @@ type Props = {|
   sourceExampleName?: string,
   storageProviders: Array<StorageProvider>,
   authenticatedUser: AuthenticatedUser,
+  isFromExample: boolean,
 |};
 
 const generateProjectName = (sourceExampleName: ?string) =>
@@ -84,6 +86,7 @@ const NewProjectSetupDialog = ({
   sourceExampleName,
   storageProviders,
   authenticatedUser,
+  isFromExample,
 }: Props): React.Node => {
   const { values } = React.useContext(PreferencesContext);
   const { openSubscriptionDialog } = React.useContext(
@@ -292,28 +295,38 @@ const NewProjectSetupDialog = ({
             setSaveAsLocation,
             newProjectsDefaultFolder,
           })}
-        <SelectField
-          fullWidth
-          disabled={isOpening}
-          floatingLabelText={<Trans>Resolution preset</Trans>}
-          value={resolutionOption}
-          onChange={(e, i, newValue: string) => {
-            // $FlowExpectedError - new value can only be option values.
-            setResolutionOption(newValue);
-          }}
-        >
-          {Object.entries(resolutionOptions).map(([id, option]) => (
-            // $FlowFixMe - Object.entries does not keep types.
-            <SelectOption key={id} value={id} primaryText={option.label} />
-          ))}
-        </SelectField>
+        <LineStackLayout noMargin alignItems="center">
+          <SelectField
+            fullWidth
+            disabled={isOpening || isFromExample}
+            floatingLabelText={<Trans>Resolution preset</Trans>}
+            value={resolutionOption}
+            onChange={(e, i, newValue: string) => {
+              // $FlowExpectedError - new value can only be option values.
+              setResolutionOption(newValue);
+            }}
+          >
+            {Object.entries(resolutionOptions).map(([id, option]) => (
+              // $FlowFixMe - Object.entries does not keep types.
+              <SelectOption key={id} value={id} primaryText={option.label} />
+            ))}
+          </SelectField>
+          {isFromExample && (
+            <IconButton
+              size="small"
+              tooltip={t`The resolution of the example will be used.`}
+            >
+              <HelpOutline />
+            </IconButton>
+          )}
+        </LineStackLayout>
         <Checkbox
           checked={optimizeForPixelArt}
           label={<Trans>Optimize for Pixel Art</Trans>}
           onCheck={(e, checked) => {
             setOptimizeForPixelArt(checked);
           }}
-          disabled={isOpening}
+          disabled={isOpening || isFromExample}
         />
         {limits && hasTooManyCloudProjects ? (
           <MaxProjectCountAlertMessage

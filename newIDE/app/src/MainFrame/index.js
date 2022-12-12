@@ -2447,6 +2447,7 @@ const MainFrame = (props: Props) => {
     setIsProjectOpening(true);
 
     try {
+      const isCreatingFromExample = !!selectedExampleShortHeader;
       const source = selectedExampleShortHeader
         ? await createNewProjectFromExampleShortHeader({
             i18n,
@@ -2491,14 +2492,17 @@ const MainFrame = (props: Props) => {
         currentProject.setTemplateSlug(selectedExampleShortHeader.slug);
       if (newProjectSetup.projectName)
         currentProject.setName(newProjectSetup.projectName);
-      currentProject.setGameResolutionSize(
-        newProjectSetup.width,
-        newProjectSetup.height
-      );
-      currentProject.setOrientation(newProjectSetup.orientation);
-      if (newProjectSetup.optimizeForPixelArt) {
-        currentProject.setPixelsRounding(true);
-        currentProject.setScaleMode('nearest');
+      if (!isCreatingFromExample) {
+        // Use the project settings of the example
+        currentProject.setGameResolutionSize(
+          newProjectSetup.width,
+          newProjectSetup.height
+        );
+        currentProject.setOrientation(newProjectSetup.orientation);
+        if (newProjectSetup.optimizeForPixelArt) {
+          currentProject.setPixelsRounding(true);
+          currentProject.setScaleMode('nearest');
+        }
       }
 
       const destinationStorageProviderOperations = getStorageProviderOperations(
@@ -3031,6 +3035,7 @@ const MainFrame = (props: Props) => {
           onClose={() => setNewProjectSetupDialogOpen(false)}
           onCreate={projectSettings => createProject(i18n, projectSettings)}
           storageProviders={props.storageProviders}
+          isFromExample={!!selectedExampleShortHeader}
           sourceExampleName={
             selectedExampleShortHeader
               ? selectedExampleShortHeader.name

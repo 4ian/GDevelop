@@ -60,7 +60,6 @@ void InitialInstancesContainer::IterateOverInstancesWithZOrdering(
   for (auto& instance : sortedInstances) func(instance);
 }
 
-#if defined(GD_IDE_ONLY)
 gd::InitialInstance& InitialInstancesContainer::InsertNewInitialInstance() {
   gd::InitialInstance newInstance;
   initialInstances.push_back(newInstance);
@@ -173,7 +172,6 @@ void InitialInstancesContainer::SerializeTo(SerializerElement& element) const {
 }
 
 void InitialInstancesContainer::Clear() { initialInstances.clear(); }
-#endif
 
 InitialInstanceFunctor::~InitialInstanceFunctor(){};
 

@@ -163,7 +163,8 @@
           }
         }
       },
-      "isOnClosableDialog": true
+      "isOnClosableDialog": true,
+      "skippable": true
     },
     {
       "elementToHighlightId": "#project-manager-tab-game-properties",
@@ -1069,7 +1070,8 @@
           }
         }
       },
-      "isOnClosableDialog": true
+      "isOnClosableDialog": true,
+      "skippable": true
     },
     {
       "elementToHighlightId": "#project-manager-extension-search-or-create",

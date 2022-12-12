@@ -246,9 +246,6 @@ const generateEventsFunctionExtension = (
       )
     )
     .then(functionInfos => {
-      if (!options.skipCodeGeneration) {
-        applyFunctionIncludeFilesDependencyTransitivity(functionInfos);
-      }
       return extension;
     });
 };
@@ -350,65 +347,6 @@ const generateFreeFunction = (
       functionFile: functionFile,
       functionMetadata: instructionOrExpression,
     });
-  }
-};
-
-/**
- * Add dependencies between functions according to transitivity.
- * @param functionInfos free function metadatas
- */
-const applyFunctionIncludeFilesDependencyTransitivity = (
-  functionInfos: Array<{
-    functionFile: string,
-    functionMetadata:
-      | gdInstructionMetadata
-      | gdExpressionMetadata
-      | gdMultipleInstructionMetadata,
-  }>
-): void => {
-  // Note that the iteration order doesn't matter, for instance for:
-  // a -> b
-  // b -> c
-  // c -> d
-  //
-  // going from a to c:
-  // a -> (b -> c)
-  // b -> c
-  // c -> d
-  //
-  // or from c to a:
-  // a -> b
-  // b -> (c -> d)
-  // c -> d
-  //
-  // give the same result:
-  // a -> (b -> (c -> d))
-  // b -> (c -> d)
-  // c -> d
-  const includeFileSets = functionInfos.map(
-    functionInfo =>
-      new Set(functionInfo.functionMetadata.getIncludeFiles().toJSArray())
-  );
-  // For any function A of the extension...
-  for (let index = 0; index < functionInfos.length; index++) {
-    const includeFiles = includeFileSets[index];
-    const functionIncludeFile = functionInfos[index].functionFile;
-
-    // ...and any function B of the extension...
-    for (let otherIndex = 0; otherIndex < functionInfos.length; otherIndex++) {
-      const otherFunctionMetadata = functionInfos[otherIndex].functionMetadata;
-      const otherIncludeFileSet = includeFileSets[otherIndex];
-      // ...where function B depends on function A...
-      if (otherIncludeFileSet.has(functionIncludeFile)) {
-        // ...add function A dependencies to the function B ones.
-        includeFiles.forEach(includeFile => {
-          if (!otherIncludeFileSet.has(includeFile)) {
-            otherIncludeFileSet.add(includeFile);
-            otherFunctionMetadata.addIncludeFile(includeFile);
-          }
-        });
-      }
-    }
   }
 };
 

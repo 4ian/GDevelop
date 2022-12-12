@@ -261,6 +261,7 @@ const InstructionParametersEditor = React.forwardRef<
                 </Column>
                 {isAnEventFunctionMetadata(instructionMetadata) && (
                   <IconButton
+                    tooltip={t`Open extension events`}
                     onClick={() => {
                       openExtension(i18n);
                     }}

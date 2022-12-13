@@ -80,8 +80,7 @@ const getAllExtensionHeaders = async () => {
           }).`
         );
       }
-
-      return extensionHeader;
+      return { ...extensionHeader, ...extensionShortHeader};
     })
   );
 

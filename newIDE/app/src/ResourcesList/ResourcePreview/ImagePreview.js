@@ -158,8 +158,8 @@ const ImagePreview = ({
     if (onImageLoaded) onImageLoaded();
   };
 
-  const zoomBy = (imageZoomFactorDelta: number) => {
-    zoomTo(imageZoomFactor + imageZoomFactorDelta);
+  const zoomBy = (imageZoomFactorMultiplier: number) => {
+    zoomTo(imageZoomFactor * imageZoomFactorMultiplier);
   };
 
   const zoomTo = (imageZoomFactor: number) => {
@@ -247,7 +247,7 @@ const ImagePreview = ({
             {!hideControls && (
               <MiniToolbar noPadding>
                 <IconButton
-                  onClick={() => zoomBy(-0.2)}
+                  onClick={() => zoomBy(0.9)}
                   tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}
                 >
                   <ZoomOut />
@@ -264,7 +264,7 @@ const ImagePreview = ({
                   />
                 </div>
                 <IconButton
-                  onClick={() => zoomBy(+0.2)}
+                  onClick={() => zoomBy(1.1)}
                   tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
                 >
                   <ZoomIn />
@@ -297,8 +297,7 @@ const ImagePreview = ({
                 onWheel={event => {
                   const { deltaY } = event;
                   if (!hideControls && shouldZoom(event)) {
-                    zoomBy(-deltaY / 500);
-                    event.preventDefault();
+                    zoomBy(1 - deltaY / 100);
                     event.stopPropagation();
                   } else {
                     // Let the usual, native vertical or horizontal scrolling happen.

@@ -57,6 +57,7 @@ export const ProjectStructureItem = ({
           {primaryText}
         </Text>
       }
+      disableButtonBehaviorForParentItem
       renderNestedItems={renderNestedItems}
       onReload={onRefresh}
       noPadding

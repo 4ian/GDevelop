@@ -5,7 +5,8 @@ import { GDevelopAssetApi } from './ApiConfigs';
 import { type InAppTutorial } from '../../InAppTutorial/InAppTutorialContext';
 import optionalRequire from '../OptionalRequire';
 import Window from '../Window';
-const fs = optionalRequire('fs').promises;
+const fs = optionalRequire('fs');
+const fsPromises = fs ? fs.promises : null;
 const path = optionalRequire('path');
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
@@ -17,10 +18,10 @@ export type InAppTutorialShortHeader = {|
 |};
 
 const readJSONFile = async (filepath: string): Promise<Object> => {
-  if (!fs) throw new Error('Filesystem is not supported.');
+  if (!fsPromises) throw new Error('Filesystem is not supported.');
 
   try {
-    const data = await fs.readFile(filepath, { encoding: 'utf8' });
+    const data = await fsPromises.readFile(filepath, { encoding: 'utf8' });
     const dataObject = JSON.parse(data);
     return dataObject;
   } catch (ex) {

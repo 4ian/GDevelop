@@ -2022,6 +2022,10 @@ const MainFrame = (props: Props) => {
           });
         }
 
+        // Refresh user cloud projects in case they saved as on Cloud storage provider
+        // so that it appears immediately in the list.
+        authenticatedUser.onCloudProjectsChanged();
+
         // Ensure resources are re-loaded from their new location.
         ResourcesLoader.burstAllUrlsCache();
 

@@ -76,6 +76,11 @@ class GD_CORE_API ArbitraryResourceWorker {
   virtual void ExposeJson(gd::String &jsonName);
 
   /**
+   * \brief Expose a Tilemap, which is always a reference to a "tilemap" resource.
+   */
+  virtual void ExposeTilemap(gd::String &tilemapName);
+
+  /**
    * \brief Expose a video, which is always a reference to a "video" resource.
    */
   virtual void ExposeVideo(gd::String &videoName);
@@ -95,6 +100,12 @@ class GD_CORE_API ArbitraryResourceWorker {
    * \brief Expose a raw filename.
    */
   virtual void ExposeFile(gd::String &resourceFileName) = 0;
+
+  /**
+   * \brief Expose the embedded resources
+   */
+  virtual void ExposeEmbeddeds(gd::String &resourceName,
+                               gd::ResourcesManager *resourcesManager);
 
  protected:
   const std::vector<gd::ResourcesManager *> &GetResources() {

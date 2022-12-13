@@ -15,6 +15,8 @@ const {
 const { convertMarkdownToDokuWikiMarkdown } = require('./lib/DokuwikiHelpers');
 const shell = require('shelljs');
 
+/** @typedef {{ tier: 'community' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number, helpPath: string, description: string, iconUrl: string}} ExtensionHeader */
+
 const extensionShortHeadersUrl =
   'https://api.gdevelop-app.com/asset/extension-short-header';
 const gdRootPath = path.join(__dirname, '..', '..', '..');
@@ -58,31 +60,32 @@ const generateAuthorNamesWithLinks = authors => {
 /**
  * Return the list of all extensions and their associated short headers
  * (useful as containing author public profiles information).
+ * @returns {Promise<Array<ExtensionHeader>>} A promise to all extension headers
  */
-const getAllExtensionAndExtensionShortHeaders = async () => {
+const getAllExtensionHeaders = async () => {
   const response = await axios.get(extensionShortHeadersUrl);
   const extensionShortHeaders = response.data;
   if (!extensionShortHeaders.length) {
     throw new Error('Unexpected response from the extension endpoint.');
   }
 
-  const extensions = await Promise.all(
+  const extensionHeaders = await Promise.all(
     extensionShortHeaders.map(async extensionShortHeader => {
-      const response = await axios.get(extensionShortHeader.url);
-      const extension = response.data;
-      if (!extension) {
+      const response = await axios.get(extensionShortHeader.headerUrl);
+      const extensionHeader = response.data;
+      if (!extensionHeader) {
         throw new Error(
-          `Unexpected response when fetching an extension (${
-            extensionShortHeader.url
+          `Unexpected response when fetching an extension header (${
+            extensionShortHeader.headerUrl
           }).`
         );
       }
 
-      return { extensionShortHeader, extension };
+      return extensionHeader;
     })
   );
 
-  return extensions;
+  return extensionHeaders;
 };
 
 const groupBy = (array, getKey) => {
@@ -107,24 +110,28 @@ const sortKeys = table => {
   return sortedTable;
 };
 
+/**
+ * Create a page for an extension.
+ * @param {ExtensionHeader} extensionHeader The extension header
+ * @param {boolean} isCommunity The tier
+ */
 const createExtensionReferencePage = async (
-  extension,
-  extensionShortHeader,
+  extensionHeader,
   isCommunity
 ) => {
-  const folderName = getExtensionFolderName(extension.name);
+  const folderName = getExtensionFolderName(extensionHeader.name);
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
-  const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;
+  const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
   const authorNamesWithLinks = generateAuthorNamesWithLinks(
-    extensionShortHeader.authors || []
+    extensionHeader.authors || []
   );
 
   const referencePageContent =
-    `# ${extension.fullName}` +
+    `# ${extensionHeader.fullName}` +
     '\n\n' +
-    generateSvgImageIcon(extension.previewIconUrl) +
+    generateSvgImageIcon(extensionHeader.previewIconUrl) +
     '\n' +
-    `${extension.shortDescription}\n` +
+    `${extensionHeader.shortDescription}\n` +
     '\n' +
     `**Authors and contributors** to this community extension: ${authorNamesWithLinks}.\n` +
     '\n' +
@@ -139,10 +146,10 @@ does or inspect its content before using it.
       : '') +
     '---\n' +
     '\n' +
-    convertMarkdownToDokuWikiMarkdown(extension.description) +
+    convertMarkdownToDokuWikiMarkdown(extensionHeader.description) +
     '\n' +
-    (extension.helpPath ? `\n[[${helpPageUrl}|Read more...]]\n` : ``) +
-    generateExtensionFooterText(extension.fullName);
+    (extensionHeader.helpPath ? `\n[[${helpPageUrl}|Read more...]]\n` : ``) +
+    generateExtensionFooterText(extensionHeader.fullName);
 
   const extensionReferenceFilePath = path.join(
     extensionsRootPath,
@@ -156,18 +163,22 @@ does or inspect its content before using it.
   console.info(`ℹ️ File generated: ${extensionReferenceFilePath}`);
 };
 
-const generateExtensionSection = (extension, extensionShortHeader) => {
-  const folderName = getExtensionFolderName(extension.name);
+/**
+ * Generate a section for an extension.
+ * @param {ExtensionHeader} extensionHeader The extension header
+ */
+const generateExtensionSection = (extensionHeader) => {
+  const folderName = getExtensionFolderName(extensionHeader.name);
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
-  const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;
+  const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
 
   return (
-    `#### ${extension.fullName}\n` +
+    `#### ${extensionHeader.fullName}\n` +
     // Use the `&.png?` syntax to force Dokuwiki to display the image.
     // See https://www.dokuwiki.org/images.
-    generateSvgImageIcon(extension.previewIconUrl) +
+    generateSvgImageIcon(extensionHeader.previewIconUrl) +
     '\n' +
-    extension.shortDescription +
+    extensionHeader.shortDescription +
     '\n\n' +
     // Link to help page or to reference if none.
     `[[${helpPageUrl}|Read more...]]` +
@@ -183,17 +194,16 @@ const generateAllExtensionsSections = extensionsAndExtensionShortHeaders => {
   const extensionsByCategory = sortKeys(
     groupBy(
       extensionsAndExtensionShortHeaders,
-      pair => pair.extension.category || 'General'
+      pair => pair.category || 'General'
     )
   );
   for (const category in extensionsByCategory) {
     const extensions = extensionsByCategory[category];
 
     extensionSectionsContent += `### ${category}\n\n`;
-    for (const { extension, extensionShortHeader } of extensions) {
+    for (const extensionHeader of extensions) {
       extensionSectionsContent += generateExtensionSection(
-        extension,
-        extensionShortHeader
+        extensionHeader
       );
     }
   }
@@ -203,7 +213,7 @@ const generateAllExtensionsSections = extensionsAndExtensionShortHeaders => {
 (async () => {
   try {
     console.info(`ℹ️ Loading all community extensions...`);
-    const extensionsAndExtensionShortHeaders = await getAllExtensionAndExtensionShortHeaders();
+    const extensionHeaders = await getAllExtensionHeaders();
 
     let indexPageContent = `# Extensions
 
@@ -213,26 +223,22 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
 
 `;
 
-    const reviewedExtensionsAndExtensionShortHeaders = extensionsAndExtensionShortHeaders.filter(
-      pair => pair.extensionShortHeader.tier !== 'community'
+    const reviewedExtensionHeaders = extensionHeaders.filter(
+      pair => pair.tier !== 'community'
     );
-    const communityExtensionsAndExtensionShortHeaders = extensionsAndExtensionShortHeaders.filter(
-      pair => pair.extensionShortHeader.tier === 'community'
+    const communityExtensionHeaders = extensionHeaders.filter(
+      pair => pair.tier === 'community'
     );
 
     indexPageContent += '## Reviewed extensions\n\n';
-    for (const {
-      extension,
-      extensionShortHeader,
-    } of reviewedExtensionsAndExtensionShortHeaders) {
+    for (const extensionHeader of reviewedExtensionHeaders) {
       await createExtensionReferencePage(
-        extension,
-        extensionShortHeader,
+        extensionHeader,
         false
       );
     }
     indexPageContent += generateAllExtensionsSections(
-      reviewedExtensionsAndExtensionShortHeaders
+      reviewedExtensionHeaders
     );
 
     indexPageContent += `## Community extensions
@@ -244,14 +250,11 @@ doubt, contact the author to know more about what the extension
 does or inspect its content before using it.
 
 `;
-    for (const {
-      extension,
-      extensionShortHeader,
-    } of communityExtensionsAndExtensionShortHeaders) {
-      await createExtensionReferencePage(extension, extensionShortHeader, true);
+    for (const extensiontHeader of communityExtensionHeaders) {
+      await createExtensionReferencePage(extensiontHeader, true);
     }
     indexPageContent += generateAllExtensionsSections(
-      communityExtensionsAndExtensionShortHeaders
+      communityExtensionHeaders
     );
 
     indexPageContent += `

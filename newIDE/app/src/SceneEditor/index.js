@@ -983,14 +983,14 @@ export default class SceneEditor extends React.Component<Props, State> {
   zoomIn = () => {
     const { editor } = this;
     if (editor) {
-      editor.zoomBy(0.1 * editor.getZoomFactor());
+      editor.zoomBy(1.1);
     }
   };
 
   zoomOut = () => {
     const { editor } = this;
     if (editor) {
-      editor.zoomBy(-0.1 * editor.getZoomFactor());
+      editor.zoomBy(0.9);
     }
   };
 

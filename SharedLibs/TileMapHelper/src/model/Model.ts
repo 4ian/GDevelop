@@ -11,8 +11,8 @@ import { FlippingHelper } from "./GID";
  */
 export class EditableTileMap {
   private _backgroundResourceName?: string;
-  private _layers: Array<AbstractEditableLayer>;
   private _tileSet: Map<integer, TileDefinition>;
+  private _layers: Array<AbstractEditableLayer>;
   /**
    * The width of a tile.
    */
@@ -55,30 +55,31 @@ export class EditableTileMap {
   }
 
   /**
-   * @param id The identifier of the new layer.
-   * @returns The new layer.
+   * @returns The tile map width in pixels.
    */
-  addObjectLayer(id: integer): EditableObjectLayer {
-    const layer = new EditableObjectLayer(this, id);
-    this._layers.push(layer);
-    return layer;
+  getWidth(): integer {
+    return this.tileWidth * this.dimX;
   }
 
   /**
-   * @param id The identifier of the new layer.
-   * @returns The new layer.
+   * @returns The tile map height in pixels.
    */
-  addTileLayer(id: integer): EditableTileMapLayer {
-    const layer = new EditableTileMapLayer(this, id);
-    this._layers.push(layer);
-    return layer;
+  getHeight(): integer {
+    return this.tileHeight * this.dimY;
   }
 
   /**
-   * @returns The resource name of the background
+   * @returns The tile width in pixels.
    */
-  getBackgroundResourceName(): string {
-    return this._backgroundResourceName;
+  getTileHeight(): integer {
+    return this.tileHeight;
+  }
+
+  /**
+   * @returns The tile height in pixels.
+   */
+  getTileWidth(): integer {
+    return this.tileWidth;
   }
 
   /**
@@ -93,20 +94,6 @@ export class EditableTileMap {
    */
   getDimensionY(): integer {
     return this.dimY;
-  }
-
-  /**
-   * @returns The tile map height in pixels.
-   */
-  getHeight(): integer {
-    return this.tileHeight * this.dimY;
-  }
-
-  /**
-   * @returns All the layers of the tile map.
-   */
-  getLayers(): Iterable<AbstractEditableLayer> {
-    return this._layers;
   }
 
   /**
@@ -125,24 +112,37 @@ export class EditableTileMap {
   }
 
   /**
-   * @returns The tile width in pixels.
+   * @param id The identifier of the new layer.
+   * @returns The new layer.
    */
-  getTileHeight(): integer {
-    return this.tileHeight;
+  addTileLayer(id: integer): EditableTileMapLayer {
+    const layer = new EditableTileMapLayer(this, id);
+    this._layers.push(layer);
+    return layer;
   }
 
   /**
-   * @returns The tile height in pixels.
+   * @param id The identifier of the new layer.
+   * @returns The new layer.
    */
-  getTileWidth(): integer {
-    return this.tileWidth;
+  addObjectLayer(id: integer): EditableObjectLayer {
+    const layer = new EditableObjectLayer(this, id);
+    this._layers.push(layer);
+    return layer;
   }
 
   /**
-   * @returns The tile map width in pixels.
+   * @returns The resource name of the background
    */
-  getWidth(): integer {
-    return this.tileWidth * this.dimX;
+  getBackgroundResourceName(): string {
+    return this._backgroundResourceName;
+  }
+
+  /**
+   * @returns All the layers of the tile map.
+   */
+  getLayers(): Iterable<AbstractEditableLayer> {
+    return this._layers;
   }
 
   /**
@@ -346,87 +346,25 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   }
 
   /**
-   * The number of tile columns in the layer.
+   * @param alpha The opacity between 0-1
    */
-  getDimensionX(): integer {
-    return this._tiles.length === 0 ? 0 : this._tiles[0].length;
-  }
-
-  /**
-   * The number of tile rows in the layer.
-   */
-  getDimensionY(): integer {
-    return this._tiles.length;
-  }
-
-  /**
-   * @returns The layer height in pixels.
-   */
-  getHeight(): integer {
-    return this.tileMap.getHeight();
+  setAlpha(alpha: float) {
+    this._alpha = alpha;
   }
 
   /**
    * @param x The layer column.
    * @param y The layer row.
-   * @returns The tile's GID (id + flipping bits).
+   * @param tileId The tile.
    */
-  getTileGID(x: integer, y: integer): integer | undefined {
-    const row = this._tiles[y];
-    if (!row || row[x] === 0) {
-      return undefined;
+  setTile(x: integer, y: integer, tileId: integer): void {
+    const definition = this.tileMap.getTileDefinition(tileId);
+    if (!definition) {
+      console.error(`Invalid tile definition index: ${tileId}`);
+      return;
     }
-    // -1 because 0 is keep for null.
-    return row[x] - 1;
-  }
-
-  /**
-   * @param x The layer column.
-   * @param y The layer row.
-   * @returns The tile's id.
-   */
-  getTileId(x: integer, y: integer): integer | undefined {
-    const row = this._tiles[y];
-    if (!row || row[x] === 0) {
-      return undefined;
-    }
-    // -1 because 0 is keep for null.
-    const tileId = FlippingHelper.getTileId(row[x] - 1);
-    return tileId;
-  }
-
-  /**
-   * @returns The layer width in pixels.
-   */
-  getWidth(): integer {
-    return this.tileMap.getWidth();
-  }
-
-  /**
-   * @param x The layer column.
-   * @param y The layer row.
-   * @returns true if the tile is flipped diagonally.
-   */
-  isFlippedDiagonally(x: integer, y: integer): boolean {
-    return FlippingHelper.isFlippedDiagonally(this._tiles[y][x]);
-  }
-
-  /**
-   * @param x The layer column.
-   * @param y The layer row.
-   * @returns true if the tile is flipped horizontally.
-   */
-  isFlippedHorizontally(x: integer, y: integer): boolean {
-    return FlippingHelper.isFlippedHorizontally(this._tiles[y][x]);
-  }
-
-  /**
-   * @param x The layer column.
-   * @param y The layer row.
-   * @returns true if the tile is flipped vertically.
-   */
-  isFlippedVertically(x: integer, y: integer): boolean {
-    return FlippingHelper.isFlippedVertically(this._tiles[y][x]);
+    // +1 because 0 mean null
+    this._tiles[y][x] = tileId + 1;
   }
 
   /**
@@ -436,13 +374,6 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   removeTile(x: integer, y: integer): void {
     // 0 mean null
     this._tiles[y][x] = 0;
-  }
-
-  /**
-   * @param alpha The opacity between 0-1
-   */
-  setAlpha(alpha: float) {
-    this._alpha = alpha;
   }
 
   /**
@@ -508,16 +439,85 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   /**
    * @param x The layer column.
    * @param y The layer row.
-   * @param tileId The tile.
+   * @returns true if the tile is flipped horizontally.
    */
-  setTile(x: integer, y: integer, tileId: integer): void {
-    const definition = this.tileMap.getTileDefinition(tileId);
-    if (!definition) {
-      console.error(`Invalid tile definition index: ${tileId}`);
-      return;
+  isFlippedHorizontally(x: integer, y: integer): boolean {
+    return FlippingHelper.isFlippedHorizontally(this._tiles[y][x]);
+  }
+
+  /**
+   * @param x The layer column.
+   * @param y The layer row.
+   * @returns true if the tile is flipped vertically.
+   */
+  isFlippedVertically(x: integer, y: integer): boolean {
+    return FlippingHelper.isFlippedVertically(this._tiles[y][x]);
+  }
+
+  /**
+   * @param x The layer column.
+   * @param y The layer row.
+   * @returns true if the tile is flipped diagonally.
+   */
+  isFlippedDiagonally(x: integer, y: integer): boolean {
+    return FlippingHelper.isFlippedDiagonally(this._tiles[y][x]);
+  }
+
+  /**
+   * @param x The layer column.
+   * @param y The layer row.
+   * @returns The tile's GID (id + flipping bits).
+   */
+  getTileGID(x: integer, y: integer): integer | undefined {
+    const row = this._tiles[y];
+    if (!row || row[x] === 0) {
+      return undefined;
     }
-    // +1 because 0 mean null
-    this._tiles[y][x] = tileId + 1;
+    // -1 because 0 is keep for null.
+    return row[x] - 1;
+  }
+
+  /**
+   * @param x The layer column.
+   * @param y The layer row.
+   * @returns The tile's id.
+   */
+  getTileId(x: integer, y: integer): integer | undefined {
+    const row = this._tiles[y];
+    if (!row || row[x] === 0) {
+      return undefined;
+    }
+    // -1 because 0 is keep for null.
+    const tileId = FlippingHelper.getTileId(row[x] - 1);
+    return tileId;
+  }
+
+  /**
+   * The number of tile columns in the layer.
+   */
+  getDimensionX(): integer {
+    return this._tiles.length === 0 ? 0 : this._tiles[0].length;
+  }
+
+  /**
+   * The number of tile rows in the layer.
+   */
+  getDimensionY(): integer {
+    return this._tiles.length;
+  }
+
+  /**
+   * @returns The layer width in pixels.
+   */
+  getWidth(): integer {
+    return this.tileMap.getWidth();
+  }
+
+  /**
+   * @returns The layer height in pixels.
+   */
+  getHeight(): integer {
+    return this.tileMap.getHeight();
   }
 }
 
@@ -525,6 +525,14 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
  * A tile definition from the tile set.
  */
 export class TileDefinition {
+  /**
+   * There will probably be at most 4 tags on a tile.
+   * An array lookup should take less time than using a Map.
+   */
+  private readonly taggedHitBoxes: {
+    tag: string;
+    polygons: PolygonVertices[];
+  }[];
   private readonly animationLength: integer;
 
   /**
@@ -535,21 +543,12 @@ export class TileDefinition {
   private stackTileId?: integer;
 
   /**
-   * There will probably be at most 4 tags on a tile.
-   * An array lookup should take less time than using a Map.
-   */
-  private readonly taggedHitBoxes: {
-    tag: string;
-    polygons: PolygonVertices[];
-  }[];
-
-  /**
    * @param animationLength The number of frame in the tile animation.
    */
   constructor(animationLength?: integer) {
+    this.taggedHitBoxes = [];
     this.animationLength = animationLength ?? 0;
     this.stackedTiles = [];
-    this.taggedHitBoxes = [];
   }
 
   /**
@@ -567,13 +566,13 @@ export class TileDefinition {
   }
 
   /**
-   * Animated tiles have a limitation:
-   * they are only able to use frames arranged horizontally one next
-   * to each other on the atlas.
-   * @returns The number of frame in the tile animation.
+   * This property is used by {@link TransformedCollisionTileMap}
+   * to make collision classes.
+   * @param tag  The tag to allow collision layer filtering.
+   * @returns true if this tile contains any polygon with the given tag.
    */
-  getAnimationLength(): integer {
-    return this.animationLength;
+  hasTaggedHitBox(tag: string): boolean {
+    return this.taggedHitBoxes.some((hitbox) => hitbox.tag === tag);
   }
 
   /**
@@ -586,6 +585,16 @@ export class TileDefinition {
       (hitbox) => hitbox.tag === tag
     );
     return taggedHitBox && taggedHitBox.polygons;
+  }
+
+  /**
+   * Animated tiles have a limitation:
+   * they are only able to use frames arranged horizontally one next
+   * to each other on the atlas.
+   * @returns The number of frame in the tile animation.
+   */
+  getAnimationLength(): integer {
+    return this.animationLength;
   }
 
   /**
@@ -614,16 +623,6 @@ export class TileDefinition {
    */
   hasStackedTiles(): boolean {
     return this.stackedTiles.length > 0;
-  }
-
-  /**
-   * This property is used by {@link TransformedCollisionTileMap}
-   * to make collision classes.
-   * @param tag  The tag to allow collision layer filtering.
-   * @returns true if this tile contains any polygon with the given tag.
-   */
-  hasTaggedHitBox(tag: string): boolean {
-    return this.taggedHitBoxes.some((hitbox) => hitbox.tag === tag);
   }
 
   /**

@@ -52,8 +52,17 @@ class LocalFileSystem {
    * Returns all the files that should be downloaded from a URL, with the specified destination path prefix.
    */
   getAllUrlFilesIn = (pathPrefix: string): Array<UrlFileDescriptor> => {
+    // Ensure the path prefix we're searching the files in is normalized,
+    // because everything that we stored was normalized. If we don't do this,
+    // we risk missing files on Windows (as pathPrefix can contain backslashes).
+    const normalizedPathPrefix = pathPosix
+      .normalize(pathPrefix)
+      .replace(/\\/g, '/');
+
+    console.log(normalizedPathPrefix, this._filesToDownload);
+
     return Object.keys(this._filesToDownload)
-      .filter(filePath => filePath.indexOf(pathPrefix) === 0)
+      .filter(filePath => filePath.indexOf(normalizedPathPrefix) === 0)
       .map(filePath => ({
         filePath,
         url: this._filesToDownload[filePath],
@@ -61,6 +70,11 @@ class LocalFileSystem {
   };
 
   mkDir = (path: string) => {
+    if (isURL(path)) {
+      // URLs are always assumed to exist.
+      return;
+    }
+
     try {
       fs.mkdirsSync(path);
     } catch (e) {
@@ -70,6 +84,11 @@ class LocalFileSystem {
     return true;
   };
   dirExists = (path: string) => {
+    if (isURL(path)) {
+      // URLs are always assumed to exist.
+      return true;
+    }
+
     return fs.existsSync(path);
   };
   clearDir = (path: string) => {

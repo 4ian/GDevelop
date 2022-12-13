@@ -94,7 +94,7 @@ type ListItemProps = {|
     padding: 0,
   |},
   noPadding?: boolean,
-  /* Use this prop for non clickable parent item that contain nested items */
+  /* Set to true to remove button behavior of item that contains nested items. */
   disableButtonBehaviorForParentItem?: boolean,
 
   style?: {|

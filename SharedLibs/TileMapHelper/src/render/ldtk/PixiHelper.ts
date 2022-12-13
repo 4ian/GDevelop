@@ -1,4 +1,4 @@
-import { TileTextureCache } from "../TextureCache";
+import { TileTextureCache } from "../TileTextureCache";
 import { LDtkTileMap, LDtkTilesetDef } from "../../types/LDtk";
 import { getLDtkTileId } from "../../load/ldtk/LoaderHelper";
 import PIXI = GlobalPIXIModule.PIXI;

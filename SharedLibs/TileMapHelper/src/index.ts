@@ -10,7 +10,7 @@ export {
 } from "./model/Model";
 
 export { TileMapManager } from "./render/Manager";
-export { TileTextureCache } from "./render/TextureCache";
+export { TileTextureCache } from "./render/TileTextureCache";
 export { PixiTileMapHelper } from "./render/PixiHelper";
 
 export * from "./types/index";

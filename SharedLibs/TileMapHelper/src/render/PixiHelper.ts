@@ -7,7 +7,7 @@ import {
 import { PixiTiledHelper } from "./tiled/PixiHelper";
 import { PixiLDtkHelper } from "./ldtk/PixiHelper";
 import { TileMap } from "../types";
-import { TileTextureCache } from "./TextureCache";
+import { TileTextureCache } from "./TileTextureCache";
 import { FlippingHelper, getPixiRotate } from "../model/GID";
 
 import PIXI = GlobalPIXIModule.PIXI;

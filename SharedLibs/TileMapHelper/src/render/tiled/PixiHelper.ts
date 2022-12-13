@@ -1,4 +1,4 @@
-import { TileTextureCache } from "../TextureCache";
+import { TileTextureCache } from "../TileTextureCache";
 import { TiledTileMap } from "../../types/Tiled";
 import { getTileIdFromTiledGUI } from "../../load/tiled/LoaderHelper";
 import PIXI = GlobalPIXIModule.PIXI;

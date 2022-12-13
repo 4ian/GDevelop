@@ -51,6 +51,8 @@ import { prepareExamples } from '../../../../AssetStore/ExampleStore';
 import Skeleton from '@material-ui/lab/Skeleton';
 import BackgroundText from '../../../../UI/BackgroundText';
 import Paper from '../../../../UI/Paper';
+import PlaceholderError from '../../../../UI/PlaceholderError';
+import AlertMessage from '../../../../UI/AlertMessage';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -152,7 +154,12 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     const { openSubscriptionDialog } = React.useContext(
       SubscriptionSuggestionContext
     );
-    const { cloudProjects, limits } = authenticatedUser;
+    const {
+      cloudProjects,
+      limits,
+      cloudProjectsFetchingErrorLabel,
+      onCloudProjectsChanged,
+    } = authenticatedUser;
     const contextMenu = React.useRef<?ContextMenuInterface>(null);
     const { showDeleteConfirmation } = useAlertDialog();
     const [pendingProject, setPendingProject] = React.useState<?string>(null);
@@ -381,6 +388,15 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                     </ResponsiveLineStackLayout>
                   </Column>
                 </LineStackLayout>
+                {cloudProjectsFetchingErrorLabel && (
+                  <Line>
+                    <PlaceholderError onRetry={onCloudProjectsChanged}>
+                      <AlertMessage kind="warning">
+                        {cloudProjectsFetchingErrorLabel}
+                      </AlertMessage>
+                    </PlaceholderError>
+                  </Line>
+                )}
                 <Line>
                   <Column noMargin expand>
                     {isWindowWidthMediumOrLarger && (

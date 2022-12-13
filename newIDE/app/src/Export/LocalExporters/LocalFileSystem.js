@@ -59,8 +59,6 @@ class LocalFileSystem {
       .normalize(pathPrefix)
       .replace(/\\/g, '/');
 
-    console.log(normalizedPathPrefix, this._filesToDownload);
-
     return Object.keys(this._filesToDownload)
       .filter(filePath => filePath.indexOf(normalizedPathPrefix) === 0)
       .map(filePath => ({

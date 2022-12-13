@@ -209,6 +209,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       authenticatedUser: {
         ...authenticatedUser,
         loginState: 'loggingIn',
+        cloudProjectsFetchingErrorLabel: null,
       },
     }));
 
@@ -291,6 +292,17 @@ export default class AuthenticatedUserProvider extends React.Component<
         })),
       error => {
         console.error('Error while loading user cloud projects:', error);
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            cloudProjectsFetchingErrorLabel: (
+              <Trans>
+                We couldn't load your cloud projects. Verify your internet
+                connection or try again later.
+              </Trans>
+            ),
+          },
+        }));
       }
     );
     listReceivedAssetPacks(authentication.getAuthorizationHeader, {
@@ -465,6 +477,13 @@ export default class AuthenticatedUserProvider extends React.Component<
     const { firebaseUser } = this.state.authenticatedUser;
     if (!firebaseUser) return;
 
+    this.setState(({ authenticatedUser }) => ({
+      authenticatedUser: {
+        ...authenticatedUser,
+        cloudProjectsFetchingErrorLabel: null,
+      },
+    }));
+
     listUserCloudProjects(
       authentication.getAuthorizationHeader,
       firebaseUser.uid
@@ -478,6 +497,17 @@ export default class AuthenticatedUserProvider extends React.Component<
         })),
       error => {
         console.error('Error while loading user cloud projects:', error);
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            cloudProjectsFetchingErrorLabel: (
+              <Trans>
+                We couldn't load your cloud projects. Verify your internet
+                connection or try again later.
+              </Trans>
+            ),
+          },
+        }));
       }
     );
   };

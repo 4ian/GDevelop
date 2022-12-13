@@ -32,7 +32,6 @@ const styles = {
 type ProjectStructureItemProps = {|
   id?: string,
   autoGenerateNestedIndicator?: boolean,
-  initiallyOpen?: boolean,
   renderNestedItems: () => Array<React$Element<any> | null>,
   primaryText: React.Node,
   error?: ?Error,
@@ -45,7 +44,6 @@ export const ProjectStructureItem = ({
   error,
   onRefresh,
   autoGenerateNestedIndicator,
-  initiallyOpen,
   open,
   primaryText,
   renderNestedItems,
@@ -54,7 +52,6 @@ export const ProjectStructureItem = ({
     <ListItem
       id={id}
       open={open}
-      initiallyOpen={initiallyOpen}
       primaryText={
         <Text size="sub-title" noMargin>
           {primaryText}
@@ -67,7 +64,7 @@ export const ProjectStructureItem = ({
       leftIcon={error ? <WarningIcon /> : undefined}
       displayReloadButton={!!error}
       reloadButtonTooltip={
-        <Trans>An error has occured in functions. Click to reload them.</Trans>
+        <Trans>An error has occurred in functions. Click to reload them.</Trans>
       }
     />
   );

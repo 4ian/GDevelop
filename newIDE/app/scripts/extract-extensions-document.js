@@ -15,6 +15,8 @@ const {
 const { convertMarkdownToDokuWikiMarkdown } = require('./lib/DokuwikiHelpers');
 const shell = require('shelljs');
 
+/** @typedef {{ tier: 'community' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number, helpPath: string, description: string, iconUrl: string}} ExtensionHeader */
+
 const extensionShortHeadersUrl =
   'https://api.gdevelop-app.com/asset/extension-short-header';
 const gdRootPath = path.join(__dirname, '..', '..', '..');
@@ -58,7 +60,7 @@ const generateAuthorNamesWithLinks = authors => {
 /**
  * Return the list of all extensions and their associated short headers
  * (useful as containing author public profiles information).
- * @returns {Promise<Array<{ tier: 'community' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number, helpPath: string, description: string, iconUrl: string}>>} A promise to all extension headers
+ * @returns {Promise<Array<ExtensionHeader>>} A promise to all extension headers
  */
 const getAllExtensionHeaders = async () => {
   const response = await axios.get(extensionShortHeadersUrl);
@@ -110,7 +112,7 @@ const sortKeys = table => {
 
 /**
  * Create a page for an extension.
- * @param {{ tier: 'community' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number, helpPath: string, description: string, iconUrl: string}} extensionHeader The extension header
+ * @param {ExtensionHeader} extensionHeader The extension header
  * @param {boolean} isCommunity The tier
  */
 const createExtensionReferencePage = async (
@@ -163,7 +165,7 @@ does or inspect its content before using it.
 
 /**
  * Generate a section for an extension.
- * @param {{ tier: 'community' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number, helpPath: string, description: string, iconUrl: string}} extensionHeader The extension header
+ * @param {ExtensionHeader} extensionHeader The extension header
  */
 const generateExtensionSection = (extensionHeader) => {
   const folderName = getExtensionFolderName(extensionHeader.name);

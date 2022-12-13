@@ -981,11 +981,17 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   zoomIn = () => {
-    if (this.editor) this.editor.zoomBy(0.1);
+    const { editor } = this;
+    if (editor) {
+      editor.zoomBy(1.1);
+    }
   };
 
   zoomOut = () => {
-    if (this.editor) this.editor.zoomBy(-0.1);
+    const { editor } = this;
+    if (editor) {
+      editor.zoomBy(0.9);
+    }
   };
 
   _onContextMenu = (

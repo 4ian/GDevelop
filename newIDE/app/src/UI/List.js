@@ -94,6 +94,8 @@ type ListItemProps = {|
     padding: 0,
   |},
   noPadding?: boolean,
+  /* Set to true to remove button behavior of item that contains nested items. */
+  disableButtonBehaviorForParentItem?: boolean,
 
   style?: {|
     color?: string,
@@ -259,7 +261,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
       return (
         <React.Fragment>
           <MUIListItem
-            button
+            button={!props.disableButtonBehaviorForParentItem}
             dense={useDenseLists}
             disableRipple
             onClick={() => {

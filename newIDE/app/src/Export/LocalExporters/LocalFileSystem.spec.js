@@ -26,6 +26,20 @@ describe('LocalFileSystem', () => {
         },
       ]);
       expect(localFileSystem.getAllUrlFilesIn('/another-folder/')).toEqual([]);
+
+      // Check that backslashes are normalized to slashes, so that paths can be using both on Windows:
+      expect(localFileSystem.getAllUrlFilesIn('\\')).toEqual([
+        {
+          filePath: '/folder/downloaded-file',
+          url: 'http://file.com/from/url',
+        },
+      ]);
+      expect(localFileSystem.getAllUrlFilesIn('/folder\\')).toEqual([
+        {
+          filePath: '/folder/downloaded-file',
+          url: 'http://file.com/from/url',
+        },
+      ]);
     });
   });
 

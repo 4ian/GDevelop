@@ -664,7 +664,6 @@ export default class ProjectManager extends React.Component<Props, State> {
               <ProjectStructureItem
                 id={getTabId('game-settings')}
                 primaryText={<Trans>Game settings</Trans>}
-                open
                 renderNestedItems={() => [
                   <ListItem
                     id={getTabId('game-properties')}
@@ -703,7 +702,6 @@ export default class ProjectManager extends React.Component<Props, State> {
               <ProjectStructureItem
                 id={getTabId('scenes')}
                 primaryText={<Trans>Scenes</Trans>}
-                open
                 renderNestedItems={() => [
                   ...displayedScenes.map((layout: gdLayout, i: number) => {
                     const name = layout.getName();
@@ -794,7 +792,6 @@ export default class ProjectManager extends React.Component<Props, State> {
                 primaryText={<Trans>Extensions</Trans>}
                 error={eventsFunctionsExtensionsError}
                 onRefresh={onReloadEventsFunctionsExtensions}
-                open
                 renderNestedItems={() => [
                   ...displayedExtensions.map((eventsFunctionsExtension, i) => {
                     const name = eventsFunctionsExtension.getName();
@@ -884,7 +881,6 @@ export default class ProjectManager extends React.Component<Props, State> {
               <ProjectStructureItem
                 id={getTabId('external-events')}
                 primaryText={<Trans>External events</Trans>}
-                open
                 renderNestedItems={() => [
                   ...displayedExternalEvents.map((externalEvents, i) => {
                     const name = externalEvents.getName();
@@ -947,7 +943,6 @@ export default class ProjectManager extends React.Component<Props, State> {
               <ProjectStructureItem
                 id={getTabId('external-layouts')}
                 primaryText={<Trans>External layouts</Trans>}
-                open
                 renderNestedItems={() => [
                   ...displayedExternalLayouts.map((externalLayout, i) => {
                     const name = externalLayout.getName();

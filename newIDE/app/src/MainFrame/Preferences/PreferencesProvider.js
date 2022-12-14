@@ -151,6 +151,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     saveTutorialProgress: this._saveTutorialProgress.bind(this),
     getTutorialProgress: this._getTutorialProgress.bind(this),
     setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this),
+    setNewProjectsDefaultStorageProviderName: this._setNewProjectsDefaultStorageProviderName.bind(
+      this
+    ),
   };
 
   componentDidMount() {
@@ -763,6 +766,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           newProjectsDefaultFolder,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setNewProjectsDefaultStorageProviderName(newStorageProviderName: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          newProjectsDefaultStorageProviderName: newStorageProviderName,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

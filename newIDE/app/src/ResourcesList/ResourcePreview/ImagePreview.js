@@ -18,6 +18,11 @@ import { getPixelatedImageRendering } from '../../Utils/CssHelpers';
 import { shouldZoom } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import Slider from '../../UI/Slider';
 import AuthorizedAssetImage from '../../AssetStore/PrivateAssets/AuthorizedAssetImage';
+import {
+  getContinuousZoomFactor,
+  zoomInFactor,
+  zoomOutFactor,
+} from '../../Utils/ZoomUtils';
 const gd: libGDevelop = global.gd;
 
 const MARGIN = 50;
@@ -247,7 +252,7 @@ const ImagePreview = ({
             {!hideControls && (
               <MiniToolbar noPadding>
                 <IconButton
-                  onClick={() => zoomBy(0.9)}
+                  onClick={() => zoomBy(zoomOutFactor)}
                   tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}
                 >
                   <ZoomOut />
@@ -264,7 +269,7 @@ const ImagePreview = ({
                   />
                 </div>
                 <IconButton
-                  onClick={() => zoomBy(1.1)}
+                  onClick={() => zoomBy(zoomInFactor)}
                   tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
                 >
                   <ZoomIn />
@@ -297,7 +302,7 @@ const ImagePreview = ({
                 onWheel={event => {
                   const { deltaY } = event;
                   if (!hideControls && shouldZoom(event)) {
-                    zoomBy(1 - deltaY / 100);
+                    zoomBy(getContinuousZoomFactor(-deltaY));
                     event.stopPropagation();
                   } else {
                     // Let the usual, native vertical or horizontal scrolling happen.

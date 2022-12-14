@@ -284,6 +284,8 @@ export const WithObjectsList = () => (
                   onRenameObject={(objectWithContext, newName, cb) => cb(true)}
                   onObjectCreated={() => {}}
                   onObjectSelected={() => {}}
+                  renamedObjectWithContext={null}
+                  setRenamedObjectWithContext={() => {}}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                   canInstallPrivateAsset={() => false}
                 />

@@ -540,25 +540,6 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
           anchorOrigin * renderedInstance.getDefaultHeight();
       }
       renderedInstance.update();
-
-      if (renderedInstance instanceof RenderedTextInstance) {
-        // TODO EBO Remove this line when an alignment property is added to the text object.
-        renderedInstance._pixiObject.style.align = 'center';
-      }
-      // This ensure objects are centered if their dimensions changed from the
-      // custom ones (preferred ones).
-      // For instance, text object dimensions change according to how the text is wrapped.
-      if (childLayout.horizontalLayout.anchorOrigin == null) {
-        childInstance.x =
-          (width - renderedInstance._pixiObject.width) / 2 +
-          (childMinX + childMaxX - width) / 2;
-      }
-      if (childLayout.verticalLayout.anchorOrigin == null) {
-        childInstance.y =
-          (height - renderedInstance._pixiObject.height) / 2 +
-          (childMinY + childMaxY - height) / 2;
-      }
-      renderedInstance.update();
     }
 
     this._pixiObject.pivot.x = centerX;

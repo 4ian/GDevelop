@@ -53,6 +53,7 @@ import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
 import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
 import { type ShortcutMap } from '../KeyboardShortcuts/DefaultShortcuts';
 import { ShortcutsReminder } from './ShortcutsReminder';
+import Paper from '../UI/Paper';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -65,8 +66,16 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     overflowY: 'scroll',
-    padding: 16,
+    marginTop: 16,
+    padding: '0 16px 16px 16px',
+    position: 'relative',
   },
+  searchBarContainer: {
+    position: 'sticky',
+    top: 0,
+    zIndex: 1,
+  },
+  searchBarPaper: { paddingBottom: 8 },
 };
 
 type ProjectItemKind =
@@ -652,14 +661,18 @@ export default class ProjectManager extends React.Component<Props, State> {
               }
               onOpenSearchExtensionDialog={this._openSearchExtensionDialog}
             />
+            <div style={styles.searchBarContainer}>
+              <Paper background="dark" square style={styles.searchBarPaper}>
+                <SearchBar
+                  ref={searchBar => (this._searchBar = searchBar)}
+                  value={searchText}
+                  onRequestSearch={this._onRequestSearch}
+                  onChange={this._onSearchChange}
+                  placeholder={t`Search in project`}
+                />
+              </Paper>
+            </div>
             <ShortcutsReminder shortcutMap={shortcutMap} />
-            <SearchBar
-              ref={searchBar => (this._searchBar = searchBar)}
-              value={searchText}
-              onRequestSearch={this._onRequestSearch}
-              onChange={this._onSearchChange}
-              placeholder={t`Search in project`}
-            />
             <List>
               <ProjectStructureItem
                 id={getTabId('game-settings')}

@@ -293,14 +293,17 @@ export default class InstancesResizer {
       // is stable by instance rotation. This allows to use the same formula
       // for both 90° or 270°.
       const angle = ((selectedInstance.getAngle() % 360) + 360) % 360;
+      let newX = initialInstanceOriginPosition.x;
+      let newY = initialInstanceOriginPosition.y;
+      let newWidth = initialWidth;
+      let newHeight = initialHeight;
       if (
         !proportional &&
         !hasRotatedInstance &&
         (angle === 90 || angle === 270)
       ) {
-        selectedInstance.setCustomWidth(scaleY * initialWidth);
-        selectedInstance.setCustomHeight(scaleX * initialHeight);
-        selectedInstance.setHasCustomSize(true);
+        newWidth = scaleY * initialWidth;
+        newHeight = scaleX * initialHeight;
 
         // These 4 variables are the positions and vector after the scaling.
         // It's easier to scale the instance center
@@ -322,20 +325,27 @@ export default class InstancesResizer {
           scaleX *
           (initialInstanceOriginPosition.y -
             initialUnrotatedInstanceAABB.centerY());
-        selectedInstance.setX(centerX + centerToOriginX);
-        selectedInstance.setY(centerY + centerToOriginY);
+        newX = centerX + centerToOriginX;
+        newY = centerY + centerToOriginY;
       } else {
-        selectedInstance.setCustomWidth(scaleX * initialWidth);
-        selectedInstance.setCustomHeight(scaleY * initialHeight);
-        selectedInstance.setHasCustomSize(true);
-
-        selectedInstance.setX(
-          (initialInstanceOriginPosition.x - fixedPointX) * scaleX + fixedPointX
-        );
-        selectedInstance.setY(
-          (initialInstanceOriginPosition.y - fixedPointY) * scaleY + fixedPointY
-        );
+        newWidth = scaleX * initialWidth;
+        newHeight = scaleY * initialHeight;
+        newX =
+          (initialInstanceOriginPosition.x - fixedPointX) * scaleX +
+          fixedPointX;
+        newY =
+          (initialInstanceOriginPosition.y - fixedPointY) * scaleY +
+          fixedPointY;
       }
+
+      // After resizing, we round the new positions and dimensions to the nearest pixel.
+      // This is to avoid having a lot of decimals appearing, and it does not
+      // prevent the user from modifying them manually in the inline fields.
+      selectedInstance.setX(Math.round(newX));
+      selectedInstance.setY(Math.round(newY));
+      selectedInstance.setCustomWidth(Math.round(newWidth));
+      selectedInstance.setCustomHeight(Math.round(newHeight));
+      selectedInstance.setHasCustomSize(true);
     }
   }
 

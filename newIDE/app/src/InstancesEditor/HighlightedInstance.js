@@ -26,14 +26,14 @@ export default class InstancesSelection {
     this.highlightRectangle = new PIXI.Graphics();
     this.highlightRectangle.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
 
-    this.tooltipBackground = new PIXI.Graphics();
-    this.tooltipText = new PIXI.Text('', {
-      fontSize: 15,
-      fill: 0xffffff,
-      align: 'center',
-    });
-    this.highlightRectangle.addChild(this.tooltipBackground);
-    this.highlightRectangle.addChild(this.tooltipText);
+    // this.tooltipBackground = new PIXI.Graphics();
+    // this.tooltipText = new PIXI.Text('', {
+    //   fontSize: 15,
+    //   fill: 0xffffff,
+    //   align: 'center',
+    // });
+    // this.highlightRectangle.addChild(this.tooltipBackground);
+    // this.highlightRectangle.addChild(this.tooltipText);
   }
 
   setInstance(instance: gdInitialInstance | null) {
@@ -77,40 +77,41 @@ export default class InstancesSelection {
     );
     this.highlightRectangle.endFill();
 
-    const tooltipInfo =
-      highlightedInstance.getObjectName() +
-      '\n' +
-      'X: ' +
-      parseInt(highlightedInstance.getX()) +
-      '  Y: ' +
-      parseInt(highlightedInstance.getY()) +
-      '\n' +
-      'Layer: ' +
-      highlightedInstance.getLayer() +
-      '  Z: ' +
-      highlightedInstance.getZOrder() +
-      '\n';
-    this.tooltipText.text = tooltipInfo;
+    // const tooltipInfo =
+    //   highlightedInstance.getObjectName() +
+    //   '\n' +
+    //   'X: ' +
+    //   Math.round(highlightedInstance.getX() * 100) / 100 + // An instance position can have a lot of decimals, so round to 2 decimals.
+    //   '  Y: ' +
+    //   Math.round(highlightedInstance.getY() * 100) / 100 + // An instance position can have a lot of decimals, so round to 2 decimals.
+    //   '\n' +
+    //   'Layer: ' +
+    //   (highlightedInstance.getLayer() || 'Base layer') +
+    //   '\n' +
+    //   'Z: ' +
+    //   highlightedInstance.getZOrder() +
+    //   '\n';
+    // this.tooltipText.text = tooltipInfo;
 
-    this.tooltipText.x = Math.round(
-      highlightRectangle.left -
-        this.tooltipText.width / 2 +
-        highlightRectangle.width() / 2
-    );
-    this.tooltipText.y = Math.round(
-      highlightRectangle.top - this.tooltipText.height
-    );
+    // this.tooltipText.x = Math.round(
+    //   highlightRectangle.left -
+    //     this.tooltipText.width / 2 +
+    //     highlightRectangle.width() / 2
+    // );
+    // this.tooltipText.y = Math.round(
+    //   highlightRectangle.top - this.tooltipText.height
+    // );
 
-    const padding = 5;
-    this.tooltipBackground.clear();
-    this.tooltipBackground.beginFill(0x000000, 0.8);
-    this.tooltipBackground.drawRoundedRect(
-      this.tooltipText.x - padding,
-      this.tooltipText.y - padding,
-      this.tooltipText.width + padding * 2,
-      this.tooltipText.height - padding,
-      4
-    );
-    this.tooltipBackground.endFill();
+    // const padding = 5;
+    // this.tooltipBackground.clear();
+    // this.tooltipBackground.beginFill(0x000000, 0.8);
+    // this.tooltipBackground.drawRoundedRect(
+    //   this.tooltipText.x - padding,
+    //   this.tooltipText.y - padding,
+    //   this.tooltipText.width + padding * 2,
+    //   this.tooltipText.height - padding,
+    //   4
+    // );
+    // this.tooltipBackground.endFill();
   }
 }

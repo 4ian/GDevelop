@@ -258,18 +258,19 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
       );
     } else {
       const isItemOpen = props.open === undefined ? isOpen : props.open;
+      const onClickItem = () => {
+        setIsOpen(!isItemOpen);
+        if (props.onClick) {
+          props.onClick();
+        }
+      };
       return (
         <React.Fragment>
           <MUIListItem
             button={!props.disableButtonBehaviorForParentItem}
             dense={useDenseLists}
             disableRipple
-            onClick={() => {
-              setIsOpen(!isItemOpen);
-              if (props.onClick) {
-                props.onClick();
-              }
-            }}
+            onClick={onClickItem}
             disabled={props.disabled}
             style={{
               // $FlowFixMe - Flow is not happy about two spreads.
@@ -291,9 +292,27 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
             />
             {props.autoGenerateNestedIndicator ? (
               isItemOpen ? (
-                <ExpandLess />
+                <MUIListItemSecondaryAction>
+                  <IconButton
+                    size="small"
+                    edge="end"
+                    aria-label="collapse"
+                    onClick={onClickItem}
+                  >
+                    <ExpandLess />
+                  </IconButton>
+                </MUIListItemSecondaryAction>
               ) : (
-                <ExpandMore />
+                <MUIListItemSecondaryAction>
+                  <IconButton
+                    size="small"
+                    edge="end"
+                    aria-label="expand"
+                    onClick={onClickItem}
+                  >
+                    <ExpandMore />
+                  </IconButton>
+                </MUIListItemSecondaryAction>
               )
             ) : null}
             {renderListItemSecondaryAction()}

@@ -32,6 +32,7 @@ const styles = {
 type ProjectStructureItemProps = {|
   id?: string,
   autoGenerateNestedIndicator?: boolean,
+  initiallyOpen?: boolean,
   renderNestedItems: () => Array<React$Element<any> | null>,
   primaryText: React.Node,
   error?: ?Error,
@@ -44,6 +45,7 @@ export const ProjectStructureItem = ({
   error,
   onRefresh,
   autoGenerateNestedIndicator,
+  initiallyOpen,
   open,
   primaryText,
   renderNestedItems,
@@ -57,7 +59,8 @@ export const ProjectStructureItem = ({
           {primaryText}
         </Text>
       }
-      disableButtonBehaviorForParentItem
+      initiallyOpen
+      autoGenerateNestedIndicator
       renderNestedItems={renderNestedItems}
       onReload={onRefresh}
       noPadding

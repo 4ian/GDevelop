@@ -87,7 +87,9 @@ const NewProjectSetupDialog = ({
   authenticatedUser,
   isFromExample,
 }: Props): React.Node => {
-  const { values } = React.useContext(PreferencesContext);
+  const { values, setNewProjectsDefaultStorageProviderName } = React.useContext(
+    PreferencesContext
+  );
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
@@ -112,6 +114,16 @@ const NewProjectSetupDialog = ({
   );
   const [storageProvider, setStorageProvider] = React.useState<StorageProvider>(
     () => {
+      // First try to use the storage provider stored in user preferences (Cloud by default).
+      if (values.newProjectsDefaultStorageProviderName === 'Empty')
+        return emptyStorageProvider;
+      const preferredStorageProvider = storageProviders.find(
+        ({ internalName }) =>
+          internalName === values.newProjectsDefaultStorageProviderName
+      );
+      if (preferredStorageProvider) return preferredStorageProvider;
+
+      // If preferred storage provider not found, push Cloud storage provider if user authenticated.
       if (authenticatedUser.authenticated) {
         const cloudStorageProvider = storageProviders.find(
           ({ internalName }) => internalName === 'Cloud'
@@ -236,6 +248,7 @@ const NewProjectSetupDialog = ({
           floatingLabelText={<Trans>Where to store this project</Trans>}
           value={storageProvider.internalName}
           onChange={(e, i, newValue: string) => {
+            setNewProjectsDefaultStorageProviderName(newValue);
             const newStorageProvider =
               storageProviders.find(
                 ({ internalName }) => internalName === newValue

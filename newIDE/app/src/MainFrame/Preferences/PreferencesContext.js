@@ -226,6 +226,7 @@ export type PreferencesValues = {|
   showEventBasedObjectsEditor: boolean,
   inAppTutorialsProgress: InAppTutorialProgressDatabase,
   newProjectsDefaultFolder: string,
+  newProjectsDefaultStorageProviderName: string,
 |};
 
 /**
@@ -289,6 +290,7 @@ export type Preferences = {|
   setShowGetStartedSection: (enabled: boolean) => void,
   setShowEventBasedObjectsEditor: (enabled: boolean) => void,
   getShowEventBasedObjectsEditor: () => boolean,
+  setNewProjectsDefaultStorageProviderName: (name: string) => void,
   saveTutorialProgress: ({|
     tutorialId: string,
     userId: ?string,
@@ -340,6 +342,7 @@ export const initialPreferences = {
     showEventBasedObjectsEditor: false,
     inAppTutorialsProgress: {},
     newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
+    newProjectsDefaultStorageProviderName: 'Cloud',
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -392,6 +395,7 @@ export const initialPreferences = {
   saveTutorialProgress: () => {},
   getTutorialProgress: () => {},
   setNewProjectsDefaultFolder: () => {},
+  setNewProjectsDefaultStorageProviderName: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

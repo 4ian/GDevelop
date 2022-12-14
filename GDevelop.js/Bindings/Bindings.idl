@@ -978,12 +978,12 @@ interface InitialInstance {
     void SetObjectName([Const] DOMString name);
     [Const, Ref] DOMString GetObjectName();
 
-    float GetX();
-    void SetX(float x);
-    float GetY();
-    void SetY(float y);
-    float GetAngle();
-    void SetAngle(float angle);
+    double GetX();
+    void SetX(double x);
+    double GetY();
+    void SetY(double y);
+    double GetAngle();
+    void SetAngle(double angle);
     boolean IsLocked();
     void SetLocked(boolean lock);
     boolean IsSealed();
@@ -996,18 +996,18 @@ interface InitialInstance {
     void SetHasCustomSize(boolean enable);
     boolean HasCustomSize();
 
-    void SetCustomWidth(float width);
-    float GetCustomWidth();
-    void SetCustomHeight(float height);
-    float GetCustomHeight();
+    void SetCustomWidth(double width);
+    double GetCustomWidth();
+    void SetCustomHeight(double height);
+    double GetCustomHeight();
 
     [Ref] InitialInstance ResetPersistentUuid();
 
     void UpdateCustomProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout layout);
     [Value] MapStringPropertyDescriptor GetCustomProperties([Ref] Project project, [Ref] Layout layout);
-    float GetRawDoubleProperty([Const] DOMString name);
+    double GetRawDoubleProperty([Const] DOMString name);
     [Const, Ref] DOMString GetRawStringProperty([Const] DOMString name);
-    void SetRawDoubleProperty([Const] DOMString name, float value);
+    void SetRawDoubleProperty([Const] DOMString name, double value);
     void SetRawStringProperty([Const] DOMString name, [Const] DOMString value);
 
     [Ref] VariablesContainer GetVariables();

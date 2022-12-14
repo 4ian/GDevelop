@@ -36,6 +36,7 @@ import {
 } from './InstancesEditorSettings';
 import Rectangle from '../Utils/Rectangle';
 import { isNoDialogOpened } from '../UI/MaterialUISpecificUtil';
+import { getContinuousZoomFactor } from '../Utils/ZoomUtils';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -182,7 +183,7 @@ export default class InstancesEditor extends Component<Props> {
     this.pixiRenderer.view.onwheel = (event: any) => {
       const zoomFactor = this.getZoomFactor();
       if (this.keyboardShortcuts.shouldZoom()) {
-        this.zoomOnCursorBy(1 - event.deltaY / 100);
+        this.zoomOnCursorBy(getContinuousZoomFactor(-event.deltaY));
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
         const deltaX = event.deltaY / (5 * zoomFactor);
         this.scrollBy(-deltaX, 0);
@@ -540,7 +541,7 @@ export default class InstancesEditor extends Component<Props> {
   setZoomFactor = (zoomFactor: number) => {
     this.props.onChangeInstancesEditorSettings({
       ...this.props.instancesEditorSettings,
-      zoomFactor: Math.max(Math.min(zoomFactor, 10), 0.01),
+      zoomFactor: Math.max(Math.min(zoomFactor, 100), 0.01),
     });
   };
 

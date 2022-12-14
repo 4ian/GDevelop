@@ -72,6 +72,7 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
 import { getInstancesInLayoutForObject } from '../Utils/Layout';
+import { zoomInFactor, zoomOutFactor } from '../Utils/ZoomUtils';
 
 const gd: libGDevelop = global.gd;
 
@@ -983,14 +984,14 @@ export default class SceneEditor extends React.Component<Props, State> {
   zoomIn = () => {
     const { editor } = this;
     if (editor) {
-      editor.zoomBy(1.1);
+      editor.zoomBy(zoomInFactor);
     }
   };
 
   zoomOut = () => {
     const { editor } = this;
     if (editor) {
-      editor.zoomBy(0.9);
+      editor.zoomBy(zoomOutFactor);
     }
   };
 

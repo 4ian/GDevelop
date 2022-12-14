@@ -328,8 +328,9 @@ const getLayouts = (
  */
 export default class RenderedCustomObjectInstance extends RenderedInstance {
   childrenInstances: ChildInstance[];
-  childrenRenderedInstances: RenderedInstance[];
   childrenLayouts: ChildLayout[];
+  childrenRenderedInstances: RenderedInstance[];
+  childrenRenderedInstanceByNames: Map<string, RenderedInstance>;
 
   constructor(
     project: gdProject,
@@ -365,6 +366,7 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
     this.childrenInstances = [];
     this.childrenLayouts = [];
     this.childrenRenderedInstances = [];
+    this.childrenRenderedInstanceByNames = new Map<string, RenderedInstance>();
 
     if (!eventBasedObject) {
       return;
@@ -406,6 +408,7 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
       this.childrenInstances.push(childInstance);
       this.childrenLayouts.push(childLayout);
       this.childrenRenderedInstances.push(renderer);
+      this.childrenRenderedInstanceByNames.set(childObject.getName(), renderer);
     });
   }
 
@@ -498,10 +501,20 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
       } else {
         const anchorOrigin = childLayout.horizontalLayout.anchorOrigin || 0;
         const anchorTarget = childLayout.horizontalLayout.anchorTarget || 0;
-        // TODO Use anchorTargetObject instead of defaulting on the background
+
+        const targetRenderedInstance =
+          this.childrenRenderedInstanceByNames.get(
+            childLayout.horizontalLayout.anchorTargetObject || ''
+          ) || this.childrenRenderedInstances[0];
+        const targetInstance = targetRenderedInstance._instance;
+        const targetInstanceWidth = targetInstance.hasCustomSize()
+          ? targetInstance.getCustomWidth()
+          : targetRenderedInstance.getDefaultWidth();
+
         childInstance.x =
+          targetInstance.getX() +
           (childLayout.horizontalLayout.anchorDelta || 0) +
-          anchorTarget * width -
+          anchorTarget * targetInstanceWidth -
           anchorOrigin * renderedInstance.getDefaultWidth();
       }
       if (childLayout.verticalLayout.anchorOrigin == null) {
@@ -510,10 +523,20 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
       } else {
         const anchorOrigin = childLayout.verticalLayout.anchorOrigin || 0;
         const anchorTarget = childLayout.verticalLayout.anchorTarget || 0;
-        // TODO Use anchorTargetObject instead of defaulting on the background
+
+        const targetRenderedInstance =
+          this.childrenRenderedInstanceByNames.get(
+            childLayout.horizontalLayout.anchorTargetObject || ''
+          ) || this.childrenRenderedInstances[0];
+        const targetInstance = targetRenderedInstance._instance;
+        const targetInstanceHeight = targetInstance.hasCustomSize()
+          ? targetInstance.getCustomHeight()
+          : targetRenderedInstance.getDefaultHeight();
+
         childInstance.y =
+          targetInstance.getY() +
           (childLayout.verticalLayout.anchorDelta || 0) +
-          anchorTarget * height -
+          anchorTarget * targetInstanceHeight -
           anchorOrigin * renderedInstance.getDefaultHeight();
       }
       renderedInstance.update();

@@ -231,6 +231,8 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 // Nothing special to do.
                 onObjectCreated={() => {}}
                 onObjectSelected={this._onObjectSelected}
+                renamedObjectWithContext={null}
+                setRenamedObjectWithContext={() => {}}
                 onRenameObject={(objectWithContext, newName, done) =>
                   this._onRenameObject(objectWithContext, newName, done, i18n)
                 }

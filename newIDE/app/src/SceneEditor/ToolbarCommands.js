@@ -16,6 +16,8 @@ type Props = {|
   toggleWindowMask: () => void,
   toggleGrid: () => void,
   setupGrid: () => void,
+  canSceneObjectRename: boolean,
+  onSceneObjectRename: () => void,
 |};
 
 const ToolbarCommands = (props: Props) => {
@@ -61,6 +63,10 @@ const ToolbarCommands = (props: Props) => {
 
   useCommand('OPEN_SETUP_GRID', true, {
     handler: props.setupGrid,
+  });
+
+  useCommand('SCENE_OBJECT_RENAME', props.canSceneObjectRename, {
+    handler: props.onSceneObjectRename,
   });
 
   return null;

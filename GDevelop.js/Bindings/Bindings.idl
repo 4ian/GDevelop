@@ -1062,7 +1062,7 @@ interface SerializerValue {
     boolean GetBool();
     [Const, Value] DOMString GetString();
     long GetInt();
-    float GetDouble();
+    double GetDouble();
 
     [Const, Value] DOMString GetRawString();
 
@@ -2788,9 +2788,9 @@ interface Direction {
     void RemoveAllSprites();
     boolean IsLooping();
     void SetLoop(boolean enable);
-    float GetTimeBetweenFrames();
+    double GetTimeBetweenFrames();
     [Const, Ref] VectorString GetSpriteNames();
-    void SetTimeBetweenFrames(float time);
+    void SetTimeBetweenFrames(double time);
     void SwapSprites(unsigned long first, unsigned long second);
     void MoveSprite(unsigned long oldIndex, unsigned long newIndex);
 

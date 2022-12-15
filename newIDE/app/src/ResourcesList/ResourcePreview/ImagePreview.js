@@ -55,8 +55,9 @@ const styles = {
     touchAction: 'none',
   },
   spriteThumbnailImage: {
-    position: 'absolute',
+    position: 'relative',
     pointerEvents: 'none',
+    maxWidth: '100%', // to enable scroll when overflowing on x
   },
   sliderContainer: {
     maxWidth: 150,

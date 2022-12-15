@@ -136,7 +136,7 @@ const ImagePreview = ({
   const adaptZoomFactorToImage = React.useCallback(
     () => {
       if (!imageWidth || !imageHeight || !containerHeight || !containerWidth) {
-        return;
+        return false;
       }
       const zoomFactor = clampImagePreviewZoom(
         Math.min(
@@ -145,7 +145,7 @@ const ImagePreview = ({
         )
       );
       setImageZoomFactor(zoomFactor);
-      hasImageLoadedRef.current = true;
+      return true;
     },
     [imageHeight, imageWidth, containerHeight, containerWidth]
   );
@@ -158,10 +158,13 @@ const ImagePreview = ({
     [imageResourceSource]
   );
 
+  // A change of adaptZoomFactorToImage means a change in one of its dependencies,
+  // so it means the container or image size has changed and we should try to adapt
+  // the zoom factor to the image.
   React.useEffect(
     () => {
       if (hasImageLoadedRef.current) return;
-      adaptZoomFactorToImage();
+      hasImageLoadedRef.current = adaptZoomFactorToImage();
     },
     [adaptZoomFactorToImage]
   );

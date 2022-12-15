@@ -55,7 +55,7 @@ const styles = {
     touchAction: 'none',
   },
   spriteThumbnailImage: {
-    position: 'relative',
+    position: 'absolute',
     pointerEvents: 'none',
   },
   sliderContainer: {

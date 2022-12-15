@@ -137,22 +137,61 @@ class ChildInstance {
 }
 
 type AxeLayout = {
+  /**
+   * The origin of the anchor on the object to place
+   * as a factor of the current object size
+   * (0 for left or top, 1 for right or bottom).
+   */
   anchorOrigin?: number,
+  /**
+   * The target of the anchor on the referential object
+   * as a factor of the targeted object size
+   * (0 for left or top, 1 for right or bottom).
+   */
   anchorTarget?: number,
+  /**
+   * The object name to take as referential.
+   */
   anchorTargetObject?: string,
+  /**
+   * A displacement to add on the anchored object.
+   */
   anchorDelta?: number,
+  /**
+   * The left or top margin in pixels.
+   */
   minSideAbsoluteMargin?: number,
+  /**
+   * The right or bottom margin in pixels.
+   */
   maxSideAbsoluteMargin?: number,
+  /**
+   * The left or top margin as a factor of the parent size.
+   */
   minSideProportionalMargin?: number,
+  /**
+   * The right or bottom margin as a factor of the parent size.
+   */
   maxSideProportionalMargin?: number,
 };
 
+/**
+ * Layout description that allows to position the child-objects
+ * to follow the size of the parent.
+ */
 type ChildLayout = {
+  /**
+   * Some child-object are optional or only displayed according to the parent state.
+   * For example, for buttons there is a background for each state.
+   */
   isShown: boolean,
   horizontalLayout: AxeLayout,
   verticalLayout: AxeLayout,
 };
 
+/**
+ * The keywords to find in the properties to build the ChildLayout.
+ */
 const layoutFields = [
   'Show',
   'LeftPadding',
@@ -196,6 +235,9 @@ const getVerticalAnchorValue = (anchorName: string) => {
     : null;
 };
 
+/**
+ * Build the layouts description from the custom object properties.
+ */
 const getLayouts = (
   eventBasedObject: gdEventsBasedObject,
   customObjectConfiguration: gdCustomObjectConfiguration
@@ -211,6 +253,9 @@ const getLayouts = (
   ) {
     const property = properties.getAt(propertyIndex);
 
+    /**
+     * The list of child-object where the layout is applied
+     */
     const childNames = property.getExtraInfo();
     if (!childNames) {
       continue;
@@ -223,6 +268,9 @@ const getLayouts = (
     const propertyValueNumber = Number.parseFloat(propertyValueString) || 0;
     const layoutField = layoutFields.find(field => name.includes(field));
 
+    // AnchorTarget extraInfo is not the list of child-object where the layout is applied
+    // but the child that is the target of the anchor.
+    // The extraInfos from the AnchorOrigin is used to get this child-object list
     let targetObjectName = '';
     let horizontalAnchorTarget: ?number = null;
     let verticalAnchorTarget: ?number = null;
@@ -477,25 +525,16 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
       const childInstance = this.childrenInstances[index];
       const childLayout = this.childrenLayouts[index];
 
-      childInstance.setCustomWidth(renderedInstance.getDefaultWidth());
-      childInstance.setCustomHeight(renderedInstance.getDefaultHeight());
-
-      const childMinX =
-        childLayout.horizontalLayout.minSideAbsoluteMargin ||
-        (childLayout.horizontalLayout.minSideProportionalMargin || 0) * width;
-      const childMaxX =
-        width -
-        (childLayout.horizontalLayout.maxSideAbsoluteMargin ||
-          (childLayout.horizontalLayout.maxSideProportionalMargin || 0) *
-            width);
-      const childMinY =
-        childLayout.verticalLayout.minSideAbsoluteMargin ||
-        (childLayout.verticalLayout.minSideProportionalMargin || 0) * height;
-      const childMaxY =
-        height -
-        (childLayout.verticalLayout.maxSideAbsoluteMargin ||
-          (childLayout.verticalLayout.maxSideProportionalMargin || 0) * height);
       if (childLayout.horizontalLayout.anchorOrigin == null) {
+        const childMinX =
+          childLayout.horizontalLayout.minSideAbsoluteMargin ||
+          (childLayout.horizontalLayout.minSideProportionalMargin || 0) * width;
+        const childMaxX =
+          width -
+          (childLayout.horizontalLayout.maxSideAbsoluteMargin ||
+            (childLayout.horizontalLayout.maxSideProportionalMargin || 0) *
+              width);
+
         childInstance.x = childMinX;
         childInstance.setCustomWidth(childMaxX - childMinX);
       } else {
@@ -516,8 +555,19 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
           (childLayout.horizontalLayout.anchorDelta || 0) +
           anchorTarget * targetInstanceWidth -
           anchorOrigin * renderedInstance.getDefaultWidth();
+        childInstance.setCustomWidth(renderedInstance.getDefaultWidth());
       }
+
       if (childLayout.verticalLayout.anchorOrigin == null) {
+        const childMinY =
+          childLayout.verticalLayout.minSideAbsoluteMargin ||
+          (childLayout.verticalLayout.minSideProportionalMargin || 0) * height;
+        const childMaxY =
+          height -
+          (childLayout.verticalLayout.maxSideAbsoluteMargin ||
+            (childLayout.verticalLayout.maxSideProportionalMargin || 0) *
+              height);
+
         childInstance.y = childMinY;
         childInstance.setCustomHeight(childMaxY - childMinY);
       } else {
@@ -538,6 +588,7 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
           (childLayout.verticalLayout.anchorDelta || 0) +
           anchorTarget * targetInstanceHeight -
           anchorOrigin * renderedInstance.getDefaultHeight();
+        childInstance.setCustomHeight(renderedInstance.getDefaultHeight());
       }
       renderedInstance.update();
     }

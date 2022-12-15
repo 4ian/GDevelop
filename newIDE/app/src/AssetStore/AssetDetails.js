@@ -35,6 +35,11 @@ import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuth
 import AuthorizedAssetImage from './PrivateAssets/AuthorizedAssetImage';
 import { MarkdownText } from '../UI/MarkdownText';
 import Paper from '../UI/Paper';
+import PublicProfileContext from '../Profile/PublicProfileContext';
+import {
+  getUserPublicProfilesByIds,
+  type UserPublicProfile,
+} from '../Utils/GDevelopServices/User';
 
 const FIXED_HEIGHT = 250;
 const FIXED_WIDTH = 300;
@@ -131,6 +136,10 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
     const { fetchPrivateAsset } = React.useContext(
       PrivateAssetsAuthorizationContext
     );
+    const { openUserPublicProfile } = React.useContext(PublicProfileContext);
+    const [authorPublicProfiles, setAuthorPublicProfiles] = React.useState<
+      UserPublicProfile[]
+    >([]);
 
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
@@ -204,6 +213,28 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
       [loadAsset]
     );
 
+    const loadAuthorPublicProfiles = React.useCallback(
+      async () => {
+        const authorIds: Array<string> = (asset && asset.authorIds) || [];
+        if (authorIds.length === 0) return;
+        const userPublicProfileByIds = await getUserPublicProfilesByIds(
+          authorIds
+        );
+        const userPublicProfiles = Object.keys(userPublicProfileByIds).map(
+          id => userPublicProfileByIds[id]
+        );
+        setAuthorPublicProfiles(userPublicProfiles);
+      },
+      [asset]
+    );
+
+    React.useEffect(
+      () => {
+        loadAuthorPublicProfiles();
+      },
+      [loadAuthorPublicProfiles]
+    );
+
     const assetAuthors: ?Array<Author> =
       asset && authors
         ? asset.authors
@@ -212,6 +243,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
             })
             .filter(Boolean)
         : [];
+
     const assetLicense =
       asset && licenses
         ? licenses.find(({ name }) => name === asset.license)
@@ -265,6 +297,22 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                             }
                           >
                             {author.name}
+                          </Link>
+                        );
+                      })}
+                    {!!authorPublicProfiles.length &&
+                      authorPublicProfiles.map(userPublicProfile => {
+                        const username =
+                          userPublicProfile.username || 'GDevelop user';
+                        return (
+                          <Link
+                            key={userPublicProfile.id}
+                            href="#"
+                            onClick={() =>
+                              openUserPublicProfile(userPublicProfile.id)
+                            }
+                          >
+                            {username}
                           </Link>
                         );
                       })}

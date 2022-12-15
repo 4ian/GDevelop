@@ -215,15 +215,22 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
 
     const loadAuthorPublicProfiles = React.useCallback(
       async () => {
-        const authorIds: Array<string> = (asset && asset.authorIds) || [];
-        if (authorIds.length === 0) return;
-        const userPublicProfileByIds = await getUserPublicProfilesByIds(
-          authorIds
-        );
-        const userPublicProfiles = Object.keys(userPublicProfileByIds).map(
-          id => userPublicProfileByIds[id]
-        );
-        setAuthorPublicProfiles(userPublicProfiles);
+        try {
+          const authorIds: Array<string> = (asset && asset.authorIds) || [];
+          if (authorIds.length === 0) return;
+          console.log('fetching', asset);
+          const userPublicProfileByIds = await getUserPublicProfilesByIds(
+            authorIds
+          );
+          console.log(userPublicProfileByIds);
+          const userPublicProfiles = Object.keys(userPublicProfileByIds).map(
+            id => userPublicProfileByIds[id]
+          );
+          setAuthorPublicProfiles(userPublicProfiles);
+        } catch (error) {
+          // Catch error, but don't display it to the user.
+          console.error('Error while loading author public profiles:', error);
+        }
       },
       [asset]
     );
@@ -285,7 +292,12 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                 <Spacer />
                 {asset && (
                   <Text size="body">
-                    <Trans>by</Trans>{' '}
+                    {((!!assetAuthors && !!assetAuthors.length) ||
+                      !!authorPublicProfiles.length) && (
+                      <>
+                        <Trans>by</Trans>{' '}
+                      </>
+                    )}
                     {!!assetAuthors &&
                       assetAuthors.map(author => {
                         return (

@@ -196,10 +196,10 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   }
 
   getDefaultWidth(): number {
-    return Math.abs(this._pixiObject.width);
+    return Math.abs(this._pixiObject.texture.frame.width);
   }
 
   getDefaultHeight(): number {
-    return Math.abs(this._pixiObject.height);
+    return Math.abs(this._pixiObject.texture.frame.height);
   }
 }

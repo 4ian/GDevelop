@@ -12,7 +12,7 @@ namespace gd {
 class Project;
 class Object;
 class InitialInstance;
-}
+}  // namespace gd
 
 /**
  * Text Object
@@ -39,11 +39,11 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
 
   /** \brief Change the character size.
    */
-  inline void SetCharacterSize(float size) { characterSize = size; };
+  inline void SetCharacterSize(double size) { characterSize = size; };
 
   /** \brief Get the character size.
    */
-  inline float GetCharacterSize() const { return characterSize; };
+  inline double GetCharacterSize() const { return characterSize; };
 
   /** \brief Return the name of the font resource used for the text.
    */
@@ -54,7 +54,9 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
   void SetFontName(const gd::String& resourceName) { fontName = resourceName; };
 
   inline const gd::String& GetTextAlignment() const { return textAlignment; };
-  void SetTextAlignment(const gd::String& textAlignment_) { textAlignment = textAlignment_; };
+  void SetTextAlignment(const gd::String& textAlignment_) {
+    textAlignment = textAlignment_;
+  };
 
   bool IsBold() const { return bold; };
   void SetBold(bool enable) { bold = enable; };
@@ -83,7 +85,7 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
 #endif
 
   gd::String text;
-  float characterSize;
+  double characterSize;
   gd::String fontName;
   bool smoothed;
   bool bold, italic, underlined;

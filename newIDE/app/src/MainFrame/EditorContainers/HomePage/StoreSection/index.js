@@ -1,15 +1,36 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
-import SectionContainer, { SectionRow } from '../SectionContainer';
+import SectionContainer from '../SectionContainer';
 import { AssetStore } from '../../../../AssetStore';
+import { Line } from '../../../../UI/Grid';
+import RaisedButton from '../../../../UI/RaisedButton';
+import { Trans } from '@lingui/macro';
 
-const CommunitySection = () => {
+type Props = {|
+  project: gdProject,
+|};
+
+const StoreSection = ({ project }: Props) => {
   return (
     <SectionContainer flexBody>
       <AssetStore />
+      <Line justifyContent="flex-end">
+        <RaisedButton
+          primary
+          onClick={() => {
+            /* TODO */
+          }}
+          label={
+            project ? (
+              <Trans>Add to the project</Trans>
+            ) : (
+              <Trans>Create a project with these assets</Trans>
+            )
+          }
+        />
+      </Line>
     </SectionContainer>
   );
 };
 
-export default CommunitySection;
+export default StoreSection;

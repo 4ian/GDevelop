@@ -139,7 +139,10 @@ export default class InstancesMover {
           y: selectedInstance.getY(),
         };
       }
-      selectedInstance.setX(
+      // We round the position to the nearest pixel when an instance is moved in the editor.
+      // This is to avoid having a lot of decimals in the position of instances.
+      // It does not prevent the user from having decimals, when editing the position manually.
+      const newX = Math.round(
         initialPosition.x +
           this._getMoveDeltaX(
             roundedTotalDeltaX,
@@ -147,7 +150,7 @@ export default class InstancesMover {
             followAxis
           )
       );
-      selectedInstance.setY(
+      const newY = Math.round(
         initialPosition.y +
           this._getMoveDeltaY(
             roundedTotalDeltaX,
@@ -155,6 +158,8 @@ export default class InstancesMover {
             followAxis
           )
       );
+      selectedInstance.setX(newX);
+      selectedInstance.setY(newY);
     }
   }
 

@@ -2,8 +2,8 @@
 import { Trans } from '@lingui/macro';
 
 import React from 'react';
-import { Column, Line } from '../../../UI/Grid';
-import { LineStackLayout } from '../../../UI/Layout';
+import { Column } from '../../../UI/Grid';
+import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
 import ImagePreview from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import Replay from '@material-ui/icons/Replay';
 import PlayArrow from '@material-ui/icons/PlayArrow';
@@ -21,6 +21,8 @@ const styles = {
     position: 'relative',
     display: 'flex',
     flex: 1,
+    width: '100%', // Needed for ImagePreview to be able to scroll horizontally
+    height: 'calc(100% - 80px)', // 80px are allocated to the space the play pause button line can take once the responsive line stack layout is collapsed
   },
   loaderContainer: {
     position: 'absolute',
@@ -238,94 +240,109 @@ const AnimationPreview = ({
 
   return (
     <Column expand noOverflowParent noMargin>
-      <Line noMargin expand>
-        <div style={styles.imageContainer}>
-          <ImagePreview
-            resourceName={resourceName}
-            imageResourceSource={getImageResourceSource(resourceName)}
-            isImageResourceSmooth={isImageResourceSmooth(resourceName)}
-            initialZoom={initialZoom}
-            project={project}
-            hideCheckeredBackground={hideCheckeredBackground}
-            hideControls={hideControls}
-            fixedHeight={fixedHeight}
-            fixedWidth={fixedWidth}
-            onImageLoaded={onImageLoaded}
-            isImagePrivate={isAssetPrivate}
-            hideLoader // Handled by the animation preview, important to let the browser cache the image.
-          />
-          {!hideAnimationLoader && isStillLoadingResources && (
-            <div style={styles.loaderContainer}>
-              <PlaceholderLoader />
-            </div>
-          )}
-        </div>
-      </Line>
+      <div style={styles.imageContainer}>
+        <ImagePreview
+          resourceName={resourceName}
+          imageResourceSource={getImageResourceSource(resourceName)}
+          isImageResourceSmooth={isImageResourceSmooth(resourceName)}
+          initialZoom={initialZoom}
+          project={project}
+          hideCheckeredBackground={hideCheckeredBackground}
+          hideControls={hideControls}
+          fixedHeight={fixedHeight}
+          fixedWidth={fixedWidth}
+          onImageLoaded={onImageLoaded}
+          isImagePrivate={isAssetPrivate}
+          hideLoader // Handled by the animation preview, important to let the browser cache the image.
+        />
+        {!hideAnimationLoader && isStillLoadingResources && (
+          <div style={styles.loaderContainer}>
+            <PlaceholderLoader />
+          </div>
+        )}
+      </div>
       {!hideControls && (
-        <LineStackLayout noMargin alignItems="center">
-          <Text>
-            <Trans>FPS:</Trans>
-          </Text>
-          <TextField
-            margin="none"
-            value={fps}
-            onChange={(e, text) => {
-              const fps = parseFloat(text);
-              if (fps > 0) {
-                setFps(fps);
-                const newTimeBetweenFrames = parseFloat((1 / fps).toFixed(4));
-                timeBetweenFramesRef.current = newTimeBetweenFrames;
-                if (onChangeTimeBetweenFrames) {
-                  onChangeTimeBetweenFrames(newTimeBetweenFrames);
-                }
-                replay();
-              }
-            }}
-            id="direction-time-between-frames"
-            type="number"
-            step={1}
-            min={1}
-            max={100}
-            style={styles.timeField}
-            autoFocus={true}
-          />
-          <Timer style={styles.timeIcon} />
-          <TextField
-            margin="none"
-            value={timeBetweenFramesRef.current}
-            onChange={(e, text) => {
-              const time = parseFloat(text);
-              if (time > 0) {
-                setFps(Math.round(1 / time));
-                timeBetweenFramesRef.current = time;
-                if (onChangeTimeBetweenFrames) {
-                  onChangeTimeBetweenFrames(time);
-                }
-                replay();
-              }
-            }}
-            id="direction-time-between-frames"
-            type="number"
-            step={0.005}
-            precision={2}
-            min={0.01}
-            max={5}
-            style={styles.timeField}
-          />
-          <FlatButton
-            leftIcon={<Replay />}
-            label={<Trans>Replay</Trans>}
-            onClick={replay}
-          />
-          <FlatButton
-            leftIcon={!!pausedRef.current ? <PlayArrow /> : <Pause />}
-            label={!!pausedRef.current ? 'Play' : 'Pause'}
-            onClick={() => {
-              pausedRef.current = !pausedRef.current;
-              forceUdpate();
-            }}
-          />
-        </LineStackLayout>
+        // Column used to not have the expand behavior when responsive line stack layout is a column
+        <Column noMargin>
+          <ResponsiveLineStackLayout alignItems="center">
+            <LineStackLayout
+              alignItems="center"
+              justifyContent="center"
+              noMargin
+            >
+              <Text>
+                <Trans>FPS:</Trans>
+              </Text>
+              <TextField
+                margin="none"
+                value={fps}
+                onChange={(e, text) => {
+                  const fps = parseFloat(text);
+                  if (fps > 0) {
+                    setFps(fps);
+                    const newTimeBetweenFrames = parseFloat(
+                      (1 / fps).toFixed(4)
+                    );
+                    timeBetweenFramesRef.current = newTimeBetweenFrames;
+                    if (onChangeTimeBetweenFrames) {
+                      onChangeTimeBetweenFrames(newTimeBetweenFrames);
+                    }
+                    replay();
+                  }
+                }}
+                id="direction-time-between-frames"
+                type="number"
+                step={1}
+                min={1}
+                max={100}
+                style={styles.timeField}
+                autoFocus={true}
+              />
+              <Timer style={styles.timeIcon} />
+              <TextField
+                margin="none"
+                value={timeBetweenFramesRef.current}
+                onChange={(e, text) => {
+                  const time = parseFloat(text);
+                  if (time > 0) {
+                    setFps(Math.round(1 / time));
+                    timeBetweenFramesRef.current = time;
+                    if (onChangeTimeBetweenFrames) {
+                      onChangeTimeBetweenFrames(time);
+                    }
+                    replay();
+                  }
+                }}
+                id="direction-time-between-frames"
+                type="number"
+                step={0.005}
+                precision={2}
+                min={0.01}
+                max={5}
+                style={styles.timeField}
+              />
+            </LineStackLayout>
+            <LineStackLayout
+              alignItems="center"
+              justifyContent="center"
+              noMargin
+            >
+              <FlatButton
+                leftIcon={<Replay />}
+                label={<Trans>Replay</Trans>}
+                onClick={replay}
+              />
+              <FlatButton
+                leftIcon={!!pausedRef.current ? <PlayArrow /> : <Pause />}
+                label={!!pausedRef.current ? 'Play' : 'Pause'}
+                onClick={() => {
+                  pausedRef.current = !pausedRef.current;
+                  forceUdpate();
+                }}
+              />
+            </LineStackLayout>
+          </ResponsiveLineStackLayout>
+        </Column>
       )}
     </Column>
   );

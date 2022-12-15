@@ -62,6 +62,7 @@ export type AssetHeader = {|
 export type Asset = {|
   ...AssetHeader,
   authors: Array<string>,
+  authorIds?: Array<string>,
   license: string,
   objectAssets: Array<ObjectAsset>,
 |};

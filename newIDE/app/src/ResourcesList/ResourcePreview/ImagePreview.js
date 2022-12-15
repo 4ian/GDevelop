@@ -127,6 +127,7 @@ const ImagePreview = ({
   const [imageZoomFactor, setImageZoomFactor] = React.useState<number>(
     initialZoom || 1
   );
+  const hasImageLoadedRef = React.useRef<boolean>(false);
 
   const handleImageError = () => {
     setErrored(true);
@@ -144,12 +145,14 @@ const ImagePreview = ({
         )
       );
       setImageZoomFactor(zoomFactor);
+      hasImageLoadedRef.current = true;
     },
     [imageHeight, imageWidth, containerHeight, containerWidth]
   );
 
   React.useEffect(
     () => {
+      if (hasImageLoadedRef.current) return;
       adaptZoomFactorToImage();
     },
     [adaptZoomFactorToImage]

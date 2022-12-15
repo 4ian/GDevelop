@@ -191,7 +191,10 @@ export default class MaterialUIMenuImplementation {
     this._onClose = onClose;
   }
 
-  buildFromTemplate(template: Array<MenuItemTemplate>) {
+  buildFromTemplate(
+    template: Array<MenuItemTemplate>,
+    forceUpdate: () => void
+  ) {
     return template
       .map((item, id) => {
         if (item.visible === false) return null;
@@ -215,13 +218,17 @@ export default class MaterialUIMenuImplementation {
                 // $FlowFixMe - existence should be inferred by Flow.
                 item.enabled === false
               }
-              onClick={() => {
+              onClick={async () => {
                 if (item.enabled === false) {
                   return;
                 }
 
                 if (item.click) {
-                  item.click();
+                  await item.click();
+                  if (item.type === 'checkbox') {
+                    forceUpdate();
+                    return;
+                  }
                 }
                 this._onClose();
               }}
@@ -238,7 +245,9 @@ export default class MaterialUIMenuImplementation {
             <SubMenuItem
               key={'submenu' + item.label}
               item={item}
-              buildFromTemplate={template => this.buildFromTemplate(template)}
+              buildFromTemplate={template =>
+                this.buildFromTemplate(template, forceUpdate)
+              }
             />
           );
         } else {

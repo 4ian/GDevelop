@@ -2713,11 +2713,11 @@ interface Point {
 
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
-    void SetXY(float x, float y);
-    float GetX();
-    void SetX(float x);
-    float GetY();
-    void SetY(float y);
+    void SetXY(double x, double y);
+    double GetX();
+    void SetX(double x);
+    double GetY();
+    void SetY(double y);
 };
 
 interface VectorPoint {
@@ -2734,12 +2734,12 @@ interface Polygon2d {
     void Polygon2d();
 
     [Ref] VectorVector2f GetVertices();
-    void Move(float x, float y);
-    void Rotate(float angle);
+    void Move(double x, double y);
+    void Rotate(double angle);
     boolean IsConvex();
     [Value] Vector2f ComputeCenter();
 
-    [Value] Polygon2d STATIC_CreateRectangle(float width, float height);
+    [Value] Polygon2d STATIC_CreateRectangle(double width, double height);
 };
 
 interface VectorPolygon2d {
@@ -2857,8 +2857,8 @@ interface TextObject {
 
     void SetString([Const] DOMString string);
     [Const, Ref] DOMString GetString();
-    void SetCharacterSize(float size);
-    float GetCharacterSize();
+    void SetCharacterSize(double size);
+    double GetCharacterSize();
     void SetFontName([Const] DOMString string);
     [Const, Ref] DOMString GetFontName();
     boolean IsBold();
@@ -2881,27 +2881,27 @@ interface TiledSpriteObject {
 
     void SetTexture([Const] DOMString texture);
     [Const, Ref] DOMString GetTexture();
-    void SetWidth(float width);
-    float GetWidth();
-    void SetHeight(float height);
-    float GetHeight();
+    void SetWidth(double width);
+    double GetWidth();
+    void SetHeight(double height);
+    double GetHeight();
 };
 TiledSpriteObject implements ObjectConfiguration;
 
 interface PanelSpriteObject {
     void PanelSpriteObject();
 
-    float GetLeftMargin();
-    void SetLeftMargin(float newMargin);
+    double GetLeftMargin();
+    void SetLeftMargin(double newMargin);
 
-    float GetTopMargin();
-    void SetTopMargin(float newMargin);
+    double GetTopMargin();
+    void SetTopMargin(double newMargin);
 
-    float GetRightMargin();
-    void SetRightMargin(float newMargin);
+    double GetRightMargin();
+    void SetRightMargin(double newMargin);
 
-    float GetBottomMargin();
-    void SetBottomMargin(float newMargin);
+    double GetBottomMargin();
+    void SetBottomMargin(double newMargin);
 
     boolean IsTiled();
     void SetTiled(boolean enable);
@@ -2909,10 +2909,10 @@ interface PanelSpriteObject {
     void SetTexture([Const] DOMString texture);
     [Const, Ref] DOMString GetTexture();
 
-    void SetWidth(float width);
-    float GetWidth();
-    void SetHeight(float height);
-    float GetHeight();
+    void SetWidth(double width);
+    double GetWidth();
+    void SetHeight(double height);
+    double GetHeight();
 };
 PanelSpriteObject implements ObjectConfiguration;
 
@@ -2926,19 +2926,19 @@ interface ShapePainterObject {
     void SetClearBetweenFrames(boolean value);
     boolean IsClearedBetweenFrames();
 
-    void SetOutlineSize(float size);
-    float GetOutlineSize();
+    void SetOutlineSize(double size);
+    double GetOutlineSize();
 
-    void SetOutlineOpacity(float val);
-    float GetOutlineOpacity();
+    void SetOutlineOpacity(double val);
+    double GetOutlineOpacity();
 
     void SetOutlineColor(unsigned long r, unsigned long g, unsigned long b);
     unsigned long GetOutlineColorR();
     unsigned long GetOutlineColorG();
     unsigned long GetOutlineColorB();
 
-    void SetFillOpacity(float val);
-    float GetFillOpacity();
+    void SetFillOpacity(double val);
+    double GetFillOpacity();
 
     void SetFillColor(unsigned long r,unsigned long g, unsigned long b);
     unsigned long GetFillColorR();
@@ -2966,85 +2966,85 @@ interface ParticleEmitterObject {
 
     void SetParticleTexture([Const] DOMString resourceName);
     [Const, Ref] DOMString GetParticleTexture();
-    void SetRendererParam1(float newValue);
-    float GetRendererParam1();
-    void SetRendererParam2(float newValue);
-    float GetRendererParam2();
+    void SetRendererParam1(double newValue);
+    double GetRendererParam1();
+    void SetRendererParam2(double newValue);
+    double GetRendererParam2();
 
     boolean IsRenderingAdditive();
     void SetRenderingAdditive();
     void SetRenderingAlpha();
 
-    void SetMaxParticleNb(float newValue);
-    float GetMaxParticleNb();
-    void SetTank(float newValue);
-    float GetTank();
-    void SetFlow(float newValue);
-    float GetFlow();
+    void SetMaxParticleNb(double newValue);
+    double GetMaxParticleNb();
+    void SetTank(double newValue);
+    double GetTank();
+    void SetFlow(double newValue);
+    double GetFlow();
     void SetDestroyWhenNoParticles(boolean enable);
     boolean GetDestroyWhenNoParticles();
 
-    void SetEmitterForceMin(float newValue);
-    float GetEmitterForceMin();
-    void SetEmitterForceMax(float newValue);
-    float GetEmitterForceMax();
+    void SetEmitterForceMin(double newValue);
+    double GetEmitterForceMin();
+    void SetEmitterForceMax(double newValue);
+    double GetEmitterForceMax();
 
-    void SetConeSprayAngle(float newValue);
-    float GetConeSprayAngle();
+    void SetConeSprayAngle(double newValue);
+    double GetConeSprayAngle();
 
-    void SetZoneRadius(float newValue);
-    float GetZoneRadius();
+    void SetZoneRadius(double newValue);
+    double GetZoneRadius();
 
-    void SetParticleGravityX(float newValue);
-    float GetParticleGravityX();
-    void SetParticleGravityY(float newValue);
-    float GetParticleGravityY();
-    void SetParticleGravityAngle(float newValue);
-    float GetParticleGravityAngle();
-    void SetParticleGravityLength(float newValue);
-    float GetParticleGravityLength();
+    void SetParticleGravityX(double newValue);
+    double GetParticleGravityX();
+    void SetParticleGravityY(double newValue);
+    double GetParticleGravityY();
+    void SetParticleGravityAngle(double newValue);
+    double GetParticleGravityAngle();
+    void SetParticleGravityLength(double newValue);
+    double GetParticleGravityLength();
 
-    void SetParticleLifeTimeMin(float newValue);
-    float GetParticleLifeTimeMin();
-    void SetParticleLifeTimeMax(float newValue);
-    float GetParticleLifeTimeMax();
+    void SetParticleLifeTimeMin(double newValue);
+    double GetParticleLifeTimeMin();
+    void SetParticleLifeTimeMax(double newValue);
+    double GetParticleLifeTimeMax();
 
-    void SetParticleRed1(float newValue);
-    float GetParticleRed1();
-    void SetParticleRed2(float newValue);
-    float GetParticleRed2();
-    void SetParticleGreen1(float newValue);
-    float GetParticleGreen1();
-    void SetParticleGreen2(float newValue);
-    float GetParticleGreen2();
-    void SetParticleBlue1(float newValue);
-    float GetParticleBlue1();
-    void SetParticleBlue2(float newValue);
-    float GetParticleBlue2();
-    void SetParticleAlpha1(float newValue);
-    float GetParticleAlpha1();
-    void SetParticleAlpha2(float newValue);
-    float GetParticleAlpha2();
-    void SetParticleSize1(float newValue);
-    float GetParticleSize1();
-    void SetParticleSize2(float newValue);
-    float GetParticleSize2();
-    void SetParticleAngle1(float newValue);
-    float GetParticleAngle1();
-    void SetParticleAngle2(float newValue);
-    float GetParticleAngle2();
-    void SetParticleAlphaRandomness1(float newValue);
-    float GetParticleAlphaRandomness1();
-    void SetParticleAlphaRandomness2(float newValue);
-    float GetParticleAlphaRandomness2();
-    void SetParticleSizeRandomness1(float newValue);
-    float GetParticleSizeRandomness1();
-    void SetParticleSizeRandomness2(float newValue);
-    float GetParticleSizeRandomness2();
-    void SetParticleAngleRandomness1(float newValue);
-    float GetParticleAngleRandomness1();
-    void SetParticleAngleRandomness2(float newValue);
-    float GetParticleAngleRandomness2();
+    void SetParticleRed1(double newValue);
+    double GetParticleRed1();
+    void SetParticleRed2(double newValue);
+    double GetParticleRed2();
+    void SetParticleGreen1(double newValue);
+    double GetParticleGreen1();
+    void SetParticleGreen2(double newValue);
+    double GetParticleGreen2();
+    void SetParticleBlue1(double newValue);
+    double GetParticleBlue1();
+    void SetParticleBlue2(double newValue);
+    double GetParticleBlue2();
+    void SetParticleAlpha1(double newValue);
+    double GetParticleAlpha1();
+    void SetParticleAlpha2(double newValue);
+    double GetParticleAlpha2();
+    void SetParticleSize1(double newValue);
+    double GetParticleSize1();
+    void SetParticleSize2(double newValue);
+    double GetParticleSize2();
+    void SetParticleAngle1(double newValue);
+    double GetParticleAngle1();
+    void SetParticleAngle2(double newValue);
+    double GetParticleAngle2();
+    void SetParticleAlphaRandomness1(double newValue);
+    double GetParticleAlphaRandomness1();
+    void SetParticleAlphaRandomness2(double newValue);
+    double GetParticleAlphaRandomness2();
+    void SetParticleSizeRandomness1(double newValue);
+    double GetParticleSizeRandomness1();
+    void SetParticleSizeRandomness2(double newValue);
+    double GetParticleSizeRandomness2();
+    void SetParticleAngleRandomness1(double newValue);
+    double GetParticleAngleRandomness1();
+    void SetParticleAngleRandomness2(double newValue);
+    double GetParticleAngleRandomness2();
 
 };
 ParticleEmitterObject implements ObjectConfiguration;

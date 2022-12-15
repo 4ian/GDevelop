@@ -26,11 +26,11 @@ class GD_EXTENSION_API ShapePainterObjectBase {
   ShapePainterObjectBase();
   virtual ~ShapePainterObjectBase(){};
 
-  inline void SetOutlineSize(float size) { outlineSize = size; };
-  inline float GetOutlineSize() const { return outlineSize; };
+  inline void SetOutlineSize(double size) { outlineSize = size; };
+  inline double GetOutlineSize() const { return outlineSize; };
 
-  void SetOutlineOpacity(float val);
-  inline float GetOutlineOpacity() const { return outlineOpacity; };
+  void SetOutlineOpacity(double val);
+  inline double GetOutlineOpacity() const { return outlineOpacity; };
 
   void SetOutlineColor(unsigned int r, unsigned int v, unsigned int b);
   inline unsigned int GetOutlineColorR() const { return outlineColorR; };
@@ -41,8 +41,8 @@ class GD_EXTENSION_API ShapePainterObjectBase {
    */
   void SetOutlineColor(const gd::String& color);
 
-  void SetFillOpacity(float val);
-  inline float GetFillOpacity() const { return fillOpacity; };
+  void SetFillOpacity(double val);
+  inline double GetFillOpacity() const { return fillOpacity; };
 
   void SetFillColor(unsigned int r, unsigned int v, unsigned int b);
   inline unsigned int GetFillColorR() const { return fillColorR; };

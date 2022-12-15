@@ -15,7 +15,7 @@ import {
 } from '../Utils/GDevelopServices/Asset';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
+import { LineStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { AssetStoreContext } from './AssetStoreContext';
 import Window from '../Utils/Window';
@@ -218,7 +218,6 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
         try {
           const authorIds: Array<string> = (asset && asset.authorIds) || [];
           if (authorIds.length === 0) return;
-          console.log('fetching', asset);
           const userPublicProfileByIds = await getUserPublicProfilesByIds(
             authorIds
           );
@@ -284,22 +283,19 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
         <Column expand noMargin>
           <Line justifyContent="space-between" noMargin>
             <Column>
-              <Line alignItems="baseline" noMargin>
+              <LineStackLayout alignItems="baseline" noMargin>
                 <Text size="block-title" displayInlineAsSpan>
                   {assetShortHeader.name}
                 </Text>
-                <Spacer />
                 {asset && (
-                  <Text size="body">
-                    {((!!assetAuthors && !!assetAuthors.length) ||
-                      !!authorPublicProfiles.length) && (
-                      <>
-                        <Trans>by</Trans>{' '}
-                      </>
-                    )}
+                  <LineStackLayout>
+                    <Text size="body">
+                      {((!!assetAuthors && !!assetAuthors.length) ||
+                        !!authorPublicProfiles.length) && <Trans>by</Trans>}
+                    </Text>
                     {!!assetAuthors &&
-                      assetAuthors.map(author => {
-                        return (
+                      assetAuthors.map(author => (
+                        <Text size="body">
                           <Link
                             key={author.name}
                             href={author.website}
@@ -309,27 +305,29 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                           >
                             {author.name}
                           </Link>
-                        );
-                      })}
+                        </Text>
+                      ))}
                     {!!authorPublicProfiles.length &&
                       authorPublicProfiles.map(userPublicProfile => {
                         const username =
                           userPublicProfile.username || 'GDevelop user';
                         return (
-                          <Link
-                            key={userPublicProfile.id}
-                            href="#"
-                            onClick={() =>
-                              openUserPublicProfile(userPublicProfile.id)
-                            }
-                          >
-                            {username}
-                          </Link>
+                          <Text size="body">
+                            <Link
+                              key={userPublicProfile.id}
+                              href="#"
+                              onClick={() =>
+                                openUserPublicProfile(userPublicProfile.id)
+                              }
+                            >
+                              {username}
+                            </Link>
+                          </Text>
                         );
                       })}
-                  </Text>
+                  </LineStackLayout>
                 )}
-              </Line>
+              </LineStackLayout>
               <Line alignItems="center">
                 <div style={{ flexWrap: 'wrap' }}>
                   {assetShortHeader.tags.slice(0, 5).map((tag, index) => (

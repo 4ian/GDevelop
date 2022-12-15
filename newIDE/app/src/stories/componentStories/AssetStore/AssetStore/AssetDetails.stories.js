@@ -90,3 +90,56 @@ PrivateAsset.parameters = {
     },
   ],
 };
+
+export const AssetWithMultipleAuthors = () => (
+  <PublicProfileProvider>
+    <AssetStoreStateProvider>
+      <AssetDetails
+        project={testProject.project}
+        onTagSelection={() => {}}
+        assetShortHeader={fakeAssetShortHeader}
+        onOpenDetails={assetShortHeader => {}}
+      />
+    </AssetStoreStateProvider>
+  </PublicProfileProvider>
+);
+PrivateAsset.decorators = [withMock];
+PrivateAsset.parameters = {
+  mockData: [
+    {
+      url: `${
+        GDevelopUserApi.baseUrl
+      }/user-public-profile?id=ZJxWdIDmJzUA5iAWryEItxINA7n1,ABCWdIDmJzUA5iAWryEItxINA7n1`,
+      method: 'GET',
+      status: 200,
+      response: {
+        ZJxWdIDmJzUA5iAWryEItxINA7n1: {
+          id: 'ZJxWdIDmJzUA5iAWryEItxINA7n1',
+          username: 'Clem',
+          description: "I'm Clement\n\ntada",
+          donateLink: 'https://ko-fi/clem',
+        },
+        ABCWdIDmJzUA5iAWryEItxINA7n1: {
+          id: 'ABCWdIDmJzUA5iAWryEItxINA7n1',
+          username: 'Clem2',
+          description: "I'm Clement 2\n\ntada",
+          donateLink: 'https://ko-fi/clem2',
+        },
+      },
+    },
+    {
+      url: `https://resources.gdevelop-app.com/assets-database/assets/${
+        fakeAssetShortHeader.id
+      }.json`,
+      method: 'GET',
+      status: 200,
+      response: {
+        ...fakeAssetWithCustomObject,
+        authorIds: [
+          'ZJxWdIDmJzUA5iAWryEItxINA7n1',
+          'ABCWdIDmJzUA5iAWryEItxINA7n1',
+        ],
+      },
+    },
+  ],
+};

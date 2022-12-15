@@ -1,9 +1,11 @@
 // @flow
 
-const stepZoomFactor = Math.pow(2, 1 / 8);
+const basePower = 1 / 16;
+
+const stepZoomFactor = Math.pow(2, 2 * basePower);
 export const zoomInFactor = stepZoomFactor;
 export const zoomOutFactor = Math.pow(stepZoomFactor, -1);
-const continuousZoomFactor = Math.sqrt(stepZoomFactor);
+const continuousZoomFactor = Math.pow(2, basePower);
 
 // TODO: Use absolute value of signal that should represent either:
 // - Mouse sensitivity

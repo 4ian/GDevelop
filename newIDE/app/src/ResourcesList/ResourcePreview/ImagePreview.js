@@ -18,6 +18,11 @@ import { getPixelatedImageRendering } from '../../Utils/CssHelpers';
 import { shouldZoom } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import Slider from '../../UI/Slider';
 import AuthorizedAssetImage from '../../AssetStore/PrivateAssets/AuthorizedAssetImage';
+import {
+  getContinuousZoomFactor,
+  zoomInFactor,
+  zoomOutFactor,
+} from '../../Utils/ZoomUtils';
 const gd: libGDevelop = global.gd;
 
 const MARGIN = 50;
@@ -115,33 +120,34 @@ const ImagePreview = ({
   onImageLoaded,
   hideLoader,
 }: Props) => {
-  const [errored, setErrored] = React.useState(false);
-  const [imageWidth, setImageWidth] = React.useState(null);
-  const [imageHeight, setImageHeight] = React.useState(null);
-  const [imageZoomFactor, setImageZoomFactor] = React.useState(
+  const [errored, setErrored] = React.useState<boolean>(false);
+  const [imageWidth, setImageWidth] = React.useState<?number>(null);
+  const [imageHeight, setImageHeight] = React.useState<?number>(null);
+  const [containerWidth, setContainerWidth] = React.useState<?number>(null);
+  const [containerHeight, setContainerHeight] = React.useState<?number>(null);
+  const [imageZoomFactor, setImageZoomFactor] = React.useState<number>(
     initialZoom || 1
-  );
-  const [isResizeObserverReady, setIsResizeObserverReady] = React.useState(
-    false
   );
 
   const handleImageError = () => {
     setErrored(true);
   };
 
-  const adaptZoomToImage = (
-    containerHeight: number,
-    containerWidth: number
-  ) => {
-    if (!imageWidth || !imageHeight) return;
-    const zoomFactor = getBoundedZoomFactor(
-      Math.min(
-        containerWidth / (imageWidth * SPRITE_MARGIN_RATIO),
-        containerHeight / (imageHeight * SPRITE_MARGIN_RATIO)
-      )
-    );
-    setImageZoomFactor(zoomFactor);
-  };
+  React.useEffect(
+    () => {
+      if (!imageWidth || !imageHeight || !containerHeight || !containerWidth) {
+        return;
+      }
+      const zoomFactor = getBoundedZoomFactor(
+        Math.min(
+          containerWidth / (imageWidth * SPRITE_MARGIN_RATIO),
+          containerHeight / (imageHeight * SPRITE_MARGIN_RATIO)
+        )
+      );
+      setImageZoomFactor(zoomFactor);
+    },
+    [containerHeight, containerWidth, imageHeight, imageWidth]
+  );
 
   const handleImageLoaded = (e: any) => {
     const imgElement = e.target;
@@ -158,8 +164,8 @@ const ImagePreview = ({
     if (onImageLoaded) onImageLoaded();
   };
 
-  const zoomBy = (imageZoomFactorDelta: number) => {
-    zoomTo(imageZoomFactor + imageZoomFactorDelta);
+  const zoomBy = (imageZoomFactorMultiplier: number) => {
+    zoomTo(imageZoomFactor * imageZoomFactorMultiplier);
   };
 
   const zoomTo = (imageZoomFactor: number) => {
@@ -169,85 +175,79 @@ const ImagePreview = ({
   const theme = React.useContext(GDevelopThemeContext);
   const frameBorderColor = theme.imagePreview.frameBorderColor || '#aaa';
 
+  const containerLoaded = !!containerWidth && !!containerHeight;
+  const imageLoaded = !!imageWidth && !!imageHeight && !errored;
+
+  // Centre-align the image and overlays
+  const imagePositionTop = Math.max(
+    0,
+    (containerHeight || 0) / 2 -
+      ((imageHeight || 0) * imageZoomFactor) / 2 -
+      MARGIN
+  );
+  const imagePositionLeft = Math.max(
+    0,
+    (containerWidth || 0) / 2 -
+      ((imageWidth || 0) * imageZoomFactor) / 2 -
+      MARGIN
+  );
+
+  // We display the elements only when the image is loaded and
+  // the zoom is applied to avoid a shift in the image.
+  // We use "visibility": "hidden" instead of "display": "none"
+  // so that the image takes the space of the container whilst being hidden.
+  // TODO: handle a proper loader.
+  const visibility = containerLoaded ? undefined : 'hidden';
+  const width = imageWidth ? imageWidth * imageZoomFactor : undefined;
+  const height = imageHeight ? imageHeight * imageZoomFactor : undefined;
+
+  const imageStyle = {
+    ...styles.spriteThumbnailImage,
+    // Apply margin only once the container is loaded, to avoid a shift in the image
+    margin: containerLoaded ? MARGIN : 0,
+    top: imagePositionTop,
+    left: imagePositionLeft,
+    width,
+    height,
+    visibility,
+    ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
+  };
+
+  const frameStyle = {
+    position: 'absolute',
+    top: imagePositionTop + MARGIN,
+    left: imagePositionLeft + MARGIN,
+    width,
+    height,
+    visibility,
+    border: `1px solid ${frameBorderColor}`,
+    boxSizing: 'border-box',
+  };
+
+  const overlayStyle = {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    visibility,
+  };
+
   return (
-    <Measure bounds>
-      {({ contentRect, measureRef }) => {
-        const containerWidth = contentRect.bounds.width;
-        const containerHeight = contentRect.bounds.height;
-        const containerLoaded = !!containerWidth && !!containerHeight;
-        const imageLoaded = !!imageWidth && !!imageHeight && !errored;
-
-        // Once the container is loaded, adapt the zoom to the image size.
-        if (!isResizeObserverReady && containerLoaded) {
-          if (!initialZoom) {
-            adaptZoomToImage(containerHeight, containerWidth);
-          }
-          setIsResizeObserverReady(true);
-        }
-
-        // Centre-align the image and overlays
-        const imagePositionTop = Math.max(
-          0,
-          (containerHeight || 0) / 2 -
-            ((imageHeight || 0) * imageZoomFactor) / 2 -
-            MARGIN
-        );
-        const imagePositionLeft = Math.max(
-          0,
-          (containerWidth || 0) / 2 -
-            ((imageWidth || 0) * imageZoomFactor) / 2 -
-            MARGIN
-        );
-
-        // We display the elements only when the image is loaded and
-        // the zoom is applied to avoid a shift in the image.
-        // We use "visibility": "hidden" instead of "display": "none"
-        // so that the image takes the space of the container whilst being hidden.
-        // TODO: handle a proper loader.
-        const visibility = containerLoaded ? undefined : 'hidden';
-        const width = imageWidth ? imageWidth * imageZoomFactor : undefined;
-        const height = imageHeight ? imageHeight * imageZoomFactor : undefined;
-
-        const imageStyle = {
-          ...styles.spriteThumbnailImage,
-          // Apply margin only once the container is loaded, to avoid a shift in the image
-          margin: containerLoaded ? MARGIN : 0,
-          top: imagePositionTop,
-          left: imagePositionLeft,
-          width,
-          height,
-          visibility,
-          ...(!isImageResourceSmooth
-            ? styles.previewImagePixelated
-            : undefined),
-        };
-
-        const frameStyle = {
-          position: 'absolute',
-          top: imagePositionTop + MARGIN,
-          left: imagePositionLeft + MARGIN,
-          width,
-          height,
-          visibility,
-          border: `1px solid ${frameBorderColor}`,
-          boxSizing: 'border-box',
-        };
-
-        const overlayStyle = {
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          visibility,
-        };
-
+    <Measure
+      bounds
+      onResize={contentRect => {
+        setContainerWidth(contentRect.bounds.width);
+        setContainerHeight(contentRect.bounds.height);
+      }}
+    >
+      {({ measureRef }) => {
         return (
           <Column expand noMargin useFullHeight>
             {!hideControls && (
               <MiniToolbar noPadding>
                 <IconButton
-                  onClick={() => zoomBy(-0.2)}
+                  onClick={() => zoomBy(zoomOutFactor)}
                   tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}
                 >
                   <ZoomOut />
@@ -264,7 +264,7 @@ const ImagePreview = ({
                   />
                 </div>
                 <IconButton
-                  onClick={() => zoomBy(+0.2)}
+                  onClick={() => zoomBy(zoomInFactor)}
                   tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
                 >
                   <ZoomIn />
@@ -297,8 +297,7 @@ const ImagePreview = ({
                 onWheel={event => {
                   const { deltaY } = event;
                   if (!hideControls && shouldZoom(event)) {
-                    zoomBy(-deltaY / 500);
-                    event.preventDefault();
+                    zoomBy(getContinuousZoomFactor(-deltaY));
                     event.stopPropagation();
                   } else {
                     // Let the usual, native vertical or horizontal scrolling happen.

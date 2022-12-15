@@ -131,7 +131,7 @@ const ImagePreview = ({
     setErrored(true);
   };
 
-  React.useEffect(
+  const adaptZoomFactorToImage = React.useCallback(
     () => {
       if (!imageWidth || !imageHeight || !containerHeight || !containerWidth) {
         return;
@@ -144,7 +144,14 @@ const ImagePreview = ({
       );
       setImageZoomFactor(zoomFactor);
     },
-    [containerHeight, containerWidth, imageHeight, imageWidth]
+    [imageHeight, imageWidth, containerHeight, containerWidth]
+  );
+
+  React.useEffect(
+    () => {
+      adaptZoomFactorToImage();
+    },
+    [adaptZoomFactorToImage]
   );
 
   const handleImageLoaded = (e: any) => {
@@ -268,8 +275,8 @@ const ImagePreview = ({
                   <ZoomIn />
                 </IconButton>
                 <IconButton
-                  onClick={() => zoomTo(1)}
-                  tooltip={t`Restore original size`}
+                  onClick={adaptZoomFactorToImage}
+                  tooltip={t`Fit content to window`}
                 >
                   <ZoomOutMap />
                 </IconButton>

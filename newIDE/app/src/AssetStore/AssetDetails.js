@@ -15,7 +15,7 @@ import {
 } from '../Utils/GDevelopServices/Asset';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
+import { LineStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { AssetStoreContext } from './AssetStoreContext';
 import Window from '../Utils/Window';
@@ -35,6 +35,11 @@ import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuth
 import AuthorizedAssetImage from './PrivateAssets/AuthorizedAssetImage';
 import { MarkdownText } from '../UI/MarkdownText';
 import Paper from '../UI/Paper';
+import PublicProfileContext from '../Profile/PublicProfileContext';
+import {
+  getUserPublicProfilesByIds,
+  type UserPublicProfile,
+} from '../Utils/GDevelopServices/User';
 
 const FIXED_HEIGHT = 250;
 const FIXED_WIDTH = 300;
@@ -131,6 +136,10 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
     const { fetchPrivateAsset } = React.useContext(
       PrivateAssetsAuthorizationContext
     );
+    const { openUserPublicProfile } = React.useContext(PublicProfileContext);
+    const [authorPublicProfiles, setAuthorPublicProfiles] = React.useState<
+      UserPublicProfile[]
+    >([]);
 
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
@@ -204,6 +213,33 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
       [loadAsset]
     );
 
+    const loadAuthorPublicProfiles = React.useCallback(
+      async () => {
+        try {
+          const authorIds: Array<string> = (asset && asset.authorIds) || [];
+          if (authorIds.length === 0) return;
+          const userPublicProfileByIds = await getUserPublicProfilesByIds(
+            authorIds
+          );
+          const userPublicProfiles = Object.keys(userPublicProfileByIds).map(
+            id => userPublicProfileByIds[id]
+          );
+          setAuthorPublicProfiles(userPublicProfiles);
+        } catch (error) {
+          // Catch error, but don't display it to the user.
+          console.error('Error while loading author public profiles:', error);
+        }
+      },
+      [asset]
+    );
+
+    React.useEffect(
+      () => {
+        loadAuthorPublicProfiles();
+      },
+      [loadAuthorPublicProfiles]
+    );
+
     const assetAuthors: ?Array<Author> =
       asset && authors
         ? asset.authors
@@ -212,6 +248,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
             })
             .filter(Boolean)
         : [];
+
     const assetLicense =
       asset && licenses
         ? licenses.find(({ name }) => name === asset.license)
@@ -246,17 +283,19 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
         <Column expand noMargin>
           <Line justifyContent="space-between" noMargin>
             <Column>
-              <Line alignItems="baseline" noMargin>
+              <LineStackLayout alignItems="baseline" noMargin>
                 <Text size="block-title" displayInlineAsSpan>
                   {assetShortHeader.name}
                 </Text>
-                <Spacer />
                 {asset && (
-                  <Text size="body">
-                    <Trans>by</Trans>{' '}
+                  <LineStackLayout>
+                    <Text size="body">
+                      {((!!assetAuthors && !!assetAuthors.length) ||
+                        !!authorPublicProfiles.length) && <Trans>by</Trans>}
+                    </Text>
                     {!!assetAuthors &&
-                      assetAuthors.map(author => {
-                        return (
+                      assetAuthors.map(author => (
+                        <Text size="body">
                           <Link
                             key={author.name}
                             href={author.website}
@@ -266,11 +305,29 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                           >
                             {author.name}
                           </Link>
+                        </Text>
+                      ))}
+                    {!!authorPublicProfiles.length &&
+                      authorPublicProfiles.map(userPublicProfile => {
+                        const username =
+                          userPublicProfile.username || 'GDevelop user';
+                        return (
+                          <Text size="body">
+                            <Link
+                              key={userPublicProfile.id}
+                              href="#"
+                              onClick={() =>
+                                openUserPublicProfile(userPublicProfile.id)
+                              }
+                            >
+                              {username}
+                            </Link>
+                          </Text>
                         );
                       })}
-                  </Text>
+                  </LineStackLayout>
                 )}
-              </Line>
+              </LineStackLayout>
               <Line alignItems="center">
                 <div style={{ flexWrap: 'wrap' }}>
                   {assetShortHeader.tags.slice(0, 5).map((tag, index) => (

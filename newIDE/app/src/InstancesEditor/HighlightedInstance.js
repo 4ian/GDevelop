@@ -4,7 +4,7 @@ import * as PIXI from 'pixi.js-legacy';
 import { type InstanceMeasurer } from './InstancesRenderer';
 import Rectangle from '../Utils/Rectangle';
 
-export default class InstancesSelection {
+export default class HighlightedInstance {
   instanceMeasurer: InstanceMeasurer;
   toCanvasCoordinates: (x: number, y: number) => [number, number];
   highlightedInstance: gdInitialInstance | null;

@@ -222,7 +222,6 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
           const userPublicProfileByIds = await getUserPublicProfilesByIds(
             authorIds
           );
-          console.log(userPublicProfileByIds);
           const userPublicProfiles = Object.keys(userPublicProfileByIds).map(
             id => userPublicProfileByIds[id]
           );

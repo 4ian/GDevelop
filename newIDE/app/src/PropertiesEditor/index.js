@@ -329,8 +329,11 @@ const PropertiesEditor = ({
             floatingLabelFixed
             helperMarkdownText={getFieldDescription(field)}
             onChange={newValue => {
-              let cleanedValue = parseFloat(newValue) || 0;
-              instances.forEach(i => setValue(i, cleanedValue));
+              const newNumberValue = parseFloat(newValue);
+              // If the value is not a number, the user is probably still typing, adding a dot or a comma.
+              // So don't update the value, it will be reverted if they leave the field.
+              if (isNaN(newNumberValue)) return;
+              instances.forEach(i => setValue(i, newNumberValue));
               _onInstancesModified(instances);
             }}
             type="number"

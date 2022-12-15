@@ -4,7 +4,6 @@ import { Trans } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
 import Measure from 'react-measure';
 import * as React from 'react';
-import { Column } from '../../UI/Grid';
 import MiniToolbar from '../../UI/MiniToolbar';
 import ZoomIn from '@material-ui/icons/ZoomIn';
 import ZoomOut from '@material-ui/icons/ZoomOut';
@@ -41,8 +40,15 @@ const styles = {
     height: '100%',
     overflow: 'hidden',
   },
-  imagePreviewContainer: {
+  container: {
     display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    flex: 1,
+    minHeight: 0,
+    width: '100%', // Needed for the div containing the image to scroll horizontally when image overflowing due to scroll.
+  },
+  imagePreviewContainer: {
     position: 'relative',
     width: '100%',
     height: '100%',
@@ -57,7 +63,6 @@ const styles = {
   spriteThumbnailImage: {
     position: 'relative',
     pointerEvents: 'none',
-    maxWidth: '100%', // to enable scroll when overflowing on x
   },
   sliderContainer: {
     maxWidth: 150,
@@ -264,7 +269,7 @@ const ImagePreview = ({
     >
       {({ measureRef }) => {
         return (
-          <Column expand noMargin useFullHeight>
+          <div style={styles.container}>
             {!hideControls && (
               <MiniToolbar noPadding>
                 <IconButton
@@ -367,7 +372,7 @@ const ImagePreview = ({
                 )}
               </div>
             </div>
-          </Column>
+          </div>
         );
       }}
     </Measure>

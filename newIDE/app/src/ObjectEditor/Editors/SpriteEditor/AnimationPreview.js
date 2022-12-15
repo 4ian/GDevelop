@@ -21,6 +21,7 @@ const styles = {
     position: 'relative',
     display: 'flex',
     flex: 1,
+    width: '100%', // Needed for ImagePreview to be able to scroll horizontally
     height: 'calc(100% - 80px)', // 80px are allocated to the space the play pause button line can take once the responsive line stack layout is collapsed
   },
   loaderContainer: {

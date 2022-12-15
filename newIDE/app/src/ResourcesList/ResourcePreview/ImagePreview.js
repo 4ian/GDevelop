@@ -127,7 +127,7 @@ const ImagePreview = ({
   const [imageZoomFactor, setImageZoomFactor] = React.useState<number>(
     initialZoom || 1
   );
-  const hasImageLoadedRef = React.useRef<boolean>(false);
+  const hasZoomBeenAdaptedToImageRef = React.useRef<boolean>(false);
 
   const handleImageError = () => {
     setErrored(true);
@@ -136,7 +136,7 @@ const ImagePreview = ({
   const adaptZoomFactorToImage = React.useCallback(
     () => {
       if (!imageWidth || !imageHeight || !containerHeight || !containerWidth) {
-        return;
+        return false;
       }
       const zoomFactor = clampImagePreviewZoom(
         Math.min(
@@ -145,7 +145,7 @@ const ImagePreview = ({
         )
       );
       setImageZoomFactor(zoomFactor);
-      hasImageLoadedRef.current = true;
+      return true;
     },
     [imageHeight, imageWidth, containerHeight, containerWidth]
   );
@@ -153,15 +153,18 @@ const ImagePreview = ({
   // Reset ref to adapt zoom when image changes
   React.useEffect(
     () => {
-      hasImageLoadedRef.current = false;
+      hasZoomBeenAdaptedToImageRef.current = false;
     },
     [imageResourceSource]
   );
 
+  // A change of adaptZoomFactorToImage means a change in one of its dependencies,
+  // so it means the container or image size has changed and we should try to adapt
+  // the zoom factor to the image.
   React.useEffect(
     () => {
-      if (hasImageLoadedRef.current) return;
-      adaptZoomFactorToImage();
+      if (hasZoomBeenAdaptedToImageRef.current) return;
+      hasZoomBeenAdaptedToImageRef.current = adaptZoomFactorToImage();
     },
     [adaptZoomFactorToImage]
   );
@@ -287,7 +290,9 @@ const ImagePreview = ({
                   <ZoomIn />
                 </IconButton>
                 <IconButton
-                  onClick={adaptZoomFactorToImage}
+                  onClick={() => {
+                    adaptZoomFactorToImage();
+                  }}
                   tooltip={t`Fit content to window`}
                 >
                   <ZoomOutMap />

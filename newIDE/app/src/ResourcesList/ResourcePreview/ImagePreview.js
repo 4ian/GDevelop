@@ -19,7 +19,10 @@ import { shouldZoom } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import Slider from '../../UI/Slider';
 import AuthorizedAssetImage from '../../AssetStore/PrivateAssets/AuthorizedAssetImage';
 import {
+  clampImagePreviewZoom,
   getContinuousZoomFactor,
+  imagePreviewMaxZoom,
+  imagePreviewMinZoom,
   zoomInFactor,
   zoomOutFactor,
 } from '../../Utils/ZoomUtils';
@@ -27,11 +30,6 @@ const gd: libGDevelop = global.gd;
 
 const MARGIN = 50;
 const SPRITE_MARGIN_RATIO = 1.3;
-const MAX_ZOOM_FACTOR = 10;
-const MIN_ZOOM_FACTOR = 0.1;
-
-const getBoundedZoomFactor = (zoom: number): number =>
-  Math.min(MAX_ZOOM_FACTOR, Math.max(MIN_ZOOM_FACTOR, zoom));
 
 const styles = {
   previewImagePixelated: {
@@ -138,7 +136,7 @@ const ImagePreview = ({
       if (!imageWidth || !imageHeight || !containerHeight || !containerWidth) {
         return;
       }
-      const zoomFactor = getBoundedZoomFactor(
+      const zoomFactor = clampImagePreviewZoom(
         Math.min(
           containerWidth / (imageWidth * SPRITE_MARGIN_RATIO),
           containerHeight / (imageHeight * SPRITE_MARGIN_RATIO)
@@ -169,7 +167,7 @@ const ImagePreview = ({
   };
 
   const zoomTo = (imageZoomFactor: number) => {
-    setImageZoomFactor(getBoundedZoomFactor(imageZoomFactor));
+    setImageZoomFactor(clampImagePreviewZoom(imageZoomFactor));
   };
 
   const theme = React.useContext(GDevelopThemeContext);
@@ -254,8 +252,8 @@ const ImagePreview = ({
                 </IconButton>
                 <div style={styles.sliderContainer}>
                   <Slider
-                    min={Math.log10(MIN_ZOOM_FACTOR)}
-                    max={Math.log10(MAX_ZOOM_FACTOR)}
+                    min={Math.log10(imagePreviewMinZoom)}
+                    max={Math.log10(imagePreviewMaxZoom)}
                     step={0.05}
                     value={Math.log10(imageZoomFactor)}
                     onChange={value => {

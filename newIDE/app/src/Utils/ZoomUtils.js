@@ -13,3 +13,15 @@ const continuousZoomFactor = Math.pow(2, basePower);
 // Signal is usually WheelEvent.deltaY
 export const getContinuousZoomFactor = (signal: number): number =>
   Math.pow(continuousZoomFactor, Math.sign(signal));
+
+const instancesEditorMaxZoom = 128;
+const instancesEditorMinZoom = 1 / 128;
+
+export const clampInstancesEditorZoom = (zoom: number): number =>
+  Math.max(Math.min(zoom, instancesEditorMaxZoom), instancesEditorMinZoom);
+
+export const imagePreviewMaxZoom = 16;
+export const imagePreviewMinZoom = 1 / 16;
+
+export const clampImagePreviewZoom = (zoom: number): number =>
+  Math.max(Math.min(zoom, imagePreviewMaxZoom), imagePreviewMinZoom);

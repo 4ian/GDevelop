@@ -458,6 +458,14 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
       this.childrenRenderedInstances.push(renderer);
       this.childrenRenderedInstanceByNames.set(childObject.getName(), renderer);
     });
+
+    if (this.childrenRenderedInstances.length === 0) {
+      // Show a placeholder.
+      this._pixiObject = new PIXI.Sprite(
+        PixiResourcesLoader.getInvalidPIXITexture()
+      );
+      this._pixiContainer.addChild(this._pixiObject);
+    }
   }
 
   /**
@@ -609,10 +617,14 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
   }
 
   getDefaultWidth() {
-    return this.childrenRenderedInstances[0].getDefaultWidth();
+    return this.childrenRenderedInstances.length > 0
+      ? this.childrenRenderedInstances[0].getDefaultWidth()
+      : 48;
   }
 
   getDefaultHeight() {
-    return this.childrenRenderedInstances[0].getDefaultHeight();
+    return this.childrenRenderedInstances.length > 0
+      ? this.childrenRenderedInstances[0].getDefaultHeight()
+      : 48;
   }
 }

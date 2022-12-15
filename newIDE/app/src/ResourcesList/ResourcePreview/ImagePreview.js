@@ -150,6 +150,14 @@ const ImagePreview = ({
     [imageHeight, imageWidth, containerHeight, containerWidth]
   );
 
+  // Reset ref to adapt zoom when image changes
+  React.useEffect(
+    () => {
+      hasImageLoadedRef.current = false;
+    },
+    [imageResourceSource]
+  );
+
   React.useEffect(
     () => {
       if (hasImageLoadedRef.current) return;

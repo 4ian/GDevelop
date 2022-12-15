@@ -226,6 +226,9 @@ export default class MaterialUIMenuImplementation {
                 if (item.click) {
                   await item.click();
                   if (item.type === 'checkbox') {
+                    // In case the item click function changes something that React does not detect,
+                    // for instance a change in the project/layout C++ object, the menu must be
+                    // manually updated to display the change.
                     forceUpdate();
                     return;
                   }

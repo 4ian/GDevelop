@@ -4,13 +4,30 @@ import SectionContainer from '../SectionContainer';
 import { AssetStore } from '../../../../AssetStore';
 import { Line } from '../../../../UI/Grid';
 import RaisedButton from '../../../../UI/RaisedButton';
+import { type ResourceManagementProps } from '../../../../ResourcesList/ResourceSource';
 import { Trans } from '@lingui/macro';
+import { AssetStoreContext } from '../../../../AssetStore/AssetStoreContext';
+import AssetPackInstallDialog from '../../../../AssetStore/AssetPackInstallDialog';
 
 type Props = {|
   project: gdProject,
+  resourceManagementProps: ResourceManagementProps,
+  canInstallPrivateAsset: () => boolean,
 |};
 
-const StoreSection = ({ project }: Props) => {
+const StoreSection = ({ project, resourceManagementProps, canInstallPrivateAsset }: Props) => {
+  const [
+    isAssetPackDialogInstallOpen,
+    setIsAssetPackDialogInstallOpen,
+  ] = React.useState(false);
+  const {
+    searchResults,
+    navigationState,
+  } = React.useContext(AssetStoreContext);
+  const {
+    openedAssetPack,
+  } = navigationState.getCurrentPage();
+  
   return (
     <SectionContainer flexBody>
       <AssetStore />
@@ -18,8 +35,13 @@ const StoreSection = ({ project }: Props) => {
         <RaisedButton
           primary
           onClick={() => {
-            /* TODO */
+            if (!project) {
+              return; // TODO: create a project, await, and then show dialog.
+            } 
+
+            setIsAssetPackDialogInstallOpen(true);            
           }}
+          disabled={!openedAssetPack || !searchResults}
           label={
             project ? (
               <Trans>Add to the project</Trans>
@@ -29,6 +51,22 @@ const StoreSection = ({ project }: Props) => {
           }
         />
       </Line>
+      {project && isAssetPackDialogInstallOpen && searchResults && openedAssetPack && (
+        <AssetPackInstallDialog
+          assetPack={openedAssetPack}
+          assetShortHeaders={searchResults}
+          addedAssetIds={[] /* TODO */}
+          onClose={() => setIsAssetPackDialogInstallOpen(false)}
+          onAssetsAdded={() => {
+            setIsAssetPackDialogInstallOpen(false);
+          }}
+          project={project}
+          objectsContainer={project /* TODO: choose the scene from inside the dialog? */}
+          onObjectAddedFromAsset={() => {}}
+          canInstallPrivateAsset={canInstallPrivateAsset}
+          resourceManagementProps={resourceManagementProps}
+        />
+      )}
     </SectionContainer>
   );
 };

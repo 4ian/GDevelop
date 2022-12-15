@@ -20,6 +20,7 @@ import LinearProgress from '../UI/LinearProgress';
 import { AssetStoreContext } from './AssetStoreContext';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 type Props = {|
   assetPack: PublicAssetPack | PrivateAssetPack,
@@ -31,7 +32,8 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   onObjectAddedFromAsset: (object: gdObject) => void,
   resourceManagementProps: ResourceManagementProps,
-|};
+  canInstallPrivateAsset: () => boolean,
+  |};
 
 const AssetPackInstallDialog = ({
   assetPack,
@@ -42,6 +44,7 @@ const AssetPackInstallDialog = ({
   project,
   objectsContainer,
   onObjectAddedFromAsset,
+  canInstallPrivateAsset,
   resourceManagementProps,
 }: Props) => {
   const missingAssetShortHeaders = assetShortHeaders.filter(
@@ -56,6 +59,7 @@ const AssetPackInstallDialog = ({
     areAssetsBeingInstalled,
     setAreAssetsBeingInstalled,
   ] = React.useState<boolean>(false);
+  const { showAlert } = useAlertDialog();
 
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
@@ -69,6 +73,18 @@ const AssetPackInstallDialog = ({
   const onInstallAssets = React.useCallback(
     async (assetShortHeaders: Array<AssetShortHeader>) => {
       if (!assetShortHeaders || !assetShortHeaders.length) return;
+
+      const hasPrivateAssets = assetShortHeaders.some(assetShortHeader => isPrivateAsset)
+      if (hasPrivateAssets) {
+        const canUserInstallPrivateAsset = await canInstallPrivateAsset();
+        if (!canUserInstallPrivateAsset) {
+          await showAlert({
+            title: t`Save your project to install premium assets`,
+            message: t`You need to save this project as a cloud project to install premium assets. Please save your project and try again.`,
+          });
+          return;
+        }
+      }
       setAreAssetsBeingInstalled(true);
       try {
         const installOutputs = await Promise.all(
@@ -127,6 +143,8 @@ const AssetPackInstallDialog = ({
       environment,
       installPrivateAsset,
       resourceManagementProps,
+      canInstallPrivateAsset,
+      showAlert
     ]
   );
 

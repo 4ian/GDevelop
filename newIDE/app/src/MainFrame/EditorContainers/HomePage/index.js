@@ -22,6 +22,7 @@ import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext'
 import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
+import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
 
 type Props = {|
   project: ?gdProject,
@@ -50,6 +51,9 @@ type Props = {|
 
   // Project creation
   onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
+
+  resourceManagementProps: ResourceManagementProps,
+  canInstallPrivateAsset: () => boolean,
 |};
 
 type HomePageEditorInterface = {|
@@ -79,6 +83,8 @@ export const HomePage = React.memo<Props>(
         isActive,
         storageProviders,
         initialTab,
+        resourceManagementProps,
+        canInstallPrivateAsset,
       }: Props,
       ref
     ) => {
@@ -222,7 +228,13 @@ export const HomePage = React.memo<Props>(
                     )}
                     {activeTab === 'play' && <PlaySection />}
                     {activeTab === 'community' && <CommunitySection />}
-                    {activeTab === 'store' && <StoreSection />}
+                    {activeTab === 'store' && (
+                      <StoreSection
+                        project={project}
+                        resourceManagementProps={resourceManagementProps}
+                        canInstallPrivateAsset={canInstallPrivateAsset}
+                      />
+                    )}
                   </Column>
                 </Line>
               </Column>
@@ -264,5 +276,7 @@ export const renderHomePageContainer = (
     initialTab={
       (props.extraEditorProps && props.extraEditorProps.initialTab) || null
     }
+    resourceManagementProps={props.resourceManagementProps}
+    canInstallPrivateAsset={props.canInstallPrivateAsset}
   />
 );

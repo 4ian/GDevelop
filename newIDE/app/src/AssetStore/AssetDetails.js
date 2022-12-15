@@ -517,6 +517,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
           </ResponsiveLineStackLayout>
           {asset && (
             <Column expand>
+              <Spacer />
               <Line noMargin>
                 <Text size="block-title" displayInlineAsSpan>
                   <Trans>You might like</Trans>

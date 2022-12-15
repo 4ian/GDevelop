@@ -25,6 +25,7 @@ import {
   imagePreviewMinZoom,
   zoomInFactor,
   zoomOutFactor,
+  zoomStepBasePower,
 } from '../../Utils/ZoomUtils';
 const gd: libGDevelop = global.gd;
 
@@ -259,12 +260,12 @@ const ImagePreview = ({
                 </IconButton>
                 <div style={styles.sliderContainer}>
                   <Slider
-                    min={Math.log10(imagePreviewMinZoom)}
-                    max={Math.log10(imagePreviewMaxZoom)}
-                    step={0.05}
-                    value={Math.log10(imageZoomFactor)}
+                    min={Math.log2(imagePreviewMinZoom)}
+                    max={Math.log2(imagePreviewMaxZoom)}
+                    step={zoomStepBasePower * 4}
+                    value={Math.log2(imageZoomFactor)}
                     onChange={value => {
-                      zoomTo(Math.pow(10, value));
+                      zoomTo(Math.pow(2, value));
                     }}
                   />
                 </div>

@@ -12,10 +12,11 @@ import BuildSection, { type BuildSectionInterface } from './BuildSection';
 import LearnSection from './LearnSection';
 import PlaySection from './PlaySection';
 import CommunitySection from './CommunitySection';
+import StoreSection from './StoreSection';
 import { TutorialContext } from '../../../Tutorial/TutorialContext';
 import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { HomePageHeader } from './HomePageHeader';
-import { HomePageMenu, type HomeTab } from './HomePageMenu';
+import { getInitialHomeTab, HomePageMenu, type HomeTab } from './HomePageMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
@@ -30,6 +31,7 @@ type Props = {|
   project: ?gdProject,
   setToolbar: (?React.Node) => void,
   storageProviders: Array<StorageProvider>,
+  initialTab?: ?string,
 
   // Project opening
   canOpen: boolean,
@@ -76,6 +78,7 @@ export const HomePage = React.memo<Props>(
         onOpenAbout,
         isActive,
         storageProviders,
+        initialTab,
       }: Props,
       ref
     ) => {
@@ -158,15 +161,15 @@ export const HomePage = React.memo<Props>(
         forceUpdateEditor,
       }));
 
-      const initialTab = showGetStartedSection ? 'get-started' : 'build';
-
-      const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
+      const [activeTab, setActiveTab] = React.useState<HomeTab>(() =>
+        getInitialHomeTab(initialTab, showGetStartedSection)
+      );
 
       return (
         <I18n>
           {({ i18n }) => (
             <>
-              <Column expand noMargin>
+              <Column expand noMargin noOverflowParent>
                 <Line expand noMargin useFullHeight>
                   <HomePageMenu
                     activeTab={activeTab}
@@ -174,7 +177,7 @@ export const HomePage = React.memo<Props>(
                     onOpenPreferences={onOpenPreferences}
                     onOpenAbout={onOpenAbout}
                   />
-                  <Column noMargin expand>
+                  <Column noMargin expand noOverflowParent>
                     {activeTab !== 'community' && !!announcements && (
                       <AnnouncementsFeed canClose level="urgent" addMargins />
                     )}
@@ -219,6 +222,7 @@ export const HomePage = React.memo<Props>(
                     )}
                     {activeTab === 'play' && <PlaySection />}
                     {activeTab === 'community' && <CommunitySection />}
+                    {activeTab === 'store' && <StoreSection />}
                   </Column>
                 </Line>
               </Column>
@@ -256,6 +260,9 @@ export const renderHomePageContainer = (
     onOpenAbout={props.onOpenAbout}
     storageProviders={
       (props.extraEditorProps && props.extraEditorProps.storageProviders) || []
+    }
+    initialTab={
+      (props.extraEditorProps && props.extraEditorProps.initialTab) || null
     }
   />
 );

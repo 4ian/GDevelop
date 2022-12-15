@@ -6,7 +6,7 @@ import axios from 'axios';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
-import PrivateAssetPackInformationDialog from '../../../../AssetStore/PrivateAssets/PrivateAssetPackInformationDialog';
+import PrivateAssetPackInformationPage from '../../../../AssetStore/PrivateAssets/PrivateAssetPackInformationPage';
 import {
   GDevelopAssetApi,
   GDevelopUserApi,
@@ -14,8 +14,8 @@ import {
 import { client as assetApiAxiosClient } from '../../../../Utils/GDevelopServices/Asset';
 
 export default {
-  title: 'AssetStore/AssetStore/PrivateAssetPackInformationDialog',
-  component: PrivateAssetPackInformationDialog,
+  title: 'AssetStore/AssetStore/PrivateAssetPackInformationPage',
+  component: PrivateAssetPackInformationPage,
   decorators: [paperDecorator, muiDecorator],
 };
 
@@ -95,9 +95,8 @@ export const Default = () => {
     });
 
   return (
-    <PrivateAssetPackInformationDialog
+    <PrivateAssetPackInformationPage
       privateAssetPackListingData={privateAssetPackListingData}
-      onClose={() => action('close')()}
       isPurchaseDialogOpen={false}
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
     />
@@ -133,9 +132,8 @@ export const WithPurchaseDialogOpen = () => {
     });
 
   return (
-    <PrivateAssetPackInformationDialog
+    <PrivateAssetPackInformationPage
       privateAssetPackListingData={privateAssetPackListingData}
-      onClose={() => action('close')()}
       isPurchaseDialogOpen
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
     />
@@ -173,9 +171,8 @@ export const Loading = () => {
     });
 
   return (
-    <PrivateAssetPackInformationDialog
+    <PrivateAssetPackInformationPage
       privateAssetPackListingData={privateAssetPackListingData}
-      onClose={() => action('close')()}
       isPurchaseDialogOpen={false}
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
     />
@@ -212,9 +209,8 @@ export const With404 = () => {
     });
 
   return (
-    <PrivateAssetPackInformationDialog
+    <PrivateAssetPackInformationPage
       privateAssetPackListingData={privateAssetPackListingData}
-      onClose={() => action('close')()}
       isPurchaseDialogOpen={false}
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
     />
@@ -251,9 +247,8 @@ export const WithUnknownError = () => {
     });
 
   return (
-    <PrivateAssetPackInformationDialog
+    <PrivateAssetPackInformationPage
       privateAssetPackListingData={privateAssetPackListingData}
-      onClose={() => action('close')()}
       isPurchaseDialogOpen={false}
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
     />

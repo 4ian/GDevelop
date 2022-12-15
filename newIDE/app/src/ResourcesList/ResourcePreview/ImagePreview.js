@@ -63,7 +63,6 @@ const styles = {
 };
 
 type Props = {|
-  project: gdProject,
   resourceName: string,
   imageResourceSource: string,
   isImageResourceSmooth: boolean,
@@ -100,7 +99,6 @@ export const isProjectImageResourceSmooth = (
  * Display the preview for a resource of a project with kind "image".
  */
 const ImagePreview = ({
-  project,
   resourceName,
   imageResourceSource,
   isImageResourceSmooth,

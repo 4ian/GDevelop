@@ -208,7 +208,10 @@ const layoutFields = [
   'AnchorDeltaY',
 ];
 
-const getHorizontalAnchorValue = (anchorName: string) => {
+const getHorizontalAnchorValue = (
+  anchorName: string,
+  properties: ?gdNamedPropertyDescriptorsList
+): ?number => {
   const horizontalAnchorName = (anchorName.includes('-')
     ? anchorName.split('-')[1]
     : anchorName
@@ -219,9 +222,16 @@ const getHorizontalAnchorValue = (anchorName: string) => {
     ? 1
     : horizontalAnchorName === 'center'
     ? 0.5
+    : // Reference to another property to allow to expose a Choice property.
+    properties && properties.has(anchorName)
+    ? getHorizontalAnchorValue(properties.get(anchorName).getValue(), null)
     : null;
 };
-const getVerticalAnchorValue = (anchorName: string) => {
+
+const getVerticalAnchorValue = (
+  anchorName: string,
+  properties: ?gdNamedPropertyDescriptorsList
+): ?number => {
   const verticalAnchorName = (anchorName.includes('-')
     ? anchorName.split('-')[0]
     : anchorName
@@ -232,7 +242,50 @@ const getVerticalAnchorValue = (anchorName: string) => {
     ? 1
     : verticalAnchorName === 'center'
     ? 0.5
+    : // Reference to another property to allow to expose a Choice property.
+    properties && properties.has(anchorName)
+    ? getVerticalAnchorValue(properties.get(anchorName).getValue(), null)
     : null;
+};
+
+/**
+ * Origin anchors can have smart value to only expose the target anchor property
+ * and fill the origin anchor property accordingly.
+ */
+const getHorizontalOriginAnchorValue = (
+  anchorName: string,
+  properties: gdNamedPropertyDescriptorsList,
+  targetAnchorValue: ?number
+): ?number => {
+  const horizontalAnchorName = (anchorName.includes('-')
+    ? anchorName.split('-')[1]
+    : anchorName
+  ).toLowerCase();
+  return horizontalAnchorName === 'same'
+    ? targetAnchorValue
+    : horizontalAnchorName === 'opposite' && targetAnchorValue != null
+    ? 1 - targetAnchorValue
+    : getHorizontalAnchorValue(horizontalAnchorName, properties);
+};
+
+/**
+ * Origin anchors can have smart value to only expose the target anchor property
+ * and fill the origin anchor property accordingly.
+ */
+const getVerticalOriginAnchorValue = (
+  anchorName: string,
+  properties: gdNamedPropertyDescriptorsList,
+  targetAnchorValue: ?number
+): ?number => {
+  const verticalAnchorName = (anchorName.includes('-')
+    ? anchorName.split('-')[0]
+    : anchorName
+  ).toLowerCase();
+  return verticalAnchorName === 'same'
+    ? targetAnchorValue
+    : verticalAnchorName === 'opposite' && targetAnchorValue != null
+    ? 1 - targetAnchorValue
+    : getVerticalAnchorValue(verticalAnchorName, properties);
 };
 
 /**
@@ -280,31 +333,33 @@ const getLayouts = (
       layoutField === 'AnchorOrigin'
     ) {
       const targetPropertyName = name.replace('AnchorOrigin', 'AnchorTarget');
-      const targetProperty = properties.get(targetPropertyName);
-      targetObjectName =
-        targetProperty.getExtraInfo().size() > 0
-          ? targetProperty.getExtraInfo().at(0)
-          : '';
-      const anchorTargetStringValue = instanceProperties
-        .get(targetPropertyName)
-        .getValue();
-      const anchorTargetValueNumber =
-        Number.parseFloat(anchorTargetStringValue) || 0;
-      if (
-        layoutField === 'HorizontalAnchorOrigin' ||
-        layoutField === 'AnchorOrigin'
-      ) {
-        horizontalAnchorTarget =
-          getHorizontalAnchorValue(anchorTargetStringValue) ||
-          anchorTargetValueNumber;
-      }
-      if (
-        layoutField === 'VerticalAnchorOrigin' ||
-        layoutField === 'AnchorOrigin'
-      ) {
-        verticalAnchorTarget =
-          getVerticalAnchorValue(anchorTargetStringValue) ||
-          anchorTargetValueNumber;
+      if (properties.has(targetPropertyName)) {
+        const targetProperty = properties.get(targetPropertyName);
+        targetObjectName =
+          targetProperty.getExtraInfo().size() > 0
+            ? targetProperty.getExtraInfo().at(0)
+            : '';
+        const anchorTargetStringValue = instanceProperties
+          .get(targetPropertyName)
+          .getValue();
+        const anchorTargetValueNumber =
+          Number.parseFloat(anchorTargetStringValue) || 0;
+        if (
+          layoutField === 'HorizontalAnchorOrigin' ||
+          layoutField === 'AnchorOrigin'
+        ) {
+          horizontalAnchorTarget =
+            getHorizontalAnchorValue(anchorTargetStringValue, instanceProperties) ||
+            anchorTargetValueNumber;
+        }
+        if (
+          layoutField === 'VerticalAnchorOrigin' ||
+          layoutField === 'AnchorOrigin'
+        ) {
+          verticalAnchorTarget =
+            getVerticalAnchorValue(anchorTargetStringValue, instanceProperties) ||
+            anchorTargetValueNumber;
+        }
       }
     }
 
@@ -320,7 +375,7 @@ const getLayouts = (
         layouts.set(childName, layout);
       }
       if (layoutField === 'Show') {
-        if (propertyValueString === 'false') {
+        if (propertyValueString !== 'true') {
           layout.isShown = false;
         }
       } else if (layoutField === 'LeftPadding') {
@@ -341,8 +396,11 @@ const getLayouts = (
           layoutField === 'AnchorOrigin'
         ) {
           const anchorOrigin =
-            getHorizontalAnchorValue(propertyValueString) ||
-            propertyValueNumber;
+            getHorizontalOriginAnchorValue(
+              propertyValueString,
+              properties,
+              horizontalAnchorTarget
+            ) || propertyValueNumber;
           if (anchorOrigin !== null) {
             layout.horizontalLayout.anchorOrigin = anchorOrigin;
           }
@@ -356,7 +414,11 @@ const getLayouts = (
           layoutField === 'AnchorOrigin'
         ) {
           const anchorOrigin =
-            getVerticalAnchorValue(propertyValueString) || propertyValueNumber;
+            getVerticalOriginAnchorValue(
+              propertyValueString,
+              properties,
+              horizontalAnchorTarget
+            ) || propertyValueNumber;
           if (anchorOrigin !== null) {
             layout.verticalLayout.anchorOrigin = anchorOrigin;
           }

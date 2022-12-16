@@ -1,5 +1,9 @@
 import { integer, PolygonVertices } from "../../types/commons";
-import { EditableTileMap, TileDefinition, TileObject } from "../../model/TileMapModel";
+import {
+  EditableTileMap,
+  TileDefinition,
+  TileObject,
+} from "../../model/TileMapModel";
 import { TiledTileMap } from "../../types/Tiled";
 import {
   decodeBase64LayerData,
@@ -32,7 +36,8 @@ export namespace TiledTileMapLoader {
 
     const definitions = new Map<integer, TileDefinition>();
     for (const tiledTileSet of tiledTileMap.tilesets) {
-      const firstGid = tiledTileSet.firstgid === undefined ? 1 : tiledTileSet.firstgid;
+      const firstGid =
+        tiledTileSet.firstgid === undefined ? 1 : tiledTileSet.firstgid;
       if (tiledTileSet.tiles) {
         for (const tile of tiledTileSet.tiles) {
           const tileDefinition = new TileDefinition(

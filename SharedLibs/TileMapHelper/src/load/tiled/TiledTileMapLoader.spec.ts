@@ -1,4 +1,7 @@
-import { EditableTileMap, EditableTileMapLayer } from "../../model/TileMapModel";
+import {
+  EditableTileMap,
+  EditableTileMapLayer,
+} from "../../model/TileMapModel";
 import { TiledTileMap } from "../../types/Tiled";
 import { TiledTileMapLoader } from "./TiledTileMapLoader";
 

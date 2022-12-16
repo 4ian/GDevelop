@@ -19,6 +19,7 @@ import PlaceholderError from '../UI/PlaceholderError';
 import RaisedButton from '../UI/RaisedButton';
 import UserAchievements from './Achievement/UserAchievements';
 import { type Badge } from '../Utils/GDevelopServices/Badge';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import Window from '../Utils/Window';
 import { GDevelopGamesPlatform } from '../Utils/GDevelopServices/ApiConfigs';
 import FlatButton from '../UI/FlatButton';
@@ -40,6 +41,7 @@ type Props = {|
   onChangeEmail?: () => void,
   onEditProfile?: () => void,
   badges: ?Array<Badge>,
+  packs?: ?Array<PrivateAssetPackListingData>,
 |};
 
 const ProfileDetails = ({
@@ -50,6 +52,7 @@ const ProfileDetails = ({
   onChangeEmail,
   onEditProfile,
   badges,
+  packs,
 }: Props) => {
   const donateLink = profile ? profile.donateLink : null;
   return profile ? (

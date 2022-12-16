@@ -10,6 +10,10 @@ import {
   type UserPublicProfile,
 } from '../Utils/GDevelopServices/User';
 import { type Badge } from '../Utils/GDevelopServices/Badge';
+import {
+  type PrivateAssetPackListingData,
+  listSellerProducts,
+} from '../Utils/GDevelopServices/Shop';
 import ProfileDetails from './ProfileDetails';
 
 type Props = {|
@@ -20,6 +24,9 @@ type Props = {|
 const PublicProfileDialog = ({ userId, onClose }: Props) => {
   const [profile, setProfile] = React.useState<?UserPublicProfile>(null);
   const [badges, setBadges] = React.useState<?(Badge[])>(null);
+  const [packs, setPacks] = React.useState<?(PrivateAssetPackListingData[])>(
+    null
+  );
   const [error, setError] = React.useState<?Error>(null);
 
   const fetchProfile = React.useCallback(
@@ -29,6 +36,24 @@ const PublicProfileDialog = ({ userId, onClose }: Props) => {
       try {
         const profile = await getUserPublicProfile(userId);
         setProfile(profile);
+      } catch (error) {
+        setError(error);
+      }
+    },
+    [userId]
+  );
+
+  const fetchUserPacks = React.useCallback(
+    async () => {
+      if (!userId) return;
+      setPacks(null);
+      try {
+        // Will return an empty array if the user is not a seller.
+        const packs = await listSellerProducts({
+          sellerId: userId,
+          productType: 'asset-pack',
+        });
+        setPacks(packs);
       } catch (error) {
         setError(error);
       }
@@ -54,8 +79,9 @@ const PublicProfileDialog = ({ userId, onClose }: Props) => {
     () => {
       fetchProfile();
       fetchUserBadges();
+      fetchUserPacks();
     },
-    [userId, fetchProfile, fetchUserBadges]
+    [userId, fetchProfile, fetchUserBadges, fetchUserPacks]
   );
 
   const onRetry = () => {
@@ -84,6 +110,7 @@ const PublicProfileDialog = ({ userId, onClose }: Props) => {
         error={error}
         onRetry={onRetry}
         badges={badges}
+        packs={packs}
       />
     </Dialog>
   );

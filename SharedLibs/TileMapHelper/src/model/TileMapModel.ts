@@ -539,7 +539,6 @@ export class TileDefinition {
    * A tile can be a composition of several tiles.
    */
   private stackedTiles: integer[];
-  private stackedTilesHash?: string;
   private stackTileId?: integer;
 
   /**
@@ -612,13 +611,6 @@ export class TileDefinition {
   }
 
   /**
-   * @returns The hash code representing the stack.
-   */
-  getStackedTilesHash(): string {
-    return this.stackedTilesHash!;
-  }
-
-  /**
    * @returns `true` if the defintion is a stack of tiles.
    */
   hasStackedTiles(): boolean {
@@ -632,6 +624,5 @@ export class TileDefinition {
   setStackedTiles(stackTileId: integer, ...tiles: integer[]): void {
     this.stackedTiles = tiles;
     this.stackTileId = stackTileId;
-    this.stackedTilesHash = tiles.map((tileId) => `${tileId}`).join(";");
   }
 }

@@ -26,7 +26,11 @@ export namespace LDtkTileMapLoader {
     let dimX = 0;
     let dimY = 0;
 
-    for (let iLayer = ldtkLevel.layerInstances.length - 1; iLayer >= 0; --iLayer) {
+    for (
+      let iLayer = ldtkLevel.layerInstances.length - 1;
+      iLayer >= 0;
+      --iLayer
+    ) {
       const layer = ldtkLevel.layerInstances[iLayer];
       const tilesetId = layer.__tilesetDefUid;
       const tileCache: Record<number, boolean> = {};
@@ -65,7 +69,11 @@ export namespace LDtkTileMapLoader {
     const composedTileMap = new Map<string, TileDefinition>();
     let nextComposedTileId = 0xfffffff;
 
-    for (let iLayer = ldtkLevel.layerInstances.length - 1; iLayer >= 0; --iLayer) {
+    for (
+      let iLayer = ldtkLevel.layerInstances.length - 1;
+      iLayer >= 0;
+      --iLayer
+    ) {
       const layer = ldtkLevel.layerInstances[iLayer];
       const gridSize = layer.__gridSize;
       const tilesetId = layer.__tilesetDefUid;
@@ -102,7 +110,10 @@ export namespace LDtkTileMapLoader {
           const oldTileDef = tileSet.get(oldTileId);
 
           if (oldTileDef?.hasStackedTiles()) {
-            const hash = `${oldTileDef.getStackedTilesHash()};${tileGID}`;
+            const hash = `${oldTileDef
+              .getStackedTiles()
+              .map((tileId) => `${tileId}`)
+              .join(";")};${tileGID}`;
             const tileDef = composedTileMap.get(hash);
             if (tileDef) {
               editableTileLayer.setTile(x, y, tileDef.getStackTileId());
@@ -118,12 +129,13 @@ export namespace LDtkTileMapLoader {
               tileSet.set(nextComposedTileId, tileDef);
               nextComposedTileId -= 1;
 
-              composedTileMap.set(tileDef.getStackedTilesHash(), tileDef);
+              composedTileMap.set(hash, tileDef);
 
               editableTileLayer.setTile(x, y, tileDef.getStackTileId());
             }
           } else {
             const oldTileGID = editableTileLayer.getTileGID(x, y)!;
+            const hash = `${oldTileGID};${tileGID}`;
             const tileDef = new TileDefinition(0);
 
             tileDef.setStackedTiles(nextComposedTileId, oldTileGID, tileGID);
@@ -131,7 +143,7 @@ export namespace LDtkTileMapLoader {
             tileSet.set(nextComposedTileId, tileDef);
             nextComposedTileId -= 1;
 
-            composedTileMap.set(tileDef.getStackedTilesHash(), tileDef);
+            composedTileMap.set(hash, tileDef);
 
             editableTileLayer.setTile(x, y, tileDef.getStackTileId());
           }

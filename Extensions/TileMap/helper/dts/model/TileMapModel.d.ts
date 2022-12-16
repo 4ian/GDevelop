@@ -308,7 +308,6 @@ export declare class TileDefinition {
    * A tile can be a composition of several tiles.
    */
   private stackedTiles;
-  private stackedTilesHash?;
   private stackTileId?;
   /**
    * @param animationLength The number of frame in the tile animation.
@@ -348,10 +347,6 @@ export declare class TileDefinition {
    * @returns All the tiles composed in the stack.
    */
   getStackedTiles(): integer[];
-  /**
-   * @returns The hash code representing the stack.
-   */
-  getStackedTilesHash(): string;
   /**
    * @returns `true` if the defintion is a stack of tiles.
    */

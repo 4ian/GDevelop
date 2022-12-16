@@ -248,6 +248,12 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
             })
             .filter(Boolean)
         : [];
+    const areAuthorsLoading =
+      !asset || // Asset not loaded.
+      (asset.authors.length > 0 && !authors) || // Authors not loaded.
+      (asset.authorIds && // User public profiles not loaded.
+        authorPublicProfiles.length > 0 &&
+        authorPublicProfiles.length === 0);
 
     const assetLicense =
       asset && licenses
@@ -287,11 +293,10 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                 <Text size="block-title" displayInlineAsSpan>
                   {assetShortHeader.name}
                 </Text>
-                {asset && (
-                  <LineStackLayout>
+                {!areAuthorsLoading && (
+                  <LineStackLayout noMargin>
                     <Text size="body">
-                      {((!!assetAuthors && !!assetAuthors.length) ||
-                        !!authorPublicProfiles.length) && <Trans>by</Trans>}
+                      <Trans>by</Trans>
                     </Text>
                     {!!assetAuthors &&
                       assetAuthors.map(author => (

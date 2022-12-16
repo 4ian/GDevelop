@@ -19,7 +19,7 @@ import Slider from '../../UI/Slider';
 import AuthorizedAssetImage from '../../AssetStore/PrivateAssets/AuthorizedAssetImage';
 import {
   clampImagePreviewZoom,
-  getContinuousZoomFactor,
+  getWheelStepZoomFactor,
   imagePreviewMaxZoom,
   imagePreviewMinZoom,
   zoomInFactor,
@@ -325,7 +325,7 @@ const ImagePreview = ({
                 onWheel={event => {
                   const { deltaY } = event;
                   if (!hideControls && shouldZoom(event)) {
-                    zoomBy(getContinuousZoomFactor(-deltaY));
+                    zoomBy(getWheelStepZoomFactor(-deltaY));
                     event.stopPropagation();
                   } else {
                     // Let the usual, native vertical or horizontal scrolling happen.

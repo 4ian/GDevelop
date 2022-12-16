@@ -939,15 +939,17 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   // (this time for effects). Ideally, this method could be moved outside of
   // gd::Project.
 
+  gd::ResourcesManager* resourcesManager = &GetResourcesManager();
+
   // Add project resources
-  worker.ExposeResources(&GetResourcesManager());
+  worker.ExposeResources(resourcesManager);
   platformSpecificAssets.ExposeResources(worker);
 
   // Add layouts resources
   for (std::size_t s = 0; s < GetLayoutsCount(); s++) {
     for (std::size_t j = 0; j < GetLayout(s).GetObjectsCount();
          ++j) { // Add objects resources
-      GetLayout(s).GetObject(j).GetConfiguration().ExposeResources(worker);
+      GetLayout(s).GetObject(j).GetConfiguration().ExposeResources(worker, resourcesManager);
     }
 
     LaunchResourceWorkerOnEvents(*this, GetLayout(s).GetEvents(), worker);
@@ -967,7 +969,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
 
   // Add global objects resources
   for (std::size_t j = 0; j < GetObjectsCount(); ++j) {
-    GetObject(j).GetConfiguration().ExposeResources(worker);
+    GetObject(j).GetConfiguration().ExposeResources(worker, resourcesManager);
   }
 
   // Add loading screen background image if present

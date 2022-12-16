@@ -14,6 +14,7 @@ import FlatButton from '../../../UI/FlatButton';
 import Text from '../../../UI/Text';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
+import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
   // This container is important to have the loader positioned on top of the image.
@@ -74,6 +75,7 @@ const AnimationPreview = ({
   hideAnimationLoader,
 }: Props) => {
   const forceUdpate = useForceUpdate();
+  const windowWidth = useResponsiveWindowWidth();
 
   // Use state for elements that don't need to be read from inside the animation callback.
   const [fps, setFps] = React.useState<number>(
@@ -296,7 +298,7 @@ const AnimationPreview = ({
                 min={1}
                 max={100}
                 style={styles.timeField}
-                autoFocus={true}
+                autoFocus={windowWidth !== 'small'} // Do not autofocus textfield if on mobile
               />
               <Timer style={styles.timeIcon} />
               <TextField

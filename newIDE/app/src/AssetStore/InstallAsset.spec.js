@@ -11,7 +11,7 @@ import {
 import { makeTestProject } from '../fixtures/TestProject';
 import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import {
-  fakeAssetShortHeader1,
+  fakeAssetShortHeader,
   fakeAsset1,
   fakePixelArtAsset1,
   fakeAssetWithUnknownExtension1,
@@ -520,7 +520,7 @@ describe('InstallAsset', () => {
 
       await expect(
         installPublicAsset({
-          assetShortHeader: fakeAssetShortHeader1,
+          assetShortHeader: fakeAssetShortHeader,
           project,
           objectsContainer: layout,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
@@ -558,7 +558,7 @@ describe('InstallAsset', () => {
       // Check that the extension is stated as not found in the registry
       await expect(
         installPublicAsset({
-          assetShortHeader: fakeAssetShortHeader1,
+          assetShortHeader: fakeAssetShortHeader,
           project,
           objectsContainer: layout,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
@@ -601,7 +601,7 @@ describe('InstallAsset', () => {
       // extension won't be loaded.
       await expect(
         installPublicAsset({
-          assetShortHeader: fakeAssetShortHeader1,
+          assetShortHeader: fakeAssetShortHeader,
           project,
           objectsContainer: layout,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
@@ -634,7 +634,7 @@ describe('InstallAsset', () => {
 
       // Install the asset
       await installPublicAsset({
-        assetShortHeader: fakeAssetShortHeader1,
+        assetShortHeader: fakeAssetShortHeader,
         project,
         objectsContainer: layout,
         eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,

@@ -1,6 +1,6 @@
 import { TileTextureCache } from "../TileTextureCache";
 import { LDtkTileMap, LDtkTilesetDef } from "../../types/LDtk";
-import { getLDtkTileId } from "../../load/ldtk/LoaderHelper";
+import { getLDtkTileId } from "../../load/ldtk/LDtkTileMapLoaderHelper";
 import PIXI = GlobalPIXIModule.PIXI;
 
 type Texture = PIXI.BaseTexture<PIXI.Resource>;
@@ -39,7 +39,7 @@ function getAtlasTexture(
   return texture;
 }
 
-export namespace PixiLDtkHelper {
+export namespace LDtkPixiHelper {
   /**
    * Split an atlas image into Pixi textures.
    *

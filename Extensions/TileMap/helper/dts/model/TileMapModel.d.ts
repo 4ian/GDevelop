@@ -363,4 +363,4 @@ export declare class TileDefinition {
   setStackedTiles(stackTileId: integer, ...tiles: integer[]): void;
 }
 export {};
-//# sourceMappingURL=Model.d.ts.map
+//# sourceMappingURL=TileMapModel.d.ts.map

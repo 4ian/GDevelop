@@ -1,4 +1,4 @@
-import { EditableTileMap } from '../../model/Model';
+import { EditableTileMap } from '../../model/TileMapModel';
 import { TiledTileMap } from '../../types/Tiled';
 /**
  * It creates a {@link EditableTileMap} from a Tiled JSON.
@@ -7,10 +7,10 @@ export declare namespace TiledTileMapLoader {
   /**
    * Create a {@link EditableTileMap} from the Tiled JSON.
    *
-   * @param tileMap A tile map exported from Tiled.
+   * @param tiledTileMap A tile map exported from Tiled.
    * @param pako The zlib library.
    * @returns A {@link EditableTileMap}
    */
-  function load(tileMap: TiledTileMap, pako: any): EditableTileMap | null;
+  function load(tiledTileMap: TiledTileMap, pako: any): EditableTileMap | null;
 }
-//# sourceMappingURL=Loader.d.ts.map
+//# sourceMappingURL=TiledTileMapLoader.d.ts.map

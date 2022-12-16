@@ -11,11 +11,11 @@ import { TiledLayer } from "../../types/Tiled";
  * by Tiled.
  * See https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#data.
  * @param pako The zlib library.
- * @param layer The layer data from a Tiled JSON.
+ * @param tiledLayer The layer data from a Tiled JSON.
  * @returns The decoded layer data.
  */
-export const decodeBase64LayerData = (pako: any, layer: TiledLayer) => {
-  const { data, compression } = layer;
+export const decodeBase64LayerData = (pako: any, tiledLayer: TiledLayer) => {
+  const { data, compression } = tiledLayer;
   const dataBase64 = data as string;
   if (!dataBase64) {
     // The layer data is not encoded.

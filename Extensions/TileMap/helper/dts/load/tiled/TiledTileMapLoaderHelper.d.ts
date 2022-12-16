@@ -5,12 +5,12 @@ import { TiledLayer } from '../../types/Tiled';
  * by Tiled.
  * See https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#data.
  * @param pako The zlib library.
- * @param layer The layer data from a Tiled JSON.
+ * @param tiledLayer The layer data from a Tiled JSON.
  * @returns The decoded layer data.
  */
 export declare const decodeBase64LayerData: (
   pako: any,
-  layer: TiledLayer
+  tiledLayer: TiledLayer
 ) => number[];
 export type TiledGID = {
   id: integer;
@@ -34,4 +34,4 @@ export declare const extractTileUidFlippedStates: (
 export declare function getTileIdFromTiledGUI(
   tiledGUI: number | undefined
 ): number | undefined;
-//# sourceMappingURL=LoaderHelper.d.ts.map
+//# sourceMappingURL=TiledTileMapLoaderHelper.d.ts.map

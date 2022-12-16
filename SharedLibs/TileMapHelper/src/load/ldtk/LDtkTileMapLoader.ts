@@ -1,6 +1,6 @@
 import { integer } from "../../types/commons";
-import { EditableTileMap, TileDefinition } from "../../model/Model";
-import { getLDtkTileId } from "./LoaderHelper";
+import { EditableTileMap, TileDefinition } from "../../model/TileMapModel";
+import { getLDtkTileId } from "./LDtkTileMapLoaderHelper";
 import { LDtkTileMap } from "../../types/LDtk";
 import { getTileGID } from "../../model/GID";
 
@@ -8,16 +8,16 @@ export namespace LDtkTileMapLoader {
   /**
    * Create a {@link EditableTileMap} from the LDtk JSON.
    *
-   * @param tileMap A tile map exported from LDtk.
+   * @param ldtkTileMap A tile map exported from LDtk.
    * @param levelIndex The level of the tile map to load from.
    * @returns A {@link EditableTileMap}
    */
   export function load(
-    tileMap: LDtkTileMap,
+    ldtkTileMap: LDtkTileMap,
     levelIndex: number
   ): EditableTileMap | null {
-    const level = tileMap.levels[levelIndex > -1 ? levelIndex : 0];
-    if (!level || !level.layerInstances) {
+    const ldtkLevel = ldtkTileMap.levels[levelIndex > -1 ? levelIndex : 0];
+    if (!ldtkLevel || !ldtkLevel.layerInstances) {
       return null;
     }
 
@@ -26,8 +26,8 @@ export namespace LDtkTileMapLoader {
     let dimX = 0;
     let dimY = 0;
 
-    for (let iLayer = level.layerInstances.length - 1; iLayer >= 0; --iLayer) {
-      const layer = level.layerInstances[iLayer];
+    for (let iLayer = ldtkLevel.layerInstances.length - 1; iLayer >= 0; --iLayer) {
+      const layer = ldtkLevel.layerInstances[iLayer];
       const tilesetId = layer.__tilesetDefUid;
       const tileCache: Record<number, boolean> = {};
 
@@ -65,8 +65,8 @@ export namespace LDtkTileMapLoader {
     const composedTileMap = new Map<string, TileDefinition>();
     let nextComposedTileId = 0xfffffff;
 
-    for (let iLayer = level.layerInstances.length - 1; iLayer >= 0; --iLayer) {
-      const layer = level.layerInstances[iLayer];
+    for (let iLayer = ldtkLevel.layerInstances.length - 1; iLayer >= 0; --iLayer) {
+      const layer = ldtkLevel.layerInstances[iLayer];
       const gridSize = layer.__gridSize;
       const tilesetId = layer.__tilesetDefUid;
 
@@ -139,8 +139,8 @@ export namespace LDtkTileMapLoader {
       }
     }
 
-    if (level.bgRelPath) {
-      void editableTileMap.setBackgroundResourceName(level.bgRelPath);
+    if (ldtkLevel.bgRelPath) {
+      void editableTileMap.setBackgroundResourceName(ldtkLevel.bgRelPath);
     }
 
     return editableTileMap;

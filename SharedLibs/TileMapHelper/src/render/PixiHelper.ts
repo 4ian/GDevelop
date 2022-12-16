@@ -3,9 +3,9 @@ import {
   EditableObjectLayer,
   EditableTileMap,
   EditableTileMapLayer,
-} from "../model/Model";
-import { PixiTiledHelper } from "./tiled/PixiHelper";
-import { PixiLDtkHelper } from "./ldtk/PixiHelper";
+} from "../model/TileMapModel";
+import { TiledPixiHelper } from "./tiled/TiledPixiHelper";
+import { LDtkPixiHelper } from "./ldtk/LDtkPixiHelper";
 import { TileMap } from "../types";
 import { TileTextureCache } from "./TileTextureCache";
 import { FlippingHelper, getPixiRotate } from "../model/GID";
@@ -29,7 +29,7 @@ export namespace PixiTileMapHelper {
     getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
   ): TileTextureCache | null {
     if (tileMap.kind === "ldtk") {
-      return PixiLDtkHelper.parseAtlas(
+      return LDtkPixiHelper.parseAtlas(
         tileMap.data,
         levelIndex,
         atlasTexture,
@@ -37,7 +37,7 @@ export namespace PixiTileMapHelper {
       );
     }
     if (tileMap.kind === "tiled") {
-      return PixiTiledHelper.parseAtlas(
+      return TiledPixiHelper.parseAtlas(
         tileMap.data,
         levelIndex,
         atlasTexture,

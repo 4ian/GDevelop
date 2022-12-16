@@ -3,7 +3,7 @@ import { LDtkTileMap } from '../../types/LDtk';
 import PIXI = GlobalPIXIModule.PIXI;
 type Texture = PIXI.BaseTexture<PIXI.Resource>;
 type TextureLoader = (textureName: string) => PIXI.BaseTexture<PIXI.Resource>;
-export declare namespace PixiLDtkHelper {
+export declare namespace LDtkPixiHelper {
   /**
    * Split an atlas image into Pixi textures.
    *
@@ -21,4 +21,4 @@ export declare namespace PixiLDtkHelper {
   ): TileTextureCache | null;
 }
 export {};
-//# sourceMappingURL=PixiHelper.d.ts.map
+//# sourceMappingURL=LDtkPixiHelper.d.ts.map

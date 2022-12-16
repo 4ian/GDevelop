@@ -1,7 +1,7 @@
 import { TileTextureCache } from '../TileTextureCache';
 import { TiledTileMap } from '../../types/Tiled';
 import PIXI = GlobalPIXIModule.PIXI;
-export declare namespace PixiTiledHelper {
+export declare namespace TiledPixiHelper {
   /**
    * Split an atlas image into Pixi textures.
    *
@@ -18,4 +18,4 @@ export declare namespace PixiTiledHelper {
     getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
   ): TileTextureCache | null;
 }
-//# sourceMappingURL=PixiHelper.d.ts.map
+//# sourceMappingURL=TiledPixiHelper.d.ts.map

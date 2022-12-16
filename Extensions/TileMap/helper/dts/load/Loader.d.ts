@@ -1,4 +1,4 @@
-import type { EditableTileMap } from '../model/Model';
+import type { EditableTileMap } from '../model/TileMapModel';
 import { TileMap } from '../types';
 export declare namespace TileMapLoader {
   /**

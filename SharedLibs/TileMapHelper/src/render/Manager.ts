@@ -1,5 +1,5 @@
 import { ResourceCache } from "./ResourceCache";
-import { EditableTileMap } from "../model/Model";
+import { EditableTileMap } from "../model/TileMapModel";
 import { TileTextureCache } from "./TileTextureCache";
 import { PixiTileMapHelper } from "./PixiHelper";
 

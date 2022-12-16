@@ -1,11 +1,11 @@
 import { integer, PolygonVertices } from "../../types/commons";
-import { EditableTileMap, TileDefinition, TileObject } from "../../model/Model";
+import { EditableTileMap, TileDefinition, TileObject } from "../../model/TileMapModel";
 import { TiledTileMap } from "../../types/Tiled";
 import {
   decodeBase64LayerData,
   extractTileUidFlippedStates,
   getTileIdFromTiledGUI,
-} from "./LoaderHelper";
+} from "./TiledTileMapLoaderHelper";
 
 /**
  * It creates a {@link EditableTileMap} from a Tiled JSON.
@@ -14,15 +14,15 @@ export namespace TiledTileMapLoader {
   /**
    * Create a {@link EditableTileMap} from the Tiled JSON.
    *
-   * @param tileMap A tile map exported from Tiled.
+   * @param tiledTileMap A tile map exported from Tiled.
    * @param pako The zlib library.
    * @returns A {@link EditableTileMap}
    */
   export function load(
-    tileMap: TiledTileMap,
+    tiledTileMap: TiledTileMap,
     pako: any
   ): EditableTileMap | null {
-    if (!tileMap.tiledversion) {
+    if (!tiledTileMap.tiledversion) {
       console.warn(
         "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?"
       );
@@ -31,10 +31,10 @@ export namespace TiledTileMapLoader {
     }
 
     const definitions = new Map<integer, TileDefinition>();
-    for (const tileSet of tileMap.tilesets) {
-      const firstGid = tileSet.firstgid === undefined ? 1 : tileSet.firstgid;
-      if (tileSet.tiles) {
-        for (const tile of tileSet.tiles) {
+    for (const tiledTileSet of tiledTileMap.tilesets) {
+      const firstGid = tiledTileSet.firstgid === undefined ? 1 : tiledTileSet.firstgid;
+      if (tiledTileSet.tiles) {
+        for (const tile of tiledTileSet.tiles) {
           const tileDefinition = new TileDefinition(
             tile.animation ? tile.animation.length : 0
           );
@@ -86,9 +86,9 @@ export namespace TiledTileMapLoader {
             // When there is no shape, default to the whole tile.
             const polygon: PolygonVertices = [
               [0, 0],
-              [0, tileMap.tileheight],
-              [tileMap.tilewidth, tileMap.tileheight],
-              [tileMap.tilewidth, 0],
+              [0, tiledTileMap.tileheight],
+              [tiledTileMap.tilewidth, tiledTileMap.tileheight],
+              [tiledTileMap.tilewidth, 0],
             ];
             tileDefinition.addHitBox(tile.class, polygon);
           }
@@ -98,7 +98,7 @@ export namespace TiledTileMapLoader {
           );
         }
       }
-      for (let tileIndex = 0; tileIndex < tileSet.tilecount; tileIndex++) {
+      for (let tileIndex = 0; tileIndex < tiledTileSet.tilecount; tileIndex++) {
         const tileId = getTileIdFromTiledGUI(firstGid + tileIndex);
         if (!definitions.has(tileId)) {
           definitions.set(tileId, new TileDefinition(0));
@@ -107,14 +107,14 @@ export namespace TiledTileMapLoader {
     }
 
     const collisionTileMap = new EditableTileMap(
-      tileMap.tilewidth,
-      tileMap.tileheight,
-      tileMap.width,
-      tileMap.height,
+      tiledTileMap.tilewidth,
+      tiledTileMap.tileheight,
+      tiledTileMap.width,
+      tiledTileMap.height,
       definitions
     );
 
-    for (const tiledLayer of tileMap.layers) {
+    for (const tiledLayer of tiledTileMap.layers) {
       if (tiledLayer.type === "objectgroup") {
         const objectLayer = collisionTileMap.addObjectLayer(tiledLayer.id);
         objectLayer.setVisible(tiledLayer.visible);

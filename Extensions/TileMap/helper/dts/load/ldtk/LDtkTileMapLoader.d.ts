@@ -1,16 +1,16 @@
-import { EditableTileMap } from '../../model/Model';
+import { EditableTileMap } from '../../model/TileMapModel';
 import { LDtkTileMap } from '../../types/LDtk';
 export declare namespace LDtkTileMapLoader {
   /**
    * Create a {@link EditableTileMap} from the LDtk JSON.
    *
-   * @param tileMap A tile map exported from LDtk.
+   * @param ldtkTileMap A tile map exported from LDtk.
    * @param levelIndex The level of the tile map to load from.
    * @returns A {@link EditableTileMap}
    */
   function load(
-    tileMap: LDtkTileMap,
+    ldtkTileMap: LDtkTileMap,
     levelIndex: number
   ): EditableTileMap | null;
 }
-//# sourceMappingURL=Loader.d.ts.map
+//# sourceMappingURL=LDtkTileMapLoader.d.ts.map

@@ -1,5 +1,5 @@
 import { integer, float } from '../types/commons';
-import { EditableTileMap } from '../model/Model';
+import { EditableTileMap } from '../model/TileMapModel';
 import { TileMap } from '../types';
 import { TileTextureCache } from './TileTextureCache';
 import PIXI = GlobalPIXIModule.PIXI;

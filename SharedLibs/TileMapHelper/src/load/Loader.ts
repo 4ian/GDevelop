@@ -1,7 +1,7 @@
-import type { EditableTileMap } from "../model/Model";
+import type { EditableTileMap } from "../model/TileMapModel";
 import { TileMap } from "../types";
-import { LDtkTileMapLoader } from "./ldtk/Loader";
-import { TiledTileMapLoader } from "./tiled/Loader";
+import { LDtkTileMapLoader } from "./ldtk/LDtkTileMapLoader";
+import { TiledTileMapLoader } from "./tiled/TiledTileMapLoader";
 
 export namespace TileMapLoader {
   /**

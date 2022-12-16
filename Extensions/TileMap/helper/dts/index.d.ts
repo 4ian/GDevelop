@@ -6,7 +6,7 @@ export {
   EditableTileMap,
   EditableTileMapLayer,
   TileDefinition,
-} from './model/Model';
+} from './model/TileMapModel';
 export { TileMapManager } from './render/Manager';
 export { TileTextureCache } from './render/TileTextureCache';
 export { PixiTileMapHelper } from './render/PixiHelper';

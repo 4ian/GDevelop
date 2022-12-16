@@ -1,6 +1,6 @@
-import { EditableTileMap, EditableTileMapLayer } from "../../model/Model";
+import { EditableTileMap, EditableTileMapLayer } from "../../model/TileMapModel";
 import { TiledTileMap } from "../../types/Tiled";
-import { TiledTileMapLoader } from "./Loader";
+import { TiledTileMapLoader } from "./TiledTileMapLoader";
 
 describe("TiledTileMapLoader", function () {
   describe("without a collision mask", function () {

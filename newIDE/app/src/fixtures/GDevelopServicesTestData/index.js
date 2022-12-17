@@ -1022,6 +1022,54 @@ export const fakeAssetShortHeader: AssetShortHeader = {
   dominantColors: [255],
 };
 
+export const fakeAssetShortHeader2: AssetShortHeader = {
+  id: 'faaa5460ffc062ece1f3ff45d24b07e40e9d4247d21602de70973049eb4f6ee6',
+  license:
+    'CC-BY 4.0 (Attribution to the artist is required, click for details)',
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  name: 'Dino Doux 2',
+  objectType: 'sprite',
+  previewImageUrls: [
+    'https://resources.gdevelop-app.com/assets/24x24 Dino Characters/Dino Doux_Crouch.png',
+  ],
+  shortDescription: 'with 5 animations',
+  tags: [
+    '24x24 dino characters',
+    'side view',
+    'pixel art',
+    'character',
+    'player',
+    'enemy',
+  ],
+  dominantColors: [255],
+};
+
+export const fakePrivateAssetShortHeader1: AssetShortHeader = {
+  id: 'bcdef460ffc062ece1f3ff45d24b07e40e9d4247d21602de70973049eb4f6ee5',
+  license:
+    'CC-BY 4.0 (Attribution to the artist is required, click for details)',
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  name: 'Premium Dino Doux',
+  objectType: 'sprite',
+  previewImageUrls: ['https://private-assets.gdevelop.io/fake-preview.png'],
+  shortDescription: 'with 10 animations',
+  tags: [
+    '24x24 dino characters',
+    'side view',
+    'pixel art',
+    'character',
+    'player',
+    'enemy',
+  ],
+  dominantColors: [255],
+};
+
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
   tier: 'reviewed',
   authorIds: [],

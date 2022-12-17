@@ -20,7 +20,6 @@ import LinearProgress from '../UI/LinearProgress';
 import { AssetStoreContext } from './AssetStoreContext';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 type Props = {|
   assetPack: PublicAssetPack | PrivateAssetPack,
@@ -29,11 +28,11 @@ type Props = {|
   onClose: () => void,
   onAssetsAdded: () => void,
   project: gdProject,
-  objectsContainer: gdObjectsContainer,
+  objectsContainer: ?gdObjectsContainer,
   onObjectAddedFromAsset: (object: gdObject) => void,
   resourceManagementProps: ResourceManagementProps,
   canInstallPrivateAsset: () => boolean,
-  |};
+|};
 
 const AssetPackInstallDialog = ({
   assetPack,
@@ -59,7 +58,14 @@ const AssetPackInstallDialog = ({
     areAssetsBeingInstalled,
     setAreAssetsBeingInstalled,
   ] = React.useState<boolean>(false);
-  const { showAlert } = useAlertDialog();
+  const hasPrivateAssets = React.useMemo(
+    () => assetShortHeaders.some(assetShortHeader => isPrivateAsset),
+    [assetShortHeaders]
+  );
+  const canUserInstallPrivateAsset = React.useMemo(
+    () => canInstallPrivateAsset(),
+    [canInstallPrivateAsset]
+  );
 
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
@@ -74,17 +80,6 @@ const AssetPackInstallDialog = ({
     async (assetShortHeaders: Array<AssetShortHeader>) => {
       if (!assetShortHeaders || !assetShortHeaders.length) return;
 
-      const hasPrivateAssets = assetShortHeaders.some(assetShortHeader => isPrivateAsset)
-      if (hasPrivateAssets) {
-        const canUserInstallPrivateAsset = await canInstallPrivateAsset();
-        if (!canUserInstallPrivateAsset) {
-          await showAlert({
-            title: t`Save your project to install premium assets`,
-            message: t`You need to save this project as a cloud project to install premium assets. Please save your project and try again.`,
-          });
-          return;
-        }
-      }
       setAreAssetsBeingInstalled(true);
       try {
         const installOutputs = await Promise.all(
@@ -143,101 +138,121 @@ const AssetPackInstallDialog = ({
       environment,
       installPrivateAsset,
       resourceManagementProps,
-      canInstallPrivateAsset,
-      showAlert
     ]
   );
 
-  const dialogContent = areAssetsBeingInstalled
-    ? {
-        actionButton: (
-          <TextButton
-            key="loading"
-            label={<Trans>Please wait...</Trans>}
-            disabled
-            onClick={() => {}}
-          />
-        ),
-        onApply: () => {},
-        content: (
-          <>
+  const dialogContent =
+    hasPrivateAssets && !canUserInstallPrivateAsset
+      ? {
+          actionButton: (
+            <RaisedButton
+              key="continue"
+              label={<Trans>Continue</Trans>}
+              primary
+              disabled
+              onClick={() => {}}
+            />
+          ),
+          onApply: () => {},
+          content: (
             <Text>
-              <Trans>Installing assets...</Trans>
+              <Trans>
+                You need to save this project as a cloud project to install
+                premium assets. Please save your project and try again.
+              </Trans>
             </Text>
-            <Line expand>
-              <LinearProgress />
-            </Line>
-          </>
-        ),
-      }
-    : allAssetsInstalled
-    ? {
-        actionButton: (
-          <RaisedButton
-            key="install-again"
-            label={<Trans>Install again</Trans>}
-            primary={false}
-            onClick={() => onInstallAssets(assetShortHeaders)}
-          />
-        ),
-        onApply: () => onInstallAssets(assetShortHeaders),
-        content: (
-          <Text>
-            <Trans>
-              You already have these {assetShortHeaders.length} assets
-              installed, do you want to add them again?
-            </Trans>
-          </Text>
-        ),
-      }
-    : noAssetsInstalled
-    ? {
-        actionButton: (
-          <RaisedButton
-            key="continue"
-            label={<Trans>Continue</Trans>}
-            primary
-            onClick={() => onInstallAssets(assetShortHeaders)}
-          />
-        ),
-        onApply: () => onInstallAssets(assetShortHeaders),
-        content: (
-          <Text>
-            <Trans>
-              You're about to add {assetShortHeaders.length} assets. Continue?
-            </Trans>
-          </Text>
-        ),
-      }
-    : {
-        actionButton: (
-          <RaisedButtonWithSplitMenu
-            label={<Trans>Install the missing assets</Trans>}
-            key="install-missing"
-            primary
-            onClick={() => {
-              onInstallAssets(missingAssetShortHeaders);
-            }}
-            buildMenuTemplate={i18n => [
-              {
-                label: i18n._(t`Install all the assets`),
-                click: () => onInstallAssets(assetShortHeaders),
-              },
-            ]}
-          />
-        ),
-        onApply: () => onInstallAssets(missingAssetShortHeaders),
-        content: (
-          <Text>
-            <Trans>
-              You already have{' '}
-              {assetShortHeaders.length - missingAssetShortHeaders.length}{' '}
-              asset(s) in your scene. Do you want to add the remaining{' '}
-              {missingAssetShortHeaders.length} one(s)?
-            </Trans>
-          </Text>
-        ),
-      };
+          ),
+        }
+      : areAssetsBeingInstalled
+      ? {
+          actionButton: (
+            <TextButton
+              key="loading"
+              label={<Trans>Please wait...</Trans>}
+              disabled
+              onClick={() => {}}
+            />
+          ),
+          onApply: () => {},
+          content: (
+            <>
+              <Text>
+                <Trans>Installing assets...</Trans>
+              </Text>
+              <Line expand>
+                <LinearProgress />
+              </Line>
+            </>
+          ),
+        }
+      : allAssetsInstalled
+      ? {
+          actionButton: (
+            <RaisedButton
+              key="install-again"
+              label={<Trans>Install again</Trans>}
+              primary={false}
+              onClick={() => onInstallAssets(assetShortHeaders)}
+            />
+          ),
+          onApply: () => onInstallAssets(assetShortHeaders),
+          content: (
+            <Text>
+              <Trans>
+                You already have these {assetShortHeaders.length} assets
+                installed, do you want to add them again?
+              </Trans>
+            </Text>
+          ),
+        }
+      : noAssetsInstalled
+      ? {
+          actionButton: (
+            <RaisedButton
+              key="continue"
+              label={<Trans>Continue</Trans>}
+              primary
+              onClick={() => onInstallAssets(assetShortHeaders)}
+            />
+          ),
+          onApply: () => onInstallAssets(assetShortHeaders),
+          content: (
+            <Text>
+              <Trans>
+                You're about to add {assetShortHeaders.length} assets. Continue?
+              </Trans>
+            </Text>
+          ),
+        }
+      : {
+          actionButton: (
+            <RaisedButtonWithSplitMenu
+              label={<Trans>Install the missing assets</Trans>}
+              key="install-missing"
+              primary
+              onClick={() => {
+                onInstallAssets(missingAssetShortHeaders);
+              }}
+              buildMenuTemplate={i18n => [
+                {
+                  label: i18n._(t`Install all the assets`),
+                  click: () => onInstallAssets(assetShortHeaders),
+                },
+              ]}
+            />
+          ),
+          onApply: () => onInstallAssets(missingAssetShortHeaders),
+          content: (
+            <Text>
+              <Trans>
+                You already have{' '}
+                {assetShortHeaders.length - missingAssetShortHeaders.length}{' '}
+                asset(s) in your scene. Do you want to add the remaining{' '}
+                {missingAssetShortHeaders.length} one(s)?
+              </Trans>
+            </Text>
+          ),
+        };
 
   return (
     <Dialog

@@ -257,8 +257,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         undo={this.undo}
         redo={this.redo}
         onOpenSettings={this.openSceneProperties}
-        selectedObjectWithContext={this.state.selectedObjectWithContext}
-        startRenamingObject={this._startRenamingObject}
+        canRenameObject={this.state.selectedObjectWithContext != null}
+        onRenameObject={this._startRenamingObject}
       />
     );
   }
@@ -455,13 +455,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
-  _onObjectSelected = (
-    selectedObjectName: string,
-    objectWithContext: ?ObjectWithContext = null
-  ) => {
+  _onObjectSelected = (objectWithContext: ?ObjectWithContext = null) => {
     const selectedObjectNames = [];
-    if (selectedObjectName) {
-      selectedObjectNames.push(selectedObjectName);
+    if (objectWithContext) {
+      selectedObjectNames.push(objectWithContext.object.getName());
     }
 
     this.setState(

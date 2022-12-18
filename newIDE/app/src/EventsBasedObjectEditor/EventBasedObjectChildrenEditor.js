@@ -162,16 +162,15 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     }
   };
 
-  _onObjectSelected = (selectedObjectName: string) => {
-    if (!selectedObjectName) {
-      this.setState({
-        selectedObjectNames: [],
-      });
-    } else {
-      this.setState({
-        selectedObjectNames: [selectedObjectName],
-      });
+  _onObjectSelected = (objectWithContext: ?ObjectWithContext = null) => {
+    const selectedObjectNames = [];
+    if (objectWithContext) {
+      selectedObjectNames.push(objectWithContext.object.getName());
     }
+
+    this.setState({
+      selectedObjectNames,
+    });
   };
 
   updateBehaviorsSharedData = () => {

@@ -125,7 +125,7 @@ type Props = {|
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onExportObject: (object: gdObject) => void,
   onObjectCreated: gdObject => void,
-  onObjectSelected: (string, ?ObjectWithContext) => void,
+  onObjectSelected: (?ObjectWithContext) => void,
   onObjectPasted?: gdObject => void,
   canRenameObject: (newName: string) => boolean,
   onAddObjectInstance: (objectName: string) => void,
@@ -231,7 +231,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (onEditObject) {
           onEditObject(object);
           onObjectCreated(object);
-          onObjectSelected(name, { object, global: false }); // objectWithContext
+          // Adding an object is always (at the moment) going to the scene (layout), and not to the project (as a global object) so the context is not global.
+          onObjectSelected({ object, global: false }); // objectWithContext
         }
       },
       [
@@ -597,10 +598,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const selectObject = React.useCallback(
       (objectWithContext: ?ObjectWithContext) => {
-        onObjectSelected(
-          objectWithContext ? objectWithContext.object.getName() : '',
-          objectWithContext
-        );
+        onObjectSelected(objectWithContext);
       },
       [onObjectSelected]
     );

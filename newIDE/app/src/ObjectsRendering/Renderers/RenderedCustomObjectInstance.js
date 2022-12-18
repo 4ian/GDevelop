@@ -210,7 +210,7 @@ const layoutFields = [
 
 const getHorizontalAnchorValue = (
   anchorName: string,
-  properties: ?gdNamedPropertyDescriptorsList
+  properties: ?gdMapStringPropertyDescriptor
 ): ?number => {
   const horizontalAnchorName = (anchorName.includes('-')
     ? anchorName.split('-')[1]
@@ -230,7 +230,7 @@ const getHorizontalAnchorValue = (
 
 const getVerticalAnchorValue = (
   anchorName: string,
-  properties: ?gdNamedPropertyDescriptorsList
+  properties: ?gdMapStringPropertyDescriptor
 ): ?number => {
   const verticalAnchorName = (anchorName.includes('-')
     ? anchorName.split('-')[0]
@@ -254,7 +254,7 @@ const getVerticalAnchorValue = (
  */
 const getHorizontalOriginAnchorValue = (
   anchorName: string,
-  properties: gdNamedPropertyDescriptorsList,
+  properties: gdMapStringPropertyDescriptor,
   targetAnchorValue: ?number
 ): ?number => {
   const horizontalAnchorName = (anchorName.includes('-')
@@ -274,7 +274,7 @@ const getHorizontalOriginAnchorValue = (
  */
 const getVerticalOriginAnchorValue = (
   anchorName: string,
-  properties: gdNamedPropertyDescriptorsList,
+  properties: gdMapStringPropertyDescriptor,
   targetAnchorValue: ?number
 ): ?number => {
   const verticalAnchorName = (anchorName.includes('-')
@@ -349,16 +349,20 @@ const getLayouts = (
           layoutField === 'AnchorOrigin'
         ) {
           horizontalAnchorTarget =
-            getHorizontalAnchorValue(anchorTargetStringValue, instanceProperties) ||
-            anchorTargetValueNumber;
+            getHorizontalAnchorValue(
+              anchorTargetStringValue,
+              instanceProperties
+            ) || anchorTargetValueNumber;
         }
         if (
           layoutField === 'VerticalAnchorOrigin' ||
           layoutField === 'AnchorOrigin'
         ) {
           verticalAnchorTarget =
-            getVerticalAnchorValue(anchorTargetStringValue, instanceProperties) ||
-            anchorTargetValueNumber;
+            getVerticalAnchorValue(
+              anchorTargetStringValue,
+              instanceProperties
+            ) || anchorTargetValueNumber;
         }
       }
     }
@@ -398,7 +402,7 @@ const getLayouts = (
           const anchorOrigin =
             getHorizontalOriginAnchorValue(
               propertyValueString,
-              properties,
+              instanceProperties,
               horizontalAnchorTarget
             ) || propertyValueNumber;
           if (anchorOrigin !== null) {
@@ -416,7 +420,7 @@ const getLayouts = (
           const anchorOrigin =
             getVerticalOriginAnchorValue(
               propertyValueString,
-              properties,
+              instanceProperties,
               horizontalAnchorTarget
             ) || propertyValueNumber;
           if (anchorOrigin !== null) {

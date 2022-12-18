@@ -20,6 +20,7 @@ import LinearProgress from '../UI/LinearProgress';
 import { AssetStoreContext } from './AssetStoreContext';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
+import PromisePool from '@supercharge/promise-pool';
 
 type Props = {|
   assetPack: PublicAssetPack | PrivateAssetPack,
@@ -82,8 +83,10 @@ const AssetPackInstallDialog = ({
 
       setAreAssetsBeingInstalled(true);
       try {
-        const installOutputs = await Promise.all(
-          assetShortHeaders.map(async assetShortHeader => {
+        // Use a pool to avoid installing an unbounded amount of assets at the same time.
+        const { results, errors } = await PromisePool.withConcurrency(6)
+          .for(assetShortHeaders)
+          .process(async assetShortHeader => {
             const installOutput = isPrivateAsset(assetShortHeader)
               ? await installPrivateAsset({
                   assetShortHeader,
@@ -105,10 +108,13 @@ const AssetPackInstallDialog = ({
             }
 
             return installOutput;
-          })
-        );
+          });
 
-        installOutputs.forEach(installOutput => {
+        if (errors.length) {
+          throw new Error('Error(s) while installing assets. The first error is: ' + errors[0].message);
+        }
+
+        results.forEach(installOutput => {
           installOutput.createdObjects.forEach(object => {
             onObjectAddedFromAsset(object);
           });

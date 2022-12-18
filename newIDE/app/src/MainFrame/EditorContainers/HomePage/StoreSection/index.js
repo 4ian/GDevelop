@@ -15,19 +15,20 @@ type Props = {|
   canInstallPrivateAsset: () => boolean,
 |};
 
-const StoreSection = ({ project, resourceManagementProps, canInstallPrivateAsset }: Props) => {
+const StoreSection = ({
+  project,
+  resourceManagementProps,
+  canInstallPrivateAsset,
+}: Props) => {
   const [
     isAssetPackDialogInstallOpen,
     setIsAssetPackDialogInstallOpen,
   ] = React.useState(false);
-  const {
-    searchResults,
-    navigationState,
-  } = React.useContext(AssetStoreContext);
-  const {
-    openedAssetPack,
-  } = navigationState.getCurrentPage();
-  
+  const { searchResults, navigationState } = React.useContext(
+    AssetStoreContext
+  );
+  const { openedAssetPack } = navigationState.getCurrentPage();
+
   return (
     <SectionContainer flexBody>
       <AssetStore />
@@ -37,9 +38,9 @@ const StoreSection = ({ project, resourceManagementProps, canInstallPrivateAsset
           onClick={() => {
             if (!project) {
               return; // TODO: create a project, await, and then show dialog.
-            } 
+            }
 
-            setIsAssetPackDialogInstallOpen(true);            
+            setIsAssetPackDialogInstallOpen(true);
           }}
           disabled={!openedAssetPack || !searchResults}
           label={
@@ -51,22 +52,25 @@ const StoreSection = ({ project, resourceManagementProps, canInstallPrivateAsset
           }
         />
       </Line>
-      {project && isAssetPackDialogInstallOpen && searchResults && openedAssetPack && (
-        <AssetPackInstallDialog
-          assetPack={openedAssetPack}
-          assetShortHeaders={searchResults}
-          addedAssetIds={[] /* TODO */}
-          onClose={() => setIsAssetPackDialogInstallOpen(false)}
-          onAssetsAdded={() => {
-            setIsAssetPackDialogInstallOpen(false);
-          }}
-          project={project}
-          objectsContainer={project /* TODO: choose the scene from inside the dialog? */}
-          onObjectAddedFromAsset={() => {}}
-          canInstallPrivateAsset={canInstallPrivateAsset}
-          resourceManagementProps={resourceManagementProps}
-        />
-      )}
+      {project &&
+        isAssetPackDialogInstallOpen &&
+        searchResults &&
+        openedAssetPack && (
+          <AssetPackInstallDialog
+            assetPack={openedAssetPack}
+            assetShortHeaders={searchResults}
+            addedAssetIds={[] /* TODO */}
+            onClose={() => setIsAssetPackDialogInstallOpen(false)}
+            onAssetsAdded={() => {
+              setIsAssetPackDialogInstallOpen(false);
+            }}
+            project={project}
+            objectsContainer={null}
+            onObjectAddedFromAsset={() => {}}
+            canInstallPrivateAsset={canInstallPrivateAsset}
+            resourceManagementProps={resourceManagementProps}
+          />
+        )}
     </SectionContainer>
   );
 };

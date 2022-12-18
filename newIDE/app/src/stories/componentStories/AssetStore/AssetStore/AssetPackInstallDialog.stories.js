@@ -302,12 +302,42 @@ export const LayoutPrivateAssetButCantInstall = () => (
   </AssetStoreStateProvider>
 );
 
-// TODO: no objectsContainer specified.
-export const NoObjectsContainerPublicAsset = () => (
+export const NoObjectsContainerPublicAssetInstallSuccess = () => (
+  <EventsFunctionsExtensionsContext.Provider
+    value={fakeEventsFunctionsExtensionsContext}
+  >
+    <AssetStoreStateProvider>
+      <AssetPackInstallDialog
+        assetPack={fakeAssetPacks.starterPacks[0]}
+        assetShortHeaders={[fakeAssetShortHeader1, fakeAssetShortHeader2]}
+        addedAssetIds={[]}
+        onClose={action('onClose')}
+        onAssetsAdded={action('onAssetsAdded')}
+        project={testProject.project}
+        objectsContainer={null}
+        onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
+        resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
+          onFetchNewlyAddedResources: async () => {},
+          resourceSources: [],
+          onChooseResource: () => Promise.reject('Unimplemented'),
+          resourceExternalEditors: fakeResourceExternalEditors,
+        }}
+        canInstallPrivateAsset={() => true}
+      />
+    </AssetStoreStateProvider>
+  </EventsFunctionsExtensionsContext.Provider>
+);
+NoObjectsContainerPublicAssetInstallSuccess.decorators = [withMock];
+NoObjectsContainerPublicAssetInstallSuccess.parameters = {
+  mockData: mockApiDataForPublicAssets,
+};
+
+export const NoObjectsContainerPrivateAssetButCantInstall = () => (
   <AssetStoreStateProvider>
     <AssetPackInstallDialog
       assetPack={fakeAssetPacks.starterPacks[0]}
-      assetShortHeaders={[fakeAssetShortHeader1]}
+      assetShortHeaders={[fakePrivateAssetShortHeader1]}
       addedAssetIds={[]}
       onClose={action('onClose')}
       onAssetsAdded={action('onAssetsAdded')}
@@ -321,7 +351,7 @@ export const NoObjectsContainerPublicAsset = () => (
         onChooseResource: () => Promise.reject('Unimplemented'),
         resourceExternalEditors: fakeResourceExternalEditors,
       }}
-      canInstallPrivateAsset={() => true}
+      canInstallPrivateAsset={() => false}
     />
   </AssetStoreStateProvider>
 );

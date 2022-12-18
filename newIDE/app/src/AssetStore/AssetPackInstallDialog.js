@@ -21,6 +21,12 @@ import { AssetStoreContext } from './AssetStoreContext';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import PromisePool from '@supercharge/promise-pool';
+import { ColumnStackLayout } from '../UI/Layout';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import { mapFor } from '../Utils/MapFor';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import AlertMessage from '../UI/AlertMessage';
 
 type Props = {|
   assetPack: PublicAssetPack | PrivateAssetPack,
@@ -77,6 +83,48 @@ const AssetPackInstallDialog = ({
 
   const { environment } = React.useContext(AssetStoreContext);
 
+  const [selectedLayoutName, setSelectedLayoutName] = React.useState<string>(
+    ''
+  );
+  const layoutNames = mapFor(0, project.getLayoutsCount(), i => {
+    return project.getLayoutAt(i).getName();
+  });
+  const sceneChooser = objectsContainer ? null : ( // The objects container where to add assets objects is already given.
+    // Give the choice to the user to choose where to add assets objects.
+    <ColumnStackLayout noMargin>
+      <Text>
+        <Trans>Choose where to add the assets:</Trans>
+      </Text>
+      <RadioGroup
+        aria-label="Associated scene"
+        name="associated-layout"
+        value={selectedLayoutName}
+        onChange={event => setSelectedLayoutName(event.target.value)}
+      >
+        <FormControlLabel
+          value={''}
+          control={<Radio color="secondary" />}
+          label={<Trans>Global objects in the project</Trans>}
+          disabled={areAssetsBeingInstalled}
+        />
+        {layoutNames.map(name => (
+          <FormControlLabel
+            key={name}
+            value={name}
+            control={<Radio color="secondary" />}
+            label={name}
+            disabled={areAssetsBeingInstalled}
+          />
+        ))}
+      </RadioGroup>
+    </ColumnStackLayout>
+  );
+  const targetObjectsContainer: gdObjectsContainer =
+    objectsContainer ||
+    (project.hasLayoutNamed(selectedLayoutName)
+      ? project.getLayout(selectedLayoutName)
+      : project);
+
   const onInstallAssets = React.useCallback(
     async (assetShortHeaders: Array<AssetShortHeader>) => {
       if (!assetShortHeaders || !assetShortHeaders.length) return;
@@ -87,19 +135,20 @@ const AssetPackInstallDialog = ({
         const { results, errors } = await PromisePool.withConcurrency(6)
           .for(assetShortHeaders)
           .process(async assetShortHeader => {
+            console.log(targetObjectsContainer);
             const installOutput = isPrivateAsset(assetShortHeader)
               ? await installPrivateAsset({
                   assetShortHeader,
                   eventsFunctionsExtensionsState,
                   project,
-                  objectsContainer,
+                  objectsContainer: targetObjectsContainer,
                   environment,
                 })
               : await installPublicAsset({
                   assetShortHeader,
                   eventsFunctionsExtensionsState,
                   project,
-                  objectsContainer,
+                  objectsContainer: targetObjectsContainer,
                   environment,
                 });
 
@@ -111,7 +160,10 @@ const AssetPackInstallDialog = ({
           });
 
         if (errors.length) {
-          throw new Error('Error(s) while installing assets. The first error is: ' + errors[0].message);
+          throw new Error(
+            'Error(s) while installing assets. The first error is: ' +
+              errors[0].message
+          );
         }
 
         results.forEach(installOutput => {
@@ -138,7 +190,7 @@ const AssetPackInstallDialog = ({
     [
       eventsFunctionsExtensionsState,
       project,
-      objectsContainer,
+      targetObjectsContainer,
       onObjectAddedFromAsset,
       onAssetsAdded,
       environment,
@@ -153,7 +205,7 @@ const AssetPackInstallDialog = ({
           actionButton: (
             <RaisedButton
               key="continue"
-              label={<Trans>Continue</Trans>}
+              label={<Trans>Add the assets</Trans>}
               primary
               disabled
               onClick={() => {}}
@@ -161,12 +213,14 @@ const AssetPackInstallDialog = ({
           ),
           onApply: () => {},
           content: (
-            <Text>
-              <Trans>
-                You need to save this project as a cloud project to install
-                premium assets. Please save your project and try again.
-              </Trans>
-            </Text>
+            <AlertMessage kind="warning">
+              <Text>
+                <Trans>
+                  You need to save this project as a cloud project to install
+                  premium assets. Please save your project and try again.
+                </Trans>
+              </Text>
+            </AlertMessage>
           ),
         }
       : areAssetsBeingInstalled
@@ -216,7 +270,7 @@ const AssetPackInstallDialog = ({
           actionButton: (
             <RaisedButton
               key="continue"
-              label={<Trans>Continue</Trans>}
+              label={<Trans>Add the assets</Trans>}
               primary
               onClick={() => onInstallAssets(assetShortHeaders)}
             />
@@ -225,7 +279,7 @@ const AssetPackInstallDialog = ({
           content: (
             <Text>
               <Trans>
-                You're about to add {assetShortHeaders.length} assets. Continue?
+                You're about to add {assetShortHeaders.length} assets.
               </Trans>
             </Text>
           ),
@@ -282,7 +336,10 @@ const AssetPackInstallDialog = ({
       ]}
       onApply={dialogContent.onApply}
     >
-      <Column noMargin>{dialogContent.content}</Column>
+      <Column noMargin>
+        {dialogContent.content}
+        {sceneChooser}
+      </Column>
     </Dialog>
   );
 };

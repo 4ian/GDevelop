@@ -8,7 +8,7 @@ import {
 } from '../../Utils/GDevelopServices/Asset';
 import Text from '../../UI/Text';
 import { t, Trans } from '@lingui/macro';
-import PriceTag, { formatPrice } from '../../UI/PriceTag';
+import { formatPrice } from '../../UI/PriceTag';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import { ResponsiveLineStackLayout, LineStackLayout } from '../../UI/Layout';

@@ -5,16 +5,15 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCore/Tools/Localization.h"
+#include "ParticleEmitterObject.h"
+
 #include "GDCore/CommonTools.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Project/InitialInstance.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#include "ParticleEmitterObject.h"
-
-#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
-#include "GDCore/CommonTools.h"
+#include "GDCore/Tools/Localization.h"
 
 using namespace std;
 
@@ -178,53 +177,49 @@ void ParticleEmitterObject::ExposeResources(
   SetParticleTexture(texture);
 }
 
-void ParticleEmitterBase::SetTank(float newValue) {
-  tank = newValue;
-}
-void ParticleEmitterBase::SetFlow(float newValue) {
-  flow = newValue;
-}
-void ParticleEmitterBase::SetEmitterForceMin(float newValue) {
+void ParticleEmitterBase::SetTank(double newValue) { tank = newValue; }
+void ParticleEmitterBase::SetFlow(double newValue) { flow = newValue; }
+void ParticleEmitterBase::SetEmitterForceMin(double newValue) {
   emitterForceMin = newValue;
 }
-void ParticleEmitterBase::SetEmitterForceMax(float newValue) {
+void ParticleEmitterBase::SetEmitterForceMax(double newValue) {
   emitterForceMax = newValue;
 }
-void ParticleEmitterBase::SetParticleGravityX(float newValue) {
+void ParticleEmitterBase::SetParticleGravityX(double newValue) {
   particleGravityX = newValue;
 }
-void ParticleEmitterBase::SetParticleGravityY(float newValue) {
+void ParticleEmitterBase::SetParticleGravityY(double newValue) {
   particleGravityY = newValue;
 }
-void ParticleEmitterBase::SetEmitterAngleA(float newValue) {
+void ParticleEmitterBase::SetEmitterAngleA(double newValue) {
   emitterAngleA = newValue;
 }
-void ParticleEmitterBase::SetEmitterAngleB(float newValue) {
+void ParticleEmitterBase::SetEmitterAngleB(double newValue) {
   emitterAngleB = newValue;
 }
-void ParticleEmitterBase::SetZoneRadius(float newValue) {
+void ParticleEmitterBase::SetZoneRadius(double newValue) {
   zoneRadius = newValue;
 }
 
-void ParticleEmitterBase::SetParticleGravityAngle(float newAngleInDegree) {
-  float length = sqrt(GetParticleGravityY() * GetParticleGravityY() +
-                      GetParticleGravityX() * GetParticleGravityX());
+void ParticleEmitterBase::SetParticleGravityAngle(double newAngleInDegree) {
+  double length = sqrt(GetParticleGravityY() * GetParticleGravityY() +
+                       GetParticleGravityX() * GetParticleGravityX());
 
   SetParticleGravityX(cos(newAngleInDegree / 180.0f * 3.14159f) * length);
   SetParticleGravityY(sin(newAngleInDegree / 180.0f * 3.14159f) * length);
 }
-void ParticleEmitterBase::SetParticleGravityLength(float length) {
-  float angle = atan2(GetParticleGravityY(), GetParticleGravityX());
+void ParticleEmitterBase::SetParticleGravityLength(double length) {
+  double angle = atan2(GetParticleGravityY(), GetParticleGravityX());
 
   SetParticleGravityX(cos(angle) * length);
   SetParticleGravityY(sin(angle) * length);
 }
 
-float ParticleEmitterBase::GetParticleGravityAngle() const {
+double ParticleEmitterBase::GetParticleGravityAngle() const {
   return atan2(GetParticleGravityY(), GetParticleGravityX()) * 180.0f /
          3.14159f;
 }
-float ParticleEmitterBase::GetParticleGravityLength() const {
+double ParticleEmitterBase::GetParticleGravityLength() const {
   return sqrt(GetParticleGravityY() * GetParticleGravityY() +
               GetParticleGravityX() * GetParticleGravityX());
 }

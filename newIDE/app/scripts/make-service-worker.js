@@ -50,10 +50,11 @@ const buildSW = () => {
       globDirectory: buildPath,
       globPatterns: [
         // Application:
-        '!(libGD)*.{js,css,html,png}', // Root files...
+        '!(libGD)*.{js,css,html,png}', // Root files.
         'static/css/*.css',
         'static/media/*',
-        'static/js/!(locales-|local-app)*.js',
+        'static/js/locales-*.js', // Locales.
+        'static/js/!local-app*.js', // Exclude electron app.
         // ...But not libGD.js/wasm (there are cached with their URL
         // query string that depends on the VersionMetadata, see below).
 

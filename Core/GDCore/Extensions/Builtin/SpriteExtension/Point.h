@@ -31,7 +31,7 @@ class GD_CORE_API Point {
   /**
    * Change point position.
    */
-  void SetXY(float x_, float y_) {
+  void SetXY(double x_, double y_) {
     x = x_;
     y = y_;
   }
@@ -39,27 +39,27 @@ class GD_CORE_API Point {
   /**
    * Change point X position.
    */
-  void SetX(float x_) { x = x_; }
+  void SetX(double x_) { x = x_; }
 
   /**
    * Change point Y position.
    */
-  void SetY(float y_) { y = y_; }
+  void SetY(double y_) { y = y_; }
 
   /**
    * Get point X position.
    */
-  float GetX() const { return x; }
+  double GetX() const { return x; }
 
   /**
    * Get point Y position.
    */
-  float GetY() const { return y; }
+  double GetY() const { return y; }
 
  private:
   gd::String name;
-  float x;
-  float y;
+  double x;
+  double y;
 };
 
 #endif  // GDCORE_POINT_H

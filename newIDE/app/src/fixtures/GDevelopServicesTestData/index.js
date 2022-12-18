@@ -775,7 +775,9 @@ export const fakeAsset1: Asset = {
   shortDescription:
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
-  previewImageUrls: ['res/GD-logo.png'],
+  previewImageUrls: [
+    'https://asset-resources.gdevelop.io/public-resources/Simple Space/spaceships/b0e7ae371773ea6cf1e18a7db1d32ea1b4b9dd388f1f31aed5b7c1501437292c_Complex Spaceship_Type A.png',
+  ],
   animationsCount: 6,
   maxFramesCount: 6,
   height: 36,
@@ -923,7 +925,9 @@ export const fakeAssetWithCustomObject: Asset = {
   objectType: 'object',
   animationsCount: 1,
   maxFramesCount: 1,
-  previewImageUrls: ['res/GD-logo.png'],
+  previewImageUrls: [
+    'https://asset-resources.gdevelop.io/public-resources/Menu buttons/3e1b2da0279f60b6a6d1cfe4c79875b70a81b0bec7aa45ff18bff03eb26326eb_Yellow Button.preview.png',
+  ],
   width: 256,
   height: 106,
   dominantColors: [16304136],
@@ -993,7 +997,7 @@ export const fakeAssetWithFlashExtensionDependency1: Asset = {
   ],
 };
 
-export const fakeAssetShortHeader1: AssetShortHeader = {
+export const fakeAssetShortHeader: AssetShortHeader = {
   id: 'a4eb5460ffc062ece1f3ff45d24b07e40e9d4247d21602de70973049eb4f6ee5',
   license:
     'CC-BY 4.0 (Attribution to the artist is required, click for details)',

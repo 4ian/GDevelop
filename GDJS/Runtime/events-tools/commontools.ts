@@ -382,7 +382,7 @@ namespace gdjs {
         x: float
       ): float {
         return (
-          angle1 + gdjs.evtTools.common.angleDifference(angle1, angle2) * x
+          angle1 + gdjs.evtTools.common.angleDifference(angle2, angle1) * x
         );
       };
     }

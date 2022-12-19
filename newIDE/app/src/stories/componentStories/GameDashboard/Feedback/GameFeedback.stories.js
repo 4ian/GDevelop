@@ -4,7 +4,6 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 
 import muiDecorator from '../../../ThemeDecorator';
-import paperDecorator from '../../../PaperDecorator';
 
 import GameFeedback from '../../../../GameDashboard/Feedbacks/GameFeedback';
 
@@ -21,11 +20,12 @@ import {
   GDevelopBuildApi,
   GDevelopPlayApi,
 } from '../../../../Utils/GDevelopServices/ApiConfigs';
+import { getPaperDecorator } from '../../../PaperDecorator';
 
 export default {
   title: 'GameDashboard/Feedback/GameFeedback',
   component: GameFeedback,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [getPaperDecorator('medium'), muiDecorator],
 };
 
 export const DefaultGameFeedback = () => {

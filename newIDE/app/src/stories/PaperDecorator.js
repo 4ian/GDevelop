@@ -7,10 +7,14 @@ const style = {
   padding: 10,
 };
 
-const paperDecorator: StoryDecorator = (Story, context) => (
-  <Paper background="dark" style={style}>
+export const getPaperDecorator = (
+  background: 'medium' | 'dark'
+): StoryDecorator => (Story, context) => (
+  <Paper background={background} style={style}>
     <Story />
   </Paper>
 );
 
-export default paperDecorator;
+const defaultPaperDecorator = getPaperDecorator('dark');
+
+export default defaultPaperDecorator;

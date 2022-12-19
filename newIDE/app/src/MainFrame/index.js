@@ -2451,7 +2451,6 @@ const MainFrame = (props: Props) => {
     setIsProjectOpening(true);
 
     try {
-      const isCreatingFromExample = !!selectedExampleShortHeader;
       const source = selectedExampleShortHeader
         ? await createNewProjectFromExampleShortHeader({
             i18n,
@@ -2460,9 +2459,6 @@ const MainFrame = (props: Props) => {
         : await createNewProject();
 
       if (!source) return; // New project creation aborted.
-
-      setSelectedExampleShortHeader(null);
-      await setState(state => ({ ...state, createDialogOpen: false }));
 
       let state: ?State;
       const sourceStorageProvider = source.storageProvider;
@@ -2492,12 +2488,11 @@ const MainFrame = (props: Props) => {
       currentProject.setVersion('1.0.0');
       currentProject.getAuthorIds().clear();
       currentProject.setAuthor('');
-      if (selectedExampleShortHeader)
+      if (selectedExampleShortHeader) {
+        // Use the project settings of the example and add template slug to project
         currentProject.setTemplateSlug(selectedExampleShortHeader.slug);
-      if (newProjectSetup.projectName)
-        currentProject.setName(newProjectSetup.projectName);
-      if (!isCreatingFromExample) {
-        // Use the project settings of the example
+      } else {
+        // Use the project settings requested by the user
         currentProject.setGameResolutionSize(
           newProjectSetup.width,
           newProjectSetup.height
@@ -2507,6 +2502,10 @@ const MainFrame = (props: Props) => {
           currentProject.setPixelsRounding(true);
           currentProject.setScaleMode('nearest');
         }
+      }
+
+      if (newProjectSetup.projectName) {
+        currentProject.setName(newProjectSetup.projectName);
       }
 
       const destinationStorageProviderOperations = getStorageProviderOperations(
@@ -2564,6 +2563,8 @@ const MainFrame = (props: Props) => {
       // We were able to load and then save the project. We can now close the dialog,
       // open the project editors and check if leaderboards must be replaced.
       setNewProjectSetupDialogOpen(false);
+      setSelectedExampleShortHeader(null);
+      await setState(state => ({ ...state, createDialogOpen: false }));
       findLeaderboardsToReplace(currentProject, oldProjectId);
       openSceneOrProjectManager({
         currentProject: currentProject,

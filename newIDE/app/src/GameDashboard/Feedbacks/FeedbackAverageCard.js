@@ -50,7 +50,7 @@ const FeedbackAverageCard = ({ feedbacks }: Props) => {
   return (
     <I18n>
       {({ i18n }) => (
-        <Card>
+        <Card background="dark">
           <Column noMargin>
             <Line noMargin justifyContent="space-between" alignItems="start">
               <Column noMargin>

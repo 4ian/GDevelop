@@ -85,6 +85,7 @@ import PreferencesContext, {
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
 import CreateProjectDialog, {
+  createNewProjectWithDefaultLogin,
   type NewProjectSetup,
 } from '../ProjectCreation/CreateProjectDialog';
 import {
@@ -162,6 +163,7 @@ import { type InAppTutorialOrchestratorInterface } from '../InAppTutorial/InAppT
 import useInAppTutorialOrchestrator from '../InAppTutorial/useInAppTutorialOrchestrator';
 import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../InAppTutorial/InAppTutorialProvider';
 import TabsTitlebar from './TabsTitlebar';
+import { registerGame } from '../Utils/GDevelopServices/Game';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -2456,6 +2458,8 @@ const MainFrame = (props: Props) => {
             i18n,
             exampleShortHeader: selectedExampleShortHeader,
           })
+        : newProjectSetup.allowPlayersToLogIn
+        ? await createNewProjectWithDefaultLogin()
         : await createNewProject();
 
       if (!source) return; // New project creation aborted.
@@ -2506,6 +2510,29 @@ const MainFrame = (props: Props) => {
 
       if (newProjectSetup.projectName) {
         currentProject.setName(newProjectSetup.projectName);
+      }
+
+      if (newProjectSetup.allowPlayersToLogIn && authenticatedUser.profile) {
+        // When the login is enabled and user is connected, ensure the game is registered to avoid
+        // having the authentication dialog asking the user to register the game.
+        try {
+          await registerGame(
+            authenticatedUser.getAuthorizationHeader,
+            authenticatedUser.profile.id,
+            {
+              gameId: currentProject.getProjectUuid(),
+              authorName: currentProject.getAuthor() || 'Unspecified publisher',
+              gameName: currentProject.getName() || 'Untitled game',
+              templateSlug: currentProject.getTemplateSlug(),
+            }
+          );
+        } catch (error) {
+          // Do not prevent the user from opening the game if the registration failed.
+          console.error(
+            'Unable to register the game to the user profile, the game will not be listed in the user profile.',
+            error
+          );
+        }
       }
 
       const destinationStorageProviderOperations = getStorageProviderOperations(

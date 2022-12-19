@@ -622,10 +622,19 @@ namespace gdjs {
       checkIfGameIsRegistered(runtimeScene.getGame(), _gameId)
         .then((isGameRegistered) => {
           if (_authenticationLoaderContainer) {
+            const electron = runtimeScene.getGame().getRenderer().getElectron();
+            const wikiOpenAction = electron
+              ? () =>
+                  electron.shell.openExternal(
+                    'https://wiki.gdevelop.io/gdevelop5/publishing/web'
+                  )
+              : null; // Only show a link if we're on electron.
+
             _authenticationTextContainer = authComponents.addAuthenticationTextsToLoadingContainer(
               _authenticationLoaderContainer,
               platform,
-              isGameRegistered
+              isGameRegistered,
+              wikiOpenAction
             );
           }
           if (isGameRegistered) {

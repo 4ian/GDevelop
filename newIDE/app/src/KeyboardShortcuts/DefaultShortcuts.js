@@ -4,7 +4,7 @@ import { type CommandName } from '../CommandPalette/CommandsList';
 export type ShortcutMap = { [CommandName]: string };
 
 const defaultShortcuts: ShortcutMap = {
-  QUIT_APP: 'CmdOrCtrl+Shift+KeyQ',
+  QUIT_APP: 'CmdOrCtrl+KeyQ', // It's important to keep this shortcut, as this default cannot be overriden on Mac.
   OPEN_PROJECT_MANAGER: 'CmdOrCtrl+Alt+KeyE',
   LAUNCH_NEW_PREVIEW: 'F4',
   LAUNCH_DEBUG_PREVIEW: 'F6',
@@ -15,7 +15,7 @@ const defaultShortcuts: ShortcutMap = {
   OPEN_PROJECT: 'CmdOrCtrl+KeyO',
   SAVE_PROJECT: 'CmdOrCtrl+KeyS',
   SAVE_PROJECT_AS: 'CmdOrCtrl+Shift+KeyS',
-  CLOSE_PROJECT: 'CmdOrCtrl+KeyQ',
+  CLOSE_PROJECT: 'CmdOrCtrl+KeyW',
   EXPORT_GAME: 'CmdOrCtrl+Shift+KeyE',
   OPEN_RECENT_PROJECT: '',
   OPEN_COMMAND_PALETTE: 'CmdOrCtrl+KeyP',

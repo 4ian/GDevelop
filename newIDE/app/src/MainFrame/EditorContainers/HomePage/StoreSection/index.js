@@ -27,7 +27,16 @@ const StoreSection = ({
   const { searchResults, navigationState } = React.useContext(
     AssetStoreContext
   );
-  const { openedAssetPack } = navigationState.getCurrentPage();
+  const {
+    openedAssetPack,
+    openedAssetShortHeader,
+  } = navigationState.getCurrentPage();
+
+  const assetShortHeadersToInstall = openedAssetShortHeader
+    ? [openedAssetShortHeader]
+    : openedAssetPack
+    ? searchResults
+    : [];
 
   return (
     <SectionContainer flexBody>
@@ -42,10 +51,16 @@ const StoreSection = ({
 
             setIsAssetPackDialogInstallOpen(true);
           }}
-          disabled={!project || !openedAssetPack || !searchResults}
+          disabled={!project || !assetShortHeadersToInstall.length}
           label={
             project ? (
-              <Trans>Add to the project</Trans>
+              openedAssetPack ? (
+                <Trans>Add assets from this pack to the project</Trans>
+              ) : assetShortHeadersToInstall.length === 1 ? (
+                <Trans>Add this asset to the project</Trans>
+              ) : (
+                <Trans>Add these assets to the project</Trans>
+              )
             ) : (
               <Trans>
                 Create a project first to add assets from the asset store
@@ -56,12 +71,13 @@ const StoreSection = ({
       </Line>
       {project &&
         isAssetPackDialogInstallOpen &&
-        searchResults &&
-        openedAssetPack && (
+        !!assetShortHeadersToInstall.length && (
           <AssetPackInstallDialog
             assetPack={openedAssetPack}
-            assetShortHeaders={searchResults}
-            addedAssetIds={[] /* TODO */}
+            assetShortHeaders={assetShortHeadersToInstall}
+            addedAssetIds={
+              [] /* Don't check if assets are already installed in the project. */
+            }
             onClose={() => setIsAssetPackDialogInstallOpen(false)}
             onAssetsAdded={() => {
               setIsAssetPackDialogInstallOpen(false);

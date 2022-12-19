@@ -30,7 +30,7 @@ import AlertMessage from '../UI/AlertMessage';
 import { type InstallAssetOutput } from './InstallAsset';
 
 type Props = {|
-  assetPack: PublicAssetPack | PrivateAssetPack,
+  assetPack: PublicAssetPack | PrivateAssetPack | null,
   assetShortHeaders: Array<AssetShortHeader>,
   addedAssetIds: Array<string>,
   onClose: () => void,
@@ -317,7 +317,7 @@ const AssetPackInstallDialog = ({
 
   return (
     <Dialog
-      title={assetPack.name}
+      title={assetPack ? assetPack.name : <Trans>Assets</Trans>}
       maxWidth="sm"
       open
       onRequestClose={() => {

@@ -835,7 +835,7 @@ interface MeasurementUnit {
   [Const, Ref] DOMString GetLabel();
   [Const, Ref] DOMString GetDescription();
   [Const, Ref] DOMString GetElementsWithWords();
-  
+
   long GetElementsCount();
   long GetElementPower(long elementIndex);
   [Const, Ref] MeasurementBaseUnit GetElementBaseUnit(long elementIndex);
@@ -1201,6 +1201,13 @@ interface ExpressionCodeGenerationInformation {
     [Const, Ref] VectorString GetIncludeFiles();
 };
 
+interface ParameterOptions {
+    [Ref] ParameterOptions SetDescription([Const] DOMString description);
+    [Ref] ParameterOptions SetTypeExtraInfo([Const] DOMString typeExtraInfo);
+
+    [Value] ParameterOptions STATIC_MakeNewOptions();
+};
+
 interface InstructionMetadata {
     void InstructionMetadata(); // For tests only.
 
@@ -1235,8 +1242,8 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] InstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
-    [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type, [Const] optional DOMString typeExtraInfo = "");
-    [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type, [Const] optional DOMString typeExtraInfo = "");
+    [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
+    [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
 
     [Ref] InstructionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
     [Const, Ref] DOMString GetRequiredBaseObjectCapability();
@@ -1312,7 +1319,7 @@ interface MultipleInstructionMetadata {
     [Ref] MultipleInstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] MultipleInstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
-    [Ref] MultipleInstructionMetadata UseStandardParameters([Const] DOMString type,  [Const] optional DOMString typeExtraInfo = "");
+    [Ref] MultipleInstructionMetadata UseStandardParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
 
     [Ref] MultipleInstructionMetadata SetHidden();
 
@@ -1615,7 +1622,7 @@ interface BehaviorMetadata {
 
     [Ref] BehaviorMetadata SetObjectType([Const] DOMString objectType);
     [Const, Ref] DOMString GetObjectType();
-    
+
     boolean IsPrivate();
     [Ref] BehaviorMetadata SetPrivate();
 

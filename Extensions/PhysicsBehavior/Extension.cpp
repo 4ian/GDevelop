@@ -337,7 +337,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
            "res/physics16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number", gd::ParameterOptions::MakeNewOptions())
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetLinearVelocityX");
 
@@ -351,7 +352,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
            "res/physics16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number", gd::ParameterOptions::MakeNewOptions())
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetLinearVelocityY");
 
@@ -364,7 +366,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                      "res/physics16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number", gd::ParameterOptions::MakeNewOptions())
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetLinearVelocity");
 
@@ -390,7 +393,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                      "res/physics16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number", gd::ParameterOptions::MakeNewOptions())
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetAngularVelocity");
 
@@ -403,7 +407,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                      "res/physics16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number", gd::ParameterOptions::MakeNewOptions())
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetLinearDamping");
 
@@ -445,7 +450,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                      "res/physics16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number", gd::ParameterOptions::MakeNewOptions())
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetAngularDamping");
 
@@ -516,7 +522,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
            "res/physics16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number", gd::ParameterOptions::MakeNewOptions())
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetPolygonScaleX");
 
@@ -530,7 +537,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
            "res/physics16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PhysicsBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number", gd::ParameterOptions::MakeNewOptions())
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("GetPolygonScaleY");
 

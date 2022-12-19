@@ -349,7 +349,6 @@ const Physics2Editor = (props: Props) => {
           >
             <ImagePreview
               resourceName={image}
-              project={props.project}
               imageResourceSource={resourcesLoader.getResourceFullUrl(
                 props.project,
                 image,

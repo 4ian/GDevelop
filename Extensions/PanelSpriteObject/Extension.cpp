@@ -24,7 +24,9 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
           "Victor Levasseur and Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/panel_sprite");
-  extension.AddInstructionOrExpressionGroupMetadata(_("Panel Sprite (9-patch) Object"))
+  extension
+      .AddInstructionOrExpressionGroupMetadata(
+          _("Panel Sprite (9-patch) Object"))
       .SetIcon("CppPlatform/Extensions/PanelSpriteIcon.png");
 
   gd::ObjectMetadata& obj =
@@ -48,7 +50,10 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/opacity.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
-      .UseStandardRelationalOperatorParameters("number");
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity to compare to (0-255)")));
 
   obj.AddAction(
          "SetOpacity",
@@ -61,7 +66,10 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
          "res/actions/opacity.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
-      .UseStandardOperatorParameters("number");
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity (0-255)")));
 
   obj.AddExpression("Opacity",
                     _("Opacity"),
@@ -91,7 +99,8 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                 "res/actions/scaleWidth_black.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions())
       .SetFunctionName("SetWidth")
       .SetGetter("GetWidth");
 
@@ -104,7 +113,8 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/scaleWidth_black.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions())
       .SetFunctionName("GetWidth");
 
   obj.AddAction("Height",
@@ -116,7 +126,8 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                 "res/actions/scaleHeight_black.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions())
       .SetFunctionName("SetHeight")
       .SetGetter("GetHeight");
 
@@ -129,7 +140,8 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/scaleHeight_black.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions())
       .SetFunctionName("SetHeight")
       .SetGetter("GetHeight");
 
@@ -143,7 +155,10 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
 
       .SetHidden()  // Deprecated
       .AddParameter("object", _("Object"), "PanelSprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Angle (in degrees)")))
       .SetFunctionName("SetAngle")
       .SetGetter("GetAngle");
 
@@ -157,7 +172,10 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
 
       .SetHidden()  // Deprecated
       .AddParameter("object", _("Object"), "PanelSprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Angle to compare to (in degrees)")))
       .SetFunctionName("SetAngle")
       .SetGetter("GetAngle");
 

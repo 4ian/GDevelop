@@ -120,7 +120,10 @@ export const declareObjectMetadata = (
       'res/actions/scale_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
-    .useStandardOperatorParameters('number')
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('setWidth')
@@ -139,7 +142,10 @@ export const declareObjectMetadata = (
     )
     .setHidden()
     .addParameter('object', i18n._('Object'), objectType)
-    .useStandardOperatorParameters('number')
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('setWidth')
@@ -156,7 +162,10 @@ export const declareObjectMetadata = (
       'res/actions/scale_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
-    .useStandardOperatorParameters('number')
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('setHeight')
@@ -175,7 +184,10 @@ export const declareObjectMetadata = (
     )
     .setHidden()
     .addParameter('object', i18n._('Object'), objectType)
-    .useStandardOperatorParameters('number')
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('setHeight')
@@ -192,7 +204,10 @@ export const declareObjectMetadata = (
       'res/actions/scale_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
-    .useStandardOperatorParameters('number')
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('setScale')
@@ -211,7 +226,10 @@ export const declareObjectMetadata = (
     )
     .setHidden()
     .addParameter('object', i18n._('Object'), objectType)
-    .useStandardOperatorParameters('number')
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('setScale')
@@ -228,7 +246,7 @@ export const declareObjectMetadata = (
       'res/actions/scaleWidth24_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
-    .useStandardParameters('number')
+    .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
     .markAsAdvanced()
     .setFunctionName('setScaleX')
     .setGetter('getScaleX');
@@ -244,7 +262,7 @@ export const declareObjectMetadata = (
       'res/actions/scaleHeight24_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
-    .useStandardParameters('number')
+    .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
     .markAsAdvanced()
     .setFunctionName('setScaleY')
     .setGetter('getScaleY');
@@ -389,7 +407,7 @@ export const declareObjectMetadata = (
       'res/conditions/opacity24.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
-    .useStandardParameters('number')
+    .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
     .setFunctionName('setOpacity')
     .setGetter('getOpacity');
 
@@ -889,6 +907,9 @@ const declarePropertyInstructionAndExpression = (
       .getCodeExtraInformation()
       .setFunctionName(setterName);
   } else {
+    const typeExtraInfo = getStringifiedExtraInfo(property);
+    const parameterOptions = gd.ParameterOptions.makeNewOptions();
+    if (typeExtraInfo) parameterOptions.setTypeExtraInfo(typeExtraInfo);
     addObjectAndBehaviorParameters(
       entityMetadata.addExpressionAndConditionAndAction(
         gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
@@ -902,7 +923,7 @@ const declarePropertyInstructionAndExpression = (
     )
       .useStandardParameters(
         gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
-        getStringifiedExtraInfo(property)
+        parameterOptions
       )
       .setFunctionName(setterName)
       .setGetter(getterName);
@@ -1161,14 +1182,24 @@ export const declareEventsFunctionParameters = (
   );
 
   if (functionType === gd.EventsFunction.ExpressionAndCondition) {
-    ((instructionOrExpression: any): gdMultipleInstructionMetadata).useStandardParameters(
+    const options = gd.ParameterOptions.makeNewOptions();
+    if (eventsFunction) {
+      const extraInfo = eventsFunction.getExpressionType().getExtraInfo();
+      if (extraInfo) options.setExtraInfo(extraInfo);
+    }
+    (instructionOrExpression: gdMultipleInstructionMetadata).useStandardParameters(
       eventsFunction ? eventsFunction.getExpressionType().getName() : 'string',
-      eventsFunction ? eventsFunction.getExpressionType().getExtraInfo() : ''
+      options
     );
   } else if (functionType === gd.EventsFunction.ActionWithOperator) {
-    ((instructionOrExpression: any): gdInstructionMetadata).useStandardOperatorParameters(
+    const options = gd.ParameterOptions.makeNewOptions();
+    if (getterFunction) {
+      const extraInfo = getterFunction.getExpressionType().getExtraInfo();
+      if (extraInfo) options.setExtraInfo(extraInfo);
+    }
+    (instructionOrExpression: gdInstructionMetadata).useStandardOperatorParameters(
       getterFunction ? getterFunction.getExpressionType().getName() : 'string',
-      getterFunction ? getterFunction.getExpressionType().getExtraInfo() : ''
+      options
     );
   }
 

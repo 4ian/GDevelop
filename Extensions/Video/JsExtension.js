@@ -202,14 +202,19 @@ module.exports = {
       .addAction(
         'SetTime',
         _('Set time'),
-        _('Set the time of the video object in seconds'),
+        _('Set the time of the video'),
         _('the time'),
         '',
         'JsPlatform/Extensions/videoicon24.png',
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardOperatorParameters('number')
+      .useStandardOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Position (in seconds)')
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('setCurrentTime')
       .setGetter('getCurrentTime');
@@ -218,16 +223,17 @@ module.exports = {
       .addAction(
         'SetVolume',
         _('Set volume'),
-        _(
-          'Set the volume of the video object, between 0 (muted) and 100 (maximum).'
-        ),
+        _('Set the volume of the video object.'),
         _('the volume'),
         '',
         'JsPlatform/Extensions/videoicon24.png',
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardOperatorParameters('number')
+      .useStandardOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Volume (0-100)'))
+      )
       .getCodeExtraInformation()
       .setFunctionName('setVolume')
       .setGetter('getVolume');
@@ -299,7 +305,12 @@ module.exports = {
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardRelationalOperatorParameters('number')
+      .useStandardRelationalOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Volume to compare to (0-100)')
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('getVolume');
 
@@ -352,7 +363,12 @@ module.exports = {
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardRelationalOperatorParameters('number')
+      .useStandardRelationalOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Duration to compare to (in seconds)')
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('getDuration');
 
@@ -367,7 +383,12 @@ module.exports = {
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardRelationalOperatorParameters('number')
+      .useStandardRelationalOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Time to compare to (in seconds)')
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('getCurrentTime');
 
@@ -389,16 +410,19 @@ module.exports = {
       .addAction(
         'SetOpacity',
         _('Set opacity'),
-        _(
-          'Set opacity of the specified video object, between 0 (fully transparent) and 255 (opaque).'
-        ),
+        _('Set opacity of the specified video object.'),
         _('the opacity'),
         '',
         'JsPlatform/Extensions/videoicon24.png',
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardOperatorParameters('number')
+      .useStandardOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Opacity (0-255)')
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('setOpacity')
       .setGetter('getOpacity');
@@ -414,7 +438,12 @@ module.exports = {
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardRelationalOperatorParameters('number')
+      .useStandardRelationalOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Opacity to compare to (0-255)')
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('getOpacity');
 
@@ -443,7 +472,12 @@ module.exports = {
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardOperatorParameters('number')
+      .useStandardOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Playback speed (1 by default)')
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('setPlaybackSpeed')
       .setGetter('getPlaybackSpeed');
@@ -459,7 +493,12 @@ module.exports = {
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardRelationalOperatorParameters('number')
+      .useStandardRelationalOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Playback speed (1 by default)')
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('getPlaybackSpeed');
 

@@ -134,7 +134,7 @@ export namespace LDtkPixiHelper {
       const rect = new PIXI.Rectangle(0, 0, level.pxWid, level.pxHei);
       const texture = new PIXI.Texture(atlasTexture!, rect);
 
-      textureCache.setImage(level.bgRelPath, texture);
+      textureCache.setLevelBackgroundTexture(level.bgRelPath, texture);
     }
 
     return textureCache;

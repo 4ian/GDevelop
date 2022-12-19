@@ -9,11 +9,11 @@ import PIXI = GlobalPIXIModule.PIXI;
  * and used by {@link PixiTileMapHelper.updatePixiTileMap}.
  */
 export class TileTextureCache {
-  private readonly _images: Map<string, PIXI.Texture>;
+  private readonly _levelBackgroundTextures: Map<string, PIXI.Texture>;
   private readonly _textures: Map<integer, PIXI.Texture>;
 
   constructor() {
-    this._images = new Map();
+    this._levelBackgroundTextures = new Map();
     this._textures = new Map();
   }
 
@@ -31,11 +31,11 @@ export class TileTextureCache {
     return this._textures.get(tileId);
   }
 
-  getImage(name: string): PIXI.Texture | undefined {
-    return this._images.get(name);
+  getLevelBackgroundTexture(name: string): PIXI.Texture | undefined {
+    return this._levelBackgroundTextures.get(name);
   }
 
-  setImage(name: string, texture: PIXI.Texture): void {
-    this._images.set(name, texture);
+  setLevelBackgroundTexture(name: string, texture: PIXI.Texture): void {
+    this._levelBackgroundTextures.set(name, texture);
   }
 }

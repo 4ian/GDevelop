@@ -7,10 +7,10 @@ import PIXI = GlobalPIXIModule.PIXI;
  * and used by {@link PixiTileMapHelper.updatePixiTileMap}.
  */
 export declare class TileTextureCache {
-  private readonly _images;
+  private readonly _levelBackgroundTextures;
   private readonly _textures;
   constructor();
-  getImage(name: string): PIXI.Texture | undefined;
+  setTexture(tileId: integer, texture: PIXI.Texture): void;
   /**
    * Return the texture to use for the tile with the specified id.
    *
@@ -18,7 +18,7 @@ export declare class TileTextureCache {
    * @returns The texture for the given tile identifier.
    */
   getTexture(tileId: integer): PIXI.Texture | undefined;
-  setImage(name: string, texture: PIXI.Texture): void;
-  setTexture(tileId: integer, texture: PIXI.Texture): void;
+  getLevelBackgroundTexture(name: string): PIXI.Texture | undefined;
+  setLevelBackgroundTexture(name: string, texture: PIXI.Texture): void;
 }
 //# sourceMappingURL=TileTextureCache.d.ts.map

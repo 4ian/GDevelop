@@ -79,7 +79,7 @@ export namespace PixiTileMapHelper {
 
     const bgResourceName = tileMap.getBackgroundResourceName();
     if (bgResourceName) {
-      const texture = textureCache.getImage(bgResourceName);
+      const texture = textureCache.getLevelBackgroundTexture(bgResourceName);
       pixiTileMap.tile(texture, 0, 0);
     }
 

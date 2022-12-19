@@ -57,11 +57,11 @@ const ColorField = ({
 
   const handleBlur = () => {
     // change alpha value to be within allowed limits (0-1)
-    let newAlpha = parseFloat(alpha);
+    let newAlpha = parseFloat(alphaValue);
     if (newAlpha < 0) newAlpha = 0;
     if (newAlpha > 1) newAlpha = 1;
     setAlphaValue(newAlpha);
-    onChange(color, newAlpha);
+    onChange(colorValue, newAlpha);
   };
 
   const handlePickerChange = (color: ColorResult) => {

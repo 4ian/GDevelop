@@ -327,13 +327,13 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
     shell.sed(
       '-i',
       /setKind\(kind: string\): void/,
-      "setKind(kind: 'image' | 'audio' | 'font' | 'video' | 'json'): void",
+      "setKind(kind: 'image' | 'audio' | 'font' | 'video' | 'json' | 'tilemap'): void",
       'types/gdresource.js'
     );
     shell.sed(
       '-i',
       /getKind\(\): string/,
-      "getKind(): 'image' | 'audio' | 'font' | 'video' | 'json'",
+      "getKind(): 'image' | 'audio' | 'font' | 'video' | 'json' | 'tilemap'",
       'types/gdresource.js'
     );
 

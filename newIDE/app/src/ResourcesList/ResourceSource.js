@@ -4,6 +4,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { t } from '@lingui/macro';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
+import { listTileMapEmbeddedFiles } from './EmbeddedResourceSources';
 import { type ResourceExternalEditor } from './ResourceExternalEditor.flow';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 
@@ -17,6 +18,7 @@ export type ResourceKind =
   | 'font'
   | 'video'
   | 'json'
+  | 'tilemap'
   | 'bitmapFont';
 
 export const allResourceKindsAndMetadata = [
@@ -25,38 +27,60 @@ export const allResourceKindsAndMetadata = [
     displayName: t`Audio`,
     fileExtensions: ['aac', 'wav', 'mp3', 'ogg'],
     createNewResource: () => new gd.AudioResource(),
+    listEmbeddedFiles: null,
   },
   {
     kind: 'image',
     displayName: t`Image`,
     fileExtensions: ['png', 'jpg', 'jpeg', 'webp'],
     createNewResource: () => new gd.ImageResource(),
+    listEmbeddedFiles: null,
   },
   {
     kind: 'font',
     displayName: t`Font`,
     fileExtensions: ['ttf', 'otf'],
     createNewResource: () => new gd.FontResource(),
+    listEmbeddedFiles: null,
   },
   {
     kind: 'video',
     displayName: t`Video`,
     fileExtensions: ['mp4', 'webm'],
     createNewResource: () => new gd.VideoResource(),
+    listEmbeddedFiles: null,
   },
   {
     kind: 'json',
     displayName: t`Json`,
     fileExtensions: ['json'],
     createNewResource: () => new gd.JsonResource(),
+    listEmbeddedFiles: listTileMapEmbeddedFiles,
+  },
+  {
+    kind: 'tilemap',
+    displayName: t`Tile Map`,
+    fileExtensions: ['json', 'ldtk'],
+    createNewResource: () => new gd.TilemapResource(),
+    listEmbeddedFiles: listTileMapEmbeddedFiles,
   },
   {
     kind: 'bitmapFont',
     displayName: t`Bitmap Font`,
     fileExtensions: ['fnt', 'xml'],
     createNewResource: () => new gd.BitmapFontResource(),
+    listEmbeddedFiles: null,
   },
 ];
+
+const constructors = {};
+for (const { kind, createNewResource } of allResourceKindsAndMetadata) {
+  constructors[kind] = createNewResource;
+}
+
+export function createNewResource(kind: string): ?gdResource {
+  return constructors[kind] ? constructors[kind]() : null;
+}
 
 export type ChooseResourceOptions = {|
   initialSourceName: string,

@@ -32,6 +32,7 @@ const resourceKindToInputAcceptedFiles = {
   font: 'font/ttf,font/otf',
   video: 'video/mp4,video/webm',
   json: 'application/json',
+  tilemap: 'application/json',
   bitmapFont: '.fnt,.xml',
 };
 

@@ -216,7 +216,7 @@ module.exports = {
           gdObject
             .addAction(
               `Set${property.functionName}`,
-              property.paramLabel,
+              property.instructionLabel,
               property.actionDescription,
               property.actionSentence,
               '',
@@ -224,7 +224,12 @@ module.exports = {
               property.iconPath
             )
             .addParameter('object', objectName, objectName, false)
-            .useStandardOperatorParameters(parameterType)
+            .useStandardOperatorParameters(
+              parameterType,
+              gd.ParameterOptions.makeNewOptions().setDescription(
+                property.paramLabel
+              )
+            )
             .getCodeExtraInformation()
             .setFunctionName(`set${property.functionName}`)
             .setGetter(`get${property.functionName}`);
@@ -232,7 +237,7 @@ module.exports = {
           gdObject
             .addAction(
               `Set${property.functionName}`,
-              property.paramLabel,
+              property.instructionLabel,
               property.actionDescription,
               property.actionSentence,
               '',
@@ -260,7 +265,7 @@ module.exports = {
           gdObject
             .addCondition(
               `Is${property.functionName}`,
-              property.paramLabel,
+              property.instructionLabel,
               property.conditionDescription,
               property.conditionSentence,
               '',
@@ -268,14 +273,19 @@ module.exports = {
               property.iconPath
             )
             .addParameter('object', objectName, objectName, false)
-            .useStandardRelationalOperatorParameters(parameterType)
+            .useStandardRelationalOperatorParameters(
+              parameterType,
+              gd.ParameterOptions.makeNewOptions().setDescription(
+                property.paramLabel
+              )
+            )
             .getCodeExtraInformation()
             .setFunctionName(`get${property.functionName}`);
         } else if (parameterType === 'yesorno') {
           gdObject
             .addCondition(
               `Is${property.functionName}`,
-              property.paramLabel,
+              property.instructionLabel,
               property.conditionDescription,
               property.conditionSentence,
               '',
@@ -294,7 +304,8 @@ module.exports = {
         functionName: 'BBText',
         iconPath: 'res/actions/text24_black.png',
         type: 'string',
-        paramLabel: _('BBCode text'),
+        instructionLabel: _('BBCode text'),
+        paramLabel: _('Text'),
         conditionDescription: _('Compare the value of the BBCode text.'),
         conditionSentence: _('the BBCode text'),
         actionDescription: _('Set BBCode text'),
@@ -306,7 +317,8 @@ module.exports = {
         functionName: 'Color',
         iconPath: 'res/actions/color24.png',
         type: 'color',
-        paramLabel: _('Color'),
+        instructionLabel: _('Color'),
+        paramLabel: _('Color (R;G;B)'),
         conditionDescription: '', // No conditions for a "color" property
         conditionSentence: '', // No conditions for a "color" property
         actionDescription: _('Set base color'),
@@ -318,7 +330,8 @@ module.exports = {
         functionName: 'Opacity',
         iconPath: 'res/actions/opacity24.png',
         type: 'number',
-        paramLabel: _('Opacity'),
+        instructionLabel: _('Opacity'),
+        paramLabel: _('Opacity (0-255)'),
         conditionDescription: _(
           'Compare the value of the base opacity of the text.'
         ),
@@ -332,6 +345,7 @@ module.exports = {
         functionName: 'FontSize',
         iconPath: 'res/actions/characterSize24.png',
         type: 'number',
+        instructionLabel: _('Font size'),
         paramLabel: _('Font size'),
         conditionDescription: _('Compare the base font size of the text.'),
         conditionSentence: _('the base font size'),
@@ -344,6 +358,7 @@ module.exports = {
         functionName: 'FontFamily',
         iconPath: 'res/actions/font24.png',
         type: 'string',
+        instructionLabel: _('Font family'),
         paramLabel: _('Font family'),
         conditionDescription: _('Compare the value of font family'),
         conditionSentence: _('the base font family'),
@@ -356,6 +371,7 @@ module.exports = {
         functionName: 'Alignment',
         iconPath: 'res/actions/textAlign24.png',
         type: 'stringWithSelector',
+        instructionLabel: _('Alignment'),
         paramLabel: _('Alignment'),
         options: ['left', 'right', 'center'],
         conditionDescription: _('Check the current text alignment.'),
@@ -369,6 +385,7 @@ module.exports = {
         functionName: 'WordWrap',
         iconPath: 'res/actions/scaleWidth24_black.png',
         type: 'boolean',
+        instructionLabel: _('Word wrap'),
         paramLabel: _('Word wrap'),
         conditionDescription: _('Check if word wrap is enabled.'),
         conditionSentence: _('Word wrap is enabled'),
@@ -381,6 +398,7 @@ module.exports = {
         functionName: 'WrappingWidth',
         iconPath: 'res/actions/scaleWidth24_black.png',
         type: 'number',
+        instructionLabel: _('Wrapping width'),
         paramLabel: _('Wrapping width'),
         conditionDescription: _(
           'Compare the width, in pixels, after which the text is wrapped on next line.'
@@ -510,8 +528,7 @@ module.exports = {
      * This is called to update the PIXI object on the scene editor
      */
     RenderedBBTextInstance.prototype.update = function () {
-      const properties = this._associatedObjectConfiguration
-        .getProperties();
+      const properties = this._associatedObjectConfiguration.getProperties();
 
       const rawText = properties.get('text').getValue();
       if (rawText !== this._pixiObject.text) {

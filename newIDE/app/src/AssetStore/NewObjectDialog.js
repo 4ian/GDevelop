@@ -177,7 +177,7 @@ export default function NewObjectDialog({
             const canUserInstallPrivateAsset = await canInstallPrivateAsset();
             if (!canUserInstallPrivateAsset) {
               await showAlert({
-                title: t`Save your project to install premium assets`,
+                title: t`Save your project`,
                 message: t`You need to save this project as a cloud project to install this asset. Please save your project and try again.`,
               });
               setIsAssetBeingInstalled(false);

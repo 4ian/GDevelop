@@ -17,8 +17,8 @@ export class TileTextureCache {
     this._textures = new Map();
   }
 
-  getImage(name: string): PIXI.Texture | undefined {
-    return this._images.get(name);
+  setTexture(tileId: integer, texture: PIXI.Texture): void {
+    this._textures.set(tileId, texture);
   }
 
   /**
@@ -31,11 +31,11 @@ export class TileTextureCache {
     return this._textures.get(tileId);
   }
 
-  setImage(name: string, texture: PIXI.Texture): void {
-    this._images.set(name, texture);
+  getImage(name: string): PIXI.Texture | undefined {
+    return this._images.get(name);
   }
 
-  setTexture(tileId: integer, texture: PIXI.Texture): void {
-    this._textures.set(tileId, texture);
+  setImage(name: string, texture: PIXI.Texture): void {
+    this._images.set(name, texture);
   }
 }

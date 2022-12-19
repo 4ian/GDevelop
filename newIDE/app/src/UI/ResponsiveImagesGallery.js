@@ -18,23 +18,30 @@ const styles = {
     // the 16:9 ratio.
     aspectRatio: '16 / 9',
     objectFit: 'cover',
+    borderRadius: 8,
   },
   carouselItem: {
+    display: 'inline-block',
     outlineOffset: -1,
+    borderRadius: 4,
   },
   imageCarouselItem: {
     height: 80,
     aspectRatio: '16 / 9',
     display: 'block',
+    borderRadius: 4,
   },
   mobileImageCarouselItem: {
     aspectRatio: '16 / 9',
     display: 'block',
+    borderRadius: 8,
   },
-  grid: {
-    width: '100%',
+  desktopGallery: {
+    flex: 1,
+    display: 'grid',
+    grid: 'auto / auto-flow max-content',
     overflowX: 'scroll',
-    overflowY: 'hidden',
+    gap: '8px',
   },
   mobileGrid: {
     overflowX: 'scroll',
@@ -206,18 +213,17 @@ const ResponsiveImagesGallery = ({
           String(selectedImageIndex + 1)
         )}
       />
-      <Grid
-        classes={classesForGridContainer}
-        container
-        spacing={GRID_SPACING}
-        wrap="nowrap"
-        style={styles.grid}
-      >
+      <div style={styles.desktopGallery}>
         {imagesUrls.map((url, index) => (
-          <Grid
-            item
+          <div
             key={url}
+            onClick={() => setSelectedImageIndex(index)}
             tabIndex={0}
+            style={{
+              ...styles.carouselItem,
+              outline:
+                index === selectedImageIndex ? 'solid 1px white' : undefined,
+            }}
             onKeyPress={(
               event: SyntheticKeyboardEvent<HTMLLIElement>
             ): void => {
@@ -226,26 +232,17 @@ const ResponsiveImagesGallery = ({
               }
             }}
           >
-            <CardMedia
-              onClick={() => setSelectedImageIndex(index)}
-              style={{
-                ...styles.carouselItem,
-                outline:
-                  index === selectedImageIndex ? 'solid 1px white' : undefined,
-              }}
-            >
-              <CorsAwareImage
-                src={url}
-                style={styles.imageCarouselItem}
-                alt={altTextTemplate.replace(
-                  /{imageIndex}/g,
-                  (index + 1).toString()
-                )}
-              />
-            </CardMedia>
-          </Grid>
+            <CorsAwareImage
+              src={url}
+              style={styles.imageCarouselItem}
+              alt={altTextTemplate.replace(
+                /{imageIndex}/g,
+                (index + 1).toString()
+              )}
+            />
+          </div>
         ))}
-      </Grid>
+      </div>
     </ColumnStackLayout>
   );
 };

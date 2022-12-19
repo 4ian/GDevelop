@@ -24,7 +24,6 @@ export const PublicAsset = () => {
   return (
     <AssetStoreStateProvider>
       <AssetDetails
-        project={testProject.project}
         onTagSelection={() => {}}
         assetShortHeader={fakeAssetShortHeader}
         onOpenDetails={assetShortHeader => {}}
@@ -50,7 +49,6 @@ export const PrivateAsset = () => (
   <PublicProfileProvider>
     <AssetStoreStateProvider>
       <AssetDetails
-        project={testProject.project}
         onTagSelection={() => {}}
         assetShortHeader={fakeAssetShortHeader}
         onOpenDetails={assetShortHeader => {}}

@@ -291,7 +291,7 @@ const PrivateAssetPackPurchaseDialog = ({
         subtitle: (
           <Trans>
             The asset pack {privateAssetPackListingData.name} will be linked to
-            your account {profile.email}
+            your account {profile.email}.
           </Trans>
         ),
         content: (

@@ -252,6 +252,7 @@ export type Props = {|
   initialDialog?: string,
   initialGameId?: string,
   initialGamesDashboardTab?: string,
+  initialAssetPackUserFriendlySlug?: string,
   introDialog?: React.Element<*>,
   renderMainMenu?: (BuildMainMenuProps, MainMenuCallbacks) => React.Node,
   renderPreviewLauncher?: (
@@ -442,6 +443,7 @@ const MainFrame = (props: Props) => {
     initialDialog,
     initialGameId,
     initialGamesDashboardTab,
+    initialAssetPackUserFriendlySlug,
     initialFileMetadataToOpen,
     introDialog,
     i18n,
@@ -553,6 +555,7 @@ const MainFrame = (props: Props) => {
       initialDialog,
       initialGameId,
       initialGamesDashboardTab,
+      initialAssetPackUserFriendlySlug,
     },
     actions: {
       openOnboardingDialog: () => {
@@ -1583,12 +1586,13 @@ const MainFrame = (props: Props) => {
           key: 'start page',
           extraEditorProps: {
             storageProviders: props.storageProviders,
+            initialTab: initialDialog === 'asset-store' ? 'shop' : null,
           },
           closable: false,
         }),
       }));
     },
-    [setState, i18n, props.storageProviders]
+    [setState, i18n, initialDialog, props.storageProviders]
   );
 
   const _openDebugger = React.useCallback(

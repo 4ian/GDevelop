@@ -177,8 +177,8 @@ export default function NewObjectDialog({
             const canUserInstallPrivateAsset = await canInstallPrivateAsset();
             if (!canUserInstallPrivateAsset) {
               await showAlert({
-                title: t`No cloud project`,
-                message: t`You need to save this project as a cloud project to install this asset. Save your project and try again!`,
+                title: t`Save your project`,
+                message: t`You need to save this project as a cloud project to install this asset. Please save your project and try again.`,
               });
               setIsAssetBeingInstalled(false);
               return;
@@ -347,9 +347,7 @@ export default function NewObjectDialog({
           />
         }
       >
-        {currentTab === 'asset-store' && (
-          <AssetStore ref={assetStore} project={project} />
-        )}
+        {currentTab === 'asset-store' && <AssetStore ref={assetStore} />}
         {currentTab === 'new-object' && (
           <ScrollView>
             {DismissableTutorialMessage && (
@@ -396,6 +394,7 @@ export default function NewObjectDialog({
           project={project}
           objectsContainer={objectsContainer}
           onObjectAddedFromAsset={onObjectAddedFromAsset}
+          canInstallPrivateAsset={canInstallPrivateAsset}
           resourceManagementProps={resourceManagementProps}
         />
       )}

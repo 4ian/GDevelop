@@ -33,6 +33,11 @@ import {
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
 import shuffle from 'lodash/shuffle';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import {
+  getAssetPackFromUserFriendlySlug,
+  getPrivateAssetPackListingData,
+} from './AssetStoreUtils';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 const defaultSearchText = '';
 
@@ -74,6 +79,7 @@ type AssetStoreState = {|
     chosenFilters: ?Set<string>,
     searchFilters: Array<SearchFilter<AssetShortHeader>>
   ) => ?Array<AssetShortHeader>,
+  setInitialPackUserFriendlySlug: (initialPackUserFriendlySlug: string) => void,
 |};
 
 export const AssetStoreContext = React.createContext<AssetStoreState>({
@@ -105,20 +111,21 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     setLicenseFilter: filter => {},
   },
   navigationState: {
-    previousPages: [assetStoreHomePageState],
     getCurrentPage: () => assetStoreHomePageState,
     backToPreviousPage: () => {},
     openHome: () => {},
     clearHistory: () => {},
     openSearchIfNeeded: () => {},
     activateTextualSearch: () => {},
-    openTagPage: string => {},
-    openPackPage: AssetPack => {},
-    openDetailPage: stAssetShortHeaderring => {},
+    openTagPage: tag => {},
+    openPackPage: assetPack => {},
+    openDetailPage: assetShortHeader => {},
+    openPrivateAssetPackInformationPage: privateAssetPackListingData => {},
   },
   currentPage: assetStoreHomePageState,
   useSearchItem: (searchText, chosenCategory, chosenFilters, searchFilters) =>
     null,
+  setInitialPackUserFriendlySlug: (initialPackUserFriendlySlug: string) => {},
 });
 
 type AssetStoreStateProviderProps = {|
@@ -151,7 +158,7 @@ export const AssetStoreStateProvider = ({
     publicAssetShortHeaders,
     setPublicAssetShortHeaders,
   ] = React.useState<?Array<AssetShortHeader>>(null);
-  const { receivedAssetShortHeaders } = React.useContext(
+  const { receivedAssetShortHeaders, receivedAssetPacks } = React.useContext(
     AuthenticatedUserContext
   );
   const [filters, setFilters] = React.useState<?Filters>(null);
@@ -171,6 +178,9 @@ export const AssetStoreStateProvider = ({
   const [licenses, setLicenses] = React.useState<?Array<License>>(null);
   const [environment, setEnvironment] = React.useState<Environment>('live');
   const [error, setError] = React.useState<?Error>(null);
+  const initialPackUserFriendlySlug = React.useRef<?string>(null);
+  const initialPackOpened = React.useRef<boolean>(false);
+  const { showAlert } = useAlertDialog();
 
   const [searchText, setSearchText] = React.useState(defaultSearchText);
   const navigationState = useNavigation();
@@ -292,6 +302,63 @@ export const AssetStoreStateProvider = ({
     [publicAssetShortHeaders, receivedAssetShortHeaders]
   );
 
+  // When the asset packs (public and received private packs) are loaded,
+  // open the asset pack with the slug that was asked to be initially loaded.
+  React.useEffect(
+    () => {
+      if (initialPackOpened.current) {
+        // The pack was already opened, don't re-open it again even
+        // if the effect run again.
+        return;
+      }
+
+      const userFriendlySlug = initialPackUserFriendlySlug.current;
+      if (
+        publicAssetPacks &&
+        receivedAssetPacks &&
+        privateAssetPacks &&
+        userFriendlySlug
+      ) {
+        initialPackOpened.current = true;
+
+        // Try to first find a public or received asset pack.
+        const assetPack = getAssetPackFromUserFriendlySlug({
+          publicAssetPacks,
+          receivedAssetPacks,
+          userFriendlySlug,
+        });
+
+        if (assetPack) {
+          navigationState.openPackPage(assetPack);
+          return;
+        }
+
+        // Otherwise, try to open the information page of a pack not yet bought.
+        const privateAssetPack = getPrivateAssetPackListingData({
+          privateAssetPacks,
+          userFriendlySlug,
+        });
+
+        if (privateAssetPack) {
+          navigationState.openPrivateAssetPackInformationPage(privateAssetPack);
+          return;
+        }
+
+        showAlert({
+          title: `Asset pack not found`,
+          message: `The link to the asset pack you've followed seems outdated. Why not take a look at the other packs in the asset store?`,
+        });
+      }
+    },
+    [
+      publicAssetPacks,
+      receivedAssetPacks,
+      privateAssetPacks,
+      navigationState,
+      showAlert,
+    ]
+  );
+
   React.useEffect(
     () => {
       // the callback fetchAssetsAndFilters depends on the environment,
@@ -329,6 +396,13 @@ export const AssetStoreStateProvider = ({
     chosenCategory,
     chosenFilters,
     searchFilters
+  );
+
+  const setInitialPackUserFriendlySlug = React.useCallback(
+    (newInitialPackUserFriendlySlug: string) => {
+      initialPackUserFriendlySlug.current = newInitialPackUserFriendlySlug;
+    },
+    []
   );
 
   const assetStoreState = React.useMemo(
@@ -376,6 +450,7 @@ export const AssetStoreStateProvider = ({
           chosenFilters,
           searchFilters
         ),
+      setInitialPackUserFriendlySlug,
     }),
     [
       searchResults,
@@ -400,6 +475,7 @@ export const AssetStoreStateProvider = ({
       licenseFilter,
       setLicenseFilter,
       assetShortHeadersById,
+      setInitialPackUserFriendlySlug,
     ]
   );
 

@@ -89,12 +89,16 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       getLabel: () => this.props.i18n._(t`Lock position/angle in the editor`),
       valueType: 'boolean',
       getValue: (instance: gdInitialInstance) => instance.isLocked(),
-      setValue: (instance: gdInitialInstance, newValue: boolean) =>
-        instance.setLocked(newValue),
+      setValue: (instance: gdInitialInstance, newValue: boolean) => {
+        instance.setLocked(newValue);
+        if (!newValue) {
+          instance.setSealed(newValue);
+        }
+      },
     },
     {
       name: 'Prevent instance selection',
-      getLabel: () => this.props.i18n._(t`Prevent selection in the canvas`),
+      getLabel: () => this.props.i18n._(t`Prevent selection in the editor`),
       valueType: 'boolean',
       disabled: (instances: gdInitialInstance[]) => {
         return instances.some(instance => !instance.isLocked());

@@ -45,7 +45,9 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                 "res/actions/text_black.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters("string")
+      .UseStandardOperatorParameters(
+          "string",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(_("Text")))
       .SetFunctionName("SetString")
       .SetGetter("GetString");
 
@@ -58,7 +60,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/text_black.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardRelationalOperatorParameters("string")
+      .UseStandardRelationalOperatorParameters(
+          "string",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Text to compare to")))
       .SetFunctionName("GetString");
 
   obj.AddAction("Font",
@@ -82,7 +87,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/scaleWidth_black.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale to compare to (1 by default)")))
       .SetFunctionName("GetScaleX");
 
   obj.AddAction(
@@ -95,7 +103,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
          "res/actions/scaleWidth_black.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
       .SetFunctionName("SetScaleX");
 
   obj.AddCondition("ScaleY",
@@ -107,7 +118,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/scaleHeight_black.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale to compare to (1 by default)")))
       .SetFunctionName("GetScaleY");
 
   obj.AddAction(
@@ -120,7 +134,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
          "res/actions/scaleHeight_black.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
       .SetFunctionName("SetScaleY");
 
   obj.AddAction(
@@ -133,7 +150,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
          "res/actions/scale_black.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
       .SetFunctionName("SetScale");
 
   obj.AddAction(
@@ -218,7 +238,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                 "res/actions/opacity.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity (0-255)")))
       .SetFunctionName("SetOpacity")
       .SetGetter("GetOpacity");
 
@@ -232,7 +255,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/opacity.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity to compare to (0-255)")))
       .SetFunctionName("GetOpacity");
 
   obj.AddAction("SetSmooth",
@@ -336,7 +362,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                 "res/actions/rotate_black.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Angle (in degrees)")))
       .SetFunctionName("SetAngle")
       .SetGetter("GetAngle");
 
@@ -349,7 +378,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/rotate_black.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Angle to compare to (in degrees)")))
       .SetFunctionName("GetAngle");
 
   obj.AddCondition("Padding",
@@ -363,7 +395,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/textPadding_black.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardRelationalOperatorParameters("number");
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions());
 
   obj.AddAction("SetPadding",
                 _("Padding"),
@@ -376,7 +409,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                 "res/actions/textPadding_black.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters("number");
+      .UseStandardOperatorParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions());
 
   obj.AddAction("SetTextAlignment",
                 _("Alignment"),
@@ -403,7 +437,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/textAlign.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardRelationalOperatorParameters("string");
+      .UseStandardRelationalOperatorParameters(
+          "string",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Alignment (\"left\", \"center\", \"right\")")));
 
   obj.AddAction(
          "SetWrapping",
@@ -437,7 +474,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                 "res/actions/wordWrap_black.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters("number");
+      .UseStandardOperatorParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions());
 
   obj.AddCondition("WrappingWidth",
                    _("Wrapping width"),
@@ -448,7 +486,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/wordWrap_black.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardRelationalOperatorParameters("number");
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions());
 
   obj.AddExpression("Padding",
                     _("Padding"),
@@ -497,7 +536,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                                          "",
                                          "res/conditions/characterSize24.png")
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardParameters("number");
+      .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions());
 
   // Support for deprecated "Size" actions/conditions:
   obj.AddDuplicatedAction("Size", "Text::SetFontSize").SetHidden();

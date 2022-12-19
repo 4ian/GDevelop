@@ -39,7 +39,9 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
                 "CppPlatform/Extensions/textentryicon.png")
 
       .AddParameter("object", _("Object"), "TextEntry")
-      .UseStandardOperatorParameters("string")
+      .UseStandardOperatorParameters(
+          "string",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(_("Text")))
       .SetFunctionName("SetString")
       .SetGetter("GetString");
 
@@ -52,7 +54,9 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
                    "CppPlatform/Extensions/textentryicon.png")
 
       .AddParameter("object", _("Object"), "TextEntry")
-      .UseStandardRelationalOperatorParameters("string")
+      .UseStandardRelationalOperatorParameters(
+          "string",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(_("Text to compare to")))
       .SetFunctionName("GetString");
 
   obj.AddAction(

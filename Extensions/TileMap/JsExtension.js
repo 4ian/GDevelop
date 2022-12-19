@@ -311,7 +311,10 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .useStandardRelationalOperatorParameters('number')
+    .useStandardRelationalOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
     .getCodeExtraInformation()
     .setFunctionName('getLayerIndex');
 
@@ -326,7 +329,10 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .useStandardOperatorParameters('number')
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
     .getCodeExtraInformation()
     .setFunctionName('setLayerIndex')
     .setGetter('getLayerIndex');
@@ -354,7 +360,12 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .useStandardRelationalOperatorParameters('number')
+    .useStandardRelationalOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Speed scale to compare to (1 by default)')
+      )
+    )
     .getCodeExtraInformation()
     .setFunctionName('getAnimationSpeedScale');
 
@@ -362,14 +373,19 @@ const defineTileMap = function (
     .addAction(
       'SetAnimationSpeedScale',
       _('Animation speed scale'),
-      _('Set the animation speed scale of the Tilemap (1 by default).'),
+      _('Set the animation speed scale of the Tilemap.'),
       _('the animation speed scale'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .useStandardOperatorParameters('number')
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Speed scale (1 by default)')
+      )
+    )
     .getCodeExtraInformation()
     .setFunctionName('setAnimationSpeedScale')
     .setGetter('getAnimationSpeedScale');
@@ -390,14 +406,19 @@ const defineTileMap = function (
     .addCondition(
       'AnimationFps',
       _('Animation speed (FPS)'),
-      _('Compare the animation speed (in frames per second).'),
+      _('Compare the animation speed.'),
       _('the animation speed (FPS)'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .useStandardRelationalOperatorParameters('number')
+    .useStandardRelationalOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Animation speed to compare to (in frames per second)')
+      )
+    )
     .getCodeExtraInformation()
     .setFunctionName('getAnimationFps');
 
@@ -405,14 +426,19 @@ const defineTileMap = function (
     .addAction(
       'SetAnimationFps',
       _('Animation speed (FPS)'),
-      _('Set the animation speed (in frames per second) of the Tilemap.'),
+      _('Set the animation speed of the Tilemap.'),
       _('the animation speed (FPS)'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .useStandardOperatorParameters('number')
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Animation speed (in frames per second)')
+      )
+    )
     .getCodeExtraInformation()
     .setFunctionName('setAnimationFps')
     .setGetter('getAnimationFps');
@@ -604,9 +630,7 @@ const defineCollisionMask = function (
         .setType('boolean')
         .setLabel(_('Debug mode'))
         .setDescription(
-          _(
-            'When activated, it displays the hitboxes in the given color.'
-          )
+          _('When activated, it displays the hitboxes in the given color.')
         )
     );
     objectProperties.set(
@@ -682,9 +706,7 @@ const defineCollisionMask = function (
     .addObject(
       'CollisionMask',
       _('Tilemap collision mask (experimental)'),
-      _(
-        'Invisible object handling collisions with parts of a tilemap.'
-      ),
+      _('Invisible object handling collisions with parts of a tilemap.'),
       'JsPlatform/Extensions/tile_map_collision_mask32.svg',
       collisionMaskObject
     )
@@ -762,89 +784,134 @@ const defineCollisionMask = function (
     .getCodeExtraInformation()
     .setFunctionName('setTilesetJsonFile');
 
-    object.addAction(
-      "Scale",
-      _("Scale"),
-      _("Modify the scale of the specified object."),
-      _("the scale"),
-      _("Size"),
-      "res/actions/scale24_black.png",
-      "res/actions/scale_black.png"
+  object
+    .addAction(
+      'Scale',
+      _('Scale'),
+      _('Modify the scale of the specified object.'),
+      _('the scale'),
+      _('Size'),
+      'res/actions/scale24_black.png',
+      'res/actions/scale_black.png'
     )
-    .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
-    .useStandardOperatorParameters("number")
+    .addParameter(
+      'object',
+      _('Tile map collision mask'),
+      'CollisionMask',
+      false
+    )
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Scale (1 by default)')
+      )
+    )
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('setScale');
 
   object
     .addExpressionAndConditionAndAction(
-      "number",
-      "ScaleX",
-      _("Scale on X axis"),
+      'number',
+      'ScaleX',
+      _('Scale on X axis'),
       _("the width's scale of an object"),
       _("the width's scale"),
-      _("Size"),
-      "res/actions/scaleWidth24_black.png"
+      _('Size'),
+      'res/actions/scaleWidth24_black.png'
     )
-    .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
-    .useStandardParameters("number")
+    .addParameter(
+      'object',
+      _('Tile map collision mask'),
+      'CollisionMask',
+      false
+    )
+    .useStandardParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Scale (1 by default)')
+      )
+    )
     .markAsAdvanced()
     .setFunctionName('setScaleX')
     .setGetter('getScaleX');
 
   object
     .addExpressionAndConditionAndAction(
-      "number",
-      "ScaleY",
-      _("Scale on Y axis"),
+      'number',
+      'ScaleY',
+      _('Scale on Y axis'),
       _("the height's scale of an object"),
       _("the height's scale"),
-      _("Size"),
-      "res/actions/scaleHeight24_black.png"
+      _('Size'),
+      'res/actions/scaleHeight24_black.png'
     )
-    .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
-    .useStandardParameters("number")
+    .addParameter(
+      'object',
+      _('Tile map collision mask'),
+      'CollisionMask',
+      false
+    )
+    .useStandardParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Scale (1 by default)')
+      )
+    )
     .markAsAdvanced()
     .setFunctionName('setScaleY')
     .setGetter('getScaleY');
 
-    object
-      .addAction(
-        "Width",
-        _("Width"),
-        _("Change the width of an object."),
-        _("the width"),
-        _("Size"),
-        "res/actions/scaleWidth24_black.png",
-        "res/actions/scaleWidth_black.png"
-      )
-      .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
-      .useStandardOperatorParameters("number")
-      .markAsAdvanced()
-      .getCodeExtraInformation()
-      .setFunctionName('setWidth');
+  object
+    .addAction(
+      'Width',
+      _('Width'),
+      _('Change the width of an object.'),
+      _('the width'),
+      _('Size'),
+      'res/actions/scaleWidth24_black.png',
+      'res/actions/scaleWidth_black.png'
+    )
+    .addParameter(
+      'object',
+      _('Tile map collision mask'),
+      'CollisionMask',
+      false
+    )
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
+    .markAsAdvanced()
+    .getCodeExtraInformation()
+    .setFunctionName('setWidth');
 
-    object
-      .addAction(
-        "Height",
-        _("Height"),
-        _("Change the height of an object."),
-        _("the height"),
-        _("Size"),
-        "res/actions/scaleHeight24_black.png",
-        "res/actions/scaleHeight_black.png"
-      )
-      .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
-      .useStandardOperatorParameters("number")
-      .markAsAdvanced()
-      .getCodeExtraInformation()
-      .setFunctionName('setHeight');
-
+  object
+    .addAction(
+      'Height',
+      _('Height'),
+      _('Change the height of an object.'),
+      _('the height'),
+      _('Size'),
+      'res/actions/scaleHeight24_black.png',
+      'res/actions/scaleHeight_black.png'
+    )
+    .addParameter(
+      'object',
+      _('Tile map collision mask'),
+      'CollisionMask',
+      false
+    )
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
+    .markAsAdvanced()
+    .getCodeExtraInformation()
+    .setFunctionName('setHeight');
 };
 
 module.exports = {
-
   createExtension: function (
     _ /*: (string) => string */,
     gd /*: libGDevelop */

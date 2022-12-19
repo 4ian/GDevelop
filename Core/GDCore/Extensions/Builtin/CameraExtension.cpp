@@ -37,7 +37,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "",
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .UseStandardParameters("number")
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
@@ -69,7 +69,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "",
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .UseStandardParameters("number")
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
@@ -104,7 +104,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"), "", true)
-      .UseStandardParameters("number")
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   extension
@@ -120,7 +120,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"), "", true)
-      .UseStandardParameters("number")
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   extension
@@ -137,7 +137,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"), "", true)
-      .UseStandardParameters("number")
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   extension
@@ -154,7 +154,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"), "", true)
-      .UseStandardParameters("number")
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   extension
@@ -171,7 +171,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"), "", true)
-      .UseStandardParameters("number")
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   extension
@@ -188,7 +188,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"), "", true)
-      .UseStandardParameters("number")
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   extension
@@ -201,7 +201,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "",
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .UseStandardParameters("number")
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
@@ -542,7 +542,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Time scale (1 by default)")))
       .MarkAsAdvanced();
 
   extension
@@ -572,7 +575,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   extension

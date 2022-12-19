@@ -105,7 +105,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           "res/function32.png",
           "res/function16.png")
       .AddParameter("functionParameterName", "Parameter name")
-      .UseStandardRelationalOperatorParameters("number");
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions());
 
   extension
       .AddCondition(
@@ -117,7 +118,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           "res/function32.png",
           "res/function16.png")
       .AddParameter("functionParameterName", "Parameter name")
-      .UseStandardRelationalOperatorParameters("string");
+      .UseStandardRelationalOperatorParameters(
+          "string", gd::ParameterOptions::MakeNewOptions());
 }
 
 }  // namespace gd

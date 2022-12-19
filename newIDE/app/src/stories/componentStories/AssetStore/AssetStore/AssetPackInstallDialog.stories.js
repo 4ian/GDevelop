@@ -213,7 +213,7 @@ export const LayoutPrivateAssetInstallSuccess = () => (
   <PrivateAssetsAuthorizationContext.Provider
     value={{
       authorizationToken: null,
-      updateAuthorizationToken: () => {},
+      updateAuthorizationToken: async () => {},
       fetchPrivateAsset: async () => null,
       installPrivateAsset: async () => ({
         // Mock a successful installation
@@ -248,7 +248,7 @@ export const LayoutPrivateAssetInstallFailure = () => (
   <PrivateAssetsAuthorizationContext.Provider
     value={{
       authorizationToken: null,
-      updateAuthorizationToken: () => {},
+      updateAuthorizationToken: async () => {},
       fetchPrivateAsset: async () => null,
       // Mock an error
       installPrivateAsset: async () => {

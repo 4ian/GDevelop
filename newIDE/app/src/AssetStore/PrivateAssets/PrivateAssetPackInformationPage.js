@@ -158,10 +158,7 @@ const PrivateAssetPackInformationPage = ({
             </Column>
           ) : assetPack && sellerPublicProfile ? (
             <Column noOverflowParent expand noMargin>
-              <ScrollView
-                autoHideScrollbar
-                style={{ overflowX: 'hidden' /* TODO */ }}
-              >
+              <ScrollView autoHideScrollbar>
                 <Column noMargin alignItems="flex-end">
                   <Text displayInlineAsSpan size="sub-title">
                     <Trans>by</Trans>{' '}

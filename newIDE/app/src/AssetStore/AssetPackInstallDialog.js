@@ -27,6 +27,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import { mapFor } from '../Utils/MapFor';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import AlertMessage from '../UI/AlertMessage';
+import { type InstallAssetOutput } from './InstallAsset';
 
 type Props = {|
   assetPack: PublicAssetPack | PrivateAssetPack,
@@ -134,7 +135,7 @@ const AssetPackInstallDialog = ({
         // Use a pool to avoid installing an unbounded amount of assets at the same time.
         const { results, errors } = await PromisePool.withConcurrency(6)
           .for(assetShortHeaders)
-          .process(async assetShortHeader => {
+          .process<InstallAssetOutput>(async assetShortHeader => {
             console.log(targetObjectsContainer);
             const installOutput = isPrivateAsset(assetShortHeader)
               ? await installPrivateAsset({

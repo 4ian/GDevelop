@@ -6,6 +6,10 @@ import {
 } from '../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 
+/**
+ * A simple slug generator that allows to link to asset packs on
+ * the app and on the website.
+ */
 const slug = (incString: string): string => {
   const p = ['.', '=', '-'];
   const s = '-';

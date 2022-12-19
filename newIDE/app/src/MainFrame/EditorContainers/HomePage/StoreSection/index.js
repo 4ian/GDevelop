@@ -10,7 +10,7 @@ import { AssetStoreContext } from '../../../../AssetStore/AssetStoreContext';
 import AssetPackInstallDialog from '../../../../AssetStore/AssetPackInstallDialog';
 
 type Props = {|
-  project: gdProject,
+  project: ?gdProject,
   resourceManagementProps: ResourceManagementProps,
   canInstallPrivateAsset: () => boolean,
 |};
@@ -42,12 +42,14 @@ const StoreSection = ({
 
             setIsAssetPackDialogInstallOpen(true);
           }}
-          disabled={!openedAssetPack || !searchResults}
+          disabled={!project || !openedAssetPack || !searchResults}
           label={
             project ? (
               <Trans>Add to the project</Trans>
             ) : (
-              <Trans>Create a project with these assets</Trans>
+              <Trans>
+                Create a project first to add assets from the asset store
+              </Trans>
             )
           }
         />

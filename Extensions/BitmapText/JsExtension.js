@@ -236,13 +236,13 @@ module.exports = {
         'res/actions/scale24_black.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardParameters('number')
-      .setFunctionName(
-        'setScale',
+      .useStandardParameters(
+        'number',
         gd.ParameterOptions.makeNewOptions().setDescription(
           _('Scale (1 by default)')
         )
       )
+      .setFunctionName('setScale')
       .setGetter('getScale');
 
     object

@@ -1185,8 +1185,9 @@ export const declareEventsFunctionParameters = (
     const options = gd.ParameterOptions.makeNewOptions();
     if (eventsFunction) {
       const extraInfo = eventsFunction.getExpressionType().getExtraInfo();
-      if (extraInfo) options.setExtraInfo(extraInfo);
+      if (extraInfo) options.setTypeExtraInfo(extraInfo);
     }
+    // $FlowExpectedError[incompatible-cast]
     (instructionOrExpression: gdMultipleInstructionMetadata).useStandardParameters(
       eventsFunction ? eventsFunction.getExpressionType().getName() : 'string',
       options
@@ -1195,8 +1196,9 @@ export const declareEventsFunctionParameters = (
     const options = gd.ParameterOptions.makeNewOptions();
     if (getterFunction) {
       const extraInfo = getterFunction.getExpressionType().getExtraInfo();
-      if (extraInfo) options.setExtraInfo(extraInfo);
+      if (extraInfo) options.setTypeExtraInfo(extraInfo);
     }
+    // $FlowExpectedError[incompatible-cast]
     (instructionOrExpression: gdInstructionMetadata).useStandardOperatorParameters(
       getterFunction ? getterFunction.getExpressionType().getName() : 'string',
       options

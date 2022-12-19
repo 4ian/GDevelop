@@ -455,52 +455,65 @@ const defineTileMap = function (
     .getCodeExtraInformation()
     .setFunctionName('getAnimationFps');
 
-  object.addAction(
-    "Scale",
-    _("Scale"),
-    _("Modify the scale of the specified object."),
-    _("the scale"),
-    _("Size"),
-    "res/actions/scale24_black.png",
-    "res/actions/scale_black.png"
-  )
-  .addParameter('object', _('Tile map'), 'TileMap', false)
-  .useStandardOperatorParameters("number")
-  .markAsAdvanced()
-  .getCodeExtraInformation()
-  .setFunctionName('setScale');
+  object
+    .addAction(
+      'Scale',
+      _('Scale'),
+      _('Modify the scale of the specified object.'),
+      _('the scale'),
+      _('Size'),
+      'res/actions/scale24_black.png',
+      'res/actions/scale_black.png'
+    )
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Scale (1 by default)')
+      )
+    )
+    .markAsAdvanced()
+    .getCodeExtraInformation()
+    .setFunctionName('setScale');
 
-object
-  .addExpressionAndConditionAndAction(
-    "number",
-    "ScaleX",
-    _("Scale on X axis"),
-    _("the width's scale of an object"),
-    _("the width's scale"),
-    _("Size"),
-    "res/actions/scaleWidth24_black.png"
-  )
-  .addParameter('object', _('Tile map'), 'TileMap', false)
-  .useStandardParameters("number")
-  .markAsAdvanced()
-  .setFunctionName('setScaleX')
-  .setGetter('getScaleX');
+  object
+    .addExpressionAndConditionAndAction(
+      'number',
+      'ScaleX',
+      _('Scale on X axis'),
+      _("the width's scale of an object"),
+      _("the width's scale"),
+      _('Size'),
+      'res/actions/scaleWidth24_black.png'
+    )
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Scale (1 by default)')
+      )
+    )
+    .markAsAdvanced()
+    .setFunctionName('setScaleX')
+    .setGetter('getScaleX');
 
-object
-  .addExpressionAndConditionAndAction(
-    "number",
-    "ScaleY",
-    _("Scale on Y axis"),
-    _("the height's scale of an object"),
-    _("the height's scale"),
-    _("Size"),
-    "res/actions/scaleHeight24_black.png"
-  )
-  .addParameter('object', _('Tile map'), 'TileMap', false)
-  .useStandardParameters("number")
-  .markAsAdvanced()
-  .setFunctionName('setScaleY')
-  .setGetter('getScaleY');
+  object
+    .addExpressionAndConditionAndAction(
+      'number',
+      'ScaleY',
+      _('Scale on Y axis'),
+      _("the height's scale of an object"),
+      _("the height's scale"),
+      _('Size'),
+      'res/actions/scaleHeight24_black.png'
+    )
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardParameters('number', gd.ParameterOptions.makeNewOptions().setDescription(
+      _('Scale (1 by default)')
+    ))
+    .markAsAdvanced()
+    .setFunctionName('setScaleY')
+    .setGetter('getScaleY');
 
   object
     .addAction(
@@ -513,7 +526,10 @@ object
       "res/actions/scaleWidth_black.png"
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .useStandardOperatorParameters("number")
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('setWidth');
@@ -529,11 +545,13 @@ object
       "res/actions/scaleHeight_black.png"
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .useStandardOperatorParameters("number")
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('setHeight');
-
 };
 
 const defineCollisionMask = function (

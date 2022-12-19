@@ -27,7 +27,8 @@ class GD_EXTENSION_API TiledSpriteObject : public gd::ObjectConfiguration {
   }
 
 #if defined(GD_IDE_ONLY)
-  virtual void ExposeResources(gd::ArbitraryResourceWorker &worker);
+  virtual void ExposeResources(gd::ArbitraryResourceWorker &worker,
+                               gd::ResourcesManager *resourcesManager);
 #endif
 
   virtual double GetWidth() const { return width; };

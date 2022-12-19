@@ -187,7 +187,7 @@ module.exports = {
         'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardParameters('string')
+      .useStandardParameters('string', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setText')
       .setGetter('getText');
 
@@ -202,7 +202,12 @@ module.exports = {
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Opacity (0-255)')
+        )
+      )
       .setFunctionName('setOpacity')
       .setGetter('getOpacity');
 
@@ -217,7 +222,7 @@ module.exports = {
         'res/conditions/characterSize24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('getFontSize');
 
     object
@@ -232,7 +237,12 @@ module.exports = {
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .useStandardParameters('number')
-      .setFunctionName('setScale')
+      .setFunctionName(
+        'setScale',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Scale (1 by default)')
+        )
+      )
       .setGetter('getScale');
 
     object
@@ -246,7 +256,7 @@ module.exports = {
         'res/conditions/font24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardParameters('string')
+      .useStandardParameters('string', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('getFontName');
 
     object
@@ -304,7 +314,12 @@ module.exports = {
         'res/actions/textAlign24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardParameters('string')
+      .useStandardParameters(
+        'string',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Alignment ("left", "right" or "center")')
+        )
+      )
       .setFunctionName('getAlignment');
 
     object
@@ -367,7 +382,7 @@ module.exports = {
         'res/actions/scaleWidth24_black.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setWrappingWidth')
       .setGetter('getWrappingWidth');
 

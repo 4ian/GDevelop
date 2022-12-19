@@ -5,10 +5,9 @@ import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import { AssetDetails } from '../../../../AssetStore/AssetDetails';
 import {
-  fakeAssetShortHeader,
+  fakeAssetShortHeader1,
   fakeAssetWithCustomObject,
 } from '../../../../fixtures/GDevelopServicesTestData';
-import { testProject } from '../../../GDevelopJsInitializerDecorator';
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
 import withMock from 'storybook-addon-mock';
 import { GDevelopUserApi } from '../../../../Utils/GDevelopServices/ApiConfigs';
@@ -25,7 +24,7 @@ export const PublicAsset = () => {
     <AssetStoreStateProvider>
       <AssetDetails
         onTagSelection={() => {}}
-        assetShortHeader={fakeAssetShortHeader}
+        assetShortHeader={fakeAssetShortHeader1}
         onOpenDetails={assetShortHeader => {}}
       />
     </AssetStoreStateProvider>
@@ -36,7 +35,7 @@ PublicAsset.parameters = {
   mockData: [
     {
       url: `https://resources.gdevelop-app.com/assets-database/assets/${
-        fakeAssetShortHeader.id
+        fakeAssetShortHeader1.id
       }.json`,
       method: 'GET',
       status: 200,
@@ -50,7 +49,7 @@ export const PrivateAsset = () => (
     <AssetStoreStateProvider>
       <AssetDetails
         onTagSelection={() => {}}
-        assetShortHeader={fakeAssetShortHeader}
+        assetShortHeader={fakeAssetShortHeader1}
         onOpenDetails={assetShortHeader => {}}
       />
     </AssetStoreStateProvider>
@@ -76,7 +75,7 @@ PrivateAsset.parameters = {
     },
     {
       url: `https://resources.gdevelop-app.com/assets-database/assets/${
-        fakeAssetShortHeader.id
+        fakeAssetShortHeader1.id
       }.json`,
       method: 'GET',
       status: 200,
@@ -93,9 +92,8 @@ export const AssetWithMultipleAuthors = () => (
   <PublicProfileProvider>
     <AssetStoreStateProvider>
       <AssetDetails
-        project={testProject.project}
         onTagSelection={() => {}}
-        assetShortHeader={fakeAssetShortHeader}
+        assetShortHeader={fakeAssetShortHeader1}
         onOpenDetails={assetShortHeader => {}}
       />
     </AssetStoreStateProvider>
@@ -127,7 +125,7 @@ PrivateAsset.parameters = {
     },
     {
       url: `https://resources.gdevelop-app.com/assets-database/assets/${
-        fakeAssetShortHeader.id
+        fakeAssetShortHeader1.id
       }.json`,
       method: 'GET',
       status: 200,

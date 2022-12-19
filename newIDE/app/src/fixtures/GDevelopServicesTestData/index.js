@@ -997,7 +997,7 @@ export const fakeAssetWithFlashExtensionDependency1: Asset = {
   ],
 };
 
-export const fakeAssetShortHeader: AssetShortHeader = {
+export const fakeAssetShortHeader1: AssetShortHeader = {
   id: 'a4eb5460ffc062ece1f3ff45d24b07e40e9d4247d21602de70973049eb4f6ee5',
   license:
     'CC-BY 4.0 (Attribution to the artist is required, click for details)',

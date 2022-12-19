@@ -374,22 +374,6 @@ const defineTileMap = function (
     .setFunctionName('getLevelndex');
 
   object
-    .addAction(
-      'SetLevelIndex',
-      _('Level index'),
-      _('Set the level index of the Tilemap.'),
-      _('the level index'),
-      '',
-      'JsPlatform/Extensions/tile_map.svg',
-      'JsPlatform/Extensions/tile_map.svg'
-    )
-    .addParameter('object', _('Tile map'), 'TileMap', false)
-    .useStandardOperatorParameters('number')
-    .getCodeExtraInformation()
-    .setFunctionName('setLevelIndex')
-    .setGetter('getLevelIndex');
-
-  object
     .addExpression(
       'LevelIndex',
       _('Level index'),

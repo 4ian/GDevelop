@@ -37,6 +37,7 @@ export type NewProjectSetup = {|
   width: number,
   orientation: 'landscape' | 'portrait' | 'default',
   optimizeForPixelArt: boolean,
+  allowPlayersToLogIn: boolean,
 |};
 
 export type NewProjectSource = {|
@@ -53,6 +54,22 @@ export const createNewProject = async (): Promise<?NewProjectSource> => {
     project,
     storageProvider: null,
     fileMetadata: null,
+  };
+};
+
+export const createNewProjectWithDefaultLogin = async (): Promise<?NewProjectSource> => {
+  const url =
+    'https://resources.gdevelop.io/examples-database/login-template.json';
+  sendNewGameCreated({
+    exampleUrl: url,
+    exampleSlug: 'login-template',
+  });
+  return {
+    project: null,
+    storageProvider: UrlStorageProvider,
+    fileMetadata: {
+      fileIdentifier: url,
+    },
   };
 };
 

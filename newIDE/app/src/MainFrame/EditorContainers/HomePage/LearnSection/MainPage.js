@@ -192,6 +192,21 @@ const MainPage = ({
       </SectionRow>
       <>
         <SectionRow>
+          <Line noMargin>
+            <Text size="title">
+              <Trans>Courses</Trans>
+            </Text>
+          </Line>
+          <Line noMargin>
+            <Text noMargin>
+              <Trans>Learn everything about GDevelop from the ground up</Trans>
+            </Text>
+          </Line>
+        </SectionRow>
+        <SectionRow>{renderTutorialsRow('official-beginner')}</SectionRow>
+        <SectionRow>{renderTutorialsRow('official-intermediate')}</SectionRow>
+        <SectionRow>{renderTutorialsRow('official-advanced')}</SectionRow>
+        <SectionRow>
           <LineStackLayout
             justifyContent="space-between"
             alignItems="center"
@@ -227,21 +242,6 @@ const MainPage = ({
         </SectionRow>
         <SectionRow>{renderTutorialsRow('full-game')}</SectionRow>
         <SectionRow>{renderTutorialsRow('game-mechanic')}</SectionRow>
-        <SectionRow>
-          <Line noMargin>
-            <Text size="title">
-              <Trans>Courses</Trans>
-            </Text>
-          </Line>
-          <Line noMargin>
-            <Text noMargin>
-              <Trans>Learn everything about GDevelop from the ground up</Trans>
-            </Text>
-          </Line>
-        </SectionRow>
-        <SectionRow>{renderTutorialsRow('official-beginner')}</SectionRow>
-        <SectionRow>{renderTutorialsRow('official-intermediate')}</SectionRow>
-        <SectionRow>{renderTutorialsRow('official-advanced')}</SectionRow>
       </>
     </SectionContainer>
   );

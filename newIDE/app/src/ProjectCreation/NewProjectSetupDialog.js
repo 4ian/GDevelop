@@ -106,6 +106,9 @@ const NewProjectSetupDialog = ({
   const [optimizeForPixelArt, setOptimizeForPixelArt] = React.useState<boolean>(
     false
   );
+  const [allowPlayersToLogIn, setAllowPlayersToLogIn] = React.useState<boolean>(
+    false
+  );
   const newProjectsDefaultFolder = app
     ? findEmptyPathInWorkspaceFolder(app, values.newProjectsDefaultFolder || '')
     : '';
@@ -170,6 +173,7 @@ const NewProjectSetupDialog = ({
         width,
         orientation,
         optimizeForPixelArt,
+        allowPlayersToLogIn,
       });
     },
     [
@@ -181,6 +185,7 @@ const NewProjectSetupDialog = ({
       saveAsLocation,
       resolutionOption,
       optimizeForPixelArt,
+      allowPlayersToLogIn,
     ]
   );
 
@@ -329,6 +334,14 @@ const NewProjectSetupDialog = ({
               label={<Trans>Optimize for Pixel Art</Trans>}
               onCheck={(e, checked) => {
                 setOptimizeForPixelArt(checked);
+              }}
+              disabled={isOpening}
+            />
+            <Checkbox
+              checked={allowPlayersToLogIn}
+              label={<Trans>Allow players to log in</Trans>}
+              onCheck={(e, checked) => {
+                setAllowPlayersToLogIn(checked);
               }}
               disabled={isOpening}
             />

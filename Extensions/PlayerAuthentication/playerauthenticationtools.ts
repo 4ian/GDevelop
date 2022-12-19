@@ -23,9 +23,8 @@ namespace gdjs {
     let _authenticationTimeoutId: NodeJS.Timeout | null = null;
 
     // Communication methods.
-    let _authenticationMessageCallback:
-      | ((event: MessageEvent) => void)
-      | null = null;
+    let _authenticationMessageCallback: ((event: MessageEvent) => void) | null =
+      null;
     let _cordovaAuthenticationMessageCallback:
       | ((event: MessageEvent) => void)
       | null = null;
@@ -604,12 +603,10 @@ namespace gdjs {
       if (_authenticationBanner) _authenticationBanner.style.opacity = '0';
 
       const platform = getPlatform(runtimeScene);
-      const {
-        rootContainer,
-        loaderContainer,
-      } = authComponents.computeAuthenticationContainer(
-        onAuthenticationContainerDismissed
-      );
+      const { rootContainer, loaderContainer } =
+        authComponents.computeAuthenticationContainer(
+          onAuthenticationContainerDismissed
+        );
       _authenticationRootContainer = rootContainer;
       _authenticationLoaderContainer = loaderContainer;
 
@@ -622,11 +619,21 @@ namespace gdjs {
       checkIfGameIsRegistered(runtimeScene.getGame(), _gameId)
         .then((isGameRegistered) => {
           if (_authenticationLoaderContainer) {
-            _authenticationTextContainer = authComponents.addAuthenticationTextsToLoadingContainer(
-              _authenticationLoaderContainer,
-              platform,
-              isGameRegistered
-            );
+            const electron = runtimeScene.getGame().getRenderer().getElectron();
+            const wikiOpenAction = electron
+              ? () =>
+                  electron.shell.openExternal(
+                    'https://wiki.gdevelop.io/gdevelop5/publishing/web'
+                  )
+              : null; // Only show a link if we're on electron.
+
+            _authenticationTextContainer =
+              authComponents.addAuthenticationTextsToLoadingContainer(
+                _authenticationLoaderContainer,
+                platform,
+                isGameRegistered,
+                wikiOpenAction
+              );
           }
           if (isGameRegistered) {
             startAuthenticationWindowTimeout(runtimeScene);

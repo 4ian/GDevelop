@@ -52,8 +52,8 @@ namespace gdjs {
       this._instanceContainer.loadFrom(objectData);
       this.getRenderer().reinitialize(this, parent);
 
-      // The generated code calls the onCreated super implementation at the end.
-      this.onCreated();
+      // The generated code calls onCreated at the constructor end
+      // and onCreated calls its super implementation at its end.
     }
 
     reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
@@ -80,26 +80,26 @@ namespace gdjs {
       }
     }
 
-    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    onDestroyFromScene(parent: gdjs.RuntimeInstanceContainer): void {
       // Let subclasses do something before the object is destroyed.
-      this.onDestroy(instanceContainer);
+      this.onDestroy(parent);
       // Let behaviors do something before the object is destroyed.
-      super.onDestroyFromScene(instanceContainer);
+      super.onDestroyFromScene(parent);
       // Destroy the children.
-      this._instanceContainer.onDestroyFromScene(instanceContainer);
+      this._instanceContainer.onDestroyFromScene(parent);
     }
 
-    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    update(parent: gdjs.RuntimeInstanceContainer): void {
       this._instanceContainer._updateObjectsPreEvents();
 
-      this.doStepPreEvents(instanceContainer);
+      this.doStepPreEvents(parent);
 
       const profiler = this.getRuntimeScene().getProfiler();
       if (profiler) {
         profiler.begin(this._objectData.type);
       }
       // This is a bit like the "scene" events for custom objects.
-      this.doStepPostEvents(instanceContainer);
+      this.doStepPostEvents(parent);
       if (profiler) {
         profiler.end(this._objectData.type);
       }
@@ -110,24 +110,24 @@ namespace gdjs {
     /**
      * This method is called when the preview is being hot-reloaded.
      */
-    onHotReloading(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+    onHotReloading(parent: gdjs.RuntimeInstanceContainer) {}
 
     // This is only to handle trigger once.
-    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+    doStepPreEvents(parent: gdjs.RuntimeInstanceContainer) {}
 
     /**
      * This method is called each tick after events are done.
-     * @param instanceContainer The instanceContainer owning the object
+     * @param parent The instanceContainer owning the object
      */
-    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+    doStepPostEvents(parent: gdjs.RuntimeInstanceContainer) {}
 
     /**
      * This method is called when the object is being removed from its parent
      * container and is about to be destroyed/reused later.
      */
-    onDestroy(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+    onDestroy(parent: gdjs.RuntimeInstanceContainer) {}
 
-    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    updatePreRender(parent: gdjs.RuntimeInstanceContainer): void {
       this._instanceContainer._updateObjectsPreRender();
       this.getRenderer().ensureUpToDate();
     }

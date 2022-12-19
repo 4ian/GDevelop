@@ -127,20 +127,23 @@ CODE_NAMESPACE = CODE_NAMESPACE || {};
  * Object generated from OBJECT_FULL_NAME
  */
 CODE_NAMESPACE.RUNTIME_OBJECT_CLASSNAME = class RUNTIME_OBJECT_CLASSNAME extends gdjs.CustomRuntimeObject {
-  constructor(runtimeScene, objectData) {
-    super(runtimeScene, objectData);
-    this._runtimeScene = runtimeScene;
+  constructor(parentInstanceContainer, objectData) {
+    super(parentInstanceContainer, objectData);
+    this._parentInstanceContainer = parentInstanceContainer;
 
     this._onceTriggers = new gdjs.OnceTriggers();
-    this._behaviorData = {};
+    this._objectData = {};
     INITIALIZE_PROPERTIES_CODE
+
+    // It calls the onCreated super implementation at the end.
+    this.onCreated();
   }
 
   // Hot-reload:
   updateFromObjectData(oldObjectData, newObjectData) {
     UPDATE_FROM_OBJECT_DATA_CODE
 
-    this.onHotReloading(this.getInstanceContainer());
+    this.onHotReloading(this._parentInstanceContainer);
     return true;
   }
 
@@ -170,7 +173,7 @@ gdjs.registerObject("EXTENSION_NAME::OBJECT_NAME", CODE_NAMESPACE.RUNTIME_OBJECT
 gd::String ObjectCodeGenerator::GenerateInitializePropertyFromDataCode(
     const gd::NamedPropertyDescriptor& property) {
   return gd::String(R"jscode_template(
-    this._objectData.content.PROPERTY_NAME = objectData.content.PROPERTY_NAME !== undefined ? objectData.content.PROPERTY_NAME : DEFAULT_VALUE;)jscode_template")
+    this._objectData.PROPERTY_NAME = objectData.content.PROPERTY_NAME !== undefined ? objectData.content.PROPERTY_NAME : DEFAULT_VALUE;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
       .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property));
 }
@@ -178,7 +181,7 @@ gd::String
 ObjectCodeGenerator::GenerateInitializePropertyFromDefaultValueCode(
     const gd::NamedPropertyDescriptor& property) {
   return gd::String(R"jscode_template(
-    this._objectData.content.PROPERTY_NAME = DEFAULT_VALUE;)jscode_template")
+    this._objectData.PROPERTY_NAME = DEFAULT_VALUE;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
       .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property));
 }
@@ -188,10 +191,10 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectPropertyTemplateCode(
     const gd::NamedPropertyDescriptor& property) {
   return gd::String(R"jscode_template(
   GETTER_NAME() {
-    return this._objectData.content.PROPERTY_NAME !== undefined ? this._objectData.content.PROPERTY_NAME : DEFAULT_VALUE;
+    return this._objectData.PROPERTY_NAME !== undefined ? this._objectData.PROPERTY_NAME : DEFAULT_VALUE;
   }
   SETTER_NAME(newValue) {
-    this._objectData.content.PROPERTY_NAME = newValue;
+    this._objectData.PROPERTY_NAME = newValue;
   })jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
       .FindAndReplace("GETTER_NAME",
@@ -208,7 +211,7 @@ gd::String ObjectCodeGenerator::GenerateUpdatePropertyFromObjectDataCode(
     const gd::NamedPropertyDescriptor& property) {
   return gd::String(R"jscode_template(
     if (oldObjectData.content.PROPERTY_NAME !== newObjectData.content.PROPERTY_NAME)
-      this._objectData.content.PROPERTY_NAME = newObjectData.content.PROPERTY_NAME;)jscode_template")
+      this._objectData.PROPERTY_NAME = newObjectData.content.PROPERTY_NAME;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName());
 }
 

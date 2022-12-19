@@ -15,6 +15,7 @@ export type EditorContainerExtraProps = {|
 
   // Homepage
   storageProviders?: Array<StorageProvider>,
+  initialTab?: ?string,
 |};
 
 export type RenderEditorContainerProps = {|

@@ -236,7 +236,6 @@ const CollisionMasksEditor = ({
                 project,
                 resourceName
               )}
-              project={project}
               onSize={setCurrentSpriteSize}
               renderOverlay={overlayProps =>
                 sprite && (

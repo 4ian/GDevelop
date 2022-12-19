@@ -2819,7 +2819,10 @@ describe('libGD.js', function () {
             'Disable.png'
           )
           .addParameter('object', 'My object', 'MyObject', false)
-          .useStandardParameters('boolean')
+          .useStandardParameters(
+            'boolean',
+            gd.ParameterOptions.makeNewOptions()
+          )
           .setFunctionName('setDisabled')
           .setGetter('isDisabled');
 
@@ -2896,7 +2899,10 @@ describe('libGD.js', function () {
             'Disable.png'
           )
           .addParameter('object', 'My object', '', false)
-          .useStandardParameters('boolean')
+          .useStandardParameters(
+            'boolean',
+            gd.ParameterOptions.makeNewOptions()
+          )
           .setFunctionName('setDisabled')
           .setGetter('isDisabled');
 
@@ -3726,7 +3732,7 @@ describe('libGD.js', function () {
         .addParameter('string', 'Some stuff', '', false)
         .setParameterLongDescription('Blabla')
         .setFunctionName('some.method.to.getPlayerHealth')
-        .useStandardParameters('number');
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions());
 
       expect(
         extension.getAllConditions().has('TestExtensionName::PlayerHealth')
@@ -3760,7 +3766,7 @@ describe('libGD.js', function () {
         .addParameter('string', 'Some stuff', '', false)
         .setParameterLongDescription('Blabla')
         .setFunctionName('some.method.to.getPlayerHealth')
-        .useStandardParameters('number');
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions());
 
       expect(
         extension.getAllConditions().has('TestExtensionName::PlayerHealth')
@@ -3799,7 +3805,7 @@ describe('libGD.js', function () {
           'Disable.png'
         )
         .addParameter('object', 'My object', 'MyObject', false)
-        .useStandardParameters('boolean')
+        .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
         .setFunctionName('setDisabled')
         .setGetter('isDisabled');
 

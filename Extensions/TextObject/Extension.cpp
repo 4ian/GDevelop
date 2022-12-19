@@ -438,9 +438,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .UseStandardRelationalOperatorParameters(
-          "string",
-          gd::ParameterOptions::MakeNewOptions().SetDescription(
-              _("Alignment (\"left\", \"center\", \"right\")")));
+          "stringWithSelector",
+          gd::ParameterOptions::MakeNewOptions()
+              .SetDescription(_("Alignment"))
+              .SetTypeExtraInfo("[\"left\", \"center\", \"right\"]"));
 
   obj.AddAction(
          "SetWrapping",

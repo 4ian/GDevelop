@@ -8,6 +8,7 @@ type Props = {|
   tooltipText?: string,
   style?: Object,
   children: ?React.Node,
+  allowSelection?: boolean,
 |};
 
 const BackgroundText = (props: Props) => {
@@ -20,6 +21,8 @@ const BackgroundText = (props: Props) => {
       style={{
         opacity: 0.6,
         textShadow: `1px 1px 0px ${gdevelopTheme.emptyMessage.shadowColor}`,
+        userSelect: props.allowSelection ? 'text' : undefined,
+        cursor: props.allowSelection ? 'text' : undefined,
         ...props.style,
       }}
       title={props.tooltipText}

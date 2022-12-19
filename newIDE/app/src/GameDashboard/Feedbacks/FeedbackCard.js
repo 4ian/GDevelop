@@ -31,11 +31,6 @@ import { useOptimisticState } from '../../Utils/UseOptimisticState';
 const styles = {
   textComment: { whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' },
   backgroundText: { padding: 0, textAlign: 'left' },
-  selectableBackgroundText: {
-    padding: 0,
-    textAlign: 'left',
-    userSelect: 'text',
-  },
 };
 
 type BuildProperties = {
@@ -154,7 +149,7 @@ const FeedbackCard = ({
                     )}
                   </Text>
                 )}
-                <BackgroundText style={styles.selectableBackgroundText}>
+                <BackgroundText style={styles.backgroundText} allowSelection>
                   {comment.playerName}
                 </BackgroundText>
               </Column>

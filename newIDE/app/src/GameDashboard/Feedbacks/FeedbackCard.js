@@ -31,6 +31,11 @@ import { useOptimisticState } from '../../Utils/UseOptimisticState';
 const styles = {
   textComment: { whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' },
   backgroundText: { padding: 0, textAlign: 'left' },
+  selectableBackgroundText: {
+    padding: 0,
+    textAlign: 'left',
+    userSelect: 'text',
+  },
 };
 
 type BuildProperties = {
@@ -149,7 +154,7 @@ const FeedbackCard = ({
                     )}
                   </Text>
                 )}
-                <BackgroundText style={styles.backgroundText}>
+                <BackgroundText style={styles.selectableBackgroundText}>
                   {comment.playerName}
                 </BackgroundText>
               </Column>
@@ -166,7 +171,9 @@ const FeedbackCard = ({
               </ResponsiveLineStackLayout>
             )}
             <LargeSpacer />
-            <Text style={styles.textComment}>{comment.text}</Text>
+            <Text style={styles.textComment} allowSelection>
+              {comment.text}
+            </Text>
           </Column>
         </Card>
       )}

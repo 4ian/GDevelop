@@ -1586,7 +1586,7 @@ const MainFrame = (props: Props) => {
           key: 'start page',
           extraEditorProps: {
             storageProviders: props.storageProviders,
-            initialTab: initialDialog === 'asset-store' ? 'store' : null,
+            initialTab: initialDialog === 'asset-store' ? 'shop' : null,
           },
           closable: false,
         }),

@@ -49,7 +49,7 @@ export type HomeTab =
   | 'learn'
   | 'play'
   | 'community'
-  | 'store';
+  | 'shop';
 
 export const getInitialHomeTab = (
   initialTab: ?string,
@@ -61,7 +61,7 @@ export const getInitialHomeTab = (
     initialTab === 'learn' ||
     initialTab === 'play' ||
     initialTab === 'community' ||
-    initialTab === 'store'
+    initialTab === 'shop'
   )
     return initialTab;
 
@@ -87,9 +87,9 @@ const tabs: {
     getIcon: color => <PickAxeIcon fontSize="small" color={color} />,
   },
   {
-    label: <Trans>Store</Trans>,
-    tab: 'store',
-    id: 'home-store-tab',
+    label: <Trans>Shop</Trans>,
+    tab: 'shop',
+    id: 'home-shop-tab',
     getIcon: color => <StorefrontIcon fontSize="small" color={color} />,
   },
   {

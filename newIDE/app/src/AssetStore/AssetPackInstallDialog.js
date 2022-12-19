@@ -136,7 +136,6 @@ const AssetPackInstallDialog = ({
         const { results, errors } = await PromisePool.withConcurrency(6)
           .for(assetShortHeaders)
           .process<InstallAssetOutput>(async assetShortHeader => {
-            console.log(targetObjectsContainer);
             const installOutput = isPrivateAsset(assetShortHeader)
               ? await installPrivateAsset({
                   assetShortHeader,

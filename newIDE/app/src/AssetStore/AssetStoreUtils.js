@@ -9,8 +9,11 @@ import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop
 /**
  * A simple slug generator that allows to link to asset packs on
  * the app and on the website.
+ *
+ * The website has a similar implementation (which is at least retro-compatible),
+ * so that asset packs can be opened from an URL containing their slug.
  */
-const slug = (incString: string): string => {
+const slugify = (incString: string): string => {
   const p = ['.', '=', '-'];
   const s = '-';
 
@@ -31,7 +34,7 @@ const slug = (incString: string): string => {
 const getPublicAssetPackUserFriendlySlug = (
   publicAssetPack: PublicAssetPack
 ) => {
-  return `${slug(publicAssetPack.name)}-${slug(publicAssetPack.tag)}`;
+  return `${slugify(publicAssetPack.name)}-${slugify(publicAssetPack.tag)}`;
 };
 
 const getIdFromPrivateAssetPackUserFriendlySlug = (slug: string) =>

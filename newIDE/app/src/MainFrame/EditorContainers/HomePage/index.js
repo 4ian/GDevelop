@@ -228,7 +228,7 @@ export const HomePage = React.memo<Props>(
                     )}
                     {activeTab === 'play' && <PlaySection />}
                     {activeTab === 'community' && <CommunitySection />}
-                    {activeTab === 'store' && (
+                    {activeTab === 'shop' && (
                       <StoreSection
                         project={project}
                         resourceManagementProps={resourceManagementProps}

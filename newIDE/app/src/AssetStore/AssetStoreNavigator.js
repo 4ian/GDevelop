@@ -19,7 +19,6 @@ export type AssetStorePageState = {|
 |};
 
 export type NavigationState = {|
-  // previousPages: Array<AssetStorePageState>,
   getCurrentPage: () => AssetStorePageState,
   backToPreviousPage: () => void,
   openHome: () => void,

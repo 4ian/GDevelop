@@ -108,10 +108,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       !isOnHomePage && !openedAssetShortHeader
     );
     const [
-      ,
-      setSelectedPrivateAssetPackListingData,
-    ] = React.useState<?PrivateAssetPackListingData>(null);
-    const [
       purchasingPrivateAssetPackListingData,
       setPurchasingPrivateAssetPackListingData,
     ] = React.useState<?PrivateAssetPackListingData>(null);
@@ -293,7 +289,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             setIsFiltersPanelOpen(true);
             saveScrollPosition();
             navigationState.openPackPage(receivedAssetPack);
-            setSelectedPrivateAssetPackListingData(null);
           }
         }
       },

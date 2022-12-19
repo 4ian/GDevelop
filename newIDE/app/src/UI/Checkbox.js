@@ -4,6 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormGroup from '@material-ui/core/FormGroup';
 import MUICheckbox from '@material-ui/core/Checkbox';
+import { FormHelperText } from '@material-ui/core';
 
 // Reduce checkbox size to avoid overlapping with other checkboxes.
 const useStyles = makeStyles({
@@ -28,6 +29,7 @@ type Props = {|
   label?: ?React.Node,
   checked: boolean,
   onCheck?: (e: {||}, checked: boolean) => void | Promise<void>,
+  tooltipOrHelperText?: React.Node,
   checkedIcon?: React.Node,
   uncheckedIcon?: React.Node,
   disabled?: boolean,
@@ -60,16 +62,21 @@ const Checkbox = (props: Props) => {
     />
   );
   return props.label ? (
-    <FormGroup classes={formGroupClasses}>
-      <FormControlLabel
-        control={checkbox}
-        label={props.label}
-        style={{
-          ...props.style,
-          cursor: 'default',
-        }}
-      />
-    </FormGroup>
+    <>
+      <FormGroup classes={formGroupClasses}>
+        <FormControlLabel
+          control={checkbox}
+          label={props.label}
+          style={{
+            ...props.style,
+            cursor: 'default',
+          }}
+        />
+        {props.tooltipOrHelperText && (
+          <FormHelperText>{props.tooltipOrHelperText}</FormHelperText>
+        )}
+      </FormGroup>
+    </>
   ) : (
     checkbox
   );

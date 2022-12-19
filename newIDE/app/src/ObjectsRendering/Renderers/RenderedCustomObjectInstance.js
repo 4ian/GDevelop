@@ -665,6 +665,14 @@ export default class RenderedCustomObjectInstance extends RenderedInstance {
         childInstance.setCustomHeight(renderedInstance.getDefaultHeight());
       }
       renderedInstance.update();
+
+      if (childLayout.verticalLayout.anchorOrigin == null) {
+        // This ensure objects are centered if their dimensions changed from the
+        // custom ones (preferred ones).
+        // For instance, text object dimensions change according to how the text is wrapped.
+        childInstance.y = (height - renderedInstance._pixiObject.height) / 2;
+        renderedInstance.update();
+      }
     }
 
     this._pixiObject.pivot.x = centerX;

@@ -754,6 +754,12 @@ namespace gdjs {
       return this._currentFrame;
     }
 
+    getAnimationFrameCount(): number {
+      return this._animations[this._currentAnimation].directions[
+        this._currentDirection
+      ].frames.length;
+    }
+
     /**
      * @deprecated
      * Return true if animation has ended.

@@ -40,6 +40,7 @@ type Props = {|
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   onCreateProject: (ExampleShortHeader | null) => void,
   onOpenProjectManager: () => void,
+  onOpenGamesDashboard: (gameId: string) => void,
 
   // Other dialogs opening:
   onOpenHelpFinder: () => void,
@@ -70,6 +71,7 @@ export const HomePage = React.memo<Props>(
         canOpen,
         onChooseProject,
         onOpenRecentFile,
+        onOpenGamesDashboard,
         onOpenNewProjectSetupDialog,
         onCreateProject,
         onOpenProjectManager,
@@ -214,6 +216,7 @@ export const HomePage = React.memo<Props>(
                           onCreateProject(exampleShortHeader)
                         }
                         onOpenRecentFile={onOpenRecentFile}
+                        onOpenGamesDashboard={onOpenGamesDashboard}
                         storageProviders={storageProviders}
                       />
                     )}
@@ -261,6 +264,7 @@ export const renderHomePageContainer = (
     canOpen={props.canOpen}
     onChooseProject={props.onChooseProject}
     onOpenRecentFile={props.onOpenRecentFile}
+    onOpenGamesDashboard={props.onOpenGamesDashboard}
     onCreateProject={props.onCreateProject}
     onOpenNewProjectSetupDialog={props.onOpenNewProjectSetupDialog}
     onOpenProjectManager={props.onOpenProjectManager}

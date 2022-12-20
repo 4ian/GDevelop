@@ -257,9 +257,8 @@ export const GameRegistrationWidget = ({
         )}
       >
         <Trans>
-          This project is not registered online. Register it now to get access
-          to metrics collected anonymously, like the number of daily players and
-          retention of the players after a few days.
+          The project currently opened is not registered online. Register it now
+          to get access to leaderboards, player accounts, analytics and more!
         </Trans>
       </AlertMessage>
     );
@@ -269,9 +268,9 @@ export const GameRegistrationWidget = ({
     return (
       <AlertMessage kind="error">
         <Trans>
-          This project is registered online but you don't have access to it. Ask
-          the original owner of the game to share it with you to get access to
-          the game metrics.
+          The project currently opened is registered online but you don't have
+          access to it. Ask the original owner of the game to share it with you
+          to be able to manage it.
         </Trans>
       </AlertMessage>
     );

@@ -130,8 +130,11 @@ export const onSaveProject = (
       'Project file is empty, "Save as" should have been called?'
     );
   }
+  // Ensure we always pick the latest name and gameId.
   const newFileMetadata = {
     ...fileMetadata,
+    name: project.getName(),
+    gameId: project.getProjectUuid(),
     lastModifiedDate: now,
   };
 
@@ -192,7 +195,13 @@ export const onSaveProjectAs = async (
     throw new Error('A file path was not chosen before saving as.');
 
   options.onStartSaving();
-  const newFileMetadata = { fileIdentifier: filePath };
+  // Ensure we always pick the latest name and gameId.
+  const newFileMetadata = {
+    fileIdentifier: filePath,
+    name: project.getName(),
+    gameId: project.getProjectUuid(),
+    lastModifiedDate: Date.now(),
+  };
 
   // Move (copy or download, etc...) the resources first.
   await options.onMoveResources({ newFileMetadata });

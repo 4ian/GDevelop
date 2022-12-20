@@ -117,5 +117,6 @@ export const useOpenInitialDialog = ({ parameters, actions }: Props) => {
     setGamesDashboardInitialGameId,
     gamesDashboardInitialTab,
     setGamesDashboardInitialTab,
+    openGameDashboard,
   };
 };

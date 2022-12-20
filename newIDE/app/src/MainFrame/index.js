@@ -550,6 +550,7 @@ const MainFrame = (props: Props) => {
     setGamesDashboardInitialGameId,
     gamesDashboardInitialTab,
     setGamesDashboardInitialTab,
+    openGameDashboard,
   } = useOpenInitialDialog({
     parameters: {
       initialDialog,
@@ -741,9 +742,12 @@ const MainFrame = (props: Props) => {
         // (like locally or on Google Drive).
         if (onSaveProject) {
           preferences.insertRecentProjectFile({
-            fileMetadata: fileMetadata.name
-              ? fileMetadata
-              : { ...fileMetadata, name: project.getName() },
+            fileMetadata: {
+              ...fileMetadata,
+              name: project.getName(),
+              gameId: project.getProjectUuid(),
+              lastModifiedDate: Date.now(),
+            },
             storageProviderName: storageProvider.internalName,
           });
         }
@@ -1953,7 +1957,6 @@ const MainFrame = (props: Props) => {
       // At the end of the promise below, currentProject and storageProvider
       // may have changed (if the user opened another project). So we read and
       // store their values in variables now.
-      const projectName = currentProject.getName();
       const storageProviderInternalName = newStorageProvider.internalName;
 
       try {
@@ -2004,11 +2007,8 @@ const MainFrame = (props: Props) => {
 
         // Save was done on a new file/location, so save it in the
         // recent projects and in the state.
-        const enrichedFileMetadata = fileMetadata.name
-          ? fileMetadata
-          : { ...fileMetadata, name: projectName };
         const fileMetadataAndStorageProviderName = {
-          fileMetadata: enrichedFileMetadata,
+          fileMetadata,
           storageProviderName: storageProviderInternalName,
         };
         preferences.insertRecentProjectFile(fileMetadataAndStorageProviderName);
@@ -2039,7 +2039,7 @@ const MainFrame = (props: Props) => {
           // can happen if another project was loaded in the meantime.
           setState(state => ({
             ...state,
-            currentFileMetadata: enrichedFileMetadata,
+            currentFileMetadata: fileMetadata,
           }));
         }
       } catch (rawError) {
@@ -2131,7 +2131,6 @@ const MainFrame = (props: Props) => {
         // At the end of the promise below, currentProject and storageProvider
         // may have changed (if the user opened another project). So we read and
         // store their values in variables now.
-        const projectName = currentProject.getName();
         const storageProviderInternalName = getStorageProvider().internalName;
 
         const { wasSaved, fileMetadata } = await onSaveProject(
@@ -2143,12 +2142,9 @@ const MainFrame = (props: Props) => {
           console.info(
             `Project saved in ${performance.now() - saveStartTime}ms.`
           );
-          const enrichedFileMetadata = fileMetadata.name
-            ? fileMetadata
-            : { ...fileMetadata, name: projectName };
 
           const fileMetadataAndStorageProviderName = {
-            fileMetadata: enrichedFileMetadata,
+            fileMetadata: fileMetadata,
             storageProviderName: storageProviderInternalName,
           };
           preferences.insertRecentProjectFile(
@@ -2173,7 +2169,7 @@ const MainFrame = (props: Props) => {
             // can happen if another project was loaded in the meantime.
             setState(state => ({
               ...state,
-              currentFileMetadata: enrichedFileMetadata,
+              currentFileMetadata: fileMetadata,
             }));
           }
 
@@ -2889,6 +2885,8 @@ const MainFrame = (props: Props) => {
                     canInstallPrivateAsset,
                     onChooseProject: () => openOpenFromStorageProviderDialog(),
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
+                    onOpenGamesDashboard: gameId =>
+                      openGameDashboard({ gameId, tab: 'details' }),
                     onOpenNewProjectSetupDialog: exampleShortHeader => {
                       setSelectedExampleShortHeader(exampleShortHeader);
                       setNewProjectSetupDialogOpen(true);

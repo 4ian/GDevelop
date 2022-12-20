@@ -2,7 +2,7 @@
 import TextEditor from './Editors/TextEditor';
 import TiledSpriteEditor from './Editors/TiledSpriteEditor';
 import PanelSpriteEditor from './Editors/PanelSpriteEditor';
-import SpriteEditor from './Editors/SpriteEditor';
+import SpriteEditor, { LockedSpriteEditor } from './Editors/SpriteEditor';
 import EmptyEditor from './Editors/EmptyEditor';
 import ShapePainterEditor from './Editors/ShapePainterEditor';
 import ParticleEmitterEditor from './Editors/ParticleEmitterEditor';
@@ -16,6 +16,32 @@ const gd: libGDevelop = global.gd;
  */
 const ObjectsEditorService = {
   getEditorConfiguration(project: gdProject, objectType: string) {
+    if (this.editorConfigurations[objectType]) {
+      return this.editorConfigurations[objectType];
+    }
+    if (project.hasEventsBasedObject(objectType)) {
+      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+        gd.JsPlatform.get(),
+        objectType
+      );
+      return this.getCustomObjectPropertiesEditor({
+        helpPagePath: objectMetadata.getHelpPath(),
+      });
+    }
+    console.warn(
+      `Object with type ${objectType} has no editor configuration registered. Please use registerEditorConfiguration to register your editor.`
+    );
+    return this.getDefaultObjectJsImplementationPropertiesEditor({
+      helpPagePath: '',
+    });
+  },
+  getEditorConfigurationForCustomObject(
+    project: gdProject,
+    objectType: string
+  ) {
+    if (this.editorConfigurationsSpecificToCustomObject[objectType]) {
+      return this.editorConfigurationsSpecificToCustomObject[objectType];
+    }
     if (this.editorConfigurations[objectType]) {
       return this.editorConfigurations[objectType];
     }
@@ -104,6 +130,16 @@ const ObjectsEditorService = {
         gd.asCustomObjectConfiguration(objectConfiguration),
       helpPagePath: options.helpPagePath,
     };
+  },
+  editorConfigurationsSpecificToCustomObject: {
+    Sprite: {
+      component: LockedSpriteEditor,
+      createNewObject: (): gdSpriteObject => new gd.SpriteObject(),
+      castToObjectType: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdSpriteObject => gd.asSpriteConfiguration(objectConfiguration),
+      helpPagePath: '/objects/sprite',
+    },
   },
   editorConfigurations: {
     Sprite: {

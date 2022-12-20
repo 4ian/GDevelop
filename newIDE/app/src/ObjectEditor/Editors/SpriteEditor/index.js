@@ -12,6 +12,7 @@ import FlatButton from '../../../UI/FlatButton';
 import RaisedButton from '../../../UI/RaisedButton';
 import { mapFor } from '../../../Utils/MapFor';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
+import Text from '../../../UI/Text';
 import Dialog from '../../../UI/Dialog';
 import HelpButton from '../../../UI/HelpButton';
 import MiniToolbar, { MiniToolbarText } from '../../../UI/MiniToolbar';
@@ -30,7 +31,7 @@ import {
 } from './Utils/SpriteObjectHelper';
 import { type EditorProps } from '../EditorProps.flow';
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
-import { Column } from '../../../UI/Grid';
+import { Column, Spacer } from '../../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import ScrollView from '../../../UI/ScrollView';
 import Checkbox from '../../../UI/Checkbox';
@@ -58,6 +59,7 @@ type AnimationProps = {|
   ) => void,
   objectName: string,
   onChangeName: string => void,
+  isAnimationListLocked: boolean,
 |};
 
 class Animation extends React.Component<AnimationProps, void> {
@@ -75,28 +77,37 @@ class Animation extends React.Component<AnimationProps, void> {
       onReplaceDirection,
       objectName,
       onChangeName,
+      isAnimationListLocked,
     } = this.props;
 
     const animationName = animation.getName();
     return (
       <div>
-        <MiniToolbar noPadding>
-          <DragHandle />
-          <MiniToolbarText>Animation #{id} </MiniToolbarText>
+        {isAnimationListLocked && (
           <Column expand>
-            <SemiControlledTextField
-              commitOnBlur
-              margin="none"
-              value={animation.getName()}
-              translatableHintText={t`Optional animation name`}
-              onChange={text => onChangeName(text)}
-              fullWidth
-            />
+            <Spacer />
+            <Text size="block-title">{animation.getName()}</Text>
           </Column>
-          <IconButton size="small" onClick={onRemove}>
-            <Delete />
-          </IconButton>
-        </MiniToolbar>
+        )}
+        {!isAnimationListLocked && (
+          <MiniToolbar noPadding>
+            <DragHandle />
+            <MiniToolbarText>{<Trans>Animation #{id}</Trans>}</MiniToolbarText>
+            <Column expand>
+              <SemiControlledTextField
+                commitOnBlur
+                margin="none"
+                value={animation.getName()}
+                translatableHintText={t`Optional animation name`}
+                onChange={text => onChangeName(text)}
+                fullWidth
+              />
+            </Column>
+            <IconButton size="small" onClick={onRemove}>
+              <Delete />
+            </IconButton>
+          </MiniToolbar>
+        )}
         {mapFor(0, animation.getDirectionsCount(), i => {
           const direction = animation.getDirection(i);
           return (
@@ -140,6 +151,7 @@ const SortableAnimationsList = SortableContainer(
     selectedSprites,
     onSelectSprite,
     onReplaceDirection,
+    isAnimationListLocked,
   }) => {
     // Note that it's important to have <ScrollView> *inside* this
     // component, otherwise the sortable list won't work (because the
@@ -150,6 +162,7 @@ const SortableAnimationsList = SortableContainer(
           const animation = spriteConfiguration.getAnimation(i);
           return (
             <SortableAnimation
+              isAnimationListLocked={isAnimationListLocked}
               key={i}
               index={i}
               id={i}
@@ -183,6 +196,7 @@ type AnimationsListContainerProps = {|
   onSizeUpdated: () => void,
   objectName: string,
   onObjectUpdated?: () => void,
+  isAnimationListLocked: boolean,
 |};
 
 type AnimationsListContainerState = {|
@@ -322,6 +336,7 @@ class AnimationsListContainer extends React.Component<
           <React.Fragment>
             <SpacedDismissableTutorialMessage />
             <SortableAnimationsList
+              isAnimationListLocked={this.props.isAnimationListLocked}
               spriteConfiguration={this.props.spriteConfiguration}
               objectName={this.props.objectName}
               helperClass="sortable-helper"
@@ -345,12 +360,14 @@ class AnimationsListContainer extends React.Component<
                 noColumnMargin
               >
                 {this.props.extraBottomTools}
-                <RaisedButton
-                  label={<Trans>Add an animation</Trans>}
-                  primary
-                  onClick={this.addAnimation}
-                  icon={<Add />}
-                />
+                {!this.props.isAnimationListLocked && (
+                  <RaisedButton
+                    label={<Trans>Add an animation</Trans>}
+                    primary
+                    onClick={this.addAnimation}
+                    icon={<Add />}
+                  />
+                )}
               </ResponsiveLineStackLayout>
             </Column>
             <ContextMenu
@@ -375,7 +392,7 @@ class AnimationsListContainer extends React.Component<
   }
 }
 
-export default function SpriteEditor({
+export function LockedSpriteEditor({
   objectConfiguration,
   project,
   resourceManagementProps,
@@ -383,6 +400,33 @@ export default function SpriteEditor({
   onObjectUpdated,
   objectName,
 }: EditorProps) {
+  return (
+    <SpriteEditor
+      isAnimationListLocked
+      objectConfiguration={objectConfiguration}
+      project={project}
+      resourceManagementProps={resourceManagementProps}
+      onSizeUpdated={onSizeUpdated}
+      onObjectUpdated={onObjectUpdated}
+      objectName={objectName}
+    />
+  );
+}
+
+type SpriteEditorProps = {|
+  ...EditorProps,
+  isAnimationListLocked?: boolean,
+|};
+
+export default function SpriteEditor({
+  objectConfiguration,
+  project,
+  resourceManagementProps,
+  onSizeUpdated,
+  onObjectUpdated,
+  objectName,
+  isAnimationListLocked = false,
+}: SpriteEditorProps) {
   const [pointsEditorOpen, setPointsEditorOpen] = React.useState(false);
   const [advancedOptionsOpen, setAdvancedOptionsOpen] = React.useState(false);
   const [
@@ -395,6 +439,7 @@ export default function SpriteEditor({
   return (
     <>
       <AnimationsListContainer
+        isAnimationListLocked={isAnimationListLocked}
         spriteConfiguration={spriteConfiguration}
         resourcesLoader={ResourcesLoader}
         resourceManagementProps={resourceManagementProps}
@@ -410,18 +455,22 @@ export default function SpriteEditor({
               onClick={() => setCollisionMasksEditorOpen(true)}
               disabled={spriteConfiguration.getAnimationsCount() === 0}
             />
-            <RaisedButton
-              label={<Trans>Edit points</Trans>}
-              primary={false}
-              onClick={() => setPointsEditorOpen(true)}
-              disabled={spriteConfiguration.getAnimationsCount() === 0}
-            />
-            <FlatButton
-              label={<Trans>Advanced options</Trans>}
-              primary={false}
-              onClick={() => setAdvancedOptionsOpen(true)}
-              disabled={spriteConfiguration.getAnimationsCount() === 0}
-            />
+            {!isAnimationListLocked && (
+              <RaisedButton
+                label={<Trans>Edit points</Trans>}
+                primary={false}
+                onClick={() => setPointsEditorOpen(true)}
+                disabled={spriteConfiguration.getAnimationsCount() === 0}
+              />
+            )}
+            {!isAnimationListLocked && (
+              <FlatButton
+                label={<Trans>Advanced options</Trans>}
+                primary={false}
+                onClick={() => setAdvancedOptionsOpen(true)}
+                disabled={spriteConfiguration.getAnimationsCount() === 0}
+              />
+            )}
           </ResponsiveLineStackLayout>
         }
       />

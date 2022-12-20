@@ -111,6 +111,8 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
     project,
     objectsContainer,
     environment,
+    requiredExtensionInstallation,
+    shouldUpdateExtension,
   }: InstallAssetShortHeaderArgs): Promise<?InstallAssetOutput> => {
     if (!profile) {
       throw new Error(
@@ -142,6 +144,8 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
       project,
       objectsContainer,
       environment,
+      requiredExtensionInstallation,
+      shouldUpdateExtension,
     });
   };
 

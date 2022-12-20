@@ -13,7 +13,9 @@ const styles = {
   },
 };
 
-export default function DropIndicator({ canDrop }: {| canDrop: boolean |}) {
+type Props = {| canDrop: boolean, zIndex?: 1 |};
+
+export default function DropIndicator({ canDrop, zIndex }: Props) {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <div
@@ -22,6 +24,7 @@ export default function DropIndicator({ canDrop }: {| canDrop: boolean |}) {
         borderColor: canDrop
           ? gdevelopTheme.dropIndicator.canDrop
           : gdevelopTheme.dropIndicator.cannotDrop,
+        zIndex: zIndex || undefined,
       }}
     />
   );

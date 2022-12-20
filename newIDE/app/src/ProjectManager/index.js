@@ -54,11 +54,25 @@ import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
 import { type ShortcutMap } from '../KeyboardShortcuts/DefaultShortcuts';
 import { ShortcutsReminder } from './ShortcutsReminder';
 import Paper from '../UI/Paper';
+import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
 const EXTERNAL_EVENTS_CLIPBOARD_KIND = 'External events';
 const EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND = 'Events Functions Extension';
+
+const DragSourceAndDropTargetForScenes = makeDragSourceAndDropTarget(
+  'project-manager-items-scenes'
+);
+const DragSourceAndDropTargetForExternalLayouts = makeDragSourceAndDropTarget(
+  'project-manager-items-external-layouts'
+);
+const DragSourceAndDropTargetForExternalEvents = makeDragSourceAndDropTarget(
+  'project-manager-items-external-events'
+);
+const DragSourceAndDropTargetForExtensions = makeDragSourceAndDropTarget(
+  'project-manager-items-external-events'
+);
 
 const styles = {
   container: {
@@ -135,6 +149,10 @@ type State = {|
 
 export default class ProjectManager extends React.Component<Props, State> {
   _searchBar: ?SearchBarInterface;
+  _draggedLayoutIndex: number | null = null;
+  _draggedExternalLayoutIndex: number | null = null;
+  _draggedExternalEventsIndex: number | null = null;
+  _draggedExtensionIndex: number | null = null;
 
   state = {
     editedPropertiesLayout: null,
@@ -339,6 +357,70 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     project.swapLayouts(index, index + 1);
     this._onProjectItemModified();
+  };
+
+  _dropOnLayout = (targetLayoutIndex: number) => {
+    const { _draggedLayoutIndex } = this;
+    if (_draggedLayoutIndex === null) return;
+
+    if (targetLayoutIndex !== _draggedLayoutIndex) {
+      this.props.project.moveLayout(
+        _draggedLayoutIndex,
+        targetLayoutIndex > _draggedLayoutIndex
+          ? targetLayoutIndex - 1
+          : targetLayoutIndex
+      );
+      this._onProjectItemModified();
+    }
+    this._draggedLayoutIndex = null;
+  };
+
+  _dropOnExternalLayout = (targetExternalLayoutIndex: number) => {
+    const { _draggedExternalLayoutIndex } = this;
+    if (_draggedExternalLayoutIndex === null) return;
+
+    if (targetExternalLayoutIndex !== _draggedExternalLayoutIndex) {
+      this.props.project.moveExternalLayout(
+        _draggedExternalLayoutIndex,
+        targetExternalLayoutIndex > _draggedExternalLayoutIndex
+          ? targetExternalLayoutIndex - 1
+          : targetExternalLayoutIndex
+      );
+      this._onProjectItemModified();
+    }
+    this._draggedExternalLayoutIndex = null;
+  };
+
+  _dropOnExternalEvents = (targetExternalEventsIndex: number) => {
+    const { _draggedExternalEventsIndex } = this;
+    if (_draggedExternalEventsIndex === null) return;
+
+    if (targetExternalEventsIndex !== _draggedExternalEventsIndex) {
+      this.props.project.moveExternalEvents(
+        _draggedExternalEventsIndex,
+        targetExternalEventsIndex > _draggedExternalEventsIndex
+          ? targetExternalEventsIndex - 1
+          : targetExternalEventsIndex
+      );
+      this._onProjectItemModified();
+    }
+    this._draggedExternalEventsIndex = null;
+  };
+
+  _dropOnExtension = (targetExtensionIndex: number) => {
+    const { _draggedExtensionIndex } = this;
+    if (_draggedExtensionIndex === null) return;
+
+    if (targetExtensionIndex !== _draggedExtensionIndex) {
+      this.props.project.moveEventsFunctionsExtension(
+        _draggedExtensionIndex,
+        targetExtensionIndex > _draggedExtensionIndex
+          ? targetExtensionIndex - 1
+          : targetExtensionIndex
+      );
+      this._onProjectItemModified();
+    }
+    this._draggedExtensionIndex = null;
   };
 
   _copyExternalEvents = (externalEvents: gdExternalEvents) => {
@@ -765,6 +847,15 @@ export default class ProjectManager extends React.Component<Props, State> {
                         onMoveUp={() => this._moveUpLayout(i)}
                         canMoveDown={i !== project.getLayoutsCount() - 1}
                         onMoveDown={() => this._moveDownLayout(i)}
+                        dragAndDropProps={{
+                          DragSourceAndDropTarget: DragSourceAndDropTargetForScenes,
+                          onBeginDrag: () => {
+                            this._draggedLayoutIndex = i;
+                          },
+                          onDrop: () => {
+                            this._dropOnLayout(i);
+                          },
+                        }}
                         buildExtraMenuTemplate={(i18n: I18nType) => [
                           {
                             label: i18n._(t`Edit Scene Properties`),
@@ -872,6 +963,15 @@ export default class ProjectManager extends React.Component<Props, State> {
                         onMoveDown={() =>
                           this._moveDownEventsFunctionsExtension(i)
                         }
+                        dragAndDropProps={{
+                          DragSourceAndDropTarget: DragSourceAndDropTargetForExtensions,
+                          onBeginDrag: () => {
+                            this._draggedExtensionIndex = i;
+                          },
+                          onDrop: () => {
+                            this._dropOnExtension(i);
+                          },
+                        }}
                       />
                     );
                   }),
@@ -933,6 +1033,15 @@ export default class ProjectManager extends React.Component<Props, State> {
                         onMoveUp={() => this._moveUpExternalEvents(i)}
                         canMoveDown={i !== project.getExternalEventsCount() - 1}
                         onMoveDown={() => this._moveDownExternalEvents(i)}
+                        dragAndDropProps={{
+                          DragSourceAndDropTarget: DragSourceAndDropTargetForExternalEvents,
+                          onBeginDrag: () => {
+                            this._draggedExternalEventsIndex = i;
+                          },
+                          onDrop: () => {
+                            this._dropOnExternalEvents(i);
+                          },
+                        }}
                       />
                     );
                   }),
@@ -997,6 +1106,15 @@ export default class ProjectManager extends React.Component<Props, State> {
                           i !== project.getExternalLayoutsCount() - 1
                         }
                         onMoveDown={() => this._moveDownExternalLayout(i)}
+                        dragAndDropProps={{
+                          DragSourceAndDropTarget: DragSourceAndDropTargetForExternalLayouts,
+                          onBeginDrag: () => {
+                            this._draggedExternalLayoutIndex = i;
+                          },
+                          onDrop: () => {
+                            this._dropOnExternalLayout(i);
+                          },
+                        }}
                       />
                     );
                   }),

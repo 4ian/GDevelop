@@ -67,7 +67,10 @@ const AssetPackInstallDialog = ({
     setAreAssetsBeingInstalled,
   ] = React.useState<boolean>(false);
   const hasPrivateAssets = React.useMemo(
-    () => assetShortHeaders.some(assetShortHeader => isPrivateAsset),
+    () =>
+      assetShortHeaders.some(assetShortHeader =>
+        isPrivateAsset(assetShortHeader)
+      ),
     [assetShortHeaders]
   );
   const canUserInstallPrivateAsset = React.useMemo(

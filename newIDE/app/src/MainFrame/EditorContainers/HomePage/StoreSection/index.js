@@ -40,7 +40,13 @@ const StoreSection = ({
     : [];
 
   const existingAssetStoreIds = React.useMemo(
-    () => (project ? enumerateAssetStoreIds(project) : new Set<string>()),
+    () => {
+      if (!project || !isAssetPackDialogInstallOpen) {
+        return new Set<string>();
+      }
+
+      return enumerateAssetStoreIds(project);
+    },
     [
       project,
       // Force recompute existing installed asset ids when the dialog to install them is

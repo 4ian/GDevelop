@@ -280,6 +280,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   }
   {
     const animation = new gd.Animation();
+    animation.setName('My animation');
     animation.setDirectionsCount(1);
     const sprite1 = new gd.Sprite();
     sprite1.setImageName('icon128.png');
@@ -305,6 +306,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   }
   {
     const animation = new gd.Animation();
+    animation.setName('My other animation');
     animation.setDirectionsCount(1);
     const sprite1 = new gd.Sprite();
     sprite1.setImageName('icon128.png');

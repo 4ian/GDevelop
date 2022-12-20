@@ -46,7 +46,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/opacity.png")
 
       .AddParameter("object", _("Object"), "TiledSprite")
-      .UseStandardRelationalOperatorParameters("number");
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity to compare to (0-255)")));
 
   obj.AddAction(
          "SetOpacity",
@@ -59,7 +62,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
          "res/actions/opacity.png")
 
       .AddParameter("object", _("Object"), "TiledSprite")
-      .UseStandardOperatorParameters("number");
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity (0-255)")));
 
   obj.AddExpression("Opacity",
                     _("Opacity"),
@@ -89,7 +95,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                 "res/actions/scaleWidth_black.png")
 
       .AddParameter("object", _("Object"), "TiledSprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions())
       .SetFunctionName("SetWidth")
       .SetGetter("GetWidth");
 
@@ -101,7 +108,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/scaleWidth24_black.png",
                    "res/conditions/scaleWidth_black.png")
       .AddParameter("object", _("Object"), "TiledSprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
       .SetFunctionName("GetWidth");
 
@@ -114,7 +122,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                 "res/actions/scaleHeight_black.png")
 
       .AddParameter("object", _("Object"), "TiledSprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions())
       .SetFunctionName("SetHeight")
       .SetGetter("GetHeight");
 
@@ -126,7 +135,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/scaleHeight24_black.png",
                    "res/conditions/scaleHeight_black.png")
       .AddParameter("object", _("Object"), "TiledSprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
       .SetFunctionName("GetHeight");
 
@@ -153,7 +163,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                 "res/actions/rotate_black.png")
 
       .AddParameter("object", _("Object"), "TiledSprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions())
       .SetHidden();
 
   // Deprecated: now available for all objects.
@@ -166,7 +177,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/rotate_black.png")
 
       .AddParameter("object", _("Object"), "TiledSprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions())
       .SetHidden();
 
   obj.AddAction(
@@ -178,7 +190,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
          "res/conditions/scaleWidth24_black.png",
          "res/conditions/scaleWidth_black.png")
       .AddParameter("object", _("Object"), "TiledSprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
       .SetFunctionName("SetXOffset")
       .SetGetter("GetXOffset");
@@ -192,7 +205,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
          "res/conditions/scaleWidth24_black.png",
          "res/conditions/scaleWidth_black.png")
       .AddParameter("object", _("Object"), "TiledSprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
       .SetFunctionName("GetXOffset");
 
@@ -205,7 +219,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
          "res/conditions/scaleHeight24_black.png",
          "res/conditions/scaleHeight_black.png")
       .AddParameter("object", _("Object"), "TiledSprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
       .SetFunctionName("SetYOffset")
       .SetGetter("GetYOffset");
@@ -219,7 +234,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
          "res/conditions/scaleHeight24_black.png",
          "res/conditions/scaleHeight_black.png")
       .AddParameter("object", _("Object"), "TiledSprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
       .SetFunctionName("GetYOffset");
 }

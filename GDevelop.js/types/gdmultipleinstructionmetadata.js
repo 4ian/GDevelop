@@ -5,7 +5,7 @@ declare class gdMultipleInstructionMetadata {
   setDefaultValue(defaultValue: string): gdMultipleInstructionMetadata;
   setParameterLongDescription(longDescription: string): gdMultipleInstructionMetadata;
   setParameterExtraInfo(extraInfo: string): gdMultipleInstructionMetadata;
-  useStandardParameters(type: string, typeExtraInfo?: string): gdMultipleInstructionMetadata;
+  useStandardParameters(type: string, options: gdParameterOptions): gdMultipleInstructionMetadata;
   setHidden(): gdMultipleInstructionMetadata;
   setFunctionName(functionName: string): gdMultipleInstructionMetadata;
   setGetter(getter: string): gdMultipleInstructionMetadata;

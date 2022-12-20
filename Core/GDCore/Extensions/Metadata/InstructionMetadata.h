@@ -14,6 +14,8 @@
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/String.h"
 #include "ParameterMetadata.h"
+#include "ParameterOptions.h"
+
 namespace gd {
 class Project;
 class Layout;
@@ -109,8 +111,8 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
-   * Check if the instruction asynchronicity is optional. If it is, it can either
-   * be used synchronously or asynchronously, with one function for each.
+   * Check if the instruction asynchronicity is optional. If it is, it can
+   * either be used synchronously or asynchronously, with one function for each.
    */
   bool IsOptionallyAsync() const {
     return IsAsync() && !codeExtraInformation.functionCallName.empty();
@@ -223,21 +225,22 @@ class GD_CORE_API InstructionMetadata {
   /**
    * \brief Add the default parameters for an instruction manipulating the
    * specified type ("string", "number") with the default operators.
-   * 
+   *
    * \note The type "string" can be declined in several subtypes.
    * \see ParameterMetadata
    */
-  InstructionMetadata &UseStandardOperatorParameters(const gd::String &type, const gd::String& typeExtraInfo = "");
+  InstructionMetadata &UseStandardOperatorParameters(
+      const gd::String &type, const ParameterOptions &options);
 
   /**
    * \brief Add the default parameters for an instruction comparing the
    * specified type ("string", "number") with the default relational operators.
-   * 
+   *
    * \note The type "string" can be declined in several subtypes.
    * \see ParameterMetadata
    */
   InstructionMetadata &UseStandardRelationalOperatorParameters(
-      const gd::String &type, const gd::String& typeExtraInfo = "");
+      const gd::String &type, const ParameterOptions &options);
 
   /**
    * \brief Mark the instruction as an object instruction. Automatically called
@@ -334,11 +337,12 @@ class GD_CORE_API InstructionMetadata {
     }
 
     /**
-     * Set the name of the function, doing asynchronous work, which will be called in
-     * the generated code. This function should return an asynchronous task
-     * (i.e: `gdjs.AsyncTask` in the JavaScript runtime).
+     * Set the name of the function, doing asynchronous work, which will be
+     * called in the generated code. This function should return an asynchronous
+     * task (i.e: `gdjs.AsyncTask` in the JavaScript runtime).
      *
-     * \param functionName the name of the function doing asynchronous work to call.
+     * \param functionName the name of the function doing asynchronous work to
+     * call.
      */
     ExtraInformation &SetAsyncFunctionName(const gd::String &functionName_) {
       asyncFunctionCallName = functionName_;
@@ -482,12 +486,12 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
-   * Set the name of the function, doing asynchronous work, which will be called in
-   * the generated code. This function should return an asynchronous task
+   * Set the name of the function, doing asynchronous work, which will be called
+   * in the generated code. This function should return an asynchronous task
    * (i.e: `gdjs.AsyncTask` in the JavaScript runtime).
    *
-   * \param functionName the name of the function doing asynchronous work to call.
-   * \note Shortcut for `codeExtraInformation.SetAsyncFunctionName`.
+   * \param functionName the name of the function doing asynchronous work to
+   * call. \note Shortcut for `codeExtraInformation.SetAsyncFunctionName`.
    */
   ExtraInformation &SetAsyncFunctionName(const gd::String &functionName) {
     return codeExtraInformation.SetAsyncFunctionName(functionName);
@@ -512,7 +516,7 @@ class GD_CORE_API InstructionMetadata {
   /**
    * \brief Get the files that must be included to use the instruction.
    */
-  const std::vector<gd::String>& GetIncludeFiles() const {
+  const std::vector<gd::String> &GetIncludeFiles() const {
     return codeExtraInformation.GetIncludeFiles();
   };
 

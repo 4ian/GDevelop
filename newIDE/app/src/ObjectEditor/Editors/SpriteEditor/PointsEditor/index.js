@@ -212,7 +212,6 @@ const PointsEditor = ({
                 project,
                 resourceName
               )}
-              project={project}
               renderOverlay={overlayProps =>
                 sprite && (
                   <PointsPreview

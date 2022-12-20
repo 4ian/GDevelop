@@ -32,7 +32,6 @@ namespace gdjs {
     _flippedX: boolean = false;
     _flippedY: boolean = false;
     opacity: float = 255;
-    _objectData: ObjectData & CustomObjectConfiguration;
 
     /**
      * @param parent The container the object belongs to
@@ -47,7 +46,6 @@ namespace gdjs {
         parent,
         this
       );
-      this._objectData = objectData;
 
       this._instanceContainer.loadFrom(objectData);
       this.getRenderer().reinitialize(this, parent);
@@ -96,12 +94,12 @@ namespace gdjs {
 
       const profiler = this.getRuntimeScene().getProfiler();
       if (profiler) {
-        profiler.begin(this._objectData.type);
+        profiler.begin(this.type);
       }
       // This is a bit like the "scene" events for custom objects.
       this.doStepPostEvents(parent);
       if (profiler) {
-        profiler.end(this._objectData.type);
+        profiler.end(this.type);
       }
 
       this._instanceContainer._updateObjectsPostEvents();

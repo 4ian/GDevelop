@@ -72,29 +72,31 @@ const SectionContainer = ({
         square
         background="dark"
       >
-        <Column expand>
-          <SectionRow>
-            {backAction && (
-              <Line>
-                <TextButton
-                  onClick={backAction}
-                  icon={<ArrowLeft fontSize="small" />}
-                  label={<Trans>Back</Trans>}
-                />
-              </Line>
-            )}
-            <Line noMargin>
-              <Text size="bold-title" noMargin>
-                {title}
-              </Text>
-            </Line>
-            {subtitleText && (
+        <Column noOverflowParent expand>
+          {title && (
+            <SectionRow>
+              {backAction && (
+                <Line>
+                  <TextButton
+                    onClick={backAction}
+                    icon={<ArrowLeft fontSize="small" />}
+                    label={<Trans>Back</Trans>}
+                  />
+                </Line>
+              )}
               <Line noMargin>
-                <Text noMargin>{subtitleText}</Text>
+                <Text size="bold-title" noMargin>
+                  {title}
+                </Text>
               </Line>
-            )}
-            {renderSubtitle && renderSubtitle()}
-          </SectionRow>
+              {subtitleText && (
+                <Line noMargin>
+                  <Text noMargin>{subtitleText}</Text>
+                </Line>
+              )}
+              {renderSubtitle && renderSubtitle()}
+            </SectionRow>
+          )}
           {children}
         </Column>
       </Paper>

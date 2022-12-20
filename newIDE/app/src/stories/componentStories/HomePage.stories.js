@@ -27,6 +27,8 @@ import {
 import { GDevelopAssetApi } from '../../Utils/GDevelopServices/ApiConfigs';
 import withMock from 'storybook-addon-mock';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
+import fakeResourceExternalEditors from '../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../ProjectsStorage/ProjectStorageProviders';
 
 const apiDataServerSideError = {
   mockData: [
@@ -128,6 +130,14 @@ const WrappedHomePage = ({
                 onOpenProfile={() => action('open profile')()}
                 onOpenPreferences={() => action('open preferences')()}
                 onOpenAbout={() => action('open about')()}
+                resourceManagementProps={{
+                  getStorageProvider: () => emptyStorageProvider,
+                  onFetchNewlyAddedResources: async () => {},
+                  resourceSources: [],
+                  onChooseResource: () => Promise.reject('Unimplemented'),
+                  resourceExternalEditors: fakeResourceExternalEditors,
+                }}
+                canInstallPrivateAsset={() => true}
               />
             </TutorialStateProvider>
           </ExampleStoreStateProvider>

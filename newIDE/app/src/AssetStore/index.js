@@ -41,7 +41,7 @@ import IconButton from '../UI/IconButton';
 import { AssetDetails, type AssetDetailsInterface } from './AssetDetails';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Home from '@material-ui/icons/Home';
-import PrivateAssetPackInformationDialog from './PrivateAssets/PrivateAssetPackInformationDialog';
+import PrivateAssetPackInformationPage from './PrivateAssets/PrivateAssetPackInformationPage';
 import PlaceholderError from '../UI/PlaceholderError';
 import AlertMessage from '../UI/AlertMessage';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
@@ -49,9 +49,7 @@ import PrivateAssetPackPurchaseDialog from './PrivateAssets/PrivateAssetPackPurc
 import { LineStackLayout } from '../UI/Layout';
 import Paper from '../UI/Paper';
 
-type Props = {|
-  project: gdProject,
-|};
+type Props = {||};
 
 export type AssetStoreInterface = {|
   onClose: () => void,
@@ -83,7 +81,7 @@ const identifyAssetPackKind = ({
 };
 
 export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
-  ({ project }: Props, ref) => {
+  (props: Props, ref) => {
     const {
       publicAssetPacks,
       privateAssetPacks,
@@ -100,6 +98,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       isOnHomePage,
       openedAssetPack,
       openedAssetShortHeader,
+      openedPrivateAssetPackListingData,
       filtersState,
     } = navigationState.getCurrentPage();
     const searchBar = React.useRef<?SearchBarInterface>(null);
@@ -108,10 +107,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(
       !isOnHomePage && !openedAssetShortHeader
     );
-    const [
-      selectedPrivateAssetPackListingData,
-      setSelectedPrivateAssetPackListingData,
-    ] = React.useState<?PrivateAssetPackListingData>(null);
     const [
       purchasingPrivateAssetPackListingData,
       setPurchasingPrivateAssetPackListingData,
@@ -246,14 +241,16 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           : null;
 
         if (!receivedAssetPack) {
-          // The user has not received the pack, open the dialog to buy it.
+          // The user has not received the pack, open the page to buy it.
           sendAssetPackInformationOpened({
             assetPackName: assetPackListingData.name,
             assetPackId: assetPackListingData.id,
             assetPackKind: 'private',
           });
 
-          setSelectedPrivateAssetPackListingData(assetPackListingData);
+          navigationState.openPrivateAssetPackInformationPage(
+            assetPackListingData
+          );
           return;
         }
 
@@ -292,7 +289,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             setIsFiltersPanelOpen(true);
             saveScrollPosition();
             navigationState.openPackPage(receivedAssetPack);
-            setSelectedPrivateAssetPackListingData(null);
           }
         }
       },
@@ -353,7 +349,13 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         <ResponsiveWindowMeasurer>
           {windowWidth => (
             <>
-              <Column expand noMargin useFullHeight id="asset-store">
+              <Column
+                expand
+                noMargin
+                useFullHeight
+                noOverflowParent
+                id="asset-store"
+              >
                 <LineStackLayout>
                   <IconButton
                     key="back-discover"
@@ -414,12 +416,16 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                             }}
                           />
                         </Column>
-                        {(openedAssetPack || filtersState.chosenCategory) && (
+                        {(openedAssetPack ||
+                          openedPrivateAssetPackListingData ||
+                          filtersState.chosenCategory) && (
                           <>
                             <Column expand alignItems="center">
                               <Text size="block-title" noMargin>
                                 {openedAssetPack
                                   ? openedAssetPack.name
+                                  : openedPrivateAssetPackListingData
+                                  ? openedPrivateAssetPackListingData.name
                                   : filtersState.chosenCategory
                                   ? capitalize(
                                       filtersState.chosenCategory.node.name
@@ -442,64 +448,65 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
                   }
                 >
-                  {!openedAssetShortHeader && ( // Don't show filters on asset page.
-                    <Column noMargin>
-                      <ScrollView>
-                        <Paper
-                          style={{
-                            width: !isFiltersPanelOpen
-                              ? 50
-                              : windowWidth === 'small'
-                              ? 205
-                              : 250,
-                          }}
-                          background="medium"
-                        >
-                          {!isFiltersPanelOpen ? (
-                            <Line justifyContent="center">
-                              <IconButton
-                                onClick={() => setIsFiltersPanelOpen(true)}
-                              >
-                                <Tune />
-                              </IconButton>
-                            </Line>
-                          ) : (
-                            <>
-                              <Line
-                                justifyContent="space-between"
-                                alignItems="center"
-                              >
-                                <Column noMargin>
-                                  <Line alignItems="center">
-                                    <Tune />
-                                    <Subheader>
-                                      <Trans>Object filters</Trans>
-                                    </Subheader>
-                                  </Line>
-                                </Column>
+                  {!openedAssetShortHeader &&
+                  !openedPrivateAssetPackListingData && ( // Don't show filters on asset page.
+                      <Column noMargin>
+                        <ScrollView>
+                          <Paper
+                            style={{
+                              width: !isFiltersPanelOpen
+                                ? 50
+                                : windowWidth === 'small'
+                                ? 205
+                                : 250,
+                            }}
+                            background="medium"
+                          >
+                            {!isFiltersPanelOpen ? (
+                              <Line justifyContent="center">
                                 <IconButton
-                                  onClick={() => setIsFiltersPanelOpen(false)}
+                                  onClick={() => setIsFiltersPanelOpen(true)}
                                 >
-                                  <DoubleChevronArrowLeft />
+                                  <Tune />
                                 </IconButton>
                               </Line>
-                              <Line
-                                justifyContent="space-between"
-                                alignItems="center"
-                              >
-                                <AssetStoreFilterPanel
-                                  assetFiltersState={assetFiltersState}
-                                  onChoiceChange={() => {
-                                    navigationState.openSearchIfNeeded();
-                                  }}
-                                />
-                              </Line>
-                            </>
-                          )}
-                        </Paper>
-                      </ScrollView>
-                    </Column>
-                  )}
+                            ) : (
+                              <>
+                                <Line
+                                  justifyContent="space-between"
+                                  alignItems="center"
+                                >
+                                  <Column noMargin>
+                                    <Line alignItems="center">
+                                      <Tune />
+                                      <Subheader>
+                                        <Trans>Object filters</Trans>
+                                      </Subheader>
+                                    </Line>
+                                  </Column>
+                                  <IconButton
+                                    onClick={() => setIsFiltersPanelOpen(false)}
+                                  >
+                                    <DoubleChevronArrowLeft />
+                                  </IconButton>
+                                </Line>
+                                <Line
+                                  justifyContent="space-between"
+                                  alignItems="center"
+                                >
+                                  <AssetStoreFilterPanel
+                                    assetFiltersState={assetFiltersState}
+                                    onChoiceChange={() => {
+                                      navigationState.openSearchIfNeeded();
+                                    }}
+                                  />
+                                </Line>
+                              </>
+                            )}
+                          </Paper>
+                        </ScrollView>
+                      </Column>
+                    )}
                   {isOnHomePage &&
                     !(publicAssetPacks && privateAssetPacks) &&
                     !error && <PlaceholderLoader />}
@@ -516,27 +523,31 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                         onPrivateAssetPackSelection={selectPrivateAssetPack}
                       />
                     )}
-                  {!isOnHomePage && !openedAssetShortHeader && (
-                    <BoxSearchResults
-                      ref={boxSearchResults}
-                      baseSize={128}
-                      onRetry={fetchAssetsAndFilters}
-                      error={error}
-                      searchItems={searchResults}
-                      renderSearchItem={(assetShortHeader, size) => (
-                        <AssetCard
-                          size={size}
-                          onOpenDetails={() => onOpenDetails(assetShortHeader)}
-                          assetShortHeader={assetShortHeader}
-                        />
-                      )}
-                      noResultPlaceholder={
-                        <NoResultPlaceholder
-                          onClear={() => clearAllFilters(assetFiltersState)}
-                        />
-                      }
-                    />
-                  )}
+                  {!isOnHomePage &&
+                    !openedAssetShortHeader &&
+                    !openedPrivateAssetPackListingData && (
+                      <BoxSearchResults
+                        ref={boxSearchResults}
+                        baseSize={128}
+                        onRetry={fetchAssetsAndFilters}
+                        error={error}
+                        searchItems={searchResults}
+                        renderSearchItem={(assetShortHeader, size) => (
+                          <AssetCard
+                            size={size}
+                            onOpenDetails={() =>
+                              onOpenDetails(assetShortHeader)
+                            }
+                            assetShortHeader={assetShortHeader}
+                          />
+                        )}
+                        noResultPlaceholder={
+                          <NoResultPlaceholder
+                            onClear={() => clearAllFilters(assetFiltersState)}
+                          />
+                        }
+                      />
+                    )}
                   {isOnHomePage && error && (
                     <PlaceholderError onRetry={fetchAssetsAndFilters}>
                       <AlertMessage kind="error">
@@ -550,24 +561,20 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                   {openedAssetShortHeader && (
                     <AssetDetails
                       ref={assetDetails}
-                      project={project}
                       onTagSelection={selectTag}
                       assetShortHeader={openedAssetShortHeader}
                       onOpenDetails={onOpenDetails}
                       onAssetLoaded={applyBackScrollPosition}
                     />
                   )}
-                  {!!selectedPrivateAssetPackListingData && (
-                    <PrivateAssetPackInformationDialog
+                  {!!openedPrivateAssetPackListingData && (
+                    <PrivateAssetPackInformationPage
                       privateAssetPackListingData={
-                        selectedPrivateAssetPackListingData
+                        openedPrivateAssetPackListingData
                       }
-                      onClose={() => {
-                        setSelectedPrivateAssetPackListingData(null);
-                      }}
                       onOpenPurchaseDialog={() =>
                         setPurchasingPrivateAssetPackListingData(
-                          selectedPrivateAssetPackListingData
+                          openedPrivateAssetPackListingData
                         )
                       }
                       isPurchaseDialogOpen={

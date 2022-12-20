@@ -28,6 +28,7 @@ const styles = {
   itemTextField: {
     top: noMarginTextFieldInListItemTopOffset,
   },
+  dragAndDropItemContainer: { display: 'flex', flexDirection: 'column' },
 };
 
 type ProjectStructureItemProps = {|
@@ -192,10 +193,10 @@ export const Item = ({
         >
           {({ connectDragSource, connectDropTarget, isOver, canDrop }) =>
             connectDropTarget(
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={styles.dragAndDropItemContainer}>
                 {isOver && <DropIndicator canDrop={canDrop} zIndex={1} />}
                 {connectDragSource(
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div style={styles.dragAndDropItemContainer}>
                     <ListItem
                       id={id}
                       data={data}

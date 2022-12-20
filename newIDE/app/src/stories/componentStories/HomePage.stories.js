@@ -119,6 +119,7 @@ const WrappedHomePage = ({
                 storageProviders={[CloudStorageProvider]}
                 onChooseProject={() => action('onChooseProject')()}
                 onOpenRecentFile={() => action('onOpenRecentFile')()}
+                onOpenGamesDashboard={() => action('onOpenGamesDashboard')()}
                 onCreateProject={() => action('onCreateProject')()}
                 onOpenProjectManager={() => action('onOpenProjectManager')()}
                 onOpenHelpFinder={() => action('onOpenHelpFinder')()}

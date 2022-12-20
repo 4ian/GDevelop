@@ -66,6 +66,7 @@ export type RenderEditorContainerProps = {|
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   onOpenProjectManager: () => void,
   onCloseProject: () => Promise<boolean>,
+  onOpenGamesDashboard: (gameId: string) => void,
 
   // Other dialogs opening:
   onCreateProject: (?ExampleShortHeader) => void,

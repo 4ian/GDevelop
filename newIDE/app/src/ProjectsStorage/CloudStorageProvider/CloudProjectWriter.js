@@ -59,15 +59,30 @@ const zipProjectAndCommitVersion = async ({
 export const generateOnSaveProject = (
   authenticatedUser: AuthenticatedUser
 ) => async (project: gdProject, fileMetadata: FileMetadata) => {
+  if (!fileMetadata.gameId) {
+    console.info('Game id was never set, updating the cloud project.');
+    try {
+      await updateCloudProject(authenticatedUser, fileMetadata.fileIdentifier, {
+        gameId: project.getProjectUuid(),
+      });
+    } catch (error) {
+      console.error('Could not update cloud project with gameId', error);
+      // Do not throw, as this is not a blocking error.
+    }
+  }
+  const newFileMetadata = {
+    ...fileMetadata,
+    gameId: project.getProjectUuid(),
+  };
   const newVersion = await zipProjectAndCommitVersion({
     authenticatedUser,
     project,
-    cloudProjectId: fileMetadata.fileIdentifier,
+    cloudProjectId: newFileMetadata.fileIdentifier,
   });
-  if (!newVersion) return { wasSaved: false, fileMetadata };
+  if (!newVersion) return { wasSaved: false, fileMetadata: newFileMetadata };
   return {
     wasSaved: true,
-    fileMetadata,
+    fileMetadata: newFileMetadata,
   };
 };
 
@@ -76,7 +91,7 @@ export const generateOnChangeProjectProperty = (
 ) => async (
   project: gdProject,
   fileMetadata: FileMetadata,
-  properties: { name: string }
+  properties: {| name?: string, gameId?: string |}
 ): Promise<boolean> => {
   if (!authenticatedUser.authenticated) return false;
   try {
@@ -180,7 +195,7 @@ export const generateOnSaveProjectAs = (
 ) => {
   if (!saveAsLocation)
     throw new Error('A location was not chosen before saving as.');
-  const { name } = saveAsLocation;
+  const { name, gameId } = saveAsLocation;
   if (!name) throw new Error('A name was not chosen before saving as.');
   if (!authenticatedUser.authenticated) {
     return { wasSaved: false, fileMetadata: null };
@@ -191,12 +206,14 @@ export const generateOnSaveProjectAs = (
     // Create a new cloud project.
     const cloudProject = await createCloudProject(authenticatedUser, {
       name,
+      gameId,
     });
     if (!cloudProject)
       throw new Error('No cloud project was returned from creation api call.');
 
     const fileMetadata = {
       fileIdentifier: cloudProject.id,
+      gameId,
     };
 
     // Move the resources to the new project.

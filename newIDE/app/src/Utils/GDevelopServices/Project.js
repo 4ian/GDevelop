@@ -40,6 +40,7 @@ export type UploadedProjectResourceFiles = Array<{|
 type CloudProject = {|
   id: string,
   name: string,
+  gameId?: string,
   createdAt: string,
   currentVersion?: string,
   deletedAt?: string,
@@ -109,7 +110,7 @@ export const clearCloudProjectCredentials = async (): Promise<void> => {
 
 export const createCloudProject = async (
   authenticatedUser: AuthenticatedUser,
-  cloudProjectCreationPayload: { name: string }
+  cloudProjectCreationPayload: {| name: string, gameId?: string |}
 ): Promise<?CloudProject> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return null;
@@ -251,13 +252,16 @@ export const getCloudProject = async (
 export const updateCloudProject = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
-  attributes: { name: string }
+  attributes: {| name?: string, gameId?: string |}
 ): Promise<?CloudProject> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
 
   const cleanedAttributes = {
-    name: attributes.name.slice(0, CLOUD_PROJECT_NAME_MAX_LENGTH),
+    name: attributes.name
+      ? attributes.name.slice(0, CLOUD_PROJECT_NAME_MAX_LENGTH)
+      : undefined,
+    gameId: attributes.gameId,
   };
 
   const { uid: userId } = firebaseUser;

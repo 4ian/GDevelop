@@ -8,6 +8,7 @@ import { type ResourceManagementProps } from '../../../../ResourcesList/Resource
 import { Trans } from '@lingui/macro';
 import { AssetStoreContext } from '../../../../AssetStore/AssetStoreContext';
 import AssetPackInstallDialog from '../../../../AssetStore/AssetPackInstallDialog';
+import { enumerateAssetStoreIds } from '../../../../AssetStore/EnumerateAssetStoreIds';
 
 type Props = {|
   project: ?gdProject,
@@ -37,6 +38,17 @@ const StoreSection = ({
     : openedAssetPack
     ? searchResults
     : [];
+
+  const existingAssetStoreIds = React.useMemo(
+    () => (project ? enumerateAssetStoreIds(project) : new Set<string>()),
+    [
+      project,
+      // Force recompute existing installed asset ids when the dialog to install them is
+      // opened/closed, so that this list of ids is always up-to-date (but not recomputed at each render,
+      // just when you're likely to need it).
+      isAssetPackDialogInstallOpen,
+    ]
+  );
 
   return (
     <SectionContainer
@@ -78,9 +90,7 @@ const StoreSection = ({
           <AssetPackInstallDialog
             assetPack={openedAssetPack}
             assetShortHeaders={assetShortHeadersToInstall}
-            addedAssetIds={
-              [] /* Don't check if assets are already installed in the project. */
-            }
+            addedAssetIds={existingAssetStoreIds}
             onClose={() => setIsAssetPackDialogInstallOpen(false)}
             onAssetsAdded={() => {
               setIsAssetPackDialogInstallOpen(false);

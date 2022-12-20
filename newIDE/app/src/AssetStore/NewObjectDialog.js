@@ -8,7 +8,6 @@ import ListIcon from '../UI/ListIcon';
 import Subheader from '../UI/Subheader';
 import { List, ListItem } from '../UI/List';
 import {
-  enumerateObjects,
   enumerateObjectTypes,
   type EnumeratedObjectMetadata,
 } from '../ObjectsList/EnumerateObjects';
@@ -36,6 +35,7 @@ import { isPrivateAsset } from '../Utils/GDevelopServices/Asset';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { enumerateAssetStoreIds } from './EnumerateAssetStoreIds';
 const isDev = Window.isDev();
 
 const ObjectListItem = ({
@@ -148,10 +148,10 @@ export default function NewObjectDialog({
     isAssetPackDialogInstallOpen,
     setIsAssetPackDialogInstallOpen,
   ] = React.useState(false);
-  const { containerObjectsList } = enumerateObjects(project, objectsContainer);
-  const addedAssetIds = containerObjectsList
-    .map(({ object }) => object.getAssetStoreId())
-    .filter(Boolean);
+  const existingAssetStoreIds = React.useMemo(
+    () => enumerateAssetStoreIds(project, objectsContainer),
+    [project, objectsContainer]
+  );
   const [
     isAssetBeingInstalled,
     setIsAssetBeingInstalled,
@@ -160,7 +160,8 @@ export default function NewObjectDialog({
     EventsFunctionsExtensionsContext
   );
   const isAssetAddedToScene =
-    openedAssetShortHeader && addedAssetIds.includes(openedAssetShortHeader.id);
+    openedAssetShortHeader &&
+    existingAssetStoreIds.has(openedAssetShortHeader.id);
   const { installPrivateAsset } = React.useContext(
     PrivateAssetsAuthorizationContext
   );
@@ -386,7 +387,7 @@ export default function NewObjectDialog({
         <AssetPackInstallDialog
           assetPack={openedAssetPack}
           assetShortHeaders={searchResults}
-          addedAssetIds={addedAssetIds}
+          addedAssetIds={existingAssetStoreIds}
           onClose={() => setIsAssetPackDialogInstallOpen(false)}
           onAssetsAdded={() => {
             setIsAssetPackDialogInstallOpen(false);

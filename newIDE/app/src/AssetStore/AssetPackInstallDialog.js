@@ -32,7 +32,7 @@ import { type InstallAssetOutput } from './InstallAsset';
 type Props = {|
   assetPack: PublicAssetPack | PrivateAssetPack | null,
   assetShortHeaders: Array<AssetShortHeader>,
-  addedAssetIds: Array<string>,
+  addedAssetIds: Set<string>,
   onClose: () => void,
   onAssetsAdded: () => void,
   project: gdProject,
@@ -55,7 +55,7 @@ const AssetPackInstallDialog = ({
   resourceManagementProps,
 }: Props) => {
   const missingAssetShortHeaders = assetShortHeaders.filter(
-    assetShortHeader => !addedAssetIds.includes(assetShortHeader.id)
+    assetShortHeader => !addedAssetIds.has(assetShortHeader.id)
   );
   const allAssetsInstalled = missingAssetShortHeaders.length === 0;
   const noAssetsInstalled =

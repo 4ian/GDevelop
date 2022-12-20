@@ -98,7 +98,7 @@ export const LayoutPublicAssetInstallSuccess = () => {
         <AssetPackInstallDialog
           assetPack={fakeAssetPacks.starterPacks[0]}
           assetShortHeaders={[fakeAssetShortHeader1]}
-          addedAssetIds={[]}
+          addedAssetIds={new Set<string>()}
           onClose={action('onClose')}
           onAssetsAdded={action('onAssetsAdded')}
           project={testProject.project}
@@ -131,7 +131,7 @@ export const LayoutPublicAssetInstallFailure = () => {
         <AssetPackInstallDialog
           assetPack={fakeAssetPacks.starterPacks[0]}
           assetShortHeaders={[fakeAssetShortHeader1]}
-          addedAssetIds={[]}
+          addedAssetIds={new Set<string>()}
           onClose={action('onClose')}
           onAssetsAdded={action('onAssetsAdded')}
           project={testProject.project}
@@ -160,7 +160,7 @@ export const LayoutPublicAssetAllAlreadyInstalled = () => (
     <AssetPackInstallDialog
       assetPack={fakeAssetPacks.starterPacks[0]}
       assetShortHeaders={[fakeAssetShortHeader1]}
-      addedAssetIds={[fakeAssetShortHeader1.id]}
+      addedAssetIds={new Set([fakeAssetShortHeader1.id])}
       onClose={action('onClose')}
       onAssetsAdded={action('onAssetsAdded')}
       project={testProject.project}
@@ -186,7 +186,7 @@ export const LayoutPublicAssetSomeAlreadyInstalled = () => (
       <AssetPackInstallDialog
         assetPack={fakeAssetPacks.starterPacks[0]}
         assetShortHeaders={[fakeAssetShortHeader1, fakeAssetShortHeader2]}
-        addedAssetIds={[fakeAssetShortHeader1.id]}
+        addedAssetIds={new Set([fakeAssetShortHeader1.id])}
         onClose={action('onClose')}
         onAssetsAdded={action('onAssetsAdded')}
         project={testProject.project}
@@ -225,7 +225,7 @@ export const LayoutPrivateAssetInstallSuccess = () => (
       <AssetPackInstallDialog
         assetPack={fakeAssetPacks.starterPacks[0]}
         assetShortHeaders={[fakePrivateAssetShortHeader1]}
-        addedAssetIds={[]}
+        addedAssetIds={new Set<string>()}
         onClose={action('onClose')}
         onAssetsAdded={action('onAssetsAdded')}
         project={testProject.project}
@@ -260,7 +260,7 @@ export const LayoutPrivateAssetInstallFailure = () => (
       <AssetPackInstallDialog
         assetPack={fakeAssetPacks.starterPacks[0]}
         assetShortHeaders={[fakePrivateAssetShortHeader1]}
-        addedAssetIds={[]}
+        addedAssetIds={new Set<string>()}
         onClose={action('onClose')}
         onAssetsAdded={action('onAssetsAdded')}
         project={testProject.project}
@@ -284,7 +284,7 @@ export const LayoutPrivateAssetButCantInstall = () => (
     <AssetPackInstallDialog
       assetPack={fakeAssetPacks.starterPacks[0]}
       assetShortHeaders={[fakePrivateAssetShortHeader1]}
-      addedAssetIds={[]}
+      addedAssetIds={new Set<string>()}
       onClose={action('onClose')}
       onAssetsAdded={action('onAssetsAdded')}
       project={testProject.project}
@@ -310,7 +310,7 @@ export const NoObjectsContainerPublicAssetInstallSuccess = () => (
       <AssetPackInstallDialog
         assetPack={fakeAssetPacks.starterPacks[0]}
         assetShortHeaders={[fakeAssetShortHeader1, fakeAssetShortHeader2]}
-        addedAssetIds={[]}
+        addedAssetIds={new Set<string>()}
         onClose={action('onClose')}
         onAssetsAdded={action('onAssetsAdded')}
         project={testProject.project}
@@ -338,7 +338,7 @@ export const NoObjectsContainerPrivateAssetButCantInstall = () => (
     <AssetPackInstallDialog
       assetPack={fakeAssetPacks.starterPacks[0]}
       assetShortHeaders={[fakePrivateAssetShortHeader1]}
-      addedAssetIds={[]}
+      addedAssetIds={new Set<string>()}
       onClose={action('onClose')}
       onAssetsAdded={action('onAssetsAdded')}
       project={testProject.project}

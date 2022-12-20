@@ -468,8 +468,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddCondition(
           "SoundCanalVolume",
           _("Volume of the sound on a channel"),
-          _("Test the volume of the sound on the specified channel. The volume "
-            "is between 0 and 100."),
+          _("Test the volume of the sound on the specified channel."),
           _("the volume of the sound on channel _PARAM1_"),
           _("Sounds on channels"),
           "res/conditions/sonVolume24.png",

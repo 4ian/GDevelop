@@ -42,24 +42,7 @@ const ObjectsEditorService = {
     if (this.editorConfigurationsSpecificToCustomObject[objectType]) {
       return this.editorConfigurationsSpecificToCustomObject[objectType];
     }
-    if (this.editorConfigurations[objectType]) {
-      return this.editorConfigurations[objectType];
-    }
-    if (project.hasEventsBasedObject(objectType)) {
-      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
-        gd.JsPlatform.get(),
-        objectType
-      );
-      return this.getCustomObjectPropertiesEditor({
-        helpPagePath: objectMetadata.getHelpPath(),
-      });
-    }
-    console.warn(
-      `Object with type ${objectType} has no editor configuration registered. Please use registerEditorConfiguration to register your editor.`
-    );
-    return this.getDefaultObjectJsImplementationPropertiesEditor({
-      helpPagePath: '',
-    });
+    return this.getEditorConfiguration(project, objectType);
   },
   registerEditorConfiguration: function(
     objectType: string,

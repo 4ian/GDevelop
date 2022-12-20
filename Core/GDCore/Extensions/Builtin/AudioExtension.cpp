@@ -146,69 +146,83 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddAction("ModVolumeSoundCanal",
                  _("Volume of the sound on a channel"),
                  _("This action modifies the volume of the sound on the "
-                   "specified channel. The volume is between 0 and 100."),
+                   "specified channel."),
                  _("the volume of the sound on channel _PARAM1_"),
                  _("Sounds on channels"),
                  "res/actions/sonVolume24.png",
                  "res/actions/sonVolume.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Volume (0-100)")))
       .MarkAsAdvanced();
 
   extension
       .AddAction("ModVolumeMusicCanal",
                  _("Volume of the music on a channel"),
                  _("This action modifies the volume of the music on the "
-                   "specified channel. The volume is between 0 and 100."),
+                   "specified channel."),
                  _("the volume of the music on channel _PARAM1_"),
                  _("Music on channels"),
                  "res/actions/musicVolume24.png",
                  "res/actions/musicVolume.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Volume (0-100)")))
       .MarkAsAdvanced();
 
   extension
       .AddAction("ModGlobalVolume",
                  _("Game global volume"),
-                 _("This action modifies the global volume of the game. The "
-                   "volume is between 0 and 100."),
+                 _("This action modifies the global volume of the game."),
                  _("the global sound level"),
                  "",
                  "res/actions/volume24.png",
                  "res/actions/volume.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Volume (0-100)")))
       .MarkAsSimple();
 
   extension
       .AddAction("ModPitchSoundChannel",
                  _("Pitch of the sound of a channel"),
                  _("This action modifies the pitch (speed) of the sound on a "
-                   "channel.\n1 is the default pitch."),
+                   "channel."),
                  _("the pitch of the sound on channel _PARAM1_"),
                  _("Sounds on channels"),
                  "res/actions/son24.png",
                  "res/actions/son.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Pitch (1 by default)")))
       .MarkAsAdvanced();
 
   extension
       .AddAction("ModPitchMusicChannel",
                  _("Pitch of the music on a channel"),
                  _("This action modifies the pitch of the music on the "
-                   "specified channel. 1 is the default pitch"),
+                   "specified channel."),
                  _("the pitch of the music on channel _PARAM1_"),
                  _("Music on channels"),
                  "res/actions/music24.png",
                  "res/actions/music.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Pitch (1 by default)")))
       .MarkAsAdvanced();
 
   extension
@@ -222,7 +236,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
                  "res/actions/son.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Position (in seconds)")))
       .MarkAsAdvanced();
 
   extension
@@ -236,7 +253,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
                  "res/actions/music.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Position (in seconds)")))
       .MarkAsAdvanced();
 
   extension
@@ -456,7 +476,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           "res/conditions/sonVolume.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Volume to compare to (0-100)")))
       .MarkAsAdvanced();
 
   extension
@@ -471,7 +494,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           "res/conditions/musicVolume.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Volume to compare to (0-100)")))
       .MarkAsAdvanced();
 
   extension
@@ -484,7 +510,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           "res/conditions/volume24.png",
           "res/conditions/volume.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .UseStandardRelationalOperatorParameters("number");
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Volume to compare to (0-100)")));
 
   extension
       .AddCondition(
@@ -498,22 +527,27 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           "res/conditions/sonVolume.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Pitch to compare to (1 by default)")))
       .MarkAsAdvanced();
 
   extension
       .AddCondition(
           "MusicChannelPitch",
           _("Pitch of the music on a channel"),
-          _("Test the pitch (speed) of the music on a specified channel. 1 is "
-            "the default pitch."),
+          _("Test the pitch (speed) of the music on a specified channel."),
           _("the pitch of the music on channel _PARAM1_"),
           _("Music on channels"),
           "res/conditions/musicVolume24.png",
           "res/conditions/musicVolume.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Pitch to compare to (1 by default)")))
       .MarkAsAdvanced();
 
   extension
@@ -527,7 +561,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           "res/conditions/sonVolume.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Position to compare to (in seconds)")))
       .MarkAsAdvanced();
 
   extension
@@ -541,7 +578,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           "res/conditions/musicVolume.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Channel identifier"))
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Position to compare to (in seconds)")))
       .MarkAsAdvanced();
 
   extension

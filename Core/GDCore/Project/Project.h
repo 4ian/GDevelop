@@ -165,7 +165,7 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   const gd::String& GetPackageName() const { return packageName; }
 
-    /**
+  /**
    * \brief Change the slug of the template from which the project is created.
    */
   void SetTemplateSlug(const gd::String& templateSlug_) {
@@ -458,7 +458,7 @@ class GD_CORE_API Project : public ObjectsContainer {
 
   /**
    * Create an object of the given type with the specified name.
-   * 
+   *
    * \param type The type of the object
    * \param name The name of the object
    */
@@ -467,7 +467,7 @@ class GD_CORE_API Project : public ObjectsContainer {
 
   /**
    * Create an object configuration of the given type.
-   * 
+   *
    * \param type The type of the object
    */
   std::unique_ptr<gd::ObjectConfiguration> CreateObjectConfiguration(
@@ -524,6 +524,11 @@ class GD_CORE_API Project : public ObjectsContainer {
    * \brief Return the position of the layout called "name" in the layout list
    */
   std::size_t GetLayoutPosition(const gd::String& name) const;
+
+  /**
+   * Change the position of the specified layout.
+   */
+  void MoveLayout(std::size_t oldIndex, std::size_t newIndex);
 
   /**
    * \brief Swap the specified layouts.
@@ -629,6 +634,11 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::size_t GetExternalEventsPosition(const gd::String& name) const;
 
   /**
+   * Change the position of the specified external events.
+   */
+  void MoveExternalEvents(std::size_t oldIndex, std::size_t newIndex);
+
+  /**
    * \brief Swap the specified external events.
    *
    * Do nothing if indexes are not correct.
@@ -701,6 +711,11 @@ class GD_CORE_API Project : public ObjectsContainer {
    * layout list
    */
   std::size_t GetExternalLayoutPosition(const gd::String& name) const;
+
+  /**
+   * Change the position of the specified external layout.
+   */
+  void MoveExternalLayout(std::size_t oldIndex, std::size_t newIndex);
 
   /**
    * \brief Swap the specified external layouts.
@@ -790,6 +805,11 @@ class GD_CORE_API Project : public ObjectsContainer {
    * in the list.
    */
   std::size_t GetEventsFunctionsExtensionPosition(const gd::String& name) const;
+
+  /**
+   * Change the position of the specified events function extension.
+   */
+  void MoveEventsFunctionsExtension(std::size_t oldIndex, std::size_t newIndex);
 
   /**
    * \brief Swap the specified events functions extensions.

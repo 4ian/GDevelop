@@ -19,6 +19,8 @@
 import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
 */
 
+const stringifyOptions = (options) => '["' + options.join('","') + '"]';
+
 module.exports = {
   createExtension: function (
     _ /*: (string) => string */,
@@ -35,8 +37,9 @@ module.exports = {
       )
       .setExtensionHelpPath('/objects/bbtext')
       .setCategory('User interface');
-    extension.addInstructionOrExpressionGroupMetadata(_("BBCode Text Object"))
-        .setIcon("JsPlatform/Extensions/bbcode32.png");
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('BBCode Text Object'))
+      .setIcon('JsPlatform/Extensions/bbcode32.png');
 
     var objectBBText = new gd.ObjectJsImplementation();
     // $FlowExpectedError
@@ -195,7 +198,10 @@ module.exports = {
             .addParameter('object', objectName, objectName, false)
             .getCodeExtraInformation()
             .setFunctionName(`get${property.functionName}`);
-        } else if (parameterType === 'string') {
+        } else if (
+          parameterType === 'string' ||
+          parameterType === 'stringWithSelector'
+        ) {
           gdObject
             .addStrExpression(
               `Get${property.functionName}`,
@@ -210,9 +216,20 @@ module.exports = {
         }
 
         // Add the action
-        if (parameterType === 'number' || parameterType === 'string') {
-          const expressionType =
-            parameterType === 'number' ? 'expression' : 'string';
+        if (
+          parameterType === 'number' ||
+          parameterType === 'string' ||
+          parameterType === 'stringWithSelector'
+        ) {
+          const parameterOptions =
+            gd.ParameterOptions.makeNewOptions().setDescription(
+              property.paramLabel
+            );
+          if (property.options) {
+            parameterOptions.setTypeExtraInfo(
+              stringifyOptions(property.options)
+            );
+          }
           gdObject
             .addAction(
               `Set${property.functionName}`,
@@ -224,12 +241,7 @@ module.exports = {
               property.iconPath
             )
             .addParameter('object', objectName, objectName, false)
-            .useStandardOperatorParameters(
-              parameterType,
-              gd.ParameterOptions.makeNewOptions().setDescription(
-                property.paramLabel
-              )
-            )
+            .useStandardOperatorParameters(parameterType, parameterOptions)
             .getCodeExtraInformation()
             .setFunctionName(`set${property.functionName}`)
             .setGetter(`get${property.functionName}`);
@@ -248,9 +260,7 @@ module.exports = {
             .addParameter(
               parameterType,
               property.paramLabel,
-              property.options
-                ? '["' + property.options.join('", "') + '"]'
-                : '',
+              '', // There should not be options for the property if it's not a stringWithSelector
               false
             )
             .getCodeExtraInformation()
@@ -259,9 +269,20 @@ module.exports = {
         }
 
         // Add condition
-        if (parameterType === 'string' || parameterType === 'number') {
-          const propExpressionType =
-            parameterType === 'string' ? 'string' : 'expression';
+        if (
+          parameterType === 'string' ||
+          parameterType === 'number' ||
+          parameterType === 'stringWithSelector'
+        ) {
+          const parameterOptions =
+            gd.ParameterOptions.makeNewOptions().setDescription(
+              property.paramLabel
+            );
+          if (property.options) {
+            parameterOptions.setTypeExtraInfo(
+              stringifyOptions(property.options)
+            );
+          }
           gdObject
             .addCondition(
               `Is${property.functionName}`,
@@ -275,9 +296,7 @@ module.exports = {
             .addParameter('object', objectName, objectName, false)
             .useStandardRelationalOperatorParameters(
               parameterType,
-              gd.ParameterOptions.makeNewOptions().setDescription(
-                property.paramLabel
-              )
+              parameterOptions
             )
             .getCodeExtraInformation()
             .setFunctionName(`get${property.functionName}`);

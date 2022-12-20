@@ -81,8 +81,13 @@ export const useNavigation = (): NavigationState => {
         setHistory({ previousPages: [assetStoreHomePageState] });
       },
       clearHistory: () => {
-        const currentPage = previousPages[previousPages.length - 1];
-        setHistory({ previousPages: [assetStoreHomePageState, currentPage] });
+        setHistory(previousHistory => {
+          const currentPage =
+            previousHistory.previousPages[
+              previousHistory.previousPages.length - 1
+            ];
+          return { previousPages: [assetStoreHomePageState, currentPage] };
+        });
       },
       openSearchIfNeeded: () => {
         const currentPage = previousPages[previousPages.length - 1];
@@ -91,18 +96,31 @@ export const useNavigation = (): NavigationState => {
         }
       },
       activateTextualSearch: () => {
-        const currentPage = previousPages[previousPages.length - 1];
-        if (currentPage.isOnHomePage || currentPage.openedAssetShortHeader) {
-          setHistory({ previousPages: [...previousPages, searchPageState] });
-        } else if (currentPage.ignoreTextualSearch) {
-          currentPage.ignoreTextualSearch = false;
-          setHistory({ previousPages: [...previousPages] });
-        }
+        setHistory(previousHistory => {
+          const currentPage =
+            previousHistory.previousPages[
+              previousHistory.previousPages.length - 1
+            ];
+          if (currentPage.isOnHomePage || currentPage.openedAssetShortHeader) {
+            return {
+              previousPages: [
+                ...previousHistory.previousPages,
+                searchPageState,
+              ],
+            };
+          } else if (currentPage.ignoreTextualSearch) {
+            currentPage.ignoreTextualSearch = false;
+            return { previousPages: [...previousHistory.previousPages] };
+          }
+
+          return previousHistory;
+        });
       },
       openTagPage: (tag: string) => {
-        setHistory({
+        setHistory(previousHistory => ({
+          ...previousHistory,
           previousPages: [
-            ...previousPages,
+            ...previousHistory.previousPages,
             {
               isOnHomePage: false,
               openedAssetShortHeader: null,
@@ -121,12 +139,13 @@ export const useNavigation = (): NavigationState => {
               ignoreTextualSearch: true,
             },
           ],
-        });
+        }));
       },
       openPackPage: (assetPack: PublicAssetPack | PrivateAssetPack) => {
-        setHistory({
+        setHistory(previousHistory => ({
+          ...previousHistory,
           previousPages: [
-            ...previousPages,
+            ...previousHistory.previousPages,
             {
               isOnHomePage: false,
               openedAssetShortHeader: null,
@@ -149,14 +168,15 @@ export const useNavigation = (): NavigationState => {
               ignoreTextualSearch: true,
             },
           ],
-        });
+        }));
       },
       openPrivateAssetPackInformationPage: (
         assetPack: PrivateAssetPackListingData
       ) => {
-        setHistory({
+        setHistory(previousHistory => ({
+          ...previousHistory,
           previousPages: [
-            ...previousPages,
+            ...previousHistory.previousPages,
             {
               isOnHomePage: false,
               openedAssetShortHeader: null,
@@ -166,12 +186,13 @@ export const useNavigation = (): NavigationState => {
               ignoreTextualSearch: true,
             },
           ],
-        });
+        }));
       },
       openDetailPage: (assetShortHeader: AssetShortHeader) => {
-        setHistory({
+        setHistory(previousHistory => ({
+          ...previousHistory,
           previousPages: [
-            ...previousPages,
+            ...previousHistory.previousPages,
             {
               isOnHomePage: false,
               openedAssetShortHeader: assetShortHeader,
@@ -181,7 +202,7 @@ export const useNavigation = (): NavigationState => {
               ignoreTextualSearch: true,
             },
           ],
-        });
+        }));
       },
     }),
     [previousPages]

@@ -435,6 +435,7 @@ interface Project {
     boolean HasLayoutNamed([Const] DOMString name);
     [Ref] Layout GetLayout([Const] DOMString name);
     [Ref] Layout GetLayoutAt(unsigned long index);
+    void MoveLayout(unsigned long oldIndex, unsigned long newIndex);
     void SwapLayouts(unsigned long first, unsigned long second);
     unsigned long GetLayoutsCount();
     [Ref] Layout InsertNewLayout([Const] DOMString name, unsigned long position);
@@ -445,6 +446,7 @@ interface Project {
     boolean HasExternalEventsNamed([Const] DOMString name);
     [Ref] ExternalEvents GetExternalEvents([Const] DOMString name);
     [Ref] ExternalEvents GetExternalEventsAt(unsigned long index);
+    void MoveExternalEvents(unsigned long oldIndex, unsigned long newIndex);
     void SwapExternalEvents(unsigned long first, unsigned long second);
     unsigned long GetExternalEventsCount();
     [Ref] ExternalEvents InsertNewExternalEvents([Const] DOMString name, unsigned long position);
@@ -453,6 +455,7 @@ interface Project {
     boolean HasExternalLayoutNamed([Const] DOMString name);
     [Ref] ExternalLayout GetExternalLayout([Const] DOMString name);
     [Ref] ExternalLayout GetExternalLayoutAt(unsigned long index);
+    void MoveExternalLayout(unsigned long oldIndex, unsigned long newIndex);
     void SwapExternalLayouts(unsigned long first, unsigned long second);
     unsigned long GetExternalLayoutsCount();
     [Ref] ExternalLayout InsertNewExternalLayout([Const] DOMString name, unsigned long position);
@@ -461,6 +464,7 @@ interface Project {
     boolean HasEventsFunctionsExtensionNamed([Const] DOMString name);
     [Ref] EventsFunctionsExtension GetEventsFunctionsExtension([Const] DOMString name);
     [Ref] EventsFunctionsExtension GetEventsFunctionsExtensionAt(unsigned long index);
+    void MoveEventsFunctionsExtension(unsigned long oldIndex, unsigned long newIndex);
     void SwapEventsFunctionsExtensions(unsigned long first, unsigned long second);
     unsigned long GetEventsFunctionsExtensionsCount();
     [Ref] EventsFunctionsExtension InsertNewEventsFunctionsExtension([Const] DOMString name, unsigned long position);

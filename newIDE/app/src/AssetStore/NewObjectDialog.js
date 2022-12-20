@@ -8,7 +8,6 @@ import ListIcon from '../UI/ListIcon';
 import Subheader from '../UI/Subheader';
 import { List, ListItem } from '../UI/List';
 import {
-  enumerateObjects,
   enumerateObjectTypes,
   type EnumeratedObjectMetadata,
 } from '../ObjectsList/EnumerateObjects';
@@ -36,6 +35,7 @@ import { isPrivateAsset } from '../Utils/GDevelopServices/Asset';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { enumerateAssetStoreIds } from './EnumerateAssetStoreIds';
 const isDev = Window.isDev();
 
 const ObjectListItem = ({
@@ -148,10 +148,10 @@ export default function NewObjectDialog({
     isAssetPackDialogInstallOpen,
     setIsAssetPackDialogInstallOpen,
   ] = React.useState(false);
-  const { containerObjectsList } = enumerateObjects(project, objectsContainer);
-  const addedAssetIds = containerObjectsList
-    .map(({ object }) => object.getAssetStoreId())
-    .filter(Boolean);
+  const existingAssetStoreIds = React.useMemo(
+    () => enumerateAssetStoreIds(project, objectsContainer),
+    [project, objectsContainer]
+  );
   const [
     isAssetBeingInstalled,
     setIsAssetBeingInstalled,
@@ -160,7 +160,8 @@ export default function NewObjectDialog({
     EventsFunctionsExtensionsContext
   );
   const isAssetAddedToScene =
-    openedAssetShortHeader && addedAssetIds.includes(openedAssetShortHeader.id);
+    openedAssetShortHeader &&
+    existingAssetStoreIds.has(openedAssetShortHeader.id);
   const { installPrivateAsset } = React.useContext(
     PrivateAssetsAuthorizationContext
   );
@@ -177,8 +178,8 @@ export default function NewObjectDialog({
             const canUserInstallPrivateAsset = await canInstallPrivateAsset();
             if (!canUserInstallPrivateAsset) {
               await showAlert({
-                title: t`No cloud project`,
-                message: t`You need to save this project as a cloud project to install this asset. Save your project and try again!`,
+                title: t`Save your project`,
+                message: t`You need to save this project as a cloud project to install this asset. Please save your project and try again.`,
               });
               setIsAssetBeingInstalled(false);
               return;
@@ -347,9 +348,7 @@ export default function NewObjectDialog({
           />
         }
       >
-        {currentTab === 'asset-store' && (
-          <AssetStore ref={assetStore} project={project} />
-        )}
+        {currentTab === 'asset-store' && <AssetStore ref={assetStore} />}
         {currentTab === 'new-object' && (
           <ScrollView>
             {DismissableTutorialMessage && (
@@ -388,7 +387,7 @@ export default function NewObjectDialog({
         <AssetPackInstallDialog
           assetPack={openedAssetPack}
           assetShortHeaders={searchResults}
-          addedAssetIds={addedAssetIds}
+          addedAssetIds={existingAssetStoreIds}
           onClose={() => setIsAssetPackDialogInstallOpen(false)}
           onAssetsAdded={() => {
             setIsAssetPackDialogInstallOpen(false);
@@ -396,6 +395,7 @@ export default function NewObjectDialog({
           project={project}
           objectsContainer={objectsContainer}
           onObjectAddedFromAsset={onObjectAddedFromAsset}
+          canInstallPrivateAsset={canInstallPrivateAsset}
           resourceManagementProps={resourceManagementProps}
         />
       )}

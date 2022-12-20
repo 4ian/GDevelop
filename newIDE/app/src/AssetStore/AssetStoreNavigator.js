@@ -6,18 +6,19 @@ import {
   type PublicAssetPack,
   type PrivateAssetPack,
 } from '../Utils/GDevelopServices/Asset';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 
 export type AssetStorePageState = {|
   isOnHomePage: boolean,
   openedAssetPack: PublicAssetPack | PrivateAssetPack | null,
   openedAssetShortHeader: ?AssetShortHeader,
+  openedPrivateAssetPackListingData: ?PrivateAssetPackListingData,
   filtersState: FiltersState,
   ignoreTextualSearch: boolean,
   scrollPosition?: ?number,
 |};
 
 export type NavigationState = {|
-  previousPages: Array<AssetStorePageState>,
   getCurrentPage: () => AssetStorePageState,
   backToPreviousPage: () => void,
   openHome: () => void,
@@ -26,6 +27,7 @@ export type NavigationState = {|
   activateTextualSearch: () => void,
   openTagPage: string => void,
   openPackPage: (PublicAssetPack | PrivateAssetPack) => void,
+  openPrivateAssetPackInformationPage: PrivateAssetPackListingData => void,
   openDetailPage: AssetShortHeader => void,
 |};
 
@@ -41,6 +43,7 @@ export const assetStoreHomePageState: AssetStorePageState = {
   isOnHomePage: true,
   openedAssetShortHeader: null,
   openedAssetPack: null,
+  openedPrivateAssetPackListingData: null,
   filtersState: noFilter,
   ignoreTextualSearch: false,
 };
@@ -49,6 +52,7 @@ const searchPageState: AssetStorePageState = {
   isOnHomePage: false,
   openedAssetShortHeader: null,
   openedAssetPack: null,
+  openedPrivateAssetPackListingData: null,
   filtersState: noFilter,
   ignoreTextualSearch: false,
 };
@@ -63,91 +67,123 @@ export const useNavigation = (): NavigationState => {
   });
   const previousPages = history.previousPages;
 
-  return {
-    previousPages,
-    getCurrentPage: () => previousPages[previousPages.length - 1],
-    backToPreviousPage: () => {
-      if (previousPages.length > 1) {
-        previousPages.pop();
-        setHistory({ previousPages });
-      }
-    },
-    openHome: () => {
-      previousPages.length = 0;
-      previousPages.push(assetStoreHomePageState);
-      setHistory({ previousPages });
-    },
-    clearHistory: () => {
-      const currentPage = previousPages[previousPages.length - 1];
-      previousPages.length = 0;
-      previousPages.push(assetStoreHomePageState);
-      previousPages.push(currentPage);
-      setHistory({ previousPages });
-    },
-    openSearchIfNeeded: () => {
-      const currentPage = previousPages[previousPages.length - 1];
-      if (currentPage.isOnHomePage || currentPage.openedAssetShortHeader) {
-        previousPages.push(searchPageState);
-        setHistory({ previousPages });
-      }
-    },
-    activateTextualSearch: () => {
-      const currentPage = previousPages[previousPages.length - 1];
-      if (currentPage.isOnHomePage || currentPage.openedAssetShortHeader) {
-        previousPages.push(searchPageState);
-        setHistory({ previousPages });
-      } else if (currentPage.ignoreTextualSearch) {
-        currentPage.ignoreTextualSearch = false;
-        setHistory({ previousPages });
-      }
-    },
-    openTagPage: (tag: string) => {
-      previousPages.push({
-        isOnHomePage: false,
-        openedAssetShortHeader: null,
-        openedAssetPack: null,
-        filtersState: {
-          chosenCategory: {
-            node: { name: tag, allChildrenTags: [], children: [] },
-            parentNodes: [],
-          },
-          chosenFilters: new Set(),
-          addFilter: () => {},
-          removeFilter: () => {},
-          setChosenCategory: () => {},
-        },
-        ignoreTextualSearch: true,
-      });
-      setHistory({ previousPages });
-    },
-    openPackPage: (assetPack: PublicAssetPack | PrivateAssetPack) => {
-      previousPages.push({
-        isOnHomePage: false,
-        openedAssetShortHeader: null,
-        openedAssetPack: assetPack,
-        filtersState: {
-          chosenCategory: {
-            node: { name: assetPack.tag, allChildrenTags: [], children: [] },
-            parentNodes: [],
-          },
-          chosenFilters: new Set(),
-          addFilter: () => {},
-          removeFilter: () => {},
-          setChosenCategory: () => {},
-        },
-        ignoreTextualSearch: true,
-      });
-      setHistory({ previousPages });
-    },
-    openDetailPage: (assetShortHeader: AssetShortHeader) => {
-      previousPages.push({
-        isOnHomePage: false,
-        openedAssetShortHeader: assetShortHeader,
-        openedAssetPack: null,
-        filtersState: noFilter,
-        ignoreTextualSearch: true,
-      });
-      setHistory({ previousPages });
-    },
-  };
+  return React.useMemo(
+    () => ({
+      getCurrentPage: () => previousPages[previousPages.length - 1],
+      backToPreviousPage: () => {
+        if (previousPages.length > 1) {
+          setHistory({
+            previousPages: previousPages.slice(0, previousPages.length - 1),
+          });
+        }
+      },
+      openHome: () => {
+        setHistory({ previousPages: [assetStoreHomePageState] });
+      },
+      clearHistory: () => {
+        const currentPage = previousPages[previousPages.length - 1];
+        setHistory({ previousPages: [assetStoreHomePageState, currentPage] });
+      },
+      openSearchIfNeeded: () => {
+        const currentPage = previousPages[previousPages.length - 1];
+        if (currentPage.isOnHomePage || currentPage.openedAssetShortHeader) {
+          setHistory({ previousPages: [...previousPages, searchPageState] });
+        }
+      },
+      activateTextualSearch: () => {
+        const currentPage = previousPages[previousPages.length - 1];
+        if (currentPage.isOnHomePage || currentPage.openedAssetShortHeader) {
+          setHistory({ previousPages: [...previousPages, searchPageState] });
+        } else if (currentPage.ignoreTextualSearch) {
+          currentPage.ignoreTextualSearch = false;
+          setHistory({ previousPages: [...previousPages] });
+        }
+      },
+      openTagPage: (tag: string) => {
+        setHistory({
+          previousPages: [
+            ...previousPages,
+            {
+              isOnHomePage: false,
+              openedAssetShortHeader: null,
+              openedAssetPack: null,
+              openedPrivateAssetPackListingData: null,
+              filtersState: {
+                chosenCategory: {
+                  node: { name: tag, allChildrenTags: [], children: [] },
+                  parentNodes: [],
+                },
+                chosenFilters: new Set(),
+                addFilter: () => {},
+                removeFilter: () => {},
+                setChosenCategory: () => {},
+              },
+              ignoreTextualSearch: true,
+            },
+          ],
+        });
+      },
+      openPackPage: (assetPack: PublicAssetPack | PrivateAssetPack) => {
+        setHistory({
+          previousPages: [
+            ...previousPages,
+            {
+              isOnHomePage: false,
+              openedAssetShortHeader: null,
+              openedAssetPack: assetPack,
+              openedPrivateAssetPackListingData: null,
+              filtersState: {
+                chosenCategory: {
+                  node: {
+                    name: assetPack.tag,
+                    allChildrenTags: [],
+                    children: [],
+                  },
+                  parentNodes: [],
+                },
+                chosenFilters: new Set(),
+                addFilter: () => {},
+                removeFilter: () => {},
+                setChosenCategory: () => {},
+              },
+              ignoreTextualSearch: true,
+            },
+          ],
+        });
+      },
+      openPrivateAssetPackInformationPage: (
+        assetPack: PrivateAssetPackListingData
+      ) => {
+        setHistory({
+          previousPages: [
+            ...previousPages,
+            {
+              isOnHomePage: false,
+              openedAssetShortHeader: null,
+              openedAssetPack: null,
+              openedPrivateAssetPackListingData: assetPack,
+              filtersState: noFilter,
+              ignoreTextualSearch: true,
+            },
+          ],
+        });
+      },
+      openDetailPage: (assetShortHeader: AssetShortHeader) => {
+        setHistory({
+          previousPages: [
+            ...previousPages,
+            {
+              isOnHomePage: false,
+              openedAssetShortHeader: assetShortHeader,
+              openedAssetPack: null,
+              openedPrivateAssetPackListingData: null,
+              filtersState: noFilter,
+              ignoreTextualSearch: true,
+            },
+          ],
+        });
+      },
+    }),
+    [previousPages]
+  );
 };

@@ -8,9 +8,7 @@ import {
 } from '../../Utils/GDevelopServices/Asset';
 import Text from '../../UI/Text';
 import { t, Trans } from '@lingui/macro';
-import Dialog from '../../UI/Dialog';
-import PriceTag, { formatPrice } from '../../UI/PriceTag';
-import FlatButton from '../../UI/FlatButton';
+import { formatPrice } from '../../UI/PriceTag';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import { ResponsiveLineStackLayout, LineStackLayout } from '../../UI/Layout';
@@ -30,6 +28,7 @@ import { sendAssetPackBuyClicked } from '../../Utils/Analytics/EventSender';
 import { MarkdownText } from '../../UI/MarkdownText';
 import Paper from '../../UI/Paper';
 import Window from '../../Utils/Window';
+import ScrollView from '../../UI/ScrollView';
 
 const sortedContentType = [
   'sprite',
@@ -57,14 +56,12 @@ const styles = {
 
 type Props = {|
   privateAssetPackListingData: PrivateAssetPackListingData,
-  onClose: () => void,
   onOpenPurchaseDialog: () => void,
   isPurchaseDialogOpen: boolean,
 |};
 
-const PrivateAssetPackDialog = ({
+const PrivateAssetPackInformationPage = ({
   privateAssetPackListingData,
-  onClose,
   onOpenPurchaseDialog,
   isPurchaseDialogOpen,
 }: Props) => {
@@ -151,34 +148,19 @@ const PrivateAssetPackDialog = ({
     <I18n>
       {({ i18n }) => (
         <>
-          <Dialog
-            title={name}
-            maxWidth="lg"
-            open
-            onRequestClose={onClose}
-            actions={[
-              <FlatButton
-                key="cancel"
-                label={<Trans>Cancel</Trans>}
-                onClick={onClose}
-              />,
-              getBuyButton(i18n),
-            ]}
-            onApply={onClickBuy}
-            flexColumnBody
-          >
-            {errorText ? (
-              <Line alignItems="center" justifyContent="center" expand>
-                <AlertMessage kind="error">{errorText}</AlertMessage>
-              </Line>
-            ) : isFetching ? (
-              <Column expand>
-                <PlaceholderLoader />
-              </Column>
-            ) : assetPack && sellerPublicProfile ? (
-              <>
-                <Column noMargin>
-                  <Text size="body2">
+          {errorText ? (
+            <Line alignItems="center" justifyContent="center" expand>
+              <AlertMessage kind="error">{errorText}</AlertMessage>
+            </Line>
+          ) : isFetching ? (
+            <Column expand>
+              <PlaceholderLoader />
+            </Column>
+          ) : assetPack && sellerPublicProfile ? (
+            <Column noOverflowParent expand noMargin>
+              <ScrollView autoHideScrollbar>
+                <Column noMargin alignItems="flex-end">
+                  <Text displayInlineAsSpan size="sub-title">
                     <Trans>by</Trans>{' '}
                     <Link
                       onClick={() => setOpenSellerPublicProfileDialog(true)}
@@ -189,12 +171,7 @@ const PrivateAssetPackDialog = ({
                   </Text>
                 </Column>
                 <ResponsiveLineStackLayout noColumnMargin noMargin>
-                  <Column
-                    useFullHeight
-                    expand={windowWidth !== 'small'}
-                    noMargin
-                    noOverflowParent
-                  >
+                  <Column useFullHeight expand noMargin noOverflowParent>
                     <ResponsiveImagesGallery
                       imagesUrls={assetPack.previewImageUrls}
                       altTextTemplate={`Asset pack ${name} preview image {imageIndex}`}
@@ -214,7 +191,9 @@ const PrivateAssetPackDialog = ({
                           justifyContent="space-between"
                           alignItems="center"
                         >
-                          <PriceTag value={prices[0].value} />
+                          <Text noMargin size="block-title">
+                            {formatPrice(i18n, prices[0].value)}
+                          </Text>
                           {getBuyButton(i18n)}
                         </Line>
                         <Text size="body2" displayInlineAsSpan>
@@ -299,9 +278,9 @@ const PrivateAssetPackDialog = ({
                     </Paper>
                   </Column>
                 </ResponsiveLineStackLayout>
-              </>
-            ) : null}
-          </Dialog>
+              </ScrollView>
+            </Column>
+          ) : null}
           {openSellerPublicProfileDialog && (
             <PublicProfileDialog
               userId={sellerId}
@@ -314,4 +293,4 @@ const PrivateAssetPackDialog = ({
   );
 };
 
-export default PrivateAssetPackDialog;
+export default PrivateAssetPackInformationPage;

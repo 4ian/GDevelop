@@ -299,7 +299,10 @@ module.exports = {
         'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('string')
+      .useStandardParameters(
+        'string',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Text'))
+      )
       .setFunctionName('setString')
       .setGetter('getString');
 
@@ -314,7 +317,10 @@ module.exports = {
         'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('string')
+      .useStandardParameters(
+        'string',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Text'))
+      )
       .setFunctionName('setPlaceholder')
       .setGetter('getPlaceholder');
 
@@ -329,7 +335,7 @@ module.exports = {
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setFontSize')
       .setGetter('getFontSize');
 
@@ -344,7 +350,7 @@ module.exports = {
         'res/conditions/font24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('string')
+      .useStandardParameters('string', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('getFontResourceName');
 
     // TODO: could this be merged with the previous expression and condition?
@@ -374,7 +380,10 @@ module.exports = {
         'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('string') // TODO: stringWithSelector?
+      .useStandardParameters(
+        'string',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Input type'))
+      ) // TODO: stringWithSelector?
       .setFunctionName('setInputType')
       .setGetter('getInputType');
 
@@ -419,7 +428,12 @@ module.exports = {
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Opacity (0-255)')
+        )
+      )
       .setFunctionName('setFillOpacity')
       .setGetter('getFillOpacity');
 
@@ -449,7 +463,12 @@ module.exports = {
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Opacity (0-255)')
+        )
+      )
       .setFunctionName('setBorderOpacity')
       .setGetter('getBorderOpacity');
 
@@ -464,7 +483,7 @@ module.exports = {
         'res/conditions/outlineSize24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setBorderWidth')
       .setGetter('getBorderWidth');
 
@@ -481,7 +500,7 @@ module.exports = {
         'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('boolean')
+      .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setReadOnly')
       .setGetter('isReadOnly');
 
@@ -496,7 +515,7 @@ module.exports = {
         'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('boolean')
+      .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setDisabled')
       .setGetter('isDisabled');
 
@@ -512,7 +531,12 @@ module.exports = {
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Opacity (0-255)')
+        )
+      )
       .setFunctionName('setOpacity')
       .setGetter('getOpacity');
 

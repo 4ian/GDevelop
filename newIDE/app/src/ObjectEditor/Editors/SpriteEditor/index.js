@@ -31,7 +31,7 @@ import {
 } from './Utils/SpriteObjectHelper';
 import { type EditorProps } from '../EditorProps.flow';
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
-import { Column, Spacer } from '../../../UI/Grid';
+import { Column, Line } from '../../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import ScrollView from '../../../UI/ScrollView';
 import Checkbox from '../../../UI/Checkbox';
@@ -82,54 +82,57 @@ class Animation extends React.Component<AnimationProps, void> {
 
     const animationName = animation.getName();
     return (
-      <div>
-        {isAnimationListLocked && (
-          <Column expand>
-            <Spacer />
-            <Text size="block-title">{animation.getName()}</Text>
-          </Column>
-        )}
-        {!isAnimationListLocked && (
-          <MiniToolbar noPadding>
-            <DragHandle />
-            <MiniToolbarText>{<Trans>Animation #{id}</Trans>}</MiniToolbarText>
-            <Column expand>
-              <SemiControlledTextField
-                commitOnBlur
-                margin="none"
-                value={animation.getName()}
-                translatableHintText={t`Optional animation name`}
-                onChange={text => onChangeName(text)}
-                fullWidth
-              />
+      <Line expand>
+        <Column expand noMargin>
+          {isAnimationListLocked && (
+            <Column expand noMargin>
+              <Text size="block-title">{animation.getName()}</Text>
             </Column>
-            <IconButton size="small" onClick={onRemove}>
-              <Delete />
-            </IconButton>
-          </MiniToolbar>
-        )}
-        {mapFor(0, animation.getDirectionsCount(), i => {
-          const direction = animation.getDirection(i);
-          return (
-            <SpritesList
-              direction={direction}
-              key={i}
-              project={project}
-              resourcesLoader={resourcesLoader}
-              resourceManagementProps={resourceManagementProps}
-              onSpriteContextMenu={onSpriteContextMenu}
-              selectedSprites={selectedSprites}
-              onSelectSprite={onSelectSprite}
-              onReplaceByDirection={newDirection =>
-                onReplaceDirection(i, newDirection)
-              }
-              objectName={objectName}
-              animationName={animationName}
-              onChangeName={onChangeName}
-            />
-          );
-        })}
-      </div>
+          )}
+          {!isAnimationListLocked && (
+            <MiniToolbar noPadding>
+              <DragHandle />
+              <MiniToolbarText>
+                {<Trans>Animation #{id}</Trans>}
+              </MiniToolbarText>
+              <Column expand>
+                <SemiControlledTextField
+                  commitOnBlur
+                  margin="none"
+                  value={animation.getName()}
+                  translatableHintText={t`Optional animation name`}
+                  onChange={text => onChangeName(text)}
+                  fullWidth
+                />
+              </Column>
+              <IconButton size="small" onClick={onRemove}>
+                <Delete />
+              </IconButton>
+            </MiniToolbar>
+          )}
+          {mapFor(0, animation.getDirectionsCount(), i => {
+            const direction = animation.getDirection(i);
+            return (
+              <SpritesList
+                direction={direction}
+                key={i}
+                project={project}
+                resourcesLoader={resourcesLoader}
+                resourceManagementProps={resourceManagementProps}
+                onSpriteContextMenu={onSpriteContextMenu}
+                selectedSprites={selectedSprites}
+                onSelectSprite={onSelectSprite}
+                onReplaceByDirection={newDirection =>
+                  onReplaceDirection(i, newDirection)
+                }
+                objectName={objectName}
+                animationName={animationName}
+                onChangeName={onChangeName}
+              />
+            );
+          })}
+        </Column>
+      </Line>
     );
   }
 }

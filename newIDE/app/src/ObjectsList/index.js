@@ -385,7 +385,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // TODO Should it be called later?
         if (sortableList.current) sortableList.current.forceUpdateGrid();
       },
-      []
+      [ setRenamedObjectWithContext ]
     );
 
     const pasteAndRename = React.useCallback(
@@ -419,7 +419,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           });
         }
       },
-      [canRenameObject, onObjectModified, onRenameObject]
+      [canRenameObject, onObjectModified, onRenameObject, setRenamedObjectWithContext]
     );
 
     const lists = enumerateObjects(project, objectsContainer);
@@ -746,6 +746,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         project,
         setAsGlobalObject,
         eventsFunctionsExtensionWriter,
+        preferences.values.userShortcutMap,
       ]
     );
 

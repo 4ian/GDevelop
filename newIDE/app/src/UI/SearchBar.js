@@ -23,6 +23,7 @@ import Search from './CustomSvgIcons/Search';
 import Cross from './CustomSvgIcons/Cross';
 import GDevelopThemeContext from './Theme/ThemeContext';
 import { type GDevelopTheme } from './Theme';
+import { useDebounce } from '../Utils/UseDebounce';
 
 type TagsHandler = {|
   remove: string => void,
@@ -161,6 +162,8 @@ export type SearchBarInterface = {|
   blur: () => void,
 |};
 
+const noop = () => {};
+
 /**
  * Material design search bar,
  * inspired from https://github.com/TeamWertarbyte/material-ui-search-bar
@@ -230,10 +233,20 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       focused: isInputFocused,
     });
 
-    const changeValue = React.useCallback(
-      newValue => {
-        setValue(newValue || '');
-        onChange && onChange(newValue || '');
+    const debouncedOnChange = useDebounce(onChange ? onChange : noop, 250);
+
+    const changeValueDebounced = React.useCallback(
+      (newValue: string) => {
+        setValue(newValue);
+        debouncedOnChange(newValue);
+      },
+      [debouncedOnChange, setValue]
+    );
+
+    const changeValueImmediately = React.useCallback(
+      (newValue: string) => {
+        setValue(newValue);
+        onChange && onChange(newValue);
       },
       [onChange, setValue]
     );
@@ -270,7 +283,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     const handleBlur = () => {
       setIsInputFocused(false);
       if (!value || value.trim() === '') {
-        changeValue('');
+        changeValueImmediately('');
       }
     };
 
@@ -279,11 +292,11 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     };
 
     const handleInput = (e: {| target: {| value: string |} |}) => {
-      changeValue(e.target.value);
+      changeValueDebounced(e.target.value);
     };
 
     const handleCancel = () => {
-      changeValue('');
+      changeValueImmediately('');
       focus();
     };
 
@@ -297,7 +310,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
 
     const handleAutocompleteInput = (
       event: any,
-      newValue: string,
+      newValue: ?string,
       reason:
         | 'create-option'
         | 'select-option'
@@ -307,35 +320,35 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     ) => {
       // Called when the value of the autocomplete changes.
       if (reason === 'select-option') {
-        tagsHandler && tagsHandler.add(newValue);
+        tagsHandler && tagsHandler.add(newValue || '');
 
         // Clear the value that was entered as an option was selected.
-        setValue('');
+        changeValueImmediately('');
 
         // Clear this value to make sure the autocomplete doesn't keep the
         // last typed value in memory.
         setAutocompleteValue('');
       } else {
-        changeValue(newValue);
+        changeValueImmediately(newValue || '');
       }
     };
 
     const handleAutocompleteInputChange = (
       event: any,
-      newValue: string,
+      newValue: ?string,
       reason: 'reset' | 'input' | 'clear'
     ) => {
       // Called when the value of the input within the autocomplete changes.
       if (reason === 'reset') {
         // Happens when user selects an option. Do as for 'select-option':
         // Clear the value that was entered as an option was selected.
-        setValue('');
+        changeValueImmediately('');
 
         // Clear this value to make sure the autocomplete doesn't keep the
         // last typed value in memory.
         setAutocompleteValue('');
       } else {
-        setValue(newValue);
+        changeValueDebounced(newValue || '');
       }
     };
 

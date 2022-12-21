@@ -115,8 +115,7 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     backToPreviousPage: () => {},
     openHome: () => {},
     clearHistory: () => {},
-    openSearchIfNeeded: () => {},
-    activateTextualSearch: () => {},
+    openSearchResultPage: () => {},
     openTagPage: tag => {},
     openPackPage: assetPack => {},
     openDetailPage: assetShortHeader => {},
@@ -392,7 +391,7 @@ export const AssetStoreStateProvider = ({
   const searchResults: ?Array<AssetShortHeader> = useSearchItem(
     assetShortHeadersById,
     getAssetShortHeaderSearchTerms,
-    currentPage.ignoreTextualSearch ? '' : searchText,
+    searchText,
     chosenCategory,
     chosenFilters,
     searchFilters

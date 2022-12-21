@@ -7,6 +7,7 @@ import {
   filterMissingExtensions,
   sanitizeObjectName,
   installPublicAsset,
+  checkRequiredExtensionUpdate,
 } from './InstallAsset';
 import { makeTestProject } from '../fixtures/TestProject';
 import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
@@ -24,8 +25,10 @@ import { makeTestExtensions } from '../fixtures/TestExtensions';
 import {
   getExtensionsRegistry,
   getExtension,
+  type ExtensionShortHeader,
 } from '../Utils/GDevelopServices/Extension';
 import * as Asset from '../Utils/GDevelopServices/Asset';
+
 const gd: libGDevelop = global.gd;
 
 jest.mock('../Utils/GDevelopServices/Extension');
@@ -350,6 +353,23 @@ describe('InstallAsset', () => {
     });
   });
 
+  const emptyExtensionShortHeader: ExtensionShortHeader = {
+    tier: 'reviewed',
+    shortDescription: '',
+    authorIds: [],
+    extensionNamespace: '',
+    fullName: '',
+    name: 'NotExistingExtension',
+    version: '1.0.0',
+    url: '',
+    headerUrl: '',
+    tags: [],
+    category: '',
+    previewIconUrl: '',
+    eventsBasedBehaviorsCount: 0,
+    eventsFunctionsCount: 0,
+  };
+
   describe('filterMissingExtensions', () => {
     it('filters extensions that are not loaded ', () => {
       makeTestExtensions(gd);
@@ -358,19 +378,22 @@ describe('InstallAsset', () => {
         filterMissingExtensions(gd, [
           // An unknown extension not loaded:
           {
-            extensionName: 'NotExistingExtension',
-            extensionVersion: '1.0.0',
+            ...emptyExtensionShortHeader,
+            name: 'NotExistingExtension',
+            version: '1.0.0',
           },
           // A fake extension loaded in makeTestExtensions:
           {
-            extensionName: 'FakeBehavior',
-            extensionVersion: '1.0.0',
+            ...emptyExtensionShortHeader,
+            name: 'FakeBehavior',
+            version: '1.0.0',
           },
         ])
       ).toEqual([
         {
-          extensionName: 'NotExistingExtension',
-          extensionVersion: '1.0.0',
+          ...emptyExtensionShortHeader,
+          name: 'NotExistingExtension',
+          version: '1.0.0',
         },
       ]);
     });
@@ -392,12 +415,17 @@ describe('InstallAsset', () => {
         () => fireBulletExtensionShortHeader
       );
 
-      await expect(downloadExtensions(['FireBullet'])).resolves.toEqual([
-        fireBulletExtensionShortHeader,
-      ]);
+      await expect(
+        downloadExtensions([
+          { ...emptyExtensionShortHeader, name: 'FireBullet' },
+        ])
+      ).resolves.toEqual([fireBulletExtensionShortHeader]);
     });
 
-    it('errors if an extension is not found ', async () => {
+    it('errors if an extension is not found in the registry', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
         allTags: [''],
@@ -409,18 +437,29 @@ describe('InstallAsset', () => {
       }));
 
       await expect(
-        downloadExtensions(['NotFoundExtension'])
+        checkRequiredExtensionUpdate({
+          assets: [fakeAssetWithUnknownExtension1],
+          project,
+        })
       ).rejects.toMatchObject({
-        message: 'Unable to find extension NotFoundExtension in the registry.',
+        message: 'Unable to find extension UnknownExtension in the registry.',
       });
     });
 
     it("errors if the registry can't be loaded ", async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => {
         throw new Error('Fake error');
       });
 
-      await expect(downloadExtensions(['FakeBehavior'])).rejects.toMatchObject({
+      await expect(
+        checkRequiredExtensionUpdate({
+          assets: [fakeAssetWithUnknownExtension1],
+          project,
+        })
+      ).rejects.toMatchObject({
         message: 'Fake error',
       });
     });
@@ -525,50 +564,18 @@ describe('InstallAsset', () => {
           objectsContainer: layout,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
           environment: 'live',
+          requiredExtensionInstallation: {
+            requiredExtensions: [],
+            missingExtensions: [],
+            outOfDateExtensions: [],
+          },
+          shouldUpdateExtension: true,
         })
       ).rejects.toMatchObject({
         message: 'Fake error - unable to download',
       });
 
       expect(getExtensionsRegistry).not.toHaveBeenCalled();
-      expect(getExtension).not.toHaveBeenCalled();
-    });
-
-    it("throws if an extension can't be found in the registry", async () => {
-      makeTestExtensions(gd);
-      const { project } = makeTestProject(gd);
-      const layout = project.insertNewLayout('MyTestLayout', 0);
-
-      // Get an asset that uses an extension...
-      mockFn(Asset.getPublicAsset).mockImplementationOnce(
-        () => fakeAssetWithUnknownExtension1
-      );
-
-      // ...but this extension does not exist in the registry
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        allTags: [''],
-        allCategories: [''],
-        extensionShortHeaders: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
-      }));
-
-      // Check that the extension is stated as not found in the registry
-      await expect(
-        installPublicAsset({
-          assetShortHeader: fakeAssetShortHeader1,
-          project,
-          objectsContainer: layout,
-          eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
-          environment: 'live',
-        })
-      ).rejects.toMatchObject({
-        message: 'Unable to find extension UnknownExtension in the registry.',
-      });
-
-      expect(getExtensionsRegistry).toHaveBeenCalledTimes(1);
       expect(getExtension).not.toHaveBeenCalled();
     });
 
@@ -606,12 +613,17 @@ describe('InstallAsset', () => {
           objectsContainer: layout,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
           environment: 'live',
+          requiredExtensionInstallation: {
+            requiredExtensions: [flashExtensionShortHeader],
+            missingExtensions: [flashExtensionShortHeader],
+            outOfDateExtensions: [],
+          },
+          shouldUpdateExtension: true,
         })
       ).rejects.toMatchObject({
         message: 'These extensions could not be installed: Flash',
       });
 
-      expect(getExtensionsRegistry).toHaveBeenCalledTimes(1);
       expect(getExtension).toHaveBeenCalledTimes(1);
     });
 
@@ -639,6 +651,18 @@ describe('InstallAsset', () => {
         objectsContainer: layout,
         eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
         environment: 'live',
+        requiredExtensionInstallation: {
+          requiredExtensions: [
+            {
+              ...emptyExtensionShortHeader,
+              name: 'Button',
+              version: '1.0.0',
+            },
+          ],
+          missingExtensions: [],
+          outOfDateExtensions: [],
+        },
+        shouldUpdateExtension: true,
       });
 
       // No extensions fetched because the extension is already installed.

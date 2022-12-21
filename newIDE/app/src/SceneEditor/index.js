@@ -156,7 +156,6 @@ type State = {|
   selectedObjectTags: SelectedTags,
 
   renamedObjectWithContext: ?ObjectWithContext,
-  setRenamedObjectWithContext: ?(obj: ObjectWithContext) => void,
   selectedObjectWithContext: ?ObjectWithContext,
 |};
 
@@ -218,7 +217,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       selectedObjectTags: [],
 
       renamedObjectWithContext: null,
-      setRenamedObjectWithContext: null,
       selectedObjectWithContext: null,
     };
   }

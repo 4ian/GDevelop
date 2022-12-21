@@ -231,8 +231,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (onEditObject) {
           onEditObject(object);
           onObjectCreated(object);
-          // Adding an object is always (at the moment) going to the scene (layout), and not to the project (as a global object) so the context is not global.
-          onObjectSelected({ object, global: false }); // objectWithContext
+          // Adding an object is always (at the moment) going to the scene (layout),
+          // and not to the project (as a global object) so the context is not global.
+          onObjectSelected(/* objectWithContext */ { object, global: false });
         }
       },
       [

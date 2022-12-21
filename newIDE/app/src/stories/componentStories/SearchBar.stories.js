@@ -7,33 +7,40 @@ import paperDecorator from '../PaperDecorator';
 import SearchBar from '../../UI/SearchBar';
 import { useFilters } from '../../UI/Search/FiltersChooser';
 import { ColumnStackLayout } from '../../UI/Layout';
+import Text from '../../UI/Text';
 
 export default {
   title: 'UI Building Blocks/SearchBar',
   component: SearchBar,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 const Vanilla = () => {
   const [value, setValue] = React.useState<string>('');
   return (
-    <SearchBar
-      value={value}
-      onChange={setValue}
-      onRequestSearch={action('request search')}
-    />
+    <>
+      <Text>Value in state is: "{value}".</Text>
+      <SearchBar
+        value={value}
+        onChange={setValue}
+        onRequestSearch={action('request search')}
+      />
+    </>
   );
 };
 
 const WithPlaceholder = () => {
   const [value, setValue] = React.useState<string>('');
   return (
-    <SearchBar
-      value={value}
-      onChange={setValue}
-      onRequestSearch={action('request search')}
-      placeholder="Search with placeholder"
-    />
+    <>
+      <Text>Value in state is: "{value}".</Text>
+      <SearchBar
+        value={value}
+        onChange={setValue}
+        onRequestSearch={action('request search')}
+        placeholder="Search with placeholder"
+      />
+    </>
   );
 };
 
@@ -42,70 +49,82 @@ const Disabled = () => {
     'something typed in disabled field'
   );
   return (
-    <SearchBar
-      value={value}
-      onChange={setValue}
-      onRequestSearch={action('request search')}
-      disabled
-    />
+    <>
+      <Text>Value in state is: "{value}".</Text>
+      <SearchBar
+        value={value}
+        onChange={setValue}
+        onRequestSearch={action('request search')}
+        disabled
+      />
+    </>
   );
 };
 
 const Integrated = () => {
   const [value, setValue] = React.useState<string>('');
   return (
-    <SearchBar
-      value={value}
-      onChange={setValue}
-      onRequestSearch={action('request search')}
-      aspect="integrated-search-bar"
-      placeholder="Search integrated"
-    />
+    <>
+      <Text>Value in state is: "{value}".</Text>
+      <SearchBar
+        value={value}
+        onChange={setValue}
+        onRequestSearch={action('request search')}
+        aspect="integrated-search-bar"
+        placeholder="Search integrated"
+      />
+    </>
   );
 };
 
 const WithHelpIcon = () => {
   const [value, setValue] = React.useState<string>('');
   return (
-    <SearchBar
-      value={value}
-      onChange={setValue}
-      onRequestSearch={action('request search')}
-      helpPagePath="https://gdevelop.io"
-      placeholder="Search with help icon"
-    />
+    <>
+      <Text>Value in state is: "{value}".</Text>
+      <SearchBar
+        value={value}
+        onChange={setValue}
+        onRequestSearch={action('request search')}
+        helpPagePath="https://gdevelop.io"
+        placeholder="Search with help icon"
+      />
+    </>
   );
 };
 
 const WithMenu = () => {
   const [value, setValue] = React.useState<string>('');
   return (
-    <SearchBar
-      value={value}
-      onChange={setValue}
-      onRequestSearch={action('request search')}
-      placeholder="Search with menu"
-      buildMenuTemplate={() => [
-        {
-          type: 'checkbox',
-          label: 'Tag 1',
-          checked: false,
-          click: action('Clicked Tag 1'),
-        },
-        {
-          type: 'checkbox',
-          label: 'Tag 2 (checked)',
-          checked: true,
-          click: action('Clicked Tag 2 (checked)'),
-        },
-        {
-          type: 'checkbox',
-          label: 'Tag 3',
-          checked: false,
-          click: action('Clicked Tag 3'),
-        },
-      ]}
-    />
+    <>
+      <Text>Value in state is: "{value}".</Text>
+      <SearchBar
+        value={value}
+        onChange={setValue}
+        onRequestSearch={action('request search')}
+        placeholder="Search with menu"
+        buildMenuTemplate={() => [
+          {
+            type: 'checkbox',
+            label: 'Tag 1',
+            checked: false,
+            click: action('Clicked Tag 1'),
+          },
+          {
+            type: 'checkbox',
+            label: 'Tag 2 (checked)',
+            checked: true,
+            click: action('Clicked Tag 2 (checked)'),
+          },
+          {
+            type: 'checkbox',
+            label: 'Tag 3',
+            checked: false,
+            click: action('Clicked Tag 3'),
+          },
+        ]}
+      />
+    </>
   );
 };
 
@@ -113,18 +132,21 @@ const WithTags = () => {
   const [value, setValue] = React.useState<string>('');
   const filtersState = useFilters();
   return (
-    <SearchBar
-      value={value}
-      onChange={setValue}
-      onRequestSearch={action('request search')}
-      placeholder="Search with tags"
-      tagsHandler={{
-        add: filtersState.addFilter,
-        remove: filtersState.removeFilter,
-        chosenTags: filtersState.chosenFilters,
-      }}
-      tags={['Platformer', 'RPG', 'Beat them all', 'Top down']}
-    />
+    <>
+      <Text>Value in state is: "{value}".</Text>
+      <SearchBar
+        value={value}
+        onChange={setValue}
+        onRequestSearch={action('request search')}
+        placeholder="Search with tags"
+        tagsHandler={{
+          add: filtersState.addFilter,
+          remove: filtersState.removeFilter,
+          chosenTags: filtersState.chosenFilters,
+        }}
+        tags={['Platformer', 'RPG', 'Beat them all', 'Top down']}
+      />
+    </>
   );
 };
 
@@ -132,19 +154,22 @@ const WithTagsAndHelp = () => {
   const [value, setValue] = React.useState<string>('');
   const filtersState = useFilters();
   return (
-    <SearchBar
-      value={value}
-      onChange={setValue}
-      onRequestSearch={action('request search')}
-      placeholder="Search with tags and help"
-      tagsHandler={{
-        add: filtersState.addFilter,
-        remove: filtersState.removeFilter,
-        chosenTags: filtersState.chosenFilters,
-      }}
-      tags={['Platformer', 'RPG', 'Beat them all', 'Top down']}
-      helpPagePath="https://gdevelop.io"
-    />
+    <>
+      <Text>Value in state is: "{value}".</Text>
+      <SearchBar
+        value={value}
+        onChange={setValue}
+        onRequestSearch={action('request search')}
+        placeholder="Search with tags and help"
+        tagsHandler={{
+          add: filtersState.addFilter,
+          remove: filtersState.removeFilter,
+          chosenTags: filtersState.chosenFilters,
+        }}
+        tags={['Platformer', 'RPG', 'Beat them all', 'Top down']}
+        helpPagePath="https://gdevelop.io"
+      />
+    </>
   );
 };
 

@@ -101,38 +101,55 @@ void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
   if (resourcesManagers.empty()) return;
   gd::ResourcesManager* resourcesManager = resourcesManagers[0];
 
-  // TODO: can this be avoided?
   gd::Resource& resource = resourcesManager->GetResource(resourceName);
 
   if (!resource.GetMetadata().empty()) {
     gd::SerializerElement serializerElement = gd::Serializer::FromJSON(resource.GetMetadata());
 
     if (serializerElement.HasChild("embeddedResourcesMapping")) {
-      const gd::SerializerElement& embeddedResourcesMappingElement = serializerElement.GetChild("embeddedResourcesMapping");
+      bool anyEmbeddedResourceNameWasRenamed = false;
+      gd::SerializerElement& embeddedResourcesMappingElement = serializerElement.GetChild("embeddedResourcesMapping");
 
       for (const auto& child : embeddedResourcesMappingElement.GetAllChildren()) {
         const gd::String& targetResourceName = child.second->GetValue().GetString();
 
+          std::cout << targetResourceName << std::endl;
+
         if (resourcesManager->HasResource(targetResourceName)) {
-          const gd::Resource& targetResource = resourcesManager->GetResource(targetResourceName);
+          std::cout << targetResourceName << std::endl;
+          gd::Resource& targetResource = resourcesManager->GetResource(targetResourceName);
           const gd::String& targetResourceKind = targetResource.GetKind();
 
+          gd::String potentiallyUpdatedTargetResourceName = targetResourceName;
+
           if (targetResourceKind == "audio") {
-            ExposeAudio(const_cast<gd::String&>(targetResource.GetName()));
+            ExposeAudio(potentiallyUpdatedTargetResourceName);
           } else if (targetResourceKind == "bitmapFont") {
-            ExposeBitmapFont(const_cast<gd::String&>(targetResource.GetName()));
+            ExposeBitmapFont(potentiallyUpdatedTargetResourceName);
           } else if (targetResourceKind == "font") {
-            ExposeFont(const_cast<gd::String&>(targetResource.GetName()));
+            ExposeFont(potentiallyUpdatedTargetResourceName);
           } else if (targetResourceKind == "image") {
-            ExposeImage(const_cast<gd::String&>(targetResource.GetName()));
+            ExposeImage(potentiallyUpdatedTargetResourceName);
           } else if (targetResourceKind == "json") {
-            ExposeJson(const_cast<gd::String&>(targetResource.GetName()));
+            ExposeJson(potentiallyUpdatedTargetResourceName);
           } else if (targetResourceKind == "tilemap") {
-            ExposeTilemap(const_cast<gd::String&>(targetResource.GetName()));
+            ExposeTilemap(potentiallyUpdatedTargetResourceName);
           } else if (targetResourceKind == "video") {
-            ExposeVideo(const_cast<gd::String&>(targetResource.GetName()));
+            ExposeVideo(potentiallyUpdatedTargetResourceName);
+          }
+          std::cout << potentiallyUpdatedTargetResourceName << std::endl;
+
+          if (potentiallyUpdatedTargetResourceName != targetResourceName) {
+            // The resource name was renamed. Also update the mapping.
+            child.second->SetStringValue(potentiallyUpdatedTargetResourceName);
+            anyEmbeddedResourceNameWasRenamed = true;
+            std::cout <<"renamed" << std::endl;
           }
         }
+      }
+
+      if (anyEmbeddedResourceNameWasRenamed) {
+        resource.SetMetadata(gd::Serializer::ToJSON(serializerElement));
       }
     }
   }

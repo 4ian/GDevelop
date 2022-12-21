@@ -38,7 +38,7 @@ export type MenuItemTemplate =
 export interface ContextMenuImplementation {
   buildFromTemplate(
     template: Array<MenuItemTemplate>,
-    forceUpdate: () => void // this props is not used in this implementation
+    forceUpdate?: () => void
   ): ?ReactNode;
   showMenu(dimensions: {|
     left: number,

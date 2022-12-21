@@ -15,10 +15,7 @@ export default class ElectronMenuImplementation
   menuTemplate: Array<MenuItemTemplate>;
   menu: any; // TODO: Is it necessary to store the menu in a class variable?
 
-  buildFromTemplate(
-    template: Array<MenuItemTemplate>,
-    forceUpdate: () => void // this props is not used in this implementation.
-  ) {
+  buildFromTemplate(template: Array<MenuItemTemplate>) {
     this.menuTemplate = template;
     return undefined;
   }

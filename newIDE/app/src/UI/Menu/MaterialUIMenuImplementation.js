@@ -197,7 +197,7 @@ export default class MaterialUIMenuImplementation
 
   buildFromTemplate(
     template: Array<MenuItemTemplate>,
-    forceUpdate: () => void
+    forceUpdate?: () => void
   ) {
     return template
       .map((item, id) => {
@@ -233,7 +233,7 @@ export default class MaterialUIMenuImplementation
                     // In case the item click function changes something that React does not detect,
                     // for instance a change in the project/layout C++ object, the menu must be
                     // manually updated to display the change.
-                    forceUpdate();
+                    if (forceUpdate) forceUpdate();
                     return;
                   }
                 }

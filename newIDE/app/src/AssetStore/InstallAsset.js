@@ -231,7 +231,7 @@ export const getRequiredExtensionsFromAsset = (
   );
 };
 
-export const filterMissingExtensions = (
+const filterMissingExtensions = (
   gd: libGDevelop,
   requiredExtensions: Array<ExtensionShortHeader>
 ): Array<ExtensionShortHeader> => {

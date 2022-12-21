@@ -4,7 +4,6 @@ import {
   addSerializedExtensionsToProject,
   getRequiredExtensionsFromAsset,
   downloadExtensions,
-  filterMissingExtensions,
   sanitizeObjectName,
   installPublicAsset,
   checkRequiredExtensionUpdate,
@@ -20,6 +19,8 @@ import {
   flashExtensionShortHeader,
   fireBulletExtensionShortHeader,
   fakeAssetWithCustomObject,
+  buttonV1ExtensionShortHeader,
+  buttonV2ExtensionShortHeader,
 } from '../fixtures/GDevelopServicesTestData';
 import { makeTestExtensions } from '../fixtures/TestExtensions';
 import {
@@ -370,35 +371,6 @@ describe('InstallAsset', () => {
     eventsFunctionsCount: 0,
   };
 
-  describe('filterMissingExtensions', () => {
-    it('filters extensions that are not loaded ', () => {
-      makeTestExtensions(gd);
-
-      expect(
-        filterMissingExtensions(gd, [
-          // An unknown extension not loaded:
-          {
-            ...emptyExtensionShortHeader,
-            name: 'NotExistingExtension',
-            version: '1.0.0',
-          },
-          // A fake extension loaded in makeTestExtensions:
-          {
-            ...emptyExtensionShortHeader,
-            name: 'FakeBehavior',
-            version: '1.0.0',
-          },
-        ])
-      ).toEqual([
-        {
-          ...emptyExtensionShortHeader,
-          name: 'NotExistingExtension',
-          version: '1.0.0',
-        },
-      ]);
-    });
-  });
-
   describe('downloadExtensions', () => {
     it('loads the required extensions ', async () => {
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
@@ -420,6 +392,111 @@ describe('InstallAsset', () => {
           { ...emptyExtensionShortHeader, name: 'FireBullet' },
         ])
       ).resolves.toEqual([fireBulletExtensionShortHeader]);
+    });
+  });
+
+  describe('checkRequiredExtensionUpdate', () => {
+    it('can find an extension to install', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+
+      // Get an asset that uses an extension...
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(
+        () => fakeAssetWithFlashExtensionDependency1
+      );
+
+      // ...and this extension is in the registry
+      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
+        version: '1.0.0',
+        allTags: [''],
+        allCategories: [''],
+        extensionShortHeaders: [
+          flashExtensionShortHeader,
+          fireBulletExtensionShortHeader,
+        ],
+      }));
+
+      await expect(
+        checkRequiredExtensionUpdate({
+          assets: [
+            fakeAssetWithFlashExtensionDependency1,
+            fakeAssetWithFlashExtensionDependency1,
+          ],
+          project,
+        })
+      ).resolves.toEqual({
+        requiredExtensions: [flashExtensionShortHeader],
+        missingExtensions: [flashExtensionShortHeader],
+        outOfDateExtensions: [],
+      });
+    });
+
+    it('can find an up to date extension from the project', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+
+      // Get an asset that uses an extension...
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(
+        () => fakeAssetWithCustomObject
+      );
+
+      // ...and this extension is in the registry
+      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
+        version: '1.0.0',
+        allTags: [''],
+        allCategories: [''],
+        extensionShortHeaders: [
+          flashExtensionShortHeader,
+          fireBulletExtensionShortHeader,
+          // The project contains the 1.0.0 of this extension.
+          buttonV1ExtensionShortHeader,
+        ],
+      }));
+
+      await expect(
+        checkRequiredExtensionUpdate({
+          assets: [fakeAssetWithCustomObject, fakeAssetWithCustomObject],
+          project,
+        })
+      ).resolves.toEqual({
+        requiredExtensions: [buttonV1ExtensionShortHeader],
+        missingExtensions: [],
+        outOfDateExtensions: [],
+      });
+    });
+
+    it('can find an extension to update', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+
+      // Get an asset that uses an extension...
+      mockFn(Asset.getPublicAsset).mockImplementationOnce(
+        () => fakeAssetWithCustomObject
+      );
+
+      // ...and this extension is in the registry
+      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
+        version: '1.0.0',
+        allTags: [''],
+        allCategories: [''],
+        extensionShortHeaders: [
+          flashExtensionShortHeader,
+          fireBulletExtensionShortHeader,
+          // The project contains the 1.0.0 of this extension.
+          buttonV2ExtensionShortHeader,
+        ],
+      }));
+
+      await expect(
+        checkRequiredExtensionUpdate({
+          assets: [fakeAssetWithCustomObject, fakeAssetWithCustomObject],
+          project,
+        })
+      ).resolves.toEqual({
+        requiredExtensions: [buttonV2ExtensionShortHeader],
+        missingExtensions: [],
+        outOfDateExtensions: [buttonV2ExtensionShortHeader],
+      });
     });
 
     it('errors if an extension is not found in the registry', async () => {
@@ -588,17 +665,6 @@ describe('InstallAsset', () => {
       mockFn(Asset.getPublicAsset).mockImplementationOnce(
         () => fakeAssetWithFlashExtensionDependency1
       );
-
-      // ...and this extension is in the registry
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        allTags: [''],
-        allCategories: [''],
-        extensionShortHeaders: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
-      }));
 
       mockFn(getExtension).mockImplementationOnce(
         () => flashExtensionShortHeader

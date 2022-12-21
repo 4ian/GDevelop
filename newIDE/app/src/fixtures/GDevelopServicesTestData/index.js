@@ -1131,6 +1131,28 @@ export const flashExtensionShortHeader: ExtensionShortHeader = {
   eventsFunctionsCount: 0,
 };
 
+export const buttonV1ExtensionShortHeader: ExtensionShortHeader = {
+  tier: 'reviewed',
+  authorIds: [],
+  shortDescription: 'An extension that is already installed in the project.',
+  extensionNamespace: '',
+  fullName: 'Button',
+  name: 'Button',
+  version: '1.0.0',
+  url: 'Extensions/Button.json',
+  headerUrl: '',
+  tags: [],
+  category: '',
+  previewIconUrl: '',
+  eventsBasedBehaviorsCount: 1,
+  eventsFunctionsCount: 0,
+};
+
+export const buttonV2ExtensionShortHeader: ExtensionShortHeader = {
+  ...buttonV1ExtensionShortHeader,
+  version: '2.0.0',
+};
+
 export const communityTierExtensionShortHeader: ExtensionShortHeader = {
   tier: 'community',
   authorIds: [],

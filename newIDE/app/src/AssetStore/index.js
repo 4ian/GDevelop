@@ -48,6 +48,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PrivateAssetPackPurchaseDialog from './PrivateAssets/PrivateAssetPackPurchaseDialog';
 import { LineStackLayout } from '../UI/Layout';
 import Paper from '../UI/Paper';
+import { isHomePage, isShowingSearchResultPage } from './AssetStoreNavigator';
 
 type Props = {||};
 
@@ -95,12 +96,15 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       assetPackRandomOrdering,
     } = React.useContext(AssetStoreContext);
     const {
-      isOnHomePage,
       openedAssetPack,
       openedAssetShortHeader,
       openedPrivateAssetPackListingData,
       filtersState,
     } = navigationState.getCurrentPage();
+    const isOnHomePage = isHomePage(navigationState.getCurrentPage());
+    const isOnShowingSearchResultPage = isShowingSearchResultPage(
+      navigationState.getCurrentPage()
+    );
     const searchBar = React.useRef<?SearchBarInterface>(null);
 
     const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
@@ -224,11 +228,12 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           Window.openExternalURL(assetPack.externalWebLink);
         } else {
           saveScrollPosition();
+          setSearchText('');
           navigationState.openPackPage(assetPack);
           setIsFiltersPanelOpen(true);
         }
       },
-      [navigationState, saveScrollPosition]
+      [navigationState, saveScrollPosition, setSearchText]
     );
 
     // When a private pack is selected from the home page,
@@ -248,6 +253,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             assetPackKind: 'private',
           });
 
+          setSearchText('');
           navigationState.openPrivateAssetPackInformationPage(
             assetPackListingData
           );
@@ -255,6 +261,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         }
 
         // The user has received the pack, open it.
+        setSearchText('');
         sendAssetPackOpened({
           assetPackName: assetPackListingData.name,
           assetPackId: assetPackListingData.id,
@@ -265,7 +272,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         navigationState.openPackPage(receivedAssetPack);
         setIsFiltersPanelOpen(true);
       },
-      [receivedAssetPacks, saveScrollPosition, navigationState]
+      [receivedAssetPacks, saveScrollPosition, navigationState, setSearchText]
     );
 
     // If the user has received the pack they are currently viewing,
@@ -286,6 +293,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           );
           if (receivedAssetPack) {
             // The user has received the pack, close the pack information dialog, and open the pack in the search.
+            setSearchText('');
             setIsFiltersPanelOpen(true);
             saveScrollPosition();
             navigationState.openPackPage(receivedAssetPack);
@@ -297,6 +305,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         purchasingPrivateAssetPackListingData,
         navigationState,
         saveScrollPosition,
+        setSearchText,
       ]
     );
 
@@ -312,6 +321,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           publicAssetPacks &&
           publicAssetPacks.starterPacks.find(pack => pack.tag === tag);
         saveScrollPosition();
+        setSearchText('');
         if (privateAssetPack) {
           navigationState.openPackPage(privateAssetPack);
         } else if (publicAssetPack) {
@@ -323,6 +333,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         setIsFiltersPanelOpen(true);
       },
       [
+        setSearchText,
         receivedAssetPacks,
         publicAssetPacks,
         saveScrollPosition,
@@ -344,6 +355,18 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       [shouldAutofocusSearchbar]
     );
 
+    React.useLayoutEffect(
+      () => {
+        if (isOnHomePage) {
+          clearAllFilters(assetFiltersState);
+          setIsFiltersPanelOpen(false);
+        }
+      },
+      // assetFiltersState is not stable, so don't list it.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [isOnHomePage]
+    );
+
     return (
       <>
         <ResponsiveWindowMeasurer>
@@ -361,6 +384,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     key="back-discover"
                     tooltip={t`Back to discover`}
                     onClick={() => {
+                      setSearchText('');
                       navigationState.openHome();
                       setScrollUpdateIsNeeded();
                       clearAllFilters(assetFiltersState);
@@ -374,13 +398,24 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     <SearchBar
                       placeholder={t`Search assets`}
                       value={searchText}
-                      onChange={setSearchText}
-                      onRequestSearch={() => {
-                        // Clear the history
-                        navigationState.activateTextualSearch();
-                        navigationState.clearHistory();
-                        setIsFiltersPanelOpen(true);
-                      }}
+                      onChange={
+                        isOnShowingSearchResultPage
+                          ? // An existing search is already being done: just update the
+                            // search text and the asset store will update the search results.
+                            setSearchText
+                          : (newValue: string) => {
+                              setSearchText(newValue);
+
+                              // A new search is being initiated: navigate to the search page,
+                              // and clear the history as a new search was launched.
+                              if (!!newValue) {
+                                navigationState.clearHistory();
+                                navigationState.openSearchPage();
+                                setIsFiltersPanelOpen(true);
+                              }
+                            }
+                      }
+                      onRequestSearch={() => {}}
                       ref={searchBar}
                       id="asset-store-search-bar"
                     />
@@ -407,12 +442,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                             onClick={() => {
                               navigationState.backToPreviousPage();
                               setScrollUpdateIsNeeded();
-                              if (
-                                navigationState.getCurrentPage().isOnHomePage
-                              ) {
-                                clearAllFilters(assetFiltersState);
-                                setIsFiltersPanelOpen(false);
-                              }
                             }}
                           />
                         </Column>
@@ -497,7 +526,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                                   <AssetStoreFilterPanel
                                     assetFiltersState={assetFiltersState}
                                     onChoiceChange={() => {
-                                      navigationState.openSearchIfNeeded();
+                                      navigationState.openSearchPage();
                                     }}
                                   />
                                 </Line>
@@ -507,13 +536,19 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                         </ScrollView>
                       </Column>
                     )}
-                  {isOnHomePage &&
-                    !(publicAssetPacks && privateAssetPacks) &&
-                    !error && <PlaceholderLoader />}
-                  {isOnHomePage &&
-                    publicAssetPacks &&
-                    privateAssetPacks &&
-                    assetPackRandomOrdering && (
+                  {isOnHomePage ? (
+                    error ? (
+                      <PlaceholderError onRetry={fetchAssetsAndFilters}>
+                        <AlertMessage kind="error">
+                          <Trans>
+                            An error occurred when fetching the asset store
+                            content. Please try again later.
+                          </Trans>
+                        </AlertMessage>
+                      </PlaceholderError>
+                    ) : publicAssetPacks &&
+                      privateAssetPacks &&
+                      assetPackRandomOrdering ? (
                       <AssetsHome
                         ref={assetsHome}
                         publicAssetPacks={publicAssetPacks}
@@ -522,43 +557,30 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                         onPublicAssetPackSelection={selectPublicAssetPack}
                         onPrivateAssetPackSelection={selectPrivateAssetPack}
                       />
-                    )}
-                  {!isOnHomePage &&
-                    !openedAssetShortHeader &&
-                    !openedPrivateAssetPackListingData && (
-                      <BoxSearchResults
-                        ref={boxSearchResults}
-                        baseSize={128}
-                        onRetry={fetchAssetsAndFilters}
-                        error={error}
-                        searchItems={searchResults}
-                        renderSearchItem={(assetShortHeader, size) => (
-                          <AssetCard
-                            size={size}
-                            onOpenDetails={() =>
-                              onOpenDetails(assetShortHeader)
-                            }
-                            assetShortHeader={assetShortHeader}
-                          />
-                        )}
-                        noResultPlaceholder={
-                          <NoResultPlaceholder
-                            onClear={() => clearAllFilters(assetFiltersState)}
-                          />
-                        }
-                      />
-                    )}
-                  {isOnHomePage && error && (
-                    <PlaceholderError onRetry={fetchAssetsAndFilters}>
-                      <AlertMessage kind="error">
-                        <Trans>
-                          An error occurred when fetching the asset store
-                          content. Please try again later.
-                        </Trans>
-                      </AlertMessage>
-                    </PlaceholderError>
-                  )}
-                  {openedAssetShortHeader && (
+                    ) : (
+                      <PlaceholderLoader />
+                    )
+                  ) : isOnShowingSearchResultPage ? (
+                    <BoxSearchResults
+                      ref={boxSearchResults}
+                      baseSize={128}
+                      onRetry={fetchAssetsAndFilters}
+                      error={error}
+                      searchItems={searchResults}
+                      renderSearchItem={(assetShortHeader, size) => (
+                        <AssetCard
+                          size={size}
+                          onOpenDetails={() => onOpenDetails(assetShortHeader)}
+                          assetShortHeader={assetShortHeader}
+                        />
+                      )}
+                      noResultPlaceholder={
+                        <NoResultPlaceholder
+                          onClear={() => clearAllFilters(assetFiltersState)}
+                        />
+                      }
+                    />
+                  ) : openedAssetShortHeader ? (
                     <AssetDetails
                       ref={assetDetails}
                       onTagSelection={selectTag}
@@ -566,8 +588,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                       onOpenDetails={onOpenDetails}
                       onAssetLoaded={applyBackScrollPosition}
                     />
-                  )}
-                  {!!openedPrivateAssetPackListingData && (
+                  ) : !!openedPrivateAssetPackListingData ? (
                     <PrivateAssetPackInformationPage
                       privateAssetPackListingData={
                         openedPrivateAssetPackListingData
@@ -581,7 +602,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                         !!purchasingPrivateAssetPackListingData
                       }
                     />
-                  )}
+                  ) : null}
                   {!!purchasingPrivateAssetPackListingData && (
                     <PrivateAssetPackPurchaseDialog
                       privateAssetPackListingData={

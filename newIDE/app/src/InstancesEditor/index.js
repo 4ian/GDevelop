@@ -552,18 +552,14 @@ export default class InstancesEditor extends Component<Props> {
    * Immediately add serialized instances at the given
    * position (in scene coordinates).
    */
-  addSerializedInstances = (
+  addSerializedInstances = (options: {|
     position: [number, number],
     copyReferential: [number, number],
     serializedInstances: Array<Object>,
-    preventSnapToGrid: boolean = false,
-  ): Array<gdInitialInstance> => {
-    return this._instancesAdder.addSerializedInstances(
-      position,
-      copyReferential,
-      serializedInstances,
-      preventSnapToGrid
-    );
+    preventSnapToGrid?: boolean,
+    addInstancesInTheForeground?: boolean,
+  |}): Array<gdInitialInstance> => {
+    return this._instancesAdder.addSerializedInstances(options);
   };
 
   /**

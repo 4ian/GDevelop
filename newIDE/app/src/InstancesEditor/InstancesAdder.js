@@ -52,12 +52,23 @@ export default class InstancesAdder {
     this._instancesEditorSettings = instancesEditorSettings;
   }
 
-  addSerializedInstances = (
+  addSerializedInstances = ({
+    position,
+    copyReferential,
+    serializedInstances,
+    preventSnapToGrid = false,
+    addInstancesInTheForeground = false,
+  }: {|
     position: [number, number],
     copyReferential: [number, number],
     serializedInstances: Array<Object>,
-    preventSnapToGrid?: boolean = false
-  ): Array<gdInitialInstance> => {
+    preventSnapToGrid?: boolean,
+    addInstancesInTheForeground?: boolean,
+  |}): Array<gdInitialInstance> => {
+    this._zOrderFinder.reset();
+    this._instances.iterateOverInstances(this._zOrderFinder);
+    const zOrder = this._zOrderFinder.getHighestZOrder() + 1;
+
     const newInstances = serializedInstances.map(serializedInstance => {
       const instance = new gd.InitialInstance();
       unserializeFromJSObject(instance, serializedInstance);
@@ -70,6 +81,7 @@ export default class InstancesAdder {
         : roundPositionsToGrid(desiredPosition, this._instancesEditorSettings);
       instance.setX(newPos[0]);
       instance.setY(newPos[1]);
+      if (addInstancesInTheForeground) instance.setZOrder(zOrder);
       const newInstance = this._instances
         .insertInitialInstance(instance)
         .resetPersistentUuid();

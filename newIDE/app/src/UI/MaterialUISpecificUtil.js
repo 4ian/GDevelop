@@ -49,3 +49,19 @@ export const getMuiCheckboxValue = (element: HTMLElement): boolean => {
   }
   return true;
 };
+
+export const doesPathContainDialog = (path: Array<Element>): boolean => {
+  // Dialogs root elements are directly placed in the body element.
+  // So the path is global > document > html > body > dialog.
+  try {
+    return isElementADialog(path[path.length - 5], { isVisible: true });
+  } catch (error) {
+    console.error(
+      `An error occurred when determining if path ${path.join(
+        ' > '
+      )} leads to a dialog`,
+      error
+    );
+    return false;
+  }
+};

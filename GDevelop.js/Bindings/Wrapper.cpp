@@ -17,6 +17,7 @@
 #include <GDCore/Extensions/Metadata/EffectMetadata.h>
 #include <GDCore/Extensions/Metadata/MetadataProvider.h>
 #include <GDCore/Extensions/Metadata/MultipleInstructionMetadata.h>
+#include <GDCore/Extensions/Metadata/ParameterOptions.h>
 #include <GDCore/Extensions/Metadata/ParameterMetadataTools.h>
 #include <GDCore/Extensions/Platform.h>
 #include <GDCore/IDE/AbstractFileSystem.h>
@@ -62,6 +63,9 @@
 #include <GDCore/Project/InitialInstance.h>
 #include <GDCore/Project/InitialInstancesContainer.h>
 #include <GDCore/Project/Layout.h>
+#include <GDCore/Project/MeasurementBaseUnit.h>
+#include <GDCore/Project/MeasurementUnitElement.h>
+#include <GDCore/Project/MeasurementUnitElement.h>
 #include <GDCore/Project/NamedPropertyDescriptor.h>
 #include <GDCore/Project/Object.h>
 #include <GDCore/Project/ObjectConfiguration.h>
@@ -552,6 +556,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetEffectMetadata GetEffectMetadata
 #define STATIC_GetActionMetadata GetActionMetadata
 #define STATIC_GetConditionMetadata GetConditionMetadata
+#define STATIC_MakeNewOptions MakeNewOptions
 #define STATIC_GetExpressionMetadata GetExpressionMetadata
 #define STATIC_GetObjectExpressionMetadata GetObjectExpressionMetadata
 #define STATIC_GetBehaviorExpressionMetadata GetBehaviorExpressionMetadata
@@ -597,7 +602,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   GetBehaviorsWithType
 #define STATIC_FixInvalidRequiredBehaviorProperties \
   FixInvalidRequiredBehaviorProperties
-#define STATIC_GenerateGetterAndSetter GenerateGetterAndSetter
+#define STATIC_GenerateBehaviorGetterAndSetter GenerateBehaviorGetterAndSetter
+#define STATIC_GenerateObjectGetterAndSetter GenerateObjectGetterAndSetter
 #define STATIC_CanGenerateGetterAndSetter CanGenerateGetterAndSetter
 #define STATIC_CreateRectangle CreateRectangle
 #define STATIC_SanityCheckBehaviorProperty SanityCheckBehaviorProperty
@@ -646,6 +652,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetPropertyActionName GetPropertyActionName
 #define STATIC_GetPropertyConditionName GetPropertyConditionName
 #define STATIC_GetPropertyExpressionName GetPropertyExpressionName
+#define STATIC_GetSharedPropertyActionName GetSharedPropertyActionName
+#define STATIC_GetSharedPropertyConditionName GetSharedPropertyConditionName
 #define STATIC_GetSharedPropertyExpressionName GetSharedPropertyExpressionName
 
 #define STATIC_CopyAllResourcesTo CopyAllResourcesTo
@@ -658,6 +666,15 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetNodeAtPosition GetNodeAtPosition
 
 #define STATIC_ScanProject ScanProject
+
+#define STATIC_ApplyTranslation ApplyTranslation
+#define STATIC_GetDimensionless GetDimensionless
+#define STATIC_GetDegreeAngle GetDegreeAngle
+#define STATIC_GetSecond GetSecond
+#define STATIC_GetPixel GetPixel
+#define STATIC_GetPixelSpeed GetPixelSpeed
+#define STATIC_GetPixelAcceleration GetPixelAcceleration
+#define STATIC_GetNewton GetNewton
 
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout

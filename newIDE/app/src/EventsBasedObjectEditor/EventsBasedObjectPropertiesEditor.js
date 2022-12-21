@@ -12,7 +12,6 @@ import RaisedButton from '../UI/RaisedButton';
 import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
-import MoreVert from '@material-ui/icons/MoreVert';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import MiniToolbar from '../UI/MiniToolbar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
@@ -25,11 +24,13 @@ import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import StringArrayEditor from '../StringArrayEditor';
 import ColorField from '../UI/ColorField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
+import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 
 const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
+  extension: gdEventsFunctionsExtension,
   eventsBasedObject: gdEventsBasedObject,
   onPropertiesUpdated?: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
@@ -211,7 +212,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                         <ElementWithMenu
                           element={
                             <IconButton>
-                              <MoreVert />
+                              <ThreeDotsMenu />
                             </IconButton>
                           }
                           buildMenuTemplate={(i18n: I18nType) => [
@@ -230,6 +231,20 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               label: i18n._(t`Move down`),
                               click: () => this._moveProperty(i, i + 1),
                               enabled: i + 1 < properties.getCount(),
+                            },
+                            {
+                              label: i18n._(t`Generate expression and action`),
+                              click: () =>
+                                gd.PropertyFunctionGenerator.generateObjectGetterAndSetter(
+                                  this.props.project,
+                                  this.props.extension,
+                                  this.props.eventsBasedObject,
+                                  property
+                                ),
+                              enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
+                                this.props.eventsBasedObject,
+                                property
+                              ),
                             },
                           ]}
                         />

@@ -59,6 +59,7 @@ export default class InstancesAdder {
     pos: [number, number],
     objectNames: Array<string>
   ): Array<gdInitialInstance> => {
+    this._zOrderFinder.reset();
     this._instances.iterateOverInstances(this._zOrderFinder);
     const zOrder = this._zOrderFinder.getHighestZOrder() + 1;
 
@@ -99,6 +100,7 @@ export default class InstancesAdder {
   ) => {
     this.deleteTemporaryInstances();
 
+    this._zOrderFinder.reset();
     this._instances.iterateOverInstances(this._zOrderFinder);
     const zOrder = this._zOrderFinder.getHighestZOrder() + 1;
 

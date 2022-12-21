@@ -17,6 +17,16 @@
       }
     },
     "surface": {
+      "titlebar": {
+        "background-color": {
+          "value": "#191724"
+        }
+      },
+      "toolbar": {
+        "background-color": {
+          "value": "#1f1d2e"
+        }
+      },
       "window": {
         "background-color": {
           "value": "#191724"
@@ -55,6 +65,36 @@
       },
       "hover-color": {
         "value": "#C4A7E7"
+      }
+    },
+    "switch": {
+      "default": {
+        "thumb-color": {
+          "value": "#EBEBED",
+          "comment": "Palette/Grey/10"
+        },
+        "track-color": {
+          "value": "#606066",
+          "comment": "Palette/Grey/60"
+        }
+      },
+      "toggled": {
+        "thumb-color": {
+          "value": "#E4C7FF"
+        },
+        "track-color": {
+          "value": "#C4A7E7"
+        }
+      },
+      "disabled": {
+        "thumb-color": {
+          "value": "#494952",
+          "comment": "Palette/Grey/70"
+        },
+        "track-color": {
+          "value": "#32323B",
+          "comment": "Palette/Grey/80"
+        }
       }
     },
     "search-bar": {
@@ -160,18 +200,24 @@
     "closable-tabs": {
       "default": {
         "background-color": {
-          "value": "#1F1D2A"
+          "value": "#6e6a86",
+          "comment": "Palette/Grey/80"
         },
         "color": {
-          "value": "#e0def4"
+          "value": "#C5C5C9",
+          "comment": "Palette/Grey/30"
         }
       },
       "selected": {
         "background-color": {
-          "value": "{theme.primary.color.value}"
+          "value": "#1f1d2e"
         },
         "color": {
-          "value": "#191724"
+          "value": "#FAFAFA",
+          "comment": "Palette/Grey/00"
+        },
+        "borderColor": {
+          "value": "{theme.primary.color.value}"
         }
       }
     },
@@ -246,14 +292,21 @@
       }
     },
     "home": {
-      "header": {
-        "background-color": {
-          "value": "{theme.surface.canvas.background-color.value}"
-        }
-      },
       "separator": {
         "color": {
           "value": "#32323B"
+        }
+      }
+    },
+    "linear-progress": {
+      "color": {
+        "complete": {
+          "value": "#16CF89",
+          "comment": "Palette/Green/50"
+        },
+        "incomplete": {
+          "value": "#FFA929",
+          "comment": "Palette/Yellow/50"
         }
       }
     },

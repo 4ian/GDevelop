@@ -10,7 +10,6 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import IconButton from '@material-ui/core/IconButton';
 import Refresh from '@material-ui/icons/Refresh';
-import MoreVert from '@material-ui/icons/MoreVert';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import Remove from '@material-ui/icons/Remove';
 import ElementWithMenu from './Menu/ElementWithMenu';
@@ -18,8 +17,10 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Add from '@material-ui/icons/Add';
 import Search from '@material-ui/icons/Search';
 import { type MenuItemTemplate } from './Menu/Menu.flow';
+import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 import { useLongTouch } from '../Utils/UseLongTouch';
 import { Collapse } from '@material-ui/core';
+import ThreeDotsMenu from './CustomSvgIcons/ThreeDotsMenu';
 const useDenseLists = true;
 export const listItemWith32PxIconHeight = 32;
 export const listItemWithoutIconHeight = 29;
@@ -42,6 +43,7 @@ const styles = {
     gap: 10,
     flexDirection: 'column',
   },
+  noLeftPaddingListItem: { paddingLeft: 0 },
 };
 
 type DoubleClickMouseEvent = {| button: 0 | 1 | 2 |};
@@ -91,6 +93,9 @@ type ListItemProps = {|
   nestedListStyle?: {|
     padding: 0,
   |},
+  noPadding?: boolean,
+  /* Set to true to remove button behavior of item that contains nested items. */
+  disableButtonBehaviorForParentItem?: boolean,
 
   style?: {|
     color?: string,
@@ -105,6 +110,7 @@ type ListItemProps = {|
   secondaryTextLines?: 1 | 2,
 
   id?: ?string,
+  data?: HTMLDataset,
 |};
 
 export type ListItemRefType = any; // Should be a material-ui ListIten
@@ -153,7 +159,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
               ref={elementWithMenu}
               element={
                 <IconButton size="small" edge="end" aria-label="menu">
-                  <MoreVert style={{ color: props.rightIconColor }} />
+                  <ThreeDotsMenu style={{ color: props.rightIconColor }} />
                 </IconButton>
               }
               buildMenuTemplate={props.buildMenuTemplate}
@@ -201,6 +207,10 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
       return null;
     };
 
+    const noPaddingStyle = props.noPadding
+      ? styles.noLeftPaddingListItem
+      : undefined;
+
     const { renderNestedItems } = props;
 
     if (!renderNestedItems) {
@@ -216,12 +226,17 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
           onDoubleClick={props.onDoubleClick}
           disabled={props.disabled}
           selected={props.selected}
-          style={props.style}
+          style={{
+            // $FlowFixMe - Flow is not happy about two spreads.
+            ...noPaddingStyle,
+            ...props.style,
+          }}
           onContextMenu={props.buildMenuTemplate ? openContextMenu : undefined}
           {...longTouchForContextMenuProps}
           alignItems={props.secondaryTextLines === 2 ? 'flex-start' : undefined}
           ref={ref}
           id={props.id}
+          {...dataObjectToProps(props.data)}
         >
           {props.leftIcon && (
             <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
@@ -243,22 +258,28 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
       );
     } else {
       const isItemOpen = props.open === undefined ? isOpen : props.open;
+      const onClickItem = () => {
+        setIsOpen(!isItemOpen);
+        if (props.onClick) {
+          props.onClick();
+        }
+      };
       return (
         <React.Fragment>
           <MUIListItem
-            button
+            button={!props.disableButtonBehaviorForParentItem}
             dense={useDenseLists}
             disableRipple
-            onClick={() => {
-              setIsOpen(!isItemOpen);
-              if (props.onClick) {
-                props.onClick();
-              }
-            }}
+            onClick={onClickItem}
             disabled={props.disabled}
-            style={props.style}
+            style={{
+              // $FlowFixMe - Flow is not happy about two spreads.
+              ...noPaddingStyle,
+              ...props.style,
+            }}
             ref={ref}
             id={props.id}
+            {...dataObjectToProps(props.data)}
           >
             {props.leftIcon && (
               <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
@@ -271,9 +292,27 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
             />
             {props.autoGenerateNestedIndicator ? (
               isItemOpen ? (
-                <ExpandLess />
+                <MUIListItemSecondaryAction>
+                  <IconButton
+                    size="small"
+                    edge="end"
+                    aria-label="collapse"
+                    onClick={onClickItem}
+                  >
+                    <ExpandLess />
+                  </IconButton>
+                </MUIListItemSecondaryAction>
               ) : (
-                <ExpandMore />
+                <MUIListItemSecondaryAction>
+                  <IconButton
+                    size="small"
+                    edge="end"
+                    aria-label="expand"
+                    onClick={onClickItem}
+                  >
+                    <ExpandMore />
+                  </IconButton>
+                </MUIListItemSecondaryAction>
               )
             ) : null}
             {renderListItemSecondaryAction()}

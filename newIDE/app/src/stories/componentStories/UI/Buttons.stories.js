@@ -20,9 +20,9 @@ import RaisedButton from '../../../UI/RaisedButton';
 import FlatButton from '../../../UI/FlatButton';
 import TextButton from '../../../UI/TextButton';
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
+import FlatButtonWithSplitMenu from '../../../UI/FlatButtonWithSplitMenu';
 import RaisedButtonWithMenu from '../../../UI/RaisedButtonWithMenu';
 import ElementWithMenu from '../../../UI/Menu/ElementWithMenu';
-import ToolbarIcon from '../../../UI/ToolbarIcon';
 import MiniToolbar, { MiniToolbarText } from '../../../UI/MiniToolbar';
 import IconButton from '../../../UI/IconButton';
 import { Column, Line } from '../../../UI/Grid';
@@ -67,6 +67,12 @@ export const Default = () => (
         primary
         onClick={action('onClick')()}
       />
+      <RaisedButton
+        icon={<CloudDownload />}
+        primary
+        onClick={action('onClick')()}
+      />
+      <RaisedButton icon={<CloudDownload />} onClick={action('onClick')()} />
     </LineStackLayout>
     <LineStackLayout noMargin>
       <FlatButton label="Flat button" onClick={action('onClick')()} />
@@ -115,24 +121,45 @@ export const Default = () => (
         onClick={action('onClick')()}
       />
       <RaisedButtonWithSplitMenu
-        label="Button with split menu"
-        onClick={action('onClick')()}
-        buildMenuTemplate={buildFakeMenuTemplate}
-      />
-      <RaisedButtonWithSplitMenu
-        label="Primary button with split menu"
+        label="Raised button with split menu"
         primary
         onClick={action('onClick')()}
         buildMenuTemplate={buildFakeMenuTemplate}
       />
-      <RaisedButtonWithSplitMenu
+      <FlatButtonWithSplitMenu
+        label="Flat primary button"
+        primary
+        onClick={action('onClick')()}
+        buildMenuTemplate={buildFakeMenuTemplate}
+      />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <FlatButtonWithSplitMenu
+        label="Flat non primary button"
+        onClick={action('onClick')()}
+        buildMenuTemplate={buildFakeMenuTemplate}
+      />
+      <FlatButtonWithSplitMenu
         label="... and with icon"
         icon={<Brush />}
         onClick={action('onClick')()}
         buildMenuTemplate={buildFakeMenuTemplate}
       />
-      <RaisedButtonWithSplitMenu
+      <FlatButtonWithSplitMenu
         label="... and disabled"
+        icon={<Brush />}
+        disabled
+        onClick={action('onClick')()}
+        buildMenuTemplate={buildFakeMenuTemplate}
+      />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <FlatButtonWithSplitMenu
+        icon={<Brush />}
+        onClick={action('onClick')()}
+        buildMenuTemplate={buildFakeMenuTemplate}
+      />
+      <FlatButtonWithSplitMenu
         icon={<Brush />}
         disabled
         onClick={action('onClick')()}
@@ -167,15 +194,6 @@ export const Default = () => (
       <Text size="block-title">Icons with menu:</Text>
     </LineStackLayout>
     <LineStackLayout noMargin>
-      <ElementWithMenu
-        element={
-          <ToolbarIcon
-            src="res/ribbon_default/bug32.png"
-            tooltip={'ToolbarIcon with menu'}
-          />
-        }
-        buildMenuTemplate={buildFakeMenuTemplate}
-      />
       <ElementWithMenu
         element={
           <IconButton>

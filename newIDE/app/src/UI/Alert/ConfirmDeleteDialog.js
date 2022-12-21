@@ -18,6 +18,8 @@ type Props = {|
   confirmText: string,
   onConfirm: () => void,
   onDismiss: () => void,
+  confirmButtonLabel?: MessageDescriptor,
+  dismissButtonLabel?: MessageDescriptor,
 |};
 
 function ConfirmDeleteDialog(props: Props) {
@@ -44,13 +46,25 @@ function ConfirmDeleteDialog(props: Props) {
           actions={[
             <FlatButton
               key="cancel"
-              label={<Trans>Cancel</Trans>}
+              label={
+                props.dismissButtonLabel ? (
+                  i18n._(props.dismissButtonLabel)
+                ) : (
+                  <Trans>Cancel</Trans>
+                )
+              }
               primary={false}
               onClick={props.onDismiss}
             />,
             <DialogPrimaryButton
               key="confirm"
-              label={<Trans>Confirm</Trans>}
+              label={
+                props.confirmButtonLabel ? (
+                  i18n._(props.confirmButtonLabel)
+                ) : (
+                  <Trans>Confirm</Trans>
+                )
+              }
               primary
               onClick={onConfirm}
               disabled={!canConfirm}

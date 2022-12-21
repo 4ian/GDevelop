@@ -8,6 +8,7 @@ import ContextMenu, { type ContextMenuInterface } from './Menu/ContextMenu';
 import { useLongTouch } from '../Utils/UseLongTouch';
 import { Spacer } from './Grid';
 import GDevelopThemeContext from './Theme/ThemeContext';
+import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 
 const styles = {
   tabContentContainer: {
@@ -77,14 +78,13 @@ type ClosableTabsProps = {|
 |};
 
 export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const tabItemContainerStyle = {
     maxWidth: '100%', // Tabs should take all width
-    flexShrink: 0, // Tabs height should never be reduced
     display: hideLabels ? 'none' : 'flex',
     flexWrap: 'nowrap', // Single line of tab...
-    overflowX: 'auto', // ...scroll horizontally if needed
-    backgroundColor: gdevelopTheme.closableTabs.containerBackgroundColor,
+    overflowX: 'overlay', // ...scroll horizontally if needed
+    overflowY: 'hidden', // ...never scroll vertically (useful on Safari)
+    marginTop: 6,
   };
 
   return (
@@ -96,6 +96,7 @@ export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => {
 
 export type ClosableTabProps = {|
   id?: string,
+  data?: HTMLDataset,
   active: boolean,
   label: ?React.Node,
   icon: ?React.Node,
@@ -109,6 +110,7 @@ export type ClosableTabProps = {|
 
 export function ClosableTab({
   id,
+  data,
   active,
   onClose,
   onCloseOthers,
@@ -169,7 +171,16 @@ export function ClosableTab({
           flexShrink: 0, // Tabs are never resized to fit in flex container
           position: 'relative',
           display: 'inline-block',
-          marginRight: 1,
+          marginRight: 2,
+          borderTopRightRadius: 8,
+          borderTopLeftRadius: 8,
+          borderTop: '1px solid black',
+          borderRight: '1px solid black',
+          borderLeft: '1px solid black',
+          borderBottom: 'none',
+          borderColor: active
+            ? gdevelopTheme.closableTabs.selectedBorderColor
+            : gdevelopTheme.closableTabs.backgroundColor,
           backgroundColor: !active
             ? gdevelopTheme.closableTabs.backgroundColor
             : gdevelopTheme.closableTabs.selectedBackgroundColor,
@@ -179,7 +190,9 @@ export function ClosableTab({
           onClick={onClick}
           onAuxClick={closable ? closeOnMiddleClick : undefined}
           onContextMenu={openContextMenu}
+          data-active={active ? 'true' : undefined}
           id={id ? `${id}-button` : undefined}
+          {...dataObjectToProps(data)}
           {...longTouchForContextMenuProps}
           focusRipple
           // If the touch ripple is not disabled, the dragged preview will

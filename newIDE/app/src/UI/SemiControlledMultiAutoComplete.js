@@ -1,10 +1,32 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { Trans } from '@lingui/macro';
 import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { makeStyles } from '@material-ui/core';
+import {
+  AutocompletePaperComponent,
+  autocompleteStyles,
+} from './SemiControlledAutoComplete';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import { textEllipsisStyle } from './TextEllipsis';
+import Text from './Text';
+
+const renderItem = (option: AutocompleteOption, state: Object): React.Node => (
+  <ListItem dense component={'div'} style={autocompleteStyles.listItem}>
+    <ListItemText
+      style={autocompleteStyles.listItemText}
+      primary={
+        <div title={option.value} style={textEllipsisStyle}>
+          {option.text}
+        </div>
+      }
+    />
+  </ListItem>
+);
 
 export type AutocompleteOption = {|
   text: string, // The text displayed
@@ -52,6 +74,8 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
           inputValue={props.inputValue}
           onInputChange={props.onInputChange}
           options={props.dataSource}
+          PaperComponent={AutocompletePaperComponent}
+          renderOption={renderItem}
           getOptionLabel={(option: AutocompleteOption) => option.text}
           getOptionDisabled={(option: AutocompleteOption) =>
             option.disabled ||
@@ -79,6 +103,16 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
           )}
           fullWidth={props.fullWidth}
           disabled={props.disabled || props.loading}
+          noOptionsText={
+            <Text>
+              <Trans>No options</Trans>
+            </Text>
+          }
+          loadingText={
+            <Text>
+              <Trans>Loading...</Trans>
+            </Text>
+          }
           ChipProps={{
             classes: chipStyles,
           }}

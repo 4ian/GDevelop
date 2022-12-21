@@ -12,7 +12,7 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Text from '../../../../UI/Text';
 import TextButton from '../../../../UI/TextButton';
 import RaisedButton from '../../../../UI/RaisedButton';
-import { Line, Column, Spacer } from '../../../../UI/Grid';
+import { Line, Column, Spacer, marginsSize } from '../../../../UI/Grid';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import {
   LineStackLayout,
@@ -45,11 +45,14 @@ import { ExampleStoreContext } from '../../../../AssetStore/ExampleStore/Example
 import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import Add from '../../../../UI/CustomSvgIcons/Add';
 import ImageTileRow from '../../../../UI/ImageTileRow';
 import { prepareExamples } from '../../../../AssetStore/ExampleStore';
-import Window from '../../../../Utils/Window';
+import Skeleton from '@material-ui/lab/Skeleton';
+import BackgroundText from '../../../../UI/BackgroundText';
+import Paper from '../../../../UI/Paper';
+import PlaceholderError from '../../../../UI/PlaceholderError';
+import AlertMessage from '../../../../UI/AlertMessage';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -61,6 +64,8 @@ const styles = {
     borderRadius: 8,
     overflowWrap: 'anywhere', // Ensure everything is wrapped on small devices.
   },
+  projectSkeleton: { borderRadius: 6 },
+  noProjectsContainer: { padding: 10 },
 };
 
 const getTemplatesGridSizeFromWidth = (width: WidthType) => {
@@ -73,6 +78,12 @@ const getTemplatesGridSizeFromWidth = (width: WidthType) => {
     default:
       return 6;
   }
+};
+
+const getProjectLineHeight = (width: WidthType) => {
+  const lineHeight = width === 'small' ? 52 : 36;
+
+  return lineHeight - 2 * marginsSize;
 };
 
 type Props = {|
@@ -143,16 +154,17 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     const { openSubscriptionDialog } = React.useContext(
       SubscriptionSuggestionContext
     );
-    const { cloudProjects, limits } = authenticatedUser;
+    const {
+      cloudProjects,
+      limits,
+      cloudProjectsFetchingErrorLabel,
+      onCloudProjectsChanged,
+    } = authenticatedUser;
     const contextMenu = React.useRef<?ContextMenuInterface>(null);
     const { showDeleteConfirmation } = useAlertDialog();
     const [pendingProject, setPendingProject] = React.useState<?string>(null);
     const windowWidth = useResponsiveWindowWidth();
     const forceUpdate = useForceUpdate();
-
-    // Search "activate cloud projects" in the codebase for everything to
-    // remove once cloud projects are activated for the desktop app.
-    const supportsCloudProjects = !electron || Window.isDev();
 
     const iconClasses = useStylesForListItemIcon();
 
@@ -164,8 +176,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       file => file.fileMetadata
     );
 
-    // Show cloud projects on the web app only.
-    if (supportsCloudProjects && cloudProjects) {
+    if (cloudProjects) {
       projectFiles = projectFiles.concat(
         cloudProjects
           .map(cloudProject => {
@@ -215,6 +226,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
         message: t`You’re about to permanently delete your project ${projectName}. You will no longer be able to access it.`,
         fieldMessage: t`Type your project name to delete it:`,
         confirmText: projectName,
+        confirmButtonLabel: t`Delete project`,
       });
       if (!deleteAnswer) return;
 
@@ -287,6 +299,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     };
 
     const isWindowWidthMediumOrLarger = windowWidth !== 'small';
+    const skeletonLineHeight = getProjectLineHeight(windowWidth);
 
     return (
       <I18n>
@@ -312,21 +325,22 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
               }
             >
               <SectionRow>
-                {!allExamples ? (
-                  <PlaceholderLoader />
-                ) : (
-                  <ImageTileRow
-                    items={prepareExamples(allExamples).map(example => ({
-                      onClick: () => onSelectExample(example),
-                      imageUrl: example.previewImageUrls[0],
-                    }))}
-                    title={<Trans>Recommended templates</Trans>}
-                    onShowAll={onShowAllExamples}
-                    showAllIcon={<Add fontSize="small" />}
-                    getColumnsFromWidth={getTemplatesGridSizeFromWidth}
-                    getLimitFromWidth={getTemplatesGridSizeFromWidth}
-                  />
-                )}
+                <ImageTileRow
+                  isLoading={!allExamples}
+                  items={
+                    allExamples
+                      ? prepareExamples(allExamples).map(example => ({
+                          onClick: () => onSelectExample(example),
+                          imageUrl: example.previewImageUrls[0],
+                        }))
+                      : []
+                  }
+                  title={<Trans>Recommended templates</Trans>}
+                  onShowAll={onShowAllExamples}
+                  showAllIcon={<Add fontSize="small" />}
+                  getColumnsFromWidth={getTemplatesGridSizeFromWidth}
+                  getLimitFromWidth={getTemplatesGridSizeFromWidth}
+                />
               </SectionRow>
               <SectionRow>
                 <LineStackLayout
@@ -374,179 +388,206 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                     </ResponsiveLineStackLayout>
                   </Column>
                 </LineStackLayout>
-                {authenticatedUser.loginState === 'loggingIn' ? (
-                  <Column
-                    useFullHeight
-                    expand
-                    noMargin
-                    justifyContent="flex-start"
-                    alignItems="center"
-                  >
-                    <CircularProgress />
-                    <Text>
-                      <Trans>Loading projects...</Trans>
-                    </Text>
-                  </Column>
-                ) : (
-                  projectFiles &&
-                  projectFiles.length > 0 && (
-                    <Line>
-                      <Column noMargin expand>
-                        {isWindowWidthMediumOrLarger && (
-                          <LineStackLayout justifyContent="space-between">
-                            <Column expand>
-                              <Text color="secondary">
-                                <Trans>File name</Trans>
-                              </Text>
-                            </Column>
-                            <Column expand>
-                              <Text color="secondary">
-                                <Trans>Location</Trans>
-                              </Text>
-                            </Column>
-                            <Column expand>
-                              <Text color="secondary">
-                                <Trans>Last edited</Trans>
-                              </Text>
-                            </Column>
-                          </LineStackLayout>
-                        )}
-                        <List>
-                          {projectFiles.map(file => {
-                            const storageProvider = getStorageProviderByInternalName(
-                              storageProviders,
-                              file.storageProviderName
-                            );
-                            return (
-                              <ListItem
-                                button
-                                key={file.fileMetadata.fileIdentifier}
-                                onClick={() => {
-                                  onOpenRecentFile(file);
-                                }}
-                                style={styles.listItem}
-                                onContextMenu={event =>
-                                  openContextMenu(event, file)
-                                }
-                              >
-                                <>
-                                  {storageProvider &&
-                                    storageProvider.renderIcon &&
-                                    !isWindowWidthMediumOrLarger && (
-                                      <ListItemAvatar
-                                        classes={iconClasses}
-                                        style={{
-                                          marginTop: 8,
-                                          alignSelf: 'flex-start',
-                                        }}
-                                      >
-                                        {storageProvider.renderIcon({
-                                          size: 'small',
-                                        })}
-                                      </ListItemAvatar>
-                                    )}
-                                  {isWindowWidthMediumOrLarger ? (
-                                    <LineStackLayout
-                                      justifyContent="flex-start"
-                                      expand
+                {cloudProjectsFetchingErrorLabel && (
+                  <Line>
+                    <PlaceholderError onRetry={onCloudProjectsChanged}>
+                      <AlertMessage kind="warning">
+                        {cloudProjectsFetchingErrorLabel}
+                      </AlertMessage>
+                    </PlaceholderError>
+                  </Line>
+                )}
+                <Line>
+                  <Column noMargin expand>
+                    {isWindowWidthMediumOrLarger && (
+                      <LineStackLayout justifyContent="space-between">
+                        <Column expand>
+                          <Text color="secondary">
+                            <Trans>File name</Trans>
+                          </Text>
+                        </Column>
+                        <Column expand>
+                          <Text color="secondary">
+                            <Trans>Location</Trans>
+                          </Text>
+                        </Column>
+                        <Column expand>
+                          <Text color="secondary">
+                            <Trans>Last edited</Trans>
+                          </Text>
+                        </Column>
+                      </LineStackLayout>
+                    )}
+                    <List>
+                      {authenticatedUser.loginState === 'loggingIn' ? (
+                        new Array(5).fill(0).map((_, index) => (
+                          <ListItem
+                            style={styles.listItem}
+                            key={`skeleton-${index}`}
+                          >
+                            <Line expand>
+                              <Column expand>
+                                <Skeleton
+                                  variant="rect"
+                                  height={skeletonLineHeight}
+                                  style={styles.projectSkeleton}
+                                />
+                              </Column>
+                            </Line>
+                          </ListItem>
+                        ))
+                      ) : projectFiles && projectFiles.length > 0 ? (
+                        projectFiles.map(file => {
+                          const storageProvider = getStorageProviderByInternalName(
+                            storageProviders,
+                            file.storageProviderName
+                          );
+                          return (
+                            <ListItem
+                              button
+                              key={file.fileMetadata.fileIdentifier}
+                              onClick={() => {
+                                onOpenRecentFile(file);
+                              }}
+                              style={styles.listItem}
+                              onContextMenu={event =>
+                                openContextMenu(event, file)
+                              }
+                            >
+                              <>
+                                {storageProvider &&
+                                  storageProvider.renderIcon &&
+                                  !isWindowWidthMediumOrLarger && (
+                                    <ListItemAvatar
+                                      classes={iconClasses}
+                                      style={{
+                                        marginTop: 8,
+                                        alignSelf: 'flex-start',
+                                      }}
                                     >
-                                      <Column expand>
-                                        <Line noMargin alignItems="center">
-                                          {storageProvider &&
-                                            storageProvider.renderIcon && (
-                                              <>
-                                                {storageProvider.renderIcon({
-                                                  size: 'small',
-                                                })}
-                                                <Spacer />
-                                              </>
-                                            )}
-                                          <Text noMargin>
-                                            {file.fileMetadata.name || (
-                                              <PrettyBreakablePath
-                                                path={
-                                                  file.fileMetadata
-                                                    .fileIdentifier
-                                                }
-                                              />
-                                            )}
-                                          </Text>
-
-                                          {pendingProject ===
-                                            file.fileMetadata
-                                              .fileIdentifier && (
+                                      {storageProvider.renderIcon({
+                                        size: 'small',
+                                      })}
+                                    </ListItemAvatar>
+                                  )}
+                                {isWindowWidthMediumOrLarger ? (
+                                  <LineStackLayout
+                                    justifyContent="flex-start"
+                                    expand
+                                  >
+                                    <Column expand>
+                                      <Line noMargin alignItems="center">
+                                        {storageProvider &&
+                                          storageProvider.renderIcon && (
                                             <>
+                                              {storageProvider.renderIcon({
+                                                size: 'small',
+                                              })}
                                               <Spacer />
-                                              <CircularProgress size={16} />
                                             </>
                                           )}
-                                        </Line>
-                                      </Column>
-                                      <Column expand>
                                         <Text noMargin>
-                                          {storageProvider
-                                            ? i18n._(storageProvider.name)
-                                            : ''}
+                                          {file.fileMetadata.name || (
+                                            <PrettyBreakablePath
+                                              path={
+                                                file.fileMetadata.fileIdentifier
+                                              }
+                                            />
+                                          )}
                                         </Text>
-                                      </Column>
-                                      <Column expand>
-                                        {file.fileMetadata.lastModifiedDate && (
-                                          <Text noMargin>
-                                            {getRelativeOrAbsoluteDisplayDate(
-                                              i18n,
-                                              file.fileMetadata.lastModifiedDate
-                                            )}
-                                          </Text>
-                                        )}
-                                      </Column>
-                                    </LineStackLayout>
-                                  ) : (
-                                    <Column expand>
-                                      <Line
-                                        noMargin
-                                        alignItems="center"
-                                        justifyContent="space-between"
-                                      >
-                                        <ListItemText
-                                          primary={
-                                            file.fileMetadata.name || (
-                                              <PrettyBreakablePath
-                                                path={
-                                                  file.fileMetadata
-                                                    .fileIdentifier
-                                                }
-                                              />
-                                            )
-                                          }
-                                          secondary={
-                                            file.fileMetadata.lastModifiedDate
-                                              ? getRelativeOrAbsoluteDisplayDate(
-                                                  i18n,
-                                                  file.fileMetadata
-                                                    .lastModifiedDate
-                                                )
-                                              : undefined
-                                          }
-                                          onContextMenu={event =>
-                                            openContextMenu(event, file)
-                                          }
-                                        />
+
                                         {pendingProject ===
                                           file.fileMetadata.fileIdentifier && (
-                                          <CircularProgress size={24} />
+                                          <>
+                                            <Spacer />
+                                            <CircularProgress size={16} />
+                                          </>
                                         )}
                                       </Line>
                                     </Column>
-                                  )}
-                                </>
-                              </ListItem>
-                            );
-                          })}
-                        </List>
-                      </Column>
-                    </Line>
-                  )
-                )}
+                                    <Column expand>
+                                      <Text noMargin>
+                                        {storageProvider
+                                          ? i18n._(storageProvider.name)
+                                          : ''}
+                                      </Text>
+                                    </Column>
+                                    <Column expand>
+                                      {file.fileMetadata.lastModifiedDate && (
+                                        <Text noMargin>
+                                          {getRelativeOrAbsoluteDisplayDate(
+                                            i18n,
+                                            file.fileMetadata.lastModifiedDate
+                                          )}
+                                        </Text>
+                                      )}
+                                    </Column>
+                                  </LineStackLayout>
+                                ) : (
+                                  <Column expand>
+                                    <Line
+                                      noMargin
+                                      alignItems="center"
+                                      justifyContent="space-between"
+                                    >
+                                      <ListItemText
+                                        primary={
+                                          file.fileMetadata.name || (
+                                            <PrettyBreakablePath
+                                              path={
+                                                file.fileMetadata.fileIdentifier
+                                              }
+                                            />
+                                          )
+                                        }
+                                        secondary={
+                                          file.fileMetadata.lastModifiedDate
+                                            ? getRelativeOrAbsoluteDisplayDate(
+                                                i18n,
+                                                file.fileMetadata
+                                                  .lastModifiedDate
+                                              )
+                                            : undefined
+                                        }
+                                        onContextMenu={event =>
+                                          openContextMenu(event, file)
+                                        }
+                                      />
+                                      {pendingProject ===
+                                        file.fileMetadata.fileIdentifier && (
+                                        <CircularProgress size={24} />
+                                      )}
+                                    </Line>
+                                  </Column>
+                                )}
+                              </>
+                            </ListItem>
+                          );
+                        })
+                      ) : (
+                        <ListItem style={styles.listItem}>
+                          <Column expand>
+                            <Paper
+                              variant="outlined"
+                              background="dark"
+                              style={styles.noProjectsContainer}
+                            >
+                              <BackgroundText>
+                                <Trans>No projects yet.</Trans>
+                              </BackgroundText>
+                              <BackgroundText>
+                                <Trans>
+                                  Create your first project using one of our
+                                  templates or start from scratch.
+                                </Trans>
+                              </BackgroundText>
+                            </Paper>
+                          </Column>
+                        </ListItem>
+                      )}
+                    </List>
+                  </Column>
+                </Line>
               </SectionRow>
             </SectionContainer>
             <ContextMenu

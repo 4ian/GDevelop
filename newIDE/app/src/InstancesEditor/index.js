@@ -30,9 +30,16 @@ import PinchHandler, { shouldBeHandledByPinch } from './PinchHandler';
 import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
 import LongTouchHandler from './LongTouchHandler';
-import { type InstancesEditorSettings } from './InstancesEditorSettings';
+import {
+  getRecommendedInitialZoomFactor,
+  type InstancesEditorSettings,
+} from './InstancesEditorSettings';
 import Rectangle from '../Utils/Rectangle';
 import { isNoDialogOpened } from '../UI/MaterialUISpecificUtil';
+import {
+  clampInstancesEditorZoom,
+  getWheelStepZoomFactor,
+} from '../Utils/ZoomUtils';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -179,7 +186,7 @@ export default class InstancesEditor extends Component<Props> {
     this.pixiRenderer.view.onwheel = (event: any) => {
       const zoomFactor = this.getZoomFactor();
       if (this.keyboardShortcuts.shouldZoom()) {
-        this.zoomOnCursorBy(-event.deltaY / 5000);
+        this.zoomOnCursorBy(getWheelStepZoomFactor(-event.deltaY));
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
         const deltaX = event.deltaY / (5 * zoomFactor);
         this.scrollBy(-deltaX, 0);
@@ -513,7 +520,7 @@ export default class InstancesEditor extends Component<Props> {
   }
 
   zoomBy(value: number) {
-    this.setZoomFactor(this.getZoomFactor() + value);
+    this.setZoomFactor(this.getZoomFactor() * value);
   }
 
   /**
@@ -521,7 +528,7 @@ export default class InstancesEditor extends Component<Props> {
    */
   zoomOnCursorBy(value: number) {
     const beforeZoomCursorPosition = this.getLastCursorSceneCoordinates();
-    this.setZoomFactor(this.getZoomFactor() + value);
+    this.setZoomFactor(this.getZoomFactor() * value);
     const afterZoomCursorPosition = this.getLastCursorSceneCoordinates();
     // Compensate for the cursor change in position
     this.scrollBy(
@@ -537,7 +544,7 @@ export default class InstancesEditor extends Component<Props> {
   setZoomFactor = (zoomFactor: number) => {
     this.props.onChangeInstancesEditorSettings({
       ...this.props.instancesEditorSettings,
-      zoomFactor: Math.max(Math.min(zoomFactor, 10), 0.01),
+      zoomFactor: clampInstancesEditorZoom(zoomFactor),
     });
   };
 
@@ -870,9 +877,13 @@ export default class InstancesEditor extends Component<Props> {
   }
 
   zoomToInitialPosition() {
-    const x = this.props.project.getGameResolutionWidth() / 2;
-    const y = this.props.project.getGameResolutionHeight() / 2;
-    this.setZoomFactor(1);
+    const width = this.props.project.getGameResolutionWidth();
+    const height = this.props.project.getGameResolutionHeight();
+    const x = width / 2;
+    const y = height / 2;
+    this.setZoomFactor(
+      getRecommendedInitialZoomFactor(Math.max(height, width))
+    );
     this.scrollTo(x, y);
   }
 

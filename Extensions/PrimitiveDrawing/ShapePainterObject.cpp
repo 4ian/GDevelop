@@ -108,7 +108,7 @@ void ShapePainterObjectBase::SetFillColor(unsigned int r,
   fillColorB = b;
 }
 
-void ShapePainterObjectBase::SetFillOpacity(float val) {
+void ShapePainterObjectBase::SetFillOpacity(double val) {
   if (val > 255)
     val = 255;
   else if (val < 0)
@@ -128,7 +128,7 @@ void ShapePainterObjectBase::SetOutlineColor(unsigned int r,
   outlineColorB = b;
 }
 
-void ShapePainterObjectBase::SetOutlineOpacity(float val) {
+void ShapePainterObjectBase::SetOutlineOpacity(double val) {
   if (val > 255)
     val = 255;
   else if (val < 0)

@@ -94,13 +94,15 @@ InstructionMetadata& InstructionMetadata::AddCodeOnlyParameter(
 }
 
 InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
-    const gd::String& type, const gd::String& typeExtraInfo) {
+    const gd::String& type, const ParameterOptions &options) {
   const gd::String& expressionValueType =
       gd::ValueTypeMetadata::GetPrimitiveValueType(type);
   SetManipulatedType(expressionValueType);
 
   if (type == "boolean") {
-    AddParameter("yesorno", _("New value"));
+    AddParameter(
+        "yesorno",
+        options.description.empty() ? _("New value") : options.description);
     size_t valueParamIndex = parameters.size() - 1;
 
     if (isObjectInstruction || isBehaviorInstruction) {
@@ -122,7 +124,9 @@ InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
     }
   } else {
     AddParameter("operator", _("Modification's sign"), expressionValueType);
-    AddParameter(type, _("Value"), typeExtraInfo);
+    AddParameter(type,
+                 options.description.empty() ? _("Value") : options.description,
+                 options.typeExtraInfo);
 
     size_t operatorParamIndex = parameters.size() - 2;
     size_t valueParamIndex = parameters.size() - 1;
@@ -155,7 +159,7 @@ InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
 
 InstructionMetadata&
 InstructionMetadata::UseStandardRelationalOperatorParameters(
-    const gd::String& type, const gd::String& typeExtraInfo) {
+    const gd::String& type, const ParameterOptions &options) {
   const gd::String& expressionValueType =
       gd::ValueTypeMetadata::GetPrimitiveValueType(type);
   SetManipulatedType(expressionValueType);
@@ -175,7 +179,9 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
     }
   } else {
     AddParameter("relationalOperator", _("Sign of the test"), expressionValueType);
-    AddParameter(type, _("Value to compare"), typeExtraInfo);
+    AddParameter(type,
+                 options.description.empty() ? _("Value to compare") : options.description,
+                 options.typeExtraInfo);
     size_t operatorParamIndex = parameters.size() - 2;
     size_t valueParamIndex = parameters.size() - 1;
 

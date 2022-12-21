@@ -130,6 +130,7 @@ export const indieUserProfile: Profile = {
   getNewsletterEmail: true,
   isCreator: true,
   isPlayer: false,
+  donateLink: 'https://www.paypal.me/indie-user',
 };
 
 export const usagesForIndieUser: Usages = [
@@ -167,6 +168,35 @@ export const noSubscription: Subscription = {
   userId: 'no-subscription-user',
 };
 
+export const limitsForNoSubscriptionUser: Limits = {
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: false,
+      retention: false,
+      sessionsTimeStats: false,
+      platforms: false,
+    },
+    cloudProjects: {
+      maximumCount: 10,
+      canMaximumCountBeIncreased: true,
+    },
+    leaderboards: {
+      maximumCountPerGame: 3,
+      canMaximumCountPerGameBeIncreased: true,
+      themeCustomizationCapabilities: 'NONE',
+    },
+  },
+  limits: {
+    'cordova-build': {
+      current: 0,
+      max: 2,
+      limitReached: false,
+    },
+  },
+  message: undefined,
+};
+
 export const limitsForIndieUser: Limits = {
   capabilities: {
     analytics: {
@@ -183,6 +213,7 @@ export const limitsForIndieUser: Limits = {
     leaderboards: {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
+      themeCustomizationCapabilities: 'BASIC',
     },
   },
   limits: {
@@ -211,6 +242,7 @@ export const limitsForProUser: Limits = {
     leaderboards: {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
+      themeCustomizationCapabilities: 'FULL',
     },
   },
   limits: {
@@ -239,6 +271,7 @@ export const limitsReached: Limits = {
     leaderboards: {
       maximumCountPerGame: 3,
       canMaximumCountPerGameBeIncreased: true,
+      themeCustomizationCapabilities: 'BASIC',
     },
   },
   limits: {
@@ -257,6 +290,7 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   loginState: 'done',
   badges: null,
   cloudProjects: null,
+  cloudProjectsFetchingErrorLabel: null,
   firebaseUser: indieFirebaseUser,
   subscription: subscriptionForIndieUser,
   usages: usagesForIndieUser,
@@ -298,10 +332,11 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   loginState: 'done',
   badges: null,
   cloudProjects: tenCloudProjects,
+  cloudProjectsFetchingErrorLabel: null,
   firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
-  limits: limitsForIndieUser,
+  limits: limitsForNoSubscriptionUser,
   receivedAssetPacks: [],
   receivedAssetShortHeaders: [],
   onLogout: async () => {},
@@ -339,6 +374,7 @@ export const fakeNoSubscriptionAndTooManyCloudProjectsAuthenticatedUser: Authent
   loginState: 'done',
   badges: null,
   cloudProjects: tenCloudProjects,
+  cloudProjectsFetchingErrorLabel: null,
   firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
@@ -380,10 +416,11 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   loginState: 'done',
   badges: null,
   cloudProjects: cloudProjectsForIndieUser,
+  cloudProjectsFetchingErrorLabel: null,
   firebaseUser: indieVerifiedFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
-  limits: limitsForIndieUser,
+  limits: limitsForNoSubscriptionUser,
   receivedAssetPacks: [],
   receivedAssetShortHeaders: [],
   onLogout: async () => {},
@@ -421,6 +458,7 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   loginState: 'loggingIn',
   badges: null,
   cloudProjects: null,
+  cloudProjectsFetchingErrorLabel: null,
   firebaseUser: null,
   subscription: null,
   usages: null,
@@ -469,10 +507,11 @@ export const fakeAuthenticatedUserWithBadges: AuthenticatedUser = {
     },
   ],
   cloudProjects: cloudProjectsForIndieUser,
+  cloudProjectsFetchingErrorLabel: null,
   firebaseUser: indieVerifiedFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
-  limits: limitsForIndieUser,
+  limits: limitsForNoSubscriptionUser,
   receivedAssetPacks: [],
   receivedAssetShortHeaders: [],
   onLogout: async () => {},
@@ -510,6 +549,7 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   loginState: 'done',
   badges: null,
   cloudProjects: null,
+  cloudProjectsFetchingErrorLabel: null,
   firebaseUser: null,
   subscription: null,
   usages: null,
@@ -735,7 +775,9 @@ export const fakeAsset1: Asset = {
   shortDescription:
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
-  previewImageUrls: ['res/GD-logo.png'],
+  previewImageUrls: [
+    'https://asset-resources.gdevelop.io/public-resources/Simple Space/spaceships/b0e7ae371773ea6cf1e18a7db1d32ea1b4b9dd388f1f31aed5b7c1501437292c_Complex Spaceship_Type A.png',
+  ],
   animationsCount: 6,
   maxFramesCount: 6,
   height: 36,
@@ -883,7 +925,9 @@ export const fakeAssetWithCustomObject: Asset = {
   objectType: 'object',
   animationsCount: 1,
   maxFramesCount: 1,
-  previewImageUrls: ['res/GD-logo.png'],
+  previewImageUrls: [
+    'https://asset-resources.gdevelop.io/public-resources/Menu buttons/3e1b2da0279f60b6a6d1cfe4c79875b70a81b0bec7aa45ff18bff03eb26326eb_Yellow Button.preview.png',
+  ],
   width: 256,
   height: 106,
   dominantColors: [16304136],
@@ -967,6 +1011,54 @@ export const fakeAssetShortHeader1: AssetShortHeader = {
     'https://resources.gdevelop-app.com/assets/24x24 Dino Characters/Dino Doux_Crouch.png',
   ],
   shortDescription: 'with 6 animations',
+  tags: [
+    '24x24 dino characters',
+    'side view',
+    'pixel art',
+    'character',
+    'player',
+    'enemy',
+  ],
+  dominantColors: [255],
+};
+
+export const fakeAssetShortHeader2: AssetShortHeader = {
+  id: 'faaa5460ffc062ece1f3ff45d24b07e40e9d4247d21602de70973049eb4f6ee6',
+  license:
+    'CC-BY 4.0 (Attribution to the artist is required, click for details)',
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  name: 'Dino Doux 2',
+  objectType: 'sprite',
+  previewImageUrls: [
+    'https://resources.gdevelop-app.com/assets/24x24 Dino Characters/Dino Doux_Crouch.png',
+  ],
+  shortDescription: 'with 5 animations',
+  tags: [
+    '24x24 dino characters',
+    'side view',
+    'pixel art',
+    'character',
+    'player',
+    'enemy',
+  ],
+  dominantColors: [255],
+};
+
+export const fakePrivateAssetShortHeader1: AssetShortHeader = {
+  id: 'bcdef460ffc062ece1f3ff45d24b07e40e9d4247d21602de70973049eb4f6ee5',
+  license:
+    'CC-BY 4.0 (Attribution to the artist is required, click for details)',
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  name: 'Premium Dino Doux',
+  objectType: 'sprite',
+  previewImageUrls: ['https://private-assets.gdevelop.io/fake-preview.png'],
+  shortDescription: 'with 10 animations',
   tags: [
     '24x24 dino characters',
     'side view',

@@ -25,7 +25,7 @@ const useListItemStyles = makeStyles(theme => {
   return {
     root: {
       border: `1px solid ${theme.palette.divider}`,
-      borderRadius: '5px',
+      borderRadius: 8,
     },
   };
 });

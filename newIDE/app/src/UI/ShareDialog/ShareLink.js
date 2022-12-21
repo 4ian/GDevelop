@@ -48,6 +48,7 @@ const ShareLink = ({ url }: Props) => {
         renderButton={style => (
           <RaisedButton
             primary
+            id="open-online-export-button"
             label={<Trans>Open</Trans>}
             onClick={onOpen}
             style={style}

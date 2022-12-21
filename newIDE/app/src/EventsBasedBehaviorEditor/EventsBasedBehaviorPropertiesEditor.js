@@ -12,7 +12,6 @@ import RaisedButton from '../UI/RaisedButton';
 import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
-import MoreVert from '@material-ui/icons/MoreVert';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import MiniToolbar from '../UI/MiniToolbar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
@@ -27,6 +26,7 @@ import ColorField from '../UI/ColorField';
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import ScrollView from '../UI/ScrollView';
+import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 
 const gd: libGDevelop = global.gd;
 
@@ -208,7 +208,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                     <ElementWithMenu
                       element={
                         <IconButton>
-                          <MoreVert />
+                          <ThreeDotsMenu />
                         </IconButton>
                       }
                       buildMenuTemplate={(i18n: I18nType) => [
@@ -230,7 +230,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                         {
                           label: i18n._(t`Generate expression and action`),
                           click: () =>
-                            gd.PropertyFunctionGenerator.generateGetterAndSetter(
+                            gd.PropertyFunctionGenerator.generateBehaviorGetterAndSetter(
                               this.props.project,
                               this.props.extension,
                               this.props.eventsBasedBehavior,
@@ -331,31 +331,30 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             />
                           </SelectField>
                         )}
-                        {property.getType() === 'Behavior' &&
-                          this.props.behaviorObjectType && (
-                            <BehaviorTypeSelector
-                              project={this.props.project}
-                              objectType={this.props.behaviorObjectType}
-                              value={
-                                property.getExtraInfo().size() === 0
-                                  ? ''
-                                  : property.getExtraInfo().at(0)
+                        {property.getType() === 'Behavior' && (
+                          <BehaviorTypeSelector
+                            project={this.props.project}
+                            objectType={this.props.behaviorObjectType || ''}
+                            value={
+                              property.getExtraInfo().size() === 0
+                                ? ''
+                                : property.getExtraInfo().at(0)
+                            }
+                            onChange={(newValue: string) => {
+                              // Change the type of the required behavior.
+                              const extraInfo = property.getExtraInfo();
+                              if (extraInfo.size() === 0) {
+                                extraInfo.push_back(newValue);
+                              } else {
+                                extraInfo.set(0, newValue);
                               }
-                              onChange={(newValue: string) => {
-                                // Change the type of the required behavior.
-                                const extraInfo = property.getExtraInfo();
-                                if (extraInfo.size() === 0) {
-                                  extraInfo.push_back(newValue);
-                                } else {
-                                  extraInfo.set(0, newValue);
-                                }
-                                this.forceUpdate();
-                                this.props.onPropertiesUpdated &&
-                                  this.props.onPropertiesUpdated();
-                              }}
-                              disabled={false}
-                            />
-                          )}
+                              this.forceUpdate();
+                              this.props.onPropertiesUpdated &&
+                                this.props.onPropertiesUpdated();
+                            }}
+                            disabled={false}
+                          />
+                        )}
                         {property.getType() === 'Color' && (
                           <ColorField
                             floatingLabelText={<Trans>Default value</Trans>}

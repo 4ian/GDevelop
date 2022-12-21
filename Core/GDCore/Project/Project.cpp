@@ -22,8 +22,8 @@
 #include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
-#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/CustomObjectConfiguration.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
@@ -346,6 +346,49 @@ void Project::RemoveExternalEvents(const gd::String& name) {
 
   externalEvents.erase(events);
 }
+
+void Project::MoveLayout(std::size_t oldIndex, std::size_t newIndex) {
+  if (oldIndex >= scenes.size() || newIndex >= scenes.size()) return;
+
+  std::unique_ptr<gd::Layout> scene = std::move(scenes[oldIndex]);
+  scenes.erase(scenes.begin() + oldIndex);
+  scenes.insert(scenes.begin() + newIndex, std::move(scene));
+};
+
+void Project::MoveExternalEvents(std::size_t oldIndex, std::size_t newIndex) {
+  if (oldIndex >= externalEvents.size() || newIndex >= externalEvents.size())
+    return;
+
+  std::unique_ptr<gd::ExternalEvents> externalEventsItem =
+      std::move(externalEvents[oldIndex]);
+  externalEvents.erase(externalEvents.begin() + oldIndex);
+  externalEvents.insert(externalEvents.begin() + newIndex,
+                        std::move(externalEventsItem));
+};
+
+void Project::MoveExternalLayout(std::size_t oldIndex, std::size_t newIndex) {
+  if (oldIndex >= externalLayouts.size() || newIndex >= externalLayouts.size())
+    return;
+
+  std::unique_ptr<gd::ExternalLayout> externalLayout =
+      std::move(externalLayouts[oldIndex]);
+  externalLayouts.erase(externalLayouts.begin() + oldIndex);
+  externalLayouts.insert(externalLayouts.begin() + newIndex,
+                         std::move(externalLayout));
+};
+
+void Project::MoveEventsFunctionsExtension(std::size_t oldIndex,
+                                          std::size_t newIndex) {
+  if (oldIndex >= eventsFunctionsExtensions.size() ||
+      newIndex >= eventsFunctionsExtensions.size())
+    return;
+
+  std::unique_ptr<gd::EventsFunctionsExtension> eventsFunctionsExtension =
+      std::move(eventsFunctionsExtensions[oldIndex]);
+  eventsFunctionsExtensions.erase(eventsFunctionsExtensions.begin() + oldIndex);
+  eventsFunctionsExtensions.insert(eventsFunctionsExtensions.begin() + newIndex,
+                                   std::move(eventsFunctionsExtension));
+};
 
 void Project::SwapExternalEvents(std::size_t first, std::size_t second) {
   if (first >= externalEvents.size() || second >= externalEvents.size()) return;

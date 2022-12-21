@@ -14,6 +14,7 @@ import ColorField from '../UI/ColorField';
 import { MarkdownText } from '../UI/MarkdownText';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 import FormHelperText from '@material-ui/core/FormHelperText';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import {
   type ResourceKind,
@@ -28,10 +29,11 @@ import RaisedButton from '../UI/RaisedButton';
 import UnsavedChangesContext, {
   type UnsavedChanges,
 } from '../MainFrame/UnsavedChangesContext';
-import { Line, Spacer } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
+import Tooltip from '@material-ui/core/Tooltip';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -54,6 +56,10 @@ export type PrimitiveValueField =
       valueType: 'number',
       getValue: Instance => number,
       setValue: (instance: Instance, newValue: number) => void,
+      getEndAdornment?: Instance => {|
+        label: string,
+        tooltipContent: React.Node,
+      |},
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -123,7 +129,7 @@ export type Field =
       name: string,
       type: 'row' | 'column',
       title?: ?string,
-      children: Array<Object>,
+      children: Array<Field>,
     |};
 
 // The schema is the tree of all fields.
@@ -165,7 +171,13 @@ const styles = {
   },
 };
 
-const getDisabled = (instances: Instances, field: ValueField): boolean => {
+const getDisabled = ({
+  instances,
+  field,
+}: {|
+  instances: Instances,
+  field: ValueField,
+|}): boolean => {
   return typeof field.disabled === 'boolean'
     ? field.disabled
     : typeof field.disabled === 'function'
@@ -179,11 +191,15 @@ const getDisabled = (instances: Instances, field: ValueField): boolean => {
  * If there is no instances, returns the default value.
  * If the field does not have a `getValue` method, returns `null`.
  */
-const getFieldValue = (
+const getFieldValue = ({
+  instances,
+  field,
+  defaultValue,
+}: {|
   instances: Instances,
   field: ValueField | ActionButton | SectionTitle,
-  defaultValue?: any
-): any => {
+  defaultValue?: any,
+|}): any => {
   if (!instances[0]) {
     console.log(
       'getFieldValue was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
@@ -205,7 +221,13 @@ const getFieldValue = (
   return value;
 };
 
-const getFieldLabel = (instances: Instances, field: ValueField): any => {
+const getFieldLabel = ({
+  instances,
+  field,
+}: {|
+  instances: Instances,
+  field: ValueField,
+|}): any => {
   if (!instances[0]) {
     console.log(
       'PropertiesEditor._getFieldLabel was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
@@ -276,10 +298,10 @@ const PropertiesEditor = ({
           <InlineCheckbox
             label={
               !description ? (
-                getFieldLabel(instances, field)
+                getFieldLabel({ instances, field })
               ) : (
                 <React.Fragment>
-                  <Line noMargin>{getFieldLabel(instances, field)}</Line>
+                  <Line noMargin>{getFieldLabel({ instances, field })}</Line>
                   <FormHelperText style={{ display: 'inline' }}>
                     <MarkdownText source={description} />
                   </FormHelperText>
@@ -287,51 +309,67 @@ const PropertiesEditor = ({
               )
             }
             key={field.name}
-            checked={getFieldValue(instances, field)}
+            checked={getFieldValue({ instances, field })}
             onCheck={(event, newValue) => {
               instances.forEach(i => setValue(i, !!newValue));
               _onInstancesModified(instances);
             }}
-            disabled={getDisabled(instances, field)}
+            disabled={getDisabled({ instances, field })}
           />
         );
       } else if (field.valueType === 'number') {
-        const { setValue } = field;
+        const { setValue, getEndAdornment } = field;
+        const endAdornment = getEndAdornment && getEndAdornment(instances[0]);
         return (
           <SemiControlledTextField
-            value={getFieldValue(instances, field)}
+            value={getFieldValue({ instances, field })}
             key={field.name}
             id={field.name}
-            floatingLabelText={getFieldLabel(instances, field)}
+            floatingLabelText={getFieldLabel({ instances, field })}
             floatingLabelFixed
             helperMarkdownText={getFieldDescription(field)}
             onChange={newValue => {
-              instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
+              const newNumberValue = parseFloat(newValue);
+              // If the value is not a number, the user is probably still typing, adding a dot or a comma.
+              // So don't update the value, it will be reverted if they leave the field.
+              if (isNaN(newNumberValue)) return;
+              instances.forEach(i => setValue(i, newNumberValue));
               _onInstancesModified(instances);
             }}
             type="number"
             style={styles.field}
-            disabled={getDisabled(instances, field)}
+            disabled={getDisabled({ instances, field })}
+            endAdornment={
+              endAdornment && (
+                <Tooltip title={endAdornment.tooltipContent}>
+                  <InputAdornment position="end">
+                    {endAdornment.label}
+                  </InputAdornment>
+                </Tooltip>
+              )
+            }
           />
         );
       } else if (field.valueType === 'color') {
         const { setValue } = field;
         return (
-          <ColorField
-            key={field.name}
-            id={field.name}
-            floatingLabelText={getFieldLabel(instances, field)}
-            helperMarkdownText={getFieldDescription(field)}
-            disableAlpha
-            fullWidth
-            color={getFieldValue(instances, field)}
-            onChange={color => {
-              const rgbString =
-                color.length === 0 ? '' : rgbOrHexToRGBString(color);
-              instances.forEach(i => setValue(i, rgbString));
-              _onInstancesModified(instances);
-            }}
-          />
+          <Column expand noMargin>
+            <ColorField
+              key={field.name}
+              id={field.name}
+              floatingLabelText={getFieldLabel({ instances, field })}
+              helperMarkdownText={getFieldDescription(field)}
+              disableAlpha
+              fullWidth
+              color={getFieldValue({ instances, field })}
+              onChange={color => {
+                const rgbString =
+                  color.length === 0 ? '' : rgbOrHexToRGBString(color);
+                instances.forEach(i => setValue(i, rgbString));
+                _onInstancesModified(instances);
+              }}
+            />
+          </Column>
         );
       } else if (field.valueType === 'textarea') {
         const { setValue } = field;
@@ -343,8 +381,8 @@ const PropertiesEditor = ({
               instances.forEach(i => setValue(i, text || ''));
               _onInstancesModified(instances);
             }}
-            value={getFieldValue(instances, field)}
-            floatingLabelText={getFieldLabel(instances, field)}
+            value={getFieldValue({ instances, field })}
+            floatingLabelText={getFieldLabel({ instances, field })}
             floatingLabelFixed
             helperMarkdownText={getFieldDescription(field)}
             multiline
@@ -362,9 +400,13 @@ const PropertiesEditor = ({
             key={field.name}
             renderTextField={() => (
               <SemiControlledTextField
-                value={getFieldValue(instances, field, '(Multiple values)')}
+                value={getFieldValue({
+                  instances,
+                  field,
+                  defaultValue: '(Multiple values)',
+                })}
                 id={field.name}
-                floatingLabelText={getFieldLabel(instances, field)}
+                floatingLabelText={getFieldLabel({ instances, field })}
                 floatingLabelFixed
                 helperMarkdownText={getFieldDescription(field)}
                 onChange={newValue => {
@@ -372,7 +414,7 @@ const PropertiesEditor = ({
                   _onInstancesModified(instances);
                 }}
                 style={styles.field}
-                disabled={getDisabled(instances, field)}
+                disabled={getDisabled({ instances, field })}
               />
             )}
             renderButton={style =>
@@ -423,9 +465,9 @@ const PropertiesEditor = ({
         const { setValue } = field;
         return (
           <SelectField
-            value={getFieldValue(instances, field)}
+            value={getFieldValue({ instances, field })}
             key={field.name}
-            floatingLabelText={getFieldLabel(instances, field)}
+            floatingLabelText={getFieldLabel({ instances, field })}
             helperMarkdownText={getFieldDescription(field)}
             onChange={(event, index, newValue: string) => {
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
@@ -441,16 +483,20 @@ const PropertiesEditor = ({
         const { setValue } = field;
         return (
           <SelectField
-            value={getFieldValue(instances, field, '(Multiple values)')}
+            value={getFieldValue({
+              instances,
+              field,
+              defaultValue: '(Multiple values)',
+            })}
             key={field.name}
-            floatingLabelText={getFieldLabel(instances, field)}
+            floatingLabelText={getFieldLabel({ instances, field })}
             helperMarkdownText={getFieldDescription(field)}
             onChange={(event, index, newValue: string) => {
               instances.forEach(i => setValue(i, newValue || ''));
               _onInstancesModified(instances);
             }}
             style={styles.field}
-            disabled={getDisabled(instances, field)}
+            disabled={getDisabled({ instances, field })}
           >
             {children}
           </SelectField>
@@ -466,8 +512,11 @@ const PropertiesEditor = ({
       if (field.disabled === 'onValuesDifferent') {
         const DIFFERENT_VALUES = 'DIFFERENT_VALUES';
         disabled =
-          getFieldValue(instances, field, DIFFERENT_VALUES) ===
-          DIFFERENT_VALUES;
+          getFieldValue({
+            instances,
+            field,
+            defaultValue: DIFFERENT_VALUES,
+          }) === DIFFERENT_VALUES;
       }
       return (
         <RaisedButton
@@ -503,16 +552,16 @@ const PropertiesEditor = ({
         resourcesLoader={ResourcesLoader}
         resourceKind={field.resourceKind}
         fullWidth
-        initialResourceName={getFieldValue(
+        initialResourceName={getFieldValue({
           instances,
           field,
-          '(Multiple values)' //TODO
-        )}
+          defaultValue: '(Multiple values)', //TODO
+        })}
         onChange={newValue => {
           instances.forEach(i => setValue(i, newValue));
           _onInstancesModified(instances);
         }}
-        floatingLabelText={getFieldLabel(instances, field)}
+        floatingLabelText={getFieldLabel({ instances, field })}
         helperMarkdownText={getFieldDescription(field)}
       />
     );
@@ -536,11 +585,11 @@ const PropertiesEditor = ({
       let additionalText = null;
 
       if (getValue) {
-        let selectedInstancesValue = getFieldValue(
+        let selectedInstancesValue = getFieldValue({
           instances,
           field,
-          field.defaultValue || 'Multiple Values'
-        );
+          defaultValue: field.defaultValue || 'Multiple Values',
+        });
         if (!!selectedInstancesValue) additionalText = selectedInstancesValue;
       }
 

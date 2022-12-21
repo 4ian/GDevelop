@@ -480,7 +480,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/outlineSize_black.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions())
       .SetFunctionName("SetOutlineSize")
       .SetGetter("GetOutlineSize");
 
@@ -493,7 +494,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                    "res/conditions/outlineSize_black.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions())
       .SetFunctionName("GetOutlineSize");
 
   obj.AddExpression("OutlineSize",
@@ -514,7 +516,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
          "res/actions/opacity.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity (0-255)")))
       .SetFunctionName("SetFillOpacity")
       .SetGetter("GetFillOpacity");
 
@@ -527,7 +532,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                    "res/conditions/opacity.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity to compare to (0-255)")))
       .SetFunctionName("GetFillOpacity");
 
   obj.AddExpression("FillOpacity",
@@ -547,7 +555,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/opacity.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity (0-255)")))
       .SetFunctionName("SetOutlineOpacity")
       .SetGetter("GetOutlineOpacity");
 
@@ -560,7 +571,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                    "res/conditions/opacity.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity to compare to (0-255)")))
       .SetFunctionName("GetOutlineOpacity");
 
   obj.AddExpression("OutlineOpacity",
@@ -605,7 +619,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/scale24_black.png",
                 "res/actions/scale_black.png")
       .AddParameter("object", _("Object"), "Drawer")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
       .MarkAsAdvanced();
 
   obj.AddExpressionAndConditionAndAction("number",
@@ -616,7 +633,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                                          _("Size"),
                                          "res/actions/scaleWidth24_black.png")
       .AddParameter("object", _("Object"), "Drawer")
-      .UseStandardParameters("number")
+      .UseStandardParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
       .MarkAsAdvanced();
 
   obj.AddExpressionAndConditionAndAction("number",
@@ -627,7 +647,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                                          _("Size"),
                                          "res/actions/scaleHeight24_black.png")
       .AddParameter("object", _("Object"), "Drawer")
-      .UseStandardParameters("number")
+      .UseStandardParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
       .MarkAsAdvanced();
 
   obj.AddAction("FlipX",
@@ -678,7 +701,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/scaleWidth24_black.png",
                 "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"), "Drawer")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   obj.AddAction("Height",
@@ -689,7 +713,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/scaleHeight24_black.png",
                 "res/actions/scaleHeight_black.png")
       .AddParameter("object", _("Object"), "Drawer")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   obj.AddAction(

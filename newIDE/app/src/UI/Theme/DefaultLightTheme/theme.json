@@ -109,6 +109,18 @@
       }
     },
     "surface": {
+      "titlebar": {
+        "background-color": {
+          "value": "#D9D9DE",
+          "comment": "Palette/Grey/20"
+        }
+      },
+      "toolbar": {
+        "background-color": {
+          "value": "#FAFAFA",
+          "comment": "Palette/Grey/00"
+        }
+      },
       "window": {
         "background-color": {
           "value": "#F7F7F7"
@@ -149,6 +161,38 @@
       "hover-color": {
         "value": "#37238F",
         "comment": "Palette/Purple/60"
+      }
+    },
+    "switch": {
+      "default": {
+        "thumb-color": {
+          "value": "#C5C5C9",
+          "comment": "Palette/Grey/30"
+        },
+        "track-color": {
+          "value": "#7F7F85",
+          "comment": "Palette/Grey/50"
+        }
+      },
+      "toggled": {
+        "thumb-color": {
+          "value": "#4F28CD",
+          "comment": "Palette/Purple/50"
+        },
+        "track-color": {
+          "value": "#9979F1",
+          "comment": "Palette/Purple/30"
+        }
+      },
+      "disabled": {
+        "thumb-color": {
+          "value": "#D9D9DE",
+          "comment": "Palette/Grey/20"
+        },
+        "track-color": {
+          "value": "#C5C5C9",
+          "comment": "Palette/Grey/30"
+        }
       }
     },
     "search-bar": {
@@ -259,18 +303,26 @@
     "closable-tabs": {
       "default": {
         "background-color": {
-          "value": "#f7f7f7"
+          "value": "#A6A6AB",
+          "comment": "Palette/Grey/40"
         },
         "color": {
-          "value": "#444444"
+          "value": "#1D1D26",
+          "comment": "Palette/Grey/100"
         }
       },
       "selected": {
         "background-color": {
-          "value": "#e1e1e1"
+          "value": "#FAFAFA",
+          "comment": "Palette/Grey/00"
         },
         "color": {
-          "value": "#000000"
+          "value": "#1D1D26",
+          "comment": "Palette/Grey/100"
+        },
+        "borderColor": {
+          "value": "#1D1D26",
+          "comment": "Palette/Grey/100"
         }
       }
     },
@@ -348,15 +400,21 @@
       }
     },
     "home": {
-      "header": {
-        "background-color": {
-          "value": "#EBEBED",
-          "comment": "Palette/Grey/10"
-        }
-      },
       "separator": {
         "color": {
           "value": "#D9D9DE"
+        }
+      }
+    },
+    "linear-progress": {
+      "color": {
+        "complete": {
+          "value": "#16CF89",
+          "comment": "Palette/Green/50"
+        },
+        "incomplete": {
+          "value": "#FFA929",
+          "comment": "Palette/Yellow/50"
         }
       }
     },
@@ -567,7 +625,8 @@
     },
     "link": {
       "color": {
-        "value": "rgb(74, 176, 228)"
+        "value": "#7046EC",
+        "comment": "Palette/Purple/30"
       }
     }
   },

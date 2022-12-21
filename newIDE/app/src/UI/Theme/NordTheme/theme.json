@@ -17,6 +17,16 @@
       }
     },
     "surface": {
+      "titlebar": {
+        "background-color": {
+          "value": "#2E3440"
+        }
+      },
+      "toolbar": {
+        "background-color": {
+          "value": "#3B4252"
+        }
+      },
       "window": {
         "background-color": {
           "value": "#2E3440"
@@ -55,6 +65,36 @@
       },
       "hover-color": {
         "value": "#5E81AC"
+      }
+    },
+    "switch": {
+      "default": {
+        "thumb-color": {
+          "value": "#EBEBED",
+          "comment": "Palette/Grey/10"
+        },
+        "track-color": {
+          "value": "#606066",
+          "comment": "Palette/Grey/60"
+        }
+      },
+      "toggled": {
+        "thumb-color": {
+          "value": "#7EA1CC"
+        },
+        "track-color": {
+          "value": "#5E81AC"
+        }
+      },
+      "disabled": {
+        "thumb-color": {
+          "value": "#494952",
+          "comment": "Palette/Grey/70"
+        },
+        "track-color": {
+          "value": "#32323B",
+          "comment": "Palette/Grey/80"
+        }
       }
     },
     "search-bar": {
@@ -160,18 +200,23 @@
     "closable-tabs": {
       "default": {
         "background-color": {
-          "value": "#343A46"
+          "value": "#434C5E"
         },
         "color": {
-          "value": "#ECEFF4"
+          "value": "#C5C5C9",
+          "comment": "Palette/Grey/30"
         }
       },
       "selected": {
         "background-color": {
-          "value": "{theme.primary.color.value}"
+          "value": "#3B4252"
         },
         "color": {
-          "value": "#2E3440"
+          "value": "#FAFAFA",
+          "comment": "Palette/Grey/00"
+        },
+        "borderColor": {
+          "value": "{theme.primary.color.value}"
         }
       }
     },
@@ -246,14 +291,21 @@
       }
     },
     "home": {
-      "header": {
-        "background-color": {
-          "value": "{theme.surface.canvas.background-color.value}"
-        }
-      },
       "separator": {
         "color": {
           "value": "#32323B"
+        }
+      }
+    },
+    "linear-progress": {
+      "color": {
+        "complete": {
+          "value": "#16CF89",
+          "comment": "Palette/Green/50"
+        },
+        "incomplete": {
+          "value": "#FFA929",
+          "comment": "Palette/Yellow/50"
         }
       }
     },

@@ -32,12 +32,12 @@ type Props = {|
 
 type State = Preferences;
 
-const LocalStorageItem = 'gd-preferences';
+const localStorageItem = 'gd-preferences';
 const MAX_RECENT_FILES_COUNT = 20;
 
 export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
   try {
-    const persistedState = localStorage.getItem(LocalStorageItem);
+    const persistedState = localStorage.getItem(localStorageItem);
     if (!persistedState) return null;
 
     const values = JSON.parse(persistedState);
@@ -148,6 +148,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     getShowEventBasedObjectsEditor: this._getShowEventBasedObjectsEditor.bind(
       this
     ),
+    saveTutorialProgress: this._saveTutorialProgress.bind(this),
+    getTutorialProgress: this._getTutorialProgress.bind(this),
+    setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this),
+    setNewProjectsDefaultStorageProviderName: this._setNewProjectsDefaultStorageProviderName.bind(
+      this
+    ),
   };
 
   componentDidMount() {
@@ -191,6 +197,53 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );
+  }
+
+  _saveTutorialProgress({
+    tutorialId,
+    userId,
+    ...tutorialProgress
+  }: {|
+    tutorialId: string,
+    userId: ?string,
+    step: number,
+    progress: number,
+    fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
+    projectData: {| [key: string]: string |},
+  |}) {
+    const userIdKey: string = userId || 'anonymous';
+    this.setState(
+      ({ values }) => {
+        return {
+          values: {
+            ...values,
+            inAppTutorialsProgress: {
+              ...values.inAppTutorialsProgress,
+              [tutorialId]: {
+                ...values.inAppTutorialsProgress[tutorialId],
+                [userIdKey]: tutorialProgress,
+              },
+            },
+          },
+        };
+      },
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getTutorialProgress({
+    tutorialId,
+    userId,
+  }: {|
+    tutorialId: string,
+    userId: ?string,
+  |}) {
+    const userIdKey: string = userId || 'anonymous';
+    const tutorialProgresses = this.state.values.inAppTutorialsProgress[
+      tutorialId
+    ];
+    if (!tutorialProgresses) return undefined;
+    return tutorialProgresses[userIdKey];
   }
 
   _setUseUndefinedVariablesInAutocompletion(
@@ -486,7 +539,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   _persistValuesToLocalStorage(preferences: Preferences) {
     try {
       localStorage.setItem(
-        LocalStorageItem,
+        localStorageItem,
         JSON.stringify(preferences.values)
       );
     } catch (e) {
@@ -701,6 +754,30 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           isAlwaysOnTopInPreview: enabled,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setNewProjectsDefaultFolder(newProjectsDefaultFolder: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          newProjectsDefaultFolder,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setNewProjectsDefaultStorageProviderName(newStorageProviderName: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          newProjectsDefaultStorageProviderName: newStorageProviderName,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

@@ -101,7 +101,7 @@ export default function ExternalPropertiesDialog({
             <FormControlLabel
               key={name}
               value={name}
-              control={<Radio color="primary" />}
+              control={<Radio color="secondary" />}
               label={name}
             />
           ))}

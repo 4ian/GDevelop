@@ -110,7 +110,7 @@ export const declareObjectMetadata = (
   const objectType = eventsBasedObject.getName();
 
   objectMetadata
-    .addAction(
+    .addScopedAction(
       'Width',
       i18n._('Width'),
       i18n._('Change the width of an object.'),
@@ -120,12 +120,58 @@ export const declareObjectMetadata = (
       'res/actions/scale_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
-    .useStandardOperatorParameters('number')
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('setWidth')
     .setGetter('getWidth');
 
+  // Deprecated
+  objectMetadata
+    .addAction(
+      'Width',
+      i18n._('Width'),
+      i18n._('Change the width of an object.'),
+      i18n._('the width'),
+      i18n._('Size'),
+      'res/actions/scaleWidth24_black.png',
+      'res/actions/scale_black.png'
+    )
+    .setHidden()
+    .addParameter('object', i18n._('Object'), objectType)
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
+    .markAsAdvanced()
+    .getCodeExtraInformation()
+    .setFunctionName('setWidth')
+    .setGetter('getWidth');
+
+  objectMetadata
+    .addScopedAction(
+      'Height',
+      i18n._('Height'),
+      i18n._('Change the height of an object.'),
+      i18n._('the height'),
+      i18n._('Size'),
+      'res/actions/scaleHeight24_black.png',
+      'res/actions/scale_black.png'
+    )
+    .addParameter('object', i18n._('Object'), objectType)
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
+    .markAsAdvanced()
+    .getCodeExtraInformation()
+    .setFunctionName('setHeight')
+    .setGetter('getHeight');
+
+  // Deprecated
   objectMetadata
     .addAction(
       'Height',
@@ -136,13 +182,38 @@ export const declareObjectMetadata = (
       'res/actions/scaleHeight24_black.png',
       'res/actions/scale_black.png'
     )
+    .setHidden()
     .addParameter('object', i18n._('Object'), objectType)
-    .useStandardOperatorParameters('number')
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('setHeight')
     .setGetter('getHeight');
 
+  objectMetadata
+    .addScopedAction(
+      'Scale',
+      i18n._('Scale'),
+      i18n._('Modify the scale of the specified object.'),
+      i18n._('the scale'),
+      i18n._('Size'),
+      'res/actions/scale24_black.png',
+      'res/actions/scale_black.png'
+    )
+    .addParameter('object', i18n._('Object'), objectType)
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
+    .markAsAdvanced()
+    .getCodeExtraInformation()
+    .setFunctionName('setScale')
+    .setGetter('getScale');
+
+  // Deprecated
   objectMetadata
     .addAction(
       'Scale',
@@ -153,8 +224,12 @@ export const declareObjectMetadata = (
       'res/actions/scale24_black.png',
       'res/actions/scale_black.png'
     )
+    .setHidden()
     .addParameter('object', i18n._('Object'), objectType)
-    .useStandardOperatorParameters('number')
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('setScale')
@@ -171,7 +246,7 @@ export const declareObjectMetadata = (
       'res/actions/scaleWidth24_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
-    .useStandardParameters('number')
+    .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
     .markAsAdvanced()
     .setFunctionName('setScaleX')
     .setGetter('getScaleX');
@@ -187,13 +262,13 @@ export const declareObjectMetadata = (
       'res/actions/scaleHeight24_black.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
-    .useStandardParameters('number')
+    .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
     .markAsAdvanced()
     .setFunctionName('setScaleY')
     .setGetter('getScaleY');
 
   objectMetadata
-    .addAction(
+    .addScopedAction(
       'FlipX',
       i18n._('Flip the object horizontally'),
       i18n._('Flip the object horizontally'),
@@ -208,8 +283,26 @@ export const declareObjectMetadata = (
     .getCodeExtraInformation()
     .setFunctionName('flipX');
 
+  // Deprecated
   objectMetadata
     .addAction(
+      'FlipX',
+      i18n._('Flip the object horizontally'),
+      i18n._('Flip the object horizontally'),
+      i18n._('Flip horizontally _PARAM0_: _PARAM1_'),
+      i18n._('Effects'),
+      'res/actions/flipX24.png',
+      'res/actions/flipX.png'
+    )
+    .setHidden()
+    .addParameter('object', i18n._('Object'), objectType)
+    .addParameter('yesorno', i18n._('Activate flipping'))
+    .markAsSimple()
+    .getCodeExtraInformation()
+    .setFunctionName('flipX');
+
+  objectMetadata
+    .addScopedAction(
       'FlipY',
       i18n._('Flip the object vertically'),
       i18n._('Flip the object vertically'),
@@ -225,7 +318,24 @@ export const declareObjectMetadata = (
     .setFunctionName('flipY');
 
   objectMetadata
-    .addCondition(
+    .addAction(
+      'FlipY',
+      i18n._('Flip the object vertically'),
+      i18n._('Flip the object vertically'),
+      i18n._('Flip vertically _PARAM0_: _PARAM1_'),
+      i18n._('Effects'),
+      'res/actions/flipY24.png',
+      'res/actions/flipY.png'
+    )
+    .setHidden()
+    .addParameter('object', i18n._('Object'), objectType)
+    .addParameter('yesorno', i18n._('Activate flipping'))
+    .markAsSimple()
+    .getCodeExtraInformation()
+    .setFunctionName('flipY');
+
+  objectMetadata
+    .addScopedCondition(
       'FlippedX',
       i18n._('Horizontally flipped'),
       i18n._('Check if the object is horizontally flipped'),
@@ -238,6 +348,37 @@ export const declareObjectMetadata = (
     .getCodeExtraInformation()
     .setFunctionName('isFlippedX');
 
+  // Deprecated
+  objectMetadata
+    .addCondition(
+      'FlippedX',
+      i18n._('Horizontally flipped'),
+      i18n._('Check if the object is horizontally flipped'),
+      i18n._('_PARAM0_ is horizontally flipped'),
+      i18n._('Effects'),
+      'res/actions/flipX24.png',
+      'res/actions/flipX.png'
+    )
+    .setHidden()
+    .addParameter('object', i18n._('Object'), objectType)
+    .getCodeExtraInformation()
+    .setFunctionName('isFlippedX');
+
+  objectMetadata
+    .addScopedCondition(
+      'FlippedY',
+      i18n._('Vertically flipped'),
+      i18n._('Check if the object is vertically flipped'),
+      i18n._('_PARAM0_ is vertically flipped'),
+      i18n._('Effects'),
+      'res/actions/flipY24.png',
+      'res/actions/flipY.png'
+    )
+    .addParameter('object', i18n._('Object'), objectType)
+    .getCodeExtraInformation()
+    .setFunctionName('isFlippedY');
+
+  // Deprecated
   objectMetadata
     .addCondition(
       'FlippedY',
@@ -248,6 +389,7 @@ export const declareObjectMetadata = (
       'res/actions/flipY24.png',
       'res/actions/flipY.png'
     )
+    .setHidden()
     .addParameter('object', i18n._('Object'), objectType)
     .getCodeExtraInformation()
     .setFunctionName('isFlippedY');
@@ -265,8 +407,9 @@ export const declareObjectMetadata = (
       'res/conditions/opacity24.png'
     )
     .addParameter('object', i18n._('Object'), objectType)
-    .useStandardParameters('number')
-    .setFunctionName('getOpacity');
+    .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+    .setFunctionName('setOpacity')
+    .setGetter('getOpacity');
 
   return objectMetadata;
 };
@@ -705,6 +848,88 @@ const getStringifiedExtraInfo = (property: gdPropertyDescriptor) => {
     : '';
 };
 
+const uncapitalizedFirstLetter = (string: string): string =>
+  string.length < 1
+    ? string
+    : string.substring(0, 1).toLowerCase() + string.substring(1);
+
+const declarePropertyInstructionAndExpression = (
+  i18n: I18nType,
+  extension: gdPlatformExtension,
+  entityMetadata: gdBehaviorMetadata | gdObjectMetadata,
+  eventsBasedEntity: gdEventsBasedBehavior | gdEventsBasedObject,
+  property: gdNamedPropertyDescriptor,
+  propertyLabel: string,
+  expressionName: string,
+  conditionName: string,
+  actionName: string,
+  setterName: string,
+  getterName: string,
+  valueParameterIndex: number,
+  addObjectAndBehaviorParameters: <T: gdInstructionOrExpressionMetadata>(
+    instructionOrExpression: T
+  ) => T
+): void => {
+  const propertyType = property.getType();
+
+  const uncapitalizedLabel = uncapitalizedFirstLetter(
+    property.getLabel() || property.getName()
+  );
+  if (propertyType === 'Boolean') {
+    addObjectAndBehaviorParameters(
+      entityMetadata.addScopedCondition(
+        conditionName,
+        propertyLabel,
+        i18n._(t`Check the property value for ${uncapitalizedLabel}`),
+        i18n._(t`Property ${uncapitalizedLabel} of _PARAM0_ is true`),
+        eventsBasedEntity.getFullName() || eventsBasedEntity.getName(),
+        getExtensionIconUrl(extension),
+        getExtensionIconUrl(extension)
+      )
+    )
+      .getCodeExtraInformation()
+      .setFunctionName(getterName);
+
+    addObjectAndBehaviorParameters(
+      entityMetadata.addScopedAction(
+        actionName,
+        propertyLabel,
+        i18n._(t`Update the property value for ${uncapitalizedLabel}`),
+        i18n._(
+          t`Set property value for ${uncapitalizedLabel} of _PARAM0_ to _PARAM${valueParameterIndex}_`
+        ),
+        eventsBasedEntity.getFullName() || eventsBasedEntity.getName(),
+        getExtensionIconUrl(extension),
+        getExtensionIconUrl(extension)
+      )
+    )
+      .addParameter('yesorno', i18n._(t`New value to set`), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName(setterName);
+  } else {
+    const typeExtraInfo = getStringifiedExtraInfo(property);
+    const parameterOptions = gd.ParameterOptions.makeNewOptions();
+    if (typeExtraInfo) parameterOptions.setTypeExtraInfo(typeExtraInfo);
+    addObjectAndBehaviorParameters(
+      entityMetadata.addExpressionAndConditionAndAction(
+        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
+        expressionName,
+        propertyLabel,
+        i18n._(t`the property value for the ${uncapitalizedLabel}`),
+        i18n._(t`the property value for the ${uncapitalizedLabel}`),
+        eventsBasedEntity.getFullName() || eventsBasedEntity.getName(),
+        getExtensionIconUrl(extension)
+      )
+    )
+      .useStandardParameters(
+        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
+        parameterOptions
+      )
+      .setFunctionName(setterName)
+      .setGetter(getterName);
+  }
+};
+
 /**
  * Declare the instructions (actions/conditions) and expressions for the
  * properties of the given events based behavior.
@@ -759,62 +984,75 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     const propertyLabel = i18n._(
       t`${property.getLabel() || propertyName} property`
     );
+    const expressionName = gd.EventsBasedBehavior.getPropertyExpressionName(
+      propertyName
+    );
+    const conditionName = gd.EventsBasedBehavior.getPropertyConditionName(
+      propertyName
+    );
+    const actionName = gd.EventsBasedBehavior.getPropertyActionName(
+      propertyName
+    );
+    const setterName = gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(
+      propertyName
+    );
+    const getterName = gd.BehaviorCodeGenerator.getBehaviorPropertyGetterName(
+      propertyName
+    );
 
-    addObjectAndBehaviorParameters(
-      behaviorMetadata.addExpressionAndConditionAndAction(
-        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
-        gd.EventsBasedBehavior.getPropertyExpressionName(propertyName),
-        propertyLabel,
-        i18n._(t`the value of ${propertyLabel}`),
-        i18n._(t`the value of ${propertyLabel}`),
-        eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-        getExtensionIconUrl(extension)
-      )
-    )
-      .useStandardParameters(
-        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
-        getStringifiedExtraInfo(property)
-      )
-      .setFunctionName(
-        gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(propertyName)
-      )
-      .setGetter(
-        gd.BehaviorCodeGenerator.getBehaviorPropertyGetterName(propertyName)
-      );
+    declarePropertyInstructionAndExpression(
+      i18n,
+      extension,
+      behaviorMetadata,
+      eventsBasedBehavior,
+      property,
+      propertyLabel,
+      expressionName,
+      conditionName,
+      actionName,
+      setterName,
+      getterName,
+      2,
+      addObjectAndBehaviorParameters
+    );
   });
 
   mapVector(eventsBasedBehavior.getSharedPropertyDescriptors(), property => {
-    const propertyType = property.getType();
     const propertyName = property.getName();
     const propertyLabel = i18n._(
       t`${property.getLabel() || propertyName} shared property`
     );
+    const expressionName = gd.EventsBasedBehavior.getSharedPropertyExpressionName(
+      propertyName
+    );
+    const conditionName = gd.EventsBasedBehavior.getSharedPropertyConditionName(
+      propertyName
+    );
+    const actionName = gd.EventsBasedBehavior.getSharedPropertyActionName(
+      propertyName
+    );
+    const setterName = gd.BehaviorCodeGenerator.getBehaviorSharedPropertySetterName(
+      propertyName
+    );
+    const getterName = gd.BehaviorCodeGenerator.getBehaviorSharedPropertyGetterName(
+      propertyName
+    );
 
-    addObjectAndBehaviorParameters(
-      behaviorMetadata.addExpressionAndConditionAndAction(
-        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
-        gd.EventsBasedBehavior.getSharedPropertyExpressionName(propertyName),
-        propertyLabel,
-        i18n._(t`the value of ${propertyLabel}`),
-        i18n._(t`the value of ${propertyLabel}`),
-        eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
-        getExtensionIconUrl(extension)
-      )
-    )
-      .useStandardParameters(
-        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
-        getStringifiedExtraInfo(property)
-      )
-      .setFunctionName(
-        gd.BehaviorCodeGenerator.getBehaviorSharedPropertySetterName(
-          propertyName
-        )
-      )
-      .setGetter(
-        gd.BehaviorCodeGenerator.getBehaviorSharedPropertyGetterName(
-          propertyName
-        )
-      );
+    declarePropertyInstructionAndExpression(
+      i18n,
+      extension,
+      behaviorMetadata,
+      eventsBasedBehavior,
+      property,
+      propertyLabel,
+      expressionName,
+      conditionName,
+      actionName,
+      setterName,
+      getterName,
+      2,
+      addObjectAndBehaviorParameters
+    );
   });
 };
 
@@ -849,207 +1087,39 @@ export const declareObjectPropertiesInstructionAndExpressions = (
   };
 
   mapVector(eventsBasedObject.getPropertyDescriptors(), property => {
-    const propertyType = property.getType();
     const propertyName = property.getName();
     const propertyLabel = i18n._(
       t`${property.getLabel() || propertyName} property`
     );
-
-    addObjectParameter(
-      objectMetadata.addExpressionAndConditionAndAction(
-        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
-        gd.EventsBasedObject.getPropertyExpressionName(propertyName),
-        propertyLabel,
-        i18n._(t`the value of ${propertyLabel}`),
-        i18n._(t`the value of ${propertyLabel}`),
-        eventsBasedObject.getFullName() || eventsBasedObject.getName(),
-        getExtensionIconUrl(extension)
-      )
-    )
-      .useStandardParameters(
-        gd.ValueTypeMetadata.convertPropertyTypeToValueType(propertyType),
-        getStringifiedExtraInfo(property)
-      )
-      .setFunctionName(
-        gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(propertyName)
-      )
-      .setGetter(
-        gd.BehaviorCodeGenerator.getBehaviorPropertyGetterName(propertyName)
-      );
-  });
-
-  mapVector(eventsBasedObject.getPropertyDescriptors(), property => {
-    const propertyType = property.getType();
-    const propertyName = property.getName();
+    const expressionName = gd.EventsBasedObject.getPropertyExpressionName(
+      propertyName
+    );
+    const conditionName = gd.EventsBasedObject.getPropertyConditionName(
+      propertyName
+    );
+    const actionName = gd.EventsBasedObject.getPropertyActionName(propertyName);
     const getterName = gd.ObjectCodeGenerator.getObjectPropertyGetterName(
       propertyName
     );
     const setterName = gd.ObjectCodeGenerator.getObjectPropertySetterName(
       propertyName
     );
-    const propertyLabel = i18n._(
-      t`${property.getLabel() || propertyName} property`
+
+    declarePropertyInstructionAndExpression(
+      i18n,
+      extension,
+      objectMetadata,
+      eventsBasedObject,
+      property,
+      propertyLabel,
+      expressionName,
+      conditionName,
+      actionName,
+      setterName,
+      getterName,
+      1,
+      addObjectParameter
     );
-
-    if (propertyType === 'String' || propertyType === 'Choice') {
-      addObjectParameter(
-        objectMetadata.addStrExpression(
-          gd.EventsBasedObject.getPropertyExpressionName(propertyName),
-          propertyLabel,
-          propertyLabel,
-          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .getCodeExtraInformation()
-        .setFunctionName(getterName);
-
-      addObjectParameter(
-        objectMetadata.addScopedCondition(
-          gd.EventsBasedObject.getPropertyConditionName(propertyName),
-          propertyLabel,
-          i18n._(t`Compare the content of ${propertyLabel}`),
-          i18n._(t`the property ${propertyName}`),
-          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
-          getExtensionIconUrl(extension),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .useStandardRelationalOperatorParameters('string')
-        .getCodeExtraInformation()
-        .setFunctionName(getterName);
-
-      addObjectParameter(
-        objectMetadata.addScopedAction(
-          gd.EventsBasedObject.getPropertyActionName(propertyName),
-          propertyLabel,
-          i18n._(t`Change the content of ${propertyLabel}`),
-          i18n._(t`the property ${propertyName}`),
-          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
-          getExtensionIconUrl(extension),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .useStandardOperatorParameters('string')
-        .getCodeExtraInformation()
-        .setFunctionName(setterName)
-        .setManipulatedType('string')
-        .setGetter(getterName);
-    } else if (propertyType === 'Number') {
-      addObjectParameter(
-        objectMetadata.addExpression(
-          gd.EventsBasedObject.getPropertyExpressionName(propertyName),
-          propertyLabel,
-          propertyLabel,
-          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .getCodeExtraInformation()
-        .setFunctionName(getterName);
-
-      addObjectParameter(
-        objectMetadata.addScopedCondition(
-          gd.EventsBasedObject.getPropertyConditionName(propertyName),
-          propertyLabel,
-          i18n._(t`Compare the value of ${propertyLabel}`),
-          i18n._(t`the property ${propertyName}`),
-          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
-          getExtensionIconUrl(extension),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .useStandardRelationalOperatorParameters('number')
-        .getCodeExtraInformation()
-        .setFunctionName(getterName);
-
-      addObjectParameter(
-        objectMetadata.addScopedAction(
-          gd.EventsBasedObject.getPropertyActionName(propertyName),
-          propertyLabel,
-          i18n._(t`Change the value of ${propertyLabel}`),
-          i18n._(t`the property ${propertyName}`),
-          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
-          getExtensionIconUrl(extension),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .useStandardOperatorParameters('number')
-        .getCodeExtraInformation()
-        .setFunctionName(setterName)
-        .setGetter(getterName);
-    } else if (propertyType === 'Boolean') {
-      addObjectParameter(
-        objectMetadata.addScopedCondition(
-          gd.EventsBasedObject.getPropertyConditionName(propertyName),
-          propertyLabel,
-          i18n._(t`Check the value of ${propertyLabel}`),
-          i18n._(t`Property ${propertyName} of _PARAM0_ is true`),
-          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
-          getExtensionIconUrl(extension),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .getCodeExtraInformation()
-        .setFunctionName(getterName);
-
-      addObjectParameter(
-        objectMetadata.addScopedAction(
-          gd.EventsBasedObject.getPropertyActionName(propertyName),
-          propertyLabel,
-          i18n._(t`Update the value of ${propertyLabel}`),
-          i18n._(t`Set property ${propertyName} of _PARAM0_ to _PARAM1_`),
-          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
-          getExtensionIconUrl(extension),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .addParameter('yesorno', i18n._(t`New value to set`), '', false)
-        .getCodeExtraInformation()
-        .setFunctionName(setterName);
-    } else if (propertyType === 'Color') {
-      addObjectParameter(
-        objectMetadata.addScopedCondition(
-          gd.EventsBasedObject.getPropertyConditionName(propertyName),
-          propertyLabel,
-          i18n._(t`Check the color of ${propertyLabel}`),
-          i18n._(t`Color ${propertyName}`),
-          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
-          getExtensionIconUrl(extension),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .useStandardRelationalOperatorParameters('string')
-        .getCodeExtraInformation()
-        .setFunctionName(getterName);
-
-      addObjectParameter(
-        objectMetadata.addScopedAction(
-          gd.EventsBasedObject.getPropertyActionName(propertyName),
-          propertyLabel,
-          i18n._(t`Update the color of ${propertyLabel}`),
-          i18n._(t`Change color ${propertyName} of _PARAM0_ to _PARAM1_`),
-          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
-          getExtensionIconUrl(extension),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .addParameter('color', i18n._(t`New color to set`), '', false)
-        .getCodeExtraInformation()
-        .setFunctionName(setterName);
-
-      addObjectParameter(
-        objectMetadata.addStrExpression(
-          gd.EventsBasedObject.getPropertyExpressionName(propertyName),
-          propertyLabel,
-          propertyLabel,
-          eventsBasedObject.getFullName() || eventsBasedObject.getName(),
-          getExtensionIconUrl(extension)
-        )
-      )
-        .getCodeExtraInformation()
-        .setFunctionName(getterName);
-    }
   });
 };
 
@@ -1112,14 +1182,26 @@ export const declareEventsFunctionParameters = (
   );
 
   if (functionType === gd.EventsFunction.ExpressionAndCondition) {
-    ((instructionOrExpression: any): gdMultipleInstructionMetadata).useStandardParameters(
+    const options = gd.ParameterOptions.makeNewOptions();
+    if (eventsFunction) {
+      const extraInfo = eventsFunction.getExpressionType().getExtraInfo();
+      if (extraInfo) options.setTypeExtraInfo(extraInfo);
+    }
+    // $FlowExpectedError[incompatible-cast]
+    (instructionOrExpression: gdMultipleInstructionMetadata).useStandardParameters(
       eventsFunction ? eventsFunction.getExpressionType().getName() : 'string',
-      eventsFunction ? eventsFunction.getExpressionType().getExtraInfo() : ''
+      options
     );
   } else if (functionType === gd.EventsFunction.ActionWithOperator) {
-    ((instructionOrExpression: any): gdInstructionMetadata).useStandardOperatorParameters(
+    const options = gd.ParameterOptions.makeNewOptions();
+    if (getterFunction) {
+      const extraInfo = getterFunction.getExpressionType().getExtraInfo();
+      if (extraInfo) options.setTypeExtraInfo(extraInfo);
+    }
+    // $FlowExpectedError[incompatible-cast]
+    (instructionOrExpression: gdInstructionMetadata).useStandardOperatorParameters(
       getterFunction ? getterFunction.getExpressionType().getName() : 'string',
-      getterFunction ? getterFunction.getExpressionType().getExtraInfo() : ''
+      options
     );
   }
 

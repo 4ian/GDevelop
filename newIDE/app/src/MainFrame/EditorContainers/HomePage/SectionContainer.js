@@ -41,7 +41,8 @@ const styles = {
 type Props = {|
   children: React.Node,
   title: React.Node,
-  subtitle?: React.Node,
+  subtitleText?: React.Node,
+  renderSubtitle?: () => React.Node,
   backAction?: () => void,
   flexBody?: boolean,
   renderFooter?: () => React.Node,
@@ -50,7 +51,8 @@ type Props = {|
 const SectionContainer = ({
   children,
   title,
-  subtitle,
+  subtitleText,
+  renderSubtitle,
   backAction,
   flexBody,
   renderFooter,
@@ -70,28 +72,31 @@ const SectionContainer = ({
         square
         background="dark"
       >
-        <Column expand>
-          <SectionRow>
-            {backAction && (
-              <Line>
-                <TextButton
-                  onClick={backAction}
-                  icon={<ArrowLeft fontSize="small" />}
-                  label={<Trans>Back</Trans>}
-                />
-              </Line>
-            )}
-            <Line noMargin>
-              <Text size="bold-title" noMargin>
-                {title}
-              </Text>
-            </Line>
-            {subtitle && (
+        <Column noOverflowParent expand>
+          {title && (
+            <SectionRow>
+              {backAction && (
+                <Line>
+                  <TextButton
+                    onClick={backAction}
+                    icon={<ArrowLeft fontSize="small" />}
+                    label={<Trans>Back</Trans>}
+                  />
+                </Line>
+              )}
               <Line noMargin>
-                <Text noMargin>{subtitle}</Text>
+                <Text size="bold-title" noMargin>
+                  {title}
+                </Text>
               </Line>
-            )}
-          </SectionRow>
+              {subtitleText && (
+                <Line noMargin>
+                  <Text noMargin>{subtitleText}</Text>
+                </Line>
+              )}
+              {renderSubtitle && renderSubtitle()}
+            </SectionRow>
+          )}
           {children}
         </Column>
       </Paper>

@@ -435,6 +435,7 @@ interface Project {
     boolean HasLayoutNamed([Const] DOMString name);
     [Ref] Layout GetLayout([Const] DOMString name);
     [Ref] Layout GetLayoutAt(unsigned long index);
+    void MoveLayout(unsigned long oldIndex, unsigned long newIndex);
     void SwapLayouts(unsigned long first, unsigned long second);
     unsigned long GetLayoutsCount();
     [Ref] Layout InsertNewLayout([Const] DOMString name, unsigned long position);
@@ -445,6 +446,7 @@ interface Project {
     boolean HasExternalEventsNamed([Const] DOMString name);
     [Ref] ExternalEvents GetExternalEvents([Const] DOMString name);
     [Ref] ExternalEvents GetExternalEventsAt(unsigned long index);
+    void MoveExternalEvents(unsigned long oldIndex, unsigned long newIndex);
     void SwapExternalEvents(unsigned long first, unsigned long second);
     unsigned long GetExternalEventsCount();
     [Ref] ExternalEvents InsertNewExternalEvents([Const] DOMString name, unsigned long position);
@@ -453,6 +455,7 @@ interface Project {
     boolean HasExternalLayoutNamed([Const] DOMString name);
     [Ref] ExternalLayout GetExternalLayout([Const] DOMString name);
     [Ref] ExternalLayout GetExternalLayoutAt(unsigned long index);
+    void MoveExternalLayout(unsigned long oldIndex, unsigned long newIndex);
     void SwapExternalLayouts(unsigned long first, unsigned long second);
     unsigned long GetExternalLayoutsCount();
     [Ref] ExternalLayout InsertNewExternalLayout([Const] DOMString name, unsigned long position);
@@ -461,6 +464,7 @@ interface Project {
     boolean HasEventsFunctionsExtensionNamed([Const] DOMString name);
     [Ref] EventsFunctionsExtension GetEventsFunctionsExtension([Const] DOMString name);
     [Ref] EventsFunctionsExtension GetEventsFunctionsExtensionAt(unsigned long index);
+    void MoveEventsFunctionsExtension(unsigned long oldIndex, unsigned long newIndex);
     void SwapEventsFunctionsExtensions(unsigned long first, unsigned long second);
     unsigned long GetEventsFunctionsExtensionsCount();
     [Ref] EventsFunctionsExtension InsertNewEventsFunctionsExtension([Const] DOMString name, unsigned long position);
@@ -818,12 +822,47 @@ interface PropertyDescriptor {
     [Ref] PropertyDescriptor SetExtraInfo([Const, Ref] VectorString info);
     [Ref] VectorString GetExtraInfo();
     [Ref] PropertyDescriptor SetHidden(boolean enable);
+    [Const, Ref] MeasurementUnit GetMeasurementUnit();
+    [Ref] PropertyDescriptor SetMeasurementUnit([Const, Ref] MeasurementUnit measurementUnit);
     boolean IsHidden();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
     void SerializeValuesTo([Ref] SerializerElement element);
     void UnserializeValuesFrom([Const, Ref] SerializerElement element);
+};
+
+interface MeasurementUnit {
+  void MeasurementUnit(DOMString name, DOMString label, DOMString description);
+
+  [Const, Ref] DOMString GetName();
+  [Const, Ref] DOMString GetLabel();
+  [Const, Ref] DOMString GetDescription();
+  [Const, Ref] DOMString GetElementsWithWords();
+
+  long GetElementsCount();
+  long GetElementPower(long elementIndex);
+  [Const, Ref] MeasurementBaseUnit GetElementBaseUnit(long elementIndex);
+
+  boolean IsUndefined();
+
+  void STATIC_ApplyTranslation();
+
+  [Ref] MeasurementUnit STATIC_GetDimensionless();
+  [Ref] MeasurementUnit STATIC_GetDegreeAngle();
+  [Ref] MeasurementUnit STATIC_GetSecond();
+  [Ref] MeasurementUnit STATIC_GetPixel();
+  [Ref] MeasurementUnit STATIC_GetPixelSpeed();
+  [Ref] MeasurementUnit STATIC_GetPixelAcceleration();
+  [Ref] MeasurementUnit STATIC_GetNewton();
+};
+
+interface MeasurementBaseUnit {
+  void MeasurementBaseUnit(DOMString name, DOMString symbol, DOMString quantity);
+
+  [Const, Ref] DOMString GetName();
+  [Const, Ref] DOMString GetSymbol();
+  [Const, Ref] DOMString GetQuantity();
 };
 
 interface NamedPropertyDescriptor {
@@ -948,12 +987,12 @@ interface InitialInstance {
     void SetObjectName([Const] DOMString name);
     [Const, Ref] DOMString GetObjectName();
 
-    float GetX();
-    void SetX(float x);
-    float GetY();
-    void SetY(float y);
-    float GetAngle();
-    void SetAngle(float angle);
+    double GetX();
+    void SetX(double x);
+    double GetY();
+    void SetY(double y);
+    double GetAngle();
+    void SetAngle(double angle);
     boolean IsLocked();
     void SetLocked(boolean lock);
     boolean IsSealed();
@@ -966,18 +1005,18 @@ interface InitialInstance {
     void SetHasCustomSize(boolean enable);
     boolean HasCustomSize();
 
-    void SetCustomWidth(float width);
-    float GetCustomWidth();
-    void SetCustomHeight(float height);
-    float GetCustomHeight();
+    void SetCustomWidth(double width);
+    double GetCustomWidth();
+    void SetCustomHeight(double height);
+    double GetCustomHeight();
 
     [Ref] InitialInstance ResetPersistentUuid();
 
     void UpdateCustomProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout layout);
     [Value] MapStringPropertyDescriptor GetCustomProperties([Ref] Project project, [Ref] Layout layout);
-    float GetRawDoubleProperty([Const] DOMString name);
+    double GetRawDoubleProperty([Const] DOMString name);
     [Const, Ref] DOMString GetRawStringProperty([Const] DOMString name);
-    void SetRawDoubleProperty([Const] DOMString name, float value);
+    void SetRawDoubleProperty([Const] DOMString name, double value);
     void SetRawStringProperty([Const] DOMString name, [Const] DOMString value);
 
     [Ref] VariablesContainer GetVariables();
@@ -1032,7 +1071,7 @@ interface SerializerValue {
     boolean GetBool();
     [Const, Value] DOMString GetString();
     long GetInt();
-    float GetDouble();
+    double GetDouble();
 
     [Const, Value] DOMString GetRawString();
 
@@ -1171,6 +1210,13 @@ interface ExpressionCodeGenerationInformation {
     [Const, Ref] VectorString GetIncludeFiles();
 };
 
+interface ParameterOptions {
+    [Ref] ParameterOptions SetDescription([Const] DOMString description);
+    [Ref] ParameterOptions SetTypeExtraInfo([Const] DOMString typeExtraInfo);
+
+    [Value] ParameterOptions STATIC_MakeNewOptions();
+};
+
 interface InstructionMetadata {
     void InstructionMetadata(); // For tests only.
 
@@ -1205,8 +1251,8 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] InstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
-    [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type, [Const] optional DOMString typeExtraInfo = "");
-    [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type, [Const] optional DOMString typeExtraInfo = "");
+    [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
+    [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
 
     [Ref] InstructionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
     [Const, Ref] DOMString GetRequiredBaseObjectCapability();
@@ -1282,7 +1328,7 @@ interface MultipleInstructionMetadata {
     [Ref] MultipleInstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] MultipleInstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
-    [Ref] MultipleInstructionMetadata UseStandardParameters([Const] DOMString type,  [Const] optional DOMString typeExtraInfo = "");
+    [Ref] MultipleInstructionMetadata UseStandardParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
 
     [Ref] MultipleInstructionMetadata SetHidden();
 
@@ -1585,7 +1631,7 @@ interface BehaviorMetadata {
 
     [Ref] BehaviorMetadata SetObjectType([Const] DOMString objectType);
     [Const, Ref] DOMString GetObjectType();
-    
+
     boolean IsPrivate();
     [Ref] BehaviorMetadata SetPrivate();
 
@@ -2165,8 +2211,9 @@ interface WholeProjectRefactorer {
 };
 
 interface PropertyFunctionGenerator {
-    void STATIC_GenerateGetterAndSetter([Ref] Project project, [Ref] EventsFunctionsExtension extension, [Ref] EventsBasedBehavior eventsBasedBehavior, [Const, Ref] NamedPropertyDescriptor property, boolean isSharedProperties);
-    boolean STATIC_CanGenerateGetterAndSetter([Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const, Ref] NamedPropertyDescriptor property);
+    void STATIC_GenerateBehaviorGetterAndSetter([Ref] Project project, [Ref] EventsFunctionsExtension extension, [Ref] EventsBasedBehavior eventsBasedBehavior, [Const, Ref] NamedPropertyDescriptor property, boolean isSharedProperties);
+    void STATIC_GenerateObjectGetterAndSetter([Ref] Project project, [Ref] EventsFunctionsExtension extension, [Ref] EventsBasedObject eventsBasedObject, [Const, Ref] NamedPropertyDescriptor property);
+    boolean STATIC_CanGenerateGetterAndSetter([Const, Ref] AbstractEventsBasedEntity eventsBasedBehavior, [Const, Ref] NamedPropertyDescriptor property);
 };
 
 interface UsedExtensionsFinder {
@@ -2361,6 +2408,14 @@ interface EventsFunctionsContainer {
     unsigned long GetEventsFunctionPosition([Const, Ref] EventsFunction eventsFunction);
 };
 
+interface AbstractEventsBasedEntity {
+    [Ref] EventsFunctionsContainer GetEventsFunctions();
+    [Ref] NamedPropertyDescriptorsList GetPropertyDescriptors();
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+};
+
 interface EventsBasedBehavior {
     void EventsBasedBehavior();
 
@@ -2375,18 +2430,16 @@ interface EventsBasedBehavior {
     [Ref] EventsBasedBehavior SetPrivate(boolean isPrivate);
     boolean IsPrivate();
 
-    [Ref] EventsFunctionsContainer GetEventsFunctions();
-    [Ref] NamedPropertyDescriptorsList GetPropertyDescriptors();
     [Ref] NamedPropertyDescriptorsList GetSharedPropertyDescriptors();
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 
     [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyExpressionName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetSharedPropertyActionName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetSharedPropertyConditionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetSharedPropertyExpressionName([Const] DOMString propertyName);
 };
+EventsBasedBehavior implements AbstractEventsBasedEntity;
 
 interface EventsBasedBehaviorsList {
     [Ref] EventsBasedBehavior InsertNew([Const] DOMString name, unsigned long pos);
@@ -2415,17 +2468,26 @@ interface EventsBasedObject {
     [Ref] EventsBasedObject SetDefaultName([Const] DOMString defaultName);
     [Const, Ref] DOMString GetDefaultName();
 
-    [Ref] EventsFunctionsContainer GetEventsFunctions();
-    [Ref] NamedPropertyDescriptorsList GetPropertyDescriptors();
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
-
     [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyExpressionName([Const] DOMString propertyName);
+
+    // Inherited from gd::ObjectsContainer
+    [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
+    [Ref] gdObject InsertObject([Const, Ref] gdObject obj, unsigned long pos);
+    boolean HasObjectNamed([Const] DOMString name);
+    [Ref] gdObject GetObject([Const] DOMString name);
+    [Ref] gdObject GetObjectAt(unsigned long pos);
+    unsigned long GetObjectPosition([Const] DOMString name);
+    void RemoveObject([Const] DOMString name);
+    void SwapObjects(unsigned long first, unsigned long second);
+    void MoveObject(unsigned long oldIndex, unsigned long newIndex);
+    void MoveObjectToAnotherContainer([Const] DOMString name, [Ref] ObjectsContainer newObjectsContainer, unsigned long newPosition);
+    unsigned long GetObjectsCount();
+
+    [Ref] ObjectGroupsContainer GetObjectGroups();
 };
-EventsBasedObject implements ObjectsContainer;
+EventsBasedObject implements AbstractEventsBasedEntity;
 
 interface EventsBasedObjectsList {
     [Ref] EventsBasedObject InsertNew([Const] DOMString name, unsigned long pos);
@@ -2667,11 +2729,11 @@ interface Point {
 
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
-    void SetXY(float x, float y);
-    float GetX();
-    void SetX(float x);
-    float GetY();
-    void SetY(float y);
+    void SetXY(double x, double y);
+    double GetX();
+    void SetX(double x);
+    double GetY();
+    void SetY(double y);
 };
 
 interface VectorPoint {
@@ -2688,12 +2750,12 @@ interface Polygon2d {
     void Polygon2d();
 
     [Ref] VectorVector2f GetVertices();
-    void Move(float x, float y);
-    void Rotate(float angle);
+    void Move(double x, double y);
+    void Rotate(double angle);
     boolean IsConvex();
     [Value] Vector2f ComputeCenter();
 
-    [Value] Polygon2d STATIC_CreateRectangle(float width, float height);
+    [Value] Polygon2d STATIC_CreateRectangle(double width, double height);
 };
 
 interface VectorPolygon2d {
@@ -2742,9 +2804,9 @@ interface Direction {
     void RemoveAllSprites();
     boolean IsLooping();
     void SetLoop(boolean enable);
-    float GetTimeBetweenFrames();
+    double GetTimeBetweenFrames();
     [Const, Ref] VectorString GetSpriteNames();
-    void SetTimeBetweenFrames(float time);
+    void SetTimeBetweenFrames(double time);
     void SwapSprites(unsigned long first, unsigned long second);
     void MoveSprite(unsigned long oldIndex, unsigned long newIndex);
 
@@ -2811,8 +2873,8 @@ interface TextObject {
 
     void SetString([Const] DOMString string);
     [Const, Ref] DOMString GetString();
-    void SetCharacterSize(float size);
-    float GetCharacterSize();
+    void SetCharacterSize(double size);
+    double GetCharacterSize();
     void SetFontName([Const] DOMString string);
     [Const, Ref] DOMString GetFontName();
     boolean IsBold();
@@ -2825,6 +2887,8 @@ interface TextObject {
     unsigned long GetColorR();
     unsigned long GetColorG();
     unsigned long GetColorB();
+    void SetTextAlignment([Const] DOMString textAlignment);
+    [Const, Ref] DOMString GetTextAlignment();
 };
 TextObject implements ObjectConfiguration;
 
@@ -2833,27 +2897,27 @@ interface TiledSpriteObject {
 
     void SetTexture([Const] DOMString texture);
     [Const, Ref] DOMString GetTexture();
-    void SetWidth(float width);
-    float GetWidth();
-    void SetHeight(float height);
-    float GetHeight();
+    void SetWidth(double width);
+    double GetWidth();
+    void SetHeight(double height);
+    double GetHeight();
 };
 TiledSpriteObject implements ObjectConfiguration;
 
 interface PanelSpriteObject {
     void PanelSpriteObject();
 
-    float GetLeftMargin();
-    void SetLeftMargin(float newMargin);
+    double GetLeftMargin();
+    void SetLeftMargin(double newMargin);
 
-    float GetTopMargin();
-    void SetTopMargin(float newMargin);
+    double GetTopMargin();
+    void SetTopMargin(double newMargin);
 
-    float GetRightMargin();
-    void SetRightMargin(float newMargin);
+    double GetRightMargin();
+    void SetRightMargin(double newMargin);
 
-    float GetBottomMargin();
-    void SetBottomMargin(float newMargin);
+    double GetBottomMargin();
+    void SetBottomMargin(double newMargin);
 
     boolean IsTiled();
     void SetTiled(boolean enable);
@@ -2861,10 +2925,10 @@ interface PanelSpriteObject {
     void SetTexture([Const] DOMString texture);
     [Const, Ref] DOMString GetTexture();
 
-    void SetWidth(float width);
-    float GetWidth();
-    void SetHeight(float height);
-    float GetHeight();
+    void SetWidth(double width);
+    double GetWidth();
+    void SetHeight(double height);
+    double GetHeight();
 };
 PanelSpriteObject implements ObjectConfiguration;
 
@@ -2878,19 +2942,19 @@ interface ShapePainterObject {
     void SetClearBetweenFrames(boolean value);
     boolean IsClearedBetweenFrames();
 
-    void SetOutlineSize(float size);
-    float GetOutlineSize();
+    void SetOutlineSize(double size);
+    double GetOutlineSize();
 
-    void SetOutlineOpacity(float val);
-    float GetOutlineOpacity();
+    void SetOutlineOpacity(double val);
+    double GetOutlineOpacity();
 
     void SetOutlineColor(unsigned long r, unsigned long g, unsigned long b);
     unsigned long GetOutlineColorR();
     unsigned long GetOutlineColorG();
     unsigned long GetOutlineColorB();
 
-    void SetFillOpacity(float val);
-    float GetFillOpacity();
+    void SetFillOpacity(double val);
+    double GetFillOpacity();
 
     void SetFillColor(unsigned long r,unsigned long g, unsigned long b);
     unsigned long GetFillColorR();
@@ -2918,85 +2982,85 @@ interface ParticleEmitterObject {
 
     void SetParticleTexture([Const] DOMString resourceName);
     [Const, Ref] DOMString GetParticleTexture();
-    void SetRendererParam1(float newValue);
-    float GetRendererParam1();
-    void SetRendererParam2(float newValue);
-    float GetRendererParam2();
+    void SetRendererParam1(double newValue);
+    double GetRendererParam1();
+    void SetRendererParam2(double newValue);
+    double GetRendererParam2();
 
     boolean IsRenderingAdditive();
     void SetRenderingAdditive();
     void SetRenderingAlpha();
 
-    void SetMaxParticleNb(float newValue);
-    float GetMaxParticleNb();
-    void SetTank(float newValue);
-    float GetTank();
-    void SetFlow(float newValue);
-    float GetFlow();
+    void SetMaxParticleNb(double newValue);
+    double GetMaxParticleNb();
+    void SetTank(double newValue);
+    double GetTank();
+    void SetFlow(double newValue);
+    double GetFlow();
     void SetDestroyWhenNoParticles(boolean enable);
     boolean GetDestroyWhenNoParticles();
 
-    void SetEmitterForceMin(float newValue);
-    float GetEmitterForceMin();
-    void SetEmitterForceMax(float newValue);
-    float GetEmitterForceMax();
+    void SetEmitterForceMin(double newValue);
+    double GetEmitterForceMin();
+    void SetEmitterForceMax(double newValue);
+    double GetEmitterForceMax();
 
-    void SetConeSprayAngle(float newValue);
-    float GetConeSprayAngle();
+    void SetConeSprayAngle(double newValue);
+    double GetConeSprayAngle();
 
-    void SetZoneRadius(float newValue);
-    float GetZoneRadius();
+    void SetZoneRadius(double newValue);
+    double GetZoneRadius();
 
-    void SetParticleGravityX(float newValue);
-    float GetParticleGravityX();
-    void SetParticleGravityY(float newValue);
-    float GetParticleGravityY();
-    void SetParticleGravityAngle(float newValue);
-    float GetParticleGravityAngle();
-    void SetParticleGravityLength(float newValue);
-    float GetParticleGravityLength();
+    void SetParticleGravityX(double newValue);
+    double GetParticleGravityX();
+    void SetParticleGravityY(double newValue);
+    double GetParticleGravityY();
+    void SetParticleGravityAngle(double newValue);
+    double GetParticleGravityAngle();
+    void SetParticleGravityLength(double newValue);
+    double GetParticleGravityLength();
 
-    void SetParticleLifeTimeMin(float newValue);
-    float GetParticleLifeTimeMin();
-    void SetParticleLifeTimeMax(float newValue);
-    float GetParticleLifeTimeMax();
+    void SetParticleLifeTimeMin(double newValue);
+    double GetParticleLifeTimeMin();
+    void SetParticleLifeTimeMax(double newValue);
+    double GetParticleLifeTimeMax();
 
-    void SetParticleRed1(float newValue);
-    float GetParticleRed1();
-    void SetParticleRed2(float newValue);
-    float GetParticleRed2();
-    void SetParticleGreen1(float newValue);
-    float GetParticleGreen1();
-    void SetParticleGreen2(float newValue);
-    float GetParticleGreen2();
-    void SetParticleBlue1(float newValue);
-    float GetParticleBlue1();
-    void SetParticleBlue2(float newValue);
-    float GetParticleBlue2();
-    void SetParticleAlpha1(float newValue);
-    float GetParticleAlpha1();
-    void SetParticleAlpha2(float newValue);
-    float GetParticleAlpha2();
-    void SetParticleSize1(float newValue);
-    float GetParticleSize1();
-    void SetParticleSize2(float newValue);
-    float GetParticleSize2();
-    void SetParticleAngle1(float newValue);
-    float GetParticleAngle1();
-    void SetParticleAngle2(float newValue);
-    float GetParticleAngle2();
-    void SetParticleAlphaRandomness1(float newValue);
-    float GetParticleAlphaRandomness1();
-    void SetParticleAlphaRandomness2(float newValue);
-    float GetParticleAlphaRandomness2();
-    void SetParticleSizeRandomness1(float newValue);
-    float GetParticleSizeRandomness1();
-    void SetParticleSizeRandomness2(float newValue);
-    float GetParticleSizeRandomness2();
-    void SetParticleAngleRandomness1(float newValue);
-    float GetParticleAngleRandomness1();
-    void SetParticleAngleRandomness2(float newValue);
-    float GetParticleAngleRandomness2();
+    void SetParticleRed1(double newValue);
+    double GetParticleRed1();
+    void SetParticleRed2(double newValue);
+    double GetParticleRed2();
+    void SetParticleGreen1(double newValue);
+    double GetParticleGreen1();
+    void SetParticleGreen2(double newValue);
+    double GetParticleGreen2();
+    void SetParticleBlue1(double newValue);
+    double GetParticleBlue1();
+    void SetParticleBlue2(double newValue);
+    double GetParticleBlue2();
+    void SetParticleAlpha1(double newValue);
+    double GetParticleAlpha1();
+    void SetParticleAlpha2(double newValue);
+    double GetParticleAlpha2();
+    void SetParticleSize1(double newValue);
+    double GetParticleSize1();
+    void SetParticleSize2(double newValue);
+    double GetParticleSize2();
+    void SetParticleAngle1(double newValue);
+    double GetParticleAngle1();
+    void SetParticleAngle2(double newValue);
+    double GetParticleAngle2();
+    void SetParticleAlphaRandomness1(double newValue);
+    double GetParticleAlphaRandomness1();
+    void SetParticleAlphaRandomness2(double newValue);
+    double GetParticleAlphaRandomness2();
+    void SetParticleSizeRandomness1(double newValue);
+    double GetParticleSizeRandomness1();
+    void SetParticleSizeRandomness2(double newValue);
+    double GetParticleSizeRandomness2();
+    void SetParticleAngleRandomness1(double newValue);
+    double GetParticleAngleRandomness1();
+    void SetParticleAngleRandomness2(double newValue);
+    double GetParticleAngleRandomness2();
 
 };
 ParticleEmitterObject implements ObjectConfiguration;

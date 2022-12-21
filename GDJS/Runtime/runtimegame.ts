@@ -515,7 +515,13 @@ namespace gdjs {
      * @param enable true to pause the game, false to unpause
      */
     pause(enable: boolean) {
+      if (this._paused === enable) return;
+
       this._paused = enable;
+      if (this._debuggerClient) {
+        if (this._paused) this._debuggerClient.sendGamePaused();
+        else this._debuggerClient.sendGameResumed();
+      }
     }
 
     /**

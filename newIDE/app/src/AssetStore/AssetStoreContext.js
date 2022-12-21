@@ -4,7 +4,6 @@ import { type Filters } from '../Utils/GDevelopServices/Filters';
 import {
   type AssetShortHeader,
   type PublicAssetPacks,
-  type PrivateAssetPack,
   type Author,
   type License,
   type Environment,
@@ -34,6 +33,11 @@ import {
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
 import shuffle from 'lodash/shuffle';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import {
+  getAssetPackFromUserFriendlySlug,
+  getPrivateAssetPackListingData,
+} from './AssetStoreUtils';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 const defaultSearchText = '';
 
@@ -57,7 +61,6 @@ type AssetStoreState = {|
   publicAssetPacks: ?PublicAssetPacks,
   privateAssetPacks: ?Array<PrivateAssetPackListingData>,
   assetPackRandomOrdering: ?Array<number>,
-  loadedReceivedAssetPackInStore: ?Array<PrivateAssetPack>,
   authors: ?Array<Author>,
   licenses: ?Array<License>,
   environment: Environment,
@@ -76,6 +79,7 @@ type AssetStoreState = {|
     chosenFilters: ?Set<string>,
     searchFilters: Array<SearchFilter<AssetShortHeader>>
   ) => ?Array<AssetShortHeader>,
+  setInitialPackUserFriendlySlug: (initialPackUserFriendlySlug: string) => void,
 |};
 
 export const AssetStoreContext = React.createContext<AssetStoreState>({
@@ -83,7 +87,6 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   publicAssetPacks: null,
   privateAssetPacks: null,
   assetPackRandomOrdering: null,
-  loadedReceivedAssetPackInStore: null,
   authors: null,
   licenses: null,
   environment: 'live',
@@ -108,20 +111,20 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     setLicenseFilter: filter => {},
   },
   navigationState: {
-    previousPages: [assetStoreHomePageState],
     getCurrentPage: () => assetStoreHomePageState,
     backToPreviousPage: () => {},
     openHome: () => {},
     clearHistory: () => {},
-    openSearchIfNeeded: () => {},
-    activateTextualSearch: () => {},
-    openTagPage: string => {},
-    openPackPage: AssetPack => {},
-    openDetailPage: stAssetShortHeaderring => {},
+    openSearchResultPage: () => {},
+    openTagPage: tag => {},
+    openPackPage: assetPack => {},
+    openDetailPage: assetShortHeader => {},
+    openPrivateAssetPackInformationPage: privateAssetPackListingData => {},
   },
   currentPage: assetStoreHomePageState,
   useSearchItem: (searchText, chosenCategory, chosenFilters, searchFilters) =>
     null,
+  setInitialPackUserFriendlySlug: (initialPackUserFriendlySlug: string) => {},
 });
 
 type AssetStoreStateProviderProps = {|
@@ -150,13 +153,13 @@ export const AssetStoreStateProvider = ({
   const [assetShortHeadersById, setAssetShortHeadersById] = React.useState<?{
     [string]: AssetShortHeader,
   }>(null);
+  const [
+    publicAssetShortHeaders,
+    setPublicAssetShortHeaders,
+  ] = React.useState<?Array<AssetShortHeader>>(null);
   const { receivedAssetShortHeaders, receivedAssetPacks } = React.useContext(
     AuthenticatedUserContext
   );
-  const [
-    loadedReceivedAssetPackInStore,
-    setLoadedReceivedAssetPackInStore,
-  ] = React.useState<?(PrivateAssetPack[])>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [
     publicAssetPacks,
@@ -174,7 +177,9 @@ export const AssetStoreStateProvider = ({
   const [licenses, setLicenses] = React.useState<?Array<License>>(null);
   const [environment, setEnvironment] = React.useState<Environment>('live');
   const [error, setError] = React.useState<?Error>(null);
-  const isLoading = React.useRef<boolean>(false);
+  const initialPackUserFriendlySlug = React.useRef<?string>(null);
+  const initialPackOpened = React.useRef<boolean>(false);
+  const { showAlert } = useAlertDialog();
 
   const [searchText, setSearchText] = React.useState(defaultSearchText);
   const navigationState = useNavigation();
@@ -237,16 +242,9 @@ export const AssetStoreStateProvider = ({
   );
 
   const fetchAssetsAndFilters = React.useCallback(
-    (options: ?{ force: boolean }) => {
-      // Allowing forcing the fetch of the assets, even if it is currently loading.
-      // This is helpful to avoid race conditions:
-      // - the user opens the asset page -> assets load
-      // - the user gets logged in at the same time -> private assets loaded
-      if (isLoading.current && (!options || !options.force)) return;
-
+    () => {
       (async () => {
         setError(null);
-        isLoading.current = true;
 
         try {
           const {
@@ -258,28 +256,17 @@ export const AssetStoreStateProvider = ({
           const licenses = await listAllLicenses({ environment });
           const privateAssetPacks = await listListedPrivateAssetPacks();
 
-          const assetShortHeadersById = {};
-          publicAssetShortHeaders.forEach(assetShortHeader => {
-            assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
-          });
-          if (receivedAssetShortHeaders) {
-            receivedAssetShortHeaders.forEach(assetShortHeader => {
-              assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
-            });
-          }
-
           console.info(
             `Loaded ${
               publicAssetShortHeaders.length
             } assets from the asset store.`
           );
-          setAssetShortHeadersById(assetShortHeadersById);
-          setFilters(publicFilters);
           setPublicAssetPacks(publicAssetPacks);
+          setPublicAssetShortHeaders(publicAssetShortHeaders);
+          setFilters(publicFilters);
           setAuthors(authors);
           setLicenses(licenses);
           setPrivateAssetPacks(privateAssetPacks);
-          setLoadedReceivedAssetPackInStore(receivedAssetPacks);
         } catch (error) {
           console.error(
             `Unable to load the assets from the asset store:`,
@@ -287,52 +274,97 @@ export const AssetStoreStateProvider = ({
           );
           setError(error);
         }
-
-        isLoading.current = false;
       })();
     },
-    [isLoading, environment, receivedAssetShortHeaders, receivedAssetPacks]
+    [environment]
   );
 
-  // In case the user logs in, we need to fetch the private assets.
+  // When the public assets or the private assets are loaded, regenerate the
+  // list of all assets by ids.
   React.useEffect(
     () => {
+      const assetShortHeadersById = {};
+      if (publicAssetShortHeaders) {
+        publicAssetShortHeaders.forEach(assetShortHeader => {
+          assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
+        });
+      }
       if (receivedAssetShortHeaders) {
-        // We're forcing the fetch of the assets, even if it is currently loading,
-        // in case the pre-fetching of the assets is happening at the same time,
-        // or the user opens the asset store at the same time.
-        fetchAssetsAndFilters({ force: true });
+        receivedAssetShortHeaders.forEach(assetShortHeader => {
+          assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
+        });
+      }
+      if (Object.keys(assetShortHeadersById).length > 0) {
+        setAssetShortHeadersById(assetShortHeadersById);
       }
     },
-    [receivedAssetShortHeaders, fetchAssetsAndFilters]
+    [publicAssetShortHeaders, receivedAssetShortHeaders]
   );
 
-  // In case the user logs out, we detect that the received assets are null
-  // and we reset the list of assets.
+  // When the asset packs (public and received private packs) are loaded,
+  // open the asset pack with the slug that was asked to be initially loaded.
   React.useEffect(
     () => {
-      if (loadedReceivedAssetPackInStore && !receivedAssetPacks) {
-        fetchAssetsAndFilters({ force: true });
+      if (initialPackOpened.current) {
+        // The pack was already opened, don't re-open it again even
+        // if the effect run again.
+        return;
+      }
+
+      const userFriendlySlug = initialPackUserFriendlySlug.current;
+      if (
+        publicAssetPacks &&
+        receivedAssetPacks &&
+        privateAssetPacks &&
+        userFriendlySlug
+      ) {
+        initialPackOpened.current = true;
+
+        // Try to first find a public or received asset pack.
+        const assetPack = getAssetPackFromUserFriendlySlug({
+          publicAssetPacks,
+          receivedAssetPacks,
+          userFriendlySlug,
+        });
+
+        if (assetPack) {
+          navigationState.openPackPage(assetPack);
+          return;
+        }
+
+        // Otherwise, try to open the information page of a pack not yet bought.
+        const privateAssetPack = getPrivateAssetPackListingData({
+          privateAssetPacks,
+          userFriendlySlug,
+        });
+
+        if (privateAssetPack) {
+          navigationState.openPrivateAssetPackInformationPage(privateAssetPack);
+          return;
+        }
+
+        showAlert({
+          title: `Asset pack not found`,
+          message: `The link to the asset pack you've followed seems outdated. Why not take a look at the other packs in the asset store?`,
+        });
       }
     },
-    [fetchAssetsAndFilters, loadedReceivedAssetPackInStore, receivedAssetPacks]
+    [
+      publicAssetPacks,
+      receivedAssetPacks,
+      privateAssetPacks,
+      navigationState,
+      showAlert,
+    ]
   );
 
-  // Preload the assets and filters when the app loads, in case the user
-  // is not logged in. (A log in will trigger a reload of the assets.)
   React.useEffect(
     () => {
-      // Don't attempt to load again assets and filters if they
-      // were loaded already.
-      if (assetShortHeadersById || isLoading.current) return;
-
-      const timeoutId = setTimeout(() => {
-        console.info('Pre-fetching assets from asset store...');
-        fetchAssetsAndFilters();
-      }, 6000);
-      return () => clearTimeout(timeoutId);
+      // the callback fetchAssetsAndFilters depends on the environment,
+      // so it will be called again if the environment changes.
+      fetchAssetsAndFilters();
     },
-    [fetchAssetsAndFilters, assetShortHeadersById, isLoading]
+    [fetchAssetsAndFilters]
   );
 
   // Randomize asset packs when number of asset packs and private asset packs change
@@ -359,10 +391,17 @@ export const AssetStoreStateProvider = ({
   const searchResults: ?Array<AssetShortHeader> = useSearchItem(
     assetShortHeadersById,
     getAssetShortHeaderSearchTerms,
-    currentPage.ignoreTextualSearch ? '' : searchText,
+    searchText,
     chosenCategory,
     chosenFilters,
     searchFilters
+  );
+
+  const setInitialPackUserFriendlySlug = React.useCallback(
+    (newInitialPackUserFriendlySlug: string) => {
+      initialPackUserFriendlySlug.current = newInitialPackUserFriendlySlug;
+    },
+    []
   );
 
   const assetStoreState = React.useMemo(
@@ -373,7 +412,6 @@ export const AssetStoreStateProvider = ({
       publicAssetPacks,
       privateAssetPacks,
       assetPackRandomOrdering,
-      loadedReceivedAssetPackInStore,
       authors,
       licenses,
       environment,
@@ -411,6 +449,7 @@ export const AssetStoreStateProvider = ({
           chosenFilters,
           searchFilters
         ),
+      setInitialPackUserFriendlySlug,
     }),
     [
       searchResults,
@@ -419,7 +458,6 @@ export const AssetStoreStateProvider = ({
       publicAssetPacks,
       privateAssetPacks,
       assetPackRandomOrdering,
-      loadedReceivedAssetPackInStore,
       authors,
       licenses,
       environment,
@@ -436,6 +474,7 @@ export const AssetStoreStateProvider = ({
       licenseFilter,
       setLicenseFilter,
       assetShortHeadersById,
+      setInitialPackUserFriendlySlug,
     ]
   );
 

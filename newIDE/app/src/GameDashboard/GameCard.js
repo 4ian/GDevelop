@@ -7,7 +7,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import { Chip } from '@material-ui/core';
 import CardHeader from '@material-ui/core/CardHeader';
 import ShareIcon from '@material-ui/icons/Share';
-import MoreVert from '@material-ui/icons/MoreVert';
 
 import { Column, Line, Spacer } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
@@ -33,6 +32,7 @@ import { type GameDetailsTab } from './GameDetailsDialog';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import BackgroundText from '../UI/BackgroundText';
 import Card from '../UI/Card';
+import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 
 type Props = {|
   game: Game,
@@ -189,7 +189,7 @@ export const GameCard = ({
               <ElementWithMenu
                 element={
                   <IconButton size="small" disabled={isDeletingGame}>
-                    <MoreVert />
+                    <ThreeDotsMenu />
                   </IconButton>
                 }
                 buildMenuTemplate={(i18n: I18nType) => [

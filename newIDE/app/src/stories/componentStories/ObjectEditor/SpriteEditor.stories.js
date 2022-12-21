@@ -43,6 +43,27 @@ export const Default = () => (
   </SerializedObjectDisplay>
 );
 
+export const AnimationLocked = () => (
+  <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
+    <DragAndDropContextProvider>
+      <SpriteEditor
+        isAnimationListLocked
+        objectConfiguration={testProject.spriteObjectConfiguration}
+        project={testProject.project}
+        resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
+          onFetchNewlyAddedResources: async () => {},
+          resourceSources: [],
+          onChooseResource: () => Promise.reject('Unimplemented'),
+          resourceExternalEditors: fakeResourceExternalEditors,
+        }}
+        onSizeUpdated={() => {}}
+        objectName="FakeObjectName"
+      />
+    </DragAndDropContextProvider>
+  </SerializedObjectDisplay>
+);
+
 export const Points = () => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>

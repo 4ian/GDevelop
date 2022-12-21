@@ -5,7 +5,6 @@ import withMock from 'storybook-addon-mock';
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
-import { testProject } from '../../../GDevelopJsInitializerDecorator';
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
 import { AssetStore } from '../../../../AssetStore';
 import {
@@ -46,7 +45,7 @@ export const Default = () => (
   <FixedHeightFlexContainer height={500}>
     <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
       <AssetStoreStateProvider>
-        <AssetStore project={testProject.project} />
+        <AssetStore />
       </AssetStoreStateProvider>
     </AuthenticatedUserContext.Provider>
   </FixedHeightFlexContainer>
@@ -58,7 +57,7 @@ export const LoadingError = () => (
   <FixedHeightFlexContainer height={500}>
     <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
       <AssetStoreStateProvider>
-        <AssetStore project={testProject.project} />
+        <AssetStore />
       </AssetStoreStateProvider>
     </AuthenticatedUserContext.Provider>
   </FixedHeightFlexContainer>

@@ -6,6 +6,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import WarningIcon from '@material-ui/icons/Warning';
 
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { IconContainer } from '../UI/IconContainer';
 import { ListItem } from '../UI/List';
 import TextField, {
@@ -17,6 +18,8 @@ import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import Text from '../UI/Text';
+import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 
 const styles = {
   noIndentNestedList: {
@@ -25,13 +28,12 @@ const styles = {
   itemTextField: {
     top: noMarginTextFieldInListItemTopOffset,
   },
+  dragAndDropItemContainer: { display: 'flex', flexDirection: 'column' },
 };
 
 type ProjectStructureItemProps = {|
+  id?: string,
   autoGenerateNestedIndicator?: boolean,
-  initiallyOpen?: boolean,
-  leftIcon?: React$Element<any>,
-  indentNestedItems?: boolean,
   renderNestedItems: () => Array<React$Element<any> | null>,
   primaryText: React.Node,
   error?: ?Error,
@@ -40,42 +42,41 @@ type ProjectStructureItemProps = {|
 |};
 
 export const ProjectStructureItem = ({
+  id,
   error,
-  leftIcon,
   onRefresh,
-  indentNestedItems,
   autoGenerateNestedIndicator,
-  initiallyOpen,
   open,
   primaryText,
   renderNestedItems,
 }: ProjectStructureItemProps) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <ListItem
+      id={id}
       open={open}
-      autoGenerateNestedIndicator={autoGenerateNestedIndicator}
-      initiallyOpen={initiallyOpen}
-      primaryText={primaryText}
+      primaryText={
+        <Text size="sub-title" noMargin>
+          {primaryText}
+        </Text>
+      }
+      initiallyOpen
+      autoGenerateNestedIndicator
       renderNestedItems={renderNestedItems}
       onReload={onRefresh}
-      style={{
-        backgroundColor: gdevelopTheme.listItem.groupBackgroundColor,
-        borderBottom: `1px solid ${gdevelopTheme.listItem.separatorColor}`,
-      }}
-      nestedListStyle={
-        indentNestedItems ? undefined : styles.noIndentNestedList
-      }
-      leftIcon={error ? <WarningIcon /> : leftIcon}
+      noPadding
+      nestedListStyle={styles.noIndentNestedList}
+      leftIcon={error ? <WarningIcon /> : undefined}
       displayReloadButton={!!error}
       reloadButtonTooltip={
-        <Trans>An error has occured in functions. Click to reload them.</Trans>
+        <Trans>An error has occurred in functions. Click to reload them.</Trans>
       }
     />
   );
 };
 
 type ItemProps = {|
+  id?: string,
+  data?: HTMLDataset,
   primaryText: string,
   textEndAdornment?: React.Node,
   editingName: boolean,
@@ -96,10 +97,17 @@ type ItemProps = {|
   canMoveDown: boolean,
   onMoveDown: () => void,
   buildExtraMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
-  style?: ?Object,
+  isLastItem: boolean,
+  dragAndDropProps: {|
+    DragSourceAndDropTarget: any => React.Node,
+    onBeginDrag: () => void,
+    onDrop: () => void,
+  |},
 |};
 
 export const Item = ({
+  id,
+  data,
   primaryText,
   textEndAdornment,
   editingName,
@@ -120,7 +128,8 @@ export const Item = ({
   canMoveDown,
   onMoveDown,
   buildExtraMenuTemplate,
-  style,
+  isLastItem,
+  dragAndDropProps: { DragSourceAndDropTarget, onBeginDrag, onDrop },
 }: ItemProps) => {
   const textField = React.useRef<?TextField>(null);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -173,72 +182,103 @@ export const Item = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <ListItem
-          style={{
-            borderBottom: `1px solid ${gdevelopTheme.listItem.separatorColor}`,
-            ...style,
+        <DragSourceAndDropTarget
+          beginDrag={() => {
+            onBeginDrag();
+            return {};
           }}
-          primaryText={label}
-          leftIcon={leftIcon}
-          displayMenuButton
-          buildMenuTemplate={(i18n: I18nType) => [
-            {
-              label: i18n._(t`Edit`),
-              click: onEdit,
-            },
-            ...(buildExtraMenuTemplate ? buildExtraMenuTemplate(i18n) : []),
-            { type: 'separator' },
-            {
-              label: i18n._(t`Rename`),
-              click: onEditName,
-            },
-            {
-              label: i18n._(t`Delete`),
-              click: onDelete,
-            },
-            {
-              label: i18n._(addLabel),
-              visible: !!onAdd,
-              click: onAdd,
-            },
-            { type: 'separator' },
-            {
-              label: i18n._(t`Copy`),
-              click: onCopy,
-            },
-            {
-              label: i18n._(t`Cut`),
-              click: onCut,
-            },
-            {
-              label: i18n._(t`Paste`),
-              enabled: canPaste(),
-              click: onPaste,
-            },
-            {
-              label: i18n._(t`Duplicate`),
-              click: onDuplicate,
-            },
-            { type: 'separator' },
-            {
-              label: i18n._(t`Move up`),
-              enabled: canMoveUp,
-              click: onMoveUp,
-            },
-            {
-              label: i18n._(t`Move down`),
-              enabled: canMoveDown,
-              click: onMoveDown,
-            },
-          ]}
-          onClick={() => {
-            // It's essential to discard clicks when editing the name,
-            // to avoid weird opening of an editor (accompanied with a
-            // closing of the project manager) when clicking on the text
-            // field.
-            if (!editingName) onEdit();
-          }}
-        />
+          canDrag={() => true}
+          canDrop={() => true}
+          drop={onDrop}
+        >
+          {({ connectDragSource, connectDropTarget, isOver, canDrop }) =>
+            connectDropTarget(
+              <div style={styles.dragAndDropItemContainer}>
+                {isOver && <DropIndicator canDrop={canDrop} zIndex={1} />}
+                {connectDragSource(
+                  <div style={styles.dragAndDropItemContainer}>
+                    <ListItem
+                      id={id}
+                      data={data}
+                      style={
+                        isLastItem
+                          ? undefined
+                          : {
+                              borderBottom: `1px solid ${
+                                gdevelopTheme.listItem.separatorColor
+                              }`,
+                            }
+                      }
+                      noPadding
+                      primaryText={label}
+                      leftIcon={leftIcon}
+                      displayMenuButton
+                      buildMenuTemplate={(i18n: I18nType) => [
+                        {
+                          label: i18n._(t`Edit`),
+                          click: onEdit,
+                        },
+                        ...(buildExtraMenuTemplate
+                          ? buildExtraMenuTemplate(i18n)
+                          : []),
+                        { type: 'separator' },
+                        {
+                          label: i18n._(t`Rename`),
+                          click: onEditName,
+                        },
+                        {
+                          label: i18n._(t`Delete`),
+                          click: onDelete,
+                        },
+                        {
+                          label: i18n._(addLabel),
+                          visible: !!onAdd,
+                          click: onAdd,
+                        },
+                        { type: 'separator' },
+                        {
+                          label: i18n._(t`Copy`),
+                          click: onCopy,
+                        },
+                        {
+                          label: i18n._(t`Cut`),
+                          click: onCut,
+                        },
+                        {
+                          label: i18n._(t`Paste`),
+                          enabled: canPaste(),
+                          click: onPaste,
+                        },
+                        {
+                          label: i18n._(t`Duplicate`),
+                          click: onDuplicate,
+                        },
+                        { type: 'separator' },
+                        {
+                          label: i18n._(t`Move up`),
+                          enabled: canMoveUp,
+                          click: onMoveUp,
+                        },
+                        {
+                          label: i18n._(t`Move down`),
+                          enabled: canMoveDown,
+                          click: onMoveDown,
+                        },
+                      ]}
+                      onClick={() => {
+                        // It's essential to discard clicks when editing the name,
+                        // to avoid weird opening of an editor (accompanied with a
+                        // closing of the project manager) when clicking on the text
+                        // field.
+                        if (!editingName) onEdit();
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            )
+          }
+        </DragSourceAndDropTarget>
       )}
     </I18n>
   );
@@ -261,6 +301,12 @@ type EventFunctionExtensionItemProps = {|
   onMoveUp: () => void,
   canMoveDown: boolean,
   onMoveDown: () => void,
+  isLastItem: boolean,
+  dragAndDropProps: {|
+    DragSourceAndDropTarget: any => React.Node,
+    onBeginDrag: () => void,
+    onDrop: () => void,
+  |},
 |};
 
 export const EventFunctionExtensionItem = ({
@@ -280,6 +326,8 @@ export const EventFunctionExtensionItem = ({
   onMoveUp,
   canMoveDown,
   onMoveDown,
+  isLastItem,
+  dragAndDropProps,
 }: EventFunctionExtensionItemProps) => {
   const name = eventsFunctionsExtension.getName();
   const iconUrl = eventsFunctionsExtension.getIconUrl();
@@ -316,6 +364,8 @@ export const EventFunctionExtensionItem = ({
       onMoveUp={onMoveUp}
       canMoveDown={canMoveDown}
       onMoveDown={onMoveDown}
+      isLastItem={isLastItem}
+      dragAndDropProps={dragAndDropProps}
     />
   );
 };

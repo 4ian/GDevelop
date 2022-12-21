@@ -15,7 +15,7 @@ import {
 } from '../Utils/GDevelopServices/Asset';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
+import { LineStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { AssetStoreContext } from './AssetStoreContext';
 import Window from '../Utils/Window';
@@ -35,6 +35,11 @@ import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuth
 import AuthorizedAssetImage from './PrivateAssets/AuthorizedAssetImage';
 import { MarkdownText } from '../UI/MarkdownText';
 import Paper from '../UI/Paper';
+import PublicProfileContext from '../Profile/PublicProfileContext';
+import {
+  getUserPublicProfilesByIds,
+  type UserPublicProfile,
+} from '../Utils/GDevelopServices/User';
 
 const FIXED_HEIGHT = 250;
 const FIXED_WIDTH = 300;
@@ -78,7 +83,6 @@ const makeFirstLetterUppercase = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
 type Props = {|
-  project: gdProject,
   onTagSelection: (tag: string) => void,
   assetShortHeader: AssetShortHeader,
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
@@ -104,13 +108,7 @@ export type AssetDetailsInterface = {|
 
 export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
   (
-    {
-      project,
-      onTagSelection,
-      assetShortHeader,
-      onOpenDetails,
-      onAssetLoaded,
-    }: Props,
+    { onTagSelection, assetShortHeader, onOpenDetails, onAssetLoaded }: Props,
     ref
   ) => {
     const {
@@ -131,6 +129,10 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
     const { fetchPrivateAsset } = React.useContext(
       PrivateAssetsAuthorizationContext
     );
+    const { openUserPublicProfile } = React.useContext(PublicProfileContext);
+    const [authorPublicProfiles, setAuthorPublicProfiles] = React.useState<
+      UserPublicProfile[]
+    >([]);
 
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
@@ -204,6 +206,33 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
       [loadAsset]
     );
 
+    const loadAuthorPublicProfiles = React.useCallback(
+      async () => {
+        try {
+          const authorIds: Array<string> = (asset && asset.authorIds) || [];
+          if (authorIds.length === 0) return;
+          const userPublicProfileByIds = await getUserPublicProfilesByIds(
+            authorIds
+          );
+          const userPublicProfiles = Object.keys(userPublicProfileByIds).map(
+            id => userPublicProfileByIds[id]
+          );
+          setAuthorPublicProfiles(userPublicProfiles);
+        } catch (error) {
+          // Catch error, but don't display it to the user.
+          console.error('Error while loading author public profiles:', error);
+        }
+      },
+      [asset]
+    );
+
+    React.useEffect(
+      () => {
+        loadAuthorPublicProfiles();
+      },
+      [loadAuthorPublicProfiles]
+    );
+
     const assetAuthors: ?Array<Author> =
       asset && authors
         ? asset.authors
@@ -212,6 +241,13 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
             })
             .filter(Boolean)
         : [];
+    const areAuthorsLoading =
+      !asset || // Asset not loaded.
+      (asset.authors.length > 0 && !authors) || // Authors not loaded.
+      (asset.authorIds && // User public profiles not loaded.
+        authorPublicProfiles.length > 0 &&
+        authorPublicProfiles.length === 0);
+
     const assetLicense =
       asset && licenses
         ? licenses.find(({ name }) => name === asset.license)
@@ -246,17 +282,18 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
         <Column expand noMargin>
           <Line justifyContent="space-between" noMargin>
             <Column>
-              <Line alignItems="baseline" noMargin>
+              <LineStackLayout alignItems="baseline" noMargin>
                 <Text size="block-title" displayInlineAsSpan>
                   {assetShortHeader.name}
                 </Text>
-                <Spacer />
-                {asset && (
-                  <Text size="body">
-                    <Trans>by</Trans>{' '}
+                {!areAuthorsLoading && (
+                  <LineStackLayout noMargin>
+                    <Text size="body">
+                      <Trans>by</Trans>
+                    </Text>
                     {!!assetAuthors &&
-                      assetAuthors.map(author => {
-                        return (
+                      assetAuthors.map(author => (
+                        <Text size="body">
                           <Link
                             key={author.name}
                             href={author.website}
@@ -266,11 +303,29 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                           >
                             {author.name}
                           </Link>
+                        </Text>
+                      ))}
+                    {!!authorPublicProfiles.length &&
+                      authorPublicProfiles.map(userPublicProfile => {
+                        const username =
+                          userPublicProfile.username || 'GDevelop user';
+                        return (
+                          <Text size="body">
+                            <Link
+                              key={userPublicProfile.id}
+                              href="#"
+                              onClick={() =>
+                                openUserPublicProfile(userPublicProfile.id)
+                              }
+                            >
+                              {username}
+                            </Link>
+                          </Text>
                         );
                       })}
-                  </Text>
+                  </LineStackLayout>
                 )}
-              </Line>
+              </LineStackLayout>
               <Line alignItems="center">
                 <div style={{ flexWrap: 'wrap' }}>
                   {assetShortHeader.tags.slice(0, 5).map((tag, index) => (
@@ -322,7 +377,6 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                           return resource ? resource.file : '';
                         }}
                         isImageResourceSmooth={() => isImageResourceSmooth}
-                        project={project}
                         timeBetweenFrames={direction.timeBetweenFrames}
                         isLooping // Always loop in the asset store.
                         hideCheckeredBackground
@@ -463,6 +517,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
           </ResponsiveLineStackLayout>
           {asset && (
             <Column expand>
+              <Spacer />
               <Line noMargin>
                 <Text size="block-title" displayInlineAsSpan>
                   <Trans>You might like</Trans>

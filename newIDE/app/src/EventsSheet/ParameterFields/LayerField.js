@@ -23,6 +23,11 @@ export default class LayerField extends Component<ParameterFieldProps, {||}> {
 
     return (
       <GenericExpressionField
+        id={
+          this.props.parameterIndex !== undefined
+            ? `parameter-${this.props.parameterIndex}-layer-field`
+            : undefined
+        }
         expressionType="string"
         onGetAdditionalAutocompletions={expression =>
           layerNames.filter(

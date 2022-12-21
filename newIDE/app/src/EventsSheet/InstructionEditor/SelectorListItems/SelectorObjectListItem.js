@@ -9,6 +9,7 @@ import {
   getObjectListItemKey,
 } from './Keys';
 import HighlightedText from '../../../UI/Search/HighlightedText';
+import { type HTMLDataset } from '../../../Utils/HTMLDataset';
 
 type Props = {|
   project: gdProject,
@@ -18,6 +19,7 @@ type Props = {|
   selectedValue: ?string,
   matchesCoordinates: number[][],
   id?: ?string,
+  data?: HTMLDataset,
 |};
 
 export const renderObjectListItem = ({
@@ -28,11 +30,13 @@ export const renderObjectListItem = ({
   selectedValue,
   matchesCoordinates,
   id,
+  data,
 }: Props) => {
   const objectName: string = objectWithContext.object.getName();
   return (
     <ListItem
       id={id}
+      data={data}
       key={getObjectListItemKey(objectWithContext)}
       selected={
         selectedValue === getObjectOrObjectGroupListItemValue(objectName)

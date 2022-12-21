@@ -149,7 +149,7 @@ const FeedbackCard = ({
                     )}
                   </Text>
                 )}
-                <BackgroundText style={styles.backgroundText}>
+                <BackgroundText style={styles.backgroundText} allowSelection>
                   {comment.playerName}
                 </BackgroundText>
               </Column>
@@ -166,7 +166,9 @@ const FeedbackCard = ({
               </ResponsiveLineStackLayout>
             )}
             <LargeSpacer />
-            <Text style={styles.textComment}>{comment.text}</Text>
+            <Text style={styles.textComment} allowSelection>
+              {comment.text}
+            </Text>
           </Column>
         </Card>
       )}

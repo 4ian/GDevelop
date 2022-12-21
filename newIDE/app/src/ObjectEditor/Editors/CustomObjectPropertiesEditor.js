@@ -97,7 +97,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                   const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
                     childObject.getName()
                   );
-                  const editorConfiguration = ObjectsEditorService.getEditorConfiguration(
+                  const editorConfiguration = ObjectsEditorService.getEditorConfigurationForCustomObject(
                     project,
                     childObjectConfiguration.getType()
                   );

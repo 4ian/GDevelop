@@ -9,11 +9,13 @@ const path = require('path');
 const {
   gdevelopWikiUrlRoot,
   getHelpLink,
-  generateReadMoreLink,
   getExtensionFolderName,
   improperlyFormattedHelpPaths,
 } = require('./lib/WikiHelpLink');
 const { convertMarkdownToDokuWikiMarkdown } = require('./lib/DokuwikiHelpers');
+const shell = require('shelljs');
+
+/** @typedef {{ tier: 'community' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number, helpPath: string, description: string, iconUrl: string}} ExtensionHeader */
 
 const extensionShortHeadersUrl =
   'https://api.gdevelop-app.com/asset/extension-short-header';
@@ -58,31 +60,31 @@ const generateAuthorNamesWithLinks = authors => {
 /**
  * Return the list of all extensions and their associated short headers
  * (useful as containing author public profiles information).
+ * @returns {Promise<Array<ExtensionHeader>>} A promise to all extension headers
  */
-const getAllExtensionAndExtensionShortHeaders = async () => {
+const getAllExtensionHeaders = async () => {
   const response = await axios.get(extensionShortHeadersUrl);
   const extensionShortHeaders = response.data;
   if (!extensionShortHeaders.length) {
     throw new Error('Unexpected response from the extension endpoint.');
   }
 
-  const extensions = await Promise.all(
+  const extensionHeaders = await Promise.all(
     extensionShortHeaders.map(async extensionShortHeader => {
-      const response = await axios.get(extensionShortHeader.url);
-      const extension = response.data;
-      if (!extension) {
+      const response = await axios.get(extensionShortHeader.headerUrl);
+      const extensionHeader = response.data;
+      if (!extensionHeader) {
         throw new Error(
-          `Unexpected response when fetching an extension (${
-            extensionShortHeader.url
+          `Unexpected response when fetching an extension header (${
+            extensionShortHeader.headerUrl
           }).`
         );
       }
-
-      return { extensionShortHeader, extension };
+      return { ...extensionHeader, ...extensionShortHeader};
     })
   );
 
-  return extensions;
+  return extensionHeaders;
 };
 
 const groupBy = (array, getKey) => {
@@ -97,46 +99,56 @@ const groupBy = (array, getKey) => {
     group.push(element);
   }
   return table;
-}
+};
 
-const sortKeys = (table) => {
+const sortKeys = table => {
   const sortedTable = {};
   for (const key of Object.keys(table).sort()) {
     sortedTable[key] = table[key];
   }
   return sortedTable;
-}
+};
 
-const createExtensionReferencePage = async (extension, extensionShortHeader, isCommunity) => {
-  const folderName = getExtensionFolderName(extension.name);
+/**
+ * Create a page for an extension.
+ * @param {ExtensionHeader} extensionHeader The extension header
+ * @param {boolean} isCommunity The tier
+ */
+const createExtensionReferencePage = async (
+  extensionHeader,
+  isCommunity
+) => {
+  const folderName = getExtensionFolderName(extensionHeader.name);
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
-  const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;
+  const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
   const authorNamesWithLinks = generateAuthorNamesWithLinks(
-    extensionShortHeader.authors || []
+    extensionHeader.authors || []
   );
 
   const referencePageContent =
-    `# ${extension.fullName}` +
+    `# ${extensionHeader.fullName}` +
     '\n\n' +
-    generateSvgImageIcon(extension.previewIconUrl) +
+    generateSvgImageIcon(extensionHeader.previewIconUrl) +
     '\n' +
-    `${extension.shortDescription}\n` +
+    `${extensionHeader.shortDescription}\n` +
     '\n' +
     `**Authors and contributors** to this community extension: ${authorNamesWithLinks}.\n` +
     '\n' +
-    (isCommunity ? `<note important>
+    (isCommunity
+      ? `<note important>
 This is an extension made by a community member — but not reviewed
 by the GDevelop extension team. As such, we can't guarantee it
 meets all the quality standards of official extensions. In case of
 doubt, contact the author to know more about what the extension
 does or inspect its content before using it.
-</note>\n\n` : '') +
+</note>\n\n`
+      : '') +
     '---\n' +
     '\n' +
-    convertMarkdownToDokuWikiMarkdown(extension.description) +
+    convertMarkdownToDokuWikiMarkdown(extensionHeader.description) +
     '\n' +
-    (extension.helpPath ? `\n[[${helpPageUrl}|Read more...]]\n` : ``) +
-    generateExtensionFooterText(extension.fullName);
+    (extensionHeader.helpPath ? `\n[[${helpPageUrl}|Read more...]]\n` : ``) +
+    generateExtensionFooterText(extensionHeader.fullName);
 
   const extensionReferenceFilePath = path.join(
     extensionsRootPath,
@@ -150,47 +162,57 @@ does or inspect its content before using it.
   console.info(`ℹ️ File generated: ${extensionReferenceFilePath}`);
 };
 
-const generateExtensionSection = (extension, extensionShortHeader) => {
-  const folderName = getExtensionFolderName(extension.name);
+/**
+ * Generate a section for an extension.
+ * @param {ExtensionHeader} extensionHeader The extension header
+ */
+const generateExtensionSection = (extensionHeader) => {
+  const folderName = getExtensionFolderName(extensionHeader.name);
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
-  const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;
+  const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
 
   return (
-    `#### ${extension.fullName}\n` +
+    `#### ${extensionHeader.fullName}\n` +
     // Use the `&.png?` syntax to force Dokuwiki to display the image.
     // See https://www.dokuwiki.org/images.
-    generateSvgImageIcon(extension.previewIconUrl) +
+    generateSvgImageIcon(extensionHeader.previewIconUrl) +
     '\n' +
-    extension.shortDescription +
+    extensionHeader.shortDescription +
     '\n\n' +
     // Link to help page or to reference if none.
     `[[${helpPageUrl}|Read more...]]` +
     (helpPageUrl !== referencePageUrl
       ? ` ([[${referencePageUrl}|reference]])`
       : '') +
-    '\n\n');
+    '\n\n'
+  );
 };
 
-const generateAllExtensionsSections = (extensionsAndExtensionShortHeaders) => {
-  let extensionSectionsContent = "";
-  const extensionsByCategory = sortKeys(groupBy(
+const generateAllExtensionsSections = extensionsAndExtensionShortHeaders => {
+  let extensionSectionsContent = '';
+  const extensionsByCategory = sortKeys(
+    groupBy(
       extensionsAndExtensionShortHeaders,
-      pair => pair.extension.category || 'General'));
+      pair => pair.category || 'General'
+    )
+  );
   for (const category in extensionsByCategory) {
-      const extensions = extensionsByCategory[category];
+    const extensions = extensionsByCategory[category];
 
-      extensionSectionsContent += `### ${category}\n\n`;
-      for (const { extension, extensionShortHeader } of extensions) {
-        extensionSectionsContent += generateExtensionSection(extension, extensionShortHeader);
-      }
+    extensionSectionsContent += `### ${category}\n\n`;
+    for (const extensionHeader of extensions) {
+      extensionSectionsContent += generateExtensionSection(
+        extensionHeader
+      );
+    }
   }
   return extensionSectionsContent;
-}
+};
 
 (async () => {
   try {
     console.info(`ℹ️ Loading all community extensions...`);
-    const extensionsAndExtensionShortHeaders = await getAllExtensionAndExtensionShortHeaders();
+    const extensionHeaders = await getAllExtensionHeaders();
 
     let indexPageContent = `# Extensions
 
@@ -200,21 +222,23 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
 
 `;
 
-    const reviewedExtensionsAndExtensionShortHeaders =
-        extensionsAndExtensionShortHeaders.filter(
-          pair => pair.extensionShortHeader.tier !== 'community');
-    const communityExtensionsAndExtensionShortHeaders =
-        extensionsAndExtensionShortHeaders.filter(
-          pair => pair.extensionShortHeader.tier === 'community');
+    const reviewedExtensionHeaders = extensionHeaders.filter(
+      pair => pair.tier !== 'community'
+    );
+    const communityExtensionHeaders = extensionHeaders.filter(
+      pair => pair.tier === 'community'
+    );
 
     indexPageContent += '## Reviewed extensions\n\n';
-    for (const {
-      extension,
-      extensionShortHeader,
-    } of reviewedExtensionsAndExtensionShortHeaders) {
-      await createExtensionReferencePage(extension, extensionShortHeader, false);
+    for (const extensionHeader of reviewedExtensionHeaders) {
+      await createExtensionReferencePage(
+        extensionHeader,
+        false
+      );
     }
-    indexPageContent += generateAllExtensionsSections(reviewedExtensionsAndExtensionShortHeaders);
+    indexPageContent += generateAllExtensionsSections(
+      reviewedExtensionHeaders
+    );
 
     indexPageContent += `## Community extensions
 
@@ -225,13 +249,12 @@ doubt, contact the author to know more about what the extension
 does or inspect its content before using it.
 
 `;
-    for (const {
-      extension,
-      extensionShortHeader,
-    } of communityExtensionsAndExtensionShortHeaders) {
-      await createExtensionReferencePage(extension, extensionShortHeader, true);
+    for (const extensiontHeader of communityExtensionHeaders) {
+      await createExtensionReferencePage(extensiontHeader, true);
     }
-    indexPageContent += generateAllExtensionsSections(communityExtensionsAndExtensionShortHeaders);
+    indexPageContent += generateAllExtensionsSections(
+      communityExtensionHeaders
+    );
 
     indexPageContent += `
 ## Make your own extension
@@ -250,6 +273,7 @@ Read more about this:
       console.info(`✅ Done. File generated: ${extensionsFilePath}`);
     } catch (err) {
       console.error('❌ Error while writing output', err);
+      shell.exit(1);
     }
 
     if (improperlyFormattedHelpPaths.size > 0) {
@@ -262,5 +286,6 @@ Read more about this:
     }
   } catch (err) {
     console.error('❌ Error while fetching data', err);
+    shell.exit(1);
   }
 })();

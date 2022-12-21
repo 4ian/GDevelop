@@ -25,6 +25,11 @@ export default class SceneNameField extends Component<
 
     return (
       <GenericExpressionField
+        id={
+          this.props.parameterIndex !== undefined
+            ? `parameter-${this.props.parameterIndex}-scene-field`
+            : undefined
+        }
         expressionType="string"
         onGetAdditionalAutocompletions={expression =>
           layoutNames.filter(

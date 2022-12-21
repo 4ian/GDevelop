@@ -84,6 +84,8 @@ declare class libGDevelop {
   EffectsContainer: Class<gdEffectsContainer>;
   Layer: Class<gdLayer>;
   PropertyDescriptor: Class<gdPropertyDescriptor>;
+  MeasurementUnit: Class<gdMeasurementUnit>;
+  MeasurementBaseUnit: Class<gdMeasurementBaseUnit>;
   NamedPropertyDescriptor: Class<gdNamedPropertyDescriptor>;
   MapStringPropertyDescriptor: Class<gdMapStringPropertyDescriptor>;
   MapStringSerializerValue: Class<gdMapStringSerializerValue>;
@@ -115,6 +117,7 @@ declare class libGDevelop {
   InstructionSentenceFormatter: Class<gdInstructionSentenceFormatter>;
   ExtraInformation: Class<gdExtraInformation>;
   ExpressionCodeGenerationInformation: Class<gdExpressionCodeGenerationInformation>;
+  ParameterOptions: Class<gdParameterOptions>;
   InstructionMetadata: Class<gdInstructionMetadata>;
   ExpressionMetadata: Class<gdExpressionMetadata>;
   MultipleInstructionMetadata: Class<gdMultipleInstructionMetadata>;
@@ -171,6 +174,7 @@ declare class libGDevelop {
   EventsFunction_FunctionType: Class<EventsFunction_FunctionType>;
   EventsFunction: Class<gdEventsFunction>;
   EventsFunctionsContainer: Class<gdEventsFunctionsContainer>;
+  AbstractEventsBasedEntity: Class<gdAbstractEventsBasedEntity>;
   EventsBasedBehavior: Class<gdEventsBasedBehavior>;
   EventsBasedBehaviorsList: Class<gdEventsBasedBehaviorsList>;
   EventsBasedObject: Class<gdEventsBasedObject>;

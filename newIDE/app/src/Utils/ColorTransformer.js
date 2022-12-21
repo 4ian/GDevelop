@@ -38,6 +38,15 @@ export const rgbStringToHexNumber = (rgbString: string) => {
 };
 
 /**
+ * Convert a RGB string ("rr;gg;bb") to a Hex string (#000000).
+ */
+export const rgbStringToHexString = (rgbString: string) => {
+  const rgbColor = rgbStringAndAlphaToRGBColor(rgbString);
+  if (!rgbColor) return '#000000';
+  return rgbColorToHex(rgbColor.r, rgbColor.g, rgbColor.b);
+};
+
+/**
  * Convert a RGB string ("rrr;ggg;bbb") or a Hex string ("#112244") to a Hex number.
  */
 export const rgbOrHexToHexNumber = (value: string): number => {
@@ -203,4 +212,12 @@ export const rgbToHsl = (r: number, g: number, b: number): number[] => {
   }
 
   return [h, s, l];
+};
+
+/**
+ * Return true if the specified color is mostly light (and so a dark text/shape
+ * should be displayed on it for being readable).
+ */
+export const isLightRgbColor = (rgbColor: RGBColor) => {
+  return rgbColor.r * 0.299 + rgbColor.g * 0.587 + rgbColor.b * 0.114 > 186;
 };

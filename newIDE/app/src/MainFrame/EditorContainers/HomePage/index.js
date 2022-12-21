@@ -12,15 +12,17 @@ import BuildSection, { type BuildSectionInterface } from './BuildSection';
 import LearnSection from './LearnSection';
 import PlaySection from './PlaySection';
 import CommunitySection from './CommunitySection';
+import StoreSection from './StoreSection';
 import { TutorialContext } from '../../../Tutorial/TutorialContext';
 import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { HomePageHeader } from './HomePageHeader';
-import { HomePageMenu, type HomeTab } from './HomePageMenu';
+import { getInitialHomeTab, HomePageMenu, type HomeTab } from './HomePageMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
+import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
 
 type Props = {|
   project: ?gdProject,
@@ -30,6 +32,7 @@ type Props = {|
   project: ?gdProject,
   setToolbar: (?React.Node) => void,
   storageProviders: Array<StorageProvider>,
+  initialTab?: ?string,
 
   // Project opening
   canOpen: boolean,
@@ -42,12 +45,15 @@ type Props = {|
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   onOpenProfile: () => void,
-  onOpenOnboardingDialog: () => void,
+  selectInAppTutorial: (tutorialId: string) => void,
   onOpenPreferences: () => void,
   onOpenAbout: () => void,
 
   // Project creation
   onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
+
+  resourceManagementProps: ResourceManagementProps,
+  canInstallPrivateAsset: () => boolean,
 |};
 
 type HomePageEditorInterface = {|
@@ -71,11 +77,14 @@ export const HomePage = React.memo<Props>(
         onOpenLanguageDialog,
         onOpenProfile,
         setToolbar,
-        onOpenOnboardingDialog,
+        selectInAppTutorial,
         onOpenPreferences,
         onOpenAbout,
         isActive,
         storageProviders,
+        initialTab,
+        resourceManagementProps,
+        canInstallPrivateAsset,
       }: Props,
       ref
     ) => {
@@ -123,17 +132,34 @@ export const HomePage = React.memo<Props>(
         [isActive]
       );
 
-      const getProject = () => {
+      const getProject = React.useCallback(() => {
         return undefined;
-      };
+      }, []);
 
-      const updateToolbar = () => {
-        if (setToolbar) setToolbar(null);
-      };
+      const updateToolbar = React.useCallback(
+        () => {
+          if (setToolbar)
+            setToolbar(
+              <HomePageHeader
+                hasProject={!!project}
+                onOpenLanguageDialog={onOpenLanguageDialog}
+                onOpenProfile={onOpenProfile}
+                onOpenProjectManager={onOpenProjectManager}
+              />
+            );
+        },
+        [
+          setToolbar,
+          onOpenLanguageDialog,
+          onOpenProfile,
+          onOpenProjectManager,
+          project,
+        ]
+      );
 
-      const forceUpdateEditor = () => {
+      const forceUpdateEditor = React.useCallback(() => {
         // No updates to be done
-      };
+      }, []);
 
       React.useImperativeHandle(ref, () => ({
         getProject,
@@ -141,21 +167,15 @@ export const HomePage = React.memo<Props>(
         forceUpdateEditor,
       }));
 
-      const initialTab = showGetStartedSection ? 'get-started' : 'build';
-
-      const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
+      const [activeTab, setActiveTab] = React.useState<HomeTab>(() =>
+        getInitialHomeTab(initialTab, showGetStartedSection)
+      );
 
       return (
         <I18n>
           {({ i18n }) => (
             <>
-              <Column expand noMargin>
-                <HomePageHeader
-                  project={project}
-                  onOpenLanguageDialog={onOpenLanguageDialog}
-                  onOpenProfile={onOpenProfile}
-                  onOpenProjectManager={onOpenProjectManager}
-                />
+              <Column expand noMargin noOverflowParent>
                 <Line expand noMargin useFullHeight>
                   <HomePageMenu
                     activeTab={activeTab}
@@ -163,7 +183,7 @@ export const HomePage = React.memo<Props>(
                     onOpenPreferences={onOpenPreferences}
                     onOpenAbout={onOpenAbout}
                   />
-                  <Column noMargin expand>
+                  <Column noMargin expand noOverflowParent>
                     {activeTab !== 'community' && !!announcements && (
                       <AnnouncementsFeed canClose level="urgent" addMargins />
                     )}
@@ -173,7 +193,7 @@ export const HomePage = React.memo<Props>(
                         onCreateProject={() =>
                           onCreateProject(/*exampleShortHeader=*/ null)
                         }
-                        onOpenOnboardingDialog={onOpenOnboardingDialog}
+                        selectInAppTutorial={selectInAppTutorial}
                         showGetStartedSection={showGetStartedSection}
                         setShowGetStartedSection={setShowGetStartedSection}
                       />
@@ -199,7 +219,6 @@ export const HomePage = React.memo<Props>(
                     )}
                     {activeTab === 'learn' && (
                       <LearnSection
-                        onOpenOnboardingDialog={onOpenOnboardingDialog}
                         onCreateProject={() =>
                           onCreateProject(/*exampleShortHeader=*/ null)
                         }
@@ -209,6 +228,13 @@ export const HomePage = React.memo<Props>(
                     )}
                     {activeTab === 'play' && <PlaySection />}
                     {activeTab === 'community' && <CommunitySection />}
+                    {activeTab === 'shop' && (
+                      <StoreSection
+                        project={project}
+                        resourceManagementProps={resourceManagementProps}
+                        canInstallPrivateAsset={canInstallPrivateAsset}
+                      />
+                    )}
                   </Column>
                 </Line>
               </Column>
@@ -241,11 +267,16 @@ export const renderHomePageContainer = (
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
-    onOpenOnboardingDialog={props.onOpenOnboardingDialog}
+    selectInAppTutorial={props.selectInAppTutorial}
     onOpenPreferences={props.onOpenPreferences}
     onOpenAbout={props.onOpenAbout}
     storageProviders={
       (props.extraEditorProps && props.extraEditorProps.storageProviders) || []
     }
+    initialTab={
+      (props.extraEditorProps && props.extraEditorProps.initialTab) || null
+    }
+    resourceManagementProps={props.resourceManagementProps}
+    canInstallPrivateAsset={props.canInstallPrivateAsset}
   />
 );

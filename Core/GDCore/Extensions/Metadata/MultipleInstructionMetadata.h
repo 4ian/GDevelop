@@ -8,6 +8,8 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/String.h"
+#include "ParameterOptions.h"
+
 namespace gd {}  // namespace gd
 
 namespace gd {
@@ -32,8 +34,7 @@ class GD_CORE_API MultipleInstructionMetadata {
     return MultipleInstructionMetadata(expression, condition, action);
   }
   static MultipleInstructionMetadata WithConditionAndAction(
-      gd::InstructionMetadata &condition,
-      gd::InstructionMetadata &action) {
+      gd::InstructionMetadata &condition, gd::InstructionMetadata &action) {
     return MultipleInstructionMetadata(condition, action);
   }
 
@@ -83,7 +84,8 @@ class GD_CORE_API MultipleInstructionMetadata {
   /**
    * \see gd::InstructionMetadata::SetParameterExtraInfo
    */
-  MultipleInstructionMetadata &SetParameterExtraInfo(const gd::String &defaultValue) {
+  MultipleInstructionMetadata &SetParameterExtraInfo(
+      const gd::String &defaultValue) {
     if (expression) expression->SetParameterExtraInfo(defaultValue);
     if (condition) condition->SetParameterExtraInfo(defaultValue);
     if (action) action->SetParameterExtraInfo(defaultValue);
@@ -126,9 +128,11 @@ class GD_CORE_API MultipleInstructionMetadata {
    * \see gd::InstructionMetadata::UseStandardOperatorParameters
    * \see gd::InstructionMetadata::UseStandardRelationalOperatorParameters
    */
-  MultipleInstructionMetadata &UseStandardParameters(const gd::String &type, const gd::String& typeExtraInfo = "") {
-    if (condition) condition->UseStandardRelationalOperatorParameters(type, typeExtraInfo);
-    if (action) action->UseStandardOperatorParameters(type, typeExtraInfo);
+  MultipleInstructionMetadata &UseStandardParameters(
+      const gd::String &type, const ParameterOptions &options) {
+    if (condition)
+      condition->UseStandardRelationalOperatorParameters(type, options);
+    if (action) action->UseStandardOperatorParameters(type, options);
     return *this;
   }
 
@@ -167,13 +171,12 @@ class GD_CORE_API MultipleInstructionMetadata {
   /**
    * \brief Get the files that must be included to use the instruction.
    */
-  const std::vector<gd::String>& GetIncludeFiles() const {
+  const std::vector<gd::String> &GetIncludeFiles() const {
     if (expression)
       return expression->GetCodeExtraInformation().GetIncludeFiles();
     if (condition)
       return condition->GetCodeExtraInformation().GetIncludeFiles();
-    if (action)
-      return action->GetCodeExtraInformation().GetIncludeFiles();
+    if (action) return action->GetCodeExtraInformation().GetIncludeFiles();
     // It can't actually happen.
     throw std::logic_error("no instruction metadata");
   }
@@ -182,12 +185,9 @@ class GD_CORE_API MultipleInstructionMetadata {
    * \see gd::InstructionMetadata::SetPrivate
    */
   MultipleInstructionMetadata &SetPrivate() {
-    if (expression)
-      expression->SetPrivate();
-    if (condition)
-      condition->SetPrivate();
-    if (action)
-      action->SetPrivate();
+    if (expression) expression->SetPrivate();
+    if (condition) condition->SetPrivate();
+    if (action) action->SetPrivate();
     return *this;
   }
 

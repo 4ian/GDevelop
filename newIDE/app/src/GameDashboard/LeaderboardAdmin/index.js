@@ -277,7 +277,7 @@ export const LeaderboardAdmin = ({
   const onListLeaderboards = React.useCallback(
     () => {
       const fetchAndHandleError = async () => {
-        setIsLoading(true);
+        setIsRequestPending(true); // We only set the local loading state here to avoid blocking the dialog buttons on first load.
         setApiError(null);
         try {
           await listLeaderboards();
@@ -297,12 +297,12 @@ export const LeaderboardAdmin = ({
             ),
           });
         } finally {
-          setIsLoading(false);
+          setIsRequestPending(false);
         }
       };
       fetchAndHandleError();
     },
-    [setIsLoading, listLeaderboards]
+    [listLeaderboards]
   );
 
   const onFetchLeaderboardEntries = async () => {
@@ -367,6 +367,7 @@ export const LeaderboardAdmin = ({
     const answer = await showConfirmation({
       title: t`Reset leaderboard ${currentLeaderboard.name}`,
       message: t`All current entries will be deleted, are you sure you want to reset this leaderboard? This can't be undone.`,
+      confirmButtonLabel: t`Reset leaderboard`,
     });
     if (!answer) return;
 
@@ -401,6 +402,7 @@ export const LeaderboardAdmin = ({
     const answer = await showDeleteConfirmation({
       title: t`Delete leaderboard ${currentLeaderboard.name}`,
       message: t`Are you sure you want to delete this leaderboard and all of its entries? This can't be undone.`,
+      confirmButtonLabel: t`Delete Leaderboard`,
       confirmText: currentLeaderboard.name,
       fieldMessage: t`Type the name of the leaderboard:`,
     });
@@ -434,6 +436,7 @@ export const LeaderboardAdmin = ({
     const answer = await showConfirmation({
       title: t`Delete score ${entry.score} from ${entry.playerName}`,
       message: t`Are you sure you want to delete this entry? This can't be undone.`,
+      confirmButtonLabel: t`Delete Entry`,
     });
     if (!answer) return;
 
@@ -564,6 +567,7 @@ export const LeaderboardAdmin = ({
           onAction={() => {
             onCreateLeaderboard();
           }}
+          actionButtonId="add-new-leaderboard-button"
           isLoading={isRequestPending}
         />
       </Line>
@@ -579,6 +583,7 @@ export const LeaderboardAdmin = ({
       text: isEditingName ? (
         <Line alignItems="center" expand noMargin>
           <TextField
+            id="edit-name-field"
             ref={newNameTextFieldRef}
             margin="none"
             style={styles.leaderboardNameTextField}
@@ -634,6 +639,7 @@ export const LeaderboardAdmin = ({
           tooltip={isEditingName ? t`Save` : t`Rename`}
           disabled={isRequestPending}
           edge="end"
+          id={isEditingName ? 'save-name-button' : 'edit-name-button'}
         >
           {isEditingName ? (
             isRequestPending ? (
@@ -888,7 +894,12 @@ export const LeaderboardAdmin = ({
                 limits={limits}
               />
             )}
-            <ResponsiveLineStackLayout noMargin expand noColumnMargin>
+            <ResponsiveLineStackLayout
+              noMargin
+              expand
+              noColumnMargin
+              id="leaderboard-administration-panel"
+            >
               <div style={styles.leftColumn}>
                 <Paper
                   elevation={3}
@@ -1004,7 +1015,6 @@ export const LeaderboardAdmin = ({
               >
                 <Line alignItems="center" justifyContent="flex-end">
                   <Toggle
-                    size="small"
                     labelPosition="left"
                     toggled={displayOnlyBestEntry}
                     onToggle={(e, newValue) =>

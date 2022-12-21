@@ -1,9 +1,10 @@
 // @flow
+import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
 import Refresh from '@material-ui/icons/Refresh';
-import * as React from 'react';
 import { type StorageProvider, type SaveAsLocation } from '../ProjectsStorage';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import FlatButton from '../UI/FlatButton';
 import TextField from '../UI/TextField';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
@@ -12,6 +13,7 @@ import { type NewProjectSetup } from './CreateProjectDialog';
 import IconButton from '../UI/IconButton';
 import { ColumnStackLayout } from '../UI/Layout';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
+import { findEmptyPathInWorkspaceFolder } from '../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import CreateProfile from '../Profile/CreateProfile';
@@ -24,7 +26,12 @@ import {
 } from '../MainFrame/EditorContainers/HomePage/BuildSection/MaxProjectCountAlertMessage';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import optionalRequire from '../Utils/OptionalRequire';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import Checkbox from '../UI/Checkbox';
+
 const electron = optionalRequire('electron');
+const remote = optionalRequire('@electron/remote');
+const app = remote ? remote.app : null;
 
 type Props = {|
   isOpening?: boolean,
@@ -33,12 +40,43 @@ type Props = {|
   sourceExampleName?: string,
   storageProviders: Array<StorageProvider>,
   authenticatedUser: AuthenticatedUser,
+  isFromExample: boolean,
 |};
 
 const generateProjectName = (sourceExampleName: ?string) =>
   sourceExampleName
     ? `${generateName()} (${sourceExampleName})`
     : generateName();
+
+type ResolutionOption = 'mobilePortrait' | 'mobileLandscape' | 'desktopHD';
+
+const resolutionOptions: {
+  [key: ResolutionOption]: {|
+    label: MessageDescriptor,
+    height: number,
+    width: number,
+    orientation: 'landscape' | 'portrait' | 'default',
+  |},
+} = {
+  mobilePortrait: {
+    label: t`Mobile portrait - 720x1280`,
+    width: 720,
+    height: 1280,
+    orientation: 'portrait',
+  },
+  mobileLandscape: {
+    label: t`Mobile landscape & Desktop - 1280x720`,
+    width: 1280,
+    height: 720,
+    orientation: 'landscape',
+  },
+  desktopHD: {
+    label: t`Desktop Full HD - 1920x1080`,
+    width: 1920,
+    height: 1080,
+    orientation: 'default',
+  },
+};
 
 const NewProjectSetupDialog = ({
   isOpening,
@@ -47,7 +85,11 @@ const NewProjectSetupDialog = ({
   sourceExampleName,
   storageProviders,
   authenticatedUser,
+  isFromExample,
 }: Props): React.Node => {
+  const { values, setNewProjectsDefaultStorageProviderName } = React.useContext(
+    PreferencesContext
+  );
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
@@ -57,11 +99,31 @@ const NewProjectSetupDialog = ({
   const [projectName, setProjectName] = React.useState<string>(() =>
     generateProjectName(sourceExampleName)
   );
+  const [
+    resolutionOption,
+    setResolutionOption,
+  ] = React.useState<ResolutionOption>('mobileLandscape');
+  const [optimizeForPixelArt, setOptimizeForPixelArt] = React.useState<boolean>(
+    false
+  );
+  const newProjectsDefaultFolder = app
+    ? findEmptyPathInWorkspaceFolder(app, values.newProjectsDefaultFolder || '')
+    : '';
   const [saveAsLocation, setSaveAsLocation] = React.useState<?SaveAsLocation>(
     null
   );
   const [storageProvider, setStorageProvider] = React.useState<StorageProvider>(
     () => {
+      // First try to use the storage provider stored in user preferences (Cloud by default).
+      if (values.newProjectsDefaultStorageProviderName === 'Empty')
+        return emptyStorageProvider;
+      const preferredStorageProvider = storageProviders.find(
+        ({ internalName }) =>
+          internalName === values.newProjectsDefaultStorageProviderName
+      );
+      if (preferredStorageProvider) return preferredStorageProvider;
+
+      // If preferred storage provider not found, push Cloud storage provider if user authenticated.
       if (authenticatedUser.authenticated) {
         const cloudStorageProvider = storageProviders.find(
           ({ internalName }) => internalName === 'Cloud'
@@ -97,7 +159,18 @@ const NewProjectSetupDialog = ({
         );
         return;
       }
-      await onCreate({ projectName, storageProvider, saveAsLocation });
+      const { height, width, orientation } = resolutionOptions[
+        resolutionOption
+      ];
+      await onCreate({
+        projectName,
+        storageProvider,
+        saveAsLocation,
+        height,
+        width,
+        orientation,
+        optimizeForPixelArt,
+      });
     },
     [
       isOpening,
@@ -106,6 +179,8 @@ const NewProjectSetupDialog = ({
       projectName,
       storageProvider,
       saveAsLocation,
+      resolutionOption,
+      optimizeForPixelArt,
     ]
   );
 
@@ -130,13 +205,12 @@ const NewProjectSetupDialog = ({
           label={<Trans>Cancel</Trans>}
           onClick={onClose}
         />,
-        <LeftLoader isLoading={isOpening}>
+        <LeftLoader isLoading={isOpening} key="create">
           <DialogPrimaryButton
             primary
             disabled={
               isOpening || needUserAuthentication || hasTooManyCloudProjects
             }
-            key="create"
             label={<Trans>Create project</Trans>}
             onClick={onValidate}
             id="create-project-button"
@@ -161,10 +235,12 @@ const NewProjectSetupDialog = ({
               onClick={() =>
                 setProjectName(generateProjectName(sourceExampleName))
               }
+              tooltip={t`Generate random name`}
             >
               <Refresh />
             </IconButton>
           }
+          autoFocus // Focus the name field when the dialog is opened.
         />
         <SelectField
           fullWidth
@@ -172,6 +248,7 @@ const NewProjectSetupDialog = ({
           floatingLabelText={<Trans>Where to store this project</Trans>}
           value={storageProvider.internalName}
           onChange={(e, i, newValue: string) => {
+            setNewProjectsDefaultStorageProviderName(newValue);
             const newStorageProvider =
               storageProviders.find(
                 ({ internalName }) => internalName === newValue
@@ -210,7 +287,7 @@ const NewProjectSetupDialog = ({
           )}
         </SelectField>
         {needUserAuthentication && (
-          <Paper background="dark">
+          <Paper background="dark" variant="outlined">
             <Line justifyContent="center">
               <CreateProfile
                 onLogin={authenticatedUser.onLogin}
@@ -228,7 +305,35 @@ const NewProjectSetupDialog = ({
             projectName,
             saveAsLocation,
             setSaveAsLocation,
+            newProjectsDefaultFolder,
           })}
+        {!isFromExample && (
+          <ColumnStackLayout noMargin>
+            <SelectField
+              fullWidth
+              disabled={isOpening}
+              floatingLabelText={<Trans>Resolution preset</Trans>}
+              value={resolutionOption}
+              onChange={(e, i, newValue: string) => {
+                // $FlowExpectedError - new value can only be option values.
+                setResolutionOption(newValue);
+              }}
+            >
+              {Object.entries(resolutionOptions).map(([id, option]) => (
+                // $FlowFixMe - Object.entries does not keep types.
+                <SelectOption key={id} value={id} primaryText={option.label} />
+              ))}
+            </SelectField>
+            <Checkbox
+              checked={optimizeForPixelArt}
+              label={<Trans>Optimize for Pixel Art</Trans>}
+              onCheck={(e, checked) => {
+                setOptimizeForPixelArt(checked);
+              }}
+              disabled={isOpening}
+            />
+          </ColumnStackLayout>
+        )}
         {limits && hasTooManyCloudProjects ? (
           <MaxProjectCountAlertMessage
             limits={limits}

@@ -10,9 +10,7 @@ import SearchBar, {
   useShouldAutofocusSearchbar,
   type SearchBarInterface,
 } from '../UI/SearchBar';
-import ListIcon from '../UI/ListIcon';
-import { AddListItem, SearchListItem } from '../UI/ListCommonItem';
-import Window from '../Utils/Window';
+import { AddListItem } from '../UI/ListCommonItem';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
 import {
@@ -30,15 +28,10 @@ import {
 } from '../Utils/Serializer';
 import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import Flag from '@material-ui/icons/Flag';
-import Close from '@material-ui/icons/Close';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
 import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
-import Save from '@material-ui/icons/Save';
 import VariableTree from '../UI/CustomSvgIcons/VariableTree';
 import ArtTrack from '@material-ui/icons/ArtTrack';
-import AddToHomeScreen from '@material-ui/icons/AddToHomeScreen';
-import FileCopy from '@material-ui/icons/FileCopy';
-import TimelineIcon from '@material-ui/icons/Timeline';
 import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
@@ -54,26 +47,58 @@ import {
   ProjectStructureItem,
   EventFunctionExtensionItem,
 } from './ProjectManagerItems';
-import { Tooltip } from '@material-ui/core';
+import Tooltip from '@material-ui/core/Tooltip';
+import SceneIcon from '../UI/CustomSvgIcons/Scene';
+import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
+import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
+import { type ShortcutMap } from '../KeyboardShortcuts/DefaultShortcuts';
+import { ShortcutsReminder } from './ShortcutsReminder';
+import Paper from '../UI/Paper';
+import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
 const EXTERNAL_EVENTS_CLIPBOARD_KIND = 'External events';
 const EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND = 'Events Functions Extension';
 
+const DragSourceAndDropTargetForScenes = makeDragSourceAndDropTarget(
+  'project-manager-items-scenes'
+);
+const DragSourceAndDropTargetForExternalLayouts = makeDragSourceAndDropTarget(
+  'project-manager-items-external-layouts'
+);
+const DragSourceAndDropTargetForExternalEvents = makeDragSourceAndDropTarget(
+  'project-manager-items-external-events'
+);
+const DragSourceAndDropTargetForExtensions = makeDragSourceAndDropTarget(
+  'project-manager-items-external-events'
+);
+
 const styles = {
   container: {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    overflowY: 'hidden',
-  },
-  list: {
-    flex: 1,
     overflowY: 'scroll',
-    padding: 0,
+    marginTop: 16,
+    padding: '0 16px 16px 16px',
+    position: 'relative',
   },
+  searchBarContainer: {
+    position: 'sticky',
+    top: 0,
+    zIndex: 1,
+  },
+  searchBarPaper: { paddingBottom: 8 },
 };
+
+type ProjectItemKind =
+  | 'layout'
+  | 'external-events'
+  | 'external-layout'
+  | 'events-functions-extension';
+
+const getTabId = (identifier: string) => `project-manager-tab-${identifier}`;
 
 type Props = {|
   project: gdProject,
@@ -91,11 +116,6 @@ type Props = {|
   onOpenExternalEvents: string => void,
   onOpenExternalLayout: string => void,
   onOpenEventsFunctionsExtension: string => void,
-  onSaveProject: () => Promise<void>,
-  onSaveProjectAs: () => void,
-  onCloseProject: () => void,
-  onExportProject: () => void,
-  onOpenGamesDashboard: () => void,
   onOpenResources: () => void,
   onOpenPlatformSpecificAssets: () => void,
   eventsFunctionsExtensionsError: ?Error,
@@ -104,6 +124,7 @@ type Props = {|
   unsavedChanges?: UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onInstallExtension: ExtensionShortHeader => void,
+  shortcutMap: ShortcutMap,
 
   // For resources:
   resourceManagementProps: ResourceManagementProps,
@@ -112,7 +133,7 @@ type Props = {|
 type State = {|
   editedPropertiesLayout: ?gdLayout,
   editedVariablesLayout: ?gdLayout,
-  renamedItemKind: ?string,
+  renamedItemKind: ?ProjectItemKind,
   renamedItemName: string,
   searchText: string,
   projectPropertiesDialogOpen: boolean,
@@ -128,6 +149,10 @@ type State = {|
 
 export default class ProjectManager extends React.Component<Props, State> {
   _searchBar: ?SearchBarInterface;
+  _draggedLayoutIndex: number | null = null;
+  _draggedExternalLayoutIndex: number | null = null;
+  _draggedExternalEventsIndex: number | null = null;
+  _draggedExtensionIndex: number | null = null;
 
   state = {
     editedPropertiesLayout: null,
@@ -199,7 +224,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     this.setState({ extensionsSearchDialogOpen: true });
   };
 
-  _onEditName = (kind: ?string, name: string) => {
+  _onEditName = (kind: ?ProjectItemKind, name: string) => {
     this.setState({
       renamedItemKind: kind,
       renamedItemName: name,
@@ -266,6 +291,9 @@ export default class ProjectManager extends React.Component<Props, State> {
     newLayout.updateBehaviorsSharedData(project);
 
     this._onProjectItemModified();
+
+    // Trigger an edit of the name, so that the user can rename the layout easily.
+    this._onEditName('layout', newName);
   };
 
   _onOpenLayoutProperties = (layout: ?gdLayout) => {
@@ -285,6 +313,9 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
     project.insertNewExternalEvents(newName, index + 1);
     this._onProjectItemModified();
+
+    // Trigger an edit of the name, so that the user can rename the external events easily.
+    this._onEditName('external-events', newName);
   };
 
   _addExternalLayout = (index: number, i18n: I18nType) => {
@@ -296,6 +327,9 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
     project.insertNewExternalLayout(newName, index + 1);
     this._onProjectItemModified();
+
+    // Trigger an edit of the name, so that the user can rename the external layout easily.
+    this._onEditName('external-layout', newName);
   };
 
   _addEventsFunctionsExtension = (index: number, i18n: I18nType) => {
@@ -323,6 +357,70 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     project.swapLayouts(index, index + 1);
     this._onProjectItemModified();
+  };
+
+  _dropOnLayout = (targetLayoutIndex: number) => {
+    const { _draggedLayoutIndex } = this;
+    if (_draggedLayoutIndex === null) return;
+
+    if (targetLayoutIndex !== _draggedLayoutIndex) {
+      this.props.project.moveLayout(
+        _draggedLayoutIndex,
+        targetLayoutIndex > _draggedLayoutIndex
+          ? targetLayoutIndex - 1
+          : targetLayoutIndex
+      );
+      this._onProjectItemModified();
+    }
+    this._draggedLayoutIndex = null;
+  };
+
+  _dropOnExternalLayout = (targetExternalLayoutIndex: number) => {
+    const { _draggedExternalLayoutIndex } = this;
+    if (_draggedExternalLayoutIndex === null) return;
+
+    if (targetExternalLayoutIndex !== _draggedExternalLayoutIndex) {
+      this.props.project.moveExternalLayout(
+        _draggedExternalLayoutIndex,
+        targetExternalLayoutIndex > _draggedExternalLayoutIndex
+          ? targetExternalLayoutIndex - 1
+          : targetExternalLayoutIndex
+      );
+      this._onProjectItemModified();
+    }
+    this._draggedExternalLayoutIndex = null;
+  };
+
+  _dropOnExternalEvents = (targetExternalEventsIndex: number) => {
+    const { _draggedExternalEventsIndex } = this;
+    if (_draggedExternalEventsIndex === null) return;
+
+    if (targetExternalEventsIndex !== _draggedExternalEventsIndex) {
+      this.props.project.moveExternalEvents(
+        _draggedExternalEventsIndex,
+        targetExternalEventsIndex > _draggedExternalEventsIndex
+          ? targetExternalEventsIndex - 1
+          : targetExternalEventsIndex
+      );
+      this._onProjectItemModified();
+    }
+    this._draggedExternalEventsIndex = null;
+  };
+
+  _dropOnExtension = (targetExtensionIndex: number) => {
+    const { _draggedExtensionIndex } = this;
+    if (_draggedExtensionIndex === null) return;
+
+    if (targetExtensionIndex !== _draggedExtensionIndex) {
+      this.props.project.moveEventsFunctionsExtension(
+        _draggedExtensionIndex,
+        targetExtensionIndex > _draggedExtensionIndex
+          ? targetExtensionIndex - 1
+          : targetExtensionIndex
+      );
+      this._onProjectItemModified();
+    }
+    this._draggedExtensionIndex = null;
   };
 
   _copyExternalEvents = (externalEvents: gdExternalEvents) => {
@@ -566,47 +664,6 @@ export default class ProjectManager extends React.Component<Props, State> {
     this.setState({ projectPropertiesDialogOpen: false });
   };
 
-  _renderMenu() {
-    // If there is already a main menu (as the native one made with
-    // Electron), don't show it in the Project Manager.
-    if (Window.hasMainMenu()) return null;
-
-    return (
-      <React.Fragment>
-        <ListItem
-          key="save"
-          primaryText={<Trans>Save</Trans>}
-          leftIcon={<Save />}
-          onClick={() => this.props.onSaveProject()}
-        />
-        <ListItem
-          key="save-as"
-          primaryText={<Trans>Save as...</Trans>}
-          leftIcon={<FileCopy />}
-          onClick={() => this.props.onSaveProjectAs()}
-        />
-        <ListItem
-          key="export"
-          primaryText={<Trans>Export</Trans>}
-          leftIcon={<AddToHomeScreen />}
-          onClick={() => this.props.onExportProject()}
-        />
-        <ListItem
-          key="close"
-          primaryText={<Trans>Close</Trans>}
-          leftIcon={<Close />}
-          onClick={() => this.props.onCloseProject()}
-        />
-        <ListItem
-          key="games-dashboard"
-          primaryText={<Trans>Published Games Dashboard</Trans>}
-          leftIcon={<TimelineIcon />}
-          onClick={() => this.props.onOpenGamesDashboard()}
-        />
-      </React.Fragment>
-    );
-  }
-
   _onSearchChange = (text: string) =>
     this.setState({
       searchText: text,
@@ -642,6 +699,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       eventsFunctionsExtensionsError,
       onReloadEventsFunctionsExtensions,
       onInstallExtension,
+      shortcutMap,
     } = this.props;
     const {
       renamedItemKind,
@@ -651,14 +709,29 @@ export default class ProjectManager extends React.Component<Props, State> {
       openedExtensionName,
     } = this.state;
 
-    const forceOpen = searchText !== '' ? true : undefined;
-
     const firstLayoutName = project.getFirstLayout();
+
+    const displayedScenes = filterProjectItemsList(
+      enumerateLayouts(project),
+      searchText
+    );
+    const displayedExtensions = filterProjectItemsList(
+      enumerateEventsFunctionsExtensions(project),
+      searchText
+    );
+    const displayedExternalEvents = filterProjectItemsList(
+      enumerateExternalEvents(project),
+      searchText
+    );
+    const displayedExternalLayouts = filterProjectItemsList(
+      enumerateExternalLayouts(project),
+      searchText
+    );
 
     return (
       <I18n>
         {({ i18n }) => (
-          <div style={styles.container}>
+          <div style={styles.container} id="project-manager">
             <ProjectManagerCommands
               project={this.props.project}
               onOpenProjectProperties={this._openProjectProperties}
@@ -670,397 +743,399 @@ export default class ProjectManager extends React.Component<Props, State> {
               }
               onOpenSearchExtensionDialog={this._openSearchExtensionDialog}
             />
-            <List style={styles.list}>
-              {this._renderMenu()}
+            <div style={styles.searchBarContainer}>
+              <Paper background="dark" square style={styles.searchBarPaper}>
+                <SearchBar
+                  ref={searchBar => (this._searchBar = searchBar)}
+                  value={searchText}
+                  onRequestSearch={this._onRequestSearch}
+                  onChange={this._onSearchChange}
+                  placeholder={t`Search in project`}
+                />
+              </Paper>
+            </div>
+            <ShortcutsReminder shortcutMap={shortcutMap} />
+            <List>
               <ProjectStructureItem
+                id={getTabId('game-settings')}
                 primaryText={<Trans>Game settings</Trans>}
-                leftIcon={
-                  <ListIcon
-                    iconSize={24}
-                    isGDevelopIcon
-                    src="res/ribbon_default/projectManager32.png"
-                  />
-                }
-                initiallyOpen={false}
-                autoGenerateNestedIndicator={true}
-                indentNestedItems
                 renderNestedItems={() => [
                   <ListItem
+                    id={getTabId('game-properties')}
                     key="properties"
                     primaryText={<Trans>Properties</Trans>}
                     leftIcon={<SettingsApplications />}
                     onClick={this._openProjectProperties}
+                    noPadding
                   />,
                   <ListItem
+                    id={getTabId('global-variables')}
                     key="global-variables"
                     primaryText={<Trans>Global variables</Trans>}
                     leftIcon={<VariableTree />}
                     onClick={this._openProjectVariables}
+                    noPadding
                   />,
                   <ListItem
+                    id={getTabId('game-icons')}
                     key="icons"
                     primaryText={<Trans>Icons and thumbnail</Trans>}
                     leftIcon={<PhotoLibrary />}
                     onClick={this.props.onOpenPlatformSpecificAssets}
+                    noPadding
                   />,
                   <ListItem
+                    id={getTabId('game-resources')}
                     key="resources"
                     primaryText={<Trans>Resources</Trans>}
                     leftIcon={<ArtTrack />}
                     onClick={this.props.onOpenResources}
+                    noPadding
                   />,
                 ]}
               />
               <ProjectStructureItem
+                id={getTabId('scenes')}
                 primaryText={<Trans>Scenes</Trans>}
-                leftIcon={
-                  <ListIcon
-                    iconSize={24}
-                    isGDevelopIcon
-                    src="res/ribbon_default/sceneadd32.png"
-                  />
-                }
-                initiallyOpen={true}
-                open={forceOpen}
-                autoGenerateNestedIndicator={!forceOpen}
-                renderNestedItems={() =>
-                  filterProjectItemsList(enumerateLayouts(project), searchText)
-                    .map((layout: gdLayout, i: number) => {
-                      const name = layout.getName();
-                      return (
-                        <Item
-                          key={i}
-                          primaryText={name}
-                          textEndAdornment={
-                            name === firstLayoutName ? (
-                              <Tooltip
-                                title={i18n._(
-                                  t`This scene will be used as the start scene.`
-                                )}
-                              >
-                                <Flag color="disabled" fontSize="small" />
-                              </Tooltip>
-                            ) : (
-                              undefined
-                            )
-                          }
-                          editingName={
-                            renamedItemKind === 'layout' &&
-                            renamedItemName === name
-                          }
-                          onEdit={() => this.props.onOpenLayout(name)}
-                          onDelete={() => this.props.onDeleteLayout(layout)}
-                          addLabel={t`Add a New Scene`}
-                          onAdd={() => this._addLayout(i, i18n)}
-                          onRename={newName => {
-                            this.props.onRenameLayout(name, newName);
-                            this._onEditName(null, '');
-                          }}
-                          onEditName={() => this._onEditName('layout', name)}
-                          onCopy={() => this._copyLayout(layout)}
-                          onCut={() => this._cutLayout(layout)}
-                          onPaste={() => this._pasteLayout(i)}
-                          onDuplicate={() => this._duplicateLayout(layout, i)}
-                          canPaste={() => Clipboard.has(LAYOUT_CLIPBOARD_KIND)}
-                          canMoveUp={i !== 0}
-                          onMoveUp={() => this._moveUpLayout(i)}
-                          canMoveDown={i !== project.getLayoutsCount() - 1}
-                          onMoveDown={() => this._moveDownLayout(i)}
-                          buildExtraMenuTemplate={(i18n: I18nType) => [
-                            {
-                              label: i18n._(t`Edit Scene Properties`),
-                              enabled: true,
-                              click: () => this._onOpenLayoutProperties(layout),
-                            },
-                            {
-                              label: i18n._(t`Edit Scene Variables`),
-                              enabled: true,
-                              click: () => this._onOpenLayoutVariables(layout),
-                            },
-                            {
-                              label: i18n._(t`Set as start scene`),
-                              enabled: name !== firstLayoutName,
-                              click: () => this._setProjectFirstLayout(name),
-                            },
-                          ]}
-                        />
-                      );
-                    })
-                    .concat(
-                      <AddListItem
-                        key={'add-scene'}
-                        onClick={() =>
-                          this._addLayout(project.getLayoutsCount(), i18n)
-                        }
-                        primaryText={<Trans>Click to add a scene</Trans>}
-                      />
-                    )
-                }
-              />
-              <ProjectStructureItem
-                primaryText={<Trans>External events</Trans>}
-                leftIcon={
-                  <ListIcon
-                    iconSize={24}
-                    isGDevelopIcon
-                    src="res/ribbon_default/externalevents32.png"
-                  />
-                }
-                initiallyOpen={false}
-                open={forceOpen}
-                autoGenerateNestedIndicator={!forceOpen}
-                renderNestedItems={() =>
-                  filterProjectItemsList(
-                    enumerateExternalEvents(project),
-                    searchText
-                  )
-                    .map((externalEvents, i) => {
-                      const name = externalEvents.getName();
-                      return (
-                        <Item
-                          key={i}
-                          primaryText={name}
-                          editingName={
-                            renamedItemKind === 'external-events' &&
-                            renamedItemName === name
-                          }
-                          onEdit={() => this.props.onOpenExternalEvents(name)}
-                          onDelete={() =>
-                            this.props.onDeleteExternalEvents(externalEvents)
-                          }
-                          addLabel={t`Add New External Events`}
-                          onAdd={() => this._addExternalEvents(i, i18n)}
-                          onRename={newName => {
-                            this.props.onRenameExternalEvents(name, newName);
-                            this._onEditName(null, '');
-                          }}
-                          onEditName={() =>
-                            this._onEditName('external-events', name)
-                          }
-                          onCopy={() =>
-                            this._copyExternalEvents(externalEvents)
-                          }
-                          onCut={() => this._cutExternalEvents(externalEvents)}
-                          onPaste={() => this._pasteExternalEvents(i)}
-                          onDuplicate={() =>
-                            this._duplicateExternalEvents(externalEvents, i)
-                          }
-                          canPaste={() =>
-                            Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)
-                          }
-                          canMoveUp={i !== 0}
-                          onMoveUp={() => this._moveUpExternalEvents(i)}
-                          canMoveDown={
-                            i !== project.getExternalEventsCount() - 1
-                          }
-                          onMoveDown={() => this._moveDownExternalEvents(i)}
-                        />
-                      );
-                    })
-                    .concat(
-                      <AddListItem
-                        key={'add-external-events'}
-                        primaryText={
-                          <Trans>Click to add external events</Trans>
-                        }
-                        onClick={() =>
-                          this._addExternalEvents(
-                            project.getExternalEventsCount(),
-                            i18n
+                renderNestedItems={() => [
+                  ...displayedScenes.map((layout: gdLayout, i: number) => {
+                    const name = layout.getName();
+                    return (
+                      <Item
+                        id={`scene-item-${i}`}
+                        isLastItem={i === displayedScenes.length - 1}
+                        key={i}
+                        data={{
+                          scene: name,
+                          default:
+                            name === firstLayoutName ? 'true' : undefined,
+                        }}
+                        leftIcon={<SceneIcon />}
+                        primaryText={name}
+                        textEndAdornment={
+                          name === firstLayoutName ? (
+                            <Tooltip
+                              title={i18n._(
+                                t`This scene will be used as the start scene.`
+                              )}
+                            >
+                              <Flag color="disabled" fontSize="small" />
+                            </Tooltip>
+                          ) : (
+                            undefined
                           )
                         }
+                        editingName={
+                          renamedItemKind === 'layout' &&
+                          renamedItemName === name
+                        }
+                        onEdit={() => this.props.onOpenLayout(name)}
+                        onDelete={() => this.props.onDeleteLayout(layout)}
+                        addLabel={t`Add a New Scene`}
+                        onAdd={() => this._addLayout(i, i18n)}
+                        onRename={newName => {
+                          this.props.onRenameLayout(name, newName);
+                          this._onEditName(null, '');
+                        }}
+                        onEditName={() => this._onEditName('layout', name)}
+                        onCopy={() => this._copyLayout(layout)}
+                        onCut={() => this._cutLayout(layout)}
+                        onPaste={() => this._pasteLayout(i)}
+                        onDuplicate={() => this._duplicateLayout(layout, i)}
+                        canPaste={() => Clipboard.has(LAYOUT_CLIPBOARD_KIND)}
+                        canMoveUp={i !== 0}
+                        onMoveUp={() => this._moveUpLayout(i)}
+                        canMoveDown={i !== project.getLayoutsCount() - 1}
+                        onMoveDown={() => this._moveDownLayout(i)}
+                        dragAndDropProps={{
+                          DragSourceAndDropTarget: DragSourceAndDropTargetForScenes,
+                          onBeginDrag: () => {
+                            this._draggedLayoutIndex = i;
+                          },
+                          onDrop: () => {
+                            this._dropOnLayout(i);
+                          },
+                        }}
+                        buildExtraMenuTemplate={(i18n: I18nType) => [
+                          {
+                            label: i18n._(t`Edit Scene Properties`),
+                            enabled: true,
+                            click: () => this._onOpenLayoutProperties(layout),
+                          },
+                          {
+                            label: i18n._(t`Edit Scene Variables`),
+                            enabled: true,
+                            click: () => this._onOpenLayoutVariables(layout),
+                          },
+                          {
+                            label: i18n._(t`Set as start scene`),
+                            enabled: name !== firstLayoutName,
+                            click: () => this._setProjectFirstLayout(name),
+                          },
+                        ]}
                       />
-                    )
-                }
+                    );
+                  }),
+                  ...(!!searchText
+                    ? []
+                    : [
+                        <AddListItem
+                          noMargin
+                          id="add-new-scene-button"
+                          key={'add-scene'}
+                          onClick={() =>
+                            this._addLayout(project.getLayoutsCount(), i18n)
+                          }
+                          primaryText={<Trans>Add scene</Trans>}
+                        />,
+                      ]),
+                ]}
               />
               <ProjectStructureItem
-                primaryText={<Trans>External layouts</Trans>}
-                leftIcon={
-                  <ListIcon
-                    iconSize={24}
-                    isGDevelopIcon
-                    src="res/ribbon_default/externallayout32.png"
-                  />
-                }
-                initiallyOpen={false}
-                open={forceOpen}
-                autoGenerateNestedIndicator={!forceOpen}
-                renderNestedItems={() =>
-                  filterProjectItemsList(
-                    enumerateExternalLayouts(project),
-                    searchText
-                  )
-                    .map((externalLayout, i) => {
-                      const name = externalLayout.getName();
-                      return (
-                        <Item
-                          key={i}
-                          primaryText={name}
-                          editingName={
-                            renamedItemKind === 'external-layout' &&
-                            renamedItemName === name
-                          }
-                          onEdit={() => this.props.onOpenExternalLayout(name)}
-                          onDelete={() =>
-                            this.props.onDeleteExternalLayout(externalLayout)
-                          }
-                          addLabel={t`Add a New External Layout`}
-                          onAdd={() => this._addExternalLayout(i, i18n)}
-                          onRename={newName => {
-                            this.props.onRenameExternalLayout(name, newName);
-                            this._onEditName(null, '');
-                          }}
-                          onEditName={() =>
-                            this._onEditName('external-layout', name)
-                          }
-                          onCopy={() =>
-                            this._copyExternalLayout(externalLayout)
-                          }
-                          onCut={() => this._cutExternalLayout(externalLayout)}
-                          onPaste={() => this._pasteExternalLayout(i)}
-                          onDuplicate={() =>
-                            this._duplicateExternalLayout(externalLayout, i)
-                          }
-                          canPaste={() =>
-                            Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)
-                          }
-                          canMoveUp={i !== 0}
-                          onMoveUp={() => this._moveUpExternalLayout(i)}
-                          canMoveDown={
-                            i !== project.getExternalLayoutsCount() - 1
-                          }
-                          onMoveDown={() => this._moveDownExternalLayout(i)}
-                        />
-                      );
-                    })
-                    .concat(
-                      <AddListItem
-                        key={'add-external-layout'}
-                        primaryText={
-                          <Trans>Click to add an external layout</Trans>
-                        }
-                        onClick={() =>
-                          this._addExternalLayout(
-                            project.getExternalLayoutsCount(),
-                            i18n
-                          )
-                        }
-                      />
-                    )
-                }
-              />
-              <ProjectStructureItem
+                id={getTabId('extensions')}
                 primaryText={<Trans>Extensions</Trans>}
                 error={eventsFunctionsExtensionsError}
                 onRefresh={onReloadEventsFunctionsExtensions}
-                leftIcon={
-                  <ListIcon
-                    iconSize={24}
-                    isGDevelopIcon
-                    src="res/ribbon_default/function32.png"
-                  />
-                }
-                initiallyOpen={false}
-                open={forceOpen}
-                autoGenerateNestedIndicator={
-                  !forceOpen && !eventsFunctionsExtensionsError
-                }
-                renderNestedItems={() =>
-                  filterProjectItemsList(
-                    enumerateEventsFunctionsExtensions(project),
-                    searchText
-                  )
-                    .map((eventsFunctionsExtension, i) => {
-                      const name = eventsFunctionsExtension.getName();
-                      return (
-                        <EventFunctionExtensionItem
-                          key={i}
-                          eventsFunctionsExtension={eventsFunctionsExtension}
-                          isEditingName={
-                            renamedItemKind === 'events-functions-extension' &&
-                            renamedItemName === name
-                          }
-                          onEdit={extensionShortHeadersByName =>
-                            this._onEditEventsFunctionExtensionOrSeeDetails(
-                              extensionShortHeadersByName,
-                              eventsFunctionsExtension,
-                              name
-                            )
-                          }
-                          onDelete={() =>
-                            this.props.onDeleteEventsFunctionsExtension(
-                              eventsFunctionsExtension
-                            )
-                          }
-                          onAdd={() => {
-                            this._addEventsFunctionsExtension(i, i18n);
-                          }}
-                          onRename={newName => {
-                            this.props.onRenameEventsFunctionsExtension(
-                              name,
-                              newName
-                            );
-                            this._onEditName(null, '');
-                          }}
-                          onEditName={() =>
-                            this._onEditName('events-functions-extension', name)
-                          }
-                          onCopy={() =>
-                            this._copyEventsFunctionsExtension(
-                              eventsFunctionsExtension
-                            )
-                          }
-                          onCut={() =>
-                            this._cutEventsFunctionsExtension(
-                              eventsFunctionsExtension
-                            )
-                          }
-                          onPaste={() => this._pasteEventsFunctionsExtension(i)}
-                          onDuplicate={() =>
-                            this._duplicateEventsFunctionsExtension(
-                              eventsFunctionsExtension,
-                              i
-                            )
-                          }
-                          canPaste={() =>
-                            Clipboard.has(
-                              EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND
-                            )
-                          }
-                          canMoveUp={i !== 0}
-                          onMoveUp={() =>
-                            this._moveUpEventsFunctionsExtension(i)
-                          }
-                          canMoveDown={
-                            i !==
-                            project.getEventsFunctionsExtensionsCount() - 1
-                          }
-                          onMoveDown={() =>
-                            this._moveDownEventsFunctionsExtension(i)
-                          }
-                        />
-                      );
-                    })
-                    .concat(
-                      <SearchListItem
-                        key={'extensions-search'}
-                        primaryText={
-                          <Trans>Create or search for new extensions</Trans>
+                renderNestedItems={() => [
+                  ...displayedExtensions.map((eventsFunctionsExtension, i) => {
+                    const name = eventsFunctionsExtension.getName();
+                    return (
+                      <EventFunctionExtensionItem
+                        key={i}
+                        isLastItem={i === displayedExtensions.length - 1}
+                        eventsFunctionsExtension={eventsFunctionsExtension}
+                        isEditingName={
+                          renamedItemKind === 'events-functions-extension' &&
+                          renamedItemName === name
                         }
-                        onClick={this._openSearchExtensionDialog}
+                        onEdit={extensionShortHeadersByName =>
+                          this._onEditEventsFunctionExtensionOrSeeDetails(
+                            extensionShortHeadersByName,
+                            eventsFunctionsExtension,
+                            name
+                          )
+                        }
+                        onDelete={() =>
+                          this.props.onDeleteEventsFunctionsExtension(
+                            eventsFunctionsExtension
+                          )
+                        }
+                        onAdd={() => {
+                          this._addEventsFunctionsExtension(i, i18n);
+                        }}
+                        onRename={newName => {
+                          this.props.onRenameEventsFunctionsExtension(
+                            name,
+                            newName
+                          );
+                          this._onEditName(null, '');
+                        }}
+                        onEditName={() =>
+                          this._onEditName('events-functions-extension', name)
+                        }
+                        onCopy={() =>
+                          this._copyEventsFunctionsExtension(
+                            eventsFunctionsExtension
+                          )
+                        }
+                        onCut={() =>
+                          this._cutEventsFunctionsExtension(
+                            eventsFunctionsExtension
+                          )
+                        }
+                        onPaste={() => this._pasteEventsFunctionsExtension(i)}
+                        onDuplicate={() =>
+                          this._duplicateEventsFunctionsExtension(
+                            eventsFunctionsExtension,
+                            i
+                          )
+                        }
+                        canPaste={() =>
+                          Clipboard.has(
+                            EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND
+                          )
+                        }
+                        canMoveUp={i !== 0}
+                        onMoveUp={() => this._moveUpEventsFunctionsExtension(i)}
+                        canMoveDown={
+                          i !== project.getEventsFunctionsExtensionsCount() - 1
+                        }
+                        onMoveDown={() =>
+                          this._moveDownEventsFunctionsExtension(i)
+                        }
+                        dragAndDropProps={{
+                          DragSourceAndDropTarget: DragSourceAndDropTargetForExtensions,
+                          onBeginDrag: () => {
+                            this._draggedExtensionIndex = i;
+                          },
+                          onDrop: () => {
+                            this._dropOnExtension(i);
+                          },
+                        }}
                       />
-                    )
-                }
+                    );
+                  }),
+                  ...(!!searchText
+                    ? []
+                    : [
+                        <AddListItem
+                          noMargin
+                          id="project-manager-extension-search-or-create"
+                          key={'extensions-search'}
+                          kind="search"
+                          primaryText={
+                            <Trans>Create or search for new extensions</Trans>
+                          }
+                          onClick={this._openSearchExtensionDialog}
+                        />,
+                      ]),
+                ]}
+              />
+              <ProjectStructureItem
+                id={getTabId('external-events')}
+                primaryText={<Trans>External events</Trans>}
+                renderNestedItems={() => [
+                  ...displayedExternalEvents.map((externalEvents, i) => {
+                    const name = externalEvents.getName();
+                    return (
+                      <Item
+                        key={i}
+                        isLastItem={i === displayedExternalEvents.length - 1}
+                        leftIcon={<ExternalEventsIcon />}
+                        primaryText={name}
+                        editingName={
+                          renamedItemKind === 'external-events' &&
+                          renamedItemName === name
+                        }
+                        onEdit={() => this.props.onOpenExternalEvents(name)}
+                        onDelete={() =>
+                          this.props.onDeleteExternalEvents(externalEvents)
+                        }
+                        addLabel={t`Add New External Events`}
+                        onAdd={() => this._addExternalEvents(i, i18n)}
+                        onRename={newName => {
+                          this.props.onRenameExternalEvents(name, newName);
+                          this._onEditName(null, '');
+                        }}
+                        onEditName={() =>
+                          this._onEditName('external-events', name)
+                        }
+                        onCopy={() => this._copyExternalEvents(externalEvents)}
+                        onCut={() => this._cutExternalEvents(externalEvents)}
+                        onPaste={() => this._pasteExternalEvents(i)}
+                        onDuplicate={() =>
+                          this._duplicateExternalEvents(externalEvents, i)
+                        }
+                        canPaste={() =>
+                          Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)
+                        }
+                        canMoveUp={i !== 0}
+                        onMoveUp={() => this._moveUpExternalEvents(i)}
+                        canMoveDown={i !== project.getExternalEventsCount() - 1}
+                        onMoveDown={() => this._moveDownExternalEvents(i)}
+                        dragAndDropProps={{
+                          DragSourceAndDropTarget: DragSourceAndDropTargetForExternalEvents,
+                          onBeginDrag: () => {
+                            this._draggedExternalEventsIndex = i;
+                          },
+                          onDrop: () => {
+                            this._dropOnExternalEvents(i);
+                          },
+                        }}
+                      />
+                    );
+                  }),
+                  ...(!!searchText
+                    ? []
+                    : [
+                        <AddListItem
+                          noMargin
+                          key={'add-external-events'}
+                          primaryText={<Trans>Add external events</Trans>}
+                          onClick={() =>
+                            this._addExternalEvents(
+                              project.getExternalEventsCount(),
+                              i18n
+                            )
+                          }
+                        />,
+                      ]),
+                ]}
+              />
+              <ProjectStructureItem
+                id={getTabId('external-layouts')}
+                primaryText={<Trans>External layouts</Trans>}
+                renderNestedItems={() => [
+                  ...displayedExternalLayouts.map((externalLayout, i) => {
+                    const name = externalLayout.getName();
+                    return (
+                      <Item
+                        key={i}
+                        isLastItem={i === displayedExternalLayouts.length - 1}
+                        leftIcon={<ExternalLayoutIcon />}
+                        primaryText={name}
+                        editingName={
+                          renamedItemKind === 'external-layout' &&
+                          renamedItemName === name
+                        }
+                        onEdit={() => this.props.onOpenExternalLayout(name)}
+                        onDelete={() =>
+                          this.props.onDeleteExternalLayout(externalLayout)
+                        }
+                        addLabel={t`Add a New External Layout`}
+                        onAdd={() => this._addExternalLayout(i, i18n)}
+                        onRename={newName => {
+                          this.props.onRenameExternalLayout(name, newName);
+                          this._onEditName(null, '');
+                        }}
+                        onEditName={() =>
+                          this._onEditName('external-layout', name)
+                        }
+                        onCopy={() => this._copyExternalLayout(externalLayout)}
+                        onCut={() => this._cutExternalLayout(externalLayout)}
+                        onPaste={() => this._pasteExternalLayout(i)}
+                        onDuplicate={() =>
+                          this._duplicateExternalLayout(externalLayout, i)
+                        }
+                        canPaste={() =>
+                          Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)
+                        }
+                        canMoveUp={i !== 0}
+                        onMoveUp={() => this._moveUpExternalLayout(i)}
+                        canMoveDown={
+                          i !== project.getExternalLayoutsCount() - 1
+                        }
+                        onMoveDown={() => this._moveDownExternalLayout(i)}
+                        dragAndDropProps={{
+                          DragSourceAndDropTarget: DragSourceAndDropTargetForExternalLayouts,
+                          onBeginDrag: () => {
+                            this._draggedExternalLayoutIndex = i;
+                          },
+                          onDrop: () => {
+                            this._dropOnExternalLayout(i);
+                          },
+                        }}
+                      />
+                    );
+                  }),
+                  ...(!!searchText
+                    ? []
+                    : [
+                        <AddListItem
+                          noMargin
+                          key={'add-external-layout'}
+                          primaryText={<Trans>Add external layout</Trans>}
+                          onClick={() =>
+                            this._addExternalLayout(
+                              project.getExternalLayoutsCount(),
+                              i18n
+                            )
+                          }
+                        />,
+                      ]),
+                ]}
               />
             </List>
-            <SearchBar
-              ref={searchBar => (this._searchBar = searchBar)}
-              value={searchText}
-              onRequestSearch={this._onRequestSearch}
-              onChange={this._onSearchChange}
-              placeholder={t`Search in project`}
-              aspect="integrated-search-bar"
-            />
             {this.state.projectVariablesEditorOpen && (
               <VariablesEditorDialog
                 title={<Trans>Global Variables</Trans>}

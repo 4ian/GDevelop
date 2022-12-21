@@ -136,6 +136,10 @@ export const handleAutocompletionsKeyDown = (
       // the user should be able to freely move to the next line.
       if (autocompletion.isExact) return state;
       onInsertAutocompletion(autocompletion);
+
+      // Stop propagation to avoid closing the modal the
+      // field is contained in.
+      event.stopPropagation();
     }
 
     // Avoid entering a new line or tabbing to the next field.

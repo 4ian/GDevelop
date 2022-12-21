@@ -55,7 +55,6 @@ export default class ResourcePreview extends React.PureComponent<Props, State> {
       case 'image':
         return (
           <ImagePreview
-            project={this.props.project}
             resourceName={this.props.resourceName}
             imageResourceSource={this.props.resourcesLoader.getResourceFullUrl(
               this.props.project,

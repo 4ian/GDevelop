@@ -44,7 +44,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 "res/actions/opacity.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity (0-255)")))
       .MarkAsSimple();
 
   obj.AddAction("ChangeAnimation",
@@ -57,7 +60,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 "res/actions/animation.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     ParameterOptions::MakeNewOptions())
       .MarkAsSimple();
 
   obj.AddAction("SetAnimationName",
@@ -86,7 +90,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .SetHidden()  // Hide as 8 direction is not supported officially in the
                     // interface.
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   obj.AddAction("ChangeSprite",
@@ -98,7 +103,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 "res/actions/sprite.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   obj.AddAction("PauseAnimation",
@@ -134,7 +140,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
          "res/actions/animation.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(_("Speed scale")))
       .MarkAsSimple();
 
   obj.AddAction("TourneVersPos",
@@ -162,7 +170,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 "res/actions/scale_black.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
       .MarkAsAdvanced();
 
   obj.AddAction("ChangeScaleWidth",
@@ -174,7 +185,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 "res/actions/scaleWidth_black.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
       .MarkAsAdvanced();
 
   obj.AddAction("ChangeScaleHeight",
@@ -186,7 +200,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 "res/actions/scaleHeight_black.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
       .MarkAsAdvanced();
 
   obj.AddAction("ChangeWidth",
@@ -198,7 +215,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 "res/actions/scaleWidth_black.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   obj.AddCondition("Width",
@@ -210,7 +228,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    "res/conditions/scaleWidth_black.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   obj.AddAction("ChangeHeight",
@@ -222,7 +241,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 "res/actions/scaleHeight_black.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   obj.AddCondition("Height",
@@ -234,7 +254,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    "res/conditions/scaleHeight_black.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   obj.AddAction("SetSize",
@@ -260,7 +281,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
          "res/conditions/animation.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   obj.AddCondition("AnimationName",
@@ -288,7 +310,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .SetHidden()  // Hide as 8 direction is not supported officially in the
                     // interface.
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardRelationalOperatorParameters("number");
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions());
 
   obj.AddCondition("Sprite",
                    _("Current frame"),
@@ -301,7 +324,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    "res/conditions/sprite.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   obj.AddCondition("AnimStopped",
@@ -349,7 +373,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    "res/conditions/scaleWidth_black.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
       .MarkAsAdvanced();
 
   obj.AddCondition("ScaleHeight",
@@ -361,7 +388,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    "res/conditions/scaleHeight_black.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
       .MarkAsAdvanced();
 
   obj.AddCondition("Opacity",
@@ -374,7 +404,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    "res/conditions/opacity.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity to compare to (0-255)")))
       .MarkAsSimple();
 
   obj.AddCondition(
@@ -387,7 +420,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
          "res/conditions/opacity.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   obj.AddAction("ChangeColor",
@@ -549,7 +583,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddExpression("Sprite",
                     _("Image"),
-                    _("Animation frame of the object"),
+                    _("Current frame of the animation of the object"),
+                    _("Animations and images"),
+                    "res/actions/sprite.png")
+      .AddParameter("object", _("Object"), "Sprite");
+
+  obj.AddExpression("AnimationFrameCount",
+                    _("Number of frames"),
+                    _("Number of frames in the current animation of the object"),
                     _("Animations and images"),
                     "res/actions/sprite.png")
       .AddParameter("object", _("Object"), "Sprite");

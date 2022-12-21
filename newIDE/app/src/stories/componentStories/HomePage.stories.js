@@ -10,6 +10,7 @@ import { ExampleStoreStateProvider } from '../../AssetStore/ExampleStore/Example
 import { TutorialStateProvider } from '../../Tutorial/TutorialContext';
 import PreferencesContext, {
   initialPreferences,
+  type InAppTutorialUserProgress,
 } from '../../MainFrame/Preferences/PreferencesContext';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
@@ -20,10 +21,14 @@ import AuthenticatedUserContext, {
 import CloudStorageProvider from '../../ProjectsStorage/CloudStorageProvider';
 import {
   fakeIndieAuthenticatedUser,
+  fakeAuthenticatedButLoadingAuthenticatedUser,
   indieUserProfile,
 } from '../../fixtures/GDevelopServicesTestData';
 import { GDevelopAssetApi } from '../../Utils/GDevelopServices/ApiConfigs';
 import withMock from 'storybook-addon-mock';
+import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
+import fakeResourceExternalEditors from '../FakeResourceExternalEditors';
+import { emptyStorageProvider } from '../../ProjectsStorage/ProjectStorageProviders';
 
 const apiDataServerSideError = {
   mockData: [
@@ -60,10 +65,14 @@ const getPartiallySavedRecentProjectFiles = (count: number) =>
 const WrappedHomePage = ({
   project,
   recentProjectFiles,
+  tutorialProgress = undefined,
+  inAppTutorialsFetchingError = null,
   user,
 }: {|
   project: ?gdProject,
   recentProjectFiles: FileMetadataAndStorageProviderName[],
+  tutorialProgress?: InAppTutorialUserProgress,
+  inAppTutorialsFetchingError?: string | null,
   user: AuthenticatedUser,
 |}) => (
   <FixedHeightFlexContainer height={1080}>
@@ -71,35 +80,69 @@ const WrappedHomePage = ({
       value={{
         ...initialPreferences,
         getRecentProjectFiles: () => recentProjectFiles,
+        getTutorialProgress: () => tutorialProgress,
       }}
     >
-      <AuthenticatedUserContext.Provider value={user}>
-        <ExampleStoreStateProvider>
-          <TutorialStateProvider>
-            <HomePage
-              project={project}
-              isActive={true}
-              projectItemName={null}
-              setToolbar={() => {}}
-              canOpen={true}
-              storageProviders={[CloudStorageProvider]}
-              onChooseProject={() => action('onChooseProject')()}
-              onOpenRecentFile={() => action('onOpenRecentFile')()}
-              onCreateProject={() => action('onCreateProject')()}
-              onOpenProjectManager={() => action('onOpenProjectManager')()}
-              onOpenHelpFinder={() => action('onOpenHelpFinder')()}
-              onOpenLanguageDialog={() => action('open language dialog')()}
-              onOpenOnboardingDialog={() => action('open onboarding dialog')()}
-              onOpenNewProjectSetupDialog={() =>
-                action('onOpenNewProjectSetupDialog')()
-              }
-              onOpenProfile={() => action('open profile')()}
-              onOpenPreferences={() => action('open preferences')()}
-              onOpenAbout={() => action('open about')()}
-            />
-          </TutorialStateProvider>
-        </ExampleStoreStateProvider>
-      </AuthenticatedUserContext.Provider>
+      <InAppTutorialContext.Provider
+        value={{
+          inAppTutorialShortHeaders: [
+            {
+              id: 'flingGame',
+              contentUrl: 'fakeUrl',
+              availableLocales: ['en', 'fr-FR'],
+            },
+          ],
+          currentlyRunningInAppTutorial: null,
+          startTutorial: async () => {
+            action('start tutorial');
+          },
+          startProjectData: {},
+          endTutorial: () => {
+            action('end tutorial');
+          },
+          startStepIndex: 0,
+          inAppTutorialsFetchingError,
+          fetchInAppTutorials: async () => {
+            action('fetch tutorials')();
+          },
+        }}
+      >
+        <AuthenticatedUserContext.Provider value={user}>
+          <ExampleStoreStateProvider>
+            <TutorialStateProvider>
+              <HomePage
+                project={project}
+                isActive={true}
+                projectItemName={null}
+                setToolbar={() => {}}
+                canOpen={true}
+                storageProviders={[CloudStorageProvider]}
+                onChooseProject={() => action('onChooseProject')()}
+                onOpenRecentFile={() => action('onOpenRecentFile')()}
+                onCreateProject={() => action('onCreateProject')()}
+                onOpenProjectManager={() => action('onOpenProjectManager')()}
+                onOpenHelpFinder={() => action('onOpenHelpFinder')()}
+                onOpenLanguageDialog={() => action('open language dialog')()}
+                onOpenNewProjectSetupDialog={() =>
+                  action('onOpenNewProjectSetupDialog')()
+                }
+                selectInAppTutorial={() => action('select in app tutorial')()}
+                onOpenProfile={() => action('open profile')()}
+                onOpenPreferences={() => action('open preferences')()}
+                onOpenAbout={() => action('open about')()}
+                resourceManagementProps={{
+                  getStorageProvider: () => emptyStorageProvider,
+                  onFetchNewlyAddedResources: async () => {},
+                  resourceSources: [],
+                  onChooseResource: () => Promise.reject('Unimplemented'),
+                  resourceExternalEditors: fakeResourceExternalEditors,
+                }}
+                canInstallPrivateAsset={() => true}
+              />
+            </TutorialStateProvider>
+          </ExampleStoreStateProvider>
+        </AuthenticatedUserContext.Provider>
+      </InAppTutorialContext.Provider>
     </PreferencesContext.Provider>
   </FixedHeightFlexContainer>
 );
@@ -110,6 +153,13 @@ export default {
   decorators: [muiDecorator, GDevelopJsInitializerDecorator],
 };
 
+export const BuildSectionLoading = () => (
+  <WrappedHomePage
+    project={null}
+    recentProjectFiles={getRecentProjectFiles(5)}
+    user={fakeAuthenticatedButLoadingAuthenticatedUser}
+  />
+);
 export const NoProjectOpened = () => (
   <WrappedHomePage
     project={null}
@@ -173,6 +223,49 @@ export const NotConnected = () => (
     project={testProject.project}
     recentProjectFiles={getRecentProjectFiles(20)}
     user={initialAuthenticatedUser}
+  />
+);
+
+export const ConnectedWithInAppTutorialProgress = () => (
+  <WrappedHomePage
+    project={testProject.project}
+    recentProjectFiles={getRecentProjectFiles(20)}
+    user={fakeIndieAuthenticatedUser}
+    tutorialProgress={{
+      step: 40,
+      progress: [100, 25, 0],
+      fileMetadataAndStorageProviderName: {
+        storageProviderName: 'fakeStorageProviderName',
+        fileMetadata: { fileIdentifier: 'fileIdentifier' },
+      },
+      projectData: {},
+    }}
+  />
+);
+export const ConnectedWithInAppTutorialLoadingError = () => (
+  <WrappedHomePage
+    project={testProject.project}
+    recentProjectFiles={getRecentProjectFiles(20)}
+    user={fakeIndieAuthenticatedUser}
+    tutorialProgress={undefined}
+    inAppTutorialsFetchingError="fetching-error"
+  />
+);
+
+export const ConnectedWithInAppTutorialCompleted = () => (
+  <WrappedHomePage
+    project={testProject.project}
+    recentProjectFiles={getRecentProjectFiles(20)}
+    user={fakeIndieAuthenticatedUser}
+    tutorialProgress={{
+      step: 40,
+      progress: [100, 100, 100],
+      fileMetadataAndStorageProviderName: {
+        storageProviderName: 'fakeStorageProviderName',
+        fileMetadata: { fileIdentifier: 'fileIdentifier' },
+      },
+      projectData: {},
+    }}
   />
 );
 

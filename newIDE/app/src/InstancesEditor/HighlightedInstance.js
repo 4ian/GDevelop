@@ -4,7 +4,7 @@ import * as PIXI from 'pixi.js-legacy';
 import { type InstanceMeasurer } from './InstancesRenderer';
 import Rectangle from '../Utils/Rectangle';
 
-export default class InstancesSelection {
+export default class HighlightedInstance {
   instanceMeasurer: InstanceMeasurer;
   toCanvasCoordinates: (x: number, y: number) => [number, number];
   highlightedInstance: gdInitialInstance | null;
@@ -81,13 +81,14 @@ export default class InstancesSelection {
       highlightedInstance.getObjectName() +
       '\n' +
       'X: ' +
-      parseInt(highlightedInstance.getX()) +
+      Math.round(highlightedInstance.getX() * 100) / 100 + // An instance position can have a lot of decimals, so round to 2 decimals.
       '  Y: ' +
-      parseInt(highlightedInstance.getY()) +
+      Math.round(highlightedInstance.getY() * 100) / 100 + // An instance position can have a lot of decimals, so round to 2 decimals.
       '\n' +
       'Layer: ' +
-      highlightedInstance.getLayer() +
-      '  Z: ' +
+      (highlightedInstance.getLayer() || 'Base layer') +
+      '\n' +
+      'Z: ' +
       highlightedInstance.getZOrder() +
       '\n';
     this.tooltipText.text = tooltipInfo;

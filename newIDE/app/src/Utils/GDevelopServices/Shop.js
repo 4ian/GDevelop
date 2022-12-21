@@ -116,10 +116,12 @@ export const getStripeCheckoutUrl = async (
     stripePriceId,
     userId,
     customerEmail,
+    password,
   }: {|
     stripePriceId: string,
     userId: string,
     customerEmail: string,
+    password?: string,
   |}
 ): Promise<string> => {
   const authorizationHeader = await getAuthorizationHeader();
@@ -128,6 +130,7 @@ export const getStripeCheckoutUrl = async (
     {
       stripePriceId,
       customerEmail,
+      password,
     },
     {
       headers: { Authorization: authorizationHeader },

@@ -7,7 +7,11 @@ import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
 import optionalRequire from '../../Utils/OptionalRequire';
+import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
+
 const electron = optionalRequire('electron');
+const remote = optionalRequire('@electron/remote');
+const app = remote ? remote.app : null;
 
 export type AlertMessageIdentifier =
   | 'default-additional-work'
@@ -47,6 +51,20 @@ export type EditorMosaicName =
   | 'debugger'
   | 'resources-editor'
   | 'events-functions-extension-editor';
+
+export type InAppTutorialUserProgress = {|
+  step: number,
+  /** Rounded progress in percentage */
+  progress: Array<number>,
+  fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
+  projectData: {| [key: string]: string |},
+|};
+
+export type InAppTutorialProgressDatabase = {
+  [tutorialId: string]: {
+    [userId: string]: InAppTutorialUserProgress,
+  },
+};
 
 export const allAlertMessages: Array<{
   key: AlertMessageIdentifier,
@@ -206,6 +224,9 @@ export type PreferencesValues = {|
   showCommunityExtensions: boolean,
   showGetStartedSection: boolean,
   showEventBasedObjectsEditor: boolean,
+  inAppTutorialsProgress: InAppTutorialProgressDatabase,
+  newProjectsDefaultFolder: string,
+  newProjectsDefaultStorageProviderName: string,
 |};
 
 /**
@@ -269,6 +290,17 @@ export type Preferences = {|
   setShowGetStartedSection: (enabled: boolean) => void,
   setShowEventBasedObjectsEditor: (enabled: boolean) => void,
   getShowEventBasedObjectsEditor: () => boolean,
+  setNewProjectsDefaultStorageProviderName: (name: string) => void,
+  saveTutorialProgress: ({|
+    tutorialId: string,
+    userId: ?string,
+    ...InAppTutorialUserProgress,
+  |}) => void,
+  getTutorialProgress: ({|
+    tutorialId: string,
+    userId: ?string,
+  |}) => ?InAppTutorialUserProgress,
+  setNewProjectsDefaultFolder: (newProjectsDefaultFolder: string) => void,
 |};
 
 export const initialPreferences = {
@@ -308,6 +340,9 @@ export const initialPreferences = {
     showCommunityExtensions: false,
     showGetStartedSection: true,
     showEventBasedObjectsEditor: false,
+    inAppTutorialsProgress: {},
+    newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
+    newProjectsDefaultStorageProviderName: 'Cloud',
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -337,12 +372,8 @@ export const initialPreferences = {
     node: ?EditorMosaicNode
   ) => {},
   getRecentProjectFiles: () => [],
-  insertRecentProjectFile: (
-    fileMetadata: FileMetadataAndStorageProviderName
-  ) => {},
-  removeRecentProjectFile: (
-    fileMetadata: FileMetadataAndStorageProviderName
-  ) => {},
+  insertRecentProjectFile: () => {},
+  removeRecentProjectFile: () => {},
   getAutoOpenMostRecentProject: () => true,
   setAutoOpenMostRecentProject: () => {},
   hadProjectOpenedDuringLastSession: () => false,
@@ -361,6 +392,10 @@ export const initialPreferences = {
   setShowGetStartedSection: (enabled: boolean) => {},
   setShowEventBasedObjectsEditor: (enabled: boolean) => {},
   getShowEventBasedObjectsEditor: () => false,
+  saveTutorialProgress: () => {},
+  getTutorialProgress: () => {},
+  setNewProjectsDefaultFolder: () => {},
+  setNewProjectsDefaultStorageProviderName: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

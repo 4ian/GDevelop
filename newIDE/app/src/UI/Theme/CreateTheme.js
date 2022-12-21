@@ -1,9 +1,9 @@
 // @flow
 import { darken, lighten } from '@material-ui/core/styles';
 
-export const closeableTabSizeOverrides = {
+const closeableTabSizeOverrides = {
   width: 200,
-  height: 32,
+  height: 30,
   closeButtonWidth: 24,
 };
 
@@ -378,8 +378,11 @@ export function createGdevelopTheme({
         error: styles['ThemeMessageErrorColor'],
         valid: styles['ThemeMessageValidColor'],
       },
+      titlebar: {
+        backgroundColor: styles['ThemeSurfaceTitlebarBackgroundColor'],
+      },
       toolbar: {
-        backgroundColor: styles['ThemeSurfaceCanvasBackgroundColor'],
+        backgroundColor: styles['ThemeSurfaceToolbarBackgroundColor'],
         separatorColor: styles['ThemeToolbarSeparatorColor'],
       },
       text: {
@@ -389,6 +392,12 @@ export function createGdevelopTheme({
         },
         highlighted: {
           backgroundColor: styles['ThemeTextHighlightedBackgroundColor'],
+        },
+      },
+      linearProgress: {
+        color: {
+          complete: styles['ThemeLinearProgressColorComplete'],
+          incomplete: styles['ThemeLinearProgressColorIncomplete'],
         },
       },
       home: {
@@ -409,6 +418,18 @@ export function createGdevelopTheme({
           hover: styles['ThemeLinkHoverColor'],
         },
       },
+      switch: {
+        trackColor: {
+          default: styles['ThemeSwitchDefaultTrackColor'],
+          toggled: styles['ThemeSwitchToggledTrackColor'],
+          disabled: styles['ThemeSwitchDisabledTrackColor'],
+        },
+        thumbColor: {
+          default: styles['ThemeSwitchDefaultThumbColor'],
+          toggled: styles['ThemeSwitchToggledThumbColor'],
+          disabled: styles['ThemeSwitchDisabledThumbColor'],
+        },
+      },
       tabs: {
         indicator: {
           backgroundColor: styles['ThemeTabsIndicatorColor'],
@@ -424,12 +445,12 @@ export function createGdevelopTheme({
       },
       closableTabs: {
         fontFamily: styles['GdevelopModernFontFamily'],
-        containerBackgroundColor: styles['ThemeSurfaceCanvasBackgroundColor'],
         backgroundColor: styles['ThemeClosableTabsDefaultBackgroundColor'],
         textColor: styles['ThemeClosableTabsDefaultColor'],
         selectedBackgroundColor:
           styles['ThemeClosableTabsSelectedBackgroundColor'],
         selectedTextColor: styles['ThemeClosableTabsSelectedColor'],
+        selectedBorderColor: styles['ThemeClosableTabsSelectedBorderColor'],
         ...closeableTabSizeOverrides,
       },
       imageThumbnail: {
@@ -476,7 +497,7 @@ export function createGdevelopTheme({
       },
       paper: {
         backgroundColor: {
-          dark: styles['ThemeSurfaceCanvasWindowBackgroundColor'],
+          dark: styles['ThemeSurfaceCanvasBackgroundColor'],
           medium: styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
           light: styles['ThemeSurfaceAlternateCanvasLightBackgroundColor'],
         },

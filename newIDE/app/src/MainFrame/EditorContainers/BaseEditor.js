@@ -15,6 +15,7 @@ export type EditorContainerExtraProps = {|
 
   // Homepage
   storageProviders?: Array<StorageProvider>,
+  initialTab?: ?string,
 |};
 
 export type RenderEditorContainerProps = {|
@@ -70,7 +71,7 @@ export type RenderEditorContainerProps = {|
   onCreateProject: (?ExampleShortHeader) => void,
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
-  onOpenOnboardingDialog: () => void,
+  selectInAppTutorial: (tutorialId: string) => void,
   onOpenProfile: () => void,
   onOpenPreferences: () => void,
   onOpenAbout: () => void,

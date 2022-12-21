@@ -40,6 +40,7 @@ import { ResponsiveWindowMeasurer } from '../../../UI/Reponsive/ResponsiveWindow
 import {
   shouldCloseOrCancel,
   shouldSubmit,
+  shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import Paper from '../../../UI/Paper';
 const gd: libGDevelop = global.gd;
@@ -552,6 +553,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                   highlights={this.state.errorHighlights}
                 />
                 <SemiControlledTextField
+                  id={this.props.id}
                   margin={this.props.isInline ? 'none' : 'dense'}
                   value={value}
                   floatingLabelText={description}
@@ -581,7 +583,11 @@ export default class ExpressionField extends React.Component<Props, State> {
                     // Apply the changes now as otherwise the onBlur handler
                     // has a risk not to be called (as the component will be
                     // unmounted).
-                    if (shouldCloseOrCancel(event) || shouldSubmit(event)) {
+                    if (
+                      shouldCloseOrCancel(event) ||
+                      shouldSubmit(event) ||
+                      shouldValidate(event)
+                    ) {
                       const value = event.currentTarget.value;
                       if (this.props.onChange) this.props.onChange(value);
                     }
@@ -664,6 +670,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                 })}
               {!this.props.isInline && (
                 <RaisedButton
+                  id={`open-${expressionType}-expression-popover-button`}
                   icon={<Functions />}
                   label={
                     expressionType === 'string'

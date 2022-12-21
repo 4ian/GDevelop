@@ -9,12 +9,10 @@ import {
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 
 export type AssetStorePageState = {|
-  isOnHomePage: boolean,
   openedAssetPack: PublicAssetPack | PrivateAssetPack | null,
   openedAssetShortHeader: ?AssetShortHeader,
   openedPrivateAssetPackListingData: ?PrivateAssetPackListingData,
   filtersState: FiltersState,
-  ignoreTextualSearch: boolean,
   scrollPosition?: ?number,
 |};
 
@@ -23,8 +21,7 @@ export type NavigationState = {|
   backToPreviousPage: () => void,
   openHome: () => void,
   clearHistory: () => void,
-  openSearchIfNeeded: () => void,
-  activateTextualSearch: () => void,
+  openSearchResultPage: () => void,
   openTagPage: string => void,
   openPackPage: (PublicAssetPack | PrivateAssetPack) => void,
   openPrivateAssetPackInformationPage: PrivateAssetPackListingData => void,
@@ -40,21 +37,29 @@ const noFilter: FiltersState = {
 };
 
 export const assetStoreHomePageState: AssetStorePageState = {
-  isOnHomePage: true,
   openedAssetShortHeader: null,
   openedAssetPack: null,
   openedPrivateAssetPackListingData: null,
   filtersState: noFilter,
-  ignoreTextualSearch: false,
 };
 
 const searchPageState: AssetStorePageState = {
-  isOnHomePage: false,
   openedAssetShortHeader: null,
   openedAssetPack: null,
   openedPrivateAssetPackListingData: null,
   filtersState: noFilter,
-  ignoreTextualSearch: false,
+};
+
+export const isHomePage = (pageState: AssetStorePageState) => {
+  return pageState === assetStoreHomePageState;
+};
+
+export const isSearchResultPage = (pageState: AssetStorePageState) => {
+  return (
+    !isHomePage(pageState) &&
+    !pageState.openedAssetShortHeader &&
+    !pageState.openedPrivateAssetPackListingData
+  );
 };
 
 type AssetStorePageHistory = {|
@@ -82,6 +87,8 @@ export const useNavigation = (): NavigationState => {
       },
       clearHistory: () => {
         setHistory(previousHistory => {
+          if (previousHistory.previousPages.length <= 1) return previousHistory;
+
           const currentPage =
             previousHistory.previousPages[
               previousHistory.previousPages.length - 1
@@ -89,28 +96,20 @@ export const useNavigation = (): NavigationState => {
           return { previousPages: [assetStoreHomePageState, currentPage] };
         });
       },
-      openSearchIfNeeded: () => {
-        const currentPage = previousPages[previousPages.length - 1];
-        if (currentPage.isOnHomePage || currentPage.openedAssetShortHeader) {
-          setHistory({ previousPages: [...previousPages, searchPageState] });
-        }
-      },
-      activateTextualSearch: () => {
+      openSearchResultPage: () => {
         setHistory(previousHistory => {
           const currentPage =
             previousHistory.previousPages[
               previousHistory.previousPages.length - 1
             ];
-          if (currentPage.isOnHomePage || currentPage.openedAssetShortHeader) {
+          if (!isSearchResultPage(currentPage)) {
             return {
+              ...previousHistory,
               previousPages: [
                 ...previousHistory.previousPages,
                 searchPageState,
               ],
             };
-          } else if (currentPage.ignoreTextualSearch) {
-            currentPage.ignoreTextualSearch = false;
-            return { previousPages: [...previousHistory.previousPages] };
           }
 
           return previousHistory;
@@ -122,7 +121,6 @@ export const useNavigation = (): NavigationState => {
           previousPages: [
             ...previousHistory.previousPages,
             {
-              isOnHomePage: false,
               openedAssetShortHeader: null,
               openedAssetPack: null,
               openedPrivateAssetPackListingData: null,
@@ -136,7 +134,6 @@ export const useNavigation = (): NavigationState => {
                 removeFilter: () => {},
                 setChosenCategory: () => {},
               },
-              ignoreTextualSearch: true,
             },
           ],
         }));
@@ -147,7 +144,6 @@ export const useNavigation = (): NavigationState => {
           previousPages: [
             ...previousHistory.previousPages,
             {
-              isOnHomePage: false,
               openedAssetShortHeader: null,
               openedAssetPack: assetPack,
               openedPrivateAssetPackListingData: null,
@@ -165,7 +161,6 @@ export const useNavigation = (): NavigationState => {
                 removeFilter: () => {},
                 setChosenCategory: () => {},
               },
-              ignoreTextualSearch: true,
             },
           ],
         }));
@@ -178,12 +173,10 @@ export const useNavigation = (): NavigationState => {
           previousPages: [
             ...previousHistory.previousPages,
             {
-              isOnHomePage: false,
               openedAssetShortHeader: null,
               openedAssetPack: null,
               openedPrivateAssetPackListingData: assetPack,
               filtersState: noFilter,
-              ignoreTextualSearch: true,
             },
           ],
         }));
@@ -194,12 +187,10 @@ export const useNavigation = (): NavigationState => {
           previousPages: [
             ...previousHistory.previousPages,
             {
-              isOnHomePage: false,
               openedAssetShortHeader: assetShortHeader,
               openedAssetPack: null,
               openedPrivateAssetPackListingData: null,
               filtersState: noFilter,
-              ignoreTextualSearch: true,
             },
           ],
         }));

@@ -55,8 +55,7 @@ void PanelSpriteObject::DoSerializeTo(gd::SerializerElement& element) const {
 }
 
 void PanelSpriteObject::ExposeResources(
-    gd::ArbitraryResourceWorker& worker,
-    gd::ResourcesManager *resourcesManager) {
+    gd::ArbitraryResourceWorker& worker) {
   worker.ExposeImage(textureName);
 }
 #endif

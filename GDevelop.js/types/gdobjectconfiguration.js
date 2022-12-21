@@ -7,7 +7,7 @@ declare class gdObjectConfiguration {
   updateProperty(name: string, value: string): boolean;
   getInitialInstanceProperties(instance: gdInitialInstance, project: gdProject, scene: gdLayout): gdMapStringPropertyDescriptor;
   updateInitialInstanceProperty(instance: gdInitialInstance, name: string, value: string, project: gdProject, scene: gdLayout): boolean;
-  exposeResources(worker: gdArbitraryResourceWorker, resourcesManager: gdResourcesManager): void;
+  exposeResources(worker: gdArbitraryResourceWorker): void;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   delete(): void;

@@ -26,10 +26,7 @@ class GD_EXTENSION_API TiledSpriteObject : public gd::ObjectConfiguration {
     return gd::make_unique<TiledSpriteObject>(*this);
   }
 
-#if defined(GD_IDE_ONLY)
-  virtual void ExposeResources(gd::ArbitraryResourceWorker &worker,
-                               gd::ResourcesManager *resourcesManager);
-#endif
+  virtual void ExposeResources(gd::ArbitraryResourceWorker &worker);
 
   virtual double GetWidth() const { return width; };
   virtual double GetHeight() const { return height; };

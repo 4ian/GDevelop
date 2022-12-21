@@ -163,9 +163,7 @@ void ObjectJsImplementation::__destroy__() {  // Useless?
       (int)this);
 }
 
-void ObjectJsImplementation::ExposeResources(
-    gd::ArbitraryResourceWorker& worker,
-    gd::ResourcesManager* resourcesManager) {
+void ObjectJsImplementation::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   std::map<gd::String, gd::PropertyDescriptor> properties = GetProperties();
 
   for (auto& property : properties) {
@@ -187,10 +185,10 @@ void ObjectJsImplementation::ExposeResources(
         worker.ExposeVideo(newPropertyValue);
       } else if (resourceType == "json") {
         worker.ExposeJson(newPropertyValue);
-        worker.ExposeEmbeddeds(newPropertyValue, resourcesManager);
+        worker.ExposeEmbeddeds(newPropertyValue);
       } else if (resourceType == "tilemap") {
         worker.ExposeTilemap(newPropertyValue);
-        worker.ExposeEmbeddeds(newPropertyValue, resourcesManager);
+        worker.ExposeEmbeddeds(newPropertyValue);
       } else if (resourceType == "bitmapFont") {
         worker.ExposeBitmapFont(newPropertyValue);
       }

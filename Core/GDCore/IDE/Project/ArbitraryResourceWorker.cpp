@@ -97,11 +97,11 @@ void ArbitraryResourceWorker::ExposeResources(
   }
 }
 
-void ArbitraryResourceWorker::ExposeEmbeddeds(
-    gd::String& resourceName,
-    gd::ResourcesManager* resourcesManager) {
-  if (!resourcesManager) return;
+void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
+  if (resourcesManagers.empty()) return;
+  gd::ResourcesManager* resourcesManager = resourcesManagers[0];
 
+  // TODO: can this be avoided?
   gd::Resource& resource = resourcesManager->GetResource(resourceName);
 
   if (!resource.GetMetadata().empty()) {

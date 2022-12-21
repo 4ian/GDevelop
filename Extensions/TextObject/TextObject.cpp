@@ -72,8 +72,7 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
 }
 
 void TextObject::ExposeResources(
-    gd::ArbitraryResourceWorker& worker,
-    gd::ResourcesManager *resourcesManager) {
+    gd::ArbitraryResourceWorker& worker) {
   worker.ExposeFont(fontName);
 }
 #endif

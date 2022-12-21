@@ -44,8 +44,7 @@ class GD_CORE_API SpriteObject : public gd::ObjectConfiguration {
     return gd::make_unique<SpriteObject>(*this);
   }
 
-  void ExposeResources(gd::ArbitraryResourceWorker& worker,
-                       gd::ResourcesManager* resourcesManager) override;
+  void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name,

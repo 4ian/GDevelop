@@ -102,10 +102,9 @@ class GD_CORE_API ArbitraryResourceWorker {
   virtual void ExposeFile(gd::String &resourceFileName) = 0;
 
   /**
-   * \brief Expose the embedded resources
+   * \brief Expose the embedded resources of the specified resource.
    */
-  virtual void ExposeEmbeddeds(gd::String &resourceName,
-                               gd::ResourcesManager *resourcesManager);
+  virtual void ExposeEmbeddeds(gd::String &resourceName);
 
  protected:
   const std::vector<gd::ResourcesManager *> &GetResources() {

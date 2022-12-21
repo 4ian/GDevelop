@@ -147,8 +147,7 @@ class GD_CORE_API ObjectConfiguration {
    *
    * \see ArbitraryResourceWorker
    */
-  virtual void ExposeResources(gd::ArbitraryResourceWorker& worker,
-                               gd::ResourcesManager* resourcesManager) { return; };
+  virtual void ExposeResources(gd::ArbitraryResourceWorker& worker) { return; };
   ///@}
 
 /** \name Serialization

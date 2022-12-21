@@ -992,7 +992,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   for (std::size_t s = 0; s < GetLayoutsCount(); s++) {
     for (std::size_t j = 0; j < GetLayout(s).GetObjectsCount();
          ++j) { // Add objects resources
-      GetLayout(s).GetObject(j).GetConfiguration().ExposeResources(worker, resourcesManager);
+      GetLayout(s).GetObject(j).GetConfiguration().ExposeResources(worker);
     }
 
     LaunchResourceWorkerOnEvents(*this, GetLayout(s).GetEvents(), worker);
@@ -1012,7 +1012,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
 
   // Add global objects resources
   for (std::size_t j = 0; j < GetObjectsCount(); ++j) {
-    GetObject(j).GetConfiguration().ExposeResources(worker, resourcesManager);
+    GetObject(j).GetConfiguration().ExposeResources(worker);
   }
 
   // Add loading screen background image if present

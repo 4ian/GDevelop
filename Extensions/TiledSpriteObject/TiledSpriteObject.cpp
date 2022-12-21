@@ -38,8 +38,7 @@ void TiledSpriteObject::DoSerializeTo(gd::SerializerElement& element) const {
 }
 
 void TiledSpriteObject::ExposeResources(
-    gd::ArbitraryResourceWorker& worker,
-    gd::ResourcesManager *resourcesManager) {
+    gd::ArbitraryResourceWorker& worker) {
   worker.ExposeImage(textureName);
 }
 #endif

@@ -104,20 +104,23 @@ void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
   gd::Resource& resource = resourcesManager->GetResource(resourceName);
 
   if (!resource.GetMetadata().empty()) {
-    gd::SerializerElement serializerElement = gd::Serializer::FromJSON(resource.GetMetadata());
+    gd::SerializerElement serializerElement =
+        gd::Serializer::FromJSON(resource.GetMetadata());
 
     if (serializerElement.HasChild("embeddedResourcesMapping")) {
       bool anyEmbeddedResourceNameWasRenamed = false;
-      gd::SerializerElement& embeddedResourcesMappingElement = serializerElement.GetChild("embeddedResourcesMapping");
+      gd::SerializerElement& embeddedResourcesMappingElement =
+          serializerElement.GetChild("embeddedResourcesMapping");
 
-      for (const auto& child : embeddedResourcesMappingElement.GetAllChildren()) {
-        const gd::String& targetResourceName = child.second->GetValue().GetString();
-
-          std::cout << targetResourceName << std::endl;
+      for (const auto& child :
+           embeddedResourcesMappingElement.GetAllChildren()) {
+        const gd::String& targetResourceName =
+            child.second->GetValue().GetString();
 
         if (resourcesManager->HasResource(targetResourceName)) {
           std::cout << targetResourceName << std::endl;
-          gd::Resource& targetResource = resourcesManager->GetResource(targetResourceName);
+          gd::Resource& targetResource =
+              resourcesManager->GetResource(targetResourceName);
           const gd::String& targetResourceKind = targetResource.GetKind();
 
           gd::String potentiallyUpdatedTargetResourceName = targetResourceName;
@@ -137,13 +140,11 @@ void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
           } else if (targetResourceKind == "video") {
             ExposeVideo(potentiallyUpdatedTargetResourceName);
           }
-          std::cout << potentiallyUpdatedTargetResourceName << std::endl;
 
           if (potentiallyUpdatedTargetResourceName != targetResourceName) {
             // The resource name was renamed. Also update the mapping.
             child.second->SetStringValue(potentiallyUpdatedTargetResourceName);
             anyEmbeddedResourceNameWasRenamed = true;
-            std::cout <<"renamed" << std::endl;
           }
         }
       }

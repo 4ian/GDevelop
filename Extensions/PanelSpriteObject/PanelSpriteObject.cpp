@@ -54,7 +54,8 @@ void PanelSpriteObject::DoSerializeTo(gd::SerializerElement& element) const {
   element.SetAttribute("tiled", tiled);
 }
 
-void PanelSpriteObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {
+void PanelSpriteObject::ExposeResources(
+    gd::ArbitraryResourceWorker& worker) {
   worker.ExposeImage(textureName);
 }
 #endif

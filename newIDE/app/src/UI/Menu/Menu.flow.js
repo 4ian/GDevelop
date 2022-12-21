@@ -1,5 +1,7 @@
 // @flow
 
+import { type Node as ReactNode } from 'react';
+
 /**
  * The type describing a menu item supported both as in an Electron
  * menu and as a material-ui menu (for the web-app).
@@ -32,6 +34,19 @@ export type MenuItemTemplate =
   | {|
       type: 'separator',
     |};
+
+export interface ContextMenuImplementation {
+  buildFromTemplate(
+    template: Array<MenuItemTemplate>,
+    forceUpdate?: () => void
+  ): ?ReactNode;
+  showMenu(dimensions: {|
+    left: number,
+    top: number,
+    width: number,
+    height: number,
+  |}): void;
+}
 
 /**
  * The type describing a menu item without any function for the clicks.

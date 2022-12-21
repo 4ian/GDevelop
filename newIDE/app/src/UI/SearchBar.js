@@ -308,6 +308,13 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       // Called when the value of the autocomplete changes.
       if (reason === 'select-option') {
         tagsHandler && tagsHandler.add(newValue);
+
+        // Clear the value that was entered as an option was selected.
+        setValue('');
+
+        // Clear this value to make sure the autocomplete doesn't keep the
+        // last typed value in memory.
+        setAutocompleteValue('');
       } else {
         changeValue(newValue);
       }
@@ -320,8 +327,10 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     ) => {
       // Called when the value of the input within the autocomplete changes.
       if (reason === 'reset') {
-        // Happens when user selects an option
+        // Happens when user selects an option. Do as for 'select-option':
+        // Clear the value that was entered as an option was selected.
         setValue('');
+
         // Clear this value to make sure the autocomplete doesn't keep the
         // last typed value in memory.
         setAutocompleteValue('');

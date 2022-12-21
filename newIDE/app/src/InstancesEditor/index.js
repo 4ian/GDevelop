@@ -555,12 +555,14 @@ export default class InstancesEditor extends Component<Props> {
   addSerializedInstances = (
     position: [number, number],
     copyReferential: [number, number],
-    serializedInstances: Array<Object>
+    serializedInstances: Array<Object>,
+    preventSnapToGrid: boolean = false,
   ): Array<gdInitialInstance> => {
     return this._instancesAdder.addSerializedInstances(
       position,
       copyReferential,
-      serializedInstances
+      serializedInstances,
+      preventSnapToGrid
     );
   };
 

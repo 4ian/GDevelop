@@ -55,13 +55,21 @@ export default class InstancesAdder {
   addSerializedInstances = (
     position: [number, number],
     copyReferential: [number, number],
-    serializedInstances: Array<Object>
+    serializedInstances: Array<Object>,
+    preventSnapToGrid?: boolean = false
   ): Array<gdInitialInstance> => {
     const newInstances = serializedInstances.map(serializedInstance => {
       const instance = new gd.InitialInstance();
       unserializeFromJSObject(instance, serializedInstance);
-      instance.setX(instance.getX() - copyReferential[0] + position[0]);
-      instance.setY(instance.getY() - copyReferential[1] + position[1]);
+      const desiredPosition = [
+        instance.getX() - copyReferential[0] + position[0],
+        instance.getY() - copyReferential[1] + position[1],
+      ];
+      const newPos = preventSnapToGrid
+        ? desiredPosition
+        : roundPositionsToGrid(desiredPosition, this._instancesEditorSettings);
+      instance.setX(newPos[0]);
+      instance.setY(newPos[1]);
       const newInstance = this._instances
         .insertInitialInstance(instance)
         .resetPersistentUuid();

@@ -1155,7 +1155,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     const newInstances = editor.addSerializedInstances(
       [0, 0],
       [-2 * MOVEMENT_BIG_DELTA, -2 * MOVEMENT_BIG_DELTA],
-      serializedSelection
+      serializedSelection,
+      /* preventSnapToGrid */ true
     );
     this._onInstancesAdded(newInstances);
     this.instancesSelection.clearSelection();

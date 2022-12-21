@@ -549,12 +549,28 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   /**
-   * Immediately add instances for the specified objects at the given
+   * Immediately add serialized instances at the given
    * position (in scene coordinates).
    */
+  addSerializedInstances = (
+    position: [number, number],
+    copyReferential: [number, number],
+    serializedInstances: Array<Object>
+  ): Array<gdInitialInstance> => {
+    return this._instancesAdder.addSerializedInstances(
+      position,
+      copyReferential,
+      serializedInstances
+    );
+  };
+
+  /**
+   * Immediately add instances for the specified objects at the given
+   * position (in scene coordinates) given their names.
+   */
   addInstances = (
-    pos /*: [number, number] */,
-    objectNames /*: Array<string> */
+    pos: [number, number],
+    objectNames: Array<string>
   ): Array<gdInitialInstance> => {
     return this._instancesAdder.addInstances(pos, objectNames);
   };

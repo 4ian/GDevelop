@@ -1,5 +1,6 @@
 // @flow
 import { roundPosition } from '../Utils/GridHelpers';
+import { unserializeFromJSObject } from '../Utils/Serializer';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
 const gd: libGDevelop = global.gd;
 
@@ -50,6 +51,25 @@ export default class InstancesAdder {
   setInstancesEditorSettings(instancesEditorSettings: InstancesEditorSettings) {
     this._instancesEditorSettings = instancesEditorSettings;
   }
+
+  addSerializedInstances = (
+    position: [number, number],
+    copyReferential: [number, number],
+    serializedInstances: Array<Object>
+  ): Array<gdInitialInstance> => {
+    const newInstances = serializedInstances.map(serializedInstance => {
+      const instance = new gd.InitialInstance();
+      unserializeFromJSObject(instance, serializedInstance);
+      instance.setX(instance.getX() - copyReferential[0] + position[0]);
+      instance.setY(instance.getY() - copyReferential[1] + position[1]);
+      const newInstance = this._instances
+        .insertInitialInstance(instance)
+        .resetPersistentUuid();
+      instance.delete();
+      return newInstance;
+    });
+    return newInstances;
+  };
 
   /**
    * Immediately create new instance at the specified position

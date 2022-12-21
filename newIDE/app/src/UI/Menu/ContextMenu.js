@@ -85,7 +85,8 @@ const ElectronContextMenu = React.forwardRef<
 
   const open = (x, y, options) => {
     menuImplementation.buildFromTemplate(
-      props.buildMenuTemplate(props.i18n, options)
+      props.buildMenuTemplate(props.i18n, options),
+      () => {}
     );
     menuImplementation.showMenu({
       left: x || 0,

@@ -11,7 +11,10 @@ import Divider from '@material-ui/core/Divider';
 import Fade from '@material-ui/core/Fade';
 import makeStyles from '@material-ui/styles/makeStyles';
 import { adaptAcceleratorString } from '../AcceleratorString';
-import { type MenuItemTemplate } from './Menu.flow';
+import {
+  type MenuItemTemplate,
+  type ContextMenuImplementation,
+} from './Menu.flow';
 
 const useStyles = makeStyles({
   backdropRootForMouse: {
@@ -185,7 +188,8 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
  *  - checked (when `type` is 'checkbox')
  *  - submenu
  */
-export default class MaterialUIMenuImplementation {
+export default class MaterialUIMenuImplementation
+  implements ContextMenuImplementation {
   _onClose: () => void;
   constructor({ onClose }: {| onClose: () => void |}) {
     this._onClose = onClose;

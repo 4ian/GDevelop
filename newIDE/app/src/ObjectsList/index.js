@@ -316,6 +316,55 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       [copyObject, deleteObject]
     );
 
+    const addSerializedObjectToObjectsContainer = React.useCallback(
+      ({
+        objectName,
+        positionObjectName,
+        objectType,
+        global,
+        serializedObject,
+      }: {|
+        objectName: string,
+        positionObjectName: string,
+        objectType: string,
+        global: boolean,
+        serializedObject: Object,
+      |}): ObjectWithContext => {
+        const newName = newNameGenerator(
+          objectName,
+          name =>
+            objectsContainer.hasObjectNamed(name) ||
+            project.hasObjectNamed(name),
+          ''
+        );
+
+        const newObject = global
+          ? project.insertNewObject(
+              project,
+              objectType,
+              newName,
+              project.getObjectPosition(positionObjectName) + 1
+            )
+          : objectsContainer.insertNewObject(
+              project,
+              objectType,
+              newName,
+              objectsContainer.getObjectPosition(positionObjectName) + 1
+            );
+
+        unserializeFromJSObject(
+          newObject,
+          serializedObject,
+          'unserializeFrom',
+          project
+        );
+        newObject.setName(newName); // Unserialization has overwritten the name.
+
+        return { object: newObject, global };
+      },
+      [objectsContainer, project]
+    );
+
     const paste = React.useCallback(
       (objectWithContext: ObjectWithContext): ?ObjectWithContext => {
         if (!Clipboard.has(CLIPBOARD_KIND)) return null;
@@ -336,42 +385,20 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         if (!name || !type || !copiedObject) return;
 
-        const newName = newNameGenerator(
-          name,
-          name =>
-            objectsContainer.hasObjectNamed(name) ||
-            project.hasObjectNamed(name),
-          ''
-        );
-
-        const newObject = global
-          ? project.insertNewObject(
-              project,
-              type,
-              newName,
-              project.getObjectPosition(pasteObject.getName()) + 1
-            )
-          : objectsContainer.insertNewObject(
-              project,
-              type,
-              newName,
-              objectsContainer.getObjectPosition(pasteObject.getName()) + 1
-            );
-
-        unserializeFromJSObject(
-          newObject,
-          copiedObject,
-          'unserializeFrom',
-          project
-        );
-        newObject.setName(newName); // Unserialization has overwritten the name.
+        const newObjectWithContext = addSerializedObjectToObjectsContainer({
+          objectName: name,
+          positionObjectName: pasteObject.getName(),
+          objectType: type,
+          serializedObject: copiedObject,
+          global,
+        });
 
         onObjectModified(false);
-        if (onObjectPasted) onObjectPasted(newObject);
+        if (onObjectPasted) onObjectPasted(newObjectWithContext.object);
 
-        return { object: newObject, global };
+        return newObjectWithContext;
       },
-      [objectsContainer, onObjectModified, onObjectPasted, project]
+      [addSerializedObjectToObjectsContainer, onObjectModified, onObjectPasted]
     );
 
     const editName = React.useCallback(
@@ -383,19 +410,25 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       []
     );
 
-    const pasteAndRename = React.useCallback(
-      (objectWithContext: ObjectWithContext) => {
-        editName(paste(objectWithContext));
-      },
-      [editName, paste]
-    );
-
     const duplicateObject = React.useCallback(
       (objectWithContext: ObjectWithContext) => {
-        copyObject(objectWithContext);
-        pasteAndRename(objectWithContext);
+        const { object, global } = objectWithContext;
+
+        const type = object.getType();
+        const name = object.getName();
+        const serializedObject = serializeToJSObject(object);
+
+        const newObjectWithContext = addSerializedObjectToObjectsContainer({
+          objectName: name,
+          positionObjectName: name,
+          objectType: type,
+          serializedObject,
+          global,
+        });
+
+        editName(newObjectWithContext);
       },
-      [copyObject, pasteAndRename]
+      [addSerializedObjectToObjectsContainer, editName]
     );
 
     const rename = React.useCallback(

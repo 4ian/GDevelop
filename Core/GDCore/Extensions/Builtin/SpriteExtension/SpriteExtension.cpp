@@ -583,7 +583,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddExpression("Sprite",
                     _("Image"),
-                    _("Animation frame of the object"),
+                    _("Current frame of the animation of the object"),
+                    _("Animations and images"),
+                    "res/actions/sprite.png")
+      .AddParameter("object", _("Object"), "Sprite");
+
+  obj.AddExpression("AnimationFrameCount",
+                    _("Number of frames"),
+                    _("Number of frames in the current animation of the object"),
                     _("Animations and images"),
                     "res/actions/sprite.png")
       .AddParameter("object", _("Object"), "Sprite");

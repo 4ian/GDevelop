@@ -143,21 +143,28 @@ const AssetPackInstallDialog = ({
 
       setAreAssetsBeingInstalled(true);
       try {
-        const assets: Array<Asset> = (await Promise.all(
-          assetShortHeaders.map(assetShortHeader => {
+        const fetchedAssets = await PromisePool.withConcurrency(6)
+          .for(assetShortHeaders)
+          .process<Asset>(async assetShortHeader => {
             const asset = isPrivateAsset(assetShortHeader)
-              ? fetchPrivateAsset(assetShortHeader, {
+              ? await fetchPrivateAsset(assetShortHeader, {
                   environment,
                 })
-              : getPublicAsset(assetShortHeader, { environment });
+              : await getPublicAsset(assetShortHeader, { environment });
+            if (!asset) {
+              throw new Error(
+                'Unable to install the asset because it could not be fetched.'
+              );
+            }
             return asset;
-          })
-        )).filter(Boolean);
-        if (assets.length < assetShortHeaders.length) {
+          });
+        if (fetchedAssets.errors.length) {
           throw new Error(
-            'Unable to install the assets because it could not be fetched.'
+            'Error(s) while installing assets. The first error is: ' +
+              fetchedAssets.errors[0].message
           );
         }
+        const assets = fetchedAssets.results;
 
         const requiredExtensionInstallation = await checkRequiredExtensionUpdate(
           {
